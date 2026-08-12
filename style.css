@@ -46,8 +46,7 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 60px;
-    flex-wrap: nowrap;
+    gap: 80px; /* wider spacing for dramatic rise */
     margin-top: 60px;
 }
 
@@ -59,14 +58,14 @@ button:hover {
 }
 
 .rock-icon {
-    width: 200px;
+    width: 220px; /* slightly larger stones */
     height: auto;
     filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.6));
     transition: transform 0.3s ease;
 }
 
 .rock-icon:hover {
-    transform: scale(1.05);
+    transform: scale(1.08);
 }
 
 .difficulty-info {
@@ -74,14 +73,14 @@ button:hover {
     text-align: center;
 }
 
-/* Stepping upward effect */
-.academy { transform: translateY(60px); }
-.genin { transform: translateY(40px); }
-.chunin { transform: translateY(20px); }
+/* Rising staircase effect (left → right) */
+.academy      { transform: translateY(120px); }
+.genin        { transform: translateY(80px); }
+.chunin       { transform: translateY(40px); }
 .specialjonin { transform: translateY(0px); }
-.jonin { transform: translateY(-20px); }
-.anbu { transform: translateY(-40px); }
-.kage { transform: translateY(-60px); }
+.jonin        { transform: translateY(-40px); }
+.anbu         { transform: translateY(-80px); }
+.kage         { transform: translateY(-120px); }
 
 /* Village Page */
 .village-container {
