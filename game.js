@@ -44,8 +44,15 @@ function goToDifficulty() {
 }
 
 function goBackToJourney() {
+    // From difficulty page → back to journey page
     document.getElementById("difficulty-page").style.display = "none";
     document.getElementById("journey-page").style.display = "block";
+}
+
+function goBackToLogin() {
+    // From journey page → back to login page
+    document.getElementById("journey-page").style.display = "none";
+    document.getElementById("login-page").style.display = "block";
 }
 
 // --- Difficulty ---
