@@ -1,5 +1,5 @@
 body {
-    background-color: #0a0a0a;
+    background-color: #000;
     color: #e0e0e0;
     font-family: Arial, sans-serif;
     margin: 0;
@@ -42,33 +42,44 @@ button:hover {
 }
 
 .difficulty-path {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 60px;
+    flex-wrap: nowrap;
+    margin-top: 60px;
     position: relative;
-    width: 100%;
-    max-width: 900px;
-    height: 600px;
-    margin-top: 40px;
 }
 
 .difficulty-level {
-    position: absolute;
-    width: 200px;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    transform-origin: center;
 }
 
 .rock-icon {
-    width: 100%;
+    width: 200px;
     height: auto;
-    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.4));
+    filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.6));
+    transition: transform 0.3s ease;
+}
+
+.rock-icon:hover {
+    transform: scale(1.05);
 }
 
 .difficulty-info {
     margin-top: -20px;
+    text-align: center;
 }
 
-.academy { left: 0; bottom: 0; }
-.genin { left: 120px; bottom: 60px; }
-.chunin { left: 240px; bottom: 120px; }
-.specialjonin { left: 360px; bottom: 180px; }
-.jonin { left: 480px; bottom: 240px; }
-.anbu { left: 600px; bottom: 300px; }
-.kage { left: 720px; bottom: 360px; }
+/* Stepping upward effect */
+.academy { transform: translateY(60px); }
+.genin { transform: translateY(40px); }
+.chunin { transform: translateY(20px); }
+.specialjonin { transform: translateY(0px); }
+.jonin { transform: translateY(-20px); }
+.anbu { transform: translateY(-40px); }
+.kage { transform: translateY(-60px); }
