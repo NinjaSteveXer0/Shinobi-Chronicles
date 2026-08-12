@@ -5,40 +5,61 @@
   top: 0;
   width: 100%;
   height: 100%;
-  pointer-events: none; /* clicks pass through to images/buttons */
+  pointer-events: none;
   overflow: visible;
   z-index: 5;
 }
 
-/* make sure difficulty-levels are above canvas background but below overlay for pointer events */
-.difficulty-level { z-index: 3; }
+/* Difficulty levels above background but below overlay */
+.difficulty-level {
+  position: absolute;
+  z-index: 3;
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
 
-/* Natural image look (no cards) */
-.difficulty-level { background: transparent; padding: 0; box-shadow: none; }
-.rock-icon { border-radius: 6px; }
+/* Icon styling */
+.rock-icon {
+  border-radius: 6px;
+  width: clamp(80px, 10vw, 160px);
+  height: auto;
+  transition: transform 0.3s ease;
+}
 
-/* Final positions (adjusted per your request) */
-/* Academy Student: closer to bottom-left */
-:root { --anchor-left:14%; --anchor-top:92%; --step-h:9.5%; --step-v:13%; --icon-max:140px; --icon-min:72px; }
+.rock-icon:hover {
+  transform: scale(1.1);
+}
 
-.academy      { left: var(--anchor-left); top: var(--anchor-top); }
-.genin        { left: calc(var(--anchor-left) + 1 * var(--step-h)); top: calc(var(--anchor-top) - 1 * var(--step-v)); }
-.chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
-.specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
-.jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
-.anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
+/* Vertical layout (up-and-down pattern) */
+:root {
+  --anchor-left: 50%;
+  --anchor-top: 85%;
+  --step-v: 10%;
+}
 
-/* Kage: closer to top-right */
-.kage         { left: calc(var(--anchor-left) + 6.6 * var(--step-h)); top: calc(var(--anchor-top) - 6.8 * var(--step-v)); }
+.academy      { left: var(--anchor-left); top: var(--anchor-top); transform: translateX(-50%); }
+.genin        { left: var(--anchor-left); top: calc(var(--anchor-top) - 1 * var(--step-v)); transform: translateX(-50%); }
+.chunin       { left: var(--anchor-left); top: calc(var(--anchor-top) - 2 * var(--step-v)); transform: translateX(-50%); }
+.specialjonin { left: var(--anchor-left); top: calc(var(--anchor-top) - 3 * var(--step-v)); transform: translateX(-50%); }
+.jonin        { left: var(--anchor-left); top: calc(var(--anchor-top) - 4 * var(--step-v)); transform: translateX(-50%); }
+.anbu         { left: var(--anchor-left); top: calc(var(--anchor-top) - 5 * var(--step-v)); transform: translateX(-50%); }
+.kage         { left: var(--anchor-left); top: calc(var(--anchor-top) - 6 * var(--step-v)); transform: translateX(-50%); }
 
-/* Paid items: slightly higher than the far bottom-right */
-.akatsuki     { left: calc(var(--anchor-left) + 6.0 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
-.jinchuriki   { left: calc(var(--anchor-left) + 6.8 * var(--step-h)); top: calc(var(--anchor-top) - 2.2 * var(--step-v)); }
+/* Paid items slightly offset to the right */
+.akatsuki     { left: calc(var(--anchor-left) + 15%); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
+.jinchuriki   { left: calc(var(--anchor-left) + 15%); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
 
 /* Paid badge small tweak */
-.paid-badge { font-size:11px; padding:4px 6px; margin-left:6px; vertical-align:middle; }
+.paid-badge {
+  font-size: 11px;
+  padding: 4px 6px;
+  margin-left: 6px;
+  vertical-align: middle;
+}
 
-/* ensure overlay scales on resize */
-@media (max-width:900px) {
-  :root { --step-h:8%; --step-v:12%; --icon-max:120px; }
+/* Responsive scaling */
+@media (max-width: 900px) {
+  :root { --step-v: 8%; }
+  .rock-icon { width: clamp(60px, 15vw, 120px); }
 }
