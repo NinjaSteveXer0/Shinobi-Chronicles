@@ -1,34 +1,25 @@
-/* Material-inspired style.css
-   - Material elevation, consistent spacing, diagonal grid alignment
-   - Ripple effect for buttons, responsive icon sizing
-*/
+/* style.css - natural image look, no cards; diagonal repositioning per your request */
 
 :root{
   --bg:#000;
-  --surface:#0f0f10;
-  --card:#111214;
+  --muted:#d0d0d0;
   --accent:#ff1a1a;
-  --muted:#bfbfbf;
-  --gold1:#b8860b;
-  --gold2:#ffd27a;
-  --icon-min:84px;
+  --icon-min:72px;
   --icon-max:150px;
   --canvas-h:62vh;
-  --card-radius:12px;
-  --card-pad:12px;
-  --shadow-1: 0 1px 3px rgba(0,0,0,0.6);
-  --shadow-2: 0 6px 18px rgba(0,0,0,0.6);
-  --shadow-hover: 0 18px 40px rgba(0,0,0,0.65);
-  --step-v: 12%; /* vertical step between ranks (adjust to taste) */
-  --step-h: 6.5%; /* horizontal step between ranks */
+  /* global diagonal anchor (change these two to shift whole diagonal) */
+  --anchor-left:18%;   /* leftmost anchor for Academy Student */
+  --anchor-top:92%;    /* top position for Academy Student (near bottom) */
+  --step-h:8.5%;       /* horizontal step between ranks */
+  --step-v:12.5%;      /* vertical step between ranks (smaller = flatter slope) */
 }
 
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:#e6e6e6;font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;-webkit-font-smoothing:antialiased}
-.page{min-height:100vh;padding:20px 18px;display:flex;flex-direction:column;align-items:center}
+html,body{height:100%;margin:0;background:var(--bg);color:#eaeaea;font-family:Arial,Helvetica,sans-serif}
+.page{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
 
 /* Title */
-h1{color:var(--accent);font-weight:700;letter-spacing:0.6px;margin:6px 0 12px;text-shadow:0 0 8px rgba(153,0,0,0.12)}
+h1{color:var(--accent);margin:8px 0 12px;font-weight:700}
 
 /* Canvas */
 .difficulty-path{
@@ -37,139 +28,88 @@ h1{color:var(--accent);font-weight:700;letter-spacing:0.6px;margin:6px 0 12px;te
   max-width:1200px;
   height:var(--canvas-h);
   margin-top:18px;
-  margin-bottom:8px;
-  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent 40%);
-  border-radius:14px;
-  padding:18px;
+  margin-bottom:12px;
   overflow:visible;
-  display:block;
 }
 
-/* Material card for each level */
+/* Natural stone: no card background, only image + subtle label */
 .difficulty-level{
   position:absolute;
   transform:translate(-50%,-50%);
-  width:220px;
-  background:linear-gradient(180deg,var(--card), #0b0b0c);
-  border-radius:var(--card-radius);
-  padding:var(--card-pad);
-  box-shadow:var(--shadow-1);
-  transition: box-shadow .18s ease, transform .18s ease;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  gap:8px;
   text-align:center;
+  width:auto;
+  pointer-events:auto;
+  background:transparent;
+  padding:0;
+  border-radius:0;
+  box-shadow:none;
 }
 
-/* Hover elevation */
-.difficulty-level:hover{
-  box-shadow:var(--shadow-hover);
-  transform:translate(-50%,-54%);
-}
-
-/* Icon sizing (responsive) */
+/* Image styling: natural, no frame */
 .rock-icon{
   width:clamp(var(--icon-min), 11.5vw, var(--icon-max));
   height:auto;
-  border-radius:10px;
   display:block;
-  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.55));
-  transition: transform .18s ease, filter .18s ease;
+  margin:0 auto;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.6));
+  transition: transform .16s ease, filter .16s ease;
+  border-radius:6px; /* small rounding to match source if images have soft edges */
 }
 
-/* Icon lift on card hover */
-.difficulty-level:hover .rock-icon{ transform:translateY(-6px) scale(1.03); filter: drop-shadow(0 18px 36px rgba(0,0,0,0.6)); }
+/* subtle lift on hover */
+.difficulty-level:hover .rock-icon{
+  transform: translateY(-6px) scale(1.03);
+  filter: drop-shadow(0 20px 36px rgba(0,0,0,0.65));
+}
 
-/* Text */
-.difficulty-info h2{margin:0;font-size:16px;font-weight:700;color:#fff}
-.difficulty-info p{margin:0;font-size:13px;color:var(--muted)}
-
-/* Buttons (Material-ish) */
-button{
-  --ripple-color: rgba(255,255,255,0.12);
-  position:relative;
-  overflow:hidden;
-  border:none;
-  background:var(--accent);
-  color:#fff;
-  padding:8px 12px;
-  border-radius:8px;
-  cursor:pointer;
+/* label sits just under the image, minimal styling */
+.difficulty-info{
+  margin-top:8px;
+  color:var(--muted);
   font-weight:700;
-  letter-spacing:0.4px;
-  box-shadow: 0 6px 14px rgba(153,0,0,0.12);
-  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
-}
-button:active{ transform: translateY(1px) scale(.995) }
-
-/* Ripple (pure CSS) */
-button::after{
-  content:"";
-  position:absolute;
-  left:50%; top:50%;
-  width:0; height:0;
-  background:var(--ripple-color);
-  border-radius:50%;
-  transform:translate(-50%,-50%);
-  transition: width .35s ease, height .35s ease, opacity .35s ease;
-  opacity:0;
-}
-button:focus::after, button:active::after{
-  width:220px; height:220px; opacity:1; transition: width .35s ease, height .35s ease, opacity .6s ease;
+  font-size:13px;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+  background:transparent;
+  width:auto;
+  line-height:1;
 }
 
-/* Paid items styling (premium look) */
-.paid-level{
-  background: linear-gradient(180deg, rgba(30,20,10,0.6), rgba(10,8,6,0.9));
-  border: 1px solid rgba(200,150,40,0.12);
-  box-shadow: 0 10px 30px rgba(200,140,40,0.08);
-}
-.paid-badge{display:inline-block;background:linear-gradient(90deg,var(--gold1),var(--gold2));color:#111;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;margin-top:6px}
+/* remove any default button/card visuals inside levels */
+.difficulty-level button{ margin-top:8px; padding:6px 10px; border-radius:8px; font-weight:700; cursor:pointer; }
 
-/* Paid locked overlay */
-.paid-locked::after{
-  content:"LOCKED";
-  position:absolute;
-  top:8px; right:8px;
-  background:rgba(0,0,0,0.6);
-  color:var(--gold2);
-  padding:6px 8px;
-  border-radius:8px;
-  font-weight:800;
-  font-size:11px;
-  transform:rotate(-8deg);
-  box-shadow:0 6px 12px rgba(0,0,0,0.5);
-}
+/* Paid items: visually distinct but still natural (gold tint + small badge) */
+.paid-level .rock-icon{ filter: drop-shadow(0 18px 36px rgba(200,140,40,0.28)); }
+.paid-badge{ display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:12px; margin-top:6px; }
 
-/* Responsive: shrink card width on small screens */
-@media (max-width:1000px){
-  .difficulty-level{ width:190px; padding:10px }
-  :root{ --icon-max:130px; --canvas-h:68vh; --step-v:13% }
-}
-@media (max-width:700px){
-  .difficulty-level{ width:160px; padding:8px }
-  :root{ --icon-min:64px; --icon-max:110px; --canvas-h:82vh; --step-h:5.5%; --step-v:11% }
-}
-
-/* ---------- Diagonal grid positions (regular steps) ----------
-   Base anchor (Academy) and then each next rank uses consistent offsets.
-   Adjust the anchorLeft/anchorTop to nudge the whole diagonal.
+/* ---------- Positions (natural diagonal) ----------
+   Academy anchor is the left/bottom start; subsequent ranks use consistent steps.
+   Kage is placed near the top-right by using multiple steps from the anchor.
+   Akatsuki/Jinchuriki are slightly higher than the far bottom-right (paid area).
 */
-:root{ --anchor-left:34%; --anchor-top:86%; } /* change these to shift whole diagonal */
 
+/* Academy Student: bottom-left anchor (moved in from extreme left) */
 .academy      { left: var(--anchor-left); top: var(--anchor-top); }
-.genin        { left: calc(var(--anchor-left) + var(--step-h)); top: calc(var(--anchor-top) - var(--step-v)); }
+
+/* Genin -> Chunin -> Special Jonin -> Jonin -> ANBU -> Kage (regular steps) */
+.genin        { left: calc(var(--anchor-left) + 1 * var(--step-h)); top: calc(var(--anchor-top) - 1 * var(--step-v)); }
 .chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
 .specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
 .jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
 .anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
+
+/* Kage: closer to top-right (6 steps up/right from anchor) */
 .kage         { left: calc(var(--anchor-left) + 6 * var(--step-h)); top: calc(var(--anchor-top) - 6 * var(--step-v)); }
 
-/* If you prefer Akatsuki/Jinchuriki inside canvas but low, uncomment and tune:
-.akatsuki { left: calc(var(--anchor-left) + 4.5 * var(--step-h)); top: calc(var(--anchor-top) - 2.5 * var(--step-v)); }
-.jinchuriki{ left: calc(var(--anchor-left) + 5.2 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
-*/
+/* Paid items: slightly higher than the far bottom-right (not at the very bottom) */
+.akatsuki     { left: calc(var(--anchor-left) + 5.5 * var(--step-h)); top: calc(var(--anchor-top) - 1.2 * var(--step-v)); }
+.jinchuriki   { left: calc(var(--anchor-left) + 6.2 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
 
-/* Paid-row fallback (keeps them visually separate) */
-.paid-row{ width:100%; max-width:1200px; display:flex; justify-content:center; gap:18px; margin-top:18px; padding:8px 12px }
+/* ---------- Responsive tweaks ---------- */
+@media (max-width:1100px){
+  :root{ --icon-max:130px; --canvas-h:68vh; --step-h:7.5%; --step-v:13%; }
+  .difficulty-info{ font-size:12px; }
+}
+@media (max-width:700px){
+  :root{ --icon-min:56px; --icon-max:110px; --canvas-h:82vh; --step-h:6.5%; --step-v:11%; --anchor-left:22%; --anchor-top:90%; }
+  .difficulty-info{ font-size:12px; }
+}
