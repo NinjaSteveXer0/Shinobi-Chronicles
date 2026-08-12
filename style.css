@@ -1,153 +1,175 @@
-/* style.css - responsive diagonal layout that fits at 100% zoom */
+/* Material-inspired style.css
+   - Material elevation, consistent spacing, diagonal grid alignment
+   - Ripple effect for buttons, responsive icon sizing
+*/
 
-/* Base */
-:root {
-  --icon-min: 90px;
-  --icon-max: 160px;
-  --canvas-height: 60vh;
+:root{
+  --bg:#000;
+  --surface:#0f0f10;
+  --card:#111214;
+  --accent:#ff1a1a;
+  --muted:#bfbfbf;
+  --gold1:#b8860b;
+  --gold2:#ffd27a;
+  --icon-min:84px;
+  --icon-max:150px;
+  --canvas-h:62vh;
+  --card-radius:12px;
+  --card-pad:12px;
+  --shadow-1: 0 1px 3px rgba(0,0,0,0.6);
+  --shadow-2: 0 6px 18px rgba(0,0,0,0.6);
+  --shadow-hover: 0 18px 40px rgba(0,0,0,0.65);
+  --step-v: 12%; /* vertical step between ranks (adjust to taste) */
+  --step-h: 6.5%; /* horizontal step between ranks */
 }
 
-html, body {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  background: #000;
-  color: #e0e0e0;
-  font-family: Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  box-sizing: border-box;
-}
-
-/* Page container */
-.page {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-  padding: 20px;
-  box-sizing: border-box;
-}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;background:var(--bg);color:#e6e6e6;font-family: "Roboto", "Helvetica Neue", Arial, sans-serif;-webkit-font-smoothing:antialiased}
+.page{min-height:100vh;padding:20px 18px;display:flex;flex-direction:column;align-items:center}
 
 /* Title */
-h1 {
-  color: #ff1a1a;
-  text-shadow: 0 0 8px #990000;
-  margin: 8px 0 16px;
+h1{color:var(--accent);font-weight:700;letter-spacing:0.6px;margin:6px 0 12px;text-shadow:0 0 8px rgba(153,0,0,0.12)}
+
+/* Canvas */
+.difficulty-path{
+  position:relative;
+  width:100%;
+  max-width:1200px;
+  height:var(--canvas-h);
+  margin-top:18px;
+  margin-bottom:8px;
+  background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent 40%);
+  border-radius:14px;
+  padding:18px;
+  overflow:visible;
+  display:block;
 }
 
-/* Difficulty canvas: use viewport-relative height so it fits without zoom */
-.difficulty-path {
-  position: relative;
-  width: 100%;
-  max-width: 1200px;
-  height: var(--canvas-height);
-  margin-top: 28px;
-  margin-bottom: 12px;
-  box-sizing: border-box;
-  overflow: visible;
-  pointer-events: auto;
+/* Material card for each level */
+.difficulty-level{
+  position:absolute;
+  transform:translate(-50%,-50%);
+  width:220px;
+  background:linear-gradient(180deg,var(--card), #0b0b0c);
+  border-radius:var(--card-radius);
+  padding:var(--card-pad);
+  box-shadow:var(--shadow-1);
+  transition: box-shadow .18s ease, transform .18s ease;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  text-align:center;
 }
 
-/* Each level is absolutely positioned inside the canvas and centered by left/top */
-.difficulty-level {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  width: auto;
-  pointer-events: auto;
+/* Hover elevation */
+.difficulty-level:hover{
+  box-shadow:var(--shadow-hover);
+  transform:translate(-50%,-54%);
 }
 
-/* Responsive icon sizing */
-.rock-icon {
-  width: clamp(var(--icon-min), 12vw, var(--icon-max));
-  height: auto;
-  display: block;
-  margin: 0 auto;
-  filter: drop-shadow(0 0 16px rgba(255,0,0,0.35));
+/* Icon sizing (responsive) */
+.rock-icon{
+  width:clamp(var(--icon-min), 11.5vw, var(--icon-max));
+  height:auto;
+  border-radius:10px;
+  display:block;
+  filter: drop-shadow(0 8px 20px rgba(0,0,0,0.55));
   transition: transform .18s ease, filter .18s ease;
 }
 
-.rock-icon:hover { transform: scale(1.06); filter: drop-shadow(0 0 26px rgba(255,0,0,0.55)); }
+/* Icon lift on card hover */
+.difficulty-level:hover .rock-icon{ transform:translateY(-6px) scale(1.03); filter: drop-shadow(0 18px 36px rgba(0,0,0,0.6)); }
 
-.difficulty-info {
-  margin-top: 8px;
-  color: #eee;
-  width: 220px;
-  box-sizing: border-box;
+/* Text */
+.difficulty-info h2{margin:0;font-size:16px;font-weight:700;color:#fff}
+.difficulty-info p{margin:0;font-size:13px;color:var(--muted)}
+
+/* Buttons (Material-ish) */
+button{
+  --ripple-color: rgba(255,255,255,0.12);
+  position:relative;
+  overflow:hidden;
+  border:none;
+  background:var(--accent);
+  color:#fff;
+  padding:8px 12px;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:700;
+  letter-spacing:0.4px;
+  box-shadow: 0 6px 14px rgba(153,0,0,0.12);
+  transition: transform .12s ease, box-shadow .12s ease, background .12s ease;
+}
+button:active{ transform: translateY(1px) scale(.995) }
+
+/* Ripple (pure CSS) */
+button::after{
+  content:"";
+  position:absolute;
+  left:50%; top:50%;
+  width:0; height:0;
+  background:var(--ripple-color);
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  transition: width .35s ease, height .35s ease, opacity .35s ease;
+  opacity:0;
+}
+button:focus::after, button:active::after{
+  width:220px; height:220px; opacity:1; transition: width .35s ease, height .35s ease, opacity .6s ease;
 }
 
-/* ---------- Diagonal positions (use top/left so they scale with canvas height) */
-/* Academy Student: much lower and moved right */
-.academy      { left: 34%; top: 86%; }
+/* Paid items styling (premium look) */
+.paid-level{
+  background: linear-gradient(180deg, rgba(30,20,10,0.6), rgba(10,8,6,0.9));
+  border: 1px solid rgba(200,150,40,0.12);
+  box-shadow: 0 10px 30px rgba(200,140,40,0.08);
+}
+.paid-badge{display:inline-block;background:linear-gradient(90deg,var(--gold1),var(--gold2));color:#111;padding:6px 10px;border-radius:999px;font-weight:800;font-size:12px;margin-top:6px}
 
-/* Genin: slightly up and to the right of Academy */
-.genin        { left: 40%; top: 72%; }
-
-/* Chunin: continuing the diagonal */
-.chunin       { left: 48%; top: 58%; }
-
-/* Special Jōnin: mid-climb */
-.specialjonin { left: 56%; top: 44%; }
-
-/* Jōnin: higher */
-.jonin        { left: 62%; top: 30%; }
-
-/* ANBU: near the upper middle */
-.anbu         { left: 68%; top: 18%; }
-
-/* Kage: the top-right crown of the diagonal */
-.kage         { left: 74%; top: 8%; }
-
-/* ---------- Paid content: bottom row (separate from diagonal) ---------- */
-.paid-row {
-  width: 100%;
-  max-width: 1200px;
-  display: flex;
-  justify-content: center;
-  gap: 18px;
-  padding: 12px;
-  box-sizing: border-box;
-  margin-top: 18px;
-  align-items: flex-end;
+/* Paid locked overlay */
+.paid-locked::after{
+  content:"LOCKED";
+  position:absolute;
+  top:8px; right:8px;
+  background:rgba(0,0,0,0.6);
+  color:var(--gold2);
+  padding:6px 8px;
+  border-radius:8px;
+  font-weight:800;
+  font-size:11px;
+  transform:rotate(-8deg);
+  box-shadow:0 6px 12px rgba(0,0,0,0.5);
 }
 
-/* Paid items visually distinct */
-.paid-level .rock-icon { filter: drop-shadow(0 0 22px rgba(255,140,80,0.45)); }
-.paid-badge { background: linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:10px; font-weight:700; font-size:12px; }
+/* Responsive: shrink card width on small screens */
+@media (max-width:1000px){
+  .difficulty-level{ width:190px; padding:10px }
+  :root{ --icon-max:130px; --canvas-h:68vh; --step-v:13% }
+}
+@media (max-width:700px){
+  .difficulty-level{ width:160px; padding:8px }
+  :root{ --icon-min:64px; --icon-max:110px; --canvas-h:82vh; --step-h:5.5%; --step-v:11% }
+}
 
-/* If you still want paid items positioned inside the canvas but low, use these classes instead:
-   .akatsuki { left: 70%; top: 82%; } .jinchuriki { left: 76%; top: 82%; }
-   (But the paid-row approach keeps them visually separate and avoids layout overflow.)
+/* ---------- Diagonal grid positions (regular steps) ----------
+   Base anchor (Academy) and then each next rank uses consistent offsets.
+   Adjust the anchorLeft/anchorTop to nudge the whole diagonal.
+*/
+:root{ --anchor-left:34%; --anchor-top:86%; } /* change these to shift whole diagonal */
+
+.academy      { left: var(--anchor-left); top: var(--anchor-top); }
+.genin        { left: calc(var(--anchor-left) + var(--step-h)); top: calc(var(--anchor-top) - var(--step-v)); }
+.chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
+.specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
+.jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
+.anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
+.kage         { left: calc(var(--anchor-left) + 6 * var(--step-h)); top: calc(var(--anchor-top) - 6 * var(--step-v)); }
+
+/* If you prefer Akatsuki/Jinchuriki inside canvas but low, uncomment and tune:
+.akatsuki { left: calc(var(--anchor-left) + 4.5 * var(--step-h)); top: calc(var(--anchor-top) - 2.5 * var(--step-v)); }
+.jinchuriki{ left: calc(var(--anchor-left) + 5.2 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
 */
 
-/* ---------- Small-screen adjustments ---------- */
-@media (max-width: 1100px) {
-  :root { --icon-max: 140px; --canvas-height: 66vh; }
-  .difficulty-info { width: 180px; font-size: 14px; }
-  .academy { left: 32%; top: 88%; }
-  .genin   { left: 38%; top: 74%; }
-  .chunin  { left: 46%; top: 60%; }
-  .specialjonin { left: 54%; top: 46%; }
-  .jonin   { left: 60%; top: 34%; }
-  .anbu    { left: 66%; top: 22%; }
-  .kage    { left: 72%; top: 10%; }
-}
-
-@media (max-width: 700px) {
-  :root { --icon-min: 72px; --icon-max: 120px; --canvas-height: 80vh; }
-  .difficulty-path { height: var(--canvas-height); margin-top: 12px; }
-  /* stack more vertically: move left positions closer to center */
-  .academy { left: 30%; top: 90%; }
-  .genin   { left: 36%; top: 78%; }
-  .chunin  { left: 44%; top: 64%; }
-  .specialjonin { left: 52%; top: 50%; }
-  .jonin   { left: 60%; top: 36%; }
-  .anbu    { left: 66%; top: 22%; }
-  .kage    { left: 72%; top: 10%; }
-  .difficulty-info { width: 160px; font-size: 13px; }
-}
-
-/* ---------- Utility debug helpers (remove after tuning) ---------- */
-/* .difficulty-path { outline: 1px dashed rgba(0,255,255,0.12); } */
-/* .difficulty-level { outline: 1px solid rgba(255,0,0,0.08); } */
+/* Paid-row fallback (keeps them visually separate) */
+.paid-row{ width:100%; max-width:1200px; display:flex; justify-content:center; gap:18px; margin-top:18px; padding:8px 12px }
