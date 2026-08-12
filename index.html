@@ -51,77 +51,61 @@
     <div id="difficulty-page" class="page" style="display:none;">
         <h1>Select Your Difficulty</h1>
         <p class="difficulty-subtext">
-            Higher difficulties have tougher missions, but the rewards are greater and the respect is unforgettable...
+            Complete missions to unlock harder difficulties with greater rewards and legendary respect.
         </p>
 
-        <div class="difficulty-container">
-
-            <div class="difficulty-box">
+        <div class="difficulty-path">
+            <div class="difficulty-box academy">
                 <img src="Assets/Icons/Academy student.png" class="rock-icon">
                 <h2>Academy Student</h2>
                 <p>Basic training, simple survival.</p>
                 <button onclick="selectDifficulty('Academy Student')">Select</button>
             </div>
 
-            <div class="difficulty-box">
+            <div class="difficulty-box genin">
                 <img src="Assets/Icons/Genin.png" class="rock-icon">
                 <h2>Genin</h2>
                 <p>Simple missions, hidden dangers.</p>
                 <button onclick="selectDifficulty('Genin')">Select</button>
             </div>
 
-            <div class="difficulty-box">
+            <div class="difficulty-box chunin">
                 <img src="Assets/Icons/Chunin.png" class="rock-icon">
                 <h2>Chunin</h2>
                 <p>Teamwork and strategy are essential.</p>
                 <button onclick="selectDifficulty('Chunin')">Select</button>
             </div>
 
-            <div class="difficulty-box">
+            <div class="difficulty-box specialjonin">
                 <img src="Assets/Icons/Special Jonin.png" class="rock-icon">
                 <h2>Special Jōnin</h2>
                 <p>Elite precision and resolve.</p>
                 <button onclick="selectDifficulty('Special Jonin')">Select</button>
             </div>
 
-            <div class="difficulty-box">
+            <div class="difficulty-box jonin">
                 <img src="Assets/Icons/Jonin.png" class="rock-icon">
                 <h2>Jōnin</h2>
-                <p>Veteran missions, mastery required.</p>
+                <p>Elite missions, respect is unforgettable.</p>
                 <button onclick="selectDifficulty('Jonin')">Select</button>
             </div>
 
-            <div class="difficulty-box">
+            <div class="difficulty-box anbu">
                 <img src="Assets/Icons/Anbu.png" class="rock-icon">
                 <h2>ANBU</h2>
                 <p>Shadow operatives. Deadly missions.</p>
                 <button onclick="selectDifficulty('Anbu')">Select</button>
             </div>
 
-            <div class="difficulty-box">
+            <div class="difficulty-box kage">
                 <img src="Assets/Icons/Kage.png" class="rock-icon">
                 <h2>Kage</h2>
                 <p>The pinnacle of shinobi power.</p>
                 <button onclick="selectDifficulty('Kage')">Select</button>
             </div>
-
         </div>
 
         <button class="back-btn" onclick="goBackToJourney()">← Back</button>
-    </div>
-
-    <!-- VILLAGE PAGE -->
-    <div id="village-page" class="page" style="display:none;">
-        <button class="back-btn" onclick="goBackToDifficulty()">← Back</button>
-        <h1>Select Your Village or Faction</h1>
-        <div id="village-list"></div>
-    </div>
-
-    <!-- NINJA PAGE -->
-    <div id="ninja-page" class="page" style="display:none;">
-        <button class="back-btn" onclick="goBackToVillage()">← Back</button>
-        <h1 id="ninja-title"></h1>
-        <div id="ninja-container"></div>
     </div>
 
 </body>
