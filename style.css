@@ -1,4 +1,5 @@
-/* style.css - updated positions to match your sketch */
+/* style.css - repositioned diagonal climb; Akatsuki & Jinchuriki placed at bottom as paid content */
+
 body {
     background-color: #000;
     color: #e0e0e0;
@@ -8,8 +9,9 @@ body {
     text-align: center;
 }
 
+/* Page container */
 .page {
-    padding: 40px;
+    padding: 24px;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -21,6 +23,7 @@ body {
 h1 {
     color: #ff1a1a;
     text-shadow: 0 0 10px #990000;
+    margin-top: 8px;
 }
 
 /* Buttons */
@@ -28,48 +31,42 @@ button {
     background-color: #990000;
     color: white;
     border: none;
-    padding: 12px 20px;
-    margin: 10px;
+    padding: 10px 16px;
+    margin: 8px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 15px;
     border-radius: 6px;
-    transition: 0.2s;
+    transition: background-color .18s ease, transform .18s ease;
 }
 
-button:hover {
-    background-color: #cc0000;
-}
-
-.back-btn {
-    background-color: #333;
-}
+button:hover { background-color: #cc0000; transform: translateY(-2px); }
+.back-btn { background-color: #333; }
 
 /* ---------- Difficulty Path Container ---------- */
-/* Larger container and pushed down so the whole diagonal sits lower on the page */
+/* Taller canvas and pushed down so the diagonal sits lower on the page */
 .difficulty-path {
     position: relative;
     width: 100%;
     max-width: 1200px;
-    height: 720px;        /* tall canvas so bottom positions are visible */
-    margin-top: 120px;    /* push the whole path down on the page */
+    height: 760px;        /* tall canvas so bottom positions are visible */
+    margin-top: 80px;     /* push the whole path down on the page */
     margin-bottom: 40px;
-    pointer-events: none; /* allow clicks only on the inner buttons (we'll re-enable per-level) */
 }
 
 /* Each level is absolutely positioned inside the container */
 .difficulty-level {
     position: absolute;
     text-align: center;
-    pointer-events: auto; /* re-enable interactions for the level contents */
+    pointer-events: auto;
     transform: translate(-50%, 0); /* center by left coordinate */
 }
 
 /* Rock icon styling */
 .rock-icon {
-    width: 170px; /* slightly smaller to help fit the diagonal */
+    width: 170px;
     height: auto;
     filter: drop-shadow(0 0 18px rgba(255, 0, 0, 0.45));
-    transition: transform 0.22s ease, filter 0.22s ease;
+    transition: transform .22s ease, filter .22s ease;
     display: block;
     margin: 0 auto;
 }
@@ -84,94 +81,140 @@ button:hover {
     margin-top: -12px;
     text-align: center;
     color: #e8e8e8;
+    width: 220px;
 }
 
 /* ---------- Precise absolute positions (diagonal climb) ---------- */
-/* Academy Student: drastically lower-left but moved right from extreme left */
+/* Academy Student: drastically lower and moved right from extreme left */
 .academy {
-    left: 18%;      /* moved in from the far left */
-    bottom: 6%;     /* very low on the canvas */
+    left: 30%;      /* moved in from the left */
+    bottom: 4%;     /* very low on the canvas */
 }
 
 /* Genin: slightly up and to the right of Academy */
 .genin {
-    left: 28%;
+    left: 38%;
     bottom: 18%;
 }
 
 /* Chunin: continuing the diagonal */
 .chunin {
-    left: 38%;
+    left: 46%;
     bottom: 30%;
 }
 
 /* Special Jōnin: mid-climb */
 .specialjonin {
-    left: 48%;
+    left: 54%;
     bottom: 42%;
 }
 
 /* Jōnin: higher */
 .jonin {
-    left: 58%;
+    left: 62%;
     bottom: 54%;
 }
 
 /* ANBU: near the upper middle */
 .anbu {
-    left: 66%;
+    left: 68%;
     bottom: 64%;
-}
-
-/* Akatsuki and Jinchūriki: placed between ANBU and Kage, lower than previous top-right placement */
-.akatsuki {
-    left: 70%;
-    bottom: 68%;   /* between ANBU (64%) and Kage (76%) */
-    transform: translate(-50%, 0) scale(1.02); /* slight emphasis */
-    filter: drop-shadow(0 0 26px rgba(255, 80, 80, 0.6));
-}
-
-.jinchuriki {
-    left: 74%;
-    bottom: 72%;   /* slightly higher than Akatsuki but still between ANBU and Kage */
-    transform: translate(-50%, 0) scale(1.04); /* subtle extra emphasis */
-    filter: drop-shadow(0 0 30px rgba(255, 120, 80, 0.7));
 }
 
 /* Kage: the top-right crown of the diagonal */
 .kage {
-    left: 80%;
-    bottom: 76%;
+    left: 76%;
+    bottom: 74%;
+}
+
+/* ---------- Paid content: Akatsuki & Jinchuriki placed at bottom area ---------- */
+/* These are intentionally separated and anchored low on the page (paid content area) */
+/* Visual treatment: subtle gold border, small badge, slightly dimmed until purchased */
+.paid-level {
+    pointer-events: auto;
+    transition: transform .18s ease, opacity .18s ease;
+}
+
+/* Akatsuki and Jinchuriki anchored near the bottom, between Anbu and Kage horizontally but low vertically */
+.akatsuki {
+    left: 70%;
+    bottom: 6%;            /* anchored low on the page */
+    transform: translate(-50%, 0) scale(1.02);
+    opacity: 0.95;
+    border-radius: 6px;
+    filter: drop-shadow(0 0 22px rgba(200, 60, 60, 0.55));
+}
+
+/* Jinchuriki sits slightly to the right of Akatsuki in the paid area */
+.jinchuriki {
+    left: 76%;
+    bottom: 6%;            /* same bottom line as Akatsuki */
+    transform: translate(-50%, 0) scale(1.04);
+    opacity: 0.98;
+    filter: drop-shadow(0 0 28px rgba(255, 120, 80, 0.6));
+}
+
+/* Paid badge ribbon (small) */
+.paid-badge {
+    display: inline-block;
+    background: linear-gradient(90deg,#b8860b,#ffd27a);
+    color: #111;
+    font-weight: 700;
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    margin-top: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
+}
+
+/* Optional locked overlay for unpaid items */
+.paid-locked {
+    position: relative;
+}
+.paid-locked::after {
+    content: "LOCKED";
+    position: absolute;
+    left: 50%;
+    top: 8%;
+    transform: translate(-50%, -50%) rotate(-12deg);
+    background: rgba(0,0,0,0.6);
+    color: #ffd27a;
+    padding: 6px 10px;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1px;
+    pointer-events: none;
 }
 
 /* ---------- Responsive tweaks ---------- */
-@media (max-width: 1100px) {
-    .difficulty-path { height: 620px; margin-top: 90px; }
+@media (max-width: 1200px) {
+    .difficulty-path { height: 700px; margin-top: 70px; }
     .rock-icon { width: 150px; }
-    .academy { left: 16%; bottom: 4%; }
-    .genin { left: 26%; bottom: 16%; }
-    .chunin { left: 36%; bottom: 28%; }
-    .specialjonin { left: 46%; bottom: 40%; }
-    .jonin { left: 56%; bottom: 52%; }
-    .anbu { left: 64%; bottom: 62%; }
-    .akatsuki { left: 68%; bottom: 66%; }
-    .jinchuriki { left: 72%; bottom: 70%; }
-    .kage { left: 78%; bottom: 74%; }
+    .academy { left: 28%; bottom: 4%; }
+    .genin { left: 36%; bottom: 16%; }
+    .chunin { left: 44%; bottom: 28%; }
+    .specialjonin { left: 52%; bottom: 40%; }
+    .jonin { left: 60%; bottom: 52%; }
+    .anbu { left: 66%; bottom: 62%; }
+    .kage { left: 74%; bottom: 72%; }
+    .akatsuki { left: 70%; bottom: 6%; }
+    .jinchuriki { left: 76%; bottom: 6%; }
 }
 
-@media (max-width: 700px) {
+@media (max-width: 800px) {
     /* stack more vertically on very small screens */
-    .difficulty-path { height: 900px; margin-top: 40px; }
+    .difficulty-path { height: 920px; margin-top: 40px; }
     .rock-icon { width: 140px; }
-    .academy { left: 20%; bottom: 2%; }
-    .genin { left: 30%; bottom: 12%; }
-    .chunin { left: 40%; bottom: 26%; }
-    .specialjonin { left: 50%; bottom: 40%; }
-    .jonin { left: 60%; bottom: 54%; }
-    .anbu { left: 68%; bottom: 66%; }
-    .akatsuki { left: 70%; bottom: 70%; }
-    .jinchuriki { left: 74%; bottom: 74%; }
-    .kage { left: 78%; bottom: 78%; }
+    .academy { left: 30%; bottom: 3%; }
+    .genin { left: 38%; bottom: 12%; }
+    .chunin { left: 46%; bottom: 24%; }
+    .specialjonin { left: 54%; bottom: 36%; }
+    .jonin { left: 62%; bottom: 48%; }
+    .anbu { left: 68%; bottom: 60%; }
+    .kage { left: 76%; bottom: 70%; }
+    .akatsuki { left: 68%; bottom: 4%; }
+    .jinchuriki { left: 74%; bottom: 4%; }
 }
 
 /* ---------- Village Page (unchanged) ---------- */
@@ -179,27 +222,27 @@ button:hover {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 40px;
-    margin-top: 40px;
+    gap: 28px;
+    margin-top: 28px;
 }
 
 .village-box {
-    width: 180px;
-    padding: 20px;
+    width: 170px;
+    padding: 18px;
     background-color: #111;
     border: 2px solid #990000;
     border-radius: 10px;
     text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: transform .18s ease, box-shadow .18s ease;
 }
 
 .village-box:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(255, 26, 26, 0.6);
+    transform: scale(1.04);
+    box-shadow: 0 0 18px rgba(255, 26, 26, 0.5);
 }
 
 .village-icon {
-    width: 120px;
+    width: 110px;
     height: auto;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
 }
