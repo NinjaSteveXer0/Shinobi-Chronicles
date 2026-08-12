@@ -2,134 +2,119 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Difficulty Selection — Background + Guides</title>
+  <title>Difficulty Selection — Uniform Icons, 16:9 Canvas</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* ---------- CONFIG: set your background image here ---------- */
+    /* ---------- CONFIG (single place to edit) ---------- */
     :root{
       --bg-color: #000;
-      --bg-image: url("Assets/Backgrounds/level-bg.png"); /* <-- set your background file path */
-      --bg-overlay: rgba(0,0,0,0.28); /* darken background for contrast */
-      --anchor-left: 14%;
-      --anchor-top: 92%;
-      --step-h: 9.5%;
-      --step-v: 13%;
-      --canvas-h: 62vh;
-      --icon-bottom-size: 150px;
-      --icon-top-size: 84px;
+      --bg-image: none; /* set to url("Assets/Backgrounds/level-bg.png") if you want a background */
+      --overlay-dark: rgba(0,0,0,0.22);
+
+      /* Formation tuning */
+      --anchor-left: 14%;   /* leftmost starting point (Academy) */
+      --anchor-top: 92%;    /* vertical start (Academy) */
+      --step-h: 9.5%;       /* horizontal step between stones */
+      --step-v: 13%;        /* vertical step between stones */
+
+      /* Canvas and icon sizing */
+      --canvas-max-width: 1200px;
+      --canvas-aspect-ratio: 16/9; /* standard screen ratio */
+      --icon-size: 110px; /* all PNGs will be this size (same for every icon) */
+
+      /* Paid item offsets (multipliers of step values) */
       --paid-offset-x: 6.0;
       --paid-offset-y: 1.6;
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg-color);color:#eaeaea;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased}
-    .page{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
+    /* ---------- Base layout ---------- */
+    * { box-sizing: border-box; }
+    html,body { height:100%; margin:0; background:var(--bg-color); color:#eaeaea; font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing:antialiased; }
+    .page { min-height:100vh; padding:18px; display:flex; flex-direction:column; align-items:center; gap:12px; }
 
-    h1{color:#ff1a1a;margin:8px 0 12px;font-weight:700}
+    h1 { color:#ff1a1a; margin:6px 0 6px; font-weight:700; }
 
-    /* Canvas with background image */
-    .difficulty-path{
-      position:relative;
-      width:100%;
-      max-width:1200px;
-      height:var(--canvas-h);
-      margin-top:18px;
-      margin-bottom:12px;
-      overflow:visible;
-      border-radius:10px;
+    /* Canvas: uses standard 16:9 aspect ratio and scales responsively */
+    .difficulty-path {
+      position: relative;
+      width: 100%;
+      max-width: var(--canvas-max-width);
+      aspect-ratio: var(--canvas-aspect-ratio);
+      margin-top: 8px;
+      margin-bottom: 8px;
+      overflow: visible;
+      border-radius: 10px;
       background-image: var(--bg-image);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
       box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      background-color: #0a0a0a;
     }
-    /* subtle overlay to improve contrast */
+
+    /* subtle overlay to improve contrast if a background is used */
     .difficulty-path::after{
       content:"";
       position:absolute; left:0; top:0; right:0; bottom:0;
-      background:var(--bg-overlay);
+      background: var(--overlay-dark);
       pointer-events:none;
       border-radius:10px;
       z-index:1;
     }
 
-    /* natural image look — no cards */
-    .difficulty-level{
-      position:absolute;
-      transform:translate(-50%,-50%);
-      text-align:center;
-      background:transparent;
-      padding:0;
-      z-index:3;
-      pointer-events:auto;
+    /* Natural PNG look — no cards, icons are all the same size */
+    .difficulty-level {
+      position: absolute;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      background: transparent;
+      padding: 0;
+      z-index: 3;
+      pointer-events: auto;
     }
 
-    .rock-icon{
-      width:var(--icon-bottom-size);
-      height:auto;
-      display:block;
-      margin:0 auto;
+    /* All icons same size (user requested) */
+    .rock-icon {
+      width: var(--icon-size);
+      height: auto;
+      display: block;
+      margin: 0 auto;
       filter: drop-shadow(0 10px 22px rgba(0,0,0,0.6));
       transition: transform .16s ease, filter .16s ease;
-      border-radius:6px;
-      will-change:transform;
-      max-width:100%;
+      border-radius: 6px;
+      will-change: transform;
+      max-width: 100%;
     }
-    .difficulty-level:hover .rock-icon{
+    .difficulty-level:hover .rock-icon {
       transform: translateY(-6px) scale(1.03);
       filter: drop-shadow(0 20px 36px rgba(0,0,0,0.65));
     }
 
-    .difficulty-info{
-      margin-top:8px;
-      color:#d0d0d0;
-      font-weight:700;
-      font-size:13px;
-      text-shadow:0 1px 0 rgba(0,0,0,0.6);
-      line-height:1;
-      z-index:4;
-      position:relative;
+    .difficulty-info {
+      margin-top: 8px;
+      color: #d0d0d0;
+      font-weight: 700;
+      font-size: 13px;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+      line-height: 1;
+      z-index: 4;
+      position: relative;
     }
 
-    .paid-badge{ display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:11px; margin-left:6px; vertical-align:middle; }
+    .paid-badge { display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:11px; margin-left:6px; vertical-align:middle; }
 
-    /* Guide overlay (toggleable) */
-    .guide-overlay{
-      position:absolute; left:0; top:0; width:100%; height:100%;
-      pointer-events:none; z-index:6; display:none;
-    }
-    .guide-overlay.visible{ display:block; }
-    .guide-grid{
-      width:100%; height:100%;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
-      background-size: 40px 40px, 40px 40px;
-      opacity:0.9;
-      mix-blend-mode: overlay;
-    }
-    .guide-center{
-      position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
-      width:2px; height:2px; background:rgba(255,255,255,0.6); border-radius:50%;
-      box-shadow:0 0 8px rgba(0,255,120,0.6);
-    }
-
-    /* Responsive */
+    /* Responsive adjustments (keeps icon size consistent but you can change --icon-size) */
     @media (max-width:1100px){
-      :root{ --canvas-h:68vh; --step-h:8%; --step-v:12%; --icon-bottom-size:130px; --icon-top-size:72px; }
-      .difficulty-info{ font-size:12px; }
+      :root { --step-h: 8%; --step-v: 12%; --icon-size: 100px; }
+      .difficulty-info { font-size: 12px; }
     }
     @media (max-width:700px){
-      :root{ --canvas-h:82vh; --step-h:6.5%; --step-v:11%; --anchor-left:20%; --anchor-top:90%; --icon-bottom-size:110px; --icon-top-size:64px; }
-      .difficulty-info{ font-size:12px; }
+      :root { --step-h: 7%; --step-v: 11%; --anchor-left: 18%; --anchor-top: 90%; --icon-size: 84px; }
+      .difficulty-info { font-size: 12px; }
     }
 
     /* small helper so images scale smoothly */
-    img.rock-icon{ max-width:100%; height:auto; display:block; }
-    /* control bar */
-    .controls{ margin-top:12px; display:flex; gap:8px; align-items:center; }
-    .controls button{ padding:8px 12px; border-radius:8px; border:none; cursor:pointer; background:#222; color:#fff; }
-    .controls input[type="text"]{ padding:8px; border-radius:8px; border:1px solid #333; background:#0b0b0b; color:#fff; width:320px; }
+    img.rock-icon { display:block; }
   </style>
 </head>
 <body>
@@ -137,13 +122,7 @@
     <h1>Select Your Difficulty</h1>
 
     <div class="difficulty-path" id="difficulty-canvas">
-      <!-- guide overlay -->
-      <div id="guide" class="guide-overlay">
-        <div class="guide-grid"></div>
-        <div class="guide-center"></div>
-      </div>
-
-      <!-- Stones -->
+      <!-- Stones (IDs required for positioning script) -->
       <div id="academy" class="difficulty-level academy">
         <img src="Assets/Icons/Academy student.png" class="rock-icon" alt="Academy Student">
         <div class="difficulty-info">Academy Student</div>
@@ -191,20 +170,18 @@
       </div>
     </div>
 
-    <div class="controls">
-      <button id="toggleGuides">Show Guides</button>
-      <input id="bgInput" type="text" placeholder='Background path (e.g. Assets/Backgrounds/level-bg.png)' />
-      <button id="setBg">Set Background</button>
-      <button id="resetBg">Reset Background</button>
-    </div>
-
-    <div style="margin-top:18px;">
+    <div style="margin-top:6px;">
       <button onclick="alert('Back')">← Back</button>
     </div>
   </div>
 
   <script>
-    /* Positioning script (same stepped diagonal logic) */
+    /* Positioning script (stepped diagonal). This version:
+       - uses the canvas element's actual pixel size (respecting the 16:9 aspect ratio)
+       - places each stone on a regular diagonal using CSS variables
+       - all icons are the same size (CSS --icon-size)
+       - paid items are placed slightly above the far bottom-right
+    */
     (function positionStones(){
       const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
 
@@ -226,10 +203,7 @@
         const stepHPx = stepHPct/100 * rect.width;
         const stepVPx = stepVPct/100 * rect.height;
 
-        const iconBottom = px(getVar('--icon-bottom-size')) || 150;
-        const iconTop = px(getVar('--icon-top-size')) || 84;
-        const totalSteps = Math.max(1, order.length - 1);
-
+        // place main order
         order.forEach((id, idx) => {
           const el = document.getElementById(id);
           if(!el) return;
@@ -237,14 +211,10 @@
           const topPx  = anchorTopPx  - idx * stepVPx;
           el.style.left = (leftPx / rect.width) * 100 + '%';
           el.style.top  = (topPx  / rect.height) * 100 + '%';
-
-          const t = idx / totalSteps;
-          const size = Math.round(iconBottom * (1 - t) + iconTop * t);
-          const img = el.querySelector('.rock-icon');
-          if(img) img.style.width = size + 'px';
+          // icon size is uniform via CSS --icon-size; no per-index sizing here
         });
 
-        // Paid items
+        // paid items: slightly higher than far bottom-right
         const paidOffsetX = parseFloat(getVar('--paid-offset-x')) || 6.0;
         const lastIdx = order.length - 1;
         const baseX = anchorLeftPx + lastIdx * stepHPx;
@@ -256,8 +226,6 @@
           const topPx  = anchorTopPx - 1.6 * stepVPx;
           ak.style.left = (leftPx / rect.width) * 100 + '%';
           ak.style.top  = (topPx  / rect.height) * 100 + '%';
-          const img = ak.querySelector('.rock-icon');
-          if(img) img.style.width = Math.round(iconBottom * 0.95) + 'px';
         }
 
         const ji = document.getElementById('jinchuriki');
@@ -266,16 +234,17 @@
           const topPx  = anchorTopPx - 2.2 * stepVPx;
           ji.style.left = (leftPx / rect.width) * 100 + '%';
           ji.style.top  = (topPx  / rect.height) * 100 + '%';
-          const img = ji.querySelector('.rock-icon');
-          if(img) img.style.width = Math.round(iconBottom * 0.98) + 'px';
         }
       }
 
+      // run on load and resize; update after images load
       window.addEventListener('resize', setPositions);
       window.addEventListener('load', ()=> setTimeout(setPositions, 80));
-      document.querySelectorAll('.rock-icon').forEach(img => { if(!img.complete) img.addEventListener('load', setPositions); });
+      document.querySelectorAll('.rock-icon').forEach(img => {
+        if(!img.complete) img.addEventListener('load', setPositions);
+      });
 
-      // Live helpers
+      // helper to nudge the whole diagonal live from console
       window.nudgeDiagonal = function(deltaLeftPct, deltaTopPct){
         const root = document.documentElement;
         const curLeft = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-left')) || 14;
@@ -285,10 +254,10 @@
         setPositions();
       };
 
+      // helper to nudge a single stone live from console (id, dxPct, dyPct)
       window.nudgeStone = function(id, dxPct, dyPct){
         const el = document.getElementById(id);
         if(!el) return;
-        // read current left/top percent and add deltas
         const left = parseFloat(el.style.left || 0);
         const top  = parseFloat(el.style.top  || 0);
         el.style.left = (left + dxPct) + '%';
@@ -296,30 +265,6 @@
       };
 
       setPositions();
-    })();
-
-    /* UI: toggle guides and set background from input */
-    (function uiControls(){
-      const toggle = document.getElementById('toggleGuides');
-      const guide = document.getElementById('guide');
-      toggle.addEventListener('click', ()=>{
-        const visible = guide.classList.toggle('visible');
-        toggle.textContent = visible ? 'Hide Guides' : 'Show Guides';
-      });
-
-      const bgInput = document.getElementById('bgInput');
-      const setBg = document.getElementById('setBg');
-      const resetBg = document.getElementById('resetBg');
-
-      setBg.addEventListener('click', ()=>{
-        const val = bgInput.value.trim();
-        if(!val) return alert('Enter a background path (relative to project). Example: Assets/Backgrounds/level-bg.png');
-        document.documentElement.style.setProperty('--bg-image', `url("${val}")`);
-      });
-
-      resetBg.addEventListener('click', ()=>{
-        document.documentElement.style.setProperty('--bg-image', 'none');
-      });
     })();
   </script>
 </body>
