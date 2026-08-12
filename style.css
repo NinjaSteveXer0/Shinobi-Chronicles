@@ -1,247 +1,153 @@
-/* style.css - refined positions: lower Academy Student; paid items anchored bottom row */
+/* style.css - responsive diagonal layout that fits at 100% zoom */
 
-body {
-    background-color: #000;
-    color: #e0e0e0;
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    text-align: center;
+/* Base */
+:root {
+  --icon-min: 90px;
+  --icon-max: 160px;
+  --canvas-height: 60vh;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #000;
+  color: #e0e0e0;
+  font-family: Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  box-sizing: border-box;
 }
 
 /* Page container */
 .page {
-    padding: 24px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 /* Title */
 h1 {
-    color: #ff1a1a;
-    text-shadow: 0 0 10px #990000;
-    margin-top: 8px;
+  color: #ff1a1a;
+  text-shadow: 0 0 8px #990000;
+  margin: 8px 0 16px;
 }
 
-/* Buttons */
-button {
-    background-color: #990000;
-    color: white;
-    border: none;
-    padding: 10px 16px;
-    margin: 8px;
-    cursor: pointer;
-    font-size: 15px;
-    border-radius: 6px;
-    transition: background-color .18s ease, transform .18s ease;
-}
-
-button:hover { background-color: #cc0000; transform: translateY(-2px); }
-.back-btn { background-color: #333; }
-
-/* Difficulty Path Container */
+/* Difficulty canvas: use viewport-relative height so it fits without zoom */
 .difficulty-path {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    height: 760px;        /* tall canvas so bottom positions are visible */
-    margin-top: 80px;     /* push the whole path down on the page */
-    margin-bottom: 40px;
-    box-sizing: border-box;
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  height: var(--canvas-height);
+  margin-top: 28px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  overflow: visible;
+  pointer-events: auto;
 }
 
-/* Each level is absolutely positioned inside the container */
+/* Each level is absolutely positioned inside the canvas and centered by left/top */
 .difficulty-level {
-    position: absolute;
-    text-align: center;
-    pointer-events: auto;
-    transform: translate(-50%, 0); /* center by left coordinate */
+  position: absolute;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  width: auto;
+  pointer-events: auto;
 }
 
-/* Rock icon styling */
+/* Responsive icon sizing */
 .rock-icon {
-    width: 170px;
-    height: auto;
-    filter: drop-shadow(0 0 18px rgba(255, 0, 0, 0.45));
-    transition: transform .22s ease, filter .22s ease;
-    display: block;
-    margin: 0 auto;
+  width: clamp(var(--icon-min), 12vw, var(--icon-max));
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  filter: drop-shadow(0 0 16px rgba(255,0,0,0.35));
+  transition: transform .18s ease, filter .18s ease;
 }
 
-.rock-icon:hover {
-    transform: scale(1.06);
-    filter: drop-shadow(0 0 26px rgba(255, 0, 0, 0.6));
-}
+.rock-icon:hover { transform: scale(1.06); filter: drop-shadow(0 0 26px rgba(255,0,0,0.55)); }
 
-/* Text block under each rock */
 .difficulty-info {
-    margin-top: -12px;
-    text-align: center;
-    color: #e8e8e8;
-    width: 220px;
+  margin-top: 8px;
+  color: #eee;
+  width: 220px;
+  box-sizing: border-box;
 }
 
-/* ---------- Precise absolute positions (refined diagonal) ---------- */
-/* Academy Student: drastically lower and moved right from extreme left */
-.academy {
-    left: 34%;      /* moved further right */
-    bottom: 2%;     /* very low on the canvas */
-}
+/* ---------- Diagonal positions (use top/left so they scale with canvas height) */
+/* Academy Student: much lower and moved right */
+.academy      { left: 34%; top: 86%; }
 
 /* Genin: slightly up and to the right of Academy */
-.genin {
-    left: 40%;
-    bottom: 16%;
-}
+.genin        { left: 40%; top: 72%; }
 
 /* Chunin: continuing the diagonal */
-.chunin {
-    left: 48%;
-    bottom: 28%;
-}
+.chunin       { left: 48%; top: 58%; }
 
 /* Special Jōnin: mid-climb */
-.specialjonin {
-    left: 56%;
-    bottom: 40%;
-}
+.specialjonin { left: 56%; top: 44%; }
 
 /* Jōnin: higher */
-.jonin {
-    left: 62%;
-    bottom: 52%;
-}
+.jonin        { left: 62%; top: 30%; }
 
 /* ANBU: near the upper middle */
-.anbu {
-    left: 68%;
-    bottom: 62%;
-}
+.anbu         { left: 68%; top: 18%; }
 
 /* Kage: the top-right crown of the diagonal */
-.kage {
-    left: 74%;
-    bottom: 72%;
+.kage         { left: 74%; top: 8%; }
+
+/* ---------- Paid content: bottom row (separate from diagonal) ---------- */
+.paid-row {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  padding: 12px;
+  box-sizing: border-box;
+  margin-top: 18px;
+  align-items: flex-end;
 }
 
-/* ---------- Paid content: Akatsuki & Jinchuriki anchored to bottom row ---------- */
-/* These are intentionally separated and anchored low on the page (paid content area) */
-.paid-level {
-    pointer-events: auto;
-    transition: transform .18s ease, opacity .18s ease;
+/* Paid items visually distinct */
+.paid-level .rock-icon { filter: drop-shadow(0 0 22px rgba(255,140,80,0.45)); }
+.paid-badge { background: linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:10px; font-weight:700; font-size:12px; }
+
+/* If you still want paid items positioned inside the canvas but low, use these classes instead:
+   .akatsuki { left: 70%; top: 82%; } .jinchuriki { left: 76%; top: 82%; }
+   (But the paid-row approach keeps them visually separate and avoids layout overflow.)
+*/
+
+/* ---------- Small-screen adjustments ---------- */
+@media (max-width: 1100px) {
+  :root { --icon-max: 140px; --canvas-height: 66vh; }
+  .difficulty-info { width: 180px; font-size: 14px; }
+  .academy { left: 32%; top: 88%; }
+  .genin   { left: 38%; top: 74%; }
+  .chunin  { left: 46%; top: 60%; }
+  .specialjonin { left: 54%; top: 46%; }
+  .jonin   { left: 60%; top: 34%; }
+  .anbu    { left: 66%; top: 22%; }
+  .kage    { left: 72%; top: 10%; }
 }
 
-/* Place paid items in a visible bottom row, horizontally between ANBU and Kage */
-.akatsuki {
-    left: 68%;
-    bottom: 4%;            /* anchored low on the page */
-    transform: translate(-50%, 0) scale(1.02);
-    opacity: 0.95;
-    filter: drop-shadow(0 0 22px rgba(200, 60, 60, 0.55));
-    border-radius: 6px;
+@media (max-width: 700px) {
+  :root { --icon-min: 72px; --icon-max: 120px; --canvas-height: 80vh; }
+  .difficulty-path { height: var(--canvas-height); margin-top: 12px; }
+  /* stack more vertically: move left positions closer to center */
+  .academy { left: 30%; top: 90%; }
+  .genin   { left: 36%; top: 78%; }
+  .chunin  { left: 44%; top: 64%; }
+  .specialjonin { left: 52%; top: 50%; }
+  .jonin   { left: 60%; top: 36%; }
+  .anbu    { left: 66%; top: 22%; }
+  .kage    { left: 72%; top: 10%; }
+  .difficulty-info { width: 160px; font-size: 13px; }
 }
 
-/* Jinchuriki sits to the right of Akatsuki in the paid area */
-.jinchuriki {
-    left: 76%;
-    bottom: 4%;            /* same bottom line as Akatsuki */
-    transform: translate(-50%, 0) scale(1.04);
-    opacity: 0.98;
-    filter: drop-shadow(0 0 28px rgba(255, 120, 80, 0.6));
-}
-
-/* Paid badge ribbon (small) */
-.paid-badge {
-    display: inline-block;
-    background: linear-gradient(90deg,#b8860b,#ffd27a);
-    color: #111;
-    font-weight: 700;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 12px;
-    margin-top: 6px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6);
-}
-
-/* Optional locked overlay for unpaid items */
-.paid-locked {
-    position: relative;
-}
-.paid-locked::after {
-    content: "LOCKED";
-    position: absolute;
-    left: 50%;
-    top: 8%;
-    transform: translate(-50%, -50%) rotate(-12deg);
-    background: rgba(0,0,0,0.6);
-    color: #ffd27a;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 1px;
-    pointer-events: none;
-}
-
-/* ---------- Responsive tweaks ---------- */
-@media (max-width: 1200px) {
-    .difficulty-path { height: 700px; margin-top: 70px; }
-    .rock-icon { width: 150px; }
-    .academy { left: 32%; bottom: 3%; }
-    .genin { left: 38%; bottom: 14%; }
-    .chunin { left: 46%; bottom: 26%; }
-    .specialjonin { left: 54%; bottom: 38%; }
-    .jonin { left: 60%; bottom: 50%; }
-    .anbu { left: 66%; bottom: 60%; }
-    .kage { left: 72%; bottom: 70%; }
-    .akatsuki { left: 68%; bottom: 4%; }
-    .jinchuriki { left: 76%; bottom: 4%; }
-}
-
-@media (max-width: 800px) {
-    /* stack more vertically on very small screens */
-    .difficulty-path { height: 920px; margin-top: 40px; }
-    .rock-icon { width: 140px; }
-    .academy { left: 34%; bottom: 3%; }
-    .genin { left: 40%; bottom: 12%; }
-    .chunin { left: 48%; bottom: 24%; }
-    .specialjonin { left: 56%; bottom: 36%; }
-    .jonin { left: 62%; bottom: 48%; }
-    .anbu { left: 68%; bottom: 60%; }
-    .kage { left: 74%; bottom: 70%; }
-    .akatsuki { left: 68%; bottom: 4%; }
-    .jinchuriki { left: 76%; bottom: 4%; }
-}
-
-/* Village Page (unchanged) */
-.village-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 28px;
-    margin-top: 28px;
-}
-
-.village-box {
-    width: 170px;
-    padding: 18px;
-    background-color: #111;
-    border: 2px solid #990000;
-    border-radius: 10px;
-    text-align: center;
-    transition: transform .18s ease, box-shadow .18s ease;
-}
-
-.village-box:hover {
-    transform: scale(1.04);
-    box-shadow: 0 0 18px rgba(255, 26, 26, 0.5);
-}
-
-.village-icon {
-    width: 110px;
-    height: auto;
-    margin-bottom: 8px;
-}
+/* ---------- Utility debug helpers (remove after tuning) ---------- */
+/* .difficulty-path { outline: 1px dashed rgba(0,255,255,0.12); } */
+/* .difficulty-level { outline: 1px solid rgba(255,0,0,0.08); } */
