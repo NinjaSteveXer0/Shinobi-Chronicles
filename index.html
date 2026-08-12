@@ -49,14 +49,53 @@
     <!-- DIFFICULTY PAGE -->
     <div id="difficulty-page" class="page" style="display:none;">
         <h1>Select Your Difficulty</h1>
+        <p class="difficulty-subtext">
+            Higher difficulties have tougher missions, but the rewards are greater and the respect is unforgettable...
+        </p>
 
-        <button onclick="selectDifficulty('Academy Student')">Academy Student</button>
-        <button onclick="selectDifficulty('Genin')">Genin</button>
-        <button onclick="selectDifficulty('Chunin')">Chunin</button>
-        <button onclick="selectDifficulty('Special Jonin')">Special Jōnin</button>
-        <button onclick="selectDifficulty('Jonin')">Jōnin</button>
-        <button onclick="selectDifficulty('Anbu')">ANBU</button>
-        <button onclick="selectDifficulty('Kage')">Kage</button>
+        <div class="difficulty-container">
+            <div class="difficulty-box">
+                <h2>Academy Student</h2>
+                <p>For those just beginning their path. Learn the basics and survive your first missions.</p>
+                <button onclick="selectDifficulty('Academy Student')">Select</button>
+            </div>
+
+            <div class="difficulty-box">
+                <h2>Genin</h2>
+                <p>Low-ranked ninja. Missions are simple, but danger lurks behind every shadow.</p>
+                <button onclick="selectDifficulty('Genin')">Select</button>
+            </div>
+
+            <div class="difficulty-box">
+                <h2>Chunin</h2>
+                <p>Intermediate rank. Strategy and teamwork become essential to survive.</p>
+                <button onclick="selectDifficulty('Chunin')">Select</button>
+            </div>
+
+            <div class="difficulty-box">
+                <h2>Special Jōnin</h2>
+                <p>Elite specialists. Missions demand precision, skill, and unwavering resolve.</p>
+                <button onclick="selectDifficulty('Special Jonin')">Select</button>
+            </div>
+
+            <div class="difficulty-box">
+                <h2>Jōnin</h2>
+                <p>Veteran shinobi. Every mission tests your mastery of jutsu and leadership.</p>
+                <button onclick="selectDifficulty('Jonin')">Select</button>
+            </div>
+
+            <div class="difficulty-box">
+                <h2>ANBU</h2>
+                <p>Shadow operatives. Missions are deadly, secrets are heavy, and failure is not an option.</p>
+                <button onclick="selectDifficulty('Anbu')">Select</button>
+            </div>
+
+            <div class="difficulty-box">
+                <h2>Kage</h2>
+                <p>The pinnacle of power. Every decision shapes nations and seals destinies.</p>
+                <button onclick="selectDifficulty('Kage')">Select</button>
+            </div>
+        </div>
 
         <button class="back-btn" onclick="goBackToJourney()">← Back</button>
     </div>

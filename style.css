@@ -1,79 +1,42 @@
-body {
-    background-color: #0a0a0a;
-    color: #e0e0e0;
-    font-family: Arial, sans-serif;
+.difficulty-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.difficulty-box {
+    background-color: #111;
+    border: 2px solid #990000;
+    border-radius: 8px;
+    width: 240px;
+    padding: 20px;
     text-align: center;
+    color: #e0e0e0;
+    box-shadow: 0 0 10px rgba(153, 0, 0, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.page {
-    padding: 40px;
+.difficulty-box:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 26, 26, 0.6);
 }
 
-h1 {
+.difficulty-box h2 {
     color: #ff1a1a;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
-button {
-    background-color: #990000;
-    color: white;
-    border: none;
-    padding: 12px 20px;
-    margin: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    border-radius: 6px;
-    transition: 0.2s;
+.difficulty-box p {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 15px;
 }
 
-button:hover {
-    background-color: #cc0000;
-}
-
-.back-btn {
-    background-color: #333;
-}
-
-.login-box input {
-    display: block;
-    margin: 10px auto;
-    padding: 10px;
-    width: 220px;
-    background-color: #111;
-    border: 1px solid #990000;
-    color: white;
-}
-
-.village-card {
-    background-color: #111;
-    border: 2px solid #990000;
-    padding: 20px;
-    margin: 15px auto;
-    width: 300px;
-    border-radius: 8px;
-}
-
-.village-card.locked {
-    opacity: 0.4;
-}
-
-.locked-btn {
-    background-color: #444;
-    cursor: not-allowed;
-}
-
-.ninja-card {
-    background-color: #111;
-    border: 2px solid #990000;
-    padding: 20px;
-    margin: 20px auto;
-    width: 500px;
-    border-radius: 8px;
-}
-
-.portrait-placeholder {
-    background-color: #222;
-    border: 1px dashed #990000;
-    padding: 40px;
-    margin-bottom: 20px;
+.difficulty-subtext {
+    color: #ccc;
+    margin-bottom: 25px;
+    font-style: italic;
 }
