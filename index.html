@@ -2,9 +2,51 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Difficulty Selection — Fixed Layout</title>
+  <title>Difficulty Selection — Clean</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="style.css">
+  <style>
+    :root{
+      --bg-color:#000;
+      --bg-image:none;
+      --overlay-dark:rgba(0,0,0,0.22);
+      --anchor-left:14%;
+      --anchor-top:92%;
+      --step-h:9.5%;
+      --step-v:13%;
+      --icon-max:140px;
+      --paid-offset-x:6.0;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg-color);color:#eaeaea;font-family:Arial,Helvetica,sans-serif}
+    .page{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+    h1{color:#ff1a1a;margin:6px 0 6px;font-weight:700}
+    .difficulty-path{
+      position:relative;width:100%;max-width:1200px;aspect-ratio:16/9;margin-top:8px;margin-bottom:8px;
+      overflow:visible;border-radius:10px;background-image:var(--bg-image);background-size:cover;background-position:center;
+      background-repeat:no-repeat;box-shadow:0 8px 30px rgba(0,0,0,0.6);background-color:#0a0a0a;
+    }
+    .difficulty-path::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;background:var(--overlay-dark);pointer-events:none;border-radius:10px;z-index:1}
+    .arrow-overlay{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:5}
+    .difficulty-level{position:absolute;transform:translate(-50%,-50%);z-index:3;background:transparent;padding:0;box-shadow:none}
+    .rock-icon{border-radius:6px;display:block;width:var(--icon-max);max-width:calc(100% - 12px);height:auto;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));transition:transform .16s ease,filter .16s ease}
+    .difficulty-level:hover .rock-icon{transform:translateY(-6px) scale(1.03);filter:drop-shadow(0 26px 46px rgba(0,0,0,0.72))}
+    .difficulty-info{margin-top:8px;color:#d0d0d0;font-weight:700;font-size:13px;text-shadow:0 1px 0 rgba(0,0,0,0.6);line-height:1;z-index:4;position:relative}
+    .paid-badge{font-size:11px;padding:4px 6px;margin-left:6px;vertical-align:middle}
+    /* CSS classes kept for clarity; JS will compute final pixel positions */
+    .academy{left:var(--anchor-left);top:var(--anchor-top)}
+    .genin{left:calc(var(--anchor-left) + 1 * var(--step-h));top:calc(var(--anchor-top) - 1 * var(--step-v))}
+    .chunin{left:calc(var(--anchor-left) + 2 * var(--step-h));top:calc(var(--anchor-top) - 2 * var(--step-v))}
+    .specialjonin{left:calc(var(--anchor-left) + 3 * var(--step-h));top:calc(var(--anchor-top) - 3 * var(--step-v))}
+    .jonin{left:calc(var(--anchor-left) + 4 * var(--step-h));top:calc(var(--anchor-top) - 4 * var(--step-v))}
+    .anbu{left:calc(var(--anchor-left) + 5 * var(--step-h));top:calc(var(--anchor-top) - 5 * var(--step-v))}
+    .kage{left:calc(var(--anchor-left) + 6.6 * var(--step-h));top:calc(var(--anchor-top) - 6.8 * var(--step-v))}
+    .akatsuki{left:calc(var(--anchor-left) + 6.0 * var(--step-h));top:calc(var(--anchor-top) - 1.6 * var(--step-v))}
+    .jinchuriki{left:calc(var(--anchor-left) + 6.8 * var(--step-h));top:calc(var(--anchor-top) - 2.2 * var(--step-v))}
+    @media (max-width:1400px){:root{--icon-max:160px}}
+    @media (max-width:1100px){:root{--icon-max:140px}}
+    @media (max-width:900px){:root{--step-h:8%;--step-v:12%;--icon-max:120px}}
+    @media (max-width:700px){:root{--icon-max:110px;--anchor-left:18%;--anchor-top:90%}}
+  </style>
 </head>
 <body>
   <div class="page">
@@ -65,78 +107,53 @@
   </div>
 
   <script>
-    // Robust positioning script: computes pixel positions from CSS variables
     (function positionStones(){
       const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
-
-      function getVar(name){
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-      }
-      function pctToPx(pct, total){
-        return (parseFloat(pct) || 0) / 100 * total;
-      }
-
+      function getVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
       function setPositions(){
         const canvas = document.getElementById('difficulty-canvas');
         if(!canvas) return;
         const rect = canvas.getBoundingClientRect();
-
-        // Read CSS tuning variables (fallbacks included)
         const anchorLeftPct = parseFloat(getVar('--anchor-left')) || 14;
         const anchorTopPct  = parseFloat(getVar('--anchor-top'))  || 92;
         const stepHPct = parseFloat(getVar('--step-h')) || 9.5;
         const stepVPct = parseFloat(getVar('--step-v')) || 13;
-        const iconMax = getVar('--icon-max') || '140px';
-
         const anchorLeftPx = anchorLeftPct/100 * rect.width;
         const anchorTopPx  = anchorTopPct/100 * rect.height;
         const stepHPx = stepHPct/100 * rect.width;
         const stepVPx = stepVPct/100 * rect.height;
-
-        // Place main sequence
         order.forEach((id, idx) => {
           const el = document.getElementById(id);
           if(!el) return;
           const leftPx = anchorLeftPx + idx * stepHPx;
           const topPx  = anchorTopPx  - idx * stepVPx;
-          el.style.position = 'absolute';
           el.style.left = (leftPx / rect.width) * 100 + '%';
           el.style.top  = (topPx  / rect.height) * 100 + '%';
-          // ensure icon size respects CSS variable
           const img = el.querySelector('.rock-icon');
           if(img) img.style.width = getComputedStyle(document.documentElement).getPropertyValue('--icon-max') || '140px';
         });
-
-        // Paid items (relative offsets)
         const paidOffsetX = parseFloat(getVar('--paid-offset-x')) || 6.0;
-        const ak = document.getElementById('akatsuki');
-        const ji = document.getElementById('jinchuriki');
         const lastIdx = order.length - 1;
         const baseX = anchorLeftPx + lastIdx * stepHPx;
-        const baseY = anchorTopPx  - lastIdx * stepVPx;
-
+        const ak = document.getElementById('akatsuki');
         if(ak){
           const leftPx = baseX + paidOffsetX * stepHPx;
           const topPx  = anchorTopPx - 1.6 * stepVPx;
           ak.style.left = (leftPx / rect.width) * 100 + '%';
-          ak.style.top  = (topPx  / rect.height) * 100 + '%';
+          ak.style.top  = (topPx / rect.height) * 100 + '%';
         }
+        const ji = document.getElementById('jinchuriki');
         if(ji){
           const leftPx = baseX + (paidOffsetX + 0.8) * stepHPx;
           const topPx  = anchorTopPx - 2.2 * stepVPx;
           ji.style.left = (leftPx / rect.width) * 100 + '%';
-          ji.style.top  = (topPx  / rect.height) * 100 + '%';
+          ji.style.top  = (topPx / rect.height) * 100 + '%';
         }
       }
-
-      // Recompute on load/resize and after images load
       window.addEventListener('resize', setPositions);
       window.addEventListener('load', ()=> setTimeout(setPositions, 60));
-      document.querySelectorAll('.rock-icon').forEach(img => {
-        if(!img.complete) img.addEventListener('load', setPositions);
-      });
-
-      // Live helpers
+      document.querySelectorAll('.rock-icon').forEach(img => { if(!img.complete) img.addEventListener('load', setPositions); });
+      setPositions();
       window.nudgeDiagonal = function(dxPct, dyPct){
         const root = document.documentElement;
         const curLeft = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-left')) || 14;
@@ -145,17 +162,6 @@
         root.style.setProperty('--anchor-top', (curTop + dyPct) + '%');
         setPositions();
       };
-
-      window.nudgeStone = function(id, dxPct, dyPct){
-        const el = document.getElementById(id);
-        if(!el) return;
-        const left = parseFloat(el.style.left || 0);
-        const top  = parseFloat(el.style.top  || 0);
-        el.style.left = (left + dxPct) + '%';
-        el.style.top  = (top  + dyPct) + '%';
-      };
-
-      setPositions();
     })();
   </script>
 </body>
