@@ -43,22 +43,20 @@ button:hover {
 
 /* Difficulty Path */
 .difficulty-path {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 20px; /* tightly huddled */
-    margin-top: 20px;
+    position: relative;
+    width: 100%;
+    max-width: 1200px;
+    height: 600px;
+    margin-top: 40px;
 }
 
 .difficulty-level {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
+    position: absolute;
+    text-align: center;
 }
 
 .rock-icon {
-    width: 180px; /* smaller for tighter grouping */
+    width: 180px;
     height: auto;
     filter: drop-shadow(0 0 15px rgba(255, 0, 0, 0.6));
     transition: transform 0.3s ease;
@@ -73,16 +71,51 @@ button:hover {
     text-align: center;
 }
 
-/* Rising staircase — steep and compact */
-.academy      { transform: translateY(120px); }
-.genin        { transform: translateY(80px); }
-.chunin       { transform: translateY(40px); }
-.specialjonin { transform: translateY(0px); }
-.jonin        { transform: translateY(-40px); }
-.anbu         { transform: translateY(-80px); }
-.kage         { transform: translateY(-120px); }
-.akatsuki     { transform: translateY(-160px); }
-.jinchuriki   { transform: translateY(-200px); }
+/* Precise positioning based on your colored boxes */
+.academy {
+    left: 5%;
+    bottom: 0%;
+}
+
+.genin {
+    left: 15%;
+    bottom: 10%;
+}
+
+.chunin {
+    left: 25%;
+    bottom: 20%;
+}
+
+.specialjonin {
+    left: 35%;
+    bottom: 30%;
+}
+
+.jonin {
+    left: 45%;
+    bottom: 40%;
+}
+
+.anbu {
+    left: 55%;
+    bottom: 50%;
+}
+
+.kage {
+    left: 65%;
+    bottom: 60%;
+}
+
+.akatsuki {
+    left: 75%;
+    bottom: 70%;
+}
+
+.jinchuriki {
+    left: 85%;
+    bottom: 80%;
+}
 
 /* Village Page */
 .village-container {
