@@ -2,158 +2,17 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Difficulty Selection — Final Layout</title>
+  <title>Difficulty Selection — Fixed Layout</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <style>
-    /* ---------- CONFIG (single place to edit) ---------- */
-    :root{
-      --bg-color: #000;
-      --bg-image: none; /* set to url("Assets/Backgrounds/level-bg.png") if you want a background */
-      --overlay-dark: rgba(0,0,0,0.22);
-
-      /* Formation tuning (used by CSS calc rules below) */
-      --anchor-left: 14%;   /* leftmost starting point (Academy) */
-      --anchor-top: 92%;    /* vertical start (Academy) */
-      --step-h: 9.5%;       /* horizontal step between stones */
-      --step-v: 13%;        /* vertical step between stones */
-
-      /* Icon sizing (max/min used for responsive scaling) */
-      --icon-max: 140px;
-      --icon-min: 72px;
-
-      /* Canvas */
-      --canvas-max-width: 1200px;
-      --canvas-aspect-ratio: 16/9;
-    }
-
-    /* ---------- Base layout ---------- */
-    * { box-sizing: border-box; }
-    html,body { height:100%; margin:0; background:var(--bg-color); color:#eaeaea; font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing:antialiased; }
-    .page { min-height:100vh; padding:18px; display:flex; flex-direction:column; align-items:center; gap:12px; }
-
-    h1 { color:#ff1a1a; margin:6px 0 6px; font-weight:700; }
-
-    /* Canvas: 16:9 responsive area */
-    .difficulty-path {
-      position: relative;
-      width: 100%;
-      max-width: var(--canvas-max-width);
-      aspect-ratio: var(--canvas-aspect-ratio);
-      margin-top: 8px;
-      margin-bottom: 8px;
-      overflow: visible;
-      border-radius: 10px;
-      background-image: var(--bg-image);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
-      background-color: #0a0a0a;
-    }
-
-    /* subtle overlay to improve contrast if a background is used */
-    .difficulty-path::after{
-      content:"";
-      position:absolute; left:0; top:0; right:0; bottom:0;
-      background: var(--overlay-dark);
-      pointer-events:none;
-      border-radius:10px;
-      z-index:1;
-    }
-
-    /* Arrow overlay fills the canvas and sits above the images */
-    .arrow-overlay {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none; /* clicks pass through to images/buttons */
-      overflow: visible;
-      z-index: 5;
-    }
-
-    /* make sure difficulty-levels are above canvas background but below overlay for pointer events */
-    .difficulty-level { z-index: 3; }
-
-    /* Natural image look (no cards) */
-    .difficulty-level { background: transparent; padding: 0; box-shadow: none; }
-    .rock-icon { border-radius: 6px; }
-
-    /* Positioning helpers: use CSS variables and calc for exact placement */
-    /* Final positions (adjusted per your request) */
-    /* Academy Student: closer to bottom-left */
-    :root { --anchor-left:14%; --anchor-top:92%; --step-h:9.5%; --step-v:13%; --icon-max:140px; --icon-min:72px; }
-
-    .academy      { left: var(--anchor-left); top: var(--anchor-top); }
-    .genin        { left: calc(var(--anchor-left) + 1 * var(--step-h)); top: calc(var(--anchor-top) - 1 * var(--step-v)); }
-    .chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
-    .specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
-    .jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
-    .anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
-
-    /* Kage: closer to top-right */
-    .kage         { left: calc(var(--anchor-left) + 6.6 * var(--step-h)); top: calc(var(--anchor-top) - 6.8 * var(--step-v)); }
-
-    /* Paid items: slightly higher than the far bottom-right */
-    .akatsuki     { left: calc(var(--anchor-left) + 6.0 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
-    .jinchuriki   { left: calc(var(--anchor-left) + 6.8 * var(--step-h)); top: calc(var(--anchor-top) - 2.2 * var(--step-v)); }
-
-    /* Paid badge small tweak */
-    .paid-badge { font-size:11px; padding:4px 6px; margin-left:6px; vertical-align:middle; }
-
-    /* Icon sizing: use --icon-max but clamp to container width so icons never overflow */
-    .rock-icon {
-      width: var(--icon-max);
-      max-width: calc(100% - 12px);
-      height: auto;
-      display:block;
-      filter: drop-shadow(0 12px 28px rgba(0,0,0,0.6));
-      transition: transform .16s ease, filter .16s ease;
-    }
-
-    .difficulty-info {
-      margin-top: 8px;
-      color: #d0d0d0;
-      font-weight: 700;
-      font-size: 13px;
-      text-shadow: 0 1px 0 rgba(0,0,0,0.6);
-      line-height: 1;
-      z-index: 4;
-      position: relative;
-    }
-
-    /* ensure overlay scales on resize */
-    @media (max-width:900px) {
-      :root { --step-h:8%; --step-v:12%; --icon-max:120px; }
-    }
-
-    /* Additional responsive fallbacks so icons remain readable on small screens */
-    @media (max-width:1400px){
-      :root { --icon-max: 160px; }
-    }
-    @media (max-width:1100px){
-      :root { --icon-max: 140px; }
-      .difficulty-info { font-size: 12px; }
-    }
-    @media (max-width:700px){
-      :root { --icon-max: 110px; --anchor-left: 18%; --anchor-top: 90%; }
-      .difficulty-info { font-size: 12px; }
-    }
-
-    /* small helper so images scale smoothly */
-    img.rock-icon { display:block; }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="page">
     <h1>Select Your Difficulty</h1>
 
     <div class="difficulty-path" id="difficulty-canvas">
-      <!-- Optional arrow overlay (SVG or canvas) can be placed here if needed -->
       <div class="arrow-overlay" aria-hidden="true"></div>
 
-      <!-- Stones (IDs required for positioning script) -->
       <div id="academy" class="difficulty-level academy">
         <img src="Assets/Icons/Academy student.png" class="rock-icon" alt="Academy Student">
         <div class="difficulty-info">Academy Student</div>
@@ -189,7 +48,6 @@
         <div class="difficulty-info">Kage</div>
       </div>
 
-      <!-- Paid items -->
       <div id="akatsuki" class="difficulty-level paid-level akatsuki">
         <img src="Assets/Icons/Akatsuki.png" class="rock-icon" alt="Akatsuki">
         <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
@@ -201,44 +59,91 @@
       </div>
     </div>
 
-    <div style="margin-top:6px;">
-      <button onclick="alert('Back')">← Back</button>
+    <div style="margin-top:10px;">
+      <button onclick="history.back()">← Back</button>
     </div>
   </div>
 
   <script>
-    /* JS positions the stones using the CSS-calculated left/top values.
-       This keeps the layout responsive and ensures the CSS calc() positions are respected.
-       The script also ensures positions are applied after layout and on resize.
-    */
-    (function applyPositions(){
-      const ids = ['academy','genin','chunin','specialjonin','jonin','anbu','kage','akatsuki','jinchuriki'];
+    // Robust positioning script: computes pixel positions from CSS variables
+    (function positionStones(){
+      const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
 
-      function setCssPositions(){
-        // Nothing to compute here — CSS classes already set left/top via calc()
-        // But ensure elements are visible and reflowed after images load/resize.
-        ids.forEach(id => {
-          const el = document.getElementById(id);
-          if(!el) return;
-          // Force a reflow/read to ensure browser applies CSS calc positions
-          el.getBoundingClientRect();
-        });
+      function getVar(name){
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      }
+      function pctToPx(pct, total){
+        return (parseFloat(pct) || 0) / 100 * total;
       }
 
-      window.addEventListener('resize', setCssPositions);
-      window.addEventListener('load', ()=> setTimeout(setCssPositions, 60));
+      function setPositions(){
+        const canvas = document.getElementById('difficulty-canvas');
+        if(!canvas) return;
+        const rect = canvas.getBoundingClientRect();
+
+        // Read CSS tuning variables (fallbacks included)
+        const anchorLeftPct = parseFloat(getVar('--anchor-left')) || 14;
+        const anchorTopPct  = parseFloat(getVar('--anchor-top'))  || 92;
+        const stepHPct = parseFloat(getVar('--step-h')) || 9.5;
+        const stepVPct = parseFloat(getVar('--step-v')) || 13;
+        const iconMax = getVar('--icon-max') || '140px';
+
+        const anchorLeftPx = anchorLeftPct/100 * rect.width;
+        const anchorTopPx  = anchorTopPct/100 * rect.height;
+        const stepHPx = stepHPct/100 * rect.width;
+        const stepVPx = stepVPct/100 * rect.height;
+
+        // Place main sequence
+        order.forEach((id, idx) => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          const leftPx = anchorLeftPx + idx * stepHPx;
+          const topPx  = anchorTopPx  - idx * stepVPx;
+          el.style.position = 'absolute';
+          el.style.left = (leftPx / rect.width) * 100 + '%';
+          el.style.top  = (topPx  / rect.height) * 100 + '%';
+          // ensure icon size respects CSS variable
+          const img = el.querySelector('.rock-icon');
+          if(img) img.style.width = getComputedStyle(document.documentElement).getPropertyValue('--icon-max') || '140px';
+        });
+
+        // Paid items (relative offsets)
+        const paidOffsetX = parseFloat(getVar('--paid-offset-x')) || 6.0;
+        const ak = document.getElementById('akatsuki');
+        const ji = document.getElementById('jinchuriki');
+        const lastIdx = order.length - 1;
+        const baseX = anchorLeftPx + lastIdx * stepHPx;
+        const baseY = anchorTopPx  - lastIdx * stepVPx;
+
+        if(ak){
+          const leftPx = baseX + paidOffsetX * stepHPx;
+          const topPx  = anchorTopPx - 1.6 * stepVPx;
+          ak.style.left = (leftPx / rect.width) * 100 + '%';
+          ak.style.top  = (topPx  / rect.height) * 100 + '%';
+        }
+        if(ji){
+          const leftPx = baseX + (paidOffsetX + 0.8) * stepHPx;
+          const topPx  = anchorTopPx - 2.2 * stepVPx;
+          ji.style.left = (leftPx / rect.width) * 100 + '%';
+          ji.style.top  = (topPx  / rect.height) * 100 + '%';
+        }
+      }
+
+      // Recompute on load/resize and after images load
+      window.addEventListener('resize', setPositions);
+      window.addEventListener('load', ()=> setTimeout(setPositions, 60));
       document.querySelectorAll('.rock-icon').forEach(img => {
-        if(!img.complete) img.addEventListener('load', setCssPositions);
+        if(!img.complete) img.addEventListener('load', setPositions);
       });
 
-      // small helpers for live nudging from console if you want:
+      // Live helpers
       window.nudgeDiagonal = function(dxPct, dyPct){
         const root = document.documentElement;
         const curLeft = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-left')) || 14;
         const curTop  = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-top'))  || 92;
         root.style.setProperty('--anchor-left', (curLeft + dxPct) + '%');
         root.style.setProperty('--anchor-top', (curTop + dyPct) + '%');
-        setCssPositions();
+        setPositions();
       };
 
       window.nudgeStone = function(id, dxPct, dyPct){
@@ -250,7 +155,7 @@
         el.style.top  = (top  + dyPct) + '%';
       };
 
-      setCssPositions();
+      setPositions();
     })();
   </script>
 </body>
