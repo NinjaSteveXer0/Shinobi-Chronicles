@@ -14,13 +14,13 @@
       /* Formation tuning: push toward top-right but tilt back upward a bit */
       --anchor-left: 12%;   /* leftmost starting point (Academy) */
       --anchor-top: 94%;    /* vertical start (Academy) */
-      --step-h: 11.5%;      /* horizontal step between stones (slightly reduced from extreme) */
+      --step-h: 11.5%;      /* horizontal step between stones */
       --step-v: 8.5%;       /* vertical step between stones (increased to tilt upward more) */
 
       /* Canvas and icon sizing */
       --canvas-max-width: 1200px;
       --canvas-aspect-ratio: 16/9; /* standard screen ratio */
-      --icon-size: 180px; /* increased icon size per request */
+      --icon-size: 200px; /* ALL PNGs will be this size (increased per request) */
 
       /* Paid item offsets (multipliers of step values) */
       --paid-offset-x: 6.0;
@@ -105,14 +105,14 @@
 
     /* Responsive adjustments (larger icons on desktop, scaled down on smaller screens) */
     @media (max-width:1400px){
-      :root { --icon-size: 160px; --step-h: 10.5%; --step-v: 7.8%; }
+      :root { --icon-size: 180px; --step-h: 10.5%; --step-v: 7.8%; }
     }
     @media (max-width:1100px){
-      :root { --step-h: 9.5%; --step-v: 7%; --icon-size: 140px; }
+      :root { --step-h: 9.5%; --step-v: 7%; --icon-size: 160px; }
       .difficulty-info { font-size: 12px; }
     }
     @media (max-width:700px){
-      :root { --step-h: 8%; --step-v: 6%; --anchor-left: 18%; --anchor-top: 90%; --icon-size: 110px; }
+      :root { --step-h: 8%; --step-v: 6%; --anchor-left: 18%; --anchor-top: 90%; --icon-size: 120px; }
       .difficulty-info { font-size: 12px; }
     }
 
