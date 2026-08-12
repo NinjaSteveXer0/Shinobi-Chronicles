@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Shinobi Chronicles</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="game.js" defer></script>
+</head>
+
+<body>
+
+    <!-- LOGIN PAGE -->
+    <div id="login-page" class="page">
+        <h1>Shinobi Chronicles</h1>
+
+        <div class="login-box">
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+
+            <button onclick="login()">Login</button>
+            <button onclick="register()">Register</button>
+        </div>
+    </div>
+
+    <!-- JOURNEY PAGE -->
+    <div id="journey-page" class="page" style="display:none;">
+        <h1>Your Journey Begins</h1>
+        <p>Welcome, young shinobi. Your path starts now.</p>
+
+        <button onclick="goToDifficulty()">Continue</button>
+    </div>
+
+    <!-- DIFFICULTY PAGE -->
+    <div id="difficulty-page" class="page" style="display:none;">
+        <h1>Select Your Difficulty</h1>
+
+        <button onclick="selectDifficulty('Academy Student')">Academy Student</button>
+        <button onclick="selectDifficulty('Genin')">Genin</button>
+        <button onclick="selectDifficulty('Chunin')">Chunin</button>
+        <button onclick="selectDifficulty('Jonin')">Jonin</button>
+
+        <button class="back-btn" onclick="goBackToJourney()">← Back</button>
+    </div>
+
+    <!-- VILLAGE PAGE -->
+    <div id="village-page" class="page" style="display:none;">
+        <button class="back-btn" onclick="goBackToDifficulty()">← Back</button>
+        <h1>Select Your Village or Faction</h1>
+        <div id="village-list"></div>
+    </div>
+
+    <!-- NINJA PAGE -->
+    <div id="ninja-page" class="page" style="display:none;">
+        <button class="back-btn" onclick="goBackToVillage()">← Back</button>
+        <h1 id="ninja-title"></h1>
+        <div id="ninja-container"></div>
+    </div>
+
+</body>
+</html>
