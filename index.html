@@ -2,122 +2,103 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Difficulty Selection</title>
+  <title>Difficulty Selection — Diagonal Formation</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    /* Natural PNG layout, no arrows, positions tuned:
-       - Academy near bottom-left
-       - Kage near top-right
-       - Akatsuki & Jinchuriki slightly higher than far bottom-right
-    */
+    /* ---------- TUNING VARIABLES (edit these to shift the whole formation) ---------- */
     :root{
-      --bg:#000;
-      --muted:#d0d0d0;
-      --accent:#ff1a1a;
-      --icon-min:72px;
-      --icon-max:150px;
-      --canvas-h:62vh;
-      --anchor-left:14%;
-      --anchor-top:92%;
-      --step-h:9.5%;
-      --step-v:13%;
+      --bg: #000;
+      --muted: #d0d0d0;
+      --anchor-left: 14%;   /* leftmost starting point (Academy) */
+      --anchor-top: 92%;    /* vertical start (Academy) */
+      --step-h: 9.5%;       /* horizontal step between stones */
+      --step-v: 13%;        /* vertical step between stones (how far up each step goes) */
+      --canvas-h: 62vh;     /* canvas height */
+      --icon-bottom-size: 150px; /* size of the bottom (largest) icon */
+      --icon-top-size: 84px;     /* size of the top (smallest) icon */
+      --paid-offset-x: 6.0;  /* multiplier of step-h for paid items X offset */
+      --paid-offset-y: 1.6;  /* multiplier of step-v for paid items Y offset */
     }
 
-    *{box-sizing:border-box}
-    html,body{height:100%;margin:0;background:var(--bg);color:#eaeaea;font-family:Arial,Helvetica,sans-serif}
-    .page{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
+    /* ---------- Base layout ---------- */
+    * { box-sizing: border-box; }
+    html,body { height:100%; margin:0; background:var(--bg); color:#eaeaea; font-family: Arial, Helvetica, sans-serif; -webkit-font-smoothing:antialiased; }
+    .page { min-height:100vh; padding:18px; display:flex; flex-direction:column; align-items:center; }
 
-    h1{color:var(--accent);margin:8px 0 12px;font-weight:700}
+    h1 { color:#ff1a1a; margin:8px 0 12px; font-weight:700; }
 
-    .difficulty-path{
-      position:relative;
-      width:100%;
-      max-width:1200px;
-      height:var(--canvas-h);
-      margin-top:18px;
-      margin-bottom:12px;
-      overflow:visible;
+    .difficulty-path {
+      position: relative;
+      width: 100%;
+      max-width: 1200px;
+      height: var(--canvas-h);
+      margin-top: 18px;
+      margin-bottom: 12px;
+      overflow: visible;
     }
 
-    /* Natural stone: no card background, only image + subtle label */
-    .difficulty-level{
-      position:absolute;
-      transform:translate(-50%,-50%);
-      text-align:center;
-      width:auto;
-      pointer-events:auto;
-      background:transparent;
-      padding:0;
-      border-radius:0;
-      box-shadow:none;
-      z-index:3;
+    /* natural image look — no cards */
+    .difficulty-level {
+      position: absolute;
+      transform: translate(-50%,-50%);
+      text-align: center;
+      background: transparent;
+      padding: 0;
+      z-index: 3;
+      pointer-events: auto;
     }
 
-    /* Image styling: natural, no frame */
-    .rock-icon{
-      width:clamp(var(--icon-min), 11.5vw, var(--icon-max));
-      height:auto;
-      display:block;
-      margin:0 auto;
+    /* icon sizing uses interpolation between bottom and top sizes */
+    .rock-icon {
+      width: var(--icon-bottom-size);
+      height: auto;
+      display: block;
+      margin: 0 auto;
       filter: drop-shadow(0 10px 22px rgba(0,0,0,0.6));
       transition: transform .16s ease, filter .16s ease;
-      border-radius:6px;
+      border-radius: 6px;
+      will-change: transform;
     }
-
-    .difficulty-level:hover .rock-icon{
+    .difficulty-level:hover .rock-icon {
       transform: translateY(-6px) scale(1.03);
       filter: drop-shadow(0 20px 36px rgba(0,0,0,0.65));
     }
 
-    .difficulty-info{
-      margin-top:8px;
-      color:var(--muted);
-      font-weight:700;
-      font-size:13px;
+    .difficulty-info {
+      margin-top: 8px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 13px;
       text-shadow: 0 1px 0 rgba(0,0,0,0.6);
-      background:transparent;
-      width:auto;
-      line-height:1;
+      line-height: 1;
     }
 
-    .difficulty-level button{ margin-top:8px; padding:6px 10px; border-radius:8px; font-weight:700; cursor:pointer; }
+    .paid-badge { display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:11px; margin-left:6px; vertical-align:middle; }
 
-    .paid-level .rock-icon{ filter: drop-shadow(0 18px 36px rgba(200,140,40,0.28)); }
-    .paid-badge{ display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:12px; margin-top:6px; }
+    /* ---------- Positions (calculated by JS for pixel-perfect diagonal) ---------- */
+    /* We set classes for each rank; JS will compute left/top and size based on index */
+    .academy, .genin, .chunin, .specialjonin, .jonin, .anbu, .kage, .akatsuki, .jinchuriki { /* placeholder */ }
 
-    /* Final positions (natural diagonal) */
-    .academy      { left: var(--anchor-left); top: var(--anchor-top); }
-    .genin        { left: calc(var(--anchor-left) + 1 * var(--step-h)); top: calc(var(--anchor-top) - 1 * var(--step-v)); }
-    .chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
-    .specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
-    .jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
-    .anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
-
-    /* Kage: closer to top-right */
-    .kage         { left: calc(var(--anchor-left) + 6.6 * var(--step-h)); top: calc(var(--anchor-top) - 6.8 * var(--step-v)); }
-
-    /* Paid items: slightly higher than the far bottom-right */
-    .akatsuki     { left: calc(var(--anchor-left) + 6.0 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
-    .jinchuriki   { left: calc(var(--anchor-left) + 6.8 * var(--step-h)); top: calc(var(--anchor-top) - 2.2 * var(--step-v)); }
-
-    .paid-badge { font-size:11px; padding:4px 6px; margin-left:6px; vertical-align:middle; }
-
+    /* Responsive tweaks */
     @media (max-width:1100px){
-      :root{ --icon-max:130px; --canvas-h:68vh; --step-h:8%; --step-v:12%; }
-      .difficulty-info{ font-size:12px; }
+      :root { --canvas-h: 68vh; --step-h: 8%; --step-v: 12%; --icon-bottom-size: 130px; --icon-top-size: 72px; }
+      .difficulty-info { font-size: 12px; }
     }
     @media (max-width:700px){
-      :root{ --icon-min:56px; --icon-max:110px; --canvas-h:82vh; --step-h:6.5%; --step-v:11%; --anchor-left:22%; --anchor-top:90%; }
-      .difficulty-info{ font-size:12px; }
+      :root { --canvas-h: 82vh; --step-h: 6.5%; --step-v: 11%; --anchor-left: 20%; --anchor-top: 90%; --icon-bottom-size: 110px; --icon-top-size: 64px; }
+      .difficulty-info { font-size: 12px; }
     }
+
+    /* small helper so images scale smoothly */
+    img.rock-icon { max-width: 100%; height: auto; display:block; }
   </style>
 </head>
 <body>
-  <div id="difficulty-page" class="page">
+  <div class="page">
     <h1>Select Your Difficulty</h1>
 
     <div class="difficulty-path" id="difficulty-canvas">
-      <!-- Levels (natural PNGs) - ensure these image paths exist in your project -->
+      <!-- Add id attributes so JS can compute positions -->
       <div id="academy" class="difficulty-level academy">
         <img src="Assets/Icons/Academy student.png" class="rock-icon" alt="Academy Student">
         <div class="difficulty-info">Academy Student</div>
@@ -153,7 +134,7 @@
         <div class="difficulty-info">Kage</div>
       </div>
 
-      <!-- Paid items (natural, slightly higher than bottom-right) -->
+      <!-- Paid items: slightly higher than far bottom-right -->
       <div id="akatsuki" class="difficulty-level paid-level akatsuki">
         <img src="Assets/Icons/Akatsuki.png" class="rock-icon" alt="Akatsuki">
         <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
@@ -171,15 +152,114 @@
   </div>
 
   <script>
-    // Minimal helpers: keep interactions safe and avoid layout jumps.
-    // If you want to nudge positions, change CSS variables at the top of the file.
-    // Example: document.documentElement.style.setProperty('--anchor-left','16%');
-    window.addEventListener('load', ()=> {
-      // ensure images that load later don't cause layout surprises
+    /* ---------- JS: compute diagonal positions and interpolate icon sizes ----------
+       - Keeps spacing consistent and matches the "stepping stones" formation in your reference.
+       - If you want to nudge the whole formation, edit the CSS :root variables at the top.
+       - This script runs on load and on resize.
+    */
+    (function positionStones(){
+      const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
+      const paid = ['akatsuki','jinchuriki'];
+
+      function px(v){ return parseFloat(v); }
+
+      function getVar(name){
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+      }
+
+      function parsePercent(str){
+        if(!str) return 0;
+        return parseFloat(str.replace('%',''));
+      }
+
+      function setPositions(){
+        const canvas = document.getElementById('difficulty-canvas');
+        if(!canvas) return;
+        const canvasRect = canvas.getBoundingClientRect();
+
+        // read tuning variables from CSS
+        const anchorLeft = parsePercent(getVar('--anchor-left')) / 100 * canvasRect.width;
+        const anchorTop  = parsePercent(getVar('--anchor-top')) / 100 * canvasRect.height;
+        const stepH = parsePercent(getVar('--step-h')) / 100 * canvasRect.width;
+        const stepV = parsePercent(getVar('--step-v')) / 100 * canvasRect.height;
+
+        // icon sizes (interpolate between bottom and top)
+        const iconBottom = px(getVar('--icon-bottom-size')) || 150;
+        const iconTop = px(getVar('--icon-top-size')) || 84;
+        const totalSteps = order.length - 1;
+
+        // place main order
+        order.forEach((id, idx) => {
+          const el = document.getElementById(id);
+          if(!el) return;
+          // compute left/top in canvas coordinates
+          const left = anchorLeft + idx * stepH;
+          const top  = anchorTop  - idx * stepV;
+          // convert to percent relative to canvas for CSS left/top
+          const leftPct = (left / canvasRect.width) * 100;
+          const topPct  = (top  / canvasRect.height) * 100;
+          el.style.left = leftPct + '%';
+          el.style.top  = topPct  + '%';
+
+          // interpolate icon size (larger at bottom, smaller at top)
+          const t = idx / Math.max(1, totalSteps);
+          const size = iconBottom * (1 - t) + iconTop * t;
+          const img = el.querySelector('.rock-icon');
+          if(img) img.style.width = Math.round(size) + 'px';
+        });
+
+        // place paid items slightly above far bottom-right (use multipliers)
+        const paidOffsetX = parseFloat(getVar('--paid-offset-x')) || 6.0;
+        const paidOffsetY = parseFloat(getVar('--paid-offset-y')) || 1.6;
+        const lastIdx = order.length - 1;
+        const baseX = anchorLeft + lastIdx * stepH;
+        const baseY = anchorTop  - lastIdx * stepV;
+
+        // Akatsuki
+        const ak = document.getElementById('akatsuki');
+        if(ak){
+          const left = baseX + paidOffsetX * (stepH / 1); // move right from last stone
+          const top  = anchorTop - 1.6 * stepV;           // slightly higher than bottom-right
+          ak.style.left = (left / canvasRect.width) * 100 + '%';
+          ak.style.top  = (top  / canvasRect.height) * 100 + '%';
+          const img = ak.querySelector('.rock-icon');
+          if(img) img.style.width = Math.round(iconBottom * 0.95) + 'px';
+        }
+
+        // Jinchuriki
+        const ji = document.getElementById('jinchuriki');
+        if(ji){
+          const left = baseX + (paidOffsetX + 0.8) * (stepH / 1);
+          const top  = anchorTop - 2.2 * stepV;
+          ji.style.left = (left / canvasRect.width) * 100 + '%';
+          ji.style.top  = (top  / canvasRect.height) * 100 + '%';
+          const img = ji.querySelector('.rock-icon');
+          if(img) img.style.width = Math.round(iconBottom * 0.98) + 'px';
+        }
+      }
+
+      // run on load and resize; also after images load to avoid jumps
+      window.addEventListener('resize', setPositions);
+      window.addEventListener('load', ()=> { setTimeout(setPositions, 80); });
+      // if images load later, update positions
       document.querySelectorAll('.rock-icon').forEach(img => {
-        if (!img.complete) img.addEventListener('load', ()=> {});
+        if(!img.complete) img.addEventListener('load', setPositions);
       });
-    });
+
+      // expose a small helper for quick live nudges in console:
+      window.nudgeDiagonal = function(deltaLeftPct, deltaTopPct){
+        // delta values are percentages to add to --anchor-left and --anchor-top
+        const root = document.documentElement;
+        const curLeft = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-left'));
+        const curTop  = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-top'));
+        root.style.setProperty('--anchor-left', (curLeft + deltaLeftPct) + '%');
+        root.style.setProperty('--anchor-top', (curTop + deltaTopPct) + '%');
+        setPositions();
+      };
+
+      // initial placement
+      setPositions();
+    })();
   </script>
 </body>
 </html>
