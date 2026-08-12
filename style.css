@@ -1,8 +1,7 @@
 body {
-    background: url('Assets/Backgrounds/red-clouds.png') no-repeat center center fixed;
-    background-size: cover;
+    background-color: #0a0a0a;
     color: #e0e0e0;
-    font-family: 'Trebuchet MS', sans-serif;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -42,51 +41,34 @@ button:hover {
     background-color: #333;
 }
 
-.difficulty-subtext {
-    margin-bottom: 30px;
-    font-size: 18px;
-    color: #ccc;
-}
-
 .difficulty-path {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    flex-wrap: wrap;
-    gap: 40px;
-    max-width: 1000px;
     position: relative;
+    width: 100%;
+    max-width: 900px;
+    height: 600px;
+    margin-top: 40px;
 }
 
-.difficulty-box {
-    background-color: rgba(20, 20, 20, 0.85);
-    border: 2px solid #990000;
-    border-radius: 10px;
-    width: 220px;
-    padding: 20px;
+.difficulty-level {
+    position: absolute;
+    width: 200px;
     text-align: center;
-    box-shadow: 0 0 20px rgba(255, 26, 26, 0.3);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    position: relative;
-}
-
-.difficulty-box:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 26, 26, 0.6);
 }
 
 .rock-icon {
     width: 100%;
     height: auto;
-    margin-bottom: 10px;
     filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.4));
 }
 
-/* Stepping stone effect */
-.academy { transform: translateY(60px); }
-.genin { transform: translateY(40px); }
-.chunin { transform: translateY(20px); }
-.specialjonin { transform: translateY(0px); }
-.jonin { transform: translateY(-20px); }
-.anbu { transform: translateY(-40px); }
-.kage { transform: translateY(-60px); }
+.difficulty-info {
+    margin-top: -20px;
+}
+
+.academy { left: 0; bottom: 0; }
+.genin { left: 120px; bottom: 60px; }
+.chunin { left: 240px; bottom: 120px; }
+.specialjonin { left: 360px; bottom: 180px; }
+.jonin { left: 480px; bottom: 240px; }
+.anbu { left: 600px; bottom: 300px; }
+.kage { left: 720px; bottom: 360px; }

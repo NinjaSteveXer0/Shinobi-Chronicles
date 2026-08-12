@@ -50,59 +50,72 @@
     <!-- DIFFICULTY PAGE -->
     <div id="difficulty-page" class="page" style="display:none;">
         <h1>Select Your Difficulty</h1>
-        <p class="difficulty-subtext">
-            Complete missions to unlock harder difficulties with greater rewards and legendary respect.
-        </p>
 
         <div class="difficulty-path">
-            <div class="difficulty-box academy">
+
+            <div class="difficulty-level academy">
                 <img src="Assets/Icons/Academy student.png" class="rock-icon">
-                <h2>Academy Student</h2>
-                <p>Basic training, simple survival.</p>
-                <button onclick="selectDifficulty('Academy Student')">Select</button>
+                <div class="difficulty-info">
+                    <h2>Academy Student</h2>
+                    <p>Basic training, simple survival.</p>
+                    <button onclick="selectDifficulty('Academy Student')">Select</button>
+                </div>
             </div>
 
-            <div class="difficulty-box genin">
+            <div class="difficulty-level genin">
                 <img src="Assets/Icons/Genin.png" class="rock-icon">
-                <h2>Genin</h2>
-                <p>Simple missions, hidden dangers.</p>
-                <button onclick="selectDifficulty('Genin')">Select</button>
+                <div class="difficulty-info">
+                    <h2>Genin</h2>
+                    <p>Simple missions, hidden dangers.</p>
+                    <button onclick="selectDifficulty('Genin')">Select</button>
+                </div>
             </div>
 
-            <div class="difficulty-box chunin">
+            <div class="difficulty-level chunin">
                 <img src="Assets/Icons/Chunin.png" class="rock-icon">
-                <h2>Chunin</h2>
-                <p>Teamwork and strategy are essential.</p>
-                <button onclick="selectDifficulty('Chunin')">Select</button>
+                <div class="difficulty-info">
+                    <h2>Chunin</h2>
+                    <p>Teamwork and strategy are essential.</p>
+                    <button onclick="selectDifficulty('Chunin')">Select</button>
+                </div>
             </div>
 
-            <div class="difficulty-box specialjonin">
+            <div class="difficulty-level specialjonin">
                 <img src="Assets/Icons/Special Jonin.png" class="rock-icon">
-                <h2>Special Jōnin</h2>
-                <p>Elite precision and resolve.</p>
-                <button onclick="selectDifficulty('Special Jonin')">Select</button>
+                <div class="difficulty-info">
+                    <h2>Special Jōnin</h2>
+                    <p>Elite precision and resolve.</p>
+                    <button onclick="selectDifficulty('Special Jonin')">Select</button>
+                </div>
             </div>
 
-            <div class="difficulty-box jonin">
+            <div class="difficulty-level jonin">
                 <img src="Assets/Icons/Jonin.png" class="rock-icon">
-                <h2>Jōnin</h2>
-                <p>Elite missions, respect is unforgettable.</p>
-                <button onclick="selectDifficulty('Jonin')">Select</button>
+                <div class="difficulty-info">
+                    <h2>Jōnin</h2>
+                    <p>Veteran missions, mastery required.</p>
+                    <button onclick="selectDifficulty('Jonin')">Select</button>
+                </div>
             </div>
 
-            <div class="difficulty-box anbu">
+            <div class="difficulty-level anbu">
                 <img src="Assets/Icons/Anbu.png" class="rock-icon">
-                <h2>ANBU</h2>
-                <p>Shadow operatives. Deadly missions.</p>
-                <button onclick="selectDifficulty('Anbu')">Select</button>
+                <div class="difficulty-info">
+                    <h2>ANBU</h2>
+                    <p>Shadow operatives. Deadly missions.</p>
+                    <button onclick="selectDifficulty('Anbu')">Select</button>
+                </div>
             </div>
 
-            <div class="difficulty-box kage">
+            <div class="difficulty-level kage">
                 <img src="Assets/Icons/Kage.png" class="rock-icon">
-                <h2>Kage</h2>
-                <p>The pinnacle of shinobi power.</p>
-                <button onclick="selectDifficulty('Kage')">Select</button>
+                <div class="difficulty-info">
+                    <h2>Kage</h2>
+                    <p>The pinnacle of shinobi power.</p>
+                    <button onclick="selectDifficulty('Kage')">Select</button>
+                </div>
             </div>
+
         </div>
 
         <button class="back-btn" onclick="goBackToJourney()">← Back</button>
