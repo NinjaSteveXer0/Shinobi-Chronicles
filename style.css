@@ -51,6 +51,7 @@ button:hover { background-color: #cc0000; transform: translateY(-2px); }
     height: 760px;        /* tall canvas so bottom positions are visible */
     margin-top: 80px;     /* push the whole path down on the page */
     margin-bottom: 40px;
+    box-sizing: border-box;
 }
 
 /* Each level is absolutely positioned inside the container */
@@ -145,7 +146,6 @@ button:hover { background-color: #cc0000; transform: translateY(-2px); }
     filter: drop-shadow(0 0 22px rgba(200, 60, 60, 0.55));
 }
 
-/* Jinchuriki sits slightly to the right of Akatsuki in the paid area */
 .jinchuriki {
     left: 76%;
     bottom: 6%;            /* same bottom line as Akatsuki */
