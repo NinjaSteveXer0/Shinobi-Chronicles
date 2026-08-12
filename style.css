@@ -18,7 +18,7 @@
 /* Icon styling */
 .rock-icon {
   border-radius: 6px;
-  width: clamp(120px, 12vw, 180px); /* consistent size */
+  width: clamp(130px, 12vw, 180px); /* consistent readable size */
   height: auto;
   transition: transform 0.3s ease;
 }
@@ -43,9 +43,9 @@
 .anbu         { left: var(--anchor-left); top: calc(var(--anchor-top) - 5 * var(--step-v)); transform: translateX(-50%); }
 .kage         { left: var(--anchor-left); top: calc(var(--anchor-top) - 6 * var(--step-v)); transform: translateX(-50%); }
 
-/* Paid ranks offset slightly to the right */
-.akatsuki     { left: calc(var(--anchor-left) + 18%); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
-.jinchuriki   { left: calc(var(--anchor-left) + 18%); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
+/* Paid ranks positioned lower but visible */
+.akatsuki     { left: calc(var(--anchor-left) + 10%); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
+.jinchuriki   { left: calc(var(--anchor-left) + 10%); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
 
 /* Paid badge styling */
 .paid-badge {
@@ -59,5 +59,5 @@
 /* Responsive scaling */
 @media (max-width: 900px) {
   :root { --step-v: 7%; }
-  .rock-icon { width: clamp(90px, 18vw, 140px); }
+  .rock-icon { width: clamp(100px, 18vw, 140px); }
 }
