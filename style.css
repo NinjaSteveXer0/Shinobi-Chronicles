@@ -1,4 +1,4 @@
-/* style.css - repositioned diagonal climb; Akatsuki & Jinchuriki placed at bottom as paid content */
+/* style.css - refined positions: lower Academy Student; paid items anchored bottom row */
 
 body {
     background-color: #000;
@@ -42,8 +42,7 @@ button {
 button:hover { background-color: #cc0000; transform: translateY(-2px); }
 .back-btn { background-color: #333; }
 
-/* ---------- Difficulty Path Container ---------- */
-/* Taller canvas and pushed down so the diagonal sits lower on the page */
+/* Difficulty Path Container */
 .difficulty-path {
     position: relative;
     width: 100%;
@@ -85,70 +84,70 @@ button:hover { background-color: #cc0000; transform: translateY(-2px); }
     width: 220px;
 }
 
-/* ---------- Precise absolute positions (diagonal climb) ---------- */
+/* ---------- Precise absolute positions (refined diagonal) ---------- */
 /* Academy Student: drastically lower and moved right from extreme left */
 .academy {
-    left: 30%;      /* moved in from the left */
-    bottom: 4%;     /* very low on the canvas */
+    left: 34%;      /* moved further right */
+    bottom: 2%;     /* very low on the canvas */
 }
 
 /* Genin: slightly up and to the right of Academy */
 .genin {
-    left: 38%;
-    bottom: 18%;
+    left: 40%;
+    bottom: 16%;
 }
 
 /* Chunin: continuing the diagonal */
 .chunin {
-    left: 46%;
-    bottom: 30%;
+    left: 48%;
+    bottom: 28%;
 }
 
 /* Special Jōnin: mid-climb */
 .specialjonin {
-    left: 54%;
-    bottom: 42%;
+    left: 56%;
+    bottom: 40%;
 }
 
 /* Jōnin: higher */
 .jonin {
     left: 62%;
-    bottom: 54%;
+    bottom: 52%;
 }
 
 /* ANBU: near the upper middle */
 .anbu {
     left: 68%;
-    bottom: 64%;
+    bottom: 62%;
 }
 
 /* Kage: the top-right crown of the diagonal */
 .kage {
-    left: 76%;
-    bottom: 74%;
+    left: 74%;
+    bottom: 72%;
 }
 
-/* ---------- Paid content: Akatsuki & Jinchuriki placed at bottom area ---------- */
+/* ---------- Paid content: Akatsuki & Jinchuriki anchored to bottom row ---------- */
 /* These are intentionally separated and anchored low on the page (paid content area) */
-/* Visual treatment: subtle gold border, small badge, slightly dimmed until purchased */
 .paid-level {
     pointer-events: auto;
     transition: transform .18s ease, opacity .18s ease;
 }
 
-/* Akatsuki and Jinchuriki anchored near the bottom, between Anbu and Kage horizontally but low vertically */
+/* Place paid items in a visible bottom row, horizontally between ANBU and Kage */
 .akatsuki {
-    left: 70%;
-    bottom: 6%;            /* anchored low on the page */
+    left: 68%;
+    bottom: 4%;            /* anchored low on the page */
     transform: translate(-50%, 0) scale(1.02);
     opacity: 0.95;
-    border-radius: 6px;
     filter: drop-shadow(0 0 22px rgba(200, 60, 60, 0.55));
+    border-radius: 6px;
 }
 
+/* Jinchuriki sits to the right of Akatsuki in the paid area */
 .jinchuriki {
     left: 76%;
-    bottom: 6%;            /* same bottom line as Akatsuki */
+    bottom: 4%;            /* same bottom line as Akatsuki */
     transform: translate(-50%, 0) scale(1.04);
     opacity: 0.98;
     filter: drop-shadow(0 0 28px rgba(255, 120, 80, 0.6));
@@ -191,33 +190,33 @@ button:hover { background-color: #cc0000; transform: translateY(-2px); }
 @media (max-width: 1200px) {
     .difficulty-path { height: 700px; margin-top: 70px; }
     .rock-icon { width: 150px; }
-    .academy { left: 28%; bottom: 4%; }
-    .genin { left: 36%; bottom: 16%; }
-    .chunin { left: 44%; bottom: 28%; }
-    .specialjonin { left: 52%; bottom: 40%; }
-    .jonin { left: 60%; bottom: 52%; }
-    .anbu { left: 66%; bottom: 62%; }
-    .kage { left: 74%; bottom: 72%; }
-    .akatsuki { left: 70%; bottom: 6%; }
-    .jinchuriki { left: 76%; bottom: 6%; }
+    .academy { left: 32%; bottom: 3%; }
+    .genin { left: 38%; bottom: 14%; }
+    .chunin { left: 46%; bottom: 26%; }
+    .specialjonin { left: 54%; bottom: 38%; }
+    .jonin { left: 60%; bottom: 50%; }
+    .anbu { left: 66%; bottom: 60%; }
+    .kage { left: 72%; bottom: 70%; }
+    .akatsuki { left: 68%; bottom: 4%; }
+    .jinchuriki { left: 76%; bottom: 4%; }
 }
 
 @media (max-width: 800px) {
     /* stack more vertically on very small screens */
     .difficulty-path { height: 920px; margin-top: 40px; }
     .rock-icon { width: 140px; }
-    .academy { left: 30%; bottom: 3%; }
-    .genin { left: 38%; bottom: 12%; }
-    .chunin { left: 46%; bottom: 24%; }
-    .specialjonin { left: 54%; bottom: 36%; }
+    .academy { left: 34%; bottom: 3%; }
+    .genin { left: 40%; bottom: 12%; }
+    .chunin { left: 48%; bottom: 24%; }
+    .specialjonin { left: 56%; bottom: 36%; }
     .jonin { left: 62%; bottom: 48%; }
     .anbu { left: 68%; bottom: 60%; }
-    .kage { left: 76%; bottom: 70%; }
+    .kage { left: 74%; bottom: 70%; }
     .akatsuki { left: 68%; bottom: 4%; }
-    .jinchuriki { left: 74%; bottom: 4%; }
+    .jinchuriki { left: 76%; bottom: 4%; }
 }
 
-/* ---------- Village Page (unchanged) ---------- */
+/* Village Page (unchanged) */
 .village-container {
     display: flex;
     flex-wrap: wrap;
