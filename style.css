@@ -1,115 +1,44 @@
-/* style.css - natural image look, no cards; diagonal repositioning per your request */
-
-:root{
-  --bg:#000;
-  --muted:#d0d0d0;
-  --accent:#ff1a1a;
-  --icon-min:72px;
-  --icon-max:150px;
-  --canvas-h:62vh;
-  /* global diagonal anchor (change these two to shift whole diagonal) */
-  --anchor-left:18%;   /* leftmost anchor for Academy Student */
-  --anchor-top:92%;    /* top position for Academy Student (near bottom) */
-  --step-h:8.5%;       /* horizontal step between ranks */
-  --step-v:12.5%;      /* vertical step between ranks (smaller = flatter slope) */
+/* Arrow overlay fills the canvas and sits above the images */
+.arrow-overlay {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* clicks pass through to images/buttons */
+  overflow: visible;
+  z-index: 5;
 }
 
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:var(--bg);color:#eaeaea;font-family:Arial,Helvetica,sans-serif}
-.page{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
+/* make sure difficulty-levels are above canvas background but below overlay for pointer events */
+.difficulty-level { z-index: 3; }
 
-/* Title */
-h1{color:var(--accent);margin:8px 0 12px;font-weight:700}
+/* Natural image look (no cards) */
+.difficulty-level { background: transparent; padding: 0; box-shadow: none; }
+.rock-icon { border-radius: 6px; }
 
-/* Canvas */
-.difficulty-path{
-  position:relative;
-  width:100%;
-  max-width:1200px;
-  height:var(--canvas-h);
-  margin-top:18px;
-  margin-bottom:12px;
-  overflow:visible;
-}
+/* Final positions (adjusted per your request) */
+/* Academy Student: closer to bottom-left */
+:root { --anchor-left:14%; --anchor-top:92%; --step-h:9.5%; --step-v:13%; --icon-max:140px; --icon-min:72px; }
 
-/* Natural stone: no card background, only image + subtle label */
-.difficulty-level{
-  position:absolute;
-  transform:translate(-50%,-50%);
-  text-align:center;
-  width:auto;
-  pointer-events:auto;
-  background:transparent;
-  padding:0;
-  border-radius:0;
-  box-shadow:none;
-}
-
-/* Image styling: natural, no frame */
-.rock-icon{
-  width:clamp(var(--icon-min), 11.5vw, var(--icon-max));
-  height:auto;
-  display:block;
-  margin:0 auto;
-  filter: drop-shadow(0 10px 22px rgba(0,0,0,0.6));
-  transition: transform .16s ease, filter .16s ease;
-  border-radius:6px; /* small rounding to match source if images have soft edges */
-}
-
-/* subtle lift on hover */
-.difficulty-level:hover .rock-icon{
-  transform: translateY(-6px) scale(1.03);
-  filter: drop-shadow(0 20px 36px rgba(0,0,0,0.65));
-}
-
-/* label sits just under the image, minimal styling */
-.difficulty-info{
-  margin-top:8px;
-  color:var(--muted);
-  font-weight:700;
-  font-size:13px;
-  text-shadow: 0 1px 0 rgba(0,0,0,0.6);
-  background:transparent;
-  width:auto;
-  line-height:1;
-}
-
-/* remove any default button/card visuals inside levels */
-.difficulty-level button{ margin-top:8px; padding:6px 10px; border-radius:8px; font-weight:700; cursor:pointer; }
-
-/* Paid items: visually distinct but still natural (gold tint + small badge) */
-.paid-level .rock-icon{ filter: drop-shadow(0 18px 36px rgba(200,140,40,0.28)); }
-.paid-badge{ display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:12px; margin-top:6px; }
-
-/* ---------- Positions (natural diagonal) ----------
-   Academy anchor is the left/bottom start; subsequent ranks use consistent steps.
-   Kage is placed near the top-right by using multiple steps from the anchor.
-   Akatsuki/Jinchuriki are slightly higher than the far bottom-right (paid area).
-*/
-
-/* Academy Student: bottom-left anchor (moved in from extreme left) */
 .academy      { left: var(--anchor-left); top: var(--anchor-top); }
-
-/* Genin -> Chunin -> Special Jonin -> Jonin -> ANBU -> Kage (regular steps) */
 .genin        { left: calc(var(--anchor-left) + 1 * var(--step-h)); top: calc(var(--anchor-top) - 1 * var(--step-v)); }
 .chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
 .specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
 .jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
 .anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
 
-/* Kage: closer to top-right (6 steps up/right from anchor) */
-.kage         { left: calc(var(--anchor-left) + 6 * var(--step-h)); top: calc(var(--anchor-top) - 6 * var(--step-v)); }
+/* Kage: closer to top-right */
+.kage         { left: calc(var(--anchor-left) + 6.6 * var(--step-h)); top: calc(var(--anchor-top) - 6.8 * var(--step-v)); }
 
-/* Paid items: slightly higher than the far bottom-right (not at the very bottom) */
-.akatsuki     { left: calc(var(--anchor-left) + 5.5 * var(--step-h)); top: calc(var(--anchor-top) - 1.2 * var(--step-v)); }
-.jinchuriki   { left: calc(var(--anchor-left) + 6.2 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
+/* Paid items: slightly higher than the far bottom-right */
+.akatsuki     { left: calc(var(--anchor-left) + 6.0 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
+.jinchuriki   { left: calc(var(--anchor-left) + 6.8 * var(--step-h)); top: calc(var(--anchor-top) - 2.2 * var(--step-v)); }
 
-/* ---------- Responsive tweaks ---------- */
-@media (max-width:1100px){
-  :root{ --icon-max:130px; --canvas-h:68vh; --step-h:7.5%; --step-v:13%; }
-  .difficulty-info{ font-size:12px; }
-}
-@media (max-width:700px){
-  :root{ --icon-min:56px; --icon-max:110px; --canvas-h:82vh; --step-h:6.5%; --step-v:11%; --anchor-left:22%; --anchor-top:90%; }
-  .difficulty-info{ font-size:12px; }
+/* Paid badge small tweak */
+.paid-badge { font-size:11px; padding:4px 6px; margin-left:6px; vertical-align:middle; }
+
+/* ensure overlay scales on resize */
+@media (max-width:900px) {
+  :root { --step-h:8%; --step-v:12%; --icon-max:120px; }
 }

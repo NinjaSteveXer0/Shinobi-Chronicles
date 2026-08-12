@@ -4,128 +4,261 @@
   <meta charset="utf-8" />
   <title>Difficulty Selection</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Inline CSS - natural image look, diagonal layout, arrow overlay */
+    :root{
+      --bg:#000;
+      --muted:#d0d0d0;
+      --accent:#ff1a1a;
+      --icon-min:72px;
+      --icon-max:150px;
+      --canvas-h:62vh;
+      --anchor-left:14%;
+      --anchor-top:92%;
+      --step-h:9.5%;
+      --step-v:13%;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;background:var(--bg);color:#eaeaea;font-family:Arial,Helvetica,sans-serif}
+    .page{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center}
+
+    /* Title */
+    h1{color:var(--accent);margin:8px 0 12px;font-weight:700}
+
+    /* Canvas */
+    .difficulty-path{
+      position:relative;
+      width:100%;
+      max-width:1200px;
+      height:var(--canvas-h);
+      margin-top:18px;
+      margin-bottom:12px;
+      overflow:visible;
+    }
+
+    /* Natural stone: no card background, only image + subtle label */
+    .difficulty-level{
+      position:absolute;
+      transform:translate(-50%,-50%);
+      text-align:center;
+      width:auto;
+      pointer-events:auto;
+      background:transparent;
+      padding:0;
+      border-radius:0;
+      box-shadow:none;
+      z-index:3;
+    }
+
+    /* Image styling: natural, no frame */
+    .rock-icon{
+      width:clamp(var(--icon-min), 11.5vw, var(--icon-max));
+      height:auto;
+      display:block;
+      margin:0 auto;
+      filter: drop-shadow(0 10px 22px rgba(0,0,0,0.6));
+      transition: transform .16s ease, filter .16s ease;
+      border-radius:6px;
+    }
+
+    /* subtle lift on hover */
+    .difficulty-level:hover .rock-icon{
+      transform: translateY(-6px) scale(1.03);
+      filter: drop-shadow(0 20px 36px rgba(0,0,0,0.65));
+    }
+
+    /* label sits just under the image, minimal styling */
+    .difficulty-info{
+      margin-top:8px;
+      color:var(--muted);
+      font-weight:700;
+      font-size:13px;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.6);
+      background:transparent;
+      width:auto;
+      line-height:1;
+    }
+
+    .difficulty-level button{ margin-top:8px; padding:6px 10px; border-radius:8px; font-weight:700; cursor:pointer; }
+
+    /* Paid items: visually distinct but still natural (gold tint + small badge) */
+    .paid-level .rock-icon{ filter: drop-shadow(0 18px 36px rgba(200,140,40,0.28)); }
+    .paid-badge{ display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:12px; margin-top:6px; }
+
+    /* Arrow overlay fills the canvas and sits above the images */
+    .arrow-overlay {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      z-index: 5;
+    }
+
+    /* Final positions (natural diagonal) */
+    .academy      { left: var(--anchor-left); top: var(--anchor-top); }
+    .genin        { left: calc(var(--anchor-left) + 1 * var(--step-h)); top: calc(var(--anchor-top) - 1 * var(--step-v)); }
+    .chunin       { left: calc(var(--anchor-left) + 2 * var(--step-h)); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
+    .specialjonin { left: calc(var(--anchor-left) + 3 * var(--step-h)); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
+    .jonin        { left: calc(var(--anchor-left) + 4 * var(--step-h)); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
+    .anbu         { left: calc(var(--anchor-left) + 5 * var(--step-h)); top: calc(var(--anchor-top) - 5 * var(--step-v)); }
+    .kage         { left: calc(var(--anchor-left) + 6.6 * var(--step-h)); top: calc(var(--anchor-top) - 6.8 * var(--step-v)); }
+
+    /* Paid items: slightly higher than the far bottom-right */
+    .akatsuki     { left: calc(var(--anchor-left) + 6.0 * var(--step-h)); top: calc(var(--anchor-top) - 1.6 * var(--step-v)); }
+    .jinchuriki   { left: calc(var(--anchor-left) + 6.8 * var(--step-h)); top: calc(var(--anchor-top) - 2.2 * var(--step-v)); }
+
+    .paid-badge { font-size:11px; padding:4px 6px; margin-left:6px; vertical-align:middle; }
+
+    /* Responsive tweaks */
+    @media (max-width:1100px){
+      :root{ --icon-max:130px; --canvas-h:68vh; --step-h:8%; --step-v:12%; }
+      .difficulty-info{ font-size:12px; }
+    }
+    @media (max-width:700px){
+      :root{ --icon-min:56px; --icon-max:110px; --canvas-h:82vh; --step-h:6.5%; --step-v:11%; --anchor-left:22%; --anchor-top:90%; }
+      .difficulty-info{ font-size:12px; }
+    }
+
+    /* small helper to ensure SVG markers look crisp on high-DPI */
+    svg { shape-rendering: geometricPrecision; }
+  </style>
 </head>
 <body>
-  <!-- Main pages -->
-  <div id="home-page" class="page" style="display:none;">
-    <h1>Home</h1>
-    <p>Home content here.</p>
-    <button onclick="showDifficulty()">Go to Difficulty</button>
-  </div>
-
-  <!-- DIFFICULTY PAGE -->
-  <div id="difficulty-page" class="page" style="display:block;">
+  <div id="difficulty-page" class="page">
     <h1>Select Your Difficulty</h1>
 
-    <div class="difficulty-path">
-      <div class="difficulty-level academy">
+    <div class="difficulty-path" id="difficulty-canvas">
+      <!-- Levels (natural PNGs) - ensure these image paths exist in your project -->
+      <div id="academy" class="difficulty-level academy">
         <img src="Assets/Icons/Academy student.png" class="rock-icon" alt="Academy Student">
-        <div class="difficulty-info">
-          <h2>Academy Student</h2>
-          <p>Basic training, simple survival.</p>
-          <button onclick="selectDifficulty('Academy Student')">Select</button>
-        </div>
+        <div class="difficulty-info">Academy Student</div>
       </div>
 
-      <div class="difficulty-level genin">
+      <div id="genin" class="difficulty-level genin">
         <img src="Assets/Icons/Genin.png" class="rock-icon" alt="Genin">
-        <div class="difficulty-info">
-          <h2>Genin</h2>
-          <p>Simple missions, hidden dangers.</p>
-          <button onclick="selectDifficulty('Genin')">Select</button>
-        </div>
+        <div class="difficulty-info">Genin</div>
       </div>
 
-      <div class="difficulty-level chunin">
+      <div id="chunin" class="difficulty-level chunin">
         <img src="Assets/Icons/Chunin.png" class="rock-icon" alt="Chunin">
-        <div class="difficulty-info">
-          <h2>Chunin</h2>
-          <p>Teamwork and strategy are essential.</p>
-          <button onclick="selectDifficulty('Chunin')">Select</button>
-        </div>
+        <div class="difficulty-info">Chunin</div>
       </div>
 
-      <div class="difficulty-level specialjonin">
+      <div id="specialjonin" class="difficulty-level specialjonin">
         <img src="Assets/Icons/Special Jonin.png" class="rock-icon" alt="Special Jonin">
-        <div class="difficulty-info">
-          <h2>Special Jōnin</h2>
-          <p>Elite precision and resolve.</p>
-          <button onclick="selectDifficulty('Special Jonin')">Select</button>
-        </div>
+        <div class="difficulty-info">Special Jōnin</div>
       </div>
 
-      <div class="difficulty-level jonin">
-        <img src="Assets/Icons/Jonin.png" class="rock-icon" alt="Jonin">
-        <div class="difficulty-info">
-          <h2>Jōnin</h2>
-          <p>Veteran missions, mastery required.</p>
-          <button onclick="selectDifficulty('Jonin')">Select</button>
-        </div>
+      <div id="jonin" class="difficulty-level jonin">
+        <img src="Assets/Icons/Jonin.png" class="rock-icon" alt="Jōnin">
+        <div class="difficulty-info">Jōnin</div>
       </div>
 
-      <div class="difficulty-level anbu">
+      <div id="anbu" class="difficulty-level anbu">
         <img src="Assets/Icons/Anbu.png" class="rock-icon" alt="ANBU">
-        <div class="difficulty-info">
-          <h2>ANBU</h2>
-          <p>Shadow operatives. Deadly missions.</p>
-          <button onclick="selectDifficulty('Anbu')">Select</button>
-        </div>
+        <div class="difficulty-info">ANBU</div>
       </div>
 
-      <div class="difficulty-level kage">
+      <div id="kage" class="difficulty-level kage">
         <img src="Assets/Icons/Kage.png" class="rock-icon" alt="Kage">
-        <div class="difficulty-info">
-          <h2>Kage</h2>
-          <p>The pinnacle of shinobi power.</p>
-          <button onclick="selectDifficulty('Kage')">Select</button>
-        </div>
+        <div class="difficulty-info">Kage</div>
       </div>
-    </div>
 
-    <!-- Paid row (Akatsuki & Jinchuriki) -->
-    <div class="paid-row" style="margin-top:28px;">
-      <div class="difficulty-level paid-level akatsuki paid-locked">
+      <!-- Paid items (natural, slightly higher than bottom-right) -->
+      <div id="akatsuki" class="difficulty-level paid-level akatsuki">
         <img src="Assets/Icons/Akatsuki.png" class="rock-icon" alt="Akatsuki">
-        <div class="difficulty-info">
-          <h2>Akatsuki</h2>
-          <p>Paid content</p>
-          <div class="paid-badge">PAID</div>
-          <button onclick="buyContent('Akatsuki')">Buy</button>
-        </div>
+        <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
       </div>
 
-      <div class="difficulty-level paid-level jinchuriki paid-locked">
+      <div id="jinchuriki" class="difficulty-level paid-level jinchuriki">
         <img src="Assets/Icons/Jinchuriki.png" class="rock-icon" alt="Jinchuriki">
-        <div class="difficulty-info">
-          <h2>Jinchūriki</h2>
-          <p>Paid content</p>
-          <div class="paid-badge">PAID</div>
-          <button onclick="buyContent('Jinchuriki')">Buy</button>
-        </div>
+        <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
       </div>
+
+      <!-- SVG overlay for arrows -->
+      <svg id="arrow-overlay" class="arrow-overlay" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto">
+            <path d="M0,0 L10,4 L0,8 z" fill="#6ee07a"></path>
+          </marker>
+        </defs>
+
+        <path id="path-academy-genin" d="" stroke="#39d353" stroke-width="4" fill="none" marker-end="url(#arrowhead)" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+        <path id="path-genin-chunin" d="" stroke="#39d353" stroke-width="4" fill="none" marker-end="url(#arrowhead)" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+        <path id="path-chunin-special" d="" stroke="#39d353" stroke-width="4" fill="none" marker-end="url(#arrowhead)" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+        <path id="path-special-jonin" d="" stroke="#39d353" stroke-width="4" fill="none" marker-end="url(#arrowhead)" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+        <path id="path-jonin-anbu" d="" stroke="#39d353" stroke-width="4" fill="none" marker-end="url(#arrowhead)" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+        <path id="path-anbu-kage" d="" stroke="#39d353" stroke-width="4" fill="none" marker-end="url(#arrowhead)" stroke-linecap="round" stroke-linejoin="round" opacity="0.95"/>
+        <path id="path-anbu-akatsuki" d="" stroke="#39d353" stroke-width="3.5" fill="none" marker-end="url(#arrowhead)" opacity="0.9"/>
+        <path id="path-akatsuki-jinchuriki" d="" stroke="#39d353" stroke-width="3.5" fill="none" marker-end="url(#arrowhead)" opacity="0.9"/>
+      </svg>
     </div>
 
-    <button class="back-btn" onclick="goBackToJourney()">← Back</button>
+    <div style="margin-top:18px;">
+      <button onclick="alert('Back')">← Back</button>
+    </div>
   </div>
 
-  <!-- Minimal script to avoid runtime errors while you iterate -->
   <script>
-    function showDifficulty() {
-      document.getElementById('home-page').style.display = 'none';
-      document.getElementById('difficulty-page').style.display = 'block';
-    }
-    function goBackToJourney() {
-      document.getElementById('difficulty-page').style.display = 'none';
-      document.getElementById('home-page').style.display = 'block';
-    }
-    function selectDifficulty(name) {
-      console.log('Selected difficulty:', name);
-      alert('Selected: ' + name);
-    }
-    function buyContent(name) {
-      alert('Purchase flow for: ' + name);
-    }
+    // Arrow drawing script: computes centers and draws smooth curved paths between elements.
+    (function drawArrows(){
+      const overlay = document.getElementById('arrow-overlay');
+      if(!overlay) return;
+
+      const pairs = [
+        ['academy','genin','path-academy-genin'],
+        ['genin','chunin','path-genin-chunin'],
+        ['chunin','specialjonin','path-chunin-special'],
+        ['specialjonin','jonin','path-special-jonin'],
+        ['jonin','anbu','path-jonin-anbu'],
+        ['anbu','kage','path-anbu-kage'],
+        ['anbu','akatsuki','path-anbu-akatsuki'],
+        ['akatsuki','jinchuriki','path-akatsuki-jinchuriki']
+      ];
+
+      function getCenter(el){
+        const r = el.getBoundingClientRect();
+        const parent = overlay.getBoundingClientRect();
+        return { x: r.left + r.width/2 - parent.left, y: r.top + r.height/2 - parent.top };
+      }
+
+      function setPath(id, p1, p2){
+        const dx = Math.abs(p2.x - p1.x);
+        const dy = Math.abs(p2.y - p1.y);
+        const curvature = Math.min(140, Math.max(40, dx * 0.25 + dy * 0.08));
+        const cx1 = p1.x + (p2.x > p1.x ? curvature : -curvature);
+        const cy1 = p1.y - curvature * 0.18;
+        const cx2 = p2.x - (p2.x > p1.x ? curvature : -curvature);
+        const cy2 = p2.y + curvature * 0.18;
+        const d = `M ${p1.x} ${p1.y} C ${cx1} ${cy1} ${cx2} ${cy2} ${p2.x} ${p2.y}`;
+        const path = document.getElementById(id);
+        if(path) path.setAttribute('d', d);
+      }
+
+      function update(){
+        pairs.forEach(([a,b,id])=>{
+          const elA = document.getElementById(a);
+          const elB = document.getElementById(b);
+          if(!elA || !elB) return;
+          const p1 = getCenter(elA);
+          const p2 = getCenter(elB);
+          setPath(id, p1, p2);
+        });
+      }
+
+      // redraw on events
+      update();
+      window.addEventListener('resize', update);
+      window.addEventListener('scroll', update);
+      window.addEventListener('load', ()=> setTimeout(update, 120));
+      // if images load later, redraw again
+      const imgs = document.querySelectorAll('.rock-icon');
+      imgs.forEach(img => img.addEventListener('load', update));
+    })();
   </script>
 </body>
 </html>
