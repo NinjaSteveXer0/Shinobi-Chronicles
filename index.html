@@ -1,194 +1,89 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Shinobi Chronicles</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="game.js" defer></script>
-</head>
+<!-- DIFFICULTY PAGE -->
+<div id="difficulty-page" class="page" style="display:none;">
+    <h1>Select Your Difficulty</h1>
 
-<body>
-
-    <!-- LOGIN PAGE -->
-    <div id="login-page" class="page">
-        <h1>Shinobi Chronicles</h1>
-
-        <div class="login-box">
-            <input type="text" id="username" placeholder="Username">
-            <input type="password" id="password" placeholder="Password">
-
-            <button onclick="login()">Login</button>
-            <button onclick="register()">Register</button>
-        </div>
-    </div>
-
-    <!-- JOURNEY PAGE -->
-    <div id="journey-page" class="page" style="display:none;">
-        <h1>Your Journey Begins</h1>
-
-        <p class="intro-text">
-            Long before your name is etched into the annals of the shinobi world,<br>
-            before your chakra is shaped into jutsu that shake the earth,<br>
-            there is a single moment that defines every warrior’s fate.<br><br>
-            A moment where the world is quiet…<br>
-            where destiny leans in…<br>
-            and whispers your true calling.<br><br>
-            You stand at the threshold of legend —<br>
-            a path walked by heroes, rogues, and ghosts of forgotten clans.<br>
-            The villages watch from the shadows.<br>
-            The winds carry rumors of rising threats.<br>
-            And somewhere, deep within you,<br>
-            a spark waits to ignite into something far greater.<br><br>
-            Today, young shinobi…<br>
-            your story begins.
-        </p>
-
-        <button onclick="goToDifficulty()">Continue</button>
-        <button class="back-btn" onclick="goBackToLogin()">← Back</button>
-    </div>
-
-    <!-- DIFFICULTY PAGE -->
-    <div id="difficulty-page" class="page" style="display:none;">
-        <h1>Select Your Difficulty</h1>
-
-        <div class="difficulty-path">
-            <div class="difficulty-level academy">
-                <img src="Assets/Icons/Academy student.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>Academy Student</h2>
-                    <p>Basic training, simple survival.</p>
-                    <button onclick="selectDifficulty('Academy Student')">Select</button>
-                </div>
-            </div>
-
-            <div class="difficulty-level genin">
-                <img src="Assets/Icons/Genin.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>Genin</h2>
-                    <p>Simple missions, hidden dangers.</p>
-                    <button onclick="selectDifficulty('Genin')">Select</button>
-                </div>
-            </div>
-
-            <div class="difficulty-level chunin">
-                <img src="Assets/Icons/Chunin.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>Chunin</h2>
-                    <p>Teamwork and strategy are essential.</p>
-                    <button onclick="selectDifficulty('Chunin')">Select</button>
-                </div>
-            </div>
-
-            <div class="difficulty-level specialjonin">
-                <img src="Assets/Icons/Special Jonin.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>Special Jōnin</h2>
-                    <p>Elite precision and resolve.</p>
-                    <button onclick="selectDifficulty('Special Jonin')">Select</button>
-                </div>
-            </div>
-
-            <div class="difficulty-level jonin">
-                <img src="Assets/Icons/Jonin.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>Jōnin</h2>
-                    <p>Veteran missions, mastery required.</p>
-                    <button onclick="selectDifficulty('Jonin')">Select</button>
-                </div>
-            </div>
-
-            <div class="difficulty-level anbu">
-                <img src="Assets/Icons/Anbu.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>ANBU</h2>
-                    <p>Shadow operatives. Deadly missions.</p>
-                    <button onclick="selectDifficulty('Anbu')">Select</button>
-                </div>
-            </div>
-
-            <div class="difficulty-level kage">
-                <img src="Assets/Icons/Kage.png" class="rock-icon">
-                <div class="difficulty-info">
-                    <h2>Kage</h2>
-                    <p>The pinnacle of shinobi power.</p>
-                    <button onclick="selectDifficulty('Kage')">Select</button>
-                </div>
+    <div class="difficulty-path">
+        <div class="difficulty-level academy">
+            <img src="Assets/Icons/Academy student.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Academy Student</h2>
+                <p>Basic training, simple survival.</p>
+                <button onclick="selectDifficulty('Academy Student')">Select</button>
             </div>
         </div>
 
-        <button class="back-btn" onclick="goBackToJourney()">← Back</button>
-    </div>
-
-    <!-- VILLAGE SELECTION PAGE -->
-    <div id="village-page" class="page" style="display:none;">
-        <h1>Choose Your Village</h1>
-
-        <div class="village-container">
-
-            <div class="village-box" onclick="selectVillage('Konoha')">
-                <img src="Assets/Icons/Konoha.png" class="village-icon">
-                <p>Konoha</p>
+        <div class="difficulty-level genin">
+            <img src="Assets/Icons/Genin.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Genin</h2>
+                <p>Simple missions, hidden dangers.</p>
+                <button onclick="selectDifficulty('Genin')">Select</button>
             </div>
-
-            <div class="village-box" onclick="selectVillage('Kiri')">
-                <img src="Assets/Icons/Kiri.png" class="village-icon">
-                <p>Kiri</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Kumo')">
-                <img src="Assets/Icons/Kumo.png" class="village-icon">
-                <p>Kumo</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Suna')">
-                <img src="Assets/Icons/Suna.png" class="village-icon">
-                <p>Suna</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Iwa')">
-                <img src="Assets/Icons/Iwa.png" class="village-icon">
-                <p>Iwa</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Ame')">
-                <img src="Assets/Icons/Ame.png" class="village-icon">
-                <p>Ame</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Oto')">
-                <img src="Assets/Icons/Oto.png" class="village-icon">
-                <p>Oto</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Kusa')">
-                <img src="Assets/Icons/Kusa.png" class="village-icon">
-                <p>Kusa</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Yuga')">
-                <img src="Assets/Icons/Yuga.png" class="village-icon">
-                <p>Yuga</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Taki')">
-                <img src="Assets/Icons/Taki.png" class="village-icon">
-                <p>Taki</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Hoshi')">
-                <img src="Assets/Icons/Hoshi.png" class="village-icon">
-                <p>Hoshi</p>
-            </div>
-
-            <div class="village-box" onclick="selectVillage('Uzushio')">
-                <img src="Assets/Icons/Uzushio.png" class="village-icon">
-                <p>Uzushio</p>
-            </div>
-
         </div>
 
-        <button class="back-btn" onclick="goBackToDifficulty()">← Back</button>
+        <div class="difficulty-level chunin">
+            <img src="Assets/Icons/Chunin.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Chunin</h2>
+                <p>Teamwork and strategy are essential.</p>
+                <button onclick="selectDifficulty('Chunin')">Select</button>
+            </div>
+        </div>
+
+        <div class="difficulty-level specialjonin">
+            <img src="Assets/Icons/Special Jonin.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Special Jōnin</h2>
+                <p>Elite precision and resolve.</p>
+                <button onclick="selectDifficulty('Special Jonin')">Select</button>
+            </div>
+        </div>
+
+        <div class="difficulty-level jonin">
+            <img src="Assets/Icons/Jonin.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Jōnin</h2>
+                <p>Veteran missions, mastery required.</p>
+                <button onclick="selectDifficulty('Jonin')">Select</button>
+            </div>
+        </div>
+
+        <div class="difficulty-level anbu">
+            <img src="Assets/Icons/Anbu.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>ANBU</h2>
+                <p>Shadow operatives. Deadly missions.</p>
+                <button onclick="selectDifficulty('Anbu')">Select</button>
+            </div>
+        </div>
+
+        <div class="difficulty-level kage">
+            <img src="Assets/Icons/Kage.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Kage</h2>
+                <p>The pinnacle of shinobi power.</p>
+                <button onclick="selectDifficulty('Kage')">Select</button>
+            </div>
+        </div>
+
+        <div class="difficulty-level akatsuki">
+            <img src="Assets/Icons/Akatsuki.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Akatsuki</h2>
+                <p>Renegade elite. Chaos incarnate.</p>
+                <button onclick="selectDifficulty('Akatsuki')">Select</button>
+            </div>
+        </div>
+
+        <div class="difficulty-level jinchuriki">
+            <img src="Assets/Icons/Jinchuriki.png" class="rock-icon">
+            <div class="difficulty-info">
+                <h2>Jinchūriki</h2>
+                <p>Hosts of tailed beasts. Ultimate power.</p>
+                <button onclick="selectDifficulty('Jinchuriki')">Select</button>
+            </div>
+        </div>
     </div>
 
-</body>
-</html>
+    <button class="back-btn" onclick="goBackToJourney()">← Back</button>
+</div>
