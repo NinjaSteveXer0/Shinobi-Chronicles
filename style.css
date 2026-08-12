@@ -1,28 +1,24 @@
-/* Arrow overlay fills the canvas and sits above the images */
+/* Overlay stays above icons */
 .arrow-overlay {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
-  overflow: visible;
   z-index: 5;
 }
 
-/* Difficulty levels above background but below overlay */
+/* Difficulty levels positioned above background */
 .difficulty-level {
   position: absolute;
   z-index: 3;
   background: transparent;
-  padding: 0;
   box-shadow: none;
+  padding: 0;
 }
 
 /* Icon styling */
 .rock-icon {
   border-radius: 6px;
-  width: clamp(80px, 10vw, 160px);
+  width: clamp(120px, 12vw, 180px); /* consistent size */
   height: auto;
   transition: transform 0.3s ease;
 }
@@ -31,35 +27,37 @@
   transform: scale(1.1);
 }
 
-/* Vertical layout (up-and-down pattern) */
+/* Vertical alignment (centered column) */
 :root {
   --anchor-left: 50%;
   --anchor-top: 85%;
-  --step-v: 10%;
+  --step-v: 9%;
 }
 
+/* Core ranks stacked vertically */
 .academy      { left: var(--anchor-left); top: var(--anchor-top); transform: translateX(-50%); }
 .genin        { left: var(--anchor-left); top: calc(var(--anchor-top) - 1 * var(--step-v)); transform: translateX(-50%); }
 .chunin       { left: var(--anchor-left); top: calc(var(--anchor-top) - 2 * var(--step-v)); transform: translateX(-50%); }
-.specialjonin { left: var(--anchor-left); top: calc(var(--anchor-top) - 3 * var(--step-v)); transform: translateX(-50%); }
-.jonin        { left: var(--anchor-left); top: calc(var(--anchor-top) - 4 * var(--step-v)); transform: translateX(-50%); }
+.jonin        { left: var(--anchor-left); top: calc(var(--anchor-top) - 3 * var(--step-v)); transform: translateX(-50%); }
+.specialjonin { left: var(--anchor-left); top: calc(var(--anchor-top) - 4 * var(--step-v)); transform: translateX(-50%); }
 .anbu         { left: var(--anchor-left); top: calc(var(--anchor-top) - 5 * var(--step-v)); transform: translateX(-50%); }
 .kage         { left: var(--anchor-left); top: calc(var(--anchor-top) - 6 * var(--step-v)); transform: translateX(-50%); }
 
-/* Paid items slightly offset to the right */
-.akatsuki     { left: calc(var(--anchor-left) + 15%); top: calc(var(--anchor-top) - 2 * var(--step-v)); }
-.jinchuriki   { left: calc(var(--anchor-left) + 15%); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
+/* Paid ranks offset slightly to the right */
+.akatsuki     { left: calc(var(--anchor-left) + 18%); top: calc(var(--anchor-top) - 3 * var(--step-v)); }
+.jinchuriki   { left: calc(var(--anchor-left) + 18%); top: calc(var(--anchor-top) - 4 * var(--step-v)); }
 
-/* Paid badge small tweak */
+/* Paid badge styling */
 .paid-badge {
-  font-size: 11px;
+  font-size: 12px;
   padding: 4px 6px;
   margin-left: 6px;
   vertical-align: middle;
+  color: #ff4444;
 }
 
 /* Responsive scaling */
 @media (max-width: 900px) {
-  :root { --step-v: 8%; }
-  .rock-icon { width: clamp(60px, 15vw, 120px); }
+  :root { --step-v: 7%; }
+  .rock-icon { width: clamp(90px, 18vw, 140px); }
 }
