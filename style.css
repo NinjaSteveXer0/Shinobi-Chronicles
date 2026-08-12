@@ -1,10 +1,10 @@
 body {
     background-color: #0a0a0a;
     color: #e0e0e0;
-    font-family: 'Trebuchet MS', sans-serif;
-    text-align: center;
+    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+    text-align: center;
 }
 
 .page {
@@ -16,52 +16,55 @@ body {
     align-items: center;
 }
 
-.difficulty-title {
-    color: #ff1a1a;
-    font-size: 36px;
-    margin-bottom: 10px;
-    text-shadow: 0 0 10px #ff1a1a;
+.intro-text {
+    max-width: 700px;
+    margin: 0 auto 30px auto;
+    line-height: 1.8;
+    font-size: 18px;
 }
 
-.difficulty-subtext {
-    color: #ccc;
-    font-style: italic;
-    margin-bottom: 40px;
+button {
+    background-color: #990000;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    margin: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: 0.2s;
+}
+
+button:hover {
+    background-color: #cc0000;
+}
+
+.back-btn {
+    background-color: #333;
 }
 
 .difficulty-container {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 25px;
-    max-width: 1000px;
+    gap: 20px;
+    max-width: 800px;
 }
 
 .difficulty-box {
-    background: radial-gradient(circle at top, #1a1a1a 0%, #000 80%);
+    background-color: #111;
     border: 2px solid #990000;
-    border-radius: 10px;
-    width: 220px;
+    border-radius: 8px;
+    width: 240px;
     padding: 20px;
     text-align: center;
-    box-shadow: 0 0 20px rgba(255, 26, 26, 0.3);
+    box-shadow: 0 0 10px rgba(153, 0, 0, 0.4);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .difficulty-box:hover {
     transform: scale(1.05);
-    box-shadow: 0 0 30px rgba(255, 26, 26, 0.6);
-}
-
-.difficulty-box.locked {
-    opacity: 0.4;
-    border-color: #333;
-    box-shadow: none;
-}
-
-.difficulty-icon {
-    font-size: 40px;
-    margin-bottom: 10px;
+    box-shadow: 0 0 20px rgba(255, 26, 26, 0.6);
 }
 
 .difficulty-box h2 {
@@ -73,34 +76,4 @@ body {
     font-size: 14px;
     line-height: 1.6;
     margin-bottom: 15px;
-}
-
-.chakra {
-    font-size: 13px;
-    color: #ccc;
-    margin-bottom: 10px;
-}
-
-.select-btn {
-    background-color: #990000;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.select-btn:hover {
-    background-color: #cc0000;
-}
-
-.back-btn {
-    background-color: #333;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin-top: 40px;
-    border-radius: 6px;
-    cursor: pointer;
 }
