@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Difficulty Selection — Diagonal Formation</title>
+  <title>Difficulty Selection — Stepped Diagonal</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     /* ---------- TUNING VARIABLES (edit these to shift the whole formation) ---------- */
@@ -58,6 +58,7 @@
       transition: transform .16s ease, filter .16s ease;
       border-radius: 6px;
       will-change: transform;
+      max-width: 100%;
     }
     .difficulty-level:hover .rock-icon {
       transform: translateY(-6px) scale(1.03);
@@ -75,9 +76,7 @@
 
     .paid-badge { display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:11px; margin-left:6px; vertical-align:middle; }
 
-    /* ---------- Positions (calculated by JS for pixel-perfect diagonal) ---------- */
-    /* We set classes for each rank; JS will compute left/top and size based on index */
-    .academy, .genin, .chunin, .specialjonin, .jonin, .anbu, .kage, .akatsuki, .jinchuriki { /* placeholder */ }
+    /* Position classes are computed by JS at runtime; no empty CSS rule here. */
 
     /* Responsive tweaks */
     @media (max-width:1100px){
@@ -120,7 +119,7 @@
       </div>
 
       <div id="jonin" class="difficulty-level jonin">
-        <img src="Assets/Icons/Jonin.png" class="rock-icon" alt="Jōnin">
+        <img src="Assets/Icons/Jonin.png" class="rock-icon" alt="Jonin">
         <div class="difficulty-info">Jōnin</div>
       </div>
 
@@ -134,7 +133,7 @@
         <div class="difficulty-info">Kage</div>
       </div>
 
-      <!-- Paid items: slightly higher than far bottom-right -->
+      <!-- Paid items (natural, slightly higher than bottom-right) -->
       <div id="akatsuki" class="difficulty-level paid-level akatsuki">
         <img src="Assets/Icons/Akatsuki.png" class="rock-icon" alt="Akatsuki">
         <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
@@ -153,111 +152,93 @@
 
   <script>
     /* ---------- JS: compute diagonal positions and interpolate icon sizes ----------
-       - Keeps spacing consistent and matches the "stepping stones" formation in your reference.
-       - If you want to nudge the whole formation, edit the CSS :root variables at the top.
-       - This script runs on load and on resize.
+       - Keeps spacing consistent and matches the "stepping stones" formation.
+       - Edit CSS :root variables at the top to nudge the whole formation.
     */
     (function positionStones(){
       const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
-      const paid = ['akatsuki','jinchuriki'];
-
-      function px(v){ return parseFloat(v); }
 
       function getVar(name){
         return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
       }
-
-      function parsePercent(str){
-        if(!str) return 0;
-        return parseFloat(str.replace('%',''));
-      }
+      function px(v){ return parseFloat(v) || 0; }
 
       function setPositions(){
         const canvas = document.getElementById('difficulty-canvas');
         if(!canvas) return;
-        const canvasRect = canvas.getBoundingClientRect();
+        const rect = canvas.getBoundingClientRect();
 
-        // read tuning variables from CSS
-        const anchorLeft = parsePercent(getVar('--anchor-left')) / 100 * canvasRect.width;
-        const anchorTop  = parsePercent(getVar('--anchor-top')) / 100 * canvasRect.height;
-        const stepH = parsePercent(getVar('--step-h')) / 100 * canvasRect.width;
-        const stepV = parsePercent(getVar('--step-v')) / 100 * canvasRect.height;
+        const anchorLeftPct = parseFloat(getVar('--anchor-left')) || 14;
+        const anchorTopPct  = parseFloat(getVar('--anchor-top'))  || 92;
+        const stepHPct = parseFloat(getVar('--step-h')) || 9.5;
+        const stepVPct = parseFloat(getVar('--step-v')) || 13;
 
-        // icon sizes (interpolate between bottom and top)
+        const anchorLeftPx = anchorLeftPct/100 * rect.width;
+        const anchorTopPx  = anchorTopPct/100 * rect.height;
+        const stepHPx = stepHPct/100 * rect.width;
+        const stepVPx = stepVPct/100 * rect.height;
+
         const iconBottom = px(getVar('--icon-bottom-size')) || 150;
         const iconTop = px(getVar('--icon-top-size')) || 84;
-        const totalSteps = order.length - 1;
+        const totalSteps = Math.max(1, order.length - 1);
 
-        // place main order
         order.forEach((id, idx) => {
           const el = document.getElementById(id);
           if(!el) return;
-          // compute left/top in canvas coordinates
-          const left = anchorLeft + idx * stepH;
-          const top  = anchorTop  - idx * stepV;
-          // convert to percent relative to canvas for CSS left/top
-          const leftPct = (left / canvasRect.width) * 100;
-          const topPct  = (top  / canvasRect.height) * 100;
-          el.style.left = leftPct + '%';
-          el.style.top  = topPct  + '%';
+          const leftPx = anchorLeftPx + idx * stepHPx;
+          const topPx  = anchorTopPx  - idx * stepVPx;
+          el.style.left = (leftPx / rect.width) * 100 + '%';
+          el.style.top  = (topPx  / rect.height) * 100 + '%';
 
-          // interpolate icon size (larger at bottom, smaller at top)
-          const t = idx / Math.max(1, totalSteps);
-          const size = iconBottom * (1 - t) + iconTop * t;
+          const t = idx / totalSteps;
+          const size = Math.round(iconBottom * (1 - t) + iconTop * t);
           const img = el.querySelector('.rock-icon');
-          if(img) img.style.width = Math.round(size) + 'px';
+          if(img) img.style.width = size + 'px';
         });
 
-        // place paid items slightly above far bottom-right (use multipliers)
+        // Paid items: slightly higher than far bottom-right
         const paidOffsetX = parseFloat(getVar('--paid-offset-x')) || 6.0;
-        const paidOffsetY = parseFloat(getVar('--paid-offset-y')) || 1.6;
         const lastIdx = order.length - 1;
-        const baseX = anchorLeft + lastIdx * stepH;
-        const baseY = anchorTop  - lastIdx * stepV;
+        const baseX = anchorLeftPx + lastIdx * stepHPx;
+        const baseY = anchorTopPx  - lastIdx * stepVPx;
 
-        // Akatsuki
         const ak = document.getElementById('akatsuki');
         if(ak){
-          const left = baseX + paidOffsetX * (stepH / 1); // move right from last stone
-          const top  = anchorTop - 1.6 * stepV;           // slightly higher than bottom-right
-          ak.style.left = (left / canvasRect.width) * 100 + '%';
-          ak.style.top  = (top  / canvasRect.height) * 100 + '%';
+          const leftPx = baseX + paidOffsetX * (stepHPx / 1);
+          const topPx  = anchorTopPx - 1.6 * stepVPx;
+          ak.style.left = (leftPx / rect.width) * 100 + '%';
+          ak.style.top  = (topPx  / rect.height) * 100 + '%';
           const img = ak.querySelector('.rock-icon');
           if(img) img.style.width = Math.round(iconBottom * 0.95) + 'px';
         }
 
-        // Jinchuriki
         const ji = document.getElementById('jinchuriki');
         if(ji){
-          const left = baseX + (paidOffsetX + 0.8) * (stepH / 1);
-          const top  = anchorTop - 2.2 * stepV;
-          ji.style.left = (left / canvasRect.width) * 100 + '%';
-          ji.style.top  = (top  / canvasRect.height) * 100 + '%';
+          const leftPx = baseX + (paidOffsetX + 0.8) * (stepHPx / 1);
+          const topPx  = anchorTopPx - 2.2 * stepVPx;
+          ji.style.left = (leftPx / rect.width) * 100 + '%';
+          ji.style.top  = (topPx  / rect.height) * 100 + '%';
           const img = ji.querySelector('.rock-icon');
           if(img) img.style.width = Math.round(iconBottom * 0.98) + 'px';
         }
       }
 
-      // run on load and resize; also after images load to avoid jumps
       window.addEventListener('resize', setPositions);
-      window.addEventListener('load', ()=> { setTimeout(setPositions, 80); });
-      // if images load later, update positions
+      window.addEventListener('load', ()=> setTimeout(setPositions, 80));
       document.querySelectorAll('.rock-icon').forEach(img => {
         if(!img.complete) img.addEventListener('load', setPositions);
       });
 
-      // expose a small helper for quick live nudges in console:
+      // helper to nudge the whole diagonal live from console
       window.nudgeDiagonal = function(deltaLeftPct, deltaTopPct){
-        // delta values are percentages to add to --anchor-left and --anchor-top
         const root = document.documentElement;
-        const curLeft = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-left'));
-        const curTop  = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-top'));
+        const curLeft = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-left')) || 14;
+        const curTop  = parseFloat(getComputedStyle(root).getPropertyValue('--anchor-top'))  || 92;
         root.style.setProperty('--anchor-left', (curLeft + deltaLeftPct) + '%');
         root.style.setProperty('--anchor-top', (curTop + deltaTopPct) + '%');
         setPositions();
       };
 
-      // initial placement
       setPositions();
     })();
   </script>
