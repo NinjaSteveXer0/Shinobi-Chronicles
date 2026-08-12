@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Difficulty Selection — Uniform Icons, 16:9 Canvas</title>
+  <title>Difficulty Selection — Flatter Diagonal</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     /* ---------- CONFIG (single place to edit) ---------- */
@@ -11,11 +11,11 @@
       --bg-image: none; /* set to url("Assets/Backgrounds/level-bg.png") if you want a background */
       --overlay-dark: rgba(0,0,0,0.22);
 
-      /* Formation tuning */
+      /* Formation tuning: make the diagonal flatter by reducing step-v */
       --anchor-left: 14%;   /* leftmost starting point (Academy) */
       --anchor-top: 92%;    /* vertical start (Academy) */
       --step-h: 9.5%;       /* horizontal step between stones */
-      --step-v: 13%;        /* vertical step between stones */
+      --step-v: 9%;         /* vertical step between stones (smaller = flatter tilt) */
 
       /* Canvas and icon sizing */
       --canvas-max-width: 1200px;
@@ -103,13 +103,13 @@
 
     .paid-badge { display:inline-block; background:linear-gradient(90deg,#b8860b,#ffd27a); color:#111; padding:4px 8px; border-radius:999px; font-weight:800; font-size:11px; margin-left:6px; vertical-align:middle; }
 
-    /* Responsive adjustments (keeps icon size consistent but you can change --icon-size) */
+    /* Responsive adjustments */
     @media (max-width:1100px){
-      :root { --step-h: 8%; --step-v: 12%; --icon-size: 100px; }
+      :root { --step-h: 8%; --step-v: 7.5%; --icon-size: 100px; }
       .difficulty-info { font-size: 12px; }
     }
     @media (max-width:700px){
-      :root { --step-h: 7%; --step-v: 11%; --anchor-left: 18%; --anchor-top: 90%; --icon-size: 84px; }
+      :root { --step-h: 7%; --step-v: 6.5%; --anchor-left: 18%; --anchor-top: 90%; --icon-size: 84px; }
       .difficulty-info { font-size: 12px; }
     }
 
@@ -176,11 +176,11 @@
   </div>
 
   <script>
-    /* Positioning script (stepped diagonal). This version:
-       - uses the canvas element's actual pixel size (respecting the 16:9 aspect ratio)
+    /* Positioning script (flatter diagonal). This version:
+       - reduces vertical step (--step-v) so the diagonal is more level
+       - uses the canvas element's pixel size (respecting 16:9 aspect ratio)
        - places each stone on a regular diagonal using CSS variables
-       - all icons are the same size (CSS --icon-size)
-       - paid items are placed slightly above the far bottom-right
+       - all icons are uniform size via CSS --icon-size
     */
     (function positionStones(){
       const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
@@ -196,7 +196,7 @@
         const anchorLeftPct = parseFloat(getVar('--anchor-left')) || 14;
         const anchorTopPct  = parseFloat(getVar('--anchor-top'))  || 92;
         const stepHPct = parseFloat(getVar('--step-h')) || 9.5;
-        const stepVPct = parseFloat(getVar('--step-v')) || 13;
+        const stepVPct = parseFloat(getVar('--step-v')) || 9;
 
         const anchorLeftPx = anchorLeftPct/100 * rect.width;
         const anchorTopPx  = anchorTopPct/100 * rect.height;
@@ -211,7 +211,6 @@
           const topPx  = anchorTopPx  - idx * stepVPx;
           el.style.left = (leftPx / rect.width) * 100 + '%';
           el.style.top  = (topPx  / rect.height) * 100 + '%';
-          // icon size is uniform via CSS --icon-size; no per-index sizing here
         });
 
         // paid items: slightly higher than far bottom-right
