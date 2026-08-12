@@ -46,7 +46,7 @@ button:hover {
     display: flex;
     justify-content: center;
     align-items: flex-end;
-    gap: 70px;
+    gap: 45px; /* tighter spacing */
     margin-top: 40px;
 }
 
@@ -73,14 +73,14 @@ button:hover {
     text-align: center;
 }
 
-/* Rising staircase — balanced and fully visible */
-.academy      { transform: translateY(100px); }
-.genin        { transform: translateY(60px); }
+/* Rising staircase — compact and fully visible */
+.academy      { transform: translateY(80px); }
+.genin        { transform: translateY(50px); }
 .chunin       { transform: translateY(20px); }
-.specialjonin { transform: translateY(-20px); }
-.jonin        { transform: translateY(-60px); }
-.anbu         { transform: translateY(-100px); }
-.kage         { transform: translateY(-140px); }
+.specialjonin { transform: translateY(-10px); }
+.jonin        { transform: translateY(-40px); }
+.anbu         { transform: translateY(-70px); }
+.kage         { transform: translateY(-100px); }
 
 /* Village Page */
 .village-container {
