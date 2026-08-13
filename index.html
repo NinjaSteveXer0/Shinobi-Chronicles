@@ -2,254 +2,151 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>Shinobi Chronicles — Play</title>
+  <title>Shinobi Chronicles — Difficulty</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
     :root{
-      --bg-color:#000;
+      --bg-color:#050405;
       --accent:#ff1a1a;
       --muted:#cfcfcf;
-      --overlay-dark:rgba(0,0,0,0.22);
-      --anchor-left:14%;
-      --anchor-top:92%;
-      --step-h:9.5%;
-      --step-v:13%;
-      --icon-max:140px;
+      --overlay-dark:rgba(0,0,0,0.28);
+      --anchor-left:10%;
+      --anchor-top:88%;
+      --step-h:12%;
+      --step-v:14%;
+      --icon-size:160px; /* larger icons */
+      --icon-min:96px;
       --paid-offset-x:6.0;
-      --panel-bg:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.22));
-      --glass:rgba(255,255,255,0.03);
+      --canvas-max-width:1200px;
     }
+
     *{box-sizing:border-box}
     html,body{height:100%;margin:0;background:var(--bg-color);color:#eaeaea;font-family:Arial,Helvetica,sans-serif}
     .app{min-height:100vh;padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
 
-    header{width:100%;max-width:1200px;display:flex;justify-content:space-between;align-items:center}
+    header{width:100%;max-width:var(--canvas-max-width);display:flex;justify-content:space-between;align-items:center}
     header h1{color:var(--accent);margin:0;font-size:20px}
     header .user{color:var(--muted);font-size:13px}
 
-    /* Page panels (we toggle display) */
-    .page-panel{width:100%;max-width:1200px;background:var(--panel-bg);border-radius:10px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
+    .page-panel{width:100%;max-width:var(--canvas-max-width);background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.22));border-radius:10px;padding:18px;box-shadow:0 8px 30px rgba(0,0,0,0.6)}
     .hidden{display:none}
 
-    /* Login / Register */
-    .auth-grid{display:flex;gap:18px;flex-wrap:wrap}
-    .auth-card{flex:1;min-width:260px;background:rgba(255,255,255,0.02);padding:14px;border-radius:8px}
-    .form-row{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
-    input[type="text"],input[type="password"]{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:rgba(255,255,255,0.02);color:#fff}
-
-    /* Journey */
-    .journey-text{font-size:15px;color:var(--muted);line-height:1.4}
-
-    /* Difficulty canvas (kept from your original) */
+    /* Difficulty canvas */
     .difficulty-path{
-      position:relative;width:100%;max-width:1200px;aspect-ratio:16/9;margin-top:8px;margin-bottom:8px;
+      position:relative;width:100%;max-width:var(--canvas-max-width);aspect-ratio:16/9;margin-top:8px;margin-bottom:8px;
       overflow:visible;border-radius:10px;background-size:cover;background-position:center;
       background-repeat:no-repeat;box-shadow:0 8px 30px rgba(0,0,0,0.6);background-color:#0a0a0a;
     }
     .difficulty-path::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;background:var(--overlay-dark);pointer-events:none;border-radius:10px;z-index:1}
-    .difficulty-level{position:absolute;transform:translate(-50%,-50%);z-index:3;background:transparent;padding:0;box-shadow:none;cursor:pointer}
-    .rock-icon{border-radius:6px;display:block;width:var(--icon-max);max-width:calc(100% - 12px);height:auto;filter:drop-shadow(0 12px 28px rgba(0,0,0,0.6));transition:transform .16s ease,filter .16s ease}
-    .difficulty-level:hover .rock-icon{transform:translateY(-6px) scale(1.03);filter:drop-shadow(0 26px 46px rgba(0,0,0,0.72))}
-    .difficulty-info{margin-top:8px;color:#d0d0d0;font-weight:700;font-size:13px;text-shadow:0 1px 0 rgba(0,0,0,0.6);line-height:1;z-index:4;position:relative}
-    .paid-badge{font-size:11px;padding:4px 6px;margin-left:6px;vertical-align:middle}
-    .difficulty-level.locked .rock-icon{filter:grayscale(0.8) brightness(0.6);opacity:0.7}
-    .difficulty-level.disabled .rock-icon{filter:grayscale(0.6) opacity(0.45);cursor:not-allowed}
-    .difficulty-level.selected .rock-icon{outline:3px solid rgba(255,26,26,0.12);transform:translateY(-8px) scale(1.04)}
+    .difficulty-level{
+      position:absolute;transform:translate(-50%,-50%);z-index:4;background:transparent;padding:0;box-shadow:none;cursor:pointer;
+      display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:auto;
+      transition:transform .18s ease,filter .18s ease,opacity .18s ease;
+    }
 
-    /* Village selection */
-    .village-list{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
-    .village-item{padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.03)}
-    .village-item.selected{box-shadow:0 8px 30px rgba(0,0,0,0.6);border-color:var(--accent);color:var(--accent)}
+    /* Large stepping stone icons */
+    .rock-icon{
+      width:var(--icon-size);
+      height:auto;
+      max-width:calc(100% - 12px);
+      border-radius:14px;
+      object-fit:cover;
+      filter:drop-shadow(0 18px 36px rgba(0,0,0,0.7));
+      transition:transform .18s ease,filter .18s ease,opacity .18s ease;
+      background:linear-gradient(180deg, rgba(0,0,0,0.12), rgba(0,0,0,0.28));
+      border:2px solid rgba(255,255,255,0.02);
+    }
+    .difficulty-level:hover .rock-icon{transform:translateY(-8px) scale(1.04);filter:drop-shadow(0 30px 60px rgba(0,0,0,0.8))}
 
-    /* Ninja list */
-    .ninja-grid{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
-    .ninja-card{width:160px;padding:8px;border-radius:8px;background:rgba(255,255,255,0.02);text-align:center;cursor:pointer;border:1px solid rgba(255,255,255,0.03)}
-    .ninja-card.locked{filter:grayscale(0.8);opacity:0.7;cursor:not-allowed}
+    .difficulty-info{margin-top:6px;color:#e6e6e6;font-weight:700;font-size:14px;text-shadow:0 1px 0 rgba(0,0,0,0.6);line-height:1;z-index:5;position:relative}
+    .paid-badge{font-size:12px;padding:4px 6px;margin-left:6px;vertical-align:middle;background:rgba(255,26,26,0.08);color:var(--accent);border-radius:999px;border:1px solid rgba(255,26,26,0.06)}
 
-    /* Start game conversation modal */
-    .modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:60;width:90%;max-width:720px;background:var(--panel-bg);padding:18px;border-radius:10px;box-shadow:0 30px 80px rgba(0,0,0,0.8)}
-    .modal.hidden{display:none}
-    .conversation{font-size:15px;color:var(--muted);line-height:1.5;margin-bottom:12px}
+    /* Disabled / locked visuals */
+    .difficulty-level.disabled .rock-icon{filter:grayscale(0.7) brightness(0.55);opacity:0.55;cursor:not-allowed}
+    .difficulty-level.locked .rock-icon{filter:grayscale(0.9) brightness(0.5);opacity:0.6;cursor:pointer}
+    .difficulty-level.selected .rock-icon{outline:4px solid rgba(255,26,26,0.12);transform:translateY(-10px) scale(1.06)}
 
-    /* Village hub */
-    .hub-headers{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
-    .hub-headers button{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:8px 10px;border-radius:8px;color:var(--muted);cursor:pointer}
-    .hub-headers button.active{border-color:var(--accent);color:var(--accent)}
+    /* Make icons responsive */
+    @media (max-width:1200px){:root{--icon-size:140px;--step-h:11%}}
+    @media (max-width:900px){:root{--icon-size:120px;--step-h:10%;--step-v:12%}}
+    @media (max-width:700px){:root{--icon-size:96px;--anchor-left:14%;--anchor-top:90%;--step-h:9%;--step-v:11%}}
 
-    /* small helpers */
-    .row{display:flex;gap:8px;align-items:center}
-    .muted{color:var(--muted)}
-    .controls{margin-top:12px;display:flex;gap:8px}
+    /* Controls */
+    .controls{margin-top:12px;display:flex;gap:8px;align-items:center}
     button.primary{background:linear-gradient(180deg,var(--accent),#c71f1f);border:none;color:#fff;padding:8px 12px;border-radius:8px;font-weight:700;cursor:pointer}
     button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 12px;border-radius:8px;cursor:pointer}
 
-    @media (max-width:900px){:root{--icon-max:110px}}
+    /* small hint */
+    .hint{color:var(--muted);font-size:13px;margin-left:8px}
   </style>
 </head>
 <body>
   <div class="app">
-
     <header>
       <h1>Shinobi Chronicles</h1>
       <div class="user" id="header-user">Not signed in</div>
     </header>
 
-    <!-- HOME: Login / Register -->
-    <section id="login-page" class="page-panel">
-      <div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap">
-        <div style="flex:1;min-width:320px">
-          <h2>Welcome, shinobi</h2>
-          <p class="journey-text">Sign in to continue your chronicles. New here? Register to begin your journey.</p>
-        </div>
-
-        <div style="min-width:320px">
-          <div class="auth-card">
-            <div class="form-row">
-              <label class="muted">Username</label>
-              <input id="username" type="text" placeholder="Enter username">
-            </div>
-            <div class="form-row">
-              <label class="muted">Password</label>
-              <input id="password" type="password" placeholder="Enter password">
-            </div>
-            <div class="row">
-              <button class="primary" onclick="login()">Sign In</button>
-              <button class="ghost" onclick="register()">Register</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- JOURNEY: Prologue -->
-    <section id="journey-page" class="page-panel hidden">
-      <h2>Journey Begins</h2>
-      <p class="journey-text">A whisper in the night. A village in peril. Your name will be written in the chronicles if you survive.</p>
-      <div class="controls">
-        <button class="primary" onclick="goToDifficulty()">Choose Difficulty</button>
-        <button class="ghost" onclick="showPage('login-page')">Sign Out</button>
-      </div>
-    </section>
-
-    <!-- DIFFICULTY: uses your difficulty-canvas -->
-    <section id="difficulty-page" class="page-panel hidden">
+    <!-- Difficulty page (this file focuses on difficulty canvas) -->
+    <section id="difficulty-page" class="page-panel">
       <h2>Select Difficulty</h2>
-      <div class="difficulty-path" id="difficulty-canvas">
+
+      <div class="difficulty-path" id="difficulty-canvas" aria-label="Difficulty path">
         <div class="arrow-overlay" aria-hidden="true"></div>
 
-        <div id="academy" class="difficulty-level academy" data-level="academy">
+        <!-- Stepping stones (IDs and data-level used by game.js) -->
+        <div id="academy" class="difficulty-level academy" data-level="academy" aria-label="Academy Student">
           <img src="Assets/Icons/Academy student.png" class="rock-icon" alt="Academy Student">
           <div class="difficulty-info">Academy Student</div>
         </div>
 
-        <div id="genin" class="difficulty-level genin disabled" data-level="genin">
+        <div id="genin" class="difficulty-level genin disabled" data-level="genin" aria-label="Genin">
           <img src="Assets/Icons/Genin.png" class="rock-icon" alt="Genin">
           <div class="difficulty-info">Genin</div>
         </div>
 
-        <div id="chunin" class="difficulty-level chunin disabled" data-level="chunin">
+        <div id="chunin" class="difficulty-level chunin disabled" data-level="chunin" aria-label="Chunin">
           <img src="Assets/Icons/Chunin.png" class="rock-icon" alt="Chunin">
           <div class="difficulty-info">Chunin</div>
         </div>
 
-        <div id="specialjonin" class="difficulty-level specialjonin locked" data-level="specialjonin">
+        <div id="specialjonin" class="difficulty-level specialjonin locked" data-level="specialjonin" aria-label="Special Jonin">
           <img src="Assets/Icons/Special Jonin.png" class="rock-icon" alt="Special Jonin">
           <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
         </div>
 
-        <div id="jonin" class="difficulty-level jonin disabled" data-level="jonin">
+        <div id="jonin" class="difficulty-level jonin disabled" data-level="jonin" aria-label="Jonin">
           <img src="Assets/Icons/Jonin.png" class="rock-icon" alt="Jonin">
           <div class="difficulty-info">Jōnin</div>
         </div>
 
-        <div id="anbu" class="difficulty-level anbu disabled" data-level="anbu">
+        <div id="anbu" class="difficulty-level anbu disabled" data-level="anbu" aria-label="ANBU">
           <img src="Assets/Icons/Anbu.png" class="rock-icon" alt="ANBU">
           <div class="difficulty-info">ANBU</div>
         </div>
 
-        <div id="kage" class="difficulty-level kage disabled" data-level="kage">
+        <div id="kage" class="difficulty-level kage disabled" data-level="kage" aria-label="Kage">
           <img src="Assets/Icons/Kage.png" class="rock-icon" alt="Kage">
           <div class="difficulty-info">Kage</div>
         </div>
 
-        <div id="akatsuki" class="difficulty-level paid-level locked akatsuki" data-level="akatsuki">
+        <div id="akatsuki" class="difficulty-level paid-level locked akatsuki" data-level="akatsuki" aria-label="Akatsuki">
           <img src="Assets/Icons/Akatsuki.png" class="rock-icon" alt="Akatsuki">
           <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
         </div>
 
-        <div id="jinchuriki" class="difficulty-level paid-level locked jinchuriki" data-level="jinchuriki">
+        <div id="jinchuriki" class="difficulty-level paid-level locked jinchuriki" data-level="jinchuriki" aria-label="Jinchuriki">
           <img src="Assets/Icons/Jinchuriki.png" class="rock-icon" alt="Jinchuriki">
           <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
         </div>
       </div>
 
-      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+      <div class="controls">
         <button class="ghost" onclick="goBackToJourney()">← Back</button>
-        <div class="muted">Only Academy Student is selectable. Locked tiers require purchase.</div>
+        <div class="hint">Only Academy Student is selectable. Use arrow keys to navigate.</div>
       </div>
     </section>
 
-    <!-- VILLAGE SELECTION -->
-    <section id="village-page" class="page-panel hidden">
-      <h2>Select Your Village</h2>
-      <div class="village-list" id="village-list">
-        <!-- populated by JS -->
-      </div>
-
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button class="ghost" onclick="goBackToDifficulty()">← Back</button>
-        <button class="primary" id="to-ninja-btn" onclick="goToNinjaSelection()" disabled>Next: Choose Ninja</button>
-      </div>
-    </section>
-
-    <!-- NINJA SELECTION -->
-    <section id="ninja-page" class="page-panel hidden">
-      <h2>Select Your Ninja</h2>
-      <div id="ninja-village-label" class="muted">Village: —</div>
-      <div class="ninja-grid" id="ninja-grid">
-        <!-- populated by JS -->
-      </div>
-
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button class="ghost" onclick="goBackToVillage()">← Back</button>
-        <button class="primary" id="start-game-btn" onclick="startGame()" disabled>Start Game</button>
-      </div>
-    </section>
-
-    <!-- START GAME: conversation modal -->
-    <div id="start-modal" class="modal hidden" role="dialog" aria-modal="true">
-      <h3 id="start-modal-title">Training</h3>
-      <div class="conversation" id="conversation-text"></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end">
-        <button class="ghost" onclick="closeStartModal()">Cancel</button>
-        <button class="primary" id="continue-to-battle" onclick="beginFirstBattle()">Continue</button>
-      </div>
-    </div>
-
-    <!-- GAME VILLAGE HUB (post-battle) -->
-    <section id="game-village" class="page-panel hidden">
-      <h2 id="hub-village-name">Your Village</h2>
-      <div class="hub-headers" id="hub-headers">
-        <button data-tab="village" class="active">Village</button>
-        <button data-tab="missions">Missions</button>
-        <button data-tab="arena">Arena</button>
-        <button data-tab="exam">Exam</button>
-        <button data-tab="physical">Physical</button>
-        <button data-tab="rogue">Rogue</button>
-        <button data-tab="defend">Defend</button>
-      </div>
-
-      <div id="hub-content" style="margin-top:12px;color:var(--muted)">
-        Welcome to your village hub. After the first battle you'll see missions and options here.
-      </div>
-
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button class="ghost" onclick="showPage('village-page')">Change Village</button>
-        <button class="primary" onclick="location.reload()">Save & Reload</button>
-      </div>
-    </section>
-
-    <footer style="margin-top:18px;color:var(--muted);font-size:13px">Tip: Use arrow keys to navigate difficulty icons.</footer>
   </div>
 
   <script src="game.js"></script>
