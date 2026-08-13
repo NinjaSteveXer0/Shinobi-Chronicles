@@ -1,14 +1,3 @@
-// -----------------------------
-// Shinobi Chronicles — game.js
-// FULL FILE — paste this entire file into your project
-// Fixes:
-// ✔ Forced login every reload
-// ✔ Difficulty page no longer loads first
-// ✔ Academy Student moves to Village selection
-// ✔ Back button works
-// ✔ Stepping-stone icons remain functional
-// -----------------------------
-
 /* Helpers */
 const $ = id => document.getElementById(id);
 const qsa = sel => Array.from(document.querySelectorAll(sel));
@@ -20,15 +9,6 @@ const App = {
   selectedVillage: null,
   selectedNinja: null
 };
-
-/* -----------------------------
-   FORCE LOGIN EVERY TIME GAME LOADS
-   ----------------------------- */
-(function forceLoginOnReload(){
-  localStorage.removeItem("shinobi_username");
-  localStorage.removeItem("shinobi_selectedDifficulty");
-  App.user = null;
-})();
 
 /* -----------------------------
    PAGE NAVIGATION
@@ -63,6 +43,7 @@ function login() {
   }
 
   App.user = user;
+  $("header-user").textContent = `Logged in as: ${user}`;
   showPage("journey-page");
 }
 
@@ -76,6 +57,7 @@ function register() {
   }
 
   App.user = user;
+  $("header-user").textContent = `Logged in as: ${user}`;
   alert("Registration successful!");
   showPage("journey-page");
 }
@@ -83,21 +65,14 @@ function register() {
 /* -----------------------------
    BACK BUTTONS
    ----------------------------- */
-function goBackToJourney() {
-  showPage("journey-page");
+function goBackToJourney() { showPage("journey-page"); }
+function goBackToLogin() { 
+  App.user = null;
+  $("header-user").textContent = "Not signed in";
+  showPage("login-page"); 
 }
-
-function goBackToLogin() {
-  showPage("login-page");
-}
-
-function goBackToDifficulty() {
-  showPage("difficulty-page");
-}
-
-function goBackToVillage() {
-  showPage("village-page");
-}
+function goBackToDifficulty() { showPage("difficulty-page"); }
+function goBackToVillage() { showPage("village-page"); }
 
 /* -----------------------------
    DIFFICULTY SELECTION
@@ -109,7 +84,6 @@ function initDifficulty() {
     const level = el.dataset.level;
 
     el.addEventListener("click", () => {
-
       // Disabled levels (except academy)
       if (el.classList.contains("disabled") && level !== "academy") {
         alert("Only Academy Student is playable right now.");
@@ -130,18 +104,9 @@ function initDifficulty() {
 
       App.selectedDifficulty = level;
 
-      // ⭐ MOVE TO VILLAGE PAGE ⭐
+      // MOVE TO VILLAGE PAGE
       showPage("village-page");
       renderVillageList();
-    });
-
-    // Keyboard navigation
-    el.setAttribute("tabindex", "0");
-    el.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" || ev.key === " ") {
-        ev.preventDefault();
-        el.click();
-      }
     });
   });
 }
@@ -156,20 +121,23 @@ const VILLAGES = [
 
 function renderVillageList() {
   const container = $("village-list");
+  if (!container) return;
+  
   container.innerHTML = "";
+  App.selectedVillage = null;
+  if ($("to-ninja-btn")) $("to-ninja-btn").disabled = true;
 
   VILLAGES.forEach(v => {
     const item = document.createElement("div");
-    item.className = "village-item";
+    item.className = "grid-item";
     item.textContent = v;
-    item.dataset.village = v;
 
     item.addEventListener("click", () => {
-      qsa(".village-item").forEach(x => x.classList.remove("selected"));
+      qsa("#village-list .grid-item").forEach(x => x.classList.remove("selected"));
       item.classList.add("selected");
 
       App.selectedVillage = v;
-      $("to-ninja-btn").disabled = false;
+      if ($("to-ninja-btn")) $("to-ninja-btn").disabled = false;
     });
 
     container.appendChild(item);
@@ -204,24 +172,28 @@ const NINJAS = {
 
 function renderNinjaGrid() {
   const grid = $("ninja-grid");
+  if (!grid) return;
+
   const village = App.selectedVillage;
   const roster = NINJAS[village] || [];
 
-  $("ninja-village-label").textContent = `Village: ${village}`;
+  App.selectedNinja = null;
+  if ($("start-game-btn")) $("start-game-btn").disabled = true;
+  if ($("ninja-village-label")) $("ninja-village-label").textContent = `Selected Village: ${village}`;
+  
   grid.innerHTML = "";
 
   roster.forEach(name => {
     const card = document.createElement("div");
-    card.className = "ninja-card";
+    card.className = "grid-item";
     card.textContent = name;
-    card.dataset.ninja = name;
 
     card.addEventListener("click", () => {
-      qsa(".ninja-card").forEach(x => x.classList.remove("selected"));
+      qsa("#ninja-grid .grid-item").forEach(x => x.classList.remove("selected"));
       card.classList.add("selected");
 
       App.selectedNinja = name;
-      $("start-game-btn").disabled = false;
+      if ($("start-game-btn")) $("start-game-btn").disabled = false;
     });
 
     grid.appendChild(card);
@@ -229,7 +201,7 @@ function renderNinjaGrid() {
 }
 
 /* -----------------------------
-   START GAME
+   START GAME MODAL & HUB
    ----------------------------- */
 function startGame() {
   if (!App.selectedNinja) {
@@ -240,11 +212,13 @@ function startGame() {
   const modal = $("start-modal");
   const convo = [
     `${App.selectedNinja}: "I’m ready, sensei."`,
-    `Trainer: "Your journey begins now. Stay sharp."`,
-    `${App.selectedNinja}: "I won't fail."`
+    `Trainer: "Your journey begins in ${App.selectedVillage}. Stay sharp."`,
+    `${App.selectedNinja}: "I won't fail!"`
   ];
 
-  $("conversation-text").innerHTML = convo.map(line => `<div>${line}</div>`).join("");
+  if ($("conversation-text")) {
+    $("conversation-text").innerHTML = convo.map(line => `<div>${line}</div>`).join("");
+  }
   modal.classList.remove("hidden");
 }
 
@@ -254,15 +228,19 @@ function closeStartModal() {
 
 function beginFirstBattle() {
   closeStartModal();
-  alert(`${App.selectedNinja} wins the first battle!`);
   showPage("game-village");
-  $("hub-village-name").textContent = `${App.selectedVillage} Village`;
+  if ($("hub-village-name")) {
+    $("hub-village-name").textContent = `${App.selectedVillage} Village Hub — ${App.selectedNinja}`;
+  }
 }
 
 /* -----------------------------
-   INIT
+   INITIALIZATION
    ----------------------------- */
-(function init(){
-  showPage("login-page"); // ALWAYS start at login
+document.addEventListener("DOMContentLoaded", () => {
+  localStorage.removeItem("shinobi_username");
+  localStorage.removeItem("shinobi_selectedDifficulty");
+  
+  showPage("login-page");
   initDifficulty();
-})();
+});
