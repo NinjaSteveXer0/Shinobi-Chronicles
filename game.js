@@ -98,13 +98,13 @@ function initDifficulty() {
         alert("Unlocked for demo purposes.");
       }
 
-      // Select visually
+      // Visual selection
       qsa(".difficulty-level").forEach(x => x.classList.remove("selected"));
       el.classList.add("selected");
 
       App.selectedDifficulty = level;
 
-      // MOVE TO VILLAGE PAGE
+      // Move to Village page
       showPage("village-page");
       renderVillageList();
     });
