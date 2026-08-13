@@ -116,14 +116,14 @@ button.ghost {
   transition: transform .2s ease, filter .2s ease;
 }
 
-/* ENHANCED HOVER ZOOM EFFECT */
+/* ONLY ZOOM ON ACTIVE HOVER */
 .difficulty-level:hover {
-  z-index: 10; /* Lifts hovered icon above neighboring elements */
+  z-index: 10; 
 }
 
 .difficulty-level:hover .rock-icon { 
-  transform: translateY(-12px) scale(1.22); /* Big pop out */
-  filter: drop-shadow(0 0 30px rgba(255, 26, 26, 0.75)); /* Red chakra glow */
+  transform: translateY(-12px) scale(1.22); 
+  filter: drop-shadow(0 0 30px rgba(255, 26, 26, 0.8)); 
 }
 
 .difficulty-info { 
@@ -145,13 +145,14 @@ button.ghost {
   border: 1px solid rgba(255,26,26,0.4); 
 }
 
-/* States */
+/* STATES (FIXED SELECTED STATE) */
 .difficulty-level.disabled .rock-icon { filter: grayscale(0.8) brightness(0.4); opacity: 0.45; cursor: not-allowed; }
 .difficulty-level.locked .rock-icon { filter: grayscale(0.9) brightness(0.4); opacity: 0.5; }
+
+/* Selected state now stays normal size until hovered */
 .difficulty-level.selected .rock-icon { 
-  outline: 4px solid var(--accent); 
-  transform: translateY(-12px) scale(1.22); 
-  filter: drop-shadow(0 0 35px rgba(255,26,26,0.9)); 
+  outline: 3px solid var(--accent); 
+  outline-offset: 4px;
 }
 
 /* Controls Bar */
