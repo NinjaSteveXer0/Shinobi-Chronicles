@@ -11,6 +11,26 @@ const App = {
 };
 
 /* -----------------------------
+   INACTIVITY TIMER & PERSISTENCE
+   ----------------------------- */
+let inactivityTimer = null;
+const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+function resetInactivityTimer() {
+  if (!App.user) return; // Don't track if logged out
+  clearTimeout(inactivityTimer);
+  inactivityTimer = setTimeout(() => {
+    alert("You have been logged out due to 15 minutes of inactivity.");
+    goBackToLogin();
+  }, INACTIVITY_LIMIT);
+}
+
+// Track user actions for inactivity
+["mousemove", "keydown", "click", "scroll"].forEach(event => {
+  window.addEventListener(event, resetInactivityTimer);
+});
+
+/* -----------------------------
    PAGE NAVIGATION
    ----------------------------- */
 function showPage(pageId) {
@@ -28,6 +48,8 @@ function showPage(pageId) {
     if (!el) return;
     el.classList.toggle("hidden", id !== pageId);
   });
+  
+  resetInactivityTimer();
 }
 
 /* -----------------------------
@@ -43,8 +65,10 @@ function login() {
   }
 
   App.user = user;
+  localStorage.setItem("shinobi_username", user);
   $("header-user").textContent = `Logged in as: ${user}`;
   showPage("journey-page");
+  resetInactivityTimer();
 }
 
 function register() {
@@ -57,9 +81,11 @@ function register() {
   }
 
   App.user = user;
+  localStorage.setItem("shinobi_username", user);
   $("header-user").textContent = `Logged in as: ${user}`;
   alert("Registration successful!");
   showPage("journey-page");
+  resetInactivityTimer();
 }
 
 /* -----------------------------
@@ -68,6 +94,8 @@ function register() {
 function goBackToJourney() { showPage("journey-page"); }
 function goBackToLogin() { 
   App.user = null;
+  localStorage.removeItem("shinobi_username");
+  clearTimeout(inactivityTimer);
   $("header-user").textContent = "Not signed in";
   showPage("login-page"); 
 }
@@ -83,34 +111,44 @@ function initDifficulty() {
   levels.forEach(el => {
     const level = el.dataset.level;
 
+    // Single click for selection
     el.addEventListener("click", () => {
-      // Disabled levels (except academy)
-      if (el.classList.contains("disabled") && level !== "academy") {
-        alert("Only Academy Student is playable right now.");
-        return;
+      handleDifficultySelection(el, level);
+    });
+
+    // Double click to instantly select and advance to village page
+    el.addEventListener("dblclick", () => {
+      handleDifficultySelection(el, level);
+      if (!el.classList.contains("disabled") && !el.classList.contains("locked")) {
+        showPage("village-page");
+        renderVillageList();
       }
-
-      // Paid / locked levels (Special Jonin, Akatsuki, Jinchuriki)
-      if (el.classList.contains("locked") || el.classList.contains("paid-level")) {
-        const wants = confirm("This is a Premium difficulty. Would you like to unlock it?");
-        if (!wants) return;
-        
-        // Unlock for demo testing
-        el.classList.remove("locked", "paid-level", "disabled");
-        alert(`${level.toUpperCase()} difficulty unlocked!`);
-      }
-
-      // Visual selection
-      qsa(".difficulty-level").forEach(x => x.classList.remove("selected"));
-      el.classList.add("selected");
-
-      App.selectedDifficulty = level;
-
-      // Move to Village page
-      showPage("village-page");
-      renderVillageList();
     });
   });
+}
+
+function handleDifficultySelection(el, level) {
+  if (el.classList.contains("disabled") && level !== "academy") {
+    alert("Only Academy Student is playable right now.");
+    return;
+  }
+
+  if (el.classList.contains("locked") || el.classList.contains("paid-level")) {
+    const wants = confirm("This is a Premium difficulty. Would you like to unlock it?");
+    if (!wants) return;
+    
+    el.classList.remove("locked", "paid-level", "disabled");
+    alert(`${level.toUpperCase()} difficulty unlocked!`);
+  }
+
+  qsa(".difficulty-level").forEach(x => x.classList.remove("selected"));
+  el.classList.add("selected");
+
+  App.selectedDifficulty = level;
+  localStorage.setItem("shinobi_selectedDifficulty", level);
+
+  showPage("village-page");
+  renderVillageList();
 }
 
 /* -----------------------------
@@ -134,16 +172,31 @@ function renderVillageList() {
     item.className = "grid-item";
     item.textContent = v;
 
+    // Single click
     item.addEventListener("click", () => {
-      qsa("#village-list .grid-item").forEach(x => x.classList.remove("selected"));
-      item.classList.add("selected");
+      selectVillage(item, v);
+    });
 
-      App.selectedVillage = v;
-      if ($("to-ninja-btn")) $("to-ninja-btn").disabled = false;
+    // Double click to instantly advance
+    item.addEventListener("dblclick", () => {
+      selectVillage(item, v);
+      showPage("ninja-page");
+      renderNinjaGrid();
     });
 
     container.appendChild(item);
   });
+}
+
+function selectVillage(item, v) {
+  qsa("#village-list .grid-item").forEach(x => x.classList.remove("selected"));
+  item.classList.add("selected");
+
+  App.selectedVillage = v;
+  if ($("to-ninja-btn")) $("to-ninja-btn").disabled = false;
+  
+  const villageLabel = $("id-village");
+  if (villageLabel) villageLabel.textContent = v;
 }
 
 function goToNinjaSelection() {
@@ -190,36 +243,49 @@ function renderNinjaGrid() {
     card.className = "grid-item";
     card.textContent = name;
 
+    // Single click
     card.addEventListener("click", () => {
-      qsa("#ninja-grid .grid-item").forEach(x => x.classList.remove("selected"));
-      card.classList.add("selected");
+      selectNinja(card, name);
+    });
 
-      App.selectedNinja = name;
-      if ($("start-game-btn")) $("start-game-btn").disabled = false;
-      
-      // Update the Ninja ID Card photo and name
-      updateMainPlayerProfile(name);
+    // Double click to instantly trigger start game modal
+    card.addEventListener("dblclick", () => {
+      selectNinja(card, name);
+      startGame();
     });
 
     grid.appendChild(card);
   });
 }
 
+function selectNinja(card, name) {
+  qsa("#ninja-grid .grid-item").forEach(x => x.classList.remove("selected"));
+  card.classList.add("selected");
+
+  App.selectedNinja = name;
+  if ($("start-game-btn")) $("start-game-btn").disabled = false;
+  
+  updateMainPlayerProfile(name);
+}
+
 /* Update main character portrait on the Ninja ID card */
 function updateMainPlayerProfile(ninjaName) {
   const nameEl = $("main-player-name");
   const imgEl = $("main-player-img");
+  const rankEl = $("id-rank");
 
   if (nameEl) nameEl.textContent = ninjaName;
 
   if (imgEl) {
     if (ninjaName === "Shadow Ninja") {
       imgEl.src = "Assets/Animated Cards/Shadow ninja - animated.png";
+      if (rankEl) rankEl.textContent = "Anbu"; // Setting rank profile update for Shadow Ninja
     } else {
       imgEl.src = `Assets/Icons/${ninjaName}.png`;
       imgEl.onerror = () => { 
         imgEl.src = "Assets/Icons/Academy student.png"; 
       };
+      if (rankEl) rankEl.textContent = "Academy Student";
     }
   }
 }
@@ -259,12 +325,32 @@ function beginFirstBattle() {
 }
 
 /* -----------------------------
-   INITIALIZATION
+   INITIALIZATION & ENTER KEY LISTENER
    ----------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  localStorage.removeItem("shinobi_username");
-  localStorage.removeItem("shinobi_selectedDifficulty");
-  
-  showPage("login-page");
+  // Check if user was previously saved in session/local storage
+  const savedUser = localStorage.getItem("shinobi_username");
+  if (savedUser) {
+    App.user = savedUser;
+    $("header-user").textContent = `Logged in as: ${savedUser}`;
+    showPage("journey-page");
+  } else {
+    showPage("login-page");
+  }
+
   initDifficulty();
+
+  // Allow pressing Enter to submit login/register when focused on password/username inputs
+  const passwordInput = $("password");
+  const usernameInput = $("username");
+
+  if (passwordInput && usernameInput) {
+    const handleEnterKey = (e) => {
+      if (e.key === "Enter") {
+        login();
+      }
+    };
+    passwordInput.addEventListener("keypress", handleEnterKey);
+    usernameInput.addEventListener("keypress", handleEnterKey);
+  }
 });
