@@ -1,67 +1,41 @@
 // -----------------------------
 // game.js
 // Full file — replace your existing game.js with this version.
-// Designed to work with the "Demon Night" index.html redesign.
+// Restores Login, Journey, Difficulty, Village, Ninja pages and integrates with index.html.
 // -----------------------------
 
-/*
-  Features
-  - Robust page/show toggles that are tolerant if an element is missing.
-  - Login / register stubs with basic validation.
-  - Difficulty selection, preview wiring, and persistence to localStorage.
-  - Safe no-op fallbacks so missing DOM elements won't throw errors.
-  - Small utility helpers for cleaner code.
-*/
-
-/* -----------------------------
-   Utility helpers
-   ----------------------------- */
 const $ = (id) => document.getElementById(id);
-const qs = (sel, root = document) => root.querySelector(sel);
-const qsa = (sel, root = document) => Array.from(root.querySelectorAll(sel));
-
-function safeSetDisplay(id, display) {
-  const el = $(id);
-  if (el) el.style.display = display;
-}
-
-function clamp(v, a, b) { return Math.max(a, Math.min(b, v)); }
+const qsa = (sel, root = document) => Array.from((root || document).querySelectorAll(sel));
 
 /* -----------------------------
    Page / Modal management
-   -----------------------------
-   The original game.js used page ids:
-   - login-page
-   - journey-page
-   - difficulty-page
-   - village-page
-   - ninja-page
-   This redesign uses a single main UI and a login modal.
-   We keep the same function names for compatibility; they will
-   gracefully no-op or toggle the login modal where appropriate.
-*/
+   ----------------------------- */
 function showPage(pageId) {
-  // If the element exists, show it and hide others from the known set.
-  const known = ["login-page", "journey-page", "difficulty-page", "village-page", "ninja-page"];
+  const known = ["login-page","journey-page","difficulty-page","village-page","ninja-page"];
+  // If pageId corresponds to a modal (login-page) toggle its active class
   const target = $(pageId);
   if (!target) {
-    // If requested page doesn't exist, fallback: if it's login-page toggle modal
+    // fallback: if login requested but element missing, do nothing
     if (pageId === "login-page") {
       const modal = $("login-page");
       if (modal) modal.classList.add("active");
     }
     return;
   }
-
+  // Hide all known page-panels and remove modal active class
   known.forEach(id => {
     const el = $(id);
     if (!el) return;
-    el.style.display = (id === pageId) ? "block" : "none";
+    if (id === "login-page") {
+      el.classList.toggle("active", id === pageId);
+    } else {
+      el.classList.toggle("active", id === pageId);
+    }
   });
 }
 
 /* -----------------------------
-   Authentication stubs
+   Authentication
    ----------------------------- */
 function login() {
   const userEl = $("username");
@@ -74,19 +48,14 @@ function login() {
     return;
   }
 
-  // Simple demo persistence
   try { localStorage.setItem("player_username", user); } catch(e){}
-
-  // Close login modal if present
   const modal = $("login-page");
   if (modal) modal.classList.remove("active");
 
-  // If your app uses a journey page, show it; otherwise do nothing
-  if ($("journey-page")) showPage("journey-page");
-  else {
-    // Optionally highlight the UI or show a toast — for now, console log
-    console.log("Login successful for", user);
-  }
+  // Show journey page
+  const journey = $("journey-page");
+  if (journey) showPage("journey-page");
+  else console.log("Login successful for", user);
 }
 
 function register() {
@@ -100,48 +69,50 @@ function register() {
     return;
   }
 
-  // In a real app you'd call an API. For now, just confirm and store locally.
   try { localStorage.setItem("player_username", user); } catch(e){}
   alert("Registration successful!");
+  const modal = $("login-page");
+  if (modal) modal.classList.remove("active");
+  if ($("journey-page")) showPage("journey-page");
 }
 
 /* -----------------------------
-   Navigation helpers (kept for compatibility)
+   Navigation helpers
    ----------------------------- */
 function goToDifficulty() {
-  if ($("difficulty-page")) showPage("difficulty-page");
-  else {
-    // If no separate difficulty page exists, focus the main UI
-    const canvas = $("path-canvas");
-    if (canvas) canvas.scrollIntoView({behavior:"smooth", block:"center"});
-  }
+  // Our redesigned index uses the main UI; ensure journey page hidden and difficulty UI visible
+  // We'll show the difficulty UI by focusing the ranks area and ensuring journey-page is hidden
+  const journey = $("journey-page");
+  if (journey) journey.classList.remove("active");
+  // No separate difficulty-page element in this layout; keep UI visible
+  const ranks = $("ranks");
+  if (ranks) ranks.scrollIntoView({behavior:"smooth", block:"center"});
 }
 
 function goBackToJourney() {
   if ($("journey-page")) showPage("journey-page");
   else {
-    // fallback: close any overlays and focus main UI
+    // fallback: close login modal if open
     const modal = $("login-page");
     if (modal) modal.classList.remove("active");
   }
 }
 
 function goBackToLogin() {
-  // Show login modal if present, otherwise try to navigate to journey page
   const modal = $("login-page");
   if (modal) modal.classList.add("active");
   else if ($("journey-page")) showPage("journey-page");
 }
 
 function goBackToDifficulty() {
-  if ($("difficulty-page")) showPage("difficulty-page");
-  else goToDifficulty();
+  // Focus ranks area
+  const ranks = $("ranks");
+  if (ranks) ranks.scrollIntoView({behavior:"smooth", block:"center"});
 }
 
 function goBackToVillage() {
   if ($("village-page")) showPage("village-page");
   else {
-    // If no village page, try to focus the ranks area
     const ranks = $("ranks");
     if (ranks) ranks.scrollIntoView({behavior:"smooth", block:"center"});
   }
@@ -159,49 +130,51 @@ function selectDifficulty(level) {
   if (!level) return;
   level = String(level);
 
-  // Validate level
   if (!GameState.availableLevels.includes(level)) {
     console.warn("Unknown difficulty level:", level);
-    GameState.selectedDifficulty = level; // still allow custom
+    GameState.selectedDifficulty = level;
   } else {
     GameState.selectedDifficulty = level;
   }
 
-  // Persist selection
   try { localStorage.setItem("selectedDifficulty", GameState.selectedDifficulty); } catch(e){}
 
-  // Update UI hint if present
+  // Update UI hint
   const selectedNameEl = $("selected-name");
   if (selectedNameEl) {
-    // Find the card name text if possible
     const card = document.querySelector(`.rank[data-level="${level}"]`);
     const name = card ? (card.querySelector('.name')?.textContent || level) : level;
     selectedNameEl.textContent = name;
   }
 
-  // If your flow expects to move to village page, do that
+  // Move to village page if present
   if ($("village-page")) showPage("village-page");
-  else {
-    // Otherwise, log and keep user on the same screen
-    console.log("Difficulty selected:", level);
-  }
+  else console.log("Difficulty selected:", level);
 }
 
 /* -----------------------------
    Initialization: wire preview, cards, and start button
    ----------------------------- */
 (function initUI(){
-  // Restore last selected difficulty
   try {
     const saved = localStorage.getItem("selectedDifficulty");
     if (saved) GameState.selectedDifficulty = saved;
   } catch(e){}
 
-  // Wire card hover/selection behavior (works with redesigned HTML)
   const cards = qsa('.rank');
   const previewImg = $("preview-img");
   const selectedNameEl = $("selected-name");
   const startBtn = $("start-btn");
+
+  // If an animated GIF exists at the recommended path, prefer it
+  (function preferGif(){
+    const gifPath = 'assets/cards/shadow_ninja.gif';
+    // Attempt to load the GIF by creating an Image and checking onload/onerror
+    const img = new Image();
+    img.onload = function(){ if(previewImg) previewImg.src = gifPath; };
+    img.onerror = function(){ /* keep default */ };
+    img.src = gifPath;
+  })();
 
   function setPreviewFromCard(card) {
     if (!card) return;
@@ -210,31 +183,24 @@ function selectDifficulty(level) {
     if (art && previewImg) previewImg.src = art.src;
     const name = card.querySelector('.name')?.textContent || level;
     if (selectedNameEl) selectedNameEl.textContent = name;
-    // update start button action
     if (startBtn) startBtn.onclick = () => selectDifficulty(level);
   }
 
   cards.forEach(card => {
     card.addEventListener('mouseenter', () => setPreviewFromCard(card));
     card.addEventListener('click', () => {
-      // Visual selection outline
       qsa('.rank').forEach(r => r.style.outline = 'none');
       card.style.outline = '3px solid rgba(255,43,43,0.14)';
-      // If card is locked, show purchase prompt
       if (card.classList.contains('locked')) {
-        // Simple prompt — replace with your monetization flow
         const wants = confirm("This is a paid difficulty. Would you like to unlock it?");
         if (wants) {
-          // In a real app you'd redirect to purchase flow. For now, unlock locally.
           card.classList.remove('locked');
           alert("Unlocked for demo purposes.");
         } else {
-          // keep previous selection
           return;
         }
       }
       setPreviewFromCard(card);
-      // store selection
       const level = card.dataset.level;
       if (level) {
         GameState.selectedDifficulty = level;
@@ -249,28 +215,62 @@ function selectDifficulty(level) {
     initialCard = document.querySelector(`.rank[data-level="${GameState.selectedDifficulty}"]`);
   }
   if (!initialCard) initialCard = document.querySelector('.rank:not(.locked)') || cards[0];
-  if (initialCard) {
-    // Slight delay to ensure images have loaded in some environments
-    setTimeout(() => setPreviewFromCard(initialCard), 40);
-  }
+  if (initialCard) setTimeout(() => setPreviewFromCard(initialCard), 40);
 
-  // Start button fallback: if no start button exists, create a safe global function
-  if (!startBtn) {
-    window.startJourney = function() {
-      const level = GameState.selectedDifficulty || 'genin';
-      selectDifficulty(level);
-    };
-  }
-
-  // Expose a small API for debugging in console
+  // Expose small API for debugging
   window.__gameState = GameState;
 })();
 
 /* -----------------------------
-   Optional: small accessibility helpers
+   Positioning helper for diagonal path (keeps original responsive behavior)
+   ----------------------------- */
+(function positionRanks(){
+  const order = ['academy','genin','chunin','specialjonin','jonin','anbu','kage'];
+  function getVar(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+  function setPositions(){
+    const canvas = document.getElementById('path-canvas');
+    if(!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const anchorLeftPct = 14;
+    const anchorTopPct  = 92;
+    const stepHPct = 9.5;
+    const stepVPct = 13;
+    const anchorLeftPx = anchorLeftPct/100 * rect.width;
+    const anchorTopPx  = anchorTopPct/100 * rect.height;
+    const stepHPx = stepHPct/100 * rect.width;
+    const stepVPx = stepVPct/100 * rect.height;
+    order.forEach((id, idx) => {
+      const el = document.getElementById(id);
+      if(!el) return;
+      const leftPx = anchorLeftPx + idx * stepHPx;
+      const topPx  = anchorTopPx  - idx * stepVPx;
+      el.style.left = (leftPx / rect.width) * 100 + '%';
+      el.style.top  = (topPx  / rect.height) * 100 + '%';
+      const img = el.querySelector('.card-art');
+      if(img) img.style.width = '100%';
+    });
+    // Paid offsets for akatsuki/jinchuriki if present
+    const ak = document.getElementById('akatsuki');
+    if(ak){
+      ak.style.left = '86%';
+      ak.style.top = '12%';
+    }
+    const ji = document.getElementById('jinchuriki');
+    if(ji){
+      ji.style.left = '92%';
+      ji.style.top = '8%';
+    }
+  }
+  window.addEventListener('resize', setPositions);
+  window.addEventListener('load', ()=> setTimeout(setPositions, 60));
+  document.querySelectorAll('.card-art').forEach(img => { if(!img.complete) img.addEventListener('load', setPositions); });
+  setPositions();
+})();
+
+/* -----------------------------
+   Accessibility helpers
    ----------------------------- */
 (function accessibilityHelpers(){
-  // Allow keyboard navigation for rank cards
   const ranks = qsa('.rank');
   ranks.forEach((r, idx) => {
     r.setAttribute('tabindex', '0');
@@ -292,7 +292,7 @@ function selectDifficulty(level) {
 })();
 
 /* -----------------------------
-   Exported functions (kept for compatibility)
+   Exported functions for compatibility
    ----------------------------- */
 window.login = login;
 window.register = register;
@@ -302,5 +302,3 @@ window.goBackToLogin = goBackToLogin;
 window.selectDifficulty = selectDifficulty;
 window.goBackToDifficulty = goBackToDifficulty;
 window.goBackToVillage = goBackToVillage;
-
-// End of game.js
