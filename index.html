@@ -26,34 +26,39 @@
       <button class="ghost" onclick="register()">Register</button>
     </div>
 
-    <!-- 2. JOURNEY PAGE (NINJA ID CARD WITH LARGE LEFT PORTRAIT) -->
+    <!-- 2. JOURNEY PAGE (TWO-BOX NINJA ID CARD) -->
     <div id="journey-page" class="page-panel hidden" style="text-align: center;">
       <h2>Ninja ID Card</h2>
       
-      <div class="profile-card" style="margin: 20px auto; max-width: 600px; padding: 24px; background: rgba(14, 64, 66, 0.12); border-radius: 10px; border: 2px solid var(--btn-teal); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); display: flex; gap: 24px; align-items: center;">
+      <!-- Outer Card Container -->
+      <div class="profile-card" style="margin: 20px auto; max-width: 650px; padding: 24px; background: rgba(14, 64, 66, 0.12); border-radius: 12px; border: 2px solid var(--btn-teal); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); display: flex; gap: 20px; align-items: stretch;">
         
-        <!-- LARGE MAIN PLAYER PHOTO SLOT ON THE LEFT -->
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 8px;">
-          <div style="width: 150px; height: 210px; border-radius: 8px; border: 2px solid var(--btn-teal); background: #07282b; overflow: hidden; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <!-- LEFT BOX: NINJA PICTURE & NAME -->
+        <div style="width: 160px; background: #07282b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          <div style="width: 100%; height: 210px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
             <img id="main-player-img" src="Assets/Icons/Academy student.png" alt="Main Character" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
-          <span id="main-player-name" style="font-size: 14px; font-weight: bold; color: var(--btn-teal); max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">No Main Chosen</span>
+          <span id="main-player-name" style="font-size: 13px; font-weight: bold; color: var(--btn-teal); margin-top: 8px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; max-width: 140px;">No Ninja Chosen</span>
         </div>
 
-        <!-- STATS COLUMN ON THE RIGHT -->
-        <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; text-align: left; font-size: 15px;">
-          <div><strong>Ninja Rank:</strong></div>
-          <div style="color: var(--btn-teal); font-weight: bold;">Unranked Trainee</div>
+        <!-- RIGHT BOX: STATS AND INFO -->
+        <div style="flex: 1; background: #07282b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: center; text-align: left; font-size: 14px; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          <div><strong>Ninja Village:</strong></div>
+          <div id="id-village" style="color: var(--btn-teal); font-weight: bold;">Unassigned</div>
 
-          <div><strong>Current Level:</strong></div>
-          <div style="color: var(--btn-teal); font-weight: bold;">Lvl 1</div>
+          <div><strong>Ninja Rank:</strong></div>
+          <div id="id-rank" style="color: var(--btn-teal); font-weight: bold;">Academy Student</div>
+
+          <div><strong>Ninja Level:</strong></div>
+          <div id="id-level" style="color: var(--btn-teal); font-weight: bold;">Lvl 1</div>
 
           <div><strong>Rogue Ninja Defeated:</strong></div>
-          <div style="color: #b81414; font-weight: bold;">0</div>
+          <div id="id-rogue-defeated" style="color: #b81414; font-weight: bold;">0</div>
 
-          <div><strong>Scroll Missions:</strong></div>
-          <div style="color: var(--btn-teal); font-weight: bold;">Ready to Begin</div>
+          <div><strong>Power Level:</strong></div>
+          <div id="id-power-level" style="color: #e5a93b; font-weight: bold;">Locked</div>
         </div>
+
       </div>
 
       <div style="margin-top: 24px;">
