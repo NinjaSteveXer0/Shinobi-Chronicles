@@ -214,7 +214,7 @@ function updateMainPlayerProfile(ninjaName) {
 
   if (imgEl) {
     if (ninjaName === "Shadow Ninja") {
-      imgEl.src = "Assets/Icons/Shadow Ninja - Animated.png";
+      imgEl.src = "Assets/Animated Cards/Shadow ninja - animated.png";
     } else {
       imgEl.src = `Assets/Icons/${ninjaName}.png`;
       imgEl.onerror = () => { 
