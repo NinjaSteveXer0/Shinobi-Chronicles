@@ -167,7 +167,7 @@ const NINJAS = {
   "Rain": ["Pain"],
   "Sound": ["Orochimaru"],
   "Grass": ["Kiba Inuzuka"],
-  "Waterfall": ["Tenten"],
+  "Waterfall": ["Shadow Ninja", "Tenten"],
   "Snow": ["Haku (Snow)"],
   "Whirling Tides": ["Ashina Uzumaki"]
 };
@@ -211,10 +211,16 @@ function updateMainPlayerProfile(ninjaName) {
   const imgEl = $("main-player-img");
 
   if (nameEl) nameEl.textContent = ninjaName;
+
   if (imgEl) {
-    // You can replace this path with actual character portrait images later!
-    imgEl.src = `Assets/Icons/${App.selectedVillage}.png`;
-    imgEl.onerror = () => { imgEl.src = "Assets/Icons/Academy student.png"; };
+    if (ninjaName === "Shadow Ninja") {
+      imgEl.src = "Assets/Icons/Shadow Ninja - Animated.png";
+    } else {
+      imgEl.src = `Assets/Icons/${ninjaName}.png`;
+      imgEl.onerror = () => { 
+        imgEl.src = "Assets/Icons/Academy student.png"; 
+      };
+    }
   }
 }
 
