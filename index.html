@@ -87,59 +87,66 @@
       <div class="user" id="header-user">Not signed in</div>
     </header>
 
-    <!-- Difficulty page (this file focuses on difficulty canvas) -->
-    <section id="difficulty-page" class="page-panel">
-      <h2>Select Difficulty</h2>
+    <div class="difficulty-path" id="difficulty-canvas">
 
-      <div class="difficulty-path" id="difficulty-canvas" aria-label="Difficulty path">
-        <div class="arrow-overlay" aria-hidden="true"></div>
+  <!-- MAIN HORIZONTAL ROW -->
+  <div class="difficulty-row">
 
-        <!-- Stepping stones (IDs and data-level used by game.js) -->
-        <div id="academy" class="difficulty-level academy" data-level="academy" aria-label="Academy Student">
-          <img src="Assets/Icons/Academy student.png" class="rock-icon" alt="Academy Student">
-          <div class="difficulty-info">Academy Student</div>
-        </div>
+    <div id="academy" class="difficulty-level" data-level="academy">
+      <img src="Assets/Icons/Academy student.png" class="rock-icon">
+      <div class="difficulty-info">Academy Student</div>
+    </div>
 
-        <div id="genin" class="difficulty-level genin disabled" data-level="genin" aria-label="Genin">
-          <img src="Assets/Icons/Genin.png" class="rock-icon" alt="Genin">
-          <div class="difficulty-info">Genin</div>
-        </div>
+    <div id="genin" class="difficulty-level disabled" data-level="genin">
+      <img src="Assets/Icons/Genin.png" class="rock-icon">
+      <div class="difficulty-info">Genin</div>
+    </div>
 
-        <div id="chunin" class="difficulty-level chunin disabled" data-level="chunin" aria-label="Chunin">
-          <img src="Assets/Icons/Chunin.png" class="rock-icon" alt="Chunin">
-          <div class="difficulty-info">Chunin</div>
-        </div>
+    <div id="chunin" class="difficulty-level disabled" data-level="chunin">
+      <img src="Assets/Icons/Chunin.png" class="rock-icon">
+      <div class="difficulty-info">Chunin</div>
+    </div>
 
-        <div id="specialjonin" class="difficulty-level specialjonin locked" data-level="specialjonin" aria-label="Special Jonin">
-          <img src="Assets/Icons/Special Jonin.png" class="rock-icon" alt="Special Jonin">
-          <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
-        </div>
+    <div id="jonin" class="difficulty-level disabled" data-level="jonin">
+      <img src="Assets/Icons/Jonin.png" class="rock-icon">
+      <div class="difficulty-info">Jōnin</div>
+    </div>
 
-        <div id="jonin" class="difficulty-level jonin disabled" data-level="jonin" aria-label="Jonin">
-          <img src="Assets/Icons/Jonin.png" class="rock-icon" alt="Jonin">
-          <div class="difficulty-info">Jōnin</div>
-        </div>
+    <!-- SPECIAL JONIN ABOVE JONIN -->
+    <div id="specialjonin" class="difficulty-level locked" data-level="specialjonin"
+         style="position:absolute; left:50%; top:10%;">
+      <img src="Assets/Icons/Special Jonin.png" class="rock-icon">
+      <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
+    </div>
 
-        <div id="anbu" class="difficulty-level anbu disabled" data-level="anbu" aria-label="ANBU">
-          <img src="Assets/Icons/Anbu.png" class="rock-icon" alt="ANBU">
-          <div class="difficulty-info">ANBU</div>
-        </div>
+    <div id="anbu" class="difficulty-level disabled" data-level="anbu">
+      <img src="Assets/Icons/Anbu.png" class="rock-icon">
+      <div class="difficulty-info">ANBU</div>
+    </div>
 
-        <div id="kage" class="difficulty-level kage disabled" data-level="kage" aria-label="Kage">
-          <img src="Assets/Icons/Kage.png" class="rock-icon" alt="Kage">
-          <div class="difficulty-info">Kage</div>
-        </div>
+    <div id="kage" class="difficulty-level disabled" data-level="kage">
+      <img src="Assets/Icons/Kage.png" class="rock-icon">
+      <div class="difficulty-info">Kage</div>
+    </div>
 
-        <div id="akatsuki" class="difficulty-level paid-level locked akatsuki" data-level="akatsuki" aria-label="Akatsuki">
-          <img src="Assets/Icons/Akatsuki.png" class="rock-icon" alt="Akatsuki">
-          <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
-        </div>
+  </div>
 
-        <div id="jinchuriki" class="difficulty-level paid-level locked jinchuriki" data-level="jinchuriki" aria-label="Jinchuriki">
-          <img src="Assets/Icons/Jinchuriki.png" class="rock-icon" alt="Jinchuriki">
-          <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
-        </div>
-      </div>
+  <!-- AKATSUKI ABOVE KAGE -->
+  <div class="difficulty-level paid-level locked" data-level="akatsuki"
+       style="position:absolute; right:10%; top:8%;">
+    <img src="Assets/Icons/Akatsuki.png" class="rock-icon">
+    <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
+  </div>
+
+  <!-- JINCHŪRIKI BELOW KAGE -->
+  <div class="difficulty-level paid-level locked" data-level="jinchuriki"
+       style="position:absolute; right:10%; bottom:8%;">
+    <img src="Assets/Icons/Jinchuriki.png" class="rock-icon">
+    <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
+  </div>
+
+</div>
+
 
       <div class="controls">
         <button class="ghost" onclick="goBackToJourney()">← Back</button>
