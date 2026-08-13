@@ -196,10 +196,26 @@ function renderNinjaGrid() {
 
       App.selectedNinja = name;
       if ($("start-game-btn")) $("start-game-btn").disabled = false;
+      
+      // Update the Ninja ID Card photo and name
+      updateMainPlayerProfile(name);
     });
 
     grid.appendChild(card);
   });
+}
+
+/* Update main character portrait on the Ninja ID card */
+function updateMainPlayerProfile(ninjaName) {
+  const nameEl = $("main-player-name");
+  const imgEl = $("main-player-img");
+
+  if (nameEl) nameEl.textContent = ninjaName;
+  if (imgEl) {
+    // You can replace this path with actual character portrait images later!
+    imgEl.src = `Assets/Icons/${App.selectedVillage}.png`;
+    imgEl.onerror = () => { imgEl.src = "Assets/Icons/Academy student.png"; };
+  }
 }
 
 /* -----------------------------
@@ -232,7 +248,7 @@ function beginFirstBattle() {
   closeStartModal();
   showPage("game-village");
   if ($("hub-village-name")) {
-    $("hub-village-name").textContent = `${App.selectedVillage} Village Hub — ${App.selectedNinja}`;
+    $("hub-village-name").textContent = `${App.selectedVillage} Village Hub — Main: ${App.selectedNinja}`;
   }
 }
 
