@@ -41,59 +41,62 @@
       <!-- Winding Path Canvas -->
       <div class="difficulty-path" id="difficulty-canvas">
 
-        <!-- Bottom Row (Left to Right) -->
+        <!-- BOTTOM ROW (Main Path: 1 to 3) -->
         <div id="academy" class="difficulty-level" data-level="academy" style="left: 12%; top: 78%;">
           <img src="Assets/Icons/Academy student.png" alt="Academy Student" class="rock-icon">
           <div class="difficulty-info">Academy Student</div>
         </div>
 
-        <div id="genin" class="difficulty-level disabled" data-level="genin" style="left: 33%; top: 78%;">
+        <div id="genin" class="difficulty-level disabled" data-level="genin" style="left: 36%; top: 78%;">
           <img src="Assets/Icons/Genin.png" alt="Genin" class="rock-icon">
           <div class="difficulty-info">Genin</div>
         </div>
 
-        <div id="chunin" class="difficulty-level disabled" data-level="chunin" style="left: 54%; top: 78%;">
+        <div id="chunin" class="difficulty-level disabled" data-level="chunin" style="left: 60%; top: 78%;">
           <img src="Assets/Icons/Chunin.png" alt="Chunin" class="rock-icon">
           <div class="difficulty-info">Chunin</div>
         </div>
 
-        <!-- Middle / Top Row (Right to Left) -->
-        <div id="jonin" class="difficulty-level disabled" data-level="jonin" style="left: 54%; top: 25%;">
-          <img src="Assets/Icons/Jonin.png" alt="Jōnin" class="rock-icon">
-          <div class="difficulty-info">Jōnin</div>
-        </div>
-
-        <div id="specialjonin" class="difficulty-level locked" data-level="specialjonin" style="left: 33%; top: 25%;">
-          <img src="Assets/Icons/Special Jonin.png" alt="Special Jōnin" class="rock-icon">
-          <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
-        </div>
-
-        <div id="anbu" class="difficulty-level disabled" data-level="anbu" style="left: 12%; top: 25%;">
-          <img src="Assets/Icons/Anbu.png" alt="ANBU" class="rock-icon">
-          <div class="difficulty-info">ANBU</div>
-        </div>
-
-        <!-- End Game & Special Ranks (Far Right Column) -->
-        <div id="kage" class="difficulty-level disabled" data-level="kage" style="left: 75%; top: 78%;">
-          <img src="Assets/Icons/Kage.png" alt="Kage" class="rock-icon">
-          <div class="difficulty-info">Kage</div>
-        </div>
-
-        <div id="akatsuki" class="difficulty-level paid-level locked" data-level="akatsuki" style="left: 75%; top: 25%;">
+        <!-- FAR RIGHT COLUMN (Paid Branch Ranks) -->
+        <!-- Akatsuki BELOW Special Jonin -->
+        <div id="akatsuki" class="difficulty-level paid-level locked" data-level="akatsuki" style="left: 84%; top: 78%;">
           <img src="Assets/Icons/Akatsuki.png" alt="Akatsuki" class="rock-icon">
           <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
         </div>
 
-        <div id="jinchuriki" class="difficulty-level paid-level locked" data-level="jinchuriki" style="left: 91%; top: 51%;">
+        <!-- Special Jonin in the MIDDLE (LOCKED/PAID) -->
+        <div id="specialjonin" class="difficulty-level paid-level locked" data-level="specialjonin" style="left: 84%; top: 50%;">
+          <img src="Assets/Icons/Special Jonin.png" alt="Special Jōnin" class="rock-icon">
+          <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
+        </div>
+
+        <!-- Jinchuriki ABOVE Special Jonin -->
+        <div id="jinchuriki" class="difficulty-level paid-level locked" data-level="jinchuriki" style="left: 84%; top: 22%;">
           <img src="Assets/Icons/Jinchuriki.png" alt="Jinchūriki" class="rock-icon">
           <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
+        </div>
+
+        <!-- TOP ROW (Main Path: 4 to 6) -->
+        <div id="jonin" class="difficulty-level disabled" data-level="jonin" style="left: 60%; top: 22%;">
+          <img src="Assets/Icons/Jonin.png" alt="Jōnin" class="rock-icon">
+          <div class="difficulty-info">Jōnin</div>
+        </div>
+
+        <div id="anbu" class="difficulty-level disabled" data-level="anbu" style="left: 36%; top: 22%;">
+          <img src="Assets/Icons/Anbu.png" alt="ANBU" class="rock-icon">
+          <div class="difficulty-info">ANBU</div>
+        </div>
+
+        <div id="kage" class="difficulty-level disabled" data-level="kage" style="left: 12%; top: 22%;">
+          <img src="Assets/Icons/Kage.png" alt="Kage" class="rock-icon">
+          <div class="difficulty-info">Kage</div>
         </div>
 
       </div>
 
       <div class="controls-bar">
         <button class="ghost" onclick="goBackToJourney()">← Back</button>
-        <span class="hint-text">Only Academy Student is selectable right now. Use mouse or keyboard.</span>
+        <span class="hint-text">Only Academy Student is selectable right now.</span>
       </div>
     </div>
 
@@ -121,7 +124,7 @@
     <!-- 6. IN-GAME VILLAGE HUB -->
     <div id="game-village" class="page-panel hidden">
       <h2 id="hub-village-name">Village Hub</h2>
-      <p>Welcome to the ninja world! Your adventure has officially begun.</p>
+      <p>Welcome to the ninja world!</p>
       <button class="ghost" onclick="goBackToLogin()">Quit to Main Menu</button>
     </div>
 

@@ -90,12 +90,14 @@ function initDifficulty() {
         return;
       }
 
-      // Paid / locked levels
+      // Paid / locked levels (Special Jonin, Akatsuki, Jinchuriki)
       if (el.classList.contains("locked") || el.classList.contains("paid-level")) {
-        const wants = confirm("This difficulty is locked behind a paywall. Unlock?");
+        const wants = confirm("This is a Premium difficulty. Would you like to unlock it?");
         if (!wants) return;
+        
+        // Unlock for demo testing
         el.classList.remove("locked", "paid-level", "disabled");
-        alert("Unlocked for demo purposes.");
+        alert(`${level.toUpperCase()} difficulty unlocked!`);
       }
 
       // Visual selection
