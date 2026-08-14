@@ -1,13 +1,18 @@
-/* Keep your main app background dark teal */
-body, .page-panel {
-  background-color: #0b2529; /* Adjust this to match your exact teal shade if needed */
+/* -----------------------------
+   GLOBAL THEME
+   ----------------------------- */
+body {
+  background-color: #0b2529; /* Dark teal background */
   color: #ffffff;
+  margin: 0;
 }
 
-/* ONLY style the individual difficulty items to be egg-white */
+/* -----------------------------
+   DIFFICULTY ROW STYLING (EGG-WHITE BOXES)
+   ----------------------------- */
 .diff-row {
-  background-color: #fdfbf7; 
-  color: #1a1a1a;            
+  background-color: #fdfbf7; /* Egg-white / soft off-white */
+  color: #1a1a1a;            /* Dark text for readability */
   border: 1px solid #dcd6cd;  
   border-radius: 12px;
   padding: 16px 20px;
@@ -44,12 +49,14 @@ body, .page-panel {
   margin: 0;
 }
 
+/* Hover lift effect for unlocked rows */
 .diff-row:not(.locked):hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
   border-color: #c5bcaf;
 }
 
+/* Muted look for locked rows */
 .diff-row.locked {
   background-color: #f4f1ea; 
   opacity: 0.7;
