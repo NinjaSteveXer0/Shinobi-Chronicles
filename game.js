@@ -88,111 +88,166 @@ const shopItems = [
 const worldRegions = {
   fire: {
     name: "Land of Fire",
-    description: "The heartland of the shinobi world, dominated by thick forests and Konohagakure.",
-    mapImage: "Assets/Maps/Land_of_Fire_Detail.png",
+    description: "A land of passion and willpower, protected by fierce ninjas and burning spirit.",
+    mapImage: "Assets/Maps/inside_LOF.png",
     locations: [
-      { id: "konoha", name: "Konohagakure Village", type: "safe", category: "VILLAGE HUB", desc: "Home base for shopping, roster management, and daily training.", top: "45%", left: "40%" },
-      { id: "training_fields", name: "Death Forest", type: "activity", category: "EXP & GOLD GRINDING", desc: "High-density wildlife and rogue ninja scouting grounds for earning rewards.", top: "30%", left: "60%" },
-      { id: "valley_end", name: "Valley of the End", type: "battle", category: "HIGH THREAT BOSS", desc: "Legendary battlefield. High-threat boss encounters with rare drop chance loot.", top: "70%", left: "75%" }
-    ]
-  },
-  wind: {
-    name: "Land of Wind",
-    description: "Vast desert expanses guarded by Sunagakure and harsh sandstorms.",
-    mapImage: "Assets/Maps/Land_of_Wind_Detail.png",
-    locations: [
-      { id: "sunagakure", name: "Sunagakure Village", type: "safe", category: "VILLAGE HUB", desc: "Hidden Sand stronghold.", top: "50%", left: "35%" },
-      { id: "desert_canyon", name: "Howling Sand Canyon", type: "battle", category: "BOUNTY HUNTING", desc: "Ambush zone for rogue puppet masters and missing-nin.", top: "65%", left: "60%" }
-    ]
-  },
-  water: {
-    name: "Land of Water",
-    description: "Misty archipelagos surrounded by dense fog and hidden ninja mist bases.",
-    mapImage: "Assets/Maps/Land_of_Water_Detail.png",
-    locations: [
-      { id: "kirigakure", name: "Kirigakure Village", type: "safe", category: "VILLAGE HUB", desc: "Mist-shrouded village headquarters.", top: "40%", left: "50%" },
-      { id: "mist_forest", name: "Forest of the Seven Swords", type: "battle", category: "RARE DROP LOOT", desc: "Deadly grounds where elite Seven Swordsmen artifacts drop.", top: "60%", left: "70%" }
-    ]
-  },
-  earth: {
-    name: "Land of Earth",
-    description: "Rugged mountainous terrain with natural stone defenses.",
-    mapImage: "Assets/Maps/Land_of_Earth_Detail.png",
-    locations: [
-      { id: "iwagakure", name: "Iwagakure Village", type: "safe", category: "VILLAGE HUB", desc: "Impenetrable mountain fortress village.", top: "35%", left: "45%" },
-      { id: "stone_quarry", name: "Stone Quarry Outpost", type: "activity", category: "EXP GRINDING", desc: "Ideal location for physical taijutsu training and stamina gains.", top: "55%", left: "65%" }
-    ]
-  },
-  lightning: {
-    name: "Land of Lightning",
-    description: "High mountain peaks piercing through thunderstorm clouds.",
-    mapImage: "Assets/Maps/Land_of_Lightning_Detail.png",
-    locations: [
-      { id: "kumogakure", name: "Kumogakure Village", type: "safe", category: "VILLAGE HUB", desc: "Cloud village suspended high above the valley.", top: "30%", left: "55%" },
-      { id: "thunder_canyon", name: "Thunder Plateau", type: "battle", category: "HIGH THREAT BOSS", desc: "Electrified arena home to powerful lightning jutsu masters.", top: "60%", left: "40%" }
+      { 
+        id: "konohagakure", 
+        name: "Konohagakure (Hidden Leaf)", 
+        type: "village", 
+        category: "CAPITAL VILLAGE HUB", 
+        desc: "The glorious capital hidden in the leaves. Home base for major village services, shopping, and high-rank operations.", 
+        levelRange: "1-50", 
+        bestFor: "Village Hub & Quests", 
+        enemyTypes: "None (Safe Zone)", 
+        rewards: ["Full Access"],
+        top: "12%", left: "50%" 
+      },
+      { 
+        id: "kojima", 
+        name: "Kojima Village Outpost", 
+        type: "village", 
+        category: "REGIONAL GATEWAY", 
+        desc: "The border outpost guarding the southern entry into the Land of Fire.", 
+        levelRange: "1-15", 
+        bestFor: "Quick Rest & Supplies", 
+        enemyTypes: "None (Safe Zone)", 
+        rewards: ["Outpost Access"],
+        top: "85%", left: "50%" 
+      },
+      { 
+        id: "training_grounds", 
+        name: "Training Grounds", 
+        type: "battle", 
+        category: "EXP Grinding", 
+        desc: "High-density wildlife and rogue ninja scouting grounds.", 
+        levelRange: "10-16", 
+        bestFor: "EXP", 
+        enemyTypes: "Bandits, Wildlife", 
+        rewards: ["EXP", "Ryo"],
+        top: "35%", left: "28%" 
+      },
+      { 
+        id: "bandit_hideout", 
+        name: "Bandit Hideout", 
+        type: "battle", 
+        category: "Loot Hotspot", 
+        desc: "Stash filled with tactical gear and rare materials.", 
+        levelRange: "15-20", 
+        bestFor: "Loot", 
+        enemyTypes: "Rogue Ninjas", 
+        rewards: ["Scrolls", "Materials"],
+        top: "18%", left: "27%" 
+      },
+      { 
+        id: "bridge_of_trials", 
+        name: "Bridge of Trials", 
+        type: "battle", 
+        category: "Mission Progression", 
+        desc: "Test your might against disciplined regional guards.", 
+        levelRange: "20-28", 
+        bestFor: "Progression", 
+        enemyTypes: "Elite Guards", 
+        rewards: ["Ryo", "Mission Token"],
+        top: "24%", left: "50%" 
+      },
+      { 
+        id: "forest_silence", 
+        name: "Forest of Silence", 
+        type: "battle", 
+        category: "EXP / Gold Grinding", 
+        desc: "Best for balanced EXP and Ryo payouts.", 
+        levelRange: "16-24", 
+        bestFor: "EXP & Ryo", 
+        enemyTypes: "Trackers", 
+        rewards: ["EXP", "Ryo"],
+        top: "42%", left: "51%" 
+      }
     ]
   }
 };
+
+let selectedLocationNode = null;
 
 function openRegionHub(regionKey) {
   const region = worldRegions[regionKey];
   if (!region) return;
   
+  selectedLocationNode = region.locations[0];
+
   const overlay = document.getElementById('screen-overlay');
   const container = document.getElementById('overlay-content-container');
   overlay.style.display = 'flex';
 
+  renderRegionHubUI(region);
+}
+
+function renderRegionHubUI(region) {
+  const container = document.getElementById('overlay-content-container');
+  if (!container) return;
+
   container.innerHTML = `
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
       <div>
         <h2 style="font-size: 16px; color: #D6A93A; letter-spacing: 1px;">${region.name.toUpperCase()}</h2>
         <p style="font-size: 11px; color: #94A3B8;">${region.description}</p>
       </div>
+      <button onclick="closeOverlay()" style="background:none; border:1px solid #1E293B; color:#FFF; padding:5px 10px; cursor:pointer; border-radius:4px;">✕ CLOSE</button>
     </div>
 
-    <div class="region-hub-container" style="display: flex; gap: 20px; flex: 1; min-height: 400px;">
-      <!-- Left Map / Keypoints Pane -->
-      <div class="region-map-pane" style="flex: 1; background: rgba(8, 12, 16, 0.8) url('${region.mapImage}') center/cover no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 350px;">
+    <div class="region-hub-container" style="display: flex; gap: 20px; flex: 1; min-height: 480px;">
+      
+      <!-- Left Map / Node Network Pane -->
+      <div class="region-map-pane" style="flex: 1; background: rgba(8, 12, 16, 0.9) url('${region.mapImage}') center/cover no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 450px;">
         ${region.locations.map(loc => `
-          <div class="location-keypoint" 
-               style="position: absolute; top: ${loc.top}; left: ${loc.left}; width: 22px; height: 22px; background: #00D9E8; border: 2px solid #FFF; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px #00D9E8;"
+          <div class="location-keypoint ${selectedLocationNode && selectedLocationNode.id === loc.id ? 'active-node' : ''}" 
+               style="position: absolute; top: ${loc.top}; left: ${loc.left}; width: 28px; height: 28px; background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#D6A93A' : '#00D9E8'}; border: 2px solid #FFF; border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%); box-shadow: 0 0 12px rgba(0,217,232,0.6); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #000;"
                title="${loc.name}"
-               onclick="highlightLocation('${loc.id}')">
+               onclick="selectMapNode('${region.id}', '${loc.id}')">
+            📍
           </div>
         `).join('')}
       </div>
 
-      <!-- Right Details & Actions Pane -->
-      <div class="region-details-pane" style="width: 360px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
-        ${region.locations.map(loc => `
-          <div id="loc-card-${loc.id}" style="background: #080C10; border: 1px solid #1E293B; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span style="font-size: 9px; font-weight: bold; color: #D6A93A; background: rgba(214, 169, 58, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(214, 169, 58, 0.3);">${loc.category}</span>
-            </div>
-            <div style="color: #FFF; font-size: 13px; font-weight: bold;">${loc.name}</div>
-            <div style="color: #94A3B8; font-size: 11px; line-height: 1.4;">${loc.desc}</div>
-            <button class="btn-ninja" style="margin-top: 4px;" onclick="handleLocationAction('${loc.type}')">ENTER LOCATION</button>
+      <!-- Right Dynamic 'Location Details' Pane -->
+      <div class="region-details-pane" style="width: 320px; background: #080C10; border: 1px solid #1E293B; border-radius: 8px; padding: 15px; display: flex; flex-direction: column; gap: 12px; justify-content: space-between;">
+        <div>
+          <div style="font-size: 10px; color: #D6A93A; font-weight: bold; margin-bottom: 6px; text-transform: uppercase;">Location Details</div>
+          <div style="height: 120px; background: #111827; border-radius: 6px; border: 1px solid #1E293B; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: #64748B; font-size: 11px;">
+            [ Preview: ${selectedLocationNode ? selectedLocationNode.name : 'Select Node'} ]
           </div>
-        `).join('')}
+          <div style="color: #FFF; font-size: 15px; font-weight: bold; margin-bottom: 2px;">${selectedLocationNode ? selectedLocationNode.name : ''}</div>
+          <div style="color: #00D9E8; font-size: 11px; margin-bottom: 10px;">${selectedLocationNode ? selectedLocationNode.category : ''}</div>
+          <div style="color: #94A3B8; font-size: 11px; line-height: 1.4; margin-bottom: 15px;">${selectedLocationNode ? selectedLocationNode.desc : ''}</div>
+
+          <div style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; border-top: 1px solid #1E293B; padding-top: 10px;">
+            <div style="display: flex; justify-content: space-between;"><span style="color: #64748B;">Level Range</span><span style="color: #FFF;">${selectedLocationNode ? selectedLocationNode.levelRange : ''}</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="color: #64748B;">Best For</span><span style="color: #FFF;">${selectedLocationNode ? selectedLocationNode.bestFor : ''}</span></div>
+            <div style="display: flex; justify-content: space-between;"><span style="color: #64748B;">Enemy Types</span><span style="color: #FFF;">${selectedLocationNode ? selectedLocationNode.enemyTypes : ''}</span></div>
+          </div>
+        </div>
+
+        <button class="btn-ninja" style="width: 100%; padding: 10px; font-weight: bold;" onclick="handleNodeNavigation('${selectedLocationNode ? selectedLocationNode.type : 'battle'}')">
+          NAVIGATE ➔
+        </button>
       </div>
+
     </div>
   `;
 }
 
-function highlightLocation(locationId) {
-  const card = document.getElementById(`loc-card-${locationId}`);
-  if (card) {
-    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    card.style.borderColor = '#00D9E8';
-    setTimeout(() => { card.style.borderColor = '#1E293B'; }, 1500);
-  }
+function selectMapNode(regionKey, locId) {
+  const region = worldRegions[regionKey];
+  if (!region) return;
+  selectedLocationNode = region.locations.find(l => l.id === locId);
+  renderRegionHubUI(region);
 }
 
-function handleLocationAction(type) {
-  if (type === 'battle' || type === 'activity') {
-    openOverlay('battle');
-  } else {
+function handleNodeNavigation(type) {
+  if (type === 'village') {
     openOverlay('village');
+  } else {
+    openOverlay('battle');
   }
 }
 
