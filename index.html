@@ -33,7 +33,7 @@
     <main class="world-map-viewport">
       <div class="world-map-bg"></div>
 
-      <!-- LEFT SIDEBAR (Single Instance) -->
+      <!-- LEFT SIDEBAR (Single Clean Instance) -->
       <aside class="map-sidebar-left">
         <div class="sidebar-card">
           <div class="sidebar-title">CURRENT LOCATION</div>
@@ -51,7 +51,7 @@
         </div>
       </aside>
 
-      <!-- Clickable World Map Region Pin Example -->
+      <!-- Clickable World Map Region Pin for Land of Fire -->
       <div class="map-node-pin" style="left: 48%; top: 40%;" onclick="openRegionHub('fire')">
         <div class="pin-glow"></div>
         <span class="pin-label">Land of Fire</span>
@@ -68,9 +68,7 @@
   <div id="screen-overlay" class="screen-overlay" style="display: none;">
     <div class="overlay-content-box">
       <button class="overlay-close-btn" onclick="closeOverlay()">✕ CLOSE</button>
-      <div id="overlay-content-container" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
-        <!-- Dynamic content injected via game.js -->
-      </div>
+      <div id="overlay-content-container" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;"></div>
     </div>
   </div>
 
