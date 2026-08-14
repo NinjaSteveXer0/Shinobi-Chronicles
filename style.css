@@ -31,8 +31,8 @@ body {
 /* Map Interactive Hotspots */
 .map-hotspot {
   position: absolute;
-  top: 38%;   /* Adjusted upward to match Land of Fire */
-  left: 36%;  /* Adjusted leftward to match Land of Fire */
+  top: 38%;   /* Aligned with Land of Fire */
+  left: 36%;  /* Aligned with Land of Fire */
   transform: translate(-50%, -50%);
   width: 90px;
   height: 90px;
@@ -44,6 +44,7 @@ body {
   justify-content: center;
   background: rgba(214, 169, 58, 0.1);
   animation: pulseHotspot 2s infinite;
+  z-index: 10;
 }
 
 .map-hotspot:hover {
@@ -68,6 +69,37 @@ body {
   0% { box-shadow: 0 0 0 0 rgba(214, 169, 58, 0.4); }
   70% { box-shadow: 0 0 0 15px rgba(214, 169, 58, 0); }
   100% { box-shadow: 0 0 0 0 rgba(214, 169, 58, 0); }
+}
+
+/* Sidebar Panel Overlays */
+.map-sidebar-panel {
+  position: absolute;
+  right: 25px; 
+  width: 260px;
+  cursor: pointer;
+  z-index: 20;
+  transition: all 0.2s;
+}
+
+.active-mission-box {
+  top: 135px;
+  height: 145px;
+}
+
+.daily-reward-box {
+  top: 400px;
+  height: 110px;
+}
+
+.world-events-box {
+  top: 610px;
+  height: 165px;
+}
+
+.map-sidebar-panel:hover {
+  background: rgba(0, 217, 232, 0.05);
+  border: 1px dashed rgba(0, 217, 232, 0.3);
+  border-radius: 8px;
 }
 
 /* ==========================================

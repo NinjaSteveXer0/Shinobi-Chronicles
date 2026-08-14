@@ -28,9 +28,22 @@
       </div>
     </div>
 
-    <!-- MAP INTERACTIVE HOTSPOTS / REGIONS (Visual Placeholders on the Map) -->
+    <!-- MAP INTERACTIVE HOTSPOT: LAND OF FIRE -->
     <div class="map-hotspot land-of-fire" onclick="openOverlay('battle')">
       <span class="hotspot-label">KONOHAGAKURE (LAND OF FIRE)</span>
+    </div>
+
+    <!-- RIGHT-HAND SIDEBAR INTERACTIVE OVERLAYS -->
+    <div class="map-sidebar-panel active-mission-box" onclick="openOverlay('missions')">
+      <span class="panel-action-text"></span>
+    </div>
+
+    <div class="map-sidebar-panel daily-reward-box" onclick="claimDailyReward()">
+      <span class="panel-action-text"></span>
+    </div>
+
+    <div class="map-sidebar-panel world-events-box" onclick="openOverlay('events')">
+      <span class="panel-action-text"></span>
     </div>
 
   </div>

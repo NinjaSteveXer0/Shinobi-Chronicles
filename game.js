@@ -88,7 +88,7 @@ let battleState = {
   ryo: 14500
 };
 
-// 2. Overlay Management System
+// 2. Overlay & Feature Management System
 function openOverlay(screenType) {
   const overlay = document.getElementById('screen-overlay');
   const container = document.getElementById('overlay-content-container');
@@ -158,11 +158,35 @@ function openOverlay(screenType) {
       <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">KONOHAGAKURE - HIDDEN LEAF VILLAGE</h2>
       <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Welcome back to your home base, Shinobi. From here, manage your active squad in the Roster, upgrade equipment at the Shop, or deploy directly to the Arena to fight rogue ninja threats.</p>
     `;
+  } else if (screenType === 'missions') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">ACTIVE MISSION: ESCORT THE KAZEKAGE ENVOY</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Rank: B | Difficulty: 780 PL. Guard the diplomatic party safely through hostile terrain.</p>
+    `;
+  } else if (screenType === 'events') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">WORLD EVENTS & THREATS</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Village Defense starting soon. Akatsuki increased activity detected across border regions.</p>
+    `;
   }
 }
 
 function closeOverlay() {
   document.getElementById('screen-overlay').style.display = 'none';
+}
+
+// Sidebar Daily Reward Action Handler
+function claimDailyReward() {
+  battleState.ryo += 500;
+  updateHUD();
+  openOverlay('village');
+  const container = document.getElementById('overlay-content-container');
+  if (container) {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">🎁 DAILY REWARD CLAIMED</h2>
+      <p style="font-size: 12px; color: #00D9E8; line-height: 1.5;">Successfully claimed your daily provisions! +500 Ryo added to your treasury.</p>
+    `;
+  }
 }
 
 // 3. Render Roster Grid
@@ -331,7 +355,6 @@ function updateHUD() {
   if (chakraEl) chakraEl.textContent = `${playerCharacter.powerPool}/${playerCharacter.maxPowerPool}`;
   if (rankEl) rankEl.textContent = playerCharacter.rank;
 
-  // Update Player Card Elements if present in DOM
   const pPl = document.getElementById('player-pl-display');
   if (pPl) {
     document.getElementById('player-pl-display').textContent = playerCharacter.getPowerLevel();
