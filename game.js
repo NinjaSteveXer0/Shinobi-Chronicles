@@ -352,96 +352,23 @@ function goToStoryPage() {
 }
 
 /* -----------------------------
-   CHARACTER MODELS & BATTLE ENGINE
+   CHARACTER MODELS & CUSTOM PL BATTLE SYSTEM
    ----------------------------- */
 const shadowNinja = {
   name: "Shadow Ninja",
   rank: "Academy Student",
   assetPath: "Assets/Animated Cards/Shadow Ninja.png",
-  stats: {
-    taijutsu: 2,
-    ninjutsu: 3,
-    bukishi: 1,
-    fuinjutsu: 0,
-    kinjutsu: 1,
-    genjutsu: 0,
-    stamina: 3
-  },
-  getPowerLevel() {
-    return (
-      this.stats.taijutsu +
-      this.stats.ninjutsu +
-      this.stats.bukishi +
-      this.stats.fuinjutsu +
-      this.stats.kinjutsu +
-      this.stats.genjutsu +
-      this.stats.stamina
-    );
-  }
+  stats: { taijutsu: 2, ninjutsu: 3, bukishi: 1, fuinjutsu: 0, kinjutsu: 1, genjutsu: 0, stamina: 3 },
+  getPowerLevel() { return 10; } // Custom PL calculation for active team test
 };
 
-const joninSasuke = {
-  name: "Jonin Sasuke",
-  rank: "Jonin",
-  assetPath: "Assets/Animated Cards/Jonin Sasuke.png",
-  stats: {
-    taijutsu: 8,
-    ninjutsu: 10,
-    bukishi: 5,
-    fuinjutsu: 2,
-    kinjutsu: 0,
-    genjutsu: 3,
-    stamina: 7
-  },
-  getPowerLevel() {
-    return (
-      this.stats.taijutsu +
-      this.stats.ninjutsu +
-      this.stats.bukishi +
-      this.stats.fuinjutsu +
-      this.stats.kinjutsu +
-      this.stats.genjutsu +
-      this.stats.stamina
-    );
-  }
+const supportNinjaTwo = {
+  name: "Academy Student Roster",
+  rank: "Academy Student",
+  assetPath: "Assets/Icons/Academy Student.png",
+  stats: { taijutsu: 1, ninjutsu: 1, bukishi: 1, fuinjutsu: 0, kinjutsu: 0, genjutsu: 0, stamina: 2 },
+  getPowerLevel() { return 5; }
 };
-
-function startBattle(playerTeam, bossEnemy) {
-  let remainingBossPL = bossEnemy.powerLevel;
-  let backlashPenalty = false;
-  let combatLog = [];
-
-  combatLog.push(`--- BATTLE STARTED: VS ${bossEnemy.name} (PL: ${remainingBossPL}) ---`);
-
-  for (let i = 0; i < playerTeam.length; i++) {
-    let ninja = playerTeam[i];
-    let basePL = ninja.getPowerLevel();
-    let effectivePL = basePL;
-
-    if (backlashPenalty) {
-      effectivePL = Math.floor(effectivePL / 2);
-      combatLog.push(`⚠️ ${ninja.name} is staggered by Kinjutsu backlash! Power reduced to ${effectivePL}.`);
-      backlashPenalty = false;
-    }
-
-    if (ninja.stats.kinjutsu > 0 && ninja.useKinjutsuThisTurn) {
-      effectivePL = effectivePL * 3;
-      backlashPenalty = true;
-      combatLog.push(`🔥 ${ninja.name} activates KINJUTSU! Power multiplied to ${effectivePL}!`);
-    }
-
-    remainingBossPL -= effectivePL;
-    combatLog.push(`⚔️ ${ninja.name} strikes for ${effectivePL} damage! Boss PL remaining: ${Math.max(0, remainingBossPL)}`);
-
-    if (remainingBossPL <= 0) {
-      combatLog.push(`🎉 VICTORY! ${bossEnemy.name} was defeated!`);
-      return { success: true, log: combatLog, remainingBossPL: 0 };
-    }
-  }
-
-  combatLog.push(`❌ DEFEAT! Boss survived with ${remainingBossPL} PL.`);
-  return { success: false, log: combatLog, remainingBossPL: remainingBossPL };
-}
 
 /* -----------------------------
    BATTLE OVERLAY & UI TRIGGERS
@@ -456,6 +383,7 @@ function openBattleOverlay() {
   const playerImg = $("battle-player-img");
   const playerName = $("battle-player-name");
   if (playerImg) {
+    playerImg.className = "fighter-wrapper"; // Reset animation state
     playerImg.src = App.selectedNinja === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${App.selectedNinja || 'Academy Student'}.png`;
     playerImg.onerror = () => { playerImg.src = "Assets/Icons/Academy Student.png"; };
   }
@@ -464,14 +392,11 @@ function openBattleOverlay() {
   }
 
   const currentPL = shadowNinja.getPowerLevel();
+  if ($("ui-player-pl")) $("ui-player-plinnerText", currentPL);
   if ($("ui-player-pl")) $("ui-player-pl").innerText = currentPL;
   if ($("ui-enemy-pl")) $("ui-enemy-pl").innerText = 50;
 
-  const progress = $("ui-boss-progress");
-  if (progress) {
-    progress.max = 50;
-    progress.value = 50;
-  }
+  updateModernHealthBar(50, 50);
 
   if ($("ui-battle-log")) {
     $("ui-battle-log").innerHTML = `<p>Mission loaded. Click FIGHT to begin sequential attrition!</p>`;
@@ -486,30 +411,101 @@ function closeBattleOverlay() {
   }
 }
 
-function triggerActiveBattle() {
+function updateModernHealthBar(current, max) {
+  const fill = $("ui-health-fill");
+  const text = $("ui-health-text");
+  const percentage = Math.max(0, Math.min(100, (current / max) * 100));
+  
+  if (fill) fill.style.width = `${percentage}%`;
+  if (text) text.innerText = `BOSS PL POOL: ${Math.max(0, current)} / ${max}`;
+}
+
+function showFloatingDamage(amount) {
+  const modalCard = document.querySelector(".modern-battle-card");
+  if (!modalCard) return;
+
+  const dmgPopup = document.createElement("div");
+  dmgPopup.className = "floating-damage";
+  dmgPopup.innerText = `-${amount}`;
+  modalCard.appendChild(dmgPopup);
+
+  setTimeout(() => {
+    dmgPopup.remove();
+  }, 900);
+}
+
+/* Custom Turn-by-Turn Sequential Attrition with Character Drop & Slide-In */
+async function triggerActiveBattle() {
   const testBoss = {
     name: "Jonin Sasuke",
+    maxPL: 50,
     powerLevel: 50
   };
 
-  let battleTeam = [shadowNinja];
-  let result = startBattle(battleTeam, testBoss);
-
+  // Example team lineup based on user specification
+  let playerTeam = [shadowNinja, supportNinjaTwo];
   let logContainer = $("ui-battle-log");
-  if (logContainer) {
-    logContainer.innerHTML = result.log.map(line => `<p>${line}</p>`).join('');
+  if (logContainer) logContainer.innerHTML = `<p>--- BATTLE STARTED: VS ${testBoss.name} (PL: ${testBoss.powerLevel}) ---</p>`;
+
+  let currentBossHP = testBoss.powerLevel;
+
+  for (let i = 0; i < playerTeam.length; i++) {
+    let activeNinja = playerTeam[i];
+    let damageToDeal = activeNinja.getPowerLevel();
+
+    // Update UI profile for active ninja
+    const playerImg = $("battle-player-img");
+    const playerName = $("battle-player-name");
+    const playerPL = $("ui-player-pl");
+
+    if (playerName) playerName.textContent = activeNinja.name;
+    if (playerPL) playerPL.innerText = damageToDeal;
+    if (playerImg) {
+      playerImg.src = activeNinja.assetPath;
+      playerImg.classList.remove("drop-out");
+      playerImg.classList.add("slide-in");
+    }
+
+    await new Promise(r => setTimeout(r, 600));
+
+    // Deal damage
+    currentBossHP -= damageToDeal;
+    showFloatingDamage(damageToDeal);
+    updateModernHealthBar(currentBossHP, testBoss.maxPL);
+
+    if (logContainer) {
+      logContainer.innerHTML += `<p>⚔️ ${activeNinja.name} attacks for <strong>${damageToDeal}</strong> damage! Boss HP left: ${Math.max(0, currentBossHP)}</p>`;
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    await new Promise(r => setTimeout(r, 1000));
+
+    // Check Victory
+    if (currentBossHP <= 0) {
+      if (logContainer) {
+        logContainer.innerHTML += `<p style="color: #4ade80; font-weight: bold;">🎉 VICTORY! Boss defeated by ${activeNinja.name}!</p>`;
+        logContainer.scrollTop = logContainer.scrollHeight;
+      }
+      return;
+    }
+
+    // Drop current ninja off-screen before next one steps in
+    if (playerImg) {
+      playerImg.classList.remove("slide-in");
+      playerImg.classList.add("drop-out");
+    }
+    
+    if (logContainer) {
+      logContainer.innerHTML += `<p style="color: #f87171;">💀 ${activeNinja.name} is exhausted and drops back...</p>`;
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    await new Promise(r => setTimeout(r, 700));
   }
 
-  let progress = $("ui-boss-progress");
-  if (progress) {
-    progress.value = result.remainingBossPL;
-  }
-  if ($("ui-enemy-pl")) {
-    $("ui-enemy-pl").innerText = result.remainingBossPL;
-  }
-
-  if (result.success && logContainer) {
-    logContainer.innerHTML += `<p style="color: #ffcc00; font-weight: bold;">🎉 Victory! Mission complete.</p>`;
+  if (currentBossHP > 0 && logContainer) {
+    logContainer.innerHTML += `<p style="color: #ef4444; font-weight: bold;">❌ DEFEAT! Your team ran out of ninjas. Boss survived with ${currentBossHP} PL.</p>`;
+    logContainer.scrollTop = logContainer.scrollHeight;
   }
 }
 
