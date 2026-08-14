@@ -39,7 +39,22 @@ body, html {
   z-index: 10;
 }
 
-.header-left, .header-right {
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.brand-logo { font-size: 20px; }
+.brand-text { display: flex; flex-direction: column; }
+.brand-title { font-size: 12px; font-weight: 900; color: #FFF; letter-spacing: 1px; }
+.brand-subtitle { font-size: 9px; color: #D6A93A; letter-spacing: 2px; }
+
+.header-nav-tabs {
+  display: flex;
+  gap: 6px;
+}
+
+.header-right {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -49,10 +64,10 @@ body, html {
   background: transparent;
   border: 1px solid #1E293B;
   color: #94A3B8;
-  padding: 6px 14px;
-  font-size: 11px;
+  padding: 6px 12px;
+  font-size: 10px;
   font-weight: bold;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   cursor: pointer;
   border-radius: 4px;
   transition: all 0.2s ease;
@@ -80,7 +95,7 @@ body, html {
 }
 
 /* ==========================================
-   WORLD MAP VIEWPORT
+   WORLD MAP VIEWPORT & SIDEBARS
    ========================================== */
 .world-map-viewport {
   flex: 1;
@@ -99,8 +114,118 @@ body, html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, rgba(17,24,39,0.2) 0%, rgba(4,6,8,0.7) 100%);
+  background: radial-gradient(circle at center, rgba(17,24,39,0.1) 0%, rgba(4,6,8,0.5) 100%);
   pointer-events: none;
+}
+
+.map-sidebar-left {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  width: 240px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.sidebar-card {
+  background: rgba(8, 12, 16, 0.9);
+  border: 1px solid #1E293B;
+  border-radius: 6px;
+  padding: 10px;
+  backdrop-filter: blur(5px);
+}
+
+.sidebar-title {
+  font-size: 9px;
+  font-weight: bold;
+  color: #D6A93A;
+  letter-spacing: 1px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid #1E293B;
+  padding-bottom: 4px;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 10px;
+  color: #94A3B8;
+}
+
+.legend-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.legend-dot.unlocked { background: #22C55E; }
+.legend-dot.locked { background: #64748B; }
+.legend-dot.premium { background: #A855F7; }
+.legend-dot.threat { background: #EF4444; }
+.legend-dot.main { background: #D6A93A; }
+.legend-dot.special { background: #00D9E8; }
+
+.interactive-loc {
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.interactive-loc:hover {
+  border-color: #D6A93A;
+}
+
+.location-preview-name {
+  font-size: 11px;
+  font-weight: bold;
+  color: #FFF;
+}
+
+.location-preview-sub {
+  font-size: 9px;
+  color: #00D9E8;
+  margin-bottom: 6px;
+}
+
+.btn-enter-loc {
+  width: 100%;
+  background: #111827;
+  border: 1px solid #D6A93A;
+  color: #D6A93A;
+  padding: 4px;
+  font-size: 9px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.progress-block {
+  display: flex;
+  justify-content: space-between;
+  font-size: 9px;
+  color: #94A3B8;
+}
+.progress-block b { color: #FFF; }
+
+.progress-bar-shell {
+  width: 100%;
+  height: 4px;
+  background: #111827;
+  border-radius: 2px;
+  margin-top: 3px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #D6A93A;
 }
 
 .map-node-pin {
@@ -114,8 +239,8 @@ body, html {
 }
 
 .pin-glow {
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   background: #00D9E8;
   border: 2px solid #FFF;
   border-radius: 50%;
@@ -124,12 +249,12 @@ body, html {
 }
 
 .pin-label {
-  margin-top: 6px;
-  font-size: 11px;
+  margin-top: 4px;
+  font-size: 10px;
   font-weight: bold;
   color: #FFF;
   background: rgba(8, 12, 16, 0.85);
-  padding: 2px 8px;
+  padding: 2px 6px;
   border-radius: 4px;
   border: 1px solid #1E293B;
   letter-spacing: 0.5px;
@@ -138,7 +263,7 @@ body, html {
 
 @keyframes pulsePin {
   0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 217, 232, 0.7); }
-  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 217, 232, 0); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(0, 217, 232, 0); }
   100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 217, 232, 0); }
 }
 
