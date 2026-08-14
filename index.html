@@ -312,9 +312,9 @@
     
     <!-- TOP NAVIGATION / HUD -->
     <div class="game-header">
-      <div class="hud-stats">
-        <div class="hud-item">RYO: <span>14,500</span></div>
-        <div class="hud-item">CHAKRA: <span>850/850</span></div>
+     <div class="hud-stats">
+        <div class="hud-item">RYO: <span id="hud-ryo">14,500</span></div>
+        <div class="hud-item">CHAKRA: <span id="hud-chakra">850/850</span></div>
         <div class="hud-item">RANK: <span>Jonin</span></div>
       </div>
       <div class="nav-tabs">
@@ -345,7 +345,7 @@
             </div>
             <div class="health-bar-container">
               <span class="name">SHADOW NINJA</span>
-              <div class="bar"><div id="player-hp-bar" class="fill" style="width: 100%;"></div></div>
+              <div class="bar"><div id="player-fill-bar" class="fill" style="width: 100%;"></div></div>
             </div>
           </div>
 
@@ -364,7 +364,7 @@
             </div>
             <div class="health-bar-container">
               <span class="name">JONIN SASUKE</span>
-              <div class="bar"><div id="enemy-hp-bar" class="fill enemy" style="width: 100%;"></div></div>
+              <div class="bar"><div id="enemy-fill-bar" class="fill enemy" style="width: 100%;"></div></div>
             </div>
           </div>
 
@@ -372,11 +372,11 @@
 
         <!-- Combat Console -->
         <div class="combat-console">
-          <div id="combat-log" class="action-feedback-log" style="color: #00D9E8;">⚡ Battle ready. Choose action.</div>
+          <div id="combat-log" class="action-feedback-log" style="color: #00D9E8;">⚡ Battle ready. Choose your action, Shinobi.</div>
           <div class="action-buttons">
-            <button class="btn-ninja" onclick="playerAttack()">NINJUTSU STRIKE</button>
-            <button class="btn-ninja" onclick="playerHeal()">CHAKRA RESTORE</button>
-            <button class="btn-ninja" onclick="resetBattle()">FLEE</button>
+            <button class="btn-ninja" onclick="performNinjutsuStrike()">NINJUTSU STRIKE</button>
+            <button class="btn-ninja" onclick="performChakraRestore()">CHAKRA RESTORE</button>
+            <button class="btn-ninja" onclick="performFlee()">FLEE</button>
           </div>
         </div>
 
