@@ -1,51 +1,74 @@
-// 1. Shinobi Chronicles Core Combat Engine: PL & Seven Stats Data
-let playerCharacter = {
-  name: "Shadow Ninja",
-  rank: "Jonin",
-  stats: {
-    ninjutsu: 320,
-    taijutsu: 280,
-    genjutsu: 210,
-    fuinjutsu: 150,
-    defense: 290,
-    speed: 340,
-    chakraControl: 300
+// 1. Shinobi Chronicles Character Roster & Combat Engine
+const charactersDatabase = {
+  naruto: {
+    name: "Kage Naruto",
+    rank: "Kage",
+    rarity: "legendary",
+    image: "Assets/Animated Cards/Kage Naruto.png",
+    stats: { ninjutsu: 420, taijutsu: 390, genjutsu: 250, fuinjutsu: 310, defense: 380, speed: 410, chakraControl: 450 },
+    hp: 1400,
+    maxHp: 1400,
+    powerPool: 1200,
+    maxPowerPool: 1200,
+    getPowerLevel: function() {
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
+    }
   },
-  hp: 1000,
-  maxHp: 1000,
-  powerPool: 850,
-  maxPowerPool: 850,
-  ryo: 14500,
-  getPowerLevel: function() {
-    let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
-    return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
+  sasuke: {
+    name: "Jonin Sasuke",
+    rank: "Elite",
+    rarity: "legendary",
+    image: "Assets/Animated Cards/Jonin Sasuke.png",
+    stats: { ninjutsu: 380, taijutsu: 350, genjutsu: 280, fuinjutsu: 200, defense: 330, speed: 360, chakraControl: 350 },
+    hp: 1200,
+    maxHp: 1200,
+    powerPool: 1000,
+    maxPowerPool: 1000,
+    getPowerLevel: function() {
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
+    }
+  },
+  sakura: {
+    name: "Sannin Sakura",
+    rank: "Legendary Sannin",
+    rarity: "rare",
+    image: "Assets/Animated Cards/Sannin Sakura.png",
+    stats: { ninjutsu: 340, taijutsu: 430, genjutsu: 220, fuinjutsu: 380, defense: 360, speed: 320, chakraControl: 400 },
+    hp: 1300,
+    maxHp: 1300,
+    powerPool: 900,
+    maxPowerPool: 900,
+    getPowerLevel: function() {
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
+    }
+  },
+  nagato: {
+    name: "Teen Nagato",
+    rank: "Akatsuki",
+    rarity: "legendary",
+    image: "Assets/Animated Cards/Teen Nagato.png",
+    stats: { ninjutsu: 450, taijutsu: 290, genjutsu: 390, fuinjutsu: 410, defense: 310, speed: 330, chakraControl: 480 },
+    hp: 1250,
+    maxHp: 1250,
+    powerPool: 1300,
+    maxPowerPool: 1300,
+    getPowerLevel: function() {
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
+    }
   }
 };
 
-let enemyCharacter = {
-  name: "Jonin Sasuke",
-  rank: "Elite",
-  stats: {
-    ninjutsu: 380,
-    taijutsu: 350,
-    genjutsu: 280,
-    fuinjutsu: 200,
-    defense: 330,
-    speed: 360,
-    chakraControl: 350
-  },
-  hp: 1200,
-  maxHp: 1200,
-  powerPool: 1000,
-  maxPowerPool: 1000,
-  getPowerLevel: function() {
-    let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
-    return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
-  }
-};
+// Active Battle Combatants
+let playerCharacter = charactersDatabase.naruto;
+let enemyCharacter = charactersDatabase.sasuke;
 
 let battleState = {
-  isBattleOver: false
+  isBattleOver: false,
+  ryo: 14500
 };
 
 // 2. Combat Logging & Feedback
@@ -82,7 +105,7 @@ function performNinjutsuStrike() {
 
   if (enemyCharacter.hp <= 0) {
     battleState.isBattleOver = true;
-    playerCharacter.ryo += 1200;
+    battleState.ryo += 1200;
     updateHUD();
     logMessage(`🎉 VICTORY! ${enemyCharacter.name} defeated. PL Verified. Gained 1,200 Ryo!`, "#D6A93A");
     return;
@@ -101,7 +124,7 @@ function performNinjutsuStrike() {
     return;
   }
 
-  logMessage(`⚡ Ninjutsu Strike dealt ${finalDamage} damage! (PL: ${playerCharacter.getPowerLevel()}). Sasuke counters for ${enemyFinalDmg}.`);
+  logMessage(`⚡ Ninjutsu Strike dealt ${finalDamage} damage! (PL: ${playerCharacter.getPowerLevel()}). ${enemyCharacter.name} counters for ${enemyFinalDmg}.`);
 }
 
 function performChakraRestore() {
@@ -132,7 +155,7 @@ function performFlee() {
 
 function updateHUD() {
   document.getElementById('hud-chakra').textContent = `${playerCharacter.powerPool}/${playerCharacter.maxPowerPool}`;
-  document.getElementById('hud-ryo').textContent = playerCharacter.ryo.toLocaleString();
+  document.getElementById('hud-ryo').textContent = battleState.ryo.toLocaleString();
   
   // Render calculated Power Levels onto the cards
   document.getElementById('player-pl-display').textContent = playerCharacter.getPowerLevel();
