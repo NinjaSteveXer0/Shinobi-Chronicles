@@ -31,11 +31,11 @@ body {
 /* Map Interactive Hotspots */
 .map-hotspot {
   position: absolute;
-  top: 45%;
-  left: 48%;
+  top: 38%;   /* Adjusted upward to match Land of Fire */
+  left: 36%;  /* Adjusted leftward to match Land of Fire */
   transform: translate(-50%, -50%);
-  width: 120px;
-  height: 120px;
+  width: 90px;
+  height: 90px;
   border: 2px dashed #D6A93A;
   border-radius: 50%;
   cursor: pointer;
