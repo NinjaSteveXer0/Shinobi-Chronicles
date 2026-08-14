@@ -83,25 +83,24 @@ const shopItems = [
 ];
 
 // ==========================================
-// REGION HIERARCHY DATA & FUNCTIONS
+// 2. REGION HIERARCHY DATA & FUNCTIONS
 // ==========================================
 const worldRegions = {
   fire: {
     name: "Land of Fire",
     description: "A land of passion and willpower, protected by fierce ninjas and burning spirit.",
-    mapImage: "Assets/Maps/inside_LOF.png",
+    mapImage: "Assets/Maps/Inside LOF.png",
     locations: [
       { 
         id: "konohagakure", 
         name: "Konohagakure (Hidden Leaf)", 
         type: "village", 
         category: "CAPITAL VILLAGE HUB", 
-        desc: "The glorious capital hidden in the leaves. Home base for major village services, shopping, and high-rank operations.", 
+        desc: "The glorious capital hidden behind the giant mountain walls. Home base for major village services, shopping, and high-rank operations.", 
         levelRange: "1-50", 
         bestFor: "Village Hub & Quests", 
         enemyTypes: "None (Safe Zone)", 
-        rewards: ["Full Access"],
-        top: "12%", left: "50%" 
+        top: "16%", left: "50%" 
       },
       { 
         id: "kojima", 
@@ -112,8 +111,7 @@ const worldRegions = {
         levelRange: "1-15", 
         bestFor: "Quick Rest & Supplies", 
         enemyTypes: "None (Safe Zone)", 
-        rewards: ["Outpost Access"],
-        top: "85%", left: "50%" 
+        top: "88%", left: "50%" 
       },
       { 
         id: "training_grounds", 
@@ -124,7 +122,6 @@ const worldRegions = {
         levelRange: "10-16", 
         bestFor: "EXP", 
         enemyTypes: "Bandits, Wildlife", 
-        rewards: ["EXP", "Ryo"],
         top: "35%", left: "28%" 
       },
       { 
@@ -136,7 +133,6 @@ const worldRegions = {
         levelRange: "15-20", 
         bestFor: "Loot", 
         enemyTypes: "Rogue Ninjas", 
-        rewards: ["Scrolls", "Materials"],
         top: "18%", left: "27%" 
       },
       { 
@@ -148,7 +144,6 @@ const worldRegions = {
         levelRange: "20-28", 
         bestFor: "Progression", 
         enemyTypes: "Elite Guards", 
-        rewards: ["Ryo", "Mission Token"],
         top: "24%", left: "50%" 
       },
       { 
@@ -160,7 +155,6 @@ const worldRegions = {
         levelRange: "16-24", 
         bestFor: "EXP & Ryo", 
         enemyTypes: "Trackers", 
-        rewards: ["EXP", "Ryo"],
         top: "42%", left: "51%" 
       }
     ]
@@ -195,10 +189,10 @@ function renderRegionHubUI(region) {
       <button onclick="closeOverlay()" style="background:none; border:1px solid #1E293B; color:#FFF; padding:5px 10px; cursor:pointer; border-radius:4px;">✕ CLOSE</button>
     </div>
 
-    <div class="region-hub-container" style="display: flex; gap: 20px; flex: 1; min-height: 480px;">
+    <div class="region-hub-container" style="display: flex; gap: 20px; flex: 1; min-height: 500px;">
       
-      <!-- Left Map / Node Network Pane -->
-      <div class="region-map-pane" style="flex: 1; background: rgba(8, 12, 16, 0.9) url('${region.mapImage}') center/cover no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 450px;">
+      <!-- Left Map / Node Network Pane with exact asset filename reference -->
+      <div class="region-map-pane" style="flex: 1; background-image: url('${region.mapImage}'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 480px;">
         ${region.locations.map(loc => `
           <div class="location-keypoint ${selectedLocationNode && selectedLocationNode.id === loc.id ? 'active-node' : ''}" 
                style="position: absolute; top: ${loc.top}; left: ${loc.left}; width: 28px; height: 28px; background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#D6A93A' : '#00D9E8'}; border: 2px solid #FFF; border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%); box-shadow: 0 0 12px rgba(0,217,232,0.6); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #000;"
