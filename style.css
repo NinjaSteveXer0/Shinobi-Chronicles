@@ -1,298 +1,48 @@
 :root {
   --bg-dark: #072225;
-  --panel-bg: #0b3135;
+  --panel-bg: #e8d5b5; /* Parchment tone */
   --btn-teal: #116466;
   --btn-teal-hover: #1b8a8d;
   --accent: #d9b48f;
-  --text-main: #f4f4f4;
+  --text-main: #1e293b; /* Dark text for parchment */
   --border-teal: #235759;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background: var(--bg-dark);
-  color: var(--text-main);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
+/* Specific styling for the Login page to use the parchment look */
+#login-page {
+  background-color: #f3e5c8;
+  background-image: radial-gradient(circle, #f7ebd0 0%, #e2ceaa 100%);
+  border: 4px solid #116466;
+  border-radius: 8px;
+  box-shadow: inset 0 0 40px rgba(139, 94, 60, 0.25), 0 10px 25px rgba(0,0,0,0.5);
+  color: #1a2e35;
+  margin: 20px;
+  padding: 40px;
 }
 
-/* FIXED-WIDTH APP CONTAINER (The Wrapper) */
-.app {
-  width: 1000px;
-  margin: 20px auto;
-  position: relative;
-  background: rgba(7, 34, 37, 0.98);
-  border: 3px solid var(--btn-teal);
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-  overflow: visible;
+#login-page h2 {
+  color: #116466;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-size: 26px;
+  margin-bottom: 20px;
 }
 
-/* Header */
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: #041416;
-  border-bottom: 2px solid var(--btn-teal);
-  border-top-left-radius: 9px;
-  border-top-right-radius: 9px;
+#login-page .form-group label {
+  color: #116466;
+  font-weight: bold;
 }
 
+#login-page .form-group input {
+  background: #ffffff;
+  color: #0f172a;
+  border: 2px solid #116466;
+}
+
+/* Glowing golden header text matching image_162640.jpg */
 header h1 {
   margin: 0;
-  font-size: 24px;
-  color: var(--accent);
+  font-size: 26px;
+  color: #fef08a;
+  text-shadow: 0 0 8px rgba(217, 180, 143, 0.8), 0 2px 4px rgba(0,0,0,0.8);
   letter-spacing: 1px;
-}
-
-header .user {
-  font-size: 14px;
-  color: #94a3b8;
-}
-
-/* Page Panels */
-.page-panel {
-  padding: 40px;
-  position: relative;
-}
-
-.page-panel.hidden {
-  display: none;
-}
-
-/* Form Styles */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-width: 420px;
-  margin: 0 auto 24px auto;
-  text-align: left;
-}
-
-.form-group label {
-  font-weight: bold;
-  color: var(--accent);
-}
-
-.form-group input {
-  padding: 12px 14px;
-  border-radius: 6px;
-  border: 1px solid var(--btn-teal);
-  background: #041416;
-  color: #fff;
-  font-size: 16px;
-}
-
-/* Login Page Button Row Container */
-#login-page {
-  text-align: center;
-}
-
-.login-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-top: 10px;
-}
-
-/* Buttons */
-button {
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-weight: bold;
-  cursor: pointer;
-  border: none;
-  font-size: 15px;
-  transition: all 0.2s ease;
-}
-
-button.primary {
-  background: var(--btn-teal);
-  color: #fff;
-  box-shadow: 0 4px 10px rgba(17, 100, 102, 0.4);
-}
-
-button.primary:hover:not(:disabled) {
-  background: var(--btn-teal-hover);
-  transform: translateY(-1px);
-}
-
-button.primary:disabled {
-  background: #2b3e40;
-  color: #64748b;
-  cursor: not-allowed;
-}
-
-button.ghost {
-  background: transparent;
-  color: var(--accent);
-  border: 1px solid var(--accent);
-}
-
-button.ghost:hover {
-  background: rgba(217, 180, 143, 0.1);
-}
-
-/* Grids & Cards */
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-  gap: 16px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding: 10px;
-  background: #041416;
-  border-radius: 8px;
-  border: 1px solid var(--btn-teal);
-}
-
-.grid-item {
-  background: #0b3135;
-  border: 2px solid var(--border-teal);
-  border-radius: 6px;
-  padding: 16px;
-  text-align: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: bold;
-  color: #cbd5e1;
-}
-
-.grid-item:hover {
-  border-color: var(--accent);
-  transform: translateY(-2px);
-}
-
-.grid-item.selected {
-  border-color: var(--accent);
-  background: #115053;
-  color: #fff;
-  box-shadow: 0 0 12px rgba(217, 180, 143, 0.4);
-}
-
-/* Difficulty Winding Path Styles */
-.difficulty-path {
-  position: relative;
-  width: 100%;
-  height: 420px;
-  background: #041416;
-  border-radius: 8px;
-  border: 2px solid var(--btn-teal);
-  margin-bottom: 20px;
-  overflow: hidden;
-}
-
-.difficulty-level {
-  position: absolute;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.difficulty-level:hover {
-  transform: translate(-50%, -50%) scale(1.08);
-}
-
-.rock-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  border: 3px solid var(--btn-teal);
-  background: #072225;
-  object-fit: cover;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
-.difficulty-level.selected .rock-icon {
-  border-color: var(--accent);
-  box-shadow: 0 0 15px var(--accent);
-}
-
-.difficulty-level.disabled {
-  opacity: 0.5;
-  filter: grayscale(80%);
-}
-
-.difficulty-info {
-  margin-top: 6px;
-  background: rgba(4, 20, 22, 0.85);
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  color: #fff;
-  white-space: nowrap;
-  border: 1px solid var(--border-teal);
-}
-
-.paid-badge {
-  background: #b81414;
-  color: white;
-  font-size: 9px;
-  padding: 1px 4px;
-  border-radius: 3px;
-  margin-left: 4px;
-}
-
-.controls-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.hint-text {
-  font-size: 13px;
-  color: #94a3b8;
-  font-style: italic;
-}
-
-/* Modals */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, 0.75);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-overlay.hidden {
-  display: none;
-}
-
-.modal-card {
-  background: #072225;
-  border: 3px solid var(--btn-teal);
-  border-radius: 10px;
-  padding: 24px;
-  width: 450px;
-  text-align: center;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-}
-
-.conversation-box {
-  background: #041416;
-  border: 1px solid var(--border-teal);
-  border-radius: 6px;
-  padding: 14px;
-  margin: 16px 0;
-  text-align: left;
-  font-size: 14px;
-  line-height: 1.5;
-  max-height: 180px;
-  overflow-y: auto;
 }
