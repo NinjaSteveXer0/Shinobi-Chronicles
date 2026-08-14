@@ -358,14 +358,6 @@ function goToStoryPage() {
 }
 
 /* -----------------------------
-   CHARACTER MODELS & CUSTOM PL
-   ----------------------------- */
-const shadowNinja = {
-  name: "Shadow Ninja",
-  getPowerLevel() { return 10; }
-};
-
-/* -----------------------------
    BATTLE OVERLAY & UI TRIGGERS
    ----------------------------- */
 function openBattleOverlay() {
@@ -432,7 +424,6 @@ function showFloatingDamage(amount) {
   }, 900);
 }
 
-/* Accurate Single Squad Member Combat with Lunge & Enemy Reaction */
 async function triggerActiveBattle() {
   const testBoss = {
     name: "Jonin Sasuke",
@@ -462,7 +453,6 @@ async function triggerActiveBattle() {
 
   await new Promise(r => setTimeout(r, 400));
 
-  // Player Attack Lunge & Enemy Shake
   if (playerImg) playerImg.classList.add("lunge-forward");
   if (enemyContainer) enemyContainer.classList.add("enemy-hit");
 
@@ -481,7 +471,6 @@ async function triggerActiveBattle() {
 
   await new Promise(r => setTimeout(r, 600));
 
-  // Outcome check
   if (currentBossHP <= 0) {
     if (logContainer) {
       logContainer.innerHTML += `<p style="color: #4ade80; font-weight: bold;">🎉 VICTORY! ${activeNinjaName} defeated ${testBoss.name}!</p>`;
@@ -521,5 +510,22 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     passwordInput.addEventListener("keypress", handleEnterKey);
     usernameInput.addEventListener("keypress", handleEnterKey);
+  }
+
+  // Initialize Animated Background Particles (Embers)
+  const particleContainer = document.getElementById('particle-container');
+  if (particleContainer) {
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement('div');
+      p.className = 'particle';
+      const size = Math.random() * 4 + 2;
+      p.style.width = size + 'px';
+      p.style.height = size + 'px';
+      p.style.left = Math.random() * 100 + '%';
+      p.style.top = Math.random() * 100 + '%';
+      p.style.animationDuration = (Math.random() * 5 + 5) + 's';
+      p.style.animationDelay = Math.random() * 5 + 's';
+      particleContainer.appendChild(p);
+    }
   }
 });
