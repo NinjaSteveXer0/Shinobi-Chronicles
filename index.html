@@ -23,6 +23,7 @@
       <div class="nav-tabs">
         <button id="tab-battle" class="nav-tab active" onclick="switchScreen('battle')">BATTLE</button>
         <button id="tab-roster" class="nav-tab" onclick="switchScreen('roster')">ROSTER</button>
+        <button id="tab-shop" class="nav-tab" onclick="switchScreen('shop')">SHOP & GEAR</button>
       </div>
     </div>
 
@@ -88,8 +89,16 @@
     <div id="screen-roster" class="screen">
       <div class="roster-container">
         <h2 style="font-size: 16px; color: #D6A93A; margin-bottom: 15px;">SELECT ACTIVE SHINOBI</h2>
-        <div id="roster-grid" class="roster-grid">
-          <!-- Dynamically populated by game.js -->
+        <div id="roster-grid" class="roster-grid"></div>
+      </div>
+    </div>
+
+    <!-- SCREEN 3: SHOP & INVENTORY -->
+    <div id="screen-shop" class="screen">
+      <div class="shop-container">
+        <h2 style="font-size: 16px; color: #D6A93A; margin-bottom: 15px;">SHINOBI ARSENAL & SHOP</h2>
+        <div class="shop-grid" id="shop-grid">
+          <!-- Populated dynamically via JS -->
         </div>
       </div>
     </div>

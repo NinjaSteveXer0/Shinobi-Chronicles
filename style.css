@@ -343,3 +343,70 @@ body {
   background: #00D9E8;
   color: #080C10;
 }
+
+/* ==========================================
+    SECTION 7: SHOP & INVENTORY SCREEN STYLES
+    ========================================== */
+.shop-container {
+  flex: 1;
+  padding: 25px;
+  overflow-y: auto;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.shop-item-card {
+  background: #080C10;
+  border: 1px solid #1E293B;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shop-item-title {
+  color: #D6A93A;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.shop-item-desc {
+  color: #94A3B8;
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.shop-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.shop-item-price {
+  color: #00D9E8;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.btn-buy-item {
+  background: #082B30;
+  color: #FFF;
+  border: 1px solid #00D9E8;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: bold;
+  transition: all 0.2s;
+}
+
+.btn-buy-item:hover {
+  background: #00D9E8;
+  color: #080C10;
+}

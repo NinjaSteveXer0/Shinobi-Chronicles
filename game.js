@@ -1,4 +1,4 @@
-// 1. Shinobi Chronicles Character Roster & Combat Engine
+// 1. Shinobi Chronicles Character Roster & Shop Database
 const charactersDatabase = {
   naruto: {
     id: "naruto",
@@ -11,8 +11,10 @@ const charactersDatabase = {
     maxHp: 1400,
     powerPool: 1200,
     maxPowerPool: 1200,
+    inventory: [],
     getPowerLevel: function() {
-      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      let itemBonus = this.inventory.reduce((sum, item) => sum + item.statBonus, 0);
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0) + itemBonus;
       return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
     }
   },
@@ -27,8 +29,10 @@ const charactersDatabase = {
     maxHp: 1200,
     powerPool: 1000,
     maxPowerPool: 1000,
+    inventory: [],
     getPowerLevel: function() {
-      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      let itemBonus = this.inventory.reduce((sum, item) => sum + item.statBonus, 0);
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0) + itemBonus;
       return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
     }
   },
@@ -43,8 +47,10 @@ const charactersDatabase = {
     maxHp: 1300,
     powerPool: 900,
     maxPowerPool: 900,
+    inventory: [],
     getPowerLevel: function() {
-      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      let itemBonus = this.inventory.reduce((sum, item) => sum + item.statBonus, 0);
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0) + itemBonus;
       return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
     }
   },
@@ -59,14 +65,21 @@ const charactersDatabase = {
     maxHp: 1250,
     powerPool: 1300,
     maxPowerPool: 1300,
+    inventory: [],
     getPowerLevel: function() {
-      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0);
+      let itemBonus = this.inventory.reduce((sum, item) => sum + item.statBonus, 0);
+      let totalStats = Object.values(this.stats).reduce((a, b) => a + b, 0) + itemBonus;
       return Math.floor(totalStats * 1.5 + (this.maxHp / 10));
     }
   }
 };
 
-// Active Battle Combatants
+const shopItems = [
+  { id: "kunai", name: "Chakra Blade Kunai", desc: "Boosts overall combat stats and precision.", price: 2500, statBonus: 40 },
+  { id: "scroll", name: "Forbidden Jutsu Scroll", desc: "Unlocks advanced chakra circulation channels.", price: 5000, statBonus: 90 },
+  { id: "flak", name: "Elite Jonin Flak Jacket", desc: "Reinforced woven armor providing high defense.", price: 3500, statBonus: 60 }
+];
+
 let playerCharacter = charactersDatabase.naruto;
 let enemyCharacter = charactersDatabase.sasuke;
 
@@ -87,6 +100,10 @@ function switchScreen(screenName) {
     document.getElementById('screen-roster').classList.add('active');
     document.getElementById('tab-roster').classList.add('active');
     renderRosterGrid();
+  } else if (screenName === 'shop') {
+    document.getElementById('screen-shop').classList.add('active');
+    document.getElementById('tab-shop').classList.add('active');
+    renderShopGrid();
   }
 }
 
@@ -123,7 +140,48 @@ function selectActiveShinobi(charId) {
   logMessage(`✨ Deployed ${playerCharacter.name} into battle!`);
 }
 
-// 4. Combat Logging & Feedback
+// 4. Render Shop Inventory View
+function renderShopGrid() {
+  const grid = document.getElementById('shop-grid');
+  grid.innerHTML = '';
+
+  shopItems.forEach(item => {
+    const alreadyOwned = playerCharacter.inventory.some(i => i.id === item.id);
+    const itemDiv = document.createElement('div');
+    itemDiv.className = 'shop-item-card';
+    itemDiv.innerHTML = `
+      <div>
+        <div class="shop-item-title">${item.name}</div>
+        <div class="shop-item-desc">${item.desc}</div>
+      </div>
+      <div class="shop-item-footer">
+        <span class="shop-item-price">💰 ${item.price.toLocaleString()} Ryo</span>
+        <button class="btn-buy-item" onclick="buyShopItem('${item.id}')" ${alreadyOwned ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''}>
+          ${alreadyOwned ? 'OWNED' : 'PURCHASE'}
+        </button>
+      </div>
+    `;
+    grid.appendChild(itemDiv);
+  });
+}
+
+function buyShopItem(itemId) {
+  const item = shopItems.find(i => i.id === itemId);
+  if (!item) return;
+
+  if (battleState.ryo < item.price) {
+    logMessage("⚠️ Insufficient Ryo to purchase this item!", "#E53935");
+    return;
+  }
+
+  battleState.ryo -= item.price;
+  playerCharacter.inventory.push(item);
+  updateHUD();
+  renderShopGrid();
+  logMessage(`🛍️ Successfully purchased ${item.name}! Power Level increased.`);
+}
+
+// 5. Combat Logging & Feedback
 function logMessage(msg, color = "#00D9E8") {
   const log = document.getElementById('combat-log');
   if (log) {
@@ -132,7 +190,7 @@ function logMessage(msg, color = "#00D9E8") {
   }
 }
 
-// 5. Action Buttons Logic
+// 6. Action Buttons Logic
 function performNinjutsuStrike() {
   if (battleState.isBattleOver) return;
 
@@ -221,7 +279,7 @@ function updateHUD() {
   document.getElementById('enemy-art').style.background = `url('${enemyCharacter.image}') center/cover no-repeat`;
 }
 
-// 6. Initialization & Listeners
+// 7. Initialization & Listeners
 document.addEventListener("DOMContentLoaded", () => {
   updateHUD();
 
