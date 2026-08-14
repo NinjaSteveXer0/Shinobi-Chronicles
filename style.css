@@ -1,14 +1,14 @@
-:root {
-  --bg-dark: #072225;
-  --panel-bg: #e8d5b5; /* Parchment tone */
-  --btn-teal: #116466;
-  --btn-teal-hover: #1b8a8d;
-  --accent: #d9b48f;
-  --text-main: #1e293b; /* Dark text for parchment */
-  --border-teal: #235759;
+/* Page Panels & Hidden State Fix */
+.page-panel {
+  padding: 40px;
+  position: relative;
 }
 
-/* Specific styling for the Login page to use the parchment look */
+.page-panel.hidden {
+  display: none !important;
+}
+
+/* Specific styling for the Login page parchment look */
 #login-page {
   background-color: #f3e5c8;
   background-image: radial-gradient(circle, #f7ebd0 0%, #e2ceaa 100%);
@@ -16,8 +16,10 @@
   border-radius: 8px;
   box-shadow: inset 0 0 40px rgba(139, 94, 60, 0.25), 0 10px 25px rgba(0,0,0,0.5);
   color: #1a2e35;
-  margin: 20px;
+  margin: 20px auto;
+  max-width: 900px;
   padding: 40px;
+  text-align: center;
 }
 
 #login-page h2 {
@@ -38,7 +40,7 @@
   border: 2px solid #116466;
 }
 
-/* Glowing golden header text matching image_162640.jpg */
+/* Glowing golden header text */
 header h1 {
   margin: 0;
   font-size: 26px;
