@@ -1,667 +1,296 @@
-/* ==========================================================
-   ROOT VARIABLES
-   ================================================---------- */
-:root {
-  --bg-dark: #072225;
-  --panel-bg: #e8d5b5;
-  --btn-teal: #116466;
-  --btn-teal-hover: #1b8a8d;
-  --accent: #d9b48f;
-  --text-main: #f8fafc;
+/* ==========================================
+    SECTION 1: GLOBAL RESET & BASE STYLES
+    ========================================== */
+* { 
+  box-sizing: border-box; 
+  margin: 0; 
+  padding: 0; 
 }
 
-/* ==========================================================
-   GLOBAL STYLES & LAYOUT
-   ================================================---------- */
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  min-height: 100vh;
+body { 
+  background-color: #040608; 
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+  color: #FFFFFF; 
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh; 
+  overflow: hidden; 
 }
 
-.app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
+/* ==========================================
+    SECTION 2: MAIN APP CONTAINER & HUD
+    ========================================== */
+.game-container { 
+  position: relative; 
+  width: 960px; 
+  height: 640px; 
+  background-color: #080C10; 
+  border: 1px solid #082B30; 
+  border-radius: 12px; 
+  overflow: hidden; 
+  display: flex; 
+  flex-direction: column; 
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9); 
 }
 
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid var(--btn-teal);
-  padding-bottom: 15px;
-  margin-bottom: 30px;
+.game-header { 
+  height: 50px; 
+  background: rgba(8, 12, 16, 0.95); 
+  border-bottom: 1px solid #082B30; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  padding: 0 20px; 
+  z-index: 10;
 }
 
-header h1 {
-  margin: 0;
-  font-size: 28px;
-  color: #fef08a;
-  text-shadow: 0 0 8px rgba(217, 180, 143, 0.8), 0 2px 4px rgba(0,0,0,0.8);
+.hud-stats { 
+  display: flex; 
+  gap: 20px; 
+  font-size: 13px; 
+  font-weight: bold; 
 }
 
-.user {
-  color: var(--accent);
-  font-weight: bold;
+.hud-item span { 
+  color: #00D9E8; 
 }
 
-/* ==========================================================
-   PAGE VISIBILITY UTILITIES
-   ================================================---------- */
-.page-panel {
-  display: block;
+.nav-tabs { 
+  display: flex; 
+  gap: 10px; 
 }
 
-.page-panel.hidden {
-  display: none !important;
+.nav-tab { 
+  background: #082B30; 
+  border: 1px solid #00D9E8; 
+  color: #FFF; 
+  padding: 5px 12px; 
+  border-radius: 4px; 
+  cursor: pointer; 
+  font-size: 12px; 
+  font-weight: bold; 
+  transition: all 0.2s; 
 }
 
-/* ==========================================================
-   LOGIN PAGE STYLING
-   ================================================---------- */
-#login-page {
-  background-color: #f3e5c8;
-  background-image: radial-gradient(circle, #f7ebd0 0%, #e2ceaa 100%);
-  border: 4px solid #116466;
-  border-radius: 8px;
-  box-shadow: inset 0 0 40px rgba(139, 94, 60, 0.25), 0 10px 25px rgba(0,0,0,0.5);
-  color: #1a2e35;
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 40px;
-  text-align: center;
+.nav-tab:hover, .nav-tab.active { 
+  background: #00D9E8; 
+  color: #080C10; 
 }
 
-#login-page h2 {
-  color: #116466;
-  margin-top: 0;
+.screen { 
+  display: none; 
+  flex: 1; 
+  position: relative; 
+  flex-direction: column; 
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-  text-align: left;
-  max-width: 320px;
-  margin-left: auto;
-  margin-right: auto;
+.screen.active { 
+  display: flex; 
 }
 
-.form-group input {
-  padding: 10px;
-  border: 2px solid #116466;
-  border-radius: 6px;
-  font-size: 16px;
-  background: #ffffff;
-  color: #0f172a;
-}
-
-.login-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-/* ==========================================================
-   BUTTONS STYLING
-   ================================================---------- */
-button.primary {
-  background-color: var(--btn-teal);
-  color: white;
-  border: 1px solid #2a5c63;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
-}
-
-button.primary:hover {
-  background-color: var(--btn-teal-hover);
-}
-
-button.primary:disabled {
-  background-color: #475569;
-  cursor: not-allowed;
-}
-
-button.ghost {
-  background-color: #0d484b; 
-  color: #ffffff;            
-  border: 1px solid #2a5c63;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
-}
-
-button.ghost:hover {
-  background-color: #125e63;
-  border-color: #38bdf8;
-  color: #ffffff;
-}
-
-/* ==========================================================
-   GRIDS AND MODALS
-   ================================================---------- */
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.grid-item {
-  background: #0d383b;
-  border: 2px solid var(--btn-teal);
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  font-weight: bold;
-  color: #fff;
-  transition: all 0.2s ease;
-}
-
-.grid-item:hover, .grid-item.selected {
-  border-color: #fef08a;
-  background: #116466;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-overlay.hidden {
-  display: none !important;
-}
-
-/* ==========================================================
-   MODERNIZED BATTLE ARENA & HEALTH BAR STYLING
-   ================================================---------- */
-.modern-battle-card {
-  background: linear-gradient(145deg, #131111, #1a1212);
-  border: 2px solid #ff4d4d;
-  width: 850px;
-  padding: 30px;
-  border-radius: 14px;
-  color: #fff;
-  text-align: center;
-  box-shadow: 0 0 30px rgba(255, 77, 77, 0.25);
-  position: relative;
-}
-
-/* Modern Health Bar Container */
-.health-bar-container {
-  background: #090606;
-  border: 1px solid #331515;
-  border-radius: 30px;
-  padding: 4px;
-  margin: 20px 0;
-  position: relative;
-  height: 26px;
+/* ==========================================
+    SECTION 3: BATTLE ARENA & ANIMATED ENVIRONMENT
+    ========================================== */
+.battle-arena { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; 
+  position: relative; 
   overflow: hidden;
-  box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
 }
 
-.health-bar-fill {
-  background: linear-gradient(90deg, #c92a2a, #ff6b6b);
-  height: 100%;
-  border-radius: 20px;
-  width: 100%;
-  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 0 12px rgba(255, 107, 107, 0.6);
-}
-
-.health-bar-text {
+.battle-environment {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-weight: bold;
-  letter-spacing: 1px;
-  color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-}
-
-/* Combat Fighter Lunge & Reaction Animations */
-.fighter-wrapper {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
-}
-
-.fighter-wrapper.lunge-forward {
-  transform: translateX(45px) scale(1.05);
-}
-
-.enemy-wrapper {
-  transition: transform 0.2s ease;
-}
-
-.enemy-wrapper.enemy-hit {
-  animation: enemyShake 0.3s ease;
-}
-
-@keyframes enemyShake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(8px); }
-  50% { transform: translateX(-8px); }
-  75% { transform: translateX(4px); }
-  100% { transform: translateX(0); }
-}
-
-/* Smooth Page Transition Animation */
-.page-transition-fade {
-  animation: fadeInPanel 0.4s ease-in-out forwards;
-}
-
-@keyframes fadeInPanel {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* Floating Red Damage Number Animation */
-@keyframes floatDamage {
-  0% { transform: translate(-50%, 0) scale(0.8); opacity: 0; }
-  30% { transform: translate(-50%, -20px) scale(1.2); opacity: 1; }
-  100% { transform: translate(-50%, -60px) scale(1); opacity: 0; }
-}
-
-.floating-damage {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 38px;
-  font-weight: 900;
-  color: #ff3333;
-  text-shadow: 0 0 10px rgba(255, 0, 0, 0.8), 2px 2px 0px #000;
   pointer-events: none;
-  animation: floatDamage 0.9s ease-out forwards;
-  z-index: 50;
-}
-
-/* Modern Combat Log Terminal */
-.combat-log-terminal {
-  background: #090505;
-  border: 1px solid #331515;
-  height: 130px;
-  text-align: left;
-  padding: 12px;
-  font-family: monospace;
-  font-size: 0.9rem;
-  color: #38bdf8;
-  overflow-y: auto;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
-}
-
-/* ==========================================================
-   DIFFICULTY PAGE STYLING
-   ================================================---------- */
-.diff-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0d383b;
-  border: 2px solid var(--btn-teal);
-  border-radius: 8px;
-  padding: 16px 20px;
-  margin-bottom: 12px;
-  transition: all 0.2s ease;
-}
-
-.diff-row.locked {
-  opacity: 0.6;
-  background: #092426;
-}
-
-.diff-info {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.diff-info img {
-  width: 54px;
-  height: 54px;
-  object-fit: contain;
-  border-radius: 6px;
-}
-
-.diff-text h4 {
-  margin: 0 0 4px 0;
-  color: #fef08a;
-  font-size: 18px;
-}
-
-.diff-text p {
-  margin: 0;
-  color: #cbd5e1;
-  font-size: 14px;
-}
-/* Shinobi Chronicles Battle Screen Styles */
-.battle-arena {
-  position: relative;
-  width: 100%;
-  height: 600px;
-  background-color: #080C10; /* Obsidian Primary */
-  border: 1px solid #082B30; /* Deep Teal */
-  border-radius: 12px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  font-family: 'Segoe UI', sans-serif;
-  color: #FFFFFF;
-}
-
-/* Layer 1: Environment */
-.environment-bg {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(to bottom, rgba(8,12,16,0.4), rgba(8,43,48,0.8)), 
-              url('path-to-ichiraku-bg.jpg') center/cover no-repeat;
   z-index: 1;
-}
-
-/* Layer 2: Combatants Stage */
-.combatants-stage {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  padding: 20px;
-  height: 65%;
-}
-
-.character-card-frame {
-  width: 180px;
-  height: 260px;
-  background: #080C10;
-  border-radius: 8px;
-  border: 2px solid #082B30;
   overflow: hidden;
-  transition: transform 0.3s ease;
 }
 
-.character-card-frame.glow-cyan {
-  box-shadow: 0 0 15px rgba(0, 217, 232, 0.4); /* Chakra Cyan */
+.particle {
+  position: absolute;
+  background: rgba(214, 169, 58, 0.4);
+  border-radius: 50%;
+  animation: drift linear infinite;
 }
 
-.character-card-frame.glow-red {
-  box-shadow: 0 0 15px rgba(229, 57, 53, 0.4); /* Blood Red */
+@keyframes drift {
+  0% { transform: translateY(0) translateX(0); opacity: 0; }
+  50% { opacity: 0.6; }
+  100% { transform: translateY(-500px) translateX(50px); opacity: 0; }
+}
+
+/* ==========================================
+    SECTION 4: CHARACTER CARD SYSTEM
+    ========================================== */
+.combatants-stage { 
+  position: relative; 
+  z-index: 2; 
+  display: flex; 
+  justify-content: space-around; 
+  align-items: center; 
+  padding: 20px; 
+  flex: 1; 
+}
+
+.combatant { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+  gap: 10px; 
+}
+
+.character-card-frame { 
+  width: 190px; 
+  height: 270px; 
+  background: #080C10; 
+  border-radius: 10px; 
+  border: 2px solid #082B30; 
+  overflow: hidden; 
+  position: relative; 
+  display: flex; 
+  flex-direction: column; 
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7); 
+  transition: all 0.3s ease;
 }
 
 .character-card-frame:hover {
-  transform: translateY(-5px);
+  transform: translateY(-6px) scale(1.02);
 }
 
-/* Layer 3: Obsidian Glass Console */
-.combat-console {
+.card-rarity-legendary { 
+  border-color: #D6A93A !important; 
+  box-shadow: 0 0 20px rgba(214, 169, 58, 0.35); 
+}
+
+.card-rarity-rare { 
+  border-color: #00D9E8 !important; 
+  box-shadow: 0 0 20px rgba(0, 217, 232, 0.35); 
+}
+
+.card-header-tag { 
+  position: absolute; 
+  top: 8px; 
+  left: 8px; 
+  background: rgba(8, 12, 16, 0.85); 
+  border: 1px solid rgba(255, 255, 255, 0.15); 
+  padding: 2px 6px; 
+  border-radius: 4px; 
+  font-size: 10px; 
+  font-weight: bold; 
+  color: #D6A93A; 
+  z-index: 3; 
+}
+
+.card-art-container { 
+  width: 100%; 
+  height: 175px; 
+  background: #121c24; 
+}
+
+.card-footer-stats { 
+  flex: 1; 
+  background: rgba(8, 12, 16, 0.95); 
+  border-top: 1px solid #082B30; 
+  padding: 10px; 
+  display: flex; 
+  flex-direction: column; 
+  justify-content: space-between; 
+}
+
+.card-title { 
+  font-size: 11px; 
+  font-weight: bold; 
+  color: #FFFFFF; 
+}
+
+.card-stats-row { 
+  display: flex; 
+  justify-content: space-between; 
+  font-size: 10px; 
+  color: #8899A6; 
+}
+
+.card-stats-row b { 
+  color: #00D9E8; 
+}
+
+.versus-badge { 
+  font-size: 22px; 
+  font-weight: 900; 
+  color: #D6A93A; 
+}
+
+/* ==========================================
+    SECTION 5: HEALTH BARS & COMBAT CONSOLE
+    ========================================== */
+.health-bar-container { 
+  width: 190px; 
+  text-align: center; 
+  z-index: 2;
+}
+
+.name { 
+  font-size: 11px; 
+  font-weight: bold; 
+  color: #C0C0C0; 
+}
+
+.bar { 
+  width: 100%; 
+  height: 8px; 
+  background: #040608; 
+  border: 1px solid #082B30; 
+  border-radius: 4px; 
+  overflow: hidden;
+}
+
+.fill { 
+  height: 100%; 
+  background: #00D9E8; 
+  transition: width 0.3s ease;
+}
+
+.fill.enemy { 
+  background: #E53935; 
+}
+
+.combat-console { 
   position: relative;
   z-index: 2;
-  background: rgba(8, 12, 16, 0.85);
-  backdrop-filter: blur(8px);
-  border-top: 1px solid #082B30;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  background: rgba(8, 12, 16, 0.95); 
+  border-top: 1px solid #082B30; 
+  padding: 15px; 
 }
 
-.action-buttons {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
+.action-feedback-log {
+  font-size: 13px;
 }
 
-.btn-ninja {
-  background: #082B30;
-  color: #FFFFFF;
-  border: 1px solid #00D9E8;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: bold;
-  transition: all 0.2s ease-in-out;
+.action-buttons { 
+  display: flex; 
+  gap: 10px; 
+  margin-top: 10px; 
 }
 
-.btn-ninja:hover {
-  background: #00D9E8;
-  color: #080C10;
-  box-shadow: 0 0 10px #00D9E8;
+.btn-ninja { 
+  flex: 1; 
+  background: #082B30; 
+  color: #FFF; 
+  border: 1px solid #00D9E8; 
+  padding: 10px; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-weight: bold; 
+  transition: all 0.2s;
 }
 
-.btn-ninja.gold-border {
-  border-color: #D6A93A; /* Ninja Gold */
+.btn-ninja:hover { 
+  background: #00D9E8; 
+  color: #080C10; 
 }
-.btn-ninja.gold-border:hover {
-  background: #D6A93A;
-  box-shadow: 0 0 10px #D6A93A;
-}
-/* ==========================================
-       POINT 2: ENHANCED CHARACTER CARD SYSTEM
-       ========================================== */
-    .character-card-frame {
-      width: 190px;
-      height: 270px;
-      background: linear-gradient(145deg, #080C10, #040608);
-      border-radius: 10px;
-      border: 2px solid #082B30;
-      overflow: hidden;
-      position: relative;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
-    }
-
-    /* Rarity Tiers */
-    .card-rarity-legendary {
-      border-color: #D6A93A !important; /* Ninja Gold */
-      box-shadow: 0 0 20px rgba(214, 169, 58, 0.35);
-    }
-
-    .card-rarity-rare {
-      border-color: #00D9E8 !important; /* Chakra Cyan */
-      box-shadow: 0 0 20px rgba(0, 217, 232, 0.35);
-    }
-
-    .character-card-frame:hover {
-      transform: translateY(-6px) scale(1.02);
-    }
-
-    /* Inner Card Layout */
-    .card-header-tag {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(8, 12, 16, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      color: #D6A93A;
-      z-index: 3;
-    }
-
-    .card-art-container {
-      width: 100%;
-      height: 70%;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .card-art-container img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .card-footer-stats {
-      height: 30%;
-      background: rgba(8, 12, 16, 0.95);
-      border-top: 1px solid #082B30;
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
-
-    .card-title {
-      font-size: 12px;
-      font-weight: bold;
-      color: #FFFFFF;
-      letter-spacing: 0.5px;
-    }
-
-    .card-stats-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #8899A6;
-    }
-
-    .card-stats-row span b {
-      color: #00D9E8;
-    }
-
-    /* ==========================================
-       FIXED CHARACTER CARD SYSTEM
-       ========================================== */
-    .character-card-frame {
-      width: 190px;
-      height: 270px;
-      background: #080C10;
-      border-radius: 10px;
-      border: 2px solid #082B30;
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      transition: all 0.3s ease;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
-    }
-
-    /* Rarity Tiers */
-    .card-rarity-legendary {
-      border-color: #D6A93A !important; /* Ninja Gold */
-      box-shadow: 0 0 20px rgba(214, 169, 58, 0.35);
-    }
-
-    .card-rarity-rare {
-      border-color: #00D9E8 !important; /* Chakra Cyan */
-      box-shadow: 0 0 20px rgba(0, 217, 232, 0.35);
-    }
-
-    .character-card-frame:hover {
-      transform: translateY(-6px) scale(1.02);
-    }
-
-    /* Inner Card Layout */
-    .card-header-tag {
-      position: absolute;
-      top: 8px;
-      left: 8px;
-      background: rgba(8, 12, 16, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: bold;
-      color: #D6A93A;
-      z-index: 3;
-    }
-
-    .card-art-container {
-      width: 100%;
-      height: 175px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .shadow-ninja-art { 
-      width: 100%;
-      height: 100%;
-      background-color: #121c24; 
-    }
-    
-    .sasuke-art { 
-      width: 100%;
-      height: 100%;
-      background-color: #241212; 
-    }
-
-    .card-footer-stats {
-      flex: 1;
-      background: rgba(8, 12, 16, 0.95);
-      border-top: 1px solid #082B30;
-      padding: 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .card-title {
-      font-size: 11px;
-      font-weight: bold;
-      color: #FFFFFF;
-      letter-spacing: 0.5px;
-    }
-
-    .card-stats-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 10px;
-      color: #8899A6;
-    }
-
-    .card-stats-row span b {
-      color: #00D9E8;
-    }
-
-    /* ==========================================
-       POINT 3: ANIMATED ENVIRONMENTS
-       ========================================== */
-    .battle-environment {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    /* Floating Embers/Particles */
-    .particle {
-      position: absolute;
-      background: rgba(214, 169, 58, 0.4); /* Gold Ember */
-      border-radius: 50%;
-      animation: drift linear infinite;
-    }
-
-    @keyframes drift {
-      0% { transform: translateY(0) translateX(0); opacity: 0; }
-      50% { opacity: 0.6; }
-      100% { transform: translateY(-500px) translateX(50px); opacity: 0; }
-    }
