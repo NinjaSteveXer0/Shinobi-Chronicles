@@ -247,3 +247,24 @@ button.ghost:hover {
   opacity: 0.6;
   border-color: #18373d;
 }
+
+/* -----------------------------
+   VILLAGE HUB BUTTON STYLING
+   ----------------------------- */
+#game-village .ghost,
+#game-village .primary-btn,
+#game-village button {
+  background-color: #0d484b;
+  color: #ffffff;
+  border: 1px solid #2a5c63;
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+#game-village button:hover {
+  background-color: #125e63;
+  border-color: #38bdf8;
+}
