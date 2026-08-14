@@ -193,19 +193,19 @@ button.ghost:hover {
 }
 
 /* -----------------------------
-   DIFFICULTY ROW STYLING (OFF-WHITE BOX)
+   THEMATIC DIFFICULTY ROW STYLING
    ----------------------------- */
 .diff-row {
-  background-color: #fdfbf7; /* Egg-white / off-white box */
-  color: #1a1a1a;            /* Dark text for readability inside the box */
-  border: 1px solid #dcd6cd;  
+  background: linear-gradient(135deg, #103136 0%, #0d272b 100%); /* Rich dark teal gradient */
+  color: #f4f1ea;                                           /* Soft parchment text */
+  border: 1px solid #2a5c63;                                 /* Subtle teal border */
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease-in-out;
 }
 
@@ -222,27 +222,28 @@ button.ghost:hover {
 }
 
 .diff-row .diff-text h4 {
-  color: #111111;
+  color: #ffd700; /* Gold heading to match the icon glow */
   font-size: 1.1rem;
   font-weight: bold;
   margin: 0 0 4px 0;
 }
 
 .diff-row .diff-text p {
-  color: #555555;
+  color: #b0c4de; /* Muted light steel blue for description */
   font-size: 0.9rem;
   margin: 0;
 }
 
-/* Hover lift effect for unlocked rows */
+/* Hover effect for unlocked/active rows */
 .diff-row:not(.locked):hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
-  border-color: #c5bcaf;
+  border-color: #ffd700; /* Gold border pop on hover */
+  box-shadow: 0 6px 16px rgba(255, 215, 0, 0.15);
 }
 
-/* Muted look for locked rows */
+/* Locked row styling */
 .diff-row.locked {
-  background-color: #f4f1ea; 
-  opacity: 0.7;
+  background: #081a1d; 
+  opacity: 0.6;
+  border-color: #18373d;
 }
