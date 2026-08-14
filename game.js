@@ -380,19 +380,32 @@ function openBattleOverlay() {
     overlay.style.display = "flex";
   }
 
+  // Get player and enemy wrapper elements
   const playerImg = $("battle-player-img");
+  const enemyImg = $("battle-enemy-img"); // Make sure your enemy image element has this ID or similar class
   const playerName = $("battle-player-name");
+
+  // Apply slide-in classes to trigger the CSS animations
   if (playerImg) {
-    playerImg.className = "fighter-wrapper"; // Reset animation state
+    playerImg.classList.remove("fighter-slide-left");
+    void playerImg.offsetWidth; // Trigger reflow to restart animation if re-opened
+    playerImg.classList.add("fighter-slide-left");
+    
     playerImg.src = App.selectedNinja === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${App.selectedNinja || 'Academy Student'}.png`;
     playerImg.onerror = () => { playerImg.src = "Assets/Icons/Academy Student.png"; };
   }
+
+  if (enemyImg) {
+    enemyImg.classList.remove("fighter-slide-right");
+    void enemyImg.offsetWidth;
+    enemyImg.classList.add("fighter-slide-right");
+  }
+
   if (playerName) {
     playerName.textContent = App.selectedNinja || "Shadow Ninja";
   }
 
   const currentPL = shadowNinja.getPowerLevel();
-  if ($("ui-player-pl")) $("ui-player-plinnerText", currentPL);
   if ($("ui-player-pl")) $("ui-player-pl").innerText = currentPL;
   if ($("ui-enemy-pl")) $("ui-enemy-pl").innerText = 50;
 
@@ -402,38 +415,6 @@ function openBattleOverlay() {
     $("ui-battle-log").innerHTML = `<p>Mission loaded. Click FIGHT to begin sequential attrition!</p>`;
   }
 }
-
-function closeBattleOverlay() {
-  const overlay = $("battle-overlay");
-  if (overlay) {
-    overlay.classList.add("hidden");
-    overlay.style.display = "none";
-  }
-}
-
-function updateModernHealthBar(current, max) {
-  const fill = $("ui-health-fill");
-  const text = $("ui-health-text");
-  const percentage = Math.max(0, Math.min(100, (current / max) * 100));
-  
-  if (fill) fill.style.width = `${percentage}%`;
-  if (text) text.innerText = `BOSS PL POOL: ${Math.max(0, current)} / ${max}`;
-}
-
-function showFloatingDamage(amount) {
-  const modalCard = document.querySelector(".modern-battle-card");
-  if (!modalCard) return;
-
-  const dmgPopup = document.createElement("div");
-  dmgPopup.className = "floating-damage";
-  dmgPopup.innerText = `-${amount}`;
-  modalCard.appendChild(dmgPopup);
-
-  setTimeout(() => {
-    dmgPopup.remove();
-  }, 900);
-}
-
 /* Custom Turn-by-Turn Sequential Attrition with Character Drop & Slide-In */
 async function triggerActiveBattle() {
   const testBoss = {
