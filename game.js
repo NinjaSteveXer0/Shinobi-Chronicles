@@ -1,4 +1,4 @@
-// 1. Shinobi Chronicles Character Roster & Shop Database
+// 1. Character Roster & Shop Database
 const charactersDatabase = {
   naruto: {
     id: "naruto",
@@ -88,28 +88,87 @@ let battleState = {
   ryo: 14500
 };
 
-// 2. Screen Navigation Logic
-function switchScreen(screenName) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+// 2. Overlay Management System
+function openOverlay(screenType) {
+  const overlay = document.getElementById('screen-overlay');
+  const container = document.getElementById('overlay-content-container');
+  overlay.style.display = 'flex';
 
-  if (screenName === 'battle') {
-    document.getElementById('screen-battle').classList.add('active');
-    document.getElementById('tab-battle').classList.add('active');
-  } else if (screenName === 'roster') {
-    document.getElementById('screen-roster').classList.add('active');
-    document.getElementById('tab-roster').classList.add('active');
+  if (screenType === 'battle') {
+    container.innerHTML = `
+      <div class="battle-arena">
+        <div class="battle-environment" id="particle-container"></div>
+        <div class="combatants-stage">
+          <div class="combatant">
+            <div id="player-card-frame" class="character-card-frame card-rarity-legendary">
+              <div id="player-header-tag" class="card-header-tag">KAGE</div>
+              <div id="player-art" class="card-art-container"></div>
+              <div class="card-footer-stats">
+                <div id="player-title" class="card-title">KAGE NARUTO</div>
+                <div class="card-stats-row"><span>PL: <b id="player-pl-display">0</b></span><span>NIN: <b id="player-nin-display">420</b></span></div>
+              </div>
+            </div>
+            <div class="health-bar-container">
+              <span id="player-name-label" class="name">KAGE NARUTO</span>
+              <div class="bar"><div id="player-fill-bar" class="fill" style="width: 100%;"></div></div>
+            </div>
+          </div>
+          <div class="versus-badge">VS</div>
+          <div class="combatant">
+            <div id="enemy-card-frame" class="character-card-frame card-rarity-legendary">
+              <div id="enemy-header-tag" class="card-header-tag">ELITE</div>
+              <div id="enemy-art" class="card-art-container"></div>
+              <div class="card-footer-stats">
+                <div id="enemy-title" class="card-title">JONIN SASUKE</div>
+                <div class="card-stats-row"><span>PL: <b id="enemy-pl-display">0</b></span><span>NIN: <b id="enemy-nin-display">380</b></span></div>
+              </div>
+            </div>
+            <div class="health-bar-container">
+              <span id="enemy-name-label" class="name">JONIN SASUKE</span>
+              <div class="bar"><div id="enemy-fill-bar" class="fill enemy" style="width: 100%;"></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="combat-console">
+          <div id="combat-log" class="action-feedback-log" style="color: #00D9E8;">⚡ Battle ready in Konohagakure arena. Choose your action.</div>
+          <div class="action-buttons">
+            <button class="btn-ninja" onclick="performNinjutsuStrike()">NINJUTSU STRIKE</button>
+            <button class="btn-ninja" onclick="performChakraRestore()">CHAKRA RESTORE</button>
+            <button class="btn-ninja" onclick="performFlee()">FLEE</button>
+          </div>
+        </div>
+      </div>
+    `;
+    initParticles();
+    updateHUD();
+  } else if (screenType === 'roster') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 20px;">SHINOBI ROSTER MANAGEMENT</h2>
+      <div id="roster-grid" class="roster-grid"></div>
+    `;
     renderRosterGrid();
-  } else if (screenName === 'shop') {
-    document.getElementById('screen-shop').classList.add('active');
-    document.getElementById('tab-shop').classList.add('active');
+  } else if (screenType === 'shop') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 20px;">VILLAGE ARSENAL & SHOP</h2>
+      <div id="shop-grid" class="shop-grid"></div>
+    `;
     renderShopGrid();
+  } else if (screenType === 'village') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">KONOHAGAKURE - HIDDEN LEAF VILLAGE</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Welcome back to your home base, Shinobi. From here, manage your active squad in the Roster, upgrade equipment at the Shop, or deploy directly to the Arena to fight rogue ninja threats.</p>
+    `;
   }
 }
 
-// 3. Render Roster Grid View
+function closeOverlay() {
+  document.getElementById('screen-overlay').style.display = 'none';
+}
+
+// 3. Render Roster Grid
 function renderRosterGrid() {
   const grid = document.getElementById('roster-grid');
+  if (!grid) return;
   grid.innerHTML = '';
 
   Object.values(charactersDatabase).forEach(char => {
@@ -126,7 +185,7 @@ function renderRosterGrid() {
         </div>
       </div>
       <button class="btn-select-shinobi" onclick="selectActiveShinobi('${char.id}')">
-        ${isSelected ? 'ACTIVE' : 'SELECT'}
+        ${isSelected ? 'ACTIVE SHINOBI' : 'DEPLOY SHINOBI'}
       </button>
     `;
     grid.appendChild(cardDiv);
@@ -136,13 +195,15 @@ function renderRosterGrid() {
 function selectActiveShinobi(charId) {
   playerCharacter = charactersDatabase[charId];
   updateHUD();
-  switchScreen('battle');
+  closeOverlay();
+  openOverlay('battle');
   logMessage(`✨ Deployed ${playerCharacter.name} into battle!`);
 }
 
-// 4. Render Shop Inventory View
+// 4. Render Shop Grid
 function renderShopGrid() {
   const grid = document.getElementById('shop-grid');
+  if (!grid) return;
   grid.innerHTML = '';
 
   shopItems.forEach(item => {
@@ -170,7 +231,7 @@ function buyShopItem(itemId) {
   if (!item) return;
 
   if (battleState.ryo < item.price) {
-    logMessage("⚠️ Insufficient Ryo to purchase this item!", "#E53935");
+    alert("Insufficient Ryo to purchase this item!");
     return;
   }
 
@@ -178,10 +239,9 @@ function buyShopItem(itemId) {
   playerCharacter.inventory.push(item);
   updateHUD();
   renderShopGrid();
-  logMessage(`🛍️ Successfully purchased ${item.name}! Power Level increased.`);
 }
 
-// 5. Combat Logging & Feedback
+// 5. Combat Engine Functions
 function logMessage(msg, color = "#00D9E8") {
   const log = document.getElementById('combat-log');
   if (log) {
@@ -190,13 +250,12 @@ function logMessage(msg, color = "#00D9E8") {
   }
 }
 
-// 6. Action Buttons Logic
 function performNinjutsuStrike() {
   if (battleState.isBattleOver) return;
 
   const chakraCost = 150;
   if (playerCharacter.powerPool < chakraCost) {
-    logMessage("⚠️ Not enough Chakra/Power Pool! Use Chakra Restore.", "#E53935");
+    logMessage("⚠️ Not enough Chakra! Use Chakra Restore.", "#E53935");
     return;
   }
 
@@ -209,7 +268,8 @@ function performNinjutsuStrike() {
   let finalDamage = Math.max(10, rawDamage - Math.floor(enemyCharacter.stats.defense * 0.2));
   
   enemyCharacter.hp = Math.max(0, enemyCharacter.hp - finalDamage);
-  document.getElementById('enemy-fill-bar').style.width = `${(enemyCharacter.hp / enemyCharacter.maxHp) * 100}%`;
+  const enemyBar = document.getElementById('enemy-fill-bar');
+  if (enemyBar) enemyBar.style.width = `${(enemyCharacter.hp / enemyCharacter.maxHp) * 100}%`;
 
   if (enemyCharacter.hp <= 0) {
     battleState.isBattleOver = true;
@@ -223,7 +283,8 @@ function performNinjutsuStrike() {
   let enemyFinalDmg = Math.max(5, enemyRawDmg - Math.floor(playerCharacter.stats.defense * 0.2));
   
   playerCharacter.hp = Math.max(0, playerCharacter.hp - enemyFinalDmg);
-  document.getElementById('player-fill-bar').style.width = `${(playerCharacter.hp / playerCharacter.maxHp) * 100}%`;
+  const playerBar = document.getElementById('player-fill-bar');
+  if (playerBar) playerBar.style.width = `${(playerCharacter.hp / playerCharacter.maxHp) * 100}%`;
 
   if (playerCharacter.hp <= 0) {
     battleState.isBattleOver = true;
@@ -241,7 +302,8 @@ function performChakraRestore() {
   playerCharacter.hp = Math.min(playerCharacter.maxHp, playerCharacter.hp + 100);
   
   updateHUD();
-  document.getElementById('player-fill-bar').style.width = `${(playerCharacter.hp / playerCharacter.maxHp) * 100}%`;
+  const playerBar = document.getElementById('player-fill-bar');
+  if (playerBar) playerBar.style.width = `${(playerCharacter.hp / playerCharacter.maxHp) * 100}%`;
   logMessage("💧 Focused breathing. Restored 300 Chakra and recovered health.");
 }
 
@@ -251,51 +313,62 @@ function performFlee() {
   playerCharacter.powerPool = playerCharacter.maxPowerPool;
   battleState.isBattleOver = false;
 
-  document.getElementById('player-fill-bar').style.width = '100%';
-  document.getElementById('enemy-fill-bar').style.width = '100%';
+  const playerBar = document.getElementById('player-fill-bar');
+  const enemyBar = document.getElementById('enemy-fill-bar');
+  if (playerBar) playerBar.style.width = '100%';
+  if (enemyBar) enemyBar.style.width = '100%';
+
   updateHUD();
-  logMessage("💨 Successfully fled from battle. Ready to try again.");
+  logMessage("💨 Successfully fled from battle back to open territory.");
 }
 
 function updateHUD() {
-  document.getElementById('hud-chakra').textContent = `${playerCharacter.powerPool}/${playerCharacter.maxPowerPool}`;
-  document.getElementById('hud-ryo').textContent = battleState.ryo.toLocaleString();
-  document.getElementById('hud-rank').textContent = playerCharacter.rank;
+  const ryoEl = document.getElementById('hud-ryo');
+  const chakraEl = document.getElementById('hud-chakra');
+  const rankEl = document.getElementById('hud-rank');
 
-  // Update Player Card Display & Artwork
-  document.getElementById('player-pl-display').textContent = playerCharacter.getPowerLevel();
-  document.getElementById('player-nin-display').textContent = playerCharacter.stats.ninjutsu;
-  document.getElementById('player-title').textContent = playerCharacter.name.toUpperCase();
-  document.getElementById('player-name-label').textContent = playerCharacter.name.toUpperCase();
-  document.getElementById('player-header-tag').textContent = playerCharacter.rank.toUpperCase();
-  document.getElementById('player-art').style.background = `url('${playerCharacter.image}') center/cover no-repeat`;
+  if (ryoEl) ryoEl.textContent = battleState.ryo.toLocaleString();
+  if (chakraEl) chakraEl.textContent = `${playerCharacter.powerPool}/${playerCharacter.maxPowerPool}`;
+  if (rankEl) rankEl.textContent = playerCharacter.rank;
 
-  // Update Enemy Card Display & Artwork
-  document.getElementById('enemy-pl-display').textContent = enemyCharacter.getPowerLevel();
-  document.getElementById('enemy-nin-display').textContent = enemyCharacter.stats.ninjutsu;
-  document.getElementById('enemy-title').textContent = enemyCharacter.name.toUpperCase();
-  document.getElementById('enemy-name-label').textContent = enemyCharacter.name.toUpperCase();
-  document.getElementById('enemy-header-tag').textContent = enemyCharacter.rank.toUpperCase();
-  document.getElementById('enemy-art').style.background = `url('${enemyCharacter.image}') center/cover no-repeat`;
+  // Update Player Card Elements if present in DOM
+  const pPl = document.getElementById('player-pl-display');
+  if (pPl) {
+    document.getElementById('player-pl-display').textContent = playerCharacter.getPowerLevel();
+    document.getElementById('player-nin-display').textContent = playerCharacter.stats.ninjutsu;
+    document.getElementById('player-title').textContent = playerCharacter.name.toUpperCase();
+    document.getElementById('player-name-label').textContent = playerCharacter.name.toUpperCase();
+    document.getElementById('player-header-tag').textContent = playerCharacter.rank.toUpperCase();
+    document.getElementById('player-art').style.background = `url('${playerCharacter.image}') center/cover no-repeat`;
+
+    document.getElementById('enemy-pl-display').textContent = enemyCharacter.getPowerLevel();
+    document.getElementById('enemy-nin-display').textContent = enemyCharacter.stats.ninjutsu;
+    document.getElementById('enemy-title').textContent = enemyCharacter.name.toUpperCase();
+    document.getElementById('enemy-name-label').textContent = enemyCharacter.name.toUpperCase();
+    document.getElementById('enemy-header-tag').textContent = enemyCharacter.rank.toUpperCase();
+    document.getElementById('enemy-art').style.background = `url('${enemyCharacter.image}') center/cover no-repeat`;
+  }
 }
 
-// 7. Initialization & Listeners
-document.addEventListener("DOMContentLoaded", () => {
-  updateHUD();
-
+// Particle Generation Helper
+function initParticles() {
   const particleContainer = document.getElementById('particle-container');
-  if (particleContainer) {
-    for (let i = 0; i < 20; i++) {
+  if (particleContainer && particleContainer.children.length === 0) {
+    for (let i = 0; i < 15; i++) {
       const p = document.createElement('div');
       p.className = 'particle';
-      const size = Math.random() * 4 + 2;
+      const size = Math.random() * 3 + 2;
       p.style.width = size + 'px';
       p.style.height = size + 'px';
       p.style.left = Math.random() * 100 + '%';
-      p.style.top = Math.random() * 100 + '%';
-      p.style.animationDuration = (Math.random() * 5 + 5) + 's';
-      p.style.animationDelay = Math.random() * 5 + 's';
+      p.style.top = (Math.random() * 50 + 50) + '%';
+      p.style.animationDuration = (Math.random() * 4 + 4) + 's';
+      p.style.animationDelay = Math.random() * 3 + 's';
       particleContainer.appendChild(p);
     }
   }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  updateHUD();
 });
