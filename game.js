@@ -58,6 +58,11 @@ function showPage(pageId) {
     }
   });
   
+  // Refresh difficulty list automatically if navigating to it
+  if (pageId === "difficulty-page") {
+    initDifficulty();
+  }
+  
   resetInactivityTimer();
 }
 
@@ -112,50 +117,60 @@ function goBackToDifficulty() { showPage("difficulty-page"); }
 function goBackToVillage() { showPage("village-page"); }
 
 /* -----------------------------
-   DIFFICULTY SELECTION
+   DIFFICULTY SELECTION (UPDATED)
    ----------------------------- */
+const DIFFICULTIES = [
+  { id: "academy", name: "Academy Student", file: "Academy Student.png", desc: "Basic training, simple survival.", unlocked: true },
+  { id: "genin", name: "Genin", file: "Genin.png", desc: "It's called Easy, but it's still going to take concentration.", unlocked: false },
+  { id: "chunin", name: "Chunin", file: "Chunin.png", desc: "A tougher test of tactical ninja prowess.", unlocked: false },
+  { id: "jonin", name: "Jonin", file: "Jonin.png", desc: "Advanced combat for experienced fighters.", unlocked: false },
+  { id: "anbu", name: "Anbu", file: "Anbu.png", desc: "Elite operations in the shadows.", unlocked: false },
+  { id: "kage", name: "Kage", file: "Kage.png", desc: "The ultimate leadership challenge.", unlocked: false },
+  { id: "akatsuki", name: "Akatsuki", file: "Akatsuki.png", desc: "Dangerous rogue entities.", unlocked: false },
+  { id: "specialjonin", name: "Special Jonin", file: "Special Jonin.png", desc: "Specialized high-risk missions.", unlocked: false },
+  { id: "jinchuriki", name: "Jinchuriki", file: "Jinchuriki.png", desc: "Unleash overwhelming tailed-beast power.", unlocked: false }
+];
+
 function initDifficulty() {
-  const levels = qsa(".difficulty-level");
+  const container = $("difficulty-list-container");
+  if (!container) return;
 
-  levels.forEach(el => {
-    const level = el.dataset.level;
+  container.innerHTML = "";
 
-    el.addEventListener("click", () => {
-      handleDifficultySelection(el, level);
-    });
-
-    el.addEventListener("dblclick", () => {
-      handleDifficultySelection(el, level);
-      if (!el.classList.contains("disabled") && !el.classList.contains("locked")) {
-        showPage("village-page");
-        renderVillageList();
-      }
-    });
+  DIFFICULTIES.forEach((diff) => {
+    const row = document.createElement("div");
+    row.className = `diff-row ${diff.unlocked ? "" : "locked"}`;
+    
+    row.innerHTML = `
+      <div class="diff-info">
+        <img src="Assets/Icons/${diff.file}" alt="${diff.name}" onerror="this.src='Assets/Icons/Academy Student.png'">
+        <div class="diff-text">
+          <h4>${diff.name}</h4>
+          <p>${diff.desc}</p>
+        </div>
+      </div>
+      <div class="diff-action">
+        <button class="primary" ${!diff.unlocked ? "disabled" : ""} onclick="selectDifficultyLevel('${diff.id}')">
+          ${diff.unlocked ? "Select →" : "Locked"}
+        </button>
+      </div>
+    `;
+    container.appendChild(row);
   });
 }
 
-function handleDifficultySelection(el, level) {
-  if (el.classList.contains("disabled") && level !== "academy") {
-    alert("Only Academy Student is playable right now.");
+function selectDifficultyLevel(levelId) {
+  const diffObj = DIFFICULTIES.find(d => d.id === levelId);
+  if (!diffObj || !diffObj.unlocked) {
+    alert("This difficulty is locked.");
     return;
   }
 
-  if (el.classList.contains("locked") || el.classList.contains("paid-level")) {
-    const wants = confirm("This is a Premium difficulty. Would you like to unlock it?");
-    if (!wants) return;
-    
-    el.classList.remove("locked", "paid-level", "disabled");
-    alert(`${level.toUpperCase()} difficulty unlocked!`);
-  }
-
-  qsa(".difficulty-level").forEach(x => x.classList.remove("selected"));
-  el.classList.add("selected");
-
-  App.selectedDifficulty = level;
-  localStorage.setItem("shinobi_selectedDifficulty", level);
+  App.selectedDifficulty = levelId;
+  localStorage.setItem("shinobi_selectedDifficulty", levelId);
 
   showPage("village-page");
-  renderVillageList();
+  if (typeof renderVillageList === "function") renderVillageList();
 }
 
 /* -----------------------------
@@ -285,7 +300,7 @@ function updateMainPlayerProfile(ninjaName) {
     } else {
       imgEl.src = `Assets/Icons/${ninjaName}.png`;
       imgEl.onerror = () => { 
-        imgEl.src = "Assets/Icons/Academy student.png"; 
+        imgEl.src = "Assets/Icons/Academy Student.png"; 
       };
       if (rankEl) rankEl.textContent = "Academy Student";
     }
