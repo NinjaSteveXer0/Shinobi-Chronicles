@@ -307,8 +307,36 @@ function updateMainPlayerProfile(ninjaName) {
 }
 
 /* -----------------------------
-   FLOW PROGRESSION & TRANSITIONS
+   FLOW PROGRESSION: SUMMARY -> TREASURES -> STORY
    ----------------------------- */
+function goToSummaryPage() {
+  if (!App.selectedNinja) {
+    alert("Please select a ninja first.");
+    return;
+  }
+
+  if ($("summary-ninja-name")) $("summary-ninja-name").textContent = App.selectedNinja;
+  if ($("summary-ninja-rank")) $("summary-ninja-rank").textContent = App.selectedNinja === "Shadow Ninja" ? "Anbu" : "Genin";
+  if ($("summary-village-name")) $("summary-village-name").textContent = App.selectedVillage || "Leaf";
+  if ($("summary-difficulty-name")) $("summary-difficulty-name").textContent = App.selectedDifficulty || "Academy Student";
+
+  const summaryImg = $("summary-ninja-img");
+  if (summaryImg) {
+    if (App.selectedNinja === "Shadow Ninja") {
+      summaryImg.src = "Assets/Animated Cards/Shadow Ninja.png";
+    } else {
+      summaryImg.src = `Assets/Icons/${App.selectedNinja}.png`;
+      summaryImg.onerror = () => { summaryImg.src = "Assets/Icons/Academy Student.png"; };
+    }
+  }
+
+  showPage("summary-page");
+}
+
+function goToTreasuresPage() {
+  showPage("treasures-page");
+}
+
 function goToStoryPage() {
   const convo = [
     `${App.selectedNinja}: "I’m ready, sensei."`,
@@ -330,7 +358,15 @@ function goToStoryPage() {
 }
 
 /* -----------------------------
-   BATTLE OVERLAY & DYNAMIC ANIMATIONS
+   CHARACTER MODELS & CUSTOM PL
+   ----------------------------- */
+const shadowNinja = {
+  name: "Shadow Ninja",
+  getPowerLevel() { return 10; }
+};
+
+/* -----------------------------
+   BATTLE OVERLAY & UI TRIGGERS
    ----------------------------- */
 function openBattleOverlay() {
   const overlay = $("battle-overlay");
@@ -343,16 +379,17 @@ function openBattleOverlay() {
 
   const playerImg = $("battle-player-img");
   const playerName = $("battle-player-name");
+  
   if (playerImg) {
     playerImg.className = "fighter-wrapper";
     playerImg.src = App.selectedNinja === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${App.selectedNinja || 'Academy Student'}.png`;
     playerImg.onerror = () => { playerImg.src = "Assets/Icons/Academy Student.png"; };
   }
+  
   if (playerName) {
     playerName.textContent = App.selectedNinja || "Shadow Ninja";
   }
 
-  // Set initial player PL based on selected ninja
   const currentPL = App.selectedNinja === "Shadow Ninja" ? 10 : 5;
   if ($("ui-player-pl")) $("ui-player-pl").innerText = currentPL;
   if ($("ui-enemy-pl")) $("ui-enemy-pl").innerText = 50;
@@ -403,7 +440,6 @@ async function triggerActiveBattle() {
     powerLevel: 50
   };
 
-  // Restrict squad strictly to the user's chosen ninja
   let activeNinjaName = App.selectedNinja || "Shadow Ninja";
   let activeNinjaPL = activeNinjaName === "Shadow Ninja" ? 10 : 5;
   let activeNinjaAsset = activeNinjaName === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${activeNinjaName}.png`;
@@ -426,7 +462,7 @@ async function triggerActiveBattle() {
 
   await new Promise(r => setTimeout(r, 400));
 
-  // Player Attack Lunge
+  // Player Attack Lunge & Enemy Shake
   if (playerImg) playerImg.classList.add("lunge-forward");
   if (enemyContainer) enemyContainer.classList.add("enemy-hit");
 
@@ -456,145 +492,6 @@ async function triggerActiveBattle() {
       logContainer.innerHTML += `<p style="color: #ef4444; font-weight: bold;">❌ DEFEAT! Boss survived with ${currentBossHP} PL. Train harder!</p>`;
       logContainer.scrollTop = logContainer.scrollHeight;
     }
-  }
-}
-
-/* -----------------------------
-   CHARACTER MODELS & CUSTOM PL BATTLE SYSTEM
-   ----------------------------- */
-const shadowNinja = {
-  name: "Shadow Ninja",
-  rank: "Academy Student",
-  assetPath: "Assets/Animated Cards/Shadow Ninja.png",
-  stats: { taijutsu: 2, ninjutsu: 3, bukishi: 1, fuinjutsu: 0, kinjutsu: 1, genjutsu: 0, stamina: 3 },
-  getPowerLevel() { return 10; } // Custom PL calculation for active team test
-};
-
-const supportNinjaTwo = {
-  name: "Academy Student Roster",
-  rank: "Academy Student",
-  assetPath: "Assets/Icons/Academy Student.png",
-  stats: { taijutsu: 1, ninjutsu: 1, bukishi: 1, fuinjutsu: 0, kinjutsu: 0, genjutsu: 0, stamina: 2 },
-  getPowerLevel() { return 5; }
-};
-
-/* -----------------------------
-   BATTLE OVERLAY & UI TRIGGERS
-   ----------------------------- */
-function openBattleOverlay() {
-  const overlay = $("battle-overlay");
-  if (overlay) {
-    overlay.classList.remove("hidden");
-    overlay.style.display = "flex";
-  }
-
-  // Get player and enemy wrapper elements
-  const playerImg = $("battle-player-img");
-  const enemyImg = $("battle-enemy-img"); // Make sure your enemy image element has this ID or similar class
-  const playerName = $("battle-player-name");
-
-  // Apply slide-in classes to trigger the CSS animations
-  if (playerImg) {
-    playerImg.classList.remove("fighter-slide-left");
-    void playerImg.offsetWidth; // Trigger reflow to restart animation if re-opened
-    playerImg.classList.add("fighter-slide-left");
-    
-    playerImg.src = App.selectedNinja === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${App.selectedNinja || 'Academy Student'}.png`;
-    playerImg.onerror = () => { playerImg.src = "Assets/Icons/Academy Student.png"; };
-  }
-
-  if (enemyImg) {
-    enemyImg.classList.remove("fighter-slide-right");
-    void enemyImg.offsetWidth;
-    enemyImg.classList.add("fighter-slide-right");
-  }
-
-  if (playerName) {
-    playerName.textContent = App.selectedNinja || "Shadow Ninja";
-  }
-
-  const currentPL = shadowNinja.getPowerLevel();
-  if ($("ui-player-pl")) $("ui-player-pl").innerText = currentPL;
-  if ($("ui-enemy-pl")) $("ui-enemy-pl").innerText = 50;
-
-  updateModernHealthBar(50, 50);
-
-  if ($("ui-battle-log")) {
-    $("ui-battle-log").innerHTML = `<p>Mission loaded. Click FIGHT to begin sequential attrition!</p>`;
-  }
-}
-/* Custom Turn-by-Turn Sequential Attrition with Character Drop & Slide-In */
-async function triggerActiveBattle() {
-  const testBoss = {
-    name: "Jonin Sasuke",
-    maxPL: 50,
-    powerLevel: 50
-  };
-
-  // Example team lineup based on user specification
-  let playerTeam = [shadowNinja, supportNinjaTwo];
-  let logContainer = $("ui-battle-log");
-  if (logContainer) logContainer.innerHTML = `<p>--- BATTLE STARTED: VS ${testBoss.name} (PL: ${testBoss.powerLevel}) ---</p>`;
-
-  let currentBossHP = testBoss.powerLevel;
-
-  for (let i = 0; i < playerTeam.length; i++) {
-    let activeNinja = playerTeam[i];
-    let damageToDeal = activeNinja.getPowerLevel();
-
-    // Update UI profile for active ninja
-    const playerImg = $("battle-player-img");
-    const playerName = $("battle-player-name");
-    const playerPL = $("ui-player-pl");
-
-    if (playerName) playerName.textContent = activeNinja.name;
-    if (playerPL) playerPL.innerText = damageToDeal;
-    if (playerImg) {
-      playerImg.src = activeNinja.assetPath;
-      playerImg.classList.remove("drop-out");
-      playerImg.classList.add("slide-in");
-    }
-
-    await new Promise(r => setTimeout(r, 600));
-
-    // Deal damage
-    currentBossHP -= damageToDeal;
-    showFloatingDamage(damageToDeal);
-    updateModernHealthBar(currentBossHP, testBoss.maxPL);
-
-    if (logContainer) {
-      logContainer.innerHTML += `<p>⚔️ ${activeNinja.name} attacks for <strong>${damageToDeal}</strong> damage! Boss HP left: ${Math.max(0, currentBossHP)}</p>`;
-      logContainer.scrollTop = logContainer.scrollHeight;
-    }
-
-    await new Promise(r => setTimeout(r, 1000));
-
-    // Check Victory
-    if (currentBossHP <= 0) {
-      if (logContainer) {
-        logContainer.innerHTML += `<p style="color: #4ade80; font-weight: bold;">🎉 VICTORY! Boss defeated by ${activeNinja.name}!</p>`;
-        logContainer.scrollTop = logContainer.scrollHeight;
-      }
-      return;
-    }
-
-    // Drop current ninja off-screen before next one steps in
-    if (playerImg) {
-      playerImg.classList.remove("slide-in");
-      playerImg.classList.add("drop-out");
-    }
-    
-    if (logContainer) {
-      logContainer.innerHTML += `<p style="color: #f87171;">💀 ${activeNinja.name} is exhausted and drops back...</p>`;
-      logContainer.scrollTop = logContainer.scrollHeight;
-    }
-
-    await new Promise(r => setTimeout(r, 700));
-  }
-
-  if (currentBossHP > 0 && logContainer) {
-    logContainer.innerHTML += `<p style="color: #ef4444; font-weight: bold;">❌ DEFEAT! Your team ran out of ninjas. Boss survived with ${currentBossHP} PL.</p>`;
-    logContainer.scrollTop = logContainer.scrollHeight;
   }
 }
 
