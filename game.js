@@ -30,9 +30,10 @@ function resetInactivityTimer() {
 });
 
 /* -----------------------------
-   PAGE NAVIGATION
+   PAGE NAVIGATION (FIXED)
    ----------------------------- */
 function showPage(pageId) {
+  // Target all sections/page panels in the application
   const pages = [
     "login-page",
     "journey-page",
@@ -45,7 +46,16 @@ function showPage(pageId) {
   pages.forEach(id => {
     const el = $(id);
     if (!el) return;
-    el.classList.toggle("hidden", id !== pageId);
+    
+    if (id === pageId) {
+      el.classList.remove("hidden");
+      el.classList.add("active");
+      el.style.display = "block"; // Force display override
+    } else {
+      el.classList.add("hidden");
+      el.classList.remove("active");
+      el.style.display = "none"; // Force hide override
+    }
   });
   
   resetInactivityTimer();
@@ -301,11 +311,12 @@ function startGame() {
   if ($("conversation-text")) {
     $("conversation-text").innerHTML = convo.map(line => `<div>${line}</div>`).join("");
   }
-  modal.classList.remove("hidden");
+  if (modal) modal.classList.remove("hidden");
 }
 
 function closeStartModal() {
-  $("start-modal").classList.add("hidden");
+  const modal = $("start-modal");
+  if (modal) modal.classList.add("hidden");
 }
 
 function beginFirstBattle() {
@@ -323,7 +334,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const savedUser = localStorage.getItem("shinobi_username");
   if (savedUser) {
     App.user = savedUser;
-    $("header-user").textContent = `Logged in as: ${savedUser}`;
+    if ($("header-user")) $("header-user").textContent = `Logged in as: ${savedUser}`;
     showPage("journey-page");
   } else {
     showPage("login-page");
