@@ -485,6 +485,92 @@ async function triggerActiveBattle() {
 }
 
 /* -----------------------------
+   GAME BATTLE SYSTEM LOGIC
+   ----------------------------- */
+let battleState = {
+  playerHp: 100,
+  playerMaxHp: 100,
+  enemyHp: 100,
+  enemyMaxHp: 100,
+  chakra: 850,
+  maxChakra: 850,
+  ryo: 14500,
+  isBattleOver: false
+};
+
+function logMessage(msg, color = "#00D9E8") {
+  const log = document.getElementById('combat-log');
+  if (log) {
+    log.style.color = color;
+    log.innerHTML = msg;
+  }
+}
+
+function performNinjutsuStrike() {
+  if (battleState.isBattleOver) return;
+
+  if (battleState.chakra < 150) {
+    logMessage("⚠️ Not enough Chakra! Use Chakra Restore.", "#E53935");
+    return;
+  }
+
+  battleState.chakra -= 150;
+  if ($('hud-chakra')) $('hud-chakra').textContent = `${battleState.chakra}/${battleState.maxChakra}`;
+
+  let playerDamage = Math.floor(Math.random() * 25) + 35;
+  battleState.enemyHp = Math.max(0, battleState.enemyHp - playerDamage);
+  let enemyHpPercent = (battleState.enemyHp / battleState.enemyMaxHp) * 100;
+  if ($('enemy-fill-bar')) $('enemy-fill-bar').style.width = enemyHpPercent + '%';
+
+  if (battleState.enemyHp <= 0) {
+    battleState.isBattleOver = true;
+    battleState.ryo += 1200;
+    if ($('hud-ryo')) $('hud-ryo').textContent = battleState.ryo.toLocaleString();
+    logMessage("🎉 VICTORY! Jonin Sasuke has been defeated. Gained 1,200 Ryo!", "#D6A93A");
+    return;
+  }
+
+  let enemyDamage = Math.floor(Math.random() * 15) + 20;
+  battleState.playerHp = Math.max(0, battleState.playerHp - enemyDamage);
+  let playerHpPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
+  if ($('player-fill-bar')) $('player-fill-bar').style.width = playerHpPercent + '%';
+
+  if (battleState.playerHp <= 0) {
+    battleState.isBattleOver = true;
+    logMessage("💀 DEFEAT... Your Shadow Ninja fell in battle.", "#E53935");
+    return;
+  }
+
+  logMessage(`⚡ Ninjutsu strike dealt ${playerDamage} damage! Sasuke counters for ${enemyDamage}.`);
+}
+
+function performChakraRestore() {
+  if (battleState.isBattleOver) return;
+
+  battleState.chakra = Math.min(battleState.maxChakra, battleState.chakra + 300);
+  battleState.playerHp = Math.min(battleState.playerMaxHp, battleState.playerHp + 15);
+  
+  if ($('hud-chakra')) $('hud-chakra').textContent = `${battleState.chakra}/${battleState.maxChakra}`;
+  let playerHpPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
+  if ($('player-fill-bar')) $('player-fill-bar').style.width = playerHpPercent + '%';
+
+  logMessage("💧 Focused breathing. Restored 300 Chakra and recovered minor health.");
+}
+
+function performFlee() {
+  battleState.playerHp = 100;
+  battleState.enemyHp = 100;
+  battleState.chakra = 850;
+  battleState.isBattleOver = false;
+
+  if ($('player-fill-bar')) $('player-fill-bar').style.width = '100%';
+  if ($('enemy-fill-bar')) $('enemy-fill-bar').style.width = '100%';
+  if ($('hud-chakra')) $('hud-chakra').textContent = `850/850`;
+
+  logMessage("💨 Successfully fled from battle. Ready to try again.");
+}
+
+/* -----------------------------
    INITIALIZATION & LISTENERS
    ----------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
@@ -529,92 +615,3 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 });
-// Game Stats Tracking
-    let battleState = {
-      playerHp: 100,
-      playerMaxHp: 100,
-      enemyHp: 100,
-      enemyMaxHp: 100,
-      chakra: 850,
-      maxChakra: 850,
-      ryo: 14500,
-      isBattleOver: false
-    };
-
-    function logMessage(msg, color = "#00D9E8") {
-      const log = document.getElementById('combat-log');
-      if (log) {
-        log.style.color = color;
-        log.innerHTML = msg;
-      }
-    }
-
-    // 1. NINJUTSU STRIKE (Costs 150 Chakra, Deals Damage, Enemy Counterattacks)
-    function performNinjutsuStrike() {
-      if (battleState.isBattleOver) return;
-
-      if (battleState.chakra < 150) {
-        logMessage("⚠️ Not enough Chakra! Use Chakra Restore.", "#E53935");
-        return;
-      }
-
-      // Deduct Chakra
-      battleState.chakra -= 150;
-      document.getElementById('hud-chakra').textContent = `${battleState.chakra}/${battleState.maxChakra}`;
-
-      // Deal damage to enemy
-      let playerDamage = Math.floor(Math.random() * 25) + 35;
-      battleState.enemyHp = Math.max(0, battleState.enemyHp - playerDamage);
-      let enemyHpPercent = (battleState.enemyHp / battleState.enemyMaxHp) * 100;
-      document.getElementById('enemy-fill-bar').style.width = enemyHpPercent + '%';
-
-      if (battleState.enemyHp <= 0) {
-        battleState.isBattleOver = true;
-        battleState.ryo += 1200;
-        document.getElementById('hud-ryo').textContent = battleState.ryo.toLocaleString();
-        logMessage("🎉 VICTORY! Jonin Sasuke has been defeated. Gained 1,200 Ryo!", "#D6A93A");
-        return;
-      }
-
-      // Enemy Counterattack
-      let enemyDamage = Math.floor(Math.random() * 15) + 20;
-      battleState.playerHp = Math.max(0, battleState.playerHp - enemyDamage);
-      let playerHpPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
-      document.getElementById('player-fill-bar').style.width = playerHpPercent + '%';
-
-      if (battleState.playerHp <= 0) {
-        battleState.isBattleOver = true;
-        logMessage("💀 DEFEAT... Your Shadow Ninja fell in battle.", "#E53935");
-        return;
-      }
-
-      logMessage(`⚡ Ninjutsu strike dealt ${playerDamage} damage! Sasuke counters for ${enemyDamage}.`);
-    }
-
-    // 2. CHAKRA RESTORE (Restores Chakra and a bit of HP)
-    function performChakraRestore() {
-      if (battleState.isBattleOver) return;
-
-      battleState.chakra = Math.min(battleState.maxChakra, battleState.chakra + 300);
-      battleState.playerHp = Math.min(battleState.playerMaxHp, battleState.playerHp + 15);
-      
-      document.getElementById('hud-chakra').textContent = `${battleState.chakra}/${battleState.maxChakra}`;
-      let playerHpPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
-      document.getElementById('player-fill-bar').style.width = playerHpPercent + '%';
-
-      logMessage("💧 Focused breathing. Restored 300 Chakra and recovered minor health.");
-    }
-
-    // 3. FLEE (Resets/Escapes Battle)
-    function performFlee() {
-      battleState.playerHp = 100;
-      battleState.enemyHp = 100;
-      battleState.chakra = 850;
-      battleState.isBattleOver = false;
-
-      document.getElementById('player-fill-bar').style.width = '100%';
-      document.getElementById('enemy-fill-bar').style.width = '100%';
-      document.getElementById('hud-chakra').textContent = `850/850`;
-
-      logMessage("💨 Successfully fled from battle. Ready to try again.");
-    }
