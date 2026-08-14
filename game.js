@@ -80,6 +80,64 @@ const shopItems = [
   { id: "flak", name: "Elite Jonin Flak Jacket", desc: "Reinforced woven armor providing high defense.", price: 3500, statBonus: 60 }
 ];
 
+// ----------------------------------------------------
+// REGION HIERARCHY DATA & FUNCTIONS
+// ----------------------------------------------------
+
+const worldRegions = {
+  fire: {
+    name: "Land of Fire",
+    description: "The heartland of the shinobi world, dominated by thick forests and Konohagakure.",
+    locations: [
+      { id: "konoha", name: "Konohagakure Village", type: "safe", desc: "Home base for shopping, roster management, and daily training." },
+      { id: "training_fields", name: "Death Forest & Training Fields", type: "activity", desc: "High-density wildlife and rogue ninja scouting grounds." },
+      { id: "valley_end", name: "Valley of the End", type: "battle", desc: "Legendary battlefield. High-threat boss encounters." }
+    ]
+  },
+  wind: {
+    name: "Land of Wind",
+    description: "Vast desert expanses guarded by Sunagakure and harsh sandstorms.",
+    locations: [
+      { id: "sunagakure", name: "Sunagakure Village", type: "safe", desc: "Hidden Sand stronghold." },
+      { id: "desert_canyon", name: "Howling Sand Canyon", type: "battle", desc: "Ambush zone for rogue puppet masters and missing-nin." }
+    ]
+  }
+};
+
+function openRegionHub(regionKey) {
+  const region = worldRegions[regionKey];
+  if (!region) return;
+  
+  const overlay = document.getElementById('screen-overlay');
+  const container = document.getElementById('overlay-content-container');
+  overlay.style.display = 'flex';
+
+  container.innerHTML = `
+    <h2 style="font-size: 16px; color: #D6A93A; margin-bottom: 5px;">${region.name.toUpperCase()}</h2>
+    <p style="font-size: 12px; color: #94A3B8; margin-bottom: 20px;">${region.description}</p>
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      ${region.locations.map(loc => `
+        <div style="background: #080C10; border: 1px solid #1E293B; border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="color: #FFF; font-size: 13px; font-weight: bold; margin-bottom: 4px;">${loc.name}</div>
+            <div style="color: #94A3B8; font-size: 11px;">${loc.desc}</div>
+          </div>
+          <button class="btn-ninja" style="width: 140px;" onclick="handleLocationAction('${loc.type}')">ENTER</button>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function handleLocationAction(type) {
+  if (type === 'battle' || type === 'activity') {
+    openOverlay('battle');
+  } else {
+    openOverlay('village');
+  }
+}
+// ----------------------------------------------------
+
 let playerCharacter = charactersDatabase.naruto;
 let enemyCharacter = charactersDatabase.sasuke;
 
