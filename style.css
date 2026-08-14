@@ -12,10 +12,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  /* Scalable backdrop that fills extra space on high-res / zoomed-out screens */
-  background: var(--bg-dark) url('Assets/Icons/Academy student.png') center top no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
+  background: var(--bg-dark);
   color: var(--text-main);
   min-height: 100vh;
   display: flex;
@@ -28,11 +25,11 @@ body {
   width: 1000px;
   margin: 20px auto;
   position: relative;
-  background: rgba(7, 34, 37, 0.92);
+  background: rgba(7, 34, 37, 0.98);
   border: 3px solid var(--btn-teal);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
-  overflow: visible; /* Allows breakout character art to hang outside borders */
+  overflow: visible;
 }
 
 /* Header */
@@ -61,7 +58,7 @@ header .user {
 
 /* Page Panels */
 .page-panel {
-  padding: 30px;
+  padding: 40px;
   position: relative;
 }
 
@@ -74,8 +71,8 @@ header .user {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-width: 400px;
-  margin: 0 auto 20px auto;
+  max-width: 420px;
+  margin: 0 auto 24px auto;
   text-align: left;
 }
 
@@ -85,12 +82,24 @@ header .user {
 }
 
 .form-group input {
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-radius: 6px;
   border: 1px solid var(--btn-teal);
   background: #041416;
   color: #fff;
   font-size: 16px;
+}
+
+/* Login Page Button Row Container */
+#login-page {
+  text-align: center;
+}
+
+.login-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 10px;
 }
 
 /* Buttons */

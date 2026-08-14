@@ -14,10 +14,10 @@ const App = {
    INACTIVITY TIMER & PERSISTENCE
    ----------------------------- */
 let inactivityTimer = null;
-const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes in milliseconds
+const INACTIVITY_LIMIT = 15 * 60 * 1000; // 15 minutes
 
 function resetInactivityTimer() {
-  if (!App.user) return; // Don't track if logged out
+  if (!App.user) return;
   clearTimeout(inactivityTimer);
   inactivityTimer = setTimeout(() => {
     alert("You have been logged out due to 15 minutes of inactivity.");
@@ -25,7 +25,6 @@ function resetInactivityTimer() {
   }, INACTIVITY_LIMIT);
 }
 
-// Track user actions for inactivity
 ["mousemove", "keydown", "click", "scroll"].forEach(event => {
   window.addEventListener(event, resetInactivityTimer);
 });
@@ -111,12 +110,10 @@ function initDifficulty() {
   levels.forEach(el => {
     const level = el.dataset.level;
 
-    // Single click for selection
     el.addEventListener("click", () => {
       handleDifficultySelection(el, level);
     });
 
-    // Double click to instantly select and advance to village page
     el.addEventListener("dblclick", () => {
       handleDifficultySelection(el, level);
       if (!el.classList.contains("disabled") && !el.classList.contains("locked")) {
@@ -172,12 +169,10 @@ function renderVillageList() {
     item.className = "grid-item";
     item.textContent = v;
 
-    // Single click
     item.addEventListener("click", () => {
       selectVillage(item, v);
     });
 
-    // Double click to instantly advance
     item.addEventListener("dblclick", () => {
       selectVillage(item, v);
       showPage("ninja-page");
@@ -243,12 +238,10 @@ function renderNinjaGrid() {
     card.className = "grid-item";
     card.textContent = name;
 
-    // Single click
     card.addEventListener("click", () => {
       selectNinja(card, name);
     });
 
-    // Double click to instantly trigger start game modal
     card.addEventListener("dblclick", () => {
       selectNinja(card, name);
       startGame();
@@ -268,7 +261,6 @@ function selectNinja(card, name) {
   updateMainPlayerProfile(name);
 }
 
-/* Update main character portrait on the Ninja ID card */
 function updateMainPlayerProfile(ninjaName) {
   const nameEl = $("main-player-name");
   const imgEl = $("main-player-img");
@@ -279,7 +271,7 @@ function updateMainPlayerProfile(ninjaName) {
   if (imgEl) {
     if (ninjaName === "Shadow Ninja") {
       imgEl.src = "Assets/Animated Cards/Shadow ninja - animated.png";
-      if (rankEl) rankEl.textContent = "Anbu"; // Setting rank profile update for Shadow Ninja
+      if (rankEl) rankEl.textContent = "Anbu";
     } else {
       imgEl.src = `Assets/Icons/${ninjaName}.png`;
       imgEl.onerror = () => { 
@@ -328,7 +320,6 @@ function beginFirstBattle() {
    INITIALIZATION & ENTER KEY LISTENER
    ----------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
-  // Check if user was previously saved in session/local storage
   const savedUser = localStorage.getItem("shinobi_username");
   if (savedUser) {
     App.user = savedUser;
@@ -340,7 +331,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   initDifficulty();
 
-  // Allow pressing Enter to submit login/register when focused on password/username inputs
   const passwordInput = $("password");
   const usernameInput = $("username");
 

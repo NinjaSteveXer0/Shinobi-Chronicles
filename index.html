@@ -1,71 +1,168 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shinobi Chronicles</title>
-    <link rel="stylesheet" href="style.css?v=1.0">
+  <meta charset="utf-8" />
+  <title>Shinobi Chronicles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="app">
+    <header>
+      <h1>Shinobi Chronicles</h1>
+      <div class="user" id="header-user">Not signed in</div>
+    </header>
 
-    <!-- FIXED-WIDTH APP CONTAINER (Matches .app in your CSS) -->
-    <div class="app">
-
-        <!-- Header -->
-        <header>
-            <h1>Shinobi Chronicles</h1>
-            <div class="user">Not signed in</div>
-        </header>
-
-        <!-- Login / Register Page Panel -->
-        <div class="page-panel" id="login-page">
-            
-            <form id="login-form">
-                
-                <div class="form-group">
-                    <label for="username">Username</label>
-                    <input type="text" id="username" value="stephenmurray91@hotmail.co.uk" placeholder="Enter username" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" value="12345678" placeholder="Enter password" required>
-                </div>
-
-                <button type="submit" class="primary">Login</button>
-                <button type="button" class="ghost">Register</button>
-
-            </form>
-
-        </div>
-
-        <!-- Difficulty Path Page Panel -->
-        <div class="page-panel hidden" id="difficulty-page">
-            <h2>Select Difficulty</h2>
-            
-            <div class="difficulty-path" id="difficulty-path">
-                <!-- Rock icons will load here from game.js -->
-            </div>
-
-            <div class="controls-bar">
-                <span class="hint-text">Select a level to proceed</span>
-                <button class="primary" id="start-game-btn" disabled>Start Game</button>
-            </div>
-        </div>
-
+    <!-- 1. LOGIN PAGE -->
+    <div id="login-page" class="page-panel">
+      <h2>Login / Register</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Ninja name">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Password">
+      </div>
+      <div class="login-actions">
+        <button class="primary" onclick="login()">Login</button>
+        <button class="ghost" onclick="register()">Register</button>
+      </div>
     </div>
 
-    <!-- Modal Overlay -->
-    <div class="modal-overlay hidden" id="modal">
-        <div class="modal-card">
-            <h3 id="modal-title">Modal Title</h3>
-            <div class="conversation-box" id="modal-content">
-                Conversation text goes here...
-            </div>
-            <button class="ghost" id="modal-close-btn">Close</button>
+    <!-- 2. JOURNEY PAGE (POLISHED NINJA ID CARD) -->
+    <div id="journey-page" class="page-panel hidden" style="text-align: center;">
+      <h2>Ninja ID Card</h2>
+      
+      <div class="profile-card" style="margin: 20px auto; max-width: 780px; padding: 28px; background: rgba(14, 64, 66, 0.12); border-radius: 12px; border: 2px solid var(--btn-teal); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); display: flex; gap: 24px; align-items: center;">
+        
+        <div style="width: 240px; background: #07282b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+          <div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
+            <img id="main-player-img" src="Assets/Icons/Academy student.png" alt="Main Character" style="width: 100%; height: 100%; object-fit: cover;">
+          </div>
+          <div style="width: 100%; background: #021214; border: 1px solid rgba(255,215,0,0.4); border-radius: 4px; padding: 6px 4px; margin-top: 10px; text-align: center;">
+            <span id="main-player-name" style="font-size: 14px; font-weight: bold; color: #ffd700; text-shadow: 0 1px 2px rgba(0,0,0,0.8); display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">No Ninja Chosen</span>
+          </div>
         </div>
+
+        <div style="flex: 1; background: #0d383b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: center; text-align: left; font-size: 15px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+          <div style="color: #cbd5e1;"><strong>Ninja Village:</strong></div>
+          <div id="id-village" style="color: #ffffff; font-weight: bold;">Unassigned</div>
+
+          <div style="color: #cbd5e1;"><strong>Ninja Rank:</strong></div>
+          <div id="id-rank" style="color: #ffd700; font-weight: bold;">Academy Student</div>
+
+          <div style="color: #cbd5e1;"><strong>Ninja Level:</strong></div>
+          <div id="id-level" style="color: #38bdf8; font-weight: bold;">Lvl 1</div>
+
+          <div style="color: #cbd5e1;"><strong>Rogue Ninja Defeated:</strong></div>
+          <div id="id-rogue-defeated" style="color: #f87171; font-weight: bold;">0</div>
+
+          <div style="color: #cbd5e1;"><strong>Power Level:</strong></div>
+          <div id="id-power-level" style="color: #fbbf24; font-weight: bold;">Locked</div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 24px;">
+        <button class="primary" onclick="showPage('difficulty-page')">Select Difficulty →</button>
+        <button class="ghost" onclick="goBackToLogin()">Logout</button>
+      </div>
     </div>
 
-    <script src="game.js"></script>
+    <!-- 3. DIFFICULTY PAGE -->
+    <div id="difficulty-page" class="page-panel hidden">
+      <h2>Select Difficulty</h2>
+      
+      <div class="difficulty-path" id="difficulty-canvas">
+        <div id="academy" class="difficulty-level" data-level="academy" style="left: 12%; top: 78%;">
+          <img src="Assets/Icons/Academy student.png" alt="Academy Student" class="rock-icon">
+          <div class="difficulty-info">Academy Student</div>
+        </div>
+
+        <div id="genin" class="difficulty-level disabled" data-level="genin" style="left: 36%; top: 78%;">
+          <img src="Assets/Icons/Genin.png" alt="Genin" class="rock-icon">
+          <div class="difficulty-info">Genin</div>
+        </div>
+
+        <div id="chunin" class="difficulty-level disabled" data-level="chunin" style="left: 60%; top: 78%;">
+          <img src="Assets/Icons/Chunin.png" alt="Chunin" class="rock-icon">
+          <div class="difficulty-info">Chunin</div>
+        </div>
+
+        <div id="akatsuki" class="difficulty-level paid-level locked" data-level="akatsuki" style="left: 84%; top: 78%;">
+          <img src="Assets/Icons/Akatsuki.png" alt="Akatsuki" class="rock-icon">
+          <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
+        </div>
+
+        <div id="specialjonin" class="difficulty-level paid-level locked" data-level="specialjonin" style="left: 84%; top: 50%;">
+          <img src="Assets/Icons/Special Jonin.png" alt="Special Jōnin" class="rock-icon">
+          <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
+        </div>
+
+        <div id="jinchuriki" class="difficulty-level paid-level locked" data-level="jinchuriki" style="left: 84%; top: 22%;">
+          <img src="Assets/Icons/Jinchuriki.png" alt="Jinchūriki" class="rock-icon">
+          <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
+        </div>
+
+        <div id="jonin" class="difficulty-level disabled" data-level="jonin" style="left: 60%; top: 22%;">
+          <img src="Assets/Icons/Jonin.png" alt="Jōnin" class="rock-icon">
+          <div class="difficulty-info">Jōnin</div>
+        </div>
+
+        <div id="anbu" class="difficulty-level disabled" data-level="anbu" style="left: 36%; top: 22%;">
+          <img src="Assets/Icons/Anbu.png" alt="ANBU" class="rock-icon">
+          <div class="difficulty-info">ANBU</div>
+        </div>
+
+        <div id="kage" class="difficulty-level disabled" data-level="kage" style="left: 12%; top: 22%;">
+          <img src="Assets/Icons/Kage.png" alt="Kage" class="rock-icon">
+          <div class="difficulty-info">Kage</div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <button class="ghost" onclick="goBackToJourney()">← Back</button>
+        <span class="hint-text">Only Academy Student is selectable right now. (Double-click items to continue!)</span>
+      </div>
+    </div>
+
+    <!-- 4. VILLAGE SELECTION PAGE -->
+    <div id="village-page" class="page-panel hidden">
+      <h2>Select Village</h2>
+      <div id="village-list" class="grid-container"></div>
+      <div style="margin-top:16px;">
+        <button class="ghost" onclick="goBackToDifficulty()">← Back</button>
+        <button id="to-ninja-btn" class="primary" disabled onclick="goToNinjaSelection()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- 5. NINJA SELECTION PAGE -->
+    <div id="ninja-page" class="page-panel hidden">
+      <h2>Select Your Character</h2>
+      <div id="ninja-village-label" style="color: var(--accent); font-weight: bold; margin-bottom: 12px;"></div>
+      <div id="ninja-grid" class="grid-container"></div>
+      <div style="margin-top:16px;">
+        <button class="ghost" onclick="goBackToVillage()">← Back</button>
+        <button id="start-game-btn" class="primary" disabled onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+
+    <!-- 6. IN-GAME VILLAGE HUB -->
+    <div id="game-village" class="page-panel hidden">
+      <h2 id="hub-village-name">Village Hub</h2>
+      <p>Welcome to the ninja world!</p>
+      <button class="ghost" onclick="goBackToLogin()">Quit to Main Menu</button>
+    </div>
+
+    <!-- START CONVERSATION MODAL -->
+    <div id="start-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h3>Beginning Training</h3>
+        <div id="conversation-text" class="conversation-box"></div>
+        <button class="primary" onclick="beginFirstBattle()">Begin First Battle</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js" defer></script>
 </body>
 </html>
