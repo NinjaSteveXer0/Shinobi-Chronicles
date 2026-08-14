@@ -458,3 +458,88 @@ button.ghost:hover {
   background: #D6A93A;
   box-shadow: 0 0 10px #D6A93A;
 }
+/* ==========================================
+       POINT 2: ENHANCED CHARACTER CARD SYSTEM
+       ========================================== */
+    .character-card-frame {
+      width: 190px;
+      height: 270px;
+      background: linear-gradient(145deg, #080C10, #040608);
+      border-radius: 10px;
+      border: 2px solid #082B30;
+      overflow: hidden;
+      position: relative;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Rarity Tiers */
+    .card-rarity-legendary {
+      border-color: #D6A93A !important; /* Ninja Gold */
+      box-shadow: 0 0 20px rgba(214, 169, 58, 0.35);
+    }
+
+    .card-rarity-rare {
+      border-color: #00D9E8 !important; /* Chakra Cyan */
+      box-shadow: 0 0 20px rgba(0, 217, 232, 0.35);
+    }
+
+    .character-card-frame:hover {
+      transform: translateY(-6px) scale(1.02);
+    }
+
+    /* Inner Card Layout */
+    .card-header-tag {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(8, 12, 16, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: bold;
+      color: #D6A93A;
+      z-index: 3;
+    }
+
+    .card-art-container {
+      width: 100%;
+      height: 70%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-art-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-footer-stats {
+      height: 30%;
+      background: rgba(8, 12, 16, 0.95);
+      border-top: 1px solid #082B30;
+      padding: 8px 10px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+    }
+
+    .card-title {
+      font-size: 12px;
+      font-weight: bold;
+      color: #FFFFFF;
+      letter-spacing: 0.5px;
+    }
+
+    .card-stats-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #8899A6;
+    }
+
+    .card-stats-row span b {
+      color: #00D9E8;
+    }
