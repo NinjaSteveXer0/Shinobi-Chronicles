@@ -2,40 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shinobi Chronicles: World of Ninja</title>
+  <title>Shinobi Chronicles</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- MAIN APP CONTAINER -->
   <div class="game-container">
-    
-    <!-- TOP NAVIGATION BAR -->
+    <!-- TOP HEADER -->
     <header class="game-header">
       <div class="header-brand">
         <span class="brand-logo">🍥</span>
-        <div class="brand-text">
+        <div>
           <h1 class="brand-title">SHINOBI CHRONICLES</h1>
           <span class="brand-subtitle">忍者年代記</span>
         </div>
       </div>
-
-      <nav class="header-nav-tabs">
+      <div class="header-nav-tabs">
         <button class="nav-btn active" onclick="openOverlay('village')">VILLAGE</button>
         <button class="nav-btn" onclick="openOverlay('missions')">MISSIONS</button>
         <button class="nav-btn" onclick="openOverlay('battle')">ARENA</button>
-        <button class="nav-btn" onclick="openOverlay('exams')">EXAMS</button>
-        <button class="nav-btn" onclick="openOverlay('practical')">PRACTICAL</button>
-        <button class="nav-btn" onclick="openOverlay('group')">GROUP</button>
-        <button class="nav-btn" onclick="openOverlay('defend')">DEFEND</button>
-        <button class="nav-btn" onclick="openOverlay('kage')">KAGE</button>
-      </nav>
-
+      </div>
       <div class="header-right">
-        <div class="currency-display"><span>RYO:</span> <b id="hud-ryo">14,500</b></div>
-        <div class="currency-display"><span>CHAKRA:</span> <b id="hud-chakra">1200/1200</b></div>
-        <div class="currency-display"><span>RANK:</span> <b id="hud-rank">Kage</b></div>
+        <div class="currency-display"><span>RYO:</span> <b>14,500</b></div>
+        <div class="currency-display"><span>CHAKRA:</span> <b>1200/1200</b></div>
+        <div class="currency-display"><span>RANK:</span> <b style="color: #D6A93A;">Kage</b></div>
       </div>
     </header>
 
@@ -43,81 +33,45 @@
     <main class="world-map-viewport">
       <div class="world-map-bg"></div>
 
-      <!-- SINGLE CLEAN LEFT SIDEBAR -->
+      <!-- LEFT SIDEBAR (Single Instance) -->
       <aside class="map-sidebar-left">
         <div class="sidebar-card">
-          <div class="sidebar-title">MAP LEGEND</div>
-          <div class="legend-items">
-            <div class="legend-row"><span class="legend-dot unlocked"></span> Unlocked</div>
-            <div class="legend-row"><span class="legend-dot locked"></span> Locked</div>
-            <div class="legend-row"><span class="legend-dot premium"></span> Premium Area</div>
-            <div class="legend-row"><span class="legend-dot threat"></span> High Threat</div>
-            <div class="legend-row"><span class="legend-dot main"></span> Main Story Area</div>
-            <div class="legend-row"><span class="legend-dot special"></span> Special Area</div>
-          </div>
-        </div>
-
-        <div class="sidebar-card interactive-loc" onclick="openRegionHub('fire')">
           <div class="sidebar-title">CURRENT LOCATION</div>
           <div class="location-preview-name">HIDDEN LEAF VILLAGE</div>
           <div class="location-preview-sub">Land of Fire</div>
-          <button class="btn-enter-loc">ENTER VILLAGE</button>
+          <button class="btn-enter-loc" onclick="openOverlay('village')">ENTER VILLAGE</button>
         </div>
 
         <div class="sidebar-card">
           <div class="sidebar-title">WORLD PROGRESS</div>
-          <div class="progress-block">
-            <span>Regions Discovered</span>
-            <b>18 / 42</b>
-          </div>
+          <div class="progress-block"><span>Regions Discovered</span><b>18 / 42</b></div>
           <div class="progress-bar-shell"><div class="progress-bar-fill" style="width: 42%;"></div></div>
-          <div class="progress-block" style="margin-top: 8px;">
-            <span>Missions Completed</span>
-            <b>84 / 350</b>
-          </div>
+          <div class="progress-block" style="margin-top: 8px;"><span>Missions Completed</span><b>84 / 350</b></div>
           <div class="progress-bar-shell"><div class="progress-bar-fill" style="width: 24%;"></div></div>
         </div>
       </aside>
 
-      <!-- INTERACTIVE REGION PINS -->
-      <div class="map-node-pin" onclick="openRegionHub('fire')" style="top: 45%; left: 35%;">
+      <!-- Clickable World Map Region Pin Example -->
+      <div class="map-node-pin" style="left: 48%; top: 40%;" onclick="openRegionHub('fire')">
         <div class="pin-glow"></div>
         <span class="pin-label">Land of Fire</span>
       </div>
-      <div class="map-node-pin" onclick="openRegionHub('wind')" style="top: 35%; left: 18%;">
-        <div class="pin-glow" style="background:#E53935; box-shadow:0 0 15px #E53935;"></div>
-        <span class="pin-label">Land of Wind</span>
-      </div>
-      <div class="map-node-pin" onclick="openRegionHub('water')" style="top: 52%; left: 48%;">
-        <div class="pin-glow" style="background:#00D9E8; box-shadow:0 0 15px #00D9E8;"></div>
-        <span class="pin-label">Land of Water</span>
-      </div>
-      <div class="map-node-pin" onclick="openRegionHub('earth')" style="top: 18%; left: 22%;">
-        <div class="pin-glow" style="background:#D6A93A; box-shadow:0 0 15px #D6A93A;"></div>
-        <span class="pin-label">Land of Earth</span>
-      </div>
-      <div class="map-node-pin" onclick="openRegionHub('lightning')" style="top: 52%; left: 65%;">
-        <div class="pin-glow" style="background:#D6A93A; box-shadow:0 0 15px #D6A93A;"></div>
-        <span class="pin-label">Land of Lightning</span>
-      </div>
     </main>
 
-    <!-- BOTTOM ACTION DOCK -->
+    <!-- FOOTER -->
     <footer class="game-footer">
-      <div class="footer-action-item" onclick="claimDailyReward()"><span>🎁 Daily Reward</span></div>
-      <div class="footer-action-item" onclick="openOverlay('events')"><span>⚔️ Events</span></div>
-      <div class="footer-action-item" onclick="openOverlay('roster')"><span>👥 Roster</span></div>
-      <div class="footer-action-item" onclick="openOverlay('shop')"><span>🛒 Special Shop</span></div>
+      <div class="footer-action-item" onclick="claimDailyReward()">Claim Daily Reward</div>
     </footer>
+  </div>
 
-    <!-- OVERLAY SCREEN MODAL -->
-    <div id="screen-overlay" class="screen-overlay" style="display: none;">
-      <div class="overlay-content-box">
-        <button class="overlay-close-btn" onclick="closeOverlay()">✕ CLOSE</button>
-        <div id="overlay-content-container" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;"></div>
+  <!-- SCREEN OVERLAY MODAL -->
+  <div id="screen-overlay" class="screen-overlay" style="display: none;">
+    <div class="overlay-content-box">
+      <button class="overlay-close-btn" onclick="closeOverlay()">✕ CLOSE</button>
+      <div id="overlay-content-container" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+        <!-- Dynamic content injected via game.js -->
       </div>
     </div>
-
   </div>
 
   <script src="game.js"></script>
