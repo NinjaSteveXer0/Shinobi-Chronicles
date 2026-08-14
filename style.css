@@ -1,277 +1,54 @@
-:root {
-  --bg-dark: #072225;
-  --panel-bg: #e8d5b5;
-  --btn-teal: #116466;
-  --btn-teal-hover: #1b8a8d;
-  --accent: #d9b48f;
-  --text-main: #f8fafc;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: var(--bg-dark);
-  color: var(--text-main);
-  min-height: 100vh;
-}
-
-.app {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid var(--btn-teal);
-  padding-bottom: 15px;
-  margin-bottom: 30px;
-}
-
-header h1 {
-  margin: 0;
-  font-size: 28px;
-  color: #fef08a;
-  text-shadow: 0 0 8px rgba(217, 180, 143, 0.8), 0 2px 4px rgba(0,0,0,0.8);
-}
-
-.user {
-  color: var(--accent);
-  font-weight: bold;
-}
-
-/* Page visibility utilities */
-.page-panel {
-  display: block;
-}
-
-.page-panel.hidden {
-  display: none !important;
-}
-
-/* Login Page Styling */
-#login-page {
-  background-color: #f3e5c8;
-  background-image: radial-gradient(circle, #f7ebd0 0%, #e2ceaa 100%);
-  border: 4px solid #116466;
-  border-radius: 8px;
-  box-shadow: inset 0 0 40px rgba(139, 94, 60, 0.25), 0 10px 25px rgba(0,0,0,0.5);
-  color: #1a2e35;
-  max-width: 500px;
-  margin: 40px auto;
-  padding: 40px;
-  text-align: center;
-}
-
-#login-page h2 {
-  color: #116466;
-  margin-top: 0;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 20px;
-  text-align: left;
-  max-width: 320px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.form-group input {
-  padding: 10px;
-  border: 2px solid #116466;
-  border-radius: 6px;
-  font-size: 16px;
-  background: #ffffff;
-  color: #0f172a;
-}
-
-.login-actions {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-}
-
-/* Buttons */
-button.primary {
-  background-color: var(--btn-teal);
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button.primary:hover {
-  background-color: var(--btn-teal-hover);
-}
-
-button.primary:disabled {
-  background-color: #475569;
-  cursor: not-allowed;
-}
-
-button.ghost {
-  background: transparent;
-  color: #116466; /* Dark teal text for clear contrast against parchment */
-  border: 2px solid #116466;
-  padding: 10px 20px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-button.ghost:hover {
-  background: rgba(17, 100, 102, 0.15);
-  color: #072225;
-}
-
-/* Grids and Modals */
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.grid-item {
-  background: #0d383b;
-  border: 2px solid var(--btn-teal);
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  cursor: pointer;
-  font-weight: bold;
-  color: #fff;
-  transition: all 0.2s ease;
-}
-
-.grid-item:hover, .grid-item.selected {
-  border-color: #fef08a;
-  background: #116466;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-overlay.hidden {
-  display: none !important;
-}
-
-.modal-card {
-  background: #f3e5c8;
-  color: #1a2e35;
-  padding: 30px;
-  border-radius: 8px;
-  border: 4px solid #116466;
-  max-width: 450px;
-  width: 100%;
-  text-align: center;
-}
-
-.conversation-box {
-  background: #fff;
-  border: 1px solid #116466;
-  padding: 15px;
-  border-radius: 6px;
-  margin: 15px 0;
-  text-align: left;
-  font-family: monospace;
-}
-
-/* ==========================================================================
-   DIFFICULTY PAGE & CIRCULAR EMBLEM STYLES (NEW)
-   ========================================================================== */
-
-.difficulty-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-  max-width: 650px;
-  margin: 0 auto;
-  text-align: left;
-}
-
+/* -----------------------------
+   DIFFICULTY ROW STYLING (EGG-WHITE BACKGROUND)
+   ----------------------------- */
 .diff-row {
+  background-color: #fdfbf7; /* Egg-white / soft off-white */
+  color: #1a1a1a;            /* Dark text for readability against the light background */
+  border: 1px solid #dcd6cd;  /* Subtle border */
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: #0d383b;
-  border: 2px solid var(--btn-teal);
-  border-radius: 12px;
-  padding: 14px 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease-in-out;
 }
 
-.diff-row:not(.locked):hover {
-  border-color: #fef08a;
-  background: #104347;
-}
-
-.diff-row.locked {
-  opacity: 0.5;
-}
-
-.diff-info {
+.diff-row .diff-info {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
 }
 
-/* Custom Circular Emblem Styling */
-.diff-info img {
-  width: 64px;
-  height: 64px;
-  object-fit: cover;
-  border-radius: 50%; /* Smooth circle */
-  border: 2px solid #ffd700; /* Gold ring around emblem */
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
-  transition: all 0.3s ease;
+.diff-row .diff-info img {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
 }
 
-/* Hover glow effect matching the gold/teal theme */
-.diff-row:not(.locked):hover .diff-info img {
-  transform: scale(1.08);
-  box-shadow: 0 0 15px rgba(17, 100, 102, 0.9), 0 0 10px rgba(255, 215, 0, 0.8);
-  border-color: #38bdf8;
-}
-
-/* Grays out and dims locked difficulty icons */
-.diff-row.locked .diff-info img {
-  filter: grayscale(90%) brightness(0.4);
-  border-color: #475569;
-  box-shadow: none;
-}
-
-.diff-text h4 {
+.diff-row .diff-text h4 {
+  color: #111111;
+  font-size: 1.1rem;
+  font-weight: bold;
   margin: 0 0 4px 0;
-  color: #ffd700;
-  font-size: 18px;
-  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
 }
 
-.diff-text p {
+.diff-row .diff-text p {
+  color: #555555;
+  font-size: 0.9rem;
   margin: 0;
-  color: #cbd5e1;
-  font-size: 13px;
-  line-height: 1.4;
 }
 
-.diff-action button {
-  padding: 8px 18px;
-  font-size: 14px;
+/* Hover lift effect for unlocked rows */
+.diff-row:not(.locked):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  border-color: #c5bcaf;
+}
+
+/* Muted look for locked rows */
+.diff-row.locked {
+  background-color: #f4f1ea; 
+  opacity: 0.7;
 }
