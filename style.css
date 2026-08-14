@@ -341,3 +341,40 @@ button.ghost:hover {
   color: #cbd5e1;
   font-size: 14px;
 }
+
+/* ==========================================================
+   BATTLE CARD ENTRANCE ANIMATIONS
+   ================================================---------- */
+.battle-arena-container {
+  overflow: hidden; /* Hides elements while they are off-screen */
+}
+
+.fighter-slide-left {
+  animation: slideFromLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fighter-slide-right {
+  animation: slideFromRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideFromLeft {
+  0% {
+    transform: translateX(-150vw);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideFromRight {
+  0% {
+    transform: translateX(150vw);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
