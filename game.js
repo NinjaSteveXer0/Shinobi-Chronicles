@@ -109,12 +109,14 @@ function goBackToJourney() { showPage("journey-page"); }
 function goBackToLogin() { 
   App.user = null;
   localStorage.removeItem("shinobi_username");
+  localStorage.removeItem("shinobi_activePage");
   clearTimeout(inactivityTimer);
-  $("header-user").textContent = "Not signed in";
+  if ($("header-user")) $("header-user").textContent = "Not signed in";
   showPage("login-page"); 
 }
 function goBackToDifficulty() { showPage("difficulty-page"); }
 function goBackToVillage() { showPage("village-page"); }
+function goBackToNinja() { showPage("ninja-page"); }
 
 /* -----------------------------
    DIFFICULTY SELECTION (UPDATED)
