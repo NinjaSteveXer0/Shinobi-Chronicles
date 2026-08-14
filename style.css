@@ -191,3 +191,87 @@ button.ghost:hover {
   text-align: left;
   font-family: monospace;
 }
+
+/* ==========================================================================
+   DIFFICULTY PAGE & CIRCULAR EMBLEM STYLES (NEW)
+   ========================================================================== */
+
+.difficulty-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 650px;
+  margin: 0 auto;
+  text-align: left;
+}
+
+.diff-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #0d383b;
+  border: 2px solid var(--btn-teal);
+  border-radius: 12px;
+  padding: 14px 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+  transition: all 0.3s ease;
+}
+
+.diff-row:not(.locked):hover {
+  border-color: #fef08a;
+  background: #104347;
+}
+
+.diff-row.locked {
+  opacity: 0.5;
+}
+
+.diff-info {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+/* Custom Circular Emblem Styling */
+.diff-info img {
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 50%; /* Smooth circle */
+  border: 2px solid #ffd700; /* Gold ring around emblem */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+  transition: all 0.3s ease;
+}
+
+/* Hover glow effect matching the gold/teal theme */
+.diff-row:not(.locked):hover .diff-info img {
+  transform: scale(1.08);
+  box-shadow: 0 0 15px rgba(17, 100, 102, 0.9), 0 0 10px rgba(255, 215, 0, 0.8);
+  border-color: #38bdf8;
+}
+
+/* Grays out and dims locked difficulty icons */
+.diff-row.locked .diff-info img {
+  filter: grayscale(90%) brightness(0.4);
+  border-color: #475569;
+  box-shadow: none;
+}
+
+.diff-text h4 {
+  margin: 0 0 4px 0;
+  color: #ffd700;
+  font-size: 18px;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+}
+
+.diff-text p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.diff-action button {
+  padding: 8px 18px;
+  font-size: 14px;
+}
