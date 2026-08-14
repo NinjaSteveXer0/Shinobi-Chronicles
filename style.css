@@ -357,3 +357,104 @@ button.ghost:hover {
   color: #cbd5e1;
   font-size: 14px;
 }
+/* Shinobi Chronicles Battle Screen Styles */
+.battle-arena {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background-color: #080C10; /* Obsidian Primary */
+  border: 1px solid #082B30; /* Deep Teal */
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: 'Segoe UI', sans-serif;
+  color: #FFFFFF;
+}
+
+/* Layer 1: Environment */
+.environment-bg {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: linear-gradient(to bottom, rgba(8,12,16,0.4), rgba(8,43,48,0.8)), 
+              url('path-to-ichiraku-bg.jpg') center/cover no-repeat;
+  z-index: 1;
+}
+
+/* Layer 2: Combatants Stage */
+.combatants-stage {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 20px;
+  height: 65%;
+}
+
+.character-card-frame {
+  width: 180px;
+  height: 260px;
+  background: #080C10;
+  border-radius: 8px;
+  border: 2px solid #082B30;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.character-card-frame.glow-cyan {
+  box-shadow: 0 0 15px rgba(0, 217, 232, 0.4); /* Chakra Cyan */
+}
+
+.character-card-frame.glow-red {
+  box-shadow: 0 0 15px rgba(229, 57, 53, 0.4); /* Blood Red */
+}
+
+.character-card-frame:hover {
+  transform: translateY(-5px);
+}
+
+/* Layer 3: Obsidian Glass Console */
+.combat-console {
+  position: relative;
+  z-index: 2;
+  background: rgba(8, 12, 16, 0.85);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid #082B30;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.btn-ninja {
+  background: #082B30;
+  color: #FFFFFF;
+  border: 1px solid #00D9E8;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-ninja:hover {
+  background: #00D9E8;
+  color: #080C10;
+  box-shadow: 0 0 10px #00D9E8;
+}
+
+.btn-ninja.gold-border {
+  border-color: #D6A93A; /* Ninja Gold */
+}
+.btn-ninja.gold-border:hover {
+  background: #D6A93A;
+  box-shadow: 0 0 10px #D6A93A;
+}
