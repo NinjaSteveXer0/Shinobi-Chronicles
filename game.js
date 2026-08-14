@@ -89,74 +89,42 @@ const worldRegions = {
   fire: {
     name: "Land of Fire",
     description: "A land of passion and willpower, protected by fierce ninjas and burning spirit.",
-    mapImage: "Assets/Maps/Inside LOF.png",
+    mapImage: "Assets/Backgrounds/inside_LOF.png",
     locations: [
-      { 
-        id: "konohagakure", 
-        name: "Konohagakure (Hidden Leaf)", 
-        type: "village", 
-        category: "CAPITAL VILLAGE HUB", 
-        desc: "The glorious capital hidden behind the giant mountain walls. Home base for major village services, shopping, and high-rank operations.", 
-        levelRange: "1-50", 
-        bestFor: "Village Hub & Quests", 
-        enemyTypes: "None (Safe Zone)", 
-        top: "16%", left: "50%" 
-      },
-      { 
-        id: "kojima", 
-        name: "Kojima Village Outpost", 
-        type: "village", 
-        category: "REGIONAL GATEWAY", 
-        desc: "The border outpost guarding the southern entry into the Land of Fire.", 
-        levelRange: "1-15", 
-        bestFor: "Quick Rest & Supplies", 
-        enemyTypes: "None (Safe Zone)", 
-        top: "88%", left: "50%" 
-      },
-      { 
-        id: "training_grounds", 
-        name: "Training Grounds", 
-        type: "battle", 
-        category: "EXP Grinding", 
-        desc: "High-density wildlife and rogue ninja scouting grounds.", 
-        levelRange: "10-16", 
-        bestFor: "EXP", 
-        enemyTypes: "Bandits, Wildlife", 
-        top: "35%", left: "28%" 
-      },
-      { 
-        id: "bandit_hideout", 
-        name: "Bandit Hideout", 
-        type: "battle", 
-        category: "Loot Hotspot", 
-        desc: "Stash filled with tactical gear and rare materials.", 
-        levelRange: "15-20", 
-        bestFor: "Loot", 
-        enemyTypes: "Rogue Ninjas", 
-        top: "18%", left: "27%" 
-      },
-      { 
-        id: "bridge_of_trials", 
-        name: "Bridge of Trials", 
-        type: "battle", 
-        category: "Mission Progression", 
-        desc: "Test your might against disciplined regional guards.", 
-        levelRange: "20-28", 
-        bestFor: "Progression", 
-        enemyTypes: "Elite Guards", 
-        top: "24%", left: "50%" 
-      },
-      { 
-        id: "forest_silence", 
-        name: "Forest of Silence", 
-        type: "battle", 
-        category: "EXP / Gold Grinding", 
-        desc: "Best for balanced EXP and Ryo payouts.", 
-        levelRange: "16-24", 
-        bestFor: "EXP & Ryo", 
-        enemyTypes: "Trackers", 
-        top: "42%", left: "51%" 
-      }
+      { id: "konohagakure", name: "Konohagakure (Hidden Leaf)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "The glorious capital hidden behind giant mountain walls.", levelRange: "1-50", bestFor: "Hub & Quests", enemyTypes: "Safe Zone", top: "16%", left: "50%" },
+      { id: "training_grounds", name: "Training Grounds", type: "battle", category: "EXP Grinding", desc: "High-density wildlife and rogue ninja scouting grounds.", levelRange: "10-16", bestFor: "EXP", enemyTypes: "Bandits", top: "35%", left: "28%" }
+    ]
+  },
+  wind: {
+    name: "Land of Wind",
+    description: "Vast desert territory known for resilient warriors and sand mastery.",
+    mapImage: "Assets/Backgrounds/WorldMap.png",
+    locations: [
+      { id: "sunagakure", name: "Sunagakure (Hidden Sand)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Hidden fortress nestled within sweeping desert dunes.", levelRange: "10-60", bestFor: "Puppet Jutsu", enemyTypes: "Safe Zone", top: "50%", left: "50%" }
+    ]
+  },
+  water: {
+    name: "Land of Water",
+    description: "An isolated island archipelago shrouded in thick mist and brutal traditions.",
+    mapImage: "Assets/Backgrounds/WorldMap.png",
+    locations: [
+      { id: "kirigakure", name: "Kirigakure (Hidden Mist)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "The misty sanctuary of legendary swordsmen.", levelRange: "15-65", bestFor: "Water Style", enemyTypes: "Safe Zone", top: "50%", left: "50%" }
+    ]
+  },
+  earth: {
+    name: "Land of Earth",
+    description: "Rugged terrain carved out of steep rock canyons and stone formations.",
+    mapImage: "Assets/Backgrounds/WorldMap.png",
+    locations: [
+      { id: "iwagakure", name: "Iwagakure (Hidden Stone)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Unwavering fortress carved directly into massive stone cliffs.", levelRange: "15-65", bestFor: "Earth Release", enemyTypes: "Safe Zone", top: "50%", left: "50%" }
+    ]
+  },
+  lightning: {
+    name: "Land of Lightning",
+    description: "Mountain ranges echoing with continuous thunder storms and high-voltage chakra.",
+    mapImage: "Assets/Backgrounds/WorldMap.png",
+    locations: [
+      { id: "kumogakure", name: "Kumogakure (Hidden Cloud)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Soaring peaks touching the skies where lightning strikes.", levelRange: "20-70", bestFor: "Lightning Release", enemyTypes: "Safe Zone", top: "50%", left: "50%" }
     ]
   }
 };
@@ -193,7 +161,7 @@ function renderRegionHubUI(region) {
       <!-- Left Map / Node Network Pane -->
       <div class="region-map-pane" style="flex: 1; background-image: url('${region.mapImage}'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 480px;">
         ${region.locations.map(loc => `
-          <div class="location-keypoint ${selectedLocationNode && selectedLocationNode.id === loc.id ? 'active-node' : ''}" 
+          <div class="location-keypoint" 
                style="position: absolute; top: ${loc.top}; left: ${loc.left}; width: 28px; height: 28px; background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#D6A93A' : '#00D9E8'}; border: 2px solid #FFF; border-radius: 50%; cursor: pointer; transform: translate(-50%, -50%); box-shadow: 0 0 12px rgba(0,217,232,0.6); display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: bold; color: #000;"
                title="${loc.name}"
                onclick="selectMapNode('${region.id}', '${loc.id}')">
@@ -296,7 +264,7 @@ function openOverlay(screenType) {
           </div>
         </div>
         <div class="combat-console">
-          <div id="combat-log" class="action-feedback-log" style="color: #00D9E8;">⚡ Battle ready in Konohagakure arena. Choose your action.</div>
+          <div id="combat-log" class="action-feedback-log" style="color: #00D9E8;">⚡ Battle ready in arena. Choose your action.</div>
           <div class="action-buttons">
             <button class="btn-ninja" onclick="performNinjutsuStrike()">NINJUTSU STRIKE</button>
             <button class="btn-ninja" onclick="performChakraRestore()">CHAKRA RESTORE</button>
@@ -322,12 +290,37 @@ function openOverlay(screenType) {
   } else if (screenType === 'village') {
     container.innerHTML = `
       <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">KONOHAGAKURE - HIDDEN LEAF VILLAGE</h2>
-      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Welcome back to your home base, Shinobi. Manage your active squad in the Roster, upgrade gear at the Shop, or deploy directly to location objectives across the world map.</p>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Welcome back to your home base, Shinobi. Manage your active squad in the Roster, upgrade gear at the Shop, or deploy directly to location objectives.</p>
     `;
   } else if (screenType === 'missions') {
     container.innerHTML = `
       <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">ACTIVE MISSION: ESCORT THE KAZEKAGE ENVOY</h2>
       <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Rank: B | Difficulty: 780 PL. Guard the diplomatic party safely through hostile terrain.</p>
+    `;
+  } else if (screenType === 'exams') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">CHUNIN EXAMS & PROMOTION TOURNAMENT</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Test your tactical prowess against elite shinobi candidates to rank up.</p>
+    `;
+  } else if (screenType === 'practical') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">PRACTICAL SKILL DRILLS</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Refine chakra control, shuriken throwing, and hand sign speed trials.</p>
+    `;
+  } else if (screenType === 'group') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">SQUAD & ALLIANCE COMMAND</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Coordinate with fellow ninjas for cooperative territory raids and clan wars.</p>
+    `;
+  } else if (screenType === 'defend') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">VILLAGE DEFENSE OPERATIONS</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Repel incoming rogue ninja waves attempting to breach the perimeter wall.</p>
+    `;
+  } else if (screenType === 'kage') {
+    container.innerHTML = `
+      <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">KAGE OFFICE & COMMAND CENTER</h2>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Assign high-priority village bounties, sign treaties, and distribute resources.</p>
     `;
   } else if (screenType === 'events') {
     container.innerHTML = `
