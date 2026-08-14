@@ -296,3 +296,48 @@ button.ghost:hover {
   margin-bottom: 20px;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
 }
+
+/* ==========================================================
+   DIFFICULTY PAGE STYLING
+   ================================================---------- */
+.diff-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0d383b;
+  border: 2px solid var(--btn-teal);
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease;
+}
+
+.diff-row.locked {
+  opacity: 0.6;
+  background: #092426;
+}
+
+.diff-info {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.diff-info img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.diff-text h4 {
+  margin: 0 0 4px 0;
+  color: #fef08a;
+  font-size: 18px;
+}
+
+.diff-text p {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 14px;
+}
