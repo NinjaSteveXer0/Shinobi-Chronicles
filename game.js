@@ -371,4 +371,103 @@ document.addEventListener("DOMContentLoaded", () => {
     passwordInput.addEventListener("keypress", handleEnterKey);
     usernameInput.addEventListener("keypress", handleEnterKey);
   }
+
+  /* ==========================================================
+   CHARACTER STATS & POWER LEVEL LOGIC
+   ================================================---------- */
+
+// Sample Character Object for Shadow Ninja
+const shadowNinja = {
+  name: "Shadow Ninja",
+  rank: "Academy Student",
+  stats: {
+    taijutsu: 2,
+    ninjutsu: 3,
+    bukishi: 1,
+    fuinjutsu: 0,
+    kinjutsu: 1, // Has a bit of forbidden knowledge!
+    genjutsu: 0,
+    stamina: 3
+  },
+  // Dynamic calculation of total Power Level
+  getPowerLevel() {
+    return (
+      this.stats.taijutsu +
+      this.stats.ninjutsu +
+      this.stats.bukishi +
+      this.stats.fuinjutsu +
+      this.stats.kinjutsu +
+      this.stats.genjutsu +
+      this.stats.stamina
+    );
+  }
+};
+
+
+/* ==========================================================
+   SEQUENTIAL BATTLE ENGINE
+   ================================================---------- */
+
+function startBattle(playerTeam, bossEnemy) {
+  let remainingBossPL = bossEnemy.powerLevel;
+  let backlashPenalty = false; // Tracks Kinjutsu penalty for the next ninja
+  let combatLog = [];
+
+  combatLog.push(`--- BATTLE STARTED: VS ${bossEnemy.name} (PL: ${remainingBossPL}) ---`);
+
+  for (let i = 0; i < playerTeam.length; i++) {
+    let ninja = playerTeam[i];
+    let basePL = ninja.getPowerLevel();
+    let effectivePL = basePL;
+
+    // 1. Check if previous teammate used Kinjutsu (Half PL Penalty)
+    if (backlashPenalty) {
+      effectivePL = Math.floor(effectivePL / 2);
+      combatLog.push(`⚠️ ${ninja.name} is staggered by Kinjutsu backlash! Power reduced to ${effectivePL}.`);
+      backlashPenalty = false; // Reset penalty after it affects this ninja
+    }
+
+    // 2. Check if this ninja uses a Kinjutsu boost (3x PL boost + trigger backlash)
+    if (ninja.stats.kinjutsu > 0 && ninja.useKinjutsuThisTurn) {
+      effectivePL = effectivePL * 3;
+      backlashPenalty = true; // Next teammate will suffer half PL
+      combatLog.push(`🔥 ${ninja.name} activates KINJUTSU! Power multiplied to ${effectivePL}!`);
+    }
+
+    // 3. Ninja attacks the boss pool
+    remainingBossPL -= effectivePL;
+    combatLog.push(`⚔️ ${ninja.name} strikes for ${effectivePL} damage! Boss PL remaining: ${Math.max(0, remainingBossPL)}`);
+
+    // 4. Check if boss is defeated
+    if (remainingBossPL <= 0) {
+      combatLog.push(`🎉 VICTORY! ${bossEnemy.name} was defeated!`);
+      return { success: true, log: combatLog, remainingBossPL: 0 };
+    } else {
+      combatLog.push(`💀 ${ninja.name} was exhausted and defeated by the boss.`);
+    }
+  }
+
+  // If loop finishes and boss PL is still > 0, it's a defeat
+  combatLog.push(`❌ DEFEAT! Your team ran out of ninjas. Boss survived with ${remainingBossPL} PL.`);
+  return { success: false, log: combatLog, remainingBossPL: remainingBossPL };
+}
+
+
+/* ==========================================================
+   MOCK BATTLE TEST
+   ================================================---------- */
+
+// Define a test boss
+const rogueNinjaBoss = {
+  name: "Rogue Jonin",
+  powerLevel: 50
+};
+
+// Define team (Shadow Ninja + Jonin Ally)
+const joninAlly = {
+  name: "Jonin Sasuke",
+  stats: { taijutsu: 8, ninjutsu: 10, bukishi: 5, fuinjutsu: 2, kinjutsu: 0, genjutsu: 3, stamina: 7 },
+  getPowerLevel() { return 35; }
+};
+
 });
