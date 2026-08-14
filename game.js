@@ -509,65 +509,57 @@ function logMessage(msg, color = "#00D9E8") {
 function performNinjutsuStrike() {
   if (battleState.isBattleOver) return;
 
-  if (battleState.chakra < 150) {
-    logMessage("⚠️ Not enough Chakra! Use Chakra Restore.", "#E53935");
+  const chakraCost = 150;
+  if (playerCharacter.powerPool < chakraCost) {
+    logMessage("⚠️ Not enough Chakra/Power Pool! Use Chakra Restore.", "#E53935");
     return;
   }
 
-  battleState.chakra -= 150;
-  if ($('hud-chakra')) $('hud-chakra').textContent = `${battleState.chakra}/${battleState.maxChakra}`;
+  // Deduct Power Pool resource
+  playerCharacter.powerPool -= chakraCost;
+  updateHUD();
 
-  let playerDamage = Math.floor(Math.random() * 25) + 35;
-  battleState.enemyHp = Math.max(0, battleState.enemyHp - playerDamage);
-  let enemyHpPercent = (battleState.enemyHp / battleState.enemyMaxHp) * 100;
-  if ($('enemy-fill-bar')) $('enemy-fill-bar').style.width = enemyHpPercent + '%';
-
-  if (battleState.enemyHp <= 0) {
-    battleState.isBattleOver = true;
-    battleState.ryo += 1200;
-    if ($('hud-ryo')) $('hud-ryo').textContent = battleState.ryo.toLocaleString();
-    logMessage("🎉 VICTORY! Jonin Sasuke has been defeated. Gained 1,200 Ryo!", "#D6A93A");
-    return;
-  }
-
-  let enemyDamage = Math.floor(Math.random() * 15) + 20;
-  battleState.playerHp = Math.max(0, battleState.playerHp - enemyDamage);
-  let playerHpPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
-  if ($('player-fill-bar')) $('player-fill-bar').style.width = playerHpPercent + '%';
-
-  if (battleState.playerHp <= 0) {
-    battleState.isBattleOver = true;
-    logMessage("💀 DEFEAT... Your Shadow Ninja fell in battle.", "#E53935");
-    return;
-  }
-
-  logMessage(`⚡ Ninjutsu strike dealt ${playerDamage} damage! Sasuke counters for ${enemyDamage}.`);
-}
-
-function performChakraRestore() {
-  if (battleState.isBattleOver) return;
-
-  battleState.chakra = Math.min(battleState.maxChakra, battleState.chakra + 300);
-  battleState.playerHp = Math.min(battleState.playerMaxHp, battleState.playerHp + 15);
+  // Dynamic Damage Calculation using Stats & PL
+  let statScaling = playerCharacter.stats.ninjutsu * 0.4;
+  let plMultiplier = playerCharacter.getPowerLevel() / 100;
+  let rawDamage = Math.floor((Math.random() * 20 + 30 + statScaling) * (plMultiplier / 10));
   
-  if ($('hud-chakra')) $('hud-chakra').textContent = `${battleState.chakra}/${battleState.maxChakra}`;
-  let playerHpPercent = (battleState.playerHp / battleState.playerMaxHp) * 100;
-  if ($('player-fill-bar')) $('player-fill-bar').style.width = playerHpPercent + '%';
+  // Mitigate with enemy defense
+  let finalDamage = Math.max(10, rawDamage - Math.floor(enemyCharacter.stats.defense * 0.2));
+  
+  enemyCharacter.hp = Math.max(0, enemyCharacter.hp - finalDamage);
+  let enemyHpPercent = (enemyCharacter.hp / enemyCharacter.maxHp) * 100;
+  document.getElementById('enemy-fill-bar').style.width = enemyHpPercent + '%';
 
-  logMessage("💧 Focused breathing. Restored 300 Chakra and recovered minor health.");
+  // Check for Boss Victory Condition
+  if (enemyCharacter.hp <= 0) {
+    battleState.isBattleOver = true;
+    playerCharacter.ryo += 1200;
+    updateHUD();
+    logMessage(`🎉 VICTORY! ${enemyCharacter.name} defeated. PL Verified. Gained 1,200 Ryo!`, "#D6A93A");
+    return;
+  }
+
+  // Enemy Counterattack scaled by their stats
+  let enemyRawDmg = Math.floor((Math.random() * 15 + 20 + (enemyCharacter.stats.ninjutsu * 0.3)));
+  let enemyFinalDmg = Math.max(5, enemyRawDmg - Math.floor(playerCharacter.stats.defense * 0.2));
+  
+  playerCharacter.hp = Math.max(0, playerCharacter.hp - enemyFinalDmg);
+  let playerHpPercent = (playerCharacter.hp / playerCharacter.maxHp) * 100;
+  document.getElementById('player-fill-bar').style.width = playerHpPercent + '%';
+
+  if (playerCharacter.hp <= 0) {
+    battleState.isBattleOver = true;
+    logMessage(`💀 DEFEAT... Your PL was insufficient to overcome ${enemyCharacter.name}.`, "#E53935");
+    return;
+  }
+
+  logMessage(`⚡ Ninjutsu Strike dealt ${finalDamage} damage! (PL: ${playerCharacter.getPowerLevel()}). Sasuke counters for ${enemyFinalDmg}.`);
 }
 
-function performFlee() {
-  battleState.playerHp = 100;
-  battleState.enemyHp = 100;
-  battleState.chakra = 850;
-  battleState.isBattleOver = false;
-
-  if ($('player-fill-bar')) $('player-fill-bar').style.width = '100%';
-  if ($('enemy-fill-bar')) $('enemy-fill-bar').style.width = '100%';
-  if ($('hud-chakra')) $('hud-chakra').textContent = `850/850`;
-
-  logMessage("💨 Successfully fled from battle. Ready to try again.");
+function updateHUD() {
+  document.getElementById('hud-chakra').textContent = `${playerCharacter.powerPool}/${playerCharacter.maxPowerPool}`;
+  document.getElementById('hud-ryo').textContent = playerCharacter.ryo.toLocaleString();
 }
 
 /* -----------------------------
