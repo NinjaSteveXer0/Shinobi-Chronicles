@@ -70,58 +70,15 @@
 
     <!-- 3. DIFFICULTY PAGE -->
     <div id="difficulty-page" class="page-panel hidden">
-      <h2>Select Difficulty</h2>
+      <h2>Difficulty</h2>
+      <p style="color: var(--accent); margin-bottom: 20px;">Complete the game to unlock harder difficulty modes with better rewards and special ninjas!</p>
       
-      <div class="difficulty-path" id="difficulty-canvas">
-        <div id="academy" class="difficulty-level" data-level="academy" style="left: 12%; top: 78%;">
-          <img src="Assets/Icons/Academy student.png" alt="Academy Student" class="rock-icon">
-          <div class="difficulty-info">Academy Student</div>
-        </div>
-
-        <div id="genin" class="difficulty-level disabled" data-level="genin" style="left: 36%; top: 78%;">
-          <img src="Assets/Icons/Genin.png" alt="Genin" class="rock-icon">
-          <div class="difficulty-info">Genin</div>
-        </div>
-
-        <div id="chunin" class="difficulty-level disabled" data-level="chunin" style="left: 60%; top: 78%;">
-          <img src="Assets/Icons/Chunin.png" alt="Chunin" class="rock-icon">
-          <div class="difficulty-info">Chunin</div>
-        </div>
-
-        <div id="akatsuki" class="difficulty-level paid-level locked" data-level="akatsuki" style="left: 84%; top: 78%;">
-          <img src="Assets/Icons/Akatsuki.png" alt="Akatsuki" class="rock-icon">
-          <div class="difficulty-info">Akatsuki <span class="paid-badge">PAID</span></div>
-        </div>
-
-        <div id="specialjonin" class="difficulty-level paid-level locked" data-level="specialjonin" style="left: 84%; top: 50%;">
-          <img src="Assets/Icons/Special Jonin.png" alt="Special Jōnin" class="rock-icon">
-          <div class="difficulty-info">Special Jōnin <span class="paid-badge">PAID</span></div>
-        </div>
-
-        <div id="jinchuriki" class="difficulty-level paid-level locked" data-level="jinchuriki" style="left: 84%; top: 22%;">
-          <img src="Assets/Icons/Jinchuriki.png" alt="Jinchūriki" class="rock-icon">
-          <div class="difficulty-info">Jinchūriki <span class="paid-badge">PAID</span></div>
-        </div>
-
-        <div id="jonin" class="difficulty-level disabled" data-level="jonin" style="left: 60%; top: 22%;">
-          <img src="Assets/Icons/Jonin.png" alt="Jōnin" class="rock-icon">
-          <div class="difficulty-info">Jōnin</div>
-        </div>
-
-        <div id="anbu" class="difficulty-level disabled" data-level="anbu" style="left: 36%; top: 22%;">
-          <img src="Assets/Icons/Anbu.png" alt="ANBU" class="rock-icon">
-          <div class="difficulty-info">ANBU</div>
-        </div>
-
-        <div id="kage" class="difficulty-level disabled" data-level="kage" style="left: 12%; top: 22%;">
-          <img src="Assets/Icons/Kage.png" alt="Kage" class="rock-icon">
-          <div class="difficulty-info">Kage</div>
-        </div>
+      <div class="difficulty-list" id="difficulty-list-container">
+        <!-- Populated dynamically via game.js -->
       </div>
 
-      <div class="controls-bar">
+      <div class="controls-bar" style="margin-top: 24px;">
         <button class="ghost" onclick="goBackToJourney()">← Back</button>
-        <span class="hint-text">Only Academy Student is selectable right now. (Double-click items to continue!)</span>
       </div>
     </div>
 
