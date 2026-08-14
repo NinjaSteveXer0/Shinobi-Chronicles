@@ -1,4 +1,6 @@
-// 1. Character Roster & Shop Database
+// ==========================================
+// 1. CHARACTER ROSTER & SHOP DATABASE
+// ==========================================
 const charactersDatabase = {
   naruto: {
     id: "naruto",
@@ -80,26 +82,54 @@ const shopItems = [
   { id: "flak", name: "Elite Jonin Flak Jacket", desc: "Reinforced woven armor providing high defense.", price: 3500, statBonus: 60 }
 ];
 
-// ----------------------------------------------------
+// ==========================================
 // REGION HIERARCHY DATA & FUNCTIONS
-// ----------------------------------------------------
-
+// ==========================================
 const worldRegions = {
   fire: {
     name: "Land of Fire",
     description: "The heartland of the shinobi world, dominated by thick forests and Konohagakure.",
+    mapImage: "Assets/Maps/Land_of_Fire_Detail.png",
     locations: [
-      { id: "konoha", name: "Konohagakure Village", type: "safe", desc: "Home base for shopping, roster management, and daily training." },
-      { id: "training_fields", name: "Death Forest & Training Fields", type: "activity", desc: "High-density wildlife and rogue ninja scouting grounds." },
-      { id: "valley_end", name: "Valley of the End", type: "battle", desc: "Legendary battlefield. High-threat boss encounters." }
+      { id: "konoha", name: "Konohagakure Village", type: "safe", category: "VILLAGE HUB", desc: "Home base for shopping, roster management, and daily training.", top: "45%", left: "40%" },
+      { id: "training_fields", name: "Death Forest", type: "activity", category: "EXP & GOLD GRINDING", desc: "High-density wildlife and rogue ninja scouting grounds for earning rewards.", top: "30%", left: "60%" },
+      { id: "valley_end", name: "Valley of the End", type: "battle", category: "HIGH THREAT BOSS", desc: "Legendary battlefield. High-threat boss encounters with rare drop chance loot.", top: "70%", left: "75%" }
     ]
   },
   wind: {
     name: "Land of Wind",
     description: "Vast desert expanses guarded by Sunagakure and harsh sandstorms.",
+    mapImage: "Assets/Maps/Land_of_Wind_Detail.png",
     locations: [
-      { id: "sunagakure", name: "Sunagakure Village", type: "safe", desc: "Hidden Sand stronghold." },
-      { id: "desert_canyon", name: "Howling Sand Canyon", type: "battle", desc: "Ambush zone for rogue puppet masters and missing-nin." }
+      { id: "sunagakure", name: "Sunagakure Village", type: "safe", category: "VILLAGE HUB", desc: "Hidden Sand stronghold.", top: "50%", left: "35%" },
+      { id: "desert_canyon", name: "Howling Sand Canyon", type: "battle", category: "BOUNTY HUNTING", desc: "Ambush zone for rogue puppet masters and missing-nin.", top: "65%", left: "60%" }
+    ]
+  },
+  water: {
+    name: "Land of Water",
+    description: "Misty archipelagos surrounded by dense fog and hidden ninja mist bases.",
+    mapImage: "Assets/Maps/Land_of_Water_Detail.png",
+    locations: [
+      { id: "kirigakure", name: "Kirigakure Village", type: "safe", category: "VILLAGE HUB", desc: "Mist-shrouded village headquarters.", top: "40%", left: "50%" },
+      { id: "mist_forest", name: "Forest of the Seven Swords", type: "battle", category: "RARE DROP LOOT", desc: "Deadly grounds where elite Seven Swordsmen artifacts drop.", top: "60%", left: "70%" }
+    ]
+  },
+  earth: {
+    name: "Land of Earth",
+    description: "Rugged mountainous terrain with natural stone defenses.",
+    mapImage: "Assets/Maps/Land_of_Earth_Detail.png",
+    locations: [
+      { id: "iwagakure", name: "Iwagakure Village", type: "safe", category: "VILLAGE HUB", desc: "Impenetrable mountain fortress village.", top: "35%", left: "45%" },
+      { id: "stone_quarry", name: "Stone Quarry Outpost", type: "activity", category: "EXP GRINDING", desc: "Ideal location for physical taijutsu training and stamina gains.", top: "55%", left: "65%" }
+    ]
+  },
+  lightning: {
+    name: "Land of Lightning",
+    description: "High mountain peaks piercing through thunderstorm clouds.",
+    mapImage: "Assets/Maps/Land_of_Lightning_Detail.png",
+    locations: [
+      { id: "kumogakure", name: "Kumogakure Village", type: "safe", category: "VILLAGE HUB", desc: "Cloud village suspended high above the valley.", top: "30%", left: "55%" },
+      { id: "thunder_canyon", name: "Thunder Plateau", type: "battle", category: "HIGH THREAT BOSS", desc: "Electrified arena home to powerful lightning jutsu masters.", top: "60%", left: "40%" }
     ]
   }
 };
@@ -113,20 +143,49 @@ function openRegionHub(regionKey) {
   overlay.style.display = 'flex';
 
   container.innerHTML = `
-    <h2 style="font-size: 16px; color: #D6A93A; margin-bottom: 5px;">${region.name.toUpperCase()}</h2>
-    <p style="font-size: 12px; color: #94A3B8; margin-bottom: 20px;">${region.description}</p>
-    <div style="display: flex; flex-direction: column; gap: 12px;">
-      ${region.locations.map(loc => `
-        <div style="background: #080C10; border: 1px solid #1E293B; border-radius: 8px; padding: 15px; display: flex; justify-content: space-between; align-items: center;">
-          <div>
-            <div style="color: #FFF; font-size: 13px; font-weight: bold; margin-bottom: 4px;">${loc.name}</div>
-            <div style="color: #94A3B8; font-size: 11px;">${loc.desc}</div>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+      <div>
+        <h2 style="font-size: 16px; color: #D6A93A; letter-spacing: 1px;">${region.name.toUpperCase()}</h2>
+        <p style="font-size: 11px; color: #94A3B8;">${region.description}</p>
+      </div>
+    </div>
+
+    <div class="region-hub-container" style="display: flex; gap: 20px; flex: 1; min-height: 400px;">
+      <!-- Left Map / Keypoints Pane -->
+      <div class="region-map-pane" style="flex: 1; background: rgba(8, 12, 16, 0.8) url('${region.mapImage}') center/cover no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 350px;">
+        ${region.locations.map(loc => `
+          <div class="location-keypoint" 
+               style="position: absolute; top: ${loc.top}; left: ${loc.left}; width: 22px; height: 22px; background: #00D9E8; border: 2px solid #FFF; border-radius: 50%; cursor: pointer; box-shadow: 0 0 10px #00D9E8;"
+               title="${loc.name}"
+               onclick="highlightLocation('${loc.id}')">
           </div>
-          <button class="btn-ninja" style="width: 140px;" onclick="handleLocationAction('${loc.type}')">ENTER</button>
-        </div>
-      `).join('')}
+        `).join('')}
+      </div>
+
+      <!-- Right Details & Actions Pane -->
+      <div class="region-details-pane" style="width: 360px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto;">
+        ${region.locations.map(loc => `
+          <div id="loc-card-${loc.id}" style="background: #080C10; border: 1px solid #1E293B; border-radius: 8px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 9px; font-weight: bold; color: #D6A93A; background: rgba(214, 169, 58, 0.1); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(214, 169, 58, 0.3);">${loc.category}</span>
+            </div>
+            <div style="color: #FFF; font-size: 13px; font-weight: bold;">${loc.name}</div>
+            <div style="color: #94A3B8; font-size: 11px; line-height: 1.4;">${loc.desc}</div>
+            <button class="btn-ninja" style="margin-top: 4px;" onclick="handleLocationAction('${loc.type}')">ENTER LOCATION</button>
+          </div>
+        `).join('')}
+      </div>
     </div>
   `;
+}
+
+function highlightLocation(locationId) {
+  const card = document.getElementById(`loc-card-${locationId}`);
+  if (card) {
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    card.style.borderColor = '#00D9E8';
+    setTimeout(() => { card.style.borderColor = '#1E293B'; }, 1500);
+  }
 }
 
 function handleLocationAction(type) {
@@ -136,8 +195,10 @@ function handleLocationAction(type) {
     openOverlay('village');
   }
 }
-// ----------------------------------------------------
 
+// ==========================================
+// 3. OVERLAY & NAVIGATION SYSTEM
+// ==========================================
 let playerCharacter = charactersDatabase.naruto;
 let enemyCharacter = charactersDatabase.sasuke;
 
@@ -146,7 +207,6 @@ let battleState = {
   ryo: 14500
 };
 
-// 2. Overlay & Feature Management System
 function openOverlay(screenType) {
   const overlay = document.getElementById('screen-overlay');
   const container = document.getElementById('overlay-content-container');
@@ -214,7 +274,7 @@ function openOverlay(screenType) {
   } else if (screenType === 'village') {
     container.innerHTML = `
       <h2 style="font-size: 15px; color: #D6A93A; margin-bottom: 10px;">KONOHAGAKURE - HIDDEN LEAF VILLAGE</h2>
-      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Welcome back to your home base, Shinobi. From here, manage your active squad in the Roster, upgrade equipment at the Shop, or deploy directly to the Arena to fight rogue ninja threats.</p>
+      <p style="font-size: 12px; color: #94A3B8; line-height: 1.5;">Welcome back to your home base, Shinobi. Manage your active squad in the Roster, upgrade gear at the Shop, or deploy directly to location objectives across the world map.</p>
     `;
   } else if (screenType === 'missions') {
     container.innerHTML = `
@@ -233,7 +293,6 @@ function closeOverlay() {
   document.getElementById('screen-overlay').style.display = 'none';
 }
 
-// Sidebar Daily Reward Action Handler
 function claimDailyReward() {
   battleState.ryo += 500;
   updateHUD();
@@ -247,7 +306,9 @@ function claimDailyReward() {
   }
 }
 
-// 3. Render Roster Grid
+// ==========================================
+// 4. ROSTER GRID & SHOP RENDERERS
+// ==========================================
 function renderRosterGrid() {
   const grid = document.getElementById('roster-grid');
   if (!grid) return;
@@ -282,7 +343,6 @@ function selectActiveShinobi(charId) {
   logMessage(`✨ Deployed ${playerCharacter.name} into battle!`);
 }
 
-// 4. Render Shop Grid
 function renderShopGrid() {
   const grid = document.getElementById('shop-grid');
   if (!grid) return;
@@ -323,7 +383,9 @@ function buyShopItem(itemId) {
   renderShopGrid();
 }
 
-// 5. Combat Engine Functions
+// ==========================================
+// 5. COMBAT ENGINE FUNCTIONS
+// ==========================================
 function logMessage(msg, color = "#00D9E8") {
   const log = document.getElementById('combat-log');
   if (log) {
@@ -431,7 +493,9 @@ function updateHUD() {
   }
 }
 
-// Particle Generation Helper
+// ==========================================
+// 6. AMBIENT PARTICLES & INITIALIZATION
+// ==========================================
 function initParticles() {
   const particleContainer = document.getElementById('particle-container');
   if (particleContainer && particleContainer.children.length === 0) {

@@ -523,3 +523,37 @@ body {
   top: 83%;
   left: 23%;
 }
+
+.region-hub-container {
+  display: flex;
+  gap: 20px;
+  height: 100%;
+}
+
+.region-map-pane {
+  flex: 1;
+  background: rgba(8, 12, 16, 0.5);
+  border: 1px solid #1E293B;
+  border-radius: 8px;
+  position: relative; /* This allows us to absolute-position the keypoints */
+  background-size: cover;
+}
+
+.region-details-pane {
+  width: 350px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Keypoint marker style */
+.location-keypoint {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background: #D6A93A;
+  border-radius: 50%;
+  cursor: pointer;
+  border: 2px solid #FFF;
+  animation: pulseHotspot 2s infinite;
+}
