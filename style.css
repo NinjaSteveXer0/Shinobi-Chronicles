@@ -1,3 +1,6 @@
+/* ==========================================================
+   ROOT VARIABLES
+   ================================================---------- */
 :root {
   --bg-dark: #072225;
   --panel-bg: #e8d5b5;
@@ -7,6 +10,10 @@
   --text-main: #f8fafc;
 }
 
+
+/* ==========================================================
+   GLOBAL STYLES & LAYOUT
+   ================================================---------- */
 body {
   margin: 0;
   padding: 0;
@@ -43,7 +50,10 @@ header h1 {
   font-weight: bold;
 }
 
-/* Page visibility utilities */
+
+/* ==========================================================
+   PAGE VISIBILITY UTILITIES
+   ================================================---------- */
 .page-panel {
   display: block;
 }
@@ -52,7 +62,10 @@ header h1 {
   display: none !important;
 }
 
-/* Login Page Styling */
+
+/* ==========================================================
+   LOGIN PAGE STYLING
+   ================================================---------- */
 #login-page {
   background-color: #f3e5c8;
   background-image: radial-gradient(circle, #f7ebd0 0%, #e2ceaa 100%);
@@ -97,11 +110,14 @@ header h1 {
   gap: 12px;
 }
 
-/* Buttons */
+
+/* ==========================================================
+   BUTTONS STYLING
+   ================================================---------- */
 button.primary {
   background-color: var(--btn-teal);
   color: white;
-  border: none;
+  border: 1px solid #2a5c63;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
@@ -118,21 +134,26 @@ button.primary:disabled {
 }
 
 button.ghost {
-  background: transparent;
-  color: #116466; /* Dark teal text for clear contrast against parchment */
-  border: 2px solid #116466;
+  background-color: #0d484b; /* Solid high-contrast background */
+  color: #ffffff;            /* Pure white text for clarity */
+  border: 1px solid #2a5c63;
   padding: 10px 20px;
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  transition: all 0.2s ease-in-out;
 }
 
 button.ghost:hover {
-  background: rgba(17, 100, 102, 0.15);
-  color: #072225;
+  background-color: #125e63;
+  border-color: #38bdf8;
+  color: #ffffff;
 }
 
-/* Grids and Modals */
+
+/* ==========================================================
+   GRIDS AND MODALS
+   ================================================---------- */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
@@ -192,13 +213,14 @@ button.ghost:hover {
   font-family: monospace;
 }
 
-/* -----------------------------
+
+/* ==========================================================
    THEMATIC DIFFICULTY ROW STYLING
-   ----------------------------- */
+   ================================================---------- */
 .diff-row {
-  background: linear-gradient(135deg, #103136 0%, #0d272b 100%); /* Rich dark teal gradient */
-  color: #f4f1ea;                                           /* Soft parchment text */
-  border: 1px solid #2a5c63;                                 /* Subtle teal border */
+  background: linear-gradient(135deg, #103136 0%, #0d272b 100%);
+  color: #f4f1ea;                                           
+  border: 1px solid #2a5c63;                                 
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 12px;
@@ -222,35 +244,34 @@ button.ghost:hover {
 }
 
 .diff-row .diff-text h4 {
-  color: #ffd700; /* Gold heading to match the icon glow */
+  color: #ffd700;
   font-size: 1.1rem;
   font-weight: bold;
   margin: 0 0 4px 0;
 }
 
 .diff-row .diff-text p {
-  color: #b0c4de; /* Muted light steel blue for description */
+  color: #b0c4de;
   font-size: 0.9rem;
   margin: 0;
 }
 
-/* Hover effect for unlocked/active rows */
 .diff-row:not(.locked):hover {
   transform: translateY(-2px);
-  border-color: #ffd700; /* Gold border pop on hover */
+  border-color: #ffd700;
   box-shadow: 0 6px 16px rgba(255, 215, 0, 0.15);
 }
 
-/* Locked row styling */
 .diff-row.locked {
   background: #081a1d; 
   opacity: 0.6;
   border-color: #18373d;
 }
 
-/* -----------------------------
+
+/* ==========================================================
    VILLAGE HUB BUTTON STYLING
-   ----------------------------- */
+   ================================================---------- */
 #game-village .ghost,
 #game-village .primary-btn,
 #game-village button {
