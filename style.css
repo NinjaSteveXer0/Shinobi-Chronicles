@@ -1,14 +1,16 @@
-/* Page Panels & Hidden State Fix */
-.page-panel {
-  padding: 40px;
-  position: relative;
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #072225 !important;
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
 }
 
-.page-panel.hidden {
-  display: none !important;
-}
-
-/* Specific styling for the Login page parchment look */
+/* Ensure login page fields stack vertically inside the parchment box */
 #login-page {
   background-color: #f3e5c8;
   background-image: radial-gradient(circle, #f7ebd0 0%, #e2ceaa 100%);
@@ -16,35 +18,36 @@
   border-radius: 8px;
   box-shadow: inset 0 0 40px rgba(139, 94, 60, 0.25), 0 10px 25px rgba(0,0,0,0.5);
   color: #1a2e35;
-  margin: 20px auto;
-  max-width: 900px;
+  margin: 0 auto;
+  max-width: 500px;
   padding: 40px;
   text-align: center;
 }
 
-#login-page h2 {
-  color: #116466;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.1);
-  font-size: 26px;
-  margin-bottom: 20px;
-}
-
-#login-page .form-group label {
-  color: #116466;
-  font-weight: bold;
+#login-page .form-group {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  max-width: 320px;
+  margin: 0 auto 20px auto;
+  text-align: left;
 }
 
 #login-page .form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 2px solid #116466;
   background: #ffffff;
   color: #0f172a;
-  border: 2px solid #116466;
+  font-size: 16px;
 }
 
-/* Glowing golden header text */
-header h1 {
-  margin: 0;
-  font-size: 26px;
-  color: #fef08a;
-  text-shadow: 0 0 8px rgba(217, 180, 143, 0.8), 0 2px 4px rgba(0,0,0,0.8);
-  letter-spacing: 1px;
+.login-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
 }
