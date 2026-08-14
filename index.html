@@ -23,9 +23,9 @@
         <input type="password" id="password" placeholder="Password">
       </div>
       <div class="login-actions">
-  <button class="primary" onclick="login()">Login</button>
-  <button class="primary" onclick="register()">Register</button>
-</div>
+        <button class="primary" onclick="login()">Login</button>
+        <button class="primary" onclick="register()">Register</button>
+      </div>
     </div>
 
     <!-- 2. JOURNEY PAGE (POLISHED NINJA ID CARD) -->
@@ -107,7 +107,10 @@
     <div id="game-village" class="page-panel hidden">
       <h2 id="hub-village-name">Village Hub</h2>
       <p>Welcome to the ninja world!</p>
-      <button class="ghost" onclick="goBackToLogin()">Quit to Main Menu</button>
+      <div style="margin-top: 16px; display: flex; gap: 12px;">
+        <button class="primary" onclick="beginFirstBattle()">Begin First Battle</button>
+        <button class="ghost" onclick="goBackToNinja()">← Back to Ninja Card</button>
+      </div>
     </div>
 
     <!-- START CONVERSATION MODAL -->
