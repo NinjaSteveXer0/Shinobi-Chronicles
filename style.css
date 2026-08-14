@@ -122,6 +122,7 @@ button.primary {
   border-radius: 6px;
   cursor: pointer;
   font-weight: bold;
+  transition: all 0.2s ease-in-out;
 }
 
 button.primary:hover {
@@ -134,8 +135,8 @@ button.primary:disabled {
 }
 
 button.ghost {
-  background-color: #0d484b; /* Solid high-contrast background */
-  color: #ffffff;            /* Pure white text for clarity */
+  background-color: #0d484b; 
+  color: #ffffff;            
   border: 1px solid #2a5c63;
   padding: 10px 20px;
   border-radius: 6px;
@@ -148,6 +149,13 @@ button.ghost:hover {
   background-color: #125e63;
   border-color: #38bdf8;
   color: #ffffff;
+}
+
+button.ghost:disabled {
+  background-color: #1a2e35;
+  color: #64748b;
+  border-color: #1e293b;
+  cursor: not-allowed;
 }
 
 
@@ -219,8 +227,8 @@ button.ghost:hover {
    ================================================---------- */
 .diff-row {
   background: linear-gradient(135deg, #103136 0%, #0d272b 100%);
-  color: #f4f1ea;                                           
-  border: 1px solid #2a5c63;                                 
+  color: #f4f1ea;                                             
+  border: 1px solid #2a5c63;                                
   border-radius: 12px;
   padding: 16px 20px;
   margin-bottom: 12px;
@@ -266,6 +274,44 @@ button.ghost:hover {
   background: #081a1d; 
   opacity: 0.6;
   border-color: #18373d;
+}
+
+
+/* ==========================================================
+   MISSION LIST & CAMPAIGN NODE STYLING (NEW)
+   ================================================---------- */
+.mission-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.mission-node {
+  background: rgba(14, 64, 66, 0.2);
+  border: 1px solid var(--btn-teal);
+  padding: 16px 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.mission-node.active {
+  border: 2px solid #ffd700;
+  background: rgba(14, 64, 66, 0.4);
+}
+
+.mission-node h4 {
+  color: #ffd700;
+  margin: 0 0 4px 0;
+}
+
+.mission-node p {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 

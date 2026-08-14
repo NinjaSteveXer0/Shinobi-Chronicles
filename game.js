@@ -30,35 +30,34 @@ function resetInactivityTimer() {
 });
 
 /* -----------------------------
-   PAGE NAVIGATION (FIXED)
+   PAGE NAVIGATION
    ----------------------------- */
 function showPage(pageId) {
-  // Target all sections/page panels in the application
-  const pages = [
+  const panelPages = [
     "login-page",
     "journey-page",
     "difficulty-page",
     "village-page",
     "ninja-page",
+    "summary-page",
+    "treasures-page",
+    "story-page",
     "game-village"
   ];
 
-  pages.forEach(id => {
+  panelPages.forEach(id => {
     const el = $(id);
     if (!el) return;
     
     if (id === pageId) {
       el.classList.remove("hidden");
-      el.classList.add("active");
-      el.style.display = "block"; // Force display override
+      el.style.display = "block";
     } else {
       el.classList.add("hidden");
-      el.classList.remove("active");
-      el.style.display = "none"; // Force hide override
+      el.style.display = "none";
     }
   });
   
-  // Refresh difficulty list automatically if navigating to it
   if (pageId === "difficulty-page") {
     initDifficulty();
   }
@@ -80,7 +79,7 @@ function login() {
 
   App.user = user;
   localStorage.setItem("shinobi_username", user);
-  $("header-user").textContent = `Logged in as: ${user}`;
+  if ($("header-user")) $("header-user").textContent = `Logged in as: ${user}`;
   showPage("journey-page");
   resetInactivityTimer();
 }
@@ -96,20 +95,19 @@ function register() {
 
   App.user = user;
   localStorage.setItem("shinobi_username", user);
-  $("header-user").textContent = `Logged in as: ${user}`;
+  if ($("header-user")) $("header-user").textContent = `Logged in as: ${user}`;
   alert("Registration successful!");
   showPage("journey-page");
   resetInactivityTimer();
 }
 
 /* -----------------------------
-   BACK BUTTONS
+   NAVIGATION BACK/FORWARD HELPERS
    ----------------------------- */
 function goBackToJourney() { showPage("journey-page"); }
 function goBackToLogin() { 
   App.user = null;
   localStorage.removeItem("shinobi_username");
-  localStorage.removeItem("shinobi_activePage");
   clearTimeout(inactivityTimer);
   if ($("header-user")) $("header-user").textContent = "Not signed in";
   showPage("login-page"); 
@@ -119,7 +117,7 @@ function goBackToVillage() { showPage("village-page"); }
 function goBackToNinja() { showPage("ninja-page"); }
 
 /* -----------------------------
-   DIFFICULTY SELECTION (UPDATED)
+   DIFFICULTY SELECTION
    ----------------------------- */
 const DIFFICULTIES = [
   { id: "academy", name: "Academy Student", file: "Academy Student.png", desc: "Basic training, simple survival.", unlocked: true },
@@ -172,7 +170,7 @@ function selectDifficultyLevel(levelId) {
   localStorage.setItem("shinobi_selectedDifficulty", levelId);
 
   showPage("village-page");
-  if (typeof renderVillageList === "function") renderVillageList();
+  renderVillageList();
 }
 
 /* -----------------------------
@@ -202,8 +200,7 @@ function renderVillageList() {
 
     item.addEventListener("dblclick", () => {
       selectVillage(item, v);
-      showPage("ninja-page");
-      renderNinjaGrid();
+      goToNinjaSelection();
     });
 
     container.appendChild(item);
@@ -271,7 +268,7 @@ function renderNinjaGrid() {
 
     card.addEventListener("dblclick", () => {
       selectNinja(card, name);
-      startGame();
+      goToSummaryPage();
     });
 
     grid.appendChild(card);
@@ -297,7 +294,7 @@ function updateMainPlayerProfile(ninjaName) {
 
   if (imgEl) {
     if (ninjaName === "Shadow Ninja") {
-      imgEl.src = "Assets/Animated Cards/Shadow ninja - animated.png";
+      imgEl.src = "Assets/Animated Cards/Shadow Ninja.png";
       if (rankEl) rankEl.textContent = "Anbu";
     } else {
       imgEl.src = `Assets/Icons/${ninjaName}.png`;
@@ -310,173 +307,53 @@ function updateMainPlayerProfile(ninjaName) {
 }
 
 /* -----------------------------
-   START GAME MODAL & HUB
+   FLOW PROGRESSION: SUMMARY -> TREASURES -> STORY
    ----------------------------- */
-function startGame() {
+function goToSummaryPage() {
   if (!App.selectedNinja) {
-    alert("Choose a ninja first.");
+    alert("Please select a ninja first.");
     return;
   }
 
-  const modal = $("start-modal");
+  if ($("summary-ninja-name")) $("summary-ninja-name").textContent = App.selectedNinja;
+  if ($("summary-ninja-rank")) $("summary-ninja-rank").textContent = App.selectedNinja === "Shadow Ninja" ? "Anbu" : "Genin";
+  if ($("summary-village-name")) $("summary-village-name").textContent = App.selectedVillage || "Leaf";
+  if ($("summary-difficulty-name")) $("summary-difficulty-name").textContent = App.selectedDifficulty || "Academy Student";
+
+  const summaryImg = $("summary-ninja-img");
+  if (summaryImg) {
+    if (App.selectedNinja === "Shadow Ninja") {
+      summaryImg.src = "Assets/Animated Cards/Shadow Ninja.png";
+    } else {
+      summaryImg.src = `Assets/Icons/${App.selectedNinja}.png`;
+      summaryImg.onerror = () => { summaryImg.src = "Assets/Icons/Academy Student.png"; };
+    }
+  }
+
+  showPage("summary-page");
+}
+
+function goToTreasuresPage() {
+  showPage("treasures-page");
+}
+
+function goToStoryPage() {
   const convo = [
     `${App.selectedNinja}: "I’m ready, sensei."`,
-    `Trainer: "Your journey begins in ${App.selectedVillage}. Stay sharp."`,
+    `Trainer: "Your journey begins in ${App.selectedVillage || 'Leaf'}. Stay sharp."`,
     `${App.selectedNinja}: "I won't fail!"`
   ];
 
   if ($("conversation-text")) {
     $("conversation-text").innerHTML = convo.map(line => `<div>${line}</div>`).join("");
   }
-  if (modal) modal.classList.remove("hidden");
-}
 
-function closeStartModal() {
-  const modal = $("start-modal");
-  if (modal) modal.classList.add("hidden");
-}
-
-function beginFirstBattle() {
-  closeStartModal();
-  showPage("game-village");
-  if ($("hub-village-name")) {
-    $("hub-village-name").textContent = `${App.selectedVillage} Village Hub — Main: ${App.selectedNinja}`;
-  }
+  showPage("story-page");
 }
 
 /* -----------------------------
-   INITIALIZATION & ENTER KEY LISTENER
+   CHARACTER MODELS & BATTLE ENGINE
    ----------------------------- */
-document.addEventListener("DOMContentLoaded", () => {
-  const savedUser = localStorage.getItem("shinobi_username");
-  if (savedUser) {
-    App.user = savedUser;
-    if ($("header-user")) $("header-user").textContent = `Logged in as: ${savedUser}`;
-    showPage("journey-page");
-  } else {
-    showPage("login-page");
-  }
-
-  initDifficulty();
-
-  const passwordInput = $("password");
-  const usernameInput = $("username");
-
-  if (passwordInput && usernameInput) {
-    const handleEnterKey = (e) => {
-      if (e.key === "Enter") {
-        login();
-      }
-    };
-    passwordInput.addEventListener("keypress", handleEnterKey);
-    usernameInput.addEventListener("keypress", handleEnterKey);
-  }
-
-  /* ==========================================================
-   CHARACTER STATS & POWER LEVEL LOGIC
-   ================================================---------- */
-
-// Sample Character Object for Shadow Ninja
-const shadowNinja = {
-  name: "Shadow Ninja",
-  rank: "Academy Student",
-  stats: {
-    taijutsu: 2,
-    ninjutsu: 3,
-    bukishi: 1,
-    fuinjutsu: 0,
-    kinjutsu: 1, // Has a bit of forbidden knowledge!
-    genjutsu: 0,
-    stamina: 3
-  },
-  // Dynamic calculation of total Power Level
-  getPowerLevel() {
-    return (
-      this.stats.taijutsu +
-      this.stats.ninjutsu +
-      this.stats.bukishi +
-      this.stats.fuinjutsu +
-      this.stats.kinjutsu +
-      this.stats.genjutsu +
-      this.stats.stamina
-    );
-  }
-};
-
-
-/* ==========================================================
-   SEQUENTIAL BATTLE ENGINE
-   ================================================---------- */
-
-function startBattle(playerTeam, bossEnemy) {
-  let remainingBossPL = bossEnemy.powerLevel;
-  let backlashPenalty = false; // Tracks Kinjutsu penalty for the next ninja
-  let combatLog = [];
-
-  combatLog.push(`--- BATTLE STARTED: VS ${bossEnemy.name} (PL: ${remainingBossPL}) ---`);
-
-  for (let i = 0; i < playerTeam.length; i++) {
-    let ninja = playerTeam[i];
-    let basePL = ninja.getPowerLevel();
-    let effectivePL = basePL;
-
-    // 1. Check if previous teammate used Kinjutsu (Half PL Penalty)
-    if (backlashPenalty) {
-      effectivePL = Math.floor(effectivePL / 2);
-      combatLog.push(`⚠️ ${ninja.name} is staggered by Kinjutsu backlash! Power reduced to ${effectivePL}.`);
-      backlashPenalty = false; // Reset penalty after it affects this ninja
-    }
-
-    // 2. Check if this ninja uses a Kinjutsu boost (3x PL boost + trigger backlash)
-    if (ninja.stats.kinjutsu > 0 && ninja.useKinjutsuThisTurn) {
-      effectivePL = effectivePL * 3;
-      backlashPenalty = true; // Next teammate will suffer half PL
-      combatLog.push(`🔥 ${ninja.name} activates KINJUTSU! Power multiplied to ${effectivePL}!`);
-    }
-
-    // 3. Ninja attacks the boss pool
-    remainingBossPL -= effectivePL;
-    combatLog.push(`⚔️ ${ninja.name} strikes for ${effectivePL} damage! Boss PL remaining: ${Math.max(0, remainingBossPL)}`);
-
-    // 4. Check if boss is defeated
-    if (remainingBossPL <= 0) {
-      combatLog.push(`🎉 VICTORY! ${bossEnemy.name} was defeated!`);
-      return { success: true, log: combatLog, remainingBossPL: 0 };
-    } else {
-      combatLog.push(`💀 ${ninja.name} was exhausted and defeated by the boss.`);
-    }
-  }
-
-  // If loop finishes and boss PL is still > 0, it's a defeat
-  combatLog.push(`❌ DEFEAT! Your team ran out of ninjas. Boss survived with ${remainingBossPL} PL.`);
-  return { success: false, log: combatLog, remainingBossPL: remainingBossPL };
-}
-
-
-/* ==========================================================
-   MOCK BATTLE TEST
-   ================================================---------- */
-
-// Define a test boss
-const rogueNinjaBoss = {
-  name: "Rogue Jonin",
-  powerLevel: 50
-};
-
-// Define team (Shadow Ninja + Jonin Ally)
-const joninAlly = {
-  name: "Jonin Sasuke",
-  stats: { taijutsu: 8, ninjutsu: 10, bukishi: 5, fuinjutsu: 2, kinjutsu: 0, genjutsu: 3, stamina: 7 },
-  getPowerLevel() { return 35; }
-};
-
-});
-
-/* ==========================================================
-   SHADOW NINJA BATTLE SYSTEM EXTENSION
-   ========================================================== */
-
-// 1. Character Data Model
 const shadowNinja = {
   name: "Shadow Ninja",
   rank: "Academy Student",
@@ -529,8 +406,7 @@ const joninSasuke = {
   }
 };
 
-// 2. Sequential Attrition Engine
-function runShadowNinjaBattle(playerTeam, bossEnemy) {
+function startBattle(playerTeam, bossEnemy) {
   let remainingBossPL = bossEnemy.powerLevel;
   let backlashPenalty = false;
   let combatLog = [];
@@ -566,3 +442,102 @@ function runShadowNinjaBattle(playerTeam, bossEnemy) {
   combatLog.push(`❌ DEFEAT! Boss survived with ${remainingBossPL} PL.`);
   return { success: false, log: combatLog, remainingBossPL: remainingBossPL };
 }
+
+/* -----------------------------
+   BATTLE OVERLAY & UI TRIGGERS
+   ----------------------------- */
+function openBattleOverlay() {
+  const overlay = $("battle-overlay");
+  if (overlay) {
+    overlay.classList.remove("hidden");
+    overlay.style.display = "flex";
+  }
+
+  const playerImg = $("battle-player-img");
+  const playerName = $("battle-player-name");
+  if (playerImg) {
+    playerImg.src = App.selectedNinja === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${App.selectedNinja || 'Academy Student'}.png`;
+    playerImg.onerror = () => { playerImg.src = "Assets/Icons/Academy Student.png"; };
+  }
+  if (playerName) {
+    playerName.textContent = App.selectedNinja || "Shadow Ninja";
+  }
+
+  const currentPL = shadowNinja.getPowerLevel();
+  if ($("ui-player-pl")) $("ui-player-pl").innerText = currentPL;
+  if ($("ui-enemy-pl")) $("ui-enemy-pl").innerText = 50;
+
+  const progress = $("ui-boss-progress");
+  if (progress) {
+    progress.max = 50;
+    progress.value = 50;
+  }
+
+  if ($("ui-battle-log")) {
+    $("ui-battle-log").innerHTML = `<p>Mission loaded. Click FIGHT to begin sequential attrition!</p>`;
+  }
+}
+
+function closeBattleOverlay() {
+  const overlay = $("battle-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+    overlay.style.display = "none";
+  }
+}
+
+function triggerActiveBattle() {
+  const testBoss = {
+    name: "Jonin Sasuke",
+    powerLevel: 50
+  };
+
+  let battleTeam = [shadowNinja];
+  let result = startBattle(battleTeam, testBoss);
+
+  let logContainer = $("ui-battle-log");
+  if (logContainer) {
+    logContainer.innerHTML = result.log.map(line => `<p>${line}</p>`).join('');
+  }
+
+  let progress = $("ui-boss-progress");
+  if (progress) {
+    progress.value = result.remainingBossPL;
+  }
+  if ($("ui-enemy-pl")) {
+    $("ui-enemy-pl").innerText = result.remainingBossPL;
+  }
+
+  if (result.success && logContainer) {
+    logContainer.innerHTML += `<p style="color: #ffcc00; font-weight: bold;">🎉 Victory! Mission complete.</p>`;
+  }
+}
+
+/* -----------------------------
+   INITIALIZATION & LISTENERS
+   ----------------------------- */
+document.addEventListener("DOMContentLoaded", () => {
+  const savedUser = localStorage.getItem("shinobi_username");
+  if (savedUser) {
+    App.user = savedUser;
+    if ($("header-user")) $("header-user").textContent = `Logged in as: ${savedUser}`;
+    showPage("journey-page");
+  } else {
+    showPage("login-page");
+  }
+
+  initDifficulty();
+
+  const passwordInput = $("password");
+  const usernameInput = $("username");
+
+  if (passwordInput && usernameInput) {
+    const handleEnterKey = (e) => {
+      if (e.key === "Enter") {
+        login();
+      }
+    };
+    passwordInput.addEventListener("keypress", handleEnterKey);
+    usernameInput.addEventListener("keypress", handleEnterKey);
+  }
+});

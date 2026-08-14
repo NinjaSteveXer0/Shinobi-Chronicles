@@ -28,40 +28,31 @@
       </div>
     </div>
 
-    <!-- 2. JOURNEY PAGE (POLISHED NINJA ID CARD) -->
+    <!-- 2. JOURNEY PAGE (NINJA ID CARD) -->
     <div id="journey-page" class="page-panel hidden" style="text-align: center;">
       <h2>Ninja ID Card</h2>
-      
       <div class="profile-card" style="margin: 20px auto; max-width: 780px; padding: 28px; background: rgba(14, 64, 66, 0.12); border-radius: 12px; border: 2px solid var(--btn-teal); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); display: flex; gap: 24px; align-items: center;">
-        
         <div style="width: 240px; background: #07282b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
           <div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
             <img id="main-player-img" src="Assets/Icons/Academy student.png" alt="Main Character" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
           <div style="width: 100%; background: #021214; border: 1px solid rgba(255,215,0,0.4); border-radius: 4px; padding: 6px 4px; margin-top: 10px; text-align: center;">
-            <span id="main-player-name" style="font-size: 14px; font-weight: bold; color: #ffd700; text-shadow: 0 1px 2px rgba(0,0,0,0.8); display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">No Ninja Chosen</span>
+            <span id="main-player-name" style="font-size: 14px; font-weight: bold; color: #ffd700; display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">No Ninja Chosen</span>
           </div>
         </div>
-
-        <div style="flex: 1; background: #0d383b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: center; text-align: left; font-size: 15px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+        <div style="flex: 1; background: #0d383b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: center; text-align: left; font-size: 15px;">
           <div style="color: #cbd5e1;"><strong>Ninja Village:</strong></div>
           <div id="id-village" style="color: #ffffff; font-weight: bold;">Unassigned</div>
-
           <div style="color: #cbd5e1;"><strong>Ninja Rank:</strong></div>
           <div id="id-rank" style="color: #ffd700; font-weight: bold;">Academy Student</div>
-
           <div style="color: #cbd5e1;"><strong>Ninja Level:</strong></div>
           <div id="id-level" style="color: #38bdf8; font-weight: bold;">Lvl 1</div>
-
           <div style="color: #cbd5e1;"><strong>Rogue Ninja Defeated:</strong></div>
           <div id="id-rogue-defeated" style="color: #f87171; font-weight: bold;">0</div>
-
           <div style="color: #cbd5e1;"><strong>Power Level:</strong></div>
           <div id="id-power-level" style="color: #fbbf24; font-weight: bold;">Locked</div>
         </div>
-
       </div>
-
       <div style="margin-top: 24px;">
         <button class="primary" onclick="showPage('difficulty-page')">Select Difficulty →</button>
         <button class="ghost" onclick="goBackToLogin()">Logout</button>
@@ -72,11 +63,7 @@
     <div id="difficulty-page" class="page-panel hidden">
       <h2>Difficulty</h2>
       <p style="color: var(--accent); margin-bottom: 20px;">Complete the game to unlock harder difficulty modes with better rewards and special ninjas!</p>
-      
-      <div class="difficulty-list" id="difficulty-list-container">
-        <!-- Populated dynamically via game.js -->
-      </div>
-
+      <div class="difficulty-list" id="difficulty-list-container"></div>
       <div class="controls-bar" style="margin-top: 24px;">
         <button class="ghost" onclick="goBackToJourney()">← Back</button>
       </div>
@@ -99,28 +86,154 @@
       <div id="ninja-grid" class="grid-container"></div>
       <div style="margin-top:16px;">
         <button class="ghost" onclick="goBackToVillage()">← Back</button>
-        <button id="start-game-btn" class="primary" disabled onclick="startGame()">Start Game</button>
+        <!-- Proceeds to the Summary Page instead of skipping -->
+        <button id="start-game-btn" class="primary" disabled onclick="goToSummaryPage()">Continue to Summary →</button>
       </div>
     </div>
 
-    <!-- 6. IN-GAME VILLAGE HUB -->
+    <!-- 6. SUMMARY PAGE (New Integration) -->
+    <div id="summary-page" class="page-panel hidden" style="text-align: left;">
+      <h2 style="color: #ffd700;">Summary</h2>
+      <p style="color: #cbd5e1; margin-bottom: 20px;">Your journey is about to begin. Review your choices below.</p>
+      
+      <div style="display: flex; gap: 20px; align-items: flex-start; background: rgba(14, 64, 66, 0.2); border: 2px solid var(--btn-teal); padding: 20px; border-radius: 8px;">
+        <!-- Selected Ninja Focus Card -->
+        <div style="width: 200px; text-align: center; background: #07282b; padding: 15px; border-radius: 6px;">
+          <img id="summary-ninja-img" src="" alt="Selected Ninja" style="width: 120px; height: 140px; object-fit: cover; border-radius: 4px; border: 2px solid #ffd700;">
+          <h3 id="summary-ninja-name" style="color: #ffd700; margin-top: 10px; font-size: 16px;">Ninja Name</h3>
+          <p id="summary-ninja-rank" style="color: #38bdf8; font-size: 13px;">Genin</p>
+        </div>
+
+        <!-- Details & Jonin Companion Box -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 15px;">
+          <div style="background: #0d383b; padding: 15px; border-radius: 6px; border: 1px solid var(--btn-teal);">
+            <h4 style="color: #38bdf8; margin-bottom: 5px;">Starting Jonin Sensei</h4>
+            <p id="summary-jonin-text" style="font-size: 14px; color: #cbd5e1;">Your sensei is awaiting your return back in the village!</p>
+          </div>
+          <div style="background: #0d383b; padding: 15px; border-radius: 6px; border: 1px solid var(--btn-teal);">
+            <h4 style="color: #ffd700; margin-bottom: 5px;">Starting Configuration</h4>
+            <p style="font-size: 14px; color: #cbd5e1;">Village: <span id="summary-village-name" style="color:#fff; font-weight:bold;">Leaf</span></p>
+            <p style="font-size: 14px; color: #cbd5e1;">Difficulty: <span id="summary-difficulty-name" style="color:#fff; font-weight:bold;">Beginner</span></p>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 24px; display: flex; justify-content: space-between;">
+        <button class="ghost" onclick="showPage('ninja-page')">← Repick Ninja</button>
+        <button class="primary" onclick="goToTreasuresPage()">Begin Journey →</button>
+      </div>
+    </div>
+
+    <!-- 7. TREASURES / LEGACY PAGE (New Integration) -->
+    <div id="treasures-page" class="page-panel hidden" style="text-align: center;">
+      <h2 style="color: #ffd700;">Treasures</h2>
+      <p style="color: #cbd5e1; margin-bottom: 20px;">Lucky! You will begin your journey with the following bonuses:</p>
+      
+      <div style="background: rgba(14, 64, 66, 0.2); border: 2px solid var(--btn-teal); padding: 30px; border-radius: 8px; max-width: 600px; margin: 0 auto; display: flex; gap: 15px; justify-content: center;">
+        <div style="background: #07282b; padding: 15px 25px; border-radius: 6px; border: 1px solid #ffd700; color: #ffd700; font-weight: bold;">
+          🥷 Shuriken
+        </div>
+        <div style="background: #07282b; padding: 15px 25px; border-radius: 6px; border: 1px solid #38bdf8; color: #38bdf8; font-weight: bold;">
+          🛡️ Iron Armor
+        </div>
+      </div>
+
+      <div style="margin-top: 24px;">
+        <button class="primary" onclick="goToStoryPage()">Continue to Story →</button>
+      </div>
+    </div>
+
+    <!-- 8. CHARACTER STARTING STORY / DIALOGUE PAGE (New Integration) -->
+    <div id="story-page" class="page-panel hidden">
+      <div style="background: rgba(14, 64, 66, 0.2); border: 2px solid var(--btn-teal); padding: 25px; border-radius: 8px;">
+        <h2 id="story-location-title" style="color: #ffd700;">Ichiraku Ramen</h2>
+        <p id="story-location-desc" style="color: #cbd5e1; margin-bottom: 20px; font-size: 14px;">Popular ramen restaurant, serving hundreds of customers every day.</p>
+        
+        <div style="background: #07282b; border: 1px solid var(--btn-teal); padding: 20px; border-radius: 6px; margin-bottom: 20px; max-height: 250px; overflow-y: auto;">
+          <h3 style="color: #38bdf8; font-size: 16px; margin-bottom: 10px;">Rumble In The Ramen Restaurant</h3>
+          <p style="font-size: 13px; color: #94a3b8; margin-bottom: 15px;">A number of complaints from neighbours has reached Mission Central, and it's up to you to sort this mess out!</p>
+          <div id="conversation-text" class="conversation-box" style="display: flex; flex-direction: column; gap: 8px; font-size: 14px; color: #fff;">
+            <!-- Populated via game.js dialogue script -->
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end;">
+          <button class="primary" onclick="openBattleOverlay()">Proceed to Battle →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. WORLD MISSION HUB (Campaign Nodes) -->
     <div id="game-village" class="page-panel hidden">
       <h2 id="hub-village-name">Village Hub</h2>
-      <p>Welcome to the ninja world!</p>
-      <div style="margin-top: 16px; display: flex; gap: 12px;">
-        <button class="primary" onclick="beginFirstBattle()">Begin First Battle</button>
+      <p>Welcome to the ninja world! Choose your next mission node below:</p>
+      
+      <div class="mission-list" style="margin-top: 20px; display: flex; flex-direction: column; gap: 12px;">
+        <div style="background: rgba(14, 64, 66, 0.2); border: 1px solid var(--btn-teal); padding: 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="color: #ffd700;">An Early Drink (Completed)</h4>
+            <p style="font-size: 13px; color: #94a3b8;">An old-timer who went straight for the free drinks.</p>
+          </div>
+          <button class="ghost" disabled>Completed</button>
+        </div>
+        <div style="background: rgba(14, 64, 66, 0.2); border: 2px solid #ffd700; padding: 15px; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <h4 style="color: #ffd700;">Mouthful of Mizuki (Active Boss)</h4>
+            <p style="font-size: 13px; color: #94a3b8;">The known troublemaker Mizuki turns tiger-like when riled up.</p>
+          </div>
+          <button class="primary" onclick="openBattleOverlay()">FIGHT</button>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
         <button class="ghost" onclick="showPage('ninja-page')">← Back to Character Select</button>
       </div>
     </div>
 
-    <!-- START CONVERSATION MODAL -->
-    <div id="start-modal" class="modal-overlay hidden">
-      <div class="modal-card">
-        <h3>Beginning Training</h3>
-        <div id="conversation-text" class="conversation-box"></div>
-        <button class="primary" onclick="beginFirstBattle()">Begin First Battle</button>
+    <!-- 10. BATTLE ARENA OVERLAY (VS Transition & Sequential Attrition) -->
+    <div id="battle-overlay" class="modal-overlay hidden" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1000; justify-content: center; align-items: center;">
+      <div style="background: #1e1111; border: 2px solid #8b0000; width: 800px; padding: 30px; border-radius: 8px; color: #fff; text-align: center; box-shadow: 0 0 20px rgba(139,0,0,0.5);">
+        
+        <h2 style="color: #ff4d4d; margin-bottom: 20px;">Mission: Rumble In The Ramen — VS Jonin Sasuke</h2>
+        
+        <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 20px;">
+          <!-- Player Card -->
+          <div>
+            <img id="battle-player-img" src="" alt="Player Ninja" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #28a745; object-fit: cover;">
+            <h3 id="battle-player-name">Ninja</h3>
+            <p>PL: <span id="ui-player-pl">10</span></p>
+          </div>
+
+          <h1 style="color: #ff4d4d; font-style: italic;">VS</h1>
+
+          <!-- Enemy Card -->
+          <div>
+            <img src="Assets/Animated Cards/Jonin Sasuke.png" alt="Jonin Sasuke" style="width: 100px; height: 100px; border-radius: 50%; border: 2px solid #dc3545; object-fit: cover;">
+            <h3>Jonin Sasuke</h3>
+            <p>Boss PL Pool: <span id="ui-enemy-pl">50</span></p>
+          </div>
+        </div>
+
+        <!-- Health / PL Pool Bar -->
+        <div style="margin-bottom: 20px;">
+          <label style="font-size: 0.9rem; color: #ccc;">Enemy Health / PL Pool</label>
+          <progress id="ui-boss-progress" value="50" max="50" style="width: 100%; height: 20px; accent-color: #ff4d4d;"></progress>
+        </div>
+
+        <!-- Combat Log / Story Output -->
+        <div id="ui-battle-log" style="background: #0f0505; border: 1px solid #500; height: 120px; text-align: left; padding: 10px; font-family: monospace; font-size: 0.85rem; color: #00ffcc; overflow-y: auto; margin-bottom: 20px;">
+          <p>Awaiting combat initiation...</p>
+        </div>
+
+        <!-- Controls -->
+        <div style="display: flex; justify-content: center; gap: 15px;">
+          <button class="primary" onclick="triggerActiveBattle()">FIGHT</button>
+          <button class="ghost" onclick="closeBattleOverlay()">CLOSE / BACK</button>
+        </div>
+
       </div>
     </div>
+
   </div>
 
   <script src="game.js" defer></script>
