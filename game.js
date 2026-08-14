@@ -58,49 +58,47 @@ function openOverlay(type) {
   switch(type) {
     case 'village':
       container.innerHTML = `
-        <h2 style="color: #D6A93A; font-size: 16px; margin-bottom: 8px;">HIDDEN LEAF VILLAGE (KONOHAGAKURE)</h2>
-        <p style="color: #94A3B8; font-size: 11px; margin-bottom: 15px;">Manage your daily Hokage duties, academy training, and merchant deals.</p>
+        <h2 style="color: #D6A93A; font-size: 15px; margin-bottom: 6px;">HIDDEN LEAF VILLAGE (KONOHAGAKURE)</h2>
+        <p style="color: #94A3B8; font-size: 10px; margin-bottom: 12px;">Manage your daily Hokage duties, academy training, and merchant deals.</p>
         <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; flex: 1;">
-          <div style="background: #080C10; border: 1px solid #1E293B; padding: 12px; border-radius: 6px;">
-            <h3 style="color: #00D9E8; font-size: 12px; margin-bottom: 5px;">Hokage Office</h3>
-            <p style="color: #64748B; font-size: 10px;">Accept high-rank missions and distribute squad assignments.</p>
+          <div style="background: #111827; border: 1px solid #1E293B; padding: 12px; border-radius: 6px;">
+            <h3 style="color: #00D9E8; font-size: 11px; margin-bottom: 4px;">Hokage Office</h3>
+            <p style="color: #64748B; font-size: 9px;">Accept high-rank missions and distribute squad assignments.</p>
           </div>
-          <div style="background: #080C10; border: 1px solid #1E293B; padding: 12px; border-radius: 6px;">
-            <h3 style="color: #00D9E8; font-size: 12px; margin-bottom: 5px;">Ichiraku Ramen</h3>
-            <p style="color: #64748B; font-size: 10px;">Boost temporary stamina and chakra regen buffers.</p>
+          <div style="background: #111827; border: 1px solid #1E293B; padding: 12px; border-radius: 6px;">
+            <h3 style="color: #00D9E8; font-size: 11px; margin-bottom: 4px;">Ichiraku Ramen</h3>
+            <p style="color: #64748B; font-size: 9px;">Boost temporary stamina and chakra regen buffers.</p>
           </div>
-          <div style="background: #080C10; border: 1px solid #1E293B; padding: 12px; border-radius: 6px;">
-            <h3 style="color: #00D9E8; font-size: 12px; margin-bottom: 5px;">Ninja Academy</h3>
-            <p style="color: #64748B; font-size: 10px;">Research new ninjutsu tiers and elemental affinities.</p>
+          <div style="background: #111827; border: 1px solid #1E293B; padding: 12px; border-radius: 6px;">
+            <h3 style="color: #00D9E8; font-size: 11px; margin-bottom: 4px;">Ninja Academy</h3>
+            <p style="color: #64748B; font-size: 9px;">Research new ninjutsu tiers and elemental affinities.</p>
           </div>
         </div>
       `;
       break;
     case 'missions':
       container.innerHTML = `
-        <h2 style="color: #D6A93A; font-size: 16px; margin-bottom: 8px;">MISSION BOARD</h2>
-        <p style="color: #94A3B8; font-size: 11px; margin-bottom: 15px;">Active B-Rank Contract: Escort the Kazekage Envoy.</p>
+        <h2 style="color: #D6A93A; font-size: 15px; margin-bottom: 6px;">MISSION BOARD</h2>
+        <p style="color: #94A3B8; font-size: 10px;">Active B-Rank Contract: Escort the Kazekage Envoy.</p>
       `;
       break;
     case 'battle':
       container.innerHTML = `
-        <h2 style="color: #D6A93A; font-size: 16px; margin-bottom: 8px;">COMBAT ARENA</h2>
-        <p style="color: #94A3B8; font-size: 11px; margin-bottom: 15px;">Prepare your squad formations for tactical clashes.</p>
+        <h2 style="color: #D6A93A; font-size: 15px; margin-bottom: 6px;">COMBAT ARENA</h2>
+        <p style="color: #94A3B8; font-size: 10px;">Prepare your squad formations for tactical clashes.</p>
       `;
       break;
     default:
       container.innerHTML = `
-        <h2 style="color: #D6A93A; font-size: 16px; margin-bottom: 8px;">SYSTEM PENDING</h2>
-        <p style="color: #94A3B8; font-size: 11px;">This module is currently under development.</p>
+        <h2 style="color: #D6A93A; font-size: 15px; margin-bottom: 6px;">SYSTEM PENDING</h2>
+        <p style="color: #94A3B8; font-size: 10px;">This module is currently under development.</p>
       `;
   }
 }
 
 function closeOverlay() {
   const overlay = document.getElementById('screen-overlay');
-  if (overlay) {
-    overlay.style.display = 'none';
-  }
+  if (overlay) overlay.style.display = 'none';
 }
 
 // --- REGION HUB CONTROLS ---
@@ -127,24 +125,23 @@ function renderRegionHubUI(regionKey, region) {
       </div>
     </div>
 
-    <div class="region-hub-container" style="display: flex; gap: 12px; flex: 1; overflow: hidden;">
+    <div style="display: flex; gap: 12px; flex: 1; overflow: hidden;">
       
-      <!-- Left Map View with Proper Image Layer and Coordinate Hotspots -->
-      <div class="region-map-pane" style="flex: 1; position: relative; overflow: hidden; border: 1px solid #1E293B; border-radius: 6px; background: #05080c; display: flex; align-items: center; justify-content: center;">
-        <img src="${region.mapImage}" class="region-map-image" alt="${region.name}" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+      <!-- Left Map View Pane -->
+      <div style="flex: 1; position: relative; overflow: hidden; border: 1px solid #1E293B; border-radius: 6px; background: #05080c; display: flex; align-items: center; justify-content: center;">
+        <img src="${region.mapImage}" alt="${region.name}" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
 
         ${region.locations.map(loc => `
-          <button class="region-hotspot ${selectedLocationNode && selectedLocationNode.id === loc.id ? 'selected' : ''}" 
-                  style="position: absolute; left: ${loc.x}%; top: ${loc.y}%; transform: translate(-50%, -50%); background: none; border: none; cursor: pointer; z-index: 5;"
+          <button style="position: absolute; left: ${loc.x}%; top: ${loc.y}%; transform: translate(-50%, -50%); background: none; border: none; cursor: pointer; z-index: 5;"
                   onclick="selectMapNode('${regionKey}', '${loc.id}')">
-            <span class="hotspot-orb" style="display: block; width: 24px; height: 24px; border: 2px solid white; border-radius: 50%; background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#FFF' : '#D6A93A'}; box-shadow: 0 0 8px #D6A93A, 0 0 20px rgba(214,169,58,.7);"></span>
-            <span class="hotspot-label" style="display: block; margin-top: 4px; padding: 3px 7px; background: rgba(5,8,12,.92); border: 1px solid #334155; border-radius: 4px; color: white; font-size: 9px; font-weight: 700; white-space: nowrap;">${loc.name}</span>
+            <span style="display: block; width: 22px; height: 22px; border: 2px solid #FFF; border-radius: 50%; background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#FFF' : '#D6A93A'}; box-shadow: 0 0 8px #D6A93A;"></span>
+            <span style="display: block; margin-top: 3px; padding: 2px 6px; background: rgba(5,8,12,0.92); border: 1px solid #334155; border-radius: 3px; color: #FFF; font-size: 8px; font-weight: 700; white-space: nowrap;">${loc.name}</span>
           </button>
         `).join('')}
       </div>
 
       <!-- Right Location Details Pane -->
-      <div class="region-details-pane" style="width: 280px; background: #080C10; border: 1px solid #1E293B; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
+      <div style="width: 270px; background: #080C10; border: 1px solid #1E293B; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="font-size: 9px; color: #D6A93A; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #1E293B; padding-bottom: 4px;">Location Details</div>
           
