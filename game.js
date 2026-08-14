@@ -6,9 +6,9 @@ const worldRegions = {
     description: "A land of passion and willpower, protected by fierce ninjas and burning spirit.",
     mapImage: "Assets/Backgrounds/inside_LOF.png",
     locations: [
-      { id: "konohagakure", name: "Konohagakure (Hidden Leaf)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "The glorious capital hidden behind giant mountain walls.", levelRange: "1-50", bestFor: "Hub & Quests", enemyTypes: "Safe Zone" },
-      { id: "training_grounds", name: "Training Grounds", type: "battle", category: "EXP Grinding", desc: "High-density wildlife and rogue ninja scouting grounds.", levelRange: "10-16", bestFor: "EXP", enemyTypes: "Bandits" },
-      { id: "bandit_hideout", name: "Bandit Hideout", type: "battle", category: "Loot Hotspot", desc: "Outlaw encampment hiding stolen scrolls and gear.", levelRange: "15-20", bestFor: "Ryo & Materials", enemyTypes: "Rogues" }
+      { id: "konohagakure", name: "Konohagakure (Hidden Leaf)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "The glorious capital hidden behind giant mountain walls.", levelRange: "1-50", bestFor: "Hub & Quests", enemyTypes: "Safe Zone", x: 50, y: 86 },
+      { id: "training_grounds", name: "Training Grounds", type: "battle", category: "EXP Grinding", desc: "High-density wildlife and rogue ninja scouting grounds.", levelRange: "10-16", bestFor: "EXP", enemyTypes: "Bandits", x: 30, y: 44 },
+      { id: "bandit_hideout", name: "Bandit Hideout", type: "battle", category: "Loot Hotspot", desc: "Outlaw encampment hiding stolen scrolls and gear.", levelRange: "15-20", bestFor: "Ryo & Materials", enemyTypes: "Rogues", x: 26, y: 22 }
     ]
   },
   wind: {
@@ -16,7 +16,7 @@ const worldRegions = {
     description: "Vast desert territory known for resilient warriors and sand mastery.",
     mapImage: "Assets/Backgrounds/WorldMap.png",
     locations: [
-      { id: "sunagakure", name: "Sunagakure (Hidden Sand)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Hidden fortress nestled within sweeping desert dunes.", levelRange: "10-60", bestFor: "Puppet Jutsu", enemyTypes: "Safe Zone" }
+      { id: "sunagakure", name: "Sunagakure (Hidden Sand)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Hidden fortress nestled within sweeping desert dunes.", levelRange: "10-60", bestFor: "Puppet Jutsu", enemyTypes: "Safe Zone", x: 50, y: 50 }
     ]
   },
   water: {
@@ -24,7 +24,7 @@ const worldRegions = {
     description: "An isolated island archipelago shrouded in thick mist and brutal traditions.",
     mapImage: "Assets/Backgrounds/WorldMap.png",
     locations: [
-      { id: "kirigakure", name: "Kirigakure (Hidden Mist)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "The misty sanctuary of legendary swordsmen.", levelRange: "15-65", bestFor: "Water Style", enemyTypes: "Safe Zone" }
+      { id: "kirigakure", name: "Kirigakure (Hidden Mist)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "The misty sanctuary of legendary swordsmen.", levelRange: "15-65", bestFor: "Water Style", enemyTypes: "Safe Zone", x: 50, y: 50 }
     ]
   },
   earth: {
@@ -32,7 +32,7 @@ const worldRegions = {
     description: "Rugged terrain carved out of steep rock canyons and stone formations.",
     mapImage: "Assets/Backgrounds/WorldMap.png",
     locations: [
-      { id: "iwagakure", name: "Iwagakure (Hidden Stone)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Unwavering fortress carved directly into massive stone cliffs.", levelRange: "15-65", bestFor: "Earth Release", enemyTypes: "Safe Zone" }
+      { id: "iwagakure", name: "Iwagakure (Hidden Stone)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Unwavering fortress carved directly into massive stone cliffs.", levelRange: "15-65", bestFor: "Earth Release", enemyTypes: "Safe Zone", x: 50, y: 50 }
     ]
   },
   lightning: {
@@ -40,7 +40,7 @@ const worldRegions = {
     description: "Mountain ranges echoing with continuous thunder storms and high-voltage chakra.",
     mapImage: "Assets/Backgrounds/WorldMap.png",
     locations: [
-      { id: "kumogakure", name: "Kumogakure (Hidden Cloud)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Soaring peaks touching the skies where lightning strikes.", levelRange: "20-70", bestFor: "Lightning Release", enemyTypes: "Safe Zone" }
+      { id: "kumogakure", name: "Kumogakure (Hidden Cloud)", type: "village", category: "CAPITAL VILLAGE HUB", desc: "Soaring peaks touching the skies where lightning strikes.", levelRange: "20-70", bestFor: "Lightning Release", enemyTypes: "Safe Zone", x: 50, y: 50 }
     ]
   }
 };
@@ -112,10 +112,10 @@ function openRegionHub(regionKey) {
   const overlay = document.getElementById('screen-overlay');
   overlay.style.display = 'flex';
 
-  renderRegionHubUI(region);
+  renderRegionHubUI(regionKey, region);
 }
 
-function renderRegionHubUI(region) {
+function renderRegionHubUI(regionKey, region) {
   const container = document.getElementById('overlay-content-container');
   if (!container) return;
 
@@ -129,18 +129,21 @@ function renderRegionHubUI(region) {
 
     <div class="region-hub-container" style="display: flex; gap: 12px; flex: 1; overflow: hidden;">
       
-      <!-- Left Map View (Cleaned background display without overlapping random pins) -->
-      <div class="region-map-pane" style="flex: 1; background-image: url('${region.mapImage}'); background-size: cover; background-position: center; background-repeat: no-repeat; border: 1px solid #1E293B; border-radius: 6px; position: relative; min-height: 400px; display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;">
-        <div style="background: rgba(8, 12, 16, 0.85); border: 1px solid #1E293B; padding: 8px; border-radius: 4px; display: flex; gap: 8px; overflow-x: auto;">
-          ${region.locations.map(loc => `
-            <button onclick="selectMapNode('${region.id}', '${loc.id}')" style="background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#D6A93A' : '#111827'}; color: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#000' : '#FFF'}; border: 1px solid #334155; padding: 4px 10px; border-radius: 4px; font-size: 9px; cursor: pointer; white-space: nowrap; font-weight: bold;">
-              ${loc.name}
-            </button>
-          `).join('')}
-        </div>
+      <!-- Left Map View with Proper Image Layer and Coordinate Hotspots -->
+      <div class="region-map-pane" style="flex: 1; position: relative; overflow: hidden; border: 1px solid #1E293B; border-radius: 6px; background: #05080c; display: flex; align-items: center; justify-content: center;">
+        <img src="${region.mapImage}" class="region-map-image" alt="${region.name}" style="width: 100%; height: 100%; object-fit: contain; display: block;" />
+
+        ${region.locations.map(loc => `
+          <button class="region-hotspot ${selectedLocationNode && selectedLocationNode.id === loc.id ? 'selected' : ''}" 
+                  style="position: absolute; left: ${loc.x}%; top: ${loc.y}%; transform: translate(-50%, -50%); background: none; border: none; cursor: pointer; z-index: 5;"
+                  onclick="selectMapNode('${regionKey}', '${loc.id}')">
+            <span class="hotspot-orb" style="display: block; width: 24px; height: 24px; border: 2px solid white; border-radius: 50%; background: ${selectedLocationNode && selectedLocationNode.id === loc.id ? '#FFF' : '#D6A93A'}; box-shadow: 0 0 8px #D6A93A, 0 0 20px rgba(214,169,58,.7);"></span>
+            <span class="hotspot-label" style="display: block; margin-top: 4px; padding: 3px 7px; background: rgba(5,8,12,.92); border: 1px solid #334155; border-radius: 4px; color: white; font-size: 9px; font-weight: 700; white-space: nowrap;">${loc.name}</span>
+          </button>
+        `).join('')}
       </div>
 
-      <!-- Right Location Details Pane (Fixed styling, removed yellow box glitch) -->
+      <!-- Right Location Details Pane -->
       <div class="region-details-pane" style="width: 280px; background: #080C10; border: 1px solid #1E293B; border-radius: 6px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between;">
         <div>
           <div style="font-size: 9px; color: #D6A93A; font-weight: bold; margin-bottom: 6px; text-transform: uppercase; border-bottom: 1px solid #1E293B; padding-bottom: 4px;">Location Details</div>
@@ -149,7 +152,7 @@ function renderRegionHubUI(region) {
           <div style="color: #00D9E8; font-size: 9px; margin-bottom: 8px;">${selectedLocationNode ? selectedLocationNode.category : ''}</div>
           <div style="color: #94A3B8; font-size: 9px; line-height: 1.4; margin-bottom: 12px;">${selectedLocationNode ? selectedLocationNode.desc : ''}</div>
 
-          <div style="display: flex; flex-direction: column; gap: 5px; font-size: 9px; border-top: 1px solid #1E293B; paddingTop: 8px;">
+          <div style="display: flex; flex-direction: column; gap: 5px; font-size: 9px; border-top: 1px solid #1E293B; padding-top: 8px;">
             <div style="display: flex; justify-content: space-between;"><span style="color: #64748B;">Level Range</span><span style="color: #FFF;">${selectedLocationNode ? selectedLocationNode.levelRange : ''}</span></div>
             <div style="display: flex; justify-content: space-between;"><span style="color: #64748B;">Best For</span><span style="color: #FFF;">${selectedLocationNode ? selectedLocationNode.bestFor : ''}</span></div>
             <div style="display: flex; justify-content: space-between;"><span style="color: #64748B;">Enemy Types</span><span style="color: #FFF;">${selectedLocationNode ? selectedLocationNode.enemyTypes : ''}</span></div>
@@ -169,7 +172,7 @@ function selectMapNode(regionKey, locId) {
   const region = worldRegions[regionKey];
   if (!region) return;
   selectedLocationNode = region.locations.find(l => l.id === locId);
-  renderRegionHubUI(region);
+  renderRegionHubUI(regionKey, region);
 }
 
 function handleNodeNavigation(type) {
