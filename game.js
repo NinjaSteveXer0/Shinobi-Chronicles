@@ -170,7 +170,6 @@ function openRegionHub(regionKey) {
   selectedLocationNode = region.locations[0];
 
   const overlay = document.getElementById('screen-overlay');
-  const container = document.getElementById('overlay-content-container');
   overlay.style.display = 'flex';
 
   renderRegionHubUI(region);
@@ -191,7 +190,7 @@ function renderRegionHubUI(region) {
 
     <div class="region-hub-container" style="display: flex; gap: 20px; flex: 1; min-height: 500px;">
       
-      <!-- Left Map / Node Network Pane with exact asset filename reference -->
+      <!-- Left Map / Node Network Pane -->
       <div class="region-map-pane" style="flex: 1; background-image: url('${region.mapImage}'); background-size: 100% 100%; background-position: center; background-repeat: no-repeat; border: 1px solid #1E293B; border-radius: 8px; position: relative; min-height: 480px;">
         ${region.locations.map(loc => `
           <div class="location-keypoint ${selectedLocationNode && selectedLocationNode.id === loc.id ? 'active-node' : ''}" 

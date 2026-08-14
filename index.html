@@ -3,80 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shinobi Chronicles - Dark Anime RPG</title>
+  <title>Shinobi Online: World of Ninja</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- ==========================================
-      PRIMARY BACKGROUND: THE WORLD MAP STAGE
-      ========================================== -->
-  <div class="world-view">
+  <!-- MAIN APP CONTAINER -->
+  <div class="game-container">
     
-    <!-- TOP NAVIGATION / HUD -->
-    <div class="game-header">
-      <div class="nav-tabs">
-        <button class="nav-tab" onclick="openOverlay('village')">VILLAGE</button>
-        <button class="nav-tab" onclick="openOverlay('roster')">ROSTER</button>
-        <button class="nav-tab" onclick="openOverlay('battle')">ARENA</button>
-        <button class="nav-tab" onclick="openOverlay('shop')">SHOP & GEAR</button>
+    <!-- TOP NAVIGATION BAR -->
+    <header class="game-header">
+      <div class="header-left">
+        <button class="nav-btn active" onclick="openOverlay('village')">VILLAGE</button>
+        <button class="nav-btn" onclick="openOverlay('roster')">ROSTER</button>
+        <button class="nav-btn" onclick="openOverlay('battle')">ARENA</button>
+        <button class="nav-btn" onclick="openOverlay('shop')">SHOP & GEAR</button>
       </div>
-      <div class="hud-stats">
-        <div class="hud-item">RYO: <span id="hud-ryo">14,500</span></div>
-        <div class="hud-item">CHAKRA: <span id="hud-chakra">1200/1200</span></div>
-        <div class="hud-item">RANK: <span id="hud-rank">Kage</span></div>
+      <div class="header-right">
+        <div class="currency-display"><span>RYO:</span> <b id="hud-ryo">14,500</b></div>
+        <div class="currency-display"><span>CHAKRA:</span> <b id="hud-chakra">1200/1200</b></div>
+        <div class="currency-display"><span>RANK:</span> <b id="hud-rank">Kage</b></div>
+      </div>
+    </header>
+
+    <!-- WORLD MAP VIEWPORT -->
+    <main class="world-map-viewport">
+      <div class="world-map-bg"></div>
+      
+      <!-- REGION NODE BUTTONS -->
+      <div class="map-node-pin region-fire" onclick="openRegionHub('fire')" style="top: 45%; left: 35%;">
+        <div class="pin-glow"></div>
+        <span class="pin-label">Land of Fire</span>
+      </div>
+    </main>
+
+    <!-- BOTTOM ACTION DOCK -->
+    <footer class="game-footer">
+      <div class="footer-action-item" onclick="claimDailyReward()">
+        <span>🎁 Daily Reward</span>
+      </div>
+      <div class="footer-action-item" onclick="openOverlay('events')">
+        <span>⚔️ Events</span>
+      </div>
+      <div class="footer-action-item" onclick="openOverlay('missions')">
+        <span>📜 Missions</span>
+      </div>
+    </footer>
+
+    <!-- OVERLAY SCREEN MODAL -->
+    <div id="screen-overlay" class="screen-overlay" style="display: none;">
+      <div class="overlay-content-box">
+        <button class="overlay-close-btn" onclick="closeOverlay()">✕ CLOSE</button>
+        <div id="overlay-content-container" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;"></div>
       </div>
     </div>
 
-    <!-- MAP INTERACTIVE HOTSPOTS -->
-
-    <div class="map-hotspot land-of-fire" onclick="openRegionHub('fire')">
-  <span class="hotspot-label">KONOHAGAKURE (LAND OF FIRE)</span>
-</div>
-
-<div class="map-hotspot land-of-wind" onclick="openRegionHub('wind')">
-  <span class="hotspot-label">SUNAGAKURE (LAND OF WIND)</span>
-</div>
-
-    <div class="map-hotspot land-of-water" onclick="openOverlay('missions')">
-      <span class="hotspot-label">KIRIGAKURE (LAND OF WATER)</span>
-    </div>
-
-    <div class="map-hotspot land-of-earth" onclick="openOverlay('missions')">
-      <span class="hotspot-label">IWAGAKURE (LAND OF EARTH)</span>
-    </div>
-
-    <div class="map-hotspot land-of-lightning" onclick="openOverlay('missions')">
-      <span class="hotspot-label">KUMOGAKURE (LAND OF LIGHTNING)</span>
-    </div>
-
-    <div class="map-hotspot akatsuki-hideout" onclick="openOverlay('events')">
-      <span class="hotspot-label">AKATSUKI HIDEOUT</span>
-    </div>
-
-    <!-- RIGHT-HAND SIDEBAR INTERACTIVE OVERLAYS -->
-    <div class="map-sidebar-panel active-mission-box" onclick="openOverlay('missions')">
-      <span class="panel-action-text"></span>
-    </div>
-
-    <div class="map-sidebar-panel daily-reward-box" onclick="claimDailyReward()">
-      <span class="panel-action-text"></span>
-    </div>
-
-    <div class="map-sidebar-panel world-events-box" onclick="openOverlay('events')">
-      <span class="panel-action-text"></span>
-    </div>
-
-  </div>
-
-  <!-- ==========================================
-      MODAL OVERLAY SCREENS
-      ========================================== -->
-  <div id="screen-overlay" class="screen-overlay" style="display: none;">
-    <button class="btn-close-overlay" onclick="closeOverlay()">✕ CLOSE</button>
-    <div id="overlay-content-container" class="overlay-content-container">
-      <!-- Dynamically injected via JavaScript -->
-    </div>
   </div>
 
   <script src="game.js"></script>

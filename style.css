@@ -1,6 +1,6 @@
 /* ==========================================
-    SECTION 1: GLOBAL RESET & BASE STYLES
-    ========================================== */
+   GLOBAL RESET & THEME STYLING
+   ========================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,217 +9,232 @@
   user-select: none;
 }
 
-body {
-  background-color: #080C10;
-  color: #E2E8F0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-}
-
-/* ==========================================
-    SECTION 2: WORLD MAP PRIMARY VIEW
-    ========================================== */
-.world-view {
-  width: 100vw;
-  height: 100vh;
-  background: url('Assets/Backgrounds/World Map.png') center/contain no-repeat; /* Changed cover to contain */
-  background-color: #080C10; /* Fills any side letterboxes with dark theme color */
-  position: relative;
-  overflow: hidden;
-}
-
-/* Map Interactive Hotspots */
-.map-hotspot {
-  position: absolute;
-  top: 38%;   /* Aligned with Land of Fire */
-  left: 36%;  /* Aligned with Land of Fire */
-  transform: translate(-50%, -50%);
-  width: 90px;
-  height: 90px;
-  border: 2px dashed #D6A93A;
-  border-radius: 50%;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(214, 169, 58, 0.1);
-  animation: pulseHotspot 2s infinite;
-  z-index: 10;
-}
-
-.map-hotspot:hover {
-  background: rgba(0, 217, 232, 0.2);
-  border-color: #00D9E8;
-}
-
-.hotspot-label {
-  position: absolute;
-  bottom: -25px;
-  font-size: 9px;
-  font-weight: bold;
-  color: #D6A93A;
-  background: rgba(8, 12, 16, 0.8);
-  padding: 2px 6px;
-  border-radius: 4px;
-  white-space: nowrap;
-  border: 1px solid #D6A93A;
-}
-
-@keyframes pulseHotspot {
-  0% { box-shadow: 0 0 0 0 rgba(214, 169, 58, 0.4); }
-  70% { box-shadow: 0 0 0 15px rgba(214, 169, 58, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(214, 169, 58, 0); }
-}
-
-/* Sidebar Panel Overlays */
-.map-sidebar-panel {
-  position: absolute;
-  right: 25px; 
-  width: 260px;
-  cursor: pointer;
-  z-index: 20;
-  transition: all 0.2s;
-}
-
-.active-mission-box {
-  top: 135px;
-  height: 145px;
-}
-
-.daily-reward-box {
-  top: 400px;
-  height: 110px;
-}
-
-.world-events-box {
-  top: 610px;
-  height: 165px;
-}
-
-.map-sidebar-panel:hover {
-  background: rgba(0, 217, 232, 0.05);
-  border: 1px dashed rgba(0, 217, 232, 0.3);
-  border-radius: 8px;
-}
-
-/* ==========================================
-    SECTION 3: HUD & NAVIGATION BAR
-    ========================================== */
-.game-header {
-  position: absolute;
-  top: 0;
-  left: 0;
+body, html {
   width: 100%;
-  height: 60px;
-  background: rgba(8, 12, 16, 0.9);
+  height: 100%;
+  background-color: #040608;
+  color: #F8FAFC;
+  overflow: hidden;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  position: relative;
+}
+
+/* ==========================================
+   HEADER BAR
+   ========================================== */
+.game-header {
+  height: 55px;
+  background: rgba(8, 12, 16, 0.95);
   border-bottom: 1px solid #1E293B;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 25px;
-  z-index: 50;
+  padding: 0 20px;
+  z-index: 10;
 }
 
-.hud-stats {
+.header-left, .header-right {
   display: flex;
-  gap: 20px;
-  font-size: 12px;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-btn {
+  background: transparent;
+  border: 1px solid #1E293B;
+  color: #94A3B8;
+  padding: 6px 14px;
+  font-size: 11px;
   font-weight: bold;
   letter-spacing: 1px;
-}
-
-.hud-item span {
-  color: #00D9E8;
-}
-
-.nav-tabs {
-  display: flex;
-  gap: 10px;
-}
-
-.nav-tab {
-  background: #080C10;
-  color: #94A3B8;
-  border: 1px solid #1E293B;
-  padding: 8px 16px;
-  border-radius: 4px;
   cursor: pointer;
-  font-size: 11px;
-  font-weight: bold;
-  transition: all 0.2s;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
-.nav-tab:hover, .nav-tab.active {
-  background: #082B30;
-  color: #00D9E8;
-  border-color: #00D9E8;
+.nav-btn:hover, .nav-btn.active {
+  background: #D6A93A;
+  color: #000;
+  border-color: #D6A93A;
+  box-shadow: 0 0 10px rgba(214, 169, 58, 0.4);
+}
+
+.currency-display {
+  font-size: 11px;
+  color: #94A3B8;
+  background: #111827;
+  border: 1px solid #1E293B;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.currency-display b {
+  color: #F8FAFC;
+  margin-left: 4px;
 }
 
 /* ==========================================
-    SECTION 4: OVERLAY MODAL SYSTEM
-    ========================================== */
+   WORLD MAP VIEWPORT
+   ========================================== */
+.world-map-viewport {
+  flex: 1;
+  position: relative;
+  background-color: #080C10;
+  overflow: hidden;
+}
+
+.world-map-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, #111827 0%, #040608 100%);
+  opacity: 0.8;
+}
+
+.map-node-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 5;
+}
+
+.pin-glow {
+  width: 24px;
+  height: 24px;
+  background: #00D9E8;
+  border: 2px solid #FFF;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #00D9E8;
+  animation: pulsePin 2s infinite;
+}
+
+.pin-label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: bold;
+  color: #FFF;
+  background: rgba(8, 12, 16, 0.85);
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid #1E293B;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+@keyframes pulsePin {
+  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 217, 232, 0.7); }
+  70% { transform: scale(1.1); box-shadow: 0 0 0 10px rgba(0, 217, 232, 0); }
+  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 217, 232, 0); }
+}
+
+/* ==========================================
+   FOOTER DOCK
+   ========================================== */
+.game-footer {
+  height: 45px;
+  background: rgba(8, 12, 16, 0.95);
+  border-top: 1px solid #1E293B;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  z-index: 10;
+}
+
+.footer-action-item {
+  font-size: 11px;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 5px 12px;
+  border-radius: 4px;
+  transition: color 0.2s;
+}
+
+.footer-action-item:hover {
+  color: #D6A93A;
+  background: #111827;
+}
+
+/* ==========================================
+   OVERLAY MODAL SYSTEM
+   ========================================== */
 .screen-overlay {
   position: absolute;
-  top: 75px;
-  left: 3%;
-  width: 94%;
-  height: 87%;
-  background: rgba(8, 12, 16, 0.96);
-  border: 1px solid #D6A93A;
-  border-radius: 10px;
-  z-index: 100;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(4, 6, 8, 0.85);
+  backdrop-filter: blur(5px);
   display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
 }
 
-.btn-close-overlay {
+.overlay-content-box {
+  width: 90vw;
+  max-width: 1100px;
+  height: 85vh;
+  background: #0B0F15;
+  border: 1px solid #1E293B;
+  border-radius: 10px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+  display: flex;
+  flex-direction: column;
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+}
+
+.overlay-close-btn {
   position: absolute;
-  top: 15px;
-  right: 20px;
-  background: #1E293B;
-  color: #FFF;
-  border: 1px solid #E53935;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+  top: 20px;
+  right: 25px;
+  background: none;
+  border: 1px solid #1E293B;
+  color: #94A3B8;
+  padding: 5px 10px;
   font-size: 11px;
   font-weight: bold;
-  z-index: 110;
-  transition: all 0.2s;
+  cursor: pointer;
+  border-radius: 4px;
+  z-index: 10;
 }
 
-.btn-close-overlay:hover {
+.overlay-close-btn:hover {
   background: #E53935;
-}
-
-.overlay-content-container {
-  flex: 1;
-  padding: 25px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
+  color: #FFF;
+  border-color: #E53935;
 }
 
 /* ==========================================
-    SECTION 5: BATTLE ARENA OVERLAY STYLES
-    ========================================== */
+   BATTLE ARENA & CARDS
+   ========================================== */
 .battle-arena {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  flex: 1;
   position: relative;
+  justify-content: space-between;
 }
 
 .battle-environment {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
-  z-index: 1;
+  overflow: hidden;
 }
 
 .combatants-stage {
@@ -237,56 +252,50 @@ body {
   gap: 15px;
 }
 
-/* Card Styling Framework */
 .character-card-frame {
-  width: 200px;
-  height: 290px;
-  background: #080C10;
-  border-radius: 12px;
-  position: relative;
+  width: 180px;
+  height: 260px;
+  background: #111827;
+  border: 2px solid #D6A93A;
+  border-radius: 8px;
   display: flex;
   flex-direction: column;
+  position: relative;
   overflow: hidden;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+  box-shadow: 0 0 20px rgba(214, 169, 58, 0.2);
 }
 
-.card-rarity-legendary { border: 2px solid #D6A93A; box-shadow: 0 0 15px rgba(214, 169, 58, 0.3); }
-.card-rarity-rare { border: 2px solid #00D9E8; box-shadow: 0 0 15px rgba(0, 217, 232, 0.3); }
+.card-rarity-legendary { border-color: #D6A93A; box-shadow: 0 0 20px rgba(214, 169, 58, 0.3); }
+.card-rarity-rare { border-color: #00D9E8; box-shadow: 0 0 20px rgba(0, 217, 232, 0.3); }
 
 .card-header-tag {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  background: rgba(8, 12, 16, 0.85);
-  border: 1px solid #D6A93A;
-  color: #D6A93A;
-  font-size: 8px;
+  background: #D6A93A;
+  color: #000;
+  font-size: 9px;
   font-weight: bold;
-  padding: 2px 6px;
-  border-radius: 3px;
-  z-index: 5;
+  text-align: center;
+  padding: 3px;
+  letter-spacing: 1px;
 }
 
 .card-art-container {
   flex: 1;
-  width: 100%;
+  background-size: cover;
+  background-position: center;
 }
 
 .card-footer-stats {
-  background: rgba(8, 12, 16, 0.95);
+  background: rgba(8, 12, 16, 0.9);
+  padding: 8px;
   border-top: 1px solid #1E293B;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
 }
 
 .card-title {
   font-size: 11px;
   font-weight: bold;
   color: #FFF;
+  margin-bottom: 3px;
   text-align: center;
-  letter-spacing: 0.5px;
 }
 
 .card-stats-row {
@@ -296,11 +305,8 @@ body {
   color: #94A3B8;
 }
 
-.card-stats-row b { color: #00D9E8; }
-
-/* Health Bars */
 .health-bar-container {
-  width: 200px;
+  width: 180px;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -315,29 +321,31 @@ body {
 
 .bar {
   width: 100%;
-  height: 6px;
-  background: #1E293B;
-  border-radius: 3px;
+  height: 8px;
+  background: #111827;
+  border: 1px solid #1E293B;
+  border-radius: 4px;
   overflow: hidden;
 }
 
 .fill {
+  width: 100%;
   height: 100%;
-  background: #00D9E8;
+  background: #22C55E;
   transition: width 0.3s ease;
 }
 
-.fill.enemy { background: #E53935; }
-
-.versus-badge {
-  font-size: 24px;
-  font-weight: bold;
-  color: #D6A93A;
-  font-style: italic;
-  z-index: 2;
+.fill.enemy {
+  background: #E53935;
 }
 
-/* Combat Console */
+.versus-badge {
+  font-size: 22px;
+  font-weight: 900;
+  color: #D6A93A;
+  font-style: italic;
+}
+
 .combat-console {
   background: #080C10;
   border: 1px solid #1E293B;
@@ -345,13 +353,13 @@ body {
   padding: 15px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   z-index: 2;
 }
 
 .action-feedback-log {
-  font-size: 11px;
-  font-family: monospace;
+  font-size: 12px;
+  min-height: 20px;
 }
 
 .action-buttons {
@@ -361,69 +369,61 @@ body {
 
 .btn-ninja {
   flex: 1;
-  background: #082B30;
-  color: #FFF;
-  border: 1px solid #00D9E8;
+  background: #111827;
+  border: 1px solid #D6A93A;
+  color: #D6A93A;
   padding: 10px;
-  border-radius: 6px;
-  cursor: pointer;
   font-size: 11px;
   font-weight: bold;
-  letter-spacing: 0.5px;
+  cursor: pointer;
+  border-radius: 4px;
   transition: all 0.2s;
 }
 
 .btn-ninja:hover {
-  background: #00D9E8;
-  color: #080C10;
+  background: #D6A93A;
+  color: #000;
+  box-shadow: 0 0 10px rgba(214, 169, 58, 0.4);
 }
 
 /* ==========================================
-    SECTION 6: ROSTER GRID STYLES
-    ========================================== */
-.roster-grid {
+   ROSTER & SHOP GRIDS
+   ========================================== */
+.roster-grid, .shop-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 20px;
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 5px;
 }
 
 .roster-card {
+  background: #080C10;
+  border: 1px solid #1E293B;
+  border-radius: 8px;
+  padding: 15px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-}
-
-.roster-card .character-card-frame {
-  width: 150px;
-  height: 220px;
+  gap: 12px;
 }
 
 .btn-select-shinobi {
-  background: #082B30;
-  color: #FFF;
+  width: 100%;
+  background: #111827;
   border: 1px solid #00D9E8;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+  color: #00D9E8;
+  padding: 6px;
   font-size: 10px;
   font-weight: bold;
-  transition: all 0.2s;
-  width: 150px;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 .btn-select-shinobi:hover {
   background: #00D9E8;
-  color: #080C10;
-}
-
-/* ==========================================
-    SECTION 7: SHOP & GEAR STYLES
-    ========================================== */
-.shop-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  color: #000;
 }
 
 .shop-item-card {
@@ -434,18 +434,19 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 12px;
+  height: 160px;
 }
 
 .shop-item-title {
-  color: #D6A93A;
   font-size: 13px;
   font-weight: bold;
+  color: #FFF;
+  margin-bottom: 5px;
 }
 
 .shop-item-desc {
-  color: #94A3B8;
   font-size: 11px;
+  color: #94A3B8;
   line-height: 1.4;
 }
 
@@ -453,107 +454,44 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  border-top: 1px solid #1E293B;
+  padding-top: 10px;
 }
 
 .shop-item-price {
-  color: #00D9E8;
-  font-size: 12px;
+  font-size: 11px;
+  color: #D6A93A;
   font-weight: bold;
 }
 
 .btn-buy-item {
-  background: #082B30;
-  color: #FFF;
-  border: 1px solid #00D9E8;
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
+  background: #D6A93A;
+  color: #000;
+  border: none;
+  padding: 5px 12px;
   font-size: 10px;
   font-weight: bold;
-  transition: all 0.2s;
+  cursor: pointer;
+  border-radius: 4px;
 }
 
 .btn-buy-item:hover {
-  background: #00D9E8;
-  color: #080C10;
+  opacity: 0.9;
 }
 
-/* Ambient Particles */
+/* ==========================================
+   PARTICLES
+   ========================================== */
 .particle {
   position: absolute;
-  background: rgba(0, 217, 232, 0.6);
+  background: #D6A93A;
   border-radius: 50%;
-  pointer-events: none;
+  opacity: 0.5;
   animation: floatParticle linear infinite;
 }
 
 @keyframes floatParticle {
-  0% { transform: translateY(0px); opacity: 0; }
+  0% { transform: translateY(0) scale(1); opacity: 0; }
   50% { opacity: 0.8; }
-  100% { transform: translateY(-400px); opacity: 0; }
-}
-
-/* Specific Regional Hotspot Coordinates */
-.land-of-fire {
-  top: 38%;
-  left: 36%;
-}
-
-.land-of-wind {
-  top: 39%;
-  left: 20%;
-}
-
-.land-of-water {
-  top: 51%;
-  left: 49%;
-}
-
-.land-of-earth {
-  top: 19%;
-  left: 21%;
-}
-
-.land-of-lightning {
-  top: 53%;
-  left: 67%;
-}
-
-.akatsuki-hideout {
-  top: 83%;
-  left: 23%;
-}
-
-.region-hub-container {
-  display: flex;
-  gap: 20px;
-  height: 100%;
-}
-
-.region-map-pane {
-  flex: 1;
-  background: rgba(8, 12, 16, 0.5);
-  border: 1px solid #1E293B;
-  border-radius: 8px;
-  position: relative; /* This allows us to absolute-position the keypoints */
-  background-size: cover;
-}
-
-.region-details-pane {
-  width: 350px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-/* Keypoint marker style */
-.location-keypoint {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  background: #D6A93A;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid #FFF;
-  animation: pulseHotspot 2s infinite;
+  100% { transform: translateY(-150px) scale(0.2); opacity: 0; }
 }
