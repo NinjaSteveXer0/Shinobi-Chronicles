@@ -307,36 +307,8 @@ function updateMainPlayerProfile(ninjaName) {
 }
 
 /* -----------------------------
-   FLOW PROGRESSION: SUMMARY -> TREASURES -> STORY
+   FLOW PROGRESSION & TRANSITIONS
    ----------------------------- */
-function goToSummaryPage() {
-  if (!App.selectedNinja) {
-    alert("Please select a ninja first.");
-    return;
-  }
-
-  if ($("summary-ninja-name")) $("summary-ninja-name").textContent = App.selectedNinja;
-  if ($("summary-ninja-rank")) $("summary-ninja-rank").textContent = App.selectedNinja === "Shadow Ninja" ? "Anbu" : "Genin";
-  if ($("summary-village-name")) $("summary-village-name").textContent = App.selectedVillage || "Leaf";
-  if ($("summary-difficulty-name")) $("summary-difficulty-name").textContent = App.selectedDifficulty || "Academy Student";
-
-  const summaryImg = $("summary-ninja-img");
-  if (summaryImg) {
-    if (App.selectedNinja === "Shadow Ninja") {
-      summaryImg.src = "Assets/Animated Cards/Shadow Ninja.png";
-    } else {
-      summaryImg.src = `Assets/Icons/${App.selectedNinja}.png`;
-      summaryImg.onerror = () => { summaryImg.src = "Assets/Icons/Academy Student.png"; };
-    }
-  }
-
-  showPage("summary-page");
-}
-
-function goToTreasuresPage() {
-  showPage("treasures-page");
-}
-
 function goToStoryPage() {
   const convo = [
     `${App.selectedNinja}: "I’m ready, sensei."`,
@@ -344,11 +316,147 @@ function goToStoryPage() {
     `${App.selectedNinja}: "I won't fail!"`
   ];
 
+  const storyPanel = $("story-page");
+  if (storyPanel) {
+    storyPanel.classList.add("page-transition-fade");
+    setTimeout(() => storyPanel.classList.remove("page-transition-fade"), 400);
+  }
+
   if ($("conversation-text")) {
     $("conversation-text").innerHTML = convo.map(line => `<div>${line}</div>`).join("");
   }
 
   showPage("story-page");
+}
+
+/* -----------------------------
+   BATTLE OVERLAY & DYNAMIC ANIMATIONS
+   ----------------------------- */
+function openBattleOverlay() {
+  const overlay = $("battle-overlay");
+  if (overlay) {
+    overlay.classList.remove("hidden");
+    overlay.style.display = "flex";
+    overlay.classList.add("page-transition-fade");
+    setTimeout(() => overlay.classList.remove("page-transition-fade"), 400);
+  }
+
+  const playerImg = $("battle-player-img");
+  const playerName = $("battle-player-name");
+  if (playerImg) {
+    playerImg.className = "fighter-wrapper";
+    playerImg.src = App.selectedNinja === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${App.selectedNinja || 'Academy Student'}.png`;
+    playerImg.onerror = () => { playerImg.src = "Assets/Icons/Academy Student.png"; };
+  }
+  if (playerName) {
+    playerName.textContent = App.selectedNinja || "Shadow Ninja";
+  }
+
+  // Set initial player PL based on selected ninja
+  const currentPL = App.selectedNinja === "Shadow Ninja" ? 10 : 5;
+  if ($("ui-player-pl")) $("ui-player-pl").innerText = currentPL;
+  if ($("ui-enemy-pl")) $("ui-enemy-pl").innerText = 50;
+
+  updateModernHealthBar(50, 50);
+
+  if ($("ui-battle-log")) {
+    $("ui-battle-log").innerHTML = `<p>Mission loaded. Click FIGHT to engage combat!</p>`;
+  }
+}
+
+function closeBattleOverlay() {
+  const overlay = $("battle-overlay");
+  if (overlay) {
+    overlay.classList.add("hidden");
+    overlay.style.display = "none";
+  }
+}
+
+function updateModernHealthBar(current, max) {
+  const fill = $("ui-health-fill");
+  const text = $("ui-health-text");
+  const percentage = Math.max(0, Math.min(100, (current / max) * 100));
+  
+  if (fill) fill.style.width = `${percentage}%`;
+  if (text) text.innerText = `BOSS PL POOL: ${Math.max(0, current)} / ${max}`;
+}
+
+function showFloatingDamage(amount) {
+  const modalCard = document.querySelector(".modern-battle-card");
+  if (!modalCard) return;
+
+  const dmgPopup = document.createElement("div");
+  dmgPopup.className = "floating-damage";
+  dmgPopup.innerText = `-${amount}`;
+  modalCard.appendChild(dmgPopup);
+
+  setTimeout(() => {
+    dmgPopup.remove();
+  }, 900);
+}
+
+/* Accurate Single Squad Member Combat with Lunge & Enemy Reaction */
+async function triggerActiveBattle() {
+  const testBoss = {
+    name: "Jonin Sasuke",
+    maxPL: 50,
+    powerLevel: 50
+  };
+
+  // Restrict squad strictly to the user's chosen ninja
+  let activeNinjaName = App.selectedNinja || "Shadow Ninja";
+  let activeNinjaPL = activeNinjaName === "Shadow Ninja" ? 10 : 5;
+  let activeNinjaAsset = activeNinjaName === "Shadow Ninja" ? "Assets/Animated Cards/Shadow Ninja.png" : `Assets/Icons/${activeNinjaName}.png`;
+
+  let logContainer = $("ui-battle-log");
+  if (logContainer) logContainer.innerHTML = `<p>--- BATTLE STARTED: VS ${testBoss.name} (PL: ${testBoss.powerLevel}) ---</p>`;
+
+  let currentBossHP = testBoss.powerLevel;
+
+  const playerImg = $("battle-player-img");
+  const enemyContainer = document.querySelector(".enemy-wrapper") || $("battle-enemy-img")?.parentElement;
+  const playerName = $("battle-player-name");
+  const playerPL = $("ui-player-pl");
+
+  if (playerName) playerName.textContent = activeNinjaName;
+  if (playerPL) playerPL.innerText = activeNinjaPL;
+  if (playerImg) {
+    playerImg.src = activeNinjaAsset;
+  }
+
+  await new Promise(r => setTimeout(r, 400));
+
+  // Player Attack Lunge
+  if (playerImg) playerImg.classList.add("lunge-forward");
+  if (enemyContainer) enemyContainer.classList.add("enemy-hit");
+
+  currentBossHP -= activeNinjaPL;
+  showFloatingDamage(activeNinjaPL);
+  updateModernHealthBar(currentBossHP, testBoss.maxPL);
+
+  if (logContainer) {
+    logContainer.innerHTML += `<p>⚔️ ${activeNinjaName} strikes for <strong>${activeNinjaPL}</strong> damage! Boss HP left: ${Math.max(0, currentBossHP)}</p>`;
+    logContainer.scrollTop = logContainer.scrollHeight;
+  }
+
+  await new Promise(r => setTimeout(r, 400));
+  if (playerImg) playerImg.classList.remove("lunge-forward");
+  if (enemyContainer) enemyContainer.classList.remove("enemy-hit");
+
+  await new Promise(r => setTimeout(r, 600));
+
+  // Outcome check
+  if (currentBossHP <= 0) {
+    if (logContainer) {
+      logContainer.innerHTML += `<p style="color: #4ade80; font-weight: bold;">🎉 VICTORY! ${activeNinjaName} defeated ${testBoss.name}!</p>`;
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+  } else {
+    if (logContainer) {
+      logContainer.innerHTML += `<p style="color: #ef4444; font-weight: bold;">❌ DEFEAT! Boss survived with ${currentBossHP} PL. Train harder!</p>`;
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+  }
 }
 
 /* -----------------------------
