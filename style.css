@@ -23,7 +23,8 @@ body {
 .world-view {
   width: 100vw;
   height: 100vh;
-  background: url('Assets/Backgrounds/World Map.png') center/cover no-repeat;
+  background: url('Assets/Backgrounds/World Map.png') center/contain no-repeat; /* Changed cover to contain */
+  background-color: #080C10; /* Fills any side letterboxes with dark theme color */
   position: relative;
   overflow: hidden;
 }
