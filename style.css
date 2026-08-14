@@ -492,3 +492,34 @@ body {
   50% { opacity: 0.8; }
   100% { transform: translateY(-400px); opacity: 0; }
 }
+
+/* Specific Regional Hotspot Coordinates */
+.land-of-fire {
+  top: 38%;
+  left: 36%;
+}
+
+.land-of-wind {
+  top: 39%;
+  left: 20%;
+}
+
+.land-of-water {
+  top: 51%;
+  left: 49%;
+}
+
+.land-of-earth {
+  top: 19%;
+  left: 21%;
+}
+
+.land-of-lightning {
+  top: 53%;
+  left: 67%;
+}
+
+.akatsuki-hideout {
+  top: 83%;
+  left: 23%;
+}
