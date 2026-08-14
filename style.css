@@ -85,9 +85,8 @@ body, html {
 .world-map-viewport {
   flex: 1;
   position: relative;
-  background-color: #080C10;
-  /* Ensure your world map background filename matches your assets folder */
-  background-image: url('Assets/Maps/WorldMap.png');
+  background-color: #0d131f;
+  background-image: url('Assets/Backgrounds/WorldMap.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
