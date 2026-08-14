@@ -1,107 +1,128 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ninja Manager: Shadow Path</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <title>Shinobi Chronicles</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <div id="game-container">
-    <!-- TOP NAVBAR / HEADER -->
-    <header id="game-header">
-      <div class="logo-area">
-        <h1>SHIN SHINOBI</h1>
-        <h2>NINJA MANAGER</h2>
-      </div>
-      <div class="player-hud">
-        <span id="player-name">Team Shadow</span>
-        <span id="player-gold">💰 150</span>
-        <span id="player-chakra">🌀 176</span>
-      </div>
+  <div class="app">
+    <header>
+      <h1>Shinobi Chronicles</h1>
+      <div class="user" id="header-user">Not signed in</div>
     </header>
 
-    <!-- MAIN VIEWPORT CONTAINER -->
-    <main id="game-viewport">
+    <!-- 1. LOGIN PAGE -->
+    <div id="login-page" class="page-panel">
+      <h2>Login / Register</h2>
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" placeholder="Ninja name">
+        <label for="password">Password</label>
+        <input type="password" id="password" placeholder="Password">
+      </div>
+      <div class="login-actions">
+        <button class="primary" onclick="login()">Login</button>
+        <button class="primary" onclick="register()">Register</button>
+      </div>
+    </div>
 
-      <!-- SCREEN 1: WORLD MAP / MISSION LIST -->
-      <section id="screen-world" class="game-screen active">
-        <div class="area-header">
-          <h2>Ichiraku Ramen</h2>
-          <p>Popular ramen restaurant, serving hundreds of Leaf customers every day.</p>
-        </div>
-        <div class="mission-list">
-          <div class="mission-card completed">
-            <div class="mission-status">✅</div>
-            <div class="mission-info">
-              <h3>An Early Drink</h3>
-              <p>An old-timer who went straight for the free drinks, placing last in the noodle tournament.</p>
-            </div>
-            <button class="btn-fight" disabled>FIGHT</button>
+    <!-- 2. JOURNEY PAGE (POLISHED NINJA ID CARD) -->
+    <div id="journey-page" class="page-panel hidden" style="text-align: center;">
+      <h2>Ninja ID Card</h2>
+      
+      <div class="profile-card" style="margin: 20px auto; max-width: 780px; padding: 28px; background: rgba(14, 64, 66, 0.12); border-radius: 12px; border: 2px solid var(--btn-teal); box-shadow: inset 0 0 10px rgba(0,0,0,0.1); display: flex; gap: 24px; align-items: center;">
+        
+        <div style="width: 240px; background: #07282b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 12px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+          <div style="width: 100%; height: 320px; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #000;">
+            <img id="main-player-img" src="Assets/Icons/Academy student.png" alt="Main Character" style="width: 100%; height: 100%; object-fit: cover;">
           </div>
-          <div class="mission-card active-mission">
-            <div class="mission-status">⚔️</div>
-            <div class="mission-info">
-              <h3>Mouthful of Mizuki</h3>
-              <p>The known troublemaker Mizuki turns into a tiger-like creature when riled up. Tread carefully!</p>
-            </div>
-            <button class="btn-fight" onclick="App.startMission('Mouthful of Mizuki', 50)">FIGHT</button>
-          </div>
-        </div>
-      </section>
-
-      <!-- SCREEN 2: BATTLE ARENA -->
-      <section id="screen-battle" class="game-screen">
-        <div class="battle-arena-layout">
-          <div class="combatant player-side">
-            <img src="Assets/Animated Cards/Shadow Ninja.png" alt="Shadow Ninja" id="battle-player-img">
-            <h3 id="battle-player-name">Shadow Ninja</h3>
-            <p>PL: <span id="battle-player-pl">0</span></p>
-          </div>
-
-          <div class="vs-center">
-            <h2>VS</h2>
-            <div class="health-container">
-              <label>Boss PL Pool</label>
-              <progress id="boss-health-bar" value="50" max="50"></progress>
-              <span id="boss-hp-text">50 / 50</span>
-            </div>
-          </div>
-
-          <div class="combatant enemy-side">
-            <img src="Assets/Animated Cards/Jonin Sasuke.png" alt="Jonin Sasuke" id="battle-enemy-img">
-            <h3 id="battle-enemy-name">Jonin Sasuke</h3>
-            <p>Target PL: <span id="battle-enemy-pl">50</span></p>
+          <div style="width: 100%; background: #021214; border: 1px solid rgba(255,215,0,0.4); border-radius: 4px; padding: 6px 4px; margin-top: 10px; text-align: center;">
+            <span id="main-player-name" style="font-size: 14px; font-weight: bold; color: #ffd700; text-shadow: 0 1px 2px rgba(0,0,0,0.8); display: block; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">No Ninja Chosen</span>
           </div>
         </div>
 
-        <div class="battle-controls">
-          <button id="btn-run-battle" class="btn-primary" onclick="App.runSequentialFight()">START AUTOMATED FIGHT</button>
-          <button id="btn-skip-battle" class="btn-secondary" onclick="App.skipFight()">SKIP BATTLE</button>
+        <div style="flex: 1; background: #0d383b; border: 2px solid var(--btn-teal); border-radius: 8px; padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-content: center; text-align: left; font-size: 15px; box-shadow: 0 4px 16px rgba(0,0,0,0.4);">
+          <div style="color: #cbd5e1;"><strong>Ninja Village:</strong></div>
+          <div id="id-village" style="color: #ffffff; font-weight: bold;">Unassigned</div>
+
+          <div style="color: #cbd5e1;"><strong>Ninja Rank:</strong></div>
+          <div id="id-rank" style="color: #ffd700; font-weight: bold;">Academy Student</div>
+
+          <div style="color: #cbd5e1;"><strong>Ninja Level:</strong></div>
+          <div id="id-level" style="color: #38bdf8; font-weight: bold;">Lvl 1</div>
+
+          <div style="color: #cbd5e1;"><strong>Rogue Ninja Defeated:</strong></div>
+          <div id="id-rogue-defeated" style="color: #f87171; font-weight: bold;">0</div>
+
+          <div style="color: #cbd5e1;"><strong>Power Level:</strong></div>
+          <div id="id-power-level" style="color: #fbbf24; font-weight: bold;">Locked</div>
         </div>
 
-        <div id="combat-log-box">
-          <p>Ready for battle...</p>
-        </div>
-      </section>
+      </div>
 
-      <!-- SCREEN 3: VICTORY / REWARDS -->
-      <section id="screen-victory" class="game-screen">
-        <div class="victory-card">
-          <h2>Victory</h2>
-          <p class="subtext">MISSION COMPLETED!</p>
-          <div class="rewards-loot">
-            <span>💰 +8 Gold</span>
-            <span>✨ +9 EXP</span>
-          </div>
-          <button class="btn-primary" onclick="App.returnToWorld()">FINISH</button>
-        </div>
-      </section>
+      <div style="margin-top: 24px;">
+        <button class="primary" onclick="showPage('difficulty-page')">Select Difficulty →</button>
+        <button class="ghost" onclick="goBackToLogin()">Logout</button>
+      </div>
+    </div>
 
-    </main>
+    <!-- 3. DIFFICULTY PAGE -->
+    <div id="difficulty-page" class="page-panel hidden">
+      <h2>Difficulty</h2>
+      <p style="color: var(--accent); margin-bottom: 20px;">Complete the game to unlock harder difficulty modes with better rewards and special ninjas!</p>
+      
+      <div class="difficulty-list" id="difficulty-list-container">
+        <!-- Populated dynamically via game.js -->
+      </div>
+
+      <div class="controls-bar" style="margin-top: 24px;">
+        <button class="ghost" onclick="goBackToJourney()">← Back</button>
+      </div>
+    </div>
+
+    <!-- 4. VILLAGE SELECTION PAGE -->
+    <div id="village-page" class="page-panel hidden">
+      <h2>Select Village</h2>
+      <div id="village-list" class="grid-container"></div>
+      <div style="margin-top:16px;">
+        <button class="ghost" onclick="goBackToDifficulty()">← Back</button>
+        <button id="to-ninja-btn" class="primary" disabled onclick="goToNinjaSelection()">Continue →</button>
+      </div>
+    </div>
+
+    <!-- 5. NINJA SELECTION PAGE -->
+    <div id="ninja-page" class="page-panel hidden">
+      <h2>Select Your Character</h2>
+      <div id="ninja-village-label" style="color: var(--accent); font-weight: bold; margin-bottom: 12px;"></div>
+      <div id="ninja-grid" class="grid-container"></div>
+      <div style="margin-top:16px;">
+        <button class="ghost" onclick="goBackToVillage()">← Back</button>
+        <button id="start-game-btn" class="primary" disabled onclick="startGame()">Start Game</button>
+      </div>
+    </div>
+
+    <!-- 6. IN-GAME VILLAGE HUB -->
+    <div id="game-village" class="page-panel hidden">
+      <h2 id="hub-village-name">Village Hub</h2>
+      <p>Welcome to the ninja world!</p>
+      <div style="margin-top: 16px; display: flex; gap: 12px;">
+        <button class="primary" onclick="beginFirstBattle()">Begin First Battle</button>
+        <button class="ghost" onclick="showPage('ninja-page')">← Back to Character Select</button>
+      </div>
+    </div>
+
+    <!-- START CONVERSATION MODAL -->
+    <div id="start-modal" class="modal-overlay hidden">
+      <div class="modal-card">
+        <h3>Beginning Training</h3>
+        <div id="conversation-text" class="conversation-box"></div>
+        <button class="primary" onclick="beginFirstBattle()">Begin First Battle</button>
+      </div>
+    </div>
   </div>
 
-  <script src="game.js"></script>
+  <script src="game.js" defer></script>
 </body>
 </html>
