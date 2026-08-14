@@ -1,6 +1,7 @@
 // 1. Shinobi Chronicles Character Roster & Combat Engine
 const charactersDatabase = {
   naruto: {
+    id: "naruto",
     name: "Kage Naruto",
     rank: "Kage",
     rarity: "legendary",
@@ -16,6 +17,7 @@ const charactersDatabase = {
     }
   },
   sasuke: {
+    id: "sasuke",
     name: "Jonin Sasuke",
     rank: "Elite",
     rarity: "legendary",
@@ -31,6 +33,7 @@ const charactersDatabase = {
     }
   },
   sakura: {
+    id: "sakura",
     name: "Sannin Sakura",
     rank: "Legendary Sannin",
     rarity: "rare",
@@ -46,6 +49,7 @@ const charactersDatabase = {
     }
   },
   nagato: {
+    id: "nagato",
     name: "Teen Nagato",
     rank: "Akatsuki",
     rarity: "legendary",
@@ -71,7 +75,55 @@ let battleState = {
   ryo: 14500
 };
 
-// 2. Combat Logging & Feedback
+// 2. Screen Navigation Logic
+function switchScreen(screenName) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+
+  if (screenName === 'battle') {
+    document.getElementById('screen-battle').classList.add('active');
+    document.getElementById('tab-battle').classList.add('active');
+  } else if (screenName === 'roster') {
+    document.getElementById('screen-roster').classList.add('active');
+    document.getElementById('tab-roster').classList.add('active');
+    renderRosterGrid();
+  }
+}
+
+// 3. Render Roster Grid View
+function renderRosterGrid() {
+  const grid = document.getElementById('roster-grid');
+  grid.innerHTML = '';
+
+  Object.values(charactersDatabase).forEach(char => {
+    const isSelected = playerCharacter.name === char.name;
+    const cardDiv = document.createElement('div');
+    cardDiv.className = 'roster-card';
+    cardDiv.innerHTML = `
+      <div class="character-card-frame card-rarity-${char.rarity}">
+        <div class="card-header-tag">${char.rank.toUpperCase()}</div>
+        <div class="card-art-container" style="background: url('${char.image}') center/cover no-repeat;"></div>
+        <div class="card-footer-stats">
+          <div class="card-title">${char.name.toUpperCase()}</div>
+          <div class="card-stats-row"><span>PL: <b>${char.getPowerLevel()}</b></span><span>NIN: <b>${char.stats.ninjutsu}</b></span></div>
+        </div>
+      </div>
+      <button class="btn-select-shinobi" onclick="selectActiveShinobi('${char.id}')">
+        ${isSelected ? 'ACTIVE' : 'SELECT'}
+      </button>
+    `;
+    grid.appendChild(cardDiv);
+  });
+}
+
+function selectActiveShinobi(charId) {
+  playerCharacter = charactersDatabase[charId];
+  updateHUD();
+  switchScreen('battle');
+  logMessage(`✨ Deployed ${playerCharacter.name} into battle!`);
+}
+
+// 4. Combat Logging & Feedback
 function logMessage(msg, color = "#00D9E8") {
   const log = document.getElementById('combat-log');
   if (log) {
@@ -80,7 +132,7 @@ function logMessage(msg, color = "#00D9E8") {
   }
 }
 
-// 3. Action Buttons Logic (Powered by Seven Stats & PL)
+// 5. Action Buttons Logic
 function performNinjutsuStrike() {
   if (battleState.isBattleOver) return;
 
@@ -96,18 +148,16 @@ function performNinjutsuStrike() {
   let statScaling = playerCharacter.stats.ninjutsu * 0.4;
   let plMultiplier = playerCharacter.getPowerLevel() / 100;
   let rawDamage = Math.floor((Math.random() * 20 + 30 + statScaling) * (plMultiplier / 10));
-  
   let finalDamage = Math.max(10, rawDamage - Math.floor(enemyCharacter.stats.defense * 0.2));
   
   enemyCharacter.hp = Math.max(0, enemyCharacter.hp - finalDamage);
-  let enemyHpPercent = (enemyCharacter.hp / enemyCharacter.maxHp) * 100;
-  document.getElementById('enemy-fill-bar').style.width = enemyHpPercent + '%';
+  document.getElementById('enemy-fill-bar').style.width = `${(enemyCharacter.hp / enemyCharacter.maxHp) * 100}%`;
 
   if (enemyCharacter.hp <= 0) {
     battleState.isBattleOver = true;
     battleState.ryo += 1200;
     updateHUD();
-    logMessage(`🎉 VICTORY! ${enemyCharacter.name} defeated. PL Verified. Gained 1,200 Ryo!`, "#D6A93A");
+    logMessage(`🎉 VICTORY! ${enemyCharacter.name} defeated. Gained 1,200 Ryo!`, "#D6A93A");
     return;
   }
 
@@ -115,8 +165,7 @@ function performNinjutsuStrike() {
   let enemyFinalDmg = Math.max(5, enemyRawDmg - Math.floor(playerCharacter.stats.defense * 0.2));
   
   playerCharacter.hp = Math.max(0, playerCharacter.hp - enemyFinalDmg);
-  let playerHpPercent = (playerCharacter.hp / playerCharacter.maxHp) * 100;
-  document.getElementById('player-fill-bar').style.width = playerHpPercent + '%';
+  document.getElementById('player-fill-bar').style.width = `${(playerCharacter.hp / playerCharacter.maxHp) * 100}%`;
 
   if (playerCharacter.hp <= 0) {
     battleState.isBattleOver = true;
@@ -124,7 +173,7 @@ function performNinjutsuStrike() {
     return;
   }
 
-  logMessage(`⚡ Ninjutsu Strike dealt ${finalDamage} damage! (PL: ${playerCharacter.getPowerLevel()}). ${enemyCharacter.name} counters for ${enemyFinalDmg}.`);
+  logMessage(`⚡ Ninjutsu Strike dealt ${finalDamage} damage! ${enemyCharacter.name} counters for ${enemyFinalDmg}.`);
 }
 
 function performChakraRestore() {
@@ -134,9 +183,7 @@ function performChakraRestore() {
   playerCharacter.hp = Math.min(playerCharacter.maxHp, playerCharacter.hp + 100);
   
   updateHUD();
-  let playerHpPercent = (playerCharacter.hp / playerCharacter.maxHp) * 100;
-  document.getElementById('player-fill-bar').style.width = playerHpPercent + '%';
-
+  document.getElementById('player-fill-bar').style.width = `${(playerCharacter.hp / playerCharacter.maxHp) * 100}%`;
   logMessage("💧 Focused breathing. Restored 300 Chakra and recovered health.");
 }
 
@@ -149,20 +196,32 @@ function performFlee() {
   document.getElementById('player-fill-bar').style.width = '100%';
   document.getElementById('enemy-fill-bar').style.width = '100%';
   updateHUD();
-
   logMessage("💨 Successfully fled from battle. Ready to try again.");
 }
 
 function updateHUD() {
   document.getElementById('hud-chakra').textContent = `${playerCharacter.powerPool}/${playerCharacter.maxPowerPool}`;
   document.getElementById('hud-ryo').textContent = battleState.ryo.toLocaleString();
-  
-  // Render calculated Power Levels onto the cards
+  document.getElementById('hud-rank').textContent = playerCharacter.rank;
+
+  // Update Player Card Display & Artwork
   document.getElementById('player-pl-display').textContent = playerCharacter.getPowerLevel();
+  document.getElementById('player-nin-display').textContent = playerCharacter.stats.ninjutsu;
+  document.getElementById('player-title').textContent = playerCharacter.name.toUpperCase();
+  document.getElementById('player-name-label').textContent = playerCharacter.name.toUpperCase();
+  document.getElementById('player-header-tag').textContent = playerCharacter.rank.toUpperCase();
+  document.getElementById('player-art').style.background = `url('${playerCharacter.image}') center/cover no-repeat`;
+
+  // Update Enemy Card Display & Artwork
   document.getElementById('enemy-pl-display').textContent = enemyCharacter.getPowerLevel();
+  document.getElementById('enemy-nin-display').textContent = enemyCharacter.stats.ninjutsu;
+  document.getElementById('enemy-title').textContent = enemyCharacter.name.toUpperCase();
+  document.getElementById('enemy-name-label').textContent = enemyCharacter.name.toUpperCase();
+  document.getElementById('enemy-header-tag').textContent = enemyCharacter.rank.toUpperCase();
+  document.getElementById('enemy-art').style.background = `url('${enemyCharacter.image}') center/cover no-repeat`;
 }
 
-// 4. Initialization & Listeners
+// 6. Initialization & Listeners
 document.addEventListener("DOMContentLoaded", () => {
   updateHUD();
 

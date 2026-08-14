@@ -17,12 +17,12 @@
     <div class="game-header">
      <div class="hud-stats">
         <div class="hud-item">RYO: <span id="hud-ryo">14,500</span></div>
-        <div class="hud-item">CHAKRA: <span id="hud-chakra">850/850</span></div>
-        <div class="hud-item">RANK: <span>Jonin</span></div>
+        <div class="hud-item">CHAKRA: <span id="hud-chakra">1200/1200</span></div>
+        <div class="hud-item">RANK: <span id="hud-rank">Kage</span></div>
       </div>
       <div class="nav-tabs">
-        <button class="nav-tab active">BATTLE</button>
-        <button class="nav-tab">ROSTER</button>
+        <button id="tab-battle" class="nav-tab active" onclick="switchScreen('battle')">BATTLE</button>
+        <button id="tab-roster" class="nav-tab" onclick="switchScreen('roster')">ROSTER</button>
       </div>
     </div>
 
@@ -30,24 +30,22 @@
     <div id="screen-battle" class="screen active">
       <div class="battle-arena">
         
-        <!-- Environment Animation Layer -->
         <div class="battle-environment" id="particle-container"></div>
 
-        <!-- Combatants Stage (Cards and Versus) -->
         <div class="combatants-stage">
           
           <!-- Player Card -->
           <div class="combatant">
-            <div class="character-card-frame card-rarity-rare">
-              <div class="card-header-tag">RTE-01</div>
-              <div class="card-art-container"></div>
+            <div id="player-card-frame" class="character-card-frame card-rarity-legendary">
+              <div id="player-header-tag" class="card-header-tag">KAGE</div>
+              <div id="player-art" class="card-art-container"></div>
               <div class="card-footer-stats">
-                <div class="card-title">SHADOW NINJA</div>
-                <div class="card-stats-row"><span>PL: <b id="player-pl-display">0</b></span><span>NIN: <b>320</b></span></div>
+                <div id="player-title" class="card-title">KAGE NARUTO</div>
+                <div class="card-stats-row"><span>PL: <b id="player-pl-display">0</b></span><span>NIN: <b id="player-nin-display">420</b></span></div>
               </div>
             </div>
             <div class="health-bar-container">
-              <span class="name">SHADOW NINJA</span>
+              <span id="player-name-label" class="name">KAGE NARUTO</span>
               <div class="bar"><div id="player-fill-bar" class="fill" style="width: 100%;"></div></div>
             </div>
           </div>
@@ -57,16 +55,16 @@
 
           <!-- Enemy Card -->
           <div class="combatant">
-            <div class="character-card-frame card-rarity-legendary">
-              <div class="card-header-tag">ELITE</div>
-              <div class="card-art-container"></div>
+            <div id="enemy-card-frame" class="character-card-frame card-rarity-legendary">
+              <div id="enemy-header-tag" class="card-header-tag">ELITE</div>
+              <div id="enemy-art" class="card-art-container"></div>
               <div class="card-footer-stats">
-                <div class="card-title">JONIN SASUKE</div>
-                <div class="card-stats-row"><span>PL: <b id="enemy-pl-display">0</b></span><span>NIN: <b>380</b></span></div>
+                <div id="enemy-title" class="card-title">JONIN SASUKE</div>
+                <div class="card-stats-row"><span>PL: <b id="enemy-pl-display">0</b></span><span>NIN: <b id="enemy-nin-display">380</b></span></div>
               </div>
             </div>
             <div class="health-bar-container">
-              <span class="name">JONIN SASUKE</span>
+              <span id="enemy-name-label" class="name">JONIN SASUKE</span>
               <div class="bar"><div id="enemy-fill-bar" class="fill enemy" style="width: 100%;"></div></div>
             </div>
           </div>
@@ -83,6 +81,16 @@
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- SCREEN 2: ROSTER MANAGEMENT -->
+    <div id="screen-roster" class="screen">
+      <div class="roster-container">
+        <h2 style="font-size: 16px; color: #D6A93A; margin-bottom: 15px;">SELECT ACTIVE SHINOBI</h2>
+        <div id="roster-grid" class="roster-grid">
+          <!-- Dynamically populated by game.js -->
+        </div>
       </div>
     </div>
 
