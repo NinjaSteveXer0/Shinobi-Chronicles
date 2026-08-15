@@ -8,6 +8,7 @@
 // =========================================================
 
 let selectedEnemy = null;
+let battleEnemy = null;
 
 const enemyDatabase = {
 
@@ -82,9 +83,11 @@ function startEncounter(enemyId) {
     return;
   }
 
-  console.log("⚔️ Starting encounter:", enemy.name);
-  console.log("Rank:", enemy.rank);
-  console.log("Image:", enemy.image);
+ console.log("⚔️ Starting encounter:", enemy.name);
+
+battleEnemy = enemy;
+
+openOverlay("battle");
 
   selectedEnemy = enemy;
 
@@ -3012,9 +3015,12 @@ function claimDailyReward() {
 // START ENCOUNTER
 // =========================================================
 
+
 function startEncounter(enemyId) {
 
+
   const enemy = enemyDatabase[enemyId];
+
 
   if (!enemy) {
     console.log("Enemy not found");
@@ -3022,6 +3028,6 @@ function startEncounter(enemyId) {
   }
 
 
-  openOverlay("combat");
+  openOverlay("battle");
 
 }
