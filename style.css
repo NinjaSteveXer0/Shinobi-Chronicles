@@ -299,247 +299,130 @@ body {
 
 
 /* =========================================================
-   6. WORLD MAP VIEWPORT
+   6. WORLD MAP LAYOUT
    ========================================================= */
 
 .world-map-viewport {
   flex: 1;
-
   min-height: 0;
+
+  display: grid;
+
+  /*
+    Sidebar gets its own dedicated space.
+    Everything else belongs to the map.
+  */
+  grid-template-columns: 280px minmax(0, 1fr);
 
   position: relative;
 
-  background: #0a1117;
+  background:
+    radial-gradient(
+      circle at 60% 40%,
+      #101923 0%,
+      #070b10 70%
+    );
 
   overflow: hidden;
 }
 
 
-/*
-   IMPORTANT:
-   This is still a visual background layer.
-
-   Eventually I recommend moving WorldMap.png into an <img>
-   element so map pins can track the image perfectly across
-   different aspect ratios.
-*/
-
-.world-map-bg {
-  position: absolute;
-  inset: 0;
-
-  background-image: url("Assets/Backgrounds/WorldMap.png");
-  
-  /* Change 'cover' to 'contain' to fit the whole map into view */
-  background-size: contain;
-  background-position: center center;
-  background-repeat: no-repeat;
-
-  filter:
-    brightness(0.80)
-    saturate(0.92);
-
-  transform: scale(1.002);
-
-  pointer-events: none;
-}
-
-
-/* ATMOSPHERIC OVERLAY */
-
-.world-map-viewport::after {
-  content: "";
-
-  position: absolute;
-
-  inset: 0;
-
-  background:
-    radial-gradient(
-      circle at 50% 45%,
-      rgba(0, 217, 232, 0.015) 0%,
-      rgba(5, 8, 12, 0.08) 45%,
-      rgba(5, 8, 12, 0.4) 100%
-    );
-
-  pointer-events: none;
-
-  z-index: 1;
-}
-
-
 /* =========================================================
-   7. LEFT MAP SIDEBAR
+   7. LEFT COMMAND SIDEBAR
    ========================================================= */
 
 .map-sidebar-left {
-  position: absolute;
+  position: relative;
 
-  top: 22px;
-  left: 20px;
+  top: auto;
+  left: auto;
 
-  width: 250px;
+  width: 100%;
+  height: 100%;
+
+  padding: 16px;
 
   display: flex;
   flex-direction: column;
 
   gap: 12px;
 
-  z-index: 8;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(5, 9, 14, 0.99),
+      rgba(7, 12, 17, 0.96)
+    );
+
+  border-right: 1px solid #1e293b;
+
+  overflow-y: auto;
+
+  z-index: 10;
 }
 
 
+/* =========================================================
+   SIDEBAR CARDS
+   ========================================================= */
+
 .sidebar-card {
-  padding: 12px;
+  padding: 13px;
 
   background:
     linear-gradient(
-      180deg,
-      rgba(8, 12, 16, 0.96),
-      rgba(5, 9, 13, 0.94)
+      145deg,
+      rgba(10, 16, 22, 0.98),
+      rgba(5, 9, 14, 0.98)
     );
 
   border: 1px solid #263448;
 
   border-radius: 7px;
 
-  backdrop-filter: blur(8px);
-
   box-shadow:
-    0 6px 18px rgba(0, 0, 0, 0.35);
+    0 6px 18px rgba(0, 0, 0, 0.32);
 }
 
 
 .sidebar-title {
-  margin-bottom: 8px;
-  padding-bottom: 6px;
+  margin-bottom: 10px;
+
+  padding-bottom: 7px;
+
+  border-bottom: 1px solid #1e293b;
 
   color: #d6a93a;
 
   font-size: 9px;
   font-weight: 900;
 
-  letter-spacing: 1px;
-
-  border-bottom: 1px solid #1e293b;
+  letter-spacing: 1.2px;
 }
 
 
 /* =========================================================
-   8. MAP LEGEND
+   CURRENT LOCATION
    ========================================================= */
 
-.legend-items {
-  display: flex;
-  flex-direction: column;
-
-  gap: 6px;
-
-  color: #94a3b8;
-
-  font-size: 10px;
-}
-
-
-.legend-row {
-  display: flex;
-  align-items: center;
-
-  gap: 8px;
-}
-
-
-.legend-dot {
-  width: 7px;
-  height: 7px;
-
-  border-radius: 50%;
-
-  flex-shrink: 0;
-}
-
-
-.legend-dot.unlocked {
-  background: #22c55e;
-
-  box-shadow:
-    0 0 6px rgba(34, 197, 94, 0.55);
-}
-
-
-.legend-dot.locked {
-  background: #64748b;
-}
-
-
-.legend-dot.premium {
-  background: #a855f7;
-
-  box-shadow:
-    0 0 6px rgba(168, 85, 247, 0.55);
-}
-
-
-.legend-dot.threat {
-  background: #ef4444;
-
-  box-shadow:
-    0 0 6px rgba(239, 68, 68, 0.55);
-}
-
-
-.legend-dot.main {
-  background: #d6a93a;
-
-  box-shadow:
-    0 0 6px rgba(214, 169, 58, 0.55);
-}
-
-
-.legend-dot.special {
-  background: #00d9e8;
-
-  box-shadow:
-    0 0 6px rgba(0, 217, 232, 0.55);
-}
-
-
-/* =========================================================
-   9. CURRENT LOCATION CARD
-   ========================================================= */
-
-.interactive-loc {
-  cursor: pointer;
-
-  transition:
-    border-color 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.15s ease;
-}
-
-
-.interactive-loc:hover {
-  border-color: #d6a93a;
-
-  box-shadow:
-    0 0 14px rgba(214, 169, 58, 0.15);
-
-  transform: translateY(-1px);
+.sidebar-current-location {
+  border-color:
+    rgba(214, 169, 58, 0.36);
 }
 
 
 .location-preview-name {
+  margin-bottom: 3px;
+
   color: #ffffff;
 
-  font-size: 11px;
-
-  font-weight: 800;
+  font-size: 12px;
+  font-weight: 900;
 }
 
 
 .location-preview-sub {
-  margin-top: 3px;
-  margin-bottom: 9px;
+  margin-bottom: 10px;
 
   color: #00d9e8;
 
@@ -547,19 +430,54 @@ body {
 }
 
 
+.location-status-row {
+  display: flex;
+  align-items: center;
+
+  gap: 6px;
+
+  margin-bottom: 10px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+
+  border-radius: 50%;
+}
+
+
+.status-dot.online {
+  background: #22c55e;
+
+  box-shadow:
+    0 0 6px #22c55e;
+}
+
+
+/* =========================================================
+   EXPLORE BUTTON
+   ========================================================= */
+
 .btn-enter-loc {
   width: 100%;
 
-  padding: 6px 8px;
+  padding: 8px;
 
   background:
     linear-gradient(
       180deg,
-      #111827,
-      #0b111b
+      #151d28,
+      #0c121b
     );
 
-  border: 1px solid #d6a93a;
+  border:
+    1px solid #d6a93a;
 
   border-radius: 4px;
 
@@ -568,7 +486,7 @@ body {
   font-size: 9px;
   font-weight: 900;
 
-  letter-spacing: 0.4px;
+  letter-spacing: 0.5px;
 
   cursor: pointer;
 
@@ -585,20 +503,20 @@ body {
   color: #05080c;
 
   box-shadow:
-    0 0 10px rgba(214, 169, 58, 0.4);
+    0 0 14px
+    rgba(214, 169, 58, 0.4);
 }
 
 
 /* =========================================================
-   10. WORLD PROGRESS
+   WORLD PROGRESS
    ========================================================= */
 
 .progress-block {
   display: flex;
   justify-content: space-between;
-  align-items: center;
 
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 
   color: #94a3b8;
 
@@ -607,7 +525,7 @@ body {
 
 
 .progress-block b {
-  color: #f8fafc;
+  color: #ffffff;
 
   font-weight: 800;
 }
@@ -617,13 +535,14 @@ body {
   width: 100%;
   height: 5px;
 
+  overflow: hidden;
+
   background: #111827;
 
-  border: 1px solid rgba(30, 41, 59, 0.75);
+  border:
+    1px solid #1e293b;
 
   border-radius: 3px;
-
-  overflow: hidden;
 }
 
 
@@ -633,17 +552,223 @@ body {
   background:
     linear-gradient(
       90deg,
-      #00aabd,
+      #0097a8,
       #00d9e8
     );
 
   box-shadow:
-    0 0 8px rgba(0, 217, 232, 0.3);
+    0 0 8px
+    rgba(0, 217, 232, 0.35);
 }
 
 
 /* =========================================================
-   11. WORLD MAP REGION PINS
+   MAP LEGEND
+   ========================================================= */
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+
+  gap: 7px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+
+.legend-row {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+}
+
+
+.legend-dot.unlocked {
+  background: #22c55e;
+}
+
+.legend-dot.locked {
+  background: #64748b;
+}
+
+.legend-dot.premium {
+  background: #a855f7;
+}
+
+.legend-dot.threat {
+  background: #ef4444;
+}
+
+.legend-dot.main {
+  background: #d6a93a;
+}
+
+.legend-dot.special {
+  background: #00d9e8;
+}
+
+
+/* =========================================================
+   QUICK LINKS
+   ========================================================= */
+
+.sidebar-quick-links {
+  margin-top: auto;
+}
+
+
+.sidebar-link {
+  width: 100%;
+
+  display: flex;
+  align-items: center;
+
+  gap: 9px;
+
+  padding: 7px 5px;
+
+  background: transparent;
+
+  border: none;
+
+  border-bottom:
+    1px solid rgba(30, 41, 59, 0.65);
+
+  color: #94a3b8;
+
+  font-size: 9px;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    padding-left 0.2s ease;
+}
+
+
+.sidebar-link:last-child {
+  border-bottom: none;
+}
+
+
+.sidebar-link:hover {
+  padding-left: 9px;
+
+  color: #d6a93a;
+}
+
+
+/* =========================================================
+   8. WORLD MAP DISPLAY
+   ========================================================= */
+
+.world-map-display {
+  min-width: 0;
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  position: relative;
+
+  padding: 8px 14px 12px;
+
+  overflow: hidden;
+}
+
+
+/*
+   THIS IS THE IMPORTANT PART.
+
+   Your artwork is 3:2.
+
+   All pins now calculate their percentages from this exact
+   map rectangle.
+*/
+
+.world-map-canvas {
+  width: min(
+    100%,
+    calc((100vh - 120px) * 1.5)
+  );
+
+  aspect-ratio: 3 / 2;
+
+  position: relative;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 0 35px rgba(0, 0, 0, 0.5);
+}
+
+
+/* ACTUAL MAP ART */
+
+.world-map-image {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: fill;
+
+  filter:
+    brightness(0.82)
+    saturate(0.94);
+
+  pointer-events: none;
+
+  user-select: none;
+}
+
+
+/* Slight vignette without interfering with clicks */
+
+.world-map-canvas::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at center,
+      transparent 48%,
+      rgba(3, 6, 9, 0.22) 100%
+    );
+
+  pointer-events: none;
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   9. WORLD REGION MARKERS
    ========================================================= */
 
 .map-node-pin {
@@ -656,102 +781,141 @@ body {
   flex-direction: column;
   align-items: center;
 
+  padding: 0;
+
   background: transparent;
 
   border: none;
 
-  padding: 0;
-
   color: inherit;
-
-  font: inherit;
-
-  appearance: none;
 
   cursor: pointer;
 
-  z-index: 7;
+  z-index: 6;
 }
 
 
 .pin-glow {
-  width: 22px;
-  height: 22px;
-
-  background: #00d9e8;
+  width: 20px;
+  height: 20px;
 
   border: 2px solid #ffffff;
 
   border-radius: 50%;
 
+  background: #00d9e8;
+
   box-shadow:
     0 0 8px #00d9e8,
-    0 0 18px rgba(0, 217, 232, 0.75);
+    0 0 16px rgba(0, 217, 232, 0.75);
 
   animation:
-    shinobiPinPulse 2.2s ease-in-out infinite;
-
-  transition:
-    transform 0.2s ease;
-}
-
-
-.map-node-pin:hover .pin-glow {
-  transform: scale(1.22);
+    shinobiPinPulse
+    2.2s
+    ease-in-out
+    infinite;
 }
 
 
 .pin-label {
-  margin-top: 5px;
+  margin-top: 4px;
 
-  padding: 3px 7px;
+  padding:
+    3px 6px;
 
   background:
-    rgba(5, 8, 12, 0.94);
+    rgba(4, 7, 11, 0.93);
 
-  border: 1px solid #263448;
+  border:
+    1px solid #263448;
 
-  border-radius: 4px;
+  border-radius: 3px;
 
   color: #ffffff;
 
-  font-size: 9px;
+  font-size: 8px;
   font-weight: 800;
-
-  letter-spacing: 0.3px;
 
   white-space: nowrap;
 
   box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.5);
+    0 3px 8px rgba(0, 0, 0, 0.55);
+}
+
+
+.map-node-pin:hover .pin-glow {
+  transform:
+    scale(1.2);
 }
 
 
 .map-node-pin:hover .pin-label {
-  border-color: #d6a93a;
+  color: #d6a93a;
 
-  color: #f5d672;
+  border-color: #d6a93a;
+}
+
+
+/* =========================================================
+   REGION-SPECIFIC MARKER COLOURS
+   ========================================================= */
+
+.pin-fire .pin-glow {
+  background: #00d9e8;
+
+  box-shadow:
+    0 0 8px #00d9e8,
+    0 0 18px rgba(0, 217, 232, 0.8);
+}
+
+
+.pin-wind .pin-glow {
+  background: #ef4444;
+
+  box-shadow:
+    0 0 8px #ef4444,
+    0 0 18px rgba(239, 68, 68, 0.8);
+}
+
+
+.pin-earth .pin-glow {
+  background: #d6a93a;
+
+  box-shadow:
+    0 0 8px #d6a93a,
+    0 0 18px rgba(214, 169, 58, 0.8);
+}
+
+
+.pin-water .pin-glow {
+  background: #00d9e8;
+
+  box-shadow:
+    0 0 8px #00d9e8,
+    0 0 18px rgba(0, 217, 232, 0.8);
+}
+
+
+.pin-lightning .pin-glow {
+  background: #d6a93a;
+
+  box-shadow:
+    0 0 8px #d6a93a,
+    0 0 18px rgba(214, 169, 58, 0.8);
 }
 
 
 @keyframes shinobiPinPulse {
 
-  0% {
-    box-shadow:
-      0 0 6px currentColor,
-      0 0 0 0 rgba(0, 217, 232, 0.38);
+  0%,
+  100% {
+    transform:
+      scale(0.96);
   }
 
   50% {
-    box-shadow:
-      0 0 12px currentColor,
-      0 0 0 9px rgba(0, 217, 232, 0);
-  }
-
-  100% {
-    box-shadow:
-      0 0 6px currentColor,
-      0 0 0 0 rgba(0, 217, 232, 0);
+    transform:
+      scale(1.08);
   }
 
 }

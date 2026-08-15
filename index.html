@@ -179,332 +179,259 @@
 
 
 
-    <!-- =====================================================
-         WORLD MAP
-         ===================================================== -->
     <main class="world-map-viewport">
 
+  <!-- =====================================================
+       LEFT COMMAND SIDEBAR
+       ===================================================== -->
+  <aside class="map-sidebar-left">
 
-      <!-- DARK ATMOSPHERIC MAP OVERLAY -->
-      <div class="world-map-bg"></div>
+    <!-- CURRENT LOCATION -->
+    <section class="sidebar-card sidebar-current-location">
 
+      <div class="sidebar-title">
+        CURRENT LOCATION
+      </div>
 
+      <div class="location-preview-name">
+        HIDDEN LEAF VILLAGE
+      </div>
 
-      <!-- =================================================
-           LEFT WORLD MAP SIDEBAR
-           ================================================= -->
-      <aside class="map-sidebar-left">
+      <div class="location-preview-sub">
+        Land of Fire
+      </div>
 
+      <div class="location-status-row">
+        <span class="status-dot online"></span>
+        <span>Region Unlocked</span>
+      </div>
 
-        <!-- MAP LEGEND -->
-        <div class="sidebar-card">
+      <button
+        type="button"
+        class="btn-enter-loc"
+        onclick="openRegionHub('fire')"
+      >
+        EXPLORE LAND OF FIRE
+      </button>
 
-          <div class="sidebar-title">
-            MAP LEGEND
-          </div>
-
-
-          <div class="legend-items">
-
-            <div class="legend-row">
-              <span class="legend-dot unlocked"></span>
-              Unlocked
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot locked"></span>
-              Locked
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot premium"></span>
-              Premium Area
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot threat"></span>
-              High Threat
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot main"></span>
-              Main Story Area
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot special"></span>
-              Special Area
-            </div>
-
-          </div>
-
-        </div>
+    </section>
 
 
+    <!-- WORLD PROGRESS -->
+    <section class="sidebar-card">
 
-        <!-- CURRENT LOCATION -->
+      <div class="sidebar-title">
+        WORLD PROGRESS
+      </div>
+
+      <div class="progress-block">
+        <span>Regions Discovered</span>
+        <b>18 / 42</b>
+      </div>
+
+      <div class="progress-bar-shell">
         <div
-          class="sidebar-card interactive-loc"
-          onclick="openRegionHub('fire')"
-        >
-
-          <div class="sidebar-title">
-            CURRENT LOCATION
-          </div>
+          class="progress-bar-fill"
+          style="width: 42%;"
+        ></div>
+      </div>
 
 
-          <div class="location-preview-name">
-            HIDDEN LEAF VILLAGE
-          </div>
+      <div
+        class="progress-block"
+        style="margin-top: 11px;"
+      >
+        <span>Missions Completed</span>
+        <b>84 / 350</b>
+      </div>
+
+      <div class="progress-bar-shell">
+        <div
+          class="progress-bar-fill"
+          style="width: 24%;"
+        ></div>
+      </div>
+
+    </section>
 
 
-          <div class="location-preview-sub">
-            Land of Fire
-          </div>
+    <!-- MAP LEGEND -->
+    <section class="sidebar-card">
 
+      <div class="sidebar-title">
+        MAP LEGEND
+      </div>
 
-          <!--
-              IMPORTANT:
-              This opens the LAND OF FIRE REGIONAL MAP.
+      <div class="legend-items">
 
-              It does NOT jump directly into Konoha.
-
-              Flow:
-              World Map
-                 ↓
-              Land of Fire
-                 ↓
-              Konohagakure
-                 ↓
-              Village
-          -->
-          <button
-            type="button"
-            class="btn-enter-loc"
-            onclick="event.stopPropagation(); openRegionHub('fire');"
-          >
-            EXPLORE LAND OF FIRE
-          </button>
-
+        <div class="legend-row">
+          <span class="legend-dot unlocked"></span>
+          <span>Unlocked Region</span>
         </div>
 
-
-
-        <!-- WORLD PROGRESS -->
-        <div class="sidebar-card">
-
-          <div class="sidebar-title">
-            WORLD PROGRESS
-          </div>
-
-
-          <!-- REGIONS -->
-          <div class="progress-block">
-
-            <span>
-              Regions Discovered
-            </span>
-
-            <b>
-              18 / 42
-            </b>
-
-          </div>
-
-
-          <div class="progress-bar-shell">
-
-            <div
-              class="progress-bar-fill"
-              style="width: 42%;"
-            ></div>
-
-          </div>
-
-
-          <!-- MISSIONS -->
-          <div
-            class="progress-block"
-            style="margin-top: 8px;"
-          >
-
-            <span>
-              Missions Completed
-            </span>
-
-            <b>
-              84 / 350
-            </b>
-
-          </div>
-
-
-          <div class="progress-bar-shell">
-
-            <div
-              class="progress-bar-fill"
-              style="width: 24%;"
-            ></div>
-
-          </div>
-
+        <div class="legend-row">
+          <span class="legend-dot locked"></span>
+          <span>Locked Region</span>
         </div>
 
+        <div class="legend-row">
+          <span class="legend-dot premium"></span>
+          <span>Premium Area</span>
+        </div>
 
-      </aside>
+        <div class="legend-row">
+          <span class="legend-dot threat"></span>
+          <span>High Threat</span>
+        </div>
+
+        <div class="legend-row">
+          <span class="legend-dot main"></span>
+          <span>Main Story</span>
+        </div>
+
+        <div class="legend-row">
+          <span class="legend-dot special"></span>
+          <span>Special Area</span>
+        </div>
+
+      </div>
+
+    </section>
 
 
+    <!-- QUICK LINKS -->
+    <section class="sidebar-card sidebar-quick-links">
 
-      <!-- =================================================
-           WORLD MAP REGION PINS
-           ================================================= -->
+      <div class="sidebar-title">
+        QUICK LINKS
+      </div>
+
+      <button
+        class="sidebar-link"
+        onclick="claimDailyReward()"
+      >
+        <span>🎁</span>
+        <span>Daily Reward</span>
+      </button>
+
+      <button
+        class="sidebar-link"
+        onclick="openOverlay('events')"
+      >
+        <span>⚔️</span>
+        <span>World Events</span>
+      </button>
+
+      <button
+        class="sidebar-link"
+        onclick="openOverlay('roster')"
+      >
+        <span>👥</span>
+        <span>Roster</span>
+      </button>
+
+      <button
+        class="sidebar-link"
+        onclick="openOverlay('shop')"
+      >
+        <span>🛒</span>
+        <span>Special Shop</span>
+      </button>
+
+    </section>
+
+  </aside>
+
+
+  <!-- =====================================================
+       MAP DISPLAY AREA
+       ===================================================== -->
+  <section class="world-map-display">
+
+    <!--
+      IMPORTANT:
+      The image and EVERY marker now live inside this one canvas.
+      Therefore marker percentages are percentages of the MAP,
+      not percentages of the browser viewport.
+    -->
+    <div class="world-map-canvas">
+
+      <img
+        class="world-map-image"
+        src="Assets/Backgrounds/WorldMap.png"
+        alt="Shinobi Chronicles World Map"
+      >
 
 
       <!-- LAND OF FIRE -->
       <button
         type="button"
-        class="map-node-pin"
-        style="
-          top: 45%;
-          left: 35%;
-          background: none;
-          border: none;
-        "
+        class="map-node-pin pin-fire"
+        style="left: 40%; top: 42%;"
         onclick="openRegionHub('fire')"
         aria-label="Open Land of Fire"
       >
-
-        <div class="pin-glow"></div>
-
-        <span class="pin-label">
-          Land of Fire
-        </span>
-
+        <span class="pin-glow"></span>
+        <span class="pin-label">Land of Fire</span>
       </button>
-
 
 
       <!-- LAND OF WIND -->
       <button
         type="button"
-        class="map-node-pin"
-        style="
-          top: 35%;
-          left: 18%;
-          background: none;
-          border: none;
-        "
+        class="map-node-pin pin-wind"
+        style="left: 20%; top: 38%;"
         onclick="openRegionHub('wind')"
         aria-label="Open Land of Wind"
       >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #E53935;
-            box-shadow: 0 0 15px #E53935;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Wind
-        </span>
-
+        <span class="pin-glow"></span>
+        <span class="pin-label">Land of Wind</span>
       </button>
-
-
-
-      <!-- LAND OF WATER -->
-      <button
-        type="button"
-        class="map-node-pin"
-        style="
-          top: 52%;
-          left: 48%;
-          background: none;
-          border: none;
-        "
-        onclick="openRegionHub('water')"
-        aria-label="Open Land of Water"
-      >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #00D9E8;
-            box-shadow: 0 0 15px #00D9E8;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Water
-        </span>
-
-      </button>
-
 
 
       <!-- LAND OF EARTH -->
       <button
         type="button"
-        class="map-node-pin"
-        style="
-          top: 18%;
-          left: 22%;
-          background: none;
-          border: none;
-        "
+        class="map-node-pin pin-earth"
+        style="left: 23%; top: 19%;"
         onclick="openRegionHub('earth')"
         aria-label="Open Land of Earth"
       >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #D6A93A;
-            box-shadow: 0 0 15px #D6A93A;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Earth
-        </span>
-
+        <span class="pin-glow"></span>
+        <span class="pin-label">Land of Earth</span>
       </button>
 
+
+      <!-- LAND OF WATER -->
+      <button
+        type="button"
+        class="map-node-pin pin-water"
+        style="left: 51%; top: 54%;"
+        onclick="openRegionHub('water')"
+        aria-label="Open Land of Water"
+      >
+        <span class="pin-glow"></span>
+        <span class="pin-label">Land of Water</span>
+      </button>
 
 
       <!-- LAND OF LIGHTNING -->
       <button
         type="button"
-        class="map-node-pin"
-        style="
-          top: 52%;
-          left: 65%;
-          background: none;
-          border: none;
-        "
+        class="map-node-pin pin-lightning"
+        style="left: 69%; top: 52%;"
         onclick="openRegionHub('lightning')"
         aria-label="Open Land of Lightning"
       >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #D6A93A;
-            box-shadow: 0 0 15px #D6A93A;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Lightning
-        </span>
-
+        <span class="pin-glow"></span>
+        <span class="pin-label">Land of Lightning</span>
       </button>
 
+    </div>
 
-    </main>
+  </section>
 
+</main>
 
 
     <!-- =====================================================
