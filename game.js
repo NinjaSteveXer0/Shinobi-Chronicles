@@ -2978,25 +2978,25 @@ function createActivityCard(
       </div>
 
       <button
-onclick="${action}"
-style="
-margin-top:12px;
-width:100%;
-padding:8px;
+onclick="console.log('BUTTON PRESSED'); ${action}"
+  style="
+  margin-top:12px;
+  width:100%;
+  padding:8px;
 
-background:#D6A93A;
-color:#05070B;
+  background:#D6A93A;
+  color:#05070B;
 
-border:none;
-border-radius:5px;
+  border:none;
+  border-radius:5px;
 
-font-size:9px;
-font-weight:bold;
+  font-size:9px;
+  font-weight:bold;
 
-cursor:pointer;
-">
-ENTER
-</button>
+  cursor:pointer;
+  ">
+  ENTER
+  </button>
 
 
     </div>
