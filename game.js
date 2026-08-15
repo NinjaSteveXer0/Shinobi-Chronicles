@@ -2810,6 +2810,12 @@ function renderBattleOverlay(
   container
 ) {
 
+  console.log("Battle overlay opened");
+  console.log(selectedEnemy);
+
+  const location =
+    selectedLocationNode;
+
   const location =
     selectedLocationNode;
 
