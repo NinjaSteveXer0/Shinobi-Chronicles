@@ -4476,3 +4476,615 @@ body {
   font-size:
     9px;
 }
+
+/* =========================================================
+   LAND OF FIRE
+   CLEAN MAP FINAL OVERRIDES
+
+   IMPORTANT:
+   Keep this at the VERY BOTTOM of style.css.
+
+   These rules override the older Land of Fire styling
+   without requiring you to find/delete the old code.
+   ========================================================= */
+
+
+/* =========================================================
+   1. REMOVE THE OBSOLETE BLACK HUD COVER
+
+   The new inside_LOF.png no longer contains the currency /
+   energy HUD, so there is nothing to hide anymore.
+
+   This is the black rectangle currently appearing across
+   the mountains at the top of the map.
+   ========================================================= */
+
+.region-baked-cover,
+.region-top-hud-cover {
+
+  display:
+    none !important;
+
+}
+
+
+/* =========================================================
+   2. REGIONAL HOTSPOT BASE
+
+   Keep the coded nodes clickable while making them a little
+   cleaner and less intrusive over the artwork.
+   ========================================================= */
+
+.region-hotspot {
+
+  position:
+    absolute;
+
+  transform:
+    translate(-50%, -50%);
+
+  z-index:
+    30;
+
+  padding:
+    0;
+
+  margin:
+    0;
+
+  border:
+    none;
+
+  background:
+    transparent;
+
+  cursor:
+    pointer;
+
+  overflow:
+    visible;
+
+}
+
+
+/* =========================================================
+   3. SMALLER CODED NODE
+
+   The artwork already contains large decorative location
+   icons, so the coded node only needs to identify the exact
+   interactive centre.
+
+   It should NOT compete visually with the artwork.
+   ========================================================= */
+
+.region-hotspot
+.hotspot-orb {
+
+  width:
+    clamp(
+      13px,
+      1vw,
+      18px
+    ) !important;
+
+  height:
+    clamp(
+      13px,
+      1vw,
+      18px
+    ) !important;
+
+  min-width:
+    0;
+
+  min-height:
+    0;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    0;
+
+  border-width:
+    1px;
+
+  font-size:
+    clamp(
+      4px,
+      0.35vw,
+      6px
+    );
+
+  line-height:
+    1;
+
+  opacity:
+    0.92;
+
+}
+
+
+/* =========================================================
+   4. REMOVE THE PERMANENT DUPLICATE LOCATION LABELS
+
+   The clean map artwork ALREADY contains:
+
+   Bandit Hideout
+   Training Grounds
+   Bridge of Trials
+   etc.
+
+   Therefore showing another coded label permanently makes
+   the screen look duplicated and cluttered.
+
+   Labels now appear only on hover or selected state.
+   ========================================================= */
+
+.region-hotspot
+.hotspot-label {
+
+  position:
+    absolute;
+
+  top:
+    calc(100% + 6px);
+
+  left:
+    50%;
+
+  transform:
+    translateX(-50%)
+    translateY(-3px);
+
+  margin:
+    0 !important;
+
+  padding:
+    3px 6px;
+
+  background:
+    rgba(4, 7, 11, 0.97);
+
+  border:
+    1px solid
+    #334155;
+
+  border-radius:
+    3px;
+
+  color:
+    #ffffff;
+
+  font-size:
+    7px;
+
+  font-weight:
+    800;
+
+  white-space:
+    nowrap;
+
+  box-shadow:
+    0 3px 9px
+    rgba(0, 0, 0, 0.72);
+
+  opacity:
+    0;
+
+  visibility:
+    hidden;
+
+  pointer-events:
+    none;
+
+  transition:
+    opacity 0.15s ease,
+    visibility 0.15s ease,
+    transform 0.15s ease;
+
+}
+
+
+/* =========================================================
+   5. SHOW LABEL ON HOVER / SELECTION
+   ========================================================= */
+
+.region-hotspot:hover
+.hotspot-label,
+
+.region-hotspot.selected
+.hotspot-label {
+
+  opacity:
+    1;
+
+  visibility:
+    visible;
+
+  transform:
+    translateX(-50%)
+    translateY(0);
+
+}
+
+
+/* =========================================================
+   6. HOVER / SELECTED NODE
+
+   Gives the player feedback without replacing the artwork.
+   ========================================================= */
+
+.region-hotspot:hover
+.hotspot-orb,
+
+.region-hotspot.selected
+.hotspot-orb {
+
+  transform:
+    scale(1.25);
+
+  filter:
+    brightness(1.25);
+
+}
+
+
+/* =========================================================
+   7. KONOHA
+   ========================================================= */
+
+.region-hotspot.village
+.hotspot-orb {
+
+  background:
+    #00d9e8;
+
+  border-color:
+    #eaffff;
+
+  box-shadow:
+    0 0 5px
+    #00d9e8,
+
+    0 0 10px
+    rgba(0, 217, 232, 0.55);
+
+}
+
+
+/* =========================================================
+   8. LOOT HOTSPOTS
+   ========================================================= */
+
+.region-hotspot.battle
+.hotspot-orb {
+
+  background:
+    #c48921;
+
+  border-color:
+    #f5d47b;
+
+  box-shadow:
+    0 0 5px
+    #d69a29,
+
+    0 0 10px
+    rgba(214, 154, 41, 0.5);
+
+}
+
+
+/* =========================================================
+   9. EXP / TRAINING
+   ========================================================= */
+
+.region-hotspot.training
+.hotspot-orb {
+
+  background:
+    #7e3db7;
+
+  border-color:
+    #e2c2ff;
+
+  box-shadow:
+    0 0 5px
+    #a855f7,
+
+    0 0 10px
+    rgba(168, 85, 247, 0.5);
+
+}
+
+
+/* =========================================================
+   10. MISSIONS
+   ========================================================= */
+
+.region-hotspot.mission
+.hotspot-orb {
+
+  background:
+    #4d842e;
+
+  border-color:
+    #c8f0a9;
+
+  box-shadow:
+    0 0 5px
+    #72b74d,
+
+    0 0 10px
+    rgba(87, 166, 48, 0.5);
+
+}
+
+
+/* =========================================================
+   11. SECRET AREA
+   ========================================================= */
+
+.region-hotspot.secret
+.hotspot-orb {
+
+  background:
+    #7433a5;
+
+  border-color:
+    #e1b7ff;
+
+  box-shadow:
+    0 0 5px
+    #a855f7,
+
+    0 0 10px
+    rgba(168, 85, 247, 0.5);
+
+}
+
+
+/* =========================================================
+   12. SIDE ACTIVITY
+   ========================================================= */
+
+.region-hotspot.activity
+.hotspot-orb {
+
+  background:
+    #2f78a0;
+
+  border-color:
+    #bdeaff;
+
+  box-shadow:
+    0 0 5px
+    #4dadde,
+
+    0 0 10px
+    rgba(67, 167, 216, 0.5);
+
+}
+
+
+/* =========================================================
+   13. OUTPOST
+   ========================================================= */
+
+.region-hotspot.outpost
+.hotspot-orb {
+
+  width:
+    clamp(
+      12px,
+      0.9vw,
+      16px
+    ) !important;
+
+  height:
+    clamp(
+      12px,
+      0.9vw,
+      16px
+    ) !important;
+
+  background:
+    #00bed1;
+
+  border-color:
+    #eaffff;
+
+  box-shadow:
+    0 0 5px
+    #00d9e8,
+
+    0 0 9px
+    rgba(0, 217, 232, 0.48);
+
+}
+
+
+/* =========================================================
+   14. CLEAN UP THE WORLD MAP BUTTON
+
+   Your NEW artwork already contains the beautiful scroll
+   and WORLD MAP artwork in the bottom-left corner.
+
+   Previously our coded button was drawing another black
+   square on top of it.
+
+   We keep the coded button CLICKABLE but make its visuals
+   transparent so the artwork underneath becomes the button.
+   ========================================================= */
+
+.region-world-map-button {
+
+  left:
+    2.1% !important;
+
+  bottom:
+    2.5% !important;
+
+  width:
+    12%;
+
+  height:
+    16%;
+
+  padding:
+    0 !important;
+
+  background:
+    transparent !important;
+
+  border:
+    none !important;
+
+  box-shadow:
+    none !important;
+
+  color:
+    transparent !important;
+
+  opacity:
+    1;
+
+  cursor:
+    pointer;
+
+}
+
+
+/*
+  Hide the extra coded diamond/text but preserve the
+  clickable button itself.
+*/
+
+.region-world-map-button
+.world-map-button-icon,
+
+.region-world-map-button
+span {
+
+  opacity:
+    0;
+
+}
+
+
+/* =========================================================
+   15. WORLD MAP HOVER
+
+   Very subtle hover feedback over the baked scroll.
+   ========================================================= */
+
+.region-world-map-button:hover {
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(214, 169, 58, 0.08),
+      transparent 68%
+    ) !important;
+
+}
+
+
+/* =========================================================
+   16. KEEP THE NEW CODED X ABOVE EVERYTHING
+
+   The new clean map no longer has a baked top-right X,
+   therefore this coded button remains necessary.
+   ========================================================= */
+
+.region-world-close {
+
+  z-index:
+    60;
+
+}
+
+
+/* =========================================================
+   17. LEFT REGION PANEL
+
+   Keep it clearly above the map and interactive nodes.
+   ========================================================= */
+
+.region-left-overlay {
+
+  z-index:
+    45;
+
+}
+
+
+/* =========================================================
+   18. INNER LOCATION DETAILS PANEL
+   ========================================================= */
+
+.region-map-detail-overlay {
+
+  z-index:
+    45;
+
+}
+
+
+/* =========================================================
+   19. SELECTED LOCATION
+
+   Make selection obvious but not enormous.
+   ========================================================= */
+
+.region-hotspot.selected
+.hotspot-orb {
+
+  outline:
+    2px solid
+    rgba(255, 255, 255, 0.75);
+
+  outline-offset:
+    2px;
+
+}
+
+
+/* =========================================================
+   20. RESPONSIVE NODE SAFEGUARD
+   ========================================================= */
+
+@media
+(max-width: 1200px) {
+
+  .region-hotspot
+  .hotspot-orb {
+
+    width:
+      13px !important;
+
+    height:
+      13px !important;
+
+  }
+
+
+  .region-hotspot.outpost
+  .hotspot-orb {
+
+    width:
+      12px !important;
+
+    height:
+      12px !important;
+
+  }
+
+}

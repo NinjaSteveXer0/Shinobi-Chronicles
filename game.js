@@ -2719,3 +2719,247 @@ function claimDailyReward() {
     "Daily reward claimed successfully!"
   );
 }
+
+// =========================================================
+// LAND OF FIRE
+// CLEAN MAP ALIGNMENT OVERRIDES
+//
+// IMPORTANT:
+// Keep this at the very bottom of game.js.
+//
+// These coordinates are calibrated for the NEW clean
+// inside_LOF.png artwork.
+// =========================================================
+
+
+(function calibrateLandOfFireMap() {
+
+  if (
+    typeof worldRegions === "undefined" ||
+    !worldRegions.fire ||
+    !Array.isArray(worldRegions.fire.locations)
+  ) {
+
+    console.warn(
+      "Land of Fire calibration could not run."
+    );
+
+    return;
+
+  }
+
+
+  const locations =
+    worldRegions.fire.locations;
+
+
+  // =======================================================
+  // HELPER
+  // =======================================================
+
+  function setLocationPosition(
+    id,
+    x,
+    y
+  ) {
+
+    const location =
+      locations.find(
+        item =>
+          item.id === id
+      );
+
+
+    if (!location) {
+
+      console.warn(
+        `Land of Fire location "${id}" was not found.`
+      );
+
+      return;
+
+    }
+
+
+    location.x = x;
+    location.y = y;
+
+  }
+
+
+  // =======================================================
+  // NEW CLEAN MAP POSITIONS
+  // =======================================================
+
+
+  /*
+    KONOHA
+
+    Positioned over the northern capital / village marker.
+  */
+
+  setLocationPosition(
+    "konohagakure",
+    49.4,
+    8.6
+  );
+
+
+  /*
+    BANDIT HIDEOUT
+
+    Gold chest in the upper-left route.
+  */
+
+  setLocationPosition(
+    "bandit_hideout",
+    25.2,
+    18.4
+  );
+
+
+  /*
+    HIDDEN SUPPLY CACHE
+
+    Gold chest in the upper-right route.
+  */
+
+  setLocationPosition(
+    "hidden_supply_cache",
+    65.3,
+    18.3
+  );
+
+
+  /*
+    TRAINING GROUNDS
+
+    Purple EXP marker on left.
+  */
+
+  setLocationPosition(
+    "training_grounds",
+    24.2,
+    34.1
+  );
+
+
+  /*
+    BRIDGE OF TRIALS
+
+    Green mission marker in upper-middle.
+  */
+
+  setLocationPosition(
+    "bridge_of_trials",
+    47.9,
+    26.7
+  );
+
+
+  /*
+    CAVE OF WHISPERS
+
+    Purple secret marker upper-right.
+  */
+
+  setLocationPosition(
+    "cave_of_whispers",
+    70.1,
+    31.5
+  );
+
+
+  /*
+    FOREST OF SILENCE
+
+    Purple EXP marker in centre.
+  */
+
+  setLocationPosition(
+    "forest_of_silence",
+    50.1,
+    41.0
+  );
+
+
+  /*
+    ESCORT MISSION
+
+    Green mission marker on left-middle.
+  */
+
+  setLocationPosition(
+    "escort_mission",
+    23.3,
+    49.8
+  );
+
+
+  /*
+    SCOUTING MISSION
+
+    Green mission marker on right-middle.
+  */
+
+  setLocationPosition(
+    "scouting_mission",
+    67.1,
+    49.9
+  );
+
+
+  /*
+    ABANDONED OUTPOST
+
+    Gold chest on lower-left route.
+  */
+
+  setLocationPosition(
+    "abandoned_outpost",
+    23.3,
+    66.0
+  );
+
+
+  /*
+    NINJA WATCHTOWER
+
+    Blue activity node in lower-middle.
+  */
+
+  setLocationPosition(
+    "ninja_watchtower",
+    45.2,
+    62.3
+  );
+
+
+  /*
+    RIVERBANK TRAINING
+
+    Purple EXP marker lower-right.
+  */
+
+  setLocationPosition(
+    "riverbank_training",
+    71.3,
+    68.0
+  );
+
+
+  /*
+    SOUTHERN OUTPOST
+
+    Placed over the actual southern gateway rather than
+    over the text plate beneath it.
+  */
+
+  setLocationPosition(
+    "southern_outpost",
+    51.5,
+    80.4
+  );
+
+
+})();
