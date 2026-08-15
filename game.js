@@ -7,6 +7,8 @@
 // ENEMY DATABASE
 // =========================================================
 
+let selectedEnemy = null;
+
 const enemyDatabase = {
 
   scout: {
@@ -83,6 +85,8 @@ function startEncounter(enemyId) {
   console.log("⚔️ Starting encounter:", enemy.name);
   console.log("Rank:", enemy.rank);
   console.log("Image:", enemy.image);
+
+  selectedEnemy = enemy;
 
 }
 
@@ -3002,4 +3006,22 @@ function claimDailyReward() {
   alert(
     "Daily reward claimed successfully!"
   );
+}
+
+// =========================================================
+// START ENCOUNTER
+// =========================================================
+
+function startEncounter(enemyId) {
+
+  const enemy = enemyDatabase[enemyId];
+
+  if (!enemy) {
+    console.log("Enemy not found");
+    return;
+  }
+
+
+  openOverlay("combat");
+
 }
