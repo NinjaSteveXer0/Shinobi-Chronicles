@@ -780,9 +780,9 @@ const worldRegions = {
 // 2. ACTIVE REGION / LOCATION STATE
 // =========================================================
 
-let selectedRegionKey = null;
-
-let selectedLocationNode = null;
+selectedRegionKey = null;
+selectedLocationNode = null;
+regionInfoOpen = false;
 
 // =========================================================
 // REGIONAL MAP UI STATE
