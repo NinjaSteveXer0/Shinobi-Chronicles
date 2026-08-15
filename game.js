@@ -3019,24 +3019,3 @@ function claimDailyReward() {
     "Daily reward claimed successfully!"
   );
 }
-
-// =========================================================
-// START ENCOUNTER
-// =========================================================
-
-
-function startEncounter(enemyId) {
-
-
-  const enemy = enemyDatabase[enemyId];
-
-
-  if (!enemy) {
-    console.log("Enemy not found");
-    return;
-  }
-
-
-  openOverlay("battle");
-
-}
