@@ -86,7 +86,7 @@ function startEncounter(enemyId) {
 
   selectedEnemy = enemy;
 
- console.log("Opening battle overlay");
+ console.log("Opening battle overlay with:", selectedEnemy);
 
 openOverlay("battle");
 
