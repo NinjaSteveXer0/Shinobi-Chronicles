@@ -780,24 +780,10 @@ const worldRegions = {
 // 2. ACTIVE REGION / LOCATION STATE
 // =========================================================
 
-selectedRegionKey = null;
-selectedLocationNode = null;
-regionInfoOpen = false;
-
-// =========================================================
-// REGIONAL MAP UI STATE
-// =========================================================
-
-let regionInfoOpen = false;
-
-
-/*
-  TEMPORARY PLAYER PL.
-
-  Later this should point to the actual saved player /
-  active-character PL rather than being hard-coded here.
-*/
-let playerPowerLevel = 2450;
+var selectedRegionKey = null;
+var selectedLocationNode = null;
+var regionInfoOpen = false;
+var playerPowerLevel = 2450;
 
 
 // =========================================================
