@@ -87,7 +87,7 @@ function startEncounter(enemyId) {
   selectedEnemy = enemy;
 
  console.log("Opening battle overlay");
- 
+
 openOverlay("battle");
 
 }
@@ -2973,7 +2973,7 @@ function createActivityCard(
       </div>
 
       <button
-onclick="${action}"
+onclick="console.log('BUTTON CLICKED'); ${action}"
 style="
 margin-top:12px;
 width:100%;
