@@ -563,6 +563,10 @@ function openOverlay(type) {
 
   switch (type) {
 
+    case "clan":
+  renderClanOverlay(container);
+  break;
+
     case "village":
       renderVillageOverlay(container);
       break;
@@ -847,6 +851,177 @@ function renderVillageOverlay(container) {
     </div>
 
   `;
+}
+
+// =========================================================
+// YOUR CLAN / SHINOBI ROSTER
+// =========================================================
+
+function renderClanOverlay(container) {
+
+  container.innerHTML = `
+
+    <div class="clan-screen">
+
+      <div class="clan-header">
+
+        <div>
+
+          <h2 class="clan-title">
+            YOUR CLAN
+          </h2>
+
+          <p class="clan-description">
+            View, manage and organise the shinobi currently under your command.
+          </p>
+
+        </div>
+
+        <div class="clan-count">
+          <span>SHINOBI</span>
+          <strong id="clan-roster-count">3</strong>
+        </div>
+
+      </div>
+
+
+      <div class="clan-toolbar">
+
+        <button
+          type="button"
+          class="clan-filter-btn active"
+        >
+          ALL
+        </button>
+
+        <button
+          type="button"
+          class="clan-filter-btn"
+        >
+          ACTIVE TEAM
+        </button>
+
+        <button
+          type="button"
+          class="clan-filter-btn"
+        >
+          RESERVE
+        </button>
+
+        <button
+          type="button"
+          class="clan-filter-btn"
+        >
+          FAVOURITES
+        </button>
+
+      </div>
+
+
+      <div class="clan-roster-grid">
+
+        ${createClanCard({
+          name: "Naruto",
+          rank: "Kage",
+          power: "2,450",
+          role: "Ninjutsu",
+          status: "ACTIVE"
+        })}
+
+        ${createClanCard({
+          name: "Sasuke",
+          rank: "Jonin",
+          power: "2,280",
+          role: "Bukishi",
+          status: "ACTIVE"
+        })}
+
+        ${createClanCard({
+          name: "Sakura",
+          rank: "Sannin",
+          power: "2,050",
+          role: "Taijutsu",
+          status: "RESERVE"
+        })}
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+function createClanCard(shinobi) {
+
+  return `
+
+    <button
+      type="button"
+      class="clan-card"
+    >
+
+      <div class="clan-card-portrait">
+
+        <span class="clan-card-placeholder">
+          忍
+        </span>
+
+      </div>
+
+
+      <div class="clan-card-body">
+
+        <div class="clan-card-top">
+
+          <div>
+
+            <div class="clan-card-name">
+              ${shinobi.name}
+            </div>
+
+            <div class="clan-card-rank">
+              ${shinobi.rank}
+            </div>
+
+          </div>
+
+
+          <span class="
+            clan-card-status
+            ${shinobi.status.toLowerCase()}
+          ">
+            ${shinobi.status}
+          </span>
+
+        </div>
+
+
+        <div class="clan-card-stats">
+
+          <div>
+            <span>POWER</span>
+            <strong>
+              ${shinobi.power}
+            </strong>
+          </div>
+
+          <div>
+            <span>SPECIALITY</span>
+            <strong>
+              ${shinobi.role}
+            </strong>
+          </div>
+
+        </div>
+
+      </div>
+
+    </button>
+
+  `;
+
 }
 
 

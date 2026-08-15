@@ -3979,3 +3979,500 @@ body {
   }
 
 }
+
+/* =========================================================
+   YOUR CLAN
+   ========================================================= */
+
+.nav-btn-clan {
+  border-color:
+    rgba(214, 169, 58, 0.6);
+}
+
+
+.nav-btn-clan:hover {
+  color:
+    #05080c;
+
+  background:
+    linear-gradient(
+      180deg,
+      #f0c54e,
+      #c79623
+    );
+
+  border-color:
+    #d6a93a;
+
+  box-shadow:
+    0 0 12px
+    rgba(214, 169, 58, 0.32);
+}
+
+
+/* =========================================================
+   CLAN SCREEN
+   ========================================================= */
+
+.clan-screen {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  flex:
+    1;
+
+  min-height:
+    0;
+}
+
+
+.clan-header {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    20px;
+
+  padding-bottom:
+    12px;
+
+  margin-bottom:
+    12px;
+
+  border-bottom:
+    1px solid #1e293b;
+}
+
+
+.clan-title {
+  margin-bottom:
+    4px;
+
+  color:
+    #d6a93a;
+
+  font-size:
+    16px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    1px;
+}
+
+
+.clan-description {
+  color:
+    #94a3b8;
+
+  font-size:
+    10px;
+}
+
+
+.clan-count {
+  min-width:
+    80px;
+
+  padding:
+    8px 12px;
+
+  background:
+    #0d141d;
+
+  border:
+    1px solid #263448;
+
+  border-radius:
+    5px;
+
+  text-align:
+    center;
+}
+
+
+.clan-count span {
+  display:
+    block;
+
+  color:
+    #64748b;
+
+  font-size:
+    7px;
+
+  font-weight:
+    800;
+
+  letter-spacing:
+    1px;
+}
+
+
+.clan-count strong {
+  color:
+    #00d9e8;
+
+  font-size:
+    16px;
+}
+
+
+/* =========================================================
+   FILTERS
+   ========================================================= */
+
+.clan-toolbar {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    7px;
+
+  margin-bottom:
+    12px;
+}
+
+
+.clan-filter-btn {
+  padding:
+    6px 11px;
+
+  background:
+    #0d141d;
+
+  border:
+    1px solid #263448;
+
+  border-radius:
+    4px;
+
+  color:
+    #7f8fa4;
+
+  font-size:
+    8px;
+
+  font-weight:
+    900;
+
+  cursor:
+    pointer;
+}
+
+
+.clan-filter-btn:hover,
+.clan-filter-btn.active {
+  color:
+    #05080c;
+
+  background:
+    #d6a93a;
+
+  border-color:
+    #d6a93a;
+}
+
+
+/* =========================================================
+   ROSTER GRID
+   ========================================================= */
+
+.clan-roster-grid {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(220px, 1fr)
+    );
+
+  gap:
+    12px;
+
+  flex:
+    1;
+
+  min-height:
+    0;
+
+  overflow-y:
+    auto;
+
+  padding-right:
+    4px;
+}
+
+
+/* =========================================================
+   SHINOBI CARD
+   ========================================================= */
+
+.clan-card {
+  display:
+    grid;
+
+  grid-template-columns:
+    82px
+    minmax(0, 1fr);
+
+  min-height:
+    118px;
+
+  padding:
+    0;
+
+  overflow:
+    hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      #111827,
+      #080d13
+    );
+
+  border:
+    1px solid #263448;
+
+  border-radius:
+    7px;
+
+  color:
+    #ffffff;
+
+  text-align:
+    left;
+
+  cursor:
+    pointer;
+
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+
+.clan-card:hover {
+  transform:
+    translateY(-2px);
+
+  border-color:
+    #d6a93a;
+
+  box-shadow:
+    0 7px 20px
+    rgba(0, 0, 0, 0.4);
+}
+
+
+.clan-card-portrait {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  background:
+    radial-gradient(
+      circle,
+      #17313b,
+      #071016 72%
+    );
+
+  border-right:
+    1px solid #263448;
+}
+
+
+.clan-card-placeholder {
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  width:
+    45px;
+
+  height:
+    45px;
+
+  border:
+    1px solid
+    rgba(0, 217, 232, 0.6);
+
+  border-radius:
+    50%;
+
+  color:
+    #00d9e8;
+
+  font-size:
+    21px;
+
+  box-shadow:
+    0 0 16px
+    rgba(0, 217, 232, 0.18);
+}
+
+
+.clan-card-body {
+  padding:
+    11px;
+}
+
+
+.clan-card-top {
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    8px;
+}
+
+
+.clan-card-name {
+  color:
+    #ffffff;
+
+  font-size:
+    12px;
+
+  font-weight:
+    900;
+}
+
+
+.clan-card-rank {
+  margin-top:
+    2px;
+
+  color:
+    #d6a93a;
+
+  font-size:
+    8px;
+
+  font-weight:
+    800;
+}
+
+
+.clan-card-status {
+  padding:
+    3px 5px;
+
+  border-radius:
+    3px;
+
+  font-size:
+    6px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    0.5px;
+}
+
+
+.clan-card-status.active {
+  color:
+    #22c55e;
+
+  background:
+    rgba(34, 197, 94, 0.1);
+
+  border:
+    1px solid
+    rgba(34, 197, 94, 0.3);
+}
+
+
+.clan-card-status.reserve {
+  color:
+    #94a3b8;
+
+  background:
+    rgba(148, 163, 184, 0.08);
+
+  border:
+    1px solid
+    rgba(148, 163, 184, 0.25);
+}
+
+
+.clan-card-stats {
+  display:
+    grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:
+    8px;
+
+  margin-top:
+    16px;
+}
+
+
+.clan-card-stats div {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    2px;
+}
+
+
+.clan-card-stats span {
+  color:
+    #64748b;
+
+  font-size:
+    6px;
+
+  font-weight:
+    800;
+}
+
+
+.clan-card-stats strong {
+  color:
+    #dce5ee;
+
+  font-size:
+    9px;
+}
