@@ -18,7 +18,7 @@ const worldRegions = {
       "A land of passion and willpower, protected by fierce ninjas and burning spirit.",
 
     mapImage:
-      "Assets/Backgrounds/inside_LOF.png",
+  "./Assets/Backgrounds/inside_LOF.png",
 
 
     /* =====================================================
