@@ -736,8 +736,8 @@ body {
   object-fit: fill;
 
   filter:
-    brightness(0.82)
-    saturate(0.94);
+  brightness(0.82)
+  saturate(0.94);
 
   pointer-events: none;
 
