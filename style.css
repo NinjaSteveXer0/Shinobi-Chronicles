@@ -326,13 +326,12 @@ body {
 
 .world-map-bg {
   position: absolute;
-
   inset: 0;
 
-  background-image:
-    url("Assets/Backgrounds/WorldMap.png");
-
-  background-size: cover;
+  background-image: url("Assets/Backgrounds/WorldMap.png");
+  
+  /* Change 'cover' to 'contain' to fit the whole map into view */
+  background-size: contain;
   background-position: center center;
   background-repeat: no-repeat;
 
