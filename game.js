@@ -75,7 +75,14 @@ function startEncounter(enemyId) {
 
   const enemy = enemyDatabase[enemyId];
 
-  console.log(enemy);
+  if (!enemy) {
+    console.log("Enemy not found");
+    return;
+  }
+
+  console.log("⚔️ Starting encounter:", enemy.name);
+  console.log("Rank:", enemy.rank);
+  console.log("Image:", enemy.image);
 
 }
 
