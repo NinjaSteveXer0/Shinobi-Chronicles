@@ -1,642 +1,151 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0"
-  >
-
-  <title>Shinobi Chronicles: World of Ninja</title>
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shinobi Chronicles</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
-
 <body>
-
-  <!-- =====================================================
-       MAIN GAME CONTAINER
-       ===================================================== -->
-  <div class="game-container">
-
-
-    <!-- =====================================================
-         TOP GAME HEADER
-         ===================================================== -->
-    <header class="game-header">
-
-
-      <!-- BRAND -->
-      <div class="header-brand">
-
-        <span class="brand-logo">🍥</span>
-
-        <div class="brand-text">
-
-          <h1 class="brand-title">
-            SHINOBI CHRONICLES
-          </h1>
-
-          <span class="brand-subtitle">
-            忍者年代記
-          </span>
-
-        </div>
-
-      </div>
-
-
-      <!-- =================================================
-           MAIN NAVIGATION
-           ================================================= -->
-      <nav class="header-nav-tabs">
-
-        <button
-          type="button"
-          class="nav-btn active"
-          onclick="openOverlay('village')"
-        >
-          VILLAGE
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('missions')"
-        >
-          MISSIONS
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('battle')"
-        >
-          ARENA
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('exams')"
-        >
-          EXAMS
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('practical')"
-        >
-          PRACTICAL
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('group')"
-        >
-          GROUP
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('defend')"
-        >
-          DEFEND
-        </button>
-
-
-        <button
-          type="button"
-          class="nav-btn"
-          onclick="openOverlay('kage')"
-        >
-          KAGE
-        </button>
-
-      </nav>
-
-
-      <!-- =================================================
-           PLAYER HUD
-           ================================================= -->
-      <div class="header-right">
-
-
-        <div class="currency-display">
-
-          <span>RYO:</span>
-
-          <b id="hud-ryo">
-            14,500
-          </b>
-
-        </div>
-
-
-        <div class="currency-display">
-
-          <span>CHAKRA:</span>
-
-          <b id="hud-chakra">
-            1200/1200
-          </b>
-
-        </div>
-
-
-        <div class="currency-display">
-
-          <span>RANK:</span>
-
-          <b
-            id="hud-rank"
-            style="color: #D6A93A;"
-          >
-            Kage
-          </b>
-
-        </div>
-
-
-      </div>
-
-    </header>
-
-
-
-    <!-- =====================================================
-         WORLD MAP
-         ===================================================== -->
-    <main class="world-map-viewport">
-
-
-      <!-- DARK ATMOSPHERIC MAP OVERLAY -->
-      <div class="world-map-bg"></div>
-
-
-
-      <!-- =================================================
-           LEFT WORLD MAP SIDEBAR
-           ================================================= -->
-      <aside class="map-sidebar-left">
-
-
-        <!-- MAP LEGEND -->
-        <div class="sidebar-card">
-
-          <div class="sidebar-title">
-            MAP LEGEND
-          </div>
-
-
-          <div class="legend-items">
-
-            <div class="legend-row">
-              <span class="legend-dot unlocked"></span>
-              Unlocked
+    <div class="game-container">
+        
+        <!-- =========================================================
+             TOP HEADER
+             ========================================================= -->
+        <header class="game-header">
+            <div class="header-brand">
+                <div class="brand-logo">🍥</div>
+                <div class="brand-text">
+                    <span class="brand-title">SHINOBI CHRONICLES</span>
+                    <span class="brand-subtitle">忍者年代記</span>
+                </div>
             </div>
 
-            <div class="legend-row">
-              <span class="legend-dot locked"></span>
-              Locked
+            <nav class="header-nav-tabs">
+                <button class="nav-btn active" onclick="switchTab('village')">VILLAGE</button>
+                <button class="nav-btn" onclick="switchTab('missions')">MISSIONS</button>
+                <button class="nav-btn" onclick="switchTab('arena')">ARENA</button>
+                <button class="nav-btn" onclick="switchTab('exams')">EXAMS</button>
+                <button class="nav-btn" onclick="switchTab('practical')">PRACTICAL</button>
+                <button class="nav-btn" onclick="switchTab('group')">GROUP</button>
+                <button class="nav-btn" onclick="switchTab('defend')">DEFEND</button>
+                <button class="nav-btn" onclick="switchTab('kage')">KAGE</button>
+            </nav>
+
+            <div class="header-right">
+                <div class="currency-display">
+                    <span>RYO:</span>
+                    <b id="hud-ryo">14,500</b>
+                </div>
+                <div class="currency-display">
+                    <span>CHAKRA:</span>
+                    <b id="hud-chakra">1,200/1,200</b>
+                </div>
+                <div class="currency-display">
+                    <span>RANK:</span>
+                    <b id="hud-rank">Kage</b>
+                </div>
+            </div>
+        </header>
+
+        <!-- =========================================================
+             WORLD MAP VIEWPORT
+             ========================================================= -->
+        <main class="world-map-viewport">
+            
+            <!-- MAP CANVAS CONTAINER (Locks map background and pins together) -->
+            <div class="map-canvas-container">
+                <div class="world-map-bg"></div>
+
+                <!-- Region Pins (Positioned relative to map bounds) -->
+                <button class="map-node-pin" style="top: 36%; left: 22%;" onclick="openRegion('Land of Wind')">
+                    <div class="pin-glow" style="color: #ef4444;"></div>
+                    <span class="pin-label">Land of Wind</span>
+                </button>
+                <button class="map-node-pin" style="top: 40%; left: 45%;" onclick="openRegion('Land of Fire')">
+                    <div class="pin-glow" style="color: #00d9e8;"></div>
+                    <span class="pin-label">Land of Fire</span>
+                </button>
             </div>
 
-            <div class="legend-row">
-              <span class="legend-dot premium"></span>
-              Premium Area
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot threat"></span>
-              High Threat
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot main"></span>
-              Main Story Area
-            </div>
-
-            <div class="legend-row">
-              <span class="legend-dot special"></span>
-              Special Area
-            </div>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- CURRENT LOCATION -->
-        <div
-          class="sidebar-card interactive-loc"
-          onclick="openRegionHub('fire')"
-        >
-
-          <div class="sidebar-title">
-            CURRENT LOCATION
-          </div>
-
-
-          <div class="location-preview-name">
-            HIDDEN LEAF VILLAGE
-          </div>
-
-
-          <div class="location-preview-sub">
-            Land of Fire
-          </div>
-
-
-          <!--
-              IMPORTANT:
-              This opens the LAND OF FIRE REGIONAL MAP.
-
-              It does NOT jump directly into Konoha.
-
-              Flow:
-              World Map
-                 ↓
-              Land of Fire
-                 ↓
-              Konohagakure
-                 ↓
-              Village
-          -->
-          <button
-            type="button"
-            class="btn-enter-loc"
-            onclick="event.stopPropagation(); openRegionHub('fire');"
-          >
-            EXPLORE LAND OF FIRE
-          </button>
-
-        </div>
-
-
-
-        <!-- WORLD PROGRESS -->
-        <div class="sidebar-card">
-
-          <div class="sidebar-title">
-            WORLD PROGRESS
-          </div>
-
-
-          <!-- REGIONS -->
-          <div class="progress-block">
-
-            <span>
-              Regions Discovered
-            </span>
-
-            <b>
-              18 / 42
-            </b>
-
-          </div>
-
-
-          <div class="progress-bar-shell">
-
-            <div
-              class="progress-bar-fill"
-              style="width: 42%;"
-            ></div>
-
-          </div>
-
-
-          <!-- MISSIONS -->
-          <div
-            class="progress-block"
-            style="margin-top: 8px;"
-          >
-
-            <span>
-              Missions Completed
-            </span>
-
-            <b>
-              84 / 350
-            </b>
-
-          </div>
-
-
-          <div class="progress-bar-shell">
-
-            <div
-              class="progress-bar-fill"
-              style="width: 24%;"
-            ></div>
-
-          </div>
-
-        </div>
-
-
-      </aside>
-
-
-
-      <!-- =================================================
-           WORLD MAP REGION PINS
-           ================================================= -->
-
-
-      <!-- LAND OF FIRE -->
-      <button
-        type="button"
-        class="map-node-pin"
-        style="
-          top: 45%;
-          left: 35%;
-          background: none;
-          border: none;
-        "
-        onclick="openRegionHub('fire')"
-        aria-label="Open Land of Fire"
-      >
-
-        <div class="pin-glow"></div>
-
-        <span class="pin-label">
-          Land of Fire
-        </span>
-
-      </button>
-
-
-
-      <!-- LAND OF WIND -->
-      <button
-        type="button"
-        class="map-node-pin"
-        style="
-          top: 35%;
-          left: 18%;
-          background: none;
-          border: none;
-        "
-        onclick="openRegionHub('wind')"
-        aria-label="Open Land of Wind"
-      >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #E53935;
-            box-shadow: 0 0 15px #E53935;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Wind
-        </span>
-
-      </button>
-
-
-
-      <!-- LAND OF WATER -->
-      <button
-        type="button"
-        class="map-node-pin"
-        style="
-          top: 52%;
-          left: 48%;
-          background: none;
-          border: none;
-        "
-        onclick="openRegionHub('water')"
-        aria-label="Open Land of Water"
-      >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #00D9E8;
-            box-shadow: 0 0 15px #00D9E8;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Water
-        </span>
-
-      </button>
-
-
-
-      <!-- LAND OF EARTH -->
-      <button
-        type="button"
-        class="map-node-pin"
-        style="
-          top: 18%;
-          left: 22%;
-          background: none;
-          border: none;
-        "
-        onclick="openRegionHub('earth')"
-        aria-label="Open Land of Earth"
-      >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #D6A93A;
-            box-shadow: 0 0 15px #D6A93A;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Earth
-        </span>
-
-      </button>
-
-
-
-      <!-- LAND OF LIGHTNING -->
-      <button
-        type="button"
-        class="map-node-pin"
-        style="
-          top: 52%;
-          left: 65%;
-          background: none;
-          border: none;
-        "
-        onclick="openRegionHub('lightning')"
-        aria-label="Open Land of Lightning"
-      >
-
-        <div
-          class="pin-glow"
-          style="
-            background: #D6A93A;
-            box-shadow: 0 0 15px #D6A93A;
-          "
-        ></div>
-
-        <span class="pin-label">
-          Land of Lightning
-        </span>
-
-      </button>
-
-
-    </main>
-
-
-
-    <!-- =====================================================
-         BOTTOM GAME DOCK
-         ===================================================== -->
-    <footer class="game-footer">
-
-
-      <div
-        class="footer-action-item"
-        onclick="claimDailyReward()"
-      >
-
-        <span>
-          🎁 Daily Reward
-        </span>
-
-      </div>
-
-
-      <div
-        class="footer-action-item"
-        onclick="openOverlay('events')"
-      >
-
-        <span>
-          ⚔️ Events
-        </span>
-
-      </div>
-
-
-      <div
-        class="footer-action-item"
-        onclick="openOverlay('roster')"
-      >
-
-        <span>
-          👥 Roster
-        </span>
-
-      </div>
-
-
-      <div
-        class="footer-action-item"
-        onclick="openOverlay('shop')"
-      >
-
-        <span>
-          🛒 Special Shop
-        </span>
-
-      </div>
-
-
-    </footer>
-
-
-
-    <!-- =====================================================
-         GLOBAL SCREEN OVERLAY
-
-         IMPORTANT:
-         This lives INSIDE .game-container.
-
-         That means your existing absolute positioning works
-         reliably against the entire game screen.
-         ===================================================== -->
-    <div
-      id="screen-overlay"
-      class="screen-overlay"
-      style="display: none;"
-    >
-
-
-      <div class="overlay-content-box">
-
-
-        <!-- CLOSE BUTTON -->
-        <button
-          type="button"
-          class="overlay-close-btn"
-          onclick="closeOverlay()"
-        >
-          ✕ CLOSE
-        </button>
-
-
-
-        <!--
-            JS injects:
-
-            Village
-            Missions
-            Battle
-            Region Map
-            Roster
-            Shop
-            etc.
-
-            into this container.
-        -->
-        <div
-          id="overlay-content-container"
-          style="
-            display: flex;
-            flex-direction: column;
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-          "
-        >
-        </div>
-
-
-      </div>
-
+            <!-- =========================================================
+                 LEFT WORLD MAP SIDEBAR
+                 ========================================================= -->
+            <aside class="map-sidebar-left">
+
+                <!-- MAP LEGEND -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">MAP LEGEND</div>
+                    <div class="legend-items">
+                        <div class="legend-row">
+                            <div class="legend-dot unlocked"></div>
+                            <span>Unlocked</span>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-dot locked"></div>
+                            <span>Locked</span>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-dot premium"></div>
+                            <span>Premium Area</span>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-dot threat"></div>
+                            <span>High Threat</span>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-dot main"></div>
+                            <span>Main Story Area</span>
+                        </div>
+                        <div class="legend-row">
+                            <div class="legend-dot special"></div>
+                            <span>Special Area</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CURRENT LOCATION -->
+                <div class="sidebar-card interactive-loc" onclick="openRegion('Land of Fire')">
+                    <div class="sidebar-title">CURRENT LOCATION</div>
+                    <div class="location-preview-name">HIDDEN LEAF VILLAGE</div>
+                    <div class="location-preview-sub">Land of Fire</div>
+                    <button class="btn-enter-loc">EXPLORE LAND OF FIRE</button>
+                </div>
+
+                <!-- WORLD PROGRESS -->
+                <div class="sidebar-card">
+                    <div class="sidebar-title">WORLD PROGRESS</div>
+                    <div class="progress-block">
+                        <span>Regions Discovered</span>
+                        <b>18 / 42</b>
+                    </div>
+                    <div class="progress-bar-shell">
+                        <div class="progress-bar-fill" style="width: 42.8%;"></div>
+                    </div>
+                    <div class="progress-block" style="margin-top: 10px;">
+                        <span>Missions Completed</span>
+                        <b>84 / 350</b>
+                    </div>
+                    <div class="progress-bar-shell">
+                        <div class="progress-bar-fill" style="width: 24%;"></div>
+                    </div>
+                </div>
+
+            </aside>
+
+        </main>
+
+        <!-- =========================================================
+             FOOTER DOCK
+             ========================================================= -->
+        <footer class="game-footer">
+            <button class="footer-action-item">Quick Menu</button>
+            <button class="footer-action-item">Settings</button>
+            <button class="footer-action-item">Codex</button>
+        </footer>
 
     </div>
 
-
-  </div>
-
-
-
-  <!-- =====================================================
-       GAME JAVASCRIPT
-       ===================================================== -->
-  <script src="game.js"></script>
-
-
+    <script src="game.js"></script>
 </body>
-
 </html>
