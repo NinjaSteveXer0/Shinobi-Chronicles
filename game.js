@@ -2816,9 +2816,6 @@ function renderBattleOverlay(
   const location =
     selectedLocationNode;
 
-  const location =
-    selectedLocationNode;
-
 
   container.innerHTML = `
 
