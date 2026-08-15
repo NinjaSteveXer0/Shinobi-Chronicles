@@ -1,207 +1,1794 @@
+/* =========================================================
+   SHINOBI CHRONICLES
+   MASTER UI STYLESHEET
+
+   Theme:
+   Obsidian / Dark Navy / Chakra Cyan / Shinobi Gold
+   ========================================================= */
+
+
+/* =========================================================
+   1. GLOBAL RESET
+   ========================================================= */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Geneva,
+    Verdana,
+    sans-serif;
+
   user-select: none;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-body, html {
-  width: 100vw;
-  height: 100vh;
-  background-color: #05080c;
-  color: #fff;
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+
+body {
+  background: #05080c;
+  color: #ffffff;
+
   overflow: hidden;
 }
+
+
+/* =========================================================
+   2. MAIN GAME CONTAINER
+   ========================================================= */
 
 .game-container {
+  width: 100%;
+  height: 100%;
+
   display: flex;
   flex-direction: column;
-  width: 100vw;
-  height: 100vh;
-}
 
-/* TOP NAVIGATION HEADER */
-.game-header {
-  height: 55px;
-  background: #080C10;
-  border-bottom: 1px solid #1E293B;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  z-index: 10;
-}
-
-.header-brand { display: flex; align-items: center; gap: 10px; }
-.brand-logo { font-size: 22px; }
-.brand-title { font-size: 14px; font-weight: 800; letter-spacing: 1px; color: #F8FAFC; }
-.brand-subtitle { font-size: 9px; color: #64748B; }
-
-.header-nav-tabs { display: flex; gap: 6px; }
-.nav-btn {
-  background: #111827;
-  border: 1px solid #1E293B;
-  color: #94A3B8;
-  padding: 6px 12px;
-  font-size: 10px;
-  font-weight: bold;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-.nav-btn:hover, .nav-btn.active {
-  background: #D6A93A;
-  color: #000;
-  border-color: #D6A93A;
-}
-
-.header-right { display: flex; gap: 15px; font-size: 11px; }
-.currency-display span { color: #64748B; margin-right: 4px; }
-.currency-display b { color: #D6A93A; }
-
-/* WORLD MAP VIEWPORT */
-.world-map-viewport {
-  flex: 1;
   position: relative;
+
+  background: #05080c;
   overflow: hidden;
 }
+
+
+/* =========================================================
+   3. TOP HEADER
+   ========================================================= */
+
+.game-header {
+  width: 100%;
+  height: 60px;
+  min-height: 60px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 18px;
+
+  padding: 0 20px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 15, 21, 0.99),
+      rgba(6, 10, 14, 0.99)
+    );
+
+  border-top: 2px solid rgba(0, 217, 232, 0.75);
+  border-bottom: 1px solid #1e293b;
+
+  box-shadow:
+    0 4px 18px rgba(0, 0, 0, 0.45);
+
+  position: relative;
+
+  z-index: 20;
+}
+
+
+/* =========================================================
+   HEADER BRAND
+   ========================================================= */
+
+.header-brand {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+
+.brand-logo {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-size: 18px;
+
+  border-radius: 50%;
+
+  background: #f8fafc;
+}
+
+
+.brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+
+.brand-title {
+  color: #f8fafc;
+
+  font-size: 13px;
+  line-height: 1;
+
+  font-weight: 900;
+
+  letter-spacing: 1px;
+
+  white-space: nowrap;
+}
+
+
+.brand-subtitle {
+  margin-top: 4px;
+
+  color: #d6a93a;
+
+  font-size: 8px;
+
+  letter-spacing: 2px;
+}
+
+
+/* =========================================================
+   4. HEADER NAVIGATION
+   ========================================================= */
+
+.header-nav-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 7px;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+
+.nav-btn {
+  height: 30px;
+
+  padding: 0 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #111827,
+      #0b111b
+    );
+
+  border: 1px solid #263448;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  letter-spacing: 0.4px;
+
+  border-radius: 5px;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+.nav-btn:hover {
+  color: #ffffff;
+
+  border-color: #d6a93a;
+
+  transform: translateY(-1px);
+}
+
+
+.nav-btn.active {
+  background:
+    linear-gradient(
+      180deg,
+      #f0c54e,
+      #c79623
+    );
+
+  color: #05080c;
+
+  border-color: #d6a93a;
+
+  box-shadow:
+    0 0 12px rgba(214, 169, 58, 0.45);
+}
+
+
+/* =========================================================
+   5. PLAYER HUD
+   ========================================================= */
+
+.header-right {
+  display: flex;
+  align-items: center;
+
+  gap: 12px;
+
+  flex-shrink: 0;
+}
+
+
+.currency-display {
+  padding: 6px 11px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #111827,
+      #0d1420
+    );
+
+  border: 1px solid #1e293b;
+
+  border-radius: 5px;
+
+  font-size: 10px;
+
+  white-space: nowrap;
+}
+
+
+.currency-display span {
+  color: #64748b;
+
+  margin-right: 5px;
+}
+
+
+.currency-display b {
+  color: #f8fafc;
+
+  font-weight: 800;
+}
+
+
+#hud-ryo {
+  color: #d6a93a;
+}
+
+
+#hud-chakra {
+  color: #00d9e8;
+}
+
+
+#hud-rank {
+  color: #d6a93a;
+}
+
+
+/* =========================================================
+   6. WORLD MAP VIEWPORT
+   ========================================================= */
+
+.world-map-viewport {
+  flex: 1;
+
+  min-height: 0;
+
+  position: relative;
+
+  background: #0a1117;
+
+  overflow: hidden;
+}
+
+
+/*
+   IMPORTANT:
+   This is still a visual background layer.
+
+   Eventually I recommend moving WorldMap.png into an <img>
+   element so map pins can track the image perfectly across
+   different aspect ratios.
+*/
 
 .world-map-bg {
   position: absolute;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background-image: url('Assets/Backgrounds/WorldMap.png');
+
+  inset: 0;
+
+  background-image:
+    url("Assets/Backgrounds/WorldMap.png");
+
   background-size: cover;
-  background-position: center;
-  filter: brightness(0.9);
+  background-position: center center;
+  background-repeat: no-repeat;
+
+  filter:
+    brightness(0.80)
+    saturate(0.92);
+
+  transform: scale(1.002);
+
+  pointer-events: none;
 }
 
-/* LEFT SIDEBAR */
+
+/* ATMOSPHERIC OVERLAY */
+
+.world-map-viewport::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 0;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(0, 217, 232, 0.015) 0%,
+      rgba(5, 8, 12, 0.08) 45%,
+      rgba(5, 8, 12, 0.4) 100%
+    );
+
+  pointer-events: none;
+
+  z-index: 1;
+}
+
+
+/* =========================================================
+   7. LEFT MAP SIDEBAR
+   ========================================================= */
+
 .map-sidebar-left {
   position: absolute;
-  top: 20px;
+
+  top: 22px;
   left: 20px;
-  width: 240px;
+
+  width: 250px;
+
   display: flex;
   flex-direction: column;
+
   gap: 12px;
-  z-index: 5;
+
+  z-index: 8;
 }
+
 
 .sidebar-card {
-  background: rgba(8, 12, 16, 0.9);
-  border: 1px solid #1E293B;
-  border-radius: 6px;
   padding: 12px;
-  backdrop-filter: blur(4px);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 12, 16, 0.96),
+      rgba(5, 9, 13, 0.94)
+    );
+
+  border: 1px solid #263448;
+
+  border-radius: 7px;
+
+  backdrop-filter: blur(8px);
+
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.35);
 }
+
 
 .sidebar-title {
-  font-size: 9px;
-  font-weight: bold;
-  color: #D6A93A;
   margin-bottom: 8px;
-  letter-spacing: 0.5px;
+  padding-bottom: 6px;
+
+  color: #d6a93a;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 1px;
+
+  border-bottom: 1px solid #1e293b;
 }
 
-.location-preview-name { font-size: 11px; font-weight: bold; color: #FFF; }
-.location-preview-sub { font-size: 9px; color: #00D9E8; margin-bottom: 10px; }
+
+/* =========================================================
+   8. MAP LEGEND
+   ========================================================= */
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+}
+
+
+.legend-row {
+  display: flex;
+  align-items: center;
+
+  gap: 8px;
+}
+
+
+.legend-dot {
+  width: 7px;
+  height: 7px;
+
+  border-radius: 50%;
+
+  flex-shrink: 0;
+}
+
+
+.legend-dot.unlocked {
+  background: #22c55e;
+
+  box-shadow:
+    0 0 6px rgba(34, 197, 94, 0.55);
+}
+
+
+.legend-dot.locked {
+  background: #64748b;
+}
+
+
+.legend-dot.premium {
+  background: #a855f7;
+
+  box-shadow:
+    0 0 6px rgba(168, 85, 247, 0.55);
+}
+
+
+.legend-dot.threat {
+  background: #ef4444;
+
+  box-shadow:
+    0 0 6px rgba(239, 68, 68, 0.55);
+}
+
+
+.legend-dot.main {
+  background: #d6a93a;
+
+  box-shadow:
+    0 0 6px rgba(214, 169, 58, 0.55);
+}
+
+
+.legend-dot.special {
+  background: #00d9e8;
+
+  box-shadow:
+    0 0 6px rgba(0, 217, 232, 0.55);
+}
+
+
+/* =========================================================
+   9. CURRENT LOCATION CARD
+   ========================================================= */
+
+.interactive-loc {
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+
+.interactive-loc:hover {
+  border-color: #d6a93a;
+
+  box-shadow:
+    0 0 14px rgba(214, 169, 58, 0.15);
+
+  transform: translateY(-1px);
+}
+
+
+.location-preview-name {
+  color: #ffffff;
+
+  font-size: 11px;
+
+  font-weight: 800;
+}
+
+
+.location-preview-sub {
+  margin-top: 3px;
+  margin-bottom: 9px;
+
+  color: #00d9e8;
+
+  font-size: 9px;
+}
+
 
 .btn-enter-loc {
   width: 100%;
-  background: #111827;
-  border: 1px solid #334155;
-  color: #FFF;
-  padding: 6px;
-  font-size: 9px;
-  font-weight: bold;
+
+  padding: 6px 8px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #111827,
+      #0b111b
+    );
+
+  border: 1px solid #d6a93a;
+
   border-radius: 4px;
+
+  color: #d6a93a;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  letter-spacing: 0.4px;
+
   cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
 }
-.btn-enter-loc:hover { background: #D6A93A; color: #000; }
+
+
+.btn-enter-loc:hover {
+  background: #d6a93a;
+
+  color: #05080c;
+
+  box-shadow:
+    0 0 10px rgba(214, 169, 58, 0.4);
+}
+
+
+/* =========================================================
+   10. WORLD PROGRESS
+   ========================================================= */
 
 .progress-block {
   display: flex;
   justify-content: space-between;
-  font-size: 10px;
-  color: #94A3B8;
+  align-items: center;
+
   margin-bottom: 4px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
 }
+
+
+.progress-block b {
+  color: #f8fafc;
+
+  font-weight: 800;
+}
+
 
 .progress-bar-shell {
   width: 100%;
-  height: 4px;
-  background: #1E293B;
-  border-radius: 2px;
+  height: 5px;
+
+  background: #111827;
+
+  border: 1px solid rgba(30, 41, 59, 0.75);
+
+  border-radius: 3px;
+
   overflow: hidden;
 }
-.progress-bar-fill { height: 100%; background: #00D9E8; }
 
-/* MAP NODE PINS */
+
+.progress-bar-fill {
+  height: 100%;
+
+  background:
+    linear-gradient(
+      90deg,
+      #00aabd,
+      #00d9e8
+    );
+
+  box-shadow:
+    0 0 8px rgba(0, 217, 232, 0.3);
+}
+
+
+/* =========================================================
+   11. WORLD MAP REGION PINS
+   ========================================================= */
+
 .map-node-pin {
   position: absolute;
-  transform: translate(-50%, -50%);
-  cursor: pointer;
+
+  transform:
+    translate(-50%, -50%);
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: 5;
-}
-.pin-glow {
-  width: 14px; height: 14px;
-  background: #00D9E8;
-  border: 2px solid #FFF;
-  border-radius: 50%;
-  box-shadow: 0 0 12px #00D9E8;
-}
-.pin-label {
-  margin-top: 4px;
-  font-size: 9px; font-weight: bold; color: #FFF;
-  background: rgba(8, 12, 16, 0.85);
-  padding: 2px 6px; border-radius: 3px;
-  border: 1px solid #1E293B;
-  white-space: nowrap;
+
+  background: transparent;
+
+  border: none;
+
+  padding: 0;
+
+  color: inherit;
+
+  font: inherit;
+
+  appearance: none;
+
+  cursor: pointer;
+
+  z-index: 7;
 }
 
-/* FOOTER DOCK */
+
+.pin-glow {
+  width: 22px;
+  height: 22px;
+
+  background: #00d9e8;
+
+  border: 2px solid #ffffff;
+
+  border-radius: 50%;
+
+  box-shadow:
+    0 0 8px #00d9e8,
+    0 0 18px rgba(0, 217, 232, 0.75);
+
+  animation:
+    shinobiPinPulse 2.2s ease-in-out infinite;
+
+  transition:
+    transform 0.2s ease;
+}
+
+
+.map-node-pin:hover .pin-glow {
+  transform: scale(1.22);
+}
+
+
+.pin-label {
+  margin-top: 5px;
+
+  padding: 3px 7px;
+
+  background:
+    rgba(5, 8, 12, 0.94);
+
+  border: 1px solid #263448;
+
+  border-radius: 4px;
+
+  color: #ffffff;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  letter-spacing: 0.3px;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.5);
+}
+
+
+.map-node-pin:hover .pin-label {
+  border-color: #d6a93a;
+
+  color: #f5d672;
+}
+
+
+@keyframes shinobiPinPulse {
+
+  0% {
+    box-shadow:
+      0 0 6px currentColor,
+      0 0 0 0 rgba(0, 217, 232, 0.38);
+  }
+
+  50% {
+    box-shadow:
+      0 0 12px currentColor,
+      0 0 0 9px rgba(0, 217, 232, 0);
+  }
+
+  100% {
+    box-shadow:
+      0 0 6px currentColor,
+      0 0 0 0 rgba(0, 217, 232, 0);
+  }
+
+}
+
+
+/* =========================================================
+   12. FOOTER DOCK
+   ========================================================= */
+
 .game-footer {
-  height: 45px;
-  background: #080C10;
-  border-top: 1px solid #1E293B;
+  width: 100%;
+  height: 48px;
+  min-height: 48px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
-}
-.footer-action-item {
-  font-size: 10px; color: #94A3B8;
-  background: #111827; border: 1px solid #1E293B;
-  padding: 6px 14px; border-radius: 4px; cursor: pointer;
-}
-.footer-action-item:hover { color: #FFF; border-color: #D6A93A; }
 
-/* SCREEN MODAL OVERLAY */
+  gap: 12px;
+
+  padding: 0 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(8, 12, 16, 0.98),
+      rgba(5, 8, 12, 0.99)
+    );
+
+  border-top: 1px solid #1e293b;
+
+  box-shadow:
+    0 -5px 18px rgba(0, 0, 0, 0.3);
+
+  z-index: 20;
+}
+
+
+.footer-action-item {
+  padding: 6px 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #111827,
+      #0c121c
+    );
+
+  border: 1px solid #1e293b;
+
+  border-radius: 5px;
+
+  color: #94a3b8;
+
+  font-size: 10px;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
+}
+
+
+.footer-action-item:hover {
+  color: #ffffff;
+
+  border-color: #d6a93a;
+
+  background: #131c29;
+}
+
+
+/* =========================================================
+   13. GLOBAL SCREEN OVERLAY
+   ========================================================= */
+
 .screen-overlay {
   position: fixed;
-  top: 0; left: 0; width: 100vw; height: 100vh;
-  background: rgba(5, 8, 12, 0.85);
-  backdrop-filter: blur(6px);
-  z-index: 100;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 30px;
+
+  padding: 28px;
+
+  background:
+    rgba(2, 5, 8, 0.86);
+
+  backdrop-filter:
+    blur(7px);
+
+  z-index: 1000;
 }
+
+
+/* =========================================================
+   14. OVERLAY WINDOW
+   ========================================================= */
+
 .overlay-content-box {
-  width: 90vw; max-width: 1050px; height: 85vh;
-  background: #080C10; border: 1px solid #1E293B;
-  border-radius: 8px; display: flex; flex-direction: column;
-  padding: 16px; position: relative;
+  width: 94vw;
+  max-width: 1450px;
+
+  height: 88vh;
+
+  min-height: 520px;
+
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #0b1017,
+      #070b10
+    );
+
+  border: 1px solid #263448;
+
+  border-radius: 10px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.75),
+    0 0 25px rgba(0, 217, 232, 0.035);
 }
+
+
+/* GOLD REGION ACCENT */
+
+.overlay-content-box::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(214, 169, 58, 0.7),
+      transparent
+    );
+}
+
+
+/* =========================================================
+   15. OVERLAY CLOSE BUTTON
+   ========================================================= */
+
 .overlay-close-btn {
-  position: absolute; top: 12px; right: 14px;
-  background: #111827; border: 1px solid #334155;
-  color: #94A3B8; padding: 4px 10px; font-size: 9px;
-  font-weight: bold; border-radius: 4px; cursor: pointer; z-index: 20;
+  position: absolute;
+
+  top: 14px;
+  right: 18px;
+
+  padding: 6px 11px;
+
+  background: #111827;
+
+  border: 1px solid #334155;
+
+  border-radius: 5px;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  cursor: pointer;
+
+  z-index: 30;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
-.overlay-close-btn:hover { background: #EF4444; color: #FFF; border-color: #EF4444; }
+
+
+.overlay-close-btn:hover {
+  background: #ef4444;
+
+  color: #ffffff;
+
+  border-color: #ef4444;
+
+  box-shadow:
+    0 0 10px rgba(239, 68, 68, 0.35);
+}
+
+
+/* =========================================================
+   16. REGIONAL HUB
+   ========================================================= */
+
+.region-hub-container {
+  width: 100%;
+
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+
+  gap: 14px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   17. REGIONAL MAP PANE
+   ========================================================= */
+
+.region-map-pane {
+  flex: 1;
+
+  min-width: 0;
+  min-height: 0;
+
+  position: relative;
+
+  background: #05080c;
+
+  border: 1px solid #263448;
+
+  border-radius: 8px;
+
+  overflow: hidden;
+
+  box-shadow:
+    inset 0 0 30px rgba(0, 0, 0, 0.35);
+}
+
+
+/*
+   Use this when the regional map is rendered as a real <img>.
+   This is preferable to background-size: cover.
+*/
+
+.region-map-image {
+  width: 100%;
+  height: 100%;
+
+  display: block;
+
+  object-fit: contain;
+
+  object-position: center;
+
+  background: #05080c;
+}
+
+
+/* =========================================================
+   18. REGIONAL HOTSPOTS
+   ========================================================= */
+
+.region-hotspot {
+  position: absolute;
+
+  transform:
+    translate(-50%, -50%);
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  padding: 0;
+
+  background: transparent;
+
+  border: none;
+
+  color: inherit;
+
+  cursor: pointer;
+
+  z-index: 15;
+}
+
+
+.hotspot-orb {
+  width: 30px;
+  height: 30px;
+
+  display: block;
+
+  border: 2px solid #ffffff;
+
+  border-radius: 50%;
+
+  background: #d6a93a;
+
+  box-shadow:
+    0 0 9px rgba(214, 169, 58, 0.9),
+    0 0 22px rgba(214, 169, 58, 0.5);
+
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+.hotspot-label {
+  margin-top: 5px;
+
+  padding: 3px 7px;
+
+  background:
+    rgba(5, 8, 12, 0.94);
+
+  border: 1px solid #334155;
+
+  border-radius: 4px;
+
+  color: #f8fafc;
+
+  font-size: 9px;
+  font-weight: 800;
+
+  white-space: nowrap;
+
+  box-shadow:
+    0 3px 9px rgba(0, 0, 0, 0.55);
+}
+
+
+.region-hotspot:hover .hotspot-orb,
+.region-hotspot.selected .hotspot-orb {
+  transform:
+    scale(1.22);
+
+  box-shadow:
+    0 0 10px #ffffff,
+    0 0 26px rgba(214, 169, 58, 0.95);
+}
+
+
+.region-hotspot.selected .hotspot-label {
+  color: #f5d672;
+
+  border-color: #d6a93a;
+}
+
+
+/* =========================================================
+   DIFFERENT HOTSPOT TYPES
+   ========================================================= */
+
+.region-hotspot.village .hotspot-orb {
+  background: #00d9e8;
+
+  box-shadow:
+    0 0 9px #00d9e8,
+    0 0 22px rgba(0, 217, 232, 0.45);
+}
+
+
+.region-hotspot.battle .hotspot-orb {
+  background: #ef4444;
+
+  box-shadow:
+    0 0 9px #ef4444,
+    0 0 22px rgba(239, 68, 68, 0.45);
+}
+
+
+.region-hotspot.training .hotspot-orb {
+  background: #a855f7;
+
+  box-shadow:
+    0 0 9px #a855f7,
+    0 0 22px rgba(168, 85, 247, 0.45);
+}
+
+
+.region-hotspot.mission .hotspot-orb {
+  background: #22c55e;
+
+  box-shadow:
+    0 0 9px #22c55e,
+    0 0 22px rgba(34, 197, 94, 0.45);
+}
+
+
+.region-hotspot.locked {
+  opacity: 0.45;
+
+  filter: grayscale(0.9);
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   19. REGIONAL DETAILS PANEL
+   ========================================================= */
+
+.region-details-pane {
+  width: 290px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: space-between;
+
+  padding: 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #080c10,
+      #060a0e
+    );
+
+  border: 1px solid #263448;
+
+  border-radius: 8px;
+
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   20. GENERAL GAME BUTTON
+   ========================================================= */
+
+.btn-ninja {
+  width: 100%;
+
+  padding: 9px 12px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #111827,
+      #0b111b
+    );
+
+  border: 1px solid #d6a93a;
+
+  border-radius: 5px;
+
+  color: #d6a93a;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  letter-spacing: 0.4px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+
+.btn-ninja:hover {
+  background: #d6a93a;
+
+  color: #05080c;
+
+  box-shadow:
+    0 0 12px rgba(214, 169, 58, 0.4);
+}
+
+
+/* =========================================================
+   21. BATTLE ARENA
+   ========================================================= */
+
+.battle-arena {
+  width: 100%;
+
+  flex: 1;
+
+  min-height: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+}
+
+
+.battle-environment {
+  position: absolute;
+
+  inset: 0;
+
+  pointer-events: none;
+
+  overflow: hidden;
+}
+
+
+.combatants-stage {
+  flex: 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+
+  position: relative;
+
+  z-index: 2;
+}
+
+
+.combatant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 14px;
+}
+
+
+/* =========================================================
+   22. CHARACTER CARDS
+   ========================================================= */
+
+.character-card-frame {
+  width: 180px;
+  height: 260px;
+
+  display: flex;
+  flex-direction: column;
+
+  position: relative;
+
+  overflow: hidden;
+
+  background: #111827;
+
+  border: 2px solid #d6a93a;
+
+  border-radius: 8px;
+
+  box-shadow:
+    0 0 22px rgba(214, 169, 58, 0.2);
+}
+
+
+.card-rarity-legendary {
+  border-color: #d6a93a;
+
+  box-shadow:
+    0 0 22px rgba(214, 169, 58, 0.32);
+}
+
+
+.card-rarity-rare {
+  border-color: #00d9e8;
+
+  box-shadow:
+    0 0 22px rgba(0, 217, 232, 0.32);
+}
+
+
+.card-header-tag {
+  padding: 4px;
+
+  background: #d6a93a;
+
+  color: #05080c;
+
+  font-size: 9px;
+  font-weight: 900;
+
+  text-align: center;
+
+  letter-spacing: 1px;
+}
+
+
+.card-art-container {
+  flex: 1;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+.card-footer-stats {
+  padding: 8px;
+
+  background:
+    rgba(8, 12, 16, 0.95);
+
+  border-top: 1px solid #1e293b;
+}
+
+
+.card-title {
+  margin-bottom: 4px;
+
+  color: #ffffff;
+
+  font-size: 11px;
+  font-weight: 800;
+
+  text-align: center;
+}
+
+
+.card-stats-row {
+  display: flex;
+  justify-content: space-between;
+
+  color: #94a3b8;
+
+  font-size: 9px;
+}
+
+
+/* =========================================================
+   23. HEALTH / POWER BARS
+   ========================================================= */
+
+.health-bar-container {
+  width: 180px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+
+.health-bar-container .name {
+  color: #94a3b8;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  text-align: center;
+}
+
+
+.bar {
+  width: 100%;
+  height: 8px;
+
+  background: #111827;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 4px;
+
+  overflow: hidden;
+}
+
+
+.fill {
+  width: 100%;
+  height: 100%;
+
+  background: #00d9e8;
+
+  transition:
+    width 0.3s ease;
+}
+
+
+.fill.enemy {
+  background: #ef4444;
+}
+
+
+.versus-badge {
+  color: #d6a93a;
+
+  font-size: 24px;
+  font-weight: 900;
+
+  font-style: italic;
+}
+
+
+/* =========================================================
+   24. COMBAT CONSOLE
+   ========================================================= */
+
+.combat-console {
+  padding: 14px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 10px;
+
+  background: #080c10;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 8px;
+
+  z-index: 2;
+}
+
+
+.action-feedback-log {
+  min-height: 20px;
+
+  color: #00d9e8;
+
+  font-size: 11px;
+}
+
+
+.action-buttons {
+  display: flex;
+
+  gap: 10px;
+}
+
+
+/* =========================================================
+   25. ROSTER / SHOP
+   ========================================================= */
+
+.roster-grid,
+.shop-grid {
+  flex: 1;
+
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(200px, 1fr)
+    );
+
+  gap: 20px;
+
+  padding-right: 6px;
+
+  overflow-y: auto;
+}
+
+
+.roster-card {
+  padding: 15px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  gap: 12px;
+
+  background: #080c10;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 8px;
+}
+
+
+.btn-select-shinobi {
+  width: 100%;
+
+  padding: 7px;
+
+  background: #111827;
+
+  border: 1px solid #00d9e8;
+
+  border-radius: 4px;
+
+  color: #00d9e8;
+
+  font-size: 10px;
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+
+.btn-select-shinobi:hover {
+  background: #00d9e8;
+
+  color: #05080c;
+}
+
+
+.shop-item-card {
+  height: 165px;
+
+  padding: 15px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  background: #080c10;
+
+  border: 1px solid #1e293b;
+
+  border-radius: 8px;
+}
+
+
+.shop-item-title {
+  margin-bottom: 5px;
+
+  color: #ffffff;
+
+  font-size: 13px;
+  font-weight: 800;
+}
+
+
+.shop-item-desc {
+  color: #94a3b8;
+
+  font-size: 11px;
+
+  line-height: 1.45;
+}
+
+
+.shop-item-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-top: 10px;
+
+  border-top: 1px solid #1e293b;
+}
+
+
+.shop-item-price {
+  color: #d6a93a;
+
+  font-size: 11px;
+  font-weight: 800;
+}
+
+
+.btn-buy-item {
+  padding: 6px 12px;
+
+  background: #d6a93a;
+
+  border: none;
+
+  border-radius: 4px;
+
+  color: #05080c;
+
+  font-size: 10px;
+  font-weight: 900;
+
+  cursor: pointer;
+}
+
+
+.btn-buy-item:hover {
+  filter: brightness(1.1);
+}
+
+
+/* =========================================================
+   26. PARTICLES
+   ========================================================= */
+
+.particle {
+  position: absolute;
+
+  border-radius: 50%;
+
+  background: #d6a93a;
+
+  opacity: 0.5;
+
+  pointer-events: none;
+
+  animation:
+    floatParticle linear infinite;
+}
+
+
+@keyframes floatParticle {
+
+  0% {
+    transform:
+      translateY(0)
+      scale(1);
+
+    opacity: 0;
+  }
+
+  40% {
+    opacity: 0.7;
+  }
+
+  100% {
+    transform:
+      translateY(-160px)
+      scale(0.2);
+
+    opacity: 0;
+  }
+
+}
+
+
+/* =========================================================
+   27. SCROLLBARS
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+
+::-webkit-scrollbar-track {
+  background: #080c10;
+}
+
+
+::-webkit-scrollbar-thumb {
+  background: #334155;
+
+  border-radius: 4px;
+}
+
+
+::-webkit-scrollbar-thumb:hover {
+  background: #d6a93a;
+}
+
+
+/* =========================================================
+   28. RESPONSIVE SAFEGUARDS
+   ========================================================= */
+
+@media (max-width: 1250px) {
+
+  .game-header {
+    gap: 10px;
+
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+
+  .nav-btn {
+    padding-left: 9px;
+    padding-right: 9px;
+
+    font-size: 9px;
+  }
+
+
+  .currency-display {
+    padding-left: 7px;
+    padding-right: 7px;
+
+    font-size: 9px;
+  }
+
+
+  .map-sidebar-left {
+    width: 220px;
+  }
+
+
+  .overlay-content-box {
+    width: 96vw;
+
+    max-width: none;
+  }
+
+}
+
+
+/* =========================================================
+   SMALLER DESKTOP / TABLET
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+  .brand-subtitle {
+    display: none;
+  }
+
+
+  .header-right {
+    gap: 5px;
+  }
+
+
+  .currency-display span {
+    display: none;
+  }
+
+
+  .nav-btn {
+    padding-left: 7px;
+    padding-right: 7px;
+  }
+
+
+  .region-details-pane {
+    width: 240px;
+  }
+
+}
