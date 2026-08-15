@@ -3913,3 +3913,22 @@ body {
   }
 
 }
+
+/* =========================================================
+   REGIONAL HOTSPOT — HOVER STACKING FIX
+   Keep the active hotspot above neighbouring markers
+   ========================================================= */
+
+.region-hotspot {
+    z-index: 100;
+}
+
+.region-hotspot:hover,
+.region-hotspot:focus-within {
+    z-index: 1000 !important;
+}
+
+.region-hotspot:hover .region-hotspot-card,
+.region-hotspot:focus-within .region-hotspot-card {
+    z-index: 1001 !important;
+}
