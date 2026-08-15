@@ -796,18 +796,17 @@ body {
 
 
 .pin-glow {
-  width: 20px;
-  height: 20px;
+  width: 16px;
+  height: 16px;
 
   border: 2px solid #ffffff;
-
   border-radius: 50%;
 
   background: #00d9e8;
 
   box-shadow:
-    0 0 8px #00d9e8,
-    0 0 16px rgba(0, 217, 232, 0.75);
+    0 0 6px #00d9e8,
+    0 0 12px rgba(0, 217, 232, 0.65);
 
   animation:
     shinobiPinPulse
