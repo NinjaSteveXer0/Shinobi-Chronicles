@@ -84,9 +84,11 @@ function startEncounter(enemyId) {
 
   console.log("⚔️ Starting encounter:", enemy.name);
 
-  selectedEnemy = enemy;
+selectedEnemy = enemy;
 
- console.log("Opening battle overlay with:", selectedEnemy);
+console.log("SELECTED ENEMY NOW:", selectedEnemy);
+
+console.log("Opening battle overlay");
 
 openOverlay("battle");
 
@@ -2867,7 +2869,7 @@ function renderBattleOverlay(
   "Fight a small rogue patrol.",
   "Ryo: 250",
   "Drop Chance: 12%",
-  "startEncounter('scout')"
+  "startEncounter('Scout')"
 )}
 
 
