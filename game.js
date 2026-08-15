@@ -68,6 +68,18 @@ const enemyDatabase = {
 };
 
 // =========================================================
+// ENCOUNTER SYSTEM
+// =========================================================
+
+function startEncounter(enemyId) {
+
+  const enemy = enemyDatabase[enemyId];
+
+  console.log(enemy);
+
+}
+
+// =========================================================
 // 1. WORLD REGION DATA
 // =========================================================
 
@@ -2833,30 +2845,30 @@ function renderBattleOverlay(
       ">
 
 
-        ${createActivityCard(
+  ${createActivityCard(
   "Scout Patrol",
   "Fight a small rogue patrol.",
   "Ryo: 250",
   "Drop Chance: 12%",
-  "startEncounter('bandit_patrol')"
+  "startEncounter('scout')"
 )}
 
 
-        ${createActivityCard(
+   ${createActivityCard(
   "Bandit Leader",
   "Defeat an elite rogue shinobi.",
   "Ryo: 650",
   "Rare Drop: 8%",
-  "startEncounter('bandit_leader')"
+  "startEncounter('banditLeader')"
 )}
 
 
-        ${createActivityCard(
+   ${createActivityCard(
   "Hidden Cache",
   "High-risk encounter protecting stolen equipment.",
   "Ryo: 1,200",
   "Rare Drop: 18%",
-  "investigateCache('hidden_cache')"
+  "startEncounter('bandit')"
 )}
 
 
