@@ -2910,6 +2910,8 @@ function createActivityCard(
   action
 ) {
 
+  console.log("CARD ACTION:", action);
+
   return `
 
     <div style="
