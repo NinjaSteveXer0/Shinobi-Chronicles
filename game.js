@@ -8,7 +8,6 @@
 // =========================================================
 
 let selectedEnemy = null;
-let battleEnemy = null;
 
 const enemyDatabase = {
 
@@ -87,7 +86,9 @@ function startEncounter(enemyId) {
 
   selectedEnemy = enemy;
 
-  openOverlay("battle");
+ console.log("Opening battle overlay");
+ 
+openOverlay("battle");
 
 }
 
