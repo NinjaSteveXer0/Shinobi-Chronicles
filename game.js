@@ -3,6 +3,69 @@
 // CORE WORLD / REGION / OVERLAY SYSTEM
 // =========================================================
 
+// =========================================================
+// ENEMY DATABASE
+// =========================================================
+
+const enemyDatabase = {
+
+  scout: {
+
+    id: "scout",
+
+    name: "Rogue Scout",
+
+    rank: "Rogue Shinobi",
+
+    image:
+      "Assets/Enemies/Scout.png",
+
+    powerRange: {
+      min: 350,
+      max: 450
+    }
+
+  },
+
+
+  bandit: {
+
+    id: "bandit",
+
+    name: "Bandit",
+
+    rank: "Outlaw",
+
+    image:
+      "Assets/Enemies/Bandit.png",
+
+    powerRange: {
+      min: 450,
+      max: 600
+    }
+
+  },
+
+
+  banditLeader: {
+
+    id: "banditLeader",
+
+    name: "Bandit Leader",
+
+    rank: "Elite Rogue",
+
+    image:
+      "Assets/Enemies/BanditLeader.png",
+
+    powerRange: {
+      min: 600,
+      max: 800
+    }
+
+  }
+
+};
 
 // =========================================================
 // 1. WORLD REGION DATA
@@ -2771,27 +2834,30 @@ function renderBattleOverlay(
 
 
         ${createActivityCard(
-          "Scout Patrol",
-          "Fight a small rogue patrol.",
-          "Ryo: 250",
-          "Drop Chance: 12%"
-        )}
+  "Scout Patrol",
+  "Fight a small rogue patrol.",
+  "Ryo: 250",
+  "Drop Chance: 12%",
+  "startEncounter('bandit_patrol')"
+)}
 
 
         ${createActivityCard(
-          "Bandit Leader",
-          "Defeat an elite rogue shinobi.",
-          "Ryo: 650",
-          "Rare Drop: 8%"
-        )}
+  "Bandit Leader",
+  "Defeat an elite rogue shinobi.",
+  "Ryo: 650",
+  "Rare Drop: 8%",
+  "startEncounter('bandit_leader')"
+)}
 
 
         ${createActivityCard(
-          "Hidden Cache",
-          "High-risk encounter protecting stolen equipment.",
-          "Ryo: 1,200",
-          "Rare Drop: 18%"
-        )}
+  "Hidden Cache",
+  "High-risk encounter protecting stolen equipment.",
+  "Ryo: 1,200",
+  "Rare Drop: 18%",
+  "investigateCache('hidden_cache')"
+)}
 
 
       </div>
@@ -2811,7 +2877,8 @@ function createActivityCard(
   title,
   description,
   reward,
-  requirement
+  requirement,
+  action
 ) {
 
   return `
@@ -2878,6 +2945,27 @@ function createActivityCard(
       ">
         ${requirement}
       </div>
+
+      <button
+onclick="${action}"
+style="
+margin-top:12px;
+width:100%;
+padding:8px;
+
+background:#D6A93A;
+color:#05070B;
+
+border:none;
+border-radius:5px;
+
+font-size:9px;
+font-weight:bold;
+
+cursor:pointer;
+">
+ENTER
+</button>
 
 
     </div>
