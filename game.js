@@ -96,56 +96,82 @@ const worldRegions = {
       // =====================================================
 
       {
-        id: "bandit_hideout",
+        // =====================================================
+// BANDIT HIDEOUT
+// =====================================================
 
-        name: "Bandit Hideout",
+  id: "bandit_hideout",
 
-        shortName: "Bandit Hideout",
+  name: "Bandit Hideout",
 
-        type: "battle",
+  shortName: "Bandit Hideout",
 
-        category: "LOOT HOTSPOT",
+  type: "battle",
 
-        icon:
-          "Assets/Icons/Loot.png",
+  category: "LOOT HOTSPOT",
 
-        desc:
-          "An outlaw camp hiding stolen equipment, materials and shinobi supplies.",
+  icon:
+    "Assets/Icons/Loot.png",
 
-        power: {
-          recommended: 500,
-          enemyMin: 350,
-          enemyMax: 650
-        },
+  desc:
+    "An outlaw camp hiding stolen equipment, materials and shinobi supplies.",
 
-        encounters: {
-          count: 4,
-          types: [
-            "Bandits",
-            "Rogue Shinobi"
-          ]
-        },
 
-        rewards: {
-          ryo: "150 – 450",
+  // ============================
+  // BATTLE SETTINGS
+  // ============================
 
-          common: [
-            "Weapons",
-            "Materials",
-            "Basic Scrolls"
-          ],
+  battle: {
 
-          rareDrops: [
-            {
-              name: "Bandit Captain's Tanto",
-              rarity: "Rare",
-              chance: 6.5
-            }
-          ]
-        },
+    difficulty: "EASY",
 
-        x: 19,
-        y: 27
+    recommendedPL: 500,
+
+    enemyPool: {
+      min: 350,
+      max: 650
+    },
+
+    encounters: 4,
+
+    enemyTypes: [
+      "Bandit",
+      "Rogue Shinobi"
+    ]
+
+  },
+
+
+  // ============================
+  // REWARDS
+  // ============================
+
+  rewards: {
+
+    ryo: {
+      min: 150,
+      max: 450
+    },
+
+    commonDrops: [
+      "Weapons",
+      "Materials",
+      "Basic Scrolls"
+    ],
+
+    rareDrops: [
+      {
+        name: "Bandit Captain's Tanto",
+        rarity: "Rare",
+        chance: 6.5
+      }
+    ]
+
+  },
+
+
+  x: 19,
+  y: 27
       },
 
 
