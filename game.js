@@ -677,7 +677,9 @@ function openOverlay(type) {
 function closeOverlay() {
 
   const overlay =
-    document.getElementById("screen-overlay");
+    document.getElementById(
+      "screen-overlay"
+    );
 
 
   if (!overlay) {
@@ -685,9 +687,23 @@ function closeOverlay() {
   }
 
 
-  overlay.style.display = "none";
-}
+  overlay.style.display =
+    "none";
 
+
+  overlay.classList.remove(
+    "region-map-open"
+  );
+
+
+  selectedRegionKey =
+    null;
+
+
+  selectedLocationNode =
+    null;
+
+}
 
 // =========================================================
 // 5. GENERIC OVERLAY
