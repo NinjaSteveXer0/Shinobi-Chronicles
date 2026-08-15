@@ -83,15 +83,14 @@ function startEncounter(enemyId) {
     return;
   }
 
- console.log("⚔️ Starting encounter:", enemy.name);
-
-battleEnemy = enemy;
-
-openOverlay("battle");
+  console.log("⚔️ Starting encounter:", enemy.name);
 
   selectedEnemy = enemy;
 
+  openOverlay("battle");
+
 }
+
 
 // =========================================================
 // 1. WORLD REGION DATA
