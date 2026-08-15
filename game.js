@@ -11,6 +11,7 @@
 const worldRegions = {
 
   fire: {
+
     name: "Land of Fire",
 
     description:
@@ -19,12 +20,34 @@ const worldRegions = {
     mapImage:
       "Assets/Backgrounds/inside_LOF.png",
 
+
+    /* =====================================================
+       CODED LEFT-SIDEBAR INFORMATION
+       ===================================================== */
+
+    progress: {
+      exploration: 42,
+
+      lootHotspots: "6/12",
+      grindingZones: "5/8",
+      missionPoints: "4/10",
+      sideActivities: "3/6",
+      secretAreas: "2/4"
+    },
+
+
     locations: [
+
+      /* ===================================================
+         NORTHERN CAPITAL
+         =================================================== */
 
       {
         id: "konohagakure",
 
         name: "Konohagakure (Hidden Leaf)",
+
+        shortName: "Konohagakure",
 
         type: "village",
 
@@ -41,41 +64,34 @@ const worldRegions = {
         enemyTypes:
           "Safe Zone",
 
-        x: 50,
-        y: 86
+        rewards: [
+          "Quests",
+          "Training",
+          "Shops"
+        ],
+
+        /*
+          Corrected position:
+          Konoha is at the NORTH of this regional map,
+          not at the bottom.
+        */
+        x: 49,
+        y: 12
       },
 
 
-      {
-        id: "training_grounds",
+      /* ===================================================
+         BANDIT HIDEOUT
 
-        name: "Training Grounds",
-
-        type: "training",
-
-        category: "EXP GRINDING",
-
-        desc:
-          "High-density wildlife and rogue ninja scouting grounds. Ideal for repeatable EXP farming.",
-
-        levelRange:
-          "10-16",
-
-        bestFor:
-          "EXP & Training",
-
-        enemyTypes:
-          "Bandits / Wildlife",
-
-        x: 30,
-        y: 44
-      },
-
+         This replaces the oversized / misplaced red marker.
+         =================================================== */
 
       {
         id: "bandit_hideout",
 
         name: "Bandit Hideout",
+
+        shortName: "Bandit Hideout",
 
         type: "battle",
 
@@ -84,20 +100,432 @@ const worldRegions = {
         desc:
           "An outlaw encampment hiding stolen scrolls, weapons and valuable materials.",
 
-        levelRange:
-          "15-20",
+        levelRange: "15-20",
 
         bestFor:
           "Ryo, Gear & Materials",
 
         enemyTypes:
+          "Bandits / Rogue Shinobi",
+
+        rewards: [
+          "Ryo",
+          "Weapons",
+          "Materials"
+        ],
+
+        x: 27,
+        y: 24
+      },
+
+
+      /* ===================================================
+         HIDDEN SUPPLY CACHE
+         =================================================== */
+
+      {
+        id: "hidden_supply_cache",
+
+        name: "Hidden Supply Cache",
+
+        shortName: "Supply Cache",
+
+        type: "battle",
+
+        category: "LOOT HOTSPOT",
+
+        desc:
+          "A concealed cache of equipment and supplies hidden along an old shinobi route.",
+
+        levelRange: "25-30",
+
+        bestFor:
+          "Equipment & Rare Materials",
+
+        enemyTypes:
+          "Rogue Shinobi / Guards",
+
+        rewards: [
+          "Gear",
+          "Ryo",
+          "Materials"
+        ],
+
+        x: 68,
+        y: 23
+      },
+
+
+      /* ===================================================
+         TRAINING GROUNDS
+         =================================================== */
+
+      {
+        id: "training_grounds",
+
+        name: "Training Grounds",
+
+        shortName: "Training Grounds",
+
+        type: "training",
+
+        category: "EXP GRINDING",
+
+        desc:
+          "A woodland training area ideal for repeatable combat practice and character progression.",
+
+        levelRange: "10-16",
+
+        bestFor:
+          "EXP & Training",
+
+        enemyTypes:
+          "Training Opponents",
+
+        rewards: [
+          "EXP",
+          "Ryo"
+        ],
+
+        x: 29,
+        y: 42
+      },
+
+
+      /* ===================================================
+         BRIDGE OF TRIALS
+         =================================================== */
+
+      {
+        id: "bridge_of_trials",
+
+        name: "Bridge of Trials",
+
+        shortName: "Bridge of Trials",
+
+        type: "mission",
+
+        category: "MISSION PROGRESSION",
+
+        desc:
+          "A dangerous crossing used for increasingly difficult shinobi assignments.",
+
+        levelRange: "20-28",
+
+        bestFor:
+          "Mission Progression",
+
+        enemyTypes:
+          "Mission Dependent",
+
+        rewards: [
+          "EXP",
+          "Ryo",
+          "Mission Rewards"
+        ],
+
+        x: 50,
+        y: 34
+      },
+
+
+      /* ===================================================
+         CAVE OF WHISPERS
+         =================================================== */
+
+      {
+        id: "cave_of_whispers",
+
+        name: "Cave of Whispers",
+
+        shortName: "Cave of Whispers",
+
+        type: "secret",
+
+        category: "SECRET / RARE AREA",
+
+        desc:
+          "A mysterious cave network whispered to contain unusual enemies and rare discoveries.",
+
+        levelRange: "25-35",
+
+        bestFor:
+          "Rare Drops & Exploration",
+
+        enemyTypes:
+          "Unknown",
+
+        rewards: [
+          "Rare Loot",
+          "Ryo",
+          "Secrets"
+        ],
+
+        x: 72,
+        y: 39
+      },
+
+
+      /* ===================================================
+         FOREST OF SILENCE
+         =================================================== */
+
+      {
+        id: "forest_of_silence",
+
+        name: "Forest of Silence",
+
+        shortName: "Forest of Silence",
+
+        type: "training",
+
+        category: "EXP / GOLD GRINDING",
+
+        desc:
+          "A dense forest suited to repeatable encounters for experience and Ryo.",
+
+        levelRange: "16-24",
+
+        bestFor:
+          "EXP & Ryo",
+
+        enemyTypes:
+          "Wildlife / Rogue Shinobi",
+
+        rewards: [
+          "EXP",
+          "Ryo"
+        ],
+
+        x: 50,
+        y: 49
+      },
+
+
+      /* ===================================================
+         ESCORT MISSION
+         =================================================== */
+
+      {
+        id: "escort_mission",
+
+        name: "Escort Mission",
+
+        shortName: "Escort Mission",
+
+        type: "mission",
+
+        category: "MISSION PROGRESSION",
+
+        desc:
+          "Protect civilians and traders travelling through dangerous Land of Fire routes.",
+
+        levelRange: "12-18",
+
+        bestFor:
+          "Mission Progression",
+
+        enemyTypes:
+          "Bandits / Ambushers",
+
+        rewards: [
+          "EXP",
+          "Ryo"
+        ],
+
+        x: 29,
+        y: 57
+      },
+
+
+      /* ===================================================
+         SCOUTING MISSION
+         =================================================== */
+
+      {
+        id: "scouting_mission",
+
+        name: "Scouting Mission",
+
+        shortName: "Scouting Mission",
+
+        type: "mission",
+
+        category: "MISSION PROGRESSION",
+
+        desc:
+          "Investigate suspicious activity beyond the heavily travelled routes.",
+
+        levelRange: "18-26",
+
+        bestFor:
+          "Recon & Mission Progression",
+
+        enemyTypes:
           "Rogue Shinobi",
 
-        x: 26,
-        y: 22
+        rewards: [
+          "EXP",
+          "Ryo",
+          "Mission Rewards"
+        ],
+
+        x: 69,
+        y: 57
+      },
+
+
+      /* ===================================================
+         ABANDONED OUTPOST
+         =================================================== */
+
+      {
+        id: "abandoned_outpost",
+
+        name: "Abandoned Outpost",
+
+        shortName: "Abandoned Outpost",
+
+        type: "battle",
+
+        category: "LOOT HOTSPOT",
+
+        desc:
+          "An abandoned military position now occupied by scavengers and rogue shinobi.",
+
+        levelRange: "18-25",
+
+        bestFor:
+          "Loot & Materials",
+
+        enemyTypes:
+          "Bandits / Rogue Shinobi",
+
+        rewards: [
+          "Weapons",
+          "Materials",
+          "Ryo"
+        ],
+
+        x: 27,
+        y: 72
+      },
+
+
+      /* ===================================================
+         NINJA WATCHTOWER
+         =================================================== */
+
+      {
+        id: "ninja_watchtower",
+
+        name: "Ninja Watchtower",
+
+        shortName: "Ninja Watchtower",
+
+        type: "activity",
+
+        category: "SIDE ACTIVITY",
+
+        desc:
+          "A regional observation tower offering optional shinobi challenges and reconnaissance tasks.",
+
+        levelRange: "15-22",
+
+        bestFor:
+          "Challenge Tasks",
+
+        enemyTypes:
+          "Challenge Dependent",
+
+        rewards: [
+          "EXP",
+          "Challenge Rewards"
+        ],
+
+        x: 47,
+        y: 69
+      },
+
+
+      /* ===================================================
+         RIVERBANK TRAINING
+         =================================================== */
+
+      {
+        id: "riverbank_training",
+
+        name: "Riverbank Training",
+
+        shortName: "Riverbank Training",
+
+        type: "training",
+
+        category: "EXP / GOLD GRINDING",
+
+        desc:
+          "A remote riverside training route used by travelling shinobi.",
+
+        levelRange: "14-20",
+
+        bestFor:
+          "EXP & Ryo",
+
+        enemyTypes:
+          "Training Opponents",
+
+        rewards: [
+          "EXP",
+          "Ryo"
+        ],
+
+        x: 73,
+        y: 75
+      },
+
+
+      /* ===================================================
+         SOUTHERN OUTPOST
+
+         IMPORTANT:
+         This replaces the incorrect second Konoha marker
+         currently appearing at the bottom.
+         =================================================== */
+
+      {
+        id: "southern_outpost",
+
+        name: "Southern Outpost",
+
+        shortName: "Southern Outpost",
+
+        type: "outpost",
+
+        category: "LAND OF FIRE OUTPOST",
+
+        desc:
+          "A fortified checkpoint guarding the southern approach into the Land of Fire.",
+
+        levelRange: "8-14",
+
+        bestFor:
+          "Early Progression",
+
+        enemyTypes:
+          "Bandits / Scouts",
+
+        rewards: [
+          "EXP",
+          "Ryo",
+          "Supplies"
+        ],
+
+        x: 50,
+        y: 88
       }
 
     ]
+
   }
 
 };
@@ -464,11 +892,13 @@ function openRegionHub(regionKey) {
 
 
   if (!region) {
+
     console.warn(
       `Region "${regionKey}" does not exist.`
     );
 
     return;
+
   }
 
 
@@ -476,8 +906,16 @@ function openRegionHub(regionKey) {
     regionKey;
 
 
+  /*
+    IMPORTANT CHANGE:
+
+    Do NOT automatically select Konoha or any other location.
+
+    The right-hand details panel now remains empty until the
+    player actually clicks a marker.
+  */
   selectedLocationNode =
-    region.locations[0] || null;
+    null;
 
 
   const overlay =
@@ -495,11 +933,24 @@ function openRegionHub(regionKey) {
     "flex";
 
 
+  /*
+    Add a special class while the region map is open.
+
+    This lets CSS make the regional overlay larger without
+    affecting Village, Battle, Training, etc.
+  */
+  overlay.classList.add(
+    "region-map-open"
+  );
+
+
   renderRegionHubUI(
     regionKey,
     region
   );
+
 }
+
 
 
 // =========================================================
@@ -524,49 +975,21 @@ function renderRegionHubUI(
 
   container.innerHTML = `
 
-    <div style="
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-
-      margin-bottom: 10px;
-
-      padding-bottom: 8px;
-
-      border-bottom:
-        1px solid #1E293B;
-    ">
-
+    <div class="region-screen-header">
 
       <div>
 
-        <h2 style="
-          margin: 0;
-
-          color: #D6A93A;
-
-          font-size: 14px;
-
-          letter-spacing: 1px;
-        ">
+        <h2 class="region-screen-title">
           ${region.name.toUpperCase()}
         </h2>
 
-
-        <p style="
-          margin-top: 3px;
-
-          color: #94A3B8;
-
-          font-size: 9px;
-        ">
+        <p class="region-screen-description">
           ${region.description}
         </p>
 
       </div>
 
     </div>
-
 
 
     <div class="
@@ -595,6 +1018,132 @@ function renderRegionHubUI(
 
 
 
+        <!-- ===============================================
+             BURNED-IN TOP HUD COVER
+
+             The artwork contains money / currency / energy
+             information here.
+
+             We cover it because the actual player HUD belongs
+             in HTML/CSS elsewhere.
+             =============================================== -->
+
+        <div
+          class="
+            region-baked-cover
+            region-top-hud-cover
+          "
+          aria-hidden="true"
+        >
+        </div>
+
+
+
+        <!-- ===============================================
+             ACTUAL CODED WORLD-MAP X
+
+             Positioned over the gold X burned into the image.
+             =============================================== -->
+
+        <button
+          type="button"
+
+          class="
+            region-world-close
+          "
+
+          onclick="
+            returnToWorldMap()
+          "
+
+          title="
+            Return to World Map
+          "
+
+          aria-label="
+            Return to World Map
+          "
+        >
+
+          <span>
+            ✕
+          </span>
+
+        </button>
+
+
+
+        <!-- ===============================================
+             CODED LEFT NAVIGATION
+
+             This deliberately sits over the left navigation
+             artwork that is burned into inside_LOF.png.
+             =============================================== -->
+
+        ${renderRegionLeftNavigation(
+          region
+        )}
+
+
+
+        <!-- ===============================================
+             CODED INNER LOCATION CARD
+
+             This permanently covers the old right-side
+             location card burned into the artwork.
+
+             Its CONTENT appears only after clicking a marker.
+             =============================================== -->
+
+        <aside
+          class="
+            region-map-detail-overlay
+            ${selectedLocationNode
+              ? "has-location"
+              : "waiting-for-location"}
+          "
+        >
+
+          ${
+            selectedLocationNode
+              ? renderMapLocationCard(
+                  selectedLocationNode
+                )
+              : `
+                  <div
+                    class="
+                      region-map-detail-placeholder
+                    "
+                  >
+
+                    <div
+                      class="
+                        region-map-detail-heading
+                      "
+                    >
+                      LOCATION DETAILS
+                    </div>
+
+                    <div
+                      class="
+                        region-map-detail-waiting
+                      "
+                    >
+                      Select a location marker.
+                    </div>
+
+                  </div>
+                `
+          }
+
+        </aside>
+
+
+
+        <!-- ===============================================
+             REAL INTERACTIVE MARKERS
+             =============================================== -->
+
         ${region.locations.map(
           location =>
             renderRegionHotspot(
@@ -604,12 +1153,50 @@ function renderRegionHubUI(
         ).join("")}
 
 
+
+        <!-- ===============================================
+             CODED WORLD MAP BUTTON
+
+             Covers / replaces the artwork version in the
+             lower-left.
+             =============================================== -->
+
+        <button
+          type="button"
+
+          class="
+            region-world-map-button
+          "
+
+          onclick="
+            returnToWorldMap()
+          "
+        >
+
+          <span class="
+            world-map-button-icon
+          ">
+            ◈
+          </span>
+
+          <span>
+            WORLD MAP
+          </span>
+
+        </button>
+
+
       </div>
 
 
 
       <!-- =================================================
-           LOCATION DETAILS
+           ACTUAL PAGE-SIDE LOCATION DETAILS
+
+           This is the panel outside the map.
+
+           It is intentionally empty until a map node has
+           actually been clicked.
            ================================================= -->
 
       ${renderLocationDetailsPane(
@@ -620,11 +1207,309 @@ function renderRegionHubUI(
     </div>
 
   `;
+
 }
 
 
+
 // =========================================================
-// 9. REGION HOTSPOT GENERATOR
+// 9. CODED LEFT REGIONAL NAVIGATION
+// =========================================================
+
+function renderRegionLeftNavigation(
+  region
+) {
+
+  const progress =
+    region.progress || {};
+
+
+  return `
+
+    <aside class="
+      region-left-overlay
+    ">
+
+
+      <div class="
+        region-left-section
+      ">
+
+        <div class="
+          region-left-heading
+        ">
+          REGION PROGRESS
+        </div>
+
+
+        <div class="
+          region-exploration-row
+        ">
+
+          <span>
+            Exploration
+          </span>
+
+          <strong>
+            ${progress.exploration || 0}%
+          </strong>
+
+        </div>
+
+
+        <div class="
+          region-exploration-track
+        ">
+
+          <span
+            style="
+              width:
+              ${progress.exploration || 0}%;
+            "
+          >
+          </span>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="
+        region-progress-list
+      ">
+
+        ${renderRegionProgressItem(
+          "loot",
+          "Loot Hotspots",
+          progress.lootHotspots || "0/0"
+        )}
+
+        ${renderRegionProgressItem(
+          "training",
+          "Grinding Zones",
+          progress.grindingZones || "0/0"
+        )}
+
+        ${renderRegionProgressItem(
+          "mission",
+          "Mission Points",
+          progress.missionPoints || "0/0"
+        )}
+
+        ${renderRegionProgressItem(
+          "activity",
+          "Side Activities",
+          progress.sideActivities || "0/0"
+        )}
+
+        ${renderRegionProgressItem(
+          "secret",
+          "Secret Areas",
+          progress.secretAreas || "0/0"
+        )}
+
+      </div>
+
+
+
+      <div class="
+        region-left-divider
+      ">
+      </div>
+
+
+
+      <div class="
+        region-left-section
+      ">
+
+        <div class="
+          region-left-heading
+        ">
+          LEGEND
+        </div>
+
+
+        ${renderRegionLegendItem(
+          "loot",
+          "Loot Hotspot"
+        )}
+
+        ${renderRegionLegendItem(
+          "training",
+          "EXP / Gold Grinding"
+        )}
+
+        ${renderRegionLegendItem(
+          "mission",
+          "Mission Progression"
+        )}
+
+        ${renderRegionLegendItem(
+          "activity",
+          "Side Activity"
+        )}
+
+        ${renderRegionLegendItem(
+          "secret",
+          "Secret / Rare Area"
+        )}
+
+        ${renderRegionLegendItem(
+          "outpost",
+          "Outpost"
+        )}
+
+
+        <div class="
+          region-legend-row
+        ">
+
+          <span class="
+            region-path-symbol
+          ">
+          </span>
+
+          <span>
+            Path
+          </span>
+
+        </div>
+
+      </div>
+
+
+    </aside>
+
+  `;
+
+}
+
+
+
+// =========================================================
+// 10. LEFT NAV PROGRESS ITEM
+// =========================================================
+
+function renderRegionProgressItem(
+  type,
+  label,
+  value
+) {
+
+  return `
+
+    <div class="
+      region-progress-item
+    ">
+
+      <span class="
+        region-small-symbol
+        ${type}
+      ">
+
+        ${getRegionSymbol(type)}
+
+      </span>
+
+
+      <span class="
+        region-progress-label
+      ">
+        ${label}
+      </span>
+
+
+      <strong>
+        ${value}
+      </strong>
+
+    </div>
+
+  `;
+
+}
+
+
+
+// =========================================================
+// 11. LEGEND ITEM
+// =========================================================
+
+function renderRegionLegendItem(
+  type,
+  label
+) {
+
+  return `
+
+    <div class="
+      region-legend-row
+    ">
+
+      <span class="
+        region-small-symbol
+        ${type}
+      ">
+
+        ${getRegionSymbol(type)}
+
+      </span>
+
+      <span>
+        ${label}
+      </span>
+
+    </div>
+
+  `;
+
+}
+
+
+
+// =========================================================
+// 12. REGIONAL SYMBOLS
+// =========================================================
+
+function getRegionSymbol(type) {
+
+  switch (type) {
+
+    case "loot":
+    case "battle":
+      return "▣";
+
+    case "training":
+      return "EXP";
+
+    case "mission":
+      return "◆";
+
+    case "activity":
+      return "✦";
+
+    case "secret":
+      return "?";
+
+    case "outpost":
+      return "▥";
+
+    case "village":
+      return "●";
+
+    default:
+      return "•";
+
+  }
+
+}
+
+
+
+// =========================================================
+// 13. REGION HOTSPOT GENERATOR
 // =========================================================
 
 function renderRegionHotspot(
@@ -670,54 +1555,276 @@ function renderRegionHotspot(
       <span class="
         hotspot-orb
       ">
+
+        ${
+          location.type === "training"
+            ? "EXP"
+            : location.type === "mission"
+              ? "◆"
+              : location.type === "secret"
+                ? "?"
+                : location.type === "activity"
+                  ? "✦"
+                  : location.type === "battle"
+                    ? "▣"
+                    : location.type === "outpost"
+                      ? "▥"
+                      : ""
+        }
+
       </span>
 
 
       <span class="
         hotspot-label
       ">
-        ${location.name}
+
+        ${location.shortName || location.name}
+
       </span>
 
 
     </button>
 
   `;
+
 }
 
 
+
 // =========================================================
-// 10. LOCATION DETAILS PANEL
+// 14. MAP-SIDE LOCATION CARD
+// =========================================================
+
+function renderMapLocationCard(
+  location
+) {
+
+  return `
+
+    <div class="
+      region-map-card-content
+    ">
+
+
+      <div class="
+        region-map-detail-heading
+      ">
+        LOCATION DETAILS
+      </div>
+
+
+      <div class="
+        region-map-card-name
+      ">
+        ${location.name}
+      </div>
+
+
+      <div class="
+        region-map-card-category
+      ">
+        ${location.category}
+      </div>
+
+
+      <p class="
+        region-map-card-description
+      ">
+        ${location.desc}
+      </p>
+
+
+      <div class="
+        region-map-card-divider
+      ">
+      </div>
+
+
+      ${renderMapDetailRow(
+        "Level Range",
+        location.levelRange
+      )}
+
+
+      ${renderMapDetailRow(
+        "Best For",
+        location.bestFor
+      )}
+
+
+      ${renderMapDetailRow(
+        "Enemy Types",
+        location.enemyTypes
+      )}
+
+
+
+      ${
+        location.rewards &&
+        location.rewards.length
+          ? `
+
+              <div class="
+                region-map-card-divider
+              ">
+              </div>
+
+
+              <div class="
+                region-map-reward-title
+              ">
+                POSSIBLE REWARDS
+              </div>
+
+
+              <div class="
+                region-map-rewards
+              ">
+
+                ${location.rewards.map(
+                  reward => `
+
+                    <span>
+                      ${reward}
+                    </span>
+
+                  `
+                ).join("")}
+
+              </div>
+
+            `
+          : ""
+      }
+
+
+
+      <button
+        type="button"
+
+        class="
+          region-map-navigate-button
+        "
+
+        onclick="
+          handleNodeNavigation()
+        "
+      >
+
+        <span>
+          NAVIGATE
+        </span>
+
+        <span>
+          ➤
+        </span>
+
+      </button>
+
+
+    </div>
+
+  `;
+
+}
+
+
+
+// =========================================================
+// 15. MAP CARD DETAIL ROW
+// =========================================================
+
+function renderMapDetailRow(
+  label,
+  value
+) {
+
+  return `
+
+    <div class="
+      region-map-card-row
+    ">
+
+      <span>
+        ${label}
+      </span>
+
+      <strong>
+        ${value}
+      </strong>
+
+    </div>
+
+  `;
+
+}
+
+
+
+// =========================================================
+// 16. LOCATION DETAILS PANEL
 // =========================================================
 
 function renderLocationDetailsPane(
   location
 ) {
 
+  /*
+    IMPORTANT:
+
+    This pane always exists so the layout does not jump around,
+    but location information only appears after a marker click.
+  */
+
   if (!location) {
 
     return `
 
-      <div class="
+      <aside class="
         region-details-pane
+        region-details-empty
       ">
 
-        <p style="
-          color: #64748B;
-          font-size: 10px;
-        ">
-          No location selected.
-        </p>
 
-      </div>
+        <div>
+
+          <div class="
+            region-details-heading
+          ">
+            LOCATION DETAILS
+          </div>
+
+
+          <div class="
+            region-details-placeholder
+          ">
+
+            <span class="
+              region-details-placeholder-icon
+            ">
+              ◉
+            </span>
+
+            <p>
+              Select a marker on the map to view its details.
+            </p>
+
+          </div>
+
+        </div>
+
+
+      </aside>
 
     `;
+
   }
 
 
   return `
 
-    <div class="
+    <aside class="
       region-details-pane
     ">
 
@@ -725,104 +1832,93 @@ function renderLocationDetailsPane(
       <div>
 
 
-        <div style="
-          margin-bottom: 8px;
-
-          padding-bottom: 5px;
-
-          color: #D6A93A;
-
-          border-bottom:
-            1px solid #1E293B;
-
-          font-size: 9px;
-
-          font-weight: 900;
-
-          letter-spacing: 1px;
+        <div class="
+          region-details-heading
         ">
           LOCATION DETAILS
         </div>
 
 
-
-        <div style="
-          color: #FFFFFF;
-
-          font-size: 13px;
-
-          font-weight: 900;
-
-          margin-bottom: 3px;
+        <div class="
+          region-details-location-name
         ">
           ${location.name}
         </div>
 
 
-
-        <div style="
-          color: #00D9E8;
-
-          font-size: 9px;
-
-          font-weight: 800;
-
-          margin-bottom: 10px;
+        <div class="
+          region-details-category
         ">
           ${location.category}
         </div>
 
 
-
-        <p style="
-          color: #94A3B8;
-
-          font-size: 9px;
-
-          line-height: 1.5;
-
-          margin-bottom: 14px;
+        <p class="
+          region-details-description
         ">
           ${location.desc}
         </p>
 
 
-
-        <div style="
-          display: flex;
-
-          flex-direction: column;
-
-          gap: 7px;
-
-          padding-top: 10px;
-
-          border-top:
-            1px solid #1E293B;
-
-          font-size: 9px;
+        <div class="
+          region-details-divider
         ">
-
-
-          ${renderDetailRow(
-            "Level Range",
-            location.levelRange
-          )}
-
-
-          ${renderDetailRow(
-            "Best For",
-            location.bestFor
-          )}
-
-
-          ${renderDetailRow(
-            "Enemy Types",
-            location.enemyTypes
-          )}
-
-
         </div>
+
+
+        ${renderDetailRow(
+          "Level Range",
+          location.levelRange
+        )}
+
+
+        ${renderDetailRow(
+          "Best For",
+          location.bestFor
+        )}
+
+
+        ${renderDetailRow(
+          "Enemy Types",
+          location.enemyTypes
+        )}
+
+
+        ${
+          location.rewards &&
+          location.rewards.length
+            ? `
+
+                <div class="
+                  region-details-divider
+                ">
+                </div>
+
+
+                <div class="
+                  region-details-rewards-title
+                ">
+                  POSSIBLE REWARDS
+                </div>
+
+
+                <div class="
+                  region-details-rewards
+                ">
+
+                  ${location.rewards.map(
+                    reward => `
+                      <span>
+                        ${reward}
+                      </span>
+                    `
+                  ).join("")}
+
+                </div>
+
+              `
+            : ""
+        }
 
 
       </div>
@@ -840,20 +1936,24 @@ function renderLocationDetailsPane(
           handleNodeNavigation()
         "
       >
+
         ${getNavigationButtonText(
           location
         )}
+
       </button>
 
 
-    </div>
+    </aside>
 
   `;
+
 }
 
 
+
 // =========================================================
-// 11. LOCATION DETAIL ROW
+// 17. LOCATION DETAIL ROW
 // =========================================================
 
 function renderDetailRow(
@@ -863,40 +1963,28 @@ function renderDetailRow(
 
   return `
 
-    <div style="
-      display: flex;
-
-      justify-content:
-        space-between;
-
-      gap: 10px;
+    <div class="
+      region-details-row
     ">
 
-
-      <span style="
-        color: #64748B;
-      ">
+      <span>
         ${label}
       </span>
 
-
-      <span style="
-        color: #FFFFFF;
-
-        text-align: right;
-      ">
+      <strong>
         ${value}
-      </span>
-
+      </strong>
 
     </div>
 
   `;
+
 }
 
 
+
 // =========================================================
-// 12. SELECT REGIONAL MAP NODE
+// 18. SELECT REGIONAL MAP NODE
 // =========================================================
 
 function selectMapNode(
@@ -934,15 +2022,65 @@ function selectMapNode(
     location;
 
 
+  /*
+    Re-rendering updates:
+
+    1. selected marker
+    2. inner map detail overlay
+    3. far-right location details
+  */
   renderRegionHubUI(
     regionKey,
     region
   );
+
 }
 
 
+
 // =========================================================
-// 13. LOCATION NAVIGATION
+// 19. RETURN TO WORLD MAP
+// =========================================================
+
+function returnToWorldMap() {
+
+  const overlay =
+    document.getElementById(
+      "screen-overlay"
+    );
+
+
+  if (!overlay) {
+    return;
+  }
+
+
+  /*
+    The world map already lives beneath the overlay,
+    so returning simply closes the regional overlay.
+  */
+  overlay.style.display =
+    "none";
+
+
+  overlay.classList.remove(
+    "region-map-open"
+  );
+
+
+  selectedRegionKey =
+    null;
+
+
+  selectedLocationNode =
+    null;
+
+}
+
+
+
+// =========================================================
+// 20. LOCATION NAVIGATION
 // =========================================================
 
 function handleNodeNavigation() {
@@ -952,9 +2090,29 @@ function handleNodeNavigation() {
   }
 
 
+  /*
+    Remove the special region-map sizing before opening
+    another overlay screen.
+  */
+  const overlay =
+    document.getElementById(
+      "screen-overlay"
+    );
+
+
+  if (overlay) {
+
+    overlay.classList.remove(
+      "region-map-open"
+    );
+
+  }
+
+
   switch (
     selectedLocationNode.type
   ) {
+
 
     case "village":
 
@@ -963,6 +2121,7 @@ function handleNodeNavigation() {
       );
 
       break;
+
 
 
     case "training":
@@ -974,6 +2133,7 @@ function handleNodeNavigation() {
       break;
 
 
+
     case "battle":
 
       openOverlay(
@@ -981,6 +2141,7 @@ function handleNodeNavigation() {
       );
 
       break;
+
 
 
     case "mission":
@@ -992,6 +2153,44 @@ function handleNodeNavigation() {
       break;
 
 
+
+    case "outpost":
+
+      /*
+        For now this opens a generic battle/area screen.
+
+        Later we can build the Southern Outpost as its own
+        dedicated regional hub.
+      */
+
+      openOverlay(
+        "battle"
+      );
+
+      break;
+
+
+
+    case "activity":
+
+      openOverlay(
+        "training"
+      );
+
+      break;
+
+
+
+    case "secret":
+
+      openOverlay(
+        "battle"
+      );
+
+      break;
+
+
+
     default:
 
       openOverlay(
@@ -999,12 +2198,15 @@ function handleNodeNavigation() {
       );
 
       break;
+
   }
+
 }
 
 
+
 // =========================================================
-// 14. NAVIGATION BUTTON TEXT
+// 21. NAVIGATION BUTTON TEXT
 // =========================================================
 
 function getNavigationButtonText(
@@ -1014,6 +2216,7 @@ function getNavigationButtonText(
   switch (
     location.type
   ) {
+
 
     case "village":
       return "ENTER VILLAGE ➜";
@@ -1031,9 +2234,23 @@ function getNavigationButtonText(
       return "VIEW MISSION ➜";
 
 
+    case "outpost":
+      return "ENTER OUTPOST ➜";
+
+
+    case "activity":
+      return "VIEW ACTIVITY ➜";
+
+
+    case "secret":
+      return "EXPLORE AREA ➜";
+
+
     default:
       return "NAVIGATE ➜";
+
   }
+
 }
 
 

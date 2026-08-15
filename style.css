@@ -1126,224 +1126,1866 @@ body {
 
 
 /* =========================================================
-   16. REGIONAL HUB
+   16. LAND OF FIRE / REGIONAL HUB
    ========================================================= */
 
-.region-hub-container {
-  width: 100%;
 
-  flex: 1;
+/* ---------------------------------------------------------
+   LARGER OVERLAY ONLY WHILE A REGIONAL MAP IS OPEN
 
-  min-height: 0;
+   Your normal overlays remain unchanged.
+--------------------------------------------------------- */
 
-  display: flex;
-
-  gap: 14px;
-
-  overflow: hidden;
+.screen-overlay.region-map-open {
+  padding:
+    16px;
 }
 
 
-/* =========================================================
-   17. REGIONAL MAP PANE
-   ========================================================= */
+.screen-overlay.region-map-open
+.overlay-content-box {
 
-.region-map-pane {
-  flex: 1;
+  width:
+    98vw;
 
-  min-width: 0;
-  min-height: 0;
+  max-width:
+    1840px;
 
-  position: relative;
+  height:
+    94vh;
 
-  background: #05080c;
+  min-height:
+    620px;
 
-  border: 1px solid #263448;
+  padding:
+    16px;
 
-  border-radius: 8px;
-
-  overflow: hidden;
-
-  box-shadow:
-    inset 0 0 30px rgba(0, 0, 0, 0.35);
 }
 
 
 /*
-   Use this when the regional map is rendered as a real <img>.
-   This is preferable to background-size: cover.
+  The normal top-right CLOSE control remains available.
+
+  We keep it because it closes the complete overlay.
+
+  The gold circular X inside the map separately returns
+  specifically to the World Map.
 */
 
-.region-map-image {
-  width: 100%;
-  height: 100%;
+.screen-overlay.region-map-open
+.overlay-close-btn {
 
-  display: block;
+  top:
+    12px;
 
-  object-fit: contain;
+  right:
+    16px;
 
-  object-position: center;
-
-  background: #05080c;
 }
 
 
+
 /* =========================================================
-   18. REGIONAL HOTSPOTS
+   REGION SCREEN HEADER
+   ========================================================= */
+
+.region-screen-header {
+
+  min-height:
+    52px;
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  padding:
+    3px 96px 10px 4px;
+
+  margin-bottom:
+    10px;
+
+  border-bottom:
+    1px solid #1e293b;
+
+}
+
+
+.region-screen-title {
+
+  margin:
+    0 0 4px;
+
+  color:
+    #d6a93a;
+
+  font-size:
+    16px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    1.2px;
+
+}
+
+
+.region-screen-description {
+
+  color:
+    #94a3b8;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.5;
+
+}
+
+
+
+/* =========================================================
+   17. REGIONAL LAYOUT
+   ========================================================= */
+
+.region-hub-container {
+
+  width:
+    100%;
+
+  flex:
+    1;
+
+  min-height:
+    0;
+
+  display:
+    grid;
+
+
+  /*
+    MAIN CHANGE:
+
+    The map receives practically the full page.
+
+    Only a compact 285px is reserved for the real
+    right-hand details panel.
+  */
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    285px;
+
+  gap:
+    12px;
+
+  overflow:
+    hidden;
+
+}
+
+
+
+/* =========================================================
+   18. REGIONAL MAP PANE
+   ========================================================= */
+
+.region-map-pane {
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  min-width:
+    0;
+
+  min-height:
+    0;
+
+  position:
+    relative;
+
+  background:
+    #05080c;
+
+  border:
+    1px solid #263448;
+
+  border-radius:
+    8px;
+
+  overflow:
+    hidden;
+
+  box-shadow:
+    inset
+    0
+    0
+    30px
+    rgba(0, 0, 0, 0.35);
+
+}
+
+
+
+/* =========================================================
+   MAP ART
+   ========================================================= */
+
+.region-map-image {
+
+  position:
+    absolute;
+
+  inset:
+    0;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  display:
+    block;
+
+
+  /*
+    FILL rather than CONTAIN.
+
+    The previous contain rule was leaving too much dead space
+    and making the actual map feel smaller.
+  */
+
+  object-fit:
+    fill;
+
+  object-position:
+    center;
+
+  background:
+    #05080c;
+
+  pointer-events:
+    none;
+
+  user-select:
+    none;
+
+  z-index:
+    1;
+
+}
+
+
+
+/* =========================================================
+   19. BURNED-IN TOP HUD COVER
+   ========================================================= */
+
+.region-baked-cover {
+
+  position:
+    absolute;
+
+  z-index:
+    10;
+
+  pointer-events:
+    none;
+
+}
+
+
+.region-top-hud-cover {
+
+  /*
+    Covers the baked:
+    coins / gold / energy HUD.
+
+    These values are relative to the map image so they resize
+    with the pane.
+  */
+
+  top:
+    5.1%;
+
+  left:
+    54%;
+
+  width:
+    33.5%;
+
+  height:
+    8%;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(7, 11, 13, 0.99),
+      rgba(8, 12, 14, 0.985)
+    );
+
+  border:
+    1px solid
+    rgba(111, 82, 35, 0.42);
+
+  border-radius:
+    4px;
+
+  box-shadow:
+    inset
+    0
+    0
+    18px
+    rgba(0, 0, 0, 0.65);
+
+}
+
+
+
+/* =========================================================
+   20. CODED WORLD-MAP X
+   ========================================================= */
+
+.region-world-close {
+
+  position:
+    absolute;
+
+  top:
+    4.2%;
+
+  right:
+    2.2%;
+
+  z-index:
+    40;
+
+  width:
+    clamp(
+      38px,
+      3.2vw,
+      52px
+    );
+
+  height:
+    clamp(
+      38px,
+      3.2vw,
+      52px
+    );
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  padding:
+    0;
+
+  border:
+    2px solid
+    #c18a2c;
+
+  border-radius:
+    50%;
+
+  background:
+    radial-gradient(
+      circle at center,
+      #21190d 0%,
+      #090b0c 72%
+    );
+
+  color:
+    #e7bd59;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      17px,
+      1.5vw,
+      24px
+    );
+
+  font-weight:
+    700;
+
+  cursor:
+    pointer;
+
+  box-shadow:
+    0 0 0 3px
+      rgba(4, 6, 7, 0.92),
+
+    0 0 14px
+      rgba(214, 169, 58, 0.28);
+
+  transition:
+    transform 0.16s ease,
+    color 0.16s ease,
+    border-color 0.16s ease,
+    box-shadow 0.16s ease;
+
+}
+
+
+.region-world-close:hover {
+
+  transform:
+    scale(1.08);
+
+  color:
+    #fff1b6;
+
+  border-color:
+    #f0c85b;
+
+  box-shadow:
+    0 0 0 3px
+      rgba(4, 6, 7, 0.92),
+
+    0 0 20px
+      rgba(214, 169, 58, 0.55);
+
+}
+
+
+
+/* =========================================================
+   21. CODED LEFT MAP SIDEBAR
+
+   This lies directly over the sidebar baked into the map.
+   ========================================================= */
+
+.region-left-overlay {
+
+  position:
+    absolute;
+
+  top:
+    18.5%;
+
+  left:
+    2.1%;
+
+  bottom:
+    20%;
+
+  width:
+    15.4%;
+
+  min-width:
+    150px;
+
+  z-index:
+    25;
+
+  padding:
+    clamp(
+      9px,
+      1vw,
+      14px
+    );
+
+  overflow:
+    hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 14, 12, 0.995),
+      rgba(7, 9, 8, 0.995)
+    );
+
+  border:
+    1px solid
+    rgba(150, 103, 29, 0.88);
+
+  border-radius:
+    3px;
+
+  color:
+    #c3ae7c;
+
+  box-shadow:
+    0 8px 24px
+      rgba(0, 0, 0, 0.76),
+
+    inset
+    0 0 18px
+      rgba(214, 169, 58, 0.035);
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+}
+
+
+.region-left-section {
+
+  width:
+    100%;
+
+}
+
+
+.region-left-heading {
+
+  margin-bottom:
+    8px;
+
+  color:
+    #d2a744;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      8px,
+      0.68vw,
+      11px
+    );
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    0.6px;
+
+}
+
+
+.region-exploration-row {
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap:
+    8px;
+
+  margin-bottom:
+    5px;
+
+  color:
+    #b9a77d;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.58vw,
+      9px
+    );
+
+}
+
+
+.region-exploration-row strong {
+
+  color:
+    #e7bf5e;
+
+}
+
+
+.region-exploration-track {
+
+  width:
+    100%;
+
+  height:
+    4px;
+
+  margin-bottom:
+    9px;
+
+  overflow:
+    hidden;
+
+  background:
+    #201a0e;
+
+  border:
+    1px solid
+    #4d391a;
+
+  border-radius:
+    999px;
+
+}
+
+
+.region-exploration-track span {
+
+  height:
+    100%;
+
+  display:
+    block;
+
+  background:
+    linear-gradient(
+      90deg,
+      #a76c16,
+      #e5ba4c
+    );
+
+}
+
+
+
+/* =========================================================
+   LEFT PROGRESS ITEMS
+   ========================================================= */
+
+.region-progress-list {
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+}
+
+
+.region-progress-item {
+
+  display:
+    grid;
+
+  grid-template-columns:
+    22px
+    minmax(0, 1fr)
+    auto;
+
+  align-items:
+    center;
+
+  gap:
+    5px;
+
+  min-height:
+    27px;
+
+  color:
+    #c6b586;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.57vw,
+      9px
+    );
+
+}
+
+
+.region-progress-item strong {
+
+  color:
+    #d0b46f;
+
+  font-family:
+    inherit;
+
+  font-size:
+    inherit;
+
+}
+
+
+.region-progress-label {
+
+  min-width:
+    0;
+
+  overflow:
+    hidden;
+
+  text-overflow:
+    ellipsis;
+
+  white-space:
+    nowrap;
+
+}
+
+
+.region-left-divider {
+
+  width:
+    100%;
+
+  height:
+    1px;
+
+  margin:
+    8px 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      #6f4d1d,
+      transparent
+    );
+
+}
+
+
+
+/* =========================================================
+   LEFT NAV SYMBOLS
+   ========================================================= */
+
+.region-small-symbol {
+
+  width:
+    18px;
+
+  height:
+    18px;
+
+  display:
+    inline-flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  flex-shrink:
+    0;
+
+  border:
+    1px solid
+    currentColor;
+
+  border-radius:
+    50%;
+
+  font-family:
+    "Segoe UI",
+    sans-serif;
+
+  font-size:
+    6px;
+
+  font-weight:
+    900;
+
+}
+
+
+.region-small-symbol.loot,
+.region-small-symbol.battle {
+
+  color:
+    #d69a2a;
+
+}
+
+
+.region-small-symbol.training {
+
+  color:
+    #bb7df0;
+
+}
+
+
+.region-small-symbol.mission {
+
+  color:
+    #79b45c;
+
+}
+
+
+.region-small-symbol.activity {
+
+  color:
+    #65bde8;
+
+}
+
+
+.region-small-symbol.secret {
+
+  color:
+    #bd73e6;
+
+}
+
+
+.region-small-symbol.outpost {
+
+  color:
+    #d39729;
+
+}
+
+
+
+/* =========================================================
+   LEFT LEGEND
+   ========================================================= */
+
+.region-legend-row {
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  gap:
+    6px;
+
+  min-height:
+    24px;
+
+  color:
+    #bdaa7c;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.55vw,
+      9px
+    );
+
+}
+
+
+.region-path-symbol {
+
+  width:
+    19px;
+
+  flex-shrink:
+    0;
+
+  border-top:
+    2px dashed
+    #c8b98f;
+
+}
+
+
+
+/* =========================================================
+   22. RIGHT-HAND CARD OVER THE MAP
+
+   This continuously covers the original baked details panel.
+   ========================================================= */
+
+.region-map-detail-overlay {
+
+  position:
+    absolute;
+
+  top:
+    18.3%;
+
+  right:
+    2.3%;
+
+  width:
+    16%;
+
+  min-width:
+    160px;
+
+  min-height:
+    43%;
+
+  z-index:
+    24;
+
+  padding:
+    clamp(
+      9px,
+      0.9vw,
+      13px
+    );
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(12, 14, 12, 0.995),
+      rgba(7, 9, 8, 0.995)
+    );
+
+  border:
+    1px solid
+    rgba(147, 101, 29, 0.9);
+
+  border-radius:
+    3px;
+
+  color:
+    #bfaa7a;
+
+  box-shadow:
+    0 9px 24px
+      rgba(0, 0, 0, 0.76),
+
+    inset
+    0 0 18px
+      rgba(214, 169, 58, 0.03);
+
+  overflow:
+    hidden;
+
+}
+
+
+.region-map-detail-heading {
+
+  padding-bottom:
+    7px;
+
+  margin-bottom:
+    9px;
+
+  border-bottom:
+    1px solid
+    #4d381b;
+
+  color:
+    #d6a63e;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.6vw,
+      10px
+    );
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    0.5px;
+
+}
+
+
+
+/* Empty state */
+
+.region-map-detail-placeholder {
+
+  height:
+    100%;
+
+}
+
+
+.region-map-detail-waiting {
+
+  padding:
+    30px 8px;
+
+  color:
+    #726b58;
+
+  font-size:
+    clamp(
+      7px,
+      0.6vw,
+      9px
+    );
+
+  text-align:
+    center;
+
+}
+
+
+
+/* Selected-location state */
+
+.region-map-card-name {
+
+  margin-bottom:
+    3px;
+
+  color:
+    #dac394;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      10px,
+      0.95vw,
+      14px
+    );
+
+  font-weight:
+    700;
+
+}
+
+
+.region-map-card-category {
+
+  margin-bottom:
+    8px;
+
+  color:
+    #d99e34;
+
+  font-size:
+    clamp(
+      6px,
+      0.5vw,
+      8px
+    );
+
+  font-weight:
+    800;
+
+}
+
+
+.region-map-card-description {
+
+  margin-bottom:
+    8px;
+
+  color:
+    #998968;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.55vw,
+      9px
+    );
+
+  line-height:
+    1.45;
+
+}
+
+
+.region-map-card-divider {
+
+  width:
+    100%;
+
+  height:
+    1px;
+
+  margin:
+    8px 0;
+
+  background:
+    #42331c;
+
+}
+
+
+.region-map-card-row {
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    8px;
+
+  margin:
+    6px 0;
+
+  font-size:
+    clamp(
+      6px,
+      0.5vw,
+      8px
+    );
+
+}
+
+
+.region-map-card-row span {
+
+  color:
+    #877a60;
+
+}
+
+
+.region-map-card-row strong {
+
+  max-width:
+    58%;
+
+  color:
+    #c8b787;
+
+  font-size:
+    inherit;
+
+  text-align:
+    right;
+
+}
+
+
+.region-map-reward-title {
+
+  margin-bottom:
+    6px;
+
+  color:
+    #937f56;
+
+  font-size:
+    clamp(
+      6px,
+      0.48vw,
+      8px
+    );
+
+}
+
+
+.region-map-rewards {
+
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    4px;
+
+  margin-bottom:
+    9px;
+
+}
+
+
+.region-map-rewards span {
+
+  padding:
+    3px 5px;
+
+  background:
+    #17130c;
+
+  border:
+    1px solid
+    #604618;
+
+  border-radius:
+    3px;
+
+  color:
+    #d3ae56;
+
+  font-size:
+    clamp(
+      6px,
+      0.47vw,
+      8px
+    );
+
+}
+
+
+.region-map-navigate-button {
+
+  width:
+    100%;
+
+  display:
+    flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  margin-top:
+    8px;
+
+  padding:
+    7px 9px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #241a0b,
+      #120e08
+    );
+
+  border:
+    1px solid
+    #a87322;
+
+  border-radius:
+    3px;
+
+  color:
+    #d8ad4d;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.57vw,
+      9px
+    );
+
+  cursor:
+    pointer;
+
+  transition:
+    background 0.18s ease,
+    color 0.18s ease;
+
+}
+
+
+.region-map-navigate-button:hover {
+
+  background:
+    #b17a23;
+
+  color:
+    #0a0a08;
+
+}
+
+
+
+/* =========================================================
+   23. REGIONAL HOTSPOTS
+
+   CRITICAL CHANGE:
+   Original orbs were 30px.
+
+   They are now substantially smaller so they don't swamp
+   the map artwork.
    ========================================================= */
 
 .region-hotspot {
-  position: absolute;
+
+  position:
+    absolute;
 
   transform:
     translate(-50%, -50%);
 
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  display:
+    flex;
 
-  padding: 0;
+  flex-direction:
+    column;
 
-  background: transparent;
+  align-items:
+    center;
 
-  border: none;
+  padding:
+    0;
 
-  color: inherit;
+  background:
+    transparent;
 
-  cursor: pointer;
+  border:
+    none;
 
-  z-index: 15;
+  color:
+    inherit;
+
+  cursor:
+    pointer;
+
+  z-index:
+    20;
+
 }
 
+
+
+/* =========================================================
+   SMALLER ACTUAL PIN / ORB
+   ========================================================= */
 
 .hotspot-orb {
-  width: 30px;
-  height: 30px;
 
-  display: block;
+  width:
+    clamp(
+      16px,
+      1.35vw,
+      23px
+    );
 
-  border: 2px solid #ffffff;
+  height:
+    clamp(
+      16px,
+      1.35vw,
+      23px
+    );
 
-  border-radius: 50%;
+  display:
+    flex;
 
-  background: #d6a93a;
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  flex-shrink:
+    0;
+
+  padding:
+    0;
+
+  border:
+    1.5px solid
+    #ffffff;
+
+  border-radius:
+    50%;
+
+  background:
+    #d6a93a;
+
+  color:
+    #ffffff;
+
+  font-size:
+    clamp(
+      5px,
+      0.42vw,
+      7px
+    );
+
+  font-weight:
+    900;
+
+  line-height:
+    1;
+
+  text-shadow:
+    0
+    1px
+    2px
+    rgba(0, 0, 0, 0.9);
 
   box-shadow:
-    0 0 9px rgba(214, 169, 58, 0.9),
-    0 0 22px rgba(214, 169, 58, 0.5);
+    0 0 5px
+      rgba(214, 169, 58, 0.9),
+
+    0 0 11px
+      rgba(214, 169, 58, 0.48);
 
   transition:
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
+    transform 0.16s ease,
+    box-shadow 0.16s ease;
+
 }
 
 
-.hotspot-label {
-  margin-top: 5px;
 
-  padding: 3px 7px;
+/* =========================================================
+   SMALLER LABEL
+   ========================================================= */
+
+.hotspot-label {
+
+  margin-top:
+    3px;
+
+  padding:
+    2px 5px;
 
   background:
     rgba(5, 8, 12, 0.94);
 
-  border: 1px solid #334155;
+  border:
+    1px solid
+    rgba(76, 86, 96, 0.9);
 
-  border-radius: 4px;
+  border-radius:
+    3px;
 
-  color: #f8fafc;
+  color:
+    #f8fafc;
 
-  font-size: 9px;
-  font-weight: 800;
+  font-size:
+    clamp(
+      6px,
+      0.52vw,
+      8px
+    );
 
-  white-space: nowrap;
+  font-weight:
+    800;
+
+  white-space:
+    nowrap;
 
   box-shadow:
-    0 3px 9px rgba(0, 0, 0, 0.55);
+    0 2px 6px
+    rgba(0, 0, 0, 0.65);
+
 }
 
 
-.region-hotspot:hover .hotspot-orb,
-.region-hotspot.selected .hotspot-orb {
+
+/* =========================================================
+   MARKER INTERACTION
+   ========================================================= */
+
+.region-hotspot:hover
+.hotspot-orb,
+
+.region-hotspot.selected
+.hotspot-orb {
+
   transform:
-    scale(1.22);
+    scale(1.15);
 
   box-shadow:
-    0 0 10px #ffffff,
-    0 0 26px rgba(214, 169, 58, 0.95);
+    0 0 7px
+      #ffffff,
+
+    0 0 15px
+      rgba(214, 169, 58, 0.92);
+
 }
 
 
-.region-hotspot.selected .hotspot-label {
-  color: #f5d672;
+.region-hotspot.selected
+.hotspot-label {
 
-  border-color: #d6a93a;
+  color:
+    #f5d672;
+
+  border-color:
+    #d6a93a;
+
 }
+
 
 
 /* =========================================================
    DIFFERENT HOTSPOT TYPES
    ========================================================= */
 
-.region-hotspot.village .hotspot-orb {
-  background: #00d9e8;
+
+/* KONOHA / VILLAGE */
+
+.region-hotspot.village
+.hotspot-orb {
+
+  background:
+    #00d9e8;
+
+  border-color:
+    #eaffff;
 
   box-shadow:
-    0 0 9px #00d9e8,
-    0 0 22px rgba(0, 217, 232, 0.45);
+    0 0 5px
+      #00d9e8,
+
+    0 0 12px
+      rgba(0, 217, 232, 0.52);
+
 }
 
 
-.region-hotspot.battle .hotspot-orb {
-  background: #ef4444;
+
+/* LOOT / BATTLE */
+
+.region-hotspot.battle
+.hotspot-orb {
+
+  /*
+    Changed from solid red to warm gold.
+
+    The screenshot's giant red dot was drawing far too much
+    attention and looked unrelated to the rest of the map.
+  */
+
+  background:
+    #c48921;
+
+  border-color:
+    #f5d47b;
 
   box-shadow:
-    0 0 9px #ef4444,
-    0 0 22px rgba(239, 68, 68, 0.45);
+    0 0 5px
+      #d69a29,
+
+    0 0 12px
+      rgba(214, 154, 41, 0.5);
+
 }
 
 
-.region-hotspot.training .hotspot-orb {
-  background: #a855f7;
+
+/* EXP */
+
+.region-hotspot.training
+.hotspot-orb {
+
+  background:
+    #7e3db7;
+
+  border-color:
+    #e2c2ff;
 
   box-shadow:
-    0 0 9px #a855f7,
-    0 0 22px rgba(168, 85, 247, 0.45);
+    0 0 5px
+      #a855f7,
+
+    0 0 12px
+      rgba(168, 85, 247, 0.48);
+
 }
 
 
-.region-hotspot.mission .hotspot-orb {
-  background: #22c55e;
+
+/* MISSIONS */
+
+.region-hotspot.mission
+.hotspot-orb {
+
+  background:
+    #4d842e;
+
+  border-color:
+    #c8f0a9;
 
   box-shadow:
-    0 0 9px #22c55e,
-    0 0 22px rgba(34, 197, 94, 0.45);
+    0 0 5px
+      #72b74d,
+
+    0 0 12px
+      rgba(87, 166, 48, 0.48);
+
 }
 
 
-.region-hotspot.locked {
-  opacity: 0.45;
 
-  filter: grayscale(0.9);
+/* SECRET */
 
-  cursor: not-allowed;
+.region-hotspot.secret
+.hotspot-orb {
+
+  background:
+    #7433a5;
+
+  border-color:
+    #e1b7ff;
+
+  box-shadow:
+    0 0 5px
+      #a855f7,
+
+    0 0 12px
+      rgba(168, 85, 247, 0.5);
+
 }
+
+
+
+/* SIDE ACTIVITY */
+
+.region-hotspot.activity
+.hotspot-orb {
+
+  background:
+    #2f78a0;
+
+  border-color:
+    #bdeaff;
+
+  box-shadow:
+    0 0 5px
+      #4dadde,
+
+    0 0 12px
+      rgba(67, 167, 216, 0.5);
+
+}
+
+
+
+/* OUTPOST */
+
+.region-hotspot.outpost
+.hotspot-orb {
+
+  background:
+    #00bed1;
+
+  border-color:
+    #eaffff;
+
+  box-shadow:
+    0 0 5px
+      #00d9e8,
+
+    0 0 11px
+      rgba(0, 217, 232, 0.45);
+
+}
+
 
 
 /* =========================================================
-   19. REGIONAL DETAILS PANEL
+   SOUTHERN OUTPOST SPECIFIC SIZE
+
+   The large cyan bottom marker from your screenshot becomes
+   deliberately smaller than ordinary hotspots.
+   ========================================================= */
+
+.region-hotspot.outpost
+.hotspot-orb {
+
+  width:
+    clamp(
+      14px,
+      1.1vw,
+      19px
+    );
+
+  height:
+    clamp(
+      14px,
+      1.1vw,
+      19px
+    );
+
+}
+
+
+
+/* =========================================================
+   LOCKED REGION
+   ========================================================= */
+
+.region-hotspot.locked {
+
+  opacity:
+    0.45;
+
+  filter:
+    grayscale(0.9);
+
+  cursor:
+    not-allowed;
+
+}
+
+
+
+/* =========================================================
+   24. CODED WORLD MAP BUTTON
+   ========================================================= */
+
+.region-world-map-button {
+
+  position:
+    absolute;
+
+  left:
+    3.5%;
+
+  bottom:
+    5%;
+
+  z-index:
+    26;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    3px;
+
+  padding:
+    5px 8px;
+
+  background:
+    rgba(8, 9, 8, 0.94);
+
+  border:
+    1px solid
+    rgba(129, 91, 31, 0.8);
+
+  border-radius:
+    4px;
+
+  color:
+    #c8b787;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      6px,
+      0.5vw,
+      8px
+    );
+
+  cursor:
+    pointer;
+
+  box-shadow:
+    0 4px 10px
+    rgba(0, 0, 0, 0.65);
+
+}
+
+
+.world-map-button-icon {
+
+  color:
+    #d1a547;
+
+  font-size:
+    clamp(
+      17px,
+      1.4vw,
+      24px
+    );
+
+}
+
+
+.region-world-map-button:hover {
+
+  color:
+    #f1cb68;
+
+  border-color:
+    #d6a93a;
+
+}
+
+
+
+/* =========================================================
+   25. ACTUAL RIGHT-HAND PAGE DETAILS PANEL
    ========================================================= */
 
 .region-details-pane {
-  width: 290px;
 
-  flex-shrink: 0;
+  width:
+    285px;
 
-  display: flex;
-  flex-direction: column;
+  min-width:
+    0;
 
-  justify-content: space-between;
+  height:
+    100%;
 
-  padding: 14px;
+  min-height:
+    0;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    space-between;
+
+  padding:
+    14px;
 
   background:
     linear-gradient(
@@ -1352,11 +2994,394 @@ body {
       #060a0e
     );
 
-  border: 1px solid #263448;
+  border:
+    1px solid
+    #263448;
 
-  border-radius: 8px;
+  border-radius:
+    8px;
 
-  overflow: hidden;
+  overflow:
+    hidden;
+
+}
+
+
+.region-details-heading {
+
+  margin-bottom:
+    12px;
+
+  padding-bottom:
+    7px;
+
+  color:
+    #d6a93a;
+
+  border-bottom:
+    1px solid
+    #1e293b;
+
+  font-size:
+    9px;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    1px;
+
+}
+
+
+.region-details-location-name {
+
+  margin-bottom:
+    4px;
+
+  color:
+    #ffffff;
+
+  font-size:
+    14px;
+
+  font-weight:
+    900;
+
+}
+
+
+.region-details-category {
+
+  margin-bottom:
+    12px;
+
+  color:
+    #00d9e8;
+
+  font-size:
+    9px;
+
+  font-weight:
+    800;
+
+}
+
+
+.region-details-description {
+
+  margin-bottom:
+    14px;
+
+  color:
+    #94a3b8;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.55;
+
+}
+
+
+.region-details-divider {
+
+  width:
+    100%;
+
+  height:
+    1px;
+
+  margin:
+    11px 0;
+
+  background:
+    #1e293b;
+
+}
+
+
+.region-details-row {
+
+  display:
+    flex;
+
+  align-items:
+    flex-start;
+
+  justify-content:
+    space-between;
+
+  gap:
+    10px;
+
+  margin:
+    8px 0;
+
+  font-size:
+    9px;
+
+}
+
+
+.region-details-row span {
+
+  color:
+    #64748b;
+
+}
+
+
+.region-details-row strong {
+
+  max-width:
+    62%;
+
+  color:
+    #ffffff;
+
+  font-size:
+    9px;
+
+  text-align:
+    right;
+
+}
+
+
+
+/* =========================================================
+   EXTERNAL DETAILS REWARDS
+   ========================================================= */
+
+.region-details-rewards-title {
+
+  margin-bottom:
+    7px;
+
+  color:
+    #64748b;
+
+  font-size:
+    8px;
+
+  font-weight:
+    800;
+
+}
+
+
+.region-details-rewards {
+
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    5px;
+
+}
+
+
+.region-details-rewards span {
+
+  padding:
+    4px 6px;
+
+  background:
+    #101722;
+
+  border:
+    1px solid
+    #263448;
+
+  border-radius:
+    3px;
+
+  color:
+    #d6a93a;
+
+  font-size:
+    8px;
+
+}
+
+
+
+/* =========================================================
+   EMPTY RIGHT PANEL
+
+   Keeps the sidebar visible but does NOT invent/select a
+   location before the user clicks a marker.
+   ========================================================= */
+
+.region-details-empty {
+
+  justify-content:
+    flex-start;
+
+}
+
+
+.region-details-placeholder {
+
+  min-height:
+    180px;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  align-items:
+    center;
+
+  justify-content:
+    center;
+
+  gap:
+    10px;
+
+  padding:
+    20px;
+
+  color:
+    #556477;
+
+  text-align:
+    center;
+
+}
+
+
+.region-details-placeholder-icon {
+
+  color:
+    #33475d;
+
+  font-size:
+    24px;
+
+}
+
+
+.region-details-placeholder p {
+
+  max-width:
+    180px;
+
+  color:
+    #65758a;
+
+  font-size:
+    9px;
+
+  line-height:
+    1.5;
+
+}
+
+
+
+/* =========================================================
+   26. REGIONAL RESPONSIVE RULES
+   ========================================================= */
+
+@media
+(max-width: 1350px) {
+
+  .screen-overlay.region-map-open
+  .overlay-content-box {
+
+    width:
+      99vw;
+
+    height:
+      96vh;
+
+    padding:
+      12px;
+
+  }
+
+
+  .region-hub-container {
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      250px;
+
+    gap:
+      9px;
+
+  }
+
+
+  .region-details-pane {
+
+    width:
+      250px;
+
+  }
+
+
+  .region-left-overlay {
+
+    min-width:
+      130px;
+
+  }
+
+
+  .region-map-detail-overlay {
+
+    min-width:
+      140px;
+
+  }
+
+}
+
+
+@media
+(max-width: 1050px) {
+
+  .region-hub-container {
+
+    grid-template-columns:
+      minmax(0, 1fr)
+      220px;
+
+  }
+
+
+  .region-details-pane {
+
+    width:
+      220px;
+
+  }
+
+
+  .region-map-detail-overlay {
+
+    display:
+      none;
+
+  }
+
+
+  .region-left-overlay {
+
+    width:
+      18%;
+
+  }
+
 }
 
 
@@ -1950,7 +3975,7 @@ body {
 
 
   .region-details-pane {
-    width: 240px;
+    width: 220px;
   }
 
 }
