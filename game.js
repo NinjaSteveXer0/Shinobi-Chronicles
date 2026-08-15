@@ -2973,7 +2973,7 @@ function createActivityCard(
       </div>
 
       <button
-onclick="console.log('BUTTON CLICKED'); ${action}"
+onclick="console.log('BUTTON CLICKED')"
 style="
 margin-top:12px;
 width:100%;
