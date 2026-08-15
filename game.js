@@ -75,22 +75,24 @@ const enemyDatabase = {
 
 function startEncounter(enemyId) {
 
+  console.log("START ENCOUNTER FIRED:", enemyId);
+
   const enemy = enemyDatabase[enemyId];
+
+  console.log("FOUND ENEMY:", enemy);
+
 
   if (!enemy) {
     console.log("Enemy not found");
     return;
   }
 
-  console.log("⚔️ Starting encounter:", enemy.name);
 
-selectedEnemy = enemy;
+  selectedEnemy = enemy;
 
-console.log("SELECTED ENEMY NOW:", selectedEnemy);
+  console.log("SELECTED ENEMY:", selectedEnemy);
 
-console.log("Opening battle overlay");
-
-openOverlay("battle");
+  openOverlay("battle");
 
 }
 
@@ -2869,7 +2871,7 @@ function renderBattleOverlay(
   "Fight a small rogue patrol.",
   "Ryo: 250",
   "Drop Chance: 12%",
-  "startEncounter('Scout')"
+  "startEncounter('scout')"
 )}
 
 
