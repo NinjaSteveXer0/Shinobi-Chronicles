@@ -9,15 +9,31 @@
 
 let playerTeam = [
 
- {
-  id: "naruto",
-  name: "Kage Naruto",
-  rank: "Kage",
-  rarity: "Legendary",
-  element: "Light",
-  power:4055,
-  image:"Assets/Animated Cards/Kage Naruto.png"
-},
+  {
+    id: "naruto",
+    name: "Kage Naruto",
+    rank: "Kage",
+    rarity: "Legendary",
+    element: "Light",
+
+    power: 92,
+
+    stats: {
+      nin: 95,
+      tai: 82,
+      buki: 68,
+      fuin: 80,
+      kin: 91,
+      gen: 62,
+      stamina: 96
+    },
+
+    equipment: [],
+    abilities: [],
+
+    image:
+      "Assets/Animated Cards/Kage Naruto.png"
+  },
 
 
   {
@@ -26,8 +42,24 @@ let playerTeam = [
     rank: "Elite Jonin",
     rarity: "Epic",
     element: "Lightning",
-    power: 3495,
-    image: "Assets/Animated Cards/Jonin Sasuke.png"
+
+    power: 89,
+
+    stats: {
+      nin: 94,
+      tai: 84,
+      buki: 91,
+      fuin: 70,
+      kin: 86,
+      gen: 90,
+      stamina: 81
+    },
+
+    equipment: [],
+    abilities: [],
+
+    image:
+      "Assets/Animated Cards/Jonin Sasuke.png"
   },
 
 
@@ -37,19 +69,52 @@ let playerTeam = [
     rank: "Sannin",
     rarity: "Rare",
     element: "Medical",
-    power: 3000,
-    image: "Assets/Animated Cards/Sannin Sakura.png"
+
+    power: 84,
+
+    stats: {
+      nin: 76,
+      tai: 96,
+      buki: 58,
+      fuin: 70,
+      kin: 45,
+      gen: 64,
+      stamina: 95
+    },
+
+    equipment: [],
+    abilities: [],
+
+    image:
+      "Assets/Animated Cards/Sannin Sakura.png"
   },
 
+
   {
-  id: "nagato",
+    id: "nagato",
     name: "Teen Nagato",
     rank: "Kage",
     rarity: "Legendary",
     element: "Dark",
-    power: 8700,
-    image: "Assets/Animated Cards/Teen Nagato.png"
-  },
+
+    power: 97,
+
+    stats: {
+      nin: 98,
+      tai: 74,
+      buki: 64,
+      fuin: 94,
+      kin: 99,
+      gen: 96,
+      stamina: 91
+    },
+
+    equipment: [],
+    abilities: [],
+
+    image:
+      "Assets/Animated Cards/Teen Nagato.png"
+  }
 
 ];
 
