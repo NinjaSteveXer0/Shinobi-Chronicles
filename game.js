@@ -167,6 +167,8 @@ const enemyDatabase = {
 
     rank: "Outlaw",
 
+    power: 41,
+
     image:
       "Enemies/Bandit.png",
 
@@ -185,6 +187,8 @@ const enemyDatabase = {
     name: "Bandit Leader",
 
     rank: "Elite Rogue",
+
+    power: 56,
 
     image:
       "Enemies/BanditLeader.png",
