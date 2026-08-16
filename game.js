@@ -638,7 +638,53 @@ function startEncounter(enemyId) {
   ];
 
 
-  // Reset rewards for every new encounter
+  // =========================================
+  // RESET BATTLE CONTRIBUTIONS
+  // =========================================
+
+  currentBattle.contributions = {};
+
+
+  playerTeam.forEach(
+    member => {
+
+      currentBattle.contributions[
+        member.id
+      ] = {
+
+        id:
+          member.id,
+
+        name:
+          member.name,
+
+        power:
+          calculateCurrentPL(
+            member
+          ),
+
+        damage:
+          0,
+
+        attacks:
+          0,
+
+        ninjutsuDamage:
+          0,
+
+        taijutsuDamage:
+          0
+
+      };
+
+    }
+  );
+
+
+  // =========================================
+  // RESET BATTLE REWARDS
+  // =========================================
+
   currentBattle.rewards = {
 
     generated: false,
@@ -651,7 +697,9 @@ function startEncounter(enemyId) {
 
     rareDrops: [],
 
-    finishingShinobi: null
+    finishingShinobi: null,
+
+    mvp: null
 
   };
 
@@ -682,6 +730,168 @@ function startEncounter(enemyId) {
   );
 
 }
+
+
+
+// =========================================================
+// BATTLE CONTRIBUTION SYSTEM
+// =========================================================
+
+function recordBattleContribution(
+  fighter,
+  damage,
+  attackType
+) {
+
+
+  if (
+    !fighter ||
+    !currentBattle.contributions
+  ) {
+
+    return;
+
+  }
+
+
+  const contribution =
+    currentBattle.contributions[
+      fighter.id
+    ];
+
+
+  if (!contribution) {
+
+    return;
+
+  }
+
+
+  contribution.damage +=
+    damage;
+
+
+  contribution.attacks +=
+    1;
+
+
+  if (
+    attackType === "ninjutsu"
+  ) {
+
+    contribution.ninjutsuDamage +=
+      damage;
+
+  }
+
+
+  if (
+    attackType === "taijutsu"
+  ) {
+
+    contribution.taijutsuDamage +=
+      damage;
+
+  }
+
+}
+
+
+
+function calculateBattleMVP() {
+
+
+  const contributions =
+    Object.values(
+      currentBattle.contributions || {}
+    );
+
+
+  if (
+    contributions.length === 0
+  ) {
+
+    return null;
+
+  }
+
+
+  const totalDamage =
+    contributions.reduce(
+      (
+        total,
+        fighter
+      ) =>
+        total +
+        fighter.damage,
+      0
+    );
+
+
+  if (
+    totalDamage <= 0
+  ) {
+
+    return null;
+
+  }
+
+
+  const winner =
+    contributions.reduce(
+      (
+        best,
+        fighter
+      ) => {
+
+        if (
+          !best ||
+          fighter.damage >
+          best.damage
+        ) {
+
+          return fighter;
+
+        }
+
+
+        return best;
+
+      },
+      null
+    );
+
+
+  return {
+
+    id:
+      winner.id,
+
+    name:
+      winner.name,
+
+    power:
+      winner.power,
+
+    damage:
+      winner.damage,
+
+    attacks:
+      winner.attacks,
+
+    percentage:
+      Math.round(
+        (
+          winner.damage /
+          totalDamage
+        ) *
+        100
+      )
+
+  };
+
+}
+
 
 
 
@@ -3969,26 +4179,11 @@ function renderCombatOverlay(container) {
 
       rareDrops: [],
 
-      finishingShinobi: null
+      finishingShinobi: null,
+
+      mvp: null
 
     };
-
-
-  console.log(
-    "Combat Arena Loaded"
-  );
-
-
-  console.log(
-    "Enemy:",
-    enemy
-  );
-
-
-  console.log(
-    "Current Rewards:",
-    rewards
-  );
 
 
   container.innerHTML = `
@@ -4325,9 +4520,7 @@ ${
               font-weight:bold;
               margin-bottom:5px;
             ">
-
               RYŌ
-
             </div>
 
             <div style="
@@ -4335,9 +4528,7 @@ ${
               font-size:18px;
               font-weight:bold;
             ">
-
               ${rewards.ryo}
-
             </div>
 
           </div>
@@ -4359,9 +4550,7 @@ ${
               font-weight:bold;
               margin-bottom:5px;
             ">
-
               EXP
-
             </div>
 
             <div style="
@@ -4369,16 +4558,14 @@ ${
               font-size:18px;
               font-weight:bold;
             ">
-
               ${rewards.exp}
-
             </div>
 
           </div>
 
 
 
-          <!-- COMMON ITEM -->
+          <!-- ITEM -->
 
           <div style="
             padding:12px;
@@ -4393,9 +4580,7 @@ ${
               font-weight:bold;
               margin-bottom:5px;
             ">
-
               ITEM
-
             </div>
 
             <div style="
@@ -4439,9 +4624,7 @@ ${
               font-weight:bold;
               margin-bottom:5px;
             ">
-
               RARE DROP
-
             </div>
 
             <div style="
@@ -4477,7 +4660,7 @@ ${
 
 
 
-          <!-- FINISHING SHINOBI -->
+          <!-- FINAL STRIKE -->
 
           <div style="
             padding:12px;
@@ -4492,9 +4675,7 @@ ${
               font-weight:bold;
               margin-bottom:5px;
             ">
-
               FINAL STRIKE
-
             </div>
 
             <div style="
@@ -4514,6 +4695,83 @@ ${
 
 
         </div>
+
+
+
+        <!-- MVP -->
+
+        ${
+          rewards.mvp
+            ? `
+
+              <div style="
+                max-width:420px;
+                margin:16px auto 0 auto;
+                padding:12px 18px;
+                border-top:1px solid #334155;
+              ">
+
+
+                <div style="
+                  color:#D6A93A;
+                  font-size:12px;
+                  font-weight:bold;
+                  letter-spacing:2px;
+                ">
+
+                  ★ BATTLE MVP ★
+
+                </div>
+
+
+                <div style="
+                  color:#FFFFFF;
+                  font-size:18px;
+                  font-weight:bold;
+                  margin-top:5px;
+                ">
+
+                  ${rewards.mvp.name}
+
+                </div>
+
+
+                <div style="
+                  color:#00D9E8;
+                  font-size:12px;
+                  margin-top:4px;
+                ">
+
+                  ${rewards.mvp.percentage}%
+                  TOTAL DAMAGE
+
+                </div>
+
+
+                <div style="
+                  color:#64748B;
+                  font-size:10px;
+                  margin-top:3px;
+                ">
+
+                  ${rewards.mvp.damage}
+                  BP DAMAGE
+                  •
+                  ${rewards.mvp.attacks}
+                  ATTACK${
+                    rewards.mvp.attacks === 1
+                      ? ""
+                      : "S"
+                  }
+
+                </div>
+
+
+              </div>
+
+            `
+            : ""
+        }
 
 
       </div>
@@ -4545,11 +4803,8 @@ gap:12px;
       : ""
   }
 >
-
 NINJUTSU
-
 </button>
-
 
 
 <button
@@ -4563,11 +4818,8 @@ NINJUTSU
       : ""
   }
 >
-
 TAIJUTSU
-
 </button>
-
 
 
 <button
@@ -4577,11 +4829,8 @@ TAIJUTSU
       : ""
   }
 >
-
 ITEM
-
 </button>
-
 
 
 <button
@@ -4591,9 +4840,7 @@ ITEM
       : ""
   }
 >
-
 FORMATION
-
 </button>
 
 
@@ -4791,7 +5038,7 @@ function performStatAttack(
     Math.random() * 0.20;
 
 
-  const damage =
+  const calculatedDamage =
     Math.max(
       1,
       Math.round(
@@ -4801,15 +5048,30 @@ function performStatAttack(
     );
 
 
+  // =========================================
+  // ACTUAL DAMAGE
+  // Prevent overkill inflating contribution
+  // =========================================
+
+  const enemyPowerBeforeAttack =
+    currentBattle.enemyPower;
+
+
+  const actualDamage =
+    Math.min(
+      calculatedDamage,
+      enemyPowerBeforeAttack
+    );
+
+
   currentBattle.lastDamage =
-    damage;
+    actualDamage;
 
 
   currentBattle.enemyPower -=
-    damage;
+    actualDamage;
 
 
-  // Enemy Battle Power cannot go below 0
   if (
     currentBattle.enemyPower < 0
   ) {
@@ -4818,6 +5080,17 @@ function performStatAttack(
       0;
 
   }
+
+
+  // =========================================
+  // RECORD CONTRIBUTION
+  // =========================================
+
+  recordBattleContribution(
+    fighter,
+    actualDamage,
+    attackType
+  );
 
 
   // =========================================
@@ -4836,7 +5109,7 @@ function performStatAttack(
 
 
   currentBattle.battleLog.push(
-    `${currentBattle.enemy.name} lost ${damage} Battle Power.`
+    `${currentBattle.enemy.name} lost ${actualDamage} Battle Power.`
   );
 
 
@@ -4868,6 +5141,18 @@ function performStatAttack(
       );
 
 
+    // =======================================
+    // CALCULATE MVP
+    // =======================================
+
+    const mvp =
+      calculateBattleMVP();
+
+
+    currentBattle.rewards.mvp =
+      mvp;
+
+
     currentBattle.battleLog.push(
       `${currentBattle.enemy.name} has been defeated!`
     );
@@ -4886,6 +5171,19 @@ function performStatAttack(
     currentBattle.battleLog.push(
       `EXP gained: ${rewards.exp}`
     );
+
+
+    // =======================================
+    // MVP
+    // =======================================
+
+    if (mvp) {
+
+      currentBattle.battleLog.push(
+        `★ MVP: ${mvp.name} — ${mvp.percentage}% Total Damage`
+      );
+
+    }
 
 
     // =======================================
@@ -4956,8 +5254,20 @@ function performStatAttack(
 
 
   console.log(
-    "Damage:",
-    damage
+    "Calculated Damage:",
+    calculatedDamage
+  );
+
+
+  console.log(
+    "Actual Damage:",
+    actualDamage
+  );
+
+
+  console.log(
+    "Battle Contributions:",
+    currentBattle.contributions
   );
 
 
@@ -4967,7 +5277,6 @@ function performStatAttack(
   );
 
 
-  // Refresh combat screen
   openOverlay(
     "combat"
   );
@@ -4997,6 +5306,7 @@ function performTaijutsuAttack() {
   );
 
 }
+
 
 
 // =========================================================
