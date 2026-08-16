@@ -4193,7 +4193,12 @@ function renderCombatOverlay(container) {
 display:flex;
 flex-direction:column;
 height:100%;
+min-height:0;
 padding:20px;
+overflow-y:auto;
+overflow-x:hidden;
+box-sizing:border-box;
+padding-bottom:80px;
 ">
 
 
