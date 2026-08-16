@@ -5067,24 +5067,25 @@ ${
 // =========================================================
 
 
-// =========================================================
-// VICTORY NUMBER ANIMATION
-// =========================================================
-
 function animateVictoryNumber(
-  elementId,
+  selector,
   finalValue,
   duration
 ) {
 
 
   const element =
-    document.getElementById(
-      elementId
+    document.querySelector(
+      selector
     );
 
 
   if (!element) {
+
+    console.log(
+      "Victory number element not found:",
+      selector
+    );
 
     return;
 
@@ -5119,7 +5120,10 @@ function animateVictoryNumber(
       );
 
 
-    // Ease-out animation
+    // =========================================
+    // EASE-OUT NUMBER MOVEMENT
+    // =========================================
+
     const easedProgress =
       1 -
       Math.pow(
@@ -5183,7 +5187,7 @@ function runVictoryRevealAnimations(
     () => {
 
       animateVictoryNumber(
-        "victory-ryo-value",
+        ".victory-ryo-number",
         rewards.ryo,
         650
       );
@@ -5201,7 +5205,7 @@ function runVictoryRevealAnimations(
     () => {
 
       animateVictoryNumber(
-        "victory-exp-value",
+        ".victory-exp-number",
         rewards.exp,
         550
       );
@@ -5212,8 +5216,6 @@ function runVictoryRevealAnimations(
 
 
 }
-
-
 
 // =========================================================
 // VICTORY SCREEN RENDERER
