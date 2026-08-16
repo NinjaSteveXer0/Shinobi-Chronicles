@@ -228,6 +228,61 @@ function calculateCurrentPL(character) {
 }
 
 // =========================================================
+// CHARACTER STAT MODIFICATION
+// =========================================================
+
+function increaseCharacterStat(
+  characterId,
+  statName,
+  amount
+) {
+
+  const character =
+    playerTeam.find(
+      member => member.id === characterId
+    );
+
+
+  if (!character) {
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+    return;
+  }
+
+
+  if (
+    character.stats[statName] === undefined
+  ) {
+
+    console.log(
+      "Stat not found:",
+      statName
+    );
+
+    return;
+  }
+
+
+  character.stats[statName] += amount;
+
+
+  console.log(
+    `${character.name} gained +${amount} ${statName.toUpperCase()}`
+  );
+
+
+  console.log(
+    "New Current PL:",
+    calculateCurrentPL(character)
+  );
+
+}
+
+// =========================================================
 // ENEMY DATABASE
 // =========================================================
 
@@ -1167,6 +1222,7 @@ var selectedRegionKey = null;
 var selectedLocationNode = null;
 var regionInfoOpen = false;
 var playerPowerLevel = 2450;
+var currentOverlayType = null;
 
 
 // =========================================================
@@ -1174,6 +1230,8 @@ var playerPowerLevel = 2450;
 // =========================================================
 
 function openOverlay(type) {
+
+  currentOverlayType = type;
 
   const overlay =
     document.getElementById("screen-overlay");
@@ -1312,11 +1370,56 @@ break;
 
 
 // =========================================================
-// 4. CLOSE OVERLAY
+// 4. CLOSE / BACK OVERLAY
 // =========================================================
 
 function closeOverlay() {
 
+
+  // COMBAT
+  // Return to encounter selection
+  if (currentOverlayType === "combat") {
+
+    currentBattle.active = false;
+
+    openOverlay("battle");
+
+    return;
+  }
+
+
+  // BATTLE / LOCATION SCREEN
+  // Return to current region map
+  if (
+    currentOverlayType === "battle" &&
+    selectedRegionKey
+  ) {
+
+    openRegionHub(
+      selectedRegionKey
+    );
+
+    return;
+  }
+
+
+  // OTHER REGION SUB-SCREENS
+  // Return to current region where possible
+  if (
+    selectedRegionKey &&
+    currentOverlayType !== "region"
+  ) {
+
+    openRegionHub(
+      selectedRegionKey
+    );
+
+    return;
+  }
+
+
+  // REGION MAP
+  // Return to world map
   const overlay =
     document.getElementById(
       "screen-overlay"
@@ -1337,12 +1440,11 @@ function closeOverlay() {
   );
 
 
-  selectedRegionKey =
-    null;
+  currentOverlayType = null;
 
+  selectedRegionKey = null;
 
-  selectedLocationNode =
-    null;
+  selectedLocationNode = null;
 
 }
 
@@ -1714,6 +1816,8 @@ function createVillageCard(
 // =========================================================
 
 function openRegionHub(regionKey) {
+
+  currentOverlayType = "region";
 
   const region =
     worldRegions[regionKey];
