@@ -3131,20 +3131,12 @@ flex:1;
 ">
 
 
-
 ${playerTeam.map(member => `
 
-<div class="team-slot">
-
-${member.name}
-
-<br>
-
-PL ${member.power}
-
-</div>
+${createCharacterCard(member)}
 
 `).join("")}
+
 
 
 <!-- ACTIVE DUEL -->
@@ -3177,16 +3169,11 @@ VS
 </p>
 
 
-<img
-
-src="${enemy.image}"
-
-style="
-width:150px;
-border-radius:10px;
-"
-
->
+${createCharacterCard({
+name: enemy.name,
+power: currentBattle.enemyPower,
+image: enemy.image
+})}
 
 
 <h2 style="
