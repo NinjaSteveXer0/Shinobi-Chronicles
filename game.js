@@ -138,23 +138,25 @@ let currentBattle = {
 
 const enemyDatabase = {
 
-  scout: {
+ scout: {
 
-    id: "scout",
+  id: "scout",
 
-    name: "Rogue Scout",
+  name: "Rogue Scout",
 
-    rank: "Rogue Shinobi",
+  rank: "Rogue Shinobi",
 
-    image:
-      "Enemies/Scout.png",
+  power: 32,
 
-    powerRange: {
-      min: 350,
-      max: 450
-    }
+  image:
+    "Enemies/Scout.png",
 
-  },
+  powerRange: {
+    min: 350,
+    max: 450
+  }
+
+},
 
 
   bandit: {
