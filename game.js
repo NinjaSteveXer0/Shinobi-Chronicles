@@ -67,7 +67,7 @@ let currentBattle = {
 
   enemyPower: 0,
 
-  playerPower: 4055
+  activePlayer: null
 
 };
 
@@ -155,10 +155,13 @@ function startEncounter(enemyId) {
 
   selectedEnemy = enemy;
 
-
   currentBattle.active = true;
 
-  currentBattle.enemy = enemy;
+currentBattle.enemy = enemy;
+
+currentBattle.activePlayer = playerTeam[0];
+
+
 
 
   currentBattle.enemyPower =
@@ -1124,6 +1127,8 @@ break;
       break;
   }
 }
+
+
 
 
 // =========================================================
@@ -3133,7 +3138,29 @@ flex:1;
 
 ${playerTeam.map(member => `
 
-${createCharacterCard(member)}
+<div
+  onclick="selectActiveFighter('${member.id}')"
+  style="
+    cursor:pointer;
+    opacity:${
+      currentBattle.activePlayer &&
+      currentBattle.activePlayer.id === member.id
+        ? "1"
+        : "0.65"
+    };
+    transform:${
+      currentBattle.activePlayer &&
+      currentBattle.activePlayer.id === member.id
+        ? "scale(1.05)"
+        : "scale(1)"
+    };
+    transition:0.2s ease;
+  "
+>
+
+  ${createCharacterCard(member)}
+
+</div>
 
 `).join("")}
 
@@ -3160,7 +3187,9 @@ border-radius:10px;
 
 
 <h2>
-Naruto
+${currentBattle.activePlayer
+  ? currentBattle.activePlayer.name
+  : "NO SHINOBI"}
 </h2>
 
 
@@ -3301,9 +3330,43 @@ Battle Log:
 
 }
 
+// =========================================================
+// 18. SELECT ACTIVE FIGHTER
+// =========================================================
+
+function selectActiveFighter(playerId) {
+
+  const fighter =
+    playerTeam.find(
+      member => member.id === playerId
+    );
+
+
+  if (!fighter) {
+
+    console.log("Fighter not found");
+
+    return;
+
+  }
+
+
+  currentBattle.activePlayer = fighter;
+
+
+  console.log(
+    "ACTIVE FIGHTER:",
+    currentBattle.activePlayer
+  );
+
+
+  openOverlay("combat");
+
+}
+
 
 // =========================================================
-// 18. ACTIVITY CARD
+// 19. ACTIVITY CARD
 // =========================================================
 
 function createActivityCard(
@@ -3410,7 +3473,7 @@ onclick="${action}; console.log('AFTER ACTION')"
 
 
 // =========================================================
-// 19. DAILY REWARD
+// 20. DAILY REWARD
 // =========================================================
 
 function claimDailyReward() {
