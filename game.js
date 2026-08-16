@@ -20,7 +20,7 @@ const enemyDatabase = {
     rank: "Rogue Shinobi",
 
     image:
-      "Assets/Enemies/Scout.png",
+      "Enemies/Scout.png",
 
     powerRange: {
       min: 350,
@@ -39,7 +39,7 @@ const enemyDatabase = {
     rank: "Outlaw",
 
     image:
-      "Assets/Enemies/Bandit.png",
+      "Enemies/Bandit.png",
 
     powerRange: {
       min: 450,
@@ -58,7 +58,7 @@ const enemyDatabase = {
     rank: "Elite Rogue",
 
     image:
-      "Assets/Enemies/BanditLeader.png",
+      "Enemies/BanditLeader.png",
 
     powerRange: {
       min: 600,
