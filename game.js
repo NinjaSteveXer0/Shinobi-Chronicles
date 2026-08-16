@@ -92,7 +92,7 @@ function startEncounter(enemyId) {
 
   console.log("SELECTED ENEMY:", selectedEnemy);
 
-  openOverlay("battle");
+  openOverlay("combat");
 
 }
 
@@ -949,6 +949,12 @@ function openOverlay(type) {
     case "battle":
       renderBattleOverlay(container);
       break;
+
+      case "combat":
+
+  renderCombatOverlay(container);
+
+break;
 
 
     case "training":
@@ -2814,26 +2820,28 @@ function renderBattleOverlay(
   container
 ) {
 
+
   console.log("Battle overlay opened");
-  console.log(selectedEnemy);
+
 
   const location =
     selectedLocationNode;
 
 
+
   container.innerHTML = `
 
     <div style="
-      display: flex;
-      flex-direction: column;
-      flex: 1;
+      display:flex;
+      flex-direction:column;
+      flex:1;
     ">
 
 
       <h2 style="
-        color: #D6A93A;
-        font-size: 16px;
-        margin-bottom: 5px;
+        color:#D6A93A;
+        font-size:16px;
+        margin-bottom:5px;
       ">
         ${
           location
@@ -2843,54 +2851,58 @@ function renderBattleOverlay(
       </h2>
 
 
+
       <p style="
-        color: #94A3B8;
-        font-size: 10px;
-        margin-bottom: 16px;
+        color:#94A3B8;
+        font-size:10px;
+        margin-bottom:16px;
       ">
-        Prepare your shinobi before entering battle.
+        Choose your opponent.
       </p>
 
 
 
+
       <div style="
-        display: grid;
+        display:grid;
 
         grid-template-columns:
           repeat(
             3,
-            minmax(0, 1fr)
+            minmax(0,1fr)
           );
 
-        gap: 12px;
+        gap:12px;
       ">
 
 
-  ${createActivityCard(
-  "Scout Patrol",
-  "Fight a small rogue patrol.",
-  "Ryo: 250",
-  "Drop Chance: 12%",
-  "startEncounter('scout')"
-)}
+        ${createActivityCard(
+          "Scout Patrol",
+          "Fight a small rogue patrol.",
+          "Ryo: 250",
+          "Drop Chance: 12%",
+          "startEncounter('scout')"
+        )}
 
 
-   ${createActivityCard(
-  "Bandit Leader",
-  "Defeat an elite rogue shinobi.",
-  "Ryo: 650",
-  "Rare Drop: 8%",
-  "startEncounter('banditLeader')"
-)}
+
+        ${createActivityCard(
+          "Bandit Leader",
+          "Defeat an elite rogue shinobi.",
+          "Ryo: 650",
+          "Rare Drop: 8%",
+          "startEncounter('banditLeader')"
+        )}
 
 
-   ${createActivityCard(
-  "Hidden Cache",
-  "High-risk encounter protecting stolen equipment.",
-  "Ryo: 1,200",
-  "Rare Drop: 18%",
-  "startEncounter('bandit')"
-)}
+
+        ${createActivityCard(
+          "Hidden Cache",
+          "High-risk encounter protecting stolen equipment.",
+          "Ryo: 1,200",
+          "Rare Drop: 18%",
+          "startEncounter('bandit')"
+        )}
 
 
       </div>
@@ -2899,11 +2911,155 @@ function renderBattleOverlay(
     </div>
 
   `;
+
+}
+
+
+
+
+
+// =========================================================
+// 17. COMBAT SCREEN
+// =========================================================
+
+function renderCombatOverlay(
+  container
+) {
+
+
+  const enemy =
+    selectedEnemy;
+
+
+
+  if (!enemy) {
+
+
+    container.innerHTML = `
+
+      <h2 style="
+        color:#E53935;
+      ">
+        NO ENEMY SELECTED
+      </h2>
+
+    `;
+
+
+    return;
+
+  }
+
+
+
+
+
+  container.innerHTML = `
+
+
+    <div style="
+      display:flex;
+      flex-direction:column;
+      flex:1;
+      align-items:center;
+    ">
+
+
+
+      <h2 style="
+        color:#D6A93A;
+        font-size:18px;
+      ">
+        BATTLE INITIATED
+      </h2>
+
+
+
+      <p style="
+        color:#94A3B8;
+        font-size:10px;
+      ">
+        A hostile shinobi approaches...
+      </p>
+
+
+
+
+
+      <div style="
+        margin-top:20px;
+        text-align:center;
+      ">
+
+
+
+        <img
+          src="${enemy.image}"
+          style="
+            width:180px;
+            border-radius:8px;
+          "
+        >
+
+
+
+
+        <h3 style="
+          color:#00D9E8;
+        ">
+          ${enemy.name}
+        </h3>
+
+
+
+
+        <p style="
+          color:#94A3B8;
+        ">
+          ${enemy.rank}
+        </p>
+
+
+
+      </div>
+
+
+
+
+
+      <button
+
+        onclick="console.log('ATTACK')"
+
+        style="
+          margin-top:25px;
+          padding:12px 40px;
+          background:#D6A93A;
+          border:none;
+          cursor:pointer;
+        "
+
+      >
+
+        BEGIN BATTLE
+
+      </button>
+
+
+
+
+    </div>
+
+
+
+  `;
+
+
 }
 
 
 // =========================================================
-// 17. ACTIVITY CARD
+// 18. ACTIVITY CARD
 // =========================================================
 
 function createActivityCard(
@@ -3010,7 +3166,7 @@ onclick="${action}; console.log('AFTER ACTION')"
 
 
 // =========================================================
-// 18. DAILY REWARD
+// 19. DAILY REWARD
 // =========================================================
 
 function claimDailyReward() {
