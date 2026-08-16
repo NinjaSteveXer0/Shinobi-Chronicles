@@ -9,6 +9,18 @@
 
 let selectedEnemy = null;
 
+let currentBattle = {
+
+  active: false,
+
+  enemy: null,
+
+  enemyPower: 0,
+
+  playerPower: 4055
+
+};
+
 const enemyDatabase = {
 
   scout: {
@@ -75,22 +87,41 @@ const enemyDatabase = {
 
 function startEncounter(enemyId) {
 
+
   console.log("START ENCOUNTER FIRED:", enemyId);
+
 
   const enemy = enemyDatabase[enemyId];
 
-  console.log("FOUND ENEMY:", enemy);
-
 
   if (!enemy) {
+
     console.log("Enemy not found");
+
     return;
+
   }
 
 
   selectedEnemy = enemy;
 
-  console.log("SELECTED ENEMY:", selectedEnemy);
+
+  currentBattle.active = true;
+
+  currentBattle.enemy = enemy;
+
+
+  currentBattle.enemyPower =
+    Math.floor(
+      Math.random() *
+      (enemy.powerRange.max - enemy.powerRange.min)
+      +
+      enemy.powerRange.min
+    );
+
+
+  console.log("CURRENT BATTLE:", currentBattle);
+
 
   openOverlay("combat");
 
@@ -3146,14 +3177,7 @@ PL ${currentBattle.enemyPower}
 </div>
 
 
-
-
-
 </div>
-
-
-
-
 
 
 
