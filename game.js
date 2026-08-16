@@ -2919,7 +2919,7 @@ function renderBattleOverlay(
 
 
 // =========================================================
-// COMBAT ARENA SCREEN
+// 17. COMBAT ARENA SCREEN
 // =========================================================
 
 function renderCombatOverlay(container) {
@@ -2942,7 +2942,12 @@ function renderCombatOverlay(container) {
 
 
 
-container.innerHTML = `
+  console.log("Combat Arena Loaded");
+  console.log("Enemy:", enemy);
+
+
+
+  container.innerHTML = `
 
 
 <div style="
@@ -2953,12 +2958,14 @@ padding:20px;
 ">
 
 
+
 <!-- HEADER -->
 
 <div style="
 text-align:center;
 margin-bottom:20px;
 ">
+
 
 <h2 style="
 color:#D6A93A;
@@ -2978,42 +2985,64 @@ BANDIT HIDEOUT
 
 
 
-<!-- ENEMY FORMATION -->
+
+
+<!-- ARENA AREA -->
 
 <div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+flex:1;
+">
+
+
+
+<!-- PLAYER SIDE -->
+
+<div style="
+width:30%;
 text-align:center;
 ">
 
 
 <h3 style="
-color:#E53935;
+color:#00D9E8;
 ">
-ENEMY FORMATION
+YOUR TEAM
 </h3>
 
 
-<div>
+<div class="team-slot">
 
-<img 
-src="${enemy.image}"
-style="
-width:100px;
-border-radius:8px;
-"
->
+Naruto
+<br>
+PL 4055
+
+</div>
 
 
-<p style="
-color:#00D9E8;
-">
-${enemy.name}
-</p>
+<div class="team-slot">
 
+Sasuke
+<br>
+PL 3495
+
+</div>
+
+
+<div class="team-slot">
+
+Sakura
+<br>
+PL 3000
 
 </div>
 
 
 </div>
+
+
 
 
 
@@ -3022,22 +3051,25 @@ ${enemy.name}
 <!-- ACTIVE DUEL -->
 
 <div style="
-margin:30px auto;
-padding:20px;
-border:1px solid #334155;
-border-radius:10px;
-width:300px;
 text-align:center;
 ">
 
 
-<h3>
+<h2>
 ⚔ ACTIVE DUEL ⚔
-</h3>
+</h2>
+
+
+
+<div style="
+padding:20px;
+border:1px solid #334155;
+border-radius:10px;
+">
 
 
 <h2>
-YOUR SHINOBI
+Naruto
 </h2>
 
 
@@ -3046,59 +3078,69 @@ VS
 </p>
 
 
-<h2>
+<img
+
+src="${enemy.image}"
+
+style="
+width:150px;
+border-radius:10px;
+"
+
+>
+
+
+<h2 style="
+color:#E53935;
+">
 ${enemy.name}
 </h2>
 
 
+<p style="
+color:#94A3B8;
+">
+${enemy.rank}
+</p>
+
+
+</div>
+
+
 </div>
 
 
 
 
 
-<!-- PLAYER TEAM -->
 
-<div>
+
+<!-- ENEMY SIDE -->
+
+<div style="
+width:30%;
+text-align:center;
+">
 
 
 <h3 style="
-color:#00D9E8;
-text-align:center;
+color:#E53935;
 ">
-YOUR TEAM
+ENEMY TEAM
 </h3>
 
 
-<div style="
-display:flex;
-justify-content:center;
-gap:10px;
-">
-
 
 <div class="team-slot">
-Naruto
+
+${enemy.name}
+
 <br>
-PL 4055
-</div>
 
-
-<div class="team-slot">
-Sasuke
-<br>
-PL 3495
-</div>
-
-
-<div class="team-slot">
-Sakura
-<br>
-PL 3000
-</div>
-
+PL ???
 
 </div>
+
 
 
 </div>
@@ -3107,13 +3149,21 @@ PL 3000
 
 
 
-<!-- ACTIONS -->
+</div>
+
+
+
+
+
+
+
+<!-- ACTION BUTTONS -->
 
 <div style="
-margin-top:auto;
+margin-top:20px;
 display:flex;
 justify-content:center;
-gap:10px;
+gap:12px;
 ">
 
 
@@ -3138,6 +3188,34 @@ FORMATION
 
 
 </div>
+
+
+
+
+<!-- BATTLE LOG -->
+
+<div style="
+margin-top:20px;
+padding:10px;
+border-top:1px solid #334155;
+color:#94A3B8;
+">
+
+
+Battle Log:
+
+<br>
+
+"${enemy.name} appears..."
+
+<br>
+
+"Naruto prepares to attack..."
+
+
+
+</div>
+
 
 
 
