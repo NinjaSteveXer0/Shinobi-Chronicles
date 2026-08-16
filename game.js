@@ -296,6 +296,8 @@ let currentBattle = {
 
   enemyPower: 0,
 
+  enemyMaxPower: 0,
+
   activePlayer: null
 
 };
@@ -312,13 +314,12 @@ const enemyDatabase = {
 
   power: 32,
 
+   stats: {
+    stamina: 34
+  },
+
   image:
     "Enemies/Scout.png",
-
-  powerRange: {
-    min: 350,
-    max: 450
-  }
 
 },
 
@@ -333,13 +334,12 @@ const enemyDatabase = {
 
     power: 41,
 
+     stats: {
+    stamina: 42
+  },
+
     image:
       "Enemies/Bandit.png",
-
-    powerRange: {
-      min: 450,
-      max: 600
-    }
 
   },
 
@@ -354,13 +354,12 @@ const enemyDatabase = {
 
     power: 56,
 
+     stats: {
+    stamina: 58
+  },
+
     image:
       "Enemies/BanditLeader.png",
-
-    powerRange: {
-      min: 600,
-      max: 800
-    }
 
   }
 
@@ -397,15 +396,19 @@ currentBattle.enemy = enemy;
 currentBattle.activePlayer = playerTeam[0];
 
 
+  const generatedBattlePower =
+  calculateBattlePower(
+    enemy,
+    "standard"
+  );
 
 
-  currentBattle.enemyPower =
-    Math.floor(
-      Math.random() *
-      (enemy.powerRange.max - enemy.powerRange.min)
-      +
-      enemy.powerRange.min
-    );
+currentBattle.enemyPower =
+  generatedBattlePower;
+
+
+currentBattle.enemyMaxPower =
+  generatedBattlePower;
 
 
   console.log("CURRENT BATTLE:", currentBattle);
@@ -1449,6 +1452,8 @@ function closeOverlay() {
 
   selectedLocationNode = null;
 
+  saveTestState();
+
 }
 
 // =========================================================
@@ -1477,6 +1482,9 @@ function saveTestState() {
 
     enemyPower:
       currentBattle.enemyPower,
+
+      enemyMaxPower:
+  currentBattle.enemyMaxPower,
 
     activePlayerId:
       currentBattle.activePlayer
@@ -1888,6 +1896,11 @@ function openRegionHub(regionKey) {
 
   regionInfoOpen =
     false;
+
+    currentOverlayType =
+  null;
+
+saveTestState();
 
 
   const overlay =
@@ -2901,6 +2914,65 @@ function formatPL(value) {
   return Number(
     value || 0
   ).toLocaleString();
+
+}
+
+// =========================================================
+// BATTLE POWER CALCULATION
+// =========================================================
+
+function calculateBattlePower(
+  character,
+  encounterType = "standard"
+) {
+
+  const pl =
+    character.basePL !== undefined
+      ? calculateCurrentPL(character)
+      : character.power;
+
+
+  const stamina =
+    character.stats?.stamina || 0;
+
+
+  // Core Battle Power
+  let battlePower =
+    pl +
+    (stamina * 0.5);
+
+
+  // Encounter scaling
+  const multipliers = {
+
+    standard: 1,
+
+    elite: 1.25,
+
+    groupBoss: 8,
+
+    guardBoss: 50
+
+  };
+
+
+  battlePower *=
+    multipliers[encounterType] || 1;
+
+
+  // Small ±10% variation
+  const variation =
+    0.90 +
+    (Math.random() * 0.20);
+
+
+  battlePower *= variation;
+
+
+  return Math.max(
+    1,
+    Math.round(battlePower)
+  );
 
 }
 
@@ -3946,6 +4018,15 @@ function restoreTestState() {
       state.enemyPower;
 
   }
+
+  if (
+  typeof state.enemyMaxPower === "number"
+) {
+
+  currentBattle.enemyMaxPower =
+    state.enemyMaxPower;
+
+}
 
 
   // Restore active player
