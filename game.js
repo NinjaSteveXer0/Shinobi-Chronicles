@@ -3271,7 +3271,7 @@ gap:12px;
 ">
 
 
-<button>
+<button onclick="performNinjutsuAttack()">
 NINJUTSU
 </button>
 
@@ -3357,6 +3357,58 @@ function selectActiveFighter(playerId) {
   console.log(
     "ACTIVE FIGHTER:",
     currentBattle.activePlayer
+  );
+
+
+  openOverlay("combat");
+
+}
+
+// =========================================================
+// 19. NINJUTSU ATTACK
+// =========================================================
+
+function performNinjutsuAttack() {
+
+  const fighter = currentBattle.activePlayer;
+
+  if (!fighter) {
+    console.log("No active fighter selected");
+    return;
+  }
+
+  if (!currentBattle.enemy) {
+    console.log("No enemy in battle");
+    return;
+  }
+
+
+  // Temporary Phase 2C damage formula
+  const damage = Math.max(
+    1,
+    Math.floor(fighter.power * 0.10)
+  );
+
+
+  currentBattle.enemyPower -= damage;
+
+
+  // Enemy PL can never go below zero
+  if (currentBattle.enemyPower < 0) {
+    currentBattle.enemyPower = 0;
+  }
+
+
+  console.log(
+    fighter.name,
+    "used Ninjutsu for",
+    damage,
+    "damage"
+  );
+
+  console.log(
+    "Enemy PL remaining:",
+    currentBattle.enemyPower
   );
 
 
