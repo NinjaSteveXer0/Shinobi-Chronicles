@@ -3480,15 +3480,20 @@ function createCharacterCard(character) {
 function renderCombatOverlay(container) {
 
 
-  const enemy = selectedEnemy;
+  const enemy =
+    selectedEnemy;
 
 
   if (!enemy) {
 
     container.innerHTML = `
-      <h2 style="color:#E53935;">
+
+      <h2 style="
+        color:#E53935;
+      ">
         NO ENEMY SELECTED
       </h2>
+
     `;
 
     return;
@@ -3496,10 +3501,15 @@ function renderCombatOverlay(container) {
   }
 
 
+  console.log(
+    "Combat Arena Loaded"
+  );
 
-  console.log("Combat Arena Loaded");
-  console.log("Enemy:", enemy);
 
+  console.log(
+    "Enemy:",
+    enemy
+  );
 
 
   container.innerHTML = `
@@ -3540,8 +3550,6 @@ BANDIT HIDEOUT
 
 
 
-
-
 <!-- ARENA AREA -->
 
 <div style="
@@ -3552,24 +3560,41 @@ flex:1;
 ">
 
 
+
+<!-- PLAYER TEAM -->
+
 ${playerTeam.map(member => `
 
 <div
-  onclick="selectActiveFighter('${member.id}')"
+  onclick="
+    ${
+      currentBattle.battleOver
+        ? ""
+        : `selectActiveFighter('${member.id}')`
+    }
+  "
+
   style="
-    cursor:pointer;
+    cursor:${
+      currentBattle.battleOver
+        ? "default"
+        : "pointer"
+    };
+
     opacity:${
       currentBattle.activePlayer &&
       currentBattle.activePlayer.id === member.id
         ? "1"
         : "0.65"
     };
+
     transform:${
       currentBattle.activePlayer &&
       currentBattle.activePlayer.id === member.id
         ? "scale(1.05)"
         : "scale(1)"
     };
+
     transition:0.2s ease;
   "
 >
@@ -3590,7 +3615,13 @@ text-align:center;
 
 
 <h2>
-⚔ ACTIVE DUEL ⚔
+
+${
+  currentBattle.battleOver
+    ? "⚔ BATTLE COMPLETE ⚔"
+    : "⚔ ACTIVE DUEL ⚔"
+}
+
 </h2>
 
 
@@ -3603,9 +3634,11 @@ border-radius:10px;
 
 
 <h2>
+
 ${currentBattle.activePlayer
   ? currentBattle.activePlayer.name
   : "NO SHINOBI"}
+
 </h2>
 
 
@@ -3614,16 +3647,26 @@ VS
 </p>
 
 
+
 ${createCharacterCard({
-  name: enemy.name,
-  power: enemy.power,
-  image: enemy.image
+
+  name:
+    enemy.name,
+
+  power:
+    enemy.power,
+
+  image:
+    enemy.image
+
 })}
+
 
 
 ${
   currentBattle.lastDamage > 0
     ? `
+
       <div style="
         color:#E53935;
         font-size:24px;
@@ -3631,24 +3674,32 @@ ${
         margin-top:6px;
         margin-bottom:6px;
       ">
+
         -${currentBattle.lastDamage}
+
       </div>
+
     `
     : ""
 }
 
 
+
 <h2 style="
 color:#E53935;
 ">
+
 ${enemy.name}
+
 </h2>
 
 
 <p style="
 color:#94A3B8;
 ">
+
 ${enemy.rank}
+
 </p>
 
 
@@ -3685,16 +3736,63 @@ PL ${enemy.power}
 
 <br>
 
-Battle Power ${currentBattle.enemyPower}
+Battle Power
+${currentBattle.enemyPower}
+/ ${currentBattle.enemyMaxPower}
+
+</div>
+
+
+</div>
+
 
 </div>
 
 
 
-</div>
+<!-- VICTORY BANNER -->
+
+${
+  currentBattle.battleOver
+    ? `
+
+      <div style="
+        text-align:center;
+        margin-top:18px;
+        margin-bottom:10px;
+        padding:12px;
+        border:1px solid #D6A93A;
+        border-radius:8px;
+      ">
 
 
-</div>
+        <div style="
+          color:#D6A93A;
+          font-size:28px;
+          font-weight:bold;
+        ">
+
+          ⚔ VICTORY ⚔
+
+        </div>
+
+
+        <div style="
+          color:#94A3B8;
+          margin-top:6px;
+        ">
+
+          ${enemy.name}
+          has been defeated.
+
+        </div>
+
+
+      </div>
+
+    `
+    : ""
+}
 
 
 
@@ -3708,28 +3806,70 @@ gap:12px;
 ">
 
 
-<button onclick="performNinjutsuAttack()">
+<button
+  onclick="
+    performNinjutsuAttack()
+  "
+
+  ${
+    currentBattle.battleOver
+      ? "disabled"
+      : ""
+  }
+>
+
 NINJUTSU
+
 </button>
 
 
-<button onclick="performTaijutsuAttack()">
+
+<button
+  onclick="
+    performTaijutsuAttack()
+  "
+
+  ${
+    currentBattle.battleOver
+      ? "disabled"
+      : ""
+  }
+>
+
 TAIJUTSU
+
 </button>
 
 
-<button>
+
+<button
+  ${
+    currentBattle.battleOver
+      ? "disabled"
+      : ""
+  }
+>
+
 ITEM
+
 </button>
 
 
-<button>
+
+<button
+  ${
+    currentBattle.battleOver
+      ? "disabled"
+      : ""
+  }
+>
+
 FORMATION
+
 </button>
 
 
 </div>
-
 
 
 
@@ -3740,23 +3880,45 @@ margin-top:20px;
 padding:10px;
 border-top:1px solid #334155;
 color:#94A3B8;
+max-height:140px;
+overflow-y:auto;
 ">
 
 
+<strong>
 Battle Log:
+</strong>
 
-<br>
 
-"${enemy.name} appears..."
+<br><br>
 
-<br>
 
-"Naruto prepares to attack..."
+${
+  currentBattle.battleLog.length > 0
+    ? currentBattle.battleLog
+        .map(entry => `
 
+          <div style="
+            margin-bottom:5px;
+          ">
+
+            ${entry}
+
+          </div>
+
+        `)
+        .join("")
+    : `
+
+        <div>
+          Battle begins...
+        </div>
+
+      `
+}
 
 
 </div>
-
 
 
 
