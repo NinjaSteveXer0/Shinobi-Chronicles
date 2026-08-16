@@ -3271,7 +3271,7 @@ VS
 
 ${createCharacterCard({
 name: enemy.name,
-power: currentBattle.enemyPower,
+power: enemy.power,
 image: enemy.image
 })}
 
@@ -3319,7 +3319,11 @@ ${enemy.name}
 
 <br>
 
-PL ${currentBattle.enemyPower}
+PL ${enemy.power}
+
+<br>
+
+Battle Power ${currentBattle.enemyPower}
 
 </div>
 
