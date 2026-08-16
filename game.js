@@ -5067,24 +5067,21 @@ ${
 // =========================================================
 
 
+// =========================================================
+// VICTORY NUMBER ANIMATION
+// =========================================================
+
 function animateVictoryNumber(
-  selector,
+  element,
   finalValue,
   duration
 ) {
 
 
-  const element =
-    document.querySelector(
-      selector
-    );
-
-
   if (!element) {
 
     console.log(
-      "Victory number element not found:",
-      selector
+      "Victory number element missing"
     );
 
     return;
@@ -5095,7 +5092,28 @@ function animateVictoryNumber(
   const target =
     Number(
       finalValue
-    ) || 0;
+    );
+
+
+  if (
+    !Number.isFinite(
+      target
+    )
+  ) {
+
+    console.log(
+      "Invalid victory reward value:",
+      finalValue
+    );
+
+    return;
+
+  }
+
+
+  // Start visibly from zero
+  element.textContent =
+    "0";
 
 
   const startTime =
@@ -5154,8 +5172,14 @@ function animateVictoryNumber(
     }
     else {
 
+      // =======================================
+      // GUARANTEE FINAL VALUE
+      // =======================================
+
       element.textContent =
-        target;
+        String(
+          target
+        );
 
     }
 
@@ -5175,8 +5199,72 @@ function animateVictoryNumber(
 // =========================================================
 
 function runVictoryRevealAnimations(
+  container,
   rewards
 ) {
+
+
+  const ryoElement =
+    container.querySelector(
+      ".victory-ryo-number"
+    );
+
+
+  const expElement =
+    container.querySelector(
+      ".victory-exp-number"
+    );
+
+
+  console.log(
+    "VICTORY RYO TARGET:",
+    rewards.ryo
+  );
+
+
+  console.log(
+    "VICTORY EXP TARGET:",
+    rewards.exp
+  );
+
+
+  console.log(
+    "RYO ELEMENT:",
+    ryoElement
+  );
+
+
+  console.log(
+    "EXP ELEMENT:",
+    expElement
+  );
+
+
+  // =========================================
+  // FALLBACK VALUES
+  //
+  // If animation ever fails, Dave STILL
+  // cannot escape without paying.
+  // =========================================
+
+  if (ryoElement) {
+
+    ryoElement.textContent =
+      String(
+        rewards.ryo
+      );
+
+  }
+
+
+  if (expElement) {
+
+    expElement.textContent =
+      String(
+        rewards.exp
+      );
+
+  }
 
 
   // =========================================
@@ -5187,7 +5275,7 @@ function runVictoryRevealAnimations(
     () => {
 
       animateVictoryNumber(
-        ".victory-ryo-number",
+        ryoElement,
         rewards.ryo,
         650
       );
@@ -5205,7 +5293,7 @@ function runVictoryRevealAnimations(
     () => {
 
       animateVictoryNumber(
-        ".victory-exp-number",
+        expElement,
         rewards.exp,
         550
       );
@@ -5216,6 +5304,7 @@ function runVictoryRevealAnimations(
 
 
 }
+
 
 // =========================================================
 // VICTORY SCREEN RENDERER
@@ -6833,8 +6922,9 @@ overflow:hidden;
     () => {
 
       runVictoryRevealAnimations(
-        rewards
-      );
+  container,
+  rewards
+);
 
     }
   );
