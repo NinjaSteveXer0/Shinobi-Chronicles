@@ -3137,7 +3137,7 @@ ${enemy.name}
 
 <br>
 
-PL ???
+PL ${currentBattle.enemyPower}
 
 </div>
 
