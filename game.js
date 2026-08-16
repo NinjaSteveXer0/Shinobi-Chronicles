@@ -300,7 +300,11 @@ let currentBattle = {
 
   activePlayer: null,
 
-  lastDamage: 0
+  lastDamage: 0,
+
+  battleOver: false,
+
+  battleLog: []
 
 };
 
@@ -397,6 +401,13 @@ currentBattle.enemy = enemy;
 
 currentBattle.activePlayer = playerTeam[0];
 currentBattle.lastDamage = 0;
+
+currentBattle.battleOver = false;
+
+currentBattle.battleLog = [
+  `${enemy.name} appears!`,
+  `${playerTeam[0].name} prepares for battle.`
+];
 
 
   const generatedBattlePower =
@@ -3825,15 +3836,15 @@ function performStatAttack(
 
 
   if (
-    currentBattle.enemyPower <= 0
-  ) {
+  currentBattle.battleOver
+) {
 
-    console.log(
-      "Enemy is already defeated"
-    );
+  console.log(
+    "Battle is already over"
+  );
 
-    return;
-  }
+  return;
+}
 
 
   let statName;
@@ -3892,63 +3903,84 @@ function performStatAttack(
   damage;
 
 
-  currentBattle.enemyPower -=
-    damage;
+ currentBattle.enemyPower -=
+  damage;
 
 
-  if (
-    currentBattle.enemyPower < 0
-  ) {
+if (
+  currentBattle.enemyPower < 0
+) {
 
-    currentBattle.enemyPower = 0;
-
-  }
-
-
-  console.log(
-    `${fighter.name} used ${attackType.toUpperCase()}`
-  );
-
-
-  console.log(
-    `${statName.toUpperCase()}:`,
-    attackStat
-  );
-
-
-  console.log(
-    "Damage:",
-    damage
-  );
-
-
-  console.log(
-    "Enemy Battle Power remaining:",
-    currentBattle.enemyPower
-  );
-
-
-  openOverlay("combat");
-
-}
-
-function performNinjutsuAttack() {
-
-  performStatAttack(
-    "ninjutsu"
-  );
+  currentBattle.enemyPower = 0;
 
 }
 
 
-function performTaijutsuAttack() {
+// =========================================
+// BATTLE LOG
+// =========================================
 
-  performStatAttack(
-    "taijutsu"
+const attackLabel =
+  attackType === "ninjutsu"
+    ? "Ninjutsu"
+    : "Taijutsu";
+
+
+currentBattle.battleLog.push(
+  `${fighter.name} used ${attackLabel}!`
+);
+
+
+currentBattle.battleLog.push(
+  `${currentBattle.enemy.name} lost ${damage} Battle Power.`
+);
+
+
+// =========================================
+// VICTORY CHECK
+// =========================================
+
+if (
+  currentBattle.enemyPower <= 0
+) {
+
+  currentBattle.battleOver = true;
+
+  currentBattle.active = false;
+
+
+  currentBattle.battleLog.push(
+    `${currentBattle.enemy.name} has been defeated!`
+  );
+
+
+  currentBattle.battleLog.push(
+    `VICTORY!`
+  );
+
+}
+else {
+
+  currentBattle.battleLog.push(
+    `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
   );
 
 }
 
+
+console.log(
+  `${fighter.name} used ${attackLabel} for ${damage} damage`
+);
+
+console.log(
+  "Enemy Battle Power remaining:",
+  currentBattle.enemyPower
+);
+
+
+openOverlay("combat");
+
+}
 
 // =========================================================
 // 19. ACTIVITY CARD
