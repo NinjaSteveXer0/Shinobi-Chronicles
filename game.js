@@ -2996,6 +2996,59 @@ function renderBattleOverlay(
 }
 
 
+// =========================================================
+// CHARACTER CARD RENDERER
+// =========================================================
+
+
+function createCharacterCard(character) {
+
+
+  return `
+
+    <div style="
+      width:120px;
+      text-align:center;
+      padding:10px;
+      border:1px solid #334155;
+      border-radius:10px;
+      background:#080D18;
+    ">
+
+
+      <img
+        src="${character.image}"
+        style="
+          width:100px;
+          height:140px;
+          object-fit:cover;
+          border-radius:8px;
+        "
+      >
+
+
+      <h4 style="
+        color:#00D9E8;
+        margin:8px 0 3px;
+      ">
+        ${character.name}
+      </h4>
+
+
+      <p style="
+        color:#94A3B8;
+        font-size:12px;
+      ">
+        PL ${character.power}
+      </p>
+
+
+    </div>
+
+
+  `;
+
+}
 
 
 
@@ -3094,10 +3147,6 @@ PL ${member.power}
 `).join("")}
 
 
-
-
-
-
 <!-- ACTIVE DUEL -->
 
 <div style="
@@ -3158,10 +3207,6 @@ ${enemy.rank}
 
 
 </div>
-
-
-
-
 
 
 
