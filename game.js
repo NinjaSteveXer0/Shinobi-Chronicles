@@ -298,7 +298,9 @@ let currentBattle = {
 
   enemyMaxPower: 0,
 
-  activePlayer: null
+  activePlayer: null,
+
+  lastDamage: 0
 
 };
 
@@ -394,6 +396,7 @@ function startEncounter(enemyId) {
 currentBattle.enemy = enemy;
 
 currentBattle.activePlayer = playerTeam[0];
+currentBattle.lastDamage = 0;
 
 
   const generatedBattlePower =
@@ -1483,7 +1486,7 @@ function saveTestState() {
     enemyPower:
       currentBattle.enemyPower,
 
-      enemyMaxPower:
+enemyMaxPower:
   currentBattle.enemyMaxPower,
 
     activePlayerId:
@@ -1897,11 +1900,6 @@ function openRegionHub(regionKey) {
   regionInfoOpen =
     false;
 
-    currentOverlayType =
-  null;
-
-saveTestState();
-
 
   const overlay =
     document.getElementById(
@@ -1927,6 +1925,8 @@ saveTestState();
     regionKey,
     region
   );
+
+  saveTestState();
 
 }
 
@@ -3604,10 +3604,27 @@ VS
 
 
 ${createCharacterCard({
-name: enemy.name,
-power: enemy.power,
-image: enemy.image
+  name: enemy.name,
+  power: enemy.power,
+  image: enemy.image
 })}
+
+
+${
+  currentBattle.lastDamage > 0
+    ? `
+      <div style="
+        color:#E53935;
+        font-size:24px;
+        font-weight:bold;
+        margin-top:6px;
+        margin-bottom:6px;
+      ">
+        -${currentBattle.lastDamage}
+      </div>
+    `
+    : ""
+}
 
 
 <h2 style="
@@ -3779,7 +3796,9 @@ function selectActiveFighter(playerId) {
 
 function performStatAttack(
   attackType
+  
 ) {
+
 
   const fighter =
     currentBattle.activePlayer;
@@ -3868,6 +3887,9 @@ function performStatAttack(
         variation
       )
     );
+
+    currentBattle.lastDamage =
+  damage;
 
 
   currentBattle.enemyPower -=
