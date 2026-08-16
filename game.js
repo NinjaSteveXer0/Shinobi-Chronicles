@@ -3956,6 +3956,24 @@ function renderCombatOverlay(container) {
   }
 
 
+  const rewards =
+    currentBattle.rewards || {
+
+      generated: false,
+
+      ryo: 0,
+
+      exp: 0,
+
+      items: [],
+
+      rareDrops: [],
+
+      finishingShinobi: null
+
+    };
+
+
   console.log(
     "Combat Arena Loaded"
   );
@@ -3964,6 +3982,12 @@ function renderCombatOverlay(container) {
   console.log(
     "Enemy:",
     enemy
+  );
+
+
+  console.log(
+    "Current Rewards:",
+    rewards
   );
 
 
@@ -4180,7 +4204,6 @@ ENEMY TEAM
 </h3>
 
 
-
 <div class="team-slot">
 
 ${enemy.name}
@@ -4193,7 +4216,8 @@ PL ${enemy.power}
 
 Battle Power
 ${currentBattle.enemyPower}
-/ ${currentBattle.enemyMaxPower}
+/
+${currentBattle.enemyMaxPower}
 
 </div>
 
@@ -4205,7 +4229,7 @@ ${currentBattle.enemyPower}
 
 
 
-<!-- VICTORY BANNER -->
+<!-- VICTORY / REWARD PANEL -->
 
 ${
   currentBattle.battleOver
@@ -4214,17 +4238,27 @@ ${
       <div style="
         text-align:center;
         margin-top:18px;
-        margin-bottom:10px;
-        padding:12px;
+        margin-bottom:12px;
+        padding:18px;
         border:1px solid #D6A93A;
         border-radius:8px;
+        background:
+          rgba(
+            5,
+            7,
+            11,
+            0.75
+          );
       ">
 
+
+        <!-- VICTORY TITLE -->
 
         <div style="
           color:#D6A93A;
           font-size:28px;
           font-weight:bold;
+          margin-bottom:4px;
         ">
 
           ⚔ VICTORY ⚔
@@ -4234,11 +4268,250 @@ ${
 
         <div style="
           color:#94A3B8;
-          margin-top:6px;
+          margin-bottom:16px;
         ">
 
           ${enemy.name}
           has been defeated.
+
+        </div>
+
+
+
+        <!-- REWARD TITLE -->
+
+        <div style="
+          color:#00D9E8;
+          font-size:14px;
+          font-weight:bold;
+          letter-spacing:2px;
+          margin-bottom:12px;
+        ">
+
+          BATTLE REWARDS
+
+        </div>
+
+
+
+        <!-- REWARD GRID -->
+
+        <div style="
+          display:grid;
+          grid-template-columns:
+            repeat(
+              5,
+              minmax(110px, 1fr)
+            );
+          gap:10px;
+          max-width:850px;
+          margin:0 auto;
+        ">
+
+
+
+          <!-- RYO -->
+
+          <div style="
+            padding:12px;
+            border:1px solid #334155;
+            border-radius:7px;
+            background:#080D18;
+          ">
+
+            <div style="
+              color:#D6A93A;
+              font-size:11px;
+              font-weight:bold;
+              margin-bottom:5px;
+            ">
+
+              RYŌ
+
+            </div>
+
+            <div style="
+              color:#FFFFFF;
+              font-size:18px;
+              font-weight:bold;
+            ">
+
+              ${rewards.ryo}
+
+            </div>
+
+          </div>
+
+
+
+          <!-- EXP -->
+
+          <div style="
+            padding:12px;
+            border:1px solid #334155;
+            border-radius:7px;
+            background:#080D18;
+          ">
+
+            <div style="
+              color:#00D9E8;
+              font-size:11px;
+              font-weight:bold;
+              margin-bottom:5px;
+            ">
+
+              EXP
+
+            </div>
+
+            <div style="
+              color:#FFFFFF;
+              font-size:18px;
+              font-weight:bold;
+            ">
+
+              ${rewards.exp}
+
+            </div>
+
+          </div>
+
+
+
+          <!-- COMMON ITEM -->
+
+          <div style="
+            padding:12px;
+            border:1px solid #334155;
+            border-radius:7px;
+            background:#080D18;
+          ">
+
+            <div style="
+              color:#94A3B8;
+              font-size:11px;
+              font-weight:bold;
+              margin-bottom:5px;
+            ">
+
+              ITEM
+
+            </div>
+
+            <div style="
+              color:#FFFFFF;
+              font-size:12px;
+              line-height:1.4;
+            ">
+
+              ${
+                rewards.items &&
+                rewards.items.length > 0
+
+                  ? rewards.items
+                      .map(
+                        item =>
+                          item.name
+                      )
+                      .join("<br>")
+
+                  : "NO DROP"
+              }
+
+            </div>
+
+          </div>
+
+
+
+          <!-- RARE DROP -->
+
+          <div style="
+            padding:12px;
+            border:1px solid #334155;
+            border-radius:7px;
+            background:#080D18;
+          ">
+
+            <div style="
+              color:#D6A93A;
+              font-size:11px;
+              font-weight:bold;
+              margin-bottom:5px;
+            ">
+
+              RARE DROP
+
+            </div>
+
+            <div style="
+              color:${
+                rewards.rareDrops &&
+                rewards.rareDrops.length > 0
+                  ? "#D6A93A"
+                  : "#64748B"
+              };
+
+              font-size:12px;
+              font-weight:bold;
+              line-height:1.4;
+            ">
+
+              ${
+                rewards.rareDrops &&
+                rewards.rareDrops.length > 0
+
+                  ? rewards.rareDrops
+                      .map(
+                        item =>
+                          `★ ${item.name}`
+                      )
+                      .join("<br>")
+
+                  : "NO DROP"
+              }
+
+            </div>
+
+          </div>
+
+
+
+          <!-- FINISHING SHINOBI -->
+
+          <div style="
+            padding:12px;
+            border:1px solid #334155;
+            border-radius:7px;
+            background:#080D18;
+          ">
+
+            <div style="
+              color:#00D9E8;
+              font-size:11px;
+              font-weight:bold;
+              margin-bottom:5px;
+            ">
+
+              FINAL STRIKE
+
+            </div>
+
+            <div style="
+              color:#FFFFFF;
+              font-size:12px;
+              font-weight:bold;
+            ">
+
+              ${
+                rewards.finishingShinobi ||
+                "UNKNOWN"
+              }
+
+            </div>
+
+          </div>
+
 
         </div>
 
