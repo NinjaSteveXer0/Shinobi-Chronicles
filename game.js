@@ -1913,146 +1913,209 @@ var currentOverlayType = null;
 
 function openOverlay(type) {
 
-  currentOverlayType = type;
+
+  currentOverlayType =
+    type;
+
 
   const overlay =
-    document.getElementById("screen-overlay");
+    document.getElementById(
+      "screen-overlay"
+    );
+
 
   const container =
-    document.getElementById("overlay-content-container");
+    document.getElementById(
+      "overlay-content-container"
+    );
 
 
-  if (!overlay || !container) {
+  if (
+    !overlay ||
+    !container
+  ) {
+
     return;
+
   }
+
 
   saveTestState();
 
 
-
-  overlay.style.display = "flex";
+  overlay.style.display =
+    "flex";
 
 
   switch (type) {
 
+
     case "clan":
-  renderClanOverlay(container);
-  break;
+
+      renderClanOverlay(
+        container
+      );
+
+      break;
+
 
     case "village":
-      renderVillageOverlay(container);
+
+      renderVillageOverlay(
+        container
+      );
+
       break;
 
 
     case "missions":
+
       renderGenericOverlay(
         container,
         "MISSION BOARD",
         "Choose story missions, side missions and regional assignments."
       );
+
       break;
 
 
     case "battle":
-      renderBattleOverlay(container);
+
+      renderBattleOverlay(
+        container
+      );
+
       break;
 
-      case "combat":
 
-  renderCombatOverlay(container);
+    case "combat":
 
-break;
+      renderCombatOverlay(
+        container
+      );
+
+      break;
+
+
+    case "victory":
+
+      renderVictoryOverlay(
+        container
+      );
+
+      break;
 
 
     case "training":
-      renderTrainingOverlay(container);
+
+      renderTrainingOverlay(
+        container
+      );
+
       break;
 
 
     case "events":
+
       renderGenericOverlay(
         container,
         "WORLD EVENTS",
         "Limited-time regional encounters and special rewards will appear here."
       );
+
       break;
 
 
     case "roster":
+
       renderGenericOverlay(
         container,
         "SHINOBI ROSTER",
         "Manage your recruited ninja, team composition and character progression."
       );
+
       break;
 
 
     case "shop":
+
       renderGenericOverlay(
         container,
         "SPECIAL SHOP",
         "Purchase rare scrolls, equipment and special items."
       );
+
       break;
 
 
     case "exams":
+
       renderGenericOverlay(
         container,
         "SHINOBI EXAMS",
         "Take rank exams to progress through the shinobi hierarchy."
       );
+
       break;
 
 
     case "practical":
+
       renderGenericOverlay(
         container,
         "PRACTICAL TRAINING",
         "Complete tactical tests and practical shinobi exercises."
       );
+
       break;
 
 
     case "group":
+
       renderGenericOverlay(
         container,
         "GROUP",
         "Manage squads, teams and future clan-based activities."
       );
+
       break;
 
 
     case "defend":
+
       renderGenericOverlay(
         container,
         "VILLAGE DEFENCE",
         "Defend your territory from invading rogue shinobi and hostile factions."
       );
+
       break;
 
 
     case "kage":
+
       renderGenericOverlay(
         container,
         "KAGE",
         "Endgame leadership systems and Kage-level responsibilities."
       );
+
       break;
 
 
     default:
+
       renderGenericOverlay(
         container,
         "SYSTEM ACTIVE",
         "This Shinobi Chronicles module is currently under development."
       );
+
       break;
+
   }
+
 }
-
-
-
 
 // =========================================================
 // 4. CLOSE / BACK OVERLAY
@@ -2061,22 +2124,62 @@ break;
 function closeOverlay() {
 
 
-  // COMBAT
+  // =========================================
+  // VICTORY SCREEN
   // Return to encounter selection
-  if (currentOverlayType === "combat") {
+  // =========================================
 
-    currentBattle.active = false;
+  if (
+    currentOverlayType ===
+    "victory"
+  ) {
 
-    openOverlay("battle");
+    currentBattle.active =
+      false;
+
+
+    openOverlay(
+      "battle"
+    );
+
 
     return;
+
   }
 
 
+  // =========================================
+  // COMBAT
+  // Return to encounter selection
+  // =========================================
+
+  if (
+    currentOverlayType ===
+    "combat"
+  ) {
+
+    currentBattle.active =
+      false;
+
+
+    openOverlay(
+      "battle"
+    );
+
+
+    return;
+
+  }
+
+
+  // =========================================
   // BATTLE / LOCATION SCREEN
   // Return to current region map
+  // =========================================
+
   if (
-    currentOverlayType === "battle" &&
+    currentOverlayType ===
+      "battle" &&
     selectedRegionKey
   ) {
 
@@ -2084,27 +2187,37 @@ function closeOverlay() {
       selectedRegionKey
     );
 
+
     return;
+
   }
 
 
+  // =========================================
   // OTHER REGION SUB-SCREENS
-  // Return to current region where possible
+  // =========================================
+
   if (
     selectedRegionKey &&
-    currentOverlayType !== "region"
+    currentOverlayType !==
+      "region"
   ) {
 
     openRegionHub(
       selectedRegionKey
     );
 
+
     return;
+
   }
 
 
+  // =========================================
   // REGION MAP
   // Return to world map
+  // =========================================
+
   const overlay =
     document.getElementById(
       "screen-overlay"
@@ -2112,7 +2225,9 @@ function closeOverlay() {
 
 
   if (!overlay) {
+
     return;
+
   }
 
 
@@ -2125,11 +2240,17 @@ function closeOverlay() {
   );
 
 
-  currentOverlayType = null;
+  currentOverlayType =
+    null;
 
-  selectedRegionKey = null;
 
-  selectedLocationNode = null;
+  selectedRegionKey =
+    null;
+
+
+  selectedLocationNode =
+    null;
+
 
   saveTestState();
 
@@ -2141,44 +2262,76 @@ function closeOverlay() {
 
 function saveTestState() {
 
+
   const state = {
+
 
     overlayType:
       currentOverlayType,
 
+
     regionKey:
       selectedRegionKey,
+
 
     locationId:
       selectedLocationNode
         ? selectedLocationNode.id
         : null,
 
+
     enemyId:
       selectedEnemy
         ? selectedEnemy.id
         : null,
 
+
     enemyPower:
       currentBattle.enemyPower,
 
-enemyMaxPower:
-  currentBattle.enemyMaxPower,
+
+    enemyMaxPower:
+      currentBattle.enemyMaxPower,
+
 
     activePlayerId:
       currentBattle.activePlayer
         ? currentBattle.activePlayer.id
-        : null
+        : null,
+
+
+    lastDamage:
+      currentBattle.lastDamage,
+
+
+    battleOver:
+      currentBattle.battleOver,
+
+
+    battleLog:
+      currentBattle.battleLog,
+
+
+    rewards:
+      currentBattle.rewards,
+
+
+    contributions:
+      currentBattle.contributions ||
+      {}
 
   };
 
 
   sessionStorage.setItem(
     "shinobiTestState",
-    JSON.stringify(state)
+    JSON.stringify(
+      state
+    )
   );
 
 }
+
 
 // =========================================================
 // 5. GENERIC OVERLAY
@@ -4910,6 +5063,581 @@ ${
 }
 
 // =========================================================
+// 17B. VICTORY RESULTS SCREEN
+// =========================================================
+
+function renderVictoryOverlay(
+  container
+) {
+
+
+  const enemy =
+    currentBattle.enemy ||
+    selectedEnemy;
+
+
+  const rewards =
+    currentBattle.rewards || {
+
+      generated:
+        false,
+
+      ryo:
+        0,
+
+      exp:
+        0,
+
+      items:
+        [],
+
+      rareDrops:
+        [],
+
+      finishingShinobi:
+        null,
+
+      mvp:
+        null
+
+    };
+
+
+  if (!enemy) {
+
+    container.innerHTML = `
+
+      <h2 style="
+        color:#E53935;
+      ">
+        NO BATTLE RESULT AVAILABLE
+      </h2>
+
+    `;
+
+
+    return;
+
+  }
+
+
+  const itemText =
+
+    rewards.items &&
+    rewards.items.length > 0
+
+      ? rewards.items
+          .map(
+            item =>
+              item.name
+          )
+          .join("<br>")
+
+      : "NO DROP";
+
+
+  const rareDropText =
+
+    rewards.rareDrops &&
+    rewards.rareDrops.length > 0
+
+      ? rewards.rareDrops
+          .map(
+            item =>
+              `★ ${item.name}`
+          )
+          .join("<br>")
+
+      : "NO DROP";
+
+
+  const mvpName =
+
+    rewards.mvp
+      ? rewards.mvp.name
+      : "NO MVP";
+
+
+  const mvpPercentage =
+
+    rewards.mvp
+      ? `${rewards.mvp.percentage}%`
+      : "—";
+
+
+  const finalStrike =
+
+    rewards.finishingShinobi ||
+    "UNKNOWN";
+
+
+  container.innerHTML = `
+
+
+<div style="
+width:100%;
+height:100%;
+min-height:0;
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+box-sizing:border-box;
+padding:12px 18px 18px 18px;
+overflow:hidden;
+">
+
+
+  <!-- VICTORY ART WRAPPER -->
+
+  <div style="
+    position:relative;
+    width:min(
+      94vw,
+      calc(76vh * 1.3333)
+    );
+    aspect-ratio:4 / 3;
+    max-width:1180px;
+    flex-shrink:1;
+  ">
+
+
+    <!-- BACKGROUND ART -->
+
+    <img
+      src="Assets/Backgrounds/Victory.png"
+
+      alt="Victory"
+
+      style="
+        position:absolute;
+        inset:0;
+        width:100%;
+        height:100%;
+        object-fit:contain;
+        display:block;
+      "
+    >
+
+
+
+    <!-- DEFEATED ENEMY -->
+
+    <div style="
+      position:absolute;
+      top:64%;
+      left:50%;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+      color:#CBD5E1;
+      font-size:clamp(
+        8px,
+        0.9vw,
+        13px
+      );
+      text-align:center;
+      text-shadow:
+        0 2px 5px #000000;
+      pointer-events:none;
+    ">
+
+      ${enemy.name}
+      DEFEATED
+
+    </div>
+
+
+
+    <!-- ============================== -->
+    <!-- REWARD SLOT 1: RYO -->
+    <!-- ============================== -->
+
+    <div style="
+      position:absolute;
+      left:12%;
+      top:82%;
+      width:14%;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+      text-align:center;
+      pointer-events:none;
+    ">
+
+      <div style="
+        color:#D6A93A;
+        font-size:clamp(
+          8px,
+          0.9vw,
+          12px
+        );
+        font-weight:bold;
+        letter-spacing:1px;
+      ">
+        RYŌ
+      </div>
+
+      <div style="
+        color:#FFFFFF;
+        font-size:clamp(
+          13px,
+          1.7vw,
+          24px
+        );
+        font-weight:bold;
+        margin-top:3px;
+        text-shadow:
+          0 2px 6px #000000;
+      ">
+
+        ${rewards.ryo}
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ============================== -->
+    <!-- REWARD SLOT 2: EXP -->
+    <!-- ============================== -->
+
+    <div style="
+      position:absolute;
+      left:28.5%;
+      top:82%;
+      width:14%;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+      text-align:center;
+      pointer-events:none;
+    ">
+
+      <div style="
+        color:#00D9E8;
+        font-size:clamp(
+          8px,
+          0.9vw,
+          12px
+        );
+        font-weight:bold;
+        letter-spacing:1px;
+      ">
+        EXP
+      </div>
+
+      <div style="
+        color:#FFFFFF;
+        font-size:clamp(
+          13px,
+          1.7vw,
+          24px
+        );
+        font-weight:bold;
+        margin-top:3px;
+        text-shadow:
+          0 2px 6px #000000;
+      ">
+
+        ${rewards.exp}
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ============================== -->
+    <!-- REWARD SLOT 3: ITEM -->
+    <!-- ============================== -->
+
+    <div style="
+      position:absolute;
+      left:45%;
+      top:82%;
+      width:14%;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+      text-align:center;
+      pointer-events:none;
+    ">
+
+      <div style="
+        color:#94A3B8;
+        font-size:clamp(
+          8px,
+          0.9vw,
+          12px
+        );
+        font-weight:bold;
+        letter-spacing:1px;
+      ">
+        ITEM
+      </div>
+
+      <div style="
+        color:#FFFFFF;
+        font-size:clamp(
+          8px,
+          1vw,
+          14px
+        );
+        font-weight:bold;
+        margin-top:4px;
+        line-height:1.25;
+        text-shadow:
+          0 2px 6px #000000;
+      ">
+
+        ${itemText}
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ============================== -->
+    <!-- REWARD SLOT 4: RARE DROP -->
+    <!-- ============================== -->
+
+    <div style="
+      position:absolute;
+      left:61.5%;
+      top:82%;
+      width:14%;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+      text-align:center;
+      pointer-events:none;
+    ">
+
+      <div style="
+        color:#D6A93A;
+        font-size:clamp(
+          8px,
+          0.9vw,
+          12px
+        );
+        font-weight:bold;
+        letter-spacing:1px;
+      ">
+        RARE
+      </div>
+
+      <div style="
+        color:${
+          rewards.rareDrops &&
+          rewards.rareDrops.length > 0
+
+            ? "#FFD76A"
+
+            : "#64748B"
+        };
+
+        font-size:clamp(
+          8px,
+          1vw,
+          14px
+        );
+
+        font-weight:bold;
+        margin-top:4px;
+        line-height:1.25;
+        text-shadow:
+          0 2px 6px #000000;
+      ">
+
+        ${rareDropText}
+
+      </div>
+
+    </div>
+
+
+
+    <!-- ============================== -->
+    <!-- REWARD SLOT 5: MVP -->
+    <!-- ============================== -->
+
+    <div style="
+      position:absolute;
+      left:78%;
+      top:81.5%;
+      width:15%;
+      transform:
+        translate(
+          -50%,
+          -50%
+        );
+      text-align:center;
+      pointer-events:none;
+    ">
+
+      <div style="
+        color:#00D9E8;
+        font-size:clamp(
+          8px,
+          0.9vw,
+          12px
+        );
+        font-weight:bold;
+        letter-spacing:1px;
+      ">
+        ★ MVP ★
+      </div>
+
+      <div style="
+        color:#FFFFFF;
+        font-size:clamp(
+          8px,
+          1vw,
+          14px
+        );
+        font-weight:bold;
+        margin-top:3px;
+        line-height:1.2;
+        text-shadow:
+          0 2px 6px #000000;
+      ">
+
+        ${mvpName}
+
+      </div>
+
+
+      <div style="
+        color:#00D9E8;
+        font-size:clamp(
+          7px,
+          0.8vw,
+          11px
+        );
+        margin-top:2px;
+      ">
+
+        ${mvpPercentage}
+        DAMAGE
+
+      </div>
+
+
+      <div style="
+        color:#94A3B8;
+        font-size:clamp(
+          6px,
+          0.65vw,
+          9px
+        );
+        margin-top:3px;
+      ">
+
+        FINAL:
+        ${finalStrike}
+
+      </div>
+
+    </div>
+
+
+
+  </div>
+
+
+
+  <!-- CONTINUE BUTTON -->
+
+  <button
+
+    onclick="
+      continueAfterVictory()
+    "
+
+    style="
+      margin-top:10px;
+      min-width:180px;
+      padding:10px 24px;
+
+      background:
+        linear-gradient(
+          180deg,
+          #E4BD52,
+          #B98B25
+        );
+
+      color:#05070B;
+
+      border:
+        1px solid #F3D675;
+
+      border-radius:5px;
+
+      font-size:11px;
+      font-weight:bold;
+
+      letter-spacing:1px;
+
+      cursor:pointer;
+
+      box-shadow:
+        0 0 18px
+        rgba(
+          214,
+          169,
+          58,
+          0.22
+        );
+    "
+  >
+
+    CONTINUE
+
+  </button>
+
+
+</div>
+
+
+`;
+
+}
+
+
+
+// =========================================================
+// VICTORY CONTINUE
+// =========================================================
+
+function continueAfterVictory() {
+
+
+  currentBattle.active =
+    false;
+
+
+  openOverlay(
+    "battle"
+  );
+
+}
+
+
+
+// =========================================================
 // 18. SELECT ACTIVE FIGHTER
 // =========================================================
 
@@ -4967,7 +5695,9 @@ function performStatAttack(
   }
 
 
-  if (!currentBattle.enemy) {
+  if (
+    !currentBattle.enemy
+  ) {
 
     console.log(
       "No enemy in battle"
@@ -4994,7 +5724,9 @@ function performStatAttack(
   let statName;
 
 
-  switch (attackType) {
+  switch (
+    attackType
+  ) {
 
 
     case "ninjutsu":
@@ -5026,7 +5758,9 @@ function performStatAttack(
 
 
   const attackStat =
-    fighter.stats[statName];
+    fighter.stats[
+      statName
+    ];
 
 
   // =========================================
@@ -5034,13 +5768,14 @@ function performStatAttack(
   // =========================================
 
   const baseDamage =
-    attackStat * 0.20;
+    attackStat *
+    0.20;
 
 
-  // Small ±10% combat variation
   const variation =
     0.90 +
-    Math.random() * 0.20;
+    Math.random() *
+    0.20;
 
 
   const calculatedDamage =
@@ -5103,8 +5838,12 @@ function performStatAttack(
   // =========================================
 
   const attackLabel =
-    attackType === "ninjutsu"
+
+    attackType ===
+      "ninjutsu"
+
       ? "Ninjutsu"
+
       : "Taijutsu";
 
 
@@ -5178,10 +5917,6 @@ function performStatAttack(
     );
 
 
-    // =======================================
-    // MVP
-    // =======================================
-
     if (mvp) {
 
       currentBattle.battleLog.push(
@@ -5232,15 +5967,28 @@ function performStatAttack(
 
     }
 
-  }
-  else {
 
+    // =======================================
+    // OPEN DEDICATED VICTORY SCREEN
+    // =======================================
 
-    currentBattle.battleLog.push(
-      `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
+    openOverlay(
+      "victory"
     );
 
+
+    return;
+
   }
+
+
+  // =========================================
+  // BATTLE CONTINUES
+  // =========================================
+
+  currentBattle.battleLog.push(
+    `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
+  );
 
 
   // =========================================
@@ -5311,7 +6059,6 @@ function performTaijutsuAttack() {
   );
 
 }
-
 
 
 // =========================================================
@@ -5446,48 +6193,71 @@ function restoreTestState() {
 
 
   if (!saved) {
+
     return;
+
   }
 
 
   const state =
-    JSON.parse(saved);
+    JSON.parse(
+      saved
+    );
 
 
-  // Restore region
+  // =========================================
+  // RESTORE REGION
+  // =========================================
+
   if (
     state.regionKey &&
-    worldRegions[state.regionKey]
+    worldRegions[
+      state.regionKey
+    ]
   ) {
+
 
     selectedRegionKey =
       state.regionKey;
 
 
-    if (state.locationId) {
+    if (
+      state.locationId
+    ) {
 
       selectedLocationNode =
-        worldRegions[state.regionKey]
+        worldRegions[
+          state.regionKey
+        ]
           .locations
           .find(
             location =>
               location.id ===
               state.locationId
-          ) || null;
+          ) ||
+        null;
 
     }
 
   }
 
 
-  // Restore enemy
+  // =========================================
+  // RESTORE ENEMY
+  // =========================================
+
   if (
     state.enemyId &&
-    enemyDatabase[state.enemyId]
+    enemyDatabase[
+      state.enemyId
+    ]
   ) {
 
     selectedEnemy =
-      enemyDatabase[state.enemyId];
+      enemyDatabase[
+        state.enemyId
+      ];
+
 
     currentBattle.enemy =
       selectedEnemy;
@@ -5495,9 +6265,14 @@ function restoreTestState() {
   }
 
 
-  // Restore Battle Power
+  // =========================================
+  // RESTORE BATTLE POWER
+  // =========================================
+
   if (
-    typeof state.enemyPower === "number"
+    typeof
+      state.enemyPower ===
+    "number"
   ) {
 
     currentBattle.enemyPower =
@@ -5505,38 +6280,112 @@ function restoreTestState() {
 
   }
 
+
   if (
-  typeof state.enemyMaxPower === "number"
-) {
+    typeof
+      state.enemyMaxPower ===
+    "number"
+  ) {
 
-  currentBattle.enemyMaxPower =
-    state.enemyMaxPower;
+    currentBattle.enemyMaxPower =
+      state.enemyMaxPower;
 
-}
+  }
 
 
-  // Restore active player
-  if (state.activePlayerId) {
+  // =========================================
+  // RESTORE ACTIVE PLAYER
+  // =========================================
+
+  if (
+    state.activePlayerId
+  ) {
 
     currentBattle.activePlayer =
       playerTeam.find(
         member =>
           member.id ===
           state.activePlayerId
-      ) || playerTeam[0];
+      ) ||
+      playerTeam[0];
 
   }
 
 
-  // Restore screen
+  // =========================================
+  // RESTORE BATTLE DATA
+  // =========================================
+
+  currentBattle.lastDamage =
+
+    typeof state.lastDamage ===
+      "number"
+
+      ? state.lastDamage
+
+      : 0;
+
+
+  currentBattle.battleOver =
+    state.battleOver ===
+    true;
+
+
+  currentBattle.battleLog =
+
+    Array.isArray(
+      state.battleLog
+    )
+
+      ? state.battleLog
+
+      : [];
+
+
+  currentBattle.rewards =
+
+    state.rewards &&
+    typeof state.rewards ===
+      "object"
+
+      ? state.rewards
+
+      : currentBattle.rewards;
+
+
+  currentBattle.contributions =
+
+    state.contributions &&
+    typeof state.contributions ===
+      "object"
+
+      ? state.contributions
+
+      : {};
+
+
+  // =========================================
+  // RESTORE SCREEN
+  // =========================================
+
   if (
-    state.overlayType === "combat" &&
+    state.overlayType ===
+      "victory" &&
     selectedEnemy
   ) {
 
-    currentBattle.active = true;
+    currentBattle.active =
+      false;
 
-    openOverlay("combat");
+
+    currentBattle.battleOver =
+      true;
+
+
+    openOverlay(
+      "victory"
+    );
+
 
     return;
 
@@ -5544,11 +6393,35 @@ function restoreTestState() {
 
 
   if (
-    state.overlayType === "battle" &&
+    state.overlayType ===
+      "combat" &&
+    selectedEnemy
+  ) {
+
+    currentBattle.active =
+      true;
+
+
+    openOverlay(
+      "combat"
+    );
+
+
+    return;
+
+  }
+
+
+  if (
+    state.overlayType ===
+      "battle" &&
     selectedRegionKey
   ) {
 
-    openOverlay("battle");
+    openOverlay(
+      "battle"
+    );
+
 
     return;
 
@@ -5556,7 +6429,8 @@ function restoreTestState() {
 
 
   if (
-    state.overlayType === "region" &&
+    state.overlayType ===
+      "region" &&
     selectedRegionKey
   ) {
 
@@ -5567,6 +6441,8 @@ function restoreTestState() {
   }
 
 }
+
+
 
 window.addEventListener(
   "load",
