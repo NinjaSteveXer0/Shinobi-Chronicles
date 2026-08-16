@@ -3807,9 +3807,7 @@ function selectActiveFighter(playerId) {
 
 function performStatAttack(
   attackType
-  
 ) {
-
 
   const fighter =
     currentBattle.activePlayer;
@@ -3836,15 +3834,15 @@ function performStatAttack(
 
 
   if (
-  currentBattle.battleOver
-) {
+    currentBattle.battleOver
+  ) {
 
-  console.log(
-    "Battle is already over"
-  );
+    console.log(
+      "Battle is already over"
+    );
 
-  return;
-}
+    return;
+  }
 
 
   let statName;
@@ -3853,12 +3851,18 @@ function performStatAttack(
   switch (attackType) {
 
     case "ninjutsu":
+
       statName = "nin";
+
       break;
 
+
     case "taijutsu":
+
       statName = "tai";
+
       break;
+
 
     default:
 
@@ -3877,7 +3881,7 @@ function performStatAttack(
 
 
   // =========================================
-  // BRICK 5 DAMAGE FORMULA
+  // DAMAGE FORMULA
   // =========================================
 
   const baseDamage =
@@ -3899,88 +3903,136 @@ function performStatAttack(
       )
     );
 
-    currentBattle.lastDamage =
-  damage;
+
+  currentBattle.lastDamage =
+    damage;
 
 
- currentBattle.enemyPower -=
-  damage;
+  currentBattle.enemyPower -=
+    damage;
 
 
-if (
-  currentBattle.enemyPower < 0
-) {
+  // Enemy Battle Power cannot go below 0
+  if (
+    currentBattle.enemyPower < 0
+  ) {
 
-  currentBattle.enemyPower = 0;
+    currentBattle.enemyPower = 0;
 
-}
-
-
-// =========================================
-// BATTLE LOG
-// =========================================
-
-const attackLabel =
-  attackType === "ninjutsu"
-    ? "Ninjutsu"
-    : "Taijutsu";
+  }
 
 
-currentBattle.battleLog.push(
-  `${fighter.name} used ${attackLabel}!`
-);
+  // =========================================
+  // BATTLE LOG
+  // =========================================
 
-
-currentBattle.battleLog.push(
-  `${currentBattle.enemy.name} lost ${damage} Battle Power.`
-);
-
-
-// =========================================
-// VICTORY CHECK
-// =========================================
-
-if (
-  currentBattle.enemyPower <= 0
-) {
-
-  currentBattle.battleOver = true;
-
-  currentBattle.active = false;
+  const attackLabel =
+    attackType === "ninjutsu"
+      ? "Ninjutsu"
+      : "Taijutsu";
 
 
   currentBattle.battleLog.push(
-    `${currentBattle.enemy.name} has been defeated!`
+    `${fighter.name} used ${attackLabel}!`
   );
 
 
   currentBattle.battleLog.push(
-    `VICTORY!`
+    `${currentBattle.enemy.name} lost ${damage} Battle Power.`
+  );
+
+
+  // =========================================
+  // VICTORY CHECK
+  // =========================================
+
+  if (
+    currentBattle.enemyPower <= 0
+  ) {
+
+    currentBattle.battleOver =
+      true;
+
+
+    currentBattle.active =
+      false;
+
+
+    currentBattle.battleLog.push(
+      `${currentBattle.enemy.name} has been defeated!`
+    );
+
+
+    currentBattle.battleLog.push(
+      "VICTORY!"
+    );
+
+  }
+  else {
+
+    currentBattle.battleLog.push(
+      `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
+    );
+
+  }
+
+
+  // =========================================
+  // DEBUG LOGGING
+  // =========================================
+
+  console.log(
+    `${fighter.name} used ${attackLabel}`
+  );
+
+
+  console.log(
+    `${statName.toUpperCase()}:`,
+    attackStat
+  );
+
+
+  console.log(
+    "Damage:",
+    damage
+  );
+
+
+  console.log(
+    "Enemy Battle Power remaining:",
+    currentBattle.enemyPower
+  );
+
+
+  // Refresh combat screen
+  openOverlay(
+    "combat"
   );
 
 }
-else {
 
-  currentBattle.battleLog.push(
-    `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
+
+// =========================================================
+// ATTACK BUTTON WRAPPERS
+// =========================================================
+
+function performNinjutsuAttack() {
+
+  performStatAttack(
+    "ninjutsu"
   );
 
 }
 
 
-console.log(
-  `${fighter.name} used ${attackLabel} for ${damage} damage`
-);
+function performTaijutsuAttack() {
 
-console.log(
-  "Enemy Battle Power remaining:",
-  currentBattle.enemyPower
-);
-
-
-openOverlay("combat");
+  performStatAttack(
+    "taijutsu"
+  );
 
 }
+
 
 // =========================================================
 // 19. ACTIVITY CARD
