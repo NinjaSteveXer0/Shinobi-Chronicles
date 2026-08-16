@@ -5066,6 +5066,159 @@ ${
 // 17B. VICTORY RESULTS SCREEN
 // =========================================================
 
+
+// =========================================================
+// VICTORY NUMBER ANIMATION
+// =========================================================
+
+function animateVictoryNumber(
+  elementId,
+  finalValue,
+  duration
+) {
+
+
+  const element =
+    document.getElementById(
+      elementId
+    );
+
+
+  if (!element) {
+
+    return;
+
+  }
+
+
+  const target =
+    Number(
+      finalValue
+    ) || 0;
+
+
+  const startTime =
+    performance.now();
+
+
+  function updateNumber(
+    currentTime
+  ) {
+
+
+    const elapsed =
+      currentTime -
+      startTime;
+
+
+    const progress =
+      Math.min(
+        elapsed /
+        duration,
+        1
+      );
+
+
+    // Ease-out animation
+    const easedProgress =
+      1 -
+      Math.pow(
+        1 - progress,
+        3
+      );
+
+
+    const currentValue =
+      Math.round(
+        target *
+        easedProgress
+      );
+
+
+    element.textContent =
+      currentValue;
+
+
+    if (
+      progress < 1
+    ) {
+
+      requestAnimationFrame(
+        updateNumber
+      );
+
+    }
+    else {
+
+      element.textContent =
+        target;
+
+    }
+
+  }
+
+
+  requestAnimationFrame(
+    updateNumber
+  );
+
+}
+
+
+
+// =========================================================
+// VICTORY REWARD REVEAL SEQUENCE
+// =========================================================
+
+function runVictoryRevealAnimations(
+  rewards
+) {
+
+
+  // =========================================
+  // RYO COUNT-UP
+  // =========================================
+
+  setTimeout(
+    () => {
+
+      animateVictoryNumber(
+        "victory-ryo-value",
+        rewards.ryo,
+        650
+      );
+
+    },
+    950
+  );
+
+
+  // =========================================
+  // EXP COUNT-UP
+  // =========================================
+
+  setTimeout(
+    () => {
+
+      animateVictoryNumber(
+        "victory-exp-value",
+        rewards.exp,
+        550
+      );
+
+    },
+    1350
+  );
+
+
+}
+
+
+
+// =========================================================
+// VICTORY SCREEN RENDERER
+// =========================================================
+
 function renderVictoryOverlay(
   container
 ) {
@@ -5130,10 +5283,6 @@ function renderVictoryOverlay(
     rewards.mvp;
 
 
-  // If MVP data somehow did not survive
-  // the victory transition, rebuild it
-  // from the battle contribution data.
-
   if (!battleMVP) {
 
     battleMVP =
@@ -5192,6 +5341,17 @@ function renderVictoryOverlay(
 
 
   // =========================================
+  // RARE DROP STATUS
+  // =========================================
+
+  const hasRareDrop =
+
+    rewards.rareDrops &&
+    rewards.rareDrops.length > 0;
+
+
+
+  // =========================================
   // MVP DETAILS
   // =========================================
 
@@ -5223,20 +5383,700 @@ function renderVictoryOverlay(
 
 
 
-  console.log(
-    "VICTORY REWARDS:",
-    rewards
-  );
-
-
-  console.log(
-    "VICTORY MVP:",
-    battleMVP
-  );
-
-
-
   container.innerHTML = `
+
+
+<style>
+
+
+/* ========================================= */
+/* VICTORY ART ENTRANCE */
+/* ========================================= */
+
+@keyframes victoryArtEntrance {
+
+  0% {
+
+    opacity:0;
+
+    transform:
+      scale(0.96);
+
+    filter:
+      brightness(0.5);
+
+  }
+
+
+  100% {
+
+    opacity:1;
+
+    transform:
+      scale(1);
+
+    filter:
+      brightness(1);
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* STANDARD REWARD REVEAL */
+/* ========================================= */
+
+@keyframes victoryRewardReveal {
+
+  0% {
+
+    opacity:0;
+
+    transform:
+      translate(
+        -50%,
+        -42%
+      )
+      scale(0.82);
+
+    filter:
+      blur(3px);
+
+  }
+
+
+  65% {
+
+    opacity:1;
+
+    transform:
+      translate(
+        -50%,
+        -52%
+      )
+      scale(1.06);
+
+    filter:
+      blur(0px);
+
+  }
+
+
+  100% {
+
+    opacity:1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1);
+
+    filter:
+      blur(0px);
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* GOLD REWARD FLASH */
+/* ========================================= */
+
+@keyframes victoryGoldFlash {
+
+  0% {
+
+    text-shadow:
+      0 0 0px
+      rgba(
+        255,
+        215,
+        100,
+        0
+      );
+
+  }
+
+
+  45% {
+
+    text-shadow:
+      0 0 24px
+      rgba(
+        255,
+        215,
+        100,
+        1
+      );
+
+  }
+
+
+  100% {
+
+    text-shadow:
+      0 2px 6px
+      #000000;
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* TEAL REWARD FLASH */
+/* ========================================= */
+
+@keyframes victoryTealFlash {
+
+  0% {
+
+    text-shadow:
+      0 0 0px
+      rgba(
+        0,
+        217,
+        232,
+        0
+      );
+
+  }
+
+
+  50% {
+
+    text-shadow:
+      0 0 24px
+      rgba(
+        0,
+        217,
+        232,
+        1
+      );
+
+  }
+
+
+  100% {
+
+    text-shadow:
+      0 2px 6px
+      #000000;
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* RARE DROP EXPLOSION */
+/* ========================================= */
+
+@keyframes victoryRareReveal {
+
+  0% {
+
+    opacity:0;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(0.55);
+
+    filter:
+      brightness(0.4);
+
+  }
+
+
+  35% {
+
+    opacity:1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1.18);
+
+    filter:
+      brightness(2);
+
+  }
+
+
+  55% {
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(0.94);
+
+  }
+
+
+  75% {
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1.06);
+
+  }
+
+
+  100% {
+
+    opacity:1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1);
+
+    filter:
+      brightness(1);
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* RARE DROP GLOW */
+/* ========================================= */
+
+@keyframes victoryRareGlow {
+
+  0%,
+  100% {
+
+    text-shadow:
+      0 0 7px
+      rgba(
+        255,
+        215,
+        100,
+        0.35
+      );
+
+  }
+
+
+  50% {
+
+    text-shadow:
+      0 0 26px
+      rgba(
+        255,
+        215,
+        100,
+        1
+      ),
+      0 0 42px
+      rgba(
+        0,
+        217,
+        232,
+        0.85
+      );
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* SPARKLE ANIMATION */
+/* ========================================= */
+
+@keyframes victorySparkle {
+
+  0% {
+
+    opacity:0;
+
+    transform:
+      scale(0.2)
+      rotate(0deg);
+
+  }
+
+
+  40% {
+
+    opacity:1;
+
+    transform:
+      scale(1.4)
+      rotate(90deg);
+
+  }
+
+
+  100% {
+
+    opacity:0;
+
+    transform:
+      scale(0.4)
+      rotate(180deg);
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* MVP REVEAL */
+/* ========================================= */
+
+@keyframes victoryMVPReveal {
+
+  0% {
+
+    opacity:0;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(0.7);
+
+  }
+
+
+  50% {
+
+    opacity:1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1.08);
+
+  }
+
+
+  100% {
+
+    opacity:1;
+
+    transform:
+      translate(
+        -50%,
+        -50%
+      )
+      scale(1);
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* CONTINUE BUTTON REVEAL */
+/* ========================================= */
+
+@keyframes victoryContinueReveal {
+
+  0% {
+
+    opacity:0;
+
+    transform:
+      translateY(
+        12px
+      );
+
+  }
+
+
+  100% {
+
+    opacity:1;
+
+    transform:
+      translateY(
+        0
+      );
+
+  }
+
+}
+
+
+
+/* ========================================= */
+/* ENEMY DEFEATED REVEAL */
+/* ========================================= */
+
+@keyframes victoryDefeatedReveal {
+
+  0% {
+
+    opacity:0;
+
+    letter-spacing:5px;
+
+  }
+
+
+  100% {
+
+    opacity:1;
+
+    letter-spacing:1px;
+
+  }
+
+}
+
+
+
+.victory-art {
+
+  opacity:0;
+
+  animation:
+    victoryArtEntrance
+    0.55s
+    ease-out
+    0.1s
+    forwards;
+
+}
+
+
+.victory-defeated {
+
+  opacity:0;
+
+  animation:
+    victoryDefeatedReveal
+    0.45s
+    ease-out
+    0.6s
+    forwards;
+
+}
+
+
+.victory-slot {
+
+  opacity:0;
+
+}
+
+
+.victory-slot-ryo {
+
+  animation:
+    victoryRewardReveal
+    0.5s
+    ease-out
+    0.9s
+    forwards;
+
+}
+
+
+.victory-slot-exp {
+
+  animation:
+    victoryRewardReveal
+    0.5s
+    ease-out
+    1.3s
+    forwards;
+
+}
+
+
+.victory-slot-item {
+
+  animation:
+    victoryRewardReveal
+    0.5s
+    ease-out
+    1.7s
+    forwards;
+
+}
+
+
+.victory-slot-rare-normal {
+
+  animation:
+    victoryRewardReveal
+    0.5s
+    ease-out
+    2.15s
+    forwards;
+
+}
+
+
+.victory-slot-rare-win {
+
+  animation:
+    victoryRareReveal
+    0.8s
+    ease-out
+    2.15s
+    forwards;
+
+}
+
+
+.victory-slot-mvp {
+
+  animation:
+    victoryMVPReveal
+    0.65s
+    ease-out
+    2.8s
+    forwards;
+
+}
+
+
+.victory-ryo-number {
+
+  animation:
+    victoryGoldFlash
+    0.8s
+    ease-out
+    1.0s;
+
+}
+
+
+.victory-exp-number {
+
+  animation:
+    victoryTealFlash
+    0.8s
+    ease-out
+    1.4s;
+
+}
+
+
+.victory-rare-win-text {
+
+  animation:
+    victoryRareGlow
+    1.15s
+    ease-in-out
+    2.15s
+    2;
+
+}
+
+
+.victory-sparkle {
+
+  position:absolute;
+
+  color:#FFD76A;
+
+  opacity:0;
+
+  font-size:
+    clamp(
+      10px,
+      1.4vw,
+      22px
+    );
+
+  pointer-events:none;
+
+}
+
+
+.victory-sparkle-one {
+
+  left:8%;
+  top:8%;
+
+  animation:
+    victorySparkle
+    0.8s
+    ease-out
+    2.3s;
+
+}
+
+
+.victory-sparkle-two {
+
+  right:5%;
+  top:25%;
+
+  animation:
+    victorySparkle
+    0.9s
+    ease-out
+    2.5s;
+
+}
+
+
+.victory-sparkle-three {
+
+  left:42%;
+  bottom:4%;
+
+  animation:
+    victorySparkle
+    0.85s
+    ease-out
+    2.7s;
+
+}
+
+
+.victory-continue {
+
+  opacity:0;
+
+  animation:
+    victoryContinueReveal
+    0.45s
+    ease-out
+    3.35s
+    forwards;
+
+}
+
+
+</style>
+
 
 
 <div style="
@@ -5258,20 +6098,24 @@ overflow:hidden;
   <!-- VICTORY ART WRAPPER -->
   <!-- ====================================== -->
 
-  <div style="
-    position:relative;
+  <div
+    class="victory-art"
 
-    width:min(
-      94vw,
-      calc(76vh * 1.3333)
-    );
+    style="
+      position:relative;
 
-    aspect-ratio:4 / 3;
+      width:min(
+        94vw,
+        calc(76vh * 1.3333)
+      );
 
-    max-width:1180px;
+      aspect-ratio:4 / 3;
 
-    flex-shrink:1;
-  ">
+      max-width:1180px;
+
+      flex-shrink:1;
+    "
+  >
 
 
 
@@ -5284,6 +6128,7 @@ overflow:hidden;
 
       style="
         position:absolute;
+
         inset:0;
 
         width:100%;
@@ -5301,41 +6146,46 @@ overflow:hidden;
     <!-- DEFEATED ENEMY -->
     <!-- ====================================== -->
 
-    <div style="
-      position:absolute;
+    <div
+      class="
+        victory-defeated
+      "
 
-      top:64%;
-      left:50%;
+      style="
+        position:absolute;
 
-      transform:
-        translate(
-          -50%,
-          -50%
+        top:64%;
+        left:50%;
+
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
+
+        width:50%;
+
+        color:#CBD5E1;
+
+        font-size:clamp(
+          8px,
+          0.85vw,
+          13px
         );
 
-      width:50%;
+        font-weight:bold;
 
-      color:#CBD5E1;
+        text-align:center;
 
-      font-size:clamp(
-        8px,
-        0.85vw,
-        13px
-      );
+        text-transform:uppercase;
 
-      font-weight:bold;
+        text-shadow:
+          0 2px 6px
+          #000000;
 
-      text-align:center;
-
-      text-transform:uppercase;
-
-      letter-spacing:1px;
-
-      text-shadow:
-        0 2px 6px #000000;
-
-      pointer-events:none;
-    ">
+        pointer-events:none;
+      "
+    >
 
       ${enemy.name}
       DEFEATED
@@ -5349,24 +6199,31 @@ overflow:hidden;
     <!-- RYO -->
     <!-- ====================================== -->
 
-    <div style="
-      position:absolute;
+    <div
+      class="
+        victory-slot
+        victory-slot-ryo
+      "
 
-      left:12%;
-      top:82%;
+      style="
+        position:absolute;
 
-      width:14%;
+        left:12%;
+        top:82%;
 
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
+        width:14%;
 
-      text-align:center;
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
 
-      pointer-events:none;
-    ">
+        text-align:center;
+
+        pointer-events:none;
+      "
+    >
 
 
       <div style="
@@ -5388,24 +6245,35 @@ overflow:hidden;
       </div>
 
 
-      <div style="
-        color:#FFFFFF;
+      <div
+        id="
+          victory-ryo-value
+        "
 
-        font-size:clamp(
-          14px,
-          1.65vw,
-          24px
-        );
+        class="
+          victory-ryo-number
+        "
 
-        font-weight:bold;
+        style="
+          color:#FFFFFF;
 
-        margin-top:3px;
+          font-size:clamp(
+            14px,
+            1.65vw,
+            24px
+          );
 
-        text-shadow:
-          0 2px 6px #000000;
-      ">
+          font-weight:bold;
 
-        ${rewards.ryo}
+          margin-top:3px;
+
+          text-shadow:
+            0 2px 6px
+            #000000;
+        "
+      >
+
+        0
 
       </div>
 
@@ -5419,24 +6287,31 @@ overflow:hidden;
     <!-- EXP -->
     <!-- ====================================== -->
 
-    <div style="
-      position:absolute;
+    <div
+      class="
+        victory-slot
+        victory-slot-exp
+      "
 
-      left:28.5%;
-      top:82%;
+      style="
+        position:absolute;
 
-      width:14%;
+        left:28.5%;
+        top:82%;
 
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
+        width:14%;
 
-      text-align:center;
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
 
-      pointer-events:none;
-    ">
+        text-align:center;
+
+        pointer-events:none;
+      "
+    >
 
 
       <div style="
@@ -5458,24 +6333,35 @@ overflow:hidden;
       </div>
 
 
-      <div style="
-        color:#FFFFFF;
+      <div
+        id="
+          victory-exp-value
+        "
 
-        font-size:clamp(
-          14px,
-          1.65vw,
-          24px
-        );
+        class="
+          victory-exp-number
+        "
 
-        font-weight:bold;
+        style="
+          color:#FFFFFF;
 
-        margin-top:3px;
+          font-size:clamp(
+            14px,
+            1.65vw,
+            24px
+          );
 
-        text-shadow:
-          0 2px 6px #000000;
-      ">
+          font-weight:bold;
 
-        ${rewards.exp}
+          margin-top:3px;
+
+          text-shadow:
+            0 2px 6px
+            #000000;
+        "
+      >
+
+        0
 
       </div>
 
@@ -5489,24 +6375,31 @@ overflow:hidden;
     <!-- COMMON ITEM -->
     <!-- ====================================== -->
 
-    <div style="
-      position:absolute;
+    <div
+      class="
+        victory-slot
+        victory-slot-item
+      "
 
-      left:45%;
-      top:82%;
+      style="
+        position:absolute;
 
-      width:14%;
+        left:45%;
+        top:82%;
 
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
+        width:14%;
 
-      text-align:center;
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
 
-      pointer-events:none;
-    ">
+        text-align:center;
+
+        pointer-events:none;
+      "
+    >
 
 
       <div style="
@@ -5551,7 +6444,8 @@ overflow:hidden;
         line-height:1.25;
 
         text-shadow:
-          0 2px 6px #000000;
+          0 2px 6px
+          #000000;
       ">
 
         ${itemText}
@@ -5568,24 +6462,76 @@ overflow:hidden;
     <!-- RARE DROP -->
     <!-- ====================================== -->
 
-    <div style="
-      position:absolute;
+    <div
+      class="
+        victory-slot
 
-      left:61.5%;
-      top:82%;
+        ${
+          hasRareDrop
 
-      width:14%;
+            ? "victory-slot-rare-win"
 
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
+            : "victory-slot-rare-normal"
+        }
+      "
 
-      text-align:center;
+      style="
+        position:absolute;
 
-      pointer-events:none;
-    ">
+        left:61.5%;
+        top:82%;
+
+        width:14%;
+
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
+
+        text-align:center;
+
+        pointer-events:none;
+      "
+    >
+
+
+      ${
+        hasRareDrop
+          ? `
+
+            <span
+              class="
+                victory-sparkle
+                victory-sparkle-one
+              "
+            >
+              ✦
+            </span>
+
+
+            <span
+              class="
+                victory-sparkle
+                victory-sparkle-two
+              "
+            >
+              ✦
+            </span>
+
+
+            <span
+              class="
+                victory-sparkle
+                victory-sparkle-three
+              "
+            >
+              ✦
+            </span>
+
+          `
+          : ""
+      }
 
 
       <div style="
@@ -5602,45 +6548,56 @@ overflow:hidden;
         letter-spacing:1px;
       ">
 
-        RARE DROP
+        ${
+          hasRareDrop
+
+            ? "★ RARE DROP ★"
+
+            : "RARE DROP"
+        }
 
       </div>
 
 
-      <div style="
-        color:${
-          rewards.rareDrops &&
-          rewards.rareDrops.length > 0
+      <div
+        class="
+          ${
+            hasRareDrop
 
-            ? "#FFD76A"
+              ? "victory-rare-win-text"
 
-            : "#64748B"
-        };
+              : ""
+          }
+        "
 
-        font-size:clamp(
-          8px,
-          0.9vw,
-          13px
-        );
+        style="
+          color:${
+            hasRareDrop
 
-        font-weight:bold;
+              ? "#FFD76A"
 
-        margin-top:4px;
+              : "#64748B"
+          };
 
-        line-height:1.25;
+          font-size:clamp(
+            8px,
+            0.9vw,
+            13px
+          );
 
-        text-shadow:
-          0 2px 6px #000000;
-      ">
+          font-weight:bold;
 
-        ${
-          rewards.rareDrops &&
-          rewards.rareDrops.length > 0
+          margin-top:4px;
 
-            ? `★ ${rareDropText} ★`
+          line-height:1.25;
 
-            : rareDropText
-        }
+          text-shadow:
+            0 2px 6px
+            #000000;
+        "
+      >
+
+        ${rareDropText}
 
       </div>
 
@@ -5654,24 +6611,31 @@ overflow:hidden;
     <!-- BATTLE MVP -->
     <!-- ====================================== -->
 
-    <div style="
-      position:absolute;
+    <div
+      class="
+        victory-slot
+        victory-slot-mvp
+      "
 
-      left:78%;
-      top:81.5%;
+      style="
+        position:absolute;
 
-      width:15%;
+        left:78%;
+        top:81.5%;
 
-      transform:
-        translate(
-          -50%,
-          -50%
-        );
+        width:15%;
 
-      text-align:center;
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
 
-      pointer-events:none;
-    ">
+        text-align:center;
+
+        pointer-events:none;
+      "
+    >
 
 
       <div style="
@@ -5679,7 +6643,7 @@ overflow:hidden;
 
         font-size:clamp(
           7px,
-          0.8vw,
+          0.78vw,
           11px
         );
 
@@ -5698,7 +6662,7 @@ overflow:hidden;
 
         font-size:clamp(
           9px,
-          1vw,
+          0.95vw,
           14px
         );
 
@@ -5709,7 +6673,8 @@ overflow:hidden;
         line-height:1.15;
 
         text-shadow:
-          0 2px 6px #000000;
+          0 2px 6px
+          #000000;
       ">
 
         ${mvpName}
@@ -5722,8 +6687,8 @@ overflow:hidden;
 
         font-size:clamp(
           7px,
-          0.75vw,
-          11px
+          0.72vw,
+          10px
         );
 
         font-weight:bold;
@@ -5732,7 +6697,7 @@ overflow:hidden;
       ">
 
         ${mvpPercentage}
-        TOTAL DAMAGE
+        DAMAGE
 
       </div>
 
@@ -5746,15 +6711,15 @@ overflow:hidden;
 
               font-size:clamp(
                 6px,
-                0.62vw,
-                9px
+                0.58vw,
+                8px
               );
 
               margin-top:2px;
             ">
 
               ${mvpDamage}
-              BP DAMAGE
+              BP
 
             </div>
 
@@ -5764,56 +6729,18 @@ overflow:hidden;
 
 
       <div style="
-        width:70%;
-
-        height:1px;
-
-        margin:
-          5px auto
-          4px auto;
-
-        background:
-          rgba(
-            214,
-            169,
-            58,
-            0.35
-          );
-      ">
-      </div>
-
-
-      <div style="
-        color:#94A3B8;
+        color:#CBD5E1;
 
         font-size:clamp(
           6px,
-          0.6vw,
-          9px
+          0.55vw,
+          8px
         );
 
-        letter-spacing:0.5px;
+        margin-top:4px;
       ">
 
-        FINAL STRIKE
-
-      </div>
-
-
-      <div style="
-        color:#FFFFFF;
-
-        font-size:clamp(
-          7px,
-          0.72vw,
-          10px
-        );
-
-        font-weight:bold;
-
-        margin-top:2px;
-      ">
-
+        FINAL:
         ${finalStrike}
 
       </div>
@@ -5832,6 +6759,10 @@ overflow:hidden;
   <!-- ====================================== -->
 
   <button
+
+    class="
+      victory-continue
+    "
 
     onclick="
       continueAfterVictory()
@@ -5856,7 +6787,8 @@ overflow:hidden;
       color:#05070B;
 
       border:
-        1px solid #F3D675;
+        1px solid
+        #F3D675;
 
       border-radius:5px;
 
@@ -5890,13 +6822,22 @@ overflow:hidden;
 
 `;
 
+
+  // =========================================
+  // START NUMBER ANIMATIONS
+  // =========================================
+
+  requestAnimationFrame(
+    () => {
+
+      runVictoryRevealAnimations(
+        rewards
+      );
+
+    }
+  );
+
 }
-
-
-// =========================================================
-// VICTORY CONTINUE
-// =========================================================
-
 
 
 // =========================================================
