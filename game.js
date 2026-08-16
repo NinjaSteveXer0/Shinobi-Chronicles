@@ -5121,6 +5121,40 @@ function renderVictoryOverlay(
   }
 
 
+
+  // =========================================
+  // MVP SAFETY CHECK
+  // =========================================
+
+  let battleMVP =
+    rewards.mvp;
+
+
+  // If MVP data somehow did not survive
+  // the victory transition, rebuild it
+  // from the battle contribution data.
+
+  if (!battleMVP) {
+
+    battleMVP =
+      calculateBattleMVP();
+
+
+    if (battleMVP) {
+
+      currentBattle.rewards.mvp =
+        battleMVP;
+
+    }
+
+  }
+
+
+
+  // =========================================
+  // COMMON ITEM TEXT
+  // =========================================
+
   const itemText =
 
     rewards.items &&
@@ -5136,6 +5170,11 @@ function renderVictoryOverlay(
       : "NO DROP";
 
 
+
+  // =========================================
+  // RARE DROP TEXT
+  // =========================================
+
   const rareDropText =
 
     rewards.rareDrops &&
@@ -5144,31 +5183,57 @@ function renderVictoryOverlay(
       ? rewards.rareDrops
           .map(
             item =>
-              `★ ${item.name}`
+              item.name
           )
           .join("<br>")
 
       : "NO DROP";
 
 
+
+  // =========================================
+  // MVP DETAILS
+  // =========================================
+
   const mvpName =
 
-    rewards.mvp
-      ? rewards.mvp.name
+    battleMVP
+      ? battleMVP.name
       : "NO MVP";
 
 
   const mvpPercentage =
 
-    rewards.mvp
-      ? `${rewards.mvp.percentage}%`
+    battleMVP
+      ? `${battleMVP.percentage}%`
       : "—";
+
+
+  const mvpDamage =
+
+    battleMVP
+      ? battleMVP.damage
+      : 0;
 
 
   const finalStrike =
 
     rewards.finishingShinobi ||
     "UNKNOWN";
+
+
+
+  console.log(
+    "VICTORY REWARDS:",
+    rewards
+  );
+
+
+  console.log(
+    "VICTORY MVP:",
+    battleMVP
+  );
+
 
 
   container.innerHTML = `
@@ -5183,23 +5248,31 @@ flex-direction:column;
 align-items:center;
 justify-content:center;
 box-sizing:border-box;
-padding:12px 18px 18px 18px;
+padding:10px 18px 18px 18px;
 overflow:hidden;
 ">
 
 
+
+  <!-- ====================================== -->
   <!-- VICTORY ART WRAPPER -->
+  <!-- ====================================== -->
 
   <div style="
     position:relative;
+
     width:min(
       94vw,
       calc(76vh * 1.3333)
     );
+
     aspect-ratio:4 / 3;
+
     max-width:1180px;
+
     flex-shrink:1;
   ">
+
 
 
     <!-- BACKGROUND ART -->
@@ -5212,35 +5285,55 @@ overflow:hidden;
       style="
         position:absolute;
         inset:0;
+
         width:100%;
         height:100%;
+
         object-fit:contain;
+
         display:block;
       "
     >
 
 
 
+    <!-- ====================================== -->
     <!-- DEFEATED ENEMY -->
+    <!-- ====================================== -->
 
     <div style="
       position:absolute;
+
       top:64%;
       left:50%;
+
       transform:
         translate(
           -50%,
           -50%
         );
+
+      width:50%;
+
       color:#CBD5E1;
+
       font-size:clamp(
         8px,
-        0.9vw,
+        0.85vw,
         13px
       );
+
+      font-weight:bold;
+
       text-align:center;
+
+      text-transform:uppercase;
+
+      letter-spacing:1px;
+
       text-shadow:
-        0 2px 5px #000000;
+        0 2px 6px #000000;
+
       pointer-events:none;
     ">
 
@@ -5251,46 +5344,63 @@ overflow:hidden;
 
 
 
-    <!-- ============================== -->
-    <!-- REWARD SLOT 1: RYO -->
-    <!-- ============================== -->
+    <!-- ====================================== -->
+    <!-- REWARD SLOT 1 -->
+    <!-- RYO -->
+    <!-- ====================================== -->
 
     <div style="
       position:absolute;
+
       left:12%;
       top:82%;
+
       width:14%;
+
       transform:
         translate(
           -50%,
           -50%
         );
+
       text-align:center;
+
       pointer-events:none;
     ">
 
+
       <div style="
         color:#D6A93A;
+
         font-size:clamp(
           8px,
-          0.9vw,
+          0.85vw,
           12px
         );
+
         font-weight:bold;
+
         letter-spacing:1px;
       ">
+
         RYŌ
+
       </div>
+
 
       <div style="
         color:#FFFFFF;
+
         font-size:clamp(
-          13px,
-          1.7vw,
+          14px,
+          1.65vw,
           24px
         );
+
         font-weight:bold;
+
         margin-top:3px;
+
         text-shadow:
           0 2px 6px #000000;
       ">
@@ -5299,50 +5409,68 @@ overflow:hidden;
 
       </div>
 
+
     </div>
 
 
 
-    <!-- ============================== -->
-    <!-- REWARD SLOT 2: EXP -->
-    <!-- ============================== -->
+    <!-- ====================================== -->
+    <!-- REWARD SLOT 2 -->
+    <!-- EXP -->
+    <!-- ====================================== -->
 
     <div style="
       position:absolute;
+
       left:28.5%;
       top:82%;
+
       width:14%;
+
       transform:
         translate(
           -50%,
           -50%
         );
+
       text-align:center;
+
       pointer-events:none;
     ">
 
+
       <div style="
         color:#00D9E8;
+
         font-size:clamp(
           8px,
-          0.9vw,
+          0.85vw,
           12px
         );
+
         font-weight:bold;
+
         letter-spacing:1px;
       ">
+
         EXP
+
       </div>
+
 
       <div style="
         color:#FFFFFF;
+
         font-size:clamp(
-          13px,
-          1.7vw,
+          14px,
+          1.65vw,
           24px
         );
+
         font-weight:bold;
+
         margin-top:3px;
+
         text-shadow:
           0 2px 6px #000000;
       ">
@@ -5351,51 +5479,77 @@ overflow:hidden;
 
       </div>
 
+
     </div>
 
 
 
-    <!-- ============================== -->
-    <!-- REWARD SLOT 3: ITEM -->
-    <!-- ============================== -->
+    <!-- ====================================== -->
+    <!-- REWARD SLOT 3 -->
+    <!-- COMMON ITEM -->
+    <!-- ====================================== -->
 
     <div style="
       position:absolute;
+
       left:45%;
       top:82%;
+
       width:14%;
+
       transform:
         translate(
           -50%,
           -50%
         );
+
       text-align:center;
+
       pointer-events:none;
     ">
 
+
       <div style="
         color:#94A3B8;
+
+        font-size:clamp(
+          8px,
+          0.85vw,
+          12px
+        );
+
+        font-weight:bold;
+
+        letter-spacing:1px;
+      ">
+
+        ITEM
+
+      </div>
+
+
+      <div style="
+        color:${
+          rewards.items &&
+          rewards.items.length > 0
+
+            ? "#FFFFFF"
+
+            : "#64748B"
+        };
+
         font-size:clamp(
           8px,
           0.9vw,
-          12px
+          13px
         );
-        font-weight:bold;
-        letter-spacing:1px;
-      ">
-        ITEM
-      </div>
 
-      <div style="
-        color:#FFFFFF;
-        font-size:clamp(
-          8px,
-          1vw,
-          14px
-        );
         font-weight:bold;
+
         margin-top:4px;
+
         line-height:1.25;
+
         text-shadow:
           0 2px 6px #000000;
       ">
@@ -5404,40 +5558,54 @@ overflow:hidden;
 
       </div>
 
+
     </div>
 
 
 
-    <!-- ============================== -->
-    <!-- REWARD SLOT 4: RARE DROP -->
-    <!-- ============================== -->
+    <!-- ====================================== -->
+    <!-- REWARD SLOT 4 -->
+    <!-- RARE DROP -->
+    <!-- ====================================== -->
 
     <div style="
       position:absolute;
+
       left:61.5%;
       top:82%;
+
       width:14%;
+
       transform:
         translate(
           -50%,
           -50%
         );
+
       text-align:center;
+
       pointer-events:none;
     ">
 
+
       <div style="
         color:#D6A93A;
+
         font-size:clamp(
           8px,
-          0.9vw,
+          0.85vw,
           12px
         );
+
         font-weight:bold;
+
         letter-spacing:1px;
       ">
-        RARE
+
+        RARE DROP
+
       </div>
+
 
       <div style="
         color:${
@@ -5451,66 +5619,95 @@ overflow:hidden;
 
         font-size:clamp(
           8px,
-          1vw,
-          14px
+          0.9vw,
+          13px
         );
 
         font-weight:bold;
+
         margin-top:4px;
+
         line-height:1.25;
+
         text-shadow:
           0 2px 6px #000000;
       ">
 
-        ${rareDropText}
+        ${
+          rewards.rareDrops &&
+          rewards.rareDrops.length > 0
+
+            ? `★ ${rareDropText} ★`
+
+            : rareDropText
+        }
 
       </div>
+
 
     </div>
 
 
 
-    <!-- ============================== -->
-    <!-- REWARD SLOT 5: MVP -->
-    <!-- ============================== -->
+    <!-- ====================================== -->
+    <!-- REWARD SLOT 5 -->
+    <!-- BATTLE MVP -->
+    <!-- ====================================== -->
 
     <div style="
       position:absolute;
+
       left:78%;
       top:81.5%;
+
       width:15%;
+
       transform:
         translate(
           -50%,
           -50%
         );
+
       text-align:center;
+
       pointer-events:none;
     ">
 
+
       <div style="
-        color:#00D9E8;
+        color:#D6A93A;
+
         font-size:clamp(
-          8px,
-          0.9vw,
-          12px
+          7px,
+          0.8vw,
+          11px
         );
+
         font-weight:bold;
+
         letter-spacing:1px;
       ">
-        ★ MVP ★
+
+        ★ BATTLE MVP ★
+
       </div>
+
 
       <div style="
         color:#FFFFFF;
+
         font-size:clamp(
-          8px,
+          9px,
           1vw,
           14px
         );
+
         font-weight:bold;
+
         margin-top:3px;
-        line-height:1.2;
+
+        line-height:1.15;
+
         text-shadow:
           0 2px 6px #000000;
       ">
@@ -5522,34 +5719,105 @@ overflow:hidden;
 
       <div style="
         color:#00D9E8;
+
         font-size:clamp(
           7px,
-          0.8vw,
+          0.75vw,
           11px
         );
-        margin-top:2px;
+
+        font-weight:bold;
+
+        margin-top:3px;
       ">
 
         ${mvpPercentage}
-        DAMAGE
+        TOTAL DAMAGE
 
+      </div>
+
+
+      ${
+        battleMVP
+          ? `
+
+            <div style="
+              color:#94A3B8;
+
+              font-size:clamp(
+                6px,
+                0.62vw,
+                9px
+              );
+
+              margin-top:2px;
+            ">
+
+              ${mvpDamage}
+              BP DAMAGE
+
+            </div>
+
+          `
+          : ""
+      }
+
+
+      <div style="
+        width:70%;
+
+        height:1px;
+
+        margin:
+          5px auto
+          4px auto;
+
+        background:
+          rgba(
+            214,
+            169,
+            58,
+            0.35
+          );
+      ">
       </div>
 
 
       <div style="
         color:#94A3B8;
+
         font-size:clamp(
           6px,
-          0.65vw,
+          0.6vw,
           9px
         );
-        margin-top:3px;
+
+        letter-spacing:0.5px;
       ">
 
-        FINAL:
+        FINAL STRIKE
+
+      </div>
+
+
+      <div style="
+        color:#FFFFFF;
+
+        font-size:clamp(
+          7px,
+          0.72vw,
+          10px
+        );
+
+        font-weight:bold;
+
+        margin-top:2px;
+      ">
+
         ${finalStrike}
 
       </div>
+
 
     </div>
 
@@ -5559,7 +5827,9 @@ overflow:hidden;
 
 
 
+  <!-- ====================================== -->
   <!-- CONTINUE BUTTON -->
+  <!-- ====================================== -->
 
   <button
 
@@ -5569,8 +5839,12 @@ overflow:hidden;
 
     style="
       margin-top:10px;
-      min-width:180px;
-      padding:10px 24px;
+
+      min-width:200px;
+
+      padding:
+        11px
+        26px;
 
       background:
         linear-gradient(
@@ -5587,9 +5861,10 @@ overflow:hidden;
       border-radius:5px;
 
       font-size:11px;
+
       font-weight:bold;
 
-      letter-spacing:1px;
+      letter-spacing:1.5px;
 
       cursor:pointer;
 
@@ -5609,12 +5884,18 @@ overflow:hidden;
   </button>
 
 
+
 </div>
 
 
 `;
 
 }
+
+
+// =========================================================
+// VICTORY CONTINUE
+// =========================================================
 
 
 
