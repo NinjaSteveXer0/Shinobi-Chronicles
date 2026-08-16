@@ -4,6 +4,48 @@
 // =========================================================
 
 // =========================================================
+// PLAYER TEAM DATABASE
+// =========================================================
+
+let playerTeam = [
+
+  {
+    id: "naruto",
+    name: "Kage Naruto",
+    rank: "Kage",
+    power: 4055,
+    image: "Assets/Animated Cards/Kage Naruto.png"
+  },
+
+
+  {
+    id: "sasuke",
+    name: "Jonin Sasuke",
+    rank: "Elite Jonin",
+    power: 3495,
+    image: "Assets/Animated Cards/Jonin Sasuke.png"
+  },
+
+
+  {
+    id: "sakura",
+    name: "Sannin Sakura",
+    rank: "Sannin",
+    power: 3000,
+    image: "Assets/Animated Cards/Sannin Sakura.png"
+  },
+
+  {
+  id: "nagato",
+    name: "Teen Nagato",
+    rank: "Kage",
+    power: 8700,
+    image: "Assets/Animated Cards/Teen Nagato.png"
+  },
+
+];
+
+// =========================================================
 // ENEMY DATABASE
 // =========================================================
 
@@ -3029,50 +3071,19 @@ flex:1;
 
 
 
-<!-- PLAYER SIDE -->
-
-<div style="
-width:30%;
-text-align:center;
-">
-
-
-<h3 style="
-color:#00D9E8;
-">
-YOUR TEAM
-</h3>
-
+${playerTeam.map(member => `
 
 <div class="team-slot">
 
-Naruto
+${member.name}
+
 <br>
-PL 4055
+
+PL ${member.power}
 
 </div>
 
-
-<div class="team-slot">
-
-Sasuke
-<br>
-PL 3495
-
-</div>
-
-
-<div class="team-slot">
-
-Sakura
-<br>
-PL 3000
-
-</div>
-
-
-</div>
-
+`).join("")}
 
 
 
