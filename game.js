@@ -65,7 +65,7 @@ let playerTeam = [
     },
 
     stats: {
-      nin: 94,
+      nin: 104,
       tai: 84,
       buki: 91,
       fuin: 70,
