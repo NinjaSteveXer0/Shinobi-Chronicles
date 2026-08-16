@@ -1244,6 +1244,9 @@ function openOverlay(type) {
     return;
   }
 
+  saveTestState();
+
+
 
   overlay.style.display = "flex";
 
@@ -1445,6 +1448,48 @@ function closeOverlay() {
   selectedRegionKey = null;
 
   selectedLocationNode = null;
+
+}
+
+// =========================================================
+// DEVELOPMENT TEST STATE
+// =========================================================
+
+function saveTestState() {
+
+  const state = {
+
+    overlayType:
+      currentOverlayType,
+
+    regionKey:
+      selectedRegionKey,
+
+    locationId:
+      selectedLocationNode
+        ? selectedLocationNode.id
+        : null,
+
+    enemyId:
+      selectedEnemy
+        ? selectedEnemy.id
+        : null,
+
+    enemyPower:
+      currentBattle.enemyPower,
+
+    activePlayerId:
+      currentBattle.activePlayer
+        ? currentBattle.activePlayer.id
+        : null
+
+  };
+
+
+  sessionStorage.setItem(
+    "shinobiTestState",
+    JSON.stringify(state)
+  );
 
 }
 
@@ -1882,6 +1927,8 @@ function renderRegionHubUI(
   regionKey,
   region
 ) {
+
+saveTestState();
 
   const container =
     document.getElementById(
@@ -3826,3 +3873,135 @@ function claimDailyReward() {
     "Daily reward claimed successfully!"
   );
 }
+
+// =========================================================
+// RESTORE DEVELOPMENT TEST STATE
+// =========================================================
+
+function restoreTestState() {
+
+
+  const saved =
+    sessionStorage.getItem(
+      "shinobiTestState"
+    );
+
+
+  if (!saved) {
+    return;
+  }
+
+
+  const state =
+    JSON.parse(saved);
+
+
+  // Restore region
+  if (
+    state.regionKey &&
+    worldRegions[state.regionKey]
+  ) {
+
+    selectedRegionKey =
+      state.regionKey;
+
+
+    if (state.locationId) {
+
+      selectedLocationNode =
+        worldRegions[state.regionKey]
+          .locations
+          .find(
+            location =>
+              location.id ===
+              state.locationId
+          ) || null;
+
+    }
+
+  }
+
+
+  // Restore enemy
+  if (
+    state.enemyId &&
+    enemyDatabase[state.enemyId]
+  ) {
+
+    selectedEnemy =
+      enemyDatabase[state.enemyId];
+
+    currentBattle.enemy =
+      selectedEnemy;
+
+  }
+
+
+  // Restore Battle Power
+  if (
+    typeof state.enemyPower === "number"
+  ) {
+
+    currentBattle.enemyPower =
+      state.enemyPower;
+
+  }
+
+
+  // Restore active player
+  if (state.activePlayerId) {
+
+    currentBattle.activePlayer =
+      playerTeam.find(
+        member =>
+          member.id ===
+          state.activePlayerId
+      ) || playerTeam[0];
+
+  }
+
+
+  // Restore screen
+  if (
+    state.overlayType === "combat" &&
+    selectedEnemy
+  ) {
+
+    currentBattle.active = true;
+
+    openOverlay("combat");
+
+    return;
+
+  }
+
+
+  if (
+    state.overlayType === "battle" &&
+    selectedRegionKey
+  ) {
+
+    openOverlay("battle");
+
+    return;
+
+  }
+
+
+  if (
+    state.overlayType === "region" &&
+    selectedRegionKey
+  ) {
+
+    openRegionHub(
+      selectedRegionKey
+    );
+
+  }
+
+}
+
+window.addEventListener(
+  "load",
+  restoreTestState
+);
