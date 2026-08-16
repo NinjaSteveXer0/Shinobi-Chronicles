@@ -288,6 +288,7 @@ function increaseCharacterStat(
 
 let selectedEnemy = null;
 
+
 let currentBattle = {
 
   active: false,
@@ -304,31 +305,111 @@ let currentBattle = {
 
   battleOver: false,
 
-  battleLog: []
+  battleLog: [],
+
+  rewards: {
+
+    generated: false,
+
+    ryo: 0,
+
+    exp: 0,
+
+    items: [],
+
+    rareDrops: [],
+
+    finishingShinobi: null
+
+  }
 
 };
 
+
 const enemyDatabase = {
 
- scout: {
 
-  id: "scout",
+  // =========================================
+  // ROGUE SCOUT
+  // =========================================
 
-  name: "Rogue Scout",
+  scout: {
 
-  rank: "Rogue Shinobi",
+    id: "scout",
 
-  power: 32,
+    name: "Rogue Scout",
 
-   stats: {
-    stamina: 34
+    rank: "Rogue Shinobi",
+
+    power: 32,
+
+
+    stats: {
+
+      stamina: 34
+
+    },
+
+
+    image:
+      "Enemies/Scout.png",
+
+
+    rewards: {
+
+      ryo: {
+
+        min: 150,
+
+        max: 220
+
+      },
+
+
+      exp: {
+
+        min: 18,
+
+        max: 28
+
+      },
+
+
+      commonDrops: [
+
+        {
+
+          name: "Bandit Supplies",
+
+          rarity: "Common",
+
+          chance: 25
+
+        },
+
+        {
+
+          name: "Basic Scroll",
+
+          rarity: "Common",
+
+          chance: 12
+
+        }
+
+      ],
+
+
+      rareDrops: []
+
+    }
+
   },
 
-  image:
-    "Enemies/Scout.png",
 
-},
-
+  // =========================================
+  // BANDIT
+  // =========================================
 
   bandit: {
 
@@ -340,15 +421,73 @@ const enemyDatabase = {
 
     power: 41,
 
-     stats: {
-    stamina: 42
-  },
+
+    stats: {
+
+      stamina: 42
+
+    },
+
 
     image:
       "Enemies/Bandit.png",
 
+
+    rewards: {
+
+      ryo: {
+
+        min: 220,
+
+        max: 320
+
+      },
+
+
+      exp: {
+
+        min: 25,
+
+        max: 38
+
+      },
+
+
+      commonDrops: [
+
+        {
+
+          name: "Weapon Materials",
+
+          rarity: "Common",
+
+          chance: 25
+
+        },
+
+        {
+
+          name: "Basic Scroll",
+
+          rarity: "Common",
+
+          chance: 18
+
+        }
+
+      ],
+
+
+      rareDrops: []
+
+    }
+
   },
 
+
+  // =========================================
+  // BANDIT LEADER
+  // =========================================
 
   banditLeader: {
 
@@ -360,16 +499,83 @@ const enemyDatabase = {
 
     power: 56,
 
-     stats: {
-    stamina: 58
-  },
+
+    stats: {
+
+      stamina: 58
+
+    },
+
 
     image:
       "Enemies/BanditLeader.png",
 
+
+    rewards: {
+
+      ryo: {
+
+        min: 350,
+
+        max: 450
+
+      },
+
+
+      exp: {
+
+        min: 45,
+
+        max: 65
+
+      },
+
+
+      commonDrops: [
+
+        {
+
+          name: "Weapon Materials",
+
+          rarity: "Common",
+
+          chance: 40
+
+        },
+
+        {
+
+          name: "Basic Scroll",
+
+          rarity: "Common",
+
+          chance: 30
+
+        }
+
+      ],
+
+
+      rareDrops: [
+
+        {
+
+          name: "Bandit Captain's Tanto",
+
+          rarity: "Rare",
+
+          chance: 6.5
+
+        }
+
+      ]
+
+    }
+
   }
 
 };
+
 
 // =========================================================
 // ENCOUNTER SYSTEM
@@ -378,64 +584,313 @@ const enemyDatabase = {
 function startEncounter(enemyId) {
 
 
-  console.log("START ENCOUNTER FIRED:", enemyId);
+  console.log(
+    "START ENCOUNTER FIRED:",
+    enemyId
+  );
 
 
-  const enemy = enemyDatabase[enemyId];
+  const enemy =
+    enemyDatabase[enemyId];
 
 
   if (!enemy) {
 
-    console.log("Enemy not found");
+    console.log(
+      "Enemy not found"
+    );
 
     return;
 
   }
 
 
-  selectedEnemy = enemy;
+  selectedEnemy =
+    enemy;
 
-  currentBattle.active = true;
 
-currentBattle.enemy = enemy;
+  currentBattle.active =
+    true;
 
-currentBattle.activePlayer = playerTeam[0];
-currentBattle.lastDamage = 0;
 
-currentBattle.battleOver = false;
+  currentBattle.enemy =
+    enemy;
 
-currentBattle.battleLog = [
-  `${enemy.name} appears!`,
-  `${playerTeam[0].name} prepares for battle.`
-];
+
+  currentBattle.activePlayer =
+    playerTeam[0];
+
+
+  currentBattle.lastDamage =
+    0;
+
+
+  currentBattle.battleOver =
+    false;
+
+
+  currentBattle.battleLog = [
+
+    `${enemy.name} appears!`,
+
+    `${playerTeam[0].name} prepares for battle.`
+
+  ];
+
+
+  // Reset rewards for every new encounter
+  currentBattle.rewards = {
+
+    generated: false,
+
+    ryo: 0,
+
+    exp: 0,
+
+    items: [],
+
+    rareDrops: [],
+
+    finishingShinobi: null
+
+  };
 
 
   const generatedBattlePower =
-  calculateBattlePower(
-    enemy,
-    "standard"
+    calculateBattlePower(
+      enemy,
+      "standard"
+    );
+
+
+  currentBattle.enemyPower =
+    generatedBattlePower;
+
+
+  currentBattle.enemyMaxPower =
+    generatedBattlePower;
+
+
+  console.log(
+    "CURRENT BATTLE:",
+    currentBattle
   );
 
 
-currentBattle.enemyPower =
-  generatedBattlePower;
+  openOverlay(
+    "combat"
+  );
+
+}
 
 
-currentBattle.enemyMaxPower =
-  generatedBattlePower;
+
+// =========================================================
+// BATTLE REWARD SYSTEM
+// =========================================================
+
+function randomRewardNumber(
+  min,
+  max
+) {
+
+  return Math.floor(
+    Math.random() *
+    (max - min + 1)
+  ) + min;
+
+}
 
 
-  console.log("CURRENT BATTLE:", currentBattle);
+
+function rollRewardChance(
+  chance
+) {
+
+  const roll =
+    Math.random() * 100;
 
 
-  openOverlay("combat");
+  return roll < chance;
+
+}
+
+
+
+function generateBattleRewards(
+  enemy,
+  finishingShinobi
+) {
+
+
+  // =========================================
+  // SAFETY CHECK
+  // Never generate the same rewards twice
+  // =========================================
+
+  if (
+    currentBattle.rewards.generated
+  ) {
+
+    console.log(
+      "Rewards already generated"
+    );
+
+    return currentBattle.rewards;
+
+  }
+
+
+  const rewardTable =
+    enemy.rewards;
+
+
+  if (!rewardTable) {
+
+    console.log(
+      "Enemy has no reward table:",
+      enemy.name
+    );
+
+    return currentBattle.rewards;
+
+  }
+
+
+  // =========================================
+  // RYO
+  // =========================================
+
+  const ryo =
+    randomRewardNumber(
+      rewardTable.ryo.min,
+      rewardTable.ryo.max
+    );
+
+
+  // =========================================
+  // EXP
+  // =========================================
+
+  const exp =
+    randomRewardNumber(
+      rewardTable.exp.min,
+      rewardTable.exp.max
+    );
+
+
+  // =========================================
+  // COMMON ITEM DROPS
+  // =========================================
+
+  const items = [];
+
+
+  rewardTable.commonDrops.forEach(
+    drop => {
+
+      if (
+        rollRewardChance(
+          drop.chance
+        )
+      ) {
+
+        items.push({
+
+          name:
+            drop.name,
+
+          rarity:
+            drop.rarity,
+
+          chance:
+            drop.chance
+
+        });
+
+      }
+
+    }
+  );
+
+
+  // =========================================
+  // RARE ITEM DROPS
+  // =========================================
+
+  const rareDrops = [];
+
+
+  rewardTable.rareDrops.forEach(
+    drop => {
+
+      if (
+        rollRewardChance(
+          drop.chance
+        )
+      ) {
+
+        rareDrops.push({
+
+          name:
+            drop.name,
+
+          rarity:
+            drop.rarity,
+
+          chance:
+            drop.chance
+
+        });
+
+      }
+
+    }
+  );
+
+
+  // =========================================
+  // STORE FINAL RESULT
+  // =========================================
+
+  currentBattle.rewards = {
+
+    generated: true,
+
+    ryo:
+      ryo,
+
+    exp:
+      exp,
+
+    items:
+      items,
+
+    rareDrops:
+      rareDrops,
+
+    finishingShinobi:
+      finishingShinobi
+        ? finishingShinobi.name
+        : null
+
+  };
+
+
+  console.log(
+    "BATTLE REWARDS:",
+    currentBattle.rewards
+  );
+
+
+  return currentBattle.rewards;
 
 }
 
 
 // =========================================================
 // 1. WORLD REGION DATA
-// =========================================================
+// =========================================================================================
 
 const worldRegions = {
 
@@ -3971,6 +4426,7 @@ function performStatAttack(
   attackType
 ) {
 
+
   const fighter =
     currentBattle.activePlayer;
 
@@ -3982,6 +4438,7 @@ function performStatAttack(
     );
 
     return;
+
   }
 
 
@@ -3992,6 +4449,7 @@ function performStatAttack(
     );
 
     return;
+
   }
 
 
@@ -4004,6 +4462,7 @@ function performStatAttack(
     );
 
     return;
+
   }
 
 
@@ -4012,16 +4471,19 @@ function performStatAttack(
 
   switch (attackType) {
 
+
     case "ninjutsu":
 
-      statName = "nin";
+      statName =
+        "nin";
 
       break;
 
 
     case "taijutsu":
 
-      statName = "tai";
+      statName =
+        "tai";
 
       break;
 
@@ -4079,7 +4541,8 @@ function performStatAttack(
     currentBattle.enemyPower < 0
   ) {
 
-    currentBattle.enemyPower = 0;
+    currentBattle.enemyPower =
+      0;
 
   }
 
@@ -4112,12 +4575,24 @@ function performStatAttack(
     currentBattle.enemyPower <= 0
   ) {
 
+
     currentBattle.battleOver =
       true;
 
 
     currentBattle.active =
       false;
+
+
+    // =======================================
+    // GENERATE REWARDS
+    // =======================================
+
+    const rewards =
+      generateBattleRewards(
+        currentBattle.enemy,
+        fighter
+      );
 
 
     currentBattle.battleLog.push(
@@ -4129,8 +4604,61 @@ function performStatAttack(
       "VICTORY!"
     );
 
+
+    currentBattle.battleLog.push(
+      `Reward: ${rewards.ryo} Ryō`
+    );
+
+
+    currentBattle.battleLog.push(
+      `EXP gained: ${rewards.exp}`
+    );
+
+
+    // =======================================
+    // COMMON DROPS
+    // =======================================
+
+    if (
+      rewards.items.length > 0
+    ) {
+
+      rewards.items.forEach(
+        item => {
+
+          currentBattle.battleLog.push(
+            `Item found: ${item.name}`
+          );
+
+        }
+      );
+
+    }
+
+
+    // =======================================
+    // RARE DROPS
+    // =======================================
+
+    if (
+      rewards.rareDrops.length > 0
+    ) {
+
+      rewards.rareDrops.forEach(
+        item => {
+
+          currentBattle.battleLog.push(
+            `★ RARE DROP: ${item.name}!`
+          );
+
+        }
+      );
+
+    }
+
   }
   else {
+
 
     currentBattle.battleLog.push(
       `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
@@ -4174,6 +4702,7 @@ function performStatAttack(
 }
 
 
+
 // =========================================================
 // ATTACK BUTTON WRAPPERS
 // =========================================================
@@ -4185,6 +4714,7 @@ function performNinjutsuAttack() {
   );
 
 }
+
 
 
 function performTaijutsuAttack() {
