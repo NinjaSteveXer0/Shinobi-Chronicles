@@ -2919,32 +2919,22 @@ function renderBattleOverlay(
 
 
 // =========================================================
-// 17. COMBAT SCREEN
+// COMBAT ARENA SCREEN
 // =========================================================
 
-function renderCombatOverlay(
-  container
-) {
+function renderCombatOverlay(container) {
 
 
-  const enemy =
-    selectedEnemy;
-
+  const enemy = selectedEnemy;
 
 
   if (!enemy) {
 
-
     container.innerHTML = `
-
-      <h2 style="
-        color:#E53935;
-      ">
+      <h2 style="color:#E53935;">
         NO ENEMY SELECTED
       </h2>
-
     `;
-
 
     return;
 
@@ -2952,108 +2942,209 @@ function renderCombatOverlay(
 
 
 
+container.innerHTML = `
 
 
-  container.innerHTML = `
+<div style="
+display:flex;
+flex-direction:column;
+height:100%;
+padding:20px;
+">
 
 
-    <div style="
-      display:flex;
-      flex-direction:column;
-      flex:1;
-      align-items:center;
-    ">
+<!-- HEADER -->
+
+<div style="
+text-align:center;
+margin-bottom:20px;
+">
+
+<h2 style="
+color:#D6A93A;
+">
+LAND OF FIRE
+</h2>
 
 
-
-      <h2 style="
-        color:#D6A93A;
-        font-size:18px;
-      ">
-        BATTLE INITIATED
-      </h2>
+<p style="
+color:#94A3B8;
+">
+BANDIT HIDEOUT
+</p>
 
 
-
-      <p style="
-        color:#94A3B8;
-        font-size:10px;
-      ">
-        A hostile shinobi approaches...
-      </p>
-
-
-
-
-
-      <div style="
-        margin-top:20px;
-        text-align:center;
-      ">
+</div>
 
 
 
-        <img
-          src="${enemy.image}"
-          style="
-            width:180px;
-            border-radius:8px;
-          "
-        >
+<!-- ENEMY FORMATION -->
+
+<div style="
+text-align:center;
+">
 
 
+<h3 style="
+color:#E53935;
+">
+ENEMY FORMATION
+</h3>
 
 
-        <h3 style="
-          color:#00D9E8;
-        ">
-          ${enemy.name}
-        </h3>
+<div>
+
+<img 
+src="${enemy.image}"
+style="
+width:100px;
+border-radius:8px;
+"
+>
 
 
+<p style="
+color:#00D9E8;
+">
+${enemy.name}
+</p>
 
 
-        <p style="
-          color:#94A3B8;
-        ">
-          ${enemy.rank}
-        </p>
+</div>
 
 
-
-      </div>
-
-
-
-
-
-      <button
-
-        onclick="console.log('ATTACK')"
-
-        style="
-          margin-top:25px;
-          padding:12px 40px;
-          background:#D6A93A;
-          border:none;
-          cursor:pointer;
-        "
-
-      >
-
-        BEGIN BATTLE
-
-      </button>
+</div>
 
 
 
 
-    </div>
+
+<!-- ACTIVE DUEL -->
+
+<div style="
+margin:30px auto;
+padding:20px;
+border:1px solid #334155;
+border-radius:10px;
+width:300px;
+text-align:center;
+">
+
+
+<h3>
+⚔ ACTIVE DUEL ⚔
+</h3>
+
+
+<h2>
+YOUR SHINOBI
+</h2>
+
+
+<p>
+VS
+</p>
+
+
+<h2>
+${enemy.name}
+</h2>
+
+
+</div>
 
 
 
-  `;
 
+
+<!-- PLAYER TEAM -->
+
+<div>
+
+
+<h3 style="
+color:#00D9E8;
+text-align:center;
+">
+YOUR TEAM
+</h3>
+
+
+<div style="
+display:flex;
+justify-content:center;
+gap:10px;
+">
+
+
+<div class="team-slot">
+Naruto
+<br>
+PL 4055
+</div>
+
+
+<div class="team-slot">
+Sasuke
+<br>
+PL 3495
+</div>
+
+
+<div class="team-slot">
+Sakura
+<br>
+PL 3000
+</div>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<!-- ACTIONS -->
+
+<div style="
+margin-top:auto;
+display:flex;
+justify-content:center;
+gap:10px;
+">
+
+
+<button>
+NINJUTSU
+</button>
+
+
+<button>
+TAIJUTSU
+</button>
+
+
+<button>
+ITEM
+</button>
+
+
+<button>
+FORMATION
+</button>
+
+
+</div>
+
+
+
+</div>
+
+
+`;
 
 }
 
