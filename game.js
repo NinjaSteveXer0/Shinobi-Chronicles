@@ -3685,7 +3685,7 @@ NINJUTSU
 </button>
 
 
-<button>
+<button onclick="performTaijutsuAttack()">
 TAIJUTSU
 </button>
 
@@ -3774,56 +3774,156 @@ function selectActiveFighter(playerId) {
 }
 
 // =========================================================
-// 19. NINJUTSU ATTACK
+// 19. STAT-BASED COMBAT ATTACK
 // =========================================================
 
-function performNinjutsuAttack() {
+function performStatAttack(
+  attackType
+) {
 
-  const fighter = currentBattle.activePlayer;
+  const fighter =
+    currentBattle.activePlayer;
+
 
   if (!fighter) {
-    console.log("No active fighter selected");
+
+    console.log(
+      "No active fighter selected"
+    );
+
     return;
   }
+
 
   if (!currentBattle.enemy) {
-    console.log("No enemy in battle");
+
+    console.log(
+      "No enemy in battle"
+    );
+
     return;
   }
 
 
-  // Temporary Phase 2C damage formula
-  const damage = Math.max(
-    1,
-    Math.floor(
-  calculateCurrentPL(fighter) * 0.10
-)
-  );
+  if (
+    currentBattle.enemyPower <= 0
+  ) {
+
+    console.log(
+      "Enemy is already defeated"
+    );
+
+    return;
+  }
 
 
-  currentBattle.enemyPower -= damage;
+  let statName;
 
 
-  // Enemy PL can never go below zero
-  if (currentBattle.enemyPower < 0) {
+  switch (attackType) {
+
+    case "ninjutsu":
+      statName = "nin";
+      break;
+
+    case "taijutsu":
+      statName = "tai";
+      break;
+
+    default:
+
+      console.log(
+        "Unknown attack type:",
+        attackType
+      );
+
+      return;
+
+  }
+
+
+  const attackStat =
+    fighter.stats[statName];
+
+
+  // =========================================
+  // BRICK 5 DAMAGE FORMULA
+  // =========================================
+
+  const baseDamage =
+    attackStat * 0.20;
+
+
+  // Small ±10% combat variation
+  const variation =
+    0.90 +
+    Math.random() * 0.20;
+
+
+  const damage =
+    Math.max(
+      1,
+      Math.round(
+        baseDamage *
+        variation
+      )
+    );
+
+
+  currentBattle.enemyPower -=
+    damage;
+
+
+  if (
+    currentBattle.enemyPower < 0
+  ) {
+
     currentBattle.enemyPower = 0;
+
   }
 
 
   console.log(
-    fighter.name,
-    "used Ninjutsu for",
-    damage,
-    "damage"
+    `${fighter.name} used ${attackType.toUpperCase()}`
   );
 
+
   console.log(
-    "Enemy PL remaining:",
+    `${statName.toUpperCase()}:`,
+    attackStat
+  );
+
+
+  console.log(
+    "Damage:",
+    damage
+  );
+
+
+  console.log(
+    "Enemy Battle Power remaining:",
     currentBattle.enemyPower
   );
 
 
   openOverlay("combat");
+
+}
+
+function performNinjutsuAttack() {
+
+  performStatAttack(
+    "ninjutsu"
+  );
+
+}
+
+
+function performTaijutsuAttack() {
+
+  performStatAttack(
+    "taijutsu"
+  );
 
 }
 
