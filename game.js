@@ -14,9 +14,18 @@ let playerTeam = [
     name: "Kage Naruto",
     rank: "Kage",
     rarity: "Legendary",
-    element: "Light",
 
-    power: 92,
+    basePL: 105,
+
+    baseStats: {
+      nin: 95,
+      tai: 82,
+      buki: 68,
+      fuin: 80,
+      kin: 91,
+      gen: 62,
+      stamina: 96
+    },
 
     stats: {
       nin: 95,
@@ -28,6 +37,7 @@ let playerTeam = [
       stamina: 96
     },
 
+    permanentPLBonus: 0,
     equipment: [],
     abilities: [],
 
@@ -41,9 +51,18 @@ let playerTeam = [
     name: "Jonin Sasuke",
     rank: "Elite Jonin",
     rarity: "Epic",
-    element: "Lightning",
 
-    power: 89,
+    basePL: 55,
+
+    baseStats: {
+      nin: 94,
+      tai: 84,
+      buki: 91,
+      fuin: 70,
+      kin: 86,
+      gen: 90,
+      stamina: 81
+    },
 
     stats: {
       nin: 94,
@@ -55,6 +74,7 @@ let playerTeam = [
       stamina: 81
     },
 
+    permanentPLBonus: 0,
     equipment: [],
     abilities: [],
 
@@ -68,9 +88,18 @@ let playerTeam = [
     name: "Sannin Sakura",
     rank: "Sannin",
     rarity: "Rare",
-    element: "Medical",
 
-    power: 84,
+    basePL: 72,
+
+    baseStats: {
+      nin: 76,
+      tai: 96,
+      buki: 58,
+      fuin: 70,
+      kin: 45,
+      gen: 64,
+      stamina: 95
+    },
 
     stats: {
       nin: 76,
@@ -82,6 +111,7 @@ let playerTeam = [
       stamina: 95
     },
 
+    permanentPLBonus: 0,
     equipment: [],
     abilities: [],
 
@@ -95,9 +125,18 @@ let playerTeam = [
     name: "Teen Nagato",
     rank: "Kage",
     rarity: "Legendary",
-    element: "Dark",
 
-    power: 97,
+    basePL: 97,
+
+    baseStats: {
+      nin: 98,
+      tai: 74,
+      buki: 64,
+      fuin: 94,
+      kin: 99,
+      gen: 96,
+      stamina: 91
+    },
 
     stats: {
       nin: 98,
@@ -109,6 +148,7 @@ let playerTeam = [
       stamina: 91
     },
 
+    permanentPLBonus: 0,
     equipment: [],
     abilities: [],
 
@@ -117,6 +157,75 @@ let playerTeam = [
   }
 
 ];
+
+// =========================================================
+// POWER LEVEL CALCULATION
+// =========================================================
+
+const STAT_WEIGHTS = {
+
+  nin: 1.10,
+  tai: 1.00,
+  buki: 0.90,
+  fuin: 1.00,
+  kin: 0.75,
+  gen: 0.95,
+  stamina: 1.10
+
+};
+
+
+function calculateStatPLGrowth(
+  baseStats,
+  currentStats
+) {
+
+  let weightedGrowth = 0;
+  let totalWeight = 0;
+
+
+  for (const stat in STAT_WEIGHTS) {
+
+    const growth =
+      currentStats[stat] -
+      baseStats[stat];
+
+
+    weightedGrowth +=
+      growth * STAT_WEIGHTS[stat];
+
+
+    totalWeight +=
+      STAT_WEIGHTS[stat];
+
+  }
+
+
+  return weightedGrowth / totalWeight;
+
+}
+
+
+function calculateCurrentPL(character) {
+
+  const statGrowth =
+    calculateStatPLGrowth(
+      character.baseStats,
+      character.stats
+    );
+
+
+  const permanentBonus =
+    character.permanentPLBonus || 0;
+
+
+  return Math.round(
+    character.basePL +
+    statGrowth +
+    permanentBonus
+  );
+
+}
 
 // =========================================================
 // ENEMY DATABASE
@@ -3115,12 +3224,14 @@ function createCharacterCard(character) {
         color:#94A3B8;
         font-size:12px;
       ">
-        PL ${character.power}
+      PL ${
+  character.basePL !== undefined
+    ? calculateCurrentPL(character)
+    : character.power
+}
       </p>
 
-
     </div>
-
 
   `;
 
@@ -3461,7 +3572,9 @@ function performNinjutsuAttack() {
   // Temporary Phase 2C damage formula
   const damage = Math.max(
     1,
-    Math.floor(fighter.power * 0.10)
+    Math.floor(
+  calculateCurrentPL(fighter) * 0.10
+)
   );
 
 
