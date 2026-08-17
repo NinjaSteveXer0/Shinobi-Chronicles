@@ -7848,6 +7848,21 @@ TAIJUTSU
 
 
 <button
+  onclick="
+    performBukijutsuAttack()
+  "
+
+  ${
+    currentBattle.battleOver
+      ? "disabled"
+      : ""
+  }
+>
+BUKIJUTSU
+</button>
+
+
+<button
   ${
     currentBattle.battleOver
       ? "disabled"
@@ -7870,7 +7885,6 @@ FORMATION
 
 
 </div>
-
 
 
 <!-- BATTLE LOG -->
