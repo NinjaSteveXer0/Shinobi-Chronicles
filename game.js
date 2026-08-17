@@ -2869,6 +2869,68 @@ function getWeaponProficiency(
 }
 
 // =========================================================
+// SIGNATURE WEAPON AFFINITY
+// =========================================================
+//
+// Optional character-specific multiplier for a particular
+// weapon.
+//
+// Example:
+//
+// signatureAffinity: {
+//   sasuke: 1.10
+// }
+//
+// If no affinity exists, the weapon behaves normally at 1.00x.
+//
+// =========================================================
+
+function getSignatureWeaponAffinityMultiplier(
+  character,
+  weaponDefinition
+) {
+
+
+  if (
+    !character ||
+    !weaponDefinition ||
+    !weaponDefinition.signatureAffinity ||
+    typeof weaponDefinition.signatureAffinity !==
+      "object"
+  ) {
+
+    return 1;
+
+  }
+
+
+  const multiplier =
+    Number(
+      weaponDefinition
+        .signatureAffinity[
+          character.id
+        ]
+    );
+
+
+  if (
+    !Number.isFinite(
+      multiplier
+    ) ||
+    multiplier <= 0
+  ) {
+
+    return 1;
+
+  }
+
+
+  return multiplier;
+
+}
+
+
+// =========================================================
 // EQUIPMENT STAT BONUS
 // =========================================================
 
@@ -2886,6 +2948,19 @@ function getEquipmentStatBonuses(
   const proficiency =
     getWeaponProficiency(
       character
+    );
+
+
+  const weaponDefinition =
+    getEquippedWeaponDefinition(
+      character
+    );
+
+
+  const signatureMultiplier =
+    getSignatureWeaponAffinityMultiplier(
+      character,
+      weaponDefinition
     );
 
 
@@ -2908,9 +2983,14 @@ function getEquipmentStatBonuses(
     stat => {
 
 
-      bonuses[stat] =
-        rawBonuses[stat] *
-        proficiency.multiplier;
+      bonuses[
+        stat
+      ] =
+        rawBonuses[
+          stat
+        ] *
+        proficiency.multiplier *
+        signatureMultiplier;
 
     }
   );
@@ -2919,7 +2999,6 @@ function getEquipmentStatBonuses(
   return bonuses;
 
 }
-
 
 // =========================================================
 // EFFECTIVE CHARACTER STATS
