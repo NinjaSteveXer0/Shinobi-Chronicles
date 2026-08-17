@@ -503,6 +503,532 @@ function getNextShinobiDifficulty(
 
 
 // =========================================================
+// BRICK 6 — MARK CURRENT DIFFICULTY COMPLETE
+// =========================================================
+
+function markCurrentDifficultyComplete() {
+
+
+  const progression =
+    playerData.progression;
+
+
+  if (!progression) {
+
+
+    console.log(
+      "No Shinobi progression data found."
+    );
+
+
+    return false;
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  if (!currentDifficulty) {
+
+
+    console.log(
+      "Current difficulty is invalid:",
+      progression.currentDifficulty
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    !Array.isArray(
+      progression.completedDifficulties
+    )
+  ) {
+
+    progression.completedDifficulties =
+      [];
+
+  }
+
+
+  if (
+    !progression.completedDifficulties.includes(
+      currentDifficulty.id
+    )
+  ) {
+
+    progression.completedDifficulties.push(
+      currentDifficulty.id
+    );
+
+  }
+
+
+  progression.runCompleted =
+    true;
+
+
+  console.log(
+    `${currentDifficulty.name} difficulty completed.`
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICK 7 — UNLOCK NEXT DIFFICULTY
+// =========================================================
+
+function unlockNextDifficulty() {
+
+
+  const progression =
+    playerData.progression;
+
+
+  if (!progression) {
+
+    return false;
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  if (!currentDifficulty) {
+
+    return false;
+
+  }
+
+
+  const nextDifficulty =
+    getNextShinobiDifficulty(
+      currentDifficulty.id
+    );
+
+
+  // =========================================
+  // JINCHURIKI HAS NO NORMAL NEXT DIFFICULTY
+  // =========================================
+
+  if (!nextDifficulty) {
+
+
+    console.log(
+      "No further normal difficulty exists."
+    );
+
+
+    return false;
+
+  }
+
+
+  const highestUnlocked =
+    getShinobiDifficulty(
+      progression.highestDifficultyUnlocked
+    );
+
+
+  if (
+    !highestUnlocked ||
+    nextDifficulty.order >
+      highestUnlocked.order
+  ) {
+
+    progression.highestDifficultyUnlocked =
+      nextDifficulty.id;
+
+
+    console.log(
+      `${nextDifficulty.name} difficulty unlocked.`
+    );
+
+  }
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// COMPLETE CURRENT DIFFICULTY
+// =========================================================
+
+function completeCurrentDifficulty() {
+
+
+  const completed =
+    markCurrentDifficultyComplete();
+
+
+  if (!completed) {
+
+    return false;
+
+  }
+
+
+  unlockNextDifficulty();
+
+
+  savePlayerData();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICK 8 — DIFFICULTY ACCESS VALIDATION
+// =========================================================
+
+function canAccessDifficulty(
+  difficultyId
+) {
+
+
+  const targetDifficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  if (!targetDifficulty) {
+
+    return false;
+
+  }
+
+
+  const progression =
+    playerData.progression;
+
+
+  if (!progression) {
+
+    return false;
+
+  }
+
+
+  const highestUnlocked =
+    getShinobiDifficulty(
+      progression.highestDifficultyUnlocked
+    );
+
+
+  if (!highestUnlocked) {
+
+    return false;
+
+  }
+
+
+  return (
+    targetDifficulty.order <=
+    highestUnlocked.order
+  );
+
+}
+
+
+// =========================================================
+// GET DIFFICULTY ACCESS DATA
+// =========================================================
+
+function getDifficultyAccessData(
+  difficultyId
+) {
+
+
+  const difficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  if (!difficulty) {
+
+
+    return {
+
+      exists:
+        false,
+
+      unlocked:
+        false,
+
+      difficulty:
+        null
+
+    };
+
+  }
+
+
+  return {
+
+    exists:
+      true,
+
+    unlocked:
+      canAccessDifficulty(
+        difficultyId
+      ),
+
+    difficulty:
+      difficulty
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 9 — START DIFFICULTY RUN
+// =========================================================
+
+function startDifficultyRun(
+  difficultyId
+) {
+
+
+  const targetDifficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  if (!targetDifficulty) {
+
+
+    console.log(
+      "Difficulty does not exist:",
+      difficultyId
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    !canAccessDifficulty(
+      difficultyId
+    )
+  ) {
+
+
+    console.log(
+      `${targetDifficulty.name} difficulty is locked.`
+    );
+
+
+    return false;
+
+  }
+
+
+  const progression =
+    playerData.progression;
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  // =========================================
+  // MOVING FORWARD REQUIRES CURRENT RUN COMPLETE
+  // =========================================
+
+  if (
+    currentDifficulty &&
+    targetDifficulty.order >
+      currentDifficulty.order &&
+    progression.runCompleted !==
+      true
+  ) {
+
+
+    console.log(
+      `Complete ${currentDifficulty.name} before starting ${targetDifficulty.name}.`
+    );
+
+
+    return false;
+
+  }
+
+
+  progression.currentDifficulty =
+    targetDifficulty.id;
+
+
+  progression.runCompleted =
+    false;
+
+
+  savePlayerData();
+
+
+  console.log(
+    `New ${targetDifficulty.name} run started.`
+  );
+
+
+  console.log(
+    `Legacy Cycle: ${progression.legacyCycle}`
+  );
+
+
+  // =========================================
+  // IMPORTANT
+  // =========================================
+  //
+  // This currently changes RUN IDENTITY ONLY.
+  //
+  // Character / inventory / equipment resets
+  // will be handled later by the inheritance
+  // and New Game+ transition system.
+  //
+  // =========================================
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICK 10 — LEGACY RESET READY CHECK
+// =========================================================
+
+function isLegacyResetReady() {
+
+
+  const progression =
+    playerData.progression;
+
+
+  if (!progression) {
+
+    return false;
+
+  }
+
+
+  if (
+    progression.currentDifficulty !==
+      "jinchuriki"
+  ) {
+
+    return false;
+
+  }
+
+
+  if (
+    progression.runCompleted !==
+      true
+  ) {
+
+    return false;
+
+  }
+
+
+  if (
+    !Array.isArray(
+      progression.completedDifficulties
+    )
+  ) {
+
+    return false;
+
+  }
+
+
+  return SHINOBI_DIFFICULTIES.every(
+    difficulty =>
+      progression.completedDifficulties.includes(
+        difficulty.id
+      )
+  );
+
+}
+
+
+// =========================================================
+// SHOW DIFFICULTY ACCESS
+// =========================================================
+
+function showDifficultyAccess() {
+
+
+  const rows =
+    SHINOBI_DIFFICULTIES.map(
+      difficulty => {
+
+
+        return {
+
+          order:
+            difficulty.order,
+
+          difficulty:
+            difficulty.name,
+
+          unlocked:
+            canAccessDifficulty(
+              difficulty.id
+            ),
+
+          completed:
+            playerData.progression
+              .completedDifficulties
+              .includes(
+                difficulty.id
+              ),
+
+          premium:
+            difficulty.premium ===
+            true
+
+        };
+
+      }
+    );
+
+
+  console.table(
+    rows
+  );
+
+}
+
+
+// =========================================================
 // CREATE DEFAULT CHARACTER PROGRESSION
 // =========================================================
 
