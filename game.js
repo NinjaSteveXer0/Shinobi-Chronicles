@@ -3964,13 +3964,45 @@ function processDisciplineLevelUps(
 
 
 // =========================================================
+// VALIDATE DISCIPLINE TRAINING SOURCE
+// =========================================================
+
+function isValidDisciplineTrainingSource(
+  disciplineId,
+  source
+) {
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+    return false;
+
+  }
+
+
+  return (
+    discipline.trainingSource ===
+    source
+  );
+
+}
+
+
+// =========================================================
 // ADD DISCIPLINE EXP
 // =========================================================
 
 function addDisciplineExp(
   characterId,
   disciplineId,
-  amount
+  amount,
+  source
 ) {
 
 
@@ -4006,6 +4038,29 @@ function addDisciplineExp(
     console.log(
       "Discipline not found:",
       disciplineId
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    !isValidDisciplineTrainingSource(
+      disciplineId,
+      source
+    )
+  ) {
+
+
+    console.log(
+      `${discipline.name} EXP cannot be gained from ${source}.`
+    );
+
+
+    console.log(
+      `Required source: ${discipline.trainingSource}`
     );
 
 
@@ -4062,12 +4117,12 @@ function addDisciplineExp(
 
 
   console.log(
-    `${character.name} gained +${expAmount} ${discipline.name} EXP.`
+    `${character.name} gained +${expAmount} ${discipline.name} EXP from ${source}.`
   );
 
 
   // =========================================
-  // PROCESS LEVEL UPS + EXP OVERFLOW
+  // PROCESS LEVEL UPS + STAT GROWTH
   // =========================================
 
   const levelResult =
@@ -4114,9 +4169,23 @@ function addDisciplineExp(
   }
 
 
+  if (
+    levelResult.statPointsGained >
+      0
+  ) {
+
+
+    console.log(
+      `${discipline.name} Permanent Stat Gain: +${levelResult.statPointsGained}`
+    );
+
+  }
+
+
   return true;
 
 }
+
 
 // =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
