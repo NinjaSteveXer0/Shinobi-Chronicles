@@ -159,6 +159,469 @@ let playerTeam = [
 ];
 
 // =========================================================
+// PLAYER SAVE / PROGRESSION SYSTEM
+// =========================================================
+
+const PLAYER_SAVE_KEY =
+  "shinobiChroniclesPlayerSave";
+
+
+
+// =========================================================
+// DEFAULT PLAYER DATA
+// =========================================================
+
+function createDefaultPlayerData() {
+
+
+  return {
+
+    ryo:
+      0,
+
+    exp:
+      0,
+
+    inventory:
+      []
+
+  };
+
+}
+
+
+
+// =========================================================
+// LOAD PLAYER DATA
+// =========================================================
+
+function loadPlayerData() {
+
+
+  const savedData =
+    localStorage.getItem(
+      PLAYER_SAVE_KEY
+    );
+
+
+  if (!savedData) {
+
+    console.log(
+      "No existing player save found."
+    );
+
+
+    return createDefaultPlayerData();
+
+  }
+
+
+  try {
+
+
+    const parsedData =
+      JSON.parse(
+        savedData
+      );
+
+
+    console.log(
+      "Player save loaded:",
+      parsedData
+    );
+
+
+    return {
+
+      ryo:
+        Number(
+          parsedData.ryo
+        ) || 0,
+
+      exp:
+        Number(
+          parsedData.exp
+        ) || 0,
+
+      inventory:
+        Array.isArray(
+          parsedData.inventory
+        )
+          ? parsedData.inventory
+          : []
+
+    };
+
+
+  }
+  catch (error) {
+
+
+    console.log(
+      "Player save could not be loaded:",
+      error
+    );
+
+
+    return createDefaultPlayerData();
+
+  }
+
+}
+
+
+
+// =========================================================
+// ACTIVE PLAYER DATA
+// =========================================================
+
+let playerData =
+  loadPlayerData();
+
+
+
+// =========================================================
+// SAVE PLAYER DATA
+// =========================================================
+
+function savePlayerData() {
+
+
+  localStorage.setItem(
+    PLAYER_SAVE_KEY,
+    JSON.stringify(
+      playerData
+    )
+  );
+
+
+  console.log(
+    "Player save updated:",
+    playerData
+  );
+
+}
+
+
+
+// =========================================================
+// CREATE INVENTORY ITEM ID
+// =========================================================
+
+function createInventoryItemId(
+  itemName
+) {
+
+
+  return String(
+    itemName
+  )
+    .toLowerCase()
+    .trim()
+    .replace(
+      /[^a-z0-9]+/g,
+      "_"
+    )
+    .replace(
+      /^_+|_+$/g,
+      ""
+    );
+
+}
+
+
+
+// =========================================================
+// ADD ITEM TO INVENTORY
+// =========================================================
+
+function addItemToInventory(
+  item
+) {
+
+
+  if (
+    !item ||
+    !item.name
+  ) {
+
+    console.log(
+      "Invalid inventory item:",
+      item
+    );
+
+
+    return;
+
+  }
+
+
+  const itemId =
+    item.id ||
+    createInventoryItemId(
+      item.name
+    );
+
+
+  const existingItem =
+    playerData.inventory.find(
+      inventoryItem =>
+        inventoryItem.id ===
+        itemId
+    );
+
+
+  // =========================================
+  // STACK EXISTING ITEM
+  // =========================================
+
+  if (existingItem) {
+
+
+    existingItem.quantity +=
+      1;
+
+
+    console.log(
+      `${item.name} increased to ×${existingItem.quantity}`
+    );
+
+
+    return;
+
+  }
+
+
+  // =========================================
+  // ADD NEW ITEM
+  // =========================================
+
+  playerData.inventory.push({
+
+    id:
+      itemId,
+
+    name:
+      item.name,
+
+    rarity:
+      item.rarity ||
+      "Common",
+
+    quantity:
+      1
+
+  });
+
+
+  console.log(
+    `New item obtained: ${item.name}`
+  );
+
+}
+
+
+
+// =========================================================
+// CLAIM CURRENT BATTLE REWARDS
+// =========================================================
+
+function claimCurrentBattleRewards() {
+
+
+  const rewards =
+    currentBattle.rewards;
+
+
+  // =========================================
+  // SAFETY CHECK
+  // =========================================
+
+  if (
+    !rewards ||
+    !rewards.generated
+  ) {
+
+    console.log(
+      "No battle rewards available to claim."
+    );
+
+
+    return false;
+
+  }
+
+
+  // =========================================
+  // DUPLICATE CLAIM PROTECTION
+  // =========================================
+
+  if (
+    rewards.claimed ===
+    true
+  ) {
+
+    console.log(
+      "Battle rewards have already been claimed."
+    );
+
+
+    return false;
+
+  }
+
+
+  // =========================================
+  // AWARD RYO
+  // =========================================
+
+  playerData.ryo +=
+    Number(
+      rewards.ryo
+    ) || 0;
+
+
+  // =========================================
+  // AWARD EXP
+  // =========================================
+
+  playerData.exp +=
+    Number(
+      rewards.exp
+    ) || 0;
+
+
+  // =========================================
+  // AWARD COMMON ITEMS
+  // =========================================
+
+  if (
+    Array.isArray(
+      rewards.items
+    )
+  ) {
+
+
+    rewards.items.forEach(
+      item => {
+
+        addItemToInventory(
+          item
+        );
+
+      }
+    );
+
+  }
+
+
+  // =========================================
+  // AWARD RARE ITEMS
+  // =========================================
+
+  if (
+    Array.isArray(
+      rewards.rareDrops
+    )
+  ) {
+
+
+    rewards.rareDrops.forEach(
+      item => {
+
+        addItemToInventory(
+          item
+        );
+
+      }
+    );
+
+  }
+
+
+  // =========================================
+  // MARK REWARDS AS CLAIMED
+  // =========================================
+
+  rewards.claimed =
+    true;
+
+
+  // =========================================
+  // SAVE PLAYER
+  // =========================================
+
+  savePlayerData();
+
+
+  console.log(
+    "================================="
+  );
+
+
+  console.log(
+    "BATTLE REWARDS CLAIMED"
+  );
+
+
+  console.log(
+    `Ryō: ${playerData.ryo}`
+  );
+
+
+  console.log(
+    `EXP: ${playerData.exp}`
+  );
+
+
+  console.log(
+    "Inventory:",
+    playerData.inventory
+  );
+
+
+  console.log(
+    "================================="
+  );
+
+
+  return true;
+
+}
+
+
+
+// =========================================================
+// DEVELOPMENT PLAYER SAVE VIEW
+// =========================================================
+
+function showPlayerData() {
+
+
+  console.log(
+    "PLAYER DATA:",
+    playerData
+  );
+
+
+  console.log(
+    `Ryō: ${playerData.ryo}`
+  );
+
+
+  console.log(
+    `EXP: ${playerData.exp}`
+  );
+
+
+  console.table(
+    playerData.inventory
+  );
+
+}
+
+
+// =========================================================
 // POWER LEVEL CALCULATION
 // =========================================================
 
@@ -2126,7 +2589,7 @@ function closeOverlay() {
 
   // =========================================
   // VICTORY SCREEN
-  // Return to encounter selection
+  // Claim rewards before leaving
   // =========================================
 
   if (
@@ -2134,13 +2597,8 @@ function closeOverlay() {
     "victory"
   ) {
 
-    currentBattle.active =
-      false;
 
-
-    openOverlay(
-      "battle"
-    );
+    continueAfterVictory();
 
 
     return;
@@ -2157,6 +2615,7 @@ function closeOverlay() {
     currentOverlayType ===
     "combat"
   ) {
+
 
     currentBattle.active =
       false;
@@ -2183,6 +2642,7 @@ function closeOverlay() {
     selectedRegionKey
   ) {
 
+
     openRegionHub(
       selectedRegionKey
     );
@@ -2202,6 +2662,7 @@ function closeOverlay() {
     currentOverlayType !==
       "region"
   ) {
+
 
     openRegionHub(
       selectedRegionKey
@@ -2255,6 +2716,7 @@ function closeOverlay() {
   saveTestState();
 
 }
+
 
 // =========================================================
 // DEVELOPMENT TEST STATE
@@ -7010,16 +7472,37 @@ overflow:hidden;
 function continueAfterVictory() {
 
 
+  // =========================================
+  // CLAIM BATTLE REWARDS
+  // =========================================
+
+  claimCurrentBattleRewards();
+
+
+  // =========================================
+  // END ACTIVE BATTLE
+  // =========================================
+
   currentBattle.active =
     false;
 
+
+  // =========================================
+  // SAVE DEVELOPMENT STATE
+  // =========================================
+
+  saveTestState();
+
+
+  // =========================================
+  // RETURN TO ENCOUNTER SCREEN
+  // =========================================
 
   openOverlay(
     "battle"
   );
 
 }
-
 
 
 // =========================================================
