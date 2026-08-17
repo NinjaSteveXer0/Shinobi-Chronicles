@@ -564,7 +564,7 @@ const enemyDatabase = {
 
           rarity: "Rare",
 
-          chance: 100
+          chance: 6.5
 
         }
 
