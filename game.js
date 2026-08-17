@@ -386,6 +386,123 @@ function cloneProgressionData(
 
 
 // =========================================================
+// SHINOBI DIFFICULTY SYSTEM
+// =========================================================
+
+const SHINOBI_DIFFICULTIES = [
+
+  {
+    id: "academy",
+    name: "Academy Student",
+    order: 0
+  },
+
+  {
+    id: "genin",
+    name: "Genin",
+    order: 1
+  },
+
+  {
+    id: "chunin",
+    name: "Chūnin",
+    order: 2
+  },
+
+  {
+    id: "special_jonin",
+    name: "Special Jōnin",
+    order: 3
+  },
+
+  {
+    id: "jonin",
+    name: "Jōnin",
+    order: 4
+  },
+
+  {
+    id: "anbu",
+    name: "ANBU",
+    order: 5
+  },
+
+  {
+    id: "kage",
+    name: "Kage",
+    order: 6
+  },
+
+  {
+    id: "akatsuki",
+    name: "Akatsuki",
+    order: 7,
+    premium: true
+  },
+
+  {
+    id: "jinchuriki",
+    name: "Jinchūriki",
+    order: 8
+  }
+
+];
+
+
+// =========================================================
+// GET SHINOBI DIFFICULTY
+// =========================================================
+
+function getShinobiDifficulty(
+  difficultyId
+) {
+
+
+  return (
+    SHINOBI_DIFFICULTIES.find(
+      difficulty =>
+        difficulty.id ===
+        difficultyId
+    ) ||
+    null
+  );
+
+}
+
+
+// =========================================================
+// GET NEXT SHINOBI DIFFICULTY
+// =========================================================
+
+function getNextShinobiDifficulty(
+  difficultyId
+) {
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  if (!currentDifficulty) {
+
+    return null;
+
+  }
+
+
+  return (
+    SHINOBI_DIFFICULTIES[
+      currentDifficulty.order + 1
+    ] ||
+    null
+  );
+
+}
+
+
+// =========================================================
 // CREATE DEFAULT CHARACTER PROGRESSION
 // =========================================================
 
@@ -426,7 +543,6 @@ function createDefaultCharacterProgression() {
   return characters;
 
 }
-
 
 // =========================================================
 // DEFAULT PLAYER DATA
