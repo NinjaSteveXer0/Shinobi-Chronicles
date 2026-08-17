@@ -38,9 +38,12 @@ let playerTeam = [
     },
 
     permanentPLBonus: 0,
+
     equipment: [],
-    abilities: [],
+
     weaponSpecializations: {},
+
+    abilities: [],
 
     image:
       "Assets/Animated Cards/Kage Naruto.png"
@@ -76,13 +79,12 @@ let playerTeam = [
     },
 
     permanentPLBonus: 0,
+
     equipment: [],
+
+    weaponSpecializations: {},
+
     abilities: [],
-    weaponSpecializations: {
-
-  Tanto: 0
-
-},
 
     image:
       "Assets/Animated Cards/Jonin Sasuke.png"
@@ -118,16 +120,12 @@ let playerTeam = [
     },
 
     permanentPLBonus: 0,
+
     equipment: [],
+
+    weaponSpecializations: {},
+
     abilities: [],
-    weaponSpecializations: {
-
-      weaponSpecializations: {
-
-  Heavy: 10
-
-},
-    },
 
     image:
       "Assets/Animated Cards/Sannin Sakura.png"
@@ -163,15 +161,19 @@ let playerTeam = [
     },
 
     permanentPLBonus: 0,
+
     equipment: [],
-    abilities: [],
+
     weaponSpecializations: {},
+
+    abilities: [],
 
     image:
       "Assets/Animated Cards/Teen Nagato.png"
   }
 
 ];
+
 
 // =========================================================
 // ITEM DATABASE
@@ -354,6 +356,77 @@ const PLAYER_SAVE_KEY =
   "shinobiChroniclesPlayerSave";
 
 
+// =========================================================
+// CLONE PROGRESSION OBJECT
+// =========================================================
+
+function cloneProgressionData(
+  data
+) {
+
+
+  if (
+    !data ||
+    typeof data !==
+      "object"
+  ) {
+
+    return {};
+
+  }
+
+
+  return JSON.parse(
+    JSON.stringify(
+      data
+    )
+  );
+
+}
+
+
+// =========================================================
+// CREATE DEFAULT CHARACTER PROGRESSION
+// =========================================================
+
+function createDefaultCharacterProgression() {
+
+
+  const characters = {};
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      characters[
+        character.id
+      ] = {
+
+        stats: {
+          ...character.stats
+        },
+
+        permanentPLBonus:
+          Number(
+            character.permanentPLBonus
+          ) || 0,
+
+        weaponSpecializations:
+          cloneProgressionData(
+            character.weaponSpecializations
+          )
+
+      };
+
+    }
+  );
+
+
+  return characters;
+
+}
+
 
 // =========================================================
 // DEFAULT PLAYER DATA
@@ -371,12 +444,141 @@ function createDefaultPlayerData() {
       0,
 
     inventory:
-      []
+      [],
+
+    characters:
+      createDefaultCharacterProgression()
 
   };
 
 }
 
+
+// =========================================================
+// NORMALIZE SAVED CHARACTER PROGRESSION
+// =========================================================
+
+function normalizeSavedCharacterProgression(
+  savedCharacters
+) {
+
+
+  const defaults =
+    createDefaultCharacterProgression();
+
+
+  const source =
+    savedCharacters &&
+    typeof savedCharacters ===
+      "object"
+      ? savedCharacters
+      : {};
+
+
+  const normalized = {};
+
+
+  Object.keys(
+    defaults
+  ).forEach(
+    characterId => {
+
+
+      const defaultCharacter =
+        defaults[
+          characterId
+        ];
+
+
+      const savedCharacter =
+        source[
+          characterId
+        ] || {};
+
+
+      const savedStats =
+        savedCharacter.stats &&
+        typeof savedCharacter.stats ===
+          "object"
+          ? savedCharacter.stats
+          : {};
+
+
+      const normalizedStats = {
+        ...defaultCharacter.stats
+      };
+
+
+      Object.keys(
+        normalizedStats
+      ).forEach(
+        stat => {
+
+
+          if (
+            typeof savedStats[
+              stat
+            ] ===
+              "number"
+          ) {
+
+            normalizedStats[
+              stat
+            ] =
+              savedStats[
+                stat
+              ];
+
+          }
+
+        }
+      );
+
+
+      normalized[
+        characterId
+      ] = {
+
+        stats:
+          normalizedStats,
+
+        permanentPLBonus:
+          typeof savedCharacter
+            .permanentPLBonus ===
+            "number"
+
+            ? savedCharacter
+                .permanentPLBonus
+
+            : defaultCharacter
+                .permanentPLBonus,
+
+        weaponSpecializations:
+          savedCharacter
+            .weaponSpecializations &&
+          typeof savedCharacter
+            .weaponSpecializations ===
+            "object"
+
+            ? cloneProgressionData(
+                savedCharacter
+                  .weaponSpecializations
+              )
+
+            : cloneProgressionData(
+                defaultCharacter
+                  .weaponSpecializations
+              )
+
+      };
+
+    }
+  );
+
+
+  return normalized;
+
+}
 
 
 // =========================================================
@@ -393,6 +595,7 @@ function loadPlayerData() {
 
 
   if (!savedData) {
+
 
     console.log(
       "No existing player save found."
@@ -436,7 +639,12 @@ function loadPlayerData() {
           parsedData.inventory
         )
           ? parsedData.inventory
-          : []
+          : [],
+
+      characters:
+        normalizeSavedCharacterProgression(
+          parsedData.characters
+        )
 
     };
 
@@ -458,7 +666,6 @@ function loadPlayerData() {
 }
 
 
-
 // =========================================================
 // ACTIVE PLAYER DATA
 // =========================================================
@@ -467,12 +674,166 @@ let playerData =
   loadPlayerData();
 
 
+// =========================================================
+// RESTORE CHARACTER PROGRESSION FROM SAVE
+// =========================================================
+
+function syncCharacterProgressionFromSave() {
+
+
+  if (
+    !playerData.characters ||
+    typeof playerData.characters !==
+      "object"
+  ) {
+
+    playerData.characters =
+      createDefaultCharacterProgression();
+
+  }
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const savedCharacter =
+        playerData.characters[
+          character.id
+        ];
+
+
+      if (!savedCharacter) {
+
+        return;
+
+      }
+
+
+      if (
+        savedCharacter.stats &&
+        typeof savedCharacter.stats ===
+          "object"
+      ) {
+
+
+        Object.keys(
+          character.stats
+        ).forEach(
+          stat => {
+
+
+            if (
+              typeof savedCharacter
+                .stats[
+                  stat
+                ] ===
+                "number"
+            ) {
+
+              character.stats[
+                stat
+              ] =
+                savedCharacter
+                  .stats[
+                    stat
+                  ];
+
+            }
+
+          }
+        );
+
+      }
+
+
+      character.permanentPLBonus =
+        Number(
+          savedCharacter
+            .permanentPLBonus
+        ) || 0;
+
+
+      character.weaponSpecializations =
+        cloneProgressionData(
+          savedCharacter
+            .weaponSpecializations
+        );
+
+    }
+  );
+
+
+  console.log(
+    "Character progression restored."
+  );
+
+}
+
+
+// =========================================================
+// COPY RUNTIME CHARACTER PROGRESSION TO SAVE
+// =========================================================
+
+function syncRuntimeProgressionToPlayerData() {
+
+
+  if (
+    !playerData.characters ||
+    typeof playerData.characters !==
+      "object"
+  ) {
+
+    playerData.characters = {};
+
+  }
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      playerData.characters[
+        character.id
+      ] = {
+
+        stats: {
+          ...character.stats
+        },
+
+        permanentPLBonus:
+          Number(
+            character.permanentPLBonus
+          ) || 0,
+
+        weaponSpecializations:
+          cloneProgressionData(
+            character.weaponSpecializations
+          )
+
+      };
+
+    }
+  );
+
+}
+
+
+// =========================================================
+// APPLY SAVED CHARACTER PROGRESSION NOW
+// =========================================================
+
+syncCharacterProgressionFromSave();
+
 
 // =========================================================
 // SAVE PLAYER DATA
 // =========================================================
 
 function savePlayerData() {
+
+
+  syncRuntimeProgressionToPlayerData();
 
 
   localStorage.setItem(
@@ -489,7 +850,6 @@ function savePlayerData() {
   );
 
 }
-
 
 
 // =========================================================
@@ -1680,6 +2040,179 @@ function getEquippedWeaponDefinition(
 
 
 // =========================================================
+// WEAPON SPECIALIZATION SETTINGS
+// =========================================================
+
+const WEAPON_SPECIALIZATION_MAX_LEVEL =
+  5;
+
+
+const WEAPON_SPECIALIZATION_BONUS_PER_LEVEL =
+  5;
+
+
+// =========================================================
+// WEAPON SPECIALIZATION EXP REQUIREMENT
+// =========================================================
+
+function getWeaponSpecializationExpRequired(
+  level
+) {
+
+
+  const safeLevel =
+    Math.max(
+      0,
+      Number(level) || 0
+    );
+
+
+  return (
+    50 +
+    safeLevel * 25
+  );
+
+}
+
+
+// =========================================================
+// NORMALIZE WEAPON SPECIALIZATION RECORD
+// =========================================================
+
+function normalizeWeaponSpecializationRecord(
+  value
+) {
+
+
+  if (
+    typeof value ===
+      "number"
+  ) {
+
+
+    const convertedLevel =
+      Math.min(
+        WEAPON_SPECIALIZATION_MAX_LEVEL,
+        Math.max(
+          0,
+          Math.floor(
+            value /
+            WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
+          )
+        )
+      );
+
+
+    return {
+
+      level:
+        convertedLevel,
+
+      exp:
+        0
+
+    };
+
+  }
+
+
+  if (
+    !value ||
+    typeof value !==
+      "object"
+  ) {
+
+    return {
+
+      level:
+        0,
+
+      exp:
+        0
+
+    };
+
+  }
+
+
+  return {
+
+    level:
+      Math.min(
+        WEAPON_SPECIALIZATION_MAX_LEVEL,
+        Math.max(
+          0,
+          Number(
+            value.level
+          ) || 0
+        )
+      ),
+
+    exp:
+      Math.max(
+        0,
+        Number(
+          value.exp
+        ) || 0
+      )
+
+  };
+
+}
+
+
+// =========================================================
+// GET / CREATE WEAPON SPECIALIZATION RECORD
+// =========================================================
+
+function getWeaponSpecializationRecord(
+  character,
+  weaponClass
+) {
+
+
+  if (
+    !character ||
+    !weaponClass
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    !character.weaponSpecializations ||
+    typeof character.weaponSpecializations !==
+      "object"
+  ) {
+
+    character.weaponSpecializations =
+      {};
+
+  }
+
+
+  const normalized =
+    normalizeWeaponSpecializationRecord(
+      character
+        .weaponSpecializations[
+          weaponClass
+        ]
+    );
+
+
+  character.weaponSpecializations[
+    weaponClass
+  ] = normalized;
+
+
+  return normalized;
+
+}
+
+
+// =========================================================
 // GET WEAPON SPECIALIZATION BONUS
 // =========================================================
 
@@ -1700,11 +2233,14 @@ function getWeaponSpecializationBonus(
   }
 
 
-  if (
-    !character.weaponSpecializations ||
-    typeof character.weaponSpecializations !==
-      "object"
-  ) {
+  const specialization =
+    getWeaponSpecializationRecord(
+      character,
+      weaponDefinition.weaponClass
+    );
+
+
+  if (!specialization) {
 
     return 0;
 
@@ -1712,12 +2248,270 @@ function getWeaponSpecializationBonus(
 
 
   return (
-    Number(
-      character.weaponSpecializations[
-        weaponDefinition.weaponClass
-      ]
-    ) ||
-    0
+    specialization.level *
+    WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
+  );
+
+}
+
+
+// =========================================================
+// ADD WEAPON SPECIALIZATION EXP
+// =========================================================
+
+function addWeaponSpecializationExp(
+  characterId,
+  weaponClass,
+  amount
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return false;
+
+  }
+
+
+  const expAmount =
+    Math.max(
+      0,
+      Number(
+        amount
+      ) || 0
+    );
+
+
+  if (
+    !weaponClass ||
+    expAmount <= 0
+  ) {
+
+    console.log(
+      "Invalid specialization EXP."
+    );
+
+
+    return false;
+
+  }
+
+
+  const specialization =
+    getWeaponSpecializationRecord(
+      character,
+      weaponClass
+    );
+
+
+  if (
+    specialization.level >=
+    WEAPON_SPECIALIZATION_MAX_LEVEL
+  ) {
+
+
+    specialization.exp =
+      0;
+
+
+    console.log(
+      `${character.name} already has maximum ${weaponClass} specialization.`
+    );
+
+
+    savePlayerData();
+
+
+    return true;
+
+  }
+
+
+  specialization.exp +=
+    expAmount;
+
+
+  let levelsGained =
+    0;
+
+
+  while (
+    specialization.level <
+      WEAPON_SPECIALIZATION_MAX_LEVEL
+  ) {
+
+
+    const expRequired =
+      getWeaponSpecializationExpRequired(
+        specialization.level
+      );
+
+
+    if (
+      specialization.exp <
+      expRequired
+    ) {
+
+      break;
+
+    }
+
+
+    specialization.exp -=
+      expRequired;
+
+
+    specialization.level +=
+      1;
+
+
+    levelsGained +=
+      1;
+
+  }
+
+
+  if (
+    specialization.level >=
+    WEAPON_SPECIALIZATION_MAX_LEVEL
+  ) {
+
+    specialization.level =
+      WEAPON_SPECIALIZATION_MAX_LEVEL;
+
+
+    specialization.exp =
+      0;
+
+  }
+
+
+  savePlayerData();
+
+
+  console.log(
+    `${character.name} gained +${expAmount} ${weaponClass} specialization EXP.`
+  );
+
+
+  console.log(
+    `${weaponClass} Specialization Level: ${specialization.level}`
+  );
+
+
+  console.log(
+    `${weaponClass} Handling Bonus: +${
+      specialization.level *
+      WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
+    }`
+  );
+
+
+  if (
+    levelsGained > 0
+  ) {
+
+    console.log(
+      `Specialization level increased by ${levelsGained}.`
+    );
+
+  }
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// SHOW WEAPON SPECIALIZATION DATA
+// =========================================================
+
+function showWeaponSpecializationData(
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+    return;
+
+  }
+
+
+  const rows =
+    Object.entries(
+      character.weaponSpecializations ||
+      {}
+    ).map(
+      (
+        [
+          weaponClass,
+          value
+        ]
+      ) => {
+
+
+        const specialization =
+          getWeaponSpecializationRecord(
+            character,
+            weaponClass
+          );
+
+
+        const maxed =
+          specialization.level >=
+          WEAPON_SPECIALIZATION_MAX_LEVEL;
+
+
+        return {
+
+          weaponClass:
+            weaponClass,
+
+          level:
+            specialization.level,
+
+          exp:
+            specialization.exp,
+
+          expToNext:
+            maxed
+              ? "MAX"
+              : getWeaponSpecializationExpRequired(
+                  specialization.level
+                ),
+
+          handlingBonus:
+            specialization.level *
+            WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
+
+        };
+
+      }
+    );
+
+
+  console.table(
+    rows
   );
 
 }
@@ -1764,7 +2558,6 @@ function getWeaponClassDifficulty(
   );
 
 }
-
 
 // =========================================================
 // GET RAW EQUIPMENT STAT BONUSES
