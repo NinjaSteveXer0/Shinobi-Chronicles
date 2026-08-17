@@ -1952,6 +1952,13 @@ function showEquipmentData() {
           );
 
 
+        const signatureMultiplier =
+          getSignatureWeaponAffinityMultiplier(
+            character,
+            definition
+          );
+
+
         const finalBonuses =
           getEquipmentStatBonuses(
             character
@@ -1995,8 +2002,13 @@ function showEquipmentData() {
           activeScore:
             activeProficiency.proficiencyBuki,
 
-          multiplier:
+          proficiencyMult:
             `${activeProficiency.multiplier.toFixed(
+              2
+            )}x`,
+
+          signatureMult:
+            `${signatureMultiplier.toFixed(
               2
             )}x`,
 
@@ -2019,6 +2031,504 @@ function showEquipmentData() {
 
   console.table(
     equipmentView
+  );
+
+}
+
+
+// =========================================================
+// EQUIPMENT PHASE DIAGNOSTICS
+// =========================================================
+
+function runEquipmentPhaseDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — EQUIPMENT DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  // =========================================
+  // PLAYER SAVE STRUCTURE
+  // =========================================
+
+  results.push({
+
+    test:
+      "Inventory exists",
+
+    pass:
+      Array.isArray(
+        playerData.inventory
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Character progression exists",
+
+    pass:
+      !!(
+        playerData.characters &&
+        typeof playerData.characters ===
+          "object"
+      )
+
+  });
+
+
+  // =========================================
+  // INVENTORY INTEGRITY
+  // =========================================
+
+  const instanceIds =
+    new Set();
+
+
+  let duplicateInstanceIds =
+    false;
+
+
+  let invalidEquippedCharacter =
+    false;
+
+
+  let invalidEquippedDefinition =
+    false;
+
+
+  playerData.inventory.forEach(
+    item => {
+
+
+      if (
+        item.instanceId
+      ) {
+
+
+        if (
+          instanceIds.has(
+            item.instanceId
+          )
+        ) {
+
+          duplicateInstanceIds =
+            true;
+
+        }
+
+
+        instanceIds.add(
+          item.instanceId
+        );
+
+      }
+
+
+      if (
+        item.equippedBy &&
+        !getPlayerCharacter(
+          item.equippedBy
+        )
+      ) {
+
+        invalidEquippedCharacter =
+          true;
+
+      }
+
+
+      if (
+        item.equippedBy &&
+        !getItemDefinition(
+          item.id
+        )
+      ) {
+
+        invalidEquippedDefinition =
+          true;
+
+      }
+
+    }
+  );
+
+
+  results.push({
+
+    test:
+      "No duplicate item instances",
+
+    pass:
+      !duplicateInstanceIds
+
+  });
+
+
+  results.push({
+
+    test:
+      "No invalid equipped character IDs",
+
+    pass:
+      !invalidEquippedCharacter
+
+  });
+
+
+  results.push({
+
+    test:
+      "No missing equipped item definitions",
+
+    pass:
+      !invalidEquippedDefinition
+
+  });
+
+
+  // =========================================
+  // CHARACTER EQUIPMENT INTEGRITY
+  // =========================================
+
+  let duplicateSlots =
+    false;
+
+
+  let invalidRuntimeEquipment =
+    false;
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const slots =
+        new Set();
+
+
+      character.equipment.forEach(
+        equipment => {
+
+
+          if (
+            slots.has(
+              equipment.slot
+            )
+          ) {
+
+            duplicateSlots =
+              true;
+
+          }
+
+
+          slots.add(
+            equipment.slot
+          );
+
+
+          const inventoryItem =
+            playerData.inventory.find(
+              item =>
+                item.instanceId ===
+                equipment.instanceId
+            );
+
+
+          if (
+            !inventoryItem ||
+            inventoryItem.equippedBy !==
+              character.id
+          ) {
+
+            invalidRuntimeEquipment =
+              true;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  results.push({
+
+    test:
+      "No duplicate character equipment slots",
+
+    pass:
+      !duplicateSlots
+
+  });
+
+
+  results.push({
+
+    test:
+      "Runtime equipment matches inventory",
+
+    pass:
+      !invalidRuntimeEquipment
+
+  });
+
+
+  // =========================================
+  // CALCULATION HEALTH
+  // =========================================
+
+  let validEffectiveStats =
+    true;
+
+
+  let validPowerLevels =
+    true;
+
+
+  let validProficiencies =
+    true;
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const effectiveStats =
+        getEffectiveCharacterStats(
+          character
+        );
+
+
+      Object.values(
+        effectiveStats
+      ).forEach(
+        value => {
+
+
+          if (
+            !Number.isFinite(
+              Number(value)
+            )
+          ) {
+
+            validEffectiveStats =
+              false;
+
+          }
+
+        }
+      );
+
+
+      const pl =
+        calculateCurrentPL(
+          character
+        );
+
+
+      if (
+        !Number.isFinite(
+          pl
+        )
+      ) {
+
+        validPowerLevels =
+          false;
+
+      }
+
+
+      const proficiency =
+        getWeaponProficiency(
+          character
+        );
+
+
+      if (
+        !Number.isFinite(
+          proficiency.multiplier
+        ) ||
+        !Number.isFinite(
+          proficiency.proficiencyBuki
+        )
+      ) {
+
+        validProficiencies =
+          false;
+
+      }
+
+    }
+  );
+
+
+  results.push({
+
+    test:
+      "Effective stats are valid",
+
+    pass:
+      validEffectiveStats
+
+  });
+
+
+  results.push({
+
+    test:
+      "Power levels are valid",
+
+    pass:
+      validPowerLevels
+
+  });
+
+
+  results.push({
+
+    test:
+      "Weapon proficiency is valid",
+
+    pass:
+      validProficiencies
+
+  });
+
+
+  // =========================================
+  // SPECIALIZATION SAVE HEALTH
+  // =========================================
+
+  let specializationDataValid =
+    true;
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const specializations =
+        character.weaponSpecializations ||
+        {};
+
+
+      Object.values(
+        specializations
+      ).forEach(
+        specialization => {
+
+
+          const normalized =
+            normalizeWeaponSpecializationRecord(
+              specialization
+            );
+
+
+          if (
+            !Number.isFinite(
+              normalized.level
+            ) ||
+            !Number.isFinite(
+              normalized.exp
+            )
+          ) {
+
+            specializationDataValid =
+              false;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  results.push({
+
+    test:
+      "Weapon specialization data valid",
+
+    pass:
+      specializationDataValid
+
+  });
+
+
+  // =========================================
+  // DISPLAY RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ EQUIPMENT PHASE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ EQUIPMENT PHASE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  showEquipmentData();
+
+
+  return (
+    failedTests.length ===
+    0
   );
 
 }
