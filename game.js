@@ -159,6 +159,179 @@ let playerTeam = [
 ];
 
 // =========================================================
+// ITEM DATABASE
+// =========================================================
+
+const itemDatabase = {
+
+
+  // =========================================
+  // BASIC SCROLL
+  // =========================================
+
+  basic_scroll: {
+
+    id:
+      "basic_scroll",
+
+    name:
+      "Basic Scroll",
+
+    type:
+      "scroll",
+
+    rarity:
+      "Common",
+
+    stackable:
+      true,
+
+    description:
+      "A basic shinobi scroll used for training, missions and future crafting systems."
+
+  },
+
+
+
+  // =========================================
+  // BANDIT SUPPLIES
+  // =========================================
+
+  bandit_supplies: {
+
+    id:
+      "bandit_supplies",
+
+    name:
+      "Bandit Supplies",
+
+    type:
+      "material",
+
+    rarity:
+      "Common",
+
+    stackable:
+      true,
+
+    description:
+      "A collection of supplies recovered from rogue shinobi and bandit camps."
+
+  },
+
+
+
+  // =========================================
+  // WEAPON MATERIALS
+  // =========================================
+
+  weapon_materials: {
+
+    id:
+      "weapon_materials",
+
+    name:
+      "Weapon Materials",
+
+    type:
+      "material",
+
+    rarity:
+      "Common",
+
+    stackable:
+      true,
+
+    description:
+      "Metal, bindings and components suitable for repairing or crafting shinobi weapons."
+
+  },
+
+
+
+  // =========================================
+  // BANDIT CAPTAIN'S TANTO
+  // =========================================
+
+  bandit_captains_tanto: {
+
+    id:
+      "bandit_captains_tanto",
+
+    name:
+      "Bandit Captain's Tanto",
+
+    type:
+      "weapon",
+
+    weaponClass:
+      "Tanto",
+
+    rarity:
+      "Rare",
+
+    stackable:
+      false,
+
+    equipmentSlot:
+      "weapon",
+
+    description:
+      "A short blade carried by an experienced bandit captain. Fast, compact and built for close-range combat.",
+
+    statModifiers: {
+
+      buki:
+        0
+
+    }
+
+  }
+
+};
+
+
+
+// =========================================================
+// ITEM DATABASE HELPERS
+// =========================================================
+
+function getItemDefinition(
+  itemId
+) {
+
+
+  return (
+    itemDatabase[
+      itemId
+    ] ||
+    null
+  );
+
+}
+
+
+
+function getItemDefinitionByName(
+  itemName
+) {
+
+
+  const itemId =
+    createInventoryItemId(
+      itemName
+    );
+
+
+  return getItemDefinition(
+    itemId
+  );
+
+}
+
+
+
+// =========================================================
 // PLAYER SAVE / PROGRESSION SYSTEM
 // =========================================================
 
@@ -356,70 +529,159 @@ function addItemToInventory(
   }
 
 
-  const itemId =
+
+  // =========================================
+  // FIND ITEM DATABASE ENTRY
+  // =========================================
+
+  const generatedId =
     item.id ||
     createInventoryItemId(
       item.name
     );
 
 
-  const existingItem =
-    playerData.inventory.find(
-      inventoryItem =>
-        inventoryItem.id ===
-        itemId
+  const definition =
+    getItemDefinition(
+      generatedId
     );
 
 
+
   // =========================================
-  // STACK EXISTING ITEM
+  // BUILD INVENTORY ITEM DATA
   // =========================================
 
-  if (existingItem) {
+  const inventoryItemData = {
+
+    id:
+      generatedId,
+
+    name:
+      definition
+        ? definition.name
+        : item.name,
+
+    type:
+      definition
+        ? definition.type
+        : "misc",
+
+    rarity:
+      definition
+        ? definition.rarity
+        : (
+            item.rarity ||
+            "Common"
+          ),
+
+    stackable:
+      definition
+        ? definition.stackable
+        : true
+
+  };
 
 
-    existingItem.quantity +=
-      1;
+
+  // =========================================
+  // STACKABLE ITEMS
+  // =========================================
+
+  if (
+    inventoryItemData.stackable
+  ) {
 
 
-    console.log(
-      `${item.name} increased to ×${existingItem.quantity}`
-    );
+    const existingItem =
+      playerData.inventory.find(
+        inventoryItem =>
+          inventoryItem.id ===
+          inventoryItemData.id
+      );
 
 
-    return;
+    if (existingItem) {
+
+
+      existingItem.quantity +=
+        1;
+
+
+      console.log(
+        `${inventoryItemData.name} increased to ×${existingItem.quantity}`
+      );
+
+
+      return;
+
+    }
 
   }
 
 
+
   // =========================================
-  // ADD NEW ITEM
+  // CREATE NEW INVENTORY ENTRY
   // =========================================
 
-  playerData.inventory.push({
+  const newInventoryItem = {
 
     id:
-      itemId,
+      inventoryItemData.id,
 
     name:
-      item.name,
+      inventoryItemData.name,
+
+    type:
+      inventoryItemData.type,
 
     rarity:
-      item.rarity ||
-      "Common",
+      inventoryItemData.rarity,
 
     quantity:
       1
 
-  });
+  };
+
+
+
+  // =========================================
+  // EQUIPMENT DATA
+  // =========================================
+
+  if (
+    definition &&
+    definition.type ===
+      "weapon"
+  ) {
+
+
+    newInventoryItem.weaponClass =
+      definition.weaponClass;
+
+
+    newInventoryItem.equipmentSlot =
+      definition.equipmentSlot;
+
+
+    newInventoryItem.equippedBy =
+      null;
+
+  }
+
+
+
+  playerData.inventory.push(
+    newInventoryItem
+  );
 
 
   console.log(
-    `New item obtained: ${item.name}`
+    `New item obtained: ${newInventoryItem.name}`
   );
 
 }
-
 
 
 // =========================================================
@@ -599,6 +861,11 @@ function showPlayerData() {
 
 
   console.log(
+    "================================"
+  );
+
+
+  console.log(
     "PLAYER DATA:",
     playerData
   );
@@ -614,8 +881,61 @@ function showPlayerData() {
   );
 
 
+  console.log(
+    "INVENTORY:"
+  );
+
+
+  const inventoryView =
+    playerData.inventory.map(
+      item => {
+
+
+        const definition =
+          getItemDefinition(
+            item.id
+          );
+
+
+        return {
+
+          id:
+            item.id,
+
+          name:
+            item.name,
+
+          type:
+            definition
+              ? definition.type
+              : (
+                  item.type ||
+                  "misc"
+                ),
+
+          rarity:
+            item.rarity,
+
+          quantity:
+            item.quantity,
+
+          equippedBy:
+            item.equippedBy ||
+            "—"
+
+        };
+
+      }
+    );
+
+
   console.table(
-    playerData.inventory
+    inventoryView
+  );
+
+
+  console.log(
+    "================================"
   );
 
 }
