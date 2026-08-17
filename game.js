@@ -6753,13 +6753,13 @@ overflow:hidden;
 
         font-size:clamp(
           9px,
-          0.95vw,
+          1vw,
           14px
         );
 
         font-weight:bold;
 
-        margin-top:3px;
+        margin-top:5px;
 
         line-height:1.15;
 
@@ -6777,62 +6777,47 @@ overflow:hidden;
         color:#00D9E8;
 
         font-size:clamp(
-          7px,
-          0.72vw,
-          10px
+          13px,
+          1.35vw,
+          20px
         );
 
         font-weight:bold;
 
-        margin-top:3px;
+        margin-top:5px;
+
+        text-shadow:
+          0 0 10px
+          rgba(
+            0,
+            217,
+            232,
+            0.45
+          );
       ">
 
         ${mvpPercentage}
-        DAMAGE
 
       </div>
 
 
-      ${
-        battleMVP
-          ? `
-
-            <div style="
-              color:#94A3B8;
-
-              font-size:clamp(
-                6px,
-                0.58vw,
-                8px
-              );
-
-              margin-top:2px;
-            ">
-
-              ${mvpDamage}
-              BP
-
-            </div>
-
-          `
-          : ""
-      }
-
-
       <div style="
-        color:#CBD5E1;
+        color:#94A3B8;
 
         font-size:clamp(
           6px,
-          0.55vw,
-          8px
+          0.58vw,
+          9px
         );
 
-        margin-top:4px;
+        font-weight:bold;
+
+        letter-spacing:0.8px;
+
+        margin-top:1px;
       ">
 
-        FINAL:
-        ${finalStrike}
+        TOTAL DAMAGE
 
       </div>
 
@@ -6841,7 +6826,88 @@ overflow:hidden;
 
 
 
-  </div>
+    <!-- ====================================== -->
+    <!-- BATTLE PERFORMANCE SUMMARY -->
+    <!-- ====================================== -->
+
+    <div
+      class="
+        victory-slot
+        victory-slot-mvp
+      "
+
+      style="
+        position:absolute;
+
+        left:50%;
+        top:95.5%;
+
+        width:62%;
+
+        transform:
+          translate(
+            -50%,
+            -50%
+          );
+
+        text-align:center;
+
+        pointer-events:none;
+
+        color:#CBD5E1;
+
+        font-size:clamp(
+          6px,
+          0.62vw,
+          9px
+        );
+
+        letter-spacing:0.7px;
+
+        text-shadow:
+          0 2px 5px
+          #000000;
+      "
+    >
+
+
+      <span style="
+        color:#D6A93A;
+        font-weight:bold;
+      ">
+
+        MVP DAMAGE:
+
+      </span>
+
+      ${mvpDamage} BP
+
+
+      <span style="
+        color:#475569;
+        margin:
+          0
+          10px;
+      ">
+
+        •
+
+      </span>
+
+
+      <span style="
+        color:#00D9E8;
+        font-weight:bold;
+      ">
+
+        FINAL STRIKE:
+
+      </span>
+
+      ${finalStrike}
+
+
+    </div>
 
 
 
