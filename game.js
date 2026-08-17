@@ -604,7 +604,11 @@ function addItemToInventory(
     if (existingItem) {
 
 
-      existingItem.quantity +=
+      existingItem.quantity =
+        (
+          existingItem.quantity ||
+          0
+        ) +
         1;
 
 
@@ -643,6 +647,25 @@ function addItemToInventory(
       1
 
   };
+
+
+
+  // =========================================
+  // NON-STACKABLE ITEM INSTANCE
+  // =========================================
+
+  if (
+    !inventoryItemData.stackable
+  ) {
+
+
+    newInventoryItem.instanceId =
+      `${inventoryItemData.id}_${Date.now()}_${Math.floor(
+        Math.random() *
+        100000
+      )}`;
+
+  }
 
 
 
@@ -848,6 +871,470 @@ function claimCurrentBattleRewards() {
 
 
   return true;
+
+}
+
+
+// =========================================================
+// PLAYER EQUIPMENT SYSTEM
+// =========================================================
+
+function getPlayerCharacter(
+  characterId
+) {
+
+
+  return (
+    playerTeam.find(
+      character =>
+        character.id ===
+        characterId
+    ) ||
+    null
+  );
+
+}
+
+
+
+// =========================================================
+// FIND AVAILABLE INVENTORY EQUIPMENT
+// =========================================================
+
+function findAvailableEquipment(
+  itemId
+) {
+
+
+  return (
+    playerData.inventory.find(
+      item =>
+        item.id === itemId &&
+        item.type === "weapon" &&
+        !item.equippedBy
+    ) ||
+    null
+  );
+
+}
+
+
+
+// =========================================================
+// EQUIP ITEM TO CHARACTER
+// =========================================================
+
+function equipItemToCharacter(
+  itemId,
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return false;
+
+  }
+
+
+
+  const item =
+    findAvailableEquipment(
+      itemId
+    );
+
+
+  if (!item) {
+
+
+    console.log(
+      "No unequipped item available:",
+      itemId
+    );
+
+
+    return false;
+
+  }
+
+
+
+  const definition =
+    getItemDefinition(
+      item.id
+    );
+
+
+  if (
+    !definition ||
+    definition.type !==
+      "weapon"
+  ) {
+
+
+    console.log(
+      "Item cannot be equipped:",
+      item.name
+    );
+
+
+    return false;
+
+  }
+
+
+
+  // =========================================
+  // PREPARE CHARACTER EQUIPMENT ARRAY
+  // =========================================
+
+  if (
+    !Array.isArray(
+      character.equipment
+    )
+  ) {
+
+
+    character.equipment =
+      [];
+
+  }
+
+
+
+  // =========================================
+  // CURRENTLY ONE WEAPON SLOT
+  // =========================================
+
+  const existingWeapon =
+    character.equipment.find(
+      equipment =>
+        equipment.slot ===
+        "weapon"
+    );
+
+
+  if (existingWeapon) {
+
+
+    console.log(
+      `${character.name} already has a weapon equipped.`
+    );
+
+
+    console.log(
+      "Unequip the current weapon first."
+    );
+
+
+    return false;
+
+  }
+
+
+
+  // =========================================
+  // EQUIP WEAPON
+  // =========================================
+
+  item.equippedBy =
+    character.id;
+
+
+  character.equipment.push({
+
+    instanceId:
+      item.instanceId,
+
+    itemId:
+      item.id,
+
+    slot:
+      "weapon"
+
+  });
+
+
+
+  savePlayerData();
+
+
+
+  console.log(
+    `${item.name} equipped by ${character.name}.`
+  );
+
+
+  return true;
+
+}
+
+
+
+// =========================================================
+// UNEQUIP CHARACTER WEAPON
+// =========================================================
+
+function unequipCharacterWeapon(
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return false;
+
+  }
+
+
+
+  if (
+    !Array.isArray(
+      character.equipment
+    ) ||
+    character.equipment.length ===
+      0
+  ) {
+
+
+    console.log(
+      `${character.name} has no equipment.`
+    );
+
+
+    return false;
+
+  }
+
+
+
+  const equippedWeapon =
+    character.equipment.find(
+      equipment =>
+        equipment.slot ===
+        "weapon"
+    );
+
+
+  if (!equippedWeapon) {
+
+
+    console.log(
+      `${character.name} has no weapon equipped.`
+    );
+
+
+    return false;
+
+  }
+
+
+
+  const inventoryItem =
+    playerData.inventory.find(
+      item =>
+        item.instanceId ===
+        equippedWeapon.instanceId
+    );
+
+
+  if (inventoryItem) {
+
+
+    inventoryItem.equippedBy =
+      null;
+
+  }
+
+
+
+  character.equipment =
+    character.equipment.filter(
+      equipment =>
+        equipment.instanceId !==
+        equippedWeapon.instanceId
+    );
+
+
+
+  savePlayerData();
+
+
+
+  console.log(
+    `${character.name}'s weapon has been unequipped.`
+  );
+
+
+  return true;
+
+}
+
+
+
+// =========================================================
+// RESTORE EQUIPMENT FROM PLAYER SAVE
+// =========================================================
+
+function syncCharacterEquipmentFromSave() {
+
+
+  // =========================================
+  // CLEAR RUNTIME EQUIPMENT
+  // =========================================
+
+  playerTeam.forEach(
+    character => {
+
+
+      character.equipment =
+        [];
+
+    }
+  );
+
+
+
+  // =========================================
+  // RESTORE SAVED EQUIPMENT
+  // =========================================
+
+  playerData.inventory.forEach(
+    item => {
+
+
+      if (
+        !item.equippedBy ||
+        item.type !==
+          "weapon"
+      ) {
+
+        return;
+
+      }
+
+
+
+      const character =
+        getPlayerCharacter(
+          item.equippedBy
+        );
+
+
+      if (!character) {
+
+        return;
+
+      }
+
+
+
+      character.equipment.push({
+
+        instanceId:
+          item.instanceId,
+
+        itemId:
+          item.id,
+
+        slot:
+          item.equipmentSlot ||
+          "weapon"
+
+      });
+
+    }
+  );
+
+
+  console.log(
+    "Character equipment restored."
+  );
+
+}
+
+
+
+// =========================================================
+// DEVELOPMENT EQUIPMENT VIEW
+// =========================================================
+
+function showEquipmentData() {
+
+
+  const equipmentView =
+    playerTeam.map(
+      character => {
+
+
+        const weapon =
+          character.equipment.find(
+            equipment =>
+              equipment.slot ===
+              "weapon"
+          );
+
+
+        const inventoryItem =
+          weapon
+            ? playerData.inventory.find(
+                item =>
+                  item.instanceId ===
+                  weapon.instanceId
+              )
+            : null;
+
+
+        return {
+
+          character:
+            character.name,
+
+          weapon:
+            inventoryItem
+              ? inventoryItem.name
+              : "—",
+
+          itemId:
+            inventoryItem
+              ? inventoryItem.id
+              : "—"
+
+        };
+
+      }
+    );
+
+
+  console.table(
+    equipmentView
+  );
 
 }
 
@@ -8631,8 +9118,19 @@ function restoreTestState() {
 }
 
 
+// =========================================================
+// INITIAL GAME LOAD
+// =========================================================
 
 window.addEventListener(
   "load",
-  restoreTestState
+  () => {
+
+
+    syncCharacterEquipmentFromSave();
+
+
+    restoreTestState();
+
+  }
 );
