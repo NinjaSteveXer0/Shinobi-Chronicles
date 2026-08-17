@@ -4188,6 +4188,670 @@ function addDisciplineExp(
 
 
 // =========================================================
+// BRICK 20 — SHINOBI DISCIPLINE DIAGNOSTICS
+// =========================================================
+
+function runDisciplinePhaseDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — DISCIPLINE DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const expectedDisciplines = [
+    "nin",
+    "tai",
+    "buki",
+    "fuin",
+    "kin",
+    "gen",
+    "stamina"
+  ];
+
+
+  // =========================================
+  // DISCIPLINE DEFINITIONS EXIST
+  // =========================================
+
+  const allDisciplinesExist =
+    expectedDisciplines.every(
+      disciplineId =>
+        !!getShinobiDiscipline(
+          disciplineId
+        )
+    );
+
+
+  results.push({
+
+    test:
+      "All seven disciplines exist",
+
+    pass:
+      allDisciplinesExist
+
+  });
+
+
+  // =========================================
+  // CORRECT TRAINING SOURCES
+  // =========================================
+
+  const expectedSources = {
+
+    nin:
+      "exam",
+
+    tai:
+      "practical",
+
+    buki:
+      "exam",
+
+    fuin:
+      "exam",
+
+    kin:
+      "battle",
+
+    gen:
+      "exam",
+
+    stamina:
+      "practical"
+
+  };
+
+
+  const validSources =
+    expectedDisciplines.every(
+      disciplineId => {
+
+
+        const definition =
+          getShinobiDiscipline(
+            disciplineId
+          );
+
+
+        return (
+          definition &&
+          definition.trainingSource ===
+            expectedSources[
+              disciplineId
+            ]
+        );
+
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Training sources are correct",
+
+    pass:
+      validSources
+
+  });
+
+
+  // =========================================
+  // KINJUTSU BATTLE ONLY
+  // =========================================
+
+  results.push({
+
+    test:
+      "Kinjutsu is battle-only",
+
+    pass:
+      (
+        isValidDisciplineTrainingSource(
+          "kin",
+          "battle"
+        ) === true &&
+        isValidDisciplineTrainingSource(
+          "kin",
+          "exam"
+        ) === false &&
+        isValidDisciplineTrainingSource(
+          "kin",
+          "practical"
+        ) === false
+      )
+
+  });
+
+
+  // =========================================
+  // CHARACTER DISCIPLINE HEALTH
+  // =========================================
+
+  let progressionValid =
+    true;
+
+
+  let runtimeSaveMatch =
+    true;
+
+
+  let statsValid =
+    true;
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const runtimeProgression =
+        normalizeDisciplineProgression(
+          character
+            .disciplineProgression
+        );
+
+
+      const savedCharacter =
+        playerData.characters &&
+        playerData.characters[
+          character.id
+        ];
+
+
+      const savedProgression =
+        savedCharacter
+          ? normalizeDisciplineProgression(
+              savedCharacter
+                .disciplineProgression
+            )
+          : null;
+
+
+      expectedDisciplines.forEach(
+        disciplineId => {
+
+
+          const record =
+            runtimeProgression[
+              disciplineId
+            ];
+
+
+          if (
+            !record ||
+            !Number.isFinite(
+              Number(
+                record.level
+              )
+            ) ||
+            record.level < 1 ||
+            !Number.isFinite(
+              Number(
+                record.exp
+              )
+            ) ||
+            record.exp < 0 ||
+            !Number.isFinite(
+              Number(
+                record.statLevelApplied
+              )
+            ) ||
+            record.statLevelApplied < 1 ||
+            record.statLevelApplied >
+              record.level
+          ) {
+
+            progressionValid =
+              false;
+
+          }
+
+
+          if (
+            !Number.isFinite(
+              Number(
+                character.stats[
+                  disciplineId
+                ]
+              )
+            )
+          ) {
+
+            statsValid =
+              false;
+
+          }
+
+
+          if (
+            !savedProgression ||
+            JSON.stringify(
+              runtimeProgression[
+                disciplineId
+              ]
+            ) !==
+            JSON.stringify(
+              savedProgression[
+                disciplineId
+              ]
+            )
+          ) {
+
+            runtimeSaveMatch =
+              false;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  results.push({
+
+    test:
+      "Discipline progression is valid",
+
+    pass:
+      progressionValid
+
+  });
+
+
+  results.push({
+
+    test:
+      "Permanent discipline stats are valid",
+
+    pass:
+      statsValid
+
+  });
+
+
+  results.push({
+
+    test:
+      "Runtime discipline data matches save",
+
+    pass:
+      runtimeSaveMatch
+
+  });
+
+
+  // =========================================
+  // EXP CURVE HEALTH
+  // =========================================
+
+  let expCurveValid =
+    true;
+
+
+  for (
+    let level = 1;
+    level <= 100;
+    level += 1
+  ) {
+
+
+    const required =
+      getDisciplineExpRequired(
+        level
+      );
+
+
+    if (
+      !Number.isFinite(
+        required
+      ) ||
+      required <= 0
+    ) {
+
+      expCurveValid =
+        false;
+
+      break;
+
+    }
+
+  }
+
+
+  results.push({
+
+    test:
+      "Discipline EXP curve is valid",
+
+    pass:
+      expCurveValid
+
+  });
+
+
+  // =========================================
+  // DISPLAY
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ DISCIPLINE PHASE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ DISCIPLINE PHASE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
+// BRICK 21 — GET TRAINING ACTION DATA
+// =========================================================
+
+function getTrainingActionData(
+  characterId,
+  disciplineId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return null;
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return null;
+
+  }
+
+
+  const progression =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!progression) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    characterId:
+      character.id,
+
+    characterName:
+      character.name,
+
+    disciplineId:
+      discipline.id,
+
+    disciplineName:
+      discipline.name,
+
+    trainingSource:
+      discipline.trainingSource,
+
+    naturalStat:
+      character.stats[
+        disciplineId
+      ],
+
+    trainingLevel:
+      progression.level,
+
+    exp:
+      progression.exp,
+
+    expToNext:
+      getDisciplineExpRequired(
+        progression.level
+      ),
+
+    statLevelApplied:
+      progression.statLevelApplied
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 22 — EXAM TRAINING AWARD
+// =========================================================
+
+function awardExamTrainingExp(
+  characterId,
+  disciplineId,
+  amount
+) {
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    discipline.trainingSource !==
+      "exam"
+  ) {
+
+
+    console.log(
+      `${discipline.name} cannot be trained in Exams.`
+    );
+
+
+    console.log(
+      `Required source: ${discipline.trainingSource}`
+    );
+
+
+    return false;
+
+  }
+
+
+  return addDisciplineExp(
+    characterId,
+    disciplineId,
+    amount,
+    "exam"
+  );
+
+}
+
+
+// =========================================================
+// BRICK 23 — PRACTICAL TRAINING AWARD
+// =========================================================
+
+function awardPracticalTrainingExp(
+  characterId,
+  disciplineId,
+  amount
+) {
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    discipline.trainingSource !==
+      "practical"
+  ) {
+
+
+    console.log(
+      `${discipline.name} cannot be trained in Practical.`
+    );
+
+
+    console.log(
+      `Required source: ${discipline.trainingSource}`
+    );
+
+
+    return false;
+
+  }
+
+
+  return addDisciplineExp(
+    characterId,
+    disciplineId,
+    amount,
+    "practical"
+  );
+
+}
+
+
+// =========================================================
+// BRICK 24 — KINJUTSU BATTLE EXP AWARD
+// =========================================================
+
+function awardKinjutsuBattleExp(
+  characterId,
+  amount
+) {
+
+
+  return addDisciplineExp(
+    characterId,
+    "kin",
+    amount,
+    "battle"
+  );
+
+}
+
+
+// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
@@ -4374,7 +5038,10 @@ function showCharacterDisciplineData(
           trainingSource:
             definition
               ? definition.trainingSource
-              : "unknown"
+              : "unknown",
+
+          statLevelApplied:
+            record.statLevelApplied
 
         };
 
@@ -4392,7 +5059,6 @@ function showCharacterDisciplineData(
   );
 
 }
-
 
 // =========================================================
 // DEVELOPMENT PLAYER SAVE VIEW
