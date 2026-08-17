@@ -1239,10 +1239,6 @@ function createDefaultPlayerData() {
 
 
 // =========================================================
-// NORMALIZE SAVED CHARACTER PROGRESSION
-// =========================================================
-
-// =========================================================
 // NORMALIZE SAVED RUN PROGRESSION
 // =========================================================
 
@@ -1319,6 +1315,80 @@ function normalizeSavedRunProgression(
   };
 
 }
+
+
+// =========================================================
+// NORMALIZE DISCIPLINE PROGRESSION
+// =========================================================
+
+function normalizeDisciplineProgression(
+  savedProgression
+) {
+
+
+  const defaults =
+    createDefaultDisciplineProgression();
+
+
+  const source =
+    savedProgression &&
+    typeof savedProgression ===
+      "object"
+      ? savedProgression
+      : {};
+
+
+  const normalized = {};
+
+
+  Object.keys(
+    defaults
+  ).forEach(
+    disciplineId => {
+
+
+      const savedRecord =
+        source[
+          disciplineId
+        ] || {};
+
+
+      normalized[
+        disciplineId
+      ] = {
+
+        level:
+          Math.max(
+            1,
+            Math.floor(
+              Number(
+                savedRecord.level
+              ) || 1
+            )
+          ),
+
+        exp:
+          Math.max(
+            0,
+            Number(
+              savedRecord.exp
+            ) || 0
+          )
+
+      };
+
+    }
+  );
+
+
+  return normalized;
+
+}
+
+
+// =========================================================
+// NORMALIZE SAVED CHARACTER PROGRESSION
+// =========================================================
 
 function normalizeSavedCharacterProgression(
   savedCharacters
@@ -1414,6 +1484,12 @@ function normalizeSavedCharacterProgression(
 
             : defaultCharacter
                 .permanentPLBonus,
+
+        disciplineProgression:
+          normalizeDisciplineProgression(
+            savedCharacter
+              .disciplineProgression
+          ),
 
         weaponSpecializations:
           savedCharacter
