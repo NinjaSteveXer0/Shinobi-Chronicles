@@ -1122,7 +1122,10 @@ function createDefaultDisciplineProgression() {
           1,
 
         exp:
-          0
+          0,
+
+        statLevelApplied:
+          1
 
       };
 
@@ -1316,7 +1319,6 @@ function normalizeSavedRunProgression(
 
 }
 
-
 // =========================================================
 // NORMALIZE DISCIPLINE PROGRESSION
 // =========================================================
@@ -1353,19 +1355,47 @@ function normalizeDisciplineProgression(
         ] || {};
 
 
+      const level =
+        Math.max(
+          1,
+          Math.floor(
+            Number(
+              savedRecord.level
+            ) || 1
+          )
+        );
+
+
+      const rawStatLevelApplied =
+        savedRecord.statLevelApplied;
+
+
+      const statLevelApplied =
+        Number.isFinite(
+          Number(
+            rawStatLevelApplied
+          )
+        )
+          ? Math.max(
+              1,
+              Math.min(
+                level,
+                Math.floor(
+                  Number(
+                    rawStatLevelApplied
+                  )
+                )
+              )
+            )
+          : 1;
+
+
       normalized[
         disciplineId
       ] = {
 
         level:
-          Math.max(
-            1,
-            Math.floor(
-              Number(
-                savedRecord.level
-              ) || 1
-            )
-          ),
+          level,
 
         exp:
           Math.max(
@@ -1373,7 +1403,10 @@ function normalizeDisciplineProgression(
             Number(
               savedRecord.exp
             ) || 0
-          )
+          ),
+
+        statLevelApplied:
+          statLevelApplied
 
       };
 
@@ -3600,6 +3633,194 @@ function getCharacterDisciplineProgression(
 
 
 // =========================================================
+// GET DISCIPLINE STAT GAIN PER LEVEL
+// =========================================================
+
+function getDisciplineStatGainPerLevel(
+  disciplineId
+) {
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+    return 0;
+
+  }
+
+
+  // =========================================
+  // CURRENT BALANCE RULE
+  // =========================================
+  //
+  // Every discipline training level gained
+  // permanently increases its natural stat
+  // by +1.
+  //
+  // This helper exists so balancing can be
+  // changed later in one place.
+  //
+  // =========================================
+
+  return 1;
+
+}
+
+
+// =========================================================
+// APPLY PENDING DISCIPLINE STAT GROWTH
+// =========================================================
+
+function applyPendingDisciplineStatGrowth(
+  characterId,
+  disciplineId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return null;
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return null;
+
+  }
+
+
+  const progression =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!progression) {
+
+    return null;
+
+  }
+
+
+  if (
+    !Number.isFinite(
+      Number(
+        progression.statLevelApplied
+      )
+    )
+  ) {
+
+    progression.statLevelApplied =
+      1;
+
+  }
+
+
+  let statPointsGained =
+    0;
+
+
+  const statGainPerLevel =
+    getDisciplineStatGainPerLevel(
+      disciplineId
+    );
+
+
+  while (
+    progression.statLevelApplied <
+      progression.level
+  ) {
+
+
+    progression.statLevelApplied +=
+      1;
+
+
+    character.stats[
+      disciplineId
+    ] =
+      (
+        Number(
+          character.stats[
+            disciplineId
+          ]
+        ) || 0
+      ) +
+      statGainPerLevel;
+
+
+    statPointsGained +=
+      statGainPerLevel;
+
+  }
+
+
+  if (
+    statPointsGained >
+      0
+  ) {
+
+
+    console.log(
+      `${character.name} gained +${statPointsGained} permanent ${discipline.name}.`
+    );
+
+  }
+
+
+  return {
+
+    statPointsGained:
+      statPointsGained,
+
+    stat:
+      character.stats[
+        disciplineId
+      ],
+
+    statLevelApplied:
+      progression.statLevelApplied
+
+  };
+
+}
+
+
+// =========================================================
 // PROCESS DISCIPLINE LEVEL UPS
 // =========================================================
 
@@ -3704,6 +3925,13 @@ function processDisciplineLevelUps(
   }
 
 
+  const statGrowth =
+    applyPendingDisciplineStatGrowth(
+      characterId,
+      disciplineId
+    );
+
+
   return {
 
     levelsGained:
@@ -3718,7 +3946,17 @@ function processDisciplineLevelUps(
     expToNext:
       getDisciplineExpRequired(
         progression.level
-      )
+      ),
+
+    statPointsGained:
+      statGrowth
+        ? statGrowth.statPointsGained
+        : 0,
+
+    stat:
+      character.stats[
+        disciplineId
+      ]
 
   };
 
