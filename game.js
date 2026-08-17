@@ -1607,7 +1607,6 @@ function syncCharacterEquipmentFromSave() {
   playerTeam.forEach(
     character => {
 
-
       character.equipment =
         [];
 
@@ -1615,9 +1614,32 @@ function syncCharacterEquipmentFromSave() {
   );
 
 
+  if (
+    !Array.isArray(
+      playerData.inventory
+    )
+  ) {
+
+    playerData.inventory =
+      [];
+
+  }
+
+
+  const usedInstanceIds =
+    new Set();
+
+
+  const occupiedSlots =
+    new Set();
+
+
+  let repairedSave =
+    false;
+
 
   // =========================================
-  // RESTORE SAVED EQUIPMENT
+  // VALIDATE + RESTORE SAVED EQUIPMENT
   // =========================================
 
   playerData.inventory.forEach(
@@ -1625,7 +1647,7 @@ function syncCharacterEquipmentFromSave() {
 
 
       if (
-        !item.equippedBy ||
+        !item ||
         item.type !==
           "weapon"
       ) {
@@ -1635,6 +1657,16 @@ function syncCharacterEquipmentFromSave() {
       }
 
 
+      if (!item.equippedBy) {
+
+        return;
+
+      }
+
+
+      // =========================================
+      // VALID CHARACTER
+      // =========================================
 
       const character =
         getPlayerCharacter(
@@ -1644,11 +1676,174 @@ function syncCharacterEquipmentFromSave() {
 
       if (!character) {
 
+
+        console.warn(
+          "Invalid equipped character removed:",
+          item.equippedBy,
+          item.name
+        );
+
+
+        item.equippedBy =
+          null;
+
+
+        repairedSave =
+          true;
+
+
         return;
 
       }
 
 
+      // =========================================
+      // VALID ITEM DEFINITION
+      // =========================================
+
+      const definition =
+        getItemDefinition(
+          item.id
+        );
+
+
+      if (
+        !definition ||
+        definition.type !==
+          "weapon"
+      ) {
+
+
+        console.warn(
+          "Invalid equipped weapon definition:",
+          item.id
+        );
+
+
+        item.equippedBy =
+          null;
+
+
+        repairedSave =
+          true;
+
+
+        return;
+
+      }
+
+
+      // =========================================
+      // VALID INSTANCE ID
+      // =========================================
+
+      if (!item.instanceId) {
+
+
+        console.warn(
+          "Equipped weapon missing instanceId:",
+          item.name
+        );
+
+
+        item.equippedBy =
+          null;
+
+
+        repairedSave =
+          true;
+
+
+        return;
+
+      }
+
+
+      // =========================================
+      // DUPLICATE INSTANCE PROTECTION
+      // =========================================
+
+      if (
+        usedInstanceIds.has(
+          item.instanceId
+        )
+      ) {
+
+
+        console.warn(
+          "Duplicate equipped item instance removed:",
+          item.instanceId
+        );
+
+
+        item.equippedBy =
+          null;
+
+
+        repairedSave =
+          true;
+
+
+        return;
+
+      }
+
+
+      const slot =
+        definition.equipmentSlot ||
+        item.equipmentSlot ||
+        "weapon";
+
+
+      const slotKey =
+        `${character.id}:${slot}`;
+
+
+      // =========================================
+      // ONE ITEM PER SLOT
+      // =========================================
+
+      if (
+        occupiedSlots.has(
+          slotKey
+        )
+      ) {
+
+
+        console.warn(
+          `${character.name} had multiple items in ${slot}. Extra item unequipped:`,
+          item.name
+        );
+
+
+        item.equippedBy =
+          null;
+
+
+        repairedSave =
+          true;
+
+
+        return;
+
+      }
+
+
+      // =========================================
+      // NORMALIZE INVENTORY EQUIPMENT DATA
+      // =========================================
+
+      item.weaponClass =
+        definition.weaponClass;
+
+
+      item.equipmentSlot =
+        slot;
+
+
+      // =========================================
+      // RESTORE RUNTIME EQUIPMENT
+      // =========================================
 
       character.equipment.push({
 
@@ -1659,13 +1854,39 @@ function syncCharacterEquipmentFromSave() {
           item.id,
 
         slot:
-          item.equipmentSlot ||
-          "weapon"
+          slot
 
       });
 
+
+      usedInstanceIds.add(
+        item.instanceId
+      );
+
+
+      occupiedSlots.add(
+        slotKey
+      );
+
     }
   );
+
+
+  // =========================================
+  // RE-SAVE ONLY IF REPAIRS WERE REQUIRED
+  // =========================================
+
+  if (repairedSave) {
+
+
+    console.warn(
+      "Equipment save contained invalid data and was repaired."
+    );
+
+
+    savePlayerData();
+
+  }
 
 
   console.log(
