@@ -606,6 +606,84 @@ function createDefaultPlayerData() {
 // NORMALIZE SAVED CHARACTER PROGRESSION
 // =========================================================
 
+// =========================================================
+// NORMALIZE SAVED RUN PROGRESSION
+// =========================================================
+
+function normalizeSavedRunProgression(
+  savedProgression
+) {
+
+
+  const defaults =
+    createDefaultRunProgression();
+
+
+  if (
+    !savedProgression ||
+    typeof savedProgression !==
+      "object"
+  ) {
+
+    return defaults;
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      savedProgression.currentDifficulty
+    )
+      ? savedProgression.currentDifficulty
+      : defaults.currentDifficulty;
+
+
+  const highestDifficultyUnlocked =
+    getShinobiDifficulty(
+      savedProgression.highestDifficultyUnlocked
+    )
+      ? savedProgression.highestDifficultyUnlocked
+      : defaults.highestDifficultyUnlocked;
+
+
+  return {
+
+    currentDifficulty:
+      currentDifficulty,
+
+    highestDifficultyUnlocked:
+      highestDifficultyUnlocked,
+
+    legacyCycle:
+      Math.max(
+        0,
+        Math.floor(
+          Number(
+            savedProgression.legacyCycle
+          ) || 0
+        )
+      ),
+
+    completedDifficulties:
+      Array.isArray(
+        savedProgression.completedDifficulties
+      )
+        ? savedProgression.completedDifficulties.filter(
+            difficultyId =>
+              !!getShinobiDifficulty(
+                difficultyId
+              )
+          )
+        : [],
+
+    runCompleted:
+      savedProgression.runCompleted ===
+      true
+
+  };
+
+}
+
 function normalizeSavedCharacterProgression(
   savedCharacters
 ) {
@@ -789,6 +867,11 @@ function loadPlayerData() {
           ? parsedData.inventory
           : [],
 
+      progression:
+        normalizeSavedRunProgression(
+          parsedData.progression
+        ),
+
       characters:
         normalizeSavedCharacterProgression(
           parsedData.characters
@@ -812,7 +895,6 @@ function loadPlayerData() {
   }
 
 }
-
 
 // =========================================================
 // ACTIVE PLAYER DATA
