@@ -1505,6 +1505,85 @@ const STAT_WEIGHTS = {
 
 
 // =========================================================
+// WEAPON CLASS SYNERGY
+// =========================================================
+//
+// 1.00 = normal effectiveness
+// 1.20 = 20% stronger equipment stat bonuses
+//
+// Any character / weapon class not listed here
+// automatically receives the normal 1.00 multiplier.
+//
+// =========================================================
+
+const WEAPON_CLASS_SYNERGY = {
+
+  sasuke: {
+
+    Tanto:
+      1.20
+
+  }
+
+};
+
+
+// =========================================================
+// GET WEAPON SYNERGY MULTIPLIER
+// =========================================================
+
+function getWeaponSynergyMultiplier(
+  character,
+  itemDefinition
+) {
+
+
+  if (
+    !character ||
+    !itemDefinition ||
+    !itemDefinition.weaponClass
+  ) {
+
+    return 1;
+
+  }
+
+
+  const characterSynergy =
+    WEAPON_CLASS_SYNERGY[
+      character.id
+    ];
+
+
+  if (!characterSynergy) {
+
+    return 1;
+
+  }
+
+
+  const multiplier =
+    characterSynergy[
+      itemDefinition.weaponClass
+    ];
+
+
+  if (
+    typeof multiplier !==
+    "number"
+  ) {
+
+    return 1;
+
+  }
+
+
+  return multiplier;
+
+}
+
+
+// =========================================================
 // EQUIPMENT STAT BONUS
 // =========================================================
 
@@ -1558,6 +1637,13 @@ function getEquipmentStatBonuses(
       }
 
 
+      const synergyMultiplier =
+        getWeaponSynergyMultiplier(
+          character,
+          definition
+        );
+
+
       Object.entries(
         definition.statModifiers
       ).forEach(
@@ -1565,16 +1651,28 @@ function getEquipmentStatBonuses(
 
 
           if (
-            bonuses[stat] !==
+            bonuses[stat] ===
             undefined
           ) {
 
-            bonuses[stat] +=
-              Number(
-                amount
-              ) || 0;
+            return;
 
           }
+
+
+          const baseAmount =
+            Number(
+              amount
+            ) || 0;
+
+
+          const effectiveAmount =
+            baseAmount *
+            synergyMultiplier;
+
+
+          bonuses[stat] +=
+            effectiveAmount;
 
         }
       );
