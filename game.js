@@ -4261,7 +4261,7 @@ function runDisciplinePhaseDiagnostics() {
       "practical",
 
     buki:
-      "exam",
+      "practical",
 
     fuin:
       "exam",
