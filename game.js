@@ -545,6 +545,35 @@ function createDefaultCharacterProgression() {
 }
 
 // =========================================================
+// CREATE DEFAULT RUN PROGRESSION
+// =========================================================
+
+function createDefaultRunProgression() {
+
+
+  return {
+
+    currentDifficulty:
+      "academy",
+
+    highestDifficultyUnlocked:
+      "academy",
+
+    legacyCycle:
+      0,
+
+    completedDifficulties:
+      [],
+
+    runCompleted:
+      false
+
+  };
+
+}
+
+
+// =========================================================
 // DEFAULT PLAYER DATA
 // =========================================================
 
@@ -561,6 +590,9 @@ function createDefaultPlayerData() {
 
     inventory:
       [],
+
+    progression:
+      createDefaultRunProgression(),
 
     characters:
       createDefaultCharacterProgression()
