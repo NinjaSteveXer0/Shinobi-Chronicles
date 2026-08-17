@@ -3600,6 +3600,132 @@ function getCharacterDisciplineProgression(
 
 
 // =========================================================
+// PROCESS DISCIPLINE LEVEL UPS
+// =========================================================
+
+function processDisciplineLevelUps(
+  characterId,
+  disciplineId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return null;
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return null;
+
+  }
+
+
+  const progression =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!progression) {
+
+    return null;
+
+  }
+
+
+  let levelsGained =
+    0;
+
+
+  let expRequired =
+    getDisciplineExpRequired(
+      progression.level
+    );
+
+
+  while (
+    progression.exp >=
+      expRequired
+  ) {
+
+
+    progression.exp -=
+      expRequired;
+
+
+    progression.level +=
+      1;
+
+
+    levelsGained +=
+      1;
+
+
+    console.log(
+      `${character.name}'s ${discipline.name} Training reached Level ${progression.level}!`
+    );
+
+
+    expRequired =
+      getDisciplineExpRequired(
+        progression.level
+      );
+
+  }
+
+
+  return {
+
+    levelsGained:
+      levelsGained,
+
+    level:
+      progression.level,
+
+    exp:
+      progression.exp,
+
+    expToNext:
+      getDisciplineExpRequired(
+        progression.level
+      )
+
+  };
+
+}
+
+
+// =========================================================
 // ADD DISCIPLINE EXP
 // =========================================================
 
@@ -3689,11 +3815,12 @@ function addDisciplineExp(
   }
 
 
+  // =========================================
+  // AWARD EXP
+  // =========================================
+
   progression.exp +=
     expAmount;
-
-
-  savePlayerData();
 
 
   console.log(
@@ -3701,22 +3828,57 @@ function addDisciplineExp(
   );
 
 
+  // =========================================
+  // PROCESS LEVEL UPS + EXP OVERFLOW
+  // =========================================
+
+  const levelResult =
+    processDisciplineLevelUps(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!levelResult) {
+
+    return false;
+
+  }
+
+
+  // =========================================
+  // SAVE RESULT
+  // =========================================
+
+  savePlayerData();
+
+
   console.log(
-    `${discipline.name} Training Level: ${progression.level}`
+    `${discipline.name} Training Level: ${levelResult.level}`
   );
 
 
   console.log(
-    `${discipline.name} EXP: ${progression.exp} / ${getDisciplineExpRequired(
-      progression.level
-    )}`
+    `${discipline.name} EXP: ${levelResult.exp} / ${levelResult.expToNext}`
   );
+
+
+  if (
+    levelResult.levelsGained >
+      0
+  ) {
+
+
+    console.log(
+      `${discipline.name} Levels Gained: +${levelResult.levelsGained}`
+    );
+
+  }
 
 
   return true;
 
 }
-
 
 // =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
