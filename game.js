@@ -40,6 +40,7 @@ let playerTeam = [
     permanentPLBonus: 0,
     equipment: [],
     abilities: [],
+    weaponSpecializations: {},
 
     image:
       "Assets/Animated Cards/Kage Naruto.png"
@@ -77,6 +78,11 @@ let playerTeam = [
     permanentPLBonus: 0,
     equipment: [],
     abilities: [],
+    weaponSpecializations: {
+
+  Tanto: 0
+
+},
 
     image:
       "Assets/Animated Cards/Jonin Sasuke.png"
@@ -114,6 +120,14 @@ let playerTeam = [
     permanentPLBonus: 0,
     equipment: [],
     abilities: [],
+    weaponSpecializations: {
+
+      weaponSpecializations: {
+
+  Heavy: 10
+
+},
+    },
 
     image:
       "Assets/Animated Cards/Sannin Sakura.png"
@@ -151,6 +165,7 @@ let playerTeam = [
     permanentPLBonus: 0,
     equipment: [],
     abilities: [],
+    weaponSpecializations: {},
 
     image:
       "Assets/Animated Cards/Teen Nagato.png"
@@ -1339,7 +1354,19 @@ function showEquipmentData() {
             : null;
 
 
-        const equipmentBonuses =
+        const rawBonuses =
+          getRawEquipmentStatBonuses(
+            character
+          );
+
+
+        const proficiency =
+          getWeaponProficiency(
+            character
+          );
+
+
+        const finalBonuses =
           getEquipmentStatBonuses(
             character
           );
@@ -1361,22 +1388,29 @@ function showEquipmentData() {
               ? inventoryItem.name
               : "—",
 
-          itemId:
-            inventoryItem
-              ? inventoryItem.id
-              : "—",
-
           weaponClass:
             definition &&
             definition.weaponClass
               ? definition.weaponClass
               : "—",
 
-          bukiBonus:
-            equipmentBonuses.buki,
-
-          baseBuki:
+          naturalBuki:
             character.stats.buki,
+
+          rawBukiBonus:
+            rawBonuses.buki,
+
+          proficiencyBuki:
+            proficiency.proficiencyBuki,
+
+          proficiency:
+            proficiency.name,
+
+          multiplier:
+            `${proficiency.multiplier.toFixed(2)}x`,
+
+          finalBukiBonus:
+            finalBonuses.buki,
 
           effectiveBuki:
             effectiveStats.buki,
@@ -1505,25 +1539,35 @@ const STAT_WEIGHTS = {
 
 
 // =========================================================
-// WEAPON PROFICIENCY TIERS
+// WEAPON CLASS DIFFICULTY
 // =========================================================
 //
-// Proficiency is calculated using:
+// Higher difficulty weapons require more effective Buki
+// before reaching the same proficiency tier.
 //
-// CURRENT BUKI
-// +
-// RAW EQUIPMENT BUKI
+// This does NOT permanently reduce character stats.
 //
-// Equipment can therefore temporarily push a character
-// into a higher proficiency tier.
-//
-// Removing the equipment immediately removes that boost.
-//
-// IMPORTANT:
-// The tier is calculated BEFORE the proficiency multiplier
-// is applied. We do not recalculate afterward.
-// This prevents multiplier feedback loops.
-//
+// =========================================================
+
+const WEAPON_CLASS_DIFFICULTY = {
+
+  Kunai: 0,
+
+  Tanto: 5,
+
+  Katana: 10,
+
+  Sword: 10,
+
+  Spear: 15,
+
+  Heavy: 25
+
+};
+
+
+// =========================================================
+// WEAPON PROFICIENCY TIERS
 // =========================================================
 
 const WEAPON_PROFICIENCY_TIERS = [
@@ -1562,15 +1606,137 @@ const WEAPON_PROFICIENCY_TIERS = [
 
 
 // =========================================================
-// GET RAW EQUIPMENT STAT BONUSES
+// GET EQUIPPED WEAPON DEFINITION
 // =========================================================
-//
-// This reads equipment bonuses WITHOUT applying
-// proficiency.
-//
-// We need this separate value so proficiency can be
-// determined without creating a circular calculation.
-//
+
+function getEquippedWeaponDefinition(
+  character
+) {
+
+
+  if (
+    !character ||
+    !Array.isArray(
+      character.equipment
+    )
+  ) {
+
+    return null;
+
+  }
+
+
+  const weapon =
+    character.equipment.find(
+      equipment =>
+        equipment.slot ===
+        "weapon"
+    );
+
+
+  if (!weapon) {
+
+    return null;
+
+  }
+
+
+  return getItemDefinition(
+    weapon.itemId
+  );
+
+}
+
+
+// =========================================================
+// GET WEAPON SPECIALIZATION BONUS
+// =========================================================
+
+function getWeaponSpecializationBonus(
+  character,
+  weaponDefinition
+) {
+
+
+  if (
+    !character ||
+    !weaponDefinition ||
+    !weaponDefinition.weaponClass
+  ) {
+
+    return 0;
+
+  }
+
+
+  if (
+    !character.weaponSpecializations ||
+    typeof character.weaponSpecializations !==
+      "object"
+  ) {
+
+    return 0;
+
+  }
+
+
+  return (
+    Number(
+      character.weaponSpecializations[
+        weaponDefinition.weaponClass
+      ]
+    ) ||
+    0
+  );
+
+}
+
+
+// =========================================================
+// GET WEAPON CLASS DIFFICULTY
+// =========================================================
+
+function getWeaponClassDifficulty(
+  character,
+  weaponDefinition
+) {
+
+
+  if (
+    !weaponDefinition ||
+    !weaponDefinition.weaponClass
+  ) {
+
+    return 0;
+
+  }
+
+
+  const baseDifficulty =
+    WEAPON_CLASS_DIFFICULTY[
+      weaponDefinition.weaponClass
+    ] ||
+    0;
+
+
+  const specialization =
+    getWeaponSpecializationBonus(
+      character,
+      weaponDefinition
+    );
+
+
+  return Math.max(
+    0,
+    baseDifficulty -
+    specialization
+  );
+
+}
+
+
+// =========================================================
+// GET RAW EQUIPMENT STAT BONUSES
 // =========================================================
 
 function getRawEquipmentStatBonuses(
@@ -1670,7 +1836,13 @@ function getWeaponProficiency(
     return {
 
       name: "Untrained",
+
+      rawProficiencyBuki: 0,
+
+      difficulty: 0,
+
       proficiencyBuki: 0,
+
       multiplier: 0.90
 
     };
@@ -1684,15 +1856,36 @@ function getWeaponProficiency(
     );
 
 
+  const weaponDefinition =
+    getEquippedWeaponDefinition(
+      character
+    );
+
+
+  const difficulty =
+  getWeaponClassDifficulty(
+    character,
+    weaponDefinition
+  );
+
+
   const currentBuki =
     Number(
       character.stats.buki
     ) || 0;
 
 
-  const proficiencyBuki =
+  const rawProficiencyBuki =
     currentBuki +
     rawBonuses.buki;
+
+
+  const proficiencyBuki =
+    Math.max(
+      0,
+      rawProficiencyBuki -
+      difficulty
+    );
 
 
   const tier =
@@ -1710,6 +1903,12 @@ function getWeaponProficiency(
         ? tier.name
         : "Untrained",
 
+    rawProficiencyBuki:
+      rawProficiencyBuki,
+
+    difficulty:
+      difficulty,
+
     proficiencyBuki:
       proficiencyBuki,
 
@@ -1725,28 +1924,6 @@ function getWeaponProficiency(
 
 // =========================================================
 // EQUIPMENT STAT BONUS
-// =========================================================
-//
-// Takes the RAW equipment bonus and applies the
-// character's ACTIVE weapon proficiency multiplier.
-//
-// Example:
-//
-// Sakura Buki: 58
-// Heavy weapon: +20 Buki
-//
-// Proficiency Buki = 78
-// Tier = Proficient
-// Multiplier = 1.20
-//
-// Final equipment Buki:
-//
-// 20 × 1.20 = 24
-//
-// Final effective Buki:
-//
-// 58 + 24 = 82
-//
 // =========================================================
 
 function getEquipmentStatBonuses(
@@ -1800,14 +1977,6 @@ function getEquipmentStatBonuses(
 
 // =========================================================
 // EFFECTIVE CHARACTER STATS
-// =========================================================
-//
-// Permanent/current stats
-// +
-// proficiency-adjusted equipment bonuses
-//
-// This DOES NOT modify character.stats.
-//
 // =========================================================
 
 function getEffectiveCharacterStats(
