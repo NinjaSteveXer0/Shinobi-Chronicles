@@ -443,11 +443,11 @@ const SHINOBI_DIFFICULTIES = [
   {
     id: "jinchuriki",
     name: "Jinchūriki",
-    order: 8
+    order: 8,
+    premium: true
   }
 
 ];
-
 
 // =========================================================
 // GET SHINOBI DIFFICULTY
