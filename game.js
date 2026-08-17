@@ -1029,6 +1029,113 @@ function showDifficultyAccess() {
 
 
 // =========================================================
+// SHINOBI DISCIPLINE SYSTEM
+// =========================================================
+
+const SHINOBI_DISCIPLINES = {
+
+  nin: {
+    id: "nin",
+    name: "Ninjutsu",
+    trainingSource: "exam"
+  },
+
+  tai: {
+    id: "tai",
+    name: "Taijutsu",
+    trainingSource: "practical"
+  },
+
+  buki: {
+    id: "buki",
+    name: "Bukijutsu",
+    trainingSource: "exam"
+  },
+
+  fuin: {
+    id: "fuin",
+    name: "Fūinjutsu",
+    trainingSource: "exam"
+  },
+
+  kin: {
+    id: "kin",
+    name: "Kinjutsu",
+    trainingSource: "battle"
+  },
+
+  gen: {
+    id: "gen",
+    name: "Genjutsu",
+    trainingSource: "exam"
+  },
+
+  stamina: {
+    id: "stamina",
+    name: "Stamina",
+    trainingSource: "practical"
+  }
+
+};
+
+
+// =========================================================
+// GET SHINOBI DISCIPLINE
+// =========================================================
+
+function getShinobiDiscipline(
+  disciplineId
+) {
+
+
+  return (
+    SHINOBI_DISCIPLINES[
+      disciplineId
+    ] ||
+    null
+  );
+
+}
+
+
+// =========================================================
+// CREATE DEFAULT DISCIPLINE PROGRESSION
+// =========================================================
+
+function createDefaultDisciplineProgression() {
+
+
+  const progression = {};
+
+
+  Object.keys(
+    SHINOBI_DISCIPLINES
+  ).forEach(
+    disciplineId => {
+
+
+      progression[
+        disciplineId
+      ] = {
+
+        level:
+          1,
+
+        exp:
+          0
+
+      };
+
+    }
+  );
+
+
+  return progression;
+
+}
+
+
+// =========================================================
 // CREATE DEFAULT CHARACTER PROGRESSION
 // =========================================================
 
@@ -1054,6 +1161,9 @@ function createDefaultCharacterProgression() {
           Number(
             character.permanentPLBonus
           ) || 0,
+
+        disciplineProgression:
+          createDefaultDisciplineProgression(),
 
         weaponSpecializations:
           cloneProgressionData(
