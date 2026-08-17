@@ -1505,89 +1505,75 @@ const STAT_WEIGHTS = {
 
 
 // =========================================================
-// WEAPON CLASS SYNERGY
+// WEAPON PROFICIENCY TIERS
 // =========================================================
 //
-// 1.00 = normal effectiveness
-// 1.20 = 20% stronger equipment stat bonuses
+// Proficiency is calculated using:
 //
-// Any character / weapon class not listed here
-// automatically receives the normal 1.00 multiplier.
+// CURRENT BUKI
+// +
+// RAW EQUIPMENT BUKI
+//
+// Equipment can therefore temporarily push a character
+// into a higher proficiency tier.
+//
+// Removing the equipment immediately removes that boost.
+//
+// IMPORTANT:
+// The tier is calculated BEFORE the proficiency multiplier
+// is applied. We do not recalculate afterward.
+// This prevents multiplier feedback loops.
 //
 // =========================================================
 
-const WEAPON_CLASS_SYNERGY = {
+const WEAPON_PROFICIENCY_TIERS = [
 
-  sasuke: {
+  {
+    name: "Master",
+    minimumBuki: 110,
+    multiplier: 1.50
+  },
 
-    Tanto:
-      1.20
+  {
+    name: "Expert",
+    minimumBuki: 90,
+    multiplier: 1.35
+  },
 
+  {
+    name: "Proficient",
+    minimumBuki: 70,
+    multiplier: 1.20
+  },
+
+  {
+    name: "Standard",
+    minimumBuki: 40,
+    multiplier: 1.00
+  },
+
+  {
+    name: "Untrained",
+    minimumBuki: 0,
+    multiplier: 0.90
   }
 
-};
+];
 
 
 // =========================================================
-// GET WEAPON SYNERGY MULTIPLIER
+// GET RAW EQUIPMENT STAT BONUSES
+// =========================================================
+//
+// This reads equipment bonuses WITHOUT applying
+// proficiency.
+//
+// We need this separate value so proficiency can be
+// determined without creating a circular calculation.
+//
 // =========================================================
 
-function getWeaponSynergyMultiplier(
-  character,
-  itemDefinition
-) {
-
-
-  if (
-    !character ||
-    !itemDefinition ||
-    !itemDefinition.weaponClass
-  ) {
-
-    return 1;
-
-  }
-
-
-  const characterSynergy =
-    WEAPON_CLASS_SYNERGY[
-      character.id
-    ];
-
-
-  if (!characterSynergy) {
-
-    return 1;
-
-  }
-
-
-  const multiplier =
-    characterSynergy[
-      itemDefinition.weaponClass
-    ];
-
-
-  if (
-    typeof multiplier !==
-    "number"
-  ) {
-
-    return 1;
-
-  }
-
-
-  return multiplier;
-
-}
-
-
-// =========================================================
-// EQUIPMENT STAT BONUS
-// =========================================================
-
-function getEquipmentStatBonuses(
+function getRawEquipmentStatBonuses(
   character
 ) {
 
@@ -1637,13 +1623,6 @@ function getEquipmentStatBonuses(
       }
 
 
-      const synergyMultiplier =
-        getWeaponSynergyMultiplier(
-          character,
-          definition
-        );
-
-
       Object.entries(
         definition.statModifiers
       ).forEach(
@@ -1660,19 +1639,10 @@ function getEquipmentStatBonuses(
           }
 
 
-          const baseAmount =
+          bonuses[stat] +=
             Number(
               amount
             ) || 0;
-
-
-          const effectiveAmount =
-            baseAmount *
-            synergyMultiplier;
-
-
-          bonuses[stat] +=
-            effectiveAmount;
 
         }
       );
@@ -1687,8 +1657,157 @@ function getEquipmentStatBonuses(
 
 
 // =========================================================
+// GET ACTIVE WEAPON PROFICIENCY
+// =========================================================
+
+function getWeaponProficiency(
+  character
+) {
+
+
+  if (!character) {
+
+    return {
+
+      name: "Untrained",
+      proficiencyBuki: 0,
+      multiplier: 0.90
+
+    };
+
+  }
+
+
+  const rawBonuses =
+    getRawEquipmentStatBonuses(
+      character
+    );
+
+
+  const currentBuki =
+    Number(
+      character.stats.buki
+    ) || 0;
+
+
+  const proficiencyBuki =
+    currentBuki +
+    rawBonuses.buki;
+
+
+  const tier =
+    WEAPON_PROFICIENCY_TIERS.find(
+      proficiencyTier =>
+        proficiencyBuki >=
+        proficiencyTier.minimumBuki
+    );
+
+
+  return {
+
+    name:
+      tier
+        ? tier.name
+        : "Untrained",
+
+    proficiencyBuki:
+      proficiencyBuki,
+
+    multiplier:
+      tier
+        ? tier.multiplier
+        : 0.90
+
+  };
+
+}
+
+
+// =========================================================
+// EQUIPMENT STAT BONUS
+// =========================================================
+//
+// Takes the RAW equipment bonus and applies the
+// character's ACTIVE weapon proficiency multiplier.
+//
+// Example:
+//
+// Sakura Buki: 58
+// Heavy weapon: +20 Buki
+//
+// Proficiency Buki = 78
+// Tier = Proficient
+// Multiplier = 1.20
+//
+// Final equipment Buki:
+//
+// 20 × 1.20 = 24
+//
+// Final effective Buki:
+//
+// 58 + 24 = 82
+//
+// =========================================================
+
+function getEquipmentStatBonuses(
+  character
+) {
+
+
+  const rawBonuses =
+    getRawEquipmentStatBonuses(
+      character
+    );
+
+
+  const proficiency =
+    getWeaponProficiency(
+      character
+    );
+
+
+  const bonuses = {
+
+    nin: 0,
+    tai: 0,
+    buki: 0,
+    fuin: 0,
+    kin: 0,
+    gen: 0,
+    stamina: 0
+
+  };
+
+
+  Object.keys(
+    rawBonuses
+  ).forEach(
+    stat => {
+
+
+      bonuses[stat] =
+        rawBonuses[stat] *
+        proficiency.multiplier;
+
+    }
+  );
+
+
+  return bonuses;
+
+}
+
+
+// =========================================================
 // EFFECTIVE CHARACTER STATS
-// Base/current stats + temporary equipment bonuses
+// =========================================================
+//
+// Permanent/current stats
+// +
+// proficiency-adjusted equipment bonuses
+//
+// This DOES NOT modify character.stats.
+//
 // =========================================================
 
 function getEffectiveCharacterStats(
