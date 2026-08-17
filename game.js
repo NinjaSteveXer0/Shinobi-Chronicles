@@ -282,7 +282,7 @@ const itemDatabase = {
     statModifiers: {
 
       buki:
-        0
+        20
 
     }
 
@@ -1465,16 +1465,153 @@ const STAT_WEIGHTS = {
 };
 
 
+// =========================================================
+// EQUIPMENT STAT BONUS
+// =========================================================
+
+function getEquipmentStatBonuses(
+  character
+) {
+
+
+  const bonuses = {
+
+    nin: 0,
+    tai: 0,
+    buki: 0,
+    fuin: 0,
+    kin: 0,
+    gen: 0,
+    stamina: 0
+
+  };
+
+
+  if (
+    !character ||
+    !Array.isArray(
+      character.equipment
+    )
+  ) {
+
+    return bonuses;
+
+  }
+
+
+  character.equipment.forEach(
+    equipment => {
+
+
+      const definition =
+        getItemDefinition(
+          equipment.itemId
+        );
+
+
+      if (
+        !definition ||
+        !definition.statModifiers
+      ) {
+
+        return;
+
+      }
+
+
+      Object.entries(
+        definition.statModifiers
+      ).forEach(
+        ([stat, amount]) => {
+
+
+          if (
+            bonuses[stat] !==
+            undefined
+          ) {
+
+            bonuses[stat] +=
+              Number(
+                amount
+              ) || 0;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  return bonuses;
+
+}
+
+
+// =========================================================
+// EFFECTIVE CHARACTER STATS
+// Base/current stats + temporary equipment bonuses
+// =========================================================
+
+function getEffectiveCharacterStats(
+  character
+) {
+
+
+  const equipmentBonuses =
+    getEquipmentStatBonuses(
+      character
+    );
+
+
+  const effectiveStats = {
+
+    ...character.stats
+
+  };
+
+
+  Object.keys(
+    equipmentBonuses
+  ).forEach(
+    stat => {
+
+
+      effectiveStats[stat] =
+        (
+          effectiveStats[stat] ||
+          0
+        ) +
+        equipmentBonuses[stat];
+
+    }
+  );
+
+
+  return effectiveStats;
+
+}
+
+
+// =========================================================
+// STAT-BASED PL GROWTH
+// =========================================================
+
 function calculateStatPLGrowth(
   baseStats,
   currentStats
 ) {
 
+
   let weightedGrowth = 0;
   let totalWeight = 0;
 
 
-  for (const stat in STAT_WEIGHTS) {
+  for (
+    const stat in STAT_WEIGHTS
+  ) {
+
 
     const growth =
       currentStats[stat] -
@@ -1482,7 +1619,8 @@ function calculateStatPLGrowth(
 
 
     weightedGrowth +=
-      growth * STAT_WEIGHTS[stat];
+      growth *
+      STAT_WEIGHTS[stat];
 
 
     totalWeight +=
@@ -1491,22 +1629,39 @@ function calculateStatPLGrowth(
   }
 
 
-  return weightedGrowth / totalWeight;
+  return (
+    weightedGrowth /
+    totalWeight
+  );
 
 }
 
 
-function calculateCurrentPL(character) {
+// =========================================================
+// CURRENT CHARACTER POWER LEVEL
+// =========================================================
+
+function calculateCurrentPL(
+  character
+) {
+
+
+  const effectiveStats =
+    getEffectiveCharacterStats(
+      character
+    );
+
 
   const statGrowth =
     calculateStatPLGrowth(
       character.baseStats,
-      character.stats
+      effectiveStats
     );
 
 
   const permanentBonus =
-    character.permanentPLBonus || 0;
+    character.permanentPLBonus ||
+    0;
 
 
   return Math.round(
@@ -1516,6 +1671,7 @@ function calculateCurrentPL(character) {
   );
 
 }
+
 
 // =========================================================
 // CHARACTER STAT MODIFICATION
