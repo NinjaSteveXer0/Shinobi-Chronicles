@@ -3505,6 +3505,34 @@ function runEquipmentPhaseDiagnostics() {
 
 
 // =========================================================
+// DISCIPLINE EXP REQUIREMENT
+// =========================================================
+
+function getDisciplineExpRequired(
+  level
+) {
+
+
+  const safeLevel =
+    Math.max(
+      1,
+      Math.floor(
+        Number(level) || 1
+      )
+    );
+
+
+  return (
+    50 +
+    (
+      safeLevel - 1
+    ) * 25
+  );
+
+}
+
+
+// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
@@ -3605,6 +3633,107 @@ function showShinobiProgression() {
 
   console.log(
     "========================================"
+  );
+
+}
+
+
+// =========================================================
+// DEVELOPMENT CHARACTER DISCIPLINE VIEW
+// =========================================================
+
+function showCharacterDisciplineData(
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return;
+
+  }
+
+
+  const progression =
+    normalizeDisciplineProgression(
+      character
+        .disciplineProgression
+    );
+
+
+  const rows =
+    Object.keys(
+      progression
+    ).map(
+      disciplineId => {
+
+
+        const definition =
+          getShinobiDiscipline(
+            disciplineId
+          );
+
+
+        const record =
+          progression[
+            disciplineId
+          ];
+
+
+        return {
+
+          discipline:
+            definition
+              ? definition.name
+              : disciplineId,
+
+          stat:
+            character.stats[
+              disciplineId
+            ],
+
+          trainingLevel:
+            record.level,
+
+          exp:
+            record.exp,
+
+          expToNext:
+            getDisciplineExpRequired(
+              record.level
+            ),
+
+          trainingSource:
+            definition
+              ? definition.trainingSource
+              : "unknown"
+
+        };
+
+      }
+    );
+
+
+  console.log(
+    `DISCIPLINE PROGRESSION — ${character.name}`
+  );
+
+
+  console.table(
+    rows
   );
 
 }
