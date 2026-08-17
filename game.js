@@ -1331,6 +1331,26 @@ function showEquipmentData() {
             : null;
 
 
+        const definition =
+          inventoryItem
+            ? getItemDefinition(
+                inventoryItem.id
+              )
+            : null;
+
+
+        const equipmentBonuses =
+          getEquipmentStatBonuses(
+            character
+          );
+
+
+        const effectiveStats =
+          getEffectiveCharacterStats(
+            character
+          );
+
+
         return {
 
           character:
@@ -1344,7 +1364,27 @@ function showEquipmentData() {
           itemId:
             inventoryItem
               ? inventoryItem.id
-              : "—"
+              : "—",
+
+          weaponClass:
+            definition &&
+            definition.weaponClass
+              ? definition.weaponClass
+              : "—",
+
+          bukiBonus:
+            equipmentBonuses.buki,
+
+          baseBuki:
+            character.stats.buki,
+
+          effectiveBuki:
+            effectiveStats.buki,
+
+          currentPL:
+            calculateCurrentPL(
+              character
+            )
 
         };
 
@@ -1357,7 +1397,6 @@ function showEquipmentData() {
   );
 
 }
-
 
 
 // =========================================================
