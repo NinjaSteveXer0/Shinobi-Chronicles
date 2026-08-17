@@ -1046,10 +1046,10 @@ const SHINOBI_DISCIPLINES = {
     trainingSource: "practical"
   },
 
-  buki: {
+    buki: {
     id: "buki",
     name: "Bukijutsu",
-    trainingSource: "exam"
+    trainingSource: "practical"
   },
 
   fuin: {
