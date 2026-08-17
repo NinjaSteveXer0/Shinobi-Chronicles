@@ -1315,7 +1315,6 @@ function syncCharacterEquipmentFromSave() {
 }
 
 
-
 // =========================================================
 // DEVELOPMENT EQUIPMENT VIEW
 // =========================================================
@@ -1328,6 +1327,10 @@ function showEquipmentData() {
       character => {
 
 
+        // =========================================
+        // FIND EQUIPPED WEAPON
+        // =========================================
+
         const weapon =
           character.equipment.find(
             equipment =>
@@ -1335,6 +1338,10 @@ function showEquipmentData() {
               "weapon"
           );
 
+
+        // =========================================
+        // FIND INVENTORY INSTANCE
+        // =========================================
 
         const inventoryItem =
           weapon
@@ -1346,6 +1353,10 @@ function showEquipmentData() {
             : null;
 
 
+        // =========================================
+        // FIND ITEM DEFINITION
+        // =========================================
+
         const definition =
           inventoryItem
             ? getItemDefinition(
@@ -1354,11 +1365,20 @@ function showEquipmentData() {
             : null;
 
 
+        // =========================================
+        // RAW EQUIPMENT BONUS
+        // Before proficiency multiplier
+        // =========================================
+
         const rawBonuses =
           getRawEquipmentStatBonuses(
             character
           );
 
+
+        // =========================================
+        // ACTIVE PROFICIENCY
+        // =========================================
 
         const proficiency =
           getWeaponProficiency(
@@ -1366,11 +1386,20 @@ function showEquipmentData() {
           );
 
 
+        // =========================================
+        // FINAL EQUIPMENT BONUS
+        // After proficiency multiplier
+        // =========================================
+
         const finalBonuses =
           getEquipmentStatBonuses(
             character
           );
 
+
+        // =========================================
+        // FINAL EFFECTIVE STATS
+        // =========================================
 
         const effectiveStats =
           getEffectiveCharacterStats(
@@ -1407,7 +1436,9 @@ function showEquipmentData() {
             proficiency.name,
 
           multiplier:
-            `${proficiency.multiplier.toFixed(2)}x`,
+            `${proficiency.multiplier.toFixed(
+              2
+            )}x`,
 
           finalBukiBonus:
             finalBonuses.buki,
