@@ -2765,6 +2765,112 @@ function runEquipmentPhaseDiagnostics() {
 
 
 // =========================================================
+// DEVELOPMENT SHINOBI PROGRESSION VIEW
+// =========================================================
+
+function showShinobiProgression() {
+
+
+  const progression =
+    playerData.progression;
+
+
+  if (!progression) {
+
+
+    console.log(
+      "No Shinobi progression data found."
+    );
+
+
+    return;
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  const highestDifficulty =
+    getShinobiDifficulty(
+      progression.highestDifficultyUnlocked
+    );
+
+
+  const nextDifficulty =
+    getNextShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI PROGRESSION"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.table({
+
+    currentDifficulty: {
+      value:
+        currentDifficulty
+          ? currentDifficulty.name
+          : "Unknown"
+    },
+
+    highestUnlocked: {
+      value:
+        highestDifficulty
+          ? highestDifficulty.name
+          : "Unknown"
+    },
+
+    nextDifficulty: {
+      value:
+        nextDifficulty
+          ? nextDifficulty.name
+          : "LEGACY"
+    },
+
+    legacyCycle: {
+      value:
+        progression.legacyCycle
+    },
+
+    currentRunComplete: {
+      value:
+        progression.runCompleted
+    }
+
+  });
+
+
+  console.log(
+    "Completed Difficulties:",
+    progression.completedDifficulties
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+}
+
+
+// =========================================================
 // DEVELOPMENT PLAYER SAVE VIEW
 // =========================================================
 
