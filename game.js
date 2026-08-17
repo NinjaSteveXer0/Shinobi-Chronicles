@@ -1652,6 +1652,10 @@ function syncCharacterProgressionFromSave() {
       }
 
 
+      // =========================================
+      // RESTORE PERMANENT STATS
+      // =========================================
+
       if (
         savedCharacter.stats &&
         typeof savedCharacter.stats ===
@@ -1689,12 +1693,31 @@ function syncCharacterProgressionFromSave() {
       }
 
 
+      // =========================================
+      // RESTORE PERMANENT PL BONUS
+      // =========================================
+
       character.permanentPLBonus =
         Number(
           savedCharacter
             .permanentPLBonus
         ) || 0;
 
+
+      // =========================================
+      // RESTORE DISCIPLINE PROGRESSION
+      // =========================================
+
+      character.disciplineProgression =
+        normalizeDisciplineProgression(
+          savedCharacter
+            .disciplineProgression
+        );
+
+
+      // =========================================
+      // RESTORE WEAPON SPECIALIZATIONS
+      // =========================================
 
       character.weaponSpecializations =
         cloneProgressionData(
@@ -1748,6 +1771,12 @@ function syncRuntimeProgressionToPlayerData() {
             character.permanentPLBonus
           ) || 0,
 
+        disciplineProgression:
+          normalizeDisciplineProgression(
+            character
+              .disciplineProgression
+          ),
+
         weaponSpecializations:
           cloneProgressionData(
             character.weaponSpecializations
@@ -1759,7 +1788,6 @@ function syncRuntimeProgressionToPlayerData() {
   );
 
 }
-
 
 // =========================================================
 // APPLY SAVED CHARACTER PROGRESSION NOW
