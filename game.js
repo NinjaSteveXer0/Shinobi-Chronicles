@@ -3663,6 +3663,44 @@ function recordBattleContribution(
   }
 
 
+  // =========================================
+  // ENSURE CONTRIBUTION DATA IS COMPLETE
+  // =========================================
+
+  contribution.damage =
+    Number(
+      contribution.damage
+    ) || 0;
+
+
+  contribution.attacks =
+    Number(
+      contribution.attacks
+    ) || 0;
+
+
+  contribution.ninjutsuDamage =
+    Number(
+      contribution.ninjutsuDamage
+    ) || 0;
+
+
+  contribution.taijutsuDamage =
+    Number(
+      contribution.taijutsuDamage
+    ) || 0;
+
+
+  contribution.bukijutsuDamage =
+    Number(
+      contribution.bukijutsuDamage
+    ) || 0;
+
+
+  // =========================================
+  // TOTAL CONTRIBUTION
+  // =========================================
+
   contribution.damage +=
     damage;
 
@@ -3671,8 +3709,13 @@ function recordBattleContribution(
     1;
 
 
+  // =========================================
+  // ATTACK TYPE CONTRIBUTION
+  // =========================================
+
   if (
-    attackType === "ninjutsu"
+    attackType ===
+    "ninjutsu"
   ) {
 
     contribution.ninjutsuDamage +=
@@ -3682,7 +3725,8 @@ function recordBattleContribution(
 
 
   if (
-    attackType === "taijutsu"
+    attackType ===
+    "taijutsu"
   ) {
 
     contribution.taijutsuDamage +=
@@ -3690,8 +3734,18 @@ function recordBattleContribution(
 
   }
 
-}
 
+  if (
+    attackType ===
+    "bukijutsu"
+  ) {
+
+    contribution.bukijutsuDamage +=
+      damage;
+
+  }
+
+}
 
 
 function calculateBattleMVP() {
