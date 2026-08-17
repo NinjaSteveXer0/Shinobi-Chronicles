@@ -3533,6 +3533,192 @@ function getDisciplineExpRequired(
 
 
 // =========================================================
+// GET CHARACTER DISCIPLINE PROGRESSION
+// =========================================================
+
+function getCharacterDisciplineProgression(
+  characterId,
+  disciplineId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return null;
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return null;
+
+  }
+
+
+  character.disciplineProgression =
+    normalizeDisciplineProgression(
+      character
+        .disciplineProgression
+    );
+
+
+  return (
+    character
+      .disciplineProgression[
+        disciplineId
+      ]
+  );
+
+}
+
+
+// =========================================================
+// ADD DISCIPLINE EXP
+// =========================================================
+
+function addDisciplineExp(
+  characterId,
+  disciplineId,
+  amount
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+
+    return false;
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    console.log(
+      "Discipline not found:",
+      disciplineId
+    );
+
+
+    return false;
+
+  }
+
+
+  const expAmount =
+    Math.floor(
+      Number(amount)
+    );
+
+
+  if (
+    !Number.isFinite(
+      expAmount
+    ) ||
+    expAmount <= 0
+  ) {
+
+
+    console.log(
+      "Invalid discipline EXP amount:",
+      amount
+    );
+
+
+    return false;
+
+  }
+
+
+  const progression =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!progression) {
+
+    return false;
+
+  }
+
+
+  progression.exp +=
+    expAmount;
+
+
+  savePlayerData();
+
+
+  console.log(
+    `${character.name} gained +${expAmount} ${discipline.name} EXP.`
+  );
+
+
+  console.log(
+    `${discipline.name} Training Level: ${progression.level}`
+  );
+
+
+  console.log(
+    `${discipline.name} EXP: ${progression.exp} / ${getDisciplineExpRequired(
+      progression.level
+    )}`
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
