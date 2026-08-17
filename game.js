@@ -1687,10 +1687,6 @@ function showEquipmentData() {
       character => {
 
 
-        // =========================================
-        // FIND EQUIPPED WEAPON
-        // =========================================
-
         const weapon =
           character.equipment.find(
             equipment =>
@@ -1698,10 +1694,6 @@ function showEquipmentData() {
               "weapon"
           );
 
-
-        // =========================================
-        // FIND INVENTORY INSTANCE
-        // =========================================
 
         const inventoryItem =
           weapon
@@ -1713,10 +1705,6 @@ function showEquipmentData() {
             : null;
 
 
-        // =========================================
-        // FIND ITEM DEFINITION
-        // =========================================
-
         const definition =
           inventoryItem
             ? getItemDefinition(
@@ -1725,41 +1713,29 @@ function showEquipmentData() {
             : null;
 
 
-        // =========================================
-        // RAW EQUIPMENT BONUS
-        // Before proficiency multiplier
-        // =========================================
-
         const rawBonuses =
           getRawEquipmentStatBonuses(
             character
           );
 
 
-        // =========================================
-        // ACTIVE PROFICIENCY
-        // =========================================
-
-        const proficiency =
-          getWeaponProficiency(
+        const naturalProficiency =
+          getNaturalWeaponProficiency(
             character
           );
 
 
-        // =========================================
-        // FINAL EQUIPMENT BONUS
-        // After proficiency multiplier
-        // =========================================
+        const activeProficiency =
+          getWeaponProficiency(
+            character
+          );
+
 
         const finalBonuses =
           getEquipmentStatBonuses(
             character
           );
 
-
-        // =========================================
-        // FINAL EFFECTIVE STATS
-        // =========================================
 
         const effectiveStats =
           getEffectiveCharacterStats(
@@ -1789,14 +1765,17 @@ function showEquipmentData() {
           rawBukiBonus:
             rawBonuses.buki,
 
-          proficiencyBuki:
-            proficiency.proficiencyBuki,
+          naturalTier:
+            naturalProficiency.name,
 
-          proficiency:
-            proficiency.name,
+          activeTier:
+            activeProficiency.name,
+
+          activeScore:
+            activeProficiency.proficiencyBuki,
 
           multiplier:
-            `${proficiency.multiplier.toFixed(
+            `${activeProficiency.multiplier.toFixed(
               2
             )}x`,
 
@@ -2647,7 +2626,157 @@ function getRawEquipmentStatBonuses(
 
 
 // =========================================================
+// WEAPON PROFICIENCY HELPERS
+// =========================================================
+
+function getWeaponProficiencyTier(
+  proficiencyBuki
+) {
+
+
+  const safeBuki =
+    Math.max(
+      0,
+      Number(
+        proficiencyBuki
+      ) || 0
+    );
+
+
+  const tier =
+    WEAPON_PROFICIENCY_TIERS.find(
+      proficiencyTier =>
+        safeBuki >=
+        proficiencyTier.minimumBuki
+    );
+
+
+  return {
+
+    name:
+      tier
+        ? tier.name
+        : "Untrained",
+
+    proficiencyBuki:
+      safeBuki,
+
+    multiplier:
+      tier
+        ? tier.multiplier
+        : 0.90
+
+  };
+
+}
+
+
+// =========================================================
+// GET NATURAL WEAPON PROFICIENCY
+// =========================================================
+//
+// Natural proficiency DOES NOT include the equipped
+// weapon's Buki bonus.
+//
+// It represents the character's permanent ability:
+//
+// Current Buki
+// - Weapon Difficulty
+// + Permanent Specialization handling
+//
+// =========================================================
+
+function getNaturalWeaponProficiency(
+  character
+) {
+
+
+  if (!character) {
+
+    return {
+
+      name: "Untrained",
+
+      naturalBuki: 0,
+
+      difficulty: 0,
+
+      proficiencyBuki: 0,
+
+      multiplier: 0.90
+
+    };
+
+  }
+
+
+  const weaponDefinition =
+    getEquippedWeaponDefinition(
+      character
+    );
+
+
+  const currentBuki =
+    Number(
+      character.stats.buki
+    ) || 0;
+
+
+  const difficulty =
+    getWeaponClassDifficulty(
+      character,
+      weaponDefinition
+    );
+
+
+  const proficiencyBuki =
+    Math.max(
+      0,
+      currentBuki -
+      difficulty
+    );
+
+
+  const tier =
+    getWeaponProficiencyTier(
+      proficiencyBuki
+    );
+
+
+  return {
+
+    name:
+      tier.name,
+
+    naturalBuki:
+      currentBuki,
+
+    difficulty:
+      difficulty,
+
+    proficiencyBuki:
+      tier.proficiencyBuki,
+
+    multiplier:
+      tier.multiplier
+
+  };
+
+}
+
+
+// =========================================================
 // GET ACTIVE WEAPON PROFICIENCY
+// =========================================================
+//
+// Active proficiency includes RAW equipment Buki.
+//
+// Equipment may temporarily push the character into
+// a higher proficiency tier.
+//
+// The tier is calculated once before the multiplier
+// is applied, preventing feedback loops.
+//
 // =========================================================
 
 function getWeaponProficiency(
@@ -2687,10 +2816,10 @@ function getWeaponProficiency(
 
 
   const difficulty =
-  getWeaponClassDifficulty(
-    character,
-    weaponDefinition
-  );
+    getWeaponClassDifficulty(
+      character,
+      weaponDefinition
+    );
 
 
   const currentBuki =
@@ -2713,19 +2842,15 @@ function getWeaponProficiency(
 
 
   const tier =
-    WEAPON_PROFICIENCY_TIERS.find(
-      proficiencyTier =>
-        proficiencyBuki >=
-        proficiencyTier.minimumBuki
+    getWeaponProficiencyTier(
+      proficiencyBuki
     );
 
 
   return {
 
     name:
-      tier
-        ? tier.name
-        : "Untrained",
+      tier.name,
 
     rawProficiencyBuki:
       rawProficiencyBuki,
@@ -2734,17 +2859,14 @@ function getWeaponProficiency(
       difficulty,
 
     proficiencyBuki:
-      proficiencyBuki,
+      tier.proficiencyBuki,
 
     multiplier:
-      tier
-        ? tier.multiplier
-        : 0.90
+      tier.multiplier
 
   };
 
 }
-
 
 // =========================================================
 // EQUIPMENT STAT BONUS
@@ -6449,56 +6571,107 @@ function calculateBattlePower(
   encounterType = "standard"
 ) {
 
+
   const pl =
     character.basePL !== undefined
-      ? calculateCurrentPL(character)
+      ? calculateCurrentPL(
+          character
+        )
       : character.power;
 
 
-  const stamina =
-    character.stats?.stamina || 0;
+  let stamina =
+    character.stats?.stamina ||
+    0;
 
 
-  // Core Battle Power
+  // =========================================
+  // PLAYER CHARACTERS USE EFFECTIVE STATS
+  // =========================================
+
+  if (
+    character.basePL !==
+    undefined
+  ) {
+
+
+    const effectiveStats =
+      getEffectiveCharacterStats(
+        character
+      );
+
+
+    stamina =
+      effectiveStats.stamina ||
+      0;
+
+  }
+
+
+  // =========================================
+  // CORE BATTLE POWER
+  // =========================================
+
   let battlePower =
     pl +
-    (stamina * 0.5);
+    (
+      stamina *
+      0.5
+    );
 
 
-  // Encounter scaling
+  // =========================================
+  // ENCOUNTER SCALING
+  // =========================================
+
   const multipliers = {
 
-    standard: 1,
+    standard:
+      1,
 
-    elite: 1.25,
+    elite:
+      1.25,
 
-    groupBoss: 8,
+    groupBoss:
+      8,
 
-    guardBoss: 50
+    guardBoss:
+      50
 
   };
 
 
   battlePower *=
-    multipliers[encounterType] || 1;
+    multipliers[
+      encounterType
+    ] ||
+    1;
 
 
-  // Small ±10% variation
+  // =========================================
+  // SMALL ±10% VARIATION
+  // =========================================
+
   const variation =
     0.90 +
-    (Math.random() * 0.20);
+    (
+      Math.random() *
+      0.20
+    );
 
 
-  battlePower *= variation;
+  battlePower *=
+    variation;
 
 
   return Math.max(
     1,
-    Math.round(battlePower)
+    Math.round(
+      battlePower
+    )
   );
 
 }
-
 
 
 // =========================================================
@@ -9790,6 +9963,7 @@ function performStatAttack(
       "No active fighter selected"
     );
 
+
     return;
 
   }
@@ -9803,6 +9977,7 @@ function performStatAttack(
       "No enemy in battle"
     );
 
+
     return;
 
   }
@@ -9815,6 +9990,7 @@ function performStatAttack(
     console.log(
       "Battle is already over"
     );
+
 
     return;
 
@@ -9845,6 +10021,14 @@ function performStatAttack(
       break;
 
 
+    case "bukijutsu":
+
+      statName =
+        "buki";
+
+      break;
+
+
     default:
 
       console.log(
@@ -9852,15 +10036,28 @@ function performStatAttack(
         attackType
       );
 
+
       return;
 
   }
 
 
+  // =========================================
+  // EFFECTIVE COMBAT STATS
+  // =========================================
+
+  const effectiveStats =
+    getEffectiveCharacterStats(
+      fighter
+    );
+
+
   const attackStat =
-    fighter.stats[
-      statName
-    ];
+    Number(
+      effectiveStats[
+        statName
+      ]
+    ) || 0;
 
 
   // =========================================
@@ -9913,7 +10110,8 @@ function performStatAttack(
 
 
   if (
-    currentBattle.enemyPower < 0
+    currentBattle.enemyPower <
+      0
   ) {
 
     currentBattle.enemyPower =
@@ -9937,14 +10135,41 @@ function performStatAttack(
   // BATTLE LOG
   // =========================================
 
-  const attackLabel =
+  let attackLabel =
+    "Attack";
 
+
+  if (
     attackType ===
-      "ninjutsu"
+    "ninjutsu"
+  ) {
 
-      ? "Ninjutsu"
+    attackLabel =
+      "Ninjutsu";
 
-      : "Taijutsu";
+  }
+
+
+  if (
+    attackType ===
+    "taijutsu"
+  ) {
+
+    attackLabel =
+      "Taijutsu";
+
+  }
+
+
+  if (
+    attackType ===
+    "bukijutsu"
+  ) {
+
+    attackLabel =
+      "Bukijutsu";
+
+  }
 
 
   currentBattle.battleLog.push(
@@ -9962,7 +10187,8 @@ function performStatAttack(
   // =========================================
 
   if (
-    currentBattle.enemyPower <= 0
+    currentBattle.enemyPower <=
+    0
   ) {
 
 
@@ -9974,20 +10200,12 @@ function performStatAttack(
       false;
 
 
-    // =======================================
-    // GENERATE REWARDS
-    // =======================================
-
     const rewards =
       generateBattleRewards(
         currentBattle.enemy,
         fighter
       );
 
-
-    // =======================================
-    // CALCULATE MVP
-    // =======================================
 
     const mvp =
       calculateBattleMVP();
@@ -10026,12 +10244,9 @@ function performStatAttack(
     }
 
 
-    // =======================================
-    // COMMON DROPS
-    // =======================================
-
     if (
-      rewards.items.length > 0
+      rewards.items.length >
+      0
     ) {
 
       rewards.items.forEach(
@@ -10047,12 +10262,9 @@ function performStatAttack(
     }
 
 
-    // =======================================
-    // RARE DROPS
-    // =======================================
-
     if (
-      rewards.rareDrops.length > 0
+      rewards.rareDrops.length >
+      0
     ) {
 
       rewards.rareDrops.forEach(
@@ -10067,10 +10279,6 @@ function performStatAttack(
 
     }
 
-
-    // =======================================
-    // OPEN DEDICATED VICTORY SCREEN
-    // =======================================
 
     openOverlay(
       "victory"
@@ -10101,7 +10309,7 @@ function performStatAttack(
 
 
   console.log(
-    `${statName.toUpperCase()}:`,
+    `${statName.toUpperCase()} EFFECTIVE STAT:`,
     attackStat
   );
 
@@ -10137,12 +10345,12 @@ function performStatAttack(
 }
 
 
-
 // =========================================================
 // ATTACK BUTTON WRAPPERS
 // =========================================================
 
 function performNinjutsuAttack() {
+
 
   performStatAttack(
     "ninjutsu"
@@ -10151,11 +10359,21 @@ function performNinjutsuAttack() {
 }
 
 
-
 function performTaijutsuAttack() {
+
 
   performStatAttack(
     "taijutsu"
+  );
+
+}
+
+
+function performBukijutsuAttack() {
+
+
+  performStatAttack(
+    "bukijutsu"
   );
 
 }
