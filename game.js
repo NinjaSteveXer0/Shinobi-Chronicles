@@ -7181,14 +7181,7 @@ function canCompleteCurrentRun() {
 // These limits describe what may be carried INTO
 // each new difficulty.
 //
-// They are centralized development balance values.
-// We can rebalance them later without changing the
-// transition engine.
-//
-// Academy has no normal inheritance because it is
-// the beginning of a fresh progression cycle.
-//
-// Legacy runs are handled separately later.
+// These are centralized development balance values.
 //
 // =========================================================
 
@@ -7467,7 +7460,7 @@ function getNextRunTarget() {
 
 
   // =========================================
-  // FINAL DIFFICULTY → LEGACY
+  // JINCHURIKI → LEGACY
   // =========================================
 
   if (
@@ -7724,6 +7717,1349 @@ function validateInheritanceSelection(
       limits
 
   };
+
+}
+
+
+// =========================================================
+// BRICK 40 — BUILD NEXT RUN PAYLOAD
+// =========================================================
+//
+// This does NOT modify the save.
+//
+// It creates the instruction package that the actual
+// transition engine will use.
+//
+// =========================================================
+
+function buildNextRunPayload(
+  selection = {}
+) {
+
+
+  const target =
+    getNextRunTarget();
+
+
+  if (!target.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        target.reason
+
+    };
+
+  }
+
+
+  // =========================================
+  // LEGACY TRANSITION
+  // =========================================
+  //
+  // Legacy does not use normal carryover limits.
+  //
+  // The completed collection is preserved and the
+  // difficulty ladder begins again from Academy.
+  //
+  // =========================================
+
+  if (
+    target.transitionType ===
+      "legacy"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      transitionType:
+        "legacy",
+
+      fromDifficultyId:
+        target.fromDifficultyId,
+
+      targetDifficultyId:
+        "academy",
+
+      targetLegacyCycle:
+        target.targetLegacyCycle,
+
+      preserveCollection:
+        true
+
+    };
+
+  }
+
+
+  // =========================================
+  // NORMAL DIFFICULTY TRANSITION
+  // =========================================
+
+  const validation =
+    validateInheritanceSelection(
+      target.targetDifficultyId,
+      selection
+    );
+
+
+  if (!validation.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        validation.reason,
+
+      errors:
+        validation.errors
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      target.fromDifficultyId,
+
+    targetDifficultyId:
+      target.targetDifficultyId,
+
+    targetLegacyCycle:
+      target.targetLegacyCycle,
+
+    inheritance:
+      validation.selection,
+
+    inheritanceLimits:
+      validation.limits
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 41 — TRANSITION SNAPSHOT / ROLLBACK
+// =========================================================
+//
+// Before a real NG+ or Legacy transition we can create
+// a complete snapshot of playerData.
+//
+// This gives us a recovery path if a transition fails.
+//
+// =========================================================
+
+function createRunTransitionSnapshot() {
+
+
+  return JSON.parse(
+    JSON.stringify(
+      playerData
+    )
+  );
+
+}
+
+
+// =========================================================
+// RESTORE RUN TRANSITION SNAPSHOT
+// =========================================================
+
+function restoreRunTransitionSnapshot(
+  snapshot
+) {
+
+
+  if (
+    !snapshot ||
+    typeof snapshot !==
+      "object"
+  ) {
+
+
+    console.log(
+      "Invalid run transition snapshot."
+    );
+
+
+    return false;
+
+  }
+
+
+  playerData =
+    JSON.parse(
+      JSON.stringify(
+        snapshot
+      )
+    );
+
+
+  // =========================================
+  // RESTORE RUNTIME CHARACTER DATA
+  // =========================================
+
+  syncCharacterProgressionFromSave();
+
+
+  // =========================================
+  // RESTORE RUNTIME EQUIPMENT
+  // =========================================
+
+  syncCharacterEquipmentFromSave();
+
+
+  // =========================================
+  // SAVE RESTORED STATE
+  // =========================================
+
+  savePlayerData();
+
+
+  console.log(
+    "Run transition snapshot restored."
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICK 42 — BUILD DIFFICULTY TRANSITION STATE
+// =========================================================
+//
+// Pure helper.
+//
+// It calculates what the next run progression should
+// look like WITHOUT changing playerData.
+//
+// This makes diagnostics safe.
+//
+// =========================================================
+
+function buildDifficultyTransitionState(
+  progression,
+  payload
+) {
+
+
+  if (
+    !progression ||
+    typeof progression !==
+      "object"
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    !payload ||
+    payload.valid !==
+      true ||
+    payload.transitionType !==
+      "difficulty"
+  ) {
+
+    return null;
+
+  }
+
+
+  const fromDifficulty =
+    getShinobiDifficulty(
+      payload.fromDifficultyId
+    );
+
+
+  const targetDifficulty =
+    getShinobiDifficulty(
+      payload.targetDifficultyId
+    );
+
+
+  if (
+    !fromDifficulty ||
+    !targetDifficulty
+  ) {
+
+    return null;
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  if (
+    !currentDifficulty ||
+    currentDifficulty.id !==
+      fromDifficulty.id
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    progression.runCompleted !==
+      true
+  ) {
+
+    return null;
+
+  }
+
+
+  // =========================================
+  // ONLY ALLOW THE IMMEDIATE NEXT DIFFICULTY
+  // =========================================
+
+  const expectedNext =
+    getNextShinobiDifficulty(
+      fromDifficulty.id
+    );
+
+
+  if (
+    !expectedNext ||
+    expectedNext.id !==
+      targetDifficulty.id
+  ) {
+
+    return null;
+
+  }
+
+
+  const completedDifficulties =
+    Array.isArray(
+      progression.completedDifficulties
+    )
+      ? [
+          ...progression.completedDifficulties
+        ]
+      : [];
+
+
+  if (
+    !completedDifficulties.includes(
+      fromDifficulty.id
+    )
+  ) {
+
+
+    completedDifficulties.push(
+      fromDifficulty.id
+    );
+
+  }
+
+
+  const currentHighest =
+    getShinobiDifficulty(
+      progression.highestDifficultyUnlocked
+    );
+
+
+  let highestDifficultyUnlocked =
+    targetDifficulty.id;
+
+
+  if (
+    currentHighest &&
+    currentHighest.order >
+      targetDifficulty.order
+  ) {
+
+
+    highestDifficultyUnlocked =
+      currentHighest.id;
+
+  }
+
+
+  return {
+
+    currentDifficulty:
+      targetDifficulty.id,
+
+    highestDifficultyUnlocked:
+      highestDifficultyUnlocked,
+
+    legacyCycle:
+      Math.max(
+        0,
+        Math.floor(
+          Number(
+            progression.legacyCycle
+          ) || 0
+        )
+      ),
+
+    completedDifficulties:
+      completedDifficulties,
+
+    runCompleted:
+      false
+
+  };
+
+}
+
+
+// =========================================================
+// APPLY NORMAL NEW GAME+ DIFFICULTY TRANSITION
+// =========================================================
+
+function applyDifficultyTransition(
+  payload
+) {
+
+
+  if (
+    !playerData ||
+    !playerData.progression
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Player progression data not found."
+
+    };
+
+  }
+
+
+  const nextProgression =
+    buildDifficultyTransitionState(
+      playerData.progression,
+      payload
+    );
+
+
+  if (!nextProgression) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Difficulty transition state is invalid."
+
+    };
+
+  }
+
+
+  const fromDifficulty =
+    getShinobiDifficulty(
+      payload.fromDifficultyId
+    );
+
+
+  const targetDifficulty =
+    getShinobiDifficulty(
+      payload.targetDifficultyId
+    );
+
+
+  playerData.progression =
+    nextProgression;
+
+
+  savePlayerData();
+
+
+  console.log(
+    `${fromDifficulty.name} → ${targetDifficulty.name} transition complete.`
+  );
+
+
+  return {
+
+    success:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      fromDifficulty.id,
+
+    fromDifficultyName:
+      fromDifficulty.name,
+
+    targetDifficultyId:
+      targetDifficulty.id,
+
+    targetDifficultyName:
+      targetDifficulty.name,
+
+    legacyCycle:
+      nextProgression.legacyCycle,
+
+    inheritance:
+      payload.inheritance || {
+        ...createEmptyInheritanceSelection()
+      }
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 43 — BUILD LEGACY TRANSITION STATE
+// =========================================================
+//
+// Pure helper.
+//
+// Jinchuriki completion closes the difficulty loop,
+// increases the Legacy Cycle and returns the run ladder
+// to Academy Student.
+//
+// Inventory / character collection data is NOT touched
+// here.
+//
+// =========================================================
+
+function buildLegacyTransitionState(
+  progression
+) {
+
+
+  if (
+    !progression ||
+    typeof progression !==
+      "object"
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    progression.currentDifficulty !==
+      "jinchuriki"
+  ) {
+
+    return null;
+
+  }
+
+
+  if (
+    progression.runCompleted !==
+      true
+  ) {
+
+    return null;
+
+  }
+
+
+  const completed =
+    Array.isArray(
+      progression.completedDifficulties
+    )
+      ? progression.completedDifficulties
+      : [];
+
+
+  // =========================================
+  // EVERY DIFFICULTY MUST HAVE BEEN COMPLETED
+  // =========================================
+
+  const fullCycleComplete =
+    SHINOBI_DIFFICULTIES.every(
+      difficulty =>
+        completed.includes(
+          difficulty.id
+        )
+    );
+
+
+  if (!fullCycleComplete) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    currentDifficulty:
+      "academy",
+
+    highestDifficultyUnlocked:
+      "academy",
+
+    legacyCycle:
+      (
+        Math.max(
+          0,
+          Math.floor(
+            Number(
+              progression.legacyCycle
+            ) || 0
+          )
+        ) +
+        1
+      ),
+
+    completedDifficulties:
+      [],
+
+    runCompleted:
+      false
+
+  };
+
+}
+
+
+// =========================================================
+// APPLY LEGACY TRANSITION
+// =========================================================
+
+function applyLegacyTransition(
+  payload
+) {
+
+
+  if (
+    !payload ||
+    payload.valid !==
+      true ||
+    payload.transitionType !==
+      "legacy"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Invalid Legacy transition payload."
+
+    };
+
+  }
+
+
+  const nextProgression =
+    buildLegacyTransitionState(
+      playerData.progression
+    );
+
+
+  if (!nextProgression) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Legacy transition requirements are not satisfied."
+
+    };
+
+  }
+
+
+  playerData.progression =
+    nextProgression;
+
+
+  // =========================================
+  // IMPORTANT — LEGACY COLLECTION PRESERVATION
+  // =========================================
+  //
+  // We deliberately do NOT modify:
+  //
+  // playerData.inventory
+  // playerData.characters
+  // Ryō
+  // collected equipment
+  //
+  // Detailed reset/preservation rules can later decide
+  // which character training values reset and which
+  // permanent Legacy rewards survive.
+  //
+  // =========================================
+
+
+  savePlayerData();
+
+
+  console.log(
+    `LEGACY CYCLE ${nextProgression.legacyCycle} BEGUN.`
+  );
+
+
+  console.log(
+    "New Academy Student run started."
+  );
+
+
+  return {
+
+    success:
+      true,
+
+    transitionType:
+      "legacy",
+
+    targetDifficultyId:
+      "academy",
+
+    targetDifficultyName:
+      "Academy Student",
+
+    legacyCycle:
+      nextProgression.legacyCycle,
+
+    preserveCollection:
+      true
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 44 — UNIFIED NEXT RUN TRANSITION
+// =========================================================
+
+function executeNextRunTransition(
+  selection = {},
+  options = {}
+) {
+
+
+  if (
+    !playerData ||
+    !playerData.progression
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Player progression data not found."
+
+    };
+
+  }
+
+
+  // =========================================
+  // COMPLETE CURRENT RUN IF REQUIRED
+  // =========================================
+
+  if (
+    playerData.progression.runCompleted !==
+      true
+  ) {
+
+
+    const eligibility =
+      getRunCompletionEligibility();
+
+
+    if (!eligibility.allowed) {
+
+
+      return {
+
+        success:
+          false,
+
+        reason:
+          eligibility.reason
+
+      };
+
+    }
+
+
+    const completed =
+      completeCurrentDifficulty();
+
+
+    if (!completed) {
+
+
+      return {
+
+        success:
+          false,
+
+        reason:
+          "Current difficulty could not be completed."
+
+      };
+
+    }
+
+  }
+
+
+  // =========================================
+  // BUILD TRANSITION PAYLOAD
+  // =========================================
+
+  const payload =
+    buildNextRunPayload(
+      selection
+    );
+
+
+  if (!payload.valid) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        payload.reason,
+
+      errors:
+        payload.errors || []
+
+    };
+
+  }
+
+
+  // =========================================
+  // PREMIUM DIFFICULTY GATE
+  // =========================================
+
+  if (
+    payload.transitionType ===
+      "difficulty" &&
+    isPremiumDifficulty(
+      payload.targetDifficultyId
+    ) &&
+    options.hasPremiumAccess !==
+      true
+  ) {
+
+
+    const targetDifficulty =
+      getShinobiDifficulty(
+        payload.targetDifficultyId
+      );
+
+
+    return {
+
+      success:
+        false,
+
+      runCompleted:
+        true,
+
+      transitionPending:
+        true,
+
+      reason:
+        "Premium access required.",
+
+      targetDifficultyId:
+        targetDifficulty.id,
+
+      targetDifficultyName:
+        targetDifficulty.name
+
+    };
+
+  }
+
+
+  // =========================================
+  // LEGACY
+  // =========================================
+
+  if (
+    payload.transitionType ===
+      "legacy"
+  ) {
+
+
+    return applyLegacyTransition(
+      payload
+    );
+
+  }
+
+
+  // =========================================
+  // NORMAL NEW GAME+
+  // =========================================
+
+  return applyDifficultyTransition(
+    payload
+  );
+
+}
+
+
+// =========================================================
+// RUN TRANSITION ENGINE DIAGNOSTICS
+// =========================================================
+
+function runRunTransitionDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — RUN TRANSITION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  // =========================================
+  // INHERITANCE CONFIGURATION
+  // =========================================
+
+  const geninLimits =
+    getInheritanceLimits(
+      "genin"
+    );
+
+
+  results.push({
+
+    test:
+      "Genin inheritance limits exist",
+
+    pass:
+      !!geninLimits
+
+  });
+
+
+  results.push({
+
+    test:
+      "Genin special ninja limit is 1",
+
+    pass:
+      !!(
+        geninLimits &&
+        geninLimits.specialNinja ===
+          1
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Genin bloodline limit is 1",
+
+    pass:
+      !!(
+        geninLimits &&
+        geninLimits.bloodlines ===
+          1
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Genin legendary weapon limit is 1",
+
+    pass:
+      !!(
+        geninLimits &&
+        geninLimits.legendaryWeapons ===
+          1
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Genin basic item limit is 5",
+
+    pass:
+      !!(
+        geninLimits &&
+        geninLimits.basicItems ===
+          5
+      )
+
+  });
+
+
+  // =========================================
+  // SELECTION VALIDATION
+  // =========================================
+
+  const legalSelection =
+    validateInheritanceSelection(
+      "genin",
+      {
+
+        specialNinja: [
+          "test_ninja"
+        ],
+
+        bloodlines: [
+          "test_bloodline"
+        ],
+
+        legendaryWeapons: [
+          "test_weapon"
+        ],
+
+        basicItems: [
+          "test_item"
+        ]
+
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Legal inheritance accepted",
+
+    pass:
+      legalSelection.valid ===
+        true
+
+  });
+
+
+  const illegalSelection =
+    validateInheritanceSelection(
+      "genin",
+      {
+
+        specialNinja: [
+          "dave",
+          "sage_dave"
+        ]
+
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Excess inheritance rejected",
+
+    pass:
+      illegalSelection.valid ===
+        false
+
+  });
+
+
+  // =========================================
+  // SNAPSHOT HEALTH
+  // =========================================
+
+  const snapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Transition snapshot created",
+
+    pass:
+      !!(
+        snapshot &&
+        snapshot.progression &&
+        snapshot.characters &&
+        Array.isArray(
+          snapshot.inventory
+        )
+      )
+
+  });
+
+
+  // =========================================
+  // PURE ACADEMY → GENIN TRANSITION TEST
+  // =========================================
+  //
+  // This does NOT modify playerData.
+  //
+  // =========================================
+
+  const testAcademyProgression = {
+
+    currentDifficulty:
+      "academy",
+
+    highestDifficultyUnlocked:
+      "genin",
+
+    legacyCycle:
+      0,
+
+    completedDifficulties: [
+      "academy"
+    ],
+
+    runCompleted:
+      true
+
+  };
+
+
+  const testDifficultyPayload = {
+
+    valid:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      "academy",
+
+    targetDifficultyId:
+      "genin",
+
+    targetLegacyCycle:
+      0,
+
+    inheritance:
+      createEmptyInheritanceSelection()
+
+  };
+
+
+  const testGeninState =
+    buildDifficultyTransitionState(
+      testAcademyProgression,
+      testDifficultyPayload
+    );
+
+
+  results.push({
+
+    test:
+      "Academy to Genin state builds safely",
+
+    pass:
+      !!(
+        testGeninState &&
+        testGeninState.currentDifficulty ===
+          "genin" &&
+        testGeninState.runCompleted ===
+          false &&
+        testGeninState.completedDifficulties.includes(
+          "academy"
+        )
+      )
+
+  });
+
+
+  // =========================================
+  // PURE LEGACY TRANSITION TEST
+  // =========================================
+  //
+  // Also does NOT modify playerData.
+  //
+  // =========================================
+
+  const testLegacyProgression = {
+
+    currentDifficulty:
+      "jinchuriki",
+
+    highestDifficultyUnlocked:
+      "jinchuriki",
+
+    legacyCycle:
+      0,
+
+    completedDifficulties:
+      SHINOBI_DIFFICULTIES.map(
+        difficulty =>
+          difficulty.id
+      ),
+
+    runCompleted:
+      true
+
+  };
+
+
+  const testLegacyState =
+    buildLegacyTransitionState(
+      testLegacyProgression
+    );
+
+
+  results.push({
+
+    test:
+      "Jinchuriki to Legacy state builds safely",
+
+    pass:
+      !!(
+        testLegacyState &&
+        testLegacyState.currentDifficulty ===
+          "academy" &&
+        testLegacyState.highestDifficultyUnlocked ===
+          "academy" &&
+        testLegacyState.legacyCycle ===
+          1 &&
+        testLegacyState.runCompleted ===
+          false &&
+        testLegacyState.completedDifficulties.length ===
+          0
+      )
+
+  });
+
+
+  // =========================================
+  // CURRENT NEXT TARGET
+  // =========================================
+
+  const currentTarget =
+    getNextRunTarget();
+
+
+  results.push({
+
+    test:
+      "Current next-run target is valid",
+
+    pass:
+      currentTarget.valid ===
+        true
+
+  });
+
+
+  // =========================================
+  // DISPLAY
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ RUN TRANSITION ENGINE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ RUN TRANSITION ENGINE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
 
 }
 
