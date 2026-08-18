@@ -6939,14 +6939,7 @@ function runProgressionGatingDiagnostics() {
 
 
   // =========================================
-  // PREMIUM FEATURE MUST REQUIRE ENTITLEMENT
-  // =========================================
-  //
-  // This does NOT require the player's current save
-  // to have Akatsuki unlocked.
-  //
-  // We test premium metadata independently below.
-  //
+  // PREMIUM FEATURE METADATA
   // =========================================
 
   const akatsukiFeature =
@@ -7085,6 +7078,98 @@ function runProgressionGatingDiagnostics() {
     failedTests.length ===
     0
   );
+
+}
+
+
+// =========================================================
+// BRICK 35 — RUN COMPLETION VALIDATION
+// =========================================================
+
+function getRunCompletionEligibility() {
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (!runState.valid) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        runState.reason
+
+    };
+
+  }
+
+
+  if (
+    runState.runCompleted ===
+      true
+  ) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        "Current run is already completed."
+
+    };
+
+  }
+
+
+  // =========================================
+  // FUTURE STORY ARC VALIDATION HOOK
+  // =========================================
+  //
+  // Story completion, final boss,
+  // six-character endgame team, etc.
+  // will eventually be checked here.
+  //
+  // =========================================
+
+
+  return {
+
+    allowed:
+      true,
+
+    reason:
+      null,
+
+    difficultyId:
+      runState.currentDifficultyId,
+
+    difficultyName:
+      runState.currentDifficultyName,
+
+    legacyCycle:
+      runState.legacyCycle
+
+  };
+
+}
+
+
+// =========================================================
+// CAN COMPLETE CURRENT RUN
+// =========================================================
+
+function canCompleteCurrentRun() {
+
+
+  return getRunCompletionEligibility()
+    .allowed;
 
 }
 
