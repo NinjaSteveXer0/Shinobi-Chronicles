@@ -12973,6 +12973,817 @@ function runNextRunApplicationDiagnostics() {
 }
 
 // =========================================================
+// BRICK 62 — SYNCHRONIZE NEXT-RUN RUNTIME STATE
+// =========================================================
+//
+// After Brick 61 replaces playerData in memory,
+// the runtime playerTeam still needs to be rebuilt
+// from that new save state.
+//
+// This step:
+//
+// - restores character stats
+// - restores permanent PL bonuses
+// - restores discipline progression
+// - restores weapon specialization data
+// - rebuilds runtime equipment
+//
+// It DOES NOT save to localStorage.
+//
+// =========================================================
+
+function synchronizeNextRunRuntimeState() {
+
+
+  if (
+    !playerData ||
+    typeof playerData !==
+      "object"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Player data is missing."
+
+    };
+
+  }
+
+
+  if (
+    !playerData.characters ||
+    typeof playerData.characters !==
+      "object"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Character progression data is missing."
+
+    };
+
+  }
+
+
+  if (
+    !Array.isArray(
+      playerData.inventory
+    )
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Inventory data is invalid."
+
+    };
+
+  }
+
+
+  // =========================================
+  // APPLY CHARACTER SAVE DATA TO RUNTIME
+  // =========================================
+
+  syncCharacterProgressionFromSave();
+
+
+  // =========================================
+  // REBUILD RUNTIME EQUIPMENT
+  // =========================================
+
+  syncCharacterEquipmentFromSave();
+
+
+  return {
+
+    success:
+      true,
+
+    characterCount:
+      playerTeam.length,
+
+    inventoryCount:
+      playerData.inventory.length
+
+  };
+
+}
+
+
+// =========================================================
+// VERIFY RUNTIME MATCHES PLAYER SAVE
+// =========================================================
+
+function verifyRuntimeMatchesPlayerData() {
+
+
+  const errors =
+    [];
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const savedCharacter =
+        playerData.characters[
+          character.id
+        ];
+
+
+      if (!savedCharacter) {
+
+
+        errors.push(
+          `${character.id}: saved character data missing.`
+        );
+
+
+        return;
+
+      }
+
+
+      // =========================================
+      // STATS
+      // =========================================
+
+      Object.keys(
+        savedCharacter.stats
+      ).forEach(
+        stat => {
+
+
+          if (
+            character.stats[
+              stat
+            ] !==
+            savedCharacter.stats[
+              stat
+            ]
+          ) {
+
+
+            errors.push(
+              `${character.id}: runtime ${stat} does not match save.`
+            );
+
+          }
+
+        }
+      );
+
+
+      // =========================================
+      // PERMANENT PL BONUS
+      // =========================================
+
+      if (
+        Number(
+          character.permanentPLBonus
+        ) !==
+        Number(
+          savedCharacter.permanentPLBonus
+        )
+      ) {
+
+
+        errors.push(
+          `${character.id}: permanent PL bonus does not match save.`
+        );
+
+      }
+
+
+      // =========================================
+      // DISCIPLINE PROGRESSION
+      // =========================================
+
+      const runtimeDiscipline =
+        character.disciplineProgression ||
+        {};
+
+
+      const savedDiscipline =
+        savedCharacter.disciplineProgression ||
+        {};
+
+
+      Object.keys(
+        SHINOBI_DISCIPLINES
+      ).forEach(
+        disciplineId => {
+
+
+          const runtimeRecord =
+            runtimeDiscipline[
+              disciplineId
+            ];
+
+
+          const savedRecord =
+            savedDiscipline[
+              disciplineId
+            ];
+
+
+          if (
+            !runtimeRecord ||
+            !savedRecord
+          ) {
+
+
+            errors.push(
+              `${character.id}: ${disciplineId} progression missing.`
+            );
+
+
+            return;
+
+          }
+
+
+          if (
+            runtimeRecord.level !==
+              savedRecord.level ||
+            runtimeRecord.exp !==
+              savedRecord.exp ||
+            runtimeRecord.statLevelApplied !==
+              savedRecord.statLevelApplied
+          ) {
+
+
+            errors.push(
+              `${character.id}: ${disciplineId} progression does not match save.`
+            );
+
+          }
+
+        }
+      );
+
+
+      // =========================================
+      // WEAPON SPECIALIZATIONS
+      // =========================================
+
+      if (
+        JSON.stringify(
+          character.weaponSpecializations ||
+          {}
+        ) !==
+        JSON.stringify(
+          savedCharacter.weaponSpecializations ||
+          {}
+        )
+      ) {
+
+
+        errors.push(
+          `${character.id}: weapon specialization data does not match save.`
+        );
+
+      }
+
+    }
+  );
+
+
+  // =========================================
+  // VERIFY EQUIPMENT MATCHES INVENTORY
+  // =========================================
+
+  playerTeam.forEach(
+    character => {
+
+
+      const equipment =
+        Array.isArray(
+          character.equipment
+        )
+          ? character.equipment
+          : [];
+
+
+      equipment.forEach(
+        equippedItem => {
+
+
+          const inventoryItem =
+            playerData.inventory.find(
+              item =>
+                item.instanceId ===
+                equippedItem.instanceId
+            );
+
+
+          if (!inventoryItem) {
+
+
+            errors.push(
+              `${character.id}: runtime equipment missing from inventory.`
+            );
+
+
+            return;
+
+          }
+
+
+          if (
+            inventoryItem.equippedBy !==
+              character.id
+          ) {
+
+
+            errors.push(
+              `${character.id}: runtime equipment ownership mismatch.`
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  return {
+
+    valid:
+      errors.length ===
+      0,
+
+    errors:
+      errors
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 62 DIAGNOSTICS
+// =========================================================
+
+function runNextRunRuntimeSyncDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — NEXT-RUN RUNTIME SYNC DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  try {
+
+
+    // =========================================
+    // CREATE CONTROLLED ACADEMY COMPLETE STATE
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "genin",
+
+      legacyCycle:
+        Math.max(
+          0,
+          Number(
+            originalSnapshot
+              .progression
+              .legacyCycle
+          ) || 0
+        ),
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    // =========================================
+    // BUILD NEXT RUN PACKAGE
+    // =========================================
+
+    const testPackage = {
+
+      valid:
+        true,
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        "academy",
+
+      targetDifficultyId:
+        "genin",
+
+      targetLegacyCycle:
+        playerData.progression
+          .legacyCycle,
+
+      carryover: {
+
+        specialNinja:
+          [],
+
+        bloodlines:
+          [],
+
+        legendaryWeapons:
+          [],
+
+        basicItems:
+          []
+
+      }
+
+    };
+
+
+    const nextRunState =
+      buildNextRunPlayerState(
+        testPackage
+      );
+
+
+    const applicationResult =
+      applyNextRunPlayerState(
+        nextRunState
+      );
+
+
+    results.push({
+
+      test:
+        "Next-run state applies before runtime sync",
+
+      pass:
+        !!(
+          applicationResult &&
+          applicationResult.success ===
+            true
+        )
+
+    });
+
+
+    // =========================================
+    // RUN SYNCHRONIZATION
+    // =========================================
+
+    const syncResult =
+      synchronizeNextRunRuntimeState();
+
+
+    results.push({
+
+      test:
+        "Runtime synchronization completes",
+
+      pass:
+        !!(
+          syncResult &&
+          syncResult.success ===
+            true
+        )
+
+    });
+
+
+    // =========================================
+    // VERIFY COMPLETE MATCH
+    // =========================================
+
+    const verification =
+      verifyRuntimeMatchesPlayerData();
+
+
+    results.push({
+
+      test:
+        "Runtime character data matches player save",
+
+      pass:
+        verification.valid ===
+          true
+
+    });
+
+
+    // =========================================
+    // VERIFY BASE CHARACTER RESET
+    // =========================================
+
+    let baseResetValid =
+      true;
+
+
+    playerTeam.forEach(
+      character => {
+
+
+        const canonicalStats =
+          character.baseStats;
+
+
+        Object.keys(
+          canonicalStats
+        ).forEach(
+          stat => {
+
+
+            if (
+              character.stats[
+                stat
+              ] !==
+              canonicalStats[
+                stat
+              ]
+            ) {
+
+
+              baseResetValid =
+                false;
+
+            }
+
+          }
+        );
+
+
+        if (
+          character.permanentPLBonus !==
+            0
+        ) {
+
+
+          baseResetValid =
+            false;
+
+        }
+
+      }
+    );
+
+
+    results.push({
+
+      test:
+        "Runtime characters reset to canonical base values",
+
+      pass:
+        baseResetValid
+
+    });
+
+
+    // =========================================
+    // VERIFY DISCIPLINE RESET
+    // =========================================
+
+    let disciplineResetValid =
+      true;
+
+
+    playerTeam.forEach(
+      character => {
+
+
+        Object.values(
+          character.disciplineProgression
+        ).forEach(
+          record => {
+
+
+            if (
+              record.level !==
+                1 ||
+              record.exp !==
+                0 ||
+              record.statLevelApplied !==
+                1
+            ) {
+
+
+              disciplineResetValid =
+                false;
+
+            }
+
+          }
+        );
+
+      }
+    );
+
+
+    results.push({
+
+      test:
+        "Runtime discipline progression reset",
+
+      pass:
+        disciplineResetValid
+
+    });
+
+
+    // =========================================
+    // VERIFY EQUIPMENT RESET
+    // =========================================
+
+    const runtimeEquipmentEmpty =
+      playerTeam.every(
+        character =>
+          Array.isArray(
+            character.equipment
+          ) &&
+          character.equipment.length ===
+            0
+      );
+
+
+    results.push({
+
+      test:
+        "Runtime equipment reset correctly",
+
+      pass:
+        runtimeEquipmentEmpty
+
+    });
+
+
+    // =========================================
+    // INVALID DATA PROTECTION
+    // =========================================
+
+    const activePlayerData =
+      playerData;
+
+
+    playerData = {
+
+      ...playerData,
+
+      characters:
+        null
+
+    };
+
+
+    const invalidSync =
+      synchronizeNextRunRuntimeState();
+
+
+    results.push({
+
+      test:
+        "Invalid runtime sync data rejected",
+
+      pass:
+        !!(
+          invalidSync &&
+          invalidSync.success ===
+            false
+        )
+
+    });
+
+
+    playerData =
+      activePlayerData;
+
+  }
+  finally {
+
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+  }
+
+
+  // =========================================
+  // FINAL ORIGINAL STATE CHECK
+  // =========================================
+
+  const restoredSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Original state restored after runtime sync test",
+
+    pass:
+      JSON.stringify(
+        originalSnapshot
+      ) ===
+      JSON.stringify(
+        restoredSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ NEXT-RUN RUNTIME SYNC PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ NEXT-RUN RUNTIME SYNC HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+// =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
 
