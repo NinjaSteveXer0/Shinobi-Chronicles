@@ -14602,26 +14602,377 @@ function runAtomicNextRunTransitionDiagnostics() {
 // ...runAtomicNextRunTransitionDiagnostics() etc...
 
 
-// ============================================================
+// =========================================================
 // BRICK 64 — NEXT-RUN RELOAD PERSISTENCE
-// ============================================================
+// =========================================================
+//
+// Confirms that player state written to localStorage
+// reconstructs correctly after a genuine browser reload.
+//
+// This brick does NOT perform a difficulty transition.
+// It tests persistence independently first.
+//
+// =========================================================
 
-// 64A
-const NG_PLUS_RELOAD_TEST_KEY = ...
+const NG_PLUS_RELOAD_TEST_KEY =
+  "shinobi_ng_plus_reload_test";
+
+
+// =========================================================
+// CREATE NEXT-RUN RELOAD MARKER
+// =========================================================
 
 function createNextRunReloadMarker() {
-    ...
+
+
+  const currentRun =
+    getCurrentRunState();
+
+
+  if (
+    !currentRun ||
+    currentRun.valid !==
+      true
+  ) {
+
+
+    console.error(
+      "Cannot create NG+ reload marker: invalid run state."
+    );
+
+
+    return null;
+
+  }
+
+
+  const marker = {
+
+    createdAt:
+      Date.now(),
+
+    expectedDifficultyId:
+      currentRun.currentDifficultyId,
+
+    expectedDifficultyOrder:
+      currentRun.currentDifficultyOrder,
+
+    expectedHighestDifficultyUnlockedId:
+      currentRun.highestDifficultyUnlockedId,
+
+    expectedLegacyCycle:
+      currentRun.legacyCycle,
+
+    expectedRunCompleted:
+      currentRun.runCompleted,
+
+    expectedRyo:
+      Number(
+        playerData.ryo
+      ) || 0,
+
+    expectedExp:
+      Number(
+        playerData.exp
+      ) || 0
+
+  };
+
+
+  localStorage.setItem(
+    NG_PLUS_RELOAD_TEST_KEY,
+    JSON.stringify(
+      marker
+    )
+  );
+
+
+  console.log(
+    "NG+ reload persistence marker created:",
+    marker
+  );
+
+
+  return marker;
+
 }
 
-// 64B
-function verifyNextRunAfterReload() {
-    ...
+
+// =========================================================
+// GET NEXT-RUN RELOAD MARKER
+// =========================================================
+
+function getNextRunReloadMarker() {
+
+
+  const rawMarker =
+    localStorage.getItem(
+      NG_PLUS_RELOAD_TEST_KEY
+    );
+
+
+  if (!rawMarker) {
+
+
+    return null;
+
+  }
+
+
+  try {
+
+
+    return JSON.parse(
+      rawMarker
+    );
+
+  }
+  catch (error) {
+
+
+    console.error(
+      "Failed to parse NG+ reload marker:",
+      error
+    );
+
+
+    return null;
+
+  }
+
 }
+
+
+// =========================================================
+// CLEAR NEXT-RUN RELOAD MARKER
+// =========================================================
 
 function clearNextRunReloadMarker() {
-    ...
+
+
+  localStorage.removeItem(
+    NG_PLUS_RELOAD_TEST_KEY
+  );
+
+
+  console.log(
+    "NG+ reload persistence marker cleared."
+  );
+
+
+  return true;
+
 }
 
+
+// =========================================================
+// VERIFY NEXT RUN AFTER RELOAD
+// =========================================================
+
+function verifyNextRunAfterReload() {
+
+
+  const marker =
+    getNextRunReloadMarker();
+
+
+  if (!marker) {
+
+
+    console.warn(
+      "No NG+ reload marker found. Nothing to verify."
+    );
+
+
+    return false;
+
+  }
+
+
+  const currentRun =
+    getCurrentRunState();
+
+
+  const tests = [
+
+    {
+
+      test:
+        "Reloaded run state is valid",
+
+      pass:
+        !!(
+          currentRun &&
+          currentRun.valid ===
+            true
+        )
+
+    },
+
+
+    {
+
+      test:
+        "Difficulty survived reload",
+
+      pass:
+        currentRun &&
+        currentRun.currentDifficultyId ===
+          marker.expectedDifficultyId
+
+    },
+
+
+    {
+
+      test:
+        "Difficulty order survived reload",
+
+      pass:
+        currentRun &&
+        currentRun.currentDifficultyOrder ===
+          marker.expectedDifficultyOrder
+
+    },
+
+
+    {
+
+      test:
+        "Highest unlocked difficulty survived reload",
+
+      pass:
+        currentRun &&
+        currentRun.highestDifficultyUnlockedId ===
+          marker.expectedHighestDifficultyUnlockedId
+
+    },
+
+
+    {
+
+      test:
+        "Legacy cycle survived reload",
+
+      pass:
+        currentRun &&
+        currentRun.legacyCycle ===
+          marker.expectedLegacyCycle
+
+    },
+
+
+    {
+
+      test:
+        "Run completion state survived reload",
+
+      pass:
+        currentRun &&
+        currentRun.runCompleted ===
+          marker.expectedRunCompleted
+
+    },
+
+
+    {
+
+      test:
+        "Ryō survived reload",
+
+      pass:
+        (
+          Number(
+            playerData.ryo
+          ) || 0
+        ) ===
+        marker.expectedRyo
+
+    },
+
+
+    {
+
+      test:
+        "EXP survived reload",
+
+      pass:
+        (
+          Number(
+            playerData.exp
+          ) || 0
+        ) ===
+        marker.expectedExp
+
+    }
+
+  ];
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — RELOAD PERSISTENCE DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.table(
+    tests
+  );
+
+
+  const failedTests =
+    tests.filter(
+      test =>
+        !test.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ NG+ RELOAD PERSISTENCE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ NG+ RELOAD PERSISTENCE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
 
 
 // =========================================================
