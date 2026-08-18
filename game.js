@@ -15884,6 +15884,1410 @@ function emergencyRestoreNextRunEndToEndTest() {
 
 
 // =========================================================
+// BRICK 66 — RUN COMPLETION CONTROLLER
+// =========================================================
+//
+// First player-facing orchestration layer.
+//
+// This does NOT:
+//
+// - complete a run
+// - modify playerData
+// - save anything
+// - execute a transition
+//
+// It answers:
+//
+// "What should the completion UI do right now?"
+//
+// =========================================================
+
+
+// =========================================================
+// GET NEXT RUN TARGET FROM RUN STATE
+// =========================================================
+//
+// Pure version of getNextRunTarget().
+//
+// Allows UI diagnostics to test hypothetical states without
+// temporarily modifying the real player save.
+//
+// =========================================================
+
+function getNextRunTargetFromRunState(
+  runState
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Run state is invalid."
+
+    };
+
+  }
+
+
+  const nextDifficulty =
+    getNextShinobiDifficulty(
+      runState.currentDifficultyId
+    );
+
+
+  // =========================================
+  // NORMAL DIFFICULTY TRANSITION
+  // =========================================
+
+  if (nextDifficulty) {
+
+
+    return {
+
+      valid:
+        true,
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        runState.currentDifficultyId,
+
+      fromDifficultyName:
+        runState.currentDifficultyName,
+
+      targetDifficultyId:
+        nextDifficulty.id,
+
+      targetDifficultyName:
+        nextDifficulty.name,
+
+      targetDifficultyOrder:
+        nextDifficulty.order,
+
+      targetLegacyCycle:
+        runState.legacyCycle,
+
+      inheritanceLimits:
+        getInheritanceLimits(
+          nextDifficulty.id
+        ),
+
+      premium:
+        nextDifficulty.premium ===
+        true
+
+    };
+
+  }
+
+
+  // =========================================
+  // JINCHURIKI -> LEGACY
+  // =========================================
+
+  if (
+    runState.currentDifficultyId ===
+      "jinchuriki"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      transitionType:
+        "legacy",
+
+      fromDifficultyId:
+        "jinchuriki",
+
+      fromDifficultyName:
+        "Jinchūriki",
+
+      targetDifficultyId:
+        "academy",
+
+      targetDifficultyName:
+        "Academy Student",
+
+      targetDifficultyOrder:
+        0,
+
+      targetLegacyCycle:
+        runState.legacyCycle +
+        1,
+
+      inheritanceLimits:
+        null,
+
+      premium:
+        false
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      false,
+
+    reason:
+      "No valid next run target exists."
+
+  };
+
+}
+
+
+// =========================================================
+// BUILD RUN COMPLETION CONTROLLER
+// =========================================================
+
+function buildRunCompletionController(
+  runState,
+  options = {}
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      status:
+        "invalid",
+
+      ready:
+        false,
+
+      reason:
+        runState &&
+        runState.reason
+
+          ? runState.reason
+
+          : "Run state is invalid."
+
+    };
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      runState.currentDifficultyId
+    );
+
+
+  if (!currentDifficulty) {
+
+
+    return {
+
+      valid:
+        false,
+
+      status:
+        "invalid",
+
+      ready:
+        false,
+
+      reason:
+        "Current difficulty does not exist."
+
+    };
+
+  }
+
+
+  const target =
+    getNextRunTargetFromRunState(
+      runState
+    );
+
+
+  if (!target.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      status:
+        "no_target",
+
+      ready:
+        false,
+
+      currentDifficultyId:
+        currentDifficulty.id,
+
+      currentDifficultyName:
+        currentDifficulty.name,
+
+      reason:
+        target.reason
+
+    };
+
+  }
+
+
+  // =========================================
+  // CURRENT RUN NOT YET COMPLETE
+  // =========================================
+
+  if (
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      status:
+        "in_progress",
+
+      ready:
+        false,
+
+      reason:
+        `Complete ${currentDifficulty.name} before continuing.`,
+
+      currentDifficultyId:
+        currentDifficulty.id,
+
+      currentDifficultyName:
+        currentDifficulty.name,
+
+      currentDifficultyOrder:
+        currentDifficulty.order,
+
+      runCompleted:
+        false,
+
+      legacyCycle:
+        runState.legacyCycle,
+
+      target:
+        target,
+
+      requiresPremium:
+        target.premium ===
+        true,
+
+      premiumOwned:
+        options.hasPremiumAccess ===
+        true,
+
+      requiresInheritance:
+        target.transitionType ===
+        "difficulty"
+
+    };
+
+  }
+
+
+  // =========================================
+  // PREMIUM TARGET
+  // =========================================
+
+  const requiresPremium =
+    target.premium ===
+    true;
+
+
+  const premiumOwned =
+    options.hasPremiumAccess ===
+    true;
+
+
+  if (
+    requiresPremium &&
+    !premiumOwned
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      status:
+        "premium_locked",
+
+      ready:
+        false,
+
+      reason:
+        `${target.targetDifficultyName} requires premium access.`,
+
+      currentDifficultyId:
+        currentDifficulty.id,
+
+      currentDifficultyName:
+        currentDifficulty.name,
+
+      currentDifficultyOrder:
+        currentDifficulty.order,
+
+      runCompleted:
+        true,
+
+      legacyCycle:
+        runState.legacyCycle,
+
+      target:
+        target,
+
+      requiresPremium:
+        true,
+
+      premiumOwned:
+        false,
+
+      requiresInheritance:
+        target.transitionType ===
+        "difficulty"
+
+    };
+
+  }
+
+
+  // =========================================
+  // READY FOR PLAYER COMPLETION FLOW
+  // =========================================
+
+  return {
+
+    valid:
+      true,
+
+    status:
+      "ready",
+
+    ready:
+      true,
+
+    reason:
+      null,
+
+    currentDifficultyId:
+      currentDifficulty.id,
+
+    currentDifficultyName:
+      currentDifficulty.name,
+
+    currentDifficultyOrder:
+      currentDifficulty.order,
+
+    runCompleted:
+      true,
+
+    legacyCycle:
+      runState.legacyCycle,
+
+    transitionType:
+      target.transitionType,
+
+    target:
+      target,
+
+    requiresPremium:
+      requiresPremium,
+
+    premiumOwned:
+      premiumOwned,
+
+    requiresInheritance:
+      target.transitionType ===
+      "difficulty",
+
+    inheritanceLimits:
+      target.inheritanceLimits
+
+  };
+
+}
+
+
+// =========================================================
+// GET LIVE RUN COMPLETION CONTROLLER
+// =========================================================
+
+function getRunCompletionController(
+  options = {}
+) {
+
+
+  return buildRunCompletionController(
+    getCurrentRunState(),
+    options
+  );
+
+}
+
+
+// =========================================================
+// BRICK 67 — COMPLETION SUMMARY PAYLOAD
+// =========================================================
+//
+// Converts Brick 66 into presentation-ready data.
+//
+// Eventually this can feed:
+//
+// - completion modal
+// - NOW, CHOOSE screen
+// - inheritance screen
+// - premium lock panel
+// - Legacy transition screen
+//
+// Still completely read-only.
+//
+// =========================================================
+
+function buildRunCompletionSummary(
+  controller
+) {
+
+
+  if (
+    !controller ||
+    controller.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      title:
+        "Progression Unavailable",
+
+      message:
+        controller &&
+        controller.reason
+
+          ? controller.reason
+
+          : "Run progression data could not be loaded.",
+
+      actionEnabled:
+        false
+
+    };
+
+  }
+
+
+  // =========================================
+  // RUN STILL IN PROGRESS
+  // =========================================
+
+  if (
+    controller.status ===
+      "in_progress"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      status:
+        "in_progress",
+
+      title:
+        controller.currentDifficultyName,
+
+      eyebrow:
+        "CURRENT RUN",
+
+      message:
+        controller.reason,
+
+      actionLabel:
+        null,
+
+      actionEnabled:
+        false,
+
+      transitionType:
+        controller.target
+          .transitionType,
+
+      targetDifficultyId:
+        controller.target
+          .targetDifficultyId,
+
+      targetDifficultyName:
+        controller.target
+          .targetDifficultyName,
+
+      legacyCycle:
+        controller.legacyCycle
+
+    };
+
+  }
+
+
+  // =========================================
+  // PREMIUM LOCK
+  // =========================================
+
+  if (
+    controller.status ===
+      "premium_locked"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      status:
+        "premium_locked",
+
+      title:
+        controller.target
+          .targetDifficultyName,
+
+      eyebrow:
+        "PREMIUM CONTENT",
+
+      message:
+        controller.reason,
+
+      actionLabel:
+        "PAID CONTENT",
+
+      actionEnabled:
+        false,
+
+      transitionType:
+        controller.target
+          .transitionType,
+
+      targetDifficultyId:
+        controller.target
+          .targetDifficultyId,
+
+      targetDifficultyName:
+        controller.target
+          .targetDifficultyName,
+
+      requiresPremium:
+        true,
+
+      premiumOwned:
+        false,
+
+      legacyCycle:
+        controller.legacyCycle
+
+    };
+
+  }
+
+
+  // =========================================
+  // READY — LEGACY
+  // =========================================
+
+  if (
+    controller.status ===
+      "ready" &&
+    controller.transitionType ===
+      "legacy"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      status:
+        "ready",
+
+      title:
+        "A New Legacy Awaits",
+
+      eyebrow:
+        "LEGACY",
+
+      message:
+        `Legacy Cycle ${controller.target.targetLegacyCycle} is ready to begin.`,
+
+      actionLabel:
+        "BEGIN LEGACY",
+
+      actionEnabled:
+        true,
+
+      transitionType:
+        "legacy",
+
+      targetDifficultyId:
+        "academy",
+
+      targetDifficultyName:
+        "Academy Student",
+
+      currentLegacyCycle:
+        controller.legacyCycle,
+
+      targetLegacyCycle:
+        controller.target
+          .targetLegacyCycle,
+
+      requiresInheritance:
+        false
+
+    };
+
+  }
+
+
+  // =========================================
+  // READY — NORMAL NEXT RUN
+  // =========================================
+
+  if (
+    controller.status ===
+      "ready" &&
+    controller.transitionType ===
+      "difficulty"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      status:
+        "ready",
+
+      title:
+        `${controller.currentDifficultyName} Complete`,
+
+      eyebrow:
+        "RUN COMPLETE",
+
+      message:
+        `${controller.target.targetDifficultyName} awaits.`,
+
+      actionLabel:
+        controller.requiresInheritance
+          ? "CHOOSE INHERITANCE"
+          : "CONTINUE",
+
+      actionEnabled:
+        true,
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        controller.currentDifficultyId,
+
+      fromDifficultyName:
+        controller.currentDifficultyName,
+
+      targetDifficultyId:
+        controller.target
+          .targetDifficultyId,
+
+      targetDifficultyName:
+        controller.target
+          .targetDifficultyName,
+
+      targetLegacyCycle:
+        controller.target
+          .targetLegacyCycle,
+
+      requiresPremium:
+        controller.requiresPremium,
+
+      premiumOwned:
+        controller.premiumOwned,
+
+      requiresInheritance:
+        controller.requiresInheritance,
+
+      inheritanceLimits:
+        controller.inheritanceLimits
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      false,
+
+    title:
+      "Progression Unavailable",
+
+    message:
+      "Completion controller returned an unsupported state.",
+
+    actionEnabled:
+      false
+
+  };
+
+}
+
+
+// =========================================================
+// GET LIVE RUN COMPLETION SUMMARY
+// =========================================================
+
+function getRunCompletionSummary(
+  options = {}
+) {
+
+
+  return buildRunCompletionSummary(
+    getRunCompletionController(
+      options
+    )
+  );
+
+}
+
+
+// =========================================================
+// BRICK 68 — COMPLETION FLOW DIAGNOSTICS
+// =========================================================
+//
+// Pure-state diagnostics.
+//
+// No live save modification.
+// No snapshots required.
+// No reload required.
+// Dave receives no buttons.
+//
+// =========================================================
+
+function runCompletionControllerDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — COMPLETION CONTROLLER DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  // =========================================
+  // INCOMPLETE ACADEMY
+  // =========================================
+
+  const academyInProgress = {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "academy",
+
+    currentDifficultyName:
+      "Academy Student",
+
+    currentDifficultyOrder:
+      0,
+
+    highestDifficultyUnlockedId:
+      "academy",
+
+    highestDifficultyUnlockedName:
+      "Academy Student",
+
+    highestDifficultyUnlockedOrder:
+      0,
+
+    legacyCycle:
+      0,
+
+    runCompleted:
+      false,
+
+    completedDifficulties:
+      [],
+
+    premiumDifficulty:
+      false
+
+  };
+
+
+  const incompleteController =
+    buildRunCompletionController(
+      academyInProgress
+    );
+
+
+  results.push({
+
+    test:
+      "Incomplete Academy run is not ready",
+
+    pass:
+      !!(
+        incompleteController &&
+        incompleteController.valid ===
+          true &&
+        incompleteController.status ===
+          "in_progress" &&
+        incompleteController.ready ===
+          false
+      )
+
+  });
+
+
+  // =========================================
+  // COMPLETED ACADEMY
+  // =========================================
+
+  const academyComplete = {
+
+    ...academyInProgress,
+
+    highestDifficultyUnlockedId:
+      "genin",
+
+    highestDifficultyUnlockedName:
+      "Genin",
+
+    highestDifficultyUnlockedOrder:
+      1,
+
+    runCompleted:
+      true,
+
+    completedDifficulties: [
+      "academy"
+    ]
+
+  };
+
+
+  const academyController =
+    buildRunCompletionController(
+      academyComplete
+    );
+
+
+  results.push({
+
+    test:
+      "Completed Academy run is ready",
+
+    pass:
+      !!(
+        academyController &&
+        academyController.status ===
+          "ready" &&
+        academyController.ready ===
+          true
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Completed Academy targets Genin",
+
+    pass:
+      !!(
+        academyController &&
+        academyController.target &&
+        academyController.target
+          .targetDifficultyId ===
+          "genin"
+      )
+
+  });
+
+
+  const academySummary =
+    buildRunCompletionSummary(
+      academyController
+    );
+
+
+  results.push({
+
+    test:
+      "Academy completion summary requests inheritance",
+
+    pass:
+      !!(
+        academySummary &&
+        academySummary.valid ===
+          true &&
+        academySummary.actionEnabled ===
+          true &&
+        academySummary.actionLabel ===
+          "CHOOSE INHERITANCE"
+      )
+
+  });
+
+
+  // =========================================
+  // COMPLETED KAGE -> PREMIUM AKATSUKI
+  // =========================================
+  //
+  // This follows the CURRENT difficulty ladder.
+  //
+  // The later NOW, CHOOSE route system will decide how
+  // Kage presents Legacy vs premium story paths.
+  //
+  // =========================================
+
+  const kageComplete = {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "kage",
+
+    currentDifficultyName:
+      "Kage",
+
+    currentDifficultyOrder:
+      6,
+
+    highestDifficultyUnlockedId:
+      "akatsuki",
+
+    highestDifficultyUnlockedName:
+      "Akatsuki",
+
+    highestDifficultyUnlockedOrder:
+      7,
+
+    legacyCycle:
+      0,
+
+    runCompleted:
+      true,
+
+    completedDifficulties: [
+      "academy",
+      "genin",
+      "chunin",
+      "special_jonin",
+      "jonin",
+      "anbu",
+      "kage"
+    ],
+
+    premiumDifficulty:
+      false
+
+  };
+
+
+  const lockedKageController =
+    buildRunCompletionController(
+      kageComplete,
+      {
+        hasPremiumAccess:
+          false
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Unowned Akatsuki route is premium locked",
+
+    pass:
+      !!(
+        lockedKageController &&
+        lockedKageController.status ===
+          "premium_locked" &&
+        lockedKageController.ready ===
+          false &&
+        lockedKageController.requiresPremium ===
+          true
+      )
+
+  });
+
+
+  const lockedSummary =
+    buildRunCompletionSummary(
+      lockedKageController
+    );
+
+
+  results.push({
+
+    test:
+      "Premium lock summary exposes Paid Content state",
+
+    pass:
+      !!(
+        lockedSummary &&
+        lockedSummary.actionLabel ===
+          "PAID CONTENT" &&
+        lockedSummary.actionEnabled ===
+          false
+      )
+
+  });
+
+
+  const ownedKageController =
+    buildRunCompletionController(
+      kageComplete,
+      {
+        hasPremiumAccess:
+          true
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Owned Akatsuki route becomes available",
+
+    pass:
+      !!(
+        ownedKageController &&
+        ownedKageController.status ===
+          "ready" &&
+        ownedKageController.ready ===
+          true
+      )
+
+  });
+
+
+  // =========================================
+  // JINCHURIKI -> LEGACY
+  // =========================================
+
+  const jinchurikiComplete = {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "jinchuriki",
+
+    currentDifficultyName:
+      "Jinchūriki",
+
+    currentDifficultyOrder:
+      8,
+
+    highestDifficultyUnlockedId:
+      "jinchuriki",
+
+    highestDifficultyUnlockedName:
+      "Jinchūriki",
+
+    highestDifficultyUnlockedOrder:
+      8,
+
+    legacyCycle:
+      3,
+
+    runCompleted:
+      true,
+
+    completedDifficulties:
+      SHINOBI_DIFFICULTIES.map(
+        difficulty =>
+          difficulty.id
+      ),
+
+    premiumDifficulty:
+      true
+
+  };
+
+
+  const legacyController =
+    buildRunCompletionController(
+      jinchurikiComplete,
+      {
+        hasPremiumAccess:
+          true
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Completed Jinchuriki produces Legacy route",
+
+    pass:
+      !!(
+        legacyController &&
+        legacyController.status ===
+          "ready" &&
+        legacyController.transitionType ===
+          "legacy" &&
+        legacyController.target
+          .targetLegacyCycle ===
+          4
+      )
+
+  });
+
+
+  const legacySummary =
+    buildRunCompletionSummary(
+      legacyController
+    );
+
+
+  results.push({
+
+    test:
+      "Legacy summary presents Begin Legacy action",
+
+    pass:
+      !!(
+        legacySummary &&
+        legacySummary.actionEnabled ===
+          true &&
+        legacySummary.actionLabel ===
+          "BEGIN LEGACY"
+      )
+
+  });
+
+
+  // =========================================
+  // INVALID STATE
+  // =========================================
+
+  const invalidController =
+    buildRunCompletionController({
+
+      valid:
+        false,
+
+      reason:
+        "Diagnostic invalid state."
+
+    });
+
+
+  results.push({
+
+    test:
+      "Invalid run state rejected safely",
+
+    pass:
+      !!(
+        invalidController &&
+        invalidController.valid ===
+          false &&
+        invalidController.ready ===
+          false
+      )
+
+  });
+
+
+  // =========================================
+  // LIVE PLAYER READ-ONLY CHECK
+  // =========================================
+
+  const beforeSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const liveController =
+    getRunCompletionController();
+
+
+  const liveSummary =
+    getRunCompletionSummary();
+
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Live completion controller returns valid data",
+
+    pass:
+      !!(
+        liveController &&
+        liveController.valid ===
+          true
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Live completion summary returns valid data",
+
+    pass:
+      !!(
+        liveSummary &&
+        liveSummary.valid ===
+          true
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Completion orchestration does not modify player save",
+
+    pass:
+      JSON.stringify(
+        beforeSnapshot
+      ) ===
+      JSON.stringify(
+        afterSnapshot
+      )
+
+  });
+
+
+  // =========================================
+  // DISPLAY
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ COMPLETION CONTROLLER PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ COMPLETION CONTROLLER HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "Live Controller:",
+    liveController
+  );
+
+
+  console.log(
+    "Live Summary:",
+    liveSummary
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
 
