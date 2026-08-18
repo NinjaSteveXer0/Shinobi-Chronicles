@@ -14594,6 +14594,36 @@ function runAtomicNextRunTransitionDiagnostics() {
 
 }
 
+// ============================================================
+// BRICK 63 — ATOMIC NEXT-RUN TRANSITION
+// ============================================================
+
+// ...all Brick 63 functions...
+// ...runAtomicNextRunTransitionDiagnostics() etc...
+
+
+// ============================================================
+// BRICK 64 — NEXT-RUN RELOAD PERSISTENCE
+// ============================================================
+
+// 64A
+const NG_PLUS_RELOAD_TEST_KEY = ...
+
+function createNextRunReloadMarker() {
+    ...
+}
+
+// 64B
+function verifyNextRunAfterReload() {
+    ...
+}
+
+function clearNextRunReloadMarker() {
+    ...
+}
+
+
+
 // =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
