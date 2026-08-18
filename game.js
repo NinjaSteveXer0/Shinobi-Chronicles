@@ -7175,6 +7175,560 @@ function canCompleteCurrentRun() {
 
 
 // =========================================================
+// BRICK 36 — INHERITANCE LIMIT CONFIGURATION
+// =========================================================
+//
+// These limits describe what may be carried INTO
+// each new difficulty.
+//
+// They are centralized development balance values.
+// We can rebalance them later without changing the
+// transition engine.
+//
+// Academy has no normal inheritance because it is
+// the beginning of a fresh progression cycle.
+//
+// Legacy runs are handled separately later.
+//
+// =========================================================
+
+const INHERITANCE_LIMITS = {
+
+  academy: {
+
+    specialNinja:
+      0,
+
+    bloodlines:
+      0,
+
+    legendaryWeapons:
+      0,
+
+    basicItems:
+      0
+
+  },
+
+
+  genin: {
+
+    specialNinja:
+      1,
+
+    bloodlines:
+      1,
+
+    legendaryWeapons:
+      1,
+
+    basicItems:
+      5
+
+  },
+
+
+  chunin: {
+
+    specialNinja:
+      2,
+
+    bloodlines:
+      2,
+
+    legendaryWeapons:
+      2,
+
+    basicItems:
+      10
+
+  },
+
+
+  special_jonin: {
+
+    specialNinja:
+      2,
+
+    bloodlines:
+      2,
+
+    legendaryWeapons:
+      2,
+
+    basicItems:
+      15
+
+  },
+
+
+  jonin: {
+
+    specialNinja:
+      3,
+
+    bloodlines:
+      3,
+
+    legendaryWeapons:
+      3,
+
+    basicItems:
+      20
+
+  },
+
+
+  anbu: {
+
+    specialNinja:
+      3,
+
+    bloodlines:
+      3,
+
+    legendaryWeapons:
+      3,
+
+    basicItems:
+      25
+
+  },
+
+
+  kage: {
+
+    specialNinja:
+      4,
+
+    bloodlines:
+      4,
+
+    legendaryWeapons:
+      4,
+
+    basicItems:
+      30
+
+  },
+
+
+  akatsuki: {
+
+    specialNinja:
+      5,
+
+    bloodlines:
+      5,
+
+    legendaryWeapons:
+      5,
+
+    basicItems:
+      40
+
+  },
+
+
+  jinchuriki: {
+
+    specialNinja:
+      6,
+
+    bloodlines:
+      6,
+
+    legendaryWeapons:
+      6,
+
+    basicItems:
+      50
+
+  }
+
+};
+
+
+// =========================================================
+// GET INHERITANCE LIMITS
+// =========================================================
+
+function getInheritanceLimits(
+  difficultyId
+) {
+
+
+  const difficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  if (!difficulty) {
+
+    return null;
+
+  }
+
+
+  const limits =
+    INHERITANCE_LIMITS[
+      difficultyId
+    ];
+
+
+  if (!limits) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    ...limits
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 37 — NEXT RUN TARGET
+// =========================================================
+
+function getNextRunTarget() {
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (!runState.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        runState.reason
+
+    };
+
+  }
+
+
+  const nextDifficulty =
+    getNextShinobiDifficulty(
+      runState.currentDifficultyId
+    );
+
+
+  // =========================================
+  // NORMAL NEW GAME+
+  // =========================================
+
+  if (nextDifficulty) {
+
+
+    return {
+
+      valid:
+        true,
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        runState.currentDifficultyId,
+
+      fromDifficultyName:
+        runState.currentDifficultyName,
+
+      targetDifficultyId:
+        nextDifficulty.id,
+
+      targetDifficultyName:
+        nextDifficulty.name,
+
+      targetLegacyCycle:
+        runState.legacyCycle,
+
+      inheritanceLimits:
+        getInheritanceLimits(
+          nextDifficulty.id
+        )
+
+    };
+
+  }
+
+
+  // =========================================
+  // FINAL DIFFICULTY → LEGACY
+  // =========================================
+
+  if (
+    runState.currentDifficultyId ===
+      "jinchuriki"
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      transitionType:
+        "legacy",
+
+      fromDifficultyId:
+        "jinchuriki",
+
+      fromDifficultyName:
+        "Jinchūriki",
+
+      targetDifficultyId:
+        "academy",
+
+      targetDifficultyName:
+        "Academy Student",
+
+      targetLegacyCycle:
+        runState.legacyCycle + 1,
+
+      inheritanceLimits:
+        null
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      false,
+
+    reason:
+      "No valid next run target exists."
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 38 — INHERITANCE SELECTION MODEL
+// =========================================================
+
+function createEmptyInheritanceSelection() {
+
+
+  return {
+
+    specialNinja:
+      [],
+
+    bloodlines:
+      [],
+
+    legendaryWeapons:
+      [],
+
+    basicItems:
+      []
+
+  };
+
+}
+
+
+// =========================================================
+// NORMALIZE INHERITANCE SELECTION
+// =========================================================
+
+function normalizeInheritanceSelection(
+  selection
+) {
+
+
+  const source =
+    (
+      selection &&
+      typeof selection ===
+        "object"
+    )
+      ? selection
+      : {};
+
+
+  const normalizeArray =
+    value => {
+
+
+      if (
+        !Array.isArray(
+          value
+        )
+      ) {
+
+        return [];
+
+      }
+
+
+      return [
+        ...new Set(
+          value.filter(
+            entry =>
+              (
+                typeof entry ===
+                  "string" &&
+                entry.trim().length >
+                  0
+              )
+          )
+        )
+      ];
+
+    };
+
+
+  return {
+
+    specialNinja:
+      normalizeArray(
+        source.specialNinja
+      ),
+
+    bloodlines:
+      normalizeArray(
+        source.bloodlines
+      ),
+
+    legendaryWeapons:
+      normalizeArray(
+        source.legendaryWeapons
+      ),
+
+    basicItems:
+      normalizeArray(
+        source.basicItems
+      )
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 39 — INHERITANCE SELECTION VALIDATION
+// =========================================================
+
+function validateInheritanceSelection(
+  targetDifficultyId,
+  selection
+) {
+
+
+  const limits =
+    getInheritanceLimits(
+      targetDifficultyId
+    );
+
+
+  if (!limits) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Inheritance limits not found.",
+
+      errors:
+        []
+
+    };
+
+  }
+
+
+  const normalized =
+    normalizeInheritanceSelection(
+      selection
+    );
+
+
+  const errors =
+    [];
+
+
+  Object.keys(
+    limits
+  ).forEach(
+    category => {
+
+
+      const selected =
+        normalized[
+          category
+        ] || [];
+
+
+      const maximum =
+        limits[
+          category
+        ];
+
+
+      if (
+        selected.length >
+          maximum
+      ) {
+
+
+        errors.push(
+          `${category}: selected ${selected.length}, maximum ${maximum}.`
+        );
+
+      }
+
+    }
+  );
+
+
+  return {
+
+    valid:
+      errors.length ===
+      0,
+
+    reason:
+      errors.length === 0
+        ? null
+        : "Inheritance selection exceeds allowed limits.",
+
+    errors:
+      errors,
+
+    selection:
+      normalized,
+
+    limits:
+      limits
+
+  };
+
+}
+
+
+// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
