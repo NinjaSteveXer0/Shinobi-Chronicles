@@ -4852,6 +4852,1017 @@ function awardKinjutsuBattleExp(
 
 
 // =========================================================
+// BRICK 25 — TRAINING CONFIGURATION
+// =========================================================
+//
+// Central configuration for deliberate training actions.
+//
+// IMPORTANT:
+// These are development balance values for now.
+//
+// Energy / Ryō / Chakra costs are represented here,
+// but are NOT charged yet.
+//
+// Kinjutsu is deliberately absent because Kinjutsu
+// progression comes from battle use, not training.
+//
+// =========================================================
+
+const TRAINING_SOURCE_CONFIG = {
+
+  exam: {
+
+    id:
+      "exam",
+
+    name:
+      "Exam",
+
+    baseExp:
+      10,
+
+    costs: {
+
+      energy:
+        0,
+
+      ryo:
+        0,
+
+      chakra:
+        0
+
+    }
+
+  },
+
+
+  practical: {
+
+    id:
+      "practical",
+
+    name:
+      "Practical",
+
+    baseExp:
+      10,
+
+    costs: {
+
+      energy:
+        0,
+
+      ryo:
+        0,
+
+      chakra:
+        0
+
+    }
+
+  }
+
+};
+
+
+// =========================================================
+// GET TRAINING CONFIGURATION
+// =========================================================
+
+function getTrainingConfiguration(
+  source
+) {
+
+
+  return (
+    TRAINING_SOURCE_CONFIG[
+      source
+    ] ||
+    null
+  );
+
+}
+
+
+// =========================================================
+// BRICK 26 — TRAINING ELIGIBILITY ENGINE
+// =========================================================
+
+function getTrainingEligibility(
+  characterId,
+  disciplineId,
+  source
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        "Character not found."
+
+    };
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if (!discipline) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        "Discipline not found."
+
+    };
+
+  }
+
+
+  const trainingConfig =
+    getTrainingConfiguration(
+      source
+    );
+
+
+  // =========================================
+  // BATTLE IS NOT A MANUAL TRAINING ACTION
+  // =========================================
+
+  if (
+    source ===
+      "battle"
+  ) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        "Battle progression is awarded through combat use, not manual training."
+
+    };
+
+  }
+
+
+  if (!trainingConfig) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        "Training source not found."
+
+    };
+
+  }
+
+
+  if (
+    discipline.trainingSource !==
+      source
+  ) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        `${discipline.name} requires ${discipline.trainingSource} training.`
+
+    };
+
+  }
+
+
+  return {
+
+    allowed:
+      true,
+
+    reason:
+      null,
+
+    character:
+      character,
+
+    discipline:
+      discipline,
+
+    trainingConfig:
+      trainingConfig
+
+  };
+
+}
+
+
+// =========================================================
+// CAN TRAIN DISCIPLINE
+// =========================================================
+
+function canTrainDiscipline(
+  characterId,
+  disciplineId,
+  source
+) {
+
+
+  return getTrainingEligibility(
+    characterId,
+    disciplineId,
+    source
+  ).allowed;
+
+}
+
+
+// =========================================================
+// BRICK 27 — BUILD TRAINING RESULT
+// =========================================================
+
+function buildTrainingResult(
+  before,
+  after,
+  expGained,
+  source
+) {
+
+
+  if (
+    !before ||
+    !after
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    success:
+      true,
+
+    characterId:
+      after.characterId,
+
+    characterName:
+      after.characterName,
+
+    disciplineId:
+      after.disciplineId,
+
+    disciplineName:
+      after.disciplineName,
+
+    source:
+      source,
+
+    expGained:
+      expGained,
+
+    previousLevel:
+      before.trainingLevel,
+
+    newLevel:
+      after.trainingLevel,
+
+    levelsGained:
+      (
+        after.trainingLevel -
+        before.trainingLevel
+      ),
+
+    leveledUp:
+      (
+        after.trainingLevel >
+        before.trainingLevel
+      ),
+
+    previousStat:
+      before.naturalStat,
+
+    newStat:
+      after.naturalStat,
+
+    statPointsGained:
+      (
+        after.naturalStat -
+        before.naturalStat
+      ),
+
+    previousExp:
+      before.exp,
+
+    currentExp:
+      after.exp,
+
+    expToNext:
+      after.expToNext
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 28 — PREVIEW DISCIPLINE TRAINING
+// =========================================================
+
+function previewDisciplineTraining(
+  characterId,
+  disciplineId,
+  source
+) {
+
+
+  const eligibility =
+    getTrainingEligibility(
+      characterId,
+      disciplineId,
+      source
+    );
+
+
+  if (
+    !eligibility.allowed
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      allowed:
+        false,
+
+      reason:
+        eligibility.reason
+
+    };
+
+  }
+
+
+  const trainingData =
+    getTrainingActionData(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!trainingData) {
+
+
+    return {
+
+      success:
+        false,
+
+      allowed:
+        false,
+
+      reason:
+        "Training data could not be created."
+
+    };
+
+  }
+
+
+  return {
+
+    success:
+      true,
+
+    allowed:
+      true,
+
+    characterId:
+      trainingData.characterId,
+
+    characterName:
+      trainingData.characterName,
+
+    disciplineId:
+      trainingData.disciplineId,
+
+    disciplineName:
+      trainingData.disciplineName,
+
+    source:
+      source,
+
+    expReward:
+      eligibility
+        .trainingConfig
+        .baseExp,
+
+    costs: {
+      ...eligibility
+        .trainingConfig
+        .costs
+    },
+
+    trainingLevel:
+      trainingData.trainingLevel,
+
+    currentExp:
+      trainingData.exp,
+
+    expToNext:
+      trainingData.expToNext,
+
+    naturalStat:
+      trainingData.naturalStat
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 28 — UNIFIED DISCIPLINE TRAINING ACTION
+// =========================================================
+
+function performDisciplineTraining(
+  characterId,
+  disciplineId,
+  source,
+  options = {}
+) {
+
+
+  const eligibility =
+    getTrainingEligibility(
+      characterId,
+      disciplineId,
+      source
+    );
+
+
+  if (
+    !eligibility.allowed
+  ) {
+
+
+    console.log(
+      "Training denied:",
+      eligibility.reason
+    );
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        eligibility.reason
+
+    };
+
+  }
+
+
+  const before =
+    getTrainingActionData(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!before) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Training data could not be loaded."
+
+    };
+
+  }
+
+
+  const configuredExp =
+    eligibility
+      .trainingConfig
+      .baseExp;
+
+
+  const expOverride =
+    Number(
+      options.expOverride
+    );
+
+
+  const expGained =
+    (
+      Number.isFinite(
+        expOverride
+      ) &&
+      expOverride >
+        0
+    )
+      ? Math.floor(
+          expOverride
+        )
+      : configuredExp;
+
+
+  let awarded =
+    false;
+
+
+  // =========================================
+  // EXAM
+  // =========================================
+
+  if (
+    source ===
+      "exam"
+  ) {
+
+
+    awarded =
+      awardExamTrainingExp(
+        characterId,
+        disciplineId,
+        expGained
+      );
+
+  }
+
+
+  // =========================================
+  // PRACTICAL
+  // =========================================
+
+  if (
+    source ===
+      "practical"
+  ) {
+
+
+    awarded =
+      awardPracticalTrainingExp(
+        characterId,
+        disciplineId,
+        expGained
+      );
+
+  }
+
+
+  if (!awarded) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Training EXP could not be awarded."
+
+    };
+
+  }
+
+
+  const after =
+    getTrainingActionData(
+      characterId,
+      disciplineId
+    );
+
+
+  const result =
+    buildTrainingResult(
+      before,
+      after,
+      expGained,
+      source
+    );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "TRAINING COMPLETE"
+  );
+
+
+  console.log(
+    result
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return result;
+
+}
+
+
+// =========================================================
+// BRICK 29 — TRAINING ENGINE DIAGNOSTICS
+// =========================================================
+
+function runTrainingEngineDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — TRAINING ENGINE DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  // =========================================
+  // CONFIGURATION
+  // =========================================
+
+  const examConfig =
+    getTrainingConfiguration(
+      "exam"
+    );
+
+
+  const practicalConfig =
+    getTrainingConfiguration(
+      "practical"
+    );
+
+
+  results.push({
+
+    test:
+      "Exam configuration exists",
+
+    pass:
+      !!examConfig
+
+  });
+
+
+  results.push({
+
+    test:
+      "Practical configuration exists",
+
+    pass:
+      !!practicalConfig
+
+  });
+
+
+  results.push({
+
+    test:
+      "Training EXP rewards are valid",
+
+    pass:
+      !!(
+        examConfig &&
+        practicalConfig &&
+        Number.isFinite(
+          examConfig.baseExp
+        ) &&
+        examConfig.baseExp >
+          0 &&
+        Number.isFinite(
+          practicalConfig.baseExp
+        ) &&
+        practicalConfig.baseExp >
+          0
+      )
+
+  });
+
+
+  // =========================================
+  // CORRECT ELIGIBILITY
+  // =========================================
+
+  results.push({
+
+    test:
+      "Ninjutsu allowed in Exam",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "nin",
+        "exam"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Genjutsu allowed in Exam",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "gen",
+        "exam"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Fuinjutsu allowed in Exam",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "fuin",
+        "exam"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Taijutsu allowed in Practical",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "tai",
+        "practical"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Bukijutsu allowed in Practical",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "buki",
+        "practical"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Stamina allowed in Practical",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "stamina",
+        "practical"
+      ) === true
+
+  });
+
+
+  // =========================================
+  // WRONG SOURCE REJECTION
+  // =========================================
+
+  results.push({
+
+    test:
+      "Bukijutsu rejected by Exam",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "buki",
+        "exam"
+      ) === false
+
+  });
+
+
+  results.push({
+
+    test:
+      "Ninjutsu rejected by Practical",
+
+    pass:
+      canTrainDiscipline(
+        "sakura",
+        "nin",
+        "practical"
+      ) === false
+
+  });
+
+
+  // =========================================
+  // KINJUTSU MANUAL TRAINING BLOCK
+  // =========================================
+
+  results.push({
+
+    test:
+      "Kinjutsu rejected as manual training",
+
+    pass:
+      (
+        canTrainDiscipline(
+          "sakura",
+          "kin",
+          "exam"
+        ) === false &&
+        canTrainDiscipline(
+          "sakura",
+          "kin",
+          "practical"
+        ) === false &&
+        canTrainDiscipline(
+          "sakura",
+          "kin",
+          "battle"
+        ) === false
+      )
+
+  });
+
+
+  // =========================================
+  // PREVIEW HEALTH
+  // =========================================
+
+  const validPreview =
+    previewDisciplineTraining(
+      "sakura",
+      "nin",
+      "exam"
+    );
+
+
+  const invalidPreview =
+    previewDisciplineTraining(
+      "sakura",
+      "buki",
+      "exam"
+    );
+
+
+  results.push({
+
+    test:
+      "Valid training preview works",
+
+    pass:
+      !!(
+        validPreview &&
+        validPreview.success ===
+          true &&
+        validPreview.allowed ===
+          true
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Invalid training preview rejected",
+
+    pass:
+      !!(
+        invalidPreview &&
+        invalidPreview.success ===
+          false &&
+        invalidPreview.allowed ===
+          false
+      )
+
+  });
+
+
+  // =========================================
+  // DISPLAY RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ TRAINING ENGINE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ TRAINING ENGINE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
