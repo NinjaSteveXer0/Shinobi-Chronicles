@@ -9811,7 +9811,7 @@ function runLiveTransitionDiagnostics() {
 }
 
 
-// =========================================================
+/// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
@@ -9916,6 +9916,1376 @@ function showShinobiProgression() {
 
 }
 
+
+// =========================================================
+// BRICK 50 — INVENTORY INHERITANCE CANDIDATES
+// =========================================================
+//
+// Carryover selections must refer to REAL inventory
+// entries instead of arbitrary strings.
+//
+// Stackable items receive one candidate key per unit:
+//
+// stack:basic_scroll:1
+// stack:basic_scroll:2
+//
+// Unique items use their instanceId:
+//
+// instance:legendary_weapon_123
+//
+// =========================================================
+
+function createInventoryInheritanceCandidateKey(
+  item,
+  unitNumber = 1
+) {
+
+
+  if (!item) {
+
+    return null;
+
+  }
+
+
+  if (item.instanceId) {
+
+
+    return (
+      `instance:${item.instanceId}`
+    );
+
+  }
+
+
+  if (!item.id) {
+
+    return null;
+
+  }
+
+
+  return (
+    `stack:${item.id}:${unitNumber}`
+  );
+
+}
+
+
+// =========================================================
+// GET INVENTORY INHERITANCE CATEGORY
+// =========================================================
+
+function getInventoryInheritanceCategory(
+  item
+) {
+
+
+  if (!item) {
+
+    return null;
+
+  }
+
+
+  const definition =
+    getItemDefinition(
+      item.id
+    );
+
+
+  const itemType =
+    definition
+      ? definition.type
+      : item.type;
+
+
+  const rarity =
+    definition
+      ? definition.rarity
+      : item.rarity;
+
+
+  if (
+    itemType ===
+      "weapon" &&
+    String(
+      rarity || ""
+    ).toLowerCase() ===
+      "legendary"
+  ) {
+
+
+    return "legendaryWeapons";
+
+  }
+
+
+  return "basicItems";
+
+}
+
+
+// =========================================================
+// BUILD INVENTORY INHERITANCE CANDIDATES
+// =========================================================
+
+function buildInventoryInheritanceCandidates(
+  inventory
+) {
+
+
+  if (
+    !Array.isArray(
+      inventory
+    )
+  ) {
+
+    return [];
+
+  }
+
+
+  const candidates =
+    [];
+
+
+  inventory.forEach(
+    item => {
+
+
+      const category =
+        getInventoryInheritanceCategory(
+          item
+        );
+
+
+      if (!category) {
+
+        return;
+
+      }
+
+
+      // =========================================
+      // UNIQUE ITEM
+      // =========================================
+
+      if (item.instanceId) {
+
+
+        candidates.push({
+
+          key:
+            createInventoryInheritanceCandidateKey(
+              item
+            ),
+
+          category:
+            category,
+
+          itemId:
+            item.id,
+
+          instanceId:
+            item.instanceId,
+
+          name:
+            item.name,
+
+          type:
+            item.type,
+
+          rarity:
+            item.rarity,
+
+          unitNumber:
+            1
+
+        });
+
+
+        return;
+
+      }
+
+
+      // =========================================
+      // STACKABLE ITEM
+      // =========================================
+
+      const quantity =
+        Math.max(
+          0,
+          Math.floor(
+            Number(
+              item.quantity
+            ) || 0
+          )
+        );
+
+
+      for (
+        let unitNumber = 1;
+        unitNumber <= quantity;
+        unitNumber += 1
+      ) {
+
+
+        candidates.push({
+
+          key:
+            createInventoryInheritanceCandidateKey(
+              item,
+              unitNumber
+            ),
+
+          category:
+            category,
+
+          itemId:
+            item.id,
+
+          instanceId:
+            null,
+
+          name:
+            item.name,
+
+          type:
+            item.type,
+
+          rarity:
+            item.rarity,
+
+          unitNumber:
+            unitNumber
+
+        });
+
+      }
+
+    }
+  );
+
+
+  return candidates;
+
+}
+
+
+// =========================================================
+// GET PLAYER INVENTORY INHERITANCE CANDIDATES
+// =========================================================
+
+function getInventoryInheritanceCandidates() {
+
+
+  return buildInventoryInheritanceCandidates(
+    playerData.inventory
+  );
+
+}
+
+
+// =========================================================
+// BRICK 51 — LEGENDARY WEAPON CANDIDATES
+// =========================================================
+
+function getLegendaryWeaponInheritanceCandidates() {
+
+
+  return getInventoryInheritanceCandidates()
+    .filter(
+      candidate =>
+        candidate.category ===
+        "legendaryWeapons"
+    );
+
+}
+
+
+// =========================================================
+// IS LEGENDARY WEAPON INHERITANCE CANDIDATE
+// =========================================================
+
+function isLegendaryWeaponInheritanceCandidate(
+  candidateKey
+) {
+
+
+  return getLegendaryWeaponInheritanceCandidates()
+    .some(
+      candidate =>
+        candidate.key ===
+        candidateKey
+    );
+
+}
+
+
+// =========================================================
+// BRICK 52 — BASIC ITEM CANDIDATES
+// =========================================================
+//
+// "Basic item" currently means any inventory unit
+// that is NOT a Legendary weapon.
+//
+// We can narrow this later with explicit inheritance
+// metadata if needed.
+//
+// =========================================================
+
+function getBasicItemInheritanceCandidates() {
+
+
+  return getInventoryInheritanceCandidates()
+    .filter(
+      candidate =>
+        candidate.category ===
+        "basicItems"
+    );
+
+}
+
+
+// =========================================================
+// IS BASIC ITEM INHERITANCE CANDIDATE
+// =========================================================
+
+function isBasicItemInheritanceCandidate(
+  candidateKey
+) {
+
+
+  return getBasicItemInheritanceCandidates()
+    .some(
+      candidate =>
+        candidate.key ===
+        candidateKey
+    );
+
+}
+
+
+// =========================================================
+// CLONE INVENTORY CANDIDATE FOR NEXT RUN
+// =========================================================
+
+function cloneInventoryCandidateForInheritance(
+  candidate
+) {
+
+
+  if (!candidate) {
+
+    return null;
+
+  }
+
+
+  let sourceItem =
+    null;
+
+
+  if (candidate.instanceId) {
+
+
+    sourceItem =
+      playerData.inventory.find(
+        item =>
+          item.instanceId ===
+          candidate.instanceId
+      );
+
+  }
+  else {
+
+
+    sourceItem =
+      playerData.inventory.find(
+        item =>
+          item.id ===
+          candidate.itemId
+      );
+
+  }
+
+
+  if (!sourceItem) {
+
+    return null;
+
+  }
+
+
+  const clone =
+    JSON.parse(
+      JSON.stringify(
+        sourceItem
+      )
+    );
+
+
+  // =========================================
+  // STACKABLE ITEMS CARRY ONE UNIT PER SLOT
+  // =========================================
+
+  if (!candidate.instanceId) {
+
+
+    clone.quantity =
+      1;
+
+  }
+
+
+  // =========================================
+  // CARRIED EQUIPMENT STARTS UNEQUIPPED
+  // =========================================
+
+  if (
+    Object.prototype.hasOwnProperty.call(
+      clone,
+      "equippedBy"
+    )
+  ) {
+
+
+    clone.equippedBy =
+      null;
+
+  }
+
+
+  return clone;
+
+}
+
+
+// =========================================================
+// RESOLVE INVENTORY INHERITANCE SELECTION
+// =========================================================
+
+function resolveInventoryInheritanceSelection(
+  selection
+) {
+
+
+  const normalized =
+    normalizeInheritanceSelection(
+      selection
+    );
+
+
+  const candidates =
+    getInventoryInheritanceCandidates();
+
+
+  const candidateMap =
+    new Map(
+      candidates.map(
+        candidate => [
+          candidate.key,
+          candidate
+        ]
+      )
+    );
+
+
+  const errors =
+    [];
+
+
+  const resolved = {
+
+    legendaryWeapons:
+      [],
+
+    basicItems:
+      []
+
+  };
+
+
+  [
+    "legendaryWeapons",
+    "basicItems"
+  ].forEach(
+    category => {
+
+
+      normalized[
+        category
+      ].forEach(
+        candidateKey => {
+
+
+          const candidate =
+            candidateMap.get(
+              candidateKey
+            );
+
+
+          if (!candidate) {
+
+
+            errors.push(
+              `${category}: ${candidateKey} is not owned.`
+            );
+
+
+            return;
+
+          }
+
+
+          if (
+            candidate.category !==
+              category
+          ) {
+
+
+            errors.push(
+              `${candidateKey} belongs to ${candidate.category}, not ${category}.`
+            );
+
+
+            return;
+
+          }
+
+
+          const clonedItem =
+            cloneInventoryCandidateForInheritance(
+              candidate
+            );
+
+
+          if (!clonedItem) {
+
+
+            errors.push(
+              `${candidateKey} could not be resolved from inventory.`
+            );
+
+
+            return;
+
+          }
+
+
+          resolved[
+            category
+          ].push(
+            clonedItem
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+  return {
+
+    valid:
+      errors.length ===
+      0,
+
+    errors:
+      errors,
+
+    resolved:
+      resolved
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 53 — SPECIAL NINJA / BLOODLINE OWNERSHIP HOOKS
+// =========================================================
+//
+// Full ownership systems for these do not exist yet.
+//
+// Future save shape:
+//
+// playerData.collections = {
+//
+//   specialNinja: [
+//     { id: "example_ninja", name: "Example Ninja" }
+//   ],
+//
+//   bloodlines: [
+//     { id: "example_bloodline", name: "Example Bloodline" }
+//   ]
+//
+// };
+//
+// Until then these safely return [].
+//
+// =========================================================
+
+function normalizeInheritanceCollection(
+  collection
+) {
+
+
+  if (
+    !Array.isArray(
+      collection
+    )
+  ) {
+
+    return [];
+
+  }
+
+
+  const normalized =
+    [];
+
+
+  const seen =
+    new Set();
+
+
+  collection.forEach(
+    entry => {
+
+
+      let id =
+        null;
+
+
+      let name =
+        null;
+
+
+      if (
+        typeof entry ===
+          "string"
+      ) {
+
+
+        id =
+          entry;
+
+        name =
+          entry;
+
+      }
+      else if (
+        entry &&
+        typeof entry ===
+          "object"
+      ) {
+
+
+        id =
+          entry.id || null;
+
+        name =
+          entry.name ||
+          entry.id ||
+          null;
+
+      }
+
+
+      if (
+        !id ||
+        seen.has(
+          id
+        )
+      ) {
+
+        return;
+
+      }
+
+
+      seen.add(
+        id
+      );
+
+
+      normalized.push({
+
+        id:
+          id,
+
+        name:
+          name
+
+      });
+
+    }
+  );
+
+
+  return normalized;
+
+}
+
+
+// =========================================================
+// GET OWNED INHERITANCE COLLECTION
+// =========================================================
+
+function getOwnedInheritanceCollection(
+  category
+) {
+
+
+  if (
+    !playerData.collections ||
+    typeof playerData.collections !==
+      "object"
+  ) {
+
+    return [];
+
+  }
+
+
+  return normalizeInheritanceCollection(
+    playerData.collections[
+      category
+    ]
+  );
+
+}
+
+
+// =========================================================
+// GET SPECIAL NINJA INHERITANCE CANDIDATES
+// =========================================================
+
+function getSpecialNinjaInheritanceCandidates() {
+
+
+  return getOwnedInheritanceCollection(
+    "specialNinja"
+  );
+
+}
+
+
+// =========================================================
+// GET BLOODLINE INHERITANCE CANDIDATES
+// =========================================================
+
+function getBloodlineInheritanceCandidates() {
+
+
+  return getOwnedInheritanceCollection(
+    "bloodlines"
+  );
+
+}
+
+
+// =========================================================
+// RESOLVE COLLECTION INHERITANCE SELECTION
+// =========================================================
+
+function resolveCollectionInheritanceSelection(
+  category,
+  selectedIds
+) {
+
+
+  const owned =
+    getOwnedInheritanceCollection(
+      category
+    );
+
+
+  const ownedMap =
+    new Map(
+      owned.map(
+        entry => [
+          entry.id,
+          entry
+        ]
+      )
+    );
+
+
+  const selected =
+    Array.isArray(
+      selectedIds
+    )
+      ? selectedIds
+      : [];
+
+
+  const resolved =
+    [];
+
+
+  const errors =
+    [];
+
+
+  selected.forEach(
+    id => {
+
+
+      const entry =
+        ownedMap.get(
+          id
+        );
+
+
+      if (!entry) {
+
+
+        errors.push(
+          `${category}: ${id} is not owned.`
+        );
+
+
+        return;
+
+      }
+
+
+      resolved.push({
+        ...entry
+      });
+
+    }
+  );
+
+
+  return {
+
+    valid:
+      errors.length ===
+      0,
+
+    errors:
+      errors,
+
+    resolved:
+      resolved
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 54 — BUILD INHERITED RUN PACKAGE
+// =========================================================
+//
+// Resolves selected carryover against actual ownership.
+//
+// NON-DESTRUCTIVE.
+// Does NOT reset or advance the current run.
+//
+// =========================================================
+
+function buildInheritedRunPackage(
+  selection = {}
+) {
+
+
+  const target =
+    getNextRunTarget();
+
+
+  if (!target.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        target.reason
+
+    };
+
+  }
+
+
+  if (
+    target.transitionType ===
+      "legacy"
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Legacy transitions preserve the collection and do not use selective inheritance."
+
+    };
+
+  }
+
+
+  const normalized =
+    normalizeInheritanceSelection(
+      selection
+    );
+
+
+  const limitValidation =
+    validateInheritanceSelection(
+      target.targetDifficultyId,
+      normalized
+    );
+
+
+  if (!limitValidation.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        limitValidation.reason,
+
+      errors:
+        limitValidation.errors
+
+    };
+
+  }
+
+
+  const inventoryResolution =
+    resolveInventoryInheritanceSelection(
+      normalized
+    );
+
+
+  const specialNinjaResolution =
+    resolveCollectionInheritanceSelection(
+      "specialNinja",
+      normalized.specialNinja
+    );
+
+
+  const bloodlineResolution =
+    resolveCollectionInheritanceSelection(
+      "bloodlines",
+      normalized.bloodlines
+    );
+
+
+  const errors = [
+    ...inventoryResolution.errors,
+    ...specialNinjaResolution.errors,
+    ...bloodlineResolution.errors
+  ];
+
+
+  if (
+    errors.length >
+      0
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "One or more inheritance selections are not owned.",
+
+      errors:
+        errors
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      target.fromDifficultyId,
+
+    targetDifficultyId:
+      target.targetDifficultyId,
+
+    targetLegacyCycle:
+      target.targetLegacyCycle,
+
+    carryover: {
+
+      specialNinja:
+        specialNinjaResolution
+          .resolved,
+
+      bloodlines:
+        bloodlineResolution
+          .resolved,
+
+      legendaryWeapons:
+        inventoryResolution
+          .resolved
+          .legendaryWeapons,
+
+      basicItems:
+        inventoryResolution
+          .resolved
+          .basicItems
+
+    },
+
+    limits:
+      limitValidation.limits
+
+  };
+
+}
+
+
+// =========================================================
+// INHERITANCE OWNERSHIP DIAGNOSTICS
+// =========================================================
+
+function runInheritanceOwnershipDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — INHERITANCE OWNERSHIP DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const beforeSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const fakeInventory = [
+
+    {
+
+      id:
+        "test_scroll",
+
+      name:
+        "Test Scroll",
+
+      type:
+        "scroll",
+
+      rarity:
+        "Common",
+
+      quantity:
+        3
+
+    },
+
+
+    {
+
+      id:
+        "test_legendary_blade",
+
+      name:
+        "Test Legendary Blade",
+
+      type:
+        "weapon",
+
+      rarity:
+        "Legendary",
+
+      quantity:
+        1,
+
+      instanceId:
+        "test_legendary_blade_instance"
+
+    }
+
+  ];
+
+
+  const fakeCandidates =
+    buildInventoryInheritanceCandidates(
+      fakeInventory
+    );
+
+
+  results.push({
+
+    test:
+      "Stackable item creates one candidate per unit",
+
+    pass:
+      fakeCandidates.filter(
+        candidate =>
+          candidate.itemId ===
+          "test_scroll"
+      ).length ===
+      3
+
+  });
+
+
+  results.push({
+
+    test:
+      "Legendary weapon classified correctly",
+
+    pass:
+      fakeCandidates.some(
+        candidate =>
+          (
+            candidate.instanceId ===
+              "test_legendary_blade_instance" &&
+            candidate.category ===
+              "legendaryWeapons"
+          )
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Basic item classified correctly",
+
+    pass:
+      fakeCandidates.some(
+        candidate =>
+          (
+            candidate.itemId ===
+              "test_scroll" &&
+            candidate.category ===
+              "basicItems"
+          )
+      )
+
+  });
+
+
+  const currentCandidates =
+    getInventoryInheritanceCandidates();
+
+
+  results.push({
+
+    test:
+      "Current inventory candidates return an array",
+
+    pass:
+      Array.isArray(
+        currentCandidates
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Legendary weapon candidates return an array",
+
+    pass:
+      Array.isArray(
+        getLegendaryWeaponInheritanceCandidates()
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Basic item candidates return an array",
+
+    pass:
+      Array.isArray(
+        getBasicItemInheritanceCandidates()
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Special Ninja ownership hook is safe",
+
+    pass:
+      Array.isArray(
+        getSpecialNinjaInheritanceCandidates()
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Bloodline ownership hook is safe",
+
+    pass:
+      Array.isArray(
+        getBloodlineInheritanceCandidates()
+      )
+
+  });
+
+
+  const emptyPackage =
+    buildInheritedRunPackage(
+      createEmptyInheritanceSelection()
+    );
+
+
+  results.push({
+
+    test:
+      "Empty Academy to Genin inheritance package builds",
+
+    pass:
+      !!(
+        emptyPackage &&
+        emptyPackage.valid ===
+          true &&
+        emptyPackage.targetDifficultyId ===
+          "genin"
+      )
+
+  });
+
+
+  const fakeOwnedSelection =
+    buildInheritedRunPackage({
+
+      legendaryWeapons: [
+        "instance:daves_eternal_hokage_staff"
+      ]
+
+    });
+
+
+  results.push({
+
+    test:
+      "Unowned Legendary weapon rejected",
+
+    pass:
+      !!(
+        fakeOwnedSelection &&
+        fakeOwnedSelection.valid ===
+          false
+      )
+
+  });
+
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Inheritance diagnostics do not modify player save",
+
+    pass:
+      JSON.stringify(
+        beforeSnapshot
+      ) ===
+      JSON.stringify(
+        afterSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ INHERITANCE OWNERSHIP PHASE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ INHERITANCE OWNERSHIP PHASE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
 
 // =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
