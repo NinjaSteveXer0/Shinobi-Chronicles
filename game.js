@@ -5863,6 +5863,1233 @@ function runTrainingEngineDiagnostics() {
 
 
 // =========================================================
+// BRICK 30 — CURRENT RUN STATE API
+// =========================================================
+
+function getCurrentRunState() {
+
+
+  const progression =
+    playerData &&
+    playerData.progression;
+
+
+  if (!progression) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Player progression data not found."
+
+    };
+
+  }
+
+
+  const currentDifficulty =
+    getShinobiDifficulty(
+      progression.currentDifficulty
+    );
+
+
+  const highestDifficulty =
+    getShinobiDifficulty(
+      progression.highestDifficultyUnlocked
+    );
+
+
+  if (
+    !currentDifficulty ||
+    !highestDifficulty
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Difficulty progression data is invalid."
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      currentDifficulty.id,
+
+    currentDifficultyName:
+      currentDifficulty.name,
+
+    currentDifficultyOrder:
+      currentDifficulty.order,
+
+    highestDifficultyUnlockedId:
+      highestDifficulty.id,
+
+    highestDifficultyUnlockedName:
+      highestDifficulty.name,
+
+    highestDifficultyUnlockedOrder:
+      highestDifficulty.order,
+
+    legacyCycle:
+      Math.max(
+        0,
+        Math.floor(
+          Number(
+            progression.legacyCycle
+          ) || 0
+        )
+      ),
+
+    runCompleted:
+      progression.runCompleted ===
+      true,
+
+    completedDifficulties:
+      Array.isArray(
+        progression.completedDifficulties
+      )
+        ? [
+            ...progression.completedDifficulties
+          ]
+        : [],
+
+    premiumDifficulty:
+      currentDifficulty.premium ===
+      true
+
+  };
+
+}
+
+
+// =========================================================
+// GET CURRENT DIFFICULTY
+// =========================================================
+
+function getCurrentDifficulty() {
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (!runState.valid) {
+
+    return null;
+
+  }
+
+
+  return getShinobiDifficulty(
+    runState.currentDifficultyId
+  );
+
+}
+
+
+// =========================================================
+// GET CURRENT LEGACY CYCLE
+// =========================================================
+
+function getCurrentLegacyCycle() {
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  return runState.valid
+    ? runState.legacyCycle
+    : 0;
+
+}
+
+
+// =========================================================
+// BRICK 31 — DIFFICULTY REQUIREMENT ENGINE
+// =========================================================
+
+function meetsDifficultyRequirement(
+  minimumDifficultyId,
+  options = {}
+) {
+
+
+  const requiredDifficulty =
+    getShinobiDifficulty(
+      minimumDifficultyId
+    );
+
+
+  if (!requiredDifficulty) {
+
+    return false;
+
+  }
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (!runState.valid) {
+
+    return false;
+
+  }
+
+
+  const useHighestUnlocked =
+    options.useHighestUnlocked ===
+    true;
+
+
+  const playerOrder =
+    useHighestUnlocked
+      ? runState
+          .highestDifficultyUnlockedOrder
+      : runState
+          .currentDifficultyOrder;
+
+
+  return (
+    playerOrder >=
+    requiredDifficulty.order
+  );
+
+}
+
+
+// =========================================================
+// GET DIFFICULTY REQUIREMENT DATA
+// =========================================================
+
+function getDifficultyRequirementData(
+  minimumDifficultyId,
+  options = {}
+) {
+
+
+  const requiredDifficulty =
+    getShinobiDifficulty(
+      minimumDifficultyId
+    );
+
+
+  if (!requiredDifficulty) {
+
+
+    return {
+
+      valid:
+        false,
+
+      met:
+        false,
+
+      reason:
+        "Required difficulty does not exist."
+
+    };
+
+  }
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (!runState.valid) {
+
+
+    return {
+
+      valid:
+        false,
+
+      met:
+        false,
+
+      reason:
+        runState.reason
+
+    };
+
+  }
+
+
+  const useHighestUnlocked =
+    options.useHighestUnlocked ===
+    true;
+
+
+  const comparisonDifficulty =
+    useHighestUnlocked
+      ? getShinobiDifficulty(
+          runState
+            .highestDifficultyUnlockedId
+        )
+      : getShinobiDifficulty(
+          runState
+            .currentDifficultyId
+        );
+
+
+  const met =
+    comparisonDifficulty.order >=
+    requiredDifficulty.order;
+
+
+  return {
+
+    valid:
+      true,
+
+    met:
+      met,
+
+    requiredDifficultyId:
+      requiredDifficulty.id,
+
+    requiredDifficultyName:
+      requiredDifficulty.name,
+
+    comparedAgainst:
+      useHighestUnlocked
+        ? "highestUnlocked"
+        : "currentDifficulty",
+
+    playerDifficultyId:
+      comparisonDifficulty.id,
+
+    playerDifficultyName:
+      comparisonDifficulty.name
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 32 — FEATURE UNLOCK DEFINITIONS
+// =========================================================
+//
+// These are progression gates only.
+//
+// This does NOT mean every system below is currently built.
+// It gives future systems one central place to ask whether
+// the player's progression allows access.
+//
+// =========================================================
+
+const PROGRESSION_FEATURES = {
+
+  core_training: {
+
+    id:
+      "core_training",
+
+    name:
+      "Core Training",
+
+    minimumDifficulty:
+      "academy",
+
+    minimumLegacyCycle:
+      0
+
+  },
+
+
+  advanced_crafting: {
+
+    id:
+      "advanced_crafting",
+
+    name:
+      "Advanced Crafting",
+
+    minimumDifficulty:
+      "genin",
+
+    minimumLegacyCycle:
+      0
+
+  },
+
+
+  advanced_specialization: {
+
+    id:
+      "advanced_specialization",
+
+    name:
+      "Advanced Specialization",
+
+    minimumDifficulty:
+      "special_jonin",
+
+    minimumLegacyCycle:
+      0
+
+  },
+
+
+  bloodline_mastery: {
+
+    id:
+      "bloodline_mastery",
+
+    name:
+      "Bloodline Mastery",
+
+    minimumDifficulty:
+      "jonin",
+
+    minimumLegacyCycle:
+      0
+
+  },
+
+
+  restricted_operations: {
+
+    id:
+      "restricted_operations",
+
+    name:
+      "Restricted Operations",
+
+    minimumDifficulty:
+      "anbu",
+
+    minimumLegacyCycle:
+      0
+
+  },
+
+
+  kage_systems: {
+
+    id:
+      "kage_systems",
+
+    name:
+      "Kage Systems",
+
+    minimumDifficulty:
+      "kage",
+
+    minimumLegacyCycle:
+      0
+
+  },
+
+
+  akatsuki_arc: {
+
+    id:
+      "akatsuki_arc",
+
+    name:
+      "Akatsuki Arc",
+
+    minimumDifficulty:
+      "akatsuki",
+
+    minimumLegacyCycle:
+      0,
+
+    premium:
+      true
+
+  },
+
+
+  jinchuriki_systems: {
+
+    id:
+      "jinchuriki_systems",
+
+    name:
+      "Jinchūriki Systems",
+
+    minimumDifficulty:
+      "jinchuriki",
+
+    minimumLegacyCycle:
+      0,
+
+    premium:
+      true
+
+  },
+
+
+  legacy_systems: {
+
+    id:
+      "legacy_systems",
+
+    name:
+      "Legacy Systems",
+
+    minimumDifficulty:
+      "academy",
+
+    minimumLegacyCycle:
+      1
+
+  }
+
+};
+
+
+// =========================================================
+// GET PROGRESSION FEATURE
+// =========================================================
+
+function getProgressionFeature(
+  featureId
+) {
+
+
+  return (
+    PROGRESSION_FEATURES[
+      featureId
+    ] ||
+    null
+  );
+
+}
+
+
+// =========================================================
+// GET FEATURE ACCESS DATA
+// =========================================================
+
+function getFeatureAccessData(
+  featureId,
+  options = {}
+) {
+
+
+  const feature =
+    getProgressionFeature(
+      featureId
+    );
+
+
+  if (!feature) {
+
+
+    return {
+
+      exists:
+        false,
+
+      allowed:
+        false,
+
+      reason:
+        "Feature does not exist."
+
+    };
+
+  }
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (!runState.valid) {
+
+
+    return {
+
+      exists:
+        true,
+
+      allowed:
+        false,
+
+      reason:
+        runState.reason,
+
+      feature:
+        feature
+
+    };
+
+  }
+
+
+  const difficultyMet =
+    meetsDifficultyRequirement(
+      feature.minimumDifficulty,
+      {
+        useHighestUnlocked:
+          options.useHighestUnlocked ===
+          true
+      }
+    );
+
+
+  if (!difficultyMet) {
+
+
+    const requiredDifficulty =
+      getShinobiDifficulty(
+        feature.minimumDifficulty
+      );
+
+
+    return {
+
+      exists:
+        true,
+
+      allowed:
+        false,
+
+      reason:
+        `Requires ${requiredDifficulty.name} difficulty.`,
+
+      feature:
+        feature
+
+    };
+
+  }
+
+
+  const minimumLegacyCycle =
+    Math.max(
+      0,
+      Math.floor(
+        Number(
+          feature.minimumLegacyCycle
+        ) || 0
+      )
+    );
+
+
+  if (
+    runState.legacyCycle <
+      minimumLegacyCycle
+  ) {
+
+
+    return {
+
+      exists:
+        true,
+
+      allowed:
+        false,
+
+      reason:
+        `Requires Legacy Cycle ${minimumLegacyCycle}.`,
+
+      feature:
+        feature
+
+    };
+
+  }
+
+
+  // =========================================
+  // PREMIUM OWNERSHIP IS CHECKED SEPARATELY
+  // =========================================
+  //
+  // We deliberately do NOT assume the player owns premium
+  // content here.
+  //
+  // options.hasPremiumAccess can be supplied by the future
+  // account / entitlement system.
+  //
+  // =========================================
+
+  if (
+    feature.premium ===
+      true &&
+    options.hasPremiumAccess !==
+      true
+  ) {
+
+
+    return {
+
+      exists:
+        true,
+
+      allowed:
+        false,
+
+      reason:
+        "Premium access required.",
+
+      feature:
+        feature
+
+    };
+
+  }
+
+
+  return {
+
+    exists:
+      true,
+
+    allowed:
+      true,
+
+    reason:
+      null,
+
+    feature:
+      feature
+
+  };
+
+}
+
+
+// =========================================================
+// CAN ACCESS PROGRESSION FEATURE
+// =========================================================
+
+function canAccessProgressionFeature(
+  featureId,
+  options = {}
+) {
+
+
+  return getFeatureAccessData(
+    featureId,
+    options
+  ).allowed;
+
+}
+
+
+// =========================================================
+// BRICK 33 — PREMIUM DIFFICULTY ACCESS API
+// =========================================================
+
+function isPremiumDifficulty(
+  difficultyId
+) {
+
+
+  const difficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  return !!(
+    difficulty &&
+    difficulty.premium ===
+      true
+  );
+
+}
+
+
+// =========================================================
+// GET PREMIUM DIFFICULTY ACCESS DATA
+// =========================================================
+
+function getPremiumDifficultyAccessData(
+  difficultyId,
+  options = {}
+) {
+
+
+  const difficulty =
+    getShinobiDifficulty(
+      difficultyId
+    );
+
+
+  if (!difficulty) {
+
+
+    return {
+
+      exists:
+        false,
+
+      requiresPremium:
+        false,
+
+      allowed:
+        false,
+
+      reason:
+        "Difficulty does not exist."
+
+    };
+
+  }
+
+
+  const progressionUnlocked =
+    canAccessDifficulty(
+      difficultyId
+    );
+
+
+  if (!progressionUnlocked) {
+
+
+    return {
+
+      exists:
+        true,
+
+      requiresPremium:
+        difficulty.premium ===
+        true,
+
+      allowed:
+        false,
+
+      reason:
+        `${difficulty.name} difficulty is not unlocked.`,
+
+      difficulty:
+        difficulty
+
+    };
+
+  }
+
+
+  const requiresPremium =
+    difficulty.premium ===
+    true;
+
+
+  if (
+    requiresPremium &&
+    options.hasPremiumAccess !==
+      true
+  ) {
+
+
+    return {
+
+      exists:
+        true,
+
+      requiresPremium:
+        true,
+
+      allowed:
+        false,
+
+      reason:
+        "Premium access required.",
+
+      difficulty:
+        difficulty
+
+    };
+
+  }
+
+
+  return {
+
+    exists:
+      true,
+
+    requiresPremium:
+      requiresPremium,
+
+    allowed:
+      true,
+
+    reason:
+      null,
+
+    difficulty:
+      difficulty
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 34 — PROGRESSION GATING DIAGNOSTICS
+// =========================================================
+
+function runProgressionGatingDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — PROGRESSION GATING DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  // =========================================
+  // RUN STATE HEALTH
+  // =========================================
+
+  results.push({
+
+    test:
+      "Current run state is valid",
+
+    pass:
+      runState.valid ===
+      true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Current difficulty is valid",
+
+    pass:
+      !!getCurrentDifficulty()
+
+  });
+
+
+  results.push({
+
+    test:
+      "Legacy cycle is valid",
+
+    pass:
+      (
+        Number.isInteger(
+          getCurrentLegacyCycle()
+        ) &&
+        getCurrentLegacyCycle() >=
+          0
+      )
+
+  });
+
+
+  // =========================================
+  // DIFFICULTY ORDER HEALTH
+  // =========================================
+
+  const difficultyOrdersValid =
+    SHINOBI_DIFFICULTIES.every(
+      (
+        difficulty,
+        index
+      ) =>
+        difficulty.order ===
+        index
+    );
+
+
+  results.push({
+
+    test:
+      "Difficulty order is valid",
+
+    pass:
+      difficultyOrdersValid
+
+  });
+
+
+  // =========================================
+  // PREMIUM METADATA
+  // =========================================
+
+  results.push({
+
+    test:
+      "Akatsuki is premium",
+
+    pass:
+      isPremiumDifficulty(
+        "akatsuki"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Jinchuriki is premium",
+
+    pass:
+      isPremiumDifficulty(
+        "jinchuriki"
+      ) === true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Special Jonin is not currently premium",
+
+    pass:
+      isPremiumDifficulty(
+        "special_jonin"
+      ) === false
+
+  });
+
+
+  // =========================================
+  // FEATURE DEFINITIONS HEALTH
+  // =========================================
+
+  const featureDefinitionsValid =
+    Object.values(
+      PROGRESSION_FEATURES
+    ).every(
+      feature =>
+        (
+          !!feature.id &&
+          !!feature.name &&
+          !!getShinobiDifficulty(
+            feature.minimumDifficulty
+          ) &&
+          Number.isFinite(
+            Number(
+              feature.minimumLegacyCycle
+            )
+          ) &&
+          Number(
+            feature.minimumLegacyCycle
+          ) >= 0
+        )
+    );
+
+
+  results.push({
+
+    test:
+      "Progression feature definitions are valid",
+
+    pass:
+      featureDefinitionsValid
+
+  });
+
+
+  // =========================================
+  // ACADEMY CORE FEATURE
+  // =========================================
+
+  results.push({
+
+    test:
+      "Core training accessible at Academy",
+
+    pass:
+      canAccessProgressionFeature(
+        "core_training"
+      ) === true
+
+  });
+
+
+  // =========================================
+  // PREMIUM FEATURE MUST REQUIRE ENTITLEMENT
+  // =========================================
+  //
+  // This does NOT require the player's current save
+  // to have Akatsuki unlocked.
+  //
+  // We test premium metadata independently below.
+  //
+  // =========================================
+
+  const akatsukiFeature =
+    getProgressionFeature(
+      "akatsuki_arc"
+    );
+
+
+  results.push({
+
+    test:
+      "Akatsuki feature marked premium",
+
+    pass:
+      !!(
+        akatsukiFeature &&
+        akatsukiFeature.premium ===
+          true
+      )
+
+  });
+
+
+  const jinchurikiFeature =
+    getProgressionFeature(
+      "jinchuriki_systems"
+    );
+
+
+  results.push({
+
+    test:
+      "Jinchuriki feature marked premium",
+
+    pass:
+      !!(
+        jinchurikiFeature &&
+        jinchurikiFeature.premium ===
+          true
+      )
+
+  });
+
+
+  // =========================================
+  // LEGACY GATE HEALTH
+  // =========================================
+
+  const legacyFeature =
+    getProgressionFeature(
+      "legacy_systems"
+    );
+
+
+  results.push({
+
+    test:
+      "Legacy systems require Legacy Cycle 1",
+
+    pass:
+      !!(
+        legacyFeature &&
+        legacyFeature
+          .minimumLegacyCycle ===
+          1
+      )
+
+  });
+
+
+  // =========================================
+  // INVALID FEATURE REJECTED
+  // =========================================
+
+  results.push({
+
+    test:
+      "Invalid feature is rejected",
+
+    pass:
+      canAccessProgressionFeature(
+        "dave_sage_of_six_paths"
+      ) === false
+
+  });
+
+
+  // =========================================
+  // DISPLAY
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ PROGRESSION GATING PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ PROGRESSION GATING HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
 // DEVELOPMENT SHINOBI PROGRESSION VIEW
 // =========================================================
 
