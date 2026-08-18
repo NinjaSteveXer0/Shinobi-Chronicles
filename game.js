@@ -17390,6 +17390,1255 @@ function showCharacterDisciplineData(
 
 }
 
+
+// =========================================================
+// BRICK 69 — COMPLETION PATH OPTION BUILDER
+// =========================================================
+//
+// Builds the actual choices that the player-facing
+// completion screen can display.
+//
+// NORMAL RUN:
+//
+// Academy -> Genin
+// Genin -> Chunin
+// etc.
+//
+// KAGE SPECIAL CASE:
+//
+// NOW, CHOOSE...
+//
+// PATH OF INHERITANCE
+//     -> Academy Student
+//     -> Legacy Cycle +1
+//
+// PATH OF SHADOWS
+//     -> Akatsuki
+//     -> Premium content
+//
+// This brick is READ ONLY.
+//
+// =========================================================
+
+
+// =========================================================
+// BUILD NORMAL NEXT-RUN PATH OPTION
+// =========================================================
+
+function buildNormalCompletionPathOption(
+  runState
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true ||
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return null;
+
+  }
+
+
+  const target =
+    getNextRunTargetFromRunState(
+      runState
+    );
+
+
+  if (!target.valid) {
+
+
+    return null;
+
+  }
+
+
+  // =========================================
+  // NORMAL DIFFICULTY
+  // =========================================
+
+  if (
+    target.transitionType ===
+      "difficulty"
+  ) {
+
+
+    return {
+
+      id:
+        `difficulty_${target.targetDifficultyId}`,
+
+      routeType:
+        "difficulty",
+
+      title:
+        target.targetDifficultyName,
+
+      subtitle:
+        "Continue Your Shinobi Journey",
+
+      description:
+        `Begin the ${target.targetDifficultyName} run.`,
+
+      fromDifficultyId:
+        runState.currentDifficultyId,
+
+      targetDifficultyId:
+        target.targetDifficultyId,
+
+      targetDifficultyName:
+        target.targetDifficultyName,
+
+      targetLegacyCycle:
+        runState.legacyCycle,
+
+      requiresInheritance:
+        true,
+
+      inheritanceLimits:
+        target.inheritanceLimits,
+
+      requiresPremium:
+        target.premium ===
+        true,
+
+      premiumOwned:
+        false,
+
+      locked:
+        false,
+
+      visualState:
+        "available",
+
+      actionLabel:
+        "CHOOSE INHERITANCE"
+
+    };
+
+  }
+
+
+  // =========================================
+  // STANDARD LEGACY TARGET
+  // =========================================
+
+  if (
+    target.transitionType ===
+      "legacy"
+  ) {
+
+
+    return {
+
+      id:
+        "legacy",
+
+      routeType:
+        "legacy",
+
+      title:
+        "Begin a New Legacy",
+
+      subtitle:
+        `Legacy Cycle ${target.targetLegacyCycle}`,
+
+      description:
+        "Return to Academy Student and begin a new generation.",
+
+      fromDifficultyId:
+        runState.currentDifficultyId,
+
+      targetDifficultyId:
+        "academy",
+
+      targetDifficultyName:
+        "Academy Student",
+
+      targetLegacyCycle:
+        target.targetLegacyCycle,
+
+      requiresInheritance:
+        false,
+
+      inheritanceLimits:
+        null,
+
+      requiresPremium:
+        false,
+
+      premiumOwned:
+        true,
+
+      locked:
+        false,
+
+      visualState:
+        "available",
+
+      actionLabel:
+        "BEGIN LEGACY"
+
+    };
+
+  }
+
+
+  return null;
+
+}
+
+
+// =========================================================
+// BUILD KAGE — PATH OF INHERITANCE
+// =========================================================
+//
+// This is the player's always-available post-Kage path.
+//
+// The execution wiring comes later.
+//
+// For now we are defining exactly what the choice means.
+//
+// =========================================================
+
+function buildKageInheritancePathOption(
+  runState
+) {
+
+
+  return {
+
+    id:
+      "kage_inheritance",
+
+    routeType:
+      "legacy_rebirth",
+
+    title:
+      "Path of Inheritance",
+
+    subtitle:
+      "A New Generation",
+
+    description:
+      "Return to Academy Student carrying forward the inheritance you have earned.",
+
+    fromDifficultyId:
+      "kage",
+
+    targetDifficultyId:
+      "academy",
+
+    targetDifficultyName:
+      "Academy Student",
+
+    currentLegacyCycle:
+      runState.legacyCycle,
+
+    targetLegacyCycle:
+      runState.legacyCycle +
+      1,
+
+    requiresInheritance:
+      true,
+
+    requiresPremium:
+      false,
+
+    premiumOwned:
+      true,
+
+    locked:
+      false,
+
+    visualState:
+      "highlighted",
+
+    iconState:
+      "bright",
+
+    chainVisible:
+      false,
+
+    actionLabel:
+      "CHOOSE INHERITANCE"
+
+  };
+
+}
+
+
+// =========================================================
+// BUILD KAGE — PATH OF SHADOWS
+// =========================================================
+
+function buildKageAkatsukiPathOption(
+  runState,
+  options = {}
+) {
+
+
+  const premiumOwned =
+    options.hasPremiumAccess ===
+    true;
+
+
+  return {
+
+    id:
+      "kage_akatsuki",
+
+    routeType:
+      "premium_difficulty",
+
+    title:
+      "Path of Shadows",
+
+    subtitle:
+      "Akatsuki",
+
+    description:
+      premiumOwned
+
+        ? "Abandon the ordinary shinobi path and enter the Akatsuki story arc."
+
+        : "Premium story content. Complete the core Kage progression before entering the Akatsuki path.",
+
+    fromDifficultyId:
+      "kage",
+
+    targetDifficultyId:
+      "akatsuki",
+
+    targetDifficultyName:
+      "Akatsuki",
+
+    currentLegacyCycle:
+      runState.legacyCycle,
+
+    targetLegacyCycle:
+      runState.legacyCycle,
+
+    requiresInheritance:
+      true,
+
+    inheritanceLimits:
+      getInheritanceLimits(
+        "akatsuki"
+      ),
+
+    requiresPremium:
+      true,
+
+    premiumOwned:
+      premiumOwned,
+
+    locked:
+      !premiumOwned,
+
+    visualState:
+      premiumOwned
+        ? "available"
+        : "premium_locked",
+
+    iconState:
+      premiumOwned
+        ? "bright"
+        : "greyed",
+
+    chainVisible:
+      !premiumOwned,
+
+    actionLabel:
+      premiumOwned
+        ? "ENTER AKATSUKI"
+        : "PAID CONTENT"
+
+  };
+
+}
+
+
+// =========================================================
+// BUILD KAGE PATH OPTIONS
+// =========================================================
+
+function buildKageCompletionPathOptions(
+  runState,
+  options = {}
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true ||
+    runState.currentDifficultyId !==
+      "kage" ||
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return [];
+
+  }
+
+
+  return [
+
+    buildKageInheritancePathOption(
+      runState
+    ),
+
+    buildKageAkatsukiPathOption(
+      runState,
+      options
+    )
+
+  ];
+
+}
+
+
+// =========================================================
+// BUILD COMPLETION PATH OPTIONS
+// =========================================================
+
+function buildCompletionPathOptions(
+  runState,
+  options = {}
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true ||
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return [];
+
+  }
+
+
+  // =========================================
+  // SPECIAL POST-KAGE FORK
+  // =========================================
+
+  if (
+    runState.currentDifficultyId ===
+      "kage"
+  ) {
+
+
+    return buildKageCompletionPathOptions(
+      runState,
+      options
+    );
+
+  }
+
+
+  // =========================================
+  // ORDINARY SINGLE-PATH PROGRESSION
+  // =========================================
+
+  const normalOption =
+    buildNormalCompletionPathOption(
+      runState
+    );
+
+
+  return normalOption
+    ? [
+        normalOption
+      ]
+    : [];
+
+}
+
+
+// =========================================================
+// GET LIVE COMPLETION PATH OPTIONS
+// =========================================================
+
+function getCompletionPathOptions(
+  options = {}
+) {
+
+
+  return buildCompletionPathOptions(
+    getCurrentRunState(),
+    options
+  );
+
+}
+
+
+// =========================================================
+// BRICK 70 — COMPLETION PATH SELECTION VALIDATION
+// =========================================================
+//
+// Gives the future UI one authoritative way to answer:
+//
+// "Can the player actually click this path?"
+//
+// Still READ ONLY.
+//
+// =========================================================
+
+
+// =========================================================
+// GET COMPLETION PATH OPTION
+// =========================================================
+
+function getCompletionPathOption(
+  pathId,
+  runState,
+  options = {}
+) {
+
+
+  if (
+    typeof pathId !==
+      "string"
+  ) {
+
+
+    return null;
+
+  }
+
+
+  const paths =
+    buildCompletionPathOptions(
+      runState,
+      options
+    );
+
+
+  return (
+    paths.find(
+      path =>
+        path.id ===
+        pathId
+    ) ||
+    null
+  );
+
+}
+
+
+// =========================================================
+// VALIDATE COMPLETION PATH SELECTION
+// =========================================================
+
+function validateCompletionPathSelection(
+  pathId,
+  runState,
+  options = {}
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Run state is invalid.",
+
+      path:
+        null
+
+    };
+
+  }
+
+
+  if (
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Current run is not complete.",
+
+      path:
+        null
+
+    };
+
+  }
+
+
+  const path =
+    getCompletionPathOption(
+      pathId,
+      runState,
+      options
+    );
+
+
+  if (!path) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Selected completion path does not exist.",
+
+      path:
+        null
+
+    };
+
+  }
+
+
+  if (
+    path.requiresPremium ===
+      true &&
+    path.premiumOwned !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Premium access required.",
+
+      path:
+        path
+
+    };
+
+  }
+
+
+  if (
+    path.locked ===
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Selected completion path is locked.",
+
+      path:
+        path
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    reason:
+      null,
+
+    path:
+      path
+
+  };
+
+}
+
+
+// =========================================================
+// VALIDATE LIVE COMPLETION PATH SELECTION
+// =========================================================
+
+function validateLiveCompletionPathSelection(
+  pathId,
+  options = {}
+) {
+
+
+  return validateCompletionPathSelection(
+    pathId,
+    getCurrentRunState(),
+    options
+  );
+
+}
+
+
+// =========================================================
+// BRICK 71 — PATH OPTION DIAGNOSTICS
+// =========================================================
+
+function runCompletionPathDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — COMPLETION PATH DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  // =========================================
+  // INCOMPLETE ACADEMY
+  // =========================================
+
+  const academyIncomplete = {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "academy",
+
+    currentDifficultyName:
+      "Academy Student",
+
+    currentDifficultyOrder:
+      0,
+
+    highestDifficultyUnlockedId:
+      "academy",
+
+    highestDifficultyUnlockedName:
+      "Academy Student",
+
+    highestDifficultyUnlockedOrder:
+      0,
+
+    legacyCycle:
+      0,
+
+    runCompleted:
+      false,
+
+    completedDifficulties:
+      [],
+
+    premiumDifficulty:
+      false
+
+  };
+
+
+  const incompletePaths =
+    buildCompletionPathOptions(
+      academyIncomplete
+    );
+
+
+  results.push({
+
+    test:
+      "Incomplete run exposes no completion paths",
+
+    pass:
+      Array.isArray(
+        incompletePaths
+      ) &&
+      incompletePaths.length ===
+        0
+
+  });
+
+
+  // =========================================
+  // COMPLETED ACADEMY
+  // =========================================
+
+  const academyComplete = {
+
+    ...academyIncomplete,
+
+    highestDifficultyUnlockedId:
+      "genin",
+
+    highestDifficultyUnlockedName:
+      "Genin",
+
+    highestDifficultyUnlockedOrder:
+      1,
+
+    runCompleted:
+      true,
+
+    completedDifficulties: [
+      "academy"
+    ]
+
+  };
+
+
+  const academyPaths =
+    buildCompletionPathOptions(
+      academyComplete
+    );
+
+
+  results.push({
+
+    test:
+      "Completed Academy exposes one path",
+
+    pass:
+      academyPaths.length ===
+      1
+
+  });
+
+
+  results.push({
+
+    test:
+      "Academy path targets Genin",
+
+    pass:
+      !!(
+        academyPaths[
+          0
+        ] &&
+        academyPaths[
+          0
+        ].targetDifficultyId ===
+          "genin"
+      )
+
+  });
+
+
+  // =========================================
+  // COMPLETED KAGE
+  // =========================================
+
+  const kageComplete = {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "kage",
+
+    currentDifficultyName:
+      "Kage",
+
+    currentDifficultyOrder:
+      6,
+
+    highestDifficultyUnlockedId:
+      "akatsuki",
+
+    highestDifficultyUnlockedName:
+      "Akatsuki",
+
+    highestDifficultyUnlockedOrder:
+      7,
+
+    legacyCycle:
+      2,
+
+    runCompleted:
+      true,
+
+    completedDifficulties: [
+      "academy",
+      "genin",
+      "chunin",
+      "special_jonin",
+      "jonin",
+      "anbu",
+      "kage"
+    ],
+
+    premiumDifficulty:
+      false
+
+  };
+
+
+  const lockedKagePaths =
+    buildCompletionPathOptions(
+      kageComplete,
+      {
+        hasPremiumAccess:
+          false
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Kage completion exposes exactly two paths",
+
+    pass:
+      lockedKagePaths.length ===
+      2
+
+  });
+
+
+  const inheritancePath =
+    lockedKagePaths.find(
+      path =>
+        path.id ===
+        "kage_inheritance"
+    );
+
+
+  const lockedAkatsukiPath =
+    lockedKagePaths.find(
+      path =>
+        path.id ===
+        "kage_akatsuki"
+    );
+
+
+  results.push({
+
+    test:
+      "Kage inheritance path returns to Academy",
+
+    pass:
+      !!(
+        inheritancePath &&
+        inheritancePath.targetDifficultyId ===
+          "academy" &&
+        inheritancePath.targetLegacyCycle ===
+          3
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Kage inheritance path is always available",
+
+    pass:
+      !!(
+        inheritancePath &&
+        inheritancePath.locked ===
+          false &&
+        inheritancePath.requiresPremium ===
+          false
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Unowned Akatsuki path is greyed and chained",
+
+    pass:
+      !!(
+        lockedAkatsukiPath &&
+        lockedAkatsukiPath.locked ===
+          true &&
+        lockedAkatsukiPath.iconState ===
+          "greyed" &&
+        lockedAkatsukiPath.chainVisible ===
+          true &&
+        lockedAkatsukiPath.actionLabel ===
+          "PAID CONTENT"
+      )
+
+  });
+
+
+  // =========================================
+  // LOCKED SELECTION VALIDATION
+  // =========================================
+
+  const lockedSelection =
+    validateCompletionPathSelection(
+      "kage_akatsuki",
+      kageComplete,
+      {
+        hasPremiumAccess:
+          false
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Locked Akatsuki path cannot be selected",
+
+    pass:
+      !!(
+        lockedSelection &&
+        lockedSelection.valid ===
+          false &&
+        lockedSelection.reason ===
+          "Premium access required."
+      )
+
+  });
+
+
+  // =========================================
+  // OWNED PREMIUM PATH
+  // =========================================
+
+  const ownedKagePaths =
+    buildCompletionPathOptions(
+      kageComplete,
+      {
+        hasPremiumAccess:
+          true
+      }
+    );
+
+
+  const ownedAkatsukiPath =
+    ownedKagePaths.find(
+      path =>
+        path.id ===
+        "kage_akatsuki"
+    );
+
+
+  results.push({
+
+    test:
+      "Owned Akatsuki path becomes available",
+
+    pass:
+      !!(
+        ownedAkatsukiPath &&
+        ownedAkatsukiPath.locked ===
+          false &&
+        ownedAkatsukiPath.iconState ===
+          "bright" &&
+        ownedAkatsukiPath.chainVisible ===
+          false &&
+        ownedAkatsukiPath.actionLabel ===
+          "ENTER AKATSUKI"
+      )
+
+  });
+
+
+  const ownedSelection =
+    validateCompletionPathSelection(
+      "kage_akatsuki",
+      kageComplete,
+      {
+        hasPremiumAccess:
+          true
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Owned Akatsuki path validates successfully",
+
+    pass:
+      !!(
+        ownedSelection &&
+        ownedSelection.valid ===
+          true
+      )
+
+  });
+
+
+  // =========================================
+  // INHERITANCE SELECTION
+  // =========================================
+
+  const inheritanceSelection =
+    validateCompletionPathSelection(
+      "kage_inheritance",
+      kageComplete,
+      {
+        hasPremiumAccess:
+          false
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Inheritance path validates without premium",
+
+    pass:
+      !!(
+        inheritanceSelection &&
+        inheritanceSelection.valid ===
+          true
+      )
+
+  });
+
+
+  // =========================================
+  // LIVE READ-ONLY CHECK
+  // =========================================
+
+  const beforeSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const livePaths =
+    getCompletionPathOptions();
+
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Live path builder returns an array",
+
+    pass:
+      Array.isArray(
+        livePaths
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Path engine does not modify player save",
+
+    pass:
+      JSON.stringify(
+        beforeSnapshot
+      ) ===
+      JSON.stringify(
+        afterSnapshot
+      )
+
+  });
+
+
+  // =========================================
+  // DISPLAY RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ COMPLETION PATH ENGINE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ COMPLETION PATH ENGINE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "Kage Paths — Premium Locked:",
+    lockedKagePaths
+  );
+
+
+  console.log(
+    "Kage Paths — Premium Owned:",
+    ownedKagePaths
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
 // =========================================================
 // DEVELOPMENT PLAYER SAVE VIEW
 // =========================================================
