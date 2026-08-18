@@ -14976,6 +14976,914 @@ function verifyNextRunAfterReload() {
 
 
 // =========================================================
+// BRICK 65 — END-TO-END NG+ RELOAD TRANSITION
+// =========================================================
+//
+// THIS IS A TWO-PART DIAGNOSTIC.
+//
+// PART ONE:
+//
+// - preserve the player's real save in localStorage
+// - create a controlled completed Academy state
+// - perform the REAL atomic Academy -> Genin transition
+// - leave the resulting Genin save in localStorage
+//
+// THEN THE USER RELOADS THE BROWSER.
+//
+// PART TWO:
+//
+// - prove the game genuinely loaded as Genin
+// - prove runtime reconstructed correctly
+// - restore the player's original save
+// - prove the restoration succeeded
+//
+// The original snapshot is stored separately from the
+// normal player save, so it survives the browser reload.
+//
+// =========================================================
+
+const NG_PLUS_END_TO_END_TEST_KEY =
+  "shinobi_ng_plus_end_to_end_test";
+
+
+// =========================================================
+// GET END-TO-END TEST RECORD
+// =========================================================
+
+function getNextRunEndToEndTestRecord() {
+
+
+  const rawRecord =
+    localStorage.getItem(
+      NG_PLUS_END_TO_END_TEST_KEY
+    );
+
+
+  if (!rawRecord) {
+
+
+    return null;
+
+  }
+
+
+  try {
+
+
+    return JSON.parse(
+      rawRecord
+    );
+
+  }
+  catch (error) {
+
+
+    console.error(
+      "Could not parse NG+ end-to-end test record:",
+      error
+    );
+
+
+    return null;
+
+  }
+
+}
+
+
+// =========================================================
+// CLEAR END-TO-END TEST RECORD
+// =========================================================
+
+function clearNextRunEndToEndTestRecord() {
+
+
+  localStorage.removeItem(
+    NG_PLUS_END_TO_END_TEST_KEY
+  );
+
+
+  console.log(
+    "NG+ end-to-end test record cleared."
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BEGIN END-TO-END NG+ RELOAD TEST
+// =========================================================
+//
+// WARNING:
+//
+// Unlike our earlier diagnostics, this function deliberately
+// writes a real temporary Genin save.
+//
+// Your original save is first stored separately under
+// NG_PLUS_END_TO_END_TEST_KEY.
+//
+// DO NOT manually clear localStorage between Part One
+// and Part Two.
+//
+// =========================================================
+
+function beginNextRunEndToEndReloadTest() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — BEGIN END-TO-END NG+ RELOAD TEST"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  // =========================================
+  // PREVENT OVERWRITING AN UNFINISHED TEST
+  // =========================================
+
+  const existingRecord =
+    getNextRunEndToEndTestRecord();
+
+
+  if (existingRecord) {
+
+
+    console.warn(
+      "An NG+ end-to-end test record already exists."
+    );
+
+
+    console.warn(
+      "Finish or recover the existing test before starting another."
+    );
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Existing end-to-end test record found."
+
+    };
+
+  }
+
+
+  // =========================================
+  // REQUIRE HEALTHY CURRENT RUN
+  // =========================================
+
+  const currentRun =
+    getCurrentRunState();
+
+
+  if (
+    !currentRun ||
+    currentRun.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Current run state is invalid."
+
+    };
+
+  }
+
+
+  // =========================================
+  // THIS DIAGNOSTIC IS SPECIFICALLY
+  // ACADEMY -> GENIN
+  // =========================================
+
+  if (
+    currentRun.currentDifficultyId !==
+      "academy"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Brick 65 diagnostic requires the real player to currently be on Academy Student difficulty."
+
+    };
+
+  }
+
+
+  // =========================================
+  // CAPTURE THE REAL PLAYER SAVE
+  // =========================================
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const testRecord = {
+
+    createdAt:
+      Date.now(),
+
+    phase:
+      "prepared",
+
+    expectedDifficultyId:
+      "genin",
+
+    expectedDifficultyOrder:
+      1,
+
+    expectedLegacyCycle:
+      Number(
+        currentRun.legacyCycle
+      ) || 0,
+
+    originalSnapshot:
+      originalSnapshot
+
+  };
+
+
+  // =========================================
+  // STORE BACKUP BEFORE ANY MUTATION
+  // =========================================
+
+  localStorage.setItem(
+    NG_PLUS_END_TO_END_TEST_KEY,
+    JSON.stringify(
+      testRecord
+    )
+  );
+
+
+  try {
+
+
+    // =========================================
+    // CONTROLLED COMPLETED ACADEMY STATE
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "genin",
+
+      legacyCycle:
+        Number(
+          currentRun.legacyCycle
+        ) || 0,
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    // =========================================
+    // EXECUTE THE REAL ATOMIC TRANSITION
+    // =========================================
+
+    const transitionResult =
+      executeAtomicNextRunDifficultyTransition(
+        createEmptyInheritanceSelection()
+      );
+
+
+    if (
+      !transitionResult ||
+      transitionResult.success !==
+        true
+    ) {
+
+
+      throw new Error(
+        transitionResult &&
+        transitionResult.reason
+
+          ? transitionResult.reason
+
+          : "Atomic Academy to Genin transition failed."
+      );
+
+    }
+
+
+    // =========================================
+    // VERIFY TEMPORARY LIVE RESULT
+    // =========================================
+
+    const transitionedRun =
+      getCurrentRunState();
+
+
+    if (
+      !transitionedRun ||
+      transitionedRun.valid !==
+        true ||
+      transitionedRun.currentDifficultyId !==
+        "genin"
+    ) {
+
+
+      throw new Error(
+        "Temporary NG+ transition did not reach Genin."
+      );
+
+    }
+
+
+    // =========================================
+    // UPDATE PERSISTENT TEST RECORD
+    // =========================================
+
+    testRecord.phase =
+      "awaiting_reload";
+
+
+    testRecord.transitionResult = {
+
+      success:
+        true,
+
+      fromDifficultyId:
+        transitionResult.fromDifficultyId,
+
+      targetDifficultyId:
+        transitionResult.targetDifficultyId,
+
+      targetLegacyCycle:
+        transitionResult.targetLegacyCycle
+
+    };
+
+
+    localStorage.setItem(
+      NG_PLUS_END_TO_END_TEST_KEY,
+      JSON.stringify(
+        testRecord
+      )
+    );
+
+
+    console.log(
+      "✅ TEMPORARY ACADEMY -> GENIN TRANSITION SAVED"
+    );
+
+
+    console.log(
+      "Now reload the browser with Ctrl + R."
+    );
+
+
+    console.log(
+      "After reload run:"
+    );
+
+
+    console.log(
+      "verifyAndRestoreNextRunEndToEndReloadTest()"
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    return {
+
+      success:
+        true,
+
+      phase:
+        "awaiting_reload",
+
+      currentDifficultyId:
+        transitionedRun.currentDifficultyId,
+
+      expectedAfterReload:
+        "genin",
+
+      instruction:
+        "Reload the browser, then run verifyAndRestoreNextRunEndToEndReloadTest()."
+
+    };
+
+  }
+  catch (error) {
+
+
+    console.error(
+      "Brick 65 setup failed:",
+      error
+    );
+
+
+    console.warn(
+      "Restoring original player save immediately..."
+    );
+
+
+    const restored =
+      restoreRunTransitionSnapshot(
+        originalSnapshot
+      );
+
+
+    if (restored) {
+
+
+      clearNextRunEndToEndTestRecord();
+
+
+      console.warn(
+        "✅ ORIGINAL SAVE RESTORED AFTER BRICK 65 SETUP FAILURE"
+      );
+
+    }
+    else {
+
+
+      console.error(
+        "❌ ORIGINAL SAVE COULD NOT BE RESTORED AUTOMATICALLY"
+      );
+
+
+      console.error(
+        "The persistent Brick 65 backup record has been retained."
+      );
+
+    }
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        error instanceof Error
+          ? error.message
+          : String(
+              error
+            ),
+
+      restored:
+        restored ===
+          true
+
+    };
+
+  }
+
+}
+
+
+// =========================================================
+// VERIFY + RESTORE END-TO-END NG+ RELOAD TEST
+// =========================================================
+
+function verifyAndRestoreNextRunEndToEndReloadTest() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — END-TO-END NG+ RELOAD DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const record =
+    getNextRunEndToEndTestRecord();
+
+
+  if (!record) {
+
+
+    console.error(
+      "No Brick 65 end-to-end test record exists."
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    record.phase !==
+      "awaiting_reload"
+  ) {
+
+
+    console.error(
+      "Brick 65 test record is not awaiting reload verification."
+    );
+
+
+    return false;
+
+  }
+
+
+  if (
+    !record.originalSnapshot ||
+    typeof record.originalSnapshot !==
+      "object"
+  ) {
+
+
+    console.error(
+      "Brick 65 original save snapshot is missing."
+    );
+
+
+    return false;
+
+  }
+
+
+  const tests =
+    [];
+
+
+  const currentRun =
+    getCurrentRunState();
+
+
+  // =========================================
+  // VERIFY RELOADED GENIN SAVE
+  // =========================================
+
+  tests.push({
+
+    test:
+      "Reloaded run state is valid",
+
+    pass:
+      !!(
+        currentRun &&
+        currentRun.valid ===
+          true
+      )
+
+  });
+
+
+  tests.push({
+
+    test:
+      "Atomic transition survived reload as Genin",
+
+    pass:
+      !!(
+        currentRun &&
+        currentRun.currentDifficultyId ===
+          record.expectedDifficultyId
+      )
+
+  });
+
+
+  tests.push({
+
+    test:
+      "Reloaded Genin difficulty order is correct",
+
+    pass:
+      !!(
+        currentRun &&
+        currentRun.currentDifficultyOrder ===
+          record.expectedDifficultyOrder
+      )
+
+  });
+
+
+  tests.push({
+
+    test:
+      "Legacy cycle survived atomic transition reload",
+
+    pass:
+      !!(
+        currentRun &&
+        currentRun.legacyCycle ===
+          record.expectedLegacyCycle
+      )
+
+  });
+
+
+  tests.push({
+
+    test:
+      "Reloaded Genin run is incomplete",
+
+    pass:
+      !!(
+        currentRun &&
+        currentRun.runCompleted ===
+          false
+      )
+
+  });
+
+
+  tests.push({
+
+    test:
+      "Academy completion survived NG+ reload",
+
+    pass:
+      !!(
+        currentRun &&
+        Array.isArray(
+          currentRun.completedDifficulties
+        ) &&
+        currentRun.completedDifficulties.includes(
+          "academy"
+        )
+      )
+
+  });
+
+
+  tests.push({
+
+    test:
+      "NG+ currencies remained reset after reload",
+
+    pass:
+      (
+        (
+          Number(
+            playerData.ryo
+          ) || 0
+        ) ===
+          0 &&
+        (
+          Number(
+            playerData.exp
+          ) || 0
+        ) ===
+          0
+      )
+
+  });
+
+
+  const runtimeVerification =
+    verifyRuntimeMatchesPlayerData();
+
+
+  tests.push({
+
+    test:
+      "Runtime reconstructed correctly from reloaded save",
+
+    pass:
+      !!(
+        runtimeVerification &&
+        runtimeVerification.valid ===
+          true
+      )
+
+  });
+
+
+  // =========================================
+  // RESTORE REAL SAVE REGARDLESS OF TEST RESULT
+  // =========================================
+
+  const restorationSucceeded =
+    restoreRunTransitionSnapshot(
+      record.originalSnapshot
+    );
+
+
+  tests.push({
+
+    test:
+      "Original player save restoration succeeds",
+
+    pass:
+      restorationSucceeded ===
+        true
+
+  });
+
+
+  // =========================================
+  // VERIFY RESTORED SAVE EXACTLY MATCHES BACKUP
+  // =========================================
+
+  const restoredSnapshot =
+    createRunTransitionSnapshot();
+
+
+  tests.push({
+
+    test:
+      "Restored player save exactly matches original",
+
+    pass:
+      JSON.stringify(
+        restoredSnapshot
+      ) ===
+      JSON.stringify(
+        record.originalSnapshot
+      )
+
+  });
+
+
+  const restoredRuntimeVerification =
+    verifyRuntimeMatchesPlayerData();
+
+
+  tests.push({
+
+    test:
+      "Restored runtime matches original save",
+
+    pass:
+      !!(
+        restoredRuntimeVerification &&
+        restoredRuntimeVerification.valid ===
+          true
+      )
+
+  });
+
+
+  // =========================================
+  // ONLY CLEAR BACKUP AFTER SUCCESSFUL RESTORE
+  // =========================================
+
+  if (restorationSucceeded) {
+
+
+    clearNextRunEndToEndTestRecord();
+
+  }
+
+
+  console.table(
+    tests
+  );
+
+
+  const failedTests =
+    tests.filter(
+      test =>
+        !test.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ END-TO-END NG+ RELOAD PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ END-TO-END NG+ RELOAD HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
+// EMERGENCY BRICK 65 RESTORE
+// =========================================================
+//
+// If the browser reloads and you decide NOT to continue
+// the diagnostic, this function restores the persistent
+// original save backup.
+//
+// =========================================================
+
+function emergencyRestoreNextRunEndToEndTest() {
+
+
+  const record =
+    getNextRunEndToEndTestRecord();
+
+
+  if (
+    !record ||
+    !record.originalSnapshot
+  ) {
+
+
+    console.warn(
+      "No Brick 65 recovery snapshot found."
+    );
+
+
+    return false;
+
+  }
+
+
+  const restored =
+    restoreRunTransitionSnapshot(
+      record.originalSnapshot
+    );
+
+
+  if (restored) {
+
+
+    clearNextRunEndToEndTestRecord();
+
+
+    console.warn(
+      "✅ BRICK 65 EMERGENCY RESTORE COMPLETE"
+    );
+
+
+    return true;
+
+  }
+
+
+  console.error(
+    "❌ BRICK 65 EMERGENCY RESTORE FAILED"
+  );
+
+
+  return false;
+
+}
+
+
+// =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
 
