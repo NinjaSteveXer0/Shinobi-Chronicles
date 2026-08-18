@@ -8676,10 +8676,6 @@ function runRunTransitionDiagnostics() {
     [];
 
 
-  // =========================================
-  // INHERITANCE CONFIGURATION
-  // =========================================
-
   const geninLimits =
     getInheritanceLimits(
       "genin"
@@ -8757,10 +8753,6 @@ function runRunTransitionDiagnostics() {
   });
 
 
-  // =========================================
-  // SELECTION VALIDATION
-  // =========================================
-
   const legalSelection =
     validateInheritanceSelection(
       "genin",
@@ -8824,10 +8816,6 @@ function runRunTransitionDiagnostics() {
   });
 
 
-  // =========================================
-  // SNAPSHOT HEALTH
-  // =========================================
-
   const snapshot =
     createRunTransitionSnapshot();
 
@@ -8849,14 +8837,6 @@ function runRunTransitionDiagnostics() {
 
   });
 
-
-  // =========================================
-  // PURE ACADEMY → GENIN TRANSITION TEST
-  // =========================================
-  //
-  // This does NOT modify playerData.
-  //
-  // =========================================
 
   const testAcademyProgression = {
 
@@ -8929,14 +8909,6 @@ function runRunTransitionDiagnostics() {
   });
 
 
-  // =========================================
-  // PURE LEGACY TRANSITION TEST
-  // =========================================
-  //
-  // Also does NOT modify playerData.
-  //
-  // =========================================
-
   const testLegacyProgression = {
 
     currentDifficulty:
@@ -8989,10 +8961,6 @@ function runRunTransitionDiagnostics() {
   });
 
 
-  // =========================================
-  // CURRENT NEXT TARGET
-  // =========================================
-
   const currentTarget =
     getNextRunTarget();
 
@@ -9008,10 +8976,6 @@ function runRunTransitionDiagnostics() {
 
   });
 
-
-  // =========================================
-  // DISPLAY
-  // =========================================
 
   console.table(
     results
@@ -9041,6 +9005,789 @@ function runRunTransitionDiagnostics() {
 
     console.warn(
       `❌ RUN TRANSITION ENGINE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
+// BRICK 45 — CONTROLLED LIVE DIFFICULTY TRANSITION TEST
+// =========================================================
+//
+// This deliberately mutates playerData and then restores
+// the original snapshot.
+//
+// It proves that the REAL applyDifficultyTransition()
+// path works without permanently moving your save.
+//
+// =========================================================
+
+function testLiveDifficultyTransitionWithRollback() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "LIVE ACADEMY → GENIN TRANSITION TEST"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  try {
+
+
+    // =========================================
+    // CREATE CONTROLLED ACADEMY-COMPLETE STATE
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "genin",
+
+      legacyCycle:
+        originalSnapshot
+          .progression
+          .legacyCycle || 0,
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    const payload = {
+
+      valid:
+        true,
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        "academy",
+
+      targetDifficultyId:
+        "genin",
+
+      targetLegacyCycle:
+        playerData.progression
+          .legacyCycle,
+
+      inheritance:
+        createEmptyInheritanceSelection()
+
+    };
+
+
+    const result =
+      applyDifficultyTransition(
+        payload
+      );
+
+
+    const transitionWorked =
+      !!(
+        result &&
+        result.success === true &&
+        playerData.progression
+          .currentDifficulty ===
+          "genin" &&
+        playerData.progression
+          .runCompleted ===
+          false &&
+        playerData.progression
+          .completedDifficulties
+          .includes(
+            "academy"
+          )
+      );
+
+
+    console.log(
+      "Live transition result:",
+      result
+    );
+
+
+    console.log(
+      "Live transition valid:",
+      transitionWorked
+    );
+
+
+    return transitionWorked;
+
+  }
+  finally {
+
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    console.log(
+      "Original player state restored."
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+  }
+
+}
+
+
+// =========================================================
+// BRICK 46 — CONTROLLED LIVE LEGACY TRANSITION TEST
+// =========================================================
+
+function testLiveLegacyTransitionWithRollback() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "LIVE JINCHURIKI → LEGACY TRANSITION TEST"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  try {
+
+
+    const startingLegacyCycle =
+      Math.max(
+        0,
+        Number(
+          originalSnapshot
+            .progression
+            .legacyCycle
+        ) || 0
+      );
+
+
+    // =========================================
+    // CREATE CONTROLLED FULL-CYCLE STATE
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "jinchuriki",
+
+      highestDifficultyUnlocked:
+        "jinchuriki",
+
+      legacyCycle:
+        startingLegacyCycle,
+
+      completedDifficulties:
+        SHINOBI_DIFFICULTIES.map(
+          difficulty =>
+            difficulty.id
+        ),
+
+      runCompleted:
+        true
+
+    };
+
+
+    const payload = {
+
+      valid:
+        true,
+
+      transitionType:
+        "legacy",
+
+      fromDifficultyId:
+        "jinchuriki",
+
+      targetDifficultyId:
+        "academy",
+
+      targetLegacyCycle:
+        startingLegacyCycle + 1,
+
+      preserveCollection:
+        true
+
+    };
+
+
+    const result =
+      applyLegacyTransition(
+        payload
+      );
+
+
+    const transitionWorked =
+      !!(
+        result &&
+        result.success === true &&
+        playerData.progression
+          .currentDifficulty ===
+          "academy" &&
+        playerData.progression
+          .highestDifficultyUnlocked ===
+          "academy" &&
+        playerData.progression
+          .legacyCycle ===
+          startingLegacyCycle + 1 &&
+        playerData.progression
+          .runCompleted ===
+          false &&
+        playerData.progression
+          .completedDifficulties
+          .length ===
+          0
+      );
+
+
+    console.log(
+      "Legacy transition result:",
+      result
+    );
+
+
+    console.log(
+      "Legacy transition valid:",
+      transitionWorked
+    );
+
+
+    return transitionWorked;
+
+  }
+  finally {
+
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    console.log(
+      "Original player state restored."
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+  }
+
+}
+
+
+// =========================================================
+// BRICK 47 — TRANSITION RESULT VALIDATOR
+// =========================================================
+
+function validateRunTransitionResult(
+  result
+) {
+
+
+  if (
+    !result ||
+    typeof result !==
+      "object"
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Transition result is missing."
+
+    };
+
+  }
+
+
+  if (
+    result.success !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        result.reason ||
+        "Transition was not successful."
+
+    };
+
+  }
+
+
+  if (
+    result.transitionType !==
+      "difficulty" &&
+    result.transitionType !==
+      "legacy"
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Transition type is invalid."
+
+    };
+
+  }
+
+
+  if (
+    !getShinobiDifficulty(
+      result.targetDifficultyId
+    )
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Transition target difficulty is invalid."
+
+    };
+
+  }
+
+
+  if (
+    !Number.isFinite(
+      Number(
+        result.legacyCycle
+      )
+    ) ||
+    Number(
+      result.legacyCycle
+    ) < 0
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Transition Legacy Cycle is invalid."
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    reason:
+      null
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 48 — TRANSITION RECORD BUILDER
+// =========================================================
+//
+// Later this can feed:
+// - Ninja ID history
+// - Codex
+// - Achievements
+// - Legacy statistics
+// - player profile records
+//
+// =========================================================
+
+function buildRunTransitionRecord(
+  result
+) {
+
+
+  const validation =
+    validateRunTransitionResult(
+      result
+    );
+
+
+  if (!validation.valid) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    transitionType:
+      result.transitionType,
+
+    fromDifficultyId:
+      result.fromDifficultyId ||
+      null,
+
+    fromDifficultyName:
+      result.fromDifficultyName ||
+      null,
+
+    targetDifficultyId:
+      result.targetDifficultyId,
+
+    targetDifficultyName:
+      result.targetDifficultyName,
+
+    legacyCycle:
+      Math.floor(
+        Number(
+          result.legacyCycle
+        )
+      ),
+
+    inheritance:
+      result.inheritance
+        ? normalizeInheritanceSelection(
+            result.inheritance
+          )
+        : null,
+
+    preserveCollection:
+      result.preserveCollection ===
+      true
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 49 — LIVE TRANSITION DIAGNOSTICS
+// =========================================================
+
+function runLiveTransitionDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — LIVE TRANSITION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const beforeSnapshot =
+    createRunTransitionSnapshot();
+
+
+  // =========================================
+  // LIVE DIFFICULTY TEST
+  // =========================================
+
+  const difficultyTest =
+    testLiveDifficultyTransitionWithRollback();
+
+
+  results.push({
+
+    test:
+      "Live Academy to Genin transition + rollback",
+
+    pass:
+      difficultyTest ===
+      true
+
+  });
+
+
+  // =========================================
+  // VERIFY ORIGINAL STATE WAS RESTORED
+  // =========================================
+
+  results.push({
+
+    test:
+      "Difficulty test restored original run",
+
+    pass:
+      JSON.stringify(
+        playerData.progression
+      ) ===
+      JSON.stringify(
+        beforeSnapshot.progression
+      )
+
+  });
+
+
+  // =========================================
+  // LIVE LEGACY TEST
+  // =========================================
+
+  const legacyTest =
+    testLiveLegacyTransitionWithRollback();
+
+
+  results.push({
+
+    test:
+      "Live Jinchuriki to Legacy transition + rollback",
+
+    pass:
+      legacyTest ===
+      true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Legacy test restored original run",
+
+    pass:
+      JSON.stringify(
+        playerData.progression
+      ) ===
+      JSON.stringify(
+        beforeSnapshot.progression
+      )
+
+  });
+
+
+  // =========================================
+  // RESULT VALIDATION
+  // =========================================
+
+  const fakeValidResult = {
+
+    success:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      "academy",
+
+    fromDifficultyName:
+      "Academy Student",
+
+    targetDifficultyId:
+      "genin",
+
+    targetDifficultyName:
+      "Genin",
+
+    legacyCycle:
+      0,
+
+    inheritance:
+      createEmptyInheritanceSelection()
+
+  };
+
+
+  results.push({
+
+    test:
+      "Valid transition result accepted",
+
+    pass:
+      validateRunTransitionResult(
+        fakeValidResult
+      ).valid ===
+      true
+
+  });
+
+
+  results.push({
+
+    test:
+      "Invalid transition result rejected",
+
+    pass:
+      validateRunTransitionResult({
+        success: true,
+        transitionType: "dave",
+        targetDifficultyId: "hokage_dave",
+        legacyCycle: -9000
+      }).valid ===
+      false
+
+  });
+
+
+  // =========================================
+  // RECORD BUILDER
+  // =========================================
+
+  const transitionRecord =
+    buildRunTransitionRecord(
+      fakeValidResult
+    );
+
+
+  results.push({
+
+    test:
+      "Transition record builds correctly",
+
+    pass:
+      !!(
+        transitionRecord &&
+        transitionRecord
+          .transitionType ===
+          "difficulty" &&
+        transitionRecord
+          .targetDifficultyId ===
+          "genin" &&
+        transitionRecord
+          .legacyCycle ===
+          0
+      )
+
+  });
+
+
+  // =========================================
+  // FINAL SAVE INTEGRITY
+  // =========================================
+
+  const finalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Full player state restored after diagnostics",
+
+    pass:
+      JSON.stringify(
+        finalSnapshot
+      ) ===
+      JSON.stringify(
+        beforeSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ LIVE TRANSITION PHASE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ LIVE TRANSITION PHASE HAS ${failedTests.length} FAILED TEST(S)`
     );
 
 
