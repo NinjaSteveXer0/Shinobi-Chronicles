@@ -12401,6 +12401,578 @@ function runNextRunResetDiagnostics() {
 }
 
 // =========================================================
+// BRICK 61 — APPLY NEXT-RUN PLAYER STATE
+// =========================================================
+//
+// IMPORTANT:
+//
+// This applies a fully built next-run state to the
+// IN-MEMORY playerData object.
+//
+// It deliberately DOES NOT:
+//
+// - save to localStorage
+// - synchronize runtime characters
+// - synchronize equipment
+//
+// Those responsibilities belong to the next bricks.
+//
+// This separation allows us to validate every stage before
+// creating the final atomic NG+ transition.
+//
+// =========================================================
+
+function applyNextRunPlayerState(
+  nextRunState
+) {
+
+
+  // =========================================
+  // VALIDATE WRAPPER
+  // =========================================
+
+  if (
+    !nextRunState ||
+    nextRunState.valid !==
+      true ||
+    nextRunState.transitionType !==
+      "difficulty"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Invalid next-run state."
+
+    };
+
+  }
+
+
+  // =========================================
+  // VALIDATE PLAYER DATA
+  // =========================================
+
+  const nextPlayerData =
+    nextRunState.playerData;
+
+
+  if (
+    !nextPlayerData ||
+    typeof nextPlayerData !==
+      "object"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Next-run player data is missing."
+
+    };
+
+  }
+
+
+  // =========================================
+  // VALIDATE REQUIRED STRUCTURE
+  // =========================================
+
+  if (
+    !nextPlayerData.progression ||
+    !nextPlayerData.characters ||
+    !Array.isArray(
+      nextPlayerData.inventory
+    ) ||
+    !nextPlayerData.collections
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Next-run player data is incomplete."
+
+    };
+
+  }
+
+
+  // =========================================
+  // VALIDATE TARGET DIFFICULTY
+  // =========================================
+
+  if (
+    nextPlayerData.progression
+      .currentDifficulty !==
+      nextRunState.targetDifficultyId
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Next-run difficulty does not match transition target."
+
+    };
+
+  }
+
+
+  // =========================================
+  // DEEP CLONE BEFORE APPLYING
+  // =========================================
+  //
+  // Never allow the preview/reset package and live
+  // playerData to share object references.
+  //
+  // =========================================
+
+  const appliedPlayerData =
+    JSON.parse(
+      JSON.stringify(
+        nextPlayerData
+      )
+    );
+
+
+  // =========================================
+  // APPLY TO MEMORY
+  // =========================================
+
+  playerData =
+    appliedPlayerData;
+
+
+  console.log(
+    "Next-run player state applied to memory."
+  );
+
+
+  console.log(
+    "Target Difficulty:",
+    playerData.progression
+      .currentDifficulty
+  );
+
+
+  console.log(
+    "Legacy Cycle:",
+    playerData.progression
+      .legacyCycle
+  );
+
+
+  return {
+
+    success:
+      true,
+
+    transitionType:
+      nextRunState.transitionType,
+
+    fromDifficultyId:
+      nextRunState.fromDifficultyId,
+
+    targetDifficultyId:
+      nextRunState.targetDifficultyId,
+
+    targetLegacyCycle:
+      nextRunState.targetLegacyCycle,
+
+    saved:
+      false,
+
+    runtimeSynchronized:
+      false
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 61 DIAGNOSTICS
+// =========================================================
+//
+// Controlled mutation test.
+//
+// Takes a full snapshot,
+// applies a generated Genin state,
+// verifies the memory change,
+// then ALWAYS restores the original save.
+//
+// =========================================================
+
+function runNextRunApplicationDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — NEXT-RUN APPLICATION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  try {
+
+
+    // =========================================
+    // CONTROLLED ACADEMY COMPLETE STATE
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "genin",
+
+      legacyCycle:
+        Math.max(
+          0,
+          Number(
+            originalSnapshot
+              .progression
+              .legacyCycle
+          ) || 0
+        ),
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    // =========================================
+    // BUILD PACKAGE
+    // =========================================
+
+    const testPackage = {
+
+      valid:
+        true,
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        "academy",
+
+      targetDifficultyId:
+        "genin",
+
+      targetLegacyCycle:
+        playerData.progression
+          .legacyCycle,
+
+      carryover: {
+
+        specialNinja:
+          [],
+
+        bloodlines:
+          [],
+
+        legendaryWeapons:
+          [],
+
+        basicItems:
+          []
+
+      }
+
+    };
+
+
+    const nextRunState =
+      buildNextRunPlayerState(
+        testPackage
+      );
+
+
+    results.push({
+
+      test:
+        "Controlled next-run state builds",
+
+      pass:
+        !!(
+          nextRunState &&
+          nextRunState.valid ===
+            true
+        )
+
+    });
+
+
+    // =========================================
+    // APPLY STATE
+    // =========================================
+
+    const applicationResult =
+      applyNextRunPlayerState(
+        nextRunState
+      );
+
+
+    results.push({
+
+      test:
+        "Next-run state applies successfully",
+
+      pass:
+        !!(
+          applicationResult &&
+          applicationResult.success ===
+            true
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Applied difficulty is Genin",
+
+      pass:
+        playerData.progression
+          .currentDifficulty ===
+          "genin"
+
+    });
+
+
+    results.push({
+
+      test:
+        "Applied run is not completed",
+
+      pass:
+        playerData.progression
+          .runCompleted ===
+          false
+
+    });
+
+
+    results.push({
+
+      test:
+        "Academy completion history preserved",
+
+      pass:
+        playerData.progression
+          .completedDifficulties
+          .includes(
+            "academy"
+          )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Applied currencies reset",
+
+      pass:
+        (
+          playerData.ryo ===
+            0 &&
+          playerData.exp ===
+            0
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Applied inventory is valid",
+
+      pass:
+        Array.isArray(
+          playerData.inventory
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Applied collections are valid",
+
+      pass:
+        !!(
+          playerData.collections &&
+          Array.isArray(
+            playerData.collections
+              .specialNinja
+          ) &&
+          Array.isArray(
+            playerData.collections
+              .bloodlines
+          )
+        )
+
+    });
+
+
+    // =========================================
+    // INVALID STATE PROTECTION
+    // =========================================
+
+    const invalidResult =
+      applyNextRunPlayerState({
+
+        valid:
+          false
+
+      });
+
+
+    results.push({
+
+      test:
+        "Invalid next-run state rejected",
+
+      pass:
+        !!(
+          invalidResult &&
+          invalidResult.success ===
+            false
+        )
+
+    });
+
+  }
+  finally {
+
+
+    // =========================================
+    // ABSOLUTE RESTORE
+    // =========================================
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+  }
+
+
+  // =========================================
+  // VERIFY ORIGINAL STATE RESTORED
+  // =========================================
+
+  const restoredSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Original player state restored after application test",
+
+    pass:
+      JSON.stringify(
+        originalSnapshot
+      ) ===
+      JSON.stringify(
+        restoredSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ NEXT-RUN APPLICATION PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ NEXT-RUN APPLICATION HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+// =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
 
