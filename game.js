@@ -13784,6 +13784,817 @@ function runNextRunRuntimeSyncDiagnostics() {
 }
 
 // =========================================================
+// BRICK 63 — ATOMIC NEXT-RUN DIFFICULTY TRANSITION
+// =========================================================
+//
+// This is the protected NG+ execution path.
+//
+// Order:
+//
+// 1. Validate / resolve inheritance
+// 2. Build complete next-run state
+// 3. Snapshot current player state
+// 4. Apply next-run playerData
+// 5. Synchronize runtime characters
+// 6. Verify runtime matches save
+// 7. Save ONLY after every stage passes
+//
+// If any stage after mutation fails:
+//
+// FULL SNAPSHOT ROLLBACK.
+//
+// =========================================================
+
+function executeAtomicNextRunDifficultyTransition(
+  selection = {},
+  options = {}
+) {
+
+
+  // =========================================
+  // BUILD INHERITANCE PACKAGE FIRST
+  // =========================================
+  //
+  // Do this BEFORE taking the destructive path.
+  //
+  // If inheritance is invalid, nothing has changed.
+  //
+  // =========================================
+
+  const inheritedPackage =
+    buildInheritedRunPackage(
+      selection
+    );
+
+
+  if (
+    !inheritedPackage ||
+    inheritedPackage.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      stage:
+        "inheritance",
+
+      reason:
+        inheritedPackage &&
+        inheritedPackage.reason
+
+          ? inheritedPackage.reason
+
+          : "Inheritance package could not be built.",
+
+      errors:
+        inheritedPackage &&
+        Array.isArray(
+          inheritedPackage.errors
+        )
+
+          ? inheritedPackage.errors
+
+          : [],
+
+      rolledBack:
+        false
+
+    };
+
+  }
+
+
+  // =========================================
+  // BUILD NEXT RUN STATE
+  // =========================================
+
+  const nextRunState =
+    buildNextRunPlayerState(
+      inheritedPackage
+    );
+
+
+  if (
+    !nextRunState ||
+    nextRunState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      stage:
+        "build",
+
+      reason:
+        nextRunState &&
+        nextRunState.reason
+
+          ? nextRunState.reason
+
+          : "Next-run state could not be built.",
+
+      rolledBack:
+        false
+
+    };
+
+  }
+
+
+  // =========================================
+  // SNAPSHOT IMMEDIATELY BEFORE MUTATION
+  // =========================================
+
+  const snapshot =
+    createRunTransitionSnapshot();
+
+
+  let stage =
+    "snapshot";
+
+
+  try {
+
+
+    // =========================================
+    // APPLY PLAYER DATA
+    // =========================================
+
+    stage =
+      "apply";
+
+
+    const applicationResult =
+      applyNextRunPlayerState(
+        nextRunState
+      );
+
+
+    if (
+      !applicationResult ||
+      applicationResult.success !==
+        true
+    ) {
+
+
+      throw new Error(
+        applicationResult &&
+        applicationResult.reason
+
+          ? applicationResult.reason
+
+          : "Next-run player state could not be applied."
+      );
+
+    }
+
+
+    // =========================================
+    // DEVELOPMENT FAILURE INJECTION
+    // =========================================
+    //
+    // Used ONLY by diagnostics to prove rollback.
+    //
+    // Never needed by normal gameplay.
+    //
+    // =========================================
+
+    if (
+      options.simulateFailureStage ===
+        "afterApply"
+    ) {
+
+
+      throw new Error(
+        "Simulated failure after player state application."
+      );
+
+    }
+
+
+    // =========================================
+    // SYNCHRONIZE RUNTIME
+    // =========================================
+
+    stage =
+      "runtimeSync";
+
+
+    const syncResult =
+      synchronizeNextRunRuntimeState();
+
+
+    if (
+      !syncResult ||
+      syncResult.success !==
+        true
+    ) {
+
+
+      throw new Error(
+        syncResult &&
+        syncResult.reason
+
+          ? syncResult.reason
+
+          : "Runtime synchronization failed."
+      );
+
+    }
+
+
+    if (
+      options.simulateFailureStage ===
+        "afterRuntimeSync"
+    ) {
+
+
+      throw new Error(
+        "Simulated failure after runtime synchronization."
+      );
+
+    }
+
+
+    // =========================================
+    // VERIFY RUNTIME AGAINST SAVE
+    // =========================================
+
+    stage =
+      "verification";
+
+
+    const verification =
+      verifyRuntimeMatchesPlayerData();
+
+
+    if (
+      !verification ||
+      verification.valid !==
+        true
+    ) {
+
+
+      const verificationErrors =
+        verification &&
+        Array.isArray(
+          verification.errors
+        )
+
+          ? verification.errors.join(
+              " | "
+            )
+
+          : "Unknown runtime verification error.";
+
+
+      throw new Error(
+        `Runtime verification failed: ${verificationErrors}`
+      );
+
+    }
+
+
+    if (
+      options.simulateFailureStage ===
+        "afterVerification"
+    ) {
+
+
+      throw new Error(
+        "Simulated failure after runtime verification."
+      );
+
+    }
+
+
+    // =========================================
+    // SAVE ONLY AFTER EVERYTHING PASSES
+    // =========================================
+
+    stage =
+      "save";
+
+
+    savePlayerData();
+
+
+    // =========================================
+    // SUCCESS
+    // =========================================
+
+    const targetDifficulty =
+      getShinobiDifficulty(
+        nextRunState.targetDifficultyId
+      );
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    console.log(
+      "ATOMIC NEXT-RUN TRANSITION COMPLETE"
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    console.log(
+      "Difficulty:",
+      targetDifficulty
+        ? targetDifficulty.name
+        : nextRunState.targetDifficultyId
+    );
+
+
+    console.log(
+      "Legacy Cycle:",
+      playerData.progression
+        .legacyCycle
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    return {
+
+      success:
+        true,
+
+      stage:
+        "complete",
+
+      transitionType:
+        "difficulty",
+
+      fromDifficultyId:
+        nextRunState.fromDifficultyId,
+
+      targetDifficultyId:
+        nextRunState.targetDifficultyId,
+
+      targetLegacyCycle:
+        nextRunState.targetLegacyCycle,
+
+      saved:
+        true,
+
+      runtimeSynchronized:
+        true,
+
+      rolledBack:
+        false
+
+    };
+
+  }
+  catch (error) {
+
+
+    // =========================================
+    // AUTOMATIC ROLLBACK
+    // =========================================
+
+    console.error(
+      "Atomic next-run transition failed:",
+      error
+    );
+
+
+    console.warn(
+      "Attempting automatic transition rollback..."
+    );
+
+
+    const rollbackSucceeded =
+      restoreRunTransitionSnapshot(
+        snapshot
+      );
+
+
+    if (rollbackSucceeded) {
+
+
+      console.warn(
+        "✅ AUTOMATIC TRANSITION ROLLBACK COMPLETE"
+      );
+
+    }
+    else {
+
+
+      console.error(
+        "❌ AUTOMATIC TRANSITION ROLLBACK FAILED"
+      );
+
+    }
+
+
+    return {
+
+      success:
+        false,
+
+      stage:
+        stage,
+
+      reason:
+        error instanceof Error
+          ? error.message
+          : String(
+              error
+            ),
+
+      rolledBack:
+        rollbackSucceeded ===
+          true
+
+    };
+
+  }
+
+}
+
+
+// =========================================================
+// BRICK 63 — ATOMIC TRANSITION DIAGNOSTICS
+// =========================================================
+//
+// Tests:
+//
+// - successful atomic Academy -> Genin transition
+// - state saved correctly
+// - runtime matches saved player data
+// - deliberate failure AFTER mutation
+// - automatic rollback restores pre-transition state
+// - original real player save restored afterward
+//
+// =========================================================
+
+function runAtomicNextRunTransitionDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — ATOMIC NG+ TRANSITION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  try {
+
+
+    // =========================================
+    // SUCCESS TEST
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "genin",
+
+      legacyCycle:
+        Math.max(
+          0,
+          Number(
+            originalSnapshot
+              .progression
+              .legacyCycle
+          ) || 0
+        ),
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    const successResult =
+      executeAtomicNextRunDifficultyTransition(
+        createEmptyInheritanceSelection()
+      );
+
+
+    results.push({
+
+      test:
+        "Atomic Academy to Genin transition succeeds",
+
+      pass:
+        !!(
+          successResult &&
+          successResult.success ===
+            true
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Atomic transition reaches Genin",
+
+      pass:
+        playerData.progression
+          .currentDifficulty ===
+          "genin"
+
+    });
+
+
+    results.push({
+
+      test:
+        "Atomic transition saves completed state",
+
+      pass:
+        !!(
+          successResult &&
+          successResult.saved ===
+            true
+        )
+
+    });
+
+
+    const runtimeVerification =
+      verifyRuntimeMatchesPlayerData();
+
+
+    results.push({
+
+      test:
+        "Atomic transition runtime matches save",
+
+      pass:
+        runtimeVerification.valid ===
+          true
+
+    });
+
+
+    // =========================================
+    // PREPARE FAILURE TEST
+    // =========================================
+    //
+    // Restore original real save first.
+    //
+    // =========================================
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    // =========================================
+    // CREATE CONTROLLED STATE AGAIN
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "genin",
+
+      legacyCycle:
+        Math.max(
+          0,
+          Number(
+            originalSnapshot
+              .progression
+              .legacyCycle
+          ) || 0
+        ),
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    // =========================================
+    // SNAPSHOT STATE THAT MUST SURVIVE FAILURE
+    // =========================================
+
+    const failureStartSnapshot =
+      createRunTransitionSnapshot();
+
+
+    // =========================================
+    // DELIBERATELY BREAK AFTER APPLY
+    // =========================================
+
+    const failureResult =
+      executeAtomicNextRunDifficultyTransition(
+        createEmptyInheritanceSelection(),
+        {
+          simulateFailureStage:
+            "afterApply"
+        }
+      );
+
+
+    results.push({
+
+      test:
+        "Simulated post-apply failure is detected",
+
+      pass:
+        !!(
+          failureResult &&
+          failureResult.success ===
+            false
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Automatic rollback reports success",
+
+      pass:
+        !!(
+          failureResult &&
+          failureResult.rolledBack ===
+            true
+        )
+
+    });
+
+
+    const failureEndSnapshot =
+      createRunTransitionSnapshot();
+
+
+    results.push({
+
+      test:
+        "Automatic rollback restores complete pre-transition state",
+
+      pass:
+        JSON.stringify(
+          failureStartSnapshot
+        ) ===
+        JSON.stringify(
+          failureEndSnapshot
+        )
+
+    });
+
+
+    const rollbackRuntimeVerification =
+      verifyRuntimeMatchesPlayerData();
+
+
+    results.push({
+
+      test:
+        "Rollback runtime matches restored save",
+
+      pass:
+        rollbackRuntimeVerification.valid ===
+          true
+
+    });
+
+  }
+  finally {
+
+
+    // =========================================
+    // RESTORE ACTUAL USER SAVE
+    // =========================================
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+  }
+
+
+  // =========================================
+  // VERIFY REAL SAVE SURVIVED TEST
+  // =========================================
+
+  const finalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Original player save restored after atomic diagnostics",
+
+    pass:
+      JSON.stringify(
+        originalSnapshot
+      ) ===
+      JSON.stringify(
+        finalSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ ATOMIC NG+ TRANSITION PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ ATOMIC NG+ TRANSITION HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+// =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
 
