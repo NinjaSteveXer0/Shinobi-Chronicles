@@ -18728,6 +18728,1603 @@ function showPlayerData() {
 
 
 // =========================================================
+// BRICK 72 — COMPLETION FLOW SESSION
+// =========================================================
+//
+// Temporary UI state.
+//
+// This is NOT player save data.
+//
+// It remembers:
+//
+// - which completion screen is open
+// - which paths are visible
+// - which path the player clicked
+// - which stage the UI should display
+//
+// Refreshing the page deliberately clears this session.
+//
+// =========================================================
+
+let completionFlowSession =
+  null;
+
+
+// =========================================================
+// GET COMPLETION PATH LAYOUT SLOT
+// =========================================================
+
+function getCompletionPathLayoutSlot(
+  path
+) {
+
+
+  if (!path) {
+
+    return "center";
+
+  }
+
+
+  if (
+    path.id ===
+      "kage_inheritance"
+  ) {
+
+    return "top-left";
+
+  }
+
+
+  if (
+    path.id ===
+      "kage_akatsuki"
+  ) {
+
+    return "top-right";
+
+  }
+
+
+  return "center";
+
+}
+
+
+// =========================================================
+// DECORATE PATH FOR PRESENTATION
+// =========================================================
+
+function buildCompletionPathPresentation(
+  path
+) {
+
+
+  if (!path) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    ...path,
+
+    layoutSlot:
+      getCompletionPathLayoutSlot(
+        path
+      )
+
+  };
+
+}
+
+
+// =========================================================
+// BEGIN COMPLETION FLOW
+// =========================================================
+
+function beginCompletionFlow(
+  runState = getCurrentRunState(),
+  options = {}
+) {
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    completionFlowSession = {
+
+      active:
+        false,
+
+      stage:
+        "invalid",
+
+      reason:
+        "Run state is invalid.",
+
+      paths:
+        [],
+
+      selectedPathId:
+        null
+
+    };
+
+
+    return completionFlowSession;
+
+  }
+
+
+  if (
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    completionFlowSession = {
+
+      active:
+        false,
+
+      stage:
+        "run_in_progress",
+
+      reason:
+        `Complete ${runState.currentDifficultyName} before continuing.`,
+
+      runState:
+        {
+          ...runState
+        },
+
+      paths:
+        [],
+
+      selectedPathId:
+        null
+
+    };
+
+
+    return completionFlowSession;
+
+  }
+
+
+  const paths =
+    buildCompletionPathOptions(
+      runState,
+      options
+    ).map(
+      path =>
+        buildCompletionPathPresentation(
+          path
+        )
+    );
+
+
+  completionFlowSession = {
+
+    active:
+      true,
+
+    stage:
+      "path_selection",
+
+    reason:
+      null,
+
+    runState:
+      {
+        ...runState
+      },
+
+    options: {
+
+      hasPremiumAccess:
+        options.hasPremiumAccess ===
+        true
+
+    },
+
+    paths:
+      paths,
+
+    selectedPathId:
+      null,
+
+    selectedPath:
+      null,
+
+    inheritanceSelection:
+      createEmptyInheritanceSelection(),
+
+    confirmation:
+      null
+
+  };
+
+
+  return completionFlowSession;
+
+}
+
+
+// =========================================================
+// GET COMPLETION FLOW SESSION
+// =========================================================
+
+function getCompletionFlowSession() {
+
+
+  return completionFlowSession;
+
+}
+
+
+// =========================================================
+// CLEAR COMPLETION FLOW SESSION
+// =========================================================
+
+function clearCompletionFlowSession() {
+
+
+  completionFlowSession =
+    null;
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// SELECT COMPLETION FLOW PATH
+// =========================================================
+
+function selectCompletionFlowPath(
+  pathId
+) {
+
+
+  if (
+    !completionFlowSession ||
+    completionFlowSession.active !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "No active completion flow exists."
+
+    };
+
+  }
+
+
+  const validation =
+    validateCompletionPathSelection(
+      pathId,
+      completionFlowSession.runState,
+      completionFlowSession.options
+    );
+
+
+  if (
+    !validation ||
+    validation.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        validation &&
+        validation.reason
+
+          ? validation.reason
+
+          : "Completion path could not be selected.",
+
+      path:
+        validation
+          ? validation.path
+          : null
+
+    };
+
+  }
+
+
+  const presentedPath =
+    buildCompletionPathPresentation(
+      validation.path
+    );
+
+
+  completionFlowSession
+    .selectedPathId =
+      presentedPath.id;
+
+
+  completionFlowSession
+    .selectedPath =
+      presentedPath;
+
+
+  completionFlowSession
+    .inheritanceSelection =
+      createEmptyInheritanceSelection();
+
+
+  completionFlowSession
+    .confirmation =
+      null;
+
+
+  completionFlowSession.stage =
+    presentedPath.requiresInheritance ===
+      true
+
+      ? "inheritance_selection"
+
+      : "confirmation";
+
+
+  return {
+
+    success:
+      true,
+
+    stage:
+      completionFlowSession.stage,
+
+    path:
+      presentedPath
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 73 — INHERITANCE SELECTION PAYLOAD
+// =========================================================
+//
+// Kage Legacy Rebirth requires a separate inheritance
+// profile because ordinary Academy entry has zero carryover.
+//
+// These are DEVELOPMENT BALANCE VALUES.
+//
+// They are deliberately centralized so we can change them
+// later without touching UI or transition logic.
+//
+// Current baseline mirrors the first NG+ Genin allowance.
+//
+// =========================================================
+
+const LEGACY_REBIRTH_INHERITANCE_LIMITS = {
+
+  specialNinja:
+    1,
+
+  bloodlines:
+    1,
+
+  legendaryWeapons:
+    1,
+
+  basicItems:
+    5
+
+};
+
+
+// =========================================================
+// GET PATH INHERITANCE LIMITS
+// =========================================================
+
+function getCompletionPathInheritanceLimits(
+  path
+) {
+
+
+  if (!path) {
+
+    return null;
+
+  }
+
+
+  if (
+    path.routeType ===
+      "legacy_rebirth"
+  ) {
+
+
+    return {
+
+      ...LEGACY_REBIRTH_INHERITANCE_LIMITS
+
+    };
+
+  }
+
+
+  if (
+    path.inheritanceLimits &&
+    typeof path.inheritanceLimits ===
+      "object"
+  ) {
+
+
+    return {
+
+      ...path.inheritanceLimits
+
+    };
+
+  }
+
+
+  if (path.targetDifficultyId) {
+
+
+    return getInheritanceLimits(
+      path.targetDifficultyId
+    );
+
+  }
+
+
+  return null;
+
+}
+
+
+// =========================================================
+// BUILD INHERITANCE CATEGORY PAYLOAD
+// =========================================================
+
+function buildInheritanceCategoryPayload(
+  id,
+  name,
+  limit,
+  candidates
+) {
+
+
+  return {
+
+    id:
+      id,
+
+    name:
+      name,
+
+    limit:
+      Math.max(
+        0,
+        Number(
+          limit
+        ) || 0
+      ),
+
+    candidates:
+      Array.isArray(
+        candidates
+      )
+        ? candidates
+        : [],
+
+    selected:
+      []
+
+  };
+
+}
+
+
+// =========================================================
+// BUILD COMPLETION INHERITANCE PAYLOAD
+// =========================================================
+
+function buildCompletionInheritancePayload(
+  path
+) {
+
+
+  if (
+    !path ||
+    path.requiresInheritance !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Selected path does not use inheritance."
+
+    };
+
+  }
+
+
+  const limits =
+    getCompletionPathInheritanceLimits(
+      path
+    );
+
+
+  if (!limits) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Inheritance limits could not be resolved."
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    pathId:
+      path.id,
+
+    routeType:
+      path.routeType,
+
+    title:
+      "Choose Your Inheritance",
+
+    subtitle:
+      path.routeType ===
+        "legacy_rebirth"
+
+        ? "Choose what the next generation will inherit."
+
+        : `Choose what will carry into ${path.targetDifficultyName}.`,
+
+    targetDifficultyId:
+      path.targetDifficultyId,
+
+    targetDifficultyName:
+      path.targetDifficultyName,
+
+    targetLegacyCycle:
+      path.targetLegacyCycle,
+
+    limits:
+      {
+        ...limits
+      },
+
+    categories: [
+
+      buildInheritanceCategoryPayload(
+        "specialNinja",
+        "Special Ninja",
+        limits.specialNinja,
+        getSpecialNinjaInheritanceCandidates()
+      ),
+
+      buildInheritanceCategoryPayload(
+        "bloodlines",
+        "Bloodlines",
+        limits.bloodlines,
+        getBloodlineInheritanceCandidates()
+      ),
+
+      buildInheritanceCategoryPayload(
+        "legendaryWeapons",
+        "Legendary Weapons",
+        limits.legendaryWeapons,
+        getLegendaryWeaponInheritanceCandidates()
+      ),
+
+      buildInheritanceCategoryPayload(
+        "basicItems",
+        "Items",
+        limits.basicItems,
+        getBasicItemInheritanceCandidates()
+      )
+
+    ]
+
+  };
+
+}
+
+
+// =========================================================
+// GET ACTIVE INHERITANCE PAYLOAD
+// =========================================================
+
+function getActiveCompletionInheritancePayload() {
+
+
+  if (
+    !completionFlowSession ||
+    completionFlowSession.active !==
+      true ||
+    !completionFlowSession.selectedPath
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "No completion path has been selected."
+
+    };
+
+  }
+
+
+  return buildCompletionInheritancePayload(
+    completionFlowSession.selectedPath
+  );
+
+}
+
+
+// =========================================================
+// VALIDATE SELECTION AGAINST PAYLOAD
+// =========================================================
+
+function validateCompletionInheritanceSelection(
+  payload,
+  selection
+) {
+
+
+  if (
+    !payload ||
+    payload.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Inheritance payload is invalid.",
+
+      errors:
+        []
+
+    };
+
+  }
+
+
+  const normalized =
+    normalizeInheritanceSelection(
+      selection
+    );
+
+
+  const errors =
+    [];
+
+
+  payload.categories.forEach(
+    category => {
+
+
+      const selected =
+        normalized[
+          category.id
+        ] || [];
+
+
+      if (
+        selected.length >
+        category.limit
+      ) {
+
+
+        errors.push(
+          `${category.name}: selected ${selected.length}, maximum ${category.limit}.`
+        );
+
+      }
+
+
+      const candidateKeys =
+        new Set(
+          category.candidates.map(
+            candidate =>
+              candidate.key ||
+              candidate.id
+          )
+        );
+
+
+      selected.forEach(
+        selectedKey => {
+
+
+          if (
+            !candidateKeys.has(
+              selectedKey
+            )
+          ) {
+
+
+            errors.push(
+              `${category.name}: invalid inheritance selection ${selectedKey}.`
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  return {
+
+    valid:
+      errors.length ===
+      0,
+
+    reason:
+      errors.length ===
+        0
+
+        ? null
+
+        : "Inheritance selection is invalid.",
+
+    errors:
+      errors,
+
+    selection:
+      normalized
+
+  };
+
+}
+
+
+// =========================================================
+// SET ACTIVE INHERITANCE SELECTION
+// =========================================================
+
+function setCompletionInheritanceSelection(
+  selection
+) {
+
+
+  const payload =
+    getActiveCompletionInheritancePayload();
+
+
+  const validation =
+    validateCompletionInheritanceSelection(
+      payload,
+      selection
+    );
+
+
+  if (
+    validation.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        validation.reason,
+
+      errors:
+        validation.errors
+
+    };
+
+  }
+
+
+  completionFlowSession
+    .inheritanceSelection =
+      validation.selection;
+
+
+  completionFlowSession.stage =
+    "confirmation";
+
+
+  completionFlowSession
+    .confirmation =
+      null;
+
+
+  return {
+
+    success:
+      true,
+
+    stage:
+      "confirmation",
+
+    selection:
+      validation.selection
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 74 — CONFIRMATION PAYLOAD
+// =========================================================
+//
+// Still does NOT execute the transition.
+//
+// It packages the exact decision that the future
+// confirmation button will eventually hand to the
+// transition execution layer.
+//
+// =========================================================
+
+function buildCompletionConfirmationPayload(
+  session
+) {
+
+
+  if (
+    !session ||
+    session.active !==
+      true ||
+    !session.selectedPath
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Completion flow has no selected path."
+
+    };
+
+  }
+
+
+  const path =
+    session.selectedPath;
+
+
+  if (
+    path.requiresPremium ===
+      true &&
+    path.premiumOwned !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Premium access required."
+
+    };
+
+  }
+
+
+  let inheritanceSelection =
+    createEmptyInheritanceSelection();
+
+
+  if (
+    path.requiresInheritance ===
+      true
+  ) {
+
+
+    const payload =
+      buildCompletionInheritancePayload(
+        path
+      );
+
+
+    const validation =
+      validateCompletionInheritanceSelection(
+        payload,
+        session.inheritanceSelection
+      );
+
+
+    if (
+      validation.valid !==
+        true
+    ) {
+
+
+      return {
+
+        valid:
+          false,
+
+        reason:
+          validation.reason,
+
+        errors:
+          validation.errors
+
+      };
+
+    }
+
+
+    inheritanceSelection =
+      validation.selection;
+
+  }
+
+
+  const warningLines =
+    [];
+
+
+  if (
+    path.routeType ===
+      "legacy_rebirth"
+  ) {
+
+
+    warningLines.push(
+      "Your current Kage run will end."
+    );
+
+
+    warningLines.push(
+      `Legacy Cycle ${path.targetLegacyCycle} will begin.`
+    );
+
+
+    warningLines.push(
+      "You will return to Academy Student."
+    );
+
+  }
+  else {
+
+
+    warningLines.push(
+      `Your current run will end and ${path.targetDifficultyName} will begin.`
+    );
+
+  }
+
+
+  if (
+    path.requiresInheritance ===
+      true
+  ) {
+
+
+    warningLines.push(
+      "Only the selected inheritance will carry forward."
+    );
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    pathId:
+      path.id,
+
+    routeType:
+      path.routeType,
+
+    fromDifficultyId:
+      path.fromDifficultyId,
+
+    targetDifficultyId:
+      path.targetDifficultyId,
+
+    targetDifficultyName:
+      path.targetDifficultyName,
+
+    targetLegacyCycle:
+      path.targetLegacyCycle,
+
+    inheritanceSelection:
+      inheritanceSelection,
+
+    requiresPremium:
+      path.requiresPremium ===
+      true,
+
+    warningTitle:
+      "Confirm Your Path",
+
+    warningLines:
+      warningLines,
+
+    confirmLabel:
+      path.routeType ===
+        "legacy_rebirth"
+
+        ? "BEGIN NEW LEGACY"
+
+        : (
+            path.routeType ===
+              "premium_difficulty"
+
+              ? "ENTER AKATSUKI"
+
+              : "BEGIN NEXT RUN"
+          ),
+
+    cancelLabel:
+      "GO BACK",
+
+    executable:
+      true
+
+  };
+
+}
+
+
+// =========================================================
+// GET ACTIVE COMPLETION CONFIRMATION
+// =========================================================
+
+function getActiveCompletionConfirmation() {
+
+
+  if (!completionFlowSession) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "No active completion flow exists."
+
+    };
+
+  }
+
+
+  const confirmation =
+    buildCompletionConfirmationPayload(
+      completionFlowSession
+    );
+
+
+  completionFlowSession.confirmation =
+    confirmation;
+
+
+  return confirmation;
+
+}
+
+
+// =========================================================
+// BRICKS 72–74 DIAGNOSTICS
+// =========================================================
+
+function runCompletionFlowSessionDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — COMPLETION FLOW SESSION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const playerSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const previousSession =
+    completionFlowSession;
+
+
+  // =========================================
+  // TEST KAGE FLOW
+  // =========================================
+
+  const kageState = {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "kage",
+
+    currentDifficultyName:
+      "Kage",
+
+    currentDifficultyOrder:
+      6,
+
+    highestDifficultyUnlockedId:
+      "akatsuki",
+
+    highestDifficultyUnlockedName:
+      "Akatsuki",
+
+    highestDifficultyUnlockedOrder:
+      7,
+
+    legacyCycle:
+      2,
+
+    runCompleted:
+      true,
+
+    completedDifficulties: [
+      "academy",
+      "genin",
+      "chunin",
+      "special_jonin",
+      "jonin",
+      "anbu",
+      "kage"
+    ],
+
+    premiumDifficulty:
+      false
+
+  };
+
+
+  const lockedSession =
+    beginCompletionFlow(
+      kageState,
+      {
+        hasPremiumAccess:
+          false
+      }
+    );
+
+
+  results.push({
+
+    test:
+      "Completed Kage opens path selection",
+
+    pass:
+      !!(
+        lockedSession &&
+        lockedSession.active ===
+          true &&
+        lockedSession.stage ===
+          "path_selection"
+      )
+
+  });
+
+
+  const inheritancePath =
+    lockedSession.paths.find(
+      path =>
+        path.id ===
+        "kage_inheritance"
+    );
+
+
+  const shadowPath =
+    lockedSession.paths.find(
+      path =>
+        path.id ===
+        "kage_akatsuki"
+    );
+
+
+  results.push({
+
+    test:
+      "Inheritance path is positioned top-left",
+
+    pass:
+      !!(
+        inheritancePath &&
+        inheritancePath.layoutSlot ===
+          "top-left"
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Shadow path is positioned top-right",
+
+    pass:
+      !!(
+        shadowPath &&
+        shadowPath.layoutSlot ===
+          "top-right"
+      )
+
+  });
+
+
+  const lockedShadowSelection =
+    selectCompletionFlowPath(
+      "kage_akatsuki"
+    );
+
+
+  results.push({
+
+    test:
+      "Locked Shadow path cannot be selected",
+
+    pass:
+      !!(
+        lockedShadowSelection &&
+        lockedShadowSelection.success ===
+          false
+      )
+
+  });
+
+
+  const inheritanceSelection =
+    selectCompletionFlowPath(
+      "kage_inheritance"
+    );
+
+
+  results.push({
+
+    test:
+      "Inheritance path can be selected",
+
+    pass:
+      !!(
+        inheritanceSelection &&
+        inheritanceSelection.success ===
+          true &&
+        completionFlowSession.stage ===
+          "inheritance_selection"
+      )
+
+  });
+
+
+  const inheritancePayload =
+    getActiveCompletionInheritancePayload();
+
+
+  results.push({
+
+    test:
+      "Inheritance payload contains four categories",
+
+    pass:
+      !!(
+        inheritancePayload &&
+        inheritancePayload.valid ===
+          true &&
+        inheritancePayload.categories.length ===
+          4
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Legacy inheritance uses dedicated limits",
+
+    pass:
+      !!(
+        inheritancePayload &&
+        inheritancePayload.limits.specialNinja ===
+          1 &&
+        inheritancePayload.limits.bloodlines ===
+          1 &&
+        inheritancePayload.limits.legendaryWeapons ===
+          1 &&
+        inheritancePayload.limits.basicItems ===
+          5
+      )
+
+  });
+
+
+  const emptySelectionResult =
+    setCompletionInheritanceSelection(
+      createEmptyInheritanceSelection()
+    );
+
+
+  results.push({
+
+    test:
+      "Empty legal inheritance selection reaches confirmation",
+
+    pass:
+      !!(
+        emptySelectionResult &&
+        emptySelectionResult.success ===
+          true &&
+        completionFlowSession.stage ===
+          "confirmation"
+      )
+
+  });
+
+
+  const legacyConfirmation =
+    getActiveCompletionConfirmation();
+
+
+  results.push({
+
+    test:
+      "Legacy confirmation payload builds",
+
+    pass:
+      !!(
+        legacyConfirmation &&
+        legacyConfirmation.valid ===
+          true &&
+        legacyConfirmation.routeType ===
+          "legacy_rebirth" &&
+        legacyConfirmation.confirmLabel ===
+          "BEGIN NEW LEGACY"
+      )
+
+  });
+
+
+  // =========================================
+  // PREMIUM-OWNED SHADOW PATH
+  // =========================================
+
+  beginCompletionFlow(
+    kageState,
+    {
+      hasPremiumAccess:
+        true
+      }
+    );
+
+
+  const ownedShadowSelection =
+    selectCompletionFlowPath(
+      "kage_akatsuki"
+    );
+
+
+  results.push({
+
+    test:
+      "Owned Shadow path becomes selectable",
+
+    pass:
+      !!(
+        ownedShadowSelection &&
+        ownedShadowSelection.success ===
+          true
+      )
+
+  });
+
+
+  const shadowPayload =
+    getActiveCompletionInheritancePayload();
+
+
+  results.push({
+
+    test:
+      "Akatsuki inheritance payload uses Akatsuki limits",
+
+    pass:
+      !!(
+        shadowPayload &&
+        shadowPayload.valid ===
+          true &&
+        shadowPayload.limits.specialNinja ===
+          5 &&
+        shadowPayload.limits.bloodlines ===
+          5 &&
+        shadowPayload.limits.legendaryWeapons ===
+          5 &&
+        shadowPayload.limits.basicItems ===
+          40
+      )
+
+  });
+
+
+  setCompletionInheritanceSelection(
+    createEmptyInheritanceSelection()
+  );
+
+
+  const shadowConfirmation =
+    getActiveCompletionConfirmation();
+
+
+  results.push({
+
+    test:
+      "Akatsuki confirmation payload builds",
+
+    pass:
+      !!(
+        shadowConfirmation &&
+        shadowConfirmation.valid ===
+          true &&
+        shadowConfirmation.routeType ===
+          "premium_difficulty" &&
+        shadowConfirmation.confirmLabel ===
+          "ENTER AKATSUKI"
+      )
+
+  });
+
+
+  // =========================================
+  // PLAYER SAVE MUST REMAIN UNTOUCHED
+  // =========================================
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Completion session never modifies player save",
+
+    pass:
+      JSON.stringify(
+        playerSnapshot
+      ) ===
+      JSON.stringify(
+        afterSnapshot
+      )
+
+  });
+
+
+  // =========================================
+  // RESTORE PREVIOUS SESSION
+  // =========================================
+
+  completionFlowSession =
+    previousSession;
+
+
+  // =========================================
+  // RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ COMPLETION FLOW SESSION PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ COMPLETION FLOW SESSION HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
 // POWER LEVEL CALCULATION
 // =========================================================
 
