@@ -11288,6 +11288,1068 @@ function runInheritanceOwnershipDiagnostics() {
 }
 
 // =========================================================
+// BRICK 55 — CREATE FRESH RUN CHARACTER PROGRESSION
+// =========================================================
+//
+// IMPORTANT:
+//
+// createDefaultCharacterProgression() uses current runtime
+// character.stats.
+//
+// That is correct for ordinary save creation, but NOT for NG+
+// because runtime stats may already contain training gains.
+//
+// NG+ must rebuild each normal roster character from their
+// canonical baseStats.
+//
+// =========================================================
+
+function createFreshRunCharacterProgression() {
+
+
+  const characters =
+    {};
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const baseStats =
+        character.baseStats &&
+        typeof character.baseStats ===
+          "object"
+
+          ? character.baseStats
+
+          : character.stats;
+
+
+      characters[
+        character.id
+      ] = {
+
+        stats: {
+          ...baseStats
+        },
+
+        permanentPLBonus:
+          0,
+
+        disciplineProgression:
+          createDefaultDisciplineProgression(),
+
+        weaponSpecializations:
+          {}
+
+      };
+
+    }
+  );
+
+
+  return characters;
+
+}
+
+
+// =========================================================
+// BRICK 56 — BUILD INHERITED INVENTORY
+// =========================================================
+//
+// Takes the already validated carryover from Brick 54 and
+// turns it into the inventory that will begin the next run.
+//
+// Stackable items are merged back together.
+// Unique equipment keeps its instance ID.
+// All inherited equipment starts UNEQUIPPED.
+//
+// =========================================================
+
+function buildInheritedInventory(
+  carryover
+) {
+
+
+  const source =
+    carryover &&
+    typeof carryover ===
+      "object"
+
+      ? carryover
+
+      : {};
+
+
+  const selectedItems = [
+
+    ...(
+      Array.isArray(
+        source.legendaryWeapons
+      )
+        ? source.legendaryWeapons
+        : []
+    ),
+
+    ...(
+      Array.isArray(
+        source.basicItems
+      )
+        ? source.basicItems
+        : []
+    )
+
+  ];
+
+
+  const inventory =
+    [];
+
+
+  selectedItems.forEach(
+    sourceItem => {
+
+
+      if (
+        !sourceItem ||
+        typeof sourceItem !==
+          "object"
+      ) {
+
+        return;
+
+      }
+
+
+      const item =
+        JSON.parse(
+          JSON.stringify(
+            sourceItem
+          )
+        );
+
+
+      // =========================================
+      // INHERITED EQUIPMENT ALWAYS STARTS FREE
+      // =========================================
+
+      if (
+        Object.prototype.hasOwnProperty.call(
+          item,
+          "equippedBy"
+        )
+      ) {
+
+
+        item.equippedBy =
+          null;
+
+      }
+
+
+      // =========================================
+      // UNIQUE ITEM
+      // =========================================
+
+      if (item.instanceId) {
+
+
+        item.quantity =
+          1;
+
+
+        inventory.push(
+          item
+        );
+
+
+        return;
+
+      }
+
+
+      // =========================================
+      // STACKABLE ITEM
+      // =========================================
+
+      const existingItem =
+        inventory.find(
+          inventoryItem =>
+            (
+              !inventoryItem.instanceId &&
+              inventoryItem.id ===
+                item.id
+            )
+        );
+
+
+      if (existingItem) {
+
+
+        existingItem.quantity =
+          (
+            Number(
+              existingItem.quantity
+            ) || 0
+          ) +
+          1;
+
+
+        return;
+
+      }
+
+
+      item.quantity =
+        1;
+
+
+      inventory.push(
+        item
+      );
+
+    }
+  );
+
+
+  return inventory;
+
+}
+
+
+// =========================================================
+// BRICK 57 — BUILD NEXT RUN COLLECTIONS
+// =========================================================
+//
+// Special Ninja and Bloodlines currently live behind the
+// collection ownership hooks created in Brick 53.
+//
+// During ordinary difficulty NG+ only SELECTED collection
+// entries carry forward.
+//
+// Legacy preservation will later use different rules.
+//
+// =========================================================
+
+function buildNextRunCollections(
+  carryover
+) {
+
+
+  const source =
+    carryover &&
+    typeof carryover ===
+      "object"
+
+      ? carryover
+
+      : {};
+
+
+  return {
+
+    specialNinja:
+      normalizeInheritanceCollection(
+        source.specialNinja
+      ),
+
+    bloodlines:
+      normalizeInheritanceCollection(
+        source.bloodlines
+      )
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 58 — BUILD NEXT RUN PLAYER STATE
+// =========================================================
+//
+// PURE FUNCTION.
+//
+// Creates the complete playerData object for the next
+// difficulty WITHOUT modifying the live player.
+//
+// Ordinary NG+ rules currently:
+//
+// Ryō                 -> RESET
+// General EXP         -> RESET
+// Normal roster stats -> RESET TO BASE
+// Discipline training -> RESET
+// Weapon mastery      -> RESET
+// Inventory           -> SELECTED INHERITANCE ONLY
+// Special Ninja       -> SELECTED INHERITANCE ONLY
+// Bloodlines          -> SELECTED INHERITANCE ONLY
+// Legacy Cycle        -> PRESERVED
+// Difficulty history  -> PRESERVED
+//
+// =========================================================
+
+function buildNextRunPlayerState(
+  inheritedPackage
+) {
+
+
+  if (
+    !inheritedPackage ||
+    inheritedPackage.valid !==
+      true ||
+    inheritedPackage.transitionType !==
+      "difficulty"
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Invalid inherited run package."
+
+    };
+
+  }
+
+
+  const nextProgression =
+    buildDifficultyTransitionState(
+      playerData.progression,
+      inheritedPackage
+    );
+
+
+  if (!nextProgression) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Could not build next difficulty progression."
+
+    };
+
+  }
+
+
+  const carryover =
+    inheritedPackage.carryover ||
+    {};
+
+
+  const nextPlayerData = {
+
+    ryo:
+      0,
+
+    exp:
+      0,
+
+    inventory:
+      buildInheritedInventory(
+        carryover
+      ),
+
+    progression:
+      nextProgression,
+
+    characters:
+      createFreshRunCharacterProgression(),
+
+    collections:
+      buildNextRunCollections(
+        carryover
+      )
+
+  };
+
+
+  return {
+
+    valid:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      inheritedPackage
+        .fromDifficultyId,
+
+    targetDifficultyId:
+      inheritedPackage
+        .targetDifficultyId,
+
+    targetLegacyCycle:
+      inheritedPackage
+        .targetLegacyCycle,
+
+    playerData:
+      nextPlayerData
+
+  };
+
+}
+
+
+// =========================================================
+// PREVIEW NEXT RUN RESET
+// =========================================================
+//
+// Safe development helper.
+//
+// Nothing is saved.
+// Nothing is reset.
+// Nothing is transitioned.
+//
+// =========================================================
+
+function previewNextRunReset(
+  selection = {}
+) {
+
+
+  const inheritedPackage =
+    buildInheritedRunPackage(
+      selection
+    );
+
+
+  if (!inheritedPackage.valid) {
+
+
+    console.log(
+      "Next run reset preview denied:",
+      inheritedPackage.reason
+    );
+
+
+    return inheritedPackage;
+
+  }
+
+
+  const preview =
+    buildNextRunPlayerState(
+      inheritedPackage
+    );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "NEXT RUN RESET PREVIEW"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    preview
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return preview;
+
+}
+
+
+// =========================================================
+// BRICK 59 — NG+ RESET PACKAGE DIAGNOSTICS
+// =========================================================
+
+function runNextRunResetDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — NG+ RESET PACKAGE DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const beforeSnapshot =
+    createRunTransitionSnapshot();
+
+
+  // =========================================
+  // TEST FRESH CHARACTER DATA
+  // =========================================
+
+  const freshCharacters =
+    createFreshRunCharacterProgression();
+
+
+  let freshCharactersValid =
+    true;
+
+
+  playerTeam.forEach(
+    character => {
+
+
+      const fresh =
+        freshCharacters[
+          character.id
+        ];
+
+
+      if (!fresh) {
+
+
+        freshCharactersValid =
+          false;
+
+
+        return;
+
+      }
+
+
+      const baseStats =
+        character.baseStats &&
+        typeof character.baseStats ===
+          "object"
+
+          ? character.baseStats
+
+          : character.stats;
+
+
+      Object.keys(
+        baseStats
+      ).forEach(
+        stat => {
+
+
+          if (
+            fresh.stats[
+              stat
+            ] !==
+            baseStats[
+              stat
+            ]
+          ) {
+
+
+            freshCharactersValid =
+              false;
+
+          }
+
+        }
+      );
+
+
+      if (
+        fresh.permanentPLBonus !==
+          0
+      ) {
+
+
+        freshCharactersValid =
+          false;
+
+      }
+
+
+      Object.values(
+        fresh.disciplineProgression
+      ).forEach(
+        discipline => {
+
+
+          if (
+            discipline.level !==
+              1 ||
+            discipline.exp !==
+              0 ||
+            discipline.statLevelApplied !==
+              1
+          ) {
+
+
+            freshCharactersValid =
+              false;
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+  results.push({
+
+    test:
+      "Fresh characters reset to canonical base state",
+
+    pass:
+      freshCharactersValid
+
+  });
+
+
+  // =========================================
+  // TEST STACKABLE INVENTORY MERGE
+  // =========================================
+
+  const testInventory =
+    buildInheritedInventory({
+
+      legendaryWeapons: [],
+
+      basicItems: [
+
+        {
+          id: "test_scroll",
+          name: "Test Scroll",
+          type: "scroll",
+          rarity: "Common",
+          quantity: 1
+        },
+
+        {
+          id: "test_scroll",
+          name: "Test Scroll",
+          type: "scroll",
+          rarity: "Common",
+          quantity: 1
+        },
+
+        {
+          id: "test_scroll",
+          name: "Test Scroll",
+          type: "scroll",
+          rarity: "Common",
+          quantity: 1
+        }
+
+      ]
+
+    });
+
+
+  const mergedScroll =
+    testInventory.find(
+      item =>
+        item.id ===
+        "test_scroll"
+    );
+
+
+  results.push({
+
+    test:
+      "Inherited stackable items merge correctly",
+
+    pass:
+      !!(
+        mergedScroll &&
+        mergedScroll.quantity ===
+          3 &&
+        testInventory.length ===
+          1
+      )
+
+  });
+
+
+  // =========================================
+  // TEST UNIQUE EQUIPMENT PRESERVATION
+  // =========================================
+
+  const testUniqueInventory =
+    buildInheritedInventory({
+
+      legendaryWeapons: [
+
+        {
+          id:
+            "test_legendary_blade",
+
+          name:
+            "Test Legendary Blade",
+
+          type:
+            "weapon",
+
+          rarity:
+            "Legendary",
+
+          quantity:
+            1,
+
+          instanceId:
+            "test_legendary_blade_instance",
+
+          equippedBy:
+            "dave"
+        }
+
+      ],
+
+      basicItems: []
+
+    });
+
+
+  results.push({
+
+    test:
+      "Inherited unique equipment remains unique and unequipped",
+
+    pass:
+      !!(
+        testUniqueInventory.length ===
+          1 &&
+        testUniqueInventory[
+          0
+        ].instanceId ===
+          "test_legendary_blade_instance" &&
+        testUniqueInventory[
+          0
+        ].equippedBy ===
+          null
+      )
+
+  });
+
+
+  // =========================================
+  // CONTROLLED ACADEMY -> GENIN STATE
+  // =========================================
+
+  const testProgression = {
+
+    currentDifficulty:
+      "academy",
+
+    highestDifficultyUnlocked:
+      "genin",
+
+    legacyCycle:
+      Math.max(
+        0,
+        Number(
+          beforeSnapshot
+            .progression
+            .legacyCycle
+        ) || 0
+      ),
+
+    completedDifficulties: [
+      "academy"
+    ],
+
+    runCompleted:
+      true
+
+  };
+
+
+  const testPackage = {
+
+    valid:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    fromDifficultyId:
+      "academy",
+
+    targetDifficultyId:
+      "genin",
+
+    targetLegacyCycle:
+      testProgression
+        .legacyCycle,
+
+    carryover: {
+
+      specialNinja: [
+        {
+          id:
+            "test_special_ninja",
+
+          name:
+            "Test Special Ninja"
+        }
+      ],
+
+      bloodlines: [
+        {
+          id:
+            "test_bloodline",
+
+          name:
+            "Test Bloodline"
+        }
+      ],
+
+      legendaryWeapons: [],
+
+      basicItems: []
+
+    }
+
+  };
+
+
+  // =========================================
+  // TEMPORARILY SWAP PROGRESSION ONLY
+  // =========================================
+
+  const originalProgression =
+    playerData.progression;
+
+
+  playerData.progression =
+    testProgression;
+
+
+  let testNextRunState =
+    null;
+
+
+  try {
+
+
+    testNextRunState =
+      buildNextRunPlayerState(
+        testPackage
+      );
+
+  }
+  finally {
+
+
+    playerData.progression =
+      originalProgression;
+
+  }
+
+
+  results.push({
+
+    test:
+      "Academy to Genin next-run state builds",
+
+    pass:
+      !!(
+        testNextRunState &&
+        testNextRunState.valid ===
+          true &&
+        testNextRunState.playerData
+          .progression
+          .currentDifficulty ===
+          "genin"
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Next-run currencies reset",
+
+    pass:
+      !!(
+        testNextRunState &&
+        testNextRunState.valid ===
+          true &&
+        testNextRunState.playerData
+          .ryo ===
+          0 &&
+        testNextRunState.playerData
+          .exp ===
+          0
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Selected Special Ninja carries into next-run collections",
+
+    pass:
+      !!(
+        testNextRunState &&
+        testNextRunState.valid ===
+          true &&
+        testNextRunState.playerData
+          .collections
+          .specialNinja
+          .some(
+            entry =>
+              entry.id ===
+              "test_special_ninja"
+          )
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Selected Bloodline carries into next-run collections",
+
+    pass:
+      !!(
+        testNextRunState &&
+        testNextRunState.valid ===
+          true &&
+        testNextRunState.playerData
+          .collections
+          .bloodlines
+          .some(
+            entry =>
+              entry.id ===
+              "test_bloodline"
+          )
+      )
+
+  });
+
+
+  // =========================================
+  // INVALID PACKAGE PROTECTION
+  // =========================================
+
+  const invalidState =
+    buildNextRunPlayerState({
+
+      valid:
+        false
+
+    });
+
+
+  results.push({
+
+    test:
+      "Invalid inherited package rejected",
+
+    pass:
+      !!(
+        invalidState &&
+        invalidState.valid ===
+          false
+      )
+
+  });
+
+
+  // =========================================
+  // VERIFY DIAGNOSTICS DID NOT CHANGE SAVE
+  // =========================================
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "NG+ reset diagnostics do not modify player save",
+
+    pass:
+      JSON.stringify(
+        beforeSnapshot
+      ) ===
+      JSON.stringify(
+        afterSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ NG+ RESET PACKAGE PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ NG+ RESET PACKAGE HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+// =========================================================
 // DEVELOPMENT CHARACTER DISCIPLINE VIEW
 // =========================================================
 
