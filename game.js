@@ -1234,7 +1234,53 @@ function createDefaultPlayerData() {
       createDefaultRunProgression(),
 
     characters:
-      createDefaultCharacterProgression()
+      createDefaultCharacterProgression(),
+
+    collections: {
+
+      specialNinja:
+        [],
+
+      bloodlines:
+        []
+
+    }
+
+  };
+
+}
+
+
+// =========================================================
+// NORMALIZE PLAYER COLLECTIONS
+// =========================================================
+
+function normalizePlayerCollections(
+  savedCollections
+) {
+
+
+  const source =
+    savedCollections &&
+    typeof savedCollections ===
+      "object"
+
+      ? savedCollections
+
+      : {};
+
+
+  return {
+
+    specialNinja:
+      normalizeInheritanceCollection(
+        source.specialNinja
+      ),
+
+    bloodlines:
+      normalizeInheritanceCollection(
+        source.bloodlines
+      )
 
   };
 
@@ -1613,14 +1659,19 @@ function loadPlayerData() {
           : [],
 
       progression:
-        normalizeSavedRunProgression(
-          parsedData.progression
-        ),
+  normalizeSavedRunProgression(
+    parsedData.progression
+  ),
 
-      characters:
-        normalizeSavedCharacterProgression(
-          parsedData.characters
-        )
+characters:
+  normalizeSavedCharacterProgression(
+    parsedData.characters
+  ),
+
+collections:
+  normalizePlayerCollections(
+    parsedData.collections
+  )
 
     };
 
