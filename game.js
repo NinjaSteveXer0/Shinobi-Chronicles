@@ -20342,6 +20342,2243 @@ const STAT_WEIGHTS = {
 
 
 // =========================================================
+// BRICK 75 — COMPLETION FLOW UI SHELL
+// =========================================================
+//
+// First visible player-facing Shinobi Progression UI.
+//
+// The UI is injected dynamically so we do NOT need to
+// modify index.html yet.
+//
+// It currently supports:
+//
+// - Kage "NOW, CHOOSE..." fork
+// - top-left inheritance path
+// - top-right Shadow / Akatsuki path
+// - premium locked presentation
+// - inheritance selection
+// - confirmation screen
+//
+// Final transition execution is deliberately NOT connected
+// until the UI flow itself has passed diagnostics.
+//
+// =========================================================
+
+const COMPLETION_FLOW_UI_ID =
+  "shinobi-completion-flow-ui";
+
+
+const COMPLETION_FLOW_STYLE_ID =
+  "shinobi-completion-flow-style";
+
+
+// =========================================================
+// ESCAPE HTML
+// =========================================================
+
+function escapeCompletionHtml(
+  value
+) {
+
+
+  return String(
+    value === undefined ||
+    value === null
+
+      ? ""
+
+      : value
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      "\"",
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#039;"
+    );
+
+}
+
+
+// =========================================================
+// INSTALL COMPLETION FLOW STYLES
+// =========================================================
+
+function installCompletionFlowStyles() {
+
+
+  if (
+    document.getElementById(
+      COMPLETION_FLOW_STYLE_ID
+    )
+  ) {
+
+
+    return true;
+
+  }
+
+
+  const style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.id =
+    COMPLETION_FLOW_STYLE_ID;
+
+
+  style.textContent = `
+
+    #${COMPLETION_FLOW_UI_ID} {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      overflow: hidden;
+      color: #f3ead5;
+      font-family: Georgia, "Times New Roman", serif;
+      background:
+        radial-gradient(
+          circle at 50% 72%,
+          rgba(24, 35, 37, 0.35) 0%,
+          rgba(5, 10, 14, 0.86) 38%,
+          rgba(0, 0, 0, 0.97) 100%
+        ),
+        linear-gradient(
+          180deg,
+          #091015 0%,
+          #030608 100%
+        );
+    }
+
+    #${COMPLETION_FLOW_UI_ID} * {
+      box-sizing: border-box;
+    }
+
+    .sc-choice-stage {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .sc-choice-stage::before,
+    .sc-choice-stage::after {
+      content: "";
+      position: absolute;
+      bottom: -8%;
+      width: 44%;
+      height: 78%;
+      opacity: 0.52;
+      pointer-events: none;
+      border-top: 2px solid rgba(218, 177, 91, 0.3);
+      filter: drop-shadow(
+        0 0 10px rgba(205, 164, 80, 0.16)
+      );
+    }
+
+    .sc-choice-stage::before {
+      left: 8%;
+      transform:
+        perspective(650px)
+        rotateZ(-16deg)
+        skewY(-9deg);
+      background:
+        linear-gradient(
+          145deg,
+          transparent 0%,
+          rgba(179, 140, 69, 0.08) 44%,
+          rgba(202, 169, 98, 0.18) 100%
+        );
+    }
+
+    .sc-choice-stage::after {
+      right: 8%;
+      transform:
+        perspective(650px)
+        rotateZ(16deg)
+        skewY(9deg);
+      background:
+        linear-gradient(
+          215deg,
+          transparent 0%,
+          rgba(88, 31, 36, 0.08) 44%,
+          rgba(124, 29, 38, 0.18) 100%
+        );
+    }
+
+    .sc-choice-vignette {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow:
+        inset 0 0 180px rgba(0, 0, 0, 0.95);
+    }
+
+    .sc-choice-heading {
+      position: absolute;
+      left: 50%;
+      bottom: 19%;
+      transform: translateX(-50%);
+      width: min(760px, 85vw);
+      text-align: center;
+      z-index: 5;
+    }
+
+    .sc-choice-heading-small {
+      margin-bottom: 8px;
+      color: #9f895c;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      letter-spacing: 5px;
+      text-transform: uppercase;
+    }
+
+    .sc-choice-heading h1 {
+      margin: 0;
+      font-size: clamp(34px, 4vw, 64px);
+      font-weight: 500;
+      letter-spacing: 7px;
+      text-shadow:
+        0 0 18px rgba(210, 174, 92, 0.22);
+    }
+
+    .sc-choice-heading p {
+      margin: 14px auto 0;
+      max-width: 620px;
+      color: #a9a59d;
+      font-family: Arial, sans-serif;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .sc-path-card {
+      position: absolute;
+      top: 9%;
+      width: min(390px, 38vw);
+      min-height: 360px;
+      padding: 34px 30px 30px;
+      z-index: 6;
+      cursor: pointer;
+      text-align: center;
+      border: 1px solid rgba(202, 169, 97, 0.42);
+      background:
+        linear-gradient(
+          180deg,
+          rgba(18, 24, 25, 0.95),
+          rgba(4, 8, 10, 0.96)
+        );
+      box-shadow:
+        0 24px 60px rgba(0, 0, 0, 0.55),
+        inset 0 0 45px rgba(204, 163, 82, 0.035);
+      transition:
+        transform 180ms ease,
+        border-color 180ms ease,
+        box-shadow 180ms ease,
+        filter 180ms ease;
+    }
+
+    .sc-path-card[data-layout="top-left"] {
+      left: 9%;
+    }
+
+    .sc-path-card[data-layout="top-right"] {
+      right: 9%;
+    }
+
+    .sc-path-card:not(.sc-path-locked):hover {
+      transform: translateY(-7px);
+      border-color: rgba(231, 194, 110, 0.88);
+      box-shadow:
+        0 28px 75px rgba(0, 0, 0, 0.7),
+        0 0 24px rgba(205, 168, 83, 0.12),
+        inset 0 0 55px rgba(204, 163, 82, 0.06);
+    }
+
+    .sc-path-inheritance {
+      border-color: rgba(199, 171, 94, 0.62);
+    }
+
+    .sc-path-shadow {
+      border-color: rgba(124, 55, 61, 0.66);
+    }
+
+    .sc-path-locked {
+      filter: grayscale(0.85) brightness(0.58);
+      cursor: not-allowed;
+    }
+
+    .sc-path-symbol {
+      display: flex;
+      width: 88px;
+      height: 88px;
+      margin: 0 auto 23px;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(214, 181, 103, 0.45);
+      border-radius: 50%;
+      color: #dbb963;
+      font-size: 42px;
+      box-shadow:
+        inset 0 0 28px rgba(190, 153, 72, 0.09),
+        0 0 28px rgba(189, 150, 65, 0.08);
+    }
+
+    .sc-path-shadow .sc-path-symbol {
+      color: #a74a53;
+      border-color: rgba(137, 49, 58, 0.55);
+    }
+
+    .sc-path-eyebrow {
+      color: #86744f;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .sc-path-title {
+      margin: 9px 0 3px;
+      color: #eee3c8;
+      font-size: clamp(23px, 2vw, 32px);
+      font-weight: 500;
+      letter-spacing: 2px;
+    }
+
+    .sc-path-subtitle {
+      color: #b59655;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .sc-path-description {
+      max-width: 290px;
+      margin: 19px auto 23px;
+      color: #989794;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .sc-path-action {
+      display: inline-block;
+      min-width: 170px;
+      padding: 11px 20px;
+      border: 1px solid rgba(206, 170, 88, 0.48);
+      color: #d5b565;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .sc-path-locked .sc-path-action {
+      border-color: rgba(143, 83, 88, 0.4);
+      color: #8e7779;
+    }
+
+    .sc-chain {
+      position: absolute;
+      color: rgba(137, 137, 137, 0.55);
+      font-family: Arial, sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -9px;
+      pointer-events: none;
+    }
+
+    .sc-chain-a {
+      left: 9%;
+      top: 12%;
+      transform: rotate(-28deg);
+    }
+
+    .sc-chain-b {
+      right: 10%;
+      bottom: 14%;
+      transform: rotate(29deg);
+    }
+
+    .sc-choice-close {
+      position: absolute;
+      top: 22px;
+      right: 28px;
+      z-index: 20;
+      width: 42px;
+      height: 42px;
+      cursor: pointer;
+      border: 1px solid rgba(196, 166, 99, 0.32);
+      background: rgba(3, 6, 8, 0.74);
+      color: #bca46e;
+      font-size: 19px;
+    }
+
+    .sc-choice-message {
+      position: absolute;
+      left: 50%;
+      bottom: 8%;
+      z-index: 20;
+      transform: translateX(-50%);
+      min-width: 280px;
+      max-width: 72vw;
+      padding: 12px 20px;
+      opacity: 0;
+      border: 1px solid rgba(156, 89, 92, 0.42);
+      background: rgba(9, 5, 6, 0.94);
+      color: #c8a8aa;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      text-align: center;
+      transition: opacity 160ms ease;
+      pointer-events: none;
+    }
+
+    .sc-choice-message.show {
+      opacity: 1;
+    }
+
+    .sc-panel {
+      position: absolute;
+      inset: 7% 9%;
+      z-index: 8;
+      overflow: auto;
+      padding: 34px;
+      border: 1px solid rgba(204, 167, 83, 0.35);
+      background:
+        linear-gradient(
+          180deg,
+          rgba(12, 17, 19, 0.97),
+          rgba(3, 6, 8, 0.98)
+        );
+      box-shadow:
+        0 25px 90px rgba(0, 0, 0, 0.8);
+    }
+
+    .sc-panel-header {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+
+    .sc-panel-eyebrow {
+      color: #8a744a;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+    }
+
+    .sc-panel-title {
+      margin: 8px 0;
+      color: #eadfca;
+      font-size: 34px;
+      font-weight: 500;
+      letter-spacing: 3px;
+    }
+
+    .sc-panel-subtitle {
+      color: #9c9a94;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+    }
+
+    .sc-inheritance-grid {
+      display: grid;
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .sc-inheritance-category {
+      min-height: 190px;
+      padding: 18px;
+      border: 1px solid rgba(172, 143, 74, 0.28);
+      background: rgba(255, 255, 255, 0.018);
+    }
+
+    .sc-inheritance-category h3 {
+      margin: 0 0 5px;
+      color: #d1b267;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .sc-inheritance-limit {
+      margin-bottom: 13px;
+      color: #777a78;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+    }
+
+    .sc-inheritance-empty {
+      padding: 20px 5px;
+      color: #626764;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      font-style: italic;
+    }
+
+    .sc-inheritance-option {
+      display: flex;
+      width: 100%;
+      margin-bottom: 7px;
+      padding: 9px 10px;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      border: 1px solid rgba(116, 113, 101, 0.24);
+      background: rgba(0, 0, 0, 0.18);
+      color: #aaa8a1;
+      font-family: Arial, sans-serif;
+      font-size: 11px;
+      text-align: left;
+    }
+
+    .sc-inheritance-option.selected {
+      border-color: rgba(205, 171, 86, 0.72);
+      background: rgba(184, 142, 54, 0.09);
+      color: #e0c47c;
+    }
+
+    .sc-panel-footer {
+      display: flex;
+      margin-top: 26px;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .sc-ui-button {
+      min-width: 180px;
+      padding: 12px 22px;
+      cursor: pointer;
+      border: 1px solid rgba(198, 165, 86, 0.5);
+      background: rgba(18, 17, 12, 0.86);
+      color: #d4b464;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .sc-ui-button:hover {
+      border-color: rgba(229, 195, 111, 0.9);
+    }
+
+    .sc-ui-button.secondary {
+      border-color: rgba(124, 125, 119, 0.32);
+      color: #92938e;
+    }
+
+    .sc-confirm-lines {
+      width: min(650px, 90%);
+      margin: 28px auto;
+      padding: 20px 28px;
+      border-top: 1px solid rgba(182, 149, 72, 0.24);
+      border-bottom: 1px solid rgba(182, 149, 72, 0.24);
+    }
+
+    .sc-confirm-line {
+      margin: 10px 0;
+      color: #aaa8a0;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .sc-execution-warning {
+      margin: 18px auto 0;
+      color: #76684e;
+      font-family: Arial, sans-serif;
+      font-size: 10px;
+      letter-spacing: 1px;
+      text-align: center;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 850px) {
+
+      .sc-path-card {
+        width: 42vw;
+        min-height: 330px;
+        padding: 25px 18px;
+      }
+
+      .sc-path-card[data-layout="top-left"] {
+        left: 4%;
+      }
+
+      .sc-path-card[data-layout="top-right"] {
+        right: 4%;
+      }
+
+      .sc-inheritance-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// GET COMPLETION UI ROOT
+// =========================================================
+
+function getCompletionFlowUIRoot() {
+
+
+  return document.getElementById(
+    COMPLETION_FLOW_UI_ID
+  );
+
+}
+
+
+// =========================================================
+// CLOSE COMPLETION FLOW UI
+// =========================================================
+
+function closeCompletionFlowUI() {
+
+
+  const existing =
+    getCompletionFlowUIRoot();
+
+
+  if (existing) {
+
+
+    existing.remove();
+
+  }
+
+
+  clearCompletionFlowSession();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// CREATE COMPLETION UI ROOT
+// =========================================================
+
+function createCompletionFlowUIRoot() {
+
+
+  installCompletionFlowStyles();
+
+
+  const existing =
+    getCompletionFlowUIRoot();
+
+
+  if (existing) {
+
+
+    existing.remove();
+
+  }
+
+
+  const root =
+    document.createElement(
+      "div"
+    );
+
+
+  root.id =
+    COMPLETION_FLOW_UI_ID;
+
+
+  document.body.appendChild(
+    root
+  );
+
+
+  return root;
+
+}
+
+
+// =========================================================
+// UI MESSAGE
+// =========================================================
+
+function showCompletionFlowMessage(
+  message
+) {
+
+
+  const root =
+    getCompletionFlowUIRoot();
+
+
+  if (!root) {
+
+    return;
+
+  }
+
+
+  const box =
+    root.querySelector(
+      ".sc-choice-message"
+    );
+
+
+  if (!box) {
+
+    return;
+
+  }
+
+
+  box.textContent =
+    message;
+
+
+  box.classList.add(
+    "show"
+  );
+
+
+  window.setTimeout(
+    () => {
+
+
+      box.classList.remove(
+        "show"
+      );
+
+    },
+    2200
+  );
+
+}
+
+
+// =========================================================
+// BRICK 76 — CLICKABLE COMPLETION FLOW
+// =========================================================
+
+
+// =========================================================
+// RENDER PATH CARD
+// =========================================================
+
+function renderCompletionPathCard(
+  path
+) {
+
+
+  const locked =
+    path.locked ===
+    true;
+
+
+  const isInheritance =
+    path.id ===
+    "kage_inheritance";
+
+
+  const symbol =
+    isInheritance
+      ? "◉"
+      : "☾";
+
+
+  const chainMarkup =
+    path.chainVisible ===
+      true
+
+      ? `
+          <span class="sc-chain sc-chain-a">⚬⚬⚬⚬⚬</span>
+          <span class="sc-chain sc-chain-b">⚬⚬⚬⚬⚬</span>
+        `
+
+      : "";
+
+
+  return `
+
+    <button
+      type="button"
+      class="
+        sc-path-card
+        ${isInheritance
+          ? "sc-path-inheritance"
+          : "sc-path-shadow"}
+        ${locked
+          ? "sc-path-locked"
+          : ""}
+      "
+      data-path-id="${escapeCompletionHtml(path.id)}"
+      data-layout="${escapeCompletionHtml(path.layoutSlot)}"
+      aria-disabled="${locked ? "true" : "false"}"
+    >
+
+      ${chainMarkup}
+
+      <div class="sc-path-symbol">
+        ${symbol}
+      </div>
+
+      <div class="sc-path-eyebrow">
+        ${isInheritance
+          ? "Legacy"
+          : "Forbidden Path"}
+      </div>
+
+      <div class="sc-path-title">
+        ${escapeCompletionHtml(path.title)}
+      </div>
+
+      <div class="sc-path-subtitle">
+        ${escapeCompletionHtml(path.subtitle)}
+      </div>
+
+      <div class="sc-path-description">
+        ${escapeCompletionHtml(path.description)}
+      </div>
+
+      <div class="sc-path-action">
+        ${escapeCompletionHtml(path.actionLabel)}
+      </div>
+
+    </button>
+
+  `;
+
+}
+
+
+// =========================================================
+// RENDER PATH SELECTION
+// =========================================================
+
+function renderCompletionPathSelectionUI() {
+
+
+  const root =
+    getCompletionFlowUIRoot();
+
+
+  const session =
+    getCompletionFlowSession();
+
+
+  if (
+    !root ||
+    !session ||
+    session.active !==
+      true
+  ) {
+
+
+    return false;
+
+  }
+
+
+  root.innerHTML = `
+
+    <div class="sc-choice-stage">
+
+      <button
+        type="button"
+        class="sc-choice-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      ${session.paths
+        .map(
+          path =>
+            renderCompletionPathCard(
+              path
+            )
+        )
+        .join("")}
+
+      <div class="sc-choice-heading">
+
+        <div class="sc-choice-heading-small">
+          Kage Path Complete
+        </div>
+
+        <h1>
+          NOW, CHOOSE...
+        </h1>
+
+        <p>
+          Every shinobi reaches a point where the road divides.
+          What you choose now will shape what comes after.
+        </p>
+
+      </div>
+
+      <div class="sc-choice-message"></div>
+
+      <div class="sc-choice-vignette"></div>
+
+    </div>
+
+  `;
+
+
+  const closeButton =
+    root.querySelector(
+      ".sc-choice-close"
+    );
+
+
+  closeButton.addEventListener(
+    "click",
+    closeCompletionFlowUI
+  );
+
+
+  root
+    .querySelectorAll(
+      ".sc-path-card"
+    )
+    .forEach(
+      card => {
+
+
+        card.addEventListener(
+          "click",
+          () => {
+
+
+            const pathId =
+              card.dataset.pathId;
+
+
+            const path =
+              session.paths.find(
+                entry =>
+                  entry.id ===
+                  pathId
+              );
+
+
+            if (!path) {
+
+              return;
+
+            }
+
+
+            if (
+              path.locked ===
+              true
+            ) {
+
+
+              showCompletionFlowMessage(
+                path.requiresPremium
+                  ? "This path requires premium access."
+                  : "This path is currently locked."
+              );
+
+
+              return;
+
+            }
+
+
+            const result =
+              selectCompletionFlowPath(
+                pathId
+              );
+
+
+            if (
+              !result ||
+              result.success !==
+                true
+            ) {
+
+
+              showCompletionFlowMessage(
+                result &&
+                result.reason
+
+                  ? result.reason
+
+                  : "Path could not be selected."
+              );
+
+
+              return;
+
+            }
+
+
+            if (
+              result.stage ===
+                "inheritance_selection"
+            ) {
+
+
+              renderCompletionInheritanceUI();
+
+
+              return;
+
+            }
+
+
+            renderCompletionConfirmationUI();
+
+          }
+        );
+
+      }
+    );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// GET CURRENT UI INHERITANCE SELECTION
+// =========================================================
+
+function getCompletionUIInheritanceSelection() {
+
+
+  const session =
+    getCompletionFlowSession();
+
+
+  if (
+    !session ||
+    !session.inheritanceSelection
+  ) {
+
+
+    return createEmptyInheritanceSelection();
+
+  }
+
+
+  return normalizeInheritanceSelection(
+    session.inheritanceSelection
+  );
+
+}
+
+
+// =========================================================
+// TOGGLE INHERITANCE UI OPTION
+// =========================================================
+
+function toggleCompletionInheritanceOption(
+  categoryId,
+  candidateId
+) {
+
+
+  const payload =
+    getActiveCompletionInheritancePayload();
+
+
+  if (
+    !payload ||
+    payload.valid !==
+      true
+  ) {
+
+
+    return false;
+
+  }
+
+
+  const category =
+    payload.categories.find(
+      entry =>
+        entry.id ===
+        categoryId
+    );
+
+
+  if (!category) {
+
+    return false;
+
+  }
+
+
+  const selection =
+    getCompletionUIInheritanceSelection();
+
+
+  const selected =
+    Array.isArray(
+      selection[
+        categoryId
+      ]
+    )
+      ? [
+          ...selection[
+            categoryId
+          ]
+        ]
+      : [];
+
+
+  const existingIndex =
+    selected.indexOf(
+      candidateId
+    );
+
+
+  if (
+    existingIndex >=
+      0
+  ) {
+
+
+    selected.splice(
+      existingIndex,
+      1
+    );
+
+  }
+  else {
+
+
+    if (
+      selected.length >=
+        category.limit
+    ) {
+
+
+      showCompletionFlowMessage(
+        `${category.name}: maximum ${category.limit}.`
+      );
+
+
+      return false;
+
+    }
+
+
+    selected.push(
+      candidateId
+    );
+
+  }
+
+
+  selection[
+    categoryId
+  ] =
+    selected;
+
+
+  completionFlowSession
+    .inheritanceSelection =
+      selection;
+
+
+  renderCompletionInheritanceUI();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// RENDER INHERITANCE CATEGORY
+// =========================================================
+
+function renderCompletionInheritanceCategory(
+  category,
+  selection
+) {
+
+
+  const selected =
+    selection[
+      category.id
+    ] || [];
+
+
+  const candidatesMarkup =
+    category.candidates.length ===
+      0
+
+      ? `
+          <div class="sc-inheritance-empty">
+            Nothing owned in this category yet.
+          </div>
+        `
+
+      : category.candidates
+          .map(
+            candidate => {
+
+
+              const candidateId =
+                candidate.key ||
+                candidate.id;
+
+
+              const isSelected =
+                selected.includes(
+                  candidateId
+                );
+
+
+              return `
+
+                <button
+                  type="button"
+                  class="
+                    sc-inheritance-option
+                    ${isSelected
+                      ? "selected"
+                      : ""}
+                  "
+                  data-category-id="${escapeCompletionHtml(category.id)}"
+                  data-candidate-id="${escapeCompletionHtml(candidateId)}"
+                >
+
+                  <span>
+                    ${escapeCompletionHtml(candidate.name)}
+                  </span>
+
+                  <span>
+                    ${isSelected
+                      ? "✓"
+                      : "+"}
+                  </span>
+
+                </button>
+
+              `;
+
+            }
+          )
+          .join("");
+
+
+  return `
+
+    <section class="sc-inheritance-category">
+
+      <h3>
+        ${escapeCompletionHtml(category.name)}
+      </h3>
+
+      <div class="sc-inheritance-limit">
+        Choose up to
+        ${category.limit}
+        · Selected
+        ${selected.length}/${category.limit}
+      </div>
+
+      ${candidatesMarkup}
+
+    </section>
+
+  `;
+
+}
+
+
+// =========================================================
+// RENDER INHERITANCE SCREEN
+// =========================================================
+
+function renderCompletionInheritanceUI() {
+
+
+  const root =
+    getCompletionFlowUIRoot();
+
+
+  const payload =
+    getActiveCompletionInheritancePayload();
+
+
+  if (
+    !root ||
+    !payload ||
+    payload.valid !==
+      true
+  ) {
+
+
+    return false;
+
+  }
+
+
+  const selection =
+    getCompletionUIInheritanceSelection();
+
+
+  root.innerHTML = `
+
+    <div class="sc-panel">
+
+      <button
+        type="button"
+        class="sc-choice-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <div class="sc-panel-header">
+
+        <div class="sc-panel-eyebrow">
+          Inheritance
+        </div>
+
+        <div class="sc-panel-title">
+          ${escapeCompletionHtml(payload.title)}
+        </div>
+
+        <div class="sc-panel-subtitle">
+          ${escapeCompletionHtml(payload.subtitle)}
+        </div>
+
+      </div>
+
+      <div class="sc-inheritance-grid">
+
+        ${payload.categories
+          .map(
+            category =>
+              renderCompletionInheritanceCategory(
+                category,
+                selection
+              )
+          )
+          .join("")}
+
+      </div>
+
+      <div class="sc-panel-footer">
+
+        <button
+          type="button"
+          class="sc-ui-button secondary"
+          data-action="back"
+        >
+          GO BACK
+        </button>
+
+        <button
+          type="button"
+          class="sc-ui-button"
+          data-action="continue"
+        >
+          CONTINUE
+        </button>
+
+      </div>
+
+      <div class="sc-choice-message"></div>
+
+    </div>
+
+  `;
+
+
+  root
+    .querySelector(
+      ".sc-choice-close"
+    )
+    .addEventListener(
+      "click",
+      closeCompletionFlowUI
+    );
+
+
+  root
+    .querySelector(
+      '[data-action="back"]'
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+
+        completionFlowSession.stage =
+          "path_selection";
+
+
+        completionFlowSession
+          .selectedPathId =
+            null;
+
+
+        completionFlowSession
+          .selectedPath =
+            null;
+
+
+        completionFlowSession
+          .inheritanceSelection =
+            createEmptyInheritanceSelection();
+
+
+        renderCompletionPathSelectionUI();
+
+      }
+    );
+
+
+  root
+    .querySelector(
+      '[data-action="continue"]'
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+
+        const result =
+          setCompletionInheritanceSelection(
+            getCompletionUIInheritanceSelection()
+          );
+
+
+        if (
+          !result ||
+          result.success !==
+            true
+        ) {
+
+
+          showCompletionFlowMessage(
+            result &&
+            result.reason
+
+              ? result.reason
+
+              : "Inheritance selection is invalid."
+          );
+
+
+          return;
+
+        }
+
+
+        renderCompletionConfirmationUI();
+
+      }
+    );
+
+
+  root
+    .querySelectorAll(
+      ".sc-inheritance-option"
+    )
+    .forEach(
+      button => {
+
+
+        button.addEventListener(
+          "click",
+          () => {
+
+
+            toggleCompletionInheritanceOption(
+              button.dataset.categoryId,
+              button.dataset.candidateId
+            );
+
+          }
+        );
+
+      }
+    );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// RENDER CONFIRMATION SCREEN
+// =========================================================
+
+function renderCompletionConfirmationUI() {
+
+
+  const root =
+    getCompletionFlowUIRoot();
+
+
+  const confirmation =
+    getActiveCompletionConfirmation();
+
+
+  if (
+    !root ||
+    !confirmation ||
+    confirmation.valid !==
+      true
+  ) {
+
+
+    return false;
+
+  }
+
+
+  root.innerHTML = `
+
+    <div class="sc-panel">
+
+      <button
+        type="button"
+        class="sc-choice-close"
+        aria-label="Close"
+      >
+        ×
+      </button>
+
+      <div class="sc-panel-header">
+
+        <div class="sc-panel-eyebrow">
+          Final Decision
+        </div>
+
+        <div class="sc-panel-title">
+          ${escapeCompletionHtml(confirmation.warningTitle)}
+        </div>
+
+        <div class="sc-panel-subtitle">
+          ${escapeCompletionHtml(confirmation.targetDifficultyName)}
+        </div>
+
+      </div>
+
+      <div class="sc-confirm-lines">
+
+        ${confirmation.warningLines
+          .map(
+            line =>
+              `
+                <div class="sc-confirm-line">
+                  ${escapeCompletionHtml(line)}
+                </div>
+              `
+          )
+          .join("")}
+
+      </div>
+
+      <div class="sc-execution-warning">
+        Transition execution will be connected in the next brick.
+        This button is currently safe.
+      </div>
+
+      <div class="sc-panel-footer">
+
+        <button
+          type="button"
+          class="sc-ui-button secondary"
+          data-action="back"
+        >
+          ${escapeCompletionHtml(confirmation.cancelLabel)}
+        </button>
+
+        <button
+          type="button"
+          class="sc-ui-button"
+          data-action="confirm"
+        >
+          ${escapeCompletionHtml(confirmation.confirmLabel)}
+        </button>
+
+      </div>
+
+      <div class="sc-choice-message"></div>
+
+    </div>
+
+  `;
+
+
+  root
+    .querySelector(
+      ".sc-choice-close"
+    )
+    .addEventListener(
+      "click",
+      closeCompletionFlowUI
+    );
+
+
+  root
+    .querySelector(
+      '[data-action="back"]'
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+
+        if (
+          completionFlowSession &&
+          completionFlowSession
+            .selectedPath &&
+          completionFlowSession
+            .selectedPath
+            .requiresInheritance ===
+              true
+        ) {
+
+
+          completionFlowSession.stage =
+            "inheritance_selection";
+
+
+          renderCompletionInheritanceUI();
+
+
+          return;
+
+        }
+
+
+        completionFlowSession.stage =
+          "path_selection";
+
+
+        renderCompletionPathSelectionUI();
+
+      }
+    );
+
+
+  root
+    .querySelector(
+      '[data-action="confirm"]'
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+
+        showCompletionFlowMessage(
+          "Safe preview only — transition execution arrives next."
+        );
+
+      }
+    );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// OPEN LIVE COMPLETION FLOW UI
+// =========================================================
+
+function openCompletionFlowUI(
+  options = {}
+) {
+
+
+  const session =
+    beginCompletionFlow(
+      getCurrentRunState(),
+      options
+    );
+
+
+  const root =
+    createCompletionFlowUIRoot();
+
+
+  if (
+    !session ||
+    session.active !==
+      true
+  ) {
+
+
+    root.innerHTML = `
+
+      <div class="sc-panel">
+
+        <button
+          type="button"
+          class="sc-choice-close"
+        >
+          ×
+        </button>
+
+        <div class="sc-panel-header">
+
+          <div class="sc-panel-eyebrow">
+            Shinobi Progression
+          </div>
+
+          <div class="sc-panel-title">
+            Path Unavailable
+          </div>
+
+          <div class="sc-panel-subtitle">
+            ${escapeCompletionHtml(
+              session &&
+              session.reason
+
+                ? session.reason
+
+                : "Completion flow is unavailable."
+            )}
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    root
+      .querySelector(
+        ".sc-choice-close"
+      )
+      .addEventListener(
+        "click",
+        closeCompletionFlowUI
+      );
+
+
+    return session;
+
+  }
+
+
+  renderCompletionPathSelectionUI();
+
+
+  return session;
+
+}
+
+
+// =========================================================
+// BRICK 77 — SAFE KAGE UI PREVIEW + DIAGNOSTICS
+// =========================================================
+//
+// Lets us visually test the Kage completion screen without
+// changing the player's real Academy save.
+//
+// Usage:
+//
+// openKageCompletionPreview(false)
+//     -> premium locked
+//
+// openKageCompletionPreview(true)
+//     -> premium owned
+//
+// =========================================================
+
+function createKageCompletionPreviewState() {
+
+
+  const liveState =
+    getCurrentRunState();
+
+
+  return {
+
+    valid:
+      true,
+
+    currentDifficultyId:
+      "kage",
+
+    currentDifficultyName:
+      "Kage",
+
+    currentDifficultyOrder:
+      6,
+
+    highestDifficultyUnlockedId:
+      "akatsuki",
+
+    highestDifficultyUnlockedName:
+      "Akatsuki",
+
+    highestDifficultyUnlockedOrder:
+      7,
+
+    legacyCycle:
+      liveState &&
+      liveState.valid ===
+        true
+
+        ? liveState.legacyCycle
+
+        : 0,
+
+    runCompleted:
+      true,
+
+    completedDifficulties: [
+      "academy",
+      "genin",
+      "chunin",
+      "special_jonin",
+      "jonin",
+      "anbu",
+      "kage"
+    ],
+
+    premiumDifficulty:
+      false
+
+  };
+
+}
+
+
+// =========================================================
+// OPEN SAFE KAGE COMPLETION PREVIEW
+// =========================================================
+
+function openKageCompletionPreview(
+  hasPremiumAccess = false
+) {
+
+
+  const playerSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const session =
+    beginCompletionFlow(
+      createKageCompletionPreviewState(),
+      {
+        hasPremiumAccess:
+          hasPremiumAccess ===
+          true
+      }
+    );
+
+
+  createCompletionFlowUIRoot();
+
+
+  renderCompletionPathSelectionUI();
+
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  if (
+    JSON.stringify(
+      playerSnapshot
+    ) !==
+    JSON.stringify(
+      afterSnapshot
+    )
+  ) {
+
+
+    console.error(
+      "Kage UI preview attempted to modify player save."
+    );
+
+
+    closeCompletionFlowUI();
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Player save changed during preview."
+
+    };
+
+  }
+
+
+  return {
+
+    success:
+      true,
+
+    premiumAccess:
+      hasPremiumAccess ===
+        true,
+
+    session:
+      session
+
+  };
+
+}
+
+
+// =========================================================
+// COMPLETION UI DIAGNOSTICS
+// =========================================================
+
+function runCompletionUIDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — COMPLETION UI DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const playerSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const oldSession =
+    completionFlowSession;
+
+
+  // =========================================
+  // OPEN LOCKED KAGE PREVIEW
+  // =========================================
+
+  const preview =
+    openKageCompletionPreview(
+      false
+    );
+
+
+  results.push({
+
+    test:
+      "Kage completion UI opens",
+
+    pass:
+      !!(
+        preview &&
+        preview.success ===
+          true &&
+        getCompletionFlowUIRoot()
+      )
+
+  });
+
+
+  const root =
+    getCompletionFlowUIRoot();
+
+
+  const cards =
+    root
+      ? root.querySelectorAll(
+          ".sc-path-card"
+        )
+      : [];
+
+
+  results.push({
+
+    test:
+      "Kage UI renders exactly two paths",
+
+    pass:
+      cards.length ===
+      2
+
+  });
+
+
+  const leftCard =
+    root
+      ? root.querySelector(
+          '[data-layout="top-left"]'
+        )
+      : null;
+
+
+  const rightCard =
+    root
+      ? root.querySelector(
+          '[data-layout="top-right"]'
+        )
+      : null;
+
+
+  results.push({
+
+    test:
+      "Inheritance path renders top-left",
+
+    pass:
+      !!leftCard
+
+  });
+
+
+  results.push({
+
+    test:
+      "Shadow path renders top-right",
+
+    pass:
+      !!rightCard
+
+  });
+
+
+  results.push({
+
+    test:
+      "Locked Shadow path is visually locked",
+
+    pass:
+      !!(
+        rightCard &&
+        rightCard.classList.contains(
+          "sc-path-locked"
+        )
+      )
+
+  });
+
+
+  // =========================================
+  // SELECT INHERITANCE THROUGH REAL UI HANDLER
+  // =========================================
+
+  if (leftCard) {
+
+
+    leftCard.click();
+
+  }
+
+
+  const inheritanceScreen =
+    getCompletionFlowUIRoot();
+
+
+  results.push({
+
+    test:
+      "Inheritance path click opens inheritance screen",
+
+    pass:
+      !!(
+        inheritanceScreen &&
+        inheritanceScreen.querySelector(
+          ".sc-inheritance-grid"
+        )
+      )
+
+  });
+
+
+  // =========================================
+  // CONTINUE TO CONFIRMATION
+  // =========================================
+
+  const continueButton =
+    inheritanceScreen
+      ? inheritanceScreen.querySelector(
+          '[data-action="continue"]'
+        )
+      : null;
+
+
+  if (continueButton) {
+
+
+    continueButton.click();
+
+  }
+
+
+  const confirmButton =
+    getCompletionFlowUIRoot()
+      ? getCompletionFlowUIRoot()
+          .querySelector(
+            '[data-action="confirm"]'
+          )
+      : null;
+
+
+  results.push({
+
+    test:
+      "Inheritance flow reaches confirmation screen",
+
+    pass:
+      !!confirmButton
+
+  });
+
+
+  // =========================================
+  // SAVE SAFETY
+  // =========================================
+
+  const afterSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Completion UI never modifies player save",
+
+    pass:
+      JSON.stringify(
+        playerSnapshot
+      ) ===
+      JSON.stringify(
+        afterSnapshot
+      )
+
+  });
+
+
+  // =========================================
+  // CLEAN UP
+  // =========================================
+
+  const rootToRemove =
+    getCompletionFlowUIRoot();
+
+
+  if (rootToRemove) {
+
+
+    rootToRemove.remove();
+
+  }
+
+
+  completionFlowSession =
+    oldSession;
+
+
+  // =========================================
+  // RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ COMPLETION UI PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ COMPLETION UI HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
 // WEAPON CLASS DIFFICULTY
 // =========================================================
 //
