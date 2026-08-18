@@ -22407,10 +22407,6 @@ function runCompletionUIDiagnostics() {
   });
 
 
-  // =========================================
-  // SELECT INHERITANCE THROUGH REAL UI HANDLER
-  // =========================================
-
   if (leftCard) {
 
 
@@ -22438,10 +22434,6 @@ function runCompletionUIDiagnostics() {
 
   });
 
-
-  // =========================================
-  // CONTINUE TO CONFIRMATION
-  // =========================================
 
   const continueButton =
     inheritanceScreen
@@ -22479,10 +22471,6 @@ function runCompletionUIDiagnostics() {
   });
 
 
-  // =========================================
-  // SAVE SAFETY
-  // =========================================
-
   const afterSnapshot =
     createRunTransitionSnapshot();
 
@@ -22503,10 +22491,6 @@ function runCompletionUIDiagnostics() {
   });
 
 
-  // =========================================
-  // CLEAN UP
-  // =========================================
-
   const rootToRemove =
     getCompletionFlowUIRoot();
 
@@ -22522,10 +22506,6 @@ function runCompletionUIDiagnostics() {
   completionFlowSession =
     oldSession;
 
-
-  // =========================================
-  // RESULTS
-  // =========================================
 
   console.table(
     results
@@ -22577,6 +22557,1734 @@ function runCompletionUIDiagnostics() {
 
 }
 
+
+// =========================================================
+// BRICK 78 — ATOMIC KAGE LEGACY REBIRTH
+// =========================================================
+//
+// Kage -> Academy Student
+// Legacy Cycle +1
+//
+// Uses SELECTIVE inheritance.
+//
+// This is intentionally separate from the old
+// Jinchuriki Legacy transition.
+//
+// =========================================================
+
+
+// =========================================================
+// VALIDATE EXPLICIT INHERITANCE LIMITS
+// =========================================================
+
+function validateInheritanceAgainstLimits(
+  selection,
+  limits
+) {
+
+
+  const normalized =
+    normalizeInheritanceSelection(
+      selection
+    );
+
+
+  const errors =
+    [];
+
+
+  const categories = [
+
+    "specialNinja",
+    "bloodlines",
+    "legendaryWeapons",
+    "basicItems"
+
+  ];
+
+
+  categories.forEach(
+    category => {
+
+
+      const selected =
+        normalized[
+          category
+        ] || [];
+
+
+      const limit =
+        Math.max(
+          0,
+          Number(
+            limits[
+              category
+            ]
+          ) || 0
+        );
+
+
+      if (
+        selected.length >
+        limit
+      ) {
+
+
+        errors.push(
+          `${category}: selected ${selected.length}, maximum ${limit}.`
+        );
+
+      }
+
+    }
+  );
+
+
+  return {
+
+    valid:
+      errors.length ===
+      0,
+
+    reason:
+      errors.length ===
+        0
+
+        ? null
+
+        : "Inheritance limits exceeded.",
+
+    errors:
+      errors,
+
+    selection:
+      normalized,
+
+    limits: {
+
+      ...limits
+
+    }
+
+  };
+
+}
+
+
+// =========================================================
+// BUILD KAGE LEGACY INHERITED PACKAGE
+// =========================================================
+
+function buildKageLegacyInheritedPackage(
+  selection = {}
+) {
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Current run state is invalid."
+
+    };
+
+  }
+
+
+  if (
+    runState.currentDifficultyId !==
+      "kage"
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Legacy rebirth requires Kage difficulty."
+
+    };
+
+  }
+
+
+  if (
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Kage run must be complete before Legacy rebirth."
+
+    };
+
+  }
+
+
+  const limitValidation =
+    validateInheritanceAgainstLimits(
+      selection,
+      LEGACY_REBIRTH_INHERITANCE_LIMITS
+    );
+
+
+  if (
+    limitValidation.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        limitValidation.reason,
+
+      errors:
+        limitValidation.errors
+
+    };
+
+  }
+
+
+  const normalized =
+    limitValidation.selection;
+
+
+  // =========================================
+  // OWNERSHIP RESOLUTION
+  // =========================================
+
+  const inventoryResolution =
+    resolveInventoryInheritanceSelection(
+      normalized
+    );
+
+
+  const specialNinjaResolution =
+    resolveCollectionInheritanceSelection(
+      "specialNinja",
+      normalized.specialNinja
+    );
+
+
+  const bloodlineResolution =
+    resolveCollectionInheritanceSelection(
+      "bloodlines",
+      normalized.bloodlines
+    );
+
+
+  const errors = [
+
+    ...inventoryResolution.errors,
+    ...specialNinjaResolution.errors,
+    ...bloodlineResolution.errors
+
+  ];
+
+
+  if (
+    errors.length >
+      0
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "One or more inherited selections are not owned.",
+
+      errors:
+        errors
+
+    };
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    transitionType:
+      "difficulty",
+
+    routeType:
+      "legacy_rebirth",
+
+    fromDifficultyId:
+      "kage",
+
+    targetDifficultyId:
+      "academy",
+
+    targetLegacyCycle:
+      runState.legacyCycle +
+      1,
+
+    carryover: {
+
+      specialNinja:
+        specialNinjaResolution
+          .resolved,
+
+      bloodlines:
+        bloodlineResolution
+          .resolved,
+
+      legendaryWeapons:
+        inventoryResolution
+          .resolved
+          .legendaryWeapons,
+
+      basicItems:
+        inventoryResolution
+          .resolved
+          .basicItems
+
+    },
+
+    limits: {
+
+      ...LEGACY_REBIRTH_INHERITANCE_LIMITS
+
+    }
+
+  };
+
+}
+
+
+// =========================================================
+// BUILD KAGE LEGACY PLAYER STATE
+// =========================================================
+
+function buildKageLegacyPlayerState(
+  inheritedPackage
+) {
+
+
+  if (
+    !inheritedPackage ||
+    inheritedPackage.valid !==
+      true ||
+    inheritedPackage.routeType !==
+      "legacy_rebirth"
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "Invalid Kage Legacy inheritance package."
+
+    };
+
+  }
+
+
+  const carryover =
+    inheritedPackage.carryover ||
+    {};
+
+
+  const nextProgression = {
+
+    currentDifficulty:
+      "academy",
+
+    highestDifficultyUnlocked:
+      "academy",
+
+    legacyCycle:
+      Math.max(
+        0,
+        Number(
+          inheritedPackage
+            .targetLegacyCycle
+        ) || 0
+      ),
+
+    completedDifficulties:
+      [],
+
+    runCompleted:
+      false
+
+  };
+
+
+  const nextPlayerData = {
+
+    ryo:
+      0,
+
+    exp:
+      0,
+
+    inventory:
+      buildInheritedInventory(
+        carryover
+      ),
+
+    progression:
+      nextProgression,
+
+    characters:
+      createFreshRunCharacterProgression(),
+
+    collections:
+      buildNextRunCollections(
+        carryover
+      )
+
+  };
+
+
+  return {
+
+    valid:
+      true,
+
+    // applyNextRunPlayerState currently accepts
+    // difficulty wrappers.
+    transitionType:
+      "difficulty",
+
+    routeType:
+      "legacy_rebirth",
+
+    fromDifficultyId:
+      inheritedPackage
+        .fromDifficultyId,
+
+    targetDifficultyId:
+      "academy",
+
+    targetLegacyCycle:
+      inheritedPackage
+        .targetLegacyCycle,
+
+    playerData:
+      nextPlayerData
+
+  };
+
+}
+
+
+// =========================================================
+// EXECUTE ATOMIC KAGE LEGACY REBIRTH
+// =========================================================
+
+function executeAtomicKageLegacyRebirth(
+  selection = {},
+  options = {}
+) {
+
+
+  const inheritedPackage =
+    buildKageLegacyInheritedPackage(
+      selection
+    );
+
+
+  if (
+    !inheritedPackage ||
+    inheritedPackage.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      stage:
+        "inheritance",
+
+      reason:
+        inheritedPackage &&
+        inheritedPackage.reason
+
+          ? inheritedPackage.reason
+
+          : "Legacy inheritance package could not be built.",
+
+      errors:
+        inheritedPackage &&
+        Array.isArray(
+          inheritedPackage.errors
+        )
+
+          ? inheritedPackage.errors
+
+          : [],
+
+      rolledBack:
+        false
+
+    };
+
+  }
+
+
+  const nextRunState =
+    buildKageLegacyPlayerState(
+      inheritedPackage
+    );
+
+
+  if (
+    !nextRunState ||
+    nextRunState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      stage:
+        "build",
+
+      reason:
+        nextRunState &&
+        nextRunState.reason
+
+          ? nextRunState.reason
+
+          : "Legacy player state could not be built.",
+
+      rolledBack:
+        false
+
+    };
+
+  }
+
+
+  const snapshot =
+    createRunTransitionSnapshot();
+
+
+  let stage =
+    "snapshot";
+
+
+  try {
+
+
+    // =========================================
+    // APPLY
+    // =========================================
+
+    stage =
+      "apply";
+
+
+    const applicationResult =
+      applyNextRunPlayerState(
+        nextRunState
+      );
+
+
+    if (
+      !applicationResult ||
+      applicationResult.success !==
+        true
+    ) {
+
+
+      throw new Error(
+        applicationResult &&
+        applicationResult.reason
+
+          ? applicationResult.reason
+
+          : "Legacy player state could not be applied."
+      );
+
+    }
+
+
+    if (
+      options.simulateFailureStage ===
+        "afterApply"
+    ) {
+
+
+      throw new Error(
+        "Simulated Legacy rebirth failure after apply."
+      );
+
+    }
+
+
+    // =========================================
+    // RUNTIME SYNC
+    // =========================================
+
+    stage =
+      "runtimeSync";
+
+
+    const syncResult =
+      synchronizeNextRunRuntimeState();
+
+
+    if (
+      !syncResult ||
+      syncResult.success !==
+        true
+    ) {
+
+
+      throw new Error(
+        syncResult &&
+        syncResult.reason
+
+          ? syncResult.reason
+
+          : "Legacy runtime synchronization failed."
+      );
+
+    }
+
+
+    // =========================================
+    // VERIFY
+    // =========================================
+
+    stage =
+      "verification";
+
+
+    const verification =
+      verifyRuntimeMatchesPlayerData();
+
+
+    if (
+      !verification ||
+      verification.valid !==
+        true
+    ) {
+
+
+      const verificationErrors =
+        verification &&
+        Array.isArray(
+          verification.errors
+        )
+
+          ? verification.errors.join(
+              " | "
+            )
+
+          : "Unknown Legacy verification error.";
+
+
+      throw new Error(
+        `Legacy runtime verification failed: ${verificationErrors}`
+      );
+
+    }
+
+
+    // =========================================
+    // SAVE
+    // =========================================
+
+    stage =
+      "save";
+
+
+    savePlayerData();
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    console.log(
+      "KAGE LEGACY REBIRTH COMPLETE"
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    console.log(
+      "New Difficulty: Academy Student"
+    );
+
+
+    console.log(
+      "Legacy Cycle:",
+      playerData.progression
+        .legacyCycle
+    );
+
+
+    console.log(
+      "========================================"
+    );
+
+
+    return {
+
+      success:
+        true,
+
+      stage:
+        "complete",
+
+      routeType:
+        "legacy_rebirth",
+
+      fromDifficultyId:
+        "kage",
+
+      targetDifficultyId:
+        "academy",
+
+      targetLegacyCycle:
+        playerData.progression
+          .legacyCycle,
+
+      saved:
+        true,
+
+      runtimeSynchronized:
+        true,
+
+      rolledBack:
+        false
+
+    };
+
+  }
+  catch (error) {
+
+
+    console.error(
+      "Atomic Kage Legacy rebirth failed:",
+      error
+    );
+
+
+    console.warn(
+      "Attempting Legacy rebirth rollback..."
+    );
+
+
+    const rollbackSucceeded =
+      restoreRunTransitionSnapshot(
+        snapshot
+      );
+
+
+    if (rollbackSucceeded) {
+
+
+      console.warn(
+        "✅ LEGACY REBIRTH ROLLBACK COMPLETE"
+      );
+
+    }
+    else {
+
+
+      console.error(
+        "❌ LEGACY REBIRTH ROLLBACK FAILED"
+      );
+
+    }
+
+
+    return {
+
+      success:
+        false,
+
+      stage:
+        stage,
+
+      reason:
+        error instanceof Error
+          ? error.message
+          : String(
+              error
+            ),
+
+      rolledBack:
+        rollbackSucceeded ===
+          true
+
+    };
+
+  }
+
+}
+
+
+// =========================================================
+// BRICK 79 — COMPLETION ROUTE EXECUTOR
+// =========================================================
+//
+// One authoritative command for the player-facing UI.
+//
+// Routes:
+//
+// legacy_rebirth
+//     -> Kage -> Academy Legacy +1
+//
+// premium_difficulty
+//     -> existing atomic difficulty engine
+//
+// difficulty
+//     -> existing atomic difficulty engine
+//
+// =========================================================
+
+
+// =========================================================
+// IS COMPLETION SESSION REAL OR PREVIEW?
+// =========================================================
+
+function isCompletionFlowLiveSession() {
+
+
+  const session =
+    getCompletionFlowSession();
+
+
+  if (
+    !session ||
+    session.active !==
+      true ||
+    !session.runState
+  ) {
+
+
+    return false;
+
+  }
+
+
+  const liveRun =
+    getCurrentRunState();
+
+
+  if (
+    !liveRun ||
+    liveRun.valid !==
+      true
+  ) {
+
+
+    return false;
+
+  }
+
+
+  return (
+    session.runState
+      .currentDifficultyId ===
+        liveRun.currentDifficultyId &&
+
+    session.runState
+      .legacyCycle ===
+        liveRun.legacyCycle &&
+
+    session.runState
+      .runCompleted ===
+        liveRun.runCompleted
+  );
+
+}
+
+
+// =========================================================
+// EXECUTE ACTIVE COMPLETION CONFIRMATION
+// =========================================================
+
+function executeActiveCompletionConfirmation() {
+
+
+  const session =
+    getCompletionFlowSession();
+
+
+  if (
+    !session ||
+    session.active !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "No active completion flow exists."
+
+    };
+
+  }
+
+
+  if (
+    session.stage !==
+      "confirmation"
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Completion flow is not awaiting confirmation."
+
+    };
+
+  }
+
+
+  // =========================================
+  // PREVIEW SAFETY
+  // =========================================
+  //
+  // This is what prevents:
+  //
+  // openKageCompletionPreview(...)
+  //
+  // from ever changing the real Academy save.
+  //
+  // =========================================
+
+  if (
+    !isCompletionFlowLiveSession()
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      preview:
+        true,
+
+      reason:
+        "Preview mode only. No player save was changed."
+
+    };
+
+  }
+
+
+  const confirmation =
+    getActiveCompletionConfirmation();
+
+
+  if (
+    !confirmation ||
+    confirmation.valid !==
+      true ||
+    confirmation.executable !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        confirmation &&
+        confirmation.reason
+
+          ? confirmation.reason
+
+          : "Completion confirmation is invalid."
+
+    };
+
+  }
+
+
+  let result;
+
+
+  // =========================================
+  // KAGE LEGACY REBIRTH
+  // =========================================
+
+  if (
+    confirmation.routeType ===
+      "legacy_rebirth"
+  ) {
+
+
+    result =
+      executeAtomicKageLegacyRebirth(
+        confirmation.inheritanceSelection
+      );
+
+  }
+
+
+  // =========================================
+  // NORMAL / PREMIUM DIFFICULTY
+  // =========================================
+
+  else if (
+    confirmation.routeType ===
+      "difficulty" ||
+    confirmation.routeType ===
+      "premium_difficulty"
+  ) {
+
+
+    result =
+      executeAtomicNextRunDifficultyTransition(
+        confirmation.inheritanceSelection
+      );
+
+  }
+
+
+  else {
+
+
+    result = {
+
+      success:
+        false,
+
+      reason:
+        `Unsupported completion route: ${confirmation.routeType}`
+
+    };
+
+  }
+
+
+  if (
+    result &&
+    result.success ===
+      true
+  ) {
+
+
+    const root =
+      getCompletionFlowUIRoot();
+
+
+    if (root) {
+
+
+      root.remove();
+
+    }
+
+
+    clearCompletionFlowSession();
+
+  }
+
+
+  return result;
+
+}
+
+
+// =========================================================
+// BRICK 80 — CONFIRM BUTTON EXECUTION BRIDGE
+// =========================================================
+//
+// The confirmation UI from Brick 76 originally has a
+// deliberately harmless click handler.
+//
+// This capture-phase bridge intercepts the confirmation
+// click BEFORE that old preview handler.
+//
+// Preview screens remain harmless.
+//
+// Real completed runs execute the selected route.
+//
+// =========================================================
+
+let completionExecutionBridgeInstalled =
+  false;
+
+
+// =========================================================
+// HANDLE CONFIRMATION BUTTON CLICK
+// =========================================================
+
+function handleCompletionExecutionClick(
+  event
+) {
+
+
+  const target =
+    event.target.closest(
+      `#${COMPLETION_FLOW_UI_ID} [data-action="confirm"]`
+    );
+
+
+  if (!target) {
+
+
+    return;
+
+  }
+
+
+  event.preventDefault();
+
+
+  event.stopPropagation();
+
+
+  event.stopImmediatePropagation();
+
+
+  const result =
+    executeActiveCompletionConfirmation();
+
+
+  // =========================================
+  // PREVIEW
+  // =========================================
+
+  if (
+    result &&
+    result.preview ===
+      true
+  ) {
+
+
+    showCompletionFlowMessage(
+      "Safe preview only — your real save was not changed."
+    );
+
+
+    return;
+
+  }
+
+
+  // =========================================
+  // FAILURE
+  // =========================================
+
+  if (
+    !result ||
+    result.success !==
+      true
+  ) {
+
+
+    showCompletionFlowMessage(
+      result &&
+      result.reason
+
+        ? result.reason
+
+        : "Transition could not be completed."
+    );
+
+
+    return;
+
+  }
+
+
+  console.log(
+    "✅ PLAYER-FACING COMPLETION TRANSITION EXECUTED"
+  );
+
+}
+
+
+// =========================================================
+// INSTALL EXECUTION BRIDGE
+// =========================================================
+
+function installCompletionExecutionBridge() {
+
+
+  if (
+    completionExecutionBridgeInstalled
+  ) {
+
+
+    return true;
+
+  }
+
+
+  document.addEventListener(
+    "click",
+    handleCompletionExecutionClick,
+    true
+  );
+
+
+  completionExecutionBridgeInstalled =
+    true;
+
+
+  return true;
+
+}
+
+
+// Install once when game.js loads.
+
+installCompletionExecutionBridge();
+
+
+// =========================================================
+// BRICKS 78–80 DIAGNOSTICS
+// =========================================================
+
+function runCompletionExecutionDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — COMPLETION EXECUTION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const originalSession =
+    completionFlowSession;
+
+
+  try {
+
+
+    // =========================================
+    // CONTROLLED COMPLETED KAGE STATE
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "kage",
+
+      highestDifficultyUnlocked:
+        "akatsuki",
+
+      legacyCycle:
+        2,
+
+      completedDifficulties: [
+        "academy",
+        "genin",
+        "chunin",
+        "special_jonin",
+        "jonin",
+        "anbu",
+        "kage"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    // =========================================
+    // BUILD LEGACY PACKAGE
+    // =========================================
+
+    const legacyPackage =
+      buildKageLegacyInheritedPackage(
+        createEmptyInheritanceSelection()
+      );
+
+
+    results.push({
+
+      test:
+        "Kage Legacy inheritance package builds",
+
+      pass:
+        !!(
+          legacyPackage &&
+          legacyPackage.valid ===
+            true &&
+          legacyPackage.targetDifficultyId ===
+            "academy" &&
+          legacyPackage.targetLegacyCycle ===
+            3
+        )
+
+    });
+
+
+    const legacyState =
+      buildKageLegacyPlayerState(
+        legacyPackage
+      );
+
+
+    results.push({
+
+      test:
+        "Kage Legacy player state builds",
+
+      pass:
+        !!(
+          legacyState &&
+          legacyState.valid ===
+            true &&
+          legacyState.playerData
+            .progression
+            .currentDifficulty ===
+            "academy" &&
+          legacyState.playerData
+            .progression
+            .legacyCycle ===
+            3
+        )
+
+    });
+
+
+    // =========================================
+    // ATOMIC LEGACY EXECUTION
+    // =========================================
+
+    const legacyResult =
+      executeAtomicKageLegacyRebirth(
+        createEmptyInheritanceSelection()
+      );
+
+
+    results.push({
+
+      test:
+        "Atomic Kage Legacy rebirth succeeds",
+
+      pass:
+        !!(
+          legacyResult &&
+          legacyResult.success ===
+            true
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Legacy rebirth reaches Academy Cycle 3",
+
+      pass:
+        !!(
+          playerData.progression
+            .currentDifficulty ===
+            "academy" &&
+          playerData.progression
+            .highestDifficultyUnlocked ===
+            "academy" &&
+          playerData.progression
+            .legacyCycle ===
+            3 &&
+          playerData.progression
+            .runCompleted ===
+            false &&
+          Array.isArray(
+            playerData.progression
+              .completedDifficulties
+          ) &&
+          playerData.progression
+            .completedDifficulties
+            .length ===
+            0
+        )
+
+    });
+
+
+    const legacyRuntime =
+      verifyRuntimeMatchesPlayerData();
+
+
+    results.push({
+
+      test:
+        "Legacy rebirth runtime matches save",
+
+      pass:
+        !!(
+          legacyRuntime &&
+          legacyRuntime.valid ===
+            true
+        )
+
+    });
+
+
+    // =========================================
+    // RESTORE THEN TEST FORCED FAILURE
+    // =========================================
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "kage",
+
+      highestDifficultyUnlocked:
+        "akatsuki",
+
+      legacyCycle:
+        2,
+
+      completedDifficulties: [
+        "academy",
+        "genin",
+        "chunin",
+        "special_jonin",
+        "jonin",
+        "anbu",
+        "kage"
+      ],
+
+      runCompleted:
+        true
+
+    };
+
+
+    const failureSnapshot =
+      createRunTransitionSnapshot();
+
+
+    const failedLegacy =
+      executeAtomicKageLegacyRebirth(
+        createEmptyInheritanceSelection(),
+        {
+          simulateFailureStage:
+            "afterApply"
+        }
+      );
+
+
+    results.push({
+
+      test:
+        "Simulated Legacy failure is detected",
+
+      pass:
+        !!(
+          failedLegacy &&
+          failedLegacy.success ===
+            false
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Legacy failure triggers rollback",
+
+      pass:
+        !!(
+          failedLegacy &&
+          failedLegacy.rolledBack ===
+            true
+        )
+
+    });
+
+
+    const failureEnd =
+      createRunTransitionSnapshot();
+
+
+    results.push({
+
+      test:
+        "Legacy rollback restores complete state",
+
+      pass:
+        JSON.stringify(
+          failureSnapshot
+        ) ===
+        JSON.stringify(
+          failureEnd
+        )
+
+    });
+
+
+    // =========================================
+    // PREVIEW BUTTON MUST REMAIN SAFE
+    // =========================================
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    const previewSnapshot =
+      createRunTransitionSnapshot();
+
+
+    openKageCompletionPreview(
+      false
+    );
+
+
+    const leftCard =
+      getCompletionFlowUIRoot()
+        ? getCompletionFlowUIRoot()
+            .querySelector(
+              '[data-layout="top-left"]'
+            )
+        : null;
+
+
+    if (leftCard) {
+
+
+      leftCard.click();
+
+    }
+
+
+    const continueButton =
+      getCompletionFlowUIRoot()
+        ? getCompletionFlowUIRoot()
+            .querySelector(
+              '[data-action="continue"]'
+            )
+        : null;
+
+
+    if (continueButton) {
+
+
+      continueButton.click();
+
+    }
+
+
+    const previewConfirm =
+      getCompletionFlowUIRoot()
+        ? getCompletionFlowUIRoot()
+            .querySelector(
+              '[data-action="confirm"]'
+            )
+        : null;
+
+
+    if (previewConfirm) {
+
+
+      previewConfirm.click();
+
+    }
+
+
+    const previewAfter =
+      createRunTransitionSnapshot();
+
+
+    results.push({
+
+      test:
+        "Preview confirmation cannot modify real save",
+
+      pass:
+        JSON.stringify(
+          previewSnapshot
+        ) ===
+        JSON.stringify(
+          previewAfter
+        )
+
+    });
+
+
+    // =========================================
+    // CLEAN PREVIEW UI
+    // =========================================
+
+    const root =
+      getCompletionFlowUIRoot();
+
+
+    if (root) {
+
+
+      root.remove();
+
+    }
+
+  }
+  finally {
+
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    completionFlowSession =
+      originalSession;
+
+  }
+
+
+  // =========================================
+  // ORIGINAL SAVE CHECK
+  // =========================================
+
+  const finalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Original player save restored after execution diagnostics",
+
+    pass:
+      JSON.stringify(
+        originalSnapshot
+      ) ===
+      JSON.stringify(
+        finalSnapshot
+      )
+
+  });
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      "✅ COMPLETION EXECUTION PASSED ALL DIAGNOSTICS"
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ COMPLETION EXECUTION HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
 
 // =========================================================
 // WEAPON CLASS DIFFICULTY
