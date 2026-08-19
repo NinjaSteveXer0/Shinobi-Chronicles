@@ -28028,6 +28028,883 @@ function runLifecycleSafeguardDiagnostics() {
 installCompletionLifecycleResume();
 
 
+// =========================================================
+// BRICK 90 — FULL CHRONICLE PROGRESSION REGRESSION
+// =========================================================
+//
+// Master player-progression regression pass.
+//
+// This DOES NOT replace the individual diagnostic suites.
+//
+// It runs them together under one outer safety snapshot.
+//
+// The outer snapshot exists so the real player save can be
+// restored even if an individual diagnostic unexpectedly
+// throws before completing its own cleanup.
+//
+// =========================================================
+
+
+// =========================================================
+// CHRONICLE REGRESSION SUITE DEFINITIONS
+// =========================================================
+
+function getChronicleRegressionSuites() {
+
+
+  return [
+
+    {
+      id:
+        "equipment",
+
+      name:
+        "Equipment / Inventory",
+
+      runner:
+        runEquipmentPhaseDiagnostics
+    },
+
+    {
+      id:
+        "disciplines",
+
+      name:
+        "Seven Disciplines",
+
+      runner:
+        runDisciplinePhaseDiagnostics
+    },
+
+    {
+      id:
+        "training",
+
+      name:
+        "Training Sources",
+
+      runner:
+        runTrainingEngineDiagnostics
+    },
+
+    {
+      id:
+        "progression_gating",
+
+      name:
+        "Difficulty Progression",
+
+      runner:
+        runProgressionGatingDiagnostics
+    },
+
+    {
+      id:
+        "transition_engine",
+
+      name:
+        "Run Transition Engine",
+
+      runner:
+        runRunTransitionDiagnostics
+    },
+
+    {
+      id:
+        "live_transition",
+
+      name:
+        "Live Transition",
+
+      runner:
+        runLiveTransitionDiagnostics
+    },
+
+    {
+      id:
+        "inheritance_ownership",
+
+      name:
+        "Inheritance Ownership",
+
+      runner:
+        runInheritanceOwnershipDiagnostics
+    },
+
+    {
+      id:
+        "next_run_reset",
+
+      name:
+        "Next-Run Reset",
+
+      runner:
+        runNextRunResetDiagnostics
+    },
+
+    {
+      id:
+        "next_run_application",
+
+      name:
+        "Next-Run Application",
+
+      runner:
+        runNextRunApplicationDiagnostics
+    },
+
+    {
+      id:
+        "runtime_sync",
+
+      name:
+        "Runtime Synchronization",
+
+      runner:
+        runNextRunRuntimeSyncDiagnostics
+    },
+
+    {
+      id:
+        "atomic_transition",
+
+      name:
+        "Atomic Transition / Rollback",
+
+      runner:
+        runAtomicNextRunTransitionDiagnostics
+    },
+
+    {
+      id:
+        "completion_controller",
+
+      name:
+        "Completion Controller",
+
+      runner:
+        runCompletionControllerDiagnostics
+    },
+
+    {
+      id:
+        "completion_paths",
+
+      name:
+        "Kage Completion Paths",
+
+      runner:
+        runCompletionPathDiagnostics
+    },
+
+    {
+      id:
+        "completion_session",
+
+      name:
+        "Completion Flow Session",
+
+      runner:
+        runCompletionFlowSessionDiagnostics
+    },
+
+    {
+      id:
+        "completion_ui",
+
+      name:
+        "Completion UI",
+
+      runner:
+        runCompletionUIDiagnostics
+    },
+
+    {
+      id:
+        "inheritance_ui",
+
+      name:
+        "Inheritance UI",
+
+      runner:
+        runInheritanceUIPolishDiagnostics
+    },
+
+    {
+      id:
+        "completion_execution",
+
+      name:
+        "Completion Execution / Legacy",
+
+      runner:
+        runCompletionExecutionDiagnostics
+    },
+
+    {
+      id:
+        "lifecycle_integration",
+
+      name:
+        "Gameplay Lifecycle Integration",
+
+      runner:
+        runLifecycleIntegrationDiagnostics
+    },
+
+    {
+      id:
+        "lifecycle_safeguards",
+
+      name:
+        "Lifecycle Re-entry / Safeguards",
+
+      runner:
+        runLifecycleSafeguardDiagnostics
+    }
+
+  ];
+
+}
+
+
+// =========================================================
+// RUN ONE CHRONICLE REGRESSION SUITE
+// =========================================================
+
+function runChronicleRegressionSuite(
+  suite
+) {
+
+
+  if (
+    !suite ||
+    typeof suite.runner !==
+      "function"
+  ) {
+
+
+    return {
+
+      id:
+        suite &&
+        suite.id
+
+          ? suite.id
+
+          : "unknown",
+
+      name:
+        suite &&
+        suite.name
+
+          ? suite.name
+
+          : "Unknown Suite",
+
+      pass:
+        false,
+
+      error:
+        "Diagnostic runner does not exist."
+
+    };
+
+  }
+
+
+  try {
+
+
+    const result =
+      suite.runner();
+
+
+    return {
+
+      id:
+        suite.id,
+
+      name:
+        suite.name,
+
+      pass:
+        result ===
+        true,
+
+      error:
+        null
+
+    };
+
+  }
+  catch (error) {
+
+
+    console.error(
+      `❌ CHRONICLE REGRESSION SUITE CRASHED: ${suite.name}`,
+      error
+    );
+
+
+    return {
+
+      id:
+        suite.id,
+
+      name:
+        suite.name,
+
+      pass:
+        false,
+
+      error:
+        error &&
+        error.message
+
+          ? error.message
+
+          : String(
+              error
+            )
+
+    };
+
+  }
+
+}
+
+
+// =========================================================
+// BUILD CHRONICLE REGRESSION SUMMARY ROW
+// =========================================================
+
+function buildChronicleRegressionSummaryRow(
+  result
+) {
+
+
+  return {
+
+    system:
+      result.name,
+
+    status:
+      result.pass ===
+        true
+
+        ? "✅ PASS"
+
+        : "❌ FAIL",
+
+    error:
+      result.error ||
+      "—"
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 90 — MASTER REGRESSION
+// =========================================================
+
+function runChronicleProgressionRegression() {
+
+
+  console.log(
+    "========================================================="
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — FULL CHRONICLE REGRESSION"
+  );
+
+
+  console.log(
+    "========================================================="
+  );
+
+
+  console.log(
+    "Running complete player-facing progression audit..."
+  );
+
+
+  console.log(
+    ""
+  );
+
+
+  console.warn(
+    "NOTE: Some rollback diagnostics intentionally simulate failures."
+  );
+
+
+  console.warn(
+    "Red simulated-failure console messages are EXPECTED when the corresponding rollback test passes."
+  );
+
+
+  console.log(
+    ""
+  );
+
+
+  // =========================================
+  // MASTER SAFETY SNAPSHOT
+  // =========================================
+
+  const masterPlayerSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const masterSession =
+    completionFlowSession;
+
+
+  const masterExecutionLock =
+    completionExecutionInProgress;
+
+
+  const masterRootExisted =
+    !!getCompletionFlowUIRoot();
+
+
+  const results =
+    [];
+
+
+  let restoreSucceeded =
+    false;
+
+
+  try {
+
+
+    // =========================================
+    // CLEAR TRANSIENT COMPLETION UI
+    // =========================================
+
+    const existingRoot =
+      getCompletionFlowUIRoot();
+
+
+    if (existingRoot) {
+
+      existingRoot.remove();
+
+    }
+
+
+    clearCompletionFlowSession();
+
+
+    completionExecutionInProgress =
+      false;
+
+
+    // =========================================
+    // RUN EVERY EXISTING PROGRESSION SUITE
+    // =========================================
+
+    const suites =
+      getChronicleRegressionSuites();
+
+
+    suites.forEach(
+      suite => {
+
+
+        console.log(
+          ""
+        );
+
+
+        console.log(
+          "---------------------------------------------------------"
+        );
+
+
+        console.log(
+          `CHRONICLE REGRESSION: ${suite.name}`
+        );
+
+
+        console.log(
+          "---------------------------------------------------------"
+        );
+
+
+        const result =
+          runChronicleRegressionSuite(
+            suite
+          );
+
+
+        results.push(
+          result
+        );
+
+      }
+    );
+
+  }
+  finally {
+
+
+    // =========================================
+    // REMOVE ANY DIAGNOSTIC COMPLETION UI
+    // =========================================
+
+    const diagnosticRoot =
+      getCompletionFlowUIRoot();
+
+
+    if (diagnosticRoot) {
+
+      diagnosticRoot.remove();
+
+    }
+
+
+    // =========================================
+    // MASTER SAVE RESTORE
+    // =========================================
+
+    restoreSucceeded =
+      restoreRunTransitionSnapshot(
+        masterPlayerSnapshot
+      ) ===
+      true;
+
+
+    // =========================================
+    // RESTORE TRANSIENT SESSION STATE
+    // =========================================
+
+    completionFlowSession =
+      masterSession;
+
+
+    completionExecutionInProgress =
+      masterExecutionLock;
+
+
+    // =========================================
+    // ONLY REBUILD A PRE-EXISTING UI WHEN
+    // THERE WAS ONE BEFORE THE MASTER TEST
+    // =========================================
+
+    if (
+      masterRootExisted &&
+      masterSession &&
+      masterSession.active ===
+        true
+    ) {
+
+
+      createCompletionFlowUIRoot();
+
+
+      renderCurrentCompletionSessionStage();
+
+    }
+
+  }
+
+
+  // =========================================
+  // MASTER SAVE INTEGRITY CHECK
+  // =========================================
+
+  const finalPlayerSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const saveRestoredExactly =
+    (
+      restoreSucceeded ===
+        true &&
+      JSON.stringify(
+        masterPlayerSnapshot
+      ) ===
+      JSON.stringify(
+        finalPlayerSnapshot
+      )
+    );
+
+
+  results.push({
+
+    id:
+      "master_save_restore",
+
+    name:
+      "Real Player Save Restored",
+
+    pass:
+      saveRestoredExactly,
+
+    error:
+      saveRestoredExactly
+
+        ? null
+
+        : "Master player snapshot did not restore exactly."
+
+  });
+
+
+  // =========================================
+  // CURRENT PLAYER STATE HEALTH
+  // =========================================
+
+  const liveRunState =
+    getCurrentRunState();
+
+
+  const liveStateValid =
+    !!(
+      liveRunState &&
+      liveRunState.valid ===
+        true
+    );
+
+
+  results.push({
+
+    id:
+      "live_run_state",
+
+    name:
+      "Live Run State Valid",
+
+    pass:
+      liveStateValid,
+
+    error:
+      liveStateValid
+
+        ? null
+
+        : (
+            liveRunState &&
+            liveRunState.reason
+
+              ? liveRunState.reason
+
+              : "Live run state is invalid."
+          )
+
+  });
+
+
+  // =========================================
+  // DUPLICATE COMPLETION ROOT CHECK
+  // =========================================
+
+  const rootCount =
+    getCompletionFlowUIRootCount();
+
+
+  const rootStateValid =
+    (
+      masterRootExisted
+
+        ? rootCount ===
+            1
+
+        : rootCount ===
+            0
+    );
+
+
+  results.push({
+
+    id:
+      "completion_root_integrity",
+
+    name:
+      "Completion UI Root Integrity",
+
+    pass:
+      rootStateValid,
+
+    error:
+      rootStateValid
+
+        ? null
+
+        : `Unexpected completion UI root count: ${rootCount}`
+
+  });
+
+
+  // =========================================
+  // DISPLAY MASTER SUMMARY
+  // =========================================
+
+  console.log(
+    ""
+  );
+
+
+  console.log(
+    "========================================================="
+  );
+
+
+  console.log(
+    "CHRONICLE REGRESSION — MASTER SUMMARY"
+  );
+
+
+  console.log(
+    "========================================================="
+  );
+
+
+  console.table(
+    results.map(
+      buildChronicleRegressionSummaryRow
+    )
+  );
+
+
+  const failedResults =
+    results.filter(
+      result =>
+        result.pass !==
+          true
+    );
+
+
+  console.log(
+    ""
+  );
+
+
+  if (
+    failedResults.length ===
+      0
+  ) {
+
+
+    console.log(
+      "========================================================="
+    );
+
+
+    console.log(
+      "✅ CHRONICLE ENGINE — PLAYER PROGRESSION VERIFIED"
+    );
+
+
+    console.log(
+      "========================================================="
+    );
+
+
+    console.log(
+      `Suites Passed: ${results.length}/${results.length}`
+    );
+
+
+    console.log(
+      "Real Save: RESTORED"
+    );
+
+
+    console.log(
+      "Lifecycle: VERIFIED"
+    );
+
+
+    console.log(
+      "Legacy Rollback: VERIFIED"
+    );
+
+
+    console.log(
+      "Player-Facing Progression: VERIFIED"
+    );
+
+
+    console.log(
+      "========================================================="
+    );
+
+  }
+  else {
+
+
+    console.error(
+      "========================================================="
+    );
+
+
+    console.error(
+      `❌ CHRONICLE REGRESSION FAILED — ${failedResults.length} ISSUE(S)`
+    );
+
+
+    console.error(
+      "========================================================="
+    );
+
+
+    console.table(
+      failedResults.map(
+        buildChronicleRegressionSummaryRow
+      )
+    );
+
+
+    console.error(
+      "Do not proceed to content abstraction until these failures are resolved."
+    );
+
+
+    console.error(
+      "========================================================="
+    );
+
+  }
+
+
+  return {
+
+    success:
+      failedResults.length ===
+        0,
+
+    passed:
+      results.length -
+      failedResults.length,
+
+    failed:
+      failedResults.length,
+
+    total:
+      results.length,
+
+    saveRestored:
+      saveRestoredExactly,
+
+    results:
+      results,
+
+    liveRunState:
+      liveRunState
+
+  };
+
+}
+
+
 
 // =========================================================
 // WEAPON CLASS DIFFICULTY
