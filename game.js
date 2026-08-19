@@ -24287,6 +24287,1351 @@ function runCompletionExecutionDiagnostics() {
 }
 
 // =========================================================
+// BRICK 81 — GAMEPLAY RUN COMPLETION TRIGGER
+// =========================================================
+//
+// Lifecycle integration begins here.
+//
+// IMPORTANT:
+//
+// Ordinary battle victories must NEVER automatically complete
+// a difficulty.
+//
+// A gameplay object must explicitly declare:
+//
+// progressionTrigger: "run_completion"
+//
+// This can later belong to:
+//
+// - a final boss
+// - a story mission
+// - a location
+// - an event
+// - another end-of-run gameplay source
+//
+// The engine therefore remains generic and reusable.
+//
+// =========================================================
+
+
+// =========================================================
+// GET PROGRESSION TRIGGER TYPE
+// =========================================================
+
+function getProgressionTriggerType(
+  source
+) {
+
+
+  if (
+    !source ||
+    typeof source !==
+      "object"
+  ) {
+
+    return null;
+
+  }
+
+
+  const trigger =
+    source.progressionTrigger;
+
+
+  if (
+    typeof trigger ===
+      "string"
+  ) {
+
+    return trigger;
+
+  }
+
+
+  if (
+    trigger &&
+    typeof trigger ===
+      "object" &&
+    typeof trigger.type ===
+      "string"
+  ) {
+
+    return trigger.type;
+
+  }
+
+
+  return null;
+
+}
+
+
+// =========================================================
+// GET GAMEPLAY RUN COMPLETION TRIGGER
+// =========================================================
+
+function getGameplayRunCompletionTrigger(
+  context = {}
+) {
+
+
+  const candidates = [
+
+    {
+      sourceType:
+        "location",
+
+      source:
+        context.location ||
+        selectedLocationNode ||
+        null
+    },
+
+    {
+      sourceType:
+        "enemy",
+
+      source:
+        context.enemy ||
+        (
+          currentBattle
+            ? currentBattle.enemy
+            : null
+        ) ||
+        selectedEnemy ||
+        null
+    }
+
+  ];
+
+
+  const matched =
+    candidates.find(
+      candidate =>
+        getProgressionTriggerType(
+          candidate.source
+        ) ===
+          "run_completion"
+    );
+
+
+  if (!matched) {
+
+
+    return {
+
+      detected:
+        false,
+
+      triggerType:
+        null,
+
+      sourceType:
+        null,
+
+      sourceId:
+        null
+
+    };
+
+  }
+
+
+  return {
+
+    detected:
+      true,
+
+    triggerType:
+      "run_completion",
+
+    sourceType:
+      matched.sourceType,
+
+    sourceId:
+      matched.source &&
+      matched.source.id
+
+        ? matched.source.id
+
+        : null
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 82 — PLAYER-FACING COMPLETION LIFECYCLE ROUTER
+// =========================================================
+//
+// This function assumes the run has ALREADY been marked
+// complete.
+//
+// It does not complete runs itself.
+//
+// ORDINARY DIFFICULTIES:
+//
+//   Academy -> Genin
+//   Genin -> Chunin
+//   Chunin -> Special Jonin
+//   etc.
+//
+// have exactly one progression route.
+//
+// That route is selected automatically so the player goes
+// directly into the existing inheritance / confirmation flow.
+//
+// KAGE:
+//
+//   opens the dedicated two-path:
+//
+//   PATH OF INHERITANCE
+//   PATH OF SHADOWS
+//
+// fork.
+//
+// =========================================================
+
+function openPlayerFacingCompletionLifecycle(
+  options = {}
+) {
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        runState &&
+        runState.reason
+
+          ? runState.reason
+
+          : "Current run state is invalid."
+
+    };
+
+  }
+
+
+  if (
+    runState.runCompleted !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Current run is not complete."
+
+    };
+
+  }
+
+
+  // =========================================
+  // START AUTHORITATIVE COMPLETION SESSION
+  // =========================================
+
+  const session =
+    beginCompletionFlow(
+      runState,
+      options
+    );
+
+
+  if (
+    !session ||
+    session.active !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        session &&
+        session.reason
+
+          ? session.reason
+
+          : "Completion flow could not be started."
+
+    };
+
+  }
+
+
+  // =========================================
+  // CREATE FRESH PLAYER-FACING ROOT
+  // =========================================
+
+  createCompletionFlowUIRoot();
+
+
+  // =========================================
+  // KAGE — SPECIAL DUAL-PATH FORK
+  // =========================================
+
+  if (
+    runState.currentDifficultyId ===
+      "kage"
+  ) {
+
+
+    const rendered =
+      renderCompletionPathSelectionUI();
+
+
+    return {
+
+      success:
+        rendered ===
+        true,
+
+      mode:
+        "kage_fork",
+
+      stage:
+        session.stage,
+
+      pathCount:
+        Array.isArray(
+          session.paths
+        )
+
+          ? session.paths.length
+
+          : 0,
+
+      session:
+        session
+
+    };
+
+  }
+
+
+  // =========================================
+  // ORDINARY DIFFICULTY — ONE NATURAL PATH
+  // =========================================
+
+  if (
+    !Array.isArray(
+      session.paths
+    ) ||
+    session.paths.length !==
+      1
+  ) {
+
+
+    const root =
+      getCompletionFlowUIRoot();
+
+
+    if (root) {
+
+      root.remove();
+
+    }
+
+
+    clearCompletionFlowSession();
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Ordinary completion expected exactly one progression path."
+
+    };
+
+  }
+
+
+  const path =
+    session.paths[0];
+
+
+  if (
+    path.locked ===
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        path.requiresPremium ===
+          true
+
+          ? "Premium access required."
+
+          : "The next progression path is locked."
+
+    };
+
+  }
+
+
+  const selectionResult =
+    selectCompletionFlowPath(
+      path.id
+    );
+
+
+  if (
+    !selectionResult ||
+    selectionResult.success !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        selectionResult &&
+        selectionResult.reason
+
+          ? selectionResult.reason
+
+          : "Next progression path could not be selected."
+
+    };
+
+  }
+
+
+  // =========================================
+  // INHERITANCE SCREEN
+  // =========================================
+
+  if (
+    selectionResult.stage ===
+      "inheritance_selection"
+  ) {
+
+
+    const rendered =
+      renderCompletionInheritanceUI();
+
+
+    return {
+
+      success:
+        rendered ===
+        true,
+
+      mode:
+        "ordinary_progression",
+
+      stage:
+        "inheritance_selection",
+
+      pathId:
+        path.id,
+
+      targetDifficultyId:
+        path.targetDifficultyId,
+
+      session:
+        session
+
+    };
+
+  }
+
+
+  // =========================================
+  // DIRECT CONFIRMATION SCREEN
+  // =========================================
+
+  const rendered =
+    renderCompletionConfirmationUI();
+
+
+  return {
+
+    success:
+      rendered ===
+      true,
+
+    mode:
+      "ordinary_progression",
+
+    stage:
+      "confirmation",
+
+    pathId:
+      path.id,
+
+    targetDifficultyId:
+      path.targetDifficultyId,
+
+    session:
+      session
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 83 — PROCESS GAMEPLAY RUN COMPLETION
+// =========================================================
+//
+// This is the lifecycle bridge called by normal gameplay.
+//
+// It performs:
+//
+// 1. Detect explicit gameplay completion marker.
+// 2. Verify completion eligibility.
+// 3. Mark current difficulty complete.
+// 4. Save through the existing completion system.
+// 5. Open the correct player-facing completion flow.
+//
+// If no run-completion marker exists, this function is
+// deliberately harmless.
+//
+// =========================================================
+
+function processGameplayRunCompletion(
+  context = {},
+  options = {}
+) {
+
+
+  const trigger =
+    getGameplayRunCompletionTrigger(
+      context
+    );
+
+
+  // =========================================
+  // ORDINARY VICTORY — NOTHING TO DO
+  // =========================================
+
+  if (
+    trigger.detected !==
+      true
+  ) {
+
+
+    return {
+
+      handled:
+        false,
+
+      completed:
+        false,
+
+      flowOpened:
+        false,
+
+      reason:
+        "Gameplay event is not a run completion trigger."
+
+    };
+
+  }
+
+
+  const runState =
+    getCurrentRunState();
+
+
+  if (
+    !runState ||
+    runState.valid !==
+      true
+  ) {
+
+
+    return {
+
+      handled:
+        true,
+
+      completed:
+        false,
+
+      flowOpened:
+        false,
+
+      reason:
+        runState &&
+        runState.reason
+
+          ? runState.reason
+
+          : "Current run state is invalid.",
+
+      trigger:
+        trigger
+
+    };
+
+  }
+
+
+  // =========================================
+  // ALREADY COMPLETE
+  // =========================================
+  //
+  // Do not complete or save twice.
+  //
+  // We may still restore the player-facing completion flow.
+  //
+  // =========================================
+
+  if (
+    runState.runCompleted ===
+      true
+  ) {
+
+
+    const existingFlow =
+      openPlayerFacingCompletionLifecycle(
+        options
+      );
+
+
+    return {
+
+      handled:
+        true,
+
+      completed:
+        true,
+
+      alreadyCompleted:
+        true,
+
+      flowOpened:
+        existingFlow &&
+        existingFlow.success ===
+          true,
+
+      trigger:
+        trigger,
+
+      flow:
+        existingFlow
+
+    };
+
+  }
+
+
+  // =========================================
+  // AUTHORITATIVE COMPLETION ELIGIBILITY
+  // =========================================
+
+  const eligibility =
+    getRunCompletionEligibility();
+
+
+  if (
+    !eligibility ||
+    eligibility.allowed !==
+      true
+  ) {
+
+
+    return {
+
+      handled:
+        true,
+
+      completed:
+        false,
+
+      flowOpened:
+        false,
+
+      reason:
+        eligibility &&
+        eligibility.reason
+
+          ? eligibility.reason
+
+          : "Current run cannot be completed.",
+
+      trigger:
+        trigger
+
+    };
+
+  }
+
+
+  // =========================================
+  // USE EXISTING COMPLETION SYSTEM
+  // =========================================
+
+  const completed =
+    completeCurrentDifficulty();
+
+
+  if (
+    completed !==
+      true
+  ) {
+
+
+    return {
+
+      handled:
+        true,
+
+      completed:
+        false,
+
+      flowOpened:
+        false,
+
+      reason:
+        "Current difficulty could not be completed.",
+
+      trigger:
+        trigger
+
+    };
+
+  }
+
+
+  // =========================================
+  // OPEN CORRECT PLAYER-FACING FLOW
+  // =========================================
+
+  const flow =
+    openPlayerFacingCompletionLifecycle(
+      options
+    );
+
+
+  if (
+    !flow ||
+    flow.success !==
+      true
+  ) {
+
+
+    return {
+
+      handled:
+        true,
+
+      completed:
+        true,
+
+      flowOpened:
+        false,
+
+      reason:
+        flow &&
+        flow.reason
+
+          ? flow.reason
+
+          : "Run completed, but completion UI could not be opened.",
+
+      trigger:
+        trigger,
+
+      flow:
+        flow
+
+    };
+
+  }
+
+
+  console.log(
+    `✅ ${eligibility.difficultyName} RUN COMPLETED FROM GAMEPLAY`
+  );
+
+
+  console.log(
+    "Completion Trigger:",
+    trigger
+  );
+
+
+  return {
+
+    handled:
+      true,
+
+    completed:
+      true,
+
+    flowOpened:
+      true,
+
+    difficultyId:
+      eligibility.difficultyId,
+
+    difficultyName:
+      eligibility.difficultyName,
+
+    legacyCycle:
+      eligibility.legacyCycle,
+
+    trigger:
+      trigger,
+
+    flow:
+      flow
+
+  };
+
+}
+
+
+// =========================================================
+// BRICKS 81–83 DIAGNOSTICS
+// =========================================================
+
+function runLifecycleIntegrationDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — LIFECYCLE INTEGRATION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const originalSession =
+    completionFlowSession;
+
+
+  const existingRoot =
+    getCompletionFlowUIRoot();
+
+
+  if (existingRoot) {
+
+    existingRoot.remove();
+
+  }
+
+
+  try {
+
+
+    // =========================================
+    // TEST 1 — ORDINARY ENEMY MUST NOT TRIGGER
+    // =========================================
+
+    const normalTrigger =
+      getGameplayRunCompletionTrigger({
+        enemy: {
+          id:
+            "diagnostic_bandit"
+        },
+        location:
+          null
+      });
+
+
+    results.push({
+
+      test:
+        "Ordinary battle does not complete a run",
+
+      pass:
+        normalTrigger.detected ===
+        false
+
+    });
+
+
+    // =========================================
+    // TEST 2 — EXPLICIT ENEMY TRIGGER DETECTED
+    // =========================================
+
+    const enemyTrigger =
+      getGameplayRunCompletionTrigger({
+        enemy: {
+          id:
+            "diagnostic_final_enemy",
+
+          progressionTrigger:
+            "run_completion"
+        },
+        location:
+          null
+      });
+
+
+    results.push({
+
+      test:
+        "Explicit enemy run-completion trigger is detected",
+
+      pass:
+        !!(
+          enemyTrigger.detected ===
+            true &&
+          enemyTrigger.triggerType ===
+            "run_completion" &&
+          enemyTrigger.sourceType ===
+            "enemy" &&
+          enemyTrigger.sourceId ===
+            "diagnostic_final_enemy"
+        )
+
+    });
+
+
+    // =========================================
+    // TEST 3 — LOCATION TRIGGER DETECTED
+    // =========================================
+
+    const locationTrigger =
+      getGameplayRunCompletionTrigger({
+        enemy: {
+          id:
+            "ordinary_enemy"
+        },
+        location: {
+          id:
+            "diagnostic_story_location",
+
+          progressionTrigger: {
+            type:
+              "run_completion"
+          }
+        }
+      });
+
+
+    results.push({
+
+      test:
+        "Explicit location run-completion trigger is detected",
+
+      pass:
+        !!(
+          locationTrigger.detected ===
+            true &&
+          locationTrigger.sourceType ===
+            "location" &&
+          locationTrigger.sourceId ===
+            "diagnostic_story_location"
+        )
+
+    });
+
+
+    // =========================================
+    // TEST 4 — ACADEMY COMPLETION
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "academy",
+
+      legacyCycle:
+        0,
+
+      completedDifficulties:
+        [],
+
+      runCompleted:
+        false
+
+    };
+
+
+    clearCompletionFlowSession();
+
+
+    const academyResult =
+      processGameplayRunCompletion({
+        enemy: {
+          id:
+            "diagnostic_academy_final",
+
+          progressionTrigger:
+            "run_completion"
+        },
+        location:
+          null
+      });
+
+
+    const academySession =
+      getCompletionFlowSession();
+
+
+    results.push({
+
+      test:
+        "Gameplay completion marks Academy complete",
+
+      pass:
+        !!(
+          academyResult &&
+          academyResult.completed ===
+            true &&
+          playerData.progression
+            .runCompleted ===
+            true &&
+          playerData.progression
+            .completedDifficulties
+            .includes(
+              "academy"
+            )
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Academy completion unlocks Genin",
+
+      pass:
+        playerData.progression
+          .highestDifficultyUnlocked ===
+          "genin"
+
+    });
+
+
+    results.push({
+
+      test:
+        "Ordinary completion opens single-path inheritance flow",
+
+      pass:
+        !!(
+          academyResult &&
+          academyResult.flowOpened ===
+            true &&
+          academyResult.flow &&
+          academyResult.flow.mode ===
+            "ordinary_progression" &&
+          academyResult.flow.stage ===
+            "inheritance_selection" &&
+          academyResult.flow
+            .targetDifficultyId ===
+            "genin" &&
+          academySession &&
+          academySession.active ===
+            true
+        )
+
+    });
+
+
+    // =========================================
+    // CLEAN ORDINARY FLOW BEFORE KAGE TEST
+    // =========================================
+
+    const academyRoot =
+      getCompletionFlowUIRoot();
+
+
+    if (academyRoot) {
+
+      academyRoot.remove();
+
+    }
+
+
+    clearCompletionFlowSession();
+
+
+    // =========================================
+    // TEST 5 — KAGE COMPLETION
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "kage",
+
+      highestDifficultyUnlocked:
+        "kage",
+
+      legacyCycle:
+        2,
+
+      completedDifficulties: [
+        "academy",
+        "genin",
+        "chunin",
+        "special_jonin",
+        "jonin",
+        "anbu"
+      ],
+
+      runCompleted:
+        false
+
+    };
+
+
+    const kageResult =
+      processGameplayRunCompletion({
+        enemy: {
+          id:
+            "diagnostic_kage_final",
+
+          progressionTrigger:
+            "run_completion"
+        },
+        location:
+          null
+      });
+
+
+    const kageSession =
+      getCompletionFlowSession();
+
+
+    results.push({
+
+      test:
+        "Gameplay completion marks Kage complete",
+
+      pass:
+        !!(
+          kageResult &&
+          kageResult.completed ===
+            true &&
+          playerData.progression
+            .runCompleted ===
+            true &&
+          playerData.progression
+            .completedDifficulties
+            .includes(
+              "kage"
+            )
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Kage completion opens dedicated two-path fork",
+
+      pass:
+        !!(
+          kageResult &&
+          kageResult.flowOpened ===
+            true &&
+          kageResult.flow &&
+          kageResult.flow.mode ===
+            "kage_fork" &&
+          kageResult.flow.pathCount ===
+            2 &&
+          kageSession &&
+          Array.isArray(
+            kageSession.paths
+          ) &&
+          kageSession.paths.length ===
+            2
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Kage fork includes Legacy Rebirth route",
+
+      pass:
+        !!(
+          kageSession &&
+          kageSession.paths.some(
+            path =>
+              path.routeType ===
+              "legacy_rebirth"
+          )
+        )
+
+    });
+
+
+    // =========================================
+    // CLEAN DIAGNOSTIC UI
+    // =========================================
+
+    const kageRoot =
+      getCompletionFlowUIRoot();
+
+
+    if (kageRoot) {
+
+      kageRoot.remove();
+
+    }
+
+  }
+  finally {
+
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    completionFlowSession =
+      originalSession;
+
+
+    const root =
+      getCompletionFlowUIRoot();
+
+
+    if (root) {
+
+      root.remove();
+
+    }
+
+  }
+
+
+  // =========================================
+  // VERIFY REAL SAVE RESTORATION
+  // =========================================
+
+  const finalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Original player save restored after lifecycle diagnostics",
+
+    pass:
+      JSON.stringify(
+        originalSnapshot
+      ) ===
+      JSON.stringify(
+        finalSnapshot
+      )
+
+  });
+
+
+  // =========================================
+  // RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      `✅ LIFECYCLE INTEGRATION PASSED ${results.length}/${results.length}`
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ LIFECYCLE INTEGRATION HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+
+// =========================================================
 // WEAPON CLASS DIFFICULTY
 // =========================================================
 //
@@ -32403,7 +33748,15 @@ function continueAfterVictory() {
 
 
   // =========================================
-  // CLAIM BATTLE REWARDS
+  // CLAIM BATTLE REWARDS FIRST
+  // =========================================
+  //
+  // The player earned these rewards during the completed
+  // encounter.
+  //
+  // Lifecycle progression is evaluated only AFTER the
+  // ordinary victory reward flow has completed.
+  //
   // =========================================
 
   claimCurrentBattleRewards();
@@ -32418,6 +33771,91 @@ function continueAfterVictory() {
 
 
   // =========================================
+  // BRICK 83 — GAMEPLAY LIFECYCLE CHECK
+  // =========================================
+  //
+  // This is harmless for every existing normal encounter.
+  //
+  // Only a gameplay source explicitly carrying:
+  //
+  // progressionTrigger: "run_completion"
+  //
+  // can complete the current difficulty.
+  //
+  // =========================================
+
+  const lifecycleResult =
+    processGameplayRunCompletion({
+
+      enemy:
+        currentBattle.enemy ||
+        selectedEnemy ||
+        null,
+
+      location:
+        selectedLocationNode ||
+        null
+
+    });
+
+
+  // =========================================
+  // COMPLETION FLOW HAS TAKEN CONTROL
+  // =========================================
+
+  if (
+    lifecycleResult &&
+    lifecycleResult.handled ===
+      true &&
+    lifecycleResult.flowOpened ===
+      true
+  ) {
+
+
+    console.log(
+      "Gameplay lifecycle opened completion flow."
+    );
+
+
+    return;
+
+  }
+
+
+  // =========================================
+  // COMPLETION WAS DETECTED BUT FLOW FAILED
+  // =========================================
+  //
+  // Do NOT silently send the player away from a completed
+  // run if its completion UI could not open.
+  //
+  // Preserve the completed save and expose the problem.
+  //
+  // =========================================
+
+  if (
+    lifecycleResult &&
+    lifecycleResult.handled ===
+      true &&
+    lifecycleResult.completed ===
+      true &&
+    lifecycleResult.flowOpened !==
+      true
+  ) {
+
+
+    console.error(
+      "Run completed, but completion flow did not open:",
+      lifecycleResult
+    );
+
+
+    return;
+
+  }
+
+
+  // =========================================
   // SAVE DEVELOPMENT STATE
   // =========================================
 
@@ -32425,6 +33863,7 @@ function continueAfterVictory() {
 
 
   // =========================================
+  // ORDINARY VICTORY
   // RETURN TO ENCOUNTER SCREEN
   // =========================================
 
