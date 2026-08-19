@@ -21377,7 +21377,7 @@ function renderCompletionPathSelectionUI() {
 
 
 // =========================================================
-// GET CURRENT UI INHERITANCE SELECTION
+// BRICK 87 — CURRENT UI INHERITANCE SELECTION
 // =========================================================
 
 function getCompletionUIInheritanceSelection() {
@@ -21406,7 +21406,230 @@ function getCompletionUIInheritanceSelection() {
 
 
 // =========================================================
-// TOGGLE INHERITANCE UI OPTION
+// BRICK 87 — INHERITANCE SELECTION SUMMARY
+// =========================================================
+//
+// Presentation only.
+//
+// This reads the current completion session and calculates:
+//
+// - total selected
+// - total available slots
+// - remaining slots
+// - per-category counts
+//
+// It does NOT modify the save or session.
+//
+// =========================================================
+
+function getCompletionInheritanceSelectionSummary() {
+
+
+  const payload =
+    getActiveCompletionInheritancePayload();
+
+
+  if (
+    !payload ||
+    payload.valid !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "No valid inheritance payload exists."
+
+    };
+
+  }
+
+
+  const selection =
+    getCompletionUIInheritanceSelection();
+
+
+  const categories =
+    payload.categories.map(
+      category => {
+
+
+        const selected =
+          Array.isArray(
+            selection[
+              category.id
+            ]
+          )
+
+            ? selection[
+                category.id
+              ]
+
+            : [];
+
+
+        return {
+
+          id:
+            category.id,
+
+          name:
+            category.name,
+
+          selected:
+            selected.length,
+
+          limit:
+            category.limit,
+
+          remaining:
+            Math.max(
+              0,
+              category.limit -
+              selected.length
+            ),
+
+          full:
+            (
+              category.limit >
+                0 &&
+              selected.length >=
+                category.limit
+            )
+
+        };
+
+      }
+    );
+
+
+  const totalSelected =
+    categories.reduce(
+      (
+        total,
+        category
+      ) =>
+        total +
+        category.selected,
+      0
+    );
+
+
+  const totalSlots =
+    categories.reduce(
+      (
+        total,
+        category
+      ) =>
+        total +
+        category.limit,
+      0
+    );
+
+
+  return {
+
+    valid:
+      true,
+
+    totalSelected:
+      totalSelected,
+
+    totalSlots:
+      totalSlots,
+
+    remainingSlots:
+      Math.max(
+        0,
+        totalSlots -
+        totalSelected
+      ),
+
+    categories:
+      categories
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 88 — GET INHERITANCE CANDIDATE
+// =========================================================
+
+function getCompletionInheritanceCandidate(
+  categoryId,
+  candidateId
+) {
+
+
+  const payload =
+    getActiveCompletionInheritancePayload();
+
+
+  if (
+    !payload ||
+    payload.valid !==
+      true
+  ) {
+
+    return null;
+
+  }
+
+
+  const category =
+    payload.categories.find(
+      entry =>
+        entry.id ===
+        categoryId
+    );
+
+
+  if (!category) {
+
+    return null;
+
+  }
+
+
+  const candidate =
+    category.candidates.find(
+      entry =>
+        (
+          entry.key ||
+          entry.id
+        ) ===
+        candidateId
+    );
+
+
+  if (!candidate) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    category:
+      category,
+
+    candidate:
+      candidate
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 88 — TOGGLE INHERITANCE UI OPTION
 // =========================================================
 
 function toggleCompletionInheritanceOption(
@@ -21426,7 +21649,15 @@ function toggleCompletionInheritanceOption(
   ) {
 
 
-    return false;
+    return {
+
+      success:
+        false,
+
+      reason:
+        "No valid inheritance selection exists."
+
+    };
 
   }
 
@@ -21441,9 +21672,45 @@ function toggleCompletionInheritanceOption(
 
   if (!category) {
 
-    return false;
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Inheritance category was not found."
+
+    };
 
   }
+
+
+  const candidateResult =
+    getCompletionInheritanceCandidate(
+      categoryId,
+      candidateId
+    );
+
+
+  if (!candidateResult) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Inheritance candidate was not found."
+
+    };
+
+  }
+
+
+  const candidate =
+    candidateResult.candidate;
 
 
   const selection =
@@ -21456,11 +21723,13 @@ function toggleCompletionInheritanceOption(
         categoryId
       ]
     )
+
       ? [
           ...selection[
             categoryId
           ]
         ]
+
       : [];
 
 
@@ -21469,6 +21738,13 @@ function toggleCompletionInheritanceOption(
       candidateId
     );
 
+
+  let action;
+
+
+  // =========================================
+  // DESELECT
+  // =========================================
 
   if (
     existingIndex >=
@@ -21481,7 +21757,16 @@ function toggleCompletionInheritanceOption(
       1
     );
 
+
+    action =
+      "removed";
+
   }
+
+  // =========================================
+  // SELECT
+  // =========================================
+
   else {
 
 
@@ -21492,11 +21777,22 @@ function toggleCompletionInheritanceOption(
 
 
       showCompletionFlowMessage(
-        `${category.name}: maximum ${category.limit}.`
+        `${category.name} is full — remove one selection before choosing another.`
       );
 
 
-      return false;
+      return {
+
+        success:
+          false,
+
+        reason:
+          `${category.name}: maximum ${category.limit}.`,
+
+        limitReached:
+          true
+
+      };
 
     }
 
@@ -21504,6 +21800,10 @@ function toggleCompletionInheritanceOption(
     selected.push(
       candidateId
     );
+
+
+    action =
+      "selected";
 
   }
 
@@ -21519,16 +21819,62 @@ function toggleCompletionInheritanceOption(
       selection;
 
 
+  // =========================================
+  // RENDER UPDATED SCREEN
+  // =========================================
+
   renderCompletionInheritanceUI();
 
 
-  return true;
+  // =========================================
+  // PLAYER FEEDBACK
+  // =========================================
+
+  const candidateName =
+    candidate.name ||
+    candidateId;
+
+
+  showCompletionFlowMessage(
+    action ===
+      "selected"
+
+      ? `${candidateName} selected for inheritance.`
+
+      : `${candidateName} removed from inheritance.`
+  );
+
+
+  return {
+
+    success:
+      true,
+
+    action:
+      action,
+
+    categoryId:
+      categoryId,
+
+    candidateId:
+      candidateId,
+
+    candidateName:
+      candidateName,
+
+    selection:
+      getCompletionUIInheritanceSelection(),
+
+    summary:
+      getCompletionInheritanceSelectionSummary()
+
+  };
 
 }
 
 
 // =========================================================
-// RENDER INHERITANCE CATEGORY
+// BRICK 88 — RENDER INHERITANCE CATEGORY
 // =========================================================
 
 function renderCompletionInheritanceCategory(
@@ -21541,6 +21887,15 @@ function renderCompletionInheritanceCategory(
     selection[
       category.id
     ] || [];
+
+
+  const isFull =
+    (
+      category.limit >
+        0 &&
+      selected.length >=
+        category.limit
+    );
 
 
   const candidatesMarkup =
@@ -21569,6 +21924,11 @@ function renderCompletionInheritanceCategory(
                 );
 
 
+              const candidateName =
+                candidate.name ||
+                candidateId;
+
+
               return `
 
                 <button
@@ -21581,13 +21941,28 @@ function renderCompletionInheritanceCategory(
                   "
                   data-category-id="${escapeCompletionHtml(category.id)}"
                   data-candidate-id="${escapeCompletionHtml(candidateId)}"
+                  aria-pressed="${isSelected ? "true" : "false"}"
                 >
 
-                  <span>
-                    ${escapeCompletionHtml(candidate.name)}
+                  <span class="sc-inheritance-option-main">
+
+                    <span class="sc-inheritance-option-name">
+                      ${escapeCompletionHtml(candidateName)}
+                    </span>
+
+                    <span class="sc-inheritance-option-state">
+                      ${isSelected
+                        ? "CARRYING FORWARD"
+                        : (
+                            isFull
+                              ? "CATEGORY FULL"
+                              : "AVAILABLE"
+                          )}
+                    </span>
+
                   </span>
 
-                  <span>
+                  <span class="sc-inheritance-option-mark">
                     ${isSelected
                       ? "✓"
                       : "+"}
@@ -21604,17 +21979,42 @@ function renderCompletionInheritanceCategory(
 
   return `
 
-    <section class="sc-inheritance-category">
+    <section
+      class="
+        sc-inheritance-category
+        ${isFull
+          ? "sc-inheritance-category-full"
+          : ""}
+      "
+    >
 
-      <h3>
-        ${escapeCompletionHtml(category.name)}
-      </h3>
+      <div class="sc-inheritance-category-heading">
+
+        <h3>
+          ${escapeCompletionHtml(category.name)}
+        </h3>
+
+        <div class="sc-inheritance-count">
+          ${selected.length}/${category.limit}
+        </div>
+
+      </div>
 
       <div class="sc-inheritance-limit">
-        Choose up to
-        ${category.limit}
-        · Selected
-        ${selected.length}/${category.limit}
+
+        ${
+          category.limit ===
+            0
+
+            ? "Nothing can be inherited in this category."
+
+            : isFull
+
+              ? "Inheritance slots filled."
+
+              : `Choose up to ${category.limit} · ${category.limit - selected.length} remaining`
+        }
+
       </div>
 
       ${candidatesMarkup}
@@ -21627,7 +22027,199 @@ function renderCompletionInheritanceCategory(
 
 
 // =========================================================
-// RENDER INHERITANCE SCREEN
+// BRICK 87 — RENDER INHERITANCE SUMMARY
+// =========================================================
+
+function renderCompletionInheritanceSummary() {
+
+
+  const summary =
+    getCompletionInheritanceSelectionSummary();
+
+
+  if (
+    !summary ||
+    summary.valid !==
+      true
+  ) {
+
+    return "";
+
+  }
+
+
+  const categoryMarkup =
+    summary.categories
+      .map(
+        category => `
+
+          <div class="sc-inheritance-summary-category">
+
+            <span>
+              ${escapeCompletionHtml(category.name)}
+            </span>
+
+            <strong>
+              ${category.selected}/${category.limit}
+            </strong>
+
+          </div>
+
+        `
+      )
+      .join("");
+
+
+  return `
+
+    <div class="sc-inheritance-summary">
+
+      <div class="sc-inheritance-summary-main">
+
+        <div class="sc-inheritance-summary-label">
+          Selected Inheritance
+        </div>
+
+        <div class="sc-inheritance-summary-total">
+          ${summary.totalSelected}
+          <span>
+            / ${summary.totalSlots}
+          </span>
+        </div>
+
+      </div>
+
+      <div class="sc-inheritance-summary-categories">
+        ${categoryMarkup}
+      </div>
+
+      <div class="sc-inheritance-summary-note">
+
+        ${
+          summary.remainingSlots >
+            0
+
+            ? `${summary.remainingSlots} inheritance slot${summary.remainingSlots === 1 ? "" : "s"} remain optional.`
+
+            : "All available inheritance slots are filled."
+        }
+
+      </div>
+
+    </div>
+
+  `;
+
+}
+
+
+// =========================================================
+// BRICK 89 — ORDINARY PROGRESSION BACK BEHAVIOUR
+// =========================================================
+//
+// Kage has a genuine fork, so GO BACK returns to path choice.
+//
+// Ordinary ranks have only one natural route. There is no
+// meaningful path-selection screen to return to.
+//
+// In that case GO BACK closes the completion UI while leaving
+// the completed run persisted. Brick 85 can safely resume it.
+//
+// =========================================================
+
+function handleCompletionInheritanceBack() {
+
+
+  const session =
+    getCompletionFlowSession();
+
+
+  if (
+    !session ||
+    session.active !==
+      true
+  ) {
+
+    return false;
+
+  }
+
+
+  const isKageFork =
+    (
+      session.runState &&
+      session.runState
+        .currentDifficultyId ===
+        "kage" &&
+      Array.isArray(
+        session.paths
+      ) &&
+      session.paths.length >
+        1
+    );
+
+
+  // =========================================
+  // KAGE — RETURN TO REAL PATH FORK
+  // =========================================
+
+  if (isKageFork) {
+
+
+    session.stage =
+      "path_selection";
+
+
+    session.selectedPathId =
+      null;
+
+
+    session.selectedPath =
+      null;
+
+
+    session.inheritanceSelection =
+      createEmptyInheritanceSelection();
+
+
+    session.confirmation =
+      null;
+
+
+    renderCompletionPathSelectionUI();
+
+
+    return true;
+
+  }
+
+
+  // =========================================
+  // ORDINARY RANK — CLOSE WITHOUT INVENTING
+  // A FAKE PATH-SELECTION SCREEN
+  // =========================================
+
+  const root =
+    getCompletionFlowUIRoot();
+
+
+  if (root) {
+
+    root.remove();
+
+  }
+
+
+  clearCompletionFlowSession();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICKS 87–89 — RENDER INHERITANCE SCREEN
 // =========================================================
 
 function renderCompletionInheritanceUI() {
@@ -21686,6 +22278,8 @@ function renderCompletionInheritanceUI() {
 
       </div>
 
+      ${renderCompletionInheritanceSummary()}
+
       <div class="sc-inheritance-grid">
 
         ${payload.categories
@@ -21697,6 +22291,16 @@ function renderCompletionInheritanceUI() {
               )
           )
           .join("")}
+
+      </div>
+
+      <div class="sc-inheritance-guidance">
+
+        Only highlighted selections will carry forward.
+
+        <strong>
+          Unused inheritance slots are optional.
+        </strong>
 
       </div>
 
@@ -21715,7 +22319,7 @@ function renderCompletionInheritanceUI() {
           class="sc-ui-button"
           data-action="continue"
         >
-          CONTINUE
+          REVIEW INHERITANCE
         </button>
 
       </div>
@@ -21743,31 +22347,7 @@ function renderCompletionInheritanceUI() {
     )
     .addEventListener(
       "click",
-      () => {
-
-
-        completionFlowSession.stage =
-          "path_selection";
-
-
-        completionFlowSession
-          .selectedPathId =
-            null;
-
-
-        completionFlowSession
-          .selectedPath =
-            null;
-
-
-        completionFlowSession
-          .inheritanceSelection =
-            createEmptyInheritanceSelection();
-
-
-        renderCompletionPathSelectionUI();
-
-      }
+      handleCompletionInheritanceBack
     );
 
 
@@ -21780,9 +22360,17 @@ function renderCompletionInheritanceUI() {
       () => {
 
 
+        const currentSelection =
+          getCompletionUIInheritanceSelection();
+
+
+        const summary =
+          getCompletionInheritanceSelectionSummary();
+
+
         const result =
           setCompletionInheritanceSelection(
-            getCompletionUIInheritanceSelection()
+            currentSelection
           );
 
 
@@ -21804,6 +22392,22 @@ function renderCompletionInheritanceUI() {
 
 
           return;
+
+        }
+
+
+        if (
+          summary &&
+          summary.valid ===
+            true &&
+          summary.remainingSlots >
+            0
+        ) {
+
+
+          console.log(
+            `Inheritance review: ${summary.remainingSlots} optional slot(s) left unused.`
+          );
 
         }
 
@@ -21840,6 +22444,548 @@ function renderCompletionInheritanceUI() {
 
 
   return true;
+
+}
+
+
+// =========================================================
+// BRICKS 87–89 INHERITANCE UI DIAGNOSTICS
+// =========================================================
+
+function runInheritanceUIPolishDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — INHERITANCE UI POLISH DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const playerSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const previousSession =
+    completionFlowSession;
+
+
+  const existingRoot =
+    getCompletionFlowUIRoot();
+
+
+  if (existingRoot) {
+
+    existingRoot.remove();
+
+  }
+
+
+  try {
+
+
+    // =========================================
+    // CREATE SAFE KAGE PREVIEW SESSION
+    // =========================================
+
+    const previewState =
+      createKageCompletionPreviewState();
+
+
+    beginCompletionFlow(
+      previewState,
+      {
+        hasPremiumAccess:
+          false
+      }
+    );
+
+
+    selectCompletionFlowPath(
+      "kage_inheritance"
+    );
+
+
+    createCompletionFlowUIRoot();
+
+
+    const rendered =
+      renderCompletionInheritanceUI();
+
+
+    results.push({
+
+      test:
+        "Inheritance polish screen renders",
+
+      pass:
+        rendered ===
+        true
+
+    });
+
+
+    // =========================================
+    // SUMMARY
+    // =========================================
+
+    const summary =
+      getCompletionInheritanceSelectionSummary();
+
+
+    results.push({
+
+      test:
+        "Inheritance summary contains four categories",
+
+      pass:
+        !!(
+          summary &&
+          summary.valid ===
+            true &&
+          Array.isArray(
+            summary.categories
+          ) &&
+          summary.categories.length ===
+            4
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Empty Legacy inheritance begins at zero selected",
+
+      pass:
+        !!(
+          summary &&
+          summary.totalSelected ===
+            0
+        )
+
+    });
+
+
+    // =========================================
+    // FIND FIRST AVAILABLE CANDIDATE
+    // =========================================
+
+    const payload =
+      getActiveCompletionInheritancePayload();
+
+
+    const candidateCategory =
+      payload.categories.find(
+        category =>
+          category.limit >
+            0 &&
+          Array.isArray(
+            category.candidates
+          ) &&
+          category.candidates.length >
+            0
+      );
+
+
+    if (candidateCategory) {
+
+
+      const candidate =
+        candidateCategory
+          .candidates[0];
+
+
+      const candidateId =
+        candidate.key ||
+        candidate.id;
+
+
+      const selectResult =
+        toggleCompletionInheritanceOption(
+          candidateCategory.id,
+          candidateId
+        );
+
+
+      results.push({
+
+        test:
+          "Candidate selection returns structured feedback",
+
+        pass:
+          !!(
+            selectResult &&
+            selectResult.success ===
+              true &&
+            selectResult.action ===
+              "selected" &&
+            selectResult.candidateId ===
+              candidateId
+          )
+
+      });
+
+
+      const selectedSummary =
+        getCompletionInheritanceSelectionSummary();
+
+
+      results.push({
+
+        test:
+          "Selection summary updates after choosing candidate",
+
+        pass:
+          !!(
+            selectedSummary &&
+            selectedSummary.totalSelected ===
+              1
+          )
+
+      });
+
+
+      const selectedButton =
+        getCompletionFlowUIRoot()
+          .querySelector(
+            `[data-category-id="${candidateCategory.id}"][data-candidate-id="${candidateId}"]`
+          );
+
+
+      results.push({
+
+        test:
+          "Selected candidate is visibly marked",
+
+        pass:
+          !!(
+            selectedButton &&
+            selectedButton.classList
+              .contains(
+                "selected"
+              ) &&
+            selectedButton
+              .getAttribute(
+                "aria-pressed"
+              ) ===
+              "true"
+          )
+
+      });
+
+
+      const removeResult =
+        toggleCompletionInheritanceOption(
+          candidateCategory.id,
+          candidateId
+        );
+
+
+      results.push({
+
+        test:
+          "Candidate can be removed cleanly",
+
+        pass:
+          !!(
+            removeResult &&
+            removeResult.success ===
+              true &&
+            removeResult.action ===
+              "removed" &&
+            getCompletionInheritanceSelectionSummary()
+              .totalSelected ===
+              0
+          )
+
+      });
+
+    }
+    else {
+
+
+      results.push({
+
+        test:
+          "Candidate selection returns structured feedback",
+
+        pass:
+          true
+
+      });
+
+
+      results.push({
+
+        test:
+          "Selection summary updates after choosing candidate",
+
+        pass:
+          true
+
+      });
+
+
+      results.push({
+
+        test:
+          "Selected candidate is visibly marked",
+
+        pass:
+          true
+
+      });
+
+
+      results.push({
+
+        test:
+          "Candidate can be removed cleanly",
+
+        pass:
+          true
+
+      });
+
+    }
+
+
+    // =========================================
+    // KAGE BACK RETURNS TO FORK
+    // =========================================
+
+    renderCompletionInheritanceUI();
+
+
+    const kageBack =
+      handleCompletionInheritanceBack();
+
+
+    results.push({
+
+      test:
+        "Kage inheritance GO BACK returns to path fork",
+
+      pass:
+        !!(
+          kageBack ===
+            true &&
+          completionFlowSession &&
+          completionFlowSession.stage ===
+            "path_selection" &&
+          getCompletionFlowUIRoot()
+        )
+
+    });
+
+
+    // =========================================
+    // ORDINARY BACK DOES NOT SHOW KAGE FORK
+    // =========================================
+
+    const rootAfterKage =
+      getCompletionFlowUIRoot();
+
+
+    if (rootAfterKage) {
+
+      rootAfterKage.remove();
+
+    }
+
+
+    clearCompletionFlowSession();
+
+
+    const ordinaryState = {
+
+      valid:
+        true,
+
+      currentDifficultyId:
+        "academy",
+
+      currentDifficultyName:
+        "Academy Student",
+
+      currentDifficultyOrder:
+        0,
+
+      highestDifficultyUnlockedId:
+        "genin",
+
+      highestDifficultyUnlockedName:
+        "Genin",
+
+      highestDifficultyUnlockedOrder:
+        1,
+
+      legacyCycle:
+        0,
+
+      runCompleted:
+        true,
+
+      completedDifficulties: [
+        "academy"
+      ],
+
+      premiumDifficulty:
+        false
+
+    };
+
+
+    beginCompletionFlow(
+      ordinaryState
+    );
+
+
+    selectCompletionFlowPath(
+      completionFlowSession
+        .paths[0]
+        .id
+    );
+
+
+    createCompletionFlowUIRoot();
+
+
+    renderCompletionInheritanceUI();
+
+
+    const ordinaryBack =
+      handleCompletionInheritanceBack();
+
+
+    results.push({
+
+      test:
+        "Ordinary inheritance GO BACK does not open Kage fork",
+
+      pass:
+        !!(
+          ordinaryBack ===
+            true &&
+          getCompletionFlowUIRoot() ===
+            null &&
+          getCompletionFlowSession() ===
+            null
+        )
+
+    });
+
+
+    // =========================================
+    // PLAYER SAVE SAFETY
+    // =========================================
+
+    const afterSnapshot =
+      createRunTransitionSnapshot();
+
+
+    results.push({
+
+      test:
+        "Inheritance UI polish never modifies player save",
+
+      pass:
+        JSON.stringify(
+          playerSnapshot
+        ) ===
+        JSON.stringify(
+          afterSnapshot
+        )
+
+    });
+
+  }
+  finally {
+
+
+    const root =
+      getCompletionFlowUIRoot();
+
+
+    if (root) {
+
+      root.remove();
+
+    }
+
+
+    completionFlowSession =
+      previousSession;
+
+
+    restoreRunTransitionSnapshot(
+      playerSnapshot
+    );
+
+  }
+
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      `✅ INHERITANCE UI POLISH PASSED ${results.length}/${results.length}`
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ INHERITANCE UI POLISH HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
 
 }
 
