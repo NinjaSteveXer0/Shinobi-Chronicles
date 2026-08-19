@@ -3914,6 +3914,640 @@ body {
 
 }
 
+
+/* =========================================================
+   35. BRICK 89A — INHERITANCE SELECTION SUMMARY
+   ========================================================= */
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary {
+  width:
+    min(
+      920px,
+      100%
+    );
+
+  margin:
+    0
+    auto
+    24px;
+
+  padding:
+    15px
+    18px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(22, 19, 13, 0.92),
+      rgba(8, 10, 10, 0.96)
+    );
+
+  border:
+    1px solid
+    rgba(190, 154, 72, 0.38);
+
+  box-shadow:
+    inset
+    0
+    1px
+    0
+    rgba(255, 228, 156, 0.035),
+
+    0
+    7px
+    22px
+    rgba(0, 0, 0, 0.34);
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-main {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 18px;
+
+  padding-bottom: 11px;
+
+  border-bottom:
+    1px solid
+    rgba(178, 146, 70, 0.19);
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-label {
+  color:
+    #a48b57;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  letter-spacing: 2px;
+
+  text-transform: uppercase;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-total {
+  color:
+    #ead087;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: 24px;
+
+  line-height: 1;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-total span {
+  color:
+    #756c58;
+
+  font-size: 14px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-categories {
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      4,
+      minmax(0, 1fr)
+    );
+
+  gap: 8px;
+
+  margin-top: 11px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-category {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 8px;
+
+  min-width: 0;
+
+  padding:
+    7px
+    9px;
+
+  background:
+    rgba(255, 255, 255, 0.018);
+
+  border:
+    1px solid
+    rgba(118, 108, 80, 0.22);
+
+  color:
+    #86837b;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 9px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-category span {
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-category strong {
+  flex-shrink: 0;
+
+  color:
+    #d0b36f;
+
+  font-size: 10px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-summary-note {
+  margin-top: 10px;
+
+  color:
+    #716d63;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 9px;
+
+  text-align: right;
+}
+
+
+/* =========================================================
+   36. BRICK 89A — INHERITANCE CATEGORY CARDS
+   ========================================================= */
+
+#shinobi-completion-flow-ui
+.sc-inheritance-grid {
+  width: 100%;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-category {
+  position: relative;
+
+  min-height: 205px;
+
+  padding: 18px;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(21, 22, 20, 0.82),
+      rgba(6, 8, 8, 0.94)
+    );
+
+  border:
+    1px solid
+    rgba(164, 137, 73, 0.28);
+
+  box-shadow:
+    inset
+    0
+    1px
+    0
+    rgba(255, 255, 255, 0.025),
+
+    0
+    7px
+    18px
+    rgba(0, 0, 0, 0.27);
+
+  transition:
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-category::before {
+  content: "";
+
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 1px;
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      rgba(210, 172, 82, 0.38),
+      transparent
+    );
+
+  pointer-events: none;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-category-full {
+  border-color:
+    rgba(210, 171, 76, 0.5);
+
+  box-shadow:
+    inset
+    0
+    0
+    20px
+    rgba(180, 137, 43, 0.04),
+
+    0
+    7px
+    18px
+    rgba(0, 0, 0, 0.3);
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-category-heading {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 12px;
+
+  margin-bottom: 5px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-category-heading h3 {
+  margin: 0;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-count {
+  min-width: 40px;
+
+  padding:
+    3px
+    7px;
+
+  background:
+    rgba(185, 143, 49, 0.08);
+
+  border:
+    1px solid
+    rgba(196, 158, 66, 0.25);
+
+  color:
+    #c9a85b;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 9px;
+
+  font-weight: 800;
+
+  text-align: center;
+
+  letter-spacing: 0.5px;
+}
+
+
+/* =========================================================
+   37. BRICK 89A — INHERITANCE OPTIONS
+   ========================================================= */
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option {
+  min-height: 48px;
+
+  padding:
+    8px
+    10px;
+
+  gap: 12px;
+
+  border:
+    1px solid
+    rgba(111, 109, 99, 0.25);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(14, 17, 17, 0.82),
+      rgba(5, 7, 8, 0.88)
+    );
+
+  transition:
+    transform 0.14s ease,
+    border-color 0.18s ease,
+    background 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option:hover {
+  transform:
+    translateY(-1px);
+
+  border-color:
+    rgba(184, 153, 80, 0.5);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(27, 25, 18, 0.9),
+      rgba(8, 10, 10, 0.92)
+    );
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option.selected {
+  border-color:
+    rgba(221, 181, 78, 0.78);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(68, 52, 18, 0.32),
+      rgba(20, 18, 11, 0.92)
+    );
+
+  color:
+    #f0d58b;
+
+  box-shadow:
+    inset
+    3px
+    0
+    0
+    rgba(222, 180, 73, 0.68),
+
+    0
+    0
+    13px
+    rgba(188, 142, 38, 0.08);
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option-main {
+  display: flex;
+
+  min-width: 0;
+
+  flex: 1;
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option-name {
+  overflow: hidden;
+
+  color:
+    #c4c1b7;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 11px;
+
+  font-weight: 700;
+
+  text-overflow: ellipsis;
+
+  white-space: nowrap;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option.selected
+.sc-inheritance-option-name {
+  color:
+    #efd17c;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option-state {
+  color:
+    #5f655f;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 7px;
+
+  font-weight: 800;
+
+  letter-spacing: 1.1px;
+
+  text-transform: uppercase;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option.selected
+.sc-inheritance-option-state {
+  color:
+    #aa8d4c;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option-mark {
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+
+  flex-shrink: 0;
+
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    rgba(117, 116, 106, 0.27);
+
+  border-radius: 50%;
+
+  color:
+    #777b75;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 13px;
+
+  font-weight: 900;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-option.selected
+.sc-inheritance-option-mark {
+  background:
+    rgba(192, 147, 42, 0.13);
+
+  border-color:
+    rgba(219, 177, 73, 0.58);
+
+  color:
+    #e6c56b;
+
+  box-shadow:
+    0
+    0
+    9px
+    rgba(206, 158, 49, 0.12);
+}
+
+
+/* =========================================================
+   38. BRICK 89A — INHERITANCE GUIDANCE
+   ========================================================= */
+
+#shinobi-completion-flow-ui
+.sc-inheritance-guidance {
+  width:
+    min(
+      760px,
+      100%
+    );
+
+  margin:
+    20px
+    auto
+    0;
+
+  padding-top: 13px;
+
+  border-top:
+    1px solid
+    rgba(162, 137, 78, 0.18);
+
+  color:
+    #77756d;
+
+  font-family:
+    Arial,
+    sans-serif;
+
+  font-size: 9px;
+
+  line-height: 1.55;
+
+  text-align: center;
+
+  letter-spacing: 0.3px;
+}
+
+
+#shinobi-completion-flow-ui
+.sc-inheritance-guidance strong {
+  margin-left: 4px;
+
+  color:
+    #b19963;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   39. BRICK 89A — COMPLETION UI RESPONSIVE POLISH
+   ========================================================= */
+
+@media
+(max-width: 1050px) {
+
+  #shinobi-completion-flow-ui
+  .sc-inheritance-summary-categories {
+    grid-template-columns:
+      repeat(
+        2,
+        minmax(0, 1fr)
+      );
+  }
+
+}
+
+
+@media
+(max-width: 700px) {
+
+  #shinobi-completion-flow-ui
+  .sc-inheritance-summary-main {
+    align-items: flex-start;
+
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+
+  #shinobi-completion-flow-ui
+  .sc-inheritance-summary-categories {
+    grid-template-columns:
+      1fr;
+  }
+
+
+  #shinobi-completion-flow-ui
+  .sc-inheritance-summary-note {
+    text-align: left;
+  }
+
+}
+
 /* =========================================================
    REGIONAL HOTSPOT — HOVER STACKING FIX
    Keep the active hotspot above neighbouring markers
