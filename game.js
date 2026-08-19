@@ -25635,6 +25635,522 @@ function installCompletionLifecycleResume() {
 
 
 // =========================================================
+// BRICKS 81–83 REGRESSION DIAGNOSTICS
+// =========================================================
+//
+// Restored in Brick 86A after the Brick 84–86 lifecycle
+// replacement accidentally removed the older test harness.
+//
+// This changes no gameplay behaviour.
+//
+// =========================================================
+
+function runLifecycleIntegrationDiagnostics() {
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "SHINOBI CHRONICLES — LIFECYCLE INTEGRATION DIAGNOSTICS"
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  const results =
+    [];
+
+
+  const originalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  const originalSession =
+    completionFlowSession;
+
+
+  const existingRoot =
+    getCompletionFlowUIRoot();
+
+
+  if (existingRoot) {
+
+    existingRoot.remove();
+
+  }
+
+
+  try {
+
+
+    // =========================================
+    // TEST 1 — ORDINARY ENEMY MUST NOT TRIGGER
+    // =========================================
+
+    const normalTrigger =
+      getGameplayRunCompletionTrigger({
+        enemy: {
+          id:
+            "diagnostic_bandit"
+        },
+        location:
+          null
+      });
+
+
+    results.push({
+
+      test:
+        "Ordinary battle does not complete a run",
+
+      pass:
+        normalTrigger.detected ===
+        false
+
+    });
+
+
+    // =========================================
+    // TEST 2 — EXPLICIT ENEMY TRIGGER DETECTED
+    // =========================================
+
+    const enemyTrigger =
+      getGameplayRunCompletionTrigger({
+        enemy: {
+          id:
+            "diagnostic_final_enemy",
+
+          progressionTrigger:
+            "run_completion"
+        },
+        location:
+          null
+      });
+
+
+    results.push({
+
+      test:
+        "Explicit enemy run-completion trigger is detected",
+
+      pass:
+        !!(
+          enemyTrigger.detected ===
+            true &&
+          enemyTrigger.triggerType ===
+            "run_completion" &&
+          enemyTrigger.sourceType ===
+            "enemy" &&
+          enemyTrigger.sourceId ===
+            "diagnostic_final_enemy"
+        )
+
+    });
+
+
+    // =========================================
+    // TEST 3 — LOCATION TRIGGER DETECTED
+    // =========================================
+
+    const locationTrigger =
+      getGameplayRunCompletionTrigger({
+        enemy: {
+          id:
+            "ordinary_enemy"
+        },
+        location: {
+          id:
+            "diagnostic_story_location",
+
+          progressionTrigger: {
+            type:
+              "run_completion"
+          }
+        }
+      });
+
+
+    results.push({
+
+      test:
+        "Explicit location run-completion trigger is detected",
+
+      pass:
+        !!(
+          locationTrigger.detected ===
+            true &&
+          locationTrigger.sourceType ===
+            "location" &&
+          locationTrigger.sourceId ===
+            "diagnostic_story_location"
+        )
+
+    });
+
+
+    // =========================================
+    // TEST 4 — ACADEMY COMPLETION
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "academy",
+
+      highestDifficultyUnlocked:
+        "academy",
+
+      legacyCycle:
+        0,
+
+      completedDifficulties:
+        [],
+
+      runCompleted:
+        false
+
+    };
+
+
+    clearCompletionFlowSession();
+
+
+    const academyResult =
+      processGameplayRunCompletion({
+        enemy: {
+          id:
+            "diagnostic_academy_final",
+
+          progressionTrigger:
+            "run_completion"
+        },
+        location:
+          null
+      });
+
+
+    const academySession =
+      getCompletionFlowSession();
+
+
+    results.push({
+
+      test:
+        "Gameplay completion marks Academy complete",
+
+      pass:
+        !!(
+          academyResult &&
+          academyResult.completed ===
+            true &&
+          playerData.progression
+            .runCompleted ===
+            true &&
+          playerData.progression
+            .completedDifficulties
+            .includes(
+              "academy"
+            )
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Academy completion unlocks Genin",
+
+      pass:
+        playerData.progression
+          .highestDifficultyUnlocked ===
+          "genin"
+
+    });
+
+
+    results.push({
+
+      test:
+        "Ordinary completion opens single-path inheritance flow",
+
+      pass:
+        !!(
+          academyResult &&
+          academyResult.flowOpened ===
+            true &&
+          academyResult.flow &&
+          academyResult.flow.mode ===
+            "ordinary_progression" &&
+          academyResult.flow.stage ===
+            "inheritance_selection" &&
+          academySession &&
+          academySession.active ===
+            true
+        )
+
+    });
+
+
+    // =========================================
+    // CLEAN ORDINARY FLOW BEFORE KAGE TEST
+    // =========================================
+
+    const academyRoot =
+      getCompletionFlowUIRoot();
+
+
+    if (academyRoot) {
+
+      academyRoot.remove();
+
+    }
+
+
+    clearCompletionFlowSession();
+
+
+    // =========================================
+    // TEST 5 — KAGE COMPLETION
+    // =========================================
+
+    playerData.progression = {
+
+      currentDifficulty:
+        "kage",
+
+      highestDifficultyUnlocked:
+        "kage",
+
+      legacyCycle:
+        2,
+
+      completedDifficulties: [
+        "academy",
+        "genin",
+        "chunin",
+        "special_jonin",
+        "jonin",
+        "anbu"
+      ],
+
+      runCompleted:
+        false
+
+    };
+
+
+    const kageResult =
+      processGameplayRunCompletion({
+        enemy: {
+          id:
+            "diagnostic_kage_final",
+
+          progressionTrigger:
+            "run_completion"
+        },
+        location:
+          null
+      });
+
+
+    const kageSession =
+      getCompletionFlowSession();
+
+
+    results.push({
+
+      test:
+        "Gameplay completion marks Kage complete",
+
+      pass:
+        !!(
+          kageResult &&
+          kageResult.completed ===
+            true &&
+          playerData.progression
+            .runCompleted ===
+            true &&
+          playerData.progression
+            .completedDifficulties
+            .includes(
+              "kage"
+            )
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Kage completion opens dedicated two-path fork",
+
+      pass:
+        !!(
+          kageResult &&
+          kageResult.flowOpened ===
+            true &&
+          kageResult.flow &&
+          (
+            kageResult.flow.mode ===
+              "kage_fork" ||
+            kageResult.flow.stage ===
+              "path_selection"
+          ) &&
+          kageSession &&
+          Array.isArray(
+            kageSession.paths
+          ) &&
+          kageSession.paths.length ===
+            2
+        )
+
+    });
+
+
+    results.push({
+
+      test:
+        "Kage fork includes Legacy Rebirth route",
+
+      pass:
+        !!(
+          kageSession &&
+          Array.isArray(
+            kageSession.paths
+          ) &&
+          kageSession.paths.some(
+            path =>
+              path.routeType ===
+              "legacy_rebirth"
+          )
+        )
+
+    });
+
+
+    const kageRoot =
+      getCompletionFlowUIRoot();
+
+
+    if (kageRoot) {
+
+      kageRoot.remove();
+
+    }
+
+  }
+  finally {
+
+
+    restoreRunTransitionSnapshot(
+      originalSnapshot
+    );
+
+
+    completionFlowSession =
+      originalSession;
+
+
+    const root =
+      getCompletionFlowUIRoot();
+
+
+    if (root) {
+
+      root.remove();
+
+    }
+
+  }
+
+
+  // =========================================
+  // ORIGINAL SAVE CHECK
+  // =========================================
+
+  const finalSnapshot =
+    createRunTransitionSnapshot();
+
+
+  results.push({
+
+    test:
+      "Original player save restored after lifecycle diagnostics",
+
+    pass:
+      JSON.stringify(
+        originalSnapshot
+      ) ===
+      JSON.stringify(
+        finalSnapshot
+      )
+
+  });
+
+
+  // =========================================
+  // RESULTS
+  // =========================================
+
+  console.table(
+    results
+  );
+
+
+  const failedTests =
+    results.filter(
+      result =>
+        !result.pass
+    );
+
+
+  if (
+    failedTests.length ===
+      0
+  ) {
+
+
+    console.log(
+      `✅ LIFECYCLE INTEGRATION PASSED ${results.length}/${results.length}`
+    );
+
+  }
+  else {
+
+
+    console.warn(
+      `❌ LIFECYCLE INTEGRATION HAS ${failedTests.length} FAILED TEST(S)`
+    );
+
+
+    console.table(
+      failedTests
+    );
+
+  }
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  return (
+    failedTests.length ===
+    0
+  );
+
+}
+
+// =========================================================
 // BRICKS 84–86 DIAGNOSTICS
 // =========================================================
 
