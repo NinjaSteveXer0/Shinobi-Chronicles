@@ -37459,7 +37459,7 @@ function getLocationVisitCount() {
 }
 
 // =========================================================
-// BRICK 144 — LOCATION PLAYER PROGRESS SUMMARY
+// LOCATION PLAYER PROGRESS SUMMARY
 // =========================================================
 
 function getLocationPlayerProgressSummary(
@@ -37504,7 +37504,7 @@ function getLocationPlayerProgressSummary(
 }
 
 // =========================================================
-// BRICK 145 — FULL LOCATION PLAYER SUMMARY
+// FULL LOCATION PLAYER SUMMARY
 // =========================================================
 
 function getPlayerLocationSummary() {
@@ -37528,7 +37528,7 @@ function getPlayerLocationSummary() {
 }
 
 // =========================================================
-// BRICK 146 — LOCATION SYSTEM HEALTH CHECK
+// LOCATION SYSTEM HEALTH CHECK
 // =========================================================
 
 function validateLocationSystem() {
@@ -37558,7 +37558,7 @@ function validateLocationSystem() {
 }
 
 // =========================================================
-// BRICK 147 — TRAINING ACTIVITY DATA BRIDGE
+// TRAINING ACTIVITY DATA BRIDGE
 // =========================================================
 
 function getTrainingActivityData(
@@ -37598,7 +37598,7 @@ function getTrainingActivityData(
 }
 
 // =========================================================
-// BRICK 148 — TRAINING DATA VALIDATION
+// TRAINING DATA VALIDATION
 // =========================================================
 
 function validateTrainingActivity(
@@ -37633,7 +37633,7 @@ function validateTrainingActivity(
 }
 
 // =========================================================
-// BRICK 149 — TRAINING EXECUTION DATA
+// TRAINING EXECUTION DATA
 // =========================================================
 
 function getTrainingExecutionData(
@@ -37672,7 +37672,7 @@ function getTrainingExecutionData(
 }
 
 // =========================================================
-// BRICK 150 — TRAINING DEBUG CHECK
+// TRAINING DEBUG CHECK
 // =========================================================
 
 function debugTrainingActivity(
@@ -37701,7 +37701,7 @@ function debugTrainingActivity(
 }
 
 // =========================================================
-// BRICK 151 — TRAINING SYSTEM HEALTH
+// TRAINING SYSTEM HEALTH
 // =========================================================
 
 function validateTrainingSystem() {
@@ -37725,9 +37725,9 @@ function validateTrainingSystem() {
 
 }
 
-// =========================================================
-// 15. TRAINING OVERLAY
-// =========================================================
+// =========================================
+// TRAINING OVERLAY UI
+// =========================================
 
 function renderTrainingOverlay(
   container
@@ -37819,7 +37819,7 @@ function renderTrainingOverlay(
 }
 
 // =========================================================
-// BRICK 153 — TRAINING ACTIVITY DATABASE
+// TRAINING ACTIVITY DATABASE
 // =========================================================
 //
 // DATA-DRIVEN TRAINING DEFINITIONS
@@ -38028,7 +38028,7 @@ function getTrainingActivityData(
 }
 
 // =========================================================
-// BRICK 154 — ACTIVITY RESULT NORMALISATION
+// BRICK 95 — ACTIVITY RESULT NORMALISATION
 // =========================================================
 //
 // Converts raw activity definitions into a standard
