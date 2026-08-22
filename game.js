@@ -37158,6 +37158,157 @@ function debugLocationSystem(
 
 }
 
+// =========================================================
+// BRICK 137 — LOCATION STATUS DATA
+// =========================================================
+
+function getLocationStatus(
+  locationId
+) {
+
+  const location =
+    LOCATION_DATABASE[locationId];
+
+
+  if (
+    !location
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      location.id,
+
+    name:
+      location.name,
+
+    type:
+      location.type,
+
+    discovered:
+      isLocationDiscovered(
+        locationId
+      ),
+
+    visited:
+      getLocationHistory()
+        .includes(
+          locationId
+        )
+
+  };
+
+}
+
+// =========================================================
+// BRICK 138 — LOCATION STATUS DEBUG
+// =========================================================
+
+function debugLocationStatus(
+  locationId
+) {
+
+
+  console.log(
+    "LOCATION STATUS:",
+    getLocationStatus(
+      locationId
+    )
+  );
+
+
+  return true;
+
+}
+
+// =========================================================
+// BRICK 139 — DISCOVERED LOCATION LIST
+// =========================================================
+
+function getDiscoveredLocations() {
+
+
+  return Object.keys(
+    LOCATION_DATABASE
+  )
+  .filter(
+    locationId =>
+      isLocationDiscovered(
+        locationId
+      )
+  )
+  .map(
+    locationId =>
+      getLocationStatus(
+        locationId
+      )
+  );
+
+}
+
+// =========================================================
+// BRICK 140 — LOCATION COMPLETION CHECK
+// =========================================================
+
+function isLocationComplete(
+  locationId
+) {
+
+
+  const progress =
+    getPlayerLocationProgress(
+      locationId
+    );
+
+
+  if (
+    !progress
+  ) {
+
+    return false;
+
+  }
+
+
+  return (
+    progress.state ===
+    "completed"
+  );
+
+}
+
+// =========================================================
+// BRICK 141 — LOCATION SYSTEM SUMMARY
+// =========================================================
+
+function getLocationSystemSummary() {
+
+
+  return {
+
+    totalLocations:
+      Object.keys(
+        LOCATION_DATABASE
+      ).length,
+
+    discovered:
+      getDiscoveredLocations()
+        .length,
+
+    currentLocation:
+      selectedLocationNode
+        ? selectedLocationNode.id
+        : null
+
+  };
+
+}
+
 
 
 
