@@ -37713,12 +37713,13 @@ function renderTrainingOverlay(
 )}
 
 
-        ${createActivityCard(
-          "Elite Training",
-          "High-level challenge with rare training rewards.",
-          "EXP: 650",
-          "Recommended PL: 1,800"
-        )}
+       ${createActivityCard(
+  "Elite Training",
+  "High-level challenge with rare training rewards.",
+  "EXP: 650",
+  "Recommended PL: 1,800",
+  "elite_training"
+)}
 
 
       </div>
