@@ -37469,6 +37469,173 @@ function validateLocationSystem() {
 
 }
 
+// =========================================================
+// BRICK 147 — TRAINING ACTIVITY DATA BRIDGE
+// =========================================================
+
+function getTrainingActivityData(
+  activityId
+) {
+
+
+  const training =
+    TRAINING_DATABASE?.[activityId];
+
+
+  if (
+    !training
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      activityId,
+
+    name:
+      training.name,
+
+    exp:
+      training.exp,
+
+    rewards:
+      training.rewards
+
+  };
+
+}
+
+// =========================================================
+// BRICK 148 — TRAINING DATA VALIDATION
+// =========================================================
+
+function validateTrainingActivity(
+  activityId
+) {
+
+
+  const activity =
+    getTrainingActivityData(
+      activityId
+    );
+
+
+  if (
+    !activity
+  ) {
+
+    return false;
+
+  }
+
+
+  return (
+
+    !!activity.name &&
+
+    typeof activity.exp ===
+    "number"
+
+  );
+
+}
+
+// =========================================================
+// BRICK 149 — TRAINING EXECUTION DATA
+// =========================================================
+
+function getTrainingExecutionData(
+  activityId
+) {
+
+
+  const activity =
+    getTrainingActivityData(
+      activityId
+    );
+
+
+  if (
+    !activity
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    activity:
+      activity.id,
+
+    rewardEXP:
+      activity.exp,
+
+    rewards:
+      activity.rewards
+
+  };
+
+}
+
+// =========================================================
+// BRICK 150 — TRAINING DEBUG CHECK
+// =========================================================
+
+function debugTrainingActivity(
+  activityId
+) {
+
+
+  console.log(
+    "TRAINING DATA:",
+    getTrainingActivityData(
+      activityId
+    )
+  );
+
+
+  console.log(
+    "EXECUTION DATA:",
+    getTrainingExecutionData(
+      activityId
+    )
+  );
+
+
+  return true;
+
+}
+
+// =========================================================
+// BRICK 151 — TRAINING SYSTEM HEALTH
+// =========================================================
+
+function validateTrainingSystem() {
+
+
+  return {
+
+    database:
+      typeof TRAINING_DATABASE !==
+      "undefined",
+
+    loader:
+      typeof getTrainingActivityData ===
+      "function",
+
+    execution:
+      typeof getTrainingExecutionData ===
+      "function"
+
+  };
+
+}
 
 // =========================================================
 // 15. TRAINING OVERLAY
