@@ -37725,9 +37725,9 @@ function validateTrainingSystem() {
 
 }
 
-// =========================================
-// TRAINING OVERLAY UI
-// =========================================
+// =========================================================
+// UI MODULE — TRAINING OVERLAY
+// =========================================================
 
 function renderTrainingOverlay(
   container
@@ -38203,9 +38203,9 @@ function startTraining(
 }
 
 
-// =========================================
-// BATTLE / LOOT OVERLAY UI
-// =========================================
+// =========================================================
+// UI MODULE — BATTLE / LOOT OVERLAY
+// =========================================================
 
 function renderBattleOverlay(
   container
@@ -41237,9 +41237,9 @@ function continueAfterVictory() {
 }
 
 
-// =========================================
-// BATTLE ACTIVE FIGHTER SELECTION
-// =========================================
+// =========================================================
+// BATTLE ENGINE — ACTIVE FIGHTER SELECTION
+// =========================================================
 
 function selectActiveFighter(playerId) {
 
@@ -41271,9 +41271,9 @@ function selectActiveFighter(playerId) {
 
 }
 
-// =========================================
-// BATTLE DAMAGE RESOLUTION
-// =========================================
+// =========================================================
+// BATTLE ENGINE — DAMAGE RESOLUTION
+// =========================================================
 
 function performStatAttack(
   attackType
@@ -41814,7 +41814,7 @@ onclick="${action}; console.log('AFTER ACTION')"
 
 
 // =========================================================
-// 20. DAILY REWARD
+// FUTURE SYSTEM — DAILY REWARD
 // =========================================================
 
 function claimDailyReward() {
@@ -41824,9 +41824,9 @@ function claimDailyReward() {
   );
 }
 
-// =========================================
-// DEVELOPMENT STATE RESTORE
-// =========================================
+// =========================================================
+// SAVE SYSTEM — DEVELOPMENT STATE RESTORE
+// =========================================================
 
 function restoreTestState() {
 
@@ -42088,9 +42088,9 @@ function restoreTestState() {
 }
 
 
-// =========================================
-// GAME INITIALISATION
-// =========================================
+// =========================================================
+// CORE ENGINE — GAME INITIALISATION
+// =========================================================
 
 window.addEventListener(
   "load",
