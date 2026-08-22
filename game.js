@@ -1881,6 +1881,106 @@ syncCharacterProgressionFromSave();
 
 
 // =========================================================
+// BRICK 91A — PRACTICAL TRAINING BRIDGE
+// =========================================================
+
+function getPracticalTrainingDisciplines(){
+
+  return Object.values(
+    SHINOBI_DISCIPLINES
+  ).filter(
+    discipline =>
+      discipline.trainingSource === "practical"
+  );
+
+}
+
+
+function awardPracticalTrainingExp(
+  characterId,
+  disciplineId
+){
+
+  const character =
+    playerTeam.find(
+      shinobi =>
+        shinobi.id === characterId
+    );
+
+
+  if(!character){
+
+    console.log(
+      "Character not found:",
+      characterId
+    );
+
+    return false;
+
+  }
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  if(
+    !discipline ||
+    discipline.trainingSource !== "practical"
+  ){
+
+    console.log(
+      "Invalid practical discipline:",
+      disciplineId
+    );
+
+    return false;
+
+  }
+
+
+  if(
+    !character.disciplineProgression
+  ){
+
+    character.disciplineProgression =
+      createDefaultDisciplineProgression();
+
+  }
+
+
+  const progression =
+    character.disciplineProgression[
+      disciplineId
+    ];
+
+
+  if(!progression){
+
+    return false;
+
+  }
+
+
+  progression.exp += 10;
+
+
+  savePlayerData();
+
+
+  console.log(
+    `${character.name} gained Practical EXP in ${discipline.name}`
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
 // SAVE PLAYER DATA
 // =========================================================
 
