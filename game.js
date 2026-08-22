@@ -34383,6 +34383,126 @@ function handleNodeNavigation() {
 
 }
 
+// =========================================================
+// BRICK 93 — LOCATION REGISTRY FOUNDATION
+// =========================================================
+
+
+const LOCATION_DATABASE = {
+
+
+  konoha: {
+
+    id:
+      "konoha",
+
+    name:
+      "Hidden Leaf Village",
+
+    type:
+      "village",
+
+    actions: [
+      "missions",
+      "training",
+      "exams",
+      "practical"
+    ]
+
+  },
+
+
+  training_grounds: {
+
+    id:
+      "training_grounds",
+
+    name:
+      "Training Grounds",
+
+    type:
+      "training",
+
+    actions: [
+      "practical"
+    ]
+
+  },
+
+
+  rogue_hideout: {
+
+    id:
+      "rogue_hideout",
+
+    name:
+      "Rogue Ninja Hideout",
+
+    type:
+      "battle",
+
+    actions: [
+      "battle"
+    ]
+
+  }
+
+
+};
+
+
+
+// =========================================================
+// GET LOCATION DATA
+// =========================================================
+
+function getLocationData(
+  locationId
+) {
+
+
+  return (
+    LOCATION_DATABASE[
+      locationId
+    ] ||
+    null
+  );
+
+
+}
+
+
+
+// =========================================================
+// GET LOCATION ACTIONS
+// =========================================================
+
+function getLocationActions(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return [];
+
+  }
+
+
+  return (
+    location.actions ||
+    []
+  );
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
