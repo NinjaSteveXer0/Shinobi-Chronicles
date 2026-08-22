@@ -35979,52 +35979,6 @@ function canTravelToLocation(
 
 }
 
-// =========================================
-// LOCATION TRAVEL ACTION
-// =========================================
-
-
-function travelToLocation(
-  locationId
-) {
-
-
-  if (
-    !canTravelToLocation(
-      locationId
-    )
-  ) {
-
-
-    console.log(
-      "Travel denied:",
-      locationId
-    );
-
-
-    return false;
-
-  }
-
-
-
-  setPlayerLocation(
-    locationId
-  );
-
-
-
-  console.log(
-    "Player travelled to:",
-    locationId
-  );
-
-
-
-  return true;
-
-
-}
 
 // =========================================
 // CURRENT LOCATION ACTION LIST
