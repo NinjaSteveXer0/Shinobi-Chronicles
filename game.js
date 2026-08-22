@@ -36612,6 +36612,144 @@ function canExploreLocation(
 
 }
 
+// =========================================================
+// BRICK 122 — LOCATION TYPE CHECK
+// =========================================================
+
+
+function isLocationType(
+  locationId,
+  type
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return false;
+
+  }
+
+
+  return (
+    location.type === type
+  );
+
+
+}
+
+// =========================================================
+// BRICK 123 — LOCATION HAS ACTION
+// =========================================================
+
+
+function locationHasAction(
+  locationId,
+  action
+) {
+
+
+  const actions =
+    getLocationActions(
+      locationId
+    );
+
+
+  if (!actions) {
+
+    return false;
+
+  }
+
+
+  return actions.includes(
+    action
+  );
+
+
+}
+
+// =========================================================
+// BRICK 124 — LOCATION DISCOVERY COUNT
+// =========================================================
+
+
+function getDiscoveredLocationCount() {
+
+
+  let count =
+    0;
+
+
+  for (
+    const locationId in LOCATION_DATABASE
+  ) {
+
+
+    if (
+      isLocationDiscovered(
+        locationId
+      )
+    ) {
+
+      count++;
+
+    }
+
+
+  }
+
+
+  return count;
+
+
+}
+
+// =========================================================
+// BRICK 125 — TOTAL LOCATION COUNT
+// =========================================================
+
+
+function getTotalLocationCount() {
+
+
+  return Object.keys(
+    LOCATION_DATABASE
+  ).length;
+
+
+}
+
+// =========================================================
+// BRICK 126 — LOCATION DISCOVERY SUMMARY
+// =========================================================
+
+
+function getLocationDiscoverySummary() {
+
+
+  return {
+
+
+    discovered:
+      getDiscoveredLocationCount(),
+
+
+    total:
+      getTotalLocationCount()
+
+
+  };
+
+
+}
+
+
 
 
 // =========================================================
