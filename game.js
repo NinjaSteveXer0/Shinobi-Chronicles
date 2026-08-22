@@ -35480,6 +35480,174 @@ function launchLocationAction(
 
 }
 
+// =========================================================
+// BRICK 97 — CONTENT REGISTRY FOUNDATION
+// =========================================================
+
+
+const CONTENT_REGISTRY = {
+
+
+  locations:
+    LOCATION_DATABASE,
+
+
+  activities:
+    ACTIVITY_DATABASE,
+
+
+  characters:
+    {},
+
+
+  enemies:
+    {},
+
+
+  missions:
+    {},
+
+
+  equipment:
+    {}
+
+
+};
+
+
+
+
+
+function getContentRegistry(
+  type
+) {
+
+
+  return (
+    CONTENT_REGISTRY[type]
+    ||
+    null
+  );
+
+
+}
+
+// =========================================================
+// BRICK 98 — LOCATION REGISTRY EXPANSION
+// =========================================================
+
+
+function registerLocation(
+  location
+) {
+
+
+  if (
+    !location ||
+    !location.id
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  LOCATION_DATABASE[
+    location.id
+  ] = location;
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
+// BRICK 99 — ACTIVITY VALIDATION SYSTEM
+// =========================================================
+
+
+function validateActivity(
+  activityId
+) {
+
+
+  const activity =
+    getActivityData(
+      activityId
+    );
+
+
+
+  if (!activity) {
+
+
+    return false;
+
+
+  }
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
+// BRICK 100 — LOCATION ACTIVITY VALIDATION
+// =========================================================
+
+
+function validateLocationActivity(
+  locationId,
+  action
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+
+  if (!location) {
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !location.actions.includes(
+      action
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  return validateActivity(
+    action
+  );
+
+
+}
+
+
 
 // =========================================================
 // BUTTON TEXT
