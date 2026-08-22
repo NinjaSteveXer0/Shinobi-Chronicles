@@ -4206,7 +4206,41 @@ function processPlayerActivity(
   ) {
 
 
+
     case PLAYER_ACTIVITY_TYPES.TRAINING:
+
+
+
+      if (
+        activityRequest.stage ===
+          "available"
+      ) {
+
+
+        return {
+
+
+          success:
+            true,
+
+
+          type:
+            "training_available",
+
+
+          location:
+            activityRequest.location,
+
+
+          message:
+            "Training opportunity available."
+
+
+        };
+
+
+      }
+
 
 
       if (
@@ -4217,7 +4251,7 @@ function processPlayerActivity(
 
 
         console.log(
-          "Training request missing data."
+          "Training execution missing data."
         );
 
 
@@ -4233,7 +4267,8 @@ function processPlayerActivity(
           activityRequest.characterId,
           activityRequest.disciplineId,
           activityRequest.amount,
-          activityRequest.source || "training"
+          activityRequest.source ||
+            "training"
         );
 
 
@@ -4263,7 +4298,15 @@ function processPlayerActivity(
 
 
         type:
-          "training",
+          "training_complete",
+
+
+        characterId:
+          activityRequest.characterId,
+
+
+        disciplineId:
+          activityRequest.disciplineId,
 
 
         message:
@@ -4271,6 +4314,8 @@ function processPlayerActivity(
 
 
       };
+
+
 
 
 
@@ -4296,6 +4341,8 @@ function processPlayerActivity(
 
 
 
+
+
     case PLAYER_ACTIVITY_TYPES.MISSION:
 
 
@@ -4315,6 +4362,8 @@ function processPlayerActivity(
 
 
       };
+
+
 
 
 
@@ -4340,6 +4389,8 @@ function processPlayerActivity(
 
 
 
+
+
     default:
 
 
@@ -4356,6 +4407,8 @@ function processPlayerActivity(
 
 
 }
+
+
 
 // =========================================================
 // ADD DISCIPLINE EXP
@@ -37695,30 +37748,30 @@ function renderTrainingOverlay(
       ">
 
 
-        ${createActivityCard(
+      ${createActivityCard(
   "Light Training",
   "Low-risk encounter.",
   "EXP: 120",
   "Recommended PL: 400",
-  "light_training"
+  "startTraining('light_training')"
 )}
 
 
-        ${createActivityCard(
+ ${createActivityCard(
   "Advanced Training",
   "Stronger opponents with higher EXP rewards.",
   "EXP: 320",
   "Recommended PL: 900",
-  "advanced_training"
+  "startTraining('advanced_training')"
 )}
 
 
-       ${createActivityCard(
+ ${createActivityCard(
   "Elite Training",
   "High-level challenge with rare training rewards.",
   "EXP: 650",
   "Recommended PL: 1,800",
-  "elite_training"
+  "startTraining('elite_training')"
 )}
 
 
