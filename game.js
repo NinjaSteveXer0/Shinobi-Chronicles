@@ -34625,6 +34625,69 @@ function isLocationDiscovered(
 
 }
 
+// =========================================================
+// BRICK 93.4 — LOCATION DATA BRIDGE
+// =========================================================
+
+
+function getCurrentLocationData() {
+
+
+  if (
+    !selectedLocationNode
+  ) {
+
+    return null;
+
+  }
+
+
+  return getLocationData(
+    selectedLocationNode.id
+  );
+
+
+}
+
+
+
+// =========================================================
+// SHOW CURRENT LOCATION
+// =========================================================
+
+function showCurrentLocationData() {
+
+
+  const location =
+    getCurrentLocationData();
+
+
+  if (!location) {
+
+    console.log(
+      "No active location."
+    );
+
+    return;
+
+  }
+
+
+  console.table({
+    Name:
+      location.name,
+
+    Type:
+      location.type,
+
+    Actions:
+      location.actions.join(", ")
+
+  });
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
