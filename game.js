@@ -35272,6 +35272,83 @@ function getActivityData(
 
 }
 
+// =========================================================
+// BRICK 94 — ACTIVITY REGISTRY BRIDGE
+// =========================================================
+
+
+
+function resolveActivityAction(
+  action
+) {
+
+
+  const activity =
+    getActivityData(
+      action
+    );
+
+
+  if (!activity) {
+
+
+    console.log(
+      "Unknown activity:",
+      action
+    );
+
+
+    return null;
+
+
+  }
+
+
+
+  return activity;
+
+
+}
+
+
+
+
+
+// =========================================================
+// START REGISTERED ACTIVITY
+// =========================================================
+
+function startRegisteredActivity(
+  action
+) {
+
+
+  const activity =
+    resolveActivityAction(
+      action
+    );
+
+
+  if (!activity) {
+
+    return false;
+
+  }
+
+
+
+  console.log(
+    "REGISTERED ACTIVITY START:",
+    activity
+  );
+
+
+
+  return activity;
+
+
+}
+
 
 
 
