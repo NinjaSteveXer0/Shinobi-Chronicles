@@ -37784,6 +37784,215 @@ function renderTrainingOverlay(
 }
 
 // =========================================================
+// BRICK 153 — TRAINING ACTIVITY DATABASE
+// =========================================================
+//
+// DATA-DRIVEN TRAINING DEFINITIONS
+//
+// The Chronicle Engine should not hard-code activities.
+// Activities become database entries that define:
+//
+// - rewards
+// - requirements
+// - progression rules
+// - future events
+//
+// The same architecture can later power:
+// Missions
+// Exams
+// Dungeons
+// Events
+// Encounters
+//
+// =========================================================
+
+
+const TRAINING_DATABASE = {
+
+
+  light_training: {
+
+
+    id:
+      "light_training",
+
+
+    name:
+      "Light Training",
+
+
+    description:
+      "Low-risk training encounter for early progression.",
+
+
+    reward: {
+
+
+      exp:
+        120
+
+
+    },
+
+
+    requirement: {
+
+
+      minimumPL:
+        400
+
+
+    },
+
+
+    progression: {
+
+
+      discipline:
+        "stamina",
+
+
+      amount:
+        10
+
+
+    }
+
+
+  },
+
+
+
+  advanced_training: {
+
+
+    id:
+      "advanced_training",
+
+
+    name:
+      "Advanced Training",
+
+
+    description:
+      "Stronger opponents with increased progression rewards.",
+
+
+    reward: {
+
+
+      exp:
+        320
+
+
+    },
+
+
+    requirement: {
+
+
+      minimumPL:
+        900
+
+
+    },
+
+
+    progression: {
+
+
+      discipline:
+        "tai",
+
+
+      amount:
+        25
+
+
+    }
+
+
+  },
+
+
+
+  elite_training: {
+
+
+    id:
+      "elite_training",
+
+
+    name:
+      "Elite Training",
+
+
+    description:
+      "High-level combat training with rare progression rewards.",
+
+
+    reward: {
+
+
+      exp:
+        650
+
+
+    },
+
+
+    requirement: {
+
+
+      minimumPL:
+        1800
+
+
+    },
+
+
+    progression: {
+
+
+      discipline:
+        "nin",
+
+
+      amount:
+        50
+
+
+    }
+
+
+  }
+
+
+};
+
+
+
+// =========================================================
+// GET TRAINING ACTIVITY DATA
+// =========================================================
+
+
+function getTrainingActivityData(
+  activityId
+) {
+
+
+  return (
+    TRAINING_DATABASE[
+      activityId
+    ] ||
+    null
+  );
+
+
+}
+
+// =========================================================
 // BRICK 152 — TRAINING ACTION EXECUTION BRIDGE
 // =========================================================
 //
