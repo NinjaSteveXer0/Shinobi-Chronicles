@@ -38107,7 +38107,7 @@ function normalizeActivityResult(
 }
 
 // =========================================================
-// BRICK 152 — TRAINING ACTION EXECUTION BRIDGE
+// BRICK 96 — TRAINING ACTIVITY EXECUTION BRIDGE
 // =========================================================
 //
 // UI ACTION → ACTIVITY SYSTEM → TRAINING DATA → REWARD PIPELINE
@@ -38203,9 +38203,9 @@ function startTraining(
 }
 
 
-// =========================================================
-// 16. BATTLE / LOOT OVERLAY
-// =========================================================
+// =========================================
+// BATTLE / LOOT OVERLAY UI
+// =========================================
 
 function renderBattleOverlay(
   container
@@ -38364,9 +38364,9 @@ function createCharacterCard(character) {
 
 
 
-// =========================================================
-// 17. COMBAT ARENA SCREEN
-// =========================================================
+// =========================================
+// COMBAT ARENA SCREEN UI
+// =========================================
 
 function renderCombatOverlay(container) {
 
@@ -39150,7 +39150,20 @@ ${
 }
 
 // =========================================================
-// 17B. VICTORY RESULTS SCREEN
+// UI MODULE — VICTORY RESULTS SCREEN
+// =========================================================
+//
+// Handles:
+// - Victory presentation
+// - Reward reveal animations
+// - MVP display
+// - Battle result presentation
+//
+// Does NOT calculate:
+// - rewards
+// - battle outcomes
+// - progression
+//
 // =========================================================
 
 
@@ -41224,9 +41237,9 @@ function continueAfterVictory() {
 }
 
 
-// =========================================================
-// 18. SELECT ACTIVE FIGHTER
-// =========================================================
+// =========================================
+// BATTLE ACTIVE FIGHTER SELECTION
+// =========================================
 
 function selectActiveFighter(playerId) {
 
@@ -41258,9 +41271,9 @@ function selectActiveFighter(playerId) {
 
 }
 
-// =========================================================
-// 19. STAT-BASED COMBAT ATTACK
-// =========================================================
+// =========================================
+// BATTLE DAMAGE RESOLUTION
+// =========================================
 
 function performStatAttack(
   attackType
