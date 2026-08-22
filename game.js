@@ -46,7 +46,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/Kage Naruto.png"
+      "Assets/Animated Cards/kage_naruto.png"
   },
 
 
@@ -87,7 +87,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/Jonin Sasuke.png"
+      "Assets/Animated Cards/jonin_sasuke.png"
   },
 
 
@@ -128,7 +128,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/Sannin Sakura.png"
+      "Assets/Animated Cards/sannin_sakura.png"
   },
 
 
@@ -169,7 +169,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/Teen Nagato.png"
+      "Assets/Animated Cards/teen_nagato.png"
   }
 
 ];
