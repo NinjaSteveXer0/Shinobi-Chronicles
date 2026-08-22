@@ -34688,6 +34688,139 @@ function showCurrentLocationData() {
 
 }
 
+// =========================================================
+// BRICK 93.5 — LOCATION ACTIVITY BRIDGE
+// =========================================================
+
+
+
+const LOCATION_ACTIVITY_MAP = {
+
+
+  practical: {
+
+    type:
+      "training",
+
+    activity:
+      "practical"
+
+  },
+
+
+  exam: {
+
+    type:
+      "exam",
+
+    activity:
+      "exam"
+
+  },
+
+
+  battle: {
+
+    type:
+      "battle",
+
+    activity:
+      "battle"
+
+  },
+
+
+  mission: {
+
+    type:
+      "mission",
+
+    activity:
+      "mission"
+
+  }
+
+
+};
+
+
+
+
+
+// =========================================================
+// RESOLVE LOCATION ACTION
+// =========================================================
+
+function resolveLocationAction(
+  action
+) {
+
+
+  if (
+    !LOCATION_ACTIVITY_MAP[action]
+  ) {
+
+
+    console.log(
+      "Unknown location action:",
+      action
+    );
+
+
+    return null;
+
+
+  }
+
+
+
+  return (
+    LOCATION_ACTIVITY_MAP[action]
+  );
+
+
+}
+
+
+
+
+
+// =========================================================
+// START LOCATION ACTIVITY
+// =========================================================
+
+function startLocationActivity(
+  action
+) {
+
+
+  const activity =
+    resolveLocationAction(
+      action
+    );
+
+
+
+  if (!activity) {
+
+    return false;
+
+  }
+
+
+
+  console.log(
+    "LOCATION ACTIVITY START:",
+    activity
+  );
+
+
+
+  return activity;
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
