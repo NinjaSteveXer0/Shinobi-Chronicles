@@ -37000,6 +37000,166 @@ function getNavigationButtonText(
   }
 }
 
+// =========================================================
+// BRICK 132 — LOCATION HEADER DATA
+// =========================================================
+
+function getLocationHeaderData(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    name:
+      location.name,
+
+    type:
+      location.type,
+
+    button:
+      getNavigationButtonText(
+        location
+      )
+
+  };
+
+}
+
+// =========================================================
+// BRICK 133 — LOCATION STATUS TEXT
+// =========================================================
+
+function getLocationStatusText(
+  locationId
+) {
+
+
+  if (
+    isLocationDiscovered(
+      locationId
+    )
+  ) {
+
+    return "DISCOVERED";
+
+  }
+
+
+  return "UNKNOWN";
+
+}
+
+// =========================================================
+// BRICK 134 — LOCATION INTERACTION DATA
+// =========================================================
+
+function getLocationInteractionData(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      location.id,
+
+    name:
+      location.name,
+
+    status:
+      getLocationStatusText(
+        locationId
+      ),
+
+    actions:
+      getLocationActionDisplayData(
+        locationId
+      )
+
+  };
+
+}
+
+// =========================================================
+// BRICK 135 — CURRENT LOCATION INTERACTION
+// =========================================================
+
+function getCurrentLocationInteraction() {
+
+
+  if (
+    !selectedLocationNode
+  ) {
+
+    return null;
+
+  }
+
+
+  return getLocationInteractionData(
+    selectedLocationNode.id
+  );
+
+}
+
+// =========================================================
+// BRICK 136 — LOCATION DEBUG CHECK
+// =========================================================
+
+function debugLocationSystem(
+  locationId
+) {
+
+
+  console.log(
+    "LOCATION HEADER:",
+    getLocationHeaderData(
+      locationId
+    )
+  );
+
+
+  console.log(
+    "LOCATION INTERACTION:",
+    getLocationInteractionData(
+      locationId
+    )
+  );
+
+
+  return true;
+
+}
+
+
+
 
 // =========================================================
 // 15. TRAINING OVERLAY
