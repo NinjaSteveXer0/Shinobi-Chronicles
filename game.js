@@ -34952,6 +34952,67 @@ function getLocationActionSummary() {
 
 }
 
+// =========================================================
+// BRICK 93.8 — LOCATION REQUIREMENTS SYSTEM
+// =========================================================
+
+
+function checkLocationRequirements(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return false;
+
+  }
+
+
+  if (!location.requirements) {
+
+    return true;
+
+  }
+
+
+  return true;
+
+
+}
+
+
+
+// =========================================================
+// GET LOCATION LOCK STATE
+// =========================================================
+
+function getLocationLockState(
+  locationId
+) {
+
+
+  return {
+
+    unlocked:
+      checkLocationRequirements(
+        locationId
+      ),
+
+    location:
+      locationId
+
+  };
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
