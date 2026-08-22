@@ -32010,10 +32010,12 @@ function openOverlay(type) {
       break;
 
 
-    case "practical":
+   case "practical":
 
-  renderPracticalTrainingOverlay(
-    container
+  renderGenericOverlay(
+    container,
+    "PRACTICAL TRAINING",
+    "Complete tactical tests and practical shinobi exercises."
   );
 
   break;
@@ -32066,87 +32068,7 @@ function openOverlay(type) {
 
 }
 
-// =========================================================
-// BRICK 91A — PRACTICAL TRAINING OVERLAY
-// =========================================================
 
-function renderPracticalTrainingOverlay(
-  container
-){
-
-  const practicalDisciplines =
-    getPracticalTrainingDisciplines();
-
-
-  container.innerHTML = `
-
-    <div class="overlay-title">
-      PRACTICAL TRAINING
-    </div>
-
-
-    <div class="overlay-description">
-
-      Complete physical training exercises
-      to improve Taijutsu, Bukijutsu and Stamina.
-
-    </div>
-
-
-    <div class="training-grid">
-
-      ${
-        playerTeam.map(
-          character => `
-
-          <div class="training-card">
-
-            <h3>
-              ${character.name}
-            </h3>
-
-
-            ${
-              practicalDisciplines.map(
-                discipline => `
-
-                <button
-                  class="nav-btn"
-                  onclick="
-                    awardPracticalTrainingExp(
-                      '${character.id}',
-                      '${discipline.id}',
-                      10
-                    );
-
-                    renderPracticalTrainingOverlay(
-                      document.getElementById(
-                        'overlay-content-container'
-                      )
-                    );
-                  "
-                >
-
-                  Train ${discipline.name}
-
-                </button>
-
-                `
-              ).join("")
-            }
-
-
-          </div>
-
-          `
-        ).join("")
-      }
-
-    </div>
-
-  `;
-
-}
 
 // =========================================================
 // 4. CLOSE / BACK OVERLAY
