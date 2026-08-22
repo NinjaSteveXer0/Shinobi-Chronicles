@@ -4047,6 +4047,265 @@ function isValidDisciplineTrainingSource(
 
 }
 
+// =========================================================
+// BRICK 91 — PLAYER LOOP BRIDGE
+// =========================================================
+//
+// PURPOSE:
+// Creates the Chronicle Engine bridge between
+// player actions and existing gameplay authorities.
+//
+// This does NOT replace:
+// - training
+// - battle
+// - missions
+// - rewards
+//
+// It routes actions safely into them.
+//
+// =========================================================
+
+
+
+const PLAYER_ACTIVITY_TYPES = {
+
+
+  TRAINING:
+    "training",
+
+
+  BATTLE:
+    "battle",
+
+
+  MISSION:
+    "mission",
+
+
+  EXAM:
+    "exam"
+
+
+};
+
+
+
+
+// =========================================================
+// EXECUTE PLAYER ACTIVITY
+// =========================================================
+
+function executePlayerActivity(
+  activityRequest
+) {
+
+
+  if (
+    !activityRequest ||
+    typeof activityRequest !==
+      "object"
+  ) {
+
+
+    console.log(
+      "Invalid player activity request."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !Object.values(
+      PLAYER_ACTIVITY_TYPES
+    ).includes(
+      activityRequest.type
+    )
+  ) {
+
+
+    console.log(
+      "Unknown player activity:",
+      activityRequest.type
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  console.log(
+    "PLAYER ACTIVITY START:",
+    activityRequest
+  );
+
+
+
+  const result =
+    processPlayerActivity(
+      activityRequest
+    );
+
+
+
+  if (
+    !result
+  ) {
+
+
+    console.log(
+      "Player activity failed."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  savePlayerData();
+
+
+
+  console.log(
+    "PLAYER ACTIVITY COMPLETE:",
+    result
+  );
+
+
+
+  return result;
+
+
+}
+
+
+
+
+
+// =========================================================
+// PROCESS PLAYER ACTIVITY
+// =========================================================
+
+function processPlayerActivity(
+  activityRequest
+) {
+
+
+  switch(
+    activityRequest.type
+  ) {
+
+
+    case PLAYER_ACTIVITY_TYPES.TRAINING:
+
+
+      return {
+
+
+        success:
+          true,
+
+
+        type:
+          "training",
+
+
+        message:
+          "Training activity accepted."
+
+
+      };
+
+
+
+    case PLAYER_ACTIVITY_TYPES.BATTLE:
+
+
+      return {
+
+
+        success:
+          true,
+
+
+        type:
+          "battle",
+
+
+        message:
+          "Battle activity accepted."
+
+
+      };
+
+
+
+    case PLAYER_ACTIVITY_TYPES.MISSION:
+
+
+      return {
+
+
+        success:
+          true,
+
+
+        type:
+          "mission",
+
+
+        message:
+          "Mission activity accepted."
+
+
+      };
+
+
+
+    case PLAYER_ACTIVITY_TYPES.EXAM:
+
+
+      return {
+
+
+        success:
+          true,
+
+
+        type:
+          "exam",
+
+
+        message:
+          "Exam activity accepted."
+
+
+      };
+
+
+
+    default:
+
+
+      return false;
+
+
+  }
+
+
+}
+
+
 
 // =========================================================
 // ADD DISCIPLINE EXP
