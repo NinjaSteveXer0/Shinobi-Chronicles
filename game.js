@@ -4209,6 +4209,52 @@ function processPlayerActivity(
     case PLAYER_ACTIVITY_TYPES.TRAINING:
 
 
+      if (
+        !activityRequest.characterId ||
+        !activityRequest.disciplineId ||
+        !activityRequest.amount
+      ) {
+
+
+        console.log(
+          "Training request missing data."
+        );
+
+
+        return false;
+
+
+      }
+
+
+
+      const trainingResult =
+        addDisciplineExp(
+          activityRequest.characterId,
+          activityRequest.disciplineId,
+          activityRequest.amount,
+          activityRequest.source || "training"
+        );
+
+
+
+      if (
+        !trainingResult
+      ) {
+
+
+        console.log(
+          "Training progression failed."
+        );
+
+
+        return false;
+
+
+      }
+
+
+
       return {
 
 
@@ -4221,7 +4267,7 @@ function processPlayerActivity(
 
 
         message:
-          "Training activity accepted."
+          "Training progression applied."
 
 
       };
@@ -4297,6 +4343,12 @@ function processPlayerActivity(
     default:
 
 
+      console.log(
+        "Unknown activity type:",
+        activityRequest.type
+      );
+
+
       return false;
 
 
@@ -4304,8 +4356,6 @@ function processPlayerActivity(
 
 
 }
-
-
 
 // =========================================================
 // ADD DISCIPLINE EXP
