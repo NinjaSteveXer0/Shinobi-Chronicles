@@ -34821,6 +34821,91 @@ function startLocationActivity(
 
 }
 
+// =========================================================
+// BRICK 93.6 — LOCATION ACTION PRESENTATION DATA
+// =========================================================
+
+
+
+const ACTION_PRESENTATION_DATABASE = {
+
+
+  practical: {
+
+    title:
+      "Practical Training",
+
+    description:
+      "Develop physical combat skills through shinobi exercises.",
+
+    icon:
+      "training"
+
+  },
+
+
+  exam: {
+
+    title:
+      "Shinobi Exam",
+
+    description:
+      "Test knowledge and technical mastery.",
+
+    icon:
+      "scroll"
+
+  },
+
+
+  battle: {
+
+    title:
+      "Battle Encounter",
+
+    description:
+      "Face enemies and prove your abilities.",
+
+    icon:
+      "battle"
+
+  },
+
+
+  mission: {
+
+    title:
+      "Mission",
+
+    description:
+      "Complete assignments and earn rewards.",
+
+    icon:
+      "mission"
+
+  }
+
+
+};
+
+
+
+
+
+function getActionPresentation(
+  action
+) {
+
+
+  return (
+    ACTION_PRESENTATION_DATABASE[action]
+    ||
+    null
+  );
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
