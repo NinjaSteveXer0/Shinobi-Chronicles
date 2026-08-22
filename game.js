@@ -36938,7 +36938,7 @@ function getLocationActionDisplayData(
 // LOCATION SUMMARY BUILDER
 // =========================================================
 
-function getLocationSummaryData(
+function getLocationDisplaySummary(
   locationId
 ) {
 
