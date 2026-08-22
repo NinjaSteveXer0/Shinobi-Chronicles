@@ -37993,6 +37993,85 @@ function getTrainingActivityData(
 }
 
 // =========================================================
+// BRICK 154 — ACTIVITY RESULT NORMALISATION
+// =========================================================
+//
+// Converts raw activity definitions into a standard
+// Chronicle Engine result format.
+//
+// All future activities can use this:
+// Training
+// Exams
+// Missions
+// Events
+// Encounters
+//
+// =========================================================
+
+
+function normalizeActivityResult(
+  activityData
+) {
+
+
+  if (
+    !activityData
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+
+  return {
+
+
+    id:
+      activityData.id ||
+      null,
+
+
+    name:
+      activityData.name ||
+      "Unknown Activity",
+
+
+    rewardEXP:
+      activityData.reward &&
+      Number.isFinite(
+        Number(
+          activityData.reward.exp
+        )
+      )
+
+        ? Number(
+            activityData.reward.exp
+          )
+
+        : 0,
+
+
+
+    progression:
+      activityData.progression ||
+      null,
+
+
+
+    requirements:
+      activityData.requirement ||
+      null
+
+
+  };
+
+
+}
+
+// =========================================================
 // BRICK 152 — TRAINING ACTION EXECUTION BRIDGE
 // =========================================================
 //
