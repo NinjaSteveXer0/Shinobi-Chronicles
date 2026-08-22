@@ -35704,8 +35704,24 @@ function isCurrentLocationDiscovered() {
 function getCurrentLocationSummary() {
 
 
+  const locationId =
+    getPlayerLocation();
+
+
+
+  if (!locationId) {
+
+    return null;
+
+  }
+
+
+
   const location =
-    getCurrentLocationData();
+    getLocationData(
+      locationId
+    );
+
 
 
   if (!location) {
@@ -35728,17 +35744,22 @@ function getCurrentLocationSummary() {
 
 
     discovered:
-      isCurrentLocationDiscovered(),
+      isLocationDiscovered(
+        locationId
+      ),
 
 
     actions:
-      getAvailableLocationActions()
+      getLocationActions(
+        locationId
+      )
 
 
   };
 
 
 }
+
 
 // =========================================================
 // BRICK 103 — LOCATION ACTION EXECUTION CHECK
