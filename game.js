@@ -34211,15 +34211,20 @@ function returnToWorldMap() {
 
 function handleNodeNavigation() {
 
+
   if (!selectedLocationNode) {
+
     return;
+
   }
+
 
 
   const overlay =
     document.getElementById(
       "screen-overlay"
     );
+
 
 
   if (overlay) {
@@ -34231,85 +34236,152 @@ function handleNodeNavigation() {
   }
 
 
+
+  console.log(
+    "LOCATION ENTERED:",
+    selectedLocationNode
+  );
+
+
+
   switch (
     selectedLocationNode.type
   ) {
 
+
+
     case "village":
+
 
       openOverlay(
         "village"
       );
 
+
       break;
 
 
+
     case "training":
+
+
+      executePlayerActivity({
+
+        type:
+          "training",
+
+        location:
+          selectedLocationNode.id
+
+      });
+
 
       openOverlay(
         "training"
       );
 
+
       break;
+
 
 
     case "battle":
 
+
+      executePlayerActivity({
+
+        type:
+          "battle",
+
+        location:
+          selectedLocationNode.id
+
+      });
+
+
       openOverlay(
         "battle"
       );
 
+
       break;
+
 
 
     case "mission":
 
+
+      executePlayerActivity({
+
+        type:
+          "mission",
+
+        location:
+          selectedLocationNode.id
+
+      });
+
+
       openOverlay(
         "missions"
       );
 
+
       break;
+
 
 
     case "outpost":
 
+
       openOverlay(
         "battle"
       );
 
+
       break;
 
 
+
     case "activity":
+
 
       openOverlay(
         "missions"
       );
 
+
       break;
+
 
 
     case "secret":
 
+
       openOverlay(
         "battle"
       );
 
+
       break;
+
 
 
     default:
 
+
       openOverlay(
         "battle"
       );
 
+
       break;
+
 
   }
 
-}
 
+}
 
 
 // =========================================================
