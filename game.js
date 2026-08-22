@@ -34906,6 +34906,52 @@ function getActionPresentation(
 
 }
 
+// =========================================================
+// BRICK 93.7 — LOCATION ACTION SUMMARY
+// =========================================================
+
+
+
+function getLocationActionSummary() {
+
+
+  const actions =
+    getAvailableLocationActions();
+
+
+
+  return actions.map(
+    action => {
+
+
+      return {
+
+
+        action:
+          action,
+
+
+        activity:
+          resolveLocationAction(
+            action
+          ),
+
+
+        presentation:
+          getActionPresentation(
+            action
+          )
+
+
+      };
+
+
+    }
+  );
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
