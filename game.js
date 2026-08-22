@@ -35013,6 +35013,267 @@ function getLocationLockState(
 
 }
 
+// =========================================================
+// BRICK 93.9 — LOCATION STATE SYSTEM
+// =========================================================
+
+
+const LOCATION_STATE = {
+
+
+  locked:
+    "locked",
+
+
+  discovered:
+    "discovered",
+
+
+  available:
+    "available",
+
+
+  completed:
+    "completed",
+
+
+  mastered:
+    "mastered"
+
+
+};
+
+
+
+
+const locationStates = {};
+
+
+
+
+
+function setLocationState(
+  locationId,
+  state
+) {
+
+
+  locationStates[
+    locationId
+  ] = state;
+
+
+}
+
+
+
+
+
+function getLocationState(
+  locationId
+) {
+
+
+  return (
+    locationStates[
+      locationId
+    ]
+    ||
+    LOCATION_STATE.locked
+  );
+
+
+}
+
+// =========================================================
+// BRICK 93.10 — LOCATION METADATA FOUNDATION
+// =========================================================
+
+
+function getLocationMetadata(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+
+  return {
+
+
+    id:
+      location.id,
+
+
+    name:
+      location.name,
+
+
+    type:
+      location.type,
+
+
+    actions:
+      location.actions || [],
+
+
+    state:
+      getLocationState(
+        locationId
+      )
+
+
+  };
+
+
+}
+
+// =========================================================
+// BRICK 94.1 — ACTIVITY REGISTRY FOUNDATION
+// =========================================================
+
+
+const ACTIVITY_DATABASE = {
+
+
+  exam: {
+
+
+    id:
+      "exam",
+
+
+    name:
+      "Shinobi Exam",
+
+
+    rewards:[
+
+      "ninjutsu",
+
+      "genjutsu",
+
+      "fuinjutsu"
+
+    ]
+
+
+  },
+
+
+
+  practical: {
+
+
+    id:
+      "practical",
+
+
+    name:
+      "Practical Training",
+
+
+    rewards:[
+
+      "taijutsu",
+
+      "bukijutsu",
+
+      "stamina"
+
+    ]
+
+
+  },
+
+
+
+  battle: {
+
+
+    id:
+      "battle",
+
+
+    name:
+      "Battle",
+
+
+    rewards:[
+
+      "kinjutsu"
+
+    ]
+
+
+  },
+
+
+
+  mission: {
+
+
+    id:
+      "mission",
+
+
+    name:
+      "Mission",
+
+
+    rewards:[
+
+      "exp",
+
+      "ryo",
+
+      "items"
+
+    ]
+
+
+  }
+
+
+};
+
+
+
+
+
+function getActivityData(
+  activityId
+) {
+
+
+  return (
+
+    ACTIVITY_DATABASE[
+      activityId
+    ]
+
+    ||
+
+    null
+
+  );
+
+
+}
+
+
+
 
 // =========================================================
 // BUTTON TEXT
