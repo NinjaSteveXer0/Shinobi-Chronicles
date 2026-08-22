@@ -35201,7 +35201,17 @@ function getLocationMetadata(
 }
 
 // =========================================================
-// BRICK 94.1 — ACTIVITY REGISTRY FOUNDATION
+// BRICK 94 — ACTIVITY ENGINE FOUNDATION
+// =========================================================
+//
+// Core Chronicle Engine Activity System
+//
+// Handles:
+// - Activity definitions
+// - Activity identity
+// - Activity rewards
+// - Activity data retrieval
+//
 // =========================================================
 
 
@@ -35333,9 +35343,9 @@ function getActivityData(
 
 }
 
-// =========================================================
-// BRICK 94 — ACTIVITY REGISTRY BRIDGE
-// =========================================================
+// =========================================
+// ACTIVITY RESOLUTION
+// =========================================
 
 
 
@@ -35375,9 +35385,9 @@ function resolveActivityAction(
 
 
 
-// =========================================================
-// START REGISTERED ACTIVITY
-// =========================================================
+// =========================================
+// ACTIVITY START REQUEST
+// =========================================
 
 function startRegisteredActivity(
   action
