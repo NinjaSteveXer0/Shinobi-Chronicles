@@ -37473,7 +37473,7 @@ function getLocationPlayerProgressSummary(
 // FULL LOCATION PLAYER SUMMARY
 // =========================================================
 
-function getPlayerLocationSummary() {
+function getPlayerLocationProgressSummary() {
 
 
   return {
