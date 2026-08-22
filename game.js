@@ -36005,6 +36005,194 @@ function executeLocationAction(
 
 }
 
+// =========================================================
+// BRICK 109 — LOCATION RETURN STATE
+// =========================================================
+
+
+function leaveCurrentLocation() {
+
+
+  currentPlayerLocation =
+    null;
+
+
+  return true;
+
+
+}
+
+
+
+
+
+function hasActiveLocation() {
+
+
+  return (
+    currentPlayerLocation !== null
+  );
+
+
+}
+
+// =========================================================
+// BRICK 110 — LOCATION HISTORY TRACKING
+// =========================================================
+
+
+let locationHistory = [];
+
+
+
+
+
+function recordLocationVisit(
+  locationId
+) {
+
+
+  if (
+    !locationHistory.includes(
+      locationId
+    )
+  ) {
+
+
+    locationHistory.push(
+      locationId
+    );
+
+
+  }
+
+
+}
+
+
+
+
+
+function getLocationHistory() {
+
+
+  return locationHistory;
+
+
+}
+
+// =========================================================
+// BRICK 111 — TRAVEL HISTORY CONNECTION
+// =========================================================
+
+
+function travelToLocation(
+  locationId
+) {
+
+
+  if (
+    !canTravelToLocation(
+      locationId
+    )
+  ) {
+
+
+    console.log(
+      "Travel denied:",
+      locationId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  setPlayerLocation(
+    locationId
+  );
+
+
+
+  recordLocationVisit(
+    locationId
+  );
+
+
+
+  console.log(
+    "Player travelled to:",
+    locationId
+  );
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
+// BRICK 112 — LOCATION OVERVIEW DATA
+// =========================================================
+
+
+function getLocationOverview(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+
+    return null;
+
+
+  }
+
+
+
+  return {
+
+
+    name:
+      location.name,
+
+
+    type:
+      location.type,
+
+
+    actions:
+      location.actions,
+
+
+    discovered:
+      isLocationDiscovered(
+        locationId
+      ),
+
+
+    visited:
+      locationHistory.includes(
+        locationId
+      )
+
+
+  };
+
+
+}
+
 
 
 
