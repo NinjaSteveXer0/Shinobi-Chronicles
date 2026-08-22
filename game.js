@@ -35561,7 +35561,16 @@ function launchLocationAction(
 }
 
 // =========================================================
-// BRICK 97 — CONTENT REGISTRY FOUNDATION
+// BRICK 96 — CONTENT REGISTRY FOUNDATION
+// =========================================================
+//
+// Core Chronicle Engine Content Layer
+//
+// Handles:
+// - Registered content types
+// - Content lookup
+// - Shared content access
+//
 // =========================================================
 
 
@@ -35612,9 +35621,9 @@ function getContentRegistry(
 
 }
 
-// =========================================================
-// BRICK 98 — LOCATION REGISTRY EXPANSION
-// =========================================================
+// =========================================
+// CONTENT REGISTRATION
+// =========================================
 
 
 function registerLocation(
@@ -35645,10 +35654,9 @@ function registerLocation(
 
 
 }
-
-// =========================================================
-// BRICK 99 — ACTIVITY VALIDATION SYSTEM
-// =========================================================
+// =========================================
+// ACTIVITY EXISTENCE VALIDATION
+// =========================================
 
 
 function validateActivity(
@@ -35678,9 +35686,9 @@ function validateActivity(
 
 }
 
-// =========================================================
-// BRICK 100 — LOCATION ACTIVITY VALIDATION
-// =========================================================
+// =========================================
+// LOCATION ACTIVITY VALIDATION
+// =========================================
 
 
 function validateLocationActivity(
@@ -35727,9 +35735,9 @@ function validateLocationActivity(
 
 }
 
-// =========================================================
-// BRICK 101 — LOCATION DISCOVERY INTEGRATION
-// =========================================================
+// =========================================
+// CURRENT LOCATION DISCOVERY BRIDGE
+// =========================================
 
 
 function discoverCurrentLocation() {
@@ -35776,9 +35784,9 @@ function isCurrentLocationDiscovered() {
 
 }
 
-// =========================================================
-// BRICK 102 — LOCATION INTERACTION SUMMARY
-// =========================================================
+// =========================================
+// CURRENT LOCATION SUMMARY
+// =========================================
 
 
 function getCurrentLocationSummary() {
@@ -35841,9 +35849,9 @@ function getCurrentLocationSummary() {
 }
 
 
-// =========================================================
-// BRICK 103 — LOCATION ACTION EXECUTION CHECK
-// =========================================================
+// =========================================
+// LOCATION ACTION EXECUTION CHECK
+// =========================================
 
 
 function canLaunchLocationAction(
@@ -35872,9 +35880,9 @@ function canLaunchLocationAction(
 
 }
 
-// =========================================================
-// BRICK 104 — PLAYER LOCATION STATE
-// =========================================================
+// =========================================
+// CURRENT PLAYER LOCATION STATE
+// =========================================
 
 
 let currentPlayerLocation =
@@ -35929,9 +35937,9 @@ function getPlayerLocation() {
 
 }
 
-// =========================================================
-// BRICK 105 — LOCATION TRAVEL VALIDATION
-// =========================================================
+// =========================================
+// LOCATION TRAVEL VALIDATION
+// =========================================
 
 
 function canTravelToLocation(
@@ -35959,9 +35967,9 @@ function canTravelToLocation(
 
 }
 
-// =========================================================
-// BRICK 106 — LOCATION TRAVEL ACTION
-// =========================================================
+// =========================================
+// LOCATION TRAVEL ACTION
+// =========================================
 
 
 function travelToLocation(
@@ -36006,9 +36014,9 @@ function travelToLocation(
 
 }
 
-// =========================================================
-// BRICK 107 — LOCATION ACTION LIST BUILDER
-// =========================================================
+// =========================================
+// CURRENT LOCATION ACTION LIST
+// =========================================
 
 
 function getCurrentLocationActions() {
@@ -36034,9 +36042,9 @@ function getCurrentLocationActions() {
 
 }
 
-// =========================================================
-// BRICK 108 — LOCATION ACTIVITY ROUTER
-// =========================================================
+// =========================================
+// LOCATION ACTIVITY EXECUTION ROUTER
+// =========================================
 
 
 function executeLocationAction(
@@ -36085,9 +36093,9 @@ function executeLocationAction(
 
 }
 
-// =========================================================
-// BRICK 109 — LOCATION RETURN STATE
-// =========================================================
+// =========================================
+// CURRENT LOCATION RETURN STATE
+// =========================================
 
 
 function leaveCurrentLocation() {
@@ -36116,9 +36124,9 @@ function hasActiveLocation() {
 
 }
 
-// =========================================================
-// BRICK 110 — LOCATION HISTORY TRACKING
-// =========================================================
+// =========================================
+// LOCATION VISIT HISTORY
+// =========================================
 
 
 let locationHistory = [];
@@ -36161,9 +36169,9 @@ function getLocationHistory() {
 
 }
 
-// =========================================================
-// BRICK 111 — TRAVEL HISTORY CONNECTION
-// =========================================================
+// =========================================
+// LOCATION TRAVEL HISTORY INTEGRATION
+// =========================================
 
 
 function travelToLocation(
@@ -36215,9 +36223,9 @@ function travelToLocation(
 
 }
 
-// =========================================================
-// BRICK 112 — LOCATION OVERVIEW DATA
-// =========================================================
+// =========================================
+// LOCATION OVERVIEW DATA
+// =========================================
 
 
 function getLocationOverview(
