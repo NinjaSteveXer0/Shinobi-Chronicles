@@ -37696,19 +37696,21 @@ function renderTrainingOverlay(
 
 
         ${createActivityCard(
-          "Light Training",
-          "Low-risk encounter.",
-          "EXP: 120",
-          "Recommended PL: 400"
-        )}
+  "Light Training",
+  "Low-risk encounter.",
+  "EXP: 120",
+  "Recommended PL: 400",
+  "light_training"
+)}
 
 
         ${createActivityCard(
-          "Advanced Training",
-          "Stronger opponents with higher EXP rewards.",
-          "EXP: 320",
-          "Recommended PL: 900"
-        )}
+  "Advanced Training",
+  "Stronger opponents with higher EXP rewards.",
+  "EXP: 320",
+  "Recommended PL: 900",
+  "advanced_training"
+)}
 
 
         ${createActivityCard(
