@@ -37309,7 +37309,165 @@ function getLocationSystemSummary() {
 
 }
 
+// =========================================================
+// BRICK 142 — LOCATION DISCOVERY COUNT DATA
+// =========================================================
 
+function getLocationDiscoveryCount() {
+
+
+  const locations =
+    Object.keys(
+      LOCATION_DATABASE
+    );
+
+
+  const discovered =
+    locations.filter(
+      locationId =>
+        isLocationDiscovered(
+          locationId
+        )
+    );
+
+
+  return {
+
+    total:
+      locations.length,
+
+    discovered:
+      discovered.length
+
+  };
+
+}
+
+// =========================================================
+// BRICK 143 — LOCATION VISIT COUNT DATA
+// =========================================================
+
+function getLocationVisitCount() {
+
+
+  const history =
+    getLocationHistory();
+
+
+  return {
+
+    totalVisits:
+      history.length,
+
+    uniqueLocations:
+      [
+        ...new Set(
+          history
+        )
+      ].length
+
+  };
+
+}
+
+// =========================================================
+// BRICK 144 — LOCATION PLAYER PROGRESS SUMMARY
+// =========================================================
+
+function getLocationPlayerProgressSummary(
+  locationId
+) {
+
+
+  const progress =
+    getPlayerLocationProgress(
+      locationId
+    );
+
+
+  if (
+    !progress
+  ) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      progress.id,
+
+    name:
+      progress.name,
+
+    state:
+      progress.state,
+
+    discovered:
+      progress.discovered,
+
+    visited:
+      progress.visited
+
+  };
+
+}
+
+// =========================================================
+// BRICK 145 — FULL LOCATION PLAYER SUMMARY
+// =========================================================
+
+function getPlayerLocationSummary() {
+
+
+  return {
+
+    discovery:
+      getLocationDiscoveryCount(),
+
+    visits:
+      getLocationVisitCount(),
+
+    current:
+      selectedLocationNode
+        ? selectedLocationNode.id
+        : null
+
+  };
+
+}
+
+// =========================================================
+// BRICK 146 — LOCATION SYSTEM HEALTH CHECK
+// =========================================================
+
+function validateLocationSystem() {
+
+
+  return {
+
+    database:
+      Object.keys(
+        LOCATION_DATABASE
+      ).length > 0,
+
+    discovery:
+      typeof isLocationDiscovered ===
+      "function",
+
+    history:
+      typeof getLocationHistory ===
+      "function",
+
+    progress:
+      typeof getPlayerLocationProgress ===
+      "function"
+
+  };
+
+}
 
 
 // =========================================================
