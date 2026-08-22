@@ -35349,7 +35349,136 @@ function startRegisteredActivity(
 
 }
 
+// =========================================================
+// BRICK 96 — LOCATION CONTENT CONNECTION
+// =========================================================
 
+
+const LOCATION_ACTIVITY_CONNECTIONS = {
+
+
+  training_grounds: {
+
+
+    practical:
+      "practical"
+
+
+  },
+
+
+  konoha: {
+
+
+    missions:
+      "mission",
+
+    exams:
+      "exam",
+
+    practical:
+      "practical"
+
+
+  },
+
+
+  rogue_hideout: {
+
+
+    battle:
+      "battle"
+
+
+  }
+
+
+};
+
+
+
+
+
+// =========================================================
+// GET LOCATION ACTIVITY
+// =========================================================
+
+function getLocationActivity(
+  locationId,
+  action
+) {
+
+
+  if (
+    !LOCATION_ACTIVITY_CONNECTIONS[locationId]
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+
+  return (
+
+    LOCATION_ACTIVITY_CONNECTIONS[locationId][action]
+
+    ||
+
+    null
+
+  );
+
+
+}
+
+
+
+
+
+// =========================================================
+// LAUNCH LOCATION ACTION
+// =========================================================
+
+function launchLocationAction(
+  locationId,
+  action
+) {
+
+
+  const activity =
+    getLocationActivity(
+      locationId,
+      action
+    );
+
+
+
+  if (!activity) {
+
+
+    console.log(
+      "No activity connected:",
+      locationId,
+      action
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  return startRegisteredActivity(
+    activity
+  );
+
+
+}
 
 
 // =========================================================
