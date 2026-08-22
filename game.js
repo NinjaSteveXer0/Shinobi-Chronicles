@@ -1880,104 +1880,7 @@ function syncRuntimeProgressionToPlayerData() {
 syncCharacterProgressionFromSave();
 
 
-// =========================================================
-// BRICK 91A — PRACTICAL TRAINING BRIDGE
-// =========================================================
 
-function getPracticalTrainingDisciplines(){
-
-  return Object.values(
-    SHINOBI_DISCIPLINES
-  ).filter(
-    discipline =>
-      discipline.trainingSource === "practical"
-  );
-
-}
-
-
-function awardPracticalTrainingExp(
-  characterId,
-  disciplineId
-){
-
-  const character =
-    playerTeam.find(
-      shinobi =>
-        shinobi.id === characterId
-    );
-
-
-  if(!character){
-
-    console.log(
-      "Character not found:",
-      characterId
-    );
-
-    return false;
-
-  }
-
-
-  const discipline =
-    getShinobiDiscipline(
-      disciplineId
-    );
-
-
-  if(
-    !discipline ||
-    discipline.trainingSource !== "practical"
-  ){
-
-    console.log(
-      "Invalid practical discipline:",
-      disciplineId
-    );
-
-    return false;
-
-  }
-
-
-  if(
-    !character.disciplineProgression
-  ){
-
-    character.disciplineProgression =
-      createDefaultDisciplineProgression();
-
-  }
-
-
-  const progression =
-    character.disciplineProgression[
-      disciplineId
-    ];
-
-
-  if(!progression){
-
-    return false;
-
-  }
-
-
-  progression.exp += 10;
-
-
-  savePlayerData();
-
-
-  console.log(
-    `${character.name} gained Practical EXP in ${discipline.name}`
-  );
-
-
-  return true;
-
-}
 
 
 // =========================================================
@@ -32109,13 +32012,11 @@ function openOverlay(type) {
 
     case "practical":
 
-      renderGenericOverlay(
-        container,
-        "PRACTICAL TRAINING",
-        "Complete tactical tests and practical shinobi exercises."
-      );
+  renderPracticalTrainingOverlay(
+    container
+  );
 
-      break;
+  break;
 
 
     case "group":
@@ -32162,6 +32063,88 @@ function openOverlay(type) {
       break;
 
   }
+
+}
+
+// =========================================================
+// BRICK 91A — PRACTICAL TRAINING OVERLAY
+// =========================================================
+
+function renderPracticalTrainingOverlay(
+  container
+){
+
+  const practicalDisciplines =
+    getPracticalTrainingDisciplines();
+
+
+  container.innerHTML = `
+
+    <div class="overlay-title">
+      PRACTICAL TRAINING
+    </div>
+
+
+    <div class="overlay-description">
+
+      Complete physical training exercises
+      to improve Taijutsu, Bukijutsu and Stamina.
+
+    </div>
+
+
+    <div class="training-grid">
+
+      ${
+        playerTeam.map(
+          character => `
+
+          <div class="training-card">
+
+            <h3>
+              ${character.name}
+            </h3>
+
+
+            ${
+              practicalDisciplines.map(
+                discipline => `
+
+                <button
+                  class="nav-btn"
+                  onclick="
+                    awardPracticalTrainingExp(
+                      '${character.id}',
+                      '${discipline.id}',
+                      10
+                    );
+
+                    renderPracticalTrainingOverlay(
+                      document.getElementById(
+                        'overlay-content-container'
+                      )
+                    );
+                  "
+                >
+
+                  Train ${discipline.name}
+
+                </button>
+
+                `
+              ).join("")
+            }
+
+
+          </div>
+
+          `
+        ).join("")
+      }
+
+    </div>
+
+  `;
 
 }
 
