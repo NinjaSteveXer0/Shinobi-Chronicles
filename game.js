@@ -35647,6 +35647,188 @@ function validateLocationActivity(
 
 }
 
+// =========================================================
+// BRICK 101 — LOCATION DISCOVERY INTEGRATION
+// =========================================================
+
+
+function discoverCurrentLocation() {
+
+
+  if (
+    !selectedLocationNode
+  ) {
+
+    return false;
+
+  }
+
+
+  return discoverLocation(
+    selectedLocationNode.id
+  );
+
+
+}
+
+
+
+// =========================================================
+// CHECK CURRENT LOCATION DISCOVERY
+// =========================================================
+
+function isCurrentLocationDiscovered() {
+
+
+  if (
+    !selectedLocationNode
+  ) {
+
+    return false;
+
+  }
+
+
+  return isLocationDiscovered(
+    selectedLocationNode.id
+  );
+
+
+}
+
+// =========================================================
+// BRICK 102 — LOCATION INTERACTION SUMMARY
+// =========================================================
+
+
+function getCurrentLocationSummary() {
+
+
+  const location =
+    getCurrentLocationData();
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+
+  return {
+
+
+    location:
+      location.name,
+
+
+    type:
+      location.type,
+
+
+    discovered:
+      isCurrentLocationDiscovered(),
+
+
+    actions:
+      getAvailableLocationActions()
+
+
+  };
+
+
+}
+
+// =========================================================
+// BRICK 103 — LOCATION ACTION EXECUTION CHECK
+// =========================================================
+
+
+function canLaunchLocationAction(
+  locationId,
+  action
+) {
+
+
+  if (
+    !validateLocationActivity(
+      locationId,
+      action
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
+// BRICK 104 — PLAYER LOCATION STATE
+// =========================================================
+
+
+let currentPlayerLocation =
+  null;
+
+
+
+
+function setPlayerLocation(
+  locationId
+) {
+
+
+  if (
+    !getLocationData(
+      locationId
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  currentPlayerLocation =
+    locationId;
+
+
+
+  discoverLocation(
+    locationId
+  );
+
+
+
+  return true;
+
+
+}
+
+
+
+
+function getPlayerLocation() {
+
+
+  return currentPlayerLocation;
+
+
+}
+
+
 
 
 // =========================================================
