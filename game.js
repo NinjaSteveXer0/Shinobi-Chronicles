@@ -34503,6 +34503,52 @@ function getLocationActions(
 
 }
 
+// =========================================================
+// BRICK 93.2 — LOCATION ACTION RESOLVER
+// =========================================================
+
+
+function getAvailableLocationActions() {
+
+
+  if (
+    !selectedLocationNode
+  ) {
+
+    return [];
+
+  }
+
+
+  return getLocationActions(
+    selectedLocationNode.id
+  );
+
+
+}
+
+
+
+// =========================================================
+// CHECK LOCATION ACTION
+// =========================================================
+
+function canPerformLocationAction(
+  action
+) {
+
+
+  const actions =
+    getAvailableLocationActions();
+
+
+  return actions.includes(
+    action
+  );
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
