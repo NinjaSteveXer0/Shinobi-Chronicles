@@ -36381,7 +36381,236 @@ function getPlayerLocationProgress() {
 
 }
 
+// =========================================================
+// 🧱 BRICK 117 — LOCATION DISCOVERY STATUS
+// =========================================================
 
+
+function getLocationDiscoveryStatus(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      locationId,
+
+
+    name:
+      location.name,
+
+
+    discovered:
+      isLocationDiscovered(
+        locationId
+      ),
+
+
+    visited:
+      locationHistory.includes(
+        locationId
+      ),
+
+
+    progress:
+      getLocationProgress(
+        locationId
+      )
+
+  };
+
+
+}
+
+// =========================================================
+// 🧱 BRICK 118 — LOCATION AVAILABLE ACTIONS
+// =========================================================
+
+
+function getLocationAvailableActions(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return [];
+
+  }
+
+
+  const actions =
+    [];
+
+
+  if (
+    isLocationDiscovered(
+      locationId
+    )
+  ) {
+
+    actions.push(
+      "explore"
+    );
+
+  }
+
+
+  if (
+    locationHistory.includes(
+      locationId
+    )
+  ) {
+
+    actions.push(
+      "revisit"
+    );
+
+  }
+
+
+  return actions;
+
+
+}
+
+// =========================================================
+// 🧱 BRICK 119 — LOCATION SUMMARY DATA
+// =========================================================
+
+
+function getLocationSummaryData(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      location.id,
+
+
+    name:
+      location.name,
+
+
+    description:
+      location.description ||
+      "",
+
+
+    discovered:
+      isLocationDiscovered(
+        locationId
+      ),
+
+
+    visited:
+      locationHistory.includes(
+        locationId
+      ),
+
+
+    actions:
+      getLocationAvailableActions(
+        locationId
+      )
+
+  };
+
+
+}
+
+// =========================================================
+// 🧱 BRICK 120 — PLAYER LOCATION SUMMARY
+// =========================================================
+
+
+function getPlayerLocationSummary() {
+
+
+  const locationId =
+    getPlayerLocation();
+
+
+  if (!locationId) {
+
+    return null;
+
+  }
+
+
+  return getLocationSummaryData(
+    locationId
+  );
+
+
+}
+
+// =========================================================
+// 🧱 BRICK 121 — LOCATION EXPLORATION CHECK
+// =========================================================
+
+
+function canExploreLocation(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return false;
+
+  }
+
+
+  return (
+    isLocationDiscovered(
+      locationId
+    ) === true
+  );
+
+
+}
 
 
 
