@@ -35433,6 +35433,87 @@ function startRegisteredActivity(
 }
 
 // =========================================================
+// BRICK 154 — ACTIVITY RESULT FOUNDATION
+// =========================================================
+//
+// Core Chronicle Engine Result System
+//
+// Converts completed activities into a universal result format.
+//
+// Activity
+// ↓
+// Result
+// ↓
+// Rewards
+// ↓
+// Progression
+//
+// Used by:
+// - Training
+// - Exams
+// - Missions
+// - Battles
+// - Events
+//
+// =========================================================
+
+
+function createActivityResult(
+  activityId,
+  characterId
+) {
+
+
+  return {
+
+
+    activity:
+
+      activityId,
+
+
+    character:
+
+      characterId,
+
+
+    success:
+
+      true,
+
+
+    rewards: {
+
+
+      exp:
+
+        0,
+
+
+      ryo:
+
+        0,
+
+
+      items:
+
+        [],
+
+
+      progression:
+
+        {}
+
+
+    }
+
+
+  };
+
+
+}
+
+// =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
 // =========================================================
 //
