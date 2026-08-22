@@ -34437,9 +34437,19 @@ function handleNodeNavigation() {
 }
 
 // =========================================================
-// BRICK 93 — LOCATION REGISTRY FOUNDATION
+// BRICK 93 — LOCATION SYSTEM FOUNDATION
 // =========================================================
-
+//
+// Core World Engine System
+//
+// Handles:
+// - Location definitions
+// - Location identity
+// - Location types
+// - Available actions
+// - Location data retrieval
+//
+// =========================================================
 
 const LOCATION_DATABASE = {
 
@@ -34556,10 +34566,9 @@ function getLocationActions(
 
 }
 
-// =========================================================
-// BRICK 93.2 — LOCATION ACTION RESOLVER
-// =========================================================
-
+// =========================================
+// LOCATION ACTION RESOLUTION
+// =========================================
 
 function getAvailableLocationActions() {
 
@@ -34602,9 +34611,9 @@ function canPerformLocationAction(
 
 }
 
-// =========================================================
-// BRICK 93.3 — LOCATION DISCOVERY STATE
-// =========================================================
+// =========================================
+// LOCATION DISCOVERY STATE
+// =========================================
 
 
 let discoveredLocations = [];
@@ -34678,9 +34687,9 @@ function isLocationDiscovered(
 
 }
 
-// =========================================================
-// BRICK 93.4 — LOCATION DATA BRIDGE
-// =========================================================
+// =========================================
+// LOCATION DATA BRIDGE
+// =========================================
 
 
 function getCurrentLocationData() {
@@ -34741,10 +34750,9 @@ function showCurrentLocationData() {
 
 }
 
-// =========================================================
-// BRICK 93.5 — LOCATION ACTIVITY BRIDGE
-// =========================================================
-
+// =========================================
+// LOCATION ACTIVITY BRIDGE
+// =========================================
 
 
 const LOCATION_ACTIVITY_MAP = {
@@ -34874,9 +34882,9 @@ function startLocationActivity(
 
 }
 
-// =========================================================
-// BRICK 93.6 — LOCATION ACTION PRESENTATION DATA
-// =========================================================
+// =========================================
+// LOCATION ACTION PRESENTATION DATA
+// =========================================
 
 
 
@@ -34959,9 +34967,9 @@ function getActionPresentation(
 
 }
 
-// =========================================================
-// BRICK 93.7 — LOCATION ACTION SUMMARY
-// =========================================================
+// =========================================
+// LOCATION ACTION SUMMARY
+// =========================================
 
 
 
@@ -35005,9 +35013,9 @@ function getLocationActionSummary() {
 
 }
 
-// =========================================================
-// BRICK 93.8 — LOCATION REQUIREMENTS SYSTEM
-// =========================================================
+// =========================================
+// LOCATION REQUIREMENTS AND LOCK STATE
+// =========================================
 
 
 function checkLocationRequirements(
@@ -35066,9 +35074,9 @@ function getLocationLockState(
 
 }
 
-// =========================================================
-// BRICK 93.9 — LOCATION STATE SYSTEM
-// =========================================================
+// =========================================
+// LOCATION STATE MANAGEMENT
+// =========================================
 
 
 const LOCATION_STATE = {
@@ -35138,9 +35146,9 @@ function getLocationState(
 
 }
 
-// =========================================================
-// BRICK 93.10 — LOCATION METADATA FOUNDATION
-// =========================================================
+// =========================================
+// LOCATION METADATA FOUNDATION
+// =========================================
 
 
 function getLocationMetadata(
