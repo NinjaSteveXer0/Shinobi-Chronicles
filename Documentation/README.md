@@ -6,7 +6,7 @@ Shinobi Chronicles
 
 ## Creator
 
-Stephen [Surname]
+Stephen Murray
 
 ## Development Status
 
