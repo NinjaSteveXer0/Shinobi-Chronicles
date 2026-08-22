@@ -36193,6 +36193,195 @@ function getLocationOverview(
 
 }
 
+// =========================================================
+// BRICK 113 — LOCATION COMPLETION STATE
+// =========================================================
+
+
+function completeLocation(
+  locationId
+) {
+
+
+  if (
+    !getLocationData(locationId)
+  ) {
+
+    return false;
+
+  }
+
+
+
+  setLocationState(
+    locationId,
+    LOCATION_STATE.completed
+  );
+
+
+  return true;
+
+
+}
+
+
+
+
+
+function isLocationCompleted(
+  locationId
+) {
+
+
+  return (
+    getLocationState(
+      locationId
+    )
+    ===
+    LOCATION_STATE.completed
+  );
+
+
+}
+
+// =========================================================
+// BRICK 114 — LOCATION MASTERY STATE
+// =========================================================
+
+
+function masterLocation(
+  locationId
+) {
+
+
+  if (
+    !getLocationData(locationId)
+  ) {
+
+    return false;
+
+  }
+
+
+
+  setLocationState(
+    locationId,
+    LOCATION_STATE.mastered
+  );
+
+
+  return true;
+
+
+}
+
+
+
+
+
+function isLocationMastered(
+  locationId
+) {
+
+
+  return (
+    getLocationState(
+      locationId
+    )
+    ===
+    LOCATION_STATE.mastered
+  );
+
+
+}
+
+// =========================================================
+// BRICK 115 — LOCATION PROGRESS SUMMARY
+// =========================================================
+
+
+function getLocationProgress(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+
+  return {
+
+
+    id:
+      locationId,
+
+
+    name:
+      location.name,
+
+
+    state:
+      getLocationState(
+        locationId
+      ),
+
+
+    discovered:
+      isLocationDiscovered(
+        locationId
+      ),
+
+
+    visited:
+      locationHistory.includes(
+        locationId
+      )
+
+
+  };
+
+
+}
+
+
+// =========================================================
+// BRICK 116 — LOCATION STATE CONNECTION
+// =========================================================
+
+
+function getPlayerLocationProgress() {
+
+
+  const locationId =
+    getPlayerLocation();
+
+
+  if (!locationId) {
+
+    return null;
+
+  }
+
+
+
+  return getLocationProgress(
+    locationId
+  );
+
+
+}
+
+
 
 
 
