@@ -37783,6 +37783,102 @@ function renderTrainingOverlay(
   `;
 }
 
+// =========================================================
+// BRICK 152 — TRAINING ACTION EXECUTION BRIDGE
+// =========================================================
+//
+// UI ACTION → ACTIVITY SYSTEM → TRAINING DATA → REWARD PIPELINE
+//
+// This keeps training buttons from directly modifying stats.
+// Future Chronicle Engine modules can reuse this pattern:
+// Missions, Exams, Events, Dungeons, etc.
+//
+// =========================================================
+
+
+function startTraining(
+  activityId
+) {
+
+
+  console.log(
+    "TRAINING ACTION START:",
+    activityId
+  );
+
+
+  const trainingData =
+    getTrainingExecutionData(
+      activityId
+    );
+
+
+  if (
+    !trainingData
+  ) {
+
+
+    console.log(
+      "Training activity not found:",
+      activityId
+    );
+
+
+    return false;
+
+  }
+
+
+
+  const result =
+    executePlayerActivity({
+
+      type:
+        PLAYER_ACTIVITY_TYPES.TRAINING,
+
+      stage:
+        "available",
+
+      location:
+        selectedLocationNode
+          ? selectedLocationNode.id
+          : null,
+
+      activityId:
+        activityId
+
+    });
+
+
+
+  if (
+    !result
+  ) {
+
+
+    console.log(
+      "Training activity failed."
+    );
+
+
+    return false;
+
+  }
+
+
+
+  console.log(
+    "TRAINING ACTIVITY COMPLETE:",
+    trainingData
+  );
+
+
+
+  return true;
+
+
+}
+
 
 // =========================================================
 // 16. BATTLE / LOOT OVERLAY
