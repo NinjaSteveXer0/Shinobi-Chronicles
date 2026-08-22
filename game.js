@@ -35421,7 +35421,17 @@ function startRegisteredActivity(
 }
 
 // =========================================================
-// BRICK 96 — LOCATION CONTENT CONNECTION
+// BRICK 95 — LOCATION ACTIVITY CONNECTION
+// =========================================================
+//
+// Connects World Engine locations
+// to Activity Engine definitions.
+//
+// Handles:
+// - Location activity mappings
+// - Action routing
+// - Activity launch requests
+//
 // =========================================================
 
 
@@ -35470,9 +35480,9 @@ const LOCATION_ACTIVITY_CONNECTIONS = {
 
 
 
-// =========================================================
-// GET LOCATION ACTIVITY
-// =========================================================
+// =========================================
+// LOCATION ACTIVITY LOOKUP
+// =========================================
 
 function getLocationActivity(
   locationId,
@@ -35507,11 +35517,10 @@ function getLocationActivity(
 
 
 
+// =========================================
+// LOCATION ACTIVITY REQUEST
+// =========================================
 
-
-// =========================================================
-// LAUNCH LOCATION ACTION
-// =========================================================
 
 function launchLocationAction(
   locationId,
