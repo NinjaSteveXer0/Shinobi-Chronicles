@@ -36749,6 +36749,216 @@ function getLocationDiscoverySummary() {
 
 }
 
+// =========================================================
+// BRICK 127 — LOCATION BUTTON DATA BRIDGE
+// =========================================================
+
+function getLocationNavigationData(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      location.id,
+
+    name:
+      location.name,
+
+    type:
+      location.type,
+
+    buttonText:
+      getNavigationButtonText(
+        location
+      )
+
+  };
+
+}
+
+// =========================================================
+// BRICK 128 — LOCATION DISCOVERY DISPLAY DATA
+// =========================================================
+
+function getLocationDiscoveryDisplayData(
+  locationId
+) {
+
+
+  const discovered =
+    isLocationDiscovered(
+      locationId
+    );
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    id:
+      location.id,
+
+    name:
+      location.name,
+
+    discovered:
+      discovered,
+
+    status:
+      discovered
+        ? "DISCOVERED"
+        : "UNDISCOVERED"
+
+  };
+
+}
+
+// =========================================================
+// BRICK 129 — LOCATION ACTION DISPLAY DATA
+// =========================================================
+
+function getLocationActionDisplayData(
+  locationId
+) {
+
+
+  const actions =
+    getLocationActions(
+      locationId
+    );
+
+
+  if (!actions) {
+
+    return [];
+
+  }
+
+
+  return actions.map(
+    action => ({
+
+      id:
+        action,
+
+      name:
+        action
+          .replace(
+            /_/g,
+            " "
+          )
+          .toUpperCase()
+
+    })
+  );
+
+}
+
+// =========================================================
+// BRICK 130 — LOCATION SUMMARY BUILDER
+// =========================================================
+
+function getLocationSummaryData(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return null;
+
+  }
+
+
+  return {
+
+    navigation:
+      getLocationNavigationData(
+        locationId
+      ),
+
+    discovery:
+      getLocationDiscoveryDisplayData(
+        locationId
+      ),
+
+    actions:
+      getLocationActionDisplayData(
+        locationId
+      )
+
+  };
+
+}
+
+// =========================================================
+// BRICK 131 — LOCATION SUMMARY VALIDATION
+// =========================================================
+
+function validateLocationSummary(
+  locationId
+) {
+
+
+  const summary =
+    getLocationSummaryData(
+      locationId
+    );
+
+
+  if (!summary) {
+
+    return false;
+
+  }
+
+
+  return (
+
+    !!summary.navigation &&
+
+    !!summary.discovery &&
+
+    Array.isArray(
+      summary.actions
+    )
+
+  );
+
+}
+
 
 
 
