@@ -34549,6 +34549,82 @@ function canPerformLocationAction(
 
 }
 
+// =========================================================
+// BRICK 93.3 — LOCATION DISCOVERY STATE
+// =========================================================
+
+
+let discoveredLocations = [];
+
+
+
+// =========================================================
+// DISCOVER LOCATION
+// =========================================================
+
+function discoverLocation(
+  locationId
+) {
+
+
+  if (
+    !getLocationData(locationId)
+  ) {
+
+    console.log(
+      "Invalid location:",
+      locationId
+    );
+
+    return false;
+
+  }
+
+
+  if (
+    !discoveredLocations.includes(
+      locationId
+    )
+  ) {
+
+
+    discoveredLocations.push(
+      locationId
+    );
+
+
+    console.log(
+      "Location discovered:",
+      locationId
+    );
+
+
+  }
+
+
+  return true;
+
+
+}
+
+
+
+// =========================================================
+// CHECK DISCOVERY
+// =========================================================
+
+function isLocationDiscovered(
+  locationId
+) {
+
+
+  return discoveredLocations.includes(
+    locationId
+  );
+
+
+}
+
 
 // =========================================================
 // BUTTON TEXT
