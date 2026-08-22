@@ -35849,6 +35849,162 @@ function getPlayerLocation() {
 
 }
 
+// =========================================================
+// BRICK 105 — LOCATION TRAVEL VALIDATION
+// =========================================================
+
+
+function canTravelToLocation(
+  locationId
+) {
+
+
+  const location =
+    getLocationData(
+      locationId
+    );
+
+
+  if (!location) {
+
+    return false;
+
+  }
+
+
+  return checkLocationRequirements(
+    locationId
+  );
+
+
+}
+
+// =========================================================
+// BRICK 106 — LOCATION TRAVEL ACTION
+// =========================================================
+
+
+function travelToLocation(
+  locationId
+) {
+
+
+  if (
+    !canTravelToLocation(
+      locationId
+    )
+  ) {
+
+
+    console.log(
+      "Travel denied:",
+      locationId
+    );
+
+
+    return false;
+
+  }
+
+
+
+  setPlayerLocation(
+    locationId
+  );
+
+
+
+  console.log(
+    "Player travelled to:",
+    locationId
+  );
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
+// BRICK 107 — LOCATION ACTION LIST BUILDER
+// =========================================================
+
+
+function getCurrentLocationActions() {
+
+
+  const locationId =
+    getPlayerLocation();
+
+
+
+  if (!locationId) {
+
+    return [];
+
+  }
+
+
+
+  return getLocationActions(
+    locationId
+  );
+
+
+}
+
+// =========================================================
+// BRICK 108 — LOCATION ACTIVITY ROUTER
+// =========================================================
+
+
+function executeLocationAction(
+  action
+) {
+
+
+  const locationId =
+    getPlayerLocation();
+
+
+
+  if (!locationId) {
+
+    return false;
+
+  }
+
+
+
+  if (
+    !canLaunchLocationAction(
+      locationId,
+      action
+    )
+  ) {
+
+
+    console.log(
+      "Action unavailable:",
+      action
+    );
+
+
+    return false;
+
+  }
+
+
+
+  return launchLocationAction(
+    locationId,
+    action
+  );
+
+
+}
+
 
 
 
