@@ -1230,6 +1230,9 @@ function createDefaultPlayerData() {
     inventory:
       [],
 
+    activityHistory:
+      [],
+
     progression:
       createDefaultRunProgression(),
 
@@ -36093,6 +36096,9 @@ function syncActivityHistory() {
 
 
 }
+
+
+
 // =========================================================
 // TASK 6.5 — ACTIVITY HISTORY ANALYTICS
 // =========================================================
