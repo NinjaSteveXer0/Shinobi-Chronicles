@@ -35970,6 +35970,82 @@ function getActivitySummary() {
 
 }
 
+
+// =========================================================
+// TASK 6.6 — ACTIVITY PROGRESSION BRIDGE
+// =========================================================
+//
+// Connects completed activities to progression systems.
+//
+// Handles:
+// - Discipline progression hooks
+// - Character growth hooks
+// - Future Chronicle progression
+//
+// This does not directly modify stats yet.
+// It creates the controlled connection point.
+//
+// =========================================================
+
+
+
+// =========================================================
+// PROCESS ACTIVITY PROGRESSION
+// =========================================================
+
+function processActivityProgression(
+  result
+) {
+
+
+  if (
+    !result ||
+    !result.rewards
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  const progression =
+    result.rewards.progression;
+
+
+
+  if (
+    !progression
+  ) {
+
+
+    console.log(
+      "No activity progression attached."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  console.log(
+    "Activity progression processed:",
+    progression
+  );
+
+
+
+  return true;
+
+
+}
+
+
 // =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
 // =========================================================
