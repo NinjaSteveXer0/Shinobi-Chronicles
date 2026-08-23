@@ -35915,7 +35915,7 @@ function applyActivityRewards(
 
 
     console.log(
-      "Invalid activity result."
+      "Invalid activity reward result."
     );
 
 
@@ -35924,11 +35924,6 @@ function applyActivityRewards(
 
   }
 
-
-
-  // =========================================
-  // EXP REWARD
-  // =========================================
 
 
   if (
@@ -35945,11 +35940,6 @@ function applyActivityRewards(
 
 
 
-  // =========================================
-  // RYO REWARD
-  // =========================================
-
-
   if (
     typeof result.rewards.ryo ===
     "number"
@@ -35962,11 +35952,6 @@ function applyActivityRewards(
 
   }
 
-
-
-  // =========================================
-  // ITEM REWARDS
-  // =========================================
 
 
   if (
@@ -35990,25 +35975,6 @@ function applyActivityRewards(
 
 
   }
-
-
-
-  // =========================================
-  // FUTURE PROGRESSION BRIDGE
-  // =========================================
-  //
-  // Reserved for:
-  //
-  // - discipline EXP
-  // - character growth
-  // - Chronicle events
-  // - achievements
-  //
-  // =========================================
-
-
-
-  savePlayerData();
 
 
 
