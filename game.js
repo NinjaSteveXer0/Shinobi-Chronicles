@@ -36082,34 +36082,18 @@ function recordActivityCompletion(
 // =========================================================
 // GET ACTIVITY HISTORY
 // =========================================================
+//
+// Returns stored activity completion records.
+//
+// Used by:
+// - Analytics
+// - Achievements
+// - Chronicle systems
+//
+// =========================================================
+
 
 function getActivityHistory() {
-
-
-  return activityHistory;
-
-
-}
-
-// =========================================================
-// BRICK 104 — ACTIVITY HISTORY ANALYTICS FOUNDATION
-// =========================================================
-//
-// Converts Activity History into usable Chronicle data.
-//
-// Handles:
-// - Activity completion counts
-// - Character activity statistics
-// - Future achievement hooks
-//
-// =========================================================
-
-
-// =========================================================
-// GET ACTIVITY ANALYTICS
-// =========================================================
-
-function getActivityAnalytics() {
 
 
   if (
@@ -36119,103 +36103,58 @@ function getActivityAnalytics() {
   ) {
 
 
-    return null;
+    return [];
 
 
   }
 
 
 
-  const analytics = {
+  return activityHistory;
 
 
-    totalActivities:
-
-      activityHistory.length,
-
-
-    activityCounts:
-
-      {},
-
-
-    characterCounts:
-
-      {}
-
-
-  };
+}
 
 
 
-  activityHistory.forEach(
-    entry => {
+// =========================================================
+// GET CHARACTER ACTIVITY HISTORY
+// =========================================================
 
 
-      if (
-        !analytics.activityCounts[
-          entry.activity
-        ]
-      ) {
+function getCharacterActivityHistory(
+  characterId
+) {
 
 
-        analytics.activityCounts[
-          entry.activity
-        ] = 0;
-
-
-      }
-
-
-
-      analytics.activityCounts[
-        entry.activity
-      ]++;
-
-
-
-      if (
-        entry.character
-      ) {
-
-
-        if (
-          !analytics.characterCounts[
-            entry.character
-          ]
-        ) {
-
-
-          analytics.characterCounts[
-            entry.character
-          ] = 0;
-
-
-        }
-
-
-
-        analytics.characterCounts[
-          entry.character
-        ]++;
-
-
-      }
-
-
-    }
+  return getActivityHistory().filter(
+    entry =>
+      entry.character ===
+      characterId
   );
 
 
-
-  console.log(
-    "Activity analytics generated:",
-    analytics
-  );
+}
 
 
 
-  return analytics;
+// =========================================================
+// GET ACTIVITY COMPLETION COUNT
+// =========================================================
+
+
+function getActivityCompletionCount(
+  activityId
+) {
+
+
+  return getActivityHistory()
+    .filter(
+      entry =>
+        entry.activity ===
+        activityId
+    )
+    .length;
 
 
 }
@@ -36295,6 +36234,8 @@ function recordActivityCompletion(
 
 
 }
+
+
 
 // =========================================================
 // TASK 6.6 — ACTIVITY PROGRESSION BRIDGE
