@@ -36013,6 +36013,16 @@ let activityHistory = [];
 // =========================================================
 // RECORD ACTIVITY COMPLETION
 // =========================================================
+//
+// Records successful activity results.
+//
+// Handles:
+// - Activity history
+// - Completion tracking
+// - Future Chronicle records
+//
+// =========================================================
+
 
 function recordActivityCompletion(
   result
@@ -36021,8 +36031,14 @@ function recordActivityCompletion(
 
   if (
     !result ||
-    !result.activity
+    !result.activity ||
+    !result.success
   ) {
+
+
+    console.log(
+      "Invalid activity completion record."
+    );
 
 
     return false;
@@ -36061,8 +36077,6 @@ function recordActivityCompletion(
 
 
 }
-
-
 
 
 // =========================================================
