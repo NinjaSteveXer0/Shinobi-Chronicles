@@ -35514,6 +35514,142 @@ function createActivityResult(
 }
 
 // =========================================================
+// TASK 6.2 — ACTIVITY REWARD PROCESSOR
+// =========================================================
+//
+// Applies Activity Result rewards.
+//
+// Handles:
+// - EXP
+// - Ryō
+// - Items
+// - Future progression hooks
+//
+// =========================================================
+
+
+function applyActivityRewards(
+  result
+) {
+
+
+  if (
+    !result ||
+    !result.rewards
+  ) {
+
+
+    console.log(
+      "Invalid activity result."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  // =========================================
+  // EXP REWARD
+  // =========================================
+
+
+  if (
+    typeof result.rewards.exp ===
+    "number"
+  ) {
+
+
+    playerData.exp +=
+      result.rewards.exp;
+
+
+  }
+
+
+
+  // =========================================
+  // RYO REWARD
+  // =========================================
+
+
+  if (
+    typeof result.rewards.ryo ===
+    "number"
+  ) {
+
+
+    playerData.ryo +=
+      result.rewards.ryo;
+
+
+  }
+
+
+
+  // =========================================
+  // ITEM REWARDS
+  // =========================================
+
+
+  if (
+    Array.isArray(
+      result.rewards.items
+    )
+  ) {
+
+
+    result.rewards.items.forEach(
+      item => {
+
+
+        addItemToInventory(
+          item
+        );
+
+
+      }
+    );
+
+
+  }
+
+
+
+  // =========================================
+  // FUTURE PROGRESSION BRIDGE
+  // =========================================
+  //
+  // Reserved for:
+  //
+  // - discipline EXP
+  // - character growth
+  // - Chronicle events
+  // - achievements
+  //
+  // =========================================
+
+
+
+  savePlayerData();
+
+
+
+  console.log(
+    "Activity rewards applied:",
+    result.rewards
+  );
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
 // =========================================================
 //
