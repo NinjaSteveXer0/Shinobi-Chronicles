@@ -35803,6 +35803,174 @@ function getActivityHistory() {
 }
 
 // =========================================================
+// TASK 6.5 — ACTIVITY HISTORY ANALYTICS
+// =========================================================
+//
+// Converts Activity History into usable Chronicle data.
+//
+// Handles:
+// - Activity completion counts
+// - Character activity statistics
+// - Future achievement hooks
+//
+// =========================================================
+
+
+
+// =========================================================
+// GET ACTIVITY COMPLETION COUNT
+// =========================================================
+
+function getActivityCompletionCount(
+  activityId
+) {
+
+
+  if (
+    !activityId
+  ) {
+
+
+    return 0;
+
+
+  }
+
+
+
+  return activityHistory.filter(
+    record =>
+      record.activity ===
+      activityId
+  ).length;
+
+
+}
+
+
+
+
+// =========================================================
+// GET CHARACTER ACTIVITY COUNT
+// =========================================================
+
+function getCharacterActivityCount(
+  characterId
+) {
+
+
+  if (
+    !characterId
+  ) {
+
+
+    return 0;
+
+
+  }
+
+
+
+  return activityHistory.filter(
+    record =>
+      record.character ===
+      characterId
+  ).length;
+
+
+}
+
+
+
+
+// =========================================================
+// GET ACTIVITY SUMMARY
+// =========================================================
+
+function getActivitySummary() {
+
+
+  const summary = {
+
+    totalActivities:
+      activityHistory.length,
+
+    activities:
+      {},
+
+    characters:
+      {}
+
+  };
+
+
+
+  activityHistory.forEach(
+    record => {
+
+
+      // =========================================
+      // ACTIVITY TOTALS
+      // =========================================
+
+      if (
+        !summary.activities[
+          record.activity
+        ]
+      ) {
+
+
+        summary.activities[
+          record.activity
+        ] = 0;
+
+
+      }
+
+
+
+      summary.activities[
+        record.activity
+      ]++;
+
+
+
+      // =========================================
+      // CHARACTER TOTALS
+      // =========================================
+
+      if (
+        !summary.characters[
+          record.character
+        ]
+      ) {
+
+
+        summary.characters[
+          record.character
+        ] = 0;
+
+
+      }
+
+
+
+      summary.characters[
+        record.character
+      ]++;
+
+
+    }
+  );
+
+
+
+  return summary;
+
+
+}
+
+// =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
 // =========================================================
 //
