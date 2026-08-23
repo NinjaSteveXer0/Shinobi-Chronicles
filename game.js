@@ -36284,6 +36284,72 @@ function checkActivityRequirements(
 
 }
 
+// =========================================================
+// TASK 6.10 — ACTIVITY REQUIREMENT EXECUTION GATE
+// =========================================================
+//
+// Connects requirement checks into activity execution.
+//
+// Flow:
+//
+// Activity Request
+//       ↓
+// Validation
+//       ↓
+// Requirements
+//       ↓
+// Execution
+//
+// =========================================================
+
+
+
+// =========================================================
+// VALIDATE ACTIVITY REQUIREMENTS
+// =========================================================
+
+function validateActivityRequirements(
+  activityId
+) {
+
+
+  const requirements =
+    checkActivityRequirements(
+      activityId
+    );
+
+
+
+  if (
+    !requirements
+  ) {
+
+
+    console.log(
+      "Activity requirement validation failed:",
+      activityId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  console.log(
+    "Activity requirement validation passed:",
+    activityId
+  );
+
+
+
+  return true;
+
+
+}
+
 
 // =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
