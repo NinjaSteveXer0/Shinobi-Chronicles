@@ -36092,173 +36092,80 @@ function getActivityHistory() {
 }
 
 // =========================================================
-// TASK 6.5 — ACTIVITY HISTORY ANALYTICS
+// TASK 6.5 — ACTIVITY COMPLETION TRACKING
 // =========================================================
 //
-// Converts Activity History into usable Chronicle data.
+// Tracks completed activities.
 //
 // Handles:
-// - Activity completion counts
-// - Character activity statistics
-// - Future achievement hooks
+// - Activity history
+// - Completion records
+// - Save preparation
 //
 // =========================================================
 
 
-
 // =========================================================
-// GET ACTIVITY COMPLETION COUNT
+// RECORD ACTIVITY COMPLETION
 // =========================================================
 
-function getActivityCompletionCount(
-  activityId
+function recordActivityCompletion(
+  result
 ) {
 
 
   if (
-    !activityId
+    !result ||
+    !result.activity ||
+    !result.success
   ) {
 
 
-    return 0;
+    console.log(
+      "Invalid activity completion record."
+    );
+
+
+    return false;
 
 
   }
 
 
 
-  return activityHistory.filter(
-    record =>
-      record.activity ===
-      activityId
-  ).length;
+  activityHistory.push({
 
+    activity:
+      result.activity,
 
-}
+    character:
+      result.character,
 
+    success:
+      result.success,
 
+    timestamp:
+      Date.now()
 
-
-// =========================================================
-// GET CHARACTER ACTIVITY COUNT
-// =========================================================
-
-function getCharacterActivityCount(
-  characterId
-) {
-
-
-  if (
-    !characterId
-  ) {
-
-
-    return 0;
-
-
-  }
+  });
 
 
 
-  return activityHistory.filter(
-    record =>
-      record.character ===
-      characterId
-  ).length;
-
-
-}
+  savePlayerData();
 
 
 
-
-// =========================================================
-// GET ACTIVITY SUMMARY
-// =========================================================
-
-function getActivitySummary() {
-
-
-  const summary = {
-
-    totalActivities:
-      activityHistory.length,
-
-    activities:
-      {},
-
-    characters:
-      {}
-
-  };
-
-
-
-  activityHistory.forEach(
-    record => {
-
-
-      // =========================================
-      // ACTIVITY TOTALS
-      // =========================================
-
-      if (
-        !summary.activities[
-          record.activity
-        ]
-      ) {
-
-
-        summary.activities[
-          record.activity
-        ] = 0;
-
-
-      }
-
-
-
-      summary.activities[
-        record.activity
-      ]++;
-
-
-
-      // =========================================
-      // CHARACTER TOTALS
-      // =========================================
-
-      if (
-        !summary.characters[
-          record.character
-        ]
-      ) {
-
-
-        summary.characters[
-          record.character
-        ] = 0;
-
-
-      }
-
-
-
-      summary.characters[
-        record.character
-      ]++;
-
-
-    }
+  console.log(
+    "Activity recorded and saved:",
+    result.activity
   );
 
 
 
-  return summary;
+  return true;
 
 
 }
-
 
 // =========================================================
 // TASK 6.6 — ACTIVITY PROGRESSION BRIDGE
