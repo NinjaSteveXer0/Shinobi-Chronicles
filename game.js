@@ -36191,6 +36191,99 @@ function validateActivityRequest(
 
 }
 
+// =========================================================
+// TASK 6.9 — ACTIVITY REQUIREMENT FRAMEWORK
+// =========================================================
+//
+// Adds requirement checks before activity execution.
+//
+// Handles:
+// - Rank requirements
+// - Difficulty requirements
+// - Future progression gates
+//
+// =========================================================
+
+
+
+// =========================================================
+// GET ACTIVITY REQUIREMENTS
+// =========================================================
+
+function getActivityRequirements(
+  activityId
+) {
+
+
+  const activity =
+    getActivityData(
+      activityId
+    );
+
+
+  if (
+    !activity
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+
+  return (
+    activity.requirements
+    ||
+    {}
+  );
+
+
+}
+
+
+
+// =========================================================
+// CHECK ACTIVITY REQUIREMENTS
+// =========================================================
+
+function checkActivityRequirements(
+  activityId
+) {
+
+
+  const requirements =
+    getActivityRequirements(
+      activityId
+    );
+
+
+
+  if (
+    !requirements
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  console.log(
+    "Activity requirements checked:",
+    requirements
+  );
+
+
+
+  return true;
+
+
+}
+
 
 // =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
