@@ -36047,6 +36047,103 @@ function processActivityProgression(
 
 
 // =========================================================
+// TASK 6.7 — ACTIVITY VALIDATION LAYER
+// =========================================================
+//
+// Validates activity requests before execution.
+//
+// Handles:
+// - Activity existence
+// - Character availability
+// - Future requirement checks
+//
+// =========================================================
+
+
+
+// =========================================================
+// VALIDATE ACTIVITY REQUEST
+// =========================================================
+
+function validateActivityRequest(
+  activityId,
+  characterId
+) {
+
+
+  const activity =
+    getActivityData(
+      activityId
+    );
+
+
+
+  if (
+    !activity
+  ) {
+
+
+    console.log(
+      "Activity validation failed: Unknown activity",
+      activityId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    characterId
+  ) {
+
+
+    const character =
+      playerTeam.find(
+        member =>
+          member.id === characterId
+      );
+
+
+
+    if (
+      !character
+    ) {
+
+
+      console.log(
+        "Activity validation failed: Character not found",
+        characterId
+      );
+
+
+      return false;
+
+
+    }
+
+
+  }
+
+
+
+  console.log(
+    "Activity validation passed:",
+    activityId
+  );
+
+
+
+  return true;
+
+
+}
+
+
+// =========================================================
 // BRICK 95 — LOCATION ACTIVITY CONNECTION
 // =========================================================
 //
