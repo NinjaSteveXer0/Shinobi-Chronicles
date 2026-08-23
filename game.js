@@ -35440,6 +35440,31 @@ function startRegisteredActivity(
 
 
 
+  // =========================================
+  // VALIDATE ACTIVITY REQUIREMENTS
+  // =========================================
+
+
+  if (
+    !validateActivityRequirements(
+      action
+    )
+  ) {
+
+
+    console.log(
+      "Activity requirements rejected:",
+      action
+    );
+
+
+    return false;
+
+
+  }
+
+
+
   const activity =
     resolveActivityAction(
       action
@@ -35626,6 +35651,8 @@ function createActivityResult(
 
 }
 
+
+
 // =========================================================
 // TASK 6.2 — ACTIVITY REWARD PROCESSOR
 // =========================================================
@@ -35761,8 +35788,6 @@ function applyActivityRewards(
 
 
 }
-
-
 
 // =========================================================
 // TASK 6.4 — ACTIVITY COMPLETION LIFECYCLE
