@@ -36417,6 +36417,23 @@ function validateActivityRequest(
 ) {
 
 
+  if (
+    !activityId
+  ) {
+
+
+    console.log(
+      "Activity validation failed: Missing activity ID."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
   const activity =
     getActivityData(
       activityId
@@ -36448,9 +36465,8 @@ function validateActivityRequest(
 
 
     const character =
-      playerTeam.find(
-        member =>
-          member.id === characterId
+      getPlayerCharacter(
+        characterId
       );
 
 
@@ -36487,6 +36503,7 @@ function validateActivityRequest(
 
 
 }
+
 
 // =========================================================
 // TASK 6.9 — ACTIVITY REQUIREMENT FRAMEWORK
