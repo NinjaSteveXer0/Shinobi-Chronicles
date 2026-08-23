@@ -35395,14 +35395,21 @@ function resolveActivityAction(
 
 
 
+// =========================================================
+// TASK 6.3 — ACTIVITY REWARD APPLICATION BRIDGE
+// =========================================================
+//
+// Connects activity execution to:
+// - Activity Results
+// - Reward Processing
+// - Player Save
+//
+// =========================================================
 
-
-// =========================================
-// ACTIVITY START REQUEST
-// =========================================
 
 function startRegisteredActivity(
-  action
+  action,
+  characterId
 ) {
 
 
@@ -35414,7 +35421,15 @@ function startRegisteredActivity(
 
   if (!activity) {
 
+
+    console.log(
+      "Unknown activity:",
+      action
+    );
+
+
     return false;
+
 
   }
 
@@ -35427,7 +35442,53 @@ function startRegisteredActivity(
 
 
 
-  return activity;
+  // =========================================
+  // CREATE RESULT
+  // =========================================
+
+
+  const result =
+    createActivityResult(
+      action,
+      characterId
+    );
+
+
+
+  if (!result) {
+
+
+    console.log(
+      "Activity result creation failed."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  // =========================================
+  // APPLY REWARDS
+  // =========================================
+
+
+  applyActivityRewards(
+    result
+  );
+
+
+
+  console.log(
+    "ACTIVITY COMPLETED:",
+    result
+  );
+
+
+
+  return result;
 
 
 }
