@@ -35413,10 +35413,38 @@ function startRegisteredActivity(
 ) {
 
 
+  // =========================================
+  // VALIDATE ACTIVITY REQUEST
+  // =========================================
+
+
+  if (
+    !validateActivityRequest(
+      action,
+      characterId
+    )
+  ) {
+
+
+    console.log(
+      "Activity request rejected:",
+      action,
+      characterId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
   const activity =
     resolveActivityAction(
       action
     );
+
 
 
   if (!activity) {
@@ -35479,9 +35507,28 @@ function startRegisteredActivity(
     result
   );
 
+
+
+  // =========================================
+  // RECORD COMPLETION
+  // =========================================
+
+
   recordActivityCompletion(
-  result
-);
+    result
+  );
+
+
+
+  // =========================================
+  // PROCESS PROGRESSION
+  // =========================================
+
+
+  processActivityProgression(
+    result
+  );
+
 
 
   console.log(
@@ -35495,6 +35542,8 @@ function startRegisteredActivity(
 
 
 }
+
+
 
 // =========================================================
 // BRICK 154 — ACTIVITY RESULT FOUNDATION
