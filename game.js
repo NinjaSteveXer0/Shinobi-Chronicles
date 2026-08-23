@@ -35221,7 +35221,7 @@ function getLocationMetadata(
 // Handles:
 // - Activity definitions
 // - Activity identity
-// - Activity rewards
+// - Structured activity rewards
 // - Activity data retrieval
 //
 // =========================================================
@@ -35243,11 +35243,43 @@ const ACTIVITY_DATABASE = {
 
     rewards:[
 
-      "ninjutsu",
+      {
+        type:
+          "discipline",
 
-      "genjutsu",
+        id:
+          "ninjutsu",
 
-      "fuinjutsu"
+        amount:
+          15
+
+      },
+
+
+      {
+        type:
+          "discipline",
+
+        id:
+          "genjutsu",
+
+        amount:
+          15
+
+      },
+
+
+      {
+        type:
+          "discipline",
+
+        id:
+          "fuinjutsu",
+
+        amount:
+          15
+
+      }
 
     ]
 
@@ -35269,11 +35301,43 @@ const ACTIVITY_DATABASE = {
 
     rewards:[
 
-      "taijutsu",
+      {
+        type:
+          "discipline",
 
-      "bukijutsu",
+        id:
+          "taijutsu",
 
-      "stamina"
+        amount:
+          15
+
+      },
+
+
+      {
+        type:
+          "discipline",
+
+        id:
+          "bukijutsu",
+
+        amount:
+          10
+
+      },
+
+
+      {
+        type:
+          "discipline",
+
+        id:
+          "stamina",
+
+        amount:
+          15
+
+      }
 
     ]
 
@@ -35295,7 +35359,17 @@ const ACTIVITY_DATABASE = {
 
     rewards:[
 
-      "kinjutsu"
+      {
+        type:
+          "discipline",
+
+        id:
+          "kinjutsu",
+
+        amount:
+          15
+
+      }
 
     ]
 
@@ -35317,11 +35391,43 @@ const ACTIVITY_DATABASE = {
 
     rewards:[
 
-      "exp",
+      {
+        type:
+          "experience",
 
-      "ryo",
+        id:
+          "exp",
 
-      "items"
+        amount:
+          100
+
+      },
+
+
+      {
+        type:
+          "currency",
+
+        id:
+          "ryo",
+
+        amount:
+          500
+
+      },
+
+
+      {
+        type:
+          "item",
+
+        id:
+          "random_common",
+
+        amount:
+          1
+
+      }
 
     ]
 
@@ -35354,6 +35460,7 @@ function getActivityData(
 
 
 }
+
 
 // =========================================
 // ACTIVITY RESOLUTION
@@ -35393,6 +35500,154 @@ function resolveActivityAction(
 
 }
 
+// =========================================================
+// BRICK 98 — ACTIVITY RESULT HYDRATION
+// =========================================================
+//
+// Converts activity definitions into universal results.
+//
+// Activity Data
+// ↓
+// Activity Result
+// ↓
+// Reward Processing
+//
+// =========================================================
+
+
+function hydrateActivityResult(
+  result,
+  activity
+) {
+
+
+  if (
+    !result ||
+    !activity
+  ) {
+
+
+    console.log(
+      "Invalid activity hydration request."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !Array.isArray(
+      activity.rewards
+    )
+  ) {
+
+
+    return result;
+
+
+  }
+
+
+
+  result.rewards.progression =
+    [
+      ...activity.rewards
+    ];
+
+
+
+  console.log(
+    "Activity result hydrated:",
+    result
+  );
+
+
+
+  return result;
+
+
+}
+
+// =========================================================
+// BRICK 98 — ACTIVITY RESULT HYDRATION
+// =========================================================
+//
+// Converts activity definitions into universal results.
+//
+// Activity Definition
+// ↓
+// Activity Result
+// ↓
+// Reward Processing
+//
+// =========================================================
+
+
+// =========================================================
+// ACTIVITY RESULT HYDRATION
+// =========================================================
+
+function hydrateActivityResult(
+  result,
+  activity
+) {
+
+
+  if (
+    !result ||
+    !activity
+  ) {
+
+
+    console.log(
+      "Invalid activity hydration request."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !Array.isArray(
+      activity.rewards
+    )
+  ) {
+
+
+    return result;
+
+
+  }
+
+
+
+  result.rewards.progression =
+    [
+      ...activity.rewards
+    ];
+
+
+
+  console.log(
+    "Activity Result Hydrated:",
+    result
+  );
+
+
+
+  return result;
+
+
+}
+
 
 
 // =========================================================
@@ -35411,11 +35666,6 @@ function startRegisteredActivity(
   action,
   characterId
 ) {
-
-
-  // =========================================
-  // VALIDATE ACTIVITY REQUEST
-  // =========================================
 
 
   if (
@@ -35438,11 +35688,6 @@ function startRegisteredActivity(
 
   }
 
-
-
-  // =========================================
-  // VALIDATE ACTIVITY REQUIREMENTS
-  // =========================================
 
 
   if (
@@ -35472,7 +35717,9 @@ function startRegisteredActivity(
 
 
 
-  if (!activity) {
+  if (
+    !activity
+  ) {
 
 
     console.log(
@@ -35495,11 +35742,6 @@ function startRegisteredActivity(
 
 
 
-  // =========================================
-  // CREATE RESULT
-  // =========================================
-
-
   const result =
     createActivityResult(
       action,
@@ -35508,7 +35750,9 @@ function startRegisteredActivity(
 
 
 
-  if (!result) {
+  if (
+    !result
+  ) {
 
 
     console.log(
@@ -35523,9 +35767,11 @@ function startRegisteredActivity(
 
 
 
-  // =========================================
-  // APPLY REWARDS
-  // =========================================
+  hydrateActivityResult(
+    result,
+    activity
+  );
+
 
 
   applyActivityRewards(
@@ -35534,20 +35780,10 @@ function startRegisteredActivity(
 
 
 
-  // =========================================
-  // RECORD COMPLETION
-  // =========================================
-
-
   recordActivityCompletion(
     result
   );
 
-
-
-  // =========================================
-  // PROCESS PROGRESSION
-  // =========================================
 
 
   processActivityProgression(
