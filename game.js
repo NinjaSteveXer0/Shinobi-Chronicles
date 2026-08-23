@@ -36005,40 +36005,25 @@ function applyActivityRewards(
 // =========================================================
 
 
+// =========================================================
+// ACTIVITY HISTORY STORAGE
+// =========================================================
+
+
 let activityHistory = [];
 
 
 
-
 // =========================================================
-// RECORD ACTIVITY COMPLETION
-// =========================================================
-//
-// Records successful activity results.
-//
-// Handles:
-// - Activity history
-// - Completion tracking
-// - Future Chronicle records
-//
+// RESTORE ACTIVITY HISTORY
 // =========================================================
 
-
-function recordActivityCompletion(
-  result
-) {
+function restoreActivityHistory() {
 
 
   if (
-    !result ||
-    !result.activity ||
-    !result.success
+    !playerData
   ) {
-
-
-    console.log(
-      "Invalid activity completion record."
-    );
 
 
     return false;
@@ -36048,27 +36033,27 @@ function recordActivityCompletion(
 
 
 
-  activityHistory.push({
+  if (
+    !Array.isArray(
+      playerData.activityHistory
+    )
+  ) {
 
-    activity:
-      result.activity,
 
-    character:
-      result.character,
+    playerData.activityHistory = [];
 
-    success:
-      result.success,
 
-    timestamp:
-      Date.now()
+  }
 
-  });
+
+
+  activityHistory =
+    playerData.activityHistory;
 
 
 
   console.log(
-    "Activity recorded:",
-    result.activity
+    "Activity history restored."
   );
 
 
@@ -36079,86 +36064,35 @@ function recordActivityCompletion(
 }
 
 
+
 // =========================================================
-// GET ACTIVITY HISTORY
-// =========================================================
-//
-// Returns stored activity completion records.
-//
-// Used by:
-// - Analytics
-// - Achievements
-// - Chronicle systems
-//
+// SYNC ACTIVITY HISTORY
 // =========================================================
 
-
-function getActivityHistory() {
+function syncActivityHistory() {
 
 
   if (
-    !Array.isArray(
-      activityHistory
-    )
+    !playerData
   ) {
 
 
-    return [];
+    return false;
 
 
   }
 
 
 
-  return activityHistory;
+  playerData.activityHistory =
+    activityHistory;
+
+
+
+  return true;
 
 
 }
-
-
-
-// =========================================================
-// GET CHARACTER ACTIVITY HISTORY
-// =========================================================
-
-
-function getCharacterActivityHistory(
-  characterId
-) {
-
-
-  return getActivityHistory().filter(
-    entry =>
-      entry.character ===
-      characterId
-  );
-
-
-}
-
-
-
-// =========================================================
-// GET ACTIVITY COMPLETION COUNT
-// =========================================================
-
-
-function getActivityCompletionCount(
-  activityId
-) {
-
-
-  return getActivityHistory()
-    .filter(
-      entry =>
-        entry.activity ===
-        activityId
-    )
-    .length;
-
-
-}
-
 // =========================================================
 // TASK 6.5 — ACTIVITY HISTORY ANALYTICS
 // =========================================================
