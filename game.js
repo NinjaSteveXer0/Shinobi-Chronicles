@@ -36298,9 +36298,19 @@ function getActivitySummary() {
 
 
 
+// ===================================// =========================================================
+// TASK 6.6 — ACTIVITY PROGRESSION BRIDGE
 // =========================================================
-// PROCESS ACTIVITY PROGRESSION
+//
+// Routes activity progression rewards
+// into existing progression authorities.
+//
+// Handles:
+// - Discipline EXP
+// - Future progression types
+//
 // =========================================================
+
 
 function processActivityProgression(
   result
@@ -36326,7 +36336,9 @@ function processActivityProgression(
 
 
   if (
-    !progression
+    !Array.isArray(
+      progression
+    )
   ) {
 
 
@@ -36342,6 +36354,32 @@ function processActivityProgression(
 
 
 
+  progression.forEach(
+    reward => {
+
+
+      if (
+        reward.type ===
+          "discipline"
+      ) {
+
+
+        addDisciplineExp(
+          result.character,
+          reward.id,
+          reward.amount,
+          "activity"
+        );
+
+
+      }
+
+
+    }
+  );
+
+
+
   console.log(
     "Activity progression processed:",
     progression
@@ -36353,7 +36391,6 @@ function processActivityProgression(
 
 
 }
-
 
 // =========================================================
 // TASK 6.7 — ACTIVITY VALIDATION LAYER
