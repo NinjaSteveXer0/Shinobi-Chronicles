@@ -1614,7 +1614,10 @@ function loadPlayerData() {
     );
 
 
-  if (!savedData) {
+
+  if (
+    !savedData
+  ) {
 
 
     console.log(
@@ -1624,7 +1627,9 @@ function loadPlayerData() {
 
     return createDefaultPlayerData();
 
+
   }
+
 
 
   try {
@@ -1636,23 +1641,30 @@ function loadPlayerData() {
       );
 
 
+
     console.log(
       "Player save loaded:",
       parsedData
     );
 
 
+
     return {
+
 
       ryo:
         Number(
           parsedData.ryo
         ) || 0,
 
+
+
       exp:
         Number(
           parsedData.exp
         ) || 0,
+
+
 
       inventory:
         Array.isArray(
@@ -1661,20 +1673,36 @@ function loadPlayerData() {
           ? parsedData.inventory
           : [],
 
+
+
+      activityHistory:
+        Array.isArray(
+          parsedData.activityHistory
+        )
+          ? parsedData.activityHistory
+          : [],
+
+
+
       progression:
-  normalizeSavedRunProgression(
-    parsedData.progression
-  ),
+        normalizeSavedRunProgression(
+          parsedData.progression
+        ),
 
-characters:
-  normalizeSavedCharacterProgression(
-    parsedData.characters
-  ),
 
-collections:
-  normalizePlayerCollections(
-    parsedData.collections
-  )
+
+      characters:
+        normalizeSavedCharacterProgression(
+          parsedData.characters
+        ),
+
+
+
+      collections:
+        normalizePlayerCollections(
+          parsedData.collections
+        )
+
 
     };
 
@@ -1691,7 +1719,9 @@ collections:
 
     return createDefaultPlayerData();
 
+
   }
+
 
 }
 
