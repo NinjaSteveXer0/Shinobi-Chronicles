@@ -35479,6 +35479,9 @@ function startRegisteredActivity(
     result
   );
 
+  recordActivityCompletion(
+  result
+);
 
 
   console.log(
@@ -35706,6 +35709,95 @@ function applyActivityRewards(
 
 
   return true;
+
+
+}
+
+
+
+// =========================================================
+// TASK 6.4 — ACTIVITY COMPLETION LIFECYCLE
+// =========================================================
+//
+// Records completed activities.
+//
+// Creates foundation for:
+// - Activity history
+// - Achievements
+// - Chronicle events
+// - Future progression
+//
+// =========================================================
+
+
+let activityHistory = [];
+
+
+
+
+// =========================================================
+// RECORD ACTIVITY COMPLETION
+// =========================================================
+
+function recordActivityCompletion(
+  result
+) {
+
+
+  if (
+    !result ||
+    !result.activity
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  activityHistory.push({
+
+    activity:
+      result.activity,
+
+    character:
+      result.character,
+
+    success:
+      result.success,
+
+    timestamp:
+      Date.now()
+
+  });
+
+
+
+  console.log(
+    "Activity recorded:",
+    result.activity
+  );
+
+
+
+  return true;
+
+
+}
+
+
+
+
+// =========================================================
+// GET ACTIVITY HISTORY
+// =========================================================
+
+function getActivityHistory() {
+
+
+  return activityHistory;
 
 
 }
