@@ -36092,6 +36092,135 @@ function getActivityHistory() {
 }
 
 // =========================================================
+// BRICK 104 — ACTIVITY HISTORY ANALYTICS FOUNDATION
+// =========================================================
+//
+// Converts Activity History into usable Chronicle data.
+//
+// Handles:
+// - Activity completion counts
+// - Character activity statistics
+// - Future achievement hooks
+//
+// =========================================================
+
+
+// =========================================================
+// GET ACTIVITY ANALYTICS
+// =========================================================
+
+function getActivityAnalytics() {
+
+
+  if (
+    !Array.isArray(
+      activityHistory
+    )
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+
+  const analytics = {
+
+
+    totalActivities:
+
+      activityHistory.length,
+
+
+    activityCounts:
+
+      {},
+
+
+    characterCounts:
+
+      {}
+
+
+  };
+
+
+
+  activityHistory.forEach(
+    entry => {
+
+
+      if (
+        !analytics.activityCounts[
+          entry.activity
+        ]
+      ) {
+
+
+        analytics.activityCounts[
+          entry.activity
+        ] = 0;
+
+
+      }
+
+
+
+      analytics.activityCounts[
+        entry.activity
+      ]++;
+
+
+
+      if (
+        entry.character
+      ) {
+
+
+        if (
+          !analytics.characterCounts[
+            entry.character
+          ]
+        ) {
+
+
+          analytics.characterCounts[
+            entry.character
+          ] = 0;
+
+
+        }
+
+
+
+        analytics.characterCounts[
+          entry.character
+        ]++;
+
+
+      }
+
+
+    }
+  );
+
+
+
+  console.log(
+    "Activity analytics generated:",
+    analytics
+  );
+
+
+
+  return analytics;
+
+
+}
+
+// =========================================================
 // TASK 6.5 — ACTIVITY COMPLETION TRACKING
 // =========================================================
 //
