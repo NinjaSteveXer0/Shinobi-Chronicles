@@ -36160,81 +36160,182 @@ function getActivityCompletionCount(
 }
 
 // =========================================================
-// TASK 6.5 — ACTIVITY COMPLETION TRACKING
+// TASK 6.5 — ACTIVITY HISTORY ANALYTICS
 // =========================================================
 //
-// Tracks completed activities.
+// Converts Activity History into usable Chronicle data.
 //
 // Handles:
-// - Activity history
-// - Completion records
-// - Save preparation
+// - Activity completion counts
+// - Character activity statistics
+// - Future achievement hooks
 //
 // =========================================================
 
 
-// =========================================================
-// RECORD ACTIVITY COMPLETION
-// =========================================================
-
-function recordActivityCompletion(
-  result
-) {
+function getActivityAnalytics() {
 
 
-  if (
-    !result ||
-    !result.activity ||
-    !result.success
-  ) {
-
-
-    console.log(
-      "Invalid activity completion record."
-    );
-
-
-    return false;
-
-
-  }
+  const history =
+    getActivityHistory();
 
 
 
-  activityHistory.push({
-
-    activity:
-      result.activity,
-
-    character:
-      result.character,
-
-    success:
-      result.success,
-
-    timestamp:
-      Date.now()
-
-  });
+  const analytics = {
 
 
+    totalActivities:
+      history.length,
 
-  savePlayerData();
+
+    successfulActivities:
+      0,
+
+
+    failedActivities:
+      0,
+
+
+    activityCounts:
+      {},
+
+
+    characterCounts:
+      {},
+
+
+    mostUsedActivity:
+      null,
+
+
+    mostActiveCharacter:
+      null
+
+
+  };
 
 
 
-  console.log(
-    "Activity recorded and saved:",
-    result.activity
+  history.forEach(
+    entry => {
+
+
+      if (
+        entry.success
+      ) {
+
+        analytics.successfulActivities++;
+
+      }
+      else {
+
+        analytics.failedActivities++;
+
+      }
+
+
+
+      analytics.activityCounts[
+        entry.activity
+      ] =
+        (
+          analytics.activityCounts[
+            entry.activity
+          ] ||
+          0
+        ) + 1;
+
+
+
+      if (
+        entry.character
+      ) {
+
+
+        analytics.characterCounts[
+          entry.character
+        ] =
+          (
+            analytics.characterCounts[
+              entry.character
+            ] ||
+            0
+          ) + 1;
+
+
+      }
+
+
+    }
   );
 
 
 
-  return true;
+  Object.keys(
+    analytics.activityCounts
+  ).forEach(
+    activity => {
+
+
+      if (
+        !analytics.mostUsedActivity ||
+        analytics.activityCounts[activity] >
+        analytics.activityCounts[
+          analytics.mostUsedActivity
+        ]
+      ) {
+
+
+        analytics.mostUsedActivity =
+          activity;
+
+
+      }
+
+
+    }
+  );
+
+
+
+  Object.keys(
+    analytics.characterCounts
+  ).forEach(
+    character => {
+
+
+      if (
+        !analytics.mostActiveCharacter ||
+        analytics.characterCounts[character] >
+        analytics.characterCounts[
+          analytics.mostActiveCharacter
+        ]
+      ) {
+
+
+        analytics.mostActiveCharacter =
+          character;
+
+
+      }
+
+
+    }
+  );
+
+
+
+  console.log(
+    "Activity analytics generated:",
+    analytics
+  );
+
+
+
+  return analytics;
 
 
 }
-
 
 
 // =========================================================
