@@ -622,6 +622,57 @@ Controlled incremental development.
 
 # Impact
 
+# Decision 008
+
+## Date
+
+2026-08-23
+
+
+## Category
+
+Architecture
+
+
+## Title
+
+Activities use a shared result and reward pipeline.
+
+
+## Decision Summary
+
+All gameplay activities should generate a standardised result object before rewards are processed.
+
+
+## Reasoning
+
+Previously, different gameplay systems could handle rewards independently.
+
+The Chronicle Engine approach centralises this process so future systems can share:
+
+- Rewards
+- Progression
+- History
+- Events
+
+
+## Impact
+
+Systems affected:
+
+- Training
+- Exams
+- Missions
+- Battles
+- Future Events
+
+
+## Final Choice
+
+Chosen:
+
+Universal Activity Result Pipeline
+
 Systems affected:
 
 - Entire codebase

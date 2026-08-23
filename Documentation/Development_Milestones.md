@@ -33,3 +33,32 @@ Activity Engine
 ## Next:
 
 Activity Reward Processor
+
+## Milestone 002
+
+Date:
+2026-08-23
+
+Title:
+Activity Engine Foundation
+
+Completed:
+
+- Activity Result Foundation created
+- Activity Reward Processor created
+- Activity Reward Bridge connected
+- Activity execution now flows through a shared reward pipeline
+
+Architecture:
+
+Activity
+↓
+Result
+↓
+Rewards
+↓
+Save
+
+Status:
+
+Completed and tested successfully.
