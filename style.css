@@ -6748,22 +6748,19 @@ body {
 }
 
 /* =========================================================
-   BRICK 304 — EXAM DISCIPLINE LIVE DATA CALIBRATION
+   BRICK 305 — EXAM LIVE DATA POSITIONING FINAL CALIBRATION
    ========================================================= */
 
 /*
-   FINAL LIVE-DATA CALIBRATION.
+   POSITIONING ONLY.
 
-   The baked artwork remains authoritative.
+   IMPORTANT:
+   data-discipline-id lives on .exam-discipline-select,
+   NOT .exam-discipline-card.
 
-   Each discipline has its own vertical calibration because
-   the three baked panels are not pixel-identical internally.
-
-   DOM owns only:
-   - level value
-   - experience value
-   - progress fill
-   - reward value
+   All live values are therefore positioned relative to
+   the discipline card inside the correctly identified
+   discipline selector.
 */
 
 
@@ -6792,7 +6789,7 @@ body {
 
 
 /* =========================================================
-   LEVEL VALUES
+   LEVEL
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6803,6 +6800,9 @@ body {
 
     left:
         21.4% !important;
+
+    top:
+        40.5% !important;
 
     width:
         auto !important;
@@ -6816,24 +6816,11 @@ body {
     padding:
         0 !important;
 
-    color:
-        #4be4e8 !important;
-
     background:
         transparent !important;
 
     border:
         none !important;
-
-    font-size:
-        clamp(
-            8px,
-            0.70vw,
-            13px
-        ) !important;
-
-    font-weight:
-        700 !important;
 
     line-height:
         1 !important;
@@ -6847,44 +6834,8 @@ body {
 }
 
 
-/* NINJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="nin"]
-.exam-live-level {
-
-    top:
-        39.5% !important;
-
-}
-
-
-/* GENJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="gen"]
-.exam-live-level {
-
-    top:
-        44.0% !important;
-
-}
-
-
-/* FUINJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="fuin"]
-.exam-live-level {
-
-    top:
-        44.0% !important;
-
-}
-
-
 /* =========================================================
-   EXPERIENCE VALUES
+   EXPERIENCE
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6895,6 +6846,9 @@ body {
 
     left:
         61.0% !important;
+
+    top:
+        29.5% !important;
 
     width:
         auto !important;
@@ -6908,31 +6862,6 @@ body {
     padding:
         0 !important;
 
-    display:
-        flex !important;
-
-    align-items:
-        baseline !important;
-
-    gap:
-        3px !important;
-
-    color:
-        #ded3b5 !important;
-
-    background:
-        transparent !important;
-
-    border:
-        none !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.58vw,
-            11px
-        ) !important;
-
     line-height:
         1 !important;
 
@@ -6945,59 +6874,8 @@ body {
 }
 
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-live-experience strong {
-
-    color:
-        #4be4e8 !important;
-
-    font-size:
-        inherit !important;
-
-    font-weight:
-        700 !important;
-
-}
-
-
-/* NINJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="nin"]
-.exam-live-experience {
-
-    top:
-        29.5% !important;
-
-}
-
-
-/* GENJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="gen"]
-.exam-live-experience {
-
-    top:
-        34.0% !important;
-
-}
-
-
-/* FUINJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="fuin"]
-.exam-live-experience {
-
-    top:
-        34.0% !important;
-
-}
-
-
 /* =========================================================
-   PROGRESS TRACK BASE
+   PROGRESS TRACK — COMMON BASE
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -7013,7 +6891,7 @@ body {
         54.6% !important;
 
     height:
-        5.2% !important;
+        5.0% !important;
 
     min-height:
         3px !important;
@@ -7030,22 +6908,11 @@ body {
     overflow:
         hidden !important;
 
-    background:
-        rgba(
-            2,
-            14,
-            17,
-            0.18
-        ) !important;
-
     border:
         none !important;
 
     border-radius:
         999px !important;
-
-    box-shadow:
-        none !important;
 
     z-index:
         5;
@@ -7056,15 +6923,15 @@ body {
 /*
    NINJUTSU
 
-   Current bar is only slightly too high.
+   Previous attempt landed slightly too low.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="nin"]
+.exam-discipline-select[data-discipline-id="nin"]
 .exam-progress-track {
 
     top:
-        67.0% !important;
+        62.8% !important;
 
 }
 
@@ -7072,15 +6939,18 @@ body {
 /*
    GENJUTSU
 
-   Current bar is substantially too high.
+   Track sits marginally higher in the baked panel.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="gen"]
+.exam-discipline-select[data-discipline-id="gen"]
 .exam-progress-track {
 
+    left:
+        20.4% !important;
+
     top:
-        79.0% !important;
+        62.0% !important;
 
 }
 
@@ -7088,15 +6958,15 @@ body {
 /*
    FUINJUTSU
 
-   Same problem as Genjutsu.
+   Same physical track region as the other panels.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="fuin"]
+.exam-discipline-select[data-discipline-id="fuin"]
 .exam-progress-track {
 
     top:
-        79.0% !important;
+        62.8% !important;
 
 }
 
@@ -7138,28 +7008,11 @@ body {
     border-radius:
         inherit !important;
 
-    background:
-        linear-gradient(
-            90deg,
-            #087f8e 0%,
-            #0bbbc5 68%,
-            #45e7e9 100%
-        ) !important;
-
-    box-shadow:
-        inset 0 0 4px
-        rgba(
-            111,
-            247,
-            249,
-            0.24
-        ) !important;
-
 }
 
 
 /* =========================================================
-   REWARD VALUES
+   REWARD VALUE
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -7170,6 +7023,9 @@ body {
 
     left:
         21.0% !important;
+
+    top:
+        78.5% !important;
 
     width:
         auto !important;
@@ -7183,24 +7039,11 @@ body {
     padding:
         0 !important;
 
-    color:
-        #4be4e8 !important;
-
     background:
         transparent !important;
 
     border:
         none !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.58vw,
-            11px
-        ) !important;
-
-    font-weight:
-        700 !important;
 
     line-height:
         1 !important;
@@ -7210,42 +7053,6 @@ body {
 
     z-index:
         6;
-
-}
-
-
-/* NINJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="nin"]
-.exam-live-reward {
-
-    top:
-        79.0% !important;
-
-}
-
-
-/* GENJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="gen"]
-.exam-live-reward {
-
-    top:
-        88.0% !important;
-
-}
-
-
-/* FUINJUTSU */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card[data-discipline-id="fuin"]
-.exam-live-reward {
-
-    top:
-        88.0% !important;
 
 }
 
@@ -7299,8 +7106,16 @@ body {
 
 
 /* =========================================================
-   BRICK 300 — FINAL EXAM BATCH CONTROLS
+   BRICK 306 — EXAM BATCH CONTROL POSITIONING
    ========================================================= */
+
+/*
+   POSITIONING ONLY.
+
+   ×1 / ×5 now sit centrally above BEGIN EXAM,
+   clearly separated from the Fūinjutsu reward row.
+*/
+
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-batch-controls {
@@ -7312,7 +7127,7 @@ body {
         50% !important;
 
     top:
-        0 !important;
+        2% !important;
 
     transform:
         translateX(-50%) !important;
@@ -7328,9 +7143,9 @@ body {
 
     gap:
         clamp(
-            5px,
-            0.45vw,
-            8px
+            8px,
+            0.7vw,
+            13px
         ) !important;
 
     margin:
@@ -7350,85 +7165,35 @@ body {
 
     min-width:
         clamp(
-            34px,
-            3vw,
-            50px
+            48px,
+            3.8vw,
+            66px
         ) !important;
 
     height:
         clamp(
-            22px,
-            1.8vw,
-            31px
+            28px,
+            2.25vw,
+            38px
         ) !important;
 
     padding:
         0
-        9px !important;
-
-    background:
-        rgba(
-            3,
-            8,
-            10,
-            0.93
+        clamp(
+            10px,
+            0.8vw,
+            14px
         ) !important;
-
-    border:
-        1px solid
-        rgba(
-            188,
-            145,
-            42,
-            0.58
-        ) !important;
-
-    color:
-        #c9aa5a !important;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
 
     font-size:
         clamp(
-            8px,
-            0.64vw,
-            11px
+            9px,
+            0.75vw,
+            13px
         ) !important;
 
     line-height:
         1 !important;
-
-    cursor:
-        pointer;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-batch-button.selected {
-
-    border-color:
-        rgba(
-            67,
-            225,
-            230,
-            0.84
-        ) !important;
-
-    color:
-        #62edf0 !important;
-
-    box-shadow:
-        inset 0 0 8px
-        rgba(
-            49,
-            218,
-            223,
-            0.08
-        ) !important;
 
 }
 
