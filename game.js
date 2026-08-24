@@ -35693,6 +35693,164 @@ function hydrateActivityResult(
 
 }
 
+// =========================================================
+// BRICK 135 — DATA-DRIVEN ACTIVITY EXECUTOR
+// =========================================================
+//
+// Executes activity definitions that do not live directly
+// inside ACTIVITY_DATABASE.
+//
+// Used by:
+// - Training variants
+// - Future events
+// - Dungeons
+// - Encounters
+//
+// Uses the same Result / Reward / Progression / Chronicle
+// authorities as registered activities.
+//
+// =========================================================
+
+
+function executeActivityDefinition(
+  activityId,
+  characterId,
+  activityDefinition
+) {
+
+
+  if (
+    !activityId ||
+    !activityDefinition
+  ) {
+
+
+    console.log(
+      "Invalid data-driven activity definition."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+
+  if (
+    !character
+  ) {
+
+
+    console.log(
+      "Data-driven activity character not found:",
+      characterId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  const result =
+    createActivityResult(
+      activityId,
+      characterId
+    );
+
+
+
+  if (
+    !result
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !hydrateActivityResult(
+      result,
+      activityDefinition
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !applyActivityRewards(
+      result
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !processActivityProgression(
+      result
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !recordActivityCompletion(
+      result
+    )
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
+  console.log(
+    "DATA-DRIVEN ACTIVITY COMPLETED:",
+    result
+  );
+
+
+
+  return result;
+
+
+}
+
 
 // =========================================================
 // BRICK 125 — REGISTERED ACTIVITY COMPLETION AUTHORITY
@@ -36996,15 +37154,15 @@ function getActivityAnalytics() {
 
 
 // =========================================================
-// BRICK 120 — ACTIVITY PROGRESSION BRIDGE
+// BRICK 134 — ACTIVITY PROGRESSION BRIDGE
 // =========================================================
 //
 // Routes Activity Result progression
 // into existing progression authorities.
 //
-// Handles:
-// - Discipline EXP
-// - Correct training-source routing
+// Supports:
+// - Registered Activity progression
+// - Data-driven progression source overrides
 // - Activities with no discipline progression
 // - Progression failure detection
 //
@@ -37058,11 +37216,6 @@ function processActivityProgression(
 
 
 
-  // =========================================
-  // NO PROGRESSION REWARDS
-  // =========================================
-
-
   if (
     progression.length ===
       0
@@ -37080,11 +37233,6 @@ function processActivityProgression(
 
   }
 
-
-
-  // =========================================
-  // ROUTE PROGRESSION
-  // =========================================
 
 
   let progressionSucceeded =
@@ -37110,12 +37258,18 @@ function processActivityProgression(
 
 
 
+      const progressionSource =
+        reward.source ||
+        result.activity;
+
+
+
       const applied =
         addDisciplineExp(
           result.character,
           reward.id,
           reward.amount,
-          result.activity
+          progressionSource
         );
 
 
@@ -40484,23 +40638,22 @@ function getTrainingActivityData(
 }
 
 // =========================================================
-// BRICK 95 — ACTIVITY RESULT NORMALISATION
+// BRICK 136 — TRAINING ACTIVITY NORMALIZATION
 // =========================================================
 //
-// Converts raw activity definitions into a standard
-// Chronicle Engine result format.
+// Converts TRAINING_DATABASE entries into
+// canonical Activity Engine definitions.
 //
-// All future activities can use this:
-// Training
-// Exams
-// Missions
-// Events
-// Encounters
+// Training Data
+// ↓
+// Structured Rewards
+// ↓
+// Activity Engine
 //
 // =========================================================
 
 
-function normalizeActivityResult(
+function normalizeTrainingActivityDefinition(
   activityData
 ) {
 
@@ -40517,6 +40670,101 @@ function normalizeActivityResult(
 
 
 
+  const rewards =
+    [];
+
+
+
+  // =========================================
+  // PLAYER EXP
+  // =========================================
+
+
+  const expReward =
+    Number(
+      activityData.reward &&
+      activityData.reward.exp
+    ) || 0;
+
+
+
+  if (
+    expReward > 0
+  ) {
+
+
+    rewards.push({
+
+      type:
+        "experience",
+
+      id:
+        "exp",
+
+      amount:
+        expReward
+
+    });
+
+
+  }
+
+
+
+  // =========================================
+  // DISCIPLINE PROGRESSION
+  // =========================================
+
+
+  if (
+    activityData.progression &&
+    activityData.progression.discipline
+  ) {
+
+
+    const disciplineId =
+      activityData.progression.discipline;
+
+
+
+    const discipline =
+      getShinobiDiscipline(
+        disciplineId
+      );
+
+
+
+    if (
+      discipline
+    ) {
+
+
+      rewards.push({
+
+        type:
+          "discipline",
+
+        id:
+          disciplineId,
+
+        amount:
+          Number(
+            activityData.progression.amount
+          ) || 0,
+
+        source:
+          discipline.trainingSource
+
+      });
+
+
+    }
+
+
+  }
+
+
+
   return {
 
 
@@ -40527,40 +40775,24 @@ function normalizeActivityResult(
 
     name:
       activityData.name ||
-      "Unknown Activity",
+      "Unknown Training Activity",
 
 
-    rewardEXP:
-      activityData.reward &&
-      Number.isFinite(
-        Number(
-          activityData.reward.exp
-        )
-      )
-
-        ? Number(
-            activityData.reward.exp
-          )
-
-        : 0,
-
-
-
-    progression:
-      activityData.progression ||
-      null,
-
+    rewards:
+      rewards,
 
 
     requirements:
       activityData.requirement ||
-      null
+      {}
 
 
   };
 
 
 }
+
+
 
 // =========================================================
 // BRICK 96 — TRAINING ACTIVITY EXECUTION BRIDGE
