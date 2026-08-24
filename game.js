@@ -31490,17 +31490,19 @@ function getEncounterDefinition(
 }
 
 // =========================================================
-// BRICK 145 — ENCOUNTER READINESS + EXECUTION BRIDGE
+// BRICK 191 — ENCOUNTER READINESS + CONTENT ACCESS
 // =========================================================
 //
 // Encounter Database
 // ↓
-// Enemy Database
+// Chronicle Access
+// ↓
+// PL Recommendation
 // ↓
 // Battle Engine
 //
-// PL recommendation is advisory.
-// Existing Battle Engine remains combat authority.
+// PL remains advisory.
+// Chronicle access is authoritative.
 //
 // =========================================================
 
@@ -31517,12 +31519,10 @@ function getEncounterReadiness(
     );
 
 
-
   const character =
     getPlayerCharacter(
       characterId
     );
-
 
 
   if (
@@ -31533,28 +31533,56 @@ function getEncounterReadiness(
 
     return {
 
-
       available:
         false,
-
 
       encounterId:
         encounterId || null,
 
-
       characterId:
         characterId || null,
 
-
       reason:
         "invalid_encounter_request"
-
 
     };
 
 
   }
 
+
+  const access =
+    getEncounterAccessStatus(
+      encounterId
+    );
+
+
+  if (
+    !access.accessible
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      encounterId:
+        encounterId,
+
+      characterId:
+        characterId,
+
+      reason:
+        "chronicle_requirements_not_met",
+
+      access:
+        access
+
+    };
+
+
+  }
 
 
   const currentPL =
@@ -31563,46 +31591,37 @@ function getEncounterReadiness(
     );
 
 
-
   return {
-
 
     available:
       true,
 
-
     encounterId:
       encounterId,
-
 
     characterId:
       characterId,
 
-
     currentPL:
       currentPL,
 
-
     recommendedPL:
       encounter.recommendedPL,
-
 
     meetsRecommendation:
       currentPL >=
         encounter.recommendedPL,
 
-
     requirementsEnforced:
-      false
+      true,
 
+    access:
+      access
 
   };
 
 
 }
-
-
-
 
 
 function startEncounterActivity(
@@ -39538,6 +39557,555 @@ function validateChronicleRequirementSystem() {
 }
 
 // =========================================================
+// BRICK 183 — CONTENT ACCESS DATABASE
+// =========================================================
+//
+// Canonical gameplay-access definitions.
+//
+// IMPORTANT:
+//
+// Current Alpha foundation content remains open.
+// Requirements can be added later without rewriting
+// Activity / Location / Training / Encounter logic.
+//
+// =========================================================
+
+
+const CONTENT_ACCESS_DATABASE = {
+
+
+  // =========================================
+  // ACTIVITIES
+  // =========================================
+
+
+  "activity:exam": {
+
+    type:
+      "activity",
+
+    id:
+      "exam",
+
+    requirements:
+      []
+
+  },
+
+
+  "activity:practical": {
+
+    type:
+      "activity",
+
+    id:
+      "practical",
+
+    requirements:
+      []
+
+  },
+
+
+  "activity:mission": {
+
+    type:
+      "activity",
+
+    id:
+      "mission",
+
+    requirements:
+      []
+
+  },
+
+
+  "activity:battle": {
+
+    type:
+      "activity",
+
+    id:
+      "battle",
+
+    requirements:
+      []
+
+  },
+
+
+  // =========================================
+  // ENCOUNTERS
+  // =========================================
+
+
+  "encounter:scout_patrol": {
+
+    type:
+      "encounter",
+
+    id:
+      "scout_patrol",
+
+    requirements:
+      []
+
+  },
+
+
+  "encounter:bandit_leader": {
+
+    type:
+      "encounter",
+
+    id:
+      "bandit_leader",
+
+    requirements:
+      []
+
+  },
+
+
+  "encounter:hidden_cache": {
+
+    type:
+      "encounter",
+
+    id:
+      "hidden_cache",
+
+    requirements:
+      []
+
+  },
+
+
+  // =========================================
+  // TRAINING
+  // =========================================
+
+
+  "training:light_training": {
+
+    type:
+      "training",
+
+    id:
+      "light_training",
+
+    requirements:
+      []
+
+  },
+
+
+  "training:steady_training": {
+
+    type:
+      "training",
+
+    id:
+      "steady_training",
+
+    requirements:
+      []
+
+  },
+
+
+  "training:advanced_training": {
+
+    type:
+      "training",
+
+    id:
+      "advanced_training",
+
+    requirements:
+      []
+
+  },
+
+
+  // =========================================
+  // KONOHA LOCATION ACTIONS
+  // =========================================
+
+
+  "location_action:konoha:exams": {
+
+    type:
+      "location_action",
+
+    id:
+      "konoha:exams",
+
+    requirements:
+      []
+
+  },
+
+
+  "location_action:konoha:practical": {
+
+    type:
+      "location_action",
+
+    id:
+      "konoha:practical",
+
+    requirements:
+      []
+
+  },
+
+
+  "location_action:konoha:missions": {
+
+    type:
+      "location_action",
+
+    id:
+      "konoha:missions",
+
+    requirements:
+      []
+
+  }
+
+
+};
+
+
+
+// =========================================================
+// BRICK 184 — CONTENT ACCESS KEY
+// =========================================================
+
+
+function createContentAccessKey(
+  contentType,
+  contentId
+) {
+
+
+  if (
+    !contentType ||
+    !contentId
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  return (
+    `${contentType}:${contentId}`
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 185 — CONTENT ACCESS DEFINITION QUERY
+// =========================================================
+
+
+function getContentAccessDefinition(
+  contentType,
+  contentId
+) {
+
+
+  const key =
+    createContentAccessKey(
+      contentType,
+      contentId
+    );
+
+
+  if (
+    !key
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  return (
+    CONTENT_ACCESS_DATABASE[
+      key
+    ] ||
+    null
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 186 — CONTENT ACCESS EVALUATOR
+// =========================================================
+//
+// Missing access definitions are treated as OPEN.
+//
+// This keeps legacy / unfinished content functional
+// until it receives an explicit access definition.
+//
+// =========================================================
+
+
+function evaluateContentAccess(
+  contentType,
+  contentId
+) {
+
+
+  const definition =
+    getContentAccessDefinition(
+      contentType,
+      contentId
+    );
+
+
+  if (
+    !definition
+  ) {
+
+
+    return {
+
+      exists:
+        false,
+
+      accessible:
+        true,
+
+      contentType:
+        contentType || null,
+
+      contentId:
+        contentId || null,
+
+      requirements:
+        [],
+
+      evaluation:
+        {
+
+          valid:
+            true,
+
+          met:
+            true,
+
+          results:
+            []
+
+        }
+
+    };
+
+
+  }
+
+
+  const evaluation =
+    evaluateChronicleRequirements(
+      Array.isArray(
+        definition.requirements
+      )
+        ? definition.requirements
+        : []
+    );
+
+
+  return {
+
+    exists:
+      true,
+
+    accessible:
+      (
+        evaluation.valid ===
+          true &&
+        evaluation.met ===
+          true
+      ),
+
+    contentType:
+      definition.type,
+
+    contentId:
+      definition.id,
+
+    requirements:
+      definition.requirements,
+
+    evaluation:
+      evaluation
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 187 — CONTENT ACCESS BOOLEAN BRIDGE
+// =========================================================
+
+
+function canAccessContent(
+  contentType,
+  contentId
+) {
+
+
+  return evaluateContentAccess(
+    contentType,
+    contentId
+  ).accessible ===
+    true;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 188 — CONTENT ACCESS PROGRESS
+// =========================================================
+//
+// UI-safe access information.
+//
+// Future use:
+//
+// - LOCKED
+// - 1 / 5 Scout defeats
+// - Complete Exam first
+//
+// =========================================================
+
+
+function getContentAccessProgress(
+  contentType,
+  contentId
+) {
+
+
+  const access =
+    evaluateContentAccess(
+      contentType,
+      contentId
+    );
+
+
+  return {
+
+    accessible:
+      access.accessible,
+
+    contentType:
+      access.contentType,
+
+    contentId:
+      access.contentId,
+
+    requirements:
+      access.requirements.map(
+        requirement =>
+          getChronicleRequirementProgress(
+            requirement
+          )
+      )
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 189 — GAMEPLAY ACCESS BRIDGES
+// =========================================================
+
+
+function getActivityAccessStatus(
+  activityId
+) {
+
+
+  return evaluateContentAccess(
+    "activity",
+    activityId
+  );
+
+
+}
+
+
+
+function getEncounterAccessStatus(
+  encounterId
+) {
+
+
+  return evaluateContentAccess(
+    "encounter",
+    encounterId
+  );
+
+
+}
+
+
+
+function getTrainingAccessStatus(
+  activityId
+) {
+
+
+  return evaluateContentAccess(
+    "training",
+    activityId
+  );
+
+
+}
+
+
+
+function getLocationActionAccessStatus(
+  locationId,
+  action
+) {
+
+
+  return evaluateContentAccess(
+
+    "location_action",
+
+    `${locationId}:${action}`
+
+  );
+
+
+}
+
+// =========================================================
 // BRICK 127 — CHRONICLE ACTIVITY ANALYTICS
 // =========================================================
 //
@@ -40745,9 +41313,17 @@ function getCurrentLocationSummary() {
 }
 
 
-// =========================================
-// LOCATION ACTION EXECUTION CHECK
-// =========================================
+// =========================================================
+// BRICK 190 — LOCATION ACTION ACCESS CHECK
+// =========================================================
+//
+// Location validity
+// ↓
+// Activity validity
+// ↓
+// Chronicle content access
+//
+// =========================================================
 
 
 function canLaunchLocationAction(
@@ -40770,11 +41346,80 @@ function canLaunchLocationAction(
   }
 
 
+  const locationAccess =
+    getLocationActionAccessStatus(
+      locationId,
+      action
+    );
+
+
+  if (
+    !locationAccess.accessible
+  ) {
+
+
+    console.log(
+      "Location action locked:",
+      locationId,
+      action,
+      locationAccess
+    );
+
+
+    return false;
+
+
+  }
+
+
+  const activityId =
+    getLocationActivity(
+      locationId,
+      action
+    );
+
+
+  if (
+    !activityId
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+  const activityAccess =
+    getActivityAccessStatus(
+      activityId
+    );
+
+
+  if (
+    !activityAccess.accessible
+  ) {
+
+
+    console.log(
+      "Activity locked:",
+      activityId,
+      activityAccess
+    );
+
+
+    return false;
+
+
+  }
+
 
   return true;
 
 
 }
+
+
 
 // =========================================
 // CURRENT PLAYER LOCATION STATE
@@ -42903,6 +43548,128 @@ function validateEncounterSystem() {
 }
 
 // =========================================================
+// BRICK 192 — CONTENT ACCESS ENGINE HEALTH CHECK
+// =========================================================
+
+
+function validateContentAccessSystem() {
+
+
+  const examAccess =
+    getActivityAccessStatus(
+      "exam"
+    );
+
+
+  const scoutAccess =
+    getEncounterAccessStatus(
+      "scout_patrol"
+    );
+
+
+  const trainingAccess =
+    getTrainingAccessStatus(
+      "light_training"
+    );
+
+
+  const locationAccess =
+    getLocationActionAccessStatus(
+      "konoha",
+      "practical"
+    );
+
+
+  const checks = {
+
+
+    database:
+      typeof CONTENT_ACCESS_DATABASE ===
+        "object",
+
+
+    keyBuilder:
+      createContentAccessKey(
+        "activity",
+        "exam"
+      ) ===
+        "activity:exam",
+
+
+    definitionQuery:
+      !!getContentAccessDefinition(
+        "activity",
+        "exam"
+      ),
+
+
+    evaluator:
+      examAccess.accessible ===
+        true,
+
+
+    booleanBridge:
+      canAccessContent(
+        "activity",
+        "exam"
+      ) ===
+        true,
+
+
+    progressBridge:
+      !!getContentAccessProgress(
+        "activity",
+        "exam"
+      ),
+
+
+    encounterBridge:
+      scoutAccess.accessible ===
+        true,
+
+
+    trainingBridge:
+      trainingAccess.accessible ===
+        true,
+
+
+    locationBridge:
+      locationAccess.accessible ===
+        true,
+
+
+    unknownContentSafe:
+      canAccessContent(
+        "future_content",
+        "not_registered_yet"
+      ) ===
+        true
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Content Access health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
+// =========================================================
 // BRICK 172 — BATTLE / CHRONICLE HEALTH CHECK
 // =========================================================
 
@@ -42997,11 +43764,15 @@ function validateBattleCompletionSystem() {
 
 
 // =========================================================
-// BRICK 172 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 192 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 
 
 function runActivityLocationRegression() {
+
+
+  const contentAccessHealth =
+    validateContentAccessSystem();
 
 
   const locationHealth =
@@ -43184,6 +43955,10 @@ function runActivityLocationRegression() {
       battleQueryHealth.healthy,
 
 
+    contentAccess:
+      contentAccessHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -43209,6 +43984,7 @@ function runActivityLocationRegression() {
         battleBridgeHealth.healthy &&
         battleCompletionHealth.healthy &&
         battleQueryHealth.healthy &&
+        contentAccessHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
@@ -43253,18 +44029,6 @@ function runActivityLocationRegression() {
 
 // =========================================================
 // BRICK 140 — LEGACY TRAINING DATA BRIDGE RETIRED
-// =========================================================
-//
-// Duplicate getTrainingActivityData() authority removed.
-//
-// Canonical Training data authority now lives with:
-//
-// TRAINING_DATABASE
-// ↓
-// getTrainingActivityData()
-//
-// No runtime logic belongs in this retired bridge.
-//
 // =========================================================
 
 // =========================================================
@@ -43966,17 +44730,17 @@ function normalizeTrainingActivityDefinition(
 }
 
 // =========================================================
-// BRICK 137 — TRAINING ACTIVITY READINESS
+// BRICK 192 — TRAINING ACTIVITY READINESS + CONTENT ACCESS
 // =========================================================
 //
-// Evaluates a character against Training Database metadata.
+// Training Database
+// ↓
+// Chronicle Access
+// ↓
+// PL Recommendation
 //
-// IMPORTANT:
-//
-// minimumPL is currently ADVISORY ONLY.
-//
-// Training is NOT blocked by these thresholds until
-// the training PL scale is deliberately recalibrated.
+// Old minimumPL values remain advisory.
+// Chronicle requirements are authoritative.
 //
 // =========================================================
 
@@ -43993,12 +44757,10 @@ function getTrainingActivityReadiness(
     );
 
 
-
   const character =
     getPlayerCharacter(
       characterId
     );
-
 
 
   if (
@@ -44012,18 +44774,14 @@ function getTrainingActivityReadiness(
       available:
         false,
 
-
       activityId:
         activityId || null,
-
 
       characterId:
         characterId || null,
 
-
       reason:
         "invalid_training_request"
-
 
     };
 
@@ -44031,12 +44789,10 @@ function getTrainingActivityReadiness(
   }
 
 
-
   const definition =
     normalizeTrainingActivityDefinition(
       rawActivity
     );
-
 
 
   if (
@@ -44049,18 +44805,14 @@ function getTrainingActivityReadiness(
       available:
         false,
 
-
       activityId:
         activityId,
-
 
       characterId:
         characterId,
 
-
       reason:
         "normalization_failed"
-
 
     };
 
@@ -44068,12 +44820,44 @@ function getTrainingActivityReadiness(
   }
 
 
+  const access =
+    getTrainingAccessStatus(
+      activityId
+    );
+
+
+  if (
+    !access.accessible
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      activityId:
+        activityId,
+
+      characterId:
+        characterId,
+
+      reason:
+        "chronicle_requirements_not_met",
+
+      access:
+        access
+
+    };
+
+
+  }
+
 
   const currentPL =
     calculateCurrentPL(
       character
     );
-
 
 
   const recommendedPL =
@@ -44083,40 +44867,35 @@ function getTrainingActivityReadiness(
     ) || 0;
 
 
-
   return {
-
 
     available:
       true,
 
-
     activityId:
       activityId,
-
 
     characterId:
       characterId,
 
-
     currentPL:
       currentPL,
-
 
     recommendedPL:
       recommendedPL,
 
-
     meetsRecommendation:
       (
         recommendedPL <= 0 ||
-        currentPL >= recommendedPL
+        currentPL >=
+          recommendedPL
       ),
 
-
     requirementsEnforced:
-      false
+      true,
 
+    access:
+      access
 
   };
 
@@ -44126,16 +44905,6 @@ function getTrainingActivityReadiness(
 
 // =========================================================
 // BRICK 138 — TRAINING ACTIVITY EXECUTION BRIDGE
-// =========================================================
-//
-// UI / Gameplay Training
-// ↓
-// Training Database
-// ↓
-// Canonical Activity Definition
-// ↓
-// Result / Rewards / Progression / Chronicle
-//
 // =========================================================
 
 
