@@ -45176,6 +45176,1127 @@ function validateKonohaServiceExecutionSystem() {
 
 }
 
+
+
+// =========================================================
+// BRICK 213 — KONOHA ACTIVITY UI SESSION STATE
+// =========================================================
+//
+// Runtime-only UI state.
+//
+// Tracks:
+//
+// - Current Exam / Practical screen
+// - Currently selected Shinobi
+//
+// Gameplay progression remains owned by the
+// existing Activity / Character systems.
+//
+// =========================================================
+
+
+const KONOHA_ACTIVITY_UI_SERVICES = [
+
+  "exams",
+  "practical"
+
+];
+
+
+const KONOHA_ACTIVITY_UI_STATE = {
+
+  serviceId:
+    null,
+
+  characterId:
+    null
+
+};
+
+
+
+function getKonohaActivityUISessionState() {
+
+
+  return {
+
+    serviceId:
+      KONOHA_ACTIVITY_UI_STATE
+        .serviceId,
+
+    characterId:
+      KONOHA_ACTIVITY_UI_STATE
+        .characterId
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 214 — KONOHA SELECTABLE SHINOBI QUERY
+// =========================================================
+//
+// Uses playerTeam as the current roster authority.
+//
+// Does NOT create a duplicate character database.
+//
+// =========================================================
+
+
+function getKonohaSelectableCharacters() {
+
+
+  return playerTeam
+    .filter(
+      character =>
+        character &&
+        character.id
+    )
+    .map(
+      character => ({
+
+
+        id:
+          character.id,
+
+
+        name:
+          character.name,
+
+
+        rank:
+          character.rank,
+
+
+        rarity:
+          character.rarity ||
+          null,
+
+
+        image:
+          character.image ||
+          null,
+
+
+        currentPL:
+          calculateCurrentPL(
+            character
+          )
+
+
+      })
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 215 — OPEN KONOHA ACTIVITY UI SESSION
+// =========================================================
+//
+// Establishes the screen and selected character.
+//
+// If no character is supplied,
+// the first selectable Shinobi is used.
+//
+// =========================================================
+
+
+function openKonohaActivityUIScreen(
+  serviceId,
+  characterId = null
+) {
+
+
+  if (
+    !KONOHA_ACTIVITY_UI_SERVICES
+      .includes(
+        serviceId
+      )
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "unsupported_activity_ui_service"
+
+    };
+
+
+  }
+
+
+  const characters =
+    getKonohaSelectableCharacters();
+
+
+  if (
+    characters.length ===
+      0
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "no_selectable_characters"
+
+    };
+
+
+  }
+
+
+  let selectedCharacterId =
+    characterId;
+
+
+  if (
+    !selectedCharacterId
+  ) {
+
+
+    selectedCharacterId =
+      characters[0].id;
+
+
+  }
+
+
+  const character =
+    getPlayerCharacter(
+      selectedCharacterId
+    );
+
+
+  if (
+    !character
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "invalid_character"
+
+    };
+
+
+  }
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .serviceId =
+      serviceId;
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .characterId =
+      character.id;
+
+
+  return {
+
+    success:
+      true,
+
+    serviceId:
+      serviceId,
+
+    characterId:
+      character.id
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 216 — KONOHA SHINOBI SELECTION CONTROL
+// =========================================================
+//
+// Supports:
+//
+// - Direct character selection
+// - Previous / Next character cycling
+//
+// Used by the CHANGE SHINOBI control.
+//
+// =========================================================
+
+
+function setKonohaSelectedCharacter(
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (
+    !character
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .characterId =
+      character.id;
+
+
+  return true;
+
+
+}
+
+
+
+function cycleKonohaSelectedCharacter(
+  direction = 1
+) {
+
+
+  const characters =
+    getKonohaSelectableCharacters();
+
+
+  if (
+    characters.length ===
+      0
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const currentId =
+    KONOHA_ACTIVITY_UI_STATE
+      .characterId;
+
+
+  let currentIndex =
+    characters.findIndex(
+      character =>
+        character.id ===
+          currentId
+    );
+
+
+  if (
+    currentIndex <
+      0
+  ) {
+
+
+    currentIndex =
+      0;
+
+
+  }
+
+
+  const step =
+    Number(direction) <
+      0
+      ? -1
+      : 1;
+
+
+  const nextIndex =
+    (
+      currentIndex +
+      step +
+      characters.length
+    ) %
+    characters.length;
+
+
+  const nextCharacter =
+    characters[
+      nextIndex
+    ];
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .characterId =
+      nextCharacter.id;
+
+
+  return nextCharacter;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 217 — SELECTED SHINOBI UI PROFILE
+// =========================================================
+//
+// Left-side character panel contract.
+//
+// NOTE:
+//
+// Village / Clan / Element / Status are currently
+// NOT canonical character fields in playerTeam.
+//
+// They remain null until a proper metadata authority
+// is deliberately added.
+//
+// =========================================================
+
+
+function getKonohaCharacterUIProfile(
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (
+    !character
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  return {
+
+
+    id:
+      character.id,
+
+
+    name:
+      character.name,
+
+
+    rank:
+      character.rank,
+
+
+    rarity:
+      character.rarity ||
+      null,
+
+
+    currentPL:
+      calculateCurrentPL(
+        character
+      ),
+
+
+    image:
+      character.image ||
+      null,
+
+
+    village:
+      character.village ||
+      null,
+
+
+    clan:
+      character.clan ||
+      null,
+
+
+    element:
+      character.element ||
+      null,
+
+
+    status:
+      character.status ||
+      null
+
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 218 — DISCIPLINE UI PANEL NORMALIZER
+// =========================================================
+//
+// Converts canonical Discipline progression into
+// renderer-ready progress data.
+//
+// =========================================================
+
+
+function getKonohaDisciplineUIPanelData(
+  discipline
+) {
+
+
+  if (
+    !discipline
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const currentExp =
+    Math.max(
+      0,
+      Number(
+        discipline.exp
+      ) || 0
+    );
+
+
+  const expRequired =
+    Math.max(
+      0,
+      Number(
+        discipline.expRequired
+      ) || 0
+    );
+
+
+  const progressPercent =
+    expRequired >
+      0
+
+      ? Math.min(
+          100,
+          Math.max(
+            0,
+            (
+              currentExp /
+              expRequired
+            ) *
+            100
+          )
+        )
+
+      : 0;
+
+
+  return {
+
+
+    id:
+      discipline.id,
+
+
+    name:
+      discipline.name,
+
+
+    level:
+      Number(
+        discipline.level
+      ) || 1,
+
+
+    exp:
+      currentExp,
+
+
+    expRequired:
+      expRequired,
+
+
+    expRemaining:
+      Math.max(
+        0,
+        expRequired -
+          currentExp
+      ),
+
+
+    progressPercent:
+      progressPercent,
+
+
+    rewardExp:
+      Math.max(
+        0,
+        Number(
+          discipline.rewardExp
+        ) || 0
+      )
+
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 219 — ACTIVITY ELIGIBILITY UI CONTRACT
+// =========================================================
+//
+// Converts existing service/access authority into
+// UI-safe eligibility state.
+//
+// IMPORTANT:
+//
+// Mock-up fields such as:
+//
+// - Rank Requirement
+// - Level Requirement
+// - Active Mission Limit
+// - Cooldown
+//
+// are NOT invented here.
+//
+// They remain unconfigured until their real
+// gameplay rules are formally defined.
+//
+// =========================================================
+
+
+function getKonohaActivityEligibilityUIData(
+  serviceId,
+  characterId
+) {
+
+
+  const preview =
+    getKonohaServiceExecutionPreview(
+      serviceId,
+      characterId
+    );
+
+
+  const access =
+    preview &&
+    preview.access
+      ? preview.access
+      : null;
+
+
+  const requirementResults =
+    access &&
+    access.evaluation &&
+    Array.isArray(
+      access.evaluation.results
+    )
+
+      ? access.evaluation.results
+
+      : [];
+
+
+  return {
+
+
+    eligible:
+      !!(
+        preview &&
+        preview.valid ===
+          true
+      ),
+
+
+    reason:
+      preview
+        ? preview.reason
+        : "preview_unavailable",
+
+
+    requirements:
+      requirementResults,
+
+
+    criteria: {
+
+
+      rankRequirement:
+        null,
+
+
+      levelRequirement:
+        null,
+
+
+      activeMissionLimit:
+        null,
+
+
+      cooldown:
+        null
+
+
+    },
+
+
+    criteriaConfigured:
+      false
+
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 220 — EXAM UI SCREEN DATA COMPOSER
+// =========================================================
+//
+// Complete renderer contract for Shinobi Exams.
+//
+// =========================================================
+
+
+function getKonohaExamUIScreenData(
+  characterId = null
+) {
+
+
+  const selectedCharacterId =
+    characterId ||
+    KONOHA_ACTIVITY_UI_STATE
+      .characterId;
+
+
+  if (
+    !selectedCharacterId
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const pageData =
+    getKonohaExamPageData(
+      selectedCharacterId
+    );
+
+
+  const profile =
+    getKonohaCharacterUIProfile(
+      selectedCharacterId
+    );
+
+
+  if (
+    !pageData ||
+    !profile
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const disciplines =
+    pageData.activity
+      .disciplines
+      .map(
+        discipline =>
+          getKonohaDisciplineUIPanelData(
+            discipline
+          )
+      )
+      .filter(
+        discipline =>
+          !!discipline
+      );
+
+
+  const eligibility =
+    getKonohaActivityEligibilityUIData(
+      "exams",
+      selectedCharacterId
+    );
+
+
+  return {
+
+
+    screen:
+      "exams",
+
+
+    title:
+      pageData.title,
+
+
+    selectedCharacterId:
+      selectedCharacterId,
+
+
+    characters:
+      getKonohaSelectableCharacters(),
+
+
+    character:
+      profile,
+
+
+    disciplines:
+      disciplines,
+
+
+    eligibility:
+      eligibility,
+
+
+    canExecute:
+      eligibility.eligible ===
+        true,
+
+
+    service:
+      pageData.service
+
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 221 — PRACTICAL UI SCREEN DATA COMPOSER
+// =========================================================
+//
+// Complete renderer contract for Practical Training.
+//
+// =========================================================
+
+
+function getKonohaPracticalUIScreenData(
+  characterId = null
+) {
+
+
+  const selectedCharacterId =
+    characterId ||
+    KONOHA_ACTIVITY_UI_STATE
+      .characterId;
+
+
+  if (
+    !selectedCharacterId
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const pageData =
+    getKonohaPracticalPageData(
+      selectedCharacterId
+    );
+
+
+  const profile =
+    getKonohaCharacterUIProfile(
+      selectedCharacterId
+    );
+
+
+  if (
+    !pageData ||
+    !profile
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const disciplines =
+    pageData.activity
+      .disciplines
+      .map(
+        discipline =>
+          getKonohaDisciplineUIPanelData(
+            discipline
+          )
+      )
+      .filter(
+        discipline =>
+          !!discipline
+      );
+
+
+  const eligibility =
+    getKonohaActivityEligibilityUIData(
+      "practical",
+      selectedCharacterId
+    );
+
+
+  return {
+
+
+    screen:
+      "practical",
+
+
+    title:
+      pageData.title,
+
+
+    selectedCharacterId:
+      selectedCharacterId,
+
+
+    characters:
+      getKonohaSelectableCharacters(),
+
+
+    character:
+      profile,
+
+
+    disciplines:
+      disciplines,
+
+
+    eligibility:
+      eligibility,
+
+
+    canExecute:
+      eligibility.eligible ===
+        true,
+
+
+    service:
+      pageData.service
+
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 222 — EXAM / PRACTICAL UI DATA HEALTH CHECK
+// =========================================================
+//
+// Non-destructive UI contract diagnostics.
+//
+// =========================================================
+
+
+function validateKonohaActivityUIDataSystem() {
+
+
+  const originalState =
+    getKonohaActivityUISessionState();
+
+
+  const opened =
+    openKonohaActivityUIScreen(
+      "exams",
+      "naruto"
+    );
+
+
+  const characters =
+    getKonohaSelectableCharacters();
+
+
+  const profile =
+    getKonohaCharacterUIProfile(
+      "naruto"
+    );
+
+
+  const exam =
+    getKonohaExamUIScreenData(
+      "naruto"
+    );
+
+
+  const practical =
+    getKonohaPracticalUIScreenData(
+      "naruto"
+    );
+
+
+  const eligibility =
+    getKonohaActivityEligibilityUIData(
+      "exams",
+      "naruto"
+    );
+
+
+  const checks = {
+
+
+    sessionState:
+      typeof KONOHA_ACTIVITY_UI_STATE ===
+        "object",
+
+
+    sessionOpen:
+      opened.success ===
+        true,
+
+
+    selectableCharacters:
+      (
+        Array.isArray(
+          characters
+        ) &&
+        characters.length >
+          0
+      ),
+
+
+    characterProfile:
+      !!(
+        profile &&
+        profile.id ===
+          "naruto"
+      ),
+
+
+    examScreen:
+      !!(
+        exam &&
+        exam.screen ===
+          "exams" &&
+        exam.disciplines.length ===
+          3
+      ),
+
+
+    practicalScreen:
+      !!(
+        practical &&
+        practical.screen ===
+          "practical" &&
+        practical.disciplines.length ===
+          3
+      ),
+
+
+    examProgress:
+      exam &&
+      exam.disciplines.every(
+        discipline =>
+          Number.isFinite(
+            discipline.progressPercent
+          )
+      ),
+
+
+    practicalProgress:
+      practical &&
+      practical.disciplines.every(
+        discipline =>
+          Number.isFinite(
+            discipline.progressPercent
+          )
+      ),
+
+
+    eligibility:
+      eligibility.eligible ===
+        true,
+
+
+    selectionControl:
+      typeof cycleKonohaSelectedCharacter ===
+        "function"
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .serviceId =
+      originalState.serviceId;
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .characterId =
+      originalState.characterId;
+
+
+  console.log(
+    "Konoha Activity UI Data health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
+
+
+
 // =========================================================
 // BRICK 202 — KONOHA DATA BRIDGE HEALTH CHECK
 // =========================================================
@@ -45524,7 +46645,7 @@ function validateBattleCompletionSystem() {
 
 
 // =========================================================
-// BRICK 212 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 222 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 
 
@@ -45541,6 +46662,10 @@ function runActivityLocationRegression() {
 
   const konohaExecutionHealth =
     validateKonohaServiceExecutionSystem();
+
+
+  const konohaActivityUIHealth =
+    validateKonohaActivityUIDataSystem();
 
 
   const locationHealth =
@@ -45735,6 +46860,10 @@ function runActivityLocationRegression() {
       konohaExecutionHealth.healthy,
 
 
+    konohaActivityUI:
+      konohaActivityUIHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -45763,6 +46892,7 @@ function runActivityLocationRegression() {
         contentAccessHealth.healthy &&
         konohaDataHealth.healthy &&
         konohaExecutionHealth.healthy &&
+        konohaActivityUIHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
