@@ -36000,6 +36000,84 @@ function createActivityResult(
 }
 
 // =========================================================
+// BRICK 121 — RANDOM COMMON ITEM RESOLVER
+// =========================================================
+//
+// Resolves abstract "random_common" Activity rewards
+// into real Item Database definitions.
+//
+// Uses the existing Item Database as authority.
+//
+// =========================================================
+
+
+// =========================================================
+// GET COMMON ITEM DEFINITIONS
+// =========================================================
+
+function getCommonItemDefinitions() {
+
+
+  return Object.values(
+    itemDatabase
+  ).filter(
+    item =>
+      item &&
+      item.rarity ===
+        "Common"
+  );
+
+
+}
+
+
+
+// =========================================================
+// GET RANDOM COMMON ITEM
+// =========================================================
+
+function getRandomCommonItem() {
+
+
+  const commonItems =
+    getCommonItemDefinitions();
+
+
+
+  if (
+    commonItems.length ===
+      0
+  ) {
+
+
+    console.log(
+      "No Common items available."
+    );
+
+
+    return null;
+
+
+  }
+
+
+
+  const randomIndex =
+    Math.floor(
+      Math.random() *
+      commonItems.length
+    );
+
+
+
+  return commonItems[
+    randomIndex
+  ];
+
+
+}
+
+// =========================================================
 // BRICK 118 — ACTIVITY REWARD PROCESSOR
 // =========================================================
 //
