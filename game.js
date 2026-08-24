@@ -43548,6 +43548,1009 @@ function validateEncounterSystem() {
 }
 
 // =========================================================
+// BRICK 193 — KONOHA SERVICE DATABASE
+// =========================================================
+//
+// Canonical UI-facing Konoha service definitions.
+//
+// This does NOT render Konoha.
+//
+// It tells future Konoha UI:
+//
+// - What services exist
+// - Which engine owns them
+// - Which Location action they represent
+// - Whether implementation currently exists
+//
+// =========================================================
+
+
+const KONOHA_SERVICE_DATABASE = {
+
+
+  missions: {
+
+    id:
+      "missions",
+
+    title:
+      "Missions",
+
+    description:
+      "Accept shinobi missions and earn rewards.",
+
+    routeType:
+      "activity",
+
+    action:
+      "missions",
+
+    activityId:
+      "mission",
+
+    implemented:
+      true
+
+  },
+
+
+
+  exams: {
+
+    id:
+      "exams",
+
+    title:
+      "Exams",
+
+    description:
+      "Develop Ninjutsu, Genjutsu and Fūinjutsu through formal shinobi examinations.",
+
+    routeType:
+      "activity",
+
+    action:
+      "exams",
+
+    activityId:
+      "exam",
+
+    implemented:
+      true
+
+  },
+
+
+
+  practical: {
+
+    id:
+      "practical",
+
+    title:
+      "Practical",
+
+    description:
+      "Develop Taijutsu, Bukijutsu and Stamina through practical training.",
+
+    routeType:
+      "activity",
+
+    action:
+      "practical",
+
+    activityId:
+      "practical",
+
+    implemented:
+      true
+
+  },
+
+
+
+  training: {
+
+    id:
+      "training",
+
+    title:
+      "Training",
+
+    description:
+      "Enter dedicated training activities.",
+
+    routeType:
+      "training",
+
+    action:
+      "training",
+
+    trainingId:
+      "light_training",
+
+    implemented:
+      true
+
+  },
+
+
+
+  shop: {
+
+    id:
+      "shop",
+
+    title:
+      "Shinobi Shop",
+
+    description:
+      "Purchase equipment, supplies and future progression items.",
+
+    routeType:
+      "shop",
+
+    action:
+      "shop",
+
+    implemented:
+      false
+
+  }
+
+
+};
+
+
+
+// =========================================================
+// BRICK 194 — KONOHA SERVICE QUERY
+// =========================================================
+
+
+function getKonohaService(
+  serviceId
+) {
+
+
+  return (
+    KONOHA_SERVICE_DATABASE[
+      serviceId
+    ] ||
+    null
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 195 — KONOHA SERVICE LIST
+// =========================================================
+
+
+function getKonohaServices() {
+
+
+  return Object.values(
+    KONOHA_SERVICE_DATABASE
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 196 — KONOHA SERVICE ACCESS
+// =========================================================
+//
+// Routes access checks to the correct Engine.
+//
+// Activity services:
+// Location → Activity → Content Access
+//
+// Training:
+// Training Engine → Content Access
+//
+// Shop:
+// Not implemented yet.
+//
+// =========================================================
+
+
+function evaluateKonohaServiceAccess(
+  serviceId
+) {
+
+
+  const service =
+    getKonohaService(
+      serviceId
+    );
+
+
+  if (
+    !service
+  ) {
+
+
+    return {
+
+      exists:
+        false,
+
+      accessible:
+        false,
+
+      implemented:
+        false,
+
+      reason:
+        "unknown_konoha_service"
+
+    };
+
+
+  }
+
+
+  const location =
+    getLocationData(
+      "konoha"
+    );
+
+
+  const actionListed =
+    !!(
+      location &&
+      Array.isArray(
+        location.actions
+      ) &&
+      location.actions.includes(
+        service.action
+      )
+    );
+
+
+  if (
+    service.implemented !==
+      true
+  ) {
+
+
+    return {
+
+      exists:
+        true,
+
+      accessible:
+        false,
+
+      implemented:
+        false,
+
+      actionListed:
+        actionListed,
+
+      service:
+        service,
+
+      reason:
+        "service_not_implemented"
+
+    };
+
+
+  }
+
+
+  // =========================================
+  // ACTIVITY ROUTE
+  // =========================================
+
+
+  if (
+    service.routeType ===
+      "activity"
+  ) {
+
+
+    const accessible =
+      canLaunchLocationAction(
+        "konoha",
+        service.action
+      );
+
+
+    return {
+
+      exists:
+        true,
+
+      accessible:
+        accessible,
+
+      implemented:
+        true,
+
+      actionListed:
+        actionListed,
+
+      routeType:
+        service.routeType,
+
+      activityId:
+        service.activityId,
+
+      service:
+        service
+
+    };
+
+
+  }
+
+
+  // =========================================
+  // TRAINING ROUTE
+  // =========================================
+
+
+  if (
+    service.routeType ===
+      "training"
+  ) {
+
+
+    const trainingAccess =
+      getTrainingAccessStatus(
+        service.trainingId
+      );
+
+
+    return {
+
+      exists:
+        true,
+
+      accessible:
+        (
+          actionListed &&
+          trainingAccess.accessible
+        ),
+
+      implemented:
+        true,
+
+      actionListed:
+        actionListed,
+
+      routeType:
+        service.routeType,
+
+      trainingId:
+        service.trainingId,
+
+      access:
+        trainingAccess,
+
+      service:
+        service
+
+    };
+
+
+  }
+
+
+  return {
+
+    exists:
+      true,
+
+    accessible:
+      false,
+
+    implemented:
+      service.implemented ===
+        true,
+
+    actionListed:
+      actionListed,
+
+    routeType:
+      service.routeType,
+
+    service:
+      service,
+
+    reason:
+      "unsupported_service_route"
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 197 — KONOHA SERVICE PRESENTATION DATA
+// =========================================================
+//
+// UI-safe service card data.
+//
+// =========================================================
+
+
+function getKonohaServicePresentation(
+  serviceId
+) {
+
+
+  const access =
+    evaluateKonohaServiceAccess(
+      serviceId
+    );
+
+
+  if (
+    !access.exists ||
+    !access.service
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const service =
+    access.service;
+
+
+  return {
+
+    id:
+      service.id,
+
+    title:
+      service.title,
+
+    description:
+      service.description,
+
+    routeType:
+      service.routeType,
+
+    action:
+      service.action,
+
+    implemented:
+      access.implemented,
+
+    accessible:
+      access.accessible,
+
+    locked:
+      access.accessible !==
+        true,
+
+    reason:
+      access.reason ||
+      null
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 198 — KONOHA HUB DATA
+// =========================================================
+//
+// Complete non-rendered Konoha UI model.
+//
+// =========================================================
+
+
+function getKonohaHubData() {
+
+
+  const location =
+    getLocationData(
+      "konoha"
+    );
+
+
+  if (
+    !location
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  return {
+
+    id:
+      location.id,
+
+    name:
+      location.name,
+
+    type:
+      location.type,
+
+    discovered:
+      isLocationDiscovered(
+        "konoha"
+      ),
+
+    difficulty:
+      playerData &&
+      playerData.progression
+        ? playerData.progression
+            .currentDifficulty
+        : null,
+
+    ryo:
+      Number(
+        playerData &&
+        playerData.ryo
+      ) || 0,
+
+    exp:
+      Number(
+        playerData &&
+        playerData.exp
+      ) || 0,
+
+    services:
+      getKonohaServices()
+        .map(
+          service =>
+            getKonohaServicePresentation(
+              service.id
+            )
+        )
+        .filter(
+          service =>
+            !!service
+        )
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 199 — KONOHA CHARACTER ACTIVITY DATA
+// =========================================================
+//
+// Creates the character-specific data required by
+// Exam and Practical screens.
+//
+// =========================================================
+
+
+function getKonohaCharacterActivityData(
+  activityId,
+  characterId
+) {
+
+
+  const activity =
+    getActivityData(
+      activityId
+    );
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (
+    !activity ||
+    !character
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const rewards =
+    Array.isArray(
+      activity.rewards
+    )
+      ? activity.rewards
+      : [];
+
+
+  const disciplines =
+    rewards
+      .filter(
+        reward =>
+          reward &&
+          reward.type ===
+            "discipline"
+      )
+      .map(
+        reward => {
+
+
+          const discipline =
+            getShinobiDiscipline(
+              reward.id
+            );
+
+
+          const progression =
+            getCharacterDisciplineProgression(
+              characterId,
+              reward.id
+            );
+
+
+          if (
+            !discipline ||
+            !progression
+          ) {
+
+
+            return null;
+
+
+          }
+
+
+          return {
+
+            id:
+              discipline.id,
+
+            name:
+              discipline.name,
+
+            level:
+              progression.level,
+
+            exp:
+              progression.exp,
+
+            expRequired:
+              getDisciplineExpRequired(
+                progression.level
+              ),
+
+            rewardExp:
+              Number(
+                reward.amount
+              ) || 0
+
+          };
+
+
+        }
+      )
+      .filter(
+        discipline =>
+          !!discipline
+      );
+
+
+  const access =
+    getActivityAccessStatus(
+      activityId
+    );
+
+
+  return {
+
+    activityId:
+      activity.id,
+
+    activityName:
+      activity.name,
+
+    character: {
+
+      id:
+        character.id,
+
+      name:
+        character.name,
+
+      rank:
+        character.rank,
+
+      currentPL:
+        calculateCurrentPL(
+          character
+        )
+
+    },
+
+    accessible:
+      access.accessible,
+
+    disciplines:
+      disciplines
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 200 — EXAM PAGE DATA BRIDGE
+// =========================================================
+//
+// Backend contract for the future Exam page.
+//
+// =========================================================
+
+
+function getKonohaExamPageData(
+  characterId
+) {
+
+
+  const service =
+    getKonohaServicePresentation(
+      "exams"
+    );
+
+
+  const activity =
+    getKonohaCharacterActivityData(
+      "exam",
+      characterId
+    );
+
+
+  if (
+    !service ||
+    !activity
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  return {
+
+    page:
+      "exam",
+
+    title:
+      "Shinobi Exams",
+
+    service:
+      service,
+
+    activity:
+      activity
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 201 — PRACTICAL PAGE DATA BRIDGE
+// =========================================================
+//
+// Backend contract for the future Practical page.
+//
+// =========================================================
+
+
+function getKonohaPracticalPageData(
+  characterId
+) {
+
+
+  const service =
+    getKonohaServicePresentation(
+      "practical"
+    );
+
+
+  const activity =
+    getKonohaCharacterActivityData(
+      "practical",
+      characterId
+    );
+
+
+  if (
+    !service ||
+    !activity
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  return {
+
+    page:
+      "practical",
+
+    title:
+      "Practical Training",
+
+    service:
+      service,
+
+    activity:
+      activity
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 202 — KONOHA DATA BRIDGE HEALTH CHECK
+// =========================================================
+
+
+function validateKonohaDataBridge() {
+
+
+  const hub =
+    getKonohaHubData();
+
+
+  const exam =
+    getKonohaExamPageData(
+      "naruto"
+    );
+
+
+  const practical =
+    getKonohaPracticalPageData(
+      "naruto"
+    );
+
+
+  const checks = {
+
+
+    database:
+      typeof KONOHA_SERVICE_DATABASE ===
+        "object",
+
+
+    serviceQuery:
+      !!getKonohaService(
+        "exams"
+      ),
+
+
+    serviceList:
+      getKonohaServices()
+        .length >=
+        5,
+
+
+    missionAccess:
+      evaluateKonohaServiceAccess(
+        "missions"
+      ).accessible ===
+        true,
+
+
+    examAccess:
+      evaluateKonohaServiceAccess(
+        "exams"
+      ).accessible ===
+        true,
+
+
+    practicalAccess:
+      evaluateKonohaServiceAccess(
+        "practical"
+      ).accessible ===
+        true,
+
+
+    trainingAccess:
+      evaluateKonohaServiceAccess(
+        "training"
+      ).accessible ===
+        true,
+
+
+    shopSafelyPending:
+      evaluateKonohaServiceAccess(
+        "shop"
+      ).implemented ===
+        false,
+
+
+    hubData:
+      !!(
+        hub &&
+        Array.isArray(
+          hub.services
+        )
+      ),
+
+
+    examData:
+      !!(
+        exam &&
+        exam.activity &&
+        exam.activity.disciplines
+          .length ===
+          3
+      ),
+
+
+    practicalData:
+      !!(
+        practical &&
+        practical.activity &&
+        practical.activity.disciplines
+          .length ===
+          3
+      )
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Konoha Data Bridge health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
+// =========================================================
 // BRICK 192 — CONTENT ACCESS ENGINE HEALTH CHECK
 // =========================================================
 
@@ -43764,7 +44767,7 @@ function validateBattleCompletionSystem() {
 
 
 // =========================================================
-// BRICK 192 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 202 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 
 
@@ -43773,6 +44776,10 @@ function runActivityLocationRegression() {
 
   const contentAccessHealth =
     validateContentAccessSystem();
+
+
+  const konohaDataHealth =
+    validateKonohaDataBridge();
 
 
   const locationHealth =
@@ -43959,6 +44966,10 @@ function runActivityLocationRegression() {
       contentAccessHealth.healthy,
 
 
+    konohaDataBridge:
+      konohaDataHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -43985,6 +44996,7 @@ function runActivityLocationRegression() {
         battleCompletionHealth.healthy &&
         battleQueryHealth.healthy &&
         contentAccessHealth.healthy &&
+        konohaDataHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
@@ -44025,6 +45037,7 @@ function runActivityLocationRegression() {
 
 
 }
+
 
 
 // =========================================================
