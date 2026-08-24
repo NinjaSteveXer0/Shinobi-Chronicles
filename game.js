@@ -33789,105 +33789,202 @@ function renderGenericOverlay(
 
 
 // =========================================================
-// 6. VILLAGE OVERLAY
+// BRICK 254 — KONOHA MAP SCREEN
+// =========================================================
+//
+// Canonical Konoha village presentation.
+//
+// Uses:
+// Assets/Backgrounds/konoha.png
+//
+// Existing openOverlay("village") remains the
+// navigation authority.
+//
 // =========================================================
 
-function renderVillageOverlay(container) {
+
+function renderVillageOverlay(
+  container
+) {
+
+
+  if (!container) {
+
+
+    return false;
+
+
+  }
+
 
   container.innerHTML = `
 
-    <div style="
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-      min-height: 0;
-    ">
+    <div
+      class="
+        konoha-map-screen
+      "
+    >
+
+      <img
+        src="
+          Assets/Backgrounds/konoha.png
+        "
+        alt="
+          Hidden Leaf Village
+        "
+        class="
+          konoha-map-image
+        "
+      >
 
 
-      <div style="
-        margin-bottom: 14px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #1E293B;
-      ">
+      <!-- =====================================
+           LAND OF FIRE RETURN
+           ===================================== -->
 
-        <h2 style="
-          color: #D6A93A;
-          font-size: 16px;
-          margin-bottom: 4px;
-        ">
-          HIDDEN LEAF VILLAGE
-        </h2>
+      <button
+        type="button"
+        class="
+          konoha-map-return
+        "
+        onclick="
+          closeOverlay()
+        "
+        aria-label="
+          Return to Land of Fire
+        "
+        title="
+          Return to Land of Fire
+        "
+      >
 
+        LAND OF FIRE
 
-        <p style="
-          color: #94A3B8;
-          font-size: 10px;
-        ">
-          Konohagakure • Land of Fire
-        </p>
-
-      </div>
-
-
-
-      <div style="
-        display: grid;
-        grid-template-columns:
-          repeat(
-            auto-fit,
-            minmax(220px, 1fr)
-          );
-
-        gap: 12px;
-
-        flex: 1;
-
-        overflow-y: auto;
-      ">
+      </button>
 
 
-        ${createVillageCard(
-          "Hokage Office",
-          "Accept high-rank missions, squad assignments and village objectives."
-        )}
+      <!-- =====================================
+           SHINOBI EXAMS HOTSPOT
+           ===================================== -->
 
+      <button
+        type="button"
+        class="
+          konoha-map-hotspot
+          konoha-map-hotspot-exams
+        "
+        onclick="
+          openKonohaExamFromVillage()
+        "
+        aria-label="
+          Enter Shinobi Exams
+        "
+        title="
+          Shinobi Exams
+        "
+      >
 
-        ${createVillageCard(
-          "Ichiraku Ramen",
-          "Restore stamina and purchase temporary combat buffs."
-        )}
+        <span
+          class="
+            konoha-map-hotspot-label
+          "
+        >
+          SHINOBI EXAMS
+        </span>
 
-
-        ${createVillageCard(
-          "Ninja Academy",
-          "Train techniques, improve stats and unlock new progression paths."
-        )}
-
-
-        ${createVillageCard(
-          "Hospital",
-          "Recover injured ninja and remove battle exhaustion effects."
-        )}
-
-
-        ${createVillageCard(
-          "Shinobi Market",
-          "Purchase weapons, scrolls, equipment and consumables."
-        )}
-
-
-        ${createVillageCard(
-          "Mission District",
-          "Access story progression and village-based missions."
-        )}
-
-
-      </div>
+      </button>
 
     </div>
 
   `;
+
+
+  return true;
+
+
 }
+
+
+// =========================================================
+// KONOHA → EXAMS
+// =========================================================
+
+
+function openKonohaExamFromVillage() {
+
+
+  const overlay =
+    document.getElementById(
+      "screen-overlay"
+    );
+
+
+  if (overlay) {
+
+
+    overlay.style.display =
+      "none";
+
+
+  }
+
+
+  const result =
+    showKonohaActivityUIScreen(
+      "exams"
+    );
+
+
+  if (
+    !result ||
+    result.success !==
+      true
+  ) {
+
+
+    if (overlay) {
+
+
+      overlay.style.display =
+        "flex";
+
+
+    }
+
+
+    return result;
+
+
+  }
+
+
+  return result;
+
+
+}
+
+
+// =========================================================
+// EXAMS → KONOHA
+// =========================================================
+
+
+function returnToKonohaFromActivityUI() {
+
+
+  closeKonohaActivityUIScreen();
+
+
+  openOverlay(
+    "village"
+  );
+
+
+  return true;
+
+
+}
+
 
 // =========================================================
 // YOUR CLAN / SHINOBI ROSTER
@@ -47842,7 +47939,17 @@ function renderKonohaExamProgressBar(
 
 
 // =========================================================
-// BRICK 227 — EXAM DISCIPLINE CARD RENDERER
+// BRICK 259 — EXAM DISCIPLINE LIVE DATA RENDERER
+// =========================================================
+//
+// Background artwork owns:
+// - discipline name
+// - EXPERIENCE label
+// - Level label
+// - EXAM REWARD label
+//
+// DOM owns only changing values.
+//
 // =========================================================
 
 
@@ -47871,55 +47978,37 @@ function renderKonohaExamDisciplineCard(
       "
     >
 
+
       <div
         class="
-          exam-discipline-top
+          exam-live-level
+        "
+      >
+        ${discipline.level}
+      </div>
+
+
+      <div
+        class="
+          exam-live-experience
         "
       >
 
-        <div>
+        <strong>
+          ${discipline.exp}
+        </strong>
 
-          <div
-            class="
-              exam-discipline-name
-            "
-          >
-            ${discipline.name}
-          </div>
-
-          <div
-            class="
-              exam-discipline-level
-            "
-          >
-            Level
-            <strong>
-              ${discipline.level}
-            </strong>
-          </div>
-
-        </div>
-
-
-        <div
-          class="
-            exam-discipline-exp
-          "
-        >
-
-          EXPERIENCE
-
-          <br>
-
-          <strong>
-            ${discipline.exp}
-          </strong>
-
+        <span>
           /
-          ${discipline.expRequired}
-          EXP
+        </span>
 
-        </div>
+        <span>
+          ${discipline.expRequired}
+        </span>
+
+        <span>
+          EXP
+        </span>
 
       </div>
 
@@ -47931,16 +48020,12 @@ function renderKonohaExamDisciplineCard(
 
       <div
         class="
-          exam-discipline-reward
+          exam-live-reward
         "
       >
 
-        EXAM REWARD
-
-        <strong>
-          +${discipline.rewardExp}
-          EXP
-        </strong>
+        +${discipline.rewardExp}
+        EXP
 
       </div>
 
@@ -48054,7 +48139,7 @@ function changeKonohaExamCharacter(
 
 
 // =========================================================
-// BRICK 230 — EXAM ELIGIBILITY PANEL
+// BRICK 261 — EXAM ELIGIBILITY PANEL
 // =========================================================
 
 
@@ -48070,6 +48155,11 @@ function renderKonohaExamEligibilityPanel(
 
 
   }
+
+
+  const criteria =
+    eligibility.criteria ||
+    {};
 
 
   const accessText =
@@ -48090,21 +48180,12 @@ function renderKonohaExamEligibilityPanel(
 
       <div
         class="
-          exam-eligibility-title
-        "
-      >
-        EXAM ELIGIBILITY
-      </div>
-
-
-      <div
-        class="
-          exam-eligibility-status
+          exam-eligibility-header
         "
       >
 
         <span>
-          Current Access
+          EXAM ELIGIBILITY
         </span>
 
         <strong>
@@ -48114,107 +48195,63 @@ function renderKonohaExamEligibilityPanel(
       </div>
 
 
-      <div
-        class="
-          exam-eligibility-status
-        "
-      >
-
-        <span>
-          Rank Requirement
-        </span>
-
-        <span>
-          ${getKonohaExamMetaValue(
-            eligibility.criteria
-              .rankRequirement
-          )}
-        </span>
-
-      </div>
+      ${renderKonohaExamEligibilityRow(
+        "Rank Requirement",
+        criteria.rankRequirement
+      )}
 
 
-      <div
-        class="
-          exam-eligibility-status
-        "
-      >
-
-        <span>
-          Level Requirement
-        </span>
-
-        <span>
-          ${getKonohaExamMetaValue(
-            eligibility.criteria
-              .levelRequirement
-          )}
-        </span>
-
-      </div>
+      ${renderKonohaExamEligibilityRow(
+        "Level Requirement",
+        criteria.levelRequirement
+      )}
 
 
-      <div
-        class="
-          exam-eligibility-status
-        "
-      >
-
-        <span>
-          Active Missions
-        </span>
-
-        <span>
-          ${getKonohaExamMetaValue(
-            eligibility.criteria
-              .activeMissionLimit
-          )}
-        </span>
-
-      </div>
+      ${renderKonohaExamEligibilityRow(
+        "Active Missions",
+        criteria.activeMissionLimit
+      )}
 
 
-      <div
-        class="
-          exam-eligibility-status
-        "
-      >
-
-        <span>
-          Cooldown
-        </span>
-
-        <span>
-          ${getKonohaExamMetaValue(
-            eligibility.criteria
-              .cooldown
-          )}
-        </span>
-
-      </div>
-
-
-      ${
-        eligibility.criteriaConfigured ===
-          false
-
-          ? `
-            <div
-              class="
-                exam-eligibility-note
-              "
-            >
-              Detailed Exam requirements have not
-              been configured yet. Current access
-              is controlled by the live Content
-              Access system.
-            </div>
-          `
-
-          : ""
-      }
+      ${renderKonohaExamEligibilityRow(
+        "Cooldown",
+        criteria.cooldown
+      )}
 
     </section>
+
+  `;
+
+
+}
+
+
+
+function renderKonohaExamEligibilityRow(
+  label,
+  value
+) {
+
+
+  return `
+
+    <div
+      class="
+        exam-eligibility-row
+      "
+    >
+
+      <span>
+        ${label}
+      </span>
+
+      <strong>
+        ${getKonohaExamMetaValue(
+          value
+        )}
+      </strong>
+
+    </div>
 
   `;
 
@@ -48309,7 +48346,7 @@ function beginKonohaExamFromUI() {
 
 
 // =========================================================
-// BRICK 232 — SHINOBI EXAMS VISUAL SCREEN COMPOSER
+// BRICK 257 — SHINOBI EXAMS VISUAL SCREEN COMPOSER
 // =========================================================
 
 
@@ -48363,6 +48400,29 @@ function renderKonohaExamVisualScreen() {
       "
     >
 
+
+      <!-- =====================================
+           BAKED KONOHA NAVIGATION HOTSPOT
+           ===================================== -->
+
+      <button
+        type="button"
+        class="
+          exam-konoha-return
+        "
+        onclick="
+          returnToKonohaFromActivityUI()
+        "
+        aria-label="
+          Return to Konoha
+        "
+        title="
+          Return to Konoha
+        "
+      >
+      </button>
+
+
       <header
         class="
           exam-header
@@ -48410,7 +48470,11 @@ function renderKonohaExamVisualScreen() {
         )}
 
 
-        <section>
+        <section
+          class="
+            exam-content-column
+          "
+        >
 
           ${renderKonohaExamDisciplineStack(
             data.disciplines
@@ -48422,6 +48486,63 @@ function renderKonohaExamVisualScreen() {
               exam-lower-grid
             "
           >
+
+            <section
+              class="
+                exam-information-panel
+              "
+            >
+
+              <div
+                class="
+                  exam-information-title
+                "
+              >
+                EXAM INFORMATION
+              </div>
+
+
+              <div
+                class="
+                  exam-information-row
+                "
+              >
+                Exams test your knowledge
+                and chakra control.
+              </div>
+
+
+              <div
+                class="
+                  exam-information-row
+                "
+              >
+                Each discipline grants
+                EXP upon completion.
+              </div>
+
+
+              <div
+                class="
+                  exam-information-row
+                "
+              >
+                Higher levels require
+                more EXP to advance.
+              </div>
+
+
+              <div
+                class="
+                  exam-information-row
+                "
+              >
+                You can only run one
+                Exam at a time.
+              </div>
+
+            </section>
+
 
             <div
               class="
@@ -48520,18 +48641,23 @@ function showKonohaExamUIScreen(
 
   return {
 
+
     success:
       rendered === true,
 
+
     serviceId:
       "exams",
+
 
     characterId:
       getKonohaActivityUISessionState()
         .characterId,
 
+
     rendered:
       rendered === true
+
 
   };
 
@@ -49065,17 +49191,7 @@ function validateBattleCompletionSystem() {
 }
 
 // =========================================================
-// BRICK 253 — EXAM VISUAL POLISH HEALTH CHECK
-// =========================================================
-//
-// Validates the real DOM emitted by the Exam renderer.
-//
-// Does not alter:
-// - activity execution
-// - progression
-// - rewards
-// - character selection
-//
+// BRICK 263 — KONOHA / EXAM NAVIGATION HEALTH CHECK
 // =========================================================
 
 
@@ -49098,6 +49214,15 @@ function validateKonohaExamVisualSystem() {
         "exams" &&
       root.querySelector(
         ".konoha-exam-screen"
+      )
+    );
+
+
+  const konohaReturn =
+    !!(
+      root &&
+      root.querySelector(
+        ".exam-konoha-return"
       )
     );
 
@@ -49145,12 +49270,32 @@ function validateKonohaExamVisualSystem() {
     );
 
 
+  const informationPanel =
+    !!(
+      root &&
+      root.querySelector(
+        ".exam-information-panel"
+      )
+    );
+
+
   const eligibilityPanel =
     !!(
       root &&
       root.querySelector(
         ".exam-eligibility"
       )
+    );
+
+
+  const navigationFunctions =
+    (
+      typeof openKonohaExamFromVillage ===
+        "function" &&
+      typeof returnToKonohaFromActivityUI ===
+        "function" &&
+      typeof renderVillageOverlay ===
+        "function"
     );
 
 
@@ -49163,6 +49308,10 @@ function validateKonohaExamVisualSystem() {
 
     examScreen:
       examScreen,
+
+
+    konohaReturn:
+      konohaReturn,
 
 
     characterPanel:
@@ -49187,14 +49336,23 @@ function validateKonohaExamVisualSystem() {
       beginButton,
 
 
+    informationPanel:
+      informationPanel,
+
+
     eligibilityPanel:
       eligibilityPanel,
+
+
+    navigationFunctions:
+      navigationFunctions,
 
 
     healthy:
       (
         screenPresent &&
         examScreen &&
+        konohaReturn &&
         characterPanel &&
         characterImage &&
         disciplineCards ===
@@ -49202,7 +49360,9 @@ function validateKonohaExamVisualSystem() {
         progressBars ===
           3 &&
         beginButton &&
-        eligibilityPanel
+        informationPanel &&
+        eligibilityPanel &&
+        navigationFunctions
       )
 
 
@@ -49210,7 +49370,7 @@ function validateKonohaExamVisualSystem() {
 
 
   console.log(
-    "Konoha Exam Visual health:",
+    "Konoha / Exam UI health:",
     health
   );
 
@@ -49224,7 +49384,6 @@ function validateKonohaExamVisualSystem() {
 // =========================================================
 // BRICK 222 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
-
 
 function runActivityLocationRegression() {
 
