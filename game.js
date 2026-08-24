@@ -35570,16 +35570,17 @@ function resolveActivityAction(
 }
 
 // =========================================================
-// BRICK 98 — ACTIVITY RESULT HYDRATION
+// BRICK 115 — ACTIVITY RESULT HYDRATION
 // =========================================================
 //
-// Converts activity definitions into universal results.
+// Converts structured Activity rewards
+// into the universal Result format.
 //
-// Activity Data
-// ↓
-// Activity Result
-// ↓
-// Reward Processing
+// Routes:
+// - EXP → result.rewards.exp
+// - Ryō → result.rewards.ryo
+// - Items → result.rewards.items
+// - Discipline → result.rewards.progression
 //
 // =========================================================
 
@@ -35592,6 +35593,7 @@ function hydrateActivityResult(
 
   if (
     !result ||
+    !result.rewards ||
     !activity
   ) {
 
@@ -35622,86 +35624,125 @@ function hydrateActivityResult(
 
 
 
-  result.rewards.progression =
-    [
-      ...activity.rewards
-    ];
+  activity.rewards.forEach(
+    reward => {
+
+
+      if (
+        !reward ||
+        !reward.type
+      ) {
+
+
+        return;
+
+
+      }
 
 
 
-  console.log(
-    "Activity result hydrated:",
-    result
+      switch (
+        reward.type
+      ) {
+
+
+        case "experience":
+
+
+          result.rewards.exp +=
+            Number(
+              reward.amount
+            ) || 0;
+
+
+          break;
+
+
+
+        case "currency":
+
+
+          if (
+            reward.id ===
+              "ryo"
+          ) {
+
+
+            result.rewards.ryo +=
+              Number(
+                reward.amount
+              ) || 0;
+
+
+          }
+
+
+          break;
+
+
+
+        case "discipline":
+
+
+          if (
+            !Array.isArray(
+              result.rewards.progression
+            )
+          ) {
+
+
+            result.rewards.progression =
+              [];
+
+
+          }
+
+
+
+          result.rewards.progression.push(
+            {
+              ...reward
+            }
+          );
+
+
+          break;
+
+
+
+        case "item":
+
+
+          if (
+            !Array.isArray(
+              result.rewards.items
+            )
+          ) {
+
+
+            result.rewards.items =
+              [];
+
+
+          }
+
+
+
+          result.rewards.items.push(
+            {
+              ...reward
+            }
+          );
+
+
+          break;
+
+
+      }
+
+
+    }
   );
-
-
-
-  return result;
-
-
-}
-
-// =========================================================
-// BRICK 98 — ACTIVITY RESULT HYDRATION
-// =========================================================
-//
-// Converts activity definitions into universal results.
-//
-// Activity Definition
-// ↓
-// Activity Result
-// ↓
-// Reward Processing
-//
-// =========================================================
-
-
-// =========================================================
-// ACTIVITY RESULT HYDRATION
-// =========================================================
-
-function hydrateActivityResult(
-  result,
-  activity
-) {
-
-
-  if (
-    !result ||
-    !activity
-  ) {
-
-
-    console.log(
-      "Invalid activity hydration request."
-    );
-
-
-    return false;
-
-
-  }
-
-
-
-  if (
-    !Array.isArray(
-      activity.rewards
-    )
-  ) {
-
-
-    return result;
-
-
-  }
-
-
-
-  result.rewards.progression =
-    [
-      ...activity.rewards
-    ];
 
 
 
@@ -35716,7 +35757,6 @@ function hydrateActivityResult(
 
 
 }
-
 
 
 // =========================================================
@@ -35958,16 +35998,16 @@ function createActivityResult(
 
 
 // =========================================================
-// TASK 6.2 — ACTIVITY REWARD PROCESSOR
+// BRICK 116 — ACTIVITY REWARD PROCESSOR
 // =========================================================
 //
-// Applies Activity Result rewards.
+// Applies hydrated Activity Result rewards.
 //
 // Handles:
 // - EXP
 // - Ryō
-// - Items
-// - Future progression hooks
+// - Resolved items
+// - Deferred item reward tokens
 //
 // =========================================================
 
@@ -35995,9 +36035,14 @@ function applyActivityRewards(
 
 
 
+  // =========================================
+  // EXP
+  // =========================================
+
+
   if (
     typeof result.rewards.exp ===
-    "number"
+      "number"
   ) {
 
 
@@ -36009,9 +36054,14 @@ function applyActivityRewards(
 
 
 
+  // =========================================
+  // RYO
+  // =========================================
+
+
   if (
     typeof result.rewards.ryo ===
-    "number"
+      "number"
   ) {
 
 
@@ -36021,6 +36071,11 @@ function applyActivityRewards(
 
   }
 
+
+
+  // =========================================
+  // ITEMS
+  // =========================================
 
 
   if (
@@ -36034,9 +36089,96 @@ function applyActivityRewards(
       item => {
 
 
-        addItemToInventory(
-          item
-        );
+        if (
+          !item
+        ) {
+
+
+          return;
+
+
+        }
+
+
+
+        // =========================================
+        // DEFER RANDOM / ABSTRACT ITEM TOKENS
+        // =========================================
+
+
+        if (
+          item.id ===
+            "random_common"
+        ) {
+
+
+          console.log(
+            "Deferred unresolved activity item reward:",
+            item.id
+          );
+
+
+          return;
+
+
+        }
+
+
+
+        const definition =
+          getItemDefinition(
+            item.id
+          );
+
+
+
+        if (
+          !definition
+        ) {
+
+
+          console.log(
+            "Unknown activity item reward:",
+            item.id
+          );
+
+
+          return;
+
+
+        }
+
+
+
+        const amount =
+          Math.max(
+            1,
+            Math.floor(
+              Number(
+                item.amount
+              ) || 1
+            )
+          );
+
+
+
+        for (
+          let i = 0;
+          i < amount;
+          i++
+        ) {
+
+
+          addItemToInventory({
+            id:
+              definition.id,
+
+            name:
+              definition.name
+          });
+
+
+        }
 
 
       }
