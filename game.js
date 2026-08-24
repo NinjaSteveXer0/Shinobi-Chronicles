@@ -37301,14 +37301,25 @@ function getLocationActivity(
 
 
 
-// =========================================
-// LOCATION ACTIVITY REQUEST
-// =========================================
+// =========================================================
+// BRICK 123 — LOCATION ACTIVITY REQUEST
+// =========================================================
+//
+// Launches mapped location activities
+// through the Activity Engine.
+//
+// Preserves:
+// - Location identity
+// - Activity identity
+// - Character identity
+//
+// =========================================================
 
 
 function launchLocationAction(
   locationId,
-  action
+  action,
+  characterId
 ) {
 
 
@@ -37320,7 +37331,9 @@ function launchLocationAction(
 
 
 
-  if (!activity) {
+  if (
+    !activity
+  ) {
 
 
     console.log(
@@ -37338,11 +37351,15 @@ function launchLocationAction(
 
 
   return startRegisteredActivity(
-    activity
+    activity,
+    characterId
   );
 
 
 }
+
+
+
 
 // =========================================================
 // BRICK 96 — CONTENT REGISTRY FOUNDATION
@@ -37470,9 +37487,20 @@ function validateActivity(
 
 }
 
-// =========================================
-// LOCATION ACTIVITY VALIDATION
-// =========================================
+// =========================================================
+// BRICK 122 — LOCATION ACTIVITY VALIDATION
+// =========================================================
+//
+// Validates location actions against
+// their mapped Activity Engine identity.
+//
+// Location Action
+// ↓
+// Activity Mapping
+// ↓
+// Activity Validation
+//
+// =========================================================
 
 
 function validateLocationActivity(
@@ -37488,7 +37516,9 @@ function validateLocationActivity(
 
 
 
-  if (!location) {
+  if (
+    !location
+  ) {
 
 
     return false;
@@ -37499,6 +37529,9 @@ function validateLocationActivity(
 
 
   if (
+    !Array.isArray(
+      location.actions
+    ) ||
     !location.actions.includes(
       action
     )
@@ -37512,8 +37545,28 @@ function validateLocationActivity(
 
 
 
+  const activityId =
+    getLocationActivity(
+      locationId,
+      action
+    );
+
+
+
+  if (
+    !activityId
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+
   return validateActivity(
-    action
+    activityId
   );
 
 
@@ -37780,13 +37833,26 @@ function getCurrentLocationActions() {
 
 }
 
-// =========================================
-// LOCATION ACTIVITY EXECUTION ROUTER
-// =========================================
+// =========================================================
+// BRICK 124 — LOCATION ACTIVITY EXECUTION ROUTER
+// =========================================================
+//
+// Routes the player's current location action
+// into the Activity Engine.
+//
+// Preserves character identity through:
+// Location
+// ↓
+// Activity
+// ↓
+// Progression
+//
+// =========================================================
 
 
 function executeLocationAction(
-  action
+  action,
+  characterId
 ) {
 
 
@@ -37795,9 +37861,39 @@ function executeLocationAction(
 
 
 
-  if (!locationId) {
+  if (
+    !locationId
+  ) {
+
+
+    console.log(
+      "No active player location."
+    );
+
 
     return false;
+
+
+  }
+
+
+
+  if (
+    !characterId ||
+    !getPlayerCharacter(
+      characterId
+    )
+  ) {
+
+
+    console.log(
+      "Invalid location activity character:",
+      characterId
+    );
+
+
+    return false;
+
 
   }
 
@@ -37819,13 +37915,15 @@ function executeLocationAction(
 
     return false;
 
+
   }
 
 
 
   return launchLocationAction(
     locationId,
-    action
+    action,
+    characterId
   );
 
 
