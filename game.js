@@ -30551,9 +30551,17 @@ function increaseCharacterStat(
 let selectedEnemy = null;
 
 
+// =========================================================
+// BRICK 148 — BATTLE ENCOUNTER CONTEXT
+// =========================================================
+
 let currentBattle = {
 
   active: false,
+
+  encounterId: null,
+
+  characterId: null,
 
   enemy: null,
 
@@ -30569,6 +30577,8 @@ let currentBattle = {
 
   battleLog: [],
 
+  contributions: {},
+
   rewards: {
 
     generated: false,
@@ -30581,7 +30591,9 @@ let currentBattle = {
 
     rareDrops: [],
 
-    finishingShinobi: null
+    finishingShinobi: null,
+
+    mvp: null
 
   }
 
@@ -31287,17 +31299,21 @@ function startEncounterActivity(
 
 
 
-  startEncounter(
-    encounter.enemyId
-  );
+    const battle =
+    startEncounter(
+
+      encounter.enemyId,
+
+      characterId,
+
+      encounter.id
+
+    );
 
 
 
   if (
-    !currentBattle.active ||
-    !currentBattle.enemy ||
-    currentBattle.enemy.id !==
-      encounter.enemyId
+    !battle
   ) {
 
 
@@ -31328,10 +31344,22 @@ function startEncounterActivity(
 
 
 // =========================================================
-// ENCOUNTER SYSTEM
+// BRICK 149 — ENCOUNTER BATTLE LAUNCH
+// =========================================================
+//
+// Battle Engine launch authority.
+//
+// Accepts optional Chronicle Encounter context
+// while preserving direct legacy battle launches.
+//
 // =========================================================
 
-function startEncounter(enemyId) {
+
+function startEncounter(
+  enemyId,
+  characterId = null,
+  encounterId = null
+) {
 
 
   console.log(
@@ -31341,16 +31369,69 @@ function startEncounter(enemyId) {
 
 
   const enemy =
-    enemyDatabase[enemyId];
+    enemyDatabase[
+      enemyId
+    ];
 
 
-  if (!enemy) {
+  if (
+    !enemy
+  ) {
+
 
     console.log(
       "Enemy not found"
     );
 
-    return;
+
+    return false;
+
+
+  }
+
+
+  let activePlayer = null;
+
+
+  if (
+    characterId
+  ) {
+
+
+    activePlayer =
+      getPlayerCharacter(
+        characterId
+      );
+
+
+  }
+
+
+  if (
+    !activePlayer
+  ) {
+
+
+    activePlayer =
+      playerTeam[0] ||
+      null;
+
+
+  }
+
+
+  if (
+    !activePlayer
+  ) {
+
+
+    console.log(
+      "No battle character available."
+    );
+
+
+    return false;
+
 
   }
 
@@ -31363,12 +31444,20 @@ function startEncounter(enemyId) {
     true;
 
 
+  currentBattle.encounterId =
+    encounterId;
+
+
+  currentBattle.characterId =
+    activePlayer.id;
+
+
   currentBattle.enemy =
     enemy;
 
 
   currentBattle.activePlayer =
-    playerTeam[0];
+    activePlayer;
 
 
   currentBattle.lastDamage =
@@ -31383,7 +31472,7 @@ function startEncounter(enemyId) {
 
     `${enemy.name} appears!`,
 
-    `${playerTeam[0].name} prepares for battle.`
+    `${activePlayer.name} prepares for battle.`
 
   ];
 
@@ -31392,40 +31481,56 @@ function startEncounter(enemyId) {
   // RESET BATTLE CONTRIBUTIONS
   // =========================================
 
-  currentBattle.contributions = {};
+
+  currentBattle.contributions =
+    {};
 
 
   playerTeam.forEach(
     member => {
 
+
       currentBattle.contributions[
         member.id
       ] = {
 
+
         id:
           member.id,
 
+
         name:
           member.name,
+
 
         power:
           calculateCurrentPL(
             member
           ),
 
+
         damage:
           0,
+
 
         attacks:
           0,
 
+
         ninjutsuDamage:
           0,
 
+
         taijutsuDamage:
+          0,
+
+
+        bukijutsuDamage:
           0
 
+
       };
+
 
     }
   );
@@ -31435,21 +31540,37 @@ function startEncounter(enemyId) {
   // RESET BATTLE REWARDS
   // =========================================
 
+
   currentBattle.rewards = {
 
-    generated: false,
 
-    ryo: 0,
+    generated:
+      false,
 
-    exp: 0,
 
-    items: [],
+    ryo:
+      0,
 
-    rareDrops: [],
 
-    finishingShinobi: null,
+    exp:
+      0,
 
-    mvp: null
+
+    items:
+      [],
+
+
+    rareDrops:
+      [],
+
+
+    finishingShinobi:
+      null,
+
+
+    mvp:
+      null
+
 
   };
 
@@ -31478,6 +31599,10 @@ function startEncounter(enemyId) {
   openOverlay(
     "combat"
   );
+
+
+  return currentBattle;
+
 
 }
 
@@ -40488,6 +40613,107 @@ function validateActivitySystem() {
 }
 
 // =========================================================
+// BRICK 151 — ENCOUNTER BATTLE BRIDGE DIAGNOSTICS
+// =========================================================
+//
+// Structural diagnostics only.
+//
+// Does NOT launch combat.
+//
+// =========================================================
+
+
+function validateEncounterBattleBridge() {
+
+
+  const scoutEncounter =
+    getEncounterDefinition(
+      "scout_patrol"
+    );
+
+
+  const naruto =
+    getPlayerCharacter(
+      "naruto"
+    );
+
+
+  const checks = {
+
+
+    battleState:
+      (
+        typeof currentBattle ===
+          "object" &&
+        currentBattle !==
+          null
+      ),
+
+
+    battleLauncher:
+      typeof startEncounter ===
+        "function",
+
+
+    encounterLauncher:
+      typeof startEncounterActivity ===
+        "function",
+
+
+    encounterContext:
+      (
+        Object.prototype.hasOwnProperty.call(
+          currentBattle,
+          "encounterId"
+        ) &&
+        Object.prototype.hasOwnProperty.call(
+          currentBattle,
+          "characterId"
+        )
+      ),
+
+
+    encounterDefinition:
+      !!scoutEncounter,
+
+
+    enemyLink:
+      !!(
+        scoutEncounter &&
+        enemyDatabase[
+          scoutEncounter.enemyId
+        ]
+      ),
+
+
+    characterResolution:
+      !!naruto
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Encounter Battle Bridge health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
+// =========================================================
 // BRICK 147 — ENCOUNTER ENGINE HEALTH CHECK
 // =========================================================
 //
@@ -40624,7 +40850,7 @@ function validateEncounterSystem() {
 
 
 // =========================================================
-// BRICK 147 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 152 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 //
 // Master non-destructive regression checkpoint.
@@ -40635,6 +40861,7 @@ function validateEncounterSystem() {
 // - Activity Engine
 // - Training Engine
 // - Encounter Engine
+// - Encounter → Battle bridge
 // - Location mappings
 // - Character bridge
 // - Training normalization
@@ -40650,20 +40877,20 @@ function runActivityLocationRegression() {
     validateLocationSystem();
 
 
-
   const activityHealth =
     validateActivitySystem();
-
 
 
   const trainingHealth =
     validateTrainingSystem();
 
 
-
   const encounterHealth =
     validateEncounterSystem();
 
+
+  const battleBridgeHealth =
+    validateEncounterBattleBridge();
 
 
   // =========================================
@@ -40717,7 +40944,6 @@ function runActivityLocationRegression() {
   };
 
 
-
   const mappingsHealthy =
     Object.values(
       mappingChecks
@@ -40725,7 +40951,6 @@ function runActivityLocationRegression() {
       value =>
         value === true
     );
-
 
 
   // =========================================
@@ -40737,7 +40962,6 @@ function runActivityLocationRegression() {
     !!getPlayerCharacter(
       "naruto"
     );
-
 
 
   // =========================================
@@ -40753,7 +40977,6 @@ function runActivityLocationRegression() {
     );
 
 
-
   const trainingNormalizationHealthy =
     !!(
       trainingProbe &&
@@ -40767,7 +40990,6 @@ function runActivityLocationRegression() {
     );
 
 
-
   // =========================================
   // ENCOUNTER NORMALIZATION
   // =========================================
@@ -40779,7 +41001,6 @@ function runActivityLocationRegression() {
     );
 
 
-
   const encounterNormalizationHealthy =
     !!(
       encounterProbe &&
@@ -40788,7 +41009,6 @@ function runActivityLocationRegression() {
       encounterProbe.enemy &&
       encounterProbe.rewards
     );
-
 
 
   // =========================================
@@ -40815,6 +41035,10 @@ function runActivityLocationRegression() {
       encounterHealth.healthy,
 
 
+    battleBridge:
+      battleBridgeHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -40837,6 +41061,7 @@ function runActivityLocationRegression() {
         activityHealth.healthy &&
         trainingHealth.healthy &&
         encounterHealth.healthy &&
+        battleBridgeHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
@@ -40845,7 +41070,6 @@ function runActivityLocationRegression() {
 
 
   };
-
 
 
   console.log(
@@ -40874,11 +41098,12 @@ function runActivityLocationRegression() {
   );
 
 
-
   return result;
 
 
 }
+
+
 
 // =========================================================
 // BRICK 140 — LEGACY TRAINING DATA BRIDGE RETIRED
