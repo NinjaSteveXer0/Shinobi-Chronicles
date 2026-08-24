@@ -6748,24 +6748,24 @@ body {
 }
 
 /* =========================================================
-   BRICK 305 — EXAM LIVE DATA POSITIONING FINAL CALIBRATION
+   BRICK 307 — EXAM DISCIPLINE POSITIONING AUTHORITY
    ========================================================= */
 
 /*
    POSITIONING ONLY.
 
-   IMPORTANT:
-   data-discipline-id lives on .exam-discipline-select,
-   NOT .exam-discipline-card.
+   Every discipline selector is forced to occupy its entire
+   grid row.
 
-   All live values are therefore positioned relative to
-   the discipline card inside the correctly identified
-   discipline selector.
+   Every discipline card is then locked exactly to that row.
+
+   All live-data percentages below therefore resolve against
+   the visible Nin / Gen / Fuin panel itself.
 */
 
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card {
+.exam-discipline-select {
 
     position:
         relative !important;
@@ -6782,6 +6782,45 @@ body {
     min-height:
         0 !important;
 
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    overflow:
+        hidden !important;
+
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card {
+
+    position:
+        absolute !important;
+
+    inset:
+        0 !important;
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    min-height:
+        0 !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
     overflow:
         hidden !important;
 
@@ -6789,7 +6828,7 @@ body {
 
 
 /* =========================================================
-   LEVEL
+   LEVEL VALUE
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6802,53 +6841,7 @@ body {
         21.4% !important;
 
     top:
-        40.5% !important;
-
-    width:
-        auto !important;
-
-    height:
-        auto !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    background:
-        transparent !important;
-
-    border:
-        none !important;
-
-    line-height:
-        1 !important;
-
-    white-space:
-        nowrap;
-
-    z-index:
-        6;
-
-}
-
-
-/* =========================================================
-   EXPERIENCE
-   ========================================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-live-experience {
-
-    position:
-        absolute !important;
-
-    left:
-        61.0% !important;
-
-    top:
-        29.5% !important;
+        42% !important;
 
     width:
         auto !important;
@@ -6875,7 +6868,47 @@ body {
 
 
 /* =========================================================
-   PROGRESS TRACK — COMMON BASE
+   EXPERIENCE VALUE
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-live-experience {
+
+    position:
+        absolute !important;
+
+    left:
+        61% !important;
+
+    top:
+        30% !important;
+
+    width:
+        auto !important;
+
+    height:
+        auto !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    line-height:
+        1 !important;
+
+    white-space:
+        nowrap !important;
+
+    z-index:
+        6;
+
+}
+
+
+/* =========================================================
+   PROGRESS TRACK
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6885,13 +6918,16 @@ body {
         absolute !important;
 
     left:
-        21.0% !important;
+        21% !important;
+
+    top:
+        66% !important;
 
     width:
         54.6% !important;
 
     height:
-        5.0% !important;
+        5% !important;
 
     min-height:
         3px !important;
@@ -6908,65 +6944,8 @@ body {
     overflow:
         hidden !important;
 
-    border:
-        none !important;
-
-    border-radius:
-        999px !important;
-
     z-index:
         5;
-
-}
-
-
-/*
-   NINJUTSU
-
-   Previous attempt landed slightly too low.
-*/
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select[data-discipline-id="nin"]
-.exam-progress-track {
-
-    top:
-        62.8% !important;
-
-}
-
-
-/*
-   GENJUTSU
-
-   Track sits marginally higher in the baked panel.
-*/
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select[data-discipline-id="gen"]
-.exam-progress-track {
-
-    left:
-        20.4% !important;
-
-    top:
-        62.0% !important;
-
-}
-
-
-/*
-   FUINJUTSU
-
-   Same physical track region as the other panels.
-*/
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select[data-discipline-id="fuin"]
-.exam-progress-track {
-
-    top:
-        62.8% !important;
 
 }
 
@@ -7002,12 +6981,6 @@ body {
     padding:
         0 !important;
 
-    border:
-        none !important;
-
-    border-radius:
-        inherit !important;
-
 }
 
 
@@ -7022,10 +6995,10 @@ body {
         absolute !important;
 
     left:
-        21.0% !important;
+        21% !important;
 
     top:
-        78.5% !important;
+        84% !important;
 
     width:
         auto !important;
@@ -7039,17 +7012,11 @@ body {
     padding:
         0 !important;
 
-    background:
-        transparent !important;
-
-    border:
-        none !important;
-
     line-height:
         1 !important;
 
     white-space:
-        nowrap;
+        nowrap !important;
 
     z-index:
         6;
@@ -7106,14 +7073,14 @@ body {
 
 
 /* =========================================================
-   BRICK 306 — EXAM BATCH CONTROL POSITIONING
+   BRICK 308 — EXAM BATCH CONTROL POSITIONING V2
    ========================================================= */
 
 /*
    POSITIONING ONLY.
 
-   ×1 / ×5 now sit centrally above BEGIN EXAM,
-   clearly separated from the Fūinjutsu reward row.
+   Controls occupy the empty transition space between
+   Fūinjutsu and the baked BEGIN EXAM frame.
 */
 
 
@@ -7127,7 +7094,7 @@ body {
         50% !important;
 
     top:
-        2% !important;
+        18% !important;
 
     transform:
         translateX(-50%) !important;
@@ -7143,9 +7110,9 @@ body {
 
     gap:
         clamp(
-            8px,
-            0.7vw,
-            13px
+            9px,
+            0.75vw,
+            14px
         ) !important;
 
     margin:
@@ -7165,31 +7132,31 @@ body {
 
     min-width:
         clamp(
-            48px,
-            3.8vw,
-            66px
+            50px,
+            4vw,
+            70px
         ) !important;
 
     height:
         clamp(
-            28px,
-            2.25vw,
-            38px
+            30px,
+            2.35vw,
+            40px
         ) !important;
 
     padding:
         0
         clamp(
-            10px,
-            0.8vw,
-            14px
+            11px,
+            0.9vw,
+            15px
         ) !important;
 
     font-size:
         clamp(
-            9px,
-            0.75vw,
-            13px
+            10px,
+            0.78vw,
+            14px
         ) !important;
 
     line-height:
