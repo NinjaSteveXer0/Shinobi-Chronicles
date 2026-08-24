@@ -40307,27 +40307,111 @@ function debugTrainingActivity(
 }
 
 // =========================================================
-// TRAINING SYSTEM HEALTH
+// BRICK 139 — TRAINING ENGINE HEALTH CHECK
 // =========================================================
+//
+// Non-destructive Training Engine diagnostics.
+//
+// Validates:
+// - Training Database
+// - Data loader
+// - Normalization
+// - Readiness
+// - Data-driven execution authority
+// - Live training bridge
+//
+// =========================================================
+
 
 function validateTrainingSystem() {
 
 
-  return {
+  const lightTraining =
+    getTrainingActivityData(
+      "light_training"
+    );
+
+
+
+  const normalized =
+    normalizeTrainingActivityDefinition(
+      lightTraining
+    );
+
+
+
+  const checks = {
+
 
     database:
       typeof TRAINING_DATABASE !==
-      "undefined",
+        "undefined",
+
+
+    databasePopulated:
+      Object.keys(
+        TRAINING_DATABASE
+      ).length > 0,
+
 
     loader:
       typeof getTrainingActivityData ===
-      "function",
+        "function",
 
-    execution:
-      typeof getTrainingExecutionData ===
-      "function"
+
+    normalizer:
+      typeof normalizeTrainingActivityDefinition ===
+        "function",
+
+
+    normalizedRewards:
+      !!(
+        normalized &&
+        Array.isArray(
+          normalized.rewards
+        ) &&
+        normalized.rewards.length > 0
+      ),
+
+
+    readiness:
+      typeof getTrainingActivityReadiness ===
+        "function",
+
+
+    executionAuthority:
+      typeof executeActivityDefinition ===
+        "function",
+
+
+    liveBridge:
+      typeof startTraining ===
+        "function"
+
 
   };
+
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+
+  console.log(
+    "Training Engine health:",
+    checks
+  );
+
+
+
+  return checks;
+
 
 }
 
@@ -40792,40 +40876,238 @@ function normalizeTrainingActivityDefinition(
 
 }
 
+// =========================================================
+// BRICK 137 — TRAINING ACTIVITY READINESS
+// =========================================================
+//
+// Evaluates a character against Training Database metadata.
+//
+// IMPORTANT:
+//
+// minimumPL is currently ADVISORY ONLY.
+//
+// Training is NOT blocked by these thresholds until
+// the training PL scale is deliberately recalibrated.
+//
+// =========================================================
+
+
+function getTrainingActivityReadiness(
+  activityId,
+  characterId
+) {
+
+
+  const rawActivity =
+    getTrainingActivityData(
+      activityId
+    );
+
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+
+  if (
+    !rawActivity ||
+    !character
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+
+      activityId:
+        activityId || null,
+
+
+      characterId:
+        characterId || null,
+
+
+      reason:
+        "invalid_training_request"
+
+
+    };
+
+
+  }
+
+
+
+  const definition =
+    normalizeTrainingActivityDefinition(
+      rawActivity
+    );
+
+
+
+  if (
+    !definition
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+
+      activityId:
+        activityId,
+
+
+      characterId:
+        characterId,
+
+
+      reason:
+        "normalization_failed"
+
+
+    };
+
+
+  }
+
+
+
+  const currentPL =
+    calculateCurrentPL(
+      character
+    );
+
+
+
+  const recommendedPL =
+    Number(
+      definition.requirements &&
+      definition.requirements.minimumPL
+    ) || 0;
+
+
+
+  return {
+
+
+    available:
+      true,
+
+
+    activityId:
+      activityId,
+
+
+    characterId:
+      characterId,
+
+
+    currentPL:
+      currentPL,
+
+
+    recommendedPL:
+      recommendedPL,
+
+
+    meetsRecommendation:
+      (
+        recommendedPL <= 0 ||
+        currentPL >= recommendedPL
+      ),
+
+
+    requirementsEnforced:
+      false
+
+
+  };
+
+
+}
 
 
 // =========================================================
-// BRICK 96 — TRAINING ACTIVITY EXECUTION BRIDGE
+// BRICK 138 — TRAINING ACTIVITY EXECUTION BRIDGE
 // =========================================================
 //
-// UI ACTION → ACTIVITY SYSTEM → TRAINING DATA → REWARD PIPELINE
-//
-// This keeps training buttons from directly modifying stats.
-// Future Chronicle Engine modules can reuse this pattern:
-// Missions, Exams, Events, Dungeons, etc.
+// UI / Gameplay Training
+// ↓
+// Training Database
+// ↓
+// Canonical Activity Definition
+// ↓
+// Result / Rewards / Progression / Chronicle
 //
 // =========================================================
 
 
 function startTraining(
-  activityId
+  activityId,
+  characterId
 ) {
 
 
   console.log(
     "TRAINING ACTION START:",
-    activityId
+    activityId,
+    characterId
   );
 
 
-  const trainingData =
-    getTrainingExecutionData(
+
+  // =========================================
+  // CHARACTER
+  // =========================================
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+
+  if (
+    !character
+  ) {
+
+
+    console.log(
+      "Training character not found:",
+      characterId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  // =========================================
+  // TRAINING DATA
+  // =========================================
+
+
+  const rawActivity =
+    getTrainingActivityData(
       activityId
     );
 
 
+
   if (
-    !trainingData
+    !rawActivity
   ) {
 
 
@@ -40837,28 +41119,102 @@ function startTraining(
 
     return false;
 
+
   }
 
 
 
+  const activityDefinition =
+    normalizeTrainingActivityDefinition(
+      rawActivity
+    );
+
+
+
+  if (
+    !activityDefinition
+  ) {
+
+
+    console.log(
+      "Training activity normalization failed:",
+      activityId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  // =========================================
+  // READINESS
+  // =========================================
+
+
+  const readiness =
+    getTrainingActivityReadiness(
+      activityId,
+      characterId
+    );
+
+
+
+  if (
+    !readiness.available
+  ) {
+
+
+    console.log(
+      "Training activity unavailable:",
+      readiness
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !readiness.meetsRecommendation
+  ) {
+
+
+    console.log(
+      "Training PL recommendation not met:",
+      {
+        currentPL:
+          readiness.currentPL,
+
+        recommendedPL:
+          readiness.recommendedPL,
+
+        enforced:
+          false
+      }
+    );
+
+
+  }
+
+
+
+  // =========================================
+  // EXECUTE
+  // =========================================
+
+
   const result =
-    executePlayerActivity({
-
-      type:
-        PLAYER_ACTIVITY_TYPES.TRAINING,
-
-      stage:
-        "available",
-
-      location:
-        selectedLocationNode
-          ? selectedLocationNode.id
-          : null,
-
-      activityId:
-        activityId
-
-    });
+    executeActivityDefinition(
+      activityId,
+      characterId,
+      activityDefinition
+    );
 
 
 
@@ -40868,11 +41224,12 @@ function startTraining(
 
 
     console.log(
-      "Training activity failed."
+      "Training activity execution failed."
     );
 
 
     return false;
+
 
   }
 
@@ -40880,16 +41237,15 @@ function startTraining(
 
   console.log(
     "TRAINING ACTIVITY COMPLETE:",
-    trainingData
+    result
   );
 
 
 
-  return true;
+  return result;
 
 
 }
-
 
 // =========================================================
 // UI MODULE — BATTLE / LOOT OVERLAY
