@@ -6972,7 +6972,12 @@ body {
    ========================================= */
 
 /*
-   Currently slightly too high.
+   NINJUTSU ONLY.
+
+   Calibrate the live cyan progress track against
+   the baked gold Ninjutsu EXP bar.
+
+   No other discipline is touched.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6980,7 +6985,7 @@ body {
 .exam-progress-track {
 
     top:
-        82% !important;
+        62% !important;
 
 }
 
@@ -6988,7 +6993,6 @@ body {
 /* =========================================
    GENJUTSU
    ========================================= */
-
 /*
    Currently considerably too high.
 */
