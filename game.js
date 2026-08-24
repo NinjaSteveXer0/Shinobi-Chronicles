@@ -4116,23 +4116,19 @@ function isValidDisciplineTrainingSource(
 }
 
 // =========================================================
-// BRICK 91 — PLAYER LOOP BRIDGE
+// BRICK 128 — PLAYER LOOP ACTIVITY TYPES
 // =========================================================
 //
-// PURPOSE:
-// Creates the Chronicle Engine bridge between
-// player actions and existing gameplay authorities.
+// Aligns Player Loop requests with
+// the canonical Activity Engine.
 //
-// This does NOT replace:
-// - training
-// - battle
-// - missions
-// - rewards
-//
-// It routes actions safely into them.
+// Handles:
+// - Practical training
+// - Exams
+// - Missions
+// - Battles
 //
 // =========================================================
-
 
 
 const PLAYER_ACTIVITY_TYPES = {
@@ -4140,6 +4136,10 @@ const PLAYER_ACTIVITY_TYPES = {
 
   TRAINING:
     "training",
+
+
+  PRACTICAL:
+    "practical",
 
 
   BATTLE:
@@ -4157,11 +4157,17 @@ const PLAYER_ACTIVITY_TYPES = {
 };
 
 
-
-
 // =========================================================
-// EXECUTE PLAYER ACTIVITY
+// BRICK 129 — EXECUTE PLAYER ACTIVITY
 // =========================================================
+//
+// Entry point for Player Loop activity requests.
+//
+// Delegates execution to the canonical
+// Activity Engine.
+//
+// =========================================================
+
 
 function executePlayerActivity(
   activityRequest
@@ -4240,10 +4246,6 @@ function executePlayerActivity(
 
 
 
-  savePlayerData();
-
-
-
   console.log(
     "PLAYER ACTIVITY COMPLETE:",
     result
@@ -4256,27 +4258,34 @@ function executePlayerActivity(
 
 }
 
-
-
-
-
 // =========================================================
-// PROCESS PLAYER ACTIVITY
+// BRICK 130 — PROCESS PLAYER ACTIVITY
 // =========================================================
+//
+// Routes Player Loop requests into
+// the registered Activity Engine.
+//
+// Prevents duplicate reward / progression logic.
+//
+// =========================================================
+
 
 function processPlayerActivity(
   activityRequest
 ) {
 
 
-  switch(
+  switch (
     activityRequest.type
   ) {
 
 
+    // =========================================
+    // TRAINING UI AVAILABILITY REQUEST
+    // =========================================
+
 
     case PLAYER_ACTIVITY_TYPES.TRAINING:
-
 
 
       if (
@@ -4297,7 +4306,13 @@ function processPlayerActivity(
 
 
           location:
-            activityRequest.location,
+            activityRequest.location ||
+            null,
+
+
+          activityId:
+            activityRequest.activityId ||
+            null,
 
 
           message:
@@ -4311,151 +4326,72 @@ function processPlayerActivity(
 
 
 
-      if (
-        !activityRequest.characterId ||
-        !activityRequest.disciplineId ||
-        !activityRequest.amount
-      ) {
+      console.log(
+        "Direct legacy training execution is disabled."
+      );
 
 
-        console.log(
-          "Training execution missing data."
-        );
-
-
-        return false;
-
-
-      }
+      return false;
 
 
 
-      const trainingResult =
-        addDisciplineExp(
-          activityRequest.characterId,
-          activityRequest.disciplineId,
-          activityRequest.amount,
-          activityRequest.source ||
-            "training"
-        );
+    // =========================================
+    // PRACTICAL
+    // =========================================
+
+
+    case PLAYER_ACTIVITY_TYPES.PRACTICAL:
+
+
+      return startRegisteredActivity(
+        "practical",
+        activityRequest.characterId
+      );
 
 
 
-      if (
-        !trainingResult
-      ) {
-
-
-        console.log(
-          "Training progression failed."
-        );
-
-
-        return false;
-
-
-      }
-
-
-
-      return {
-
-
-        success:
-          true,
-
-
-        type:
-          "training_complete",
-
-
-        characterId:
-          activityRequest.characterId,
-
-
-        disciplineId:
-          activityRequest.disciplineId,
-
-
-        message:
-          "Training progression applied."
-
-
-      };
-
-
-
+    // =========================================
+    // BATTLE
+    // =========================================
 
 
     case PLAYER_ACTIVITY_TYPES.BATTLE:
 
 
-      return {
-
-
-        success:
-          true,
-
-
-        type:
-          "battle",
-
-
-        message:
-          "Battle activity accepted."
-
-
-      };
+      return startRegisteredActivity(
+        "battle",
+        activityRequest.characterId
+      );
 
 
 
+    // =========================================
+    // MISSION
+    // =========================================
 
 
     case PLAYER_ACTIVITY_TYPES.MISSION:
 
 
-      return {
-
-
-        success:
-          true,
-
-
-        type:
-          "mission",
-
-
-        message:
-          "Mission activity accepted."
-
-
-      };
+      return startRegisteredActivity(
+        "mission",
+        activityRequest.characterId
+      );
 
 
 
+    // =========================================
+    // EXAM
+    // =========================================
 
 
     case PLAYER_ACTIVITY_TYPES.EXAM:
 
 
-      return {
-
-
-        success:
-          true,
-
-
-        type:
-          "exam",
-
-
-        message:
-          "Exam activity accepted."
-
-
-      };
-
-
+      return startRegisteredActivity(
+        "exam",
+        activityRequest.characterId
+      );
 
 
 
@@ -4475,7 +4411,6 @@ function processPlayerActivity(
 
 
 }
-
 
 
 // =========================================================
