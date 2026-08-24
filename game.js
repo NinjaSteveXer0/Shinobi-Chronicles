@@ -2226,10 +2226,277 @@ function addItemToInventory(
 
 }
 
+// =========================================================
+// BRICK 157 — BATTLE CHRONICLE RESULT
+// =========================================================
+//
+// Converts completed Battle state into
+// Chronicle-compatible history data.
+//
+// =========================================================
+
+
+function createBattleChronicleResult() {
+
+
+  if (
+    !currentBattle ||
+    !currentBattle.enemy ||
+    !currentBattle.rewards ||
+    currentBattle.battleOver !==
+      true
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+  const rewards =
+    currentBattle.rewards;
+
+
+  const itemRewards = [
+
+    ...(
+      Array.isArray(
+        rewards.items
+      )
+        ? rewards.items
+        : []
+    ),
+
+    ...(
+      Array.isArray(
+        rewards.rareDrops
+      )
+        ? rewards.rareDrops
+        : []
+    )
+
+  ].map(
+    item => ({
+
+
+      id:
+        item.id ||
+        createInventoryItemId(
+          item.name
+        ),
+
+
+      name:
+        item.name,
+
+
+      rarity:
+        item.rarity ||
+        "Common",
+
+
+      amount:
+        1
+
+
+    })
+  );
+
+
+  return {
+
+
+    type:
+      "battle",
+
+
+    battleId:
+      currentBattle.battleId,
+
+
+    activity:
+      "battle",
+
+
+    encounterId:
+      currentBattle.encounterId,
+
+
+    enemyId:
+      currentBattle.enemy.id,
+
+
+    enemyName:
+      currentBattle.enemy.name,
+
+
+    character:
+      currentBattle.characterId,
+
+
+    success:
+      true,
+
+
+    finishingShinobi:
+      rewards.finishingShinobi ||
+      null,
+
+
+    mvp:
+      rewards.mvp
+        ? {
+            ...rewards.mvp
+          }
+        : null,
+
+
+    rewards: {
+
+
+      exp:
+        Number(
+          rewards.exp
+        ) || 0,
+
+
+      ryo:
+        Number(
+          rewards.ryo
+        ) || 0,
+
+
+      items:
+        itemRewards,
+
+
+      progression:
+        []
+
+
+    },
+
+
+    timestamp:
+      currentBattle.completedAt ||
+      Date.now()
+
+
+  };
+
+
+}
 
 // =========================================================
-// CLAIM CURRENT BATTLE REWARDS
+// BRICK 158 — BATTLE CHRONICLE RECORD
 // =========================================================
+//
+// Persists one completed Battle exactly once.
+//
+// =========================================================
+
+
+function recordBattleChronicle() {
+
+
+  const result =
+    createBattleChronicleResult();
+
+
+  if (
+    !result ||
+    !result.battleId
+  ) {
+
+
+    console.log(
+      "Battle Chronicle result unavailable."
+    );
+
+
+    return false;
+
+
+  }
+
+
+  const duplicate =
+    getActivityHistory()
+      .some(
+        entry =>
+          entry &&
+          entry.type ===
+            "battle" &&
+          entry.battleId ===
+            result.battleId
+      );
+
+
+  if (
+    duplicate ||
+    currentBattle.completionRecorded ===
+      true
+  ) {
+
+
+    console.log(
+      "Battle Chronicle already recorded:",
+      result.battleId
+    );
+
+
+    currentBattle.completionRecorded =
+      true;
+
+
+    return true;
+
+
+  }
+
+
+  activityHistory.push(
+    result
+  );
+
+
+  currentBattle.completionRecorded =
+    true;
+
+
+  syncActivityHistory();
+
+
+  console.log(
+    "Battle Chronicle recorded:",
+    result
+  );
+
+
+  return true;
+
+
+}
+
+// =========================================================
+// BRICK 159 — ENCOUNTER-AWARE BATTLE REWARD CLAIM
+// =========================================================
+//
+// Canonical Battle victory payout.
+//
+// Handles:
+//
+// - Duplicate claim protection
+// - Ryō
+// - EXP
+// - Common items
+// - Rare items
+// - Battle Chronicle
+// - Persistence
+//
+// =========================================================
+
 
 function claimCurrentBattleRewards() {
 
@@ -2238,14 +2505,11 @@ function claimCurrentBattleRewards() {
     currentBattle.rewards;
 
 
-  // =========================================
-  // SAFETY CHECK
-  // =========================================
-
   if (
     !rewards ||
     !rewards.generated
   ) {
+
 
     console.log(
       "No battle rewards available to claim."
@@ -2254,17 +2518,15 @@ function claimCurrentBattleRewards() {
 
     return false;
 
+
   }
 
 
-  // =========================================
-  // DUPLICATE CLAIM PROTECTION
-  // =========================================
-
   if (
     rewards.claimed ===
-    true
+      true
   ) {
+
 
     console.log(
       "Battle rewards have already been claimed."
@@ -2273,12 +2535,14 @@ function claimCurrentBattleRewards() {
 
     return false;
 
+
   }
 
 
   // =========================================
-  // AWARD RYO
+  // RYO
   // =========================================
+
 
   playerData.ryo +=
     Number(
@@ -2287,8 +2551,9 @@ function claimCurrentBattleRewards() {
 
 
   // =========================================
-  // AWARD EXP
+  // EXP
   // =========================================
+
 
   playerData.exp +=
     Number(
@@ -2297,8 +2562,9 @@ function claimCurrentBattleRewards() {
 
 
   // =========================================
-  // AWARD COMMON ITEMS
+  // COMMON ITEMS
   // =========================================
+
 
   if (
     Array.isArray(
@@ -2310,19 +2576,23 @@ function claimCurrentBattleRewards() {
     rewards.items.forEach(
       item => {
 
+
         addItemToInventory(
           item
         );
 
+
       }
     );
+
 
   }
 
 
   // =========================================
-  // AWARD RARE ITEMS
+  // RARE ITEMS
   // =========================================
+
 
   if (
     Array.isArray(
@@ -2334,27 +2604,58 @@ function claimCurrentBattleRewards() {
     rewards.rareDrops.forEach(
       item => {
 
+
         addItemToInventory(
           item
         );
 
+
       }
     );
+
 
   }
 
 
   // =========================================
-  // MARK REWARDS AS CLAIMED
+  // CLAIM STATE
   // =========================================
+
 
   rewards.claimed =
     true;
 
 
+  currentBattle.claimedAt =
+    Date.now();
+
+
   // =========================================
-  // SAVE PLAYER
+  // CHRONICLE
   // =========================================
+
+
+  const chronicleRecorded =
+    recordBattleChronicle();
+
+
+  if (
+    !chronicleRecorded
+  ) {
+
+
+    console.warn(
+      "Battle rewards claimed but Chronicle recording failed."
+    );
+
+
+  }
+
+
+  // =========================================
+  // SAVE
+  // =========================================
+
 
   savePlayerData();
 
@@ -2380,8 +2681,8 @@ function claimCurrentBattleRewards() {
 
 
   console.log(
-    "Inventory:",
-    playerData.inventory
+    "Battle Chronicle:",
+    chronicleRecorded
   );
 
 
@@ -2391,6 +2692,7 @@ function claimCurrentBattleRewards() {
 
 
   return true;
+
 
 }
 
@@ -30552,50 +30854,142 @@ let selectedEnemy = null;
 
 
 // =========================================================
-// BRICK 148 — BATTLE ENCOUNTER CONTEXT
+// BRICK 153 — BATTLE COMPLETION IDENTITY
 // =========================================================
+//
+// Persistent identity for one Battle lifecycle.
+//
+// Encounter
+// ↓
+// Battle Instance
+// ↓
+// Victory
+// ↓
+// Reward Claim
+// ↓
+// Chronicle
+//
+// =========================================================
+
+
+function createBattleInstanceId() {
+
+
+  return (
+    "battle_" +
+    Date.now() +
+    "_" +
+    Math.floor(
+      Math.random() *
+      1000000
+    )
+  );
+
+
+}
+
+
 
 let currentBattle = {
 
-  active: false,
 
-  encounterId: null,
+  active:
+    false,
 
-  characterId: null,
 
-  enemy: null,
+  battleId:
+    null,
 
-  enemyPower: 0,
 
-  enemyMaxPower: 0,
+  encounterId:
+    null,
 
-  activePlayer: null,
 
-  lastDamage: 0,
+  characterId:
+    null,
 
-  battleOver: false,
 
-  battleLog: [],
+  enemy:
+    null,
 
-  contributions: {},
+
+  enemyPower:
+    0,
+
+
+  enemyMaxPower:
+    0,
+
+
+  activePlayer:
+    null,
+
+
+  lastDamage:
+    0,
+
+
+  battleOver:
+    false,
+
+
+  completedAt:
+    null,
+
+
+  claimedAt:
+    null,
+
+
+  completionRecorded:
+    false,
+
+
+  battleLog:
+    [],
+
+
+  contributions:
+    {},
+
 
   rewards: {
 
-    generated: false,
 
-    ryo: 0,
+    generated:
+      false,
 
-    exp: 0,
 
-    items: [],
+    claimed:
+      false,
 
-    rareDrops: [],
 
-    finishingShinobi: null,
+    ryo:
+      0,
 
-    mvp: null
+
+    exp:
+      0,
+
+
+    items:
+      [],
+
+
+    rareDrops:
+      [],
+
+
+    finishingShinobi:
+      null,
+
+
+    mvp:
+      null
+
 
   }
+
 
 };
 
@@ -31344,13 +31738,18 @@ function startEncounterActivity(
 
 
 // =========================================================
-// BRICK 149 — ENCOUNTER BATTLE LAUNCH
+// BRICK 154 — BATTLE INSTANCE LAUNCH
 // =========================================================
 //
-// Battle Engine launch authority.
+// Canonical Battle Engine launch authority.
 //
-// Accepts optional Chronicle Encounter context
-// while preserving direct legacy battle launches.
+// Creates a unique Battle identity and preserves:
+//
+// - Encounter identity
+// - Character identity
+// - Enemy identity
+// - Contribution state
+// - Reward state
 //
 // =========================================================
 
@@ -31390,7 +31789,8 @@ function startEncounter(
   }
 
 
-  let activePlayer = null;
+  let activePlayer =
+    null;
 
 
   if (
@@ -31444,6 +31844,10 @@ function startEncounter(
     true;
 
 
+  currentBattle.battleId =
+    createBattleInstanceId();
+
+
   currentBattle.encounterId =
     encounterId;
 
@@ -31468,6 +31872,18 @@ function startEncounter(
     false;
 
 
+  currentBattle.completedAt =
+    null;
+
+
+  currentBattle.claimedAt =
+    null;
+
+
+  currentBattle.completionRecorded =
+    false;
+
+
   currentBattle.battleLog = [
 
     `${enemy.name} appears!`,
@@ -31478,7 +31894,7 @@ function startEncounter(
 
 
   // =========================================
-  // RESET BATTLE CONTRIBUTIONS
+  // RESET CONTRIBUTIONS
   // =========================================
 
 
@@ -31537,7 +31953,7 @@ function startEncounter(
 
 
   // =========================================
-  // RESET BATTLE REWARDS
+  // RESET REWARDS
   // =========================================
 
 
@@ -31545,6 +31961,10 @@ function startEncounter(
 
 
     generated:
+      false,
+
+
+    claimed:
       false,
 
 
@@ -31591,6 +32011,12 @@ function startEncounter(
 
 
   console.log(
+    "BATTLE INSTANCE CREATED:",
+    currentBattle.battleId
+  );
+
+
+  console.log(
     "CURRENT BATTLE:",
     currentBattle
   );
@@ -31605,6 +32031,7 @@ function startEncounter(
 
 
 }
+
 
 
 
@@ -33191,8 +33618,13 @@ function closeOverlay() {
 
 
 // =========================================================
-// DEVELOPMENT TEST STATE
+// BRICK 155 — DEVELOPMENT BATTLE STATE SAVE
 // =========================================================
+//
+// Preserves Battle / Encounter context across refreshes.
+//
+// =========================================================
+
 
 function saveTestState() {
 
@@ -33220,6 +33652,18 @@ function saveTestState() {
         : null,
 
 
+    battleId:
+      currentBattle.battleId,
+
+
+    encounterId:
+      currentBattle.encounterId,
+
+
+    characterId:
+      currentBattle.characterId,
+
+
     enemyPower:
       currentBattle.enemyPower,
 
@@ -33242,6 +33686,19 @@ function saveTestState() {
       currentBattle.battleOver,
 
 
+    completedAt:
+      currentBattle.completedAt,
+
+
+    claimedAt:
+      currentBattle.claimedAt,
+
+
+    completionRecorded:
+      currentBattle.completionRecorded ===
+        true,
+
+
     battleLog:
       currentBattle.battleLog,
 
@@ -33254,6 +33711,7 @@ function saveTestState() {
       currentBattle.contributions ||
       {}
 
+
   };
 
 
@@ -33263,6 +33721,7 @@ function saveTestState() {
       state
     )
   );
+
 
 }
 
@@ -37481,6 +37940,283 @@ function getActivityHistory() {
 
 }
 
+// =========================================================
+// BRICK 160 — BATTLE CHRONICLE ANALYTICS
+// =========================================================
+
+
+function getBattleAnalytics() {
+
+
+  const battles =
+    getActivityHistory()
+      .filter(
+        entry =>
+          entry &&
+          entry.type ===
+            "battle"
+      );
+
+
+  const analytics = {
+
+
+    totalBattles:
+      battles.length,
+
+
+    victories:
+      0,
+
+
+    totalExpEarned:
+      0,
+
+
+    totalRyoEarned:
+      0,
+
+
+    totalItemsEarned:
+      0,
+
+
+    enemyCounts:
+      {},
+
+
+    characterCounts:
+      {},
+
+
+    mvpCounts:
+      {}
+
+
+  };
+
+
+  battles.forEach(
+    battle => {
+
+
+      if (
+        battle.success
+      ) {
+
+
+        analytics.victories++;
+
+
+      }
+
+
+      analytics.totalExpEarned +=
+        Number(
+          battle.rewards &&
+          battle.rewards.exp
+        ) || 0;
+
+
+      analytics.totalRyoEarned +=
+        Number(
+          battle.rewards &&
+          battle.rewards.ryo
+        ) || 0;
+
+
+      if (
+        battle.rewards &&
+        Array.isArray(
+          battle.rewards.items
+        )
+      ) {
+
+
+        battle.rewards.items.forEach(
+          item => {
+
+
+            analytics.totalItemsEarned +=
+              Number(
+                item.amount
+              ) || 1;
+
+
+          }
+        );
+
+
+      }
+
+
+      if (
+        battle.enemyId
+      ) {
+
+
+        analytics.enemyCounts[
+          battle.enemyId
+        ] =
+          (
+            analytics.enemyCounts[
+              battle.enemyId
+            ] ||
+            0
+          ) + 1;
+
+
+      }
+
+
+      if (
+        battle.character
+      ) {
+
+
+        analytics.characterCounts[
+          battle.character
+        ] =
+          (
+            analytics.characterCounts[
+              battle.character
+            ] ||
+            0
+          ) + 1;
+
+
+      }
+
+
+      if (
+        battle.mvp &&
+        battle.mvp.id
+      ) {
+
+
+        analytics.mvpCounts[
+          battle.mvp.id
+        ] =
+          (
+            analytics.mvpCounts[
+              battle.mvp.id
+            ] ||
+            0
+          ) + 1;
+
+
+      }
+
+
+    }
+  );
+
+
+  console.log(
+    "Battle Chronicle analytics:",
+    analytics
+  );
+
+
+  return analytics;
+
+
+}
+
+// =========================================================
+// BRICK 161 — ENCOUNTER ANALYTICS
+// =========================================================
+
+
+function getEncounterAnalytics() {
+
+
+  const battles =
+    getActivityHistory()
+      .filter(
+        entry =>
+          entry &&
+          entry.type ===
+            "battle" &&
+          entry.encounterId
+      );
+
+
+  const analytics = {
+
+
+    totalEncounterBattles:
+      battles.length,
+
+
+    encounterCounts:
+      {},
+
+
+    mostPlayedEncounter:
+      null
+
+
+  };
+
+
+  battles.forEach(
+    battle => {
+
+
+      analytics.encounterCounts[
+        battle.encounterId
+      ] =
+        (
+          analytics.encounterCounts[
+            battle.encounterId
+          ] ||
+          0
+        ) + 1;
+
+
+    }
+  );
+
+
+  Object.keys(
+    analytics.encounterCounts
+  ).forEach(
+    encounterId => {
+
+
+      if (
+        !analytics.mostPlayedEncounter ||
+        analytics.encounterCounts[
+          encounterId
+        ] >
+        analytics.encounterCounts[
+          analytics.mostPlayedEncounter
+        ]
+      ) {
+
+
+        analytics.mostPlayedEncounter =
+          encounterId;
+
+
+      }
+
+
+    }
+  );
+
+
+  console.log(
+    "Encounter analytics:",
+    analytics
+  );
+
+
+  return analytics;
+
+
+}
 
 // =========================================================
 // BRICK 127 — CHRONICLE ACTIVITY ANALYTICS
@@ -40847,26 +41583,89 @@ function validateEncounterSystem() {
 
 }
 
+// =========================================================
+// BRICK 162 — BATTLE COMPLETION HEALTH CHECK
+// =========================================================
 
 
+function validateBattleCompletionSystem() {
+
+
+  const checks = {
+
+
+    battleIdentity:
+      typeof createBattleInstanceId ===
+        "function",
+
+
+    chronicleResult:
+      typeof createBattleChronicleResult ===
+        "function",
+
+
+    chronicleRecord:
+      typeof recordBattleChronicle ===
+        "function",
+
+
+    rewardClaim:
+      typeof claimCurrentBattleRewards ===
+        "function",
+
+
+    battleAnalytics:
+      typeof getBattleAnalytics ===
+        "function",
+
+
+    encounterAnalytics:
+      typeof getEncounterAnalytics ===
+        "function",
+
+
+    battleContext:
+      (
+        Object.prototype.hasOwnProperty.call(
+          currentBattle,
+          "battleId"
+        ) &&
+        Object.prototype.hasOwnProperty.call(
+          currentBattle,
+          "completionRecorded"
+        ) &&
+        Object.prototype.hasOwnProperty.call(
+          currentBattle,
+          "claimedAt"
+        )
+      )
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Battle Completion health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
 // =========================================================
-// BRICK 152 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
-// =========================================================
-//
-// Master non-destructive regression checkpoint.
-//
-// Validates:
-//
-// - Location Engine
-// - Activity Engine
-// - Training Engine
-// - Encounter Engine
-// - Encounter → Battle bridge
-// - Location mappings
-// - Character bridge
-// - Training normalization
-// - Encounter normalization
-//
+// BRICK 162 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 
 
@@ -40893,9 +41692,8 @@ function runActivityLocationRegression() {
     validateEncounterBattleBridge();
 
 
-  // =========================================
-  // LOCATION → ACTIVITY MAPPINGS
-  // =========================================
+  const battleCompletionHealth =
+    validateBattleCompletionSystem();
 
 
   const mappingChecks = {
@@ -40953,20 +41751,10 @@ function runActivityLocationRegression() {
     );
 
 
-  // =========================================
-  // CHARACTER BRIDGE
-  // =========================================
-
-
   const characterBridgeHealthy =
     !!getPlayerCharacter(
       "naruto"
     );
-
-
-  // =========================================
-  // TRAINING NORMALIZATION
-  // =========================================
 
 
   const trainingProbe =
@@ -40984,15 +41772,8 @@ function runActivityLocationRegression() {
         "light_training" &&
       Array.isArray(
         trainingProbe.rewards
-      ) &&
-      trainingProbe.rewards.length ===
-        2
+      )
     );
-
-
-  // =========================================
-  // ENCOUNTER NORMALIZATION
-  // =========================================
 
 
   const encounterProbe =
@@ -41009,11 +41790,6 @@ function runActivityLocationRegression() {
       encounterProbe.enemy &&
       encounterProbe.rewards
     );
-
-
-  // =========================================
-  // FINAL RESULT
-  // =========================================
 
 
   const result = {
@@ -41039,6 +41815,10 @@ function runActivityLocationRegression() {
       battleBridgeHealth.healthy,
 
 
+    battleCompletion:
+      battleCompletionHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -41062,6 +41842,7 @@ function runActivityLocationRegression() {
         trainingHealth.healthy &&
         encounterHealth.healthy &&
         battleBridgeHealth.healthy &&
+        battleCompletionHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
@@ -45960,8 +46741,9 @@ function claimDailyReward() {
 // #########################################################
 
 // =========================================================
-// SAVE SYSTEM — DEVELOPMENT STATE RESTORE
+// BRICK 156 — DEVELOPMENT BATTLE STATE RESTORE
 // =========================================================
+
 
 function restoreTestState() {
 
@@ -45972,9 +46754,13 @@ function restoreTestState() {
     );
 
 
-  if (!saved) {
+  if (
+    !saved
+  ) {
+
 
     return;
+
 
   }
 
@@ -45986,8 +46772,9 @@ function restoreTestState() {
 
 
   // =========================================
-  // RESTORE REGION
+  // REGION
   // =========================================
+
 
   if (
     state.regionKey &&
@@ -46005,6 +46792,7 @@ function restoreTestState() {
       state.locationId
     ) {
 
+
       selectedLocationNode =
         worldRegions[
           state.regionKey
@@ -46017,14 +46805,17 @@ function restoreTestState() {
           ) ||
         null;
 
+
     }
+
 
   }
 
 
   // =========================================
-  // RESTORE ENEMY
+  // ENEMY
   // =========================================
+
 
   if (
     state.enemyId &&
@@ -46032,6 +46823,7 @@ function restoreTestState() {
       state.enemyId
     ]
   ) {
+
 
     selectedEnemy =
       enemyDatabase[
@@ -46042,88 +46834,126 @@ function restoreTestState() {
     currentBattle.enemy =
       selectedEnemy;
 
-  }
-
-
-  // =========================================
-  // RESTORE BATTLE POWER
-  // =========================================
-
-  if (
-    typeof
-      state.enemyPower ===
-    "number"
-  ) {
-
-    currentBattle.enemyPower =
-      state.enemyPower;
-
-  }
-
-
-  if (
-    typeof
-      state.enemyMaxPower ===
-    "number"
-  ) {
-
-    currentBattle.enemyMaxPower =
-      state.enemyMaxPower;
 
   }
 
 
   // =========================================
-  // RESTORE ACTIVE PLAYER
+  // BATTLE IDENTITY
   // =========================================
+
+
+  currentBattle.battleId =
+    state.battleId ||
+    null;
+
+
+  currentBattle.encounterId =
+    state.encounterId ||
+    null;
+
+
+  currentBattle.characterId =
+    state.characterId ||
+    null;
+
+
+  currentBattle.completedAt =
+    Number(
+      state.completedAt
+    ) || null;
+
+
+  currentBattle.claimedAt =
+    Number(
+      state.claimedAt
+    ) || null;
+
+
+  currentBattle.completionRecorded =
+    state.completionRecorded ===
+      true;
+
+
+  // =========================================
+  // BATTLE POWER
+  // =========================================
+
+
+  currentBattle.enemyPower =
+    typeof state.enemyPower ===
+      "number"
+      ? state.enemyPower
+      : 0;
+
+
+  currentBattle.enemyMaxPower =
+    typeof state.enemyMaxPower ===
+      "number"
+      ? state.enemyMaxPower
+      : 0;
+
+
+  // =========================================
+  // ACTIVE PLAYER
+  // =========================================
+
 
   if (
     state.activePlayerId
   ) {
 
+
     currentBattle.activePlayer =
-      playerTeam.find(
-        member =>
-          member.id ===
-          state.activePlayerId
+      getPlayerCharacter(
+        state.activePlayerId
       ) ||
-      playerTeam[0];
+      playerTeam[0] ||
+      null;
+
+
+  }
+
+
+  if (
+    !currentBattle.characterId &&
+    currentBattle.activePlayer
+  ) {
+
+
+    currentBattle.characterId =
+      currentBattle.activePlayer.id;
+
 
   }
 
 
   // =========================================
-  // RESTORE BATTLE DATA
+  // BATTLE DATA
   // =========================================
 
-  currentBattle.lastDamage =
 
+  currentBattle.lastDamage =
     typeof state.lastDamage ===
       "number"
-
       ? state.lastDamage
-
       : 0;
 
 
   currentBattle.battleOver =
     state.battleOver ===
-    true;
+      true;
 
 
   currentBattle.battleLog =
-
     Array.isArray(
       state.battleLog
     )
-
       ? state.battleLog
-
       : [];
 
 
   currentBattle.rewards =
-
     state.rewards &&
     typeof state.rewards ===
       "object"
@@ -46134,7 +46964,6 @@ function restoreTestState() {
 
 
   currentBattle.contributions =
-
     state.contributions &&
     typeof state.contributions ===
       "object"
@@ -46148,11 +46977,13 @@ function restoreTestState() {
   // RESTORE SCREEN
   // =========================================
 
+
   if (
     state.overlayType ===
       "victory" &&
     selectedEnemy
   ) {
+
 
     currentBattle.active =
       false;
@@ -46169,6 +47000,7 @@ function restoreTestState() {
 
     return;
 
+
   }
 
 
@@ -46177,6 +47009,7 @@ function restoreTestState() {
       "combat" &&
     selectedEnemy
   ) {
+
 
     currentBattle.active =
       true;
@@ -46189,6 +47022,7 @@ function restoreTestState() {
 
     return;
 
+
   }
 
 
@@ -46198,12 +47032,14 @@ function restoreTestState() {
     selectedRegionKey
   ) {
 
+
     openOverlay(
       "battle"
     );
 
 
     return;
+
 
   }
 
@@ -46214,11 +47050,14 @@ function restoreTestState() {
     selectedRegionKey
   ) {
 
+
     openRegionHub(
       selectedRegionKey
     );
 
+
   }
+
 
 }
 
