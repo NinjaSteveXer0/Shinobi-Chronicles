@@ -46480,10 +46480,20 @@ function closeKonohaActivityUIScreen() {
       "none";
 
 
+    delete root.dataset.serviceId;
+
+
   }
 
 
-  closeKonohaActivityUISession();
+  KONOHA_ACTIVITY_UI_STATE
+    .serviceId =
+      null;
+
+
+  KONOHA_ACTIVITY_UI_STATE
+    .characterId =
+      null;
 
 
   return true;
