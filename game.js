@@ -46295,6 +46295,350 @@ function validateKonohaActivityUIDataSystem() {
 }
 
 
+// =========================================================
+// BRICK 223 — KONOHA ACTIVITY SCREEN RENDERER FOUNDATION
+// =========================================================
+//
+// Presentation authority for the Konoha Exam / Practical UI.
+//
+// IMPORTANT:
+//
+// This layer does NOT own:
+// - progression
+// - rewards
+// - eligibility
+// - character data
+// - activity execution
+//
+// It consumes the existing Konoha Activity UI data layer.
+//
+// =========================================================
+
+
+function getKonohaActivityUIScreenData(
+  serviceId
+) {
+
+
+  const session =
+    getKonohaActivityUISessionState();
+
+
+  const selectedCharacterId =
+    session.characterId;
+
+
+  if (
+    serviceId === "exams"
+  ) {
+
+
+    return getKonohaExamUIScreenData(
+      selectedCharacterId
+    );
+
+
+  }
+
+
+  if (
+    serviceId === "practical"
+  ) {
+
+
+    return getKonohaPracticalUIScreenData(
+      selectedCharacterId
+    );
+
+
+  }
+
+
+  return null;
+
+
+}
+
+
+// =========================================================
+// KONOHA ACTIVITY UI ROOT QUERY
+// =========================================================
+
+
+function getKonohaActivityUIRoot() {
+
+
+  return document.getElementById(
+    "konoha-activity-screen"
+  );
+
+
+}
+
+
+// =========================================================
+// KONOHA ACTIVITY UI ROOT CREATOR
+// =========================================================
+
+
+function ensureKonohaActivityUIRoot() {
+
+
+  let root =
+    getKonohaActivityUIRoot();
+
+
+  if (root) {
+
+
+    return root;
+
+
+  }
+
+
+  root =
+    document.createElement(
+      "div"
+    );
+
+
+  root.id =
+    "konoha-activity-screen";
+
+
+  root.className =
+    "konoha-activity-screen";
+
+
+  root.style.display =
+    "none";
+
+
+  document.body.appendChild(
+    root
+  );
+
+
+  return root;
+
+
+}
+
+
+// =========================================================
+// KONOHA ACTIVITY UI CLEAR
+// =========================================================
+
+
+function clearKonohaActivityUIScreen() {
+
+
+  const root =
+    getKonohaActivityUIRoot();
+
+
+  if (!root) {
+
+
+    return false;
+
+
+  }
+
+
+  root.innerHTML =
+    "";
+
+
+  return true;
+
+
+}
+
+
+// =========================================================
+// KONOHA ACTIVITY UI CLOSE
+// =========================================================
+
+
+function closeKonohaActivityUIScreen() {
+
+
+  const root =
+    getKonohaActivityUIRoot();
+
+
+  if (root) {
+
+
+    root.innerHTML =
+      "";
+
+
+    root.style.display =
+      "none";
+
+
+  }
+
+
+  closeKonohaActivityUISession();
+
+
+  return true;
+
+
+}
+
+
+// =========================================================
+// KONOHA ACTIVITY UI FOUNDATION RENDERER
+// =========================================================
+
+
+function renderKonohaActivityUIScreen(
+  serviceId
+) {
+
+
+  const root =
+    ensureKonohaActivityUIRoot();
+
+
+  const data =
+    getKonohaActivityUIScreenData(
+      serviceId
+    );
+
+
+  if (!data) {
+
+
+    console.log(
+      "Konoha Activity UI render failed:",
+      serviceId
+    );
+
+
+    return false;
+
+
+  }
+
+
+  root.innerHTML =
+    "";
+
+
+  root.dataset.serviceId =
+    serviceId;
+
+
+  root.style.display =
+    "block";
+
+
+  const shell =
+    document.createElement(
+      "div"
+    );
+
+
+  shell.className =
+    "konoha-activity-shell";
+
+
+  shell.dataset.screen =
+    data.screen;
+
+
+  root.appendChild(
+    shell
+  );
+
+
+  console.log(
+    "KONOHA ACTIVITY UI RENDER:",
+    {
+      serviceId:
+        serviceId,
+
+      screen:
+        data.screen,
+
+      characterId:
+        data.selectedCharacterId
+    }
+  );
+
+
+  return true;
+
+
+}
+
+
+// =========================================================
+// KONOHA ACTIVITY UI OPEN + RENDER BRIDGE
+// =========================================================
+
+
+function showKonohaActivityUIScreen(
+  serviceId,
+  characterId
+) {
+
+
+  const sessionResult =
+    openKonohaActivityUIScreen(
+      serviceId,
+      characterId
+    );
+
+
+  if (
+    !sessionResult ||
+    sessionResult.success !== true
+  ) {
+
+
+    return sessionResult;
+
+
+  }
+
+
+  const rendered =
+    renderKonohaActivityUIScreen(
+      serviceId
+    );
+
+
+  return {
+
+
+    success:
+      rendered === true,
+
+
+    serviceId:
+      serviceId,
+
+
+    characterId:
+      characterId,
+
+
+    rendered:
+      rendered === true
+
+
+  };
+
+
+}
+
 
 
 // =========================================================
