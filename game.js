@@ -40000,22 +40000,26 @@ function validateActivitySystem() {
 }
 
 // =========================================================
-// BRICK 133 — ACTIVITY / LOCATION INTEGRATION REGRESSION
+// BRICK 142 — CHRONICLE ACTIVITY INTEGRATION REGRESSION
 // =========================================================
 //
-// Master non-destructive regression checkpoint
-// for the current Chronicle Engine integration phase.
+// Master non-destructive regression checkpoint.
 //
 // Validates:
+//
 // - Location Engine
 // - Activity Engine
+// - Training Engine
 // - Location → Activity mappings
-// - Character-aware execution routes
+// - Character bridge
+// - Training data normalization
 //
 // Does NOT:
+//
 // - Award EXP
 // - Award Ryō
-// - Modify history
+// - Modify inventory
+// - Modify Activity History
 // - Modify save data
 //
 // =========================================================
@@ -40032,6 +40036,16 @@ function runActivityLocationRegression() {
   const activityHealth =
     validateActivitySystem();
 
+
+
+  const trainingHealth =
+    validateTrainingSystem();
+
+
+
+  // =========================================
+  // LOCATION → ACTIVITY MAPPINGS
+  // =========================================
 
 
   const mappingChecks = {
@@ -40091,11 +40105,49 @@ function runActivityLocationRegression() {
 
 
 
+  // =========================================
+  // CHARACTER BRIDGE
+  // =========================================
+
+
   const characterBridgeHealthy =
     !!getPlayerCharacter(
       "naruto"
     );
 
+
+
+  // =========================================
+  // TRAINING NORMALIZATION
+  // =========================================
+
+
+  const trainingProbe =
+    normalizeTrainingActivityDefinition(
+      getTrainingActivityData(
+        "light_training"
+      )
+    );
+
+
+
+  const trainingNormalizationHealthy =
+    !!(
+      trainingProbe &&
+      trainingProbe.id ===
+        "light_training" &&
+      Array.isArray(
+        trainingProbe.rewards
+      ) &&
+      trainingProbe.rewards.length ===
+        2
+    );
+
+
+
+  // =========================================
+  // FINAL RESULT
+  // =========================================
 
 
   const result = {
@@ -40109,6 +40161,10 @@ function runActivityLocationRegression() {
       activityHealth.healthy,
 
 
+    trainingEngine:
+      trainingHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -40117,12 +40173,18 @@ function runActivityLocationRegression() {
       characterBridgeHealthy,
 
 
+    trainingNormalization:
+      trainingNormalizationHealthy,
+
+
     healthy:
       (
         locationHealth.healthy &&
         activityHealth.healthy &&
+        trainingHealth.healthy &&
         mappingsHealthy &&
-        characterBridgeHealthy
+        characterBridgeHealthy &&
+        trainingNormalizationHealthy
       )
 
 
@@ -40136,7 +40198,7 @@ function runActivityLocationRegression() {
 
 
   console.log(
-    "ACTIVITY / LOCATION REGRESSION"
+    "CHRONICLE ACTIVITY INTEGRATION REGRESSION"
   );
 
 
@@ -40164,44 +40226,20 @@ function runActivityLocationRegression() {
 
 
 // =========================================================
-// TRAINING ACTIVITY DATA BRIDGE
+// BRICK 140 — LEGACY TRAINING DATA BRIDGE RETIRED
 // =========================================================
-
-function getTrainingActivityData(
-  activityId
-) {
-
-
-  const training =
-    TRAINING_DATABASE?.[activityId];
-
-
-  if (
-    !training
-  ) {
-
-    return null;
-
-  }
-
-
-  return {
-
-    id:
-      activityId,
-
-    name:
-      training.name,
-
-    exp:
-      training.exp,
-
-    rewards:
-      training.rewards
-
-  };
-
-}
+//
+// Duplicate getTrainingActivityData() authority removed.
+//
+// Canonical Training data authority now lives with:
+//
+// TRAINING_DATABASE
+// ↓
+// getTrainingActivityData()
+//
+// No runtime logic belongs in this retired bridge.
+//
+// =========================================================
 
 // =========================================================
 // TRAINING DATA VALIDATION
@@ -40511,6 +40549,31 @@ function renderTrainingOverlay(
 
   `;
 }
+
+// #########################################################
+// BRICK 141 — CANONICAL TRAINING ENGINE
+// #########################################################
+//
+// Chronicle Engine Training Module
+//
+// Canonical authority for:
+//
+// TRAINING_DATABASE
+// ↓
+// getTrainingActivityData()
+// ↓
+// normalizeTrainingActivityDefinition()
+// ↓
+// getTrainingActivityReadiness()
+// ↓
+// startTraining()
+// ↓
+// executeActivityDefinition()
+//
+// Legacy helper bridges above this point may READ from
+// this module but must not redefine its data authority.
+//
+// #########################################################
 
 // =========================================================
 // TRAINING ACTIVITY DATABASE
