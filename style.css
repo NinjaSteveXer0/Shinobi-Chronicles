@@ -6748,29 +6748,22 @@ body {
 }
 
 /* =========================================================
-   BRICK 295 — EXAM LIVE DATA COORDINATE AUTHORITY
+   BRICK 304 — EXAM DISCIPLINE LIVE DATA CALIBRATION
    ========================================================= */
 
 /*
-   IMPORTANT:
+   FINAL LIVE-DATA CALIBRATION.
 
-   Every live value below is positioned relative to ONE
-   discipline card.
+   The baked artwork remains authoritative.
 
-   The baked artwork owns:
-
-   NINJUTSU / GENJUTSU / FUINJUTSU
-   Level
-   EXPERIENCE
-   EXAM REWARD
-   progress-bar frame
+   Each discipline has its own vertical calibration because
+   the three baked panels are not pixel-identical internally.
 
    DOM owns only:
-
-   current level
-   current / required EXP
-   progress fill
-   reward amount
+   - level value
+   - experience value
+   - progress fill
+   - reward value
 */
 
 
@@ -6795,14 +6788,11 @@ body {
     overflow:
         hidden !important;
 
-    contain:
-        layout paint;
-
 }
 
 
 /* =========================================================
-   BRICK 296 — LEVEL + EXPERIENCE VALUES
+   LEVEL VALUES
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6813,9 +6803,6 @@ body {
 
     left:
         21.4% !important;
-
-    top:
-        38.5% !important;
 
     width:
         auto !important;
@@ -6860,6 +6847,46 @@ body {
 }
 
 
+/* NINJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="nin"]
+.exam-live-level {
+
+    top:
+        39.5% !important;
+
+}
+
+
+/* GENJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="gen"]
+.exam-live-level {
+
+    top:
+        44.0% !important;
+
+}
+
+
+/* FUINJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="fuin"]
+.exam-live-level {
+
+    top:
+        44.0% !important;
+
+}
+
+
+/* =========================================================
+   EXPERIENCE VALUES
+   ========================================================= */
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-live-experience {
 
@@ -6868,9 +6895,6 @@ body {
 
     left:
         61.0% !important;
-
-    top:
-        28.8% !important;
 
     width:
         auto !important;
@@ -6893,14 +6917,14 @@ body {
     gap:
         3px !important;
 
+    color:
+        #ded3b5 !important;
+
     background:
         transparent !important;
 
     border:
         none !important;
-
-    color:
-        #ded3b5 !important;
 
     font-size:
         clamp(
@@ -6936,8 +6960,44 @@ body {
 }
 
 
+/* NINJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="nin"]
+.exam-live-experience {
+
+    top:
+        29.5% !important;
+
+}
+
+
+/* GENJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="gen"]
+.exam-live-experience {
+
+    top:
+        34.0% !important;
+
+}
+
+
+/* FUINJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="fuin"]
+.exam-live-experience {
+
+    top:
+        34.0% !important;
+
+}
+
+
 /* =========================================================
-   BRICK 297 — PROGRESS BAR INSIDE BAKED TRACK
+   PROGRESS TRACK BASE
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6949,20 +7009,17 @@ body {
     left:
         21.0% !important;
 
-    top:
-        61.2% !important;
-
     width:
         54.6% !important;
 
     height:
-        5.4% !important;
+        5.2% !important;
 
     min-height:
         3px !important;
 
     max-height:
-        10px !important;
+        8px !important;
 
     margin:
         0 !important;
@@ -6978,7 +7035,7 @@ body {
             2,
             14,
             17,
-            0.32
+            0.18
         ) !important;
 
     border:
@@ -6995,6 +7052,58 @@ body {
 
 }
 
+
+/*
+   NINJUTSU
+
+   Current bar is only slightly too high.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="nin"]
+.exam-progress-track {
+
+    top:
+        67.0% !important;
+
+}
+
+
+/*
+   GENJUTSU
+
+   Current bar is substantially too high.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="gen"]
+.exam-progress-track {
+
+    top:
+        79.0% !important;
+
+}
+
+
+/*
+   FUINJUTSU
+
+   Same problem as Genjutsu.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="fuin"]
+.exam-progress-track {
+
+    top:
+        79.0% !important;
+
+}
+
+
+/* =========================================================
+   PROGRESS FILL
+   ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-progress-fill {
@@ -7050,7 +7159,7 @@ body {
 
 
 /* =========================================================
-   BRICK 298 — REWARD VALUE
+   REWARD VALUES
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -7061,9 +7170,6 @@ body {
 
     left:
         21.0% !important;
-
-    top:
-        77.2% !important;
 
     width:
         auto !important;
@@ -7104,6 +7210,42 @@ body {
 
     z-index:
         6;
+
+}
+
+
+/* NINJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="nin"]
+.exam-live-reward {
+
+    top:
+        79.0% !important;
+
+}
+
+
+/* GENJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="gen"]
+.exam-live-reward {
+
+    top:
+        88.0% !important;
+
+}
+
+
+/* FUINJUTSU */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="fuin"]
+.exam-live-reward {
+
+    top:
+        88.0% !important;
 
 }
 
