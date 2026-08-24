@@ -5194,3 +5194,885 @@ body {
 
 }
 
+/* =========================================================
+   BRICK 245 — EXAM REFERENCE CANVAS FIT
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"] {
+
+    display: grid;
+
+    place-items: center;
+
+    width: 100vw;
+    height: 100dvh;
+
+    overflow: hidden;
+
+    background: #020507;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.konoha-exam-screen {
+
+    position: relative;
+
+    width:
+        min(
+            100vw,
+            139.383dvh
+        );
+
+    aspect-ratio:
+        1536 / 1102;
+
+    min-height: 0;
+    height: auto;
+
+    max-width: 100vw;
+    max-height: 100dvh;
+
+    margin: 0;
+    padding: 0;
+
+    overflow: hidden;
+
+    background:
+        url("./Assets/Backgrounds/exams.png")
+        center center /
+        100% 100%
+        no-repeat;
+}
+
+/* =========================================================
+   BRICK 246 — REMOVE LEGACY EXAM GHOST LAYER
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.konoha-exam-screen::before {
+
+    display: none !important;
+
+    content: none !important;
+}
+
+
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.konoha-exam-screen > * {
+
+    position: relative;
+
+    z-index: 2;
+}
+
+/* =========================================================
+   BRICK 247 — EXAM BAKED HEADER AUTHORITY
+   ========================================================= */
+
+/*
+   exams.png already owns:
+   - KONOHA
+   - SHINOBI EXAMS
+   - subtitle
+   - ornate header framing
+
+   Hide the duplicate DOM header only.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-header {
+    display: none !important;
+}
+
+/* =========================================================
+   BRICK 248 — EXAM LIVE OVERLAY GEOMETRY
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-main-grid {
+
+    position: absolute !important;
+
+    inset: 0 !important;
+
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: none !important;
+
+    margin: 0 !important;
+    padding: 0 !important;
+
+    pointer-events: none;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-main-grid > * {
+
+    pointer-events: auto;
+}
+
+/* =========================================================
+   BRICK 249 — EXAM CHARACTER FRAME + CARD FIT
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-panel {
+
+    position: absolute !important;
+
+    left: 3.35% !important;
+    top: 12.1% !important;
+
+    width: 27.6% !important;
+    height: 60.8% !important;
+
+    margin: 0 !important;
+
+    padding:
+        1.15% !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    overflow:
+        hidden !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-image-wrap {
+
+    position: relative !important;
+
+    width: 100% !important;
+    height: 62% !important;
+
+    min-height: 0 !important;
+
+    margin: 0 !important;
+
+    display: flex !important;
+
+    align-items: center !important;
+    justify-content: center !important;
+
+    overflow: hidden !important;
+
+    border:
+        none !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-image {
+
+    display: block !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    max-width: 100% !important;
+    max-height: 100% !important;
+
+    object-fit:
+        contain !important;
+
+    object-position:
+        center center !important;
+
+    filter:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-image-wrap:hover
+.exam-character-image {
+
+    transform:
+        none !important;
+
+    filter:
+        none !important;
+}
+
+/* =========================================================
+   BRICK 250 — EXAM CHARACTER DATA + SELECTOR
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-selector {
+
+    position: absolute !important;
+
+    top: 50% !important;
+    left: 0 !important;
+    right: 0 !important;
+
+    transform:
+        translateY(-50%) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-arrow {
+
+    width: 11% !important;
+    min-width: 30px !important;
+
+    height: 48px !important;
+
+    border:
+        1px solid
+        rgba(218, 172, 59, 0.75) !important;
+
+    background:
+        rgba(2, 8, 10, 0.88) !important;
+
+    color:
+        #44e5e9 !important;
+
+    font-size:
+        clamp(
+            17px,
+            1.45vw,
+            25px
+        ) !important;
+
+    cursor: pointer !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-name {
+
+    margin-top:
+        1.8% !important;
+
+    font-size:
+        clamp(
+            14px,
+            1.45vw,
+            27px
+        ) !important;
+
+    line-height:
+        1.05 !important;
+
+    color:
+        #f0cc72 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-rank {
+
+    margin-top:
+        0.7% !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.78vw,
+            14px
+        ) !important;
+
+    color:
+        #43dfe4 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-pl {
+
+    margin:
+        1.5%
+        0 !important;
+
+    font-size:
+        clamp(
+            13px,
+            1.25vw,
+            22px
+        ) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-pl strong {
+
+    font-size:
+        clamp(
+            18px,
+            1.8vw,
+            32px
+        ) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-meta {
+
+    padding-top:
+        1% !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-meta-row {
+
+    padding:
+        1.15%
+        3% !important;
+
+    font-size:
+        clamp(
+            7px,
+            0.66vw,
+            12px
+        ) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-change-character {
+
+    margin-top:
+        1.2% !important;
+
+    padding:
+        1.7% !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.72vw,
+            13px
+        ) !important;
+
+    background:
+        rgba(3, 9, 11, 0.86) !important;
+}
+
+/* =========================================================
+   BRICK 251 — EXAM DISCIPLINE LIVE DATA OVERLAY
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-main-grid > section {
+
+    position:
+        static !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-heading {
+
+    display:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-stack {
+
+    position:
+        absolute !important;
+
+    left:
+        32.6% !important;
+
+    top:
+        17.1% !important;
+
+    width:
+        63.7% !important;
+
+    height:
+        50.8% !important;
+
+    display:
+        grid !important;
+
+    grid-template-rows:
+        repeat(
+            3,
+            1fr
+        ) !important;
+
+    gap:
+        1.55% !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card {
+
+    position:
+        relative !important;
+
+    min-height:
+        0 !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    overflow:
+        visible !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card::before {
+
+    display:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-name {
+
+    display:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-top {
+
+    position:
+        absolute !important;
+
+    inset:
+        0 !important;
+
+    display:
+        block !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-level {
+
+    position:
+        absolute !important;
+
+    left:
+        20.5% !important;
+
+    top:
+        34.5% !important;
+
+    margin:
+        0 !important;
+
+    font-size:
+        0 !important;
+
+    color:
+        transparent !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-level strong {
+
+    color:
+        #45e3e7 !important;
+
+    font-size:
+        clamp(
+            10px,
+            0.92vw,
+            18px
+        ) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-exp {
+
+    position:
+        absolute !important;
+
+    left:
+        60.7% !important;
+
+    top:
+        26% !important;
+
+    width:
+        18% !important;
+
+    text-align:
+        left !important;
+
+    color:
+        transparent !important;
+
+    font-size:
+        0 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-exp strong {
+
+    color:
+        #45e4e8 !important;
+
+    font-size:
+        clamp(
+            11px,
+            1vw,
+            19px
+        ) !important;
+}
+
+/* =========================================================
+   BRICK 252 — EXAM EXP + LOWER LIVE CONTROLS
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-progress-track {
+
+    position:
+        absolute !important;
+
+    left:
+        20.5% !important;
+
+    top:
+        52% !important;
+
+    width:
+        55.2% !important;
+
+    height:
+        10% !important;
+
+    margin:
+        0 !important;
+
+    border:
+        none !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    overflow:
+        hidden !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-progress-fill {
+
+    height:
+        100% !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(2, 112, 124, 0.88),
+            rgba(7, 196, 205, 0.95),
+            rgba(46, 238, 238, 0.98)
+        ) !important;
+
+    box-shadow:
+        0 0 8px
+        rgba(30, 224, 230, 0.36) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-reward {
+
+    position:
+        absolute !important;
+
+    left:
+        20.5% !important;
+
+    bottom:
+        10% !important;
+
+    margin:
+        0 !important;
+
+    color:
+        transparent !important;
+
+    font-size:
+        0 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-reward strong {
+
+    margin-left:
+        0 !important;
+
+    color:
+        #45e4e8 !important;
+
+    font-size:
+        clamp(
+            9px,
+            0.78vw,
+            15px
+        ) !important;
+}
+
+
+/* =========================================
+   LOWER LAYOUT
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-lower-grid {
+
+    position:
+        static !important;
+
+    display:
+        contents !important;
+
+    margin:
+        0 !important;
+}
+
+
+/* =========================================
+   BEGIN EXAM
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-begin-wrap {
+
+    position:
+        absolute !important;
+
+    left:
+        32.6% !important;
+
+    top:
+        72.4% !important;
+
+    width:
+        34.1% !important;
+
+    height:
+        12.3% !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-begin-button {
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
+
+    padding:
+        0 !important;
+
+    border:
+        none !important;
+
+    background:
+        transparent !important;
+
+    box-shadow:
+        none !important;
+
+    color:
+        #43e5e9 !important;
+
+    font-size:
+        clamp(
+            19px,
+            2.35vw,
+            42px
+        ) !important;
+
+    text-shadow:
+        0 0 9px
+        rgba(40, 224, 230, 0.48),
+        0 2px 3px
+        #000000 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-begin-button:hover:not(:disabled) {
+
+    transform:
+        none !important;
+
+    background:
+        radial-gradient(
+            ellipse at center,
+            rgba(10, 208, 218, 0.13),
+            transparent 68%
+        ) !important;
+
+    color:
+        #9affff !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+/* =========================================
+   ELIGIBILITY
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-eligibility {
+
+    position:
+        absolute !important;
+
+    right:
+        3.35% !important;
+
+    top:
+        72.25% !important;
+
+    width:
+        27.4% !important;
+
+    height:
+        17% !important;
+
+    padding:
+        1.1% !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-eligibility-title {
+
+    visibility:
+        hidden !important;
+
+    height:
+        12% !important;
+
+    margin:
+        0 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-eligibility-status {
+
+    padding:
+        1.2%
+        2% !important;
+
+    border:
+        none !important;
+
+    font-size:
+        clamp(
+            7px,
+            0.66vw,
+            12px
+        ) !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-eligibility-status:first-of-type {
+
+    display:
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-eligibility-note {
+
+    display:
+        none !important;
+}
+
+
+/*
+   Navigation artwork is already baked into exams.png.
+   Temporary coded navigation is hidden until we deliberately
+   wire the real Konoha navigation layer.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-bottom-nav {
+
+    display:
+        none !important;
+}
+
+
+

@@ -46590,7 +46590,14 @@ function renderKonohaActivityUIScreen(
 
 
 // =========================================================
-// KONOHA ACTIVITY UI OPEN + RENDER BRIDGE
+// BRICK 244 — KONOHA ACTIVITY UI OPEN + RENDER ROUTER
+// =========================================================
+//
+// Canonical Activity UI entry point.
+//
+// Specialised visual screens take priority.
+// Generic renderer remains as safe fallback.
+//
 // =========================================================
 
 
@@ -46598,6 +46605,30 @@ function showKonohaActivityUIScreen(
   serviceId,
   characterId
 ) {
+
+
+  // =========================================
+  // SHINOBI EXAMS
+  // =========================================
+
+
+  if (
+    serviceId ===
+      "exams"
+  ) {
+
+
+    return showKonohaExamUIScreen(
+      characterId
+    );
+
+
+  }
+
+
+  // =========================================
+  // GENERIC FALLBACK
+  // =========================================
 
 
   const sessionResult =
@@ -46609,7 +46640,8 @@ function showKonohaActivityUIScreen(
 
   if (
     !sessionResult ||
-    sessionResult.success !== true
+    sessionResult.success !==
+      true
   ) {
 
 
@@ -46637,7 +46669,8 @@ function showKonohaActivityUIScreen(
 
 
     characterId:
-      characterId,
+      getKonohaActivityUISessionState()
+        .characterId,
 
 
     rendered:
@@ -46648,6 +46681,8 @@ function showKonohaActivityUIScreen(
 
 
 }
+
+
 
 // =========================================================
 // BRICK 224 — SHINOBI EXAMS VISUAL STYLE FOUNDATION
@@ -49030,7 +49065,17 @@ function validateBattleCompletionSystem() {
 }
 
 // =========================================================
-// BRICK 243 — EXAM VISUAL POLISH HEALTH CHECK
+// BRICK 253 — EXAM VISUAL POLISH HEALTH CHECK
+// =========================================================
+//
+// Validates the real DOM emitted by the Exam renderer.
+//
+// Does not alter:
+// - activity execution
+// - progression
+// - rewards
+// - character selection
+//
 // =========================================================
 
 
@@ -49049,7 +49094,11 @@ function validateKonohaExamVisualSystem() {
     !!(
       root &&
       root.dataset &&
-      root.dataset.serviceId === "exams"
+      root.dataset.serviceId ===
+        "exams" &&
+      root.querySelector(
+        ".konoha-exam-screen"
+      )
     );
 
 
@@ -49057,7 +49106,16 @@ function validateKonohaExamVisualSystem() {
     !!(
       root &&
       root.querySelector(
-        ".konoha-character-panel"
+        ".exam-character-panel"
+      )
+    );
+
+
+  const characterImage =
+    !!(
+      root &&
+      root.querySelector(
+        ".exam-character-image"
       )
     );
 
@@ -49065,7 +49123,15 @@ function validateKonohaExamVisualSystem() {
   const disciplineCards =
     root
       ? root.querySelectorAll(
-          ".konoha-discipline-card"
+          ".exam-discipline-card"
+        ).length
+      : 0;
+
+
+  const progressBars =
+    root
+      ? root.querySelectorAll(
+          ".exam-progress-track"
         ).length
       : 0;
 
@@ -49074,7 +49140,7 @@ function validateKonohaExamVisualSystem() {
     !!(
       root &&
       root.querySelector(
-        ".konoha-begin-button"
+        ".exam-begin-button"
       )
     );
 
@@ -49083,7 +49149,7 @@ function validateKonohaExamVisualSystem() {
     !!(
       root &&
       root.querySelector(
-        ".konoha-eligibility-panel"
+        ".exam-eligibility"
       )
     );
 
@@ -49091,23 +49157,38 @@ function validateKonohaExamVisualSystem() {
   const health = {
 
 
-    screenPresent,
+    screenPresent:
+      screenPresent,
 
 
-    examScreen,
+    examScreen:
+      examScreen,
 
 
-    characterPanel,
+    characterPanel:
+      characterPanel,
+
+
+    characterImage:
+      characterImage,
 
 
     disciplineCards:
-      disciplineCards === 3,
+      disciplineCards ===
+        3,
 
 
-    beginButton,
+    progressBars:
+      progressBars ===
+        3,
 
 
-    eligibilityPanel,
+    beginButton:
+      beginButton,
+
+
+    eligibilityPanel:
+      eligibilityPanel,
 
 
     healthy:
@@ -49115,7 +49196,11 @@ function validateKonohaExamVisualSystem() {
         screenPresent &&
         examScreen &&
         characterPanel &&
-        disciplineCards === 3 &&
+        characterImage &&
+        disciplineCards ===
+          3 &&
+        progressBars ===
+          3 &&
         beginButton &&
         eligibilityPanel
       )
