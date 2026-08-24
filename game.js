@@ -36164,6 +36164,88 @@ function syncActivityHistory() {
 }
 
 // =========================================================
+// BRICK 114 — ACTIVITY COMPLETION RECORD
+// =========================================================
+//
+// Records successful Activity Results
+// into the persistent Activity History.
+//
+// Handles:
+// - Completion history
+// - Character attribution
+// - Persistent save sync
+// - Future Chronicle records
+//
+// =========================================================
+
+
+// =========================================================
+// RECORD ACTIVITY COMPLETION
+// =========================================================
+
+function recordActivityCompletion(
+  result
+) {
+
+
+  if (
+    !result ||
+    !result.activity ||
+    !result.success
+  ) {
+
+
+    console.log(
+      "Invalid activity completion record."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  activityHistory.push({
+
+    activity:
+      result.activity,
+
+    character:
+      result.character,
+
+    success:
+      result.success,
+
+    timestamp:
+      Date.now()
+
+  });
+
+
+
+  syncActivityHistory();
+
+
+
+  savePlayerData();
+
+
+
+  console.log(
+    "Activity recorded and saved:",
+    result.activity
+  );
+
+
+
+  return true;
+
+
+}
+
+// =========================================================
 // BRICK 110 — APPLY SAVED ACTIVITY HISTORY
 // =========================================================
 //
