@@ -1917,13 +1917,46 @@ syncCharacterProgressionFromSave();
 
 
 // =========================================================
-// SAVE PLAYER DATA
+// BRICK 109 — SAVE PLAYER DATA
 // =========================================================
 
 function savePlayerData() {
 
 
+  // =========================================
+  // SYNC CHARACTER PROGRESSION
+  // =========================================
+
+
   syncRuntimeProgressionToPlayerData();
+
+
+
+  // =========================================
+  // SYNC ACTIVITY HISTORY
+  // =========================================
+
+
+  if (
+    typeof activityHistory !==
+      "undefined" &&
+    Array.isArray(
+      activityHistory
+    )
+  ) {
+
+
+    playerData.activityHistory =
+      activityHistory;
+
+
+  }
+
+
+
+  // =========================================
+  // SAVE PLAYER DATA
+  // =========================================
 
 
   localStorage.setItem(
@@ -1934,10 +1967,12 @@ function savePlayerData() {
   );
 
 
+
   console.log(
     "Player save updated:",
     playerData
   );
+
 
 }
 
