@@ -44417,7 +44417,764 @@ function getKonohaPracticalPageData(
 
 }
 
+// =========================================================
+// BRICK 203 — KONOHA SERVICE EXECUTION REQUEST
+// =========================================================
+//
+// Normalizes one Konoha service launch request.
+//
+// =========================================================
 
+
+function createKonohaServiceRequest(
+  serviceId,
+  characterId
+) {
+
+
+  return {
+
+    serviceId:
+      serviceId || null,
+
+    characterId:
+      characterId || null,
+
+    timestamp:
+      Date.now()
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 204 — KONOHA SERVICE REQUEST VALIDATION
+// =========================================================
+
+
+function validateKonohaServiceRequest(
+  request
+) {
+
+
+  if (
+    !request ||
+    !request.serviceId
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "invalid_service_request"
+
+    };
+
+
+  }
+
+
+  const service =
+    getKonohaService(
+      request.serviceId
+    );
+
+
+  if (
+    !service
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "unknown_konoha_service",
+
+      serviceId:
+        request.serviceId
+
+    };
+
+
+  }
+
+
+  const access =
+    evaluateKonohaServiceAccess(
+      request.serviceId
+    );
+
+
+  if (
+    access.implemented !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "service_not_implemented",
+
+      service:
+        service,
+
+      access:
+        access
+
+    };
+
+
+  }
+
+
+  if (
+    access.accessible !==
+      true
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "service_locked",
+
+      service:
+        service,
+
+      access:
+        access
+
+    };
+
+
+  }
+
+
+  const character =
+    getPlayerCharacter(
+      request.characterId
+    );
+
+
+  if (
+    !character
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "invalid_character",
+
+      service:
+        service,
+
+      access:
+        access
+
+    };
+
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    reason:
+      null,
+
+    service:
+      service,
+
+    access:
+      access,
+
+    character:
+      character
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 205 — KONOHA ACTIVITY SERVICE EXECUTOR
+// =========================================================
+//
+// Routes:
+//
+// - Missions
+// - Exams
+// - Practical
+//
+// through the existing Location → Activity authority.
+//
+// =========================================================
+
+
+function executeKonohaActivityService(
+  service,
+  characterId
+) {
+
+
+  if (
+    !service ||
+    service.routeType !==
+      "activity"
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+  return launchLocationAction(
+
+    "konoha",
+
+    service.action,
+
+    characterId
+
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 206 — KONOHA TRAINING SERVICE EXECUTOR
+// =========================================================
+//
+// Dedicated Training remains owned by
+// the Training Engine.
+//
+// =========================================================
+
+
+function executeKonohaTrainingService(
+  service,
+  characterId
+) {
+
+
+  if (
+    !service ||
+    service.routeType !==
+      "training" ||
+    !service.trainingId
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+  return startTraining(
+
+    service.trainingId,
+
+    characterId
+
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 207 — KONOHA SERVICE ROUTER
+// =========================================================
+//
+// One execution authority for Konoha services.
+//
+// =========================================================
+
+
+function routeKonohaServiceExecution(
+  service,
+  characterId
+) {
+
+
+  if (
+    !service
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+  switch (
+    service.routeType
+  ) {
+
+
+    case "activity":
+
+
+      return executeKonohaActivityService(
+        service,
+        characterId
+      );
+
+
+
+    case "training":
+
+
+      return executeKonohaTrainingService(
+        service,
+        characterId
+      );
+
+
+
+    default:
+
+
+      console.log(
+        "Unsupported Konoha service route:",
+        service.routeType
+      );
+
+
+      return false;
+
+
+  }
+
+
+}
+
+
+
+// =========================================================
+// BRICK 208 — KONOHA SERVICE EXECUTION RESULT
+// =========================================================
+//
+// UI-safe result returned after execution.
+//
+// =========================================================
+
+
+function createKonohaServiceExecutionResult(
+  request,
+  validation,
+  executionResult
+) {
+
+
+  const success =
+    !!executionResult;
+
+
+  return {
+
+    success:
+      success,
+
+    serviceId:
+      request.serviceId,
+
+    characterId:
+      request.characterId,
+
+    routeType:
+      validation.service
+        ? validation.service.routeType
+        : null,
+
+    activityId:
+      validation.service &&
+      validation.service.activityId
+        ? validation.service.activityId
+        : null,
+
+    trainingId:
+      validation.service &&
+      validation.service.trainingId
+        ? validation.service.trainingId
+        : null,
+
+    result:
+      executionResult || null
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 209 — KONOHA SERVICE EXECUTION PREVIEW
+// =========================================================
+//
+// Non-destructive UI / diagnostic preview.
+//
+// =========================================================
+
+
+function getKonohaServiceExecutionPreview(
+  serviceId,
+  characterId
+) {
+
+
+  const request =
+    createKonohaServiceRequest(
+      serviceId,
+      characterId
+    );
+
+
+  const validation =
+    validateKonohaServiceRequest(
+      request
+    );
+
+
+  return {
+
+    request:
+      request,
+
+    valid:
+      validation.valid ===
+        true,
+
+    reason:
+      validation.reason ||
+      null,
+
+    service:
+      validation.service ||
+      getKonohaService(
+        serviceId
+      ),
+
+    access:
+      validation.access ||
+      evaluateKonohaServiceAccess(
+        serviceId
+      ),
+
+    character:
+      validation.character
+        ? {
+
+            id:
+              validation.character.id,
+
+            name:
+              validation.character.name,
+
+            rank:
+              validation.character.rank,
+
+            currentPL:
+              calculateCurrentPL(
+                validation.character
+              )
+
+          }
+        : null
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 210 — EXECUTE KONOHA SERVICE
+// =========================================================
+//
+// Canonical Konoha UI launch function.
+//
+// Future UI buttons should call THIS,
+// not individual engines directly.
+//
+// =========================================================
+
+
+function executeKonohaService(
+  serviceId,
+  characterId
+) {
+
+
+  const request =
+    createKonohaServiceRequest(
+      serviceId,
+      characterId
+    );
+
+
+  const validation =
+    validateKonohaServiceRequest(
+      request
+    );
+
+
+  if (
+    validation.valid !==
+      true
+  ) {
+
+
+    console.log(
+      "Konoha service execution rejected:",
+      validation
+    );
+
+
+    return {
+
+      success:
+        false,
+
+      serviceId:
+        serviceId || null,
+
+      characterId:
+        characterId || null,
+
+      reason:
+        validation.reason ||
+        "service_execution_rejected"
+
+    };
+
+
+  }
+
+
+  console.log(
+    "KONOHA SERVICE START:",
+    serviceId,
+    characterId
+  );
+
+
+  const executionResult =
+    routeKonohaServiceExecution(
+
+      validation.service,
+
+      characterId
+
+    );
+
+
+  const result =
+    createKonohaServiceExecutionResult(
+
+      request,
+
+      validation,
+
+      executionResult
+
+    );
+
+
+  console.log(
+    "KONOHA SERVICE COMPLETE:",
+    result
+  );
+
+
+  return result;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 211 — KONOHA SERVICE EXECUTION HEALTH CHECK
+// =========================================================
+//
+// Non-destructive diagnostics.
+//
+// =========================================================
+
+
+function validateKonohaServiceExecutionSystem() {
+
+
+  const examPreview =
+    getKonohaServiceExecutionPreview(
+      "exams",
+      "naruto"
+    );
+
+
+  const practicalPreview =
+    getKonohaServiceExecutionPreview(
+      "practical",
+      "naruto"
+    );
+
+
+  const trainingPreview =
+    getKonohaServiceExecutionPreview(
+      "training",
+      "naruto"
+    );
+
+
+  const shopPreview =
+    getKonohaServiceExecutionPreview(
+      "shop",
+      "naruto"
+    );
+
+
+  const invalidCharacterPreview =
+    getKonohaServiceExecutionPreview(
+      "exams",
+      "not_a_character"
+    );
+
+
+  const checks = {
+
+
+    requestBuilder:
+      !!createKonohaServiceRequest(
+        "exams",
+        "naruto"
+      ),
+
+
+    validator:
+      examPreview.valid ===
+        true,
+
+
+    activityExecutor:
+      typeof executeKonohaActivityService ===
+        "function",
+
+
+    trainingExecutor:
+      typeof executeKonohaTrainingService ===
+        "function",
+
+
+    router:
+      typeof routeKonohaServiceExecution ===
+        "function",
+
+
+    resultBuilder:
+      typeof createKonohaServiceExecutionResult ===
+        "function",
+
+
+    preview:
+      typeof getKonohaServiceExecutionPreview ===
+        "function",
+
+
+    executionAuthority:
+      typeof executeKonohaService ===
+        "function",
+
+
+    examReady:
+      examPreview.valid ===
+        true,
+
+
+    practicalReady:
+      practicalPreview.valid ===
+        true,
+
+
+    trainingReady:
+      trainingPreview.valid ===
+        true,
+
+
+    shopSafelyBlocked:
+      (
+        shopPreview.valid ===
+          false &&
+        shopPreview.reason ===
+          "service_not_implemented"
+      ),
+
+
+    invalidCharacterBlocked:
+      (
+        invalidCharacterPreview.valid ===
+          false &&
+        invalidCharacterPreview.reason ===
+          "invalid_character"
+      )
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Konoha Service Execution health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
 
 // =========================================================
 // BRICK 202 — KONOHA DATA BRIDGE HEALTH CHECK
@@ -44767,7 +45524,7 @@ function validateBattleCompletionSystem() {
 
 
 // =========================================================
-// BRICK 202 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 212 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 
 
@@ -44780,6 +45537,10 @@ function runActivityLocationRegression() {
 
   const konohaDataHealth =
     validateKonohaDataBridge();
+
+
+  const konohaExecutionHealth =
+    validateKonohaServiceExecutionSystem();
 
 
   const locationHealth =
@@ -44970,6 +45731,10 @@ function runActivityLocationRegression() {
       konohaDataHealth.healthy,
 
 
+    konohaExecution:
+      konohaExecutionHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -44997,6 +45762,7 @@ function runActivityLocationRegression() {
         battleQueryHealth.healthy &&
         contentAccessHealth.healthy &&
         konohaDataHealth.healthy &&
+        konohaExecutionHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
