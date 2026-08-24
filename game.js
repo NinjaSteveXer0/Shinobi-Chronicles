@@ -46649,7 +46649,2040 @@ function showKonohaActivityUIScreen(
 
 }
 
+// =========================================================
+// BRICK 224 — SHINOBI EXAMS VISUAL STYLE FOUNDATION
+// =========================================================
+//
+// Creates the coded visual language for the Exam screen.
+//
+// Uses exams.png only as a subtle atmospheric reference.
+// Live UI remains real DOM.
+//
+// =========================================================
 
+
+function ensureKonohaExamUIStyles() {
+
+
+  let style =
+    document.getElementById(
+      "konoha-exam-ui-styles"
+    );
+
+
+  if (style) {
+
+
+    return style;
+
+
+  }
+
+
+  style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.id =
+    "konoha-exam-ui-styles";
+
+
+  style.textContent = `
+
+    .konoha-activity-screen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      overflow: auto;
+      background:
+        #05080c;
+      color:
+        #ead8a1;
+      font-family:
+        Georgia,
+        "Times New Roman",
+        serif;
+    }
+
+
+    .konoha-exam-screen {
+      position: relative;
+      min-height: 100vh;
+      padding:
+        24px
+        34px
+        92px;
+      box-sizing: border-box;
+      overflow: hidden;
+
+      background:
+        radial-gradient(
+          circle at 50% 30%,
+          rgba(0, 218, 222, 0.07),
+          transparent 36%
+        ),
+        linear-gradient(
+          180deg,
+          rgba(5, 8, 11, 0.92),
+          rgba(3, 5, 7, 0.97)
+        );
+    }
+
+
+    .konoha-exam-screen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+
+      background-image:
+        url("Assets/Backgrounds/exams.png");
+
+      background-size:
+        cover;
+
+      background-position:
+        center;
+
+      opacity:
+        0.13;
+
+      filter:
+        saturate(0.75)
+        brightness(0.72);
+    }
+
+
+    .konoha-exam-screen > * {
+      position: relative;
+      z-index: 1;
+    }
+
+
+    .exam-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+
+    .exam-header-konoha {
+      position: absolute;
+      top: 6px;
+      left: 4px;
+
+      color:
+        #d8b85f;
+
+      font-size:
+        17px;
+
+      letter-spacing:
+        1.6px;
+    }
+
+
+    .exam-header-title {
+      margin: 0;
+
+      color:
+        #f0d28a;
+
+      font-size:
+        clamp(
+          34px,
+          4vw,
+          64px
+        );
+
+      font-weight:
+        600;
+
+      letter-spacing:
+        3px;
+
+      text-shadow:
+        0 2px 2px #000,
+        0 0 18px
+        rgba(213, 174, 72, 0.24);
+    }
+
+
+    .exam-header-subtitle {
+      margin-top: 3px;
+
+      color:
+        #d4c392;
+
+      font-size:
+        16px;
+
+      letter-spacing:
+        0.6px;
+    }
+
+
+    .exam-main-grid {
+      display: grid;
+
+      grid-template-columns:
+        minmax(270px, 31%)
+        minmax(520px, 1fr);
+
+      gap:
+        24px;
+
+      width:
+        min(
+          1450px,
+          100%
+        );
+
+      margin:
+        0 auto;
+    }
+
+
+    .exam-panel {
+      background:
+        linear-gradient(
+          180deg,
+          rgba(12, 17, 20, 0.96),
+          rgba(4, 8, 10, 0.98)
+        );
+
+      border:
+        1px solid
+        #8f6b22;
+
+      box-shadow:
+        inset 0 0 0 1px
+        rgba(233, 192, 91, 0.12),
+        0 8px 30px
+        rgba(0, 0, 0, 0.62);
+    }
+
+
+    .exam-character-panel {
+      padding: 14px;
+    }
+
+
+    .exam-character-image-wrap {
+      position: relative;
+
+      height:
+        min(
+          55vh,
+          520px
+        );
+
+      min-height:
+        330px;
+
+      overflow: hidden;
+
+      border:
+        1px solid
+        #9b7728;
+
+      background:
+        radial-gradient(
+          circle at 50% 42%,
+          rgba(0, 217, 232, 0.14),
+          rgba(0, 0, 0, 0.9)
+        );
+
+      box-shadow:
+        inset 0 0 35px
+        rgba(0, 217, 232, 0.08);
+    }
+
+
+    .exam-character-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: center bottom;
+      display: block;
+    }
+
+
+    .exam-character-selector {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+
+      display: flex;
+      justify-content: space-between;
+
+      transform:
+        translateY(-50%);
+
+      pointer-events: none;
+    }
+
+
+    .exam-character-arrow {
+      pointer-events: auto;
+
+      width: 42px;
+      height: 58px;
+
+      border:
+        1px solid
+        #a78030;
+
+      background:
+        rgba(3, 8, 10, 0.88);
+
+      color:
+        #54e1e5;
+
+      font-size:
+        24px;
+
+      cursor: pointer;
+    }
+
+
+    .exam-character-arrow:hover {
+      color:
+        #ffffff;
+
+      box-shadow:
+        0 0 16px
+        rgba(0, 220, 230, 0.35);
+    }
+
+
+    .exam-character-name {
+      margin-top: 12px;
+      text-align: center;
+
+      color:
+        #edce80;
+
+      font-size:
+        28px;
+
+      letter-spacing:
+        1.3px;
+    }
+
+
+    .exam-character-rank {
+      text-align: center;
+
+      color:
+        #50dbe2;
+
+      font-size:
+        15px;
+
+      letter-spacing:
+        1.5px;
+
+      text-transform:
+        uppercase;
+    }
+
+
+    .exam-character-pl {
+      margin:
+        8px 0 12px;
+
+      text-align: center;
+
+      color:
+        #e0bc63;
+
+      font-size:
+        25px;
+    }
+
+
+    .exam-character-pl strong {
+      color:
+        #57dce3;
+
+      font-size:
+        34px;
+    }
+
+
+    .exam-character-meta {
+      border-top:
+        1px solid
+        rgba(192, 153, 57, 0.42);
+
+      padding-top:
+        9px;
+    }
+
+
+    .exam-character-meta-row {
+      display: flex;
+      justify-content: space-between;
+
+      gap: 18px;
+
+      padding:
+        6px 8px;
+
+      border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.055);
+
+      font-size:
+        14px;
+    }
+
+
+    .exam-character-meta-label {
+      color:
+        #c5a85e;
+    }
+
+
+    .exam-character-meta-value {
+      color:
+        #e8e1cf;
+    }
+
+
+    .exam-change-character {
+      width: 100%;
+      margin-top: 12px;
+
+      padding:
+        11px 16px;
+
+      border:
+        1px solid
+        #a67d26;
+
+      background:
+        linear-gradient(
+          180deg,
+          #191712,
+          #090b0d
+        );
+
+      color:
+        #e4c774;
+
+      font-family: inherit;
+
+      font-size:
+        15px;
+
+      letter-spacing:
+        1.1px;
+
+      cursor: pointer;
+    }
+
+
+    .exam-change-character:hover {
+      color:
+        #61e1e5;
+
+      box-shadow:
+        0 0 15px
+        rgba(0, 220, 230, 0.22);
+    }
+
+
+    .exam-discipline-heading {
+      width: fit-content;
+      margin:
+        0 auto 14px;
+
+      padding:
+        8px 36px;
+
+      border:
+        1px solid
+        #9a7425;
+
+      background:
+        #090c0e;
+
+      color:
+        #e9c96f;
+
+      font-size:
+        21px;
+
+      letter-spacing:
+        1.4px;
+    }
+
+
+    .exam-discipline-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+    }
+
+
+    .exam-discipline-card {
+      padding:
+        18px 20px;
+
+      background:
+        linear-gradient(
+          90deg,
+          rgba(8, 12, 14, 0.98),
+          rgba(14, 19, 21, 0.96)
+        );
+
+      border:
+        1px solid
+        #80631f;
+
+      box-shadow:
+        inset 0 0 0 1px
+        rgba(235, 190, 72, 0.08);
+    }
+
+
+    .exam-discipline-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 14px;
+    }
+
+
+    .exam-discipline-name {
+      color:
+        #e7c56b;
+
+      font-size:
+        clamp(
+          23px,
+          2.5vw,
+          34px
+        );
+
+      letter-spacing:
+        1.3px;
+    }
+
+
+    .exam-discipline-level {
+      margin-top: 2px;
+
+      color:
+        #e1d2aa;
+
+      font-size:
+        16px;
+    }
+
+
+    .exam-discipline-level strong {
+      color:
+        #52dfe4;
+
+      font-size:
+        22px;
+    }
+
+
+    .exam-discipline-exp {
+      text-align: right;
+
+      color:
+        #ddd2b3;
+
+      font-size:
+        15px;
+    }
+
+
+    .exam-discipline-exp strong {
+      color:
+        #55dce2;
+
+      font-size:
+        23px;
+    }
+
+
+    .exam-progress-track {
+      position: relative;
+
+      height: 17px;
+
+      margin-top: 13px;
+
+      overflow: hidden;
+
+      border:
+        1px solid
+        #9d7623;
+
+      background:
+        #05090b;
+
+      box-shadow:
+        inset 0 0 8px
+        #000000;
+    }
+
+
+    .exam-progress-fill {
+      height: 100%;
+
+      background:
+        linear-gradient(
+          90deg,
+          #087a84,
+          #14cbd4,
+          #46f0ed
+        );
+
+      box-shadow:
+        0 0 14px
+        rgba(0, 225, 235, 0.55);
+
+      transition:
+        width 0.35s ease;
+    }
+
+
+    .exam-discipline-reward {
+      margin-top: 9px;
+
+      color:
+        #cbae62;
+
+      font-size:
+        14px;
+
+      letter-spacing:
+        0.6px;
+    }
+
+
+    .exam-discipline-reward strong {
+      margin-left: 8px;
+
+      color:
+        #55dfe4;
+    }
+
+
+    .exam-lower-grid {
+      display: grid;
+
+      grid-template-columns:
+        1fr
+        minmax(280px, 38%);
+
+      gap: 18px;
+
+      margin-top: 18px;
+    }
+
+
+    .exam-begin-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+
+    .exam-begin-button {
+      width:
+        min(
+          520px,
+          100%
+        );
+
+      padding:
+        18px 24px;
+
+      border:
+        1px solid
+        #b88b29;
+
+      background:
+        linear-gradient(
+          180deg,
+          #10282b,
+          #061215
+        );
+
+      color:
+        #59e4e5;
+
+      font-family: inherit;
+
+      font-size:
+        clamp(
+          24px,
+          3vw,
+          37px
+        );
+
+      letter-spacing:
+        1.6px;
+
+      cursor: pointer;
+
+      box-shadow:
+        inset 0 0 20px
+        rgba(0, 218, 225, 0.10),
+        0 0 20px
+        rgba(0, 0, 0, 0.62);
+    }
+
+
+    .exam-begin-button:hover:not(:disabled) {
+      color:
+        #ffffff;
+
+      box-shadow:
+        inset 0 0 22px
+        rgba(0, 225, 235, 0.20),
+        0 0 25px
+        rgba(0, 225, 235, 0.17);
+    }
+
+
+    .exam-begin-button:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+    }
+
+
+    .exam-eligibility {
+      padding:
+        13px 16px;
+    }
+
+
+    .exam-eligibility-title {
+      color:
+        #e0bd63;
+
+      font-size:
+        17px;
+
+      letter-spacing:
+        1px;
+
+      margin-bottom: 8px;
+    }
+
+
+    .exam-eligibility-status {
+      display: flex;
+      justify-content: space-between;
+
+      padding:
+        8px 0;
+
+      border-bottom:
+        1px solid
+        rgba(255, 255, 255, 0.06);
+    }
+
+
+    .exam-eligibility-status strong {
+      color:
+        #51dfe1;
+    }
+
+
+    .exam-eligibility-note {
+      margin-top: 9px;
+
+      color:
+        #8e8773;
+
+      font-size:
+        12px;
+
+      line-height:
+        1.45;
+    }
+
+
+    .exam-bottom-nav {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+
+      z-index: 10001;
+
+      display: grid;
+      grid-template-columns:
+        repeat(8, 1fr);
+
+      min-height: 66px;
+
+      background:
+        rgba(4, 7, 9, 0.98);
+
+      border-top:
+        1px solid
+        #75591d;
+    }
+
+
+    .exam-nav-item {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      border: 0;
+      border-right:
+        1px solid
+        rgba(181, 140, 43, 0.20);
+
+      background:
+        transparent;
+
+      color:
+        #b99e5c;
+
+      font-family: inherit;
+
+      font-size:
+        12px;
+
+      letter-spacing:
+        0.8px;
+    }
+
+
+    .exam-nav-item.active {
+      color:
+        #5ae2e6;
+
+      background:
+        linear-gradient(
+          180deg,
+          rgba(0, 211, 222, 0.13),
+          transparent
+        );
+
+      box-shadow:
+        inset 0 -3px
+        #35d9df;
+    }
+
+
+    @media (
+      max-width: 900px
+    ) {
+
+      .exam-main-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .exam-character-image-wrap {
+        height: 440px;
+      }
+
+
+      .exam-lower-grid {
+        grid-template-columns:
+          1fr;
+      }
+
+
+      .exam-bottom-nav {
+        grid-template-columns:
+          repeat(4, 1fr);
+      }
+
+    }
+
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  return style;
+
+
+}
+
+
+// =========================================================
+// BRICK 225 — EXAM CHARACTER PANEL RENDERER
+// =========================================================
+
+
+function getKonohaExamMetaValue(
+  value
+) {
+
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+
+
+    return "—";
+
+
+  }
+
+
+  return String(
+    value
+  );
+
+
+}
+
+
+
+function renderKonohaExamCharacterPanel(
+  character
+) {
+
+
+  if (!character) {
+
+
+    return "";
+
+
+  }
+
+
+  return `
+
+    <section
+      class="
+        exam-panel
+        exam-character-panel
+      "
+    >
+
+      <div
+        class="
+          exam-character-image-wrap
+        "
+      >
+
+        ${
+          character.image
+            ? `
+              <img
+                class="
+                  exam-character-image
+                "
+                src="${character.image}"
+                alt="${character.name}"
+              >
+            `
+            : ""
+        }
+
+        <div
+          class="
+            exam-character-selector
+          "
+        >
+
+          <button
+            class="
+              exam-character-arrow
+            "
+            type="button"
+            onclick="
+              changeKonohaExamCharacter(-1)
+            "
+          >
+            ‹
+          </button>
+
+          <button
+            class="
+              exam-character-arrow
+            "
+            type="button"
+            onclick="
+              changeKonohaExamCharacter(1)
+            "
+          >
+            ›
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="
+          exam-character-name
+        "
+      >
+        ${character.name}
+      </div>
+
+
+      <div
+        class="
+          exam-character-rank
+        "
+      >
+        ${character.rank}
+      </div>
+
+
+      <div
+        class="
+          exam-character-pl
+        "
+      >
+        PL
+        <strong>
+          ${character.currentPL}
+        </strong>
+      </div>
+
+
+      <div
+        class="
+          exam-character-meta
+        "
+      >
+
+        ${renderKonohaExamCharacterMetaRow(
+          "Village",
+          character.village
+        )}
+
+        ${renderKonohaExamCharacterMetaRow(
+          "Clan",
+          character.clan
+        )}
+
+        ${renderKonohaExamCharacterMetaRow(
+          "Element",
+          character.element
+        )}
+
+        ${renderKonohaExamCharacterMetaRow(
+          "Status",
+          character.status
+        )}
+
+      </div>
+
+
+      <button
+        type="button"
+        class="
+          exam-change-character
+        "
+        onclick="
+          changeKonohaExamCharacter(1)
+        "
+      >
+        CHANGE SHINOBI
+      </button>
+
+    </section>
+
+  `;
+
+
+}
+
+
+
+function renderKonohaExamCharacterMetaRow(
+  label,
+  value
+) {
+
+
+  return `
+
+    <div
+      class="
+        exam-character-meta-row
+      "
+    >
+
+      <span
+        class="
+          exam-character-meta-label
+        "
+      >
+        ${label}
+      </span>
+
+      <span
+        class="
+          exam-character-meta-value
+        "
+      >
+        ${getKonohaExamMetaValue(
+          value
+        )}
+      </span>
+
+    </div>
+
+  `;
+
+
+}
+
+
+// =========================================================
+// BRICK 226 — EXAM DISCIPLINE PROGRESS BAR
+// =========================================================
+
+
+function renderKonohaExamProgressBar(
+  progressPercent
+) {
+
+
+  const safePercent =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        Number(
+          progressPercent
+        ) || 0
+      )
+    );
+
+
+  return `
+
+    <div
+      class="
+        exam-progress-track
+      "
+      role="progressbar"
+      aria-valuemin="0"
+      aria-valuemax="100"
+      aria-valuenow="${safePercent}"
+    >
+
+      <div
+        class="
+          exam-progress-fill
+        "
+        style="
+          width:
+          ${safePercent}%;
+        "
+      >
+      </div>
+
+    </div>
+
+  `;
+
+
+}
+
+
+// =========================================================
+// BRICK 227 — EXAM DISCIPLINE CARD RENDERER
+// =========================================================
+
+
+function renderKonohaExamDisciplineCard(
+  discipline
+) {
+
+
+  if (!discipline) {
+
+
+    return "";
+
+
+  }
+
+
+  return `
+
+    <article
+      class="
+        exam-discipline-card
+      "
+      data-discipline-id="
+        ${discipline.id}
+      "
+    >
+
+      <div
+        class="
+          exam-discipline-top
+        "
+      >
+
+        <div>
+
+          <div
+            class="
+              exam-discipline-name
+            "
+          >
+            ${discipline.name}
+          </div>
+
+          <div
+            class="
+              exam-discipline-level
+            "
+          >
+            Level
+            <strong>
+              ${discipline.level}
+            </strong>
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            exam-discipline-exp
+          "
+        >
+
+          EXPERIENCE
+
+          <br>
+
+          <strong>
+            ${discipline.exp}
+          </strong>
+
+          /
+          ${discipline.expRequired}
+          EXP
+
+        </div>
+
+      </div>
+
+
+      ${renderKonohaExamProgressBar(
+        discipline.progressPercent
+      )}
+
+
+      <div
+        class="
+          exam-discipline-reward
+        "
+      >
+
+        EXAM REWARD
+
+        <strong>
+          +${discipline.rewardExp}
+          EXP
+        </strong>
+
+      </div>
+
+    </article>
+
+  `;
+
+
+}
+
+
+// =========================================================
+// BRICK 228 — EXAM DISCIPLINE STACK
+// =========================================================
+
+
+function renderKonohaExamDisciplineStack(
+  disciplines
+) {
+
+
+  if (
+    !Array.isArray(
+      disciplines
+    )
+  ) {
+
+
+    return "";
+
+
+  }
+
+
+  return `
+
+    <section>
+
+      <div
+        class="
+          exam-discipline-heading
+        "
+      >
+        EXAM DISCIPLINES
+      </div>
+
+
+      <div
+        class="
+          exam-discipline-stack
+        "
+      >
+
+        ${disciplines
+          .map(
+            discipline =>
+              renderKonohaExamDisciplineCard(
+                discipline
+              )
+          )
+          .join("")}
+
+      </div>
+
+    </section>
+
+  `;
+
+
+}
+
+
+// =========================================================
+// BRICK 229 — EXAM CHARACTER SELECTION INTERACTION
+// =========================================================
+
+
+function changeKonohaExamCharacter(
+  direction
+) {
+
+
+  const character =
+    cycleKonohaSelectedCharacter(
+      direction
+    );
+
+
+  if (!character) {
+
+
+    return false;
+
+
+  }
+
+
+  renderKonohaExamVisualScreen();
+
+
+  console.log(
+    "EXAM SHINOBI SELECTED:",
+    character.id
+  );
+
+
+  return true;
+
+
+}
+
+
+// =========================================================
+// BRICK 230 — EXAM ELIGIBILITY PANEL
+// =========================================================
+
+
+function renderKonohaExamEligibilityPanel(
+  eligibility
+) {
+
+
+  if (!eligibility) {
+
+
+    return "";
+
+
+  }
+
+
+  const accessText =
+    eligibility.eligible ===
+      true
+      ? "READY"
+      : "LOCKED";
+
+
+  return `
+
+    <section
+      class="
+        exam-panel
+        exam-eligibility
+      "
+    >
+
+      <div
+        class="
+          exam-eligibility-title
+        "
+      >
+        EXAM ELIGIBILITY
+      </div>
+
+
+      <div
+        class="
+          exam-eligibility-status
+        "
+      >
+
+        <span>
+          Current Access
+        </span>
+
+        <strong>
+          ${accessText}
+        </strong>
+
+      </div>
+
+
+      <div
+        class="
+          exam-eligibility-status
+        "
+      >
+
+        <span>
+          Rank Requirement
+        </span>
+
+        <span>
+          ${getKonohaExamMetaValue(
+            eligibility.criteria
+              .rankRequirement
+          )}
+        </span>
+
+      </div>
+
+
+      <div
+        class="
+          exam-eligibility-status
+        "
+      >
+
+        <span>
+          Level Requirement
+        </span>
+
+        <span>
+          ${getKonohaExamMetaValue(
+            eligibility.criteria
+              .levelRequirement
+          )}
+        </span>
+
+      </div>
+
+
+      <div
+        class="
+          exam-eligibility-status
+        "
+      >
+
+        <span>
+          Active Missions
+        </span>
+
+        <span>
+          ${getKonohaExamMetaValue(
+            eligibility.criteria
+              .activeMissionLimit
+          )}
+        </span>
+
+      </div>
+
+
+      <div
+        class="
+          exam-eligibility-status
+        "
+      >
+
+        <span>
+          Cooldown
+        </span>
+
+        <span>
+          ${getKonohaExamMetaValue(
+            eligibility.criteria
+              .cooldown
+          )}
+        </span>
+
+      </div>
+
+
+      ${
+        eligibility.criteriaConfigured ===
+          false
+
+          ? `
+            <div
+              class="
+                exam-eligibility-note
+              "
+            >
+              Detailed Exam requirements have not
+              been configured yet. Current access
+              is controlled by the live Content
+              Access system.
+            </div>
+          `
+
+          : ""
+      }
+
+    </section>
+
+  `;
+
+
+}
+
+
+// =========================================================
+// BRICK 231 — BEGIN EXAM UI EXECUTION
+// =========================================================
+
+
+function beginKonohaExamFromUI() {
+
+
+  const session =
+    getKonohaActivityUISessionState();
+
+
+  if (
+    session.serviceId !==
+      "exams" ||
+    !session.characterId
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "exam_ui_session_invalid"
+
+    };
+
+
+  }
+
+
+  const screenData =
+    getKonohaExamUIScreenData(
+      session.characterId
+    );
+
+
+  if (
+    !screenData ||
+    screenData.canExecute !==
+      true
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "exam_not_eligible"
+
+    };
+
+
+  }
+
+
+  const result =
+    executeKonohaService(
+      "exams",
+      session.characterId
+    );
+
+
+  if (
+    result &&
+    result.success ===
+      true
+  ) {
+
+
+    renderKonohaExamVisualScreen();
+
+
+  }
+
+
+  return result;
+
+
+}
+
+
+// =========================================================
+// BRICK 232 — SHINOBI EXAMS VISUAL SCREEN COMPOSER
+// =========================================================
+
+
+function renderKonohaExamVisualScreen() {
+
+
+  ensureKonohaExamUIStyles();
+
+
+  const root =
+    ensureKonohaActivityUIRoot();
+
+
+  const session =
+    getKonohaActivityUISessionState();
+
+
+  const data =
+    getKonohaExamUIScreenData(
+      session.characterId
+    );
+
+
+  if (!data) {
+
+
+    console.log(
+      "Exam visual render failed."
+    );
+
+
+    return false;
+
+
+  }
+
+
+  root.dataset.serviceId =
+    "exams";
+
+
+  root.style.display =
+    "block";
+
+
+  root.innerHTML = `
+
+    <div
+      class="
+        konoha-exam-screen
+      "
+    >
+
+      <header
+        class="
+          exam-header
+        "
+      >
+
+        <div
+          class="
+            exam-header-konoha
+          "
+        >
+          ◉ KONOHA
+        </div>
+
+
+        <h1
+          class="
+            exam-header-title
+          "
+        >
+          SHINOBI EXAMS
+        </h1>
+
+
+        <div
+          class="
+            exam-header-subtitle
+          "
+        >
+          Advance your knowledge.
+          Prove your mastery.
+        </div>
+
+      </header>
+
+
+      <main
+        class="
+          exam-main-grid
+        "
+      >
+
+        ${renderKonohaExamCharacterPanel(
+          data.character
+        )}
+
+
+        <section>
+
+          ${renderKonohaExamDisciplineStack(
+            data.disciplines
+          )}
+
+
+          <div
+            class="
+              exam-lower-grid
+            "
+          >
+
+            <div
+              class="
+                exam-begin-wrap
+              "
+            >
+
+              <button
+                type="button"
+                class="
+                  exam-begin-button
+                "
+                ${
+                  data.canExecute
+                    ? ""
+                    : "disabled"
+                }
+                onclick="
+                  beginKonohaExamFromUI()
+                "
+              >
+                BEGIN EXAM
+              </button>
+
+            </div>
+
+
+            ${renderKonohaExamEligibilityPanel(
+              data.eligibility
+            )}
+
+          </div>
+
+        </section>
+
+      </main>
+
+
+      ${renderKonohaExamBottomNavigation()}
+
+    </div>
+
+  `;
+
+
+  console.log(
+    "SHINOBI EXAMS UI RENDERED:",
+    {
+      character:
+        data.selectedCharacterId,
+
+      disciplines:
+        data.disciplines.length,
+
+      canExecute:
+        data.canExecute
+    }
+  );
+
+
+  return true;
+
+
+}
+
+
+
+function showKonohaExamUIScreen(
+  characterId = null
+) {
+
+
+  const opened =
+    openKonohaActivityUIScreen(
+      "exams",
+      characterId
+    );
+
+
+  if (
+    !opened ||
+    opened.success !==
+      true
+  ) {
+
+
+    return opened;
+
+
+  }
+
+
+  const rendered =
+    renderKonohaExamVisualScreen();
+
+
+  return {
+
+    success:
+      rendered === true,
+
+    serviceId:
+      "exams",
+
+    characterId:
+      getKonohaActivityUISessionState()
+        .characterId,
+
+    rendered:
+      rendered === true
+
+  };
+
+
+}
+
+
+// =========================================================
+// BRICK 233 — EXAM BOTTOM HUD + UI HEALTH CHECK
+// =========================================================
+
+
+function renderKonohaExamBottomNavigation() {
+
+
+  const items = [
+
+    "VILLAGE",
+    "MISSIONS",
+    "ARENA",
+    "EXAMS",
+    "PRACTICAL",
+    "GROUP",
+    "DEFEND",
+    "KAGE"
+
+  ];
+
+
+  return `
+
+    <nav
+      class="
+        exam-bottom-nav
+      "
+      aria-label="
+        Konoha Navigation
+      "
+    >
+
+      ${items
+        .map(
+          item => `
+
+            <button
+              type="button"
+              class="
+                exam-nav-item
+                ${
+                  item === "EXAMS"
+                    ? "active"
+                    : ""
+                }
+              "
+              ${
+                item === "EXAMS"
+                  ? ""
+                  : "disabled"
+              }
+            >
+              ${item}
+            </button>
+
+          `
+        )
+        .join("")}
+
+    </nav>
+
+  `;
+
+
+}
+
+
+
+function validateKonohaExamUISystem() {
+
+
+  const data =
+    getKonohaExamUIScreenData(
+      "naruto"
+    );
+
+
+  const style =
+    ensureKonohaExamUIStyles();
+
+
+  const checks = {
+
+
+    styleAuthority:
+      !!(
+        style &&
+        style.id ===
+          "konoha-exam-ui-styles"
+      ),
+
+
+    examData:
+      !!(
+        data &&
+        data.screen ===
+          "exams"
+      ),
+
+
+    characterRenderer:
+      typeof renderKonohaExamCharacterPanel ===
+        "function",
+
+
+    progressRenderer:
+      typeof renderKonohaExamProgressBar ===
+        "function",
+
+
+    disciplineRenderer:
+      typeof renderKonohaExamDisciplineCard ===
+        "function",
+
+
+    disciplineStack:
+      !!(
+        data &&
+        Array.isArray(
+          data.disciplines
+        ) &&
+        data.disciplines.length ===
+          3
+      ),
+
+
+    selectionControl:
+      typeof changeKonohaExamCharacter ===
+        "function",
+
+
+    eligibilityRenderer:
+      typeof renderKonohaExamEligibilityPanel ===
+        "function",
+
+
+    executionBridge:
+      typeof beginKonohaExamFromUI ===
+        "function",
+
+
+    screenComposer:
+      typeof renderKonohaExamVisualScreen ===
+        "function",
+
+
+    screenLauncher:
+      typeof showKonohaExamUIScreen ===
+        "function",
+
+
+    bottomNavigation:
+      typeof renderKonohaExamBottomNavigation ===
+        "function"
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Shinobi Exams UI health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
 
 // =========================================================
 // BRICK 202 — KONOHA DATA BRIDGE HEALTH CHECK
