@@ -6969,31 +6969,23 @@ body {
 
 /* =========================================
    NINJUTSU
+   POSITION LOCK
    ========================================= */
-
-/*
-   NINJUTSU PROGRESS POSITION — LOCKED.
-
-   Calibrated live in browser DevTools.
-
-   Vertical:
-   top: 80%
-
-   Horizontal:
-   translateX(55px)
-
-   Do not modify while calibrating Genjutsu / Fuinjutsu.
-*/
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-card[data-discipline-id="nin"]
 .exam-progress-track {
 
-    top:
-        84% !important;
+    position: absolute !important;
 
-    transform:
-        translateX(9px) !important;
+    left: 17.8% !important;
+
+    top: 84% !important;
+
+    width: 54.6% !important;
+
+    height: 5% !important;
+
 }
 
 
