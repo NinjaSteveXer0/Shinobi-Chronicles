@@ -49029,6 +49029,111 @@ function validateBattleCompletionSystem() {
 
 }
 
+// =========================================================
+// BRICK 243 — EXAM VISUAL POLISH HEALTH CHECK
+// =========================================================
+
+
+function validateKonohaExamVisualSystem() {
+
+
+  const root =
+    getKonohaActivityUIRoot();
+
+
+  const screenPresent =
+    !!root;
+
+
+  const examScreen =
+    !!(
+      root &&
+      root.dataset &&
+      root.dataset.serviceId === "exams"
+    );
+
+
+  const characterPanel =
+    !!(
+      root &&
+      root.querySelector(
+        ".konoha-character-panel"
+      )
+    );
+
+
+  const disciplineCards =
+    root
+      ? root.querySelectorAll(
+          ".konoha-discipline-card"
+        ).length
+      : 0;
+
+
+  const beginButton =
+    !!(
+      root &&
+      root.querySelector(
+        ".konoha-begin-button"
+      )
+    );
+
+
+  const eligibilityPanel =
+    !!(
+      root &&
+      root.querySelector(
+        ".konoha-eligibility-panel"
+      )
+    );
+
+
+  const health = {
+
+
+    screenPresent,
+
+
+    examScreen,
+
+
+    characterPanel,
+
+
+    disciplineCards:
+      disciplineCards === 3,
+
+
+    beginButton,
+
+
+    eligibilityPanel,
+
+
+    healthy:
+      (
+        screenPresent &&
+        examScreen &&
+        characterPanel &&
+        disciplineCards === 3 &&
+        beginButton &&
+        eligibilityPanel
+      )
+
+
+  };
+
+
+  console.log(
+    "Konoha Exam Visual health:",
+    health
+  );
+
+
+  return health;
+
+
+}
 
 
 // =========================================================
