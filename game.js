@@ -48260,12 +48260,954 @@ function renderKonohaExamEligibilityRow(
 
 
 // =========================================================
-// BRICK 231 — BEGIN EXAM UI EXECUTION
+// BRICK 264 — EXAM ATTEMPT STATE
 // =========================================================
+//
+// Runtime-only Exam interaction state.
+//
+// The selected discipline is intentionally separate from
+// the selected character.
+//
+// =========================================================
+
+const KONOHA_EXAM_ATTEMPT_STATE = {
+
+  disciplineId:
+    "nin",
+
+  batchSize:
+    1,
+
+  lastBatch:
+    []
+
+};
+
+
+// =========================================================
+// BRICK 265 — EXAM DISCIPLINE SELECTION
+// =========================================================
+
+function getKonohaExamSelectedDisciplineId() {
+
+  const validDisciplines = [
+    "nin",
+    "gen",
+    "fuin"
+  ];
+
+
+  if (
+    !validDisciplines.includes(
+      KONOHA_EXAM_ATTEMPT_STATE
+        .disciplineId
+    )
+  ) {
+
+    KONOHA_EXAM_ATTEMPT_STATE
+      .disciplineId =
+        "nin";
+
+  }
+
+
+  return KONOHA_EXAM_ATTEMPT_STATE
+    .disciplineId;
+
+}
+
+
+function selectKonohaExamDiscipline(
+  disciplineId
+) {
+
+  const validDisciplines = [
+    "nin",
+    "gen",
+    "fuin"
+  ];
+
+
+  if (
+    !validDisciplines.includes(
+      disciplineId
+    )
+  ) {
+
+    console.log(
+      "Invalid Exam discipline:",
+      disciplineId
+    );
+
+
+    return false;
+
+  }
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .disciplineId =
+      disciplineId;
+
+
+  renderKonohaExamVisualScreen();
+
+
+  console.log(
+    "EXAM DISCIPLINE SELECTED:",
+    disciplineId
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICK 266 — EXAM ATTEMPT CONTEXT
+// =========================================================
+//
+// Creates the immutable context used to resolve one Exam.
+//
+// The player selects WHAT is being tested.
+// The resolver determines HOW difficult that attempt is.
+//
+// =========================================================
+
+function createKonohaExamAttemptContext(
+  characterId,
+  disciplineId
+) {
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+
+  const progression =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+
+  if (
+    !character ||
+    !discipline ||
+    !progression
+  ) {
+
+    return null;
+
+  }
+
+
+  const statValue =
+    Number(
+      character.stats[
+        disciplineId
+      ]
+    ) || 0;
+
+
+  return {
+
+    activity:
+      "exam",
+
+    characterId:
+      character.id,
+
+    disciplineId:
+      discipline.id,
+
+    disciplineName:
+      discipline.name,
+
+    disciplineLevel:
+      Number(
+        progression.level
+      ) || 1,
+
+    disciplineExp:
+      Number(
+        progression.exp
+      ) || 0,
+
+    statValue:
+      statValue,
+
+    createdAt:
+      Date.now()
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 267 — HIDDEN EXAM DIFFICULTY
+// =========================================================
+//
+// Exam difficulty is intentionally hidden from the player.
+//
+// Difficulty rises with discipline mastery so Exams remain
+// meaningful rather than becoming automatic forever.
+//
+// =========================================================
+
+function getKonohaExamHiddenDifficulty(
+  context
+) {
+
+  if (!context) {
+
+    return null;
+
+  }
+
+
+  const level =
+    Math.max(
+      1,
+      Number(
+        context.disciplineLevel
+      ) || 1
+    );
+
+
+  const baseDifficulty =
+    44;
+
+
+  const levelPressure =
+    Math.min(
+      28,
+      Math.floor(
+        (level - 1) * 1.75
+      )
+    );
+
+
+  return Math.min(
+    82,
+    baseDifficulty +
+      levelPressure
+  );
+
+}
+
+
+// =========================================================
+// BRICK 268 — EXAM HISTORY PRESSURE
+// =========================================================
+//
+// Chronicle evidence affects future Exam resolution.
+//
+// Repeated failure creates learning pressure.
+// Repeated success creates confidence, but does not make
+// success permanently guaranteed.
+//
+// This prevents pure RNG from trapping a character in an
+// endless failure streak.
+//
+// =========================================================
+
+function getKonohaExamHistoryPressure(
+  characterId,
+  disciplineId
+) {
+
+  const history =
+    getActivityHistory()
+      .filter(
+        entry =>
+          entry &&
+          entry.activity ===
+            "exam" &&
+          entry.character ===
+            characterId &&
+          entry.exam &&
+          entry.exam.disciplineId ===
+            disciplineId
+      )
+      .slice(
+        -5
+      );
+
+
+  let consecutiveFailures =
+    0;
+
+
+  for (
+    let index =
+      history.length - 1;
+    index >= 0;
+    index -= 1
+  ) {
+
+    if (
+      history[index].success ===
+        false
+    ) {
+
+      consecutiveFailures +=
+        1;
+
+    }
+    else {
+
+      break;
+
+    }
+
+  }
+
+
+  const totalSuccesses =
+    history.filter(
+      entry =>
+        entry.success ===
+          true
+    ).length;
+
+
+  return {
+
+    recentAttempts:
+      history.length,
+
+    consecutiveFailures:
+      consecutiveFailures,
+
+    recentSuccesses:
+      totalSuccesses,
+
+    failureAssist:
+      Math.min(
+        24,
+        consecutiveFailures * 8
+      ),
+
+    confidenceBonus:
+      Math.min(
+        6,
+        totalSuccesses * 2
+      )
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 269 — EXAM OUTCOME RESOLVER
+// =========================================================
+//
+// One Exam attempt.
+//
+// Character ability matters.
+// Discipline mastery matters.
+// Recent history matters.
+// Randomness creates uncertainty but does not own the system.
+//
+// =========================================================
+
+function resolveKonohaExamAttempt(
+  context
+) {
+
+  if (!context) {
+
+    return null;
+
+  }
+
+
+  const difficulty =
+    getKonohaExamHiddenDifficulty(
+      context
+    );
+
+
+  const history =
+    getKonohaExamHistoryPressure(
+      context.characterId,
+      context.disciplineId
+    );
+
+
+  const statContribution =
+    Math.min(
+      34,
+      context.statValue * 0.34
+    );
+
+
+  const masteryContribution =
+    Math.min(
+      24,
+      context.disciplineLevel * 2.4
+    );
+
+
+  const randomContribution =
+    Math.random() * 42;
+
+
+  const score =
+    statContribution +
+    masteryContribution +
+    history.failureAssist +
+    history.confidenceBonus +
+    randomContribution;
+
+
+  const passed =
+    score >= difficulty;
+
+
+  return {
+
+    passed:
+      passed,
+
+    outcome:
+      passed
+        ? "pass"
+        : "fail",
+
+    difficulty:
+      difficulty,
+
+    score:
+      Number(
+        score.toFixed(
+          2
+        )
+      ),
+
+    history:
+      history
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 270 — EXAM ATTEMPT CHRONICLE RECORD
+// =========================================================
+//
+// IMPORTANT CHRONICLE RULE:
+//
+// "The activity occurred" and "the desired outcome succeeded"
+// are separate facts.
+//
+// Failed Exam attempts therefore remain historical evidence.
+//
+// =========================================================
+
+function recordKonohaExamAttempt(
+  context,
+  resolution,
+  rewardExp
+) {
+
+  if (
+    !context ||
+    !resolution
+  ) {
+
+    return false;
+
+  }
+
+
+  const successful =
+    resolution.passed ===
+      true;
+
+
+  const progressionRewards =
+    successful &&
+    rewardExp > 0
+
+      ? [
+          {
+            type:
+              "discipline",
+
+            id:
+              context.disciplineId,
+
+            amount:
+              rewardExp
+          }
+        ]
+
+      : [];
+
+
+  activityHistory.push({
+
+    activity:
+      "exam",
+
+    character:
+      context.characterId,
+
+    completed:
+      true,
+
+    success:
+      successful,
+
+    outcome:
+      resolution.outcome,
+
+    exam: {
+
+      disciplineId:
+        context.disciplineId,
+
+      disciplineName:
+        context.disciplineName,
+
+      disciplineLevel:
+        context.disciplineLevel,
+
+      statValue:
+        context.statValue
+
+    },
+
+    rewards: {
+
+      exp:
+        0,
+
+      ryo:
+        0,
+
+      items:
+        [],
+
+      progression:
+        progressionRewards
+
+    },
+
+    timestamp:
+      Date.now()
+
+  });
+
+
+  syncActivityHistory();
+
+  savePlayerData();
+
+
+  console.log(
+    "EXAM CHRONICLE ATTEMPT RECORDED:",
+    {
+      character:
+        context.characterId,
+
+      discipline:
+        context.disciplineId,
+
+      outcome:
+        resolution.outcome
+    }
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// BRICK 271 — SINGLE DISCIPLINE EXAM EXECUTION
+// =========================================================
+
+function executeKonohaExamAttempt(
+  characterId,
+  disciplineId
+) {
+
+  const context =
+    createKonohaExamAttemptContext(
+      characterId,
+      disciplineId
+    );
+
+
+  if (!context) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "exam_context_invalid"
+
+    };
+
+  }
+
+
+  const resolution =
+    resolveKonohaExamAttempt(
+      context
+    );
+
+
+  if (!resolution) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "exam_resolution_failed"
+
+    };
+
+  }
+
+
+  const activity =
+    getActivityData(
+      "exam"
+    );
+
+
+  const rewardDefinition =
+    activity &&
+    Array.isArray(
+      activity.rewards
+    )
+
+      ? activity.rewards.find(
+          reward =>
+            reward &&
+            reward.type ===
+              "discipline" &&
+            reward.id ===
+              disciplineId
+        )
+
+      : null;
+
+
+  const rewardExp =
+    rewardDefinition
+      ? Number(
+          rewardDefinition.amount
+        ) || 0
+      : 0;
+
+
+  if (
+    resolution.passed ===
+      true
+  ) {
+
+    const progressionApplied =
+      addDisciplineExp(
+        characterId,
+        disciplineId,
+        rewardExp,
+        "exam"
+      );
+
+
+    if (!progressionApplied) {
+
+      return {
+
+        success:
+          false,
+
+        completed:
+          false,
+
+        reason:
+          "exam_progression_failed"
+
+      };
+
+    }
+
+  }
+
+
+  const recorded =
+    recordKonohaExamAttempt(
+      context,
+      resolution,
+      resolution.passed
+        ? rewardExp
+        : 0
+    );
+
+
+  if (!recorded) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "exam_history_failed"
+
+    };
+
+  }
+
+
+  return {
+
+    success:
+      resolution.passed,
+
+    completed:
+      true,
+
+    outcome:
+      resolution.outcome,
+
+    characterId:
+      characterId,
+
+    disciplineId:
+      disciplineId,
+
+    rewardExp:
+      resolution.passed
+        ? rewardExp
+        : 0
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 272 — EXAM BATCH EXECUTION + RESULT STRIP
+// =========================================================
+
+function setKonohaExamBatchSize(
+  batchSize
+) {
+
+  const normalized =
+    Number(
+      batchSize
+    ) === 5
+      ? 5
+      : 1;
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .batchSize =
+      normalized;
+
+
+  renderKonohaExamVisualScreen();
+
+
+  return true;
+
+}
+
+
+function executeKonohaExamBatch(
+  characterId,
+  disciplineId,
+  batchSize = 1
+) {
+
+  const count =
+    batchSize === 5
+      ? 5
+      : 1;
+
+
+  const results =
+    [];
+
+
+  for (
+    let index = 0;
+    index < count;
+    index += 1
+  ) {
+
+    const result =
+      executeKonohaExamAttempt(
+        characterId,
+        disciplineId
+      );
+
+
+    results.push(
+      result
+    );
+
+
+    if (
+      !result ||
+      result.completed !==
+        true
+    ) {
+
+      break;
+
+    }
+
+  }
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .lastBatch =
+      results;
+
+
+  return results;
+
+}
+
+
+function renderKonohaExamResultStrip() {
+
+  const results =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .lastBatch;
+
+
+  if (
+    !Array.isArray(
+      results
+    ) ||
+    results.length ===
+      0
+  ) {
+
+    return "";
+
+  }
+
+
+  return `
+
+    <div
+      class="
+        exam-result-strip
+      "
+      style="
+        display:flex;
+        justify-content:center;
+        gap:8px;
+        flex-wrap:wrap;
+        margin:10px 0 0;
+      "
+    >
+
+      ${results
+        .map(
+          result => {
+
+            const passed =
+              result &&
+              result.completed ===
+                true &&
+              result.success ===
+                true;
+
+
+            const label =
+              result &&
+              result.completed ===
+                true
+
+                ? (
+                    passed
+                      ? "PASS"
+                      : "FAIL"
+                  )
+
+                : "ERROR";
+
+
+            return `
+
+              <span
+                class="
+                  exam-result-chip
+                  ${
+                    passed
+                      ? "pass"
+                      : "fail"
+                  }
+                "
+                style="
+                  min-width:64px;
+                  padding:6px 10px;
+                  border:1px solid
+                    ${
+                      passed
+                        ? "#4fdde4"
+                        : "#9d4b45"
+                    };
+                  background:
+                    rgba(3,8,10,0.88);
+                  text-align:center;
+                  font-size:13px;
+                  letter-spacing:1.4px;
+                "
+              >
+                ${label}
+              </span>
+
+            `;
+
+          }
+        )
+        .join("")}
+
+    </div>
+
+  `;
+
+}
 
 
 function beginKonohaExamFromUI() {
-
 
   const session =
     getKonohaActivityUISessionState();
@@ -48277,17 +49219,18 @@ function beginKonohaExamFromUI() {
     !session.characterId
   ) {
 
-
     return {
 
       success:
+        false,
+
+      completed:
         false,
 
       reason:
         "exam_ui_session_invalid"
 
     };
-
 
   }
 
@@ -48304,10 +49247,12 @@ function beginKonohaExamFromUI() {
       true
   ) {
 
-
     return {
 
       success:
+        false,
+
+      completed:
         false,
 
       reason:
@@ -48315,32 +49260,170 @@ function beginKonohaExamFromUI() {
 
     };
 
-
   }
 
 
-  const result =
-    executeKonohaService(
-      "exams",
-      session.characterId
+  const disciplineId =
+    getKonohaExamSelectedDisciplineId();
+
+
+  const batchSize =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .batchSize === 5
+        ? 5
+        : 1;
+
+
+  const results =
+    executeKonohaExamBatch(
+      session.characterId,
+      disciplineId,
+      batchSize
     );
 
 
-  if (
-    result &&
-    result.success ===
-      true
-  ) {
+  renderKonohaExamVisualScreen();
 
 
-    renderKonohaExamVisualScreen();
+  return {
+
+    success:
+      results.length > 0 &&
+      results.every(
+        result =>
+          result &&
+          result.completed ===
+            true
+      ),
+
+    completed:
+      results.length > 0,
+
+    characterId:
+      session.characterId,
+
+    disciplineId:
+      disciplineId,
+
+    batchSize:
+      batchSize,
+
+    results:
+      results
+
+  };
+
+}
 
 
-  }
+// =========================================================
+// BRICK 273 — EXAM GAMEPLAY REGRESSION
+// =========================================================
+
+function validateKonohaExamGameplaySystem() {
+
+  const selectedDiscipline =
+    getKonohaExamSelectedDisciplineId();
 
 
-  return result;
+  const context =
+    createKonohaExamAttemptContext(
+      "naruto",
+      selectedDiscipline
+    );
 
+
+  const difficulty =
+    context
+      ? getKonohaExamHiddenDifficulty(
+          context
+        )
+      : null;
+
+
+  const history =
+    context
+      ? getKonohaExamHistoryPressure(
+          context.characterId,
+          context.disciplineId
+        )
+      : null;
+
+
+  const activity =
+    getActivityData(
+      "exam"
+    );
+
+
+  const checks = {
+
+    attemptState:
+      !!KONOHA_EXAM_ATTEMPT_STATE,
+
+    selectedDiscipline:
+      [
+        "nin",
+        "gen",
+        "fuin"
+      ].includes(
+        selectedDiscipline
+      ),
+
+    context:
+      !!context,
+
+    hiddenDifficulty:
+      Number.isFinite(
+        difficulty
+      ),
+
+    historyPressure:
+      !!(
+        history &&
+        Number.isFinite(
+          history.failureAssist
+        )
+      ),
+
+    activityAuthority:
+      !!activity,
+
+    singleExecution:
+      typeof executeKonohaExamAttempt ===
+        "function",
+
+    batchExecution:
+      typeof executeKonohaExamBatch ===
+        "function",
+
+    chronicleRecording:
+      typeof recordKonohaExamAttempt ===
+        "function",
+
+    resultRenderer:
+      typeof renderKonohaExamResultStrip ===
+        "function"
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "KONOHA EXAM GAMEPLAY HEALTH:",
+    checks
+  );
+
+
+  return checks;
 
 }
 
@@ -48349,9 +49432,7 @@ function beginKonohaExamFromUI() {
 // BRICK 257 — SHINOBI EXAMS VISUAL SCREEN COMPOSER
 // =========================================================
 
-
 function renderKonohaExamVisualScreen() {
-
 
   ensureKonohaExamUIStyles();
 
@@ -48372,7 +49453,6 @@ function renderKonohaExamVisualScreen() {
 
   if (!data) {
 
-
     console.log(
       "Exam visual render failed."
     );
@@ -48380,8 +49460,18 @@ function renderKonohaExamVisualScreen() {
 
     return false;
 
-
   }
+
+
+  const selectedDisciplineId =
+    getKonohaExamSelectedDisciplineId();
+
+
+  const batchSize =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .batchSize === 5
+        ? 5
+        : 1;
 
 
   root.dataset.serviceId =
@@ -48399,11 +49489,6 @@ function renderKonohaExamVisualScreen() {
         konoha-exam-screen
       "
     >
-
-
-      <!-- =====================================
-           BAKED KONOHA NAVIGATION HOTSPOT
-           ===================================== -->
 
       <button
         type="button"
@@ -48476,9 +49561,118 @@ function renderKonohaExamVisualScreen() {
           "
         >
 
-          ${renderKonohaExamDisciplineStack(
-            data.disciplines
-          )}
+          <div
+            class="
+              exam-discipline-stack
+            "
+          >
+
+            ${data.disciplines
+              .map(
+                discipline => `
+
+                  <button
+                    type="button"
+                    class="
+                      exam-discipline-select
+                      ${
+                        discipline.id ===
+                          selectedDisciplineId
+                          ? "selected"
+                          : ""
+                      }
+                    "
+                    onclick="
+                      selectKonohaExamDiscipline(
+                        '${discipline.id}'
+                      )
+                    "
+                    style="
+                      display:block;
+                      width:100%;
+                      padding:0;
+                      border:
+                        ${
+                          discipline.id ===
+                            selectedDisciplineId
+                            ? "2px solid #4fdde4"
+                            : "1px solid transparent"
+                        };
+                      background:transparent;
+                      cursor:pointer;
+                      text-align:inherit;
+                    "
+                  >
+
+                    ${renderKonohaExamDisciplineCard(
+                      discipline
+                    )}
+
+                  </button>
+
+                `
+              )
+              .join("")}
+
+          </div>
+
+
+          <div
+            style="
+              display:flex;
+              justify-content:center;
+              gap:8px;
+              margin-top:10px;
+            "
+          >
+
+            <button
+              type="button"
+              onclick="
+                setKonohaExamBatchSize(1)
+              "
+              style="
+                padding:7px 14px;
+                cursor:pointer;
+                border:1px solid
+                  ${
+                    batchSize === 1
+                      ? "#4fdde4"
+                      : "#8f6b22"
+                  };
+                background:#070c0f;
+                color:#ead8a1;
+              "
+            >
+              ×1
+            </button>
+
+
+            <button
+              type="button"
+              onclick="
+                setKonohaExamBatchSize(5)
+              "
+              style="
+                padding:7px 14px;
+                cursor:pointer;
+                border:1px solid
+                  ${
+                    batchSize === 5
+                      ? "#4fdde4"
+                      : "#8f6b22"
+                  };
+                background:#070c0f;
+                color:#ead8a1;
+              "
+            >
+              ×5
+            </button>
+
+          </div>
+
+
+          ${renderKonohaExamResultStrip()}
 
 
           <div
@@ -48507,8 +49701,8 @@ function renderKonohaExamVisualScreen() {
                   exam-information-row
                 "
               >
-                Exams test your knowledge
-                and chakra control.
+                Select the discipline
+                you wish to examine.
               </div>
 
 
@@ -48517,8 +49711,8 @@ function renderKonohaExamVisualScreen() {
                   exam-information-row
                 "
               >
-                Each discipline grants
-                EXP upon completion.
+                Successful attempts grant
+                discipline EXP.
               </div>
 
 
@@ -48527,8 +49721,9 @@ function renderKonohaExamVisualScreen() {
                   exam-information-row
                 "
               >
-                Higher levels require
-                more EXP to advance.
+                Failed attempts grant no
+                EXP, but remain part of
+                your shinobi history.
               </div>
 
 
@@ -48537,8 +49732,8 @@ function renderKonohaExamVisualScreen() {
                   exam-information-row
                 "
               >
-                You can only run one
-                Exam at a time.
+                ×5 resolves five real
+                sequential Exam attempts.
               </div>
 
             </section>
@@ -48591,20 +49786,24 @@ function renderKonohaExamVisualScreen() {
   console.log(
     "SHINOBI EXAMS UI RENDERED:",
     {
+
       character:
         data.selectedCharacterId,
 
-      disciplines:
-        data.disciplines.length,
+      discipline:
+        selectedDisciplineId,
+
+      batchSize:
+        batchSize,
 
       canExecute:
         data.canExecute
+
     }
   );
 
 
   return true;
-
 
 }
 
@@ -49382,8 +50581,9 @@ function validateKonohaExamVisualSystem() {
 
 
 // =========================================================
-// BRICK 222 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 273B — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
+
 
 function runActivityLocationRegression() {
 
@@ -49430,6 +50630,10 @@ function runActivityLocationRegression() {
 
   const battleQueryHealth =
     validateBattleChronicleQueries();
+
+
+  const examGameplayHealth =
+    validateKonohaExamGameplaySystem();
 
 
   // =========================================
@@ -49584,6 +50788,10 @@ function runActivityLocationRegression() {
       battleQueryHealth.healthy,
 
 
+    examGameplay:
+      examGameplayHealth.healthy,
+
+
     contentAccess:
       contentAccessHealth.healthy,
 
@@ -49625,6 +50833,7 @@ function runActivityLocationRegression() {
         battleBridgeHealth.healthy &&
         battleCompletionHealth.healthy &&
         battleQueryHealth.healthy &&
+        examGameplayHealth.healthy &&
         contentAccessHealth.healthy &&
         konohaDataHealth.healthy &&
         konohaExecutionHealth.healthy &&
