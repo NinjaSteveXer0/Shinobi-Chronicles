@@ -49429,10 +49429,25 @@ function validateKonohaExamGameplaySystem() {
 
 
 // =========================================================
-// BRICK 257 — SHINOBI EXAMS VISUAL SCREEN COMPOSER
+// BRICK 274 — SHINOBI EXAMS VISUAL COMPOSER V2
+// =========================================================
+//
+// Pure presentation pass.
+//
+// Existing Exam gameplay authorities remain untouched:
+//
+// - discipline selection
+// - hidden difficulty
+// - history pressure
+// - PASS / FAIL resolution
+// - x1 / x5 execution
+// - Chronicle attempt recording
+//
 // =========================================================
 
+
 function renderKonohaExamVisualScreen() {
+
 
   ensureKonohaExamUIStyles();
 
@@ -49453,12 +49468,14 @@ function renderKonohaExamVisualScreen() {
 
   if (!data) {
 
+
     console.log(
       "Exam visual render failed."
     );
 
 
     return false;
+
 
   }
 
@@ -49470,7 +49487,9 @@ function renderKonohaExamVisualScreen() {
   const batchSize =
     KONOHA_EXAM_ATTEMPT_STATE
       .batchSize === 5
+
         ? 5
+
         : 1;
 
 
@@ -49490,6 +49509,11 @@ function renderKonohaExamVisualScreen() {
       "
     >
 
+
+      <!-- =====================================
+           BRICK 275 — KONOHA RETURN HOTSPOT
+           ===================================== -->
+
       <button
         type="button"
         class="
@@ -49508,9 +49532,16 @@ function renderKonohaExamVisualScreen() {
       </button>
 
 
+      <!--
+         Header graphics/text remain baked into exams.png.
+      -->
+
       <header
         class="
           exam-header
+        "
+        aria-hidden="
+          true
         "
       >
 
@@ -49519,7 +49550,7 @@ function renderKonohaExamVisualScreen() {
             exam-header-konoha
           "
         >
-          ◉ KONOHA
+          KONOHA
         </div>
 
 
@@ -49550,6 +49581,11 @@ function renderKonohaExamVisualScreen() {
         "
       >
 
+
+        <!-- =====================================
+             CHARACTER
+             ===================================== -->
+
         ${renderKonohaExamCharacterPanel(
           data.character
         )}
@@ -49560,6 +49596,11 @@ function renderKonohaExamVisualScreen() {
             exam-content-column
           "
         >
+
+
+          <!-- =====================================
+               BRICK 276 — DISCIPLINE SELECTORS
+               ===================================== -->
 
           <div
             class="
@@ -49572,35 +49613,33 @@ function renderKonohaExamVisualScreen() {
                 discipline => `
 
                   <button
-                    type="button"
+                    type="
+                      button
+                    "
                     class="
                       exam-discipline-select
                       ${
                         discipline.id ===
                           selectedDisciplineId
+
                           ? "selected"
+
                           : ""
                       }
+                    "
+                    data-discipline-id="
+                      ${discipline.id}
                     "
                     onclick="
                       selectKonohaExamDiscipline(
                         '${discipline.id}'
                       )
                     "
-                    style="
-                      display:block;
-                      width:100%;
-                      padding:0;
-                      border:
-                        ${
-                          discipline.id ===
-                            selectedDisciplineId
-                            ? "2px solid #4fdde4"
-                            : "1px solid transparent"
-                        };
-                      background:transparent;
-                      cursor:pointer;
-                      text-align:inherit;
+                    aria-pressed="
+                      ${
+                        discipline.id ===
+                          selectedDisciplineId
+                      }
                     "
                   >
 
@@ -49617,63 +49656,118 @@ function renderKonohaExamVisualScreen() {
           </div>
 
 
+          <!-- =====================================
+               BRICK 277 — LOWER ACTION CONTROL
+               ===================================== -->
+
           <div
-            style="
-              display:flex;
-              justify-content:center;
-              gap:8px;
-              margin-top:10px;
+            class="
+              exam-action-control
             "
           >
 
-            <button
-              type="button"
-              onclick="
-                setKonohaExamBatchSize(1)
+
+            <div
+              class="
+                exam-batch-controls
               "
-              style="
-                padding:7px 14px;
-                cursor:pointer;
-                border:1px solid
+              aria-label="
+                Exam attempt count
+              "
+            >
+
+              <button
+                type="
+                  button
+                "
+                class="
+                  exam-batch-button
                   ${
                     batchSize === 1
-                      ? "#4fdde4"
-                      : "#8f6b22"
-                  };
-                background:#070c0f;
-                color:#ead8a1;
-              "
-            >
-              ×1
-            </button>
+                      ? "selected"
+                      : ""
+                  }
+                "
+                onclick="
+                  setKonohaExamBatchSize(
+                    1
+                  )
+                "
+                aria-pressed="
+                  ${
+                    batchSize === 1
+                  }
+                "
+              >
+                ×1
+              </button>
 
 
-            <button
-              type="button"
-              onclick="
-                setKonohaExamBatchSize(5)
-              "
-              style="
-                padding:7px 14px;
-                cursor:pointer;
-                border:1px solid
+              <button
+                type="
+                  button
+                "
+                class="
+                  exam-batch-button
                   ${
                     batchSize === 5
-                      ? "#4fdde4"
-                      : "#8f6b22"
-                  };
-                background:#070c0f;
-                color:#ead8a1;
+                      ? "selected"
+                      : ""
+                  }
+                "
+                onclick="
+                  setKonohaExamBatchSize(
+                    5
+                  )
+                "
+                aria-pressed="
+                  ${
+                    batchSize === 5
+                  }
+                "
+              >
+                ×5
+              </button>
+
+            </div>
+
+
+            ${renderKonohaExamResultStrip()}
+
+
+            <div
+              class="
+                exam-begin-wrap
               "
             >
-              ×5
-            </button>
+
+              <button
+                type="
+                  button
+                "
+                class="
+                  exam-begin-button
+                "
+                ${
+                  data.canExecute
+                    ? ""
+                    : "disabled"
+                }
+                onclick="
+                  beginKonohaExamFromUI()
+                "
+              >
+                BEGIN EXAM
+              </button>
+
+            </div>
 
           </div>
 
 
-          ${renderKonohaExamResultStrip()}
-
+          <!-- =====================================
+               BRICK 278 — LOWER INFORMATION PANELS
+               ===================================== -->
 
           <div
             class="
@@ -49721,9 +49815,8 @@ function renderKonohaExamVisualScreen() {
                   exam-information-row
                 "
               >
-                Failed attempts grant no
-                EXP, but remain part of
-                your shinobi history.
+                Unsuccessful attempts remain
+                part of your shinobi history.
               </div>
 
 
@@ -49732,37 +49825,11 @@ function renderKonohaExamVisualScreen() {
                   exam-information-row
                 "
               >
-                ×5 resolves five real
-                sequential Exam attempts.
+                ×5 resolves five genuine
+                sequential attempts.
               </div>
 
             </section>
-
-
-            <div
-              class="
-                exam-begin-wrap
-              "
-            >
-
-              <button
-                type="button"
-                class="
-                  exam-begin-button
-                "
-                ${
-                  data.canExecute
-                    ? ""
-                    : "disabled"
-                }
-                onclick="
-                  beginKonohaExamFromUI()
-                "
-              >
-                BEGIN EXAM
-              </button>
-
-            </div>
 
 
             ${renderKonohaExamEligibilityPanel(
@@ -49804,6 +49871,7 @@ function renderKonohaExamVisualScreen() {
 
 
   return true;
+
 
 }
 
