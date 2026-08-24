@@ -39601,34 +39601,413 @@ function getPlayerLocationProgressSummary() {
 }
 
 // =========================================================
-// LOCATION SYSTEM HEALTH CHECK
+// BRICK 131 — LOCATION ENGINE HEALTH CHECK
 // =========================================================
+//
+// Non-destructive Location Engine diagnostics.
+//
+// Validates:
+// - Location database
+// - Discovery
+// - History
+// - Progress
+// - Activity mappings
+// - Location activity execution bridge
+//
+// =========================================================
+
 
 function validateLocationSystem() {
 
 
-  return {
+  const checks = {
+
 
     database:
       Object.keys(
         LOCATION_DATABASE
       ).length > 0,
 
+
     discovery:
       typeof isLocationDiscovered ===
-      "function",
+        "function",
+
 
     history:
       typeof getLocationHistory ===
-      "function",
+        "function",
+
 
     progress:
       typeof getPlayerLocationProgress ===
-      "function"
+        "function",
+
+
+    activityConnections:
+      typeof LOCATION_ACTIVITY_CONNECTIONS ===
+        "object",
+
+
+    activityLookup:
+      typeof getLocationActivity ===
+        "function",
+
+
+    activityValidation:
+      typeof validateLocationActivity ===
+        "function",
+
+
+    activityLaunch:
+      typeof launchLocationAction ===
+        "function",
+
+
+    activityExecution:
+      typeof executeLocationAction ===
+        "function"
+
 
   };
 
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+
+  console.log(
+    "Location Engine health:",
+    checks
+  );
+
+
+
+  return checks;
+
+
 }
+
+// =========================================================
+// BRICK 132 — ACTIVITY ENGINE HEALTH CHECK
+// =========================================================
+//
+// Non-destructive Activity Engine diagnostics.
+//
+// Validates:
+// - Activity database
+// - Result creation
+// - Hydration
+// - Reward processor
+// - Progression router
+// - Completion recording
+// - Chronicle history
+// - Player Loop bridge
+//
+// =========================================================
+
+
+function validateActivitySystem() {
+
+
+  const requiredActivities = [
+    "exam",
+    "practical",
+    "battle",
+    "mission"
+  ];
+
+
+
+  const registeredActivities =
+    requiredActivities.every(
+      activityId =>
+        !!getActivityData(
+          activityId
+        )
+    );
+
+
+
+  const resultProbe =
+    createActivityResult(
+      "practical",
+      "naruto"
+    );
+
+
+
+  const normalizedResult =
+    !!(
+      resultProbe &&
+      resultProbe.rewards &&
+      Array.isArray(
+        resultProbe.rewards.items
+      ) &&
+      Array.isArray(
+        resultProbe.rewards.progression
+      )
+    );
+
+
+
+  const checks = {
+
+
+    database:
+      typeof ACTIVITY_DATABASE ===
+        "object",
+
+
+    registeredActivities:
+      registeredActivities,
+
+
+    resolution:
+      typeof resolveActivityAction ===
+        "function",
+
+
+    resultFoundation:
+      normalizedResult,
+
+
+    hydration:
+      typeof hydrateActivityResult ===
+        "function",
+
+
+    rewardProcessor:
+      typeof applyActivityRewards ===
+        "function",
+
+
+    progression:
+      typeof processActivityProgression ===
+        "function",
+
+
+    completion:
+      typeof recordActivityCompletion ===
+        "function",
+
+
+    history:
+      typeof getActivityHistory ===
+        "function",
+
+
+    analytics:
+      typeof getActivityAnalytics ===
+        "function",
+
+
+    registeredExecution:
+      typeof startRegisteredActivity ===
+        "function",
+
+
+    playerLoop:
+      typeof executePlayerActivity ===
+        "function"
+
+
+  };
+
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+
+  console.log(
+    "Activity Engine health:",
+    checks
+  );
+
+
+
+  return checks;
+
+
+}
+
+// =========================================================
+// BRICK 133 — ACTIVITY / LOCATION INTEGRATION REGRESSION
+// =========================================================
+//
+// Master non-destructive regression checkpoint
+// for the current Chronicle Engine integration phase.
+//
+// Validates:
+// - Location Engine
+// - Activity Engine
+// - Location → Activity mappings
+// - Character-aware execution routes
+//
+// Does NOT:
+// - Award EXP
+// - Award Ryō
+// - Modify history
+// - Modify save data
+//
+// =========================================================
+
+
+function runActivityLocationRegression() {
+
+
+  const locationHealth =
+    validateLocationSystem();
+
+
+
+  const activityHealth =
+    validateActivitySystem();
+
+
+
+  const mappingChecks = {
+
+
+    konohaMission:
+      getLocationActivity(
+        "konoha",
+        "missions"
+      ) ===
+        "mission",
+
+
+    konohaExam:
+      getLocationActivity(
+        "konoha",
+        "exams"
+      ) ===
+        "exam",
+
+
+    konohaPractical:
+      getLocationActivity(
+        "konoha",
+        "practical"
+      ) ===
+        "practical",
+
+
+    trainingGrounds:
+      getLocationActivity(
+        "training_grounds",
+        "practical"
+      ) ===
+        "practical",
+
+
+    rogueBattle:
+      getLocationActivity(
+        "rogue_hideout",
+        "battle"
+      ) ===
+        "battle"
+
+
+  };
+
+
+
+  const mappingsHealthy =
+    Object.values(
+      mappingChecks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+
+  const characterBridgeHealthy =
+    !!getPlayerCharacter(
+      "naruto"
+    );
+
+
+
+  const result = {
+
+
+    locationEngine:
+      locationHealth.healthy,
+
+
+    activityEngine:
+      activityHealth.healthy,
+
+
+    mappings:
+      mappingsHealthy,
+
+
+    characterBridge:
+      characterBridgeHealthy,
+
+
+    healthy:
+      (
+        locationHealth.healthy &&
+        activityHealth.healthy &&
+        mappingsHealthy &&
+        characterBridgeHealthy
+      )
+
+
+  };
+
+
+
+  console.log(
+    "========================================"
+  );
+
+
+  console.log(
+    "ACTIVITY / LOCATION REGRESSION"
+  );
+
+
+  console.table(
+    mappingChecks
+  );
+
+
+  console.log(
+    "Integration result:",
+    result
+  );
+
+
+  console.log(
+    "========================================"
+  );
+
+
+
+  return result;
+
+
+}
+
 
 // =========================================================
 // TRAINING ACTIVITY DATA BRIDGE
