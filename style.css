@@ -6990,7 +6990,7 @@ body {
 .exam-progress-track {
 
     top:
-        5% !important;
+        80% !important;
 
     transform:
         translateX(55px) !important;
