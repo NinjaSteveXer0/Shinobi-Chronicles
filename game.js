@@ -30838,6 +30838,494 @@ const enemyDatabase = {
 
 };
 
+// =========================================================
+// BRICK 143 — CANONICAL ENCOUNTER DATABASE
+// =========================================================
+//
+// Chronicle Engine Encounter definitions.
+//
+// Encounter metadata references enemyDatabase
+// rather than duplicating combat reward authority.
+//
+// =========================================================
+
+
+const ENCOUNTER_DATABASE = {
+
+
+  scout_patrol: {
+
+
+    id:
+      "scout_patrol",
+
+
+    name:
+      "Scout Patrol",
+
+
+    description:
+      "Fight a small rogue patrol.",
+
+
+    enemyId:
+      "scout"
+
+
+  },
+
+
+
+  bandit_leader: {
+
+
+    id:
+      "bandit_leader",
+
+
+    name:
+      "Bandit Leader",
+
+
+    description:
+      "Defeat an elite rogue shinobi.",
+
+
+    enemyId:
+      "banditLeader"
+
+
+  },
+
+
+
+  hidden_cache: {
+
+
+    id:
+      "hidden_cache",
+
+
+    name:
+      "Hidden Cache",
+
+
+    description:
+      "High-risk encounter protecting stolen equipment.",
+
+
+    enemyId:
+      "bandit"
+
+
+  }
+
+
+};
+
+
+
+
+
+function getEncounterData(
+  encounterId
+) {
+
+
+  return (
+
+    ENCOUNTER_DATABASE[
+      encounterId
+    ]
+
+    ||
+
+    null
+
+  );
+
+
+}
+
+// =========================================================
+// BRICK 144 — ENCOUNTER DEFINITION NORMALIZATION
+// =========================================================
+//
+// Combines Encounter metadata with
+// canonical Enemy Database combat data.
+//
+// =========================================================
+
+
+function normalizeEncounterDefinition(
+  encounterData
+) {
+
+
+  if (
+    !encounterData
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+
+  const enemy =
+    enemyDatabase[
+      encounterData.enemyId
+    ];
+
+
+
+  if (
+    !enemy
+  ) {
+
+
+    return null;
+
+
+  }
+
+
+
+  const rewards =
+    enemy.rewards ||
+    {};
+
+
+
+  return {
+
+
+    id:
+      encounterData.id,
+
+
+    name:
+      encounterData.name,
+
+
+    description:
+      encounterData.description,
+
+
+    enemyId:
+      enemy.id,
+
+
+    enemy:
+      enemy,
+
+
+    recommendedPL:
+      Number(
+        enemy.power
+      ) || 0,
+
+
+    rewards: {
+
+
+      ryo:
+        rewards.ryo ||
+        null,
+
+
+      exp:
+        rewards.exp ||
+        null,
+
+
+      commonDrops:
+        Array.isArray(
+          rewards.commonDrops
+        )
+          ? rewards.commonDrops
+          : [],
+
+
+      rareDrops:
+        Array.isArray(
+          rewards.rareDrops
+        )
+          ? rewards.rareDrops
+          : []
+
+
+    }
+
+
+  };
+
+
+}
+
+
+
+
+
+function getEncounterDefinition(
+  encounterId
+) {
+
+
+  return normalizeEncounterDefinition(
+    getEncounterData(
+      encounterId
+    )
+  );
+
+
+}
+
+// =========================================================
+// BRICK 145 — ENCOUNTER READINESS + EXECUTION BRIDGE
+// =========================================================
+//
+// Encounter Database
+// ↓
+// Enemy Database
+// ↓
+// Battle Engine
+//
+// PL recommendation is advisory.
+// Existing Battle Engine remains combat authority.
+//
+// =========================================================
+
+
+function getEncounterReadiness(
+  encounterId,
+  characterId
+) {
+
+
+  const encounter =
+    getEncounterDefinition(
+      encounterId
+    );
+
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+
+  if (
+    !encounter ||
+    !character
+  ) {
+
+
+    return {
+
+
+      available:
+        false,
+
+
+      encounterId:
+        encounterId || null,
+
+
+      characterId:
+        characterId || null,
+
+
+      reason:
+        "invalid_encounter_request"
+
+
+    };
+
+
+  }
+
+
+
+  const currentPL =
+    calculateCurrentPL(
+      character
+    );
+
+
+
+  return {
+
+
+    available:
+      true,
+
+
+    encounterId:
+      encounterId,
+
+
+    characterId:
+      characterId,
+
+
+    currentPL:
+      currentPL,
+
+
+    recommendedPL:
+      encounter.recommendedPL,
+
+
+    meetsRecommendation:
+      currentPL >=
+        encounter.recommendedPL,
+
+
+    requirementsEnforced:
+      false
+
+
+  };
+
+
+}
+
+
+
+
+
+function startEncounterActivity(
+  encounterId,
+  characterId = "naruto"
+) {
+
+
+  const encounter =
+    getEncounterDefinition(
+      encounterId
+    );
+
+
+
+  if (
+    !encounter
+  ) {
+
+
+    console.log(
+      "Encounter not found:",
+      encounterId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  const readiness =
+    getEncounterReadiness(
+      encounterId,
+      characterId
+    );
+
+
+
+  if (
+    !readiness.available
+  ) {
+
+
+    console.log(
+      "Encounter unavailable:",
+      readiness
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  if (
+    !readiness.meetsRecommendation
+  ) {
+
+
+    console.log(
+      "Encounter PL recommendation not met:",
+      {
+        currentPL:
+          readiness.currentPL,
+
+        recommendedPL:
+          readiness.recommendedPL,
+
+        enforced:
+          false
+      }
+    );
+
+
+  }
+
+
+
+  console.log(
+    "ENCOUNTER ACTIVITY START:",
+    encounter
+  );
+
+
+
+  startEncounter(
+    encounter.enemyId
+  );
+
+
+
+  if (
+    !currentBattle.active ||
+    !currentBattle.enemy ||
+    currentBattle.enemy.id !==
+      encounter.enemyId
+  ) {
+
+
+    console.log(
+      "Encounter Battle Engine launch failed:",
+      encounterId
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  console.log(
+    "ENCOUNTER BATTLE LAUNCHED:",
+    encounter.id
+  );
+
+
+
+  return encounter;
+
+
+}
+
 
 // =========================================================
 // ENCOUNTER SYSTEM
@@ -40000,7 +40488,143 @@ function validateActivitySystem() {
 }
 
 // =========================================================
-// BRICK 142 — CHRONICLE ACTIVITY INTEGRATION REGRESSION
+// BRICK 147 — ENCOUNTER ENGINE HEALTH CHECK
+// =========================================================
+//
+// Non-destructive Encounter Engine diagnostics.
+//
+// =========================================================
+
+
+function validateEncounterSystem() {
+
+
+  const requiredEncounters = [
+
+    "scout_patrol",
+    "bandit_leader",
+    "hidden_cache"
+
+  ];
+
+
+
+  const registered =
+    requiredEncounters.every(
+      encounterId =>
+        !!getEncounterData(
+          encounterId
+        )
+    );
+
+
+
+  const definitions =
+    requiredEncounters.every(
+      encounterId =>
+        !!getEncounterDefinition(
+          encounterId
+        )
+    );
+
+
+
+  const enemyLinks =
+    requiredEncounters.every(
+      encounterId => {
+
+
+        const encounter =
+          getEncounterDefinition(
+            encounterId
+          );
+
+
+
+        return !!(
+          encounter &&
+          encounter.enemy &&
+          enemyDatabase[
+            encounter.enemyId
+          ]
+        );
+
+
+      }
+    );
+
+
+
+  const checks = {
+
+
+    database:
+      typeof ENCOUNTER_DATABASE ===
+        "object",
+
+
+    registered:
+      registered,
+
+
+    definitions:
+      definitions,
+
+
+    enemyLinks:
+      enemyLinks,
+
+
+    normalizer:
+      typeof normalizeEncounterDefinition ===
+        "function",
+
+
+    readiness:
+      typeof getEncounterReadiness ===
+        "function",
+
+
+    execution:
+      typeof startEncounterActivity ===
+        "function",
+
+
+    battleAuthority:
+      typeof startEncounter ===
+        "function"
+
+
+  };
+
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+
+  console.log(
+    "Encounter Engine health:",
+    checks
+  );
+
+
+
+  return checks;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 147 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 //
 // Master non-destructive regression checkpoint.
@@ -40010,17 +40634,11 @@ function validateActivitySystem() {
 // - Location Engine
 // - Activity Engine
 // - Training Engine
-// - Location → Activity mappings
+// - Encounter Engine
+// - Location mappings
 // - Character bridge
-// - Training data normalization
-//
-// Does NOT:
-//
-// - Award EXP
-// - Award Ryō
-// - Modify inventory
-// - Modify Activity History
-// - Modify save data
+// - Training normalization
+// - Encounter normalization
 //
 // =========================================================
 
@@ -40040,6 +40658,11 @@ function runActivityLocationRegression() {
 
   const trainingHealth =
     validateTrainingSystem();
+
+
+
+  const encounterHealth =
+    validateEncounterSystem();
 
 
 
@@ -40146,6 +40769,29 @@ function runActivityLocationRegression() {
 
 
   // =========================================
+  // ENCOUNTER NORMALIZATION
+  // =========================================
+
+
+  const encounterProbe =
+    getEncounterDefinition(
+      "scout_patrol"
+    );
+
+
+
+  const encounterNormalizationHealthy =
+    !!(
+      encounterProbe &&
+      encounterProbe.enemyId ===
+        "scout" &&
+      encounterProbe.enemy &&
+      encounterProbe.rewards
+    );
+
+
+
+  // =========================================
   // FINAL RESULT
   // =========================================
 
@@ -40165,6 +40811,10 @@ function runActivityLocationRegression() {
       trainingHealth.healthy,
 
 
+    encounterEngine:
+      encounterHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -40177,14 +40827,20 @@ function runActivityLocationRegression() {
       trainingNormalizationHealthy,
 
 
+    encounterNormalization:
+      encounterNormalizationHealthy,
+
+
     healthy:
       (
         locationHealth.healthy &&
         activityHealth.healthy &&
         trainingHealth.healthy &&
+        encounterHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
-        trainingNormalizationHealthy
+        trainingNormalizationHealthy &&
+        encounterNormalizationHealthy
       )
 
 
@@ -40198,7 +40854,7 @@ function runActivityLocationRegression() {
 
 
   console.log(
-    "CHRONICLE ACTIVITY INTEGRATION REGRESSION"
+    "CHRONICLE GAMEPLAY INTEGRATION REGRESSION"
   );
 
 
@@ -40223,7 +40879,6 @@ function runActivityLocationRegression() {
 
 
 }
-
 
 // =========================================================
 // BRICK 140 — LEGACY TRAINING DATA BRIDGE RETIRED
@@ -41311,19 +41966,200 @@ function startTraining(
 }
 
 // =========================================================
-// UI MODULE — BATTLE / LOOT OVERLAY
+// BRICK 146 — DATA-DRIVEN BATTLE / LOOT OVERLAY
 // =========================================================
+//
+// Renders Encounter cards directly from
+// ENCOUNTER_DATABASE + enemyDatabase.
+//
+// Removes hard-coded reward presentation.
+//
+// =========================================================
+
+
+function getEncounterRewardSummary(
+  encounter
+) {
+
+
+  if (
+    !encounter ||
+    !encounter.rewards
+  ) {
+
+
+    return "Rewards unavailable";
+
+
+  }
+
+
+
+  const ryo =
+    encounter.rewards.ryo;
+
+
+
+  if (
+    !ryo
+  ) {
+
+
+    return "Ryō: —";
+
+
+  }
+
+
+
+  return (
+    `Ryō: ${ryo.min} – ${ryo.max}`
+  );
+
+
+}
+
+
+
+
+
+function getEncounterDropSummary(
+  encounter
+) {
+
+
+  if (
+    !encounter ||
+    !encounter.rewards
+  ) {
+
+
+    return "No known drops";
+
+
+  }
+
+
+
+  const rareDrops =
+    encounter.rewards.rareDrops;
+
+
+
+  if (
+    Array.isArray(
+      rareDrops
+    ) &&
+    rareDrops.length > 0
+  ) {
+
+
+    const bestRareDrop =
+      rareDrops[0];
+
+
+
+    return (
+      `${bestRareDrop.name}: ${bestRareDrop.chance}%`
+    );
+
+
+  }
+
+
+
+  const commonDrops =
+    encounter.rewards.commonDrops;
+
+
+
+  if (
+    Array.isArray(
+      commonDrops
+    ) &&
+    commonDrops.length > 0
+  ) {
+
+
+    const bestCommonDrop =
+      commonDrops[0];
+
+
+
+    return (
+      `${bestCommonDrop.name}: ${bestCommonDrop.chance}%`
+    );
+
+
+  }
+
+
+
+  return "No item drops";
+
+
+}
+
+
+
+
 
 function renderBattleOverlay(
   container
 ) {
 
 
-  console.log("Battle overlay opened");
+  console.log(
+    "Battle overlay opened"
+  );
+
 
 
   const location =
     selectedLocationNode;
+
+
+
+  const encounterCards =
+    Object.keys(
+      ENCOUNTER_DATABASE
+    )
+      .map(
+        encounterId =>
+          getEncounterDefinition(
+            encounterId
+          )
+      )
+      .filter(
+        encounter =>
+          !!encounter
+      )
+      .map(
+        encounter => {
+
+
+          return createActivityCard(
+
+            encounter.name,
+
+            encounter.description,
+
+            getEncounterRewardSummary(
+              encounter
+            ),
+
+            getEncounterDropSummary(
+              encounter
+            ),
+
+            `startEncounterActivity('${encounter.id}')`
+
+          );
+
+
+        }
+      )
+      .join("");
 
 
 
@@ -41334,7 +42170,6 @@ function renderBattleOverlay(
       flex-direction:column;
       flex:1;
     ">
-
 
       <h2 style="
         color:#D6A93A;
@@ -41348,8 +42183,6 @@ function renderBattleOverlay(
         }
       </h2>
 
-
-
       <p style="
         color:#94A3B8;
         font-size:10px;
@@ -41358,57 +42191,23 @@ function renderBattleOverlay(
         Choose your opponent.
       </p>
 
-
-
-
       <div style="
         display:grid;
-
         grid-template-columns:
           repeat(
             3,
             minmax(0,1fr)
           );
-
         gap:12px;
       ">
 
-
-        ${createActivityCard(
-          "Scout Patrol",
-          "Fight a small rogue patrol.",
-          "Ryo: 250",
-          "Drop Chance: 12%",
-          "startEncounter('scout')"
-        )}
-
-
-
-        ${createActivityCard(
-          "Bandit Leader",
-          "Defeat an elite rogue shinobi.",
-          "Ryo: 650",
-          "Rare Drop: 8%",
-          "startEncounter('banditLeader')"
-        )}
-
-
-
-        ${createActivityCard(
-          "Hidden Cache",
-          "High-risk encounter protecting stolen equipment.",
-          "Ryo: 1,200",
-          "Rare Drop: 18%",
-          "startEncounter('bandit')"
-        )}
-
+        ${encounterCards}
 
       </div>
 
-
     </div>
-
   `;
+
 
 }
 
