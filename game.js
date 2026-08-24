@@ -38219,6 +38219,497 @@ function getEncounterAnalytics() {
 }
 
 // =========================================================
+// BRICK 163 — BATTLE CHRONICLE HISTORY QUERY
+// =========================================================
+//
+// Canonical read authority for recorded Battles.
+//
+// =========================================================
+
+
+function getBattleHistory() {
+
+
+  return getActivityHistory()
+    .filter(
+      entry =>
+        entry &&
+        entry.type ===
+          "battle"
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 164 — ENCOUNTER BATTLE HISTORY QUERY
+// =========================================================
+
+
+function getEncounterBattleHistory(
+  encounterId
+) {
+
+
+  if (
+    !encounterId
+  ) {
+
+
+    return [];
+
+
+  }
+
+
+  return getBattleHistory()
+    .filter(
+      battle =>
+        battle.encounterId ===
+          encounterId
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 165 — ENEMY BATTLE HISTORY QUERY
+// =========================================================
+
+
+function getEnemyBattleHistory(
+  enemyId
+) {
+
+
+  if (
+    !enemyId
+  ) {
+
+
+    return [];
+
+
+  }
+
+
+  return getBattleHistory()
+    .filter(
+      battle =>
+        battle.enemyId ===
+          enemyId
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 166 — CHARACTER BATTLE HISTORY QUERY
+// =========================================================
+
+
+function getCharacterBattleHistory(
+  characterId
+) {
+
+
+  if (
+    !characterId
+  ) {
+
+
+    return [];
+
+
+  }
+
+
+  return getBattleHistory()
+    .filter(
+      battle =>
+        battle.character ===
+          characterId
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 167 — ENCOUNTER COMPLETION STATE
+// =========================================================
+//
+// Provides reusable gameplay knowledge:
+//
+// "Has this Encounter ever been defeated?"
+//
+// =========================================================
+
+
+function hasCompletedEncounter(
+  encounterId
+) {
+
+
+  return getEncounterBattleHistory(
+    encounterId
+  ).some(
+    battle =>
+      battle.success ===
+        true
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 168 — ENCOUNTER VICTORY COUNT
+// =========================================================
+
+
+function getEncounterVictoryCount(
+  encounterId
+) {
+
+
+  return getEncounterBattleHistory(
+    encounterId
+  ).filter(
+    battle =>
+      battle.success ===
+        true
+  ).length;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 169 — ENEMY DEFEAT COUNT
+// =========================================================
+//
+// Foundation for:
+//
+// - Rogue Shinobi Defeated
+// - Enemy achievements
+// - Unlock requirements
+// - Chronicle milestones
+//
+// =========================================================
+
+
+function getEnemyDefeatCount(
+  enemyId
+) {
+
+
+  return getEnemyBattleHistory(
+    enemyId
+  ).filter(
+    battle =>
+      battle.success ===
+        true
+  ).length;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 170 — BATTLE CHRONICLE SUMMARY BRIDGE
+// =========================================================
+//
+// Produces one gameplay-facing summary from
+// Battle Chronicle records.
+//
+// Filters are optional.
+//
+// =========================================================
+
+
+function getBattleChronicleSummary(
+  filters = {}
+) {
+
+
+  let battles =
+    getBattleHistory();
+
+
+  if (
+    filters.encounterId
+  ) {
+
+
+    battles =
+      battles.filter(
+        battle =>
+          battle.encounterId ===
+            filters.encounterId
+      );
+
+
+  }
+
+
+  if (
+    filters.enemyId
+  ) {
+
+
+    battles =
+      battles.filter(
+        battle =>
+          battle.enemyId ===
+            filters.enemyId
+      );
+
+
+  }
+
+
+  if (
+    filters.characterId
+  ) {
+
+
+    battles =
+      battles.filter(
+        battle =>
+          battle.character ===
+            filters.characterId
+      );
+
+
+  }
+
+
+  const summary = {
+
+
+    totalBattles:
+      battles.length,
+
+
+    victories:
+      0,
+
+
+    totalExp:
+      0,
+
+
+    totalRyo:
+      0,
+
+
+    totalItems:
+      0,
+
+
+    latestBattle:
+      null
+
+
+  };
+
+
+  battles.forEach(
+    battle => {
+
+
+      if (
+        battle.success ===
+          true
+      ) {
+
+
+        summary.victories++;
+
+
+      }
+
+
+      if (
+        battle.rewards
+      ) {
+
+
+        summary.totalExp +=
+          Number(
+            battle.rewards.exp
+          ) || 0;
+
+
+        summary.totalRyo +=
+          Number(
+            battle.rewards.ryo
+          ) || 0;
+
+
+        if (
+          Array.isArray(
+            battle.rewards.items
+          )
+        ) {
+
+
+          battle.rewards.items.forEach(
+            item => {
+
+
+              summary.totalItems +=
+                Number(
+                  item.amount
+                ) || 1;
+
+
+            }
+          );
+
+
+        }
+
+
+      }
+
+
+    }
+  );
+
+
+  if (
+    battles.length > 0
+  ) {
+
+
+    summary.latestBattle =
+      battles[
+        battles.length - 1
+      ];
+
+
+  }
+
+
+  return summary;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 171 — BATTLE CHRONICLE QUERY HEALTH
+// =========================================================
+//
+// Non-destructive diagnostics.
+//
+// =========================================================
+
+
+function validateBattleChronicleQueries() {
+
+
+  const battleHistory =
+    getBattleHistory();
+
+
+  const checks = {
+
+
+    battleHistory:
+      Array.isArray(
+        battleHistory
+      ),
+
+
+    encounterHistory:
+      Array.isArray(
+        getEncounterBattleHistory(
+          "scout_patrol"
+        )
+      ),
+
+
+    enemyHistory:
+      Array.isArray(
+        getEnemyBattleHistory(
+          "scout"
+        )
+      ),
+
+
+    characterHistory:
+      Array.isArray(
+        getCharacterBattleHistory(
+          "naruto"
+        )
+      ),
+
+
+    encounterCompletion:
+      typeof hasCompletedEncounter(
+        "scout_patrol"
+      ) ===
+        "boolean",
+
+
+    encounterCount:
+      Number.isFinite(
+        getEncounterVictoryCount(
+          "scout_patrol"
+        )
+      ),
+
+
+    enemyCount:
+      Number.isFinite(
+        getEnemyDefeatCount(
+          "scout"
+        )
+      ),
+
+
+    summary:
+      !!getBattleChronicleSummary()
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Battle Chronicle Query health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
+// =========================================================
 // BRICK 127 — CHRONICLE ACTIVITY ANALYTICS
 // =========================================================
 //
@@ -41584,7 +42075,7 @@ function validateEncounterSystem() {
 }
 
 // =========================================================
-// BRICK 162 — BATTLE COMPLETION HEALTH CHECK
+// BRICK 172 — BATTLE / CHRONICLE HEALTH CHECK
 // =========================================================
 
 
@@ -41624,6 +42115,17 @@ function validateBattleCompletionSystem() {
         "function",
 
 
+    chronicleQueries:
+      (
+        typeof getBattleHistory ===
+          "function" &&
+        typeof getBattleChronicleSummary ===
+          "function" &&
+        typeof validateBattleChronicleQueries ===
+          "function"
+      ),
+
+
     battleContext:
       (
         Object.prototype.hasOwnProperty.call(
@@ -41654,7 +42156,7 @@ function validateBattleCompletionSystem() {
 
 
   console.log(
-    "Battle Completion health:",
+    "Battle / Chronicle health:",
     checks
   );
 
@@ -41664,8 +42166,10 @@ function validateBattleCompletionSystem() {
 
 }
 
+
+
 // =========================================================
-// BRICK 162 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
+// BRICK 172 — CHRONICLE GAMEPLAY INTEGRATION REGRESSION
 // =========================================================
 
 
@@ -41694,6 +42198,15 @@ function runActivityLocationRegression() {
 
   const battleCompletionHealth =
     validateBattleCompletionSystem();
+
+
+  const battleQueryHealth =
+    validateBattleChronicleQueries();
+
+
+  // =========================================
+  // LOCATION → ACTIVITY
+  // =========================================
 
 
   const mappingChecks = {
@@ -41751,10 +42264,20 @@ function runActivityLocationRegression() {
     );
 
 
+  // =========================================
+  // CHARACTER BRIDGE
+  // =========================================
+
+
   const characterBridgeHealthy =
     !!getPlayerCharacter(
       "naruto"
     );
+
+
+  // =========================================
+  // TRAINING NORMALIZATION
+  // =========================================
 
 
   const trainingProbe =
@@ -41776,6 +42299,11 @@ function runActivityLocationRegression() {
     );
 
 
+  // =========================================
+  // ENCOUNTER NORMALIZATION
+  // =========================================
+
+
   const encounterProbe =
     getEncounterDefinition(
       "scout_patrol"
@@ -41790,6 +42318,11 @@ function runActivityLocationRegression() {
       encounterProbe.enemy &&
       encounterProbe.rewards
     );
+
+
+  // =========================================
+  // FINAL RESULT
+  // =========================================
 
 
   const result = {
@@ -41819,6 +42352,10 @@ function runActivityLocationRegression() {
       battleCompletionHealth.healthy,
 
 
+    battleQueries:
+      battleQueryHealth.healthy,
+
+
     mappings:
       mappingsHealthy,
 
@@ -41843,6 +42380,7 @@ function runActivityLocationRegression() {
         encounterHealth.healthy &&
         battleBridgeHealth.healthy &&
         battleCompletionHealth.healthy &&
+        battleQueryHealth.healthy &&
         mappingsHealthy &&
         characterBridgeHealthy &&
         trainingNormalizationHealthy &&
@@ -41883,7 +42421,6 @@ function runActivityLocationRegression() {
 
 
 }
-
 
 
 // =========================================================
