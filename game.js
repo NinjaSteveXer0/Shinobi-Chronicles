@@ -36174,6 +36174,46 @@ function syncActivityHistory() {
 
 restoreActivityHistory();
 
+// =========================================================
+// BRICK 111 — ACTIVITY HISTORY QUERY
+// =========================================================
+//
+// Provides safe read access to Activity History.
+//
+// Used by:
+// - Activity analytics
+// - Chronicle systems
+// - Future achievements
+//
+// =========================================================
+
+
+// =========================================================
+// GET ACTIVITY HISTORY
+// =========================================================
+
+function getActivityHistory() {
+
+
+  if (
+    !Array.isArray(
+      activityHistory
+    )
+  ) {
+
+
+    return [];
+
+
+  }
+
+
+
+  return activityHistory;
+
+
+}
+
 
 // =========================================================
 // TASK 6.5 — ACTIVITY HISTORY ANALYTICS
