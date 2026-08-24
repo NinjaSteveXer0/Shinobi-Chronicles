@@ -36162,6 +36162,17 @@ function syncActivityHistory() {
 
 }
 
+// =========================================================
+// BRICK 110 — APPLY SAVED ACTIVITY HISTORY
+// =========================================================
+//
+// Restores persisted Activity History
+// into the runtime Activity Engine.
+//
+// =========================================================
+
+
+restoreActivityHistory();
 
 
 // =========================================================
