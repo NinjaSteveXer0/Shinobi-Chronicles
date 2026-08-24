@@ -35915,12 +35915,13 @@ function startRegisteredActivity(
 
 
 // =========================================================
-// BRICK 154 — ACTIVITY RESULT FOUNDATION
+// BRICK 119 — ACTIVITY RESULT FOUNDATION
 // =========================================================
 //
-// Core Chronicle Engine Result System
+// Core Chronicle Engine Result System.
 //
-// Converts completed activities into a universal result format.
+// Creates one normalized result structure
+// for every Activity Engine outcome.
 //
 // Activity
 // ↓
@@ -35929,13 +35930,6 @@ function startRegisteredActivity(
 // Rewards
 // ↓
 // Progression
-//
-// Used by:
-// - Training
-// - Exams
-// - Missions
-// - Battles
-// - Events
 //
 // =========================================================
 
@@ -35946,21 +35940,35 @@ function createActivityResult(
 ) {
 
 
+  if (
+    !activityId
+  ) {
+
+
+    console.log(
+      "Cannot create Activity Result without an activity ID."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
   return {
 
 
     activity:
-
       activityId,
 
 
     character:
-
-      characterId,
+      characterId || null,
 
 
     success:
-
       true,
 
 
@@ -35968,107 +35976,25 @@ function createActivityResult(
 
 
       exp:
-
         0,
 
 
       ryo:
-
         0,
 
 
       items:
-
         [],
 
 
       progression:
-
-        {}
+        []
 
 
     }
 
 
   };
-
-
-}
-
-// =========================================================
-// BRICK 117 — RANDOM COMMON ITEM RESOLVER
-// =========================================================
-//
-// Resolves abstract "random_common" Activity rewards
-// into real Item Database definitions.
-//
-// Uses the existing Item Database as authority.
-//
-// =========================================================
-
-
-// =========================================================
-// GET COMMON ITEM DEFINITIONS
-// =========================================================
-
-function getCommonItemDefinitions() {
-
-
-  return Object.values(
-    itemDatabase
-  ).filter(
-    item =>
-      item &&
-      item.rarity ===
-        "Common"
-  );
-
-
-}
-
-
-
-// =========================================================
-// GET RANDOM COMMON ITEM
-// =========================================================
-
-function getRandomCommonItem() {
-
-
-  const commonItems =
-    getCommonItemDefinitions();
-
-
-
-  if (
-    commonItems.length ===
-      0
-  ) {
-
-
-    console.log(
-      "No Common items available."
-    );
-
-
-    return null;
-
-
-  }
-
-
-
-  const randomIndex =
-    Math.floor(
-      Math.random() *
-      commonItems.length
-    );
-
-
-
-  return commonItems[
-    randomIndex
-  ];
 
 
 }
@@ -36755,7 +36681,7 @@ function getActivityAnalytics() {
 
 
 // =========================================================
-// BRICK 113 — ACTIVITY PROGRESSION BRIDGE
+// BRICK 120 — ACTIVITY PROGRESSION BRIDGE
 // =========================================================
 //
 // Routes Activity Result progression
@@ -36764,7 +36690,8 @@ function getActivityAnalytics() {
 // Handles:
 // - Discipline EXP
 // - Correct training-source routing
-// - Future progression reward types
+// - Activities with no discipline progression
+// - Progression failure detection
 //
 // =========================================================
 
@@ -36778,6 +36705,11 @@ function processActivityProgression(
     !result ||
     !result.rewards
   ) {
+
+
+    console.log(
+      "Invalid Activity Result progression request."
+    );
 
 
     return false;
@@ -36800,7 +36732,7 @@ function processActivityProgression(
 
 
     console.log(
-      "No activity progression attached."
+      "Invalid Activity Result progression data."
     );
 
 
@@ -36808,6 +36740,40 @@ function processActivityProgression(
 
 
   }
+
+
+
+  // =========================================
+  // NO PROGRESSION REWARDS
+  // =========================================
+
+
+  if (
+    progression.length ===
+      0
+  ) {
+
+
+    console.log(
+      "Activity completed with no discipline progression:",
+      result.activity
+    );
+
+
+    return true;
+
+
+  }
+
+
+
+  // =========================================
+  // ROUTE PROGRESSION
+  // =========================================
+
+
+  let progressionSucceeded =
+    true;
 
 
 
@@ -36829,16 +36795,48 @@ function processActivityProgression(
 
 
 
-      addDisciplineExp(
-        result.character,
-        reward.id,
-        reward.amount,
-        result.activity
-      );
+      const applied =
+        addDisciplineExp(
+          result.character,
+          reward.id,
+          reward.amount,
+          result.activity
+        );
+
+
+
+      if (
+        !applied
+      ) {
+
+
+        progressionSucceeded =
+          false;
+
+
+      }
 
 
     }
   );
+
+
+
+  if (
+    !progressionSucceeded
+  ) {
+
+
+    console.log(
+      "Activity progression failed:",
+      result.activity
+    );
+
+
+    return false;
+
+
+  }
 
 
 
@@ -36853,7 +36851,6 @@ function processActivityProgression(
 
 
 }
-
 
 
 // =========================================================
