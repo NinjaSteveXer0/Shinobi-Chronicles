@@ -6747,20 +6747,21 @@ body {
         none !important;
 }
 
+
+
+
 /* =========================================================
-   BRICK 307 — EXAM DISCIPLINE POSITIONING AUTHORITY
+   BRICK 309 — EXAM DISCIPLINE POSITION CALIBRATION
    ========================================================= */
 
 /*
    POSITIONING ONLY.
 
-   Every discipline selector is forced to occupy its entire
-   grid row.
+   The structure is now stable.
 
-   Every discipline card is then locked exactly to that row.
-
-   All live-data percentages below therefore resolve against
-   the visible Nin / Gen / Fuin panel itself.
+   We are calibrating the three baked progress tracks
+   independently because each row is accumulating a
+   slightly different vertical offset against the artwork.
 */
 
 
@@ -6827,9 +6828,9 @@ body {
 }
 
 
-/* =========================================================
-   LEVEL VALUE
-   ========================================================= */
+/* =========================================
+   EXISTING LIVE VALUES
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-live-level {
@@ -6843,12 +6844,6 @@ body {
     top:
         42% !important;
 
-    width:
-        auto !important;
-
-    height:
-        auto !important;
-
     margin:
         0 !important;
 
@@ -6866,10 +6861,6 @@ body {
 
 }
 
-
-/* =========================================================
-   EXPERIENCE VALUE
-   ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-live-experience {
@@ -6883,11 +6874,35 @@ body {
     top:
         30% !important;
 
-    width:
-        auto !important;
+    margin:
+        0 !important;
 
-    height:
-        auto !important;
+    padding:
+        0 !important;
+
+    line-height:
+        1 !important;
+
+    white-space:
+        nowrap !important;
+
+    z-index:
+        6;
+
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-live-reward {
+
+    position:
+        absolute !important;
+
+    left:
+        21% !important;
+
+    top:
+        84% !important;
 
     margin:
         0 !important;
@@ -6907,9 +6922,9 @@ body {
 }
 
 
-/* =========================================================
-   PROGRESS TRACK
-   ========================================================= */
+/* =========================================
+   PROGRESS TRACK COMMON GEOMETRY
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-progress-track {
@@ -6917,11 +6932,13 @@ body {
     position:
         absolute !important;
 
-    left:
-        21% !important;
+    /*
+       Move the whole live bar slightly LEFT
+       to match the baked gold track.
+    */
 
-    top:
-        66% !important;
+    left:
+        17.8% !important;
 
     width:
         54.6% !important;
@@ -6950,9 +6967,66 @@ body {
 }
 
 
-/* =========================================================
+/* =========================================
+   NINJUTSU
+   ========================================= */
+
+/*
+   Currently slightly too high.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="nin"]
+.exam-progress-track {
+
+    top:
+        82% !important;
+
+}
+
+
+/* =========================================
+   GENJUTSU
+   ========================================= */
+
+/*
+   Currently considerably too high.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="gen"]
+.exam-progress-track {
+
+    top:
+        94% !important;
+
+}
+
+
+/* =========================================
+   FUINJUTSU
+   ========================================= */
+
+/*
+   Currently much too high.
+
+   Yes, this looks dramatic compared with Nin.
+   That is intentional based on the actual rendered offset.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="fuin"]
+.exam-progress-track {
+
+    top:
+        108% !important;
+
+}
+
+
+/* =========================================
    PROGRESS FILL
-   ========================================================= */
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-progress-fill {
@@ -6985,48 +7059,9 @@ body {
 
 
 /* =========================================================
-   REWARD VALUE
-   ========================================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-live-reward {
-
-    position:
-        absolute !important;
-
-    left:
-        21% !important;
-
-    top:
-        84% !important;
-
-    width:
-        auto !important;
-
-    height:
-        auto !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1 !important;
-
-    white-space:
-        nowrap !important;
-
-    z-index:
-        6;
-
-}
-
-
-/* =========================================================
    BRICK 299 — FINAL EXAM ACTION ZONE
    ========================================================= */
+
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-action-control {
@@ -7073,14 +7108,14 @@ body {
 
 
 /* =========================================================
-   BRICK 308 — EXAM BATCH CONTROL POSITIONING V2
+   BRICK 310 — EXAM BATCH CONTROLS POSITION V3
    ========================================================= */
 
 /*
    POSITIONING ONLY.
 
-   Controls occupy the empty transition space between
-   Fūinjutsu and the baked BEGIN EXAM frame.
+   Move ×1 / ×5 down into the gap ABOVE BEGIN EXAM
+   instead of allowing them to sit on Fūinjutsu.
 */
 
 
@@ -7094,7 +7129,7 @@ body {
         50% !important;
 
     top:
-        18% !important;
+        34% !important;
 
     transform:
         translateX(-50%) !important;
@@ -7400,7 +7435,7 @@ body {
 
 
 /* =========================================================
-   BRICK 302 — BEGIN EXAM + LOWER PANELS FINAL ALIGNMENT
+   BRICK 311 — BEGIN EXAM POSITION RECALIBRATION
    ========================================================= */
 
 
@@ -7418,13 +7453,13 @@ body {
         0 !important;
 
     top:
-        49% !important;
+        57% !important;
 
     width:
         100% !important;
 
     height:
-        46% !important;
+        38% !important;
 
     margin:
         0 !important;
@@ -7468,58 +7503,15 @@ body {
     box-shadow:
         none !important;
 
-    color:
-        #4be4e8 !important;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size:
-        clamp(
-            15px,
-            1.75vw,
-            31px
-        ) !important;
-
-    font-weight:
-        500 !important;
-
-    line-height:
-        1 !important;
-
-    letter-spacing:
-        0.015em;
-
-    text-shadow:
-        0 0 7px
-        rgba(
-            58,
-            224,
-            229,
-            0.24
-        ),
-        0 2px 3px
-        #000 !important;
-
     cursor:
         pointer;
 
 }
 
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-begin-button:hover:not(:disabled) {
-
-    color:
-        #9afcff !important;
-
-}
-
-
 /* =========================================
-   INFORMATION
+   INFORMATION PANEL
+   UNCHANGED POSITION
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -7540,41 +7532,12 @@ body {
     height:
         15.4% !important;
 
-    padding:
-        1.0%
-        1.25% !important;
-
-    background:
-        rgba(
-            4,
-            8,
-            10,
-            0.94
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            178,
-            132,
-            35,
-            0.60
-        ) !important;
-
-    box-shadow:
-        inset 0 0 20px
-        rgba(
-            0,
-            0,
-            0,
-            0.42
-        ) !important;
-
 }
 
 
 /* =========================================
-   ELIGIBILITY
+   ELIGIBILITY PANEL
+   UNCHANGED POSITION
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -7594,76 +7557,6 @@ body {
 
     height:
         15.4% !important;
-
-    padding:
-        1.0%
-        1.25% !important;
-
-    background:
-        rgba(
-            4,
-            8,
-            10,
-            0.94
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            178,
-            132,
-            35,
-            0.60
-        ) !important;
-
-    box-shadow:
-        inset 0 0 20px
-        rgba(
-            0,
-            0,
-            0,
-            0.42
-        ) !important;
-
-}
-
-
-/* =========================================
-   PANEL TYPOGRAPHY
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-information-title,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-header {
-
-    color:
-        #ddb95f !important;
-
-    font-size:
-        clamp(
-            8px,
-            0.68vw,
-            12px
-        ) !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-information-row,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-row {
-
-    font-size:
-        clamp(
-            6px,
-            0.50vw,
-            9px
-        ) !important;
-
-    line-height:
-        1.18 !important;
 
 }
 
