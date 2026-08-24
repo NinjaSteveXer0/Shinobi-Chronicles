@@ -35281,7 +35281,7 @@ function getLocationMetadata(
 // #########################################################
 
 // =========================================================
-// BRICK 94 — ACTIVITY ENGINE FOUNDATION
+// BRICK 112 — ACTIVITY ENGINE REWARD ALIGNMENT
 // =========================================================
 //
 // Core Chronicle Engine Activity System
@@ -35290,6 +35290,7 @@ function getLocationMetadata(
 // - Activity definitions
 // - Activity identity
 // - Structured activity rewards
+// - Discipline authority alignment
 // - Activity data retrieval
 //
 // =========================================================
@@ -35316,7 +35317,7 @@ const ACTIVITY_DATABASE = {
           "discipline",
 
         id:
-          "ninjutsu",
+          "nin",
 
         amount:
           15
@@ -35329,7 +35330,7 @@ const ACTIVITY_DATABASE = {
           "discipline",
 
         id:
-          "genjutsu",
+          "gen",
 
         amount:
           15
@@ -35342,7 +35343,7 @@ const ACTIVITY_DATABASE = {
           "discipline",
 
         id:
-          "fuinjutsu",
+          "fuin",
 
         amount:
           15
@@ -35374,7 +35375,7 @@ const ACTIVITY_DATABASE = {
           "discipline",
 
         id:
-          "taijutsu",
+          "tai",
 
         amount:
           15
@@ -35387,7 +35388,7 @@ const ACTIVITY_DATABASE = {
           "discipline",
 
         id:
-          "bukijutsu",
+          "buki",
 
         amount:
           10
@@ -35432,7 +35433,7 @@ const ACTIVITY_DATABASE = {
           "discipline",
 
         id:
-          "kinjutsu",
+          "kin",
 
         amount:
           15
@@ -36395,33 +36396,16 @@ function getActivityAnalytics() {
 
 
 // =========================================================
-// TASK 6.6 — ACTIVITY PROGRESSION BRIDGE
+// BRICK 113 — ACTIVITY PROGRESSION BRIDGE
 // =========================================================
 //
-// Connects completed activities to progression systems.
-//
-// Handles:
-// - Discipline progression hooks
-// - Character growth hooks
-// - Future Chronicle progression
-//
-// This does not directly modify stats yet.
-// It creates the controlled connection point.
-//
-// =========================================================
-
-
-
-// ===================================// =========================================================
-// TASK 6.6 — ACTIVITY PROGRESSION BRIDGE
-// =========================================================
-//
-// Routes activity progression rewards
+// Routes Activity Result progression
 // into existing progression authorities.
 //
 // Handles:
 // - Discipline EXP
-// - Future progression types
+// - Correct training-source routing
+// - Future progression reward types
 //
 // =========================================================
 
@@ -36473,20 +36457,25 @@ function processActivityProgression(
 
 
       if (
-        reward.type ===
+        !reward ||
+        reward.type !==
           "discipline"
       ) {
 
 
-        addDisciplineExp(
-          result.character,
-          reward.id,
-          reward.amount,
-          "activity"
-        );
+        return;
 
 
       }
+
+
+
+      addDisciplineExp(
+        result.character,
+        reward.id,
+        reward.amount,
+        result.activity
+      );
 
 
     }
@@ -36505,6 +36494,8 @@ function processActivityProgression(
 
 
 }
+
+
 
 // =========================================================
 // TASK 6.7 — ACTIVITY VALIDATION LAYER
