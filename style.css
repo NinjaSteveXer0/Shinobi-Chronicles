@@ -6972,12 +6972,17 @@ body {
    ========================================= */
 
 /*
-   NINJUTSU ONLY.
+   NINJUTSU PROGRESS POSITION — LOCKED.
 
-   Calibrate the live cyan progress track against
-   the baked gold Ninjutsu EXP bar.
+   Calibrated live in browser DevTools.
 
-   No other discipline is touched.
+   Vertical:
+   top: 80%
+
+   Horizontal:
+   translateX(55px)
+
+   Do not modify while calibrating Genjutsu / Fuinjutsu.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6985,7 +6990,10 @@ body {
 .exam-progress-track {
 
     top:
-        62% !important;
+        80% !important;
+
+    transform:
+        translateX(55px) !important;
 
 }
 
