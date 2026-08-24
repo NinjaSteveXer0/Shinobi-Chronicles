@@ -35760,13 +35760,27 @@ function hydrateActivityResult(
 
 
 // =========================================================
-// TASK 6.3 — ACTIVITY REWARD APPLICATION BRIDGE
+// BRICK 125 — REGISTERED ACTIVITY COMPLETION AUTHORITY
 // =========================================================
 //
-// Connects activity execution to:
-// - Activity Results
-// - Reward Processing
-// - Player Save
+// Controls the complete registered Activity lifecycle.
+//
+// Activity
+// ↓
+// Validation
+// ↓
+// Result
+// ↓
+// Hydration
+// ↓
+// Rewards
+// ↓
+// Progression
+// ↓
+// Completion Record
+//
+// An Activity is only recorded as complete
+// after all required execution stages succeed.
 //
 // =========================================================
 
@@ -35775,6 +35789,11 @@ function startRegisteredActivity(
   action,
   characterId
 ) {
+
+
+  // =========================================
+  // VALIDATE REQUEST
+  // =========================================
 
 
   if (
@@ -35799,6 +35818,11 @@ function startRegisteredActivity(
 
 
 
+  // =========================================
+  // VALIDATE REQUIREMENTS
+  // =========================================
+
+
   if (
     !validateActivityRequirements(
       action
@@ -35817,6 +35841,11 @@ function startRegisteredActivity(
 
   }
 
+
+
+  // =========================================
+  // RESOLVE ACTIVITY
+  // =========================================
 
 
   const activity =
@@ -35851,6 +35880,11 @@ function startRegisteredActivity(
 
 
 
+  // =========================================
+  // CREATE RESULT
+  // =========================================
+
+
   const result =
     createActivityResult(
       action,
@@ -35876,28 +35910,120 @@ function startRegisteredActivity(
 
 
 
-  hydrateActivityResult(
-    result,
-    activity
-  );
+  // =========================================
+  // HYDRATE RESULT
+  // =========================================
+
+
+  const hydrated =
+    hydrateActivityResult(
+      result,
+      activity
+    );
 
 
 
-  applyActivityRewards(
-    result
-  );
+  if (
+    !hydrated
+  ) {
+
+
+    console.log(
+      "Activity result hydration failed."
+    );
+
+
+    return false;
+
+
+  }
 
 
 
-  recordActivityCompletion(
-    result
-  );
+  // =========================================
+  // APPLY REWARDS
+  // =========================================
+
+
+  const rewardsApplied =
+    applyActivityRewards(
+      result
+    );
 
 
 
-  processActivityProgression(
-    result
-  );
+  if (
+    !rewardsApplied
+  ) {
+
+
+    console.log(
+      "Activity reward application failed."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  // =========================================
+  // PROCESS PROGRESSION
+  // =========================================
+
+
+  const progressionApplied =
+    processActivityProgression(
+      result
+    );
+
+
+
+  if (
+    !progressionApplied
+  ) {
+
+
+    console.log(
+      "Activity progression execution failed."
+    );
+
+
+    return false;
+
+
+  }
+
+
+
+  // =========================================
+  // RECORD COMPLETION
+  // =========================================
+
+
+  const completionRecorded =
+    recordActivityCompletion(
+      result
+    );
+
+
+
+  if (
+    !completionRecorded
+  ) {
+
+
+    console.log(
+      "Activity completion recording failed."
+    );
+
+
+    return false;
+
+
+  }
 
 
 
@@ -35912,7 +36038,6 @@ function startRegisteredActivity(
 
 
 }
-
 
 // =========================================================
 // BRICK 119 — ACTIVITY RESULT FOUNDATION
@@ -36445,24 +36570,24 @@ function syncActivityHistory() {
 }
 
 // =========================================================
-// BRICK 114 — ACTIVITY COMPLETION RECORD
+// BRICK 126 — CHRONICLE ACTIVITY COMPLETION RECORD
 // =========================================================
 //
-// Records successful Activity Results
-// into the persistent Activity History.
+// Stores completed Activity Results as persistent
+// Chronicle-compatible history records.
 //
-// Handles:
-// - Completion history
-// - Character attribution
-// - Persistent save sync
-// - Future Chronicle records
+// Records:
+// - Activity
+// - Character
+// - Success
+// - EXP
+// - Ryō
+// - Item rewards
+// - Progression rewards
+// - Timestamp
 //
 // =========================================================
 
-
-// =========================================================
-// RECORD ACTIVITY COMPLETION
-// =========================================================
 
 function recordActivityCompletion(
   result
@@ -36488,19 +36613,91 @@ function recordActivityCompletion(
 
 
 
+  const rewards =
+    result.rewards ||
+    {};
+
+
+
   activityHistory.push({
+
 
     activity:
       result.activity,
 
+
     character:
       result.character,
+
 
     success:
       result.success,
 
+
+    rewards: {
+
+
+      exp:
+        Number(
+          rewards.exp
+        ) || 0,
+
+
+      ryo:
+        Number(
+          rewards.ryo
+        ) || 0,
+
+
+      items:
+        Array.isArray(
+          rewards.items
+        )
+          ? rewards.items.map(
+              item => ({
+
+                id:
+                  item.id,
+
+                amount:
+                  Number(
+                    item.amount
+                  ) || 1
+
+              })
+            )
+          : [],
+
+
+      progression:
+        Array.isArray(
+          rewards.progression
+        )
+          ? rewards.progression.map(
+              reward => ({
+
+                type:
+                  reward.type,
+
+                id:
+                  reward.id,
+
+                amount:
+                  Number(
+                    reward.amount
+                  ) || 0
+
+              })
+            )
+          : []
+
+
+    },
+
+
     timestamp:
       Date.now()
+
 
   });
 
@@ -36515,7 +36712,7 @@ function recordActivityCompletion(
 
 
   console.log(
-    "Activity recorded and saved:",
+    "Chronicle activity recorded:",
     result.activity
   );
 
@@ -36580,15 +36777,19 @@ function getActivityHistory() {
 
 
 // =========================================================
-// TASK 6.5 — ACTIVITY HISTORY ANALYTICS
+// BRICK 127 — CHRONICLE ACTIVITY ANALYTICS
 // =========================================================
 //
-// Converts Activity History into usable Chronicle data.
+// Converts Activity History into Chronicle-ready statistics.
 //
 // Handles:
-// - Activity completion counts
-// - Character activity statistics
-// - Future achievement hooks
+// - Activity counts
+// - Character activity counts
+// - Successful / failed activities
+// - EXP earned
+// - Ryō earned
+// - Item rewards
+// - Progression rewards
 //
 // =========================================================
 
@@ -36613,6 +36814,22 @@ function getActivityAnalytics() {
 
 
     failedActivities:
+      0,
+
+
+    totalExpEarned:
+      0,
+
+
+    totalRyoEarned:
+      0,
+
+
+    totalItemRewards:
+      0,
+
+
+    totalProgressionRewards:
       0,
 
 
@@ -36644,26 +36861,38 @@ function getActivityAnalytics() {
         entry.success
       ) {
 
+
         analytics.successfulActivities++;
+
 
       }
       else {
 
+
         analytics.failedActivities++;
+
 
       }
 
 
 
-      analytics.activityCounts[
+      if (
         entry.activity
-      ] =
-        (
-          analytics.activityCounts[
-            entry.activity
-          ] ||
-          0
-        ) + 1;
+      ) {
+
+
+        analytics.activityCounts[
+          entry.activity
+        ] =
+          (
+            analytics.activityCounts[
+              entry.activity
+            ] ||
+            0
+          ) + 1;
+
+
+      }
 
 
 
@@ -36686,6 +36915,75 @@ function getActivityAnalytics() {
       }
 
 
+
+      const rewards =
+        entry.rewards;
+
+
+
+      if (
+        rewards &&
+        typeof rewards ===
+          "object"
+      ) {
+
+
+        analytics.totalExpEarned +=
+          Number(
+            rewards.exp
+          ) || 0;
+
+
+
+        analytics.totalRyoEarned +=
+          Number(
+            rewards.ryo
+          ) || 0;
+
+
+
+        if (
+          Array.isArray(
+            rewards.items
+          )
+        ) {
+
+
+          rewards.items.forEach(
+            item => {
+
+
+              analytics.totalItemRewards +=
+                Number(
+                  item.amount
+                ) || 1;
+
+
+            }
+          );
+
+
+        }
+
+
+
+        if (
+          Array.isArray(
+            rewards.progression
+          )
+        ) {
+
+
+          analytics.totalProgressionRewards +=
+            rewards.progression.length;
+
+
+        }
+
+
+      }
+
+
     }
   );
 
@@ -36699,7 +36997,9 @@ function getActivityAnalytics() {
 
       if (
         !analytics.mostUsedActivity ||
-        analytics.activityCounts[activity] >
+        analytics.activityCounts[
+          activity
+        ] >
         analytics.activityCounts[
           analytics.mostUsedActivity
         ]
@@ -36726,7 +37026,9 @@ function getActivityAnalytics() {
 
       if (
         !analytics.mostActiveCharacter ||
-        analytics.characterCounts[character] >
+        analytics.characterCounts[
+          character
+        ] >
         analytics.characterCounts[
           analytics.mostActiveCharacter
         ]
@@ -36746,7 +37048,7 @@ function getActivityAnalytics() {
 
 
   console.log(
-    "Activity analytics generated:",
+    "Chronicle activity analytics:",
     analytics
   );
 
