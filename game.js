@@ -35995,10 +35995,86 @@ function createActivityResult(
 
 }
 
+// =========================================================
+// BRICK 117 — RANDOM COMMON ITEM RESOLVER
+// =========================================================
+//
+// Resolves abstract "random_common" Activity rewards
+// into real Item Database definitions.
+//
+// Uses the existing Item Database as authority.
+//
+// =========================================================
 
 
 // =========================================================
-// BRICK 116 — ACTIVITY REWARD PROCESSOR
+// GET COMMON ITEM DEFINITIONS
+// =========================================================
+
+function getCommonItemDefinitions() {
+
+
+  return Object.values(
+    itemDatabase
+  ).filter(
+    item =>
+      item &&
+      item.rarity ===
+        "Common"
+  );
+
+
+}
+
+
+
+// =========================================================
+// GET RANDOM COMMON ITEM
+// =========================================================
+
+function getRandomCommonItem() {
+
+
+  const commonItems =
+    getCommonItemDefinitions();
+
+
+
+  if (
+    commonItems.length ===
+      0
+  ) {
+
+
+    console.log(
+      "No Common items available."
+    );
+
+
+    return null;
+
+
+  }
+
+
+
+  const randomIndex =
+    Math.floor(
+      Math.random() *
+      commonItems.length
+    );
+
+
+
+  return commonItems[
+    randomIndex
+  ];
+
+
+}
+
+// =========================================================
+// BRICK 118 — ACTIVITY REWARD PROCESSOR
 // =========================================================
 //
 // Applies hydrated Activity Result rewards.
@@ -36006,8 +36082,8 @@ function createActivityResult(
 // Handles:
 // - EXP
 // - Ryō
-// - Resolved items
-// - Deferred item reward tokens
+// - Direct item rewards
+// - Random Common item rewards
 //
 // =========================================================
 
@@ -36086,11 +36162,11 @@ function applyActivityRewards(
 
 
     result.rewards.items.forEach(
-      item => {
+      itemReward => {
 
 
         if (
-          !item
+          !itemReward
         ) {
 
 
@@ -36102,20 +36178,72 @@ function applyActivityRewards(
 
 
         // =========================================
-        // DEFER RANDOM / ABSTRACT ITEM TOKENS
+        // RANDOM COMMON ITEM
         // =========================================
 
 
         if (
-          item.id ===
+          itemReward.id ===
             "random_common"
         ) {
 
 
-          console.log(
-            "Deferred unresolved activity item reward:",
-            item.id
-          );
+          const amount =
+            Math.max(
+              1,
+              Math.floor(
+                Number(
+                  itemReward.amount
+                ) || 1
+              )
+            );
+
+
+
+          for (
+            let i = 0;
+            i < amount;
+            i++
+          ) {
+
+
+            const randomItem =
+              getRandomCommonItem();
+
+
+
+            if (
+              !randomItem
+            ) {
+
+
+              continue;
+
+
+            }
+
+
+
+            addItemToInventory({
+
+              id:
+                randomItem.id,
+
+              name:
+                randomItem.name
+
+            });
+
+
+
+            console.log(
+              "Random Common reward:",
+              randomItem.name
+            );
+
+
+          }
+
 
 
           return;
@@ -36125,9 +36253,14 @@ function applyActivityRewards(
 
 
 
+        // =========================================
+        // DIRECT ITEM
+        // =========================================
+
+
         const definition =
           getItemDefinition(
-            item.id
+            itemReward.id
           );
 
 
@@ -36139,7 +36272,7 @@ function applyActivityRewards(
 
           console.log(
             "Unknown activity item reward:",
-            item.id
+            itemReward.id
           );
 
 
@@ -36155,7 +36288,7 @@ function applyActivityRewards(
             1,
             Math.floor(
               Number(
-                item.amount
+                itemReward.amount
               ) || 1
             )
           );
@@ -36170,11 +36303,13 @@ function applyActivityRewards(
 
 
           addItemToInventory({
+
             id:
               definition.id,
 
             name:
               definition.name
+
           });
 
 
