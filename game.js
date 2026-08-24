@@ -49018,12 +49018,14 @@ function executeKonohaExamAttempt(
 
 
 // =========================================================
-// BRICK 272 — EXAM BATCH EXECUTION + RESULT STRIP
+// BRICK 294 — EXAM BATCH + CLEAN RESULT PRESENTATION
 // =========================================================
+
 
 function setKonohaExamBatchSize(
   batchSize
 ) {
+
 
   const normalized =
     Number(
@@ -49043,7 +49045,9 @@ function setKonohaExamBatchSize(
 
   return true;
 
+
 }
+
 
 
 function executeKonohaExamBatch(
@@ -49051,6 +49055,7 @@ function executeKonohaExamBatch(
   disciplineId,
   batchSize = 1
 ) {
+
 
   const count =
     batchSize === 5
@@ -49067,6 +49072,7 @@ function executeKonohaExamBatch(
     index < count;
     index += 1
   ) {
+
 
     const result =
       executeKonohaExamAttempt(
@@ -49086,9 +49092,12 @@ function executeKonohaExamBatch(
         true
     ) {
 
+
       break;
 
+
     }
+
 
   }
 
@@ -49100,10 +49109,13 @@ function executeKonohaExamBatch(
 
   return results;
 
+
 }
 
 
+
 function renderKonohaExamResultStrip() {
+
 
   const results =
     KONOHA_EXAM_ATTEMPT_STATE
@@ -49118,96 +49130,166 @@ function renderKonohaExamResultStrip() {
       0
   ) {
 
+
     return "";
 
+
   }
+
+
+  const completedResults =
+    results.filter(
+      result =>
+        result &&
+        result.completed ===
+          true
+    );
+
+
+  const passes =
+    completedResults.filter(
+      result =>
+        result.success ===
+          true
+    );
+
+
+  const totalRewardExp =
+    passes.reduce(
+      (
+        total,
+        result
+      ) =>
+        total +
+        (
+          Number(
+            result.rewardExp
+          ) || 0
+        ),
+      0
+    );
+
+
+  const disciplineId =
+    completedResults[0]
+      ? completedResults[0]
+          .disciplineId
+      : null;
+
+
+  const discipline =
+    disciplineId
+      ? getShinobiDiscipline(
+          disciplineId
+        )
+      : null;
 
 
   return `
 
     <div
       class="
-        exam-result-strip
-      "
-      style="
-        display:flex;
-        justify-content:center;
-        gap:8px;
-        flex-wrap:wrap;
-        margin:10px 0 0;
+        exam-result-zone
       "
     >
 
-      ${results
-        .map(
-          result => {
+      <div
+        class="
+          exam-result-strip
+        "
+      >
 
-            const passed =
-              result &&
-              result.completed ===
-                true &&
-              result.success ===
-                true;
-
-
-            const label =
-              result &&
-              result.completed ===
-                true
-
-                ? (
-                    passed
-                      ? "PASS"
-                      : "FAIL"
-                  )
-
-                : "ERROR";
+        ${results
+          .map(
+            result => {
 
 
-            return `
+              const completed =
+                result &&
+                result.completed ===
+                  true;
 
-              <span
-                class="
-                  exam-result-chip
-                  ${
-                    passed
-                      ? "pass"
-                      : "fail"
-                  }
-                "
-                style="
-                  min-width:64px;
-                  padding:6px 10px;
-                  border:1px solid
-                    ${
+
+              const passed =
+                completed &&
+                result.success ===
+                  true;
+
+
+              const label =
+                !completed
+
+                  ? "ERROR"
+
+                  : (
                       passed
-                        ? "#4fdde4"
-                        : "#9d4b45"
-                    };
-                  background:
-                    rgba(3,8,10,0.88);
-                  text-align:center;
-                  font-size:13px;
-                  letter-spacing:1.4px;
-                "
-              >
-                ${label}
-              </span>
+                        ? "PASS"
+                        : "FAIL"
+                    );
 
-            `;
 
-          }
-        )
-        .join("")}
+              const stateClass =
+                !completed
+
+                  ? "error"
+
+                  : (
+                      passed
+                        ? "pass"
+                        : "fail"
+                    );
+
+
+              return `
+
+                <span
+                  class="
+                    exam-result-chip
+                    ${stateClass}
+                  "
+                >
+                  ${label}
+                </span>
+
+              `;
+
+
+            }
+          )
+          .join("")}
+
+      </div>
+
+
+      <div
+        class="
+          exam-result-summary
+        "
+      >
+
+        ${
+          discipline
+            ? discipline.name
+            : "Exam"
+        }
+
+        <span>
+          +${totalRewardExp} EXP
+        </span>
+
+      </div>
 
     </div>
 
   `;
 
+
 }
 
 
+
 function beginKonohaExamFromUI() {
+
 
   const session =
     getKonohaActivityUISessionState();
@@ -49218,6 +49300,7 @@ function beginKonohaExamFromUI() {
       "exams" ||
     !session.characterId
   ) {
+
 
     return {
 
@@ -49231,6 +49314,7 @@ function beginKonohaExamFromUI() {
         "exam_ui_session_invalid"
 
     };
+
 
   }
 
@@ -49247,6 +49331,7 @@ function beginKonohaExamFromUI() {
       true
   ) {
 
+
     return {
 
       success:
@@ -49260,6 +49345,7 @@ function beginKonohaExamFromUI() {
 
     };
 
+
   }
 
 
@@ -49270,7 +49356,9 @@ function beginKonohaExamFromUI() {
   const batchSize =
     KONOHA_EXAM_ATTEMPT_STATE
       .batchSize === 5
+
         ? 5
+
         : 1;
 
 
@@ -49312,6 +49400,7 @@ function beginKonohaExamFromUI() {
       results
 
   };
+
 
 }
 
@@ -50458,7 +50547,7 @@ function validateBattleCompletionSystem() {
 }
 
 // =========================================================
-// BRICK 263 — KONOHA / EXAM NAVIGATION HEALTH CHECK
+// BRICK 303 — FINAL KONOHA EXAM VISUAL HEALTH CHECK
 // =========================================================
 
 
@@ -50469,63 +50558,125 @@ function validateKonohaExamVisualSystem() {
     getKonohaActivityUIRoot();
 
 
-  const screenPresent =
-    !!root;
-
-
   const examScreen =
-    !!(
-      root &&
-      root.dataset &&
-      root.dataset.serviceId ===
-        "exams" &&
-      root.querySelector(
-        ".konoha-exam-screen"
-      )
-    );
-
-
-  const konohaReturn =
-    !!(
-      root &&
-      root.querySelector(
-        ".exam-konoha-return"
-      )
+    root &&
+    root.querySelector(
+      ".konoha-exam-screen"
     );
 
 
   const characterPanel =
-    !!(
-      root &&
-      root.querySelector(
-        ".exam-character-panel"
-      )
+    root &&
+    root.querySelector(
+      ".exam-character-panel"
     );
 
 
   const characterImage =
-    !!(
-      root &&
-      root.querySelector(
-        ".exam-character-image"
-      )
+    root &&
+    root.querySelector(
+      ".exam-character-image"
     );
 
 
   const disciplineCards =
     root
-      ? root.querySelectorAll(
-          ".exam-discipline-card"
-        ).length
-      : 0;
+      ? Array.from(
+          root.querySelectorAll(
+            ".exam-discipline-card"
+          )
+        )
+      : [];
 
 
-  const progressBars =
+  const progressTracks =
+    root
+      ? Array.from(
+          root.querySelectorAll(
+            ".exam-progress-track"
+          )
+        )
+      : [];
+
+
+  const levelValues =
     root
       ? root.querySelectorAll(
-          ".exam-progress-track"
+          ".exam-live-level"
         ).length
       : 0;
+
+
+  const expValues =
+    root
+      ? root.querySelectorAll(
+          ".exam-live-experience"
+        ).length
+      : 0;
+
+
+  const rewardValues =
+    root
+      ? root.querySelectorAll(
+          ".exam-live-reward"
+        ).length
+      : 0;
+
+
+  const tracksContained =
+    progressTracks.every(
+      (
+        track,
+        index
+      ) => {
+
+
+        const card =
+          disciplineCards[
+            index
+          ];
+
+
+        if (!card) {
+
+
+          return false;
+
+
+        }
+
+
+        const trackRect =
+          track.getBoundingClientRect();
+
+
+        const cardRect =
+          card.getBoundingClientRect();
+
+
+        return (
+          trackRect.left >=
+            cardRect.left &&
+          trackRect.right <=
+            cardRect.right &&
+          trackRect.top >=
+            cardRect.top &&
+          trackRect.bottom <=
+            cardRect.bottom
+        );
+
+
+      }
+    );
+
+
+  const batchControls =
+    !!(
+      root &&
+      root.querySelector(
+        ".exam-batch-controls"
+      )
+    );
 
 
   const beginButton =
@@ -50555,14 +50706,12 @@ function validateKonohaExamVisualSystem() {
     );
 
 
-  const navigationFunctions =
-    (
-      typeof openKonohaExamFromVillage ===
-        "function" &&
-      typeof returnToKonohaFromActivityUI ===
-        "function" &&
-      typeof renderVillageOverlay ===
-        "function"
+  const konohaReturn =
+    !!(
+      root &&
+      root.querySelector(
+        ".exam-konoha-return"
+      )
     );
 
 
@@ -50570,33 +50719,52 @@ function validateKonohaExamVisualSystem() {
 
 
     screenPresent:
-      screenPresent,
+      !!root,
 
 
     examScreen:
-      examScreen,
-
-
-    konohaReturn:
-      konohaReturn,
+      !!examScreen,
 
 
     characterPanel:
-      characterPanel,
+      !!characterPanel,
 
 
     characterImage:
-      characterImage,
+      !!characterImage,
 
 
     disciplineCards:
-      disciplineCards ===
+      disciplineCards.length ===
+        3,
+
+
+    levelValues:
+      levelValues ===
+        3,
+
+
+    expValues:
+      expValues ===
         3,
 
 
     progressBars:
-      progressBars ===
+      progressTracks.length ===
         3,
+
+
+    progressBarsContained:
+      tracksContained,
+
+
+    rewardValues:
+      rewardValues ===
+        3,
+
+
+    batchControls:
+      batchControls,
 
 
     beginButton:
@@ -50611,33 +50779,35 @@ function validateKonohaExamVisualSystem() {
       eligibilityPanel,
 
 
+    konohaReturn:
+      konohaReturn,
+
+
     navigationFunctions:
-      navigationFunctions,
-
-
-    healthy:
       (
-        screenPresent &&
-        examScreen &&
-        konohaReturn &&
-        characterPanel &&
-        characterImage &&
-        disciplineCards ===
-          3 &&
-        progressBars ===
-          3 &&
-        beginButton &&
-        informationPanel &&
-        eligibilityPanel &&
-        navigationFunctions
+        typeof openKonohaExamFromVillage ===
+          "function" &&
+        typeof returnToKonohaFromActivityUI ===
+          "function" &&
+        typeof renderVillageOverlay ===
+          "function"
       )
 
 
   };
 
 
+  health.healthy =
+    Object.values(
+      health
+    ).every(
+      value =>
+        value === true
+    );
+
+
   console.log(
-    "Konoha / Exam UI health:",
+    "FINAL KONOHA EXAM VISUAL HEALTH:",
     health
   );
 
