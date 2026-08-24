@@ -38710,6 +38710,834 @@ function validateBattleChronicleQueries() {
 }
 
 // =========================================================
+// BRICK 173 — CHRONICLE REQUIREMENT TYPES
+// =========================================================
+//
+// Canonical requirement vocabulary.
+//
+// Future systems should use these requirement types
+// rather than inventing independent gate logic.
+//
+// =========================================================
+
+
+const CHRONICLE_REQUIREMENT_TYPES = {
+
+  ACTIVITY_COMPLETED:
+    "activity_completed",
+
+  ACTIVITY_COUNT:
+    "activity_count",
+
+  ENCOUNTER_COMPLETED:
+    "encounter_completed",
+
+  ENCOUNTER_VICTORIES:
+    "encounter_victories",
+
+  ENEMY_DEFEATS:
+    "enemy_defeats",
+
+  CHARACTER_BATTLES:
+    "character_battles",
+
+  PLAYER_EXP:
+    "player_exp",
+
+  PLAYER_RYO:
+    "player_ryo"
+
+};
+
+
+
+// =========================================================
+// BRICK 174 — ACTIVITY COMPLETION QUERY
+// =========================================================
+//
+// Determines whether an Activity has ever been
+// successfully completed.
+//
+// =========================================================
+
+
+function hasCompletedActivity(
+  activityId
+) {
+
+
+  if (
+    !activityId
+  ) {
+
+
+    return false;
+
+
+  }
+
+
+  return getActivityHistory()
+    .some(
+      entry =>
+        entry &&
+        entry.activity ===
+          activityId &&
+        entry.success ===
+          true
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 175 — ACTIVITY SUCCESS COUNT
+// =========================================================
+
+
+function getActivitySuccessCount(
+  activityId
+) {
+
+
+  if (
+    !activityId
+  ) {
+
+
+    return 0;
+
+
+  }
+
+
+  return getActivityHistory()
+    .filter(
+      entry =>
+        entry &&
+        entry.activity ===
+          activityId &&
+        entry.success ===
+          true
+    )
+    .length;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 176 — CHARACTER BATTLE COUNT
+// =========================================================
+
+
+function getCharacterBattleCount(
+  characterId
+) {
+
+
+  if (
+    !characterId
+  ) {
+
+
+    return 0;
+
+
+  }
+
+
+  return getCharacterBattleHistory(
+    characterId
+  ).length;
+
+
+}
+
+
+
+// =========================================================
+// BRICK 177 — SINGLE REQUIREMENT EVALUATOR
+// =========================================================
+//
+// Converts one requirement definition into a
+// reusable Chronicle gate result.
+//
+// =========================================================
+
+
+function evaluateChronicleRequirement(
+  requirement
+) {
+
+
+  if (
+    !requirement ||
+    !requirement.type
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      met:
+        false,
+
+      reason:
+        "Invalid Chronicle requirement."
+
+    };
+
+
+  }
+
+
+  const target =
+    Math.max(
+      0,
+      Number(
+        requirement.amount
+      ) || 0
+    );
+
+
+  let current =
+    0;
+
+
+  let met =
+    false;
+
+
+  switch (
+    requirement.type
+  ) {
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.ACTIVITY_COMPLETED:
+
+
+      current =
+        hasCompletedActivity(
+          requirement.id
+        )
+          ? 1
+          : 0;
+
+
+      met =
+        current >= 1;
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.ACTIVITY_COUNT:
+
+
+      current =
+        getActivitySuccessCount(
+          requirement.id
+        );
+
+
+      met =
+        current >=
+          Math.max(
+            1,
+            target
+          );
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.ENCOUNTER_COMPLETED:
+
+
+      current =
+        hasCompletedEncounter(
+          requirement.id
+        )
+          ? 1
+          : 0;
+
+
+      met =
+        current >= 1;
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.ENCOUNTER_VICTORIES:
+
+
+      current =
+        getEncounterVictoryCount(
+          requirement.id
+        );
+
+
+      met =
+        current >=
+          Math.max(
+            1,
+            target
+          );
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.ENEMY_DEFEATS:
+
+
+      current =
+        getEnemyDefeatCount(
+          requirement.id
+        );
+
+
+      met =
+        current >=
+          Math.max(
+            1,
+            target
+          );
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.CHARACTER_BATTLES:
+
+
+      current =
+        getCharacterBattleCount(
+          requirement.id
+        );
+
+
+      met =
+        current >=
+          Math.max(
+            1,
+            target
+          );
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.PLAYER_EXP:
+
+
+      current =
+        Number(
+          playerData &&
+          playerData.exp
+        ) || 0;
+
+
+      met =
+        current >=
+          target;
+
+
+      break;
+
+
+
+    case CHRONICLE_REQUIREMENT_TYPES.PLAYER_RYO:
+
+
+      current =
+        Number(
+          playerData &&
+          playerData.ryo
+        ) || 0;
+
+
+      met =
+        current >=
+          target;
+
+
+      break;
+
+
+
+    default:
+
+
+      return {
+
+        valid:
+          false,
+
+        met:
+          false,
+
+        type:
+          requirement.type,
+
+        reason:
+          "Unknown Chronicle requirement type."
+
+      };
+
+
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    met:
+      met,
+
+    type:
+      requirement.type,
+
+    id:
+      requirement.id ||
+      null,
+
+    current:
+      current,
+
+    required:
+      (
+        requirement.type ===
+          CHRONICLE_REQUIREMENT_TYPES.ACTIVITY_COMPLETED ||
+        requirement.type ===
+          CHRONICLE_REQUIREMENT_TYPES.ENCOUNTER_COMPLETED
+      )
+        ? 1
+        : target
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 178 — REQUIREMENT SET EVALUATOR
+// =========================================================
+//
+// Evaluates multiple requirements.
+//
+// Default behaviour:
+// ALL requirements must be met.
+//
+// =========================================================
+
+
+function evaluateChronicleRequirements(
+  requirements
+) {
+
+
+  if (
+    !Array.isArray(
+      requirements
+    )
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      met:
+        false,
+
+      results:
+        []
+
+    };
+
+
+  }
+
+
+  if (
+    requirements.length ===
+      0
+  ) {
+
+
+    return {
+
+      valid:
+        true,
+
+      met:
+        true,
+
+      results:
+        []
+
+    };
+
+
+  }
+
+
+  const results =
+    requirements.map(
+      requirement =>
+        evaluateChronicleRequirement(
+          requirement
+        )
+    );
+
+
+  const valid =
+    results.every(
+      result =>
+        result.valid ===
+          true
+    );
+
+
+  const met =
+    valid &&
+    results.every(
+      result =>
+        result.met ===
+          true
+    );
+
+
+  return {
+
+    valid:
+      valid,
+
+    met:
+      met,
+
+    results:
+      results
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 179 — CHRONICLE UNLOCK CHECK
+// =========================================================
+//
+// Gameplay-facing gate.
+//
+// Example:
+//
+// isChronicleUnlocked([
+//   {
+//     type: "enemy_defeats",
+//     id: "scout",
+//     amount: 5
+//   }
+// ])
+//
+// =========================================================
+
+
+function isChronicleUnlocked(
+  requirements
+) {
+
+
+  const evaluation =
+    evaluateChronicleRequirements(
+      requirements
+    );
+
+
+  return (
+    evaluation.valid ===
+      true &&
+    evaluation.met ===
+      true
+  );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 180 — UNMET REQUIREMENT QUERY
+// =========================================================
+//
+// Gives future UI / Konoha screens the exact
+// reasons something remains locked.
+//
+// =========================================================
+
+
+function getUnmetChronicleRequirements(
+  requirements
+) {
+
+
+  const evaluation =
+    evaluateChronicleRequirements(
+      requirements
+    );
+
+
+  if (
+    !evaluation.valid
+  ) {
+
+
+    return evaluation.results;
+
+
+  }
+
+
+  return evaluation.results
+    .filter(
+      result =>
+        result.met !==
+          true
+    );
+
+
+}
+
+
+
+// =========================================================
+// BRICK 181 — REQUIREMENT PROGRESS SUMMARY
+// =========================================================
+//
+// UI-safe summary.
+//
+// This eventually powers things such as:
+//
+// Scout Defeats: 1 / 5
+// Mission Victories: 3 / 10
+//
+// =========================================================
+
+
+function getChronicleRequirementProgress(
+  requirement
+) {
+
+
+  const result =
+    evaluateChronicleRequirement(
+      requirement
+    );
+
+
+  if (
+    !result.valid
+  ) {
+
+
+    return result;
+
+
+  }
+
+
+  return {
+
+    type:
+      result.type,
+
+    id:
+      result.id,
+
+    current:
+      result.current,
+
+    required:
+      result.required,
+
+    remaining:
+      Math.max(
+        0,
+        result.required -
+          result.current
+      ),
+
+    met:
+      result.met
+
+  };
+
+
+}
+
+
+
+// =========================================================
+// BRICK 182 — CHRONICLE REQUIREMENT HEALTH CHECK
+// =========================================================
+//
+// Non-destructive validation.
+//
+// =========================================================
+
+
+function validateChronicleRequirementSystem() {
+
+
+  const knownActivity =
+    evaluateChronicleRequirement({
+
+      type:
+        CHRONICLE_REQUIREMENT_TYPES.ACTIVITY_COMPLETED,
+
+      id:
+        "light_training"
+
+    });
+
+
+  const knownEncounter =
+    evaluateChronicleRequirement({
+
+      type:
+        CHRONICLE_REQUIREMENT_TYPES.ENCOUNTER_COMPLETED,
+
+      id:
+        "scout_patrol"
+
+    });
+
+
+  const knownEnemy =
+    evaluateChronicleRequirement({
+
+      type:
+        CHRONICLE_REQUIREMENT_TYPES.ENEMY_DEFEATS,
+
+      id:
+        "scout",
+
+      amount:
+        1
+
+    });
+
+
+  const checks = {
+
+
+    requirementTypes:
+      !!(
+        CHRONICLE_REQUIREMENT_TYPES &&
+        CHRONICLE_REQUIREMENT_TYPES.ENEMY_DEFEATS
+      ),
+
+
+    activityQuery:
+      typeof hasCompletedActivity ===
+        "function",
+
+
+    activityCount:
+      typeof getActivitySuccessCount ===
+        "function",
+
+
+    characterBattleCount:
+      typeof getCharacterBattleCount ===
+        "function",
+
+
+    singleEvaluator:
+      knownActivity.valid ===
+        true,
+
+
+    encounterEvaluator:
+      knownEncounter.valid ===
+        true,
+
+
+    enemyEvaluator:
+      knownEnemy.valid ===
+        true,
+
+
+    setEvaluator:
+      evaluateChronicleRequirements(
+        []
+      ).met ===
+        true,
+
+
+    unlockBridge:
+      typeof isChronicleUnlocked ===
+        "function",
+
+
+    unmetQuery:
+      Array.isArray(
+        getUnmetChronicleRequirements(
+          []
+        )
+      ),
+
+
+    progressQuery:
+      typeof getChronicleRequirementProgress ===
+        "function"
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "Chronicle Requirement health:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
+
+// =========================================================
 // BRICK 127 — CHRONICLE ACTIVITY ANALYTICS
 // =========================================================
 //
