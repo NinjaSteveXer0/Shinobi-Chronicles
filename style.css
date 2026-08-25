@@ -6557,15 +6557,14 @@ body {
 /* =========================================
    CHARACTER IDENTITY AREA
 
-   Pushes name/meta/change shinobi lower
-   into the baked card area.
+   Character card sleeve identity stack calibration.
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-name {
 
     margin-top:
-        1.8% !important;
+        -1% !important;
 
 }
 
@@ -6574,7 +6573,7 @@ body {
 .exam-change-character {
 
     margin-top:
-        2% !important;
+        12px !important;
 
     width:
         94% !important;
