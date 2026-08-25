@@ -6964,21 +6964,9 @@ body {
 
 
 /* =========================================
-   NINJUTSU
+   PROGRESS TRACK COMMON GEOMETRY
+   LOCKED
    ========================================= */
-
-/*
-   NINJUTSU PROGRESS POSITION — LOCKED.
-
-   Calibrated live in browser DevTools.
-
-   Vertical:
-   top: 80%
-
-   Horizontal:
-   translateX(55px)
-
-   Do not modify while calibrating Genjutsu / Fuinjutsu.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
