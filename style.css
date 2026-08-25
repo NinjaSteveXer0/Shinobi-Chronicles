@@ -6329,7 +6329,7 @@ body {
 
 
 /* =========================================
-   CODED EXAM INFORMATION
+   EXAM INFORMATION
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6342,7 +6342,7 @@ body {
         3.3%;
 
     top:
-        75.1%;
+        65.0%;
 
     width:
         27.5%;
@@ -6594,8 +6594,7 @@ body {
     left:
         32.7% !important;
 
-    top:
-        74.7% !important;
+    top: 82%;
 
     width:
         34% !important;
