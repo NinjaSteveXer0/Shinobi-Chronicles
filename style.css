@@ -5674,6 +5674,11 @@ body {
 #konoha-activity-screen[data-service-id="exams"]
 .exam-change-character {
 
+    display:
+        none !important;
+
+
+
     width:
         94% !important;
 
@@ -6287,116 +6292,18 @@ body {
 
 
 /* =========================================
-   EXAM INFORMATION
+   EXAM INFORMATION REMOVED
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-information-panel {
 
-    position:
-        absolute;
+    display:
+        none !important;
 
-    left:
-        4.0%;
-
-    top:
-        80.0%;
-
-    width:
-        27.5%;
-
-    height:
-        15.8%;
-
-    z-index:
-        10;
-
-    padding:
-        1.15%
-        1.4%;
-
-    background:
-        rgba(4, 8, 10, 0.96);
-
-    border:
-        1px solid
-        rgba(178, 132, 35, 0.72);
-
-    box-shadow:
-        inset 0 0 24px
-        rgba(0, 0, 0, 0.45);
 }
 
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-information-title {
-
-    margin-bottom:
-        4%;
-
-    color:
-        #e0bd63;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size:
-        clamp(
-            9px,
-            0.86vw,
-            16px
-        );
-
-    letter-spacing:
-        0.06em;
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-information-row {
-
-    position:
-        relative;
-
-    margin:
-        2.2%
-        0;
-
-    padding-left:
-        6%;
-
-    color:
-        #d8ceb5;
-
-    font-size:
-        clamp(
-            7px,
-            0.65vw,
-            12px
-        );
-
-    line-height:
-        1.3;
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-information-row::before {
-
-    content:
-        "✦";
-
-    position:
-        absolute;
-
-    left:
-        0;
-
-    color:
-        #d3a43f;
-}
 
 /* =========================================================
    BRICK 262 — EXAM CHARACTER CARD SLEEVE CALIBRATION
