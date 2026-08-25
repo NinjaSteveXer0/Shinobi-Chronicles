@@ -5405,6 +5405,11 @@ body {
    BRICK 284 — CHARACTER CARD FIT FINAL
    ========================================================= */
 
+
+/* =========================================
+   CHARACTER CARD IMAGE WINDOW
+   ========================================= */
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image-wrap {
 
@@ -5415,7 +5420,7 @@ body {
         100% !important;
 
     height:
-        100% !important;
+        78% !important;
 
     min-height:
         0 !important;
@@ -5433,15 +5438,21 @@ body {
         center !important;
 
     overflow:
-        hidden !important;
+        visible !important;
 
     border:
         none !important;
 
     background:
         transparent !important;
+
 }
 
+
+
+/* =========================================
+   CHARACTER CARD IMAGE FIT
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
@@ -5453,7 +5464,89 @@ body {
         100% !important;
 
     height:
-        auto !important;
+        100% !important;
+
+    max-width:
+        none !important;
+
+    max-height:
+        none !important;
+
+    object-fit:
+        contain !important;
+
+    object-position:
+        center center !important;
+
+    transform:
+        translateX(0%)
+        translateY(0%)
+        scale(1) !important;
+
+}/* =========================================================
+   BRICK 284 — CHARACTER CARD FIT FINAL
+   ========================================================= */
+
+
+/* =========================================
+   CHARACTER CARD IMAGE WINDOW
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-image-wrap {
+
+    position:
+        relative !important;
+
+    width:
+        100% !important;
+
+    height:
+        78% !important;
+
+    min-height:
+        0 !important;
+
+    margin:
+        0 auto !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    overflow:
+        visible !important;
+
+    border:
+        none !important;
+
+    background:
+        transparent !important;
+
+}
+
+
+
+/* =========================================
+   CHARACTER CARD IMAGE FIT
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-image {
+
+    display:
+        block !important;
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
 
     max-width:
         none !important;
@@ -5473,7 +5566,6 @@ body {
         scale(1) !important;
 
 }
-
 
 /* =========================================================
    BRICK 285 — CHARACTER SELECTOR + IDENTITY
