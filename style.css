@@ -6479,7 +6479,7 @@ body {
         0 !important;
 
     overflow:
-        hidden !important;
+        visible !important;
 
     background:
         transparent !important;
