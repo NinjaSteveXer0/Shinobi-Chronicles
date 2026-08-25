@@ -6399,11 +6399,14 @@ body {
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
 
+    display:
+        block !important;
+
     width:
-        95% !important;
+        100% !important;
 
     height:
-        87% !important;
+        100% !important;
 
     max-width:
         none !important;
@@ -6418,8 +6421,8 @@ body {
         center center !important;
 
     transform:
-        translateX(-7%)
-        translateY(-17%)
+        translateX(0%)
+        translateY(0%)
         scale(1) !important;
 
 }
