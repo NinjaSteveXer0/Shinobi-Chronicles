@@ -5449,42 +5449,6 @@ body {
 
 
 
-/* =========================================
-   CHARACTER CARD IMAGE FIT
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-image {
-
-    display:
-        block !important;
-
-    width:
-    100% !important;
-
-    height:
-    100% !important;
-
-    max-width:
-        none !important;
-
-    max-height:
-        none !important;
-
-    object-fit:
-        contain !important;
-
-    object-position:
-        center center !important;
-
-    transform:
-        translateX(-5%)
-        translateY(-4%)
-        scale(1.05) !important;
-
-}
-
-
 /* =========================================================
    BRICK 285 — CHARACTER SELECTOR + IDENTITY
    ========================================================= */
@@ -6352,42 +6316,6 @@ body {
 }
 
 
-
-
-/* =========================================
-   CHARACTER ART FIT FINAL
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-image {
-
-    display:
-        block !important;
-
-    width:
-        100% !important;
-
-    height:
-        100% !important;
-
-    max-width:
-        none !important;
-
-    max-height:
-        none !important;
-
-    object-fit:
-        contain !important;
-
-    object-position:
-        center center !important;
-
-    transform:
-        translateX(0%)
-        translateY(0%)
-        scale(1) !important;
-
-}
 
 /* =========================================
    CHARACTER IDENTITY AREA
