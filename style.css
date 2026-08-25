@@ -6441,7 +6441,7 @@ body {
 }
 
 /* =========================================================
-   BRICK 262 — EXAM LOWER PANELS + CHARACTER FIT
+   BRICK 262 — EXAM CHARACTER CARD SLEEVE CALIBRATION
    ========================================================= */
 
 
@@ -6465,7 +6465,7 @@ body {
         27.6% !important;
 
     height:
-        60.2% !important;
+        64.5% !important;
 
     padding:
         1.3% !important;
@@ -6487,14 +6487,18 @@ body {
 }
 
 
+/* =========================================
+   CHARACTER CARD SLEEVE WINDOW
+   ========================================= */
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image-wrap {
 
     width:
-        82% !important;
+        86% !important;
 
     height:
-        53% !important;
+        58% !important;
 
     min-height:
         0 !important;
@@ -6503,7 +6507,16 @@ body {
         0 auto !important;
 
     overflow:
-        visible !important;
+        hidden !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
 
     border:
         none !important;
@@ -6512,6 +6525,10 @@ body {
         transparent !important;
 }
 
+
+/* =========================================
+   CHARACTER ART FIT
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
@@ -6522,11 +6539,46 @@ body {
     height:
         100% !important;
 
+    max-width:
+        none !important;
+
+    max-height:
+        none !important;
+
     object-fit:
         contain !important;
 
     object-position:
         center center !important;
+
+}
+
+
+/* =========================================
+   CHARACTER IDENTITY AREA
+
+   Pushes name/meta/change shinobi lower
+   into the baked card area.
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-name {
+
+    margin-top:
+        1.8% !important;
+
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-change-character {
+
+    margin-top:
+        2% !important;
+
+    width:
+        94% !important;
+
 }
 
 
