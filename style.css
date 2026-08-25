@@ -5421,7 +5421,7 @@ body {
         100% !important;
 
     height:
-        115% !important;
+    100% !important;
 
     min-height:
         0 !important;
@@ -5449,23 +5449,13 @@ body {
 }
 
 
-#konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
 
-    display:
-        block !important;
-
     width:
-    100% !important;
+        92% !important;
 
     height:
-    auto !important;
-
-    max-width:
-        none !important;
-
-    max-height:
-        none !important;
+        92% !important;
 
     object-fit:
         contain !important;
@@ -5474,8 +5464,9 @@ body {
         center center !important;
 
     transform:
-    translateX(-10%)
-    translateY(-5%) scale(0.92) !important;
+        translateX(0%)
+        translateY(0%)
+        scale(1) !important;
 
 }
 
