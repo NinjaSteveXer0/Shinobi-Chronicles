@@ -7650,4 +7650,32 @@ body {
 
 }
 
+/* =========================================================
+   EXAMS UI — LEFT CHARACTER SLEEVE CLEANUP
+   Hide Battle UI growth systems inside Exams
+   ========================================================= */
 
+#konoha-activity-screen[data-service-id="exams"]
+.character-power-panel,
+#konoha-activity-screen[data-service-id="exams"]
+.power-level-display,
+#konoha-activity-screen[data-service-id="exams"]
+.pl-growth-preview,
+#konoha-activity-screen[data-service-id="exams"]
+.character-discipline-panel {
+
+    display:
+        none !important;
+
+}
+
+
+/* Restore spacing after removing Battle UI panels */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-panel {
+
+    height:
+        auto !important;
+
+}
