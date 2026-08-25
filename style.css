@@ -6540,10 +6540,10 @@ body {
 .exam-character-image {
 
     width:
-        82% !important;
+        87% !important;
 
     height:
-        82% !important;
+        87% !important;
 
     max-width:
         none !important;
@@ -6558,7 +6558,7 @@ body {
         center center !important;
 
     transform:
-        translateX(0%)
+        translateX(-10%)
         translateY(0%)
         scale(1) !important;
 
