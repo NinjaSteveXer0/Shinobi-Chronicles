@@ -5411,11 +5411,6 @@ body {
    BRICK 284 — CHARACTER CARD FIT FINAL
    ========================================================= */
 
-
-/* =========================================
-   CHARACTER CARD IMAGE WINDOW
-   ========================================= */
-
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image-wrap {
 
@@ -5428,40 +5423,43 @@ body {
     height:
         100% !important;
 
+    min-height:
+        0 !important;
+
     margin:
         0 auto !important;
-
-    padding:
-        0 !important;
 
     display:
         flex !important;
 
     align-items:
-        flex-start !important;
+        center !important;
 
     justify-content:
         center !important;
 
     overflow:
-        hidden !important;
+        visible !important;
 
+    border:
+        none !important;
+
+    background:
+        transparent !important;
 }
 
-
-
-/* =========================================
-   CHARACTER IMAGE FIT
-   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
 
+    display:
+        block !important;
+
     width:
-        125% !important;
+        100% !important;
 
     height:
-        125% !important;
+        100% !important;
 
     max-width:
         none !important;
@@ -5470,13 +5468,13 @@ body {
         none !important;
 
     object-fit:
-        cover !important;
+        contain !important;
 
     object-position:
-        center top !important;
+        center center !important;
 
     transform:
-        translateX(-8%) translateY(-5%) !important;
+        translateY(0%) !important;
 
 }
 
@@ -6476,7 +6474,7 @@ body {
         0 !important;
 
     overflow:
-        visible !important;
+        hidden !important;
 
     background:
         transparent !important;
