@@ -5468,7 +5468,7 @@ body {
         none !important;
 
     object-fit:
-        cover !important;
+        contain !important;
 
     object-position:
         center center !important;
