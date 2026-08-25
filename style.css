@@ -5370,40 +5370,34 @@ body {
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-character-panel {
+.exam-character-image {
 
-    position:
-        absolute !important;
-
-    left:
-        3.65% !important;
-
-    top:
-        12.25% !important;
+    display:
+        block !important;
 
     width:
-        27.1% !important;
+        92% !important;
 
     height:
-        59.75% !important;
+        92% !important;
 
-    margin:
-        0 !important;
-
-    padding:
-        1.0% !important;
-
-    overflow:
-        hidden !important;
-
-    background:
-        transparent !important;
-
-    border:
+    max-width:
         none !important;
 
-    box-shadow:
+    max-height:
         none !important;
+
+    object-fit:
+        contain !important;
+
+    object-position:
+        center center !important;
+
+    transform:
+        translateX(0%)
+        translateY(0%)
+        scale(1) !important;
+
 }
 
 
@@ -5421,7 +5415,7 @@ body {
         100% !important;
 
     height:
-    100% !important;
+        100% !important;
 
     min-height:
         0 !important;
@@ -5439,7 +5433,7 @@ body {
         center !important;
 
     overflow:
-        visible !important;
+        hidden !important;
 
     border:
         none !important;
@@ -5449,13 +5443,23 @@ body {
 }
 
 
+#konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
 
+    display:
+        block !important;
+
     width:
-        92% !important;
+        100% !important;
 
     height:
-        92% !important;
+        auto !important;
+
+    max-width:
+        none !important;
+
+    max-height:
+        none !important;
 
     object-fit:
         contain !important;
@@ -5469,7 +5473,6 @@ body {
         scale(1) !important;
 
 }
-
 
 
 /* =========================================================
