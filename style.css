@@ -6493,17 +6493,17 @@ body {
 
 
 /* =========================================
-   CHARACTER CARD SLEEVE WINDOW
+   CHARACTER CARD SLEEVE WINDOW FINAL
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image-wrap {
 
- width:
-    100% !important;
+    width:
+        100% !important;
 
-  height:
-    66% !important;
+    height:
+        100% !important;
 
     min-height:
         0 !important;
@@ -6512,7 +6512,7 @@ body {
         0 auto !important;
 
     overflow:
-        hidden !important;
+        visible !important;
 
     display:
         flex !important;
@@ -6528,21 +6528,22 @@ body {
 
     background:
         transparent !important;
+
 }
 
 
 /* =========================================
-   CHARACTER ART FIT
+   CHARACTER ART FIT FINAL
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-image {
 
     width:
-        100% !important;
+        92% !important;
 
     height:
-        100% !important;
+        92% !important;
 
     max-width:
         none !important;
@@ -6551,13 +6552,17 @@ body {
         none !important;
 
     object-fit:
-        cover !important;
+        contain !important;
 
     object-position:
         center center !important;
 
-}
+    transform:
+        translateX(0%)
+        translateY(0%)
+        scale(1) !important;
 
+}
 
 /* =========================================
    CHARACTER IDENTITY AREA
