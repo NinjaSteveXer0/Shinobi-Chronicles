@@ -5456,10 +5456,10 @@ body {
         block !important;
 
     width:
-        100% !important;
+    100% !important;
 
     height:
-        100% !important;
+    auto !important;
 
     max-width:
         none !important;
