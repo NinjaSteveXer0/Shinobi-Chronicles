@@ -5474,7 +5474,8 @@ body {
         center center !important;
 
     transform:
-        translateY(0%) !important;
+    translateX(-5%)
+    translateY(-5%) !important;
 
 }
 
