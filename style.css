@@ -5489,6 +5489,7 @@ body {
    BRICK 285 — CHARACTER SELECTOR + IDENTITY
    ========================================================= */
 
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-selector {
 
@@ -5509,8 +5510,13 @@ body {
 
     z-index:
         12;
+
 }
 
+
+/* =========================================
+   CHARACTER ARROWS
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-arrow {
@@ -5566,6 +5572,7 @@ body {
             0,
             0.55
         );
+
 }
 
 
@@ -5582,91 +5589,37 @@ body {
 
     color:
         #91fbff !important;
+
 }
+
+
+/* =========================================
+   CHARACTER IDENTITY
+   =========================================
+
+   Identity is now owned by the card itself.
+
+   Duplicate:
+   - character name
+   - rank
+   - PL
+
+   removed.
+   ========================================= */
 
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-character-name {
-
-    margin-top:
-        1.2% !important;
-
-    color:
-        #efcb70 !important;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif;
-
-    font-size:
-        clamp(
-            13px,
-            1.30vw,
-            24px
-        ) !important;
-
-    line-height:
-        1.05 !important;
-
-    text-align:
-        center;
-}
-
-
+.exam-character-name,
 #konoha-activity-screen[data-service-id="exams"]
-.exam-character-rank {
-
-    margin-top:
-        0.6% !important;
-
-    color:
-        #43dfe4 !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.68vw,
-            12px
-        ) !important;
-
-    letter-spacing:
-        0.11em;
-}
-
-
+.exam-character-rank,
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-pl {
 
-    margin:
-        1.15%
-        0 !important;
+    display:
+        none !important;
 
-    color:
-        #e5c26c;
-
-    font-size:
-        clamp(
-            12px,
-            1.05vw,
-            19px
-        ) !important;
 }
 
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-pl strong {
-
-    color:
-        #43e2e7;
-
-    font-size:
-        clamp(
-            17px,
-            1.62vw,
-            29px
-        ) !important;
-}
 
 
 /* =========================================================
