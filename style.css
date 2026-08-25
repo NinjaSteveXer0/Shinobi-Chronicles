@@ -5478,7 +5478,7 @@ body {
         center center !important;
 
     transform:
-        translateX(0%)
+        translateX(-10%)
         translateY(-4%)
         scale(1) !important;
 
