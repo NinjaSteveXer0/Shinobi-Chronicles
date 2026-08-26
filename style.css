@@ -5770,13 +5770,13 @@ body {
         0 !important;
 
     top:
-        0% !important;
+        -10% !important;
 
     width:
-        100% !important;
+        102% !important;
 
     height:
-    29.5% !important;
+    33% !important;
 
     background:
         rgba(0, 217, 232, 0.10) !important;
@@ -5800,13 +5800,13 @@ body {
         0 !important;
 
     top:
-        34.25% !important;
+        32% !important;
 
     width:
         100% !important;
 
     height:
-        31.5% !important;
+        35% !important;
 
     background:
         rgba(0, 217, 232, 0.10) !important;
@@ -5830,13 +5830,13 @@ body {
         0 !important;
 
     top:
-        68.5% !important;
+        78% !important;
 
     width:
         100% !important;
 
     height:
-        31.5% !important;
+        35% !important;
 
     background:
         rgba(0, 217, 232, 0.10) !important;
@@ -6670,69 +6670,6 @@ body {
 */
 
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select {
-
-    position:
-        relative !important;
-
-    width:
-        100% !important;
-
-    height:
-        100% !important;
-
-    min-width:
-        0 !important;
-
-    min-height:
-        0 !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    overflow:
-        hidden !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-card {
-
-    position:
-        absolute !important;
-
-    inset:
-        0 !important;
-
-    width:
-        100% !important;
-
-    height:
-        100% !important;
-
-    min-width:
-        0 !important;
-
-    min-height:
-        0 !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    overflow:
-        hidden !important;
-
-}
-
-
 /* =========================================
    EXISTING LIVE VALUES
    ========================================= */
@@ -6875,6 +6812,9 @@ body {
     overflow:
         hidden !important;
 
+    border-radius:
+        5px !important;
+
     z-index:
         5;
 }
@@ -6889,10 +6829,10 @@ body {
 .exam-progress-track {
 
     left:
-    16.75% !important;
+    16.5% !important;
 
     top:
-        53% !important;
+        77% !important;
 
     width:
         25.5% !important;
@@ -6935,7 +6875,7 @@ body {
 
 
 /* =========================================
-   FUINJUTSU
+   FUINJUTSU PROGRESS TRACK
    ========================================= */
 
 /*
@@ -6949,10 +6889,23 @@ body {
 .exam-discipline-card[data-discipline-id="fuin"]
 .exam-progress-track {
 
+     left:
+        16.75% !important;
+
     top:
-        108% !important;
+        75% !important;
+
+    width:
+        25.5% !important;
+
+    height:
+        10% !important;
+
+    transform:
+        translateX(0) !important;
 
 }
+
 
 
 /* =========================================
