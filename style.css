@@ -6782,22 +6782,31 @@ body {
 
 
 /* =========================================
-   PROGRESS TRACK COMMON GEOMETRY
-   LOCKED
+   NINJUTSU PROGRESS TRACK
    ========================================= */
-*/
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-card[data-discipline-id="nin"]
 .exam-progress-track {
 
+    left:
+        19.8% !important;
+
     top:
-        84% !important;
+        62% !important;
+
+    width:
+        25% !important;
+
+    height:
+        5% !important;
 
     transform:
-        translateX(9px) !important;
+        translateX(0) !important;
 
 }
+
+
 
 
 /* =========================================
