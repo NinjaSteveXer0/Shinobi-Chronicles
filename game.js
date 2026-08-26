@@ -47346,48 +47346,6 @@ function ensureKonohaExamUIStyles() {
     }
 
 
-    .exam-progress-track {
-      position: relative;
-
-      height: 17px;
-
-      margin-top: 13px;
-
-      overflow: hidden;
-
-      border:
-        1px solid
-        #9d7623;
-
-      background:
-        #05090b;
-
-      box-shadow:
-        inset 0 0 8px
-        #000000;
-    }
-
-
-    .exam-progress-fill {
-      height: 100%;
-
-      background:
-        linear-gradient(
-          90deg,
-          #087a84,
-          #14cbd4,
-          #46f0ed
-        );
-
-      box-shadow:
-        0 0 14px
-        rgba(0, 225, 235, 0.55);
-
-      transition:
-        width 0.35s ease;
-    }
-
-
     .exam-discipline-reward {
       margin-top: 9px;
 
