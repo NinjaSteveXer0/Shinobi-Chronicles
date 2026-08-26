@@ -6671,11 +6671,25 @@ body {
 
 
 /* =========================================
-   EXISTING LIVE VALUES
+   LIVE DISCIPLINE PROGRESSION VALUES
+   ========================================= */
+
+/*
+   These are intentionally coded rather than baked.
+
+   Fine calibration belongs here.
+
+   Progress-bar geometry remains independently owned
+   by the track sections below.
+*/
+
+
+/* =========================================
+   CURRENT MASTERY VALUE
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-live-level {
+.exam-mastery-value {
 
     position:
         absolute !important;
@@ -6692,6 +6706,116 @@ body {
     padding:
         0 !important;
 
+    color:
+        #d9c58b !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.72vw,
+            13px
+        ) !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1 !important;
+
+    white-space:
+        nowrap !important;
+
+    z-index:
+        6;
+
+}
+
+
+/* =========================================
+   DISCIPLINE EXP LABEL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-exp-label {
+
+    position:
+        absolute !important;
+
+    left:
+        16.5% !important;
+
+    top:
+        57% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    color:
+        #c9a653 !important;
+
+    font-size:
+        clamp(
+            7px,
+            0.58vw,
+            11px
+        ) !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.04em !important;
+
+    white-space:
+        nowrap !important;
+
+    z-index:
+        6;
+
+}
+
+
+/* =========================================
+   DISCIPLINE EXP VALUE
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-exp-value {
+
+    position:
+        absolute !important;
+
+    left:
+        16.5% !important;
+
+    top:
+        67% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    color:
+        #ded7c4 !important;
+
+    font-size:
+        clamp(
+            7px,
+            0.62vw,
+            12px
+        ) !important;
+
+    font-weight:
+        500 !important;
+
     line-height:
         1 !important;
 
@@ -6705,78 +6829,16 @@ body {
 
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-live-experience {
+.exam-discipline-exp-value strong {
 
-    position:
-        absolute !important;
+    color:
+        #45e5e9 !important;
 
-    left:
-        61% !important;
-
-    top:
-        30% !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1 !important;
-
-    white-space:
-        nowrap !important;
-
-    z-index:
-        6;
-
-            color:
-        #ff2a2a !important;
+    font-weight:
+        700 !important;
 
 }
 
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-live-reward {
-
-    position:
-        absolute !important;
-
-    left:
-        21% !important;
-
-    top:
-        84% !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        0 !important;
-
-    line-height:
-        1 !important;
-
-    white-space:
-        nowrap !important;
-
-    z-index:
-        6;
-
-            color:
-        #27e2e7 !important;
-
-    text-shadow:
-        0 0 4px
-        rgba(
-            39,
-            226,
-            231,
-            0.45
-        );
-
-}
 
 /* =========================================
    PROGRESS TRACK COMMON GEOMETRY

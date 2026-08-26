@@ -47897,16 +47897,22 @@ function renderKonohaExamProgressBar(
 
 
 // =========================================================
-// BRICK 259 — EXAM DISCIPLINE LIVE DATA RENDERER
+// BRICK 259 — EXAM DISCIPLINE LIVE PROGRESSION RENDERER
 // =========================================================
 //
 // Background artwork owns:
-// - discipline name
-// - EXPERIENCE label
-// - Level label
-// - EXAM REWARD label
+// - discipline identity
+// - CURRENT MASTERY label
+// - EXAM REWARD presentation
 //
-// DOM owns only changing values.
+// DOM owns:
+// - live mastery value
+// - DISCIPLINE EXP label
+// - live current / required EXP
+// - live progress bar
+//
+// Obsolete floating reward presentation retired.
+// Result feedback is owned by the Exam result system.
 //
 // =========================================================
 
@@ -47935,7 +47941,7 @@ function renderKonohaExamDisciplineCard(
 
       <div
         class="
-          exam-live-level
+          exam-mastery-value
         "
       >
         ${discipline.level}
@@ -47944,7 +47950,16 @@ function renderKonohaExamDisciplineCard(
 
       <div
         class="
-          exam-live-experience
+          exam-discipline-exp-label
+        "
+      >
+        DISCIPLINE EXP
+      </div>
+
+
+      <div
+        class="
+          exam-discipline-exp-value
         "
       >
 
@@ -47971,17 +47986,6 @@ function renderKonohaExamDisciplineCard(
         discipline.progressPercent
       )}
 
-
-      <div
-        class="
-          exam-live-reward
-        "
-      >
-
-        +${discipline.rewardExp}
-        EXP
-
-      </div>
 
     </article>
 
