@@ -48892,6 +48892,17 @@ function executeKonohaExamAttempt(
 // =========================================================
 // BRICK 294 — EXAM BATCH + CLEAN RESULT PRESENTATION
 // =========================================================
+//
+// Supported Exam batch sizes:
+//
+// ×1  — single attempt
+// ×5  — five sequential attempts
+// ×10 — ten sequential attempts
+//
+// Each attempt remains a genuine independent Exam resolution.
+// PASS / FAIL, EXP and Chronicle history are processed by the
+// existing single-attempt authority.
+// =========================================================
 
 
 function setKonohaExamBatchSize(
@@ -48899,11 +48910,23 @@ function setKonohaExamBatchSize(
 ) {
 
 
-  const normalized =
+  const requested =
     Number(
       batchSize
-    ) === 5
-      ? 5
+    );
+
+
+  const normalized =
+    [
+      1,
+      5,
+      10
+    ].includes(
+      requested
+    )
+
+      ? requested
+
       : 1;
 
 
@@ -48930,9 +48953,21 @@ function executeKonohaExamBatch(
 
 
   const count =
-    batchSize === 5
-      ? 5
-      : 1;
+  [
+    1,
+    5,
+    10
+  ].includes(
+    Number(
+      batchSize
+    )
+  )
+
+    ? Number(
+        batchSize
+      )
+
+    : 1;
 
 
   const results =
@@ -49225,13 +49260,25 @@ function beginKonohaExamFromUI() {
     getKonohaExamSelectedDisciplineId();
 
 
-  const batchSize =
+  const requestedBatchSize =
+  Number(
     KONOHA_EXAM_ATTEMPT_STATE
-      .batchSize === 5
+      .batchSize
+  );
 
-        ? 5
 
-        : 1;
+const batchSize =
+  [
+    1,
+    5,
+    10
+  ].includes(
+    requestedBatchSize
+  )
+
+    ? requestedBatchSize
+
+    : 1;
 
 
   const results =
@@ -49617,7 +49664,7 @@ function renderKonohaExamVisualScreen() {
           </div>
 
 
-          <!-- =====================================
+                    <!-- =====================================
                BRICK 277 — LOWER ACTION CONTROL
                ===================================== -->
 
@@ -49690,6 +49737,33 @@ function renderKonohaExamVisualScreen() {
                 ×5
               </button>
 
+
+              <button
+                type="
+                  button
+                "
+                class="
+                  exam-batch-button
+                  ${
+                    batchSize === 10
+                      ? "selected"
+                      : ""
+                  }
+                "
+                onclick="
+                  setKonohaExamBatchSize(
+                    10
+                  )
+                "
+                aria-pressed="
+                  ${
+                    batchSize === 10
+                  }
+                "
+              >
+                ×10
+              </button>
+
             </div>
 
 
@@ -49724,6 +49798,8 @@ function renderKonohaExamVisualScreen() {
             </div>
 
           </div>
+
+
 
 
           <!-- =====================================
