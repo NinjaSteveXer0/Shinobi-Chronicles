@@ -5446,11 +5446,28 @@ body {
         transparent !important;
 
     transform:
-    translateX(-11%)
-    translateY(-11%) !important;
+        translateX(-11%)
+        translateY(-11%) !important;
+
+    -webkit-mask-image:
+        linear-gradient(
+            to right,
+            transparent 0%,
+            black 2.5%,
+            black 97.5%,
+            transparent 100%
+        ) !important;
+
+    mask-image:
+        linear-gradient(
+            to right,
+            transparent 0%,
+            black 2.5%,
+            black 97.5%,
+            transparent 100%
+        ) !important;
 
 }
-
 
 
 /* =========================================================
