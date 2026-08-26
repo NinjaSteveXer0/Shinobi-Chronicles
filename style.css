@@ -5446,7 +5446,8 @@ body {
         transparent !important;
 
     transform:
-        translateY(-12%) !important;
+    translateX(-10%)
+    translateY(-18%) !important;
 
 }
 
