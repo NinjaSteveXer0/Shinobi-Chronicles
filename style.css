@@ -7431,15 +7431,3 @@ body {
         none !important;
 
 }
-
-
-/* Restore spacing after removing Battle UI panels */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-panel {
-
-    height:
-        auto !important;
-
-}
-
