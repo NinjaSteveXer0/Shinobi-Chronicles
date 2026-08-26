@@ -7556,7 +7556,7 @@ body {
 
 @media (
     max-aspect-ratio:
-    1536 / 1102
+    1311 / 1200
 ) {
 
     #konoha-activity-screen[data-service-id="exams"]
@@ -7565,7 +7565,7 @@ body {
         width:
             calc(
                 100dvh *
-                1.39383
+                1.0925
             );
 
         max-width:
@@ -7603,6 +7603,8 @@ body {
     }
 
 }
+
+
 
 /* =========================================================
    EXAMS UI — LEFT CHARACTER SLEEVE CLEANUP
