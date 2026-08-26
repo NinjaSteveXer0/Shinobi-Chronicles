@@ -5244,12 +5244,12 @@ body {
             100vw,
             calc(
                 100dvh *
-                1.39383
+                1.0925
             )
         );
 
     aspect-ratio:
-        1536 / 1102;
+        1311 / 1200;
 
     height:
         auto;
