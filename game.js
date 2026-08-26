@@ -47928,12 +47928,8 @@ function renderKonohaExamDisciplineCard(
   return `
 
     <article
-      class="
-        exam-discipline-card
-      "
-      data-discipline-id="
-        ${discipline.id}
-      "
+      class="exam-discipline-card"
+      data-discipline-id="${discipline.id}"
     >
 
 
@@ -47993,6 +47989,7 @@ function renderKonohaExamDisciplineCard(
 
 
 }
+
 
 
 // =========================================================
