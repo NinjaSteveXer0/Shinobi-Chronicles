@@ -50081,8 +50081,8 @@ function renderKonohaExamBottomNavigation() {
 
   `;
 
-
 }
+
 
 
 
@@ -50146,11 +50146,6 @@ function validateKonohaExamUISystem() {
 
     selectionControl:
       typeof changeKonohaExamCharacter ===
-        "function",
-
-
-    eligibilityRenderer:
-      typeof renderKonohaExamEligibilityPanel ===
         "function",
 
 
