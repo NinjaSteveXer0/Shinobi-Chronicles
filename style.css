@@ -7099,11 +7099,8 @@ body {
     position:
         absolute !important;
 
-   left:
-    82% !important;
-
-   top:
-    80% !important;
+   left: 82% !important;  /* left/right */
+   top:  80% !important;  /* up/down */
 
   transform:
     translateX(-50%) !important;
@@ -7376,17 +7373,10 @@ body {
     position:
         absolute !important;
 
-    left:
-    32.5% !important;
-
-    top:
-    79.5% !important;
-
-    width:
-    35% !important;
-
-    height:
-    10% !important;
+    left:   32.5% !important;  /* left/right */
+    top:    79.5% !important;  /* up/down */
+    width:  35% !important;    /* box width */
+    height: 10% !important;    /* box height */
 
     margin:
         0 !important;
