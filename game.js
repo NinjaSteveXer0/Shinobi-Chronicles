@@ -50698,8 +50698,13 @@ function validateKonohaExamVisualSystem() {
         3,
 
 
-    levelValues:
-      levelValues ===
+    masteryValues:
+      masteryValues ===
+        3,
+
+
+    expLabels:
+      expLabels ===
         3,
 
 
@@ -50716,10 +50721,6 @@ function validateKonohaExamVisualSystem() {
     progressBarsContained:
       tracksContained,
 
-
-    rewardValues:
-      rewardValues ===
-        3,
 
 
     batchControls:
