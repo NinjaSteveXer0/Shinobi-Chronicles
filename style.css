@@ -5416,7 +5416,7 @@ body {
         relative !important;
 
     width:
-        100% !important;
+        110% !important;
 
     height:
         100% !important;
@@ -5446,7 +5446,7 @@ body {
         transparent !important;
 
     transform:
-    translateX(-14%)
+    translateX(-12%)
     translateY(-18%) !important;
 
 }
