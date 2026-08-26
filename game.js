@@ -49793,9 +49793,6 @@ function renderKonohaExamVisualScreen() {
             </section>
 
 
-            ${renderKonohaExamEligibilityPanel(
-              data.eligibility
-            )}
 
           </div>
 
