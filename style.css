@@ -5447,7 +5447,7 @@ body {
 
     transform:
         translateX(-8%)
-        translateY(-8%) !important;
+        translateY(-6%) !important;
 
     -webkit-mask-image:
         linear-gradient(
