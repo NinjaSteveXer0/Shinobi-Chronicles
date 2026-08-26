@@ -49327,8 +49327,25 @@ const batchSize =
 // =========================================================
 // BRICK 273 — EXAM GAMEPLAY REGRESSION
 // =========================================================
+//
+// Validates:
+//
+// - Exam attempt state
+// - discipline selection
+// - hidden difficulty
+// - history pressure
+// - activity authority
+// - single attempt execution
+// - batch execution
+// - x1 / x5 / x10 support
+// - Chronicle recording
+// - result rendering
+//
+// =========================================================
+
 
 function validateKonohaExamGameplaySystem() {
+
 
   const selectedDiscipline =
     getKonohaExamSelectedDisciplineId();
@@ -49362,6 +49379,14 @@ function validateKonohaExamGameplaySystem() {
     getActivityData(
       "exam"
     );
+
+
+  const supportedBatchSizes =
+    [
+      1,
+      5,
+      10
+    ];
 
 
   const checks = {
@@ -49405,6 +49430,18 @@ function validateKonohaExamGameplaySystem() {
       typeof executeKonohaExamBatch ===
         "function",
 
+    supportedBatchSizes:
+      supportedBatchSizes.every(
+        batchSize =>
+          [
+            1,
+            5,
+            10
+          ].includes(
+            batchSize
+          )
+      ),
+
     chronicleRecording:
       typeof recordKonohaExamAttempt ===
         "function",
@@ -49433,6 +49470,7 @@ function validateKonohaExamGameplaySystem() {
 
   return checks;
 
+
 }
 
 
@@ -49448,7 +49486,7 @@ function validateKonohaExamGameplaySystem() {
 // - hidden difficulty
 // - history pressure
 // - PASS / FAIL resolution
-// - x1 / x5 execution
+// - x1 / x5 / x10 execution
 // - Chronicle attempt recording
 //
 // =========================================================
@@ -49492,13 +49530,25 @@ function renderKonohaExamVisualScreen() {
     getKonohaExamSelectedDisciplineId();
 
 
+  const requestedBatchSize =
+    Number(
+      KONOHA_EXAM_ATTEMPT_STATE
+        .batchSize
+    );
+
+
   const batchSize =
-    KONOHA_EXAM_ATTEMPT_STATE
-      .batchSize === 5
+    [
+      1,
+      5,
+      10
+    ].includes(
+      requestedBatchSize
+    )
 
-        ? 5
+      ? requestedBatchSize
 
-        : 1;
+      : 1;
 
 
   root.dataset.serviceId =
@@ -49516,6 +49566,7 @@ function renderKonohaExamVisualScreen() {
         konoha-exam-screen
       "
     >
+
 
 
       <!-- =====================================
