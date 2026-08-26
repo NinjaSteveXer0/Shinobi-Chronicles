@@ -5730,7 +5730,7 @@ body {
         63.2% !important;
 
     height:
-        50.8% !important;
+        56.5% !important;
 
     display:
         grid !important;
@@ -5885,37 +5885,24 @@ body {
 
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select.selected::after {
+.exam-discipline-select.selected {
 
-    content:
-        "";
-
-    position:
-        absolute;
-
-    left:
-        0.35%;
-
-    top:
-        18%;
-
-    bottom:
-        18%;
-
-    width:
-        2px;
+    border-color:
+        transparent !important;
 
     background:
-        #43dfe4;
+        transparent !important;
 
     box-shadow:
-        0 0 8px
-        rgba(
-            67,
-            223,
-            228,
-            0.62
-        );
+        none !important;
+}
+
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select.selected::after {
+
+    display:
+        none !important;
 }
 
 
@@ -6796,7 +6783,7 @@ body {
         53% !important;
 
     width:
-        15% !important;
+        25.5% !important;
 
     height:
         10% !important;
@@ -6810,18 +6797,27 @@ body {
 
 
 /* =========================================
-   GENJUTSU
+   GENJUTSU PROGRESS TRACK
    ========================================= */
-/*
-   Currently considerably too high.
-*/
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-card[data-discipline-id="gen"]
 .exam-progress-track {
 
+    left:
+        16.75% !important;
+
     top:
-        94% !important;
+        80% !important;
+
+    width:
+        25.5% !important;
+
+    height:
+        10% !important;
+
+    transform:
+        translateX(0) !important;
 
 }
 
