@@ -47616,33 +47616,20 @@ function ensureKonohaExamUIStyles() {
 // =========================================================
 // BRICK 225 — EXAM CHARACTER PANEL RENDERER
 // =========================================================
-
-
-function getKonohaExamMetaValue(
-  value
-) {
-
-
-  if (
-    value === null ||
-    value === undefined ||
-    value === ""
-  ) {
-
-
-    return "—";
-
-
-  }
-
-
-  return String(
-    value
-  );
-
-
-}
-
+//
+// Left-side Exam character presentation.
+//
+// Exam-relevant identity remains:
+//
+// - Character artwork
+// - Character name
+// - Rank
+// - Current PL
+// - Character selection controls
+//
+// Village / Clan / Element / Status are intentionally
+// excluded from the Exam presentation.
+// =========================================================
 
 
 function renderKonohaExamCharacterPanel(
@@ -47652,9 +47639,7 @@ function renderKonohaExamCharacterPanel(
 
   if (!character) {
 
-
     return "";
-
 
   }
 
@@ -47753,35 +47738,6 @@ function renderKonohaExamCharacterPanel(
       </div>
 
 
-      <div
-        class="
-          exam-character-meta
-        "
-      >
-
-        ${renderKonohaExamCharacterMetaRow(
-          "Village",
-          character.village
-        )}
-
-        ${renderKonohaExamCharacterMetaRow(
-          "Clan",
-          character.clan
-        )}
-
-        ${renderKonohaExamCharacterMetaRow(
-          "Element",
-          character.element
-        )}
-
-        ${renderKonohaExamCharacterMetaRow(
-          "Status",
-          character.status
-        )}
-
-      </div>
-
-
       <button
         type="button"
         class="
@@ -47798,50 +47754,7 @@ function renderKonohaExamCharacterPanel(
 
   `;
 
-
 }
-
-
-
-function renderKonohaExamCharacterMetaRow(
-  label,
-  value
-) {
-
-
-  return `
-
-    <div
-      class="
-        exam-character-meta-row
-      "
-    >
-
-      <span
-        class="
-          exam-character-meta-label
-        "
-      >
-        ${label}
-      </span>
-
-      <span
-        class="
-          exam-character-meta-value
-        "
-      >
-        ${getKonohaExamMetaValue(
-          value
-        )}
-      </span>
-
-    </div>
-
-  `;
-
-
-}
-
 
 // =========================================================
 // BRICK 226 — EXAM DISCIPLINE PROGRESS BAR
