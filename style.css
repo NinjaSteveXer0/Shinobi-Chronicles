@@ -6695,10 +6695,10 @@ body {
         absolute !important;
 
     left:
-        21.4% !important;
+        2% !important;
 
     top:
-        42% !important;
+        75% !important;
 
     margin:
         0 !important;
@@ -6710,11 +6710,7 @@ body {
         #d9c58b !important;
 
     font-size:
-        clamp(
-            8px,
-            0.72vw,
-            13px
-        ) !important;
+    1.55vw !important;
 
     font-weight:
         700 !important;
@@ -6727,6 +6723,29 @@ body {
 
     z-index:
         6;
+
+}
+
+/* =========================================
+   GENJUTSU MASTERY VALUE CALIBRATION
+   ========================================= */
+
+/*
+   Genjutsu requires an independent positional correction.
+
+   Ninjutsu and Fuinjutsu are aligned against the baked
+   artwork and must not be affected by this adjustment.
+*/
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-card[data-discipline-id="gen"]
+.exam-mastery-value {
+
+    left:
+        21.4% !important;
+
+    top:
+        42% !important;
 
 }
 
