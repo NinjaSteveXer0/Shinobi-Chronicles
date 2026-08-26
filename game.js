@@ -50558,10 +50558,18 @@ function validateKonohaExamVisualSystem() {
       : [];
 
 
-  const levelValues =
+    const masteryValues =
     root
       ? root.querySelectorAll(
-          ".exam-live-level"
+          ".exam-mastery-value"
+        ).length
+      : 0;
+
+
+  const expLabels =
+    root
+      ? root.querySelectorAll(
+          ".exam-discipline-exp-label"
         ).length
       : 0;
 
@@ -50569,15 +50577,7 @@ function validateKonohaExamVisualSystem() {
   const expValues =
     root
       ? root.querySelectorAll(
-          ".exam-live-experience"
-        ).length
-      : 0;
-
-
-  const rewardValues =
-    root
-      ? root.querySelectorAll(
-          ".exam-live-reward"
+          ".exam-discipline-exp-value"
         ).length
       : 0;
 
