@@ -6368,6 +6368,122 @@ body {
    with obsolete Exam UI authorities.
 */
 
+/* =========================================================
+   BRICK 310 — EXAM CHARACTER CARD SLEEVE SURPLUS FILL
+   ========================================================= */
+
+/*
+   FINAL CHARACTER SLEEVE GUTTER TREATMENT
+
+   PURPOSE:
+   - preserve the collectible card's native proportions
+   - do NOT stretch or crop the card
+   - convert surplus sleeve width into intentional
+     ceremonial selector rails
+   - give the left/right character arrows a natural home
+
+   Brick 262 remains the card geometry authority.
+*/
+
+
+/* =========================================
+   LEFT CEREMONIAL GUTTER
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-panel::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        1%;
+
+    bottom:
+        1%;
+
+    left:
+        -24%;
+
+    width:
+        20%;
+
+    pointer-events:
+        none;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(2, 4, 5, 0.94) 0%,
+            rgba(20, 15, 7, 0.92) 54%,
+            rgba(8, 7, 4, 0.88) 100%
+        );
+
+    border-left:
+        1px solid rgba(214, 169, 58, 0.18);
+
+    border-right:
+        1px solid rgba(214, 169, 58, 0.52);
+
+    box-shadow:
+        inset -8px 0 14px rgba(214, 169, 58, 0.06),
+        inset 8px 0 18px rgba(0, 0, 0, 0.68),
+        0 0 8px rgba(0, 0, 0, 0.55);
+
+}
+
+
+/* =========================================
+   RIGHT CEREMONIAL GUTTER
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-panel::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        1%;
+
+    bottom:
+        1%;
+
+    right:
+        -24%;
+
+    width:
+        20%;
+
+    pointer-events:
+        none;
+
+    background:
+        linear-gradient(
+            270deg,
+            rgba(2, 4, 5, 0.94) 0%,
+            rgba(20, 15, 7, 0.92) 54%,
+            rgba(8, 7, 4, 0.88) 100%
+        );
+
+    border-right:
+        1px solid rgba(214, 169, 58, 0.18);
+
+    border-left:
+        1px solid rgba(214, 169, 58, 0.52);
+
+    box-shadow:
+        inset 8px 0 14px rgba(214, 169, 58, 0.06),
+        inset -8px 0 18px rgba(0, 0, 0, 0.68),
+        0 0 8px rgba(0, 0, 0, 0.55);
+
+}
 
 /* =========================================================
    BRICK 262 — EXAM CHARACTER CARD SLEEVE CALIBRATION
@@ -6385,10 +6501,10 @@ body {
         absolute !important;
 
     left:
-        5.5% !important;
+        5.8% !important;
 
     top:
-        10% !important;
+        9% !important;
 
     width:
         15% !important;
