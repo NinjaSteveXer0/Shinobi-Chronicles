@@ -3381,6 +3381,14 @@ function syncCharacterEquipmentFromSave() {
 // =========================================================
 // DEVELOPMENT EQUIPMENT VIEW
 // =========================================================
+//
+// Equipment presentation uses Effective state.
+//
+// Current PL remains persistent progression.
+// Effective PL reflects equipment and other contextual
+// stat effects.
+//
+// =========================================================
 
 function showEquipmentData() {
 
@@ -3448,7 +3456,7 @@ function showEquipmentData() {
 
 
         const effectiveStats =
-          getEffectiveCharacterStats(
+          getDevelopedEffectiveCharacterStats(
             character
           );
 
@@ -3502,6 +3510,11 @@ function showEquipmentData() {
 
           currentPL:
             calculateCurrentPL(
+              character
+            ),
+
+          effectivePL:
+            calculateEffectivePL(
               character
             )
 
@@ -32203,8 +32216,12 @@ function startEncounterActivity(
 // - Encounter identity
 // - Character identity
 // - Enemy identity
-// - Contribution state
+// - Effective contribution state
 // - Reward state
+//
+// Battle contribution Power uses Effective PL because
+// equipment and contextual combat effects belong to the
+// character's active battle state.
 //
 // =========================================================
 
@@ -32240,7 +32257,6 @@ function startEncounter(
 
     return false;
 
-
   }
 
 
@@ -32258,7 +32274,6 @@ function startEncounter(
         characterId
       );
 
-
   }
 
 
@@ -32270,7 +32285,6 @@ function startEncounter(
     activePlayer =
       playerTeam[0] ||
       null;
-
 
   }
 
@@ -32286,7 +32300,6 @@ function startEncounter(
 
 
     return false;
-
 
   }
 
@@ -32365,43 +32378,33 @@ function startEncounter(
         member.id
       ] = {
 
-
         id:
           member.id,
-
 
         name:
           member.name,
 
-
         power:
-          calculateCurrentPL(
+          calculateEffectivePL(
             member
           ),
-
 
         damage:
           0,
 
-
         attacks:
           0,
-
 
         ninjutsuDamage:
           0,
 
-
         taijutsuDamage:
           0,
-
 
         bukijutsuDamage:
           0
 
-
       };
-
 
     }
   );
@@ -32414,38 +32417,29 @@ function startEncounter(
 
   currentBattle.rewards = {
 
-
     generated:
       false,
-
 
     claimed:
       false,
 
-
     ryo:
       0,
-
 
     exp:
       0,
 
-
     items:
       [],
-
 
     rareDrops:
       [],
 
-
     finishingShinobi:
       null,
 
-
     mvp:
       null
-
 
   };
 
@@ -32484,10 +32478,7 @@ function startEncounter(
 
   return currentBattle;
 
-
 }
-
-
 
 
 // =========================================================
@@ -35694,6 +35685,20 @@ function formatPL(value) {
 // =========================================================
 // BATTLE POWER CALCULATION
 // =========================================================
+//
+// Battle uses Effective state.
+//
+// PLAYER:
+// Developed persistent stats
+// +
+// equipment / contextual stat effects
+// ↓
+// Effective PL
+//
+// ENEMY:
+// Existing enemy Power authority.
+//
+// =========================================================
 
 function calculateBattlePower(
   character,
@@ -35701,9 +35706,14 @@ function calculateBattlePower(
 ) {
 
 
+  const isPlayerCharacter =
+    character.basePL !==
+      undefined;
+
+
   const pl =
-    character.basePL !== undefined
-      ? calculateCurrentPL(
+    isPlayerCharacter
+      ? calculateEffectivePL(
           character
         )
       : character.power;
@@ -35715,17 +35725,17 @@ function calculateBattlePower(
 
 
   // =========================================
-  // PLAYER CHARACTERS USE EFFECTIVE STATS
+  // PLAYER CHARACTERS USE DEVELOPED
+  // EFFECTIVE STATS
   // =========================================
 
   if (
-    character.basePL !==
-    undefined
+    isPlayerCharacter
   ) {
 
 
     const effectiveStats =
-      getEffectiveCharacterStats(
+      getDevelopedEffectiveCharacterStats(
         character
       );
 
