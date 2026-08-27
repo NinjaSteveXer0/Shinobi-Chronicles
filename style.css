@@ -7101,20 +7101,37 @@ outline:
    BRICK 310 — EXAM BATCH CONTROLS POSITION FINAL
    ========================================================= */
 
+/*
+   MANUAL CALIBRATION TARGET.
+
+   left = horizontal position
+   top  = vertical position
+
+   Temporary cyan diagnostic is intentional.
+   Remove only after final placement is confirmed.
+*/
+
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-batch-controls {
 
     position:
         absolute !important;
 
-   left: 82% !important;  /* left/right */
-   top:  80% !important;  /* up/down */
+    left:
+        150% !important;
 
-  transform:
-    translateX(-50%) !important;
+    top:
+        105% !important;
+
+    transform:
+        translateX(-50%) !important;
 
     display:
         flex !important;
+
+    flex-direction:
+        row !important;
 
     align-items:
         center !important;
@@ -7122,17 +7139,43 @@ outline:
     justify-content:
         center !important;
 
+    flex-wrap:
+        nowrap !important;
+
     gap:
         12px !important;
+
+    width:
+        max-content !important;
 
     margin:
         0 !important;
 
     padding:
-        0 !important;
+        6px !important;
+
+    white-space:
+        nowrap !important;
+
+    outline:
+        2px solid cyan !important;
+
+    background:
+        rgba(
+            0,
+            255,
+            255,
+            0.15
+        ) !important;
+
+    box-sizing:
+        border-box !important;
 
     z-index:
         20 !important;
+
+    pointer-events:
+        auto !important;
 
 }
 
@@ -7374,6 +7417,20 @@ outline:
    BRICK 311 — BEGIN EXAM POSITION FINAL
    ========================================================= */
 
+/*
+   FINAL BEGIN EXAM CHILD AUTHORITY.
+
+   Brick 299 owns the calibrated parent position.
+
+   This block owns only:
+   - Begin Exam hitbox geometry
+   - hitbox containment
+   - horizontal text presentation
+   - click-boundary safety
+
+   The baked artwork remains the visual button.
+*/
+
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-begin-wrap {
@@ -7381,10 +7438,17 @@ outline:
     position:
         absolute !important;
 
-    left:   32.5% !important;  /* left/right */
-    top:    110% !important;  /* up/down */
-    width:  35% !important;    /* box width */
-    height: 20% !important;    /* box height */
+    left:
+        32.5% !important;
+
+    top:
+        110% !important;
+
+    width:
+        35% !important;
+
+    height:
+        20% !important;
 
     margin:
         0 !important;
@@ -7401,17 +7465,14 @@ outline:
     justify-content:
         center !important;
 
+    overflow:
+        hidden !important;
+
+    box-sizing:
+        border-box !important;
+
     z-index:
         25 !important;
-
-        background:
-    rgba(0, 255, 255, 0.20) !important;
-
-border:
-    2px solid cyan !important;
-
-    overflow:
-    hidden !important;
 
 }
 
@@ -7425,13 +7486,46 @@ border:
     height:
         100% !important;
 
+    min-width:
+        0 !important;
+
+    min-height:
+        0 !important;
+
+    margin:
+        0 !important;
+
     padding:
         0 !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    box-sizing:
+        border-box !important;
+
+    overflow:
+        hidden !important;
+
+    white-space:
+        nowrap !important;
+
+    line-height:
+        1 !important;
 
     background:
         transparent !important;
 
     border:
+        none !important;
+
+    outline:
         none !important;
 
     box-shadow:
@@ -7440,12 +7534,11 @@ border:
     color:
         #45e5e9 !important;
 
-        outline:
-    3px solid lime !important;
+    cursor:
+        pointer !important;
 
-background:
-    rgba(0, 255, 0, 0.18) !important;
-
+    pointer-events:
+        auto !important;
 
 }
 
