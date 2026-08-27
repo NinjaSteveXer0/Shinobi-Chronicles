@@ -7409,16 +7409,20 @@ body {
 
 
 /* =========================================================
-   BRICK 311 — BEGIN EXAM POSITION FINAL
+   BRICK 311 — BEGIN EXAM FINAL AUTHORITY
    ========================================================= */
 
 /*
-   FINAL BEGIN EXAM CHILD AUTHORITY.
+   Brick 299 owns the parent Exam action zone.
 
-   Brick 299 owns the parent position.
+   This authority owns:
+   - BEGIN EXAM wrapper geometry
+   - BEGIN EXAM button geometry
+   - click containment
+   - live button text presentation
 
-   Wrapper owns the complete clickable boundary.
-   overflow:hidden prevents ghost-click overflow.
+   The wrapper deliberately clips overflow so the
+   interactive region cannot escape its visible authority.
 */
 
 
@@ -7545,7 +7549,18 @@ body {
 
 }
 
-/* FIX BLACK EXP / POWER TEXT */
+/* =========================================================
+   EXAM CHARACTER PL TEXT AUTHORITY
+   ========================================================= */
+
+/*
+   Presentation only.
+
+   The live PL value itself remains owned by the
+   character / Power Level systems.
+
+   This authority controls only Exam-screen colouring.
+*/
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-pl,
@@ -7557,6 +7572,7 @@ body {
 
 }
 
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-pl strong {
 
@@ -7564,8 +7580,6 @@ body {
         #43e2e7 !important;
 
 }
-
-
 
 /* =========================================================
    BRICK 293 — EXAM VISUAL FINAL AUTHORITY / RESPONSIVE GUARD
