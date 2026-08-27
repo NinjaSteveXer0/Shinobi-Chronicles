@@ -7374,9 +7374,9 @@ body {
         absolute !important;
 
     left:   32.5% !important;  /* left/right */
-    top:    79.5% !important;  /* up/down */
+    top:    110% !important;  /* up/down */
     width:  35% !important;    /* box width */
-    height: 10% !important;    /* box height */
+    height: 20% !important;    /* box height */
 
     margin:
         0 !important;
@@ -7395,6 +7395,12 @@ body {
 
     z-index:
         25 !important;
+
+        background:
+    rgba(0, 255, 255, 0.20) !important;
+
+border:
+    2px solid cyan !important;
 
 }
 
