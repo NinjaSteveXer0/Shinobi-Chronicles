@@ -7031,6 +7031,20 @@ body {
    BRICK 299 — FINAL EXAM ACTION ZONE
    ========================================================= */
 
+/*
+   FINAL ACTION-ZONE PARENT AUTHORITY.
+
+   Position manually approved:
+   left: 35%
+   top: 72.5%
+
+   Parent is layout-only.
+   It must never itself receive clicks.
+
+   Legitimate interactive children explicitly
+   regain pointer events below.
+*/
+
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-action-control {
@@ -7042,7 +7056,7 @@ body {
         35% !important;
 
     top:
-    72.5% !important;
+        72.5% !important;
 
     width:
         34.0% !important;
@@ -7057,9 +7071,19 @@ body {
         0 !important;
 
     z-index:
-        18;
+        18 !important;
 
-    #konoha-activity-screen[data-service-id="exams"]
+    pointer-events:
+        none !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   CHILDREN DEFAULT TO NON-INTERACTIVE
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="exams"]
 .exam-action-control > * {
 
     pointer-events:
@@ -7067,33 +7091,24 @@ body {
 
 }
 
+
+/* ---------------------------------------------------------
+   LEGITIMATE INTERACTIVE CONTROLS
+   --------------------------------------------------------- */
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-begin-wrap,
 #konoha-activity-screen[data-service-id="exams"]
-.exam-begin-button {
+.exam-begin-button,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-batch-controls,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-batch-controls > button {
 
     pointer-events:
         auto !important;
 
 }
-
-        background:
-    rgba(255, 0, 0, 0.15) !important;
-
-outline:
-    2px solid red !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-action-control > * {
-
-    pointer-events:
-        auto;
-
-}
-
 
 
 
@@ -7102,13 +7117,14 @@ outline:
    ========================================================= */
 
 /*
-   MANUAL CALIBRATION TARGET.
+   FINAL BATCH CONTROL AUTHORITY.
 
-   left = horizontal position
-   top  = vertical position
+   Position is manually approved:
+   left: 150%
+   top: 105%
 
-   Temporary cyan diagnostic is intentional.
-   Remove only after final placement is confirmed.
+   Parent owns placement only.
+   Individual buttons own visual presentation.
 */
 
 
@@ -7143,7 +7159,7 @@ outline:
         nowrap !important;
 
     gap:
-        12px !important;
+        14px !important;
 
     width:
         max-content !important;
@@ -7152,21 +7168,34 @@ outline:
         0 !important;
 
     padding:
-        6px !important;
+        7px 9px !important;
 
     white-space:
         nowrap !important;
 
-    outline:
-        2px solid cyan !important;
-
     background:
-        rgba(
-            0,
-            255,
-            255,
-            0.15
+        linear-gradient(
+            180deg,
+            rgba(9, 14, 18, 0.94),
+            rgba(3, 7, 10, 0.97)
         ) !important;
+
+    border:
+        1px solid
+        rgba(183, 137, 42, 0.72) !important;
+
+    border-radius:
+        6px !important;
+
+    outline:
+        none !important;
+
+    box-shadow:
+        inset 0 0 16px
+        rgba(0, 0, 0, 0.55),
+
+        0 0 10px
+        rgba(214, 169, 58, 0.10) !important;
 
     box-sizing:
         border-box !important;
@@ -7178,6 +7207,155 @@ outline:
         auto !important;
 
 }
+
+
+/* ---------------------------------------------------------
+   INDIVIDUAL ×1 / ×5 / ×10 BUTTONS
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-batch-controls > button {
+
+    min-width:
+        clamp(
+            52px,
+            4.2vw,
+            76px
+        ) !important;
+
+    height:
+        clamp(
+            34px,
+            3vw,
+            50px
+        ) !important;
+
+    padding:
+        0 12px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(19, 29, 34, 0.98),
+            rgba(5, 11, 15, 0.99)
+        ) !important;
+
+    border:
+        2px solid
+        rgba(190, 143, 43, 0.88) !important;
+
+    border-radius:
+        5px !important;
+
+    color:
+        #e7c568 !important;
+
+    font-size:
+        clamp(
+            15px,
+            1.35vw,
+            24px
+        ) !important;
+
+    font-weight:
+        900 !important;
+
+    line-height:
+        1 !important;
+
+    text-shadow:
+        0 1px 3px
+        rgba(0, 0, 0, 0.85) !important;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(0, 217, 232, 0.10),
+
+        inset 0 0 12px
+        rgba(0, 0, 0, 0.65),
+
+        0 3px 8px
+        rgba(0, 0, 0, 0.55) !important;
+
+    cursor:
+        pointer !important;
+
+    box-sizing:
+        border-box !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   HOVER
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-batch-controls > button:hover {
+
+    color:
+        #fff0a8 !important;
+
+    border-color:
+        #e4b64e !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(25, 38, 43, 0.99),
+            rgba(7, 15, 19, 0.99)
+        ) !important;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(0, 217, 232, 0.20),
+
+        0 0 12px
+        rgba(214, 169, 58, 0.28) !important;
+
+}
+
+
+/* ---------------------------------------------------------
+   SELECTED BATCH
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-batch-controls > button.active,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-batch-controls > button.selected {
+
+    color:
+        #071014 !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            #5be8eb,
+            #24bfc8
+        ) !important;
+
+    border-color:
+        #e1bd63 !important;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(255, 235, 166, 0.48),
+
+        0 0 13px
+        rgba(69, 229, 233, 0.30) !important;
+
+}
+
 
 /* =========================================================
    BRICK 301 — FINAL RESULT FEEDBACK
@@ -7420,15 +7598,13 @@ outline:
 /*
    FINAL BEGIN EXAM CHILD AUTHORITY.
 
-   Brick 299 owns the calibrated parent position.
+   Brick 299 owns the parent position.
 
-   This block owns only:
-   - Begin Exam hitbox geometry
-   - hitbox containment
-   - horizontal text presentation
-   - click-boundary safety
+   This wrapper is the ONLY permitted clickable
+   BEGIN EXAM geometry.
 
-   The baked artwork remains the visual button.
+   overflow:hidden is intentional and prevents
+   the previous ghost-click region.
 */
 
 
@@ -7474,6 +7650,9 @@ outline:
     z-index:
         25 !important;
 
+    pointer-events:
+        auto !important;
+
 }
 
 
@@ -7507,11 +7686,11 @@ outline:
     justify-content:
         center !important;
 
-    box-sizing:
-        border-box !important;
-
     overflow:
         hidden !important;
+
+    box-sizing:
+        border-box !important;
 
     white-space:
         nowrap !important;
@@ -7534,6 +7713,16 @@ outline:
     color:
         #45e5e9 !important;
 
+    font-size:
+        clamp(
+            18px,
+            2.05vw,
+            37px
+        ) !important;
+
+    font-weight:
+        900 !important;
+
     cursor:
         pointer !important;
 
@@ -7541,7 +7730,6 @@ outline:
         auto !important;
 
 }
-
 
 /* FIX BLACK EXP / POWER TEXT */
 
