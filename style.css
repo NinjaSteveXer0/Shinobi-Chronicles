@@ -7675,18 +7675,25 @@ body {
    ========================================================= */
 
 /*
-   Presentation only.
+   Current PL and Progress to Next PL are live DOM values.
 
-   Current PL is supplied by the existing canonical
-   calculateCurrentPL(character) gameplay authority.
+   Background artwork owns:
+   - POWER LEVEL heading
+   - PL medallion
+   - PROGRESS TO NEXT PL heading
+   - progress-track frame
 
-   This block positions that live value inside the baked
-   POWER LEVEL medallion.
+   DOM owns:
+   - Current PL number
+   - live progress fill
 
-   Progress to Next PL remains intentionally unbound until
-   the canonical PL progression contract is established.
+   Progress uses persistent Current development only.
 */
 
+
+/* =========================================
+   CURRENT PL NUMBER
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-pl {
@@ -7770,6 +7777,101 @@ body {
     text-shadow:
         0 2px 8px rgba(0, 0, 0, 0.9),
         0 0 10px rgba(214, 169, 58, 0.18) !important;
+
+}
+
+
+/* =========================================
+   PROGRESS TO NEXT PL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-pl-progress {
+
+    position:
+        fixed !important;
+
+    left:
+        7.25% !important;
+
+    top:
+        67.15% !important;
+
+    width:
+        18.75% !important;
+
+    height:
+        0.72% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    overflow:
+        hidden !important;
+
+    border:
+        none !important;
+
+    border-radius:
+        999px !important;
+
+    background:
+        transparent !important;
+
+    pointer-events:
+        none !important;
+
+    z-index:
+        13 !important;
+
+}
+
+
+/* =========================================
+   LIVE PL PROGRESS FILL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-pl-progress-fill {
+
+    display:
+        block !important;
+
+    height:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    border:
+        none !important;
+
+    border-radius:
+        inherit !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(22, 170, 177, 0.92) 0%,
+            rgba(43, 222, 226, 0.98) 70%,
+            rgba(103, 245, 239, 1) 100%
+        ) !important;
+
+    box-shadow:
+        0 0 5px rgba(46, 224, 227, 0.55),
+        0 0 10px rgba(46, 224, 227, 0.18) !important;
+
+    transition:
+        width 280ms ease !important;
 
 }
 

@@ -46106,13 +46106,16 @@ function cycleKonohaSelectedCharacter(
 //
 // Left-side character panel contract.
 //
-// NOTE:
+// Current PL:
+// persistent Developed Stats.
 //
-// Village / Clan / Element / Status are currently
-// NOT canonical character fields in playerTeam.
+// PL Progress:
+// continuous progress through the current Raw PL interval.
 //
-// They remain null until a proper metadata authority
-// is deliberately added.
+// Effective PL remains excluded from this UI profile.
+//
+// Village / Clan / Element / Status remain null until
+// proper canonical metadata authorities are added.
 //
 // =========================================================
 
@@ -46135,8 +46138,13 @@ function getKonohaCharacterUIProfile(
 
     return null;
 
-
   }
+
+
+  const plProgress =
+    getCharacterPLProgress(
+      character
+    );
 
 
   return {
@@ -46160,9 +46168,27 @@ function getKonohaCharacterUIProfile(
 
 
     currentPL:
-      calculateCurrentPL(
-        character
-      ),
+      plProgress.displayedPL,
+
+
+    plProgress: {
+
+      rawPL:
+        plProgress.rawPL,
+
+      currentPL:
+        plProgress.displayedPL,
+
+      nextPL:
+        plProgress.nextPL,
+
+      progress:
+        plProgress.progress,
+
+      progressPercent:
+        plProgress.progressPercent
+
+    },
 
 
     image:
@@ -46191,7 +46217,6 @@ function getKonohaCharacterUIProfile(
 
 
   };
-
 
 }
 
@@ -47307,16 +47332,20 @@ function ensureKonohaExamUIStyles() {
 //
 // Left-side Exam character presentation.
 //
-// Exam-relevant identity remains:
+// Background artwork owns:
 //
-// - Character artwork
-// - Character name
-// - Rank
-// - Current PL
-// - Character selection controls
+// - POWER LEVEL label
+// - PROGRESS TO NEXT PL label
+// - PL medallion artwork
+// - PL progress-track artwork
 //
-// Village / Clan / Element / Status are intentionally
-// excluded from the Exam presentation.
+// DOM owns:
+//
+// - character card
+// - character selection
+// - Current PL number
+// - live PL progress fill
+//
 // =========================================================
 
 
@@ -47330,6 +47359,45 @@ function renderKonohaExamCharacterPanel(
     return "";
 
   }
+
+
+  const plProgress =
+    character.plProgress &&
+    typeof character.plProgress ===
+      "object"
+
+      ? character.plProgress
+
+      : {
+
+          currentPL:
+            Number(
+              character.currentPL
+            ) || 0,
+
+          nextPL:
+            (
+              Number(
+                character.currentPL
+              ) || 0
+            ) + 1,
+
+          progressPercent:
+            0
+
+        };
+
+
+  const plProgressPercent =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(
+          plProgress.progressPercent
+        ) || 0
+      )
+    );
 
 
   return `
@@ -47421,8 +47489,42 @@ function renderKonohaExamCharacterPanel(
       >
         PL
         <strong>
-          ${character.currentPL}
+          ${plProgress.currentPL}
         </strong>
+      </div>
+
+
+      <div
+        class="
+          exam-character-pl-progress
+        "
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        aria-valuenow="${plProgressPercent.toFixed(
+          1
+        )}"
+        aria-label="
+          Progress to PL ${plProgress.nextPL}
+        "
+        title="
+          Progress to PL ${plProgress.nextPL}: ${plProgressPercent.toFixed(
+            1
+          )}%
+        "
+      >
+
+        <div
+          class="
+            exam-character-pl-progress-fill
+          "
+          style="
+            width:
+              ${plProgressPercent}%;
+          "
+        >
+        </div>
+
       </div>
 
 
