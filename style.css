@@ -6441,26 +6441,20 @@ body {
 
 
 /* =========================================================
-   EXAM LEGACY PRESENTATION RETIRED
+   EXAM RETIRED PRESENTATION BOUNDARY
    ========================================================= */
 
 /*
-   Retired presentation authorities:
+   Retired from the active Exam UI:
 
    - legacy BEGIN EXAM geometry
-   - legacy Exam Eligibility panel
-   - legacy Eligibility rows / status presentation
+   - Exam Information panel
+   - Exam Eligibility panel
+   - Exam-specific coded bottom navigation
 
-   Current ownership:
+   Gameplay/data responsibilities remain independent.
 
-   - BEGIN EXAM:
-     BRICK 299 + BRICK 311
-
-   - Exam eligibility:
-     gameplay/data authority only
-
-   Presentation retirement does not imply
-   gameplay-system retirement.
+   Current live Exam presentation continues below.
 */
 
 
@@ -7578,16 +7572,13 @@ body {
    ========================================================= */
 
 /*
-   Baked navigation remains visual-only for now.
+   Exam-specific coded bottom navigation is retired.
+
+   The baked navigation remains presentation-only.
+
+   Konoha return is independently owned by the dedicated
+   live return hotspot below.
 */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-bottom-nav {
-
-    display:
-        none !important;
-}
-
 
 /*
    Konoha image itself remains the real return control.

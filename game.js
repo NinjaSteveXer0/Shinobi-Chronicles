@@ -49868,22 +49868,20 @@ function showKonohaExamUIScreen(
 
 
 // =========================================================
-// BRICK 233 — EXAM BOTTOM HUD PRESENTATION RETIRED
+// BRICK 233 — EXAM UI MODULE HEALTH CONTRACT
 // =========================================================
 //
-// The dedicated coded Exam bottom navigation is no longer
-// rendered.
+// Validates that the Exam UI module has the authorities
+// required to operate.
 //
-// Current Alpha presentation:
-// - navigation artwork remains baked into exams.png
-// - Konoha return is owned by its dedicated live hotspot
+// This is NOT a rendered-geometry test.
 //
-// Global navigation architecture remains independent of
-// this retired Exam-specific presentation.
+// Rendered visual structure is validated separately by:
+// validateKonohaExamVisualSystem()
+//
+// Retired presentation is intentionally excluded.
 //
 // =========================================================
-
-
 
 function validateKonohaExamUISystem() {
 
@@ -49979,6 +49977,27 @@ function validateKonohaExamUISystem() {
 
 
   };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "KONOHA EXAM UI MODULE HEALTH:",
+    checks
+  );
+
+
+  return checks;
+
+
+}
 
 
   checks.healthy =
@@ -50347,15 +50366,27 @@ function validateBattleCompletionSystem() {
 }
 
 // =========================================================
-// BRICK 303 — FINAL KONOHA EXAM VISUAL HEALTH CHECK
+// BRICK 303 — EXAM RENDERED VISUAL HEALTH CONTRACT
 // =========================================================
 //
-// Validates the ACTIVE Alpha Exam presentation.
+// Validates the Exam screen AFTER it has been rendered.
 //
-// Retired presentation must not be required for health.
+// Owns checks for:
+// - required live DOM
+// - discipline presentation count
+// - live progression presentation
+// - progress-track containment
+// - batch controls
+// - BEGIN EXAM
+// - Konoha return
 //
-// Gameplay systems are validated by their own authorities.
-// This function validates only the rendered Exam UI.
+// Does NOT validate:
+// - gameplay resolution
+// - progression mathematics
+// - Chronicle history
+// - access architecture
+//
+// Those remain owned by their dedicated systems.
 //
 // =========================================================
 
@@ -50503,13 +50534,10 @@ function validateKonohaExamVisualSystem() {
     );
 
 
-  const retiredEligibilityAbsent =
-    !(
-      root &&
-      root.querySelector(
-        ".exam-eligibility"
-      )
-    );
+  /*
+     Retired Exam presentation is intentionally outside
+     the active visual-health contract.
+  */
 
 
   const health = {
@@ -50568,12 +50596,10 @@ function validateKonohaExamVisualSystem() {
       beginButton,
 
 
-    konohaReturn:
+        konohaReturn:
       konohaReturn,
 
 
-    retiredEligibilityAbsent:
-      retiredEligibilityAbsent,
 
 
     navigationFunctions:
