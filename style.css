@@ -7039,10 +7039,10 @@ body {
         absolute !important;
 
     left:
-        32.8% !important;
+        35% !important;
 
     top:
-        69.2% !important;
+    72.5% !important;
 
     width:
         34.0% !important;
@@ -7059,8 +7059,23 @@ body {
     z-index:
         18;
 
+    #konoha-activity-screen[data-service-id="exams"]
+.exam-action-control > * {
+
     pointer-events:
-        none;
+        none !important;
+
+}
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-begin-wrap,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-begin-button {
+
+    pointer-events:
+        auto !important;
+
+}
 
         background:
     rgba(255, 0, 0, 0.15) !important;
@@ -7395,6 +7410,9 @@ outline:
 border:
     2px solid cyan !important;
 
+    overflow:
+    hidden !important;
+
 }
 
 
@@ -7421,6 +7439,13 @@ border:
 
     color:
         #45e5e9 !important;
+
+        outline:
+    3px solid lime !important;
+
+background:
+    rgba(0, 255, 0, 0.18) !important;
+
 
 }
 
