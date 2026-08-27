@@ -47823,21 +47823,26 @@ function changeKonohaExamCharacter(
 // BRICK 264 — EXAM ATTEMPT STATE
 // =========================================================
 //
-// Runtime-only interaction state for the current Exam UI.
+// Runtime interaction state for the active Exam UI.
 //
 // Owns:
+//
 // - selected discipline
 // - selected batch size
 // - most recently resolved batch
+// - result-stage metadata
+// - active Special Notifications
+// - recent Special Notification history
+// - history-panel state
 //
 // Does NOT own:
+//
 // - character progression
 // - Exam difficulty
 // - pass/fail resolution
 // - Activity History
-// - Chronicle consequences
-//
-// Those responsibilities remain independent.
+// - permanent Shinobi Records
+// - Chronicle consequences themselves
 //
 // =========================================================
 
@@ -47850,10 +47855,21 @@ const KONOHA_EXAM_ATTEMPT_STATE = {
     1,
 
   lastBatch:
-    []
+    [],
+
+  lastBatchMeta:
+    null,
+
+  activeSpecialNotifications:
+    [],
+
+  specialNotificationHistory:
+    [],
+
+  specialNotificationHistoryOpen:
+    false
 
 };
-
 
 // =========================================================
 // BRICK 265 — EXAM DISCIPLINE SELECTION
@@ -48918,7 +48934,6 @@ function executeKonohaExamBatch(
 
 }
 
-
 // =========================================================
 // EXAM RESULT STAGE RENDERER
 // =========================================================
@@ -49456,7 +49471,6 @@ function beginKonohaExamFromUI() {
 //
 // =========================================================
 
-
 function validateKonohaExamGameplaySystem() {
 
 
@@ -49473,22 +49487,18 @@ function validateKonohaExamGameplaySystem() {
 
   const difficulty =
     context
-
       ? getKonohaExamHiddenDifficulty(
           context
         )
-
       : null;
 
 
   const history =
     context
-
       ? getKonohaExamHistoryPressure(
           context.characterId,
           context.disciplineId
         )
-
       : null;
 
 
@@ -49594,37 +49604,26 @@ function validateKonohaExamGameplaySystem() {
 
 
 // =========================================================
-// BRICK 302 — EXAM SPECIAL NOTIFICATIONS
+// BRICK 302 — EXAM SPECIAL NOTIFICATION AUTHORITY
 // =========================================================
 //
-// Special Notifications are NOT ordinary Exam results.
+// Special Notifications describe meaningful persistent
+// consequences produced by Exam activity.
 //
-// RESULT STAGE:
-// What happened during the Exam.
+// They remain visible until acknowledged.
 //
-// SPECIAL NOTIFICATIONS:
-// What meaningful persistent state changed because of it.
-//
-// Current supported consequences:
+// Current supported events:
 //
 // - Discipline Mastery increased
 // - Current PL increased
 //
-// Future systems may later add:
-//
-// - Technique Breakthrough Possible
-// - Ability Learned
-// - hidden requirement satisfied
-// - trait identified
-// - promotion condition discovered
-// - Shinobi Record milestone
-//
-// Those are intentionally NOT invented here.
+// Permanent Chronicle archival will later belong to
+// Shinobi Records.
 //
 // =========================================================
 
 
-function renderKonohaExamSpecialNotifications(
+function buildKonohaExamSpecialNotifications(
   characterId
 ) {
 
@@ -49648,8 +49647,7 @@ function renderKonohaExamSpecialNotifications(
       0
   ) {
 
-
-    return "";
+    return [];
 
   }
 
@@ -49661,8 +49659,7 @@ function renderKonohaExamSpecialNotifications(
       characterId
   ) {
 
-
-    return "";
+    return [];
 
   }
 
@@ -49681,8 +49678,7 @@ function renderKonohaExamSpecialNotifications(
       0
   ) {
 
-
-    return "";
+    return [];
 
   }
 
@@ -49708,11 +49704,9 @@ function renderKonohaExamSpecialNotifications(
 
   const discipline =
     disciplineId
-
       ? getShinobiDiscipline(
           disciplineId
         )
-
       : null;
 
 
@@ -49727,7 +49721,7 @@ function renderKonohaExamSpecialNotifications(
 
 
   // =========================================
-  // DISCIPLINE MASTERY INCREASE
+  // DISCIPLINE MASTERY
   // =========================================
 
   const masteryBefore =
@@ -49752,6 +49746,12 @@ function renderKonohaExamSpecialNotifications(
 
     notifications.push({
 
+      id:
+        `mastery-${characterId}-${disciplineId}-${masteryAfter}-${Date.now()}`,
+
+      characterId:
+        characterId,
+
       type:
         "mastery",
 
@@ -49759,7 +49759,10 @@ function renderKonohaExamSpecialNotifications(
         "DISCIPLINE MASTERY INCREASED",
 
       detail:
-        `${disciplineName.toUpperCase()} MASTERY ${masteryBefore} → ${masteryAfter}`
+        `${disciplineName.toUpperCase()} MASTERY ${masteryBefore} → ${masteryAfter}`,
+
+      timestamp:
+        Date.now()
 
     });
 
@@ -49767,7 +49770,7 @@ function renderKonohaExamSpecialNotifications(
 
 
   // =========================================
-  // CURRENT PL INCREASE
+  // POWER LEVEL
   // =========================================
 
   if (
@@ -49799,6 +49802,12 @@ function renderKonohaExamSpecialNotifications(
 
       notifications.push({
 
+        id:
+          `power-${characterId}-${plAfter}-${Date.now()}`,
+
+        characterId:
+          characterId,
+
         type:
           "power",
 
@@ -49806,7 +49815,10 @@ function renderKonohaExamSpecialNotifications(
           "POWER LEVEL INCREASED",
 
         detail:
-          `POWER LEVEL ${plBefore} → ${plAfter}`
+          `POWER LEVEL ${plBefore} → ${plAfter}`,
+
+        timestamp:
+          Date.now()
 
       });
 
@@ -49816,17 +49828,161 @@ function renderKonohaExamSpecialNotifications(
   }
 
 
-  // =========================================
-  // EMPTY IS INTENTIONAL
-  // =========================================
+  return notifications;
+
+}
+
+
+// =========================================================
+// RECORD SPECIAL NOTIFICATIONS
+// =========================================================
+
+function recordKonohaExamSpecialNotifications(
+  characterId
+) {
+
+
+  const notifications =
+    buildKonohaExamSpecialNotifications(
+      characterId
+    );
+
 
   if (
     notifications.length ===
       0
   ) {
 
+    return [];
 
-    return "";
+  }
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .activeSpecialNotifications
+    .push(
+      ...notifications
+    );
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .specialNotificationHistory
+    .unshift(
+      ...notifications
+    );
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .specialNotificationHistory =
+      KONOHA_EXAM_ATTEMPT_STATE
+        .specialNotificationHistory
+        .slice(
+          0,
+          20
+        );
+
+
+  return notifications;
+
+}
+
+
+// =========================================================
+// ACKNOWLEDGE ACTIVE SPECIAL NOTIFICATIONS
+// =========================================================
+
+function acknowledgeKonohaExamSpecialNotifications() {
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .activeSpecialNotifications =
+      [];
+
+
+  renderKonohaExamVisualScreen();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// TOGGLE SPECIAL NOTIFICATION HISTORY
+// =========================================================
+
+function toggleKonohaExamSpecialNotificationHistory() {
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .specialNotificationHistoryOpen =
+      KONOHA_EXAM_ATTEMPT_STATE
+        .specialNotificationHistoryOpen !==
+      true;
+
+
+  renderKonohaExamVisualScreen();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// SPECIAL NOTIFICATION RENDERER
+// =========================================================
+
+function renderKonohaExamSpecialNotifications(
+  characterId
+) {
+
+
+  const active =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .activeSpecialNotifications
+      .filter(
+        notification =>
+          notification.characterId ===
+            characterId
+      );
+
+
+  const history =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .specialNotificationHistory
+      .filter(
+        notification =>
+          notification.characterId ===
+            characterId
+      );
+
+
+  const historyOpen =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .specialNotificationHistoryOpen ===
+        true;
+
+
+  if (
+    active.length ===
+      0 &&
+    !historyOpen
+  ) {
+
+    return `
+      <button
+        type="button"
+        class="
+          exam-special-history-trigger
+        "
+        onclick="
+          toggleKonohaExamSpecialNotificationHistory()
+        "
+      >
+        HISTORY
+      </button>
+    `;
 
   }
 
@@ -49840,43 +49996,143 @@ function renderKonohaExamSpecialNotifications(
       aria-live="
         polite
       "
-      aria-label="
-        Special Notifications
-      "
     >
 
-      ${notifications
-        .map(
-          notification => `
+      ${
+        active
+          .map(
+            notification => `
+
+              <div
+                class="
+                  exam-special-notification
+                  ${notification.type}
+                "
+              >
+
+                <div
+                  class="
+                    exam-special-notification-title
+                  "
+                >
+                  ${notification.title}
+                </div>
+
+                <div
+                  class="
+                    exam-special-notification-detail
+                  "
+                >
+                  ${notification.detail}
+                </div>
+
+              </div>
+
+            `
+          )
+          .join("")
+      }
+
+
+      ${
+        active.length >
+          0
+
+          ? `
+
+            <button
+              type="button"
+              class="
+                exam-special-acknowledge
+              "
+              onclick="
+                acknowledgeKonohaExamSpecialNotifications()
+              "
+            >
+              ACKNOWLEDGE
+            </button>
+
+          `
+
+          : ""
+      }
+
+
+      <button
+        type="button"
+        class="
+          exam-special-history-trigger
+        "
+        onclick="
+          toggleKonohaExamSpecialNotificationHistory()
+        "
+      >
+        ${
+          historyOpen
+            ? "CLOSE HISTORY"
+            : "HISTORY"
+        }
+      </button>
+
+
+      ${
+        historyOpen
+
+          ? `
 
             <div
               class="
-                exam-special-notification
-                ${notification.type}
+                exam-special-history
               "
             >
 
-              <div
-                class="
-                  exam-special-notification-title
-                "
-              >
-                ${notification.title}
-              </div>
+              ${
+                history.length >
+                  0
 
-              <div
-                class="
-                  exam-special-notification-detail
-                "
-              >
-                ${notification.detail}
-              </div>
+                  ? history
+                      .map(
+                        notification => `
+
+                          <div
+                            class="
+                              exam-special-history-entry
+                            "
+                          >
+
+                            <strong>
+                              ${notification.title}
+                            </strong>
+
+                            <span>
+                              ${notification.detail}
+                            </span>
+
+                          </div>
+
+                        `
+                      )
+                      .join("")
+
+                  : `
+
+                    <div
+                      class="
+                        exam-special-history-empty
+                      "
+                    >
+                      NO SPECIAL NOTIFICATIONS YET
+                    </div>
+
+                  `
+              }
 
             </div>
 
           `
-        )
-        .join("")}
+
+          : ""
+      }
 
     </div>
 
