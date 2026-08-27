@@ -48599,7 +48599,7 @@ function executeKonohaExamAttempt(
 
 
 // =========================================================
-// BRICK 294 — EXAM BATCH + CLEAN RESULT PRESENTATION
+// BRICK 294 — EXAM BATCH + RESULT STAGE
 // =========================================================
 //
 // Supported Exam batch sizes:
@@ -48609,8 +48609,22 @@ function executeKonohaExamAttempt(
 // ×10 — ten sequential attempts
 //
 // Each attempt remains a genuine independent Exam resolution.
-// PASS / FAIL, EXP and Chronicle history are processed by the
-// existing single-attempt authority.
+//
+// Existing authorities still own:
+//
+// - PASS / FAIL resolution
+// - discipline EXP awards
+// - Chronicle recording
+// - stat progression
+// - Current PL derivation
+//
+// This brick owns:
+//
+// - batch execution
+// - before / after PL snapshot
+// - compact result summary
+// - Exam Result Stage presentation contract
+//
 // =========================================================
 
 
@@ -48649,10 +48663,12 @@ function setKonohaExamBatchSize(
 
   return true;
 
-
 }
 
 
+// =========================================================
+// EXAM BATCH EXECUTION
+// =========================================================
 
 function executeKonohaExamBatch(
   characterId,
@@ -48662,21 +48678,44 @@ function executeKonohaExamBatch(
 
 
   const count =
-  [
-    1,
-    5,
-    10
-  ].includes(
-    Number(
-      batchSize
-    )
-  )
-
-    ? Number(
+    [
+      1,
+      5,
+      10
+    ].includes(
+      Number(
         batchSize
       )
+    )
 
-    : 1;
+      ? Number(
+          batchSize
+        )
+
+      : 1;
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+    return [];
+
+  }
+
+
+  // =========================================
+  // PRE-EXAM PL SNAPSHOT
+  // =========================================
+
+  const beforePL =
+    getCharacterPLProgress(
+      character
+    );
 
 
   const results =
@@ -48711,11 +48750,20 @@ function executeKonohaExamBatch(
 
       break;
 
-
     }
 
 
   }
+
+
+  // =========================================
+  // POST-EXAM PL SNAPSHOT
+  // =========================================
+
+  const afterPL =
+    getCharacterPLProgress(
+      character
+    );
 
 
   KONOHA_EXAM_ATTEMPT_STATE
@@ -48723,12 +48771,69 @@ function executeKonohaExamBatch(
       results;
 
 
-  return results;
+  // =========================================
+  // RESULT-STAGE META
+  // =========================================
+  //
+  // Stored separately so lastBatch remains the existing
+  // array authority expected by regression / gameplay.
+  // =========================================
 
+  KONOHA_EXAM_ATTEMPT_STATE
+    .lastBatchMeta = {
+
+      characterId:
+        characterId,
+
+      disciplineId:
+        disciplineId,
+
+      requestedBatchSize:
+        count,
+
+      beforePL: {
+
+        rawPL:
+          beforePL.rawPL,
+
+        displayedPL:
+          beforePL.displayedPL,
+
+        nextPL:
+          beforePL.nextPL,
+
+        progressPercent:
+          beforePL.progressPercent
+
+      },
+
+      afterPL: {
+
+        rawPL:
+          afterPL.rawPL,
+
+        displayedPL:
+          afterPL.displayedPL,
+
+        nextPL:
+          afterPL.nextPL,
+
+        progressPercent:
+          afterPL.progressPercent
+
+      }
+
+    };
+
+
+  return results;
 
 }
 
 
+// =========================================================
+// EXAM RESULT STAGE RENDERER
+// =========================================================
 
 function renderKonohaExamResultStrip() {
 
@@ -48736,6 +48841,12 @@ function renderKonohaExamResultStrip() {
   const results =
     KONOHA_EXAM_ATTEMPT_STATE
       .lastBatch;
+
+
+  const meta =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .lastBatchMeta ||
+      null;
 
 
   if (
@@ -48749,6 +48860,26 @@ function renderKonohaExamResultStrip() {
 
     return "";
 
+  }
+
+
+  // =========================================
+  // PREVENT STALE RESULT BETWEEN CHARACTERS
+  // =========================================
+
+  const session =
+    getKonohaActivityUISessionState();
+
+
+  if (
+    meta &&
+    meta.characterId &&
+    session.characterId !==
+      meta.characterId
+  ) {
+
+
+    return "";
 
   }
 
@@ -48768,6 +48899,19 @@ function renderKonohaExamResultStrip() {
         result.success ===
           true
     );
+
+
+  const fails =
+    completedResults.filter(
+      result =>
+        result.success !==
+          true
+    );
+
+
+  const errors =
+    results.length -
+    completedResults.length;
 
 
   const totalRewardExp =
@@ -48790,7 +48934,11 @@ function renderKonohaExamResultStrip() {
     completedResults[0]
       ? completedResults[0]
           .disciplineId
-      : null;
+      : (
+          meta
+            ? meta.disciplineId
+            : null
+        );
 
 
   const discipline =
@@ -48801,108 +48949,279 @@ function renderKonohaExamResultStrip() {
       : null;
 
 
+  const disciplineName =
+    discipline
+      ? discipline.name
+      : "Exam";
+
+
+  const isSingle =
+    completedResults.length ===
+      1 &&
+    results.length ===
+      1;
+
+
+  // =========================================
+  // PRIMARY RESULT
+  // =========================================
+
+  let primaryResult =
+    "ERROR";
+
+
+  let resultClass =
+    "error";
+
+
+  if (isSingle) {
+
+
+    const single =
+      completedResults[0];
+
+
+    if (single) {
+
+
+      if (
+        single.success ===
+          true
+      ) {
+
+
+        primaryResult =
+          "PASS";
+
+
+        resultClass =
+          "pass";
+
+      }
+      else {
+
+
+        primaryResult =
+          "FAIL";
+
+
+        resultClass =
+          "fail";
+
+      }
+
+
+    }
+
+
+  }
+  else if (
+    completedResults.length >
+      0
+  ) {
+
+
+    primaryResult =
+      `${passes.length} PASS · ${fails.length} FAIL`;
+
+
+    resultClass =
+      fails.length ===
+        0
+
+        ? "pass"
+
+        : (
+            passes.length ===
+              0
+
+              ? "fail"
+
+              : "mixed"
+          );
+
+  }
+
+
+  // =========================================
+  // POWER DEVELOPMENT CONSEQUENCE
+  // =========================================
+
+  let powerResult =
+    "";
+
+
+  let powerResultClass =
+    "progress";
+
+
+  if (
+    meta &&
+    meta.beforePL &&
+    meta.afterPL
+  ) {
+
+
+    const beforeDisplayed =
+      Number(
+        meta.beforePL
+          .displayedPL
+      ) || 0;
+
+
+    const afterDisplayed =
+      Number(
+        meta.afterPL
+          .displayedPL
+      ) || 0;
+
+
+    if (
+      afterDisplayed >
+      beforeDisplayed
+    ) {
+
+
+      powerResult =
+        `POWER LEVEL ${beforeDisplayed} → ${afterDisplayed}`;
+
+
+      powerResultClass =
+        "level-up";
+
+    }
+    else {
+
+
+      const beforeRaw =
+        Number(
+          meta.beforePL
+            .rawPL
+        ) || 0;
+
+
+      const afterRaw =
+        Number(
+          meta.afterPL
+            .rawPL
+        ) || 0;
+
+
+      const rawDifference =
+        Math.max(
+          0,
+          afterRaw -
+          beforeRaw
+        );
+
+
+      const progressGain =
+        rawDifference *
+        100;
+
+
+      if (
+        progressGain >
+          0
+      ) {
+
+
+        powerResult =
+          `PL PROGRESS +${progressGain.toFixed(
+            2
+          )}%`;
+
+      }
+      else {
+
+
+        powerResult =
+          "NO PL DEVELOPMENT";
+
+      }
+
+
+    }
+
+
+  }
+
+
   return `
 
     <div
       class="
         exam-result-zone
+        ${resultClass}
       "
     >
 
       <div
         class="
-          exam-result-strip
+          exam-result-primary
+          ${resultClass}
         "
       >
-
-        ${results
-          .map(
-            result => {
-
-
-              const completed =
-                result &&
-                result.completed ===
-                  true;
-
-
-              const passed =
-                completed &&
-                result.success ===
-                  true;
-
-
-              const label =
-                !completed
-
-                  ? "ERROR"
-
-                  : (
-                      passed
-                        ? "PASS"
-                        : "FAIL"
-                    );
-
-
-              const stateClass =
-                !completed
-
-                  ? "error"
-
-                  : (
-                      passed
-                        ? "pass"
-                        : "fail"
-                    );
-
-
-              return `
-
-                <span
-                  class="
-                    exam-result-chip
-                    ${stateClass}
-                  "
-                >
-                  ${label}
-                </span>
-
-              `;
-
-
-            }
-          )
-          .join("")}
-
+        ${primaryResult}
       </div>
 
 
       <div
         class="
-          exam-result-summary
+          exam-result-reward
         "
       >
-
-        ${
-          discipline
-            ? discipline.name
-            : "Exam"
-        }
-
-        <span>
-          +${totalRewardExp} EXP
-        </span>
-
+        +${totalRewardExp}
+        ${disciplineName.toUpperCase()}
+        EXP
       </div>
+
+
+      ${
+        powerResult
+          ? `
+
+            <div
+              class="
+                exam-result-power
+                ${powerResultClass}
+              "
+            >
+              ${powerResult}
+            </div>
+
+          `
+          : ""
+      }
+
+
+      ${
+        errors > 0
+          ? `
+
+            <div
+              class="
+                exam-result-error
+              "
+            >
+              ${errors}
+              INCOMPLETE
+            </div>
+
+          `
+          : ""
+      }
 
     </div>
 
   `;
 
-
 }
 
 
+// =========================================================
+// BEGIN EXAM FROM UI
+// =========================================================
 
 function beginKonohaExamFromUI() {
 
@@ -48930,7 +49249,6 @@ function beginKonohaExamFromUI() {
         "exam_ui_session_invalid"
 
     };
-
 
   }
 
@@ -48961,7 +49279,6 @@ function beginKonohaExamFromUI() {
 
     };
 
-
   }
 
 
@@ -48970,24 +49287,24 @@ function beginKonohaExamFromUI() {
 
 
   const requestedBatchSize =
-  Number(
-    KONOHA_EXAM_ATTEMPT_STATE
-      .batchSize
-  );
+    Number(
+      KONOHA_EXAM_ATTEMPT_STATE
+        .batchSize
+    );
 
 
-const batchSize =
-  [
-    1,
-    5,
-    10
-  ].includes(
-    requestedBatchSize
-  )
+  const batchSize =
+    [
+      1,
+      5,
+      10
+    ].includes(
+      requestedBatchSize
+    )
 
-    ? requestedBatchSize
+      ? requestedBatchSize
 
-    : 1;
+      : 1;
 
 
   const results =
@@ -49029,9 +49346,7 @@ const batchSize =
 
   };
 
-
 }
-
 
 // =========================================================
 // BRICK 273 — EXAM GAMEPLAY REGRESSION

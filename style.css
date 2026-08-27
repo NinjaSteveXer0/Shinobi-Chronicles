@@ -7257,8 +7257,33 @@ body {
 
 
 /* =========================================================
-   BRICK 301 — FINAL RESULT FEEDBACK
+   BRICK 301 — EXAM RESULT STAGE
    ========================================================= */
+
+/*
+   Bottom ornamental seal result authority.
+
+   Idle:
+   - no DOM result
+   - baked seal remains visually empty
+
+   ×1:
+   - PASS / FAIL
+
+   ×5 / ×10:
+   - compact PASS / FAIL summary
+
+   Secondary presentation:
+   - earned discipline EXP
+   - real PL development consequence
+
+   Special Notifications remain separate.
+*/
+
+
+/* =========================================
+   RESULT STAGE POSITION
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-result-zone {
@@ -7270,56 +7295,53 @@ body {
         50% !important;
 
     top:
-        20% !important;
+        19% !important;
 
     transform:
         translateX(-50%) !important;
 
     width:
-        94% !important;
+        96% !important;
+
+    height:
+        70% !important;
 
     margin:
         0 !important;
 
     padding:
         0 !important;
-
-    text-align:
-        center;
-
-    z-index:
-        8;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-result-strip {
 
     display:
         flex !important;
 
+    flex-direction:
+        column !important;
+
     align-items:
         center !important;
 
     justify-content:
         center !important;
 
-    flex-wrap:
-        nowrap !important;
+    text-align:
+        center !important;
 
-    gap:
-        clamp(
-            3px,
-            0.3vw,
-            6px
-        ) !important;
+    pointer-events:
+        none !important;
 
-    width:
-        100% !important;
+    z-index:
+        22 !important;
 
-    min-height:
-        20px !important;
+}
+
+
+/* =========================================
+   PRIMARY PASS / FAIL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-primary {
 
     margin:
         0 !important;
@@ -7327,61 +7349,266 @@ body {
     padding:
         0 !important;
 
-    position:
-        static !important;
+    font-size:
+        clamp(
+            20px,
+            2vw,
+            38px
+        ) !important;
 
-    transform:
-        none !important;
+    font-weight:
+        900 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.06em !important;
+
+    white-space:
+        nowrap !important;
+
+    color:
+        #e1c36f !important;
+
+    text-shadow:
+        0 2px 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.92
+        ) !important;
 
 }
 
 
+/* =========================================
+   PASS
+   ========================================= */
+
 #konoha-activity-screen[data-service-id="exams"]
-.exam-result-chip {
+.exam-result-primary.pass {
 
-    display:
-        inline-flex !important;
+    color:
+        #66edf0 !important;
 
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    min-width:
-        clamp(
-            38px,
-            3.1vw,
-            54px
+    text-shadow:
+        0 0 7px
+        rgba(
+            65,
+            229,
+            233,
+            0.48
+        ),
+        0 2px 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.92
         ) !important;
 
-    height:
-        clamp(
-            18px,
-            1.5vw,
-            25px
+}
+
+
+/* =========================================
+   FAIL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-primary.fail {
+
+    color:
+        #df8c7e !important;
+
+    text-shadow:
+        0 0 7px
+        rgba(
+            183,
+            79,
+            67,
+            0.34
+        ),
+        0 2px 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.92
         ) !important;
+
+}
+
+
+/* =========================================
+   MIXED BATCH
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-primary.mixed {
+
+    color:
+        #e2c46f !important;
+
+    text-shadow:
+        0 0 7px
+        rgba(
+            214,
+            169,
+            58,
+            0.30
+        ),
+        0 2px 6px
+        rgba(
+            0,
+            0,
+            0,
+            0.92
+        ) !important;
+
+}
+
+
+/* =========================================
+   ERROR
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-primary.error {
+
+    color:
+        #e0ad55 !important;
+
+}
+
+
+/* =========================================
+   EARNED EXP
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-reward {
+
+    margin-top:
+        8px !important;
 
     padding:
-        0
+        0 !important;
+
+    color:
+        #d8c17d !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.68vw,
+            13px
+        ) !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.045em !important;
+
+    white-space:
+        nowrap !important;
+
+    text-shadow:
+        0 1px 4px
+        rgba(
+            0,
+            0,
+            0,
+            0.9
+        ) !important;
+
+}
+
+
+/* =========================================
+   PL CONSEQUENCE
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-power {
+
+    margin-top:
         6px !important;
 
-    background:
-        rgba(
-            3,
-            8,
-            10,
-            0.94
+    padding:
+        0 !important;
+
+    color:
+        #57dfe4 !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.62vw,
+            12px
         ) !important;
 
-    border:
-        1px solid
-        rgba(
-            170,
-            170,
-            170,
-            0.38
+    font-weight:
+        800 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.04em !important;
+
+    white-space:
+        nowrap !important;
+
+}
+
+
+/* =========================================
+   PL LEVEL-UP CONSEQUENCE
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-power.level-up {
+
+    color:
+        #f0d47e !important;
+
+    font-size:
+        clamp(
+            9px,
+            0.78vw,
+            15px
         ) !important;
+
+    text-shadow:
+        0 0 8px
+        rgba(
+            222,
+            181,
+            70,
+            0.42
+        ) !important;
+
+}
+
+
+/* =========================================
+   INCOMPLETE / ERROR DETAIL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-error {
+
+    margin-top:
+        5px !important;
+
+    color:
+        #d69b53 !important;
 
     font-size:
         clamp(
@@ -7390,102 +7617,8 @@ body {
             10px
         ) !important;
 
-    line-height:
-        1 !important;
-
-    letter-spacing:
-        0.06em !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-result-chip.pass {
-
-    border-color:
-        rgba(
-            70,
-            224,
-            229,
-            0.66
-        ) !important;
-
-    color:
-        #71edf0 !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-result-chip.fail {
-
-    border-color:
-        rgba(
-            183,
-            79,
-            67,
-            0.67
-        ) !important;
-
-    color:
-        #df8c7e !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-result-chip.error {
-
-    border-color:
-        rgba(
-            208,
-            159,
-            48,
-            0.66
-        ) !important;
-
-    color:
-        #e4bf61 !important;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-result-summary {
-
-    margin-top:
-        4px;
-
-    color:
-        #cbb068;
-
-    font-size:
-        clamp(
-            7px,
-            0.54vw,
-            10px
-        );
-
-    line-height:
-        1;
-
-    white-space:
-        nowrap;
-
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-result-summary span {
-
-    margin-left:
-        6px;
-
-    color:
-        #4be4e8;
-
     font-weight:
-        700;
+        700 !important;
 
 }
 
