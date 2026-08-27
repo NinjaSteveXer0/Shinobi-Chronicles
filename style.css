@@ -5394,11 +5394,23 @@ body {
     position:
         relative !important;
 
-      width: 142% !important;
-    aspect-ratio: 320 / 450;
-    height: auto !important;
-    max-height: none !important;
-    margin: 0 auto !important;
+    left:
+        50% !important;
+
+    width:
+        142% !important;
+
+    aspect-ratio:
+        1 / 1 !important;
+
+    height:
+        auto !important;
+
+    max-height:
+        none !important;
+
+    margin:
+        0 !important;
 
     display:
         flex !important;
@@ -5419,14 +5431,13 @@ body {
         transparent !important;
 
     transform:
-        none !important;
+        translateX(-50%) !important;
 
     -webkit-mask-image:
         none !important;
 
     mask-image:
         none !important;
-
 }
 
 
@@ -5460,7 +5471,6 @@ body {
 
     transform:
         none !important;
-
 }
 
 /* =========================================================
