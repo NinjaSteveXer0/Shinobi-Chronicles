@@ -7765,21 +7765,25 @@ body {
 }
 
 /* =========================================================
-   EXAM CHARACTER PL TEXT AUTHORITY
+   EXAM CHARACTER PL + SPECIAL NOTIFICATION AUTHORITY
    ========================================================= */
 
 /*
    Current PL and Progress to Next PL are live DOM values.
 
    Background artwork owns:
+
    - POWER LEVEL heading
    - PL medallion
    - PROGRESS TO NEXT PL heading
    - progress-track frame
+   - SPECIAL NOTIFICATIONS heading / panel
 
    DOM owns:
+
    - Current PL number
    - live progress fill
+   - meaningful persistent consequence notifications
 
    Progress uses persistent Current development only.
 */
@@ -7966,6 +7970,219 @@ body {
 
     transition:
         width 280ms ease !important;
+
+}
+
+
+/* =========================================
+   SPECIAL NOTIFICATIONS — MANUAL POSITION
+   CONTROL
+
+   left = move LEFT / RIGHT
+   top  = move UP / DOWN
+   width = panel content width
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification-zone {
+
+    position:
+        fixed !important;
+
+    left:
+        8.4% !important;
+
+    top:
+        73.5% !important;
+
+    width:
+        20.5% !important;
+
+    max-height:
+        15.5% !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    gap:
+        clamp(
+            5px,
+            0.5vw,
+            9px
+        ) !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        8px !important;
+
+    overflow:
+        hidden !important;
+
+    pointer-events:
+        none !important;
+
+    z-index:
+        16 !important;
+
+}
+
+
+/* =========================================
+   SPECIAL NOTIFICATION ENTRY
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification {
+
+    width:
+        100% !important;
+
+    padding:
+        7px 9px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(3, 9, 12, 0.84),
+            rgba(8, 12, 14, 0.58)
+        ) !important;
+
+    border-left:
+        2px solid
+        rgba(70, 224, 229, 0.72) !important;
+
+    border-bottom:
+        1px solid
+        rgba(211, 170, 61, 0.28) !important;
+
+    box-shadow:
+        0 3px 9px
+        rgba(0, 0, 0, 0.44) !important;
+
+}
+
+
+/* =========================================
+   MASTERY EVENT
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification.mastery {
+
+    border-left-color:
+        rgba(
+            72,
+            228,
+            232,
+            0.85
+        ) !important;
+
+}
+
+
+/* =========================================
+   POWER LEVEL EVENT
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification.power {
+
+    border-left-color:
+        rgba(
+            226,
+            190,
+            91,
+            0.9
+        ) !important;
+
+}
+
+
+/* =========================================
+   NOTIFICATION TITLE
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification-title {
+
+    color:
+        #e3c56d !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.64vw,
+            12px
+        ) !important;
+
+    font-weight:
+        900 !important;
+
+    line-height:
+        1.1 !important;
+
+    letter-spacing:
+        0.055em !important;
+
+    text-shadow:
+        0 1px 4px
+        rgba(
+            0,
+            0,
+            0,
+            0.9
+        ) !important;
+
+}
+
+
+/* =========================================
+   NOTIFICATION DETAIL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification-detail {
+
+    margin-top:
+        4px !important;
+
+    color:
+        #67e5e8 !important;
+
+    font-size:
+        clamp(
+            7px,
+            0.55vw,
+            10px
+        ) !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1.2 !important;
+
+    letter-spacing:
+        0.025em !important;
+
+}
+
+
+/* =========================================
+   POWER NOTIFICATION DETAIL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-notification.power
+.exam-special-notification-detail {
+
+    color:
+        #e6c86e !important;
 
 }
 

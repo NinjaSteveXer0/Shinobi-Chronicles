@@ -47336,6 +47336,7 @@ function ensureKonohaExamUIStyles() {
 //
 // - POWER LEVEL label
 // - PROGRESS TO NEXT PL label
+// - SPECIAL NOTIFICATIONS label
 // - PL medallion artwork
 // - PL progress-track artwork
 //
@@ -47345,6 +47346,7 @@ function ensureKonohaExamUIStyles() {
 // - character selection
 // - Current PL number
 // - live PL progress fill
+// - Special Notification consequences
 //
 // =========================================================
 
@@ -47528,6 +47530,11 @@ function renderKonohaExamCharacterPanel(
       </div>
 
 
+      ${renderKonohaExamSpecialNotifications(
+        character.id
+      )}
+
+
       <button
         type="button"
         class="
@@ -47545,6 +47552,7 @@ function renderKonohaExamCharacterPanel(
   `;
 
 }
+
 
 // =========================================================
 // BRICK 226 — EXAM DISCIPLINE PROGRESS BAR
@@ -48422,11 +48430,25 @@ function recordKonohaExamAttempt(
 // =========================================================
 // BRICK 271 — SINGLE DISCIPLINE EXAM EXECUTION
 // =========================================================
+//
+// Resolves one genuine Exam attempt.
+//
+// In addition to the existing result contract, this brick
+// now snapshots Discipline Mastery / EXP before and after
+// the attempt.
+//
+// These snapshots do NOT create progression.
+// They only expose real progression consequences to later
+// presentation systems such as Special Notifications.
+//
+// =========================================================
+
 
 function executeKonohaExamAttempt(
   characterId,
   disciplineId
 ) {
+
 
   const context =
     createKonohaExamAttemptContext(
@@ -48436,6 +48458,7 @@ function executeKonohaExamAttempt(
 
 
   if (!context) {
+
 
     return {
 
@@ -48453,6 +48476,22 @@ function executeKonohaExamAttempt(
   }
 
 
+  // =========================================
+  // PRE-ATTEMPT DISCIPLINE SNAPSHOT
+  // =========================================
+
+  const disciplineLevelBefore =
+    Number(
+      context.disciplineLevel
+    ) || 1;
+
+
+  const disciplineExpBefore =
+    Number(
+      context.disciplineExp
+    ) || 0;
+
+
   const resolution =
     resolveKonohaExamAttempt(
       context
@@ -48460,6 +48499,7 @@ function executeKonohaExamAttempt(
 
 
   if (!resolution) {
+
 
     return {
 
@@ -48503,9 +48543,11 @@ function executeKonohaExamAttempt(
 
   const rewardExp =
     rewardDefinition
+
       ? Number(
           rewardDefinition.amount
         ) || 0
+
       : 0;
 
 
@@ -48513,6 +48555,7 @@ function executeKonohaExamAttempt(
     resolution.passed ===
       true
   ) {
+
 
     const progressionApplied =
       addDisciplineExp(
@@ -48524,6 +48567,7 @@ function executeKonohaExamAttempt(
 
 
     if (!progressionApplied) {
+
 
       return {
 
@@ -48540,6 +48584,7 @@ function executeKonohaExamAttempt(
 
     }
 
+
   }
 
 
@@ -48555,6 +48600,7 @@ function executeKonohaExamAttempt(
 
   if (!recorded) {
 
+
     return {
 
       success:
@@ -48569,6 +48615,37 @@ function executeKonohaExamAttempt(
     };
 
   }
+
+
+  // =========================================
+  // POST-ATTEMPT DISCIPLINE SNAPSHOT
+  // =========================================
+
+  const progressionAfter =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+
+  const disciplineLevelAfter =
+    progressionAfter
+
+      ? Number(
+          progressionAfter.level
+        ) || disciplineLevelBefore
+
+      : disciplineLevelBefore;
+
+
+  const disciplineExpAfter =
+    progressionAfter
+
+      ? Number(
+          progressionAfter.exp
+        ) || 0
+
+      : disciplineExpBefore;
 
 
   return {
@@ -48591,12 +48668,23 @@ function executeKonohaExamAttempt(
     rewardExp:
       resolution.passed
         ? rewardExp
-        : 0
+        : 0,
+
+    disciplineLevelBefore:
+      disciplineLevelBefore,
+
+    disciplineLevelAfter:
+      disciplineLevelAfter,
+
+    disciplineExpBefore:
+      disciplineExpBefore,
+
+    disciplineExpAfter:
+      disciplineExpAfter
 
   };
 
 }
-
 
 // =========================================================
 // BRICK 294 — EXAM BATCH + RESULT STAGE
@@ -49364,6 +49452,7 @@ function beginKonohaExamFromUI() {
 // - x1 / x5 / x10 support
 // - Chronicle recording
 // - result rendering
+// - Special Notification rendering
 //
 // =========================================================
 
@@ -49384,18 +49473,22 @@ function validateKonohaExamGameplaySystem() {
 
   const difficulty =
     context
+
       ? getKonohaExamHiddenDifficulty(
           context
         )
+
       : null;
 
 
   const history =
     context
+
       ? getKonohaExamHistoryPressure(
           context.characterId,
           context.disciplineId
         )
+
       : null;
 
 
@@ -49405,12 +49498,11 @@ function validateKonohaExamGameplaySystem() {
     );
 
 
-  const supportedBatchSizes =
-    [
-      1,
-      5,
-      10
-    ];
+  const supportedBatchSizes = [
+    1,
+    5,
+    10
+  ];
 
 
   const checks = {
@@ -49472,6 +49564,10 @@ function validateKonohaExamGameplaySystem() {
 
     resultRenderer:
       typeof renderKonohaExamResultStrip ===
+        "function",
+
+    specialNotificationRenderer:
+      typeof renderKonohaExamSpecialNotifications ===
         "function"
 
   };
@@ -49494,9 +49590,299 @@ function validateKonohaExamGameplaySystem() {
 
   return checks;
 
-
 }
 
+
+// =========================================================
+// BRICK 302 — EXAM SPECIAL NOTIFICATIONS
+// =========================================================
+//
+// Special Notifications are NOT ordinary Exam results.
+//
+// RESULT STAGE:
+// What happened during the Exam.
+//
+// SPECIAL NOTIFICATIONS:
+// What meaningful persistent state changed because of it.
+//
+// Current supported consequences:
+//
+// - Discipline Mastery increased
+// - Current PL increased
+//
+// Future systems may later add:
+//
+// - Technique Breakthrough Possible
+// - Ability Learned
+// - hidden requirement satisfied
+// - trait identified
+// - promotion condition discovered
+// - Shinobi Record milestone
+//
+// Those are intentionally NOT invented here.
+//
+// =========================================================
+
+
+function renderKonohaExamSpecialNotifications(
+  characterId
+) {
+
+
+  const results =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .lastBatch;
+
+
+  const meta =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .lastBatchMeta ||
+      null;
+
+
+  if (
+    !Array.isArray(
+      results
+    ) ||
+    results.length ===
+      0
+  ) {
+
+
+    return "";
+
+  }
+
+
+  if (
+    meta &&
+    meta.characterId &&
+    meta.characterId !==
+      characterId
+  ) {
+
+
+    return "";
+
+  }
+
+
+  const completedResults =
+    results.filter(
+      result =>
+        result &&
+        result.completed ===
+          true
+    );
+
+
+  if (
+    completedResults.length ===
+      0
+  ) {
+
+
+    return "";
+
+  }
+
+
+  const firstResult =
+    completedResults[0];
+
+
+  const lastResult =
+    completedResults[
+      completedResults.length - 1
+    ];
+
+
+  const disciplineId =
+    firstResult.disciplineId ||
+    (
+      meta
+        ? meta.disciplineId
+        : null
+    );
+
+
+  const discipline =
+    disciplineId
+
+      ? getShinobiDiscipline(
+          disciplineId
+        )
+
+      : null;
+
+
+  const disciplineName =
+    discipline
+      ? discipline.name
+      : "Discipline";
+
+
+  const notifications =
+    [];
+
+
+  // =========================================
+  // DISCIPLINE MASTERY INCREASE
+  // =========================================
+
+  const masteryBefore =
+    Number(
+      firstResult
+        .disciplineLevelBefore
+    ) || 0;
+
+
+  const masteryAfter =
+    Number(
+      lastResult
+        .disciplineLevelAfter
+    ) || masteryBefore;
+
+
+  if (
+    masteryAfter >
+    masteryBefore
+  ) {
+
+
+    notifications.push({
+
+      type:
+        "mastery",
+
+      title:
+        "DISCIPLINE MASTERY INCREASED",
+
+      detail:
+        `${disciplineName.toUpperCase()} MASTERY ${masteryBefore} → ${masteryAfter}`
+
+    });
+
+  }
+
+
+  // =========================================
+  // CURRENT PL INCREASE
+  // =========================================
+
+  if (
+    meta &&
+    meta.beforePL &&
+    meta.afterPL
+  ) {
+
+
+    const plBefore =
+      Number(
+        meta.beforePL
+          .displayedPL
+      ) || 0;
+
+
+    const plAfter =
+      Number(
+        meta.afterPL
+          .displayedPL
+      ) || plBefore;
+
+
+    if (
+      plAfter >
+      plBefore
+    ) {
+
+
+      notifications.push({
+
+        type:
+          "power",
+
+        title:
+          "POWER LEVEL INCREASED",
+
+        detail:
+          `POWER LEVEL ${plBefore} → ${plAfter}`
+
+      });
+
+    }
+
+
+  }
+
+
+  // =========================================
+  // EMPTY IS INTENTIONAL
+  // =========================================
+
+  if (
+    notifications.length ===
+      0
+  ) {
+
+
+    return "";
+
+  }
+
+
+  return `
+
+    <div
+      class="
+        exam-special-notification-zone
+      "
+      aria-live="
+        polite
+      "
+      aria-label="
+        Special Notifications
+      "
+    >
+
+      ${notifications
+        .map(
+          notification => `
+
+            <div
+              class="
+                exam-special-notification
+                ${notification.type}
+              "
+            >
+
+              <div
+                class="
+                  exam-special-notification-title
+                "
+              >
+                ${notification.title}
+              </div>
+
+              <div
+                class="
+                  exam-special-notification-detail
+                "
+              >
+                ${notification.detail}
+              </div>
+
+            </div>
+
+          `
+        )
+        .join("")}
+
+    </div>
+
+  `;
+
+}
 
 // =========================================================
 // BRICK 274 — SHINOBI EXAMS VISUAL COMPOSER V2
