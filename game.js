@@ -48011,125 +48011,26 @@ function changeKonohaExamCharacter(
 
 
 // =========================================================
-// BRICK 261 — EXAM ELIGIBILITY PANEL
+// BRICK 261 — EXAM ELIGIBILITY PRESENTATION RETIRED
 // =========================================================
-
-
-function renderKonohaExamEligibilityPanel(
-  eligibility
-) {
-
-
-  if (!eligibility) {
-
-
-    return "";
-
-
-  }
-
-
-  const criteria =
-    eligibility.criteria ||
-    {};
-
-
-  const accessText =
-    eligibility.eligible ===
-      true
-      ? "READY"
-      : "LOCKED";
-
-
-  return `
-
-    <section
-      class="
-        exam-panel
-        exam-eligibility
-      "
-    >
-
-      <div
-        class="
-          exam-eligibility-header
-        "
-      >
-
-        <span>
-          EXAM ELIGIBILITY
-        </span>
-
-        <strong>
-          ${accessText}
-        </strong>
-
-      </div>
-
-
-      ${renderKonohaExamEligibilityRow(
-        "Rank Requirement",
-        criteria.rankRequirement
-      )}
-
-
-      ${renderKonohaExamEligibilityRow(
-        "Level Requirement",
-        criteria.levelRequirement
-      )}
-
-
-      ${renderKonohaExamEligibilityRow(
-        "Active Missions",
-        criteria.activeMissionLimit
-      )}
-
-
-      ${renderKonohaExamEligibilityRow(
-        "Cooldown",
-        criteria.cooldown
-      )}
-
-    </section>
-
-  `;
-
-
-}
-
-
-
-function renderKonohaExamEligibilityRow(
-  label,
-  value
-) {
-
-
-  return `
-
-    <div
-      class="
-        exam-eligibility-row
-      "
-    >
-
-      <span>
-        ${label}
-      </span>
-
-      <strong>
-        ${getKonohaExamMetaValue(
-          value
-        )}
-      </strong>
-
-    </div>
-
-  `;
-
-
-}
-
+//
+// The dedicated Exam Eligibility panel is no longer part
+// of the active Exam UI.
+//
+// IMPORTANT:
+//
+// Eligibility remains a gameplay/data responsibility.
+//
+// Removing its dedicated renderer does NOT remove:
+// - Exam access rules
+// - execution validation
+// - eligibility data
+// - future progression requirements
+//
+// Presentation consumes gameplay state.
+// Presentation does not own gameplay state.
+//
+// =========================================================
 
 // =========================================================
 // BRICK 264 — EXAM ATTEMPT STATE
@@ -50540,7 +50441,15 @@ function validateBattleCompletionSystem() {
 // =========================================================
 // BRICK 303 — FINAL KONOHA EXAM VISUAL HEALTH CHECK
 // =========================================================
-
+//
+// Validates the ACTIVE Alpha Exam presentation.
+//
+// Retired presentation must not be required for health.
+//
+// Gameplay systems are validated by their own authorities.
+// This function validates only the rendered Exam UI.
+//
+// =========================================================
 
 function validateKonohaExamVisualSystem() {
 
@@ -50590,7 +50499,7 @@ function validateKonohaExamVisualSystem() {
       : [];
 
 
-    const masteryValues =
+  const masteryValues =
     root
       ? root.querySelectorAll(
           ".exam-mastery-value"
@@ -50630,9 +50539,7 @@ function validateKonohaExamVisualSystem() {
 
         if (!card) {
 
-
           return false;
-
 
         }
 
@@ -50679,29 +50586,20 @@ function validateKonohaExamVisualSystem() {
     );
 
 
-  const informationPanel =
-    !!(
-      root &&
-      root.querySelector(
-        ".exam-information-panel"
-      )
-    );
-
-
-  const eligibilityPanel =
-    !!(
-      root &&
-      root.querySelector(
-        ".exam-eligibility"
-      )
-    );
-
-
   const konohaReturn =
     !!(
       root &&
       root.querySelector(
         ".exam-konoha-return"
+      )
+    );
+
+
+  const retiredEligibilityAbsent =
+    !(
+      root &&
+      root.querySelector(
+        ".exam-eligibility"
       )
     );
 
@@ -50754,7 +50652,6 @@ function validateKonohaExamVisualSystem() {
       tracksContained,
 
 
-
     batchControls:
       batchControls,
 
@@ -50763,16 +50660,12 @@ function validateKonohaExamVisualSystem() {
       beginButton,
 
 
-    informationPanel:
-      informationPanel,
-
-
-    eligibilityPanel:
-      eligibilityPanel,
-
-
     konohaReturn:
       konohaReturn,
+
+
+    retiredEligibilityAbsent:
+      retiredEligibilityAbsent,
 
 
     navigationFunctions:

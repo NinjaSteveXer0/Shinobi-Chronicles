@@ -6438,207 +6438,28 @@ body {
 }
 
 
-/* =========================================
-   BEGIN EXAM
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-begin-wrap {
-
-    position:
-        absolute !important;
-
-    left:
-        32.7% !important;
-
-    top: 82%;
-
-    width:
-        34% !important;
-
-    height:
-        10.7% !important;
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-begin-button {
-
-    width:
-        100% !important;
-
-    height:
-        100% !important;
-
-    padding:
-        0 !important;
-
-    border:
-        none !important;
-
-    background:
-        transparent !important;
-
-    box-shadow:
-        none !important;
-
-    color:
-        #45e5e9 !important;
-
-    font-size:
-        clamp(
-            18px,
-            2.05vw,
-            37px
-        ) !important;
-
-    line-height:
-        1 !important;
-}
-
-
-/* =========================================
-   ELIGIBILITY
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility {
-
-    position:
-        absolute !important;
-
-    right:
-        3.35% !important;
-
-    top:
-        74.3% !important;
-
-    width:
-        27.5% !important;
-
-    height:
-        16.4% !important;
-
-    padding:
-        1.1%
-        1.35% !important;
-
-    background:
-        rgba(4, 8, 10, 0.96) !important;
-
-    border:
-        1px solid
-        rgba(178, 132, 35, 0.72) !important;
-
-    box-shadow:
-        inset 0 0 24px
-        rgba(0, 0, 0, 0.45) !important;
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-header {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    margin-bottom:
-        4%;
-
-    padding-bottom:
-        2.5%;
-
-    border-bottom:
-        1px solid
-        rgba(192, 148, 43, 0.28);
-
-    color:
-        #e1bd63;
-
-    font-size:
-        clamp(
-            8px,
-            0.78vw,
-            14px
-        );
-
-    letter-spacing:
-        0.05em;
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-header strong {
-
-    color:
-        #45e5e9;
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-row {
-
-    display:
-        flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        space-between;
-
-    padding:
-        2.5% 0;
-
-    border-bottom:
-        1px solid
-        rgba(255, 255, 255, 0.045);
-
-    color:
-        #caa653;
-
-    font-size:
-        clamp(
-            7px,
-            0.66vw,
-            12px
-        );
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-row strong {
-
-    color:
-        #ded7c4;
-
-    font-weight:
-        500;
-}
-
+/* =========================================================
+   EXAM LEGACY PRESENTATION RETIRED
+   ========================================================= */
 
 /*
-   Retire obsolete eligibility markup styles.
+   Retired presentation authorities:
+
+   - legacy BEGIN EXAM geometry
+   - legacy Exam Eligibility panel
+   - legacy Eligibility rows / status presentation
+
+   Current ownership:
+
+   - BEGIN EXAM:
+     BRICK 299 + BRICK 311
+
+   - Exam eligibility:
+     gameplay/data authority only
+
+   Presentation retirement does not imply
+   gameplay-system retirement.
 */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-title,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-status,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-eligibility-note {
-
-    display:
-        none !important;
-}
-
-
 
 
 /* =========================================================
@@ -7600,11 +7421,8 @@ body {
 
    Brick 299 owns the parent position.
 
-   This wrapper is the ONLY permitted clickable
-   BEGIN EXAM geometry.
-
-   overflow:hidden is intentional and prevents
-   the previous ghost-click region.
+   Wrapper owns the complete clickable boundary.
+   overflow:hidden prevents ghost-click overflow.
 */
 
 
@@ -7615,13 +7433,13 @@ body {
         absolute !important;
 
     left:
-        32.5% !important;
+        15% !important;
 
     top:
         110% !important;
 
     width:
-        35% !important;
+        70% !important;
 
     height:
         20% !important;
@@ -7715,9 +7533,9 @@ body {
 
     font-size:
         clamp(
-            18px,
-            2.05vw,
-            37px
+            14px,
+            1.45vw,
+            26px
         ) !important;
 
     font-weight:
@@ -7869,7 +7687,10 @@ body {
 
 
 /*
-   Reduce microcopy before allowing collisions.
+   Narrow viewport result-feedback guard.
+
+   Retired Exam Information / Eligibility presentation
+   is intentionally excluded from responsive authority.
 */
 
 @media (
@@ -7878,21 +7699,12 @@ body {
 ) {
 
     #konoha-activity-screen[data-service-id="exams"]
-    .exam-information-row,
-    #konoha-activity-screen[data-service-id="exams"]
-    .exam-eligibility-row {
-
-        font-size:
-            6px !important;
-    }
-
-
-    #konoha-activity-screen[data-service-id="exams"]
     .exam-result-chip {
 
         padding:
             3px
             5px !important;
+
     }
 
 }
