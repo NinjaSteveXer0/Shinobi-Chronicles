@@ -6065,30 +6065,10 @@ body {
     background:
         linear-gradient(
             90deg,
-            rgba(
-                38,
-                214,
-                220,
-                0
-            ) 0%,
-            rgba(
-                49,
-                226,
-                231,
-                0.82
-            ) 28%,
-            rgba(
-                219,
-                179,
-                75,
-                0.82
-            ) 72%,
-            rgba(
-                38,
-                214,
-                220,
-                0
-            ) 100%
+            rgba(38, 214, 220, 0) 0%,
+            rgba(49, 226, 231, 0.82) 28%,
+            rgba(219, 179, 75, 0.82) 72%,
+            rgba(38, 214, 220, 0) 100%
         );
 
     box-shadow:
@@ -6107,6 +6087,25 @@ body {
 
 
 /* =========================================
+   FUINJUTSU MARKER CALIBRATION
+
+   Third Exam panel sits lower against the
+   Exam Result Stage. Pull only its selection
+   marker upward while preserving the global
+   Nin / Gen treatment.
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select:nth-of-type(3).selected
+.exam-discipline-card::after {
+
+    bottom:
+        13%;
+
+}
+
+
+/* =========================================
    RETIRED LEGACY MARKER
    ========================================= */
 
@@ -6117,7 +6116,6 @@ body {
         none !important;
 
 }
-
 
 /* =========================================================
    BRICK 255 — KONOHA MAP VISUAL FOUNDATION
