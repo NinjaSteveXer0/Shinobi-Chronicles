@@ -5778,11 +5778,6 @@ body {
     height:
     38% !important;
 
-    background:
-        rgba(0, 217, 232, 0.10) !important;
-
-    outline:
-        1px solid rgba(0, 217, 232, 0.75) !important;
 }
 
 
@@ -5808,11 +5803,7 @@ body {
     height:
         35% !important;
 
-    background:
-        rgba(0, 217, 232, 0.10) !important;
-
-    outline:
-        1px solid rgba(0, 217, 232, 0.75) !important;
+   
 }
 
 
@@ -5838,11 +5829,7 @@ body {
     height:
         35% !important;
 
-    background:
-        rgba(0, 217, 232, 0.10) !important;
-
-    outline:
-        1px solid rgba(0, 217, 232, 0.75) !important;
+    
 }
 
 
@@ -7074,6 +7061,12 @@ body {
 
     pointer-events:
         none;
+
+        background:
+    rgba(255, 0, 0, 0.15) !important;
+
+outline:
+    2px solid red !important;
 
 }
 
