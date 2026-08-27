@@ -5840,6 +5840,17 @@ body {
    BRICK 288 — DISCIPLINE SELECTION LANGUAGE
    ========================================================= */
 
+/*
+   Discipline selection is gameplay-authoritative.
+
+   This layer communicates:
+   - hover availability
+   - physical press feedback
+   - persistent selected state
+
+   It does NOT own discipline selection.
+*/
+
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-select {
 
@@ -5855,6 +5866,9 @@ body {
     min-width:
         0;
 
+    height:
+        100%;
+
     margin:
         0;
 
@@ -5865,14 +5879,16 @@ body {
         none;
 
     border:
-        1px solid
-        transparent !important;
+        1px solid transparent;
 
     background:
-        transparent !important;
+        transparent;
 
-    box-shadow:
-        none;
+    color:
+        inherit;
+
+    font:
+        inherit;
 
     cursor:
         pointer;
@@ -5884,14 +5900,16 @@ body {
         visible;
 
     transition:
-        border-color
-        130ms ease,
-        box-shadow
-        130ms ease,
-        background
-        130ms ease;
+        border-color 130ms ease,
+        box-shadow 130ms ease,
+        background 130ms ease,
+        transform 90ms ease;
 }
 
+
+/* =========================================
+   HOVER FEEDBACK
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-select:hover {
@@ -5901,7 +5919,7 @@ body {
             59,
             220,
             225,
-            0.22
+            0.24
         ) !important;
 
     background:
@@ -5911,33 +5929,67 @@ body {
                 32,
                 213,
                 218,
-                0.025
-            ),
-            rgba(
-                32,
-                213,
-                218,
-                0.07
-            ),
-            rgba(
-                32,
-                213,
-                218,
                 0.015
+            ),
+            rgba(
+                32,
+                213,
+                218,
+                0.055
+            ),
+            rgba(
+                32,
+                213,
+                218,
+                0.012
             )
         ) !important;
+
+    box-shadow:
+        inset 0 0 14px
+        rgba(
+            36,
+            222,
+            228,
+            0.025
+        );
 }
 
+
+/* =========================================
+   PHYSICAL PRESS FEEDBACK
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select:active {
+
+    transform:
+        scale(0.992);
+
+    box-shadow:
+        inset 0 0 20px
+        rgba(
+            0,
+            0,
+            0,
+            0.18
+        );
+}
+
+
+/* =========================================
+   SELECTED DISCIPLINE
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-select.selected {
 
     border-color:
         rgba(
-            63,
-            226,
+            64,
+            225,
             231,
-            0.34
+            0.58
         ) !important;
 
     background:
@@ -5947,13 +5999,81 @@ body {
                 29,
                 213,
                 219,
-                0.015
+                0.012
             ),
             rgba(
                 29,
                 213,
                 219,
-                0.085
+                0.07
+            ),
+            rgba(
+                214,
+                169,
+                58,
+                0.025
+            ),
+            rgba(
+                29,
+                213,
+                219,
+                0.012
+            )
+        ) !important;
+
+    box-shadow:
+        inset 0 0 18px
+        rgba(
+            36,
+            222,
+            228,
+            0.035
+        ),
+        0 0 7px
+        rgba(
+            36,
+            222,
+            228,
+            0.12
+        );
+}
+
+
+/* =========================================
+   SELECTED + HOVER
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select.selected:hover {
+
+    border-color:
+        rgba(
+            69,
+            231,
+            236,
+            0.72
+        ) !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(
+                29,
+                213,
+                219,
+                0.018
+            ),
+            rgba(
+                29,
+                213,
+                219,
+                0.09
+            ),
+            rgba(
+                214,
+                169,
+                58,
+                0.035
             ),
             rgba(
                 29,
@@ -5969,22 +6089,15 @@ body {
             36,
             222,
             228,
-            0.04
+            0.045
+        ),
+        0 0 9px
+        rgba(
+            36,
+            222,
+            228,
+            0.15
         );
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select.selected {
-
-    border-color:
-        transparent !important;
-
-    background:
-        transparent !important;
-
-    box-shadow:
-        none !important;
 }
 
 
@@ -5995,6 +6108,10 @@ body {
         none !important;
 }
 
+
+/* =========================================
+   DISCIPLINE LIVE CONTENT
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-card {
@@ -6037,7 +6154,6 @@ body {
     display:
         none !important;
 }
-
 
 
 /* =========================================================
@@ -7561,19 +7677,61 @@ body {
 /*
    Presentation only.
 
-   The live PL value itself remains owned by the
-   character / Power Level systems.
+   Current PL is supplied by the existing canonical
+   calculateCurrentPL(character) gameplay authority.
 
-   This authority controls only Exam-screen colouring.
+   This block positions that live value inside the baked
+   POWER LEVEL medallion.
+
+   Progress to Next PL remains intentionally unbound until
+   the canonical PL progression contract is established.
 */
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-pl,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-pl * {
 
-    color:
-        #e5c26c !important;
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-pl {
+
+    display:
+        block !important;
+
+    position:
+        fixed !important;
+
+    left:
+        17.6% !important;
+
+    top:
+        58.0% !important;
+
+    width:
+        8% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    text-align:
+        center !important;
+
+    font-size:
+        0 !important;
+
+    line-height:
+        1 !important;
+
+    pointer-events:
+        none !important;
+
+    z-index:
+        12 !important;
 
 }
 
@@ -7581,8 +7739,37 @@ body {
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-pl strong {
 
+    display:
+        block !important;
+
+    margin:
+        0 !important;
+
     color:
-        #43e2e7 !important;
+        #e5c26c !important;
+
+    font-size:
+        clamp(
+            28px,
+            3vw,
+            52px
+        ) !important;
+
+    font-weight:
+        900 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        1px !important;
+
+    text-align:
+        center !important;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.9),
+        0 0 10px rgba(214, 169, 58, 0.18) !important;
 
 }
 
