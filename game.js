@@ -48011,24 +48011,13 @@ function changeKonohaExamCharacter(
 
 
 // =========================================================
-// BRICK 261 — EXAM ELIGIBILITY PRESENTATION RETIRED
+// EXAM PRESENTATION RETIREMENT BOUNDARY
 // =========================================================
 //
-// The dedicated Exam Eligibility panel is no longer part
-// of the active Exam UI.
+// Dedicated Eligibility presentation is retired.
 //
-// IMPORTANT:
-//
-// Eligibility remains a gameplay/data responsibility.
-//
-// Removing its dedicated renderer does NOT remove:
-// - Exam access rules
-// - execution validation
-// - eligibility data
-// - future progression requirements
-//
-// Presentation consumes gameplay state.
-// Presentation does not own gameplay state.
+// Eligibility/access remains owned by gameplay/data systems.
+// The active Exam interaction runtime begins below.
 //
 // =========================================================
 
@@ -48036,10 +48025,21 @@ function changeKonohaExamCharacter(
 // BRICK 264 — EXAM ATTEMPT STATE
 // =========================================================
 //
-// Runtime-only Exam interaction state.
+// Runtime-only interaction state for the current Exam UI.
 //
-// The selected discipline is intentionally separate from
-// the selected character.
+// Owns:
+// - selected discipline
+// - selected batch size
+// - most recently resolved batch
+//
+// Does NOT own:
+// - character progression
+// - Exam difficulty
+// - pass/fail resolution
+// - Activity History
+// - Chronicle consequences
+//
+// Those responsibilities remain independent.
 //
 // =========================================================
 
@@ -48059,6 +48059,13 @@ const KONOHA_EXAM_ATTEMPT_STATE = {
 
 // =========================================================
 // BRICK 265 — EXAM DISCIPLINE SELECTION
+// =========================================================
+//
+// Owns selection of the discipline being examined.
+//
+// Presentation may visually react to this state,
+// but visual feedback does not own the selection.
+//
 // =========================================================
 
 function getKonohaExamSelectedDisciplineId() {
@@ -48136,15 +48143,27 @@ function selectKonohaExamDiscipline(
 
 }
 
-
 // =========================================================
 // BRICK 266 — EXAM ATTEMPT CONTEXT
 // =========================================================
 //
-// Creates the immutable context used to resolve one Exam.
+// Creates the normalized snapshot used to resolve ONE Exam.
 //
-// The player selects WHAT is being tested.
-// The resolver determines HOW difficult that attempt is.
+// Player/UI chooses:
+// - character
+// - discipline
+//
+// Context captures:
+// - current discipline mastery
+// - current discipline EXP
+// - current natural discipline stat
+// - attempt timestamp
+//
+// Context does NOT determine:
+// - difficulty
+// - outcome
+// - rewards
+// - Chronicle consequences
 //
 // =========================================================
 
@@ -48224,7 +48243,6 @@ function createKonohaExamAttemptContext(
   };
 
 }
-
 
 // =========================================================
 // BRICK 267 — HIDDEN EXAM DIFFICULTY
@@ -49996,26 +50014,6 @@ function validateKonohaExamUISystem() {
 
   return checks;
 
-
-}
-
-
-  checks.healthy =
-    Object.values(
-      checks
-    ).every(
-      value =>
-        value === true
-    );
-
-
-  console.log(
-    "Shinobi Exams UI health:",
-    checks
-  );
-
-
-  return checks;
 
 }
 
