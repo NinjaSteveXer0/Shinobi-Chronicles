@@ -6,6 +6,16 @@
 // =========================================================
 // PLAYER TEAM DATABASE
 // =========================================================
+//
+// Canonical Base Stats now own Base PL.
+//
+// basePL remains temporarily stored as compatibility metadata
+// for older systems that still identify playable characters
+// through that field.
+//
+// PL calculation itself no longer trusts basePL as authority.
+//
+// =========================================================
 
 let playerTeam = [
 
@@ -15,26 +25,26 @@ let playerTeam = [
     rank: "Kage",
     rarity: "Legendary",
 
-    basePL: 105,
+    basePL: 95,
 
     baseStats: {
-      nin: 95,
-      tai: 82,
-      buki: 68,
-      fuin: 80,
-      kin: 91,
-      gen: 62,
-      stamina: 96
+      nin: 96,
+      tai: 88,
+      buki: 63,
+      fuin: 69,
+      kin: 72,
+      gen: 55,
+      stamina: 99
     },
 
     stats: {
-      nin: 95,
-      tai: 82,
-      buki: 68,
-      fuin: 80,
-      kin: 91,
-      gen: 62,
-      stamina: 96
+      nin: 96,
+      tai: 88,
+      buki: 63,
+      fuin: 69,
+      kin: 72,
+      gen: 55,
+      stamina: 99
     },
 
     permanentPLBonus: 0,
@@ -56,26 +66,26 @@ let playerTeam = [
     rank: "Elite Jonin",
     rarity: "Epic",
 
-    basePL: 55,
+    basePL: 56,
 
     baseStats: {
-      nin: 94,
-      tai: 84,
-      buki: 91,
-      fuin: 70,
-      kin: 86,
-      gen: 90,
-      stamina: 81
+      nin: 57,
+      tai: 50,
+      buki: 56,
+      fuin: 36,
+      kin: 43,
+      gen: 54,
+      stamina: 50
     },
 
     stats: {
-      nin: 94,
-      tai: 84,
-      buki: 91,
-      fuin: 70,
-      kin: 86,
-      gen: 90,
-      stamina: 81
+      nin: 57,
+      tai: 50,
+      buki: 56,
+      fuin: 36,
+      kin: 43,
+      gen: 54,
+      stamina: 50
     },
 
     permanentPLBonus: 0,
@@ -97,26 +107,26 @@ let playerTeam = [
     rank: "Sannin",
     rarity: "Rare",
 
-    basePL: 72,
+    basePL: 90,
 
     baseStats: {
-      nin: 76,
-      tai: 96,
-      buki: 58,
-      fuin: 70,
-      kin: 45,
-      gen: 64,
-      stamina: 95
+      nin: 82,
+      tai: 93,
+      buki: 54,
+      fuin: 86,
+      kin: 80,
+      gen: 65,
+      stamina: 88
     },
 
     stats: {
-      nin: 76,
-      tai: 96,
-      buki: 58,
-      fuin: 70,
-      kin: 45,
-      gen: 64,
-      stamina: 95
+      nin: 82,
+      tai: 93,
+      buki: 54,
+      fuin: 86,
+      kin: 80,
+      gen: 65,
+      stamina: 88
     },
 
     permanentPLBonus: 0,
@@ -173,7 +183,6 @@ let playerTeam = [
   }
 
 ];
-
 
 // =========================================================
 // ITEM DATABASE
@@ -1736,6 +1745,24 @@ let playerData =
 // =========================================================
 // RESTORE CHARACTER PROGRESSION FROM SAVE
 // =========================================================
+//
+// Canonical PL migration:
+//
+// Old saves stored absolute character.stats values.
+//
+// Base Stats have now been recalibrated for the universal
+// Peak / Core / Breadth PL model.
+//
+// To preserve player training without restoring obsolete
+// stat baselines:
+//
+// - discipline level is preserved
+// - discipline EXP is preserved
+// - statLevelApplied is preserved
+// - weapon specialisation is preserved
+// - natural stats are rebuilt from NEW Base Stats
+//
+// =========================================================
 
 function syncCharacterProgressionFromSave() {
 
@@ -1770,59 +1797,7 @@ function syncCharacterProgressionFromSave() {
 
 
       // =========================================
-      // RESTORE PERMANENT STATS
-      // =========================================
-
-      if (
-        savedCharacter.stats &&
-        typeof savedCharacter.stats ===
-          "object"
-      ) {
-
-
-        Object.keys(
-          character.stats
-        ).forEach(
-          stat => {
-
-
-            if (
-              typeof savedCharacter
-                .stats[
-                  stat
-                ] ===
-                "number"
-            ) {
-
-              character.stats[
-                stat
-              ] =
-                savedCharacter
-                  .stats[
-                    stat
-                  ];
-
-            }
-
-          }
-        );
-
-      }
-
-
-      // =========================================
-      // RESTORE PERMANENT PL BONUS
-      // =========================================
-
-      character.permanentPLBonus =
-        Number(
-          savedCharacter
-            .permanentPLBonus
-        ) || 0;
-
-
-      // =========================================
-      // RESTORE DISCIPLINE PROGRESSION
+      // RESTORE DISCIPLINE PROGRESSION FIRST
       // =========================================
 
       character.disciplineProgression =
@@ -1830,6 +1805,86 @@ function syncCharacterProgressionFromSave() {
           savedCharacter
             .disciplineProgression
         );
+
+
+      // =========================================
+      // REBUILD NATURAL CURRENT STATS
+      // =========================================
+      //
+      // Base Stat
+      // +
+      // already-earned discipline stat levels.
+      //
+      // Old absolute saved stats are deliberately
+      // not restored.
+      // =========================================
+
+      Object.keys(
+        character.baseStats
+      ).forEach(
+        stat => {
+
+
+          const progression =
+            character
+              .disciplineProgression[
+                stat
+              ];
+
+
+          const appliedLevel =
+            progression
+              ? Math.max(
+                  1,
+                  Math.floor(
+                    Number(
+                      progression
+                        .statLevelApplied
+                    ) || 1
+                  )
+                )
+              : 1;
+
+
+          const levelsAboveBase =
+            Math.max(
+              0,
+              appliedLevel - 1
+            );
+
+
+          const statGainPerLevel =
+            getDisciplineStatGainPerLevel(
+              stat
+            );
+
+
+          character.stats[
+            stat
+          ] =
+            (
+              Number(
+                character.baseStats[
+                  stat
+                ]
+              ) || 0
+            )
+            +
+            (
+              levelsAboveBase *
+              statGainPerLevel
+            );
+
+        }
+      );
+
+
+      // =========================================
+      // LEGACY DIRECT PL BONUS RETIRED
+      // =========================================
+
+      character.permanentPLBonus =
+        0;
 
 
       // =========================================
@@ -1847,7 +1902,7 @@ function syncCharacterProgressionFromSave() {
 
 
   console.log(
-    "Character progression restored."
+    "Character progression restored against canonical Base Stats."
   );
 
 }
@@ -20997,18 +21052,29 @@ function runCompletionFlowSessionDiagnostics() {
 // =========================================================
 // POWER LEVEL CALCULATION
 // =========================================================
+//
+// Canonical universal PL model.
+//
+// Base PL:
+// whole-number canonical Base Stats.
+//
+// Current PL:
+// persistent Developed Stats.
+//
+// Effective PL:
+// Developed Stats + contextual/equipment effects.
+//
+// =========================================================
 
-const STAT_WEIGHTS = {
-
-  nin: 1.10,
-  tai: 1.00,
-  buki: 0.90,
-  fuin: 1.00,
-  kin: 0.75,
-  gen: 0.95,
-  stamina: 1.10
-
-};
+const PL_STAT_KEYS = [
+  "nin",
+  "tai",
+  "buki",
+  "fuin",
+  "kin",
+  "gen",
+  "stamina"
+];
 
 
 // =========================================================
@@ -30713,50 +30779,271 @@ function getEffectiveCharacterStats(
 
 
 // =========================================================
-// STAT-BASED PL GROWTH
+// CANONICAL POWER LEVEL DERIVATION
+// =========================================================
+//
+// PL is derived.
+//
+// There is no permanent PL EXP pool.
+//
+// Peak:
+// highest stat.
+//
+// Core:
+// average of highest three.
+//
+// Breadth:
+// average of all seven.
+//
 // =========================================================
 
-function calculateStatPLGrowth(
-  baseStats,
-  currentStats
+
+function calculateRawPLFromStats(
+  stats
 ) {
 
 
-  let weightedGrowth = 0;
-  let totalWeight = 0;
-
-
-  for (
-    const stat in STAT_WEIGHTS
+  if (
+    !stats ||
+    typeof stats !==
+      "object"
   ) {
 
-
-    const growth =
-      currentStats[stat] -
-      baseStats[stat];
-
-
-    weightedGrowth +=
-      growth *
-      STAT_WEIGHTS[stat];
-
-
-    totalWeight +=
-      STAT_WEIGHTS[stat];
+    return 0;
 
   }
 
 
+  const values =
+    PL_STAT_KEYS
+      .map(
+        stat =>
+          Number(
+            stats[
+              stat
+            ]
+          ) || 0
+      )
+      .sort(
+        (
+          a,
+          b
+        ) =>
+          b - a
+      );
+
+
+  const peak =
+    values[
+      0
+    ] || 0;
+
+
+  const core =
+    (
+      (
+        values[0] || 0
+      )
+      +
+      (
+        values[1] || 0
+      )
+      +
+      (
+        values[2] || 0
+      )
+    )
+    /
+    3;
+
+
+  const breadth =
+    values.reduce(
+      (
+        total,
+        value
+      ) =>
+        total + value,
+      0
+    )
+    /
+    PL_STAT_KEYS.length;
+
+
   return (
-    weightedGrowth /
-    totalWeight
+    peak * 0.60
+  )
+  +
+  (
+    core * 0.25
+  )
+  +
+  (
+    breadth * 0.15
   );
 
 }
 
 
 // =========================================================
-// CURRENT CHARACTER POWER LEVEL
+// BASE POWER LEVEL
+// =========================================================
+
+function calculateBasePL(
+  character
+) {
+
+
+  if (
+    !character ||
+    !character.baseStats
+  ) {
+
+    return 0;
+
+  }
+
+
+  return Math.round(
+    calculateRawPLFromStats(
+      character.baseStats
+    )
+  );
+
+}
+
+
+// =========================================================
+// DEVELOPED CURRENT STATS
+// =========================================================
+//
+// Continuous development:
+//
+// visible stat
+// +
+// current EXP / EXP required
+//
+// This recognises partial training progress
+// without creating another progression currency.
+//
+// =========================================================
+
+function getDevelopedCharacterStats(
+  character
+) {
+
+
+  if (
+    !character ||
+    !character.stats
+  ) {
+
+    return {};
+  }
+
+
+  const developedStats =
+    {};
+
+
+  PL_STAT_KEYS.forEach(
+    stat => {
+
+
+      const visibleStat =
+        Number(
+          character.stats[
+            stat
+          ]
+        ) || 0;
+
+
+      const progression =
+        getCharacterDisciplineProgression(
+          character.id,
+          stat
+        );
+
+
+      if (!progression) {
+
+        developedStats[
+          stat
+        ] =
+          visibleStat;
+
+        return;
+
+      }
+
+
+      const expRequired =
+        getDisciplineExpRequired(
+          progression.level
+        );
+
+
+      const progressFraction =
+        expRequired >
+          0
+          ? Math.max(
+              0,
+              Math.min(
+                1,
+                (
+                  Number(
+                    progression.exp
+                  ) || 0
+                )
+                /
+                expRequired
+              )
+            )
+          : 0;
+
+
+      developedStats[
+        stat
+      ] =
+        visibleStat +
+        progressFraction;
+
+    }
+  );
+
+
+  return developedStats;
+
+}
+
+
+// =========================================================
+// CURRENT RAW POWER LEVEL
+// =========================================================
+
+function calculateCurrentRawPL(
+  character
+) {
+
+
+  return calculateRawPLFromStats(
+    getDevelopedCharacterStats(
+      character
+    )
+  );
+
+}
+
+
+// =========================================================
+// CURRENT DISPLAYED POWER LEVEL
+// =========================================================
+//
+// Persistent development only.
+//
+// Equipment / transformations / contextual
+// modifiers must NOT enter this value.
+//
 // =========================================================
 
 function calculateCurrentPL(
@@ -30764,28 +31051,177 @@ function calculateCurrentPL(
 ) {
 
 
-  const effectiveStats =
-    getEffectiveCharacterStats(
+  return Math.round(
+    calculateCurrentRawPL(
+      character
+    )
+  );
+
+}
+
+
+// =========================================================
+// PROGRESS TO NEXT CURRENT PL
+// =========================================================
+
+function getCharacterPLProgress(
+  character
+) {
+
+
+  const rawPL =
+    calculateCurrentRawPL(
       character
     );
 
 
-  const statGrowth =
-    calculateStatPLGrowth(
-      character.baseStats,
-      effectiveStats
+  const displayedPL =
+    Math.round(
+      rawPL
     );
 
 
-  const permanentBonus =
-    character.permanentPLBonus ||
-    0;
+  const lowerThreshold =
+    displayedPL -
+    0.5;
+
+
+  const nextThreshold =
+    displayedPL +
+    0.5;
+
+
+  const progress =
+    Math.max(
+      0,
+      Math.min(
+        1,
+        (
+          rawPL -
+          lowerThreshold
+        )
+        /
+        (
+          nextThreshold -
+          lowerThreshold
+        )
+      )
+    );
+
+
+  return {
+
+    rawPL:
+      rawPL,
+
+    displayedPL:
+      displayedPL,
+
+    nextPL:
+      displayedPL + 1,
+
+    progress:
+      progress,
+
+    progressPercent:
+      progress * 100
+
+  };
+
+}
+
+
+// =========================================================
+// EFFECTIVE DEVELOPED STATS
+// =========================================================
+//
+// Current Developed Stats
+// +
+// equipment/contextual stat effects.
+//
+// =========================================================
+
+function getDevelopedEffectiveCharacterStats(
+  character
+) {
+
+
+  const developedStats =
+    getDevelopedCharacterStats(
+      character
+    );
+
+
+  const equipmentBonuses =
+    getEquipmentStatBonuses(
+      character
+    );
+
+
+  const effectiveStats = {
+    ...developedStats
+  };
+
+
+  PL_STAT_KEYS.forEach(
+    stat => {
+
+
+      effectiveStats[
+        stat
+      ] =
+        (
+          Number(
+            effectiveStats[
+              stat
+            ]
+          ) || 0
+        )
+        +
+        (
+          Number(
+            equipmentBonuses[
+              stat
+            ]
+          ) || 0
+        );
+
+    }
+  );
+
+
+  return effectiveStats;
+
+}
+
+
+// =========================================================
+// EFFECTIVE POWER LEVEL
+// =========================================================
+
+function calculateEffectiveRawPL(
+  character
+) {
+
+
+  return calculateRawPLFromStats(
+    getDevelopedEffectiveCharacterStats(
+      character
+    )
+  );
+
+}
+
+
+function calculateEffectivePL(
+  character
+) {
 
 
   return Math.round(
-    character.basePL +
-    statGrowth +
-    permanentBonus
+    calculateEffectiveRawPL(
+      character
+    )
   );
 
 }
