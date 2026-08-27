@@ -49754,83 +49754,32 @@ function renderKonohaExamVisualScreen() {
 
 
 
-          <!-- =====================================
-               BRICK 278 — LOWER INFORMATION PANELS
+                   <!-- =====================================
+               BRICK 278 — LOWER PRESENTATION RETIRED
+               =====================================
+
+               Dedicated Exam Information and Eligibility
+               panels are no longer rendered.
+
+               Their gameplay responsibilities remain
+               owned by the Exam systems.
+
+               This region remains intentionally open for
+               future result / Chronicle presentation.
+
                ===================================== -->
-
-          <div
-            class="
-              exam-lower-grid
-            "
-          >
-
-            <section
-              class="
-                exam-information-panel
-              "
-            >
-
-              <div
-                class="
-                  exam-information-title
-                "
-              >
-                EXAM INFORMATION
-              </div>
-
-
-              <div
-                class="
-                  exam-information-row
-                "
-              >
-                Select the discipline
-                you wish to examine.
-              </div>
-
-
-              <div
-                class="
-                  exam-information-row
-                "
-              >
-                Successful attempts grant
-                discipline EXP.
-              </div>
-
-
-              <div
-                class="
-                  exam-information-row
-                "
-              >
-                Unsuccessful attempts remain
-                part of your shinobi history.
-              </div>
-
-
-              <div
-                class="
-                  exam-information-row
-                "
-              >
-                ×5 resolves five genuine
-                sequential attempts.
-              </div>
-
-            </section>
-
-
-
-          </div>
 
         </section>
 
-      </main>
+            </main>
 
 
-      ${renderKonohaExamBottomNavigation()}
+      <!--
+         Exam-specific coded bottom navigation retired.
 
+         Global navigation remains independent of this
+         presentation layer.
+      -->
     </div>
 
   `;
@@ -49919,71 +49868,20 @@ function showKonohaExamUIScreen(
 
 
 // =========================================================
-// BRICK 233 — EXAM BOTTOM HUD + UI HEALTH CHECK
+// BRICK 233 — EXAM BOTTOM HUD PRESENTATION RETIRED
 // =========================================================
-
-
-function renderKonohaExamBottomNavigation() {
-
-
-  const items = [
-
-    "VILLAGE",
-    "MISSIONS",
-    "ARENA",
-    "EXAMS",
-    "PRACTICAL",
-    "GROUP",
-    "DEFEND",
-    "KAGE"
-
-  ];
-
-
-  return `
-
-    <nav
-      class="
-        exam-bottom-nav
-      "
-      aria-label="
-        Konoha Navigation
-      "
-    >
-
-      ${items
-        .map(
-          item => `
-
-            <button
-              type="button"
-              class="
-                exam-nav-item
-                ${
-                  item === "EXAMS"
-                    ? "active"
-                    : ""
-                }
-              "
-              ${
-                item === "EXAMS"
-                  ? ""
-                  : "disabled"
-              }
-            >
-              ${item}
-            </button>
-
-          `
-        )
-        .join("")}
-
-    </nav>
-
-  `;
-
-}
-
+//
+// The dedicated coded Exam bottom navigation is no longer
+// rendered.
+//
+// Current Alpha presentation:
+// - navigation artwork remains baked into exams.png
+// - Konoha return is owned by its dedicated live hotspot
+//
+// Global navigation architecture remains independent of
+// this retired Exam-specific presentation.
+//
+// =========================================================
 
 
 
@@ -50034,7 +49932,7 @@ function validateKonohaExamUISystem() {
         "function",
 
 
-    disciplineStack:
+    disciplineData:
       !!(
         data &&
         Array.isArray(
@@ -50045,8 +49943,18 @@ function validateKonohaExamUISystem() {
       ),
 
 
-    selectionControl:
+    characterSelection:
       typeof changeKonohaExamCharacter ===
+        "function",
+
+
+    disciplineSelection:
+      typeof selectKonohaExamDiscipline ===
+        "function",
+
+
+    batchSelection:
+      typeof setKonohaExamBatchSize ===
         "function",
 
 
@@ -50065,8 +49973,8 @@ function validateKonohaExamUISystem() {
         "function",
 
 
-    bottomNavigation:
-      typeof renderKonohaExamBottomNavigation ===
+    returnBridge:
+      typeof returnToKonohaFromActivityUI ===
         "function"
 
 
@@ -50090,8 +49998,8 @@ function validateKonohaExamUISystem() {
 
   return checks;
 
-
 }
+
 
 // =========================================================
 // BRICK 202 — KONOHA DATA BRIDGE HEALTH CHECK

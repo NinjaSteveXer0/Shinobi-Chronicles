@@ -6350,18 +6350,20 @@ body {
 }
 
 
-/* =========================================
-   EXAM INFORMATION REMOVED
-   ========================================= */
+/* =========================================================
+   EXAM LOWER PRESENTATION RETIRED
+   ========================================================= */
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-information-panel {
+/*
+   Dedicated Exam Information and Eligibility panels
+   are intentionally absent from the active Alpha UI.
 
-    display:
-        none !important;
+   No hidden DOM presentation is required here.
 
-}
-
+   Lower-screen presentation space remains unowned
+   so later systems can integrate without competing
+   with obsolete Exam UI authorities.
+*/
 
 
 /* =========================================================
