@@ -5841,15 +5841,19 @@ body {
    ========================================================= */
 
 /*
-   Discipline selection is gameplay-authoritative.
+   Selection state is owned by gameplay.
 
-   This layer communicates:
-   - hover availability
-   - physical press feedback
-   - persistent selected state
+   The button remains an invisible calibrated hitbox.
 
-   It does NOT own discipline selection.
+   Visual feedback is projected inward onto the live
+   discipline card so the clickable geometry itself
+   never becomes visible.
 */
+
+
+/* =========================================
+   INVISIBLE CLICK AUTHORITY
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-select {
@@ -5879,10 +5883,16 @@ body {
         none;
 
     border:
-        1px solid transparent;
+        none !important;
+
+    outline:
+        none !important;
 
     background:
-        transparent;
+        transparent !important;
+
+    box-shadow:
+        none !important;
 
     color:
         inherit;
@@ -5899,218 +5909,11 @@ body {
     overflow:
         visible;
 
-    transition:
-        border-color 130ms ease,
-        box-shadow 130ms ease,
-        background 130ms ease,
-        transform 90ms ease;
 }
 
 
 /* =========================================
-   HOVER FEEDBACK
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select:hover {
-
-    border-color:
-        rgba(
-            59,
-            220,
-            225,
-            0.24
-        ) !important;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(
-                32,
-                213,
-                218,
-                0.015
-            ),
-            rgba(
-                32,
-                213,
-                218,
-                0.055
-            ),
-            rgba(
-                32,
-                213,
-                218,
-                0.012
-            )
-        ) !important;
-
-    box-shadow:
-        inset 0 0 14px
-        rgba(
-            36,
-            222,
-            228,
-            0.025
-        );
-}
-
-
-/* =========================================
-   PHYSICAL PRESS FEEDBACK
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select:active {
-
-    transform:
-        scale(0.992);
-
-    box-shadow:
-        inset 0 0 20px
-        rgba(
-            0,
-            0,
-            0,
-            0.18
-        );
-}
-
-
-/* =========================================
-   SELECTED DISCIPLINE
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select.selected {
-
-    border-color:
-        rgba(
-            64,
-            225,
-            231,
-            0.58
-        ) !important;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(
-                29,
-                213,
-                219,
-                0.012
-            ),
-            rgba(
-                29,
-                213,
-                219,
-                0.07
-            ),
-            rgba(
-                214,
-                169,
-                58,
-                0.025
-            ),
-            rgba(
-                29,
-                213,
-                219,
-                0.012
-            )
-        ) !important;
-
-    box-shadow:
-        inset 0 0 18px
-        rgba(
-            36,
-            222,
-            228,
-            0.035
-        ),
-        0 0 7px
-        rgba(
-            36,
-            222,
-            228,
-            0.12
-        );
-}
-
-
-/* =========================================
-   SELECTED + HOVER
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select.selected:hover {
-
-    border-color:
-        rgba(
-            69,
-            231,
-            236,
-            0.72
-        ) !important;
-
-    background:
-        linear-gradient(
-            90deg,
-            rgba(
-                29,
-                213,
-                219,
-                0.018
-            ),
-            rgba(
-                29,
-                213,
-                219,
-                0.09
-            ),
-            rgba(
-                214,
-                169,
-                58,
-                0.035
-            ),
-            rgba(
-                29,
-                213,
-                219,
-                0.018
-            )
-        ) !important;
-
-    box-shadow:
-        inset 0 0 20px
-        rgba(
-            36,
-            222,
-            228,
-            0.045
-        ),
-        0 0 9px
-        rgba(
-            36,
-            222,
-            228,
-            0.15
-        );
-}
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-discipline-select.selected::after {
-
-    display:
-        none !important;
-}
-
-
-/* =========================================
-   DISCIPLINE LIVE CONTENT
+   LIVE DISCIPLINE CARD
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6145,14 +5948,174 @@ body {
 
     overflow:
         visible !important;
+
+    transform:
+        translateY(0)
+        scale(1);
+
+    transition:
+        transform 90ms ease,
+        filter 140ms ease;
+
 }
 
+
+/* =========================================
+   HOVER FEEDBACK
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select:hover
+.exam-discipline-card {
+
+    filter:
+        brightness(1.045)
+        drop-shadow(
+            0 0 4px
+            rgba(
+                45,
+                220,
+                225,
+                0.18
+            )
+        );
+
+}
+
+
+/* =========================================
+   PHYSICAL PRESS
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select:active
+.exam-discipline-card {
+
+    transform:
+        translateY(2px)
+        scale(0.992);
+
+    filter:
+        brightness(0.96);
+
+}
+
+
+/* =========================================
+   SELECTED DISCIPLINE
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select.selected
+.exam-discipline-card {
+
+    filter:
+        brightness(1.075)
+        drop-shadow(
+            0 0 5px
+            rgba(
+                42,
+                225,
+                230,
+                0.42
+            )
+        )
+        drop-shadow(
+            0 0 10px
+            rgba(
+                214,
+                169,
+                58,
+                0.14
+            )
+        );
+
+}
+
+
+/* =========================================
+   SELECTED DISCIPLINE MARKER
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select.selected
+.exam-discipline-card::after {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    left:
+        8%;
+
+    right:
+        8%;
+
+    bottom:
+        7%;
+
+    height:
+        3px;
+
+    border-radius:
+        999px;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(
+                38,
+                214,
+                220,
+                0
+            ) 0%,
+            rgba(
+                49,
+                226,
+                231,
+                0.82
+            ) 28%,
+            rgba(
+                219,
+                179,
+                75,
+                0.82
+            ) 72%,
+            rgba(
+                38,
+                214,
+                220,
+                0
+            ) 100%
+        );
+
+    box-shadow:
+        0 0 5px
+        rgba(
+            45,
+            223,
+            228,
+            0.38
+        );
+
+    pointer-events:
+        none;
+
+}
+
+
+/* =========================================
+   RETIRED LEGACY MARKER
+   ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-discipline-card::before {
 
     display:
         none !important;
+
 }
 
 
