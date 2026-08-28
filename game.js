@@ -49651,21 +49651,44 @@ function validateKonohaExamGameplaySystem() {
 
 
 // =========================================================
-// BRICK 302 — EXAM SPECIAL NOTIFICATION AUTHORITY
+// BRICK 303 — EXAM SIGNIFICANT HISTORY FEED
 // =========================================================
 //
-// Special Notifications describe meaningful persistent
-// consequences produced by Exam activity.
+// The baked SPECIAL NOTIFICATIONS panel now behaves as a
+// passive recent-history feed.
 //
-// They remain visible until acknowledged.
+// There is no:
+// - ACKNOWLEDGE
+// - ACKNOWLEDGE ALL
+// - HISTORY button
+// - CLOSE HISTORY
+// - open / closed history mode
 //
-// Current supported events:
+// The panel simply displays the most recent meaningful
+// Exam consequences for the currently selected shinobi.
 //
-// - Discipline Mastery increased
+// IMPORTANT:
+//
+// Ordinary progression noise is deliberately excluded.
+//
+// Current supported significant events:
+//
 // - Current PL increased
 //
-// Permanent Chronicle archival will later belong to
-// Shinobi Records.
+// Discipline Mastery increases are NOT retained here.
+// They remain visible through the ordinary Exam progression
+// UI and result stage.
+//
+// Future systems may add genuinely significant events such as:
+//
+// - Breakthrough available
+// - Technique learned
+// - Specialist path discovered
+// - Promotion condition discovered
+// - Rare training consequence
+//
+// Those events must come from their real gameplay authority.
+// This renderer must never invent them.
 //
 // =========================================================
 
@@ -49683,7 +49706,7 @@ function buildKonohaExamSpecialNotifications(
   const meta =
     KONOHA_EXAM_ATTEMPT_STATE
       .lastBatchMeta ||
-      null;
+    null;
 
 
   if (
@@ -49730,95 +49753,21 @@ function buildKonohaExamSpecialNotifications(
   }
 
 
-  const firstResult =
-    completedResults[0];
-
-
-  const lastResult =
-    completedResults[
-      completedResults.length - 1
-    ];
-
-
-  const disciplineId =
-    firstResult.disciplineId ||
-    (
-      meta
-        ? meta.disciplineId
-        : null
-    );
-
-
-  const discipline =
-    disciplineId
-      ? getShinobiDiscipline(
-          disciplineId
-        )
-      : null;
-
-
-  const disciplineName =
-    discipline
-      ? discipline.name
-      : "Discipline";
-
-
   const notifications =
     [];
 
 
   // =========================================
-  // DISCIPLINE MASTERY
+  // POWER LEVEL INCREASE
+  // =========================================
+  //
+  // PL crossing is significant enough to enter
+  // the persistent recent-history feed.
+  //
+  // Ordinary Discipline Mastery increases are
+  // deliberately NOT recorded here.
   // =========================================
 
-  const masteryBefore =
-    Number(
-      firstResult
-        .disciplineLevelBefore
-    ) || 0;
-
-
-  const masteryAfter =
-    Number(
-      lastResult
-        .disciplineLevelAfter
-    ) || masteryBefore;
-
-
-  if (
-    masteryAfter >
-    masteryBefore
-  ) {
-
-
-    notifications.push({
-
-      id:
-        `mastery-${characterId}-${disciplineId}-${masteryAfter}-${Date.now()}`,
-
-      characterId:
-        characterId,
-
-      type:
-        "mastery",
-
-      title:
-        "DISCIPLINE MASTERY INCREASED",
-
-      detail:
-        `${disciplineName.toUpperCase()} MASTERY ${masteryBefore} → ${masteryAfter}`,
-
-      timestamp:
-        Date.now()
-
-    });
-
-  }
-
-
-  // =========================================
-  // POWER LEVEL
-  // =========================================
 
   if (
     meta &&
@@ -49843,7 +49792,7 @@ function buildKonohaExamSpecialNotifications(
 
     if (
       plAfter >
-      plBefore
+        plBefore
     ) {
 
 
@@ -49857,6 +49806,9 @@ function buildKonohaExamSpecialNotifications(
 
         type:
           "power",
+
+        significance:
+          "major",
 
         title:
           "POWER LEVEL INCREASED",
@@ -49881,8 +49833,17 @@ function buildKonohaExamSpecialNotifications(
 
 
 // =========================================================
-// RECORD SPECIAL NOTIFICATIONS
+// RECORD SIGNIFICANT EXAM HISTORY
 // =========================================================
+//
+// The feed retains the newest 10 significant notifications
+// PER CHARACTER.
+//
+// activeSpecialNotifications is cleared because the old
+// acknowledgement lifecycle is retired.
+//
+// =========================================================
+
 
 function recordKonohaExamSpecialNotifications(
   characterId
@@ -49895,6 +49856,21 @@ function recordKonohaExamSpecialNotifications(
     );
 
 
+  // =========================================
+  // RETIRE OLD ACTIVE-NOTIFICATION STATE
+  // =========================================
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .activeSpecialNotifications =
+      [];
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .specialNotificationHistoryOpen =
+      false;
+
+
   if (
     notifications.length ===
       0
@@ -49905,28 +49881,77 @@ function recordKonohaExamSpecialNotifications(
   }
 
 
-  KONOHA_EXAM_ATTEMPT_STATE
-    .activeSpecialNotifications
-    .push(
-      ...notifications
-    );
+  // =========================================
+  // EXISTING HISTORY AUTHORITY
+  // =========================================
 
 
-  KONOHA_EXAM_ATTEMPT_STATE
-    .specialNotificationHistory
-    .unshift(
-      ...notifications
-    );
-
-
-  KONOHA_EXAM_ATTEMPT_STATE
-    .specialNotificationHistory =
+  const existingHistory =
+    Array.isArray(
       KONOHA_EXAM_ATTEMPT_STATE
         .specialNotificationHistory
-        .slice(
-          0,
-          20
-        );
+    )
+
+      ? KONOHA_EXAM_ATTEMPT_STATE
+          .specialNotificationHistory
+
+      : [];
+
+
+  // =========================================
+  // ADD NEWEST FIRST
+  // =========================================
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .specialNotificationHistory = [
+
+      ...notifications,
+
+      ...existingHistory
+
+    ];
+
+
+  // =========================================
+  // KEEP LAST 10 PER CHARACTER
+  // =========================================
+
+
+  const characterHistory =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .specialNotificationHistory
+      .filter(
+        notification =>
+          notification &&
+          notification.characterId ===
+            characterId
+      )
+      .slice(
+        0,
+        10
+      );
+
+
+  const otherCharacterHistory =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .specialNotificationHistory
+      .filter(
+        notification =>
+          notification &&
+          notification.characterId !==
+            characterId
+      );
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .specialNotificationHistory = [
+
+      ...characterHistory,
+
+      ...otherCharacterHistory
+
+    ];
 
 
   return notifications;
@@ -49935,8 +49960,17 @@ function recordKonohaExamSpecialNotifications(
 
 
 // =========================================================
-// ACKNOWLEDGE ACTIVE SPECIAL NOTIFICATIONS
+// RETIRED ACKNOWLEDGEMENT COMPATIBILITY BRIDGE
 // =========================================================
+//
+// Kept temporarily so any stale external caller does not
+// throw an error.
+//
+// It performs no UI state transition because acknowledgement
+// no longer exists.
+//
+// =========================================================
+
 
 function acknowledgeKonohaExamSpecialNotifications() {
 
@@ -49946,327 +49980,179 @@ function acknowledgeKonohaExamSpecialNotifications() {
       [];
 
 
-  renderKonohaExamVisualScreen();
-
-
   return true;
 
 }
 
 
 // =========================================================
-// TOGGLE SPECIAL NOTIFICATION HISTORY
+// RETIRED HISTORY TOGGLE COMPATIBILITY BRIDGE
 // =========================================================
+//
+// History is permanently visible inside the baked panel.
+// There is therefore nothing to open or close.
+//
+// =========================================================
+
 
 function toggleKonohaExamSpecialNotificationHistory() {
 
 
   KONOHA_EXAM_ATTEMPT_STATE
     .specialNotificationHistoryOpen =
-      KONOHA_EXAM_ATTEMPT_STATE
-        .specialNotificationHistoryOpen !==
-      true;
-
-
-  renderKonohaExamVisualScreen();
+      false;
 
 
   return true;
+
 }
 
 
 // =========================================================
-// SPECIAL NOTIFICATION RENDERER
+// SIGNIFICANT HISTORY FEED RENDERER
 // =========================================================
 //
-// Active notifications and notification history are
-// deliberately independent.
+// The baked artwork already owns the:
 //
-// Opening HISTORY must NEVER acknowledge, remove or replace
-// the active notification.
+// SPECIAL NOTIFICATIONS
 //
-// Only ACKNOWLEDGE clears active notifications.
+// heading.
+//
+// DOM text is rendered invisibly over the artwork until
+// entries exist, then occupies only the baked notification
+// square.
+//
+// Newest event appears first.
 //
 // =========================================================
+
 
 function renderKonohaExamSpecialNotifications(
   characterId
 ) {
 
 
-  const active =
-    KONOHA_EXAM_ATTEMPT_STATE
-      .activeSpecialNotifications
-      .filter(
-        notification =>
-          notification.characterId ===
-            characterId
-      );
-
-
   const history =
-    KONOHA_EXAM_ATTEMPT_STATE
-      .specialNotificationHistory
+    (
+      Array.isArray(
+        KONOHA_EXAM_ATTEMPT_STATE
+          .specialNotificationHistory
+      )
+
+        ? KONOHA_EXAM_ATTEMPT_STATE
+            .specialNotificationHistory
+
+        : []
+    )
       .filter(
         notification =>
+          notification &&
           notification.characterId ===
             characterId
+      )
+      .slice(
+        0,
+        10
       );
 
 
-  const historyOpen =
-    KONOHA_EXAM_ATTEMPT_STATE
-      .specialNotificationHistoryOpen ===
-        true;
+  // =========================================
+  // EMPTY FEED
+  // =========================================
+  //
+  // Intentionally render an empty live layer.
+  //
+  // The baked SPECIAL NOTIFICATIONS artwork remains
+  // completely unobstructed.
+  // =========================================
+
+
+  if (
+    history.length ===
+      0
+  ) {
+
+
+    return `
+
+      <div
+        class="
+          exam-special-feed
+          empty
+        "
+        aria-live="
+          polite
+        "
+      >
+      </div>
+
+    `;
+
+  }
+
+
+  // =========================================
+  // LIVE HISTORY FEED
+  // =========================================
 
 
   return `
 
     <div
       class="
-        exam-special-notification-zone
+        exam-special-feed
       "
       aria-live="
         polite
       "
     >
 
-
-      <!-- =====================================
-           ACTIVE SPECIAL NOTIFICATIONS
-           ===================================== -->
-
-      ${
-        active.length > 0
-
-          ? active
-              .map(
-                notification => `
-
-                  <div
-                    class="
-                      exam-special-notification
-                      ${notification.type}
-                    "
-                  >
-
-                    <div
-                      class="
-                        exam-special-notification-title
-                      "
-                    >
-                      ${notification.title}
-                    </div>
-
-                    <div
-                      class="
-                        exam-special-notification-detail
-                      "
-                    >
-                      ${notification.detail}
-                    </div>
-
-                  </div>
-
-                `
-              )
-              .join("")
-
-          : ""
-      }
-
-
-      <!-- =====================================
-           ACTIVE NOTIFICATION ACKNOWLEDGEMENT
-           ===================================== -->
-
-      ${
-        active.length > 0
-
-          ? `
-
-            <button
-              type="
-                button
-              "
-              class="
-                exam-special-acknowledge
-              "
-              onclick="
-                acknowledgeKonohaExamSpecialNotifications()
-              "
-            >
-              ACKNOWLEDGE
-            </button>
-
-          `
-
-          : ""
-      }
-
-
-      <!-- =====================================
-           NOTIFICATION HISTORY CONTROL
-           ===================================== -->
-
-      <button
-        type="
-          button
-        "
-        class="
-          exam-special-history-trigger
-        "
-        onclick="
-          toggleKonohaExamSpecialNotificationHistory()
-        "
-      >
-        ${
-          historyOpen
-            ? "CLOSE HISTORY"
-            : "HISTORY"
-        }
-      </button>
-
-
-      <!-- =====================================
-           NOTIFICATION HISTORY
-           ===================================== -->
-
-      ${
-        historyOpen
-
-          ? `
+      ${history
+        .map(
+          (
+            notification,
+            index
+          ) => `
 
             <div
               class="
-                exam-special-history
+                exam-special-feed-entry
+                ${notification.type || ""}
+                ${
+                  index === 0
+                    ? "newest"
+                    : ""
+                }
               "
             >
 
-              ${
-                history.length > 0
+              <div
+                class="
+                  exam-special-feed-title
+                "
+              >
+                ${notification.title}
+              </div>
 
-                  ? history
-                      .map(
-                        notification => `
-
-                          <div
-                            class="
-                              exam-special-history-entry
-                            "
-                          >
-
-                            <strong>
-                              ${notification.title}
-                            </strong>
-
-                            <span>
-                              ${notification.detail}
-                            </span>
-
-                          </div>
-
-                        `
-                      )
-                      .join("")
-
-                  : `
-
-                    <div
-                      class="
-                        exam-special-history-empty
-                      "
-                    >
-                      NO SPECIAL NOTIFICATIONS YET
-                    </div>
-
-                  `
-              }
+              <div
+                class="
+                  exam-special-feed-detail
+                "
+              >
+                ${notification.detail}
+              </div>
 
             </div>
 
           `
-
-          : ""
-      }
-
+        )
+        .join("")}
 
     </div>
 
   `;
 
 }
-
-
-// =========================================================
-// SPECIAL NOTIFICATION LIFECYCLE VALIDATION
-// =========================================================
-
-function validateKonohaExamSpecialNotificationLifecycle() {
-
-
-  const state =
-    KONOHA_EXAM_ATTEMPT_STATE;
-
-
-  const checks = {
-
-
-    activeNotifications:
-      Array.isArray(
-        state.activeSpecialNotifications
-      ),
-
-
-    notificationHistory:
-      Array.isArray(
-        state.specialNotificationHistory
-      ),
-
-
-    historyState:
-      typeof state
-        .specialNotificationHistoryOpen ===
-          "boolean",
-
-
-    acknowledgeAuthority:
-      typeof acknowledgeKonohaExamSpecialNotifications ===
-        "function",
-
-
-    historyToggleAuthority:
-      typeof toggleKonohaExamSpecialNotificationHistory ===
-        "function",
-
-
-    renderer:
-      typeof renderKonohaExamSpecialNotifications ===
-        "function"
-
-
-  };
-
-
-  checks.healthy =
-    Object.values(
-      checks
-    ).every(
-      value =>
-        value === true
-    );
-
-
-  console.log(
-    "KONOHA EXAM SPECIAL NOTIFICATION HEALTH:",
-    checks
-  );
-
-
-  return checks;
-
-}
-
 // =========================================================
 // BRICK 274 — SHINOBI EXAMS VISUAL COMPOSER V2
 // =========================================================
