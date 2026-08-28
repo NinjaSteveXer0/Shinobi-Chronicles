@@ -49972,12 +49972,21 @@ function toggleKonohaExamSpecialNotificationHistory() {
 
 
   return true;
-
 }
 
 
 // =========================================================
 // SPECIAL NOTIFICATION RENDERER
+// =========================================================
+//
+// Active notifications and notification history are
+// deliberately independent.
+//
+// Opening HISTORY must NEVER acknowledge, remove or replace
+// the active notification.
+//
+// Only ACKNOWLEDGE clears active notifications.
+//
 // =========================================================
 
 function renderKonohaExamSpecialNotifications(
@@ -50011,29 +50020,6 @@ function renderKonohaExamSpecialNotifications(
         true;
 
 
-  if (
-    active.length ===
-      0 &&
-    !historyOpen
-  ) {
-
-    return `
-      <button
-        type="button"
-        class="
-          exam-special-history-trigger
-        "
-        onclick="
-          toggleKonohaExamSpecialNotificationHistory()
-        "
-      >
-        HISTORY
-      </button>
-    `;
-
-  }
-
-
   return `
 
     <div
@@ -50045,50 +50031,64 @@ function renderKonohaExamSpecialNotifications(
       "
     >
 
+
+      <!-- =====================================
+           ACTIVE SPECIAL NOTIFICATIONS
+           ===================================== -->
+
       ${
-        active
-          .map(
-            notification => `
+        active.length > 0
 
-              <div
-                class="
-                  exam-special-notification
-                  ${notification.type}
-                "
-              >
+          ? active
+              .map(
+                notification => `
 
-                <div
-                  class="
-                    exam-special-notification-title
-                  "
-                >
-                  ${notification.title}
-                </div>
+                  <div
+                    class="
+                      exam-special-notification
+                      ${notification.type}
+                    "
+                  >
 
-                <div
-                  class="
-                    exam-special-notification-detail
-                  "
-                >
-                  ${notification.detail}
-                </div>
+                    <div
+                      class="
+                        exam-special-notification-title
+                      "
+                    >
+                      ${notification.title}
+                    </div>
 
-              </div>
+                    <div
+                      class="
+                        exam-special-notification-detail
+                      "
+                    >
+                      ${notification.detail}
+                    </div>
 
-            `
-          )
-          .join("")
+                  </div>
+
+                `
+              )
+              .join("")
+
+          : ""
       }
 
 
+      <!-- =====================================
+           ACTIVE NOTIFICATION ACKNOWLEDGEMENT
+           ===================================== -->
+
       ${
-        active.length >
-          0
+        active.length > 0
 
           ? `
 
             <button
-              type="button"
+              type="
+                button
+              "
               class="
                 exam-special-acknowledge
               "
@@ -50105,8 +50105,14 @@ function renderKonohaExamSpecialNotifications(
       }
 
 
+      <!-- =====================================
+           NOTIFICATION HISTORY CONTROL
+           ===================================== -->
+
       <button
-        type="button"
+        type="
+          button
+        "
         class="
           exam-special-history-trigger
         "
@@ -50122,6 +50128,10 @@ function renderKonohaExamSpecialNotifications(
       </button>
 
 
+      <!-- =====================================
+           NOTIFICATION HISTORY
+           ===================================== -->
+
       ${
         historyOpen
 
@@ -50134,8 +50144,7 @@ function renderKonohaExamSpecialNotifications(
             >
 
               ${
-                history.length >
-                  0
+                history.length > 0
 
                   ? history
                       .map(
@@ -50181,9 +50190,80 @@ function renderKonohaExamSpecialNotifications(
           : ""
       }
 
+
     </div>
 
   `;
+
+}
+
+
+// =========================================================
+// SPECIAL NOTIFICATION LIFECYCLE VALIDATION
+// =========================================================
+
+function validateKonohaExamSpecialNotificationLifecycle() {
+
+
+  const state =
+    KONOHA_EXAM_ATTEMPT_STATE;
+
+
+  const checks = {
+
+
+    activeNotifications:
+      Array.isArray(
+        state.activeSpecialNotifications
+      ),
+
+
+    notificationHistory:
+      Array.isArray(
+        state.specialNotificationHistory
+      ),
+
+
+    historyState:
+      typeof state
+        .specialNotificationHistoryOpen ===
+          "boolean",
+
+
+    acknowledgeAuthority:
+      typeof acknowledgeKonohaExamSpecialNotifications ===
+        "function",
+
+
+    historyToggleAuthority:
+      typeof toggleKonohaExamSpecialNotificationHistory ===
+        "function",
+
+
+    renderer:
+      typeof renderKonohaExamSpecialNotifications ===
+        "function"
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "KONOHA EXAM SPECIAL NOTIFICATION HEALTH:",
+    checks
+  );
+
+
+  return checks;
 
 }
 
