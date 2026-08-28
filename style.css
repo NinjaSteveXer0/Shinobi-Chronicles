@@ -7271,18 +7271,19 @@ body {
 
 
 
-/* ========================================================= 
-   BRICK 310 — EXAM BATCH CONTROLS POSITION FINAL 
+/* =========================================================
+   BRICK 310 — EXAM BATCH CONTROLS POSITION FINAL
    ========================================================= */
 
 /*
    FINAL BATCH CONTROL AUTHORITY.
 
-   Parent controls placement only.
-   The parent itself is completely transparent so the
-   baked Exam UI provides the visible surrounding frame.
+   Position is manually approved:
+   left: 150%
+   top: 105%
 
-   Individual buttons retain their own presentation below.
+   Parent owns placement only.
+   Individual buttons own visual presentation.
 */
 
 
@@ -7326,29 +7327,34 @@ body {
         0 !important;
 
     padding:
-        0 !important;
+        7px 9px !important;
 
     white-space:
         nowrap !important;
 
-
-    /* BAKED IMAGE OWNS THE OUTER FRAME */
-
     background:
-        transparent !important;
+        linear-gradient(
+            180deg,
+            rgba(9, 14, 18, 0.94),
+            rgba(3, 7, 10, 0.97)
+        ) !important;
 
     border:
-        none !important;
+        1px solid
+        rgba(183, 137, 42, 0.72) !important;
 
     border-radius:
-        0 !important;
+        6px !important;
 
     outline:
         none !important;
 
     box-shadow:
-        none !important;
+        inset 0 0 16px
+        rgba(0, 0, 0, 0.55),
 
+        0 0 10px
+        rgba(214, 169, 58, 0.10) !important;
 
     box-sizing:
         border-box !important;
@@ -7359,14 +7365,31 @@ body {
     pointer-events:
         auto !important;
 
+        
+
 }
 
-
- 
 
 /* ---------------------------------------------------------
    INDIVIDUAL ×1 / ×5 / ×10 BUTTONS
    --------------------------------------------------------- */
+
+/*
+   Baked artwork owns:
+
+   - button slot background
+   - button slot border
+   - button slot ornamentation
+
+   Live DOM owns:
+
+   - ×1 / ×5 / ×10 text
+   - hover feedback
+   - selected-state colour
+
+   No live button rectangle is rendered.
+*/
+
 
 #konoha-activity-screen[data-service-id="exams"]
 .exam-batch-controls > button {
@@ -7398,18 +7421,16 @@ body {
         center !important;
 
     background:
-        linear-gradient(
-            180deg,
-            rgba(19, 29, 34, 0.98),
-            rgba(5, 11, 15, 0.99)
-        ) !important;
+        transparent !important;
 
     border:
-        2px solid
-        rgba(190, 143, 43, 0.88) !important;
+        none !important;
 
     border-radius:
-        5px !important;
+        0 !important;
+
+    outline:
+        none !important;
 
     color:
         #e7c568 !important;
@@ -7429,17 +7450,15 @@ body {
 
     text-shadow:
         0 1px 3px
-        rgba(0, 0, 0, 0.85) !important;
+        rgba(
+            0,
+            0,
+            0,
+            0.85
+        ) !important;
 
     box-shadow:
-        inset 0 0 0 1px
-        rgba(0, 217, 232, 0.10),
-
-        inset 0 0 12px
-        rgba(0, 0, 0, 0.65),
-
-        0 3px 8px
-        rgba(0, 0, 0, 0.55) !important;
+        none !important;
 
     cursor:
         pointer !important;
@@ -7460,22 +7479,31 @@ body {
     color:
         #fff0a8 !important;
 
-    border-color:
-        #e4b64e !important;
-
     background:
-        linear-gradient(
-            180deg,
-            rgba(25, 38, 43, 0.99),
-            rgba(7, 15, 19, 0.99)
-        ) !important;
+        transparent !important;
+
+    border:
+        none !important;
 
     box-shadow:
-        inset 0 0 0 1px
-        rgba(0, 217, 232, 0.20),
+        none !important;
 
-        0 0 12px
-        rgba(214, 169, 58, 0.28) !important;
+    text-shadow:
+        0 0 7px
+        rgba(
+            231,
+            197,
+            104,
+            0.45
+        ),
+
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.85
+        ) !important;
 
 }
 
@@ -7490,27 +7518,35 @@ body {
 .exam-batch-controls > button.selected {
 
     color:
-        #071014 !important;
+        #55e8eb !important;
 
     background:
-        linear-gradient(
-            180deg,
-            #5be8eb,
-            #24bfc8
-        ) !important;
+        transparent !important;
 
-    border-color:
-        #e1bd63 !important;
+    border:
+        none !important;
 
     box-shadow:
-        inset 0 0 0 1px
-        rgba(255, 235, 166, 0.48),
+        none !important;
 
-        0 0 13px
-        rgba(69, 229, 233, 0.30) !important;
+    text-shadow:
+        0 0 7px
+        rgba(
+            69,
+            229,
+            233,
+            0.60
+        ),
+
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.90
+        ) !important;
 
 }
-
 
 /* =========================================================
    BRICK 301 — EXAM RESULT STAGE / TRANSIENT FEEDBACK
