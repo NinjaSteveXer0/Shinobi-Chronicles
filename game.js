@@ -48773,6 +48773,21 @@ function setKonohaExamBatchSize(
 // =========================================================
 // EXAM BATCH EXECUTION
 // =========================================================
+//
+// Canonical batch lifecycle:
+//
+// 1. Snapshot persistent Current PL.
+// 2. Execute ×1 / ×5 / ×10 genuine Exam attempts.
+// 3. Snapshot resulting Current PL.
+// 4. Store ordinary Exam result authority.
+// 5. Derive and record meaningful Special Notifications.
+// 6. Return the completed attempt results.
+//
+// Special Notification recording happens only AFTER
+// lastBatch and lastBatchMeta are complete because
+// BRICK 302 derives consequences from those authorities.
+//
+// =========================================================
 
 function executeKonohaExamBatch(
   characterId,
@@ -48826,6 +48841,10 @@ function executeKonohaExamBatch(
     [];
 
 
+  // =========================================
+  // EXECUTE GENUINE ATTEMPTS
+  // =========================================
+
   for (
     let index = 0;
     index < count;
@@ -48870,6 +48889,10 @@ function executeKonohaExamBatch(
     );
 
 
+  // =========================================
+  // ORDINARY RESULT AUTHORITY
+  // =========================================
+
   KONOHA_EXAM_ATTEMPT_STATE
     .lastBatch =
       results;
@@ -48879,8 +48902,9 @@ function executeKonohaExamBatch(
   // RESULT-STAGE META
   // =========================================
   //
-  // Stored separately so lastBatch remains the existing
-  // array authority expected by regression / gameplay.
+  // Stored separately so lastBatch remains the
+  // existing array authority expected by
+  // gameplay / regression systems.
   // =========================================
 
   KONOHA_EXAM_ATTEMPT_STATE
@@ -48928,6 +48952,29 @@ function executeKonohaExamBatch(
       }
 
     };
+
+
+  // =========================================
+  // SPECIAL NOTIFICATION CONSEQUENCES
+  // =========================================
+  //
+  // IMPORTANT:
+  //
+  // This must happen AFTER lastBatch and
+  // lastBatchMeta are written.
+  //
+  // BRICK 302 reads those two authorities to
+  // determine whether:
+  //
+  // - Discipline Mastery increased
+  // - Current PL increased
+  //
+  // Ordinary PASS / FAIL remains separate.
+  // =========================================
+
+  recordKonohaExamSpecialNotifications(
+    characterId
+  );
 
 
   return results;
