@@ -6671,7 +6671,7 @@ body {
         visible !important;
 
     z-index:
-        5 !important;
+        9 !important;
 }
 
 
@@ -7712,7 +7712,7 @@ body {
         49% !important;
 
     width:
-        118% !important;
+        116% !important;
 }
 
 
@@ -7844,7 +7844,7 @@ body {
 .practical-discipline-stack {
 
     left:
-        22.5 !important;
+        24.5% !important;
 
     top:
         12.4% !important;
@@ -7866,6 +7866,9 @@ body {
 
     top:
         0 !important;
+
+    width:
+        99% !important;
 }
 
 
@@ -7878,6 +7881,9 @@ body {
 
     top:
         34.5% !important;
+
+    width:
+        92% !important;
 }
 
 
@@ -7890,6 +7896,9 @@ body {
 
     top:
         69% !important;
+
+    width:
+        92% !important;
 }
 
 
@@ -7916,10 +7925,10 @@ body {
 .practical-discipline-exp {
 
     left:
-        28% !important;
+        30.5% !important;
 
     top:
-        58% !important;
+        57% !important;
 }
 
 
@@ -7937,7 +7946,50 @@ body {
         78% !important;
 
     width:
-        24% !important;
+        21% !important;
+
+    height:
+        6px !important;
+}
+
+/* =========================================================
+   BUKIJUTSU EXP BAR — MANUAL CALIBRATION
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2)
+.practical-progress-track {
+
+    left:
+        27% !important;
+
+    top:
+        77.5% !important;
+
+    width:
+        22% !important;
+
+    height:
+        6px !important;
+}
+
+
+/* =========================================================
+   STAMINA EXP BAR — MANUAL CALIBRATION
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3)
+.practical-progress-track {
+
+    left:
+        26.75% !important;
+
+    top:
+        76.7% !important;
+
+    width:
+        22% !important;
 
     height:
         6px !important;
