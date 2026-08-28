@@ -7090,16 +7090,23 @@ body {
 
 
 /* =========================================================
-   BRICK 258 — ACTIVITY KONOHA RETURN AUTHORITY
+   BRICK 315 — ACTIVITY KONOHA RETURN AUTHORITY
    ========================================================= */
 
 /*
-   EXAMS:
+   EXAMS
 
    Existing game.js button remains the navigation authority.
 
-   The baked Konoha icon remains underneath, but the live
-   control now makes the return action explicit.
+   Button is intentionally positioned BELOW the baked
+   Konoha logo and ABOVE the character card.
+
+   Fine tuning:
+
+   left = horizontal position
+   top  = vertical position
+
+   Do NOT move the baked Konoha artwork.
 */
 
 
@@ -7110,25 +7117,25 @@ body {
         absolute !important;
 
     left:
-        1.1% !important;
+        1.5% !important;
 
     top:
-        1.4% !important;
+        7.2% !important;
 
     width:
-        auto !important;
+        14% !important;
 
     min-width:
-        12.5% !important;
+        0 !important;
 
     height:
-        6.5% !important;
+        3.4% !important;
 
     z-index:
         30 !important;
 
     padding:
-        0 12px !important;
+        0 10px !important;
 
     display:
         flex !important;
@@ -7141,10 +7148,23 @@ body {
 
     border:
         1px solid
-        transparent !important;
+        rgba(
+            208,
+            162,
+            55,
+            0.48
+        ) !important;
+
+    border-radius:
+        2px !important;
 
     background:
-        transparent !important;
+        rgba(
+            3,
+            8,
+            10,
+            0.72
+        ) !important;
 
     color:
         #e5c66d !important;
@@ -7159,24 +7179,35 @@ body {
 
     font-size:
         clamp(
-            8px,
-            0.72vw,
-            13px
+            7px,
+            0.60vw,
+            11px
         ) !important;
 
     font-weight:
         700 !important;
 
     letter-spacing:
-        0.06em !important;
+        0.05em !important;
+
+    white-space:
+        nowrap !important;
+
+    box-shadow:
+        inset 0 0 10px
+        rgba(
+            0,
+            0,
+            0,
+            0.28
+        ) !important;
 }
 
 
 /*
-   game.js currently renders an empty Exam return button.
+   game.js owns the actual empty clickable button.
 
-   Give that existing button a visible label without
-   replacing its onclick authority.
+   CSS supplies the visible player-facing label.
 */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -7200,7 +7231,7 @@ body {
             45,
             222,
             227,
-            0.38
+            0.46
         ) !important;
 
     background:
@@ -7208,7 +7239,7 @@ body {
             3,
             10,
             12,
-            0.58
+            0.86
         ) !important;
 
     color:
