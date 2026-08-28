@@ -7162,6 +7162,9 @@ body {
 
     pointer-events:
         none !important;
+
+        border-radius:
+    3px !important;
 }
 
 
@@ -7776,7 +7779,7 @@ body {
         86% !important;
 
     height:
-        24% !important;
+        17% !important;
 
     box-sizing:
         border-box !important;
@@ -9189,7 +9192,7 @@ body {
         20% !important;
 
     top:
-        85% !important;
+        85.5% !important;
 
     width:
         26% !important;
@@ -9215,7 +9218,7 @@ body {
         21% !important;
 
     top:
-        84.5% !important;
+        85.5% !important;
 
     width:
         27.75% !important;
@@ -9241,13 +9244,13 @@ body {
         21.5% !important;
 
     top:
-        68% !important;
+        69% !important;
 
     width:
         26.75% !important;
 
     height:
-        10% !important;
+        9.5% !important;
 
     transform:
         translateX(0) !important;
