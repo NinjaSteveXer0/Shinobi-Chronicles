@@ -5478,14 +5478,22 @@ body {
    ========================================================= */
 
 /*
-   Character selector is INSIDE the character image wrapper.
+   EXAM CHARACTER ARROW FINAL AUTHORITY
 
-   Therefore:
-   left / width are relative to the card image itself.
+   The selector remains inside the character image wrapper.
 
-   left  = horizontal selector position inside card
-   top   = vertical arrow position inside card
-   width = span between left and right arrows
+   Fine tuning:
+
+   left  = shifts the entire arrow pair horizontally
+   top   = shifts the arrows vertically
+   width = controls distance between the arrows
+
+   Arrow width / height / font-size control click-target
+   size and visible arrow size independently.
+
+   IMPORTANT:
+   Selector does not intercept clicks.
+   Individual arrows explicitly restore pointer interaction.
 */
 
 
@@ -5495,14 +5503,25 @@ body {
     position:
         absolute !important;
 
+    /*
+       MANUAL FINE TUNE — PAIR POSITION
+    */
+
     left:
-        0 !important;
+        -7% !important;
 
     top:
         46% !important;
 
+    /*
+       MANUAL FINE TUNE — DISTANCE BETWEEN ARROWS
+
+       Increase this to move BOTH arrows
+       farther away from the card.
+    */
+
     width:
-        100% !important;
+        114% !important;
 
     height:
         auto !important;
@@ -5520,7 +5539,7 @@ body {
         space-between !important;
 
     padding:
-        0 2.5% !important;
+        0 !important;
 
     margin:
         0 !important;
@@ -5533,7 +5552,6 @@ body {
 
     z-index:
         12 !important;
-
 }
 
 
@@ -5541,32 +5559,28 @@ body {
    CHARACTER ARROWS
    ========================================= */
 
-/*
-   Baked Exam artwork owns the surrounding presentation.
-
-   Live DOM owns only:
-   - arrow symbol
-   - click target
-   - subtle hover feedback
-
-   Existing geometry remains unchanged.
-*/
-
-
 #konoha-activity-screen[data-service-id="exams"]
 .exam-character-arrow {
 
+    /*
+       Larger click target.
+    */
+
     width:
-        10.5% !important;
+        clamp(
+            34px,
+            3vw,
+            48px
+        ) !important;
 
     min-width:
-        27px !important;
+        34px !important;
 
     height:
         clamp(
-            33px,
-            4.1vw,
-            52px
+            40px,
+            4.6vw,
+            58px
         ) !important;
 
     padding:
@@ -5587,11 +5601,15 @@ body {
     color:
         #42dfe4 !important;
 
+    /*
+       Slightly larger visible arrow.
+    */
+
     font-size:
         clamp(
-            14px,
-            1.2vw,
-            22px
+            28px,
+            1.5vw,
+            26px
         ) !important;
 
     font-weight:
@@ -5615,6 +5633,20 @@ body {
             0.34
         ) !important;
 
+    /*
+       CRITICAL:
+       Restores click functionality even though
+       selector itself ignores pointer events.
+    */
+
+    pointer-events:
+        auto !important;
+
+    position:
+        relative !important;
+
+    z-index:
+        13 !important;
 }
 
 
@@ -5649,9 +5681,7 @@ body {
             228,
             0.30
         ) !important;
-
 }
-
 
 
 /* =========================================
@@ -6605,6 +6635,10 @@ body {
 
    left  = horizontal card position INSIDE assembly
    width = card image size
+
+   IMPORTANT:
+   overflow MUST remain visible so character
+   navigation arrows may sit outside card edges.
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
@@ -6641,7 +6675,7 @@ body {
         center !important;
 
     overflow:
-        hidden !important;
+        visible !important;
 
     border:
         none !important;
@@ -6660,6 +6694,10 @@ body {
 
 }
 
+
+/* =========================================
+   CHARACTER CARD IMAGE
+   ========================================= */
 
 /* =========================================
    CHARACTER CARD IMAGE
