@@ -6048,13 +6048,13 @@ body {
         absolute;
 
     left:
-        8%;
+        4%;
 
     right:
         8%;
 
     bottom:
-        7%;
+        4%;
 
     height:
         3px;
@@ -6100,7 +6100,7 @@ body {
 .exam-discipline-card::after {
 
     bottom:
-        26%;
+        20%;
 
 }
 
@@ -6966,7 +6966,7 @@ body {
 .exam-discipline-exp-value {
 
     left:
-        31% !important;
+        30% !important;
 
     top:
         67% !important;
@@ -6983,10 +6983,10 @@ body {
 .exam-discipline-exp-value {
 
     left:
-        32.5% !important;
+        31% !important;
 
     top:
-        66% !important;
+        65% !important;
 
 }
 
@@ -7000,10 +7000,10 @@ body {
 .exam-discipline-exp-value {
 
     left:
-        32% !important;
+        31% !important;
 
     top:
-        50% !important;
+        48% !important;
 
 }
 
@@ -7271,102 +7271,95 @@ body {
 
 
 
-/* =========================================================
-   BRICK 310 — EXAM BATCH CONTROLS POSITION FINAL
-   ========================================================= */
-
-/*
-   FINAL BATCH CONTROL AUTHORITY.
-
+/* ========================================================= 
+   BRICK 310 — EXAM BATCH CONTROLS POSITION FINAL 
+   ========================================================= */ 
+ 
+/* 
+   FINAL BATCH CONTROL AUTHORITY. 
+ 
    Position is manually approved:
-   left: 150%
-   top: 105%
-
+   left: 148.5%
+   top: 97.5%
+ 
    Parent owns placement only.
+   Parent is visually transparent.
    Individual buttons own visual presentation.
-*/
-
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-batch-controls {
-
-    position:
-        absolute !important;
-
-    left:
-        148.5% !important;
-
-    top:
-        97.5% !important;
-
-    transform:
-        translateX(-50%) !important;
-
-    display:
-        flex !important;
-
-    flex-direction:
-        row !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        center !important;
-
-    flex-wrap:
-        nowrap !important;
-
-    gap:
-        38px !important;
-
-    width:
-        max-content !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        7px 9px !important;
-
-    white-space:
-        nowrap !important;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(9, 14, 18, 0.94),
-            rgba(3, 7, 10, 0.97)
-        ) !important;
-
-    border:
-        1px solid
-        rgba(183, 137, 42, 0.72) !important;
-
-    border-radius:
-        6px !important;
-
-    outline:
-        none !important;
-
-    box-shadow:
-        inset 0 0 16px
-        rgba(0, 0, 0, 0.55),
-
-        0 0 10px
-        rgba(214, 169, 58, 0.10) !important;
-
-    box-sizing:
-        border-box !important;
-
-    z-index:
-        20 !important;
-
-    pointer-events:
-        auto !important;
-
-}
-
+*/ 
+ 
+ 
+#konoha-activity-screen[data-service-id="exams"] 
+.exam-batch-controls { 
+ 
+    position: 
+        absolute !important; 
+ 
+    left: 
+        148.5% !important; 
+ 
+    top: 
+        97.5% !important; 
+ 
+    transform: 
+        translateX(-50%) !important; 
+ 
+    display: 
+        flex !important; 
+ 
+    flex-direction: 
+        row !important; 
+ 
+    align-items: 
+        center !important; 
+ 
+    justify-content: 
+        center !important; 
+ 
+    flex-wrap: 
+        nowrap !important; 
+ 
+    gap: 
+        38px !important; 
+ 
+    width: 
+        max-content !important; 
+ 
+    margin: 
+        0 !important; 
+ 
+    padding: 
+        7px 9px !important; 
+ 
+    white-space: 
+        nowrap !important; 
+ 
+    background: 
+        transparent !important; 
+ 
+    border: 
+        none !important; 
+ 
+    border-radius: 
+        0 !important; 
+ 
+    outline: 
+        none !important; 
+ 
+    box-shadow: 
+        none !important; 
+ 
+    box-sizing: 
+        border-box !important; 
+ 
+    z-index: 
+        20 !important; 
+ 
+    pointer-events: 
+        auto !important; 
+ 
+} 
+ 
+ 
 
 /* ---------------------------------------------------------
    INDIVIDUAL ×1 / ×5 / ×10 BUTTONS
