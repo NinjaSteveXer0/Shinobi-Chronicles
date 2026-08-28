@@ -6492,13 +6492,13 @@ body {
         absolute !important;
 
     left:
-        5.8% !important;
+       5.3% !important;
 
     top:
-        9% !important;
+        11% !important;
 
     width:
-        15% !important;
+        16.3% !important;
 
     height:
         auto !important;
@@ -6541,10 +6541,10 @@ body {
         relative !important;
 
     left:
-        69% !important;
+        70% !important;
 
     width:
-        180% !important;
+        155% !important;
 
     aspect-ratio:
         1 / 1 !important;
@@ -8494,9 +8494,6 @@ body {
 
     z-index:
         16 !important;
-
-        outline: 1px solid red !important;
-background: rgba(255, 0, 0, 0.08) !important;
 
 }
 
