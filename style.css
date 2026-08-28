@@ -7873,6 +7873,69 @@ body {
 
 
 /* =========================================================
+   PRACTICAL SELECTED DISCIPLINE ACCENT
+   ========================================================= */
+
+/*
+   Automatically follows whichever panel has .selected.
+
+   left   = line start
+   bottom = move line UP / DOWN inside panel
+   width  = line length
+   height = line thickness
+*/
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select.selected::after {
+
+    content:
+        "";
+
+    position:
+        absolute !important;
+
+    left:
+        10% !important;
+
+    bottom:
+        4% !important;
+
+    width:
+        92% !important;
+
+    height:
+        3px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            transparent 0%,
+            #8f4f18 8%,
+            #d98a2b 30%,
+            #ffd36a 50%,
+            #d98a2b 70%,
+            #8f4f18 92%,
+            transparent 100%
+        ) !important;
+
+    box-shadow:
+        0 0 7px
+        rgba(
+            217,
+            138,
+            43,
+            0.55
+        ) !important;
+
+    pointer-events:
+        none !important;
+
+    z-index:
+        10 !important;
+}
+
+
+/* =========================================================
    BUKIJUTSU PANEL
    ========================================================= */
 
@@ -7925,7 +7988,7 @@ body {
 .practical-mastery {
 
     left:
-        16.25% !important;
+        13% !important;
 
     top:
         67% !important;
@@ -7952,15 +8015,52 @@ body {
    DISCIPLINE EXP TEXT
    ========================================================= */
 
+/*
+   TAIJUTSU DEFAULT
+*/
+
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-exp {
 
     left:
-        30.5% !important;
+        32% !important;
 
     top:
         57% !important;
 }
+
+
+/* =========================================================
+   BUKIJUTSU DISCIPLINE EXP — MANUAL CALIBRATION
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2)
+.practical-discipline-exp {
+
+    left:
+        31% !important;
+
+    top:
+        57% !important;
+}
+
+
+/* =========================================================
+   STAMINA DISCIPLINE EXP — MANUAL CALIBRATION
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3)
+.practical-discipline-exp {
+
+    left:
+        35% !important;
+
+    top:
+        56% !important;
+}
+
 
 
 /* =========================================================
@@ -7992,13 +8092,13 @@ body {
 .practical-progress-track {
 
     left:
-        27% !important;
+        24% !important;
 
     top:
-        77.5% !important;
+        78.5% !important;
 
     width:
-        22% !important;
+        21.8% !important;
 
     height:
         6px !important;
@@ -8178,7 +8278,7 @@ body {
         6% !important;
 
     top:
-        0.75% !important;
+        -20% !important;
 }
 
 
@@ -8346,11 +8446,15 @@ body {
 
 
 /* =========================================
-   PRACTICAL → KONOHA
+   BRICK 339 — PRACTICAL → KONOHA
+   FINAL VISIBILITY / POSITION AUTHORITY
    ========================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-konoha-return {
+
+    position:
+        absolute !important;
 
     left:
         6% !important;
@@ -8363,6 +8467,9 @@ body {
 
     height:
         5.5% !important;
+
+    z-index:
+        30 !important;
 
     padding:
         0 12px !important;
@@ -8377,16 +8484,16 @@ body {
         center !important;
 
     background:
-    transparent !important;
+        transparent !important;
 
-border:
-    none !important;
+    border:
+        none !important;
 
-outline:
-    none !important;
+    outline:
+        none !important;
 
-box-shadow:
-    none !important;
+    box-shadow:
+        none !important;
 
     color:
         #e4c36d !important;
@@ -8415,19 +8522,43 @@ box-shadow:
 
 
 #konoha-activity-screen[data-service-id="practical"]
+.practical-konoha-return::after {
+
+    content:
+        "← BACK TO KONOHA" !important;
+
+    display:
+        block !important;
+
+    color:
+        #e4c36d !important;
+
+    white-space:
+        nowrap !important;
+
+    visibility:
+        visible !important;
+
+    opacity:
+        1 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="practical"]
 .practical-konoha-return:hover {
 
     color:
         #53e6ea !important;
-
-    border-color:
-        rgba(
-            83,
-            230,
-            234,
-            0.52
-        ) !important;
 }
+
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-konoha-return:hover::after {
+
+    color:
+        #53e6ea !important;
+}
+
 
 
 /* =========================================================
