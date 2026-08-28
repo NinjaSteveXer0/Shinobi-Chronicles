@@ -7975,31 +7975,41 @@ body {
 
 
 /* =========================================
-   SPECIAL NOTIFICATIONS — MANUAL POSITION
-   CONTROL
+   SPECIAL NOTIFICATIONS — SIGNIFICANT FEED
+   MANUAL CALIBRATION
 
-   left  = move LEFT / RIGHT
-   top   = move UP / DOWN
-   width = panel content width
+   This live DOM layer sits INSIDE the baked
+   Special Notifications panel.
+
+   Fine-tune here:
+
+   left   = move feed LEFT / RIGHT
+   top    = move feed UP / DOWN
+   width  = make feed wider / narrower
+   height = increase / reduce visible feed area
+
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification-zone {
+.exam-special-feed {
 
     position:
         fixed !important;
 
     left:
-        8.4% !important;
+        15.6% !important;
 
     top:
-        73.5% !important;
+        73.8% !important;
 
     width:
-        20.5% !important;
+        16.8% !important;
 
-    max-height:
-        16.5% !important;
+    height:
+        17.0% !important;
+
+    box-sizing:
+        border-box !important;
 
     display:
         flex !important;
@@ -8008,16 +8018,28 @@ body {
         column !important;
 
     gap:
-        5px !important;
+        4px !important;
 
     margin:
         0 !important;
 
     padding:
-        8px !important;
+        5px 7px !important;
 
-    overflow:
-        visible !important;
+    overflow-x:
+        hidden !important;
+
+    overflow-y:
+        auto !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
 
     pointer-events:
         auto !important;
@@ -8029,11 +8051,24 @@ body {
 
 
 /* =========================================
-   SPECIAL NOTIFICATION ENTRY
+   EMPTY FEED
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification {
+.exam-special-feed.empty {
+
+    pointer-events:
+        none !important;
+
+}
+
+
+/* =========================================
+   SIGNIFICANT FEED ENTRY
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-feed-entry {
 
     width:
         100% !important;
@@ -8045,13 +8080,13 @@ body {
         0 !important;
 
     padding:
-        7px 9px !important;
+        4px 5px 6px !important;
 
     background:
         linear-gradient(
             90deg,
-            rgba(3, 9, 12, 0.92),
-            rgba(8, 12, 14, 0.72)
+            rgba(5, 10, 12, 0.68),
+            rgba(5, 10, 12, 0.16)
         ) !important;
 
     border:
@@ -8059,49 +8094,65 @@ body {
 
     border-left:
         2px solid
-        rgba(70, 224, 229, 0.72) !important;
+        rgba(
+            211,
+            173,
+            69,
+            0.72
+        ) !important;
 
     border-bottom:
         1px solid
-        rgba(211, 170, 61, 0.28) !important;
+        rgba(
+            211,
+            173,
+            69,
+            0.14
+        ) !important;
 
     box-shadow:
-        0 3px 9px
-        rgba(0, 0, 0, 0.44) !important;
+        none !important;
 
 }
 
 
 /* =========================================
-   MASTERY EVENT
+   NEWEST ENTRY
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification.mastery {
+.exam-special-feed-entry.newest {
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(15, 20, 20, 0.82),
+            rgba(6, 11, 13, 0.20)
+        ) !important;
 
     border-left-color:
         rgba(
-            72,
-            228,
-            232,
-            0.90
+            238,
+            202,
+            103,
+            0.98
         ) !important;
 
 }
 
 
 /* =========================================
-   POWER LEVEL EVENT
+   POWER EVENT
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification.power {
+.exam-special-feed-entry.power {
 
     border-left-color:
         rgba(
-            226,
-            190,
-            91,
+            230,
+            191,
+            79,
             0.95
         ) !important;
 
@@ -8109,61 +8160,117 @@ body {
 
 
 /* =========================================
-   NOTIFICATION TITLE
+   BREAKTHROUGH EVENT
+   FUTURE AUTHORITY
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification-title {
+.exam-special-feed-entry.breakthrough {
 
-    color:
-        #e3c56d !important;
-
-    font-size:
-        clamp(
-            8px,
-            0.64vw,
-            12px
-        ) !important;
-
-    font-weight:
-        900 !important;
-
-    line-height:
-        1.1 !important;
-
-    letter-spacing:
-        0.055em !important;
-
-    text-shadow:
-        0 1px 4px
+    border-left-color:
         rgba(
-            0,
-            0,
-            0,
-            0.90
+            75,
+            225,
+            229,
+            0.92
         ) !important;
 
 }
 
 
 /* =========================================
-   NOTIFICATION DETAIL
+   TECHNIQUE EVENT
+   FUTURE AUTHORITY
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification-detail {
+.exam-special-feed-entry.technique {
 
-    margin-top:
-        4px !important;
+    border-left-color:
+        rgba(
+            174,
+            117,
+            220,
+            0.92
+        ) !important;
+
+}
+
+
+/* =========================================
+   FEED TITLE
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-feed-title {
+
+    display:
+        block !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
 
     color:
-        #67e5e8 !important;
+        #e4c56a !important;
 
     font-size:
         clamp(
             7px,
-            0.55vw,
-            10px
+            0.47vw,
+            9px
+        ) !important;
+
+    font-weight:
+        900 !important;
+
+    line-height:
+        1.15 !important;
+
+    letter-spacing:
+        0.045em !important;
+
+    text-transform:
+        uppercase !important;
+
+    text-shadow:
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.85
+        ) !important;
+
+}
+
+
+/* =========================================
+   FEED DETAIL
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-special-feed-detail {
+
+    display:
+        block !important;
+
+    margin-top:
+        2px !important;
+
+    padding:
+        0 !important;
+
+    color:
+        #63dde2 !important;
+
+    font-size:
+        clamp(
+            6px,
+            0.42vw,
+            8px
         ) !important;
 
     font-weight:
@@ -8173,413 +8280,91 @@ body {
         1.2 !important;
 
     letter-spacing:
-        0.025em !important;
+        0.018em !important;
 
 }
 
 
 /* =========================================
-   POWER NOTIFICATION DETAIL
+   POWER EVENT DETAIL
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-notification.power
-.exam-special-notification-detail {
+.exam-special-feed-entry.power
+.exam-special-feed-detail {
 
     color:
-        #e6c86e !important;
+        #e5c86d !important;
 
 }
 
 
 /* =========================================
-   SPECIAL NOTIFICATION CONTROLS
+   BREAKTHROUGH DETAIL
+   FUTURE AUTHORITY
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-acknowledge,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-trigger {
-
-    display:
-        block !important;
-
-    width:
-        100% !important;
-
-    box-sizing:
-        border-box !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        5px 8px !important;
-
-    appearance:
-        none !important;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(12, 18, 22, 0.96),
-            rgba(4, 9, 12, 0.96)
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            210,
-            171,
-            69,
-            0.52
-        ) !important;
-
-    border-radius:
-        2px !important;
+.exam-special-feed-entry.breakthrough
+.exam-special-feed-detail {
 
     color:
-        #d9bd6b !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.50vw,
-            10px
-        ) !important;
-
-    font-weight:
-        800 !important;
-
-    line-height:
-        1.2 !important;
-
-    letter-spacing:
-        0.05em !important;
-
-    text-align:
-        center !important;
-
-    cursor:
-        pointer !important;
-
-    pointer-events:
-        auto !important;
-
-    box-shadow:
-        none !important;
+        #63e2e6 !important;
 
 }
 
 
 /* =========================================
-   SPECIAL NOTIFICATION CONTROL HOVER
+   TECHNIQUE DETAIL
+   FUTURE AUTHORITY
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-acknowledge:hover,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-trigger:hover {
+.exam-special-feed-entry.technique
+.exam-special-feed-detail {
 
     color:
-        #67e5e8 !important;
-
-    border-color:
-        rgba(
-            73,
-            224,
-            229,
-            0.75
-        ) !important;
-
-    background:
-        linear-gradient(
-            180deg,
-            rgba(12, 24, 27, 0.98),
-            rgba(5, 14, 17, 0.98)
-        ) !important;
+        #c39ae9 !important;
 
 }
 
 
 /* =========================================
-   SPECIAL NOTIFICATION CONTROL ACTIVE
+   FEED SCROLLBAR
    ========================================= */
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-acknowledge:active,
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-trigger:active {
-
-    transform:
-        translateY(1px) !important;
-
-}
-
-
-/* =========================================
-   SPECIAL NOTIFICATION HISTORY
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history {
+.exam-special-feed::-webkit-scrollbar {
 
     width:
-        100% !important;
-
-    max-height:
-        150px !important;
-
-    box-sizing:
-        border-box !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        6px !important;
-
-    overflow-x:
-        hidden !important;
-
-    overflow-y:
-        auto !important;
-
-    background:
-        rgba(
-            2,
-            7,
-            10,
-            0.97
-        ) !important;
-
-    border:
-        1px solid
-        rgba(
-            58,
-            218,
-            223,
-            0.30
-        ) !important;
-
-    pointer-events:
-        auto !important;
-
-}
-
-
-/* =========================================
-   SPECIAL NOTIFICATION HISTORY ENTRY
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-entry {
-
-    display:
-        flex !important;
-
-    flex-direction:
-        column !important;
-
-    gap:
-        3px !important;
-
-    width:
-        100% !important;
-
-    box-sizing:
-        border-box !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        6px 4px !important;
-
-    border-bottom:
-        1px solid
-        rgba(
-            214,
-            169,
-            58,
-            0.18
-        ) !important;
-
-}
-
-
-/* =========================================
-   HISTORY ENTRY TITLE
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-entry strong {
-
-    display:
-        block !important;
-
-    margin:
-        0 !important;
-
-    color:
-        #e1c46f !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.52vw,
-            10px
-        ) !important;
-
-    font-weight:
-        800 !important;
-
-    line-height:
-        1.2 !important;
-
-}
-
-
-/* =========================================
-   HISTORY ENTRY DETAIL
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-entry span {
-
-    display:
-        block !important;
-
-    margin:
-        0 !important;
-
-    color:
-        #64e1e5 !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.48vw,
-            9px
-        ) !important;
-
-    line-height:
-        1.25 !important;
-
-}
-
-
-/* =========================================
-   EMPTY HISTORY
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history-empty {
-
-    width:
-        100% !important;
-
-    box-sizing:
-        border-box !important;
-
-    margin:
-        0 !important;
-
-    padding:
-        8px 4px !important;
-
-    color:
-        rgba(
-            214,
-            196,
-            138,
-            0.72
-        ) !important;
-
-    font-size:
-        clamp(
-            7px,
-            0.48vw,
-            9px
-        ) !important;
-
-    line-height:
-        1.2 !important;
-
-    text-align:
-        center !important;
-
-}
-
-
-/* =========================================
-   EMPTY-STATE HISTORY BUTTON
-   MANUAL POSITION CONTROL
-
-   Used when there is no active notification.
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-panel >
-.exam-special-history-trigger {
-
-    position:
-        fixed !important;
-
-    left:
-        8.4% !important;
-
-    top:
-        73.5% !important;
-
-    width:
-        20.5% !important;
-
-    margin:
-        0 !important;
-
-    z-index:
-        16 !important;
-
-}
-
-
-/* =========================================
-   SPECIAL NOTIFICATION SCROLLBAR
-   ========================================= */
-
-#konoha-activity-screen[data-service-id="exams"]
-.exam-special-history::-webkit-scrollbar {
-
-    width:
-        5px;
+        4px;
 
 }
 
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-history::-webkit-scrollbar-track {
+.exam-special-feed::-webkit-scrollbar-track {
 
     background:
         rgba(
             0,
             0,
             0,
-            0.35
+            0.14
         );
 
 }
 
 
 #konoha-activity-screen[data-service-id="exams"]
-.exam-special-history::-webkit-scrollbar-thumb {
+.exam-special-feed::-webkit-scrollbar-thumb {
 
     background:
         rgba(
-            75,
-            222,
-            227,
-            0.55
+            73,
+            219,
+            224,
+            0.38
         );
 
     border-radius:
