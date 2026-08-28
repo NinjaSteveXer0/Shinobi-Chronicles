@@ -48093,6 +48093,17 @@ function selectKonohaExamDiscipline(
   }
 
 
+  /*
+     Clear any PASS / FAIL presentation belonging
+     to the previously selected discipline before
+     rendering the newly selected discipline.
+  */
+
+  clearKonohaExamResultPresentation(
+    false
+  );
+
+
   KONOHA_EXAM_ATTEMPT_STATE
     .disciplineId =
       disciplineId;
@@ -48110,6 +48121,8 @@ function selectKonohaExamDiscipline(
   return true;
 
 }
+
+
 
 // =========================================================
 // BRICK 266 — EXAM ATTEMPT CONTEXT
