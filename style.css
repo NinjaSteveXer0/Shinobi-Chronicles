@@ -7997,13 +7997,13 @@ body {
         fixed !important;
 
     left:
-        15% !important;
+        13.5% !important;
 
     top:
-        73.8% !important;
+        75.25% !important;
 
     width:
-        19% !important;
+        19.25% !important;
 
     height:
         23% !important;
@@ -8046,9 +8046,6 @@ body {
 
     z-index:
         16 !important;
-
-        outline: 1px solid red !important;
-background: rgba(255, 0, 0, 0.08) !important;
 
 }
 
