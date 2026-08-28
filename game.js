@@ -34237,9 +34237,7 @@ function renderVillageOverlay(
 
   if (!container) {
 
-
     return false;
-
 
   }
 
@@ -34321,13 +34319,47 @@ function renderVillageOverlay(
 
       </button>
 
+
+      <!-- =====================================
+           PRACTICAL TRAINING DEV HOTSPOT
+           ===================================== -->
+
+      <button
+        type="
+          button
+        "
+        class="
+          konoha-map-hotspot
+          konoha-map-hotspot-practical
+        "
+        onclick="
+          openKonohaPracticalFromVillage()
+        "
+        aria-label="
+          Enter Practical Training
+        "
+        title="
+          Practical Training
+        "
+      >
+
+        <span
+          class="
+            konoha-map-hotspot-label
+          "
+        >
+          PRACTICAL TRAINING
+        </span>
+
+      </button>
+
+
     </div>
 
   `;
 
 
   return true;
-
 
 }
 
@@ -34348,10 +34380,8 @@ function openKonohaExamFromVillage() {
 
   if (overlay) {
 
-
     overlay.style.display =
       "none";
-
 
   }
 
@@ -34371,28 +34401,77 @@ function openKonohaExamFromVillage() {
 
     if (overlay) {
 
-
       overlay.style.display =
         "flex";
-
 
     }
 
 
     return result;
 
+  }
+
+
+  return result;
+
+}
+
+
+// =========================================================
+// KONOHA → PRACTICAL
+// =========================================================
+
+
+function openKonohaPracticalFromVillage() {
+
+
+  const overlay =
+    document.getElementById(
+      "screen-overlay"
+    );
+
+
+  if (overlay) {
+
+    overlay.style.display =
+      "none";
+
+  }
+
+
+  const result =
+    showKonohaActivityUIScreen(
+      "practical"
+    );
+
+
+  if (
+    !result ||
+    result.success !==
+      true
+  ) {
+
+
+    if (overlay) {
+
+      overlay.style.display =
+        "flex";
+
+    }
+
+
+    return result;
 
   }
 
 
   return result;
 
-
 }
 
 
 // =========================================================
-// EXAMS → KONOHA
+// ACTIVITY UI → KONOHA
 // =========================================================
 
 
@@ -34408,7 +34487,6 @@ function returnToKonohaFromActivityUI() {
 
 
   return true;
-
 
 }
 
@@ -47291,6 +47369,7 @@ function showKonohaActivityUIScreen(
 //
 // =========================================================
 
+
 function ensureKonohaExamUIStyles() {
 
 
@@ -47338,8 +47417,76 @@ function ensureKonohaExamUIStyles() {
 
   return style;
 
+}
+
+
+// =========================================================
+// PRACTICAL TRAINING STYLE AUTHORITY BRIDGE
+// =========================================================
+//
+// Practical presentation is owned by style.css.
+//
+// This bridge mirrors the proven Exam presentation contract
+// without sharing geometry.
+//
+// Exam CSS remains locked.
+//
+// Practical receives its own selector authority:
+//
+// #konoha-activity-screen[data-service-id="practical"]
+//
+// =========================================================
+
+
+function ensureKonohaPracticalUIStyles() {
+
+
+  let style =
+    document.getElementById(
+      "konoha-practical-ui-styles"
+    );
+
+
+  if (style) {
+
+    return style;
+
+  }
+
+
+  style =
+    document.createElement(
+      "style"
+    );
+
+
+  style.id =
+    "konoha-practical-ui-styles";
+
+
+  style.dataset.authority =
+    "style.css";
+
+
+  style.textContent = `
+    /*
+       Practical Training presentation authority:
+       style.css
+
+       Runtime injection intentionally retired.
+    */
+  `;
+
+
+  document.head.appendChild(
+    style
+  );
+
+
+  return style;
 
 }
+
 
 
 // =========================================================
@@ -50936,6 +51083,696 @@ function showKonohaExamUIScreen(
 
 
 // =========================================================
+// PRACTICAL TRAINING UI INTERACTION STATE
+// =========================================================
+//
+// UI state only.
+//
+// DOES NOT own:
+// - progression
+// - EXP rewards
+// - training resolution
+// - PL calculation
+//
+// =========================================================
+
+
+const KONOHA_PRACTICAL_UI_STATE = {
+
+  disciplineId:
+    "tai",
+
+  batchSize:
+    1
+
+};
+
+
+// =========================================================
+// PRACTICAL DISCIPLINE SELECTION
+// =========================================================
+
+
+function selectKonohaPracticalDiscipline(
+  disciplineId
+) {
+
+
+  const validDisciplines = [
+    "tai",
+    "buki",
+    "stamina"
+  ];
+
+
+  if (
+    !validDisciplines.includes(
+      disciplineId
+    )
+  ) {
+
+    console.log(
+      "Invalid Practical discipline:",
+      disciplineId
+    );
+
+
+    return false;
+
+  }
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .disciplineId =
+      disciplineId;
+
+
+  renderKonohaPracticalVisualScreen();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// PRACTICAL BATCH SELECTION
+// =========================================================
+
+
+function setKonohaPracticalBatchSize(
+  batchSize
+) {
+
+
+  const requested =
+    Number(
+      batchSize
+    );
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .batchSize =
+      [
+        1,
+        5,
+        10
+      ].includes(
+        requested
+      )
+
+        ? requested
+
+        : 1;
+
+
+  renderKonohaPracticalVisualScreen();
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// PRACTICAL CHARACTER SELECTION
+// =========================================================
+
+
+function changeKonohaPracticalCharacter(
+  direction
+) {
+
+
+  const character =
+    cycleKonohaSelectedCharacter(
+      direction
+    );
+
+
+  if (!character) {
+
+    return false;
+
+  }
+
+
+  renderKonohaPracticalVisualScreen();
+
+
+  console.log(
+    "PRACTICAL SHINOBI SELECTED:",
+    character.id
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// PRACTICAL TRAINING VISUAL SCREEN
+// =========================================================
+//
+// First-class Practical presentation.
+//
+// Background:
+// Assets/Backgrounds/practical.png
+//
+// Existing data authorities remain untouched.
+//
+// BEGIN TRAINING remains disabled until the real existing
+// training execution/progression authority is audited.
+//
+// =========================================================
+
+
+function renderKonohaPracticalVisualScreen() {
+
+
+  ensureKonohaPracticalUIStyles();
+
+
+  const root =
+    ensureKonohaActivityUIRoot();
+
+
+  const session =
+    getKonohaActivityUISessionState();
+
+
+  const data =
+    getKonohaPracticalUIScreenData(
+      session.characterId
+    );
+
+
+  if (!data) {
+
+
+    console.log(
+      "Practical visual render failed."
+    );
+
+
+    return false;
+
+  }
+
+
+  const selectedDisciplineId =
+    KONOHA_PRACTICAL_UI_STATE
+      .disciplineId;
+
+
+  const batchSize =
+    KONOHA_PRACTICAL_UI_STATE
+      .batchSize;
+
+
+  const character =
+    data.character;
+
+
+  const plProgress =
+    character &&
+    character.plProgress &&
+    typeof character.plProgress ===
+      "object"
+
+      ? character.plProgress
+
+      : {
+
+          currentPL:
+            Number(
+              character &&
+              character.currentPL
+            ) || 0,
+
+          progressPercent:
+            0
+
+        };
+
+
+  const plProgressPercent =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        Number(
+          plProgress.progressPercent
+        ) || 0
+      )
+    );
+
+
+  root.dataset.serviceId =
+    "practical";
+
+
+  root.style.display =
+    "block";
+
+
+  root.innerHTML = `
+
+    <div
+      class="
+        konoha-practical-screen
+      "
+    >
+
+
+      <img
+        src="
+          Assets/Backgrounds/practical.png
+        "
+        alt="
+          Practical Training
+        "
+        class="
+          practical-background
+        "
+      >
+
+
+      <!-- =====================================
+           BACK TO KONOHA
+           ===================================== -->
+
+      <button
+        type="
+          button
+        "
+        class="
+          practical-konoha-return
+        "
+        onclick="
+          returnToKonohaFromActivityUI()
+        "
+        aria-label="
+          Back to Konoha
+        "
+        title="
+          Back to Konoha
+        "
+      >
+        ← BACK TO KONOHA
+      </button>
+
+
+      <!-- =====================================
+           CHARACTER
+           ===================================== -->
+
+      <section
+        class="
+          practical-character-panel
+        "
+      >
+
+
+        <div
+          class="
+            practical-character-image-wrap
+          "
+        >
+
+
+          ${
+            character &&
+            character.image
+
+              ? `
+                  <img
+                    class="
+                      practical-character-image
+                    "
+                    src="
+                      ${character.image}
+                    "
+                    alt="
+                      ${character.name}
+                    "
+                  >
+                `
+
+              : ""
+          }
+
+
+          <div
+            class="
+              practical-character-selector
+            "
+          >
+
+
+            <button
+              type="
+                button
+              "
+              class="
+                practical-character-arrow
+              "
+              onclick="
+                changeKonohaPracticalCharacter(-1)
+              "
+              aria-label="
+                Previous shinobi
+              "
+            >
+              ‹
+            </button>
+
+
+            <button
+              type="
+                button
+              "
+              class="
+                practical-character-arrow
+              "
+              onclick="
+                changeKonohaPracticalCharacter(1)
+              "
+              aria-label="
+                Next shinobi
+              "
+            >
+              ›
+            </button>
+
+
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            practical-character-pl
+          "
+        >
+          ${plProgress.currentPL}
+        </div>
+
+
+        <div
+          class="
+            practical-character-pl-progress
+          "
+        >
+
+          <div
+            class="
+              practical-character-pl-progress-fill
+            "
+            style="
+              width:
+                ${plProgressPercent}%;
+            "
+          >
+          </div>
+
+        </div>
+
+
+        <div
+          class="
+            practical-special-feed
+          "
+          aria-live="
+            polite
+          "
+        >
+        </div>
+
+
+      </section>
+
+
+      <!-- =====================================
+           DISCIPLINES
+           ===================================== -->
+
+      <section
+        class="
+          practical-discipline-stack
+        "
+      >
+
+
+        ${data.disciplines
+          .map(
+            discipline => `
+
+              <button
+                type="
+                  button
+                "
+                class="
+                  practical-discipline-select
+                  ${
+                    discipline.id ===
+                      selectedDisciplineId
+
+                      ? "selected"
+
+                      : ""
+                  }
+                "
+                data-discipline-id="
+                  ${discipline.id}
+                "
+                onclick="
+                  selectKonohaPracticalDiscipline(
+                    '${discipline.id}'
+                  )
+                "
+                aria-pressed="
+                  ${
+                    discipline.id ===
+                      selectedDisciplineId
+                  }
+                "
+              >
+
+
+                <div
+                  class="
+                    practical-mastery
+                  "
+                >
+                  ${discipline.level}
+                </div>
+
+
+                <div
+                  class="
+                    practical-discipline-exp
+                  "
+                >
+                  ${discipline.exp}
+                  /
+                  ${discipline.expRequired}
+                  EXP
+                </div>
+
+
+                <div
+                  class="
+                    practical-progress-track
+                  "
+                >
+
+                  <div
+                    class="
+                      practical-progress-fill
+                    "
+                    style="
+                      width:
+                        ${discipline.progressPercent}%;
+                    "
+                  >
+                  </div>
+
+                </div>
+
+
+              </button>
+
+            `
+          )
+          .join("")}
+
+
+      </section>
+
+
+      <!-- =====================================
+           BATCH CONTROLS
+           ===================================== -->
+
+      <div
+        class="
+          practical-batch-controls
+        "
+      >
+
+
+        ${[
+          1,
+          5,
+          10
+        ]
+          .map(
+            amount => `
+
+              <button
+                type="
+                  button
+                "
+                class="
+                  practical-batch-button
+                  ${
+                    batchSize ===
+                      amount
+
+                      ? "selected"
+
+                      : ""
+                  }
+                "
+                onclick="
+                  setKonohaPracticalBatchSize(
+                    ${amount}
+                  )
+                "
+              >
+                ×${amount}
+              </button>
+
+            `
+          )
+          .join("")}
+
+
+      </div>
+
+
+      <!-- =====================================
+           BEGIN TRAINING
+           ===================================== -->
+
+      <button
+        type="
+          button
+        "
+        class="
+          practical-begin-button
+        "
+        disabled
+        title="
+          Training execution connection pending gameplay-authority audit.
+        "
+      >
+        BEGIN TRAINING
+      </button>
+
+
+    </div>
+
+  `;
+
+
+  console.log(
+    "PRACTICAL TRAINING UI RENDERED:",
+    {
+
+      character:
+        data.selectedCharacterId,
+
+      discipline:
+        selectedDisciplineId,
+
+      batchSize:
+        batchSize,
+
+      canExecute:
+        data.canExecute
+
+    }
+  );
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// PRACTICAL SCREEN LAUNCHER
+// =========================================================
+
+
+function showKonohaPracticalUIScreen(
+  characterId = null
+) {
+
+
+  const opened =
+    openKonohaActivityUIScreen(
+      "practical",
+      characterId
+    );
+
+
+  if (
+    !opened ||
+    opened.success !==
+      true
+  ) {
+
+
+    return opened;
+
+  }
+
+
+  const rendered =
+    renderKonohaPracticalVisualScreen();
+
+
+  return {
+
+
+    success:
+      rendered === true,
+
+
+    serviceId:
+      "practical",
+
+
+    characterId:
+      getKonohaActivityUISessionState()
+        .characterId,
+
+
+    rendered:
+      rendered === true
+
+
+  };
+
+}
+
+
+// =========================================================
 // BRICK 233 — EXAM UI MODULE HEALTH CONTRACT
 // =========================================================
 //
@@ -51063,7 +51900,6 @@ function validateKonohaExamUISystem() {
 
 
   return checks;
-
 
 }
 
