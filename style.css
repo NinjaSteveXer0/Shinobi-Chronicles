@@ -7756,7 +7756,8 @@ body {
 
 
 /* =========================================================
-   SPECIAL NOTIFICATIONS PANEL
+   BRICK 341 — PRACTICAL SPECIAL NOTIFICATIONS
+   SCROLLABLE FEED AUTHORITY
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
@@ -7777,11 +7778,20 @@ body {
     height:
         24% !important;
 
-    overflow:
+    box-sizing:
+        border-box !important;
+
+    overflow-x:
         hidden !important;
 
+    overflow-y:
+        auto !important;
+
     pointer-events:
-        none !important;
+        auto !important;
+
+    padding-right:
+        4px !important;
 
     color:
         #e4c36d !important;
@@ -8518,29 +8528,6 @@ body {
 
     cursor:
         pointer !important;
-}
-
-
-#konoha-activity-screen[data-service-id="practical"]
-.practical-konoha-return::after {
-
-    content:
-        "← BACK TO KONOHA" !important;
-
-    display:
-        block !important;
-
-    color:
-        #e4c36d !important;
-
-    white-space:
-        nowrap !important;
-
-    visibility:
-        visible !important;
-
-    opacity:
-        1 !important;
 }
 
 
