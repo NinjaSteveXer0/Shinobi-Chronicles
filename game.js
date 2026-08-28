@@ -47158,7 +47158,7 @@ function renderKonohaActivityUIScreen(
 
 
 // =========================================================
-// BRICK 244 — KONOHA ACTIVITY UI OPEN + RENDER ROUTER
+// BRICK 304 — KONOHA ACTIVITY UI OPEN + RENDER ROUTER
 // =========================================================
 //
 // Canonical Activity UI entry point.
@@ -47179,7 +47179,6 @@ function showKonohaActivityUIScreen(
   // SHINOBI EXAMS
   // =========================================
 
-
   if (
     serviceId ===
       "exams"
@@ -47195,9 +47194,26 @@ function showKonohaActivityUIScreen(
 
 
   // =========================================
-  // GENERIC FALLBACK
+  // PRACTICAL TRAINING
   // =========================================
 
+  if (
+    serviceId ===
+      "practical"
+  ) {
+
+
+    return showKonohaPracticalUIScreen(
+      characterId
+    );
+
+
+  }
+
+
+  // =========================================
+  // GENERIC FALLBACK
+  // =========================================
 
   const sessionResult =
     openKonohaActivityUIScreen(
