@@ -7647,6 +7647,430 @@ body {
         ) !important;
 }
 
+/* =========================================================
+   BRICK 328 — PRACTICAL FINE-TUNING CONTROL CENTRE
+   ========================================================= */
+
+/*
+   =========================================================
+   STEPHEN — THIS IS THE PRACTICAL POSITION CONTROL PANEL
+   =========================================================
+
+   When fine-tuning Practical later, COME HERE.
+
+   HOW POSITIONING WORKS:
+
+   left   = move LEFT / RIGHT
+   top    = move UP / DOWN
+   width  = make WIDER / NARROWER
+   height = make TALLER / SHORTER
+
+   For bottom controls:
+
+   right  = distance from RIGHT edge
+   bottom = distance from BOTTOM edge
+
+   Everything below overrides the earlier temporary Practical
+   geometry without touching gameplay logic.
+
+   =========================================================
+*/
+
+
+/* =========================================================
+   CHARACTER CARD
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-character-image-wrap {
+
+    left:
+        8% !important;
+
+    top:
+        2% !important;
+
+    width:
+        84% !important;
+
+    height:
+        36% !important;
+}
+
+
+/* =========================================================
+   CHARACTER ARROWS
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-character-selector {
+
+    left:
+        -10% !important;
+
+    top:
+        50% !important;
+
+    width:
+        120% !important;
+}
+
+
+/* =========================================================
+   POWER LEVEL NUMBER
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-character-pl {
+
+    left:
+        10% !important;
+
+    top:
+        48% !important;
+
+    width:
+        80% !important;
+}
+
+
+/* =========================================================
+   POWER LEVEL PROGRESS BAR
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-character-pl-progress {
+
+    left:
+        12% !important;
+
+    top:
+        64% !important;
+
+    width:
+        76% !important;
+
+    height:
+        7px !important;
+}
+
+
+/* =========================================================
+   SPECIAL NOTIFICATIONS PANEL
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-special-feed {
+
+    position:
+        absolute !important;
+
+    left:
+        7% !important;
+
+    top:
+        72% !important;
+
+    width:
+        86% !important;
+
+    height:
+        24% !important;
+
+    overflow:
+        hidden !important;
+
+    pointer-events:
+        none !important;
+
+    color:
+        #e4c36d !important;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-size:
+        clamp(
+            7px,
+            0.62vw,
+            11px
+        ) !important;
+
+    line-height:
+        1.25 !important;
+}
+
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-special-notification {
+
+    margin-bottom:
+        7px !important;
+}
+
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-special-notification-title {
+
+    color:
+        #e4c36d !important;
+
+    font-weight:
+        900 !important;
+
+    letter-spacing:
+        0.04em !important;
+}
+
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-special-notification-detail {
+
+    margin-top:
+        2px !important;
+
+    color:
+        #d7c58d !important;
+}
+
+
+/* =========================================================
+   ALL THREE DISCIPLINE PANELS
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-stack {
+
+    left:
+        29% !important;
+
+    top:
+        10% !important;
+
+    width:
+        68% !important;
+
+    height:
+        75% !important;
+}
+
+
+/* =========================================================
+   TAIJUTSU PANEL
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(1) {
+
+    top:
+        0 !important;
+}
+
+
+/* =========================================================
+   BUKIJUTSU PANEL
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2) {
+
+    top:
+        34.5% !important;
+}
+
+
+/* =========================================================
+   SURVIVAL PANEL
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3) {
+
+    top:
+        69% !important;
+}
+
+
+/* =========================================================
+   CURRENT MASTERY NUMBERS
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-mastery {
+
+    left:
+        9% !important;
+
+    top:
+        57% !important;
+}
+
+
+/* =========================================================
+   DISCIPLINE EXP TEXT
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-exp {
+
+    left:
+        28% !important;
+
+    top:
+        58% !important;
+}
+
+
+/* =========================================================
+   DISCIPLINE EXP PROGRESS BARS
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-progress-track {
+
+    left:
+        25% !important;
+
+    top:
+        78% !important;
+
+    width:
+        24% !important;
+
+    height:
+        6px !important;
+}
+
+
+/* =========================================================
+   ORDINARY TRAINING RESULT
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-stage {
+
+    position:
+        absolute !important;
+
+    left:
+        31% !important;
+
+    bottom:
+        1.2% !important;
+
+    width:
+        34% !important;
+
+    min-height:
+        2.5% !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    pointer-events:
+        none !important;
+
+    color:
+        #45e5e9 !important;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-size:
+        clamp(
+            8px,
+            0.72vw,
+            13px
+        ) !important;
+
+    font-weight:
+        800 !important;
+
+    text-align:
+        center !important;
+}
+
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-stage.empty {
+
+    visibility:
+        hidden !important;
+}
+
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-stage.visible {
+
+    visibility:
+        visible !important;
+}
+
+
+/* =========================================================
+   BEGIN TRAINING
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button {
+
+    left:
+        48% !important;
+
+    bottom:
+        3.5% !important;
+}
+
+
+/* =========================================================
+   ×1 / ×5 / ×10 GROUP
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-controls {
+
+    right:
+        4% !important;
+
+    bottom:
+        3.5% !important;
+
+    gap:
+        18px !important;
+}
+
+
+/* =========================================================
+   PRACTICAL BACK TO KONOHA
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-konoha-return {
+
+    left:
+        6% !important;
+
+    top:
+        0.75% !important;
+}
+
+
 
 
 /* =========================================================

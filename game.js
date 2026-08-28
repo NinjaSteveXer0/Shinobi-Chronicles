@@ -52758,6 +52758,530 @@ function showKonohaPracticalUIScreen(
 
 
 // =========================================================
+// BRICK 329 — PRACTICAL UI MODULE HEALTH CONTRACT
+// =========================================================
+//
+// Validates the permanent Practical UI authorities.
+//
+// Does NOT execute training.
+// Does NOT alter progression.
+// Does NOT alter saved player data.
+//
+// =========================================================
+
+
+function validateKonohaPracticalUISystem() {
+
+
+  const data =
+    getKonohaPracticalUIScreenData(
+      "naruto"
+    );
+
+
+  const style =
+    ensureKonohaPracticalUIStyles();
+
+
+  const checks = {
+
+
+    styleAuthority:
+      !!(
+        style &&
+        style.id ===
+          "konoha-practical-ui-styles"
+      ),
+
+
+    practicalData:
+      !!(
+        data &&
+        data.screen ===
+          "practical"
+      ),
+
+
+    attemptState:
+      !!(
+        KONOHA_PRACTICAL_UI_STATE &&
+        typeof KONOHA_PRACTICAL_UI_STATE ===
+          "object"
+      ),
+
+
+    disciplineSelection:
+      typeof selectKonohaPracticalDiscipline ===
+        "function",
+
+
+    batchSelection:
+      typeof setKonohaPracticalBatchSize ===
+        "function",
+
+
+    batchAccess:
+      typeof getKonohaPracticalBatchSize ===
+        "function",
+
+
+    characterSelection:
+      typeof changeKonohaPracticalCharacter ===
+        "function",
+
+
+    resultReset:
+      typeof clearKonohaPracticalResultPresentation ===
+        "function",
+
+
+    executionAuthority:
+      typeof executeKonohaPracticalTraining ===
+        "function",
+
+
+    screenComposer:
+      typeof renderKonohaPracticalVisualScreen ===
+        "function",
+
+
+    screenLauncher:
+      typeof showKonohaPracticalUIScreen ===
+        "function",
+
+
+    returnBridge:
+      typeof returnToKonohaFromActivityUI ===
+        "function"
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "KONOHA PRACTICAL UI MODULE HEALTH:",
+    checks
+  );
+
+
+  return checks;
+
+}
+
+
+// =========================================================
+// BRICK 330 — PRACTICAL RENDERED VISUAL HEALTH CONTRACT
+// =========================================================
+//
+// Run AFTER Practical is visible.
+//
+// Validates the live Practical DOM only.
+//
+// Does NOT execute training.
+// Does NOT alter progression.
+// Does NOT move UI geometry.
+//
+// =========================================================
+
+
+function validateKonohaPracticalVisualSystem() {
+
+
+  const root =
+    getKonohaActivityUIRoot();
+
+
+  const practicalScreen =
+    root &&
+    root.querySelector(
+      ".konoha-practical-screen"
+    );
+
+
+  const background =
+    root &&
+    root.querySelector(
+      ".practical-background"
+    );
+
+
+  const characterPanel =
+    root &&
+    root.querySelector(
+      ".practical-character-panel"
+    );
+
+
+  const characterImage =
+    root &&
+    root.querySelector(
+      ".practical-character-image"
+    );
+
+
+  const characterSelector =
+    root &&
+    root.querySelector(
+      ".practical-character-selector"
+    );
+
+
+  const powerLevel =
+    root &&
+    root.querySelector(
+      ".practical-character-pl"
+    );
+
+
+  const powerProgress =
+    root &&
+    root.querySelector(
+      ".practical-character-pl-progress"
+    );
+
+
+  const disciplinePanels =
+    root
+      ? Array.from(
+          root.querySelectorAll(
+            ".practical-discipline-select"
+          )
+        )
+      : [];
+
+
+  const masteryValues =
+    root
+      ? root.querySelectorAll(
+          ".practical-mastery"
+        ).length
+      : 0;
+
+
+  const disciplineExpValues =
+    root
+      ? root.querySelectorAll(
+          ".practical-discipline-exp"
+        ).length
+      : 0;
+
+
+  const progressTracks =
+    root
+      ? root.querySelectorAll(
+          ".practical-progress-track"
+        ).length
+      : 0;
+
+
+  const resultStage =
+    root &&
+    root.querySelector(
+      ".practical-result-stage"
+    );
+
+
+  const batchControls =
+    root &&
+    root.querySelector(
+      ".practical-batch-controls"
+    );
+
+
+  const batchButtons =
+    root
+      ? root.querySelectorAll(
+          ".practical-batch-button"
+        ).length
+      : 0;
+
+
+  const beginButton =
+    root &&
+    root.querySelector(
+      ".practical-begin-button"
+    );
+
+
+  const returnButton =
+    root &&
+    root.querySelector(
+      ".practical-konoha-return"
+    );
+
+
+  const specialFeed =
+    root &&
+    root.querySelector(
+      ".practical-special-feed"
+    );
+
+
+  const checks = {
+
+
+    correctService:
+      !!(
+        root &&
+        root.dataset.serviceId ===
+          "practical"
+      ),
+
+
+    practicalScreen:
+      !!practicalScreen,
+
+
+    background:
+      !!background,
+
+
+    characterPanel:
+      !!characterPanel,
+
+
+    characterImage:
+      !!characterImage,
+
+
+    characterSelector:
+      !!characterSelector,
+
+
+    powerLevel:
+      !!powerLevel,
+
+
+    powerProgress:
+      !!powerProgress,
+
+
+    disciplinePanels:
+      disciplinePanels.length ===
+        3,
+
+
+    masteryValues:
+      masteryValues ===
+        3,
+
+
+    disciplineExpValues:
+      disciplineExpValues ===
+        3,
+
+
+    progressTracks:
+      progressTracks ===
+        3,
+
+
+    resultStage:
+      !!resultStage,
+
+
+    batchControls:
+      !!batchControls,
+
+
+    batchButtons:
+      batchButtons ===
+        3,
+
+
+    beginButton:
+      !!beginButton,
+
+
+    returnButton:
+      !!returnButton,
+
+
+    specialFeed:
+      !!specialFeed
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "KONOHA PRACTICAL VISUAL HEALTH:",
+    checks
+  );
+
+
+  return checks;
+
+}
+
+
+// =========================================================
+// BRICK 331 — PRACTICAL FINAL READINESS CHECK
+// =========================================================
+//
+// Final Practical checkpoint before Battle UI.
+//
+// Combines:
+// - module authority health
+// - rendered visual health
+// - interaction state validity
+//
+// Does NOT execute training.
+//
+// =========================================================
+
+
+function validateKonohaPracticalFinalReadiness() {
+
+
+  const moduleHealth =
+    validateKonohaPracticalUISystem();
+
+
+  const visualHealth =
+    validateKonohaPracticalVisualSystem();
+
+
+  const selectedDiscipline =
+    KONOHA_PRACTICAL_UI_STATE
+      .disciplineId;
+
+
+  const batchSize =
+    getKonohaPracticalBatchSize();
+
+
+  const validDisciplines = [
+    "tai",
+    "buki",
+    "stamina"
+  ];
+
+
+  const checks = {
+
+
+    moduleHealthy:
+      moduleHealth.healthy ===
+        true,
+
+
+    visualHealthy:
+      visualHealth.healthy ===
+        true,
+
+
+    validDiscipline:
+      validDisciplines.includes(
+        selectedDiscipline
+      ),
+
+
+    validBatchSize:
+      [
+        1,
+        5,
+        10
+      ].includes(
+        batchSize
+      ),
+
+
+    trainingAuthority:
+      typeof performDisciplineTraining ===
+        "function",
+
+
+    executionBridge:
+      typeof executeKonohaPracticalTraining ===
+        "function",
+
+
+    resultPresentation:
+      typeof renderKonohaPracticalResultSummary ===
+        "function",
+
+
+    notificationPresentation:
+      typeof renderKonohaPracticalSpecialNotifications ===
+        "function",
+
+
+    notificationRecording:
+      typeof recordKonohaPracticalSpecialNotifications ===
+        "function"
+
+
+  };
+
+
+  checks.healthy =
+    Object.values(
+      checks
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.log(
+    "========================================"
+  );
+
+  console.log(
+    "PRACTICAL FINAL READINESS:",
+    checks
+  );
+
+  console.log(
+    checks.healthy
+      ? "PRACTICAL READY — CLEARED FOR BATTLE UI"
+      : "PRACTICAL NOT READY — CHECK FAILED AUTHORITY"
+  );
+
+  console.log(
+    "========================================"
+  );
+
+
+  return {
+
+    healthy:
+      checks.healthy,
+
+    checks:
+      checks,
+
+    module:
+      moduleHealth,
+
+    visual:
+      visualHealth
+
+  };
+
+}
+
+
+// =========================================================
 // BRICK 233 — EXAM UI MODULE HEALTH CONTRACT
 // =========================================================
 //
