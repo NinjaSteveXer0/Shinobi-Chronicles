@@ -7997,16 +7997,16 @@ body {
         fixed !important;
 
     left:
-        15.6% !important;
+        15% !important;
 
     top:
         73.8% !important;
 
     width:
-        16.8% !important;
+        19% !important;
 
     height:
-        17.0% !important;
+        23% !important;
 
     box-sizing:
         border-box !important;
@@ -8046,6 +8046,9 @@ body {
 
     z-index:
         16 !important;
+
+        outline: 1px solid red !important;
+background: rgba(255, 0, 0, 0.08) !important;
 
 }
 
