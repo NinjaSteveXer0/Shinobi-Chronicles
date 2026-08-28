@@ -6848,10 +6848,10 @@ body {
 .exam-discipline-exp-label {
 
     left:
-        16.5% !important;
+        18% !important;
 
     top:
-        57% !important;
+        63% !important;
 
 }
 
@@ -6869,6 +6869,14 @@ body {
 
     top:
         57% !important;
+
+}
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-exp-label {
+
+    display:
+        none !important;
 
 }
 
