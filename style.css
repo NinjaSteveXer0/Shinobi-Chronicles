@@ -7258,10 +7258,10 @@ body {
 .practical-konoha-return {
 
     left:
-        1.5% !important;
+        6% !important;
 
     top:
-        1.5% !important;
+        4% !important;
 
     min-width:
         17% !important;
@@ -7281,22 +7281,17 @@ body {
     justify-content:
         center !important;
 
-    border:
-        1px solid
-        rgba(
-            211,
-            169,
-            66,
-            0.36
-        ) !important;
-
     background:
-        rgba(
-            2,
-            7,
-            9,
-            0.58
-        ) !important;
+    transparent !important;
+
+border:
+    none !important;
+
+outline:
+    none !important;
+
+box-shadow:
+    none !important;
 
     color:
         #e4c36d !important;
