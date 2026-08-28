@@ -7008,16 +7008,16 @@ body {
 .practical-discipline-select:nth-child(2) {
 
     left:
-        0% !important;
+        3% !important;
 
     top:
-        34.5% !important;
+        38% !important;
 
     width:
         100% !important;
 
     height:
-        31% !important;
+        30.5% !important;
 }
 
 
@@ -7038,7 +7038,7 @@ body {
         0% !important;
 
     top:
-        69% !important;
+        72% !important;
 
     width:
         100% !important;
@@ -7910,10 +7910,41 @@ body {
 .practical-mastery {
 
     left:
-        9% !important;
+        15.25% !important;
 
     top:
-        57% !important;
+        67.5% !important;
+}
+
+/* =========================================================
+   BUKIJUTSU MASTERY NUMBER — MANUAL CALIBRATION
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2)
+.practical-mastery {
+
+    left:
+        16.25% !important;
+
+    top:
+        67% !important;
+}
+
+
+/* =========================================================
+   STAMINA MASTERY NUMBER — MANUAL CALIBRATION
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3)
+.practical-mastery {
+
+    left:
+        15.25% !important;
+
+    top:
+        65% !important;
 }
 
 
@@ -8076,8 +8107,16 @@ body {
 
 
 /* =========================================================
-   BEGIN TRAINING
+   BRICK 335 — BEGIN TRAINING FINE-TUNING AUTHORITY
    ========================================================= */
+
+/*
+   left = LEFT / RIGHT
+   top  = UP / DOWN
+
+   Higher top = DOWN
+   Lower top  = UP
+*/
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-begin-button {
@@ -8085,8 +8124,14 @@ body {
     left:
         48% !important;
 
+    top:
+        88.5% !important;
+
+    right:
+        auto !important;
+
     bottom:
-        3.5% !important;
+        auto !important;
 }
 
 
@@ -8094,17 +8139,31 @@ body {
    ×1 / ×5 / ×10 GROUP
    ========================================================= */
 
+/*
+   FINAL FINE-TUNING AUTHORITY
+
+   left = move entire group LEFT / RIGHT
+   top  = move entire group UP / DOWN
+   gap  = spacing between ×1 / ×5 / ×10
+*/
+
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-controls {
 
+    left:
+        70% !important;
+
+    top:
+        89.5% !important;
+
     right:
-        4% !important;
+        auto !important;
 
     bottom:
-        3.5% !important;
+        auto !important;
 
     gap:
-        18px !important;
+        26px !important;
 }
 
 
