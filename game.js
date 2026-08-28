@@ -47771,11 +47771,22 @@ function renderKonohaExamDisciplineStack(
 // =========================================================
 // BRICK 229 — EXAM CHARACTER SELECTION INTERACTION
 // =========================================================
-
+//
+// Changing shinobi immediately retires temporary Exam
+// result presentation.
+//
+// Persistent progression and Special Notifications remain.
+//
+// =========================================================
 
 function changeKonohaExamCharacter(
   direction
 ) {
+
+
+  clearKonohaExamResultPresentation(
+    false
+  );
 
 
   const character =
@@ -47786,9 +47797,7 @@ function changeKonohaExamCharacter(
 
   if (!character) {
 
-
     return false;
-
 
   }
 
@@ -47803,7 +47812,6 @@ function changeKonohaExamCharacter(
 
 
   return true;
-
 
 }
 
@@ -47825,24 +47833,15 @@ function changeKonohaExamCharacter(
 //
 // Runtime interaction state for the active Exam UI.
 //
-// Owns:
+// Permanent progression remains elsewhere.
 //
-// - selected discipline
-// - selected batch size
-// - most recently resolved batch
-// - result-stage metadata
-// - active Special Notifications
-// - recent Special Notification history
-// - history-panel state
+// Result presentation is temporary:
 //
-// Does NOT own:
-//
-// - character progression
-// - Exam difficulty
-// - pass/fail resolution
-// - Activity History
-// - permanent Shinobi Records
-// - Chronicle consequences themselves
+// - appears after an Exam batch
+// - animates briefly
+// - automatically retires
+// - disappears immediately on character change
+// - is replaced by the next Exam result
 //
 // =========================================================
 
@@ -47867,9 +47866,164 @@ const KONOHA_EXAM_ATTEMPT_STATE = {
     [],
 
   specialNotificationHistoryOpen:
-    false
+    false,
+
+  resultVisible:
+    false,
+
+  resultPresentationToken:
+    0,
+
+  resultDismissTimer:
+    null
 
 };
+
+
+// =========================================================
+// CLEAR EXAM RESULT PRESENTATION
+// =========================================================
+
+function clearKonohaExamResultPresentation(
+  rerender = false
+) {
+
+
+  if (
+    KONOHA_EXAM_ATTEMPT_STATE
+      .resultDismissTimer !==
+    null
+  ) {
+
+
+    clearTimeout(
+      KONOHA_EXAM_ATTEMPT_STATE
+        .resultDismissTimer
+    );
+
+
+    KONOHA_EXAM_ATTEMPT_STATE
+      .resultDismissTimer =
+        null;
+
+  }
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .resultPresentationToken +=
+      1;
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .resultVisible =
+      false;
+
+
+  if (rerender) {
+
+    renderKonohaExamVisualScreen();
+
+  }
+
+
+  return true;
+
+}
+
+
+// =========================================================
+// SHOW TEMPORARY EXAM RESULT
+// =========================================================
+//
+// CSS owns:
+// - letter bounce
+// - linger
+// - exit animation
+//
+// JS owns:
+// - actual presentation lifetime
+// - stale timer protection
+//
+// =========================================================
+
+function showKonohaExamResultPresentation(
+  duration = 2800
+) {
+
+
+  if (
+    KONOHA_EXAM_ATTEMPT_STATE
+      .resultDismissTimer !==
+    null
+  ) {
+
+
+    clearTimeout(
+      KONOHA_EXAM_ATTEMPT_STATE
+        .resultDismissTimer
+    );
+
+  }
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .resultPresentationToken +=
+      1;
+
+
+  const token =
+    KONOHA_EXAM_ATTEMPT_STATE
+      .resultPresentationToken;
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .resultVisible =
+      true;
+
+
+  KONOHA_EXAM_ATTEMPT_STATE
+    .resultDismissTimer =
+      setTimeout(
+        () => {
+
+
+          if (
+            KONOHA_EXAM_ATTEMPT_STATE
+              .resultPresentationToken !==
+            token
+          ) {
+
+            return;
+
+          }
+
+
+          KONOHA_EXAM_ATTEMPT_STATE
+            .resultVisible =
+              false;
+
+
+          KONOHA_EXAM_ATTEMPT_STATE
+            .resultDismissTimer =
+              null;
+
+
+          renderKonohaExamVisualScreen();
+
+
+        },
+        Math.max(
+          800,
+          Number(
+            duration
+          ) || 2800
+        )
+      );
+
+
+  return true;
+
+}
 
 // =========================================================
 // BRICK 265 — EXAM DISCIPLINE SELECTION
@@ -48982,10 +49136,74 @@ function executeKonohaExamBatch(
 }
 
 // =========================================================
+// EXAM RESULT ANIMATED LETTERS
+// =========================================================
+
+function renderKonohaExamAnimatedResultText(
+  text
+) {
+
+
+  return Array.from(
+    String(
+      text || ""
+    )
+  )
+    .map(
+      (
+        character,
+        index
+      ) => {
+
+
+        const visibleCharacter =
+          character === " "
+            ? "&nbsp;"
+            : character;
+
+
+        return `
+
+          <span
+            class="
+              exam-result-letter
+            "
+            style="
+              --exam-result-letter-index:
+              ${index};
+            "
+            aria-hidden="
+              true
+            "
+          >
+            ${visibleCharacter}
+          </span>
+
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+// =========================================================
 // EXAM RESULT STAGE RENDERER
 // =========================================================
 
 function renderKonohaExamResultStrip() {
+
+
+  if (
+    KONOHA_EXAM_ATTEMPT_STATE
+      .resultVisible !==
+    true
+  ) {
+
+    return "";
+
+  }
 
 
   const results =
@@ -49007,7 +49225,6 @@ function renderKonohaExamResultStrip() {
       0
   ) {
 
-
     return "";
 
   }
@@ -49027,7 +49244,6 @@ function renderKonohaExamResultStrip() {
     session.characterId !==
       meta.characterId
   ) {
-
 
     return "";
 
@@ -49147,6 +49363,7 @@ function renderKonohaExamResultStrip() {
         resultClass =
           "pass";
 
+
       }
       else {
 
@@ -49157,6 +49374,7 @@ function renderKonohaExamResultStrip() {
 
         resultClass =
           "fail";
+
 
       }
 
@@ -49189,6 +49407,7 @@ function renderKonohaExamResultStrip() {
 
               : "mixed"
           );
+
 
   }
 
@@ -49239,6 +49458,7 @@ function renderKonohaExamResultStrip() {
       powerResultClass =
         "level-up";
 
+
     }
     else {
 
@@ -49281,12 +49501,14 @@ function renderKonohaExamResultStrip() {
             2
           )}%`;
 
+
       }
       else {
 
 
         powerResult =
           "NO PL DEVELOPMENT";
+
 
       }
 
@@ -49311,8 +49533,13 @@ function renderKonohaExamResultStrip() {
           exam-result-primary
           ${resultClass}
         "
+        aria-label="
+          ${primaryResult}
+        "
       >
-        ${primaryResult}
+        ${renderKonohaExamAnimatedResultText(
+          primaryResult
+        )}
       </div>
 
 
@@ -49362,6 +49589,7 @@ function renderKonohaExamResultStrip() {
           : ""
       }
 
+
     </div>
 
   `;
@@ -49371,6 +49599,11 @@ function renderKonohaExamResultStrip() {
 
 // =========================================================
 // BEGIN EXAM FROM UI
+// =========================================================
+//
+// Every new Exam retires the previous temporary result
+// before producing the next one.
+//
 // =========================================================
 
 function beginKonohaExamFromUI() {
@@ -49432,6 +49665,15 @@ function beginKonohaExamFromUI() {
   }
 
 
+  // =========================================
+  // RETIRE PREVIOUS RESULT
+  // =========================================
+
+  clearKonohaExamResultPresentation(
+    false
+  );
+
+
   const disciplineId =
     getKonohaExamSelectedDisciplineId();
 
@@ -49463,6 +49705,24 @@ function beginKonohaExamFromUI() {
       disciplineId,
       batchSize
     );
+
+
+  // =========================================
+  // TEMPORARY RESULT PRESENTATION
+  // =========================================
+
+  if (
+    results.length >
+      0
+  ) {
+
+
+    showKonohaExamResultPresentation(
+      2800
+    );
+
+
+  }
 
 
   renderKonohaExamVisualScreen();
@@ -49497,6 +49757,7 @@ function beginKonohaExamFromUI() {
   };
 
 }
+
 
 // =========================================================
 // BRICK 273 — EXAM GAMEPLAY REGRESSION

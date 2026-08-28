@@ -7257,27 +7257,20 @@ body {
 
 
 /* =========================================================
-   BRICK 301 — EXAM RESULT STAGE
+   BRICK 301 — EXAM RESULT STAGE / TRANSIENT FEEDBACK
    ========================================================= */
 
 /*
-   Bottom ornamental seal result authority.
+   Result lifecycle:
 
-   Idle:
-   - no DOM result
-   - baked seal remains visually empty
+   1. Individual letters bounce into place.
+   2. Result remains readable briefly.
+   3. Entire result drops slightly and fades away.
+   4. JS removes the presentation after 2.8 seconds.
 
-   ×1:
-   - PASS / FAIL
-
-   ×5 / ×10:
-   - compact PASS / FAIL summary
-
-   Secondary presentation:
-   - earned discipline EXP
-   - real PL development consequence
-
-   Special Notifications remain separate.
+   Result also disappears immediately when:
+   - changing shinobi
+   - beginning another Exam
 */
 
 
@@ -7333,6 +7326,12 @@ body {
     z-index:
         22 !important;
 
+    animation:
+        exam-result-stage-lifecycle
+        2.8s
+        ease
+        both !important;
+
 }
 
 
@@ -7348,6 +7347,15 @@ body {
 
     padding:
         0 !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        baseline !important;
+
+    justify-content:
+        center !important;
 
     font-size:
         clamp(
@@ -7378,6 +7386,44 @@ body {
             0,
             0,
             0.92
+        ) !important;
+
+}
+
+
+/* =========================================
+   INDIVIDUAL BOUNCING LETTER
+   ========================================= */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-result-letter {
+
+    display:
+        inline-block !important;
+
+    min-width:
+        0 !important;
+
+    transform-origin:
+        center bottom !important;
+
+    animation:
+        exam-result-letter-bounce
+        460ms
+        cubic-bezier(
+            0.22,
+            1.35,
+            0.45,
+            1
+        )
+        both !important;
+
+    animation-delay:
+        calc(
+            var(
+                --exam-result-letter-index
+            ) *
+            34ms
         ) !important;
 
 }
@@ -7527,6 +7573,16 @@ body {
             0.9
         ) !important;
 
+    opacity:
+        0;
+
+    animation:
+        exam-result-detail-arrive
+        320ms
+        ease
+        420ms
+        forwards !important;
+
 }
 
 
@@ -7564,6 +7620,16 @@ body {
 
     white-space:
         nowrap !important;
+
+    opacity:
+        0;
+
+    animation:
+        exam-result-detail-arrive
+        320ms
+        ease
+        520ms
+        forwards !important;
 
 }
 
@@ -7619,6 +7685,136 @@ body {
 
     font-weight:
         700 !important;
+
+}
+
+
+/* =========================================
+   LETTER BOUNCE
+   ========================================= */
+
+@keyframes exam-result-letter-bounce {
+
+    0% {
+
+        opacity:
+            0;
+
+        transform:
+            translateY(14px)
+            scale(0.68);
+
+    }
+
+    48% {
+
+        opacity:
+            1;
+
+        transform:
+            translateY(-7px)
+            scale(1.12);
+
+    }
+
+    72% {
+
+        transform:
+            translateY(3px)
+            scale(0.96);
+
+    }
+
+    88% {
+
+        transform:
+            translateY(-2px)
+            scale(1.03);
+
+    }
+
+    100% {
+
+        opacity:
+            1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+/* =========================================
+   SECONDARY DETAIL ARRIVAL
+   ========================================= */
+
+@keyframes exam-result-detail-arrive {
+
+    from {
+
+        opacity:
+            0;
+
+        transform:
+            translateY(5px);
+
+    }
+
+    to {
+
+        opacity:
+            1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================
+   WHOLE RESULT EXIT
+   ========================================= */
+
+@keyframes exam-result-stage-lifecycle {
+
+    0%,
+    72% {
+
+        opacity:
+            1;
+
+        transform:
+            translateX(-50%)
+            translateY(0);
+
+    }
+
+    84% {
+
+        opacity:
+            1;
+
+        transform:
+            translateX(-50%)
+            translateY(0);
+
+    }
+
+    100% {
+
+        opacity:
+            0;
+
+        transform:
+            translateX(-50%)
+            translateY(18px);
+
+    }
 
 }
 
@@ -7997,10 +8193,10 @@ body {
         fixed !important;
 
     left:
-        13.5% !important;
+        14% !important;
 
     top:
-        75.25% !important;
+        78% !important;
 
     width:
         19.25% !important;
@@ -8046,6 +8242,9 @@ body {
 
     z-index:
         16 !important;
+
+        outline: 1px solid red !important;
+background: rgba(255, 0, 0, 0.08) !important;
 
 }
 
