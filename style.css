@@ -6511,7 +6511,7 @@ body {
 
 
 /* =========================================================
-   BRICK 314 — PRACTICAL TRAINING REFERENCE CANVAS
+   BRICK 319 — PRACTICAL TRAINING FINAL REFERENCE CANVAS
    ========================================================= */
 
 /*
@@ -6519,9 +6519,22 @@ body {
 
    Exams remains untouched.
 
-   practical.png ratio:
+   practical.png:
    1536 × 1440
    = 16 : 15
+
+   This Brick owns:
+   - reference canvas
+   - baked Practical artwork
+   - character sleeve
+   - character navigation
+   - Power Level
+   - PL progress
+   - discipline interaction geometry
+   - live mastery / EXP
+   - discipline progress
+   - Begin Training
+   - batch controls
 */
 
 
@@ -6632,42 +6645,33 @@ body {
 }
 
 
-/*
-   All live Practical controls sit above baked artwork.
-*/
-
-#konoha-activity-screen[data-service-id="practical"]
-.konoha-practical-screen > *:not(.practical-background) {
-
-    position:
-        absolute;
-
-    z-index:
-        5;
-}
-
-
-/* =========================================
-   TEMP CHARACTER CARD PLACEMENT
-
-   Intentionally rough for first rendering test.
-   Final calibration comes AFTER test.
-   ========================================= */
+/* =========================================================
+   CHARACTER SLEEVE
+   ========================================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-panel {
 
+    position:
+        absolute !important;
+
     left:
-        2.8%;
+        2.8% !important;
 
     top:
-        7%;
+        7% !important;
 
     width:
-        25%;
+        25% !important;
 
     height:
-        88%;
+        88% !important;
+
+    overflow:
+        visible !important;
+
+    z-index:
+        5 !important;
 }
 
 
@@ -6711,6 +6715,10 @@ body {
 }
 
 
+/* =========================================================
+   CHARACTER NAVIGATION
+   ========================================================= */
+
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-selector {
 
@@ -6737,6 +6745,9 @@ body {
 
     pointer-events:
         none !important;
+
+    z-index:
+        8 !important;
 }
 
 
@@ -6744,6 +6755,9 @@ body {
 .practical-character-arrow {
 
     border:
+        none !important;
+
+    outline:
         none !important;
 
     background:
@@ -6770,12 +6784,15 @@ body {
 }
 
 
-/* =========================================
-   TEMP LIVE VALUES
-   ========================================= */
+/* =========================================================
+   POWER LEVEL
+   ========================================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-pl {
+
+    position:
+        absolute !important;
 
     left:
         10% !important;
@@ -6807,6 +6824,9 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-pl-progress {
 
+    position:
+        absolute !important;
+
     left:
         12% !important;
 
@@ -6830,20 +6850,54 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-pl-progress-fill {
 
+    display:
+        block !important;
+
     height:
         100% !important;
 
     background:
         #45e5e9 !important;
+
+    box-shadow:
+        0 0 8px
+        rgba(
+            69,
+            229,
+            233,
+            0.48
+        ) !important;
+
+    transition:
+        width 280ms ease !important;
 }
 
 
-/* =========================================
-   DISCIPLINE STACK — TEMP ALIGNMENT
-   ========================================= */
+/* =========================================================
+   DISCIPLINE STACK — INDEPENDENT ROW CALIBRATION
+   ========================================================= */
+
+/*
+   Parent establishes the Practical discipline coordinate space.
+
+   Each discipline owns independent:
+   - left
+   - top
+   - width
+   - height
+
+   This allows surgical alignment against practical.png
+   without moving the other two disciplines.
+
+   Gameplay selection remains owned by game.js.
+*/
+
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-stack {
+
+    position:
+        absolute !important;
 
     left:
         29% !important;
@@ -6856,8 +6910,24 @@ body {
 
     height:
         75% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    overflow:
+        visible !important;
+
+    z-index:
+        6 !important;
 }
 
+
+/* ---------------------------------------------------------
+   COMMON DISCIPLINE INTERACTION AUTHORITY
+   --------------------------------------------------------- */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select {
@@ -6865,52 +6935,121 @@ body {
     position:
         absolute !important;
 
-    left:
+    margin:
         0 !important;
 
-    width:
-        100% !important;
-
-    height:
-        31% !important;
+    padding:
+        0 !important;
 
     border:
         none !important;
 
+    outline:
+        none !important;
+
     background:
         transparent !important;
+
+    box-shadow:
+        none !important;
 
     cursor:
         pointer !important;
 
     color:
         #ffffff !important;
+
+    box-sizing:
+        border-box !important;
 }
 
+
+/* =========================================================
+   TAIJUTSU
+   ========================================================= */
+
+/*
+   MANUAL CALIBRATION
+
+   left   = move Taijutsu LEFT / RIGHT
+   top    = move Taijutsu UP / DOWN
+   width  = Taijutsu interaction width
+   height = Taijutsu interaction height
+*/
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(1) {
 
+    left:
+        0% !important;
+
     top:
-        0 !important;
+        0% !important;
+
+    width:
+        100% !important;
+
+    height:
+        31% !important;
 }
 
+
+/* =========================================================
+   BUKIJUTSU
+   ========================================================= */
+
+/*
+   MANUAL CALIBRATION
+
+   Independent from Taijutsu and Survival.
+*/
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(2) {
 
+    left:
+        0% !important;
+
     top:
         34.5% !important;
+
+    width:
+        100% !important;
+
+    height:
+        31% !important;
 }
 
+
+/* =========================================================
+   SURVIVAL
+   ========================================================= */
+
+/*
+   MANUAL CALIBRATION
+
+   Independent from Taijutsu and Bukijutsu.
+*/
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(3) {
 
+    left:
+        0% !important;
+
     top:
         69% !important;
+
+    width:
+        100% !important;
+
+    height:
+        31% !important;
 }
 
+/* =========================================================
+   LIVE DISCIPLINE VALUES
+   ========================================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-mastery {
@@ -6924,6 +7063,12 @@ body {
     top:
         57% !important;
 
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
     color:
         #dfc777 !important;
 
@@ -6936,6 +7081,12 @@ body {
 
     font-weight:
         800 !important;
+
+    line-height:
+        1 !important;
+
+    pointer-events:
+        none !important;
 }
 
 
@@ -6951,6 +7102,12 @@ body {
     top:
         58% !important;
 
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
     color:
         #45e5e9 !important;
 
@@ -6960,8 +7117,15 @@ body {
             0.65vw,
             12px
         ) !important;
+
+    pointer-events:
+        none !important;
 }
 
+
+/* =========================================================
+   DISCIPLINE PROGRESS
+   ========================================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-progress-track {
@@ -6981,112 +7145,508 @@ body {
     height:
         6px !important;
 
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
     overflow:
         hidden !important;
 
+    border:
+        none !important;
+
     background:
         transparent !important;
+
+    pointer-events:
+        none !important;
 }
 
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-progress-fill {
 
+    display:
+        block !important;
+
     height:
         100% !important;
 
+    max-width:
+        100% !important;
+
     background:
-        #45e5e9 !important;
+        linear-gradient(
+            90deg,
+            #087a84,
+            #14cbd4,
+            #46f0ed
+        ) !important;
+
+    box-shadow:
+        0 0 10px
+        rgba(
+            0,
+            225,
+            235,
+            0.5
+        ) !important;
+
+    transition:
+        width 0.35s ease !important;
 }
 
 
-/* =========================================
-   TEMP ACTION CONTROLS
-   ========================================= */
+/* =========================================================
+   BRICK 321 — PRACTICAL FINAL ACTION ZONE
+   ========================================================= */
+
+/*
+   Baked practical.png owns:
+
+   - BEGIN TRAINING frame
+   - ×1 / ×5 / ×10 slots
+   - borders
+   - decorative artwork
+
+   Live DOM owns:
+
+   - click targets
+   - text
+   - selected state
+   - hover state
+
+   NO live black boxes.
+   NO live gold rectangles.
+
+   Fine tuning is deliberately obvious.
+*/
+
+
+/* =========================================================
+   BEGIN TRAINING — FINAL POSITION AUTHORITY
+   ========================================================= */
+
+/*
+   MANUAL FINE TUNE
+
+   left   = move button LEFT / RIGHT
+   top    = move button UP / DOWN
+   width  = clickable width
+   height = clickable height
+*/
 
 #konoha-activity-screen[data-service-id="practical"]
-.practical-batch-controls {
+.practical-begin-button {
 
-    right:
-        4% !important;
+    position:
+        absolute !important;
 
-    bottom:
-        3.5% !important;
+    left:
+        50% !important;
+
+    top:
+        90.2% !important;
+
+    width:
+        24% !important;
+
+    height:
+        6.5% !important;
+
+    transform:
+        translateX(-50%) !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
 
     display:
         flex !important;
 
-    gap:
-        18px !important;
-}
+    align-items:
+        center !important;
 
+    justify-content:
+        center !important;
 
-#konoha-activity-screen[data-service-id="practical"]
-.practical-batch-button {
+    appearance:
+        none !important;
 
     border:
+        none !important;
+
+    border-radius:
+        0 !important;
+
+    outline:
         none !important;
 
     background:
         transparent !important;
 
+    box-shadow:
+        none !important;
+
     color:
-        #e4c36d !important;
+        #55e8eb !important;
+
+    font-size:
+        clamp(
+            15px,
+            1.45vw,
+            25px
+        ) !important;
+
+    font-weight:
+        900 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.04em !important;
+
+    white-space:
+        nowrap !important;
+
+    text-shadow:
+        0 1px 4px
+        rgba(
+            0,
+            0,
+            0,
+            0.92
+        ) !important;
+
+    cursor:
+        pointer !important;
+
+    box-sizing:
+        border-box !important;
+
+    z-index:
+        20 !important;
+}
+
+
+/* ---------------------------------------------------------
+   BEGIN TRAINING HOVER
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:hover {
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    color:
+        #8af6f3 !important;
+
+    text-shadow:
+        0 0 8px
+        rgba(
+            69,
+            229,
+            233,
+            0.58
+        ),
+
+        0 1px 4px
+        rgba(
+            0,
+            0,
+            0,
+            0.92
+        ) !important;
+}
+
+
+/* ---------------------------------------------------------
+   BEGIN TRAINING DISABLED
+
+   Visual presentation stays readable while JS execution
+   remains intentionally disabled until gameplay wiring.
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:disabled {
+
+    opacity:
+        0.72 !important;
+
+    cursor:
+        default !important;
+
+}
+
+
+/* =========================================================
+   ×1 / ×5 / ×10 — FINAL POSITION AUTHORITY
+   ========================================================= */
+
+/*
+   MANUAL FINE TUNE
+
+   left = move complete group LEFT / RIGHT
+   top  = move complete group UP / DOWN
+   gap  = distance between ×1 / ×5 / ×10
+*/
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-controls {
+
+    position:
+        absolute !important;
+
+    left:
+        79.2% !important;
+
+    top:
+        89.8% !important;
+
+    right:
+        auto !important;
+
+    bottom:
+        auto !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        row !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    flex-wrap:
+        nowrap !important;
+
+    gap:
+        26px !important;
+
+    width:
+        max-content !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    white-space:
+        nowrap !important;
+
+    z-index:
+        20 !important;
+
+    pointer-events:
+        auto !important;
+}
+
+
+/* =========================================================
+   INDIVIDUAL BATCH BUTTONS
+   ========================================================= */
+
+/*
+   Live buttons are transparent hitboxes.
+
+   Baked artwork owns their visible boxes.
+*/
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button {
+
+    min-width:
+        clamp(
+            44px,
+            3.7vw,
+            66px
+        ) !important;
+
+    height:
+        clamp(
+            32px,
+            2.8vw,
+            46px
+        ) !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 8px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    appearance:
+        none !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    border-radius:
+        0 !important;
+
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    color:
+        #e5c66d !important;
 
     font-size:
         clamp(
             14px,
-            1.3vw,
+            1.25vw,
             22px
         ) !important;
 
     font-weight:
         900 !important;
 
+    line-height:
+        1 !important;
+
+    white-space:
+        nowrap !important;
+
+    text-shadow:
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.90
+        ) !important;
+
     cursor:
         pointer !important;
+
+    box-sizing:
+        border-box !important;
+
+    pointer-events:
+        auto !important;
 }
 
 
-#konoha-activity-screen[data-service-id="practical"]
-.practical-batch-button.selected {
-
-    color:
-        #45e5e9 !important;
-}
-
+/* ---------------------------------------------------------
+   BATCH HOVER
+   --------------------------------------------------------- */
 
 #konoha-activity-screen[data-service-id="practical"]
-.practical-begin-button {
-
-    left:
-        48% !important;
-
-    bottom:
-        3.5% !important;
-
-    transform:
-        translateX(-50%) !important;
-
-    border:
-        none !important;
+.practical-batch-button:hover {
 
     background:
         transparent !important;
 
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+
     color:
-        #45e5e9 !important;
+        #fff0a8 !important;
 
-    font-size:
-        clamp(
-            15px,
-            1.5vw,
-            25px
+    text-shadow:
+        0 0 7px
+        rgba(
+            231,
+            197,
+            104,
+            0.44
+        ),
+
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.90
         ) !important;
-
-    font-weight:
-        900 !important;
 }
+
+
+/* ---------------------------------------------------------
+   SELECTED BATCH
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button.selected,
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button.active {
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    color:
+        #55e8eb !important;
+
+    text-shadow:
+        0 0 7px
+        rgba(
+            69,
+            229,
+            233,
+            0.60
+        ),
+
+        0 1px 3px
+        rgba(
+            0,
+            0,
+            0,
+            0.90
+        ) !important;
+}
+
 
 
 /* =========================================================
@@ -7117,10 +7677,10 @@ body {
         absolute !important;
 
     left:
-        1.5% !important;
+        5% !important;
 
     top:
-        7.2% !important;
+        2.5% !important;
 
     width:
         14% !important;
