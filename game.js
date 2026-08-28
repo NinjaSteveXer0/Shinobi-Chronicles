@@ -51081,18 +51081,29 @@ function showKonohaExamUIScreen(
 
 }
 
-
 // =========================================================
-// PRACTICAL TRAINING UI INTERACTION STATE
+// BRICK 322 — PRACTICAL INTERACTION + ATTEMPT STATE
 // =========================================================
 //
-// UI state only.
+// Single Practical runtime UI authority.
+//
+// Owns:
+// - selected Practical discipline
+// - requested batch size
+// - most recent genuine training batch
+// - batch result metadata
+// - temporary result visibility
 //
 // DOES NOT own:
-// - progression
-// - EXP rewards
-// - training resolution
+// - Discipline EXP calculation
+// - Discipline level-ups
+// - stat growth
 // - PL calculation
+// - persistence
+// - training resolution
+//
+// Existing progression authorities retain those
+// responsibilities.
 //
 // =========================================================
 
@@ -51103,9 +51114,157 @@ const KONOHA_PRACTICAL_UI_STATE = {
     "tai",
 
   batchSize:
-    1
+    1,
+
+  lastBatch:
+    [],
+
+  lastBatchMeta:
+    null,
+
+  resultVisible:
+    false
 
 };
+
+
+// =========================================================
+// PRACTICAL STATE ACCESS
+// =========================================================
+
+
+function getKonohaPracticalAttemptState() {
+
+
+  return KONOHA_PRACTICAL_UI_STATE;
+
+}
+
+
+// =========================================================
+// PRACTICAL SELECTED DISCIPLINE ACCESS
+// =========================================================
+
+
+function getKonohaPracticalSelectedDisciplineId() {
+
+
+  const validDisciplines = [
+    "tai",
+    "buki",
+    "stamina"
+  ];
+
+
+  if (
+    !validDisciplines.includes(
+      KONOHA_PRACTICAL_UI_STATE
+        .disciplineId
+    )
+  ) {
+
+
+    KONOHA_PRACTICAL_UI_STATE
+      .disciplineId =
+        "tai";
+
+  }
+
+
+  return KONOHA_PRACTICAL_UI_STATE
+    .disciplineId;
+
+}
+
+
+// =========================================================
+// PRACTICAL BATCH SIZE ACCESS
+// =========================================================
+
+
+function getKonohaPracticalBatchSize() {
+
+
+  const requested =
+    Number(
+      KONOHA_PRACTICAL_UI_STATE
+        .batchSize
+    );
+
+
+  return [
+    1,
+    5,
+    10
+  ].includes(
+    requested
+  )
+
+    ? requested
+
+    : 1;
+
+}
+
+
+// =========================================================
+// PRACTICAL RESULT PRESENTATION RESET
+// =========================================================
+
+
+function clearKonohaPracticalResultPresentation(
+  rerender = true
+) {
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .resultVisible =
+      false;
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .lastBatch =
+      [];
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .lastBatchMeta =
+      null;
+
+
+  if (
+    rerender === true &&
+    typeof renderKonohaPracticalVisualScreen ===
+      "function"
+  ) {
+
+
+    renderKonohaPracticalVisualScreen();
+
+  }
+
+
+  return true;
+
+}
+
+
+
+// =========================================================
+// BRICK 324 — PRACTICAL INTERACTION STATE LIFECYCLE
+// =========================================================
+//
+// Owns Practical UI interaction changes:
+//
+// - discipline selection
+// - batch selection
+// - character selection
+// - stale result cleanup
+//
+// Training execution remains owned by BRICK 323.
+// Progression remains owned by the existing Training Engine.
+//
+// =========================================================
 
 
 // =========================================================
@@ -51131,6 +51290,7 @@ function selectKonohaPracticalDiscipline(
     )
   ) {
 
+
     console.log(
       "Invalid Practical discipline:",
       disciplineId
@@ -51142,12 +51302,31 @@ function selectKonohaPracticalDiscipline(
   }
 
 
+  /*
+     A result belongs to the discipline that produced it.
+
+     Changing discipline therefore immediately retires any
+     previous Practical result before the new discipline is
+     rendered.
+  */
+
+  clearKonohaPracticalResultPresentation(
+    false
+  );
+
+
   KONOHA_PRACTICAL_UI_STATE
     .disciplineId =
       disciplineId;
 
 
   renderKonohaPracticalVisualScreen();
+
+
+  console.log(
+    "PRACTICAL DISCIPLINE SELECTED:",
+    disciplineId
+  );
 
 
   return true;
@@ -51171,22 +51350,44 @@ function setKonohaPracticalBatchSize(
     );
 
 
+  const normalized =
+    [
+      1,
+      5,
+      10
+    ].includes(
+      requested
+    )
+
+      ? requested
+
+      : 1;
+
+
+  /*
+     Batch selection changes the next requested action.
+
+     Any previous result is retired so old feedback cannot
+     be mistaken for the newly selected batch.
+  */
+
+  clearKonohaPracticalResultPresentation(
+    false
+  );
+
+
   KONOHA_PRACTICAL_UI_STATE
     .batchSize =
-      [
-        1,
-        5,
-        10
-      ].includes(
-        requested
-      )
-
-        ? requested
-
-        : 1;
+      normalized;
 
 
   renderKonohaPracticalVisualScreen();
+
+
+  console.log(
+    "PRACTICAL BATCH SIZE SELECTED:",
+    normalized
+  );
 
 
   return true;
@@ -51204,6 +51405,17 @@ function changeKonohaPracticalCharacter(
 ) {
 
 
+  /*
+     A result belongs to the shinobi that produced it.
+
+     Kill the old result before changing character.
+  */
+
+  clearKonohaPracticalResultPresentation(
+    false
+  );
+
+
   const character =
     cycleKonohaSelectedCharacter(
       direction
@@ -51211,6 +51423,7 @@ function changeKonohaPracticalCharacter(
 
 
   if (!character) {
+
 
     return false;
 
@@ -51232,18 +51445,733 @@ function changeKonohaPracticalCharacter(
 
 
 // =========================================================
-// PRACTICAL TRAINING VISUAL SCREEN
+// BRICK 325 — PRACTICAL EXECUTION + RESULT AUTHORITY
 // =========================================================
 //
-// First-class Practical presentation.
+// Connects Practical to the existing unified Training Engine.
 //
-// Background:
-// Assets/Backgrounds/practical.png
+// Owns:
+// - genuine ×1 / ×5 / ×10 execution
+// - before / after PL snapshots
+// - batch result storage
+// - significant Practical notifications
 //
-// Existing data authorities remain untouched.
+// DOES NOT own:
+// - EXP calculation
+// - Discipline level-ups
+// - stat growth
+// - PL calculation
+// - persistence
 //
-// BEGIN TRAINING remains disabled until the real existing
-// training execution/progression authority is audited.
+// performDisciplineTraining() remains gameplay authority.
+//
+// =========================================================
+
+
+function buildKonohaPracticalSpecialNotifications(
+  characterId
+) {
+
+
+  const meta =
+    KONOHA_PRACTICAL_UI_STATE
+      .lastBatchMeta;
+
+
+  const results =
+    Array.isArray(
+      KONOHA_PRACTICAL_UI_STATE
+        .lastBatch
+    )
+
+      ? KONOHA_PRACTICAL_UI_STATE
+          .lastBatch
+
+      : [];
+
+
+  const notifications =
+    [];
+
+
+  if (
+    !meta ||
+    meta.characterId !==
+      characterId
+  ) {
+
+
+    return notifications;
+
+  }
+
+
+  const successfulResults =
+    results.filter(
+      result =>
+        result &&
+        result.success ===
+          true
+    );
+
+
+  if (
+    successfulResults.length ===
+      0
+  ) {
+
+
+    return notifications;
+
+  }
+
+
+  const firstResult =
+    successfulResults[0];
+
+
+  const finalResult =
+    successfulResults[
+      successfulResults.length - 1
+    ];
+
+
+  const previousLevel =
+    Number(
+      firstResult.previousLevel
+    ) || 0;
+
+
+  const newLevel =
+    Number(
+      finalResult.newLevel
+    ) || previousLevel;
+
+
+  if (
+    newLevel >
+      previousLevel
+  ) {
+
+
+    notifications.push({
+
+      id:
+        `practical-mastery-${characterId}-${meta.disciplineId}-${newLevel}-${Date.now()}`,
+
+      characterId:
+        characterId,
+
+      type:
+        "mastery",
+
+      title:
+        "MASTERY INCREASED",
+
+      detail:
+        `${String(
+          finalResult.disciplineName ||
+          meta.disciplineId
+        ).toUpperCase()} ${previousLevel} → ${newLevel}`,
+
+      timestamp:
+        Date.now()
+
+    });
+
+  }
+
+
+  if (
+    meta.beforePL &&
+    meta.afterPL
+  ) {
+
+
+    const plBefore =
+      Number(
+        meta.beforePL.displayedPL
+      ) || 0;
+
+
+    const plAfter =
+      Number(
+        meta.afterPL.displayedPL
+      ) || plBefore;
+
+
+    if (
+      plAfter >
+        plBefore
+    ) {
+
+
+      notifications.push({
+
+        id:
+          `practical-power-${characterId}-${plAfter}-${Date.now()}`,
+
+        characterId:
+          characterId,
+
+        type:
+          "power",
+
+        title:
+          "POWER LEVEL INCREASED",
+
+        detail:
+          `POWER LEVEL ${plBefore} → ${plAfter}`,
+
+        timestamp:
+          Date.now()
+
+      });
+
+    }
+
+  }
+
+
+  return notifications;
+
+}
+
+
+// =========================================================
+// RECORD PRACTICAL SPECIAL NOTIFICATIONS
+// =========================================================
+
+
+function recordKonohaPracticalSpecialNotifications(
+  characterId
+) {
+
+
+  const notifications =
+    buildKonohaPracticalSpecialNotifications(
+      characterId
+    );
+
+
+  if (
+    notifications.length ===
+      0
+  ) {
+
+
+    return [];
+
+  }
+
+
+  const existingHistory =
+    Array.isArray(
+      KONOHA_PRACTICAL_UI_STATE
+        .specialNotificationHistory
+    )
+
+      ? KONOHA_PRACTICAL_UI_STATE
+          .specialNotificationHistory
+
+      : [];
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .specialNotificationHistory = [
+
+      ...notifications,
+      ...existingHistory
+
+    ];
+
+
+  const characterHistory =
+    KONOHA_PRACTICAL_UI_STATE
+      .specialNotificationHistory
+      .filter(
+        notification =>
+          notification &&
+          notification.characterId ===
+            characterId
+      )
+      .slice(
+        0,
+        10
+      );
+
+
+  const otherCharacterHistory =
+    KONOHA_PRACTICAL_UI_STATE
+      .specialNotificationHistory
+      .filter(
+        notification =>
+          notification &&
+          notification.characterId !==
+            characterId
+      );
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .specialNotificationHistory = [
+
+      ...characterHistory,
+      ...otherCharacterHistory
+
+    ];
+
+
+  return notifications;
+
+}
+
+
+// =========================================================
+// PRACTICAL SPECIAL NOTIFICATION RENDERER
+// =========================================================
+
+
+function renderKonohaPracticalSpecialNotifications(
+  characterId
+) {
+
+
+  const history =
+    (
+      Array.isArray(
+        KONOHA_PRACTICAL_UI_STATE
+          .specialNotificationHistory
+      )
+
+        ? KONOHA_PRACTICAL_UI_STATE
+            .specialNotificationHistory
+
+        : []
+    )
+      .filter(
+        notification =>
+          notification &&
+          notification.characterId ===
+            characterId
+      )
+      .slice(
+        0,
+        10
+      );
+
+
+  if (
+    history.length ===
+      0
+  ) {
+
+
+    return "";
+
+  }
+
+
+  return history
+    .map(
+      notification => `
+
+        <div
+          class="
+            practical-special-notification
+            practical-special-notification-${notification.type}
+          "
+        >
+
+          <div
+            class="
+              practical-special-notification-title
+            "
+          >
+            ${notification.title}
+          </div>
+
+          <div
+            class="
+              practical-special-notification-detail
+            "
+          >
+            ${notification.detail}
+          </div>
+
+        </div>
+
+      `
+    )
+    .join("");
+
+}
+
+
+// =========================================================
+// PRACTICAL ORDINARY RESULT SUMMARY
+// =========================================================
+
+
+function renderKonohaPracticalResultSummary() {
+
+
+  if (
+    KONOHA_PRACTICAL_UI_STATE
+      .resultVisible !==
+        true
+  ) {
+
+
+    return "";
+
+  }
+
+
+  const results =
+    Array.isArray(
+      KONOHA_PRACTICAL_UI_STATE
+        .lastBatch
+    )
+
+      ? KONOHA_PRACTICAL_UI_STATE
+          .lastBatch
+
+      : [];
+
+
+  const successfulResults =
+    results.filter(
+      result =>
+        result &&
+        result.success ===
+          true
+    );
+
+
+  if (
+    successfulResults.length ===
+      0
+  ) {
+
+
+    const failedResult =
+      results.find(
+        result =>
+          result &&
+          result.success !==
+            true
+      );
+
+
+    return failedResult &&
+      failedResult.reason
+
+      ? `TRAINING UNAVAILABLE — ${failedResult.reason}`
+
+      : "TRAINING UNAVAILABLE";
+
+  }
+
+
+  const totalExp =
+    successfulResults.reduce(
+      (
+        total,
+        result
+      ) =>
+        total +
+        (
+          Number(
+            result.expGained
+          ) || 0
+        ),
+      0
+    );
+
+
+  const disciplineName =
+    String(
+      successfulResults[
+        successfulResults.length - 1
+      ].disciplineName ||
+      getKonohaPracticalSelectedDisciplineId()
+    ).toUpperCase();
+
+
+  return `+${totalExp} ${disciplineName} EXP`;
+
+}
+
+
+// =========================================================
+// PRACTICAL TRAINING EXECUTION
+// =========================================================
+
+
+function executeKonohaPracticalTraining() {
+
+
+  const session =
+    getKonohaActivityUISessionState();
+
+
+  if (
+    !session ||
+    !session.characterId
+  ) {
+
+
+    console.log(
+      "Practical training failed: no selected character."
+    );
+
+
+    return {
+      success:
+        false,
+
+      reason:
+        "No selected character."
+    };
+
+  }
+
+
+  const characterId =
+    session.characterId;
+
+
+  const disciplineId =
+    getKonohaPracticalSelectedDisciplineId();
+
+
+  const batchSize =
+    getKonohaPracticalBatchSize();
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (!character) {
+
+
+    return {
+      success:
+        false,
+
+      reason:
+        "Selected character could not be loaded."
+    };
+
+  }
+
+
+  clearKonohaPracticalResultPresentation(
+    false
+  );
+
+
+  const beforePL =
+    getCharacterPLProgress(
+      character
+    );
+
+
+  const results =
+    [];
+
+
+  let successfulAttempts =
+    0;
+
+
+  let failedAttempts =
+    0;
+
+
+  for (
+    let attemptIndex = 0;
+    attemptIndex < batchSize;
+    attemptIndex += 1
+  ) {
+
+
+    const result =
+      performDisciplineTraining(
+        characterId,
+        disciplineId,
+        "practical"
+      );
+
+
+    results.push(
+      result
+    );
+
+
+    if (
+      result &&
+      result.success ===
+        true
+    ) {
+
+
+      successfulAttempts +=
+        1;
+
+    } else {
+
+
+      failedAttempts +=
+        1;
+
+
+      break;
+
+    }
+
+  }
+
+
+  const afterPL =
+    getCharacterPLProgress(
+      character
+    );
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .lastBatch =
+      results;
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .lastBatchMeta = {
+
+      characterId:
+        characterId,
+
+      disciplineId:
+        disciplineId,
+
+      requestedBatchSize:
+        batchSize,
+
+      completedAttempts:
+        results.length,
+
+      successfulAttempts:
+        successfulAttempts,
+
+      failedAttempts:
+        failedAttempts,
+
+      beforePL: {
+
+        rawPL:
+          beforePL.rawPL,
+
+        displayedPL:
+          beforePL.displayedPL,
+
+        nextPL:
+          beforePL.nextPL,
+
+        progressPercent:
+          beforePL.progressPercent
+
+      },
+
+      afterPL: {
+
+        rawPL:
+          afterPL.rawPL,
+
+        displayedPL:
+          afterPL.displayedPL,
+
+        nextPL:
+          afterPL.nextPL,
+
+        progressPercent:
+          afterPL.progressPercent
+
+      }
+
+    };
+
+
+  KONOHA_PRACTICAL_UI_STATE
+    .resultVisible =
+      results.length >
+        0;
+
+
+  recordKonohaPracticalSpecialNotifications(
+    characterId
+  );
+
+
+  renderKonohaPracticalVisualScreen();
+
+
+  console.log(
+    "PRACTICAL TRAINING BATCH COMPLETE:",
+    KONOHA_PRACTICAL_UI_STATE
+      .lastBatchMeta
+  );
+
+
+  return {
+
+    success:
+      successfulAttempts >
+        0,
+
+    characterId:
+      characterId,
+
+    disciplineId:
+      disciplineId,
+
+    requestedAttempts:
+      batchSize,
+
+    completedAttempts:
+      results.length,
+
+    successfulAttempts:
+      successfulAttempts,
+
+    failedAttempts:
+      failedAttempts,
+
+    results:
+      results
+
+  };
+
+}
+
+
+// =========================================================
+// BRICK 326 — PRACTICAL LIVE TRAINING VISUAL SCREEN
+// =========================================================
+//
+// Final live Practical renderer.
+//
+// Owns:
+// - live character presentation
+// - live PL presentation
+// - live Discipline presentation
+// - batch controls
+// - ordinary training result
+// - Special Notifications
+// - BEGIN TRAINING interaction
+//
+// Gameplay progression remains external.
 //
 // =========================================================
 
@@ -51282,13 +52210,11 @@ function renderKonohaPracticalVisualScreen() {
 
 
   const selectedDisciplineId =
-    KONOHA_PRACTICAL_UI_STATE
-      .disciplineId;
+    getKonohaPracticalSelectedDisciplineId();
 
 
   const batchSize =
-    KONOHA_PRACTICAL_UI_STATE
-      .batchSize;
+    getKonohaPracticalBatchSize();
 
 
   const character =
@@ -51326,6 +52252,16 @@ function renderKonohaPracticalVisualScreen() {
           plProgress.progressPercent
         ) || 0
       )
+    );
+
+
+  const resultSummary =
+    renderKonohaPracticalResultSummary();
+
+
+  const specialNotifications =
+    renderKonohaPracticalSpecialNotifications(
+      data.selectedCharacterId
     );
 
 
@@ -51509,6 +52445,9 @@ function renderKonohaPracticalVisualScreen() {
             polite
           "
         >
+
+          ${specialNotifications}
+
         </div>
 
 
@@ -51614,6 +52553,29 @@ function renderKonohaPracticalVisualScreen() {
 
 
       <!-- =====================================
+           ORDINARY TRAINING RESULT
+           ===================================== -->
+
+      <div
+        class="
+          practical-result-stage
+          ${
+            resultSummary
+              ? "visible"
+              : "empty"
+          }
+        "
+        aria-live="
+          polite
+        "
+      >
+
+        ${resultSummary}
+
+      </div>
+
+
+      <!-- =====================================
            BATCH CONTROLS
            ===================================== -->
 
@@ -51652,6 +52614,12 @@ function renderKonohaPracticalVisualScreen() {
                     ${amount}
                   )
                 "
+                aria-pressed="
+                  ${
+                    batchSize ===
+                      amount
+                  }
+                "
               >
                 ×${amount}
               </button>
@@ -51675,9 +52643,11 @@ function renderKonohaPracticalVisualScreen() {
         class="
           practical-begin-button
         "
-        disabled
+        onclick="
+          executeKonohaPracticalTraining()
+        "
         title="
-          Training execution connection pending gameplay-authority audit.
+          Begin Practical Training
         "
       >
         BEGIN TRAINING
@@ -51715,7 +52685,22 @@ function renderKonohaPracticalVisualScreen() {
 
 
 // =========================================================
-// PRACTICAL SCREEN LAUNCHER
+// BRICK 327 — PRACTICAL SCREEN ENTRY LIFECYCLE
+// =========================================================
+//
+// Opening Practical starts a fresh presentation session.
+//
+// Persistent character progression remains untouched.
+//
+// Cleared on entry:
+// - old ordinary result
+// - old batch result metadata
+//
+// Preserved:
+// - selected discipline
+// - selected batch size
+// - persistent Special Notification history
+//
 // =========================================================
 
 
@@ -51743,29 +52728,29 @@ function showKonohaPracticalUIScreen(
   }
 
 
+  clearKonohaPracticalResultPresentation(
+    false
+  );
+
+
   const rendered =
     renderKonohaPracticalVisualScreen();
 
 
   return {
 
-
     success:
       rendered === true,
 
-
     serviceId:
       "practical",
-
 
     characterId:
       getKonohaActivityUISessionState()
         .characterId,
 
-
     rendered:
       rendered === true
-
 
   };
 
