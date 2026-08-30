@@ -55727,28 +55727,331 @@ function createCharacterCard(character) {
 
 
 
-// =========================================
-// BRICK 295 — BATTLE LIVE CANVAS FOUNDATION
-// =========================================
+// =========================================================
+// BRICK 296 — BATTLE ROSTER PRESENTATION PROJECTION
+// =========================================================
 //
-// Presentation only.
+// IMPORTANT:
 //
-// Reuses:
-// - currentBattle runtime authority
-// - selected Encounter / Enemy authority
-// - selected Region / Location context
-// - canonical Effective PL calculation
-// - existing closeOverlay() navigation
+// This is a presentation adapter only.
 //
-// Does NOT add:
-// - Skill resolution
+// The current source does not yet contain a canonical
+// six-slot deployment / formation authority.
+//
+// Therefore:
+// - playerTeam order is NOT persisted as deployment state
+// - this adapter does NOT own Active / Reserve mechanics
+// - it does NOT mutate playerTeam
+// - it exists only so the authored Battle sleeves can display
+//   the current team while the real deployment system remains
+//   a later authority
+//
+// Player visual order follows the approved Battle artwork:
+//
+// visual row 1 -> slot 3
+// visual row 2 -> slot 2
+// visual row 3 -> slot 1
+// visual row 4 -> slot 4
+// visual row 5 -> slot 5
+// visual row 6 -> slot 6
+//
+// =========================================================
+
+function getBattlePlayerSlotPresentation() {
+
+
+  const activePlayerId =
+    currentBattle.activePlayer &&
+    currentBattle.activePlayer.id
+      ? currentBattle.activePlayer.id
+      : null;
+
+
+  const slotRecords = [];
+
+
+  for (
+    let slotNumber = 1;
+    slotNumber <= 6;
+    slotNumber += 1
+  ) {
+
+
+    const member =
+      playerTeam[
+        slotNumber - 1
+      ] ||
+      null;
+
+
+    slotRecords.push({
+
+      slotNumber:
+        slotNumber,
+
+      member:
+        member,
+
+      active:
+        !!(
+          member &&
+          activePlayerId &&
+          member.id ===
+            activePlayerId
+        )
+
+    });
+  }
+
+
+  const visualOrder = [
+    3,
+    2,
+    1,
+    4,
+    5,
+    6
+  ];
+
+
+  return visualOrder.map(
+    slotNumber =>
+      slotRecords[
+        slotNumber - 1
+      ]
+  );
+}
+
+
+function getBattleEnemySlotPresentation() {
+
+
+  const enemy =
+    currentBattle.enemy ||
+    selectedEnemy ||
+    null;
+
+
+  const slots = [];
+
+
+  for (
+    let slotNumber = 1;
+    slotNumber <= 6;
+    slotNumber += 1
+  ) {
+
+
+    slots.push({
+
+      slotNumber:
+        slotNumber,
+
+      enemy:
+        slotNumber === 1
+          ? enemy
+          : null,
+
+      active:
+        slotNumber === 1 &&
+        !!enemy
+
+    });
+  }
+
+
+  return slots;
+}
+
+
+// =========================================================
+// BRICK 297 — LIVE BATTLE ROSTER SLEEVE RENDERER
+// =========================================================
+//
+// Uses existing character / enemy identity and image fields.
+//
+// Does NOT create:
+// - portrait asset authority
+// - deployment authority
+// - hidden enemy participants
+// - Remaining Battle PL for player characters
+//
+// Player rows therefore show Effective PL only.
+// Enemy Slot 1 may show current / max Battle Power because
+// those values already belong to currentBattle runtime state.
+//
+// =========================================================
+
+function renderBattleRosterSlot(
+  slot,
+  side
+) {
+
+
+  const isPlayer =
+    side ===
+    "player";
+
+
+  const participant =
+    isPlayer
+      ? slot.member
+      : slot.enemy;
+
+
+  const compact =
+    slot.slotNumber >= 4;
+
+
+  if (!participant) {
+
+
+    return `
+      <div
+        class="battle-live-roster-slot ${compact ? "compact" : "full"} is-empty"
+        data-side="${side}"
+        data-slot="${slot.slotNumber}"
+      >
+
+        <span class="battle-live-slot-number">
+          ${slot.slotNumber}
+        </span>
+
+      </div>
+    `;
+  }
+
+
+  const name =
+    participant.name ||
+    "UNKNOWN";
+
+
+  const image =
+    participant.image ||
+    "";
+
+
+  let primaryValue =
+    "";
+
+
+  let secondaryValue =
+    "";
+
+
+  if (isPlayer) {
+
+
+    primaryValue =
+      `EPL ${calculateEffectivePL(
+        participant
+      )}`;
+  }
+  else {
+
+
+    const currentPower =
+      Math.max(
+        0,
+        Number(
+          currentBattle.enemyPower
+        ) || 0
+      );
+
+
+    const maxPower =
+      Math.max(
+        currentPower,
+        Number(
+          currentBattle.enemyMaxPower
+        ) ||
+        Number(
+          participant.power
+        ) ||
+        0
+      );
+
+
+    primaryValue =
+      `BP ${currentPower}`;
+
+
+    secondaryValue =
+      `/ ${maxPower}`;
+  }
+
+
+  return `
+    <div
+      class="battle-live-roster-slot ${compact ? "compact" : "full"} ${slot.active ? "is-active" : ""}"
+      data-side="${side}"
+      data-slot="${slot.slotNumber}"
+      aria-current="${slot.active ? "true" : "false"}"
+    >
+
+      <span class="battle-live-slot-number">
+        ${slot.slotNumber}
+      </span>
+
+      ${
+        image
+          ? `
+              <img
+                class="battle-live-roster-portrait"
+                src="${image}"
+                alt="${name}"
+                draggable="false"
+              >
+            `
+          : ""
+      }
+
+      <div class="battle-live-roster-copy">
+
+        <div class="battle-live-roster-name">
+          ${name}
+        </div>
+
+        <div class="battle-live-roster-power">
+          ${primaryValue}
+          ${
+            secondaryValue
+              ? `<span>${secondaryValue}</span>`
+              : ""
+          }
+        </div>
+
+      </div>
+
+    </div>
+  `;
+}
+
+
+// =========================================================
+// BRICK 298 — LIVE SIX-SLOT BATTLE ROSTERS
+// =========================================================
+//
+// Extends Brick 295's live authored Battle canvas.
+//
+// Reads:
+// - currentBattle
+// - selected Enemy
+// - selected Region / Location
+// - existing playerTeam
+// - canonical calculateEffectivePL()
+//
+// Does NOT yet implement:
+// - turn order
+// - queue movement
+// - withdrawal transfer
+// - Active / Reserve mechanics
+// - Skill cards
 // - Conditions
-// - temporary Battle states
-// - turn sequencing
 // - Stamina mitigation
-// - new damage rules
 //
-// =========================================
+// =========================================================
 
 function renderCombatOverlay(
   container
@@ -55829,6 +56132,56 @@ function renderCombatOverlay(
     )
       ? currentBattle.battleLog
       : [];
+
+
+  const playerSlots =
+    getBattlePlayerSlotPresentation();
+
+
+  const enemySlots =
+    getBattleEnemySlotPresentation();
+
+
+  const activePlayerSlot =
+    playerSlots.find(
+      slot =>
+        slot &&
+        slot.active
+    ) ||
+    null;
+
+
+  const activeEnemySlot =
+    enemySlots.find(
+      slot =>
+        slot &&
+        slot.active
+    ) ||
+    null;
+
+
+  const playerRosterMarkup =
+    playerSlots
+      .map(
+        slot =>
+          renderBattleRosterSlot(
+            slot,
+            "player"
+          )
+      )
+      .join("");
+
+
+  const enemyRosterMarkup =
+    enemySlots
+      .map(
+        slot =>
+          renderBattleRosterSlot(
+            slot,
+            "enemy"
+          )
+      )
+      .join("");
 
 
   const regionLabel =
@@ -55916,12 +56269,28 @@ function renderCombatOverlay(
           </span>
         </div>
 
+        <div class="battle-live-roster battle-live-roster-player">
+          ${playerRosterMarkup}
+        </div>
+
+        <div class="battle-live-roster battle-live-roster-enemy">
+          ${enemyRosterMarkup}
+        </div>
+
         <div class="battle-live-active-label battle-live-active-player">
-          ACTIVE
+          ACTIVE: ${
+            activePlayerSlot
+              ? activePlayerSlot.slotNumber
+              : "—"
+          }
         </div>
 
         <div class="battle-live-active-label battle-live-active-enemy">
-          ACTIVE
+          ACTIVE: ${
+            activeEnemySlot
+              ? activeEnemySlot.slotNumber
+              : "—"
+          }
         </div>
 
         <div class="battle-live-power battle-live-power-player">
@@ -55959,7 +56328,6 @@ function renderCombatOverlay(
     </section>
   `;
 }
-
 
 // =========================================================
 // UI MODULE — VICTORY RESULTS SCREEN

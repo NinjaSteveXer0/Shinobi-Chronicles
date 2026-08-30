@@ -1174,18 +1174,9 @@ body {
    BRICK 295 — BATTLE LIVE CANVAS FOUNDATION
    ========================================================= */
 
-/*
-   The global overlay remains the navigation authority.
-   Combat temporarily promotes it to a full-screen Battle
-   presentation so the authored 1536×1024 canvas can fit
-   without inheriting the generic overlay padding/window.
-*/
-
 .screen-overlay.battle-live-open {
   padding: 0;
-
   background: #020507;
-
   backdrop-filter: none;
 }
 
@@ -1303,11 +1294,12 @@ body {
 
   color: #f4d27b;
 
-  font-size: clamp(
-    10px,
-    1.18vw,
-    20px
-  );
+  font-size:
+    clamp(
+      10px,
+      1.18vw,
+      20px
+    );
 
   font-weight: 900;
   letter-spacing: 0.055em;
@@ -1344,7 +1336,8 @@ body {
 
   width: 30%;
 
-  transform: translateX(-50%);
+  transform:
+    translateX(-50%);
 
   z-index: 5;
 
@@ -1368,11 +1361,12 @@ body {
     "Times New Roman",
     serif;
 
-  font-size: clamp(
-    14px,
-    1.75vw,
-    30px
-  );
+  font-size:
+    clamp(
+      14px,
+      1.75vw,
+      30px
+    );
 
   line-height: 1.05;
   letter-spacing: 0.055em;
@@ -1388,11 +1382,12 @@ body {
 
   color: #e6a74e;
 
-  font-size: clamp(
-    8px,
-    0.88vw,
-    15px
-  );
+  font-size:
+    clamp(
+      8px,
+      0.88vw,
+      15px
+    );
 
   font-weight: 700;
   letter-spacing: 0.035em;
@@ -1422,11 +1417,12 @@ body {
 
   color: #e9b95a;
 
-  font-size: clamp(
-    7px,
-    0.72vw,
-    12px
-  );
+  font-size:
+    clamp(
+      7px,
+      0.72vw,
+      12px
+    );
 
   font-weight: 900;
   letter-spacing: 0.065em;
@@ -1483,11 +1479,12 @@ body {
 .battle-live-status strong {
   color: #f0c36a;
 
-  font-size: clamp(
-    9px,
-    1.02vw,
-    17px
-  );
+  font-size:
+    clamp(
+      9px,
+      1.02vw,
+      17px
+    );
 
   letter-spacing: 0.06em;
 }
@@ -1498,11 +1495,12 @@ body {
 
   color: #60dfe9;
 
-  font-size: clamp(
-    6px,
-    0.58vw,
-    10px
-  );
+  font-size:
+    clamp(
+      6px,
+      0.58vw,
+      10px
+    );
 
   font-weight: 800;
   letter-spacing: 0.04em;
@@ -1530,11 +1528,12 @@ body {
 
   text-align: center;
 
-  font-size: clamp(
-    7px,
-    0.7vw,
-    12px
-  );
+  font-size:
+    clamp(
+      7px,
+      0.7vw,
+      12px
+    );
 
   font-weight: 900;
   letter-spacing: 0.055em;
@@ -1594,11 +1593,12 @@ body {
 
   color: #f7f4ec;
 
-  font-size: clamp(
-    22px,
-    3.45vw,
-    58px
-  );
+  font-size:
+    clamp(
+      22px,
+      3.45vw,
+      58px
+    );
 
   font-weight: 800;
   line-height: 0.95;
@@ -1615,11 +1615,12 @@ body {
 
   color: #ded6c7;
 
-  font-size: clamp(
-    6px,
-    0.72vw,
-    12px
-  );
+  font-size:
+    clamp(
+      6px,
+      0.72vw,
+      12px
+    );
 
   font-weight: 700;
   letter-spacing: 0.035em;
@@ -1656,11 +1657,12 @@ body {
 
   color: #efc26b;
 
-  font-size: clamp(
-    8px,
-    0.82vw,
-    14px
-  );
+  font-size:
+    clamp(
+      8px,
+      0.82vw,
+      14px
+    );
 
   font-weight: 900;
   letter-spacing: 0.075em;
@@ -1685,11 +1687,12 @@ body {
 
   color: #ddd6c8;
 
-  font-size: clamp(
-    6px,
-    0.63vw,
-    11px
-  );
+  font-size:
+    clamp(
+      6px,
+      0.63vw,
+      11px
+    );
 
   font-weight: 600;
   line-height: 1.3;
@@ -1717,6 +1720,372 @@ body {
     rgba(222, 175, 75, 0.42);
 
   border-radius: 999px;
+}
+
+
+/* =========================================================
+   BRICK 296 — BATTLE ROSTER SLOT GEOMETRY
+   ========================================================= */
+
+.battle-live-roster {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: 9;
+
+  pointer-events: none;
+}
+
+
+.battle-live-roster-slot {
+  position: absolute;
+
+  overflow: hidden;
+
+  pointer-events: none;
+}
+
+
+.battle-live-roster-slot.full {
+  height: 11.35%;
+}
+
+
+.battle-live-roster-slot.compact {
+  height: 6.15%;
+}
+
+
+.battle-live-roster-player
+.battle-live-roster-slot {
+  left: 0.95%;
+
+  width: 18.85%;
+}
+
+
+.battle-live-roster-enemy
+.battle-live-roster-slot {
+  left: 79.05%;
+
+  width: 19.7%;
+}
+
+
+.battle-live-roster-player
+[data-slot="3"],
+.battle-live-roster-enemy
+[data-slot="1"] {
+  top: 8.55%;
+}
+
+
+.battle-live-roster-player
+[data-slot="2"],
+.battle-live-roster-enemy
+[data-slot="2"] {
+  top: 20.65%;
+}
+
+
+.battle-live-roster-player
+[data-slot="1"],
+.battle-live-roster-enemy
+[data-slot="3"] {
+  top: 32.75%;
+}
+
+
+.battle-live-roster-player
+[data-slot="4"],
+.battle-live-roster-enemy
+[data-slot="4"] {
+  top: 45.35%;
+}
+
+
+.battle-live-roster-player
+[data-slot="5"],
+.battle-live-roster-enemy
+[data-slot="5"] {
+  top: 52.45%;
+}
+
+
+.battle-live-roster-player
+[data-slot="6"],
+.battle-live-roster-enemy
+[data-slot="6"] {
+  top: 59.45%;
+}
+
+
+/* =========================================================
+   BRICK 297 — LIVE ROSTER CONTENT
+   ========================================================= */
+
+.battle-live-slot-number {
+  position: absolute;
+
+  left: 1.5%;
+  top: 3%;
+
+  width: 12.3%;
+
+  aspect-ratio: 1 / 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 4;
+
+  color: #f4eee2;
+
+  font-size:
+    clamp(
+      7px,
+      0.82vw,
+      14px
+    );
+
+  font-weight: 900;
+  line-height: 1;
+
+  text-shadow:
+    0 2px 3px #000;
+}
+
+
+.battle-live-roster-player
+.battle-live-roster-slot.is-active
+.battle-live-slot-number {
+  color: #64e4f1;
+}
+
+
+.battle-live-roster-enemy
+.battle-live-roster-slot.is-active
+.battle-live-slot-number {
+  color: #ff7b5f;
+}
+
+
+.battle-live-roster-portrait {
+  position: absolute;
+
+  z-index: 2;
+
+  display: block;
+
+  object-fit: cover;
+  object-position: 50% 22%;
+
+  background:
+    rgba(2, 5, 7, 0.96);
+
+  filter:
+    contrast(1.03)
+    saturate(0.96);
+
+  user-select: none;
+
+  pointer-events: none;
+}
+
+
+.battle-live-roster-slot.full
+.battle-live-roster-portrait {
+  left: 13.2%;
+  top: 7.5%;
+
+  width: 26.5%;
+  height: 81%;
+}
+
+
+.battle-live-roster-slot.compact
+.battle-live-roster-portrait {
+  left: 13.5%;
+  top: 10%;
+
+  width: 19%;
+  height: 76%;
+}
+
+
+.battle-live-roster-copy {
+  position: absolute;
+
+  z-index: 3;
+
+  overflow: hidden;
+}
+
+
+.battle-live-roster-slot.full
+.battle-live-roster-copy {
+  left: 46%;
+  right: 5%;
+
+  top: 14%;
+  bottom: 12%;
+}
+
+
+.battle-live-roster-slot.compact
+.battle-live-roster-copy {
+  left: 40%;
+  right: 5%;
+
+  top: 14%;
+  bottom: 10%;
+}
+
+
+.battle-live-roster-name {
+  color: #eee9df;
+
+  font-size:
+    clamp(
+      7px,
+      0.82vw,
+      14px
+    );
+
+  font-weight: 800;
+  line-height: 1.15;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+
+  text-shadow:
+    0 2px 3px #000;
+}
+
+
+.battle-live-roster-power {
+  margin-top: 8%;
+
+  color: #d7cec0;
+
+  font-size:
+    clamp(
+      6px,
+      0.67vw,
+      11px
+    );
+
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: 0.02em;
+
+  white-space: nowrap;
+
+  text-shadow:
+    0 2px 3px #000;
+}
+
+
+.battle-live-roster-power span {
+  margin-left: 3%;
+
+  color: #aaa296;
+}
+
+
+.battle-live-roster-slot.compact
+.battle-live-roster-name {
+  font-size:
+    clamp(
+      6px,
+      0.7vw,
+      12px
+    );
+}
+
+
+.battle-live-roster-slot.compact
+.battle-live-roster-power {
+  margin-top: 5%;
+
+  font-size:
+    clamp(
+      5px,
+      0.58vw,
+      10px
+    );
+}
+
+
+.battle-live-roster-slot.is-empty
+.battle-live-slot-number {
+  color: #b9b1a4;
+
+  opacity: 0.82;
+}
+
+
+/* =========================================================
+   BRICK 298 — ACTIVE ROSTER PRESENTATION
+   ========================================================= */
+
+.battle-live-roster-slot.is-active::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 1px;
+
+  z-index: 5;
+
+  pointer-events: none;
+
+  border:
+    1px solid
+    transparent;
+}
+
+
+.battle-live-roster-player
+.battle-live-roster-slot.is-active::after {
+  border-color:
+    rgba(
+      66,
+      223,
+      239,
+      0.74
+    );
+
+  box-shadow:
+    inset
+    0 0 18px
+    rgba(28, 193, 214, 0.08),
+    0 0 12px
+    rgba(39, 220, 238, 0.16);
+}
+
+
+.battle-live-roster-enemy
+.battle-live-roster-slot.is-active::after {
+  border-color:
+    rgba(
+      239,
+      82,
+      55,
+      0.74
+    );
+
+  box-shadow:
+    inset
+    0 0 18px
+    rgba(205, 56, 30, 0.08),
+    0 0 12px
+    rgba(239, 75, 47, 0.14);
 }
 
 
