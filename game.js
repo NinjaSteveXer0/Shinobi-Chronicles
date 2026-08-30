@@ -632,9 +632,122 @@ const itemDatabase = {
     description:
       "Reusable shinobi wire used for guided projectiles, traps and other prepared techniques."
 
+  },
+
+
+  // =======================================================
+  // BRICK 338 — BATTLE POUCH CONSUMABLE PILOT
+  // =======================================================
+
+  field_recovery_pill: {
+
+    id:
+      "field_recovery_pill",
+
+    name:
+      "Field Recovery Pill",
+
+    type:
+      "consumable",
+
+    rarity:
+      "Common",
+
+    stackable:
+      true,
+
+    battleConsumable:
+      true,
+
+    battleEffect: {
+
+      kind:
+        "restore_underlying_battle_pl",
+
+      amount:
+        4
+
+    },
+
+    description:
+      "A field-use recovery pill that restores a small amount of underlying Remaining Battle PL without increasing Battle capacity."
+
+  },
+
+
+  standard_antidote: {
+
+    id:
+      "standard_antidote",
+
+    name:
+      "Standard Antidote",
+
+    type:
+      "consumable",
+
+    rarity:
+      "Common",
+
+    stackable:
+      true,
+
+    battleConsumable:
+      true,
+
+    battleEffect: {
+
+      kind:
+        "cure_compatible_condition",
+
+      conditionType:
+        "poison"
+
+    },
+
+    description:
+      "A standard field antidote. It resolves only Poison Conditions that explicitly accept this cure."
+
+  },
+
+
+  burn_treatment: {
+
+    id:
+      "burn_treatment",
+
+    name:
+      "Burn Treatment",
+
+    type:
+      "consumable",
+
+    rarity:
+      "Common",
+
+    stackable:
+      true,
+
+    battleConsumable:
+      true,
+
+    battleEffect: {
+
+      kind:
+        "cure_compatible_condition",
+
+      conditionType:
+        "burning"
+
+    },
+
+    description:
+      "A field treatment for burns. It resolves only Burning Conditions that explicitly accept this treatment."
+
   }
 
 };
+
 
 // =========================================================
 // ITEM DATABASE HELPERS
@@ -2378,6 +2491,109 @@ function createDefaultRunProgression() {
 
 
 // =========================================================
+// BRICK 339 — PERSISTENT BATTLE POUCH PREPARATION
+// =========================================================
+//
+// Persistent Inventory remains the quantity authority.
+//
+// This record stores only which Item stacks are PREPARED for
+// Battle. It does not copy quantities and is not a second
+// inventory.
+//
+// Maximum prepared stack identities: 3.
+//
+// =========================================================
+
+const BATTLE_POUCH_CAPACITY =
+  3;
+
+
+function normalizeBattlePouchSelection(
+  savedBattlePouch
+) {
+
+
+  const sourceIds =
+    Array.isArray(
+      savedBattlePouch
+    )
+
+      ? savedBattlePouch
+
+      : (
+          savedBattlePouch &&
+          Array.isArray(
+            savedBattlePouch.itemIds
+          )
+
+            ? savedBattlePouch.itemIds
+
+            : []
+        );
+
+
+  const itemIds =
+    [];
+
+
+  sourceIds.forEach(
+    itemId => {
+
+
+      if (
+        itemIds.length >=
+          BATTLE_POUCH_CAPACITY
+      ) {
+
+        return;
+      }
+
+
+      if (
+        typeof itemId !==
+          "string" ||
+        itemIds.includes(
+          itemId
+        )
+      ) {
+
+        return;
+      }
+
+
+      const definition =
+        getItemDefinition(
+          itemId
+        );
+
+
+      if (
+        !definition ||
+        definition.battleConsumable !==
+          true
+      ) {
+
+        return;
+      }
+
+
+      itemIds.push(
+        itemId
+      );
+    }
+  );
+
+
+  return {
+
+    itemIds:
+      itemIds
+
+  };
+}
+
+
+// =========================================================
 // DEFAULT PLAYER DATA
 // =========================================================
 
@@ -2394,6 +2610,11 @@ function createDefaultPlayerData() {
 
     inventory:
       [],
+
+    battlePouch:
+      normalizeBattlePouchSelection(
+        null
+      ),
 
     activityHistory:
       [],
@@ -2840,6 +3061,13 @@ function loadPlayerData() {
 
 
 
+      battlePouch:
+        normalizeBattlePouchSelection(
+          parsedData.battlePouch
+        ),
+
+
+
       activityHistory:
         Array.isArray(
           parsedData.activityHistory
@@ -2896,6 +3124,7 @@ function loadPlayerData() {
 
 let playerData =
   loadPlayerData();
+
 
 
 // =========================================================
@@ -3436,6 +3665,209 @@ function addItemToInventory(
   );
 
 }
+
+
+// =========================================================
+// BRICK 340 — INVENTORY STACK QUANTITY AUTHORITY
+// =========================================================
+//
+// Battle Items consume the real persistent Inventory stack.
+// No Battle-only quantity copy exists.
+//
+// =========================================================
+
+function getInventoryStackByItemId(
+  itemId
+) {
+
+
+  if (
+    !itemId ||
+    !playerData ||
+    !Array.isArray(
+      playerData.inventory
+    )
+  ) {
+
+    return null;
+  }
+
+
+  return (
+    playerData.inventory.find(
+      item =>
+        item &&
+        item.id ===
+          itemId &&
+        !item.instanceId
+    ) ||
+    null
+  );
+}
+
+
+function getInventoryStackQuantity(
+  itemId
+) {
+
+
+  const stack =
+    getInventoryStackByItemId(
+      itemId
+    );
+
+
+  return stack
+    ? Math.max(
+        0,
+        Math.floor(
+          Number(
+            stack.quantity
+          ) || 0
+        )
+      )
+    : 0;
+}
+
+
+function consumeInventoryStackQuantity(
+  itemId,
+  amount = 1
+) {
+
+
+  const definition =
+    getItemDefinition(
+      itemId
+    );
+
+
+  const stack =
+    getInventoryStackByItemId(
+      itemId
+    );
+
+
+  const quantity =
+    Math.max(
+      1,
+      Math.floor(
+        Number(
+          amount
+        ) || 1
+      )
+    );
+
+
+  if (
+    !definition ||
+    definition.stackable !==
+      true ||
+    !stack
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "inventory_stack_unavailable"
+
+    };
+  }
+
+
+  const before =
+    getInventoryStackQuantity(
+      itemId
+    );
+
+
+  if (
+    before <
+      quantity
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "insufficient_inventory_quantity",
+
+      quantityBefore:
+        before
+
+    };
+  }
+
+
+  stack.quantity =
+    before -
+    quantity;
+
+
+  return {
+
+    success:
+      true,
+
+    itemId:
+      itemId,
+
+    quantityBefore:
+      before,
+
+    quantityAfter:
+      stack.quantity
+
+  };
+}
+
+
+function restoreInventoryStackQuantity(
+  itemId,
+  amount = 1
+) {
+
+
+  const stack =
+    getInventoryStackByItemId(
+      itemId
+    );
+
+
+  if (
+    !stack
+  ) {
+
+    return false;
+  }
+
+
+  const quantity =
+    Math.max(
+      1,
+      Math.floor(
+        Number(
+          amount
+        ) || 1
+      )
+    );
+
+
+  stack.quantity =
+    getInventoryStackQuantity(
+      itemId
+    ) +
+    quantity;
+
+
+  return true;
+}
+
 
 // =========================================================
 // BRICK 157 — BATTLE CHRONICLE RESULT
@@ -34495,6 +34927,13 @@ function startEncounter(
   });
 
 
+  // =========================================
+  // BRICK 342 — PREPARED BATTLE POUCH SNAPSHOT
+  // =========================================
+
+  initializeBattlePouchFromPreparedSelection();
+
+
   console.log(
     "BATTLE INSTANCE CREATED:",
     currentBattle.battleId
@@ -34514,6 +34953,7 @@ function startEncounter(
 
   return currentBattle;
 }
+
 
 
 // =========================================================
@@ -59317,6 +59757,16 @@ function renderCombatOverlay(
     );
 
 
+  // =======================================================
+  // BRICK 349 — TEMPORARY TEAM-WIDE BATTLE POUCH
+  // =======================================================
+
+  const battlePouchMarkup =
+    renderTemporaryBattlePouch(
+      activePlayer
+    );
+
+
   container.innerHTML = `
 
     <section
@@ -59478,6 +59928,9 @@ function renderCombatOverlay(
         ${skillDeckMarkup}
 
 
+        ${battlePouchMarkup}
+
+
         <button
           type="button"
           class="battle-live-withdraw-action"
@@ -59510,6 +59963,7 @@ function renderCombatOverlay(
     </section>
   `;
 }
+
 
 
 // =========================================================
@@ -61602,6 +62056,7 @@ function continueAfterVictory() {
 // =========================================================
 // BRICK 302 — BATTLE RUNTIME STATE FOUNDATION
 // BRICK 321 — REMAINING BATTLE PL RUNTIME AUTHORITY
+// BRICK 341 — BATTLE POUCH RUNTIME SNAPSHOT
 // =========================================================
 //
 // Owns Battle-local transient truth only.
@@ -61643,6 +62098,14 @@ function createBattleRuntimeState() {
       player: {},
 
       enemy: {}
+
+    },
+
+
+    battlePouch: {
+
+      preparedItemIds:
+        []
 
     },
 
@@ -61711,6 +62174,37 @@ function ensureBattleRuntimeState() {
   ) {
 
     currentBattle.runtime.remainingPL.enemy = {};
+  }
+
+
+  if (
+    !currentBattle.runtime.battlePouch ||
+    typeof currentBattle.runtime.battlePouch !==
+      "object"
+  ) {
+
+
+    currentBattle.runtime.battlePouch = {
+
+      preparedItemIds:
+        []
+
+    };
+  }
+
+
+  if (
+    !Array.isArray(
+      currentBattle.runtime
+        .battlePouch
+        .preparedItemIds
+    )
+  ) {
+
+    currentBattle.runtime
+      .battlePouch
+      .preparedItemIds =
+        [];
   }
 
 
@@ -61796,6 +62290,10 @@ function getBattleRuntimeSaveState() {
       runtime.remainingPL,
 
 
+    battlePouch:
+      runtime.battlePouch,
+
+
     transientStates:
       runtime.transientStates,
 
@@ -61835,6 +62333,9 @@ function restoreBattleRuntimeState(
     });
 
 
+    initializeBattlePouchFromPreparedSelection();
+
+
     return currentBattle.runtime;
   }
 
@@ -61862,6 +62363,21 @@ function restoreBattleRuntimeState(
         : {
             player: {},
             enemy: {}
+          },
+
+
+    battlePouch:
+      rawRuntime.battlePouch &&
+      typeof rawRuntime.battlePouch ===
+        "object"
+
+        ? rawRuntime.battlePouch
+
+        : {
+            preparedItemIds:
+              normalizeBattlePouchSelection(
+                playerData.battlePouch
+              ).itemIds
           },
 
 
@@ -62387,6 +62903,7 @@ function initializeBattleRemainingPLFromDeployment(
 }
 
 
+
 // =========================================================
 // BRICK 303 — SOURCE/TARGET TRANSIENT INTERACTION STATE
 // =========================================================
@@ -62815,6 +63332,7 @@ function removeBattleTransientState(
 // BRICK 303 — TEMPORARY BATTLE CONDITIONS
 // BRICK 331 — CONDITION SEMANTICS
 // BRICK 332 — NEXT ACTION OPPORTUNITY LIFECYCLE
+// BRICK 343 — AUTHORED CONDITION-CURE COMPATIBILITY
 // =========================================================
 //
 // Conditions may restrict action classes and/or explicit
@@ -62863,6 +63381,36 @@ function addBattleCondition(
 
     conditionKey:
       definition.conditionKey,
+
+
+    conditionType:
+      typeof definition.conditionType ===
+        "string"
+
+        ? definition.conditionType
+
+        : null,
+
+
+    compatibleCureItemIds:
+      Array.isArray(
+        definition.compatibleCureItemIds
+      )
+
+        ? [
+            ...new Set(
+              definition
+                .compatibleCureItemIds
+                .filter(
+                  itemId =>
+                    typeof itemId ===
+                      "string" &&
+                    itemId.length > 0
+                )
+            )
+          ]
+
+        : [],
 
 
     sourceRef:
@@ -63298,9 +63846,8 @@ function cleanupBattleParticipantRuntimeState(
 }
 
 
-
-// =========================================================
 // BRICK 304 — SHARED BATTLE ACTION ENVELOPE
+// BRICK 344 — ITEM IDENTITY THROUGH SHARED ACTION EVIDENCE
 // =========================================================
 //
 // Both manual input and future Smart AI should create the
@@ -63370,6 +63917,11 @@ function createBattleActionEnvelope(
 
     skillId:
       definition.skillId ||
+      null,
+
+
+    itemId:
+      definition.itemId ||
       null,
 
 
@@ -63689,6 +64241,11 @@ function recordBattleEvidence(
       null,
 
 
+    itemId:
+      definition.itemId ||
+      null,
+
+
     sourceRefs:
       Array.isArray(
         definition.sourceRefs
@@ -63797,6 +64354,9 @@ function beginBattleActionResolution(
       skillId:
         envelope.skillId,
 
+      itemId:
+        envelope.itemId,
+
       sourceRefs:
         envelope.sourceRefs,
 
@@ -63821,6 +64381,7 @@ function beginBattleActionResolution(
 
   };
 }
+
 
 
 // =========================================================
@@ -64125,6 +64686,2057 @@ function runBattleRuntimeFoundationDiagnostics() {
   return result;
 }
 
+
+// =========================================================
+// BRICK 345 — TEAM-WIDE BATTLE POUCH PREPARATION AUTHORITY
+// =========================================================
+//
+// Prepared identity is separate from Inventory quantity.
+//
+// playerData.battlePouch:
+// - persistent prepared stack identities
+//
+// currentBattle.runtime.battlePouch:
+// - Battle-start snapshot of those identities
+//
+// playerData.inventory:
+// - ONLY quantity authority
+//
+// =========================================================
+
+function validateBattlePouchSelection(
+  itemIds
+) {
+
+
+  if (
+    !Array.isArray(
+      itemIds
+    )
+  ) {
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "battle_pouch_selection_invalid",
+
+      itemIds:
+        []
+
+    };
+  }
+
+
+  const uniqueIds =
+    [
+      ...new Set(
+        itemIds.filter(
+          itemId =>
+            typeof itemId ===
+              "string" &&
+            itemId.length > 0
+        )
+      )
+    ];
+
+
+  if (
+    uniqueIds.length >
+      BATTLE_POUCH_CAPACITY
+  ) {
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "battle_pouch_capacity_exceeded",
+
+      itemIds:
+        uniqueIds
+
+    };
+  }
+
+
+  for (
+    const itemId of
+    uniqueIds
+  ) {
+
+
+    const definition =
+      getItemDefinition(
+        itemId
+      );
+
+
+    if (
+      !definition ||
+      definition.battleConsumable !==
+        true ||
+      definition.stackable !==
+        true
+    ) {
+
+      return {
+
+        valid:
+          false,
+
+        reason:
+          "item_not_battle_pouch_compatible",
+
+        itemId:
+          itemId,
+
+        itemIds:
+          uniqueIds
+
+      };
+    }
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    reason:
+      null,
+
+    itemIds:
+      uniqueIds
+
+  };
+}
+
+
+function getPreparedBattlePouchItemIds() {
+
+
+  const normalized =
+    normalizeBattlePouchSelection(
+      playerData.battlePouch
+    );
+
+
+  return [
+    ...normalized.itemIds
+  ];
+}
+
+
+function setPreparedBattlePouch(
+  itemIds,
+  options = {}
+) {
+
+
+  if (
+    currentBattle.active &&
+    !currentBattle.battleOver &&
+    options.allowActiveBattleDevelopmentOverride !==
+      true
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      valid:
+        false,
+
+      reason:
+        "battle_pouch_locked_during_battle"
+
+    };
+  }
+
+
+  const validation =
+    validateBattlePouchSelection(
+      itemIds
+    );
+
+
+  if (
+    !validation.valid
+  ) {
+
+    console.log(
+      "Battle Pouch preparation rejected:",
+      validation
+    );
+
+
+    return {
+
+      success:
+        false,
+
+      ...validation
+
+    };
+  }
+
+
+  const missingOwnedStack =
+    validation.itemIds.find(
+      itemId =>
+        getInventoryStackQuantity(
+          itemId
+        ) <= 0
+    );
+
+
+  if (
+    missingOwnedStack
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      valid:
+        false,
+
+      reason:
+        "prepared_stack_not_owned",
+
+      itemId:
+        missingOwnedStack
+
+    };
+  }
+
+
+  playerData.battlePouch = {
+
+    itemIds: [
+      ...validation.itemIds
+    ]
+
+  };
+
+
+  savePlayerData();
+
+
+  if (
+    currentBattle.active &&
+    !currentBattle.battleOver
+  ) {
+
+    initializeBattlePouchFromPreparedSelection();
+  }
+
+
+  return {
+
+    success:
+      true,
+
+    itemIds: [
+      ...validation.itemIds
+    ]
+
+  };
+}
+
+
+function initializeBattlePouchFromPreparedSelection() {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const prepared =
+    normalizeBattlePouchSelection(
+      playerData.battlePouch
+    );
+
+
+  runtime.battlePouch = {
+
+    preparedItemIds: [
+      ...prepared.itemIds
+    ]
+
+  };
+
+
+  return runtime.battlePouch;
+}
+
+
+function getLiveBattlePouchItemIds() {
+
+
+  if (
+    currentBattle.active &&
+    currentBattle.runtime &&
+    currentBattle.runtime.battlePouch &&
+    Array.isArray(
+      currentBattle.runtime
+        .battlePouch
+        .preparedItemIds
+    )
+  ) {
+
+    return [
+      ...currentBattle.runtime
+        .battlePouch
+        .preparedItemIds
+    ];
+  }
+
+
+  return getPreparedBattlePouchItemIds();
+}
+
+
+function getBattlePouchInventoryStack(
+  itemId
+) {
+
+
+  if (
+    !getLiveBattlePouchItemIds()
+      .includes(
+        itemId
+      )
+  ) {
+
+    return null;
+  }
+
+
+  return getInventoryStackByItemId(
+    itemId
+  );
+}
+
+
+function getBattlePouchItemQuantity(
+  itemId
+) {
+
+
+  const stack =
+    getBattlePouchInventoryStack(
+      itemId
+    );
+
+
+  return stack
+    ? Math.max(
+        0,
+        Math.floor(
+          Number(
+            stack.quantity
+          ) || 0
+        )
+      )
+    : 0;
+}
+
+
+// =========================================================
+// BRICK 346 — AUTHORED CONDITION-CURE COMPATIBILITY
+// =========================================================
+
+function getBattleConditionsCompatibleWithCure(
+  side,
+  participantId,
+  itemId,
+  requiredConditionType = null
+) {
+
+
+  return getBattleParticipantConditions(
+    side,
+    participantId
+  )
+    .filter(
+      condition => {
+
+
+        if (
+          requiredConditionType &&
+          condition.conditionType !==
+            requiredConditionType
+        ) {
+
+          return false;
+        }
+
+
+        return (
+          Array.isArray(
+            condition.compatibleCureItemIds
+          ) &&
+          condition.compatibleCureItemIds
+            .includes(
+              itemId
+            )
+        );
+      }
+    );
+}
+
+
+// =========================================================
+// BRICK 347 — BATTLE ITEM ADMISSIBILITY
+// =========================================================
+//
+// This preflight occurs BEFORE creating/accepting the action.
+// Therefore an invalid Item selection cannot consume:
+// - Inventory quantity
+// - the actor's action opportunity
+//
+// =========================================================
+
+function evaluateBattlePouchItemAvailability(
+  itemId,
+  actor
+) {
+
+
+  if (
+    !currentBattle.active ||
+    currentBattle.battleOver
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "battle_not_active"
+
+    };
+  }
+
+
+  if (
+    !actor ||
+    actor.id !==
+      getBattleActiveParticipantId(
+        "player"
+      )
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "actor_not_active"
+
+    };
+  }
+
+
+  const item =
+    getItemDefinition(
+      itemId
+    );
+
+
+  if (
+    !item ||
+    item.battleConsumable !==
+      true ||
+    !item.battleEffect
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "invalid_battle_item"
+
+    };
+  }
+
+
+  if (
+    !getLiveBattlePouchItemIds()
+      .includes(
+        itemId
+      )
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "item_not_prepared",
+
+      item:
+        item
+
+    };
+  }
+
+
+  const stack =
+    getBattlePouchInventoryStack(
+      itemId
+    );
+
+
+  const quantity =
+    getBattlePouchItemQuantity(
+      itemId
+    );
+
+
+  if (
+    !stack ||
+    quantity <= 0
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "empty_stack",
+
+      item:
+        item,
+
+      stack:
+        stack,
+
+      quantity:
+        quantity
+
+    };
+  }
+
+
+  const effect =
+    item.battleEffect;
+
+
+  if (
+    effect.kind ===
+      "restore_underlying_battle_pl"
+  ) {
+
+
+    const current =
+      getBattleRemainingPL(
+        "player",
+        actor.id
+      );
+
+
+    const maximum =
+      getBattleMaximumPL(
+        "player",
+        actor.id
+      );
+
+
+    if (
+      maximum <= 0 ||
+      current >= maximum
+    ) {
+
+      return {
+
+        available:
+          false,
+
+        reason:
+          "battle_pl_already_full",
+
+        item:
+          item,
+
+        stack:
+          stack,
+
+        quantity:
+          quantity,
+
+        currentBattlePL:
+          current,
+
+        maximumBattlePL:
+          maximum
+
+      };
+    }
+
+
+    return {
+
+      available:
+        true,
+
+      reason:
+        null,
+
+      item:
+        item,
+
+      stack:
+        stack,
+
+      quantity:
+        quantity,
+
+      currentBattlePL:
+        current,
+
+      maximumBattlePL:
+        maximum
+
+    };
+  }
+
+
+  if (
+    effect.kind ===
+      "cure_compatible_condition"
+  ) {
+
+
+    const compatibleConditions =
+      getBattleConditionsCompatibleWithCure(
+        "player",
+        actor.id,
+        item.id,
+        effect.conditionType ||
+          null
+      );
+
+
+    if (
+      compatibleConditions.length ===
+        0
+    ) {
+
+      return {
+
+        available:
+          false,
+
+        reason:
+          "no_compatible_condition",
+
+        item:
+          item,
+
+        stack:
+          stack,
+
+        quantity:
+          quantity,
+
+        compatibleConditions:
+          []
+
+      };
+    }
+
+
+    return {
+
+      available:
+        true,
+
+      reason:
+        null,
+
+      item:
+        item,
+
+      stack:
+        stack,
+
+      quantity:
+        quantity,
+
+      compatibleConditions:
+        compatibleConditions
+
+    };
+  }
+
+
+  return {
+
+    available:
+      false,
+
+    reason:
+      "unsupported_battle_item_effect",
+
+    item:
+      item,
+
+    stack:
+      stack,
+
+    quantity:
+      quantity
+
+  };
+}
+
+
+// =========================================================
+// BRICK 348 — SHARED BATTLE ITEM RESOLUTION
+// =========================================================
+
+function resolveBattlePouchItemUse(
+  item,
+  actor,
+  availability,
+  envelope
+) {
+
+
+  if (
+    !item ||
+    !actor ||
+    !availability ||
+    availability.available !==
+      true ||
+    !envelope
+  ) {
+
+    return {
+
+      resolved:
+        false,
+
+      reason:
+        "invalid_item_resolution_request"
+
+    };
+  }
+
+
+  const effect =
+    item.battleEffect;
+
+
+  const consumption =
+    consumeInventoryStackQuantity(
+      item.id,
+      1
+    );
+
+
+  if (
+    !consumption.success
+  ) {
+
+    return {
+
+      resolved:
+        false,
+
+      reason:
+        consumption.reason ||
+        "item_quantity_consumption_failed"
+
+    };
+  }
+
+
+  const sourceRefs = [
+
+    {
+
+      type:
+        "inventory_stack",
+
+      id:
+        item.id
+
+    }
+
+  ];
+
+
+  let result =
+    null;
+
+
+  if (
+    effect.kind ===
+      "restore_underlying_battle_pl"
+  ) {
+
+
+    const before =
+      getBattleRemainingPL(
+        "player",
+        actor.id
+      );
+
+
+    const maximum =
+      getBattleMaximumPL(
+        "player",
+        actor.id
+      );
+
+
+    const requestedAmount =
+      Math.max(
+        0,
+        Math.round(
+          Number(
+            effect.amount
+          ) || 0
+        )
+      );
+
+
+    const next =
+      Math.min(
+        maximum,
+        before +
+        requestedAmount
+      );
+
+
+    const updated =
+      setBattleRemainingPL(
+        "player",
+        actor.id,
+        next
+      );
+
+
+    if (
+      !updated ||
+      next <= before
+    ) {
+
+      restoreInventoryStackQuantity(
+        item.id,
+        1
+      );
+
+
+      return {
+
+        resolved:
+          false,
+
+        reason:
+          "recovery_effect_failed"
+
+      };
+    }
+
+
+    result = {
+
+      resolved:
+        true,
+
+      effectKind:
+        effect.kind,
+
+      battlePLBefore:
+        before,
+
+      battlePLAfter:
+        next,
+
+      maximumBattlePL:
+        maximum,
+
+      restoredBattlePL:
+        next -
+        before,
+
+      conditionRefs:
+        []
+
+    };
+
+
+    currentBattle.battleLog.push(
+      `${actor.name} used ${item.name} and restored ${result.restoredBattlePL} Battle PL.`
+    );
+  }
+
+
+  if (
+    effect.kind ===
+      "cure_compatible_condition"
+  ) {
+
+
+    const compatible =
+      getBattleConditionsCompatibleWithCure(
+        "player",
+        actor.id,
+        item.id,
+        effect.conditionType ||
+          null
+      );
+
+
+    const removedConditionIds =
+      [];
+
+
+    compatible.forEach(
+      condition => {
+
+
+        if (
+          removeBattleCondition(
+            condition.conditionId
+          )
+        ) {
+
+          removedConditionIds.push(
+            condition.conditionId
+          );
+        }
+      }
+    );
+
+
+    if (
+      removedConditionIds.length ===
+        0
+    ) {
+
+      restoreInventoryStackQuantity(
+        item.id,
+        1
+      );
+
+
+      return {
+
+        resolved:
+          false,
+
+        reason:
+          "compatible_condition_resolution_failed"
+
+      };
+    }
+
+
+    result = {
+
+      resolved:
+        true,
+
+      effectKind:
+        effect.kind,
+
+      conditionType:
+        effect.conditionType ||
+        null,
+
+      conditionRefs:
+        removedConditionIds
+
+    };
+
+
+    currentBattle.battleLog.push(
+      `${actor.name} used ${item.name}. ${removedConditionIds.length} compatible Condition${
+        removedConditionIds.length === 1
+          ? ""
+          : "s"
+      } resolved.`
+    );
+  }
+
+
+  if (
+    !result ||
+    result.resolved !==
+      true
+  ) {
+
+    restoreInventoryStackQuantity(
+      item.id,
+      1
+    );
+
+
+    return {
+
+      resolved:
+        false,
+
+      reason:
+        "battle_item_effect_not_resolved"
+
+    };
+  }
+
+
+  const quantityAfter =
+    getInventoryStackQuantity(
+      item.id
+    );
+
+
+  const evidence =
+    recordBattleEvidence({
+
+      eventType:
+        "battle_item_resolved",
+
+      actionId:
+        envelope.actionId,
+
+      actorRef:
+        envelope.actorRef,
+
+      targetRef:
+        envelope.targetRef,
+
+      itemId:
+        item.id,
+
+      sourceRefs:
+        sourceRefs,
+
+      conditionRefs:
+        result.conditionRefs ||
+        [],
+
+      data: {
+
+        effectKind:
+          result.effectKind,
+
+        conditionType:
+          result.conditionType ||
+          null,
+
+        quantityBefore:
+          consumption.quantityBefore,
+
+        quantityAfter:
+          quantityAfter,
+
+        battlePLBefore:
+          typeof result.battlePLBefore ===
+            "number"
+            ? result.battlePLBefore
+            : null,
+
+        battlePLAfter:
+          typeof result.battlePLAfter ===
+            "number"
+            ? result.battlePLAfter
+            : null,
+
+        maximumBattlePL:
+          typeof result.maximumBattlePL ===
+            "number"
+            ? result.maximumBattlePL
+            : null,
+
+        restoredBattlePL:
+          typeof result.restoredBattlePL ===
+            "number"
+            ? result.restoredBattlePL
+            : 0
+
+      }
+
+    });
+
+
+  return {
+
+    ...result,
+
+    itemId:
+      item.id,
+
+    quantityBefore:
+      consumption.quantityBefore,
+
+    quantityAfter:
+      quantityAfter,
+
+    evidence:
+      evidence
+
+  };
+}
+
+
+function attemptBattlePouchItem(
+  itemId
+) {
+
+
+  const actor =
+    getBattleDeploymentParticipant(
+      "player",
+      1
+    );
+
+
+  const availability =
+    evaluateBattlePouchItemAvailability(
+      itemId,
+      actor
+    );
+
+
+  // IMPORTANT:
+  // invalid selection returns BEFORE an action envelope,
+  // quantity change or action-opportunity consumption.
+  if (
+    !availability.available
+  ) {
+
+    console.log(
+      "Battle Item unavailable:",
+      availability.reason,
+      availability
+    );
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        availability.reason,
+
+      availability:
+        availability
+
+    };
+  }
+
+
+  const item =
+    availability.item;
+
+
+  const envelope =
+    createBattleActionEnvelope({
+
+      actorSide:
+        "player",
+
+      actorParticipantId:
+        actor.id,
+
+      targetSide:
+        "player",
+
+      targetParticipantId:
+        actor.id,
+
+      actionClass:
+        "item_use",
+
+      itemId:
+        item.id,
+
+      sourceRefs: [
+
+        {
+
+          type:
+            "inventory_stack",
+
+          id:
+            item.id
+
+        }
+
+      ],
+
+      data: {
+
+        type:
+          item.type,
+
+        effectKind:
+          item.battleEffect
+            .kind,
+
+        traits: [
+          "battle_consumable"
+        ]
+
+      }
+
+    });
+
+
+  const entry =
+    beginBattleActionResolution(
+      envelope
+    );
+
+
+  if (
+    !entry.accepted
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        entry.validation.reason,
+
+      validation:
+        entry.validation
+
+    };
+  }
+
+
+  const resolution =
+    resolveBattlePouchItemUse(
+      item,
+      actor,
+      availability,
+      envelope
+    );
+
+
+  if (
+    !resolution ||
+    resolution.resolved !==
+      true
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        resolution
+          ? resolution.reason
+          : "item_resolution_failed",
+
+      resolution:
+        resolution ||
+        null
+
+    };
+  }
+
+
+  recordBattleEvidence({
+
+    eventType:
+      "item_action_completed",
+
+    actionId:
+      envelope.actionId,
+
+    actorRef:
+      envelope.actorRef,
+
+    targetRef:
+      envelope.targetRef,
+
+    itemId:
+      item.id,
+
+    sourceRefs:
+      envelope.sourceRefs,
+
+    conditionRefs:
+      resolution.conditionRefs ||
+      [],
+
+    data: {
+
+      resolved:
+        true,
+
+      effectKind:
+        resolution.effectKind,
+
+      quantityBefore:
+        resolution.quantityBefore,
+
+      quantityAfter:
+        resolution.quantityAfter
+
+    }
+
+  });
+
+
+  consumeBattleActionOpportunity(
+    "player",
+    actor.id,
+    envelope.actionId,
+    "valid_item_action_completed"
+  );
+
+
+  savePlayerData();
+
+
+  saveTestState();
+
+
+  if (
+    currentBattle.battleOver !==
+      true
+  ) {
+
+    openOverlay(
+      "combat"
+    );
+  }
+
+
+  return {
+
+    success:
+      true,
+
+    envelope:
+      envelope,
+
+    resolution:
+      resolution
+
+  };
+}
+
+
+// =========================================================
+// BRICK 349 — TEMPORARY BATTLE POUCH PRESENTATION
+// =========================================================
+//
+// Developer presentation only.
+// Final artwork/layout remains UI-owned.
+//
+// =========================================================
+
+function getBattlePouchCompactStatus(
+  item,
+  availability
+) {
+
+
+  if (
+    !item
+  ) {
+
+    return "EMPTY";
+  }
+
+
+  const quantity =
+    getBattlePouchItemQuantity(
+      item.id
+    );
+
+
+  if (
+    !availability.available
+  ) {
+
+    switch (
+      availability.reason
+    ) {
+
+      case "battle_pl_already_full":
+        return `×${quantity} • BP FULL`;
+
+      case "no_compatible_condition":
+        return `×${quantity} • NO TARGET`;
+
+      case "empty_stack":
+        return "×0 • EMPTY";
+
+      default:
+        return `×${quantity} • UNAVAILABLE`;
+    }
+  }
+
+
+  if (
+    item.battleEffect.kind ===
+      "restore_underlying_battle_pl"
+  ) {
+
+    return (
+      `×${quantity} • +${item.battleEffect.amount} BP`
+    );
+  }
+
+
+  if (
+    item.battleEffect.kind ===
+      "cure_compatible_condition"
+  ) {
+
+    return (
+      `×${quantity} • CURE ${String(
+        item.battleEffect
+          .conditionType ||
+        "STATE"
+      ).toUpperCase()}`
+    );
+  }
+
+
+  return `×${quantity} • READY`;
+}
+
+
+function renderTemporaryBattlePouch(
+  actor
+) {
+
+
+  const preparedIds =
+    getLiveBattlePouchItemIds();
+
+
+  const slots =
+    [];
+
+
+  for (
+    let index = 0;
+    index < BATTLE_POUCH_CAPACITY;
+    index += 1
+  ) {
+
+
+    const itemId =
+      preparedIds[
+        index
+      ] ||
+      null;
+
+
+    const item =
+      itemId
+        ? getItemDefinition(
+            itemId
+          )
+        : null;
+
+
+    if (
+      !item
+    ) {
+
+      slots.push(`
+        <div
+          style="
+            min-width:0;
+            border:1px solid rgba(214,169,58,0.34);
+            background:rgba(3,8,14,0.78);
+            color:#64748B;
+            font-size:clamp(5px,0.48vw,7px);
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            letter-spacing:0.8px;
+          "
+        >
+          EMPTY
+        </div>
+      `);
+
+      continue;
+    }
+
+
+    const availability =
+      evaluateBattlePouchItemAvailability(
+        item.id,
+        actor
+      );
+
+
+    const status =
+      getBattlePouchCompactStatus(
+        item,
+        availability
+      );
+
+
+    slots.push(`
+      <button
+        type="button"
+        onclick="attemptBattlePouchItem('${item.id}')"
+        ${
+          availability.available
+            ? ""
+            : "disabled"
+        }
+        title="${item.name} — ${status}"
+        style="
+          min-width:0;
+          overflow:hidden;
+          border:1px solid ${
+            availability.available
+              ? "rgba(0,217,232,0.65)"
+              : "rgba(214,169,58,0.28)"
+          };
+          background:rgba(3,8,14,0.86);
+          color:${
+            availability.available
+              ? "#E2F8FA"
+              : "#64748B"
+          };
+          font-size:clamp(5px,0.46vw,7px);
+          line-height:1.08;
+          padding:2px 4px;
+          cursor:${
+            availability.available
+              ? "pointer"
+              : "not-allowed"
+          };
+        "
+      >
+        <strong
+          style="
+            display:block;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          "
+        >
+          ${item.name}
+        </strong>
+        <span
+          style="
+            display:block;
+            margin-top:2px;
+            white-space:nowrap;
+            overflow:hidden;
+            text-overflow:ellipsis;
+          "
+        >
+          ${status}
+        </span>
+      </button>
+    `);
+  }
+
+
+  return `
+    <div
+      aria-label="Prepared Battle Pouch"
+      title="BATTLE POUCH — team-wide prepared consumables"
+      style="
+        position:absolute;
+        left:2.0%;
+        bottom:1.15%;
+        width:31%;
+        height:4.4%;
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:1.5%;
+        z-index:14;
+      "
+    >
+      ${slots.join("")}
+    </div>
+  `;
+}
+
+
+// =========================================================
+// BRICK 350 — BATTLE POUCH PILOT / DIAGNOSTICS
+// =========================================================
+
+const BATTLE_POUCH_PILOT_ITEM_IDS = [
+
+  "field_recovery_pill",
+
+  "standard_antidote",
+
+  "burn_treatment"
+
+];
+
+
+function prepareBattlePouchPilotItems(
+  minimumQuantity = 3
+) {
+
+
+  const requestedQuantity =
+    Math.max(
+      1,
+      Math.floor(
+        Number(
+          minimumQuantity
+        ) || 3
+      )
+    );
+
+
+  BATTLE_POUCH_PILOT_ITEM_IDS
+    .forEach(
+      itemId => {
+
+
+        const definition =
+          getItemDefinition(
+            itemId
+          );
+
+
+        if (
+          !definition
+        ) {
+
+          return;
+        }
+
+
+        while (
+          getInventoryStackQuantity(
+            itemId
+          ) <
+          requestedQuantity
+        ) {
+
+          addItemToInventory({
+
+            id:
+              definition.id,
+
+            name:
+              definition.name,
+
+            rarity:
+              definition.rarity
+
+          });
+        }
+      }
+    );
+
+
+  const preparation =
+    setPreparedBattlePouch(
+      BATTLE_POUCH_PILOT_ITEM_IDS,
+      {
+
+        allowActiveBattleDevelopmentOverride:
+          true
+
+      }
+    );
+
+
+  if (
+    !preparation.success
+  ) {
+
+    return preparation;
+  }
+
+
+  if (
+    currentBattle.active &&
+    !currentBattle.battleOver
+  ) {
+
+    initializeBattlePouchFromPreparedSelection();
+
+    openOverlay(
+      "combat"
+    );
+  }
+
+
+  return {
+
+    success:
+      true,
+
+    itemIds: [
+      ...BATTLE_POUCH_PILOT_ITEM_IDS
+    ],
+
+    quantities:
+      Object.fromEntries(
+        BATTLE_POUCH_PILOT_ITEM_IDS
+          .map(
+            itemId => [
+              itemId,
+              getInventoryStackQuantity(
+                itemId
+              )
+            ]
+          )
+      )
+
+  };
+}
+
+
+function applyBattlePouchDiagnosticCondition(
+  conditionType,
+  characterId = null
+) {
+
+
+  const target =
+    characterId
+
+      ? getPlayerCharacter(
+          characterId
+        )
+
+      : getBattleDeploymentParticipant(
+          "player",
+          1
+        );
+
+
+  if (
+    !target
+  ) {
+
+    return null;
+  }
+
+
+  const definitions = {
+
+    poison: {
+
+      conditionKey:
+        "diagnostic_poison",
+
+      conditionType:
+        "poison",
+
+      compatibleCureItemIds: [
+        "standard_antidote"
+      ]
+
+    },
+
+    burning: {
+
+      conditionKey:
+        "diagnostic_burning",
+
+      conditionType:
+        "burning",
+
+      compatibleCureItemIds: [
+        "burn_treatment"
+      ]
+
+    }
+
+  };
+
+
+  const definition =
+    definitions[
+      conditionType
+    ];
+
+
+  if (
+    !definition
+  ) {
+
+    return null;
+  }
+
+
+  return addBattleCondition({
+
+    ...definition,
+
+    sourceSide:
+      "enemy",
+
+    sourceParticipantId:
+      currentBattle.enemy
+        ? currentBattle.enemy.id
+        : "diagnostic_enemy",
+
+    targetSide:
+      "player",
+
+    targetParticipantId:
+      target.id,
+
+    data: {
+
+      diagnostic:
+        true
+
+    }
+
+  });
+}
+
+
+function getLatestBattleItemEvidence() {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const matches =
+    runtime.evidence.filter(
+      entry =>
+        entry &&
+        entry.eventType ===
+          "battle_item_resolved"
+    );
+
+
+  return matches.length > 0
+    ? matches[
+        matches.length - 1
+      ]
+    : null;
+}
+
+
+function runBattlePouchV1Diagnostics() {
+
+
+  const recovery =
+    getItemDefinition(
+      "field_recovery_pill"
+    );
+
+
+  const antidote =
+    getItemDefinition(
+      "standard_antidote"
+    );
+
+
+  const burnTreatment =
+    getItemDefinition(
+      "burn_treatment"
+    );
+
+
+  const overCapacity =
+    validateBattlePouchSelection([
+
+      "field_recovery_pill",
+
+      "standard_antidote",
+
+      "burn_treatment",
+
+      "basic_scroll"
+
+    ]);
+
+
+  const weaponRejected =
+    validateBattlePouchSelection([
+      "kunai"
+    ]);
+
+
+  const prepared =
+    getLiveBattlePouchItemIds();
+
+
+  const actor =
+    getBattleDeploymentParticipant(
+      "player",
+      1
+    );
+
+
+  let emptyStackRejected =
+    true;
+
+
+  if (
+    actor &&
+    prepared.length > 0
+  ) {
+
+
+    const testItemId =
+      prepared[0];
+
+
+    const stack =
+      getInventoryStackByItemId(
+        testItemId
+      );
+
+
+    if (
+      stack
+    ) {
+
+
+      const previousQuantity =
+        stack.quantity;
+
+
+      stack.quantity =
+        0;
+
+
+      emptyStackRejected =
+        evaluateBattlePouchItemAvailability(
+          testItemId,
+          actor
+        ).reason ===
+          "empty_stack";
+
+
+      stack.quantity =
+        previousQuantity;
+    }
+  }
+
+
+  const result = {
+
+    threeSlotCapacity:
+      BATTLE_POUCH_CAPACITY ===
+        3,
+
+    recoveryDefined:
+      !!(
+        recovery &&
+        recovery.battleConsumable ===
+          true &&
+        recovery.battleEffect &&
+        recovery.battleEffect.kind ===
+          "restore_underlying_battle_pl" &&
+        recovery.battleEffect.amount ===
+          4
+      ),
+
+    antidoteDefined:
+      !!(
+        antidote &&
+        antidote.battleEffect &&
+        antidote.battleEffect.conditionType ===
+          "poison"
+      ),
+
+    burnTreatmentDefined:
+      !!(
+        burnTreatment &&
+        burnTreatment.battleEffect &&
+        burnTreatment.battleEffect.conditionType ===
+          "burning"
+      ),
+
+    fourthPreparedTypeRejected:
+      overCapacity.valid ===
+        false &&
+      overCapacity.reason ===
+        "battle_pouch_capacity_exceeded",
+
+    reusableWeaponRejectedFromPouch:
+      weaponRejected.valid ===
+        false &&
+      weaponRejected.reason ===
+        "item_not_battle_pouch_compatible",
+
+    livePouchAtMostThree:
+      prepared.length <=
+        BATTLE_POUCH_CAPACITY,
+
+    inventoryOwnsQuantities:
+      prepared.every(
+        itemId =>
+          getBattlePouchInventoryStack(
+            itemId
+          ) ===
+          getInventoryStackByItemId(
+            itemId
+          )
+      ),
+
+    emptyStackUnavailable:
+      emptyStackRejected,
+
+    authoredCureCompatibilityAvailable:
+      typeof getBattleConditionsCompatibleWithCure ===
+        "function",
+
+    sharedActionEntryAvailable:
+      typeof beginBattleActionResolution ===
+        "function" &&
+      typeof consumeBattleActionOpportunity ===
+        "function"
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
+}
+
+// =========================================================
 // BRICK 308 — ACADEMY BATTLE SKILL REGISTRY
 // =========================================================
 //
