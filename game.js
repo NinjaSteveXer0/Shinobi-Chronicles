@@ -32211,20 +32211,604 @@ function startEncounterActivity(
 //
 // Canonical Battle Engine launch authority.
 //
-// Creates a unique Battle identity and preserves:
+// =========================================================
+
+
+// =========================================================
+// BRICK 299 — BATTLE DEPLOYMENT RUNTIME FOUNDATION
+// =========================================================
 //
-// - Encounter identity
-// - Character identity
-// - Enemy identity
-// - Effective contribution state
-// - Reward state
+// Battle-local deployment snapshot.
 //
-// Battle contribution Power uses Effective PL because
-// equipment and contextual combat effects belong to the
-// character's active battle state.
+// Slots:
+// 1–3 = Active
+// 4–6 = Reserve
+//
+// This does NOT mutate playerTeam and is NOT the permanent
+// Formation / team-building authority.
 //
 // =========================================================
 
+function createBattleDeploymentSlots(
+  participantIds
+) {
+
+
+  const ids =
+    Array.isArray(
+      participantIds
+    )
+      ? participantIds
+      : [];
+
+
+  const slots = [];
+
+
+  for (
+    let slotNumber = 1;
+    slotNumber <= 6;
+    slotNumber += 1
+  ) {
+
+
+    slots.push({
+
+      slotNumber:
+        slotNumber,
+
+      participantId:
+        ids[
+          slotNumber - 1
+        ] ||
+        null
+
+    });
+  }
+
+
+  return slots;
+}
+
+
+function createInitialBattlePlayerParticipantIds(
+  activePlayerId = null
+) {
+
+
+  const members =
+    playerTeam.filter(
+      member =>
+        !!member
+    );
+
+
+  const activePlayer =
+    activePlayerId
+      ? (
+          members.find(
+            member =>
+              member.id ===
+              activePlayerId
+          ) ||
+          null
+        )
+      : null;
+
+
+  const orderedMembers =
+    activePlayer
+      ? [
+          activePlayer,
+
+          ...members.filter(
+            member =>
+              member.id !==
+              activePlayer.id
+          )
+        ]
+      : members;
+
+
+  return orderedMembers
+    .slice(
+      0,
+      6
+    )
+    .map(
+      member =>
+        member.id
+    );
+}
+
+
+function createBattleDeployment(
+  enemy,
+  activePlayerId = null
+) {
+
+
+  return {
+
+    player: {
+
+      slots:
+        createBattleDeploymentSlots(
+          createInitialBattlePlayerParticipantIds(
+            activePlayerId
+          )
+        )
+
+    },
+
+
+    enemy: {
+
+      slots:
+        createBattleDeploymentSlots(
+          enemy &&
+          enemy.id
+            ? [
+                enemy.id
+              ]
+            : []
+        )
+
+    },
+
+
+    transitionCounter:
+      0,
+
+
+    lastTransition:
+      null
+
+  };
+}
+
+
+function getBattleDeploymentSlot(
+  side,
+  slotNumber
+) {
+
+
+  const deployment =
+    currentBattle.deployment;
+
+
+  if (
+    !deployment ||
+    !deployment[
+      side
+    ] ||
+    !Array.isArray(
+      deployment[
+        side
+      ].slots
+    )
+  ) {
+
+    return null;
+  }
+
+
+  return (
+    deployment[
+      side
+    ]
+      .slots
+      .find(
+        slot =>
+          Number(
+            slot.slotNumber
+          ) ===
+          Number(
+            slotNumber
+          )
+      ) ||
+    null
+  );
+}
+
+
+function getBattleDeploymentParticipant(
+  side,
+  slotNumber
+) {
+
+
+  const slot =
+    getBattleDeploymentSlot(
+      side,
+      slotNumber
+    );
+
+
+  if (
+    !slot ||
+    !slot.participantId
+  ) {
+
+    return null;
+  }
+
+
+  if (
+    side ===
+    "player"
+  ) {
+
+    return (
+      getPlayerCharacter(
+        slot.participantId
+      ) ||
+      null
+    );
+  }
+
+
+  if (
+    side ===
+    "enemy"
+  ) {
+
+
+    const enemy =
+      currentBattle.enemy ||
+      selectedEnemy ||
+      null;
+
+
+    return (
+      enemy &&
+      enemy.id ===
+        slot.participantId
+
+        ? enemy
+
+        : null
+    );
+  }
+
+
+  return null;
+}
+
+
+function normalizeBattleDeployment(
+  rawDeployment,
+  fallbackActivePlayerId = null
+) {
+
+
+  if (
+    !rawDeployment ||
+    typeof rawDeployment !==
+      "object"
+  ) {
+
+
+    return createBattleDeployment(
+      currentBattle.enemy ||
+        selectedEnemy ||
+        null,
+      fallbackActivePlayerId
+    );
+  }
+
+
+  const normalizeSide =
+    side => {
+
+
+      const rawSide =
+        rawDeployment[
+          side
+        ];
+
+
+      const rawSlots =
+        rawSide &&
+        Array.isArray(
+          rawSide.slots
+        )
+
+          ? rawSide.slots
+
+          : [];
+
+
+      const seen =
+        new Set();
+
+
+      const participantIds =
+        [];
+
+
+      for (
+        let slotNumber = 1;
+        slotNumber <= 6;
+        slotNumber += 1
+      ) {
+
+
+        const rawSlot =
+          rawSlots.find(
+            slot =>
+              Number(
+                slot &&
+                slot.slotNumber
+              ) ===
+              slotNumber
+          ) ||
+          null;
+
+
+        let participantId =
+          rawSlot &&
+          typeof rawSlot
+            .participantId ===
+            "string"
+
+            ? rawSlot
+                .participantId
+
+            : null;
+
+
+        if (
+          participantId &&
+          seen.has(
+            participantId
+          )
+        ) {
+
+          participantId =
+            null;
+        }
+
+
+        if (
+          participantId &&
+          side ===
+            "player" &&
+          !getPlayerCharacter(
+            participantId
+          )
+        ) {
+
+          participantId =
+            null;
+        }
+
+
+        if (
+          participantId &&
+          side ===
+            "enemy"
+        ) {
+
+
+          const enemy =
+            currentBattle.enemy ||
+            selectedEnemy ||
+            null;
+
+
+          if (
+            !enemy ||
+            enemy.id !==
+              participantId
+          ) {
+
+            participantId =
+              null;
+          }
+        }
+
+
+        if (
+          participantId
+        ) {
+
+          seen.add(
+            participantId
+          );
+        }
+
+
+        participantIds.push(
+          participantId
+        );
+      }
+
+
+      return {
+
+        slots:
+          createBattleDeploymentSlots(
+            participantIds
+          )
+
+      };
+    };
+
+
+  const player =
+    normalizeSide(
+      "player"
+    );
+
+
+  const enemy =
+    normalizeSide(
+      "enemy"
+    );
+
+
+  const hasPlayer =
+    player.slots.some(
+      slot =>
+        !!slot.participantId
+    );
+
+
+  const hasEnemy =
+    enemy.slots.some(
+      slot =>
+        !!slot.participantId
+    );
+
+
+  const currentEnemy =
+    currentBattle.enemy ||
+    selectedEnemy ||
+    null;
+
+
+  return {
+
+    player:
+      hasPlayer
+        ? player
+        : {
+
+            slots:
+              createBattleDeploymentSlots(
+                createInitialBattlePlayerParticipantIds(
+                  fallbackActivePlayerId
+                )
+              )
+
+          },
+
+
+    enemy:
+      hasEnemy
+        ? enemy
+        : {
+
+            slots:
+              createBattleDeploymentSlots(
+                currentEnemy &&
+                currentEnemy.id
+
+                  ? [
+                      currentEnemy.id
+                    ]
+
+                  : []
+              )
+
+          },
+
+
+    transitionCounter:
+      0,
+
+
+    lastTransition:
+      null
+
+  };
+}
+
+
+function getBattleDeploymentSaveState() {
+
+
+  const deployment =
+    currentBattle.deployment;
+
+
+  if (
+    !deployment
+  ) {
+
+    return null;
+  }
+
+
+  const serializeSide =
+    side => ({
+
+      slots:
+        Array.isArray(
+          deployment[
+            side
+          ] &&
+          deployment[
+            side
+          ].slots
+        )
+
+          ? deployment[
+              side
+            ]
+              .slots
+              .map(
+                slot => ({
+
+                  slotNumber:
+                    Number(
+                      slot.slotNumber
+                    ),
+
+                  participantId:
+                    slot.participantId ||
+                    null
+
+                })
+              )
+
+          : createBattleDeploymentSlots(
+              []
+            )
+
+    });
+
+
+  return {
+
+    player:
+      serializeSide(
+        "player"
+      ),
+
+    enemy:
+      serializeSide(
+        "enemy"
+      )
+
+  };
+}
+
+
+function syncBattleActivePlayerFromDeployment() {
+
+
+  const activePlayer =
+    getBattleDeploymentParticipant(
+      "player",
+      1
+    );
+
+
+  currentBattle.activePlayer =
+    activePlayer ||
+    null;
+
+
+  return currentBattle.activePlayer;
+}
+
+
+// =========================================================
+// EXISTING BATTLE LAUNCH — NOW CREATES DEPLOYMENT
+// =========================================================
 
 function startEncounter(
   enemyId,
@@ -32256,7 +32840,6 @@ function startEncounter(
 
 
     return false;
-
   }
 
 
@@ -32273,7 +32856,6 @@ function startEncounter(
       getPlayerCharacter(
         characterId
       );
-
   }
 
 
@@ -32283,9 +32865,10 @@ function startEncounter(
 
 
     activePlayer =
-      playerTeam[0] ||
+      playerTeam[
+        0
+      ] ||
       null;
-
   }
 
 
@@ -32300,7 +32883,6 @@ function startEncounter(
 
 
     return false;
-
   }
 
 
@@ -32320,6 +32902,11 @@ function startEncounter(
     encounterId;
 
 
+  /*
+     Preserve launch identity.
+
+     This does NOT change every time the Active queue advances.
+  */
   currentBattle.characterId =
     activePlayer.id;
 
@@ -32328,7 +32915,18 @@ function startEncounter(
     enemy;
 
 
+  currentBattle.deployment =
+    createBattleDeployment(
+      enemy,
+      activePlayer.id
+    );
+
+
   currentBattle.activePlayer =
+    getBattleDeploymentParticipant(
+      "player",
+      1
+    ) ||
     activePlayer;
 
 
@@ -32356,14 +32954,9 @@ function startEncounter(
 
     `${enemy.name} appears!`,
 
-    `${activePlayer.name} prepares for battle.`
+    `${currentBattle.activePlayer.name} prepares for battle.`
 
   ];
-
-
-  // =========================================
-  // RESET CONTRIBUTIONS
-  // =========================================
 
 
   currentBattle.contributions =
@@ -32405,14 +32998,8 @@ function startEncounter(
           0
 
       };
-
     }
   );
-
-
-  // =========================================
-  // RESET REWARDS
-  // =========================================
 
 
   currentBattle.rewards = {
@@ -32477,7 +33064,344 @@ function startEncounter(
 
 
   return currentBattle;
+}
 
+
+// =========================================================
+// BRICK 300 — WITHDRAWAL / QUEUE TRANSITION AUTHORITY
+// =========================================================
+//
+// Semantic Battle transition:
+//
+// 2 → 1   Active slide
+// 3 → 2   Active slide
+// 4 → 3   Reserve promotion
+// 5 → 4   Reserve slide
+// 6 → 5   Reserve slide
+//
+// Slot 6 becomes empty.
+//
+// =========================================================
+
+function canWithdrawActiveBattleFighter() {
+
+
+  if (
+    !currentBattle.active ||
+    currentBattle.battleOver ||
+    !currentBattle.deployment
+  ) {
+
+    return false;
+  }
+
+
+  const activeSlot =
+    getBattleDeploymentSlot(
+      "player",
+      1
+    );
+
+
+  if (
+    !activeSlot ||
+    !activeSlot.participantId
+  ) {
+
+    return false;
+  }
+
+
+  for (
+    let slotNumber = 2;
+    slotNumber <= 6;
+    slotNumber += 1
+  ) {
+
+
+    const slot =
+      getBattleDeploymentSlot(
+        "player",
+        slotNumber
+      );
+
+
+    if (
+      slot &&
+      slot.participantId
+    ) {
+
+      return true;
+    }
+  }
+
+
+  return false;
+}
+
+
+function withdrawActiveBattleFighter() {
+
+
+  if (
+    !canWithdrawActiveBattleFighter()
+  ) {
+
+
+    console.log(
+      "No valid Battle deployment successor is available."
+    );
+
+
+    return false;
+  }
+
+
+  const deployment =
+    currentBattle.deployment;
+
+
+  const slots =
+    deployment.player.slots;
+
+
+  const withdrawnParticipantId =
+    slots[
+      0
+    ].participantId;
+
+
+  const withdrawnPlayer =
+    getPlayerCharacter(
+      withdrawnParticipantId
+    );
+
+
+  const movements =
+    [];
+
+
+  for (
+    let sourceSlot = 2;
+    sourceSlot <= 6;
+    sourceSlot += 1
+  ) {
+
+
+    const sourceRecord =
+      slots[
+        sourceSlot - 1
+      ];
+
+
+    if (
+      !sourceRecord ||
+      !sourceRecord.participantId
+    ) {
+
+      continue;
+    }
+
+
+    let movementType =
+      "reserve_slide";
+
+
+    if (
+      sourceSlot <= 3
+    ) {
+
+      movementType =
+        "active_slide";
+    }
+
+    else if (
+      sourceSlot === 4
+    ) {
+
+      movementType =
+        "reserve_promotion";
+    }
+
+
+    movements.push({
+
+      participantId:
+        sourceRecord.participantId,
+
+      fromSlot:
+        sourceSlot,
+
+      toSlot:
+        sourceSlot - 1,
+
+      movementType:
+        movementType
+
+    });
+  }
+
+
+  /*
+     Authoritative queue mutation occurs once.
+  */
+  for (
+    let index = 0;
+    index < 5;
+    index += 1
+  ) {
+
+
+    slots[
+      index
+    ].participantId =
+      slots[
+        index + 1
+      ].participantId ||
+      null;
+  }
+
+
+  slots[
+    5
+  ].participantId =
+    null;
+
+
+  deployment.transitionCounter =
+    (
+      Number(
+        deployment.transitionCounter
+      ) ||
+      0
+    ) +
+    1;
+
+
+  const transition = {
+
+    id:
+      `battle_deployment_${Date.now()}_${deployment.transitionCounter}`,
+
+    type:
+      "withdrawal_queue_advance",
+
+    side:
+      "player",
+
+    withdrawnParticipantId:
+      withdrawnParticipantId,
+
+    movements:
+      movements,
+
+    createdAt:
+      Date.now()
+
+  };
+
+
+  deployment.lastTransition =
+    transition;
+
+
+  const newActivePlayer =
+    syncBattleActivePlayerFromDeployment();
+
+
+  if (
+    withdrawnPlayer
+  ) {
+
+
+    currentBattle.battleLog.push(
+      `${withdrawnPlayer.name} withdrew from Active Slot 1.`
+    );
+  }
+
+
+  const promotion =
+    movements.find(
+      movement =>
+        movement.movementType ===
+        "reserve_promotion"
+    ) ||
+    null;
+
+
+  if (
+    promotion
+  ) {
+
+
+    const promotedPlayer =
+      getPlayerCharacter(
+        promotion.participantId
+      );
+
+
+    if (
+      promotedPlayer
+    ) {
+
+
+      currentBattle.battleLog.push(
+        `${promotedPlayer.name} promoted from Reserve to Active Slot 3.`
+      );
+    }
+  }
+
+
+  if (
+    newActivePlayer
+  ) {
+
+
+    currentBattle.battleLog.push(
+      `${newActivePlayer.name} advances to Active Slot 1.`
+    );
+  }
+
+
+  saveTestState();
+
+
+  openOverlay(
+    "combat"
+  );
+
+
+  /*
+     Transition evidence remains just long enough for the
+     presentation subscriber to animate it.
+
+     Deployment state itself remains authoritative afterward.
+  */
+  setTimeout(
+    () => {
+
+
+      if (
+        currentBattle.deployment &&
+        currentBattle.deployment
+          .lastTransition &&
+        currentBattle.deployment
+          .lastTransition.id ===
+          transition.id
+      ) {
+
+
+        currentBattle.deployment
+          .lastTransition =
+          null;
+      }
+
+    },
+    760
+  );
+
+
+  return transition;
 }
 
 
@@ -34080,16 +35004,18 @@ function closeOverlay() {
 // BRICK 155 — DEVELOPMENT BATTLE STATE SAVE
 // =========================================================
 //
-// Preserves Battle / Encounter context across refreshes.
+// BRICK 299:
+// Battle deployment is now included in the development
+// refresh-safe Battle snapshot.
+//
+// Presentation transition animation is NOT persisted.
 //
 // =========================================================
-
 
 function saveTestState() {
 
 
   const state = {
-
 
     overlayType:
       currentOverlayType,
@@ -34137,6 +35063,10 @@ function saveTestState() {
         : null,
 
 
+    deployment:
+      getBattleDeploymentSaveState(),
+
+
     lastDamage:
       currentBattle.lastDamage,
 
@@ -34154,7 +35084,8 @@ function saveTestState() {
 
 
     completionRecorded:
-      currentBattle.completionRecorded ===
+      currentBattle
+        .completionRecorded ===
         true,
 
 
@@ -34170,7 +35101,6 @@ function saveTestState() {
       currentBattle.contributions ||
       {}
 
-
   };
 
 
@@ -34180,10 +35110,7 @@ function saveTestState() {
       state
     )
   );
-
-
 }
-
 
 // =========================================================
 // 5. GENERIC OVERLAY
@@ -55731,77 +56658,12 @@ function createCharacterCard(character) {
 // BRICK 296 — BATTLE ROSTER PRESENTATION PROJECTION
 // =========================================================
 //
-// IMPORTANT:
-//
-// This is a presentation adapter only.
-//
-// The current source does not yet contain a canonical
-// six-slot deployment / formation authority.
-//
-// Therefore:
-// - playerTeam order is NOT persisted as deployment state
-// - this adapter does NOT own Active / Reserve mechanics
-// - it does NOT mutate playerTeam
-// - it exists only so the authored Battle sleeves can display
-//   the current team while the real deployment system remains
-//   a later authority
-//
-// Player visual order follows the approved Battle artwork:
-//
-// visual row 1 -> slot 3
-// visual row 2 -> slot 2
-// visual row 3 -> slot 1
-// visual row 4 -> slot 4
-// visual row 5 -> slot 5
-// visual row 6 -> slot 6
+// Presentation now reads the authoritative Battle deployment
+// snapshot rather than projecting directly from playerTeam.
 //
 // =========================================================
 
 function getBattlePlayerSlotPresentation() {
-
-
-  const activePlayerId =
-    currentBattle.activePlayer &&
-    currentBattle.activePlayer.id
-      ? currentBattle.activePlayer.id
-      : null;
-
-
-  const slotRecords = [];
-
-
-  for (
-    let slotNumber = 1;
-    slotNumber <= 6;
-    slotNumber += 1
-  ) {
-
-
-    const member =
-      playerTeam[
-        slotNumber - 1
-      ] ||
-      null;
-
-
-    slotRecords.push({
-
-      slotNumber:
-        slotNumber,
-
-      member:
-        member,
-
-      active:
-        !!(
-          member &&
-          activePlayerId &&
-          member.id ===
-            activePlayerId
-        )
-
-    });
-  }
 
 
   const visualOrder = [
@@ -55815,10 +56677,44 @@ function getBattlePlayerSlotPresentation() {
 
 
   return visualOrder.map(
-    slotNumber =>
-      slotRecords[
-        slotNumber - 1
-      ]
+    slotNumber => {
+
+
+      const slot =
+        getBattleDeploymentSlot(
+          "player",
+          slotNumber
+        );
+
+
+      const member =
+        getBattleDeploymentParticipant(
+          "player",
+          slotNumber
+        );
+
+
+      return {
+
+        slotNumber:
+          slotNumber,
+
+        participantId:
+          slot
+            ? slot.participantId
+            : null,
+
+        member:
+          member,
+
+        active:
+          !!(
+            member &&
+            slotNumber === 1
+          )
+
+      };
+    }
   );
 }
 
@@ -55826,60 +56722,149 @@ function getBattlePlayerSlotPresentation() {
 function getBattleEnemySlotPresentation() {
 
 
-  const enemy =
-    currentBattle.enemy ||
-    selectedEnemy ||
-    null;
+  const visualOrder = [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6
+  ];
 
 
-  const slots = [];
+  return visualOrder.map(
+    slotNumber => {
 
 
-  for (
-    let slotNumber = 1;
-    slotNumber <= 6;
-    slotNumber += 1
+      const slot =
+        getBattleDeploymentSlot(
+          "enemy",
+          slotNumber
+        );
+
+
+      const enemy =
+        getBattleDeploymentParticipant(
+          "enemy",
+          slotNumber
+        );
+
+
+      return {
+
+        slotNumber:
+          slotNumber,
+
+        participantId:
+          slot
+            ? slot.participantId
+            : null,
+
+        enemy:
+          enemy,
+
+        active:
+          !!(
+            enemy &&
+            slotNumber === 1
+          )
+
+      };
+    }
+  );
+}
+
+
+// =========================================================
+// BRICK 301 — QUEUE TRANSITION PRESENTATION LOOKUP
+// =========================================================
+
+function getBattleRosterTransitionClass(
+  slot,
+  participant,
+  side
+) {
+
+
+  const deployment =
+    currentBattle.deployment;
+
+
+  const transition =
+    deployment &&
+    deployment.lastTransition
+
+      ? deployment.lastTransition
+
+      : null;
+
+
+  if (
+    !transition ||
+    transition.side !==
+      side ||
+    !participant ||
+    !Array.isArray(
+      transition.movements
+    )
   ) {
 
-
-    slots.push({
-
-      slotNumber:
-        slotNumber,
-
-      enemy:
-        slotNumber === 1
-          ? enemy
-          : null,
-
-      active:
-        slotNumber === 1 &&
-        !!enemy
-
-    });
+    return "";
   }
 
 
-  return slots;
+  const movement =
+    transition.movements.find(
+      entry =>
+        entry.participantId ===
+          participant.id &&
+        Number(
+          entry.toSlot
+        ) ===
+        Number(
+          slot.slotNumber
+        )
+    ) ||
+    null;
+
+
+  if (
+    !movement
+  ) {
+
+    return "";
+  }
+
+
+  switch (
+    movement.movementType
+  ) {
+
+
+    case "active_slide":
+
+      return "transition-active-slide";
+
+
+    case "reserve_promotion":
+
+      return "transition-reserve-promotion";
+
+
+    case "reserve_slide":
+
+      return "transition-reserve-slide";
+
+
+    default:
+
+      return "";
+  }
 }
 
 
 // =========================================================
 // BRICK 297 — LIVE BATTLE ROSTER SLEEVE RENDERER
-// =========================================================
-//
-// Uses existing character / enemy identity and image fields.
-//
-// Does NOT create:
-// - portrait asset authority
-// - deployment authority
-// - hidden enemy participants
-// - Remaining Battle PL for player characters
-//
-// Player rows therefore show Effective PL only.
-// Enemy Slot 1 may show current / max Battle Power because
-// those values already belong to currentBattle runtime state.
-//
 // =========================================================
 
 function renderBattleRosterSlot(
@@ -55900,15 +56885,22 @@ function renderBattleRosterSlot(
 
 
   const compact =
-    slot.slotNumber >= 4;
+    slot.slotNumber >=
+    4;
 
 
-  if (!participant) {
+  if (
+    !participant
+  ) {
 
 
     return `
       <div
-        class="battle-live-roster-slot ${compact ? "compact" : "full"} is-empty"
+        class="
+          battle-live-roster-slot
+          ${compact ? "compact" : "full"}
+          is-empty
+        "
         data-side="${side}"
         data-slot="${slot.slotNumber}"
       >
@@ -55932,6 +56924,14 @@ function renderBattleRosterSlot(
     "";
 
 
+  const transitionClass =
+    getBattleRosterTransitionClass(
+      slot,
+      participant,
+      side
+    );
+
+
   let primaryValue =
     "";
 
@@ -55940,7 +56940,9 @@ function renderBattleRosterSlot(
     "";
 
 
-  if (isPlayer) {
+  if (
+    isPlayer
+  ) {
 
 
     primaryValue =
@@ -55948,6 +56950,7 @@ function renderBattleRosterSlot(
         participant
       )}`;
   }
+
   else {
 
 
@@ -55956,7 +56959,8 @@ function renderBattleRosterSlot(
         0,
         Number(
           currentBattle.enemyPower
-        ) || 0
+        ) ||
+        0
       );
 
 
@@ -55984,7 +56988,12 @@ function renderBattleRosterSlot(
 
   return `
     <div
-      class="battle-live-roster-slot ${compact ? "compact" : "full"} ${slot.active ? "is-active" : ""}"
+      class="
+        battle-live-roster-slot
+        ${compact ? "compact" : "full"}
+        ${slot.active ? "is-active" : ""}
+        ${transitionClass}
+      "
       data-side="${side}"
       data-slot="${slot.slotNumber}"
       aria-current="${slot.active ? "true" : "false"}"
@@ -56014,12 +57023,15 @@ function renderBattleRosterSlot(
         </div>
 
         <div class="battle-live-roster-power">
+
           ${primaryValue}
+
           ${
             secondaryValue
               ? `<span>${secondaryValue}</span>`
               : ""
           }
+
         </div>
 
       </div>
@@ -56030,27 +57042,81 @@ function renderBattleRosterSlot(
 
 
 // =========================================================
-// BRICK 298 — LIVE SIX-SLOT BATTLE ROSTERS
+// BRICK 301 — WITHDRAWAL PRESENTATION ECHO
 // =========================================================
-//
-// Extends Brick 295's live authored Battle canvas.
-//
-// Reads:
-// - currentBattle
-// - selected Enemy
-// - selected Region / Location
-// - existing playerTeam
-// - canonical calculateEffectivePL()
-//
-// Does NOT yet implement:
-// - turn order
-// - queue movement
-// - withdrawal transfer
-// - Active / Reserve mechanics
-// - Skill cards
-// - Conditions
-// - Stamina mitigation
-//
+
+function renderBattleWithdrawalEcho() {
+
+
+  const deployment =
+    currentBattle.deployment;
+
+
+  const transition =
+    deployment &&
+    deployment.lastTransition
+
+      ? deployment.lastTransition
+
+      : null;
+
+
+  if (
+    !transition ||
+    transition.type !==
+      "withdrawal_queue_advance" ||
+    transition.side !==
+      "player" ||
+    !transition
+      .withdrawnParticipantId
+  ) {
+
+    return "";
+  }
+
+
+  const withdrawnPlayer =
+    getPlayerCharacter(
+      transition
+        .withdrawnParticipantId
+    );
+
+
+  if (
+    !withdrawnPlayer
+  ) {
+
+    return "";
+  }
+
+
+  return `
+    <div class="battle-live-withdraw-echo">
+
+      ${
+        withdrawnPlayer.image
+          ? `
+              <img
+                src="${withdrawnPlayer.image}"
+                alt=""
+                draggable="false"
+              >
+            `
+          : ""
+      }
+
+      <span>
+        WITHDRAW
+      </span>
+
+    </div>
+  `;
+}
+
+
+// =========================================================
+// BRICK 298 — LIVE SIX-SLOT BATTLE ROSTERS
+// BRICK 301 — QUEUE PRESENTATION INTEGRATION
 // =========================================================
 
 function renderCombatOverlay(
@@ -56063,7 +57129,10 @@ function renderCombatOverlay(
     selectedEnemy;
 
 
-  if (!enemy) {
+  if (
+    !enemy
+  ) {
+
 
     container.innerHTML = `
       <div class="battle-live-error">
@@ -56071,7 +57140,34 @@ function renderCombatOverlay(
       </div>
     `;
 
+
     return;
+  }
+
+
+  /*
+     Legacy / pre-Brick-299 Battle recovery.
+  */
+  if (
+    !currentBattle.deployment
+  ) {
+
+
+    currentBattle.deployment =
+      createBattleDeployment(
+        enemy,
+        currentBattle.activePlayer
+
+          ? currentBattle
+              .activePlayer
+              .id
+
+          : currentBattle
+              .characterId
+      );
+
+
+    syncBattleActivePlayerFromDeployment();
   }
 
 
@@ -56085,9 +57181,11 @@ function renderCombatOverlay(
     worldRegions[
       selectedRegionKey
     ]
+
       ? worldRegions[
           selectedRegionKey
         ]
+
       : null;
 
 
@@ -56098,9 +57196,11 @@ function renderCombatOverlay(
 
   const playerEffectivePL =
     activePlayer
+
       ? calculateEffectivePL(
           activePlayer
         )
+
       : 0;
 
 
@@ -56109,7 +57209,8 @@ function renderCombatOverlay(
       0,
       Number(
         currentBattle.enemyPower
-      ) || 0
+      ) ||
+      0
     );
 
 
@@ -56130,7 +57231,9 @@ function renderCombatOverlay(
     Array.isArray(
       currentBattle.battleLog
     )
+
       ? currentBattle.battleLog
+
       : [];
 
 
@@ -56186,7 +57289,8 @@ function renderCombatOverlay(
 
   const regionLabel =
     region
-      ? region.name.toUpperCase()
+      ? region.name
+          .toUpperCase()
       : "BATTLE";
 
 
@@ -56209,8 +57313,11 @@ function renderCombatOverlay(
 
   const battleLogMarkup =
     battleLog.length > 0
+
       ? battleLog
-          .slice(-8)
+          .slice(
+            -8
+          )
           .map(
             entry => `
               <div class="battle-live-log-entry">
@@ -56219,11 +57326,20 @@ function renderCombatOverlay(
             `
           )
           .join("")
+
       : `
           <div class="battle-live-log-entry muted">
             Battle begins...
           </div>
         `;
+
+
+  const canWithdraw =
+    canWithdrawActiveBattleFighter();
+
+
+  const withdrawalEcho =
+    renderBattleWithdrawalEcho();
 
 
   container.innerHTML = `
@@ -56235,22 +57351,29 @@ function renderCombatOverlay(
 
       <div class="battle-live-stage">
 
+
         <div class="battle-live-heading battle-live-heading-player">
           YOUR TEAM
         </div>
+
 
         <div class="battle-live-heading battle-live-heading-enemy">
           ENEMY TEAM
         </div>
 
+
         <div class="battle-live-location">
+
           <strong>
             ${regionLabel}
           </strong>
+
           <span>
             ${locationLabel}
           </span>
+
         </div>
+
 
         <button
           type="button"
@@ -56260,56 +57383,92 @@ function renderCombatOverlay(
           RETREAT
         </button>
 
+
         <div class="battle-live-status">
+
           <strong>
             BATTLE ACTIVE
           </strong>
+
           <span>
             ${playerLabel} VS ${enemyLabel}
           </span>
+
         </div>
+
 
         <div class="battle-live-roster battle-live-roster-player">
           ${playerRosterMarkup}
         </div>
 
+
         <div class="battle-live-roster battle-live-roster-enemy">
           ${enemyRosterMarkup}
         </div>
 
+
+        ${withdrawalEcho}
+
+
         <div class="battle-live-active-label battle-live-active-player">
+
           ACTIVE: ${
             activePlayerSlot
-              ? activePlayerSlot.slotNumber
+              ? activePlayerSlot
+                  .slotNumber
               : "—"
           }
+
         </div>
+
 
         <div class="battle-live-active-label battle-live-active-enemy">
+
           ACTIVE: ${
             activeEnemySlot
-              ? activeEnemySlot.slotNumber
+              ? activeEnemySlot
+                  .slotNumber
               : "—"
           }
+
         </div>
 
+
         <div class="battle-live-power battle-live-power-player">
+
           <strong>
             ${playerEffectivePL}
           </strong>
+
           <span>
             EFFECTIVE PL
           </span>
+
         </div>
 
+
         <div class="battle-live-power battle-live-power-enemy">
+
           <strong>
             ${enemyPower}
           </strong>
+
           <span>
             / ${enemyMaxPower}
           </span>
+
         </div>
+
+
+        <button
+          type="button"
+          class="battle-live-withdraw-action"
+          onclick="withdrawActiveBattleFighter()"
+          ${canWithdraw ? "" : "disabled"}
+        >
+          WITHDRAW
+        </button>
+
 
         <div class="battle-live-log">
 
@@ -56322,6 +57481,7 @@ function renderCombatOverlay(
           </div>
 
         </div>
+
 
       </div>
 
@@ -59011,7 +60171,13 @@ function claimDailyReward() {
 // =========================================================
 // BRICK 156 — DEVELOPMENT BATTLE STATE RESTORE
 // =========================================================
-
+//
+// BRICK 299:
+// Restore Battle-local deployment before reopening Combat.
+//
+// Old saves without deployment remain compatible.
+//
+// =========================================================
 
 function restoreTestState() {
 
@@ -59026,10 +60192,7 @@ function restoreTestState() {
     !saved
   ) {
 
-
     return;
-
-
   }
 
 
@@ -59042,7 +60205,6 @@ function restoreTestState() {
   // =========================================
   // REGION
   // =========================================
-
 
   if (
     state.regionKey &&
@@ -59072,18 +60234,13 @@ function restoreTestState() {
               state.locationId
           ) ||
         null;
-
-
     }
-
-
   }
 
 
   // =========================================
   // ENEMY
   // =========================================
-
 
   if (
     state.enemyId &&
@@ -59101,15 +60258,12 @@ function restoreTestState() {
 
     currentBattle.enemy =
       selectedEnemy;
-
-
   }
 
 
   // =========================================
   // BATTLE IDENTITY
   // =========================================
-
 
   currentBattle.battleId =
     state.battleId ||
@@ -59129,45 +60283,66 @@ function restoreTestState() {
   currentBattle.completedAt =
     Number(
       state.completedAt
-    ) || null;
+    ) ||
+    null;
 
 
   currentBattle.claimedAt =
     Number(
       state.claimedAt
-    ) || null;
+    ) ||
+    null;
 
 
   currentBattle.completionRecorded =
     state.completionRecorded ===
-      true;
+    true;
 
 
   // =========================================
   // BATTLE POWER
   // =========================================
 
-
   currentBattle.enemyPower =
     typeof state.enemyPower ===
       "number"
+
       ? state.enemyPower
+
       : 0;
 
 
   currentBattle.enemyMaxPower =
     typeof state.enemyMaxPower ===
       "number"
+
       ? state.enemyMaxPower
+
       : 0;
 
 
   // =========================================
-  // ACTIVE PLAYER
+  // BRICK 299 — DEPLOYMENT
   // =========================================
 
+  currentBattle.deployment =
+    normalizeBattleDeployment(
+      state.deployment,
+      state.activePlayerId ||
+        state.characterId ||
+        null
+    );
 
+
+  const deploymentActivePlayer =
+    syncBattleActivePlayerFromDeployment();
+
+
+  /*
+     Legacy snapshot fallback only.
+  */
   if (
+    !deploymentActivePlayer &&
     state.activePlayerId
   ) {
 
@@ -59176,10 +60351,10 @@ function restoreTestState() {
       getPlayerCharacter(
         state.activePlayerId
       ) ||
-      playerTeam[0] ||
+      playerTeam[
+        0
+      ] ||
       null;
-
-
   }
 
 
@@ -59190,9 +60365,9 @@ function restoreTestState() {
 
 
     currentBattle.characterId =
-      currentBattle.activePlayer.id;
-
-
+      currentBattle
+        .activePlayer
+        .id;
   }
 
 
@@ -59200,24 +60375,27 @@ function restoreTestState() {
   // BATTLE DATA
   // =========================================
 
-
   currentBattle.lastDamage =
     typeof state.lastDamage ===
       "number"
+
       ? state.lastDamage
+
       : 0;
 
 
   currentBattle.battleOver =
     state.battleOver ===
-      true;
+    true;
 
 
   currentBattle.battleLog =
     Array.isArray(
       state.battleLog
     )
+
       ? state.battleLog
+
       : [];
 
 
@@ -59245,7 +60423,6 @@ function restoreTestState() {
   // RESTORE SCREEN
   // =========================================
 
-
   if (
     state.overlayType ===
       "victory" &&
@@ -59267,8 +60444,6 @@ function restoreTestState() {
 
 
     return;
-
-
   }
 
 
@@ -59289,8 +60464,6 @@ function restoreTestState() {
 
 
     return;
-
-
   }
 
 
@@ -59307,8 +60480,6 @@ function restoreTestState() {
 
 
     return;
-
-
   }
 
 
@@ -59322,11 +60493,7 @@ function restoreTestState() {
     openRegionHub(
       selectedRegionKey
     );
-
-
   }
-
-
 }
 
 

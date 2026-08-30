@@ -2064,9 +2064,19 @@ body {
   box-shadow:
     inset
     0 0 18px
-    rgba(28, 193, 214, 0.08),
+    rgba(
+      28,
+      193,
+      214,
+      0.08
+    ),
     0 0 12px
-    rgba(39, 220, 238, 0.16);
+    rgba(
+      39,
+      220,
+      238,
+      0.16
+    );
 }
 
 
@@ -2083,11 +2093,371 @@ body {
   box-shadow:
     inset
     0 0 18px
-    rgba(205, 56, 30, 0.08),
+    rgba(
+      205,
+      56,
+      30,
+      0.08
+    ),
     0 0 12px
-    rgba(239, 75, 47, 0.14);
+    rgba(
+      239,
+      75,
+      47,
+      0.14
+    );
 }
 
+
+/* =========================================================
+   BRICK 301 — QUEUE PRESENTATION TRANSITIONS
+   ========================================================= */
+
+.battle-live-roster-slot.transition-active-slide {
+  animation:
+    battleActiveQueueSlide
+    420ms
+    cubic-bezier(
+      0.22,
+      0.78,
+      0.25,
+      1
+    )
+    both;
+}
+
+
+.battle-live-roster-slot.transition-reserve-promotion {
+  animation:
+    battleReservePromotion
+    620ms
+    cubic-bezier(
+      0.16,
+      0.82,
+      0.22,
+      1
+    )
+    both;
+}
+
+
+.battle-live-roster-slot.transition-reserve-slide {
+  animation:
+    battleReserveQueueSlide
+    420ms
+    cubic-bezier(
+      0.22,
+      0.78,
+      0.25,
+      1
+    )
+    both;
+}
+
+
+@keyframes battleActiveQueueSlide {
+
+  from {
+    transform:
+      translateY(
+        -106%
+      );
+
+    opacity:
+      0.7;
+  }
+
+
+  to {
+    transform:
+      translateY(
+        0
+      );
+
+    opacity:
+      1;
+  }
+
+}
+
+
+@keyframes battleReserveQueueSlide {
+
+  from {
+    transform:
+      translateY(
+        115%
+      );
+
+    opacity:
+      0.72;
+  }
+
+
+  to {
+    transform:
+      translateY(
+        0
+      );
+
+    opacity:
+      1;
+  }
+
+}
+
+
+/*
+   Slot 4 is spatially separated from Slot 3.
+
+   Promotion therefore gets a distinct authored transition
+   instead of pretending it is an ordinary adjacent slide.
+*/
+@keyframes battleReservePromotion {
+
+  0% {
+    transform:
+      translateY(
+        324%
+      )
+      scale(
+        0.72
+      );
+
+    opacity:
+      0.3;
+
+    filter:
+      brightness(
+        0.72
+      );
+  }
+
+
+  55% {
+    opacity:
+      1;
+
+    filter:
+      brightness(
+        1.28
+      );
+  }
+
+
+  100% {
+    transform:
+      translateY(
+        0
+      )
+      scale(
+        1
+      );
+
+    opacity:
+      1;
+
+    filter:
+      brightness(
+        1
+      );
+  }
+
+}
+
+
+/* =========================================
+   WITHDRAWING SLOT-1 ECHO
+   ========================================= */
+
+.battle-live-withdraw-echo {
+  position: absolute;
+
+  left: 0.95%;
+  top: 32.75%;
+
+  width: 18.85%;
+  height: 11.35%;
+
+  z-index: 18;
+
+  overflow: hidden;
+
+  pointer-events: none;
+
+  animation:
+    battleWithdrawExit
+    540ms
+    ease-out
+    both;
+}
+
+
+.battle-live-withdraw-echo img {
+  position: absolute;
+
+  left: 13.2%;
+  top: 7.5%;
+
+  width: 26.5%;
+  height: 81%;
+
+  object-fit: cover;
+  object-position: 50% 22%;
+
+  filter:
+    saturate(
+      0.7
+    )
+    brightness(
+      1.12
+    );
+}
+
+
+.battle-live-withdraw-echo span {
+  position: absolute;
+
+  left: 46%;
+  top: 33%;
+
+  color: #73e8f3;
+
+  font-size:
+    clamp(
+      6px,
+      0.68vw,
+      11px
+    );
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.08em;
+
+  text-shadow:
+    0 2px 4px #000,
+    0 0 8px
+    rgba(
+      62,
+      220,
+      237,
+      0.45
+    );
+}
+
+
+@keyframes battleWithdrawExit {
+
+  0% {
+    transform:
+      translateX(
+        0
+      );
+
+    opacity:
+      0.92;
+  }
+
+
+  100% {
+    transform:
+      translateX(
+        -34%
+      )
+      scale(
+        0.94
+      );
+
+    opacity:
+      0;
+  }
+
+}
+
+
+/* =========================================
+   LIVE WITHDRAW ACTION
+   ========================================= */
+
+.battle-live-withdraw-action {
+  position: absolute;
+
+  left: 61.1%;
+  top: 82.65%;
+
+  width: 8.7%;
+  height: 6.55%;
+
+  z-index: 20;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #f0a06b;
+
+  font-size:
+    clamp(
+      7px,
+      0.76vw,
+      13px
+    );
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.055em;
+
+  cursor: pointer;
+
+  text-shadow:
+    0 2px 4px #000;
+}
+
+
+.battle-live-withdraw-action:hover,
+.battle-live-withdraw-action:focus-visible {
+  color:
+    #ffd1ad;
+
+  outline:
+    1px solid
+    rgba(
+      232,
+      112,
+      60,
+      0.48
+    );
+
+  background:
+    rgba(
+      190,
+      69,
+      32,
+      0.055
+    );
+}
+
+
+.battle-live-withdraw-action:disabled {
+  color:
+    #6d5a4e;
+
+  cursor:
+    default;
+
+  opacity:
+    0.48;
+
+  outline:
+    none;
+
+  background:
+    transparent;
+}
 
 /* =========================================================
    25. ROSTER / SHOP
