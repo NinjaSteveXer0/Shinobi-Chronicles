@@ -34207,6 +34207,15 @@ function initializeBattleContributionRecordsFromDeployment() {
           0,
 
         bukijutsuDamage:
+          0,
+
+        genjutsuDamage:
+          0,
+
+        fuinjutsuDamage:
+          0,
+
+        kinjutsuDamage:
           0
 
       };
@@ -34474,6 +34483,18 @@ function startEncounter(
     generatedBattlePower;
 
 
+  // =========================================
+  // BRICK 321 — REMAINING BATTLE PL
+  // =========================================
+
+  initializeBattleRemainingPLFromDeployment({
+
+    preserveExistingEnemyPower:
+      true
+
+  });
+
+
   console.log(
     "BATTLE INSTANCE CREATED:",
     currentBattle.battleId
@@ -34493,8 +34514,6 @@ function startEncounter(
 
   return currentBattle;
 }
-
-
 
 
 // =========================================================
@@ -34739,6 +34758,14 @@ function loadAcademyPilotBattleDeployment() {
   initializeBattleContributionRecordsFromDeployment();
 
 
+  initializeBattleRemainingPLFromDeployment({
+
+    preserveExistingEnemyPower:
+      true
+
+  });
+
+
   currentBattle.battleLog = [
 
     `${currentBattle.enemy.name} appears!`,
@@ -34941,8 +34968,10 @@ function runAcademyPilotDeploymentDiagnostics() {
   return result;
 }
 
-// =========================================================
+
+//=========================================================
 // BRICK 300 — WITHDRAWAL / QUEUE TRANSITION AUTHORITY
+// BRICK 329 — ZERO REMAINING PL WITHDRAWAL INTEGRATION
 // =========================================================
 //
 // Semantic Battle transition:
@@ -34954,6 +34983,9 @@ function runAcademyPilotDeploymentDiagnostics() {
 // 6 → 5   Reserve slide
 //
 // Slot 6 becomes empty.
+//
+// Manual withdrawal and zero-Remaining-PL withdrawal share
+// this exact queue authority.
 //
 // =========================================================
 
@@ -35014,7 +35046,9 @@ function canWithdrawActiveBattleFighter() {
 }
 
 
-function withdrawActiveBattleFighter() {
+function withdrawActiveBattleFighter(
+  options = {}
+) {
 
 
   if (
@@ -35048,6 +35082,23 @@ function withdrawActiveBattleFighter() {
   const withdrawnPlayer =
     getPlayerCharacter(
       withdrawnParticipantId
+    );
+
+
+  const reason =
+    options &&
+    options.reason
+
+      ? options.reason
+
+      : "manual_withdrawal";
+
+
+  const runtimeCleanup =
+    cleanupBattleParticipantRuntimeState(
+      "player",
+      withdrawnParticipantId,
+      reason
     );
 
 
@@ -35116,9 +35167,6 @@ function withdrawActiveBattleFighter() {
   }
 
 
-  /*
-     Authoritative queue mutation occurs once.
-  */
   for (
     let index = 0;
     index < 5;
@@ -35163,11 +35211,17 @@ function withdrawActiveBattleFighter() {
     side:
       "player",
 
+    reason:
+      reason,
+
     withdrawnParticipantId:
       withdrawnParticipantId,
 
     movements:
       movements,
+
+    runtimeCleanup:
+      runtimeCleanup,
 
     createdAt:
       Date.now()
@@ -35188,8 +35242,17 @@ function withdrawActiveBattleFighter() {
   ) {
 
 
+    const message =
+      reason ===
+        "zero_remaining_battle_pl"
+
+        ? `${withdrawnPlayer.name} reached 0 Battle PL and withdrew from Active Slot 1.`
+
+        : `${withdrawnPlayer.name} withdrew from Active Slot 1.`;
+
+
     currentBattle.battleLog.push(
-      `${withdrawnPlayer.name} withdrew from Active Slot 1.`
+      message
     );
   }
 
@@ -35198,7 +35261,7 @@ function withdrawActiveBattleFighter() {
     movements.find(
       movement =>
         movement.movementType ===
-        "reserve_promotion"
+          "reserve_promotion"
     ) ||
     null;
 
@@ -35237,6 +35300,30 @@ function withdrawActiveBattleFighter() {
   }
 
 
+  recordBattleEvidence({
+
+    eventType:
+      "battle_participant_withdrawn",
+
+    actorRef:
+      createBattleParticipantRef(
+        "player",
+        withdrawnParticipantId
+      ),
+
+    data: {
+
+      reason:
+        reason,
+
+      movements:
+        movements
+
+    }
+
+  });
+
+
   saveTestState();
 
 
@@ -35245,12 +35332,6 @@ function withdrawActiveBattleFighter() {
   );
 
 
-  /*
-     Transition evidence remains just long enough for the
-     presentation subscriber to animate it.
-
-     Deployment state itself remains authoritative afterward.
-  */
   setTimeout(
     () => {
 
@@ -35296,7 +35377,6 @@ function recordBattleContribution(
   ) {
 
     return;
-
   }
 
 
@@ -35306,16 +35386,13 @@ function recordBattleContribution(
     ];
 
 
-  if (!contribution) {
+  if (
+    !contribution
+  ) {
 
     return;
-
   }
 
-
-  // =========================================
-  // ENSURE CONTRIBUTION DATA IS COMPLETE
-  // =========================================
 
   contribution.damage =
     Number(
@@ -35329,72 +35406,76 @@ function recordBattleContribution(
     ) || 0;
 
 
-  contribution.ninjutsuDamage =
-    Number(
-      contribution.ninjutsuDamage
-    ) || 0;
+  const disciplineDamageKeys = {
+
+    nin:
+      "ninjutsuDamage",
+
+    tai:
+      "taijutsuDamage",
+
+    gen:
+      "genjutsuDamage",
+
+    buki:
+      "bukijutsuDamage",
+
+    fuin:
+      "fuinjutsuDamage",
+
+    kin:
+      "kinjutsuDamage"
+
+  };
 
 
-  contribution.taijutsuDamage =
-    Number(
-      contribution.taijutsuDamage
-    ) || 0;
+  Object.values(
+    disciplineDamageKeys
+  ).forEach(
+    key => {
 
 
-  contribution.bukijutsuDamage =
-    Number(
-      contribution.bukijutsuDamage
-    ) || 0;
+      contribution[
+        key
+      ] =
+        Number(
+          contribution[
+            key
+          ]
+        ) || 0;
+    }
+  );
 
-
-  // =========================================
-  // TOTAL CONTRIBUTION
-  // =========================================
 
   contribution.damage +=
-    damage;
+    Number(
+      damage
+    ) || 0;
 
 
   contribution.attacks +=
     1;
 
 
-  // =========================================
-  // ATTACK TYPE CONTRIBUTION
-  // =========================================
-
-  if (
-    attackType ===
-    "ninjutsu"
-  ) {
-
-    contribution.ninjutsuDamage +=
-      damage;
-
-  }
+  const disciplineDamageKey =
+    disciplineDamageKeys[
+      attackType
+    ] ||
+    null;
 
 
   if (
-    attackType ===
-    "taijutsu"
+    disciplineDamageKey
   ) {
 
-    contribution.taijutsuDamage +=
-      damage;
 
+    contribution[
+      disciplineDamageKey
+    ] +=
+      Number(
+        damage
+      ) || 0;
   }
-
-
-  if (
-    attackType ===
-    "bukijutsu"
-  ) {
-
-    contribution.bukijutsuDamage +=
-      damage;
-
-  }
-
 }
 
 
@@ -35491,8 +35572,6 @@ function calculateBattleMVP() {
   };
 
 }
-
-
 
 
 // =========================================================
@@ -38586,20 +38665,25 @@ function formatPL(value) {
 }
 
 // =========================================================
-// BATTLE POWER CALCULATION
+// BRICK 320 — BATTLE POWER CAPACITY
+// DAMAGE / STAMINA v1 ALIGNMENT
 // =========================================================
 //
-// Battle uses Effective state.
+// Remaining Battle PL capacity is derived from authoritative
+// PL only.
 //
-// PLAYER:
-// Developed persistent stats
-// +
-// equipment / contextual stat effects
-// ↓
-// Effective PL
+// Stamina is NOT added to Battle PL capacity.
 //
-// ENEMY:
-// Existing enemy Power authority.
+// Stamina participates later, once per mechanical damage
+// packet, at the canonical mitigation stage:
+//
+// resolved attack PL
+// → Stamina mitigation
+// → final PL damage
+// → Remaining Battle PL
+//
+// Encounter multipliers and the existing small Battle-entry
+// variation remain presentation/runtime capacity rules.
 //
 // =========================================================
 
@@ -38607,6 +38691,14 @@ function calculateBattlePower(
   character,
   encounterType = "standard"
 ) {
+
+
+  if (
+    !character
+  ) {
+
+    return 0;
+  }
 
 
   const isPlayerCharacter =
@@ -38619,47 +38711,9 @@ function calculateBattlePower(
       ? calculateEffectivePL(
           character
         )
-      : character.power;
-
-
-  let stamina =
-    character.stats?.stamina ||
-    0;
-
-
-  // =========================================
-  // PLAYER CHARACTERS USE DEVELOPED
-  // EFFECTIVE STATS
-  // =========================================
-
-  if (
-    isPlayerCharacter
-  ) {
-
-
-    const effectiveStats =
-      getDevelopedEffectiveCharacterStats(
-        character
-      );
-
-
-    stamina =
-      effectiveStats.stamina ||
-      0;
-
-  }
-
-
-  // =========================================
-  // CORE BATTLE POWER
-  // =========================================
-
-  let battlePower =
-    pl +
-    (
-      stamina *
-      0.5
-    );
+      : Number(
+          character.power
+        ) || 0;
 
 
   // =========================================
@@ -38683,15 +38737,22 @@ function calculateBattlePower(
   };
 
 
-  battlePower *=
-    multipliers[
-      encounterType
-    ] ||
-    1;
+  let battlePower =
+    pl *
+    (
+      multipliers[
+        encounterType
+      ] ||
+      1
+    );
 
 
   // =========================================
-  // SMALL ±10% VARIATION
+  // EXISTING SMALL ±10% BATTLE-ENTRY VARIATION
+  // =========================================
+  //
+  // Stamina is deliberately absent here.
+  //
   // =========================================
 
   const variation =
@@ -38712,7 +38773,6 @@ function calculateBattlePower(
       battlePower
     )
   );
-
 }
 
 
@@ -58835,35 +58895,42 @@ function renderBattleRosterSlot(
   ) {
 
 
+    const currentPower =
+      getBattleRemainingPL(
+        "player",
+        participant.id
+      );
+
+
+    const maxPower =
+      getBattleMaximumPL(
+        "player",
+        participant.id
+      );
+
+
     primaryValue =
-      `EPL ${calculateEffectivePL(
-        participant
-      )}`;
+      `BP ${currentPower}`;
+
+
+    secondaryValue =
+      `/ ${maxPower}`;
   }
 
   else {
 
 
     const currentPower =
-      Math.max(
-        0,
-        Number(
-          currentBattle.enemyPower
-        ) ||
-        0
+      getBattleRemainingPL(
+        "enemy",
+        participant.id
       );
 
 
     const maxPower =
-      Math.max(
-        currentPower,
-        Number(
-          currentBattle.enemyMaxPower
-        ) ||
-        Number(
-          participant.power
-        ) ||
-        0
+      getBattleMaximumPL(
+        "enemy",
+        participant.id
       );
 
 
@@ -59082,37 +59149,39 @@ function renderCombatOverlay(
     null;
 
 
-  const playerEffectivePL =
+  const playerBattlePL =
     activePlayer
 
-      ? calculateEffectivePL(
-          activePlayer
+      ? getBattleRemainingPL(
+          "player",
+          activePlayer.id
+        )
+
+      : 0;
+
+
+  const playerMaxBattlePL =
+    activePlayer
+
+      ? getBattleMaximumPL(
+          "player",
+          activePlayer.id
         )
 
       : 0;
 
 
   const enemyPower =
-    Math.max(
-      0,
-      Number(
-        currentBattle.enemyPower
-      ) ||
-      0
+    getBattleRemainingPL(
+      "enemy",
+      enemy.id
     );
 
 
   const enemyMaxPower =
-    Math.max(
-      enemyPower,
-
-      Number(
-        currentBattle.enemyMaxPower
-      ) ||
-      Number(
-        enemy.power
-      ) ||
-      0
+    getBattleMaximumPL(
+      "enemy",
+      enemy.id
     );
 
 
@@ -59378,11 +59447,11 @@ function renderCombatOverlay(
         >
 
           <strong>
-            ${playerEffectivePL}
+            ${playerBattlePL}
           </strong>
 
           <span>
-            EFFECTIVE PL
+            / ${playerMaxBattlePL} BATTLE PL
           </span>
 
         </div>
@@ -59441,6 +59510,7 @@ function renderCombatOverlay(
     </section>
   `;
 }
+
 
 // =========================================================
 // UI MODULE — VICTORY RESULTS SCREEN
@@ -61529,31 +61599,28 @@ function continueAfterVictory() {
 
 }
 
-
 // =========================================================
 // BRICK 302 — BATTLE RUNTIME STATE FOUNDATION
+// BRICK 321 — REMAINING BATTLE PL RUNTIME AUTHORITY
 // =========================================================
 //
 // Owns Battle-local transient truth only.
 //
 // Persistent authorities remain elsewhere.
 //
-// Runtime state currently supports:
+// Runtime state supports:
 //
+// - Remaining Battle PL by participant
 // - transient source/target interaction state
 // - temporary Conditions
 // - structured Battle evidence
 // - shared action sequence identity
 //
-// It does NOT own:
-// - Character Stats
-// - Relationships
-// - Equipment
-// - Weapons
-// - Hosted Entities
-// - Bloodlines
-// - Transformations
-// - Chronicle history
+// Remaining Battle PL is runtime capacity. It never mutates
+// persistent Character Stats or PL.
+//
+// Stamina is not stored as a depletion value here.
+// There is intentionally no remainingStamina.
 //
 // =========================================================
 
@@ -61569,6 +61636,15 @@ function createBattleRuntimeState() {
 
     actionSequence:
       0,
+
+
+    remainingPL: {
+
+      player: {},
+
+      enemy: {}
+
+    },
 
 
     transientStates:
@@ -61598,6 +61674,43 @@ function ensureBattleRuntimeState() {
 
     currentBattle.runtime =
       createBattleRuntimeState();
+  }
+
+
+  if (
+    !currentBattle.runtime.remainingPL ||
+    typeof currentBattle.runtime.remainingPL !==
+      "object"
+  ) {
+
+
+    currentBattle.runtime.remainingPL = {
+
+      player: {},
+
+      enemy: {}
+
+    };
+  }
+
+
+  if (
+    !currentBattle.runtime.remainingPL.player ||
+    typeof currentBattle.runtime.remainingPL.player !==
+      "object"
+  ) {
+
+    currentBattle.runtime.remainingPL.player = {};
+  }
+
+
+  if (
+    !currentBattle.runtime.remainingPL.enemy ||
+    typeof currentBattle.runtime.remainingPL.enemy !==
+      "object"
+  ) {
+
+    currentBattle.runtime.remainingPL.enemy = {};
   }
 
 
@@ -61679,6 +61792,10 @@ function getBattleRuntimeSaveState() {
       ) || 0,
 
 
+    remainingPL:
+      runtime.remainingPL,
+
+
     transientStates:
       runtime.transientStates,
 
@@ -61710,6 +61827,14 @@ function restoreBattleRuntimeState(
       createBattleRuntimeState();
 
 
+    initializeBattleRemainingPLFromDeployment({
+
+      preserveExistingEnemyPower:
+        true
+
+    });
+
+
     return currentBattle.runtime;
   }
 
@@ -61725,6 +61850,19 @@ function restoreBattleRuntimeState(
       Number(
         rawRuntime.actionSequence
       ) || 0,
+
+
+    remainingPL:
+      rawRuntime.remainingPL &&
+      typeof rawRuntime.remainingPL ===
+        "object"
+
+        ? rawRuntime.remainingPL
+
+        : {
+            player: {},
+            enemy: {}
+          },
 
 
     transientStates:
@@ -61759,7 +61897,493 @@ function restoreBattleRuntimeState(
   };
 
 
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const hasAnyRemainingPL =
+    Object.keys(
+      runtime.remainingPL.player
+    ).length > 0 ||
+    Object.keys(
+      runtime.remainingPL.enemy
+    ).length > 0;
+
+
+  if (
+    !hasAnyRemainingPL
+  ) {
+
+
+    initializeBattleRemainingPLFromDeployment({
+
+      preserveExistingEnemyPower:
+        true
+
+    });
+  }
+
+  else {
+
+    syncBattleEnemyPowerCompatibilityProjection();
+  }
+
+
   return currentBattle.runtime;
+}
+
+
+// =========================================================
+// BRICK 321 — REMAINING BATTLE PL HELPERS
+// =========================================================
+
+function getBattleRemainingPLSideStore(
+  side
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    side !== "player" &&
+    side !== "enemy"
+  ) {
+
+    return null;
+  }
+
+
+  return runtime.remainingPL[
+    side
+  ];
+}
+
+
+function getBattleParticipantByIdentity(
+  side,
+  participantId
+) {
+
+
+  if (
+    !side ||
+    !participantId
+  ) {
+
+    return null;
+  }
+
+
+  if (
+    side === "player"
+  ) {
+
+    return getPlayerCharacter(
+      participantId
+    );
+  }
+
+
+  if (
+    side === "enemy" &&
+    currentBattle.enemy &&
+    currentBattle.enemy.id ===
+      participantId
+  ) {
+
+    return currentBattle.enemy;
+  }
+
+
+  return null;
+}
+
+
+function getBattleRemainingPLRecord(
+  side,
+  participantId
+) {
+
+
+  const store =
+    getBattleRemainingPLSideStore(
+      side
+    );
+
+
+  if (
+    !store ||
+    !participantId
+  ) {
+
+    return null;
+  }
+
+
+  return store[
+    participantId
+  ] || null;
+}
+
+
+function setBattleRemainingPLRecord(
+  side,
+  participantId,
+  maximum,
+  current = maximum
+) {
+
+
+  const store =
+    getBattleRemainingPLSideStore(
+      side
+    );
+
+
+  if (
+    !store ||
+    !participantId
+  ) {
+
+    return null;
+  }
+
+
+  const maxPL =
+    Math.max(
+      1,
+      Math.round(
+        Number(
+          maximum
+        ) || 1
+      )
+    );
+
+
+  const currentPL =
+    Math.max(
+      0,
+      Math.min(
+        maxPL,
+        Math.round(
+          Number(
+            current
+          ) || 0
+        )
+      )
+    );
+
+
+  store[
+    participantId
+  ] = {
+
+    participantId:
+      participantId,
+
+    maximum:
+      maxPL,
+
+    current:
+      currentPL
+
+  };
+
+
+  if (
+    side === "enemy"
+  ) {
+
+    syncBattleEnemyPowerCompatibilityProjection();
+  }
+
+
+  return store[
+    participantId
+  ];
+}
+
+
+function getBattleRemainingPL(
+  side,
+  participantId
+) {
+
+
+  const record =
+    getBattleRemainingPLRecord(
+      side,
+      participantId
+    );
+
+
+  return record
+    ? Number(
+        record.current
+      ) || 0
+    : 0;
+}
+
+
+function getBattleMaximumPL(
+  side,
+  participantId
+) {
+
+
+  const record =
+    getBattleRemainingPLRecord(
+      side,
+      participantId
+    );
+
+
+  return record
+    ? Number(
+        record.maximum
+      ) || 0
+    : 0;
+}
+
+
+function setBattleRemainingPL(
+  side,
+  participantId,
+  nextValue
+) {
+
+
+  const record =
+    getBattleRemainingPLRecord(
+      side,
+      participantId
+    );
+
+
+  if (
+    !record
+  ) {
+
+    return null;
+  }
+
+
+  record.current =
+    Math.max(
+      0,
+      Math.min(
+        record.maximum,
+        Math.round(
+          Number(
+            nextValue
+          ) || 0
+        )
+      )
+    );
+
+
+  if (
+    side === "enemy"
+  ) {
+
+    syncBattleEnemyPowerCompatibilityProjection();
+  }
+
+
+  return record;
+}
+
+
+function syncBattleEnemyPowerCompatibilityProjection() {
+
+
+  if (
+    !currentBattle.enemy
+  ) {
+
+    return false;
+  }
+
+
+  const record =
+    getBattleRemainingPLRecord(
+      "enemy",
+      currentBattle.enemy.id
+    );
+
+
+  if (
+    !record
+  ) {
+
+    return false;
+  }
+
+
+  currentBattle.enemyPower =
+    record.current;
+
+
+  currentBattle.enemyMaxPower =
+    record.maximum;
+
+
+  return true;
+}
+
+
+function initializeBattleRemainingPLFromDeployment(
+  options = {}
+) {
+
+
+  if (
+    !currentBattle.deployment
+  ) {
+
+    return false;
+  }
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  runtime.remainingPL.player = {};
+
+
+  const playerSlots =
+    currentBattle.deployment.player &&
+    Array.isArray(
+      currentBattle.deployment.player.slots
+    )
+
+      ? currentBattle.deployment.player.slots
+
+      : [];
+
+
+  playerSlots.forEach(
+    slot => {
+
+
+      if (
+        !slot ||
+        !slot.participantId
+      ) {
+
+        return;
+      }
+
+
+      const participant =
+        getPlayerCharacter(
+          slot.participantId
+        );
+
+
+      if (
+        !participant
+      ) {
+
+        return;
+      }
+
+
+      const maximum =
+        calculateBattlePower(
+          participant,
+          "standard"
+        );
+
+
+      setBattleRemainingPLRecord(
+        "player",
+        participant.id,
+        maximum,
+        maximum
+      );
+    }
+  );
+
+
+  const enemy =
+    currentBattle.enemy ||
+    null;
+
+
+  if (
+    enemy
+  ) {
+
+
+    const existingEnemyCurrent =
+      options.preserveExistingEnemyPower ===
+        true
+
+        ? Math.max(
+            0,
+            Number(
+              currentBattle.enemyPower
+            ) || 0
+          )
+
+        : null;
+
+
+    const existingEnemyMaximum =
+      options.preserveExistingEnemyPower ===
+        true
+
+        ? Math.max(
+            0,
+            Number(
+              currentBattle.enemyMaxPower
+            ) || 0
+          )
+
+        : null;
+
+
+    runtime.remainingPL.enemy = {};
+
+
+    const maximum =
+      existingEnemyMaximum &&
+      existingEnemyMaximum > 0
+
+        ? existingEnemyMaximum
+
+        : calculateBattlePower(
+            enemy,
+            "standard"
+          );
+
+
+    const current =
+      existingEnemyCurrent !== null &&
+      existingEnemyCurrent >= 0
+
+        ? Math.min(
+            maximum,
+            existingEnemyCurrent
+          )
+
+        : maximum;
+
+
+    setBattleRemainingPLRecord(
+      "enemy",
+      enemy.id,
+      maximum,
+      current
+    );
+  }
+
+
+  return runtime.remainingPL;
 }
 
 
@@ -62189,11 +62813,17 @@ function removeBattleTransientState(
 
 // =========================================================
 // BRICK 303 — TEMPORARY BATTLE CONDITIONS
+// BRICK 331 — CONDITION SEMANTICS
+// BRICK 332 — NEXT ACTION OPPORTUNITY LIFECYCLE
 // =========================================================
 //
-// Conditions may restrict classes of actions.
+// Conditions may restrict action classes and/or explicit
+// action semantic traits.
 //
 // They do NOT rewrite Character Stats.
+//
+// sealed_chakra_flow therefore blocks chakra expression,
+// not every positive runtime state.
 //
 // =========================================================
 
@@ -62278,6 +62908,27 @@ function addBattleCondition(
         : [],
 
 
+    blockedActionTraits:
+      Array.isArray(
+        definition.blockedActionTraits
+      )
+
+        ? [
+            ...new Set(
+              definition
+                .blockedActionTraits
+                .filter(
+                  value =>
+                    typeof value ===
+                      "string" &&
+                    value.length > 0
+                )
+            )
+          ]
+
+        : [],
+
+
     data:
       definition.data
         ? cloneBattleRuntimeValue(
@@ -62308,7 +62959,8 @@ function addBattleCondition(
 function getBattleBlockingConditions(
   side,
   participantId,
-  actionClass
+  actionClass,
+  actionTraits = []
 ) {
 
 
@@ -62326,21 +62978,61 @@ function getBattleBlockingConditions(
   }
 
 
+  const traits =
+    Array.isArray(
+      actionTraits
+    )
+
+      ? actionTraits
+
+      : [];
+
+
   return runtime.conditions.filter(
-    condition =>
-      condition.targetRef &&
-      condition.targetRef.side ===
-        side &&
-      condition.targetRef
-        .participantId ===
-        participantId &&
-      Array.isArray(
+    condition => {
+
+
+      if (
+        !condition.targetRef ||
+        condition.targetRef.side !==
+          side ||
+        condition.targetRef
+          .participantId !==
+          participantId
+      ) {
+
+        return false;
+      }
+
+
+      const classBlocked =
+        Array.isArray(
+          condition.blockedActionClasses
+        ) &&
         condition.blockedActionClasses
-      ) &&
-      condition.blockedActionClasses
-        .includes(
-          actionClass
-        )
+          .includes(
+            actionClass
+          );
+
+
+      const traitBlocked =
+        Array.isArray(
+          condition.blockedActionTraits
+        ) &&
+        condition.blockedActionTraits
+          .some(
+            blockedTrait =>
+              traits.includes(
+                blockedTrait
+              )
+          );
+
+
+      return (
+        classBlocked ||
+        traitBlocked
+      );
+    }
   );
 }
 
@@ -62379,6 +63071,232 @@ function removeBattleCondition(
 
   return true;
 }
+
+
+function getBattleParticipantConditions(
+  side,
+  participantId
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  return runtime.conditions.filter(
+    condition =>
+      condition.targetRef &&
+      condition.targetRef.side ===
+        side &&
+      condition.targetRef.participantId ===
+        participantId
+  );
+}
+
+
+function consumeBattleActionOpportunity(
+  side,
+  participantId,
+  actionId,
+  reason = "valid_action_completed"
+) {
+
+
+  const expiringConditions =
+    getBattleParticipantConditions(
+      side,
+      participantId
+    )
+      .filter(
+        condition =>
+          condition.data &&
+          condition.data.expiry ===
+            "next_action_opportunity"
+      );
+
+
+  const removedConditionIds =
+    [];
+
+
+  expiringConditions.forEach(
+    condition => {
+
+
+      if (
+        removeBattleCondition(
+          condition.conditionId
+        )
+      ) {
+
+
+        removedConditionIds.push(
+          condition.conditionId
+        );
+
+
+        recordBattleEvidence({
+
+          eventType:
+            "condition_expired_on_action_opportunity",
+
+          actionId:
+            actionId || null,
+
+          actorRef:
+            createBattleParticipantRef(
+              side,
+              participantId
+            ),
+
+          conditionRefs: [
+            condition.conditionId
+          ],
+
+          data: {
+
+            conditionKey:
+              condition.conditionKey,
+
+            reason:
+              reason
+
+          }
+
+        });
+      }
+    }
+  );
+
+
+  return removedConditionIds;
+}
+
+
+function cleanupBattleParticipantRuntimeState(
+  side,
+  participantId,
+  reason = "participant_left_battle"
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const removedStateIds =
+    [];
+
+
+  const removedConditionIds =
+    [];
+
+
+  runtime.transientStates =
+    runtime.transientStates.filter(
+      state => {
+
+
+        const targetsParticipant =
+          state.targetRef &&
+          state.targetRef.side ===
+            side &&
+          state.targetRef.participantId ===
+            participantId;
+
+
+        if (
+          targetsParticipant
+        ) {
+
+          removedStateIds.push(
+            state.stateId
+          );
+
+          return false;
+        }
+
+
+        return true;
+      }
+    );
+
+
+  runtime.conditions =
+    runtime.conditions.filter(
+      condition => {
+
+
+        const targetsParticipant =
+          condition.targetRef &&
+          condition.targetRef.side ===
+            side &&
+          condition.targetRef.participantId ===
+            participantId;
+
+
+        if (
+          targetsParticipant
+        ) {
+
+          removedConditionIds.push(
+            condition.conditionId
+          );
+
+          return false;
+        }
+
+
+        return true;
+      }
+    );
+
+
+  if (
+    removedStateIds.length > 0 ||
+    removedConditionIds.length > 0
+  ) {
+
+
+    recordBattleEvidence({
+
+      eventType:
+        "participant_runtime_cleanup",
+
+      actorRef:
+        createBattleParticipantRef(
+          side,
+          participantId
+        ),
+
+      stateRefs:
+        removedStateIds,
+
+      conditionRefs:
+        removedConditionIds,
+
+      data: {
+
+        reason:
+          reason
+
+      }
+
+    });
+  }
+
+
+  return {
+
+    removedStateIds:
+      removedStateIds,
+
+    removedConditionIds:
+      removedConditionIds
+
+  };
+}
+
 
 
 // =========================================================
@@ -62644,7 +63562,13 @@ function validateBattleActionEnvelope(
       envelope.actorRef.side,
       envelope.actorRef
         .participantId,
-      envelope.actionClass
+      envelope.actionClass,
+      envelope.data &&
+      Array.isArray(
+        envelope.data.traits
+      )
+        ? envelope.data.traits
+        : []
     );
 
 
@@ -63201,7 +64125,6 @@ function runBattleRuntimeFoundationDiagnostics() {
   return result;
 }
 
-// =========================================================
 // BRICK 308 — ACADEMY BATTLE SKILL REGISTRY
 // =========================================================
 //
@@ -63215,8 +64138,8 @@ function runBattleRuntimeFoundationDiagnostics() {
 //
 // 15 Skills total.
 //
-// Final numerical damage coefficients and Stamina mitigation
-// remain outside this registry.
+// Damage / Stamina Resolution v1 is now authoritative.
+// Each damaging Skill carries its authored damage profile.
 //
 // =========================================================
 
@@ -63261,6 +64184,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
     staminaMitigation:
       true,
+
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
 
     executionTags: [
       "close_range"
@@ -63308,6 +64241,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
     staminaMitigation:
       true,
+
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
 
     executionTags: [
       "close_range"
@@ -63414,6 +64357,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     staminaMitigation:
       true,
 
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
+
     executionTags: [
       "close_range"
     ],
@@ -63511,6 +64464,20 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     staminaMitigation:
       true,
 
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers: {
+
+        enhanced:
+          1.35
+
+      }
+
+    },
+
     executionTags: [
       "close_range"
     ],
@@ -63579,6 +64546,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     staminaMitigation:
       true,
 
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
+
     executionTags: [
       "close_range"
     ],
@@ -63640,6 +64617,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
     staminaMitigation:
       true,
+
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
 
     executionTags: [
       "ranged"
@@ -63703,6 +64690,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
     staminaMitigation:
       true,
+
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
 
     executionTags: [
       "redirected_projectile"
@@ -63783,6 +64780,20 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
     staminaMitigation:
       true,
+
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers: {
+
+        guided:
+          1.25
+
+      }
+
+    },
 
     executionTags: [
       "ranged"
@@ -63868,6 +64879,20 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     staminaMitigation:
       true,
 
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers: {
+
+        guided:
+          1.25
+
+      }
+
+    },
+
     executionTags: [
       "close_range"
     ],
@@ -63949,8 +64974,9 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     executionTags:
       [],
 
-    traits:
-      [],
+    traits: [
+      "chakra_dependent_positive_self_enhancement"
+    ],
 
     requirements: [
 
@@ -64041,6 +65067,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
     staminaMitigation:
       true,
+
+    damageProfile: {
+
+      coefficient:
+        0.45,
+
+      branchMultipliers:
+        {}
+
+    },
 
     executionTags: [
       "close_range"
@@ -64139,6 +65175,16 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     staminaMitigation:
       true,
 
+    damageProfile: {
+
+      coefficient:
+        0.30,
+
+      branchMultipliers:
+        {}
+
+    },
+
     executionTags: [
       "close_range",
       "physical_contact_delivery"
@@ -64176,9 +65222,13 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 
         blockedActionClasses: [
 
-          "transformation_activation",
+          "transformation_activation"
 
-          "positive_self_enhancement"
+        ],
+
+        blockedActionTraits: [
+
+          "chakra_dependent_positive_self_enhancement"
 
         ]
 
@@ -64321,7 +65371,6 @@ function getPreparedAcademyBattleSkills(
 }
 
 
-// =========================================================
 // BRICK 308 — SKILL AVAILABILITY
 // BRICK 316 — PERSISTENT THROWING-WEAPON AVAILABILITY
 // =========================================================
@@ -64569,7 +65618,12 @@ function evaluateAcademyBattleSkillAvailability(
     getBattleBlockingConditions(
       "player",
       actor.id,
-      skill.actionClass
+      skill.actionClass,
+      Array.isArray(
+        skill.traits
+      )
+        ? skill.traits
+        : []
     );
 
 
@@ -64879,11 +65933,12 @@ function getAcademyBattleSkillCompactStatus(
 
   if (
     skill.staminaMitigation ===
-      true
+      true &&
+    skill.damageProfile
   ) {
 
     return (
-      "1 PL packet • Stamina stage"
+      `${skill.damageProfile.coefficient}× ${skill.primaryDiscipline} • 1 packet`
     );
   }
 
@@ -65039,6 +66094,7 @@ function renderTemporaryBattleSkillDeck(
     </div>
   `;
 }
+
 
 
 // =========================================================
@@ -65381,7 +66437,1245 @@ function getAcademyBattleSkillSourceRefs(
 // =========================================================
 // BRICK 310 — SHARED SKILL SEMANTIC RESOLVER
 // BRICK 317 — COMPATIBLE SELF-STATE CONSUMPTION
+// BRICK 323 — EFFECTIVE PRIMARY DISCIPLINE OUTPUT
+// BRICK 324 — AUTHORED BRANCH MULTIPLIERS
+// BRICK 325 — PRE-STAMINA DEFENSIVE INTERACTIONS
+// BRICK 326 — STAMINA MITIGATION v1
+// BRICK 327 — DAMAGE RESOLUTION EVIDENCE
+// BRICK 328 — REMAINING BATTLE PL MUTATION
+// BRICK 330 — VICTORY BOUNDARY
+// BRICK 333 — SEAL STRIKE CONDITION APPLICATION
 // =========================================================
+
+const BATTLE_STAMINA_PIVOT_V1 =
+  100;
+
+
+const BATTLE_PRIMARY_DISCIPLINE_STAT_KEYS = {
+
+  Ninjutsu:
+    "nin",
+
+  Taijutsu:
+    "tai",
+
+  Genjutsu:
+    "gen",
+
+  Bukijutsu:
+    "buki",
+
+  "Fūinjutsu":
+    "fuin",
+
+  Fuinjutsu:
+    "fuin",
+
+  Kinjutsu:
+    "kin",
+
+  Stamina:
+    "stamina"
+
+};
+
+
+function getBattlePrimaryDisciplineStatKey(
+  primaryDiscipline
+) {
+
+
+  return (
+    BATTLE_PRIMARY_DISCIPLINE_STAT_KEYS[
+      primaryDiscipline
+    ] ||
+    null
+  );
+}
+
+
+function getBattleEffectiveStatsForParticipant(
+  side,
+  participantId
+) {
+
+
+  if (
+    side === "player"
+  ) {
+
+
+    const character =
+      getPlayerCharacter(
+        participantId
+      );
+
+
+    return character
+      ? getDevelopedEffectiveCharacterStats(
+          character
+        )
+      : null;
+  }
+
+
+  if (
+    side === "enemy" &&
+    currentBattle.enemy &&
+    currentBattle.enemy.id ===
+      participantId
+  ) {
+
+
+    return {
+
+      ...(
+        currentBattle.enemy.stats ||
+        {}
+      )
+
+    };
+  }
+
+
+  return null;
+}
+
+
+function getBattleEffectiveStamina(
+  side,
+  participantId
+) {
+
+
+  const stats =
+    getBattleEffectiveStatsForParticipant(
+      side,
+      participantId
+    );
+
+
+  return Math.max(
+    0,
+    Number(
+      stats &&
+      stats.stamina
+    ) || 0
+  );
+}
+
+
+function getAcademySkillDamageProfile(
+  skill
+) {
+
+
+  if (
+    !skill ||
+    skill.resolutionKind !==
+      "direct_damage" ||
+    !skill.damageProfile
+  ) {
+
+    return null;
+  }
+
+
+  return skill.damageProfile;
+}
+
+
+function calculateAcademySkillAttackOutput(
+  skill,
+  actor,
+  branch = "normal"
+) {
+
+
+  const profile =
+    getAcademySkillDamageProfile(
+      skill
+    );
+
+
+  if (
+    !profile ||
+    !actor
+  ) {
+
+    return null;
+  }
+
+
+  const statKey =
+    getBattlePrimaryDisciplineStatKey(
+      skill.primaryDiscipline
+    );
+
+
+  if (
+    !statKey
+  ) {
+
+    return null;
+  }
+
+
+  const effectiveStats =
+    getDevelopedEffectiveCharacterStats(
+      actor
+    );
+
+
+  const effectivePrimaryDiscipline =
+    Math.max(
+      0,
+      Number(
+        effectiveStats[
+          statKey
+        ]
+      ) || 0
+    );
+
+
+  const coefficient =
+    Math.max(
+      0,
+      Number(
+        profile.coefficient
+      ) || 0
+    );
+
+
+  const branchMultipliers =
+    profile.branchMultipliers &&
+    typeof profile.branchMultipliers ===
+      "object"
+
+      ? profile.branchMultipliers
+
+      : {};
+
+
+  const branchMultiplier =
+    branch !== "normal" &&
+    branchMultipliers[
+      branch
+    ] !== undefined
+
+      ? Number(
+          branchMultipliers[
+            branch
+          ]
+        ) || 1
+
+      : 1;
+
+
+  const preDefenseAttackMagnitude =
+    effectivePrimaryDiscipline *
+    coefficient *
+    branchMultiplier;
+
+
+  const attackPL =
+    Math.max(
+      1,
+      Math.round(
+        preDefenseAttackMagnitude
+      )
+    );
+
+
+  return {
+
+    primaryDiscipline:
+      skill.primaryDiscipline,
+
+    statKey:
+      statKey,
+
+    effectivePrimaryDiscipline:
+      effectivePrimaryDiscipline,
+
+    coefficient:
+      coefficient,
+
+    branch:
+      branch,
+
+    branchMultiplier:
+      branchMultiplier,
+
+    preDefenseAttackMagnitude:
+      preDefenseAttackMagnitude,
+
+    attackPL:
+      attackPL
+
+  };
+}
+
+
+function calculateBattleStaminaMitigationV1(
+  resolvedAttackPL,
+  effectiveStamina,
+  pivot = BATTLE_STAMINA_PIVOT_V1
+) {
+
+
+  const attackPL =
+    Math.max(
+      0,
+      Math.round(
+        Number(
+          resolvedAttackPL
+        ) || 0
+      )
+    );
+
+
+  const stamina =
+    Math.max(
+      0,
+      Number(
+        effectiveStamina
+      ) || 0
+    );
+
+
+  const staminaPivot =
+    Math.max(
+      1,
+      Number(
+        pivot
+      ) || 100
+    );
+
+
+  if (
+    attackPL <= 0
+  ) {
+
+
+    return {
+
+      resolvedAttackPL:
+        0,
+
+      effectiveStamina:
+        stamina,
+
+      pivot:
+        staminaPivot,
+
+      mitigationAmount:
+        0,
+
+      finalDamage:
+        0
+
+    };
+  }
+
+
+  const calculatedDamage =
+    Math.floor(
+      attackPL *
+      staminaPivot /
+      (
+        staminaPivot +
+        stamina
+      )
+    );
+
+
+  const finalDamage =
+    Math.max(
+      1,
+      calculatedDamage
+    );
+
+
+  return {
+
+    resolvedAttackPL:
+      attackPL,
+
+    effectiveStamina:
+      stamina,
+
+    pivot:
+      staminaPivot,
+
+    mitigationAmount:
+      Math.max(
+        0,
+        attackPL -
+        finalDamage
+      ),
+
+    finalDamage:
+      finalDamage
+
+  };
+}
+
+
+function resolveBattlePreStaminaDefense(
+  definition
+) {
+
+
+  const incomingAttackPL =
+    Math.max(
+      1,
+      Math.round(
+        Number(
+          definition.attackPL
+        ) || 1
+      )
+    );
+
+
+  const result = {
+
+    incomingAttackPL:
+      incomingAttackPL,
+
+    resolvedAttackPL:
+      incomingAttackPL,
+
+    guardingStep: {
+
+      participated:
+        false,
+
+      stateId:
+        null,
+
+      attemptedReduction:
+        0,
+
+      actualReduction:
+        0
+
+    },
+
+    consumedStateIds:
+      []
+
+  };
+
+
+  if (
+    definition.mitigable !==
+      true ||
+    definition.targetSide !==
+      "player" ||
+    !definition.targetParticipantId
+  ) {
+
+    return result;
+  }
+
+
+  const guardingStep =
+    findBattleTransientState({
+
+      stateKey:
+        "guarding_step",
+
+      targetSide:
+        "player",
+
+      targetParticipantId:
+        definition.targetParticipantId
+
+    });
+
+
+  if (
+    !guardingStep
+  ) {
+
+    return result;
+  }
+
+
+  result.guardingStep.participated =
+    true;
+
+
+  result.guardingStep.stateId =
+    guardingStep.stateId;
+
+
+  const attemptedReduction =
+    incomingAttackPL > 1
+
+      ? Math.max(
+          1,
+          Math.round(
+            incomingAttackPL *
+            0.25
+          )
+        )
+
+      : 0;
+
+
+  const reducedAttackPL =
+    Math.max(
+      1,
+      incomingAttackPL -
+      attemptedReduction
+    );
+
+
+  result.guardingStep.attemptedReduction =
+    attemptedReduction;
+
+
+  result.guardingStep.actualReduction =
+    Math.max(
+      0,
+      incomingAttackPL -
+      reducedAttackPL
+    );
+
+
+  result.resolvedAttackPL =
+    reducedAttackPL;
+
+
+  const consumed =
+    consumeBattleTransientState(
+      guardingStep.stateId,
+      "player",
+      definition.targetParticipantId
+    );
+
+
+  if (
+    consumed
+  ) {
+
+    result.consumedStateIds.push(
+      consumed.stateId
+    );
+  }
+
+
+  return result;
+}
+
+
+function completeBattleVictoryFromDamage(
+  finishingShinobi,
+  envelope = null
+) {
+
+
+  if (
+    currentBattle.battleOver ===
+      true
+  ) {
+
+    return currentBattle.rewards;
+  }
+
+
+  currentBattle.battleOver =
+    true;
+
+
+  currentBattle.active =
+    false;
+
+
+  currentBattle.completedAt =
+    Date.now();
+
+
+  const rewards =
+    generateBattleRewards(
+      currentBattle.enemy,
+      finishingShinobi
+    );
+
+
+  const mvp =
+    calculateBattleMVP();
+
+
+  if (
+    rewards &&
+    mvp
+  ) {
+
+    rewards.mvp =
+      mvp;
+  }
+
+
+  recordBattleEvidence({
+
+    eventType:
+      "battle_victory",
+
+    actionId:
+      envelope
+        ? envelope.actionId
+        : null,
+
+    actorRef:
+      finishingShinobi
+        ? createBattleParticipantRef(
+            "player",
+            finishingShinobi.id
+          )
+        : null,
+
+    targetRef:
+      currentBattle.enemy
+        ? createBattleParticipantRef(
+            "enemy",
+            currentBattle.enemy.id
+          )
+        : null,
+
+    data: {
+
+      enemyRemainingBattlePL:
+        0,
+
+      finishingShinobiId:
+        finishingShinobi
+          ? finishingShinobi.id
+          : null
+
+    }
+
+  });
+
+
+  saveTestState();
+
+
+  openOverlay(
+    "victory"
+  );
+
+
+  return rewards;
+}
+
+
+function handleBattleParticipantAtZeroPL(
+  side,
+  participantId,
+  actor,
+  envelope
+) {
+
+
+  if (
+    side === "enemy"
+  ) {
+
+
+    return completeBattleVictoryFromDamage(
+      actor,
+      envelope
+    );
+  }
+
+
+  if (
+    side === "player" &&
+    getBattleActiveParticipantId(
+      "player"
+    ) ===
+      participantId
+  ) {
+
+
+    if (
+      canWithdrawActiveBattleFighter()
+    ) {
+
+
+      return withdrawActiveBattleFighter({
+
+        reason:
+          "zero_remaining_battle_pl"
+
+      });
+    }
+
+
+    currentBattle.battleLog.push(
+      "Active shinobi reached 0 Battle PL with no deployment successor available."
+    );
+  }
+
+
+  return null;
+}
+
+
+function resolveBattleDamagePacket(
+  definition
+) {
+
+
+  if (
+    !definition ||
+    !definition.actorSide ||
+    !definition.actorParticipantId ||
+    !definition.targetSide ||
+    !definition.targetParticipantId ||
+    !definition.output
+  ) {
+
+    return null;
+  }
+
+
+  const targetRecord =
+    getBattleRemainingPLRecord(
+      definition.targetSide,
+      definition.targetParticipantId
+    );
+
+
+  if (
+    !targetRecord
+  ) {
+
+
+    console.log(
+      "Battle damage target has no Remaining PL record."
+    );
+
+
+    return null;
+  }
+
+
+  const before =
+    targetRecord.current;
+
+
+  const preDefense =
+    resolveBattlePreStaminaDefense({
+
+      attackPL:
+        definition.output.attackPL,
+
+      mitigable:
+        definition.mitigable ===
+          true,
+
+      targetSide:
+        definition.targetSide,
+
+      targetParticipantId:
+        definition.targetParticipantId
+
+    });
+
+
+  const effectiveStamina =
+    getBattleEffectiveStamina(
+      definition.targetSide,
+      definition.targetParticipantId
+    );
+
+
+  const staminaResolution =
+    calculateBattleStaminaMitigationV1(
+      preDefense.resolvedAttackPL,
+      effectiveStamina
+    );
+
+
+  const after =
+    Math.max(
+      0,
+      before -
+      staminaResolution.finalDamage
+    );
+
+
+  setBattleRemainingPL(
+    definition.targetSide,
+    definition.targetParticipantId,
+    after
+  );
+
+
+  const stateRefs = [
+
+    ...(
+      Array.isArray(
+        definition.stateRefs
+      )
+        ? definition.stateRefs
+        : []
+    ),
+
+    ...preDefense.consumedStateIds
+
+  ];
+
+
+  const evidence =
+    recordBattleEvidence({
+
+      eventType:
+        "damage_resolved",
+
+      actionId:
+        definition.envelope
+          ? definition.envelope.actionId
+          : null,
+
+      actorRef:
+        createBattleParticipantRef(
+          definition.actorSide,
+          definition.actorParticipantId
+        ),
+
+      targetRef:
+        createBattleParticipantRef(
+          definition.targetSide,
+          definition.targetParticipantId
+        ),
+
+      skillId:
+        definition.skill
+          ? definition.skill.id
+          : null,
+
+      sourceRefs:
+        definition.envelope &&
+        Array.isArray(
+          definition.envelope.sourceRefs
+        )
+          ? definition.envelope.sourceRefs
+          : [],
+
+      stateRefs:
+        stateRefs,
+
+      data: {
+
+        primaryDiscipline:
+          definition.output.primaryDiscipline,
+
+        primaryDisciplineStatKey:
+          definition.output.statKey,
+
+        effectivePrimaryDiscipline:
+          definition.output.effectivePrimaryDiscipline,
+
+        authoredCoefficient:
+          definition.output.coefficient,
+
+        branch:
+          definition.output.branch,
+
+        branchMultiplier:
+          definition.output.branchMultiplier,
+
+        preDefenseAttackMagnitude:
+          definition.output.preDefenseAttackMagnitude,
+
+        preDefenseAttackPL:
+          definition.output.attackPL,
+
+        guardingStepParticipated:
+          preDefense.guardingStep.participated,
+
+        guardingStepStateId:
+          preDefense.guardingStep.stateId,
+
+        guardingStepAttemptedReduction:
+          preDefense.guardingStep.attemptedReduction,
+
+        guardingStepActualReduction:
+          preDefense.guardingStep.actualReduction,
+
+        resolvedAttackPL:
+          preDefense.resolvedAttackPL,
+
+        effectiveStamina:
+          staminaResolution.effectiveStamina,
+
+        staminaPivot:
+          staminaResolution.pivot,
+
+        staminaMitigationAmount:
+          staminaResolution.mitigationAmount,
+
+        finalDamage:
+          staminaResolution.finalDamage,
+
+        remainingBattlePLBefore:
+          before,
+
+        remainingBattlePLAfter:
+          after,
+
+        mechanicalPacketCount:
+          definition.skill &&
+          definition.skill.mechanicalPacketCount
+            ? definition.skill.mechanicalPacketCount
+            : 1
+
+      }
+
+    });
+
+
+  const actor =
+    getBattleParticipantByIdentity(
+      definition.actorSide,
+      definition.actorParticipantId
+    );
+
+
+  if (
+    definition.actorSide ===
+      "player" &&
+    definition.targetSide ===
+      "enemy" &&
+    actor
+  ) {
+
+
+    recordBattleContribution(
+      actor,
+      staminaResolution.finalDamage,
+      definition.output.statKey
+    );
+  }
+
+
+  currentBattle.lastDamage =
+    staminaResolution.finalDamage;
+
+
+  if (
+    currentBattle.battleLog &&
+    Array.isArray(
+      currentBattle.battleLog
+    )
+  ) {
+
+
+    const guardText =
+      preDefense.guardingStep.participated
+
+        ? ` Guard blocked ${preDefense.guardingStep.actualReduction}.`
+
+        : "";
+
+
+    currentBattle.battleLog.push(
+      `Attack ${definition.output.attackPL}.${guardText} Stamina blocked ${staminaResolution.mitigationAmount}. ${staminaResolution.finalDamage} BP lost.`
+    );
+  }
+
+
+  let zeroResult =
+    null;
+
+
+  if (
+    after <= 0
+  ) {
+
+
+    zeroResult =
+      handleBattleParticipantAtZeroPL(
+        definition.targetSide,
+        definition.targetParticipantId,
+        actor,
+        definition.envelope ||
+          null
+      );
+  }
+
+
+  return {
+
+    evidence:
+      evidence,
+
+    output:
+      definition.output,
+
+    preDefense:
+      preDefense,
+
+    stamina:
+      staminaResolution,
+
+    finalDamage:
+      staminaResolution.finalDamage,
+
+    remainingBattlePLBefore:
+      before,
+
+    remainingBattlePLAfter:
+      after,
+
+    zeroResult:
+      zeroResult
+
+  };
+}
+
+
+function findAcademyConditionalState(
+  skill,
+  actor,
+  target
+) {
+
+
+  if (
+    !skill ||
+    !skill.conditional ||
+    !skill.conditional.stateKey ||
+    !actor ||
+    !target
+  ) {
+
+    return null;
+  }
+
+
+  const targetSide =
+    skill.targetMode ===
+      "self"
+
+      ? "player"
+
+      : "enemy";
+
+
+  let matchingState =
+    findBattleTransientState({
+
+      stateKey:
+        skill.conditional.stateKey,
+
+      sourceSide:
+        "player",
+
+      sourceParticipantId:
+        skill.conditional.sourceMustBeActor
+
+          ? actor.id
+
+          : undefined,
+
+      targetSide:
+        targetSide,
+
+      targetParticipantId:
+        target.id
+
+    });
+
+
+  if (
+    !matchingState &&
+    Array.isArray(
+      skill.traits
+    )
+  ) {
+
+
+    const selfState =
+      findBattleTransientState({
+
+        stateKey:
+          skill.conditional.stateKey,
+
+        sourceSide:
+          "player",
+
+        sourceParticipantId:
+          skill.conditional.sourceMustBeActor
+
+          ? actor.id
+
+          : undefined,
+
+        targetSide:
+          "player",
+
+        targetParticipantId:
+          actor.id
+
+      });
+
+
+    const compatibleTrait =
+      selfState &&
+      selfState.data
+
+        ? selfState.data.compatibleConsumerTrait ||
+          null
+
+        : null;
+
+
+    if (
+      selfState &&
+      compatibleTrait &&
+      skill.traits.includes(
+        compatibleTrait
+      )
+    ) {
+
+      matchingState =
+        selfState;
+    }
+  }
+
+
+  if (
+    !matchingState ||
+    !canBattleParticipantConsumeTransientState(
+      matchingState,
+      "player",
+      actor.id
+    )
+  ) {
+
+    return null;
+  }
+
+
+  return matchingState;
+}
+
+
+function applyAcademySealStrikeCondition(
+  skill,
+  envelope,
+  actor,
+  target
+) {
+
+
+  if (
+    !skill ||
+    !skill.conditional ||
+    !skill.conditional.deferredCondition ||
+    !target
+  ) {
+
+    return null;
+  }
+
+
+  const definition =
+    skill.conditional.deferredCondition;
+
+
+  const condition =
+    addBattleCondition({
+
+      conditionKey:
+        definition.conditionKey,
+
+      sourceSide:
+        "player",
+
+      sourceParticipantId:
+        actor.id,
+
+      targetSide:
+        envelope.targetRef.side,
+
+      targetParticipantId:
+        target.id,
+
+      blockedActionClasses:
+        definition.blockedActionClasses ||
+        [],
+
+      blockedActionTraits:
+        definition.blockedActionTraits ||
+        [],
+
+      data: {
+
+        expiry:
+          definition.expiry ||
+          "next_action_opportunity",
+
+        appliedBySkillId:
+          skill.id
+
+      }
+
+    });
+
+
+  if (
+    condition
+  ) {
+
+
+    recordBattleEvidence({
+
+      eventType:
+        "condition_applied",
+
+      actionId:
+        envelope.actionId,
+
+      actorRef:
+        envelope.actorRef,
+
+      targetRef:
+        envelope.targetRef,
+
+      skillId:
+        skill.id,
+
+      sourceRefs:
+        envelope.sourceRefs,
+
+      conditionRefs: [
+        condition.conditionId
+      ],
+
+      data: {
+
+        conditionKey:
+          condition.conditionKey,
+
+        expiry:
+          condition.data.expiry
+
+      }
+
+    });
+  }
+
+
+  return condition;
+}
+
 
 function resolveAcademyBattleSkillSemantics(
   skill,
@@ -65393,14 +67687,6 @@ function resolveAcademyBattleSkillSemantics(
 
   const stateRefs =
     [];
-
-
-  let branch =
-    "normal";
-
-
-  let consumedState =
-    null;
 
 
   // =======================================================
@@ -65519,6 +67805,9 @@ function resolveAcademyBattleSkillSemantics(
       stateRefs:
         stateRefs,
 
+      conditionRefs:
+        [],
+
       damageApplied:
         false
 
@@ -65527,252 +67816,158 @@ function resolveAcademyBattleSkillSemantics(
 
 
   // =======================================================
-  // CONDITIONAL ALTERNATE RESOLUTION
+  // DIRECT DAMAGE SKILLS
   // =======================================================
 
+  const conditionalState =
+    findAcademyConditionalState(
+      skill,
+      actor,
+      target
+    );
+
+
+  const branch =
+    conditionalState
+
+      ? skill.conditional.enhancedBranch ||
+        "enhanced"
+
+      : "normal";
+
+
+  const output =
+    calculateAcademySkillAttackOutput(
+      skill,
+      actor,
+      branch
+    );
+
+
   if (
-    skill.conditional &&
-    skill.conditional.stateKey &&
-    target
+    !output
   ) {
 
 
-    const targetSide =
-      skill.targetMode ===
-        "self"
+    return {
 
-        ? "player"
+      resolved:
+        false,
 
-        : "enemy";
+      reason:
+        "damage_output_unavailable"
 
-
-    let matchingState =
-      findBattleTransientState({
-
-        stateKey:
-          skill.conditional
-            .stateKey,
-
-        sourceSide:
-          "player",
-
-        sourceParticipantId:
-          skill.conditional
-            .sourceMustBeActor
-
-            ? actor.id
-
-            : undefined,
-
-        targetSide:
-          targetSide,
-
-        targetParticipantId:
-          target.id
-
-      });
+    };
+  }
 
 
-    // =====================================================
-    // BRICK 317 — COMPATIBLE SELF-STATE FALLBACK
-    // =====================================================
-    //
-    // Some setup states target the acting character rather
-    // than the eventual enemy target.
-    //
-    // Example:
-    // Menma + Yin Kurama → Menma = kurama_guidance
-    //
-    // A fallback self-state is valid only when that runtime
-    // state explicitly names a compatible consumer trait and
-    // the selected Skill carries that trait.
-    //
-    // This keeps relation-scoped enemy openings such as
-    // feinted_opening and binding_formula target-specific.
-    //
-    // =====================================================
+  const damage =
+    resolveBattleDamagePacket({
 
-    if (
-      !matchingState &&
-      actor &&
-      Array.isArray(
-        skill.traits
-      )
-    ) {
+      envelope:
+        envelope,
 
+      skill:
+        skill,
 
-      const selfState =
-        findBattleTransientState({
+      actorSide:
+        "player",
 
-          stateKey:
-            skill.conditional
-              .stateKey,
+      actorParticipantId:
+        actor.id,
 
-          sourceSide:
-            "player",
+      targetSide:
+        envelope.targetRef.side,
 
-          sourceParticipantId:
-            skill.conditional
-              .sourceMustBeActor
+      targetParticipantId:
+        target.id,
 
-              ? actor.id
+      output:
+        output,
 
-              : undefined,
+      mitigable:
+        skill.staminaMitigation ===
+          true,
 
-          targetSide:
-            "player",
+      stateRefs:
+        conditionalState
+          ? [
+              conditionalState.stateId
+            ]
+          : []
 
-          targetParticipantId:
-            actor.id
-
-        });
+    });
 
 
-      const compatibleTrait =
-        selfState &&
-        selfState.data
-          ? selfState
-              .data
-              .compatibleConsumerTrait ||
-            null
-          : null;
+  if (
+    !damage
+  ) {
 
 
-      if (
-        selfState &&
-        compatibleTrait &&
-        skill.traits.includes(
-          compatibleTrait
-        )
-      ) {
+    return {
+
+      resolved:
+        false,
+
+      reason:
+        "damage_resolution_failed"
+
+    };
+  }
 
 
-        matchingState =
-          selfState;
-      }
-    }
+  let consumedState =
+    null;
 
 
-    if (
-      matchingState &&
-      canBattleParticipantConsumeTransientState(
-        matchingState,
+  if (
+    conditionalState &&
+    skill.conditional.consume ===
+      true
+  ) {
+
+
+    consumedState =
+      consumeBattleTransientState(
+        conditionalState.stateId,
         "player",
         actor.id
-      )
-    ) {
-
-
-      branch =
-        skill.conditional
-          .enhancedBranch ||
-        "enhanced";
-
-
-      stateRefs.push(
-        matchingState.stateId
       );
 
 
-      if (
-        skill.conditional.consume ===
-          true
-      ) {
+    if (
+      consumedState
+    ) {
 
-
-        consumedState =
-          consumeBattleTransientState(
-            matchingState.stateId,
-            "player",
-            actor.id
-          );
-      }
+      stateRefs.push(
+        consumedState.stateId
+      );
     }
   }
 
 
-  // =======================================================
-  // DIRECT DAMAGE SEMANTICS
-  // =======================================================
-  //
-  // Final magnitude intentionally remains unresolved.
-  //
-  // This is NOT the legacy stat × 0.20 formula.
-  //
-  // =======================================================
+  let appliedCondition =
+    null;
 
-  recordBattleEvidence({
 
-    eventType:
-      "skill_resolution_pending_balance",
+  if (
+    branch ===
+      "sealed_chakra_flow" &&
+    damage.remainingBattlePLAfter >
+      0 &&
+    skill.conditional &&
+    skill.conditional.deferredCondition
+  ) {
 
-    actionId:
-      envelope.actionId,
 
-    actorRef:
-      envelope.actorRef,
-
-    targetRef:
-      envelope.targetRef,
-
-    skillId:
-      skill.id,
-
-    sourceRefs:
-      envelope.sourceRefs,
-
-    stateRefs:
-      stateRefs,
-
-    data: {
-
-      branch:
-        branch,
-
-      mechanicalPacketCount:
-        skill.mechanicalPacketCount ||
-        0,
-
-      visualImpactCount:
-        skill.visualImpactCount ||
-        0,
-
-      staminaMitigation:
-        skill.staminaMitigation ===
-        true,
-
-      damageMagnitudeStatus:
-        "tunable_not_locked",
-
-      consumedStateId:
-        consumedState
-          ? consumedState.stateId
-          : null,
-
-      deferredCondition:
-        skill.conditional &&
-        skill.conditional
-          .deferredCondition
-
-          ? cloneBattleRuntimeValue(
-              skill.conditional
-                .deferredCondition
-            )
-
-          : null,
-
-      deferredConditionReason:
-        skill.conditional &&
-        skill.conditional
-          .deferredCondition
-
-          ? "next_action_opportunity_lifecycle_not_yet_authoritative"
-
-          : null
-
-    }
-
-  });
+    appliedCondition =
+      applyAcademySealStrikeCondition(
+        skill,
+        envelope,
+        actor,
+        target
+      );
+  }
 
 
   currentBattle.battleLog.push(
@@ -65781,11 +67976,6 @@ function resolveAcademyBattleSkillSemantics(
         ? ` [${branch}]`
         : ""
     }.`
-  );
-
-
-  currentBattle.battleLog.push(
-    "PL damage tuning pending — Battle Power unchanged."
   );
 
 
@@ -65800,15 +67990,37 @@ function resolveAcademyBattleSkillSemantics(
     stateRefs:
       stateRefs,
 
+    conditionRefs:
+      appliedCondition
+        ? [
+            appliedCondition.conditionId
+          ]
+        : [],
+
+    consumedStateId:
+      consumedState
+        ? consumedState.stateId
+        : null,
+
     damageApplied:
-      false
+      true,
+
+    damage:
+      damage,
+
+    finalDamage:
+      damage.finalDamage,
+
+    remainingBattlePLBefore:
+      damage.remainingBattlePLBefore,
+
+    remainingBattlePLAfter:
+      damage.remainingBattlePLAfter
 
   };
 }
 
 
-
-// =========================================================
 // BRICK 310 — SHARED SKILL ACTION ENTRY
 // =========================================================
 
@@ -65996,6 +68208,16 @@ function attemptAcademyBattleSkill(
 
         : [],
 
+    conditionRefs:
+      resolution &&
+      Array.isArray(
+        resolution.conditionRefs
+      )
+
+        ? resolution.conditionRefs
+
+        : [],
+
     data: {
 
       resolved:
@@ -66014,19 +68236,56 @@ function attemptAcademyBattleSkill(
         !!(
           resolution &&
           resolution.damageApplied
-        )
+        ),
+
+      finalDamage:
+        resolution &&
+        typeof resolution.finalDamage ===
+          "number"
+          ? resolution.finalDamage
+          : 0,
+
+      remainingBattlePLAfter:
+        resolution &&
+        typeof resolution.remainingBattlePLAfter ===
+          "number"
+          ? resolution.remainingBattlePLAfter
+          : null
 
     }
 
   });
 
 
+  if (
+    resolution &&
+    resolution.resolved ===
+      true
+  ) {
+
+
+    consumeBattleActionOpportunity(
+      "player",
+      actor.id,
+      envelope.actionId,
+      "valid_action_completed"
+    );
+  }
+
+
   saveTestState();
 
 
-  openOverlay(
-    "combat"
-  );
+  if (
+    currentBattle.battleOver !==
+      true
+  ) {
+
+
+    openOverlay(
+      "combat"
+    );
+  }
 
 
   return {
@@ -66044,7 +68303,6 @@ function attemptAcademyBattleSkill(
 }
 
 
-// =========================================================
 // BRICK 308–310 — PILOT DIAGNOSTIC
 // =========================================================
 
@@ -66215,12 +68473,20 @@ function runAcademyBattleSkillDefinitionDiagnostics() {
       ),
 
 
-    noLockedDamageCoefficients:
-      skills.every(
-        skill =>
-          skill.damageCoefficient ===
-          undefined
-      )
+    approvedDamageProfilesPresent:
+      skills
+        .filter(
+          skill =>
+            skill.resolutionKind ===
+              "direct_damage"
+        )
+        .every(
+          skill =>
+            skill.damageProfile &&
+            Number(
+              skill.damageProfile.coefficient
+            ) > 0
+        )
 
   };
 
@@ -66435,12 +68701,20 @@ function runAcademyPilotIntegrationDiagnostics() {
         true,
 
 
-    battlePowerStillUnchanged:
-      Number(
-        currentBattle.enemyPower
-      ) ===
-      Number(
-        currentBattle.enemyMaxPower
+    remainingBattlePLReady:
+      !!(
+        currentBattle.enemy &&
+        getBattleMaximumPL(
+          "enemy",
+          currentBattle.enemy.id
+        ) > 0 &&
+        ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(
+          characterId =>
+            getBattleMaximumPL(
+              "player",
+              characterId
+            ) > 0
+        )
       )
 
   };
@@ -66464,6 +68738,558 @@ function runAcademyPilotIntegrationDiagnostics() {
   return result;
 }
 
+// =========================================================
+// BRICK 334 — DAMAGE / STAMINA v1 FORMULA DIAGNOSTICS
+// =========================================================
+
+function runAcademyDamageStaminaV1Diagnostics() {
+
+
+  const hinata =
+    getPlayerCharacter(
+      "academy_hinata"
+    );
+
+
+  const izuno =
+    getPlayerCharacter(
+      "academy_izuno"
+    );
+
+
+  const menma =
+    getPlayerCharacter(
+      "academy_menma"
+    );
+
+
+  const openingPalm =
+    getAcademyBattleSkillDefinition(
+      "academy_hinata_hyuga_opening_palm"
+    );
+
+
+  const pouncingStrike =
+    getAcademyBattleSkillDefinition(
+      "academy_izuno_pouncing_strike"
+    );
+
+
+  const yinPulse =
+    getAcademyBattleSkillDefinition(
+      "academy_menma_yin_chakra_pulse"
+    );
+
+
+  const twinPalm =
+    getAcademyBattleSkillDefinition(
+      "academy_hinata_hyuga_twin_palm"
+    );
+
+
+  const crossfire =
+    getAcademyBattleSkillDefinition(
+      "academy_mirai_shuriken_crossfire"
+    );
+
+
+  const hinataOutput =
+    calculateAcademySkillAttackOutput(
+      openingPalm,
+      hinata,
+      "normal"
+    );
+
+
+  const izunoOutput =
+    calculateAcademySkillAttackOutput(
+      pouncingStrike,
+      izuno,
+      "enhanced"
+    );
+
+
+  const menmaOutput =
+    calculateAcademySkillAttackOutput(
+      yinPulse,
+      menma,
+      "guided"
+    );
+
+
+  const hinataDamage =
+    calculateBattleStaminaMitigationV1(
+      hinataOutput.attackPL,
+      8
+    );
+
+
+  const izunoDamage =
+    calculateBattleStaminaMitigationV1(
+      izunoOutput.attackPL,
+      8
+    );
+
+
+  const menmaDamage =
+    calculateBattleStaminaMitigationV1(
+      menmaOutput.attackPL,
+      8
+    );
+
+
+  const guardPreview =
+    (() => {
+
+      const incoming =
+        4;
+
+      const attemptedReduction =
+        Math.max(
+          1,
+          Math.round(
+            incoming *
+            0.25
+          )
+        );
+
+      const resolved =
+        Math.max(
+          1,
+          incoming -
+          attemptedReduction
+        );
+
+      const stamina =
+        calculateBattleStaminaMitigationV1(
+          resolved,
+          8
+        );
+
+      return {
+        incoming,
+        attemptedReduction,
+        resolved,
+        finalDamage: stamina.finalDamage
+      };
+    })();
+
+
+  const result = {
+
+    hinataOpeningPalmAttackPL:
+      hinataOutput.attackPL ===
+      4,
+
+    hinataOpeningPalmVsSta8:
+      hinataDamage.finalDamage ===
+      3,
+
+    izunoEnhancedPounceAttackPL:
+      izunoOutput.attackPL ===
+      5,
+
+    izunoEnhancedPounceVsSta8:
+      izunoDamage.finalDamage ===
+      4,
+
+    menmaGuidedPulseAttackPL:
+      menmaOutput.attackPL ===
+      6,
+
+    menmaGuidedPulseVsSta8:
+      menmaDamage.finalDamage ===
+      5,
+
+    guardBeforeStaminaPreview:
+      guardPreview.incoming ===
+        4 &&
+      guardPreview.attemptedReduction ===
+        1 &&
+      guardPreview.resolved ===
+        3 &&
+      guardPreview.finalDamage ===
+        2,
+
+    twinPalmOneMechanicalPacket:
+      twinPalm.mechanicalPacketCount ===
+        1 &&
+      twinPalm.visualImpactCount ===
+        2,
+
+    crossfireOneMechanicalPacket:
+      crossfire.mechanicalPacketCount ===
+        1 &&
+      crossfire.visualImpactCount ===
+        "multiple",
+
+    staminaPivotIsTunableConstant:
+      BATTLE_STAMINA_PIVOT_V1 ===
+      100
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return {
+
+    ...result,
+
+    details: {
+
+      hinataOutput,
+      hinataDamage,
+      izunoOutput,
+      izunoDamage,
+      menmaOutput,
+      menmaDamage,
+      guardPreview
+
+    }
+
+  };
+}
+
+
+// =========================================================
+// BRICK 335 — LIVE DAMAGE EVIDENCE HELPERS
+// =========================================================
+
+function getLatestBattleDamageEvidence() {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  return [
+    ...runtime.evidence
+  ]
+    .reverse()
+    .find(
+      evidence =>
+        evidence.eventType ===
+          "damage_resolved"
+    ) ||
+    null;
+}
+
+
+function getBattleDamageEvidenceForSkill(
+  skillId
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  return runtime.evidence.filter(
+    evidence =>
+      evidence.eventType ===
+        "damage_resolved" &&
+      evidence.skillId ===
+        skillId
+  );
+}
+
+
+// =========================================================
+// BRICK 336 — LIVE INCOMING DAMAGE DIAGNOSTIC
+// =========================================================
+//
+// Uses the SAME shared damage resolver as real Skills.
+//
+// This helper exists only because enemy Skills / Smart AI
+// are not authored yet. It does not create a second damage
+// formula or a second mitigation architecture.
+//
+// =========================================================
+
+function resolveAcademyPilotIncomingDamageDiagnostic(
+  attackPL,
+  targetCharacterId = null
+) {
+
+
+  if (
+    !currentBattle.active ||
+    currentBattle.battleOver ||
+    !currentBattle.enemy
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Start an active Battle first."
+
+    };
+  }
+
+
+  const targetId =
+    targetCharacterId ||
+    getBattleActiveParticipantId(
+      "player"
+    );
+
+
+  const target =
+    getPlayerCharacter(
+      targetId
+    );
+
+
+  if (
+    !target
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "Target character unavailable."
+
+    };
+  }
+
+
+  const numericAttackPL =
+    Math.max(
+      1,
+      Math.round(
+        Number(
+          attackPL
+        ) || 1
+      )
+    );
+
+
+  const envelope =
+    createBattleActionEnvelope({
+
+      actorSide:
+        "enemy",
+
+      actorParticipantId:
+        currentBattle.enemy.id,
+
+      targetSide:
+        "player",
+
+      targetParticipantId:
+        target.id,
+
+      actionClass:
+        "diagnostic_enemy_attack",
+
+      data: {
+
+        traits: [
+          "diagnostic_only"
+        ]
+
+      }
+
+    });
+
+
+  const entry =
+    beginBattleActionResolution(
+      envelope
+    );
+
+
+  if (
+    !entry.accepted
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        entry.validation.reason
+
+    };
+  }
+
+
+  const resolution =
+    resolveBattleDamagePacket({
+
+      envelope:
+        envelope,
+
+      skill:
+        null,
+
+      actorSide:
+        "enemy",
+
+      actorParticipantId:
+        currentBattle.enemy.id,
+
+      targetSide:
+        "player",
+
+      targetParticipantId:
+        target.id,
+
+      output: {
+
+        primaryDiscipline:
+          "Diagnostic",
+
+        statKey:
+          null,
+
+        effectivePrimaryDiscipline:
+          null,
+
+        coefficient:
+          1,
+
+        branch:
+          "diagnostic",
+
+        branchMultiplier:
+          1,
+
+        preDefenseAttackMagnitude:
+          numericAttackPL,
+
+        attackPL:
+          numericAttackPL
+
+      },
+
+      mitigable:
+        true,
+
+      stateRefs:
+        []
+
+    });
+
+
+  saveTestState();
+
+
+  if (
+    currentBattle.battleOver !==
+      true
+  ) {
+
+    openOverlay(
+      "combat"
+    );
+  }
+
+
+  return {
+
+    success:
+      !!resolution,
+
+    resolution:
+      resolution
+
+  };
+}
+
+
+// =========================================================
+// BRICK 337 — SEALED CHAKRA FLOW LIVE DIAGNOSTIC
+// =========================================================
+//
+// Applies the real Condition model to an Academy participant
+// so its next-action-opportunity semantics can be verified
+// before enemy AI/actions exist.
+//
+// =========================================================
+
+function applySealedChakraFlowDiagnosticToPlayer(
+  characterId
+) {
+
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+
+  if (
+    !character
+  ) {
+
+    return null;
+  }
+
+
+  return addBattleCondition({
+
+    conditionKey:
+      "sealed_chakra_flow",
+
+    sourceSide:
+      "enemy",
+
+    sourceParticipantId:
+      currentBattle.enemy
+        ? currentBattle.enemy.id
+        : "diagnostic_enemy",
+
+    targetSide:
+      "player",
+
+    targetParticipantId:
+      character.id,
+
+    blockedActionClasses: [
+      "transformation_activation"
+    ],
+
+    blockedActionTraits: [
+      "chakra_dependent_positive_self_enhancement"
+    ],
+
+    data: {
+
+      expiry:
+        "next_action_opportunity",
+
+      diagnostic:
+        true
+
+    }
+
+  });
+}
 
 // =========================================
 // UI COMPONENT — ACTIVITY CARD
