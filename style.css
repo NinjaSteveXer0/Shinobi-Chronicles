@@ -1171,254 +1171,552 @@ body {
 
 
 /* =========================================================
-   21. BATTLE ARENA
+   BRICK 295 — BATTLE LIVE CANVAS FOUNDATION
    ========================================================= */
 
-.battle-arena {
-  width: 100%;
+/*
+   The global overlay remains the navigation authority.
+   Combat temporarily promotes it to a full-screen Battle
+   presentation so the authored 1536×1024 canvas can fit
+   without inheriting the generic overlay padding/window.
+*/
 
-  flex: 1;
+.screen-overlay.battle-live-open {
+  padding: 0;
 
+  background: #020507;
+
+  backdrop-filter: none;
+}
+
+
+.screen-overlay.battle-live-open
+.overlay-content-box {
+  width: 100vw;
+  max-width: none;
+
+  height: 100vh;
   min-height: 0;
 
-  display: flex;
-  flex-direction: column;
+  padding: 0;
 
-  position: relative;
-}
+  background: #020507;
 
-
-.battle-environment {
-  position: absolute;
-
-  inset: 0;
-
-  pointer-events: none;
-
-  overflow: hidden;
-}
-
-
-.combatants-stage {
-  flex: 1;
-
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-
-  position: relative;
-
-  z-index: 2;
-}
-
-
-.combatant {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-
-  gap: 14px;
-}
-
-
-/* =========================================================
-   22. CHARACTER CARDS
-   ========================================================= */
-
-.character-card-frame {
-  width: 180px;
-  height: 260px;
-
-  display: flex;
-  flex-direction: column;
-
-  position: relative;
+  border: 0;
+  border-radius: 0;
 
   overflow: hidden;
 
-  background: #111827;
-
-  border: 2px solid #d6a93a;
-
-  border-radius: 8px;
-
-  box-shadow:
-    0 0 22px rgba(214, 169, 58, 0.2);
+  box-shadow: none;
 }
 
 
-.card-rarity-legendary {
-  border-color: #d6a93a;
-
-  box-shadow:
-    0 0 22px rgba(214, 169, 58, 0.32);
+.screen-overlay.battle-live-open
+.overlay-content-box::before {
+  display: none;
 }
 
 
-.card-rarity-rare {
-  border-color: #00d9e8;
-
-  box-shadow:
-    0 0 22px rgba(0, 217, 232, 0.32);
+.screen-overlay.battle-live-open
+.overlay-close-btn {
+  display: none;
 }
 
 
-.card-header-tag {
-  padding: 4px;
-
-  background: #d6a93a;
-
-  color: #05080c;
-
-  font-size: 9px;
-  font-weight: 900;
-
-  text-align: center;
-
-  letter-spacing: 1px;
-}
-
-
-.card-art-container {
-  flex: 1;
-
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
-
-.card-footer-stats {
-  padding: 8px;
-
-  background:
-    rgba(8, 12, 16, 0.95);
-
-  border-top: 1px solid #1e293b;
-}
-
-
-.card-title {
-  margin-bottom: 4px;
-
-  color: #ffffff;
-
-  font-size: 11px;
-  font-weight: 800;
-
-  text-align: center;
-}
-
-
-.card-stats-row {
-  display: flex;
-  justify-content: space-between;
-
-  color: #94a3b8;
-
-  font-size: 9px;
-}
-
-
-/* =========================================================
-   23. HEALTH / POWER BARS
-   ========================================================= */
-
-.health-bar-container {
-  width: 180px;
-
-  display: flex;
-  flex-direction: column;
-
-  gap: 4px;
-}
-
-
-.health-bar-container .name {
-  color: #94a3b8;
-
-  font-size: 10px;
-  font-weight: 800;
-
-  text-align: center;
-}
-
-
-.bar {
-  width: 100%;
-  height: 8px;
-
-  background: #111827;
-
-  border: 1px solid #1e293b;
-
-  border-radius: 4px;
-
-  overflow: hidden;
-}
-
-
-.fill {
+.screen-overlay.battle-live-open
+#overlay-content-container {
   width: 100%;
   height: 100%;
 
-  background: #00d9e8;
+  flex: none !important;
 
-  transition:
-    width 0.3s ease;
+  min-height: 0 !important;
+
+  overflow: hidden !important;
 }
 
 
-.fill.enemy {
-  background: #ef4444;
+.battle-live-screen {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #020507;
+
+  overflow: hidden;
 }
 
 
-.versus-badge {
-  color: #d6a93a;
+.battle-live-stage {
+  width: min(
+    100vw,
+    calc(100vh * 1.5)
+  );
 
-  font-size: 24px;
+  aspect-ratio: 3 / 2;
+
+  position: relative;
+
+  flex-shrink: 0;
+
+  overflow: hidden;
+
+  background:
+    url("./Assets/Backgrounds/battle.png")
+    center center / 100% 100%
+    no-repeat;
+
+  box-shadow:
+    0 0 45px rgba(0, 0, 0, 0.72);
+}
+
+
+.battle-live-stage * {
+  box-sizing: border-box;
+}
+
+
+.battle-live-error {
+  margin: auto;
+
+  color: #ef4444;
+
+  font-size: 18px;
   font-weight: 900;
-
-  font-style: italic;
+  letter-spacing: 0.08em;
 }
 
 
-/* =========================================================
-   24. COMBAT CONSOLE
-   ========================================================= */
+/* =========================================
+   TEAM HEADINGS
+   ========================================= */
 
-.combat-console {
-  padding: 14px;
+.battle-live-heading {
+  position: absolute;
 
-  display: flex;
-  flex-direction: column;
+  top: 1.45%;
 
-  gap: 10px;
+  z-index: 5;
 
-  background: #080c10;
+  color: #f4d27b;
 
-  border: 1px solid #1e293b;
+  font-size: clamp(
+    10px,
+    1.18vw,
+    20px
+  );
 
-  border-radius: 8px;
+  font-weight: 900;
+  letter-spacing: 0.055em;
 
-  z-index: 2;
+  text-shadow:
+    0 2px 4px #000,
+    0 0 10px rgba(214, 166, 66, 0.16);
 }
 
 
-.action-feedback-log {
-  min-height: 20px;
+.battle-live-heading-player {
+  left: 6.1%;
 
-  color: #00d9e8;
-
-  font-size: 11px;
+  color: #52dff0;
 }
 
 
-.action-buttons {
-  display: flex;
+.battle-live-heading-enemy {
+  right: 11.2%;
 
-  gap: 10px;
+  color: #ef4a3f;
+}
+
+
+/* =========================================
+   REGION / LOCATION TITLE
+   ========================================= */
+
+.battle-live-location {
+  position: absolute;
+
+  top: 1.1%;
+  left: 50%;
+
+  width: 30%;
+
+  transform: translateX(-50%);
+
+  z-index: 5;
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+
+.battle-live-location strong,
+.battle-live-location span {
+  display: block;
+}
+
+
+.battle-live-location strong {
+  color: #f0c36a;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size: clamp(
+    14px,
+    1.75vw,
+    30px
+  );
+
+  line-height: 1.05;
+  letter-spacing: 0.055em;
+
+  text-shadow:
+    0 2px 4px #000,
+    0 0 14px rgba(214, 166, 66, 0.18);
+}
+
+
+.battle-live-location span {
+  margin-top: 0.45%;
+
+  color: #e6a74e;
+
+  font-size: clamp(
+    8px,
+    0.88vw,
+    15px
+  );
+
+  font-weight: 700;
+  letter-spacing: 0.035em;
+}
+
+
+/* =========================================
+   RETREAT
+   ========================================= */
+
+.battle-live-retreat {
+  position: absolute;
+
+  top: 2.2%;
+  right: 1.7%;
+
+  width: 7.8%;
+  height: 4.1%;
+
+  z-index: 20;
+
+  padding: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  color: #e9b95a;
+
+  font-size: clamp(
+    7px,
+    0.72vw,
+    12px
+  );
+
+  font-weight: 900;
+  letter-spacing: 0.065em;
+
+  cursor: pointer;
+
+  text-shadow:
+    0 1px 3px #000;
+}
+
+
+.battle-live-retreat:hover,
+.battle-live-retreat:focus-visible {
+  color: #fff0bf;
+
+  outline:
+    1px solid
+    rgba(231, 180, 79, 0.52);
+
+  background:
+    rgba(214, 166, 66, 0.06);
+}
+
+
+/* =========================================
+   CENTRAL BATTLE STATUS
+   ========================================= */
+
+.battle-live-status {
+  position: absolute;
+
+  top: 9.2%;
+  left: 50%;
+
+  width: 24%;
+
+  transform:
+    translateX(-50%);
+
+  z-index: 5;
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+
+.battle-live-status strong,
+.battle-live-status span {
+  display: block;
+}
+
+
+.battle-live-status strong {
+  color: #f0c36a;
+
+  font-size: clamp(
+    9px,
+    1.02vw,
+    17px
+  );
+
+  letter-spacing: 0.06em;
+}
+
+
+.battle-live-status span {
+  margin-top: 1.8%;
+
+  color: #60dfe9;
+
+  font-size: clamp(
+    6px,
+    0.58vw,
+    10px
+  );
+
+  font-weight: 800;
+  letter-spacing: 0.04em;
+
+  white-space: nowrap;
+
+  overflow: hidden;
+
+  text-overflow: ellipsis;
+}
+
+
+/* =========================================
+   ACTIVE DUEL LABELS
+   ========================================= */
+
+.battle-live-active-label {
+  position: absolute;
+
+  top: 44.6%;
+
+  width: 8.2%;
+
+  z-index: 5;
+
+  text-align: center;
+
+  font-size: clamp(
+    7px,
+    0.7vw,
+    12px
+  );
+
+  font-weight: 900;
+  letter-spacing: 0.055em;
+
+  pointer-events: none;
+}
+
+
+.battle-live-active-player {
+  left: 33.7%;
+
+  color: #52dff0;
+}
+
+
+.battle-live-active-enemy {
+  right: 33.7%;
+
+  color: #ef5942;
+}
+
+
+/* =========================================
+   ACTIVE POWER READOUTS
+   ========================================= */
+
+.battle-live-power {
+  position: absolute;
+
+  top: 54.25%;
+
+  width: 10%;
+
+  transform:
+    translateY(-50%);
+
+  z-index: 6;
+
+  text-align: center;
+
+  pointer-events: none;
+}
+
+
+.battle-live-power-player {
+  left: 32.75%;
+}
+
+
+.battle-live-power-enemy {
+  right: 32.75%;
+}
+
+
+.battle-live-power strong {
+  display: block;
+
+  color: #f7f4ec;
+
+  font-size: clamp(
+    22px,
+    3.45vw,
+    58px
+  );
+
+  font-weight: 800;
+  line-height: 0.95;
+
+  text-shadow:
+    0 3px 7px #000;
+}
+
+
+.battle-live-power span {
+  display: block;
+
+  margin-top: 5%;
+
+  color: #ded6c7;
+
+  font-size: clamp(
+    6px,
+    0.72vw,
+    12px
+  );
+
+  font-weight: 700;
+  letter-spacing: 0.035em;
+}
+
+
+/* =========================================
+   BATTLE LOG
+   ========================================= */
+
+.battle-live-log {
+  position: absolute;
+
+  left: 74.25%;
+  top: 67.2%;
+
+  width: 23.8%;
+  height: 25.9%;
+
+  z-index: 8;
+
+  padding:
+    1.25%
+    1.35%;
+
+  overflow: hidden;
+
+  pointer-events: auto;
+}
+
+
+.battle-live-log-title {
+  margin-bottom: 4%;
+
+  color: #efc26b;
+
+  font-size: clamp(
+    8px,
+    0.82vw,
+    14px
+  );
+
+  font-weight: 900;
+  letter-spacing: 0.075em;
+
+  text-align: center;
+}
+
+
+.battle-live-log-feed {
+  height: 83%;
+
+  overflow-y: auto;
+
+  padding-right: 3%;
+
+  scrollbar-width: thin;
+}
+
+
+.battle-live-log-entry {
+  margin-bottom: 3%;
+
+  color: #ddd6c8;
+
+  font-size: clamp(
+    6px,
+    0.63vw,
+    11px
+  );
+
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+
+.battle-live-log-entry.muted {
+  color: #7f8b91;
+}
+
+
+.battle-live-log-feed::-webkit-scrollbar {
+  width: 4px;
+}
+
+
+.battle-live-log-feed::-webkit-scrollbar-track {
+  background:
+    rgba(0, 0, 0, 0.16);
+}
+
+
+.battle-live-log-feed::-webkit-scrollbar-thumb {
+  background:
+    rgba(222, 175, 75, 0.42);
+
+  border-radius: 999px;
 }
 
 

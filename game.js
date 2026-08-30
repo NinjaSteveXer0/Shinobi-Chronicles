@@ -33742,8 +33742,23 @@ function openOverlay(type) {
   ) {
 
     return;
-
   }
+
+
+  // =========================================
+  // BRICK 295 — BATTLE LIVE CANVAS MODE
+  // =========================================
+  //
+  // Combat reuses the existing global overlay authority.
+  // Only presentation changes while the live Battle screen
+  // is open. Other overlay types remain unchanged.
+  //
+  // =========================================
+
+  overlay.classList.toggle(
+    "battle-live-open",
+    type === "combat"
+  );
 
 
   saveTestState();
@@ -33865,15 +33880,15 @@ function openOverlay(type) {
       break;
 
 
-   case "practical":
+    case "practical":
 
-  renderGenericOverlay(
-    container,
-    "PRACTICAL TRAINING",
-    "Complete tactical tests and practical shinobi exercises."
-  );
+      renderGenericOverlay(
+        container,
+        "PRACTICAL TRAINING",
+        "Complete tactical tests and practical shinobi exercises."
+      );
 
-  break;
+      break;
 
 
     case "group":
@@ -33918,9 +33933,7 @@ function openOverlay(type) {
       );
 
       break;
-
   }
-
 }
 
 
@@ -55715,789 +55728,238 @@ function createCharacterCard(character) {
 
 
 // =========================================
-// COMBAT ARENA SCREEN UI
+// BRICK 295 — BATTLE LIVE CANVAS FOUNDATION
+// =========================================
+//
+// Presentation only.
+//
+// Reuses:
+// - currentBattle runtime authority
+// - selected Encounter / Enemy authority
+// - selected Region / Location context
+// - canonical Effective PL calculation
+// - existing closeOverlay() navigation
+//
+// Does NOT add:
+// - Skill resolution
+// - Conditions
+// - temporary Battle states
+// - turn sequencing
+// - Stamina mitigation
+// - new damage rules
+//
 // =========================================
 
-function renderCombatOverlay(container) {
+function renderCombatOverlay(
+  container
+) {
 
 
   const enemy =
+    currentBattle.enemy ||
     selectedEnemy;
 
 
   if (!enemy) {
 
     container.innerHTML = `
-
-      <h2 style="
-        color:#E53935;
-      ">
+      <div class="battle-live-error">
         NO ENEMY SELECTED
-      </h2>
-
+      </div>
     `;
 
     return;
-
   }
 
 
-  const rewards =
-    currentBattle.rewards || {
+  const activePlayer =
+    currentBattle.activePlayer ||
+    null;
 
-      generated: false,
 
-      ryo: 0,
+  const region =
+    selectedRegionKey &&
+    worldRegions[
+      selectedRegionKey
+    ]
+      ? worldRegions[
+          selectedRegionKey
+        ]
+      : null;
 
-      exp: 0,
 
-      items: [],
+  const location =
+    selectedLocationNode ||
+    null;
 
-      rareDrops: [],
 
-      finishingShinobi: null,
+  const playerEffectivePL =
+    activePlayer
+      ? calculateEffectivePL(
+          activePlayer
+        )
+      : 0;
 
-      mvp: null
 
-    };
+  const enemyPower =
+    Math.max(
+      0,
+      Number(
+        currentBattle.enemyPower
+      ) || 0
+    );
+
+
+  const enemyMaxPower =
+    Math.max(
+      enemyPower,
+      Number(
+        currentBattle.enemyMaxPower
+      ) ||
+      Number(
+        enemy.power
+      ) ||
+      0
+    );
+
+
+  const battleLog =
+    Array.isArray(
+      currentBattle.battleLog
+    )
+      ? currentBattle.battleLog
+      : [];
+
+
+  const regionLabel =
+    region
+      ? region.name.toUpperCase()
+      : "BATTLE";
+
+
+  const locationLabel =
+    location
+      ? location.name
+      : enemy.name;
+
+
+  const playerLabel =
+    activePlayer
+      ? activePlayer.name
+      : "NO ACTIVE SHINOBI";
+
+
+  const enemyLabel =
+    enemy.name ||
+    "UNKNOWN ENEMY";
+
+
+  const battleLogMarkup =
+    battleLog.length > 0
+      ? battleLog
+          .slice(-8)
+          .map(
+            entry => `
+              <div class="battle-live-log-entry">
+                ${entry}
+              </div>
+            `
+          )
+          .join("")
+      : `
+          <div class="battle-live-log-entry muted">
+            Battle begins...
+          </div>
+        `;
 
 
   container.innerHTML = `
 
+    <section
+      class="battle-live-screen"
+      aria-label="Active Battle"
+    >
 
-<div style="
-display:flex;
-flex-direction:column;
-height:100%;
-min-height:0;
-padding:20px;
-overflow-y:auto;
-overflow-x:hidden;
-box-sizing:border-box;
-padding-bottom:80px;
-">
+      <div class="battle-live-stage">
 
+        <div class="battle-live-heading battle-live-heading-player">
+          YOUR TEAM
+        </div>
 
+        <div class="battle-live-heading battle-live-heading-enemy">
+          ENEMY TEAM
+        </div>
 
-<!-- HEADER -->
+        <div class="battle-live-location">
+          <strong>
+            ${regionLabel}
+          </strong>
+          <span>
+            ${locationLabel}
+          </span>
+        </div>
 
-<div style="
-text-align:center;
-margin-bottom:20px;
-">
+        <button
+          type="button"
+          class="battle-live-retreat"
+          onclick="closeOverlay()"
+        >
+          RETREAT
+        </button>
 
+        <div class="battle-live-status">
+          <strong>
+            BATTLE ACTIVE
+          </strong>
+          <span>
+            ${playerLabel} VS ${enemyLabel}
+          </span>
+        </div>
 
-<h2 style="
-color:#D6A93A;
-">
-LAND OF FIRE
-</h2>
+        <div class="battle-live-active-label battle-live-active-player">
+          ACTIVE
+        </div>
 
+        <div class="battle-live-active-label battle-live-active-enemy">
+          ACTIVE
+        </div>
 
-<p style="
-color:#94A3B8;
-">
-BANDIT HIDEOUT
-</p>
+        <div class="battle-live-power battle-live-power-player">
+          <strong>
+            ${playerEffectivePL}
+          </strong>
+          <span>
+            EFFECTIVE PL
+          </span>
+        </div>
 
+        <div class="battle-live-power battle-live-power-enemy">
+          <strong>
+            ${enemyPower}
+          </strong>
+          <span>
+            / ${enemyMaxPower}
+          </span>
+        </div>
 
-</div>
+        <div class="battle-live-log">
 
+          <div class="battle-live-log-title">
+            BATTLE LOG
+          </div>
 
+          <div class="battle-live-log-feed">
+            ${battleLogMarkup}
+          </div>
 
-<!-- ARENA AREA -->
-
-<div style="
-display:flex;
-justify-content:space-between;
-align-items:center;
-flex:1;
-">
-
-
-
-<!-- PLAYER TEAM -->
-
-${playerTeam.map(member => `
-
-<div
-  onclick="
-    ${
-      currentBattle.battleOver
-        ? ""
-        : `selectActiveFighter('${member.id}')`
-    }
-  "
-
-  style="
-    cursor:${
-      currentBattle.battleOver
-        ? "default"
-        : "pointer"
-    };
-
-    opacity:${
-      currentBattle.activePlayer &&
-      currentBattle.activePlayer.id === member.id
-        ? "1"
-        : "0.65"
-    };
-
-    transform:${
-      currentBattle.activePlayer &&
-      currentBattle.activePlayer.id === member.id
-        ? "scale(1.05)"
-        : "scale(1)"
-    };
-
-    transition:0.2s ease;
-  "
->
-
-  ${createCharacterCard(member)}
-
-</div>
-
-`).join("")}
-
-
-
-<!-- ACTIVE DUEL -->
-
-<div style="
-text-align:center;
-">
-
-
-<h2>
-
-${
-  currentBattle.battleOver
-    ? "⚔ BATTLE COMPLETE ⚔"
-    : "⚔ ACTIVE DUEL ⚔"
-}
-
-</h2>
-
-
-
-<div style="
-padding:20px;
-border:1px solid #334155;
-border-radius:10px;
-">
-
-
-<h2>
-
-${currentBattle.activePlayer
-  ? currentBattle.activePlayer.name
-  : "NO SHINOBI"}
-
-</h2>
-
-
-<p>
-VS
-</p>
-
-
-
-${createCharacterCard({
-
-  name:
-    enemy.name,
-
-  power:
-    enemy.power,
-
-  image:
-    enemy.image
-
-})}
-
-
-
-${
-  currentBattle.lastDamage > 0
-    ? `
-
-      <div style="
-        color:#E53935;
-        font-size:24px;
-        font-weight:bold;
-        margin-top:6px;
-        margin-bottom:6px;
-      ">
-
-        -${currentBattle.lastDamage}
+        </div>
 
       </div>
 
-    `
-    : ""
+    </section>
+  `;
 }
 
-
-
-<h2 style="
-color:#E53935;
-">
-
-${enemy.name}
-
-</h2>
-
-
-<p style="
-color:#94A3B8;
-">
-
-${enemy.rank}
-
-</p>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- ENEMY SIDE -->
-
-<div style="
-width:30%;
-text-align:center;
-">
-
-
-<h3 style="
-color:#E53935;
-">
-ENEMY TEAM
-</h3>
-
-
-<div class="team-slot">
-
-${enemy.name}
-
-<br>
-
-PL ${enemy.power}
-
-<br>
-
-Battle Power
-${currentBattle.enemyPower}
-/
-${currentBattle.enemyMaxPower}
-
-</div>
-
-
-</div>
-
-
-</div>
-
-
-
-<!-- VICTORY / REWARD PANEL -->
-
-${
-  currentBattle.battleOver
-    ? `
-
-      <div style="
-        text-align:center;
-        margin-top:18px;
-        margin-bottom:12px;
-        padding:18px;
-        border:1px solid #D6A93A;
-        border-radius:8px;
-        background:
-          rgba(
-            5,
-            7,
-            11,
-            0.75
-          );
-      ">
-
-
-        <!-- VICTORY TITLE -->
-
-        <div style="
-          color:#D6A93A;
-          font-size:28px;
-          font-weight:bold;
-          margin-bottom:4px;
-        ">
-
-          ⚔ VICTORY ⚔
-
-        </div>
-
-
-        <div style="
-          color:#94A3B8;
-          margin-bottom:16px;
-        ">
-
-          ${enemy.name}
-          has been defeated.
-
-        </div>
-
-
-
-        <!-- REWARD TITLE -->
-
-        <div style="
-          color:#00D9E8;
-          font-size:14px;
-          font-weight:bold;
-          letter-spacing:2px;
-          margin-bottom:12px;
-        ">
-
-          BATTLE REWARDS
-
-        </div>
-
-
-
-        <!-- REWARD GRID -->
-
-        <div style="
-          display:grid;
-          grid-template-columns:
-            repeat(
-              5,
-              minmax(110px, 1fr)
-            );
-          gap:10px;
-          max-width:850px;
-          margin:0 auto;
-        ">
-
-
-
-          <!-- RYO -->
-
-          <div style="
-            padding:12px;
-            border:1px solid #334155;
-            border-radius:7px;
-            background:#080D18;
-          ">
-
-            <div style="
-              color:#D6A93A;
-              font-size:11px;
-              font-weight:bold;
-              margin-bottom:5px;
-            ">
-              RYŌ
-            </div>
-
-            <div style="
-              color:#FFFFFF;
-              font-size:18px;
-              font-weight:bold;
-            ">
-              ${rewards.ryo}
-            </div>
-
-          </div>
-
-
-
-          <!-- EXP -->
-
-          <div style="
-            padding:12px;
-            border:1px solid #334155;
-            border-radius:7px;
-            background:#080D18;
-          ">
-
-            <div style="
-              color:#00D9E8;
-              font-size:11px;
-              font-weight:bold;
-              margin-bottom:5px;
-            ">
-              EXP
-            </div>
-
-            <div style="
-              color:#FFFFFF;
-              font-size:18px;
-              font-weight:bold;
-            ">
-              ${rewards.exp}
-            </div>
-
-          </div>
-
-
-
-          <!-- ITEM -->
-
-          <div style="
-            padding:12px;
-            border:1px solid #334155;
-            border-radius:7px;
-            background:#080D18;
-          ">
-
-            <div style="
-              color:#94A3B8;
-              font-size:11px;
-              font-weight:bold;
-              margin-bottom:5px;
-            ">
-              ITEM
-            </div>
-
-            <div style="
-              color:#FFFFFF;
-              font-size:12px;
-              line-height:1.4;
-            ">
-
-              ${
-                rewards.items &&
-                rewards.items.length > 0
-
-                  ? rewards.items
-                      .map(
-                        item =>
-                          item.name
-                      )
-                      .join("<br>")
-
-                  : "NO DROP"
-              }
-
-            </div>
-
-          </div>
-
-
-
-          <!-- RARE DROP -->
-
-          <div style="
-            padding:12px;
-            border:1px solid #334155;
-            border-radius:7px;
-            background:#080D18;
-          ">
-
-            <div style="
-              color:#D6A93A;
-              font-size:11px;
-              font-weight:bold;
-              margin-bottom:5px;
-            ">
-              RARE DROP
-            </div>
-
-            <div style="
-              color:${
-                rewards.rareDrops &&
-                rewards.rareDrops.length > 0
-                  ? "#D6A93A"
-                  : "#64748B"
-              };
-
-              font-size:12px;
-              font-weight:bold;
-              line-height:1.4;
-            ">
-
-              ${
-                rewards.rareDrops &&
-                rewards.rareDrops.length > 0
-
-                  ? rewards.rareDrops
-                      .map(
-                        item =>
-                          `★ ${item.name}`
-                      )
-                      .join("<br>")
-
-                  : "NO DROP"
-              }
-
-            </div>
-
-          </div>
-
-
-
-          <!-- FINAL STRIKE -->
-
-          <div style="
-            padding:12px;
-            border:1px solid #334155;
-            border-radius:7px;
-            background:#080D18;
-          ">
-
-            <div style="
-              color:#00D9E8;
-              font-size:11px;
-              font-weight:bold;
-              margin-bottom:5px;
-            ">
-              FINAL STRIKE
-            </div>
-
-            <div style="
-              color:#FFFFFF;
-              font-size:12px;
-              font-weight:bold;
-            ">
-
-              ${
-                rewards.finishingShinobi ||
-                "UNKNOWN"
-              }
-
-            </div>
-
-          </div>
-
-
-        </div>
-
-
-
-        <!-- MVP -->
-
-        ${
-          rewards.mvp
-            ? `
-
-              <div style="
-                max-width:420px;
-                margin:16px auto 0 auto;
-                padding:12px 18px;
-                border-top:1px solid #334155;
-              ">
-
-
-                <div style="
-                  color:#D6A93A;
-                  font-size:12px;
-                  font-weight:bold;
-                  letter-spacing:2px;
-                ">
-
-                  ★ BATTLE MVP ★
-
-                </div>
-
-
-                <div style="
-                  color:#FFFFFF;
-                  font-size:18px;
-                  font-weight:bold;
-                  margin-top:5px;
-                ">
-
-                  ${rewards.mvp.name}
-
-                </div>
-
-
-                <div style="
-                  color:#00D9E8;
-                  font-size:12px;
-                  margin-top:4px;
-                ">
-
-                  ${rewards.mvp.percentage}%
-                  TOTAL DAMAGE
-
-                </div>
-
-
-                <div style="
-                  color:#64748B;
-                  font-size:10px;
-                  margin-top:3px;
-                ">
-
-                  ${rewards.mvp.damage}
-                  BP DAMAGE
-                  •
-                  ${rewards.mvp.attacks}
-                  ATTACK${
-                    rewards.mvp.attacks === 1
-                      ? ""
-                      : "S"
-                  }
-
-                </div>
-
-
-              </div>
-
-            `
-            : ""
-        }
-
-
-      </div>
-
-    `
-    : ""
-}
-
-
-
-<!-- ACTION BUTTONS -->
-
-<div style="
-margin-top:20px;
-display:flex;
-justify-content:center;
-gap:12px;
-">
-
-
-<button
-  onclick="
-    performNinjutsuAttack()
-  "
-
-  ${
-    currentBattle.battleOver
-      ? "disabled"
-      : ""
-  }
->
-NINJUTSU
-</button>
-
-
-<button
-  onclick="
-    performTaijutsuAttack()
-  "
-
-  ${
-    currentBattle.battleOver
-      ? "disabled"
-      : ""
-  }
->
-TAIJUTSU
-</button>
-
-
-<button
-  onclick="
-    performBukijutsuAttack()
-  "
-
-  ${
-    currentBattle.battleOver
-      ? "disabled"
-      : ""
-  }
->
-BUKIJUTSU
-</button>
-
-
-<button
-  ${
-    currentBattle.battleOver
-      ? "disabled"
-      : ""
-  }
->
-ITEM
-</button>
-
-
-<button
-  ${
-    currentBattle.battleOver
-      ? "disabled"
-      : ""
-  }
->
-FORMATION
-</button>
-
-
-</div>
-
-
-<!-- BATTLE LOG -->
-
-<div style="
-margin-top:20px;
-padding:10px;
-border-top:1px solid #334155;
-color:#94A3B8;
-max-height:140px;
-overflow-y:auto;
-">
-
-
-<strong>
-Battle Log:
-</strong>
-
-
-<br><br>
-
-
-${
-  currentBattle.battleLog.length > 0
-    ? currentBattle.battleLog
-        .map(entry => `
-
-          <div style="
-            margin-bottom:5px;
-          ">
-
-            ${entry}
-
-          </div>
-
-        `)
-        .join("")
-    : `
-
-        <div>
-          Battle begins...
-        </div>
-
-      `
-}
-
-
-</div>
-
-
-
-</div>
-
-
-`;
-
-}
 
 // =========================================================
 // UI MODULE — VICTORY RESULTS SCREEN
