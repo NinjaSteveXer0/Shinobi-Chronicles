@@ -35004,11 +35004,16 @@ function closeOverlay() {
 // BRICK 155 — DEVELOPMENT BATTLE STATE SAVE
 // =========================================================
 //
-// BRICK 299:
-// Battle deployment is now included in the development
-// refresh-safe Battle snapshot.
+// Preserves Battle / Encounter context across refreshes.
 //
-// Presentation transition animation is NOT persisted.
+// BRICK 299:
+// - deployment
+//
+// BRICKS 302–304:
+// - transient Battle state
+// - Conditions
+// - action sequence
+// - structured Battle evidence
 //
 // =========================================================
 
@@ -35065,6 +35070,12 @@ function saveTestState() {
 
     deployment:
       getBattleDeploymentSaveState(),
+
+
+    runtime:
+      currentBattle.battleId
+        ? getBattleRuntimeSaveState()
+        : null,
 
 
     lastDamage:
@@ -59578,37 +59589,1674 @@ function continueAfterVictory() {
 
 
 // =========================================================
-// BATTLE ENGINE — ACTIVE FIGHTER SELECTION
+// BRICK 302 — BATTLE RUNTIME STATE FOUNDATION
+// =========================================================
+//
+// Owns Battle-local transient truth only.
+//
+// Persistent authorities remain elsewhere.
+//
+// Runtime state currently supports:
+//
+// - transient source/target interaction state
+// - temporary Conditions
+// - structured Battle evidence
+// - shared action sequence identity
+//
+// It does NOT own:
+// - Character Stats
+// - Relationships
+// - Equipment
+// - Weapons
+// - Hosted Entities
+// - Bloodlines
+// - Transformations
+// - Chronicle history
+//
 // =========================================================
 
-function selectActiveFighter(playerId) {
-
-  const fighter =
-    playerTeam.find(
-      member => member.id === playerId
-    );
+function createBattleRuntimeState() {
 
 
-  if (!fighter) {
+  return {
 
-    console.log("Fighter not found");
+    battleId:
+      currentBattle.battleId ||
+      null,
 
-    return;
 
+    actionSequence:
+      0,
+
+
+    transientStates:
+      [],
+
+
+    conditions:
+      [],
+
+
+    evidence:
+      []
+
+  };
+}
+
+
+function ensureBattleRuntimeState() {
+
+
+  if (
+    !currentBattle.runtime ||
+    currentBattle.runtime.battleId !==
+      currentBattle.battleId
+  ) {
+
+
+    currentBattle.runtime =
+      createBattleRuntimeState();
   }
 
 
-  currentBattle.activePlayer = fighter;
+  return currentBattle.runtime;
+}
 
 
-  console.log(
-    "ACTIVE FIGHTER:",
-    currentBattle.activePlayer
+function cloneBattleRuntimeValue(
+  value
+) {
+
+
+  try {
+
+
+    return JSON.parse(
+      JSON.stringify(
+        value
+      )
+    );
+
+  }
+
+  catch (
+    error
+  ) {
+
+
+    console.log(
+      "Battle runtime clone failed:",
+      error
+    );
+
+
+    return null;
+  }
+}
+
+
+function createBattleRuntimeRecordId(
+  prefix
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  return (
+    `${prefix}_` +
+    `${currentBattle.battleId || "battle"}_` +
+    `${runtime.actionSequence}_` +
+    `${Date.now()}_` +
+    `${Math.floor(
+      Math.random() *
+      100000
+    )}`
+  );
+}
+
+
+function getBattleRuntimeSaveState() {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  return cloneBattleRuntimeValue({
+
+    battleId:
+      currentBattle.battleId ||
+      null,
+
+
+    actionSequence:
+      Number(
+        runtime.actionSequence
+      ) || 0,
+
+
+    transientStates:
+      runtime.transientStates,
+
+
+    conditions:
+      runtime.conditions,
+
+
+    evidence:
+      runtime.evidence
+
+  });
+}
+
+
+function restoreBattleRuntimeState(
+  rawRuntime
+) {
+
+
+  if (
+    !rawRuntime ||
+    typeof rawRuntime !==
+      "object"
+  ) {
+
+
+    currentBattle.runtime =
+      createBattleRuntimeState();
+
+
+    return currentBattle.runtime;
+  }
+
+
+  currentBattle.runtime = {
+
+    battleId:
+      currentBattle.battleId ||
+      null,
+
+
+    actionSequence:
+      Number(
+        rawRuntime.actionSequence
+      ) || 0,
+
+
+    transientStates:
+      Array.isArray(
+        rawRuntime.transientStates
+      )
+
+        ? rawRuntime.transientStates
+
+        : [],
+
+
+    conditions:
+      Array.isArray(
+        rawRuntime.conditions
+      )
+
+        ? rawRuntime.conditions
+
+        : [],
+
+
+    evidence:
+      Array.isArray(
+        rawRuntime.evidence
+      )
+
+        ? rawRuntime.evidence
+
+        : []
+
+  };
+
+
+  return currentBattle.runtime;
+}
+
+
+// =========================================================
+// BRICK 303 — SOURCE/TARGET TRANSIENT INTERACTION STATE
+// =========================================================
+//
+// Example:
+//
+// Izuno
+//   → Rogue Scout
+//   → feinted_opening
+//
+// The state belongs to the relationship between those
+// participants during this Battle.
+//
+// It is NOT a target Stat modifier.
+//
+// =========================================================
+
+function createBattleParticipantRef(
+  side,
+  participantId
+) {
+
+
+  if (
+    !side ||
+    !participantId
+  ) {
+
+    return null;
+  }
+
+
+  return {
+
+    side:
+      side,
+
+    participantId:
+      participantId
+
+  };
+}
+
+
+function addBattleTransientState(
+  definition
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    !definition ||
+    !definition.stateKey
+  ) {
+
+
+    console.log(
+      "Battle transient state requires stateKey."
+    );
+
+
+    return null;
+  }
+
+
+  const sourceRef =
+    createBattleParticipantRef(
+      definition.sourceSide,
+      definition.sourceParticipantId
+    );
+
+
+  const targetRef =
+    createBattleParticipantRef(
+      definition.targetSide,
+      definition.targetParticipantId
+    );
+
+
+  /*
+     Source-scoped is the safe default.
+
+     Authored state may explicitly supply other authorised
+     consumers when another participant should be allowed
+     to consume the interaction.
+  */
+  let authorisedConsumers =
+    Array.isArray(
+      definition.authorisedConsumers
+    )
+
+      ? definition.authorisedConsumers
+          .filter(
+            ref =>
+              ref &&
+              ref.side &&
+              ref.participantId
+          )
+          .map(
+            ref => ({
+
+              side:
+                ref.side,
+
+              participantId:
+                ref.participantId
+
+            })
+          )
+
+      : [];
+
+
+  if (
+    authorisedConsumers.length ===
+      0 &&
+    sourceRef
+  ) {
+
+
+    authorisedConsumers = [
+      {
+        ...sourceRef
+      }
+    ];
+  }
+
+
+  const state = {
+
+    stateId:
+      createBattleRuntimeRecordId(
+        "state"
+      ),
+
+
+    stateKey:
+      definition.stateKey,
+
+
+    sourceRef:
+      sourceRef,
+
+
+    targetRef:
+      targetRef,
+
+
+    ownerRef:
+      definition.ownerRef
+        ? cloneBattleRuntimeValue(
+            definition.ownerRef
+          )
+        : null,
+
+
+    authorisedConsumers:
+      authorisedConsumers,
+
+
+    data:
+      definition.data
+        ? cloneBattleRuntimeValue(
+            definition.data
+          )
+        : {},
+
+
+    createdActionSequence:
+      runtime.actionSequence,
+
+
+    createdAt:
+      Date.now()
+
+  };
+
+
+  runtime.transientStates.push(
+    state
   );
 
 
-  openOverlay("combat");
+  return state;
+}
 
+
+function findBattleTransientState(
+  criteria
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    !criteria
+  ) {
+
+    return null;
+  }
+
+
+  return (
+    runtime.transientStates.find(
+      state => {
+
+
+        if (
+          criteria.stateId &&
+          state.stateId !==
+            criteria.stateId
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          criteria.stateKey &&
+          state.stateKey !==
+            criteria.stateKey
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          criteria.sourceSide &&
+          (
+            !state.sourceRef ||
+            state.sourceRef.side !==
+              criteria.sourceSide
+          )
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          criteria.sourceParticipantId &&
+          (
+            !state.sourceRef ||
+            state.sourceRef
+              .participantId !==
+              criteria.sourceParticipantId
+          )
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          criteria.targetSide &&
+          (
+            !state.targetRef ||
+            state.targetRef.side !==
+              criteria.targetSide
+          )
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          criteria.targetParticipantId &&
+          (
+            !state.targetRef ||
+            state.targetRef
+              .participantId !==
+              criteria.targetParticipantId
+          )
+        ) {
+
+          return false;
+        }
+
+
+        return true;
+      }
+    ) ||
+    null
+  );
+}
+
+
+function canBattleParticipantConsumeTransientState(
+  state,
+  side,
+  participantId
+) {
+
+
+  if (
+    !state ||
+    !side ||
+    !participantId
+  ) {
+
+    return false;
+  }
+
+
+  const consumers =
+    Array.isArray(
+      state.authorisedConsumers
+    )
+
+      ? state.authorisedConsumers
+
+      : [];
+
+
+  return consumers.some(
+    consumer =>
+      consumer.side ===
+        side &&
+      consumer.participantId ===
+        participantId
+  );
+}
+
+
+function consumeBattleTransientState(
+  stateId,
+  consumerSide,
+  consumerParticipantId
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const index =
+    runtime.transientStates
+      .findIndex(
+        state =>
+          state.stateId ===
+            stateId
+      );
+
+
+  if (
+    index < 0
+  ) {
+
+    return null;
+  }
+
+
+  const state =
+    runtime.transientStates[
+      index
+    ];
+
+
+  if (
+    !canBattleParticipantConsumeTransientState(
+      state,
+      consumerSide,
+      consumerParticipantId
+    )
+  ) {
+
+
+    return null;
+  }
+
+
+  runtime.transientStates.splice(
+    index,
+    1
+  );
+
+
+  return state;
+}
+
+
+function removeBattleTransientState(
+  stateId
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const index =
+    runtime.transientStates
+      .findIndex(
+        state =>
+          state.stateId ===
+            stateId
+      );
+
+
+  if (
+    index < 0
+  ) {
+
+    return false;
+  }
+
+
+  runtime.transientStates.splice(
+    index,
+    1
+  );
+
+
+  return true;
+}
+
+
+// =========================================================
+// BRICK 303 — TEMPORARY BATTLE CONDITIONS
+// =========================================================
+//
+// Conditions may restrict classes of actions.
+//
+// They do NOT rewrite Character Stats.
+//
+// =========================================================
+
+function addBattleCondition(
+  definition
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    !definition ||
+    !definition.conditionKey ||
+    !definition.targetSide ||
+    !definition.targetParticipantId
+  ) {
+
+
+    console.log(
+      "Battle Condition missing required identity."
+    );
+
+
+    return null;
+  }
+
+
+  const condition = {
+
+    conditionId:
+      createBattleRuntimeRecordId(
+        "condition"
+      ),
+
+
+    conditionKey:
+      definition.conditionKey,
+
+
+    sourceRef:
+      createBattleParticipantRef(
+        definition.sourceSide,
+        definition.sourceParticipantId
+      ),
+
+
+    targetRef:
+      createBattleParticipantRef(
+        definition.targetSide,
+        definition.targetParticipantId
+      ),
+
+
+    ownerRef:
+      definition.ownerRef
+        ? cloneBattleRuntimeValue(
+            definition.ownerRef
+          )
+        : null,
+
+
+    blockedActionClasses:
+      Array.isArray(
+        definition.blockedActionClasses
+      )
+
+        ? [
+            ...new Set(
+              definition
+                .blockedActionClasses
+                .filter(
+                  value =>
+                    typeof value ===
+                      "string" &&
+                    value.length > 0
+                )
+            )
+          ]
+
+        : [],
+
+
+    data:
+      definition.data
+        ? cloneBattleRuntimeValue(
+            definition.data
+          )
+        : {},
+
+
+    createdActionSequence:
+      runtime.actionSequence,
+
+
+    createdAt:
+      Date.now()
+
+  };
+
+
+  runtime.conditions.push(
+    condition
+  );
+
+
+  return condition;
+}
+
+
+function getBattleBlockingConditions(
+  side,
+  participantId,
+  actionClass
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    !side ||
+    !participantId ||
+    !actionClass
+  ) {
+
+    return [];
+  }
+
+
+  return runtime.conditions.filter(
+    condition =>
+      condition.targetRef &&
+      condition.targetRef.side ===
+        side &&
+      condition.targetRef
+        .participantId ===
+        participantId &&
+      Array.isArray(
+        condition.blockedActionClasses
+      ) &&
+      condition.blockedActionClasses
+        .includes(
+          actionClass
+        )
+  );
+}
+
+
+function removeBattleCondition(
+  conditionId
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const index =
+    runtime.conditions
+      .findIndex(
+        condition =>
+          condition.conditionId ===
+            conditionId
+      );
+
+
+  if (
+    index < 0
+  ) {
+
+    return false;
+  }
+
+
+  runtime.conditions.splice(
+    index,
+    1
+  );
+
+
+  return true;
+}
+
+
+// =========================================================
+// BRICK 304 — SHARED BATTLE ACTION ENVELOPE
+// =========================================================
+//
+// Both manual input and future Smart AI should create the
+// same semantic action request.
+//
+// This layer validates the request.
+//
+// It does NOT calculate final damage.
+//
+// =========================================================
+
+function createBattleActionEnvelope(
+  definition
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    !definition
+  ) {
+
+    return null;
+  }
+
+
+  runtime.actionSequence +=
+    1;
+
+
+  return {
+
+    actionId:
+      createBattleRuntimeRecordId(
+        "action"
+      ),
+
+
+    battleId:
+      currentBattle.battleId,
+
+
+    sequence:
+      runtime.actionSequence,
+
+
+    actorRef:
+      createBattleParticipantRef(
+        definition.actorSide,
+        definition.actorParticipantId
+      ),
+
+
+    targetRef:
+      createBattleParticipantRef(
+        definition.targetSide,
+        definition.targetParticipantId
+      ),
+
+
+    actionClass:
+      definition.actionClass ||
+      null,
+
+
+    skillId:
+      definition.skillId ||
+      null,
+
+
+    sourceRefs:
+      Array.isArray(
+        definition.sourceRefs
+      )
+
+        ? definition.sourceRefs
+            .filter(
+              ref =>
+                ref &&
+                ref.type &&
+                ref.id
+            )
+            .map(
+              ref => ({
+
+                type:
+                  ref.type,
+
+                id:
+                  ref.id
+
+              })
+            )
+
+        : [],
+
+
+    data:
+      definition.data
+        ? cloneBattleRuntimeValue(
+            definition.data
+          )
+        : {},
+
+
+    createdAt:
+      Date.now()
+
+  };
+}
+
+
+function getBattleActiveParticipantId(
+  side
+) {
+
+
+  const slot =
+    getBattleDeploymentSlot(
+      side,
+      1
+    );
+
+
+  return (
+    slot &&
+    slot.participantId
+
+      ? slot.participantId
+
+      : null
+  );
+}
+
+
+function validateBattleActionEnvelope(
+  envelope
+) {
+
+
+  if (
+    !envelope
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "missing_action"
+
+    };
+  }
+
+
+  if (
+    !currentBattle.active
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "battle_not_active"
+
+    };
+  }
+
+
+  if (
+    currentBattle.battleOver
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "battle_complete"
+
+    };
+  }
+
+
+  if (
+    !envelope.actorRef ||
+    !envelope.actorRef.side ||
+    !envelope.actorRef
+      .participantId
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "missing_actor"
+
+    };
+  }
+
+
+  if (
+    !envelope.actionClass
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "missing_action_class"
+
+    };
+  }
+
+
+  const activeParticipantId =
+    getBattleActiveParticipantId(
+      envelope.actorRef.side
+    );
+
+
+  if (
+    !activeParticipantId ||
+    activeParticipantId !==
+      envelope.actorRef
+        .participantId
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "actor_not_active"
+
+    };
+  }
+
+
+  const blockingConditions =
+    getBattleBlockingConditions(
+      envelope.actorRef.side,
+      envelope.actorRef
+        .participantId,
+      envelope.actionClass
+    );
+
+
+  if (
+    blockingConditions.length >
+      0
+  ) {
+
+
+    return {
+
+      valid:
+        false,
+
+      reason:
+        "blocked_by_condition",
+
+      blockingConditionIds:
+        blockingConditions.map(
+          condition =>
+            condition.conditionId
+        )
+
+    };
+  }
+
+
+  return {
+
+    valid:
+      true,
+
+    reason:
+      null,
+
+    blockingConditionIds:
+      []
+
+  };
+}
+
+
+// =========================================================
+// BRICK 304 — STRUCTURED BATTLE EVIDENCE
+// =========================================================
+//
+// Runtime resolution records what participated.
+//
+// Downstream persistent authorities decide what that evidence
+// means afterward.
+//
+// Examples of sourceRefs:
+//
+// { type: "weapon_instance", id: "..." }
+// { type: "hosted_entity", id: "..." }
+// { type: "relationship", id: "..." }
+// { type: "summon", id: "..." }
+//
+// =========================================================
+
+function recordBattleEvidence(
+  definition
+) {
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  if (
+    !definition ||
+    !definition.eventType
+  ) {
+
+    return null;
+  }
+
+
+  const record = {
+
+    evidenceId:
+      createBattleRuntimeRecordId(
+        "evidence"
+      ),
+
+
+    battleId:
+      currentBattle.battleId,
+
+
+    actionId:
+      definition.actionId ||
+      null,
+
+
+    eventType:
+      definition.eventType,
+
+
+    actorRef:
+      definition.actorRef
+        ? cloneBattleRuntimeValue(
+            definition.actorRef
+          )
+        : null,
+
+
+    targetRef:
+      definition.targetRef
+        ? cloneBattleRuntimeValue(
+            definition.targetRef
+          )
+        : null,
+
+
+    skillId:
+      definition.skillId ||
+      null,
+
+
+    sourceRefs:
+      Array.isArray(
+        definition.sourceRefs
+      )
+
+        ? cloneBattleRuntimeValue(
+            definition.sourceRefs
+          )
+
+        : [],
+
+
+    stateRefs:
+      Array.isArray(
+        definition.stateRefs
+      )
+
+        ? [
+            ...definition.stateRefs
+          ]
+
+        : [],
+
+
+    conditionRefs:
+      Array.isArray(
+        definition.conditionRefs
+      )
+
+        ? [
+            ...definition.conditionRefs
+          ]
+
+        : [],
+
+
+    data:
+      definition.data
+        ? cloneBattleRuntimeValue(
+            definition.data
+          )
+        : {},
+
+
+    createdAt:
+      Date.now()
+
+  };
+
+
+  runtime.evidence.push(
+    record
+  );
+
+
+  return record;
+}
+
+
+function beginBattleActionResolution(
+  envelope
+) {
+
+
+  const validation =
+    validateBattleActionEnvelope(
+      envelope
+    );
+
+
+  if (
+    !validation.valid
+  ) {
+
+
+    return {
+
+      accepted:
+        false,
+
+      validation:
+        validation,
+
+      evidence:
+        null
+
+    };
+  }
+
+
+  const evidence =
+    recordBattleEvidence({
+
+      eventType:
+        "action_attempted",
+
+      actionId:
+        envelope.actionId,
+
+      actorRef:
+        envelope.actorRef,
+
+      targetRef:
+        envelope.targetRef,
+
+      skillId:
+        envelope.skillId,
+
+      sourceRefs:
+        envelope.sourceRefs,
+
+      data: {
+        actionClass:
+          envelope.actionClass
+      }
+
+    });
+
+
+  return {
+
+    accepted:
+      true,
+
+    validation:
+      validation,
+
+    evidence:
+      evidence
+
+  };
+}
+
+
+// =========================================================
+// BRICK 304 — RUNTIME FOUNDATION DIAGNOSTIC
+// =========================================================
+//
+// Safe developer diagnostic.
+//
+// Creates temporary test state, validates it, then removes
+// everything it created.
+//
+// No damage is dealt.
+//
+// =========================================================
+
+function runBattleRuntimeFoundationDiagnostics() {
+
+
+  if (
+    !currentBattle.active ||
+    currentBattle.battleOver
+  ) {
+
+
+    return {
+
+      pass:
+        false,
+
+      reason:
+        "Start an active Battle first."
+
+    };
+  }
+
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+
+  const startingSequence =
+    runtime.actionSequence;
+
+
+  const actor =
+    getBattleDeploymentParticipant(
+      "player",
+      1
+    );
+
+
+  const target =
+    getBattleDeploymentParticipant(
+      "enemy",
+      1
+    );
+
+
+  const unrelatedPlayer =
+    getBattleDeploymentParticipant(
+      "player",
+      2
+    );
+
+
+  if (
+    !actor ||
+    !target
+  ) {
+
+
+    return {
+
+      pass:
+        false,
+
+      reason:
+        "Active participants missing."
+
+    };
+  }
+
+
+  const transientState =
+    addBattleTransientState({
+
+      stateKey:
+        "diagnostic_opening",
+
+      sourceSide:
+        "player",
+
+      sourceParticipantId:
+        actor.id,
+
+      targetSide:
+        "enemy",
+
+      targetParticipantId:
+        target.id
+
+    });
+
+
+  const sourceCanConsume =
+    canBattleParticipantConsumeTransientState(
+      transientState,
+      "player",
+      actor.id
+    );
+
+
+  const unrelatedCanConsume =
+    unrelatedPlayer
+
+      ? canBattleParticipantConsumeTransientState(
+          transientState,
+          "player",
+          unrelatedPlayer.id
+        )
+
+      : false;
+
+
+  const consumedState =
+    consumeBattleTransientState(
+      transientState.stateId,
+      "player",
+      actor.id
+    );
+
+
+  const condition =
+    addBattleCondition({
+
+      conditionKey:
+        "diagnostic_action_lock",
+
+      sourceSide:
+        "enemy",
+
+      sourceParticipantId:
+        target.id,
+
+      targetSide:
+        "player",
+
+      targetParticipantId:
+        actor.id,
+
+      blockedActionClasses: [
+        "diagnostic_action"
+      ]
+
+    });
+
+
+  const blockedEnvelope =
+    createBattleActionEnvelope({
+
+      actorSide:
+        "player",
+
+      actorParticipantId:
+        actor.id,
+
+      targetSide:
+        "enemy",
+
+      targetParticipantId:
+        target.id,
+
+      actionClass:
+        "diagnostic_action"
+
+    });
+
+
+  const blockedValidation =
+    validateBattleActionEnvelope(
+      blockedEnvelope
+    );
+
+
+  removeBattleCondition(
+    condition.conditionId
+  );
+
+
+  const clearEnvelope =
+    createBattleActionEnvelope({
+
+      actorSide:
+        "player",
+
+      actorParticipantId:
+        actor.id,
+
+      targetSide:
+        "enemy",
+
+      targetParticipantId:
+        target.id,
+
+      actionClass:
+        "diagnostic_action"
+
+    });
+
+
+  const clearValidation =
+    validateBattleActionEnvelope(
+      clearEnvelope
+    );
+
+
+  const diagnosticEvidence =
+    recordBattleEvidence({
+
+      eventType:
+        "diagnostic_evidence",
+
+      actorRef:
+        clearEnvelope.actorRef,
+
+      targetRef:
+        clearEnvelope.targetRef,
+
+      data: {
+        diagnostic:
+          true
+      }
+
+    });
+
+
+  runtime.evidence =
+    runtime.evidence.filter(
+      entry =>
+        entry.evidenceId !==
+          diagnosticEvidence.evidenceId
+    );
+
+
+  runtime.actionSequence =
+    startingSequence;
+
+
+  const result = {
+
+    transientStateCreated:
+      !!transientState,
+
+
+    sourceScopedConsumerAllowed:
+      sourceCanConsume ===
+      true,
+
+
+    unrelatedConsumerRejected:
+      unrelatedCanConsume ===
+      false,
+
+
+    transientStateConsumed:
+      !!consumedState,
+
+
+    conditionBlockedAction:
+      blockedValidation.valid ===
+        false &&
+      blockedValidation.reason ===
+        "blocked_by_condition",
+
+
+    actionAllowedAfterConditionRemoval:
+      clearValidation.valid ===
+      true,
+
+
+    structuredEvidenceCreated:
+      !!diagnosticEvidence
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
 }
 
 // =========================================================
@@ -60172,10 +61820,10 @@ function claimDailyReward() {
 // BRICK 156 — DEVELOPMENT BATTLE STATE RESTORE
 // =========================================================
 //
-// BRICK 299:
-// Restore Battle-local deployment before reopening Combat.
+// Restores Battle-local deployment and runtime state before
+// reopening Combat.
 //
-// Old saves without deployment remain compatible.
+// Old snapshots remain compatible.
 //
 // =========================================================
 
@@ -60322,7 +61970,7 @@ function restoreTestState() {
 
 
   // =========================================
-  // BRICK 299 — DEPLOYMENT
+  // DEPLOYMENT
   // =========================================
 
   currentBattle.deployment =
@@ -60338,9 +61986,6 @@ function restoreTestState() {
     syncBattleActivePlayerFromDeployment();
 
 
-  /*
-     Legacy snapshot fallback only.
-  */
   if (
     !deploymentActivePlayer &&
     state.activePlayerId
@@ -60369,6 +62014,15 @@ function restoreTestState() {
         .activePlayer
         .id;
   }
+
+
+  // =========================================
+  // BRICKS 302–304 — BATTLE RUNTIME
+  // =========================================
+
+  restoreBattleRuntimeState(
+    state.runtime
+  );
 
 
   // =========================================
