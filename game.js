@@ -5,15 +5,20 @@
 
 // =========================================================
 // PLAYER TEAM DATABASE
+// BRICK 314 — ACADEMY PLAYABLE VARIANT INTEGRATION
 // =========================================================
 //
-// Canonical Base Stats now own Base PL.
+// Canonical Base Stats own Base PL.
 //
-// basePL remains temporarily stored as compatibility metadata
-// for older systems that still identify playable characters
-// through that field.
+// basePL remains compatibility metadata for older systems.
 //
-// PL calculation itself no longer trusts basePL as authority.
+// Academy pilot variants are registered in the existing
+// playable-character authority so save/progression/equipment
+// systems can resolve them normally.
+//
+// developmentPilotOnly prevents them from silently entering
+// the ordinary Battle roster before permanent team-building
+// authority exists.
 //
 // =========================================================
 
@@ -180,9 +185,224 @@ let playerTeam = [
 
     image:
       "Assets/Animated Cards/teen_nagato.png"
+  },
+
+
+  // =======================================================
+  // ACADEMY PILOT VARIANTS
+  // =======================================================
+
+  {
+    id: "academy_hinata",
+    name: "Academy Hinata",
+    rank: "Academy",
+
+    basePL: 8,
+
+    baseStats: {
+      nin: 6,
+      tai: 9,
+      buki: 5,
+      fuin: 5,
+      kin: 5,
+      gen: 5,
+      stamina: 7
+    },
+
+    stats: {
+      nin: 6,
+      tai: 9,
+      buki: 5,
+      fuin: 5,
+      kin: 5,
+      gen: 5,
+      stamina: 7
+    },
+
+    permanentPLBonus: 0,
+
+    equipment: [],
+
+    weaponSpecializations: {},
+
+    abilities: [],
+
+    developmentPilotOnly: true,
+
+    image:
+      "Assets/Animated Cards/academy_hinata.png"
+  },
+
+
+  {
+    id: "academy_izuno",
+    name: "Academy Izuno",
+    rank: "Academy",
+
+    basePL: 9,
+
+    baseStats: {
+      nin: 10,
+      tai: 9,
+      buki: 6,
+      fuin: 5,
+      kin: 6,
+      gen: 5,
+      stamina: 8
+    },
+
+    stats: {
+      nin: 10,
+      tai: 9,
+      buki: 6,
+      fuin: 5,
+      kin: 6,
+      gen: 5,
+      stamina: 8
+    },
+
+    permanentPLBonus: 0,
+
+    equipment: [],
+
+    weaponSpecializations: {},
+
+    abilities: [],
+
+    developmentPilotOnly: true,
+
+    image:
+      "Assets/Animated Cards/academy_izuno.png"
+  },
+
+
+  {
+    id: "academy_mirai",
+    name: "Academy Mirai",
+    rank: "Academy",
+
+    basePL: 9,
+
+    baseStats: {
+      nin: 8,
+      tai: 8,
+      buki: 9,
+      fuin: 5,
+      kin: 6,
+      gen: 7,
+      stamina: 8
+    },
+
+    stats: {
+      nin: 8,
+      tai: 8,
+      buki: 9,
+      fuin: 5,
+      kin: 6,
+      gen: 7,
+      stamina: 8
+    },
+
+    permanentPLBonus: 0,
+
+    equipment: [],
+
+    weaponSpecializations: {},
+
+    abilities: [],
+
+    developmentPilotOnly: true,
+
+    image:
+      "Assets/Animated Cards/academy_mirai.png"
+  },
+
+
+  {
+    id: "academy_menma",
+    name: "Academy Menma",
+    rank: "Academy",
+
+    basePL: 10,
+
+    baseStats: {
+      nin: 10,
+      tai: 8,
+      buki: 6,
+      fuin: 5,
+      kin: 9,
+      gen: 7,
+      stamina: 11
+    },
+
+    stats: {
+      nin: 10,
+      tai: 8,
+      buki: 6,
+      fuin: 5,
+      kin: 9,
+      gen: 7,
+      stamina: 11
+    },
+
+    permanentPLBonus: 0,
+
+    equipment: [],
+
+    weaponSpecializations: {},
+
+    abilities: [],
+
+    developmentPilotOnly: true,
+
+    image:
+      "Assets/Animated Cards/academy_menma.png"
+  },
+
+
+  {
+    id: "academy_kushina",
+    name: "Academy Kushina",
+    rank: "Academy",
+
+    basePL: 12,
+
+    baseStats: {
+      nin: 8,
+      tai: 9,
+      buki: 5,
+      fuin: 8,
+      kin: 5,
+      gen: 5,
+      stamina: 14
+    },
+
+    stats: {
+      nin: 8,
+      tai: 9,
+      buki: 5,
+      fuin: 8,
+      kin: 5,
+      gen: 5,
+      stamina: 14
+    },
+
+    permanentPLBonus: 0,
+
+    equipment: [],
+
+    weaponSpecializations: {},
+
+    abilities: [],
+
+    developmentPilotOnly: true,
+
+    image:
+      "Assets/Animated Cards/academy_kushina.png"
   }
 
 ];
+
 
 // =========================================================
 // ITEM DATABASE
@@ -33371,7 +33591,9 @@ function createInitialBattlePlayerParticipantIds(
   const members =
     playerTeam.filter(
       member =>
-        !!member
+        !!member &&
+        member.developmentPilotOnly !==
+          true
     );
 
 
@@ -33899,6 +34121,140 @@ function syncBattleActivePlayerFromDeployment() {
 
 
 // =========================================================
+// BRICK 315 — DEPLOYMENT-SCOPED CONTRIBUTION RECORDS
+// =========================================================
+//
+// Contribution records are created only for participants
+// actually deployed into this Battle.
+//
+// This prevents registry-only / development-pilot variants
+// from silently becoming Battle participants.
+//
+// =========================================================
+
+function initializeBattleContributionRecordsFromDeployment() {
+
+
+  const contributions = {};
+
+
+  const deployment =
+    currentBattle.deployment;
+
+
+  const slots =
+    deployment &&
+    deployment.player &&
+    Array.isArray(
+      deployment.player.slots
+    )
+      ? deployment.player.slots
+      : [];
+
+
+  slots.forEach(
+    slot => {
+
+
+      if (
+        !slot ||
+        !slot.participantId
+      ) {
+
+        return;
+      }
+
+
+      const member =
+        getPlayerCharacter(
+          slot.participantId
+        );
+
+
+      if (
+        !member
+      ) {
+
+        return;
+      }
+
+
+      contributions[
+        member.id
+      ] = {
+
+        id:
+          member.id,
+
+        name:
+          member.name,
+
+        power:
+          calculateEffectivePL(
+            member
+          ),
+
+        damage:
+          0,
+
+        attacks:
+          0,
+
+        ninjutsuDamage:
+          0,
+
+        taijutsuDamage:
+          0,
+
+        bukijutsuDamage:
+          0
+
+      };
+    }
+  );
+
+
+  currentBattle.contributions =
+    contributions;
+
+
+  return currentBattle.contributions;
+}
+
+
+// =========================================================
+// BRICK 315 — ACADEMY PILOT DEPLOYMENT IDENTITY
+// =========================================================
+
+const ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS = [
+
+  "academy_hinata",
+  "academy_izuno",
+  "academy_mirai",
+  "academy_menma",
+  "academy_kushina"
+
+];
+
+
+function getAcademyBattlePilotParticipants() {
+
+
+  return ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS
+    .map(
+      characterId =>
+        getPlayerCharacter(
+          characterId
+        )
+    )
+    .filter(
+      character =>
+        !!character
+    );
+}
+
+
+// =========================================================
 // EXISTING BATTLE LAUNCH — NOW CREATES DEPLOYMENT
 // =========================================================
 
@@ -33952,14 +34308,34 @@ function startEncounter(
 
 
   if (
+    activePlayer &&
+    activePlayer.developmentPilotOnly ===
+      true
+  ) {
+
+
+    console.log(
+      "Development pilot variants require Battle-local pilot deployment."
+    );
+
+
+    activePlayer =
+      null;
+  }
+
+
+  if (
     !activePlayer
   ) {
 
 
     activePlayer =
-      playerTeam[
-        0
-      ] ||
+      playerTeam.find(
+        member =>
+          member &&
+          member.developmentPilotOnly !==
+            true
+      ) ||
       null;
   }
 
@@ -34051,47 +34427,7 @@ function startEncounter(
   ];
 
 
-  currentBattle.contributions =
-    {};
-
-
-  playerTeam.forEach(
-    member => {
-
-
-      currentBattle.contributions[
-        member.id
-      ] = {
-
-        id:
-          member.id,
-
-        name:
-          member.name,
-
-        power:
-          calculateEffectivePL(
-            member
-          ),
-
-        damage:
-          0,
-
-        attacks:
-          0,
-
-        ninjutsuDamage:
-          0,
-
-        taijutsuDamage:
-          0,
-
-        bukijutsuDamage:
-          0
-
-      };
-    }
-  );
+  initializeBattleContributionRecordsFromDeployment();
 
 
   currentBattle.rewards = {
@@ -34156,6 +34492,424 @@ function startEncounter(
 
 
   return currentBattle;
+}
+
+
+
+
+// =========================================================
+// BRICK 318 — ACADEMY PILOT EQUIPMENT PREPARATION
+// =========================================================
+//
+// Uses existing Inventory / Equipment authorities.
+//
+// Mirai equips one authoritative Kunai instance.
+// Shuriken Set remains an available persistent weapon set.
+// Ninja Wire remains an available persistent tool.
+//
+// =========================================================
+
+function prepareAcademyPilotBattleEquipment() {
+
+
+  grantAcademyPilotEquipmentPrerequisites();
+
+
+  const mirai =
+    getPlayerCharacter(
+      "academy_mirai"
+    );
+
+
+  if (
+    !mirai
+  ) {
+
+    console.log(
+      "Academy Mirai is not registered."
+    );
+
+
+    return false;
+  }
+
+
+  const currentWeapon =
+    getBattleEquippedWeaponExecutionContext(
+      mirai
+    );
+
+
+  if (
+    currentWeapon &&
+    currentWeapon.weaponClass !==
+      "Kunai"
+  ) {
+
+
+    const unequipped =
+      unequipCharacterWeapon(
+        mirai.id
+      );
+
+
+    if (
+      !unequipped
+    ) {
+
+      return false;
+    }
+  }
+
+
+  const refreshedWeapon =
+    getBattleEquippedWeaponExecutionContext(
+      mirai
+    );
+
+
+  if (
+    !refreshedWeapon ||
+    refreshedWeapon.weaponClass !==
+      "Kunai"
+  ) {
+
+
+    const equipped =
+      equipItemToCharacter(
+        "kunai",
+        mirai.id
+      );
+
+
+    if (
+      !equipped
+    ) {
+
+      return false;
+    }
+  }
+
+
+  savePlayerData();
+
+
+  return {
+
+    mirai:
+      mirai,
+
+    kunai:
+      getBattleEquippedWeaponExecutionContext(
+        mirai
+      ),
+
+    shuriken:
+      getBattleAvailablePersistentThrowingWeaponContext(
+        mirai,
+        [
+          "Shuriken"
+        ]
+      ),
+
+    ninjaWire:
+      getBattleInventoryToolContext(
+        "ninja_wire"
+      )
+
+  };
+}
+
+
+// =========================================================
+// BRICK 315 / 318 — LOAD ACADEMY PILOT INTO LIVE BATTLE
+// =========================================================
+//
+// IMPORTANT:
+//
+// This does NOT launch a Battle.
+//
+// Use the real world path:
+// Land of Fire → Bandit Hideout → encounter.
+//
+// Once Combat is open, this function replaces only the
+// Battle-local deployment snapshot with the Academy pilot.
+//
+// =========================================================
+
+function loadAcademyPilotBattleDeployment() {
+
+
+  if (
+    !currentBattle.active ||
+    currentBattle.battleOver ||
+    !currentBattle.enemy
+  ) {
+
+
+    console.log(
+      "Start a live Battle before loading the Academy pilot."
+    );
+
+
+    return false;
+  }
+
+
+  const participants =
+    getAcademyBattlePilotParticipants();
+
+
+  if (
+    participants.length !==
+      ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.length
+  ) {
+
+
+    console.log(
+      "Academy pilot characters are not fully registered.",
+      participants
+    );
+
+
+    return false;
+  }
+
+
+  const equipment =
+    prepareAcademyPilotBattleEquipment();
+
+
+  if (
+    !equipment
+  ) {
+
+    console.log(
+      "Academy pilot equipment preparation failed."
+    );
+
+
+    return false;
+  }
+
+
+  currentBattle.deployment = {
+
+    player: {
+
+      slots:
+        createBattleDeploymentSlots(
+          ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS
+        )
+
+    },
+
+    enemy: {
+
+      slots:
+        createBattleDeploymentSlots(
+          currentBattle.enemy &&
+          currentBattle.enemy.id
+            ? [
+                currentBattle.enemy.id
+              ]
+            : []
+        )
+
+    },
+
+    transitionCounter:
+      0,
+
+    lastTransition:
+      null
+
+  };
+
+
+  currentBattle.characterId =
+    ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS[
+      0
+    ];
+
+
+  syncBattleActivePlayerFromDeployment();
+
+
+  initializeBattleContributionRecordsFromDeployment();
+
+
+  currentBattle.battleLog = [
+
+    `${currentBattle.enemy.name} appears!`,
+
+    `${currentBattle.activePlayer.name} prepares for battle.`,
+
+    "Academy Battle pilot deployed."
+
+  ];
+
+
+  saveTestState();
+
+
+  openOverlay(
+    "combat"
+  );
+
+
+  return {
+
+    success:
+      true,
+
+    participantIds:
+      [
+        ...ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS
+      ],
+
+    equipment:
+      equipment
+
+  };
+}
+
+
+// =========================================================
+// BRICK 319 — ACADEMY PILOT DEPLOYMENT DIAGNOSTIC
+// =========================================================
+
+function runAcademyPilotDeploymentDiagnostics() {
+
+
+  const participants =
+    getAcademyBattlePilotParticipants();
+
+
+  const normalIds =
+    createInitialBattlePlayerParticipantIds();
+
+
+  const currentPilotIds =
+    currentBattle.deployment &&
+    currentBattle.deployment.player &&
+    Array.isArray(
+      currentBattle.deployment.player.slots
+    )
+      ? currentBattle.deployment.player.slots
+          .map(
+            slot =>
+              slot.participantId
+          )
+          .filter(
+            participantId =>
+              !!participantId
+          )
+      : [];
+
+
+  const expectedPL = {
+
+    academy_hinata:
+      8,
+
+    academy_izuno:
+      9,
+
+    academy_mirai:
+      9,
+
+    academy_menma:
+      10,
+
+    academy_kushina:
+      12
+
+  };
+
+
+  const result = {
+
+    fivePilotCharactersRegistered:
+      participants.length ===
+      5,
+
+
+    suppliedBasePLMatchesFormula:
+      participants.every(
+        character =>
+          calculateRawPLFromStats(
+            character.baseStats
+          ) ===
+          expectedPL[
+            character.id
+          ]
+      ),
+
+
+    ordinaryRosterExcludesPilot:
+      ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(
+        characterId =>
+          !normalIds.includes(
+            characterId
+          )
+      ),
+
+
+    livePilotDeploymentLoaded:
+      ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(
+        (
+          characterId,
+          index
+        ) =>
+          currentPilotIds[
+            index
+          ] ===
+          characterId
+      ),
+
+
+    hinataIsActiveSlotOne:
+      !!(
+        currentBattle.activePlayer &&
+        currentBattle.activePlayer.id ===
+          "academy_hinata"
+      ),
+
+
+    contributionsScopedToPilot:
+      Object.keys(
+        currentBattle.contributions ||
+        {}
+      ).length ===
+        5 &&
+      ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(
+        characterId =>
+          !!currentBattle
+            .contributions[
+              characterId
+            ]
+      )
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
 }
 
 
@@ -63541,7 +64295,151 @@ function getPreparedAcademyBattleSkills(
 
 // =========================================================
 // BRICK 308 — SKILL AVAILABILITY
+// BRICK 316 — PERSISTENT THROWING-WEAPON AVAILABILITY
 // =========================================================
+
+function getBattleAvailablePersistentThrowingWeaponContext(
+  character,
+  allowedWeaponClasses = []
+) {
+
+
+  if (
+    !character ||
+    !playerData ||
+    !Array.isArray(
+      playerData.inventory
+    )
+  ) {
+
+    return null;
+  }
+
+
+  const allowed =
+    Array.isArray(
+      allowedWeaponClasses
+    )
+      ? allowedWeaponClasses
+      : [];
+
+
+  const candidates =
+    playerData.inventory.filter(
+      item => {
+
+
+        if (
+          !item ||
+          !item.instanceId ||
+          item.type !==
+            "weapon"
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          item.equippedBy &&
+          item.equippedBy !==
+            character.id
+        ) {
+
+          return false;
+        }
+
+
+        const definition =
+          getItemDefinition(
+            item.id
+          );
+
+
+        if (
+          !definition ||
+          definition.type !==
+            "weapon" ||
+          definition
+            .persistentThrowingWeapon !==
+            true
+        ) {
+
+          return false;
+        }
+
+
+        if (
+          allowed.length >
+            0 &&
+          !allowed.includes(
+            definition.weaponClass
+          )
+        ) {
+
+          return false;
+        }
+
+
+        return true;
+      }
+    );
+
+
+  const selected =
+    candidates[
+      0
+    ] ||
+    null;
+
+
+  if (
+    !selected
+  ) {
+
+    return null;
+  }
+
+
+  const definition =
+    getItemDefinition(
+      selected.id
+    );
+
+
+  return {
+
+    instanceId:
+      selected.instanceId,
+
+    itemId:
+      selected.id,
+
+    weaponClass:
+      definition.weaponClass ||
+      null,
+
+    persistentThrowingWeapon:
+      true,
+
+    persistentWeaponSet:
+      definition
+        .persistentWeaponSet ===
+        true,
+
+    equipped:
+      selected.equippedBy ===
+        character.id,
+
+    definition:
+      definition,
+
+    inventoryItem:
+      selected
+
+  };
+}
+
 
 function evaluateAcademyBattleSkillAvailability(
   skill,
@@ -63670,7 +64568,7 @@ function evaluateAcademyBattleSkillAvailability(
   }
 
 
-  const weaponContext =
+  let weaponContext =
     getBattleEquippedWeaponExecutionContext(
       actor
     );
@@ -63746,21 +64644,16 @@ function evaluateAcademyBattleSkillAvailability(
     ) {
 
 
+      const throwingWeaponContext =
+        getBattleAvailablePersistentThrowingWeaponContext(
+          actor,
+          requirement.allowedWeaponClasses ||
+          []
+        );
+
+
       if (
-        !weaponContext ||
-        weaponContext
-          .persistentThrowingWeapon !==
-          true ||
-        (
-          Array.isArray(
-            requirement.allowedWeaponClasses
-          ) &&
-          !requirement
-            .allowedWeaponClasses
-            .includes(
-              weaponContext.weaponClass
-            )
-        )
+        !throwingWeaponContext
       ) {
 
         return {
@@ -63774,6 +64667,10 @@ function evaluateAcademyBattleSkillAvailability(
 
         };
       }
+
+
+      weaponContext =
+        throwingWeaponContext;
     }
 
 
@@ -63896,6 +64793,7 @@ function evaluateAcademyBattleSkillAvailability(
 
   };
 }
+
 
 
 // =========================================================
@@ -64454,6 +65352,7 @@ function getAcademyBattleSkillSourceRefs(
 
 // =========================================================
 // BRICK 310 — SHARED SKILL SEMANTIC RESOLVER
+// BRICK 317 — COMPATIBLE SELF-STATE CONSUMPTION
 // =========================================================
 
 function resolveAcademyBattleSkillSemantics(
@@ -64619,7 +65518,7 @@ function resolveAcademyBattleSkillSemantics(
         : "enemy";
 
 
-    const matchingState =
+    let matchingState =
       findBattleTransientState({
 
         stateKey:
@@ -64644,6 +65543,86 @@ function resolveAcademyBattleSkillSemantics(
           target.id
 
       });
+
+
+    // =====================================================
+    // BRICK 317 — COMPATIBLE SELF-STATE FALLBACK
+    // =====================================================
+    //
+    // Some setup states target the acting character rather
+    // than the eventual enemy target.
+    //
+    // Example:
+    // Menma + Yin Kurama → Menma = kurama_guidance
+    //
+    // A fallback self-state is valid only when that runtime
+    // state explicitly names a compatible consumer trait and
+    // the selected Skill carries that trait.
+    //
+    // This keeps relation-scoped enemy openings such as
+    // feinted_opening and binding_formula target-specific.
+    //
+    // =====================================================
+
+    if (
+      !matchingState &&
+      actor &&
+      Array.isArray(
+        skill.traits
+      )
+    ) {
+
+
+      const selfState =
+        findBattleTransientState({
+
+          stateKey:
+            skill.conditional
+              .stateKey,
+
+          sourceSide:
+            "player",
+
+          sourceParticipantId:
+            skill.conditional
+              .sourceMustBeActor
+
+              ? actor.id
+
+              : undefined,
+
+          targetSide:
+            "player",
+
+          targetParticipantId:
+            actor.id
+
+        });
+
+
+      const compatibleTrait =
+        selfState &&
+        selfState.data
+          ? selfState
+              .data
+              .compatibleConsumerTrait ||
+            null
+          : null;
+
+
+      if (
+        selfState &&
+        compatibleTrait &&
+        skill.traits.includes(
+          compatibleTrait
+        )
+      ) {
+
+
+        matchingState =
+          selfState;
+      }
+    }
 
 
     if (
@@ -64798,6 +65777,7 @@ function resolveAcademyBattleSkillSemantics(
 
   };
 }
+
 
 
 // =========================================================
@@ -65234,6 +66214,228 @@ function runAcademyBattleSkillDefinitionDiagnostics() {
 
   return result;
 }
+
+
+
+// =========================================================
+// BRICK 319 — ACADEMY PILOT INTEGRATION DIAGNOSTIC
+// =========================================================
+//
+// Run only after:
+//
+// 1. Entering Bandit Hideout normally.
+// 2. Starting a real encounter.
+// 3. Calling loadAcademyPilotBattleDeployment().
+//
+// This diagnostic does not execute Skills or change BP.
+//
+// =========================================================
+
+function runAcademyPilotIntegrationDiagnostics() {
+
+
+  const enemy =
+    getBattleDeploymentParticipant(
+      "enemy",
+      1
+    );
+
+
+  const hinata =
+    getPlayerCharacter(
+      "academy_hinata"
+    );
+
+
+  const mirai =
+    getPlayerCharacter(
+      "academy_mirai"
+    );
+
+
+  const menma =
+    getPlayerCharacter(
+      "academy_menma"
+    );
+
+
+  const miraiSkills =
+    getPreparedAcademyBattleSkills(
+      "academy_mirai"
+    );
+
+
+  const menmaSkills =
+    getPreparedAcademyBattleSkills(
+      "academy_menma"
+    );
+
+
+  const miraiAvailability =
+    miraiSkills.map(
+      skill =>
+        evaluateAcademyBattleSkillAvailability(
+          skill,
+          mirai,
+          enemy
+        )
+    );
+
+
+  const menmaAvailability =
+    menmaSkills.map(
+      skill =>
+        evaluateAcademyBattleSkillAvailability(
+          skill,
+          menma,
+          enemy
+        )
+    );
+
+
+  const crossfireAvailability =
+    evaluateAcademyBattleSkillAvailability(
+      getAcademyBattleSkillDefinition(
+        "academy_mirai_shuriken_crossfire"
+      ),
+      mirai,
+      enemy
+    );
+
+
+  const wireAvailability =
+    evaluateAcademyBattleSkillAvailability(
+      getAcademyBattleSkillDefinition(
+        "academy_mirai_wire_guided_kunai"
+      ),
+      mirai,
+      enemy
+    );
+
+
+  const result = {
+
+
+    liveBattleActive:
+      currentBattle.active ===
+        true &&
+      currentBattle.battleOver !==
+        true,
+
+
+    academyPilotLoaded:
+      !!(
+        currentBattle.activePlayer &&
+        currentBattle.activePlayer.id ===
+          "academy_hinata"
+      ),
+
+
+    hinataThreeSkillsPrepared:
+      getPreparedAcademyBattleSkills(
+        "academy_hinata"
+      ).length ===
+        3,
+
+
+    miraiThreeSkillsAvailable:
+      miraiAvailability.length ===
+        3 &&
+      miraiAvailability.every(
+        availability =>
+          availability.available ===
+            true
+      ),
+
+
+    miraiKunaiEquipped:
+      !!(
+        getBattleEquippedWeaponExecutionContext(
+          mirai
+        ) &&
+        getBattleEquippedWeaponExecutionContext(
+          mirai
+        ).weaponClass ===
+          "Kunai"
+      ),
+
+
+    crossfireUsesPersistentShuriken:
+      !!(
+        crossfireAvailability.available &&
+        crossfireAvailability
+          .weaponContext &&
+        crossfireAvailability
+          .weaponContext
+          .weaponClass ===
+          "Shuriken" &&
+        crossfireAvailability
+          .weaponContext
+          .persistentThrowingWeapon ===
+          true
+      ),
+
+
+    wireGuidedHasNinjaWire:
+      !!(
+        wireAvailability.available &&
+        Array.isArray(
+          wireAvailability.toolContexts
+        ) &&
+        wireAvailability.toolContexts.some(
+          context =>
+            context &&
+            context.itemId ===
+              "ninja_wire"
+        )
+      ),
+
+
+    menmaThreeSkillsAvailable:
+      menmaAvailability.length ===
+        3 &&
+      menmaAvailability.every(
+        availability =>
+          availability.available ===
+            true
+      ),
+
+
+    menmaHostedAccessAvailable:
+      getAcademyMenmaHostedEntityAccess()
+        .available ===
+        true,
+
+
+    battlePowerStillUnchanged:
+      Number(
+        currentBattle.enemyPower
+      ) ===
+      Number(
+        currentBattle.enemyMaxPower
+      )
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
+}
+
 
 // =========================================
 // UI COMPONENT — ACTIVITY CARD
