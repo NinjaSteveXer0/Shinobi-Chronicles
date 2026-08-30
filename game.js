@@ -58073,6 +58073,7 @@ function renderBattleWithdrawalEcho() {
 // =========================================================
 // BRICK 298 — LIVE SIX-SLOT BATTLE ROSTERS
 // BRICK 301 — QUEUE PRESENTATION INTEGRATION
+// BRICK 309 — TEMPORARY PREPARED SKILL DECK
 // =========================================================
 
 function renderCombatOverlay(
@@ -58101,9 +58102,6 @@ function renderCombatOverlay(
   }
 
 
-  /*
-     Legacy / pre-Brick-299 Battle recovery.
-  */
   if (
     !currentBattle.deployment
   ) {
@@ -58173,6 +58171,7 @@ function renderCombatOverlay(
   const enemyMaxPower =
     Math.max(
       enemyPower,
+
       Number(
         currentBattle.enemyMaxPower
       ) ||
@@ -58245,20 +58244,26 @@ function renderCombatOverlay(
 
   const regionLabel =
     region
+
       ? region.name
           .toUpperCase()
+
       : "BATTLE";
 
 
   const locationLabel =
     location
+
       ? location.name
+
       : enemy.name;
 
 
   const playerLabel =
     activePlayer
+
       ? activePlayer.name
+
       : "NO ACTIVE SHINOBI";
 
 
@@ -58298,6 +58303,17 @@ function renderCombatOverlay(
     renderBattleWithdrawalEcho();
 
 
+  // =======================================================
+  // BRICK 309 — TEMPORARY SKILL DECK
+  // =======================================================
+
+  const skillDeckMarkup =
+    renderTemporaryBattleSkillDeck(
+      activePlayer,
+      enemy
+    );
+
+
   container.innerHTML = `
 
     <section
@@ -58308,12 +58324,22 @@ function renderCombatOverlay(
       <div class="battle-live-stage">
 
 
-        <div class="battle-live-heading battle-live-heading-player">
+        <div
+          class="
+            battle-live-heading
+            battle-live-heading-player
+          "
+        >
           YOUR TEAM
         </div>
 
 
-        <div class="battle-live-heading battle-live-heading-enemy">
+        <div
+          class="
+            battle-live-heading
+            battle-live-heading-enemy
+          "
+        >
           ENEMY TEAM
         </div>
 
@@ -58353,12 +58379,22 @@ function renderCombatOverlay(
         </div>
 
 
-        <div class="battle-live-roster battle-live-roster-player">
+        <div
+          class="
+            battle-live-roster
+            battle-live-roster-player
+          "
+        >
           ${playerRosterMarkup}
         </div>
 
 
-        <div class="battle-live-roster battle-live-roster-enemy">
+        <div
+          class="
+            battle-live-roster
+            battle-live-roster-enemy
+          "
+        >
           ${enemyRosterMarkup}
         </div>
 
@@ -58366,7 +58402,12 @@ function renderCombatOverlay(
         ${withdrawalEcho}
 
 
-        <div class="battle-live-active-label battle-live-active-player">
+        <div
+          class="
+            battle-live-active-label
+            battle-live-active-player
+          "
+        >
 
           ACTIVE: ${
             activePlayerSlot
@@ -58378,7 +58419,12 @@ function renderCombatOverlay(
         </div>
 
 
-        <div class="battle-live-active-label battle-live-active-enemy">
+        <div
+          class="
+            battle-live-active-label
+            battle-live-active-enemy
+          "
+        >
 
           ACTIVE: ${
             activeEnemySlot
@@ -58390,7 +58436,12 @@ function renderCombatOverlay(
         </div>
 
 
-        <div class="battle-live-power battle-live-power-player">
+        <div
+          class="
+            battle-live-power
+            battle-live-power-player
+          "
+        >
 
           <strong>
             ${playerEffectivePL}
@@ -58403,7 +58454,12 @@ function renderCombatOverlay(
         </div>
 
 
-        <div class="battle-live-power battle-live-power-enemy">
+        <div
+          class="
+            battle-live-power
+            battle-live-power-enemy
+          "
+        >
 
           <strong>
             ${enemyPower}
@@ -58416,11 +58472,18 @@ function renderCombatOverlay(
         </div>
 
 
+        ${skillDeckMarkup}
+
+
         <button
           type="button"
           class="battle-live-withdraw-action"
           onclick="withdrawActiveBattleFighter()"
-          ${canWithdraw ? "" : "disabled"}
+          ${
+            canWithdraw
+              ? ""
+              : "disabled"
+          }
         >
           WITHDRAW
         </button>
@@ -62205,439 +62268,2820 @@ function runBattleRuntimeFoundationDiagnostics() {
 }
 
 // =========================================================
-// BATTLE ENGINE — DAMAGE RESOLUTION
+// BRICK 308 — ACADEMY BATTLE SKILL REGISTRY
+// =========================================================
+//
+// First canonical Battle-content pilot:
+//
+// - Academy Hinata
+// - Academy Izuno
+// - Academy Mirai
+// - Academy Menma
+// - Academy Kushina
+//
+// 15 Skills total.
+//
+// Final numerical damage coefficients and Stamina mitigation
+// remain outside this registry.
+//
 // =========================================================
 
-function performStatAttack(
-  attackType
+const ACADEMY_BATTLE_SKILL_DATABASE = {
+
+
+  // =======================================================
+  // ACADEMY HINATA
+  // =======================================================
+
+  academy_hinata_hyuga_opening_palm: {
+
+    id:
+      "academy_hinata_hyuga_opening_palm",
+
+    displayName:
+      "Hyūga Opening Palm",
+
+    ownerId:
+      "academy_hinata",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits:
+      [],
+
+    requirements:
+      []
+  },
+
+
+  academy_hinata_hyuga_twin_palm: {
+
+    id:
+      "academy_hinata_hyuga_twin_palm",
+
+    displayName:
+      "Hyūga Twin Palm",
+
+    ownerId:
+      "academy_hinata",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      2,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits: [
+      "multi_hit_presentation"
+    ],
+
+    requirements:
+      []
+  },
+
+
+  academy_hinata_hyuga_guarding_step: {
+
+    id:
+      "academy_hinata_hyuga_guarding_step",
+
+    displayName:
+      "Hyūga Guarding Step",
+
+    ownerId:
+      "academy_hinata",
+
+    type:
+      "Defensive Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "self",
+
+    actionClass:
+      "positive_self_enhancement",
+
+    resolutionKind:
+      "transient_state",
+
+    staminaMitigation:
+      null,
+
+    executionTags:
+      [],
+
+    traits:
+      [],
+
+    requirements:
+      [],
+
+    state: {
+
+      stateKey:
+        "guarding_step",
+
+      reapplication:
+        "refresh_replace",
+
+      consumeOn:
+        "next_valid_incoming_mitigable_attack"
+
+    }
+  },
+
+
+  // =======================================================
+  // ACADEMY IZUNO
+  // =======================================================
+
+  academy_izuno_quickstep_lunge: {
+
+    id:
+      "academy_izuno_quickstep_lunge",
+
+    displayName:
+      "Quickstep Lunge",
+
+    ownerId:
+      "academy_izuno",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits:
+      [],
+
+    requirements:
+      []
+  },
+
+
+  academy_izuno_clone_feint: {
+
+    id:
+      "academy_izuno_clone_feint",
+
+    displayName:
+      "Academy Clone Feint",
+
+    ownerId:
+      "academy_izuno",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Ninjutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "setup_technique",
+
+    resolutionKind:
+      "transient_state",
+
+    staminaMitigation:
+      null,
+
+    executionTags:
+      [],
+
+    traits:
+      [],
+
+    requirements:
+      [],
+
+    state: {
+
+      stateKey:
+        "feinted_opening",
+
+      reapplication:
+        "refresh_replace"
+
+    }
+  },
+
+
+  academy_izuno_pouncing_strike: {
+
+    id:
+      "academy_izuno_pouncing_strike",
+
+    displayName:
+      "Pouncing Strike",
+
+    ownerId:
+      "academy_izuno",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits: [
+      "setup_exploiter"
+    ],
+
+    requirements:
+      [],
+
+    conditional: {
+
+      stateKey:
+        "feinted_opening",
+
+      sourceMustBeActor:
+        true,
+
+      consume:
+        true,
+
+      enhancedBranch:
+        "enhanced"
+
+    }
+  },
+
+
+  // =======================================================
+  // ACADEMY MIRAI
+  // =======================================================
+
+  academy_mirai_sarutobi_kunai_form: {
+
+    id:
+      "academy_mirai_sarutobi_kunai_form",
+
+    displayName:
+      "Sarutobi Kunai Form",
+
+    ownerId:
+      "academy_mirai",
+
+    type:
+      "Weapon Technique",
+
+    primaryDiscipline:
+      "Bukijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits:
+      [],
+
+    requirements: [
+
+      {
+
+        kind:
+          "weapon_class",
+
+        allowedWeaponClasses: [
+          "Kunai"
+        ],
+
+        label:
+          "Compatible Kunai required."
+
+      }
+
+    ]
+  },
+
+
+  academy_mirai_shuriken_crossfire: {
+
+    id:
+      "academy_mirai_shuriken_crossfire",
+
+    displayName:
+      "Shuriken Crossfire",
+
+    ownerId:
+      "academy_mirai",
+
+    type:
+      "Weapon Technique",
+
+    primaryDiscipline:
+      "Bukijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      "multiple",
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "ranged"
+    ],
+
+    traits: [
+      "multi_hit_presentation"
+    ],
+
+    requirements: [
+
+      {
+
+        kind:
+          "persistent_throwing_weapon",
+
+        allowedWeaponClasses: [
+          "Shuriken"
+        ],
+
+        label:
+          "Persistent Shuriken Set required."
+
+      }
+
+    ]
+  },
+
+
+  academy_mirai_wire_guided_kunai: {
+
+    id:
+      "academy_mirai_wire_guided_kunai",
+
+    displayName:
+      "Wire-Guided Kunai",
+
+    ownerId:
+      "academy_mirai",
+
+    type:
+      "Weapon Technique",
+
+    primaryDiscipline:
+      "Bukijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "redirected_projectile"
+    ],
+
+    traits: [
+      "redirected_projectile"
+    ],
+
+    requirements: [
+
+      {
+
+        kind:
+          "weapon_class",
+
+        allowedWeaponClasses: [
+          "Kunai"
+        ],
+
+        label:
+          "Compatible Kunai required."
+
+      },
+
+      {
+
+        kind:
+          "tool_item",
+
+        itemId:
+          "ninja_wire",
+
+        label:
+          "Ninja Wire required."
+
+      }
+
+    ]
+  },
+
+
+  // =======================================================
+  // ACADEMY MENMA
+  // =======================================================
+
+  academy_menma_yin_chakra_pulse: {
+
+    id:
+      "academy_menma_yin_chakra_pulse",
+
+    displayName:
+      "Yin Chakra Pulse",
+
+    ownerId:
+      "academy_menma",
+
+    type:
+      "Hosted-Entity-Assisted Technique",
+
+    primaryDiscipline:
+      "Ninjutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "ranged"
+    ],
+
+    traits: [
+      "hosted_entity_assisted"
+    ],
+
+    requirements: [
+
+      {
+
+        kind:
+          "hosted_entity_access",
+
+        entityId:
+          "yin_kurama",
+
+        expressionId:
+          "limited_yin_kurama_chakra",
+
+        requireCooperative:
+          true,
+
+        label:
+          "Yin Kurama cooperative access required."
+
+      }
+
+    ],
+
+    conditional: {
+
+      stateKey:
+        "kurama_guidance",
+
+      sourceMustBeActor:
+        true,
+
+      consume:
+        true,
+
+      enhancedBranch:
+        "guided"
+
+    }
+  },
+
+
+  academy_menma_fox_chakra_strike: {
+
+    id:
+      "academy_menma_fox_chakra_strike",
+
+    displayName:
+      "Fox-Chakra Strike",
+
+    ownerId:
+      "academy_menma",
+
+    type:
+      "Hosted-Entity-Assisted Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits: [
+      "hosted_entity_assisted"
+    ],
+
+    requirements: [
+
+      {
+
+        kind:
+          "hosted_entity_access",
+
+        entityId:
+          "yin_kurama",
+
+        expressionId:
+          "limited_yin_kurama_chakra",
+
+        requireCooperative:
+          true,
+
+        label:
+          "Yin Kurama cooperative access required."
+
+      }
+
+    ],
+
+    conditional: {
+
+      stateKey:
+        "kurama_guidance",
+
+      sourceMustBeActor:
+        true,
+
+      consume:
+        true,
+
+      enhancedBranch:
+        "guided"
+
+    }
+  },
+
+
+  academy_menma_kuramas_guidance: {
+
+    id:
+      "academy_menma_kuramas_guidance",
+
+    displayName:
+      "Kurama's Guidance",
+
+    ownerId:
+      "academy_menma",
+
+    type:
+      "Relationship-Owned / Hosted-Entity Setup",
+
+    primaryDiscipline:
+      "Ninjutsu-support",
+
+    targetMode:
+      "self",
+
+    actionClass:
+      "positive_self_enhancement",
+
+    resolutionKind:
+      "transient_state",
+
+    staminaMitigation:
+      null,
+
+    executionTags:
+      [],
+
+    traits:
+      [],
+
+    requirements: [
+
+      {
+
+        kind:
+          "hosted_entity_access",
+
+        entityId:
+          "yin_kurama",
+
+        expressionId:
+          "limited_yin_kurama_chakra",
+
+        cooperativeCapabilityId:
+          "kurama_guidance",
+
+        requireCooperative:
+          true,
+
+        label:
+          "Menma ↔ Yin Kurama cooperative access required."
+
+      }
+
+    ],
+
+    stateOwnerRef: {
+
+      type:
+        "hosted_binding",
+
+      id:
+        "academy_menma_yin_kurama"
+
+    },
+
+    state: {
+
+      stateKey:
+        "kurama_guidance",
+
+      reapplication:
+        "refresh_replace",
+
+      compatibleConsumerTrait:
+        "hosted_entity_assisted"
+
+    }
+  },
+
+
+  // =======================================================
+  // ACADEMY KUSHINA
+  // =======================================================
+
+  academy_kushina_scarlet_spiral_strike: {
+
+    id:
+      "academy_kushina_scarlet_spiral_strike",
+
+    displayName:
+      "Scarlet Spiral Strike",
+
+    ownerId:
+      "academy_kushina",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Taijutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range"
+    ],
+
+    traits:
+      [],
+
+    requirements:
+      []
+  },
+
+
+  academy_kushina_uzumaki_binding_formula: {
+
+    id:
+      "academy_kushina_uzumaki_binding_formula",
+
+    displayName:
+      "Uzumaki Binding Formula",
+
+    ownerId:
+      "academy_kushina",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Fūinjutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "setup_technique",
+
+    resolutionKind:
+      "transient_state",
+
+    staminaMitigation:
+      null,
+
+    executionTags:
+      [],
+
+    traits:
+      [],
+
+    requirements:
+      [],
+
+    state: {
+
+      stateKey:
+        "binding_formula",
+
+      reapplication:
+        "refresh_replace"
+
+    }
+  },
+
+
+  academy_kushina_uzumaki_seal_strike: {
+
+    id:
+      "academy_kushina_uzumaki_seal_strike",
+
+    displayName:
+      "Uzumaki Seal Strike",
+
+    ownerId:
+      "academy_kushina",
+
+    type:
+      "Technique",
+
+    primaryDiscipline:
+      "Fūinjutsu",
+
+    targetMode:
+      "current_enemy",
+
+    actionClass:
+      "technique",
+
+    resolutionKind:
+      "direct_damage",
+
+    mechanicalPacketCount:
+      1,
+
+    visualImpactCount:
+      1,
+
+    staminaMitigation:
+      true,
+
+    executionTags: [
+      "close_range",
+      "physical_contact_delivery"
+    ],
+
+    traits: [
+      "fuinjutsu_application",
+      "setup_exploiter"
+    ],
+
+    requirements:
+      [],
+
+    conditional: {
+
+      stateKey:
+        "binding_formula",
+
+      sourceMustBeActor:
+        true,
+
+      consume:
+        true,
+
+      enhancedBranch:
+        "sealed_chakra_flow",
+
+      deferredCondition: {
+
+        conditionKey:
+          "sealed_chakra_flow",
+
+        expiry:
+          "next_action_opportunity",
+
+        blockedActionClasses: [
+
+          "transformation_activation",
+
+          "positive_self_enhancement"
+
+        ]
+
+      }
+
+    }
+  }
+
+};
+
+
+// =========================================================
+// BRICK 308 — TEMPORARY PILOT PREPARATION
+// =========================================================
+//
+// Pilot authority only.
+//
+// All three approved Skills are treated as learned/prepared.
+//
+// This does not replace the future permanent Loadout /
+// Preparation system.
+//
+// =========================================================
+
+const ACADEMY_BATTLE_PILOT_PREPARED_SKILLS = {
+
+
+  academy_hinata: [
+
+    "academy_hinata_hyuga_opening_palm",
+
+    "academy_hinata_hyuga_twin_palm",
+
+    "academy_hinata_hyuga_guarding_step"
+
+  ],
+
+
+  academy_izuno: [
+
+    "academy_izuno_quickstep_lunge",
+
+    "academy_izuno_clone_feint",
+
+    "academy_izuno_pouncing_strike"
+
+  ],
+
+
+  academy_mirai: [
+
+    "academy_mirai_sarutobi_kunai_form",
+
+    "academy_mirai_shuriken_crossfire",
+
+    "academy_mirai_wire_guided_kunai"
+
+  ],
+
+
+  academy_menma: [
+
+    "academy_menma_yin_chakra_pulse",
+
+    "academy_menma_fox_chakra_strike",
+
+    "academy_menma_kuramas_guidance"
+
+  ],
+
+
+  academy_kushina: [
+
+    "academy_kushina_scarlet_spiral_strike",
+
+    "academy_kushina_uzumaki_binding_formula",
+
+    "academy_kushina_uzumaki_seal_strike"
+
+  ]
+
+};
+
+
+function getAcademyBattleSkillDefinition(
+  skillId
 ) {
 
 
-  const fighter =
-    currentBattle.activePlayer;
+  return (
+    ACADEMY_BATTLE_SKILL_DATABASE[
+      skillId
+    ] ||
+    null
+  );
+}
 
 
-  if (!fighter) {
+function getPreparedAcademyBattleSkillIds(
+  characterId
+) {
 
-    console.log(
-      "No active fighter selected"
+
+  const prepared =
+    ACADEMY_BATTLE_PILOT_PREPARED_SKILLS[
+      characterId
+    ];
+
+
+  return Array.isArray(
+    prepared
+  )
+
+    ? [
+        ...prepared
+      ]
+
+    : [];
+}
+
+
+function getPreparedAcademyBattleSkills(
+  characterId
+) {
+
+
+  return getPreparedAcademyBattleSkillIds(
+    characterId
+  )
+    .map(
+      skillId =>
+        getAcademyBattleSkillDefinition(
+          skillId
+        )
+    )
+    .filter(
+      skill =>
+        !!skill
     );
+}
 
 
-    return;
+// =========================================================
+// BRICK 308 — SKILL AVAILABILITY
+// =========================================================
 
-  }
+function evaluateAcademyBattleSkillAvailability(
+  skill,
+  actor,
+  target
+) {
 
 
   if (
-    !currentBattle.enemy
+    !skill ||
+    !actor
   ) {
 
-    console.log(
-      "No enemy in battle"
-    );
+    return {
 
+      available:
+        false,
 
-    return;
+      reason:
+        "Missing Skill or actor."
 
+    };
   }
 
 
   if (
+    !currentBattle.active ||
     currentBattle.battleOver
   ) {
 
-    console.log(
-      "Battle is already over"
-    );
+    return {
 
+      available:
+        false,
 
-    return;
+      reason:
+        "Battle is not active."
 
+    };
   }
 
 
-  let statName;
+  if (
+    skill.ownerId !==
+      actor.id
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "Wrong Skill owner."
+
+    };
+  }
 
 
-  switch (
-    attackType
+  if (
+    !getPreparedAcademyBattleSkillIds(
+      actor.id
+    ).includes(
+      skill.id
+    )
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "Skill is not prepared."
+
+    };
+  }
+
+
+  if (
+    skill.targetMode ===
+      "current_enemy" &&
+    !target
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "No current enemy."
+
+    };
+  }
+
+
+  const blockingConditions =
+    getBattleBlockingConditions(
+      "player",
+      actor.id,
+      skill.actionClass
+    );
+
+
+  if (
+    blockingConditions.length >
+      0
+  ) {
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "Blocked by current Condition.",
+
+      blockingConditionIds:
+        blockingConditions.map(
+          condition =>
+            condition.conditionId
+        )
+
+    };
+  }
+
+
+  const weaponContext =
+    getBattleEquippedWeaponExecutionContext(
+      actor
+    );
+
+
+  const toolContexts =
+    [];
+
+
+  const hostedAccessRecords =
+    [];
+
+
+  for (
+    const requirement of
+    skill.requirements ||
+    []
   ) {
 
 
-    case "ninjutsu":
+    if (
+      !requirement ||
+      !requirement.kind
+    ) {
 
-      statName =
-        "nin";
-
-      break;
-
-
-    case "taijutsu":
-
-      statName =
-        "tai";
-
-      break;
+      continue;
+    }
 
 
-    case "bukijutsu":
+    // =====================================================
+    // WEAPON CLASS
+    // =====================================================
 
-      statName =
-        "buki";
+    if (
+      requirement.kind ===
+        "weapon_class"
+    ) {
 
-      break;
+
+      if (
+        !weaponContext ||
+        !Array.isArray(
+          requirement.allowedWeaponClasses
+        ) ||
+        !requirement
+          .allowedWeaponClasses
+          .includes(
+            weaponContext.weaponClass
+          )
+      ) {
+
+        return {
+
+          available:
+            false,
+
+          reason:
+            requirement.label ||
+            "Compatible weapon required."
+
+        };
+      }
+    }
 
 
-    default:
+    // =====================================================
+    // REUSABLE THROWING WEAPON
+    // =====================================================
 
-      console.log(
-        "Unknown attack type:",
-        attackType
+    if (
+      requirement.kind ===
+        "persistent_throwing_weapon"
+    ) {
+
+
+      if (
+        !weaponContext ||
+        weaponContext
+          .persistentThrowingWeapon !==
+          true ||
+        (
+          Array.isArray(
+            requirement.allowedWeaponClasses
+          ) &&
+          !requirement
+            .allowedWeaponClasses
+            .includes(
+              weaponContext.weaponClass
+            )
+        )
+      ) {
+
+        return {
+
+          available:
+            false,
+
+          reason:
+            requirement.label ||
+            "Persistent throwing weapon required."
+
+        };
+      }
+    }
+
+
+    // =====================================================
+    // PERSISTENT TOOL
+    // =====================================================
+
+    if (
+      requirement.kind ===
+        "tool_item"
+    ) {
+
+
+      const toolContext =
+        getBattleInventoryToolContext(
+          requirement.itemId
+        );
+
+
+      if (
+        !toolContext
+      ) {
+
+        return {
+
+          available:
+            false,
+
+          reason:
+            requirement.label ||
+            "Required tool unavailable."
+
+        };
+      }
+
+
+      toolContexts.push(
+        toolContext
       );
+    }
 
 
-      return;
+    // =====================================================
+    // HOSTED / BOUND ENTITY ACCESS
+    // =====================================================
 
+    if (
+      requirement.kind ===
+        "hosted_entity_access"
+    ) {
+
+
+      const access =
+        evaluateHostedEntityAccess(
+          actor.id,
+          requirement.entityId,
+          {
+
+            requireCooperative:
+              requirement
+                .requireCooperative ===
+                true,
+
+            expressionId:
+              requirement.expressionId ||
+              null,
+
+            cooperativeCapabilityId:
+              requirement
+                .cooperativeCapabilityId ||
+              null
+
+          }
+        );
+
+
+      if (
+        !access.available
+      ) {
+
+        return {
+
+          available:
+            false,
+
+          reason:
+            requirement.label ||
+            access.reason,
+
+          hostedAccess:
+            access
+
+        };
+      }
+
+
+      hostedAccessRecords.push(
+        access
+      );
+    }
   }
 
 
-  // =========================================
-  // EFFECTIVE COMBAT STATS
-  // =========================================
+  return {
 
-  const effectiveStats =
-    getEffectiveCharacterStats(
-      fighter
+    available:
+      true,
+
+    reason:
+      null,
+
+    weaponContext:
+      weaponContext,
+
+    toolContexts:
+      toolContexts,
+
+    hostedAccessRecords:
+      hostedAccessRecords
+
+  };
+}
+
+
+// =========================================================
+// BRICK 309 — TEMPORARY DEVELOPER SKILL CARDS
+// =========================================================
+
+function getAcademyBattleSkillCompactStatus(
+  skill,
+  availability
+) {
+
+
+  if (
+    !availability.available
+  ) {
+
+    return availability.reason;
+  }
+
+
+  if (
+    skill.resolutionKind ===
+      "transient_state" &&
+    skill.state
+  ) {
+
+    return (
+      `Creates ${skill.state.stateKey}`
+    );
+  }
+
+
+  if (
+    skill.traits.includes(
+      "multi_hit_presentation"
+    )
+  ) {
+
+    return (
+      `${skill.visualImpactCount} visuals • 1 packet`
+    );
+  }
+
+
+  if (
+    skill.conditional &&
+    skill.conditional.stateKey
+  ) {
+
+    return (
+      `Uses ${skill.conditional.stateKey}`
+    );
+  }
+
+
+  if (
+    skill.staminaMitigation ===
+      true
+  ) {
+
+    return (
+      "1 PL packet • Stamina stage"
+    );
+  }
+
+
+  return "Ready";
+}
+
+
+function renderTemporaryBattleSkillDeck(
+  actor,
+  target
+) {
+
+
+  const skills =
+    actor
+
+      ? getPreparedAcademyBattleSkills(
+          actor.id
+        )
+
+      : [];
+
+
+  const cards =
+    [];
+
+
+  for (
+    let index = 0;
+    index < 5;
+    index += 1
+  ) {
+
+
+    const skill =
+      skills[
+        index
+      ] ||
+      null;
+
+
+    if (
+      !skill
+    ) {
+
+
+      cards.push(
+        `
+          <div
+            class="
+              battle-dev-skill-card
+              is-empty
+            "
+          >
+
+            <span>
+              ${
+                index === 0 &&
+                skills.length === 0
+
+                  ? "NO PILOT SKILLS"
+
+                  : "EMPTY"
+              }
+            </span>
+
+          </div>
+        `
+      );
+
+
+      continue;
+    }
+
+
+    const availability =
+      evaluateAcademyBattleSkillAvailability(
+        skill,
+        actor,
+        target
+      );
+
+
+    const status =
+      getAcademyBattleSkillCompactStatus(
+        skill,
+        availability
+      );
+
+
+    cards.push(
+      `
+        <button
+          type="button"
+          class="
+            battle-dev-skill-card
+            ${
+              availability.available
+                ? "is-ready"
+                : "is-disabled"
+            }
+          "
+          onclick="
+            attemptAcademyBattleSkill(
+              '${skill.id}'
+            )
+          "
+          ${
+            availability.available
+              ? ""
+              : "disabled"
+          }
+          title="${status}"
+        >
+
+          <span
+            class="
+              battle-dev-skill-discipline
+            "
+          >
+            ${skill.primaryDiscipline}
+          </span>
+
+          <strong>
+            ${skill.displayName}
+          </strong>
+
+          <span
+            class="
+              battle-dev-skill-type
+            "
+          >
+            ${skill.type}
+          </span>
+
+          <small>
+            ${status}
+          </small>
+
+        </button>
+      `
+    );
+  }
+
+
+  return `
+    <div
+      class="battle-live-skill-deck"
+      aria-label="Prepared Battle Skills"
+    >
+      ${cards.join("")}
+    </div>
+  `;
+}
+
+
+// =========================================================
+// BRICK 310 — TRANSIENT STATE UPSERT
+// =========================================================
+
+function upsertAcademyBattleSkillState(
+  skill,
+  actor,
+  target
+) {
+
+
+  if (
+    !skill ||
+    !skill.state ||
+    !actor ||
+    !target
+  ) {
+
+    return null;
+  }
+
+
+  const targetSide =
+    skill.targetMode ===
+      "self"
+
+      ? "player"
+
+      : "enemy";
+
+
+  const existing =
+    findBattleTransientState({
+
+      stateKey:
+        skill.state.stateKey,
+
+      sourceSide:
+        "player",
+
+      sourceParticipantId:
+        actor.id,
+
+      targetSide:
+        targetSide,
+
+      targetParticipantId:
+        target.id
+
+    });
+
+
+  if (
+    existing
+  ) {
+
+
+    existing.createdActionSequence =
+      ensureBattleRuntimeState()
+        .actionSequence;
+
+
+    existing.createdAt =
+      Date.now();
+
+
+    existing.ownerRef =
+      skill.stateOwnerRef
+        ? cloneBattleRuntimeValue(
+            skill.stateOwnerRef
+          )
+        : existing.ownerRef;
+
+
+    existing.data = {
+
+      ...(
+        existing.data ||
+        {}
+      ),
+
+      skillId:
+        skill.id,
+
+      reapplication:
+        skill.state.reapplication ||
+        "refresh_replace",
+
+      consumeOn:
+        skill.state.consumeOn ||
+        null,
+
+      compatibleConsumerTrait:
+        skill.state
+          .compatibleConsumerTrait ||
+        null
+
+    };
+
+
+    return {
+
+      state:
+        existing,
+
+      refreshed:
+        true
+
+    };
+  }
+
+
+  const state =
+    addBattleTransientState({
+
+      stateKey:
+        skill.state.stateKey,
+
+      sourceSide:
+        "player",
+
+      sourceParticipantId:
+        actor.id,
+
+      targetSide:
+        targetSide,
+
+      targetParticipantId:
+        target.id,
+
+      ownerRef:
+        skill.stateOwnerRef ||
+        null,
+
+      data: {
+
+        skillId:
+          skill.id,
+
+        reapplication:
+          skill.state.reapplication ||
+          "refresh_replace",
+
+        consumeOn:
+          skill.state.consumeOn ||
+          null,
+
+        compatibleConsumerTrait:
+          skill.state
+            .compatibleConsumerTrait ||
+          null
+
+      }
+
+    });
+
+
+  return state
+
+    ? {
+
+        state:
+          state,
+
+        refreshed:
+          false
+
+      }
+
+    : null;
+}
+
+
+// =========================================================
+// BRICK 310 — SOURCE PARTICIPATION EVIDENCE
+// =========================================================
+
+function getAcademyBattleSkillSourceRefs(
+  availability
+) {
+
+
+  const refs =
+    [];
+
+
+  if (
+    availability &&
+    availability.weaponContext &&
+    availability.weaponContext.instanceId
+  ) {
+
+
+    refs.push({
+
+      type:
+        "weapon_instance",
+
+      id:
+        availability
+          .weaponContext
+          .instanceId
+
+    });
+  }
+
+
+  if (
+    availability &&
+    Array.isArray(
+      availability.toolContexts
+    )
+  ) {
+
+
+    availability.toolContexts.forEach(
+      context => {
+
+
+        if (
+          context &&
+          context.instanceId
+        ) {
+
+
+          refs.push({
+
+            type:
+              "tool_instance",
+
+            id:
+              context.instanceId
+
+          });
+        }
+      }
+    );
+  }
+
+
+  if (
+    availability &&
+    Array.isArray(
+      availability.hostedAccessRecords
+    )
+  ) {
+
+
+    availability
+      .hostedAccessRecords
+      .forEach(
+        access => {
+
+
+          if (
+            access &&
+            access.entity &&
+            access.entity.id
+          ) {
+
+
+            refs.push({
+
+              type:
+                "hosted_entity",
+
+              id:
+                access.entity.id
+
+            });
+          }
+
+
+          if (
+            access &&
+            access.binding &&
+            access.binding.id
+          ) {
+
+
+            refs.push({
+
+              type:
+                "hosted_binding",
+
+              id:
+                access.binding.id
+
+            });
+          }
+        }
+      );
+  }
+
+
+  const unique =
+    [];
+
+
+  const seen =
+    new Set();
+
+
+  refs.forEach(
+    ref => {
+
+
+      const key =
+        `${ref.type}:${ref.id}`;
+
+
+      if (
+        seen.has(
+          key
+        )
+      ) {
+
+        return;
+      }
+
+
+      seen.add(
+        key
+      );
+
+
+      unique.push(
+        ref
+      );
+    }
+  );
+
+
+  return unique;
+}
+
+
+// =========================================================
+// BRICK 310 — SHARED SKILL SEMANTIC RESOLVER
+// =========================================================
+
+function resolveAcademyBattleSkillSemantics(
+  skill,
+  envelope,
+  actor,
+  target
+) {
+
+
+  const stateRefs =
+    [];
+
+
+  let branch =
+    "normal";
+
+
+  let consumedState =
+    null;
+
+
+  // =======================================================
+  // SETUP / SELF-STATE SKILLS
+  // =======================================================
+
+  if (
+    skill.resolutionKind ===
+      "transient_state" &&
+    skill.state
+  ) {
+
+
+    const stateTarget =
+      skill.targetMode ===
+        "self"
+
+        ? actor
+
+        : target;
+
+
+    const upsert =
+      upsertAcademyBattleSkillState(
+        skill,
+        actor,
+        stateTarget
+      );
+
+
+    if (
+      !upsert
+    ) {
+
+
+      return {
+
+        resolved:
+          false,
+
+        reason:
+          "state_creation_failed"
+
+      };
+    }
+
+
+    stateRefs.push(
+      upsert.state.stateId
     );
 
 
-  const attackStat =
-    Number(
-      effectiveStats[
-        statName
-      ]
-    ) || 0;
+    recordBattleEvidence({
+
+      eventType:
+        upsert.refreshed
+
+          ? "transient_state_refreshed"
+
+          : "transient_state_created",
+
+      actionId:
+        envelope.actionId,
+
+      actorRef:
+        envelope.actorRef,
+
+      targetRef:
+        envelope.targetRef,
+
+      skillId:
+        skill.id,
+
+      sourceRefs:
+        envelope.sourceRefs,
+
+      stateRefs:
+        stateRefs,
+
+      data: {
+
+        stateKey:
+          upsert.state.stateKey,
+
+        ownerRef:
+          upsert.state.ownerRef ||
+          null
+
+      }
+
+    });
 
 
-  // =========================================
-  // DAMAGE FORMULA
-  // =========================================
-
-  const baseDamage =
-    attackStat *
-    0.20;
+    currentBattle.battleLog.push(
+      `${actor.name} used ${skill.displayName}.`
+    );
 
 
-  const variation =
-    0.90 +
-    Math.random() *
-    0.20;
+    currentBattle.battleLog.push(
+      `${upsert.state.stateKey} ${
+        upsert.refreshed
+          ? "refreshed"
+          : "created"
+      }.`
+    );
 
 
-  const calculatedDamage =
-    Math.max(
-      1,
-      Math.round(
-        baseDamage *
-        variation
+    return {
+
+      resolved:
+        true,
+
+      branch:
+        "setup",
+
+      stateRefs:
+        stateRefs,
+
+      damageApplied:
+        false
+
+    };
+  }
+
+
+  // =======================================================
+  // CONDITIONAL ALTERNATE RESOLUTION
+  // =======================================================
+
+  if (
+    skill.conditional &&
+    skill.conditional.stateKey &&
+    target
+  ) {
+
+
+    const targetSide =
+      skill.targetMode ===
+        "self"
+
+        ? "player"
+
+        : "enemy";
+
+
+    const matchingState =
+      findBattleTransientState({
+
+        stateKey:
+          skill.conditional
+            .stateKey,
+
+        sourceSide:
+          "player",
+
+        sourceParticipantId:
+          skill.conditional
+            .sourceMustBeActor
+
+            ? actor.id
+
+            : undefined,
+
+        targetSide:
+          targetSide,
+
+        targetParticipantId:
+          target.id
+
+      });
+
+
+    if (
+      matchingState &&
+      canBattleParticipantConsumeTransientState(
+        matchingState,
+        "player",
+        actor.id
       )
-    );
-
-
-  // =========================================
-  // ACTUAL DAMAGE
-  // Prevent overkill inflating contribution
-  // =========================================
-
-  const enemyPowerBeforeAttack =
-    currentBattle.enemyPower;
-
-
-  const actualDamage =
-    Math.min(
-      calculatedDamage,
-      enemyPowerBeforeAttack
-    );
-
-
-  currentBattle.lastDamage =
-    actualDamage;
-
-
-  currentBattle.enemyPower -=
-    actualDamage;
-
-
-  if (
-    currentBattle.enemyPower <
-      0
-  ) {
-
-    currentBattle.enemyPower =
-      0;
-
-  }
-
-
-  // =========================================
-  // RECORD CONTRIBUTION
-  // =========================================
-
-  recordBattleContribution(
-    fighter,
-    actualDamage,
-    attackType
-  );
-
-
-  // =========================================
-  // BATTLE LOG
-  // =========================================
-
-  let attackLabel =
-    "Attack";
-
-
-  if (
-    attackType ===
-    "ninjutsu"
-  ) {
-
-    attackLabel =
-      "Ninjutsu";
-
-  }
-
-
-  if (
-    attackType ===
-    "taijutsu"
-  ) {
-
-    attackLabel =
-      "Taijutsu";
-
-  }
-
-
-  if (
-    attackType ===
-    "bukijutsu"
-  ) {
-
-    attackLabel =
-      "Bukijutsu";
-
-  }
-
-
-  currentBattle.battleLog.push(
-    `${fighter.name} used ${attackLabel}!`
-  );
-
-
-  currentBattle.battleLog.push(
-    `${currentBattle.enemy.name} lost ${actualDamage} Battle Power.`
-  );
-
-
-  // =========================================
-  // VICTORY CHECK
-  // =========================================
-
-  if (
-    currentBattle.enemyPower <=
-    0
-  ) {
-
-
-    currentBattle.battleOver =
-      true;
-
-
-    currentBattle.active =
-      false;
-
-
-    const rewards =
-      generateBattleRewards(
-        currentBattle.enemy,
-        fighter
-      );
-
-
-    const mvp =
-      calculateBattleMVP();
-
-
-    currentBattle.rewards.mvp =
-      mvp;
-
-
-    currentBattle.battleLog.push(
-      `${currentBattle.enemy.name} has been defeated!`
-    );
-
-
-    currentBattle.battleLog.push(
-      "VICTORY!"
-    );
-
-
-    currentBattle.battleLog.push(
-      `Reward: ${rewards.ryo} Ryō`
-    );
-
-
-    currentBattle.battleLog.push(
-      `EXP gained: ${rewards.exp}`
-    );
-
-
-    if (mvp) {
-
-      currentBattle.battleLog.push(
-        `★ MVP: ${mvp.name} — ${mvp.percentage}% Total Damage`
-      );
-
-    }
-
-
-    if (
-      rewards.items.length >
-      0
     ) {
 
-      rewards.items.forEach(
-        item => {
 
-          currentBattle.battleLog.push(
-            `Item found: ${item.name}`
-          );
+      branch =
+        skill.conditional
+          .enhancedBranch ||
+        "enhanced";
 
-        }
+
+      stateRefs.push(
+        matchingState.stateId
       );
 
-    }
+
+      if (
+        skill.conditional.consume ===
+          true
+      ) {
 
 
-    if (
-      rewards.rareDrops.length >
-      0
-    ) {
-
-      rewards.rareDrops.forEach(
-        item => {
-
-          currentBattle.battleLog.push(
-            `★ RARE DROP: ${item.name}!`
+        consumedState =
+          consumeBattleTransientState(
+            matchingState.stateId,
+            "player",
+            actor.id
           );
-
-        }
-      );
-
+      }
     }
-
-
-    openOverlay(
-      "victory"
-    );
-
-
-    return;
-
   }
 
 
-  // =========================================
-  // BATTLE CONTINUES
-  // =========================================
+  // =======================================================
+  // DIRECT DAMAGE SEMANTICS
+  // =======================================================
+  //
+  // Final magnitude intentionally remains unresolved.
+  //
+  // This is NOT the legacy stat × 0.20 formula.
+  //
+  // =======================================================
+
+  recordBattleEvidence({
+
+    eventType:
+      "skill_resolution_pending_balance",
+
+    actionId:
+      envelope.actionId,
+
+    actorRef:
+      envelope.actorRef,
+
+    targetRef:
+      envelope.targetRef,
+
+    skillId:
+      skill.id,
+
+    sourceRefs:
+      envelope.sourceRefs,
+
+    stateRefs:
+      stateRefs,
+
+    data: {
+
+      branch:
+        branch,
+
+      mechanicalPacketCount:
+        skill.mechanicalPacketCount ||
+        0,
+
+      visualImpactCount:
+        skill.visualImpactCount ||
+        0,
+
+      staminaMitigation:
+        skill.staminaMitigation ===
+        true,
+
+      damageMagnitudeStatus:
+        "tunable_not_locked",
+
+      consumedStateId:
+        consumedState
+          ? consumedState.stateId
+          : null,
+
+      deferredCondition:
+        skill.conditional &&
+        skill.conditional
+          .deferredCondition
+
+          ? cloneBattleRuntimeValue(
+              skill.conditional
+                .deferredCondition
+            )
+
+          : null,
+
+      deferredConditionReason:
+        skill.conditional &&
+        skill.conditional
+          .deferredCondition
+
+          ? "next_action_opportunity_lifecycle_not_yet_authoritative"
+
+          : null
+
+    }
+
+  });
+
 
   currentBattle.battleLog.push(
-    `${currentBattle.enemy.name} has ${currentBattle.enemyPower} BP remaining.`
+    `${actor.name} used ${skill.displayName}${
+      branch !== "normal"
+        ? ` [${branch}]`
+        : ""
+    }.`
   );
 
 
-  // =========================================
-  // DEBUG LOGGING
-  // =========================================
-
-  console.log(
-    `${fighter.name} used ${attackLabel}`
+  currentBattle.battleLog.push(
+    "PL damage tuning pending — Battle Power unchanged."
   );
 
 
-  console.log(
-    `${statName.toUpperCase()} EFFECTIVE STAT:`,
-    attackStat
-  );
+  return {
+
+    resolved:
+      true,
+
+    branch:
+      branch,
+
+    stateRefs:
+      stateRefs,
+
+    damageApplied:
+      false
+
+  };
+}
 
 
-  console.log(
-    "Calculated Damage:",
-    calculatedDamage
-  );
+// =========================================================
+// BRICK 310 — SHARED SKILL ACTION ENTRY
+// =========================================================
+
+function attemptAcademyBattleSkill(
+  skillId
+) {
 
 
-  console.log(
-    "Actual Damage:",
-    actualDamage
-  );
+  const actor =
+    getBattleDeploymentParticipant(
+      "player",
+      1
+    );
 
 
-  console.log(
-    "Battle Contributions:",
-    currentBattle.contributions
-  );
+  const enemyTarget =
+    getBattleDeploymentParticipant(
+      "enemy",
+      1
+    );
 
 
-  console.log(
-    "Enemy Battle Power remaining:",
-    currentBattle.enemyPower
-  );
+  const skill =
+    getAcademyBattleSkillDefinition(
+      skillId
+    );
+
+
+  const availability =
+    evaluateAcademyBattleSkillAvailability(
+      skill,
+      actor,
+      enemyTarget
+    );
+
+
+  if (
+    !availability.available
+  ) {
+
+
+    console.log(
+      "Skill unavailable:",
+      availability.reason
+    );
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        availability.reason
+
+    };
+  }
+
+
+  const resolvedTarget =
+    skill.targetMode ===
+      "self"
+
+      ? actor
+
+      : enemyTarget;
+
+
+  const envelope =
+    createBattleActionEnvelope({
+
+      actorSide:
+        "player",
+
+      actorParticipantId:
+        actor.id,
+
+      targetSide:
+        skill.targetMode ===
+          "self"
+
+          ? "player"
+
+          : "enemy",
+
+      targetParticipantId:
+        resolvedTarget
+          ? resolvedTarget.id
+          : null,
+
+      actionClass:
+        skill.actionClass,
+
+      skillId:
+        skill.id,
+
+      sourceRefs:
+        getAcademyBattleSkillSourceRefs(
+          availability
+        ),
+
+      data: {
+
+        type:
+          skill.type,
+
+        primaryDiscipline:
+          skill.primaryDiscipline,
+
+        executionTags: [
+          ...skill.executionTags
+        ],
+
+        traits: [
+          ...skill.traits
+        ]
+
+      }
+
+    });
+
+
+  const entry =
+    beginBattleActionResolution(
+      envelope
+    );
+
+
+  if (
+    !entry.accepted
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        entry.validation.reason,
+
+      validation:
+        entry.validation
+
+    };
+  }
+
+
+  const resolution =
+    resolveAcademyBattleSkillSemantics(
+      skill,
+      envelope,
+      actor,
+      resolvedTarget
+    );
+
+
+  recordBattleEvidence({
+
+    eventType:
+      "skill_action_completed",
+
+    actionId:
+      envelope.actionId,
+
+    actorRef:
+      envelope.actorRef,
+
+    targetRef:
+      envelope.targetRef,
+
+    skillId:
+      skill.id,
+
+    sourceRefs:
+      envelope.sourceRefs,
+
+    stateRefs:
+      resolution &&
+      Array.isArray(
+        resolution.stateRefs
+      )
+
+        ? resolution.stateRefs
+
+        : [],
+
+    data: {
+
+      resolved:
+        !!(
+          resolution &&
+          resolution.resolved
+        ),
+
+      branch:
+        resolution
+          ? resolution.branch ||
+            null
+          : null,
+
+      damageApplied:
+        !!(
+          resolution &&
+          resolution.damageApplied
+        )
+
+    }
+
+  });
+
+
+  saveTestState();
 
 
   openOverlay(
     "combat"
   );
 
+
+  return {
+
+    success:
+      true,
+
+    envelope:
+      envelope,
+
+    resolution:
+      resolution
+
+  };
 }
 
 
 // =========================================================
-// ATTACK BUTTON WRAPPERS
+// BRICK 308–310 — PILOT DIAGNOSTIC
 // =========================================================
 
-function performNinjutsuAttack() {
+function runAcademyBattleSkillDefinitionDiagnostics() {
 
 
-  performStatAttack(
-    "ninjutsu"
+  const skills =
+    Object.values(
+      ACADEMY_BATTLE_SKILL_DATABASE
+    );
+
+
+  const owners =
+    Object.keys(
+      ACADEMY_BATTLE_PILOT_PREPARED_SKILLS
+    );
+
+
+  const twinPalm =
+    getAcademyBattleSkillDefinition(
+      "academy_hinata_hyuga_twin_palm"
+    );
+
+
+  const crossfire =
+    getAcademyBattleSkillDefinition(
+      "academy_mirai_shuriken_crossfire"
+    );
+
+
+  const cloneFeint =
+    getAcademyBattleSkillDefinition(
+      "academy_izuno_clone_feint"
+    );
+
+
+  const pouncingStrike =
+    getAcademyBattleSkillDefinition(
+      "academy_izuno_pouncing_strike"
+    );
+
+
+  const bindingFormula =
+    getAcademyBattleSkillDefinition(
+      "academy_kushina_uzumaki_binding_formula"
+    );
+
+
+  const sealStrike =
+    getAcademyBattleSkillDefinition(
+      "academy_kushina_uzumaki_seal_strike"
+    );
+
+
+  const menmaPulse =
+    getAcademyBattleSkillDefinition(
+      "academy_menma_yin_chakra_pulse"
+    );
+
+
+  const guidance =
+    getAcademyBattleSkillDefinition(
+      "academy_menma_kuramas_guidance"
+    );
+
+
+  const result = {
+
+
+    fifteenSkills:
+      skills.length ===
+      15,
+
+
+    fiveOwners:
+      owners.length ===
+      5,
+
+
+    threePreparedEach:
+      owners.every(
+        ownerId =>
+          getPreparedAcademyBattleSkillIds(
+            ownerId
+          ).length ===
+          3
+      ),
+
+
+    uniqueSkillIds:
+      new Set(
+        skills.map(
+          skill =>
+            skill.id
+        )
+      ).size ===
+      15,
+
+
+    twinPalmOnePacket:
+      !!(
+        twinPalm &&
+        twinPalm
+          .mechanicalPacketCount ===
+          1 &&
+        twinPalm
+          .visualImpactCount ===
+          2
+      ),
+
+
+    crossfireOnePacket:
+      !!(
+        crossfire &&
+        crossfire
+          .mechanicalPacketCount ===
+          1 &&
+        crossfire
+          .traits
+          .includes(
+            "multi_hit_presentation"
+          )
+      ),
+
+
+    sourceScopedFeint:
+      !!(
+        cloneFeint &&
+        cloneFeint.state &&
+        pouncingStrike &&
+        pouncingStrike
+          .conditional
+          .stateKey ===
+          "feinted_opening"
+      ),
+
+
+    bindingSealChain:
+      !!(
+        bindingFormula &&
+        bindingFormula.state &&
+        sealStrike &&
+        sealStrike
+          .conditional
+          .stateKey ===
+          "binding_formula"
+      ),
+
+
+    menmaUsesHostedAuthority:
+      !!(
+        menmaPulse &&
+        menmaPulse.requirements
+          .some(
+            requirement =>
+              requirement.kind ===
+              "hosted_entity_access"
+          )
+      ),
+
+
+    guidanceUsesHostedBinding:
+      !!(
+        guidance &&
+        guidance.stateOwnerRef &&
+        guidance.stateOwnerRef.type ===
+          "hosted_binding"
+      ),
+
+
+    noLockedDamageCoefficients:
+      skills.every(
+        skill =>
+          skill.damageCoefficient ===
+          undefined
+      )
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
   );
 
+
+  return result;
 }
-
-
-function performTaijutsuAttack() {
-
-
-  performStatAttack(
-    "taijutsu"
-  );
-
-}
-
-
-function performBukijutsuAttack() {
-
-
-  performStatAttack(
-    "bukijutsu"
-  );
-
-}
-
 
 // =========================================
 // UI COMPONENT — ACTIVITY CARD
