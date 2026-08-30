@@ -34778,6 +34778,18 @@ function loadAcademyPilotBattleDeployment() {
 // =========================================================
 // BRICK 319 — ACADEMY PILOT DEPLOYMENT DIAGNOSTIC
 // =========================================================
+//
+// Validates:
+//
+// - five Academy pilot identities exist
+// - supplied compatibility Base PL matches canonical
+//   rounded Base-PL calculation
+// - ordinary Battle roster excludes pilot-only variants
+// - explicit Academy deployment order is correct
+// - Hinata begins in Active Slot 1
+// - Battle contribution state is scoped to deployed pilot
+//
+// =========================================================
 
 function runAcademyPilotDeploymentDiagnostics() {
 
@@ -34796,6 +34808,7 @@ function runAcademyPilotDeploymentDiagnostics() {
     Array.isArray(
       currentBattle.deployment.player.slots
     )
+
       ? currentBattle.deployment.player.slots
           .map(
             slot =>
@@ -34805,6 +34818,7 @@ function runAcademyPilotDeploymentDiagnostics() {
             participantId =>
               !!participantId
           )
+
       : [];
 
 
@@ -34830,6 +34844,7 @@ function runAcademyPilotDeploymentDiagnostics() {
 
   const result = {
 
+
     fivePilotCharactersRegistered:
       participants.length ===
       5,
@@ -34837,13 +34852,27 @@ function runAcademyPilotDeploymentDiagnostics() {
 
     suppliedBasePLMatchesFormula:
       participants.every(
-        character =>
-          calculateRawPLFromStats(
-            character.baseStats
-          ) ===
-          expectedPL[
-            character.id
-          ]
+        character => {
+
+
+          const expected =
+            expectedPL[
+              character.id
+            ];
+
+
+          return (
+            calculateBasePL(
+              character
+            ) ===
+              expected
+            &&
+            Number(
+              character.basePL
+            ) ===
+              expected
+          );
+        }
       ),
 
 
@@ -34911,7 +34940,6 @@ function runAcademyPilotDeploymentDiagnostics() {
 
   return result;
 }
-
 
 // =========================================================
 // BRICK 300 — WITHDRAWAL / QUEUE TRANSITION AUTHORITY
