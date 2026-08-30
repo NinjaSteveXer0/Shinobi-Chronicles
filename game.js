@@ -218,7 +218,6 @@ const itemDatabase = {
   },
 
 
-
   // =========================================
   // BANDIT SUPPLIES
   // =========================================
@@ -246,7 +245,6 @@ const itemDatabase = {
   },
 
 
-
   // =========================================
   // WEAPON MATERIALS
   // =========================================
@@ -272,7 +270,6 @@ const itemDatabase = {
       "Metal, bindings and components suitable for repairing or crafting shinobi weapons."
 
   },
-
 
 
   // =========================================
@@ -312,11 +309,112 @@ const itemDatabase = {
 
     }
 
+  },
+
+
+  // =======================================================
+  // BRICK 305 — ORDINARY NINJA WEAPON CONTENT
+  // =======================================================
+
+  kunai: {
+
+    id:
+      "kunai",
+
+    name:
+      "Kunai",
+
+    type:
+      "weapon",
+
+    weaponClass:
+      "Kunai",
+
+    rarity:
+      "Common",
+
+    stackable:
+      false,
+
+    equipmentSlot:
+      "weapon",
+
+    persistentThrowingWeapon:
+      true,
+
+    reusableWeapon:
+      true,
+
+    description:
+      "A reusable standard shinobi kunai. Ordinary Battle use does not consume the weapon."
+
+  },
+
+
+  shuriken_set: {
+
+    id:
+      "shuriken_set",
+
+    name:
+      "Shuriken Set",
+
+    type:
+      "weapon",
+
+    weaponClass:
+      "Shuriken",
+
+    rarity:
+      "Common",
+
+    stackable:
+      false,
+
+    equipmentSlot:
+      "weapon",
+
+    persistentThrowingWeapon:
+      true,
+
+    reusableWeapon:
+      true,
+
+    persistentWeaponSet:
+      true,
+
+    description:
+      "A prepared reusable set of standard shinobi shuriken. Throwing them during ordinary Battle does not consume the persistent set."
+
+  },
+
+
+  ninja_wire: {
+
+    id:
+      "ninja_wire",
+
+    name:
+      "Ninja Wire",
+
+    type:
+      "tool",
+
+    rarity:
+      "Common",
+
+    stackable:
+      false,
+
+    persistentTool:
+      true,
+
+    description:
+      "Reusable shinobi wire used for guided projectiles, traps and other prepared techniques."
+
   }
 
 };
-
-
 
 // =========================================================
 // ITEM DATABASE HELPERS
@@ -333,9 +431,7 @@ function getItemDefinition(
     ] ||
     null
   );
-
 }
-
 
 
 function getItemDefinitionByName(
@@ -352,7 +448,847 @@ function getItemDefinitionByName(
   return getItemDefinition(
     itemId
   );
+}
 
+
+// =========================================================
+// BRICK 306 — HOSTED / BOUND ENTITY FOUNDATION
+// =========================================================
+//
+// Minimum first-class authority required by the Academy
+// Menma Battle pilot.
+//
+// Hosted / Bound Entity is NOT an Attached Summon.
+//
+// Nothing in this structure occupies or mutates a normal
+// Summon slot.
+//
+// Artwork is presentation metadata only and is never used
+// when determining presence, binding or access.
+//
+// =========================================================
+
+const hostedEntityDatabase = {
+
+
+  yin_kurama: {
+
+    id:
+      "yin_kurama",
+
+    name:
+      "Yin Kurama",
+
+    entityType:
+      "hosted_bound_entity",
+
+    presentation: {
+
+      image:
+        "Assets/Summons/temp_kura.png",
+
+      temporaryArtwork:
+        true
+
+    }
+
+  }
+
+};
+
+
+// =========================================================
+// HOSTED-ENTITY BINDING / ACCESS RECORDS
+// =========================================================
+//
+// This is deliberately smaller than a future full
+// Relationship system.
+//
+// It records only the current persistent facts required to
+// answer the Academy pilot's access questions.
+//
+// It does NOT own:
+// - relationship history
+// - Shared History
+// - affinity progression
+// - Summon contracts
+// - Battle runtime state
+//
+// =========================================================
+
+const hostedEntityBindingDatabase = {
+
+
+  academy_menma_yin_kurama: {
+
+    id:
+      "academy_menma_yin_kurama",
+
+    hostCharacterId:
+      "academy_menma",
+
+    entityId:
+      "yin_kurama",
+
+    bindingType:
+      "hosted_bound",
+
+    occupiesNormalSummonSlot:
+      false,
+
+    presenceState:
+      "present",
+
+    cooperationState:
+      "cooperative",
+
+    permittedExpressions: [
+
+      "limited_yin_kurama_chakra"
+
+    ],
+
+    permittedCooperativeCapabilities: [
+
+      "kurama_guidance"
+
+    ]
+
+  }
+
+};
+
+
+function getHostedEntityDefinition(
+  entityId
+) {
+
+
+  return (
+    hostedEntityDatabase[
+      entityId
+    ] ||
+    null
+  );
+}
+
+
+function getHostedEntityBinding(
+  hostCharacterId,
+  entityId
+) {
+
+
+  return (
+    Object.values(
+      hostedEntityBindingDatabase
+    )
+      .find(
+        binding =>
+          binding &&
+          binding.hostCharacterId ===
+            hostCharacterId &&
+          binding.entityId ===
+            entityId
+      ) ||
+    null
+  );
+}
+
+
+// =========================================================
+// HOSTED-ENTITY ACCESS EVALUATION
+// =========================================================
+
+function evaluateHostedEntityAccess(
+  hostCharacterId,
+  entityId,
+  requirements = {}
+) {
+
+
+  const entity =
+    getHostedEntityDefinition(
+      entityId
+    );
+
+
+  if (
+    !entity
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "hosted_entity_missing",
+
+      entity:
+        null,
+
+      binding:
+        null
+
+    };
+  }
+
+
+  const binding =
+    getHostedEntityBinding(
+      hostCharacterId,
+      entityId
+    );
+
+
+  if (
+    !binding
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "hosted_binding_missing",
+
+      entity:
+        entity,
+
+      binding:
+        null
+
+    };
+  }
+
+
+  if (
+    binding.presenceState !==
+      "present"
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "hosted_entity_not_present",
+
+      entity:
+        entity,
+
+      binding:
+        binding
+
+    };
+  }
+
+
+  if (
+    requirements.requireCooperative ===
+      true &&
+    binding.cooperationState !==
+      "cooperative"
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "cooperation_unavailable",
+
+      entity:
+        entity,
+
+      binding:
+        binding
+
+    };
+  }
+
+
+  if (
+    requirements.expressionId &&
+    !binding
+      .permittedExpressions
+      .includes(
+        requirements.expressionId
+      )
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "expression_not_permitted",
+
+      entity:
+        entity,
+
+      binding:
+        binding
+
+    };
+  }
+
+
+  if (
+    requirements.cooperativeCapabilityId &&
+    !binding
+      .permittedCooperativeCapabilities
+      .includes(
+        requirements
+          .cooperativeCapabilityId
+      )
+  ) {
+
+
+    return {
+
+      available:
+        false,
+
+      reason:
+        "cooperative_capability_unavailable",
+
+      entity:
+        entity,
+
+      binding:
+        binding
+
+    };
+  }
+
+
+  return {
+
+    available:
+      true,
+
+    reason:
+      null,
+
+    entity:
+      entity,
+
+    binding:
+      binding
+
+  };
+}
+
+
+// =========================================================
+// BRICK 307 — PERSISTENT ITEM EXECUTION CONTEXT
+// =========================================================
+//
+// Reads existing Inventory / Equipment authority.
+//
+// It does not apply weapon Stats.
+//
+// =========================================================
+
+function getBattleEquippedWeaponExecutionContext(
+  character
+) {
+
+
+  if (
+    !character ||
+    !Array.isArray(
+      character.equipment
+    )
+  ) {
+
+    return null;
+  }
+
+
+  const equippedWeapon =
+    character.equipment.find(
+      equipment =>
+        equipment &&
+        equipment.slot ===
+          "weapon"
+    ) ||
+    null;
+
+
+  if (
+    !equippedWeapon ||
+    !equippedWeapon.instanceId ||
+    !equippedWeapon.itemId
+  ) {
+
+    return null;
+  }
+
+
+  const definition =
+    getItemDefinition(
+      equippedWeapon.itemId
+    );
+
+
+  if (
+    !definition ||
+    definition.type !==
+      "weapon"
+  ) {
+
+    return null;
+  }
+
+
+  const inventoryItem =
+    playerData &&
+    Array.isArray(
+      playerData.inventory
+    )
+
+      ? playerData.inventory.find(
+          item =>
+            item &&
+            item.instanceId ===
+              equippedWeapon.instanceId
+        ) ||
+        null
+
+      : null;
+
+
+  if (
+    !inventoryItem
+  ) {
+
+    return null;
+  }
+
+
+  return {
+
+    instanceId:
+      equippedWeapon.instanceId,
+
+    itemId:
+      equippedWeapon.itemId,
+
+    weaponClass:
+      definition.weaponClass ||
+      null,
+
+    persistentThrowingWeapon:
+      definition
+        .persistentThrowingWeapon ===
+        true,
+
+    persistentWeaponSet:
+      definition
+        .persistentWeaponSet ===
+        true,
+
+    definition:
+      definition,
+
+    inventoryItem:
+      inventoryItem
+
+  };
+}
+
+
+// =========================================================
+// PERSISTENT TOOL AVAILABILITY CONTEXT
+// =========================================================
+//
+// Current source has no carried-tool/loadout authority yet.
+//
+// Therefore this adapter answers only the truthful question:
+//
+// "Does the player's authoritative Inventory contain this
+// persistent tool instance?"
+//
+// It does NOT claim the tool is equipped/prepared.
+//
+// =========================================================
+
+function getBattleInventoryToolContext(
+  itemId
+) {
+
+
+  const definition =
+    getItemDefinition(
+      itemId
+    );
+
+
+  if (
+    !definition ||
+    definition.type !==
+      "tool"
+  ) {
+
+    return null;
+  }
+
+
+  const inventoryItem =
+    playerData &&
+    Array.isArray(
+      playerData.inventory
+    )
+
+      ? playerData.inventory.find(
+          item =>
+            item &&
+            item.id ===
+              itemId &&
+            item.instanceId
+        ) ||
+        null
+
+      : null;
+
+
+  if (
+    !inventoryItem
+  ) {
+
+    return null;
+  }
+
+
+  return {
+
+    instanceId:
+      inventoryItem.instanceId,
+
+    itemId:
+      itemId,
+
+    definition:
+      definition,
+
+    inventoryItem:
+      inventoryItem
+
+  };
+}
+
+
+// =========================================================
+// HOSTED-ENTITY BATTLE REQUIREMENT ADAPTER
+// =========================================================
+
+function getAcademyMenmaHostedEntityAccess(
+  options = {}
+) {
+
+
+  return evaluateHostedEntityAccess(
+    "academy_menma",
+    "yin_kurama",
+    {
+
+      requireCooperative:
+        true,
+
+      expressionId:
+        options.expressionId ||
+        "limited_yin_kurama_chakra",
+
+      cooperativeCapabilityId:
+        options.cooperativeCapabilityId ||
+        null
+
+    }
+  );
+}
+
+
+// =========================================================
+// BRICK 307 — DEVELOPMENT PREREQUISITE GRANT
+// =========================================================
+//
+// Explicit developer helper.
+//
+// Does not run automatically.
+//
+// Uses existing addItemToInventory() so instance creation
+// remains under current Inventory authority.
+//
+// =========================================================
+
+function grantAcademyPilotEquipmentPrerequisites() {
+
+
+  const requiredItems = [
+
+    {
+      id:
+        "kunai",
+
+      name:
+        "Kunai"
+    },
+
+    {
+      id:
+        "shuriken_set",
+
+      name:
+        "Shuriken Set"
+    },
+
+    {
+      id:
+        "ninja_wire",
+
+      name:
+        "Ninja Wire"
+    }
+
+  ];
+
+
+  requiredItems.forEach(
+    requiredItem => {
+
+
+      const alreadyOwned =
+        playerData.inventory.some(
+          item =>
+            item &&
+            item.id ===
+              requiredItem.id
+        );
+
+
+      if (
+        alreadyOwned
+      ) {
+
+        return;
+      }
+
+
+      addItemToInventory(
+        requiredItem
+      );
+    }
+  );
+
+
+  savePlayerData();
+
+
+  return requiredItems.map(
+    requiredItem => {
+
+
+      const item =
+        playerData.inventory.find(
+          inventoryItem =>
+            inventoryItem &&
+            inventoryItem.id ===
+              requiredItem.id
+        ) ||
+        null;
+
+
+      return {
+
+        itemId:
+          requiredItem.id,
+
+        instanceId:
+          item &&
+          item.instanceId
+            ? item.instanceId
+            : null
+
+      };
+    }
+  );
+}
+
+
+// =========================================================
+// BRICK 307 — PILOT PREREQUISITE DIAGNOSTIC
+// =========================================================
+
+function runAcademyPilotPrerequisiteDiagnostics() {
+
+
+  const kunai =
+    getItemDefinition(
+      "kunai"
+    );
+
+
+  const shuriken =
+    getItemDefinition(
+      "shuriken_set"
+    );
+
+
+  const wire =
+    getItemDefinition(
+      "ninja_wire"
+    );
+
+
+  const yinKurama =
+    getHostedEntityDefinition(
+      "yin_kurama"
+    );
+
+
+  const binding =
+    getHostedEntityBinding(
+      "academy_menma",
+      "yin_kurama"
+    );
+
+
+  const chakraAccess =
+    getAcademyMenmaHostedEntityAccess();
+
+
+  const guidanceAccess =
+    getAcademyMenmaHostedEntityAccess({
+
+      cooperativeCapabilityId:
+        "kurama_guidance"
+
+    });
+
+
+  const result = {
+
+
+    kunaiExists:
+      !!kunai,
+
+
+    kunaiPersistentInstance:
+      !!(
+        kunai &&
+        kunai.stackable ===
+          false &&
+        kunai
+          .persistentThrowingWeapon ===
+          true
+      ),
+
+
+    shurikenSetExists:
+      !!shuriken,
+
+
+    shurikenPersistentSet:
+      !!(
+        shuriken &&
+        shuriken.stackable ===
+          false &&
+        shuriken
+          .persistentThrowingWeapon ===
+          true &&
+        shuriken
+          .persistentWeaponSet ===
+          true
+      ),
+
+
+    ninjaWireExists:
+      !!(
+        wire &&
+        wire.type ===
+          "tool" &&
+        wire.stackable ===
+          false
+      ),
+
+
+    yinKuramaExists:
+      !!yinKurama,
+
+
+    yinKuramaHostedType:
+      !!(
+        yinKurama &&
+        yinKurama.entityType ===
+          "hosted_bound_entity"
+      ),
+
+
+    menmaBindingExists:
+      !!binding,
+
+
+    doesNotOccupySummonSlot:
+      !!(
+        binding &&
+        binding
+          .occupiesNormalSummonSlot ===
+          false
+      ),
+
+
+    limitedChakraAccessPermitted:
+      chakraAccess.available ===
+        true,
+
+
+    guidanceAccessPermitted:
+      guidanceAccess.available ===
+        true,
+
+
+    artworkNotAccessAuthority:
+      !!(
+        yinKurama &&
+        yinKurama.presentation &&
+        yinKurama.presentation
+          .temporaryArtwork ===
+          true &&
+        chakraAccess.available ===
+          true
+      )
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
 }
 
 
@@ -29668,17 +30604,26 @@ function runChronicleProgressionRegression() {
 
 const WEAPON_CLASS_DIFFICULTY = {
 
-  Kunai: 0,
+  Kunai:
+    0,
 
-  Tanto: 5,
+  Shuriken:
+    0,
 
-  Katana: 10,
+  Tanto:
+    5,
 
-  Sword: 10,
+  Katana:
+    10,
 
-  Spear: 15,
+  Sword:
+    10,
 
-  Heavy: 25
+  Spear:
+    15,
+
+  Heavy:
+    25
 
 };
 
