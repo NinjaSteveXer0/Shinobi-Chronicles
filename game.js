@@ -5566,15 +5566,19 @@ function executePlayerActivity(
 
 // =========================================================
 // BRICK 130 — PROCESS PLAYER ACTIVITY
+// BRICK 311 — BATTLE ACTIVITY PHASE BOUNDARY
 // =========================================================
 //
 // Routes Player Loop requests into
 // the registered Activity Engine.
 //
-// Prevents duplicate reward / progression logic.
+// Battle location availability and Battle completion are
+// explicitly different lifecycle phases.
+//
+// Merely entering a Battle location must NEVER execute
+// completion rewards / progression.
 //
 // =========================================================
-
 
 function processPlayerActivity(
   activityRequest
@@ -5590,7 +5594,6 @@ function processPlayerActivity(
     // TRAINING UI AVAILABILITY REQUEST
     // =========================================
 
-
     case PLAYER_ACTIVITY_TYPES.TRAINING:
 
 
@@ -5602,34 +5605,25 @@ function processPlayerActivity(
 
         return {
 
-
           success:
             true,
 
-
           type:
             "training_available",
-
 
           location:
             activityRequest.location ||
             null,
 
-
           activityId:
             activityRequest.activityId ||
             null,
 
-
           message:
             "Training opportunity available."
 
-
         };
-
-
       }
-
 
 
       console.log(
@@ -5640,11 +5634,9 @@ function processPlayerActivity(
       return false;
 
 
-
     // =========================================
     // PRACTICAL
     // =========================================
-
 
     case PLAYER_ACTIVITY_TYPES.PRACTICAL:
 
@@ -5655,13 +5647,77 @@ function processPlayerActivity(
       );
 
 
-
     // =========================================
     // BATTLE
     // =========================================
 
-
     case PLAYER_ACTIVITY_TYPES.BATTLE:
+
+
+      // =======================================
+      // LOCATION / OPPORTUNITY PHASE
+      // =======================================
+
+      if (
+        activityRequest.stage ===
+          "available"
+      ) {
+
+
+        return {
+
+          success:
+            true,
+
+          type:
+            "battle_available",
+
+          location:
+            activityRequest.location ||
+            null,
+
+          encounterId:
+            activityRequest.encounterId ||
+            null,
+
+          message:
+            "Battle opportunity available."
+
+        };
+      }
+
+
+      // =======================================
+      // EXPLICIT COMPLETION PHASE ONLY
+      // =======================================
+
+      if (
+        activityRequest.stage !==
+          "completion"
+      ) {
+
+
+        console.log(
+          "Battle Activity execution requires an explicit lifecycle stage."
+        );
+
+
+        return false;
+      }
+
+
+      if (
+        !activityRequest.characterId
+      ) {
+
+
+        console.log(
+          "Battle completion requires a character ID."
+        );
+
+
+        return false;
+      }
 
 
       return startRegisteredActivity(
@@ -5670,11 +5726,9 @@ function processPlayerActivity(
       );
 
 
-
     // =========================================
     // MISSION
     // =========================================
-
 
     case PLAYER_ACTIVITY_TYPES.MISSION:
 
@@ -5685,11 +5739,9 @@ function processPlayerActivity(
       );
 
 
-
     // =========================================
     // EXAM
     // =========================================
-
 
     case PLAYER_ACTIVITY_TYPES.EXAM:
 
@@ -5698,7 +5750,6 @@ function processPlayerActivity(
         "exam",
         activityRequest.characterId
       );
-
 
 
     default:
@@ -5712,11 +5763,107 @@ function processPlayerActivity(
 
       return false;
 
-
   }
 
-
 }
+
+
+// =========================================================
+// BRICK 313 — BATTLE ACTIVITY BOUNDARY DIAGNOSTIC
+// =========================================================
+
+function runBattleActivityBoundaryDiagnostics() {
+
+
+  const availability =
+    processPlayerActivity({
+
+      type:
+        PLAYER_ACTIVITY_TYPES.BATTLE,
+
+      stage:
+        "available",
+
+      location:
+        "diagnostic_location"
+
+    });
+
+
+  const invalidCompletion =
+    processPlayerActivity({
+
+      type:
+        PLAYER_ACTIVITY_TYPES.BATTLE,
+
+      stage:
+        "completion"
+
+    });
+
+
+  const battleActivity =
+    getActivityData(
+      "battle"
+    );
+
+
+  const result = {
+
+
+    availabilityAccepted:
+      !!(
+        availability &&
+        availability.success ===
+          true
+      ),
+
+
+    availabilityIsNotCompletion:
+      !!(
+        availability &&
+        availability.type ===
+          "battle_available"
+      ),
+
+
+    completionWithoutCharacterRejected:
+      invalidCompletion ===
+        false,
+
+
+    registeredBattleStillExists:
+      !!battleActivity,
+
+
+    registeredBattleNotAutoExecuted:
+      !!(
+        availability &&
+        availability.type !==
+          "battle"
+      )
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value ===
+        true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
+}
+
 
 
 // =========================================================
@@ -37875,17 +38022,18 @@ function returnToWorldMap() {
 
 // =========================================================
 // LOCATION NAVIGATION
+// BRICK 312 — BATTLE LOCATION AVAILABILITY BOUNDARY
 // =========================================================
 
 function handleNodeNavigation() {
 
 
-  if (!selectedLocationNode) {
+  if (
+    !selectedLocationNode
+  ) {
 
     return;
-
   }
-
 
 
   const overlay =
@@ -37894,15 +38042,15 @@ function handleNodeNavigation() {
     );
 
 
+  if (
+    overlay
+  ) {
 
-  if (overlay) {
 
     overlay.classList.remove(
       "region-map-open"
     );
-
   }
-
 
 
   console.log(
@@ -37911,11 +38059,9 @@ function handleNodeNavigation() {
   );
 
 
-
   switch (
     selectedLocationNode.type
   ) {
-
 
 
     case "village":
@@ -37929,7 +38075,6 @@ function handleNodeNavigation() {
       break;
 
 
-
     case "training":
 
 
@@ -37937,6 +38082,9 @@ function handleNodeNavigation() {
 
         type:
           "training",
+
+        stage:
+          "available",
 
         location:
           selectedLocationNode.id
@@ -37952,14 +38100,24 @@ function handleNodeNavigation() {
       break;
 
 
-
     case "battle":
 
+
+      // =======================================
+      // Entering a Battle location exposes
+      // Battle opportunities only.
+      //
+      // It is NOT Battle completion.
+      // No rewards or progression resolve here.
+      // =======================================
 
       executePlayerActivity({
 
         type:
           "battle",
+
+        stage:
+          "available",
 
         location:
           selectedLocationNode.id
@@ -37973,7 +38131,6 @@ function handleNodeNavigation() {
 
 
       break;
-
 
 
     case "mission":
@@ -37998,7 +38155,6 @@ function handleNodeNavigation() {
       break;
 
 
-
     case "outpost":
 
 
@@ -38008,7 +38164,6 @@ function handleNodeNavigation() {
 
 
       break;
-
 
 
     case "activity":
@@ -38022,7 +38177,6 @@ function handleNodeNavigation() {
       break;
 
 
-
     case "secret":
 
 
@@ -38032,7 +38186,6 @@ function handleNodeNavigation() {
 
 
       break;
-
 
 
     default:
@@ -38045,11 +38198,10 @@ function handleNodeNavigation() {
 
       break;
 
-
   }
 
-
 }
+
 
 // #########################################################
 // LOCATION ENGINE
