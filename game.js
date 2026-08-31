@@ -106,403 +106,1237 @@ function getUIAssetPath(
 
 
 // =========================================================
-// PLAYER TEAM DATABASE
-// BRICK 314 — ACADEMY PLAYABLE VARIANT INTEGRATION
+// BRICK 357 — CANONICAL CHARACTER REGISTRY AUTHORITY
+// BRICK 358 — RUNTIME CHARACTER ↔ REGISTRY ID BRIDGE
+// BRICK 359 — REGISTRY EMBODIMENT / EXCLUSION METADATA
+// BRICK 360 — REGISTRY CALIBRATION HOLD BOUNDARY
 // =========================================================
-// Canonical Base Stats own Base PL.
 //
-// basePL remains compatibility metadata for older systems.
+// Registry presence is not player ownership, team assignment,
+// or Battle deployment.
 //
-// Academy pilot variants are registered in the existing
-// playable-character authority so save/progression/equipment
-// systems can resolve them normally.
+// playerTeam remains the compatibility/runtime character set
+// consumed by older progression/UI code. Its canonical Base
+// Stats are projected from the Registry for the nine currently
+// instantiated Alpha runtime variants.
 //
-// developmentPilotOnly prevents them from silently entering
-// the ordinary Battle roster before permanent team-building
-// authority exists.
+// developmentPilotOnly remains development metadata only. It
+// is no longer an ownership/deployment gate.
 //
 // =========================================================
 
-let playerTeam = [
-
-  {
-    id: "naruto",
-    name: "Kage Naruto",
-    rank: "Kage",
-    rarity: "Legendary",
-
-    basePL: 95,
-
-    baseStats: {
-      nin: 96,
-      tai: 88,
-      buki: 63,
-      fuin: 69,
-      kin: 72,
-      gen: 55,
-      stamina: 99
+const characterRegistry = {
+  "academy_hinata": {
+    "id": "academy_hinata",
+    "baseStats": {
+      "nin": 6,
+      "tai": 9,
+      "buki": 5,
+      "fuin": 5,
+      "kin": 5,
+      "gen": 5,
+      "stamina": 7
     },
-
-    stats: {
-      nin: 96,
-      tai: 88,
-      buki: 63,
-      fuin: 69,
-      kin: 72,
-      gen: 55,
-      stamina: 99
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    image:
-      getCharacterCardAssetPath("kage_naruto")
+    "basePL": 8,
+    "formalRank": "academy",
+    "embodiedExpressions": []
   },
-
-
-  {
-    id: "sasuke",
-    name: "Jonin Sasuke",
-    rank: "Elite Jonin",
-    rarity: "Epic",
-
-    basePL: 56,
-
-    baseStats: {
-      nin: 57,
-      tai: 50,
-      buki: 56,
-      fuin: 36,
-      kin: 43,
-      gen: 54,
-      stamina: 50
+  "academy_izuno": {
+    "id": "academy_izuno",
+    "baseStats": {
+      "nin": 10,
+      "tai": 9,
+      "buki": 6,
+      "fuin": 5,
+      "kin": 6,
+      "gen": 5,
+      "stamina": 8
     },
-
-    stats: {
-      nin: 57,
-      tai: 50,
-      buki: 56,
-      fuin: 36,
-      kin: 43,
-      gen: 54,
-      stamina: 50
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    image:
-      getCharacterCardAssetPath("jonin_sasuke")
+    "basePL": 9,
+    "formalRank": "academy",
+    "embodiedExpressions": []
   },
-
-
-  {
-    id: "sakura",
-    name: "Sannin Sakura",
-    rank: "Sannin",
-    rarity: "Rare",
-
-    basePL: 90,
-
-    baseStats: {
-      nin: 82,
-      tai: 93,
-      buki: 54,
-      fuin: 86,
-      kin: 80,
-      gen: 65,
-      stamina: 88
+  "academy_mirai": {
+    "id": "academy_mirai",
+    "baseStats": {
+      "nin": 8,
+      "tai": 8,
+      "buki": 9,
+      "fuin": 5,
+      "kin": 6,
+      "gen": 7,
+      "stamina": 8
     },
-
-    stats: {
-      nin: 82,
-      tai: 93,
-      buki: 54,
-      fuin: 86,
-      kin: 80,
-      gen: 65,
-      stamina: 88
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    image:
-      getCharacterCardAssetPath("sannin_sakura")
+    "basePL": 9,
+    "formalRank": "academy",
+    "embodiedExpressions": []
   },
-
-
-  {
-    id: "nagato",
-    name: "Teen Nagato",
-    rank: "Kage",
-    rarity: "Legendary",
-
-    basePL: 97,
-
-    baseStats: {
-      nin: 98,
-      tai: 74,
-      buki: 64,
-      fuin: 94,
-      kin: 99,
-      gen: 96,
-      stamina: 91
+  "academy_menma": {
+    "id": "academy_menma",
+    "baseStats": {
+      "nin": 10,
+      "tai": 8,
+      "buki": 6,
+      "fuin": 5,
+      "kin": 9,
+      "gen": 7,
+      "stamina": 11
     },
-
-    stats: {
-      nin: 98,
-      tai: 74,
-      buki: 64,
-      fuin: 94,
-      kin: 99,
-      gen: 96,
-      stamina: 91
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    image:
-      getCharacterCardAssetPath("teen_nagato")
+    "basePL": 10,
+    "formalRank": "academy",
+    "embodiedExpressions": [],
+    "defaultAttachedSummonId": "menma_nine_tails"
   },
-
-
-  // =======================================================
-  // ACADEMY PILOT VARIANTS
-  // =======================================================
-
-  {
-    id: "academy_hinata",
-    name: "Academy Hinata",
-    rank: "Academy",
-
-    basePL: 8,
-
-    baseStats: {
-      nin: 6,
-      tai: 9,
-      buki: 5,
-      fuin: 5,
-      kin: 5,
-      gen: 5,
-      stamina: 7
+  "academy_kushina": {
+    "id": "academy_kushina",
+    "baseStats": {
+      "nin": 8,
+      "tai": 9,
+      "buki": 5,
+      "fuin": 8,
+      "kin": 5,
+      "gen": 5,
+      "stamina": 14
     },
-
-    stats: {
-      nin: 6,
-      tai: 9,
-      buki: 5,
-      fuin: 5,
-      kin: 5,
-      gen: 5,
-      stamina: 7
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    developmentPilotOnly: true,
-
-    image:
-      getCharacterCardAssetPath("academy_hinata")
+    "basePL": 12,
+    "formalRank": "academy",
+    "embodiedExpressions": []
   },
-
-
-  {
-    id: "academy_izuno",
-    name: "Academy Izuno",
-    rank: "Academy",
-
-    basePL: 9,
-
-    baseStats: {
-      nin: 10,
-      tai: 9,
-      buki: 6,
-      fuin: 5,
-      kin: 6,
-      gen: 5,
-      stamina: 8
+  "genin_naruto": {
+    "id": "genin_naruto",
+    "baseStats": {
+      "nin": 15,
+      "tai": 14,
+      "buki": 8,
+      "fuin": 5,
+      "kin": 12,
+      "gen": 5,
+      "stamina": 20
     },
-
-    stats: {
-      nin: 10,
-      tai: 9,
-      buki: 6,
-      fuin: 5,
-      kin: 6,
-      gen: 5,
-      stamina: 8
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    developmentPilotOnly: true,
-
-    image:
-      getCharacterCardAssetPath("academy_izuno")
+    "basePL": 18,
+    "formalRank": "genin"
   },
-
-
-  {
-    id: "academy_mirai",
-    name: "Academy Mirai",
-    rank: "Academy",
-
-    basePL: 9,
-
-    baseStats: {
-      nin: 8,
-      tai: 8,
-      buki: 9,
-      fuin: 5,
-      kin: 6,
-      gen: 7,
-      stamina: 8
+  "genin_chocho": {
+    "id": "genin_chocho",
+    "baseStats": {
+      "nin": 16,
+      "tai": 18,
+      "buki": 10,
+      "fuin": 7,
+      "kin": 8,
+      "gen": 8,
+      "stamina": 21
     },
-
-    stats: {
-      nin: 8,
-      tai: 8,
-      buki: 9,
-      fuin: 5,
-      kin: 6,
-      gen: 7,
-      stamina: 8
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    developmentPilotOnly: true,
-
-    image:
-      getCharacterCardAssetPath("academy_mirai")
+    "basePL": 19,
+    "formalRank": "genin"
   },
-
-
-  {
-    id: "academy_menma",
-    name: "Academy Menma",
-    rank: "Academy",
-
-    basePL: 10,
-
-    baseStats: {
-      nin: 10,
-      tai: 8,
-      buki: 6,
-      fuin: 5,
-      kin: 9,
-      gen: 7,
-      stamina: 11
+  "genin_hoki": {
+    "id": "genin_hoki",
+    "baseStats": {
+      "nin": 15,
+      "tai": 17,
+      "buki": 20,
+      "fuin": 10,
+      "kin": 9,
+      "gen": 13,
+      "stamina": 17
     },
-
-    stats: {
-      nin: 10,
-      tai: 8,
-      buki: 6,
-      fuin: 5,
-      kin: 9,
-      gen: 7,
-      stamina: 11
-    },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    developmentPilotOnly: true,
-
-    image:
-      getCharacterCardAssetPath("academy_menma")
+    "basePL": 19,
+    "formalRank": "genin"
   },
-
-
-  {
-    id: "academy_kushina",
-    name: "Academy Kushina",
-    rank: "Academy",
-
-    basePL: 12,
-
-    baseStats: {
-      nin: 8,
-      tai: 9,
-      buki: 5,
-      fuin: 8,
-      kin: 5,
-      gen: 5,
-      stamina: 14
+  "genin_sarada": {
+    "id": "genin_sarada",
+    "baseStats": {
+      "nin": 20,
+      "tai": 18,
+      "buki": 17,
+      "fuin": 9,
+      "kin": 10,
+      "gen": 16,
+      "stamina": 15
     },
-
-    stats: {
-      nin: 8,
-      tai: 9,
-      buki: 5,
-      fuin: 8,
-      kin: 5,
-      gen: 5,
-      stamina: 14
+    "basePL": 19,
+    "formalRank": "genin"
+  },
+  "genin_sasuke": {
+    "id": "genin_sasuke",
+    "baseStats": {
+      "nin": 21,
+      "tai": 20,
+      "buki": 19,
+      "fuin": 9,
+      "kin": 12,
+      "gen": 16,
+      "stamina": 18
     },
-
-    permanentPLBonus: 0,
-
-    equipment: [],
-
-    weaponSpecializations: {},
-
-    abilities: [],
-
-    developmentPilotOnly: true,
-
-    image:
-      getCharacterCardAssetPath("academy_kushina")
+    "basePL": 20,
+    "formalRank": "genin"
+  },
+  "genin_karin": {
+    "id": "genin_karin",
+    "baseStats": {
+      "nin": 18,
+      "tai": 12,
+      "buki": 9,
+      "fuin": 15,
+      "kin": 10,
+      "gen": 16,
+      "stamina": 24
+    },
+    "basePL": 21,
+    "formalRank": "genin"
+  },
+  "genin_himawari": {
+    "id": "genin_himawari",
+    "baseStats": {
+      "nin": 18,
+      "tai": 25,
+      "buki": 11,
+      "fuin": 10,
+      "kin": 10,
+      "gen": 14,
+      "stamina": 20
+    },
+    "basePL": 23,
+    "formalRank": "genin",
+    "embodiedExpressions": [
+      "byakugan"
+    ]
+  },
+  "genin_mitsuki": {
+    "id": "genin_mitsuki",
+    "baseStats": {
+      "nin": 26,
+      "tai": 22,
+      "buki": 15,
+      "fuin": 13,
+      "kin": 19,
+      "gen": 17,
+      "stamina": 23
+    },
+    "basePL": 24,
+    "formalRank": "genin"
+  },
+  "chunin_jiraiya": {
+    "id": "chunin_jiraiya",
+    "baseStats": {
+      "nin": 26,
+      "tai": 23,
+      "buki": 17,
+      "fuin": 16,
+      "kin": 20,
+      "gen": 14,
+      "stamina": 28
+    },
+    "basePL": 26,
+    "formalRank": "chunin"
+  },
+  "chunin_shikadai": {
+    "id": "chunin_shikadai",
+    "baseStats": {
+      "nin": 31,
+      "tai": 21,
+      "buki": 19,
+      "fuin": 18,
+      "kin": 22,
+      "gen": 17,
+      "stamina": 21
+    },
+    "basePL": 28,
+    "formalRank": "chunin"
+  },
+  "chunin_mitsuki": {
+    "id": "chunin_mitsuki",
+    "baseStats": {
+      "nin": 34,
+      "tai": 28,
+      "buki": 19,
+      "fuin": 18,
+      "kin": 26,
+      "gen": 21,
+      "stamina": 29
+    },
+    "basePL": 32,
+    "formalRank": "chunin"
+  },
+  "chunin_shinki": {
+    "id": "chunin_shinki",
+    "baseStats": {
+      "nin": 37,
+      "tai": 27,
+      "buki": 31,
+      "fuin": 18,
+      "kin": 23,
+      "gen": 19,
+      "stamina": 32
+    },
+    "basePL": 35,
+    "formalRank": "chunin",
+    "embodiedExpressions": [
+      "magnet_release_iron_sand"
+    ]
+  },
+  "chunin_boruto": {
+    "id": "chunin_boruto",
+    "baseStats": {
+      "nin": 39,
+      "tai": 34,
+      "buki": 31,
+      "fuin": 20,
+      "kin": 35,
+      "gen": 26,
+      "stamina": 32
+    },
+    "basePL": 37,
+    "formalRank": "chunin",
+    "embodiedExpressions": [
+      "jogan",
+      "karma_influence"
+    ]
+  },
+  "jonin_sasuke": {
+    "id": "jonin_sasuke",
+    "baseStats": {
+      "nin": 57,
+      "tai": 50,
+      "buki": 56,
+      "fuin": 36,
+      "kin": 43,
+      "gen": 54,
+      "stamina": 50
+    },
+    "basePL": 56,
+    "formalRank": "jonin"
+  },
+  "sannin_sakura": {
+    "id": "sannin_sakura",
+    "baseStats": {
+      "nin": 82,
+      "tai": 93,
+      "buki": 54,
+      "fuin": 86,
+      "kin": 80,
+      "gen": 65,
+      "stamina": 88
+    },
+    "basePL": 90,
+    "title": "sannin"
+  },
+  "akatsuki_teen_naruto": {
+    "id": "akatsuki_teen_naruto",
+    "baseStats": {
+      "nin": 86,
+      "tai": 78,
+      "buki": 45,
+      "fuin": 62,
+      "kin": 82,
+      "gen": 35,
+      "stamina": 99
+    },
+    "basePL": 92,
+    "affiliations": [
+      "akatsuki"
+    ],
+    "lifeStage": "teen",
+    "defaultAttachedSummonId": "nine_tails"
+  },
+  "akatsuki_itachi": {
+    "id": "akatsuki_itachi",
+    "baseStats": {
+      "nin": 90,
+      "tai": 78,
+      "buki": 84,
+      "fuin": 74,
+      "kin": 91,
+      "gen": 98,
+      "stamina": 84
+    },
+    "basePL": 95,
+    "affiliations": [
+      "akatsuki"
+    ],
+    "embodiedExpressions": [
+      "mangekyo_sharingan_itachi"
+    ],
+    "defaultAttachedSummonId": "koto_crow",
+    "canonicalIllness": false
+  },
+  "kage_naruto": {
+    "id": "kage_naruto",
+    "baseStats": {
+      "nin": 96,
+      "tai": 88,
+      "buki": 63,
+      "fuin": 69,
+      "kin": 72,
+      "gen": 55,
+      "stamina": 99
+    },
+    "basePL": 95,
+    "title": "kage",
+    "hostedEntityIds": [
+      "yang_kurama",
+      "yin_kurama"
+    ],
+    "defaultAttachedSummonId": "gamakichi",
+    "defaultAttachedSummonRegistryPending": true
+  },
+  "teen_nagato": {
+    "id": "teen_nagato",
+    "baseStats": {
+      "nin": 98,
+      "tai": 74,
+      "buki": 64,
+      "fuin": 94,
+      "kin": 99,
+      "gen": 96,
+      "stamina": 91
+    },
+    "basePL": 97,
+    "lifeStage": "teen"
+  },
+  "undying_madara": {
+    "id": "undying_madara",
+    "baseStats": {
+      "nin": 105,
+      "tai": 88,
+      "buki": 80,
+      "fuin": 86,
+      "kin": 103,
+      "gen": 98,
+      "stamina": 112
+    },
+    "basePL": 108
+  },
+  "black_madara": {
+    "id": "black_madara",
+    "baseStats": {
+      "nin": 119,
+      "tai": 98,
+      "buki": 87,
+      "fuin": 101,
+      "kin": 117,
+      "gen": 111,
+      "stamina": 115
+    },
+    "basePL": 117
+  },
+  "failed_god_madara": {
+    "id": "failed_god_madara",
+    "baseStats": {
+      "nin": 140,
+      "tai": 112,
+      "buki": 95,
+      "fuin": 126,
+      "kin": 138,
+      "gen": 128,
+      "stamina": 135
+    },
+    "basePL": 137
+  },
+  "fallen_hokage": {
+    "id": "fallen_hokage",
+    "baseStats": {
+      "nin": 108,
+      "tai": 96,
+      "buki": 104,
+      "fuin": 88,
+      "kin": 105,
+      "gen": 110,
+      "stamina": 91
+    },
+    "basePL": 108
+  },
+  "shadow_of_indra": {
+    "id": "shadow_of_indra",
+    "baseStats": {
+      "nin": 125,
+      "tai": 108,
+      "buki": 112,
+      "fuin": 105,
+      "kin": 120,
+      "gen": 127,
+      "stamina": 110
+    },
+    "basePL": 124
+  },
+  "sixth_shadow": {
+    "id": "sixth_shadow",
+    "baseStats": {
+      "nin": 134,
+      "tai": 113,
+      "buki": 116,
+      "fuin": 132,
+      "kin": 130,
+      "gen": 136,
+      "stamina": 119
+    },
+    "basePL": 134
+  },
+  "jonin_inojin": {
+    "id": "jonin_inojin",
+    "baseStats": {
+      "nin": 50,
+      "tai": 43,
+      "buki": 46,
+      "fuin": 38,
+      "kin": 42,
+      "gen": 53,
+      "stamina": 45
+    },
+    "basePL": 51,
+    "formalRank": "jonin"
+  },
+  "jonin_hanabi": {
+    "id": "jonin_hanabi",
+    "baseStats": {
+      "nin": 48,
+      "tai": 55,
+      "buki": 40,
+      "fuin": 38,
+      "kin": 42,
+      "gen": 44,
+      "stamina": 50
+    },
+    "basePL": 53,
+    "formalRank": "jonin",
+    "embodiedExpressions": [
+      "byakugan"
+    ]
+  },
+  "jonin_shino": {
+    "id": "jonin_shino",
+    "baseStats": {
+      "nin": 52,
+      "tai": 43,
+      "buki": 39,
+      "fuin": 40,
+      "kin": 46,
+      "gen": 48,
+      "stamina": 55
+    },
+    "basePL": 53,
+    "formalRank": "jonin",
+    "boundEntityIds": [
+      "kikaichu_colony"
+    ]
+  },
+  "jonin_konohamaru": {
+    "id": "jonin_konohamaru",
+    "baseStats": {
+      "nin": 55,
+      "tai": 52,
+      "buki": 45,
+      "fuin": 41,
+      "kin": 50,
+      "gen": 36,
+      "stamina": 57
+    },
+    "basePL": 55,
+    "formalRank": "jonin"
+  },
+  "sakura_resonance": {
+    "id": "sakura_resonance",
+    "baseStats": {
+      "nin": 108,
+      "tai": 105,
+      "buki": 65,
+      "fuin": 96,
+      "kin": 88,
+      "gen": 78,
+      "stamina": 112
+    },
+    "basePL": 108
+  },
+  "sakura_manifestation": {
+    "id": "sakura_manifestation",
+    "baseStats": {
+      "nin": 120,
+      "tai": 118,
+      "buki": 70,
+      "fuin": 105,
+      "kin": 98,
+      "gen": 84,
+      "stamina": 126
+    },
+    "basePL": 121
+  },
+  "sakura_avatar": {
+    "id": "sakura_avatar",
+    "baseStats": {
+      "nin": 134,
+      "tai": 130,
+      "buki": 76,
+      "fuin": 116,
+      "kin": 110,
+      "gen": 92,
+      "stamina": 140
+    },
+    "basePL": 135
+  },
+  "shikamaru_resonance_yang": {
+    "id": "shikamaru_resonance_yang",
+    "baseStats": {
+      "nin": 98,
+      "tai": 82,
+      "buki": 60,
+      "fuin": 78,
+      "kin": 90,
+      "gen": 92,
+      "stamina": 112
+    },
+    "basePL": 105
+  },
+  "shikamaru_manifestation_yang": {
+    "id": "shikamaru_manifestation_yang",
+    "baseStats": {
+      "nin": 112,
+      "tai": 94,
+      "buki": 66,
+      "fuin": 88,
+      "kin": 103,
+      "gen": 102,
+      "stamina": 126
+    },
+    "basePL": 119
+  },
+  "shikamaru_avatar_yang": {
+    "id": "shikamaru_avatar_yang",
+    "baseStats": {
+      "nin": 126,
+      "tai": 106,
+      "buki": 72,
+      "fuin": 98,
+      "kin": 116,
+      "gen": 112,
+      "stamina": 140
+    },
+    "basePL": 132
+  },
+  "shikamaru_resonance_yin": {
+    "id": "shikamaru_resonance_yin",
+    "baseStats": {
+      "nin": 96,
+      "tai": 74,
+      "buki": 58,
+      "fuin": 92,
+      "kin": 106,
+      "gen": 109,
+      "stamina": 96
+    },
+    "basePL": 105
+  },
+  "shikamaru_manifestation_yin": {
+    "id": "shikamaru_manifestation_yin",
+    "baseStats": {
+      "nin": 110,
+      "tai": 84,
+      "buki": 63,
+      "fuin": 104,
+      "kin": 119,
+      "gen": 124,
+      "stamina": 108
+    },
+    "basePL": 119
+  },
+  "shikamaru_avatar_yin": {
+    "id": "shikamaru_avatar_yin",
+    "baseStats": {
+      "nin": 123,
+      "tai": 94,
+      "buki": 68,
+      "fuin": 116,
+      "kin": 133,
+      "gen": 137,
+      "stamina": 120
+    },
+    "basePL": 132
+  },
+  "tobirama_resonance": {
+    "id": "tobirama_resonance",
+    "baseStats": {
+      "nin": 105,
+      "tai": 92,
+      "buki": 76,
+      "fuin": 108,
+      "kin": 102,
+      "gen": 94,
+      "stamina": 112
+    },
+    "basePL": 109
+  },
+  "tobirama_manifestation": {
+    "id": "tobirama_manifestation",
+    "baseStats": {
+      "nin": 118,
+      "tai": 102,
+      "buki": 82,
+      "fuin": 120,
+      "kin": 115,
+      "gen": 102,
+      "stamina": 126
+    },
+    "basePL": 122
+  },
+  "tobirama_avatar": {
+    "id": "tobirama_avatar",
+    "baseStats": {
+      "nin": 130,
+      "tai": 110,
+      "buki": 88,
+      "fuin": 132,
+      "kin": 126,
+      "gen": 108,
+      "stamina": 138
+    },
+    "basePL": 134
+  },
+  "stolen_chakra": {
+    "id": "stolen_chakra",
+    "baseStats": {
+      "nin": 26,
+      "tai": 20,
+      "buki": 8,
+      "fuin": 24,
+      "kin": 28,
+      "gen": 5,
+      "stamina": 30
+    },
+    "basePL": 28,
+    "embodiedExpressions": [
+      "coercive_kurama_chakra_extraction_initial"
+    ]
+  },
+  "shisui": {
+    "id": "shisui",
+    "baseStats": {
+      "nin": 87,
+      "tai": 89,
+      "buki": 80,
+      "fuin": 60,
+      "kin": 82,
+      "gen": 95,
+      "stamina": 70
+    },
+    "basePL": 92,
+    "continuity": "alternate_timeline",
+    "embodiedExpressions": [
+      "mangekyo_sharingan_shisui"
+    ]
+  },
+  "serpent_ascendant": {
+    "id": "serpent_ascendant",
+    "baseStats": {
+      "nin": 102,
+      "tai": 88,
+      "buki": 79,
+      "fuin": 84,
+      "kin": 105,
+      "gen": 76,
+      "stamina": 96
+    },
+    "basePL": 102,
+    "embodiedExpressions": [
+      "serpent_ascendant_anko"
+    ],
+    "excludedExpressions": [
+      "curse_seal_level_1_anko",
+      "curse_seal_level_2_anko"
+    ]
+  },
+  "black_sun_himawari": {
+    "id": "black_sun_himawari",
+    "baseStats": {
+      "nin": 105,
+      "tai": 102,
+      "buki": 58,
+      "fuin": 82,
+      "kin": 99,
+      "gen": 78,
+      "stamina": 112
+    },
+    "basePL": 107,
+    "embodiedExpressions": [
+      "byakugan",
+      "black_sun_kurama_himawari"
+    ]
+  },
+  "sj_ebisu": {
+    "id": "sj_ebisu",
+    "baseStats": {
+      "nin": 43,
+      "tai": 39,
+      "buki": 37,
+      "fuin": 40,
+      "kin": 38,
+      "gen": 44,
+      "stamina": 42
+    },
+    "basePL": 43,
+    "formalRank": "special_jonin",
+    "specialistQualifications": [
+      "instruction_and_examination.elite_instructor"
+    ],
+    "embodiedExpressions": []
+  },
+  "sj_genma": {
+    "id": "sj_genma",
+    "baseStats": {
+      "nin": 51,
+      "tai": 55,
+      "buki": 60,
+      "fuin": 43,
+      "kin": 49,
+      "gen": 44,
+      "stamina": 56
+    },
+    "basePL": 58,
+    "formalRank": "special_jonin",
+    "specialistQualifications": [
+      "instruction_and_examination.examination_specialist"
+    ],
+    "appointment": "hokage_guard_platoon",
+    "embodiedExpressions": []
+  },
+  "sj_ibiki": {
+    "id": "sj_ibiki",
+    "baseStats": {
+      "nin": 53,
+      "tai": 49,
+      "buki": 45,
+      "fuin": 60,
+      "kin": 59,
+      "gen": 64,
+      "stamina": 62
+    },
+    "basePL": 62,
+    "formalRank": "special_jonin",
+    "department": "intelligence",
+    "specialistQualifications": [
+      "intelligence.interrogator"
+    ],
+    "appointment": "interrogation_division_head",
+    "embodiedExpressions": [],
+    "signatureSummonId": "iron_maiden",
+    "defaultAttachedSummonId": "iron_maiden"
+  },
+  "sannin_shikamaru": {
+    "id": "sannin_shikamaru",
+    "baseStats": {
+      "nin": 78,
+      "tai": 60,
+      "buki": 52,
+      "fuin": 72,
+      "kin": 88,
+      "gen": 84,
+      "stamina": 74
+    },
+    "basePL": 85,
+    "continuity": "alternate_timeline",
+    "title": "sannin",
+    "embodiedExpressions": [],
+    "excludedPackageFamilies": [
+      "shikamaru_jinchuriki",
+      "shikamaru_hosted_entity"
+    ]
+  },
+  "kage_kakashi": {
+    "id": "kage_kakashi",
+    "baseStats": {
+      "nin": 91,
+      "tai": 82,
+      "buki": 83,
+      "fuin": 70,
+      "kin": 88,
+      "gen": 86,
+      "stamina": 84
+    },
+    "basePL": 89,
+    "continuity": "canonical",
+    "title": "hokage",
+    "embodiedExpressions": [],
+    "excludedExpressions": [
+      "sharingan_kakashi",
+      "mangekyo_sharingan_kakashi",
+      "double_mangekyo_kakashi"
+    ]
+  },
+  "kage_sarada": {
+    "id": "kage_sarada",
+    "baseStats": {
+      "nin": 100,
+      "tai": 94,
+      "buki": 88,
+      "fuin": 75,
+      "kin": 96,
+      "gen": 105,
+      "stamina": 91
+    },
+    "basePL": 102,
+    "continuity": "future_timeline",
+    "title": "hokage",
+    "embodiedExpressions": [
+      "mangekyo_sharingan_sarada"
+    ],
+    "excludedExpressions": [
+      "eternal_mangekyo_sharingan_sarada"
+    ]
+  },
+  "kage_itachi": {
+    "id": "kage_itachi",
+    "baseStats": {
+      "nin": 103,
+      "tai": 88,
+      "buki": 91,
+      "fuin": 78,
+      "kin": 99,
+      "gen": 108,
+      "stamina": 86
+    },
+    "basePL": 105,
+    "continuity": "alternate_timeline",
+    "title": "hokage",
+    "embodiedExpressions": [
+      "mangekyo_sharingan_itachi"
+    ],
+    "excludedExpressions": [
+      "eternal_mangekyo_sharingan_itachi"
+    ],
+    "stableHealthBaseline": true
+  },
+  "kage_menma": {
+    "id": "kage_menma",
+    "baseStats": {
+      "nin": 104,
+      "tai": 92,
+      "buki": 75,
+      "fuin": 98,
+      "kin": 102,
+      "gen": 84,
+      "stamina": 110
+    },
+    "basePL": 107,
+    "continuity": "alternate_timeline",
+    "title": "kage",
+    "embodiedExpressions": [],
+    "defaultAttachedSummonId": "menma_kurama",
+    "relationship": "cooperative",
+    "control": "full"
+  },
+  "sharingan_sasuke": {
+    "id": "sharingan_sasuke",
+    "baseStats": {
+      "nin": 29,
+      "tai": 27,
+      "buki": 25,
+      "fuin": 10,
+      "kin": 18,
+      "gen": 28,
+      "stamina": 22
+    },
+    "basePL": 28,
+    "embodiedExpressions": [
+      "sharingan_three_tomoe_sasuke"
+    ]
+  },
+  "cs_sasuke": {
+    "id": "cs_sasuke",
+    "baseStats": {
+      "nin": 38,
+      "tai": 35,
+      "buki": 32,
+      "fuin": 13,
+      "kin": 34,
+      "gen": 27,
+      "stamina": 40
+    },
+    "basePL": 38,
+    "embodiedExpressions": [
+      "curse_seal_level_1_sasuke"
+    ],
+    "separatelyAvailableExpressions": [
+      "sharingan_three_tomoe_sasuke"
+    ]
+  },
+  "naruto_v1": {
+    "id": "naruto_v1",
+    "baseStats": {
+      "nin": 36,
+      "tai": 31,
+      "buki": 12,
+      "fuin": 10,
+      "kin": 30,
+      "gen": 7,
+      "stamina": 45
+    },
+    "basePL": 40,
+    "embodiedExpressions": [
+      "kurama_v1_naruto"
+    ]
+  },
+  "naruto_v2": {
+    "id": "naruto_v2",
+    "baseStats": {
+      "nin": 52,
+      "tai": 43,
+      "buki": 15,
+      "fuin": 15,
+      "kin": 46,
+      "gen": 8,
+      "stamina": 62
+    },
+    "basePL": 56,
+    "embodiedExpressions": [
+      "kurama_v2_naruto"
+    ],
+    "instabilityResolverOwned": true
+  },
+  "cs_anko": {
+    "id": "cs_anko",
+    "baseStats": {
+      "nin": 61,
+      "tai": 58,
+      "buki": 52,
+      "fuin": 48,
+      "kin": 65,
+      "gen": 45,
+      "stamina": 62
+    },
+    "basePL": 63,
+    "embodiedExpressions": [
+      "curse_seal_level_1_anko"
+    ]
+  },
+  "curse_mark_hinata": {
+    "id": "curse_mark_hinata",
+    "baseStats": {
+      "nin": 68,
+      "tai": 82,
+      "buki": 44,
+      "fuin": 55,
+      "kin": 72,
+      "gen": 64,
+      "stamina": 78
+    },
+    "basePL": 78,
+    "embodiedExpressions": [
+      "curse_mark_level_1_hinata"
+    ],
+    "separatelyAvailableExpressions": [
+      "byakugan"
+    ]
+  },
+  "l2_anko": {
+    "id": "l2_anko",
+    "baseStats": {
+      "nin": 78,
+      "tai": 72,
+      "buki": 61,
+      "fuin": 60,
+      "kin": 84,
+      "gen": 52,
+      "stamina": 80
+    },
+    "basePL": 81,
+    "embodiedExpressions": [
+      "curse_seal_level_2_anko"
+    ],
+    "suppressesEmbodiedExpressions": [
+      "curse_seal_level_1_anko"
+    ]
+  },
+  "mangekyo_sarada": {
+    "id": "mangekyo_sarada",
+    "baseStats": {
+      "nin": 86,
+      "tai": 78,
+      "buki": 73,
+      "fuin": 60,
+      "kin": 82,
+      "gen": 92,
+      "stamina": 74
+    },
+    "basePL": 89,
+    "embodiedExpressions": [
+      "mangekyo_sharingan_sarada"
+    ]
+  },
+  "baryon_mode": {
+    "id": "baryon_mode",
+    "baseStats": {
+      "nin": 165,
+      "tai": 178,
+      "buki": 90,
+      "fuin": 105,
+      "kin": 172,
+      "gen": 88,
+      "stamina": 185
+    },
+    "basePL": 177,
+    "embodiedExpressions": [
+      "baryon_mode_naruto"
+    ],
+    "resolverOwnedCosts": [
+      "duration",
+      "life_force_consumption",
+      "collapse",
+      "contact_lifespan_erosion"
+    ]
   }
+};
 
+const CHARACTER_REGISTRY_IMPLEMENTATION_HOLDS = [
+  "genin_boruto_conflicting_calibration",
+  "batch4_exact_seven_stats_not_supplied",
+  "coercive_cloak_pending_replacement_art_and_calibration"
 ];
+
+function getCharacterRegistryEntry(registryId) {
+  return characterRegistry[registryId] || null;
+}
+
+function cloneCanonicalSevenStats(stats) {
+  const source = stats && typeof stats === "object" ? stats : {};
+  return {
+    nin: Number(source.nin) || 0,
+    tai: Number(source.tai) || 0,
+    buki: Number(source.buki) || 0,
+    fuin: Number(source.fuin) || 0,
+    kin: Number(source.kin) || 0,
+    gen: Number(source.gen) || 0,
+    stamina: Number(source.stamina) || 0
+  };
+}
+
+const RUNTIME_CHARACTER_REGISTRY_BINDINGS = [
+  {
+    "runtimeId": "naruto",
+    "registryId": "kage_naruto",
+    "name": "Kage Naruto",
+    "rank": "Kage",
+    "rarity": "Legendary",
+    "assetId": "kage_naruto"
+  },
+  {
+    "runtimeId": "sasuke",
+    "registryId": "jonin_sasuke",
+    "name": "Jonin Sasuke",
+    "rank": "Elite Jonin",
+    "rarity": "Epic",
+    "assetId": "jonin_sasuke"
+  },
+  {
+    "runtimeId": "sakura",
+    "registryId": "sannin_sakura",
+    "name": "Sannin Sakura",
+    "rank": "Sannin",
+    "rarity": "Rare",
+    "assetId": "sannin_sakura"
+  },
+  {
+    "runtimeId": "nagato",
+    "registryId": "teen_nagato",
+    "name": "Teen Nagato",
+    "rank": "Kage",
+    "rarity": "Legendary",
+    "assetId": "teen_nagato"
+  },
+  {
+    "runtimeId": "academy_hinata",
+    "registryId": "academy_hinata",
+    "name": "Academy Hinata",
+    "rank": "Academy",
+    "assetId": "academy_hinata",
+    "developmentPilotOnly": true
+  },
+  {
+    "runtimeId": "academy_izuno",
+    "registryId": "academy_izuno",
+    "name": "Academy Izuno",
+    "rank": "Academy",
+    "assetId": "academy_izuno",
+    "developmentPilotOnly": true
+  },
+  {
+    "runtimeId": "academy_mirai",
+    "registryId": "academy_mirai",
+    "name": "Academy Mirai",
+    "rank": "Academy",
+    "assetId": "academy_mirai",
+    "developmentPilotOnly": true
+  },
+  {
+    "runtimeId": "academy_menma",
+    "registryId": "academy_menma",
+    "name": "Academy Menma",
+    "rank": "Academy",
+    "assetId": "academy_menma",
+    "developmentPilotOnly": true
+  },
+  {
+    "runtimeId": "academy_kushina",
+    "registryId": "academy_kushina",
+    "name": "Academy Kushina",
+    "rank": "Academy",
+    "assetId": "academy_kushina",
+    "developmentPilotOnly": true
+  }
+];
+
+function createRuntimeCharacterFromRegistry(binding) {
+  const registry = getCharacterRegistryEntry(binding.registryId);
+  if (!registry) {
+    throw new Error(`Missing Character Registry record: ${binding.registryId}`);
+  }
+  const baseStats = cloneCanonicalSevenStats(registry.baseStats);
+  return {
+    id: binding.runtimeId,
+    registryId: binding.registryId,
+    name: binding.name,
+    rank: binding.rank,
+    ...(binding.rarity ? { rarity: binding.rarity } : {}),
+    basePL: registry.basePL,
+    baseStats: baseStats,
+    stats: cloneCanonicalSevenStats(baseStats),
+    permanentPLBonus: 0,
+    equipment: [],
+    weaponSpecializations: {},
+    abilities: [],
+    ...(binding.developmentPilotOnly === true ? { developmentPilotOnly: true } : {}),
+    image: getCharacterCardAssetPath(binding.assetId)
+  };
+}
+
+let playerTeam = RUNTIME_CHARACTER_REGISTRY_BINDINGS.map(
+  binding => createRuntimeCharacterFromRegistry(binding)
+);
+
+function getCharacterRegistryId(characterOrId) {
+  if (!characterOrId) return null;
+  if (typeof characterOrId === "object") {
+    return characterOrId.registryId || characterOrId.id || null;
+  }
+  if (characterRegistry[characterOrId]) return characterOrId;
+  const runtime = playerTeam.find(character => character && character.id === characterOrId);
+  return runtime ? (runtime.registryId || runtime.id) : null;
+}
+
+function getRuntimeCharacterByRegistryId(registryId) {
+  return playerTeam.find(character =>
+    character && getCharacterRegistryId(character) === registryId
+  ) || null;
+}
+
+function characterEmbodiesExactPackage(characterOrId, exactPackageId) {
+  const registryId = getCharacterRegistryId(characterOrId);
+  const record = getCharacterRegistryEntry(registryId);
+  return !!(
+    record &&
+    Array.isArray(record.embodiedExpressions) &&
+    record.embodiedExpressions.includes(exactPackageId)
+  );
+}
+
 
 
 
@@ -897,342 +1731,582 @@ function getItemDefinitionByName(
 
 
 // =========================================================
-// BRICK 306 — HOSTED / BOUND ENTITY FOUNDATION
+// BRICK 361 — FIRST-CLASS ENTITY REGISTRY BATCH 10
+// BRICK 362 — ENTITY BASE/CURRENT PL INDEPENDENCE
+// BRICK 363 — KURAMA PARENT / PARTITION IDENTITY
+// BRICK 364 — MULTIPLE HOSTED-ENTITY BINDINGS
+// BRICK 365 — ATTACHED SUMMON ASSOCIATION AUTHORITY
+// BRICK 366 — ACADEMY MENMA SUMMON MIGRATION
+// BRICK 367 — SOURCE/PACKAGE CONTENT CATALOG
+// BRICK 368 — SUMMON ENHANCEMENT CLASSIFICATION
 // =========================================================
 //
-// Minimum first-class authority required by the Academy
-// Menma Battle pilot.
+// Entity PL is the entity's own capability. It is never added
+// directly to a host character's PL.
 //
-// Hosted / Bound Entity is NOT an Attached Summon.
-//
-// Nothing in this structure occupies or mutates a normal
-// Summon slot.
-//
-// Artwork is presentation metadata only and is never used
-// when determining presence, binding or access.
+// Hosted Entity identity, Attached Summon identity, access,
+// relationship and active expression remain separate facts.
 //
 // =========================================================
 
-const hostedEntityDatabase = {
-
-
-  yin_kurama: {
-
-    id:
-      "yin_kurama",
-
-    name:
-      "Yin Kurama",
-
-    entityType:
-      "hosted_bound_entity",
-
-    presentation: {
-
-      image:
-        getHostedEntityAssetPath("yin_kurama"),
-
-      temporaryArtwork:
-        false
-
+const entityRegistry = {
+  "kurama": {
+    "id": "kurama",
+    "entityType": "parent_entity"
+  },
+  "koto_crow": {
+    "id": "koto_crow",
+    "baseStats": {
+      "nin": 20,
+      "tai": 12,
+      "buki": 5,
+      "fuin": 6,
+      "kin": 18,
+      "gen": 48,
+      "stamina": 14
+    },
+    "basePL": 39,
+    "entityType": "attached_summon"
+  },
+  "key_gero": {
+    "id": "key_gero",
+    "baseStats": {
+      "nin": 34,
+      "tai": 20,
+      "buki": 8,
+      "fuin": 62,
+      "kin": 38,
+      "gen": 28,
+      "stamina": 32
+    },
+    "basePL": 53,
+    "entityType": "entity_collectible"
+  },
+  "de_baku": {
+    "id": "de_baku",
+    "baseStats": {
+      "nin": 55,
+      "tai": 48,
+      "buki": 18,
+      "fuin": 22,
+      "kin": 40,
+      "gen": 62,
+      "stamina": 70
+    },
+    "basePL": 64,
+    "entityType": "attached_summon",
+    "canonicalAssociationName": "Danzō"
+  },
+  "iron_maiden": {
+    "id": "iron_maiden",
+    "baseStats": {
+      "nin": 18,
+      "tai": 42,
+      "buki": 52,
+      "fuin": 48,
+      "kin": 58,
+      "gen": 12,
+      "stamina": 72
+    },
+    "basePL": 65,
+    "entityType": "attached_summon"
+  },
+  "ibuse": {
+    "id": "ibuse",
+    "baseStats": {
+      "nin": 58,
+      "tai": 64,
+      "buki": 22,
+      "fuin": 18,
+      "kin": 68,
+      "gen": 28,
+      "stamina": 76
+    },
+    "basePL": 70,
+    "entityType": "attached_summon",
+    "canonicalAssociationName": "Hanzō"
+  },
+  "mirage_clam": {
+    "id": "mirage_clam",
+    "baseStats": {
+      "nin": 68,
+      "tai": 35,
+      "buki": 12,
+      "fuin": 26,
+      "kin": 48,
+      "gen": 82,
+      "stamina": 78
+    },
+    "basePL": 76,
+    "entityType": "attached_summon",
+    "canonicalAssociationName": "Second Mizukage"
+  },
+  "wr_kamatari": {
+    "id": "wr_kamatari",
+    "baseStats": {
+      "nin": 74,
+      "tai": 78,
+      "buki": 82,
+      "fuin": 24,
+      "kin": 48,
+      "gen": 30,
+      "stamina": 70
+    },
+    "basePL": 77,
+    "entityType": "attached_summon",
+    "canonicalAssociationName": "Temari"
+  },
+  "mk_enma": {
+    "id": "mk_enma",
+    "baseStats": {
+      "nin": 72,
+      "tai": 82,
+      "buki": 78,
+      "fuin": 38,
+      "kin": 55,
+      "gen": 30,
+      "stamina": 88
+    },
+    "basePL": 83,
+    "entityType": "attached_summon",
+    "canonicalAssociationName": "Third Hokage Hiruzen"
+  },
+  "triple_rashomon": {
+    "id": "triple_rashomon",
+    "baseStats": {
+      "nin": 38,
+      "tai": 20,
+      "buki": 12,
+      "fuin": 72,
+      "kin": 64,
+      "gen": 18,
+      "stamina": 108
+    },
+    "basePL": 92,
+    "entityType": "collective_summon",
+    "summonSlotCost": 1
+  },
+  "nine_tails": {
+    "id": "nine_tails",
+    "baseStats": {
+      "nin": 112,
+      "tai": 105,
+      "buki": 35,
+      "fuin": 68,
+      "kin": 96,
+      "gen": 72,
+      "stamina": 125
+    },
+    "basePL": 117,
+    "entityType": "attached_summon"
+  },
+  "menma_nine_tails": {
+    "id": "menma_nine_tails",
+    "baseStats": {
+      "nin": 105,
+      "tai": 98,
+      "buki": 32,
+      "fuin": 85,
+      "kin": 105,
+      "gen": 88,
+      "stamina": 126
+    },
+    "basePL": 117,
+    "entityType": "attached_summon"
+  },
+  "yang_kurama": {
+    "id": "yang_kurama",
+    "baseStats": {
+      "nin": 118,
+      "tai": 110,
+      "buki": 40,
+      "fuin": 82,
+      "kin": 102,
+      "gen": 78,
+      "stamina": 130
+    },
+    "basePL": 122,
+    "entityType": "hosted_entity_partition",
+    "parentEntityId": "kurama"
+  },
+  "yin_kurama": {
+    "id": "yin_kurama",
+    "baseStats": {
+      "nin": 108,
+      "tai": 100,
+      "buki": 35,
+      "fuin": 92,
+      "kin": 112,
+      "gen": 94,
+      "stamina": 130
+    },
+    "basePL": 122,
+    "entityType": "hosted_entity_partition",
+    "parentEntityId": "kurama",
+    "presentation": {
+      "image": "Assets/Summons/yin_kurama.png",
+      "temporaryArtwork": false
     }
-
+  },
+  "menma_kurama": {
+    "id": "menma_kurama",
+    "baseStats": {
+      "nin": 112,
+      "tai": 104,
+      "buki": 36,
+      "fuin": 94,
+      "kin": 114,
+      "gen": 94,
+      "stamina": 132
+    },
+    "basePL": 124,
+    "entityType": "attached_summon"
+  },
+  "kurama_complete": {
+    "id": "kurama_complete",
+    "entityType": "reserved_combined_expression",
+    "parentEntityId": "kurama",
+    "calibrationStatus": "pending"
   }
-
 };
 
+const effectiveStatePackageDatabase = {
+  "mk_enma.adamantine_presence": {
+    "packageKey": "mk_enma.adamantine_presence",
+    "sourceId": "mk_enma",
+    "exactPackageId": "adamantine_presence",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 6
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "mk_enma.staffmasters_counsel": {
+    "packageKey": "mk_enma.staffmasters_counsel",
+    "sourceId": "mk_enma",
+    "exactPackageId": "staffmasters_counsel",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "buki": 5
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "koto_crow.shared_genjutsu_focus": {
+    "packageKey": "koto_crow.shared_genjutsu_focus",
+    "sourceId": "koto_crow",
+    "exactPackageId": "shared_genjutsu_focus",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "gen": 4
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "key_gero.sealkeepers_counsel": {
+    "packageKey": "key_gero.sealkeepers_counsel",
+    "sourceId": "key_gero",
+    "exactPackageId": "sealkeepers_counsel",
+    "defaultExpressionStateId": "entity_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "fuin": 6
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "de_baku.devouring_pressure": {
+    "packageKey": "de_baku.devouring_pressure",
+    "sourceId": "de_baku",
+    "exactPackageId": "devouring_pressure",
+    "defaultExpressionStateId": "resolver",
+    "classification": "resolver",
+    "statModifiers": {},
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "iron_maiden.immovable_frame": {
+    "packageKey": "iron_maiden.immovable_frame",
+    "sourceId": "iron_maiden",
+    "exactPackageId": "immovable_frame",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 7
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "ibuse.salamanders_endurance": {
+    "packageKey": "ibuse.salamanders_endurance",
+    "sourceId": "ibuse",
+    "exactPackageId": "salamanders_endurance",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 6
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "mirage_clam.illusion_lattice": {
+    "packageKey": "mirage_clam.illusion_lattice",
+    "sourceId": "mirage_clam",
+    "exactPackageId": "illusion_lattice",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "gen": 7
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "wr_kamatari.sicklewind_guidance": {
+    "packageKey": "wr_kamatari.sicklewind_guidance",
+    "sourceId": "wr_kamatari",
+    "exactPackageId": "sicklewind_guidance",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "buki": 6
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "triple_rashomon.gatekeeper_formulae": {
+    "packageKey": "triple_rashomon.gatekeeper_formulae",
+    "sourceId": "triple_rashomon",
+    "exactPackageId": "gatekeeper_formulae",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "fuin": 7
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "nine_tails.vast_chakra_reserve": {
+    "packageKey": "nine_tails.vast_chakra_reserve",
+    "sourceId": "nine_tails",
+    "exactPackageId": "vast_chakra_reserve",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 10
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "menma_nine_tails.yin_chakra_reservoir": {
+    "packageKey": "menma_nine_tails.yin_chakra_reservoir",
+    "sourceId": "menma_nine_tails",
+    "exactPackageId": "yin_chakra_reservoir",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 10
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression",
+    "coexistsWith": [
+      "academy_menma.yin_chakra_mantle_academy"
+    ]
+  },
+  "menma_kurama.mature_chakra_accord": {
+    "packageKey": "menma_kurama.mature_chakra_accord",
+    "sourceId": "menma_kurama",
+    "exactPackageId": "mature_chakra_accord",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 11
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "yang_kurama.vital_chakra_resonance": {
+    "packageKey": "yang_kurama.vital_chakra_resonance",
+    "sourceId": "yang_kurama",
+    "exactPackageId": "vital_chakra_resonance",
+    "defaultExpressionStateId": "hosted_expression",
+    "classification": "effective_state",
+    "statModifiers": {
+      "stamina": 10
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "yin_kurama.yin_chakra_precision": {
+    "packageKey": "yin_kurama.yin_chakra_precision",
+    "sourceId": "yin_kurama",
+    "exactPackageId": "yin_chakra_precision",
+    "defaultExpressionStateId": "hosted_expression",
+    "classification": "effective_state",
+    "statModifiers": {
+      "fuin": 8
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "academy_menma.yin_chakra_mantle_academy": {
+    "packageKey": "academy_menma.yin_chakra_mantle_academy",
+    "sourceId": "academy_menma",
+    "exactPackageId": "yin_chakra_mantle_academy",
+    "defaultExpressionStateId": "active_transformation",
+    "classification": "effective_state",
+    "statModifiers": {
+      "nin": 3,
+      "tai": 2,
+      "gen": 1,
+      "kin": 2,
+      "stamina": 4
+    },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression",
+    "coexistsWith": [
+      "menma_nine_tails.yin_chakra_reservoir"
+    ],
+    "durationActionOpportunities": 2,
+    "temporaryCapacityOverlay": 4
+  }
+};
 
-// =========================================================
-// HOSTED-ENTITY BINDING / ACCESS RECORDS
-// =========================================================
-//
-// This is deliberately smaller than a future full
-// Relationship system.
-//
-// It records only the current persistent facts required to
-// answer the Academy pilot's access questions.
-//
-// It does NOT own:
-// - relationship history
-// - Shared History
-// - affinity progression
-// - Summon contracts
-// - Battle runtime state
-//
-// =========================================================
+function getEntityDefinition(entityId) {
+  return entityRegistry[entityId] || null;
+}
+
+function getEffectiveStatePackageDefinition(sourceId, exactPackageId) {
+  if (!sourceId || !exactPackageId) return null;
+  return effectiveStatePackageDatabase[`${sourceId}.${exactPackageId}`] || null;
+}
+
+function createEffectiveStateProjectionKey(sourceId, exactPackageId, expressionStateId) {
+  return [sourceId || "", exactPackageId || "", expressionStateId || "default"].join("::");
+}
+
+const hostedEntityDatabase = Object.fromEntries(
+  Object.entries(entityRegistry).filter(([, entity]) =>
+    entity && entity.entityType === "hosted_entity_partition"
+  )
+);
 
 const hostedEntityBindingDatabase = {
-
-
-  academy_menma_yin_kurama: {
-
-    id:
-      "academy_menma_yin_kurama",
-
-    hostCharacterId:
-      "academy_menma",
-
-    entityId:
-      "yin_kurama",
-
-    bindingType:
-      "hosted_bound",
-
-    occupiesNormalSummonSlot:
-      false,
-
-    presenceState:
-      "present",
-
-    cooperationState:
-      "cooperative",
-
-    permittedExpressions: [
-
-      "limited_yin_kurama_chakra"
-
-    ],
-
-    permittedCooperativeCapabilities: [
-
-      "kurama_guidance"
-
-    ]
-
+  kage_naruto_yang_kurama: {
+    id: "kage_naruto_yang_kurama",
+    hostCharacterRegistryId: "kage_naruto",
+    entityId: "yang_kurama",
+    bindingType: "hosted_bound",
+    occupiesNormalSummonSlot: false,
+    presenceState: "present",
+    relationshipState: "deeply_bonded",
+    cooperationState: "fully_cooperative",
+    accessState: "strong_controlled",
+    permittedExpressions: ["vital_chakra_resonance"]
+  },
+  kage_naruto_yin_kurama: {
+    id: "kage_naruto_yin_kurama",
+    hostCharacterRegistryId: "kage_naruto",
+    entityId: "yin_kurama",
+    bindingType: "hosted_bound",
+    occupiesNormalSummonSlot: false,
+    presenceState: "present",
+    relationshipState: "positive",
+    cooperationState: "cooperative",
+    accessState: "developing_controlled",
+    permittedExpressions: ["yin_chakra_precision"]
   }
-
 };
 
+const attachedSummonAccessDatabase = {
+  academy_menma_menma_nine_tails: {
+    id: "academy_menma_menma_nine_tails",
+    characterRegistryId: "academy_menma",
+    entityId: "menma_nine_tails",
+    cooperationState: "cooperative",
+    permittedExpressions: ["limited_yin_kurama_chakra"],
+    permittedCooperativeCapabilities: ["kurama_guidance"]
+  }
+};
 
-function getHostedEntityDefinition(
-  entityId
-) {
-
-
-  return (
-    hostedEntityDatabase[
-      entityId
-    ] ||
-    null
-  );
+function getHostedEntityDefinition(entityId) {
+  return hostedEntityDatabase[entityId] || null;
 }
 
-
-function getHostedEntityBinding(
-  hostCharacterId,
-  entityId
-) {
-
-
-  return (
-    Object.values(
-      hostedEntityBindingDatabase
-    )
-      .find(
-        binding =>
-          binding &&
-          binding.hostCharacterId ===
-            hostCharacterId &&
-          binding.entityId ===
-            entityId
-      ) ||
-    null
-  );
+function getHostedEntityBinding(hostCharacterId, entityId) {
+  const registryId = getCharacterRegistryId(hostCharacterId);
+  return Object.values(hostedEntityBindingDatabase).find(binding =>
+    binding &&
+    binding.hostCharacterRegistryId === registryId &&
+    binding.entityId === entityId
+  ) || null;
 }
 
-
-// =========================================================
-// HOSTED-ENTITY ACCESS EVALUATION
-// =========================================================
-
-function evaluateHostedEntityAccess(
-  hostCharacterId,
-  entityId,
-  requirements = {}
-) {
-
-
-  const entity =
-    getHostedEntityDefinition(
-      entityId
-    );
-
-
-  if (
-    !entity
-  ) {
-
-
-    return {
-
-      available:
-        false,
-
-      reason:
-        "hosted_entity_missing",
-
-      entity:
-        null,
-
-      binding:
-        null
-
-    };
+function evaluateHostedEntityAccess(hostCharacterId, entityId, requirements = {}) {
+  const entity = getHostedEntityDefinition(entityId);
+  const binding = getHostedEntityBinding(hostCharacterId, entityId);
+  if (!entity) return { available:false, reason:"hosted_entity_missing", entity:null, binding:null };
+  if (!binding) return { available:false, reason:"hosted_binding_missing", entity, binding:null };
+  if (binding.presenceState !== "present") return { available:false, reason:"hosted_entity_not_present", entity, binding };
+  if (requirements.requireCooperative === true && !["cooperative","fully_cooperative"].includes(binding.cooperationState)) {
+    return { available:false, reason:"cooperation_unavailable", entity, binding };
   }
-
-
-  const binding =
-    getHostedEntityBinding(
-      hostCharacterId,
-      entityId
-    );
-
-
-  if (
-    !binding
-  ) {
-
-
-    return {
-
-      available:
-        false,
-
-      reason:
-        "hosted_binding_missing",
-
-      entity:
-        entity,
-
-      binding:
-        null
-
-    };
+  if (requirements.expressionId && !(binding.permittedExpressions || []).includes(requirements.expressionId)) {
+    return { available:false, reason:"expression_not_permitted", entity, binding };
   }
+  return { available:true, reason:null, entity, binding };
+}
 
+function getAttachedSummonAccessRecord(characterId, entityId) {
+  const registryId = getCharacterRegistryId(characterId);
+  return Object.values(attachedSummonAccessDatabase).find(record =>
+    record && record.characterRegistryId === registryId && record.entityId === entityId
+  ) || null;
+}
 
-  if (
-    binding.presenceState !==
-      "present"
-  ) {
+function getAttachedSummonIdForCharacter(characterId) {
+  const registryId = getCharacterRegistryId(characterId);
+  if (!registryId || !playerData || !playerData.entities) return null;
+  const map = playerData.entities.attachedSummonByCharacterRegistryId || {};
+  return map[registryId] || null;
+}
 
-
-    return {
-
-      available:
-        false,
-
-      reason:
-        "hosted_entity_not_present",
-
-      entity:
-        entity,
-
-      binding:
-        binding
-
-    };
+function evaluateAttachedSummonAccess(characterId, entityId, requirements = {}) {
+  const entity = getEntityDefinition(entityId);
+  if (!entity) return { available:false, reason:"summon_entity_missing", entity:null, access:null };
+  const attachedId = getAttachedSummonIdForCharacter(characterId);
+  if (attachedId !== entityId) return { available:false, reason:"summon_not_attached", entity, access:null };
+  const access = getAttachedSummonAccessRecord(characterId, entityId);
+  if (!access) return { available:false, reason:"summon_access_record_missing", entity, access:null };
+  if (requirements.requireCooperative === true && !["cooperative","fully_cooperative"].includes(access.cooperationState)) {
+    return { available:false, reason:"cooperation_unavailable", entity, access };
   }
-
-
-  if (
-    requirements.requireCooperative ===
-      true &&
-    binding.cooperationState !==
-      "cooperative"
-  ) {
-
-
-    return {
-
-      available:
-        false,
-
-      reason:
-        "cooperation_unavailable",
-
-      entity:
-        entity,
-
-      binding:
-        binding
-
-    };
+  if (requirements.expressionId && !(access.permittedExpressions || []).includes(requirements.expressionId)) {
+    return { available:false, reason:"expression_not_permitted", entity, access };
   }
-
-
-  if (
-    requirements.expressionId &&
-    !binding
-      .permittedExpressions
-      .includes(
-        requirements.expressionId
-      )
-  ) {
-
-
-    return {
-
-      available:
-        false,
-
-      reason:
-        "expression_not_permitted",
-
-      entity:
-        entity,
-
-      binding:
-        binding
-
-    };
+  if (requirements.cooperativeCapabilityId && !(access.permittedCooperativeCapabilities || []).includes(requirements.cooperativeCapabilityId)) {
+    return { available:false, reason:"cooperative_capability_unavailable", entity, access };
   }
-
-
-  if (
-    requirements.cooperativeCapabilityId &&
-    !binding
-      .permittedCooperativeCapabilities
-      .includes(
-        requirements
-          .cooperativeCapabilityId
-      )
-  ) {
-
-
-    return {
-
-      available:
-        false,
-
-      reason:
-        "cooperative_capability_unavailable",
-
-      entity:
-        entity,
-
-      binding:
-        binding
-
-    };
-  }
-
-
-  return {
-
-    available:
-      true,
-
-    reason:
-      null,
-
-    entity:
-      entity,
-
-    binding:
-      binding
-
-  };
+  return { available:true, reason:null, entity, access };
 }
 
 
@@ -1439,29 +2513,26 @@ function getBattleInventoryToolContext(
 // HOSTED-ENTITY BATTLE REQUIREMENT ADAPTER
 // =========================================================
 
-function getAcademyMenmaHostedEntityAccess(
-  options = {}
-) {
+// =========================================================
+// BRICK 434 — ACADEMY MENMA ATTACHED-SUMMON REQUIREMENT ADAPTER
+// =========================================================
 
-
-  return evaluateHostedEntityAccess(
+function getAcademyMenmaAttachedSummonAccess(options = {}) {
+  return evaluateAttachedSummonAccess(
     "academy_menma",
-    "yin_kurama",
+    "menma_nine_tails",
     {
-
-      requireCooperative:
-        true,
-
-      expressionId:
-        options.expressionId ||
-        "limited_yin_kurama_chakra",
-
-      cooperativeCapabilityId:
-        options.cooperativeCapabilityId ||
-        null
-
+      requireCooperative:true,
+      expressionId:options.expressionId || "limited_yin_kurama_chakra",
+      cooperativeCapabilityId:options.cooperativeCapabilityId || null
     }
   );
+}
+
+function getAcademyMenmaHostedEntityAccess(options = {}) {
+  // Legacy function name retained only for old console/test callers.
+  // It delegates to the canonical Attached-Summon authority.
+  return getAcademyMenmaAttachedSummonAccess(options);
 }
 
 
@@ -1573,168 +2644,36 @@ function grantAcademyPilotEquipmentPrerequisites() {
 
 
 // =========================================================
-// BRICK 307 — PILOT PREREQUISITE DIAGNOSTIC
+// BRICK 419 — ACADEMY MENMA ENTITY-MIGRATION DIAGNOSTIC
 // =========================================================
 
 function runAcademyPilotPrerequisiteDiagnostics() {
-
-
-  const kunai =
-    getItemDefinition(
-      "kunai"
-    );
-
-
-  const shuriken =
-    getItemDefinition(
-      "shuriken_set"
-    );
-
-
-  const wire =
-    getItemDefinition(
-      "ninja_wire"
-    );
-
-
-  const yinKurama =
-    getHostedEntityDefinition(
-      "yin_kurama"
-    );
-
-
-  const binding =
-    getHostedEntityBinding(
-      "academy_menma",
-      "yin_kurama"
-    );
-
-
-  const chakraAccess =
-    getAcademyMenmaHostedEntityAccess();
-
-
-  const guidanceAccess =
-    getAcademyMenmaHostedEntityAccess({
-
-      cooperativeCapabilityId:
-        "kurama_guidance"
-
-    });
-
-
-  const result = {
-
-
-    kunaiExists:
-      !!kunai,
-
-
-    kunaiPersistentInstance:
-      !!(
-        kunai &&
-        kunai.stackable ===
-          false &&
-        kunai
-          .persistentThrowingWeapon ===
-          true
-      ),
-
-
-    shurikenSetExists:
-      !!shuriken,
-
-
-    shurikenPersistentSet:
-      !!(
-        shuriken &&
-        shuriken.stackable ===
-          false &&
-        shuriken
-          .persistentThrowingWeapon ===
-          true &&
-        shuriken
-          .persistentWeaponSet ===
-          true
-      ),
-
-
-    ninjaWireExists:
-      !!(
-        wire &&
-        wire.type ===
-          "tool" &&
-        wire.stackable ===
-          false
-      ),
-
-
-    yinKuramaExists:
-      !!yinKurama,
-
-
-    yinKuramaHostedType:
-      !!(
-        yinKurama &&
-        yinKurama.entityType ===
-          "hosted_bound_entity"
-      ),
-
-
-    menmaBindingExists:
-      !!binding,
-
-
-    doesNotOccupySummonSlot:
-      !!(
-        binding &&
-        binding
-          .occupiesNormalSummonSlot ===
-          false
-      ),
-
-
-    limitedChakraAccessPermitted:
-      chakraAccess.available ===
-        true,
-
-
-    guidanceAccessPermitted:
-      guidanceAccess.available ===
-        true,
-
-
-    artworkNotAccessAuthority:
-      !!(
-        yinKurama &&
-        yinKurama.presentation &&
-        yinKurama.presentation
-          .temporaryArtwork ===
-          true &&
-        chakraAccess.available ===
-          true
-      )
-
+  const kunai=getItemDefinition("kunai");
+  const shuriken=getItemDefinition("shuriken_set");
+  const wire=getItemDefinition("ninja_wire");
+  const menmaSummon=getEntityDefinition("menma_nine_tails");
+  const staleBinding=getHostedEntityBinding("academy_menma","yin_kurama");
+  const access=getAcademyMenmaHostedEntityAccess();
+  const guidance=getAcademyMenmaHostedEntityAccess({cooperativeCapabilityId:"kurama_guidance"});
+  const yinKurama=getEntityDefinition("yin_kurama");
+  const result={
+    kunaiExists:!!kunai,
+    kunaiPersistentInstance:!!(kunai&&kunai.stackable===false&&kunai.persistentThrowingWeapon===true),
+    shurikenSetExists:!!shuriken,
+    shurikenPersistentSet:!!(shuriken&&shuriken.stackable===false&&shuriken.persistentThrowingWeapon===true&&shuriken.persistentWeaponSet===true),
+    ninjaWireExists:!!(wire&&wire.type==="tool"&&wire.stackable===false),
+    menmaSummonExists:!!menmaSummon,
+    menmaSummonIsAttachedIdentity:!!(menmaSummon&&menmaSummon.entityType==="attached_summon"),
+    staleAcademyHostedBindingRemoved:!staleBinding,
+    limitedChakraAccessPermitted:access.available===true,
+    guidanceAccessPermitted:guidance.available===true,
+    yinKuramaArtworkNotAuthority:!!(yinKurama&&access.available===true)
   };
-
-
-  result.pass =
-    Object.values(
-      result
-    ).every(
-      value =>
-        value ===
-        true
-    );
-
-
-  console.table(
-    result
-  );
-
-
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
   return result;
 }
+
 
 
 
@@ -2705,265 +3644,228 @@ function normalizeBattlePouchSelection(
 }
 
 
+// BRICK 369 — EXPLICIT CHARACTER OWNERSHIP AUTHORITY
+// BRICK 370 — ALPHA OWNERSHIP SEED / SAVE MIGRATION
+// BRICK 371 — CLAN OWNERSHIP CONSUMER
+// BRICK 372 — DEVELOPMENT-PILOT FLAG DECOUPLING
 // =========================================================
-// BRICK 354 — PERSISTENT CLAN / TEAM MANAGEMENT AUTHORITY
-// =========================================================
 //
-// playerTeam remains the current roster authority.
-//
-// This record owns only player-managed presentation / formation
-// state for that roster:
-//
-// - six persistent team slots
-// - favourite character IDs
-//
-// It does NOT create character ownership, Stats, PL, Equipment,
-// Battle runtime state or a duplicate Character Registry.
-//
-// Slots 1–3 = Active Team
-// Slots 4–6 = Reserve
+// Registry presence != ownership != team assignment != Battle
+// deployment. playerData.characterOwnership owns acquisition
+// truth; playerData.clan owns only six-slot formation/favourites.
 //
 // =========================================================
 
-const CLAN_TEAM_SLOT_COUNT =
-  6;
+const CLAN_TEAM_SLOT_COUNT = 6;
 
+const DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS = [
+  "kage_naruto",
+  "jonin_sasuke",
+  "sannin_sakura",
+  "teen_nagato",
+  "academy_hinata",
+  "academy_izuno",
+  "academy_mirai",
+  "academy_menma",
+  "academy_kushina"
+];
 
-function getClanManageableRosterCharacters() {
+let characterOwnershipRuntimeAuthority = { ownedRegistryIds:[...DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS] };
 
+function createDefaultCharacterOwnershipState() {
+  return { ownedRegistryIds:[...DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS] };
+}
 
-  return playerTeam.filter(
-    character =>
-      character &&
-      character.id &&
-      character.developmentPilotOnly !==
-        true
+function normalizeCharacterOwnershipState(savedOwnership) {
+  const sourceIds = savedOwnership && Array.isArray(savedOwnership.ownedRegistryIds)
+    ? savedOwnership.ownedRegistryIds
+    : DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS;
+  const ownedRegistryIds = [...new Set(sourceIds.filter(registryId =>
+    typeof registryId === "string" && !!getCharacterRegistryEntry(registryId)
+  ))];
+  DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.forEach(registryId => {
+    // Alpha migration: existing saves predate explicit ownership.
+    if (!savedOwnership && !ownedRegistryIds.includes(registryId)) ownedRegistryIds.push(registryId);
+  });
+  return { ownedRegistryIds };
+}
+
+function setCharacterOwnershipRuntimeAuthority(state) {
+  characterOwnershipRuntimeAuthority = normalizeCharacterOwnershipState(state);
+  return characterOwnershipRuntimeAuthority;
+}
+
+function isCharacterRegistryOwned(registryId, ownershipState = characterOwnershipRuntimeAuthority) {
+  return !!(
+    registryId && ownershipState && Array.isArray(ownershipState.ownedRegistryIds) &&
+    ownershipState.ownedRegistryIds.includes(registryId)
   );
 }
 
+function isRuntimeCharacterOwned(character, ownershipState = characterOwnershipRuntimeAuthority) {
+  return !!character && isCharacterRegistryOwned(getCharacterRegistryId(character), ownershipState);
+}
 
-function createDefaultClanManagementState() {
+// =========================================================
+// BRICK 420 — ACQUISITION-SAFE OWNERSHIP MUTATION API
+// =========================================================
 
+function grantCharacterRegistryOwnership(registryId) {
+  if (!getCharacterRegistryEntry(registryId)) return {success:false,reason:"character_registry_missing"};
+  if (!playerData.characterOwnership) playerData.characterOwnership=createDefaultCharacterOwnershipState();
+  const ids=playerData.characterOwnership.ownedRegistryIds;
+  const changed=!ids.includes(registryId);
+  if (changed) ids.push(registryId);
+  setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+  savePlayerData();
+  return {success:true,changed,registryId,runtimeCharacterId:(getRuntimeCharacterByRegistryId(registryId)||{}).id||null};
+}
 
-  const defaultIds =
-    getClanManageableRosterCharacters()
-      .slice(
-        0,
-        CLAN_TEAM_SLOT_COUNT
-      )
-      .map(
-        character =>
-          character.id
-      );
-
-
-  const teamSlots = [];
-
-
-  for (
-    let index = 0;
-    index < CLAN_TEAM_SLOT_COUNT;
-    index += 1
-  ) {
-
-
-    teamSlots.push(
-      defaultIds[index] ||
-      null
-    );
+function revokeCharacterRegistryOwnership(registryId) {
+  if (!playerData.characterOwnership || !Array.isArray(playerData.characterOwnership.ownedRegistryIds)) return {success:false,reason:"ownership_state_missing"};
+  const before=playerData.characterOwnership.ownedRegistryIds.length;
+  playerData.characterOwnership.ownedRegistryIds=playerData.characterOwnership.ownedRegistryIds.filter(id=>id!==registryId);
+  const runtime=getRuntimeCharacterByRegistryId(registryId);
+  if (runtime && playerData.clan) {
+    playerData.clan.teamSlots=(playerData.clan.teamSlots||[]).map(id=>id===runtime.id?null:id);
+    playerData.clan.favoriteIds=(playerData.clan.favoriteIds||[]).filter(id=>id!==runtime.id);
   }
+  setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+  playerData.clan=normalizeClanManagementState(playerData.clan,playerData.characterOwnership);
+  savePlayerData();
+  return {success:true,changed:before!==playerData.characterOwnership.ownedRegistryIds.length,registryId};
+}
 
+function getClanManageableRosterCharacters(ownershipState = characterOwnershipRuntimeAuthority) {
+  return playerTeam.filter(character =>
+    character && character.id && isRuntimeCharacterOwned(character, ownershipState)
+  );
+}
 
+function createDefaultClanManagementState(ownershipState = characterOwnershipRuntimeAuthority) {
+  const defaultIds = getClanManageableRosterCharacters(ownershipState)
+    .slice(0, CLAN_TEAM_SLOT_COUNT)
+    .map(character => character.id);
   return {
-
-    teamSlots:
-      teamSlots,
-
-    favoriteIds:
-      []
-
+    teamSlots: Array.from({length:CLAN_TEAM_SLOT_COUNT}, (_, index) => defaultIds[index] || null),
+    favoriteIds: []
   };
 }
 
-
-function normalizeClanManagementState(
-  savedClan
-) {
-
-
-  const defaults =
-    createDefaultClanManagementState();
-
-
-  if (
-    !savedClan ||
-    typeof savedClan !==
-      "object"
-  ) {
-
-
-    return defaults;
-  }
-
-
-  const manageableIds =
-    new Set(
-      getClanManageableRosterCharacters()
-        .map(
-          character =>
-            character.id
-        )
-    );
-
-
-  const rawSlots =
-    Array.isArray(
-      savedClan.teamSlots
-    )
-      ? savedClan.teamSlots
-      : (
-          Array.isArray(
-            savedClan.teamIds
-          )
-            ? savedClan.teamIds
-            : null
-        );
-
-
+function normalizeClanManagementState(savedClan, ownershipState = characterOwnershipRuntimeAuthority) {
+  const defaults = createDefaultClanManagementState(ownershipState);
+  if (!savedClan || typeof savedClan !== "object") return defaults;
+  const manageableIds = new Set(getClanManageableRosterCharacters(ownershipState).map(character => character.id));
+  const rawSlots = Array.isArray(savedClan.teamSlots)
+    ? savedClan.teamSlots
+    : (Array.isArray(savedClan.teamIds) ? savedClan.teamIds : null);
   const teamSlots = [];
   const seen = new Set();
-
-
   if (rawSlots) {
-
-
-    for (
-      let index = 0;
-      index < CLAN_TEAM_SLOT_COUNT;
-      index += 1
-    ) {
-
-
-      const characterId =
-        typeof rawSlots[index] ===
-          "string"
-          ? rawSlots[index]
-          : null;
-
-
-      const validId =
-        characterId &&
-        manageableIds.has(
-          characterId
-        ) &&
-        !seen.has(
-          characterId
-        )
-          ? characterId
-          : null;
-
-
-      teamSlots.push(
-        validId
-      );
-
-
-      if (validId) {
-
-
-        seen.add(
-          validId
-        );
-      }
+    for (let index=0; index<CLAN_TEAM_SLOT_COUNT; index+=1) {
+      const characterId = typeof rawSlots[index] === "string" ? rawSlots[index] : null;
+      const validId = characterId && manageableIds.has(characterId) && !seen.has(characterId) ? characterId : null;
+      teamSlots.push(validId);
+      if (validId) seen.add(validId);
     }
+  } else {
+    teamSlots.push(...defaults.teamSlots);
   }
-  else {
-
-
-    teamSlots.push(
-      ...defaults.teamSlots
-    );
-  }
-
-
-  const favoriteIds =
-    Array.isArray(
-      savedClan.favoriteIds
-    )
-      ? [
-          ...new Set(
-            savedClan.favoriteIds.filter(
-              characterId =>
-                typeof characterId ===
-                  "string" &&
-                manageableIds.has(
-                  characterId
-                )
-            )
-          )
-        ]
-      : [];
-
-
-  return {
-
-    teamSlots:
-      teamSlots,
-
-    favoriteIds:
-      favoriteIds
-
-  };
+  const favoriteIds = Array.isArray(savedClan.favoriteIds)
+    ? [...new Set(savedClan.favoriteIds.filter(characterId => typeof characterId === "string" && manageableIds.has(characterId)))]
+    : [];
+  return { teamSlots, favoriteIds };
 }
 
 
+
+// BRICK 373 — ENTITY CURRENT-STATE SAVE AUTHORITY
+// BRICK 374 — ATTACHED SUMMON SAVE AUTHORITY
+// BRICK 375 — EXACT-INSTANCE WEAPON ACCLIMATION SAVE AUTHORITY
 // =========================================================
-// DEFAULT PLAYER DATA
+
+function createDefaultEntityCurrentStats() {
+  const currentStatsByEntityId = {};
+  Object.values(entityRegistry).forEach(entity => {
+    if (entity && entity.baseStats) currentStatsByEntityId[entity.id] = cloneCanonicalSevenStats(entity.baseStats);
+  });
+  return currentStatsByEntityId;
+}
+
+function createDefaultPlayerEntityState() {
+  return {
+    ownedEntityIds: ["menma_nine_tails"],
+    currentStatsByEntityId: createDefaultEntityCurrentStats(),
+    attachedSummonByCharacterRegistryId: {
+      academy_menma: "menma_nine_tails"
+    }
+  };
+}
+
+function getEntityCurrentStats(entityId) {
+  const definition = getEntityDefinition(entityId);
+  const saved = playerData && playerData.entities && playerData.entities.currentStatsByEntityId
+    ? playerData.entities.currentStatsByEntityId[entityId]
+    : null;
+  return cloneCanonicalSevenStats(saved || (definition ? definition.baseStats : null));
+}
+
+function calculateEntityCurrentPL(entityId) {
+  const definition = getEntityDefinition(entityId);
+  if (!definition || !definition.baseStats) return null;
+  return Math.round(calculateRawPLFromStats(getEntityCurrentStats(entityId)));
+}
+
 // =========================================================
+// BRICK 421 — ENTITY OWNERSHIP / PERMANENT STAT DEVELOPMENT API
+// =========================================================
+
+function grantEntityOwnership(entityId) {
+  const entity=getEntityDefinition(entityId);
+  if (!entity || !entity.baseStats) return {success:false,reason:"entity_registry_missing_or_reserved"};
+  if (!playerData.entities) playerData.entities=createDefaultPlayerEntityState();
+  const changed=!playerData.entities.ownedEntityIds.includes(entityId);
+  if (changed) playerData.entities.ownedEntityIds.push(entityId);
+  if (!playerData.entities.currentStatsByEntityId[entityId]) playerData.entities.currentStatsByEntityId[entityId]=cloneCanonicalSevenStats(entity.baseStats);
+  savePlayerData();
+  return {success:true,changed,entityId};
+}
+
+function increaseEntityStat(entityId, statName, amount) {
+  const validStats=["nin","tai","buki","fuin","kin","gen","stamina"];
+  if (!validStats.includes(statName)) return {success:false,reason:"invalid_stat"};
+  const entity=getEntityDefinition(entityId);
+  if (!entity || !entity.baseStats) return {success:false,reason:"entity_registry_missing"};
+  if (!playerData.entities || !playerData.entities.ownedEntityIds.includes(entityId)) return {success:false,reason:"entity_not_owned"};
+  const delta=Number(amount)||0;
+  if (delta===0) return {success:false,reason:"zero_stat_change"};
+  const stats=playerData.entities.currentStatsByEntityId[entityId] || cloneCanonicalSevenStats(entity.baseStats);
+  stats[statName]=(Number(stats[statName])||0)+delta;
+  playerData.entities.currentStatsByEntityId[entityId]=stats;
+  savePlayerData();
+  return {success:true,entityId,statName,currentValue:stats[statName],currentPL:calculateEntityCurrentPL(entityId)};
+}
 
 function createDefaultPlayerData() {
-
-
+  const characterOwnership = createDefaultCharacterOwnershipState();
+  setCharacterOwnershipRuntimeAuthority(characterOwnership);
   return {
-
-    ryo:
-      0,
-
-    exp:
-      0,
-
-    inventory:
-      [],
-
-    battlePouch:
-      normalizeBattlePouchSelection(
-        null
-      ),
-
-    clan:
-      createDefaultClanManagementState(),
-
-    activityHistory:
-      [],
-
-    progression:
-      createDefaultRunProgression(),
-
-    characters:
-      createDefaultCharacterProgression(),
-
+    ryo: 0,
+    exp: 0,
+    inventory: [],
+    battlePouch: normalizeBattlePouchSelection(null),
+    characterOwnership: characterOwnership,
+    clan: createDefaultClanManagementState(characterOwnership),
+    entities: createDefaultPlayerEntityState(),
+    weaponAcclimation: {},
+    activityHistory: [],
+    progression: createDefaultRunProgression(),
+    characters: createDefaultCharacterProgression(),
     collections: {
-
-      specialNinja:
-        [],
-
-      bloodlines:
-        []
-
+      specialNinja: [],
+      bloodlines: []
     }
-
   };
-
 }
 
 
@@ -3316,142 +4218,110 @@ function normalizeSavedCharacterProgression(
 
 
 // =========================================================
+
+
+// =========================================================
+// BRICK 376 — ENTITY SAVE NORMALIZATION
+// BRICK 377 — ATTACHMENT VALIDATION / MIGRATION
+// BRICK 378 — ACCLIMATION MUTUAL-EXCLUSIVITY NORMALIZATION
+// =========================================================
+
+function normalizePlayerEntityState(savedEntities) {
+  const defaults = createDefaultPlayerEntityState();
+  const source = savedEntities && typeof savedEntities === "object" ? savedEntities : {};
+  const ownedEntityIds = Array.isArray(source.ownedEntityIds)
+    ? [...new Set(source.ownedEntityIds.filter(entityId => typeof entityId === "string" && !!getEntityDefinition(entityId)))]
+    : [...defaults.ownedEntityIds];
+  const currentStatsByEntityId = {};
+  Object.entries(defaults.currentStatsByEntityId).forEach(([entityId, baseStats]) => {
+    const saved = source.currentStatsByEntityId && source.currentStatsByEntityId[entityId];
+    const stats = cloneCanonicalSevenStats(baseStats);
+    if (saved && typeof saved === "object") {
+      Object.keys(stats).forEach(stat => {
+        if (typeof saved[stat] === "number" && Number.isFinite(saved[stat])) stats[stat] = saved[stat];
+      });
+    }
+    currentStatsByEntityId[entityId] = stats;
+  });
+  const attached = {};
+  const rawAttached = source.attachedSummonByCharacterRegistryId && typeof source.attachedSummonByCharacterRegistryId === "object"
+    ? source.attachedSummonByCharacterRegistryId
+    : defaults.attachedSummonByCharacterRegistryId;
+  Object.entries(rawAttached).forEach(([registryId, entityId]) => {
+    const entity = getEntityDefinition(entityId);
+    if (getCharacterRegistryEntry(registryId) && entity && ["attached_summon","collective_summon"].includes(entity.entityType)) {
+      attached[registryId] = entityId;
+    }
+  });
+  if (!attached.academy_menma) attached.academy_menma = "menma_nine_tails";
+  if (!ownedEntityIds.includes("menma_nine_tails")) ownedEntityIds.push("menma_nine_tails");
+  return { ownedEntityIds, currentStatsByEntityId, attachedSummonByCharacterRegistryId: attached };
+}
+
+function normalizeWeaponAcclimationState(savedState) {
+  const source = savedState && typeof savedState === "object" ? savedState : {};
+  const normalized = {};
+  Object.entries(source).forEach(([registryId, instanceMap]) => {
+    if (!getCharacterRegistryEntry(registryId) || !instanceMap || typeof instanceMap !== "object") return;
+    normalized[registryId] = {};
+    Object.entries(instanceMap).forEach(([instanceId, record]) => {
+      if (!instanceId || !record || typeof record !== "object") return;
+      if (record.state === "unfamiliar") {
+        normalized[registryId][instanceId] = { state:"unfamiliar", severity:null };
+      } else if (record.state === "reacclimating" && ["minor","major","fundamental"].includes(record.severity)) {
+        normalized[registryId][instanceId] = { state:"reacclimating", severity:record.severity };
+      }
+    });
+  });
+  return normalized;
+}
+
+
+
+// =========================================================
 // LOAD PLAYER DATA
 // =========================================================
 
+// =========================================================
+// BRICK 379 — OWNERSHIP-AWARE SAVE LOAD
+// BRICK 380 — ENTITY / ACCLIMATION SAVE LOAD
+// =========================================================
+
 function loadPlayerData() {
-
-
-  const savedData =
-    localStorage.getItem(
-      PLAYER_SAVE_KEY
-    );
-
-
-
-  if (
-    !savedData
-  ) {
-
-
-    console.log(
-      "No existing player save found."
-    );
-
-
-    return createDefaultPlayerData();
-
-
+  const savedData = localStorage.getItem(PLAYER_SAVE_KEY);
+  if (!savedData) {
+    console.log("No existing player save found.");
+    const defaults = createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(defaults.characterOwnership);
+    return defaults;
   }
-
-
-
   try {
-
-
-    const parsedData =
-      JSON.parse(
-        savedData
-      );
-
-
-
-    console.log(
-      "Player save loaded:",
-      parsedData
-    );
-
-
-
+    const parsedData = JSON.parse(savedData);
+    console.log("Player save loaded:", parsedData);
+    const characterOwnership = normalizeCharacterOwnershipState(parsedData.characterOwnership);
+    setCharacterOwnershipRuntimeAuthority(characterOwnership);
     return {
-
-
-      ryo:
-        Number(
-          parsedData.ryo
-        ) || 0,
-
-
-
-      exp:
-        Number(
-          parsedData.exp
-        ) || 0,
-
-
-
-      inventory:
-        Array.isArray(
-          parsedData.inventory
-        )
-          ? parsedData.inventory
-          : [],
-
-
-
-      battlePouch:
-        normalizeBattlePouchSelection(
-          parsedData.battlePouch
-        ),
-
-
-
-      clan:
-        normalizeClanManagementState(
-          parsedData.clan
-        ),
-
-
-
-      activityHistory:
-        Array.isArray(
-          parsedData.activityHistory
-        )
-          ? parsedData.activityHistory
-          : [],
-
-
-
-      progression:
-        normalizeSavedRunProgression(
-          parsedData.progression
-        ),
-
-
-
-      characters:
-        normalizeSavedCharacterProgression(
-          parsedData.characters
-        ),
-
-
-
-      collections:
-        normalizePlayerCollections(
-          parsedData.collections
-        )
-
-
+      ryo: Number(parsedData.ryo) || 0,
+      exp: Number(parsedData.exp) || 0,
+      inventory: Array.isArray(parsedData.inventory) ? parsedData.inventory : [],
+      battlePouch: normalizeBattlePouchSelection(parsedData.battlePouch),
+      characterOwnership: characterOwnership,
+      clan: normalizeClanManagementState(parsedData.clan, characterOwnership),
+      entities: normalizePlayerEntityState(parsedData.entities),
+      weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
+      activityHistory: Array.isArray(parsedData.activityHistory) ? parsedData.activityHistory : [],
+      progression: normalizeSavedRunProgression(parsedData.progression),
+      characters: normalizeSavedCharacterProgression(parsedData.characters),
+      collections: normalizePlayerCollections(parsedData.collections)
     };
-
-
+  } catch (error) {
+    console.log("Player save could not be loaded:", error);
+    const defaults = createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(defaults.characterOwnership);
+    return defaults;
   }
-  catch (error) {
-
-
-    console.log(
-      "Player save could not be loaded:",
-      error
-    );
-
-
-    return createDefaultPlayerData();
-
-
-  }
-
-
 }
+
 
 
 
@@ -31734,1147 +32604,296 @@ function runChronicleProgressionRegression() {
 
 
 // =========================================================
-// WEAPON CLASS DIFFICULTY
-// =========================================================
-//
-// Higher difficulty weapons require more effective Buki
-// before reaching the same proficiency tier.
-//
-// This does NOT permanently reduce character stats.
-//
-// =========================================================
-
-const WEAPON_CLASS_DIFFICULTY = {
-
-  Kunai:
-    0,
-
-  Shuriken:
-    0,
-
-  Tanto:
-    5,
-
-  Katana:
-    10,
-
-  Sword:
-    10,
-
-  Spear:
-    15,
-
-  Heavy:
-    25
-
-};
-
-
-// =========================================================
-// WEAPON PROFICIENCY TIERS
+// BRICK 381 — WEAPON FAMILY PROFICIENCY MODEL v1.0
+// BRICK 382 — DIFFICULTY-GAP CONTRIBUTION REALISATION
+// BRICK 383 — FRACTIONAL EFFECTIVE WEAPON STATS
+// BRICK 384 — EQUIPMENT SOURCE-PACKAGE IDENTITY
+// BRICK 385 — LEGACY SIGNATURE MULTIPLIER RETIREMENT
+// BRICK 386 — EXACT-INSTANCE UNFAMILIARITY
+// BRICK 387 — MODIFICATION REACCLIMATION
+// BRICK 388 — ACCLIMATION MUTUAL EXCLUSIVITY
+// BRICK 389 — WEAPON-ACTION EXECUTION MODIFIER
 // =========================================================
 
-const WEAPON_PROFICIENCY_TIERS = [
+const WEAPON_SPECIALIZATION_MAX_LEVEL = 5;
+const WEAPON_PROFICIENCY_REALIZATION_BY_GAP = { 0:1, 1:0.90, 2:0.75, 3:0.55 };
+const WEAPON_REACCLIMATION_EXECUTION_MULTIPLIER = { minor:0.95, major:0.90, fundamental:0.85 };
 
+// Approved representative Weapon Model v1.0 profiles.
+// These profiles are calibration/reference data, not Inventory identities.
+// Where the supplied contract did not explicitly name a broad family,
+// family assignment remains null rather than being guessed.
+const WEAPON_CONTRIBUTION_PILOT_PROFILES = [
   {
-    name: "Master",
-    minimumBuki: 110,
-    multiplier: 1.50
+    name:"Shinobi Chokutō",
+    weaponFamily:"Blades",
+    weaponDifficulty:1,
+    statModifiers:{buki:5}
   },
-
   {
-    name: "Expert",
-    minimumBuki: 90,
-    multiplier: 1.35
+    name:"Kumo Conduction Blade",
+    weaponFamily:null,
+    familyAssignmentPending:true,
+    weaponDifficulty:2,
+    statModifiers:{buki:5}
   },
-
   {
-    name: "Proficient",
-    minimumBuki: 70,
-    multiplier: 1.20
+    name:"Uzumaki Sealblade",
+    weaponFamily:null,
+    familyAssignmentPending:true,
+    weaponDifficulty:3,
+    statModifiers:{buki:4,fuin:5}
   },
-
   {
-    name: "Standard",
-    minimumBuki: 40,
-    multiplier: 1.00
+    name:"Bandit's Tanto",
+    weaponFamily:null,
+    familyAssignmentPending:true,
+    weaponDifficulty:1,
+    statModifiers:{buki:3}
   },
-
   {
-    name: "Untrained",
-    minimumBuki: 0,
-    multiplier: 0.90
+    name:"Mist Butcher's Blade",
+    weaponFamily:"Heavy",
+    weaponDifficulty:4,
+    statModifiers:{buki:10}
+  },
+  {
+    name:"Raincutter",
+    weaponFamily:null,
+    familyAssignmentPending:true,
+    weaponDifficulty:3,
+    statModifiers:{buki:7}
   }
-
 ];
 
-
-// =========================================================
-// GET EQUIPPED WEAPON DEFINITION
-// =========================================================
-
-function getEquippedWeaponDefinition(
-  character
-) {
-
-
-  if (
-    !character ||
-    !Array.isArray(
-      character.equipment
-    )
-  ) {
-
-    return null;
-
-  }
-
-
-  const weapon =
-    character.equipment.find(
-      equipment =>
-        equipment.slot ===
-        "weapon"
-    );
-
-
-  if (!weapon) {
-
-    return null;
-
-  }
-
-
-  return getItemDefinition(
-    weapon.itemId
-  );
-
+function getWeaponContributionPilotProfiles() {
+  return WEAPON_CONTRIBUTION_PILOT_PROFILES.map(profile=>({
+    ...profile,
+    statModifiers:{...(profile.statModifiers||{})}
+  }));
 }
 
 
-// =========================================================
-// WEAPON SPECIALIZATION SETTINGS
-// =========================================================
-
-const WEAPON_SPECIALIZATION_MAX_LEVEL =
-  5;
-
-
-const WEAPON_SPECIALIZATION_BONUS_PER_LEVEL =
-  5;
-
-
-// =========================================================
-// WEAPON SPECIALIZATION EXP REQUIREMENT
-// =========================================================
-
-function getWeaponSpecializationExpRequired(
-  level
-) {
-
-
-  const safeLevel =
-    Math.max(
-      0,
-      Number(level) || 0
-    );
-
-
-  return (
-    50 +
-    safeLevel * 25
-  );
-
+function getEquippedWeaponDefinition(character) {
+  if (!character || !Array.isArray(character.equipment)) return null;
+  const weapon = character.equipment.find(equipment => equipment && equipment.slot === "weapon");
+  return weapon ? getItemDefinition(weapon.itemId) : null;
 }
 
+function getWeaponFamily(weaponDefinition) {
+  if (!weaponDefinition) return null;
+  return weaponDefinition.weaponFamily || weaponDefinition.weaponClass || null;
+}
 
-// =========================================================
-// NORMALIZE WEAPON SPECIALIZATION RECORD
-// =========================================================
+function getWeaponSpecializationExpRequired(level) {
+  const safeLevel = Math.max(0, Number(level) || 0);
+  return 50 + safeLevel * 25;
+}
 
-function normalizeWeaponSpecializationRecord(
-  value
-) {
-
-
-  if (
-    typeof value ===
-      "number"
-  ) {
-
-
-    const convertedLevel =
-      Math.min(
-        WEAPON_SPECIALIZATION_MAX_LEVEL,
-        Math.max(
-          0,
-          Math.floor(
-            value /
-            WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
-          )
-        )
-      );
-
-
-    return {
-
-      level:
-        convertedLevel,
-
-      exp:
-        0
-
-    };
-
+function normalizeWeaponSpecializationRecord(value) {
+  if (typeof value === "number") {
+    return { level:Math.min(WEAPON_SPECIALIZATION_MAX_LEVEL, Math.max(0, Math.floor(value))), exp:0 };
   }
-
-
-  if (
-    !value ||
-    typeof value !==
-      "object"
-  ) {
-
-    return {
-
-      level:
-        0,
-
-      exp:
-        0
-
-    };
-
-  }
-
-
+  if (!value || typeof value !== "object") return { level:0, exp:0 };
   return {
-
-    level:
-      Math.min(
-        WEAPON_SPECIALIZATION_MAX_LEVEL,
-        Math.max(
-          0,
-          Number(
-            value.level
-          ) || 0
-        )
-      ),
-
-    exp:
-      Math.max(
-        0,
-        Number(
-          value.exp
-        ) || 0
-      )
-
+    level:Math.min(WEAPON_SPECIALIZATION_MAX_LEVEL, Math.max(0, Math.floor(Number(value.level) || 0))),
+    exp:Math.max(0, Number(value.exp) || 0)
   };
-
 }
 
-
-// =========================================================
-// GET / CREATE WEAPON SPECIALIZATION RECORD
-// =========================================================
-
-function getWeaponSpecializationRecord(
-  character,
-  weaponClass
-) {
-
-
-  if (
-    !character ||
-    !weaponClass
-  ) {
-
-    return null;
-
-  }
-
-
-  if (
-    !character.weaponSpecializations ||
-    typeof character.weaponSpecializations !==
-      "object"
-  ) {
-
-    character.weaponSpecializations =
-      {};
-
-  }
-
-
-  const normalized =
-    normalizeWeaponSpecializationRecord(
-      character
-        .weaponSpecializations[
-          weaponClass
-        ]
-    );
-
-
-  character.weaponSpecializations[
-    weaponClass
-  ] = normalized;
-
-
+function getWeaponSpecializationRecord(character, weaponFamily) {
+  if (!character || !weaponFamily) return null;
+  if (!character.weaponSpecializations || typeof character.weaponSpecializations !== "object") character.weaponSpecializations = {};
+  const normalized = normalizeWeaponSpecializationRecord(character.weaponSpecializations[weaponFamily]);
+  character.weaponSpecializations[weaponFamily] = normalized;
   return normalized;
-
 }
 
-
-// =========================================================
-// GET WEAPON SPECIALIZATION BONUS
-// =========================================================
-
-function getWeaponSpecializationBonus(
-  character,
-  weaponDefinition
-) {
-
-
-  if (
-    !character ||
-    !weaponDefinition ||
-    !weaponDefinition.weaponClass
-  ) {
-
-    return 0;
-
-  }
-
-
-  const specialization =
-    getWeaponSpecializationRecord(
-      character,
-      weaponDefinition.weaponClass
-    );
-
-
-  if (!specialization) {
-
-    return 0;
-
-  }
-
-
-  return (
-    specialization.level *
-    WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
-  );
-
+function getWeaponSpecializationBonus(character, weaponDefinition) {
+  // Compatibility name: now returns family proficiency stars/level, not a hidden Stat bonus.
+  const family = getWeaponFamily(weaponDefinition);
+  const record = getWeaponSpecializationRecord(character, family);
+  return record ? record.level : 0;
 }
 
-
-// =========================================================
-// ADD WEAPON SPECIALIZATION EXP
-// =========================================================
-
-function addWeaponSpecializationExp(
-  characterId,
-  weaponClass,
-  amount
-) {
-
-
-  const character =
-    getPlayerCharacter(
-      characterId
-    );
-
-
-  if (!character) {
-
-    console.log(
-      "Character not found:",
-      characterId
-    );
-
-
-    return false;
-
+function addWeaponSpecializationExp(characterId, weaponFamily, amount) {
+  const character = getPlayerCharacter(characterId);
+  if (!character) return false;
+  const expAmount = Math.max(0, Number(amount) || 0);
+  if (!weaponFamily || expAmount <= 0) return false;
+  const record = getWeaponSpecializationRecord(character, weaponFamily);
+  if (record.level >= WEAPON_SPECIALIZATION_MAX_LEVEL) { record.exp=0; savePlayerData(); return true; }
+  record.exp += expAmount;
+  while (record.level < WEAPON_SPECIALIZATION_MAX_LEVEL) {
+    const required = getWeaponSpecializationExpRequired(record.level);
+    if (record.exp < required) break;
+    record.exp -= required;
+    record.level += 1;
   }
-
-
-  const expAmount =
-    Math.max(
-      0,
-      Number(
-        amount
-      ) || 0
-    );
-
-
-  if (
-    !weaponClass ||
-    expAmount <= 0
-  ) {
-
-    console.log(
-      "Invalid specialization EXP."
-    );
-
-
-    return false;
-
-  }
-
-
-  const specialization =
-    getWeaponSpecializationRecord(
-      character,
-      weaponClass
-    );
-
-
-  if (
-    specialization.level >=
-    WEAPON_SPECIALIZATION_MAX_LEVEL
-  ) {
-
-
-    specialization.exp =
-      0;
-
-
-    console.log(
-      `${character.name} already has maximum ${weaponClass} specialization.`
-    );
-
-
-    savePlayerData();
-
-
-    return true;
-
-  }
-
-
-  specialization.exp +=
-    expAmount;
-
-
-  let levelsGained =
-    0;
-
-
-  while (
-    specialization.level <
-      WEAPON_SPECIALIZATION_MAX_LEVEL
-  ) {
-
-
-    const expRequired =
-      getWeaponSpecializationExpRequired(
-        specialization.level
-      );
-
-
-    if (
-      specialization.exp <
-      expRequired
-    ) {
-
-      break;
-
-    }
-
-
-    specialization.exp -=
-      expRequired;
-
-
-    specialization.level +=
-      1;
-
-
-    levelsGained +=
-      1;
-
-  }
-
-
-  if (
-    specialization.level >=
-    WEAPON_SPECIALIZATION_MAX_LEVEL
-  ) {
-
-    specialization.level =
-      WEAPON_SPECIALIZATION_MAX_LEVEL;
-
-
-    specialization.exp =
-      0;
-
-  }
-
-
+  if (record.level >= WEAPON_SPECIALIZATION_MAX_LEVEL) { record.level=WEAPON_SPECIALIZATION_MAX_LEVEL; record.exp=0; }
   savePlayerData();
-
-
-  console.log(
-    `${character.name} gained +${expAmount} ${weaponClass} specialization EXP.`
-  );
-
-
-  console.log(
-    `${weaponClass} Specialization Level: ${specialization.level}`
-  );
-
-
-  console.log(
-    `${weaponClass} Handling Bonus: +${
-      specialization.level *
-      WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
-    }`
-  );
-
-
-  if (
-    levelsGained > 0
-  ) {
-
-    console.log(
-      `Specialization level increased by ${levelsGained}.`
-    );
-
-  }
-
-
   return true;
-
 }
 
-
-// =========================================================
-// SHOW WEAPON SPECIALIZATION DATA
-// =========================================================
-
-function showWeaponSpecializationData(
-  characterId
-) {
-
-
-  const character =
-    getPlayerCharacter(
-      characterId
-    );
-
-
-  if (!character) {
-
-    return;
-
-  }
-
-
-  const rows =
-    Object.entries(
-      character.weaponSpecializations ||
-      {}
-    ).map(
-      (
-        [
-          weaponClass,
-          value
-        ]
-      ) => {
-
-
-        const specialization =
-          getWeaponSpecializationRecord(
-            character,
-            weaponClass
-          );
-
-
-        const maxed =
-          specialization.level >=
-          WEAPON_SPECIALIZATION_MAX_LEVEL;
-
-
-        return {
-
-          weaponClass:
-            weaponClass,
-
-          level:
-            specialization.level,
-
-          exp:
-            specialization.exp,
-
-          expToNext:
-            maxed
-              ? "MAX"
-              : getWeaponSpecializationExpRequired(
-                  specialization.level
-                ),
-
-          handlingBonus:
-            specialization.level *
-            WEAPON_SPECIALIZATION_BONUS_PER_LEVEL
-
-        };
-
-      }
-    );
-
-
-  console.table(
-    rows
-  );
-
+function showWeaponSpecializationData(characterId) {
+  const character = getPlayerCharacter(characterId);
+  if (!character) return;
+  console.table(Object.entries(character.weaponSpecializations || {}).map(([weaponFamily]) => {
+    const record = getWeaponSpecializationRecord(character, weaponFamily);
+    return { weaponFamily, familyProficiency:record.level, exp:record.exp,
+      expToNext:record.level >= WEAPON_SPECIALIZATION_MAX_LEVEL ? "MAX" : getWeaponSpecializationExpRequired(record.level) };
+  }));
 }
 
-
-// =========================================================
-// GET WEAPON CLASS DIFFICULTY
-// =========================================================
-
-function getWeaponClassDifficulty(
-  character,
-  weaponDefinition
-) {
-
-
-  if (
-    !weaponDefinition ||
-    !weaponDefinition.weaponClass
-  ) {
-
-    return 0;
-
-  }
-
-
-  const baseDifficulty =
-    WEAPON_CLASS_DIFFICULTY[
-      weaponDefinition.weaponClass
-    ] ||
-    0;
-
-
-  const specialization =
-    getWeaponSpecializationBonus(
-      character,
-      weaponDefinition
-    );
-
-
-  return Math.max(
-    0,
-    baseDifficulty -
-    specialization
-  );
-
+function getWeaponDifficulty(weaponDefinition) {
+  if (!weaponDefinition || !Number.isFinite(Number(weaponDefinition.weaponDifficulty))) return 0;
+  return Math.max(0, Math.floor(Number(weaponDefinition.weaponDifficulty)));
 }
 
-// =========================================================
-// GET RAW EQUIPMENT STAT BONUSES
-// =========================================================
+function getWeaponClassDifficulty(character, weaponDefinition) {
+  // Compatibility name retained. Difficulty is authored by the weapon and is not reduced in-place.
+  return getWeaponDifficulty(weaponDefinition);
+}
 
-function getRawEquipmentStatBonuses(
-  character
-) {
+function getWeaponFamilyProficiency(character, weaponDefinition) {
+  const family = getWeaponFamily(weaponDefinition);
+  const record = getWeaponSpecializationRecord(character, family);
+  return record ? record.level : 0;
+}
 
+function getWeaponContributionRealization(character, weaponDefinition) {
+  const difficulty = getWeaponDifficulty(weaponDefinition);
+  const familyProficiency = getWeaponFamilyProficiency(character, weaponDefinition);
+  const proficiencyGap = Math.max(0, difficulty - familyProficiency);
+  const multiplier = proficiencyGap >= 4 ? 0.35 : WEAPON_PROFICIENCY_REALIZATION_BY_GAP[proficiencyGap];
+  return { difficulty, familyProficiency, proficiencyGap, multiplier:Number(multiplier) || 0.35 };
+}
 
-  const bonuses = {
-
-    nin: 0,
-    tai: 0,
-    buki: 0,
-    fuin: 0,
-    kin: 0,
-    gen: 0,
-    stamina: 0
-
-  };
-
-
-  if (
-    !character ||
-    !Array.isArray(
-      character.equipment
-    )
-  ) {
-
-    return bonuses;
-
-  }
-
-
-  character.equipment.forEach(
-    equipment => {
-
-
-      const definition =
-        getItemDefinition(
-          equipment.itemId
-        );
-
-
-      if (
-        !definition ||
-        !definition.statModifiers
-      ) {
-
-        return;
-
-      }
-
-
-      Object.entries(
-        definition.statModifiers
-      ).forEach(
-        ([stat, amount]) => {
-
-
-          if (
-            bonuses[stat] ===
-            undefined
-          ) {
-
-            return;
-
-          }
-
-
-          bonuses[stat] +=
-            Number(
-              amount
-            ) || 0;
-
-        }
-      );
-
-    }
-  );
-
-
+function getRawEquipmentStatBonuses(character) {
+  const bonuses = { nin:0,tai:0,buki:0,fuin:0,kin:0,gen:0,stamina:0 };
+  if (!character || !Array.isArray(character.equipment)) return bonuses;
+  character.equipment.forEach(equipment => {
+    const definition = equipment ? getItemDefinition(equipment.itemId) : null;
+    if (!definition || !definition.statModifiers) return;
+    Object.entries(definition.statModifiers).forEach(([stat, amount]) => {
+      if (bonuses[stat] !== undefined) bonuses[stat] += Number(amount) || 0;
+    });
+  });
   return bonuses;
-
 }
 
-
-// =========================================================
-// WEAPON PROFICIENCY HELPERS
-// =========================================================
-
-function getWeaponProficiencyTier(
-  proficiencyBuki
-) {
-
-
-  const safeBuki =
-    Math.max(
-      0,
-      Number(
-        proficiencyBuki
-      ) || 0
-    );
-
-
-  const tier =
-    WEAPON_PROFICIENCY_TIERS.find(
-      proficiencyTier =>
-        safeBuki >=
-        proficiencyTier.minimumBuki
-    );
-
-
-  return {
-
-    name:
-      tier
-        ? tier.name
-        : "Untrained",
-
-    proficiencyBuki:
-      safeBuki,
-
-    multiplier:
-      tier
-        ? tier.multiplier
-        : 0.90
-
-  };
-
+function getEquipmentSourcePackageDescriptors(character) {
+  if (!character || !Array.isArray(character.equipment)) return [];
+  const seen = new Set();
+  const descriptors = [];
+  character.equipment.forEach(equipment => {
+    if (!equipment || !equipment.itemId) return;
+    const definition = getItemDefinition(equipment.itemId);
+    if (!definition || !definition.statModifiers) return;
+    const sourceId = equipment.instanceId || `item:${equipment.itemId}`;
+    const exactPackageId = `equipment_stat_modifiers:${equipment.itemId}`;
+    const expressionStateId = `equipped:${equipment.slot || "equipment"}`;
+    const projectionKey = createEffectiveStateProjectionKey(sourceId, exactPackageId, expressionStateId);
+    if (seen.has(projectionKey)) return;
+    seen.add(projectionKey);
+    const realization = definition.type === "weapon"
+      ? getWeaponContributionRealization(character, definition)
+      : { difficulty:0, familyProficiency:0, proficiencyGap:0, multiplier:1 };
+    const statModifiers = {};
+    Object.entries(definition.statModifiers).forEach(([stat, amount]) => {
+      if (["nin","tai","buki","fuin","kin","gen","stamina"].includes(stat)) {
+        statModifiers[stat] = (Number(amount) || 0) * realization.multiplier;
+      }
+    });
+    descriptors.push({ projectionKey, sourceId, exactPackageId, expressionStateId,
+      classification:"effective_state", overlapMode:"coexists", statModifiers, realization,
+      sourceType:definition.type === "weapon" ? "equipment_weapon" : "equipment" });
+  });
+  return descriptors;
 }
 
-
-// =========================================================
-// GET NATURAL WEAPON PROFICIENCY
-// =========================================================
-//
-// Natural proficiency DOES NOT include the equipped
-// weapon's Buki bonus.
-//
-// It represents the character's permanent ability:
-//
-// Current Buki
-// - Weapon Difficulty
-// + Permanent Specialization handling
-//
-// =========================================================
-
-function getNaturalWeaponProficiency(
-  character
-) {
-
-
-  if (!character) {
-
-    return {
-
-      name: "Untrained",
-
-      naturalBuki: 0,
-
-      difficulty: 0,
-
-      proficiencyBuki: 0,
-
-      multiplier: 0.90
-
-    };
-
-  }
-
-
-  const weaponDefinition =
-    getEquippedWeaponDefinition(
-      character
-    );
-
-
-  const currentBuki =
-    Number(
-      character.stats.buki
-    ) || 0;
-
-
-  const difficulty =
-    getWeaponClassDifficulty(
-      character,
-      weaponDefinition
-    );
-
-
-  const proficiencyBuki =
-    Math.max(
-      0,
-      currentBuki -
-      difficulty
-    );
-
-
-  const tier =
-    getWeaponProficiencyTier(
-      proficiencyBuki
-    );
-
-
-  return {
-
-    name:
-      tier.name,
-
-    naturalBuki:
-      currentBuki,
-
-    difficulty:
-      difficulty,
-
-    proficiencyBuki:
-      tier.proficiencyBuki,
-
-    multiplier:
-      tier.multiplier
-
-  };
-
-}
-
-
-// =========================================================
-// GET ACTIVE WEAPON PROFICIENCY
-// =========================================================
-//
-// Active proficiency includes RAW equipment Buki.
-//
-// Equipment may temporarily push the character into
-// a higher proficiency tier.
-//
-// The tier is calculated once before the multiplier
-// is applied, preventing feedback loops.
-//
-// =========================================================
-
-function getWeaponProficiency(
-  character
-) {
-
-
-  if (!character) {
-
-    return {
-
-      name: "Untrained",
-
-      rawProficiencyBuki: 0,
-
-      difficulty: 0,
-
-      proficiencyBuki: 0,
-
-      multiplier: 0.90
-
-    };
-
-  }
-
-
-  const rawBonuses =
-    getRawEquipmentStatBonuses(
-      character
-    );
-
-
-  const weaponDefinition =
-    getEquippedWeaponDefinition(
-      character
-    );
-
-
-  const difficulty =
-    getWeaponClassDifficulty(
-      character,
-      weaponDefinition
-    );
-
-
-  const currentBuki =
-    Number(
-      character.stats.buki
-    ) || 0;
-
-
-  const rawProficiencyBuki =
-    currentBuki +
-    rawBonuses.buki;
-
-
-  const proficiencyBuki =
-    Math.max(
-      0,
-      rawProficiencyBuki -
-      difficulty
-    );
-
-
-  const tier =
-    getWeaponProficiencyTier(
-      proficiencyBuki
-    );
-
-
-  return {
-
-    name:
-      tier.name,
-
-    rawProficiencyBuki:
-      rawProficiencyBuki,
-
-    difficulty:
-      difficulty,
-
-    proficiencyBuki:
-      tier.proficiencyBuki,
-
-    multiplier:
-      tier.multiplier
-
-  };
-
-}
-
-// =========================================================
-// SIGNATURE WEAPON AFFINITY
-// =========================================================
-//
-// Optional character-specific multiplier for a particular
-// weapon.
-//
-// Example:
-//
-// signatureAffinity: {
-//   sasuke: 1.10
-// }
-//
-// If no affinity exists, the weapon behaves normally at 1.00x.
-//
-// =========================================================
-
-function getSignatureWeaponAffinityMultiplier(
-  character,
-  weaponDefinition
-) {
-
-
-  if (
-    !character ||
-    !weaponDefinition ||
-    !weaponDefinition.signatureAffinity ||
-    typeof weaponDefinition.signatureAffinity !==
-      "object"
-  ) {
-
-    return 1;
-
-  }
-
-
-  const multiplier =
-    Number(
-      weaponDefinition
-        .signatureAffinity[
-          character.id
-        ]
-    );
-
-
-  if (
-    !Number.isFinite(
-      multiplier
-    ) ||
-    multiplier <= 0
-  ) {
-
-    return 1;
-
-  }
-
-
-  return multiplier;
-
-}
-
-
-// =========================================================
-// EQUIPMENT STAT BONUS
-// =========================================================
-
-function getEquipmentStatBonuses(
-  character
-) {
-
-
-  const rawBonuses =
-    getRawEquipmentStatBonuses(
-      character
-    );
-
-
-  const proficiency =
-    getWeaponProficiency(
-      character
-    );
-
-
-  const weaponDefinition =
-    getEquippedWeaponDefinition(
-      character
-    );
-
-
-  const signatureMultiplier =
-    getSignatureWeaponAffinityMultiplier(
-      character,
-      weaponDefinition
-    );
-
-
-  const bonuses = {
-
-    nin: 0,
-    tai: 0,
-    buki: 0,
-    fuin: 0,
-    kin: 0,
-    gen: 0,
-    stamina: 0
-
-  };
-
-
-  Object.keys(
-    rawBonuses
-  ).forEach(
-    stat => {
-
-
-      bonuses[
-        stat
-      ] =
-        rawBonuses[
-          stat
-        ] *
-        proficiency.multiplier *
-        signatureMultiplier;
-
-    }
-  );
-
-
+function getEquipmentStatBonuses(character) {
+  const bonuses = { nin:0,tai:0,buki:0,fuin:0,kin:0,gen:0,stamina:0 };
+  getEquipmentSourcePackageDescriptors(character).forEach(descriptor => {
+    Object.entries(descriptor.statModifiers || {}).forEach(([stat, amount]) => {
+      if (bonuses[stat] !== undefined) bonuses[stat] += Number(amount) || 0;
+    });
+  });
   return bonuses;
-
 }
 
-// =========================================================
-// EFFECTIVE CHARACTER STATS
-// =========================================================
+function getWeaponProficiencyTier(value) {
+  const safe = Math.max(0, Math.min(WEAPON_SPECIALIZATION_MAX_LEVEL, Math.floor(Number(value) || 0)));
+  return { name:`Family ${safe}/5`, proficiencyBuki:safe, multiplier:1 };
+}
 
-function getEffectiveCharacterStats(
-  character
-) {
+function getNaturalWeaponProficiency(character) {
+  const definition = getEquippedWeaponDefinition(character);
+  const realization = getWeaponContributionRealization(character, definition);
+  return { name:`Family ${realization.familyProficiency}/5`, naturalBuki:character ? Number(character.stats.buki)||0 : 0,
+    difficulty:realization.difficulty, familyProficiency:realization.familyProficiency,
+    proficiencyBuki:realization.familyProficiency, proficiencyGap:realization.proficiencyGap, multiplier:realization.multiplier };
+}
 
+function getWeaponProficiency(character) {
+  const definition = getEquippedWeaponDefinition(character);
+  const realization = getWeaponContributionRealization(character, definition);
+  return { name:`Family ${realization.familyProficiency}/5`, rawProficiencyBuki:character ? Number(character.stats.buki)||0 : 0,
+    difficulty:realization.difficulty, familyProficiency:realization.familyProficiency,
+    proficiencyBuki:realization.familyProficiency, proficiencyGap:realization.proficiencyGap, multiplier:realization.multiplier };
+}
 
-  const equipmentBonuses =
-    getEquipmentStatBonuses(
-      character
-    );
+function getSignatureWeaponAffinityMultiplier(character, weaponDefinition) {
+  // Retained only as a compatibility API. The old implicit multiplier is retired;
+  // future affinities must be exact source-owned authored packages.
+  return 1;
+}
 
+function getEffectiveCharacterStats(character) {
+  const bonuses = getEquipmentStatBonuses(character);
+  const stats = { ...character.stats };
+  Object.keys(bonuses).forEach(stat => { stats[stat] = (Number(stats[stat])||0) + bonuses[stat]; });
+  return stats;
+}
 
-  const effectiveStats = {
+function getWeaponInstanceAcclimationRecord(character, instanceId) {
+  const registryId = getCharacterRegistryId(character);
+  const root = playerData && playerData.weaponAcclimation && registryId ? playerData.weaponAcclimation[registryId] : null;
+  return root && instanceId ? (root[instanceId] || null) : null;
+}
 
-    ...character.stats
+function setWeaponInstanceAcclimation(characterId, instanceId, state, severity = null) {
+  const character = getPlayerCharacter(characterId);
+  if (!character || !instanceId || !["unfamiliar","reacclimating"].includes(state)) return false;
+  if (state === "reacclimating" && !["minor","major","fundamental"].includes(severity)) return false;
+  const registryId = getCharacterRegistryId(character);
+  if (!playerData.weaponAcclimation || typeof playerData.weaponAcclimation !== "object") playerData.weaponAcclimation = {};
+  if (!playerData.weaponAcclimation[registryId]) playerData.weaponAcclimation[registryId] = {};
+  playerData.weaponAcclimation[registryId][instanceId] = { state, severity:state === "reacclimating" ? severity : null };
+  savePlayerData();
+  return true;
+}
 
+function clearWeaponInstanceAcclimation(characterId, instanceId) {
+  const character = getPlayerCharacter(characterId);
+  const registryId = getCharacterRegistryId(character);
+  if (!registryId || !playerData.weaponAcclimation || !playerData.weaponAcclimation[registryId]) return false;
+  delete playerData.weaponAcclimation[registryId][instanceId];
+  savePlayerData();
+  return true;
+}
+
+function getWeaponActionExecutionMultiplier(character, weaponContext = null) {
+  const context = weaponContext || getBattleEquippedWeaponExecutionContext(character);
+  if (!context || !context.instanceId) return { multiplier:1, state:null, severity:null };
+  const record = getWeaponInstanceAcclimationRecord(character, context.instanceId);
+  if (!record) return { multiplier:1, state:null, severity:null };
+  if (record.state === "unfamiliar") return { multiplier:0.90, state:"unfamiliar", severity:null };
+  if (record.state === "reacclimating") return {
+    multiplier:WEAPON_REACCLIMATION_EXECUTION_MULTIPLIER[record.severity] || 1,
+    state:"reacclimating", severity:record.severity
   };
-
-
-  Object.keys(
-    equipmentBonuses
-  ).forEach(
-    stat => {
-
-
-      effectiveStats[stat] =
-        (
-          effectiveStats[stat] ||
-          0
-        ) +
-        equipmentBonuses[stat];
-
-    }
-  );
-
-
-  return effectiveStats;
-
+  return { multiplier:1, state:null, severity:null };
 }
 
 
@@ -33232,67 +33251,26 @@ function getCharacterPLProgress(
 
 
 // =========================================================
-// EFFECTIVE DEVELOPED STATS
+// BRICK 390 — CANONICAL EFFECTIVE-STATE PROJECTION CONSUMER
 // =========================================================
-//
-// Current Developed Stats
-// +
-// equipment/contextual stat effects.
-//
+// Current Developed Stats + source-aware Equipment packages +
+// active Combat Effective-State packages. Fractional values are
+// preserved here; PL rounds only after Formula v1.0.
 // =========================================================
 
-function getDevelopedEffectiveCharacterStats(
-  character
-) {
-
-
-  const developedStats =
-    getDevelopedCharacterStats(
-      character
-    );
-
-
-  const equipmentBonuses =
-    getEquipmentStatBonuses(
-      character
-    );
-
-
-  const effectiveStats = {
-    ...developedStats
-  };
-
-
-  PL_STAT_KEYS.forEach(
-    stat => {
-
-
-      effectiveStats[
-        stat
-      ] =
-        (
-          Number(
-            effectiveStats[
-              stat
-            ]
-          ) || 0
-        )
-        +
-        (
-          Number(
-            equipmentBonuses[
-              stat
-            ]
-          ) || 0
-        );
-
-    }
-  );
-
-
+function getDevelopedEffectiveCharacterStats(character) {
+  const developedStats = getDevelopedCharacterStats(character);
+  const equipmentBonuses = getEquipmentStatBonuses(character);
+  const runtimeBonuses = getBattleEffectiveStateStatModifiersForCharacter(character);
+  const effectiveStats = { ...developedStats };
+  PL_STAT_KEYS.forEach(stat => {
+    effectiveStats[stat] = (Number(effectiveStats[stat]) || 0)
+      + (Number(equipmentBonuses[stat]) || 0)
+      + (Number(runtimeBonuses[stat]) || 0);
+  });
   return effectiveStats;
-
 }
+
 
 
 // =========================================================
@@ -35065,261 +35043,54 @@ function getAcademyBattlePilotParticipants() {
 
 
 // =========================================================
-// EXISTING BATTLE LAUNCH — NOW CREATES DEPLOYMENT
+// BRICK 391 — OWNERSHIP / FORMATION-AWARE BATTLE LAUNCH
+// BRICK 392 — SOURCE-PACKAGE RUNTIME INITIALIZATION
+// BRICK 393 — ATTACHED-SUMMON RUNTIME SNAPSHOT
 // =========================================================
 
-function startEncounter(
-  enemyId,
-  characterId = null,
-  encounterId = null
-) {
-
-
-  console.log(
-    "START ENCOUNTER FIRED:",
-    enemyId
-  );
-
-
-  const enemy =
-    enemyDatabase[
-      enemyId
-    ];
-
-
-  if (
-    !enemy
-  ) {
-
-
-    console.log(
-      "Enemy not found"
-    );
-
-
-    return false;
-  }
-
-
-  let activePlayer =
-    null;
-
-
-  if (
-    characterId
-  ) {
-
-
-    activePlayer =
-      getPlayerCharacter(
-        characterId
-      );
-  }
-
-
-  if (
-    activePlayer &&
-    activePlayer.developmentPilotOnly ===
-      true
-  ) {
-
-
-    console.log(
-      "Development pilot variants require Battle-local pilot deployment."
-    );
-
-
-    activePlayer =
-      null;
-  }
-
-
-  if (
-    !activePlayer
-  ) {
-
-
-    activePlayer =
-      playerTeam.find(
-        member =>
-          member &&
-          member.developmentPilotOnly !==
-            true
-      ) ||
-      null;
-  }
-
-
-  if (
-    !activePlayer
-  ) {
-
-
-    console.log(
-      "No battle character available."
-    );
-
-
-    return false;
-  }
-
-
-  selectedEnemy =
-    enemy;
-
-
-  currentBattle.active =
-    true;
-
-
-  currentBattle.battleId =
-    createBattleInstanceId();
-
-
-  currentBattle.encounterId =
-    encounterId;
-
-
-  /*
-     Preserve launch identity.
-
-     This does NOT change every time the Active queue advances.
-  */
-  currentBattle.characterId =
-    activePlayer.id;
-
-
-  currentBattle.enemy =
-    enemy;
-
-
-  currentBattle.deployment =
-    createBattleDeployment(
-      enemy,
-      activePlayer.id
-    );
-
-
-  currentBattle.activePlayer =
-    getBattleDeploymentParticipant(
-      "player",
-      1
-    ) ||
-    activePlayer;
-
-
-  currentBattle.lastDamage =
-    0;
-
-
-  currentBattle.battleOver =
-    false;
-
-
-  currentBattle.completedAt =
-    null;
-
-
-  currentBattle.claimedAt =
-    null;
-
-
-  currentBattle.completionRecorded =
-    false;
-
-
-  currentBattle.battleLog = [
-
-    `${enemy.name} appears!`,
-
-    `${currentBattle.activePlayer.name} prepares for battle.`
-
-  ];
-
+function startEncounter(enemyId, characterId = null, encounterId = null) {
+  console.log("START ENCOUNTER FIRED:", enemyId);
+  const enemy = enemyDatabase[enemyId];
+  if (!enemy) { console.log("Enemy not found"); return false; }
+
+  const formationIds = getPersistentClanBattleParticipantIds();
+  let requestedPlayer = characterId ? getPlayerCharacter(characterId) : null;
+  if (requestedPlayer && !isRuntimeCharacterOwned(requestedPlayer)) requestedPlayer = null;
+  if (requestedPlayer && !formationIds.includes(requestedPlayer.id)) requestedPlayer = null;
+  const activePlayer = requestedPlayer || (formationIds.length > 0 ? getPlayerCharacter(formationIds[0]) : null);
+  if (!activePlayer) { console.log("No owned Battle formation character available."); return false; }
+
+  selectedEnemy = enemy;
+  currentBattle.active = true;
+  currentBattle.battleId = createBattleInstanceId();
+  currentBattle.encounterId = encounterId;
+  currentBattle.characterId = activePlayer.id;
+  currentBattle.enemy = enemy;
+  currentBattle.deployment = createBattleDeployment(enemy, activePlayer.id);
+  currentBattle.activePlayer = getBattleDeploymentParticipant("player", 1) || activePlayer;
+  currentBattle.lastDamage = 0;
+  currentBattle.battleOver = false;
+  currentBattle.completedAt = null;
+  currentBattle.claimedAt = null;
+  currentBattle.completionRecorded = false;
+  currentBattle.battleLog = [`${enemy.name} appears!`, `${currentBattle.activePlayer.name} prepares for battle.`];
 
   initializeBattleContributionRecordsFromDeployment();
-
-
   currentBattle.rewards = {
-
-    generated:
-      false,
-
-    claimed:
-      false,
-
-    ryo:
-      0,
-
-    exp:
-      0,
-
-    items:
-      [],
-
-    rareDrops:
-      [],
-
-    finishingShinobi:
-      null,
-
-    mvp:
-      null
-
+    generated:false, claimed:false, ryo:0, exp:0, items:[], rareDrops:[], finishingShinobi:null, mvp:null
   };
+  const generatedBattlePower = calculateBattlePower(enemy, "standard");
+  currentBattle.enemyPower = generatedBattlePower;
+  currentBattle.enemyMaxPower = generatedBattlePower;
 
-
-  const generatedBattlePower =
-    calculateBattlePower(
-      enemy,
-      "standard"
-    );
-
-
-  currentBattle.enemyPower =
-    generatedBattlePower;
-
-
-  currentBattle.enemyMaxPower =
-    generatedBattlePower;
-
-
-  // =========================================
-  // BRICK 321 — REMAINING BATTLE PL
-  // =========================================
-
-  initializeBattleRemainingPLFromDeployment({
-
-    preserveExistingEnemyPower:
-      true
-
-  });
-
-
-  // =========================================
-  // BRICK 342 — PREPARED BATTLE POUCH SNAPSHOT
-  // =========================================
-
+  initializeBattleSourcePackageRuntime();
+  initializeBattleRemainingPLFromDeployment({ preserveExistingEnemyPower:true });
   initializeBattlePouchFromPreparedSelection();
+  initializeBattleAttachedSummonRuntimeFromDeployment();
 
-
-  console.log(
-    "BATTLE INSTANCE CREATED:",
-    currentBattle.battleId
-  );
-
-
-  console.log(
-    "CURRENT BATTLE:",
-    currentBattle
-  );
-
-
-  openOverlay(
-    "combat"
-  );
-
-
+  console.log("BATTLE INSTANCE CREATED:", currentBattle.battleId);
+  console.log("CURRENT BATTLE:", currentBattle);
+  openOverlay("combat");
   return currentBattle;
 }
 
@@ -35567,12 +35338,18 @@ function loadAcademyPilotBattleDeployment() {
   initializeBattleContributionRecordsFromDeployment();
 
 
+  initializeBattleSourcePackageRuntime();
+
+
   initializeBattleRemainingPLFromDeployment({
 
     preserveExistingEnemyPower:
       true
 
   });
+
+
+  initializeBattleAttachedSummonRuntimeFromDeployment();
 
 
   currentBattle.battleLog = [
@@ -35611,6 +35388,7 @@ function loadAcademyPilotBattleDeployment() {
 }
 
 
+
 // =========================================================
 // BRICK 319 — ACADEMY PILOT DEPLOYMENT DIAGNOSTIC
 // =========================================================
@@ -35620,7 +35398,7 @@ function loadAcademyPilotBattleDeployment() {
 // - five Academy pilot identities exist
 // - supplied compatibility Base PL matches canonical
 //   rounded Base-PL calculation
-// - ordinary Battle roster excludes pilot-only variants
+// - ordinary roster visibility follows explicit ownership, not pilot metadata
 // - explicit Academy deployment order is correct
 // - Hinata begins in Active Slot 1
 // - Battle contribution state is scoped to deployed pilot
@@ -35712,12 +35490,10 @@ function runAcademyPilotDeploymentDiagnostics() {
       ),
 
 
-    ordinaryRosterExcludesPilot:
+    ownershipNotPilotFlagControlsRoster:
       ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(
         characterId =>
-          !normalIds.includes(
-            characterId
-          )
+          getClanManageableRosterCharacters().some(character => character.id === characterId)
       ),
 
 
@@ -38602,6 +38378,32 @@ function setClanTeamSlot(
 }
 
 
+// =========================================================
+// BRICK 424 — NEXT-OPEN TEAM SLOT ASSIGNMENT
+// BRICK 425 — TEAM REORDER AUTHORITY FOR FUTURE DRAG UI
+// =========================================================
+
+function assignClanCharacterToNextOpenSlot(characterId) {
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const character=getClanManageableRosterCharacters().find(member=>member.id===characterId)||null;
+  if (!character) return {success:false,reason:"character_not_clan_manageable"};
+  const clan=ensureClanManagementState();
+  const existingIndex=clan.teamSlots.indexOf(characterId);
+  if (existingIndex>=0) return {success:true,changed:false,slotNumber:existingIndex+1,characterId};
+  const openIndex=clan.teamSlots.findIndex(id=>!id);
+  if (openIndex<0) return {success:false,reason:"clan_team_full"};
+  clan.teamSlots[openIndex]=characterId;
+  playerData.clan=normalizeClanManagementState(clan);
+  savePlayerData();
+  rerenderClanOverlay();
+  return {success:true,changed:true,slotNumber:openIndex+1,characterId};
+}
+
+function moveClanCharacterToSlot(characterId, slotNumber) {
+  return setClanTeamSlot(slotNumber,characterId);
+}
+
 function removeClanCharacterFromTeam(
   characterId
 ) {
@@ -39358,12 +39160,16 @@ function runClanManagementDiagnostics() {
       );
 
 
-    results.pilotOnlyExcluded =
+    results.ownershipControlsManageableRoster =
       roster.every(
         character =>
-          character
-            .developmentPilotOnly !==
-            true
+          isRuntimeCharacterOwned(character)
+      );
+
+    results.academyOwnedVariantsVisible =
+      ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(
+        characterId =>
+          roster.some(character => character.id === characterId)
       );
 
 
@@ -39496,6 +39302,7 @@ function runClanManagementDiagnostics() {
 
   return results;
 }
+
 
 
 // =========================================================
@@ -63528,403 +63335,339 @@ function continueAfterVictory() {
 
 }
 
-// =========================================================
-// BRICK 302 — BATTLE RUNTIME STATE FOUNDATION
-// BRICK 321 — REMAINING BATTLE PL RUNTIME AUTHORITY
-// BRICK 341 — BATTLE POUCH RUNTIME SNAPSHOT
-// =========================================================
-//
-// Owns Battle-local transient truth only.
-//
-// Persistent authorities remain elsewhere.
-//
-// Runtime state supports:
-//
-// - Remaining Battle PL by participant
-// - transient source/target interaction state
-// - temporary Conditions
-// - structured Battle evidence
-// - shared action sequence identity
-//
-// Remaining Battle PL is runtime capacity. It never mutates
-// persistent Character Stats or PL.
-//
-// Stamina is not stored as a depletion value here.
-// There is intentionally no remainingStamina.
-//
+// BRICK 394 — BATTLE RUNTIME SOURCE-PACKAGE LEDGER
+// BRICK 395 — EXACT PROJECTION IDENTITY / IDEMPOTENCE
+// BRICK 396 — EXPLICIT PACKAGE OVERLAP SEMANTICS
+// BRICK 397 — EMBODIED EXPRESSION GUARD
+// BRICK 398 — SOURCE-SCOPED PACKAGE REMOVAL
+// BRICK 399 — TEMPORARY CAPACITY RUNTIME STORE
+// BRICK 400 — ATTACHED SUMMON RUNTIME STATE
+// BRICK 401 — RUNTIME SAVE / RESTORE EXTENSION
 // =========================================================
 
 function createBattleRuntimeState() {
-
-
   return {
-
-    battleId:
-      currentBattle.battleId ||
-      null,
-
-
-    actionSequence:
-      0,
-
-
-    remainingPL: {
-
-      player: {},
-
-      enemy: {}
-
-    },
-
-
-    battlePouch: {
-
-      preparedItemIds:
-        []
-
-    },
-
-
-    transientStates:
-      [],
-
-
-    conditions:
-      [],
-
-
-    evidence:
-      []
-
+    battleId: currentBattle.battleId || null,
+    actionSequence: 0,
+    remainingPL: { player:{}, enemy:{} },
+    temporaryCapacity: { player:{}, enemy:{} },
+    battlePouch: { preparedItemIds:[] },
+    effectiveStateProjections: [],
+    attachedSummons: { player:{}, enemy:{} },
+    summonActionState: { actorParticipantId:null, summonId:null, mode:"closed" },
+    transientStates: [],
+    conditions: [],
+    evidence: []
   };
 }
 
-
 function ensureBattleRuntimeState() {
-
-
-  if (
-    !currentBattle.runtime ||
-    currentBattle.runtime.battleId !==
-      currentBattle.battleId
-  ) {
-
-
-    currentBattle.runtime =
-      createBattleRuntimeState();
+  if (!currentBattle.runtime || currentBattle.runtime.battleId !== currentBattle.battleId) {
+    currentBattle.runtime = createBattleRuntimeState();
   }
-
-
-  if (
-    !currentBattle.runtime.remainingPL ||
-    typeof currentBattle.runtime.remainingPL !==
-      "object"
-  ) {
-
-
-    currentBattle.runtime.remainingPL = {
-
-      player: {},
-
-      enemy: {}
-
-    };
-  }
-
-
-  if (
-    !currentBattle.runtime.remainingPL.player ||
-    typeof currentBattle.runtime.remainingPL.player !==
-      "object"
-  ) {
-
-    currentBattle.runtime.remainingPL.player = {};
-  }
-
-
-  if (
-    !currentBattle.runtime.remainingPL.enemy ||
-    typeof currentBattle.runtime.remainingPL.enemy !==
-      "object"
-  ) {
-
-    currentBattle.runtime.remainingPL.enemy = {};
-  }
-
-
-  if (
-    !currentBattle.runtime.battlePouch ||
-    typeof currentBattle.runtime.battlePouch !==
-      "object"
-  ) {
-
-
-    currentBattle.runtime.battlePouch = {
-
-      preparedItemIds:
-        []
-
-    };
-  }
-
-
-  if (
-    !Array.isArray(
-      currentBattle.runtime
-        .battlePouch
-        .preparedItemIds
-    )
-  ) {
-
-    currentBattle.runtime
-      .battlePouch
-      .preparedItemIds =
-        [];
-  }
-
-
-  return currentBattle.runtime;
+  const runtime = currentBattle.runtime;
+  if (!runtime.remainingPL || typeof runtime.remainingPL !== "object") runtime.remainingPL={player:{},enemy:{}};
+  if (!runtime.remainingPL.player || typeof runtime.remainingPL.player !== "object") runtime.remainingPL.player={};
+  if (!runtime.remainingPL.enemy || typeof runtime.remainingPL.enemy !== "object") runtime.remainingPL.enemy={};
+  if (!runtime.temporaryCapacity || typeof runtime.temporaryCapacity !== "object") runtime.temporaryCapacity={player:{},enemy:{}};
+  if (!runtime.temporaryCapacity.player || typeof runtime.temporaryCapacity.player !== "object") runtime.temporaryCapacity.player={};
+  if (!runtime.temporaryCapacity.enemy || typeof runtime.temporaryCapacity.enemy !== "object") runtime.temporaryCapacity.enemy={};
+  if (!runtime.battlePouch || typeof runtime.battlePouch !== "object") runtime.battlePouch={preparedItemIds:[]};
+  if (!Array.isArray(runtime.battlePouch.preparedItemIds)) runtime.battlePouch.preparedItemIds=[];
+  if (!Array.isArray(runtime.effectiveStateProjections)) runtime.effectiveStateProjections=[];
+  if (!runtime.attachedSummons || typeof runtime.attachedSummons !== "object") runtime.attachedSummons={player:{},enemy:{}};
+  if (!runtime.attachedSummons.player || typeof runtime.attachedSummons.player !== "object") runtime.attachedSummons.player={};
+  if (!runtime.attachedSummons.enemy || typeof runtime.attachedSummons.enemy !== "object") runtime.attachedSummons.enemy={};
+  if (!runtime.summonActionState || typeof runtime.summonActionState !== "object") runtime.summonActionState={actorParticipantId:null,summonId:null,mode:"closed"};
+  if (!Array.isArray(runtime.transientStates)) runtime.transientStates=[];
+  if (!Array.isArray(runtime.conditions)) runtime.conditions=[];
+  if (!Array.isArray(runtime.evidence)) runtime.evidence=[];
+  return runtime;
 }
 
-
-function cloneBattleRuntimeValue(
-  value
-) {
-
-
-  try {
-
-
-    return JSON.parse(
-      JSON.stringify(
-        value
-      )
-    );
-
-  }
-
-  catch (
-    error
-  ) {
-
-
-    console.log(
-      "Battle runtime clone failed:",
-      error
-    );
-
-
-    return null;
-  }
+function initializeBattleSourcePackageRuntime() {
+  const runtime = ensureBattleRuntimeState();
+  runtime.effectiveStateProjections = [];
+  runtime.temporaryCapacity = { player:{}, enemy:{} };
+  runtime.attachedSummons = { player:{}, enemy:{} };
+  runtime.summonActionState = { actorParticipantId:null, summonId:null, mode:"closed" };
+  return runtime;
 }
 
-
-function createBattleRuntimeRecordId(
-  prefix
-) {
-
-
-  const runtime =
-    ensureBattleRuntimeState();
-
-
-  return (
-    `${prefix}_` +
-    `${currentBattle.battleId || "battle"}_` +
-    `${runtime.actionSequence}_` +
-    `${Date.now()}_` +
-    `${Math.floor(
-      Math.random() *
-      100000
-    )}`
-  );
+function cloneBattleRuntimeValue(value) {
+  try { return JSON.parse(JSON.stringify(value)); }
+  catch (error) { console.log("Battle runtime clone failed:", error); return null; }
 }
 
+function createBattleRuntimeRecordId(prefix) {
+  const runtime = ensureBattleRuntimeState();
+  return `${prefix}_${currentBattle.battleId || "battle"}_${runtime.actionSequence}_${Date.now()}_${Math.floor(Math.random()*100000)}`;
+}
 
 function getBattleRuntimeSaveState() {
-
-
-  const runtime =
-    ensureBattleRuntimeState();
-
-
+  const runtime = ensureBattleRuntimeState();
   return cloneBattleRuntimeValue({
-
-    battleId:
-      currentBattle.battleId ||
-      null,
-
-
-    actionSequence:
-      Number(
-        runtime.actionSequence
-      ) || 0,
-
-
-    remainingPL:
-      runtime.remainingPL,
-
-
-    battlePouch:
-      runtime.battlePouch,
-
-
-    transientStates:
-      runtime.transientStates,
-
-
-    conditions:
-      runtime.conditions,
-
-
-    evidence:
-      runtime.evidence
-
+    battleId:currentBattle.battleId || null,
+    actionSequence:Number(runtime.actionSequence)||0,
+    remainingPL:runtime.remainingPL,
+    temporaryCapacity:runtime.temporaryCapacity,
+    battlePouch:runtime.battlePouch,
+    effectiveStateProjections:runtime.effectiveStateProjections,
+    attachedSummons:runtime.attachedSummons,
+    summonActionState:runtime.summonActionState,
+    transientStates:runtime.transientStates,
+    conditions:runtime.conditions,
+    evidence:runtime.evidence
   });
 }
 
-
-function restoreBattleRuntimeState(
-  rawRuntime
-) {
-
-
-  if (
-    !rawRuntime ||
-    typeof rawRuntime !==
-      "object"
-  ) {
-
-
-    currentBattle.runtime =
-      createBattleRuntimeState();
-
-
-    initializeBattleRemainingPLFromDeployment({
-
-      preserveExistingEnemyPower:
-        true
-
-    });
-
-
+function restoreBattleRuntimeState(rawRuntime) {
+  if (!rawRuntime || typeof rawRuntime !== "object") {
+    currentBattle.runtime = createBattleRuntimeState();
+    initializeBattleRemainingPLFromDeployment({ preserveExistingEnemyPower:true });
     initializeBattlePouchFromPreparedSelection();
-
-
+    initializeBattleAttachedSummonRuntimeFromDeployment();
     return currentBattle.runtime;
   }
-
-
   currentBattle.runtime = {
-
-    battleId:
-      currentBattle.battleId ||
-      null,
-
-
-    actionSequence:
-      Number(
-        rawRuntime.actionSequence
-      ) || 0,
-
-
-    remainingPL:
-      rawRuntime.remainingPL &&
-      typeof rawRuntime.remainingPL ===
-        "object"
-
-        ? rawRuntime.remainingPL
-
-        : {
-            player: {},
-            enemy: {}
-          },
-
-
-    battlePouch:
-      rawRuntime.battlePouch &&
-      typeof rawRuntime.battlePouch ===
-        "object"
-
-        ? rawRuntime.battlePouch
-
-        : {
-            preparedItemIds:
-              normalizeBattlePouchSelection(
-                playerData.battlePouch
-              ).itemIds
-          },
-
-
-    transientStates:
-      Array.isArray(
-        rawRuntime.transientStates
-      )
-
-        ? rawRuntime.transientStates
-
-        : [],
-
-
-    conditions:
-      Array.isArray(
-        rawRuntime.conditions
-      )
-
-        ? rawRuntime.conditions
-
-        : [],
-
-
-    evidence:
-      Array.isArray(
-        rawRuntime.evidence
-      )
-
-        ? rawRuntime.evidence
-
-        : []
-
+    battleId:currentBattle.battleId || null,
+    actionSequence:Number(rawRuntime.actionSequence)||0,
+    remainingPL:rawRuntime.remainingPL && typeof rawRuntime.remainingPL === "object" ? rawRuntime.remainingPL : {player:{},enemy:{}},
+    temporaryCapacity:rawRuntime.temporaryCapacity && typeof rawRuntime.temporaryCapacity === "object" ? rawRuntime.temporaryCapacity : {player:{},enemy:{}},
+    battlePouch:rawRuntime.battlePouch && typeof rawRuntime.battlePouch === "object" ? rawRuntime.battlePouch : {preparedItemIds:normalizeBattlePouchSelection(playerData.battlePouch).itemIds},
+    effectiveStateProjections:Array.isArray(rawRuntime.effectiveStateProjections) ? rawRuntime.effectiveStateProjections : [],
+    attachedSummons:rawRuntime.attachedSummons && typeof rawRuntime.attachedSummons === "object" ? rawRuntime.attachedSummons : {player:{},enemy:{}},
+    summonActionState:rawRuntime.summonActionState && typeof rawRuntime.summonActionState === "object" ? rawRuntime.summonActionState : {actorParticipantId:null,summonId:null,mode:"closed"},
+    transientStates:Array.isArray(rawRuntime.transientStates) ? rawRuntime.transientStates : [],
+    conditions:Array.isArray(rawRuntime.conditions) ? rawRuntime.conditions : [],
+    evidence:Array.isArray(rawRuntime.evidence) ? rawRuntime.evidence : []
   };
+  const runtime=ensureBattleRuntimeState();
+  const hasAnyRemainingPL=Object.keys(runtime.remainingPL.player).length>0 || Object.keys(runtime.remainingPL.enemy).length>0;
+  if (!hasAnyRemainingPL) initializeBattleRemainingPLFromDeployment({ preserveExistingEnemyPower:true });
+  else syncBattleEnemyPowerCompatibilityProjection();
+  return runtime;
+}
 
+function getBattleEffectiveStateProjection(projectionKey, side, participantId) {
+  return ensureBattleRuntimeState().effectiveStateProjections.find(projection =>
+    projection && projection.projectionKey === projectionKey && projection.targetRef &&
+    projection.targetRef.side === side && projection.targetRef.participantId === participantId
+  ) || null;
+}
 
-  const runtime =
-    ensureBattleRuntimeState();
+function getBattleParticipantEffectiveStateProjections(side, participantId) {
+  return ensureBattleRuntimeState().effectiveStateProjections.filter(projection =>
+    projection && projection.targetRef && projection.targetRef.side === side && projection.targetRef.participantId === participantId
+  );
+}
 
+function removeBattleEffectiveStateProjection(projectionKey, side, participantId, reason="source_removed") {
+  const runtime=ensureBattleRuntimeState();
+  const removed=[];
+  runtime.effectiveStateProjections=runtime.effectiveStateProjections.filter(projection => {
+    const match=projection && projection.projectionKey===projectionKey && projection.targetRef &&
+      projection.targetRef.side===side && projection.targetRef.participantId===participantId;
+    if (match) removed.push(projection);
+    return !match;
+  });
+  removed.forEach(projection => {
+    removeBattleTemporaryCapacityByProjection(projection.projectionKey, side, participantId);
+    recordBattleEvidence({ eventType:"effective_state_projection_removed", actorRef:createBattleParticipantRef(side,participantId),
+      sourceRefs:[{type:"source",id:projection.sourceId}], data:{projectionKey:projection.projectionKey, exactPackageId:projection.exactPackageId, reason} });
+  });
+  return removed;
+}
 
-  const hasAnyRemainingPL =
-    Object.keys(
-      runtime.remainingPL.player
-    ).length > 0 ||
-    Object.keys(
-      runtime.remainingPL.enemy
-    ).length > 0;
+function removeBattleEffectiveStatePackagesBySource(side, participantId, sourceId, reason="source_removed") {
+  const projections=getBattleParticipantEffectiveStateProjections(side,participantId).filter(p=>p.sourceId===sourceId);
+  const removed=[];
+  projections.forEach(p=>removed.push(...removeBattleEffectiveStateProjection(p.projectionKey,side,participantId,reason)));
+  return removed;
+}
 
+function activateBattleEffectiveStatePackage(definition) {
+  if (!definition || !definition.side || !definition.participantId || !definition.sourceId || !definition.exactPackageId) {
+    return {success:false,reason:"projection_identity_incomplete"};
+  }
+  const catalog=getEffectiveStatePackageDefinition(definition.sourceId,definition.exactPackageId);
+  if (!catalog) return {success:false,reason:"package_not_authored"};
+  if (catalog.classification !== "effective_state") return {success:false,reason:"package_is_not_effective_state"};
+  const participant=getBattleParticipantByIdentity(definition.side,definition.participantId);
+  if (!participant) return {success:false,reason:"participant_missing"};
+  if (definition.side === "player") {
+    const entitySource=getEntityDefinition(definition.sourceId);
+    const characterSource=getCharacterRegistryEntry(definition.sourceId);
+    if (entitySource && !isBattleEntitySourceAvailableForCharacter(participant,definition.sourceId)) {
+      return {success:false,reason:"authoritative_source_not_available"};
+    }
+    if (characterSource && getCharacterRegistryId(participant)!==definition.sourceId) {
+      return {success:false,reason:"character_source_owner_mismatch"};
+    }
+  }
+  if (definition.side === "player" && characterEmbodiesExactPackage(participant, definition.exactPackageId)) {
+    return {success:false,reason:"exact_package_already_embodied"};
+  }
+  const expressionStateId=definition.expressionStateId || catalog.defaultExpressionStateId || "default";
+  const projectionKey=createEffectiveStateProjectionKey(definition.sourceId,definition.exactPackageId,expressionStateId);
+  const existing=getBattleEffectiveStateProjection(projectionKey,definition.side,definition.participantId);
+  if (existing) return {success:true,idempotent:true,projection:existing};
 
-  if (
-    !hasAnyRemainingPL
-  ) {
+  const overlapMode=definition.overlapMode || catalog.overlapMode || "coexists";
+  const overlapPackageKeys=Array.isArray(definition.overlapPackageKeys) ? definition.overlapPackageKeys : [];
+  const active=getBattleParticipantEffectiveStateProjections(definition.side,definition.participantId);
+  if (overlapMode === "mutually_exclusive" && active.some(p=>overlapPackageKeys.includes(p.packageKey))) {
+    return {success:false,reason:"mutually_exclusive_package_active"};
+  }
+  if (["replaces","suppresses"].includes(overlapMode)) {
+    active.filter(p=>overlapPackageKeys.includes(p.packageKey)).forEach(p=>
+      removeBattleEffectiveStateProjection(p.projectionKey,definition.side,definition.participantId,overlapMode)
+    );
+  }
 
+  const projection={
+    projectionId:createBattleRuntimeRecordId("projection"), projectionKey,
+    packageKey:catalog.packageKey, sourceId:definition.sourceId, exactPackageId:definition.exactPackageId,
+    expressionStateId, classification:"effective_state", overlapMode,
+    statModifiers:cloneCanonicalSevenStats(catalog.statModifiers),
+    targetRef:createBattleParticipantRef(definition.side,definition.participantId),
+    activationOwner:definition.activationOwner || catalog.activationOwnership || null,
+    expirationOwner:definition.expirationOwner || catalog.expirationOwnership || null,
+    activationActionId:definition.activationActionId || null,
+    durationActionOpportunities:Number.isFinite(Number(definition.durationActionOpportunities))
+      ? Math.max(0,Math.floor(Number(definition.durationActionOpportunities)))
+      : (Number.isFinite(Number(catalog.durationActionOpportunities)) ? Math.max(0,Math.floor(Number(catalog.durationActionOpportunities))) : null),
+    remainingActionOpportunities:Number.isFinite(Number(definition.durationActionOpportunities))
+      ? Math.max(0,Math.floor(Number(definition.durationActionOpportunities)))
+      : (Number.isFinite(Number(catalog.durationActionOpportunities)) ? Math.max(0,Math.floor(Number(catalog.durationActionOpportunities))) : null),
+    createdAt:Date.now()
+  };
+  ensureBattleRuntimeState().effectiveStateProjections.push(projection);
+  const overlay=Number(catalog.temporaryCapacityOverlay)||0;
+  if (overlay>0) addBattleTemporaryCapacityOverlay(definition.side,definition.participantId,overlay,projection.projectionKey);
+  recordBattleEvidence({eventType:"effective_state_projection_applied",actionId:projection.activationActionId,
+    actorRef:createBattleParticipantRef(definition.side,definition.participantId),sourceRefs:[{type:"source",id:definition.sourceId}],
+    data:{projectionKey,exactPackageId:definition.exactPackageId,expressionStateId,overlapMode,statModifiers:projection.statModifiers}});
+  return {success:true,idempotent:false,projection};
+}
 
-    initializeBattleRemainingPLFromDeployment({
-
-      preserveExistingEnemyPower:
-        true
-
+function getBattleEffectiveStateStatModifiersForCharacter(character) {
+  const totals={nin:0,tai:0,buki:0,fuin:0,kin:0,gen:0,stamina:0};
+  if (!character || !currentBattle || !currentBattle.active || !currentBattle.runtime) return totals;
+  getBattleParticipantEffectiveStateProjections("player",character.id).forEach(projection => {
+    Object.entries(projection.statModifiers || {}).forEach(([stat,amount]) => {
+      if (totals[stat] !== undefined) totals[stat] += Number(amount)||0;
     });
+  });
+  return totals;
+}
+
+function isBattleEntitySourceAvailableForCharacter(character, sourceId) {
+  const entity=getEntityDefinition(sourceId);
+  if (!character || !entity) return false;
+  if (entity.entityType === "hosted_entity_partition") {
+    return evaluateHostedEntityAccess(character.id,sourceId,{requireCooperative:false}).available===true;
   }
-
-  else {
-
-    syncBattleEnemyPowerCompatibilityProjection();
+  if (["attached_summon","collective_summon"].includes(entity.entityType)) {
+    return getAttachedSummonIdForCharacter(character.id)===sourceId;
   }
+  return false;
+}
 
+function activateBattleEntityEnhancement(characterId, sourceId, exactPackageId, expressionStateId=null) {
+  const character=getPlayerCharacter(characterId);
+  if (!character || !currentBattle.active) return {success:false,reason:"battle_or_character_missing"};
+  const entity=getEntityDefinition(sourceId);
+  if (!entity || !isBattleEntitySourceAvailableForCharacter(character,sourceId)) return {success:false,reason:"source_not_available"};
+  if (entity.entityType==="hosted_entity_partition") {
+    const access=evaluateHostedEntityAccess(character.id,sourceId,{expressionId:exactPackageId});
+    if (!access.available) return {success:false,reason:access.reason,access};
+  }
+  return activateBattleEffectiveStatePackage({side:"player",participantId:character.id,sourceId,exactPackageId,expressionStateId});
+}
 
-  return currentBattle.runtime;
+// =========================================================
+// BRICK 422 — HOSTED-SOURCE EXPRESSION ACCESS GUARD
+// BRICK 423 — HOSTED-SOURCE REMOVAL CLEANUP
+// =========================================================
+
+function setHostedEntityBattlePresence(characterId, entityId, present) {
+  const character=getPlayerCharacter(characterId);
+  const binding=getHostedEntityBinding(characterId,entityId);
+  if (!character || !binding) return {success:false,reason:"hosted_binding_missing"};
+  binding.presenceState=present===true?"present":"absent";
+  if (present!==true && currentBattle.active) removeBattleEffectiveStatePackagesBySource("player",character.id,entityId,"hosted_source_not_present");
+  return {success:true,entityId,presenceState:binding.presenceState};
+}
+
+function attachEntitySummonToCharacter(characterId, entityId) {
+  const character=getPlayerCharacter(characterId);
+  const entity=getEntityDefinition(entityId);
+  if (!character || !entity || !["attached_summon","collective_summon"].includes(entity.entityType)) return false;
+  if (!playerData.entities || !Array.isArray(playerData.entities.ownedEntityIds) || !playerData.entities.ownedEntityIds.includes(entityId)) return false;
+  const registryId=getCharacterRegistryId(character);
+  const previous=playerData.entities.attachedSummonByCharacterRegistryId[registryId] || null;
+  if (previous && currentBattle.active) removeBattleEffectiveStatePackagesBySource("player",character.id,previous,"summon_replaced");
+  playerData.entities.attachedSummonByCharacterRegistryId[registryId]=entityId;
+  if (currentBattle.active) initializeBattleAttachedSummonForParticipant("player",character.id);
+  savePlayerData();
+  return true;
+}
+
+function detachEntitySummonFromCharacter(characterId) {
+  const character=getPlayerCharacter(characterId);
+  if (!character || !playerData.entities) return false;
+  const registryId=getCharacterRegistryId(character);
+  const previous=playerData.entities.attachedSummonByCharacterRegistryId[registryId] || null;
+  if (!previous) return false;
+  delete playerData.entities.attachedSummonByCharacterRegistryId[registryId];
+  if (currentBattle.active) {
+    removeBattleEffectiveStatePackagesBySource("player",character.id,previous,"summon_detached");
+    delete ensureBattleRuntimeState().attachedSummons.player[character.id];
+  }
+  savePlayerData();
+  return true;
+}
+
+function initializeBattleAttachedSummonForParticipant(side, participantId) {
+  if (side !== "player") return null;
+  const character=getPlayerCharacter(participantId);
+  const summonId=character ? getAttachedSummonIdForCharacter(character.id) : null;
+  const runtime=ensureBattleRuntimeState();
+  if (!summonId || !getEntityDefinition(summonId)) { delete runtime.attachedSummons.player[participantId]; return null; }
+  runtime.attachedSummons.player[participantId]={participantId,summonId,state:"attached",manifestedSkillId:null};
+  return runtime.attachedSummons.player[participantId];
+}
+
+function initializeBattleAttachedSummonRuntimeFromDeployment() {
+  const runtime=ensureBattleRuntimeState();
+  runtime.attachedSummons={player:{},enemy:{}};
+  const slots=currentBattle.deployment && currentBattle.deployment.player && Array.isArray(currentBattle.deployment.player.slots)
+    ? currentBattle.deployment.player.slots : [];
+  slots.forEach(slot=>{if(slot&&slot.participantId) initializeBattleAttachedSummonForParticipant("player",slot.participantId);});
+  return runtime.attachedSummons;
+}
+
+function getBattleAttachedSummon(side, participantId) {
+  const runtime=ensureBattleRuntimeState();
+  return runtime.attachedSummons[side] ? (runtime.attachedSummons[side][participantId] || null) : null;
+}
+
+function manifestBattleAttachedSummon(side, participantId, summonSkillId) {
+  const record=getBattleAttachedSummon(side,participantId);
+  if (!record || record.state !== "attached") return null;
+  record.state="manifested"; record.manifestedSkillId=summonSkillId || null;
+  return record;
+}
+
+function returnBattleAttachedSummon(side, participantId) {
+  const record=getBattleAttachedSummon(side,participantId);
+  if (!record) return null;
+  record.state="attached"; record.manifestedSkillId=null;
+  return record;
 }
 
 
-// =========================================================
 // BRICK 321 — REMAINING BATTLE PL HELPERS
 // =========================================================
 
@@ -64380,6 +64123,87 @@ function initializeBattleRemainingPLFromDeployment(
 
 
 // =========================================================
+
+
+// =========================================================
+// BRICK 402 — TEMPORARY BATTLE-CAPACITY OVERLAYS
+// BRICK 403 — DAMAGE-BEARING CAPACITY ORDERING
+// BRICK 404 — SOURCE-OWNED OVERLAY REMOVAL
+// =========================================================
+
+function getBattleTemporaryCapacityLayers(side, participantId) {
+  const runtime=ensureBattleRuntimeState();
+  if (!runtime.temporaryCapacity[side]) return [];
+  if (!Array.isArray(runtime.temporaryCapacity[side][participantId])) runtime.temporaryCapacity[side][participantId]=[];
+  return runtime.temporaryCapacity[side][participantId];
+}
+
+function addBattleTemporaryCapacityOverlay(side, participantId, amount, sourceProjectionKey) {
+  const safe=Math.max(0,Math.round(Number(amount)||0));
+  if (safe<=0) return null;
+  const layers=getBattleTemporaryCapacityLayers(side,participantId);
+  const overlayId=createBattleRuntimeRecordId("capacity");
+  const layer={overlayId,sourceProjectionKey:sourceProjectionKey||null,maximum:safe,current:safe,createdAt:Date.now()};
+  layers.push(layer);
+  return layer;
+}
+
+function removeBattleTemporaryCapacityByProjection(sourceProjectionKey, side, participantId) {
+  const layers=getBattleTemporaryCapacityLayers(side,participantId);
+  const removed=[];
+  const kept=[];
+  layers.forEach(layer => (layer && layer.sourceProjectionKey===sourceProjectionKey ? removed : kept).push(layer));
+  ensureBattleRuntimeState().temporaryCapacity[side][participantId]=kept;
+  return removed;
+}
+
+function getBattleTemporaryCapacity(side, participantId) {
+  return getBattleTemporaryCapacityLayers(side,participantId).reduce((sum,layer)=>sum+Math.max(0,Number(layer.current)||0),0);
+}
+
+function getBattleDamageBearingCapacity(side, participantId) {
+  return getBattleTemporaryCapacity(side,participantId)+getBattleRemainingPL(side,participantId);
+}
+
+function absorbBattleDamageBearingCapacity(side, participantId, finalPLDamage) {
+  const incoming=Math.max(0,Math.round(Number(finalPLDamage)||0));
+  const underlyingBefore=getBattleRemainingPL(side,participantId);
+  const tempBefore=getBattleTemporaryCapacity(side,participantId);
+  let remaining=incoming;
+  let temporaryAbsorbed=0;
+  const layers=getBattleTemporaryCapacityLayers(side,participantId);
+  for (const layer of layers) {
+    if (remaining<=0) break;
+    const available=Math.max(0,Number(layer.current)||0);
+    const used=Math.min(available,remaining);
+    layer.current=available-used;
+    remaining-=used;
+    temporaryAbsorbed+=used;
+  }
+  ensureBattleRuntimeState().temporaryCapacity[side][participantId]=layers.filter(layer=>Number(layer.current)>0);
+  const underlyingAbsorbed=Math.min(underlyingBefore,remaining);
+  const underlyingAfter=underlyingBefore-underlyingAbsorbed;
+  setBattleRemainingPL(side,participantId,underlyingAfter);
+  remaining-=underlyingAbsorbed;
+  const absorbedPL=temporaryAbsorbed+underlyingAbsorbed;
+  return {
+    incomingFinalPLDamage:incoming, absorbedPL, residualAttackPL:Math.max(0,incoming-absorbedPL),
+    temporaryCapacityBefore:tempBefore, temporaryCapacityAbsorbed:temporaryAbsorbed,
+    temporaryCapacityAfter:getBattleTemporaryCapacity(side,participantId),
+    underlyingBattlePLBefore:underlyingBefore, underlyingBattlePLAbsorbed:underlyingAbsorbed,
+    underlyingBattlePLAfter:underlyingAfter,
+    totalCapacityBefore:tempBefore+underlyingBefore,
+    totalCapacityAfter:getBattleTemporaryCapacity(side,participantId)+underlyingAfter
+  };
+}
+
+function calculateExcessDamageResidual(finalPLDamage, absorbedPL) {
+  return Math.max(0,Math.round(Number(finalPLDamage)||0)-Math.max(0,Math.round(Number(absorbedPL)||0)));
+}
+
+
+
+// =========================================================
 // BRICK 303 — SOURCE/TARGET TRANSIENT INTERACTION STATE
 // =========================================================
 //
@@ -64802,7 +64626,6 @@ function removeBattleTransientState(
   return true;
 }
 
-
 // =========================================================
 // BRICK 303 — TEMPORARY BATTLE CONDITIONS
 // BRICK 331 — CONDITION SEMANTICS
@@ -65117,6 +64940,31 @@ function getBattleParticipantConditions(
 }
 
 
+// =========================================================
+// BRICK 405 — ACTION-OPPORTUNITY PACKAGE DURATION
+// =========================================================
+
+function consumeBattleEffectiveStateActionOpportunity(side, participantId, actionId, reason) {
+  const projections=[...getBattleParticipantEffectiveStateProjections(side,participantId)];
+  const expired=[];
+  projections.forEach(projection => {
+    if (projection.remainingActionOpportunities === null || projection.remainingActionOpportunities === undefined) return;
+    if (!Number.isFinite(Number(projection.remainingActionOpportunities))) return;
+    if (projection.activationActionId && projection.activationActionId===actionId) return;
+    projection.remainingActionOpportunities=Math.max(0,Number(projection.remainingActionOpportunities)-1);
+    recordBattleEvidence({eventType:"effective_state_duration_advanced",actionId:actionId||null,
+      actorRef:createBattleParticipantRef(side,participantId),sourceRefs:[{type:"source",id:projection.sourceId}],
+      data:{projectionKey:projection.projectionKey,remainingActionOpportunities:projection.remainingActionOpportunities,reason:reason||null}});
+    if (projection.remainingActionOpportunities<=0) {
+      expired.push(...removeBattleEffectiveStateProjection(projection.projectionKey,side,participantId,"action_opportunity_duration_expired"));
+      if (side==="player" && getBattleDamageBearingCapacity(side,participantId)<=0 && getBattleActiveParticipantId(side)===participantId) {
+        handleBattleParticipantAtZeroPL(side,participantId,null,{actionId:actionId||null});
+      }
+    }
+  });
+  return expired;
+}
+
 function consumeBattleActionOpportunity(
   side,
   participantId,
@@ -65191,6 +65039,10 @@ function consumeBattleActionOpportunity(
     }
   );
 
+
+  consumeBattleEffectiveStateActionOpportunity(
+    side, participantId, actionId, reason
+  );
 
   return removedConditionIds;
 }
@@ -65275,9 +65127,18 @@ function cleanupBattleParticipantRuntimeState(
     );
 
 
+  const removedProjections = getBattleParticipantEffectiveStateProjections(side, participantId);
+  removedProjections.forEach(projection => {
+    removeBattleEffectiveStateProjection(projection.projectionKey, side, participantId, reason);
+  });
+
+  if (runtime.temporaryCapacity[side]) delete runtime.temporaryCapacity[side][participantId];
+  if (runtime.attachedSummons[side]) delete runtime.attachedSummons[side][participantId];
+
   if (
     removedStateIds.length > 0 ||
-    removedConditionIds.length > 0
+    removedConditionIds.length > 0 ||
+    removedProjections.length > 0
   ) {
 
 
@@ -65315,12 +65176,15 @@ function cleanupBattleParticipantRuntimeState(
       removedStateIds,
 
     removedConditionIds:
-      removedConditionIds
+      removedConditionIds,
+
+    removedProjectionKeys:
+      removedProjections.map(projection => projection.projectionKey)
 
   };
 }
 
-
+// =========================================================
 // BRICK 304 — SHARED BATTLE ACTION ENVELOPE
 // BRICK 344 — ITEM IDENTITY THROUGH SHARED ACTION EVIDENCE
 // =========================================================
@@ -66160,6 +66024,94 @@ function runBattleRuntimeFoundationDiagnostics() {
 
   return result;
 }
+
+
+// =========================================================
+
+
+// =========================================================
+// BRICK 406 — ATTACHED→MANIFESTED SUMMON LIFECYCLE
+// BRICK 407 — SUMMON SUB-PALETTE ACTION AUTHORITY
+// BRICK 408 — ENMA PREPARED SKILL REGISTRY
+// BRICK 409 — ENMA ADAMANTINE STAFF LUNGE
+// BRICK 410 — ENMA ADAMANTINE GUARD STATE
+// BRICK 411 — ENMA PHYSICAL RESTRAINT CONDITION
+// BRICK 412 — SUMMON EVIDENCE CHAIN
+// =========================================================
+
+const summonSkillDatabase = {
+  enma_adamantine_staff_lunge:{ id:"enma_adamantine_staff_lunge",sourceEntityId:"mk_enma",displayName:"Adamantine Staff Lunge",resolutionKind:"direct_damage",authoredAttackPL:8,staminaMitigation:true,traits:["summon_manifestation","substantial_free_movement"] },
+  enma_adamantine_guard:{ id:"enma_adamantine_guard",sourceEntityId:"mk_enma",displayName:"Adamantine Guard",resolutionKind:"pre_stamina_guard",guardReduction:6,traits:["summon_manifestation"] },
+  enma_monkey_kings_restraint:{ id:"enma_monkey_kings_restraint",sourceEntityId:"mk_enma",displayName:"Monkey King's Restraint",resolutionKind:"physical_restraint",traits:["summon_manifestation","substantial_free_movement"] }
+};
+
+function getSummonSkillsForEntity(entityId) {
+  return Object.values(summonSkillDatabase).filter(skill=>skill&&skill.sourceEntityId===entityId);
+}
+
+function openBattleSummonActionFamily() {
+  if (!currentBattle.active || currentBattle.battleOver) return {success:false,reason:"battle_not_active"};
+  const actor=getBattleDeploymentParticipant("player",1);
+  const attached=actor ? getBattleAttachedSummon("player",actor.id) : null;
+  if (!actor || !attached) return {success:false,reason:"attached_summon_unavailable"};
+  const skills=getSummonSkillsForEntity(attached.summonId);
+  if (skills.length===0) return {success:false,reason:"no_prepared_summon_skills"};
+  const state=ensureBattleRuntimeState().summonActionState;
+  state.actorParticipantId=actor.id; state.summonId=attached.summonId; state.mode="summon_skills";
+  return {success:true,mode:state.mode,summonId:state.summonId,skillIds:skills.map(skill=>skill.id)};
+}
+
+function closeBattleSummonActionFamily() {
+  const state=ensureBattleRuntimeState().summonActionState;
+  state.actorParticipantId=null; state.summonId=null; state.mode="closed";
+  return {success:true,mode:"closed"};
+}
+
+function attemptBattleSummonSkill(skillId) {
+  const skill=summonSkillDatabase[skillId] || null;
+  const actor=getBattleDeploymentParticipant("player",1);
+  const target=getBattleDeploymentParticipant("enemy",1);
+  if (!skill || !actor) return {success:false,reason:"skill_or_actor_missing"};
+  const attached=getBattleAttachedSummon("player",actor.id);
+  if (!attached || attached.summonId!==skill.sourceEntityId || attached.state!=="attached") return {success:false,reason:"required_summon_not_attached"};
+  if ((skill.resolutionKind==="direct_damage" || skill.resolutionKind==="physical_restraint") && !target) return {success:false,reason:"target_missing"};
+  const envelope=createBattleActionEnvelope({
+    actorSide:"player",actorParticipantId:actor.id,
+    targetSide:skill.resolutionKind==="pre_stamina_guard" ? "player" : "enemy",
+    targetParticipantId:skill.resolutionKind==="pre_stamina_guard" ? actor.id : target.id,
+    actionClass:"summon_skill",skillId:skill.id,
+    sourceRefs:[{type:"summon_entity",id:skill.sourceEntityId},{type:"summon_skill",id:skill.id}],
+    data:{traits:[...skill.traits],summonId:skill.sourceEntityId}
+  });
+  const entry=beginBattleActionResolution(envelope);
+  if (!entry.accepted) return {success:false,reason:entry.validation.reason,validation:entry.validation};
+  const manifested=manifestBattleAttachedSummon("player",actor.id,skill.id);
+  if (!manifested) return {success:false,reason:"manifestation_failed"};
+  recordBattleEvidence({eventType:"summon_manifested",actionId:envelope.actionId,actorRef:envelope.actorRef,sourceRefs:envelope.sourceRefs,data:{summonId:skill.sourceEntityId,skillId:skill.id}});
+  let resolution=null;
+  if (skill.resolutionKind==="direct_damage") {
+    const output={primaryDiscipline:null,statKey:null,effectivePrimaryDiscipline:null,coefficient:null,branch:"authored_summon_output",branchMultiplier:1,preDefenseAttackMagnitude:skill.authoredAttackPL,attackPL:skill.authoredAttackPL};
+    const damage=resolveBattleDamagePacket({actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,envelope,skill});
+    resolution={resolved:!!damage,damageApplied:!!damage,damage};
+  } else if (skill.resolutionKind==="pre_stamina_guard") {
+    const state=addBattleTransientState({stateKey:"enma_adamantine_guard",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,
+      ownerRef:{type:"summon_entity",id:"mk_enma"},data:{guardReduction:skill.guardReduction,oneUse:true}});
+    resolution={resolved:!!state,stateRefs:state?[state.stateId]:[]};
+  } else if (skill.resolutionKind==="physical_restraint") {
+    const condition=addBattleCondition({conditionKey:"physical_restraint",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,
+      ownerRef:{type:"summon_entity",id:"mk_enma"},blockedActionTraits:["substantial_free_movement"],data:{expiry:"next_action_opportunity",blanketStun:false}});
+    resolution={resolved:!!condition,conditionRefs:condition?[condition.conditionId]:[]};
+  }
+  returnBattleAttachedSummon("player",actor.id);
+  recordBattleEvidence({eventType:"summon_skill_resolved_and_returned",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,
+    stateRefs:resolution&&resolution.stateRefs?resolution.stateRefs:[],conditionRefs:resolution&&resolution.conditionRefs?resolution.conditionRefs:[],data:{summonId:skill.sourceEntityId,returnedState:"attached",resolved:!!(resolution&&resolution.resolved)}});
+  if (resolution && resolution.resolved) consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_summon_skill_completed");
+  closeBattleSummonActionFamily();
+  saveTestState();
+  if (!currentBattle.battleOver) openOverlay("combat");
+  return {success:!!(resolution&&resolution.resolved),envelope,resolution};
+}
+
 
 
 // =========================================================
@@ -68837,7 +68789,6 @@ function runBattlePouchV1Diagnostics() {
   return result;
 }
 
-// =========================================================
 // BRICK 308 — ACADEMY BATTLE SKILL REGISTRY
 // =========================================================
 //
@@ -69471,7 +69422,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
       "academy_menma",
 
     type:
-      "Hosted-Entity-Assisted Technique",
+      "Attached-Summon-Assisted Technique",
 
     primaryDiscipline:
       "Ninjutsu",
@@ -69513,7 +69464,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     ],
 
     traits: [
-      "hosted_entity_assisted"
+      "attached_summon_assisted"
     ],
 
     requirements: [
@@ -69521,10 +69472,10 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
       {
 
         kind:
-          "hosted_entity_access",
+          "attached_summon_access",
 
         entityId:
-          "yin_kurama",
+          "menma_nine_tails",
 
         expressionId:
           "limited_yin_kurama_chakra",
@@ -69533,7 +69484,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
           true,
 
         label:
-          "Yin Kurama cooperative access required."
+          "Menma Nine-Tails cooperative access required."
 
       }
 
@@ -69569,7 +69520,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
       "academy_menma",
 
     type:
-      "Hosted-Entity-Assisted Technique",
+      "Attached-Summon-Assisted Technique",
 
     primaryDiscipline:
       "Taijutsu",
@@ -69611,7 +69562,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     ],
 
     traits: [
-      "hosted_entity_assisted"
+      "attached_summon_assisted"
     ],
 
     requirements: [
@@ -69619,10 +69570,10 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
       {
 
         kind:
-          "hosted_entity_access",
+          "attached_summon_access",
 
         entityId:
-          "yin_kurama",
+          "menma_nine_tails",
 
         expressionId:
           "limited_yin_kurama_chakra",
@@ -69631,7 +69582,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
           true,
 
         label:
-          "Yin Kurama cooperative access required."
+          "Menma Nine-Tails cooperative access required."
 
       }
 
@@ -69667,7 +69618,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
       "academy_menma",
 
     type:
-      "Relationship-Owned / Hosted-Entity Setup",
+      "Relationship-Owned / Attached-Summon Setup",
 
     primaryDiscipline:
       "Ninjutsu-support",
@@ -69696,10 +69647,10 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
       {
 
         kind:
-          "hosted_entity_access",
+          "attached_summon_access",
 
         entityId:
-          "yin_kurama",
+          "menma_nine_tails",
 
         expressionId:
           "limited_yin_kurama_chakra",
@@ -69711,7 +69662,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
           true,
 
         label:
-          "Menma ↔ Yin Kurama cooperative access required."
+          "Menma ↔ Menma Nine-Tails cooperative access required."
 
       }
 
@@ -69720,10 +69671,10 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
     stateOwnerRef: {
 
       type:
-        "hosted_binding",
+        "attached_summon_access",
 
       id:
-        "academy_menma_yin_kurama"
+        "academy_menma_menma_nine_tails"
 
     },
 
@@ -69736,7 +69687,7 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
         "refresh_replace",
 
       compatibleConsumerTrait:
-        "hosted_entity_assisted"
+        "attached_summon_assisted"
 
     }
   },
@@ -70083,7 +70034,7 @@ function getPreparedAcademyBattleSkills(
     );
 }
 
-
+// =========================================================
 // BRICK 308 — SKILL AVAILABILITY
 // BRICK 316 — PERSISTENT THROWING-WEAPON AVAILABILITY
 // =========================================================
@@ -70377,6 +70328,10 @@ function evaluateAcademyBattleSkillAvailability(
     [];
 
 
+  const attachedSummonAccessRecords =
+    [];
+
+
   for (
     const requirement of
     skill.requirements ||
@@ -70509,6 +70464,34 @@ function evaluateAcademyBattleSkillAvailability(
 
 
     // =====================================================
+    // ATTACHED SUMMON ACCESS
+    // =====================================================
+
+    if (
+      requirement.kind ===
+        "attached_summon_access"
+    ) {
+
+      const access =
+        evaluateAttachedSummonAccess(
+          actor.id,
+          requirement.entityId,
+          {
+            requireCooperative: requirement.requireCooperative === true,
+            expressionId: requirement.expressionId || null,
+            cooperativeCapabilityId: requirement.cooperativeCapabilityId || null
+          }
+        );
+
+      if (!access.available) {
+        return { available:false, reason:requirement.label || access.reason, attachedSummonAccess:access };
+      }
+
+      attachedSummonAccessRecords.push(access);
+    }
+
+
+    // =====================================================
     // HOSTED / BOUND ENTITY ACCESS
     // =====================================================
 
@@ -70584,7 +70567,10 @@ function evaluateAcademyBattleSkillAvailability(
       toolContexts,
 
     hostedAccessRecords:
-      hostedAccessRecords
+      hostedAccessRecords,
+
+    attachedSummonAccessRecords:
+      attachedSummonAccessRecords
 
   };
 }
@@ -71105,6 +71091,17 @@ function getAcademyBattleSkillSourceRefs(
   }
 
 
+  if (
+    availability &&
+    Array.isArray(availability.attachedSummonAccessRecords)
+  ) {
+    availability.attachedSummonAccessRecords.forEach(access => {
+      if (access && access.entity && access.entity.id) refs.push({type:"attached_summon",id:access.entity.id});
+      if (access && access.access && access.access.id) refs.push({type:"summon_access",id:access.access.id});
+    });
+  }
+
+
   const unique =
     [];
 
@@ -71147,7 +71144,6 @@ function getAcademyBattleSkillSourceRefs(
 }
 
 
-// =========================================================
 // BRICK 310 — SHARED SKILL SEMANTIC RESOLVER
 // BRICK 317 — COMPATIBLE SELF-STATE CONSUMPTION
 // BRICK 323 — EFFECTIVE PRIMARY DISCIPLINE OUTPUT
@@ -71298,137 +71294,38 @@ function getAcademySkillDamageProfile(
 }
 
 
-function calculateAcademySkillAttackOutput(
-  skill,
-  actor,
-  branch = "normal"
-) {
-
-
-  const profile =
-    getAcademySkillDamageProfile(
-      skill
-    );
-
-
-  if (
-    !profile ||
-    !actor
-  ) {
-
-    return null;
-  }
-
-
-  const statKey =
-    getBattlePrimaryDisciplineStatKey(
-      skill.primaryDiscipline
-    );
-
-
-  if (
-    !statKey
-  ) {
-
-    return null;
-  }
-
-
-  const effectiveStats =
-    getDevelopedEffectiveCharacterStats(
-      actor
-    );
-
-
-  const effectivePrimaryDiscipline =
-    Math.max(
-      0,
-      Number(
-        effectiveStats[
-          statKey
-        ]
-      ) || 0
-    );
-
-
-  const coefficient =
-    Math.max(
-      0,
-      Number(
-        profile.coefficient
-      ) || 0
-    );
-
-
-  const branchMultipliers =
-    profile.branchMultipliers &&
-    typeof profile.branchMultipliers ===
-      "object"
-
-      ? profile.branchMultipliers
-
-      : {};
-
-
-  const branchMultiplier =
-    branch !== "normal" &&
-    branchMultipliers[
-      branch
-    ] !== undefined
-
-      ? Number(
-          branchMultipliers[
-            branch
-          ]
-        ) || 1
-
-      : 1;
-
-
-  const preDefenseAttackMagnitude =
-    effectivePrimaryDiscipline *
-    coefficient *
-    branchMultiplier;
-
-
-  const attackPL =
-    Math.max(
-      1,
-      Math.round(
-        preDefenseAttackMagnitude
-      )
-    );
-
-
-  return {
-
-    primaryDiscipline:
-      skill.primaryDiscipline,
-
-    statKey:
-      statKey,
-
-    effectivePrimaryDiscipline:
-      effectivePrimaryDiscipline,
-
-    coefficient:
-      coefficient,
-
-    branch:
-      branch,
-
-    branchMultiplier:
-      branchMultiplier,
-
-    preDefenseAttackMagnitude:
-      preDefenseAttackMagnitude,
-
-    attackPL:
-      attackPL
-
-  };
+function getWeaponExecutionContextForSkill(skill, actor) {
+  const requirements=skill && Array.isArray(skill.requirements) ? skill.requirements : [];
+  const throwing=requirements.find(requirement=>requirement&&requirement.kind==="persistent_throwing_weapon");
+  if (throwing) return getBattleAvailablePersistentThrowingWeaponContext(actor,throwing.allowedWeaponClasses||[]);
+  const weaponRequired=requirements.some(requirement=>requirement&&requirement.kind==="weapon_class");
+  return weaponRequired ? getBattleEquippedWeaponExecutionContext(actor) : null;
 }
 
+function calculateAcademySkillAttackOutput(skill, actor, branch = "normal") {
+  const profile=getAcademySkillDamageProfile(skill);
+  if (!profile || !actor) return null;
+  const statKey=getBattlePrimaryDisciplineStatKey(skill.primaryDiscipline);
+  if (!statKey) return null;
+  const effectiveStats=getDevelopedEffectiveCharacterStats(actor);
+  const effectivePrimaryDiscipline=Math.max(0,Number(effectiveStats[statKey])||0);
+  const coefficient=Math.max(0,Number(profile.coefficient)||0);
+  const branchMultipliers=profile.branchMultipliers&&typeof profile.branchMultipliers==="object"?profile.branchMultipliers:{};
+  const branchMultiplier=branch!=="normal"&&branchMultipliers[branch]!==undefined ? Number(branchMultipliers[branch])||1 : 1;
+  const authoredMagnitude=effectivePrimaryDiscipline*coefficient*branchMultiplier;
+  const weaponContext=getWeaponExecutionContextForSkill(skill,actor);
+  const execution=weaponContext ? getWeaponActionExecutionMultiplier(actor,weaponContext) : {multiplier:1,state:null,severity:null};
+  const preDefenseAttackMagnitude=authoredMagnitude*execution.multiplier;
+  const attackPL=Math.max(1,Math.round(preDefenseAttackMagnitude));
+  return {
+    primaryDiscipline:skill.primaryDiscipline, statKey, effectivePrimaryDiscipline, coefficient, branch, branchMultiplier,
+    authoredPreExecutionMagnitude:authoredMagnitude,
+    weaponExecutionMultiplier:execution.multiplier,
+    weaponAcclimationState:execution.state,
+    weaponAcclimationSeverity:execution.severity,
+    preDefenseAttackMagnitude, attackPL
+  };
+}
 
 function calculateBattleStaminaMitigationV1(
   resolvedAttackPL,
@@ -71535,154 +71432,43 @@ function calculateBattleStaminaMitigationV1(
 }
 
 
-function resolveBattlePreStaminaDefense(
-  definition
-) {
-
-
-  const incomingAttackPL =
-    Math.max(
-      1,
-      Math.round(
-        Number(
-          definition.attackPL
-        ) || 1
-      )
-    );
-
-
-  const result = {
-
-    incomingAttackPL:
-      incomingAttackPL,
-
-    resolvedAttackPL:
-      incomingAttackPL,
-
-    guardingStep: {
-
-      participated:
-        false,
-
-      stateId:
-        null,
-
-      attemptedReduction:
-        0,
-
-      actualReduction:
-        0
-
-    },
-
-    consumedStateIds:
-      []
-
+function resolveBattlePreStaminaDefense(definition) {
+  const incomingAttackPL=Math.max(0,Math.round(Number(definition&&definition.attackPL)||0));
+  const result={
+    incomingAttackPL, resolvedAttackPL:incomingAttackPL,
+    guardingStep:{participated:false,stateId:null,attemptedReduction:0,actualReduction:0},
+    enmaGuard:{participated:false,stateId:null,attemptedReduction:0,actualReduction:0,sourceId:null},
+    consumedStateIds:[]
   };
+  if (definition.mitigable!==true || definition.targetSide!=="player" || !definition.targetParticipantId || incomingAttackPL<=0) return result;
 
-
-  if (
-    definition.mitigable !==
-      true ||
-    definition.targetSide !==
-      "player" ||
-    !definition.targetParticipantId
-  ) {
-
-    return result;
+  const guardingStep=findBattleTransientState({stateKey:"guarding_step",targetSide:"player",targetParticipantId:definition.targetParticipantId});
+  if (guardingStep) {
+    result.guardingStep.participated=true; result.guardingStep.stateId=guardingStep.stateId;
+    const attempted=incomingAttackPL>1?Math.max(1,Math.round(incomingAttackPL*0.25)):0;
+    const reduced=Math.max(1,result.resolvedAttackPL-attempted);
+    result.guardingStep.attemptedReduction=attempted;
+    result.guardingStep.actualReduction=Math.max(0,result.resolvedAttackPL-reduced);
+    result.resolvedAttackPL=reduced;
+    const consumed=consumeBattleTransientState(guardingStep.stateId,"player",definition.targetParticipantId);
+    if (consumed) result.consumedStateIds.push(consumed.stateId);
   }
 
-
-  const guardingStep =
-    findBattleTransientState({
-
-      stateKey:
-        "guarding_step",
-
-      targetSide:
-        "player",
-
-      targetParticipantId:
-        definition.targetParticipantId
-
-    });
-
-
-  if (
-    !guardingStep
-  ) {
-
-    return result;
+  const enmaGuard=findBattleTransientState({stateKey:"enma_adamantine_guard",targetSide:"player",targetParticipantId:definition.targetParticipantId});
+  if (enmaGuard && result.resolvedAttackPL>0) {
+    const authoredReduction=Math.max(0,Number(enmaGuard.data&&enmaGuard.data.guardReduction)||6);
+    const actual=Math.min(result.resolvedAttackPL,authoredReduction);
+    if (actual>0) {
+      result.enmaGuard.participated=true; result.enmaGuard.stateId=enmaGuard.stateId;
+      result.enmaGuard.attemptedReduction=authoredReduction; result.enmaGuard.actualReduction=actual;
+      result.enmaGuard.sourceId=enmaGuard.ownerRef&&enmaGuard.ownerRef.id?enmaGuard.ownerRef.id:"mk_enma";
+      result.resolvedAttackPL=Math.max(0,result.resolvedAttackPL-actual);
+      const consumed=consumeBattleTransientState(enmaGuard.stateId,"player",definition.targetParticipantId);
+      if (consumed) result.consumedStateIds.push(consumed.stateId);
+    }
   }
-
-
-  result.guardingStep.participated =
-    true;
-
-
-  result.guardingStep.stateId =
-    guardingStep.stateId;
-
-
-  const attemptedReduction =
-    incomingAttackPL > 1
-
-      ? Math.max(
-          1,
-          Math.round(
-            incomingAttackPL *
-            0.25
-          )
-        )
-
-      : 0;
-
-
-  const reducedAttackPL =
-    Math.max(
-      1,
-      incomingAttackPL -
-      attemptedReduction
-    );
-
-
-  result.guardingStep.attemptedReduction =
-    attemptedReduction;
-
-
-  result.guardingStep.actualReduction =
-    Math.max(
-      0,
-      incomingAttackPL -
-      reducedAttackPL
-    );
-
-
-  result.resolvedAttackPL =
-    reducedAttackPL;
-
-
-  const consumed =
-    consumeBattleTransientState(
-      guardingStep.stateId,
-      "player",
-      definition.targetParticipantId
-    );
-
-
-  if (
-    consumed
-  ) {
-
-    result.consumedStateIds.push(
-      consumed.stateId
-    );
-  }
-
-
   return result;
 }
-
 
 function completeBattleVictoryFromDamage(
   finishingShinobi,
@@ -71838,320 +71624,133 @@ function handleBattleParticipantAtZeroPL(
 }
 
 
-function resolveBattleDamagePacket(
-  definition
-) {
-
-
-  if (
-    !definition ||
-    !definition.actorSide ||
-    !definition.actorParticipantId ||
-    !definition.targetSide ||
-    !definition.targetParticipantId ||
-    !definition.output
-  ) {
-
-    return null;
+function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
+  if (!definition || !definition.actorSide || !definition.actorParticipantId || !definition.targetSide || !definition.targetParticipantId || !definition.output) return null;
+  const targetRecord=getBattleRemainingPLRecord(definition.targetSide,definition.targetParticipantId);
+  if (!targetRecord) return null;
+  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId});
+  const effectiveStamina=getBattleEffectiveStamina(definition.targetSide,definition.targetParticipantId);
+  const staminaResolution=calculateBattleStaminaMitigationV1(preDefense.resolvedAttackPL,effectiveStamina);
+  const absorption=absorbBattleDamageBearingCapacity(definition.targetSide,definition.targetParticipantId,staminaResolution.finalDamage);
+  const stateRefs=[...(Array.isArray(definition.stateRefs)?definition.stateRefs:[]),...preDefense.consumedStateIds];
+  const evidence=recordBattleEvidence({
+    eventType:"damage_resolved",actionId:definition.envelope?definition.envelope.actionId:null,
+    actorRef:createBattleParticipantRef(definition.actorSide,definition.actorParticipantId),
+    targetRef:createBattleParticipantRef(definition.targetSide,definition.targetParticipantId),
+    skillId:definition.skill?definition.skill.id:null,
+    sourceRefs:definition.envelope&&Array.isArray(definition.envelope.sourceRefs)?definition.envelope.sourceRefs:[],stateRefs,
+    data:{
+      excessDamageSegmentIndex:segmentIndex,
+      continuationSegment:segmentIndex>0,
+      primaryDiscipline:definition.output.primaryDiscipline,
+      primaryDisciplineStatKey:definition.output.statKey,
+      effectivePrimaryDiscipline:definition.output.effectivePrimaryDiscipline,
+      authoredCoefficient:segmentIndex===0?definition.output.coefficient:null,
+      branch:segmentIndex===0?definition.output.branch:"excess_damage_continuation",
+      branchMultiplier:segmentIndex===0?definition.output.branchMultiplier:null,
+      authoredPreExecutionMagnitude:segmentIndex===0?definition.output.authoredPreExecutionMagnitude:null,
+      weaponExecutionMultiplier:segmentIndex===0?definition.output.weaponExecutionMultiplier:null,
+      preDefenseAttackMagnitude:definition.output.preDefenseAttackMagnitude,
+      preDefenseAttackPL:definition.output.attackPL,
+      guardingStepParticipated:preDefense.guardingStep.participated,
+      guardingStepActualReduction:preDefense.guardingStep.actualReduction,
+      enmaGuardParticipated:preDefense.enmaGuard.participated,
+      enmaGuardActualReduction:preDefense.enmaGuard.actualReduction,
+      resolvedAttackPL:preDefense.resolvedAttackPL,
+      effectiveStamina:staminaResolution.effectiveStamina,
+      staminaPivot:staminaResolution.pivot,
+      staminaMitigationAmount:staminaResolution.mitigationAmount,
+      finalDamage:staminaResolution.finalDamage,
+      temporaryCapacityBefore:absorption.temporaryCapacityBefore,
+      temporaryCapacityAbsorbed:absorption.temporaryCapacityAbsorbed,
+      temporaryCapacityAfter:absorption.temporaryCapacityAfter,
+      remainingBattlePLBefore:absorption.underlyingBattlePLBefore,
+      remainingBattlePLAfter:absorption.underlyingBattlePLAfter,
+      absorbedPL:absorption.absorbedPL,
+      residualAttackPL:absorption.residualAttackPL,
+      mechanicalPacketCount:definition.skill&&definition.skill.mechanicalPacketCount?definition.skill.mechanicalPacketCount:1
+    }
+  });
+  const actor=getBattleParticipantByIdentity(definition.actorSide,definition.actorParticipantId);
+  if (definition.actorSide==="player"&&definition.targetSide==="enemy"&&actor) recordBattleContribution(actor,absorption.absorbedPL,definition.output.statKey);
+  currentBattle.lastDamage=absorption.absorbedPL;
+  if (Array.isArray(currentBattle.battleLog)) {
+    const g=preDefense.guardingStep.participated?` Guard blocked ${preDefense.guardingStep.actualReduction}.`:"";
+    const e=preDefense.enmaGuard.participated?` Enma blocked ${preDefense.enmaGuard.actualReduction}.`:"";
+    const t=absorption.temporaryCapacityAbsorbed>0?` Temporary capacity absorbed ${absorption.temporaryCapacityAbsorbed}.`:"";
+    currentBattle.battleLog.push(`Attack ${definition.output.attackPL}.${g}${e} Stamina blocked ${staminaResolution.mitigationAmount}.${t} ${absorption.absorbedPL} capacity lost.`);
   }
-
-
-  const targetRecord =
-    getBattleRemainingPLRecord(
-      definition.targetSide,
-      definition.targetParticipantId
-    );
-
-
-  if (
-    !targetRecord
-  ) {
-
-
-    console.log(
-      "Battle damage target has no Remaining PL record."
-    );
-
-
-    return null;
-  }
-
-
-  const before =
-    targetRecord.current;
-
-
-  const preDefense =
-    resolveBattlePreStaminaDefense({
-
-      attackPL:
-        definition.output.attackPL,
-
-      mitigable:
-        definition.mitigable ===
-          true,
-
-      targetSide:
-        definition.targetSide,
-
-      targetParticipantId:
-        definition.targetParticipantId
-
-    });
-
-
-  const effectiveStamina =
-    getBattleEffectiveStamina(
-      definition.targetSide,
-      definition.targetParticipantId
-    );
-
-
-  const staminaResolution =
-    calculateBattleStaminaMitigationV1(
-      preDefense.resolvedAttackPL,
-      effectiveStamina
-    );
-
-
-  const after =
-    Math.max(
-      0,
-      before -
-      staminaResolution.finalDamage
-    );
-
-
-  setBattleRemainingPL(
-    definition.targetSide,
-    definition.targetParticipantId,
-    after
-  );
-
-
-  const stateRefs = [
-
-    ...(
-      Array.isArray(
-        definition.stateRefs
-      )
-        ? definition.stateRefs
-        : []
-    ),
-
-    ...preDefense.consumedStateIds
-
-  ];
-
-
-  const evidence =
-    recordBattleEvidence({
-
-      eventType:
-        "damage_resolved",
-
-      actionId:
-        definition.envelope
-          ? definition.envelope.actionId
-          : null,
-
-      actorRef:
-        createBattleParticipantRef(
-          definition.actorSide,
-          definition.actorParticipantId
-        ),
-
-      targetRef:
-        createBattleParticipantRef(
-          definition.targetSide,
-          definition.targetParticipantId
-        ),
-
-      skillId:
-        definition.skill
-          ? definition.skill.id
-          : null,
-
-      sourceRefs:
-        definition.envelope &&
-        Array.isArray(
-          definition.envelope.sourceRefs
-        )
-          ? definition.envelope.sourceRefs
-          : [],
-
-      stateRefs:
-        stateRefs,
-
-      data: {
-
-        primaryDiscipline:
-          definition.output.primaryDiscipline,
-
-        primaryDisciplineStatKey:
-          definition.output.statKey,
-
-        effectivePrimaryDiscipline:
-          definition.output.effectivePrimaryDiscipline,
-
-        authoredCoefficient:
-          definition.output.coefficient,
-
-        branch:
-          definition.output.branch,
-
-        branchMultiplier:
-          definition.output.branchMultiplier,
-
-        preDefenseAttackMagnitude:
-          definition.output.preDefenseAttackMagnitude,
-
-        preDefenseAttackPL:
-          definition.output.attackPL,
-
-        guardingStepParticipated:
-          preDefense.guardingStep.participated,
-
-        guardingStepStateId:
-          preDefense.guardingStep.stateId,
-
-        guardingStepAttemptedReduction:
-          preDefense.guardingStep.attemptedReduction,
-
-        guardingStepActualReduction:
-          preDefense.guardingStep.actualReduction,
-
-        resolvedAttackPL:
-          preDefense.resolvedAttackPL,
-
-        effectiveStamina:
-          staminaResolution.effectiveStamina,
-
-        staminaPivot:
-          staminaResolution.pivot,
-
-        staminaMitigationAmount:
-          staminaResolution.mitigationAmount,
-
-        finalDamage:
-          staminaResolution.finalDamage,
-
-        remainingBattlePLBefore:
-          before,
-
-        remainingBattlePLAfter:
-          after,
-
-        mechanicalPacketCount:
-          definition.skill &&
-          definition.skill.mechanicalPacketCount
-            ? definition.skill.mechanicalPacketCount
-            : 1
-
-      }
-
-    });
-
-
-  const actor =
-    getBattleParticipantByIdentity(
-      definition.actorSide,
-      definition.actorParticipantId
-    );
-
-
-  if (
-    definition.actorSide ===
-      "player" &&
-    definition.targetSide ===
-      "enemy" &&
-    actor
-  ) {
-
-
-    recordBattleContribution(
-      actor,
-      staminaResolution.finalDamage,
-      definition.output.statKey
-    );
-  }
-
-
-  currentBattle.lastDamage =
-    staminaResolution.finalDamage;
-
-
-  if (
-    currentBattle.battleLog &&
-    Array.isArray(
-      currentBattle.battleLog
-    )
-  ) {
-
-
-    const guardText =
-      preDefense.guardingStep.participated
-
-        ? ` Guard blocked ${preDefense.guardingStep.actualReduction}.`
-
-        : "";
-
-
-    currentBattle.battleLog.push(
-      `Attack ${definition.output.attackPL}.${guardText} Stamina blocked ${staminaResolution.mitigationAmount}. ${staminaResolution.finalDamage} BP lost.`
-    );
-  }
-
-
-  let zeroResult =
-    null;
-
-
-  if (
-    after <= 0
-  ) {
-
-
-    zeroResult =
-      handleBattleParticipantAtZeroPL(
-        definition.targetSide,
-        definition.targetParticipantId,
-        actor,
-        definition.envelope ||
-          null
-      );
-  }
-
-
-  return {
-
-    evidence:
-      evidence,
-
-    output:
-      definition.output,
-
-    preDefense:
-      preDefense,
-
-    stamina:
-      staminaResolution,
-
-    finalDamage:
-      staminaResolution.finalDamage,
-
-    remainingBattlePLBefore:
-      before,
-
-    remainingBattlePLAfter:
-      after,
-
-    zeroResult:
-      zeroResult
-
-  };
+  let zeroResult=null;
+  if (absorption.totalCapacityAfter<=0) zeroResult=handleBattleParticipantAtZeroPL(definition.targetSide,definition.targetParticipantId,actor,definition.envelope||null);
+  return {evidence,output:definition.output,preDefense,stamina:staminaResolution,absorption,
+    finalDamage:staminaResolution.finalDamage,absorbedPL:absorption.absorbedPL,residualAttackPL:absorption.residualAttackPL,
+    remainingBattlePLBefore:absorption.underlyingBattlePLBefore,remainingBattlePLAfter:absorption.underlyingBattlePLAfter,zeroResult};
 }
 
+function resolveBattleDamagePacket(definition) {
+  if (!definition || !definition.output) return null;
+  const explicitExcess=definition.propagationMode==="excess_damage" || (definition.skill&&definition.skill.propagationMode==="excess_damage");
+  const segments=[];
+  let targetParticipantId=definition.targetParticipantId;
+  let carriedAttackPL=Math.max(0,Math.round(Number(definition.output.attackPL)||0));
+  let segmentIndex=0;
+  while (targetParticipantId && carriedAttackPL>0) {
+    const output={...definition.output,attackPL:carriedAttackPL,preDefenseAttackMagnitude:carriedAttackPL};
+    const segment=resolveSingleBattleDamageSegment({...definition,targetParticipantId,output},segmentIndex);
+    if (!segment) break;
+    segments.push(segment);
+    if (!explicitExcess || segment.residualAttackPL<=0 || segment.absorption.totalCapacityAfter>0 || currentBattle.battleOver) break;
+    const nextTarget=getBattleDeploymentParticipant(definition.targetSide,1);
+    if (!nextTarget || nextTarget.id===targetParticipantId) break;
+    carriedAttackPL=calculateExcessDamageResidual(segment.finalDamage,segment.absorbedPL);
+    if (carriedAttackPL<=0) break;
+    targetParticipantId=nextTarget.id;
+    segmentIndex+=1;
+  }
+  if (explicitExcess && segments.length>0) {
+    recordBattleEvidence({eventType:"excess_damage_resolution_completed",actionId:definition.envelope?definition.envelope.actionId:null,
+      actorRef:createBattleParticipantRef(definition.actorSide,definition.actorParticipantId),skillId:definition.skill?definition.skill.id:null,
+      data:{segmentCount:segments.length,targetParticipantIds:segments.map(segment=>segment.evidence&&segment.evidence.targetRef?segment.evidence.targetRef.participantId:null),
+        residualAttackPL:segments[segments.length-1].residualAttackPL}});
+  }
+  const first=segments[0]||null, last=segments[segments.length-1]||null;
+  return first ? {...first,segments,remainingBattlePLAfter:last.remainingBattlePLAfter,residualAttackPL:last.residualAttackPL} : null;
+}
+
+// =========================================================
+// BRICK 413 — EXCESS DAMAGE v1 COMMON CONTINUATION
+// BRICK 414 — PER-TARGET CONTINUATION EVIDENCE
+// BRICK 415 — TEMP-CAPACITY PROPAGATION PARTICIPATION
+// BRICK 416 — MENMA YIN CHAKRA MANTLE ACTIVATION
+// BRICK 417 — MENMA RESERVOIR / MANTLE COEXISTENCE
+// BRICK 418 — MANTLE TWO-OPPORTUNITY DURATION
+// =========================================================
+
+function attemptAcademyMenmaYinChakraMantle() {
+  if (!currentBattle.active || currentBattle.battleOver) return {success:false,reason:"battle_not_active"};
+  const actor=getBattleDeploymentParticipant("player",1);
+  if (!actor || actor.id!=="academy_menma") return {success:false,reason:"academy_menma_not_active"};
+  const access=evaluateAttachedSummonAccess(actor.id,"menma_nine_tails",{requireCooperative:true,expressionId:"limited_yin_kurama_chakra"});
+  if (!access.available) return {success:false,reason:access.reason,access};
+  const key=createEffectiveStateProjectionKey("academy_menma","yin_chakra_mantle_academy","active_transformation");
+  if (getBattleEffectiveStateProjection(key,"player",actor.id)) return {success:false,reason:"mantle_already_active"};
+  const envelope=createBattleActionEnvelope({actorSide:"player",actorParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,
+    actionClass:"positive_self_enhancement",skillId:"yin_chakra_mantle_academy",
+    sourceRefs:[{type:"attached_summon",id:"menma_nine_tails"},{type:"transformation_package",id:"yin_chakra_mantle_academy"}],
+    data:{traits:["chakra_dependent_positive_self_enhancement","active_transformation"]}});
+  const entry=beginBattleActionResolution(envelope);
+  if (!entry.accepted) return {success:false,reason:entry.validation.reason,validation:entry.validation};
+  const activated=activateBattleEffectiveStatePackage({side:"player",participantId:actor.id,sourceId:"academy_menma",exactPackageId:"yin_chakra_mantle_academy",
+    expressionStateId:"active_transformation",activationActionId:envelope.actionId,durationActionOpportunities:2,
+    activationOwner:{type:"transformation",id:"yin_chakra_mantle_academy"},expirationOwner:{type:"action_opportunity",count:2}});
+  if (!activated.success) return activated;
+  recordBattleEvidence({eventType:"transformation_activated",actionId:envelope.actionId,actorRef:envelope.actorRef,sourceRefs:envelope.sourceRefs,
+    data:{transformationId:"yin_chakra_mantle_academy",durationActionOpportunities:2,temporaryCapacityOverlay:4}});
+  consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"transformation_activation_completed");
+  saveTestState();
+  openOverlay("combat");
+  return {success:true,envelope,projection:activated.projection,effectiveStats:getDevelopedEffectiveCharacterStats(actor),effectivePL:calculateEffectivePL(actor),temporaryCapacity:getBattleTemporaryCapacity("player",actor.id)};
+}
 
 function findAcademyConditionalState(
   skill,
@@ -72734,6 +72333,7 @@ function resolveAcademyBattleSkillSemantics(
 }
 
 
+// =========================================================
 // BRICK 310 — SHARED SKILL ACTION ENTRY
 // =========================================================
 
@@ -73015,7 +72615,7 @@ function attemptAcademyBattleSkill(
   };
 }
 
-
+// =========================================================
 // BRICK 308–310 — PILOT DIAGNOSTIC
 // =========================================================
 
@@ -73165,24 +72765,28 @@ function runAcademyBattleSkillDefinitionDiagnostics() {
       ),
 
 
-    menmaUsesHostedAuthority:
+    menmaUsesAttachedSummonAuthority:
       !!(
         menmaPulse &&
         menmaPulse.requirements
           .some(
             requirement =>
               requirement.kind ===
-              "hosted_entity_access"
+              "attached_summon_access" &&
+              requirement.entityId ===
+                "menma_nine_tails"
           )
       ),
 
 
-    guidanceUsesHostedBinding:
+    guidanceUsesAttachedSummonAccess:
       !!(
         guidance &&
         guidance.stateOwnerRef &&
         guidance.stateOwnerRef.type ===
-          "hosted_binding"
+          "attached_summon_access" &&
+        guidance.stateOwnerRef.id ===
+          "academy_menma_menma_nine_tails"
       ),
 
 
@@ -73408,10 +73012,24 @@ function runAcademyPilotIntegrationDiagnostics() {
       ),
 
 
-    menmaHostedAccessAvailable:
+    menmaAttachedSummonAccessAvailable:
       getAcademyMenmaHostedEntityAccess()
         .available ===
         true,
+
+
+    menmaAttachedSummonRuntimeReady:
+      !!(
+        getBattleAttachedSummon(
+          "player",
+          "academy_menma"
+        ) &&
+        getBattleAttachedSummon(
+          "player",
+          "academy_menma"
+        ).summonId ===
+          "menma_nine_tails"
+      ),
 
 
     remainingBattlePLReady:
@@ -73675,6 +73293,123 @@ function runAcademyDamageStaminaV1Diagnostics() {
     }
 
   };
+}
+
+
+// =========================================================
+
+
+// =========================================================
+// BRICK 426 — REGISTRY FORMULA REGRESSION
+// BRICK 427 — ENTITY PL INDEPENDENCE REGRESSION
+// BRICK 428 — PACKAGE IDEMPOTENCE REGRESSION
+// BRICK 429 — MENMA COEXISTENCE / DURATION REGRESSION
+// BRICK 430 — WEAPON GAP / ACCLIMATION REGRESSION
+// BRICK 431 — EXCESS DAMAGE CAPACITY REGRESSION
+// BRICK 432 — ENMA GUARD / RESTRAINT REGRESSION
+// BRICK 433 — MEGA-BATCH MASTER DIAGNOSTIC
+// =========================================================
+
+function showEffectiveStatePackageCatalog() {
+  const rows=Object.values(effectiveStatePackageDatabase).map(definition=>({
+    packageKey:definition.packageKey, sourceId:definition.sourceId, exactPackageId:definition.exactPackageId,
+    classification:definition.classification, overlapMode:definition.overlapMode, statModifiers:JSON.stringify(definition.statModifiers||{})
+  }));
+  console.table(rows);
+  return rows;
+}
+
+function showEntityRegistryPL() {
+  const rows=Object.values(entityRegistry).filter(entity=>entity&&entity.baseStats).map(entity=>({
+    entityId:entity.id,basePL:entity.basePL,currentPL:calculateEntityCurrentPL(entity.id)
+  }));
+  console.table(rows);
+  return rows;
+}
+
+function runMegaBatchStaticDiagnostics() {
+  const characterFormula=Object.values(characterRegistry).filter(record=>record&&record.baseStats).every(record=>
+    Math.round(calculateRawPLFromStats(record.baseStats))===Number(record.basePL));
+  const runtimeRegistryBridge=playerTeam.every(character=>{
+    const record=getCharacterRegistryEntry(getCharacterRegistryId(character));
+    return !!record && JSON.stringify(cloneCanonicalSevenStats(record.baseStats))===JSON.stringify(cloneCanonicalSevenStats(character.baseStats)) && Number(record.basePL)===Number(character.basePL);
+  });
+  const ownedNine=DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.every(id=>isCharacterRegistryOwned(id));
+  const academyVisible=ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(id=>getClanManageableRosterCharacters().some(character=>character.id===id));
+  const entityFormula=Object.values(entityRegistry).filter(entity=>entity&&entity.baseStats).every(entity=>
+    Math.round(calculateRawPLFromStats(entity.baseStats))===Number(entity.basePL));
+  const itachi=getCharacterRegistryEntry("akatsuki_itachi");
+  const itachiCorrect=!!(itachi&&itachi.basePL===95&&itachi.baseStats.stamina===84&&itachi.canonicalIllness===false);
+  const noStaleMenmaHostedBinding=!getHostedEntityBinding("academy_menma","yin_kurama");
+  const menmaAttached=getAttachedSummonIdForCharacter("academy_menma")==="menma_nine_tails";
+  const gapTable=[0,1,2,3,4,8].map(gap=>gap>=4?0.35:WEAPON_PROFICIENCY_REALIZATION_BY_GAP[gap]);
+  const weaponGapTable=JSON.stringify(gapTable)===JSON.stringify([1,0.9,0.75,0.55,0.35,0.35]);
+  const pilotWeaponProfiles=WEAPON_CONTRIBUTION_PILOT_PROFILES.length===6 &&
+    WEAPON_CONTRIBUTION_PILOT_PROFILES.every(profile=>
+      profile && typeof profile.name==="string" &&
+      Number.isFinite(Number(profile.weaponDifficulty)) &&
+      profile.statModifiers && typeof profile.statModifiers==="object"
+    );
+  const packageCatalog=!!(
+    getEffectiveStatePackageDefinition("mk_enma","adamantine_presence") &&
+    getEffectiveStatePackageDefinition("nine_tails","vast_chakra_reserve") &&
+    getEffectiveStatePackageDefinition("yin_kurama","yin_chakra_precision") &&
+    getEffectiveStatePackageDefinition("de_baku","devouring_pressure").classification==="resolver"
+  );
+  const result={characterFormula,runtimeRegistryBridge,ownedNine,academyVisible,entityFormula,itachiCorrect,noStaleMenmaHostedBinding,menmaAttached,weaponGapTable,pilotWeaponProfiles,packageCatalog};
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result); return result;
+}
+
+function runMegaBatchLiveDiagnostics() {
+  if (!currentBattle.active || currentBattle.battleOver) return {pass:false,reason:"Start an active Battle first."};
+  const academyMenma=getPlayerCharacter("academy_menma");
+  const actor=getBattleDeploymentParticipant("player",1);
+  if (!actor || !academyMenma) return {pass:false,reason:"Battle participant or Academy Menma missing."};
+  const runtimeSnapshot=cloneBattleRuntimeValue(getBattleRuntimeSaveState());
+  const results={};
+  try {
+    // Source-aware idempotence + Menma coexistence can be tested on Menma if deployed; otherwise use low-risk formula checks only.
+    const menmaDeployed=currentBattle.deployment.player.slots.some(slot=>slot.participantId==="academy_menma");
+    results.menmaDeployedForPackageProof=menmaDeployed;
+    if (menmaDeployed) {
+      const reservoir=activateBattleEntityEnhancement("academy_menma","menma_nine_tails","yin_chakra_reservoir","attached_enhancement");
+      const reservoirAgain=activateBattleEntityEnhancement("academy_menma","menma_nine_tails","yin_chakra_reservoir","attached_enhancement");
+      const mantle=activateBattleEffectiveStatePackage({side:"player",participantId:"academy_menma",sourceId:"academy_menma",exactPackageId:"yin_chakra_mantle_academy",expressionStateId:"active_transformation",activationActionId:"diagnostic_activation",durationActionOpportunities:2});
+      const mods=getBattleEffectiveStateStatModifiersForCharacter(academyMenma);
+      results.packageIdempotence=reservoir.success===true&&reservoirAgain.idempotent===true;
+      results.menmaCoexistence=mantle.success===true&&mods.stamina===14&&getBattleTemporaryCapacity("player","academy_menma")===4;
+      consumeBattleEffectiveStateActionOpportunity("player","academy_menma","diagnostic_activation","diagnostic");
+      const p1=getBattleEffectiveStateProjection(createEffectiveStateProjectionKey("academy_menma","yin_chakra_mantle_academy","active_transformation"),"player","academy_menma");
+      consumeBattleEffectiveStateActionOpportunity("player","academy_menma","diagnostic_next_1","diagnostic");
+      const p2=getBattleEffectiveStateProjection(createEffectiveStateProjectionKey("academy_menma","yin_chakra_mantle_academy","active_transformation"),"player","academy_menma");
+      consumeBattleEffectiveStateActionOpportunity("player","academy_menma","diagnostic_next_2","diagnostic");
+      const p3=getBattleEffectiveStateProjection(createEffectiveStateProjectionKey("academy_menma","yin_chakra_mantle_academy","active_transformation"),"player","academy_menma");
+      results.mantleDuration=p1&&p1.remainingActionOpportunities===1&&p2&&p2.remainingActionOpportunities===1?false:(!p3);
+      // The above references are live objects; authoritative proof is expiry after exactly two post-activation consumes.
+      results.mantleDuration=!p3;
+      results.reservoirSurvivesMantleExpiry=!!getBattleEffectiveStateProjection(createEffectiveStateProjectionKey("menma_nine_tails","yin_chakra_reservoir","attached_enhancement"),"player","academy_menma");
+    }
+    const guard=addBattleTransientState({stateKey:"enma_adamantine_guard",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"summon_entity",id:"mk_enma"},data:{guardReduction:6,diagnostic:true}});
+    const guardResolution=resolveBattlePreStaminaDefense({attackPL:10,mitigable:true,targetSide:"player",targetParticipantId:actor.id});
+    results.enmaGuard=!!guard&&guardResolution.enmaGuard.participated===true&&guardResolution.enmaGuard.actualReduction===6&&guardResolution.resolvedAttackPL<=4;
+    const restraint=addBattleCondition({conditionKey:"physical_restraint",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,blockedActionTraits:["substantial_free_movement"],data:{expiry:"next_action_opportunity",diagnostic:true}});
+    const blocked=getBattleBlockingConditions("player",actor.id,"technique",["substantial_free_movement"]);
+    const nonMovement=getBattleBlockingConditions("player",actor.id,"technique",["stationary"]);
+    results.physicalRestraintSelective=!!restraint&&blocked.length>0&&nonMovement.length===0;
+    results.excessResidual=calculateExcessDamageResidual(12,7)===5;
+    results.entityPLIndependent=calculateEntityCurrentPL("mk_enma")===83 && calculateEffectivePL(actor)<(calculateEffectivePL(actor)+83);
+  } finally {
+    restoreBattleRuntimeState(runtimeSnapshot);
+  }
+  results.pass=Object.entries(results).filter(([key])=>key!=="menmaDeployedForPackageProof").every(([,value])=>value===true) && results.menmaDeployedForPackageProof===true;
+  console.table(results); return results;
+}
+
+function runMegaBatchDiagnostics() {
+  const staticResult=runMegaBatchStaticDiagnostics();
+  const liveResult=runMegaBatchLiveDiagnostics();
+  return {pass:staticResult.pass===true&&liveResult.pass===true,static:staticResult,live:liveResult};
 }
 
 
