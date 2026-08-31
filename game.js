@@ -62412,7 +62412,7 @@ overflow:hidden;
     <!-- BACKGROUND ART -->
 
     <img
-      src="Assets/Backgrounds/Victory.png"
+      src="Assets/UI/Victory.png"
 
       alt="Victory"
 
