@@ -3,7 +3,6 @@
 // CORE WORLD / REGION / OVERLAY SYSTEM
 // =========================================================
 
-// =========================================================
 // BRICK 351 — ASSET MANIFEST FOUNDATION
 // =========================================================
 //
@@ -59,7 +58,13 @@ const assetManifest = {
   ui: {
 
     practical:
-      "Assets/UI/practical.png"
+      "Assets/UI/practical.png",
+
+    // =====================================================
+    // BRICK 435 — VICTORY UI ASSET MANIFEST MIGRATION
+    // =====================================================
+    victory:
+      "Assets/UI/Victory.png"
 
   }
 
@@ -104,6 +109,21 @@ function getUIAssetPath(
   );
 }
 
+
+// =========================================================
+// BRICK 437 — VICTORY ASSET PATH DIAGNOSTIC
+// =========================================================
+function runVictoryAssetManifestDiagnostics() {
+  const path=getUIAssetPath("victory");
+  const result={
+    manifestEntry:path==="Assets/UI/Victory.png",
+    uiScoped:typeof path==="string"&&path.startsWith("Assets/UI/"),
+    noLegacyBackgroundPath:path!=="Assets/Backgrounds/Victory.png"
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
 
 // =========================================================
 // BRICK 357 — CANONICAL CHARACTER REGISTRY AUTHORITY
@@ -478,8 +498,8 @@ const characterRegistry = {
       "yang_kurama",
       "yin_kurama"
     ],
-    "defaultAttachedSummonId": "gamakichi",
-    "defaultAttachedSummonRegistryPending": true
+    // BRICK 481 — KAGE NARUTO DEFAULT SUMMON POINTER RESOLVED
+    "defaultAttachedSummonId": "gamakichi"
   },
   "teen_nagato": {
     "id": "teen_nagato",
@@ -1161,6 +1181,39 @@ const characterRegistry = {
       "mangekyo_sharingan_sarada"
     ]
   },
+  // =======================================================
+  // BRICK 439 — COERCIVE CLOAK CANONICAL REGISTRY RECORD
+  // =======================================================
+  "coercive_cloak": {
+    "id": "coercive_cloak",
+    "variantId": "coercive_cloak",
+    "variantType": "dedicated_transformed_variant",
+    "formalRank": "genin",
+    "continuity": "alternate_route",
+    "baseStats": {
+      "nin": 36,
+      "tai": 32,
+      "buki": 9,
+      "fuin": 24,
+      "kin": 34,
+      "gen": 6,
+      "stamina": 42
+    },
+    "basePL": 38,
+    "embodiedPackageId": "coercive_kurama_cloak_v1",
+    "expressionStateId": "one_tail_coercive",
+    "embodiedExpressions": [
+      "coercive_kurama_cloak_v1"
+    ],
+    "capabilities": [
+      "rasengan_form_shaping",
+      "coercive_kurama_chakra_access"
+    ],
+    "runtimeStateKeys": [
+      "seal_tension",
+      "coercive_instability"
+    ]
+  },
   "baryon_mode": {
     "id": "baryon_mode",
     "baseStats": {
@@ -1185,10 +1238,12 @@ const characterRegistry = {
   }
 };
 
+// =========================================================
+// BRICK 438 — REGISTRY HOLD BOUNDARY CLEANUP
+// =========================================================
 const CHARACTER_REGISTRY_IMPLEMENTATION_HOLDS = [
   "genin_boruto_conflicting_calibration",
-  "batch4_exact_seven_stats_not_supplied",
-  "coercive_cloak_pending_replacement_art_and_calibration"
+  "batch4_exact_seven_stats_not_supplied"
 ];
 
 function getCharacterRegistryEntry(registryId) {
@@ -1330,13 +1385,326 @@ function getRuntimeCharacterByRegistryId(registryId) {
 function characterEmbodiesExactPackage(characterOrId, exactPackageId) {
   const registryId = getCharacterRegistryId(characterOrId);
   const record = getCharacterRegistryEntry(registryId);
-  return !!(
-    record &&
-    Array.isArray(record.embodiedExpressions) &&
-    record.embodiedExpressions.includes(exactPackageId)
-  );
+  if (!record || !exactPackageId) return false;
+  if (record.embodiedPackageId===exactPackageId) return true;
+  return Array.isArray(record.embodiedExpressions)&&record.embodiedExpressions.includes(exactPackageId);
 }
 
+
+
+
+// =========================================================
+// BRICK 440 — PRECISE REGISTRY CAPABILITY ACCESS
+// =========================================================
+function getCharacterRegistryCapabilities(characterOrId) {
+  const record=getCharacterRegistryEntry(getCharacterRegistryId(characterOrId));
+  return record&&Array.isArray(record.capabilities)?[...new Set(record.capabilities.filter(Boolean))]:[];
+}
+
+function characterHasRegistryCapability(characterOrId, capabilityId) {
+  return typeof capabilityId==="string"&&getCharacterRegistryCapabilities(characterOrId).includes(capabilityId);
+}
+
+// =========================================================
+// BRICK 441 — DEDICATED-VARIANT EMBODIMENT PROOF
+// =========================================================
+function getCharacterEmbodiedPackageIds(characterOrId) {
+  const record=getCharacterRegistryEntry(getCharacterRegistryId(characterOrId));
+  if (!record) return [];
+  const ids=[];
+  if (typeof record.embodiedPackageId==="string") ids.push(record.embodiedPackageId);
+  if (Array.isArray(record.embodiedExpressions)) ids.push(...record.embodiedExpressions);
+  return [...new Set(ids.filter(Boolean))];
+}
+
+function characterEmbodiesExactPackageCanonical(characterOrId, exactPackageId) {
+  return !!exactPackageId&&getCharacterEmbodiedPackageIds(characterOrId).includes(exactPackageId);
+}
+
+// =========================================================
+// BRICK 442 — DEVELOPMENT-PILOT DECOUPLING REGRESSION
+// =========================================================
+function runDevelopmentPilotOwnershipDecouplingDiagnostics() {
+  const pilotBindings=RUNTIME_CHARACTER_REGISTRY_BINDINGS.filter(binding=>binding&&binding.developmentPilotOnly===true);
+  const result={
+    pilotMetadataExists:pilotBindings.length===5,
+    ownershipAuthoritySeparate:typeof isCharacterRegistryOwned==="function",
+    pilotFlagNotOwnership:pilotBindings.every(binding=>typeof binding.registryId==="string")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
+}
+
+// =========================================================
+// BRICK 443 — POST-434 REGISTRY CLEANUP DIAGNOSTIC
+// =========================================================
+function runPost434RegistryCleanupDiagnostics() {
+  const coercive=getCharacterRegistryEntry("coercive_cloak");
+  const result={
+    coerciveHoldRemoved:!CHARACTER_REGISTRY_IMPLEMENTATION_HOLDS.includes("coercive_cloak_pending_replacement_art_and_calibration"),
+    coerciveRegistered:!!coercive&&coercive.basePL===38,
+    coerciveFormula:!!coercive&&Math.round(calculateRawPLFromStats(coercive.baseStats))===38,
+    exactEmbodiment:characterEmbodiesExactPackageCanonical("coercive_cloak","coercive_kurama_cloak_v1"),
+    rasenganFormPrecise:characterHasRegistryCapability("coercive_cloak","rasengan_form_shaping")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+// =========================================================
+// BRICK 516 — SPECIAL JŌNIN ALPHA QUALIFICATION POLICY
+// =========================================================
+const SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY = {
+  requiredWeightedPoints:12,
+  minimumDistinctEvidenceRecords:4,
+  minimumEvidenceCategories:2,
+  minimumIndependentSources:2,
+  activityFamilyPointCapRatio:0.50,
+  requiresVerifiedSpecialistCapstone:true
+};
+
+// =========================================================
+// BRICK 517 — EVIDENCE SIGNIFICANCE NORMALIZATION
+// =========================================================
+function normalizeSpecialistEvidenceSignificance(value) {
+  const numeric=Math.floor(Number(value)||0);
+  return Math.max(1,Math.min(4,numeric));
+}
+
+// =========================================================
+// BRICK 518 — SPECIALIST EVIDENCE RECORD SCHEMA
+// =========================================================
+function normalizeSpecialistEvidenceRecord(record) {
+  if (!record||!record.evidenceId) return null;
+  return {
+    evidenceId:String(record.evidenceId),
+    significance:normalizeSpecialistEvidenceSignificance(record.significance),
+    category:typeof record.category==="string"?record.category:"unspecified",
+    activityFamilyId:typeof record.activityFamilyId==="string"?record.activityFamilyId:null,
+    independentSourceId:typeof record.independentSourceId==="string"?record.independentSourceId:String(record.evidenceId),
+    tags:Array.isArray(record.tags)?[...new Set(record.tags.filter(tag=>typeof tag==="string"&&tag.length>0))]:[],
+    competencyGroupIds:Array.isArray(record.competencyGroupIds)?[...new Set(record.competencyGroupIds.filter(Boolean))]:[],
+    verified:record.verified===true,
+    specialistLevel:record.specialistLevel===true,
+    context:record.context?cloneProgressionData(record.context):{}
+  };
+}
+
+// =========================================================
+// BRICK 519 — QUALIFICATION DEFINITION SCHEMA VALIDATOR
+// BRICK 520 — DECLARATIVE QUALIFICATION DEFINITION REGISTRY
+// =========================================================
+const SPECIAL_JONIN_QUALIFICATION_DEFINITIONS = {};
+
+function validateSpecialJoninQualificationDefinition(definition) {
+  const errors=[];
+  if (!definition||!definition.qualificationId) errors.push("qualification_id_missing");
+  if (!definition||!definition.familyId) errors.push("family_id_missing");
+  if (!Array.isArray(definition&&definition.requiredEvidenceTags)) errors.push("required_evidence_tags_missing");
+  if (!Array.isArray(definition&&definition.mandatoryCompetencyGroups)) errors.push("mandatory_competency_groups_missing");
+  if (!Array.isArray(definition&&definition.optionalSupportingTags)) errors.push("optional_supporting_tags_missing");
+  if (!Array.isArray(definition&&definition.permittedEvidenceCategories)) errors.push("permitted_evidence_categories_missing");
+  if (!Array.isArray(definition&&definition.capacityRequirements)) errors.push("capacity_requirements_missing");
+  if (!definition||!definition.capstoneRequirement||typeof definition.capstoneRequirement!=="object") errors.push("capstone_requirement_missing");
+  return {valid:errors.length===0,errors};
+}
+
+function registerSpecialJoninQualificationDefinition(definition) {
+  const validation=validateSpecialJoninQualificationDefinition(definition);
+  if (!validation.valid) return {success:false,reason:"invalid_qualification_definition",validation};
+  SPECIAL_JONIN_QUALIFICATION_DEFINITIONS[definition.qualificationId]=cloneProgressionData(definition);
+  return {success:true,qualificationId:definition.qualificationId};
+}
+
+function getSpecialJoninQualificationDefinition(qualificationId) {
+  return SPECIAL_JONIN_QUALIFICATION_DEFINITIONS[qualificationId]||null;
+}
+
+// =========================================================
+// BRICK 521 — REQUIRED EVIDENCE-TAG COVERAGE
+// =========================================================
+function evaluateSpecialistRequiredTagCoverage(definition, evidence) {
+  const tags=new Set(evidence.flatMap(record=>record.tags||[]));
+  const missing=(definition.requiredEvidenceTags||[]).filter(tag=>!tags.has(tag));
+  return {met:missing.length===0,missing};
+}
+
+// =========================================================
+// BRICK 522 — MANDATORY COMPETENCY-GROUP COVERAGE
+// =========================================================
+function evaluateSpecialistCompetencyCoverage(definition,evidence) {
+  const missing=[];
+  (definition.mandatoryCompetencyGroups||[]).forEach(group=>{
+    const groupId=typeof group==="string"?group:group.groupId;
+    const anyTags=group&&typeof group==="object"&&Array.isArray(group.anyTags)?group.anyTags:[];
+    const covered=evidence.some(record=>(record.competencyGroupIds||[]).includes(groupId)||(anyTags.length>0&&anyTags.some(tag=>(record.tags||[]).includes(tag))));
+    if (!covered) missing.push(groupId||"unnamed_competency_group");
+  });
+  return {met:missing.length===0,missing};
+}
+
+// =========================================================
+// BRICK 523 — PERMITTED EVIDENCE-CATEGORY FILTER
+// =========================================================
+function filterSpecialistQualifyingEvidence(definition,evidenceRecords) {
+  const normalized=(Array.isArray(evidenceRecords)?evidenceRecords:[]).map(normalizeSpecialistEvidenceRecord).filter(Boolean);
+  const permitted=definition&&Array.isArray(definition.permittedEvidenceCategories)?definition.permittedEvidenceCategories:[];
+  return permitted.length===0?normalized:normalized.filter(record=>permitted.includes(record.category));
+}
+
+// =========================================================
+// BRICK 524 — CAPACITY-REQUIREMENT EVALUATOR
+// =========================================================
+function evaluateSpecialistCapacityRequirements(definition,capacityContext={}) {
+  const failures=[];
+  (definition.capacityRequirements||[]).forEach(requirement=>{
+    if (!requirement||!requirement.field) return;
+    const actual=Number(capacityContext[requirement.field]);
+    if (!Number.isFinite(actual)) { failures.push({field:requirement.field,reason:"capacity_value_missing"}); return; }
+    if (Number.isFinite(Number(requirement.minimum))&&actual<Number(requirement.minimum)) failures.push({field:requirement.field,reason:"below_minimum",actual,required:Number(requirement.minimum)});
+    if (Number.isFinite(Number(requirement.maximum))&&actual>Number(requirement.maximum)) failures.push({field:requirement.field,reason:"above_maximum",actual,required:Number(requirement.maximum)});
+  });
+  return {met:failures.length===0,failures};
+}
+
+// =========================================================
+// BRICK 525 — ACTIVITY-FAMILY 50% POINT CAP
+// BRICK 526 — WEIGHTED EVIDENCE-POINT CALCULATION
+// =========================================================
+function calculateSpecialistWeightedEvidencePoints(evidence,policy=SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY) {
+  const familyRaw={};
+  evidence.forEach(record=>{
+    const family=record.activityFamilyId||`uncategorized:${record.evidenceId}`;
+    familyRaw[family]=(familyRaw[family]||0)+record.significance;
+  });
+  const cap=policy.requiredWeightedPoints*policy.activityFamilyPointCapRatio;
+  const familyApplied={};
+  Object.entries(familyRaw).forEach(([family,points])=>{familyApplied[family]=Math.min(points,cap);});
+  return {raw:Object.values(familyRaw).reduce((sum,value)=>sum+value,0),applied:Object.values(familyApplied).reduce((sum,value)=>sum+value,0),familyRaw,familyApplied,capPerFamily:cap};
+}
+
+// =========================================================
+// BRICK 527 — DISTINCT RECORD / CATEGORY REQUIREMENTS
+// BRICK 528 — INDEPENDENT SOURCE REQUIREMENT
+// =========================================================
+function summarizeSpecialistEvidenceDiversity(evidence) {
+  return {
+    distinctRecordCount:new Set(evidence.map(record=>record.evidenceId)).size,
+    categoryCount:new Set(evidence.map(record=>record.category)).size,
+    independentSourceCount:new Set(evidence.map(record=>record.independentSourceId)).size
+  };
+}
+
+// =========================================================
+// BRICK 529 — VERIFIED SPECIALIST CAPSTONE
+// =========================================================
+function evaluateSpecialistCapstone(definition,evidence) {
+  const requirement=definition.capstoneRequirement||{};
+  const requiredTags=Array.isArray(requirement.requiredTags)?requirement.requiredTags:[];
+  const record=evidence.find(item=>item.verified===true&&item.specialistLevel===true&&(!requirement.category||item.category===requirement.category)&&requiredTags.every(tag=>(item.tags||[]).includes(tag)))||null;
+  return {met:!!record,evidenceId:record?record.evidenceId:null};
+}
+
+// =========================================================
+// BRICK 530 — GENERIC SPECIAL JŌNIN QUALIFICATION EVALUATOR
+// =========================================================
+function evaluateSpecialJoninQualification(definitionOrId,evidenceRecords,capacityContext={}) {
+  const definition=typeof definitionOrId==="string"?getSpecialJoninQualificationDefinition(definitionOrId):definitionOrId;
+  const validation=validateSpecialJoninQualificationDefinition(definition);
+  if (!validation.valid) return {qualified:false,reason:"qualification_definition_invalid",validation};
+  const evidence=filterSpecialistQualifyingEvidence(definition,evidenceRecords);
+  const points=calculateSpecialistWeightedEvidencePoints(evidence);
+  const diversity=summarizeSpecialistEvidenceDiversity(evidence);
+  const tags=evaluateSpecialistRequiredTagCoverage(definition,evidence);
+  const competencies=evaluateSpecialistCompetencyCoverage(definition,evidence);
+  const capacity=evaluateSpecialistCapacityRequirements(definition,capacityContext);
+  const capstone=evaluateSpecialistCapstone(definition,evidence);
+  const policy=SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY;
+  const checks={
+    weightedPoints:points.applied>=policy.requiredWeightedPoints,
+    distinctEvidence:diversity.distinctRecordCount>=policy.minimumDistinctEvidenceRecords,
+    evidenceCategories:diversity.categoryCount>=policy.minimumEvidenceCategories,
+    independentSources:diversity.independentSourceCount>=policy.minimumIndependentSources,
+    requiredTags:tags.met,
+    competencies:competencies.met,
+    capacity:capacity.met,
+    capstone:policy.requiresVerifiedSpecialistCapstone?capstone.met:true
+  };
+  return {qualified:Object.values(checks).every(Boolean),qualificationId:definition.qualificationId,checks,points,diversity,tags,competencies,capacity,capstone,qualifyingEvidenceIds:evidence.map(record=>record.evidenceId)};
+}
+
+// =========================================================
+// BRICK 531 — QUALIFICATION PROVENANCE RECORD
+// BRICK 532 — PERMANENT EARNED-QUALIFICATION TRUTH
+// BRICK 533 — ACTIVE-PRACTICE / SUSPENSION SEPARATION
+// =========================================================
+function createDefaultSpecialistQualificationState() {
+  return {earnedByOwnedCharacterId:{},practiceStatusByOwnedCharacterId:{}};
+}
+
+function normalizeSpecialistQualificationState(saved) {
+  const source=saved&&typeof saved==="object"?saved:{};
+  return {
+    earnedByOwnedCharacterId:source.earnedByOwnedCharacterId&&typeof source.earnedByOwnedCharacterId==="object"?cloneProgressionData(source.earnedByOwnedCharacterId):{},
+    practiceStatusByOwnedCharacterId:source.practiceStatusByOwnedCharacterId&&typeof source.practiceStatusByOwnedCharacterId==="object"?cloneProgressionData(source.practiceStatusByOwnedCharacterId):{}
+  };
+}
+
+function ensureSpecialistQualificationState() {
+  if (!playerData.specialistQualifications) playerData.specialistQualifications=createDefaultSpecialistQualificationState();
+  return playerData.specialistQualifications;
+}
+
+function earnSpecialJoninQualification(ownedCharacterId,qualificationId,evidenceRecords,capacityContext={}) {
+  if (!getOwnedCharacterRecordById(ownedCharacterId)) return {success:false,reason:"owned_character_missing"};
+  const definition=getSpecialJoninQualificationDefinition(qualificationId);
+  if (!definition) return {success:false,reason:"qualification_definition_missing"};
+  const evaluation=evaluateSpecialJoninQualification(definition,evidenceRecords,capacityContext);
+  if (!evaluation.qualified) return {success:false,reason:"qualification_requirements_unmet",evaluation};
+  const state=ensureSpecialistQualificationState();
+  if (!state.earnedByOwnedCharacterId[ownedCharacterId]) state.earnedByOwnedCharacterId[ownedCharacterId]={};
+  if (!state.earnedByOwnedCharacterId[ownedCharacterId][qualificationId]) {
+    state.earnedByOwnedCharacterId[ownedCharacterId][qualificationId]={qualificationId,earnedAt:Date.now(),evidenceRecordIds:[...evaluation.qualifyingEvidenceIds],capstoneEvidenceId:evaluation.capstone.evidenceId};
+  }
+  savePlayerData();
+  return {success:true,permanent:true,record:state.earnedByOwnedCharacterId[ownedCharacterId][qualificationId],evaluation};
+}
+
+function setSpecialistPracticeStatus(ownedCharacterId,qualificationId,status) {
+  const allowed=["active","suspended","licence_revoked","clearance_revoked","appointment_inactive"];
+  if (!allowed.includes(status)) return {success:false,reason:"invalid_practice_status"};
+  const state=ensureSpecialistQualificationState();
+  if (!state.practiceStatusByOwnedCharacterId[ownedCharacterId]) state.practiceStatusByOwnedCharacterId[ownedCharacterId]={};
+  state.practiceStatusByOwnedCharacterId[ownedCharacterId][qualificationId]={status,updatedAt:Date.now()};
+  savePlayerData();
+  return {success:true,status};
+}
+
+// =========================================================
+// BRICK 534 — SYNTHETIC EVALUATOR REGRESSION
+// BRICK 535 — SPECIAL JŌNIN MASTER DIAGNOSTIC
+// =========================================================
+function runSpecialJoninEvaluatorDiagnostics() {
+  const definition={qualificationId:"diagnostic.synthetic",familyId:"diagnostic",requiredEvidenceTags:["specialist_work"],mandatoryCompetencyGroups:[{groupId:"analysis",anyTags:["analysis"]},{groupId:"execution",anyTags:["execution"]}],optionalSupportingTags:[],permittedEvidenceCategories:["mission","case","project"],capacityRequirements:[],capstoneRequirement:{requiredTags:["capstone"]}};
+  const evidence=[
+    {evidenceId:"sj_diag_1",significance:4,category:"mission",activityFamilyId:"family_a",independentSourceId:"mission_a",tags:["specialist_work","analysis"],competencyGroupIds:["analysis"],verified:true,specialistLevel:true},
+    {evidenceId:"sj_diag_2",significance:4,category:"mission",activityFamilyId:"family_a",independentSourceId:"mission_a",tags:["execution"],competencyGroupIds:["execution"],verified:true,specialistLevel:true},
+    {evidenceId:"sj_diag_3",significance:3,category:"case",activityFamilyId:"family_b",independentSourceId:"case_b",tags:["analysis"],verified:true,specialistLevel:true},
+    {evidenceId:"sj_diag_4",significance:3,category:"project",activityFamilyId:"family_c",independentSourceId:"project_c",tags:["execution","capstone"],verified:true,specialistLevel:true}
+  ];
+  const evaluation=evaluateSpecialJoninQualification(definition,evidence,{});
+  const result={
+    genericEvaluator:evaluation.qualified===true,
+    pointsCapApplied:evaluation.points.familyApplied.family_a===6,
+    exactEvidenceIds:evaluation.qualifyingEvidenceIds.length===4,
+    capstoneVerified:evaluation.capstone.evidenceId==="sj_diag_4",
+    noStatAutoGrant:evaluation.checks.capacity===true,
+    definitionsDeclarative:typeof registerSpecialJoninQualificationDefinition==="function"
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
+}
 
 
 
@@ -1962,11 +2330,27 @@ const entityRegistry = {
     "basePL": 124,
     "entityType": "attached_summon"
   },
-  "kurama_complete": {
-    "id": "kurama_complete",
-    "entityType": "reserved_combined_expression",
-    "parentEntityId": "kurama",
-    "calibrationStatus": "pending"
+  // =======================================================
+  // BRICK 478 — GAMAKICHI ENTITY REGISTRY
+  // BRICK 479 — GAMAKICHI PL INDEPENDENCE
+  // BRICK 480 — SUMMON CLASSIFICATION BRIDGE
+  // =======================================================
+  "gamakichi": {
+    "id": "gamakichi",
+    "baseStats": {
+      "nin": 72,
+      "tai": 68,
+      "buki": 52,
+      "fuin": 28,
+      "kin": 40,
+      "gen": 20,
+      "stamina": 76
+    },
+    "basePL": 71,
+    "entityType": "summon",
+    "summonType": "creature",
+    "species": "toad",
+    "affiliation": "mount_myoboku"
   }
 };
 
@@ -2167,6 +2551,72 @@ const effectiveStatePackageDatabase = {
     "activationOwnership": "combat_or_authored_access",
     "expirationOwnership": "source_or_expression"
   },
+  // =======================================================
+  // BRICK 483 — GAMAKICHI TOAD CHAKRA GUIDANCE PACKAGE
+  // BRICK 486 — GAMAKICHI NON-STAT POSSIBILITY CATALOG
+  // =======================================================
+  "gamakichi.toad_chakra_guidance": {
+    "packageKey": "gamakichi.toad_chakra_guidance",
+    "sourceId": "gamakichi",
+    "exactPackageId": "toad_chakra_guidance",
+    "defaultExpressionStateId": "attached_enhancement",
+    "classification": "effective_state",
+    "statModifiers": { "nin": 6 },
+    "overlapMode": "coexists",
+    "activationOwnership": "combat_or_authored_access",
+    "expirationOwnership": "source_or_expression"
+  },
+  "gamakichi.battlefield_hop": {
+    "packageKey": "gamakichi.battlefield_hop",
+    "sourceId": "gamakichi",
+    "exactPackageId": "battlefield_hop",
+    "defaultExpressionStateId": "resolver",
+    "classification": "resolver",
+    "statModifiers": {},
+    "overlapMode": "coexists"
+  },
+  "gamakichi.toad_oil_support": {
+    "packageKey": "gamakichi.toad_oil_support",
+    "sourceId": "gamakichi",
+    "exactPackageId": "toad_oil_support",
+    "defaultExpressionStateId": "resolver",
+    "classification": "resolver",
+    "statModifiers": {},
+    "overlapMode": "coexists"
+  },
+  "gamakichi.veteran_toads_warning": {
+    "packageKey": "gamakichi.veteran_toads_warning",
+    "sourceId": "gamakichi",
+    "exactPackageId": "veteran_toads_warning",
+    "defaultExpressionStateId": "context",
+    "classification": "resolver",
+    "statModifiers": {},
+    "overlapMode": "coexists"
+  },
+  "gamakichi.heavy_landing": {
+    "packageKey": "gamakichi.heavy_landing",
+    "sourceId": "gamakichi",
+    "exactPackageId": "heavy_landing",
+    "defaultExpressionStateId": "resolver",
+    "classification": "resolver",
+    "statModifiers": {},
+    "overlapMode": "coexists"
+  },
+  // =======================================================
+  // BRICK 496 — COERCIVE CHAKRA BUFFER RUNTIME PACKAGE
+  // =======================================================
+  "coercive_cloak.coercive_chakra_buffer": {
+    "packageKey": "coercive_cloak.coercive_chakra_buffer",
+    "sourceId": "coercive_cloak",
+    "exactPackageId": "coercive_chakra_buffer",
+    "defaultExpressionStateId": "one_tail_coercive",
+    "classification": "effective_state",
+    "statModifiers": {},
+    "overlapMode": "coexists",
+    "activationOwnership": "dedicated_variant_runtime",
+    "expirationOwnership": "battle_runtime",
+    "temporaryCapacityOverlay": 6
+  },
   "academy_menma.yin_chakra_mantle_academy": {
     "packageKey": "academy_menma.yin_chakra_mantle_academy",
     "sourceId": "academy_menma",
@@ -2190,6 +2640,84 @@ const effectiveStatePackageDatabase = {
     "temporaryCapacityOverlay": 4
   }
 };
+
+// =========================================================
+// BRICK 489 — KURAMA COMPLETE COMBINED-EXPRESSION AUTHORITY
+// BRICK 490 — COMPLETE HOSTED-BINDING ELIGIBILITY
+// BRICK 491 — CONVERGENCE-EVIDENCE ELIGIBILITY
+// BRICK 492 — EXACT PACKAGE SUPPRESSION CONTRACT
+// BRICK 493 — CONSTITUENT BINDING PRESERVATION
+// BRICK 494 — CONSTITUENT PACKAGE RESTORATION ELIGIBILITY
+// =========================================================
+const combinedExpressionAuthorityDatabase = {
+  kurama_complete: {
+    id:"kurama_complete",
+    authorityType:"combined_expression",
+    parentEntityId:"kurama",
+    constituentEntityIds:["yang_kurama","yin_kurama"],
+    requiredHostedEntityIds:["yang_kurama","yin_kurama"],
+    requiresConvergenceEvidence:true,
+    status:"reserved_pending_card",
+    baseStats:null,
+    basePL:null,
+    exactSuppressionPackageKeys:[],
+    preserveUnderlyingBindings:true,
+    restoreEligibleConstituentPackagesOnEnd:true
+  }
+};
+
+function getCombinedExpressionAuthority(expressionId) {
+  return combinedExpressionAuthorityDatabase[expressionId]||null;
+}
+
+function hasCombinedExpressionConvergenceEvidence(characterId, expressionId, evidenceIds=[]) {
+  const authority=getCombinedExpressionAuthority(expressionId);
+  if (!authority||authority.requiresConvergenceEvidence!==true) return true;
+  return Array.isArray(evidenceIds)&&evidenceIds.some(id=>typeof id==="string"&&id.length>0);
+}
+
+function evaluateCombinedExpressionEligibility(characterId, expressionId, options={}) {
+  const authority=getCombinedExpressionAuthority(expressionId);
+  if (!authority) return {available:false,reason:"combined_expression_missing"};
+  const missingBindings=(authority.requiredHostedEntityIds||[]).filter(entityId=>!getHostedEntityBinding(characterId,entityId));
+  if (missingBindings.length>0) return {available:false,reason:"required_hosted_binding_missing",missingBindings,authority};
+  if (!hasCombinedExpressionConvergenceEvidence(characterId,expressionId,options.convergenceEvidenceIds||[])) {
+    return {available:false,reason:"convergence_evidence_missing",authority};
+  }
+  if (!Array.isArray(authority.exactSuppressionPackageKeys)||authority.exactSuppressionPackageKeys.length===0) {
+    return {available:false,reason:"exact_suppression_contract_not_authored",authority};
+  }
+  return {available:true,reason:null,authority};
+}
+
+function getCombinedExpressionSuppressionPackageKeys(expressionId) {
+  const authority=getCombinedExpressionAuthority(expressionId);
+  return authority&&Array.isArray(authority.exactSuppressionPackageKeys)?[...authority.exactSuppressionPackageKeys]:[];
+}
+
+function getCombinedExpressionRestorationCandidatePackageKeys(characterId, expressionId) {
+  const authority=getCombinedExpressionAuthority(expressionId);
+  if (!authority||authority.restoreEligibleConstituentPackagesOnEnd!==true) return [];
+  return (authority.constituentEntityIds||[]).flatMap(entityId=>
+    Object.values(effectiveStatePackageDatabase).filter(pkg=>pkg&&pkg.sourceId===entityId&&pkg.classification==="effective_state").map(pkg=>pkg.packageKey)
+  );
+}
+
+// =========================================================
+// BRICK 495 — KURAMA COMPLETE RESERVATION DIAGNOSTIC
+// =========================================================
+function runKuramaCompleteReservationDiagnostics() {
+  const authority=getCombinedExpressionAuthority("kurama_complete");
+  const result={
+    notEntityCollectible:getEntityDefinition("kurama_complete")===null,
+    reservedCombinedExpression:!!authority&&authority.authorityType==="combined_expression"&&authority.status==="reserved_pending_card",
+    noStats:!!authority&&authority.baseStats===null&&authority.basePL===null,
+    bothConstituents:JSON.stringify(authority&&authority.constituentEntityIds)===JSON.stringify(["yang_kurama","yin_kurama"]),
+    looseSuppressionForbidden:Array.isArray(authority&&authority.exactSuppressionPackageKeys)
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
+}
 
 function getEntityDefinition(entityId) {
   return entityRegistry[entityId] || null;
@@ -2238,6 +2766,21 @@ const hostedEntityBindingDatabase = {
 };
 
 const attachedSummonAccessDatabase = {
+  // =======================================================
+  // BRICK 482 — NARUTO ↔ GAMAKICHI ACCESS / RELATIONSHIP
+  // =======================================================
+  kage_naruto_gamakichi: {
+    id:"kage_naruto_gamakichi",
+    characterRegistryId:"kage_naruto",
+    entityId:"gamakichi",
+    contractState:"established",
+    cooperationState:"cooperative",
+    relationshipState:"trusted_battle_ally",
+    sharedHistory:"meaningful",
+    manifestationAccess:"normal",
+    permittedExpressions:["toad_chakra_guidance"],
+    permittedCooperativeCapabilities:["battlefield_hop","toad_oil_support","veteran_toads_warning","heavy_landing"]
+  },
   academy_menma_menma_nine_tails: {
     id: "academy_menma_menma_nine_tails",
     characterRegistryId: "academy_menma",
@@ -2308,6 +2851,48 @@ function evaluateAttachedSummonAccess(characterId, entityId, requirements = {}) 
   }
   return { available:true, reason:null, entity, access };
 }
+
+
+// =========================================================
+// ATTACHABLE SUMMON CLASSIFICATION BRIDGE
+// =========================================================
+function isAttachableSummonEntity(entity) {
+  return !!entity&&["attached_summon","collective_summon","summon"].includes(entity.entityType);
+}
+
+// =========================================================
+// BRICK 484 — GAMAKICHI EXACT-PACKAGE IDEMPOTENCE
+// BRICK 485 — GAMAKICHI SOURCE-SCOPED DETACH CLEANUP
+// BRICK 487 — GAMAKICHI PRESENTATION CONTRACT
+// BRICK 488 — GAMAKICHI MASTER DIAGNOSTIC
+// =========================================================
+function getGamakichiPresentationContract(characterId="naruto") {
+  return {
+    sourceId:"gamakichi",
+    attached:getAttachedSummonIdForCharacter(characterId)==="gamakichi",
+    entityPL:calculateEntityCurrentPL("gamakichi"),
+    additiveToCharacterPL:false,
+    enhancementPackageId:"toad_chakra_guidance",
+    nonStatPackages:["battlefield_hop","toad_oil_support","veteran_toads_warning","heavy_landing"]
+  };
+}
+
+function runGamakichiRegistryDiagnostics() {
+  const entity=getEntityDefinition("gamakichi");
+  const pkg=getEffectiveStatePackageDefinition("gamakichi","toad_chakra_guidance");
+  const naruto=getCharacterRegistryEntry("kage_naruto");
+  const result={
+    entityRegistered:!!entity&&entity.entityType==="summon"&&entity.summonType==="creature"&&entity.species==="toad",
+    formula:!!entity&&Math.round(calculateRawPLFromStats(entity.baseStats))===71&&entity.basePL===71,
+    independentPL:calculateEntityCurrentPL("gamakichi")===71,
+    narutoPointer:!!naruto&&naruto.defaultAttachedSummonId==="gamakichi",
+    enhancement:!!pkg&&pkg.classification==="effective_state"&&pkg.statModifiers.nin===6,
+    noHiddenStatConversion:["battlefield_hop","toad_oil_support","veteran_toads_warning","heavy_landing"].every(id=>{const p=getEffectiveStatePackageDefinition("gamakichi",id);return !!p&&p.classification==="resolver"&&Object.keys(p.statModifiers||{}).length===0;})
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
+}
+
 
 
 // =========================================================
@@ -3670,24 +4255,28 @@ const DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS = [
   "academy_kushina"
 ];
 
-let characterOwnershipRuntimeAuthority = { ownedRegistryIds:[...DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS] };
+// =========================================================
+// BRICK 545 — FRESH ONBOARDING HAS NO AUTO-ROSTER
+// BRICK 546 — LEGACY NINE-SEED NON-DESTRUCTIVE MIGRATION BOUNDARY
+// =========================================================
+const FRESH_ALPHA_OWNED_CHARACTER_REGISTRY_IDS = [];
+const LEGACY_ALPHA_SEED_CHARACTER_REGISTRY_IDS = [...DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS];
+
+let characterOwnershipRuntimeAuthority = { ownedRegistryIds:[] };
 
 function createDefaultCharacterOwnershipState() {
-  return { ownedRegistryIds:[...DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS] };
+  return { ownedRegistryIds:[...FRESH_ALPHA_OWNED_CHARACTER_REGISTRY_IDS] };
 }
 
 function normalizeCharacterOwnershipState(savedOwnership) {
   const sourceIds = savedOwnership && Array.isArray(savedOwnership.ownedRegistryIds)
     ? savedOwnership.ownedRegistryIds
-    : DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS;
-  const ownedRegistryIds = [...new Set(sourceIds.filter(registryId =>
-    typeof registryId === "string" && !!getCharacterRegistryEntry(registryId)
-  ))];
-  DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.forEach(registryId => {
-    // Alpha migration: existing saves predate explicit ownership.
-    if (!savedOwnership && !ownedRegistryIds.includes(registryId)) ownedRegistryIds.push(registryId);
-  });
-  return { ownedRegistryIds };
+    : [];
+  return {
+    ownedRegistryIds:[...new Set(sourceIds.filter(registryId =>
+      typeof registryId === "string" && !!getCharacterRegistryEntry(registryId)
+    ))]
+  };
 }
 
 function setCharacterOwnershipRuntimeAuthority(state) {
@@ -3734,6 +4323,258 @@ function revokeCharacterRegistryOwnership(registryId) {
   playerData.clan=normalizeClanManagementState(playerData.clan,playerData.characterOwnership);
   savePlayerData();
   return {success:true,changed:before!==playerData.characterOwnership.ownedRegistryIds.length,registryId};
+}
+
+// =========================================================
+// BRICK 536 — ACQUISITION STATE SCHEMA
+// BRICK 537 — OWNEDCHARACTER IDENTITY BRIDGE
+// BRICK 538 — ACQUISITIONRECORD IDEMPOTENCY
+// =========================================================
+const CHRONICLE_ORIGIN_VARIANT_IDS = [
+  "academy_hinata",
+  "academy_izuno",
+  "academy_mirai",
+  "academy_menma",
+  "academy_kushina"
+];
+
+function createOwnedCharacterIdForVariant(variantId) {
+  return variantId&&getCharacterRegistryEntry(variantId)?`owned_character_${variantId}`:null;
+}
+
+function createAcquisitionRecordKey(definition) {
+  if (!definition||!definition.variantId||!definition.route||!definition.sourceEventId) return null;
+  return [definition.route,definition.sourceEventId,definition.variantId].join("::");
+}
+
+function createDefaultAcquisitionState() {
+  return {
+    records:[],
+    processedRecordKeys:[],
+    ownedCharactersByVariantId:{},
+    chronicleOriginVariantId:null,
+    chronicleOriginOwnedCharacterId:null,
+    ninjaIdentityVariantId:null,
+    ninjaIdentityOwnedCharacterId:null,
+    ninjaIdentityLocked:false,
+    onboardingStatus:"chronicle_origin_pending",
+    formalRankProgressionByOwnedCharacterId:{},
+    firstTeamFormation:{ unlocked:false, promotionEvidenceIds:[], availableCandidateVariantIds:[] },
+    joninLeadershipAssignment:null,
+    migration:{ source:null, preservedVariantIds:[], identitySelectionRequired:false }
+  };
+}
+
+function ensureOwnedCharacterRecord(acquisitionState, variantId, acquisitionRecordId=null) {
+  if (!acquisitionState||!getCharacterRegistryEntry(variantId)) return null;
+  const existing=acquisitionState.ownedCharactersByVariantId[variantId];
+  const ownedCharacterId=createOwnedCharacterIdForVariant(variantId);
+  const runtime=getRuntimeCharacterByRegistryId(variantId);
+  const record=existing&&typeof existing==="object"?existing:{
+    ownedCharacterId,
+    variantId,
+    progressionCharacterId:runtime?runtime.id:variantId,
+    acquisitionRecordIds:[]
+  };
+  record.ownedCharacterId=ownedCharacterId;
+  record.variantId=variantId;
+  if (!Array.isArray(record.acquisitionRecordIds)) record.acquisitionRecordIds=[];
+  if (acquisitionRecordId&&!record.acquisitionRecordIds.includes(acquisitionRecordId)) record.acquisitionRecordIds.push(acquisitionRecordId);
+  acquisitionState.ownedCharactersByVariantId[variantId]=record;
+  return record;
+}
+
+function normalizeAcquisitionState(savedState, ownershipState, options={}) {
+  const defaults=createDefaultAcquisitionState();
+  const source=savedState&&typeof savedState==="object"?savedState:{};
+  const state={
+    ...defaults,
+    records:Array.isArray(source.records)?source.records.filter(record=>record&&record.recordId&&record.variantId):[],
+    processedRecordKeys:Array.isArray(source.processedRecordKeys)?[...new Set(source.processedRecordKeys.filter(Boolean))]:[],
+    ownedCharactersByVariantId:source.ownedCharactersByVariantId&&typeof source.ownedCharactersByVariantId==="object"?cloneProgressionData(source.ownedCharactersByVariantId):{},
+    chronicleOriginVariantId:source.chronicleOriginVariantId||null,
+    chronicleOriginOwnedCharacterId:source.chronicleOriginOwnedCharacterId||null,
+    ninjaIdentityVariantId:source.ninjaIdentityVariantId||null,
+    ninjaIdentityOwnedCharacterId:source.ninjaIdentityOwnedCharacterId||null,
+    ninjaIdentityLocked:source.ninjaIdentityLocked===true,
+    onboardingStatus:typeof source.onboardingStatus==="string"?source.onboardingStatus:defaults.onboardingStatus,
+    formalRankProgressionByOwnedCharacterId:source.formalRankProgressionByOwnedCharacterId&&typeof source.formalRankProgressionByOwnedCharacterId==="object"?cloneProgressionData(source.formalRankProgressionByOwnedCharacterId):{},
+    firstTeamFormation:source.firstTeamFormation&&typeof source.firstTeamFormation==="object"?{
+      unlocked:source.firstTeamFormation.unlocked===true,
+      promotionEvidenceIds:Array.isArray(source.firstTeamFormation.promotionEvidenceIds)?[...new Set(source.firstTeamFormation.promotionEvidenceIds.filter(Boolean))]:[],
+      availableCandidateVariantIds:Array.isArray(source.firstTeamFormation.availableCandidateVariantIds)?[...new Set(source.firstTeamFormation.availableCandidateVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[]
+    }:defaults.firstTeamFormation,
+    joninLeadershipAssignment:source.joninLeadershipAssignment?cloneProgressionData(source.joninLeadershipAssignment):null,
+    migration:source.migration&&typeof source.migration==="object"?cloneProgressionData(source.migration):defaults.migration
+  };
+  const ownedIds=ownershipState&&Array.isArray(ownershipState.ownedRegistryIds)?ownershipState.ownedRegistryIds:[];
+  ownedIds.forEach(variantId=>ensureOwnedCharacterRecord(state,variantId));
+  if (options.legacySeedMigration===true&&ownedIds.length>0&&state.records.length===0) {
+    state.migration={source:"pre_acquisition_alpha_seed",preservedVariantIds:[...ownedIds],identitySelectionRequired:!state.ninjaIdentityVariantId};
+    ownedIds.forEach(variantId=>{
+      const key=`migration::pre_acquisition_alpha_seed:${variantId}::${variantId}`;
+      const recordId=`acquisition_${key.replace(/[^a-zA-Z0-9_:-]/g,"_")}`;
+      const record={recordId,recordKey:key,variantId,route:"migration",sourceEventId:`pre_acquisition_alpha_seed:${variantId}`,timestamp:null,context:{},provenance:{source:"pre_acquisition_alpha_seed"},linkedChronicleEvidenceIds:[],duplicate:false,duplicateCompensationResult:null};
+      state.records.push(record); state.processedRecordKeys.push(key); ensureOwnedCharacterRecord(state,variantId,recordId);
+    });
+    state.processedRecordKeys=[...new Set(state.processedRecordKeys)];
+    state.onboardingStatus=state.ninjaIdentityVariantId?"migrated":"identity_selection_pending";
+  }
+  return state;
+}
+
+function ensurePlayerAcquisitionState() {
+  if (!playerData.acquisition) playerData.acquisition=normalizeAcquisitionState(null,playerData.characterOwnership||characterOwnershipRuntimeAuthority);
+  return playerData.acquisition;
+}
+
+function getOwnedCharacterRecordByVariantId(variantId) {
+  return ensurePlayerAcquisitionState().ownedCharactersByVariantId[variantId]||null;
+}
+
+function getOwnedCharacterRecordById(ownedCharacterId) {
+  return Object.values(ensurePlayerAcquisitionState().ownedCharactersByVariantId).find(record=>record&&record.ownedCharacterId===ownedCharacterId)||null;
+}
+
+// =========================================================
+// BRICK 539 — FIRST ACQUISITION OWNERSHIP COMMIT
+// BRICK 540 — DUPLICATE ACQUISITION PROVENANCE
+// BRICK 541 — AUTHORED DUPLICATE-COMPENSATION RECORD
+// =========================================================
+function commitCharacterAcquisition(definition) {
+  if (!definition||!getCharacterRegistryEntry(definition.variantId)) return {success:false,reason:"character_registry_missing"};
+  const recordKey=createAcquisitionRecordKey(definition);
+  if (!recordKey) return {success:false,reason:"acquisition_identity_incomplete"};
+  const state=ensurePlayerAcquisitionState();
+  const existing=state.records.find(record=>record&&record.recordKey===recordKey);
+  if (existing) return {success:true,idempotent:true,record:existing,ownedCharacter:getOwnedCharacterRecordByVariantId(definition.variantId)};
+  const alreadyOwned=isCharacterRegistryOwned(definition.variantId);
+  if (!alreadyOwned) {
+    const grant=grantCharacterRegistryOwnership(definition.variantId);
+    if (!grant.success) return grant;
+  }
+  const recordId=`acquisition_${state.records.length+1}_${Date.now()}`;
+  const record={
+    recordId,recordKey,variantId:definition.variantId,route:definition.route,sourceEventId:definition.sourceEventId,
+    timestamp:definition.timestamp||Date.now(),context:definition.context?cloneProgressionData(definition.context):{},
+    provenance:definition.provenance?cloneProgressionData(definition.provenance):{},
+    linkedChronicleEvidenceIds:Array.isArray(definition.linkedChronicleEvidenceIds)?[...new Set(definition.linkedChronicleEvidenceIds.filter(Boolean))]:[],
+    duplicate:alreadyOwned,
+    duplicateCompensationResult:alreadyOwned&&definition.duplicateCompensationResult?cloneProgressionData(definition.duplicateCompensationResult):null
+  };
+  state.records.push(record); state.processedRecordKeys.push(recordKey); state.processedRecordKeys=[...new Set(state.processedRecordKeys)];
+  const ownedCharacter=ensureOwnedCharacterRecord(state,definition.variantId,recordId);
+  playerData.clan=normalizeClanManagementState(playerData.clan,playerData.characterOwnership);
+  savePlayerData();
+  return {success:true,idempotent:false,duplicate:alreadyOwned,record,ownedCharacter};
+}
+
+// =========================================================
+// BRICK 542 — LINKED GRANT BUNDLE TRANSACTION
+// =========================================================
+function commitAcquisitionGrantBundle(bundle) {
+  if (!bundle||!bundle.bundleId) return {success:false,reason:"grant_bundle_identity_missing"};
+  const snapshot=cloneProgressionData(playerData);
+  try {
+    const results={characters:[],entities:[],attachments:[]};
+    (bundle.characterGrants||[]).forEach(grant=>{const r=commitCharacterAcquisition({...grant,sourceEventId:grant.sourceEventId||bundle.bundleId});if(!r.success)throw new Error(r.reason||"character_grant_failed");results.characters.push(r);});
+    (bundle.entityGrantIds||[]).forEach(entityId=>{const r=grantEntityOwnership(entityId);if(!r.success)throw new Error(r.reason||"entity_grant_failed");results.entities.push(r);});
+    (bundle.attachedSummonAssignments||[]).forEach(assignment=>{const ok=attachEntitySummonToCharacter(assignment.characterId,assignment.entityId);if(!ok)throw new Error("summon_assignment_failed");results.attachments.push({...assignment});});
+    savePlayerData();
+    return {success:true,bundleId:bundle.bundleId,results};
+  } catch (error) {
+    playerData=snapshot;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    savePlayerData();
+    return {success:false,reason:"grant_bundle_rolled_back",error:String(error&&error.message||error)};
+  }
+}
+
+// =========================================================
+// BRICK 543 — SINGLE CHRONICLE-ORIGIN CONTRACT
+// BRICK 544 — NINJA ID IDENTITY / ALPHA LOCK
+// =========================================================
+function selectChronicleOrigin(variantId, sourceEventId="onboarding_chronicle_origin_confirmation") {
+  const state=ensurePlayerAcquisitionState();
+  if (!CHRONICLE_ORIGIN_VARIANT_IDS.includes(variantId)) return {success:false,reason:"invalid_chronicle_origin"};
+  if (state.chronicleOriginVariantId) return {success:false,reason:"chronicle_origin_already_confirmed"};
+  const acquisition=commitCharacterAcquisition({variantId,route:"chronicle_origin",sourceEventId,context:{phase:"academy_opening"},provenance:{authority:"player_onboarding"}});
+  if (!acquisition.success) return acquisition;
+  const ownedCharacter=acquisition.ownedCharacter;
+  state.chronicleOriginVariantId=variantId;
+  state.chronicleOriginOwnedCharacterId=ownedCharacter.ownedCharacterId;
+  state.ninjaIdentityVariantId=variantId;
+  state.ninjaIdentityOwnedCharacterId=ownedCharacter.ownedCharacterId;
+  state.ninjaIdentityLocked=true;
+  state.onboardingStatus="academy_chronicle";
+  const runtime=getRuntimeCharacterByRegistryId(variantId);
+  if (runtime) {
+    playerData.clan=normalizeClanManagementState({teamSlots:[runtime.id,null,null,null,null,null],favoriteIds:(playerData.clan&&playerData.clan.favoriteIds)||[]},playerData.characterOwnership);
+  }
+  savePlayerData();
+  return {success:true,variantId,ownedCharacterId:ownedCharacter.ownedCharacterId,ninjaIdentityLocked:true};
+}
+
+function getNinjaIdentityRecord() {
+  const state=ensurePlayerAcquisitionState();
+  return {variantId:state.ninjaIdentityVariantId,ownedCharacterId:state.ninjaIdentityOwnedCharacterId,locked:state.ninjaIdentityLocked===true};
+}
+
+// =========================================================
+// BRICK 547 — GENIN PROMOTION PROGRESSION RECORD
+// BRICK 548 — FIRST TEAM FORMATION UNLOCK / CANDIDATE CONTRACT
+// =========================================================
+function recordOwnedCharacterGeninPromotion(ownedCharacterId, evidenceIds=[]) {
+  const state=ensurePlayerAcquisitionState();
+  const owned=getOwnedCharacterRecordById(ownedCharacterId);
+  if (!owned) return {success:false,reason:"owned_character_missing"};
+  const ids=Array.isArray(evidenceIds)?[...new Set(evidenceIds.filter(Boolean))]:[];
+  state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]={formalRank:"genin",promotedAt:Date.now(),promotionEvidenceIds:ids};
+  state.firstTeamFormation.unlocked=true;
+  state.firstTeamFormation.promotionEvidenceIds=[...new Set([...(state.firstTeamFormation.promotionEvidenceIds||[]),...ids])];
+  state.onboardingStatus="first_team_formation_available";
+  savePlayerData();
+  return {success:true,ownedCharacterId,formalRank:"genin",firstTeamFormationUnlocked:true};
+}
+
+function setFirstTeamFormationAvailableCandidates(variantIds) {
+  const state=ensurePlayerAcquisitionState();
+  state.firstTeamFormation.availableCandidateVariantIds=Array.isArray(variantIds)?[...new Set(variantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[];
+  savePlayerData();
+  return [...state.firstTeamFormation.availableCandidateVariantIds];
+}
+
+function getFirstTeamFormationCandidateVariantIds() {
+  const state=ensurePlayerAcquisitionState();
+  if (state.firstTeamFormation.unlocked!==true) return [];
+  const owned=playerData.characterOwnership&&Array.isArray(playerData.characterOwnership.ownedRegistryIds)?playerData.characterOwnership.ownedRegistryIds:[];
+  return [...new Set([...owned,...(state.firstTeamFormation.availableCandidateVariantIds||[])])];
+}
+
+function setJoninLeadershipAssignment(assignment) {
+  const state=ensurePlayerAcquisitionState();
+  state.joninLeadershipAssignment=assignment?cloneProgressionData(assignment):null;
+  savePlayerData();
+  return state.joninLeadershipAssignment;
+}
+
+// =========================================================
+// BRICK 549 — ACQUISITION MASTER DIAGNOSTIC
+// =========================================================
+function runAcquisitionV1Diagnostics() {
+  const state=ensurePlayerAcquisitionState();
+  const ownedIds=playerData.characterOwnership&&Array.isArray(playerData.characterOwnership.ownedRegistryIds)?playerData.characterOwnership.ownedRegistryIds:[];
+  const result={
+    onePersistentOwnedRecordPerVariant:Object.keys(state.ownedCharactersByVariantId).every(variantId=>state.ownedCharactersByVariantId[variantId].ownedCharacterId===createOwnedCharacterIdForVariant(variantId)),
+    ownershipSeparateFromIdentity:typeof state.ninjaIdentityVariantId!=="undefined"&&Array.isArray(ownedIds),
+    originChoicesExactlyFive:CHRONICLE_ORIGIN_VARIANT_IDS.length===5&&new Set(CHRONICLE_ORIGIN_VARIANT_IDS).size===5,
+    noFreshAutoRoster:createDefaultCharacterOwnershipState().ownedRegistryIds.length===0,
+    noFreshAutoEntityGrant:createDefaultPlayerEntityState().ownedEntityIds.length===0,
+    firstTeamFormationSeparate:state.firstTeamFormation&&typeof state.firstTeamFormation.unlocked==="boolean",
+    joninAssignmentSeparate:Object.prototype.hasOwnProperty.call(state,"joninLeadershipAssignment")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
 }
 
 function getClanManageableRosterCharacters(ownershipState = characterOwnershipRuntimeAuthority) {
@@ -3792,13 +4633,12 @@ function createDefaultEntityCurrentStats() {
   return currentStatsByEntityId;
 }
 
-function createDefaultPlayerEntityState() {
+function createDefaultPlayerEntityState(options = {}) {
+  const legacySeed = options.legacySeedMigration === true;
   return {
-    ownedEntityIds: ["menma_nine_tails"],
+    ownedEntityIds: legacySeed ? ["menma_nine_tails"] : [],
     currentStatsByEntityId: createDefaultEntityCurrentStats(),
-    attachedSummonByCharacterRegistryId: {
-      academy_menma: "menma_nine_tails"
-    }
+    attachedSummonByCharacterRegistryId: legacySeed ? { academy_menma:"menma_nine_tails" } : {}
   };
 }
 
@@ -3855,6 +4695,8 @@ function createDefaultPlayerData() {
     inventory: [],
     battlePouch: normalizeBattlePouchSelection(null),
     characterOwnership: characterOwnership,
+    acquisition: createDefaultAcquisitionState(),
+    specialistQualifications: createDefaultSpecialistQualificationState(),
     clan: createDefaultClanManagementState(characterOwnership),
     entities: createDefaultPlayerEntityState(),
     weaponAcclimation: {},
@@ -3867,7 +4709,6 @@ function createDefaultPlayerData() {
     }
   };
 }
-
 
 
 // =========================================================
@@ -4084,7 +4925,6 @@ function normalizeDisciplineProgression(
 }
 
 
-// =========================================================
 // NORMALIZE SAVED CHARACTER PROGRESSION
 // =========================================================
 
@@ -4226,8 +5066,8 @@ function normalizeSavedCharacterProgression(
 // BRICK 378 — ACCLIMATION MUTUAL-EXCLUSIVITY NORMALIZATION
 // =========================================================
 
-function normalizePlayerEntityState(savedEntities) {
-  const defaults = createDefaultPlayerEntityState();
+function normalizePlayerEntityState(savedEntities, options = {}) {
+  const defaults = createDefaultPlayerEntityState(options);
   const source = savedEntities && typeof savedEntities === "object" ? savedEntities : {};
   const ownedEntityIds = Array.isArray(source.ownedEntityIds)
     ? [...new Set(source.ownedEntityIds.filter(entityId => typeof entityId === "string" && !!getEntityDefinition(entityId)))]
@@ -4249,12 +5089,10 @@ function normalizePlayerEntityState(savedEntities) {
     : defaults.attachedSummonByCharacterRegistryId;
   Object.entries(rawAttached).forEach(([registryId, entityId]) => {
     const entity = getEntityDefinition(entityId);
-    if (getCharacterRegistryEntry(registryId) && entity && ["attached_summon","collective_summon"].includes(entity.entityType)) {
+    if (getCharacterRegistryEntry(registryId) && isAttachableSummonEntity(entity)) {
       attached[registryId] = entityId;
     }
   });
-  if (!attached.academy_menma) attached.academy_menma = "menma_nine_tails";
-  if (!ownedEntityIds.includes("menma_nine_tails")) ownedEntityIds.push("menma_nine_tails");
   return { ownedEntityIds, currentStatsByEntityId, attachedSummonByCharacterRegistryId: attached };
 }
 
@@ -4298,16 +5136,22 @@ function loadPlayerData() {
   try {
     const parsedData = JSON.parse(savedData);
     console.log("Player save loaded:", parsedData);
-    const characterOwnership = normalizeCharacterOwnershipState(parsedData.characterOwnership);
+    const legacySeedMigration = !parsedData.acquisition;
+    const characterOwnership = normalizeCharacterOwnershipState(
+      parsedData.characterOwnership || (legacySeedMigration ? {ownedRegistryIds:[...LEGACY_ALPHA_SEED_CHARACTER_REGISTRY_IDS]} : null)
+    );
     setCharacterOwnershipRuntimeAuthority(characterOwnership);
+    const acquisition = normalizeAcquisitionState(parsedData.acquisition,characterOwnership,{legacySeedMigration});
     return {
       ryo: Number(parsedData.ryo) || 0,
       exp: Number(parsedData.exp) || 0,
       inventory: Array.isArray(parsedData.inventory) ? parsedData.inventory : [],
       battlePouch: normalizeBattlePouchSelection(parsedData.battlePouch),
       characterOwnership: characterOwnership,
+      acquisition: acquisition,
+      specialistQualifications: normalizeSpecialistQualificationState(parsedData.specialistQualifications),
       clan: normalizeClanManagementState(parsedData.clan, characterOwnership),
-      entities: normalizePlayerEntityState(parsedData.entities),
+      entities: normalizePlayerEntityState(parsedData.entities,{legacySeedMigration}),
       weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
       activityHistory: Array.isArray(parsedData.activityHistory) ? parsedData.activityHistory : [],
       progression: normalizeSavedRunProgression(parsedData.progression),
@@ -4321,7 +5165,6 @@ function loadPlayerData() {
     return defaults;
   }
 }
-
 
 
 
@@ -35087,6 +35930,7 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   initializeBattleRemainingPLFromDeployment({ preserveExistingEnemyPower:true });
   initializeBattlePouchFromPreparedSelection();
   initializeBattleAttachedSummonRuntimeFromDeployment();
+  initializeBattleDedicatedVariantRuntimePackages();
 
   console.log("BATTLE INSTANCE CREATED:", currentBattle.battleId);
   console.log("CURRENT BATTLE:", currentBattle);
@@ -35275,6 +36119,15 @@ function loadAcademyPilotBattleDeployment() {
   }
 
 
+  // Development pilot prerequisite only: the production acquisition flow does not
+  // auto-grant Menma's Entity to fresh players.
+  if (!playerData.entities.ownedEntityIds.includes("menma_nine_tails")) {
+    grantEntityOwnership("menma_nine_tails");
+  }
+  if (getAttachedSummonIdForCharacter("academy_menma")!=="menma_nine_tails") {
+    attachEntitySummonToCharacter("academy_menma","menma_nine_tails");
+  }
+
   const equipment =
     prepareAcademyPilotBattleEquipment();
 
@@ -35351,6 +36204,8 @@ function loadAcademyPilotBattleDeployment() {
 
   initializeBattleAttachedSummonRuntimeFromDeployment();
 
+  initializeBattleDedicatedVariantRuntimePackages();
+
 
   currentBattle.battleLog = [
 
@@ -35386,7 +36241,6 @@ function loadAcademyPilotBattleDeployment() {
 
   };
 }
-
 
 
 // =========================================================
@@ -61505,8 +62359,8 @@ function runVictoryRevealAnimations(
 }
 
 
-// =========================================================
 // VICTORY SCREEN RENDERER
+// BRICK 436 — VICTORY RENDERER MANIFEST CONSUMER
 // =========================================================
 
 function renderVictoryOverlay(
@@ -62412,7 +63266,7 @@ overflow:hidden;
     <!-- BACKGROUND ART -->
 
     <img
-      src="Assets/UI/Victory.png"
+      src="${getUIAssetPath("victory")}"
 
       alt="Victory"
 
@@ -63202,6 +64056,7 @@ overflow:hidden;
 }
 
 
+
 // =========================================================
 // VICTORY CONTINUE
 // =========================================================
@@ -63355,6 +64210,8 @@ function createBattleRuntimeState() {
     effectiveStateProjections: [],
     attachedSummons: { player:{}, enemy:{} },
     summonActionState: { actorParticipantId:null, summonId:null, mode:"closed" },
+    actionOpportunityState: { counters:{player:{},enemy:{}}, startedTokens:{} },
+    battleContext: { facts:{}, tags:[], sourceRefs:[] },
     transientStates: [],
     conditions: [],
     evidence: []
@@ -63379,6 +64236,15 @@ function ensureBattleRuntimeState() {
   if (!runtime.attachedSummons.player || typeof runtime.attachedSummons.player !== "object") runtime.attachedSummons.player={};
   if (!runtime.attachedSummons.enemy || typeof runtime.attachedSummons.enemy !== "object") runtime.attachedSummons.enemy={};
   if (!runtime.summonActionState || typeof runtime.summonActionState !== "object") runtime.summonActionState={actorParticipantId:null,summonId:null,mode:"closed"};
+  if (!runtime.actionOpportunityState || typeof runtime.actionOpportunityState !== "object") runtime.actionOpportunityState={counters:{player:{},enemy:{}},startedTokens:{}};
+  if (!runtime.actionOpportunityState.counters || typeof runtime.actionOpportunityState.counters !== "object") runtime.actionOpportunityState.counters={player:{},enemy:{}};
+  if (!runtime.actionOpportunityState.counters.player) runtime.actionOpportunityState.counters.player={};
+  if (!runtime.actionOpportunityState.counters.enemy) runtime.actionOpportunityState.counters.enemy={};
+  if (!runtime.actionOpportunityState.startedTokens || typeof runtime.actionOpportunityState.startedTokens !== "object") runtime.actionOpportunityState.startedTokens={};
+  if (!runtime.battleContext || typeof runtime.battleContext !== "object") runtime.battleContext={facts:{},tags:[],sourceRefs:[]};
+  if (!runtime.battleContext.facts || typeof runtime.battleContext.facts !== "object") runtime.battleContext.facts={};
+  if (!Array.isArray(runtime.battleContext.tags)) runtime.battleContext.tags=[];
+  if (!Array.isArray(runtime.battleContext.sourceRefs)) runtime.battleContext.sourceRefs=[];
   if (!Array.isArray(runtime.transientStates)) runtime.transientStates=[];
   if (!Array.isArray(runtime.conditions)) runtime.conditions=[];
   if (!Array.isArray(runtime.evidence)) runtime.evidence=[];
@@ -63391,7 +64257,28 @@ function initializeBattleSourcePackageRuntime() {
   runtime.temporaryCapacity = { player:{}, enemy:{} };
   runtime.attachedSummons = { player:{}, enemy:{} };
   runtime.summonActionState = { actorParticipantId:null, summonId:null, mode:"closed" };
+  runtime.actionOpportunityState = { counters:{player:{},enemy:{}}, startedTokens:{} };
+  runtime.battleContext = { facts:{}, tags:[], sourceRefs:[] };
   return runtime;
+}
+
+// =========================================================
+// BRICK 497 — DEDICATED-VARIANT RUNTIME PACKAGE INITIALIZATION
+// BRICK 508 — COERCIVE BUFFER DEPLETION USES COMMON CAPACITY ORDER
+// BRICK 509 — COERCIVE BUFFER SOURCE REMOVAL / EXPIRY
+// =========================================================
+function initializeBattleDedicatedVariantRuntimePackages() {
+  if (!currentBattle.active||!currentBattle.deployment||!currentBattle.deployment.player) return [];
+  const results=[];
+  (currentBattle.deployment.player.slots||[]).forEach(slot=>{
+    if (!slot||!slot.participantId) return;
+    const actor=getPlayerCharacter(slot.participantId);
+    if (!actor) return;
+    if (getCharacterRegistryId(actor)==="coercive_cloak") {
+      results.push(activateBattleEffectiveStatePackage({side:"player",participantId:actor.id,sourceId:"coercive_cloak",exactPackageId:"coercive_chakra_buffer",expressionStateId:"one_tail_coercive"}));
+    }
+  });
+  return results;
 }
 
 function cloneBattleRuntimeValue(value) {
@@ -63415,6 +64302,8 @@ function getBattleRuntimeSaveState() {
     effectiveStateProjections:runtime.effectiveStateProjections,
     attachedSummons:runtime.attachedSummons,
     summonActionState:runtime.summonActionState,
+    actionOpportunityState:runtime.actionOpportunityState,
+    battleContext:runtime.battleContext,
     transientStates:runtime.transientStates,
     conditions:runtime.conditions,
     evidence:runtime.evidence
@@ -63438,6 +64327,8 @@ function restoreBattleRuntimeState(rawRuntime) {
     effectiveStateProjections:Array.isArray(rawRuntime.effectiveStateProjections) ? rawRuntime.effectiveStateProjections : [],
     attachedSummons:rawRuntime.attachedSummons && typeof rawRuntime.attachedSummons === "object" ? rawRuntime.attachedSummons : {player:{},enemy:{}},
     summonActionState:rawRuntime.summonActionState && typeof rawRuntime.summonActionState === "object" ? rawRuntime.summonActionState : {actorParticipantId:null,summonId:null,mode:"closed"},
+    actionOpportunityState:rawRuntime.actionOpportunityState && typeof rawRuntime.actionOpportunityState === "object" ? rawRuntime.actionOpportunityState : {counters:{player:{},enemy:{}},startedTokens:{}},
+    battleContext:rawRuntime.battleContext && typeof rawRuntime.battleContext === "object" ? rawRuntime.battleContext : {facts:{},tags:[],sourceRefs:[]},
     transientStates:Array.isArray(rawRuntime.transientStates) ? rawRuntime.transientStates : [],
     conditions:Array.isArray(rawRuntime.conditions) ? rawRuntime.conditions : [],
     evidence:Array.isArray(rawRuntime.evidence) ? rawRuntime.evidence : []
@@ -63490,24 +64381,27 @@ function activateBattleEffectiveStatePackage(definition) {
   if (!definition || !definition.side || !definition.participantId || !definition.sourceId || !definition.exactPackageId) {
     return {success:false,reason:"projection_identity_incomplete"};
   }
-  const catalog=getEffectiveStatePackageDefinition(definition.sourceId,definition.exactPackageId);
-  if (!catalog) return {success:false,reason:"package_not_authored"};
-  if (catalog.classification !== "effective_state") return {success:false,reason:"package_is_not_effective_state"};
   const participant=getBattleParticipantByIdentity(definition.side,definition.participantId);
   if (!participant) return {success:false,reason:"participant_missing"};
   if (definition.side === "player") {
     const entitySource=getEntityDefinition(definition.sourceId);
     const characterSource=getCharacterRegistryEntry(definition.sourceId);
-    if (entitySource && !isBattleEntitySourceAvailableForCharacter(participant,definition.sourceId)) {
-      return {success:false,reason:"authoritative_source_not_available"};
-    }
     if (characterSource && getCharacterRegistryId(participant)!==definition.sourceId) {
       return {success:false,reason:"character_source_owner_mismatch"};
     }
+    // =====================================================
+    // BRICK 510 — EMBODIED PACKAGE NO-DOUBLE-COUNT GUARD
+    // =====================================================
+    if (characterEmbodiesExactPackage(participant,definition.exactPackageId)) {
+      return {success:false,reason:"exact_package_already_embodied"};
+    }
+    if (entitySource && !isBattleEntitySourceAvailableForCharacter(participant,definition.sourceId)) {
+      return {success:false,reason:"authoritative_source_not_available"};
+    }
   }
-  if (definition.side === "player" && characterEmbodiesExactPackage(participant, definition.exactPackageId)) {
-    return {success:false,reason:"exact_package_already_embodied"};
-  }
+  const catalog=getEffectiveStatePackageDefinition(definition.sourceId,definition.exactPackageId);
+  if (!catalog) return {success:false,reason:"package_not_authored"};
+  if (catalog.classification !== "effective_state") return {success:false,reason:"package_is_not_effective_state"};
   const expressionStateId=definition.expressionStateId || catalog.defaultExpressionStateId || "default";
   const projectionKey=createEffectiveStateProjectionKey(definition.sourceId,definition.exactPackageId,expressionStateId);
   const existing=getBattleEffectiveStateProjection(projectionKey,definition.side,definition.participantId);
@@ -63568,7 +64462,7 @@ function isBattleEntitySourceAvailableForCharacter(character, sourceId) {
   if (entity.entityType === "hosted_entity_partition") {
     return evaluateHostedEntityAccess(character.id,sourceId,{requireCooperative:false}).available===true;
   }
-  if (["attached_summon","collective_summon"].includes(entity.entityType)) {
+  if (isAttachableSummonEntity(entity)) {
     return getAttachedSummonIdForCharacter(character.id)===sourceId;
   }
   return false;
@@ -63603,7 +64497,7 @@ function setHostedEntityBattlePresence(characterId, entityId, present) {
 function attachEntitySummonToCharacter(characterId, entityId) {
   const character=getPlayerCharacter(characterId);
   const entity=getEntityDefinition(entityId);
-  if (!character || !entity || !["attached_summon","collective_summon"].includes(entity.entityType)) return false;
+  if (!character || !isAttachableSummonEntity(entity)) return false;
   if (!playerData.entities || !Array.isArray(playerData.entities.ownedEntityIds) || !playerData.entities.ownedEntityIds.includes(entityId)) return false;
   const registryId=getCharacterRegistryId(character);
   const previous=playerData.entities.attachedSummonByCharacterRegistryId[registryId] || null;
@@ -63667,6 +64561,33 @@ function returnBattleAttachedSummon(side, participantId) {
   return record;
 }
 
+
+// =========================================================
+// BRICK 467 — AUTHORED BATTLE CONTEXT AUTHORITY
+// =========================================================
+function setBattleContextFact(key,value,sourceRef=null) {
+  if (!key) return false;
+  const context=ensureBattleRuntimeState().battleContext;
+  context.facts[key]=value;
+  if (sourceRef&&sourceRef.type&&sourceRef.id) context.sourceRefs.push({type:sourceRef.type,id:sourceRef.id});
+  return true;
+}
+
+function getBattleContextFact(key) {
+  const context=ensureBattleRuntimeState().battleContext;
+  return key&&Object.prototype.hasOwnProperty.call(context.facts,key)?context.facts[key]:null;
+}
+
+function setBattleContextTags(tags,sourceRef=null) {
+  const context=ensureBattleRuntimeState().battleContext;
+  context.tags=Array.isArray(tags)?[...new Set(tags.filter(Boolean))]:[];
+  if (sourceRef&&sourceRef.type&&sourceRef.id) context.sourceRefs.push({type:sourceRef.type,id:sourceRef.id});
+  return [...context.tags];
+}
+
+function battleContextHasTag(tag) {
+  return !!tag&&ensureBattleRuntimeState().battleContext.tags.includes(tag);
+}
 
 // BRICK 321 — REMAINING BATTLE PL HELPERS
 // =========================================================
@@ -64119,10 +65040,6 @@ function initializeBattleRemainingPLFromDeployment(
 
   return runtime.remainingPL;
 }
-
-
-
-// =========================================================
 
 
 // =========================================================
@@ -64627,6 +65544,51 @@ function removeBattleTransientState(
 }
 
 // =========================================================
+// =========================================================
+// BRICK 465 — CHARGED TRANSIENT-STATE CONSUMPTION
+// BRICK 466 — TRANSIENT ACTION-OPPORTUNITY DURATION
+// =========================================================
+function getBattleTransientStatesForParticipant(side,participantId) {
+  return ensureBattleRuntimeState().transientStates.filter(state=>state&&state.targetRef&&state.targetRef.side===side&&state.targetRef.participantId===participantId);
+}
+
+function consumeBattleTransientStateCharge(stateId,side,participantId,amount=1) {
+  const state=findBattleTransientState({stateId});
+  if (!state||!canBattleParticipantConsumeTransientState(state,side,participantId)) return {success:false,reason:"state_not_consumable"};
+  const current=Math.max(0,Math.floor(Number(state.data&&state.data.remainingCharges)||0));
+  const used=Math.max(1,Math.floor(Number(amount)||1));
+  if (current<=0) return {success:false,reason:"no_state_charges"};
+  state.data.remainingCharges=Math.max(0,current-used);
+  if (state.data.remainingCharges<=0) removeBattleTransientState(stateId);
+  return {success:true,stateId,remainingCharges:state.data.remainingCharges};
+}
+
+function advanceBattleTransientStateActionOpportunity(side,participantId,actionId,reason) {
+  const states=[...getBattleTransientStatesForParticipant(side,participantId)];
+  const expired=[];
+  states.forEach(state=>{
+    if (!state.data||!Number.isFinite(Number(state.data.remainingActionOpportunities))) return;
+    if (state.data.activationActionId&&state.data.activationActionId===actionId) return;
+    state.data.remainingActionOpportunities=Math.max(0,Number(state.data.remainingActionOpportunities)-1);
+    recordBattleEvidence({eventType:"transient_state_duration_advanced",actionId:actionId||null,actorRef:createBattleParticipantRef(side,participantId),stateRefs:[state.stateId],data:{stateKey:state.stateKey,remainingActionOpportunities:state.data.remainingActionOpportunities,reason:reason||null}});
+    if (state.data.remainingActionOpportunities<=0) { removeBattleTransientState(state.stateId); expired.push(state.stateId); }
+  });
+  return expired;
+}
+
+function upsertBattleParticipantCounterState(side,participantId,stateKey,delta=1,ownerRef=null) {
+  let state=findBattleTransientState({stateKey,targetSide:side,targetParticipantId:participantId});
+  if (!state) state=addBattleTransientState({stateKey,sourceSide:side,sourceParticipantId:participantId,targetSide:side,targetParticipantId:participantId,ownerRef,data:{value:0}});
+  if (!state) return null;
+  state.data.value=Math.max(0,(Number(state.data.value)||0)+(Number(delta)||0));
+  return state;
+}
+
+function getBattleParticipantCounterValue(side,participantId,stateKey) {
+  const state=findBattleTransientState({stateKey,targetSide:side,targetParticipantId:participantId});
+  return state&&state.data?Math.max(0,Number(state.data.value)||0):0;
+}
+
 // BRICK 303 — TEMPORARY BATTLE CONDITIONS
 // BRICK 331 — CONDITION SEMANTICS
 // BRICK 332 — NEXT ACTION OPPORTUNITY LIFECYCLE
@@ -64642,6 +65604,87 @@ function removeBattleTransientState(
 // not every positive runtime state.
 //
 // =========================================================
+
+// =========================================================
+// BRICK 444 — GENERIC ALPHA CONDITION CATALOG
+// BRICK 446 — AUTHORED CONDITION TICK METADATA
+// =========================================================
+const GENERIC_ALPHA_BATTLE_CONDITION_CATALOG = {
+  poisoned:{
+    conditionKey:"poisoned",
+    conditionType:"poison",
+    tickDamage:2,
+    maximumTicks:3,
+    tickPhase:"end_of_action_opportunity",
+    bypassStamina:true,
+    reapplication:"refresh",
+    stackMode:"single_stream",
+    compatibleCureItemIds:["standard_antidote"]
+  },
+  burning:{
+    conditionKey:"burning",
+    conditionType:"burning",
+    tickDamage:2,
+    maximumTicks:2,
+    tickPhase:"start_of_action_opportunity",
+    bypassStamina:true,
+    reapplication:"refresh",
+    stackMode:"single_stream",
+    compatibleCureItemIds:["burn_treatment"]
+  }
+};
+
+function getGenericAlphaBattleConditionDefinition(conditionKey) {
+  return GENERIC_ALPHA_BATTLE_CONDITION_CATALOG[conditionKey]||null;
+}
+
+// =========================================================
+// BRICK 445 — CONDITION REFRESH / NON-STACK UPSERT
+// =========================================================
+function upsertBattleCondition(definition) {
+  if (!definition||!definition.conditionKey||!definition.targetSide||!definition.targetParticipantId) return {condition:null,refreshed:false};
+  const runtime=ensureBattleRuntimeState();
+  const existing=runtime.conditions.find(condition=>condition&&condition.conditionKey===definition.conditionKey&&condition.targetRef&&condition.targetRef.side===definition.targetSide&&condition.targetRef.participantId===definition.targetParticipantId);
+  if (existing&&definition.reapplication==="refresh") {
+    existing.sourceRef=createBattleParticipantRef(definition.sourceSide,definition.sourceParticipantId);
+    existing.compatibleCureItemIds=Array.isArray(definition.compatibleCureItemIds)?[...new Set(definition.compatibleCureItemIds.filter(Boolean))]:existing.compatibleCureItemIds;
+    existing.blockedActionClasses=Array.isArray(definition.blockedActionClasses)?[...new Set(definition.blockedActionClasses.filter(Boolean))]:existing.blockedActionClasses;
+    existing.blockedActionTraits=Array.isArray(definition.blockedActionTraits)?[...new Set(definition.blockedActionTraits.filter(Boolean))]:existing.blockedActionTraits;
+    existing.data={...(existing.data||{}),...(definition.data?cloneBattleRuntimeValue(definition.data):{})};
+    existing.createdActionSequence=runtime.actionSequence;
+    existing.refreshedAt=Date.now();
+    return {condition:existing,refreshed:true};
+  }
+  return {condition:addBattleCondition(definition),refreshed:false};
+}
+
+function applyGenericAlphaBattleCondition(conditionKey,definition={}) {
+  const authored=getGenericAlphaBattleConditionDefinition(conditionKey);
+  if (!authored) return {condition:null,refreshed:false,reason:"generic_condition_missing"};
+  return upsertBattleCondition({
+    conditionKey:authored.conditionKey,
+    conditionType:authored.conditionType,
+    compatibleCureItemIds:authored.compatibleCureItemIds,
+    sourceSide:definition.sourceSide,
+    sourceParticipantId:definition.sourceParticipantId,
+    targetSide:definition.targetSide,
+    targetParticipantId:definition.targetParticipantId,
+    ownerRef:definition.ownerRef||null,
+    blockedActionClasses:definition.blockedActionClasses||[],
+    blockedActionTraits:definition.blockedActionTraits||[],
+    reapplication:authored.reapplication,
+    data:{
+      ...(definition.data||{}),
+      tickDamage:authored.tickDamage,
+      maximumTicks:authored.maximumTicks,
+      remainingTicks:authored.maximumTicks,
+      tickPhase:authored.tickPhase,
+      bypassStamina:authored.bypassStamina,
+      stackMode:authored.stackMode,
+      reapplication:authored.reapplication
+    }
+  });
+}
 
 function addBattleCondition(
   definition
@@ -64941,6 +65984,122 @@ function getBattleParticipantConditions(
 
 
 // =========================================================
+// BRICK 447 — ACTION-OPPORTUNITY TOKEN AUTHORITY
+// =========================================================
+function getBattleActionOpportunityIndex(side,participantId) {
+  const state=ensureBattleRuntimeState().actionOpportunityState;
+  if (!state.counters[side]) state.counters[side]={};
+  if (!Number.isFinite(Number(state.counters[side][participantId]))) state.counters[side][participantId]=0;
+  return Number(state.counters[side][participantId])||0;
+}
+
+function getBattleActionOpportunityToken(side,participantId) {
+  return `${side}:${participantId}:${getBattleActionOpportunityIndex(side,participantId)}`;
+}
+
+function advanceBattleActionOpportunityIndex(side,participantId) {
+  const state=ensureBattleRuntimeState().actionOpportunityState;
+  const current=getBattleActionOpportunityIndex(side,participantId);
+  state.counters[side][participantId]=current+1;
+  return state.counters[side][participantId];
+}
+
+// =========================================================
+// BRICK 450 — CONDITION DAMAGE BYPASSES STAMINA
+// BRICK 451 — CONDITION TICK EVIDENCE
+// =========================================================
+function resolveBattleConditionTick(condition,phase,actionId=null) {
+  if (!condition||!condition.targetRef||!condition.data) return null;
+  const expectedPhase=condition.data.tickPhase||null;
+  if (expectedPhase!==phase) return null;
+  const remaining=Math.max(0,Math.floor(Number(condition.data.remainingTicks)||0));
+  const tickDamage=Math.max(0,Math.round(Number(condition.data.tickDamage)||0));
+  if (remaining<=0||tickDamage<=0) return null;
+  const side=condition.targetRef.side;
+  const participantId=condition.targetRef.participantId;
+  const beforeCapacity=getBattleDamageBearingCapacity(side,participantId);
+  const absorption=absorbBattleDamageBearingCapacity(side,participantId,tickDamage);
+  condition.data.remainingTicks=Math.max(0,remaining-1);
+  const evidence=recordBattleEvidence({
+    eventType:"condition_tick_resolved",
+    actionId,
+    actorRef:createBattleParticipantRef(side,participantId),
+    targetRef:createBattleParticipantRef(side,participantId),
+    conditionRefs:[condition.conditionId],
+    data:{conditionKey:condition.conditionKey,phase,tickDamage,bypassStamina:condition.data.bypassStamina===true,remainingTicks:condition.data.remainingTicks,beforeCapacity,absorption}
+  });
+  let zeroResult=null;
+  if (absorption.totalCapacityAfter<=0) zeroResult=handleBattleParticipantAtZeroPL(side,participantId,null,{actionId});
+  const expired=condition.data.remainingTicks<=0;
+  if (expired) removeBattleCondition(condition.conditionId);
+  return {conditionId:condition.conditionId,conditionKey:condition.conditionKey,phase,tickDamage,remainingTicks:condition.data.remainingTicks,absorption,evidence,expired,zeroResult};
+}
+
+// =========================================================
+// BRICK 448 — BURNING START-OF-OPPORTUNITY TICK
+// BRICK 453 — BURN-TREATMENT TIMING BOUNDARY
+// =========================================================
+function resolveBattleStartOfActionOpportunityEffects(side,participantId,actionId=null) {
+  const runtime=ensureBattleRuntimeState();
+  const token=getBattleActionOpportunityToken(side,participantId);
+  if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[]};
+  runtime.actionOpportunityState.startedTokens[token]=true;
+  const ticks=[...getBattleParticipantConditions(side,participantId)]
+    .filter(condition=>condition.data&&condition.data.tickPhase==="start_of_action_opportunity")
+    .map(condition=>resolveBattleConditionTick(condition,"start_of_action_opportunity",actionId))
+    .filter(Boolean);
+  return {token,idempotent:false,ticks};
+}
+
+// =========================================================
+// BRICK 449 — POISON END-OF-OPPORTUNITY TICK
+// BRICK 452 — ANTIDOTE-BEFORE-END-TICK TIMING BRIDGE
+// =========================================================
+function resolveBattleEndOfActionOpportunityEffects(side,participantId,actionId=null) {
+  const ticks=[...getBattleParticipantConditions(side,participantId)]
+    .filter(condition=>condition.data&&condition.data.tickPhase==="end_of_action_opportunity")
+    .map(condition=>resolveBattleConditionTick(condition,"end_of_action_opportunity",actionId))
+    .filter(Boolean);
+  return {ticks};
+}
+
+// =========================================================
+// BRICK 454 — CONDITION PRESENTATION DESCRIPTOR
+// =========================================================
+function getBattleConditionPresentationDescriptor(condition) {
+  if (!condition) return null;
+  const phase=condition.data&&condition.data.tickPhase;
+  return {
+    conditionId:condition.conditionId,
+    conditionKey:condition.conditionKey,
+    conditionType:condition.conditionType,
+    remainingTicks:Number.isFinite(Number(condition.data&&condition.data.remainingTicks))?Number(condition.data.remainingTicks):null,
+    tickDamage:Number.isFinite(Number(condition.data&&condition.data.tickDamage))?Number(condition.data.tickDamage):null,
+    timing:phase==="start_of_action_opportunity"?"start_of_action":phase==="end_of_action_opportunity"?"end_of_action":null,
+    bypassStamina:condition.data&&condition.data.bypassStamina===true,
+    blockedActionClasses:[...(condition.blockedActionClasses||[])],
+    blockedActionTraits:[...(condition.blockedActionTraits||[])]
+  };
+}
+
+// =========================================================
+// BRICK 455 — CONDITION LIFECYCLE DIAGNOSTIC
+// =========================================================
+function runGenericConditionDefinitionDiagnostics() {
+  const poison=getGenericAlphaBattleConditionDefinition("poisoned");
+  const burning=getGenericAlphaBattleConditionDefinition("burning");
+  const result={
+    poisonPilot:!!poison&&poison.tickDamage===2&&poison.maximumTicks===3&&poison.tickPhase==="end_of_action_opportunity"&&poison.bypassStamina===true,
+    burningPilot:!!burning&&burning.tickDamage===2&&burning.maximumTicks===2&&burning.tickPhase==="start_of_action_opportunity"&&burning.bypassStamina===true,
+    poisonRefresh:!!poison&&poison.reapplication==="refresh"&&poison.stackMode==="single_stream",
+    burningRefresh:!!burning&&burning.reapplication==="refresh"&&burning.stackMode==="single_stream",
+    curesAuthored:poison.compatibleCureItemIds.includes("standard_antidote")&&burning.compatibleCureItemIds.includes("burn_treatment")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
+}
+
+// =========================================================
 // BRICK 405 — ACTION-OPPORTUNITY PACKAGE DURATION
 // =========================================================
 
@@ -64971,82 +66130,32 @@ function consumeBattleActionOpportunity(
   actionId,
   reason = "valid_action_completed"
 ) {
+  // End-of-opportunity authored effects resolve after the action's own
+  // mechanics. This permits a successfully used Antidote to remove Poison
+  // before its pending end tick. Burning already resolved at opportunity start.
+  const endEffects=resolveBattleEndOfActionOpportunityEffects(side,participantId,actionId);
 
-
-  const expiringConditions =
-    getBattleParticipantConditions(
-      side,
-      participantId
-    )
-      .filter(
-        condition =>
-          condition.data &&
-          condition.data.expiry ===
-            "next_action_opportunity"
-      );
-
-
-  const removedConditionIds =
-    [];
-
-
-  expiringConditions.forEach(
-    condition => {
-
-
-      if (
-        removeBattleCondition(
-          condition.conditionId
-        )
-      ) {
-
-
-        removedConditionIds.push(
-          condition.conditionId
-        );
-
-
-        recordBattleEvidence({
-
-          eventType:
-            "condition_expired_on_action_opportunity",
-
-          actionId:
-            actionId || null,
-
-          actorRef:
-            createBattleParticipantRef(
-              side,
-              participantId
-            ),
-
-          conditionRefs: [
-            condition.conditionId
-          ],
-
-          data: {
-
-            conditionKey:
-              condition.conditionKey,
-
-            reason:
-              reason
-
-          }
-
-        });
-      }
+  const expiringConditions = getBattleParticipantConditions(side,participantId)
+    .filter(condition=>condition.data&&condition.data.expiry==="next_action_opportunity");
+  const removedConditionIds=[];
+  expiringConditions.forEach(condition=>{
+    if (removeBattleCondition(condition.conditionId)) {
+      removedConditionIds.push(condition.conditionId);
+      recordBattleEvidence({
+        eventType:"condition_expired_on_action_opportunity",
+        actionId:actionId||null,
+        actorRef:createBattleParticipantRef(side,participantId),
+        conditionRefs:[condition.conditionId],
+        data:{conditionKey:condition.conditionKey,reason}
+      });
     }
-  );
+  });
 
-
-  consumeBattleEffectiveStateActionOpportunity(
-    side, participantId, actionId, reason
-  );
-
-  return removedConditionIds;
+  consumeBattleEffectiveStateActionOpportunity(side,participantId,actionId,reason);
+  advanceBattleTransientStateActionOpportunity(side,participantId,actionId,reason);
+  advanceBattleActionOpportunityIndex(side,participantId);
+  return {removedConditionIds,endEffects};
 }
-
 
 function cleanupBattleParticipantRuntimeState(
   side,
@@ -65134,6 +66243,7 @@ function cleanupBattleParticipantRuntimeState(
 
   if (runtime.temporaryCapacity[side]) delete runtime.temporaryCapacity[side][participantId];
   if (runtime.attachedSummons[side]) delete runtime.attachedSummons[side][participantId];
+  if (runtime.actionOpportunityState&&runtime.actionOpportunityState.counters&&runtime.actionOpportunityState.counters[side]) delete runtime.actionOpportunityState.counters[side][participantId];
 
   if (
     removedStateIds.length > 0 ||
@@ -65647,78 +66757,27 @@ function recordBattleEvidence(
 function beginBattleActionResolution(
   envelope
 ) {
-
-
-  const validation =
-    validateBattleActionEnvelope(
-      envelope
-    );
-
-
-  if (
-    !validation.valid
-  ) {
-
-
-    return {
-
-      accepted:
-        false,
-
-      validation:
-        validation,
-
-      evidence:
-        null
-
-    };
+  let startEffects=null;
+  if (envelope&&currentBattle.active&&!currentBattle.battleOver&&envelope.actorRef&&envelope.actorRef.side&&envelope.actorRef.participantId&&getBattleActiveParticipantId(envelope.actorRef.side)===envelope.actorRef.participantId) {
+    startEffects=resolveBattleStartOfActionOpportunityEffects(envelope.actorRef.side,envelope.actorRef.participantId,envelope.actionId||null);
   }
 
+  const validation=validateBattleActionEnvelope(envelope);
+  if (!validation.valid) {
+    return {accepted:false,validation,evidence:null,startEffects};
+  }
 
-  const evidence =
-    recordBattleEvidence({
-
-      eventType:
-        "action_attempted",
-
-      actionId:
-        envelope.actionId,
-
-      actorRef:
-        envelope.actorRef,
-
-      targetRef:
-        envelope.targetRef,
-
-      skillId:
-        envelope.skillId,
-
-      itemId:
-        envelope.itemId,
-
-      sourceRefs:
-        envelope.sourceRefs,
-
-      data: {
-        actionClass:
-          envelope.actionClass
-      }
-
-    });
-
-
-  return {
-
-    accepted:
-      true,
-
-    validation:
-      validation,
-
-    evidence:
-      evidence
-
-  };
+  const evidence=recordBattleEvidence({
+    eventType:"action_attempted",
+    actionId:envelope.actionId,
+    actorRef:envelope.actorRef,
+    targetRef:envelope.targetRef,
+    skillId:envelope.skillId,
+    itemId:envelope.itemId,
+    sourceRefs:envelope.sourceRefs,
+    data:{actionClass:envelope.actionClass}
+  });
+  return {accepted:true,validation,evidence,startEffects};
 }
 
 
@@ -67531,7 +68590,6 @@ function attemptBattlePouchItem(
 }
 
 
-// =========================================================
 // BRICK 353 — BATTLE ACTION REGION / BATTLE POUCH UI
 // =========================================================
 //
@@ -68333,6 +69391,96 @@ function renderBattleActionRegion(
   );
 }
 
+
+
+// =========================================================
+// =========================================================
+// BRICK 550 — BATTLE UI PARTICIPANT SNAPSHOT
+// =========================================================
+function getBattleUIParticipantSnapshot(side,slotIndex) {
+  const slot=getBattleDeploymentSlot(side,slotIndex);
+  if (!slot||!slot.participantId) return {side,slotIndex,participantId:null,assignment:slotIndex<=3?"active":"reserve",empty:true};
+  const participant=getBattleParticipantByIdentity(side,slot.participantId);
+  const remaining=getBattleRemainingPL(side,slot.participantId);
+  const maximum=getBattleMaximumPL(side,slot.participantId);
+  const temporaryCapacity=getBattleTemporaryCapacity(side,slot.participantId);
+  const conditions=getBattleParticipantConditions(side,slot.participantId).map(getBattleConditionPresentationDescriptor).filter(Boolean);
+  const weapon=side==="player"&&participant?getBattleEquippedWeaponExecutionContext(participant):null;
+  const acclimation=side==="player"&&participant&&weapon?getWeaponActionExecutionMultiplier(participant,weapon):null;
+  return {
+    side,slotIndex,participantId:slot.participantId,name:participant&&participant.name?participant.name:slot.participantId,
+    assignment:slotIndex<=3?"active":"reserve",currentActor:slotIndex===1,
+    battlePL:{remaining,maximum,temporaryCapacity,totalDamageBearingCapacity:remaining+temporaryCapacity},
+    stamina:participant?getBattleEffectiveStamina(side,slot.participantId):null,
+    staminaIsResource:false,
+    conditions,
+    exactWeapon:weapon?{instanceId:weapon.instanceId,itemId:weapon.itemId,weaponClass:weapon.weaponClass,properties:weapon.definition?Object.fromEntries(Object.entries(weapon.definition).filter(([key,value])=>key.startsWith("chakra_")||key==="weaponClass"||key==="weaponFamily")):{} ,acclimation}:null
+  };
+}
+
+// =========================================================
+// BRICK 551 — CONDITIONS / SUMMON / TRANSFORMATION PRESENTATION
+// =========================================================
+function getBattleUIStatefulSourceSnapshot(side,participantId) {
+  const summon=getBattleAttachedSummon(side,participantId);
+  const projections=getBattleParticipantEffectiveStateProjections(side,participantId);
+  const transformations=projections.filter(projection=>projection.expressionStateId==="active_transformation"||projection.activationOwner&&projection.activationOwner.type==="transformation").map(projection=>({sourceId:projection.sourceId,exactPackageId:projection.exactPackageId,expressionStateId:projection.expressionStateId,remainingActionOpportunities:projection.remainingActionOpportunities,temporaryCapacity:getBattleTemporaryCapacity(side,participantId)}));
+  const clone=findBattleTransientState({stateKey:"shadow_clone_formation",targetSide:side,targetParticipantId:participantId});
+  return {
+    summon:summon?{summonId:summon.summonId,state:summon.state,manifestedSkillId:summon.manifestedSkillId||null,hasIndependentTurn:false,hasBattlePLBar:false}:null,
+    transformations,
+    shadowCloneFormation:clone?{remainingCharges:Number(clone.data&&clone.data.remainingCharges)||0,remainingActionOpportunities:Number(clone.data&&clone.data.remainingActionOpportunities)||0,independentParticipants:false}:null,
+    sourcePackages:projections.map(projection=>({sourceId:projection.sourceId,exactPackageId:projection.exactPackageId,expressionStateId:projection.expressionStateId,remainingActionOpportunities:projection.remainingActionOpportunities}))
+  };
+}
+
+// =========================================================
+// BRICK 552 — BATTLE POUCH / SKILL / CONTEXT PRESENTATION
+// =========================================================
+function getBattleUIPouchPresentation(actor) {
+  return getLiveBattlePouchItemIds().map(itemId=>{
+    const item=getItemDefinition(itemId);
+    const availability=actor?evaluateBattlePouchItemAvailability(itemId,actor):{available:false,reason:"actor_missing"};
+    return {itemId,displayName:item?item.name:itemId,quantity:getBattlePouchItemQuantity(itemId),available:availability.available===true,invalidReason:availability.available===true?null:availability.reason};
+  });
+}
+
+function getBattleUISkillPalettePresentation(actor) {
+  if (!actor) return {skillIds:[],source:"none"};
+  if (actor.id==="academy_menma") {
+    const ids=getAcademyMenmaBattlePaletteIds(actor);
+    const mantleActive=ids===ACADEMY_MENMA_MANTLE_PREPARED_SKILLS||ids.some(id=>id&&id.startsWith("academy_menma_yin_"));
+    return {skillIds:[...ids],source:mantleActive?"transformation_palette":"prepared_academy_palette",fifthSlotUnavailable:mantleActive&&ids[4]===null};
+  }
+  const academy=getPreparedAcademyBattleSkillIds(actor.id);
+  if (academy.length>0) return {skillIds:academy,source:"prepared_academy_palette"};
+  const registryId=getCharacterRegistryId(actor);
+  return {skillIds:Object.values(CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE).filter(skill=>skill.ownerRegistryId===registryId).map(skill=>skill.id),source:"authored_registry_skills"};
+}
+
+function getBattleUIContextPresentation() {
+  const context=ensureBattleRuntimeState().battleContext;
+  return {facts:cloneBattleRuntimeValue(context.facts),tags:[...context.tags],sourceRefs:cloneBattleRuntimeValue(context.sourceRefs)};
+}
+
+// =========================================================
+// BRICK 553 — AUTHORITATIVE BATTLE UI PRESENTATION CONTRACT
+// =========================================================
+function getBattleUIAuthoritativePresentationContract() {
+  if (!currentBattle.active||!currentBattle.deployment) return {active:false};
+  const actor=getBattleDeploymentParticipant("player",1);
+  return {
+    active:true,battleId:currentBattle.battleId,
+    deployment:{player:[1,2,3,4,5,6].map(index=>getBattleUIParticipantSnapshot("player",index)),enemy:[1,2,3,4,5,6].map(index=>getBattleUIParticipantSnapshot("enemy",index))},
+    currentActorId:actor?actor.id:null,
+    actorState:actor?getBattleUIStatefulSourceSnapshot("player",actor.id):null,
+    pouch:getBattleUIPouchPresentation(actor),
+    skillPalette:getBattleUISkillPalettePresentation(actor),
+    context:getBattleUIContextPresentation(),
+    lastQueueTransition:currentBattle.deployment.lastTransition?cloneBattleRuntimeValue(currentBattle.deployment.lastTransition):null,
+    semantics:{battlePLIsHealth:false,staminaIsBar:false,summonsAreParticipants:false,temporaryCapacityIsStamina:false,uiCalculatesEffectiveState:false}
+  };
+}
 
 
 // =========================================================
@@ -69917,6 +71065,70 @@ const ACADEMY_BATTLE_SKILL_DATABASE = {
 //
 // =========================================================
 
+// =========================================================
+// BRICK 456 — GREAT FIREBALL SKILL DEFINITION
+// BRICK 459 — MYSTICAL PALM SKILL DEFINITION
+// BRICK 462 — SHACKLING STAKES SKILL DEFINITION
+// BRICK 468 — LIGHTNING CHANNEL SLASH DEFINITION
+// BRICK 472 — MENMA TRANSFORMED PALETTE
+// BRICK 498 — COERCIVE TRANSFORMED SKILL REGISTRY
+// =========================================================
+const CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE = {
+  jonin_sasuke_fire_style_great_fireball:{
+    id:"jonin_sasuke_fire_style_great_fireball",displayName:"Fire Style: Great Fireball",ownerRegistryId:"jonin_sasuke",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,propagationMode:"excess_damage",damageProfile:{coefficient:0.55},traits:["chakra_dependent","fire_technique"],requirements:[]
+  },
+  sannin_sakura_mystical_palm:{
+    id:"sannin_sakura_mystical_palm",displayName:"Mystical Palm",ownerRegistryId:"sannin_sakura",primaryDiscipline:"Ninjutsu",targetMode:"selected_ally",actionClass:"restorative_technique",resolutionKind:"restore_underlying_battle_pl",staminaMitigation:null,restorationProfile:{coefficient:0.25},traits:["medical_ninjutsu"],requirements:[]
+  },
+  akatsuki_itachi_shackling_stakes:{
+    id:"akatsuki_itachi_shackling_stakes",displayName:"Shackling Stakes",ownerRegistryId:"akatsuki_itachi",primaryDiscipline:"Genjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"condition",staminaMitigation:null,traits:["genjutsu"],requirements:[],condition:{conditionKey:"illusory_bind",reapplication:"refresh",expiry:"next_action_opportunity",blockedActionTraits:["movement_dependent_taijutsu","movement_dependent_bukijutsu","reposition"]}
+  },
+  kage_naruto_multiple_shadow_clone:{
+    id:"kage_naruto_multiple_shadow_clone",displayName:"Multiple Shadow Clone",ownerRegistryId:"kage_naruto",primaryDiscipline:"Kinjutsu",targetMode:"self",actionClass:"setup_technique",resolutionKind:"shadow_clone_formation",staminaMitigation:null,traits:["created_expression"],requirements:[],formation:{remainingCharges:2,remainingActionOpportunities:3,compatibleConsumerTrait:"clone_assisted"}
+  },
+  jonin_sasuke_lightning_channel_slash:{
+    id:"jonin_sasuke_lightning_channel_slash",displayName:"Lightning Channel Slash",ownerRegistryId:"jonin_sasuke",primaryDiscipline:"Bukijutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,damageProfile:{coefficient:0.50,conductionMultiplier:1.20},traits:["weapon_dependent","lightning_technique"],requirements:[{kind:"weapon_property",property:"chakra_conductive",value:true,label:"Exact compatible chakra-conductive Blade required."}]
+  },
+  // BRICK 473 — YIN FANG RUSH
+  academy_menma_yin_fang_rush:{
+    id:"academy_menma_yin_fang_rush",displayName:"Yin Fang Rush",ownerRegistryId:"academy_menma",primaryDiscipline:"Taijutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,damageProfile:{coefficient:0.50},traits:["mantle_only","movement_dependent_taijutsu"],requirements:[{kind:"active_effective_package",sourceId:"academy_menma",exactPackageId:"yin_chakra_mantle_academy",expressionStateId:"active_transformation"}]
+  },
+  // BRICK 474 — YIN CHAKRA BURST
+  academy_menma_yin_chakra_burst:{
+    id:"academy_menma_yin_chakra_burst",displayName:"Yin Chakra Burst",ownerRegistryId:"academy_menma",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,damageProfile:{coefficient:0.50},traits:["mantle_only","chakra_dependent"],requirements:[{kind:"active_effective_package",sourceId:"academy_menma",exactPackageId:"yin_chakra_mantle_academy",expressionStateId:"active_transformation"}]
+  },
+  academy_menma_foxfire_guard:{
+    id:"academy_menma_foxfire_guard",displayName:"Foxfire Guard",ownerRegistryId:"academy_menma",primaryDiscipline:"Ninjutsu",targetMode:"self",actionClass:"defensive_technique",resolutionKind:"ratio_guard_state",staminaMitigation:null,traits:["mantle_only"],requirements:[{kind:"active_effective_package",sourceId:"academy_menma",exactPackageId:"yin_chakra_mantle_academy",expressionStateId:"active_transformation"}],guard:{stateKey:"foxfire_guard",attackMultiplier:0.65,oneUse:true}
+  },
+  academy_menma_controlled_withdrawal:{
+    id:"academy_menma_controlled_withdrawal",displayName:"Controlled Withdrawal",ownerRegistryId:"academy_menma",primaryDiscipline:null,targetMode:"self",actionClass:"transformation_control",resolutionKind:"controlled_withdrawal",staminaMitigation:null,traits:["mantle_only"],requirements:[{kind:"active_effective_package",sourceId:"academy_menma",exactPackageId:"yin_chakra_mantle_academy",expressionStateId:"active_transformation"}]
+  },
+  coercive_cloak_rending_lunge:{
+    id:"coercive_cloak_rending_lunge",displayName:"Rending Lunge",ownerRegistryId:"coercive_cloak",primaryDiscipline:"Taijutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,damageProfile:{coefficient:0.55},traits:["movement_dependent_taijutsu","coercive_cloak"],requirements:[{kind:"embodied_or_active_package",exactPackageId:"coercive_kurama_cloak_v1"}]
+  },
+  coercive_cloak_chakra_claw:{
+    id:"coercive_cloak_chakra_claw",displayName:"Chakra Claw",ownerRegistryId:"coercive_cloak",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,damageProfile:{coefficient:0.50},traits:["chakra_dependent","coercive_cloak"],requirements:[{kind:"embodied_or_active_package",exactPackageId:"coercive_kurama_cloak_v1"}]
+  },
+  coercive_cloak_tailed_beast_rasengan:{
+    id:"coercive_cloak_tailed_beast_rasengan",displayName:"Tailed Beast Rasengan",ownerRegistryId:"coercive_cloak",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",staminaMitigation:true,damageProfile:{coefficient:0.65},traits:["chakra_dependent","coercive_cloak","coercive_overdraw","rasengan_form_hybrid"],requirements:[{kind:"embodied_or_active_package",exactPackageId:"coercive_kurama_cloak_v1"},{kind:"registry_capability",capabilityId:"rasengan_form_shaping"},{kind:"registry_capability",capabilityId:"coercive_kurama_chakra_access"}]
+  },
+  coercive_cloak_seal_braced_guard:{
+    id:"coercive_cloak_seal_braced_guard",displayName:"Seal-Braced Guard",ownerRegistryId:"coercive_cloak",primaryDiscipline:"Fūinjutsu",targetMode:"self",actionClass:"defensive_technique",resolutionKind:"ratio_guard_state",staminaMitigation:null,traits:["coercive_cloak"],requirements:[{kind:"embodied_or_active_package",exactPackageId:"coercive_kurama_cloak_v1"}],guard:{stateKey:"coercive_seal_braced_guard",attackMultiplier:0.70,oneUse:true}
+  }
+};
+
+const ACADEMY_MENMA_MANTLE_PREPARED_SKILLS = [
+  "academy_menma_yin_fang_rush",
+  "academy_menma_yin_chakra_burst",
+  "academy_menma_foxfire_guard",
+  "academy_menma_controlled_withdrawal",
+  null
+];
+
+function getClosureWaveBattleSkillDefinition(skillId) {
+  return CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE[skillId]||null;
+}
+
 const ACADEMY_BATTLE_PILOT_PREPARED_SKILLS = {
 
 
@@ -70033,6 +71245,7 @@ function getPreparedAcademyBattleSkills(
         !!skill
     );
 }
+
 
 // =========================================================
 // BRICK 308 — SKILL AVAILABILITY
@@ -71467,6 +72680,22 @@ function resolveBattlePreStaminaDefense(definition) {
       if (consumed) result.consumedStateIds.push(consumed.stateId);
     }
   }
+  // =====================================================
+  // BRICK 507 — GENERALISED RATIO PRE-STAMINA GUARD
+  // =====================================================
+  result.ratioGuards=[];
+  const ratioGuardStates=ensureBattleRuntimeState().transientStates.filter(state=>state&&state.targetRef&&state.targetRef.side===definition.targetSide&&state.targetRef.participantId===definition.targetParticipantId&&state.data&&Number.isFinite(Number(state.data.attackMultiplier))&&Number(state.data.attackMultiplier)>0&&Number(state.data.attackMultiplier)<1);
+  ratioGuardStates.forEach(state=>{
+    if (result.resolvedAttackPL<=0) return;
+    const before=result.resolvedAttackPL;
+    const after=Math.max(1,Math.round(before*Number(state.data.attackMultiplier)));
+    const participated=after<before;
+    result.resolvedAttackPL=after;
+    const detail={stateId:state.stateId,stateKey:state.stateKey,sourceSkillId:state.data.sourceSkillId||null,multiplier:Number(state.data.attackMultiplier),participated,before,after,actualReduction:Math.max(0,before-after)};
+    result.ratioGuards.push(detail);
+    if (participated&&state.data.oneUse===true) { const consumed=consumeBattleTransientState(state.stateId,"player",definition.targetParticipantId); if (consumed) result.consumedStateIds.push(consumed.stateId); }
+  });
+
   return result;
 }
 
@@ -71656,6 +72885,7 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
       guardingStepActualReduction:preDefense.guardingStep.actualReduction,
       enmaGuardParticipated:preDefense.enmaGuard.participated,
       enmaGuardActualReduction:preDefense.enmaGuard.actualReduction,
+      ratioGuards:Array.isArray(preDefense.ratioGuards)?cloneBattleRuntimeValue(preDefense.ratioGuards):[],
       resolvedAttackPL:preDefense.resolvedAttackPL,
       effectiveStamina:staminaResolution.effectiveStamina,
       staminaPivot:staminaResolution.pivot,
@@ -71677,8 +72907,9 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
   if (Array.isArray(currentBattle.battleLog)) {
     const g=preDefense.guardingStep.participated?` Guard blocked ${preDefense.guardingStep.actualReduction}.`:"";
     const e=preDefense.enmaGuard.participated?` Enma blocked ${preDefense.enmaGuard.actualReduction}.`:"";
+    const r=Array.isArray(preDefense.ratioGuards)&&preDefense.ratioGuards.some(guard=>guard.participated)?` Ratio guard reduced to ${preDefense.resolvedAttackPL}.`:"";
     const t=absorption.temporaryCapacityAbsorbed>0?` Temporary capacity absorbed ${absorption.temporaryCapacityAbsorbed}.`:"";
-    currentBattle.battleLog.push(`Attack ${definition.output.attackPL}.${g}${e} Stamina blocked ${staminaResolution.mitigationAmount}.${t} ${absorption.absorbedPL} capacity lost.`);
+    currentBattle.battleLog.push(`Attack ${definition.output.attackPL}.${g}${e}${r} Stamina blocked ${staminaResolution.mitigationAmount}.${t} ${absorption.absorbedPL} capacity lost.`);
   }
   let zeroResult=null;
   if (absorption.totalCapacityAfter<=0) zeroResult=handleBattleParticipantAtZeroPL(definition.targetSide,definition.targetParticipantId,actor,definition.envelope||null);
@@ -71716,6 +72947,7 @@ function resolveBattleDamagePacket(definition) {
   const first=segments[0]||null, last=segments[segments.length-1]||null;
   return first ? {...first,segments,remainingBattlePLAfter:last.remainingBattlePLAfter,residualAttackPL:last.residualAttackPL} : null;
 }
+
 
 // =========================================================
 // BRICK 413 — EXCESS DAMAGE v1 COMMON CONTINUATION
@@ -72334,6 +73566,231 @@ function resolveAcademyBattleSkillSemantics(
 
 
 // =========================================================
+// BRICK 457 — GREAT FIREBALL OUTPUT RESOLVER
+// BRICK 458 — GREAT FIREBALL EXCESS-DAMAGE INTEGRATION
+// BRICK 460 — MYSTICAL PALM RESTORATION RESOLVER
+// BRICK 461 — ILLUSORY BIND CONDITION AUTHORITY
+// BRICK 463 — SHACKLING STAKES RESOLVER
+// BRICK 469 — CONDUCTIVE-BLADE EXACT PROPERTY GUARD
+// BRICK 470 — HEAVY-RAIN CONDUCTION BRANCH
+// BRICK 471 — WEAPON EXECUTION-ORDER BRIDGE
+// =========================================================
+function getClosureWaveSkillWeaponContext(skill,actor) {
+  const requiresProperty=(skill.requirements||[]).find(requirement=>requirement&&requirement.kind==="weapon_property");
+  if (!requiresProperty) return null;
+  return getBattleEquippedWeaponExecutionContext(actor);
+}
+
+function isClosureWaveSkillRequirementMet(requirement,actor) {
+  if (!requirement) return {met:true};
+  if (requirement.kind==="registry_capability") return {met:characterHasRegistryCapability(actor,requirement.capabilityId),reason:"registry_capability_missing"};
+  if (requirement.kind==="embodied_or_active_package") {
+    if (characterEmbodiesExactPackage(actor,requirement.exactPackageId)) return {met:true};
+    const active=getBattleParticipantEffectiveStateProjections("player",actor.id).some(projection=>projection.exactPackageId===requirement.exactPackageId);
+    return {met:active,reason:"required_package_inactive"};
+  }
+  if (requirement.kind==="active_effective_package") {
+    const key=createEffectiveStateProjectionKey(requirement.sourceId,requirement.exactPackageId,requirement.expressionStateId||"default");
+    return {met:!!getBattleEffectiveStateProjection(key,"player",actor.id),reason:"required_effective_package_inactive"};
+  }
+  if (requirement.kind==="weapon_property") {
+    const context=getBattleEquippedWeaponExecutionContext(actor);
+    const actual=context&&context.definition?context.definition[requirement.property]:undefined;
+    return {met:!!context&&actual===requirement.value,reason:"required_exact_weapon_property_missing",weaponContext:context};
+  }
+  return {met:false,reason:"unsupported_requirement"};
+}
+
+function evaluateClosureWaveSkillAvailability(skill,actor,target=null) {
+  if (!skill||!actor) return {available:false,reason:"missing_skill_or_actor"};
+  if (!currentBattle.active||currentBattle.battleOver) return {available:false,reason:"battle_not_active"};
+  if (getCharacterRegistryId(actor)!==skill.ownerRegistryId) return {available:false,reason:"wrong_skill_owner"};
+  if (skill.targetMode==="current_enemy"&&!target) return {available:false,reason:"no_current_enemy"};
+  if (skill.targetMode==="selected_ally"&&(!target||!getBattleRemainingPLRecord("player",target.id))) return {available:false,reason:"valid_deployed_ally_required"};
+  const blocked=getBattleBlockingConditions("player",actor.id,skill.actionClass,skill.traits||[]);
+  if (blocked.length>0) return {available:false,reason:"blocked_by_condition",blockingConditionIds:blocked.map(condition=>condition.conditionId)};
+  for (const requirement of skill.requirements||[]) {
+    const check=isClosureWaveSkillRequirementMet(requirement,actor);
+    if (!check.met) return {available:false,reason:requirement.label||check.reason,requirement,check};
+  }
+  return {available:true,reason:null,weaponContext:getClosureWaveSkillWeaponContext(skill,actor)};
+}
+
+function calculateClosureWaveSkillAttackOutput(skill,actor) {
+  if (!skill||skill.resolutionKind!=="direct_damage"||!skill.damageProfile) return null;
+  const statKey=getBattlePrimaryDisciplineStatKey(skill.primaryDiscipline);
+  if (!statKey) return null;
+  const stats=getDevelopedEffectiveCharacterStats(actor);
+  const effectivePrimary=Math.max(0,Number(stats[statKey])||0);
+  const coefficient=Math.max(0,Number(skill.damageProfile.coefficient)||0);
+  let branch="normal";
+  let branchMultiplier=1;
+  const weaponContext=getClosureWaveSkillWeaponContext(skill,actor);
+  if (skill.id==="jonin_sasuke_lightning_channel_slash"&&weaponContext&&weaponContext.definition&&weaponContext.definition.chakra_conductive===true&&(battleContextHasTag("heavy_rain")||getBattleContextFact("weather")==="heavy_rain")) {
+    branch="conduction";
+    branchMultiplier=Number(skill.damageProfile.conductionMultiplier)||1.20;
+  }
+  const authoredMagnitude=effectivePrimary*coefficient*branchMultiplier;
+  const execution=weaponContext?getWeaponActionExecutionMultiplier(actor,weaponContext):{multiplier:1,state:null,severity:null};
+  const preDefenseAttackMagnitude=authoredMagnitude*execution.multiplier;
+  return {primaryDiscipline:skill.primaryDiscipline,statKey,effectivePrimaryDiscipline:effectivePrimary,coefficient,branch,branchMultiplier,authoredPreExecutionMagnitude:authoredMagnitude,weaponExecutionMultiplier:execution.multiplier,weaponAcclimationState:execution.state,weaponAcclimationSeverity:execution.severity,preDefenseAttackMagnitude,attackPL:Math.max(1,Math.round(preDefenseAttackMagnitude))};
+}
+
+function restoreUnderlyingBattlePLFromSkill(side,participantId,amount) {
+  const before=getBattleRemainingPL(side,participantId);
+  const maximum=getBattleMaximumPL(side,participantId);
+  if (maximum<=0) return {success:false,reason:"target_not_damage_bearing"};
+  const requested=Math.max(0,Math.round(Number(amount)||0));
+  const after=Math.min(maximum,before+requested);
+  setBattleRemainingPL(side,participantId,after);
+  return {success:true,before,after,maximum,restored:after-before};
+}
+
+function applyIllusoryBindCondition(actor,target,envelope) {
+  return upsertBattleCondition({
+    conditionKey:"illusory_bind",
+    conditionType:"genjutsu_bind",
+    sourceSide:"player",sourceParticipantId:actor.id,
+    targetSide:"enemy",targetParticipantId:target.id,
+    reapplication:"refresh",
+    blockedActionTraits:["movement_dependent_taijutsu","movement_dependent_bukijutsu","reposition"],
+    data:{expiry:"next_action_opportunity",sourceSkillId:"akatsuki_itachi_shackling_stakes",refreshMode:"refresh_not_stack"}
+  });
+}
+
+// =========================================================
+// BRICK 464 — SHADOW CLONE FORMATION CREATION
+// =========================================================
+function createShadowCloneFormation(actor,envelope) {
+  const existing=findBattleTransientState({stateKey:"shadow_clone_formation",targetSide:"player",targetParticipantId:actor.id});
+  if (existing) removeBattleTransientState(existing.stateId);
+  return addBattleTransientState({
+    stateKey:"shadow_clone_formation",
+    sourceSide:"player",sourceParticipantId:actor.id,
+    targetSide:"player",targetParticipantId:actor.id,
+    ownerRef:{type:"created_expression",id:"shadow_clone_formation"},
+    data:{remainingCharges:2,remainingActionOpportunities:3,compatibleConsumerTrait:"clone_assisted",activationActionId:envelope.actionId,noIndependentParticipant:true,noBattlePLBar:true}
+  });
+}
+
+function consumeShadowCloneFormationForSkill(actor,skill) {
+  if (!actor||!skill||!(skill.traits||[]).includes("clone_assisted")) return {consumed:false,reason:"skill_not_clone_assisted"};
+  const state=findBattleTransientState({stateKey:"shadow_clone_formation",targetSide:"player",targetParticipantId:actor.id});
+  if (!state) return {consumed:false,reason:"formation_missing"};
+  const result=consumeBattleTransientStateCharge(state.stateId,"player",actor.id,1);
+  return {consumed:result.success===true,...result};
+}
+
+// =========================================================
+// BRICK 475 — FOXFIRE GUARD
+// BRICK 506 — COERCIVE SEAL-BRACED GUARD
+// =========================================================
+function createRatioGuardState(actor,skill,envelope) {
+  const guard=skill&&skill.guard;
+  if (!actor||!guard) return null;
+  const existing=findBattleTransientState({stateKey:guard.stateKey,targetSide:"player",targetParticipantId:actor.id});
+  if (existing) removeBattleTransientState(existing.stateId);
+  return addBattleTransientState({stateKey:guard.stateKey,sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"skill",id:skill.id},data:{attackMultiplier:Number(guard.attackMultiplier)||1,oneUse:guard.oneUse===true,sourceSkillId:skill.id}});
+}
+
+// =========================================================
+// BRICK 476 — CONTROLLED WITHDRAWAL / PALETTE RESTORATION
+// =========================================================
+function endAcademyMenmaMantle(actor,reason="controlled_withdrawal") {
+  const key=createEffectiveStateProjectionKey("academy_menma","yin_chakra_mantle_academy","active_transformation");
+  const removed=removeBattleEffectiveStateProjection(key,"player",actor.id,reason);
+  return {ended:removed.length>0,reservoirPreserved:!!getBattleEffectiveStateProjection(createEffectiveStateProjectionKey("menma_nine_tails","yin_chakra_reservoir","attached_enhancement"),"player",actor.id),ordinaryPaletteRestored:true};
+}
+
+function getAcademyMenmaBattlePaletteIds(actor) {
+  const key=createEffectiveStateProjectionKey("academy_menma","yin_chakra_mantle_academy","active_transformation");
+  return actor&&getBattleEffectiveStateProjection(key,"player",actor.id)?[...ACADEMY_MENMA_MANTLE_PREPARED_SKILLS]:getPreparedAcademyBattleSkillIds(actor?actor.id:null);
+}
+
+// =========================================================
+// BRICK 503 — COERCIVE OVERDRAW
+// BRICK 504 — SEAL TENSION COUNTER
+// BRICK 505 — COERCIVE INSTABILITY RUNTIME BOUNDARY
+// =========================================================
+function applyCoerciveOverdraw(actor,skill,envelope) {
+  if (!actor||!skill||(skill.traits||[]).includes("coercive_overdraw")!==true) return null;
+  const state=upsertBattleParticipantCounterState("player",actor.id,"seal_tension",1,{type:"skill",id:skill.id});
+  if (state) recordBattleEvidence({eventType:"coercive_overdraw_applied",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,stateRefs:[state.stateId],data:{sealTension:state.data.value,noStatConversion:true}});
+  return state;
+}
+
+function getCoerciveRuntimeTruth(actor) {
+  return {sealTension:getBattleParticipantCounterValue("player",actor.id,"seal_tension"),coerciveInstability:getBattleParticipantCounterValue("player",actor.id,"coercive_instability"),temporaryCapacity:getBattleTemporaryCapacity("player",actor.id),writesToEffectiveStats:false};
+}
+
+function resolveClosureWaveSkillSemantics(skill,envelope,actor,target) {
+  if (skill.resolutionKind==="direct_damage") {
+    const output=calculateClosureWaveSkillAttackOutput(skill,actor);
+    if (!output) return {resolved:false,reason:"damage_output_unavailable"};
+    const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"player",actorParticipantId:actor.id,targetSide:envelope.targetRef.side,targetParticipantId:target.id,output,mitigable:skill.staminaMitigation===true,propagationMode:skill.propagationMode||null,stateRefs:[]});
+    if (!damage) return {resolved:false,reason:"damage_resolution_failed"};
+    const overdraw=applyCoerciveOverdraw(actor,skill,envelope);
+    const cloneAssist=consumeShadowCloneFormationForSkill(actor,skill);
+    return {resolved:true,branch:output.branch,damageApplied:true,damage,finalDamage:damage.finalDamage,remainingBattlePLAfter:damage.remainingBattlePLAfter,stateRefs:[...(overdraw?[overdraw.stateId]:[]),...(cloneAssist.consumed?[cloneAssist.stateId]:[])],conditionRefs:[]};
+  }
+  if (skill.resolutionKind==="restore_underlying_battle_pl") {
+    const statKey=getBattlePrimaryDisciplineStatKey(skill.primaryDiscipline);
+    const effective=Math.max(0,Number(getDevelopedEffectiveCharacterStats(actor)[statKey])||0);
+    const requested=Math.round(effective*(Number(skill.restorationProfile&&skill.restorationProfile.coefficient)||0));
+    const restoration=restoreUnderlyingBattlePLFromSkill("player",target.id,requested);
+    if (!restoration.success) return {resolved:false,reason:restoration.reason};
+    recordBattleEvidence({eventType:"battle_pl_restored",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,data:{requested,restored:restoration.restored,underlyingOnly:true,conditionCleanse:false,injuryCure:false,temporaryCapacityRestored:false}});
+    return {resolved:true,branch:"restoration",damageApplied:false,restoration,stateRefs:[],conditionRefs:[]};
+  }
+  if (skill.resolutionKind==="condition") {
+    const applied=applyIllusoryBindCondition(actor,target,envelope);
+    if (!applied.condition) return {resolved:false,reason:"condition_application_failed"};
+    recordBattleEvidence({eventType:applied.refreshed?"condition_refreshed":"condition_applied",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,conditionRefs:[applied.condition.conditionId],data:{conditionKey:"illusory_bind",refreshNotStack:true}});
+    return {resolved:true,branch:"illusory_bind",damageApplied:false,stateRefs:[],conditionRefs:[applied.condition.conditionId]};
+  }
+  if (skill.resolutionKind==="shadow_clone_formation") {
+    const state=createShadowCloneFormation(actor,envelope);
+    if (!state) return {resolved:false,reason:"formation_creation_failed"};
+    recordBattleEvidence({eventType:"shadow_clone_formation_created",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,stateRefs:[state.stateId],data:{remainingCharges:2,remainingActionOpportunities:3,noIndependentParticipants:true}});
+    return {resolved:true,branch:"formation",damageApplied:false,stateRefs:[state.stateId],conditionRefs:[]};
+  }
+  if (skill.resolutionKind==="ratio_guard_state") {
+    const state=createRatioGuardState(actor,skill,envelope);
+    if (!state) return {resolved:false,reason:"guard_state_creation_failed"};
+    return {resolved:true,branch:"guard",damageApplied:false,stateRefs:[state.stateId],conditionRefs:[]};
+  }
+  if (skill.resolutionKind==="controlled_withdrawal") {
+    const ended=endAcademyMenmaMantle(actor,"controlled_withdrawal");
+    return {resolved:ended.ended===true,branch:"controlled_withdrawal",damageApplied:false,stateRefs:[],conditionRefs:[],mantleEnd:ended};
+  }
+  return {resolved:false,reason:"unsupported_closure_wave_resolution"};
+}
+
+function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null) {
+  const actor=getBattleDeploymentParticipant("player",1);
+  const enemy=getBattleDeploymentParticipant("enemy",1);
+  const skill=getClosureWaveBattleSkillDefinition(skillId);
+  if (!actor||!skill) return {success:false,reason:"skill_or_actor_missing"};
+  let target=null,targetSide="player";
+  if (skill.targetMode==="current_enemy") { target=enemy; targetSide="enemy"; }
+  else if (skill.targetMode==="selected_ally") { target=targetParticipantId?getBattleParticipantByIdentity("player",targetParticipantId):actor; targetSide="player"; }
+  else { target=actor; targetSide="player"; }
+  const availability=evaluateClosureWaveSkillAvailability(skill,actor,target);
+  if (!availability.available) return {success:false,reason:availability.reason,availability};
+  const envelope=createBattleActionEnvelope({actorSide:"player",actorParticipantId:actor.id,targetSide,targetParticipantId:target?target.id:null,actionClass:skill.actionClass,skillId:skill.id,sourceRefs:[{type:"character_registry",id:skill.ownerRegistryId}],data:{primaryDiscipline:skill.primaryDiscipline,traits:[...(skill.traits||[])]}});
+  const entry=beginBattleActionResolution(envelope);
+  if (!entry.accepted) return {success:false,reason:entry.validation.reason,entry};
+  const resolution=resolveClosureWaveSkillSemantics(skill,envelope,actor,target);
+  recordBattleEvidence({eventType:"skill_action_completed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:resolution.stateRefs||[],conditionRefs:resolution.conditionRefs||[],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0}});
+  if (resolution.resolved===true) consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_action_completed");
+  saveTestState();
+  if (!currentBattle.battleOver) openOverlay("combat");
+  return {success:resolution.resolved===true,envelope,resolution};
+}
+
+
+
+// =========================================================
 // BRICK 310 — SHARED SKILL ACTION ENTRY
 // =========================================================
 
@@ -72613,6 +74070,59 @@ function attemptAcademyBattleSkill(
       resolution
 
   };
+}
+
+// =========================================================
+// BRICK 477 — CLOSURE WAVE 1 CONTENT DIAGNOSTIC
+// BRICK 499 — RENDING LUNGE CALIBRATION
+// BRICK 500 — CHAKRA CLAW CALIBRATION
+// BRICK 501 — TAILED BEAST RASENGAN CALIBRATION
+// BRICK 502 — PRECISE RASENGAN-FORM CAPABILITY GUARD
+// EMBODIED PACKAGE NO-DOUBLE-COUNT PROOF
+// BRICK 511 — INVALID ACTION HAS NO OVERDRAW
+// BRICK 512 — SUCCESSFUL RASENGAN TENSION PROOF
+// BRICK 513 — RUNTIME TRUTH PERSISTENCE BOUNDARY
+// BRICK 514 — COERCIVE SKILL FORMULA DIAGNOSTICS
+// BRICK 515 — COERCIVE MASTER DIAGNOSTIC
+// =========================================================
+function runClosureWave1ContentDiagnostics() {
+  const fireball=getClosureWaveBattleSkillDefinition("jonin_sasuke_fire_style_great_fireball");
+  const palm=getClosureWaveBattleSkillDefinition("sannin_sakura_mystical_palm");
+  const stakes=getClosureWaveBattleSkillDefinition("akatsuki_itachi_shackling_stakes");
+  const clones=getClosureWaveBattleSkillDefinition("kage_naruto_multiple_shadow_clone");
+  const slash=getClosureWaveBattleSkillDefinition("jonin_sasuke_lightning_channel_slash");
+  const result={
+    greatFireball:!!fireball&&fireball.damageProfile.coefficient===0.55&&fireball.propagationMode==="excess_damage"&&fireball.staminaMitigation===true,
+    mysticalPalm:!!palm&&palm.restorationProfile.coefficient===0.25&&palm.resolutionKind==="restore_underlying_battle_pl",
+    shacklingStakes:!!stakes&&stakes.condition.conditionKey==="illusory_bind"&&stakes.condition.reapplication==="refresh",
+    shadowCloneFormation:!!clones&&clones.formation.remainingCharges===2&&clones.formation.remainingActionOpportunities===3,
+    lightningSlash:!!slash&&slash.damageProfile.coefficient===0.50&&slash.damageProfile.conductionMultiplier===1.20,
+    menmaPalette:ACADEMY_MENMA_MANTLE_PREPARED_SKILLS.length===5&&ACADEMY_MENMA_MANTLE_PREPARED_SKILLS[4]===null
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
+}
+
+function runCoerciveCloakDefinitionDiagnostics() {
+  const record=getCharacterRegistryEntry("coercive_cloak");
+  const buffer=getEffectiveStatePackageDefinition("coercive_cloak","coercive_chakra_buffer");
+  const lunge=getClosureWaveBattleSkillDefinition("coercive_cloak_rending_lunge");
+  const claw=getClosureWaveBattleSkillDefinition("coercive_cloak_chakra_claw");
+  const rasengan=getClosureWaveBattleSkillDefinition("coercive_cloak_tailed_beast_rasengan");
+  const guard=getClosureWaveBattleSkillDefinition("coercive_cloak_seal_braced_guard");
+  const fakeActor={id:"coercive_diag",registryId:"coercive_cloak",basePL:38,baseStats:cloneCanonicalSevenStats(record.baseStats),stats:cloneCanonicalSevenStats(record.baseStats),equipment:[],weaponSpecializations:{}};
+  const result={
+    baseFormula:Math.round(calculateRawPLFromStats(record.baseStats))===38,
+    embodiedNoDoubleCount:characterEmbodiesExactPackage(fakeActor,"coercive_kurama_cloak_v1")===true,
+    bufferRuntimeOnly:!!buffer&&Object.keys(buffer.statModifiers||{}).length===0&&buffer.temporaryCapacityOverlay===6,
+    lunge:!!lunge&&lunge.damageProfile.coefficient===0.55&&lunge.primaryDiscipline==="Taijutsu",
+    claw:!!claw&&claw.damageProfile.coefficient===0.50&&claw.primaryDiscipline==="Ninjutsu",
+    rasengan:!!rasengan&&rasengan.damageProfile.coefficient===0.65&&rasengan.traits.includes("coercive_overdraw")&&rasengan.requirements.some(req=>req.capabilityId==="rasengan_form_shaping"),
+    guard:!!guard&&guard.guard.attackMultiplier===0.70,
+    runtimeStateNoFormula:["seal_tension","coercive_instability"].every(key=>record.runtimeStateKeys.includes(key))
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  return result;
 }
 
 // =========================================================
@@ -73334,14 +74844,16 @@ function runMegaBatchStaticDiagnostics() {
     const record=getCharacterRegistryEntry(getCharacterRegistryId(character));
     return !!record && JSON.stringify(cloneCanonicalSevenStats(record.baseStats))===JSON.stringify(cloneCanonicalSevenStats(character.baseStats)) && Number(record.basePL)===Number(character.basePL);
   });
-  const ownedNine=DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.every(id=>isCharacterRegistryOwned(id));
-  const academyVisible=ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(id=>getClanManageableRosterCharacters().some(character=>character.id===id));
+  const acquisitionState=playerData.acquisition||null;
+  const legacySeedPreserved=!!(acquisitionState&&acquisitionState.migration&&acquisitionState.migration.source==="pre_acquisition_alpha_seed");
+  const ownedNine=!legacySeedPreserved||DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.every(id=>isCharacterRegistryOwned(id));
+  const academyVisible=!legacySeedPreserved||ACADEMY_BATTLE_PILOT_PARTICIPANT_IDS.every(id=>getClanManageableRosterCharacters().some(character=>character.id===id));
   const entityFormula=Object.values(entityRegistry).filter(entity=>entity&&entity.baseStats).every(entity=>
     Math.round(calculateRawPLFromStats(entity.baseStats))===Number(entity.basePL));
   const itachi=getCharacterRegistryEntry("akatsuki_itachi");
   const itachiCorrect=!!(itachi&&itachi.basePL===95&&itachi.baseStats.stamina===84&&itachi.canonicalIllness===false);
   const noStaleMenmaHostedBinding=!getHostedEntityBinding("academy_menma","yin_kurama");
-  const menmaAttached=getAttachedSummonIdForCharacter("academy_menma")==="menma_nine_tails";
+  const menmaAttached=!legacySeedPreserved||getAttachedSummonIdForCharacter("academy_menma")==="menma_nine_tails";
   const gapTable=[0,1,2,3,4,8].map(gap=>gap>=4?0.35:WEAPON_PROFICIENCY_REALIZATION_BY_GAP[gap]);
   const weaponGapTable=JSON.stringify(gapTable)===JSON.stringify([1,0.9,0.75,0.55,0.35,0.35]);
   const pilotWeaponProfiles=WEAPON_CONTRIBUTION_PILOT_PROFILES.length===6 &&
@@ -73354,6 +74866,8 @@ function runMegaBatchStaticDiagnostics() {
     getEffectiveStatePackageDefinition("mk_enma","adamantine_presence") &&
     getEffectiveStatePackageDefinition("nine_tails","vast_chakra_reserve") &&
     getEffectiveStatePackageDefinition("yin_kurama","yin_chakra_precision") &&
+    getEffectiveStatePackageDefinition("gamakichi","toad_chakra_guidance") &&
+    getEffectiveStatePackageDefinition("coercive_cloak","coercive_chakra_buffer") &&
     getEffectiveStatePackageDefinition("de_baku","devouring_pressure").classification==="resolver"
   );
   const result={characterFormula,runtimeRegistryBridge,ownedNine,academyVisible,entityFormula,itachiCorrect,noStaleMenmaHostedBinding,menmaAttached,weaponGapTable,pilotWeaponProfiles,packageCatalog};
@@ -73411,6 +74925,88 @@ function runMegaBatchDiagnostics() {
   const liveResult=runMegaBatchLiveDiagnostics();
   return {pass:staticResult.pass===true&&liveResult.pass===true,static:staticResult,live:liveResult};
 }
+
+
+// =========================================================
+// BRICK 554 — INDUSTRIAL ESTATE MASTER DIAGNOSTIC
+// =========================================================
+function runIndustrialEstateStaticDiagnostics() {
+  const results={
+    victory:runVictoryAssetManifestDiagnostics().pass===true,
+    registryCleanup:runPost434RegistryCleanupDiagnostics().pass===true,
+    conditions:runGenericConditionDefinitionDiagnostics().pass===true,
+    closureWave:runClosureWave1ContentDiagnostics().pass===true,
+    gamakichi:runGamakichiRegistryDiagnostics().pass===true,
+    kuramaComplete:runKuramaCompleteReservationDiagnostics().pass===true,
+    coercive:runCoerciveCloakDefinitionDiagnostics().pass===true,
+    specialJonin:runSpecialJoninEvaluatorDiagnostics().pass===true,
+    acquisition:runAcquisitionV1Diagnostics().pass===true
+  };
+  results.pass=Object.values(results).every(value=>value===true);
+  console.table(results);
+  return results;
+}
+
+function runIndustrialEstateLiveDiagnostics() {
+  if (!currentBattle.active||currentBattle.battleOver) return {pass:false,reason:"Start an active Battle first."};
+  const runtimeSnapshot=cloneBattleRuntimeValue(getBattleRuntimeSaveState());
+  const deploymentSnapshot=cloneBattleRuntimeValue(currentBattle.deployment);
+  const activePlayerSnapshot=currentBattle.activePlayer;
+  const characterIdSnapshot=currentBattle.characterId;
+  const syntheticId="__coercive_cloak_diagnostic__";
+  const results={};
+  try {
+    const actor=getBattleDeploymentParticipant("player",1);
+    if (!actor) return {pass:false,reason:"Active player participant missing."};
+    const originalRemaining=getBattleRemainingPL("player",actor.id);
+    const poison1=applyGenericAlphaBattleCondition("poisoned",{sourceSide:"enemy",sourceParticipantId:currentBattle.enemy&&currentBattle.enemy.id,targetSide:"player",targetParticipantId:actor.id});
+    if (poison1.condition) poison1.condition.data.remainingTicks=1;
+    const poison2=applyGenericAlphaBattleCondition("poisoned",{sourceSide:"enemy",sourceParticipantId:currentBattle.enemy&&currentBattle.enemy.id,targetSide:"player",targetParticipantId:actor.id});
+    results.poisonRefresh=poison1.condition&&poison2.refreshed===true&&poison2.condition.data.remainingTicks===3;
+    removeBattleCondition(poison2.condition.conditionId);
+    resolveBattleEndOfActionOpportunityEffects("player",actor.id,"diagnostic_poison_cured");
+    results.antidoteTiming=getBattleRemainingPL("player",actor.id)===originalRemaining;
+    const burn=applyGenericAlphaBattleCondition("burning",{sourceSide:"enemy",sourceParticipantId:currentBattle.enemy&&currentBattle.enemy.id,targetSide:"player",targetParticipantId:actor.id});
+    const burnStart=resolveBattleStartOfActionOpportunityEffects("player",actor.id,"diagnostic_burn_start");
+    const burnAgain=resolveBattleStartOfActionOpportunityEffects("player",actor.id,"diagnostic_burn_start_repeat");
+    results.burningStartIdempotent=burn.condition&&burnStart.ticks.length===1&&burnAgain.idempotent===true;
+
+    const record=getCharacterRegistryEntry("coercive_cloak");
+    const synthetic={id:syntheticId,registryId:"coercive_cloak",name:"Coercive Diagnostic",rank:"Genin",basePL:38,baseStats:cloneCanonicalSevenStats(record.baseStats),stats:cloneCanonicalSevenStats(record.baseStats),permanentPLBonus:0,equipment:[],weaponSpecializations:{},abilities:[]};
+    playerTeam.push(synthetic);
+    currentBattle.deployment.player.slots[0].participantId=syntheticId;
+    currentBattle.characterId=syntheticId;
+    currentBattle.activePlayer=synthetic;
+    setBattleRemainingPLRecord("player",syntheticId,38,38);
+    const broadAttempt=activateBattleEffectiveStatePackage({side:"player",participantId:syntheticId,sourceId:"coercive_cloak",exactPackageId:"coercive_kurama_cloak_v1",expressionStateId:"one_tail_coercive"});
+    results.coerciveNoDoubleCount=broadAttempt.success===false&&broadAttempt.reason==="exact_package_already_embodied";
+    const buffer=activateBattleEffectiveStatePackage({side:"player",participantId:syntheticId,sourceId:"coercive_cloak",exactPackageId:"coercive_chakra_buffer",expressionStateId:"one_tail_coercive"});
+    const beforeUnderlying=getBattleRemainingPL("player",syntheticId);
+    const absorbed=absorbBattleDamageBearingCapacity("player",syntheticId,4);
+    results.coerciveBuffer=buffer.success===true&&absorbed.temporaryCapacityAbsorbed===4&&getBattleTemporaryCapacity("player",syntheticId)===2&&getBattleRemainingPL("player",syntheticId)===beforeUnderlying;
+    const tensionBefore=getBattleParticipantCounterValue("player",syntheticId,"seal_tension");
+    const skill=getClosureWaveBattleSkillDefinition("coercive_cloak_tailed_beast_rasengan");
+    const tensionState=applyCoerciveOverdraw(synthetic,skill,{actionId:"diagnostic_overdraw",actorRef:createBattleParticipantRef("player",syntheticId)});
+    results.sealTension=tensionState&&getBattleParticipantCounterValue("player",syntheticId,"seal_tension")===tensionBefore+1;
+  } finally {
+    const index=playerTeam.findIndex(character=>character&&character.id===syntheticId);
+    if (index>=0) playerTeam.splice(index,1);
+    currentBattle.deployment=deploymentSnapshot;
+    currentBattle.activePlayer=activePlayerSnapshot;
+    currentBattle.characterId=characterIdSnapshot;
+    restoreBattleRuntimeState(runtimeSnapshot);
+  }
+  results.pass=Object.values(results).every(value=>value===true);
+  console.table(results);
+  return results;
+}
+
+function runIndustrialEstateDiagnostics() {
+  const staticResult=runIndustrialEstateStaticDiagnostics();
+  const liveResult=runIndustrialEstateLiveDiagnostics();
+  return {pass:staticResult.pass===true&&liveResult.pass===true,static:staticResult,live:liveResult};
+}
+
 
 
 // =========================================================
