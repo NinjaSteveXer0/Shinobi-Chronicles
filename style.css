@@ -1256,7 +1256,7 @@ body {
   overflow: hidden;
 
   background:
-    url("./Assets/Backgrounds/battle.png")
+    url("./Assets/UI/battle.png")
     center center / 100% 100%
     no-repeat;
 
@@ -2653,13 +2653,14 @@ body {
 
 
 /* =========================================================
-   BRICK 309 — TEMPORARY DEVELOPER BATTLE SKILL CARDS
+   BRICK 309 / 353 — BATTLE ACTION REGION
    ========================================================= */
 
 /*
-   TEMPORARY DEVELOPMENT PRESENTATION.
+   Existing five-card Skill presentation remains unchanged.
 
-   Final Skill Card art/layout remains UI authority.
+   BRICK 353 adds the permanent Battle Pouch presentation
+   inside the same action region. Runtime remains authoritative.
 */
 
 .battle-live-skill-deck {
@@ -2880,6 +2881,566 @@ body {
   line-height: 1.2;
 
   overflow-wrap: anywhere;
+}
+
+/* =========================================
+   BRICK 353 — BATTLE POUCH TRAY
+   ========================================= */
+
+.battle-live-pouch {
+  position: absolute;
+
+  left: 5.65%;
+  top: 71.8%;
+
+  width: 42.7%;
+  height: 21.0%;
+
+  z-index: 21;
+
+  display: grid;
+
+  grid-template-rows:
+    14%
+    minmax(0, 1fr)
+    18%;
+
+  padding:
+    0.45%
+    1.55%
+    0.65%;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4, 11, 15, 0.92),
+      rgba(2, 7, 10, 0.96)
+    );
+
+  border:
+    1px solid
+    rgba(
+      205,
+      155,
+      59,
+      0.62
+    );
+
+  box-shadow:
+    inset
+    0 0 20px
+    rgba(
+      0,
+      0,
+      0,
+      0.72
+    ),
+    0
+    8px
+    20px
+    rgba(
+      0,
+      0,
+      0,
+      0.38
+    );
+
+  overflow: hidden;
+}
+
+
+.battle-live-pouch-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #d9b660;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      8px,
+      0.82vw,
+      14px
+    );
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.075em;
+
+  text-shadow:
+    0 2px 4px #000;
+}
+
+
+.battle-live-pouch-items {
+  min-height: 0;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(
+        0,
+        1fr
+      )
+    );
+
+  gap: 2.25%;
+}
+
+
+.battle-pouch-item-card {
+  min-width: 0;
+  min-height: 0;
+
+  position: relative;
+
+  display: grid;
+
+  grid-template-rows:
+    auto
+    minmax(0, 1fr)
+    auto;
+
+  align-items: center;
+
+  padding:
+    5.5%
+    5%
+    6%;
+
+  overflow: hidden;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(6, 17, 21, 0.94),
+      rgba(3, 10, 13, 0.98)
+    );
+
+  border:
+    1px solid
+    rgba(
+      203,
+      158,
+      68,
+      0.48
+    );
+
+  border-radius: 2px;
+
+  color: #e3dccf;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+
+.battle-pouch-item-card.is-available:hover,
+.battle-pouch-item-card.is-available:focus-visible {
+  border-color:
+    rgba(
+      101,
+      232,
+      244,
+      0.9
+    );
+
+  box-shadow:
+    inset
+    0 0 16px
+    rgba(
+      36,
+      196,
+      220,
+      0.11
+    );
+
+  outline: none;
+
+  transform:
+    translateY(
+      -1px
+    );
+}
+
+
+.battle-pouch-item-card.is-selected {
+  border-color: #45d9eb;
+
+  box-shadow:
+    inset
+    0 0 18px
+    rgba(
+      29,
+      205,
+      231,
+      0.18
+    ),
+    0
+    0
+    12px
+    rgba(
+      28,
+      190,
+      219,
+      0.38
+    );
+}
+
+
+.battle-pouch-item-card.is-unavailable {
+  opacity: 0.5;
+
+  cursor: not-allowed;
+
+  filter:
+    saturate(
+      0.45
+    );
+}
+
+
+.battle-pouch-item-card.is-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: #59666b;
+
+  font-size:
+    clamp(
+      6px,
+      0.56vw,
+      9px
+    );
+
+  font-weight: 800;
+
+  letter-spacing:
+    0.08em;
+
+  cursor: default;
+}
+
+
+.battle-pouch-item-name {
+  min-width: 0;
+
+  color: #ead39b;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      7px,
+      0.68vw,
+      12px
+    );
+
+  line-height: 1.05;
+
+  text-align: center;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.battle-pouch-item-art {
+  min-height: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+}
+
+
+.battle-pouch-item-icon {
+  max-width: 76%;
+  max-height: 76%;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0
+      4px
+      6px
+      rgba(
+        0,
+        0,
+        0,
+        0.66
+      )
+    );
+}
+
+
+.battle-pouch-item-icon.is-fallback {
+  width: 48%;
+  aspect-ratio: 1 / 1;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border:
+    1px solid
+    rgba(
+      214,
+      173,
+      83,
+      0.44
+    );
+
+  border-radius: 50%;
+
+  color: #d7b86f;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(21, 33, 34, 0.92),
+      rgba(5, 13, 16, 0.96)
+    );
+
+  font-size:
+    clamp(
+      10px,
+      1.18vw,
+      20px
+    );
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.04em;
+}
+
+
+.battle-pouch-item-quantity {
+  position: absolute;
+
+  right: 7%;
+  bottom: 7%;
+
+  color: #f0d696;
+
+  font-size:
+    clamp(
+      8px,
+      0.82vw,
+      14px
+    );
+
+  font-weight: 900;
+
+  text-shadow:
+    0 2px 4px #000;
+}
+
+
+.battle-pouch-item-status {
+  position: absolute;
+
+  left: 5%;
+  right: 27%;
+  bottom: 7%;
+
+  color: #83dfe8;
+
+  font-size:
+    clamp(
+      5px,
+      0.47vw,
+      8px
+    );
+
+  font-weight: 900;
+
+  line-height: 1.05;
+
+  letter-spacing:
+    0.025em;
+
+  text-transform: uppercase;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+
+.battle-pouch-item-status.is-reason {
+  color: #ef654d;
+}
+
+
+.battle-live-pouch-back {
+  align-self: end;
+  justify-self: start;
+
+  min-width: 18%;
+
+  height: 82%;
+
+  padding:
+    0
+    2.5%;
+
+  background:
+    rgba(
+      6,
+      13,
+      16,
+      0.92
+    );
+
+  border:
+    1px solid
+    rgba(
+      204,
+      154,
+      61,
+      0.58
+    );
+
+  border-radius: 2px;
+
+  color: #d9b660;
+
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+
+  font-size:
+    clamp(
+      6px,
+      0.62vw,
+      10px
+    );
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.045em;
+
+  cursor: pointer;
+}
+
+
+.battle-live-pouch-back:hover,
+.battle-live-pouch-back:focus-visible {
+  color: #f3d78f;
+
+  border-color:
+    rgba(
+      235,
+      192,
+      94,
+      0.9
+    );
+
+  outline: none;
+
+  background:
+    rgba(
+      18,
+      27,
+      27,
+      0.98
+    );
+}
+
+
+/* =========================================
+   BRICK 353 — VALID ITEM TARGET
+   ========================================= */
+
+.battle-live-roster-slot.is-item-target {
+  cursor: pointer;
+
+  outline:
+    1px solid
+    rgba(
+      82,
+      223,
+      240,
+      0.9
+    );
+
+  outline-offset:
+    -1px;
+
+  box-shadow:
+    inset
+    0 0 18px
+    rgba(
+      44,
+      208,
+      230,
+      0.14
+    ),
+    0
+    0
+    12px
+    rgba(
+      28,
+      189,
+      216,
+      0.24
+    );
+}
+
+
+.battle-live-roster-slot.is-item-target::before {
+  content: "TARGET";
+
+  position: absolute;
+
+  right: 3%;
+  bottom: 3%;
+
+  z-index: 6;
+
+  color: #65e2ef;
+
+  font-size:
+    clamp(
+      4px,
+      0.4vw,
+      7px
+    );
+
+  font-weight: 900;
+
+  letter-spacing:
+    0.04em;
+
+  text-shadow:
+    0 1px 3px #000;
+
+  pointer-events: none;
 }
 
 
@@ -5869,7 +6430,7 @@ body {
             rgba(0, 0, 0, 0.20) 55%,
             rgba(0, 0, 0, 0.58) 100%
         ),
-        url("./Assets/Backgrounds/exams.png")
+        url("./Assets/UI/exams.png")
         center center / cover no-repeat;
 
     color: #eee4ca;
@@ -5878,6 +6439,7 @@ body {
 #konoha-activity-screen[data-service-id="exams"] * {
     box-sizing: border-box;
 }
+
 
 /* =========================================================
    BRICK 235 — EXAM MAIN LAYOUT
@@ -6542,7 +7104,7 @@ body {
 
     background:
         url(
-            "./Assets/Backgrounds/exams.png"
+            "./Assets/UI/exams.png"
         )
         center center /
         100% 100%

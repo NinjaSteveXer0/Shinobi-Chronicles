@@ -4,10 +4,111 @@
 // =========================================================
 
 // =========================================================
+// BRICK 351 — ASSET MANIFEST FOUNDATION
+// =========================================================
+//
+// Canonical presentation paths for currently wired character
+// cards and Hosted-Entity artwork.
+//
+// Registry identity and asset identity remain separate.
+// Future roster expansion should add approved art here rather
+// than scattering literal character-card paths through systems.
+//
+// =========================================================
+
+const assetManifest = {
+
+  characterCards: {
+
+    academy_hinata:
+      "Assets/Academy Student/academy_hinata.png",
+
+    academy_izuno:
+      "Assets/Academy Student/academy_izuno.png",
+
+    academy_mirai:
+      "Assets/Academy Student/academy_mirai.png",
+
+    academy_menma:
+      "Assets/Academy Student/academy_menma.png",
+
+    academy_kushina:
+      "Assets/Academy Student/academy_kushina.png",
+
+    jonin_sasuke:
+      "Assets/Jonin/jonin_sasuke.png",
+
+    sannin_sakura:
+      "Assets/Sannin/sannin_sakura.png",
+
+    kage_naruto:
+      "Assets/Kage/kage_naruto.png",
+
+    teen_nagato:
+      "Assets/Variant/teen_nagato.png"
+
+  },
+
+  hostedEntities: {
+
+    yin_kurama:
+      "Assets/Summons/yin_kurama.png"
+
+  },
+
+  ui: {
+
+    practical:
+      "Assets/UI/practical.png"
+
+  }
+
+};
+
+
+function getCharacterCardAssetPath(
+  assetId
+) {
+
+  return (
+    assetManifest.characterCards[
+      assetId
+    ] ||
+    ""
+  );
+}
+
+
+function getHostedEntityAssetPath(
+  assetId
+) {
+
+  return (
+    assetManifest.hostedEntities[
+      assetId
+    ] ||
+    ""
+  );
+}
+
+
+function getUIAssetPath(
+  assetId
+) {
+
+  return (
+    assetManifest.ui[
+      assetId
+    ] ||
+    ""
+  );
+}
+
+
+// =========================================================
 // PLAYER TEAM DATABASE
 // BRICK 314 — ACADEMY PLAYABLE VARIANT INTEGRATION
 // =========================================================
-//
 // Canonical Base Stats own Base PL.
 //
 // basePL remains compatibility metadata for older systems.
@@ -61,7 +162,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/kage_naruto.png"
+      getCharacterCardAssetPath("kage_naruto")
   },
 
 
@@ -102,7 +203,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/jonin_sasuke.png"
+      getCharacterCardAssetPath("jonin_sasuke")
   },
 
 
@@ -143,7 +244,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/sannin_sakura.png"
+      getCharacterCardAssetPath("sannin_sakura")
   },
 
 
@@ -184,7 +285,7 @@ let playerTeam = [
     abilities: [],
 
     image:
-      "Assets/Animated Cards/teen_nagato.png"
+      getCharacterCardAssetPath("teen_nagato")
   },
 
 
@@ -230,7 +331,7 @@ let playerTeam = [
     developmentPilotOnly: true,
 
     image:
-      "Assets/Animated Cards/academy_hinata.png"
+      getCharacterCardAssetPath("academy_hinata")
   },
 
 
@@ -272,7 +373,7 @@ let playerTeam = [
     developmentPilotOnly: true,
 
     image:
-      "Assets/Animated Cards/academy_izuno.png"
+      getCharacterCardAssetPath("academy_izuno")
   },
 
 
@@ -314,7 +415,7 @@ let playerTeam = [
     developmentPilotOnly: true,
 
     image:
-      "Assets/Animated Cards/academy_mirai.png"
+      getCharacterCardAssetPath("academy_mirai")
   },
 
 
@@ -356,7 +457,7 @@ let playerTeam = [
     developmentPilotOnly: true,
 
     image:
-      "Assets/Animated Cards/academy_menma.png"
+      getCharacterCardAssetPath("academy_menma")
   },
 
 
@@ -398,10 +499,11 @@ let playerTeam = [
     developmentPilotOnly: true,
 
     image:
-      "Assets/Animated Cards/academy_kushina.png"
+      getCharacterCardAssetPath("academy_kushina")
   }
 
 ];
+
 
 
 // =========================================================
@@ -659,6 +761,9 @@ const itemDatabase = {
     battleConsumable:
       true,
 
+    battleTargetMode:
+      "self",
+
     battleEffect: {
 
       kind:
@@ -694,6 +799,9 @@ const itemDatabase = {
 
     battleConsumable:
       true,
+
+    battleTargetMode:
+      "self",
 
     battleEffect: {
 
@@ -731,6 +839,9 @@ const itemDatabase = {
     battleConsumable:
       true,
 
+    battleTargetMode:
+      "self",
+
     battleEffect: {
 
       kind:
@@ -747,6 +858,7 @@ const itemDatabase = {
   }
 
 };
+
 
 
 // =========================================================
@@ -818,10 +930,10 @@ const hostedEntityDatabase = {
     presentation: {
 
       image:
-        "Assets/Summons/yin_kurama.png",
+        getHostedEntityAssetPath("yin_kurama"),
 
       temporaryArtwork:
-        true
+        false
 
     }
 
@@ -55613,9 +55725,11 @@ function renderKonohaPracticalVisualScreen() {
 
 
       <img
-        src="
-          Assets/Backgrounds/practical.png
-        "
+        src="${
+          getUIAssetPath(
+            "practical"
+          )
+        }"
         alt="
           Practical Training
         "
@@ -56012,6 +56126,7 @@ function renderKonohaPracticalVisualScreen() {
   return true;
 
 }
+
 
 
 // =========================================================
@@ -59322,6 +59437,13 @@ function renderBattleRosterSlot(
     );
 
 
+  const pouchTargetState =
+    getBattlePouchTargetPresentationState(
+      side,
+      participant.id
+    );
+
+
   let primaryValue =
     "";
 
@@ -59390,10 +59512,42 @@ function renderBattleRosterSlot(
         ${compact ? "compact" : "full"}
         ${slot.active ? "is-active" : ""}
         ${transitionClass}
+        ${
+          pouchTargetState.valid
+            ? "is-item-target"
+            : ""
+        }
       "
       data-side="${side}"
       data-slot="${slot.slotNumber}"
       aria-current="${slot.active ? "true" : "false"}"
+      ${
+        pouchTargetState.valid
+          ? `
+              role="button"
+              tabindex="0"
+              aria-label="Use selected Battle Pouch item on ${name}"
+              onclick="
+                confirmSelectedBattlePouchTarget(
+                  '${side}',
+                  '${participant.id}'
+                )
+              "
+              onkeydown="
+                if (
+                  event.key === 'Enter' ||
+                  event.key === ' '
+                ) {
+                  event.preventDefault();
+                  confirmSelectedBattlePouchTarget(
+                    '${side}',
+                    '${participant.id}'
+                  );
+                }
+              "
+            `
+          : ""
+      }
     >
 
       <span class="battle-live-slot-number">
@@ -59436,6 +59590,7 @@ function renderBattleRosterSlot(
     </div>
   `;
 }
+
 
 
 // =========================================================
@@ -59747,23 +59902,13 @@ function renderCombatOverlay(
 
 
   // =======================================================
-  // BRICK 309 — TEMPORARY SKILL DECK
+  // BRICK 352 — SHARED BATTLE ACTION REGION
   // =======================================================
 
-  const skillDeckMarkup =
-    renderTemporaryBattleSkillDeck(
+  const actionRegionMarkup =
+    renderBattleActionRegion(
       activePlayer,
       enemy
-    );
-
-
-  // =======================================================
-  // BRICK 349 — TEMPORARY TEAM-WIDE BATTLE POUCH
-  // =======================================================
-
-  const battlePouchMarkup =
-    renderTemporaryBattlePouch(
-      activePlayer
     );
 
 
@@ -59925,10 +60070,7 @@ function renderCombatOverlay(
         </div>
 
 
-        ${skillDeckMarkup}
-
-
-        ${battlePouchMarkup}
+        ${actionRegionMarkup}
 
 
         <button
@@ -59963,6 +60105,7 @@ function renderCombatOverlay(
     </section>
   `;
 }
+
 
 
 
@@ -65405,6 +65548,67 @@ function evaluateBattlePouchItemAvailability(
   };
 }
 
+function getBattlePouchValidTargetRefs(
+  itemId,
+  actor
+) {
+
+  const availability =
+    evaluateBattlePouchItemAvailability(
+      itemId,
+      actor
+    );
+
+
+  if (
+    !availability ||
+    availability.available !==
+      true
+  ) {
+
+    return [];
+  }
+
+
+  const item =
+    availability.item ||
+    getItemDefinition(
+      itemId
+    );
+
+
+  if (
+    !item
+  ) {
+
+    return [];
+  }
+
+
+  switch (
+    item.battleTargetMode
+  ) {
+
+    case "self":
+
+      return [
+
+        {
+          side:
+            "player",
+
+          participantId:
+            actor.id
+        }
+
+      ];
+
+
+    default:
+
+      return [];
+  }
+}
 
 // =========================================================
 // BRICK 348 — SHARED BATTLE ITEM RESOLUTION
@@ -66044,54 +66248,460 @@ function attemptBattlePouchItem(
 
 
 // =========================================================
-// BRICK 349 — TEMPORARY BATTLE POUCH PRESENTATION
+// BRICK 353 — BATTLE ACTION REGION / BATTLE POUCH UI
 // =========================================================
 //
-// Developer presentation only.
-// Final artwork/layout remains UI-owned.
+// Presentation state only.
+//
+// Runtime remains authoritative for:
+// - prepared Item identity
+// - Inventory-backed quantity
+// - admissibility
+// - valid targets
+// - effects
+// - quantity consumption
+// - action-opportunity consumption
+// - evidence
+//
+// The action-family row binding is intentionally separate.
+// UI must bind its approved ITEM control to
+// openBattleItemActionFamily().
 //
 // =========================================================
 
-function getBattlePouchCompactStatus(
-  item,
-  availability
-) {
+let battleActionRegionState = {
+
+  battleId:
+    null,
+
+  mode:
+    "skills",
+
+  selectedItemId:
+    null
+
+};
+
+
+function syncBattleActionRegionState() {
+
+  const battleId =
+    currentBattle &&
+    currentBattle.battleId
+      ? currentBattle.battleId
+      : null;
 
 
   if (
-    !item
+    battleActionRegionState.battleId !==
+      battleId
   ) {
 
-    return "EMPTY";
+    battleActionRegionState = {
+
+      battleId:
+        battleId,
+
+      mode:
+        "skills",
+
+      selectedItemId:
+        null
+
+    };
   }
 
 
-  const quantity =
-    getBattlePouchItemQuantity(
-      item.id
+  if (
+    !currentBattle ||
+    !currentBattle.active ||
+    currentBattle.battleOver
+  ) {
+
+    battleActionRegionState.mode =
+      "skills";
+
+    battleActionRegionState.selectedItemId =
+      null;
+  }
+
+
+  return battleActionRegionState;
+}
+
+
+function refreshBattleActionRegionPresentation() {
+
+  if (
+    currentBattle &&
+    currentBattle.active &&
+    !currentBattle.battleOver
+  ) {
+
+    openOverlay(
+      "combat"
+    );
+
+    return true;
+  }
+
+
+  return false;
+}
+
+
+function openBattleItemActionFamily() {
+
+  if (
+    !currentBattle ||
+    !currentBattle.active ||
+    currentBattle.battleOver
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "battle_not_active"
+
+    };
+  }
+
+
+  const state =
+    syncBattleActionRegionState();
+
+
+  state.mode =
+    "items";
+
+  state.selectedItemId =
+    null;
+
+
+  refreshBattleActionRegionPresentation();
+
+
+  return {
+
+    success:
+      true,
+
+    mode:
+      state.mode
+
+  };
+}
+
+
+function closeBattleItemActionFamily() {
+
+  const state =
+    syncBattleActionRegionState();
+
+
+  state.mode =
+    "skills";
+
+  state.selectedItemId =
+    null;
+
+
+  refreshBattleActionRegionPresentation();
+
+
+  return {
+
+    success:
+      true,
+
+    mode:
+      state.mode
+
+  };
+}
+
+
+function getSelectedBattlePouchItemId() {
+
+  const state =
+    syncBattleActionRegionState();
+
+
+  return (
+    state.mode ===
+      "items"
+      ? state.selectedItemId
+      : null
+  );
+}
+
+
+function selectBattlePouchItem(
+  itemId
+) {
+
+  const actor =
+    currentBattle &&
+    currentBattle.activePlayer
+      ? currentBattle.activePlayer
+      : null;
+
+
+  const availability =
+    evaluateBattlePouchItemAvailability(
+      itemId,
+      actor
     );
 
 
   if (
-    !availability.available
+    !availability ||
+    availability.available !==
+      true
   ) {
 
-    switch (
-      availability.reason
-    ) {
+    return {
 
-      case "battle_pl_already_full":
-        return `×${quantity} • BP FULL`;
+      success:
+        false,
 
-      case "no_compatible_condition":
-        return `×${quantity} • NO TARGET`;
+      reason:
+        availability
+          ? availability.reason
+          : "item_unavailable",
 
-      case "empty_stack":
-        return "×0 • EMPTY";
+      availability:
+        availability ||
+        null
 
-      default:
-        return `×${quantity} • UNAVAILABLE`;
-    }
+    };
+  }
+
+
+  const state =
+    syncBattleActionRegionState();
+
+
+  state.mode =
+    "items";
+
+  state.selectedItemId =
+    itemId;
+
+
+  refreshBattleActionRegionPresentation();
+
+
+  return {
+
+    success:
+      true,
+
+    selectedItemId:
+      itemId
+
+  };
+}
+
+
+function getBattlePouchTargetPresentationState(
+  side,
+  participantId
+) {
+
+  const selectedItemId =
+    getSelectedBattlePouchItemId();
+
+
+  if (
+    !selectedItemId
+  ) {
+
+    return {
+
+      valid:
+        false,
+
+      itemId:
+        null
+
+    };
+  }
+
+
+  const actor =
+    currentBattle &&
+    currentBattle.activePlayer
+      ? currentBattle.activePlayer
+      : null;
+
+
+  const validTargetRefs =
+    getBattlePouchValidTargetRefs(
+      selectedItemId,
+      actor
+    );
+
+
+  const valid =
+    validTargetRefs.some(
+      targetRef =>
+        targetRef &&
+        targetRef.side ===
+          side &&
+        targetRef.participantId ===
+          participantId
+    );
+
+
+  return {
+
+    valid:
+      valid,
+
+    itemId:
+      selectedItemId,
+
+    targetRefs:
+      validTargetRefs
+
+  };
+}
+
+
+function confirmSelectedBattlePouchTarget(
+  side,
+  participantId
+) {
+
+  const state =
+    syncBattleActionRegionState();
+
+  const itemId =
+    state.selectedItemId;
+
+
+  if (
+    !itemId
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "battle_pouch_item_not_selected"
+
+    };
+  }
+
+
+  const targetState =
+    getBattlePouchTargetPresentationState(
+      side,
+      participantId
+    );
+
+
+  if (
+    !targetState.valid
+  ) {
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "invalid_battle_item_target"
+
+    };
+  }
+
+
+  state.selectedItemId =
+    null;
+
+
+  const result =
+    attemptBattlePouchItem(
+      itemId
+    );
+
+
+  if (
+    !result ||
+    result.success !==
+      true
+  ) {
+
+    state.selectedItemId =
+      itemId;
+
+    refreshBattleActionRegionPresentation();
+  }
+
+
+  return result;
+}
+
+
+function getBattlePouchPresentationReason(
+  availability
+) {
+
+  if (
+    !availability ||
+    availability.available ===
+      true
+  ) {
+
+    return "";
+  }
+
+
+  switch (
+    availability.reason
+  ) {
+
+    case "battle_pl_already_full":
+      return "BP FULL";
+
+    case "no_compatible_condition":
+      return "NO VALID TARGET";
+
+    case "empty_stack":
+      return "EMPTY";
+
+    case "actor_not_active":
+      return "ACTIVE SHINOBI ONLY";
+
+    case "item_not_prepared":
+      return "NOT PREPARED";
+
+    case "battle_not_active":
+      return "BATTLE INACTIVE";
+
+    default:
+      return "UNAVAILABLE";
+  }
+}
+
+
+function getBattlePouchPresentationEffect(
+  item
+) {
+
+  if (
+    !item ||
+    !item.battleEffect
+  ) {
+
+    return "";
   }
 
 
@@ -66101,7 +66711,7 @@ function getBattlePouchCompactStatus(
   ) {
 
     return (
-      `×${quantity} • +${item.battleEffect.amount} BP`
+      `+${item.battleEffect.amount} BP`
     );
   }
 
@@ -66112,27 +66722,117 @@ function getBattlePouchCompactStatus(
   ) {
 
     return (
-      `×${quantity} • CURE ${String(
-        item.battleEffect
-          .conditionType ||
+      `CURE ${String(
+        item.battleEffect.conditionType ||
         "STATE"
       ).toUpperCase()}`
     );
   }
 
 
-  return `×${quantity} • READY`;
+  return "READY";
 }
 
 
-function renderTemporaryBattlePouch(
+function getBattlePouchFallbackMonogram(
+  item
+) {
+
+  if (
+    !item ||
+    !item.name
+  ) {
+
+    return "—";
+  }
+
+
+  const words =
+    String(
+      item.name
+    )
+      .trim()
+      .split(
+        /\s+/
+      )
+      .filter(
+        Boolean
+      );
+
+
+  return words
+    .slice(
+      0,
+      2
+    )
+    .map(
+      word =>
+        word
+          .charAt(
+            0
+          )
+          .toUpperCase()
+    )
+    .join("") ||
+    "—";
+}
+
+
+function renderBattlePouchItemIcon(
+  item
+) {
+
+  const iconPath =
+    item &&
+    item.presentation &&
+    item.presentation.icon
+      ? item.presentation.icon
+      : item &&
+        item.icon
+          ? item.icon
+          : null;
+
+
+  if (
+    iconPath
+  ) {
+
+    return `
+      <img
+        class="battle-pouch-item-icon"
+        src="${iconPath}"
+        alt=""
+        draggable="false"
+      >
+    `;
+  }
+
+
+  return `
+    <span
+      class="
+        battle-pouch-item-icon
+        is-fallback
+      "
+      aria-hidden="true"
+    >
+      ${getBattlePouchFallbackMonogram(
+        item
+      )}
+    </span>
+  `;
+}
+
+
+function renderBattlePouchTray(
   actor
 ) {
 
+  const state =
+    syncBattleActionRegionState();
 
   const preparedIds =
     getLiveBattlePouchItemIds();
-
 
   const slots =
     [];
@@ -66144,13 +66844,11 @@ function renderTemporaryBattlePouch(
     index += 1
   ) {
 
-
     const itemId =
       preparedIds[
         index
       ] ||
       null;
-
 
     const item =
       itemId
@@ -66166,19 +66864,14 @@ function renderTemporaryBattlePouch(
 
       slots.push(`
         <div
-          style="
-            min-width:0;
-            border:1px solid rgba(214,169,58,0.34);
-            background:rgba(3,8,14,0.78);
-            color:#64748B;
-            font-size:clamp(5px,0.48vw,7px);
-            display:flex;
-            align-items:center;
-            justify-content:center;
-            letter-spacing:0.8px;
+          class="
+            battle-pouch-item-card
+            is-empty
           "
         >
-          EMPTY
+          <span>
+            EMPTY
+          </span>
         </div>
       `);
 
@@ -66192,94 +66885,170 @@ function renderTemporaryBattlePouch(
         actor
       );
 
+    const quantity =
+      getBattlePouchItemQuantity(
+        item.id
+      );
 
-    const status =
-      getBattlePouchCompactStatus(
-        item,
+    const selected =
+      state.selectedItemId ===
+        item.id;
+
+    const reason =
+      getBattlePouchPresentationReason(
         availability
+      );
+
+    const effect =
+      getBattlePouchPresentationEffect(
+        item
       );
 
 
     slots.push(`
       <button
         type="button"
-        onclick="attemptBattlePouchItem('${item.id}')"
+        class="
+          battle-pouch-item-card
+          ${
+            availability.available
+              ? "is-available"
+              : "is-unavailable"
+          }
+          ${
+            selected
+              ? "is-selected"
+              : ""
+          }
+        "
+        data-item-id="${item.id}"
+        onclick="
+          selectBattlePouchItem(
+            '${item.id}'
+          )
+        "
         ${
           availability.available
             ? ""
             : "disabled"
         }
-        title="${item.name} — ${status}"
-        style="
-          min-width:0;
-          overflow:hidden;
-          border:1px solid ${
-            availability.available
-              ? "rgba(0,217,232,0.65)"
-              : "rgba(214,169,58,0.28)"
-          };
-          background:rgba(3,8,14,0.86);
-          color:${
-            availability.available
-              ? "#E2F8FA"
-              : "#64748B"
-          };
-          font-size:clamp(5px,0.46vw,7px);
-          line-height:1.08;
-          padding:2px 4px;
-          cursor:${
-            availability.available
-              ? "pointer"
-              : "not-allowed"
-          };
-        "
+        aria-pressed="${
+          selected
+            ? "true"
+            : "false"
+        }"
+        title="${
+          reason ||
+          effect
+        }"
       >
+
         <strong
-          style="
-            display:block;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
+          class="
+            battle-pouch-item-name
           "
         >
           ${item.name}
         </strong>
+
         <span
-          style="
-            display:block;
-            margin-top:2px;
-            white-space:nowrap;
-            overflow:hidden;
-            text-overflow:ellipsis;
+          class="
+            battle-pouch-item-art
           "
         >
-          ${status}
+          ${renderBattlePouchItemIcon(
+            item
+          )}
         </span>
+
+        <span
+          class="
+            battle-pouch-item-quantity
+          "
+        >
+          ×${quantity}
+        </span>
+
+        <span
+          class="
+            battle-pouch-item-status
+            ${
+              reason
+                ? "is-reason"
+                : ""
+            }
+          "
+        >
+          ${
+            reason ||
+            effect
+          }
+        </span>
+
       </button>
     `);
   }
 
 
   return `
-    <div
-      aria-label="Prepared Battle Pouch"
-      title="BATTLE POUCH — team-wide prepared consumables"
-      style="
-        position:absolute;
-        left:2.0%;
-        bottom:1.15%;
-        width:31%;
-        height:4.4%;
-        display:grid;
-        grid-template-columns:repeat(3,minmax(0,1fr));
-        gap:1.5%;
-        z-index:14;
-      "
+    <section
+      class="battle-live-pouch"
+      aria-label="Battle Pouch"
     >
-      ${slots.join("")}
-    </div>
+
+      <div
+        class="battle-live-pouch-title"
+      >
+        BATTLE POUCH
+      </div>
+
+      <div
+        class="battle-live-pouch-items"
+      >
+        ${slots.join("")}
+      </div>
+
+      <button
+        type="button"
+        class="battle-live-pouch-back"
+        onclick="
+          closeBattleItemActionFamily()
+        "
+      >
+        ← BACK
+      </button>
+
+    </section>
   `;
 }
+
+
+function renderBattleActionRegion(
+  actor,
+  target
+) {
+
+  const state =
+    syncBattleActionRegionState();
+
+
+  if (
+    state.mode ===
+      "items"
+  ) {
+
+    return renderBattlePouchTray(
+      actor
+    );
+  }
+
+
+  return renderTemporaryBattleSkillDeck(
+    actor,
+    target
+  );
+}
+
 
 
 // =========================================================
