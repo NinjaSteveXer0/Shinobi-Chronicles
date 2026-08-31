@@ -818,7 +818,7 @@ const hostedEntityDatabase = {
     presentation: {
 
       image:
-        "Assets/Summons/temp_kura.png",
+        "Assets/Summons/yin_kurama.png",
 
       temporaryArtwork:
         true
