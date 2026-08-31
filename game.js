@@ -2706,6 +2706,218 @@ function normalizeBattlePouchSelection(
 
 
 // =========================================================
+// BRICK 354 — PERSISTENT CLAN / TEAM MANAGEMENT AUTHORITY
+// =========================================================
+//
+// playerTeam remains the current roster authority.
+//
+// This record owns only player-managed presentation / formation
+// state for that roster:
+//
+// - six persistent team slots
+// - favourite character IDs
+//
+// It does NOT create character ownership, Stats, PL, Equipment,
+// Battle runtime state or a duplicate Character Registry.
+//
+// Slots 1–3 = Active Team
+// Slots 4–6 = Reserve
+//
+// =========================================================
+
+const CLAN_TEAM_SLOT_COUNT =
+  6;
+
+
+function getClanManageableRosterCharacters() {
+
+
+  return playerTeam.filter(
+    character =>
+      character &&
+      character.id &&
+      character.developmentPilotOnly !==
+        true
+  );
+}
+
+
+function createDefaultClanManagementState() {
+
+
+  const defaultIds =
+    getClanManageableRosterCharacters()
+      .slice(
+        0,
+        CLAN_TEAM_SLOT_COUNT
+      )
+      .map(
+        character =>
+          character.id
+      );
+
+
+  const teamSlots = [];
+
+
+  for (
+    let index = 0;
+    index < CLAN_TEAM_SLOT_COUNT;
+    index += 1
+  ) {
+
+
+    teamSlots.push(
+      defaultIds[index] ||
+      null
+    );
+  }
+
+
+  return {
+
+    teamSlots:
+      teamSlots,
+
+    favoriteIds:
+      []
+
+  };
+}
+
+
+function normalizeClanManagementState(
+  savedClan
+) {
+
+
+  const defaults =
+    createDefaultClanManagementState();
+
+
+  if (
+    !savedClan ||
+    typeof savedClan !==
+      "object"
+  ) {
+
+
+    return defaults;
+  }
+
+
+  const manageableIds =
+    new Set(
+      getClanManageableRosterCharacters()
+        .map(
+          character =>
+            character.id
+        )
+    );
+
+
+  const rawSlots =
+    Array.isArray(
+      savedClan.teamSlots
+    )
+      ? savedClan.teamSlots
+      : (
+          Array.isArray(
+            savedClan.teamIds
+          )
+            ? savedClan.teamIds
+            : null
+        );
+
+
+  const teamSlots = [];
+  const seen = new Set();
+
+
+  if (rawSlots) {
+
+
+    for (
+      let index = 0;
+      index < CLAN_TEAM_SLOT_COUNT;
+      index += 1
+    ) {
+
+
+      const characterId =
+        typeof rawSlots[index] ===
+          "string"
+          ? rawSlots[index]
+          : null;
+
+
+      const validId =
+        characterId &&
+        manageableIds.has(
+          characterId
+        ) &&
+        !seen.has(
+          characterId
+        )
+          ? characterId
+          : null;
+
+
+      teamSlots.push(
+        validId
+      );
+
+
+      if (validId) {
+
+
+        seen.add(
+          validId
+        );
+      }
+    }
+  }
+  else {
+
+
+    teamSlots.push(
+      ...defaults.teamSlots
+    );
+  }
+
+
+  const favoriteIds =
+    Array.isArray(
+      savedClan.favoriteIds
+    )
+      ? [
+          ...new Set(
+            savedClan.favoriteIds.filter(
+              characterId =>
+                typeof characterId ===
+                  "string" &&
+                manageableIds.has(
+                  characterId
+                )
+            )
+          )
+        ]
+      : [];
+
+
+  return {
+
+    teamSlots:
+      teamSlots,
+
+    favoriteIds:
+      favoriteIds
+
+  };
+}
+
+
+// =========================================================
 // DEFAULT PLAYER DATA
 // =========================================================
 
@@ -2727,6 +2939,9 @@ function createDefaultPlayerData() {
       normalizeBattlePouchSelection(
         null
       ),
+
+    clan:
+      createDefaultClanManagementState(),
 
     activityHistory:
       [],
@@ -2750,6 +2965,7 @@ function createDefaultPlayerData() {
   };
 
 }
+
 
 
 // =========================================================
@@ -3180,6 +3396,13 @@ function loadPlayerData() {
 
 
 
+      clan:
+        normalizeClanManagementState(
+          parsedData.clan
+        ),
+
+
+
       activityHistory:
         Array.isArray(
           parsedData.activityHistory
@@ -3229,6 +3452,8 @@ function loadPlayerData() {
 
 
 }
+
+
 
 // =========================================================
 // ACTIVE PLAYER DATA
@@ -14291,6 +14516,11 @@ function buildNextRunPlayerState(
         carryover
       ),
 
+    clan:
+      normalizeClanManagementState(
+        playerData.clan
+      ),
+
     progression:
       nextProgression,
 
@@ -14331,6 +14561,7 @@ function buildNextRunPlayerState(
   };
 
 }
+
 
 
 // =========================================================
@@ -34127,56 +34358,80 @@ function createBattleDeploymentSlots(
 }
 
 
+function getPersistentClanBattleParticipantIds() {
+
+
+  const normalized =
+    normalizeClanManagementState(
+      playerData &&
+      playerData.clan
+        ? playerData.clan
+        : null
+    );
+
+
+  const participantIds =
+    normalized.teamSlots.filter(
+      characterId =>
+        !!characterId &&
+        !!getPlayerCharacter(
+          characterId
+        )
+    );
+
+
+  if (
+    participantIds.length >
+      0
+  ) {
+
+
+    return participantIds;
+  }
+
+
+  return getClanManageableRosterCharacters()
+    .slice(
+      0,
+      CLAN_TEAM_SLOT_COUNT
+    )
+    .map(
+      character =>
+        character.id
+    );
+}
+
+
 function createInitialBattlePlayerParticipantIds(
   activePlayerId = null
 ) {
 
 
-  const members =
-    playerTeam.filter(
-      member =>
-        !!member &&
-        member.developmentPilotOnly !==
-          true
-    );
+  const participantIds =
+    getPersistentClanBattleParticipantIds();
 
 
-  const activePlayer =
-    activePlayerId
-      ? (
-          members.find(
-            member =>
-              member.id ===
-              activePlayerId
-          ) ||
-          null
-        )
-      : null;
-
-
-  const orderedMembers =
-    activePlayer
-      ? [
-          activePlayer,
-
-          ...members.filter(
-            member =>
-              member.id !==
-              activePlayer.id
-          )
-        ]
-      : members;
-
-
-  return orderedMembers
-    .slice(
-      0,
-      6
+  if (
+    !activePlayerId ||
+    !participantIds.includes(
+      activePlayerId
     )
-    .map(
-      member =>
-        member.id
-    );
+  ) {
+
+
+    return participantIds;
+  }
+
+
+  return [
+    activePlayerId,
+
+    ...participantIds.filter(
+      characterId =>
+        characterId !==
+          activePlayerId
+    )
+  ];
 }
 
 
@@ -34662,6 +34917,8 @@ function syncBattleActivePlayerFromDeployment() {
 
   return currentBattle.activePlayer;
 }
+
+
 
 
 // =========================================================
@@ -37278,10 +37535,20 @@ function openOverlay(type) {
 
     case "roster":
 
-      renderGenericOverlay(
-        container,
-        "SHINOBI ROSTER",
-        "Manage your recruited ninja, team composition and character progression."
+      // =========================================
+      // BRICK 356 — LEGACY ROSTER ROUTE
+      // =========================================
+      //
+      // YOUR CLAN is now the sole character-management surface.
+      // Keep this route as a compatibility redirect only.
+      //
+      // =========================================
+
+      currentOverlayType =
+        "clan";
+
+      renderClanOverlay(
+        container
       );
 
       break;
@@ -37364,7 +37631,6 @@ function openOverlay(type) {
       break;
   }
 }
-
 
 
 // =========================================================
@@ -37948,10 +38214,891 @@ function returnToKonohaFromActivityUI() {
 
 
 // =========================================================
-// YOUR CLAN / SHINOBI ROSTER
+// BRICKS 354–356 — YOUR CLAN / CHARACTER MANAGEMENT
+// =========================================================
+//
+// Functional Alpha foundation.
+//
+// Character identity / Stats / PL remain owned by playerTeam
+// and the existing progression authorities.
+//
+// playerData.clan owns only persistent six-slot formation and
+// favourites. Battle snapshots consume the formation but never
+// mutate it.
+//
+// UI may replace this presentation later without moving these
+// authorities into the UI layer.
+//
 // =========================================================
 
-function renderClanOverlay(container) {
+const CLAN_FILTER_IDS = [
+  "all",
+  "active",
+  "reserve",
+  "favourites"
+];
+
+
+const CLAN_UI_STATE = {
+
+  filterId:
+    "all",
+
+  selectedCharacterId:
+    null
+
+};
+
+
+function ensureClanManagementState() {
+
+
+  const normalized =
+    normalizeClanManagementState(
+      playerData.clan
+    );
+
+
+  playerData.clan =
+    normalized;
+
+
+  return normalized;
+}
+
+
+function getClanTeamSlotNumber(
+  characterId
+) {
+
+
+  const clan =
+    ensureClanManagementState();
+
+
+  const index =
+    clan.teamSlots.indexOf(
+      characterId
+    );
+
+
+  return index >= 0
+    ? index + 1
+    : null;
+}
+
+
+function getClanCharacterTeamStatus(
+  characterId
+) {
+
+
+  const slotNumber =
+    getClanTeamSlotNumber(
+      characterId
+    );
+
+
+  if (
+    slotNumber >= 1 &&
+    slotNumber <= 3
+  ) {
+
+
+    return "ACTIVE";
+  }
+
+
+  if (
+    slotNumber >= 4 &&
+    slotNumber <= 6
+  ) {
+
+
+    return "RESERVE";
+  }
+
+
+  return "AVAILABLE";
+}
+
+
+function isClanFavourite(
+  characterId
+) {
+
+
+  return ensureClanManagementState()
+    .favoriteIds
+    .includes(
+      characterId
+    );
+}
+
+
+function getClanFilteredCharacters(
+  filterId = "all"
+) {
+
+
+  const roster =
+    getClanManageableRosterCharacters();
+
+
+  switch (filterId) {
+
+    case "active":
+      return roster.filter(
+        character => {
+
+          const slotNumber =
+            getClanTeamSlotNumber(
+              character.id
+            );
+
+          return (
+            slotNumber >= 1 &&
+            slotNumber <= 3
+          );
+        }
+      );
+
+    case "reserve":
+      return roster.filter(
+        character => {
+
+          const slotNumber =
+            getClanTeamSlotNumber(
+              character.id
+            );
+
+          return (
+            slotNumber >= 4 &&
+            slotNumber <= 6
+          );
+        }
+      );
+
+    case "favourites":
+      return roster.filter(
+        character =>
+          isClanFavourite(
+            character.id
+          )
+      );
+
+    default:
+      return roster;
+  }
+}
+
+
+function canEditClanFormation() {
+
+
+  if (
+    typeof currentBattle !==
+      "undefined" &&
+    currentBattle &&
+    currentBattle.active ===
+      true &&
+    currentBattle.battleOver !==
+      true
+  ) {
+
+
+    return {
+
+      allowed:
+        false,
+
+      reason:
+        "clan_team_locked_during_battle"
+
+    };
+  }
+
+
+  return {
+
+    allowed:
+      true,
+
+    reason:
+      null
+
+  };
+}
+
+
+function setClanTeamSlot(
+  slotNumber,
+  characterId
+) {
+
+
+  const editability =
+    canEditClanFormation();
+
+
+  if (
+    !editability.allowed
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        editability.reason
+
+    };
+  }
+
+
+  const slotIndex =
+    Number(slotNumber) - 1;
+
+
+  if (
+    !Number.isInteger(
+      slotIndex
+    ) ||
+    slotIndex < 0 ||
+    slotIndex >=
+      CLAN_TEAM_SLOT_COUNT
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "invalid_clan_team_slot"
+
+    };
+  }
+
+
+  const character =
+    getClanManageableRosterCharacters()
+      .find(
+        member =>
+          member.id ===
+            characterId
+      ) ||
+    null;
+
+
+  if (!character) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "character_not_clan_manageable"
+
+    };
+  }
+
+
+  const clan =
+    ensureClanManagementState();
+
+
+  const previousIndex =
+    clan.teamSlots.indexOf(
+      character.id
+    );
+
+
+  const displacedId =
+    clan.teamSlots[
+      slotIndex
+    ] ||
+    null;
+
+
+  if (
+    previousIndex ===
+      slotIndex
+  ) {
+
+
+    return {
+
+      success:
+        true,
+
+      changed:
+        false,
+
+      slotNumber:
+        slotNumber,
+
+      characterId:
+        character.id
+
+    };
+  }
+
+
+  clan.teamSlots[
+    slotIndex
+  ] =
+    character.id;
+
+
+  if (
+    previousIndex >=
+      0
+  ) {
+
+
+    clan.teamSlots[
+      previousIndex
+    ] =
+      displacedId;
+  }
+
+
+  playerData.clan =
+    normalizeClanManagementState(
+      clan
+    );
+
+
+  savePlayerData();
+
+
+  rerenderClanOverlay();
+
+
+  return {
+
+    success:
+      true,
+
+    changed:
+      true,
+
+    slotNumber:
+      slotNumber,
+
+    characterId:
+      character.id,
+
+    displacedCharacterId:
+      displacedId
+
+  };
+}
+
+
+function removeClanCharacterFromTeam(
+  characterId
+) {
+
+
+  const editability =
+    canEditClanFormation();
+
+
+  if (
+    !editability.allowed
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        editability.reason
+
+    };
+  }
+
+
+  const clan =
+    ensureClanManagementState();
+
+
+  const slotIndex =
+    clan.teamSlots.indexOf(
+      characterId
+    );
+
+
+  if (
+    slotIndex < 0
+  ) {
+
+
+    return {
+
+      success:
+        true,
+
+      changed:
+        false,
+
+      reason:
+        null
+
+    };
+  }
+
+
+  const deployedCount =
+    clan.teamSlots.filter(
+      id =>
+        !!id
+    ).length;
+
+
+  if (
+    deployedCount <= 1
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "clan_team_requires_one_member"
+
+    };
+  }
+
+
+  clan.teamSlots[
+    slotIndex
+  ] =
+    null;
+
+
+  playerData.clan =
+    normalizeClanManagementState(
+      clan
+    );
+
+
+  savePlayerData();
+
+
+  rerenderClanOverlay();
+
+
+  return {
+
+    success:
+      true,
+
+    changed:
+      true,
+
+    characterId:
+      characterId
+
+  };
+}
+
+
+function toggleClanFavourite(
+  characterId
+) {
+
+
+  const character =
+    getClanManageableRosterCharacters()
+      .find(
+        member =>
+          member.id ===
+            characterId
+      ) ||
+    null;
+
+
+  if (!character) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        "character_not_clan_manageable"
+
+    };
+  }
+
+
+  const clan =
+    ensureClanManagementState();
+
+
+  if (
+    clan.favoriteIds.includes(
+      characterId
+    )
+  ) {
+
+
+    clan.favoriteIds =
+      clan.favoriteIds.filter(
+        id =>
+          id !==
+            characterId
+      );
+  }
+  else {
+
+
+    clan.favoriteIds.push(
+      characterId
+    );
+  }
+
+
+  playerData.clan =
+    normalizeClanManagementState(
+      clan
+    );
+
+
+  savePlayerData();
+
+
+  rerenderClanOverlay();
+
+
+  return {
+
+    success:
+      true,
+
+    characterId:
+      characterId,
+
+    favourite:
+      isClanFavourite(
+        characterId
+      )
+
+  };
+}
+
+
+function setClanFilter(
+  filterId
+) {
+
+
+  CLAN_UI_STATE.filterId =
+    CLAN_FILTER_IDS.includes(
+      filterId
+    )
+      ? filterId
+      : "all";
+
+
+  rerenderClanOverlay();
+
+
+  return CLAN_UI_STATE.filterId;
+}
+
+
+function selectClanCharacter(
+  characterId
+) {
+
+
+  const character =
+    getClanManageableRosterCharacters()
+      .find(
+        member =>
+          member.id ===
+            characterId
+      ) ||
+    null;
+
+
+  if (!character) {
+
+
+    return false;
+  }
+
+
+  CLAN_UI_STATE
+    .selectedCharacterId =
+      character.id;
+
+
+  rerenderClanOverlay();
+
+
+  return true;
+}
+
+
+function rerenderClanOverlay() {
+
+
+  if (
+    currentOverlayType !==
+      "clan"
+  ) {
+
+
+    return false;
+  }
+
+
+  const container =
+    document.getElementById(
+      "overlay-content-container"
+    );
+
+
+  if (!container) {
+
+
+    return false;
+  }
+
+
+  renderClanOverlay(
+    container
+  );
+
+
+  return true;
+}
+
+
+function renderClanManagementControls(
+  character
+) {
+
+
+  if (!character) {
+
+
+    return `
+      <div style="
+        margin-bottom:12px;
+        padding:10px 12px;
+        border:1px solid #1e293b;
+        border-radius:5px;
+        color:#64748b;
+        font-size:9px;
+        background:#080d13;
+      ">
+        Select a shinobi to manage team placement or favourites.
+      </div>
+    `;
+  }
+
+
+  const slotNumber =
+    getClanTeamSlotNumber(
+      character.id
+    );
+
+
+  const favourite =
+    isClanFavourite(
+      character.id
+    );
+
+
+  const slotButtons =
+    Array.from(
+      {
+        length:
+          CLAN_TEAM_SLOT_COUNT
+      },
+      (_, index) => {
+
+
+        const targetSlot =
+          index + 1;
+
+
+        const label =
+          targetSlot <= 3
+            ? `ACTIVE ${targetSlot}`
+            : `RESERVE ${targetSlot}`;
+
+
+        const selected =
+          slotNumber ===
+            targetSlot;
+
+
+        return `
+          <button
+            type="button"
+            onclick="setClanTeamSlot(${targetSlot}, '${character.id}')"
+            style="
+              padding:6px 8px;
+              border:1px solid ${selected ? "#00d9e8" : "#263448"};
+              border-radius:4px;
+              background:${selected ? "rgba(0,217,232,0.12)" : "#0d141d"};
+              color:${selected ? "#00d9e8" : "#94a3b8"};
+              font-size:7px;
+              font-weight:900;
+              cursor:pointer;
+            "
+          >
+            ${label}
+          </button>
+        `;
+      }
+    )
+      .join("");
+
+
+  return `
+    <div style="
+      margin-bottom:12px;
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      border:1px solid #263448;
+      border-radius:5px;
+      background:#080d13;
+    ">
+      <strong style="
+        color:#ffffff;
+        font-size:9px;
+        margin-right:4px;
+      ">
+        ${character.name}
+      </strong>
+
+      ${slotButtons}
+
+      <button
+        type="button"
+        onclick="removeClanCharacterFromTeam('${character.id}')"
+        style="
+          padding:6px 8px;
+          border:1px solid #263448;
+          border-radius:4px;
+          background:#0d141d;
+          color:#94a3b8;
+          font-size:7px;
+          font-weight:900;
+          cursor:pointer;
+        "
+      >
+        REMOVE FROM TEAM
+      </button>
+
+      <button
+        type="button"
+        onclick="toggleClanFavourite('${character.id}')"
+        style="
+          padding:6px 8px;
+          border:1px solid ${favourite ? "#d6a93a" : "#263448"};
+          border-radius:4px;
+          background:${favourite ? "rgba(214,169,58,0.12)" : "#0d141d"};
+          color:${favourite ? "#d6a93a" : "#94a3b8"};
+          font-size:7px;
+          font-weight:900;
+          cursor:pointer;
+        "
+      >
+        ${favourite ? "★ FAVOURITE" : "☆ FAVOURITE"}
+      </button>
+    </div>
+  `;
+}
+
+
+function renderClanOverlay(
+  container
+) {
+
+
+  ensureClanManagementState();
+
+
+  const roster =
+    getClanManageableRosterCharacters();
+
+
+  if (
+    !CLAN_UI_STATE.selectedCharacterId ||
+    !roster.some(
+      character =>
+        character.id ===
+          CLAN_UI_STATE
+            .selectedCharacterId
+    )
+  ) {
+
+
+    CLAN_UI_STATE
+      .selectedCharacterId =
+        roster.length > 0
+          ? roster[0].id
+          : null;
+  }
+
+
+  const selectedCharacter =
+    CLAN_UI_STATE
+      .selectedCharacterId
+        ? getPlayerCharacter(
+            CLAN_UI_STATE
+              .selectedCharacterId
+          )
+        : null;
+
+
+  const visibleCharacters =
+    getClanFilteredCharacters(
+      CLAN_UI_STATE.filterId
+    );
+
+
+  const filterButton =
+    (
+      filterId,
+      label
+    ) => `
+      <button
+        type="button"
+        class="clan-filter-btn ${
+          CLAN_UI_STATE.filterId ===
+            filterId
+              ? "active"
+              : ""
+        }"
+        onclick="setClanFilter('${filterId}')"
+      >
+        ${label}
+      </button>
+    `;
+
 
   container.innerHTML = `
 
@@ -37966,14 +39113,16 @@ function renderClanOverlay(container) {
           </h2>
 
           <p class="clan-description">
-            View, manage and organise the shinobi currently under your command.
+            View, organise and prepare the shinobi currently under your command.
           </p>
 
         </div>
 
         <div class="clan-count">
           <span>SHINOBI</span>
-          <strong id="clan-roster-count">3</strong>
+          <strong id="clan-roster-count">
+            ${roster.length}
+          </strong>
         </div>
 
       </div>
@@ -37981,86 +39130,138 @@ function renderClanOverlay(container) {
 
       <div class="clan-toolbar">
 
-        <button
-          type="button"
-          class="clan-filter-btn active"
-        >
-          ALL
-        </button>
+        ${filterButton(
+          "all",
+          "ALL"
+        )}
 
-        <button
-          type="button"
-          class="clan-filter-btn"
-        >
-          ACTIVE TEAM
-        </button>
+        ${filterButton(
+          "active",
+          "ACTIVE TEAM"
+        )}
 
-        <button
-          type="button"
-          class="clan-filter-btn"
-        >
-          RESERVE
-        </button>
+        ${filterButton(
+          "reserve",
+          "RESERVE"
+        )}
 
-        <button
-          type="button"
-          class="clan-filter-btn"
-        >
-          FAVOURITES
-        </button>
+        ${filterButton(
+          "favourites",
+          "FAVOURITES"
+        )}
 
       </div>
+
+
+      ${renderClanManagementControls(
+        selectedCharacter
+      )}
 
 
       <div class="clan-roster-grid">
 
-        ${createClanCard({
-          name: "Naruto",
-          rank: "Kage",
-          power: "2,450",
-          role: "Ninjutsu",
-          status: "ACTIVE"
-        })}
-
-        ${createClanCard({
-          name: "Sasuke",
-          rank: "Jonin",
-          power: "2,280",
-          role: "Bukishi",
-          status: "ACTIVE"
-        })}
-
-        ${createClanCard({
-          name: "Sakura",
-          rank: "Sannin",
-          power: "2,050",
-          role: "Taijutsu",
-          status: "RESERVE"
-        })}
+        ${
+          visibleCharacters.length > 0
+            ? visibleCharacters
+                .map(
+                  character =>
+                    createClanCard(
+                      character
+                    )
+                )
+                .join("")
+            : `
+                <div style="
+                  padding:18px;
+                  color:#64748b;
+                  font-size:9px;
+                  border:1px solid #1e293b;
+                  border-radius:6px;
+                  background:#080d13;
+                ">
+                  No shinobi match this filter.
+                </div>
+              `
+        }
 
       </div>
 
     </div>
-
   `;
-
 }
 
 
-function createClanCard(shinobi) {
+function createClanCard(
+  character
+) {
+
+
+  const status =
+    getClanCharacterTeamStatus(
+      character.id
+    );
+
+
+  const slotNumber =
+    getClanTeamSlotNumber(
+      character.id
+    );
+
+
+  const favourite =
+    isClanFavourite(
+      character.id
+    );
+
+
+  const currentPL =
+    calculateCurrentPL(
+      character
+    );
+
+
+  const selected =
+    CLAN_UI_STATE
+      .selectedCharacterId ===
+        character.id;
+
 
   return `
 
     <button
       type="button"
       class="clan-card"
+      onclick="selectClanCharacter('${character.id}')"
+      style="${
+        selected
+          ? "border-color:#00d9e8;box-shadow:0 0 14px rgba(0,217,232,0.16);"
+          : ""
+      }"
     >
 
       <div class="clan-card-portrait">
 
-        <span class="clan-card-placeholder">
-          忍
-        </span>
+        ${
+          character.image
+            ? `
+                <img
+                  src="${character.image}"
+                  alt="${character.name}"
+                  draggable="false"
+                  style="
+                    width:100%;
+                    height:100%;
+                    object-fit:cover;
+                    object-position:center top;
+                  "
+                >
+              `
+            : `
+                <span class="clan-card-placeholder">
+                  忍
+                </span>
+              `
+        }
 
       </div>
 
@@ -38072,11 +39273,12 @@ function createClanCard(shinobi) {
           <div>
 
             <div class="clan-card-name">
-              ${shinobi.name}
+              ${character.name}
+              ${favourite ? " ★" : ""}
             </div>
 
             <div class="clan-card-rank">
-              ${shinobi.rank}
+              ${character.rank || "UNCLASSIFIED"}
             </div>
 
           </div>
@@ -38084,9 +39286,9 @@ function createClanCard(shinobi) {
 
           <span class="
             clan-card-status
-            ${shinobi.status.toLowerCase()}
+            ${status.toLowerCase()}
           ">
-            ${shinobi.status}
+            ${status}
           </span>
 
         </div>
@@ -38095,16 +39297,16 @@ function createClanCard(shinobi) {
         <div class="clan-card-stats">
 
           <div>
-            <span>POWER</span>
+            <span>CURRENT PL</span>
             <strong>
-              ${shinobi.power}
+              ${currentPL}
             </strong>
           </div>
 
           <div>
-            <span>SPECIALITY</span>
+            <span>TEAM SLOT</span>
             <strong>
-              ${shinobi.role}
+              ${slotNumber || "—"}
             </strong>
           </div>
 
@@ -38113,56 +39315,186 @@ function createClanCard(shinobi) {
       </div>
 
     </button>
-
   `;
-
 }
 
 
-function createVillageCard(
-  title,
-  description
-) {
+function runClanManagementDiagnostics() {
 
-  return `
 
-    <div style="
-      background:
-        linear-gradient(
-          180deg,
-          #111827,
-          #0B111B
+  const originalClan =
+    JSON.parse(
+      JSON.stringify(
+        ensureClanManagementState()
+      )
+    );
+
+
+  const originalUIState = {
+    ...CLAN_UI_STATE
+  };
+
+
+  const results = {};
+
+
+  try {
+
+
+    const roster =
+      getClanManageableRosterCharacters();
+
+
+    const clan =
+      ensureClanManagementState();
+
+
+    results.rosterUsesPlayerTeamAuthority =
+      roster.every(
+        character =>
+          playerTeam.includes(
+            character
+          )
+      );
+
+
+    results.pilotOnlyExcluded =
+      roster.every(
+        character =>
+          character
+            .developmentPilotOnly !==
+            true
+      );
+
+
+    results.sixPersistentSlots =
+      Array.isArray(
+        clan.teamSlots
+      ) &&
+      clan.teamSlots.length ===
+        CLAN_TEAM_SLOT_COUNT;
+
+
+    const configuredIds =
+      clan.teamSlots.filter(
+        characterId =>
+          !!characterId
+      );
+
+
+    results.uniqueTeamParticipants =
+      new Set(
+        configuredIds
+      ).size ===
+      configuredIds.length;
+
+
+    results.activeReserveSemantics =
+      clan.teamSlots.every(
+        (
+          characterId,
+          index
+        ) =>
+          !characterId ||
+          getClanCharacterTeamStatus(
+            characterId
+          ) ===
+            (
+              index < 3
+                ? "ACTIVE"
+                : "RESERVE"
+            )
+      );
+
+
+    results.battleConsumesClanFormation =
+      JSON.stringify(
+        getPersistentClanBattleParticipantIds()
+      ) ===
+      JSON.stringify(
+        configuredIds.length > 0
+          ? configuredIds
+          : getClanManageableRosterCharacters()
+              .slice(
+                0,
+                CLAN_TEAM_SLOT_COUNT
+              )
+              .map(
+                character =>
+                  character.id
+              )
+      );
+
+
+    const firstCharacter =
+      roster[0] ||
+      null;
+
+
+    if (firstCharacter) {
+
+
+      const beforeFavourite =
+        isClanFavourite(
+          firstCharacter.id
         );
 
-      border: 1px solid #1E293B;
 
-      padding: 14px;
-
-      border-radius: 7px;
-
-      cursor: pointer;
-    ">
-
-      <h3 style="
-        color: #00D9E8;
-        font-size: 11px;
-        margin-bottom: 6px;
-      ">
-        ${title}
-      </h3>
+      toggleClanFavourite(
+        firstCharacter.id
+      );
 
 
-      <p style="
-        color: #64748B;
-        font-size: 9px;
-        line-height: 1.45;
-      ">
-        ${description}
-      </p>
+      results.favouriteToggleWorks =
+        isClanFavourite(
+          firstCharacter.id
+        ) !==
+        beforeFavourite;
+    }
+    else {
 
-    </div>
 
-  `;
+      results.favouriteToggleWorks =
+        true;
+    }
+  }
+  finally {
+
+
+    playerData.clan =
+      originalClan;
+
+
+    CLAN_UI_STATE.filterId =
+      originalUIState.filterId;
+
+
+    CLAN_UI_STATE
+      .selectedCharacterId =
+        originalUIState
+          .selectedCharacterId;
+
+
+    savePlayerData();
+  }
+
+
+  results.pass =
+    Object.values(
+      results
+    ).every(
+      value =>
+        value ===
+          true
+    );
+
+
+  console.table(
+    results
+  );
+
+
+  return results;
 }
 
 
