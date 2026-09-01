@@ -8269,16 +8269,17 @@ function executePlayerActivity(
 // =========================================================
 // BRICK 130 — PROCESS PLAYER ACTIVITY
 // BRICK 311 — BATTLE ACTIVITY PHASE BOUNDARY
+// BRICK 555 — MISSION ACTIVITY PHASE BOUNDARY
 // =========================================================
 //
 // Routes Player Loop requests into
 // the registered Activity Engine.
 //
-// Battle location availability and Battle completion are
-// explicitly different lifecycle phases.
+// Location/opportunity availability and actual completion are
+// explicitly different lifecycle phases for Battle and Mission.
 //
-// Merely entering a Battle location must NEVER execute
-// completion rewards / progression.
+// Merely entering a Battle or Mission location must NEVER
+// execute completion rewards / progression / history.
 //
 // =========================================================
 
@@ -8430,9 +8431,76 @@ function processPlayerActivity(
 
     // =========================================
     // MISSION
+    // BRICK 555 — EXPLICIT MISSION LIFECYCLE
     // =========================================
 
     case PLAYER_ACTIVITY_TYPES.MISSION:
+
+
+      // =======================================
+      // LOCATION / OPPORTUNITY PHASE
+      // =======================================
+
+      if (
+        activityRequest.stage ===
+          "available"
+      ) {
+
+
+        return {
+
+          success:
+            true,
+
+          type:
+            "mission_available",
+
+          location:
+            activityRequest.location ||
+            null,
+
+          missionId:
+            activityRequest.missionId ||
+            null,
+
+          message:
+            "Mission opportunity available."
+
+        };
+      }
+
+
+      // =======================================
+      // EXPLICIT COMPLETION PHASE ONLY
+      // =======================================
+
+      if (
+        activityRequest.stage !==
+          "completion"
+      ) {
+
+
+        console.log(
+          "Mission Activity execution requires an explicit lifecycle stage."
+        );
+
+
+        return false;
+      }
+
+
+      if (
+        !activityRequest.characterId
+      ) {
+
+
+        console.log(
+          "Mission completion requires a character ID."
+        );
+
+
+        return false;
+      }
 
 
       return startRegisteredActivity(
@@ -8468,7 +8536,6 @@ function processPlayerActivity(
   }
 
 }
-
 
 // =========================================================
 // BRICK 313 — BATTLE ACTIVITY BOUNDARY DIAGNOSTIC
@@ -41410,6 +41477,7 @@ function returnToWorldMap() {
 // =========================================================
 // LOCATION NAVIGATION
 // BRICK 312 — BATTLE LOCATION AVAILABILITY BOUNDARY
+// BRICK 556 — MISSION LOCATION AVAILABILITY BOUNDARY
 // =========================================================
 
 function handleNodeNavigation() {
@@ -41523,10 +41591,21 @@ function handleNodeNavigation() {
     case "mission":
 
 
+      // =======================================
+      // Entering a Mission location exposes
+      // Mission opportunities only.
+      //
+      // It is NOT Mission completion.
+      // No rewards, progression or history resolve here.
+      // =======================================
+
       executePlayerActivity({
 
         type:
           "mission",
+
+        stage:
+          "available",
 
         location:
           selectedLocationNode.id
@@ -41588,7 +41667,6 @@ function handleNodeNavigation() {
   }
 
 }
-
 
 // #########################################################
 // LOCATION ENGINE
@@ -42972,6 +43050,33 @@ function executeActivityDefinition(
 
 
 
+  // =========================================
+  // BRICK 557 — FINALISE HISTORICAL COMPLETION
+  // =========================================
+  //
+  // Reaching this point means the Activity lifecycle committed
+  // and completed. Intended outcome success remains independent.
+  //
+  // =========================================
+
+  result.completed =
+    true;
+
+
+  if (
+    !result.outcome
+  ) {
+
+
+    result.outcome =
+      result.success === true
+        ? "success"
+        : "failure";
+
+
+  }
+
+
   if (
     !recordActivityCompletion(
       result
@@ -43239,6 +43344,33 @@ function startRegisteredActivity(
 
 
   // =========================================
+  // BRICK 557 — FINALISE HISTORICAL COMPLETION
+  // =========================================
+  //
+  // Reaching this point means the Activity lifecycle committed
+  // and completed. Intended outcome success remains independent.
+  //
+  // =========================================
+
+  result.completed =
+    true;
+
+
+  if (
+    !result.outcome
+  ) {
+
+
+    result.outcome =
+      result.success === true
+        ? "success"
+        : "failure";
+
+
+  }
+
+
+  // =========================================
   // RECORD COMPLETION
   // =========================================
 
@@ -43281,6 +43413,7 @@ function startRegisteredActivity(
 
 // =========================================================
 // BRICK 119 — ACTIVITY RESULT FOUNDATION
+// BRICK 557 — COMPLETION / OUTCOME SEPARATION
 // =========================================================
 //
 // Core Chronicle Engine Result System.
@@ -43333,8 +43466,16 @@ function createActivityResult(
       characterId || null,
 
 
+    completed:
+      false,
+
+
     success:
       true,
+
+
+    outcome:
+      null,
 
 
     rewards: {
@@ -43363,6 +43504,7 @@ function createActivityResult(
 
 
 }
+
 
 // =========================================================
 // BRICK 121 — RANDOM COMMON ITEM RESOLVER
@@ -43811,15 +43953,21 @@ function syncActivityHistory() {
 
 // =========================================================
 // BRICK 126 — CHRONICLE ACTIVITY COMPLETION RECORD
+// BRICK 557 — HISTORICAL ELIGIBILITY REBASE
 // =========================================================
 //
-// Stores completed Activity Results as persistent
+// Stores genuinely completed Activity Results as persistent
 // Chronicle-compatible history records.
+//
+// Historical eligibility is based on committed completion,
+// NOT on whether the intended outcome succeeded.
 //
 // Records:
 // - Activity
 // - Character
-// - Success
+// - Completed
+// - Intended outcome success/failure
+// - Outcome
 // - EXP
 // - Ryō
 // - Item rewards
@@ -43829,7 +43977,7 @@ function syncActivityHistory() {
 // =========================================================
 
 
-function recordActivityCompletion(
+function createActivityCompletionRecord(
   result
 ) {
 
@@ -43837,20 +43985,15 @@ function recordActivityCompletion(
   if (
     !result ||
     !result.activity ||
-    !result.success
+    result.completed !==
+      true ||
+    typeof result.success !==
+      "boolean"
   ) {
 
 
-    console.log(
-      "Invalid activity completion record."
-    );
-
-
-    return false;
-
-
+    return null;
   }
-
 
 
   const rewards =
@@ -43858,8 +44001,7 @@ function recordActivityCompletion(
     {};
 
 
-
-  activityHistory.push({
+  return {
 
 
     activity:
@@ -43867,11 +44009,25 @@ function recordActivityCompletion(
 
 
     character:
-      result.character,
+      result.character ||
+      null,
+
+
+    completed:
+      true,
 
 
     success:
       result.success,
+
+
+    outcome:
+      result.outcome ||
+      (
+        result.success === true
+          ? "success"
+          : "failure"
+      ),
 
 
     rewards: {
@@ -43936,31 +44092,357 @@ function recordActivityCompletion(
 
 
     timestamp:
-      Date.now()
+      Number(
+        result.timestamp
+      ) || Date.now()
 
 
-  });
+  };
+}
 
+
+function recordActivityCompletion(
+  result
+) {
+
+
+  const record =
+    createActivityCompletionRecord(
+      result
+    );
+
+
+  if (
+    !record
+  ) {
+
+
+    console.log(
+      "Invalid or incomplete activity history record."
+    );
+
+
+    return false;
+  }
+
+
+  activityHistory.push(
+    record
+  );
 
 
   syncActivityHistory();
 
 
-
   savePlayerData();
-
 
 
   console.log(
     "Chronicle activity recorded:",
-    result.activity
+    record.activity,
+    record.outcome
   );
-
 
 
   return true;
 
 
+}
+
+
+// =========================================================
+// BRICK 558 — POST-554 CE DRIFT REGRESSION DIAGNOSTIC
+// =========================================================
+//
+// Proves:
+// - viewing a Mission is availability only;
+// - Mission view does not change rewards/inventory/history;
+// - Mission UI still opens;
+// - completion requires an explicit stage + character;
+// - completed failed outcomes are representable as history;
+// - uncompleted failures are not recordable history.
+//
+// Diagnostic is non-destructive: it does not persist a test
+// history record or execute Mission completion.
+//
+// =========================================================
+
+
+function runPost554CeDriftDiagnostics() {
+
+
+  const originalSelectedLocationNode =
+    selectedLocationNode;
+
+
+  const originalOpenOverlay =
+    openOverlay;
+
+
+  const expBefore =
+    Number(
+      playerData.exp
+    ) || 0;
+
+
+  const ryoBefore =
+    Number(
+      playerData.ryo
+    ) || 0;
+
+
+  const inventoryBefore =
+    JSON.stringify(
+      Array.isArray(
+        playerData.inventory
+      )
+        ? playerData.inventory
+        : []
+    );
+
+
+  const historyCountBefore =
+    getActivityHistory()
+      .length;
+
+
+  let openedOverlay =
+    null;
+
+
+  let availability =
+    null;
+
+
+  let completionWithoutCharacter =
+    null;
+
+
+  let failedCompletedRecord =
+    null;
+
+
+  let uncompletedFailureRecord =
+    null;
+
+
+  try {
+
+
+    openOverlay =
+      function diagnosticOpenOverlay(
+        type
+      ) {
+
+
+        openedOverlay =
+          type;
+
+
+        return true;
+      };
+
+
+    selectedLocationNode = {
+
+      id:
+        "diagnostic_mission_location",
+
+      type:
+        "mission",
+
+      name:
+        "Diagnostic Mission"
+
+    };
+
+
+    // Uses the real map-navigation path. The only substituted
+    // dependency is presentation rendering itself.
+    handleNodeNavigation();
+
+
+    availability =
+      processPlayerActivity({
+
+        type:
+          PLAYER_ACTIVITY_TYPES.MISSION,
+
+        stage:
+          "available",
+
+        location:
+          "diagnostic_mission_location"
+
+      });
+
+
+    completionWithoutCharacter =
+      processPlayerActivity({
+
+        type:
+          PLAYER_ACTIVITY_TYPES.MISSION,
+
+        stage:
+          "completion"
+
+      });
+
+
+    const failedCompletedResult =
+      createActivityResult(
+        "diagnostic_failed_completed_activity",
+        null
+      );
+
+
+    failedCompletedResult.completed =
+      true;
+
+
+    failedCompletedResult.success =
+      false;
+
+
+    failedCompletedResult.outcome =
+      "failure";
+
+
+    failedCompletedRecord =
+      createActivityCompletionRecord(
+        failedCompletedResult
+      );
+
+
+    const uncompletedFailureResult =
+      createActivityResult(
+        "diagnostic_uncompleted_failure",
+        null
+      );
+
+
+    uncompletedFailureResult.success =
+      false;
+
+
+    uncompletedFailureResult.outcome =
+      "failure";
+
+
+    uncompletedFailureRecord =
+      createActivityCompletionRecord(
+        uncompletedFailureResult
+      );
+
+
+  }
+  finally {
+
+
+    openOverlay =
+      originalOpenOverlay;
+
+
+    selectedLocationNode =
+      originalSelectedLocationNode;
+
+
+  }
+
+
+  const result = {
+
+
+    missionAvailabilityAccepted:
+      !!(
+        availability &&
+        availability.success ===
+          true &&
+        availability.type ===
+          "mission_available"
+      ),
+
+
+    missionOverlayExposed:
+      openedOverlay ===
+        "missions",
+
+
+    missionViewDidNotChangeExp:
+      (
+        Number(
+          playerData.exp
+        ) || 0
+      ) ===
+        expBefore,
+
+
+    missionViewDidNotChangeRyo:
+      (
+        Number(
+          playerData.ryo
+        ) || 0
+      ) ===
+        ryoBefore,
+
+
+    missionViewDidNotChangeInventory:
+      JSON.stringify(
+        Array.isArray(
+          playerData.inventory
+        )
+          ? playerData.inventory
+          : []
+      ) ===
+        inventoryBefore,
+
+
+    missionViewDidNotAppendHistory:
+      getActivityHistory()
+        .length ===
+        historyCountBefore,
+
+
+    completionWithoutCharacterRejected:
+      completionWithoutCharacter ===
+        false,
+
+
+    failedCompletedOutcomeRecordable:
+      !!(
+        failedCompletedRecord &&
+        failedCompletedRecord.completed ===
+          true &&
+        failedCompletedRecord.success ===
+          false &&
+        failedCompletedRecord.outcome ===
+          "failure"
+      ),
+
+
+    uncompletedFailureNotRecordable:
+      uncompletedFailureRecord ===
+        null
+
+
+  };
+
+
+  result.pass =
+    Object.values(
+      result
+    ).every(
+      value =>
+        value === true
+    );
+
+
+  console.table(
+    result
+  );
+
+
+  return result;
 }
 
 // =========================================================
