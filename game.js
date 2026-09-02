@@ -66547,21 +66547,312 @@ function resolveBattleEndOfActionOpportunityEffects(side,participantId,actionId=
 
 // =========================================================
 // BRICK 454 — CONDITION PRESENTATION DESCRIPTOR
+// BRICK 559 — CONDITION UI LIFECYCLE PROJECTION
 // =========================================================
-function getBattleConditionPresentationDescriptor(condition) {
-  if (!condition) return null;
-  const phase=condition.data&&condition.data.tickPhase;
+//
+// Presentation derives from the existing Condition runtime.
+// It does not decide admissibility, consume Conditions, or
+// rewrite Character Stats.
+//
+// =========================================================
+
+function formatBattleConditionPresentationLabel(
+  conditionKey
+) {
+
+  if (
+    typeof conditionKey !==
+      "string" ||
+    conditionKey.length ===
+      0
+  ) {
+
+    return "CONDITION";
+  }
+
+  return conditionKey
+    .split("_")
+    .filter(Boolean)
+    .map(
+      part =>
+        part.charAt(0)
+          .toUpperCase() +
+        part.slice(1)
+    )
+    .join(" ");
+}
+
+
+function getBattleConditionPresentationDescriptor(
+  condition
+) {
+
+  if (
+    !condition
+  ) {
+
+    return null;
+  }
+
+  const data =
+    condition.data &&
+    typeof condition.data ===
+      "object"
+      ? condition.data
+      : {};
+
+  const phase =
+    data.tickPhase ||
+    null;
+
+  const expiry =
+    data.expiry ||
+    null;
+
+  const blockedActionClasses =
+    [
+      ...(
+        Array.isArray(
+          condition.blockedActionClasses
+        )
+          ? condition.blockedActionClasses
+          : []
+      )
+    ];
+
+  const blockedActionTraits =
+    [
+      ...(
+        Array.isArray(
+          condition.blockedActionTraits
+        )
+          ? condition.blockedActionTraits
+          : []
+      )
+    ];
+
+  const remainingTicks =
+    Number.isFinite(
+      Number(
+        data.remainingTicks
+      )
+    )
+      ? Number(
+          data.remainingTicks
+        )
+      : null;
+
+  const conditionKey =
+    condition.conditionKey ||
+    "condition";
+
   return {
-    conditionId:condition.conditionId,
-    conditionKey:condition.conditionKey,
-    conditionType:condition.conditionType,
-    remainingTicks:Number.isFinite(Number(condition.data&&condition.data.remainingTicks))?Number(condition.data.remainingTicks):null,
-    tickDamage:Number.isFinite(Number(condition.data&&condition.data.tickDamage))?Number(condition.data.tickDamage):null,
-    timing:phase==="start_of_action_opportunity"?"start_of_action":phase==="end_of_action_opportunity"?"end_of_action":null,
-    bypassStamina:condition.data&&condition.data.bypassStamina===true,
-    blockedActionClasses:[...(condition.blockedActionClasses||[])],
-    blockedActionTraits:[...(condition.blockedActionTraits||[])]
+
+    conditionId:
+      condition.conditionId,
+
+    conditionKey:
+      conditionKey,
+
+    displayName:
+      formatBattleConditionPresentationLabel(
+        conditionKey
+      ),
+
+    conditionType:
+      condition.conditionType,
+
+    remainingTicks:
+      remainingTicks,
+
+    tickDamage:
+      Number.isFinite(
+        Number(
+          data.tickDamage
+        )
+      )
+        ? Number(
+            data.tickDamage
+          )
+        : null,
+
+    timing:
+      phase ===
+        "start_of_action_opportunity"
+          ? "start_of_action"
+          : phase ===
+              "end_of_action_opportunity"
+            ? "end_of_action"
+            : null,
+
+    expiry:
+      expiry,
+
+    expiresOnNextActionOpportunity:
+      expiry ===
+        "next_action_opportunity",
+
+    invalidAttemptRetained:
+      true,
+
+    bypassStamina:
+      data.bypassStamina ===
+        true,
+
+    blockedActionClasses:
+      blockedActionClasses,
+
+    blockedActionTraits:
+      blockedActionTraits,
+
+    blocksActions:
+      blockedActionClasses.length >
+        0 ||
+      blockedActionTraits.length >
+        0
   };
+}
+
+
+function getBattleConditionCardSealPresentation(
+  condition
+) {
+
+  const descriptor =
+    getBattleConditionPresentationDescriptor(
+      condition
+    );
+
+  if (
+    !descriptor ||
+    descriptor.blocksActions !==
+      true
+  ) {
+
+    return null;
+  }
+
+  if (
+    descriptor.conditionKey ===
+      "sealed_chakra_flow"
+  ) {
+
+    return {
+      ...descriptor,
+      sealHeadline:
+        "CHAKRA FLOW",
+      sealState:
+        "SEALED"
+    };
+  }
+
+  return {
+    ...descriptor,
+    sealHeadline:
+      descriptor.displayName
+        .toUpperCase(),
+    sealState:
+      "BLOCKED"
+  };
+}
+
+
+function runBattleConditionUIPresentationDiagnostics() {
+
+  const condition = {
+
+    conditionId:
+      "condition_ui_diagnostic",
+
+    conditionKey:
+      "sealed_chakra_flow",
+
+    conditionType:
+      "seal",
+
+    blockedActionClasses: [
+      "transformation_activation"
+    ],
+
+    blockedActionTraits: [
+      "chakra_dependent_positive_self_enhancement"
+    ],
+
+    data: {
+      expiry:
+        "next_action_opportunity"
+    }
+  };
+
+  const descriptor =
+    getBattleConditionPresentationDescriptor(
+      condition
+    );
+
+  const seal =
+    getBattleConditionCardSealPresentation(
+      condition
+    );
+
+  const result = {
+
+    displayNameDerived:
+      !!descriptor &&
+      descriptor.displayName ===
+        "Sealed Chakra Flow",
+
+    nextRealActionLifecycle:
+      !!descriptor &&
+      descriptor.expiresOnNextActionOpportunity ===
+        true,
+
+    invalidAttemptRetained:
+      !!descriptor &&
+      descriptor.invalidAttemptRetained ===
+        true,
+
+    actionBlockingProjected:
+      !!descriptor &&
+      descriptor.blocksActions ===
+        true,
+
+    blockedClassesPreserved:
+      !!descriptor &&
+      descriptor.blockedActionClasses
+        .includes(
+          "transformation_activation"
+        ),
+
+    blockedTraitsPreserved:
+      !!descriptor &&
+      descriptor.blockedActionTraits
+        .includes(
+          "chakra_dependent_positive_self_enhancement"
+        ),
+
+    sealedCardPresentation:
+      !!seal &&
+      seal.sealHeadline ===
+        "CHAKRA FLOW" &&
+      seal.sealState ===
+        "SEALED"
+  };
+
+  result.pass =
+    Object.values(
+      result
+    )
+      .every(
+        value =>
+          value ===
+            true
+      );
+
+  console.table(
+    result
+  );
+
+  return result;
 }
 
 // =========================================================
@@ -72274,6 +72565,18 @@ function evaluateAcademyBattleSkillAvailability(
 
 // =========================================================
 // BRICK 309 — TEMPORARY DEVELOPER SKILL CARDS
+// BRICK 560 — CONDITION-AWARE SKILL / PANEL PRESENTATION
+// =========================================================
+//
+// Skill admissibility remains authoritative in
+// evaluateAcademyBattleSkillAvailability().
+//
+// This Brick only presents that result:
+// - blocked Skill cards receive a Condition seal;
+// - the active actor receives a compact Condition marker;
+// - the right-side panel explains the current Condition;
+// - no Skill ID is hard-coded as blocked.
+//
 // =========================================================
 
 function getAcademyBattleSkillCompactStatus(
@@ -72281,14 +72584,12 @@ function getAcademyBattleSkillCompactStatus(
   availability
 ) {
 
-
   if (
     !availability.available
   ) {
 
     return availability.reason;
   }
-
 
   if (
     skill.resolutionKind ===
@@ -72301,7 +72602,6 @@ function getAcademyBattleSkillCompactStatus(
     );
   }
 
-
   if (
     skill.traits.includes(
       "multi_hit_presentation"
@@ -72313,7 +72613,6 @@ function getAcademyBattleSkillCompactStatus(
     );
   }
 
-
   if (
     skill.conditional &&
     skill.conditional.stateKey
@@ -72323,7 +72622,6 @@ function getAcademyBattleSkillCompactStatus(
       `Uses ${skill.conditional.stateKey}`
     );
   }
-
 
   if (
     skill.staminaMitigation ===
@@ -72336,8 +72634,276 @@ function getAcademyBattleSkillCompactStatus(
     );
   }
 
-
   return "Ready";
+}
+
+
+function isBattleSkillConditionBlocked(
+  availability
+) {
+
+  return !!(
+    availability &&
+    availability.available !==
+      true &&
+    availability.reason ===
+      "Blocked by current Condition." &&
+    Array.isArray(
+      availability.blockingConditionIds
+    ) &&
+    availability.blockingConditionIds.length >
+      0
+  );
+}
+
+
+function getBattleConditionByPresentationId(
+  conditionId
+) {
+
+  if (
+    !conditionId
+  ) {
+
+    return null;
+  }
+
+  const runtime =
+    ensureBattleRuntimeState();
+
+  return runtime.conditions
+    .find(
+      condition =>
+        condition &&
+        condition.conditionId ===
+          conditionId
+    ) ||
+    null;
+}
+
+
+function getBattleSkillBlockingConditionPresentation(
+  availability
+) {
+
+  if (
+    !isBattleSkillConditionBlocked(
+      availability
+    )
+  ) {
+
+    return null;
+  }
+
+  for (
+    const conditionId of
+    availability.blockingConditionIds
+  ) {
+
+    const condition =
+      getBattleConditionByPresentationId(
+        conditionId
+      );
+
+    const presentation =
+      getBattleConditionCardSealPresentation(
+        condition
+      );
+
+    if (
+      presentation
+    ) {
+
+      return presentation;
+    }
+  }
+
+  return {
+    conditionId:
+      availability
+        .blockingConditionIds[0] ||
+      null,
+    conditionKey:
+      null,
+    displayName:
+      "Current Condition",
+    sealHeadline:
+      "CONDITION",
+    sealState:
+      "BLOCKED"
+  };
+}
+
+
+function getBattlePrimaryConditionPresentation(
+  actor
+) {
+
+  if (
+    !actor
+  ) {
+
+    return null;
+  }
+
+  const conditions =
+    getBattleParticipantConditions(
+      "player",
+      actor.id
+    );
+
+  if (
+    conditions.length ===
+      0
+  ) {
+
+    return null;
+  }
+
+  const entries =
+    conditions
+      .map(
+        condition => ({
+          condition,
+          presentation:
+            getBattleConditionPresentationDescriptor(
+              condition
+            )
+        })
+      )
+      .filter(
+        entry =>
+          !!entry.presentation
+      );
+
+  if (
+    entries.length ===
+      0
+  ) {
+
+    return null;
+  }
+
+  const blockingEntry =
+    entries.find(
+      entry =>
+        entry.presentation
+          .blocksActions ===
+          true
+    );
+
+  return (
+    blockingEntry ||
+    entries[0]
+  ).presentation;
+}
+
+
+function renderBattleConditionPanel(
+  actor
+) {
+
+  const condition =
+    getBattlePrimaryConditionPresentation(
+      actor
+    );
+
+  if (
+    !condition
+  ) {
+
+    return "";
+  }
+
+  const displayName =
+    condition.displayName
+      .toUpperCase();
+
+  const isNextRealAction =
+    condition.expiresOnNextActionOpportunity ===
+      true;
+
+  const lifecyclePrimary =
+    isNextRealAction
+      ? "NEXT REAL ACTION"
+      : Number.isFinite(
+          Number(
+            condition.remainingTicks
+          )
+        )
+        ? `${condition.remainingTicks} TICK${condition.remainingTicks === 1 ? "" : "S"} REMAINING`
+        : "ACTIVE CONDITION";
+
+  const lifecycleDetail =
+    isNextRealAction
+      ? "Invalid choices do not consume condition."
+      : condition.timing ===
+          "start_of_action"
+        ? "Authored effect resolves at action start."
+        : condition.timing ===
+            "end_of_action"
+          ? "Authored effect resolves at action end."
+          : "Runtime condition remains under its authored lifecycle.";
+
+  const expiryMarkup =
+    isNextRealAction
+      ? `
+          <div class="battle-live-condition-row">
+            <span class="battle-live-condition-row-icon" aria-hidden="true">
+              ◷
+            </span>
+
+            <span class="battle-live-condition-row-copy">
+              <strong>THEN EXPIRES</strong>
+              <small>Condition ends after that consumed action opportunity.</small>
+            </span>
+          </div>
+        `
+      : "";
+
+  return `
+    <div
+      class="battle-live-condition-roster-marker"
+      aria-label="${displayName}"
+      data-condition-key="${condition.conditionKey || "condition"}"
+    >
+      <span aria-hidden="true">◉</span>
+      <small>${displayName}</small>
+    </div>
+
+    <aside
+      class="battle-live-condition-panel"
+      aria-label="Active Battle Condition"
+      aria-live="polite"
+      data-condition-key="${condition.conditionKey || "condition"}"
+    >
+      <div class="battle-live-condition-panel-title">
+        <span aria-hidden="true">◉</span>
+        <strong>CONDITION APPLIED</strong>
+      </div>
+
+      <div class="battle-live-condition-name">
+        ${displayName}
+      </div>
+
+      <div class="battle-live-condition-row">
+        <span class="battle-live-condition-row-icon" aria-hidden="true">
+          ▶
+        </span>
+
+        <span class="battle-live-condition-row-copy">
+          <strong>${lifecyclePrimary}</strong>
+          <small>${lifecycleDetail}</small>
+        </span>
+      </div>
+
+      ${expiryMarkup}
+
+      <div class="battle-live-condition-footer">
+        INVALID ATTEMPT • RETAINED
+      </div>
+    </aside>
+  `;
 }
 
 
@@ -72346,20 +72912,15 @@ function renderTemporaryBattleSkillDeck(
   target
 ) {
 
-
   const skills =
     actor
-
       ? getPreparedAcademyBattleSkills(
           actor.id
         )
-
       : [];
-
 
   const cards =
     [];
-
 
   for (
     let index = 0;
@@ -72367,18 +72928,15 @@ function renderTemporaryBattleSkillDeck(
     index += 1
   ) {
 
-
     const skill =
       skills[
         index
       ] ||
       null;
 
-
     if (
       !skill
     ) {
-
 
       cards.push(
         `
@@ -72388,26 +72946,20 @@ function renderTemporaryBattleSkillDeck(
               is-empty
             "
           >
-
             <span>
               ${
                 index === 0 &&
                 skills.length === 0
-
                   ? "NO PILOT SKILLS"
-
                   : "EMPTY"
               }
             </span>
-
           </div>
         `
       );
 
-
       continue;
     }
-
 
     const availability =
       evaluateAcademyBattleSkillAvailability(
@@ -72416,13 +72968,45 @@ function renderTemporaryBattleSkillDeck(
         target
       );
 
-
     const status =
       getAcademyBattleSkillCompactStatus(
         skill,
         availability
       );
 
+    const conditionBlocked =
+      isBattleSkillConditionBlocked(
+        availability
+      );
+
+    const blockingCondition =
+      conditionBlocked
+        ? getBattleSkillBlockingConditionPresentation(
+            availability
+          )
+        : null;
+
+    const conditionSealMarkup =
+      blockingCondition
+        ? `
+            <span
+              class="battle-skill-condition-seal"
+              aria-hidden="true"
+            >
+              <span class="battle-skill-condition-seal-symbol">
+                ◉
+              </span>
+
+              <span class="battle-skill-condition-seal-headline">
+                ${blockingCondition.sealHeadline}
+              </span>
+
+              <strong class="battle-skill-condition-seal-state">
+                ${blockingCondition.sealState}
+              </strong>
+            </span>
+          `
+        : "";
 
     cards.push(
       `
@@ -72435,6 +73019,11 @@ function renderTemporaryBattleSkillDeck(
                 ? "is-ready"
                 : "is-disabled"
             }
+            ${
+              conditionBlocked
+                ? "is-condition-blocked"
+                : ""
+            }
           "
           onclick="
             attemptAcademyBattleSkill(
@@ -72446,13 +73035,15 @@ function renderTemporaryBattleSkillDeck(
               ? ""
               : "disabled"
           }
+          ${
+            blockingCondition
+              ? `data-blocking-condition-id="${blockingCondition.conditionId || ""}"`
+              : ""
+          }
           title="${status}"
         >
-
           <span
-            class="
-              battle-dev-skill-discipline
-            "
+            class="battle-dev-skill-discipline"
           >
             ${skill.primaryDiscipline}
           </span>
@@ -72462,9 +73053,7 @@ function renderTemporaryBattleSkillDeck(
           </strong>
 
           <span
-            class="
-              battle-dev-skill-type
-            "
+            class="battle-dev-skill-type"
           >
             ${skill.type}
           </span>
@@ -72473,11 +73062,11 @@ function renderTemporaryBattleSkillDeck(
             ${status}
           </small>
 
+          ${conditionSealMarkup}
         </button>
       `
     );
   }
-
 
   return `
     <div
@@ -72486,8 +73075,98 @@ function renderTemporaryBattleSkillDeck(
     >
       ${cards.join("")}
     </div>
+
+    ${renderBattleConditionPanel(actor)}
   `;
 }
+
+
+function runBattleConditionSkillPresentationDiagnostics() {
+
+  const blocked = {
+    available:
+      false,
+    reason:
+      "Blocked by current Condition.",
+    blockingConditionIds: [
+      "condition_ui_diagnostic"
+    ]
+  };
+
+  const otherUnavailable = {
+    available:
+      false,
+    reason:
+      "Skill is not prepared.",
+    blockingConditionIds: []
+  };
+
+  const result = {
+
+    conditionBlockedRecognized:
+      isBattleSkillConditionBlocked(
+        blocked
+      ) ===
+        true,
+
+    unrelatedUnavailableNotMislabelled:
+      isBattleSkillConditionBlocked(
+        otherUnavailable
+      ) ===
+        false,
+
+    availableSkillNotMislabelled:
+      isBattleSkillConditionBlocked({
+        available:
+          true,
+        reason:
+          null,
+        blockingConditionIds: []
+      }) ===
+        false,
+
+    rendererUsesAuthoritativeAvailability:
+      renderTemporaryBattleSkillDeck
+        .toString()
+        .includes(
+          "evaluateAcademyBattleSkillAvailability"
+        ),
+
+    noHardCodedSkillBlockList:
+      !renderTemporaryBattleSkillDeck
+        .toString()
+        .includes(
+          "chidori"
+        ) &&
+      !renderTemporaryBattleSkillDeck
+        .toString()
+        .includes(
+          "fireball"
+        ) &&
+      !renderTemporaryBattleSkillDeck
+        .toString()
+        .includes(
+          "water_dragon"
+        )
+  };
+
+  result.pass =
+    Object.values(
+      result
+    )
+      .every(
+        value =>
+          value ===
+            true
+      );
+
+  console.table(
+    result
+  );
+
+  return result;
+}
+
 
 
 
