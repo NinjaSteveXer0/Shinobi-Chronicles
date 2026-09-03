@@ -3088,10 +3088,14 @@ function validateAlphaProductionStatRecord(record,id,errors) {
   }
 }
 
+// =========================================================
+// BRICK 651 — SOURCE-ONLY BOUND ENTITY REFERENCE VALIDATION
+// =========================================================
 function collectAlphaProductionReferenceErrors() {
   const errors=[];
   const all=[...ALPHA_PRODUCTION_CHARACTER_IDS.map(id=>characterRegistry[id]),...ALPHA_PRODUCTION_ENTITY_IDS.map(id=>entityRegistry[id])].filter(Boolean);
-  const entityResolvedSourceTypes=new Set(["entity","bound_entity","attached_summon","summon_entity","hosted_entity"]);
+  const entityResolvedSourceTypes=new Set(["entity","attached_summon","summon_entity","hosted_entity"]);
+  const sourceOnlyBoundEntityClassifications=new Set(["source_only_bound_collective_companion"]);
   all.forEach(record=>{
     if (record.defaultAttachedSummonId&&!entityRegistry[record.defaultAttachedSummonId]) errors.push(`${record.id}:defaultAttachedSummonId:${record.defaultAttachedSummonId}`);
     ["hostedEntityIds","boundEntityIds","signatureEntityIds"].forEach(field=>{
@@ -3100,6 +3104,11 @@ function collectAlphaProductionReferenceErrors() {
     (Array.isArray(record.sourceRefs)?record.sourceRefs:[]).forEach((ref,index)=>{
       if (!ref||typeof ref!=="object"||typeof ref.type!=="string"||!ref.type||typeof ref.id!=="string"||!ref.id) {
         errors.push(`${record.id}:sourceRefs:${index}:invalid_source_ref`);
+        return;
+      }
+      const sourceOnlyBoundEntity=ref.type==="bound_entity"&&sourceOnlyBoundEntityClassifications.has(ref.classification);
+      if (ref.type==="bound_entity"&&!sourceOnlyBoundEntity&&!entityRegistry[ref.id]) {
+        errors.push(`${record.id}:sourceRefs:${index}:bound_entity:${ref.id}`);
         return;
       }
       if (entityResolvedSourceTypes.has(ref.type)&&!entityRegistry[ref.id]) {
