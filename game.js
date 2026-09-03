@@ -5844,6 +5844,8 @@ function createDefaultPlayerData() {
     entities: createDefaultPlayerEntityState(),
     weaponAcclimation: {},
     activityHistory: [],
+    // BRICK 742 — STORY SCENE RUNTIME IS SAVEABLE CURRENT STATE, NOT HISTORY
+    storySceneRuntime: createDefaultStorySceneRuntimeState(),
     progression: createDefaultRunProgression(),
     characters: createDefaultCharacterProgression(),
     collections: {
@@ -6298,6 +6300,8 @@ function loadPlayerData() {
       entities: normalizePlayerEntityState(parsedData.entities,{legacySeedMigration}),
       weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
       activityHistory: Array.isArray(parsedData.activityHistory) ? parsedData.activityHistory : [],
+      // BRICK 742 — restore current scene continuation state without inventing a story ledger.
+      storySceneRuntime: normalizeStorySceneRuntimeState(parsedData.storySceneRuntime),
       progression: normalizeSavedRunProgression(parsedData.progression),
       characters: normalizeSavedCharacterProgression(parsedData.characters),
       collections: normalizePlayerCollections(parsedData.collections)
@@ -35551,6 +35555,19 @@ let currentBattle = {
     null,
 
 
+  // =======================================================
+  // BRICK 738 — CALLER / STORY-SCENE RETURN CONTEXT
+  // =======================================================
+  // This is continuation routing only. It is not Battle history,
+  // observer Knowledge, or a second Chronicle store.
+  returnContext:
+    null,
+
+
+  observerSafeResultContext:
+    null,
+
+
   battleLog:
     [],
 
@@ -36745,6 +36762,10 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   currentBattle.completionRecorded=false;
   currentBattle.outcome=null;
   currentBattle.defeat=null;
+  // BRICK 738 — every ordinary Battle starts caller-neutral.
+  // A story/event wrapper may attach a fresh returnContext immediately after launch.
+  currentBattle.returnContext=null;
+  currentBattle.observerSafeResultContext=null;
   currentBattle.battleLog=[`${enemy.name} appears!`,`${currentBattle.activePlayer.name} prepares for battle.`];
 
   initializeBattleContributionRecordsFromDeployment();
@@ -38714,6 +38735,16 @@ function openOverlay(type) {
       break;
 
 
+    // BRICK 736 — GENERIC DIALOGUE / STORY SCENE CONSUMER
+    case "story_scene":
+
+      renderStorySceneOverlay(
+        container
+      );
+
+      break;
+
+
     case "training":
 
       renderTrainingOverlay(
@@ -38871,6 +38902,19 @@ function closeOverlay() {
   ) {
 
 
+    // BRICK 747 — a story-owned Battle cannot be abandoned through the
+    // generic overlay close path. Withdrawal/defeat remains Battle-owned.
+    if (
+      currentBattle.active === true &&
+      currentBattle.battleOver !== true &&
+      currentBattle.returnContext &&
+      currentBattle.returnContext.type === "story_scene"
+    ) {
+      console.log("Story-scene Battle is still active; use Battle actions/Withdraw rather than closing the caller context.");
+      return;
+    }
+
+
     currentBattle.active =
       false;
 
@@ -38882,6 +38926,16 @@ function closeOverlay() {
 
     return;
 
+  }
+
+
+  // =========================================
+  // STORY SCENE
+  // Return through the scene's authored caller context.
+  // =========================================
+  if (currentOverlayType === "story_scene") {
+    exitActiveStoryScene({reason:"presentation_close"});
+    return;
   }
 
 
@@ -39086,6 +39140,20 @@ function saveTestState() {
     defeat:
       currentBattle.defeat
         ? cloneBattleRuntimeValue(currentBattle.defeat)
+        : null,
+
+
+    // BRICK 742 — preserve caller routing across refresh without copying
+    // authored scene definitions or hidden story truth into Battle state.
+    battleReturnContext:
+      currentBattle.returnContext
+        ? cloneBattleRuntimeValue(currentBattle.returnContext)
+        : null,
+
+
+    observerSafeResultContext:
+      currentBattle.observerSafeResultContext
+        ? cloneBattleRuntimeValue(currentBattle.observerSafeResultContext)
         : null,
 
 
@@ -41372,6 +41440,24 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
     case "recruit":
       result=commitRecruitmentOpportunity(definition,action);
       break;
+    // BRICK 737 — WORLD OPPORTUNITY → GENERIC STORY SCENE
+    case "story_scene": {
+      const sceneId=action.sceneId||action.storySceneId||null;
+      if (!sceneId) return {success:false,reason:"story_scene_id_missing"};
+      result=startStoryScene(sceneId,{
+        entryBeatId:action.entryBeatId||null,
+        sourceOpportunityId:definition.opportunityId,
+        sourceEventId:definition.eventId,
+        returnContext:action.returnContext||{
+          type:"region_hotspot",
+          regionKey:definition.regionKey,
+          hotspotId:definition.hotspotId,
+          opportunityId:definition.opportunityId
+        },
+        context:action.sceneContext||{}
+      });
+      break;
+    }
     case "navigation":
       result={success:!!openOverlay(action.overlayType||"village"),type:"navigation"};
       if (!result.success) result.success=true; // openOverlay is presentation and may return undefined.
@@ -41383,6 +41469,21 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
       break;
     }
     case "narrative":
+      // BRICK 737 — authored narrative opportunities may opt into the same
+      // reusable Story Scene runtime without changing their interaction family.
+      if (action.sceneId||action.storySceneId) {
+        result=startStoryScene(action.sceneId||action.storySceneId,{
+          entryBeatId:action.entryBeatId||null,
+          sourceOpportunityId:definition.opportunityId,
+          sourceEventId:definition.eventId,
+          returnContext:action.returnContext||{type:"region_hotspot",regionKey:definition.regionKey,hotspotId:definition.hotspotId,opportunityId:definition.opportunityId},
+          context:action.sceneContext||{}
+        });
+        break;
+      }
+      if (typeof action.resolve==="function") result=action.resolve({definition,action,playerData,currentBattle,queue:getClanQueueReadModel()})||{success:false,reason:"interaction_resolver_no_result"};
+      else result={success:false,reason:"interaction_resolver_missing"};
+      break;
     case "investigation":
     case "shop":
     case "training":
@@ -41498,6 +41599,824 @@ function runAlphaKnowledgeSensitiveMapDiagnostics() {
   if (saved.discoveryA) runtime.observerDiscoveryByOpportunityId[opportunityA]=saved.discoveryA; else delete runtime.observerDiscoveryByOpportunityId[opportunityA];
   if (saved.discoveryB) runtime.observerDiscoveryByOpportunityId[opportunityB]=saved.discoveryB; else delete runtime.observerDiscoveryByOpportunityId[opportunityB];
   if (saved.trackingA) runtime.trackingByOpportunityId[opportunityA]=saved.trackingA; else delete runtime.trackingByOpportunityId[opportunityA];
+  return result;
+}
+
+
+// =========================================================
+// BRICKS 729–748 — GENERIC DIALOGUE / STORY SCENE RUNTIME
+// =========================================================
+//
+// One reusable scene consumer for Origins, world opportunities, Arena / Promotion,
+// recruitment, main Story, post-Battle reactions and later CE-contextual dialogue.
+//
+// Hard boundaries:
+// scene presentation != world truth
+// dialogue line != automatic Chronicle fact
+// speaker != physical participant
+// Battle result != dialogue Knowledge
+// choice selection != arbitrary state mutation
+// story scene != parallel history store
+//
+// Current-state persistence lives in playerData.storySceneRuntime. Durable consequences
+// must route through an existing domain authority or an authored resolver.
+// =========================================================
+
+const STORY_SCENE_PRESENTATION_MODES=Object.freeze([
+  "dialogue",
+  "internal_voice",
+  "narration",
+  "choice",
+  "battle_transition",
+  "post_battle"
+]);
+
+const STORY_SCENE_REGISTRY=new Map();
+
+function createDefaultStorySceneRuntimeState() {
+  return {
+    version:1,
+    sequence:0,
+    active:null,
+    lastFeedbackReceipt:null
+  };
+}
+
+function normalizeStorySceneRuntimeState(savedState) {
+  const source=savedState&&typeof savedState==="object"?savedState:{};
+  const active=source.active&&typeof source.active==="object"?source.active:null;
+  const normalizedActive=active&&typeof active.sceneId==="string"&&typeof active.beatId==="string"
+    ? {
+        instanceId:typeof active.instanceId==="string"?active.instanceId:null,
+        sceneId:active.sceneId,
+        beatId:active.beatId,
+        startedAt:Number(active.startedAt)||null,
+        sourceEventId:typeof active.sourceEventId==="string"?active.sourceEventId:null,
+        sourceOpportunityId:typeof active.sourceOpportunityId==="string"?active.sourceOpportunityId:null,
+        returnContext:active.returnContext&&typeof active.returnContext==="object"?cloneProgressionData(active.returnContext):null,
+        localContext:active.localContext&&typeof active.localContext==="object"?cloneProgressionData(active.localContext):{},
+        processedConsequenceKeys:Array.isArray(active.processedConsequenceKeys)?[...new Set(active.processedConsequenceKeys.filter(Boolean))]:[],
+        committedChoiceKeys:Array.isArray(active.committedChoiceKeys)?[...new Set(active.committedChoiceKeys.filter(Boolean))]:[],
+        pendingBattle:active.pendingBattle&&typeof active.pendingBattle==="object"?cloneProgressionData(active.pendingBattle):null,
+        battleResume:active.battleResume&&typeof active.battleResume==="object"?cloneProgressionData(active.battleResume):null
+      }
+    : null;
+  return {
+    version:1,
+    sequence:Math.max(0,Number(source.sequence)||0),
+    active:normalizedActive,
+    lastFeedbackReceipt:source.lastFeedbackReceipt&&typeof source.lastFeedbackReceipt==="object"
+      ? normalizeStorySceneFeedbackReceipt(source.lastFeedbackReceipt)
+      : null
+  };
+}
+
+function ensureStorySceneRuntimeState() {
+  if (!playerData.storySceneRuntime||typeof playerData.storySceneRuntime!=="object") {
+    playerData.storySceneRuntime=createDefaultStorySceneRuntimeState();
+  } else {
+    const state=playerData.storySceneRuntime;
+    const structurallyReady=state.version===1&&Number.isFinite(Number(state.sequence))&&Object.prototype.hasOwnProperty.call(state,"active")&&Object.prototype.hasOwnProperty.call(state,"lastFeedbackReceipt");
+    if (!structurallyReady) playerData.storySceneRuntime=normalizeStorySceneRuntimeState(state);
+  }
+  return playerData.storySceneRuntime;
+}
+
+function normalizeStorySceneSourceRef(sourceRef,mode="dialogue") {
+  if (!sourceRef) return null;
+  if (typeof sourceRef==="string") {
+    return {
+      sourceId:sourceRef,
+      sourceType:"stable_source",
+      physicalPresence:mode==="internal_voice"?false:null,
+      displayName:null,
+      portraitRef:null
+    };
+  }
+  if (typeof sourceRef!=="object"||!sourceRef.sourceId) return null;
+  return {
+    sourceId:String(sourceRef.sourceId),
+    sourceType:String(sourceRef.sourceType||"stable_source"),
+    physicalPresence:sourceRef.physicalPresence===true?true:(sourceRef.physicalPresence===false?false:(mode==="internal_voice"?false:null)),
+    displayName:sourceRef.displayName?String(sourceRef.displayName):null,
+    portraitRef:sourceRef.portraitRef?cloneProgressionData(sourceRef.portraitRef):null
+  };
+}
+
+function normalizeStorySceneParticipant(participant) {
+  if (!participant) return null;
+  if (typeof participant==="string") return {sourceId:participant,physicalPresence:true,visible:true,role:null};
+  if (typeof participant!=="object"||!participant.sourceId) return null;
+  return {
+    sourceId:String(participant.sourceId),
+    physicalPresence:participant.physicalPresence!==false,
+    visible:participant.visible!==false,
+    role:participant.role?String(participant.role):null
+  };
+}
+
+function normalizeStorySceneChoice(choice,index=0) {
+  if (!choice||typeof choice!=="object") return null;
+  const authoredChoiceId=choice.choiceId||choice.id||null;
+  if (!authoredChoiceId) return null;
+  const choiceId=String(authoredChoiceId);
+  return {
+    choiceId,
+    label:String(choice.label||choice.text||choiceId),
+    nextBeatId:choice.nextBeatId?String(choice.nextBeatId):null,
+    availability:typeof choice.availability==="function"?choice.availability:null,
+    knownBlocker:choice.knownBlocker?String(choice.knownBlocker):null,
+    consequenceRequests:Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.map(item=>cloneStorySceneAuthoredValue(item)):[],
+    contextPatch:choice.contextPatch&&typeof choice.contextPatch==="object"?cloneProgressionData(choice.contextPatch):null
+  };
+}
+
+function cloneStorySceneAuthoredValue(value) {
+  if (typeof value==="function") return value;
+  if (Array.isArray(value)) return value.map(cloneStorySceneAuthoredValue);
+  if (value&&typeof value==="object") {
+    const out={};
+    Object.entries(value).forEach(([key,item])=>{out[key]=cloneStorySceneAuthoredValue(item);});
+    return out;
+  }
+  return value;
+}
+
+function normalizeStorySceneBattleContract(contract) {
+  if (!contract||typeof contract!=="object") return null;
+  return {
+    enemyId:contract.enemyId?String(contract.enemyId):null,
+    encounterId:contract.encounterId?String(contract.encounterId):null,
+    victoryBeatId:contract.victoryBeatId?String(contract.victoryBeatId):null,
+    defeatBeatId:contract.defeatBeatId?String(contract.defeatBeatId):null,
+    postBattleBeatId:contract.postBattleBeatId?String(contract.postBattleBeatId):null,
+    resultProjector:typeof contract.resultProjector==="function"?contract.resultProjector:null,
+    exposeFinisher:contract.exposeFinisher===true,
+    actionLabel:String(contract.actionLabel||"BEGIN BATTLE")
+  };
+}
+
+function normalizeStorySceneBeat(beat,index=0) {
+  if (!beat||typeof beat!=="object") return null;
+  const authoredBeatId=beat.beatId||beat.id||null;
+  if (!authoredBeatId) return null;
+  const beatId=String(authoredBeatId);
+  const mode=STORY_SCENE_PRESENTATION_MODES.includes(beat.mode)?beat.mode:"dialogue";
+  return {
+    beatId,
+    mode,
+    speakerRef:normalizeStorySceneSourceRef(beat.speakerRef||beat.speakerSourceId||beat.speakerId||null,mode),
+    speakerName:beat.speakerName?String(beat.speakerName):null,
+    text:typeof beat.text==="string"?beat.text:"",
+    presentationResolver:typeof beat.presentationResolver==="function"?beat.presentationResolver:null,
+    nextBeatId:beat.nextBeatId?String(beat.nextBeatId):null,
+    choices:Array.isArray(beat.choices)?beat.choices.map(normalizeStorySceneChoice).filter(Boolean):[],
+    battle:normalizeStorySceneBattleContract(beat.battle||beat.battleContract||null),
+    onEnterConsequences:Array.isArray(beat.onEnterConsequences)?beat.onEnterConsequences.map(cloneStorySceneAuthoredValue):[],
+    onAdvanceConsequences:Array.isArray(beat.onAdvanceConsequences)?beat.onAdvanceConsequences.map(cloneStorySceneAuthoredValue):[],
+    exitScene:beat.exitScene===true,
+    allowPresentationClose:beat.allowPresentationClose===true,
+    uiHints:beat.uiHints&&typeof beat.uiHints==="object"?cloneProgressionData(beat.uiHints):{}
+  };
+}
+
+function normalizeStorySceneDefinition(definition) {
+  if (!definition||typeof definition!=="object"||!definition.sceneId) return null;
+  const beats=Array.isArray(definition.beats)?definition.beats.map(normalizeStorySceneBeat).filter(Boolean):[];
+  if (!beats.length) return null;
+  const beatIds=new Set();
+  for (const beat of beats) {
+    if (beatIds.has(beat.beatId)) return null;
+    beatIds.add(beat.beatId);
+  }
+  const entryBeatId=definition.entryBeatId?String(definition.entryBeatId):beats[0].beatId;
+  if (!beatIds.has(entryBeatId)) return null;
+  return {
+    sceneId:String(definition.sceneId),
+    eventId:definition.eventId?String(definition.eventId):null,
+    title:definition.title?String(definition.title):null,
+    entryBeatId,
+    participants:Array.isArray(definition.participants)?definition.participants.map(normalizeStorySceneParticipant).filter(Boolean):[],
+    beats,
+    beatMap:new Map(beats.map(beat=>[beat.beatId,beat])),
+    defaultReturnContext:definition.defaultReturnContext&&typeof definition.defaultReturnContext==="object"?cloneProgressionData(definition.defaultReturnContext):null,
+    contextResolver:typeof definition.contextResolver==="function"?definition.contextResolver:null,
+    onCompleteConsequences:Array.isArray(definition.onCompleteConsequences)?definition.onCompleteConsequences.map(cloneStorySceneAuthoredValue):[]
+  };
+}
+
+function registerStoryScene(definition) {
+  const normalized=normalizeStorySceneDefinition(definition);
+  if (!normalized) return {success:false,reason:"story_scene_definition_invalid"};
+  STORY_SCENE_REGISTRY.set(normalized.sceneId,normalized);
+  return {success:true,sceneId:normalized.sceneId,definition:normalized};
+}
+
+function unregisterStoryScene(sceneId) {
+  return STORY_SCENE_REGISTRY.delete(String(sceneId||""));
+}
+
+function getStorySceneDefinition(sceneId) {
+  return STORY_SCENE_REGISTRY.get(String(sceneId||""))||null;
+}
+
+function getActiveStorySceneRuntime() {
+  const state=ensureStorySceneRuntimeState();
+  return state.active||null;
+}
+
+function getActiveStorySceneDefinition() {
+  const active=getActiveStorySceneRuntime();
+  return active?getStorySceneDefinition(active.sceneId):null;
+}
+
+function getCurrentStorySceneBeat() {
+  const active=getActiveStorySceneRuntime();
+  const definition=getActiveStorySceneDefinition();
+  return active&&definition?definition.beatMap.get(active.beatId)||null:null;
+}
+
+function createStorySceneInstanceId(sceneId,runtimeState=null) {
+  const state=runtimeState&&typeof runtimeState==="object"?runtimeState:ensureStorySceneRuntimeState();
+  state.sequence=Math.max(0,Number(state.sequence)||0)+1;
+  return `story_scene_${String(sceneId||"scene")}_${state.sequence}_${Date.now()}`;
+}
+
+function getStorySceneRuntimeContext() {
+  const active=getActiveStorySceneRuntime();
+  const definition=getActiveStorySceneDefinition();
+  const base={
+    sceneId:active?active.sceneId:null,
+    beatId:active?active.beatId:null,
+    instanceId:active?active.instanceId:null,
+    sourceEventId:active?active.sourceEventId:null,
+    sourceOpportunityId:active?active.sourceOpportunityId:null,
+    localContext:active?cloneProgressionData(active.localContext||{}):{},
+    battleResume:active&&active.battleResume?cloneProgressionData(active.battleResume):null
+  };
+  if (definition&&typeof definition.contextResolver==="function") {
+    const authored=definition.contextResolver({playerData,active:cloneProgressionData(active),base:cloneProgressionData(base)});
+    if (authored&&typeof authored==="object") base.authoredContext=cloneProgressionData(authored);
+  }
+  return base;
+}
+
+function evaluateStorySceneChoiceAvailability(choice) {
+  if (!choice) return {available:false,knownBlocker:null};
+  if (typeof choice.availability!=="function") return {available:true,knownBlocker:null};
+  const result=choice.availability(getStorySceneRuntimeContext());
+  if (result===true) return {available:true,knownBlocker:null};
+  if (result===false||result==null) return {available:false,knownBlocker:choice.knownBlocker||null};
+  if (typeof result==="object") return {available:result.available===true,knownBlocker:result.knownBlocker?String(result.knownBlocker):null};
+  return {available:false,knownBlocker:null};
+}
+
+function normalizeStorySceneFeedbackReceipt(receipt) {
+  if (!receipt||typeof receipt!=="object") return null;
+  return {
+    receiptId:receipt.receiptId?String(receipt.receiptId):null,
+    kind:receipt.kind?String(receipt.kind):"chronicle_update",
+    label:receipt.label?String(receipt.label):"Chronicle Updated",
+    timestamp:Number(receipt.timestamp)||Date.now()
+  };
+}
+
+function emitStorySceneFeedbackReceipt(receipt) {
+  const safe=normalizeStorySceneFeedbackReceipt(receipt);
+  if (!safe) return null;
+  ensureStorySceneRuntimeState().lastFeedbackReceipt=safe;
+  savePlayerData();
+  return cloneProgressionData(safe);
+}
+
+function getStorySceneFeedbackReceipt() {
+  const receipt=ensureStorySceneRuntimeState().lastFeedbackReceipt;
+  return receipt?cloneProgressionData(receipt):null;
+}
+
+function clearStorySceneFeedbackReceipt() {
+  ensureStorySceneRuntimeState().lastFeedbackReceipt=null;
+  savePlayerData();
+  return true;
+}
+
+function processStorySceneConsequenceRequest(request,context={}) {
+  if (!request||typeof request!=="object") return {success:false,reason:"scene_consequence_request_invalid"};
+  const kind=String(request.kind||request.type||"custom");
+  switch (kind) {
+    case "character_acquisition":
+      return commitCharacterAcquisition({
+        variantId:request.variantId,
+        route:request.route||"story_scene",
+        sourceEventId:request.sourceEventId||context.sourceEventId||context.sceneId||null,
+        context:request.context||{sceneId:context.sceneId||null,beatId:context.beatId||null},
+        provenance:request.provenance||{authority:"authored_story_scene"},
+        linkedChronicleEvidenceIds:Array.isArray(request.linkedChronicleEvidenceIds)?request.linkedChronicleEvidenceIds:[]
+      });
+    case "world_opportunity_resolution":
+      if (!request.opportunityId&&!context.sourceOpportunityId) return {success:false,reason:"opportunity_id_missing"};
+      setOpportunityResolution(request.opportunityId||context.sourceOpportunityId,request.patch||{},request.options||{});
+      return {success:true,type:kind};
+    case "world_opportunity_discovery":
+      if (!request.opportunityId&&!context.sourceOpportunityId) return {success:false,reason:"opportunity_id_missing"};
+      setOpportunityDiscovery(request.opportunityId||context.sourceOpportunityId,request.patch||{},request.options||{});
+      return {success:true,type:kind};
+    case "world_opportunity_tracking":
+      if (!request.opportunityId&&!context.sourceOpportunityId) return {success:false,reason:"opportunity_id_missing"};
+      setOpportunityTracking(request.opportunityId||context.sourceOpportunityId,request.patch||{},request.options||{});
+      return {success:true,type:kind};
+    case "activity": {
+      const activity=executePlayerActivity(request.activityRequest||{});
+      return {success:activity!==false,type:kind,activity};
+    }
+    case "feedback": {
+      const receipt=emitStorySceneFeedbackReceipt({receiptId:request.receiptId||null,kind:request.feedbackKind||"chronicle_update",label:request.label||"Chronicle Updated"});
+      return {success:!!receipt,type:kind,receipt};
+    }
+    case "custom":
+    case "domain":
+    case "chronicle":
+      if (typeof request.resolve!=="function") return {success:false,reason:"authored_domain_resolver_missing"};
+      return request.resolve({
+        request,
+        sceneContext:cloneProgressionData(context),
+        playerData,
+        currentBattle,
+        activeScene:getActiveStorySceneRuntime()
+      })||{success:false,reason:"authored_domain_resolver_no_result"};
+    default:
+      return {success:false,reason:"scene_consequence_route_unknown"};
+  }
+}
+
+function processStorySceneConsequenceRequests(requests,phaseKey) {
+  const active=getActiveStorySceneRuntime();
+  if (!active) return {success:false,reason:"story_scene_not_active",results:[]};
+  const list=Array.isArray(requests)?requests:[];
+  const results=[];
+  for (let index=0;index<list.length;index+=1) {
+    const request=list[index];
+    const stableKey=String((request&&request.requestId)||`${active.sceneId}:${active.beatId}:${phaseKey}:${index}`);
+    if (active.processedConsequenceKeys.includes(stableKey)) {
+      results.push({success:true,idempotent:true,requestKey:stableKey});
+      continue;
+    }
+    const result=processStorySceneConsequenceRequest(request,{
+      sceneId:active.sceneId,
+      beatId:active.beatId,
+      instanceId:active.instanceId,
+      sourceEventId:active.sourceEventId,
+      sourceOpportunityId:active.sourceOpportunityId,
+      phase:phaseKey
+    });
+    results.push(result);
+    if (!result||result.success!==true) return {success:false,reason:(result&&result.reason)||"scene_consequence_failed",results};
+    active.processedConsequenceKeys.push(stableKey);
+  }
+  savePlayerData();
+  return {success:true,results};
+}
+
+function createStorySceneObserverSafeProjection() {
+  const active=getActiveStorySceneRuntime();
+  const definition=getActiveStorySceneDefinition();
+  const beat=getCurrentStorySceneBeat();
+  if (!active||!definition||!beat) return null;
+
+  const context=getStorySceneRuntimeContext();
+  let authoredPresentation={};
+  if (typeof beat.presentationResolver==="function") {
+    const resolved=beat.presentationResolver(context);
+    if (resolved&&typeof resolved==="object") authoredPresentation=resolved;
+  }
+
+  const speakerRef=normalizeStorySceneSourceRef(authoredPresentation.speakerRef||beat.speakerRef,beat.mode);
+  const choices=beat.choices.map(choice=>{
+    const availability=evaluateStorySceneChoiceAvailability(choice);
+    return {
+      choice_id:choice.choiceId,
+      label:choice.label,
+      available:availability.available===true,
+      known_blocker:availability.knownBlocker||null
+    };
+  });
+  const physicalParticipants=definition.participants
+    .filter(participant=>participant.visible!==false&&participant.physicalPresence===true)
+    .map(participant=>({source_id:participant.sourceId,role:participant.role||null}));
+
+  return {
+    scene_id:active.sceneId,
+    scene_instance_id:active.instanceId,
+    beat_id:active.beatId,
+    mode:beat.mode,
+    title:authoredPresentation.title?String(authoredPresentation.title):(definition.title||null),
+    speaker_source_id:speakerRef?speakerRef.sourceId:null,
+    speaker_source_type:speakerRef?speakerRef.sourceType:null,
+    speaker_name:authoredPresentation.speakerName?String(authoredPresentation.speakerName):(beat.speakerName||(speakerRef&&speakerRef.displayName)||null),
+    speaker_physically_present:speakerRef?speakerRef.physicalPresence:null,
+    portrait_ref:authoredPresentation.portraitRef?cloneProgressionData(authoredPresentation.portraitRef):(speakerRef&&speakerRef.portraitRef?cloneProgressionData(speakerRef.portraitRef):null),
+    text:typeof authoredPresentation.text==="string"?authoredPresentation.text:beat.text,
+    physical_participants:physicalParticipants,
+    choices,
+    has_next:!!beat.nextBeatId||beat.exitScene===true,
+    battle_transition:beat.mode==="battle_transition"&&beat.battle?{
+      available:!!beat.battle.enemyId,
+      action_label:beat.battle.actionLabel,
+      encounter_ref:beat.battle.encounterId||null
+    }:null,
+    post_battle_context:beat.mode==="post_battle"&&active.battleResume?cloneProgressionData(active.battleResume):null,
+    ui_hints:cloneProgressionData(beat.uiHints||{}),
+    feedback_receipt:getStorySceneFeedbackReceipt()
+  };
+}
+
+function startStoryScene(sceneId,options={}) {
+  const definition=getStorySceneDefinition(sceneId);
+  if (!definition) return {success:false,reason:"story_scene_not_registered"};
+  const entryBeatId=options.entryBeatId||definition.entryBeatId;
+  if (!definition.beatMap.has(entryBeatId)) return {success:false,reason:"story_scene_entry_beat_missing"};
+  const state=ensureStorySceneRuntimeState();
+  state.active={
+    instanceId:createStorySceneInstanceId(sceneId,state),
+    sceneId:definition.sceneId,
+    beatId:entryBeatId,
+    startedAt:Date.now(),
+    sourceEventId:options.sourceEventId||definition.eventId||null,
+    sourceOpportunityId:options.sourceOpportunityId||null,
+    returnContext:options.returnContext?cloneProgressionData(options.returnContext):(definition.defaultReturnContext?cloneProgressionData(definition.defaultReturnContext):null),
+    localContext:options.context&&typeof options.context==="object"?cloneProgressionData(options.context):{},
+    processedConsequenceKeys:[],
+    committedChoiceKeys:[],
+    pendingBattle:null,
+    battleResume:null
+  };
+  const beat=getCurrentStorySceneBeat();
+  const entered=processStorySceneConsequenceRequests(beat?beat.onEnterConsequences:[],"enter");
+  if (!entered.success) return entered;
+  savePlayerData();
+  openOverlay("story_scene");
+  return {success:true,type:"story_scene",sceneId:definition.sceneId,beatId:entryBeatId,instanceId:state.active.instanceId};
+}
+
+function setStorySceneBeat(beatId,options={}) {
+  const active=getActiveStorySceneRuntime();
+  const definition=getActiveStorySceneDefinition();
+  if (!active||!definition) return {success:false,reason:"story_scene_not_active"};
+  if (!definition.beatMap.has(beatId)) return {success:false,reason:"story_scene_beat_missing"};
+  active.beatId=beatId;
+  const beat=definition.beatMap.get(beatId);
+  const entered=processStorySceneConsequenceRequests(beat.onEnterConsequences,"enter");
+  if (!entered.success) return entered;
+  savePlayerData();
+  if (options.render!==false) openOverlay("story_scene");
+  return {success:true,beatId};
+}
+
+function applyStorySceneChoice(choiceId) {
+  const active=getActiveStorySceneRuntime();
+  const beat=getCurrentStorySceneBeat();
+  if (!active||!beat) return {success:false,reason:"story_scene_not_active"};
+  const choice=beat.choices.find(item=>item.choiceId===choiceId)||null;
+  if (!choice) return {success:false,reason:"story_choice_missing"};
+  const availability=evaluateStorySceneChoiceAvailability(choice);
+  if (!availability.available) return {success:false,reason:"story_choice_unavailable",knownBlocker:availability.knownBlocker||null};
+  const choiceKey=`${active.instanceId}:${beat.beatId}:${choice.choiceId}`;
+  if (active.committedChoiceKeys.includes(choiceKey)) return {success:false,reason:"story_choice_already_committed"};
+  const consequences=processStorySceneConsequenceRequests(choice.consequenceRequests,`choice:${choice.choiceId}`);
+  if (!consequences.success) return consequences;
+  active.committedChoiceKeys.push(choiceKey);
+  if (choice.contextPatch) active.localContext={...(active.localContext||{}),...cloneProgressionData(choice.contextPatch)};
+  savePlayerData();
+  if (choice.nextBeatId) return setStorySceneBeat(choice.nextBeatId);
+  if (beat.nextBeatId) return setStorySceneBeat(beat.nextBeatId);
+  return completeStoryScene({reason:"choice_terminal"});
+}
+
+function launchBattleWithReturnContext(enemyId,encounterId,returnContext) {
+  const battle=startEncounter(enemyId,null,encounterId||null);
+  if (!battle) return {success:false,reason:"battle_launch_failed"};
+  currentBattle.returnContext=returnContext&&typeof returnContext==="object"?cloneBattleRuntimeValue(returnContext):null;
+  currentBattle.observerSafeResultContext=null;
+  saveTestState();
+  return {success:true,battleId:currentBattle.battleId,encounterId:currentBattle.encounterId,returnContext:cloneBattleRuntimeValue(currentBattle.returnContext)};
+}
+
+function launchStorySceneBattle() {
+  const active=getActiveStorySceneRuntime();
+  const beat=getCurrentStorySceneBeat();
+  if (!active||!beat) return {success:false,reason:"story_scene_not_active"};
+  if (beat.mode!=="battle_transition"||!beat.battle) return {success:false,reason:"story_beat_not_battle_transition"};
+  if (!beat.battle.enemyId) return {success:false,reason:"story_battle_enemy_authority_missing"};
+  if (active.pendingBattle&&active.pendingBattle.battleId) return {success:false,reason:"story_battle_already_pending"};
+
+  const returnContext={
+    type:"story_scene",
+    sceneId:active.sceneId,
+    sceneInstanceId:active.instanceId,
+    sourceBeatId:beat.beatId,
+    victoryBeatId:beat.battle.victoryBeatId,
+    defeatBeatId:beat.battle.defeatBeatId,
+    postBattleBeatId:beat.battle.postBattleBeatId,
+    exposeFinisher:beat.battle.exposeFinisher===true,
+    resultProjector:beat.battle.resultProjector||null
+  };
+  // Functions cannot survive save serialization; keep the executable projector on the
+  // authored beat and store only stable routing fields in Battle/current scene state.
+  const saveableReturnContext={...returnContext};
+  delete saveableReturnContext.resultProjector;
+  const launched=launchBattleWithReturnContext(beat.battle.enemyId,beat.battle.encounterId||active.sourceEventId||active.sceneId,saveableReturnContext);
+  if (!launched.success) return launched;
+  active.pendingBattle={
+    battleId:launched.battleId,
+    encounterId:launched.encounterId,
+    sourceBeatId:beat.beatId,
+    victoryBeatId:beat.battle.victoryBeatId,
+    defeatBeatId:beat.battle.defeatBeatId,
+    postBattleBeatId:beat.battle.postBattleBeatId
+  };
+  savePlayerData();
+  saveTestState();
+  return {success:true,type:"battle_transition",battleId:launched.battleId};
+}
+
+function getStorySceneBattleResultProjector(returnContext) {
+  if (!returnContext||returnContext.type!=="story_scene") return null;
+  const definition=getStorySceneDefinition(returnContext.sceneId);
+  const beat=definition&&definition.beatMap?definition.beatMap.get(returnContext.sourceBeatId):null;
+  return beat&&beat.battle&&typeof beat.battle.resultProjector==="function"?beat.battle.resultProjector:null;
+}
+
+function createObserverSafeStoryBattleResult(returnContext) {
+  const outcome=currentBattle.outcome&&typeof currentBattle.outcome==="object"?currentBattle.outcome:null;
+  if (!outcome) return null;
+  const safe={
+    outcome:outcome.type==="victory"?"victory":"defeat",
+    battle_id:currentBattle.battleId||null,
+    encounter_id:currentBattle.encounterId||null,
+    completed_at:Number(outcome.completedAt)||Number(currentBattle.completedAt)||null
+  };
+  if (returnContext&&returnContext.exposeFinisher===true&&outcome.type==="victory"&&outcome.finishingShinobiId) {
+    safe.finishing_shinobi_id=outcome.finishingShinobiId;
+  }
+  const projector=getStorySceneBattleResultProjector(returnContext);
+  if (projector) {
+    const projected=projector({
+      outcome:cloneBattleRuntimeValue(outcome),
+      battleId:currentBattle.battleId,
+      encounterId:currentBattle.encounterId,
+      getEvidence:()=>cloneBattleRuntimeValue((currentBattle.runtime&&currentBattle.runtime.evidence)||[]),
+      getRemainingBattlePL:(side,participantId)=>getBattleRemainingPL(side,participantId)
+    });
+    if (projected&&typeof projected==="object") safe.authored=cloneBattleRuntimeValue(projected);
+  }
+  return safe;
+}
+
+function resumeStorySceneFromBattle(returnContext) {
+  if (!returnContext||returnContext.type!=="story_scene") return {success:false,reason:"story_return_context_missing"};
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==returnContext.sceneId||active.instanceId!==returnContext.sceneInstanceId) {
+    return {success:false,reason:"story_return_instance_mismatch"};
+  }
+  const safeResult=createObserverSafeStoryBattleResult(returnContext);
+  if (!safeResult) return {success:false,reason:"story_battle_result_missing"};
+  currentBattle.observerSafeResultContext=cloneBattleRuntimeValue(safeResult);
+  active.battleResume=cloneProgressionData(safeResult);
+  active.pendingBattle=null;
+
+  const outcome=safeResult.outcome;
+  const nextBeatId=returnContext.postBattleBeatId||(outcome==="victory"?returnContext.victoryBeatId:returnContext.defeatBeatId)||null;
+  if (!nextBeatId) return {success:false,reason:"story_post_battle_continuation_missing"};
+  const definition=getActiveStorySceneDefinition();
+  if (!definition||!definition.beatMap.has(nextBeatId)) return {success:false,reason:"story_post_battle_beat_missing"};
+  active.beatId=nextBeatId;
+  const entered=processStorySceneConsequenceRequests(definition.beatMap.get(nextBeatId).onEnterConsequences,"enter");
+  if (!entered.success) return entered;
+  currentBattle.returnContext=null;
+  savePlayerData();
+  saveTestState();
+  openOverlay("story_scene");
+  return {success:true,type:"story_scene_resumed",beatId:nextBeatId,result:cloneProgressionData(safeResult)};
+}
+
+function resumeBattleCallerAfterCompletion(outcomeType=null) {
+  const returnContext=currentBattle.returnContext&&typeof currentBattle.returnContext==="object"?cloneBattleRuntimeValue(currentBattle.returnContext):null;
+  if (!returnContext) return {success:false,reason:"battle_return_context_absent"};
+  if (returnContext.type==="story_scene") return resumeStorySceneFromBattle(returnContext);
+  return {success:false,reason:"battle_return_context_type_unhandled",type:returnContext.type||null,outcomeType};
+}
+
+function advanceStoryScene(choiceId=null) {
+  const active=getActiveStorySceneRuntime();
+  const beat=getCurrentStorySceneBeat();
+  if (!active||!beat) return {success:false,reason:"story_scene_not_active"};
+  if (beat.mode==="choice") {
+    if (!choiceId) return {success:false,reason:"story_choice_required"};
+    return applyStorySceneChoice(choiceId);
+  }
+  if (beat.mode==="battle_transition") return launchStorySceneBattle();
+  const consequences=processStorySceneConsequenceRequests(beat.onAdvanceConsequences,"advance");
+  if (!consequences.success) return consequences;
+  if (beat.exitScene===true||!beat.nextBeatId) return completeStoryScene({reason:"scene_terminal_beat"});
+  return setStorySceneBeat(beat.nextBeatId);
+}
+
+function resumeStorySceneReturnContext(returnContext) {
+  if (!returnContext||typeof returnContext!=="object") {
+    const overlay=document.getElementById("screen-overlay");
+    if (overlay) overlay.style.display="none";
+    currentOverlayType=null;
+    return {success:true,type:"overlay_closed"};
+  }
+  switch (returnContext.type) {
+    case "region_hotspot":
+      if (!returnContext.regionKey||!worldRegions[returnContext.regionKey]) return {success:false,reason:"story_return_region_missing"};
+      openRegionHub(returnContext.regionKey);
+      if (returnContext.hotspotId) {
+        selectedHotspotId=returnContext.hotspotId;
+        selectedOpportunityId=returnContext.opportunityId||null;
+        renderRegionHubUI(returnContext.regionKey,worldRegions[returnContext.regionKey]);
+      }
+      return {success:true,type:"region_hotspot"};
+    case "overlay":
+      if (!returnContext.overlayType) return {success:false,reason:"story_return_overlay_missing"};
+      openOverlay(returnContext.overlayType);
+      return {success:true,type:"overlay",overlayType:returnContext.overlayType};
+    case "region":
+      if (!returnContext.regionKey) return {success:false,reason:"story_return_region_missing"};
+      openRegionHub(returnContext.regionKey);
+      return {success:true,type:"region"};
+    case "none":
+      return {success:true,type:"none"};
+    default:
+      if (typeof returnContext.resolve==="function") return returnContext.resolve({playerData,currentBattle})||{success:false,reason:"story_return_resolver_no_result"};
+      return {success:false,reason:"story_return_context_unhandled"};
+  }
+}
+
+function completeStoryScene(options={}) {
+  const state=ensureStorySceneRuntimeState();
+  const active=state.active;
+  const definition=active?getStorySceneDefinition(active.sceneId):null;
+  if (!active||!definition) return {success:false,reason:"story_scene_not_active"};
+  if (active.pendingBattle) return {success:false,reason:"story_scene_battle_pending"};
+  const completion=processStorySceneConsequenceRequests(definition.onCompleteConsequences,"complete");
+  if (!completion.success) return completion;
+  const returnContext=active.returnContext?cloneProgressionData(active.returnContext):null;
+  const receipt={success:true,type:"story_scene_complete",sceneId:active.sceneId,instanceId:active.instanceId,reason:options.reason||"complete"};
+  state.active=null;
+  savePlayerData();
+  const returned=resumeStorySceneReturnContext(returnContext);
+  saveTestState();
+  return {...receipt,returnResult:returned};
+}
+
+function exitActiveStoryScene(options={}) {
+  const active=getActiveStorySceneRuntime();
+  const beat=getCurrentStorySceneBeat();
+  if (!active) return {success:false,reason:"story_scene_not_active"};
+  if (active.pendingBattle) return {success:false,reason:"story_scene_battle_pending"};
+  if (beat&&beat.allowPresentationClose!==true&&options.force!==true) {
+    return {success:false,reason:"story_scene_close_not_authored"};
+  }
+  const returnContext=active.returnContext?cloneProgressionData(active.returnContext):null;
+  ensureStorySceneRuntimeState().active=null;
+  savePlayerData();
+  const returned=resumeStorySceneReturnContext(returnContext);
+  saveTestState();
+  return {success:true,type:"story_scene_exited",returnResult:returned};
+}
+
+function escapeStorySceneHTML(value) {
+  return String(value==null?"":value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function renderStorySceneOverlay(container) {
+  if (!container) return false;
+  const model=createStorySceneObserverSafeProjection();
+  if (!model) {
+    container.innerHTML='<div style="padding:24px;color:#d7c8aa;">No active authored story scene.</div>';
+    return false;
+  }
+  const speaker=model.speaker_name||model.speaker_source_id||"";
+  const modeLabel=model.mode.replace(/_/g," ").toUpperCase();
+  const postBattle=model.post_battle_context;
+  const choiceButtons=model.mode==="choice"
+    ? model.choices.map(choice=>`<button type="button" onclick="advanceStoryScene('${escapeStorySceneHTML(choice.choice_id)}')" ${choice.available?'':'disabled'} style="display:block;width:100%;margin-top:8px;padding:10px 12px;text-align:left;">${escapeStorySceneHTML(choice.label)}${!choice.available&&choice.known_blocker?` — ${escapeStorySceneHTML(choice.known_blocker)}`:''}</button>`).join("")
+    : "";
+  const actionButton=model.mode==="battle_transition"&&model.battle_transition
+    ? `<button type="button" onclick="advanceStoryScene()" ${model.battle_transition.available?'':'disabled'} style="margin-top:14px;padding:10px 18px;">${escapeStorySceneHTML(model.battle_transition.action_label)}</button>`
+    : (model.mode!=="choice"?`<button type="button" onclick="advanceStoryScene()" style="margin-top:14px;padding:10px 18px;">${model.has_next?'CONTINUE':'CONTINUE'}</button>`:"");
+  const closeAllowed=(getCurrentStorySceneBeat()&&getCurrentStorySceneBeat().allowPresentationClose===true);
+
+  container.innerHTML=`
+    <section class="story-scene-runtime" data-scene-id="${escapeStorySceneHTML(model.scene_id)}" data-beat-id="${escapeStorySceneHTML(model.beat_id)}" data-mode="${escapeStorySceneHTML(model.mode)}" style="position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:70vh;padding:28px;background:radial-gradient(circle at 50% 30%,rgba(37,48,61,.36),rgba(4,8,13,.94));color:#eadfc9;">
+      <div style="max-width:900px;margin:0 auto;width:100%;background:rgba(5,9,14,.93);border:1px solid rgba(201,158,72,.62);box-shadow:0 18px 60px rgba(0,0,0,.52);padding:20px 22px;">
+        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+          <div>
+            ${model.title?`<div style="color:#d5aa55;letter-spacing:.12em;font-size:12px;">${escapeStorySceneHTML(model.title)}</div>`:""}
+            <div style="opacity:.62;font-size:10px;letter-spacing:.14em;margin-top:3px;">${escapeStorySceneHTML(modeLabel)}</div>
+          </div>
+          ${closeAllowed?'<button type="button" onclick="exitActiveStoryScene({reason:\'ui_close\'})" aria-label="Close scene">✕</button>':''}
+        </div>
+        ${speaker?`<div style="margin-top:18px;color:${model.mode==='internal_voice'?'#c896ff':'#6fd8e8'};font-weight:700;letter-spacing:.08em;">${escapeStorySceneHTML(speaker)}${model.mode==='internal_voice'?' · INTERNAL':''}</div>`:""}
+        <div style="margin-top:10px;font-size:16px;line-height:1.6;white-space:pre-wrap;">${escapeStorySceneHTML(model.text)}</div>
+        ${postBattle?`<div style="margin-top:12px;padding:8px 10px;border:1px solid rgba(255,255,255,.12);font-size:11px;opacity:.8;">BATTLE RESULT: ${escapeStorySceneHTML(String(postBattle.outcome||'resolved').toUpperCase())}</div>`:""}
+        ${choiceButtons}
+        ${actionButton}
+        ${model.feedback_receipt?`<div style="margin-top:12px;color:#d6b66a;font-size:11px;">${escapeStorySceneHTML(model.feedback_receipt.label)}</div>`:""}
+      </div>
+    </section>`;
+  return true;
+}
+
+// =========================================================
+// BRICKS 743–748 — STORY SCENE / BATTLE / KNOWLEDGE REGRESSION
+// =========================================================
+function runAlphaStorySceneRuntimeDiagnostics() {
+  const diagnosticSceneId="diagnostic_story_scene_runtime";
+  unregisterStoryScene(diagnosticSceneId);
+  const registered=registerStoryScene({
+    sceneId:diagnosticSceneId,
+    title:"Diagnostic Scene",
+    participants:[{sourceId:"diagnostic_actor",physicalPresence:true}],
+    beats:[
+      {beatId:"internal",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},text:"Internal source test.",nextBeatId:"choice"},
+      {beatId:"choice",mode:"choice",text:"Choose.",choices:[
+        {choiceId:"legal",label:"Legal",availability:()=>true,nextBeatId:"battle"},
+        {choiceId:"hidden_blocked",label:"Blocked",availability:()=>({available:false,knownBlocker:null}),nextBeatId:"battle"}
+      ]},
+      {beatId:"battle",mode:"battle_transition",text:"Battle.",battle:{enemyId:"scout",encounterId:"diagnostic_scene_encounter",victoryBeatId:"post",defeatBeatId:"post",postBattleBeatId:"post"}},
+      {beatId:"post",mode:"post_battle",text:"After Battle.",exitScene:true}
+    ]
+  });
+  const definition=getStorySceneDefinition(diagnosticSceneId);
+  const internal=definition&&definition.beatMap.get("internal");
+  const choice=definition&&definition.beatMap.get("choice");
+  const blocked=choice&&choice.choices.find(item=>item.choiceId==="hidden_blocked");
+  const blockedProjection=blocked?evaluateStorySceneChoiceAvailability(blocked):null;
+  const emptyRuntime=createDefaultStorySceneRuntimeState();
+  const sourceCode=[createDefaultStorySceneRuntimeState,createStorySceneObserverSafeProjection,processStorySceneConsequenceRequest,resumeStorySceneFromBattle].map(fn=>fn.toString()).join("\n");
+  const savedBattleProjectionState={
+    outcome:currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null,
+    battleId:currentBattle.battleId,encounterId:currentBattle.encounterId,completedAt:currentBattle.completedAt
+  };
+  currentBattle.outcome={type:"victory",committed:true,completedAt:12345,finishingShinobiId:"hidden_finisher"};
+  currentBattle.battleId="diagnostic_battle";
+  currentBattle.encounterId="diagnostic_encounter";
+  currentBattle.completedAt=12345;
+  const defaultBattleProjection=createObserverSafeStoryBattleResult({type:"story_scene",sceneId:"missing_projector_scene",sourceBeatId:"missing",exposeFinisher:false});
+  currentBattle.outcome=savedBattleProjectionState.outcome;
+  currentBattle.battleId=savedBattleProjectionState.battleId;
+  currentBattle.encounterId=savedBattleProjectionState.encounterId;
+  currentBattle.completedAt=savedBattleProjectionState.completedAt;
+  const routerSource=routeWorldOpportunityInteraction.toString();
+  const victorySource=continueAfterVictory.toString();
+  const defeatSource=completeBattleDefeat.toString();
+  const saveSource=saveTestState.toString()+restoreTestState.toString();
+  const startSource=startEncounter.toString();
+  const closeSource=closeOverlay.toString();
+  const result={
+    reusableSceneRegistry:registered.success===true&&!!definition,
+    requiredPresentationModes:["dialogue","internal_voice","narration","choice","battle_transition","post_battle"].every(mode=>STORY_SCENE_PRESENTATION_MODES.includes(mode)),
+    noParallelStoryHistoryStore:!Object.prototype.hasOwnProperty.call(emptyRuntime,"history")&&!Object.prototype.hasOwnProperty.call(emptyRuntime,"chronicle")&&!sourceCode.includes("storySceneHistory"),
+    internalVoiceSourceNotPhysical:!!internal&&internal.speakerRef.sourceId==="nine_tails"&&internal.speakerRef.physicalPresence===false,
+    speakerDoesNotRequireRegistryParticipant:!!internal&&internal.speakerRef.sourceType==="communication_source"&&!normalizeStorySceneSourceRef.toString().includes("getCharacterRegistryEntry"),
+    observerProjectionNoHiddenTruthKeys:!createStorySceneObserverSafeProjection.toString().includes("hiddenTruth")&&!createStorySceneObserverSafeProjection.toString().includes("hiddenPrerequisites"),
+    legalChoicesOnlyCanCommit:applyStorySceneChoice.toString().includes("evaluateStorySceneChoiceAvailability")&&applyStorySceneChoice.toString().includes("story_choice_unavailable"),
+    unknownBlockerCanRemainHidden:!!blockedProjection&&blockedProjection.available===false&&blockedProjection.knownBlocker===null,
+    choiceConsequencesRouteThroughAuthority:applyStorySceneChoice.toString().includes("processStorySceneConsequenceRequests")&&processStorySceneConsequenceRequest.toString().includes("commitCharacterAcquisition"),
+    genericWorldSceneRoute:routerSource.includes('case "story_scene"')&&routerSource.includes("startStoryScene")&&!routerSource.includes('case "story_scene": {\n      const enemy'),
+    battleCallerContextExists:typeof launchBattleWithReturnContext==="function"&&typeof launchStorySceneBattle==="function",
+    ordinaryBattleClearsStaleCaller:startSource.includes("currentBattle.returnContext=null"),
+    victoryReturnsCallerBeforeGenericBattle:victorySource.indexOf("resumeBattleCallerAfterCompletion")<victorySource.lastIndexOf('openOverlay(\n    "battle"'),
+    defeatCanReturnSameScene:defeatSource.includes('returnContext.type === "story_scene"')&&defeatSource.includes("resumeBattleCallerAfterCompletion"),
+    returnContextSaveRestore:saveSource.includes("battleReturnContext")&&saveSource.includes("currentBattle.returnContext"),
+    storyBattleCannotGenericClose:closeSource.includes("Story-scene Battle is still active"),
+    postBattleProjectionDefaultIsMinimal:!!defaultBattleProjection&&Object.keys(defaultBattleProjection).every(key=>["outcome","battle_id","encounter_id","completed_at"].includes(key))&&!Object.prototype.hasOwnProperty.call(defaultBattleProjection,"finishing_shinobi_id")&&!Object.prototype.hasOwnProperty.call(defaultBattleProjection,"evidence"),
+    cePresentationResolverHook:normalizeStorySceneBeat.toString().includes("presentationResolver")&&createStorySceneObserverSafeProjection.toString().includes("beat.presentationResolver"),
+    feedbackReceiptObserverSafe:["receiptId","kind","label","timestamp"].every(key=>Object.prototype.hasOwnProperty.call(normalizeStorySceneFeedbackReceipt({receiptId:"x"}),key)),
+    sceneCurrentStatePersistsInPlayerSave:createDefaultPlayerData.toString().includes("storySceneRuntime")&&loadPlayerData.toString().includes("normalizeStorySceneRuntimeState"),
+    selectionDoesNotBecomeHistoryAutomatically:!startStoryScene.toString().includes("recordBattleChronicle")&&!startStoryScene.toString().includes("activityHistory.push")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  unregisterStoryScene(diagnosticSceneId);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPostDialogue749Diagnostics() {
+  const groups={
+    post728:typeof runAlphaPostMonster728Diagnostics==="function"?runAlphaPostMonster728Diagnostics():{pass:false},
+    storyScene:runAlphaStorySceneRuntimeDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-749 dialogue/story-scene gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
 }
 
@@ -64984,6 +65903,15 @@ function continueAfterVictory() {
 
 
   // =========================================
+  // BRICK 739 — RESUME AUTHORED CALLER AFTER ORDINARY REWARD FLOW
+  // =========================================
+  const callerResume = resumeBattleCallerAfterCompletion("victory");
+  if (callerResume && callerResume.success === true) {
+    return;
+  }
+
+
+  // =========================================
   // SAVE DEVELOPMENT STATE
   // =========================================
 
@@ -75637,6 +76565,14 @@ function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="p
   });
 
   saveTestState();
+
+  // BRICK 740 — Story-owned defeat resumes the same authored caller rather
+  // than silently falling into a generic Battle catalogue. Ordinary Battles
+  // keep their existing behaviour because they have no story returnContext.
+  if (currentBattle.returnContext && currentBattle.returnContext.type === "story_scene") {
+    resumeBattleCallerAfterCompletion("defeat");
+  }
+
   return currentBattle.outcome;
 }
 
@@ -80227,6 +81163,20 @@ function restoreTestState() {
       : null;
 
 
+  currentBattle.returnContext =
+    state.battleReturnContext &&
+    typeof state.battleReturnContext === "object"
+      ? cloneBattleRuntimeValue(state.battleReturnContext)
+      : null;
+
+
+  currentBattle.observerSafeResultContext =
+    state.observerSafeResultContext &&
+    typeof state.observerSafeResultContext === "object"
+      ? cloneBattleRuntimeValue(state.observerSafeResultContext)
+      : null;
+
+
   // =========================================
   // BATTLE POWER
   // =========================================
@@ -80375,6 +81325,12 @@ function restoreTestState() {
       true;
 
 
+    if (currentBattle.returnContext && currentBattle.returnContext.type === "story_scene") {
+      const resumed=resumeBattleCallerAfterCompletion("defeat");
+      if (resumed&&resumed.success===true) return;
+    }
+
+
     if (
       selectedRegionKey
     ) {
@@ -80460,6 +81416,14 @@ function restoreTestState() {
     openRegionHub(
       selectedRegionKey
     );
+    return;
+  }
+
+
+  // BRICK 742 — restore an authored scene from playerData runtime state.
+  if (state.overlayType === "story_scene" && getActiveStorySceneRuntime()) {
+    openOverlay("story_scene");
+    return;
   }
 }
 
