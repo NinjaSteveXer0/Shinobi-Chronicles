@@ -2912,10 +2912,10 @@ const entityRegistry = {
     "baseStats": {
       "nin": 132,
       "tai": 124,
-      "buki": 84,
-      "fuin": 116,
-      "kin": 84,
-      "gen": 38,
+      "buki": 38,
+      "fuin": 84,
+      "kin": 116,
+      "gen": 84,
       "stamina": 148
     },
     "basePL": 138,
@@ -3487,7 +3487,7 @@ function runAlphaProductionRegistryGate() {
     yangKuramaPL:!!getEntityDefinition("yang_kurama")&&Number(getEntityDefinition("yang_kurama").basePL)===122,
     yinKuramaPL:!!getEntityDefinition("yin_kurama")&&Number(getEntityDefinition("yin_kurama").basePL)===122,
     completeKuramaPL:!!complete&&Number(complete.basePL)===138,
-    completeKuramaCanonicalStats:JSON.stringify(completeStats)===JSON.stringify([132,124,84,116,84,38,148]),
+    completeKuramaCanonicalStats:JSON.stringify(completeStats)===JSON.stringify([132,124,38,84,116,84,148]),
     completeRequiresReunionEvidence:!!getCombinedExpressionAuthority("kurama_complete")&&getCombinedExpressionAuthority("kurama_complete").requiresConvergenceEvidence===true,
     historicalPartitionsIntact:!!getEntityDefinition("yang_kurama")&&!!getEntityDefinition("yin_kurama"),
     breakoutNotOrdinarilyAttachable:!!getEntityDefinition("breakout_kurama")&&getEntityDefinition("breakout_kurama").ordinaryAttachmentEligible===false&&!isAttachableSummonEntity(getEntityDefinition("breakout_kurama")),
@@ -5272,6 +5272,12 @@ function normalizeClanFormationConstraint(definition=null) {
   const normalizeSlots=slots=>Array.isArray(slots)
     ? [...new Set(slots.map(Number).filter(slot=>Number.isInteger(slot)&&slot>=1&&slot<=CLAN_TEAM_SLOT_COUNT))]
     : [];
+  const fixedRegistryIdBySlot={};
+  const fixedSource=definition.fixedRegistryIdBySlot&&typeof definition.fixedRegistryIdBySlot==="object"?definition.fixedRegistryIdBySlot:{};
+  Object.entries(fixedSource).forEach(([slotValue,registryId])=>{
+    const slot=Number(slotValue);
+    if (Number.isInteger(slot)&&slot>=1&&slot<=CLAN_TEAM_SLOT_COUNT&&typeof registryId==="string"&&!!getCharacterRegistryEntry(registryId)) fixedRegistryIdBySlot[slot]=registryId;
+  });
   return {
     contextId:typeof definition.contextId==="string"?definition.contextId:"formation_context",
     eligibleRegistryIds:normalizeRegistryIds(definition.eligibleRegistryIds),
@@ -5279,6 +5285,7 @@ function normalizeClanFormationConstraint(definition=null) {
     requiredSlotNumbers:normalizeSlots(definition.requiredSlotNumbers),
     leaderEligibleRegistryIds:normalizeRegistryIds(definition.leaderEligibleRegistryIds),
     leaderSlotNumber:Number.isInteger(Number(definition.leaderSlotNumber))?Number(definition.leaderSlotNumber):null,
+    fixedRegistryIdBySlot,
     source:definition.source||"runtime_authority"
   };
 }
@@ -5321,6 +5328,15 @@ function evaluateClanFormationPlacement(characterId,slotNumber) {
     return {allowed:false,reason:"character_not_eligible_for_formation_context",contextId:constraint.contextId};
   }
 
+  const fixedForSlot=constraint.fixedRegistryIdBySlot&&constraint.fixedRegistryIdBySlot[slot]||null;
+  if (fixedForSlot&&registryId!==fixedForSlot) {
+    return {allowed:false,reason:"formation_slot_fixed",contextId:constraint.contextId};
+  }
+  const fixedSlotForCharacter=constraint.fixedRegistryIdBySlot?Object.entries(constraint.fixedRegistryIdBySlot).find(([,id])=>id===registryId):null;
+  if (fixedSlotForCharacter&&Number(fixedSlotForCharacter[0])!==slot) {
+    return {allowed:false,reason:"character_fixed_to_formation_slot",contextId:constraint.contextId};
+  }
+
   if (constraint.leaderSlotNumber===slot&&constraint.leaderEligibleRegistryIds.length>0&&!constraint.leaderEligibleRegistryIds.includes(registryId)) {
     return {allowed:false,reason:"character_not_eligible_for_leader_slot",contextId:constraint.contextId};
   }
@@ -5336,6 +5352,11 @@ function validateCurrentClanFormationAgainstConstraint() {
   constraint.requiredSlotNumbers.forEach(slotNumber=>{
     const characterId=clan.teamSlots[slotNumber-1]||null;
     if (!characterId) errors.push(`required_slot_empty:${slotNumber}`);
+  });
+  Object.entries(constraint.fixedRegistryIdBySlot||{}).forEach(([slotValue,expectedRegistryId])=>{
+    const slotNumber=Number(slotValue);
+    const characterId=clan.teamSlots[slotNumber-1]||null;
+    if (!characterId||getCharacterRegistryId(characterId)!==expectedRegistryId) errors.push(`fixed_slot_mismatch:${slotNumber}:${expectedRegistryId}`);
   });
   clan.teamSlots.forEach((characterId,index)=>{
     if (!characterId) return;
@@ -5433,13 +5454,19 @@ function revokeCharacterRegistryOwnership(registryId) {
 // BRICK 537 — OWNEDCHARACTER IDENTITY BRIDGE
 // BRICK 538 — ACQUISITIONRECORD IDEMPOTENCY
 // =========================================================
-const CHRONICLE_ORIGIN_VARIANT_IDS = [
+// BRICKS 824–830 — FINAL 10-ORIGIN / ACADEMY TEAM-FORMATION MIGRATION
+const CHRONICLE_ORIGIN_VARIANT_IDS = Object.freeze([
   "academy_hinata",
   "academy_izuno",
   "academy_mirai",
   "academy_menma",
-  "academy_kushina"
-];
+  "academy_kushina",
+  "academy_kurenai",
+  "academy_iwabee",
+  "academy_metal_lee",
+  "academy_kakashi",
+  "academy_obito"
+]);
 
 function createOwnedCharacterIdForVariant(variantId) {
   return variantId&&getCharacterRegistryEntry(variantId)?`owned_character_${variantId}`:null;
@@ -5462,7 +5489,11 @@ function createDefaultAcquisitionState() {
     ninjaIdentityLocked:false,
     onboardingStatus:"chronicle_origin_pending",
     formalRankProgressionByOwnedCharacterId:{},
-    firstTeamFormation:{ unlocked:false, promotionEvidenceIds:[], availableCandidateVariantIds:[] },
+    chronicleOrigin:{variantId:null,ownedCharacterId:null,prologueCompleted:false,completionEvidenceIds:[],activeKonohaEntered:false},
+    academyTeamFormation:{unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],completedAt:null},
+    geninRosterTransition:{unlocked:false,required:false,completed:false,promotionEvidenceIds:[],eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null},
+    // Legacy compatibility only. Production semantics live in academyTeamFormation/geninRosterTransition.
+    firstTeamFormation:{unlocked:false,promotionEvidenceIds:[],availableCandidateVariantIds:[],deprecated:true},
     joninLeadershipAssignment:null,
     migration:{ source:null, preservedVariantIds:[], identitySelectionRequired:false }
   };
@@ -5502,14 +5533,40 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
     ninjaIdentityLocked:source.ninjaIdentityLocked===true,
     onboardingStatus:typeof source.onboardingStatus==="string"?source.onboardingStatus:defaults.onboardingStatus,
     formalRankProgressionByOwnedCharacterId:source.formalRankProgressionByOwnedCharacterId&&typeof source.formalRankProgressionByOwnedCharacterId==="object"?cloneProgressionData(source.formalRankProgressionByOwnedCharacterId):{},
+    chronicleOrigin:source.chronicleOrigin&&typeof source.chronicleOrigin==="object"?{
+      variantId:source.chronicleOrigin.variantId||source.chronicleOriginVariantId||null,
+      ownedCharacterId:source.chronicleOrigin.ownedCharacterId||source.chronicleOriginOwnedCharacterId||null,
+      prologueCompleted:source.chronicleOrigin.prologueCompleted===true,
+      completionEvidenceIds:Array.isArray(source.chronicleOrigin.completionEvidenceIds)?[...new Set(source.chronicleOrigin.completionEvidenceIds.filter(Boolean))]:[],
+      activeKonohaEntered:source.chronicleOrigin.activeKonohaEntered===true
+    }:{...defaults.chronicleOrigin,variantId:source.chronicleOriginVariantId||null,ownedCharacterId:source.chronicleOriginOwnedCharacterId||null},
+    academyTeamFormation:source.academyTeamFormation&&typeof source.academyTeamFormation==="object"?{
+      unlocked:source.academyTeamFormation.unlocked===true,required:source.academyTeamFormation.required===true,completed:source.academyTeamFormation.completed===true,
+      selectedTeammateIds:Array.from({length:2},(_,index)=>{const id=Array.isArray(source.academyTeamFormation.selectedTeammateIds)?source.academyTeamFormation.selectedTeammateIds[index]:null;return CHRONICLE_ORIGIN_VARIANT_IDS.includes(id)?id:null;}),
+      eligibleCandidateVariantIds:Array.isArray(source.academyTeamFormation.eligibleCandidateVariantIds)?[...new Set(source.academyTeamFormation.eligibleCandidateVariantIds.filter(id=>CHRONICLE_ORIGIN_VARIANT_IDS.includes(id)))]:[],
+      completedAt:source.academyTeamFormation.completedAt||null
+    }:defaults.academyTeamFormation,
+    geninRosterTransition:source.geninRosterTransition&&typeof source.geninRosterTransition==="object"?{
+      unlocked:source.geninRosterTransition.unlocked===true,required:source.geninRosterTransition.required===true,completed:source.geninRosterTransition.completed===true,
+      promotionEvidenceIds:Array.isArray(source.geninRosterTransition.promotionEvidenceIds)?[...new Set(source.geninRosterTransition.promotionEvidenceIds.filter(Boolean))]:[],
+      eligibleCandidateVariantIds:Array.isArray(source.geninRosterTransition.eligibleCandidateVariantIds)?[...new Set(source.geninRosterTransition.eligibleCandidateVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
+      selectedReplacementVariantIds:Array.isArray(source.geninRosterTransition.selectedReplacementVariantIds)?[...new Set(source.geninRosterTransition.selectedReplacementVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
+      joninLeaderVariantId:source.geninRosterTransition.joninLeaderVariantId&&getCharacterRegistryEntry(source.geninRosterTransition.joninLeaderVariantId)?source.geninRosterTransition.joninLeaderVariantId:null
+    }:defaults.geninRosterTransition,
     firstTeamFormation:source.firstTeamFormation&&typeof source.firstTeamFormation==="object"?{
       unlocked:source.firstTeamFormation.unlocked===true,
       promotionEvidenceIds:Array.isArray(source.firstTeamFormation.promotionEvidenceIds)?[...new Set(source.firstTeamFormation.promotionEvidenceIds.filter(Boolean))]:[],
-      availableCandidateVariantIds:Array.isArray(source.firstTeamFormation.availableCandidateVariantIds)?[...new Set(source.firstTeamFormation.availableCandidateVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[]
+      availableCandidateVariantIds:Array.isArray(source.firstTeamFormation.availableCandidateVariantIds)?[...new Set(source.firstTeamFormation.availableCandidateVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
+      deprecated:true
     }:defaults.firstTeamFormation,
     joninLeadershipAssignment:source.joninLeadershipAssignment?cloneProgressionData(source.joninLeadershipAssignment):null,
     migration:source.migration&&typeof source.migration==="object"?cloneProgressionData(source.migration):defaults.migration
   };
+  if (!source.geninRosterTransition&&source.firstTeamFormation&&source.firstTeamFormation.unlocked===true) {
+    state.geninRosterTransition.unlocked=true;
+    state.geninRosterTransition.promotionEvidenceIds=[...(state.firstTeamFormation.promotionEvidenceIds||[])];
+    state.geninRosterTransition.eligibleCandidateVariantIds=[...(state.firstTeamFormation.availableCandidateVariantIds||[])];
+  }
   const ownedIds=ownershipState&&Array.isArray(ownershipState.ownedRegistryIds)?ownershipState.ownedRegistryIds:[];
   ownedIds.forEach(variantId=>ensureOwnedCharacterRecord(state,variantId));
   if (options.legacySeedMigration===true&&ownedIds.length>0&&state.records.length===0) {
@@ -5548,6 +5605,7 @@ function getOwnedCharacterRecordById(ownedCharacterId) {
 const ACTIVE_KONOHA_CONTINUITY_ID="active_konoha";
 const HISTORY_SCOPE_KINDS=Object.freeze([
   "representation_source_provenance",
+  "origin_chronicle_occurrence",
   "active_konoha_chronicle_occurrence",
   "shared_history",
   "observer_knowledge",
@@ -5626,7 +5684,9 @@ function commitCharacterAcquisition(definition) {
   const record={
     recordId,recordKey,variantId:definition.variantId,route:definition.route,sourceEventId:definition.sourceEventId,
     timestamp:definition.timestamp||Date.now(),context:definition.context?cloneProgressionData(definition.context):{},
-    historyScope:createHistoryScopeAddress("active_konoha_chronicle_occurrence",{continuityId:ACTIVE_KONOHA_CONTINUITY_ID,occurrenceType:"character_acquisition"}),
+    historyScope:definition.historyScope&&HISTORY_SCOPE_KINDS.includes(definition.historyScope.kind)
+      ? cloneProgressionData(definition.historyScope)
+      : createHistoryScopeAddress("active_konoha_chronicle_occurrence",{continuityId:ACTIVE_KONOHA_CONTINUITY_ID,occurrenceType:"character_acquisition"}),
     provenance:definition.provenance?cloneProgressionData(definition.provenance):{},
     linkedChronicleEvidenceIds:Array.isArray(definition.linkedChronicleEvidenceIds)?[...new Set(definition.linkedChronicleEvidenceIds.filter(Boolean))]:[],
     duplicate:alreadyOwned,
@@ -5668,7 +5728,10 @@ function selectChronicleOrigin(variantId, sourceEventId="onboarding_chronicle_or
   const state=ensurePlayerAcquisitionState();
   if (!CHRONICLE_ORIGIN_VARIANT_IDS.includes(variantId)) return {success:false,reason:"invalid_chronicle_origin"};
   if (state.chronicleOriginVariantId) return {success:false,reason:"chronicle_origin_already_confirmed"};
-  const acquisition=commitCharacterAcquisition({variantId,route:"chronicle_origin",sourceEventId,context:{phase:"academy_opening"},provenance:{authority:"player_onboarding"}});
+  const acquisition=commitCharacterAcquisition({
+    variantId,route:"chronicle_origin",sourceEventId,context:{phase:"origin_prologue"},provenance:{authority:"player_onboarding"},
+    historyScope:createHistoryScopeAddress("origin_chronicle_occurrence",{continuityId:`origin:${variantId}`,originVariantId:variantId,occurrenceType:"protagonist_acquisition"})
+  });
   if (!acquisition.success) return acquisition;
   const ownedCharacter=acquisition.ownedCharacter;
   state.chronicleOriginVariantId=variantId;
@@ -5676,7 +5739,9 @@ function selectChronicleOrigin(variantId, sourceEventId="onboarding_chronicle_or
   state.ninjaIdentityVariantId=variantId;
   state.ninjaIdentityOwnedCharacterId=ownedCharacter.ownedCharacterId;
   state.ninjaIdentityLocked=true;
-  state.onboardingStatus="academy_chronicle";
+  state.chronicleOrigin={variantId,ownedCharacterId:ownedCharacter.ownedCharacterId,prologueCompleted:false,completionEvidenceIds:[],activeKonohaEntered:false};
+  state.academyTeamFormation={unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],completedAt:null};
+  state.onboardingStatus="origin_prologue";
   const runtime=getRuntimeCharacterByRegistryId(variantId);
   if (runtime) {
     playerData.clan=normalizeClanManagementState({teamSlots:[runtime.id,null,null,null,null,null],favoriteIds:(playerData.clan&&playerData.clan.favoriteIds)||[]},playerData.characterOwnership);
@@ -5691,39 +5756,171 @@ function getNinjaIdentityRecord() {
 }
 
 // =========================================================
-// BRICK 547 — GENIN PROMOTION PROGRESSION RECORD
-// BRICK 548 — FIRST TEAM FORMATION UNLOCK / CANDIDATE CONTRACT
+// BRICKS 831–838 — ORIGIN COMPLETION / ACADEMY TEAM FORMATION / GENIN TRANSITION
 // =========================================================
-function recordOwnedCharacterGeninPromotion(ownedCharacterId, evidenceIds=[]) {
+function getAcademyTeamFormationEligibleCandidateVariantIds(originVariantId=ensurePlayerAcquisitionState().chronicleOriginVariantId) {
+  if (!originVariantId||!CHRONICLE_ORIGIN_VARIANT_IDS.includes(originVariantId)) return [];
+  return CHRONICLE_ORIGIN_VARIANT_IDS.filter(id=>id!==originVariantId);
+}
+
+function configureAcademyTeamFormationConstraint() {
+  const state=ensurePlayerAcquisitionState();
+  const originId=state.chronicleOriginVariantId;
+  if (!originId||state.academyTeamFormation.unlocked!==true||state.academyTeamFormation.completed===true) return null;
+  return setActiveClanFormationConstraint({
+    contextId:"academy_team_formation",
+    eligibleRegistryIds:[originId,...getAcademyTeamFormationEligibleCandidateVariantIds(originId)],
+    availableSlotNumbers:[1,2,3],
+    requiredSlotNumbers:[1,2,3],
+    fixedRegistryIdBySlot:{1:originId},
+    source:"academy_team_formation_authority"
+  });
+}
+
+function completeChronicleOriginPrologue(originVariantId,evidenceIds=[]) {
+  const state=ensurePlayerAcquisitionState();
+  if (!originVariantId||state.chronicleOriginVariantId!==originVariantId) return {success:false,reason:"chronicle_origin_mismatch"};
+  const ids=Array.isArray(evidenceIds)?[...new Set(evidenceIds.filter(Boolean))]:[];
+  state.chronicleOrigin={
+    variantId:originVariantId,
+    ownedCharacterId:state.chronicleOriginOwnedCharacterId,
+    prologueCompleted:true,
+    completionEvidenceIds:ids,
+    activeKonohaEntered:true
+  };
+  state.academyTeamFormation={
+    unlocked:true,required:true,completed:false,selectedTeammateIds:[null,null],
+    eligibleCandidateVariantIds:getAcademyTeamFormationEligibleCandidateVariantIds(originVariantId),completedAt:null
+  };
+  state.onboardingStatus="academy_team_formation_required";
+  configureAcademyTeamFormationConstraint();
+  savePlayerData();
+  return {success:true,originVariantId,activeKonohaEntered:true,academyTeamFormationRequired:true};
+}
+
+function getAcademyTeamFormationSnapshot() {
+  const state=ensurePlayerAcquisitionState();
+  const formation=state.academyTeamFormation||createDefaultAcquisitionState().academyTeamFormation;
+  return {
+    originVariantId:state.chronicleOriginVariantId,unlocked:formation.unlocked===true,required:formation.required===true,completed:formation.completed===true,
+    selectedTeammateIds:[...(formation.selectedTeammateIds||[])],eligibleCandidateVariantIds:[...(formation.eligibleCandidateVariantIds||[])],
+    canConfirm:formation.unlocked===true&&formation.completed!==true&&Array.isArray(formation.selectedTeammateIds)&&formation.selectedTeammateIds.filter(Boolean).length===2&&new Set(formation.selectedTeammateIds.filter(Boolean)).size===2
+  };
+}
+
+function selectAcademyTeamFormationTeammate(selectionPosition,variantId) {
+  const state=ensurePlayerAcquisitionState();
+  const formation=state.academyTeamFormation;
+  const position=Number(selectionPosition);
+  if (!formation||formation.unlocked!==true||formation.completed===true) return {success:false,reason:"academy_team_formation_not_selectable"};
+  if (![1,2].includes(position)) return {success:false,reason:"academy_teammate_selection_position_invalid"};
+  if (variantId===state.chronicleOriginVariantId) return {success:false,reason:"chronicle_origin_cannot_be_teammate_selection"};
+  if (!formation.eligibleCandidateVariantIds.includes(variantId)) return {success:false,reason:"academy_teammate_ineligible"};
+  const next=[...(formation.selectedTeammateIds||[])];
+  const otherIndex=position===1?1:0;
+  if (next[otherIndex]===variantId) return {success:false,reason:"academy_teammate_duplicate_selection"};
+  next[position-1]=variantId;
+  formation.selectedTeammateIds=Array.from({length:2},(_,index)=>next[index]||null);
+  savePlayerData();
+  return {success:true,selectionPosition:position,variantId,selectedTeammateIds:[...formation.selectedTeammateIds]};
+}
+
+function clearAcademyTeamFormationTeammate(selectionPosition) {
+  const state=ensurePlayerAcquisitionState();
+  const formation=state.academyTeamFormation;
+  const position=Number(selectionPosition);
+  if (!formation||formation.completed===true||![1,2].includes(position)) return {success:false,reason:"academy_teammate_selection_not_clearable"};
+  const next=[...(formation.selectedTeammateIds||[])];
+  next[position-1]=null;
+  formation.selectedTeammateIds=Array.from({length:2},(_,index)=>next[index]||null);
+  savePlayerData();
+  return {success:true,selectedTeammateIds:[...formation.selectedTeammateIds]};
+}
+
+function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confirmation") {
+  const state=ensurePlayerAcquisitionState();
+  const formation=state.academyTeamFormation;
+  const originId=state.chronicleOriginVariantId;
+  const selected=formation&&Array.isArray(formation.selectedTeammateIds)?formation.selectedTeammateIds.filter(Boolean):[];
+  if (!originId||!state.chronicleOrigin||state.chronicleOrigin.activeKonohaEntered!==true) return {success:false,reason:"active_konoha_not_entered"};
+  if (!formation||formation.unlocked!==true||formation.required!==true||formation.completed===true) return {success:false,reason:"academy_team_formation_not_required"};
+  if (selected.length!==2||new Set(selected).size!==2) return {success:false,reason:"academy_team_requires_exactly_two_distinct_teammates"};
+  if (selected.includes(originId)) return {success:false,reason:"chronicle_origin_cannot_be_teammate_selection"};
+  if (!selected.every(id=>formation.eligibleCandidateVariantIds.includes(id))) return {success:false,reason:"academy_teammate_ineligible"};
+  const snapshot=cloneProgressionData(playerData);
+  try {
+    const acquisitionResults=selected.map((variantId,index)=>{
+      const result=commitCharacterAcquisition({
+        variantId,route:"academy_team_formation",sourceEventId:`${sourceEventId}:slot_${index+2}`,
+        context:{phase:"active_konoha_academy_team_formation",originVariantId:originId,teamSlot:index+2},
+        provenance:{authority:"academy_team_formation_player_selection"}
+      });
+      if (!result.success) throw new Error(result.reason||"academy_teammate_acquisition_failed");
+      materializeProductionRuntimeCharacter(variantId);
+      return result;
+    });
+    const originRuntime=materializeProductionRuntimeCharacter(originId)||getRuntimeCharacterByRegistryId(originId);
+    const teammateRuntimes=selected.map(id=>materializeProductionRuntimeCharacter(id)||getRuntimeCharacterByRegistryId(id));
+    if (!originRuntime||teammateRuntimes.some(runtime=>!runtime)) throw new Error("academy_team_runtime_materialization_failed");
+    playerData.clan=normalizeClanManagementState({teamSlots:[originRuntime.id,teammateRuntimes[0].id,teammateRuntimes[1].id,null,null,null],favoriteIds:(playerData.clan&&playerData.clan.favoriteIds)||[]},playerData.characterOwnership);
+    formation.completed=true;formation.required=false;formation.completedAt=Date.now();
+    state.onboardingStatus="academy_free_play";
+    clearActiveClanFormationConstraint();
+    savePlayerData();
+    rerenderClanOverlay();
+    return {success:true,originVariantId:originId,selectedTeammateIds:selected,teamSlots:[...playerData.clan.teamSlots],acquisitionResults};
+  } catch (error) {
+    playerData=snapshot;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    hydrateOwnedProductionRuntimeCharacters(playerData.characterOwnership);
+    configureAcademyTeamFormationConstraint();
+    savePlayerData();
+    return {success:false,reason:"academy_team_formation_rolled_back",error:String(error&&error.message||error)};
+  }
+}
+
+function isAcademyFreePlayAvailable() {
+  const state=ensurePlayerAcquisitionState();
+  return !!(state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntered===true&&state.academyTeamFormation&&state.academyTeamFormation.completed===true);
+}
+
+function recordOwnedCharacterGeninPromotion(ownedCharacterId,evidenceIds=[]) {
   const state=ensurePlayerAcquisitionState();
   const owned=getOwnedCharacterRecordById(ownedCharacterId);
   if (!owned) return {success:false,reason:"owned_character_missing"};
   const ids=Array.isArray(evidenceIds)?[...new Set(evidenceIds.filter(Boolean))]:[];
   state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]={formalRank:"genin",promotedAt:Date.now(),promotionEvidenceIds:ids};
-  state.firstTeamFormation.unlocked=true;
-  state.firstTeamFormation.promotionEvidenceIds=[...new Set([...(state.firstTeamFormation.promotionEvidenceIds||[]),...ids])];
-  state.onboardingStatus="first_team_formation_available";
+  state.geninRosterTransition.unlocked=true;
+  state.geninRosterTransition.promotionEvidenceIds=[...new Set([...(state.geninRosterTransition.promotionEvidenceIds||[]),...ids])];
+  state.onboardingStatus="genin_roster_transition_available";
   savePlayerData();
-  return {success:true,ownedCharacterId,formalRank:"genin",firstTeamFormationUnlocked:true};
+  return {success:true,ownedCharacterId,formalRank:"genin",geninRosterTransitionUnlocked:true};
 }
 
+function setGeninRosterTransitionAvailableCandidates(variantIds) {
+  const state=ensurePlayerAcquisitionState();
+  state.geninRosterTransition.eligibleCandidateVariantIds=Array.isArray(variantIds)?[...new Set(variantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[];
+  savePlayerData();
+  return [...state.geninRosterTransition.eligibleCandidateVariantIds];
+}
+
+function getGeninRosterTransitionCandidateVariantIds() {
+  const state=ensurePlayerAcquisitionState();
+  return state.geninRosterTransition.unlocked===true?[...(state.geninRosterTransition.eligibleCandidateVariantIds||[])]:[];
+}
+
+// Compatibility wrappers for pre-migration callers. They no longer own first-team semantics.
 function setFirstTeamFormationAvailableCandidates(variantIds) {
-  const state=ensurePlayerAcquisitionState();
-  state.firstTeamFormation.availableCandidateVariantIds=Array.isArray(variantIds)?[...new Set(variantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[];
-  savePlayerData();
-  return [...state.firstTeamFormation.availableCandidateVariantIds];
+  return setGeninRosterTransitionAvailableCandidates(variantIds);
 }
-
 function getFirstTeamFormationCandidateVariantIds() {
-  const state=ensurePlayerAcquisitionState();
-  if (state.firstTeamFormation.unlocked!==true) return [];
-  const owned=playerData.characterOwnership&&Array.isArray(playerData.characterOwnership.ownedRegistryIds)?playerData.characterOwnership.ownedRegistryIds:[];
-  return [...new Set([...owned,...(state.firstTeamFormation.availableCandidateVariantIds||[])])];
+  return getGeninRosterTransitionCandidateVariantIds();
 }
 
 function setJoninLeadershipAssignment(assignment) {
   const state=ensurePlayerAcquisitionState();
   state.joninLeadershipAssignment=assignment?cloneProgressionData(assignment):null;
+  if (state.geninRosterTransition) state.geninRosterTransition.joninLeaderVariantId=assignment&&assignment.variantId&&getCharacterRegistryEntry(assignment.variantId)?assignment.variantId:null;
   savePlayerData();
   return state.joninLeadershipAssignment;
 }
@@ -5737,10 +5934,12 @@ function runAcquisitionV1Diagnostics() {
   const result={
     onePersistentOwnedRecordPerVariant:Object.keys(state.ownedCharactersByVariantId).every(variantId=>state.ownedCharactersByVariantId[variantId].ownedCharacterId===createOwnedCharacterIdForVariant(variantId)),
     ownershipSeparateFromIdentity:typeof state.ninjaIdentityVariantId!=="undefined"&&Array.isArray(ownedIds),
-    originChoicesExactlyFive:CHRONICLE_ORIGIN_VARIANT_IDS.length===5&&new Set(CHRONICLE_ORIGIN_VARIANT_IDS).size===5,
+    originChoicesExactlyTen:CHRONICLE_ORIGIN_VARIANT_IDS.length===10&&new Set(CHRONICLE_ORIGIN_VARIANT_IDS).size===10&&["academy_hinata","academy_izuno","academy_mirai","academy_menma","academy_kushina","academy_kurenai","academy_iwabee","academy_metal_lee","academy_kakashi","academy_obito"].every(id=>CHRONICLE_ORIGIN_VARIANT_IDS.includes(id)),
     noFreshAutoRoster:createDefaultCharacterOwnershipState().ownedRegistryIds.length===0,
     noFreshAutoEntityGrant:createDefaultPlayerEntityState().ownedEntityIds.length===0,
-    firstTeamFormationSeparate:state.firstTeamFormation&&typeof state.firstTeamFormation.unlocked==="boolean",
+    academyFormationSeparate:state.academyTeamFormation&&typeof state.academyTeamFormation.completed==="boolean",
+    geninTransitionSeparate:state.geninRosterTransition&&typeof state.geninRosterTransition.unlocked==="boolean",
+    legacyFirstTeamDeprecated:state.firstTeamFormation&&state.firstTeamFormation.deprecated===true,
     joninAssignmentSeparate:Object.prototype.hasOwnProperty.call(state,"joninLeadershipAssignment")
   };
   result.pass=Object.values(result).every(value=>value===true);
@@ -40062,6 +40261,12 @@ function removeClanCharacterFromTeam(
     );
 
 
+  const activeConstraint=getActiveClanFormationConstraint();
+  if (slotIndex>=0&&activeConstraint&&activeConstraint.fixedRegistryIdBySlot&&activeConstraint.fixedRegistryIdBySlot[slotIndex+1]===getCharacterRegistryId(characterId)) {
+    return {success:false,reason:"formation_slot_fixed",contextId:activeConstraint.contextId||null};
+  }
+
+
   if (
     slotIndex < 0
   ) {
@@ -41475,6 +41680,10 @@ function commitRecruitmentOpportunity(definition,action) {
 }
 
 function routeWorldOpportunityInteraction(opportunityId,actionId) {
+  const acquisitionState=ensurePlayerAcquisitionState();
+  if (acquisitionState.chronicleOrigin&&acquisitionState.chronicleOrigin.activeKonohaEntered===true&&acquisitionState.academyTeamFormation&&acquisitionState.academyTeamFormation.required===true&&acquisitionState.academyTeamFormation.completed!==true) {
+    return {success:false,reason:"academy_team_formation_required"};
+  }
   const definition=getOpportunityDefinitionIncludingLegacy(opportunityId);
   if (!definition) return {success:false,reason:"opportunity_missing"};
   const action=definition.interactions.find(item=>item.id===actionId);
@@ -42876,6 +43085,87 @@ function runAlphaPost790MonsterDiagnostics() {
 
 
 // =========================================================
+// BRICKS 824–838 — ORIGIN / FORMATION / COMPLETE-KURAMA MIGRATION GATE
+// =========================================================
+function runAlphaOriginTeamFormationRuntimeDiagnostics() {
+  const savedPlayerData=cloneProgressionData(playerData);
+  const savedConstraint=getActiveClanFormationConstraint();
+  const result={};
+  try {
+    playerData.characterOwnership=createDefaultCharacterOwnershipState();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    playerData.acquisition=normalizeAcquisitionState(null,playerData.characterOwnership);
+    playerData.clan=normalizeClanManagementState({teamSlots:[null,null,null,null,null,null],favoriteIds:[]},playerData.characterOwnership);
+    clearActiveClanFormationConstraint();
+
+    const origin=selectChronicleOrigin("academy_menma","diagnostic_origin_selection");
+    const originRecord=origin&&origin.success?ensurePlayerAcquisitionState().records.find(record=>record&&record.variantId==="academy_menma"&&record.route==="chronicle_origin"):null;
+    result.originSelectionAcquiresProtagonistOnly=!!origin&&origin.success===true&&JSON.stringify(playerData.characterOwnership.ownedRegistryIds)===JSON.stringify(["academy_menma"]);
+    result.originHistoryNotActiveKonoha=!!originRecord&&getHistoryScopeAddress(originRecord)&&getHistoryScopeAddress(originRecord).kind==="origin_chronicle_occurrence";
+
+    const completion=completeChronicleOriginPrologue("academy_menma",["diagnostic_origin_completion"]);
+    const formationSnapshot=getAcademyTeamFormationSnapshot();
+    result.originCompletionRequiresFormation=completion.success===true&&formationSnapshot.required===true&&formationSnapshot.completed===false&&formationSnapshot.eligibleCandidateVariantIds.length===9;
+    result.freePlayBlockedBeforeFormation=isAcademyFreePlayAvailable()===false&&routeWorldOpportunityInteraction("diagnostic_missing_opportunity","diagnostic_action").reason==="academy_team_formation_required";
+    result.originCannotSelectItself=selectAcademyTeamFormationTeammate(1,"academy_menma").reason==="chronicle_origin_cannot_be_teammate_selection";
+
+    const secondFirst=selectAcademyTeamFormationTeammate(2,"academy_izuno");
+    const firstSecond=selectAcademyTeamFormationTeammate(1,"academy_hinata");
+    const duplicate=selectAcademyTeamFormationTeammate(2,"academy_hinata");
+    result.twoPositionSelectionStable=secondFirst.success===true&&firstSecond.success===true&&JSON.stringify(getAcademyTeamFormationSnapshot().selectedTeammateIds)===JSON.stringify(["academy_hinata","academy_izuno"]);
+    result.duplicateRejected=duplicate.success===false&&duplicate.reason==="academy_teammate_duplicate_selection";
+
+    const confirmed=confirmAcademyTeamFormation("diagnostic_academy_team");
+    const ownershipAfter=[...(playerData.characterOwnership.ownedRegistryIds||[])].sort();
+    result.confirmAcquiresExactlyChosenTwo=confirmed.success===true&&JSON.stringify(ownershipAfter)===JSON.stringify(["academy_hinata","academy_izuno","academy_menma"].sort());
+    result.exactInitialAcademyTeam=confirmed.success===true&&JSON.stringify(playerData.clan.teamSlots.slice(0,3))===JSON.stringify(["academy_menma","academy_hinata","academy_izuno"])&&playerData.clan.teamSlots.slice(3).every(id=>id===null);
+    result.freePlayAfterFormation=isAcademyFreePlayAvailable()===true&&ensurePlayerAcquisitionState().academyTeamFormation.completed===true;
+
+    const promoted=recordOwnedCharacterGeninPromotion(createOwnedCharacterIdForVariant("academy_menma"),["diagnostic_genin_promotion"]);
+    const finalState=ensurePlayerAcquisitionState();
+    result.geninUnlocksSeparateTransition=promoted.success===true&&finalState.geninRosterTransition.unlocked===true&&finalState.academyTeamFormation.completed===true;
+    result.geninDoesNotOverwriteOrigin=finalState.chronicleOriginVariantId==="academy_menma"&&finalState.chronicleOrigin.variantId==="academy_menma";
+  } catch (error) {
+    result.runtimeExceptionFree=false;
+    result.runtimeError=String(error&&error.message||error);
+  } finally {
+    playerData=savedPlayerData;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    playerData.clan=normalizeClanManagementState(playerData.clan,playerData.characterOwnership);
+    if (savedConstraint) setActiveClanFormationConstraint(savedConstraint); else clearActiveClanFormationConstraint();
+    savePlayerData();
+  }
+  const booleanEntries=Object.entries(result).filter(([,value])=>typeof value==="boolean");
+  result.pass=booleanEntries.length>=10&&booleanEntries.every(([,value])=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaOriginTeamFormationMigrationDiagnostics() {
+  const expectedOrigins=["academy_hinata","academy_izuno","academy_mirai","academy_menma","academy_kushina","academy_kurenai","academy_iwabee","academy_metal_lee","academy_kakashi","academy_obito"];
+  const v2=getCharacterRegistryEntry("naruto_v2");
+  const complete=getEntityDefinition("kurama_complete");
+  const result={
+    exactTenOrigins:JSON.stringify(CHRONICLE_ORIGIN_VARIANT_IDS)===JSON.stringify(expectedOrigins),
+    allOriginsRegistryBacked:expectedOrigins.every(id=>!!getCharacterRegistryEntry(id)),
+    originAcquisitionOnlyExplicitSelection:selectChronicleOrigin.toString().includes("commitCharacterAcquisition")&&!selectChronicleOrigin.toString().includes("CHRONICLE_ORIGIN_VARIANT_IDS.forEach"),
+    academyFormationSeparated:createDefaultAcquisitionState().academyTeamFormation!==undefined&&createDefaultAcquisitionState().geninRosterTransition!==undefined,
+    exactTwoSelectionContract:confirmAcademyTeamFormation.toString().includes("selected.length!==2")&&selectAcademyTeamFormationTeammate.toString().includes("academy_teammate_duplicate_selection"),
+    originExcludedFromTeammates:selectAcademyTeamFormationTeammate.toString().includes("chronicle_origin_cannot_be_teammate_selection"),
+    freePlayGate:isAcademyFreePlayAvailable.toString().includes("academyTeamFormation.completed===true")&&routeWorldOpportunityInteraction.toString().includes("academy_team_formation_required"),
+    geninDoesNotCreateFirstAcademyTeam:recordOwnedCharacterGeninPromotion.toString().includes("geninRosterTransition.unlocked=true")&&!recordOwnedCharacterGeninPromotion.toString().includes("firstTeamFormation.unlocked=true"),
+    independentFormationStates:createDefaultAcquisitionState().academyTeamFormation!==createDefaultAcquisitionState().geninRosterTransition,
+    reusableSixSlotConstraint:configureAcademyTeamFormationConstraint.toString().includes("setActiveClanFormationConstraint")&&configureAcademyTeamFormationConstraint.toString().includes("availableSlotNumbers:[1,2,3]")&&configureAcademyTeamFormationConstraint.toString().includes("fixedRegistryIdBySlot:{1:originId}"),
+    originHistorySeparate:HISTORY_SCOPE_KINDS.includes("origin_chronicle_occurrence")&&selectChronicleOrigin.toString().includes("origin_chronicle_occurrence"),
+    narutoV2SuppressesV1:!!v2&&Array.isArray(v2.suppressesEmbodiedExpressions)&&v2.suppressesEmbodiedExpressions.includes("kurama_v1_naruto")&&activateBattleEffectiveStatePackage.toString().includes("exact_package_suppressed_by_representation")&&ensureDedicatedRepresentationLifecycleState.toString().includes("removeSuppressedBattleEffectiveStateProjectionsForCharacter"),
+    completeKuramaFinalStats:!!complete&&JSON.stringify(ALPHA_CANONICAL_STAT_KEYS.map(key=>Number(complete.baseStats[key])))===JSON.stringify([132,124,38,84,116,84,148])&&complete.basePL===138
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+// =========================================================
 // BRICKS 817–823 — ENTITY / BOSS FINAL ACCEPTANCE GATES
 // =========================================================
 function runAlphaEntityFactoryFinalClosureDiagnostics() {
@@ -42892,8 +43182,8 @@ function runAlphaEntityFactoryFinalClosureDiagnostics() {
     breakoutNotNineTails:getSummonSkillDefinition("breakout_kurama_calamity_rend").sourceEntityId==="breakout_kurama"&&getSummonSkillDefinition("nine_tails_calamity_rend").sourceEntityId==="nine_tails",
     yangNotYin:getSummonSkillDefinition("yang_kurama_maul").sourceEntityId==="yang_kurama"&&getSummonSkillDefinition("yin_kurama_night_rend").sourceEntityId==="yin_kurama",
     completeRequiresReunion:!!complete&&complete.requiresAuthoritativeReunion===true&&complete.manifestationMode==="authoritative_reunion",
-    completeStatsPreserveRegistryAuthority:!!complete&&JSON.stringify([complete.baseStats.nin,complete.baseStats.tai,complete.baseStats.buki,complete.baseStats.fuin,complete.baseStats.kin,complete.baseStats.gen,complete.baseStats.stamina])===JSON.stringify([132,124,84,116,84,38,148]),
-    combatHandoffStatConflictNotSilentlyApplied:!!complete&&complete.baseStats.buki===84&&complete.baseStats.fuin===116&&complete.baseStats.kin===84&&complete.baseStats.gen===38,
+    completeStatsPreserveRegistryAuthority:!!complete&&JSON.stringify([complete.baseStats.nin,complete.baseStats.tai,complete.baseStats.buki,complete.baseStats.fuin,complete.baseStats.kin,complete.baseStats.gen,complete.baseStats.stamina])===JSON.stringify([132,124,38,84,116,84,148]),
+    completeKuramaFinalDisciplineAssignment:!!complete&&complete.baseStats.buki===38&&complete.baseStats.fuin===84&&complete.baseStats.kin===116&&complete.baseStats.gen===84,
     rashomonSuccessfulOrderOwnsPayoff:TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES["3>2>1"]==="Ruined Gate Cataclysm"&&getSummonSkillDefinition("triple_rashomon_ruined_gate_cataclysm").preparedSelectable===false,
     cleanupNotHistoryRollback:(getSummonSkillDefinition("key_gero_recoil_purge").traits||[]).includes("history_rollback_forbidden"),
     entityPLNeverTransferred:attemptBattleSummonSkill.toString().includes("entityPLTransfer:false")
@@ -42936,6 +43226,18 @@ function runAlphaPost823MonsterDiagnostics() {
   };
   const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-823 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaPost838MonsterDiagnostics() {
+  const groups={
+    post823:runAlphaPost823MonsterDiagnostics(),
+    originTeamMigration:runAlphaOriginTeamFormationMigrationDiagnostics(),
+    originTeamRuntime:runAlphaOriginTeamFormationRuntimeDiagnostics(),
+    acquisition:runAcquisitionV1Diagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-838 monster gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
 }
 
@@ -66526,9 +66828,22 @@ function initializeBattleSourcePackageRuntime() {
 // BRICK 509 — COERCIVE BUFFER SOURCE REMOVAL / EXPIRY
 // BRICK 566 — STAGED-REPRESENTATION RUNTIME MIGRATION
 // =========================================================
+function removeSuppressedBattleEffectiveStateProjectionsForCharacter(actor,reason="representation_stage_suppression") {
+  if (!actor) return [];
+  const suppressedIds=getCharacterSuppressedEmbodiedExpressionIds(actor);
+  if (suppressedIds.length===0) return [];
+  const active=getBattleParticipantEffectiveStateProjections("player",actor.id);
+  const removed=[];
+  active.filter(projection=>projection&&suppressedIds.includes(projection.exactPackageId)).forEach(projection=>{
+    removed.push(...removeBattleEffectiveStateProjection(projection.projectionKey,"player",actor.id,reason));
+  });
+  return removed;
+}
+
 function ensureDedicatedRepresentationLifecycleState(actor) {
   if (!actor) return null;
   const registryId=getCharacterRegistryId(actor);
+  removeSuppressedBattleEffectiveStateProjectionsForCharacter(actor);
   if (registryId==="baryon_mode") {
     const existing=findBattleTransientState({stateKey:"baryon_mode_lifecycle",targetSide:"player",targetParticipantId:actor.id});
     if (existing) return existing;
@@ -81885,7 +82200,7 @@ function runCompleteKuramaRuntimeBoundaryDiagnostics() {
     hostedRepresentationAddressable:!!getHostedEntityDefinition("kurama_complete"),
     authoritativeReunionOnly:!!entity&&entity.manifestationMode==="authoritative_reunion"&&entity.requiresAuthoritativeReunion===true,
     notOrdinarySummon:!!entity&&!isAttachableSummonEntity(entity),
-    independentCalibration:!!entity&&entity.basePL===138&&JSON.stringify(ALPHA_CANONICAL_STAT_KEYS.map(key=>Number(entity.baseStats[key])))===JSON.stringify([132,124,84,116,84,38,148]),
+    independentCalibration:!!entity&&entity.basePL===138&&JSON.stringify(ALPHA_CANONICAL_STAT_KEYS.map(key=>Number(entity.baseStats[key])))===JSON.stringify([132,124,38,84,116,84,148]),
     descriptorDoesNotCreateParticipant:getCombinedExpressionRuntimeDescriptor.toString().includes("independentBattleParticipantCreated:false"),
     noConstituentProjection:getCombinedExpressionRuntimeDescriptor.toString().includes("projectConstituentPackagesIntoComplete:false"),
     noEntityPLMerge:getCombinedExpressionRuntimeDescriptor.toString().includes("mergeEntityPL:false")
