@@ -73259,6 +73259,7 @@ registerFactoryBatch([
 // =========================================================
 // BRICK 684 — COMBAT ALPHA ORDINARY PALETTE CLOSURE
 // BRICK 690 — FINAL COMBAT ORDINARY PALETTE CLOSURE WAVE CORRECTION
+// BRICK 691 — FACTORY BATCH 5 FINAL EXECUTION SEMANTICS
 // FINAL / LOCKED Combat authority. Exact IDs only.
 // =========================================================
 registerFactoryBatch([
@@ -73310,17 +73311,17 @@ registerFactoryBatch([
   makeFactoryFixedDamageSkill("kage_naruto_shadow_clone_assault","kage_naruto",48,{primaryDiscipline:"Ninjutsu",traits:["clone_count_not_packet_count"]}),
   makeFactoryFixedDamageSkill("kage_naruto_massive_rasengan","kage_naruto",62,{primaryDiscipline:"Ninjutsu"}),
   makeFactoryFixedDamageSkill("kage_naruto_rasenshuriken","kage_naruto",76,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:38,authoredMaximumPreStaminaContinuation:114}}),
-  makeFactoryCategoricalSkill("kage_naruto_clone_interposition","kage_naruto",{targetMode:"self",actionClass:"defensive_technique",traits:["clone_construct_not_participant","no_percentage_scalar"],informationBoundary:"categorical_interposition_only"}),
+  {id:"kage_naruto_clone_interposition",ownerRegistryId:"kage_naruto",primaryDiscipline:null,targetMode:"self",actionClass:"defensive_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["one_use_clone_interposition_opportunity","clone_construct_not_participant","no_percentage_scalar","incoming_action_history_preserved"],requirements:[],state:{stateKey:"kage_naruto_clone_interposition_ready",reapplication:"refresh_replace",consumeOn:"qualifying_incoming_action",remainingCharges:1,expiry:"consumed_or_battle_cleanup"}},
   makeFactoryCategoricalSkill("kage_naruto_sage_sensory_read","kage_naruto",{targetMode:"current_enemy",traits:["legitimate_sage_sensory_information","no_omniscience","no_generic_accuracy"],informationBoundary:"categorical_sage_sensory_evidence_only"}),
 
-  makeFactoryFixedDamageSkill("kage_sarada_inferno_fireball","kage_sarada",64,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("kage_sarada_inferno_fireball","kage_sarada",64,{primaryDiscipline:"Ninjutsu",conditionalRider:{kind:"ordinary_burning",qualificationRequired:true,automatic:false}}),
   makeFactoryFixedDamageSkill("kage_sarada_chidori_breakthrough","kage_sarada",70,{primaryDiscipline:"Ninjutsu"}),
   makeFactoryFixedDamageSkill("kage_sarada_chakra_enhanced_impact","kage_sarada",72,{primaryDiscipline:"Taijutsu",traits:["damage_does_not_imply_stun_displacement_guard_break"]}),
   makeFactoryFixedDamageSkill("kage_sarada_lightning_shuriken_convergence","kage_sarada",56,{primaryDiscipline:"Bukijutsu",traits:["projectile_count_not_packet_count"]}),
   makeFactoryCategoricalSkill("kage_sarada_sharingan_read","kage_sarada",{targetMode:"current_enemy",requirements:[{kind:"embodied_expression",expressionId:"mangekyo_sharingan_sarada"}],traits:["observable_evidence_only","no_invented_signature_technique"],informationBoundary:"categorical_sharingan_observation_only"}),
 
   makeFactoryFixedDamageSkill("shisui_body_flicker_assault","shisui",60,{primaryDiscipline:"Taijutsu",traits:["body_flicker_is_technique_not_speed_stat"]}),
-  makeFactoryFixedDamageSkill("shisui_great_fireball","shisui",55,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("shisui_great_fireball","shisui",55,{primaryDiscipline:"Ninjutsu",conditionalRider:{kind:"ordinary_burning",qualificationRequired:true,automatic:false}}),
   makeFactoryDynamicControlSkill("shisui_ocular_genjutsu","shisui","Genjutsu",{semanticClass:"illusory_bind",conditionKey:"illusory_bind",conditionType:"genjutsu_bind",requirements:[{kind:"embodied_expression",expressionId:"mangekyo_sharingan_shisui"}]}),
   makeFactoryFixedDamageSkill("shisui_flicker_shuriken_convergence","shisui",50,{primaryDiscipline:"Bukijutsu",traits:["one_authored_packet"]}),
   makeFactoryCategoricalSkill("shisui_afterimage_feint","shisui",{targetMode:"current_enemy",actionClass:"setup_technique",traits:["afterimages_not_participants","perception_targeting_interaction"],informationBoundary:"categorical_afterimage_evidence_only"}),
@@ -77465,6 +77466,7 @@ function executeEnemyAuthoredActionOpportunity() {
 // =========================================================
 // BRICK 689 — COMBAT ALPHA CONTENT CLOSURE DIAGNOSTIC
 // BRICK 690 — FINAL ORDINARY PALETTE CLOSURE WAVE REGRESSION
+// BRICK 691 — FACTORY BATCH 5 FINAL SEMANTIC REGRESSION
 // =========================================================
 function runAlphaCombatContentClosureDiagnostics() {
   const ordinary=runOrdinaryProductionPaletteDiagnostics();
@@ -77489,6 +77491,11 @@ function runAlphaCombatContentClosureDiagnostics() {
   const narutoFeint=getClosureWaveBattleSkillDefinition("genin_naruto_transformation_feint","genin_naruto");
   const mitsukiSub=getClosureWaveBattleSkillDefinition("chunin_mitsuki_snake_substitution","chunin_mitsuki");
   const ebisuSub=getClosureWaveBattleSkillDefinition("sj_ebisu_substitution_drill","sj_ebisu");
+  const kageNarutoInterposition=getClosureWaveBattleSkillDefinition("kage_naruto_clone_interposition","kage_naruto");
+  const kageSaradaFireball=getClosureWaveBattleSkillDefinition("kage_sarada_inferno_fireball","kage_sarada");
+  const shisuiFireball=getClosureWaveBattleSkillDefinition("shisui_great_fireball","shisui");
+  const shisuiOcular=getClosureWaveBattleSkillDefinition("shisui_ocular_genjutsu","shisui");
+  const teenNagatoReceiver=getClosureWaveBattleSkillDefinition("teen_nagato_black_receiver_bind","teen_nagato");
   const result={
     ordinaryCharacters49:ordinary.ordinaryCharacters===true,
     ordinaryPreparedSlots245:ordinary.ordinaryPreparedSlots===true,
@@ -77516,6 +77523,18 @@ function runAlphaCombatContentClosureDiagnostics() {
     substitutionContextsOneUse:
       !!mitsukiSub&&mitsukiSub.state&&mitsukiSub.state.stateKey==="snake_substitution_ready"&&mitsukiSub.state.remainingCharges===1&&
       !!ebisuSub&&ebisuSub.state&&ebisuSub.state.remainingCharges===1,
+    batch5CloneInterpositionOneUse:
+      !!kageNarutoInterposition&&kageNarutoInterposition.resolutionKind==="transient_state"&&
+      kageNarutoInterposition.state&&kageNarutoInterposition.state.stateKey==="kage_naruto_clone_interposition_ready"&&
+      kageNarutoInterposition.state.remainingCharges===1&&kageNarutoInterposition.state.consumeOn==="qualifying_incoming_action",
+    batch5FireRidersQualificationOnly:
+      !!kageSaradaFireball&&kageSaradaFireball.conditionalRider&&kageSaradaFireball.conditionalRider.kind==="ordinary_burning"&&kageSaradaFireball.conditionalRider.automatic===false&&
+      !!shisuiFireball&&shisuiFireball.conditionalRider&&shisuiFireball.conditionalRider.kind==="ordinary_burning"&&shisuiFireball.conditionalRider.automatic===false,
+    batch5ShisuiExactIllusoryBind:
+      !!shisuiOcular&&shisuiOcular.resolutionKind==="dynamic_control"&&shisuiOcular.conditionKey==="illusory_bind",
+    batch5TeenNagatoReceiverConditionalRestraint:
+      !!teenNagatoReceiver&&teenNagatoReceiver.fixedAttackPL===42&&teenNagatoReceiver.conditionalRider&&
+      teenNagatoReceiver.conditionalRider.type==="physical_restraint"&&teenNagatoReceiver.conditionalRider.automaticFromDamage===false,
     kikaichuSourceOnly:shinoRefs.length>=2&&shinoRefs.every(ref=>ref.id==="kikaichu_colony"&&ref.role==="causal_participant")&&!Object.prototype.hasOwnProperty.call(entityRegistry,"kikaichu_colony"),
     production102:ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length===17
   };
