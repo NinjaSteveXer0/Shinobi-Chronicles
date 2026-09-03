@@ -1658,6 +1658,68 @@ function getRuntimeCharacterByRegistryId(registryId) {
   ) || null;
 }
 
+
+// =========================================================
+// BRICK 725 — ON-DEMAND PRODUCTION CHARACTER RUNTIME MATERIALIZATION
+// BRICK 726 — OWNERSHIP / SAVE-LOAD RUNTIME HYDRATION
+// =========================================================
+// The Registry owns Character identity, Base Stats and Base PL.
+// The runtime roster is a presentation/execution materialization only.
+// An acquired production Character must not disappear from My Clan merely
+// because it was not one of the original development-pilot bindings.
+// =========================================================
+function getProductionRuntimeDisplayName(registryId) {
+  const record=getCharacterRegistryEntry(registryId);
+  if (record&&typeof record.displayName==="string"&&record.displayName.trim()) return record.displayName.trim();
+  if (record&&typeof record.name==="string"&&record.name.trim()) return record.name.trim();
+  return String(registryId||"").split("_").filter(Boolean).map(part=>part.charAt(0).toUpperCase()+part.slice(1)).join(" ");
+}
+
+function getProductionRuntimeRankLabel(registryId) {
+  const record=getCharacterRegistryEntry(registryId);
+  if (!record) return "";
+  const value=record.formalRank||record.title||record.lifeStage||"";
+  return String(value||"").split("_").filter(Boolean).map(part=>part.charAt(0).toUpperCase()+part.slice(1)).join(" ");
+}
+
+function materializeProductionRuntimeCharacter(registryId) {
+  const existing=getRuntimeCharacterByRegistryId(registryId);
+  if (existing) return existing;
+  if (!Array.isArray(ALPHA_PRODUCTION_CHARACTER_IDS)||!ALPHA_PRODUCTION_CHARACTER_IDS.includes(registryId)) return null;
+  const registry=getCharacterRegistryEntry(registryId);
+  if (!registry||!registry.baseStats) return null;
+  const baseStats=cloneCanonicalSevenStats(registry.baseStats);
+  const runtime={
+    id:registryId,
+    registryId,
+    name:getProductionRuntimeDisplayName(registryId),
+    rank:getProductionRuntimeRankLabel(registryId),
+    basePL:Number(registry.basePL)||0,
+    baseStats,
+    stats:cloneCanonicalSevenStats(baseStats),
+    permanentPLBonus:0,
+    equipment:[],
+    weaponSpecializations:{},
+    abilities:[],
+    image:getCharacterCardAssetPath(registryId),
+    registryMaterializedRuntime:true
+  };
+  playerTeam.push(runtime);
+  return runtime;
+}
+
+function hydrateOwnedProductionRuntimeCharacters(ownershipState=characterOwnershipRuntimeAuthority) {
+  const ids=ownershipState&&Array.isArray(ownershipState.ownedRegistryIds)?ownershipState.ownedRegistryIds:[];
+  const hydrated=[];
+  ids.forEach(registryId=>{
+    if (!ALPHA_PRODUCTION_CHARACTER_IDS.includes(registryId)) return;
+    const before=!!getRuntimeCharacterByRegistryId(registryId);
+    const runtime=materializeProductionRuntimeCharacter(registryId);
+    if (runtime&&!before) hydrated.push(runtime.id);
+  });
+  return {success:true,ownedProductionCount:ids.filter(id=>ALPHA_PRODUCTION_CHARACTER_IDS.includes(id)).length,hydratedRuntimeIds:hydrated};
+}
+
 function characterEmbodiesExactPackage(characterOrId, exactPackageId) {
   const registryId = getCharacterRegistryId(characterOrId);
   const record = getCharacterRegistryEntry(registryId);
@@ -3186,6 +3248,64 @@ const effectiveStatePackageDatabase = {
     "activationOwnership": "dedicated_variant_runtime",
     "expirationOwnership": "battle_runtime",
     "temporaryCapacityOverlay": 6
+  },
+  // =======================================================
+  // BRICK 698 — SPECIAL-REPRESENTATION RUNTIME CONTRIBUTIONS
+  // =======================================================
+  "three_tail_dominion.three_tail_dominion_overrun_focus": {
+    "packageKey": "three_tail_dominion.three_tail_dominion_overrun_focus",
+    "sourceId": "three_tail_dominion",
+    "exactPackageId": "three_tail_dominion_overrun_focus",
+    "defaultExpressionStateId": "next_qualifying_taijutsu_consumer",
+    "classification": "effective_state",
+    "statModifiers": { "tai": 10 },
+    "overlapMode": "replaces",
+    "activationOwnership": "authored_skill_runtime",
+    "expirationOwnership": "qualifying_consumer"
+  },
+  "six_tail_dominion.six_tail_formation_hunt": {
+    "packageKey": "six_tail_dominion.six_tail_formation_hunt",
+    "sourceId": "six_tail_dominion",
+    "exactPackageId": "six_tail_formation_hunt",
+    "defaultExpressionStateId": "formation",
+    "classification": "effective_state",
+    "statModifiers": { "tai": 12 },
+    "overlapMode": "replaces",
+    "activationOwnership": "representation_local_formation",
+    "expirationOwnership": "formation_replacement_or_battle_end"
+  },
+  "six_tail_dominion.six_tail_formation_bastion": {
+    "packageKey": "six_tail_dominion.six_tail_formation_bastion",
+    "sourceId": "six_tail_dominion",
+    "exactPackageId": "six_tail_formation_bastion",
+    "defaultExpressionStateId": "formation",
+    "classification": "effective_state",
+    "statModifiers": { "stamina": 14 },
+    "overlapMode": "replaces",
+    "activationOwnership": "representation_local_formation",
+    "expirationOwnership": "formation_replacement_or_battle_end"
+  },
+  "six_tail_dominion.six_tail_formation_cage": {
+    "packageKey": "six_tail_dominion.six_tail_formation_cage",
+    "sourceId": "six_tail_dominion",
+    "exactPackageId": "six_tail_formation_cage",
+    "defaultExpressionStateId": "formation",
+    "classification": "effective_state",
+    "statModifiers": { "nin": 10 },
+    "overlapMode": "replaces",
+    "activationOwnership": "representation_local_formation",
+    "expirationOwnership": "formation_replacement_or_battle_end"
+  },
+  "kurama_dominion.extinction_core_anchor": {
+    "packageKey": "kurama_dominion.extinction_core_anchor",
+    "sourceId": "kurama_dominion",
+    "exactPackageId": "extinction_core_anchor",
+    "defaultExpressionStateId": "anchored_critical_mass",
+    "classification": "effective_state",
+    "statModifiers": { "stamina": 12 },
+    "overlapMode": "coexists",
+    "activationOwnership": "extinction_core_stage_2",
+    "expirationOwnership": "release_collapse_or_legitimate_interruption"
   },
   "academy_menma.yin_chakra_mantle_academy": {
     "packageKey": "academy_menma.yin_chakra_mantle_academy",
@@ -5261,8 +5381,9 @@ function grantCharacterRegistryOwnership(registryId) {
   const changed=!ids.includes(registryId);
   if (changed) ids.push(registryId);
   setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+  const runtime=materializeProductionRuntimeCharacter(registryId);
   savePlayerData();
-  return {success:true,changed,registryId,runtimeCharacterId:(getRuntimeCharacterByRegistryId(registryId)||{}).id||null};
+  return {success:true,changed,registryId,runtimeCharacterId:runtime?runtime.id:null};
 }
 
 function revokeCharacterRegistryOwnership(registryId) {
@@ -6163,6 +6284,7 @@ function loadPlayerData() {
       parsedData.characterOwnership || (legacySeedMigration ? {ownedRegistryIds:[...LEGACY_ALPHA_SEED_CHARACTER_REGISTRY_IDS]} : null)
     );
     setCharacterOwnershipRuntimeAuthority(characterOwnership);
+    hydrateOwnedProductionRuntimeCharacters(characterOwnership);
     const acquisition = normalizeAcquisitionState(parsedData.acquisition,characterOwnership,{legacySeedMigration});
     return {
       ryo: Number(parsedData.ryo) || 0,
@@ -66517,7 +66639,11 @@ function resolveBattleConditionTick(condition,phase,actionId=null) {
   const expectedPhase=condition.data.tickPhase||null;
   if (expectedPhase!==phase) return null;
   const remaining=Math.max(0,Math.floor(Number(condition.data.remainingTicks)||0));
-  const tickDamage=Math.max(0,Math.round(Number(condition.data.tickDamage)||0));
+  const baseTickDamage=Math.max(0,Math.round(Number(condition.data.tickDamage)||0));
+  const pendingTickBonus=Math.max(0,Math.round(Number(condition.data.pendingTickBonus)||0));
+  const perTickMaximum=Number.isFinite(Number(condition.data.perTickMaximum))?Math.max(0,Math.round(Number(condition.data.perTickMaximum))):null;
+  const tickDamage=perTickMaximum===null?baseTickDamage:Math.min(perTickMaximum,baseTickDamage+pendingTickBonus);
+  if (pendingTickBonus>0) condition.data.pendingTickBonus=0;
   if (remaining<=0||tickDamage<=0) return null;
   const side=condition.targetRef.side;
   const participantId=condition.targetRef.participantId;
@@ -67004,6 +67130,16 @@ function consumeBattleActionOpportunity(
   // mechanics. This permits a successfully used Antidote to remove Poison
   // before its pending end tick. Burning already resolved at opportunity start.
   const endEffects=resolveBattleEndOfActionOpportunityEffects(side,participantId,actionId);
+  const threeTailRegeneration=applyThreeTailEndOpportunityRegeneration(side,participantId,actionId);
+  const blackGoldDeterioration=applyBlackGoldSaturationOpportunityDeterioration(side,participantId,actionId);
+
+  const durationConditions=getBattleParticipantConditions(side,participantId)
+    .filter(condition=>condition.data&&Number.isFinite(Number(condition.data.remainingActionOpportunities)));
+  durationConditions.forEach(condition=>{
+    condition.data.remainingActionOpportunities=Math.max(0,Number(condition.data.remainingActionOpportunities)-1);
+    recordBattleEvidence({eventType:"condition_duration_advanced",actionId,actorRef:createBattleParticipantRef(side,participantId),conditionRefs:[condition.conditionId],sourceRefs:getBattleConditionCausalSourceRefs(condition),data:{conditionKey:condition.conditionKey,remainingActionOpportunities:condition.data.remainingActionOpportunities}});
+    if (condition.data.remainingActionOpportunities<=0) removeBattleCondition(condition.conditionId,{reason:"action_opportunity_duration_expired",actionId,targetRef:createBattleParticipantRef(side,participantId)});
+  });
 
   const expiringConditions=getBattleParticipantConditions(side,participantId)
     .filter(condition=>condition.data&&condition.data.expiry==="next_action_opportunity");
@@ -67019,7 +67155,7 @@ function consumeBattleActionOpportunity(
   advanceBattleActionOpportunityIndex(side,participantId);
   const sovereignOverload=applyKuramaSovereignOverloadOpportunityCost(side,participantId,actionId);
   const representationLifecycle=consumeDedicatedRepresentationLifecycleActionOpportunity(side,participantId,actionId);
-  return {removedConditionIds,endEffects,sovereignOverload,representationLifecycle};
+  return {removedConditionIds,endEffects,threeTailRegeneration,blackGoldDeterioration,sovereignOverload,representationLifecycle};
 }
 
 function cleanupBattleParticipantRuntimeState(
@@ -68001,6 +68137,7 @@ function getSummonSkillSourceRefs(skill,actor) {
 function openBattleSummonActionFamily() {
   if (!currentBattle.active || currentBattle.battleOver) return {success:false,reason:"battle_not_active"};
   const actor=getBattleDeploymentParticipant("player",1);
+  if (actor&&getKuramaDominionExtinctionCoreState(actor)) return {success:false,reason:"extinction_core_commitment_active"};
   const attached=actor ? getBattleAttachedSummon("player",actor.id) : null;
   if (!actor || !attached) return {success:false,reason:"attached_summon_unavailable"};
   const entity=getEntityDefinition(attached.summonId);
@@ -69827,6 +69964,9 @@ function refreshBattleActionRegionPresentation() {
 
 function openBattleItemActionFamily() {
 
+  const committedActor=getBattleDeploymentParticipant("player",1);
+  if (committedActor&&getKuramaDominionExtinctionCoreState(committedActor)) return {success:false,reason:"extinction_core_commitment_active"};
+
   if (
     !currentBattle ||
     !currentBattle.active ||
@@ -70205,8 +70345,8 @@ function selectBattlePreparedSkill(skillId) {
     success:true,
     selectedSkillId:skill.id,
     selectedTargetRef:cloneBattleRuntimeValue(state.selectedTargetRef),
-    branchSelectionRequired:availability.reason==="branch_selection_required",
-    availableModes:skill.availableModes? [...skill.availableModes] : Object.keys(skill.modes||{})
+    branchSelectionRequired:availability.reason==="branch_selection_required"||battleSkillRequiresCurrentModeSelection(skill,actor),
+    availableModes:getBattlePreparedSkillAvailableModes(skill,actor)
   };
 }
 
@@ -70229,8 +70369,9 @@ function setSelectedBattleSkillMode(mode) {
   if (!state.selectedSkillId) return {success:false,reason:"skill_not_selected"};
   const actor=getBattleDeploymentParticipant("player",1);
   const skill=actor?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
-  if (!skill||skill.requiresExplicitModeSelection!==true) return {success:false,reason:"skill_mode_selection_not_required"};
-  const availableModes=Array.isArray(skill.availableModes)?skill.availableModes:Object.keys(skill.modes||{});
+  if (!skill) return {success:false,reason:"skill_missing"};
+  const availableModes=getBattlePreparedSkillAvailableModes(skill,actor);
+  if (availableModes.length===0) return {success:false,reason:"skill_mode_selection_not_required"};
   if (!availableModes.includes(mode)) return {success:false,reason:"invalid_skill_mode",availableModes:[...availableModes]};
   state.selectedSkillOptions={...(state.selectedSkillOptions||{}),mode};
   refreshBattleActionRegionPresentation();
@@ -70239,6 +70380,10 @@ function setSelectedBattleSkillMode(mode) {
 
 function cancelSelectedBattleSkill() {
   const state=syncBattleActionRegionState();
+  const actor=getBattleDeploymentParticipant("player",1);
+  if (actor&&isKuramaDominionExtinctionCoreCommitted(actor)) {
+    return {success:false,reason:"committed_release_cannot_cancel",actionOpportunityConsumed:false,actionEnvelopeCreated:false};
+  }
   const cancelledSkillId=state.selectedSkillId||null;
   state.selectedSkillId=null;
   state.selectedTargetRef=null;
@@ -70269,11 +70414,12 @@ function confirmSelectedBattleSkill() {
   const skill=actor?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
   if (!actor||!skill) return {success:false,reason:"skill_or_actor_missing"};
 
-  if (skill.requiresExplicitModeSelection===true && !(state.selectedSkillOptions&&state.selectedSkillOptions.mode)) {
+  const requiredModes=getBattlePreparedSkillAvailableModes(skill,actor);
+  if (requiredModes.length>0 && !(state.selectedSkillOptions&&state.selectedSkillOptions.mode)) {
     return {
       success:false,
       reason:"branch_selection_required",
-      availableModes:Array.isArray(skill.availableModes)?[...skill.availableModes]:Object.keys(skill.modes||{})
+      availableModes:requiredModes
     };
   }
 
@@ -70320,6 +70466,8 @@ function openBattleSkillsActionFamily() {
 }
 
 function invokeBattleWithdrawAction() {
+  const actor=getBattleDeploymentParticipant("player",1);
+  if (actor&&getKuramaDominionExtinctionCoreState(actor)) return {success:false,reason:"extinction_core_commitment_active"};
   const state=syncBattleActionRegionState();
   state.selectedSkillId=null;
   state.selectedTargetRef=null;
@@ -70827,7 +70975,7 @@ function getBattleUISkillPalettePresentation(actor) {
     if (mantleActive) return {skillIds:[...transformed],source:"transformation_palette",fifthSlotUnavailable:transformed[4]===null};
   }
   const special=getSpecialRepresentationPreparedSkillIds(actor);
-  if (special.length>0) return {skillIds:special,source:"special_representation_contract",ordinaryFiveSkillLifecycle:false,authoredSpecialPalette:true,fifthSlotUnavailable:special.length<5,missingExactPreparedSlots:Math.max(0,5-special.length)};
+  if (special.length>0) return {skillIds:special,source:"special_representation_contract",ordinaryFiveSkillLifecycle:false,authoredSpecialPalette:true,authoredPackageSize:special.length,intentionalUnusedOrdinarySockets:Math.max(0,5-special.length),missingExactPreparedSlots:0};
   const production=getProductionPreparedSkillIds(actor);
   if (production.length>0) return {skillIds:production,source:"production_factory_palette",fifthSlotUnavailable:production.length<5,missingExactPreparedSlots:Math.max(0,5-production.length)};
   const registryId=getCharacterRegistryId(actor);
@@ -72892,6 +73040,75 @@ registerFactoryBatch([
 ]);
 
 const SPECIAL_REPRESENTATION_PREPARED_SKILL_PALETTES = {
+  black_sun_himawari:[
+    "black_sun_himawari_gentle_fist","black_sun_himawari_tenketsu_lock",
+    "black_sun_himawari_black_sun_flare","black_sun_himawari_black_sun_guard"
+  ],
+  serpent_ascendant:[
+    "serpent_ascendant_fang","serpent_ascendant_ascendant_coil",
+    "serpent_ascendant_venom_torrent","serpent_ascendant_shed_skin"
+  ],
+  sakura_resonance:[
+    "sakura_resonance_resonant_impact","sakura_resonance_chakra_pulse","sakura_resonance_guard"
+  ],
+  sakura_manifestation:[
+    "sakura_manifestation_manifested_arm_crush","sakura_manifestation_manifested_grasp",
+    "sakura_manifestation_breaker_wave","sakura_manifestation_mantle_guard"
+  ],
+  sakura_avatar:[
+    "sakura_avatar_avatar_cataclysm","sakura_avatar_crushing_grasp","sakura_avatar_avatar_breaker","sakura_avatar_avatar_wall"
+  ],
+  shikamaru_resonance_yang:[
+    "shikamaru_resonance_yang_sunshadow_bind","shikamaru_resonance_yang_radiant_shadow_strike","shikamaru_resonance_yang_resonance_guard"
+  ],
+  shikamaru_manifestation_yang:[
+    "shikamaru_manifestation_yang_manifested_shadow_claw","shikamaru_manifestation_yang_solar_shadow_prison",
+    "shikamaru_manifestation_yang_manifestation_barrage","shikamaru_manifestation_yang_living_rampart"
+  ],
+  shikamaru_avatar_yang:[
+    "shikamaru_avatar_yang_solar_beast_cannon","shikamaru_avatar_yang_avatar_shadow_prison",
+    "shikamaru_avatar_yang_solar_shadow_cataclysm","shikamaru_avatar_yang_avatar_rampart"
+  ],
+  shikamaru_resonance_yin:[
+    "shikamaru_resonance_yin_eclipse_shadow_bind","shikamaru_resonance_yin_nightshadow_rend","shikamaru_resonance_yin_nightveil_eclipse_mark"
+  ],
+  shikamaru_manifestation_yin:[
+    "shikamaru_manifestation_yin_eclipse_shadow_claw","shikamaru_manifestation_yin_umbra_seal_prison",
+    "shikamaru_manifestation_yin_nightshadow_lattice","shikamaru_manifestation_yin_eclipse_guard"
+  ],
+  shikamaru_avatar_yin:[
+    "shikamaru_avatar_yin_eclipse_beast_cannon","shikamaru_avatar_yin_black_moon_prison",
+    "shikamaru_avatar_yin_nightfall_cataclysm","shikamaru_avatar_yin_voidveil"
+  ],
+  tobirama_resonance:[
+    "tobirama_resonance_resonant_tidal_sever","tobirama_resonance_seal_lattice",
+    "tobirama_resonance_water_wall","tobirama_resonance_flying_raijin_intercept"
+  ],
+  tobirama_manifestation:[
+    "tobirama_manifestation_tidal_lance","tobirama_manifestation_formula_cage",
+    "tobirama_manifestation_flying_raijin_strike","tobirama_manifestation_water_bastion"
+  ],
+  tobirama_avatar:[
+    "tobirama_avatar_ocean_cataclysm","tobirama_avatar_formula_prison",
+    "tobirama_avatar_flying_raijin_breaker","tobirama_avatar_tidal_wall"
+  ],
+  stolen_chakra:[
+    "stolen_chakra_rending_lunge","stolen_chakra_chakra_burst","stolen_chakra_chakra_claw","stolen_chakra_seal_brace"
+  ],
+  coercive_cloak:[
+    "coercive_cloak_rending_lunge","coercive_cloak_chakra_claw","coercive_cloak_tailed_beast_rasengan","coercive_cloak_seal_braced_guard"
+  ],
+  three_tail_dominion:[
+    "three_tail_tail_swipe","three_tail_rending_pursuit","three_tail_dominion_roar","three_tail_foxwall","three_tail_dominion_overrun"
+  ],
+  six_tail_dominion:[
+    "six_tail_mauling_torrent","six_tail_beast_cannon","six_tail_dominion_cage","six_tail_bastion_of_wrath","six_tail_furnace_break"
+  ],
+  black_gold_naruto:[
+    "black_gold_naruto_dominion_chains","black_gold_naruto_chakra_burst","black_gold_naruto_atomic_rasenshuriken",
+    "black_gold_naruto_forbidden_seal_jutsu_devourer","black_gold_naruto_tailed_beast_necrosis"
+  ],
+  kurama_dominion:["kurama_dominion_extinction_core"],
   kurama_sovereign:[
     "kurama_sovereign_chains_of_the_sovereign",
     "kurama_sovereign_atomic_core",
@@ -72899,6 +73116,13 @@ const SPECIAL_REPRESENTATION_PREPARED_SKILL_PALETTES = {
     "kurama_sovereign_black_sun_dominion",
     "kurama_sovereign_usurpers_execution"
   ]
+};
+
+const SPECIAL_REPRESENTATION_WIDER_SKILL_PALETTES = {
+  kurama_dominion:[
+    "kurama_dominion_calamity_pounce","kurama_dominion_calamity_roar","kurama_dominion_nine_pillars","kurama_dominion_tail_citadel"
+  ],
+  kurama_sovereign:["kurama_sovereign_imperial_mantle"]
 };
 
 function getSpecialRepresentationPreparedSkillIds(characterOrId) {
@@ -72919,8 +73143,140 @@ function getSpecialRepresentationPreparedSkillIds(characterOrId) {
 
 function getSpecialRepresentationWiderSkillIds(characterOrId) {
   const registryId=getCharacterRegistryId(characterOrId);
-  return registryId==="kurama_sovereign"?["kurama_sovereign_imperial_mantle"]:[];
+  const ids=registryId&&SPECIAL_REPRESENTATION_WIDER_SKILL_PALETTES[registryId];
+  return Array.isArray(ids)?[...ids]:[];
 }
+
+// =========================================================
+// BRICK 699 — WAVE A: BLACK SUN HIMAWARI / SERPENT ASCENDANT
+// BRICK 700 — WAVE A: SAKURA STAGE FAMILY
+// BRICK 701 — WAVE A: SHIKAMARU YANG STAGE FAMILY
+// BRICK 702 — WAVE A: SHIKAMARU YIN STAGE FAMILY
+// BRICK 703 — WAVE A: TOBIRAMA / SHUKAKU STAGE FAMILY
+// BRICK 706 — WAVE B: STOLEN CHAKRA
+// BRICK 707 — WAVE B: COERCIVE CLOAK PALETTE ALIGNMENT
+// BRICK 708 — WAVE B: THREE-TAIL DOMINION
+// BRICK 710 — WAVE B: SIX-TAIL DOMINION
+// BRICK 712 — WAVE B: BLACK-GOLD NARUTO
+// BRICK 715 — WAVE B: KURAMA DOMINION EXTINCTION CORE
+// BRICK 719 — DOMINION WIDER-REPERTOIRE EXPOSURE GATE
+// =========================================================
+// Dedicated representations use their exact authored package sizes.
+// They are deliberately excluded from PRODUCTION_PREPARED_SKILL_PALETTES.
+// =========================================================
+
+registerFactoryBatch([
+  // ---------------- WAVE A: Black Sun Himawari ----------------
+  makeFactoryFixedDamageSkill("black_sun_himawari_gentle_fist","black_sun_himawari",70,{primaryDiscipline:"Taijutsu",traits:["damage_does_not_imply_tenketsu_shutdown"]}),
+  makeFactoryDynamicControlSkill("black_sun_himawari_tenketsu_lock","black_sun_himawari","Taijutsu",{semanticClass:"tenketsu_lock",conditionKey:"tenketsu_lock",conditionType:"tenketsu_control",durationActionOpportunities:2,blockedActionTraits:[],traits:["not_generic_stun"]}),
+  makeFactoryAreaDamageSkill("black_sun_himawari_black_sun_flare","black_sun_himawari",42,3,{primaryDiscipline:"Ninjutsu",traits:["separate_target_packets","no_shared_excess_pool"]}),
+  makeFactoryRatioGuardSkill("black_sun_himawari_black_sun_guard","black_sun_himawari",0.60,{primaryDiscipline:"Ninjutsu"}),
+
+  // ---------------- WAVE A: Serpent Ascendant ----------------
+  makeFactoryFixedDamageSkill("serpent_ascendant_fang","serpent_ascendant",68,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryDynamicControlSkill("serpent_ascendant_ascendant_coil","serpent_ascendant","Ninjutsu",{semanticClass:"serpent_containment",traits:["not_generic_stun"]}),
+  makeFactoryAreaDamageSkill("serpent_ascendant_venom_torrent","serpent_ascendant",40,3,{primaryDiscipline:"Ninjutsu",traits:["initial_damage_does_not_author_poison_without_exact_branch"]}),
+  {id:"serpent_ascendant_shed_skin",ownerRegistryId:"serpent_ascendant",primaryDiscipline:null,targetMode:"self",actionClass:"cleanup_technique",resolutionKind:"compatible_state_escape",staminaMitigation:null,traits:["categorical","no_scalar","no_battle_pl_restoration","no_injury_heal","history_preserved"],requirements:[]},
+
+  // ---------------- WAVE A: Sakura ----------------
+  makeFactoryFixedDamageSkill("sakura_resonance_resonant_impact","sakura_resonance",72,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryAreaDamageSkill("sakura_resonance_chakra_pulse","sakura_resonance",42,3,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("sakura_resonance_guard","sakura_resonance",0.55,{primaryDiscipline:"Ninjutsu"}),
+
+  makeFactoryFixedDamageSkill("sakura_manifestation_manifested_arm_crush","sakura_manifestation",82,{primaryDiscipline:"Taijutsu",traits:["manifested_geometry_not_participant"]}),
+  makeFactoryDynamicControlSkill("sakura_manifestation_manifested_grasp","sakura_manifestation","Taijutsu",{semanticClass:"manifested_grasp_containment",traits:["manifested_geometry_not_participant","not_generic_stun"]}),
+  makeFactoryAreaDamageSkill("sakura_manifestation_breaker_wave","sakura_manifestation",48,3,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryRatioGuardSkill("sakura_manifestation_mantle_guard","sakura_manifestation",0.60,{primaryDiscipline:"Ninjutsu"}),
+
+  makeFactoryAreaDamageSkill("sakura_avatar_avatar_cataclysm","sakura_avatar",58,3,{primaryDiscipline:"Taijutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:29,requiresCappedExcessResolver:true},traits:["avatar_geometry_not_participant"]}),
+  makeFactoryDynamicControlSkill("sakura_avatar_crushing_grasp","sakura_avatar","Taijutsu",{semanticClass:"avatar_crushing_grasp_containment",traits:["avatar_geometry_not_participant","not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("sakura_avatar_avatar_breaker","sakura_avatar",96,{primaryDiscipline:"Taijutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:48,authoredMaximumPreStaminaContinuation:144,requiresCappedExcessResolver:true},traits:["avatar_geometry_not_participant"]}),
+  makeFactoryRatioGuardSkill("sakura_avatar_avatar_wall","sakura_avatar",0.65,{primaryDiscipline:"Taijutsu"}),
+
+  // ---------------- WAVE A: Shikamaru Yang ----------------
+  makeFactoryDynamicControlSkill("shikamaru_resonance_yang_sunshadow_bind","shikamaru_resonance_yang","Ninjutsu",{semanticClass:"sunshadow_bind",traits:["not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("shikamaru_resonance_yang_radiant_shadow_strike","shikamaru_resonance_yang",64,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("shikamaru_resonance_yang_resonance_guard","shikamaru_resonance_yang",0.55,{primaryDiscipline:"Ninjutsu"}),
+
+  makeFactoryFixedDamageSkill("shikamaru_manifestation_yang_manifested_shadow_claw","shikamaru_manifestation_yang",76,{primaryDiscipline:"Ninjutsu",traits:["manifested_shadow_not_participant"]}),
+  makeFactoryDynamicControlSkill("shikamaru_manifestation_yang_solar_shadow_prison","shikamaru_manifestation_yang","Ninjutsu",{semanticClass:"solar_shadow_prison",traits:["not_generic_stun"]}),
+  makeFactoryAreaDamageSkill("shikamaru_manifestation_yang_manifestation_barrage","shikamaru_manifestation_yang",46,3,{primaryDiscipline:"Ninjutsu",traits:["manifested_shadow_not_participant"]}),
+  makeFactoryRatioGuardSkill("shikamaru_manifestation_yang_living_rampart","shikamaru_manifestation_yang",0.60,{primaryDiscipline:"Ninjutsu"}),
+
+  makeFactoryFixedDamageSkill("shikamaru_avatar_yang_solar_beast_cannon","shikamaru_avatar_yang",92,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:46,authoredMaximumPreStaminaContinuation:138,requiresCappedExcessResolver:true},traits:["avatar_geometry_not_participant"]}),
+  makeFactoryDynamicControlSkill("shikamaru_avatar_yang_avatar_shadow_prison","shikamaru_avatar_yang","Ninjutsu",{semanticClass:"avatar_shadow_prison",maxTargets:3,traits:["avatar_geometry_not_participant","not_generic_stun"]}),
+  makeFactoryAreaDamageSkill("shikamaru_avatar_yang_solar_shadow_cataclysm","shikamaru_avatar_yang",56,3,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:28,requiresCappedExcessResolver:true},traits:["avatar_geometry_not_participant"]}),
+  makeFactoryRatioGuardSkill("shikamaru_avatar_yang_avatar_rampart","shikamaru_avatar_yang",0.65,{primaryDiscipline:"Ninjutsu"}),
+
+  // ---------------- WAVE A: Shikamaru Yin ----------------
+  makeFactoryDynamicControlSkill("shikamaru_resonance_yin_eclipse_shadow_bind","shikamaru_resonance_yin","Fūinjutsu",{semanticClass:"eclipse_shadow_bind",traits:["control_sealing_interaction","not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("shikamaru_resonance_yin_nightshadow_rend","shikamaru_resonance_yin",66,{primaryDiscipline:"Kinjutsu"}),
+  {id:"shikamaru_resonance_yin_nightveil_eclipse_mark",ownerRegistryId:"shikamaru_resonance_yin",primaryDiscipline:"Fūinjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["categorical","no_scalar","does_not_preresolve_bind_attack_belief_or_future_technique"],requirements:[],state:{stateKey:"nightveil_eclipse_mark",reapplication:"refresh_replace",expiry:"consume_invalidate_or_battle_end"}},
+
+  makeFactoryFixedDamageSkill("shikamaru_manifestation_yin_eclipse_shadow_claw","shikamaru_manifestation_yin",76,{primaryDiscipline:"Kinjutsu",traits:["manifested_shadow_not_participant"]}),
+  makeFactoryDynamicControlSkill("shikamaru_manifestation_yin_umbra_seal_prison","shikamaru_manifestation_yin","Fūinjutsu",{semanticClass:"umbra_seal_prison",traits:["not_generic_stun"]}),
+  makeFactoryCategoricalSkill("shikamaru_manifestation_yin_nightshadow_lattice","shikamaru_manifestation_yin",{primaryDiscipline:"Genjutsu",targetMode:"current_enemy",resolverDiscipline:"Genjutsu",traits:["perception_control_interaction","no_hidden_lattice_stat"],informationBoundary:"categorical_perception_control_unless_common_resolver_requires_live_genjutsu"}),
+  makeFactoryRatioGuardSkill("shikamaru_manifestation_yin_eclipse_guard","shikamaru_manifestation_yin",0.60,{primaryDiscipline:"Fūinjutsu"}),
+
+  makeFactoryFixedDamageSkill("shikamaru_avatar_yin_eclipse_beast_cannon","shikamaru_avatar_yin",94,{primaryDiscipline:"Kinjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:47,authoredMaximumPreStaminaContinuation:141,requiresCappedExcessResolver:true},traits:["avatar_geometry_not_participant"]}),
+  makeFactoryDynamicControlSkill("shikamaru_avatar_yin_black_moon_prison","shikamaru_avatar_yin","Fūinjutsu",{semanticClass:"black_moon_prison",maxTargets:3,traits:["not_generic_stun"]}),
+  makeFactoryAreaDamageSkill("shikamaru_avatar_yin_nightfall_cataclysm","shikamaru_avatar_yin",58,3,{primaryDiscipline:"Kinjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:29,requiresCappedExcessResolver:true},traits:["avatar_geometry_not_participant"]}),
+  makeFactoryRatioGuardSkill("shikamaru_avatar_yin_voidveil","shikamaru_avatar_yin",0.65,{primaryDiscipline:"Fūinjutsu"}),
+
+  // ---------------- WAVE A: Tobirama ----------------
+  makeFactoryFixedDamageSkill("tobirama_resonance_resonant_tidal_sever","tobirama_resonance",70,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryDynamicControlSkill("tobirama_resonance_seal_lattice","tobirama_resonance","Fūinjutsu",{semanticClass:"seal_lattice",traits:["not_generic_stun"]}),
+  makeFactoryRatioGuardSkill("tobirama_resonance_water_wall","tobirama_resonance",0.55,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryCategoricalSkill("tobirama_resonance_flying_raijin_intercept","tobirama_resonance",{targetMode:"self",actionClass:"defensive_interception",traits:["ftg_reference_required","incoming_action_history_preserved","no_arbitrary_teleport"],requirements:[{kind:"authored_ftg_mark_reference",scope:"any"}],informationBoundary:"categorical_ftg_defensive_reposition_only"}),
+
+  makeFactoryFixedDamageSkill("tobirama_manifestation_tidal_lance","tobirama_manifestation",80,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryDynamicControlSkill("tobirama_manifestation_formula_cage","tobirama_manifestation","Fūinjutsu",{semanticClass:"formula_cage",traits:["not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("tobirama_manifestation_flying_raijin_strike","tobirama_manifestation",84,{primaryDiscipline:"Ninjutsu",requirements:[{kind:"authored_ftg_mark_reference",scope:"current_target"}],traits:["ftg_reference_required","no_arbitrary_teleport"]}),
+  makeFactoryRatioGuardSkill("tobirama_manifestation_water_bastion","tobirama_manifestation",0.60,{primaryDiscipline:"Ninjutsu"}),
+
+  makeFactoryAreaDamageSkill("tobirama_avatar_ocean_cataclysm","tobirama_avatar",58,3,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:29,requiresCappedExcessResolver:true},traits:["water_geometry_not_participant"]}),
+  makeFactoryDynamicControlSkill("tobirama_avatar_formula_prison","tobirama_avatar","Fūinjutsu",{semanticClass:"formula_prison",maxTargets:3,traits:["not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("tobirama_avatar_flying_raijin_breaker","tobirama_avatar",94,{primaryDiscipline:"Ninjutsu",requirements:[{kind:"authored_ftg_mark_reference",scope:"current_target"}],excess:{eligible:true,capRatio:0.50,absoluteCap:47,authoredMaximumPreStaminaContinuation:141,requiresCappedExcessResolver:true},traits:["ftg_reference_required","no_arbitrary_teleport"]}),
+  makeFactoryRatioGuardSkill("tobirama_avatar_tidal_wall","tobirama_avatar",0.65,{primaryDiscipline:"Ninjutsu"}),
+
+  // ---------------- WAVE B: Stolen Chakra ----------------
+  makeFactoryFixedDamageSkill("stolen_chakra_rending_lunge","stolen_chakra",17,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryFixedDamageSkill("stolen_chakra_chakra_burst","stolen_chakra",18,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("stolen_chakra_chakra_claw","stolen_chakra",16,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("stolen_chakra_seal_brace","stolen_chakra",0.35,{primaryDiscipline:"Fūinjutsu"}),
+
+  // ---------------- WAVE B: Three-Tail ----------------
+  {id:"three_tail_tail_swipe",ownerRegistryId:"three_tail_dominion",primaryDiscipline:"Taijutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.50},staminaMitigation:true,traits:["three_tail_taijutsu_consumer"],requirements:[]},
+  {id:"three_tail_rending_pursuit",ownerRegistryId:"three_tail_dominion",primaryDiscipline:"Taijutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.65},staminaMitigation:true,traits:["three_tail_taijutsu_consumer","movement_dependent_taijutsu"],requirements:[]},
+  {id:"three_tail_dominion_roar",ownerRegistryId:"three_tail_dominion",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.55},staminaMitigation:true,traits:["chakra_dependent"],requirements:[]},
+  {id:"three_tail_foxwall",ownerRegistryId:"three_tail_dominion",primaryDiscipline:"Ninjutsu",targetMode:"self",actionClass:"defensive_technique",resolutionKind:"branch_guard",staminaMitigation:null,traits:["explicit_commitment_branch"],requirements:[],requiresExplicitModeSelection:true,availableModes:["one_tail_commitment","two_tail_commitment"],guardModes:{one_tail_commitment:{preventionRatio:0.25},two_tail_commitment:{preventionRatio:0.45}}},
+  {id:"three_tail_dominion_overrun",ownerRegistryId:"three_tail_dominion",primaryDiscipline:"Taijutsu",targetMode:"self",actionClass:"setup_technique",resolutionKind:"special_effective_state_setup",staminaMitigation:null,traits:["next_qualifying_three_tail_taijutsu_consumer","not_current_growth"],requirements:[],effectiveStateSetup:{sourceId:"three_tail_dominion",exactPackageId:"three_tail_dominion_overrun_focus",expressionStateId:"next_qualifying_taijutsu_consumer",consumerTrait:"three_tail_taijutsu_consumer"}},
+
+  // ---------------- WAVE B: Six-Tail ----------------
+  {id:"six_tail_mauling_torrent",ownerRegistryId:"six_tail_dominion",primaryDiscipline:"Taijutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.65},staminaMitigation:true,traits:["six_tail_taijutsu"]},
+  {id:"six_tail_beast_cannon",ownerRegistryId:"six_tail_dominion",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.85},staminaMitigation:true,traits:["six_tail_chakra_output"],excess:{eligible:true,capRatio:0.50,absoluteCap:34,requiresCappedExcessResolver:true}},
+  makeFactoryDynamicControlSkill("six_tail_dominion_cage","six_tail_dominion","Ninjutsu",{semanticClass:"six_tail_dominion_cage",traits:["not_generic_stun"]}),
+  makeFactoryRatioGuardSkill("six_tail_bastion_of_wrath","six_tail_dominion",0.55,{primaryDiscipline:"Ninjutsu"}),
+  {id:"six_tail_furnace_break",ownerRegistryId:"six_tail_dominion",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.70},staminaMitigation:true,traits:["six_tail_chakra_output"]},
+
+  // ---------------- WAVE B: Black-Gold Naruto ----------------
+  makeFactoryDynamicControlSkill("black_gold_naruto_dominion_chains","black_gold_naruto","Fūinjutsu",{semanticClass:"black_gold_dominion_chains",traits:["chains_are_causal_constructs_not_participants","not_generic_stun"]}),
+  {id:"black_gold_naruto_chakra_burst",ownerRegistryId:"black_gold_naruto",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"direct_damage",damageProfile:{coefficient:0.60},staminaMitigation:true,traits:["chakra_dependent"]},
+  {id:"black_gold_naruto_atomic_rasenshuriken",ownerRegistryId:"black_gold_naruto",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"black_gold_atomic_rasenshuriken",damageProfile:{coefficient:1.00},staminaMitigation:true,traits:["qualifying_atomic_fallout_branch"],excess:{eligible:true,capRatio:0.50,absoluteCap:53,requiresCappedExcessResolver:true},persistentState:{conditionKey:"atomic_fallout",tickDamage:4,maximumTicks:2,tickPhase:"end_of_action_opportunity",bypassStamina:true,reapplication:"refresh",qualificationRequired:true}},
+  {id:"black_gold_naruto_forbidden_seal_jutsu_devourer",ownerRegistryId:"black_gold_naruto",primaryDiscipline:"Fūinjutsu",targetMode:"current_enemy",actionClass:"control_technique",resolutionKind:"black_gold_devourer",staminaMitigation:null,traits:["exact_package_only","no_anatomy_entity_equipment_mastery_knowledge_manufacture"],requirements:[]},
+  {id:"black_gold_naruto_tailed_beast_necrosis",ownerRegistryId:"black_gold_naruto",primaryDiscipline:"Kinjutsu",targetMode:"current_enemy",actionClass:"technique",resolutionKind:"black_gold_necrosis",damageProfile:{coefficient:0.80},staminaMitigation:true,traits:["qualifying_poison_branch"],persistentState:{conditionKey:"poisoned",conditionType:"poison",tickDamage:3,maximumTicks:3,tickPhase:"end_of_action_opportunity",bypassStamina:true,reapplication:"refresh",compatibleCureItemIds:["standard_antidote"],qualificationRequired:true,nextTickAggravationBonus:2,perTickMaximum:5}},
+
+  // ---------------- WAVE B: Kurama Dominion ----------------
+  {id:"kurama_dominion_extinction_core",ownerRegistryId:"kurama_dominion",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"committed_technique",resolutionKind:"kurama_dominion_extinction_core",staminaMitigation:true,traits:["persistent_committed_action","target_not_locked_during_charge","release_not_hit_guarantee"],requirements:[],dynamicRuntimeModes:true},
+
+  // Wider repertoire: registered, but not all production-ready.
+  makeFactoryFixedDamageSkill("kurama_dominion_converge","kurama_dominion",130,{primaryDiscipline:"Ninjutsu",traits:["wider_repertoire","production_unexposed_missing_exact_excess_cap"],excess:{eligible:false,deferredExactCap:true}}),
+  makeFactoryAreaDamageSkill("kurama_dominion_ravage","kurama_dominion",65,3,{primaryDiscipline:"Taijutsu",traits:["wider_repertoire","production_unexposed_missing_exact_excess_cap"]}),
+  makeFactoryFixedDamageSkill("kurama_dominion_calamity_pounce","kurama_dominion",74,{primaryDiscipline:"Taijutsu",traits:["wider_repertoire"]}),
+  makeFactoryAreaDamageSkill("kurama_dominion_calamity_roar","kurama_dominion",65,3,{primaryDiscipline:"Ninjutsu",traits:["wider_repertoire"]}),
+  {id:"kurama_dominion_nine_pillars",ownerRegistryId:"kurama_dominion",primaryDiscipline:"Fūinjutsu",targetMode:"current_enemy",actionClass:"control_technique",resolutionKind:"dynamic_control",staminaMitigation:null,traits:["wider_repertoire","qualifying_damage_branch_41_not_automatic"],requirements:[],dynamicControl:{discipline:"Fūinjutsu",multiplier:1,conditionKey:null,conditionType:null,semanticClass:"nine_pillars_containment",maxTargets:1,durationActionOpportunities:null,blockedActionTraits:[],blanketStun:false},conditionalRider:{kind:"qualifying_damage_branch",authoredAttackPL:41,automatic:false}},
+  makeFactoryRatioGuardSkill("kurama_dominion_tail_citadel","kurama_dominion",0.55,{primaryDiscipline:"Ninjutsu",traits:["wider_repertoire"]})
+]);
 
 // =========================================================
 // BRICK 646 — FIVE ACADEMY PRODUCTION SKILL INGESTION
@@ -73210,9 +73566,25 @@ function getProductionPreparedSkillIds(characterOrId) {
   return Array.isArray(ids)?[...ids]:[];
 }
 
+// =========================================================
+// BRICK 697 — DEDICATED SPECIAL-REPRESENTATION IDENTITY AUTHORITY
+// =========================================================
+const DEDICATED_SPECIAL_REPRESENTATION_IDS = Object.freeze([
+  "black_sun_himawari","serpent_ascendant",
+  "sakura_resonance","sakura_manifestation","sakura_avatar",
+  "shikamaru_resonance_yang","shikamaru_manifestation_yang","shikamaru_avatar_yang",
+  "shikamaru_resonance_yin","shikamaru_manifestation_yin","shikamaru_avatar_yin",
+  "tobirama_resonance","tobirama_manifestation","tobirama_avatar",
+  "stolen_chakra","coercive_cloak","three_tail_dominion","six_tail_dominion",
+  "black_gold_naruto","kurama_dominion","kurama_sovereign","baryon_mode"
+]);
+
 function isDedicatedSpecialRepresentationRecord(record) {
   if (!record) return false;
-  return record.variantType==="dedicated_transformed_variant" || record.representationLifecycle==="special_representation" || record.specialRepresentation===true;
+  return DEDICATED_SPECIAL_REPRESENTATION_IDS.includes(record.id||record.variantId) ||
+    record.variantType==="dedicated_transformed_variant" ||
+    record.representationLifecycle==="special_representation" ||
+    record.specialRepresentation===true;
 }
 
 const ACADEMY_MENMA_MANTLE_PREPARED_SKILLS = [
@@ -74299,6 +74671,27 @@ function attemptBattlePreparedSkill(skillId,targetParticipantId=null,options={})
   return attemptAcademyBattleSkill(skillId);
 }
 
+// =========================================================
+// BRICK 721 — RUNTIME MODE PROJECTION FOR COMMITTED SPECIAL TECHNIQUES
+// =========================================================
+function getBattlePreparedSkillAvailableModes(skill,actor) {
+  if (!skill) return [];
+  if (skill.dynamicRuntimeModes===true && skill.id==="kurama_dominion_extinction_core") {
+    const state=getKuramaDominionExtinctionCoreState(actor);
+    if (!state) return [];
+    const stage=Math.max(1,Math.floor(Number(state.data&&state.data.stage)||1));
+    if (stage===1||stage===2) return ["release","continue"];
+    return [];
+  }
+  return skill.requiresExplicitModeSelection===true
+    ? (Array.isArray(skill.availableModes)?[...skill.availableModes]:Object.keys(skill.modes||{}))
+    : [];
+}
+
+function battleSkillRequiresCurrentModeSelection(skill,actor) {
+  return getBattlePreparedSkillAvailableModes(skill,actor).length>0;
+}
+
 function getBattlePreparedSkillPresentationDescription(skill) {
   if (!skill) return "No Skill selected.";
   const kind=String(skill.resolutionKind||skill.actionClass||"authored_action").replaceAll("_"," ");
@@ -74322,9 +74715,7 @@ function renderBattleSelectedSkillDetails(actor,target) {
   const selectedTarget=state.selectedTargetRef
     ? getBattleParticipantByIdentity(state.selectedTargetRef.side,state.selectedTargetRef.participantId)
     : null;
-  const branchModes=skill.requiresExplicitModeSelection===true
-    ? (Array.isArray(skill.availableModes)?skill.availableModes:Object.keys(skill.modes||{}))
-    : [];
+  const branchModes=getBattlePreparedSkillAvailableModes(skill,actor);
   const selectedMode=state.selectedSkillOptions&&state.selectedSkillOptions.mode||null;
   const modeMarkup=branchModes.length>0
     ? `<div class="battle-live-skill-mode-list">${branchModes.map(mode=>`
@@ -75360,7 +75751,9 @@ function resolveBattleDamagePacket(definition) {
     const capRatio=Math.max(0,Math.min(1,Number(excessContract.capRatio)||0));
     const authoredPrimaryAttackPL=Math.max(0,Math.round(Number(definition.output.attackPL)||0));
     const rawExcess=Math.max(0,Math.round(Number(primary.residualAttackPL)||0));
-    const capAmount=Math.max(0,Math.floor(authoredPrimaryAttackPL*capRatio));
+    const ratioCapAmount=Math.max(0,Math.floor(authoredPrimaryAttackPL*capRatio));
+    const absoluteCap=Number.isFinite(Number(excessContract.absoluteCap))?Math.max(0,Math.floor(Number(excessContract.absoluteCap))):null;
+    const capAmount=absoluteCap===null?ratioCapAmount:Math.min(ratioCapAmount,absoluteCap);
     const cappedExcess=Math.min(rawExcess,capAmount);
     const transition=primary.zeroResult&&primary.zeroResult.type==="withdrawal_queue_advance"?primary.zeroResult:null;
     const continuationTargetId=transition&&transition.replacementParticipantId?transition.replacementParticipantId:null;
@@ -75368,6 +75761,8 @@ function resolveBattleDamagePacket(definition) {
     excessResolution={
       eligible:true,
       capRatio,
+      ratioCapAmount,
+      absoluteCap,
       capAmount,
       rawExcess,
       cappedExcess,
@@ -76077,7 +76472,7 @@ function characterHasActiveBattleExpression(actor,expressionId) {
   );
 }
 
-function isClosureWaveSkillRequirementMet(requirement,actor) {
+function isClosureWaveSkillRequirementMet(requirement,actor,target=null) {
   if (!requirement) return {met:true};
   if (requirement.kind==="registry_capability") return {met:characterHasRegistryCapability(actor,requirement.capabilityId),reason:"registry_capability_missing"};
   if (requirement.kind==="registry_technique_access") return {met:characterHasRegistryCapability(actor,requirement.techniqueId),reason:"exact_technique_access_missing"};
@@ -76109,6 +76504,10 @@ function isClosureWaveSkillRequirementMet(requirement,actor) {
     const actual=context&&context.definition?context.definition[requirement.property]:undefined;
     return {met:!!context&&actual===requirement.value,reason:"required_exact_weapon_property_missing",weaponContext:context};
   }
+  if (requirement.kind==="authored_ftg_mark_reference") {
+    const mark=getAuthoredFtgMarkReference(actor,requirement.scope==="current_target"?target:null);
+    return {met:!!mark,reason:"authored_ftg_mark_reference_missing",mark};
+  }
   return {met:false,reason:"unsupported_requirement"};
 }
 
@@ -76116,12 +76515,23 @@ function evaluateClosureWaveSkillAvailability(skill,actor,target=null) {
   if (!skill||!actor) return {available:false,reason:"missing_skill_or_actor"};
   if (!currentBattle.active||currentBattle.battleOver) return {available:false,reason:"battle_not_active"};
   if (getCharacterRegistryId(actor)!==skill.ownerRegistryId) return {available:false,reason:"wrong_skill_owner"};
+  const registryId=getCharacterRegistryId(actor);
+  const extinctionState=getKuramaDominionExtinctionCoreState(actor);
+  if (registryId==="kurama_dominion"&&extinctionState&&skill.id!=="kurama_dominion_extinction_core") {
+    return {available:false,reason:"extinction_core_commitment_active",committedTechnique:true};
+  }
+  if (registryId==="black_gold_naruto"&&skill.id==="black_gold_naruto_forbidden_seal_jutsu_devourer"&&getBattleParticipantCounterValue("player",actor.id,"seal_saturation")>=3) {
+    return {available:false,reason:"seal_saturation_maximum",sealSaturation:3};
+  }
+  if (skill.resolutionKind==="compatible_state_escape"&&!findSerpentShedSkinCompatibleState(actor)) {
+    return {available:false,reason:"compatible_restraint_or_state_required"};
+  }
   if (skill.targetMode==="current_enemy"&&!target) return {available:false,reason:"no_current_enemy"};
   if (skill.targetMode==="selected_ally"&&(!target||!getBattleRemainingPLRecord("player",target.id))) return {available:false,reason:"valid_deployed_ally_required"};
   const blocked=getBattleBlockingConditions("player",actor.id,skill.actionClass,skill.traits||[]);
   if (blocked.length>0) return {available:false,reason:"blocked_by_condition",blockingConditionIds:blocked.map(condition=>condition.conditionId)};
   for (const requirement of skill.requirements||[]) {
-    const check=isClosureWaveSkillRequirementMet(requirement,actor);
+    const check=isClosureWaveSkillRequirementMet(requirement,actor,target);
     if (!check.met) return {available:false,reason:requirement.label||check.reason,requirement,check};
   }
   return {available:true,reason:null,weaponContext:getClosureWaveSkillWeaponContext(skill,actor),requiresExplicitModeSelection:skill.requiresExplicitModeSelection===true,availableModes:Array.isArray(skill.availableModes)?[...skill.availableModes]:[]};
@@ -76343,7 +76753,7 @@ function resolveFactoryDynamicControl(skill,envelope,actor) {
   const conditionRefs=[];
   if (contract.conditionKey) {
     targetIds.forEach(targetId=>{
-      const applied=upsertBattleCondition({conditionKey:contract.conditionKey,conditionType:contract.conditionType||contract.semanticClass||"authored_control",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:"enemy",targetParticipantId:targetId,reapplication:"refresh",blockedActionTraits:contract.blockedActionTraits||[],data:{semanticClass:contract.semanticClass||null,resolverDiscipline:contract.discipline,resolverStrength:strength,liveEffectiveResolver:true,blanketStun:false,durationActionOpportunities:contract.durationActionOpportunities||null}});
+      const applied=upsertBattleCondition({conditionKey:contract.conditionKey,conditionType:contract.conditionType||contract.semanticClass||"authored_control",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:"enemy",targetParticipantId:targetId,reapplication:"refresh",blockedActionTraits:contract.blockedActionTraits||[],data:{semanticClass:contract.semanticClass||null,resolverDiscipline:contract.discipline,resolverStrength:strength,liveEffectiveResolver:true,blanketStun:false,durationActionOpportunities:contract.durationActionOpportunities||null,remainingActionOpportunities:contract.durationActionOpportunities||null}});
       if (applied.condition) conditionRefs.push(applied.condition.conditionId);
     });
   }
@@ -76650,8 +77060,7 @@ function resolveKuramaSovereignUsurpersExecution(skill,envelope,actor,target,opt
     return {resolved:true,branch:"usurpers_execution_strip",damageApplied:false,consequenceApplied:removed.length>0,stateRefs:[],conditionRefs:[]};
   }
   if (mode==="seal") {
-    const duration=Math.max(0,Math.floor(Number(options.durationActionOpportunities)||0));
-    if (duration<=0) return {resolved:true,branch:"usurpers_execution_seal_duration_missing",damageApplied:false,consequenceApplied:false,reason:"authored_seal_duration_required",stateRefs:[],conditionRefs:[]};
+    const duration=1;
     const state=addBattleTransientState({stateKey:"sovereign_usurper_exact_package_seal",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,ownerRef:{type:"skill",id:skill.id},data:{exactPackageId,suppressesExactRuntimePackage:true,remainingActionOpportunities:duration,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true}});
     return {resolved:!!state,branch:"usurpers_execution_seal",damageApplied:false,consequenceApplied:!!state,stateRefs:state?[state.stateId]:[],conditionRefs:[]};
   }
@@ -76671,7 +77080,301 @@ function resolveKuramaSovereignImperialMantle(skill,envelope,actor) {
   return {resolved:!!state,branch:"imperial_mantle",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[]};
 }
 
+// =========================================================
+// BRICK 704 — AUTHORED FLYING RAIJIN MARK / SIGNIFICANT-REFERENCE BRIDGE
+// =========================================================
+function establishAuthoredFtgMarkReference(definition={}) {
+  const actor=definition.actor||getBattleParticipantByIdentity("player",definition.actorParticipantId);
+  if (!actor) return {success:false,reason:"ftg_actor_missing"};
+  const registryId=getCharacterRegistryId(actor);
+  if (!["tobirama_resonance","tobirama_manifestation","tobirama_avatar"].includes(registryId)) return {success:false,reason:"ftg_representation_not_authorised"};
+  const targetSide=definition.targetSide||null;
+  const targetParticipantId=definition.targetParticipantId||null;
+  const locationRef=definition.locationRef||null;
+  if (!targetParticipantId&&!locationRef) return {success:false,reason:"ftg_mark_reference_target_missing"};
+  const existing=ensureBattleRuntimeState().transientStates.find(state=>state&&state.stateKey==="authored_ftg_mark_reference"&&state.sourceRef&&state.sourceRef.participantId===actor.id&&state.data&&
+    ((targetParticipantId&&state.data.targetSide===targetSide&&state.data.targetParticipantId===targetParticipantId)||(locationRef&&state.data.locationRef===locationRef)));
+  if (existing) return {success:true,idempotent:true,state:existing};
+  const state=addBattleTransientState({
+    stateKey:"authored_ftg_mark_reference",sourceSide:"player",sourceParticipantId:actor.id,
+    targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"significant_reference",id:definition.referenceId||`ftg_mark_${actor.id}`},
+    data:{targetSide,targetParticipantId,locationRef,sourceEventId:definition.sourceEventId||null,significantCausalReference:true,markEstablishmentIsHistoricalOccurrence:true}
+  });
+  return state?{success:true,idempotent:false,state}:{success:false,reason:"ftg_mark_reference_creation_failed"};
+}
+
+function getAuthoredFtgMarkReference(actor,target=null) {
+  if (!actor) return null;
+  return ensureBattleRuntimeState().transientStates.find(state=>{
+    if (!state||state.stateKey!=="authored_ftg_mark_reference"||!state.sourceRef||state.sourceRef.participantId!==actor.id||!state.data) return false;
+    if (!target) return true;
+    const targetSide=getBattleRemainingPLRecord("enemy",target.id)?"enemy":"player";
+    return state.data.targetSide===targetSide&&state.data.targetParticipantId===target.id;
+  })||null;
+}
+
+// =========================================================
+// BRICK 709 — THREE-TAIL END-OF-OPPORTUNITY REGENERATION
+// =========================================================
+function applyThreeTailEndOpportunityRegeneration(side,participantId,actionId) {
+  if (side!=="player") return null;
+  const actor=getBattleParticipantByIdentity(side,participantId);
+  if (!actor||getCharacterRegistryId(actor)!=="three_tail_dominion") return null;
+  const before=getBattleRemainingPL(side,participantId);
+  const maximum=getBattleMaximumPL(side,participantId);
+  if (before<=0||maximum<=0) return {applied:false,reason:"three_tail_not_active_damage_bearing"};
+  const after=Math.min(maximum,before+3);
+  setBattleRemainingPL(side,participantId,after);
+  const restored=after-before;
+  const evidence=recordBattleEvidence({eventType:"three_tail_underlying_battle_pl_regenerated",actionId,actorRef:createBattleParticipantRef(side,participantId),sourceRefs:[{type:"character_registry",id:"three_tail_dominion",role:"dedicated_representation"}],data:{before,after,maximum,restored,underlyingBattlePLOnly:true,temporaryCapacityRestored:false,injuryHealed:false,historicalRollback:false}});
+  return {applied:true,before,after,maximum,restored,evidence};
+}
+
+function consumeThreeTailOverrunFocusIfQualified(actor,skill,envelope) {
+  if (!actor||getCharacterRegistryId(actor)!=="three_tail_dominion"||!(skill.traits||[]).includes("three_tail_taijutsu_consumer")) return null;
+  const key=createEffectiveStateProjectionKey("three_tail_dominion","three_tail_dominion_overrun_focus","next_qualifying_taijutsu_consumer");
+  const projection=getBattleEffectiveStateProjection(key,"player",actor.id);
+  if (!projection) return null;
+  removeBattleEffectiveStateProjection(key,"player",actor.id,"qualifying_three_tail_taijutsu_consumer_completed");
+  return recordBattleEvidence({eventType:"three_tail_overrun_focus_consumed",actionId:envelope&&envelope.actionId||null,actorRef:createBattleParticipantRef("player",actor.id),skillId:skill.id,sourceRefs:[{type:"effective_state",id:"three_tail_dominion_overrun_focus",role:"temporary_effective_taijutsu_source"}],data:{temporaryEffectiveTaijutsu:10,consumedBySkillId:skill.id,currentDevelopmentChanged:false}});
+}
+
+// =========================================================
+// BRICK 711 — SIX-TAIL MUTUALLY EXCLUSIVE FORMATION AUTHORITY
+// =========================================================
+const SIX_TAIL_FORMATION_PACKAGE_IDS = Object.freeze({
+  hunt:"six_tail_formation_hunt",bastion:"six_tail_formation_bastion",cage:"six_tail_formation_cage"
+});
+function setSixTailDominionFormation(actorOrId,mode) {
+  const actor=typeof actorOrId==="object"?actorOrId:getPlayerCharacter(actorOrId);
+  if (!actor||getCharacterRegistryId(actor)!=="six_tail_dominion") return {success:false,reason:"six_tail_representation_required"};
+  const exactPackageId=SIX_TAIL_FORMATION_PACKAGE_IDS[mode]||null;
+  if (!exactPackageId) return {success:false,reason:"invalid_six_tail_formation",availableModes:Object.keys(SIX_TAIL_FORMATION_PACKAGE_IDS)};
+  Object.values(SIX_TAIL_FORMATION_PACKAGE_IDS).forEach(other=>{
+    const key=createEffectiveStateProjectionKey("six_tail_dominion",other,"formation");
+    if (other!==exactPackageId) removeBattleEffectiveStateProjection(key,"player",actor.id,"six_tail_formation_replaced");
+  });
+  return activateBattleEffectiveStatePackage({side:"player",participantId:actor.id,sourceId:"six_tail_dominion",exactPackageId,expressionStateId:"formation",overlapMode:"replaces",overlapPackageKeys:Object.values(SIX_TAIL_FORMATION_PACKAGE_IDS).map(id=>`six_tail_dominion.${id}`),activationOwner:{type:"representation_local_formation",id:mode}});
+}
+
+// =========================================================
+// BRICK 713 — BLACK-GOLD SATURATION / OPPORTUNITY DETERIORATION
+// =========================================================
+function getBlackGoldSealSaturationState(actor) {
+  if (!actor||getCharacterRegistryId(actor)!=="black_gold_naruto") return null;
+  return findBattleTransientState({stateKey:"seal_saturation",targetSide:"player",targetParticipantId:actor.id});
+}
+function addBlackGoldSealSaturation(actor,envelope) {
+  const before=getBattleParticipantCounterValue("player",actor.id,"seal_saturation");
+  const state=upsertBattleParticipantCounterState("player",actor.id,"seal_saturation",1,{type:"skill",id:"black_gold_naruto_forbidden_seal_jutsu_devourer"});
+  if (!state) return null;
+  state.data.value=Math.min(3,Math.max(0,Number(state.data.value)||0));
+  if (before<3&&state.data.value>=3) state.data.saturatedAtActionId=envelope&&envelope.actionId||null;
+  recordBattleEvidence({eventType:"black_gold_seal_saturation_increased",actionId:envelope&&envelope.actionId||null,actorRef:createBattleParticipantRef("player",actor.id),skillId:"black_gold_naruto_forbidden_seal_jutsu_devourer",stateRefs:[state.stateId],data:{before,after:state.data.value,maximum:3,automaticDecay:false}});
+  return state;
+}
+function applyBlackGoldSaturationOpportunityDeterioration(side,participantId,actionId) {
+  if (side!=="player") return null;
+  const actor=getBattleParticipantByIdentity(side,participantId);
+  if (!actor||getCharacterRegistryId(actor)!=="black_gold_naruto") return null;
+  const state=getBlackGoldSealSaturationState(actor);
+  if (!state||!state.data||Number(state.data.value)<3) return null;
+  if (state.data.saturatedAtActionId&&state.data.saturatedAtActionId===actionId) return {applied:false,reason:"saturation_just_reached_this_action"};
+  const before=getBattleRemainingPL("player",actor.id);
+  const after=Math.max(0,before-3);
+  setBattleRemainingPL("player",actor.id,after);
+  recordBattleEvidence({eventType:"black_gold_saturation_underlying_battle_pl_deterioration",actionId,actorRef:createBattleParticipantRef("player",actor.id),sourceRefs:[{type:"state",id:state.stateId,role:"seal_saturation"}],stateRefs:[state.stateId],data:{before,after,loss:before-after,staminaBypassed:true,temporaryCapacityUnaffected:true,automaticDecay:false}});
+  let zeroResult=null;
+  if (after<=0&&getBattleTemporaryCapacity("player",actor.id)<=0) zeroResult=handleBattleParticipantAtZeroPL("player",actor.id,actor,{actionId});
+  return {applied:true,before,after,loss:before-after,zeroResult};
+}
+
+// =========================================================
+// BRICK 714 — BLACK-GOLD AUTHORED PERSISTENT CONDITION HELPERS
+// =========================================================
+function establishBlackGoldPersistentCondition(skill,envelope,actor,target,options={}) {
+  const p=skill&&skill.persistentState||null;
+  if (!p||!target) return null;
+  const qualification=options&&(
+    options.qualifyingPersistentState===true ||
+    (skill.id==="black_gold_naruto_atomic_rasenshuriken"&&options.qualifyingAtomicFallout===true) ||
+    (skill.id==="black_gold_naruto_tailed_beast_necrosis"&&options.qualifyingNecrosisPoison===true)
+  );
+  if (p.qualificationRequired===true&&!qualification) return {condition:null,qualified:false};
+  return upsertBattleCondition({
+    conditionKey:p.conditionKey,conditionType:p.conditionType||"persistent_damage",
+    compatibleCureItemIds:p.compatibleCureItemIds||[],
+    sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,
+    targetSide:"enemy",targetParticipantId:target.id,reapplication:p.reapplication||"refresh",
+    data:{tickDamage:p.tickDamage,maximumTicks:p.maximumTicks,remainingTicks:p.maximumTicks,tickPhase:p.tickPhase,bypassStamina:p.bypassStamina===true,stackMode:"single_stream",nextTickAggravationBonus:p.nextTickAggravationBonus||0,perTickMaximum:p.perTickMaximum||p.tickDamage,establishmentProvenanceLocked:true}
+  });
+}
+function aggravateBlackGoldNecrosisPoison(targetParticipantId,amount=2,sourceRef=null) {
+  const condition=getBattleParticipantConditions("enemy",targetParticipantId).find(c=>c&&c.conditionKey==="poisoned"&&c.establishment&&c.establishment.skillId==="black_gold_naruto_tailed_beast_necrosis");
+  if (!condition||!condition.data) return {success:false,reason:"necrosis_poison_missing"};
+  const bonus=Math.min(2,Math.max(0,Math.round(Number(amount)||0)));
+  condition.data.pendingTickBonus=Math.min(2,Math.max(0,Number(condition.data.pendingTickBonus)||0)+bonus);
+  if (sourceRef) condition.data.aggravationSourceRef=cloneBattleRuntimeValue(sourceRef);
+  return {success:true,conditionId:condition.conditionId,pendingTickBonus:condition.data.pendingTickBonus,hardPerTickMaximum:5};
+}
+
+// =========================================================
+// BRICK 716 — KURAMA DOMINION EXTINCTION CORE PERSISTENT STATE
+// =========================================================
+const KURAMA_DOMINION_EXTINCTION_CORE_STATE_KEY="kurama_dominion_extinction_core_active";
+const KURAMA_DOMINION_EXTINCTION_ANCHOR_KEY=createEffectiveStateProjectionKey("kurama_dominion","extinction_core_anchor","anchored_critical_mass");
+function getKuramaDominionExtinctionCoreState(actor) {
+  if (!actor||getCharacterRegistryId(actor)!=="kurama_dominion"||!currentBattle.active) return null;
+  return findBattleTransientState({stateKey:KURAMA_DOMINION_EXTINCTION_CORE_STATE_KEY,targetSide:"player",targetParticipantId:actor.id});
+}
+function isKuramaDominionExtinctionCoreCommitted(actor) {
+  const state=getKuramaDominionExtinctionCoreState(actor);
+  return !!(state&&state.data&&Number(state.data.stage)>=3&&state.data.committedRelease===true);
+}
+function clearKuramaDominionExtinctionCore(actor,reason="release_or_collapse") {
+  if (!actor) return {removed:false};
+  const state=getKuramaDominionExtinctionCoreState(actor);
+  if (state) removeBattleTransientState(state.stateId);
+  removeBattleEffectiveStateProjection(KURAMA_DOMINION_EXTINCTION_ANCHOR_KEY,"player",actor.id,reason);
+  return {removed:!!state,stateId:state?state.stateId:null,reason};
+}
+function getKuramaDominionExtinctionStageAttackPL(actor,stage) {
+  const effective=getDevelopedEffectiveCharacterStats(actor);
+  const nin=Math.max(0,Number(effective.nin)||0);
+  const coefficient=stage===1?0.75:stage===2?1.00:1.30;
+  return Math.max(1,Math.round(nin*coefficient));
+}
+function getKuramaDominionExtinctionStageContract(stage) {
+  if (stage===1) return {stage:1,capRatio:0.25,absoluteCap:22,maxCollateralRecipients:1};
+  if (stage===2) return {stage:2,capRatio:0.50,absoluteCap:59,maxCollateralRecipients:2};
+  return {stage:3,capRatio:0.75,absoluteCap:115,maxCollateralRecipients:3};
+}
+function getExtinctionCoreCollateralRecipientIds(primaryTargetId,maxRecipients) {
+  const ids=getFactoryActiveTargetIds("enemy",3).filter(id=>id&&id!==primaryTargetId);
+  return ids.slice(0,Math.max(0,Math.min(3,Number(maxRecipients)||0)));
+}
+function resolveExtinctionCoreCollateral(actor,envelope,primaryTargetId,rawExcess,stageContract) {
+  const capped=Math.min(Math.max(0,Math.round(Number(rawExcess)||0)),stageContract.absoluteCap,Math.floor(Math.max(0,Number(stageContract.attackPL)||0)*stageContract.capRatio));
+  const recipients=getExtinctionCoreCollateralRecipientIds(primaryTargetId,stageContract.maxCollateralRecipients);
+  if (capped<=0||recipients.length===0) return {rawExcess,cappedExcess:capped,recipientResults:[],nonRecursive:true};
+  const base=Math.floor(capped/recipients.length),remainder=capped%recipients.length;
+  const recipientResults=recipients.map((targetId,index)=>{
+    const amount=base+(index===0?remainder:0);
+    const output={primaryDiscipline:"Ninjutsu",statKey:"nin",effectivePrimaryDiscipline:null,coefficient:null,branch:"extinction_core_collateral",branchMultiplier:null,authoredPreExecutionMagnitude:amount,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:amount,attackPL:amount,fixedCalibration:true};
+    const damage=resolveBattleDamagePacket({envelope,skill:{id:"kurama_dominion_extinction_core",excess:null},actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:targetId,output,mitigable:true,excess:null,stateRefs:[]});
+    return {targetParticipantId:targetId,assignedAttackPL:amount,damage};
+  });
+  return {rawExcess,cappedExcess:capped,recipientResults,nonRecursive:true,remainderToFirst:true};
+}
+
+// =========================================================
+// BRICK 717 / 718 — EXTINCTION CORE STAGED RELEASE + COLLATERAL
+// =========================================================
+function resolveKuramaDominionExtinctionCore(skill,envelope,actor,target,options={}) {
+  let state=getKuramaDominionExtinctionCoreState(actor);
+  if (!state) {
+    state=addBattleTransientState({stateKey:KURAMA_DOMINION_EXTINCTION_CORE_STATE_KEY,sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"skill",id:skill.id},data:{stage:1,persistentCommittedTechnique:true,targetLocked:false,activationActionId:envelope.actionId,committedRelease:false,ordinaryCancelAvailable:true}});
+    recordBattleEvidence({eventType:"extinction_core_stage_1_formed",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:state?[state.stateId]:[],data:{stage:1,attackCommitted:false,targetLocked:false,nextOpportunityReserved:true}});
+    return {resolved:!!state,branch:"extinction_stage_1_formation",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],stage:1};
+  }
+  const stage=Math.max(1,Math.min(3,Math.floor(Number(state.data&&state.data.stage)||1)));
+  if (stage<3) {
+    const mode=options&&options.mode||null;
+    if (!mode||!["release","continue"].includes(mode)) return {resolved:false,reason:"branch_selection_required",availableModes:["release","continue"]};
+    if (mode==="continue") {
+      if (stage===1) {
+        state.data.stage=2; state.data.anchoredCriticalMass=true; state.data.ordinaryCancelAvailable=true;
+        const anchor=activateBattleEffectiveStatePackage({side:"player",participantId:actor.id,sourceId:"kurama_dominion",exactPackageId:"extinction_core_anchor",expressionStateId:"anchored_critical_mass",activationActionId:envelope.actionId,activationOwner:{type:"skill",id:skill.id}});
+        recordBattleEvidence({eventType:"extinction_core_stage_2_anchored",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:[state.stateId,...(anchor.success&&anchor.projection?[anchor.projection.projectionId]:[])],data:{stage:2,temporaryEffectiveStamina:12,nextOpportunityReserved:true,damageDoesNotEqualInterruption:true}});
+        return {resolved:true,branch:"extinction_continue_stage_2",damageApplied:false,stateRefs:[state.stateId],conditionRefs:[],stage:2};
+      }
+      state.data.stage=3; state.data.committedRelease=true; state.data.ordinaryCancelAvailable=false; state.data.committedAtActionId=envelope.actionId;
+      recordBattleEvidence({eventType:"extinction_core_stage_3_committed",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:[state.stateId],data:{stage:3,automaticNextOpportunityRelease:true,ordinaryCancel:false,ordinaryReconsideration:false,ordinaryDisplacementCannotCancelLaunch:true,specialisedNullificationMayStillInteract:true}});
+      return {resolved:true,branch:"extinction_continue_stage_3_commitment",damageApplied:false,stateRefs:[state.stateId],conditionRefs:[],stage:3,automaticReleasePending:true};
+    }
+  }
+  const releaseStage=stage;
+  const attackPL=getKuramaDominionExtinctionStageAttackPL(actor,releaseStage);
+  const targetNow=getBattleDeploymentParticipant("enemy",1);
+  if (!targetNow) return {resolved:false,reason:"extinction_release_target_missing"};
+  const output={primaryDiscipline:"Ninjutsu",statKey:"nin",effectivePrimaryDiscipline:getDevelopedEffectiveCharacterStats(actor).nin,coefficient:releaseStage===1?0.75:releaseStage===2?1:1.30,branch:`extinction_stage_${releaseStage}_release`,branchMultiplier:1,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,attackPL};
+  const primary=resolveBattleDamagePacket({envelope,skill:{...skill,excess:null},actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:targetNow.id,output,mitigable:true,excess:null,stateRefs:[state.stateId]});
+  if (!primary) return {resolved:false,reason:"extinction_primary_release_failed"};
+  const contract=getKuramaDominionExtinctionStageContract(releaseStage);
+  contract.attackPL=attackPL;
+  const rawExcess=Math.max(0,Number(primary.residualAttackPL)||0);
+  const collateral=resolveExtinctionCoreCollateral(actor,envelope,targetNow.id,rawExcess,contract);
+  recordBattleEvidence({eventType:"extinction_core_released",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:createBattleParticipantRef("enemy",targetNow.id),skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:[state.stateId],data:{stage:releaseStage,attackPL,capRatio:contract.capRatio,absoluteCap:contract.absoluteCap,maxCollateralRecipients:contract.maxCollateralRecipients,rawExcess,cappedCollateralExcess:collateral.cappedExcess,collateralRecipientIds:collateral.recipientResults.map(r=>r.targetParticipantId),collateralOrdinaryStamina:true,collateralNonRecursive:true,targetResolvedAtRelease:true,releaseGuaranteedNotHitGuaranteed:true}});
+  clearKuramaDominionExtinctionCore(actor,"extinction_core_released");
+  return {resolved:true,branch:`extinction_stage_${releaseStage}_release`,damageApplied:true,damage:primary,finalDamage:primary.finalDamage,collateral,stateRefs:[state.stateId],conditionRefs:[],stage:releaseStage};
+}
+
+// =========================================================
+// BRICK 723 — SPECIALIZED RESOLUTION HELPERS
+// =========================================================
+function findSerpentShedSkinCompatibleState(actor) {
+  if (!actor) return null;
+  const conditions=getBattleParticipantConditions("player",actor.id).filter(c=>c&&["physical_restraint","containment","restraint"].includes(c.conditionType));
+  if (conditions.length>0) return {kind:"condition",record:conditions[0]};
+  const states=getBattleTransientStatesForParticipant("player",actor.id).filter(s=>s&&s.data&&(s.data.compatibleWithShedSkin===true||s.data.physicalRestraint===true||s.data.containment===true));
+  return states.length>0?{kind:"state",record:states[0]}:null;
+}
+function resolveSerpentShedSkin(skill,envelope,actor) {
+  const compatible=findSerpentShedSkinCompatibleState(actor);
+  if (!compatible) return {resolved:false,reason:"compatible_restraint_or_state_required"};
+  let removed=false;
+  if (compatible.kind==="condition") removed=!!removeBattleCondition(compatible.record.conditionId,{reason:"serpent_ascendant_shed_skin",actionId:envelope.actionId,removerRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs});
+  else removed=removeBattleTransientState(compatible.record.stateId);
+  recordBattleEvidence({eventType:"serpent_shed_skin_escape",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,data:{removedCompatibleRuntimeState:removed,battlePLRestored:false,injuryHealed:false,historicalEstablishmentErased:false}});
+  return {resolved:removed,branch:"compatible_state_escape",damageApplied:false,stateRefs:[],conditionRefs:[]};
+}
+function resolveSpecialEffectiveStateSetup(skill,envelope,actor) {
+  const setup=skill.effectiveStateSetup||{};
+  if (!setup.sourceId||!setup.exactPackageId) return {resolved:false,reason:"effective_state_setup_contract_missing"};
+  const result=activateBattleEffectiveStatePackage({side:"player",participantId:actor.id,sourceId:setup.sourceId,exactPackageId:setup.exactPackageId,expressionStateId:setup.expressionStateId||"runtime",activationActionId:envelope.actionId,activationOwner:{type:"skill",id:skill.id}});
+  if (!result.success) return {resolved:false,reason:result.reason,result};
+  if (result.projection) result.projection.consumerTrait=setup.consumerTrait||null;
+  return {resolved:true,branch:"special_effective_state_setup",damageApplied:false,stateRefs:result.projection?[result.projection.projectionId]:[],conditionRefs:[],projection:result.projection};
+}
+function resolveBranchGuard(skill,envelope,actor,options={}) {
+  const mode=options&&options.mode||null;
+  const branch=mode&&skill.guardModes&&skill.guardModes[mode];
+  if (!branch) return {resolved:false,reason:"branch_selection_required",availableModes:Object.keys(skill.guardModes||{})};
+  const synthetic={...skill,guard:{stateKey:`${skill.id}:${mode}`,preventionRatio:Number(branch.preventionRatio)||0,attackMultiplier:1-(Number(branch.preventionRatio)||0),oneUse:true}};
+  const state=createRatioGuardState(actor,synthetic,envelope);
+  return {resolved:!!state,branch:mode,damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[]};
+}
+function getTargetExactRuntimePackageCandidates(target) {
+  if (!target) return [];
+  const side=getBattleRemainingPLRecord("enemy",target.id)?"enemy":"player";
+  return getBattleParticipantEffectiveStateProjections(side,target.id).filter(p=>p&&p.exactPackageId).map(p=>p.exactPackageId);
+}
+function resolveBlackGoldDevourer(skill,envelope,actor,target,options={}) {
+  const candidates=getTargetExactRuntimePackageCandidates(target);
+  const exactPackageId=options.exactTargetPackageId||(candidates.length===1?candidates[0]:null);
+  if (!exactPackageId||!candidates.includes(exactPackageId)) return {resolved:false,reason:"eligible_exact_target_package_required",eligibleExactPackageIds:candidates};
+  const live=resolveAuthoredDynamicControlStrength({sourceSide:"player",sourceParticipantId:actor.id,discipline:"Fūinjutsu"});
+  if (!live.success) return {resolved:false,reason:live.reason};
+  const saturation=addBlackGoldSealSaturation(actor,envelope);
+  recordBattleEvidence({eventType:"black_gold_devourer_committed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:saturation?[saturation.stateId]:[],data:{exactPackageId,resolverStrength:live.strength,allSixDisciplinesAddressable:true,bloodlineAnatomyManufactured:false,entityOwnershipManufactured:false,equipmentManufactured:false,masteryManufactured:false,observerKnowledgeManufactured:false,missingRequirementsManufactured:false}});
+  return {resolved:true,branch:"devourer_exact_package_interaction",damageApplied:false,control:{strength:live.strength,exactPackageId},stateRefs:saturation?[saturation.stateId]:[],conditionRefs:[]};
+}
+function resolveBlackGoldDamageWithQualifiedPersistentState(skill,envelope,actor,target,options={}) {
+  const output=calculateClosureWaveSkillAttackOutput({...skill,resolutionKind:"direct_damage"},actor);
+  if (!output) return {resolved:false,reason:"damage_output_unavailable"};
+  const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,excess:skill.excess||null,stateRefs:[]});
+  if (!damage) return {resolved:false,reason:"damage_resolution_failed"};
+  const persistent=establishBlackGoldPersistentCondition(skill,envelope,actor,target,options);
+  return {resolved:true,branch:skill.id==="black_gold_naruto_atomic_rasenshuriken"?"atomic_rasenshuriken":"tailed_beast_necrosis",damageApplied:true,damage,finalDamage:damage.finalDamage,stateRefs:[],conditionRefs:persistent&&persistent.condition?[persistent.condition.conditionId]:[],persistentQualified:!!(persistent&&persistent.condition)};
+}
+
 function resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options={}) {
+  if (skill.resolutionKind==="compatible_state_escape") return resolveSerpentShedSkin(skill,envelope,actor);
+  if (skill.resolutionKind==="special_effective_state_setup") return resolveSpecialEffectiveStateSetup(skill,envelope,actor);
+  if (skill.resolutionKind==="branch_guard") return resolveBranchGuard(skill,envelope,actor,options);
+  if (skill.resolutionKind==="black_gold_devourer") return resolveBlackGoldDevourer(skill,envelope,actor,target,options);
+  if (skill.resolutionKind==="black_gold_atomic_rasenshuriken"||skill.resolutionKind==="black_gold_necrosis") return resolveBlackGoldDamageWithQualifiedPersistentState(skill,envelope,actor,target,options);
+  if (skill.resolutionKind==="kurama_dominion_extinction_core") return resolveKuramaDominionExtinctionCore(skill,envelope,actor,target,options);
   if (skill.resolutionKind==="sovereign_chains") return resolveKuramaSovereignChains(skill,envelope,actor,target,options);
   if (skill.resolutionKind==="sovereign_atomic_core") return resolveKuramaSovereignAtomicCore(skill,envelope,actor);
   if (skill.resolutionKind==="sovereign_atomic_annihilation") return resolveKuramaSovereignAtomicAnnihilation(skill,envelope,actor,target);
@@ -76740,10 +77443,11 @@ function resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options={}
       recordBattleEvidence({eventType:"resolver_local_attack_bonus_consumed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:[output.contextualStateId],data:{bonusAttackPL:output.contextualBonusAttackPL,baseAuthoredAttackPL:output.baseAuthoredAttackPL,finalAuthoredAttackPL:output.attackPL,statModified:false,battlePLModified:false,genericDamageModifier:false}});
     }
     const overdraw=applyCoerciveOverdraw(actor,skill,envelope);
+    const threeTailFocus=consumeThreeTailOverrunFocusIfQualified(actor,skill,envelope);
     const cloneAssist=consumeShadowCloneFormationForSkill(actor,skill);
     if (skill.conditionalRider) recordBattleEvidence({eventType:"conditional_rider_not_automatically_resolved",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,data:{rider:cloneBattleRuntimeValue(skill.conditionalRider),damageSuccessDoesNotImplyRiderSuccess:true}});
     if (skill.excess&&skill.excess.eligible===true) recordBattleEvidence({eventType:"capped_excess_contract_executed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,data:{capRatio:skill.excess.capRatio,cappedExcessResolverUsed:true,legacyUncappedPropagationNotAuthorised:true,excessResolution:damage.excessResolution?cloneBattleRuntimeValue(damage.excessResolution):null}});
-    return {resolved:true,branch:output.branch,damageApplied:true,damage,finalDamage:damage.finalDamage,remainingBattlePLAfter:damage.remainingBattlePLAfter,stateRefs:[...(overdraw?[overdraw.stateId]:[]),...(cloneAssist.consumed?[cloneAssist.stateId]:[])],conditionRefs:[],conditionalRiderDeferred:!!skill.conditionalRider,excessContractResolved:!!(skill.excess&&skill.excess.eligible),excessResolution:damage.excessResolution||null};
+    return {resolved:true,branch:output.branch,damageApplied:true,damage,finalDamage:damage.finalDamage,remainingBattlePLAfter:damage.remainingBattlePLAfter,stateRefs:[...(overdraw?[overdraw.stateId]:[]),...(threeTailFocus&&threeTailFocus.evidenceId?[threeTailFocus.evidenceId]:[]),...(cloneAssist.consumed?[cloneAssist.stateId]:[])],conditionRefs:[],conditionalRiderDeferred:!!skill.conditionalRider,excessContractResolved:!!(skill.excess&&skill.excess.eligible),excessResolution:damage.excessResolution||null};
   }
   if (skill.resolutionKind==="restore_underlying_battle_pl") {
     let requested=Number(skill.restorationProfile&&skill.restorationProfile.authoredAmount);
@@ -79212,6 +79916,124 @@ function runFormationConstraintReuseDiagnostics() {
   result.pass=Object.values(result).every(value=>value===true);
   console.table(result);
   return result;
+}
+
+// =========================================================
+// BRICK 705 — WAVE A SPECIAL-REPRESENTATION VALIDATOR
+// BRICK 722 — WAVE B COERCIVE-ROUTE VALIDATOR
+// BRICK 723 — SPECIAL-REPRESENTATION MASTER DIAGNOSTIC
+// BRICK 724 — POST-MONSTER ALPHA ACCEPTANCE GATE
+// =========================================================
+function getSpecialRepresentationPackageStatus(registryId) {
+  const record=getCharacterRegistryEntry(registryId);
+  const ids=SPECIAL_REPRESENTATION_PREPARED_SKILL_PALETTES[registryId]||[];
+  const skills=ids.map(id=>getClosureWaveBattleSkillDefinition(id,registryId));
+  return {registryId,record,ids,skills,allResolve:ids.length>0&&skills.every(Boolean),allOwned:skills.every(skill=>skill&&skill.ownerRegistryId===registryId),ordinaryLeak:Object.prototype.hasOwnProperty.call(PRODUCTION_PREPARED_SKILL_PALETTES,registryId)};
+}
+
+function runSpecialRepresentationWaveADiagnostics() {
+  const expectedSizes={
+    black_sun_himawari:4,serpent_ascendant:4,
+    sakura_resonance:3,sakura_manifestation:4,sakura_avatar:4,
+    shikamaru_resonance_yang:3,shikamaru_manifestation_yang:4,shikamaru_avatar_yang:4,
+    shikamaru_resonance_yin:3,shikamaru_manifestation_yin:4,shikamaru_avatar_yin:4,
+    tobirama_resonance:4,tobirama_manifestation:4,tobirama_avatar:4
+  };
+  const statuses=Object.keys(expectedSizes).map(getSpecialRepresentationPackageStatus);
+  const result={
+    exactPackageSizes:statuses.every(status=>status.ids.length===expectedSizes[status.registryId]),
+    everyMachineIdResolves:statuses.every(status=>status.allResolve),
+    exactOwnerPreserved:statuses.every(status=>status.allOwned),
+    noOrdinaryAutofive:statuses.every(status=>status.ordinaryLeak===false),
+    sakuraPLStages:[108,121,135].every((pl,i)=>Number(getCharacterRegistryEntry(["sakura_resonance","sakura_manifestation","sakura_avatar"][i]).basePL)===pl),
+    shikamaruYangPLStages:[105,119,132].every((pl,i)=>Number(getCharacterRegistryEntry(["shikamaru_resonance_yang","shikamaru_manifestation_yang","shikamaru_avatar_yang"][i]).basePL)===pl),
+    shikamaruYinPLStages:[105,119,132].every((pl,i)=>Number(getCharacterRegistryEntry(["shikamaru_resonance_yin","shikamaru_manifestation_yin","shikamaru_avatar_yin"][i]).basePL)===pl),
+    tobiramaPLStages:[109,122,134].every((pl,i)=>Number(getCharacterRegistryEntry(["tobirama_resonance","tobirama_manifestation","tobirama_avatar"][i]).basePL)===pl),
+    blackSunNoReprojection:!getEffectiveStatePackageDefinition("black_sun_himawari","black_sun_kurama_himawari")&&!getEffectiveStatePackageDefinition("black_sun_himawari","byakugan"),
+    serpentLowerStagesExcluded:(getCharacterRegistryEntry("serpent_ascendant").excludedExpressions||[]).includes("curse_seal_level_1_anko")&&(getCharacterRegistryEntry("serpent_ascendant").excludedExpressions||[]).includes("curse_seal_level_2_anko"),
+    avatarExcessAbsoluteCaps:getClosureWaveBattleSkillDefinition("sakura_avatar_avatar_breaker","sakura_avatar").excess.absoluteCap===48&&getClosureWaveBattleSkillDefinition("shikamaru_avatar_yin_eclipse_beast_cannon","shikamaru_avatar_yin").excess.absoluteCap===47&&getClosureWaveBattleSkillDefinition("tobirama_avatar_flying_raijin_breaker","tobirama_avatar").excess.absoluteCap===47,
+    ftgRequiresAuthoredReference:["tobirama_resonance_flying_raijin_intercept","tobirama_manifestation_flying_raijin_strike","tobirama_avatar_flying_raijin_breaker"].every(id=>(getClosureWaveBattleSkillDefinition(id)||{}).requirements.some(r=>r.kind==="authored_ftg_mark_reference"))
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result); return result;
+}
+
+function runSpecialRepresentationWaveBDiagnostics() {
+  const expectedSizes={stolen_chakra:4,coercive_cloak:4,three_tail_dominion:5,six_tail_dominion:5,black_gold_naruto:5,kurama_dominion:1,kurama_sovereign:5};
+  const statuses=Object.keys(expectedSizes).map(getSpecialRepresentationPackageStatus);
+  const routeIds=["stolen_chakra","coercive_cloak","three_tail_dominion","six_tail_dominion","black_gold_naruto","kurama_dominion","kurama_sovereign"];
+  const routePL=[28,38,58,86,110,123,132];
+  const result={
+    exactRoutePL:routeIds.every((id,i)=>Number(getCharacterRegistryEntry(id).basePL)===routePL[i]),
+    exactSpecialPackageSizes:statuses.every(status=>status.ids.length===expectedSizes[status.registryId]),
+    everyMachineIdResolves:statuses.every(status=>status.allResolve),
+    exactOwnerPreserved:statuses.every(status=>status.allOwned),
+    noOrdinaryAutofive:statuses.every(status=>status.ordinaryLeak===false),
+    coerciveBufferSix:(getEffectiveStatePackageDefinition("coercive_cloak","coercive_chakra_buffer")||{}).temporaryCapacityOverlay===6,
+    threeTailOverrunPlus10:(getEffectiveStatePackageDefinition("three_tail_dominion","three_tail_dominion_overrun_focus")||{}).statModifiers.tai===10,
+    sixTailFormationsExact:(getEffectiveStatePackageDefinition("six_tail_dominion","six_tail_formation_hunt")||{}).statModifiers.tai===12&&(getEffectiveStatePackageDefinition("six_tail_dominion","six_tail_formation_bastion")||{}).statModifiers.stamina===14&&(getEffectiveStatePackageDefinition("six_tail_dominion","six_tail_formation_cage")||{}).statModifiers.nin===10,
+    blackGoldAtomicCap:getClosureWaveBattleSkillDefinition("black_gold_naruto_atomic_rasenshuriken","black_gold_naruto").excess.absoluteCap===53,
+    blackGoldNecrosisExact:getClosureWaveBattleSkillDefinition("black_gold_naruto_tailed_beast_necrosis","black_gold_naruto").persistentState.tickDamage===3&&getClosureWaveBattleSkillDefinition("black_gold_naruto_tailed_beast_necrosis","black_gold_naruto").persistentState.maximumTicks===3&&getClosureWaveBattleSkillDefinition("black_gold_naruto_tailed_beast_necrosis","black_gold_naruto").persistentState.perTickMaximum===5,
+    extinctionOnlyMandatoryPrepared:JSON.stringify(SPECIAL_REPRESENTATION_PREPARED_SKILL_PALETTES.kurama_dominion)===JSON.stringify(["kurama_dominion_extinction_core"]),
+    extinctionAnchorPlus12:(getEffectiveStatePackageDefinition("kurama_dominion","extinction_core_anchor")||{}).statModifiers.stamina===12,
+    extinctionStageCaps:[getKuramaDominionExtinctionStageContract(1),getKuramaDominionExtinctionStageContract(2),getKuramaDominionExtinctionStageContract(3)].map(c=>[c.capRatio,c.absoluteCap,c.maxCollateralRecipients]).every((v,i)=>JSON.stringify(v)===JSON.stringify([[.25,22,1],[.5,59,2],[.75,115,3]][i])),
+    dominionDeferredExcessNotExposed:!getSpecialRepresentationWiderSkillIds("kurama_dominion").includes("kurama_dominion_converge")&&!getSpecialRepresentationWiderSkillIds("kurama_dominion").includes("kurama_dominion_ravage"),
+    sovereignSealDurationOne:resolveKuramaSovereignUsurpersExecution.toString().includes("const duration=1"),
+    lowerStageSuppressionPreserved:(getCharacterRegistryEntry("kurama_sovereign").suppressesEmbodiedExpressions||[]).includes("coercive_kurama_dominion_full")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result); return result;
+}
+
+function runAlphaSpecialRepresentationClosureDiagnostics() {
+  const groups={waveA:runSpecialRepresentationWaveADiagnostics(),waveB:runSpecialRepresentationWaveBDiagnostics(),sovereign:runKuramaSovereignImplementationDiagnostics()};
+  const result={waveA:groups.waveA.pass===true,waveB:groups.waveB.pass===true,sovereign:groups.sovereign.pass===true,groups};
+  result.pass=result.waveA&&result.waveB&&result.sovereign;
+  console.log(`SC Alpha special representation closure: ${result.pass?"PASS":"FAIL"}`); return result;
+}
+
+// =========================================================
+// BRICK 727 — ACQUISITION → RUNTIME → MY CLAN CONTINUITY DIAGNOSTIC
+// BRICK 728 — POST-MONSTER RUNTIME-ROSTER ACCEPTANCE
+// =========================================================
+function runProductionRuntimeRosterMaterializationDiagnostics() {
+  const originalTeamLength=playerTeam.length;
+  const candidateIds=["academy_kurenai","academy_iwabee","academy_metal_lee","academy_kakashi","academy_obito","black_sun_himawari","kurama_dominion"];
+  const materialized=candidateIds.map(id=>materializeProductionRuntimeCharacter(id));
+  const result={
+    registryRemainsIdentityAuthority:materialized.every((runtime,index)=>!!runtime&&runtime.registryId===candidateIds[index]&&getCharacterRegistryEntry(candidateIds[index])!=null),
+    baseStatsCopiedFromRegistry:materialized.every((runtime,index)=>JSON.stringify(runtime.baseStats)===JSON.stringify(cloneCanonicalSevenStats(getCharacterRegistryEntry(candidateIds[index]).baseStats))),
+    basePLCopiedFromRegistry:materialized.every((runtime,index)=>Number(runtime.basePL)===Number(getCharacterRegistryEntry(candidateIds[index]).basePL)),
+    stableRuntimeIdWithoutParallelIdentity:materialized.every((runtime,index)=>runtime.id===candidateIds[index]),
+    cardAssetOnlyWhenManifestAuthorised:getRuntimeCharacterByRegistryId("academy_kurenai").image===getCharacterCardAssetPath("academy_kurenai"),
+    missingCardAssetNotInvented:getCharacterCardAssetPath("black_sun_himawari")===""&&getRuntimeCharacterByRegistryId("black_sun_himawari").image==="",
+    ownershipHydrationFunctionExists:typeof hydrateOwnedProductionRuntimeCharacters==="function",
+    acquisitionGrantMaterializesRuntime:grantCharacterRegistryOwnership.toString().includes("materializeProductionRuntimeCharacter"),
+    loadHydratesBeforeClanNormalization:loadPlayerData.toString().indexOf("hydrateOwnedProductionRuntimeCharacters")<loadPlayerData.toString().indexOf("clan: normalizeClanManagementState"),
+    clanRosterStillOwnershipFiltered:getClanManageableRosterCharacters.toString().includes("isRuntimeCharacterOwned"),
+    productionCountUnchanged:ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length===17,
+    noEntityRuntimeMaterialization:materializeProductionRuntimeCharacter("nine_tails")===null,
+    materializationIdempotent:candidateIds.every(id=>materializeProductionRuntimeCharacter(id)===getRuntimeCharacterByRegistryId(id))
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPostMonster728Diagnostics() {
+  const prior=runAlphaPostMonster724Diagnostics();
+  const runtimeRoster=runProductionRuntimeRosterMaterializationDiagnostics();
+  const result={post724:prior.pass===true,runtimeRoster:runtimeRoster.pass===true,groups:{post724:prior,runtimeRoster}};
+  result.pass=result.post724&&result.runtimeRoster;
+  console.log(`SC Alpha post-728 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaPostMonster724Diagnostics() {
+  const groups={preContent:runAlphaPreContentBoundaryDiagnostics(),combat:runAlphaCombatContentClosureDiagnostics(),map:runAlphaKnowledgeSensitiveMapDiagnostics(),special:runAlphaSpecialRepresentationClosureDiagnostics()};
+  const result={preContent:groups.preContent.pass===true,combat:groups.combat.pass===true,map:groups.map.pass===true,special:groups.special.pass===true,groups};
+  result.pass=result.preContent&&result.combat&&result.map&&result.special;
+  console.log(`SC Alpha post-724 monster gate: ${result.pass?"PASS":"FAIL"}`); return result;
 }
 
 function runAlphaPreContentBoundaryDiagnostics() {
