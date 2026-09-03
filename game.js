@@ -38467,14 +38467,16 @@ const worldRegions = {
 
 // =========================================================
 // 2. ACTIVE REGION / LOCATION STATE
+// BRICK 694 — KNOWLEDGE-SENSITIVE HOTSPOT SELECTION STATE
 // =========================================================
 
 var selectedRegionKey = null;
 var selectedLocationNode = null;
+var selectedHotspotId = null;
+var selectedOpportunityId = null;
 var regionInfoOpen = false;
-var playerPowerLevel = 2450;
+var playerPowerLevel = 2450; // legacy presentation value; new hotspot projection never consumes it.
 var currentOverlayType = null;
-
 
 // =========================================================
 // 3. GLOBAL OVERLAY SYSTEM
@@ -40776,186 +40778,47 @@ function openRegionHub(regionKey) {
 
 // =========================================================
 // RENDER REGION MAP
+// BRICK 694 — RUNTIME HOTSPOT PROJECTION SURFACE
 // =========================================================
 
-function renderRegionHubUI(
-  regionKey,
-  region
-) {
+function renderRegionHubUI(regionKey, region) {
+  saveTestState();
+  const container=document.getElementById("overlay-content-container");
+  if (!container) return;
 
-saveTestState();
-
-  const container =
-    document.getElementById(
-      "overlay-content-container"
-    );
-
-
-  if (!container) {
-    return;
-  }
-
+  const hotspotProjections=getRegionHotspotProjections(regionKey,region);
 
   container.innerHTML = `
-
-    <div class="
-      region-screen-header
-    ">
-
+    <div class="region-screen-header">
       <div>
-
-        <h2 class="
-          region-screen-title
-        ">
-          ${region.name.toUpperCase()}
-        </h2>
-
-        <p class="
-          region-screen-description
-        ">
-          ${region.description}
-        </p>
-
+        <h2 class="region-screen-title">${region.name.toUpperCase()}</h2>
+        <p class="region-screen-description">${region.description}</p>
       </div>
-
     </div>
 
+    <div class="region-hub-container region-hub-full">
+      <div class="region-map-pane">
+        <img src="${region.mapImage}" alt="${region.name}" class="region-map-image">
 
-    <div class="
-      region-hub-container
-      region-hub-full
-    ">
+        <button type="button" class="region-world-close" onclick="returnToWorldMap()" aria-label="Return to World Map" title="Return to World Map">✕</button>
 
-
-      <div class="
-        region-map-pane
-      ">
-
-
-        <img
-          src="${region.mapImage}"
-
-          alt="${region.name}"
-
-          class="
-            region-map-image
-          "
-        >
-
-
-        <!-- WORLD MAP CLOSE -->
-
-        <button
-          type="button"
-
-          class="
-            region-world-close
-          "
-
-          onclick="
-            returnToWorldMap()
-          "
-
-          aria-label="
-            Return to World Map
-          "
-
-          title="
-            Return to World Map
-          "
-        >
-
-          ✕
-
+        <button type="button" class="region-info-toggle ${regionInfoOpen?"active":""}" onclick="toggleRegionInfo()">
+          <span>◈</span> REGION INFO
         </button>
 
-
-        <!-- REGION INFORMATION BUTTON -->
-
-        <button
-          type="button"
-
-          class="
-            region-info-toggle
-            ${regionInfoOpen
-              ? "active"
-              : ""}
-          "
-
-          onclick="
-            toggleRegionInfo()
-          "
-        >
-
-          <span>
-            ◈
-          </span>
-
-          REGION INFO
-
-        </button>
-
-
-        <!-- COLLAPSIBLE REGION PANEL -->
-
-        <aside class="
-          region-info-drawer
-          ${regionInfoOpen
-            ? "open"
-            : ""}
-        ">
-
-          ${renderRegionLeftNavigation(
-            region
-          )}
-
+        <aside class="region-info-drawer ${regionInfoOpen?"open":""}">
+          ${renderRegionLeftNavigation(region)}
         </aside>
 
+        ${hotspotProjections.map(hotspot=>renderRegionHotspot(regionKey,hotspot)).join("")}
 
-        <!-- ALL INTERACTIVE HOTSPOTS -->
+        ${renderRegionEventDrawer(regionKey)}
 
-        ${region.locations.map(
-          location =>
-            renderRegionHotspot(
-              regionKey,
-              location
-            )
-        ).join("")}
-
-
-        <!-- CLICKABLE WORLD MAP AREA -->
-
-        <button
-          type="button"
-
-          class="
-            region-world-map-button
-          "
-
-          onclick="
-            returnToWorldMap()
-          "
-
-          aria-label="
-            Return to World Map
-          "
-        >
-
-          WORLD MAP
-
-        </button>
-
-
+        <button type="button" class="region-world-map-button" onclick="returnToWorldMap()" aria-label="Return to World Map">WORLD MAP</button>
       </div>
-
-
     </div>
-
   `;
-
 }
-
-
 
 // =========================================================
 // TOGGLE REGION INFORMATION
@@ -40984,374 +40847,556 @@ function toggleRegionInfo() {
 
 
 // =========================================================
-// REGION PROGRESS / LEGEND
+// REGION KNOWLEDGE / LEGEND
+// BRICK 694 — PRESENTATION FAMILIES ARE UI FAMILIES, NOT LIFECYCLES
 // =========================================================
 
-function renderRegionLeftNavigation(
-  region
-) {
+const WORLD_HOTSPOT_PRESENTATION_FAMILIES=Object.freeze([
+  "Story","Chronicle Event","Known Threat","Discovery","Character","Unknown"
+]);
 
-  const progress =
-    region.progress || {};
-
+function renderRegionLeftNavigation(region) {
+  const runtime=ensureWorldEventRuntimeState();
+  const regionKey=selectedRegionKey||null;
+  const projections=regionKey?getRegionHotspotProjections(regionKey,region):[];
+  const trackedCount=Object.values(runtime.trackingByOpportunityId||{}).filter(state=>state&&state.tracked===true).length;
+  const visibleOpportunityCount=projections.reduce((sum,hotspot)=>sum+Number(hotspot.aggregationCount||0),0);
 
   return `
-
-    <div class="
-      region-left-overlay
-    ">
-
-
-      <div class="
-        region-left-section
-      ">
-
-        <div class="
-          region-left-heading
-        ">
-          REGION PROGRESS
-        </div>
-
-
-        <div class="
-          region-exploration-row
-        ">
-
-          <span>
-            Exploration
-          </span>
-
-          <strong>
-            ${progress.exploration || 0}%
-          </strong>
-
-        </div>
-
-
-        <div class="
-          region-exploration-track
-        ">
-
-          <span
-            style="
-              width:
-              ${progress.exploration || 0}%;
-            "
-          >
-          </span>
-
-        </div>
-
+    <div class="region-left-overlay">
+      <div class="region-left-section">
+        <div class="region-left-heading">KNOWN WORLD</div>
+        <div class="region-exploration-row"><span>Visible Opportunities</span><strong>${visibleOpportunityCount}</strong></div>
+        <div class="region-exploration-row"><span>Tracked Leads</span><strong>${trackedCount}</strong></div>
       </div>
-
-
-      <div class="
-        region-progress-list
-      ">
-
-        ${renderRegionProgressItem(
-          "battle",
-          "Loot Hotspots",
-          progress.lootHotspots || "0/0"
-        )}
-
-        ${renderRegionProgressItem(
-          "training",
-          "Grinding Zones",
-          progress.grindingZones || "0/0"
-        )}
-
-        ${renderRegionProgressItem(
-          "mission",
-          "Mission Points",
-          progress.missionPoints || "0/0"
-        )}
-
-        ${renderRegionProgressItem(
-          "activity",
-          "Side Activities",
-          progress.sideActivities || "0/0"
-        )}
-
-        ${renderRegionProgressItem(
-          "secret",
-          "Secret Areas",
-          progress.secretAreas || "0/0"
-        )}
-
+      <div class="region-left-divider"></div>
+      <div class="region-left-heading">HOTSPOTS</div>
+      ${WORLD_HOTSPOT_PRESENTATION_FAMILIES.map(family=>renderRegionLegendItem(family,family)).join("")}
+      <div class="region-left-divider"></div>
+      <div style="font-size:11px;line-height:1.45;opacity:.78;">
+        Map markers show only what your shinobi legitimately know. A visible hotspot may contain more than one independent opportunity.
       </div>
-
-
-      <div class="
-        region-left-divider
-      ">
-      </div>
-
-
-      <div class="
-        region-left-heading
-      ">
-        LEGEND
-      </div>
-
-
-      ${renderRegionLegendItem(
-        "battle",
-        "Loot Hotspot"
-      )}
-
-      ${renderRegionLegendItem(
-        "training",
-        "EXP / Ryo Grinding"
-      )}
-
-      ${renderRegionLegendItem(
-        "mission",
-        "Mission Progression"
-      )}
-
-      ${renderRegionLegendItem(
-        "activity",
-        "Side Mission"
-      )}
-
-      ${renderRegionLegendItem(
-        "secret",
-        "Secret / Rare Area"
-      )}
-
-      ${renderRegionLegendItem(
-        "outpost",
-        "Outpost"
-      )}
-
-      ${renderRegionLegendItem(
-        "village",
-        "Village / Hub"
-      )}
-
-
-      <div class="
-        region-legend-row
-      ">
-
-        <span class="
-          region-path-symbol
-        ">
-        </span>
-
-        <span>
-          Path
-        </span>
-
-      </div>
-
-
     </div>
-
   `;
-
 }
 
-
-
-// =========================================================
-// REGION PROGRESS ITEM
-// =========================================================
-
-function renderRegionProgressItem(
-  type,
-  label,
-  value
-) {
-
-  return `
-
-    <div class="
-      region-progress-item
-    ">
-
-      <span class="
-        region-small-symbol
-        ${type}
-      ">
-
-        ${getRegionSymbol(type)}
-
-      </span>
-
-      <span class="
-        region-progress-label
-      ">
-        ${label}
-      </span>
-
-      <strong>
-        ${value}
-      </strong>
-
-    </div>
-
-  `;
-
+function renderRegionProgressItem(type,label,value) {
+  return `<div class="region-progress-item"><span class="region-small-symbol ${getHotspotPresentationClass(type)}">${getRegionSymbol(type)}</span><span class="region-progress-label">${label}</span><strong>${value}</strong></div>`;
 }
 
-
-
-// =========================================================
-// REGION LEGEND ITEM
-// =========================================================
-
-function renderRegionLegendItem(
-  type,
-  label
-) {
-
-  return `
-
-    <div class="
-      region-legend-row
-    ">
-
-      <span class="
-        region-small-symbol
-        ${type}
-      ">
-        ${getRegionSymbol(type)}
-      </span>
-
-      <span>
-        ${label}
-      </span>
-
-    </div>
-
-  `;
-
+function renderRegionLegendItem(type,label) {
+  return `<div class="region-legend-row"><span class="region-small-symbol ${getHotspotPresentationClass(type)}">${getRegionSymbol(type)}</span><span>${label}</span></div>`;
 }
 
-
-
-// =========================================================
-// REGIONAL SYMBOL
-// =========================================================
+function getHotspotPresentationClass(type) {
+  const key=String(type||"").toLowerCase();
+  if (key.includes("threat")||key==="battle") return "battle";
+  if (key.includes("story")||key.includes("chronicle")||key==="mission") return "mission";
+  if (key.includes("character")||key==="activity") return "activity";
+  if (key.includes("unknown")||key==="secret") return "secret";
+  if (key.includes("discovery")||key==="training") return "training";
+  if (key==="village") return "village";
+  if (key==="outpost") return "outpost";
+  return "activity";
+}
 
 function getRegionSymbol(type) {
-
-  switch (type) {
-
-    case "battle":
-      return "▣";
-
-    case "training":
-      return "EXP";
-
-    case "mission":
-      return "◆";
-
-    case "activity":
-      return "✦";
-
-    case "secret":
-      return "?";
-
-    case "outpost":
-      return "▥";
-
-    case "village":
-      return "●";
-
-    default:
-      return "•";
-  }
-
+  const key=String(type||"").toLowerCase();
+  if (key.includes("threat")||key==="battle") return "▣";
+  if (key.includes("story")) return "◆";
+  if (key.includes("chronicle")) return "✦";
+  if (key.includes("character")) return "●";
+  if (key.includes("unknown")||key==="secret") return "?";
+  if (key.includes("discovery")||key==="training") return "◈";
+  if (key==="outpost") return "▥";
+  if (key==="village") return "●";
+  return "•";
 }
 
+// =========================================================
+// BRICK 694 — KNOWLEDGE-SENSITIVE WORLD EVENT RUNTIME
+// =========================================================
+// Independent dimensions:
+// world/event lifecycle != observer discovery != actionability
+// != Chronicle tracking != historical resolution.
+// There is deliberately no universal `eventStatus` field.
+// =========================================================
 
+const WORLD_EVENT_OPPORTUNITY_REGISTRY=new Map();
+
+function ensureWorldEventRuntimeState() {
+  if (!playerData.worldEventRuntime||typeof playerData.worldEventRuntime!=="object") playerData.worldEventRuntime={};
+  const state=playerData.worldEventRuntime;
+  if (!state.worldLifecycleByEventId||typeof state.worldLifecycleByEventId!=="object") state.worldLifecycleByEventId={};
+  if (!state.observerDiscoveryByOpportunityId||typeof state.observerDiscoveryByOpportunityId!=="object") state.observerDiscoveryByOpportunityId={};
+  if (!state.actionabilityByOpportunityId||typeof state.actionabilityByOpportunityId!=="object") state.actionabilityByOpportunityId={};
+  if (!state.trackingByOpportunityId||typeof state.trackingByOpportunityId!=="object") state.trackingByOpportunityId={};
+  if (!state.resolutionByOpportunityId||typeof state.resolutionByOpportunityId!=="object") state.resolutionByOpportunityId={};
+  return state;
+}
+
+function normalizeWorldOpportunityDefinition(definition) {
+  if (!definition||!definition.opportunityId||!definition.locationId) return null;
+  const regionKey=definition.regionKey||"fire";
+  const locationId=String(definition.locationId);
+  const opportunityId=String(definition.opportunityId);
+  const hotspotId=String(definition.hotspotId||`hotspot_${regionKey}_${locationId}`);
+  const eventId=definition.eventId?String(definition.eventId):null;
+  const sourceKind=String(definition.sourceKind||"authored");
+  const presentation=definition.presentation&&typeof definition.presentation==="object"?definition.presentation:{};
+  const family=WORLD_HOTSPOT_PRESENTATION_FAMILIES.includes(presentation.family)?presentation.family:"Unknown";
+  return {
+    ...definition,
+    regionKey,
+    locationId,
+    opportunityId,
+    hotspotId,
+    eventId,
+    sourceKind,
+    randomPoolEligible:sourceKind==="story"?false:definition.randomPoolEligible===true,
+    presentation:{...presentation,family},
+    interactions:Array.isArray(definition.interactions)?definition.interactions.filter(action=>action&&action.id):[],
+    defaultDiscoveryLevel:String(definition.defaultDiscoveryLevel||"undiscovered")
+  };
+}
+
+function registerWorldEventOpportunity(definition) {
+  const normalized=normalizeWorldOpportunityDefinition(definition);
+  if (!normalized) return {success:false,reason:"opportunity_identity_incomplete"};
+  WORLD_EVENT_OPPORTUNITY_REGISTRY.set(normalized.opportunityId,normalized);
+  return {success:true,opportunity:normalized};
+}
+
+function unregisterWorldEventOpportunity(opportunityId) {
+  return WORLD_EVENT_OPPORTUNITY_REGISTRY.delete(String(opportunityId||""));
+}
+
+function getRegisteredWorldEventOpportunity(opportunityId) {
+  return WORLD_EVENT_OPPORTUNITY_REGISTRY.get(String(opportunityId||""))||null;
+}
+
+function getWorldEventDimensionState(dimension,key) {
+  const runtime=ensureWorldEventRuntimeState();
+  const table=runtime[dimension];
+  return table&&key&&table[key]&&typeof table[key]==="object"?table[key]:{};
+}
+
+function patchWorldEventDimensionState(dimension,key,patch,{save=true}={}) {
+  if (!key||!patch||typeof patch!=="object") return null;
+  const runtime=ensureWorldEventRuntimeState();
+  const table=runtime[dimension];
+  if (!table||typeof table!=="object") return null;
+  table[key]={...(table[key]||{}),...cloneProgressionData(patch)};
+  if (save) savePlayerData();
+  return table[key];
+}
+
+function setWorldEventLifecycle(eventId,patch,options) {
+  return patchWorldEventDimensionState("worldLifecycleByEventId",eventId,patch,options);
+}
+function setOpportunityDiscovery(opportunityId,patch,options) {
+  return patchWorldEventDimensionState("observerDiscoveryByOpportunityId",opportunityId,patch,options);
+}
+function setOpportunityActionability(opportunityId,patch,options) {
+  return patchWorldEventDimensionState("actionabilityByOpportunityId",opportunityId,patch,options);
+}
+function setOpportunityTracking(opportunityId,patch,options) {
+  return patchWorldEventDimensionState("trackingByOpportunityId",opportunityId,patch,options);
+}
+function setOpportunityResolution(opportunityId,patch,options) {
+  return patchWorldEventDimensionState("resolutionByOpportunityId",opportunityId,patch,options);
+}
+
+function ensureMandatoryStoryOpportunityDiscoverable(opportunityId,{level="rumoured",leadState="mandatory",save=true}={}) {
+  const definition=getRegisteredWorldEventOpportunity(opportunityId);
+  if (!definition||definition.sourceKind!=="story") return {success:false,reason:"mandatory_story_opportunity_missing"};
+  setOpportunityDiscovery(opportunityId,{level,guaranteedDiscoveryRoute:true},{save:false});
+  setOpportunityTracking(opportunityId,{tracked:true,leadState,mandatory:true},{save:false});
+  if (save) savePlayerData();
+  return {success:true,opportunityId,level};
+}
+
+function getWorldRegionLocation(regionKey,locationId) {
+  const region=worldRegions[regionKey];
+  return region&&Array.isArray(region.locations)?region.locations.find(location=>location&&location.id===locationId)||null:null;
+}
+
+function getLegacyLocationPresentationFamily(location) {
+  if (!location) return "Unknown";
+  if (location.type==="battle"||location.type==="secret") return "Known Threat";
+  if (location.type==="mission") return "Chronicle Event";
+  if (location.type==="activity") return "Discovery";
+  if (location.type==="training") return "Discovery";
+  return "Discovery";
+}
+
+function getLegacyLocationInteractions(regionKey,location) {
+  if (!location) return [];
+  if (location.type==="village") return [{id:"enter_location",label:"ENTER LOCATION",kind:"navigation",overlayType:"village"}];
+  if (location.type==="training") return [{id:"open_training",label:"TRAIN",kind:"activity",activityType:"training",activityStage:"available",overlayType:"training"}];
+  // Old battle/mission catalogue metadata remains legacy data only. Until an
+  // authored event/encounter is registered, the new map does not infer Fight.
+  return [];
+}
+
+function createLegacyLocationOpportunityDefinition(regionKey,location) {
+  if (!location||!location.id) return null;
+  return normalizeWorldOpportunityDefinition({
+    opportunityId:`location_opportunity_${regionKey}_${location.id}`,
+    hotspotId:`hotspot_${regionKey}_${location.id}`,
+    eventId:null,
+    locationId:location.id,
+    regionKey,
+    sourceKind:"persistent_location",
+    randomPoolEligible:false,
+    defaultDiscoveryLevel:"discovered",
+    presentation:{
+      family:getLegacyLocationPresentationFamily(location),
+      label:location.shortName||location.name,
+      summary:location.desc||"",
+      icon:location.icon||"",
+      showUnknownMarker:false
+    },
+    anchor:{x:Number(location.x)||0,y:Number(location.y)||0},
+    interactions:getLegacyLocationInteractions(regionKey,location)
+  });
+}
+
+function getWorldOpportunityDefinitionsForRegion(regionKey,region) {
+  const authored=[...WORLD_EVENT_OPPORTUNITY_REGISTRY.values()].filter(def=>def.regionKey===regionKey);
+  const authoredLocationIds=new Set(authored.filter(def=>def.sourceKind==="persistent_location").map(def=>def.locationId));
+  const legacy=(region&&Array.isArray(region.locations)?region.locations:[])
+    .filter(location=>!authoredLocationIds.has(location.id))
+    .map(location=>createLegacyLocationOpportunityDefinition(regionKey,location))
+    .filter(Boolean);
+  return [...legacy,...authored];
+}
+
+function getOpportunityDiscoveryLevel(definition) {
+  const state=getWorldEventDimensionState("observerDiscoveryByOpportunityId",definition.opportunityId);
+  return String(state.level||definition.defaultDiscoveryLevel||"undiscovered");
+}
+
+function shouldProjectOpportunityForObserver(definition) {
+  const discoveryLevel=getOpportunityDiscoveryLevel(definition);
+  const worldState=definition.eventId?getWorldEventDimensionState("worldLifecycleByEventId",definition.eventId):{};
+  if (worldState.projectable===false) return false;
+  if (["rumoured","partially_known","discovered","investigated","known"].includes(discoveryLevel)) return true;
+  return definition.presentation&&definition.presentation.showUnknownMarker===true;
+}
+
+function evaluateOpportunityActionAvailability(definition,action) {
+  if (!definition||!action) return {available:false,reason:"interaction_missing",reasonVisible:false};
+  const override=getWorldEventDimensionState("actionabilityByOpportunityId",definition.opportunityId);
+  if (override.available===false) return {available:false,reason:override.reason||"unavailable",reasonVisible:override.reasonVisible===true};
+  if (Array.isArray(override.legalActionIds)&&!override.legalActionIds.includes(action.id)) return {available:false,reason:override.reason||"action_unavailable",reasonVisible:override.reasonVisible===true};
+  if (typeof action.evaluateAvailability==="function") {
+    const evaluated=action.evaluateAvailability({definition,playerData,currentBattle});
+    if (evaluated===false) return {available:false,reason:"requirements_not_met",reasonVisible:false};
+    if (evaluated&&typeof evaluated==="object") return {available:evaluated.available!==false,reason:evaluated.reason||null,reasonVisible:evaluated.reasonVisible===true};
+  }
+  return {available:true,reason:null,reasonVisible:false};
+}
+
+function createObserverSafeOpportunityProjection(definition) {
+  if (!definition||!shouldProjectOpportunityForObserver(definition)) return null;
+  const discovery=getWorldEventDimensionState("observerDiscoveryByOpportunityId",definition.opportunityId);
+  const level=getOpportunityDiscoveryLevel(definition);
+  const isKnown=level!=="undiscovered"&&level!=="unknown";
+  const tracking=getWorldEventDimensionState("trackingByOpportunityId",definition.opportunityId);
+  const resolution=getWorldEventDimensionState("resolutionByOpportunityId",definition.opportunityId);
+  const actionability=getWorldEventDimensionState("actionabilityByOpportunityId",definition.opportunityId);
+  const presentation=definition.presentation||{};
+  const label=isKnown?(discovery.label||presentation.label||"Unknown"):"???";
+  const summary=isKnown?(discovery.summary||presentation.summary||""):"";
+  const family=isKnown?(discovery.family||presentation.family||"Unknown"):"Unknown";
+  const legalActions=definition.interactions.map(action=>{
+    const availability=evaluateOpportunityActionAvailability(definition,action);
+    return {
+      actionId:action.id,
+      label:action.label||String(action.kind||"INTERACT").toUpperCase(),
+      kind:action.kind||"custom",
+      available:availability.available,
+      knownBlocker:availability.available?null:(availability.reasonVisible?availability.reason:null)
+    };
+  }).filter(action=>action.available||action.knownBlocker);
+
+  return {
+    hotspot_id:definition.hotspotId,
+    location_id:definition.locationId,
+    event_id:definition.eventId,
+    opportunity_id:definition.opportunityId,
+    presentation_family:family,
+    known_label:label,
+    known_summary:summary,
+    discovery:{level,rumoured:level==="rumoured"||level==="partially_known",known:isKnown},
+    actionability:{available:actionability.available!==false,known_blocker:actionability.reasonVisible===true?(actionability.reason||null):null},
+    legal_actions:legalActions,
+    tracking:{tracked:tracking.tracked===true,lead_state:tracking.leadState||null,mandatory:tracking.mandatory===true},
+    resolution:{known_state:resolution.visibleState||null},
+    anchor:{x:Number((definition.anchor||{}).x)||0,y:Number((definition.anchor||{}).y)||0},
+    icon:presentation.icon||"",
+    source_kind:definition.sourceKind
+  };
+}
+
+function getRegionHotspotProjections(regionKey,region=worldRegions[regionKey]) {
+  const projected=getWorldOpportunityDefinitionsForRegion(regionKey,region)
+    .map(createObserverSafeOpportunityProjection)
+    .filter(Boolean);
+  const groups=new Map();
+  projected.forEach(opportunity=>{
+    if (!groups.has(opportunity.hotspot_id)) groups.set(opportunity.hotspot_id,[]);
+    groups.get(opportunity.hotspot_id).push(opportunity);
+  });
+  return [...groups.entries()].map(([hotspotId,opportunities])=>{
+    const firstKnown=opportunities.find(item=>item.known_label!=="???")||opportunities[0];
+    const location=getWorldRegionLocation(regionKey,firstKnown.location_id);
+    return {
+      hotspotId,
+      locationId:firstKnown.location_id,
+      anchor:firstKnown.anchor,
+      icon:firstKnown.icon||(location&&location.icon)||"",
+      presentationFamily:opportunities.every(item=>item.presentation_family===opportunities[0].presentation_family)?opportunities[0].presentation_family:"Chronicle Event",
+      knownLabel:firstKnown.known_label,
+      knownSummary:firstKnown.known_summary,
+      aggregationCount:opportunities.length,
+      opportunityIds:opportunities.map(item=>item.opportunity_id),
+      opportunities
+    };
+  });
+}
+
+function getHotspotProjection(regionKey,hotspotOrLocationId) {
+  const projections=getRegionHotspotProjections(regionKey,worldRegions[regionKey]);
+  return projections.find(hotspot=>hotspot.hotspotId===hotspotOrLocationId||hotspot.locationId===hotspotOrLocationId)||null;
+}
+
+function selectHotspotOpportunity(opportunityId) {
+  selectedOpportunityId=opportunityId||null;
+  if (selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  return getSelectedOpportunityProjection();
+}
+
+function getSelectedOpportunityProjection() {
+  if (!selectedRegionKey||!selectedOpportunityId) return null;
+  const hotspot=getHotspotProjection(selectedRegionKey,selectedHotspotId);
+  return hotspot?hotspot.opportunities.find(item=>item.opportunity_id===selectedOpportunityId)||null:null;
+}
+
+function getOpportunityDefinitionIncludingLegacy(opportunityId) {
+  const registered=getRegisteredWorldEventOpportunity(opportunityId);
+  if (registered) return registered;
+  if (!selectedRegionKey) return null;
+  const region=worldRegions[selectedRegionKey];
+  return getWorldOpportunityDefinitionsForRegion(selectedRegionKey,region).find(def=>def.opportunityId===opportunityId)||null;
+}
+
+function getClanQueueReadModel() {
+  return getPersistentClanBattleQueueSlots().map((characterId,index)=>{
+    const character=characterId?getPlayerCharacter(characterId):null;
+    return {slot:index+1,label:CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS[index]?CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS[index].label:`SLOT ${index+1}`,characterId:characterId||null,name:character?character.name:null};
+  });
+}
+
+function evaluateRecruitmentOpportunity(definition,action) {
+  const recruitment=action&&action.recruitment;
+  if (!recruitment||!recruitment.variantId) return {eligible:false,reason:"recruitment_authority_missing"};
+  if (!getCharacterRegistryEntry(recruitment.variantId)) return {eligible:false,reason:"character_registry_missing"};
+  if (isCharacterRegistryOwned(recruitment.variantId)) return {eligible:false,reason:"character_already_owned"};
+  if (typeof recruitment.evaluateEligibility==="function") {
+    const result=recruitment.evaluateEligibility({definition,playerData});
+    if (result===false) return {eligible:false,reason:"recruitment_requirements_not_met"};
+    if (result&&typeof result==="object"&&result.eligible===false) return result;
+  }
+  return {eligible:true};
+}
+
+function commitRecruitmentOpportunity(definition,action) {
+  const eligibility=evaluateRecruitmentOpportunity(definition,action);
+  if (!eligibility.eligible) return {success:false,reason:eligibility.reason||"recruitment_ineligible"};
+  const recruitment=action.recruitment;
+  const result=commitCharacterAcquisition({
+    variantId:recruitment.variantId,
+    route:recruitment.route||"world_event_recruitment",
+    sourceEventId:definition.eventId||definition.opportunityId,
+    context:{opportunityId:definition.opportunityId,locationId:definition.locationId,...(recruitment.context||{})},
+    provenance:recruitment.provenance||{},
+    linkedChronicleEvidenceIds:recruitment.linkedChronicleEvidenceIds||[]
+  });
+  if (result.success&&recruitment.resolutionPatch) setOpportunityResolution(definition.opportunityId,recruitment.resolutionPatch);
+  return result;
+}
+
+function routeWorldOpportunityInteraction(opportunityId,actionId) {
+  const definition=getOpportunityDefinitionIncludingLegacy(opportunityId);
+  if (!definition) return {success:false,reason:"opportunity_missing"};
+  const action=definition.interactions.find(item=>item.id===actionId);
+  if (!action) return {success:false,reason:"interaction_missing"};
+  const availability=evaluateOpportunityActionAvailability(definition,action);
+  if (!availability.available) return {success:false,reason:availability.reason||"interaction_unavailable"};
+
+  let result={success:false,reason:"interaction_route_unhandled"};
+  switch (action.kind) {
+    case "battle": {
+      const enemyId=action.enemyId||action.encounterRef||null;
+      if (!enemyId) return {success:false,reason:"battle_encounter_authority_missing"};
+      const queue=getPersistentClanBattleQueueSlots();
+      if (!queue[0]) return {success:false,reason:"clan_start_slot_empty"};
+      const battle=startEncounter(enemyId,null,action.encounterId||definition.eventId||definition.opportunityId);
+      result=battle?{success:true,type:"battle",battle}:{success:false,reason:"battle_launch_failed"};
+      break;
+    }
+    case "recruit":
+      result=commitRecruitmentOpportunity(definition,action);
+      break;
+    case "navigation":
+      result={success:!!openOverlay(action.overlayType||"village"),type:"navigation"};
+      if (!result.success) result.success=true; // openOverlay is presentation and may return undefined.
+      break;
+    case "activity": {
+      const activity=executePlayerActivity({type:action.activityType||"training",stage:action.activityStage||"available",location:definition.locationId,missionId:action.missionId||null});
+      if (action.overlayType) openOverlay(action.overlayType);
+      result={success:activity!==false,type:"activity",activity};
+      break;
+    }
+    case "narrative":
+    case "investigation":
+    case "shop":
+    case "training":
+    case "travel":
+    case "discovery":
+    case "character":
+    case "custom":
+      if (typeof action.resolve==="function") result=action.resolve({definition,action,playerData,currentBattle,queue:getClanQueueReadModel()})||{success:false,reason:"interaction_resolver_no_result"};
+      else result={success:false,reason:"interaction_resolver_missing"};
+      break;
+    default:
+      result={success:false,reason:"interaction_route_unknown"};
+  }
+
+  if (result&&result.success===true&&action.resolutionPatch) setOpportunityResolution(definition.opportunityId,action.resolutionPatch);
+  if (result&&result.success===true&&typeof action.onCommitted==="function") action.onCommitted({definition,action,result});
+  return result;
+}
+
+function executeSelectedOpportunityAction(actionId) {
+  if (!selectedOpportunityId) return {success:false,reason:"opportunity_not_selected"};
+  return routeWorldOpportunityInteraction(selectedOpportunityId,actionId);
+}
+
+function renderRegionEventDrawer(regionKey) {
+  if (!selectedHotspotId) return "";
+  const hotspot=getHotspotProjection(regionKey,selectedHotspotId);
+  if (!hotspot) return "";
+  const selected=hotspot.opportunities.find(item=>item.opportunity_id===selectedOpportunityId)||hotspot.opportunities[0]||null;
+  if (!selected) return "";
+  selectedOpportunityId=selected.opportunity_id;
+  const hasBattle=selected.legal_actions.some(action=>action.kind==="battle");
+  const queue=hasBattle?getClanQueueReadModel():[];
+
+  return `
+    <aside class="region-event-drawer" style="position:absolute;right:2.5%;top:13%;width:min(390px,34vw);max-height:72%;overflow:auto;z-index:40;background:rgba(6,10,16,.95);border:1px solid rgba(203,161,79,.72);box-shadow:0 16px 45px rgba(0,0,0,.55);padding:16px;color:#e9dfc8;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+        <div><small style="opacity:.68;letter-spacing:.12em;">${selected.presentation_family}</small><h3 style="margin:4px 0 6px;">${selected.known_label}</h3></div>
+        <button type="button" onclick="closeRegionEventDrawer()" aria-label="Close event drawer">✕</button>
+      </div>
+      ${selected.known_summary?`<p style="margin:6px 0 12px;line-height:1.45;">${selected.known_summary}</p>`:""}
+      ${hotspot.aggregationCount>1?`<div style="margin:10px 0;"><small>OPPORTUNITIES AT THIS HOTSPOT</small><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${hotspot.opportunities.map(item=>`<button type="button" onclick="selectHotspotOpportunity('${item.opportunity_id}')" ${item.opportunity_id===selected.opportunity_id?'disabled':''}>${item.known_label}</button>`).join("")}</div></div>`:""}
+      ${selected.tracking.tracked?`<div style="margin:8px 0;font-size:12px;">TRACKED${selected.tracking.mandatory?" • STORY":""}${selected.tracking.lead_state?` • ${selected.tracking.lead_state}`:""}</div>`:""}
+      ${selected.actionability.known_blocker?`<div style="margin:8px 0;color:#d9b56f;">${selected.actionability.known_blocker}</div>`:""}
+      ${hasBattle?`<div style="margin:12px 0;padding:10px;border:1px solid rgba(255,255,255,.12);"><small>MY CLAN BATTLE ORDER</small>${queue.map(slot=>`<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;"><span>${slot.label}</span><strong>${slot.name||"—"}</strong></div>`).join("")}</div>`:""}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+        ${selected.legal_actions.length?selected.legal_actions.map(action=>`<button type="button" onclick="executeSelectedOpportunityAction('${action.actionId}')" ${action.available?'':'disabled'}>${action.label}</button>`).join(""):`<span style="opacity:.66;font-size:12px;">No authored interaction is currently available.</span>`}
+      </div>
+    </aside>
+  `;
+}
+
+function closeRegionEventDrawer() {
+  selectedHotspotId=null;
+  selectedOpportunityId=null;
+  if (selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+}
+
+// =========================================================
+// BRICK 696 — MAP / OPPORTUNITY / ACQUISITION REGRESSION
+// =========================================================
+function runAlphaKnowledgeSensitiveMapDiagnostics() {
+  const diagnosticLocationId="diagnostic_world_surface_location";
+  const diagnosticHotspotId="diagnostic_world_surface_hotspot";
+  const opportunityA="diagnostic_world_surface_a";
+  const opportunityB="diagnostic_world_surface_b";
+  const eventA="diagnostic_world_event_a";
+  const runtime=ensureWorldEventRuntimeState();
+  const saved={
+    discoveryA:cloneProgressionData(runtime.observerDiscoveryByOpportunityId[opportunityA]||null),
+    discoveryB:cloneProgressionData(runtime.observerDiscoveryByOpportunityId[opportunityB]||null),
+    trackingA:cloneProgressionData(runtime.trackingByOpportunityId[opportunityA]||null)
+  };
+
+  registerWorldEventOpportunity({
+    opportunityId:opportunityA,hotspotId:diagnosticHotspotId,eventId:eventA,locationId:diagnosticLocationId,regionKey:"diagnostic",sourceKind:"story",randomPoolEligible:true,defaultDiscoveryLevel:"undiscovered",
+    presentation:{family:"Story",label:"Hidden Truth",summary:"Secret summary",showUnknownMarker:true},anchor:{x:40,y:40},
+    hiddenPrerequisites:["secret_gate"],hiddenEnemyId:"secret_enemy",hiddenRewardId:"secret_reward",
+    interactions:[{id:"inspect",label:"INSPECT",kind:"custom",resolve:()=>({success:true})}]
+  });
+  registerWorldEventOpportunity({
+    opportunityId:opportunityB,hotspotId:diagnosticHotspotId,eventId:"diagnostic_world_event_b",locationId:diagnosticLocationId,regionKey:"diagnostic",sourceKind:"authored",defaultDiscoveryLevel:"discovered",
+    presentation:{family:"Discovery",label:"Known Lead",summary:"Known summary"},anchor:{x:40,y:40},interactions:[]
+  });
+
+  const hiddenProjection=createObserverSafeOpportunityProjection(getRegisteredWorldEventOpportunity(opportunityA));
+  ensureMandatoryStoryOpportunityDiscoverable(opportunityA,{save:false});
+  const knownProjection=createObserverSafeOpportunityProjection(getRegisteredWorldEventOpportunity(opportunityA));
+  const grouped=getRegionHotspotProjections("diagnostic",{locations:[]});
+  const source=ensureWorldEventRuntimeState.toString()+createObserverSafeOpportunityProjection.toString();
+  const routerSource=routeWorldOpportunityInteraction.toString();
+  const recruitmentSource=commitRecruitmentOpportunity.toString();
+  const result={
+    noUniversalEventStatus:!source.includes("eventStatus"),
+    independentDimensionStores:["worldLifecycleByEventId","observerDiscoveryByOpportunityId","actionabilityByOpportunityId","trackingByOpportunityId","resolutionByOpportunityId"].every(key=>Object.prototype.hasOwnProperty.call(runtime,key)),
+    distinctStableIds:knownProjection&&knownProjection.hotspot_id!==knownProjection.location_id&&knownProjection.opportunity_id!==knownProjection.hotspot_id&&knownProjection.event_id!==knownProjection.opportunity_id,
+    unknownProjectionHidesTruth:hiddenProjection&&hiddenProjection.known_label==="???"&&!JSON.stringify(hiddenProjection).includes("secret_enemy")&&!JSON.stringify(hiddenProjection).includes("secret_reward")&&!JSON.stringify(hiddenProjection).includes("secret_gate"),
+    mandatoryStoryGuaranteedDiscovery:knownProjection&&knownProjection.discovery.known===true&&knownProjection.tracking.mandatory===true,
+    storyNeverRandomPool:getRegisteredWorldEventOpportunity(opportunityA).randomPoolEligible===false,
+    hotspotCanAggregateIndependentOpportunities:grouped.length===1&&grouped[0].aggregationCount===2&&new Set(grouped[0].opportunityIds).size===2,
+    selectionIsNotCommit:selectMapNode.toString().includes("selectedHotspotId")&&!selectMapNode.toString().includes("routeWorldOpportunityInteraction"),
+    genericRouterNotFightHardcode:routerSource.includes('case "battle"')&&routerSource.includes('case "recruit"')&&routerSource.includes('case "investigation"'),
+    battleConsumesExistingClanOrder:routerSource.includes("getPersistentClanBattleQueueSlots")&&!routerSource.includes("teamSlots="),
+    recruitmentUsesExistingAcquisitionAuthority:recruitmentSource.includes("commitCharacterAcquisition")&&!recruitmentSource.includes("grantCharacterRegistryOwnership"),
+    discoveryDoesNotGrantOwnership:!setOpportunityDiscovery.toString().includes("commitCharacterAcquisition"),
+    observerProjectionOmitsLegacyPLThreat:!renderHotspotHoverCard.toString().includes("getLocationThreat")&&!renderHotspotHoverCard.toString().includes("playerPowerLevel")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+
+  unregisterWorldEventOpportunity(opportunityA);
+  unregisterWorldEventOpportunity(opportunityB);
+  if (saved.discoveryA) runtime.observerDiscoveryByOpportunityId[opportunityA]=saved.discoveryA; else delete runtime.observerDiscoveryByOpportunityId[opportunityA];
+  if (saved.discoveryB) runtime.observerDiscoveryByOpportunityId[opportunityB]=saved.discoveryB; else delete runtime.observerDiscoveryByOpportunityId[opportunityB];
+  if (saved.trackingA) runtime.trackingByOpportunityId[opportunityA]=saved.trackingA; else delete runtime.trackingByOpportunityId[opportunityA];
+  return result;
+}
 
 // =========================================================
 // HOTSPOT GENERATOR
+// BRICK 695 — OBSERVER-SAFE RUNTIME HOTSPOTS
 // =========================================================
 
-function renderRegionHotspot(
-  regionKey,
-  location
-) {
-
-  const hoverSide =
-    getHotspotHoverSide(
-      location
-    );
-
-
+function renderRegionHotspot(regionKey,hotspot) {
+  const hoverSide=getHotspotHoverSide(hotspot.anchor||{x:0,y:0});
+  const visualClass=getHotspotPresentationClass(hotspot.presentationFamily);
+  const label=hotspot.knownLabel||"???";
+  const aggregateSuffix=hotspot.aggregationCount>1?` +${hotspot.aggregationCount-1}`:"";
   return `
-
-    <button
-      type="button"
-
-      class="
-        region-hotspot
-        region-hotspot-image
-        ${location.type}
-        ${hoverSide}
-      "
-
-      style="
-        left: ${location.x}%;
-        top: ${location.y}%;
-      "
-
-      onclick="
-        selectMapNode(
-          '${regionKey}',
-          '${location.id}'
-        )
-      "
-
-      aria-label="
-        ${location.name}
-      "
-    >
-
-
-      <span class="
-        hotspot-icon-shell
-      ">
-
-        <img
-          src="${location.icon}"
-
-          alt=""
-
-          class="
-            hotspot-icon-image
-          "
-        >
-
-      </span>
-
-
-      <span class="
-        hotspot-nameplate
-      ">
-
-        ${location.shortName || location.name}
-
-      </span>
-
-
-      ${renderHotspotHoverCard(
-        location
-      )}
-
-
+    <button type="button" class="region-hotspot region-hotspot-image ${visualClass} ${hoverSide}" style="left:${hotspot.anchor.x}%;top:${hotspot.anchor.y}%;" onclick="selectMapNode('${regionKey}','${hotspot.hotspotId}')" aria-label="${label}">
+      <span class="hotspot-icon-shell">${hotspot.icon?`<img src="${hotspot.icon}" alt="" class="hotspot-icon-image">`:getRegionSymbol(hotspot.presentationFamily)}</span>
+      <span class="hotspot-nameplate">${label}${aggregateSuffix}</span>
+      ${renderHotspotHoverCard(hotspot)}
     </button>
-
   `;
-
 }
-
-
 
 // =========================================================
 // AUTOMATIC HOVER-CARD DIRECTION
@@ -41381,307 +41426,23 @@ function getHotspotHoverSide(
 
 // =========================================================
 // HOVER INFORMATION CARD
+// BRICK 695 — COMPACT KNOWLEDGE-BOUNDED PREVIEW
 // =========================================================
 
-function renderHotspotHoverCard(
-  location
-) {
-
-  const power =
-    location.power || {};
-
-
-  const encounters =
-    location.encounters || {};
-
-
-  const rewards =
-    location.rewards || {};
-
-
-  const threat =
-    getLocationThreat(
-      location
-    );
-
-
+function renderHotspotHoverCard(hotspot) {
+  const label=hotspot.knownLabel||"???";
+  const summary=hotspot.knownSummary||"";
   return `
-
-    <span class="
-      hotspot-hover-card
-    ">
-
-
-      <span class="
-        hover-card-top
-      ">
-
-        <span>
-
-          <strong class="
-            hover-card-name
-          ">
-            ${location.name}
-          </strong>
-
-          <small class="
-            hover-card-category
-          ">
-            ${location.category}
-          </small>
-
-        </span>
-
-
-        <span class="
-          hover-threat
-          ${threat.className}
-        ">
-
-          ${threat.label}
-
-        </span>
-
+    <span class="hotspot-hover-card">
+      <span class="hover-card-top">
+        <span><strong class="hover-card-name">${label}</strong><small class="hover-card-category">${hotspot.presentationFamily||"Unknown"}</small></span>
       </span>
-
-
-      <span class="
-        hover-card-divider
-      ">
-      </span>
-
-
-      <span class="
-        hover-pl-grid
-      ">
-
-        <span>
-
-          <small>
-            YOUR PL
-          </small>
-
-          <strong>
-            ${formatPL(
-              playerPowerLevel
-            )}
-          </strong>
-
-        </span>
-
-
-        <span>
-
-          <small>
-            RECOMMENDED
-          </small>
-
-          <strong>
-            ${
-              power.recommended
-                ? formatPL(
-                    power.recommended
-                  )
-                : "SAFE"
-            }
-          </strong>
-
-        </span>
-
-      </span>
-
-
-      ${
-        power.enemyMax
-          ? `
-
-              <span class="
-                hover-info-row
-              ">
-
-                <small>
-                  Enemy PL
-                </small>
-
-                <strong>
-                  ${formatPL(
-                    power.enemyMin
-                  )}
-                  –
-                  ${formatPL(
-                    power.enemyMax
-                  )}
-                </strong>
-
-              </span>
-
-            `
-          : ""
-      }
-
-
-      <span class="
-        hover-info-row
-      ">
-
-        <small>
-          Encounters
-        </small>
-
-        <strong>
-          ${encounters.count || 0}
-        </strong>
-
-      </span>
-
-
-      ${
-        encounters.types &&
-        encounters.types.length
-          ? `
-
-              <span class="
-                hover-tags
-              ">
-
-                ${encounters.types.map(
-                  enemy => `
-
-                    <span>
-                      ${enemy}
-                    </span>
-
-                  `
-                ).join("")}
-
-              </span>
-
-            `
-          : ""
-      }
-
-
-      <span class="
-        hover-card-divider
-      ">
-      </span>
-
-
-      <span class="
-        hover-info-row
-      ">
-
-        <small>
-          Ryō
-        </small>
-
-        <strong>
-          ${rewards.ryo || "—"}
-        </strong>
-
-      </span>
-
-
-      ${
-        rewards.common &&
-        rewards.common.length
-          ? `
-
-              <span class="
-                hover-reward-title
-              ">
-                POSSIBLE LOOT
-              </span>
-
-
-              <span class="
-                hover-tags
-                rewards
-              ">
-
-                ${rewards.common.map(
-                  reward => `
-
-                    <span>
-                      ${reward}
-                    </span>
-
-                  `
-                ).join("")}
-
-              </span>
-
-            `
-          : ""
-      }
-
-
-      ${
-        rewards.rareDrops &&
-        rewards.rareDrops.length
-          ? `
-
-              <span class="
-                hover-rare-title
-              ">
-                RARE DROPS
-              </span>
-
-
-              <span class="
-                hover-rare-list
-              ">
-
-                ${rewards.rareDrops.map(
-                  drop => `
-
-                    <span class="
-                      hover-rare-row
-                    ">
-
-                      <span>
-
-                        <strong>
-                          ${drop.name}
-                        </strong>
-
-                        <small>
-                          ${drop.rarity}
-                        </small>
-
-                      </span>
-
-
-                      <b>
-                        ${drop.chance}%
-                      </b>
-
-                    </span>
-
-                  `
-                ).join("")}
-
-              </span>
-
-            `
-          : ""
-      }
-
-
-      <span class="
-        hover-card-footer
-      ">
-        CLICK TO ENTER / SELECT
-      </span>
-
-
+      ${summary?`<span class="hover-card-divider"></span><span class="hover-info-row"><small>${summary}</small></span>`:""}
+      ${hotspot.aggregationCount>1?`<span class="hover-info-row"><small>Known opportunities</small><strong>${hotspot.aggregationCount}</strong></span>`:""}
+      <span class="hover-card-footer">CLICK TO REVIEW</span>
     </span>
-
   `;
-
 }
-
-
 
 // =========================================================
 // PLAYER-TO-LOCATION THREAT
@@ -41873,89 +41634,37 @@ function calculateBattlePower(
 
 // =========================================================
 // SELECT / ENTER HOTSPOT
+// BRICK 695 — SELECTION IS PRESENTATION, NOT COMMITMENT
 // =========================================================
 
-function selectMapNode(
-  regionKey,
-  locationId
-) {
-
-  const region =
-    worldRegions[regionKey];
-
-
-  if (!region) {
-    return;
-  }
-
-
-  const location =
-    region.locations.find(
-      item =>
-        item.id ===
-        locationId
-    );
-
-
-  if (!location) {
-    return;
-  }
-
-
-  selectedRegionKey =
-    regionKey;
-
-
-  selectedLocationNode =
-    location;
-
-
-  handleNodeNavigation();
-
+function selectMapNode(regionKey,hotspotOrLocationId) {
+  const region=worldRegions[regionKey];
+  if (!region) return null;
+  const hotspot=getHotspotProjection(regionKey,hotspotOrLocationId);
+  if (!hotspot) return null;
+  selectedRegionKey=regionKey;
+  selectedHotspotId=hotspot.hotspotId;
+  selectedLocationNode=getWorldRegionLocation(regionKey,hotspot.locationId);
+  selectedOpportunityId=hotspot.opportunityIds[0]||null;
+  renderRegionHubUI(regionKey,region);
+  return hotspot;
 }
-
-
 
 // =========================================================
 // RETURN TO WORLD MAP
 // =========================================================
 
 function returnToWorldMap() {
-
-  const overlay =
-    document.getElementById(
-      "screen-overlay"
-    );
-
-
-  if (!overlay) {
-    return;
-  }
-
-
-  overlay.style.display =
-    "none";
-
-
-  overlay.classList.remove(
-    "region-map-open"
-  );
-
-
-  selectedRegionKey =
-    null;
-
-
-  selectedLocationNode =
-    null;
-
-
-  regionInfoOpen =
-    false;
-
+  const overlay=document.getElementById("screen-overlay");
+  if (!overlay) return;
+  overlay.style.display="none";
+  overlay.classList.remove("region-map-open");
+  selectedRegionKey=null;
+  selectedLocationNode=null;
+  selectedHotspotId=null;
+  selectedOpportunityId=null;
+  regionInfoOpen=false;
 }
-
-
 
 // =========================================================
 // LOCATION NAVIGATION
