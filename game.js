@@ -41694,6 +41694,19 @@ const STORY_SCENE_PRESENTATION_MODES=Object.freeze([
 // location identity != Scene Environment asset != Battle presentation.
 // No scene beat needs a bespoke image merely because dialogue exists.
 // =========================================================
+// =========================================================
+// BRICK 791 — CANONICAL SCENE BACKDROP DIRECTORY
+// =========================================================
+// The folder now exists in the project. This is directory authority only:
+// individual files are still registered only when approved assets actually exist.
+const ALPHA_SCENE_BACKDROP_ASSET_DIRECTORY="Assets/Scene Backdrops/";
+
+function getExpectedAlphaSceneBackdropAssetPath(assetId,extension="png") {
+  if (!assetId||!ALPHA_SCENE_ENVIRONMENT_LIBRARY||!ALPHA_SCENE_ENVIRONMENT_LIBRARY[assetId]) return "";
+  const ext=String(extension||"png").replace(/^\./,"");
+  return `${ALPHA_SCENE_BACKDROP_ASSET_DIRECTORY}${assetId}.${ext}`;
+}
+
 const ALPHA_SCENE_ENVIRONMENT_LIBRARY=Object.freeze({
   konoha_academy_classroom_day:Object.freeze({assetId:"konoha_academy_classroom_day",locationAssociations:["konoha:academy:classroom"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
   konoha_academy_courtyard_day:Object.freeze({assetId:"konoha_academy_courtyard_day",locationAssociations:["konoha:academy:courtyard","konoha:academy:exterior"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
@@ -42859,6 +42872,71 @@ function runAlphaPost790MonsterDiagnostics() {
   const groups={post764:runAlphaPostStoryUI764Diagnostics(),sceneEnvironment:runAlphaStorySceneEnvironmentDiagnostics(),waveC:runAlphaSpecialRepresentationWaveCDiagnostics()};
   const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-790 monster gate: ${result.pass?"PASS":"FAIL"}`);return result;
+}
+
+
+// =========================================================
+// BRICKS 817–823 — ENTITY / BOSS FINAL ACCEPTANCE GATES
+// =========================================================
+function runAlphaEntityFactoryFinalClosureDiagnostics() {
+  const complete=getEntityDefinition("kurama_complete");
+  const expectedProduction=["koto_crow","key_gero","de_baku","iron_maiden","ibuse","gamakichi","mirage_clam","wr_kamatari","mk_enma","triple_rashomon","nine_tails","breakout_kurama","menma_nine_tails","yang_kurama","yin_kurama","menma_kurama","kurama_complete"];
+  const result={
+    exactProductionEntities17:JSON.stringify(ALPHA_PRODUCTION_ENTITY_IDS)===JSON.stringify(expectedProduction),
+    summonFactoryFinalGate:runSummonFactoryProductionDiagnostics().pass===true,
+    ordinaryEntityActionConsumesCharacterOpportunity:attemptBattleSummonSkill.toString().includes('consumeBattleActionOpportunity("player",actor.id')&&attemptBattleSummonSkill.toString().includes("entityActionOwnerId:skill.sourceEntityId"),
+    noIndependentEntityTurn:!attemptBattleSummonSkill.toString().includes('consumeBattleActionOpportunity("entity"')&&!attemptBattleSummonSkill.toString().includes("entityTurn"),
+    directBattlePLDistinct:getSummonSkillDefinition("koto_crow_genjutsu_echo").resolutionKind==="direct_battle_pl"&&getSummonSkillDefinition("ibuse_poison_mist").resolutionKind==="direct_battle_pl_with_poison",
+    oilNotBurning:getSummonSkillDefinition("gamakichi_oil_bullet").stateKey==="oiled",
+    restraintNotStun:getSummonSkillDefinition("enma_monkey_kings_restraint").conditionType==="physical_restraint",
+    breakoutNotNineTails:getSummonSkillDefinition("breakout_kurama_calamity_rend").sourceEntityId==="breakout_kurama"&&getSummonSkillDefinition("nine_tails_calamity_rend").sourceEntityId==="nine_tails",
+    yangNotYin:getSummonSkillDefinition("yang_kurama_maul").sourceEntityId==="yang_kurama"&&getSummonSkillDefinition("yin_kurama_night_rend").sourceEntityId==="yin_kurama",
+    completeRequiresReunion:!!complete&&complete.requiresAuthoritativeReunion===true&&complete.manifestationMode==="authoritative_reunion",
+    completeStatsPreserveRegistryAuthority:!!complete&&JSON.stringify([complete.baseStats.nin,complete.baseStats.tai,complete.baseStats.buki,complete.baseStats.fuin,complete.baseStats.kin,complete.baseStats.gen,complete.baseStats.stamina])===JSON.stringify([132,124,84,116,84,38,148]),
+    combatHandoffStatConflictNotSilentlyApplied:!!complete&&complete.baseStats.buki===84&&complete.baseStats.fuin===116&&complete.baseStats.kin===84&&complete.baseStats.gen===38,
+    rashomonSuccessfulOrderOwnsPayoff:TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES["3>2>1"]==="Ruined Gate Cataclysm"&&getSummonSkillDefinition("triple_rashomon_ruined_gate_cataclysm").preparedSelectable===false,
+    cleanupNotHistoryRollback:(getSummonSkillDefinition("key_gero_recoil_purge").traits||[]).includes("history_rollback_forbidden"),
+    entityPLNeverTransferred:attemptBattleSummonSkill.toString().includes("entityPLTransfer:false")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);return result;
+}
+
+function runAlphaBossFinalClosureDiagnostics() {
+  const failed=ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.failed_god_madara||[];
+  const shadowSeal=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.fallen_hokage_sasuke||[]).find(action=>action.id==="fallen_hokage_sasuke_shadow_seal");
+  const tendril=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.black_madara||[]).find(action=>action.id==="black_madara_black_tendril_impalement");
+  const result={
+    exactBossPL:[["undying_madara",108],["black_madara",117],["failed_god_madara",137],["fallen_hokage_sasuke",108],["shadow_of_indra",124],["sixth_shadow",134]].every(([id,pl])=>getCharacterRegistryEntry(id).basePL===pl),
+    canonSuccessionExact:getAuthoritativeBossStageSuccessor("undying_madara")==="black_madara"&&getAuthoritativeBossStageSuccessor("black_madara")==="failed_god_madara"&&getAuthoritativeBossStageSuccessor("failed_god_madara")===null,
+    alternateSuccessionExact:getAuthoritativeBossStageSuccessor("fallen_hokage_sasuke")==="shadow_of_indra"&&getAuthoritativeBossStageSuccessor("shadow_of_indra")==="sixth_shadow"&&getAuthoritativeBossStageSuccessor("sixth_shadow")===null,
+    noPerfectSusanoo:!getCharacterRegistryEntry("perfect_susanoo")&&getAuthoritativeBossStageSuccessor("fallen_hokage_sasuke")==="shadow_of_indra",
+    noGenericFallenHokage:!getCharacterRegistryEntry("fallen_hokage"),
+    noPriorStagePackageInheritance:["undying_madara","black_madara","failed_god_madara","fallen_hokage_sasuke","shadow_of_indra","sixth_shadow"].every(id=>{const stage=getBossStageSuccessionAuthority(id);return stage&&stage.inheritPriorStagePackages===false;}),
+    tendrilRestraintNotAutomatic:!!tendril&&(tendril.traits||[]).includes("damage_success_not_automatic_restraint"),
+    areaPerTargetAbsoluteCaps:makeEnemyAreaDamageAction.toString().includes("absoluteCapPerTarget")&&makeEnemyAreaDamageAction.toString().includes("perTargetExcess"),
+    heavenCoreForcedSequence:getEligibleEnemyAuthoredBattleActions.toString().includes("failed_god_heaven_core_committed")&&getEligibleEnemyAuthoredBattleActions.toString().includes('action.id==="failed_god_madara_heaven_core"'),
+    shadowSealOneInterference:!!shadowSeal&&makeEnemyDynamicControlAction.toString().includes("durationActionOpportunities")&&JSON.stringify((ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.fallen_hokage_sasuke||[]).map(a=>a.id)).includes("fallen_hokage_sasuke_shadow_seal"),
+    aegisFractureExact:(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.failed_god_madara||[]).some(action=>action.id==="failed_god_madara_divinity_aegis"),
+    blackMirrorCategorical:(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.shadow_of_indra||[]).find(action=>action.id==="shadow_of_indra_black_mirror").actionClass==="enemy_context_technique",
+    shadowstepNoHiddenSpeed:(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.sixth_shadow||[]).find(action=>action.id==="sixth_shadow_shadowstep_reversal").traits.includes("no_hidden_speed"),
+    fireNoAutomaticBurning:["undying_madara_great_fire_annihilation","black_madara_firestorm"].every(id=>!JSON.stringify(Object.values(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES).flat()).includes(`${id}::automatic_burning`)),
+    guardsRemainPreStamina:resolveBattlePreStaminaDefense.toString().includes("ratioGuardStates"),
+    transitionPreservesHistory:transitionAuthoritativeBossStage.toString().includes("historicalEvidencePreserved:true")&&transitionAuthoritativeBossStage.toString().includes("recordBattleEvidence")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);return result;
+}
+
+function runAlphaPost823MonsterDiagnostics() {
+  const groups={
+    post790:runAlphaPost790MonsterDiagnostics(),
+    entityFactory:runAlphaEntityFactoryFinalClosureDiagnostics(),
+    bossFinal:runAlphaBossFinalClosureDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-823 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
 }
 
 // =========================================================
@@ -69515,12 +69593,276 @@ const summonSkillDatabase = {
   nine_tails_fox_chakra_surge:{ id:"nine_tails_fox_chakra_surge",sourceEntityId:"nine_tails",displayName:"Fox Chakra Surge",resolutionKind:"support_access_evidence",traits:["summon_manifestation","transformation_support_only"] }
 };
 
+
+// =========================================================
+// BRICKS 792–808 — ENTITY FACTORY FINAL 17/17 COMBAT INGESTION
+// =========================================================
+// This finishes Combat authority in the existing Entity/Summon skill catalogue.
+// Registering a special/hosted Entity package does NOT make that Entity an
+// ordinary attached Summon, participant, turn owner, or PL donor.
+Object.assign(summonSkillDatabase,{
+  // Koto Crow final third action.
+  koto_crow_feather_veil:{
+    id:"koto_crow_feather_veil",sourceEntityId:"koto_crow",displayName:"Feather Veil",
+    resolutionKind:"categorical_evidence",targetMode:"current_enemy",
+    semanticClass:"visual_perception_interference",
+    traits:["summon_manifestation","perception_interference","no_automatic_blind","no_automatic_miss","knowledge_not_erased","controller_not_untargetable"]
+  },
+
+  // Gerotora / Key Gero. Entity is not promoted into ordinary Summon lifecycle.
+  key_gero_formula_diagnosis:{
+    id:"key_gero_formula_diagnosis",sourceEntityId:"key_gero",displayName:"Formula Diagnosis",
+    resolutionKind:"categorical_state_inspection",targetMode:"current_enemy",
+    semanticClass:"observable_seal_or_recoil_inspection",
+    traits:["no_universal_seal_knowledge","observer_authority_required"],ordinarySummonSelectable:false
+  },
+  key_gero_recoil_purge:{
+    id:"key_gero_recoil_purge",sourceEntityId:"key_gero",displayName:"Recoil Purge",
+    resolutionKind:"exact_state_cleanup",targetMode:"current_enemy",
+    semanticClass:"compatible_recoil_or_seal_cleanup",
+    traits:["current_state_only","history_rollback_forbidden","not_generic_condition_cure","cannot_dismiss_breakout_kurama"],ordinarySummonSelectable:false
+  },
+  key_gero_formula_brace:{
+    id:"key_gero_formula_brace",sourceEntityId:"key_gero",displayName:"Formula Brace",
+    resolutionKind:"dynamic_interaction",targetMode:"current_enemy",
+    resolverDiscipline:"Fūinjutsu",nativeBaselineStrength:62,enhancementPackageId:"sealkeepers_counsel",
+    semanticClass:"formula_brace",traits:["live_effective_resolver","no_universal_68"],ordinarySummonSelectable:false
+  },
+
+  // Baku.
+  de_baku_devouring_suction:{
+    id:"de_baku_devouring_suction",sourceEntityId:"de_baku",displayName:"Devouring Suction",
+    resolutionKind:"dynamic_interaction",targetMode:"current_enemy",
+    resolverDiscipline:"Ninjutsu",nativeBaselineStrength:55,semanticClass:"forced_movement_control",
+    traits:["forced_movement_only","not_generic_stun","no_automatic_attack_pl"]
+  },
+  de_baku_anchor:{
+    id:"de_baku_anchor",sourceEntityId:"de_baku",displayName:"Anchor",
+    resolutionKind:"categorical_self_state",targetMode:"self",stateKey:"de_baku_anchor_ready",
+    semanticClass:"forced_movement_anchor",
+    traits:["forced_movement_resistance_context","no_invulnerability","no_scalar"]
+  },
+
+  // Iron Maiden.
+  iron_maiden_iron_containment:{
+    id:"iron_maiden_iron_containment",sourceEntityId:"iron_maiden",displayName:"Iron Containment",
+    resolutionKind:"dynamic_control",targetMode:"current_enemy",
+    resolverDiscipline:"Fūinjutsu",nativeBaselineStrength:48,
+    conditionKey:"iron_containment",conditionType:"containment",
+    traits:["typed_containment","not_generic_stun","no_automatic_attack_pl"]
+  },
+  iron_maiden_sealed_chamber_lock:{
+    id:"iron_maiden_sealed_chamber_lock",sourceEntityId:"iron_maiden",displayName:"Sealed Chamber Lock",
+    resolutionKind:"upgrade_control_state",targetMode:"current_enemy",
+    resolverDiscipline:"Fūinjutsu",nativeBaselineStrength:48,
+    requiresConditionKey:"iron_containment",upgradedConditionKey:"sealed_chamber",
+    traits:["typed_containment_upgrade","not_generic_stun","no_automatic_attack_pl"]
+  },
+
+  // Mirage Clam.
+  mirage_clam_false_horizon:{
+    id:"mirage_clam_false_horizon",sourceEntityId:"mirage_clam",displayName:"False Horizon",
+    resolutionKind:"field_state",targetMode:"self",stateKey:"mirage_field",
+    resolverDiscipline:"Genjutsu",nativeBaselineStrength:82,enhancementPackageId:"illusion_lattice",
+    semanticClass:"observer_relative_mirage_field",
+    traits:["world_truth_unchanged","perception_before_interpretation","no_automatic_attack_pl"]
+  },
+  mirage_clam_crushing_shell:{
+    id:"mirage_clam_crushing_shell",sourceEntityId:"mirage_clam",displayName:"Crushing Shell",
+    resolutionKind:"field_context_damage",targetMode:"current_enemy",
+    authoredAttackPL:14,boostedAttackPL:18,staminaMitigation:true,
+    requiredFieldStateKey:"mirage_field",consumeFieldOnEnhancedCommit:true,
+    traits:["field_consumed_on_committed_branch","no_rollback_if_defended"]
+  },
+
+  // Kamatari.
+  kamatari_crosswind_interception:{
+    id:"kamatari_crosswind_interception",sourceEntityId:"wr_kamatari",displayName:"Crosswind Interception",
+    resolutionKind:"categorical_self_state",targetMode:"self",stateKey:"kamatari_crosswind_interception_ready",
+    semanticClass:"interception_reposition",
+    traits:["categorical_interception","no_universal_defense_percentage"]
+  },
+  kamatari_gale_sever:{
+    id:"kamatari_gale_sever",sourceEntityId:"wr_kamatari",displayName:"Gale Sever",
+    resolutionKind:"charged_persistent_attack",targetMode:"current_enemy",
+    chargeStateKey:"kamatari_gale_sever_charge",
+    stageAttackPL:{1:12,2:21,3:32},
+    stage3Excess:{eligible:true,capRatio:0.50,absoluteCap:16},
+    catastrophicBackfire:{2:6,3:10},staminaMitigation:true,
+    traits:["persistent_charged_technique","stage2_3_require_maintained_commitment","clean_cancel_no_backfire","catastrophic_interruption_only"]
+  },
+
+  // Triple Rashomon. Gate input order never counts; only successful qualified interceptions append.
+  triple_rashomon_gate_flesh:{
+    id:"triple_rashomon_gate_flesh",sourceEntityId:"triple_rashomon",displayName:"Flesh Gate",
+    resolutionKind:"rashomon_gate_prepare",targetMode:"self",gateNumber:1,
+    qualifyingDisciplines:["Taijutsu","Bukijutsu"],
+    traits:["categorical_gate","collective_entity_one_participant","no_percentage_guard"]
+  },
+  triple_rashomon_gate_spirit:{
+    id:"triple_rashomon_gate_spirit",sourceEntityId:"triple_rashomon",displayName:"Spirit Gate",
+    resolutionKind:"rashomon_gate_prepare",targetMode:"self",gateNumber:2,
+    qualifyingDisciplines:["Genjutsu","Fūinjutsu"],
+    traits:["categorical_gate","collective_entity_one_participant","no_percentage_guard"]
+  },
+  triple_rashomon_gate_chakra:{
+    id:"triple_rashomon_gate_chakra",sourceEntityId:"triple_rashomon",displayName:"Chakra Gate",
+    resolutionKind:"rashomon_gate_prepare",targetMode:"self",gateNumber:3,
+    qualifyingDisciplines:["Ninjutsu","Kinjutsu"],
+    traits:["categorical_gate","collective_entity_one_participant","no_percentage_guard"]
+  },
+  triple_rashomon_ruined_gate_cataclysm:{
+    id:"triple_rashomon_ruined_gate_cataclysm",sourceEntityId:"triple_rashomon",displayName:"Ruined Gate Cataclysm",
+    resolutionKind:"rashomon_sequence_payoff_damage",targetMode:"current_enemy",
+    authoredAttackPL:80,staminaMitigation:true,excess:{eligible:true,capRatio:0.50,absoluteCap:40},
+    requiresSequence:"3>2>1",preparedSelectable:false,
+    traits:["sequence_art_payoff","requires_legitimate_completed_sequence","nonrecursive_excess"]
+  },
+
+  // Nine-Tails cap completion.
+  nine_tails_calamity_rend:{
+    id:"nine_tails_calamity_rend",sourceEntityId:"nine_tails",displayName:"Calamity Rend",
+    resolutionKind:"direct_damage",authoredAttackPL:48,staminaMitigation:true,
+    excess:{eligible:true,capRatio:0.40,absoluteCap:19},traits:["summon_manifestation"]
+  },
+  nine_tails_tailed_beast_bomb:{
+    id:"nine_tails_tailed_beast_bomb",sourceEntityId:"nine_tails",displayName:"Tailed Beast Bomb",
+    resolutionKind:"direct_damage",authoredAttackPL:90,staminaMitigation:true,
+    excess:{eligible:true,capRatio:0.60,absoluteCap:54},
+    traits:["summon_manifestation","committed_high_end_attack","not_extinction_core_lifecycle"]
+  },
+
+  // Breakout Kurama — hostile manifestation package, not ordinary Summon.
+  breakout_kurama_calamity_rend:{
+    id:"breakout_kurama_calamity_rend",sourceEntityId:"breakout_kurama",displayName:"Calamity Rend",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:56,staminaMitigation:true,
+    excess:{eligible:true,capRatio:0.50,absoluteCap:28},ordinarySummonSelectable:false
+  },
+  breakout_kurama_calamity_roar:{
+    id:"breakout_kurama_calamity_roar",sourceEntityId:"breakout_kurama",displayName:"Calamity Roar",
+    resolutionKind:"area_damage",targetMode:"active_enemies",authoredAttackPL:28,maxTargets:3,staminaMitigation:true,
+    ordinarySummonSelectable:false,traits:["one_authored_area_action","separate_target_packets"]
+  },
+  breakout_kurama_tailed_beast_bomb:{
+    id:"breakout_kurama_tailed_beast_bomb",sourceEntityId:"breakout_kurama",displayName:"Tailed Beast Bomb",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:98,staminaMitigation:true,
+    excess:{eligible:true,capRatio:0.60,absoluteCap:58},ordinarySummonSelectable:false
+  },
+
+  // Menma Nine-Tails ordinary attached relationship package.
+  menma_nine_tails_foxfire:{
+    id:"menma_nine_tails_foxfire",sourceEntityId:"menma_nine_tails",displayName:"Foxfire",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:40,staminaMitigation:true
+  },
+  menma_nine_tails_yin_bind:{
+    id:"menma_nine_tails_yin_bind",sourceEntityId:"menma_nine_tails",displayName:"Yin Bind",
+    resolutionKind:"fixed_control",targetMode:"current_enemy",fixedControlMagnitude:72,
+    conditionKey:"yin_bind",conditionType:"sealing_control",
+    traits:["control_only","no_extra_damage","not_generic_stun"]
+  },
+  menma_nine_tails_mantle_infusion:{
+    id:"menma_nine_tails_mantle_infusion",sourceEntityId:"menma_nine_tails",displayName:"Mantle Infusion",
+    resolutionKind:"restore_temporary_capacity_overlay",targetMode:"self",temporaryCapacityMaximum:4,
+    overlaySourceKey:"entity:menma_nine_tails:mantle_infusion",
+    traits:["temporary_battle_capacity_only","not_underlying_battle_pl","not_stamina","not_injury","not_permanent_pl"]
+  },
+
+  // Yang partition package — not ordinary attachment by registration.
+  yang_kurama_maul:{
+    id:"yang_kurama_maul",sourceEntityId:"yang_kurama",displayName:"Maul",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:48,staminaMitigation:true,ordinarySummonSelectable:false
+  },
+  yang_kurama_chakra_cannon:{
+    id:"yang_kurama_chakra_cannon",sourceEntityId:"yang_kurama",displayName:"Chakra Cannon",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:86,staminaMitigation:true,
+    excess:{eligible:true,capRatio:0.50,absoluteCap:43},ordinarySummonSelectable:false
+  },
+  yang_kurama_rampart:{
+    id:"yang_kurama_rampart",sourceEntityId:"yang_kurama",displayName:"Rampart",
+    resolutionKind:"ratio_guard",targetMode:"self",preventionRatio:0.55,ordinarySummonSelectable:false
+  },
+
+  // Yin partition package.
+  yin_kurama_yin_bind:{
+    id:"yin_kurama_yin_bind",sourceEntityId:"yin_kurama",displayName:"Yin Bind",
+    resolutionKind:"fixed_control",targetMode:"current_enemy",fixedControlMagnitude:100,
+    conditionKey:"yin_kurama_yin_bind",conditionType:"sealing_control",
+    ordinarySummonSelectable:false,traits:["live_authored_sealing_strength","not_generic_stun"]
+  },
+  yin_kurama_night_rend:{
+    id:"yin_kurama_night_rend",sourceEntityId:"yin_kurama",displayName:"Night Rend",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:44,staminaMitigation:true,ordinarySummonSelectable:false
+  },
+  yin_kurama_nightveil:{
+    id:"yin_kurama_nightveil",sourceEntityId:"yin_kurama",displayName:"Nightveil",
+    resolutionKind:"categorical_dynamic_interaction",targetMode:"current_enemy",
+    resolverDiscipline:"Genjutsu",nativeBaselineStrength:94,semanticClass:"nightveil_perception_interaction",
+    ordinarySummonSelectable:false,traits:["observer_relative","scalar_only_if_resolver_needs"]
+  },
+
+  // Menma Kurama special relationship representation.
+  menma_kurama_foxfire_barrage:{
+    id:"menma_kurama_foxfire_barrage",sourceEntityId:"menma_kurama",displayName:"Foxfire Barrage",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:56,staminaMitigation:true,
+    mechanicalPacketCount:1,ordinarySummonSelectable:false,traits:["barrage_visual_one_packet"]
+  },
+  menma_kurama_eclipse_prison:{
+    id:"menma_kurama_eclipse_prison",sourceEntityId:"menma_kurama",displayName:"Eclipse Prison",
+    resolutionKind:"scaled_dynamic_control",targetMode:"current_enemy",resolverDiscipline:"Fūinjutsu",
+    resolverMultiplier:0.90,nativeBaselineStrength:94,conditionKey:"eclipse_prison",conditionType:"containment",
+    ordinarySummonSelectable:false,traits:["control_only","not_generic_stun"]
+  },
+  menma_kurama_eclipse_citadel:{
+    id:"menma_kurama_eclipse_citadel",sourceEntityId:"menma_kurama",displayName:"Eclipse Citadel",
+    resolutionKind:"ratio_guard",targetMode:"self",preventionRatio:0.60,ordinarySummonSelectable:false
+  },
+
+  // Complete Kurama authoritative reunion package.
+  kurama_complete_chakra_cannon:{
+    id:"kurama_complete_chakra_cannon",sourceEntityId:"kurama_complete",displayName:"Chakra Cannon",
+    resolutionKind:"direct_damage",targetMode:"current_enemy",authoredAttackPL:112,staminaMitigation:true,
+    excess:{eligible:true,capRatio:0.60,absoluteCap:67,authoredMaximumPreStaminaContinuation:179},
+    ordinarySummonSelectable:false
+  },
+  kurama_complete_calamity_roar:{
+    id:"kurama_complete_calamity_roar",sourceEntityId:"kurama_complete",displayName:"Calamity Roar",
+    resolutionKind:"area_damage",targetMode:"active_enemies",authoredAttackPL:50,maxTargets:3,staminaMitigation:true,
+    ordinarySummonSelectable:false,traits:["one_authored_area_action","separate_target_packets"]
+  },
+  kurama_complete_rampart:{
+    id:"kurama_complete_rampart",sourceEntityId:"kurama_complete",displayName:"Rampart",
+    resolutionKind:"ratio_guard",targetMode:"self",preventionRatio:0.65,ordinarySummonSelectable:false
+  }
+});
+
+const TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES=Object.freeze({
+  "1>2>3":"Nine Hells Sanctuary",
+  "1>3>2":"Demon's Reversal",
+  "2>1>3":"Graveyard Seal",
+  "2>3>1":"Forsaken Threshold",
+  "3>1>2":"Maw of the Abandoned",
+  "3>2>1":"Ruined Gate Cataclysm"
+});
+
 function getSummonSkillDefinition(skillId) {
   return summonSkillDatabase[skillId]||null;
 }
 
 function getSummonSkillsForEntity(entityId) {
   return Object.values(summonSkillDatabase).filter(skill=>skill&&skill.sourceEntityId===entityId);
+}
+
+function getSummonPreparedSkillsForEntity(entityId,actor=null) {
+  return getSummonSkillsForEntity(entityId).filter(skill=>{
+    if (!skill||skill.ordinarySummonSelectable===false) return false;
+    if (skill.preparedSelectable===false) {
+      if (skill.id==="triple_rashomon_ruined_gate_cataclysm"&&actor) {
+        return !!findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actor.id});
+      }
+      return false;
+    }
+    return true;
+  });
 }
 
 function getSummonSkillSourceRefs(skill,actor) {
@@ -69542,7 +69884,7 @@ function openBattleSummonActionFamily() {
   if (!actor || !attached) return {success:false,reason:"attached_summon_unavailable"};
   const entity=getEntityDefinition(attached.summonId);
   if (!entity||!isAttachableSummonEntity(entity)) return {success:false,reason:"representation_not_ordinary_summon_lifecycle"};
-  const skills=getSummonSkillsForEntity(attached.summonId);
+  const skills=getSummonPreparedSkillsForEntity(attached.summonId,actor);
   if (skills.length===0) return {success:false,reason:"no_prepared_summon_skills"};
   const state=ensureBattleRuntimeState().summonActionState;
   state.actorParticipantId=actor.id; state.summonId=attached.summonId; state.mode="summon_skills";
@@ -69572,7 +69914,7 @@ function renderBattleSummonActionRegion(actor) {
   const attached=actor?getBattleAttachedSummon("player",actor.id):null;
   if (!attached) return `<section class="battle-live-summon"><div class="battle-live-summon-title">SUMMON</div><div class="battle-live-summon-empty">NO ATTACHED SUMMON</div><button type="button" onclick="closeBattleSummonActionFamily()">← BACK</button></section>`;
   const entity=getEntityDefinition(attached.summonId);
-  const skills=entity&&isAttachableSummonEntity(entity)?getSummonSkillsForEntity(attached.summonId):[];
+  const skills=entity&&isAttachableSummonEntity(entity)?getSummonPreparedSkillsForEntity(attached.summonId,actor):[];
   return `
     <section class="battle-live-summon" aria-label="Summon Actions">
       <div class="battle-live-summon-title">SUMMON • ${attached.summonId}</div>
@@ -69677,8 +70019,242 @@ function createSummonFlatGuard(skill,actor,envelope) {
   });
 }
 
-function resolveBattleSummonSkillSemantics(skill,actor,target,envelope) {
+
+// =========================================================
+// BRICKS 809–816 — ENTITY SKILL RESOLUTION EXTENSIONS
+// =========================================================
+function recordSummonCategoricalEvidence(skill,actor,target,envelope,extra={}) {
+  const evidence=recordBattleEvidence({
+    eventType:"entity_categorical_interaction_resolved",
+    actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:target?createBattleParticipantRef("enemy",target.id):envelope.targetRef,
+    skillId:skill.id,sourceRefs:envelope.sourceRefs,
+    data:{semanticClass:skill.semanticClass||skill.resolutionKind,automaticAttackPL:0,hiddenStatCreated:false,independentParticipantCreated:false,...cloneBattleRuntimeValue(extra)}
+  });
+  return {resolved:!!evidence,branch:skill.resolutionKind,damageApplied:false,stateRefs:[],conditionRefs:[],evidence};
+}
+
+function resolveSummonAreaAttackPL(skill,actor,envelope) {
+  const targetIds=getFactoryActiveTargetIds("enemy",Math.max(1,Math.min(3,Number(skill.maxTargets)||3)));
+  const results=[];
+  targetIds.forEach(targetId=>{
+    const target=getBattleParticipantByIdentity("enemy",targetId);
+    if (!target) return;
+    const output={primaryDiscipline:skill.primaryDiscipline||null,statKey:getBattlePrimaryDisciplineStatKey(skill.primaryDiscipline),effectivePrimaryDiscipline:null,coefficient:null,branch:"authored_entity_area_output",branchMultiplier:1,authoredPreExecutionMagnitude:skill.authoredAttackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:skill.authoredAttackPL,attackPL:skill.authoredAttackPL,perTarget:true};
+    const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:skill.staminaMitigation!==false,excess:skill.excess||null,stateRefs:[]});
+    if (damage) results.push({targetParticipantId:target.id,damage});
+  });
+  return {resolved:results.length>0,branch:"entity_area_damage",damageApplied:results.length>0,areaResults:results,stateRefs:[],conditionRefs:[],crossTargetPooling:false};
+}
+
+function resolveSummonDynamicInteraction(skill,actor,target,envelope,{createCondition=false,multiplier=1}={}) {
+  if (!target) return {resolved:false,reason:"dynamic_interaction_target_missing"};
+  const resolver=getSummonEntityLiveResolverStat(skill.sourceEntityId,skill.resolverDiscipline,actor,skill.enhancementPackageId||null);
+  const strength=Math.max(0,Math.round(resolver.value*(Number(multiplier)||1)));
+  if (!createCondition) return recordSummonCategoricalEvidence(skill,actor,target,envelope,{resolverDiscipline:skill.resolverDiscipline,resolverStrength:strength,liveEffectiveResolver:true,nativeBaseline:resolver.base,currentEntityStat:resolver.current,packageContribution:resolver.packageContribution,packageActive:resolver.packageActive,blanketStun:false});
+  const condition=upsertBattleCondition({
+    conditionKey:skill.conditionKey||skill.id,conditionType:skill.conditionType||"authored_control",
+    sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,
+    targetSide:"enemy",targetParticipantId:target.id,reapplication:"refresh",blockedActionTraits:[...(skill.blockedActionTraits||[])],
+    ownerRef:{type:"summon_entity",id:skill.sourceEntityId,role:"control_source"},
+    data:{semanticClass:skill.semanticClass||null,controlStrength:strength,resolverDiscipline:skill.resolverDiscipline,liveEffectiveResolver:true,nativeBaseline:resolver.base,currentEntityStat:resolver.current,packageContribution:resolver.packageContribution,packageActive:resolver.packageActive,blanketStun:false}
+  });
+  return {resolved:!!condition,branch:"dynamic_control",damageApplied:false,stateRefs:[],conditionRefs:condition?[condition.conditionId]:[],resolver:{...resolver,value:strength}};
+}
+
+function resolveSummonFixedControl(skill,actor,target,envelope) {
+  if (!target) return {resolved:false,reason:"fixed_control_target_missing"};
+  const strength=Math.max(0,Math.round(Number(skill.fixedControlMagnitude)||0));
+  if (strength<=0) return {resolved:false,reason:"fixed_control_magnitude_missing"};
+  const condition=upsertBattleCondition({
+    conditionKey:skill.conditionKey||skill.id,conditionType:skill.conditionType||"authored_control",
+    sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,
+    targetSide:"enemy",targetParticipantId:target.id,reapplication:"refresh",blockedActionTraits:[],
+    ownerRef:{type:"summon_entity",id:skill.sourceEntityId,role:"control_source"},
+    data:{controlStrength:strength,fixedAuthoredMagnitude:true,blanketStun:false,attackPL:0}
+  });
+  return {resolved:!!condition,branch:"fixed_control",damageApplied:false,stateRefs:[],conditionRefs:condition?[condition.conditionId]:[],controlStrength:strength};
+}
+
+function resolveSummonExactStateCleanup(skill,actor,target,envelope) {
+  if (!target) return {resolved:false,reason:"cleanup_target_missing"};
+  const candidateCondition=getBattleParticipantConditions("enemy",target.id).find(condition=>condition&&condition.data&&(condition.data.gerotoraCompatible===true||condition.data.recoilOrSealConsequence===true));
+  const candidateState=getBattleTransientStatesForParticipant("enemy",target.id).find(state=>state&&state.data&&(state.data.gerotoraCompatible===true||state.data.recoilOrSealConsequence===true));
+  if (!candidateCondition&&!candidateState) return {resolved:false,reason:"compatible_recoil_or_seal_state_missing"};
+  let removedId=null,removedKind=null;
+  if (candidateCondition) {removeBattleCondition(candidateCondition.conditionId,{reason:"gerotora_exact_state_cleanup",actionId:envelope.actionId,targetRef:createBattleParticipantRef("enemy",target.id)});removedId=candidateCondition.conditionId;removedKind="condition";}
+  else if (candidateState) {removeBattleTransientState(candidateState.stateId);removedId=candidateState.stateId;removedKind="transient_state";}
+  const evidence=recordBattleEvidence({eventType:"entity_exact_state_cleanup",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:createBattleParticipantRef("enemy",target.id),skillId:skill.id,sourceRefs:envelope.sourceRefs,data:{removedId,removedKind,historyRollback:false,genericConditionCure:false,breakoutKuramaDismissed:false}});
+  return {resolved:!!evidence,branch:"exact_state_cleanup",damageApplied:false,stateRefs:[],conditionRefs:[],removedId,removedKind};
+}
+
+function resolveIronMaidenContainmentUpgrade(skill,actor,target,envelope) {
+  if (!target) return {resolved:false,reason:"containment_target_missing"};
+  const current=getBattleParticipantConditions("enemy",target.id).find(condition=>condition&&condition.conditionKey===skill.requiresConditionKey&&condition.ownerRef&&condition.ownerRef.id===skill.sourceEntityId);
+  if (!current) return {resolved:false,reason:"required_iron_containment_missing"};
+  const resolver=getSummonEntityLiveResolverStat(skill.sourceEntityId,skill.resolverDiscipline,actor,null);
+  removeBattleCondition(current.conditionId,{reason:"sealed_chamber_upgrade",actionId:envelope.actionId,targetRef:createBattleParticipantRef("enemy",target.id)});
+  const upgraded=upsertBattleCondition({
+    conditionKey:skill.upgradedConditionKey,conditionType:"containment",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,
+    sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:"enemy",targetParticipantId:target.id,reapplication:"refresh",blockedActionTraits:[],
+    ownerRef:{type:"summon_entity",id:skill.sourceEntityId,role:"control_source"},
+    data:{controlStrength:resolver.value,resolverDiscipline:skill.resolverDiscipline,liveEffectiveResolver:true,blanketStun:false,upgradedFromConditionId:current.conditionId}
+  });
+  return {resolved:!!upgraded,branch:"containment_upgrade",damageApplied:false,stateRefs:[],conditionRefs:upgraded?[upgraded.conditionId]:[]};
+}
+
+function resolveMirageField(skill,actor,envelope) {
+  const existing=findBattleTransientState({stateKey:skill.stateKey,sourceSide:"player",sourceParticipantId:actor.id});
+  if (existing) removeBattleTransientState(existing.stateId);
+  const resolver=getSummonEntityLiveResolverStat(skill.sourceEntityId,skill.resolverDiscipline,actor,skill.enhancementPackageId||null);
+  const state=addBattleTransientState({
+    stateKey:skill.stateKey,sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,
+    ownerRef:{type:"summon_entity",id:skill.sourceEntityId,role:"field_source"},
+    data:{fieldStrength:resolver.value,resolverDiscipline:skill.resolverDiscipline,worldTruthChanged:false,observerRelative:true,sourceSkillId:skill.id}
+  });
+  const evidence=recordBattleEvidence({eventType:"entity_field_established",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:state?[state.stateId]:[],data:{fieldStateKey:skill.stateKey,fieldStrength:resolver.value,worldTruthChanged:false,observerPerceptionInteractionRequired:true}});
+  return {resolved:!!state&&!!evidence,branch:"field_state",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],resolver};
+}
+
+function resolveMirageCrushingShell(skill,actor,target,envelope) {
+  if (!target) return {resolved:false,reason:"mirage_shell_target_missing"};
+  const field=findBattleTransientState({stateKey:skill.requiredFieldStateKey,sourceSide:"player",sourceParticipantId:actor.id});
+  const attackPL=Math.max(0,Math.round(Number(field?skill.boostedAttackPL:skill.authoredAttackPL)||0));
+  if (field&&skill.consumeFieldOnEnhancedCommit===true) removeBattleTransientState(field.stateId);
+  const output={primaryDiscipline:null,statKey:null,effectivePrimaryDiscipline:null,coefficient:null,branch:field?"mirage_field_enhanced":"base",branchMultiplier:1,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,attackPL};
+  const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,excess:null,stateRefs:field?[field.stateId]:[]});
+  if (!damage) return {resolved:false,reason:"mirage_shell_damage_failed"};
+  recordBattleEvidence({eventType:"mirage_shell_branch_committed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:field?[field.stateId]:[],data:{fieldPresentAtCommit:!!field,attackPL,fieldConsumedAtCommit:!!field,defenceDoesNotRollbackField:true}});
+  return {resolved:true,branch:field?"enhanced":"base",damageApplied:true,damage,finalDamage:damage.finalDamage,stateRefs:field?[field.stateId]:[],conditionRefs:[]};
+}
+
+function resolveSummonCategoricalSelfState(skill,actor,envelope) {
+  const existing=findBattleTransientState({stateKey:skill.stateKey,targetSide:"player",targetParticipantId:actor.id});
+  if (existing) removeBattleTransientState(existing.stateId);
+  const state=addBattleTransientState({
+    stateKey:skill.stateKey,sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,
+    ownerRef:{type:"summon_entity",id:skill.sourceEntityId,role:"categorical_source"},
+    data:{sourceSkillId:skill.id,semanticClass:skill.semanticClass||null,oneUse:true,noScalar:true,automaticInvulnerability:false}
+  });
+  return {resolved:!!state,branch:"categorical_self_state",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[]};
+}
+
+function resolveSummonTemporaryCapacityRestore(skill,actor,envelope) {
+  const maximum=Math.max(0,Math.round(Number(skill.temporaryCapacityMaximum)||0));
+  if (maximum<=0) return {resolved:false,reason:"temporary_capacity_maximum_missing"};
+  const key=skill.overlaySourceKey||`entity:${skill.sourceEntityId}:${skill.id}`;
+  const layers=getBattleTemporaryCapacityLayers("player",actor.id);
+  let layer=layers.find(item=>item&&item.sourceProjectionKey===key)||null;
+  let restored=0;
+  if (!layer) {layer=addBattleTemporaryCapacityOverlay("player",actor.id,maximum,key);restored=layer?maximum:0;}
+  else {const before=Math.max(0,Number(layer.current)||0);layer.maximum=maximum;layer.current=Math.min(maximum,Math.max(before,maximum));restored=Math.max(0,layer.current-before);}
+  const evidence=recordBattleEvidence({eventType:"entity_temporary_capacity_overlay_restored",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,data:{maximum,restored,current:layer?layer.current:0,underlyingBattlePLRestored:false,staminaRestored:false,injuryCured:false,permanentPLChanged:false}});
+  return {resolved:!!layer&&!!evidence,branch:"temporary_capacity_overlay_restore",damageApplied:false,stateRefs:[],conditionRefs:[],maximum,restored,current:layer?layer.current:0};
+}
+
+function getKamatariGaleSeverChargeState(actor) {
+  return actor?findBattleTransientState({stateKey:"kamatari_gale_sever_charge",targetSide:"player",targetParticipantId:actor.id}):null;
+}
+function resolveKamatariGaleSever(skill,actor,target,envelope,options={}) {
+  const current=getKamatariGaleSeverChargeState(actor);
+  const command=options&&options.galeSeverCommand?String(options.galeSeverCommand):"release";
+  const stage=current?Math.max(1,Math.min(3,Number(current.data&&current.data.stage)||1)):1;
+  if (command==="charge") {
+    const nextStage=current?Math.min(3,stage+1):2;
+    if (current) {current.data.stage=nextStage;current.data.maintainedCommitment=true;current.data.lastChargeActionId=envelope.actionId;}
+    else addBattleTransientState({stateKey:"kamatari_gale_sever_charge",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"summon_entity",id:"wr_kamatari"},data:{stage:nextStage,maintainedCommitment:true,lastChargeActionId:envelope.actionId}});
+    recordBattleEvidence({eventType:"kamatari_gale_sever_charge_maintained",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,data:{stage:nextStage,attackPL:0}});
+    return {resolved:true,branch:"charge",damageApplied:false,stateRefs:[],conditionRefs:[],stage:nextStage};
+  }
+  if (!target) return {resolved:false,reason:"gale_sever_target_missing"};
+  const attackPL=Math.max(0,Math.round(Number(skill.stageAttackPL&&skill.stageAttackPL[stage])||0));
+  if (current) removeBattleTransientState(current.stateId);
+  const excess=stage===3?skill.stage3Excess:null;
+  const output={primaryDiscipline:"Bukijutsu",statKey:"buki",effectivePrimaryDiscipline:null,coefficient:null,branch:`gale_sever_stage_${stage}_release`,branchMultiplier:1,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,attackPL};
+  const damage=resolveBattleDamagePacket({envelope,skill:{...skill,excess},actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,excess,stateRefs:current?[current.stateId]:[]});
+  return {resolved:!!damage,branch:`release_stage_${stage}`,damageApplied:!!damage,damage,finalDamage:damage?damage.finalDamage:0,stateRefs:current?[current.stateId]:[],conditionRefs:[],stage};
+}
+function interruptKamatariGaleSever(actor,{catastrophic=false,reason="interrupted"}={}) {
+  const state=getKamatariGaleSeverChargeState(actor);
+  if (!state) return {success:false,reason:"gale_sever_not_charged"};
+  const stage=Math.max(1,Math.min(3,Number(state.data&&state.data.stage)||1));
+  removeBattleTransientState(state.stateId);
+  let directBattlePL=0;
+  if (catastrophic===true&&stage>=2) directBattlePL=Math.max(0,Number((summonSkillDatabase.kamatari_gale_sever.catastrophicBackfire||{})[stage])||0);
+  let absorption=null;
+  if (directBattlePL>0) absorption=absorbBattleDamageBearingCapacity("player",actor.id,directBattlePL);
+  recordBattleEvidence({eventType:"kamatari_gale_sever_interrupted",actorRef:createBattleParticipantRef("player",actor.id),skillId:"kamatari_gale_sever",stateRefs:[state.stateId],data:{stage,reason,catastrophic:catastrophic===true,directBattlePL,bypassStamina:directBattlePL>0,cleanCancelNoBackfire:catastrophic!==true}});
+  return {success:true,stage,catastrophic:catastrophic===true,directBattlePL,absorption};
+}
+
+function getTripleRashomonPreparedGateState(actorId) {
+  return findBattleTransientState({stateKey:"triple_rashomon_gate_ready",targetSide:"player",targetParticipantId:actorId});
+}
+function getTripleRashomonSequenceState(actorId) {
+  return findBattleTransientState({stateKey:"triple_rashomon_sequence",targetSide:"player",targetParticipantId:actorId});
+}
+function prepareTripleRashomonGate(skill,actor,envelope) {
+  const existing=getTripleRashomonPreparedGateState(actor.id);
+  if (existing) removeBattleTransientState(existing.stateId);
+  const state=addBattleTransientState({stateKey:"triple_rashomon_gate_ready",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"gate_source"},data:{gateNumber:skill.gateNumber,gateSkillId:skill.id,qualifyingDisciplines:[...(skill.qualifyingDisciplines||[])],oneUse:true,inputOrderDoesNotCount:true}});
+  return {resolved:!!state,branch:"rashomon_gate_prepared",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],gateNumber:skill.gateNumber};
+}
+function appendTripleRashomonSuccessfulGate(actorId,gateNumber,actionId,incomingSkillId) {
+  let state=getTripleRashomonSequenceState(actorId);
+  if (!state) state=addBattleTransientState({stateKey:"triple_rashomon_sequence",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_art_source"},data:{sequence:[]}});
+  if (!state) return null;
+  const sequence=Array.isArray(state.data.sequence)?state.data.sequence:[];
+  if (!sequence.includes(gateNumber)) sequence.push(gateNumber);
+  state.data.sequence=sequence.slice(0,3);
+  const sequenceKey=state.data.sequence.join(">");
+  let payoffName=null;
+  if (state.data.sequence.length===3) {
+    payoffName=TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES[sequenceKey]||null;
+    recordBattleEvidence({eventType:"triple_rashomon_sequence_completed",actionId:actionId||null,actorRef:createBattleParticipantRef("player",actorId),skillId:incomingSkillId||null,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_art_source"}],stateRefs:[state.stateId],data:{successfulGateSequence:[...state.data.sequence],sequenceKey,canonicalPayoffName:payoffName,inputButtonOrderIgnored:true}});
+    if (sequenceKey==="3>2>1") {
+      const prior=findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actorId});
+      if (prior) removeBattleTransientState(prior.stateId);
+      addBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},data:{sequenceKey,remainingCharges:1}});
+    }
+    removeBattleTransientState(state.stateId);
+  }
+  return {sequenceKey,payoffName};
+}
+function tryTripleRashomonInterceptIncoming({targetSide,targetParticipantId,primaryDiscipline,actionId=null,incomingSkillId=null}={}) {
+  if (targetSide!=="player"||!targetParticipantId||!primaryDiscipline) return {intercepted:false};
+  const state=getTripleRashomonPreparedGateState(targetParticipantId);
+  if (!state||!state.data||!Array.isArray(state.data.qualifyingDisciplines)||!state.data.qualifyingDisciplines.includes(primaryDiscipline)) return {intercepted:false};
+  const gateNumber=Number(state.data.gateNumber)||0;
+  const gateSkillId=state.data.gateSkillId||null;
+  removeBattleTransientState(state.stateId);
+  const sequence=appendTripleRashomonSuccessfulGate(targetParticipantId,gateNumber,actionId,incomingSkillId);
+  recordBattleEvidence({eventType:"triple_rashomon_gate_intercepted",actionId:actionId||null,targetRef:createBattleParticipantRef("player",targetParticipantId),skillId:gateSkillId,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"interception_source"}],stateRefs:[state.stateId],data:{gateNumber,primaryDiscipline,incomingSkillId,attackPreventedCategorically:true,percentageGuard:false,sequenceKey:sequence&&sequence.sequenceKey||null}});
+  return {intercepted:true,gateNumber,gateSkillId,stateId:state.stateId,sequence};
+}
+function resolveTripleRashomonCataclysm(skill,actor,target,envelope) {
+  const ready=findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actor.id});
+  if (!ready||!target) return {resolved:false,reason:"rashomon_321_sequence_not_ready"};
+  removeBattleTransientState(ready.stateId);
+  const output={primaryDiscipline:"Fūinjutsu",statKey:"fuin",effectivePrimaryDiscipline:null,coefficient:null,branch:"ruined_gate_cataclysm",branchMultiplier:1,authoredPreExecutionMagnitude:80,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:80,attackPL:80};
+  const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,excess:skill.excess,stateRefs:[ready.stateId]});
+  return {resolved:!!damage,branch:"ruined_gate_cataclysm",damageApplied:!!damage,damage,finalDamage:damage?damage.finalDamage:0,stateRefs:[ready.stateId],conditionRefs:[]};
+}
+
+function resolveBattleSummonSkillSemantics(skill,actor,target,envelope,options={}) {
   if (!skill||!actor||!envelope) return {resolved:false,reason:"summon_resolution_input_missing"};
+  if (skill.resolutionKind==="area_damage") return resolveSummonAreaAttackPL(skill,actor,envelope);
+  if (skill.resolutionKind==="categorical_evidence"||skill.resolutionKind==="categorical_state_inspection") return recordSummonCategoricalEvidence(skill,actor,target,envelope,{observerAuthorityRequired:true});
+  if (skill.resolutionKind==="dynamic_interaction"||skill.resolutionKind==="categorical_dynamic_interaction") return resolveSummonDynamicInteraction(skill,actor,target,envelope,{createCondition:false,multiplier:skill.resolverMultiplier||1});
+  if (skill.resolutionKind==="fixed_control") return resolveSummonFixedControl(skill,actor,target,envelope);
+  if (skill.resolutionKind==="scaled_dynamic_control") return resolveSummonDynamicInteraction(skill,actor,target,envelope,{createCondition:true,multiplier:skill.resolverMultiplier||1});
+  if (skill.resolutionKind==="exact_state_cleanup") return resolveSummonExactStateCleanup(skill,actor,target,envelope);
+  if (skill.resolutionKind==="upgrade_control_state") return resolveIronMaidenContainmentUpgrade(skill,actor,target,envelope);
+  if (skill.resolutionKind==="field_state") return resolveMirageField(skill,actor,envelope);
+  if (skill.resolutionKind==="field_context_damage") return resolveMirageCrushingShell(skill,actor,target,envelope);
+  if (skill.resolutionKind==="categorical_self_state") return resolveSummonCategoricalSelfState(skill,actor,envelope);
+  if (skill.resolutionKind==="restore_temporary_capacity_overlay") return resolveSummonTemporaryCapacityRestore(skill,actor,envelope);
+  if (skill.resolutionKind==="charged_persistent_attack") return resolveKamatariGaleSever(skill,actor,target,envelope,options);
+  if (skill.resolutionKind==="rashomon_gate_prepare") return prepareTripleRashomonGate(skill,actor,envelope);
+  if (skill.resolutionKind==="rashomon_sequence_payoff_damage") return resolveTripleRashomonCataclysm(skill,actor,target,envelope);
   if (["direct_damage","contextual_damage","terrain_context_damage","opening_context_damage"].includes(skill.resolutionKind)) {
     const damage=resolveSummonDirectAttackPL(skill,actor,target,envelope);
     return {resolved:!!damage,damageApplied:!!damage,damage,finalDamage:damage?damage.finalDamage:0,stateRefs:[],conditionRefs:[],excessResolution:damage?damage.excessResolution||null:null};
@@ -69733,13 +70309,15 @@ function resolveBattleSummonSkillSemantics(skill,actor,target,envelope) {
     return {resolved:!!evidence,branch:"support_access_only",damageApplied:false,stateRefs:[],conditionRefs:[]};
   }
   if (skill.resolutionKind==="categorical_guard_authority") {
-    const evidence=recordBattleEvidence({eventType:"summon_defensive_authority_prepared",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,data:{preventionRatio:skill.preventionRatio,requiresNontrivialIncomingQualification:skill.requiresNontrivialIncomingQualification===true,automaticGuardStateCreated:false,reason:"qualifying_nontrivial_packet_contract_not_numeric_in_source"}});
-    return {resolved:!!evidence,branch:"defensive_authority_qualification_held",damageApplied:false,stateRefs:[],conditionRefs:[],qualificationHeld:true};
+    const state=createSummonRatioGuard({...skill,resolutionKind:"ratio_guard"},actor,envelope);
+    if (state&&state.data) state.data.requiresNontrivialIncomingQualification=skill.requiresNontrivialIncomingQualification===true;
+    const evidence=recordBattleEvidence({eventType:"summon_defensive_authority_prepared",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:state?[state.stateId]:[],data:{preventionRatio:skill.preventionRatio,requiresNontrivialIncomingQualification:skill.requiresNontrivialIncomingQualification===true,automaticBlindOrMiss:false,oneUse:true}});
+    return {resolved:!!state&&!!evidence,branch:"qualified_ratio_guard_prepared",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],qualificationHeld:true};
   }
   return {resolved:false,reason:"unsupported_summon_resolution"};
 }
 
-function attemptBattleSummonSkill(skillId) {
+function attemptBattleSummonSkill(skillId,options={}) {
   const skill=getSummonSkillDefinition(skillId);
   const actor=getBattleDeploymentParticipant("player",1);
   const target=getBattleDeploymentParticipant("enemy",1);
@@ -69748,7 +70326,9 @@ function attemptBattleSummonSkill(skillId) {
   if (!attached || attached.summonId!==skill.sourceEntityId || attached.state!=="attached") return {success:false,reason:"required_summon_not_attached"};
   const entity=getEntityDefinition(skill.sourceEntityId);
   if (!entity||!isAttachableSummonEntity(entity)) return {success:false,reason:"representation_not_ordinary_summon_lifecycle"};
-  const targetNeeded=!["ratio_guard","flat_guard","support_access_evidence","categorical_guard_authority"].includes(skill.resolutionKind);
+  const selfTargetModes=["self"];
+  const noEnemyTargetKinds=["ratio_guard","flat_guard","support_access_evidence","categorical_guard_authority","field_state","categorical_self_state","rashomon_gate_prepare","restore_temporary_capacity_overlay"];
+  const targetNeeded=!selfTargetModes.includes(skill.targetMode)&&!noEnemyTargetKinds.includes(skill.resolutionKind);
   if (targetNeeded&&!target) return {success:false,reason:"target_missing"};
   const targetSide=targetNeeded?"enemy":"player";
   const targetId=targetNeeded?target.id:actor.id;
@@ -69765,7 +70345,7 @@ function attemptBattleSummonSkill(skillId) {
   recordBattleEvidence({eventType:"summon_manifested",actionId:envelope.actionId,actorRef:envelope.actorRef,sourceRefs:envelope.sourceRefs,data:{summonId:skill.sourceEntityId,skillId:skill.id,entityActionOwnerId:skill.sourceEntityId,summonerIdentityMerged:false}});
   let resolution=null;
   try {
-    resolution=resolveBattleSummonSkillSemantics(skill,actor,target,envelope);
+    resolution=resolveBattleSummonSkillSemantics(skill,actor,target,envelope,options);
   } finally {
     returnBattleAttachedSummon("player",actor.id);
   }
@@ -69780,24 +70360,41 @@ function attemptBattleSummonSkill(skillId) {
 }
 
 function runSummonFactoryProductionDiagnostics() {
+  const expectedCounts={
+    koto_crow:3,key_gero:3,de_baku:3,iron_maiden:3,ibuse:3,gamakichi:3,mirage_clam:2,wr_kamatari:4,mk_enma:3,triple_rashomon:4,
+    nine_tails:5,breakout_kurama:3,menma_nine_tails:3,yang_kurama:3,yin_kurama:3,menma_kurama:3,kurama_complete:3
+  };
   const result={
+    allSeventeenEntityPackagesPresent:Object.entries(expectedCounts).every(([id,count])=>getSummonSkillsForEntity(id).length===count),
+    exactAuthoritySkillCount:Object.values(expectedCounts).reduce((a,b)=>a+b,0)===54,
     enmaFinal:getSummonSkillDefinition("enma_adamantine_staff_lunge").authoredAttackPL===54&&getSummonSkillDefinition("enma_adamantine_guard").preventionRatio===0.55,
     gamakichiThree:getSummonSkillsForEntity("gamakichi").filter(skill=>["gamakichi_oil_bullet","gamakichi_heavy_landing","gamakichi_blade_guard"].includes(skill.id)).length===3,
     gamakichiOilNotBurning:getSummonSkillDefinition("gamakichi_oil_bullet").stateKey==="oiled",
+    kotoFinalThird:!!getSummonSkillDefinition("koto_crow_feather_veil")&&getSummonSkillDefinition("koto_crow_feather_veil").resolutionKind==="categorical_evidence",
     kotoEchoDirectBP:getSummonSkillDefinition("koto_crow_genjutsu_echo").authoredBattlePL===7&&getSummonSkillDefinition("koto_crow_genjutsu_echo").resolutionKind==="direct_battle_pl",
-    kotoWitnessQualificationHeld:getSummonSkillDefinition("koto_crow_silent_witness").requiresNontrivialIncomingQualification===true,
+    gerotoraCannotDismissBreakout:(getSummonSkillDefinition("key_gero_recoil_purge").traits||[]).includes("cannot_dismiss_breakout_kurama"),
     bakuMaw:getSummonSkillDefinition("de_baku_vacuum_maw").authoredAttackPL===11,
+    bakuPressureNoHiddenStat:Object.keys((getEffectiveStatePackageDefinition("de_baku","devouring_pressure")||{}).statModifiers||{}).length===0,
     ironMaidenContext:getSummonSkillDefinition("iron_maiden_crushing_closure").contextualDamage.sealed_chamber===18,
+    mirageFieldExact:getSummonSkillDefinition("mirage_clam_false_horizon").stateKey==="mirage_field"&&getSummonSkillDefinition("mirage_clam_crushing_shell").boostedAttackPL===18,
     ibusePoison:getSummonSkillDefinition("ibuse_poison_mist").authoredBattlePL===4&&getSummonSkillDefinition("ibuse_venom_bite").authoredAttackPL===13,
     ibuseTerrain:getSummonSkillDefinition("ibuse_subterranean_ambush").authoredAttackPL===10&&getSummonSkillDefinition("ibuse_subterranean_ambush").boostedAttackPL===13,
-    kamatariKnownSkills:getSummonSkillDefinition("kamatari_reap").authoredAttackPL===15&&getSummonSkillDefinition("kamatari_gale_pursuit").boostedAttackPL===14,
-    nineTailsDistinct:getSummonSkillDefinition("nine_tails_calamity_rend").sourceEntityId==="nine_tails"&&getSummonSkillDefinition("nine_tails_calamity_rend").excess.capRatio===0.40&&getSummonSkillDefinition("nine_tails_tailed_beast_bomb").excess.capRatio===0.60,
-    breakoutDoesNotInherit:getSummonSkillsForEntity("breakout_kurama").length===0,
-    completeDoesNotInherit:getSummonSkillsForEntity("kurama_complete").length===0,
-    specialNotOpenable:!isAttachableSummonEntity(getEntityDefinition("breakout_kurama"))&&!isAttachableSummonEntity(getEntityDefinition("kurama_complete")),
+    kamatariFinalFour:getSummonSkillsForEntity("wr_kamatari").length===4&&getSummonSkillDefinition("kamatari_gale_sever").stageAttackPL[3]===32&&getSummonSkillDefinition("kamatari_gale_sever").stage3Excess.absoluteCap===16,
+    rashomonCollectiveOneSlot:getEntityDefinition("triple_rashomon").summonSlotCost===1&&getSummonSkillDefinition("triple_rashomon_ruined_gate_cataclysm").authoredAttackPL===80&&getSummonSkillDefinition("triple_rashomon_ruined_gate_cataclysm").excess.absoluteCap===40,
+    nineTailsDistinct:getSummonSkillDefinition("nine_tails_calamity_rend").sourceEntityId==="nine_tails"&&getSummonSkillDefinition("nine_tails_calamity_rend").excess.absoluteCap===19&&getSummonSkillDefinition("nine_tails_tailed_beast_bomb").excess.absoluteCap===54,
+    breakoutOwnPackage:getSummonSkillsForEntity("breakout_kurama").length===3&&getSummonSkillDefinition("breakout_kurama_tailed_beast_bomb").authoredAttackPL===98,
+    breakoutStillNotOrdinary:!isAttachableSummonEntity(getEntityDefinition("breakout_kurama")),
+    menmaNineTailsFinal:getSummonSkillDefinition("menma_nine_tails_yin_bind").fixedControlMagnitude===72&&getSummonSkillDefinition("menma_nine_tails_mantle_infusion").temporaryCapacityMaximum===4,
+    yangYinPackagesRemainDistinct:getSummonSkillsForEntity("yang_kurama").every(skill=>skill.sourceEntityId==="yang_kurama")&&getSummonSkillsForEntity("yin_kurama").every(skill=>skill.sourceEntityId==="yin_kurama"),
+    menmaKuramaNotOrdinary:!isAttachableSummonEntity(getEntityDefinition("menma_kurama"))&&getSummonSkillDefinition("menma_kurama_eclipse_prison").resolverMultiplier===0.90,
+    completeFinalPackage:getSummonSkillDefinition("kurama_complete_chakra_cannon").authoredAttackPL===112&&getSummonSkillDefinition("kurama_complete_chakra_cannon").excess.absoluteCap===67&&getSummonSkillDefinition("kurama_complete_rampart").preventionRatio===0.65,
+    completeStillRequiresReunion:!!getEntityDefinition("kurama_complete")&&getEntityDefinition("kurama_complete").requiresAuthoritativeReunion===true&&!isAttachableSummonEntity(getEntityDefinition("kurama_complete")),
     entityCurrentStatUsed:getSummonEntityLiveResolverStat.toString().includes("getEntityCurrentStats"),
     returnedLifecycle:attemptBattleSummonSkill.toString().includes("finally")&&attemptBattleSummonSkill.toString().includes("returnBattleAttachedSummon"),
-    sourceOwnership:getSummonSkillSourceRefs.toString().includes('role:"action_owner"')
+    ordinarySourceOwnership:getSummonSkillSourceRefs.toString().includes('role:"action_owner"'),
+    sourceEnhancementsExactOnce:runAttachedSummonEnhancementProjectionDiagnostics().pass===true,
+    productionEntityCount17:ALPHA_PRODUCTION_ENTITY_IDS.length===17,
+    noEntityPLTransfer:attemptBattleSummonSkill.toString().includes("entityPLTransfer:false")
   };
   result.pass=Object.values(result).every(value=>value===true);
   console.table(result);
@@ -76908,6 +77505,20 @@ function resolveBattlePreStaminaDefense(definition) {
   };
   if (!definition||definition.mitigable!==true||!definition.targetSide||!definition.targetParticipantId||incomingAttackPL<=0) return result;
 
+  const rashomon=tryTripleRashomonInterceptIncoming({
+    targetSide:definition.targetSide,
+    targetParticipantId:definition.targetParticipantId,
+    primaryDiscipline:definition.primaryDiscipline||null,
+    actionId:definition.actionId||null,
+    incomingSkillId:definition.skillId||null
+  });
+  if (rashomon&&rashomon.intercepted===true) {
+    result.resolvedAttackPL=0;
+    result.rashomonGate={participated:true,...rashomon};
+    if (rashomon.stateId) result.consumedStateIds.push(rashomon.stateId);
+    return result;
+  }
+
   if (definition.targetSide==="player") {
     const guardingStep=findBattleTransientState({stateKey:"guarding_step",targetSide:"player",targetParticipantId:definition.targetParticipantId});
     if (guardingStep) {
@@ -77132,7 +77743,7 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
   if (!definition || !definition.actorSide || !definition.actorParticipantId || !definition.targetSide || !definition.targetParticipantId || !definition.output) return null;
   const targetRecord=getBattleRemainingPLRecord(definition.targetSide,definition.targetParticipantId);
   if (!targetRecord) return null;
-  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId});
+  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId,primaryDiscipline:definition.output.primaryDiscipline||null,skillId:definition.skill&&definition.skill.id||null,actionId:definition.envelope&&definition.envelope.actionId||null});
   const effectiveStamina=getBattleEffectiveStamina(definition.targetSide,definition.targetParticipantId);
   const staminaResolution=calculateBattleStaminaMitigationV1(preDefense.resolvedAttackPL,effectiveStamina);
   const absorption=absorbBattleDamageBearingCapacity(definition.targetSide,definition.targetParticipantId,staminaResolution.finalDamage);
@@ -78997,7 +79608,11 @@ function makeEnemyFixedDamageAction(id,authoredAttackPL,options={}) {
       const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id,output,mitigable:options.staminaMitigation!==false,excess:options.excess||null,stateRefs:[]});
       if (!damage) return {resolved:false,reason:"enemy_damage_resolution_failed"};
       if (options.dynamicControlRider&&damage.remainingBattlePLAfter>0) {
-        establishEnemyDynamicControlState(enemy,target,envelope,id,options.dynamicControlRider);
+        if (options.dynamicControlRider.requiresExplicitQualification===true) {
+          recordBattleEvidence({eventType:"enemy_control_rider_available_not_automatic",actionId:actionIdOrNull(envelope),actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),skillId:id,data:{semanticClass:options.dynamicControlRider.semanticClass||null,damageSuccessDoesNotGuaranteeControl:true,requiresExplicitQualification:true}});
+        } else {
+          establishEnemyDynamicControlState(enemy,target,envelope,id,options.dynamicControlRider);
+        }
       }
       return {resolved:true,branch:"fixed_enemy_damage",damageApplied:true,damage,finalDamage:damage.finalDamage,excessResolution:damage.excessResolution||null};
     }
@@ -79016,7 +79631,8 @@ function makeEnemyAreaDamageAction(id,authoredAttackPLPerTarget,maxTargets=3,opt
       targetIds.forEach(targetId=>{
         const attackPL=Math.max(0,Math.round(Number(authoredAttackPLPerTarget)||0));
         const output={primaryDiscipline:options.primaryDiscipline||null,statKey:getBattlePrimaryDisciplineStatKey(options.primaryDiscipline),effectivePrimaryDiscipline:null,coefficient:null,branch:"fixed_authored_enemy_area_output",branchMultiplier:1,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,attackPL,fixedCalibration:true,perTarget:true};
-        const damage=resolveBattleDamagePacket({envelope,skill:{id,excess:options.excess||null,mechanicalPacketCount:1},actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:targetId,output,mitigable:options.staminaMitigation!==false,excess:options.excess||null,stateRefs:[]});
+        const perTargetExcess=options.excess?{...options.excess,absoluteCap:Number.isFinite(Number(options.excess.absoluteCapPerTarget))?Number(options.excess.absoluteCapPerTarget):options.excess.absoluteCap}:null;
+        const damage=resolveBattleDamagePacket({envelope,skill:{id,excess:perTargetExcess,mechanicalPacketCount:1},actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:targetId,output,mitigable:options.staminaMitigation!==false,excess:perTargetExcess,stateRefs:[]});
         if (damage) results.push({targetParticipantId:targetId,damage});
       });
       return {resolved:results.length>0,branch:"enemy_area_damage",damageApplied:results.length>0,areaResults:results,crossTargetPooling:false};
@@ -79055,6 +79671,8 @@ function actionIdOrNull(envelope) {
 
 function establishEnemyDynamicControlState(enemy,target,envelope,skillId,contract={}) {
   if (!enemy||!target||!contract.discipline) return null;
+  const gateInterception=tryTripleRashomonInterceptIncoming({targetSide:"player",targetParticipantId:target.id,primaryDiscipline:contract.discipline,actionId:envelope?actionIdOrNull(envelope):null,incomingSkillId:skillId});
+  if (gateInterception&&gateInterception.intercepted===true) return {stateId:gateInterception.stateId||null,intercepted:true,semanticClass:contract.semanticClass||"authored_control"};
   const live=resolveAuthoredDynamicControlStrength({sourceSide:"enemy",sourceParticipantId:enemy.id,discipline:contract.discipline});
   if (!live.success) return null;
   const multiplier=Number.isFinite(Number(contract.multiplier))?Number(contract.multiplier):1;
@@ -79156,7 +79774,7 @@ const ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES = Object.freeze({
     makeEnemyRestorationAction("undying_madara_reconstitution",28,{traits:["history_rollback_forbidden"]})
   ]),
   black_madara:Object.freeze([
-    makeEnemyFixedDamageAction("black_madara_black_tendril_impalement",76,{primaryDiscipline:"Kinjutsu",dynamicControlRider:{discipline:"Kinjutsu",semanticClass:"black_tendril_restraint"},traits:["black_zetsu_causal_provenance_where_relevant","single_boss_turn"]}),
+    makeEnemyFixedDamageAction("black_madara_black_tendril_impalement",76,{primaryDiscipline:"Kinjutsu",dynamicControlRider:{discipline:"Kinjutsu",semanticClass:"black_tendril_restraint",requiresExplicitQualification:true},traits:["black_zetsu_causal_provenance_where_relevant","single_boss_turn","damage_success_not_automatic_restraint"]}),
     makeEnemyDynamicControlAction("black_madara_black_lattice","Kinjutsu",{semanticClass:"black_lattice_control",maxTargets:3}),
     makeEnemyAreaDamageAction("black_madara_firestorm",48,3,{primaryDiscipline:"Ninjutsu"}),
     makeEnemyRatioGuardAction("black_madara_corruption_guard",0.60)
@@ -79174,7 +79792,7 @@ const ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES = Object.freeze({
   fallen_hokage_sasuke:Object.freeze([
     makeEnemyFixedDamageAction("fallen_hokage_sasuke_chidori_execution",74,{primaryDiscipline:"Ninjutsu"}),
     makeEnemyFixedDamageAction("fallen_hokage_sasuke_dragon_flame",68,{primaryDiscipline:"Ninjutsu",traits:["ordinary_fire_state_rider_only_through_qualifying_branch"]}),
-    makeEnemyDynamicControlAction("fallen_hokage_sasuke_shadow_seal","Fūinjutsu",{semanticClass:"shadow_seal_interference"}),
+    makeEnemyDynamicControlAction("fallen_hokage_sasuke_shadow_seal","Fūinjutsu",{semanticClass:"shadow_seal_interference",durationActionOpportunities:1,traits:["one_qualifying_interference","not_endless_shutdown"]}),
     makeEnemyRatioGuardAction("fallen_hokage_sasuke_counter",0.55)
   ]),
   shadow_of_indra:Object.freeze([
