@@ -72406,7 +72406,7 @@ const PRODUCTION_PREPARED_SKILL_PALETTES = {
   academy_kakashi:["academy_kakashi_kunai_quickdraw","academy_kakashi_clone_feint","academy_kakashi_opening_exploit","academy_kakashi_wire_snare","academy_kakashi_prodigys_read"],
   academy_obito:["academy_obito_fire_style_ember_burst","academy_obito_headlong_rush","academy_obito_uchiha_shuriken_rush","academy_obito_protective_intercept","academy_obito_determined_stand"],
   academy_hinata:["academy_hinata_gentle_palm","academy_hinata_twin_palm_guard","academy_hinata_palm_counter","academy_hinata_academy_shuriken"],
-  academy_izuno:["academy_izuno_pouncing_palm","academy_izuno_shuriken_pounce"],
+  academy_izuno:["academy_izuno_pouncing_palm","academy_izuno_shuriken_pounce","academy_izuno_catstep_feint","academy_izuno_wall_spring","academy_izuno_clone_pounce"],
   academy_kushina:["academy_kushina_red_whirlwind","academy_kushina_beginner_binding_formula","academy_kushina_iron_will_brace","academy_kushina_headstrong_counter"],
   academy_menma:["academy_menma_chakra_knuckle","academy_menma_crescent_kunai","academy_menma_guard_breaker"],
   academy_mirai:["academy_mirai_twin_kunai","academy_mirai_wire_trip","academy_mirai_false_footstep","academy_mirai_guarding_blade","academy_mirai_crossing_strike"],
@@ -72446,6 +72446,7 @@ const PRODUCTION_PREPARED_SKILL_PALETTES = {
   kage_kakashi:["kage_kakashi_purple_lightning","kage_kakashi_purple_lightning_net","kage_kakashi_water_dragon","kage_kakashi_earth_wall","kage_kakashi_lightning_clone"],
   kage_menma:["kage_menma_moonfall_rasengan","kage_menma_black_crescent_seal","kage_menma_shadow_crescent_assault","kage_menma_eclipse_beast_cannon","kage_menma_eclipse_guard"]
 };
+
 
 function runAcademyExpansion102Diagnostics() {
   const expected={
