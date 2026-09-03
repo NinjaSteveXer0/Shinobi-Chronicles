@@ -77467,7 +77467,48 @@ function executeEnemyAuthoredActionOpportunity() {
 // BRICK 689 — COMBAT ALPHA CONTENT CLOSURE DIAGNOSTIC
 // BRICK 690 — FINAL ORDINARY PALETTE CLOSURE WAVE REGRESSION
 // BRICK 691 — FACTORY BATCH 5 FINAL SEMANTIC REGRESSION
+// BRICK 692 — GENERIC ENEMY ACTION PACKAGE DIRECT ATTACHMENT
 // =========================================================
+// Combat's final ingestion contract requires these three existing enemy records
+// to expose authoredBattleActions directly. The central package map remains the
+// source definition, while the enemy record receives the exact authored package.
+["scout","bandit","banditLeader"].forEach(enemyId=>{
+  const enemy=enemyDatabase[enemyId];
+  const authored=ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[enemyId];
+  if (enemy&&Array.isArray(authored)) enemy.authoredBattleActions=[...authored];
+});
+
+function runAlphaGenericEnemyActionAuthorityDiagnostics() {
+  const expected={
+    scout:["enemy_rogue_scout_kunai_cut","enemy_rogue_scout_shuriken_burst"],
+    bandit:["enemy_bandit_tanto_slash","enemy_bandit_heavy_kick","enemy_bandit_throwing_knife"],
+    banditLeader:["enemy_bandit_leader_execution_cut","enemy_bandit_leader_explosive_tag_burst","enemy_bandit_leader_cross_slash"]
+  };
+  const idsFor=id=>(enemyDatabase[id]&&Array.isArray(enemyDatabase[id].authoredBattleActions)?enemyDatabase[id].authoredBattleActions:[]).map(action=>action.id);
+  const allActions=Object.keys(expected).flatMap(id=>enemyDatabase[id].authoredBattleActions||[]);
+  const result={
+    scoutAttachedDirectly:JSON.stringify(idsFor("scout"))===JSON.stringify(expected.scout),
+    banditAttachedDirectly:JSON.stringify(idsFor("bandit"))===JSON.stringify(expected.bandit),
+    banditLeaderAttachedDirectly:JSON.stringify(idsFor("banditLeader"))===JSON.stringify(expected.banditLeader),
+    schedulerConsumesDirectPackages:Object.keys(expected).every(id=>JSON.stringify(getEnemyAuthoredBattleActions(enemyDatabase[id]).map(action=>action.id))===JSON.stringify(expected[id])),
+    everyActionHasExactSkillId:allActions.every(action=>typeof action.id==="string"&&action.skillId===action.id),
+    everyActionHasResolver:allActions.every(action=>typeof action.resolve==="function"),
+    fixedDamageUsesSharedResolver:makeEnemyFixedDamageAction.toString().includes("resolveBattleDamagePacket"),
+    ordinaryStaminaDefault:makeEnemyFixedDamageAction.toString().includes("options.staminaMitigation!==false"),
+    onePacketContract:makeEnemyFixedDamageAction.toString().includes("mechanicalPacketCount:1"),
+    schedulerStillFiltersBeforeRandomness:evaluateEnemyActionScheduler.toString().includes("getEligibleEnemyAuthoredBattleActions")&&chooseEnemyAuthoredBattleAction.toString().includes("Math.random"),
+    missingAuthorityDiagnosticPreserved:evaluateEnemyActionScheduler.toString().includes("enemy_action_authority_missing"),
+    noPowerDerivedFallback:!evaluateEnemyActionScheduler.toString().includes(".power")&&!makeEnemyFixedDamageAction.toString().includes("enemy.power"),
+    heavyKickNoInventedControl:(enemyDatabase.bandit.authoredBattleActions.find(action=>action.id==="enemy_bandit_heavy_kick")||{traits:[]}).traits.includes("damage_does_not_imply_displacement_or_stun"),
+    explosiveTagNoAutomaticBurning:(enemyDatabase.banditLeader.authoredBattleActions.find(action=>action.id==="enemy_bandit_leader_explosive_tag_burst")||{traits:[]}).traits.includes("no_automatic_burning"),
+    crossSlashOnePacket:(enemyDatabase.banditLeader.authoredBattleActions.find(action=>action.id==="enemy_bandit_leader_cross_slash")||{traits:[]}).traits.includes("visual_two_hit_one_packet"),
+    scoutShurikenOnePacket:(enemyDatabase.scout.authoredBattleActions.find(action=>action.id==="enemy_rogue_scout_shuriken_burst")||{traits:[]}).traits.includes("multiple_projectiles_one_packet")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
 function runAlphaCombatContentClosureDiagnostics() {
   const ordinary=runOrdinaryProductionPaletteDiagnostics();
   const genericExpected={
@@ -77501,6 +77542,7 @@ function runAlphaCombatContentClosureDiagnostics() {
     ordinaryPreparedSlots245:ordinary.ordinaryPreparedSlots===true,
     ordinaryIncompletePalettesZero:ordinary.ordinaryIncompletePalettes===true,
     genericEnemyPackagesExact:packageMatches(genericExpected),
+    genericEnemyDirectAttachment:runAlphaGenericEnemyActionAuthorityDiagnostics().pass===true,
     bossPackagesExact:packageMatches(bossExpected),
     schedulerNoDerivedFallback:evaluateEnemyActionScheduler.toString().includes("enemy_action_authority_missing")&&!evaluateEnemyActionScheduler.toString().includes(".power"),
     randomnessAfterEligibility:chooseEnemyAuthoredBattleAction.toString().includes("randomnessAppliedAfterEligibility"),
