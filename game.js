@@ -79,6 +79,14 @@ const assetManifest = {
 
   },
 
+  // =====================================================
+  // BRICK 765 — STORY SCENE BACKDROP ASSET AUTHORITY
+  // =====================================================
+  // Stable Scene Environment IDs are registered below, but actual file paths
+  // remain empty until approved backdrop files are supplied. Coding must not
+  // invent folder/path authority merely from a stable asset name.
+  sceneBackdrops: {},
+
   ui: {
 
     practical:
@@ -118,6 +126,21 @@ function getHostedEntityAssetPath(
     ] ||
     ""
   );
+}
+
+
+// =========================================================
+// BRICK 765 — STORY SCENE BACKDROP ASSET PATH BRIDGE
+// =========================================================
+function getSceneBackdropAssetPath(assetId) {
+  return (assetManifest.sceneBackdrops&&assetManifest.sceneBackdrops[assetId]) || "";
+}
+
+function registerSceneBackdropAssetPath(assetId,path) {
+  if (!assetId||!path) return {success:false,reason:"scene_backdrop_asset_identity_or_path_missing"};
+  if (!assetManifest.sceneBackdrops||typeof assetManifest.sceneBackdrops!=="object") assetManifest.sceneBackdrops={};
+  assetManifest.sceneBackdrops[String(assetId)]=String(path);
+  return {success:true,assetId:String(assetId),path:String(path)};
 }
 
 
@@ -1180,6 +1203,10 @@ const characterRegistry = {
     "basePL": 56,
     "embodiedExpressions": [
       "kurama_v2_naruto"
+    ],
+    // BRICK 776 — WAVE C: V2 explicitly suppresses V1 embodiment.
+    "suppressesEmbodiedExpressions": [
+      "kurama_v1_naruto"
     ],
     "instabilityResolverOwned": true
   },
@@ -41660,6 +41687,64 @@ const STORY_SCENE_PRESENTATION_MODES=Object.freeze([
   "post_battle"
 ]);
 
+// =========================================================
+// BRICKS 766–773 — ALPHA STORY SCENE ENVIRONMENT RESOLVER
+// =========================================================
+// Scene Environment is presentation authority, not world identity.
+// location identity != Scene Environment asset != Battle presentation.
+// No scene beat needs a bespoke image merely because dialogue exists.
+// =========================================================
+const ALPHA_SCENE_ENVIRONMENT_LIBRARY=Object.freeze({
+  konoha_academy_classroom_day:Object.freeze({assetId:"konoha_academy_classroom_day",locationAssociations:["konoha:academy:classroom"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_academy_courtyard_day:Object.freeze({assetId:"konoha_academy_courtyard_day",locationAssociations:["konoha:academy:courtyard","konoha:academy:exterior"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_village_street_day:Object.freeze({assetId:"konoha_village_street_day",locationAssociations:["konoha:village:street"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_forest_path_day:Object.freeze({assetId:"konoha_forest_path_day",locationAssociations:["konoha:forest:path"],status:"core_alpha",timeOfDay:"day",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_forest_path_night:Object.freeze({assetId:"konoha_forest_path_night",locationAssociations:["konoha:forest:path"],status:"core_alpha",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_forest_clearing_day:Object.freeze({assetId:"konoha_forest_clearing_day",locationAssociations:["konoha:forest:clearing"],status:"core_alpha",timeOfDay:"day",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_forest_clearing_night:Object.freeze({assetId:"konoha_forest_clearing_night",locationAssociations:["konoha:forest:clearing"],status:"core_alpha",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_training_grounds_day:Object.freeze({assetId:"konoha_training_grounds_day",locationAssociations:["konoha:training_grounds"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_hokage_administration_interior:Object.freeze({assetId:"konoha_hokage_administration_interior",locationAssociations:["konoha:hokage_administration:interior"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_arena_concourse:Object.freeze({assetId:"konoha_arena_concourse",locationAssociations:["konoha:arena:concourse"],status:"core_alpha",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_arena_ring:Object.freeze({assetId:"konoha_arena_ring",locationAssociations:["konoha:arena:ring"],status:"core_alpha",storyOnly:true,neverBattleSurface:true,aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35}),
+  konoha_village_street_night:Object.freeze({assetId:"konoha_village_street_night",locationAssociations:["konoha:village:street"],status:"optional_variant",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35})
+});
+
+const SCENE_LOCATION_ENVIRONMENT_CANDIDATES=Object.freeze(Object.values(ALPHA_SCENE_ENVIRONMENT_LIBRARY).reduce((map,definition)=>{
+  (definition.locationAssociations||[]).forEach(locationId=>{if(!map[locationId])map[locationId]=[];map[locationId].push(definition.assetId);});
+  return map;
+},{}));
+
+function normalizeStorySceneEnvironmentRef(ref) {
+  if (!ref) return null;
+  if (typeof ref==="string") return {mode:"authored_asset",assetId:String(ref),locationId:null,timeOfDay:null,presentationState:null};
+  if (typeof ref!=="object") return null;
+  const mode=["authored_asset","location_backdrop","inherit_current"].includes(ref.mode)?ref.mode:(ref.assetId?"authored_asset":(ref.locationId?"location_backdrop":"inherit_current"));
+  return {mode,assetId:ref.assetId?String(ref.assetId):null,locationId:ref.locationId?String(ref.locationId):null,timeOfDay:ref.timeOfDay?String(ref.timeOfDay):null,presentationState:ref.presentationState?String(ref.presentationState):null};
+}
+
+function resolveSceneEnvironmentAssetForLocation(locationId,timeOfDay=null) {
+  if (!locationId) return null;
+  const candidates=(SCENE_LOCATION_ENVIRONMENT_CANDIDATES[String(locationId)]||[]).map(assetId=>ALPHA_SCENE_ENVIRONMENT_LIBRARY[assetId]).filter(Boolean);
+  if (!candidates.length) return null;
+  if (timeOfDay) {const exact=candidates.filter(item=>item.timeOfDay===String(timeOfDay));if(exact.length===1)return exact[0];}
+  return candidates.length===1?candidates[0]:null; // never guess day/night
+}
+
+function resolveStorySceneEnvironmentProjection(authoredPresentation={},beat=null,definition=null,active=null) {
+  const explicit=normalizeStorySceneEnvironmentRef(authoredPresentation.environmentRef||authoredPresentation.sceneEnvironmentRef||null);
+  const beatRef=normalizeStorySceneEnvironmentRef(beat&&beat.environmentRef?beat.environmentRef:null);
+  const sceneRef=normalizeStorySceneEnvironmentRef(definition&&definition.environmentRef?definition.environmentRef:null);
+  const requested=explicit||beatRef||sceneRef;
+  const locationId=(requested&&requested.locationId)||(beat&&beat.locationId)||(definition&&definition.locationId)||null;
+  const timeOfDay=(requested&&requested.timeOfDay)||(authoredPresentation&&authoredPresentation.timeOfDay)||null;
+  if (requested&&requested.mode==="inherit_current") return {mode:"inherit_current",asset_id:null,asset_path:null,location_id:locationId,world_identity_unchanged:true};
+  let environment=null;
+  if (requested&&requested.assetId) environment=ALPHA_SCENE_ENVIRONMENT_LIBRARY[requested.assetId]||null;
+  if (!environment&&locationId) environment=resolveSceneEnvironmentAssetForLocation(locationId,timeOfDay);
+  if (!environment) return {mode:"inherit_current",asset_id:null,asset_path:null,location_id:locationId,world_identity_unchanged:true,ambiguous_location_variant:!!(locationId&&(SCENE_LOCATION_ENVIRONMENT_CANDIDATES[locationId]||[]).length>1)};
+  return {mode:"dedicated_backdrop",asset_id:environment.assetId,asset_path:getSceneBackdropAssetPath(environment.assetId)||null,location_id:locationId||((environment.locationAssociations||[])[0]||null),status:environment.status,aspect_ratio:environment.aspectRatio,master_resolution:{width:environment.masterWidth,height:environment.masterHeight},dialogue_safe_lower_ratio:environment.dialogueSafeLowerRatio,story_only:environment.storyOnly===true,never_battle_surface:environment.neverBattleSurface===true,world_identity_unchanged:true};
+}
+
 const STORY_SCENE_REGISTRY=new Map();
 
 function createDefaultStorySceneRuntimeState() {
@@ -41880,6 +41965,8 @@ function normalizeStorySceneBeat(beat,index=0) {
     speakerRef:normalizeStorySceneSourceRef(beat.speakerRef||beat.speakerSourceId||beat.speakerId||null,mode),
     speakerName:beat.speakerName?String(beat.speakerName):null,
     text:typeof beat.text==="string"?beat.text:"",
+    locationId:beat.locationId?String(beat.locationId):null,
+    environmentRef:normalizeStorySceneEnvironmentRef(beat.environmentRef||beat.sceneEnvironmentRef||null),
     presentationResolver:typeof beat.presentationResolver==="function"?beat.presentationResolver:null,
     nextBeatId:beat.nextBeatId?String(beat.nextBeatId):null,
     choices:Array.isArray(beat.choices)?beat.choices.map(normalizeStorySceneChoice).filter(Boolean):[],
@@ -41908,6 +41995,8 @@ function normalizeStorySceneDefinition(definition) {
     eventId:definition.eventId?String(definition.eventId):null,
     title:definition.title?String(definition.title):null,
     entryBeatId,
+    locationId:definition.locationId?String(definition.locationId):null,
+    environmentRef:normalizeStorySceneEnvironmentRef(definition.environmentRef||definition.sceneEnvironmentRef||null),
     participants:Array.isArray(definition.participants)?definition.participants.map(normalizeStorySceneParticipant).filter(Boolean):[],
     beats,
     beatMap:new Map(beats.map(beat=>[beat.beatId,beat])),
@@ -42121,6 +42210,7 @@ function createStorySceneObserverSafeProjection() {
       portrait_ref:normalizeStoryScenePortraitProjection(participant.portraitRef)
     }));
   const portraitProjection=resolveStoryScenePortraitProjection(authoredPresentation,beat,speakerRef);
+  const sceneEnvironment=resolveStorySceneEnvironmentProjection(authoredPresentation,beat,definition,active);
 
   return {
     scene_id:active.sceneId,
@@ -42134,6 +42224,7 @@ function createStorySceneObserverSafeProjection() {
     speaker_name:authoredPresentation.speakerName?String(authoredPresentation.speakerName):(beat.speakerName||(speakerRef&&speakerRef.displayName)||null),
     speaker_physically_present:speakerRef?speakerRef.physicalPresence:null,
     portrait_ref:portraitProjection,
+    scene_environment:sceneEnvironment,
     text:typeof authoredPresentation.text==="string"?authoredPresentation.text:beat.text,
     physical_participants:physicalParticipants,
     choices,
@@ -42433,7 +42524,9 @@ function ensureStoryScenePresentationStyles() {
   const style=document.createElement("style");
   style.id="sc-story-scene-runtime-style";
   style.textContent=`
-    #story-scene-presentation-layer{position:fixed;inset:0;z-index:12000;display:flex;align-items:flex-end;justify-content:center;pointer-events:auto;background:linear-gradient(180deg,rgba(2,5,9,.05) 0%,rgba(2,5,9,.18) 45%,rgba(2,5,9,.56) 100%);font-family:inherit;color:#eadfc9;}
+    #story-scene-presentation-layer{position:fixed;inset:0;z-index:12000;display:flex;align-items:flex-end;justify-content:center;pointer-events:auto;background:linear-gradient(180deg,rgba(2,5,9,.05) 0%,rgba(2,5,9,.18) 45%,rgba(2,5,9,.56) 100%);font-family:inherit;color:#eadfc9;overflow:hidden;}
+    #story-scene-presentation-layer .sc-story-environment{position:absolute;inset:0;z-index:-2;background-position:center center;background-repeat:no-repeat;background-size:cover;pointer-events:none;}
+    #story-scene-presentation-layer .sc-story-environment-scrim{position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(2,5,9,.02) 0%,rgba(2,5,9,.10) 48%,rgba(2,5,9,.50) 100%);pointer-events:none;}
     #story-scene-presentation-layer .sc-story-shell{width:min(1120px,calc(100vw - 56px));margin:0 28px 34px;padding:0;display:grid;grid-template-columns:minmax(0,1fr);filter:drop-shadow(0 22px 42px rgba(0,0,0,.58));}
     #story-scene-presentation-layer .sc-story-panel{position:relative;min-height:188px;border:1px solid rgba(197,151,66,.78);background:linear-gradient(180deg,rgba(8,13,19,.94),rgba(3,7,12,.97));box-shadow:inset 0 0 0 1px rgba(255,225,157,.08);padding:22px 24px 20px 190px;overflow:hidden;}
     #story-scene-presentation-layer .sc-story-panel.no-portrait{padding-left:28px;}
@@ -42525,6 +42618,8 @@ function renderStorySceneOverlay(container) {
   const closeAllowed=!!(getCurrentStorySceneBeat()&&getCurrentStorySceneBeat().allowPresentationClose===true);
   const modeLabel=(model.ui_mode||model.mode||"character").replace(/_/g," ").toUpperCase();
   const postBattle=model.post_battle_context;
+  const sceneEnvironment=model.scene_environment||{mode:"inherit_current",asset_path:null};
+  const dedicatedBackdrop=sceneEnvironment.mode==="dedicated_backdrop"&&sceneEnvironment.asset_path;
 
   const choices=model.mode==="choice"
     ? `<div class="sc-story-actions">${model.choices.map(choice=>`<button type="button" class="sc-story-action sc-story-choice" onclick="advanceStoryScene('${escapeStorySceneHTML(choice.choice_id)}')" ${choice.available?"":"disabled"}>${escapeStorySceneHTML(choice.label)}${!choice.available&&choice.known_blocker?` — ${escapeStorySceneHTML(choice.known_blocker)}`:""}</button>`).join("")}</div>`
@@ -42545,6 +42640,7 @@ function renderStorySceneOverlay(container) {
   container.dataset.uiMode=model.ui_mode||"character";
   container.setAttribute("aria-label",speaker?`${speaker} dialogue`:"Story scene");
   container.innerHTML=`
+    ${dedicatedBackdrop?`<div class="sc-story-environment" data-scene-environment-id="${escapeStorySceneHTML(sceneEnvironment.asset_id||"")}" style="background-image:url('${escapeStorySceneHTML(sceneEnvironment.asset_path)}')"></div><div class="sc-story-environment-scrim"></div>`:""}
     <div class="sc-story-shell">
       <section class="sc-story-panel ${hasPortrait?"":"no-portrait"}">
         ${closeAllowed?`<button type="button" class="sc-story-close" onclick="exitActiveStoryScene({reason:'ui_close'})" aria-label="Close scene">✕</button>`:""}
@@ -42685,13 +42781,84 @@ function runAlphaStorySceneUIContractDiagnostics() {
 }
 
 function runAlphaPostStoryUI764Diagnostics() {
-  const groups={
-    post749:runAlphaPostDialogue749Diagnostics(),
-    storyUI:runAlphaStorySceneUIContractDiagnostics()
-  };
+  const groups={post749:runAlphaPostDialogue749Diagnostics(),storyUI:runAlphaStorySceneUIContractDiagnostics()};
   const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-764 story-scene UI gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
+}
+
+// =========================================================
+// BRICKS 774–775 — STORY SCENE ENVIRONMENT ACCEPTANCE GATE
+// =========================================================
+function runAlphaStorySceneEnvironmentDiagnostics() {
+  const forestCandidates=SCENE_LOCATION_ENVIRONMENT_CANDIDATES["konoha:forest:path"]||[];
+  const classroom=resolveSceneEnvironmentAssetForLocation("konoha:academy:classroom");
+  const ambiguousForest=resolveSceneEnvironmentAssetForLocation("konoha:forest:path");
+  const explicitNight=resolveStorySceneEnvironmentProjection({environmentRef:"konoha_forest_path_night"},null,null,null);
+  const inherited=resolveStorySceneEnvironmentProjection({environmentRef:{mode:"inherit_current"}},null,null,null);
+  const arena=ALPHA_SCENE_ENVIRONMENT_LIBRARY.konoha_arena_ring;
+  const source=[resolveStorySceneEnvironmentProjection.toString(),renderStorySceneOverlay.toString(),resumeStorySceneFromBattle.toString()].join("\n");
+  const result={
+    exactLibraryCount:Object.keys(ALPHA_SCENE_ENVIRONMENT_LIBRARY).length===12,
+    elevenCoreOneOptional:Object.values(ALPHA_SCENE_ENVIRONMENT_LIBRARY).filter(item=>item.status==="core_alpha").length===11&&Object.values(ALPHA_SCENE_ENVIRONMENT_LIBRARY).filter(item=>item.status==="optional_variant").length===1,
+    standard1920x1080:Object.values(ALPHA_SCENE_ENVIRONMENT_LIBRARY).every(item=>item.aspectRatio==="16:9"&&item.masterWidth===1920&&item.masterHeight===1080),
+    lowerDialogueSafeRegion:Object.values(ALPHA_SCENE_ENVIRONMENT_LIBRARY).every(item=>Number(item.dialogueSafeLowerRatio)>=0.30&&Number(item.dialogueSafeLowerRatio)<=0.35),
+    actualPathsNotInvented:Object.keys(assetManifest.sceneBackdrops||{}).length===0,
+    explicitAssetCanResolveWithoutWorldIdentityMerge:explicitNight.asset_id==="konoha_forest_path_night"&&explicitNight.world_identity_unchanged===true,
+    uniqueLocationCanResolve:!!classroom&&classroom.assetId==="konoha_academy_classroom_day",
+    ambiguousDayNightNeverGuessed:forestCandidates.length===2&&ambiguousForest===null,
+    inheritCurrentSupported:inherited.mode==="inherit_current"&&inherited.asset_id===null,
+    arenaBackdropNeverBattleSurface:arena.storyOnly===true&&arena.neverBattleSurface===true,
+    rendererUsesBackdropOnlyWhenAssetPathExists:source.includes("dedicatedBackdrop")&&source.includes("scene_environment"),
+    battleReturnRestoresSameSceneRuntime:resumeStorySceneFromBattle.toString().includes("restoreStoryScenePresentationUnderlay")&&resumeStorySceneFromBattle.toString().includes('openOverlay("story_scene")'),
+    noBattleDamageToEnvironmentInference:!source.includes("environmentDamage")&&!source.includes("burnedClearing")&&!source.includes("damageBackdrop")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+// =========================================================
+// BRICKS 789–790 — WAVE C / POST-790 MONSTER GATE
+// =========================================================
+function runAlphaSpecialRepresentationWaveCDiagnostics() {
+  const exactPalettes={
+    sharingan_sasuke:["sharingan_sasuke_sharingan_read","sharingan_sasuke_counter","sharingan_sasuke_fireball","sharingan_sasuke_wire_bind"],
+    cs_sasuke:["cs_sasuke_lunge","cs_sasuke_fireball","cs_sasuke_chakra_burst","cs_sasuke_guard"],
+    naruto_v1:["naruto_v1_chakra_claw","naruto_v1_rushing_assault","naruto_v1_chakra_roar","naruto_v1_chakra_guard"],
+    naruto_v2:["naruto_v2_maul","naruto_v2_beast_cannon","naruto_v2_shockwave","naruto_v2_bastion"],
+    cs_anko:["cs_anko_serpent_strike","cs_anko_snake_bind","cs_anko_curse_burst","cs_anko_curse_guard"],
+    curse_mark_hinata:["curse_mark_hinata_curse_palm","curse_mark_hinata_rushing_palm","curse_mark_hinata_chakra_lash","curse_mark_hinata_curse_guard"],
+    l2_anko:["l2_anko_ascendant_fang","l2_anko_serpent_torrent","l2_anko_serpent_prison","l2_anko_cursed_carapace"],
+    mangekyo_sarada:["mangekyo_sarada_mangekyo_read","mangekyo_sarada_counter","mangekyo_sarada_fireball","mangekyo_sarada_chakra_impact"],
+    baryon_mode:["baryon_mode_flashstep_strike","baryon_mode_baryon_combo","baryon_mode_baryon_breaker","baryon_mode_baryon_evasion"]
+  };
+  const expectedPL={sharingan_sasuke:28,cs_sasuke:38,naruto_v1:40,naruto_v2:56,cs_anko:63,curse_mark_hinata:78,l2_anko:81,mangekyo_sarada:89,baryon_mode:177};
+  const allSkillIds=Object.entries(exactPalettes).flatMap(([owner,ids])=>ids.map(id=>({owner,id})));
+  const v2=getCharacterRegistryEntry("naruto_v2"),csSasuke=getCharacterRegistryEntry("cs_sasuke"),curseHinata=getCharacterRegistryEntry("curse_mark_hinata"),l2=getCharacterRegistryEntry("l2_anko"),baryon=getCharacterRegistryEntry("baryon_mode"),baryonBreaker=getClosureWaveBattleSkillDefinition("baryon_mode_baryon_breaker","baryon_mode");
+  const result={
+    exactNinePalettes:Object.entries(exactPalettes).every(([id,ids])=>JSON.stringify(SPECIAL_REPRESENTATION_PREPARED_SKILL_PALETTES[id])===JSON.stringify(ids)),
+    allThirtySixMachineIdsResolve:allSkillIds.length===36&&allSkillIds.every(item=>!!getClosureWaveBattleSkillDefinition(item.id,item.owner)),
+    exactBasePL:Object.entries(expectedPL).every(([id,pl])=>{const record=getCharacterRegistryEntry(id);return !!record&&record.basePL===pl;}),
+    csSasukeSharinganSeparate:!!csSasuke&&getCharacterEmbodiedPackageIds("cs_sasuke").includes("curse_seal_level_1_sasuke")&&!getCharacterEmbodiedPackageIds("cs_sasuke").includes("sharingan_three_tomoe_sasuke")&&characterHasRegistryExpressionAccess("cs_sasuke","sharingan_three_tomoe_sasuke"),
+    curseHinataByakuganSeparate:!!curseHinata&&!getCharacterEmbodiedPackageIds("curse_mark_hinata").includes("byakugan")&&characterHasRegistryExpressionAccess("curse_mark_hinata","byakugan"),
+    l2AnkoSuppressesCs1:!!l2&&Array.isArray(l2.suppressesEmbodiedExpressions)&&l2.suppressesEmbodiedExpressions.includes("curse_seal_level_1_anko"),
+    narutoV2SuppressesV1:!!v2&&Array.isArray(v2.suppressesEmbodiedExpressions)&&v2.suppressesEmbodiedExpressions.includes("kurama_v1_naruto"),
+    v2InstabilityCategorical:ensureDedicatedRepresentationLifecycleState.toString().includes('instabilityState:"stable"')&&advanceNarutoV2InstabilityAfterCompletedSkill.toString().includes('["stable","strained","breached"]'),
+    shockwaveEscalationNotBlind:advanceNarutoV2InstabilityAfterCompletedSkill.toString().includes("requiresAuthoredEscalationConfirmation")&&getClosureWaveBattleSkillDefinition("naruto_v2_shockwave","naruto_v2").instability.requiresAuthoredEscalationConfirmation===true,
+    mangekyoNoInventedSignature:!exactPalettes.mangekyo_sarada.some(id=>/amaterasu|kamui|susanoo|teleport/i.test(id)),
+    baryonExactlyFive:!!baryon&&baryon.lifecycleActionOpportunities===5&&consumeDedicatedRepresentationLifecycleActionOpportunity.toString().includes("representation_lifecycle_collapsed"),
+    baryonFifthAfterActionResolution:attemptClosureWaveBattleSkill.toString().indexOf("resolveClosureWaveSkillSemantics")<attemptClosureWaveBattleSkill.toString().indexOf("consumeBattleActionOpportunity"),
+    baryonCollapseNotDamage:!!baryon&&baryon.collapseDealsSelfDamage===false&&baryon.lifespanErosionIsAttackPL===false,
+    baryonContactEvidenceOnly:recordBaryonContactErosionOccurrence.toString().includes('eventType:"baryon_contact_erosion"')&&recordBaryonContactErosionOccurrence.toString().includes("attackPLContribution:0")&&recordBaryonContactErosionOccurrence.toString().includes("lifespanStatCreated:false"),
+    baryonBreakerCapped:!!baryonBreaker&&baryonBreaker.authoredAttackPL===150&&baryonBreaker.excess.capRatio===0.50&&baryonBreaker.excess.absoluteCap===75,
+    areaActionsOneActionSeparatePackets:getClosureWaveBattleSkillDefinition("naruto_v1_chakra_roar","naruto_v1").resolutionKind==="area_damage"&&getClosureWaveBattleSkillDefinition("l2_anko_serpent_torrent","l2_anko").resolutionKind==="area_damage",
+    noOrdinaryFiveLeak:Object.keys(exactPalettes).every(id=>!Object.prototype.hasOwnProperty.call(PRODUCTION_PREPARED_SKILL_PALETTES,id))
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+function runAlphaPost790MonsterDiagnostics() {
+  const groups={post764:runAlphaPostStoryUI764Diagnostics(),sceneEnvironment:runAlphaStorySceneEnvironmentDiagnostics(),waveC:runAlphaSpecialRepresentationWaveCDiagnostics()};
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-790 monster gate: ${result.pass?"PASS":"FAIL"}`);return result;
 }
 
 // =========================================================
@@ -68293,6 +68460,37 @@ function consumeDedicatedRepresentationLifecycleActionOpportunity(side,participa
 }
 
 // =========================================================
+// BRICKS 782 / 788 — WAVE C LIFECYCLE CONSEQUENCE HELPERS
+// =========================================================
+function getNarutoV2InstabilityState(actor) {
+  if (!actor||getCharacterRegistryId(actor)!=="naruto_v2") return null;
+  return findBattleTransientState({stateKey:"naruto_v2_instability",targetSide:"player",targetParticipantId:actor.id})||ensureDedicatedRepresentationLifecycleState(actor);
+}
+function advanceNarutoV2InstabilityAfterCompletedSkill(actor,skill,envelope,resolution,options={}) {
+  if (!actor||!skill||!resolution||resolution.resolved!==true||getCharacterRegistryId(actor)!=="naruto_v2") return null;
+  const state=getNarutoV2InstabilityState(actor); if(!state||!state.data)return null;
+  const order=["stable","strained","breached"]; const before=order.includes(state.data.instabilityState)?state.data.instabilityState:"stable";
+  let shouldAdvance=!!(skill.instability&&skill.instability.advanceOnCompleted===true);
+  if(skill.instability&&skill.instability.advanceWhenState===before) shouldAdvance=skill.instability.requiresAuthoredEscalationConfirmation===true?options.confirmInstabilityEscalation===true:true;
+  if(!shouldAdvance){if(skill.instability&&skill.instability.advanceWhenState===before)recordBattleEvidence({eventType:"naruto_v2_instability_escalation_available",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,stateRefs:[state.stateId],data:{before,requiresAuthoredEscalationConfirmation:true,hiddenStatCreated:false,automaticBattlePLDamage:0}});return {advanced:false,before,after:before,stateId:state.stateId};}
+  const index=Math.max(0,order.indexOf(before)); const after=order[Math.min(order.length-1,index+Math.max(1,Number(skill.instability&&skill.instability.steps)||1))];
+  state.data.instabilityState=after;
+  recordBattleEvidence({eventType:"naruto_v2_instability_advanced",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,stateRefs:[state.stateId],data:{before,after,categorical:true,hiddenStatCreated:false,battlePLDamage:0,injury:false,staminaLoss:0,forcedTransformation:false}});
+  return {advanced:after!==before,before,after,stateId:state.stateId};
+}
+function recordBaryonContactErosionOccurrence(definition={}) {
+  const actorSide=definition.actorSide||"player",actorParticipantId=definition.actorParticipantId||null,targetSide=definition.targetSide||null,targetParticipantId=definition.targetParticipantId||null;
+  if(!actorParticipantId||!targetSide||!targetParticipantId)return {success:false,reason:"baryon_participant_refs_missing"};
+  const actor=getBattleParticipantByIdentity(actorSide,actorParticipantId); if(!actor||getCharacterRegistryId(actor)!=="baryon_mode")return {success:false,reason:"actor_not_baryon_representation"};
+  if(definition.qualifyingContactConfirmed!==true)return {success:false,reason:"qualifying_baryon_contact_not_confirmed"};
+  const opportunityIndex=getBattleActionOpportunityIndex(actorSide,actorParticipantId),runtime=ensureBattleRuntimeState();
+  const duplicate=runtime.evidence.find(record=>record&&record.eventType==="baryon_contact_erosion"&&record.actorRef&&record.actorRef.side===actorSide&&record.actorRef.participantId===actorParticipantId&&record.targetRef&&record.targetRef.side===targetSide&&record.targetRef.participantId===targetParticipantId&&record.data&&Number(record.data.actorOpportunityIndex)===Number(opportunityIndex));
+  if(duplicate)return {success:true,idempotent:true,evidence:duplicate};
+  const evidence=recordBattleEvidence({eventType:"baryon_contact_erosion",actionId:definition.actionId||null,actorRef:createBattleParticipantRef(actorSide,actorParticipantId),targetRef:createBattleParticipantRef(targetSide,targetParticipantId),skillId:definition.skillId||null,sourceRefs:[{type:"character_registry",id:"baryon_mode",role:"active_representation"},...(definition.skillId?[{type:"skill",id:definition.skillId,role:"qualifying_contact_action"}]:[])],data:{actorOpportunityIndex:opportunityIndex,qualifyingContactConfirmed:true,attackPLContribution:0,battlePLDamage:0,poison:false,burning:false,injury:false,lifespanStatCreated:false,permanentStatReduction:false,causalConsequenceEvidenceOnly:true}});
+  return evidence?{success:true,evidence}:{success:false,reason:"baryon_contact_erosion_evidence_commit_failed"};
+}
+
+// =========================================================
 // BRICK 634 — KURAMA SOVEREIGN OVERLOAD OPPORTUNITY COST
 // =========================================================
 function applyKuramaSovereignOverloadOpportunityCost(side,participantId,actionId) {
@@ -74310,6 +74508,15 @@ const SPECIAL_REPRESENTATION_PREPARED_SKILL_PALETTES = {
     "black_gold_naruto_dominion_chains","black_gold_naruto_chakra_burst","black_gold_naruto_atomic_rasenshuriken",
     "black_gold_naruto_forbidden_seal_jutsu_devourer","black_gold_naruto_tailed_beast_necrosis"
   ],
+  sharingan_sasuke:["sharingan_sasuke_sharingan_read","sharingan_sasuke_counter","sharingan_sasuke_fireball","sharingan_sasuke_wire_bind"],
+  cs_sasuke:["cs_sasuke_lunge","cs_sasuke_fireball","cs_sasuke_chakra_burst","cs_sasuke_guard"],
+  naruto_v1:["naruto_v1_chakra_claw","naruto_v1_rushing_assault","naruto_v1_chakra_roar","naruto_v1_chakra_guard"],
+  naruto_v2:["naruto_v2_maul","naruto_v2_beast_cannon","naruto_v2_shockwave","naruto_v2_bastion"],
+  cs_anko:["cs_anko_serpent_strike","cs_anko_snake_bind","cs_anko_curse_burst","cs_anko_curse_guard"],
+  curse_mark_hinata:["curse_mark_hinata_curse_palm","curse_mark_hinata_rushing_palm","curse_mark_hinata_chakra_lash","curse_mark_hinata_curse_guard"],
+  l2_anko:["l2_anko_ascendant_fang","l2_anko_serpent_torrent","l2_anko_serpent_prison","l2_anko_cursed_carapace"],
+  mangekyo_sarada:["mangekyo_sarada_mangekyo_read","mangekyo_sarada_counter","mangekyo_sarada_fireball","mangekyo_sarada_chakra_impact"],
+  baryon_mode:["baryon_mode_flashstep_strike","baryon_mode_baryon_combo","baryon_mode_baryon_breaker","baryon_mode_baryon_evasion"],
   kurama_dominion:["kurama_dominion_extinction_core"],
   kurama_sovereign:[
     "kurama_sovereign_chains_of_the_sovereign",
@@ -74478,6 +74685,48 @@ registerFactoryBatch([
   makeFactoryAreaDamageSkill("kurama_dominion_calamity_roar","kurama_dominion",65,3,{primaryDiscipline:"Ninjutsu",traits:["wider_repertoire"]}),
   {id:"kurama_dominion_nine_pillars",ownerRegistryId:"kurama_dominion",primaryDiscipline:"Fūinjutsu",targetMode:"current_enemy",actionClass:"control_technique",resolutionKind:"dynamic_control",staminaMitigation:null,traits:["wider_repertoire","qualifying_damage_branch_41_not_automatic"],requirements:[],dynamicControl:{discipline:"Fūinjutsu",multiplier:1,conditionKey:null,conditionType:null,semanticClass:"nine_pillars_containment",maxTargets:1,durationActionOpportunities:null,blockedActionTraits:[],blanketStun:false},conditionalRider:{kind:"qualifying_damage_branch",authoredAttackPL:41,automatic:false}},
   makeFactoryRatioGuardSkill("kurama_dominion_tail_citadel","kurama_dominion",0.55,{primaryDiscipline:"Ninjutsu",traits:["wider_repertoire"]})
+]);
+
+// =========================================================
+// BRICKS 778–787 — SPECIAL REPRESENTATION CLOSURE WAVE C
+// =========================================================
+registerFactoryBatch([
+  makeFactoryCategoricalSkill("sharingan_sasuke_sharingan_read","sharingan_sasuke",{primaryDiscipline:"Genjutsu",targetMode:"current_enemy",actionClass:"perception_technique",traits:["observation_evidence_only","no_accuracy_stat","no_technique_copy"],informationBoundary:"legitimate_observation_only_no_automatic_technique_knowledge_or_copy"}),
+  makeFactoryFixedDamageSkill("sharingan_sasuke_counter","sharingan_sasuke",18,{primaryDiscipline:"Taijutsu",actionClass:"counter_technique"}),
+  makeFactoryFixedDamageSkill("sharingan_sasuke_fireball","sharingan_sasuke",19,{primaryDiscipline:"Ninjutsu",traits:["fire_technique","damage_does_not_auto_burn"]}),
+  makeFactoryDynamicControlSkill("sharingan_sasuke_wire_bind","sharingan_sasuke","Bukijutsu",{semanticClass:"physical_wire_restraint",conditionKey:"physical_restraint",conditionType:"physical_restraint",blockedActionTraits:["substantial_free_movement"],traits:["physical_restraint","not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("cs_sasuke_lunge","cs_sasuke",26,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryFixedDamageSkill("cs_sasuke_fireball","cs_sasuke",27,{primaryDiscipline:"Ninjutsu",traits:["fire_technique","damage_does_not_auto_burn"]}),
+  makeFactoryFixedDamageSkill("cs_sasuke_chakra_burst","cs_sasuke",25,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("cs_sasuke_guard","cs_sasuke",0.40),
+  makeFactoryFixedDamageSkill("naruto_v1_chakra_claw","naruto_v1",27,{primaryDiscipline:"Taijutsu",traits:["chakra_assisted_contact"]}),
+  makeFactoryFixedDamageSkill("naruto_v1_rushing_assault","naruto_v1",25,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryAreaDamageSkill("naruto_v1_chakra_roar","naruto_v1",16,3,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("naruto_v1_chakra_guard","naruto_v1",0.45),
+  makeFactoryFixedDamageSkill("naruto_v2_maul","naruto_v2",38,{primaryDiscipline:"Taijutsu"}),
+  {...makeFactoryFixedDamageSkill("naruto_v2_beast_cannon","naruto_v2",46,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:23,requiresCappedExcessResolver:true}}),instability:{advanceOnCompleted:true,steps:1}},
+  {...makeFactoryAreaDamageSkill("naruto_v2_shockwave","naruto_v2",22,3,{primaryDiscipline:"Ninjutsu"}),instability:{advanceWhenState:"strained",requiresAuthoredEscalationConfirmation:true}},
+  makeFactoryRatioGuardSkill("naruto_v2_bastion","naruto_v2",0.50),
+  makeFactoryFixedDamageSkill("cs_anko_serpent_strike","cs_anko",42,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryDynamicControlSkill("cs_anko_snake_bind","cs_anko","Ninjutsu",{semanticClass:"serpent_containment",traits:["snake_construct_not_participant","not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("cs_anko_curse_burst","cs_anko",40,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("cs_anko_curse_guard","cs_anko",0.45),
+  makeFactoryFixedDamageSkill("curse_mark_hinata_curse_palm","curse_mark_hinata",54,{primaryDiscipline:"Taijutsu",traits:["palm_name_does_not_imply_tenketsu_disable"]}),
+  makeFactoryFixedDamageSkill("curse_mark_hinata_rushing_palm","curse_mark_hinata",58,{primaryDiscipline:"Taijutsu",traits:["palm_name_does_not_imply_tenketsu_disable"]}),
+  makeFactoryFixedDamageSkill("curse_mark_hinata_chakra_lash","curse_mark_hinata",50,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryRatioGuardSkill("curse_mark_hinata_curse_guard","curse_mark_hinata",0.50),
+  makeFactoryFixedDamageSkill("l2_anko_ascendant_fang","l2_anko",58,{primaryDiscipline:"Taijutsu"}),
+  makeFactoryAreaDamageSkill("l2_anko_serpent_torrent","l2_anko",30,3,{primaryDiscipline:"Ninjutsu",traits:["serpent_visuals_not_participants"]}),
+  makeFactoryDynamicControlSkill("l2_anko_serpent_prison","l2_anko","Ninjutsu",{semanticClass:"serpent_prison",traits:["serpent_visuals_not_participants","not_generic_stun"]}),
+  makeFactoryRatioGuardSkill("l2_anko_cursed_carapace","l2_anko",0.55),
+  makeFactoryCategoricalSkill("mangekyo_sarada_mangekyo_read","mangekyo_sarada",{primaryDiscipline:"Genjutsu",targetMode:"current_enemy",actionClass:"perception_technique",traits:["legitimate_resolver_context_only","no_omniscience","no_signature_technique_grant"],informationBoundary:"ocular_analysis_evidence_only"}),
+  makeFactoryCategoricalSkill("mangekyo_sarada_counter","mangekyo_sarada",{targetMode:"self",actionClass:"counter_technique",reactiveOnly:true,traits:["categorical_reactive","no_automatic_damage","no_guaranteed_dodge"],informationBoundary:"reactive_context_only_no_hidden_evasion_stat"}),
+  makeFactoryFixedDamageSkill("mangekyo_sarada_fireball","mangekyo_sarada",54,{primaryDiscipline:"Ninjutsu",traits:["fire_technique","damage_does_not_auto_burn"]}),
+  makeFactoryFixedDamageSkill("mangekyo_sarada_chakra_impact","mangekyo_sarada",58,{primaryDiscipline:"Taijutsu"}),
+  {...makeFactoryFixedDamageSkill("baryon_mode_flashstep_strike","baryon_mode",118,{primaryDiscipline:"Taijutsu",traits:["baryon_contact_possible","no_hidden_speed_stat"]}),contactErosion:{eligible:true,requiresQualifyingContactConfirmation:true}},
+  {...makeFactoryFixedDamageSkill("baryon_mode_baryon_combo","baryon_mode",128,{primaryDiscipline:"Taijutsu",traits:["baryon_contact_possible","multi_hit_presentation_one_packet"]}),contactErosion:{eligible:true,requiresQualifyingContactConfirmation:true}},
+  {...makeFactoryFixedDamageSkill("baryon_mode_baryon_breaker","baryon_mode",150,{primaryDiscipline:"Taijutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:75,requiresCappedExcessResolver:true},traits:["baryon_contact_possible"]}),contactErosion:{eligible:true,requiresQualifyingContactConfirmation:true}},
+  makeFactoryCategoricalSkill("baryon_mode_baryon_evasion","baryon_mode",{targetMode:"self",actionClass:"defensive_evasion",reactiveOnly:true,traits:["categorical_defense","no_hidden_speed_or_evasion_stat"],informationBoundary:"categorical_defensive_interaction_only"})
 ]);
 
 // =========================================================
@@ -78717,11 +78966,14 @@ function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null,options=
   const entry=beginBattleActionResolution(envelope);
   if (!entry.accepted) return {success:false,reason:entry.validation.reason,entry};
   const resolution=resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options||{});
+  const narutoV2Instability=advanceNarutoV2InstabilityAfterCompletedSkill(actor,skill,envelope,resolution,options||{});
+  let baryonContactErosion=null;
+  if(resolution&&resolution.resolved===true&&skill.contactErosion&&skill.contactErosion.eligible===true&&options&&options.qualifyingContact===true&&target&&targetSide==="enemy") baryonContactErosion=recordBaryonContactErosionOccurrence({actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,actionId:envelope.actionId,skillId:skill.id,qualifyingContactConfirmed:true});
   recordBattleEvidence({eventType:"skill_action_completed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:resolution.stateRefs||[],conditionRefs:resolution.conditionRefs||[],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0,sourceIdentityMerge:false,entityPLTransfer:false}});
   if (resolution.resolved===true) consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_action_completed");
   saveTestState();
   if (!currentBattle.battleOver) openOverlay("combat");
-  return {success:resolution.resolved===true,envelope,resolution};
+  return {success:resolution.resolved===true,envelope,resolution,narutoV2Instability,baryonContactErosion};
 }
 
 // =========================================================
