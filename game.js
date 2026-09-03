@@ -72008,8 +72008,14 @@ registerFactoryBatch([
   makeFactoryRatioGuardSkill("academy_hinata_twin_palm_guard","academy_hinata",0.30),
   makeFactoryCategoricalSkill("academy_hinata_palm_counter","academy_hinata",{actionClass:"counter_technique",reactiveOnly:true,targetMode:"self"}),
   makeFactoryFixedDamageSkill("academy_hinata_academy_shuriken","academy_hinata",4),
+
+  // BRICK 648 — ACADEMY IZUNO FINAL FIVE-SKILL PRODUCTION MIGRATION
   makeFactoryFixedDamageSkill("academy_izuno_pouncing_palm","academy_izuno",5),
-  makeFactoryFixedDamageSkill("academy_izuno_shuriken_pounce","academy_izuno",5,{traits:["multi_projectile_presentation_one_packet"]}),
+  makeFactoryFixedDamageSkill("academy_izuno_shuriken_pounce","academy_izuno",5,{traits:["multi_projectile_presentation_one_packet","movement_presentation_not_extra_packet"]}),
+  makeFactoryCategoricalSkill("academy_izuno_catstep_feint","academy_izuno",{actionClass:"setup_technique",targetMode:"self",traits:["contextual_mobility_setup","no_hidden_accuracy_speed_evasion"],informationBoundary:"mobility_setup_evidence_only_no_automatic_deception_or_belief"}),
+  makeFactoryCategoricalSkill("academy_izuno_wall_spring","academy_izuno",{actionClass:"movement_technique",targetMode:"self",traits:["contextual_traversal_reposition","requires_legitimately_viable_nearby_surface_or_path","not_teleportation"],informationBoundary:"traversal_reposition_requires_legitimate_environment_context"}),
+  makeFactoryCategoricalSkill("academy_izuno_clone_pounce","academy_izuno",{actionClass:"setup_technique",targetMode:"current_enemy",traits:["clone_assisted_feint","effect_construct_not_participant"],informationBoundary:"deceptive_evidence_not_automatic_deception_or_belief"}),
+
   makeFactoryFixedDamageSkill("academy_kushina_red_whirlwind","academy_kushina",6),
   makeFactoryDynamicControlSkill("academy_kushina_beginner_binding_formula","academy_kushina","Fūinjutsu",{semanticClass:"binding_formula"}),
   makeFactoryRatioGuardSkill("academy_kushina_iron_will_brace","academy_kushina",0.30),
@@ -72048,6 +72054,7 @@ registerFactoryBatch([
   makeFactoryDynamicControlSkill("genin_karin_seal_tag_bind","genin_karin","Fūinjutsu",{semanticClass:"seal_tag_bind"}),
   makeFactoryFixedDamageSkill("genin_karin_endurance_counter","genin_karin",12)
 ]);
+
 
 // ---------------- BATCH 2 ----------------
 registerFactoryBatch([
@@ -72490,6 +72497,55 @@ function runAcademyExpansion102Diagnostics() {
   if (errors.length) console.log("Academy expansion errors:",errors);
   return result;
 }
+
+
+// =========================================================
+// BRICK 648 — ORDINARY PRODUCTION PALETTE COMPLETENESS GATE
+// =========================================================
+function getOrdinaryProductionPaletteStatus(characterOrId) {
+  const registryId=getCharacterRegistryId(characterOrId);
+  const palette=registryId&&Array.isArray(PRODUCTION_PREPARED_SKILL_PALETTES[registryId])
+    ? [...PRODUCTION_PREPARED_SKILL_PALETTES[registryId]]
+    : [];
+  const missingSkillIds=palette.filter(skillId=>!getClosureWaveBattleSkillDefinition(skillId,registryId));
+  return {
+    registryId:registryId||null,
+    expectedPreparedSkills:5,
+    preparedSkillCount:palette.length,
+    missingPreparedSlots:Math.max(0,5-palette.length),
+    missingSkillIds,
+    complete:palette.length===5&&missingSkillIds.length===0
+  };
+}
+
+function runOrdinaryProductionPaletteDiagnostics() {
+  const statuses=Object.keys(PRODUCTION_PREPARED_SKILL_PALETTES)
+    .map(id=>getOrdinaryProductionPaletteStatus(id));
+  const izuno=getOrdinaryProductionPaletteStatus("academy_izuno");
+  const underfilledOrdinaryIds=statuses
+    .filter(status=>status.complete!==true)
+    .map(status=>status.registryId);
+  const result={
+    academyIzunoFiveOfFive:izuno.complete===true&&izuno.preparedSkillCount===5&&izuno.missingPreparedSlots===0,
+    academyIzunoExactOrder:JSON.stringify(PRODUCTION_PREPARED_SKILL_PALETTES.academy_izuno)===JSON.stringify([
+      "academy_izuno_pouncing_palm",
+      "academy_izuno_shuriken_pounce",
+      "academy_izuno_catstep_feint",
+      "academy_izuno_wall_spring",
+      "academy_izuno_clone_pounce"
+    ]),
+    pilotIzunoIdsRetiredFromProduction:[
+      "academy_izuno_quickstep_lunge",
+      "academy_izuno_clone_feint",
+      "academy_izuno_pouncing_strike"
+    ].every(id=>!PRODUCTION_PREPARED_SKILL_PALETTES.academy_izuno.includes(id)),
+    underfilledOrdinaryIds
+  };
+  result.pass=result.academyIzunoFiveOfFive===true&&result.academyIzunoExactOrder===true&&result.pilotIzunoIdsRetiredFromProduction===true&&underfilledOrdinaryIds.length===0;
+  console.table({...result,underfilledOrdinaryIds:underfilledOrdinaryIds.join(", ")});
+  return result;
+}
+
 
 function getProductionPreparedSkillIds(characterOrId) {
   const registryId=getCharacterRegistryId(characterOrId);
@@ -77180,14 +77236,13 @@ function runIndustrialEstateLiveDiagnostics() {
 }
 
 
-// =========================================================
 // BRICK 600 — FACTORY BATCHES 1–4 IMPLEMENTATION DIAGNOSTIC
 // =========================================================
 function runFactoryBatches1To4ImplementationDiagnostics() {
   const byOwner=(owner,id)=>getClosureWaveBattleSkillDefinition(id,owner);
   const allSkills=Object.values(CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE);
   const result={
-    productionCharacters80:getProductionCharacterRegistryIds().length===80,
+    productionCharacters85:getProductionCharacterRegistryIds().length===85,
     productionEntities17:getProductionEntityRegistryIds().length===17,
     noDeletedFallenHokage:!getCharacterRegistryEntry("fallen_hokage")&&!!getCharacterRegistryEntry("fallen_hokage_sasuke"),
     karinCapability:characterHasRegistryCapability("genin_karin","karin_chakra_sensing_access"),
@@ -77210,6 +77265,7 @@ function runFactoryBatches1To4ImplementationDiagnostics() {
   console.table(result);
   return result;
 }
+
 
 function runIndustrialEstateDiagnostics() {
   const staticResult=runIndustrialEstateStaticDiagnostics();
