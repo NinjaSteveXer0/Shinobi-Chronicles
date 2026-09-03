@@ -635,6 +635,10 @@ const characterRegistry = {
       "byakugan"
     ]
   },
+  // =======================================================
+  // BRICK 649 — KIKAICHŪ SOURCE-ONLY BOUND COLLECTIVE MIGRATION
+  // BRICK 650 — FINAL BOUND_ENTITY SOURCE SEMANTICS
+  // =======================================================
   "jonin_shino": {
     "id": "jonin_shino",
     "baseStats": {
@@ -648,8 +652,13 @@ const characterRegistry = {
     },
     "basePL": 53,
     "formalRank": "jonin",
-    "boundEntityIds": [
-      "kikaichu_colony"
+    "sourceRefs": [
+      {
+        "type": "bound_entity",
+        "id": "kikaichu_colony",
+        "role": "bound_companion_source",
+        "classification": "source_only_bound_collective_companion"
+      }
     ]
   },
   "jonin_konohamaru": {
@@ -3082,10 +3091,20 @@ function validateAlphaProductionStatRecord(record,id,errors) {
 function collectAlphaProductionReferenceErrors() {
   const errors=[];
   const all=[...ALPHA_PRODUCTION_CHARACTER_IDS.map(id=>characterRegistry[id]),...ALPHA_PRODUCTION_ENTITY_IDS.map(id=>entityRegistry[id])].filter(Boolean);
+  const entityResolvedSourceTypes=new Set(["entity","bound_entity","attached_summon","summon_entity","hosted_entity"]);
   all.forEach(record=>{
     if (record.defaultAttachedSummonId&&!entityRegistry[record.defaultAttachedSummonId]) errors.push(`${record.id}:defaultAttachedSummonId:${record.defaultAttachedSummonId}`);
     ["hostedEntityIds","boundEntityIds","signatureEntityIds"].forEach(field=>{
       (Array.isArray(record[field])?record[field]:[]).forEach(entityId=>{ if (!entityRegistry[entityId]) errors.push(`${record.id}:${field}:${entityId}`); });
+    });
+    (Array.isArray(record.sourceRefs)?record.sourceRefs:[]).forEach((ref,index)=>{
+      if (!ref||typeof ref!=="object"||typeof ref.type!=="string"||!ref.type||typeof ref.id!=="string"||!ref.id) {
+        errors.push(`${record.id}:sourceRefs:${index}:invalid_source_ref`);
+        return;
+      }
+      if (entityResolvedSourceTypes.has(ref.type)&&!entityRegistry[ref.id]) {
+        errors.push(`${record.id}:sourceRefs:${index}:${ref.type}:${ref.id}`);
+      }
     });
   });
   return errors;
@@ -72112,6 +72131,7 @@ registerFactoryBatch([
 ]);
 
 // ---------------- BATCH 3 ----------------
+// BRICK 649 — KIKAICHŪ SOURCE-ONLY ACTION PROVENANCE
 registerFactoryBatch([
   makeFactoryDynamicControlSkill("akatsuki_itachi_tsukuyomi","akatsuki_itachi","Genjutsu",{semanticClass:"tsukuyomi_capture",conditionKey:"tsukuyomi_capture",conditionType:"genjutsu_capture"}),
   makeFactoryPersistentDamageSkill("akatsuki_itachi_amaterasu","akatsuki_itachi",50,12,3,{conditionKey:"amaterasu_flame",notGenericBurning:true,requirements:[{kind:"embodied_expression",expressionId:"mangekyo_sharingan_itachi"}]}),
@@ -72159,9 +72179,9 @@ registerFactoryBatch([
   makeFactoryFixedDamageSkill("vacuum_palm","jonin_hanabi",34),
   makeFactoryRatioGuardSkill("rotation","jonin_hanabi",0.50),
 
-  makeFactoryFixedDamageSkill("parasitic_swarm","jonin_shino",30,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant"}],traits:["entity_pl_not_transferred"]}),
-  makeFactoryDynamicControlSkill("insect_sphere","jonin_shino","Ninjutsu",{semanticClass:"insect_containment",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant"}]}),
-  makeFactoryRatioGuardSkill("insect_wall","jonin_shino",0.45,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant"}]})
+  makeFactoryFixedDamageSkill("parasitic_swarm","jonin_shino",30,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}],traits:["entity_pl_not_transferred"]}),
+  makeFactoryDynamicControlSkill("insect_sphere","jonin_shino","Ninjutsu",{semanticClass:"insect_containment",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}]}),
+  makeFactoryRatioGuardSkill("insect_wall","jonin_shino",0.45,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}]})
 ]);
 
 // ---------------- BATCH 4 ----------------
@@ -77266,6 +77286,39 @@ function runFactoryBatches1To4ImplementationDiagnostics() {
   return result;
 }
 
+
+
+// =========================================================
+// BRICK 649 — KIKAICHŪ SOURCE-ONLY BOUND COLLECTIVE DIAGNOSTIC
+// BRICK 650 — FINAL BOUND_ENTITY SOURCE SEMANTICS / DEDUPE REGRESSION
+// =========================================================
+function runKikaichuSourceMigrationDiagnostics() {
+  const shino=getCharacterRegistryEntry("jonin_shino");
+  const registrySourceRefs=shino&&Array.isArray(shino.sourceRefs)?shino.sourceRefs:[];
+  const registryRef=registrySourceRefs.find(ref=>ref&&ref.id==="kikaichu_colony")||null;
+  const skillIds=["parasitic_swarm","insect_sphere","insect_wall"];
+  const skills=skillIds.map(id=>getClosureWaveBattleSkillDefinition(id,"jonin_shino"));
+  const skillRefs=skills.map(skill=>skill&&Array.isArray(skill.sourceRefs)?skill.sourceRefs.find(ref=>ref&&ref.id==="kikaichu_colony")||null:null);
+  const evidenceProbe=normalizeBattleEvidenceSourceRefs(skillRefs.filter(Boolean));
+  const factoryEnvelopeProbe=skills[0]?getFactorySkillSourceRefs(skills[0],{id:"__kikaichu_diag_shino__",registryId:"jonin_shino"}):[];
+  const result={
+    shinoLoads:!!shino,
+    stableSourceId:!!registryRef&&registryRef.id==="kikaichu_colony",
+    sourceOnlyCollectiveClassification:!!registryRef&&registryRef.type==="bound_entity"&&registryRef.classification==="source_only_bound_collective_companion",
+    staleBoundEntityRegistryFieldRetired:!shino||!Array.isArray(shino.boundEntityIds)||!shino.boundEntityIds.includes("kikaichu_colony"),
+    sourceAddressabilityDoesNotRequireEntityRegistration:!!registryRef&&!getEntityDefinition("kikaichu_colony")&&!ALPHA_PRODUCTION_ENTITY_IDS.includes("kikaichu_colony"),
+    productionEntitiesRemain17:getProductionEntityRegistryIds().length===17,
+    productionTotalRemains102:getProductionCharacterRegistryIds().length===85&&getProductionEntityRegistryIds().length===17,
+    allThreeSkillsCarryBoundEntitySource:skills.every(Boolean)&&skillRefs.every(ref=>ref&&ref.type==="bound_entity"&&ref.id==="kikaichu_colony"&&ref.role==="causal_participant"&&ref.classification==="source_only_bound_collective_companion"),
+    noSummonAttachmentRequirement:skills.every(skill=>skill&&!((skill.requirements||[]).some(req=>req&&req.kind==="attached_summon_access"&&req.entityId==="kikaichu_colony"))),
+    actionSourcePipelinePreservesBoundEntity:factoryEnvelopeProbe.some(ref=>ref&&ref.id==="kikaichu_colony"&&ref.type==="bound_entity"&&ref.role==="causal_participant"&&ref.classification==="source_only_bound_collective_companion"),
+    evidencePipelinePreservesBoundEntityAfterDedupe:evidenceProbe.length===1&&evidenceProbe[0].id==="kikaichu_colony"&&evidenceProbe[0].type==="bound_entity"&&evidenceProbe[0].role==="causal_participant"&&evidenceProbe[0].classification==="source_only_bound_collective_companion",
+    noIndependentParticipantTurnOrPL:!getEntityDefinition("kikaichu_colony")&&!isAttachableSummonEntity(getEntityDefinition("kikaichu_colony"))
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
 
 function runIndustrialEstateDiagnostics() {
   const staticResult=runIndustrialEstateStaticDiagnostics();
