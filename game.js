@@ -77468,6 +77468,7 @@ function executeEnemyAuthoredActionOpportunity() {
 // BRICK 690 — FINAL ORDINARY PALETTE CLOSURE WAVE REGRESSION
 // BRICK 691 — FACTORY BATCH 5 FINAL SEMANTIC REGRESSION
 // BRICK 692 — GENERIC ENEMY ACTION PACKAGE DIRECT ATTACHMENT
+// BRICK 693 — BATCH 5 DIAGNOSTIC SHAPE CORRECTION
 // =========================================================
 // Combat's final ingestion contract requires these three existing enemy records
 // to expose authoredBattleActions directly. The central package map remains the
@@ -77573,9 +77574,9 @@ function runAlphaCombatContentClosureDiagnostics() {
       !!kageSaradaFireball&&kageSaradaFireball.conditionalRider&&kageSaradaFireball.conditionalRider.kind==="ordinary_burning"&&kageSaradaFireball.conditionalRider.automatic===false&&
       !!shisuiFireball&&shisuiFireball.conditionalRider&&shisuiFireball.conditionalRider.kind==="ordinary_burning"&&shisuiFireball.conditionalRider.automatic===false,
     batch5ShisuiExactIllusoryBind:
-      !!shisuiOcular&&shisuiOcular.resolutionKind==="dynamic_control"&&shisuiOcular.conditionKey==="illusory_bind",
+      !!shisuiOcular&&shisuiOcular.resolutionKind==="dynamic_control"&&shisuiOcular.dynamicControl&&shisuiOcular.dynamicControl.conditionKey==="illusory_bind",
     batch5TeenNagatoReceiverConditionalRestraint:
-      !!teenNagatoReceiver&&teenNagatoReceiver.fixedAttackPL===42&&teenNagatoReceiver.conditionalRider&&
+      !!teenNagatoReceiver&&teenNagatoReceiver.authoredAttackPL===42&&teenNagatoReceiver.conditionalRider&&
       teenNagatoReceiver.conditionalRider.type==="physical_restraint"&&teenNagatoReceiver.conditionalRider.automaticFromDamage===false,
     kikaichuSourceOnly:shinoRefs.length>=2&&shinoRefs.every(ref=>ref.id==="kikaichu_colony"&&ref.role==="causal_participant")&&!Object.prototype.hasOwnProperty.call(entityRegistry,"kikaichu_colony"),
     production102:ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length===17
