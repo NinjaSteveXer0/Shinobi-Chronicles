@@ -656,8 +656,8 @@ const characterRegistry = {
       {
         "type": "bound_entity",
         "id": "kikaichu_colony",
-        "role": "bound_companion_source",
-        "classification": "source_only_bound_collective_companion"
+        "role": "causal_participant",
+        "classification": "source_only_bound_collective"
       }
     ]
   },
@@ -3089,13 +3089,14 @@ function validateAlphaProductionStatRecord(record,id,errors) {
 }
 
 // =========================================================
-// BRICK 651 — SOURCE-ONLY BOUND ENTITY REFERENCE VALIDATION
+// BRICK 651 — SOURCE-ONLY BOUND COLLECTIVE REFERENCE VALIDATION
+// BRICK 652 — FINAL SOURCE ADDRESSABILITY ≠ ENTITY REGISTRATION LOCK
 // =========================================================
 function collectAlphaProductionReferenceErrors() {
   const errors=[];
   const all=[...ALPHA_PRODUCTION_CHARACTER_IDS.map(id=>characterRegistry[id]),...ALPHA_PRODUCTION_ENTITY_IDS.map(id=>entityRegistry[id])].filter(Boolean);
   const entityResolvedSourceTypes=new Set(["entity","attached_summon","summon_entity","hosted_entity"]);
-  const sourceOnlyBoundEntityClassifications=new Set(["source_only_bound_collective_companion"]);
+  const sourceOnlyBoundEntityClassifications=new Set(["source_only_bound_collective"]);
   all.forEach(record=>{
     if (record.defaultAttachedSummonId&&!entityRegistry[record.defaultAttachedSummonId]) errors.push(`${record.id}:defaultAttachedSummonId:${record.defaultAttachedSummonId}`);
     ["hostedEntityIds","boundEntityIds","signatureEntityIds"].forEach(field=>{
@@ -4844,6 +4845,40 @@ function normalizeBattlePouchSelection(
 // =========================================================
 
 const CLAN_TEAM_SLOT_COUNT = 6;
+
+// =========================================================
+// BRICK 652 — MY CLAN / BATTLE QUEUE ORDER AUTHORITY
+// =========================================================
+//
+// Persistent six-slot order maps directly into Battle:
+//
+// 1 START      -> Current Actor
+// 2 NEXT 1     -> Next 1
+// 3 NEXT 2     -> Next 2
+// 4 NEXT 3     -> Next 3
+// 5 RESERVE 1  -> Reserve 1
+// 6 RESERVE 2  -> Reserve 2
+//
+// UI presentation does not own this order.
+// =========================================================
+
+const CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS = Object.freeze([
+  Object.freeze({slotNumber:1,key:"start",label:"START",battleRole:"current_actor"}),
+  Object.freeze({slotNumber:2,key:"next_1",label:"NEXT 1",battleRole:"next_1"}),
+  Object.freeze({slotNumber:3,key:"next_2",label:"NEXT 2",battleRole:"next_2"}),
+  Object.freeze({slotNumber:4,key:"next_3",label:"NEXT 3",battleRole:"next_3"}),
+  Object.freeze({slotNumber:5,key:"reserve_1",label:"RESERVE 1",battleRole:"reserve_1"}),
+  Object.freeze({slotNumber:6,key:"reserve_2",label:"RESERVE 2",battleRole:"reserve_2"})
+]);
+
+function getClanBattleQueueSlotDefinition(slotNumber) {
+  return CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS.find(definition=>definition.slotNumber===Number(slotNumber))||null;
+}
+
+function getClanBattleQueueSlotLabel(slotNumber) {
+  const definition=getClanBattleQueueSlotDefinition(slotNumber);
+  return definition?definition.label:`SLOT ${Number(slotNumber)||"?"}`;
+}
 
 const DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS = [
   "kage_naruto",
@@ -35889,8 +35924,9 @@ function startEncounterActivity(
 // BRICK 602 — PARTICIPANT-BACKED ENEMY 3+3 FOUNDATION
 // =========================================================
 //
-// Slots 1–3 = Active
-// Slots 4–6 = Reserve
+// Slot 1 = Current Actor / START
+// Slots 2–4 = NEXT 1 / NEXT 2 / NEXT 3
+// Slots 5–6 = Reserve 1 / Reserve 2
 //
 // Player and enemy deployment now share participant-backed slot
 // semantics. currentBattle.enemy remains only the ACTIVE enemy
@@ -35908,17 +35944,25 @@ function createBattleDeploymentSlots(participantIds) {
   return slots;
 }
 
-function getPersistentClanBattleParticipantIds() {
+function getPersistentClanBattleQueueSlots() {
   const normalized=normalizeClanManagementState(playerData&&playerData.clan?playerData.clan:null);
-  const participantIds=normalized.teamSlots.filter(characterId=>!!characterId&&!!getPlayerCharacter(characterId));
-  if (participantIds.length>0) return participantIds;
-  return getClanManageableRosterCharacters().slice(0,CLAN_TEAM_SLOT_COUNT).map(character=>character.id);
+  const directSlots=Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>{
+    const characterId=normalized.teamSlots[index]||null;
+    return characterId&&getPlayerCharacter(characterId)?characterId:null;
+  });
+  if (directSlots.some(Boolean)) return directSlots;
+  const fallbackIds=getClanManageableRosterCharacters().slice(0,CLAN_TEAM_SLOT_COUNT).map(character=>character.id);
+  return Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>fallbackIds[index]||null);
+}
+
+function getPersistentClanBattleParticipantIds() {
+  return getPersistentClanBattleQueueSlots().filter(Boolean);
 }
 
 function createInitialBattlePlayerParticipantIds(activePlayerId=null) {
-  const participantIds=getPersistentClanBattleParticipantIds();
-  if (!activePlayerId||!participantIds.includes(activePlayerId)) return participantIds;
-  return [activePlayerId,...participantIds.filter(characterId=>characterId!==activePlayerId)];
+  // Legacy compatibility helper: Battle deployment itself consumes the
+  // authoritative six-slot queue and does not reorder around activePlayerId.
+  return getPersistentClanBattleParticipantIds();
 }
 
 function normalizeBattleEnemyParticipantSource(source) {
@@ -35971,7 +36015,7 @@ function createBattleDeployment(enemy,activePlayerId=null,enemyParticipants=null
   else ensureBattleEnemyParticipants(enemy);
   const enemyIds=getBattleEnemyParticipantIds();
   return {
-    player:{slots:createBattleDeploymentSlots(createInitialBattlePlayerParticipantIds(activePlayerId))},
+    player:{slots:createBattleDeploymentSlots(getPersistentClanBattleQueueSlots())},
     enemy:{slots:createBattleDeploymentSlots(enemyIds.length>0?enemyIds:(enemy&&enemy.id?[enemy.id]:[]))},
     transitionCounter:0,
     lastTransition:null
@@ -36019,7 +36063,7 @@ function normalizeBattleDeployment(rawDeployment,fallbackActivePlayerId=null) {
   const hasEnemy=enemy.slots.some(slot=>!!slot.participantId);
   const enemyIds=getBattleEnemyParticipantIds();
   return {
-    player:hasPlayer?player:{slots:createBattleDeploymentSlots(createInitialBattlePlayerParticipantIds(fallbackActivePlayerId))},
+    player:hasPlayer?player:{slots:createBattleDeploymentSlots(getPersistentClanBattleQueueSlots())},
     enemy:hasEnemy?enemy:{slots:createBattleDeploymentSlots(enemyIds)},
     transitionCounter:0,
     lastTransition:null
@@ -36213,12 +36257,13 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   const enemy=enemyDatabase[enemyId];
   if (!enemy) { console.log("Enemy not found"); return false; }
 
-  const formationIds=getPersistentClanBattleParticipantIds();
-  let requestedPlayer=characterId?getPlayerCharacter(characterId):null;
-  if (requestedPlayer&&!isRuntimeCharacterOwned(requestedPlayer)) requestedPlayer=null;
-  if (requestedPlayer&&!formationIds.includes(requestedPlayer.id)) requestedPlayer=null;
-  const activePlayer=requestedPlayer||(formationIds.length>0?getPlayerCharacter(formationIds[0]):null);
-  if (!activePlayer) { console.log("No owned Battle formation character available."); return false; }
+  const formationQueue=getPersistentClanBattleQueueSlots();
+  const startCharacterId=formationQueue[0]||null;
+  const activePlayer=startCharacterId?getPlayerCharacter(startCharacterId):null;
+  if (!activePlayer) { console.log("No owned shinobi is assigned to My Clan START."); return false; }
+  if (characterId&&characterId!==activePlayer.id) {
+    console.log(`Battle launch character override "${characterId}" ignored; My Clan START "${activePlayer.id}" owns Current Actor order.`);
+  }
 
   selectedEnemy=enemy;
   currentBattle.active=true;
@@ -36228,7 +36273,7 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   currentBattle.encounterEnemy=enemy;
   setBattleEnemyParticipants([enemy]);
   currentBattle.enemy=enemy;
-  currentBattle.deployment=createBattleDeployment(enemy,activePlayer.id);
+  currentBattle.deployment=createBattleDeployment(enemy);
   currentBattle.activePlayer=getBattleDeploymentParticipant("player",1)||activePlayer;
   syncBattleActiveEnemyFromDeployment();
   currentBattle.lastDamage=0;
@@ -36779,9 +36824,9 @@ function advanceBattleDeploymentQueue(side,participantId,reason="zero_remaining_
     if (!source||!source.participantId) continue;
     const fromSlot=sourceIndex+1;
     const toSlot=sourceIndex;
-    let movementType="reserve_slide";
-    if (fromSlot>=4&&toSlot<=3) movementType="reserve_promotion";
-    else if (toSlot<=3) movementType="active_slide";
+    let movementType="queue_advance";
+    if (fromSlot>=5&&toSlot<=4) movementType="reserve_promotion";
+    else if (toSlot<=4) movementType="next_queue_advance";
     movements.push({participantId:source.participantId,fromSlot,toSlot,movementType});
   }
 
@@ -36818,7 +36863,8 @@ function advanceBattleDeploymentQueue(side,participantId,reason="zero_remaining_
   const promotion=movements.find(movement=>movement.movementType==="reserve_promotion")||null;
   if (promotion&&Array.isArray(currentBattle.battleLog)) {
     const promoted=getBattleParticipantByIdentity(side,promotion.participantId);
-    if (promoted) currentBattle.battleLog.push(`${promoted.name||promoted.id} promoted from Reserve to Active Slot ${promotion.toSlot}.`);
+    const queueLabel=getClanBattleQueueSlotLabel(promotion.toSlot);
+    if (promoted) currentBattle.battleLog.push(`${promoted.name||promoted.id} advanced from Reserve to ${queueLabel}.`);
   }
 
   recordBattleEvidence({
@@ -38906,6 +38952,7 @@ function returnToKonohaFromActivityUI() {
 
 // =========================================================
 // BRICKS 354–356 — YOUR CLAN / CHARACTER MANAGEMENT
+// BRICK 652 — DIRECT ALPHA BATTLE QUEUE ALIGNMENT
 // =========================================================
 //
 // Functional Alpha foundation.
@@ -38992,7 +39039,7 @@ function getClanCharacterTeamStatus(
 
   if (
     slotNumber >= 1 &&
-    slotNumber <= 3
+    slotNumber <= 4
   ) {
 
 
@@ -39001,7 +39048,7 @@ function getClanCharacterTeamStatus(
 
 
   if (
-    slotNumber >= 4 &&
+    slotNumber >= 5 &&
     slotNumber <= 6
   ) {
 
@@ -39317,6 +39364,30 @@ function assignClanCharacterToNextOpenSlot(characterId) {
 
 function moveClanCharacterToSlot(characterId, slotNumber) {
   return setClanTeamSlot(slotNumber,characterId);
+}
+
+function beginClanCharacterDrag(event, characterId) {
+  if (!event||!event.dataTransfer||typeof characterId!=="string") return false;
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return false;
+  event.dataTransfer.effectAllowed="move";
+  event.dataTransfer.setData("text/plain",characterId);
+  return true;
+}
+
+function allowClanTeamSlotDrop(event) {
+  if (!event) return false;
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect="move";
+  return true;
+}
+
+function dropClanCharacterIntoTeamSlot(event, slotNumber) {
+  if (!event||!event.dataTransfer) return {success:false,reason:"drag_payload_missing"};
+  event.preventDefault();
+  const characterId=event.dataTransfer.getData("text/plain");
+  if (!characterId) return {success:false,reason:"drag_character_missing"};
+  return moveClanCharacterToSlot(characterId,slotNumber);
 }
 
 function removeClanCharacterFromTeam(
@@ -39657,9 +39728,9 @@ function renderClanManagementControls(
 
 
         const label =
-          targetSlot <= 3
-            ? `ACTIVE ${targetSlot}`
-            : `RESERVE ${targetSlot}`;
+          getClanBattleQueueSlotLabel(
+            targetSlot
+          );
 
 
         const selected =
@@ -39671,6 +39742,8 @@ function renderClanManagementControls(
           <button
             type="button"
             onclick="setClanTeamSlot(${targetSlot}, '${character.id}')"
+            ondragover="allowClanTeamSlotDrop(event)"
+            ondrop="dropClanCharacterIntoTeamSlot(event, ${targetSlot})"
             style="
               padding:6px 8px;
               border:1px solid ${selected ? "#00d9e8" : "#263448"};
@@ -39948,6 +40021,8 @@ function createClanCard(
     <button
       type="button"
       class="clan-card"
+      draggable="true"
+      ondragstart="beginClanCharacterDrag(event, '${character.id}')"
       onclick="selectClanCharacter('${character.id}')"
       style="${
         selected
@@ -40121,7 +40196,7 @@ function runClanManagementDiagnostics() {
             characterId
           ) ===
             (
-              index < 3
+              index < 4
                 ? "ACTIVE"
                 : "RESERVE"
             )
@@ -40216,6 +40291,32 @@ function runClanManagementDiagnostics() {
 
 
   return results;
+}
+
+
+// =========================================================
+// BRICK 652 — MY CLAN / BATTLE ORDER ALIGNMENT DIAGNOSTIC
+// =========================================================
+function runClanBattleQueueAlignmentDiagnostics() {
+  const expectedLabels=["START","NEXT 1","NEXT 2","NEXT 3","RESERVE 1","RESERVE 2"];
+  const queue=getPersistentClanBattleQueueSlots();
+  const configured=normalizeClanManagementState(playerData&&playerData.clan?playerData.clan:null).teamSlots;
+  const configuredHasAny=configured.some(Boolean);
+  const result={
+    sixAuthoritativePositions:CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS.length===6&&queue.length===6,
+    exactQueueLabels:JSON.stringify(CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS.map(definition=>definition.label))===JSON.stringify(expectedLabels),
+    startMapsCurrentActor:CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS[0].battleRole==="current_actor",
+    nextThreeMappedExactly:["next_1","next_2","next_3"].every((role,index)=>CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS[index+1].battleRole===role),
+    reservesAreSlotsFiveSix:CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS[4].battleRole==="reserve_1"&&CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS[5].battleRole==="reserve_2",
+    persistentOrderPreserved:!configuredHasAny||JSON.stringify(queue)===JSON.stringify(configured.map(id=>id&&getPlayerCharacter(id)?id:null)),
+    deploymentConsumesQueueDirectly:createBattleDeployment.toString().includes("getPersistentClanBattleQueueSlots"),
+    launchUsesStartAuthority:startEncounter.toString().includes("startCharacterId=formationQueue[0]")&&!startEncounter.toString().includes("requestedPlayer"),
+    dragDropReordersAuthority:typeof beginClanCharacterDrag==="function"&&typeof dropClanCharacterIntoTeamSlot==="function"&&dropClanCharacterIntoTeamSlot.toString().includes("moveClanCharacterToSlot"),
+    noAggregateTeamPL:!renderClanOverlay.toString().toLowerCase().includes("team pl")&&!renderClanOverlay.toString().toLowerCase().includes("average pl")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
 }
 
 
@@ -72188,9 +72289,9 @@ registerFactoryBatch([
   makeFactoryFixedDamageSkill("vacuum_palm","jonin_hanabi",34),
   makeFactoryRatioGuardSkill("rotation","jonin_hanabi",0.50),
 
-  makeFactoryFixedDamageSkill("parasitic_swarm","jonin_shino",30,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}],traits:["entity_pl_not_transferred"]}),
-  makeFactoryDynamicControlSkill("insect_sphere","jonin_shino","Ninjutsu",{semanticClass:"insect_containment",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}]}),
-  makeFactoryRatioGuardSkill("insect_wall","jonin_shino",0.45,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}]})
+  makeFactoryFixedDamageSkill("parasitic_swarm","jonin_shino",30,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective"}],traits:["entity_pl_not_transferred"]}),
+  makeFactoryDynamicControlSkill("insect_sphere","jonin_shino","Ninjutsu",{semanticClass:"insect_containment",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective"}]}),
+  makeFactoryRatioGuardSkill("insect_wall","jonin_shino",0.45,{sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective"}]})
 ]);
 
 // ---------------- BATCH 4 ----------------
@@ -77313,15 +77414,15 @@ function runKikaichuSourceMigrationDiagnostics() {
   const result={
     shinoLoads:!!shino,
     stableSourceId:!!registryRef&&registryRef.id==="kikaichu_colony",
-    sourceOnlyCollectiveClassification:!!registryRef&&registryRef.type==="bound_entity"&&registryRef.classification==="source_only_bound_collective_companion",
+    sourceOnlyCollectiveClassification:!!registryRef&&registryRef.type==="bound_entity"&&registryRef.classification==="source_only_bound_collective",
     staleBoundEntityRegistryFieldRetired:!shino||!Array.isArray(shino.boundEntityIds)||!shino.boundEntityIds.includes("kikaichu_colony"),
     sourceAddressabilityDoesNotRequireEntityRegistration:!!registryRef&&!getEntityDefinition("kikaichu_colony")&&!ALPHA_PRODUCTION_ENTITY_IDS.includes("kikaichu_colony"),
     productionEntitiesRemain17:getProductionEntityRegistryIds().length===17,
     productionTotalRemains102:getProductionCharacterRegistryIds().length===85&&getProductionEntityRegistryIds().length===17,
-    allThreeSkillsCarryBoundEntitySource:skills.every(Boolean)&&skillRefs.every(ref=>ref&&ref.type==="bound_entity"&&ref.id==="kikaichu_colony"&&ref.role==="causal_participant"&&ref.classification==="source_only_bound_collective_companion"),
+    allThreeSkillsCarryBoundEntitySource:skills.every(Boolean)&&skillRefs.every(ref=>ref&&ref.type==="bound_entity"&&ref.id==="kikaichu_colony"&&ref.role==="causal_participant"&&ref.classification==="source_only_bound_collective"),
     noSummonAttachmentRequirement:skills.every(skill=>skill&&!((skill.requirements||[]).some(req=>req&&req.kind==="attached_summon_access"&&req.entityId==="kikaichu_colony"))),
-    actionSourcePipelinePreservesBoundEntity:factoryEnvelopeProbe.some(ref=>ref&&ref.id==="kikaichu_colony"&&ref.type==="bound_entity"&&ref.role==="causal_participant"&&ref.classification==="source_only_bound_collective_companion"),
-    evidencePipelinePreservesBoundEntityAfterDedupe:evidenceProbe.length===1&&evidenceProbe[0].id==="kikaichu_colony"&&evidenceProbe[0].type==="bound_entity"&&evidenceProbe[0].role==="causal_participant"&&evidenceProbe[0].classification==="source_only_bound_collective_companion",
+    actionSourcePipelinePreservesBoundEntity:factoryEnvelopeProbe.some(ref=>ref&&ref.id==="kikaichu_colony"&&ref.type==="bound_entity"&&ref.role==="causal_participant"&&ref.classification==="source_only_bound_collective"),
+    evidencePipelinePreservesBoundEntityAfterDedupe:evidenceProbe.length===1&&evidenceProbe[0].id==="kikaichu_colony"&&evidenceProbe[0].type==="bound_entity"&&evidenceProbe[0].role==="causal_participant"&&evidenceProbe[0].classification==="source_only_bound_collective",
     noIndependentParticipantTurnOrPL:!getEntityDefinition("kikaichu_colony")&&!isAttachableSummonEntity(getEntityDefinition("kikaichu_colony"))
   };
   result.pass=Object.values(result).every(value=>value===true);
