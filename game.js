@@ -38628,6 +38628,21 @@ var currentOverlayType = null;
 function openOverlay(type) {
 
 
+  // =====================================================
+  // BRICK 750 — STORY SCENE IS A PRESENTATION LAYER
+  // =====================================================
+  // Dialogue overlays the current environment/map rather than replacing it.
+  // The underlying overlay type remains authoritative so Battle can return to
+  // the same scene/environment without manufacturing a separate story page.
+  if (type === "story_scene") {
+    saveTestState();
+    return renderStoryScenePresentationLayer();
+  }
+
+  if (typeof hideStoryScenePresentationLayer === "function") {
+    hideStoryScenePresentationLayer({preserveRuntime:true});
+  }
+
   currentOverlayType =
     type;
 
@@ -38870,6 +38885,20 @@ function openOverlay(type) {
 // =========================================================
 
 function closeOverlay() {
+
+
+  // =====================================================
+  // BRICK 751 — STORY LAYER CLOSE AUTHORITY
+  // =====================================================
+  // Escape/back cannot close the environment underneath an active dialogue.
+  // The current authored beat decides whether presentation close is legal.
+  if (typeof isStoryScenePresentationVisible === "function" && isStoryScenePresentationVisible()) {
+    const result=exitActiveStoryScene({reason:"presentation_close"});
+    if (!result || result.success !== true) {
+      console.log("Story scene presentation remains open:", result && result.reason ? result.reason : "close_not_authorised");
+    }
+    return;
+  }
 
 
   // =========================================
@@ -41654,6 +41683,7 @@ function normalizeStorySceneRuntimeState(savedState) {
         sourceEventId:typeof active.sourceEventId==="string"?active.sourceEventId:null,
         sourceOpportunityId:typeof active.sourceOpportunityId==="string"?active.sourceOpportunityId:null,
         returnContext:active.returnContext&&typeof active.returnContext==="object"?cloneProgressionData(active.returnContext):null,
+        presentationUnderlay:active.presentationUnderlay&&typeof active.presentationUnderlay==="object"?cloneProgressionData(active.presentationUnderlay):null,
         localContext:active.localContext&&typeof active.localContext==="object"?cloneProgressionData(active.localContext):{},
         processedConsequenceKeys:Array.isArray(active.processedConsequenceKeys)?[...new Set(active.processedConsequenceKeys.filter(Boolean))]:[],
         committedChoiceKeys:Array.isArray(active.committedChoiceKeys)?[...new Set(active.committedChoiceKeys.filter(Boolean))]:[],
@@ -41705,14 +41735,96 @@ function normalizeStorySceneSourceRef(sourceRef,mode="dialogue") {
 
 function normalizeStorySceneParticipant(participant) {
   if (!participant) return null;
-  if (typeof participant==="string") return {sourceId:participant,physicalPresence:true,visible:true,role:null};
+  if (typeof participant==="string") return {sourceId:participant,physicalPresence:true,visible:true,role:null,displayName:null,portraitRef:null};
   if (typeof participant!=="object"||!participant.sourceId) return null;
   return {
     sourceId:String(participant.sourceId),
     physicalPresence:participant.physicalPresence!==false,
     visible:participant.visible!==false,
-    role:participant.role?String(participant.role):null
+    role:participant.role?String(participant.role):null,
+    displayName:participant.displayName?String(participant.displayName):null,
+    portraitRef:participant.portraitRef?cloneProgressionData(participant.portraitRef):null
   };
+}
+
+// =========================================================
+// BRICKS 752–754 — STORY PRESENTATION / PORTRAIT BOUNDARIES
+// =========================================================
+const STORY_SCENE_UI_MODE_BY_RUNTIME_MODE=Object.freeze({
+  dialogue:"character",
+  internal_voice:"internal_or_remote_voice",
+  narration:"narration_action",
+  choice:"choice",
+  battle_transition:"battle_transition",
+  post_battle:"post_battle"
+});
+
+function normalizeStoryScenePortraitProjection(ref) {
+  if (!ref) return null;
+  if (typeof ref==="string") return {src:ref,kind:"authored_path",alt:null};
+  if (typeof ref!=="object") return null;
+
+  let src=ref.src||ref.path||null;
+  const assetType=ref.assetType||ref.kind||null;
+  const assetId=ref.assetId||ref.id||null;
+
+  // Collectible-card fallback is NEVER automatic. Writing/UI must explicitly
+  // author that fallback kind so card art is not silently treated as portrait art.
+  if (!src&&assetType==="character_card"&&assetId) src=getCharacterCardAssetPath(assetId);
+  if (!src&&assetType==="hosted_entity"&&assetId) src=getHostedEntityAssetPath(assetId);
+  if (!src&&assetType==="ui"&&assetId) src=getUIAssetPath(assetId);
+  if (!src) return null;
+  return {src:String(src),kind:String(assetType||"authored_path"),alt:ref.alt?String(ref.alt):null};
+}
+
+function resolveStoryScenePortraitProjection(authoredPresentation,beat,speakerRef) {
+  const explicit=authoredPresentation&&authoredPresentation.portraitRef
+    ? authoredPresentation.portraitRef
+    : (speakerRef&&speakerRef.portraitRef?speakerRef.portraitRef:null);
+  const uiFallback=beat&&beat.uiHints&&beat.uiHints.dialoguePortraitRef?beat.uiHints.dialoguePortraitRef:null;
+  return normalizeStoryScenePortraitProjection(explicit||uiFallback);
+}
+
+function createStorySceneTransitionInstruction(beat) {
+  if (!beat) return null;
+  if (beat.mode==="choice") return {kind:"choice",requires_explicit_player_action:true};
+  if (beat.mode==="battle_transition") return {kind:"battle",requires_explicit_player_action:true};
+  if (beat.exitScene===true||!beat.nextBeatId) return {kind:"complete",requires_explicit_player_action:true};
+  return {kind:"advance",requires_explicit_player_action:true};
+}
+
+function captureStoryScenePresentationUnderlay() {
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  return {
+    overlayType:currentOverlayType||null,
+    overlayVisible:!!(overlay&&overlay.style.display!=="none"),
+    regionKey:selectedRegionKey||null,
+    hotspotId:selectedHotspotId||null,
+    opportunityId:selectedOpportunityId||null
+  };
+}
+
+function restoreStoryScenePresentationUnderlay(underlay) {
+  if (!underlay||typeof underlay!=="object") return {success:true,type:"underlay_unchanged"};
+  hideStoryScenePresentationLayer({preserveRuntime:true});
+
+  if (underlay.overlayType==="region"&&underlay.regionKey&&worldRegions[underlay.regionKey]) {
+    openRegionHub(underlay.regionKey);
+    selectedHotspotId=underlay.hotspotId||null;
+    selectedOpportunityId=underlay.opportunityId||null;
+    renderRegionHubUI(underlay.regionKey,worldRegions[underlay.regionKey]);
+    return {success:true,type:"region"};
+  }
+  if (underlay.overlayType&&underlay.overlayType!=="story_scene") {
+    openOverlay(underlay.overlayType);
+    return {success:true,type:"overlay",overlayType:underlay.overlayType};
+  }
+  if (underlay.overlayVisible!==true) {
+    const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+    if (overlay) overlay.style.display="none";
+    currentOverlayType=null;
+  }
+  return {success:true,type:"world"};
 }
 
 function normalizeStorySceneChoice(choice,index=0) {
@@ -42002,22 +42114,30 @@ function createStorySceneObserverSafeProjection() {
   });
   const physicalParticipants=definition.participants
     .filter(participant=>participant.visible!==false&&participant.physicalPresence===true)
-    .map(participant=>({source_id:participant.sourceId,role:participant.role||null}));
+    .map(participant=>({
+      source_id:participant.sourceId,
+      role:participant.role||null,
+      display_name:participant.displayName||null,
+      portrait_ref:normalizeStoryScenePortraitProjection(participant.portraitRef)
+    }));
+  const portraitProjection=resolveStoryScenePortraitProjection(authoredPresentation,beat,speakerRef);
 
   return {
     scene_id:active.sceneId,
     scene_instance_id:active.instanceId,
     beat_id:active.beatId,
     mode:beat.mode,
+    ui_mode:STORY_SCENE_UI_MODE_BY_RUNTIME_MODE[beat.mode]||"character",
     title:authoredPresentation.title?String(authoredPresentation.title):(definition.title||null),
     speaker_source_id:speakerRef?speakerRef.sourceId:null,
     speaker_source_type:speakerRef?speakerRef.sourceType:null,
     speaker_name:authoredPresentation.speakerName?String(authoredPresentation.speakerName):(beat.speakerName||(speakerRef&&speakerRef.displayName)||null),
     speaker_physically_present:speakerRef?speakerRef.physicalPresence:null,
-    portrait_ref:authoredPresentation.portraitRef?cloneProgressionData(authoredPresentation.portraitRef):(speakerRef&&speakerRef.portraitRef?cloneProgressionData(speakerRef.portraitRef):null),
+    portrait_ref:portraitProjection,
     text:typeof authoredPresentation.text==="string"?authoredPresentation.text:beat.text,
     physical_participants:physicalParticipants,
     choices,
+    transition_instruction:createStorySceneTransitionInstruction(beat),
     has_next:!!beat.nextBeatId||beat.exitScene===true,
     battle_transition:beat.mode==="battle_transition"&&beat.battle?{
       available:!!beat.battle.enemyId,
@@ -42036,6 +42156,7 @@ function startStoryScene(sceneId,options={}) {
   const entryBeatId=options.entryBeatId||definition.entryBeatId;
   if (!definition.beatMap.has(entryBeatId)) return {success:false,reason:"story_scene_entry_beat_missing"};
   const state=ensureStorySceneRuntimeState();
+  const presentationUnderlay=captureStoryScenePresentationUnderlay();
   state.active={
     instanceId:createStorySceneInstanceId(sceneId,state),
     sceneId:definition.sceneId,
@@ -42044,6 +42165,7 @@ function startStoryScene(sceneId,options={}) {
     sourceEventId:options.sourceEventId||definition.eventId||null,
     sourceOpportunityId:options.sourceOpportunityId||null,
     returnContext:options.returnContext?cloneProgressionData(options.returnContext):(definition.defaultReturnContext?cloneProgressionData(definition.defaultReturnContext):null),
+    presentationUnderlay,
     localContext:options.context&&typeof options.context==="object"?cloneProgressionData(options.context):{},
     processedConsequenceKeys:[],
     committedChoiceKeys:[],
@@ -42124,6 +42246,7 @@ function launchStorySceneBattle() {
   // authored beat and store only stable routing fields in Battle/current scene state.
   const saveableReturnContext={...returnContext};
   delete saveableReturnContext.resultProjector;
+  hideStoryScenePresentationLayer({preserveRuntime:true});
   const launched=launchBattleWithReturnContext(beat.battle.enemyId,beat.battle.encounterId||active.sourceEventId||active.sceneId,saveableReturnContext);
   if (!launched.success) return launched;
   active.pendingBattle={
@@ -42195,6 +42318,7 @@ function resumeStorySceneFromBattle(returnContext) {
   currentBattle.returnContext=null;
   savePlayerData();
   saveTestState();
+  restoreStoryScenePresentationUnderlay(active.presentationUnderlay);
   openOverlay("story_scene");
   return {success:true,type:"story_scene_resumed",beatId:nextBeatId,result:cloneProgressionData(safeResult)};
 }
@@ -42265,6 +42389,7 @@ function completeStoryScene(options={}) {
   const returnContext=active.returnContext?cloneProgressionData(active.returnContext):null;
   const receipt={success:true,type:"story_scene_complete",sceneId:active.sceneId,instanceId:active.instanceId,reason:options.reason||"complete"};
   state.active=null;
+  hideStoryScenePresentationLayer({preserveRuntime:true});
   savePlayerData();
   const returned=resumeStorySceneReturnContext(returnContext);
   saveTestState();
@@ -42281,11 +42406,17 @@ function exitActiveStoryScene(options={}) {
   }
   const returnContext=active.returnContext?cloneProgressionData(active.returnContext):null;
   ensureStorySceneRuntimeState().active=null;
+  hideStoryScenePresentationLayer({preserveRuntime:true});
   savePlayerData();
   const returned=resumeStorySceneReturnContext(returnContext);
   saveTestState();
   return {success:true,type:"story_scene_exited",returnResult:returned};
 }
+
+// =========================================================
+// BRICKS 755–763 — ALPHA STORY SCENE UI SURFACE
+// =========================================================
+let lastStorySceneFeedbackReceiptPresented=null;
 
 function escapeStorySceneHTML(value) {
   return String(value==null?"":value)
@@ -42296,43 +42427,145 @@ function escapeStorySceneHTML(value) {
     .replace(/'/g,"&#039;");
 }
 
+function ensureStoryScenePresentationStyles() {
+  if (typeof document==="undefined"||!document.head) return false;
+  if (document.getElementById("sc-story-scene-runtime-style")) return true;
+  const style=document.createElement("style");
+  style.id="sc-story-scene-runtime-style";
+  style.textContent=`
+    #story-scene-presentation-layer{position:fixed;inset:0;z-index:12000;display:flex;align-items:flex-end;justify-content:center;pointer-events:auto;background:linear-gradient(180deg,rgba(2,5,9,.05) 0%,rgba(2,5,9,.18) 45%,rgba(2,5,9,.56) 100%);font-family:inherit;color:#eadfc9;}
+    #story-scene-presentation-layer .sc-story-shell{width:min(1120px,calc(100vw - 56px));margin:0 28px 34px;padding:0;display:grid;grid-template-columns:minmax(0,1fr);filter:drop-shadow(0 22px 42px rgba(0,0,0,.58));}
+    #story-scene-presentation-layer .sc-story-panel{position:relative;min-height:188px;border:1px solid rgba(197,151,66,.78);background:linear-gradient(180deg,rgba(8,13,19,.94),rgba(3,7,12,.97));box-shadow:inset 0 0 0 1px rgba(255,225,157,.08);padding:22px 24px 20px 190px;overflow:hidden;}
+    #story-scene-presentation-layer .sc-story-panel.no-portrait{padding-left:28px;}
+    #story-scene-presentation-layer .sc-story-portrait{position:absolute;left:18px;bottom:0;width:150px;height:170px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;border-right:1px solid rgba(197,151,66,.24);}
+    #story-scene-presentation-layer .sc-story-portrait img{max-width:100%;max-height:100%;object-fit:contain;object-position:center bottom;}
+    #story-scene-presentation-layer .sc-story-kicker{font-size:10px;letter-spacing:.18em;color:#b6904e;text-transform:uppercase;opacity:.9;}
+    #story-scene-presentation-layer .sc-story-name{font-size:17px;letter-spacing:.12em;font-weight:700;color:#72d9e7;margin-top:6px;text-transform:uppercase;}
+    #story-scene-presentation-layer[data-ui-mode="internal_or_remote_voice"] .sc-story-name{color:#c891ff;}
+    #story-scene-presentation-layer[data-ui-mode="narration_action"] .sc-story-name{display:none;}
+    #story-scene-presentation-layer .sc-story-text{font-size:17px;line-height:1.62;margin-top:10px;white-space:pre-wrap;text-shadow:0 1px 1px #000;}
+    #story-scene-presentation-layer .sc-story-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+    #story-scene-presentation-layer .sc-story-action{appearance:none;border:1px solid rgba(195,151,68,.72);background:rgba(14,19,25,.92);color:#eadfc9;padding:10px 18px;cursor:pointer;letter-spacing:.05em;}
+    #story-scene-presentation-layer .sc-story-action:hover:not(:disabled){border-color:#e5bd69;background:rgba(38,31,20,.94);}
+    #story-scene-presentation-layer .sc-story-action:disabled{opacity:.44;cursor:not-allowed;}
+    #story-scene-presentation-layer .sc-story-choice{width:100%;text-align:left;}
+    #story-scene-presentation-layer .sc-story-close{position:absolute;right:12px;top:10px;border:0;background:transparent;color:#d3b77e;font-size:18px;cursor:pointer;}
+    #story-scene-presentation-layer .sc-story-result{margin-top:12px;font-size:11px;letter-spacing:.08em;color:#c9b487;opacity:.86;}
+    #story-scene-feedback-toast{position:fixed;left:28px;bottom:246px;z-index:12010;border:1px solid rgba(202,162,78,.72);background:rgba(6,11,16,.96);color:#e2c47e;padding:11px 15px;box-shadow:0 12px 28px rgba(0,0,0,.45);font-size:12px;letter-spacing:.07em;}
+    @media(max-width:720px){#story-scene-presentation-layer .sc-story-shell{width:calc(100vw - 20px);margin:0 10px 12px;}#story-scene-presentation-layer .sc-story-panel{padding:18px 18px 18px 118px;min-height:156px;}#story-scene-presentation-layer .sc-story-portrait{width:98px;height:140px;left:10px;}#story-scene-presentation-layer .sc-story-text{font-size:15px;}}
+  `;
+  document.head.appendChild(style);
+  return true;
+}
+
+function getStoryScenePresentationLayer() {
+  if (typeof document==="undefined"||!document.body) return null;
+  let layer=document.getElementById("story-scene-presentation-layer");
+  if (!layer) {
+    layer=document.createElement("div");
+    layer.id="story-scene-presentation-layer";
+    layer.setAttribute("role","dialog");
+    layer.setAttribute("aria-modal","true");
+    layer.setAttribute("aria-live","polite");
+    document.body.appendChild(layer);
+  }
+  return layer;
+}
+
+function isStoryScenePresentationVisible() {
+  if (typeof document==="undefined") return false;
+  const layer=document.getElementById("story-scene-presentation-layer");
+  return !!(layer&&layer.style.display!=="none"&&layer.childNodes.length>0);
+}
+
+function hideStoryScenePresentationLayer(options={}) {
+  if (typeof document==="undefined") return true;
+  const layer=document.getElementById("story-scene-presentation-layer");
+  if (layer) {
+    layer.style.display="none";
+    layer.innerHTML="";
+  }
+  if (options.preserveRuntime!==true&&ensureStorySceneRuntimeState().active) {
+    // Presentation hiding is not a world/history mutation. Runtime is preserved by default
+    // in all authoritative callers; this branch exists only for explicit cleanup tooling.
+  }
+  return true;
+}
+
+function renderStorySceneFeedbackToast(receipt) {
+  if (!receipt||!receipt.receiptId||typeof document==="undefined"||!document.body) return false;
+  if (lastStorySceneFeedbackReceiptPresented===receipt.receiptId) return false;
+  lastStorySceneFeedbackReceiptPresented=receipt.receiptId;
+  let toast=document.getElementById("story-scene-feedback-toast");
+  if (!toast) {
+    toast=document.createElement("div");
+    toast.id="story-scene-feedback-toast";
+    toast.setAttribute("role","status");
+    document.body.appendChild(toast);
+  }
+  toast.textContent=receipt.label||"Chronicle Updated";
+  toast.style.display="block";
+  if (typeof setTimeout==="function") setTimeout(()=>{if(toast) toast.style.display="none";},2200);
+  return true;
+}
+
 function renderStorySceneOverlay(container) {
   if (!container) return false;
   const model=createStorySceneObserverSafeProjection();
   if (!model) {
-    container.innerHTML='<div style="padding:24px;color:#d7c8aa;">No active authored story scene.</div>';
+    container.innerHTML="";
+    container.style.display="none";
     return false;
   }
-  const speaker=model.speaker_name||model.speaker_source_id||"";
-  const modeLabel=model.mode.replace(/_/g," ").toUpperCase();
-  const postBattle=model.post_battle_context;
-  const choiceButtons=model.mode==="choice"
-    ? model.choices.map(choice=>`<button type="button" onclick="advanceStoryScene('${escapeStorySceneHTML(choice.choice_id)}')" ${choice.available?'':'disabled'} style="display:block;width:100%;margin-top:8px;padding:10px 12px;text-align:left;">${escapeStorySceneHTML(choice.label)}${!choice.available&&choice.known_blocker?` — ${escapeStorySceneHTML(choice.known_blocker)}`:''}</button>`).join("")
-    : "";
-  const actionButton=model.mode==="battle_transition"&&model.battle_transition
-    ? `<button type="button" onclick="advanceStoryScene()" ${model.battle_transition.available?'':'disabled'} style="margin-top:14px;padding:10px 18px;">${escapeStorySceneHTML(model.battle_transition.action_label)}</button>`
-    : (model.mode!=="choice"?`<button type="button" onclick="advanceStoryScene()" style="margin-top:14px;padding:10px 18px;">${model.has_next?'CONTINUE':'CONTINUE'}</button>`:"");
-  const closeAllowed=(getCurrentStorySceneBeat()&&getCurrentStorySceneBeat().allowPresentationClose===true);
 
+  ensureStoryScenePresentationStyles();
+  const speaker=model.speaker_name||model.speaker_source_id||"";
+  const portrait=model.portrait_ref&&model.portrait_ref.src?model.portrait_ref:null;
+  const hasPortrait=!!portrait&&model.ui_mode!=="narration_action";
+  const closeAllowed=!!(getCurrentStorySceneBeat()&&getCurrentStorySceneBeat().allowPresentationClose===true);
+  const modeLabel=(model.ui_mode||model.mode||"character").replace(/_/g," ").toUpperCase();
+  const postBattle=model.post_battle_context;
+
+  const choices=model.mode==="choice"
+    ? `<div class="sc-story-actions">${model.choices.map(choice=>`<button type="button" class="sc-story-action sc-story-choice" onclick="advanceStoryScene('${escapeStorySceneHTML(choice.choice_id)}')" ${choice.available?"":"disabled"}>${escapeStorySceneHTML(choice.label)}${!choice.available&&choice.known_blocker?` — ${escapeStorySceneHTML(choice.known_blocker)}`:""}</button>`).join("")}</div>`
+    : "";
+
+  let primaryAction="";
+  if (model.mode==="battle_transition"&&model.battle_transition) {
+    primaryAction=`<div class="sc-story-actions"><button type="button" class="sc-story-action" onclick="advanceStoryScene()" ${model.battle_transition.available?"":"disabled"}>${escapeStorySceneHTML(model.battle_transition.action_label)}</button></div>`;
+  } else if (model.mode!=="choice") {
+    const label=model.transition_instruction&&model.transition_instruction.kind==="complete"?"CONTINUE":"CONTINUE";
+    primaryAction=`<div class="sc-story-actions"><button type="button" class="sc-story-action" onclick="advanceStoryScene()">${label}</button></div>`;
+  }
+
+  container.style.display="flex";
+  container.dataset.sceneId=model.scene_id;
+  container.dataset.beatId=model.beat_id;
+  container.dataset.mode=model.mode;
+  container.dataset.uiMode=model.ui_mode||"character";
+  container.setAttribute("aria-label",speaker?`${speaker} dialogue`:"Story scene");
   container.innerHTML=`
-    <section class="story-scene-runtime" data-scene-id="${escapeStorySceneHTML(model.scene_id)}" data-beat-id="${escapeStorySceneHTML(model.beat_id)}" data-mode="${escapeStorySceneHTML(model.mode)}" style="position:relative;display:flex;flex-direction:column;justify-content:flex-end;min-height:70vh;padding:28px;background:radial-gradient(circle at 50% 30%,rgba(37,48,61,.36),rgba(4,8,13,.94));color:#eadfc9;">
-      <div style="max-width:900px;margin:0 auto;width:100%;background:rgba(5,9,14,.93);border:1px solid rgba(201,158,72,.62);box-shadow:0 18px 60px rgba(0,0,0,.52);padding:20px 22px;">
-        <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
-          <div>
-            ${model.title?`<div style="color:#d5aa55;letter-spacing:.12em;font-size:12px;">${escapeStorySceneHTML(model.title)}</div>`:""}
-            <div style="opacity:.62;font-size:10px;letter-spacing:.14em;margin-top:3px;">${escapeStorySceneHTML(modeLabel)}</div>
-          </div>
-          ${closeAllowed?'<button type="button" onclick="exitActiveStoryScene({reason:\'ui_close\'})" aria-label="Close scene">✕</button>':''}
-        </div>
-        ${speaker?`<div style="margin-top:18px;color:${model.mode==='internal_voice'?'#c896ff':'#6fd8e8'};font-weight:700;letter-spacing:.08em;">${escapeStorySceneHTML(speaker)}${model.mode==='internal_voice'?' · INTERNAL':''}</div>`:""}
-        <div style="margin-top:10px;font-size:16px;line-height:1.6;white-space:pre-wrap;">${escapeStorySceneHTML(model.text)}</div>
-        ${postBattle?`<div style="margin-top:12px;padding:8px 10px;border:1px solid rgba(255,255,255,.12);font-size:11px;opacity:.8;">BATTLE RESULT: ${escapeStorySceneHTML(String(postBattle.outcome||'resolved').toUpperCase())}</div>`:""}
-        ${choiceButtons}
-        ${actionButton}
-        ${model.feedback_receipt?`<div style="margin-top:12px;color:#d6b66a;font-size:11px;">${escapeStorySceneHTML(model.feedback_receipt.label)}</div>`:""}
-      </div>
-    </section>`;
+    <div class="sc-story-shell">
+      <section class="sc-story-panel ${hasPortrait?"":"no-portrait"}">
+        ${closeAllowed?`<button type="button" class="sc-story-close" onclick="exitActiveStoryScene({reason:'ui_close'})" aria-label="Close scene">✕</button>`:""}
+        ${hasPortrait?`<div class="sc-story-portrait" aria-hidden="true"><img src="${escapeStorySceneHTML(portrait.src)}" alt=""></div>`:""}
+        <div class="sc-story-kicker">${escapeStorySceneHTML(modeLabel)}${model.title?` · ${escapeStorySceneHTML(model.title)}`:""}</div>
+        ${speaker&&model.ui_mode!=="narration_action"?`<div class="sc-story-name">${escapeStorySceneHTML(speaker)}</div>`:""}
+        <div class="sc-story-text">${escapeStorySceneHTML(model.text)}</div>
+        ${postBattle?`<div class="sc-story-result">BATTLE RESULT · ${escapeStorySceneHTML(String(postBattle.outcome||"resolved").toUpperCase())}</div>`:""}
+        ${choices}
+        ${primaryAction}
+      </section>
+    </div>`;
+
+  if (model.feedback_receipt) renderStorySceneFeedbackToast(model.feedback_receipt);
   return true;
+}
+
+function renderStoryScenePresentationLayer() {
+  const layer=getStoryScenePresentationLayer();
+  if (!layer) return false;
+  return renderStorySceneOverlay(layer);
 }
 
 // =========================================================
@@ -42417,6 +42650,47 @@ function runAlphaPostDialogue749Diagnostics() {
   };
   const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-749 dialogue/story-scene gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 764 — ALPHA DIALOGUE / STORY SCENE UI CONTRACT GATE
+// =========================================================
+function runAlphaStorySceneUIContractDiagnostics() {
+  const openSource=openOverlay.toString();
+  const projectionSource=createStorySceneObserverSafeProjection.toString();
+  const rendererSource=renderStorySceneOverlay.toString();
+  const startSource=startStoryScene.toString();
+  const battleSource=launchStorySceneBattle.toString();
+  const resumeSource=resumeStorySceneFromBattle.toString();
+  const result={
+    storyDoesNotReplaceEnvironment:openSource.includes('type === "story_scene"')&&openSource.includes("renderStoryScenePresentationLayer")&&openSource.indexOf('type === "story_scene"')<openSource.indexOf("currentOverlayType"),
+    presentationLayerIndependentFromGlobalOverlay:typeof getStoryScenePresentationLayer==="function"&&getStoryScenePresentationLayer.toString().includes("document.body.appendChild"),
+    runtimeAndUiModesRemainSeparate:STORY_SCENE_UI_MODE_BY_RUNTIME_MODE.dialogue==="character"&&STORY_SCENE_UI_MODE_BY_RUNTIME_MODE.internal_voice==="internal_or_remote_voice"&&STORY_SCENE_UI_MODE_BY_RUNTIME_MODE.narration==="narration_action"&&STORY_SCENE_UI_MODE_BY_RUNTIME_MODE.choice==="choice",
+    speakerPresenceExplicit:projectionSource.includes("speaker_physically_present")&&projectionSource.includes("physical_participants"),
+    internalVoiceDoesNotCreateParticipant:normalizeStorySceneSourceRef({sourceId:"nine_tails"},"internal_voice").physicalPresence===false,
+    portraitFallbackNeverAutomatic:normalizeStoryScenePortraitProjection({assetType:"character_card",assetId:"academy_menma"})!==null&&normalizeStoryScenePortraitProjection({assetId:"academy_menma"})===null,
+    choicesExposeOnlyLegalProjection:projectionSource.includes("known_blocker")&&rendererSource.includes("choice.available"),
+    transitionInstructionProjected:projectionSource.includes("transition_instruction")&&typeof createStorySceneTransitionInstruction==="function",
+    sceneCapturesVisualUnderlay:startSource.includes("captureStoryScenePresentationUnderlay"),
+    battleHidesOnlyPresentation:battleSource.includes("hideStoryScenePresentationLayer")&&battleSource.includes("preserveRuntime:true"),
+    battleResumeRestoresSameUnderlay:resumeSource.includes("restoreStoryScenePresentationUnderlay")&&resumeSource.includes('openOverlay("story_scene")'),
+    feedbackToastConsumesSafeReceipt:rendererSource.includes("feedback_receipt")&&renderStorySceneFeedbackToast.toString().includes("receipt.label")&&!renderStorySceneFeedbackToast.toString().includes("relationship"),
+    narrationDoesNotRequireSpeakerVisual:rendererSource.includes('model.ui_mode!=="narration_action"'),
+    noUiHistoryMutation:!rendererSource.includes("activityHistory.push")&&!rendererSource.includes("recordBattleChronicle")&&!rendererSource.includes("grantCharacterRegistryOwnership")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPostStoryUI764Diagnostics() {
+  const groups={
+    post749:runAlphaPostDialogue749Diagnostics(),
+    storyUI:runAlphaStorySceneUIContractDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-764 story-scene UI gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
 }
 
