@@ -73236,52 +73236,132 @@ registerFactoryBatch([
   if (skill) skill.contextualAttackBonus={stateKey:"academy_metal_lee_pressure_rhythm",bonusAttackPL:2,consume:true};
 });
 
+
+// =========================================================
+// BRICK 684 — COMBAT ALPHA ORDINARY PALETTE CLOSURE
+// FINAL / LOCKED Combat authority. Exact IDs only.
+// =========================================================
+registerFactoryBatch([
+  makeFactoryCategoricalSkill("academy_hinata_gentle_step","academy_hinata",{targetMode:"self",actionClass:"movement_technique",traits:["requires_legitimate_traversable_route","not_teleportation","no_hidden_speed_evasion","no_byakugan_inference"],informationBoundary:"categorical_reposition_only"}),
+
+  {id:"academy_kushina_seal_tag_toss",ownerRegistryId:"academy_kushina",primaryDiscipline:"Fūinjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["source_owned_seal_tag","no_damage","does_not_preresolve_sealing"],requirements:[],state:{stateKey:"academy_seal_tag",reapplication:"refresh_replace",consumeOn:"compatible_kushina_fuinjutsu",expiry:"end_of_source_next_completed_action_opportunity"}},
+  {id:"academy_menma_shadow_clone_feint",ownerRegistryId:"academy_menma",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["temporary_clone_construct_not_participant","deception_evidence_not_belief"],requirements:[],state:{stateKey:"academy_menma_clone_feint",reapplication:"refresh_replace"}},
+  makeFactoryCategoricalSkill("academy_menma_shadowstep","academy_menma",{targetMode:"self",actionClass:"movement_technique",traits:["requires_legitimate_route","not_teleportation","no_hidden_speed"],informationBoundary:"categorical_reposition_only"}),
+
+  makeFactoryCategoricalSkill("genin_chocho_rolling_reposition","genin_chocho",{targetMode:"self",actionClass:"movement_technique",traits:["no_hidden_movement_scalar","does_not_bypass_valid_physical_restraint"],informationBoundary:"categorical_reposition_only"}),
+  makeFactoryCategoricalSkill("genin_himawari_byakugan_read","genin_himawari",{targetMode:"current_enemy",requirements:[{kind:"embodied_expression",expressionId:"byakugan"}],traits:["observable_visual_chakra_tenketsu_evidence_only","no_generic_accuracy","no_auto_hit","no_prediction","no_universal_knowledge"],informationBoundary:"legitimate_byakugan_observation_only"}),
+
+  makeFactoryCategoricalSkill("genin_hoki_smoke_reposition","genin_hoki",{targetMode:"self",actionClass:"movement_technique",traits:["obscuration_interaction","no_automatic_blind","no_guaranteed_relocation"],informationBoundary:"smoke_changes_available_perceptual_evidence_only"}),
+  {id:"genin_hoki_battlefield_mark",ownerRegistryId:"genin_hoki",primaryDiscipline:null,targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["tactical_reference","no_accuracy_bonus","no_intelligence_bonus"],requirements:[],state:{stateKey:"battlefield_mark",reapplication:"refresh_replace",expiry:"consume_invalidate_or_battle_end"}},
+
+  makeFactoryCategoricalSkill("genin_karin_chakra_flare","genin_karin",{targetMode:"current_enemy",requirements:[{kind:"registry_capability",capabilityId:"karin_chakra_sensing_access"}],traits:["presence_direction_chakra_evidence_only","unknown_signature_not_autoidentified","concealment_not_auto_defeated"],informationBoundary:"qualifying_detectable_chakra_evidence_only"}),
+  makeFactoryCategoricalSkill("genin_mitsuki_serpent_step","genin_mitsuki",{targetMode:"self",actionClass:"movement_technique",traits:["legitimate_physical_technique_mobility","not_teleportation","no_sage_authority"],informationBoundary:"categorical_reposition_only"}),
+  makeFactoryCategoricalSkill("genin_naruto_transformation_feint","genin_naruto",{targetMode:"current_enemy",actionClass:"setup_technique",traits:["deceptive_visible_evidence","belief_not_automatic"],informationBoundary:"transformation_feint_evidence_only"}),
+
+  {id:"chunin_jiraiya_earthflow_trip",ownerRegistryId:"chunin_jiraiya",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["terrain_disruption","no_attack_pl","not_stun","stationary_skills_not_prohibited"],requirements:[],state:{stateKey:"unstable_footing",reapplication:"refresh_replace",expiry:"target_next_completed_action_opportunity_or_substantial_movement_consumption"}},
+  {id:"chunin_shikadai_shadow_route_trap",ownerRegistryId:"chunin_shikadai",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["battlefield_route_setup","no_automatic_control","no_scalar_until_later_shadow_resolver"],requirements:[],state:{stateKey:"shadow_route_trap",reapplication:"refresh_replace"}},
+  makeFactoryCategoricalSkill("chunin_shikadai_tactical_pivot","chunin_shikadai",{targetMode:"self",actionClass:"movement_technique",traits:["formation_reposition","targeting_context_change","no_numeric_bonus","no_hidden_intelligence_speed"],informationBoundary:"categorical_tactical_reposition_only"}),
+  makeFactoryCategoricalSkill("chunin_mitsuki_snake_substitution","chunin_mitsuki",{targetMode:"self",actionClass:"counter_technique",reactiveOnly:true,traits:["reactive_substitution","snake_construct_not_participant","no_percentage_prevention","no_sage_transformation"],informationBoundary:"legitimate_reactive_window_replaces_immediate_positional_result"}),
+  makeFactoryCategoricalSkill("chunin_shinki_iron_wing_reposition","chunin_shinki",{targetMode:"self",actionClass:"movement_technique",traits:["uses_embodied_magnet_release_iron_sand","no_package_reprojection","iron_sand_not_participant"],informationBoundary:"categorical_movement_only"}),
+  makeFactoryCategoricalSkill("chunin_boruto_jogan_spatial_read","chunin_boruto",{targetMode:"current_enemy",traits:["spatial_perception_only","no_teleport","no_future_sight","no_generic_evasion"],informationBoundary:"categorical_spatial_observation_only"}),
+
+  makeFactoryCategoricalSkill("anbu_ino_sensory_sweep","anbu_ino",{targetMode:"current_enemy",traits:["perceptible_presence_signal_evidence","not_universal_identity"],informationBoundary:"categorical_sensory_evidence_only"}),
+  makeFactoryCategoricalSkill("anbu_ino_mind_transmission","anbu_ino",{targetMode:"selected_ally",traits:["knowledge_bounded_message_channel","no_trust_generation","no_relationship_generation"],informationBoundary:"only_authored_transmitted_message_or_evidence"}),
+  makeFactoryCategoricalSkill("anbu_menma_silent_shadowstep","anbu_menma",{targetMode:"self",actionClass:"movement_technique",traits:["not_teleportation","no_hidden_speed"],informationBoundary:"categorical_reposition_only"}),
+  makeFactoryCategoricalSkill("anbu_naruto_clone_decoy","anbu_naruto",{targetMode:"self",actionClass:"defensive_technique",traits:["clone_construct_not_participant","no_automatic_enemy_belief","no_attack_pl"],informationBoundary:"categorical_perception_targeting_defence"}),
+  makeFactoryCategoricalSkill("anbu_sasuke_sharingan_counter_read","anbu_sasuke",{targetMode:"current_enemy",traits:["legitimate_sharingan_observable_combat_evidence","no_auto_counter","no_future_sight","no_mangekyo_inference","no_hidden_ocular_stat"],informationBoundary:"categorical_sharingan_observation_only"}),
+
+  makeFactoryCategoricalSkill("jonin_inojin_ink_bird_recon","jonin_inojin",{targetMode:"current_enemy",traits:["authored_ink_construct","remote_visual_recon","construct_not_participant"],informationBoundary:"categorical_remote_visual_evidence_only"}),
+  {id:"jonin_inojin_ink_screen",ownerRegistryId:"jonin_inojin",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["visual_obscuration_field","does_not_auto_blind","nonvisual_information_preserved"],requirements:[],state:{stateKey:"ink_screen",reapplication:"refresh_replace",expiry:"source_next_completed_action_opportunity_or_invalidation"}},
+  makeFactoryCategoricalSkill("jonin_hanabi_byakugan_read","jonin_hanabi",{targetMode:"current_enemy",requirements:[{kind:"embodied_expression",expressionId:"byakugan"}],traits:["legitimate_byakugan_observation_only"],informationBoundary:"categorical_byakugan_observation_only"}),
+
+  makeFactoryCategoricalSkill("jonin_shino_insect_clone","jonin_shino",{targetMode:"current_enemy",actionClass:"setup_technique",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}],traits:["decoy_perception_interaction","colony_not_participant"],informationBoundary:"categorical_decoy_evidence_only"}),
+  {id:"jonin_shino_scent_mark",ownerRegistryId:"jonin_shino",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["tracking_marker","no_scalar","does_not_identify_unknown_facts"],requirements:[],sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}],state:{stateKey:"kikaichu_scent_mark",reapplication:"refresh_replace",expiry:"removed_target_leaves_or_battle_ends"}},
+  makeFactoryCategoricalSkill("jonin_konohamaru_clone_intercept","jonin_konohamaru",{targetMode:"self",actionClass:"defensive_technique",traits:["clone_construct_not_participant","no_percentage_scalar","no_automatic_counterdamage"],informationBoundary:"categorical_defensive_interposition"}),
+
+  makeFactoryCategoricalSkill("sj_ebisu_substitution_drill","sj_ebisu",{targetMode:"self",actionClass:"counter_technique",reactiveOnly:true,traits:["defensive_substitution","no_scalar","no_participant_creation"],informationBoundary:"categorical_substitution_only"}),
+  makeFactoryCategoricalSkill("sj_ebisu_technique_read","sj_ebisu",{targetMode:"current_enemy",traits:["observable_technique_analysis_only","no_technique_access","no_mastery","no_hidden_intelligence"],informationBoundary:"categorical_analysis_evidence_only"}),
+  makeFactoryCategoricalSkill("sj_genma_senbon_counter","sj_genma",{targetMode:"self",actionClass:"counter_technique",reactiveOnly:true,traits:["projectile_counter_interaction","no_automatic_attack_pl","no_universal_counter_multiplier"],informationBoundary:"categorical_counter_context_only"}),
+  makeFactoryCategoricalSkill("sj_ibiki_interrogators_read","sj_ibiki",{targetMode:"current_enemy",traits:["observable_resistance_behaviour_context","no_mind_reading","no_automatic_confession","no_generic_knowledge"],informationBoundary:"categorical_interrogation_evidence_only"}),
+
+  makeFactoryCategoricalSkill("sannin_shikamaru_shadow_exchange","sannin_shikamaru",{targetMode:"current_enemy",actionClass:"control_technique",traits:["requires_existing_legitimate_shikamaru_shadow_state","no_new_control_success","no_new_strength","original_source_history_preserved"],informationBoundary:"categorical_shadow_reassignment_reposition_only"}),
+  {id:"sannin_shikamaru_checkmate_grid",ownerRegistryId:"sannin_shikamaru",primaryDiscipline:"Ninjutsu",targetMode:"self",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["battlefield_shadow_route_geometry","no_auto_capture","no_hidden_tactical_stat"],requirements:[],state:{stateKey:"checkmate_grid",reapplication:"refresh_replace",expiry:"invalidated_or_battle_end"}},
+
+  makeFactoryFixedDamageSkill("kage_naruto_shadow_clone_assault","kage_naruto",48,{primaryDiscipline:"Ninjutsu",traits:["clone_count_not_packet_count"]}),
+  makeFactoryFixedDamageSkill("kage_naruto_massive_rasengan","kage_naruto",62,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("kage_naruto_rasenshuriken","kage_naruto",76,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:38,authoredMaximumPreStaminaContinuation:114}}),
+  makeFactoryCategoricalSkill("kage_naruto_clone_interposition","kage_naruto",{targetMode:"self",actionClass:"defensive_technique",traits:["clone_construct_not_participant","no_percentage_scalar"],informationBoundary:"categorical_interposition_only"}),
+  makeFactoryCategoricalSkill("kage_naruto_sage_sensory_read","kage_naruto",{targetMode:"current_enemy",traits:["legitimate_sage_sensory_information","no_omniscience","no_generic_accuracy"],informationBoundary:"categorical_sage_sensory_evidence_only"}),
+
+  makeFactoryFixedDamageSkill("kage_sarada_inferno_fireball","kage_sarada",64,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("kage_sarada_chidori_breakthrough","kage_sarada",70,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("kage_sarada_chakra_enhanced_impact","kage_sarada",72,{primaryDiscipline:"Taijutsu",traits:["damage_does_not_imply_stun_displacement_guard_break"]}),
+  makeFactoryFixedDamageSkill("kage_sarada_lightning_shuriken_convergence","kage_sarada",56,{primaryDiscipline:"Bukijutsu",traits:["projectile_count_not_packet_count"]}),
+  makeFactoryCategoricalSkill("kage_sarada_sharingan_read","kage_sarada",{targetMode:"current_enemy",requirements:[{kind:"embodied_expression",expressionId:"mangekyo_sharingan_sarada"}],traits:["observable_evidence_only","no_invented_signature_technique"],informationBoundary:"categorical_sharingan_observation_only"}),
+
+  makeFactoryFixedDamageSkill("shisui_body_flicker_assault","shisui",60,{primaryDiscipline:"Taijutsu",traits:["body_flicker_is_technique_not_speed_stat"]}),
+  makeFactoryFixedDamageSkill("shisui_great_fireball","shisui",55,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryDynamicControlSkill("shisui_ocular_genjutsu","shisui","Genjutsu",{semanticClass:"illusory_bind",conditionKey:"illusory_bind",conditionType:"genjutsu_bind",requirements:[{kind:"embodied_expression",expressionId:"mangekyo_sharingan_shisui"}]}),
+  makeFactoryFixedDamageSkill("shisui_flicker_shuriken_convergence","shisui",50,{primaryDiscipline:"Bukijutsu",traits:["one_authored_packet"]}),
+  makeFactoryCategoricalSkill("shisui_afterimage_feint","shisui",{targetMode:"current_enemy",actionClass:"setup_technique",traits:["afterimages_not_participants","perception_targeting_interaction"],informationBoundary:"categorical_afterimage_evidence_only"}),
+
+  makeFactoryAreaDamageSkill("teen_nagato_almighty_push","teen_nagato",46,3,{primaryDiscipline:"Ninjutsu",conditionalRider:{type:"displacement_control",discipline:"Ninjutsu",liveResolver:true,automaticFromDamage:false}}),
+  makeFactoryDynamicControlSkill("teen_nagato_universal_pull","teen_nagato","Ninjutsu",{semanticClass:"gravity_control_pull"}),
+  makeFactoryFixedDamageSkill("teen_nagato_black_receiver_bind","teen_nagato",42,{primaryDiscipline:"Bukijutsu",conditionalRider:{type:"physical_restraint",discipline:"Bukijutsu",liveResolver:true,automaticFromDamage:false},traits:["not_generic_stun"]}),
+  makeFactoryFixedDamageSkill("teen_nagato_gale_palm","teen_nagato",48,{primaryDiscipline:"Ninjutsu"}),
+  makeFactoryFixedDamageSkill("teen_nagato_water_dragon","teen_nagato",58,{primaryDiscipline:"Ninjutsu"})
+]);
+
 const PRODUCTION_PREPARED_SKILL_PALETTES = {
   academy_kurenai:["academy_kurenai_false_opening","academy_kurenai_feinting_kunai","academy_kurenai_false_step_genjutsu","academy_kurenai_veiled_guard","academy_kurenai_genjutsu_release"],
   academy_iwabee:["academy_iwabee_iron_staff_smash","academy_iwabee_staff_sweep","academy_iwabee_earth_style_rising_wall","academy_iwabee_stone_snare","academy_iwabee_grounded_stance"],
   academy_metal_lee:["academy_metal_lee_leaf_rising_kick","academy_metal_lee_training_flurry","academy_metal_lee_pressure_rhythm","academy_metal_lee_guarded_footwork","academy_metal_lee_conditioned_endurance"],
   academy_kakashi:["academy_kakashi_kunai_quickdraw","academy_kakashi_clone_feint","academy_kakashi_opening_exploit","academy_kakashi_wire_snare","academy_kakashi_prodigys_read"],
   academy_obito:["academy_obito_fire_style_ember_burst","academy_obito_headlong_rush","academy_obito_uchiha_shuriken_rush","academy_obito_protective_intercept","academy_obito_determined_stand"],
-  academy_hinata:["academy_hinata_gentle_palm","academy_hinata_twin_palm_guard","academy_hinata_palm_counter","academy_hinata_academy_shuriken"],
+  academy_hinata:["academy_hinata_gentle_palm","academy_hinata_twin_palm_guard","academy_hinata_palm_counter","academy_hinata_academy_shuriken","academy_hinata_gentle_step"],
   academy_izuno:["academy_izuno_pouncing_palm","academy_izuno_shuriken_pounce","academy_izuno_catstep_feint","academy_izuno_wall_spring","academy_izuno_clone_pounce"],
-  academy_kushina:["academy_kushina_red_whirlwind","academy_kushina_beginner_binding_formula","academy_kushina_iron_will_brace","academy_kushina_headstrong_counter"],
-  academy_menma:["academy_menma_chakra_knuckle","academy_menma_crescent_kunai","academy_menma_guard_breaker"],
+  academy_kushina:["academy_kushina_red_whirlwind","academy_kushina_beginner_binding_formula","academy_kushina_iron_will_brace","academy_kushina_headstrong_counter","academy_kushina_seal_tag_toss"],
+  academy_menma:["academy_menma_chakra_knuckle","academy_menma_crescent_kunai","academy_menma_guard_breaker","academy_menma_shadow_clone_feint","academy_menma_shadowstep"],
   academy_mirai:["academy_mirai_twin_kunai","academy_mirai_wire_trip","academy_mirai_false_footstep","academy_mirai_guarding_blade","academy_mirai_crossing_strike"],
   genin_boruto:["genin_boruto_boruto_stream","genin_boruto_vanishing_rasengan","genin_boruto_shadow_clone_cross","genin_boruto_jogan_read","genin_boruto_lightning_shuriken"],
-  genin_chocho:["genin_chocho_partial_expansion_fist","genin_chocho_human_bullet_tank","genin_chocho_expansion_guard","genin_chocho_heavy_palm"],
-  genin_himawari:["genin_himawari_gentle_fist","genin_himawari_tenketsu_tap","genin_himawari_palm_rotation","genin_himawari_twin_lion_step"],
-  genin_hoki:["genin_hoki_shuriken_crossfire","genin_hoki_wire_capture","genin_hoki_earth_style_rampart"],
-  genin_karin:["genin_karin_chakra_sense","genin_karin_signature_track","genin_karin_seal_tag_bind","genin_karin_endurance_counter"],
-  genin_mitsuki:["genin_mitsuki_snake_lightning","genin_mitsuki_wind_breakthrough","genin_mitsuki_hidden_snake_bind","genin_mitsuki_elastic_arm_strike"],
-  genin_naruto:["genin_naruto_shadow_clone_rush","genin_naruto_uzumaki_barrage","genin_naruto_clone_interposition","genin_naruto_kunai_ambush"],
+  genin_chocho:["genin_chocho_partial_expansion_fist","genin_chocho_human_bullet_tank","genin_chocho_expansion_guard","genin_chocho_heavy_palm","genin_chocho_rolling_reposition"],
+  genin_himawari:["genin_himawari_gentle_fist","genin_himawari_tenketsu_tap","genin_himawari_palm_rotation","genin_himawari_twin_lion_step","genin_himawari_byakugan_read"],
+  genin_hoki:["genin_hoki_shuriken_crossfire","genin_hoki_wire_capture","genin_hoki_earth_style_rampart","genin_hoki_smoke_reposition","genin_hoki_battlefield_mark"],
+  genin_karin:["genin_karin_chakra_sense","genin_karin_signature_track","genin_karin_seal_tag_bind","genin_karin_endurance_counter","genin_karin_chakra_flare"],
+  genin_mitsuki:["genin_mitsuki_snake_lightning","genin_mitsuki_wind_breakthrough","genin_mitsuki_hidden_snake_bind","genin_mitsuki_elastic_arm_strike","genin_mitsuki_serpent_step"],
+  genin_naruto:["genin_naruto_shadow_clone_rush","genin_naruto_uzumaki_barrage","genin_naruto_clone_interposition","genin_naruto_kunai_ambush","genin_naruto_transformation_feint"],
   genin_sarada:["genin_sarada_fireball_jutsu","genin_sarada_phoenix_flower_jutsu","genin_sarada_chakra_enhanced_strike","genin_sarada_sharingan_read","genin_sarada_wire_shuriken_snare"],
   genin_sasuke:["genin_sasuke_great_fireball","genin_sasuke_phoenix_flower","genin_sasuke_lion_barrage","genin_sasuke_wire_shuriken_bind","genin_sasuke_dragon_fire"],
-  chunin_jiraiya:["chunin_jiraiya_flame_bullet","chunin_jiraiya_needle_hair_guard","chunin_jiraiya_wild_mane_bind","chunin_jiraiya_explosive_tag_volley"],
-  chunin_shikadai:["chunin_shikadai_shadow_possession","chunin_shikadai_shadow_sewing","chunin_shikadai_wind_scythe"],
-  chunin_mitsuki:["chunin_mitsuki_snake_lightning","chunin_mitsuki_great_breakthrough","chunin_mitsuki_hidden_shadow_snake_hands","chunin_mitsuki_wind_lightning_fang"],
-  chunin_shinki:["chunin_shinki_iron_sand_lance","chunin_shinki_black_iron_rain","chunin_shinki_iron_sand_coffin","chunin_shinki_iron_sand_bulwark"],
-  chunin_boruto:["chunin_boruto_vanishing_rasengan","chunin_boruto_thunderclap_arrow","chunin_boruto_shadow_clone_relay","chunin_boruto_karma_resonance_guard"],
+  chunin_jiraiya:["chunin_jiraiya_flame_bullet","chunin_jiraiya_needle_hair_guard","chunin_jiraiya_wild_mane_bind","chunin_jiraiya_explosive_tag_volley","chunin_jiraiya_earthflow_trip"],
+  chunin_shikadai:["chunin_shikadai_shadow_possession","chunin_shikadai_shadow_sewing","chunin_shikadai_wind_scythe","chunin_shikadai_shadow_route_trap","chunin_shikadai_tactical_pivot"],
+  chunin_mitsuki:["chunin_mitsuki_snake_lightning","chunin_mitsuki_great_breakthrough","chunin_mitsuki_hidden_shadow_snake_hands","chunin_mitsuki_wind_lightning_fang","chunin_mitsuki_snake_substitution"],
+  chunin_shinki:["chunin_shinki_iron_sand_lance","chunin_shinki_black_iron_rain","chunin_shinki_iron_sand_coffin","chunin_shinki_iron_sand_bulwark","chunin_shinki_iron_wing_reposition"],
+  chunin_boruto:["chunin_boruto_vanishing_rasengan","chunin_boruto_thunderclap_arrow","chunin_boruto_shadow_clone_relay","chunin_boruto_karma_resonance_guard","chunin_boruto_jogan_spatial_read"],
   akatsuki_deva:["akatsuki_deva_almighty_push","akatsuki_deva_universal_pull","akatsuki_deva_black_receiver_impalement","akatsuki_deva_repulsive_barrier","akatsuki_deva_planetary_devastation"],
   akatsuki_itachi:["akatsuki_itachi_tsukuyomi","akatsuki_itachi_amaterasu","akatsuki_itachi_ephemeral_genjutsu","akatsuki_itachi_crow_clone_feint","akatsuki_itachi_shuriken_convergence"],
   akatsuki_teen_naruto:["black_spiral_rasengan","shadow_clone_hunt","wind_rending_sphere","fox_chakra_burst","fox_chakra_intercession"],
   akatsuki_sasuke:["chidori_spear","chidori_stream","dragon_flame","sharingan_genjutsu","amaterasu"],
-  anbu_ino:["mind_transfer","mind_disturbance","psychic_intercept"],
-  anbu_menma:["crescent_rasengan","shadow_clone_execution","black_wire_seal","execution_guard"],
-  anbu_naruto:["silent_clone_assault","rasengan_ambush","wire_capture","body_flicker_intercept"],
-  anbu_sasuke:["chidori","lightning_blade_arc","fireball_ambush","wire_execution"],
-  jonin_inojin:["super_beast_hawk","ink_lion_bind","mind_transfer"],
-  jonin_hanabi:["gentle_fist","eight_trigrams_sixty_four_palms","vacuum_palm","rotation"],
-  jonin_shino:["parasitic_swarm","insect_sphere","insect_wall"],
-  jonin_konohamaru:["jonin_konohamaru_rasengan","jonin_konohamaru_burning_ash_cloud","jonin_konohamaru_shadow_clone_pincer","jonin_konohamaru_shuriken_shadow_volley"],
+  anbu_ino:["mind_transfer","mind_disturbance","psychic_intercept","anbu_ino_sensory_sweep","anbu_ino_mind_transmission"],
+  anbu_menma:["crescent_rasengan","shadow_clone_execution","black_wire_seal","execution_guard","anbu_menma_silent_shadowstep"],
+  anbu_naruto:["silent_clone_assault","rasengan_ambush","wire_capture","body_flicker_intercept","anbu_naruto_clone_decoy"],
+  anbu_sasuke:["chidori","lightning_blade_arc","fireball_ambush","wire_execution","anbu_sasuke_sharingan_counter_read"],
+  jonin_inojin:["super_beast_hawk","ink_lion_bind","mind_transfer","jonin_inojin_ink_bird_recon","jonin_inojin_ink_screen"],
+  jonin_hanabi:["gentle_fist","eight_trigrams_sixty_four_palms","vacuum_palm","rotation","jonin_hanabi_byakugan_read"],
+  jonin_shino:["parasitic_swarm","insect_sphere","insect_wall","jonin_shino_insect_clone","jonin_shino_scent_mark"],
+  jonin_konohamaru:["jonin_konohamaru_rasengan","jonin_konohamaru_burning_ash_cloud","jonin_konohamaru_shadow_clone_pincer","jonin_konohamaru_shuriken_shadow_volley","jonin_konohamaru_clone_intercept"],
   jonin_sasuke:["jonin_sasuke_great_fireball","jonin_sasuke_lightning_channel_slash","jonin_sasuke_chidori_spear","jonin_sasuke_wire_dragon_flame","jonin_sasuke_chidori_senbon"],
-  sj_ebisu:["sj_ebisu_precision_shuriken","sj_ebisu_chakra_control_strike","sj_ebisu_fundamentals_guard"],
-  sj_genma:["sj_genma_senbon_flick","sj_genma_crosswire_capture","sj_genma_body_flicker_lunge","sj_genma_guarding_senbon"],
-  sj_ibiki:["sj_ibiki_interrogators_bind","sj_ibiki_psychological_break","sj_ibiki_suppression_formula","sj_ibiki_chain_capture"],
+  sj_ebisu:["sj_ebisu_precision_shuriken","sj_ebisu_chakra_control_strike","sj_ebisu_fundamentals_guard","sj_ebisu_substitution_drill","sj_ebisu_technique_read"],
+  sj_genma:["sj_genma_senbon_flick","sj_genma_crosswire_capture","sj_genma_body_flicker_lunge","sj_genma_guarding_senbon","sj_genma_senbon_counter"],
+  sj_ibiki:["sj_ibiki_interrogators_bind","sj_ibiki_psychological_break","sj_ibiki_suppression_formula","sj_ibiki_chain_capture","sj_ibiki_interrogators_read"],
   sannin_sakura:["sannin_sakura_cherry_blossom_impact","sannin_sakura_heaven_kick","sannin_sakura_groundbreaker","sannin_sakura_mystical_palm","sannin_sakura_poison_extraction"],
-  sannin_shikamaru:["sannin_shikamaru_shadow_possession_field","sannin_shikamaru_shadow_neck_binding","sannin_shikamaru_shadow_sewing_barrage"],
+  sannin_shikamaru:["sannin_shikamaru_shadow_possession_field","sannin_shikamaru_shadow_neck_binding","sannin_shikamaru_shadow_sewing_barrage","sannin_shikamaru_shadow_exchange","sannin_shikamaru_checkmate_grid"],
   kage_itachi:["kage_itachi_tsukuyomi","kage_itachi_amaterasu","kage_itachi_yata_mirror","kage_itachi_totsuka_blade","kage_itachi_yasaka_magatama"],
   kage_kakashi:["kage_kakashi_purple_lightning","kage_kakashi_purple_lightning_net","kage_kakashi_water_dragon","kage_kakashi_earth_wall","kage_kakashi_lightning_clone"],
-  kage_menma:["kage_menma_moonfall_rasengan","kage_menma_black_crescent_seal","kage_menma_shadow_crescent_assault","kage_menma_eclipse_beast_cannon","kage_menma_eclipse_guard"]
+  kage_menma:["kage_menma_moonfall_rasengan","kage_menma_black_crescent_seal","kage_menma_shadow_crescent_assault","kage_menma_eclipse_beast_cannon","kage_menma_eclipse_guard"],
+  kage_naruto:["kage_naruto_shadow_clone_assault","kage_naruto_massive_rasengan","kage_naruto_rasenshuriken","kage_naruto_clone_interposition","kage_naruto_sage_sensory_read"],
+  kage_sarada:["kage_sarada_inferno_fireball","kage_sarada_chidori_breakthrough","kage_sarada_chakra_enhanced_impact","kage_sarada_lightning_shuriken_convergence","kage_sarada_sharingan_read"],
+  shisui:["shisui_body_flicker_assault","shisui_great_fireball","shisui_ocular_genjutsu","shisui_flicker_shuriken_convergence","shisui_afterimage_feint"],
+  teen_nagato:["teen_nagato_almighty_push","teen_nagato_universal_pull","teen_nagato_black_receiver_bind","teen_nagato_gale_palm","teen_nagato_water_dragon"]
 };
 
 
@@ -73351,28 +73431,45 @@ function getOrdinaryProductionPaletteStatus(characterOrId) {
 function runOrdinaryProductionPaletteDiagnostics() {
   const statuses=Object.keys(PRODUCTION_PREPARED_SKILL_PALETTES)
     .map(id=>getOrdinaryProductionPaletteStatus(id));
-  const izuno=getOrdinaryProductionPaletteStatus("academy_izuno");
   const underfilledOrdinaryIds=statuses
     .filter(status=>status.complete!==true)
     .map(status=>status.registryId);
+  const ordinaryPreparedSlots=statuses.reduce((sum,status)=>sum+status.preparedSkillCount,0);
+  const expectedOrdinaryIds=Object.keys(PRODUCTION_PREPARED_SKILL_PALETTES);
+  const specialLeakIds=[
+    "black_gold_naruto","black_sun_himawari","serpent_ascendant",
+    "sakura_resonance","sakura_manifestation","sakura_avatar",
+    "shikamaru_resonance_yang","shikamaru_manifestation_yang","shikamaru_avatar_yang",
+    "shikamaru_resonance_yin","shikamaru_manifestation_yin","shikamaru_avatar_yin",
+    "tobirama_resonance","tobirama_manifestation","tobirama_avatar",
+    "stolen_chakra","coercive_cloak","three_tail_dominion","six_tail_dominion",
+    "kurama_dominion","kurama_sovereign","baryon_mode",
+    "undying_madara","black_madara","failed_god_madara","fallen_hokage_sasuke","shadow_of_indra","sixth_shadow"
+  ].filter(id=>Object.prototype.hasOwnProperty.call(PRODUCTION_PREPARED_SKILL_PALETTES,id));
   const result={
-    academyIzunoFiveOfFive:izuno.complete===true&&izuno.preparedSkillCount===5&&izuno.missingPreparedSlots===0,
-    academyIzunoExactOrder:JSON.stringify(PRODUCTION_PREPARED_SKILL_PALETTES.academy_izuno)===JSON.stringify([
+    ordinaryCharacters:statuses.length===49,
+    ordinaryPreparedSlots:ordinaryPreparedSlots===245,
+    ordinaryIncompletePalettes:underfilledOrdinaryIds.length===0,
+    everyOrdinaryExactFive:statuses.every(status=>status.preparedSkillCount===5),
+    everyOrdinaryMachineIdResolves:statuses.every(status=>status.missingSkillIds.length===0),
+    noSpecialRepresentationAutoFive:specialLeakIds.length===0,
+    academyIzunoStillExact:JSON.stringify(PRODUCTION_PREPARED_SKILL_PALETTES.academy_izuno)===JSON.stringify([
       "academy_izuno_pouncing_palm",
       "academy_izuno_shuriken_pounce",
       "academy_izuno_catstep_feint",
       "academy_izuno_wall_spring",
       "academy_izuno_clone_pounce"
     ]),
-    pilotIzunoIdsRetiredFromProduction:[
-      "academy_izuno_quickstep_lunge",
-      "academy_izuno_clone_feint",
-      "academy_izuno_pouncing_strike"
-    ].every(id=>!PRODUCTION_PREPARED_SKILL_PALETTES.academy_izuno.includes(id)),
-    underfilledOrdinaryIds
+    productionCharacters:ALPHA_PRODUCTION_CHARACTER_IDS.length===85,
+    productionEntities:ALPHA_PRODUCTION_ENTITY_IDS.length===17,
+    productionIdentities:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===102
   };
-  result.pass=result.academyIzunoFiveOfFive===true&&result.academyIzunoExactOrder===true&&result.pilotIzunoIdsRetiredFromProduction===true&&underfilledOrdinaryIds.length===0;
-  console.table({...result,underfilledOrdinaryIds:underfilledOrdinaryIds.join(", ")});
+  result.underfilledOrdinaryIds=underfilledOrdinaryIds;
+  result.specialLeakIds=specialLeakIds;
+  result.pass=Object.entries(result)
+    .filter(([key])=>!["underfilledOrdinaryIds","specialLeakIds","pass"].includes(key))
+    .every(([,value])=>value===true);
+  console.table({...result,underfilledOrdinaryIds:underfilledOrdinaryIds.join(", "),specialLeakIds:specialLeakIds.join(", ")});
   return result;
 }
 
@@ -75272,6 +75369,21 @@ function resolveBattlePreStaminaDefense(definition) {
           const sovereignActor=getBattleParticipantByIdentity("player",definition.targetParticipantId);
           addKuramaSovereignOverload(sovereignActor,Number(state.data.sovereignOverloadOnConsume),{sourceRefs:[{type:"skill",id:state.data.sourceSkillId||state.stateKey,role:"consumed_defensive_source"}]});
         }
+        if (state.data&&state.data.onConsumeCreatesSelfState&&definition.targetSide&&definition.targetParticipantId) {
+          const contract=state.data.onConsumeCreatesSelfState;
+          const created=addBattleTransientState({
+            stateKey:contract.stateKey,
+            sourceSide:definition.targetSide,sourceParticipantId:definition.targetParticipantId,
+            targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId,
+            ownerRef:{type:"consumed_defensive_source",id:state.data.sourceSkillId||state.stateKey},
+            data:{
+              remainingActionOpportunities:Math.max(1,Number(contract.remainingActionOpportunities)||1),
+              activationActionId:null,
+              sourceSkillId:state.data.sourceSkillId||state.stateKey
+            }
+          });
+          if (created) result.consumedStateIds.push(created.stateId);
+        }
       }
     }
   });
@@ -76924,15 +77036,232 @@ function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null,options=
 }
 
 // =========================================================
-// BRICK 671 — ENEMY AUTHORED ACTION SCHEDULER FOUNDATION
-// BRICK 672 — RANDOMNESS ONLY AFTER SEMANTIC ELIGIBILITY
+// BRICK 686 — COMBAT ALPHA GENERIC ENEMY ACTION AUTHORITY
+// BRICK 687 — ALPHA BOSS ACTION PACKAGE INGESTION
+// BRICK 688 — RANDOMNESS ONLY AFTER SEMANTIC ELIGIBILITY
 // =========================================================
-// Coding owns scheduling. Combat owns the concrete enemy actions.
-// No generic damage/action is invented when authored authority is absent.
+// Coding owns scheduling. Combat owns concrete action authority.
+// Enemy power/Rank/Stamina never derive an un-authored Attack PL.
+
+function makeEnemyFixedDamageAction(id,authoredAttackPL,options={}) {
+  return {
+    id,skillId:id,actionClass:options.actionClass||"enemy_authored_action",
+    traits:[...(options.traits||[])],
+    evaluateAvailability:typeof options.evaluateAvailability==="function"?options.evaluateAvailability:null,
+    resolve({enemy,target,envelope}) {
+      const attackPL=Math.max(0,Math.round(Number(authoredAttackPL)||0));
+      if (!enemy||!target||attackPL<=0) return {resolved:false,reason:"enemy_fixed_damage_contract_missing"};
+      const skill={id,excess:options.excess||null,mechanicalPacketCount:1};
+      const output={primaryDiscipline:options.primaryDiscipline||null,statKey:getBattlePrimaryDisciplineStatKey(options.primaryDiscipline),effectivePrimaryDiscipline:null,coefficient:null,branch:"fixed_authored_enemy_output",branchMultiplier:1,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,attackPL,fixedCalibration:true};
+      const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id,output,mitigable:options.staminaMitigation!==false,excess:options.excess||null,stateRefs:[]});
+      if (!damage) return {resolved:false,reason:"enemy_damage_resolution_failed"};
+      if (options.dynamicControlRider&&damage.remainingBattlePLAfter>0) {
+        establishEnemyDynamicControlState(enemy,target,envelope,id,options.dynamicControlRider);
+      }
+      return {resolved:true,branch:"fixed_enemy_damage",damageApplied:true,damage,finalDamage:damage.finalDamage,excessResolution:damage.excessResolution||null};
+    }
+  };
+}
+
+function makeEnemyAreaDamageAction(id,authoredAttackPLPerTarget,maxTargets=3,options={}) {
+  return {
+    id,skillId:id,actionClass:options.actionClass||"enemy_authored_action",
+    traits:[...(options.traits||[]),"one_authored_area_action"],
+    evaluateAvailability:typeof options.evaluateAvailability==="function"?options.evaluateAvailability:null,
+    resolve({enemy,envelope}) {
+      if (!enemy) return {resolved:false,reason:"enemy_area_actor_missing"};
+      const targetIds=getFactoryActiveTargetIds("player",maxTargets);
+      const results=[];
+      targetIds.forEach(targetId=>{
+        const attackPL=Math.max(0,Math.round(Number(authoredAttackPLPerTarget)||0));
+        const output={primaryDiscipline:options.primaryDiscipline||null,statKey:getBattlePrimaryDisciplineStatKey(options.primaryDiscipline),effectivePrimaryDiscipline:null,coefficient:null,branch:"fixed_authored_enemy_area_output",branchMultiplier:1,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,attackPL,fixedCalibration:true,perTarget:true};
+        const damage=resolveBattleDamagePacket({envelope,skill:{id,excess:options.excess||null,mechanicalPacketCount:1},actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:targetId,output,mitigable:options.staminaMitigation!==false,excess:options.excess||null,stateRefs:[]});
+        if (damage) results.push({targetParticipantId:targetId,damage});
+      });
+      return {resolved:results.length>0,branch:"enemy_area_damage",damageApplied:results.length>0,areaResults:results,crossTargetPooling:false};
+    }
+  };
+}
+
+function makeEnemyRatioGuardAction(id,preventionRatio,options={}) {
+  const ratio=Math.max(0,Math.min(1,Number(preventionRatio)||0));
+  return {
+    id,skillId:id,actionClass:"enemy_defensive_technique",traits:[...(options.traits||[])],
+    evaluateAvailability:typeof options.evaluateAvailability==="function"?options.evaluateAvailability:null,
+    resolve({enemy,envelope}) {
+      if (!enemy) return {resolved:false,reason:"enemy_guard_actor_missing"};
+      const existing=findBattleTransientState({stateKey:options.stateKey||id,targetSide:"enemy",targetParticipantId:enemy.id});
+      if (existing) removeBattleTransientState(existing.stateId);
+      const state=addBattleTransientState({
+        stateKey:options.stateKey||id,
+        sourceSide:"enemy",sourceParticipantId:enemy.id,
+        targetSide:"enemy",targetParticipantId:enemy.id,
+        ownerRef:{type:"skill",id},
+        data:{
+          sourceSkillId:id,attackMultiplier:1-ratio,preventionRatio:ratio,oneUse:true,
+          activationActionId:envelope?actionIdOrNull(envelope):null,
+          onConsumeCreatesSelfState:options.onConsumeCreatesSelfState||null
+        }
+      });
+      return {resolved:!!state,branch:"enemy_ratio_guard",damageApplied:false,stateRefs:state?[state.stateId]:[]};
+    }
+  };
+}
+
+function actionIdOrNull(envelope) {
+  return envelope&&envelope.actionId?envelope.actionId:null;
+}
+
+function establishEnemyDynamicControlState(enemy,target,envelope,skillId,contract={}) {
+  if (!enemy||!target||!contract.discipline) return null;
+  const live=resolveAuthoredDynamicControlStrength({sourceSide:"enemy",sourceParticipantId:enemy.id,discipline:contract.discipline});
+  if (!live.success) return null;
+  const multiplier=Number.isFinite(Number(contract.multiplier))?Number(contract.multiplier):1;
+  const strength=Math.max(0,Math.round(live.strength*multiplier));
+  const state=addBattleTransientState({
+    stateKey:contract.stateKey||contract.semanticClass||skillId,
+    sourceSide:"enemy",sourceParticipantId:enemy.id,
+    targetSide:"player",targetParticipantId:target.id,
+    ownerRef:{type:"skill",id:skillId},
+    data:{
+      resolverDiscipline:contract.discipline,resolverStrength:strength,liveAtResolution:true,
+      semanticClass:contract.semanticClass||"authored_control",blanketStun:false,
+      remainingActionOpportunities:Number.isFinite(Number(contract.durationActionOpportunities))?Math.max(1,Number(contract.durationActionOpportunities)):undefined,
+      activationActionId:envelope?actionIdOrNull(envelope):null
+    }
+  });
+  recordBattleEvidence({eventType:"enemy_dynamic_control_resolved",actionId:actionIdOrNull(envelope),actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),skillId, stateRefs:state?[state.stateId]:[],data:{resolverDiscipline:contract.discipline,resolverStrength:strength,semanticClass:contract.semanticClass||"authored_control",blanketStun:false}});
+  return state;
+}
+
+function makeEnemyDynamicControlAction(id,discipline,options={}) {
+  return {
+    id,skillId:id,actionClass:"enemy_control_technique",traits:[...(options.traits||[])],
+    evaluateAvailability:typeof options.evaluateAvailability==="function"?options.evaluateAvailability:null,
+    resolve({enemy,target,envelope}) {
+      const targets=(Number(options.maxTargets)||1)>1
+        ? getFactoryActiveTargetIds("player",options.maxTargets).map(targetId=>getBattleParticipantByIdentity("player",targetId)).filter(Boolean)
+        : [target].filter(Boolean);
+      const states=targets.map(item=>establishEnemyDynamicControlState(enemy,item,envelope,id,{discipline,multiplier:options.multiplier,semanticClass:options.semanticClass,stateKey:options.stateKey,durationActionOpportunities:options.durationActionOpportunities})).filter(Boolean);
+      return {resolved:states.length>0,branch:"enemy_dynamic_control",damageApplied:false,stateRefs:states.map(state=>state.stateId)};
+    }
+  };
+}
+
+function makeEnemyCategoricalAction(id,options={}) {
+  return {
+    id,skillId:id,actionClass:options.actionClass||"enemy_context_technique",traits:[...(options.traits||[])],
+    evaluateAvailability:typeof options.evaluateAvailability==="function"?options.evaluateAvailability:null,
+    resolve({enemy,target,envelope}) {
+      recordBattleEvidence({eventType:"enemy_categorical_action_resolved",actionId:actionIdOrNull(envelope),actorRef:enemy?createBattleParticipantRef("enemy",enemy.id):null,targetRef:target?createBattleParticipantRef("player",target.id):null,skillId:id,data:{informationBoundary:options.informationBoundary||null,automaticAttackPL:0,genericSpeedModifier:false,genericAccuracyModifier:false,independentParticipantCreated:false}});
+      return {resolved:true,branch:"enemy_categorical",damageApplied:false,stateRefs:[]};
+    }
+  };
+}
+
+function makeEnemyRestorationAction(id,amount,options={}) {
+  return {
+    id,skillId:id,actionClass:"enemy_restorative_technique",traits:[...(options.traits||[])],
+    evaluateAvailability:typeof options.evaluateAvailability==="function"?options.evaluateAvailability:null,
+    resolve({enemy,envelope}) {
+      const restoration=enemy?restoreUnderlyingBattlePLFromSkill("enemy",enemy.id,amount):null;
+      if (!restoration||!restoration.success) return {resolved:false,reason:restoration&&restoration.reason||"enemy_restoration_failed"};
+      recordBattleEvidence({eventType:"enemy_battle_pl_restored",actionId:actionIdOrNull(envelope),actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:id,data:{requested:amount,restored:restoration.restored,underlyingOnly:true,historyRollback:false}});
+      return {resolved:true,branch:"enemy_restoration",damageApplied:false,restoration};
+    }
+  };
+}
+
+function makeEnemyTwoStageAreaAction(id,collapseAttackPL,maxTargets,options={}) {
+  const stateKey=options.stateKey||`${id}_committed`;
+  return {
+    id,skillId:id,actionClass:"enemy_committed_technique",traits:["committed_two_stage_action",...(options.traits||[])],
+    resolve({enemy,envelope}) {
+      const existing=findBattleTransientState({stateKey,targetSide:"enemy",targetParticipantId:enemy.id});
+      if (!existing) {
+        const state=addBattleTransientState({stateKey,sourceSide:"enemy",sourceParticipantId:enemy.id,targetSide:"enemy",targetParticipantId:enemy.id,ownerRef:{type:"skill",id},data:{committedTechnique:true,stage:1,activationActionId:actionIdOrNull(envelope)}});
+        recordBattleEvidence({eventType:"enemy_committed_technique_stage1",actionId:actionIdOrNull(envelope),actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:id,stateRefs:state?[state.stateId]:[],data:{automaticAttackPL:0,stage:1,commitmentPersists:true}});
+        return {resolved:!!state,branch:"formation_stage",damageApplied:false,stateRefs:state?[state.stateId]:[],stage2Pending:true};
+      }
+      removeBattleTransientState(existing.stateId);
+      const area=makeEnemyAreaDamageAction(id,collapseAttackPL,maxTargets,{excess:options.excess||null,traits:["committed_collapse"]});
+      const result=area.resolve({enemy,envelope});
+      recordBattleEvidence({eventType:"enemy_committed_technique_stage2",actionId:actionIdOrNull(envelope),actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:id,data:{stage:2,collapseCommitted:true}});
+      return {...result,branch:"collapse_stage",stage2Pending:false};
+    }
+  };
+}
+
+const ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES = Object.freeze({
+  scout:Object.freeze([
+    makeEnemyFixedDamageAction("enemy_rogue_scout_kunai_cut",9,{primaryDiscipline:"Bukijutsu"}),
+    makeEnemyFixedDamageAction("enemy_rogue_scout_shuriken_burst",7,{primaryDiscipline:"Bukijutsu",traits:["multiple_projectiles_one_packet"]})
+  ]),
+  bandit:Object.freeze([
+    makeEnemyFixedDamageAction("enemy_bandit_tanto_slash",12,{primaryDiscipline:"Bukijutsu"}),
+    makeEnemyFixedDamageAction("enemy_bandit_heavy_kick",10,{primaryDiscipline:"Taijutsu",traits:["damage_does_not_imply_displacement_or_stun"]}),
+    makeEnemyFixedDamageAction("enemy_bandit_throwing_knife",9,{primaryDiscipline:"Bukijutsu",traits:["projectile_presentation_one_packet"]})
+  ]),
+  banditLeader:Object.freeze([
+    makeEnemyFixedDamageAction("enemy_bandit_leader_execution_cut",17,{primaryDiscipline:"Bukijutsu"}),
+    makeEnemyFixedDamageAction("enemy_bandit_leader_explosive_tag_burst",14,{primaryDiscipline:"Bukijutsu",traits:["one_packet","no_automatic_burning"]}),
+    makeEnemyFixedDamageAction("enemy_bandit_leader_cross_slash",15,{primaryDiscipline:"Bukijutsu",traits:["visual_two_hit_one_packet"]})
+  ]),
+
+  undying_madara:Object.freeze([
+    makeEnemyAreaDamageAction("undying_madara_great_fire_annihilation",44,3,{primaryDiscipline:"Ninjutsu"}),
+    makeEnemyFixedDamageAction("undying_madara_gunbai_sever",68,{primaryDiscipline:"Bukijutsu"}),
+    makeEnemyRatioGuardAction("undying_madara_gunbai_reversal",0.60,{traits:["no_automatic_reflected_damage"]}),
+    makeEnemyRestorationAction("undying_madara_reconstitution",28,{traits:["history_rollback_forbidden"]})
+  ]),
+  black_madara:Object.freeze([
+    makeEnemyFixedDamageAction("black_madara_black_tendril_impalement",76,{primaryDiscipline:"Kinjutsu",dynamicControlRider:{discipline:"Kinjutsu",semanticClass:"black_tendril_restraint"},traits:["black_zetsu_causal_provenance_where_relevant","single_boss_turn"]}),
+    makeEnemyDynamicControlAction("black_madara_black_lattice","Kinjutsu",{semanticClass:"black_lattice_control",maxTargets:3}),
+    makeEnemyAreaDamageAction("black_madara_firestorm",48,3,{primaryDiscipline:"Ninjutsu"}),
+    makeEnemyRatioGuardAction("black_madara_corruption_guard",0.60)
+  ]),
+  failed_god_madara:Object.freeze([
+    makeEnemyAreaDamageAction("failed_god_madara_divine_ruin",62,3,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCapPerTarget:31}}),
+    makeEnemyTwoStageAreaAction("failed_god_madara_heaven_core",70,3,{stateKey:"failed_god_heaven_core_committed",excess:{eligible:true,capRatio:0.75,absoluteCapPerTarget:52}}),
+    makeEnemyDynamicControlAction("failed_god_madara_divine_prison","Fūinjutsu",{semanticClass:"divine_prison",maxTargets:3}),
+    makeEnemyRatioGuardAction("failed_god_madara_divinity_aegis",0.70,{
+      stateKey:"failed_god_madara_divinity_aegis_guard",
+      onConsumeCreatesSelfState:{stateKey:"aegis_fracture",remainingActionOpportunities:1},
+      evaluateAvailability:({enemy})=>({available:!findBattleTransientState({stateKey:"aegis_fracture",targetSide:"enemy",targetParticipantId:enemy.id}),reason:"aegis_fracture_blocks_next_activation"})
+    })
+  ]),
+  fallen_hokage_sasuke:Object.freeze([
+    makeEnemyFixedDamageAction("fallen_hokage_sasuke_chidori_execution",74,{primaryDiscipline:"Ninjutsu"}),
+    makeEnemyFixedDamageAction("fallen_hokage_sasuke_dragon_flame",68,{primaryDiscipline:"Ninjutsu",traits:["ordinary_fire_state_rider_only_through_qualifying_branch"]}),
+    makeEnemyDynamicControlAction("fallen_hokage_sasuke_shadow_seal","Fūinjutsu",{semanticClass:"shadow_seal_interference"}),
+    makeEnemyRatioGuardAction("fallen_hokage_sasuke_counter",0.55)
+  ]),
+  shadow_of_indra:Object.freeze([
+    makeEnemyFixedDamageAction("shadow_of_indra_indra_spear",88,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCap:44}}),
+    makeEnemyAreaDamageAction("shadow_of_indra_shadow_wave",50,3,{primaryDiscipline:"Ninjutsu"}),
+    makeEnemyDynamicControlAction("shadow_of_indra_indra_bind","Fūinjutsu",{semanticClass:"indra_bind",maxTargets:3}),
+    makeEnemyCategoricalAction("shadow_of_indra_black_mirror",{traits:["perception_reversal_interaction","genjutsu_scalar_only_if_common_resolver_requires"],informationBoundary:"categorical_reversal_unless_scalar_genuinely_required"}),
+    makeEnemyRatioGuardAction("shadow_of_indra_indra_guard",0.65)
+  ]),
+  sixth_shadow:Object.freeze([
+    makeEnemyFixedDamageAction("sixth_shadow_judgment",100,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.75,absoluteCap:75}}),
+    makeEnemyAreaDamageAction("sixth_shadow_cataclysm",58,3,{primaryDiscipline:"Ninjutsu",excess:{eligible:true,capRatio:0.50,absoluteCapPerTarget:29}}),
+    makeEnemyDynamicControlAction("sixth_shadow_sixfold_seal","Fūinjutsu",{semanticClass:"sixfold_seal",maxTargets:3}),
+    makeEnemyRatioGuardAction("sixth_shadow_shadow_guard",0.70),
+    makeEnemyCategoricalAction("sixth_shadow_shadowstep_reversal",{actionClass:"enemy_movement_reversal",traits:["not_arbitrary_teleportation","no_hidden_speed"],informationBoundary:"categorical_reposition_reversal_only"})
+  ])
+});
+
 function getEnemyAuthoredBattleActions(enemy) {
-  return enemy&&Array.isArray(enemy.authoredBattleActions)
-    ? enemy.authoredBattleActions.filter(action=>action&&typeof action.id==="string")
-    : [];
+  if (!enemy) return [];
+  if (Array.isArray(enemy.authoredBattleActions)) {
+    const inline=enemy.authoredBattleActions.filter(action=>action&&typeof action.id==="string");
+    if (inline.length>0) return inline;
+  }
+  const registryId=getCharacterRegistryId(enemy);
+  const key=(registryId&&ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[registryId])?registryId:enemy.id;
+  const packageActions=key&&ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[key];
+  return Array.isArray(packageActions)?[...packageActions]:[];
 }
 
 function evaluateEnemyAuthoredActionEligibility(action,enemy,target) {
@@ -76950,7 +77279,12 @@ function evaluateEnemyAuthoredActionEligibility(action,enemy,target) {
 }
 
 function getEligibleEnemyAuthoredBattleActions(enemy,target) {
-  return getEnemyAuthoredBattleActions(enemy)
+  const actions=getEnemyAuthoredBattleActions(enemy);
+  const committedHeaven=enemy&&findBattleTransientState({stateKey:"failed_god_heaven_core_committed",targetSide:"enemy",targetParticipantId:enemy.id});
+  const semanticallyScoped=committedHeaven
+    ? actions.filter(action=>action.id==="failed_god_madara_heaven_core")
+    : actions;
+  return semanticallyScoped
     .map(action=>({action,eligibility:evaluateEnemyAuthoredActionEligibility(action,enemy,target)}))
     .filter(entry=>entry.eligibility.eligible===true);
 }
@@ -77004,7 +77338,8 @@ function chooseEnemyAuthoredBattleAction(schedulerState=null) {
     success:true,
     action:candidates[index],
     eligibleActionIds:candidates.map(action=>action.id),
-    randomnessAppliedAfterEligibility:true
+    randomnessAppliedAfterEligibility:true,
+    equalSelectionWeight:true
   };
 }
 
@@ -77052,6 +77387,7 @@ function executeEnemyAuthoredActionOpportunity() {
       resolved,
       actionId:action.id,
       randomnessAppliedAfterEligibility:true,
+      equalSelectionWeight:true,
       inventedFallback:false
     }
   });
@@ -77059,6 +77395,48 @@ function executeEnemyAuthoredActionOpportunity() {
   saveTestState();
   if (!currentBattle.battleOver) openOverlay("combat");
   return {success:resolved,envelope,resolution,choice};
+}
+
+// =========================================================
+// BRICK 689 — COMBAT ALPHA CONTENT CLOSURE DIAGNOSTIC
+// =========================================================
+function runAlphaCombatContentClosureDiagnostics() {
+  const ordinary=runOrdinaryProductionPaletteDiagnostics();
+  const genericExpected={
+    scout:["enemy_rogue_scout_kunai_cut","enemy_rogue_scout_shuriken_burst"],
+    bandit:["enemy_bandit_tanto_slash","enemy_bandit_heavy_kick","enemy_bandit_throwing_knife"],
+    banditLeader:["enemy_bandit_leader_execution_cut","enemy_bandit_leader_explosive_tag_burst","enemy_bandit_leader_cross_slash"]
+  };
+  const bossExpected={
+    undying_madara:["undying_madara_great_fire_annihilation","undying_madara_gunbai_sever","undying_madara_gunbai_reversal","undying_madara_reconstitution"],
+    black_madara:["black_madara_black_tendril_impalement","black_madara_black_lattice","black_madara_firestorm","black_madara_corruption_guard"],
+    failed_god_madara:["failed_god_madara_divine_ruin","failed_god_madara_heaven_core","failed_god_madara_divine_prison","failed_god_madara_divinity_aegis"],
+    fallen_hokage_sasuke:["fallen_hokage_sasuke_chidori_execution","fallen_hokage_sasuke_dragon_flame","fallen_hokage_sasuke_shadow_seal","fallen_hokage_sasuke_counter"],
+    shadow_of_indra:["shadow_of_indra_indra_spear","shadow_of_indra_shadow_wave","shadow_of_indra_indra_bind","shadow_of_indra_black_mirror","shadow_of_indra_indra_guard"],
+    sixth_shadow:["sixth_shadow_judgment","sixth_shadow_cataclysm","sixth_shadow_sixfold_seal","sixth_shadow_shadow_guard","sixth_shadow_shadowstep_reversal"]
+  };
+  const packageMatches=expectedMap=>Object.entries(expectedMap).every(([id,ids])=>JSON.stringify((ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[id]||[]).map(action=>action.id))===JSON.stringify(ids));
+  const shinoClone=getClosureWaveBattleSkillDefinition("jonin_shino_insect_clone","jonin_shino");
+  const shinoMark=getClosureWaveBattleSkillDefinition("jonin_shino_scent_mark","jonin_shino");
+  const shinoRefs=[shinoClone,shinoMark].flatMap(skill=>skill&&Array.isArray(skill.sourceRefs)?skill.sourceRefs:[]);
+  const result={
+    ordinaryCharacters49:ordinary.ordinaryCharacters===true,
+    ordinaryPreparedSlots245:ordinary.ordinaryPreparedSlots===true,
+    ordinaryIncompletePalettesZero:ordinary.ordinaryIncompletePalettes===true,
+    genericEnemyPackagesExact:packageMatches(genericExpected),
+    bossPackagesExact:packageMatches(bossExpected),
+    schedulerNoDerivedFallback:evaluateEnemyActionScheduler.toString().includes("enemy_action_authority_missing")&&!evaluateEnemyActionScheduler.toString().includes(".power"),
+    randomnessAfterEligibility:chooseEnemyAuthoredBattleAction.toString().includes("randomnessAppliedAfterEligibility"),
+    equalGenericWeights:Object.values(genericExpected).every(ids=>ids.length>0),
+    bossSuccessionUntouched:getAuthoritativeBossStageSuccessor("undying_madara")==="black_madara"&&getAuthoritativeBossStageSuccessor("black_madara")==="failed_god_madara"&&getAuthoritativeBossStageSuccessor("fallen_hokage_sasuke")==="shadow_of_indra"&&getAuthoritativeBossStageSuccessor("shadow_of_indra")==="sixth_shadow",
+    noPerfectSusanooStage:getAuthoritativeBossStageSuccessor("fallen_hokage_sasuke")==="shadow_of_indra",
+    noDeletedFallenHokage:!getCharacterRegistryEntry("fallen_hokage"),
+    kikaichuSourceOnly:shinoRefs.length>=2&&shinoRefs.every(ref=>ref.id==="kikaichu_colony"&&ref.role==="causal_participant")&&!Object.prototype.hasOwnProperty.call(entityRegistry,"kikaichu_colony"),
+    production102:ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length===17
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
 }
 
 
@@ -78940,15 +79318,21 @@ function runBattleActionSelectionDiagnostics() {
 function runEnemyActionSchedulerBoundaryDiagnostics() {
   const chooseSource=chooseEnemyAuthoredBattleAction.toString();
   const executeSource=executeEnemyAuthoredActionOpportunity.toString();
+  const scoutIds=getEnemyAuthoredBattleActions(enemyDatabase.scout).map(action=>action.id);
+  const banditIds=getEnemyAuthoredBattleActions(enemyDatabase.bandit).map(action=>action.id);
+  const leaderIds=getEnemyAuthoredBattleActions(enemyDatabase.banditLeader).map(action=>action.id);
   const result={
-    genericScoutHasNoInventedActions:getEnemyAuthoredBattleActions(enemyDatabase.scout).length===0,
-    genericBanditHasNoInventedActions:getEnemyAuthoredBattleActions(enemyDatabase.bandit).length===0,
-    missingAuthorityExplicit:evaluateEnemyActionScheduler.toString().includes("enemy_action_authority_missing"),
-    noFallbackDamage:evaluateEnemyActionScheduler.toString().includes("inventedFallback:false"),
-    randomnessAfterEligibility:chooseSource.includes("eligibleActions")&&chooseSource.includes("Math.random"),
+    genericScoutAuthoredPackage:JSON.stringify(scoutIds)===JSON.stringify(["enemy_rogue_scout_kunai_cut","enemy_rogue_scout_shuriken_burst"]),
+    genericBanditAuthoredPackage:JSON.stringify(banditIds)===JSON.stringify(["enemy_bandit_tanto_slash","enemy_bandit_heavy_kick","enemy_bandit_throwing_knife"]),
+    genericLeaderAuthoredPackage:JSON.stringify(leaderIds)===JSON.stringify(["enemy_bandit_leader_execution_cut","enemy_bandit_leader_explosive_tag_burst","enemy_bandit_leader_cross_slash"]),
+    missingAuthorityStillExplicit:evaluateEnemyActionScheduler.toString().includes("enemy_action_authority_missing"),
+    noDerivedPowerFallback:!getEnemyAuthoredBattleActions.toString().includes(".power")&&!evaluateEnemyActionScheduler.toString().includes(".power"),
+    randomnessAfterEligibility:chooseSource.includes("eligibleActions")&&chooseSource.includes("Math.random")&&chooseSource.includes("randomnessAppliedAfterEligibility"),
+    equalSelectionWeight:chooseSource.includes("equalSelectionWeight:true"),
     sharedActionEnvelope:executeSource.includes("createBattleActionEnvelope")&&executeSource.includes('actorSide:"enemy"'),
     sharedOpportunityLifecycle:executeSource.includes('consumeBattleActionOpportunity("enemy"'),
-    resolverMustBeAuthored:evaluateEnemyAuthoredActionEligibility.toString().includes('typeof action.resolve!=="function"')
+    resolverMustBeAuthored:evaluateEnemyAuthoredActionEligibility.toString().includes('typeof action.resolve!=="function"'),
+    bossActionsUseSameScheduler:["undying_madara","black_madara","failed_god_madara","fallen_hokage_sasuke","shadow_of_indra","sixth_shadow"].every(id=>Array.isArray(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[id])&&ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[id].length>=4)
   };
   result.pass=Object.values(result).every(value=>value===true);
   console.table(result);
