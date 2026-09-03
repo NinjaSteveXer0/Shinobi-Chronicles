@@ -4,6 +4,7 @@
 // =========================================================
 
 // BRICK 351 — ASSET MANIFEST FOUNDATION
+// BRICK 683 — FIVE ACADEMY COLLECTIBLE CARD ASSET MAPPINGS
 // =========================================================
 //
 // Canonical presentation paths for currently wired character
@@ -12,6 +13,11 @@
 // Registry identity and asset identity remain separate.
 // Future roster expansion should add approved art here rather
 // than scattering literal character-card paths through systems.
+//
+// Collectible Character Card artwork remains distinct from
+// square Battle Portrait artwork. These mappings do not grant
+// Battle portrait authority, ownership, eligibility, Stats, PL,
+// Skills, or progression state.
 //
 // =========================================================
 
@@ -33,6 +39,24 @@ const assetManifest = {
 
     academy_kushina:
       "Assets/Academy Student/academy_kushina.png",
+
+    // =====================================================
+    // BRICK 683 — FINAL 102-ROSTER ACADEMY CARD ASSETS
+    // =====================================================
+    academy_kurenai:
+      "Assets/Academy Student/academy_kurenai.png",
+
+    academy_iwabee:
+      "Assets/Academy Student/academy_iwabee.png",
+
+    academy_metal_lee:
+      "Assets/Academy Student/academy_metal_lee.png",
+
+    academy_kakashi:
+      "Assets/Academy Student/academy_kakashi.png",
+
+    academy_obito:
+      "Assets/Academy Student/academy_obito.png",
 
     jonin_sasuke:
       "Assets/Jonin/jonin_sasuke.png",
@@ -107,6 +131,34 @@ function getUIAssetPath(
     ] ||
     ""
   );
+}
+
+
+// =========================================================
+// BRICK 683 — FIVE ACADEMY COLLECTIBLE CARD ASSET DIAGNOSTIC
+// =========================================================
+function runAcademyExpansionCardAssetDiagnostics() {
+  const expected={
+    academy_kurenai:"Assets/Academy Student/academy_kurenai.png",
+    academy_iwabee:"Assets/Academy Student/academy_iwabee.png",
+    academy_metal_lee:"Assets/Academy Student/academy_metal_lee.png",
+    academy_kakashi:"Assets/Academy Student/academy_kakashi.png",
+    academy_obito:"Assets/Academy Student/academy_obito.png"
+  };
+  const ids=Object.keys(expected);
+  const result={
+    allFiveCardMappingsExact:ids.every(id=>getCharacterCardAssetPath(id)===expected[id]),
+    iwabeeFilenameCorrect:getCharacterCardAssetPath("academy_iwabee")==="Assets/Academy Student/academy_iwabee.png",
+    metalLeeFilenameCorrect:getCharacterCardAssetPath("academy_metal_lee")==="Assets/Academy Student/academy_metal_lee.png",
+    staleIwabeFilenameAbsent:!Object.values(assetManifest.characterCards).includes("Assets/Academy Student/academy_iwabe.png"),
+    staleMetalFilenameAbsent:!Object.values(assetManifest.characterCards).includes("Assets/Academy Student/academy_metal.png"),
+    registryIdsUnchanged:ids.every(id=>typeof characterRegistry!=="undefined"&&!!characterRegistry[id]),
+    productionTargetRemains102:typeof ALPHA_PRODUCTION_CHARACTER_IDS!=="undefined"&&typeof ALPHA_PRODUCTION_ENTITY_IDS!=="undefined"&&ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length===17,
+    cardAssetIsNotPortraitAuthority:ids.every(id=>typeof getCharacterCardAssetPath(id)==="string"&&getCharacterCardAssetPath(id).startsWith("Assets/Academy Student/"))
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
 }
 
 
