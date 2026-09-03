@@ -1695,6 +1695,136 @@ function getBossStageTransitionProvenance(fromStageId,toStageId) {
 }
 
 
+
+// =========================================================
+// BRICK 656 — BOSS STAGE BATTLE PARTICIPANT ADAPTER
+// =========================================================
+const BOSS_STAGE_DISPLAY_NAMES = Object.freeze({
+  undying_madara:"Undying Madara",
+  black_madara:"Black Madara",
+  failed_god_madara:"Failed God Madara",
+  fallen_hokage_sasuke:"Fallen Hokage Sasuke",
+  shadow_of_indra:"Shadow of Indra",
+  sixth_shadow:"The Sixth Shadow"
+});
+
+function createBossStageBattleParticipant(stageId) {
+  const authority=getBossStageSuccessionAuthority(stageId);
+  const record=getCharacterRegistryEntry(stageId);
+  if (!authority||!record) return null;
+  return {
+    id:stageId,
+    registryId:stageId,
+    name:BOSS_STAGE_DISPLAY_NAMES[stageId]||stageId,
+    rank:"Boss Stage",
+    power:Number(record.basePL)||0,
+    stats:cloneCanonicalSevenStats(record.baseStats),
+    baseStats:cloneCanonicalSevenStats(record.baseStats),
+    bossStage:true,
+    bossRoute:authority.route,
+    ordinaryCharacterTurnLifecycle:false,
+    sourceRegistryIdentity:stageId
+  };
+}
+
+function isBossStageBattleParticipant(participantOrId) {
+  const stageId=typeof participantOrId==="string"
+    ? participantOrId
+    : participantOrId&&(participantOrId.registryId||participantOrId.id);
+  return !!getBossStageSuccessionAuthority(stageId);
+}
+
+
+// =========================================================
+// BRICK 657 — AUTHORITATIVE BOSS STAGE TRANSITION
+// =========================================================
+function transitionAuthoritativeBossStage(defeatedStageId,successorStageId,envelope=null) {
+  if (!isAuthoritativeBossStageTransition(defeatedStageId,successorStageId)) {
+    return {success:false,reason:"boss_stage_transition_not_authorised"};
+  }
+  const slotNumber=getBattleDeploymentParticipantSlotNumber("enemy",defeatedStageId);
+  const slot=slotNumber?getBattleDeploymentSlot("enemy",slotNumber):null;
+  if (!slot) return {success:false,reason:"defeated_boss_stage_not_deployed"};
+
+  const successor=createBossStageBattleParticipant(successorStageId);
+  if (!successor) return {success:false,reason:"successor_boss_stage_missing"};
+
+  const provenance=getBossStageTransitionProvenance(defeatedStageId,successorStageId);
+  const cleanup=cleanupBattleParticipantRuntimeState("enemy",defeatedStageId,"authoritative_boss_stage_transition");
+
+  currentBattle.enemyParticipants=currentBattle.enemyParticipants&&typeof currentBattle.enemyParticipants==="object"
+    ? currentBattle.enemyParticipants
+    : {};
+  currentBattle.enemyParticipants[successorStageId]=successor;
+
+  const order=Array.isArray(currentBattle.enemyParticipantOrder)?currentBattle.enemyParticipantOrder:[];
+  const orderIndex=order.indexOf(defeatedStageId);
+  if (orderIndex>=0) order[orderIndex]=successorStageId;
+  else if (!order.includes(successorStageId)) order.push(successorStageId);
+  currentBattle.enemyParticipantOrder=[...new Set(order.filter(Boolean))];
+
+  slot.participantId=successorStageId;
+
+  const runtime=ensureBattleRuntimeState();
+  if (runtime.remainingPL&&runtime.remainingPL.enemy) {
+    delete runtime.remainingPL.enemy[defeatedStageId];
+  }
+  // Boss stages enter with their authored stage Base PL. No lower-stage
+  // package survives merely through lineage/succession.
+  setBattleRemainingPLRecord("enemy",successorStageId,successor.power,successor.power);
+
+  const deployment=currentBattle.deployment;
+  deployment.transitionCounter=(Number(deployment.transitionCounter)||0)+1;
+  const transition={
+    id:`boss_stage_transition_${Date.now()}_${deployment.transitionCounter}`,
+    type:"boss_stage_transition",
+    side:"enemy",
+    fromStageId:defeatedStageId,
+    toStageId:successorStageId,
+    slotNumber,
+    transitionMode:provenance.transitionMode,
+    inheritPriorStagePackages:false,
+    runtimeCleanup:cleanup,
+    createdAt:Date.now()
+  };
+  deployment.lastTransition=transition;
+  syncBattleActiveEnemyFromDeployment();
+
+  if (Array.isArray(currentBattle.battleLog)) {
+    currentBattle.battleLog.push(`${successor.name} emerges as the next authored boss stage.`);
+  }
+
+  recordBattleEvidence({
+    eventType:"boss_stage_transition_committed",
+    actionId:envelope&&envelope.actionId?envelope.actionId:null,
+    actorRef:createBattleParticipantRef("enemy",successorStageId),
+    targetRef:createBattleParticipantRef("enemy",defeatedStageId),
+    sourceRefs:[
+      {type:"character_registry",id:defeatedStageId,role:"prior_stage_identity"},
+      {type:"character_registry",id:successorStageId,role:"successor_stage_identity"}
+    ],
+    data:{
+      fromStageId:defeatedStageId,
+      toStageId:successorStageId,
+      route:provenance.route,
+      transitionMode:provenance.transitionMode,
+      inheritPriorStagePackages:false,
+      mergedStateProvenance:provenance.mergedStateProvenance,
+      rewardAuthorityEnemyId:(getBattleEncounterEnemy()||{}).id||null,
+      historicalEvidencePreserved:true
+    }
+  });
+
+  return {success:true,...transition,successor};
+}
+
+function tryAdvanceAuthoritativeBossStage(defeatedParticipantId,envelope=null) {
+  const successorStageId=getAuthoritativeBossStageSuccessor(defeatedParticipantId);
+  if (!successorStageId) return null;
+  return transitionAuthoritativeBossStage(defeatedParticipantId,successorStageId,envelope);
+}
+
+
 // =========================================================
 // BRICK 440 — PRECISE REGISTRY CAPABILITY ACCESS
 // BRICK 441 — DEDICATED-VARIANT EMBODIMENT PROOF
@@ -3284,6 +3414,35 @@ function getCombinedExpressionRestorationCandidatePackageKeys(characterId, expre
   );
 }
 
+
+
+// =========================================================
+// BRICK 654 — COMPLETE KURAMA RUNTIME DESCRIPTOR
+// =========================================================
+// Descriptor only: it does not manufacture a participant, Summon slot,
+// PL transfer, or blind Yang/Yin package projection.
+function getCombinedExpressionRuntimeDescriptor(characterId,expressionId,options={}) {
+  const eligibility=evaluateCombinedExpressionEligibility(characterId,expressionId,options);
+  if (!eligibility.available) return {available:false,reason:eligibility.reason,missingBindings:eligibility.missingBindings||[]};
+  const authority=eligibility.authority;
+  const entity=eligibility.entity;
+  return {
+    available:true,
+    expressionId,
+    entityId:entity.id,
+    basePL:Number(entity.basePL)||0,
+    baseStats:cloneCanonicalSevenStats(entity.baseStats),
+    constituentEntityIds:[...(authority.constituentEntityIds||[])],
+    constituentBindingsPreserved:authority.preserveUnderlyingBindings===true,
+    constituentHistoryPreserved:authority.preserveConstituentHistory===true,
+    projectConstituentPackagesIntoComplete:false,
+    mergeEntityPL:false,
+    ordinarySummonLifecycle:false,
+    independentBattleParticipantCreated:false,
+    historicalParticipantIdsMigrated:false
+  };
+}
+
 // =========================================================
 // BRICK 495 — KURAMA COMPLETE RESERVATION DIAGNOSTIC
 // BRICK 565 — COMPLETE PRODUCTION AUTHORITY DIAGNOSTIC
@@ -3299,7 +3458,9 @@ function runKuramaCompleteReservationDiagnostics() {
     evidenceRequired:!!authority&&authority.requiresConvergenceEvidence===true,
     exactSuppression:!!authority&&authority.exactSuppressionPackageKeys.includes("yang_kurama.vital_chakra_resonance")&&authority.exactSuppressionPackageKeys.includes("yin_kurama.yin_chakra_precision"),
     noConstituentProjection:!!authority&&authority.projectConstituentPackagesIntoComplete===false,
-    noHistoryMigration:!!authority&&authority.migrateHistoricalParticipantIds===false
+    noHistoryMigration:!!authority&&authority.migrateHistoricalParticipantIds===false,
+    hostedRepresentationAddressable:!!getHostedEntityDefinition("kurama_complete"),
+    completeNotOrdinarySummon:!!entity&&!isAttachableSummonEntity(entity)
   };
   result.pass=Object.values(result).every(value=>value===true);
   return result;
@@ -3318,9 +3479,23 @@ function createEffectiveStateProjectionKey(sourceId, exactPackageId, expressionS
   return [sourceId || "", exactPackageId || "", expressionStateId || "default"].join("::");
 }
 
+// =========================================================
+// BRICK 653 — HOSTED REPRESENTATION CLASSIFICATION BRIDGE
+// =========================================================
+// Hosted partitions and the authorised reunited Complete Kurama
+// representation are addressable through hosted-representation lookup.
+// This does NOT make Complete Kurama an ordinary attached Summon.
+function isHostedEntityRepresentationDefinition(entity) {
+  if (!entity) return false;
+  if (entity.entityType === "hosted_entity_partition") return true;
+  return entity.entityType === "special_entity_representation"
+    && entity.manifestationMode === "authoritative_reunion"
+    && entity.requiresAuthoritativeReunion === true;
+}
+
 const hostedEntityDatabase = Object.fromEntries(
   Object.entries(entityRegistry).filter(([, entity]) =>
-    entity && entity.entityType === "hosted_entity_partition"
+    isHostedEntityRepresentationDefinition(entity)
   )
 );
 
@@ -4878,6 +5053,97 @@ function getClanBattleQueueSlotDefinition(slotNumber) {
 function getClanBattleQueueSlotLabel(slotNumber) {
   const definition=getClanBattleQueueSlotDefinition(slotNumber);
   return definition?definition.label:`SLOT ${Number(slotNumber)||"?"}`;
+}
+
+
+
+// =========================================================
+// BRICK 673 — REUSABLE FORMATION CONSTRAINT CONTEXT
+// BRICK 674 — ACADEMY / GENIN TEAM-BUILDER ELIGIBILITY HOOKS
+// =========================================================
+// The same six persistent My Clan slots are reused. Story/Chronicle
+// authority supplies eligible identities and available slots later.
+let activeClanFormationConstraint = null;
+
+function normalizeClanFormationConstraint(definition=null) {
+  if (!definition||typeof definition!=="object") return null;
+  const normalizeRegistryIds=ids=>Array.isArray(ids)
+    ? [...new Set(ids.filter(id=>typeof id==="string"&&!!getCharacterRegistryEntry(id)))]
+    : [];
+  const normalizeSlots=slots=>Array.isArray(slots)
+    ? [...new Set(slots.map(Number).filter(slot=>Number.isInteger(slot)&&slot>=1&&slot<=CLAN_TEAM_SLOT_COUNT))]
+    : [];
+  return {
+    contextId:typeof definition.contextId==="string"?definition.contextId:"formation_context",
+    eligibleRegistryIds:normalizeRegistryIds(definition.eligibleRegistryIds),
+    availableSlotNumbers:normalizeSlots(definition.availableSlotNumbers),
+    requiredSlotNumbers:normalizeSlots(definition.requiredSlotNumbers),
+    leaderEligibleRegistryIds:normalizeRegistryIds(definition.leaderEligibleRegistryIds),
+    leaderSlotNumber:Number.isInteger(Number(definition.leaderSlotNumber))?Number(definition.leaderSlotNumber):null,
+    source:definition.source||"runtime_authority"
+  };
+}
+
+function setActiveClanFormationConstraint(definition) {
+  activeClanFormationConstraint=normalizeClanFormationConstraint(definition);
+  return activeClanFormationConstraint?cloneProgressionData(activeClanFormationConstraint):null;
+}
+
+function clearActiveClanFormationConstraint() {
+  activeClanFormationConstraint=null;
+  return true;
+}
+
+function getActiveClanFormationConstraint() {
+  return activeClanFormationConstraint?cloneProgressionData(activeClanFormationConstraint):null;
+}
+
+function getClanFormationEligibleRosterCharacters() {
+  const roster=getClanManageableRosterCharacters();
+  const constraint=activeClanFormationConstraint;
+  if (!constraint||constraint.eligibleRegistryIds.length===0) return roster;
+  const allowed=new Set(constraint.eligibleRegistryIds);
+  return roster.filter(character=>allowed.has(getCharacterRegistryId(character)));
+}
+
+function evaluateClanFormationPlacement(characterId,slotNumber) {
+  const slot=Number(slotNumber);
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return {allowed:false,reason:"character_not_clan_manageable"};
+  const constraint=activeClanFormationConstraint;
+  if (!constraint) return {allowed:true,reason:null};
+
+  if (constraint.availableSlotNumbers.length>0&&!constraint.availableSlotNumbers.includes(slot)) {
+    return {allowed:false,reason:"formation_slot_unavailable",contextId:constraint.contextId};
+  }
+
+  const registryId=getCharacterRegistryId(character);
+  if (constraint.eligibleRegistryIds.length>0&&!constraint.eligibleRegistryIds.includes(registryId)) {
+    return {allowed:false,reason:"character_not_eligible_for_formation_context",contextId:constraint.contextId};
+  }
+
+  if (constraint.leaderSlotNumber===slot&&constraint.leaderEligibleRegistryIds.length>0&&!constraint.leaderEligibleRegistryIds.includes(registryId)) {
+    return {allowed:false,reason:"character_not_eligible_for_leader_slot",contextId:constraint.contextId};
+  }
+
+  return {allowed:true,reason:null,contextId:constraint.contextId};
+}
+
+function validateCurrentClanFormationAgainstConstraint() {
+  const constraint=activeClanFormationConstraint;
+  const clan=ensureClanManagementState();
+  if (!constraint) return {valid:true,reason:null,contextId:null};
+  const errors=[];
+  constraint.requiredSlotNumbers.forEach(slotNumber=>{
+    const characterId=clan.teamSlots[slotNumber-1]||null;
+    if (!characterId) errors.push(`required_slot_empty:${slotNumber}`);
+  });
+  clan.teamSlots.forEach((characterId,index)=>{
+    if (!characterId) return;
+    const placement=evaluateClanFormationPlacement(characterId,index+1);
+    if (!placement.allowed) errors.push(`${placement.reason}:${index+1}:${characterId}`);
+  });
+  return {valid:errors.length===0,contextId:constraint.contextId,errors};
 }
 
 const DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS = [
@@ -35100,6 +35366,17 @@ let currentBattle = {
     false,
 
 
+  // =======================================================
+  // BRICK 661 — TERMINAL BATTLE OUTCOME AUTHORITY
+  // =======================================================
+  outcome:
+    null,
+
+
+  defeat:
+    null,
+
+
   battleLog:
     [],
 
@@ -35965,8 +36242,13 @@ function createInitialBattlePlayerParticipantIds(activePlayerId=null) {
   return getPersistentClanBattleParticipantIds();
 }
 
+// =========================================================
+// BRICK 658 — BOSS STAGE PARTICIPANTS SHARE ENEMY DEPLOYMENT
+// =========================================================
 function normalizeBattleEnemyParticipantSource(source) {
-  if (typeof source==="string") return enemyDatabase[source]||null;
+  if (typeof source==="string") {
+    return enemyDatabase[source] || createBossStageBattleParticipant(source) || null;
+  }
   if (source&&typeof source==="object"&&typeof source.id==="string") return source;
   return null;
 }
@@ -36257,6 +36539,12 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   const enemy=enemyDatabase[enemyId];
   if (!enemy) { console.log("Enemy not found"); return false; }
 
+  const formationValidation=validateCurrentClanFormationAgainstConstraint();
+  if (!formationValidation.valid) {
+    console.log("Current My Clan formation does not satisfy the active formation context:",formationValidation);
+    return false;
+  }
+
   const formationQueue=getPersistentClanBattleQueueSlots();
   const startCharacterId=formationQueue[0]||null;
   const activePlayer=startCharacterId?getPlayerCharacter(startCharacterId):null;
@@ -36281,6 +36569,8 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   currentBattle.completedAt=null;
   currentBattle.claimedAt=null;
   currentBattle.completionRecorded=false;
+  currentBattle.outcome=null;
+  currentBattle.defeat=null;
   currentBattle.battleLog=[`${enemy.name} appears!`,`${currentBattle.activePlayer.name} prepares for battle.`];
 
   initializeBattleContributionRecordsFromDeployment();
@@ -36852,7 +37142,10 @@ function advanceBattleDeploymentQueue(side,participantId,reason="zero_remaining_
   };
   deployment.lastTransition=transition;
 
-  if (side==="player") syncBattleActivePlayerFromDeployment();
+  if (side==="player") {
+    syncBattleActivePlayerFromDeployment();
+    if (typeof clearBattleActionSelectionForActorChange==="function") clearBattleActionSelectionForActorChange();
+  }
   if (side==="enemy") syncBattleActiveEnemyFromDeployment();
 
   if (participant&&Array.isArray(currentBattle.battleLog)) {
@@ -38608,6 +38901,18 @@ function saveTestState() {
         true,
 
 
+    outcome:
+      currentBattle.outcome
+        ? cloneBattleRuntimeValue(currentBattle.outcome)
+        : null,
+
+
+    defeat:
+      currentBattle.defeat
+        ? cloneBattleRuntimeValue(currentBattle.defeat)
+        : null,
+
+
     battleLog:
       currentBattle.battleLog,
 
@@ -39222,6 +39527,34 @@ function setClanTeamSlot(
   }
 
 
+  const formationPlacement =
+    evaluateClanFormationPlacement(
+      characterId,
+      slotNumber
+    );
+
+
+  if (
+    !formationPlacement.allowed
+  ) {
+
+
+    return {
+
+      success:
+        false,
+
+      reason:
+        formationPlacement.reason,
+
+      contextId:
+        formationPlacement.contextId ||
+        null
+
+    };
+  }
+
+
   const character =
     getClanManageableRosterCharacters()
       .find(
@@ -39353,8 +39686,11 @@ function assignClanCharacterToNextOpenSlot(characterId) {
   const clan=ensureClanManagementState();
   const existingIndex=clan.teamSlots.indexOf(characterId);
   if (existingIndex>=0) return {success:true,changed:false,slotNumber:existingIndex+1,characterId};
-  const openIndex=clan.teamSlots.findIndex(id=>!id);
-  if (openIndex<0) return {success:false,reason:"clan_team_full"};
+  const openIndex=clan.teamSlots.findIndex((id,index)=>!id&&evaluateClanFormationPlacement(characterId,index+1).allowed);
+  if (openIndex<0) {
+    const anyOpen=clan.teamSlots.some(id=>!id);
+    return {success:false,reason:anyOpen?"no_eligible_open_formation_slot":"clan_team_full"};
+  }
   clan.teamSlots[openIndex]=characterId;
   playerData.clan=normalizeClanManagementState(clan);
   savePlayerData();
@@ -62019,6 +62355,21 @@ function renderBattleRosterSlot(
     );
 
 
+  const skillTargetState =
+    getBattleSkillTargetPresentationState(
+      side,
+      participant.id
+    );
+
+
+  const targetInteraction =
+    pouchTargetState.valid
+      ? "item"
+      : skillTargetState.valid
+        ? "skill"
+        : null;
+
+
   let primaryValue =
     "";
 
@@ -62047,7 +62398,7 @@ function renderBattleRosterSlot(
 
 
     primaryValue =
-      `BP ${currentPower}`;
+      `PL ${currentPower}`;
 
 
     secondaryValue =
@@ -62072,7 +62423,7 @@ function renderBattleRosterSlot(
 
 
     primaryValue =
-      `BP ${currentPower}`;
+      `PL ${currentPower}`;
 
 
     secondaryValue =
@@ -62092,21 +62443,36 @@ function renderBattleRosterSlot(
             ? "is-item-target"
             : ""
         }
+        ${
+          skillTargetState.valid
+            ? "is-skill-target"
+            : ""
+        }
+        ${
+          skillTargetState.selected
+            ? "is-selected-skill-target"
+            : ""
+        }
       "
       data-side="${side}"
       data-slot="${slot.slotNumber}"
       aria-current="${slot.active ? "true" : "false"}"
       ${
-        pouchTargetState.valid
+        targetInteraction
           ? `
               role="button"
               tabindex="0"
-              aria-label="Use selected Battle Pouch item on ${name}"
+              aria-label="${
+                targetInteraction === "item"
+                  ? `Use selected Battle Pouch item on ${name}`
+                  : `Select ${name} as Skill target`
+              }"
               onclick="
-                confirmSelectedBattlePouchTarget(
-                  '${side}',
-                  '${participant.id}'
-                )
+                ${
+                  targetInteraction === "item"
+                    ? `confirmSelectedBattlePouchTarget('${side}','${participant.id}')`
+                    : `setSelectedBattleSkillTarget('${side}','${participant.id}')`
+                }
               "
               onkeydown="
                 if (
@@ -62114,10 +62480,11 @@ function renderBattleRosterSlot(
                   event.key === ' '
                 ) {
                   event.preventDefault();
-                  confirmSelectedBattlePouchTarget(
-                    '${side}',
-                    '${participant.id}'
-                  );
+                  ${
+                    targetInteraction === "item"
+                      ? `confirmSelectedBattlePouchTarget('${side}','${participant.id}')`
+                      : `setSelectedBattleSkillTarget('${side}','${participant.id}')`
+                  };
                 }
               "
             `
@@ -62530,15 +62897,6 @@ function renderCombatOverlay(
         </div>
 
 
-        <button
-          type="button"
-          class="battle-live-retreat"
-          onclick="closeOverlay()"
-        >
-          RETREAT
-        </button>
-
-
         <div class="battle-live-status">
 
           <strong>
@@ -62621,7 +62979,7 @@ function renderCombatOverlay(
           </strong>
 
           <span>
-            / ${playerMaxBattlePL} BATTLE PL
+            / ${playerMaxBattlePL} PL
           </span>
 
         </div>
@@ -62645,21 +63003,9 @@ function renderCombatOverlay(
         </div>
 
 
+        ${renderBattleActionFamilyRow(activePlayer)}
+
         ${actionRegionMarkup}
-
-
-        <button
-          type="button"
-          class="battle-live-withdraw-action"
-          onclick="withdrawActiveBattleFighter()"
-          ${
-            canWithdraw
-              ? ""
-              : "disabled"
-          }
-        >
-          WITHDRAW
-        </button>
 
 
         <div class="battle-live-log">
@@ -67869,6 +68215,9 @@ function getSummonSkillSourceRefs(skill,actor) {
   ];
 }
 
+// =========================================================
+// BRICK 669 — SUMMON JOINS SHARED ACTION-FAMILY PRESENTATION
+// =========================================================
 function openBattleSummonActionFamily() {
   if (!currentBattle.active || currentBattle.battleOver) return {success:false,reason:"battle_not_active"};
   const actor=getBattleDeploymentParticipant("player",1);
@@ -67880,13 +68229,42 @@ function openBattleSummonActionFamily() {
   if (skills.length===0) return {success:false,reason:"no_prepared_summon_skills"};
   const state=ensureBattleRuntimeState().summonActionState;
   state.actorParticipantId=actor.id; state.summonId=attached.summonId; state.mode="summon_skills";
+  const region=syncBattleActionRegionState();
+  region.mode="summon";
+  region.selectedItemId=null;
+  region.selectedSkillId=null;
+  region.selectedTargetRef=null;
+  region.selectedSkillOptions={};
+  refreshBattleActionRegionPresentation();
   return {success:true,mode:state.mode,summonId:state.summonId,skillIds:skills.map(skill=>skill.id)};
 }
 
 function closeBattleSummonActionFamily() {
   const state=ensureBattleRuntimeState().summonActionState;
   state.actorParticipantId=null; state.summonId=null; state.mode="closed";
+  const region=syncBattleActionRegionState();
+  region.mode="skills";
+  region.selectedSkillId=null;
+  region.selectedTargetRef=null;
+  region.selectedSkillOptions={};
+  if (currentBattle.active&&!currentBattle.battleOver) refreshBattleActionRegionPresentation();
   return {success:true,mode:"closed"};
+}
+
+function renderBattleSummonActionRegion(actor) {
+  const attached=actor?getBattleAttachedSummon("player",actor.id):null;
+  if (!attached) return `<section class="battle-live-summon"><div class="battle-live-summon-title">SUMMON</div><div class="battle-live-summon-empty">NO ATTACHED SUMMON</div><button type="button" onclick="closeBattleSummonActionFamily()">← BACK</button></section>`;
+  const entity=getEntityDefinition(attached.summonId);
+  const skills=entity&&isAttachableSummonEntity(entity)?getSummonSkillsForEntity(attached.summonId):[];
+  return `
+    <section class="battle-live-summon" aria-label="Summon Actions">
+      <div class="battle-live-summon-title">SUMMON • ${attached.summonId}</div>
+      <div class="battle-live-summon-skills">
+        ${skills.length>0?skills.map(skill=>`<button type="button" class="battle-live-summon-skill" onclick="attemptBattleSummonSkill('${skill.id}')"><strong>${skill.displayName||skill.id}</strong><small>READY</small></button>`).join(""):`<div class="battle-live-summon-empty">NO AUTHORED SUMMON SKILLS</div>`}
+      </div>
+      <button type="button" onclick="closeBattleSummonActionFamily()">← BACK</button>
+    </section>
+  `;
 }
 
 function getSummonEntityLiveResolverStat(entityId,discipline,actor,exactPackageId=null) {
@@ -69556,6 +69934,9 @@ function attemptBattlePouchItem(
 //
 // =========================================================
 
+// =========================================================
+// BRICK 666 — BATTLE ACTION SELECTION STATE
+// =========================================================
 let battleActionRegionState = {
 
   battleId:
@@ -69565,7 +69946,16 @@ let battleActionRegionState = {
     "skills",
 
   selectedItemId:
-    null
+    null,
+
+  selectedSkillId:
+    null,
+
+  selectedTargetRef:
+    null,
+
+  selectedSkillOptions:
+    {}
 
 };
 
@@ -69593,7 +69983,16 @@ function syncBattleActionRegionState() {
         "skills",
 
       selectedItemId:
-        null
+        null,
+
+      selectedSkillId:
+        null,
+
+      selectedTargetRef:
+        null,
+
+      selectedSkillOptions:
+        {}
 
     };
   }
@@ -69610,6 +70009,15 @@ function syncBattleActionRegionState() {
 
     battleActionRegionState.selectedItemId =
       null;
+
+    battleActionRegionState.selectedSkillId =
+      null;
+
+    battleActionRegionState.selectedTargetRef =
+      null;
+
+    battleActionRegionState.selectedSkillOptions =
+      {};
   }
 
 
@@ -69667,6 +70075,15 @@ function openBattleItemActionFamily() {
   state.selectedItemId =
     null;
 
+  state.selectedSkillId =
+    null;
+
+  state.selectedTargetRef =
+    null;
+
+  state.selectedSkillOptions =
+    {};
+
 
   refreshBattleActionRegionPresentation();
 
@@ -69694,6 +70111,15 @@ function closeBattleItemActionFamily() {
 
   state.selectedItemId =
     null;
+
+  state.selectedSkillId =
+    null;
+
+  state.selectedTargetRef =
+    null;
+
+  state.selectedSkillOptions =
+    {};
 
 
   refreshBattleActionRegionPresentation();
@@ -69937,6 +70363,192 @@ function confirmSelectedBattlePouchTarget(
 }
 
 
+// =========================================================
+// BRICK 667 — SELECT → DETAILS → TARGET → CONFIRM / CANCEL
+// =========================================================
+function getSelectedBattleSkillId() {
+  const state=syncBattleActionRegionState();
+  return state.mode==="skills"?state.selectedSkillId:null;
+}
+
+function getBattlePreparedSkillDefaultTarget(actor,skill) {
+  if (!actor||!skill) return {side:null,participant:null};
+  if (["current_enemy","active_enemies","branch_selected"].includes(skill.targetMode)) {
+    return {side:"enemy",participant:getBattleDeploymentParticipant("enemy",1)};
+  }
+  if (skill.targetMode==="selected_ally") {
+    return {side:"player",participant:actor};
+  }
+  return {side:"player",participant:actor};
+}
+
+function getBattlePreparedSkillValidTargetRefs(skill,actor) {
+  if (!skill||!actor) return [];
+  if (skill.targetMode==="selected_ally") {
+    const slots=currentBattle.deployment&&currentBattle.deployment.player&&Array.isArray(currentBattle.deployment.player.slots)
+      ? currentBattle.deployment.player.slots
+      : [];
+    return slots
+      .map(slot=>slot&&slot.participantId?createBattleParticipantRef("player",slot.participantId):null)
+      .filter(ref=>ref&&!!getBattleParticipantByIdentity(ref.side,ref.participantId));
+  }
+  if (["current_enemy","active_enemies","branch_selected"].includes(skill.targetMode)) {
+    const enemy=getBattleDeploymentParticipant("enemy",1);
+    return enemy?[createBattleParticipantRef("enemy",enemy.id)]:[];
+  }
+  return [createBattleParticipantRef("player",actor.id)].filter(Boolean);
+}
+
+function selectBattlePreparedSkill(skillId) {
+  if (!currentBattle.active||currentBattle.battleOver) return {success:false,reason:"battle_not_active"};
+  const actor=getBattleDeploymentParticipant("player",1);
+  const skill=actor?getBattlePreparedSkillDefinition(actor,skillId):null;
+  if (!actor||!skill) return {success:false,reason:"skill_or_actor_missing"};
+
+  const defaultTarget=getBattlePreparedSkillDefaultTarget(actor,skill);
+  const availability=evaluateBattlePreparedSkillAvailability(skill,actor,defaultTarget.participant);
+  if (!availability.available && availability.reason!=="branch_selection_required") {
+    return {success:false,reason:availability.reason,availability};
+  }
+
+  const state=syncBattleActionRegionState();
+  state.mode="skills";
+  state.selectedItemId=null;
+  state.selectedSkillId=skill.id;
+  state.selectedSkillOptions={};
+  state.selectedTargetRef=defaultTarget.participant
+    ? createBattleParticipantRef(defaultTarget.side,defaultTarget.participant.id)
+    : null;
+
+  refreshBattleActionRegionPresentation();
+  return {
+    success:true,
+    selectedSkillId:skill.id,
+    selectedTargetRef:cloneBattleRuntimeValue(state.selectedTargetRef),
+    branchSelectionRequired:availability.reason==="branch_selection_required",
+    availableModes:skill.availableModes? [...skill.availableModes] : Object.keys(skill.modes||{})
+  };
+}
+
+function setSelectedBattleSkillTarget(side,participantId) {
+  const state=syncBattleActionRegionState();
+  if (!state.selectedSkillId) return {success:false,reason:"skill_not_selected"};
+  const actor=getBattleDeploymentParticipant("player",1);
+  const skill=actor?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
+  if (!actor||!skill) return {success:false,reason:"skill_or_actor_missing"};
+  const validRefs=getBattlePreparedSkillValidTargetRefs(skill,actor);
+  const valid=validRefs.some(ref=>ref.side===side&&ref.participantId===participantId);
+  if (!valid) return {success:false,reason:"invalid_skill_target",validTargetRefs:validRefs};
+  state.selectedTargetRef=createBattleParticipantRef(side,participantId);
+  refreshBattleActionRegionPresentation();
+  return {success:true,targetRef:cloneBattleRuntimeValue(state.selectedTargetRef)};
+}
+
+function setSelectedBattleSkillMode(mode) {
+  const state=syncBattleActionRegionState();
+  if (!state.selectedSkillId) return {success:false,reason:"skill_not_selected"};
+  const actor=getBattleDeploymentParticipant("player",1);
+  const skill=actor?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
+  if (!skill||skill.requiresExplicitModeSelection!==true) return {success:false,reason:"skill_mode_selection_not_required"};
+  const availableModes=Array.isArray(skill.availableModes)?skill.availableModes:Object.keys(skill.modes||{});
+  if (!availableModes.includes(mode)) return {success:false,reason:"invalid_skill_mode",availableModes:[...availableModes]};
+  state.selectedSkillOptions={...(state.selectedSkillOptions||{}),mode};
+  refreshBattleActionRegionPresentation();
+  return {success:true,mode};
+}
+
+function cancelSelectedBattleSkill() {
+  const state=syncBattleActionRegionState();
+  const cancelledSkillId=state.selectedSkillId||null;
+  state.selectedSkillId=null;
+  state.selectedTargetRef=null;
+  state.selectedSkillOptions={};
+  refreshBattleActionRegionPresentation();
+  return {
+    success:true,
+    cancelledSkillId,
+    actionOpportunityConsumed:false,
+    actionEnvelopeCreated:false
+  };
+}
+
+
+function clearBattleActionSelectionForActorChange() {
+  const state=syncBattleActionRegionState();
+  state.selectedSkillId=null;
+  state.selectedTargetRef=null;
+  state.selectedSkillOptions={};
+  state.selectedItemId=null;
+  return true;
+}
+
+function confirmSelectedBattleSkill() {
+  const state=syncBattleActionRegionState();
+  if (!state.selectedSkillId) return {success:false,reason:"skill_not_selected"};
+  const actor=getBattleDeploymentParticipant("player",1);
+  const skill=actor?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
+  if (!actor||!skill) return {success:false,reason:"skill_or_actor_missing"};
+
+  if (skill.requiresExplicitModeSelection===true && !(state.selectedSkillOptions&&state.selectedSkillOptions.mode)) {
+    return {
+      success:false,
+      reason:"branch_selection_required",
+      availableModes:Array.isArray(skill.availableModes)?[...skill.availableModes]:Object.keys(skill.modes||{})
+    };
+  }
+
+  const targetRef=state.selectedTargetRef;
+  const targetParticipantId=targetRef&&targetRef.participantId?targetRef.participantId:null;
+  const skillId=state.selectedSkillId;
+  const options=cloneBattleRuntimeValue(state.selectedSkillOptions||{})||{};
+
+  const result=attemptBattlePreparedSkill(skillId,targetParticipantId,options);
+  if (result&&result.success===true) {
+    state.selectedSkillId=null;
+    state.selectedTargetRef=null;
+    state.selectedSkillOptions={};
+  }
+  return result;
+}
+
+function getBattleSkillTargetPresentationState(side,participantId) {
+  const state=syncBattleActionRegionState();
+  if (state.mode!=="skills"||!state.selectedSkillId) return {valid:false,selected:false,skillId:null};
+  const actor=getBattleDeploymentParticipant("player",1);
+  const skill=actor?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
+  if (!actor||!skill) return {valid:false,selected:false,skillId:state.selectedSkillId};
+  const validRefs=getBattlePreparedSkillValidTargetRefs(skill,actor);
+  return {
+    valid:validRefs.some(ref=>ref.side===side&&ref.participantId===participantId),
+    selected:!!(state.selectedTargetRef&&state.selectedTargetRef.side===side&&state.selectedTargetRef.participantId===participantId),
+    skillId:state.selectedSkillId,
+    targetRefs:validRefs
+  };
+}
+
+
+// =========================================================
+// BRICK 668 — BATTLE ACTION-FAMILY CONTROL API
+// =========================================================
+function openBattleSkillsActionFamily() {
+  if (!currentBattle.active||currentBattle.battleOver) return {success:false,reason:"battle_not_active"};
+  const state=syncBattleActionRegionState();
+  state.mode="skills";
+  state.selectedItemId=null;
+  refreshBattleActionRegionPresentation();
+  return {success:true,mode:"skills"};
+}
+
+function invokeBattleWithdrawAction() {
+  const state=syncBattleActionRegionState();
+  state.selectedSkillId=null;
+  state.selectedTargetRef=null;
+  state.selectedSkillOptions={};
+  state.selectedItemId=null;
+  return withdrawActiveBattleFighter({reason:"manual_withdrawal"});
+}
+
+
 function getBattlePouchPresentationReason(
   availability
 ) {
@@ -69956,7 +70568,7 @@ function getBattlePouchPresentationReason(
   ) {
 
     case "battle_pl_already_full":
-      return "BP FULL";
+      return "PL FULL";
 
     case "no_compatible_condition":
       return "NO VALID TARGET";
@@ -70310,6 +70922,31 @@ function renderBattlePouchTray(
 }
 
 
+// =========================================================
+// BRICK 681 — FINAL ALPHA ACTION-FAMILY ROW
+// =========================================================
+function canOpenBattleSummonActionFamily(actor) {
+  const attached=actor?getBattleAttachedSummon("player",actor.id):null;
+  if (!attached) return false;
+  const entity=getEntityDefinition(attached.summonId);
+  return !!(entity&&isAttachableSummonEntity(entity)&&getSummonSkillsForEntity(attached.summonId).length>0);
+}
+
+function renderBattleActionFamilyRow(actor) {
+  const state=syncBattleActionRegionState();
+  const canWithdraw=canWithdrawActiveBattleFighter();
+  const canSummon=canOpenBattleSummonActionFamily(actor);
+  return `
+    <nav class="battle-live-action-family-row" aria-label="Battle Actions">
+      <button type="button" class="battle-live-action-family ${state.mode==="skills"?"is-selected":""}" onclick="openBattleSkillsActionFamily()">SKILLS</button>
+      <button type="button" class="battle-live-action-family ${state.mode==="items"?"is-selected":""}" onclick="openBattleItemActionFamily()">ITEM</button>
+      <button type="button" class="battle-live-action-family ${state.mode==="summon"?"is-selected":""}" onclick="openBattleSummonActionFamily()" ${canSummon?"":"disabled"}>SUMMON</button>
+      <button type="button" class="battle-live-action-family battle-live-withdraw-action" onclick="invokeBattleWithdrawAction()" ${canWithdraw?"":"disabled"}>WITHDRAW</button>
+    </nav>
+  `;
+}
+
+
 function renderBattleActionRegion(
   actor,
   target
@@ -70330,10 +70967,21 @@ function renderBattleActionRegion(
   }
 
 
-  return renderTemporaryBattleSkillDeck(
-    actor,
-    target
-  );
+  if (
+    state.mode ===
+      "summon"
+  ) {
+
+    return renderBattleSummonActionRegion(
+      actor
+    );
+  }
+
+
+  return `
+    ${renderTemporaryBattleSkillDeck(actor,target)}
+    ${renderBattleSelectedSkillDetails(actor,target)}
+  `;
 }
 
 
@@ -70344,7 +70992,7 @@ function renderBattleActionRegion(
 // =========================================================
 function getBattleUIParticipantSnapshot(side,slotIndex) {
   const slot=getBattleDeploymentSlot(side,slotIndex);
-  if (!slot||!slot.participantId) return {side,slotIndex,participantId:null,assignment:slotIndex<=3?"active":"reserve",empty:true};
+  if (!slot||!slot.participantId) return {side,slotIndex,participantId:null,assignment:slotIndex<=4?"queue":"reserve",queueRole:(getClanBattleQueueSlotDefinition(slotIndex)||{}).battleRole||null,empty:true};
   const participant=getBattleParticipantByIdentity(side,slot.participantId);
   const remaining=getBattleRemainingPL(side,slot.participantId);
   const maximum=getBattleMaximumPL(side,slot.participantId);
@@ -70354,7 +71002,7 @@ function getBattleUIParticipantSnapshot(side,slotIndex) {
   const acclimation=side==="player"&&participant&&weapon?getWeaponActionExecutionMultiplier(participant,weapon):null;
   return {
     side,slotIndex,participantId:slot.participantId,name:participant&&participant.name?participant.name:slot.participantId,
-    assignment:slotIndex<=3?"active":"reserve",currentActor:slotIndex===1,
+    assignment:slotIndex<=4?"queue":"reserve",queueRole:(getClanBattleQueueSlotDefinition(slotIndex)||{}).battleRole||null,currentActor:slotIndex===1,
     battlePL:{remaining,maximum,temporaryCapacity,totalDamageBearingCapacity:remaining+temporaryCapacity},
     stamina:participant?getBattleEffectiveStamina(side,slot.participantId):null,
     staminaIsResource:false,
@@ -73772,9 +74420,59 @@ function attemptBattlePreparedSkill(skillId,targetParticipantId=null,options={})
   return attemptAcademyBattleSkill(skillId);
 }
 
+function getBattlePreparedSkillPresentationDescription(skill) {
+  if (!skill) return "No Skill selected.";
+  const kind=String(skill.resolutionKind||skill.actionClass||"authored_action").replaceAll("_"," ");
+  const discipline=skill.primaryDiscipline?` • ${skill.primaryDiscipline}`:"";
+  return `${kind.toUpperCase()}${discipline}`;
+}
+
+function renderBattleSelectedSkillDetails(actor,target) {
+  const state=syncBattleActionRegionState();
+  if (state.mode!=="skills") return "";
+  const skill=actor&&state.selectedSkillId?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;
+  if (!skill) {
+    return `
+      <aside class="battle-live-skill-details" aria-label="Skill Details">
+        <div class="battle-live-skill-details-title">SKILL DETAILS</div>
+        <div class="battle-live-skill-details-empty">Select a Skill.</div>
+      </aside>
+    `;
+  }
+
+  const selectedTarget=state.selectedTargetRef
+    ? getBattleParticipantByIdentity(state.selectedTargetRef.side,state.selectedTargetRef.participantId)
+    : null;
+  const branchModes=skill.requiresExplicitModeSelection===true
+    ? (Array.isArray(skill.availableModes)?skill.availableModes:Object.keys(skill.modes||{}))
+    : [];
+  const selectedMode=state.selectedSkillOptions&&state.selectedSkillOptions.mode||null;
+  const modeMarkup=branchModes.length>0
+    ? `<div class="battle-live-skill-mode-list">${branchModes.map(mode=>`
+        <button type="button" class="battle-live-skill-mode ${selectedMode===mode?"is-selected":""}" onclick="setSelectedBattleSkillMode('${mode}')">${String(mode).replaceAll("_"," ").toUpperCase()}</button>
+      `).join("")}</div>`
+    : "";
+  const canConfirm=branchModes.length===0||!!selectedMode;
+
+  return `
+    <aside class="battle-live-skill-details" aria-label="Skill Details">
+      <div class="battle-live-skill-details-title">SKILL DETAILS</div>
+      <strong class="battle-live-skill-details-name">${skill.displayName||getFactorySkillDisplayName(skill.id)}</strong>
+      <span class="battle-live-skill-details-type">${getBattlePreparedSkillPresentationDescription(skill)}</span>
+      <span class="battle-live-skill-details-target">TARGET: ${selectedTarget?(selectedTarget.name||selectedTarget.id):"—"}</span>
+      ${modeMarkup}
+      <div class="battle-live-skill-details-actions">
+        <button type="button" class="battle-live-use-skill" onclick="confirmSelectedBattleSkill()" ${canConfirm?"":"disabled"}>USE SKILL</button>
+        <button type="button" class="battle-live-cancel-skill" onclick="cancelSelectedBattleSkill()">CANCEL</button>
+      </div>
+    </aside>
+  `;
+}
+
 function renderTemporaryBattleSkillDeck(actor,target) {
   const presentation=actor?getBattleUISkillPalettePresentation(actor):{skillIds:[],source:"none"};
   const skillIds=Array.isArray(presentation.skillIds)?presentation.skillIds:[];
+  const state=syncBattleActionRegionState();
   const cards=[];
   for (let index=0;index<5;index+=1) {
     const skillId=skillIds[index]||null;
@@ -73783,12 +74481,15 @@ function renderTemporaryBattleSkillDeck(actor,target) {
       cards.push(`<div class="battle-dev-skill-card is-empty"><span>${index===0&&skillIds.length===0?"NO AUTHORED SKILLS":"EMPTY"}</span></div>`);
       continue;
     }
-    const availability=evaluateBattlePreparedSkillAvailability(skill,actor,target);
+    const skillDefaultTarget=getBattlePreparedSkillDefaultTarget(actor,skill);
+    const availability=evaluateBattlePreparedSkillAvailability(skill,actor,skillDefaultTarget.participant);
+    const selectable=availability.available===true||availability.reason==="branch_selection_required";
+    const selected=state.selectedSkillId===skill.id;
     const conditionBlocked=isBattleSkillConditionBlocked(availability);
     const blockingCondition=conditionBlocked?getBattleSkillBlockingConditionPresentation(availability):null;
-    const status=availability.available?"READY":String(availability.reason||"UNAVAILABLE").replaceAll("_"," ").toUpperCase();
+    const status=selected?"SELECTED":availability.available?"READY":availability.reason==="branch_selection_required"?"READY":String(availability.reason||"UNAVAILABLE").replaceAll("_"," ").toUpperCase();
     const conditionSealMarkup=blockingCondition?`<span class="battle-skill-condition-seal" aria-hidden="true"><span class="battle-skill-condition-seal-symbol">◉</span><span class="battle-skill-condition-seal-headline">${blockingCondition.sealHeadline}</span><strong class="battle-skill-condition-seal-state">${blockingCondition.sealState}</strong></span>`:"";
-    cards.push(`<button type="button" class="battle-dev-skill-card ${availability.available?"is-ready":"is-disabled"} ${conditionBlocked?"is-condition-blocked":""}" onclick="attemptBattlePreparedSkill('${skill.id}')" ${availability.available?"":"disabled"} ${blockingCondition?`data-blocking-condition-id="${blockingCondition.conditionId||""}"`:""} title="${status}"><span class="battle-dev-skill-discipline">${skill.primaryDiscipline||"AUTHORED"}</span><strong>${skill.displayName||getFactorySkillDisplayName(skill.id)}</strong><span class="battle-dev-skill-type">${skill.actionClass||skill.type||"Technique"}</span><small>${status}</small>${conditionSealMarkup}</button>`);
+    cards.push(`<button type="button" class="battle-dev-skill-card ${selectable?"is-ready":"is-disabled"} ${selected?"is-selected":""} ${conditionBlocked?"is-condition-blocked":""}" onclick="selectBattlePreparedSkill('${skill.id}')" ${selectable?"":"disabled"} ${blockingCondition?`data-blocking-condition-id="${blockingCondition.conditionId||""}"`:""} aria-pressed="${selected?"true":"false"}" title="${status}"><span class="battle-dev-skill-discipline">${skill.primaryDiscipline||"AUTHORED"}</span><strong>${skill.displayName||getFactorySkillDisplayName(skill.id)}</strong><span class="battle-dev-skill-type">${skill.actionClass||skill.type||"Technique"}</span><small>${status}</small>${conditionSealMarkup}</button>`);
   }
   return `<div class="battle-live-skill-deck" aria-label="Prepared Battle Skills" data-palette-source="${presentation.source||"unknown"}">${cards.join("")}</div>`;
 }
@@ -74526,6 +75227,11 @@ function resolveBattlePreStaminaDefense(definition) {
   return result;
 }
 
+// =========================================================
+// BRICK 659 — VICTORY COMMITS EXPLICIT OUTCOME
+// BRICK 662 — REAL DEFEAT LIFECYCLE
+// BRICK 663 — BOSS SUCCESSION PRECEDES VICTORY
+// =========================================================
 function completeBattleVictoryFromDamage(
   finishingShinobi,
   envelope = null,
@@ -74536,6 +75242,15 @@ function completeBattleVictoryFromDamage(
   currentBattle.battleOver=true;
   currentBattle.active=false;
   currentBattle.completedAt=Date.now();
+  currentBattle.outcome={
+    type:"victory",
+    committed:true,
+    completedAt:currentBattle.completedAt,
+    finishingShinobiId:finishingShinobi?finishingShinobi.id:null,
+    defeatedParticipantId:defeatedParticipantId||null,
+    rewardAuthorityEnemyId:rewardSource?rewardSource.id:null
+  };
+  currentBattle.defeat=null;
   const rewards=generateBattleRewards(rewardSource,finishingShinobi);
   const mvp=calculateBattleMVP();
   if (rewards&&mvp) rewards.mvp=mvp;
@@ -74544,13 +75259,55 @@ function completeBattleVictoryFromDamage(
     actionId:envelope?envelope.actionId:null,
     actorRef:finishingShinobi?createBattleParticipantRef("player",finishingShinobi.id):null,
     targetRef:defeatedParticipantId?createBattleParticipantRef("enemy",defeatedParticipantId):null,
-    data:{enemyRemainingBattlePL:0,finishingShinobiId:finishingShinobi?finishingShinobi.id:null,enemyDeploymentExhausted:true,rewardAuthorityEnemyId:rewardSource?rewardSource.id:null}
+    data:{enemyRemainingBattlePL:0,finishingShinobiId:finishingShinobi?finishingShinobi.id:null,enemyDeploymentExhausted:true,rewardAuthorityEnemyId:rewardSource?rewardSource.id:null,outcomeCommitted:true}
   });
   // Victory presentation still expects an enemy compatibility object.
   currentBattle.enemy=rewardSource;
   saveTestState();
   openOverlay("victory");
   return rewards;
+}
+
+function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="player_deployment_exhausted") {
+  if (currentBattle.battleOver===true) return currentBattle.outcome;
+  const completedAt=Date.now();
+  currentBattle.battleOver=true;
+  currentBattle.active=false;
+  currentBattle.completedAt=completedAt;
+  currentBattle.claimedAt=null;
+  currentBattle.completionRecorded=false;
+  currentBattle.outcome={
+    type:"defeat",
+    committed:true,
+    completedAt,
+    reason,
+    defeatedParticipantId:defeatedParticipantId||null,
+    rewardsGenerated:false,
+    rewardClaimAvailable:false,
+    historyPreserved:true
+  };
+  currentBattle.defeat=cloneBattleRuntimeValue(currentBattle.outcome);
+
+  if (Array.isArray(currentBattle.battleLog)) {
+    currentBattle.battleLog.push("All deployed shinobi have reached 0 Battle PL. DEFEAT.");
+  }
+
+  recordBattleEvidence({
+    eventType:"battle_defeat",
+    actionId:envelope&&envelope.actionId?envelope.actionId:null,
+    targetRef:defeatedParticipantId?createBattleParticipantRef("player",defeatedParticipantId):null,
+    data:{
+      reason,
+      playerDeploymentExhausted:true,
+      outcomeCommitted:true,
+      rewardsGenerated:false,
+      rewardClaimAvailable:false,
+      historyRollback:false
+    }
+  });
+
+  saveTestState();
+  return currentBattle.outcome;
 }
 
 function handleBattleParticipantAtZeroPL(
@@ -74563,21 +75320,23 @@ function handleBattleParticipantAtZeroPL(
   const slotNumber=getBattleDeploymentParticipantSlotNumber(side,participantId);
   if (!slotNumber) return null;
 
-  const transition=advanceBattleParticipantAtZeroPL(side,participantId);
-
   if (side==="enemy") {
+    const bossTransition=tryAdvanceAuthoritativeBossStage(participantId,envelope||null);
+    if (bossTransition&&bossTransition.success===true) return bossTransition;
+
+    const transition=advanceBattleParticipantAtZeroPL(side,participantId);
     if (hasBattleDeploymentParticipants("enemy")) return transition;
     return completeBattleVictoryFromDamage(actor,envelope,participantId);
   }
 
   if (side==="player") {
+    const transition=advanceBattleParticipantAtZeroPL(side,participantId);
     if (hasBattleDeploymentParticipants("player")) return transition;
-    if (Array.isArray(currentBattle.battleLog)) currentBattle.battleLog.push("All deployed shinobi have reached 0 Battle PL.");
-    recordBattleEvidence({eventType:"player_deployment_exhausted",actionId:envelope&&envelope.actionId?envelope.actionId:null,targetRef:createBattleParticipantRef("player",participantId),data:{defeatPresentationDeferred:true}});
-    return transition;
+    completeBattleDefeat(participantId,envelope||null,"player_deployment_exhausted");
+    return transition||currentBattle.outcome;
   }
 
-  return transition;
+  return advanceBattleParticipantAtZeroPL(side,participantId);
 }
 
 function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
@@ -76111,6 +76870,145 @@ function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null,options=
   if (!currentBattle.battleOver) openOverlay("combat");
   return {success:resolution.resolved===true,envelope,resolution};
 }
+
+// =========================================================
+// BRICK 671 — ENEMY AUTHORED ACTION SCHEDULER FOUNDATION
+// BRICK 672 — RANDOMNESS ONLY AFTER SEMANTIC ELIGIBILITY
+// =========================================================
+// Coding owns scheduling. Combat owns the concrete enemy actions.
+// No generic damage/action is invented when authored authority is absent.
+function getEnemyAuthoredBattleActions(enemy) {
+  return enemy&&Array.isArray(enemy.authoredBattleActions)
+    ? enemy.authoredBattleActions.filter(action=>action&&typeof action.id==="string")
+    : [];
+}
+
+function evaluateEnemyAuthoredActionEligibility(action,enemy,target) {
+  if (!action) return {eligible:false,reason:"enemy_action_missing"};
+  if (typeof action.evaluateAvailability==="function") {
+    const result=action.evaluateAvailability({enemy,target,currentBattle});
+    if (!result||result.available!==true) {
+      return {eligible:false,reason:result&&result.reason?result.reason:"enemy_action_unavailable",detail:result||null};
+    }
+  }
+  if (typeof action.resolve!=="function") {
+    return {eligible:false,reason:"enemy_action_resolver_missing"};
+  }
+  return {eligible:true,reason:null};
+}
+
+function getEligibleEnemyAuthoredBattleActions(enemy,target) {
+  return getEnemyAuthoredBattleActions(enemy)
+    .map(action=>({action,eligibility:evaluateEnemyAuthoredActionEligibility(action,enemy,target)}))
+    .filter(entry=>entry.eligibility.eligible===true);
+}
+
+function evaluateEnemyActionScheduler() {
+  if (!currentBattle.active||currentBattle.battleOver) return {ready:false,reason:"battle_not_active"};
+  const enemy=getBattleDeploymentParticipant("enemy",1);
+  const target=getBattleDeploymentParticipant("player",1);
+  if (!enemy) return {ready:false,reason:"enemy_actor_missing"};
+  if (!target) return {ready:false,reason:"player_target_missing"};
+
+  const authored=getEnemyAuthoredBattleActions(enemy);
+  if (authored.length===0) {
+    return {
+      ready:false,
+      reason:"enemy_action_authority_missing",
+      enemyId:enemy.id,
+      inventedFallback:false
+    };
+  }
+
+  const eligible=getEligibleEnemyAuthoredBattleActions(enemy,target);
+  if (eligible.length===0) {
+    return {
+      ready:false,
+      reason:"no_semantically_eligible_enemy_action",
+      enemyId:enemy.id,
+      authoredActionIds:authored.map(action=>action.id),
+      inventedFallback:false
+    };
+  }
+
+  return {
+    ready:true,
+    reason:null,
+    enemyId:enemy.id,
+    targetParticipantId:target.id,
+    eligibleActions:eligible.map(entry=>entry.action),
+    eligibleActionIds:eligible.map(entry=>entry.action.id),
+    randomnessApplied:false
+  };
+}
+
+function chooseEnemyAuthoredBattleAction(schedulerState=null) {
+  const state=schedulerState&&schedulerState.ready===true?schedulerState:evaluateEnemyActionScheduler();
+  if (!state.ready) return {success:false,...state};
+  const candidates=state.eligibleActions||[];
+  if (candidates.length===0) return {success:false,reason:"no_semantically_eligible_enemy_action"};
+  const index=Math.floor(Math.random()*candidates.length);
+  return {
+    success:true,
+    action:candidates[index],
+    eligibleActionIds:candidates.map(action=>action.id),
+    randomnessAppliedAfterEligibility:true
+  };
+}
+
+function executeEnemyAuthoredActionOpportunity() {
+  const scheduler=evaluateEnemyActionScheduler();
+  if (!scheduler.ready) {
+    recordBattleEvidence({
+      eventType:"enemy_action_scheduler_waiting_for_authority",
+      actorRef:getBattleActiveParticipantId("enemy")?createBattleParticipantRef("enemy",getBattleActiveParticipantId("enemy")):null,
+      targetRef:getBattleActiveParticipantId("player")?createBattleParticipantRef("player",getBattleActiveParticipantId("player")):null,
+      data:{reason:scheduler.reason||null,inventedFallback:false}
+    });
+    return {success:false,...scheduler};
+  }
+
+  const choice=chooseEnemyAuthoredBattleAction(scheduler);
+  if (!choice.success) return choice;
+
+  const enemy=getBattleDeploymentParticipant("enemy",1);
+  const target=getBattleDeploymentParticipant("player",1);
+  const action=choice.action;
+  const envelope=createBattleActionEnvelope({
+    actorSide:"enemy",
+    actorParticipantId:enemy.id,
+    targetSide:"player",
+    targetParticipantId:target.id,
+    actionClass:action.actionClass||"enemy_authored_action",
+    skillId:action.skillId||action.id,
+    sourceRefs:Array.isArray(action.sourceRefs)?action.sourceRefs:[],
+    data:{traits:Array.isArray(action.traits)?[...action.traits]:[],authoredEnemyAction:true}
+  });
+  const entry=beginBattleActionResolution(envelope);
+  if (!entry.accepted) return {success:false,reason:entry.validation.reason,entry};
+
+  const resolution=action.resolve({enemy,target,envelope,currentBattle});
+  const resolved=!!(resolution&&resolution.resolved===true);
+  recordBattleEvidence({
+    eventType:"enemy_authored_action_completed",
+    actionId:envelope.actionId,
+    actorRef:envelope.actorRef,
+    targetRef:envelope.targetRef,
+    skillId:envelope.skillId,
+    sourceRefs:envelope.sourceRefs,
+    data:{
+      resolved,
+      actionId:action.id,
+      randomnessAppliedAfterEligibility:true,
+      inventedFallback:false
+    }
+  });
+  if (resolved) consumeBattleActionOpportunity("enemy",enemy.id,envelope.actionId,"valid_enemy_action_completed");
+  saveTestState();
+  if (!currentBattle.battleOver) openOverlay("combat");
+  return {success:resolved,envelope,resolution,choice};
+}
+
 
 // BRICK 310 — SHARED SKILL ACTION ENTRY
 // =========================================================
@@ -77902,6 +78800,151 @@ function claimDailyReward() {
   );
 }
 
+// =========================================================
+// BRICK 675 — COMPLETE KURAMA RUNTIME-BOUNDARY DIAGNOSTIC
+// BRICK 676 — BOSS SUCCESSION DIAGNOSTIC
+// BRICK 677 — DEFEAT LIFECYCLE DIAGNOSTIC
+// BRICK 678 — ACTION-SELECTION DIAGNOSTIC
+// BRICK 679 — ENEMY-SCHEDULER AUTHORITY DIAGNOSTIC
+// BRICK 680 — FORMATION-REUSE / PRE-CONTENT BOUNDARY DIAGNOSTIC
+// =========================================================
+
+function runCompleteKuramaRuntimeBoundaryDiagnostics() {
+  const entity=getEntityDefinition("kurama_complete");
+  const result={
+    hostedRepresentationAddressable:!!getHostedEntityDefinition("kurama_complete"),
+    authoritativeReunionOnly:!!entity&&entity.manifestationMode==="authoritative_reunion"&&entity.requiresAuthoritativeReunion===true,
+    notOrdinarySummon:!!entity&&!isAttachableSummonEntity(entity),
+    independentCalibration:!!entity&&entity.basePL===138&&JSON.stringify(ALPHA_CANONICAL_STAT_KEYS.map(key=>Number(entity.baseStats[key])))===JSON.stringify([132,124,84,116,84,38,148]),
+    descriptorDoesNotCreateParticipant:getCombinedExpressionRuntimeDescriptor.toString().includes("independentBattleParticipantCreated:false"),
+    noConstituentProjection:getCombinedExpressionRuntimeDescriptor.toString().includes("projectConstituentPackagesIntoComplete:false"),
+    noEntityPLMerge:getCombinedExpressionRuntimeDescriptor.toString().includes("mergeEntityPL:false")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runBossStageSuccessionDiagnostics() {
+  const canon=["undying_madara","black_madara","failed_god_madara"];
+  const alternate=["fallen_hokage_sasuke","shadow_of_indra","sixth_shadow"];
+  const handlerSource=handleBattleParticipantAtZeroPL.toString();
+  const transitionSource=transitionAuthoritativeBossStage.toString();
+  const result={
+    canonChainExact:getAuthoritativeBossStageSuccessor(canon[0])===canon[1]&&getAuthoritativeBossStageSuccessor(canon[1])===canon[2]&&getAuthoritativeBossStageSuccessor(canon[2])===null,
+    alternateChainExact:getAuthoritativeBossStageSuccessor(alternate[0])===alternate[1]&&getAuthoritativeBossStageSuccessor(alternate[1])===alternate[2]&&getAuthoritativeBossStageSuccessor(alternate[2])===null,
+    allSixAdaptable:[...canon,...alternate].every(id=>{const participant=createBossStageBattleParticipant(id);const record=getCharacterRegistryEntry(id);return !!participant&&participant.power===record.basePL&&participant.stats.stamina===record.baseStats.stamina;}),
+    successionCheckedBeforeGenericRemoval:handlerSource.indexOf("tryAdvanceAuthoritativeBossStage")>=0&&handlerSource.indexOf("tryAdvanceAuthoritativeBossStage")<handlerSource.indexOf("advanceBattleParticipantAtZeroPL"),
+    transitionDoesNotInheritPackages:transitionSource.includes("inheritPriorStagePackages:false"),
+    stableRewardAuthority:transitionSource.includes("rewardAuthorityEnemyId"),
+    noPerfectSusanooStage:!Object.prototype.hasOwnProperty.call(BOSS_STAGE_SUCCESSION_AUTHORITY,"perfect_susanoo")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runBattleDefeatLifecycleDiagnostics() {
+  const defeatSource=completeBattleDefeat.toString();
+  const zeroSource=handleBattleParticipantAtZeroPL.toString();
+  const result={
+    explicitOutcomeAuthority:Object.prototype.hasOwnProperty.call(currentBattle,"outcome")&&Object.prototype.hasOwnProperty.call(currentBattle,"defeat"),
+    defeatCommitsBattleOver:defeatSource.includes("currentBattle.battleOver=true")&&defeatSource.includes("currentBattle.active=false"),
+    noRewardClaimOnDefeat:defeatSource.includes("rewardClaimAvailable:false")&&defeatSource.includes("rewardsGenerated:false"),
+    historyPreserved:defeatSource.includes("historyRollback:false"),
+    zeroPLCommitsDefeat:zeroSource.includes("completeBattleDefeat"),
+    saveCarriesOutcome:saveTestState.toString().includes("outcome:")&&restoreTestState.toString().includes("state.outcome"),
+    oldDeferredFlagRetired:!zeroSource.includes("defeatPresentationDeferred:true")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runBattleActionSelectionDiagnostics() {
+  const selectSource=selectBattlePreparedSkill.toString();
+  const confirmSource=confirmSelectedBattleSkill.toString();
+  const cancelSource=cancelSelectedBattleSkill.toString();
+  const deckSource=renderTemporaryBattleSkillDeck.toString();
+  const result={
+    selectionStateHasSkill:Object.prototype.hasOwnProperty.call(battleActionRegionState,"selectedSkillId"),
+    selectionStateHasTarget:Object.prototype.hasOwnProperty.call(battleActionRegionState,"selectedTargetRef"),
+    selectionDoesNotExecute:!selectSource.includes("attemptBattlePreparedSkill("),
+    confirmOwnsExecution:confirmSource.includes("attemptBattlePreparedSkill("),
+    cancelConsumesNothing:cancelSource.includes("actionOpportunityConsumed:false")&&cancelSource.includes("actionEnvelopeCreated:false"),
+    deckSelectsNotExecutes:deckSource.includes("selectBattlePreparedSkill")&&!deckSource.includes("onclick=\"attemptBattlePreparedSkill"),
+    detailsUseAndCancel:renderBattleSelectedSkillDetails.toString().includes("confirmSelectedBattleSkill")&&renderBattleSelectedSkillDetails.toString().includes("cancelSelectedBattleSkill"),
+    branchModeHeldUntilSelection:confirmSource.includes("branch_selection_required")&&typeof setSelectedBattleSkillMode==="function",
+    summonSharesActionRegion:renderBattleActionRegion.toString().includes("renderBattleSummonActionRegion"),
+    finalFourActionControls:["SKILLS","ITEM","SUMMON","WITHDRAW"].every(label=>renderBattleActionFamilyRow.toString().includes(label)),
+    noFloatingRetreatControl:!renderCombatOverlay.toString().includes("battle-live-retreat"),
+    withdrawUsesAuthoritativeLifecycle:renderBattleActionFamilyRow.toString().includes("invokeBattleWithdrawAction")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runEnemyActionSchedulerBoundaryDiagnostics() {
+  const chooseSource=chooseEnemyAuthoredBattleAction.toString();
+  const executeSource=executeEnemyAuthoredActionOpportunity.toString();
+  const result={
+    genericScoutHasNoInventedActions:getEnemyAuthoredBattleActions(enemyDatabase.scout).length===0,
+    genericBanditHasNoInventedActions:getEnemyAuthoredBattleActions(enemyDatabase.bandit).length===0,
+    missingAuthorityExplicit:evaluateEnemyActionScheduler.toString().includes("enemy_action_authority_missing"),
+    noFallbackDamage:evaluateEnemyActionScheduler.toString().includes("inventedFallback:false"),
+    randomnessAfterEligibility:chooseSource.includes("eligibleActions")&&chooseSource.includes("Math.random"),
+    sharedActionEnvelope:executeSource.includes("createBattleActionEnvelope")&&executeSource.includes('actorSide:"enemy"'),
+    sharedOpportunityLifecycle:executeSource.includes('consumeBattleActionOpportunity("enemy"'),
+    resolverMustBeAuthored:evaluateEnemyAuthoredActionEligibility.toString().includes('typeof action.resolve!=="function"')
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runFormationConstraintReuseDiagnostics() {
+  const setSlotSource=setClanTeamSlot.toString();
+  const startSource=startEncounter.toString();
+  const result={
+    sameSixSlotAuthority:CLAN_TEAM_SLOT_COUNT===6&&CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS.length===6,
+    noParallelTeamStore:normalizeClanFormationConstraint.toString().includes("eligibleRegistryIds")&&!normalizeClanFormationConstraint.toString().includes("teamSlots:"),
+    placementUsesExistingClan:setSlotSource.includes("evaluateClanFormationPlacement")&&setSlotSource.includes("ensureClanManagementState"),
+    battleLaunchValidatesSameFormation:startSource.includes("validateCurrentClanFormationAgainstConstraint")&&startSource.includes("getPersistentClanBattleQueueSlots"),
+    runtimeEligibilityHook:typeof setActiveClanFormationConstraint==="function"&&typeof getClanFormationEligibleRosterCharacters==="function",
+    slotAvailabilityHook:evaluateClanFormationPlacement.toString().includes("formation_slot_unavailable"),
+    leaderEligibilityHook:evaluateClanFormationPlacement.toString().includes("character_not_eligible_for_leader_slot"),
+    uiSnapshotUsesFourQueueSlots:getBattleUIParticipantSnapshot.toString().includes('slotIndex<=4?"queue":"reserve"'),
+    presentationTerminologyPL:!renderBattleRosterSlot.toString().includes("BP ")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPreContentBoundaryDiagnostics() {
+  const groups={
+    production:runAlphaProductionRegistryGate(),
+    academy:runAcademyExpansion102Diagnostics(),
+    factory:runFactoryBatches1To4ImplementationDiagnostics(),
+    clanQueue:runClanBattleQueueAlignmentDiagnostics(),
+    kikaichu:runKikaichuSourceMigrationDiagnostics(),
+    completeKurama:runCompleteKuramaRuntimeBoundaryDiagnostics(),
+    bossSuccession:runBossStageSuccessionDiagnostics(),
+    defeat:runBattleDefeatLifecycleDiagnostics(),
+    actionSelection:runBattleActionSelectionDiagnostics(),
+    enemyScheduler:runEnemyActionSchedulerBoundaryDiagnostics(),
+    formationReuse:runFormationConstraintReuseDiagnostics()
+  };
+  const result={
+    pass:Object.values(groups).every(group=>group&&group.pass===true),
+    groups
+  };
+  console.log("SC Alpha pre-content boundary:",result.pass?"PASS":"FAIL");
+  return result;
+}
+
+
 // #########################################################
 // SAVE & DEVELOPMENT SYSTEMS
 // #########################################################
@@ -78056,6 +79099,20 @@ function restoreTestState() {
     true;
 
 
+  currentBattle.outcome =
+    state.outcome &&
+    typeof state.outcome === "object"
+      ? cloneBattleRuntimeValue(state.outcome)
+      : null;
+
+
+  currentBattle.defeat =
+    state.defeat &&
+    typeof state.defeat === "object"
+      ? cloneBattleRuntimeValue(state.defeat)
+      : null;
+
+
   // =========================================
   // BATTLE POWER
   // =========================================
@@ -78188,6 +79245,36 @@ function restoreTestState() {
   // =========================================
   // RESTORE SCREEN
   // =========================================
+
+  if (
+    currentBattle.outcome &&
+    currentBattle.outcome.type ===
+      "defeat"
+  ) {
+
+
+    currentBattle.active =
+      false;
+
+
+    currentBattle.battleOver =
+      true;
+
+
+    if (
+      selectedRegionKey
+    ) {
+
+
+      openOverlay(
+        "battle"
+      );
+    }
+
+
+    return;
+  }
+
 
   if (
     state.overlayType ===
