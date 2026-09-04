@@ -3,7 +3,7 @@
 **Status:** Current production authority checkpoint  
 **Date:** 2026-09-04
 
-This document records current PL / Character Registry / Rank authority for Alpha reconciliation. It does not replace Combat, Writing, Character Creation, Codex/CE, Acquisition, UI, or Coding ownership.
+This document records current PL / Character Registry / Rank / Acquisition-boundary authority for Alpha reconciliation. It does not replace Combat, Writing, Character Creation, Codex/CE, UI, or Coding ownership.
 
 ---
 
@@ -87,13 +87,28 @@ Preserve:
 
 No current handoff authorises recalibration of the locked 102 production identities.
 
-### Legacy Battle-entry variation
+### Legacy Battle-entry variation — RETIRED
 
-Legacy Battle-entry multipliers and random ±10% capacity variation, if still live, are Battle-runtime policy only. They are **not Base, Current, or Effective PL authority** and must not trigger Stat/PL recalibration. Combat must classify them KEEP / REPLACE / RETIRE / DEVELOPMENT-ONLY before Combat freeze.
+Combat has retired the following from production Battle entry:
+
+- random ±10% Remaining-Battle-PL capacity variation;
+- elite ×1.25;
+- `groupBoss` ×8;
+- `guardBoss` ×50.
+
+These are no longer production Battle-entry authority. No Base, Current, or Effective PL/Stat recalibration follows their retirement.
+
+**Stamina remains mitigation, not Battle-capacity scaling.**
+
+Any stale runtime implementation of those multipliers is compatibility/dead-code cleanup for Coding, not PL authority.
 
 ### Legacy world-region PL fossils
 
 Old `worldRegions` fields such as `recommendedPL`, `enemyMin`, `enemyMax`, and old `getLocationThreat()` values are **not current PL authority**. Do not recalibrate them in place. Coding must either retire the dead compatibility path or quarantine it from current Knowledge-sensitive hotspot presentation and modern PL comparisons.
+
+### Wasabi route / Intercept resolver boundary
+
+Wasabi's Intercept route is tactical inference/prediction. It does **not** create or imply a hidden Speed/Agility Stat, hidden turn-order Stat, or direct PL modifier.
 
 ---
 
@@ -166,6 +181,23 @@ Initial Academy Team Formation requires:
 
 before ordinary Academy free play.
 
+### Acquisition/Rank column for the Ten-Origin matrix
+
+For all ten exact Origin IDs, the Acquisition/Rank architecture is **LOCKED** independently of Writing completeness:
+
+- Origin selection acquires/sets the exact Origin protagonist only;
+- it does not auto-acquire the other nine Academy representations;
+- the protagonist begins the Active Konoha progression at formal rank Academy unless exact upstream authority later says otherwise;
+- after the exact Origin prologue reaches the committed Active-Konoha entry boundary, Academy Team Formation requires two distinct eligible Academy teammates;
+- ordinary Academy free play remains gated until that three-person Academy team is complete;
+- per-Origin Writing lock, Coding integration, UI presentation, continuity verification, and runtime testing must be reported independently and cannot be inferred from this Acquisition/Rank lock.
+
+Preserve:
+
+**skeleton lock ≠ authored-content completion**
+
+**shared Origin acquisition architecture ≠ shared Origin sequence**
+
 ---
 
 ## 7. Alpha Arena Promotion contract — Rank authority
@@ -229,18 +261,57 @@ Writing still owns the first actual Academy→Genin assessment fiction/content a
 
 ---
 
-## 8. Genin Roster Transition — Jōnin leader boundary
+## 8. Genin Roster Transition — Acquisition + Rank contract
 
 Successful Genin promotion opens a **separate** `geninRosterTransition`.
 
 To complete the Alpha Genin Roster Transition, the player must:
 
-- keep both current Academy teammates, replace one, or replace both through the legitimate candidate/acquisition authority; and
+- keep both current Academy teammates, replace one, or replace both through legitimate candidate/acquisition authority; and
 - select/assign **one eligible Jōnin leader**.
 
 Jōnin leader selection is therefore **mandatory for transition completion**, but it is not what causes the already-earned Genin promotion.
 
 A leader candidate must be explicitly authorised as eligible and normally hold formal rank **Jōnin**. Do not infer a universal all-Jōnin pool. Any future exception for another rank requires explicit authority.
+
+### Candidate authority
+
+CE/history supplies the causal/history context used to determine who may be available. Acquisition owns the candidate/acquisition transaction and team mutation. Rank owns the formal-rank/leader-role boundary.
+
+A candidate list is therefore an authoritative snapshot, not a static global roster.
+
+Candidate availability may legitimately depend on:
+
+- actions and outcomes in the current Chronicle;
+- relationships/Shared History where authorised;
+- observer/world Knowledge where relevant to discoverability;
+- timing, including how quickly or slowly the player promoted;
+- exact acquisition/recruitment prerequisites;
+- current world state.
+
+Fast promotion is not inherently superior to slow promotion, and slow promotion is not inherently superior to fast promotion.
+
+### Retaining an existing teammate
+
+Keeping an existing Academy teammate in the Genin team:
+
+- does not create a new acquisition record;
+- does not replace the Registry representation;
+- preserves the same owned-character continuity and Shared History;
+- requires that the teammate is still legitimately eligible for the Genin team role.
+
+### Replacing a teammate
+
+Replacing one or both teammates:
+
+- does not delete or un-own the outgoing teammate;
+- does not erase prior team/Shared History;
+- requires the selected replacement to be explicitly eligible;
+- if the replacement is not already legitimately acquired/owned under the relevant character-system contract, selection must not silently manufacture ownership; the required acquisition/recruitment transaction must resolve first.
+
+An acquisition record created through that route remains historical/ownership truth even if the player later changes the final team assignment.
+
+### Jōnin leader assignment
 
 Preserve:
 
@@ -250,7 +321,13 @@ Preserve:
 
 **Genin promotion ≠ first-team creation**
 
-Leadership assignment is a team/progression role, not automatically Battle slot 1 or My Clan queue position. Acquisition/CE owns candidate availability and any required transaction; Coding consumes the closed candidate list and Rank state.
+A Jōnin leader cannot be assigned merely because the corresponding Registry identity exists. The candidate must have explicit leader eligibility in the current Chronicle and satisfy whatever acquisition/recruitment/access state the exact route requires.
+
+Leadership assignment is a team/progression role, not automatically Battle slot 1 or My Clan queue position.
+
+### Commit boundary
+
+The Genin Roster Transition completes only when the final teammate composition and Jōnin leader assignment are all valid. Acquisition/recruitment occurrences that happened while preparing the transition remain committed historical facts; the final team-assignment commit must not erase them.
 
 ---
 
@@ -276,31 +353,46 @@ For current Alpha, the stable `ownedCharacterId` plus formal-rank progression re
 
 ---
 
-## 10. Menma Origin test-subject enemy identities
+## 10. Menma Origin test-subject enemy identities — direct opponent CLOSED
 
-Writing/Character Creation has established three distinct Orochimaru-linked experimental-hostile identities for Menma's Origin. Registry now promotes them as dedicated **Enemy/Opposition Registry identities**, not collectible Character/Entity identities:
+Writing and Character Creation have now closed the Menma tutorial hostile identity.
+
+The exact direct one-on-one tutorial opponent in:
+
+`origin_academy_menma_prologue`
+
+is:
+
+**TEST SUBJECT — ALTERED SHINOBI**
+
+Authoritative stable Enemy/Opposition Registry identity:
+
+`test_subject_altered_shinobi`
+
+This identity already exists under Registry authority and must be reused. Coding and Combat must not mint an alternate ID from prose.
+
+The wider clearing may also contain the already-authorised opposition identities:
 
 - `test_subject_brute` — **Test Subject — Brute**
-- `test_subject_altered_shinobi` — **Test Subject — Altered Shinobi**
 - `test_subject_unstable` — **Test Subject — Unstable**
 
-They do **not** alter the 85 + 17 = 102 collectible production gate.
+These three are dedicated **Enemy/Opposition Registry identities**, not collectible Character/Entity identities. They do **not** alter the 85 + 17 = 102 collectible production gate.
 
 Narrative boundary:
 
 - victims of experimentation who are currently dangerous;
 - grounded Orochimaru-linked escaped/discarded subjects;
-- not generic Bandits;
-- not generic evil mutants;
-- not boss-scale Curse Mark monsters.
+- not generic Bandits/Rogue Genin substitutes;
+- not disposable evil mutants;
+- not boss-scale/high-tier Curse Mark enemies.
 
-Writing owns exact encounter composition/dialogue. Combat must now close their exact action packages. PL calibrates them only after Combat semantics/role are closed. Coding must not invent alternate machine IDs from prose.
+Writing owns exact encounter composition/dialogue beyond the locked direct opponent. Combat must now close the exact Battle package for `test_subject_altered_shinobi`; PL calibrates it only after Combat semantics/role are closed.
 
 ---
 
 ## 11. Chronicle Reaper / Chronicle Wraith — resolved
 
-Writing has resolved the representation question.
+Writing and Character Creation agree on the representation classification.
 
 Authoritative progression:
 
@@ -328,7 +420,7 @@ This representation resolution does not itself add `chronicle_reaper` to the cur
 
 ---
 
-## 12. Kisōgan explicit access authority
+## 12. Kisōgan explicit access + Acquisition authority
 
 Official Ability/Expression:
 
@@ -367,7 +459,21 @@ The dedicated Phase-3 representation must explicitly author:
 
 Kisōgan access/actions do not grant Reaping, derivative construction, Reaper historical retention, or cross-Renewal identity.
 
-Player acquisition later must independently author `kisogan_access` plus whichever individual actions that exact route grants.
+### Player acquisition
+
+No player Kisōgan acquisition route is final yet.
+
+Any future acquisition transaction must explicitly author:
+
+- `kisogan_access`;
+- whichever individual Kisōgan analysis-action access IDs that exact route grants;
+- any separate activation/embodiment occurrence if the route is intended to make the Expression active/embodied immediately.
+
+Acquisition of access does not itself mean active state or embodiment. Embodiment does not back-fill missing access.
+
+A limited route may legitimately grant only a subset of the Kisōgan analysis palette. No route may infer all subordinate actions merely from `kisogan_access` unless that exact route explicitly lists them.
+
+Full Kisōgan analysis access still grants neither Reaping nor derivative construction by itself.
 
 ### PL lock
 
@@ -449,11 +555,13 @@ Qualification remains separate from rank, department, appointment, clearance/lic
 
 The following are Coding/Combat corrections, not PL recalibration:
 
+- remove retired Battle-entry modifiers from any reachable production path;
 - Kisōgan Causal Strata minimum reference count 1 → 2;
 - remove embodiment → Kisōgan access inference;
 - preserve exact `source_only_bound_collective` Kikaichū taxonomy;
 - reconcile My Clan Active/Reserve filtering against current queue authority;
 - implement already-ratified Triple Rashōmon payoff semantics where current working source is incomplete;
+- bind Menma's direct tutorial opponent to `test_subject_altered_shinobi` only after Combat supplies the exact action package/numerics;
 - enumerate every Alpha-production action still relying only on explicit unresolved/placeholder semantics before Golden Combat Freeze.
 
 A green diagnostic must not be treated as proof of semantic completeness when the diagnostic was intentionally allowed to pass explicit unresolved markers during development.
