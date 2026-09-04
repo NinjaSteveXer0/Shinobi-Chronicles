@@ -5515,6 +5515,7 @@ function createDefaultAcquisitionState() {
     chronicleOrigin:{variantId:null,ownedCharacterId:null,prologueCompleted:false,completionEvidenceIds:[],activeKonohaEntered:false,activeKonohaEnteredAt:null,activeKonohaEntryBoundaryId:null},
     academyTeamFormation:{unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],completedAt:null},
     geninRosterTransition:{unlocked:false,required:false,completed:false,promotionEvidenceIds:[],eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null},
+    academyToGeninAssessment:{sequence:0,activeAttempt:null,attempts:[]},
     // Legacy compatibility only. Production semantics live in academyTeamFormation/geninRosterTransition.
     firstTeamFormation:{unlocked:false,promotionEvidenceIds:[],availableCandidateVariantIds:[],deprecated:true},
     joninLeadershipAssignment:null,
@@ -5578,6 +5579,11 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
       selectedReplacementVariantIds:Array.isArray(source.geninRosterTransition.selectedReplacementVariantIds)?[...new Set(source.geninRosterTransition.selectedReplacementVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
       joninLeaderVariantId:source.geninRosterTransition.joninLeaderVariantId&&getCharacterRegistryEntry(source.geninRosterTransition.joninLeaderVariantId)?source.geninRosterTransition.joninLeaderVariantId:null
     }:defaults.geninRosterTransition,
+    academyToGeninAssessment:source.academyToGeninAssessment&&typeof source.academyToGeninAssessment==="object"?{
+      sequence:Math.max(0,Number(source.academyToGeninAssessment.sequence)||0),
+      activeAttempt:source.academyToGeninAssessment.activeAttempt?cloneProgressionData(source.academyToGeninAssessment.activeAttempt):null,
+      attempts:Array.isArray(source.academyToGeninAssessment.attempts)?source.academyToGeninAssessment.attempts.filter(Boolean).map(cloneProgressionData):[]
+    }:defaults.academyToGeninAssessment,
     firstTeamFormation:source.firstTeamFormation&&typeof source.firstTeamFormation==="object"?{
       unlocked:source.firstTeamFormation.unlocked===true,
       promotionEvidenceIds:Array.isArray(source.firstTeamFormation.promotionEvidenceIds)?[...new Set(source.firstTeamFormation.promotionEvidenceIds.filter(Boolean))]:[],
@@ -5591,6 +5597,14 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
     state.geninRosterTransition.unlocked=true;
     state.geninRosterTransition.promotionEvidenceIds=[...(state.firstTeamFormation.promotionEvidenceIds||[])];
     state.geninRosterTransition.eligibleCandidateVariantIds=[...(state.firstTeamFormation.availableCandidateVariantIds||[])];
+  }
+  // BRICK 878 — activeAttempt is a pointer into the authoritative attempts
+  // collection, not an independently mutable duplicate after save/load.
+  if (state.academyToGeninAssessment.activeAttempt&&state.academyToGeninAssessment.activeAttempt.attemptId) {
+    const linkedAttempt=state.academyToGeninAssessment.attempts.find(
+      attempt=>attempt&&attempt.attemptId===state.academyToGeninAssessment.activeAttempt.attemptId
+    );
+    state.academyToGeninAssessment.activeAttempt=linkedAttempt||null;
   }
   migrateLegacyOriginAcquisitionRecordScopes(state);
   const ownedIds=ownershipState&&Array.isArray(ownershipState.ownedRegistryIds)?ownershipState.ownedRegistryIds:[];
@@ -6084,10 +6098,141 @@ function recordOwnedCharacterGeninPromotion(ownedCharacterId,evidenceIds=[]) {
   const ids=Array.isArray(evidenceIds)?[...new Set(evidenceIds.filter(Boolean))]:[];
   state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]={formalRank:"genin",promotedAt:Date.now(),promotionEvidenceIds:ids};
   state.geninRosterTransition.unlocked=true;
+  state.geninRosterTransition.required=true;
   state.geninRosterTransition.promotionEvidenceIds=[...new Set([...(state.geninRosterTransition.promotionEvidenceIds||[]),...ids])];
   state.onboardingStatus="genin_roster_transition_available";
   savePlayerData();
   return {success:true,ownedCharacterId,formalRank:"genin",geninRosterTransitionUnlocked:true};
+}
+
+const ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT=Object.freeze({
+  assessmentId:"academy_to_genin_field_readiness_assessment",
+  displayName:"FIELD READINESS ASSESSMENT",
+  mission:"Locate the missing field courier, recover the sealed dispatch, and return it to the examiner.",
+  objectiveSteps:Object.freeze(["courier_located","sealed_dispatch_recovered","sealed_dispatch_returned_to_examiner"]),
+  readinessDomains:Object.freeze(["mission_comprehension","information_use","team_coordination","combat_readiness","objective_protection","judgement_under_pressure"]),
+  requiredDomains:Object.freeze(["mission_comprehension","judgement_under_pressure"]),
+  flexibleDomains:Object.freeze(["information_use","team_coordination","combat_readiness","objective_protection"]),
+  minimumFlexibleDomains:2,
+  battleMandatory:false
+});
+
+function getOwnedCharacterFormalRank(ownedCharacterId) {
+  const state=ensurePlayerAcquisitionState();
+  const progression=state.formalRankProgressionByOwnedCharacterId&&state.formalRankProgressionByOwnedCharacterId[ownedCharacterId];
+  if (progression&&progression.formalRank) return String(progression.formalRank);
+  const owned=getOwnedCharacterRecordById(ownedCharacterId);
+  const registry=owned?getCharacterRegistryEntry(owned.variantId):null;
+  return registry&&registry.formalRank?String(registry.formalRank):null;
+}
+
+function getAcademyToGeninAssessmentState() {
+  const state=ensurePlayerAcquisitionState();
+  if (!state.academyToGeninAssessment||typeof state.academyToGeninAssessment!=="object") state.academyToGeninAssessment=createDefaultAcquisitionState().academyToGeninAssessment;
+  return state.academyToGeninAssessment;
+}
+
+function evaluateAcademyToGeninAssessmentEntry(ownedCharacterId) {
+  const state=ensurePlayerAcquisitionState();
+  const assessment=getAcademyToGeninAssessmentState();
+  const reasons=[];
+  if (!getOwnedCharacterRecordById(ownedCharacterId)) reasons.push("assessment_subject_not_owned");
+  if (getOwnedCharacterFormalRank(ownedCharacterId)!=="academy") reasons.push("assessment_subject_not_academy_rank");
+  if (!state.chronicleOrigin||state.chronicleOrigin.activeKonohaEntered!==true) reasons.push("active_konoha_not_entered");
+  if (!state.academyTeamFormation||state.academyTeamFormation.completed!==true) reasons.push("academy_team_formation_incomplete");
+  if (!ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT) reasons.push("authored_assessment_unavailable");
+  if (assessment.activeAttempt&&assessment.activeAttempt.status==="in_progress") reasons.push("assessment_attempt_unresolved");
+  return {eligible:reasons.length===0,reasons,assessmentId:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.assessmentId,assessmentSubjectOwnedCharacterId:ownedCharacterId,teamPLChecked:false};
+}
+
+function appendFieldReadinessHistory(record) {
+  if (!playerData.activityHistory||!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const safe={historyScope:createHistoryScopeAddress("active_konoha_chronicle_occurrence",{continuityId:ACTIVE_KONOHA_CONTINUITY_ID,occurrenceType:"academy_to_genin_assessment"}),...cloneProgressionData(record)};
+  playerData.activityHistory.push(safe);
+  activityHistory=playerData.activityHistory;
+  return safe;
+}
+
+function startAcademyToGeninFieldReadinessAssessment(ownedCharacterId) {
+  const eligibility=evaluateAcademyToGeninAssessmentEntry(ownedCharacterId);
+  if (!eligibility.eligible) return {success:false,reason:eligibility.reasons[0]||"assessment_entry_ineligible",eligibility};
+  const state=getAcademyToGeninAssessmentState();
+  state.sequence=Math.max(0,Number(state.sequence)||0)+1;
+  const attemptId=`field_readiness_${ownedCharacterId}_${state.sequence}`;
+  const attempt={
+    attemptId,assessmentId:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.assessmentId,assessmentSubjectOwnedCharacterId:ownedCharacterId,
+    status:"in_progress",startedAt:Date.now(),completedAt:null,
+    objectives:{courier_located:false,sealed_dispatch_recovered:false,sealed_dispatch_returned_to_examiner:false},
+    evidenceByDomain:Object.fromEntries(ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.readinessDomains.map(domain=>[domain,[]])),
+    evidenceRefs:[],abort:null,result:null
+  };
+  state.activeAttempt=attempt;
+  state.attempts.push(attempt);
+  appendFieldReadinessHistory({type:"academy_to_genin_assessment_started",activity:"promotion_assessment",attemptId,assessmentId:attempt.assessmentId,assessmentSubjectOwnedCharacterId:ownedCharacterId,completed:true,success:true,outcome:"attempt_started",timestamp:attempt.startedAt});
+  savePlayerData();
+  return {success:true,attempt:cloneProgressionData(attempt)};
+}
+
+function getFieldReadinessAttempt(attemptId=null) {
+  const state=getAcademyToGeninAssessmentState();
+  if (!attemptId) return state.activeAttempt||null;
+  return (state.attempts||[]).find(attempt=>attempt&&attempt.attemptId===attemptId)||null;
+}
+
+function addFieldReadinessEvidence(attemptId,{domain=null,evidenceId=null,occurrenceId=null,qualifies=false,objectiveStep=null,source="authoritative_domain"}={}) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  const definition=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT;
+  if (domain&&!definition.readinessDomains.includes(domain)) return {success:false,reason:"readiness_domain_invalid"};
+  if (objectiveStep&&!definition.objectiveSteps.includes(objectiveStep)) return {success:false,reason:"objective_step_invalid"};
+  if (!evidenceId&&!occurrenceId) return {success:false,reason:"assessment_evidence_reference_required"};
+  const ref={evidenceId:evidenceId||null,occurrenceId:occurrenceId||null,domain:domain||null,qualifies:qualifies===true,objectiveStep:objectiveStep||null,source:String(source||"authoritative_domain")};
+  const key=JSON.stringify(ref);
+  const alreadyRecorded=(attempt.evidenceRefs||[]).some(existing=>JSON.stringify(existing)===key);
+  if (!alreadyRecorded) attempt.evidenceRefs.push(ref);
+  if (domain&&qualifies===true&&!attempt.evidenceByDomain[domain].some(existing=>JSON.stringify(existing)===key)) attempt.evidenceByDomain[domain].push(ref);
+  if (objectiveStep) attempt.objectives[objectiveStep]=true;
+  savePlayerData();
+  return {success:true,idempotent:alreadyRecorded,attempt:cloneProgressionData(attempt)};
+}
+
+function authorFieldReadinessAssessmentAbort(attemptId,{reason,evidenceId=null,occurrenceId=null}={}) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  if (!reason) return {success:false,reason:"authored_abort_reason_required"};
+  attempt.abort={reason:String(reason),evidenceId:evidenceId||null,occurrenceId:occurrenceId||null,authored:true};
+  savePlayerData();
+  return {success:true,abort:cloneProgressionData(attempt.abort)};
+}
+
+function resolveAcademyToGeninFieldReadinessAssessment(attemptId) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
+  if (attempt.status!=="in_progress"&&attempt.result) return {success:true,idempotent:true,result:cloneProgressionData(attempt.result)};
+  if (attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  const definition=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT;
+  const objectiveCompleted=definition.objectiveSteps.every(step=>attempt.objectives&&attempt.objectives[step]===true);
+  const qualifyingDomains=definition.readinessDomains.filter(domain=>Array.isArray(attempt.evidenceByDomain&&attempt.evidenceByDomain[domain])&&attempt.evidenceByDomain[domain].length>0);
+  const requiredDomainsSatisfied=definition.requiredDomains.every(domain=>qualifyingDomains.includes(domain));
+  const flexibleCount=definition.flexibleDomains.filter(domain=>qualifyingDomains.includes(domain)).length;
+  const abortDisqualification=!!(attempt.abort&&attempt.abort.authored===true);
+  const passed=objectiveCompleted&&requiredDomainsSatisfied&&flexibleCount>=definition.minimumFlexibleDomains&&!abortDisqualification;
+  attempt.status=passed?"passed":"failed";
+  attempt.completedAt=Date.now();
+  const evidenceIds=[...new Set((attempt.evidenceRefs||[]).flatMap(ref=>[ref.evidenceId,ref.occurrenceId]).filter(Boolean))];
+  const result={
+    assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,
+    passed,objectiveCompleted,qualifyingDomains,requiredDomainsSatisfied,flexibleDomainCount:flexibleCount,minimumFlexibleDomains:definition.minimumFlexibleDomains,
+    abortDisqualification,battleMandatory:false,battleResultDoesNotOwnPromotion:true,teamWidePromotion:false,evidenceIds
+  };
+  attempt.result=result;
+  const state=getAcademyToGeninAssessmentState();
+  state.activeAttempt=null;
+  appendFieldReadinessHistory({type:"academy_to_genin_assessment_resolved",activity:"promotion_assessment",attemptId:attempt.attemptId,assessmentId:attempt.assessmentId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,completed:true,success:passed,outcome:passed?"passed":"failed",qualifyingDomains:[...qualifyingDomains],objectiveCompleted,abortDisqualification,linkedChronicleEvidenceIds:evidenceIds,timestamp:attempt.completedAt});
+  let promotion=null;
+  if (passed) promotion=recordOwnedCharacterGeninPromotion(attempt.assessmentSubjectOwnedCharacterId,evidenceIds);
+  savePlayerData();
+  return {success:true,result:cloneProgressionData(result),promotion};
 }
 
 function setGeninRosterTransitionAvailableCandidates(variantIds) {
@@ -36092,7 +36237,50 @@ const enemyDatabase = {
 
     }
 
+  },
+
+  // =========================================
+  // BRICK 875 — MENMA ORIGIN OPPOSITION
+  // Stable encounter identities only; these are not additions to the 102
+  // collectible production Registry gate. No portrait path is fabricated.
+  // =========================================
+  test_subject_altered_shinobi: {
+    id:"test_subject_altered_shinobi",
+    name:"TEST SUBJECT — ALTERED SHINOBI",
+    rank:"Experimental Hostile",
+    power:11,
+    calibratedBasePL:11,
+    stats:{nin:12,tai:11,buki:10,fuin:5,kin:5,gen:6,stamina:11},
+    image:null,
+    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    provenance:{origin:"abandoned_or_escaped_orochimaru_operation",tutorialRole:"menma_direct_opponent",female:true},
+    noSummon:true,noTransformation:true,noBossScaling:true
+  },
+  test_subject_brute: {
+    id:"test_subject_brute",
+    name:"TEST SUBJECT — BRUTE",
+    rank:"Experimental Hostile",
+    power:13,
+    calibratedBasePL:13,
+    stats:{nin:6,tai:14,buki:8,fuin:4,kin:5,gen:4,stamina:14},
+    image:null,
+    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    provenance:{origin:"abandoned_or_escaped_orochimaru_operation",tutorialRole:"wider_clearing_anko_pressure"},
+    noSummon:true,noTransformation:true,noBossScaling:true
+  },
+  test_subject_unstable: {
+    id:"test_subject_unstable",
+    name:"TEST SUBJECT — UNSTABLE",
+    rank:"Experimental Hostile",
+    power:12,
+    calibratedBasePL:12,
+    stats:{nin:13,tai:10,buki:6,fuin:4,kin:6,gen:4,stamina:12},
+    image:null,
+    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    provenance:{origin:"abandoned_or_escaped_orochimaru_operation",tutorialRole:"wider_clearing_danger"},
+    noSummon:true,noTransformation:true,noBossScaling:true
   }
+
 
 };
 
@@ -42820,6 +43008,69 @@ function renderStoryScenePresentationLayer() {
 }
 
 // =========================================================
+// BRICK 877 — ACADEMY MENMA PRODUCTION ORIGIN SCENE
+// =========================================================
+function registerAcademyMenmaOriginProductionScene() {
+  unregisterStoryScene("origin_academy_menma_prologue");
+  return registerStoryScene({
+    sceneId:"origin_academy_menma_prologue",
+    eventId:"origin_academy_menma_prologue",
+    title:"ACADEMY MENMA",
+    participants:[],
+    entryBeatId:"academy_menma_more",
+    beats:[
+      {beatId:"academy_menma_more",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"I can do more.",environmentRef:{environmentId:"konoha_academy_classroom_day"},nextBeatId:"academy_iruka_finished"},
+      {beatId:"academy_iruka_finished",mode:"dialogue",speakerRef:{sourceId:"iruka",sourceType:"story_character",physicalPresence:true},speakerName:"IRUKA",text:"Class isn't finished.",environmentRef:{environmentId:"konoha_academy_classroom_day"},nextBeatId:"academy_menma_mine"},
+      {beatId:"academy_menma_mine",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"Mine is.",environmentRef:{environmentId:"konoha_academy_classroom_day"},nextBeatId:"forest_objective"},
+      {beatId:"forest_objective",mode:"narration",text:"Clear your head.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_nine_tails_interesting"},
+      {beatId:"forest_nine_tails_interesting",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},speakerName:"NINE-TAILS",text:"Interesting.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_menma_what"},
+      {beatId:"forest_menma_what",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"What?",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_nine_tails_test"},
+      {beatId:"forest_nine_tails_test",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},speakerName:"NINE-TAILS",text:"You wanted to test yourself.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_nine_tails_chance"},
+      {beatId:"forest_nine_tails_chance",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},speakerName:"NINE-TAILS",text:"There's your chance.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_menma_permission"},
+      {beatId:"forest_menma_permission",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"I don't need your permission.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_nine_tails_not_given"},
+      {beatId:"forest_nine_tails_not_given",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},speakerName:"NINE-TAILS",text:"I didn't give it.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_menma_right"},
+      {beatId:"forest_menma_right",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"...But you're right.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"forest_menma_go"},
+      {beatId:"forest_menma_go",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"Let's go.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"clearing_anko_menma"},
+      {beatId:"clearing_anko_menma",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"...Menma?",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"clearing_anko_why"},
+      {beatId:"clearing_anko_why",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"What are you doing here?",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"clearing_menma_help"},
+      {beatId:"clearing_menma_help",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"You looked like you needed help.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"clearing_anko_no"},
+      {beatId:"clearing_anko_no",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"I don't.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"clearing_menma_she"},
+      {beatId:"clearing_menma_she",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"She does.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"clearing_anko_back"},
+      {beatId:"clearing_anko_back",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"Get back!",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"tutorial_battle"},
+      {beatId:"tutorial_battle",mode:"battle_transition",text:"Stop the Altered Shinobi.",environmentRef:{environmentId:"konoha_forest_clearing_day"},battle:{enemyId:"test_subject_altered_shinobi",encounterId:"origin_academy_menma_prologue:altered_shinobi",victoryBeatId:"post_battle_opening",defeatBeatId:"tutorial_not_completed",resultProjector:createMenmaOriginTutorialResultProjection,actionLabel:"STOP THE ALTERED SHINOBI"}},
+      {beatId:"tutorial_not_completed",mode:"post_battle",text:"Stop the Altered Shinobi — not completed.",environmentRef:{environmentId:"konoha_forest_clearing_day"},allowPresentationClose:true},
+      {beatId:"post_battle_opening",mode:"post_battle",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"You're not bad, kid.",environmentRef:{environmentId:"konoha_forest_clearing_day"},onEnterConsequences:[{requestId:"menma_origin_post_battle_reads",kind:"domain",resolve:()=>recordMenmaOriginPostBattleReads()}],nextBeatId:"post_battle_danger"},
+      {beatId:"post_battle_danger",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"Still, pretty dangerous situation to get yourself involved in.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_fine"},
+      {beatId:"post_battle_fine",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"I'm fine.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_nothing_special"},
+      {beatId:"post_battle_nothing_special",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"They weren't anything special.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_look"},
+      {beatId:"post_battle_look",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"Let's have a look at you.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_bucket"},
+      {beatId:"post_battle_bucket",mode:"post_battle",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"",environmentRef:{environmentId:"konoha_forest_clearing_day"},presentationResolver:(context)=>{const bucket=context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.performanceBucket;return {title:bucket?`PERFORMANCE · ${String(bucket).toUpperCase()}`:"PERFORMANCE",text:bucket==="low"?"Yeah. I'm looking at the price tag.":""};},nextBeatId:"post_battle_uninformed"},
+      {beatId:"post_battle_uninformed",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"You had no idea what you were jumping into.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_i_won"},
+      {beatId:"post_battle_i_won",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"I won.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_not_said"},
+      {beatId:"post_battle_not_said",mode:"dialogue",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"That's not what I said.",environmentRef:{environmentId:"konoha_forest_clearing_day"},nextBeatId:"post_battle_kinjutsu"},
+      {beatId:"post_battle_kinjutsu",mode:"post_battle",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"",environmentRef:{environmentId:"konoha_forest_clearing_day"},presentationResolver:(context)=>{const observed=!!(context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu);return {text:observed?"Those are some dangerous skills you've got, kid.":""};},nextBeatId:"post_battle_kinjutsu_own"},
+      {beatId:"post_battle_kinjutsu_own",mode:"post_battle",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"",environmentRef:{environmentId:"konoha_forest_clearing_day"},presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"I've got some of my own, you know.":""}),nextBeatId:"post_battle_kinjutsu_menma"},
+      {beatId:"post_battle_kinjutsu_menma",mode:"post_battle",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"",environmentRef:{environmentId:"konoha_forest_clearing_day"},presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"You'll have to teach me sometime.":""}),nextBeatId:"post_battle_kinjutsu_maybe"},
+      {beatId:"post_battle_kinjutsu_maybe",mode:"post_battle",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"",environmentRef:{environmentId:"konoha_forest_clearing_day"},presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"Maybe.":""}),nextBeatId:"post_battle_kinjutsu_when"},
+      {beatId:"post_battle_kinjutsu_when",mode:"post_battle",speakerRef:{sourceId:"anko",sourceType:"story_character",physicalPresence:true},speakerName:"ANKO",text:"",environmentRef:{environmentId:"konoha_forest_clearing_day"},presentationResolver:(context)=>({text:context&&context.battleResume&&context.battleResume.authored&&context.battleResume.authored.observedKinjutsu?"When you learn when not to use yours.":""}),nextBeatId:"ending_nine_tails_right"},
+      {beatId:"ending_nine_tails_right",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},speakerName:"NINE-TAILS",text:"You were right.",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"ending_menma_what"},
+      {beatId:"ending_menma_what",mode:"dialogue",speakerRef:{sourceId:"academy_menma",sourceType:"character",physicalPresence:true},speakerName:"MENMA",text:"About what?",environmentRef:{environmentId:"konoha_forest_path_day"},nextBeatId:"ending_nine_tails_held_back"},
+      {beatId:"ending_nine_tails_held_back",mode:"internal_voice",speakerRef:{sourceId:"nine_tails",sourceType:"communication_source",physicalPresence:false},speakerName:"NINE-TAILS",text:"They were holding you back.",environmentRef:{environmentId:"konoha_forest_path_day"},exitScene:true}
+    ],
+    onCompleteConsequences:[{
+      requestId:"complete_academy_menma_origin",
+      kind:"domain",
+      resolve:({activeScene})=>{
+        const authored=activeScene&&activeScene.battleResume&&activeScene.battleResume.authored||{};
+        const ids=[...(authored.supportingOccurrenceIds||[]),...(authored.kinjutsuObservationOccurrenceIds||[])];
+        return completeChronicleOriginPrologue("academy_menma",ids);
+      }
+    }]
+  });
+}
+registerAcademyMenmaOriginProductionScene();
+
+// =========================================================
 // BRICKS 743–748 — STORY SCENE / BATTLE / KNOWLEDGE REGRESSION
 // =========================================================
 function runAlphaStorySceneRuntimeDiagnostics() {
@@ -44079,11 +44330,9 @@ function runAlphaPost866CorrectiveReconciliationDiagnostics() {
     allSixRashomonAuthorities:Object.keys(rashomonAuthority).length===6&&Object.keys(TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES).every(key=>rashomonAuthority[key]&&rashomonAuthority[key].displayName===TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES[key]),
     noInventedFiveMachineIds:["1>2>3","1>3>2","2>1>3","2>3>1","3>1>2"].every(key=>rashomonAuthority[key].machineId===null),
     cataclysmMachineIdPreserved:rashomonAuthority["3>2>1"].machineId==="triple_rashomon_ruined_gate_cataclysm"&&rashomonAuthority["3>2>1"].authoredAttackPL===80&&rashomonAuthority["3>2>1"].excess.capRatio===0.50&&rashomonAuthority["3>2>1"].excess.absoluteCap===40,
-    nineHellsConsumerIntegrated:resolveBattleDamagePacket.toString().includes("consumeTripleRashomonNineHellsSanctuaryOnExcess")&&consumeTripleRashomonNineHellsSanctuaryOnExcess.toString().includes("primaryTargetDamageUnchanged:true"),
-    demonsReversalConsumerIntegrated:tryTripleRashomonInterceptIncoming.toString().includes("prepareTripleRashomonDemonsReversalRedirect")&&prepareTripleRashomonDemonsReversalRedirect.toString().includes("Math.floor(magnitude*0.60)")&&resolveSingleBattleDamageSegment.toString().includes("resolveTripleRashomonDemonsReversalRedirectDamage"),
-    graveyardExactPackageOnly:resolveTripleRashomonGraveyardSeal.toString().includes("getBattleExactActiveProjection")&&resolveTripleRashomonGraveyardSeal.toString().includes("suppressesExactRuntimePackage:true")&&resolveTripleRashomonGraveyardSeal.toString().includes("remainingActionOpportunities:1"),
-    forsakenExactRouteOnly:resolveTripleRashomonForsakenThreshold.toString().includes("exact_authored_route_required")&&isTripleRashomonAuthoredRouteDenied.toString().includes("exactRouteId===routeId")&&consumeTripleRashomonForsakenThresholdRouteDenial.toString().includes("oneRouteOnly:true"),
-    mawExactProjectedExpressionOnly:resolveTripleRashomonMawOfTheAbandoned.toString().includes("qualifyingProjectedChakraExpression!==true")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("removeBattleEffectiveStateProjection")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("reserveGain:0")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("healing:0")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("plTransfer:0")
+    fiveNamedSequencesRecognitionOnly:["1>2>3","1>3>2","2>1>3","2>3>1","3>1>2"].every(key=>rashomonAuthority[key].recognitionOnly===true&&rashomonAuthority[key].executableInAlpha===false&&rashomonAuthority[key].machineId===null),
+    fiveNamedSequencesNoExecutableConsumers:!appendTripleRashomonSuccessfulGate.toString().includes("establishTripleRashomonContextualPayoff")&&!tryTripleRashomonInterceptIncoming.toString().includes("DemonsReversal")&&!resolveBattleDamagePacket.toString().includes("NineHellsSanctuary"),
+    onlyCataclysmGetsAlphaReadyState:appendTripleRashomonSuccessfulGate.toString().includes('sequenceKey==="3>2>1"')&&appendTripleRashomonSuccessfulGate.toString().includes("recognitionOnly:!executablePayoffAvailable")
   };
   result.pass=Object.values(result).every(value=>value===true);
   console.table(result);
@@ -44217,6 +44466,117 @@ function runAlphaPost872PreFreezeAudit() {
 
 
 // =========================================================
+// BRICK 879 — POST-872 CURRENT-AUTHORITY RECONCILIATION GATE
+// =========================================================
+function runAlphaDeterministicBattleEntryPLDiagnostics() {
+  const probe={id:"diagnostic_battle_capacity",power:100,stats:{stamina:999}};
+  const outputs=["standard","elite","groupBoss","guardBoss"].map(type=>calculateBattlePower(probe,type));
+  const source=calculateBattlePower.toString();
+  const result={
+    deterministicAcrossLegacyEncounterLabels:outputs.every(value=>value===100),
+    noEntryRandomisation:!source.includes("Math.random"),
+    noLegacyEncounterMultipliers:!source.includes("1.25")&&!source.includes("groupBoss")&&!source.includes("guardBoss"),
+    staminaNotCapacity:calculateBattlePower(probe,"standard")===100,
+    encounterTypeCompatibilityOnly:source.includes("void encounterType")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaTripleRashomonScopeCorrectionDiagnostics() {
+  const authority=TRIPLE_RASHOMON_SEQUENCE_PAYOFF_AUTHORITY;
+  const five=["1>2>3","1>3>2","2>1>3","2>3>1","3>1>2"];
+  const source=[appendTripleRashomonSuccessfulGate,tryTripleRashomonInterceptIncoming,resolveBattleDamagePacket,resolveSingleBattleDamageSegment].map(fn=>fn.toString()).join("\n");
+  const result={
+    allSixNamesPreserved:Object.keys(TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES).length===6&&Object.keys(TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES).every(key=>authority[key]&&authority[key].displayName===TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES[key]),
+    fiveRecognitionOnly:five.every(key=>authority[key].recognitionOnly===true&&authority[key].executableInAlpha===false&&authority[key].machineId===null),
+    fiveNoExecutablePayoffConsumers:!["NineHellsSanctuary","DemonsReversal","GraveyardSeal","ForsakenThreshold","MawOfTheAbandoned","triple_rashomon_sequence_payoff_ready"].some(token=>source.includes(token)),
+    cataclysmOnlyExecutable:authority["3>2>1"].executableInAlpha===true&&authority["3>2>1"].machineId==="triple_rashomon_ruined_gate_cataclysm"&&authority["3>2>1"].authoredAttackPL===80&&authority["3>2>1"].excess.capRatio===0.50&&authority["3>2>1"].excess.absoluteCap===40,
+    sequenceEvidenceSeparatesRecognitionFromAccess:appendTripleRashomonSuccessfulGate.toString().includes("techniqueDiscoveredAutomatically:false")&&appendTripleRashomonSuccessfulGate.toString().includes("techniqueAccessGranted:false")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaMenmaOriginProductionDiagnostics() {
+  const altered=enemyDatabase.test_subject_altered_shinobi,brute=enemyDatabase.test_subject_brute,unstable=enemyDatabase.test_subject_unstable;
+  const alteredActions=getEnemyAuthoredBattleActions(altered).map(action=>[action.id,Number(action&&action.resolve?1:0)]);
+  const scene=getStorySceneDefinition("origin_academy_menma_prologue");
+  const battleBeat=scene&&scene.beatMap.get("tutorial_battle");
+  const sheBeat=scene&&scene.beatMap.get("clearing_menma_she");
+  const result={
+    oppositionOutsideCollectibleGate:[altered,brute,unstable].every(Boolean)&&!getCharacterRegistryEntry("test_subject_altered_shinobi")&&!getCharacterRegistryEntry("test_subject_brute")&&!getCharacterRegistryEntry("test_subject_unstable"),
+    exactAlteredCalibration:!!altered&&altered.power===11&&JSON.stringify([altered.stats.nin,altered.stats.tai,altered.stats.buki,altered.stats.fuin,altered.stats.kin,altered.stats.gen,altered.stats.stamina])===JSON.stringify([12,11,10,5,5,6,11]),
+    exactWiderClearingCalibrations:!!brute&&brute.power===13&&JSON.stringify([brute.stats.nin,brute.stats.tai,brute.stats.buki,brute.stats.fuin,brute.stats.kin,brute.stats.gen,brute.stats.stamina])===JSON.stringify([6,14,8,4,5,4,14])&&!!unstable&&unstable.power===12&&JSON.stringify([unstable.stats.nin,unstable.stats.tai,unstable.stats.buki,unstable.stats.fuin,unstable.stats.kin,unstable.stats.gen,unstable.stats.stamina])===JSON.stringify([13,10,6,4,6,4,12]),
+    onlyAlteredGetsTutorialActionPackage:JSON.stringify(getEnemyAuthoredBattleActions(altered).map(action=>action.id))===JSON.stringify(["test_subject_altered_shinobi_shinobi_strike","test_subject_altered_shinobi_shuriken_cast","test_subject_altered_shinobi_unstable_chakra_burst"])&&getEnemyAuthoredBattleActions(brute).length===0&&getEnemyAuthoredBattleActions(unstable).length===0,
+    alteredExactAttackPLs:JSON.stringify((ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.test_subject_altered_shinobi||[]).map(action=>action.authoredAttackPL))===JSON.stringify([5,4,6]),
+    sceneRegistered:!!scene,
+    directBattleExactlyMenmaVsAltered:!!battleBeat&&battleBeat.battle&&battleBeat.battle.enemyId==="test_subject_altered_shinobi"&&battleBeat.battle.encounterId===MENMA_ORIGIN_TUTORIAL_ENCOUNTER_ID&&!JSON.stringify(battleBeat.battle).includes("test_subject_brute")&&!JSON.stringify(battleBeat.battle).includes("test_subject_unstable"),
+    correctedFemaleLine:!!sheBeat&&sheBeat.text==="She does.",
+    noAutomaticNineTailsBattleSupport:!!scene&&!JSON.stringify(scene.beats.map(beat=>beat.battle||null)).includes("nine_tails"),
+    performanceReadOwnsThresholds:resolveMenmaOriginTutorialPerformance.toString().includes("pressureRatio<=0.30")&&resolveMenmaOriginTutorialPerformance.toString().includes("actionExecutionRatio>=0.75")&&resolveMenmaOriginTutorialPerformance.toString().includes("pressureRatio>0.65")&&resolveMenmaOriginTutorialPerformance.toString().includes("actionExecutionRatio<0.50"),
+    kinjutsuIndependentFromPerformance:!resolveMenmaOriginKinjutsuObservationRead.toString().includes("performanceBucket")&&resolveMenmaOriginKinjutsuObservationRead.toString().includes('eventType==="skill_action_completed"')&&resolveMenmaOriginKinjutsuObservationRead.toString().includes("committedOccurrence===true"),
+    failedTutorialHasNoPerformanceBucket:resolveMenmaOriginTutorialPerformance.toString().includes('const tutorialResult=opponentStopped?"completed":"not_completed"')&&resolveMenmaOriginTutorialPerformance.toString().includes("let performanceBucket=null"),
+    originCompletionUsesExistingBoundary:!!scene&&scene.onCompleteConsequences.some(request=>typeof request.resolve==="function"&&request.resolve.toString().includes("completeChronicleOriginPrologue"))
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaFieldReadinessAssessmentDiagnostics() {
+  const definition=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT;
+  const source=[evaluateAcademyToGeninAssessmentEntry,resolveAcademyToGeninFieldReadinessAssessment].map(fn=>fn.toString()).join("\n");
+  const pointerProbe=normalizeAcquisitionState({academyToGeninAssessment:{sequence:1,activeAttempt:{attemptId:"diag_field_attempt",status:"in_progress"},attempts:[{attemptId:"diag_field_attempt",status:"in_progress"}]}},createDefaultCharacterOwnershipState());
+  const activeProbe=pointerProbe.academyToGeninAssessment.activeAttempt;
+  const attemptProbe=pointerProbe.academyToGeninAssessment.attempts.find(attempt=>attempt&&attempt.attemptId==="diag_field_attempt")||null;
+  const result={
+    stableAssessmentId:definition.assessmentId==="academy_to_genin_field_readiness_assessment",
+    exactMission:definition.mission==="Locate the missing field courier, recover the sealed dispatch, and return it to the examiner.",
+    exactReadinessDomains:JSON.stringify(definition.readinessDomains)===JSON.stringify(["mission_comprehension","information_use","team_coordination","combat_readiness","objective_protection","judgement_under_pressure"]),
+    exactObjectiveSteps:JSON.stringify(definition.objectiveSteps)===JSON.stringify(["courier_located","sealed_dispatch_recovered","sealed_dispatch_returned_to_examiner"]),
+    passNeedsRequiredPlusTwoFlexible:JSON.stringify(definition.requiredDomains)===JSON.stringify(["mission_comprehension","judgement_under_pressure"])&&definition.minimumFlexibleDomains===2,
+    battleNotMandatory:definition.battleMandatory===false&&source.includes("battleMandatory:false")&&source.includes("battleResultDoesNotOwnPromotion:true"),
+    noTeamPLGate:source.includes("teamPLChecked:false")&&!source.includes("Team PL")&&!source.includes("teamPower"),
+    failureDoesNotPromote:resolveAcademyToGeninFieldReadinessAssessment.toString().includes("if (passed) promotion=recordOwnedCharacterGeninPromotion"),
+    successUnlocksRequiredRosterTransition:recordOwnedCharacterGeninPromotion.toString().includes("geninRosterTransition.required=true"),
+    representationNotAutoSwapped:recordOwnedCharacterGeninPromotion.toString().includes("formalRankProgressionByOwnedCharacterId")&&!recordOwnedCharacterGeninPromotion.toString().includes("commitCharacterAcquisition")&&!recordOwnedCharacterGeninPromotion.toString().includes("materializeProductionRuntimeCharacter"),
+    persistedAttemptHistory:startAcademyToGeninFieldReadinessAssessment.toString().includes("appendFieldReadinessHistory")&&resolveAcademyToGeninFieldReadinessAssessment.toString().includes("appendFieldReadinessHistory"),
+    activeAttemptRehydratesAsAuthoritativeAttempt:!!activeProbe&&activeProbe===attemptProbe,
+    evidenceRetryIsIdempotent:addFieldReadinessEvidence.toString().includes("const alreadyRecorded=")&&addFieldReadinessEvidence.toString().includes("idempotent:alreadyRecorded")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runGeneratedConversationRuntimeBoundaryAudit() {
+  const storySources=[createStorySceneObserverSafeProjection,processStorySceneConsequenceRequests,processStorySceneConsequenceRequest,startStoryScene].map(fn=>fn.toString()).join("\n");
+  const state=createDefaultStorySceneRuntimeState();
+  const result={
+    communicationTextNotPersistentAuthority:!Object.prototype.hasOwnProperty.call(state,"generatedConversationHistory")&&!Object.prototype.hasOwnProperty.call(state,"conversationHistory"),
+    presentationDoesNotWriteHistory:!createStorySceneObserverSafeProjection.toString().includes("activityHistory.push")&&!createStorySceneObserverSafeProjection.toString().includes("recordBattleEvidence"),
+    consequencesRequireExplicitAuthority:processStorySceneConsequenceRequests.toString().includes("processStorySceneConsequenceRequest")&&processStorySceneConsequenceRequest.toString().includes("commitCharacterAcquisition"),
+    choiceRequiresAvailabilityValidation:applyStorySceneChoice.toString().includes("evaluateStorySceneChoiceAvailability"),
+    authoredStorySceneAlreadySeparatesPresentationAndMutation:storySources.includes("presentationResolver")&&storySources.includes("consequence"),
+    noParallelGeneratedDialogueWritebackStore:!storySources.includes("GeneratedDialogueEvent")&&!storySources.includes("ConversationHistory"),
+    generatedConversationRuntimeImplemented:false,
+    runtimeBoundaryStatus:"authored_story_scene_compliant_generated_runtime_not_implemented"
+  };
+  result.pass=result.communicationTextNotPersistentAuthority&&result.presentationDoesNotWriteHistory&&result.consequencesRequireExplicitAuthority&&result.choiceRequiresAvailabilityValidation&&result.authoredStorySceneAlreadySeparatesPresentationAndMutation&&result.noParallelGeneratedDialogueWritebackStore;
+  console.table({...result,generatedConversationRuntimeImplemented:String(result.generatedConversationRuntimeImplemented)});return result;
+}
+
+function runAlphaPost879MonsterDiagnostics() {
+  const preFreeze=runAlphaPost872PreFreezeAudit();
+  const groups={
+    deterministicBattlePL:runAlphaDeterministicBattleEntryPLDiagnostics(),
+    rashomonAlphaScope:runAlphaTripleRashomonScopeCorrectionDiagnostics(),
+    menmaOrigin:runAlphaMenmaOriginProductionDiagnostics(),
+    fieldReadiness:runAlphaFieldReadinessAssessmentDiagnostics(),
+    generatedConversationBoundary:runGeneratedConversationRuntimeBoundaryAudit()
+  };
+  const runtimeGreen=preFreeze&&preFreeze.runtimeGreen===true&&Object.values(groups).every(group=>group&&group.pass===true);
+  const result={preFreeze,groups,runtimeGreen,combatFreezeReady:preFreeze&&preFreeze.semanticClosure&&preFreeze.semanticClosure.alphaCombatFreezeReady===true,pass:runtimeGreen};
+  console.log(`SC Alpha post-879 monster gate: runtime=${runtimeGreen?"GREEN":"FAIL"} / Combat Freeze=${result.combatFreezeReady?"READY":"HOLD"}`);
+  return result;
+}
+
+// =========================================================
 // BRICK 866 — POST-KISŌGAN / EQUIPMENT-UI GOLDEN GATE
 // =========================================================
 function runAlphaPost866MonsterDiagnostics() {
@@ -44347,8 +44707,9 @@ function formatPL(value) {
 // → final PL damage
 // → Remaining Battle PL
 //
-// Encounter multipliers and the existing small Battle-entry
-// variation remain presentation/runtime capacity rules.
+// Legacy encounter-type capacity multipliers and random Battle-entry
+// variation are retired for Alpha. Battle-entry underlying Battle PL
+// is deterministic from current authoritative PL.
 //
 // =========================================================
 
@@ -44356,88 +44717,19 @@ function calculateBattlePower(
   character,
   encounterType = "standard"
 ) {
+  if (!character) return 0;
 
+  const isPlayerCharacter = character.basePL !== undefined;
+  const pl = isPlayerCharacter
+    ? calculateEffectivePL(character)
+    : Number(character.power) || 0;
 
-  if (
-    !character
-  ) {
-
-    return 0;
-  }
-
-
-  const isPlayerCharacter =
-    character.basePL !==
-      undefined;
-
-
-  const pl =
-    isPlayerCharacter
-      ? calculateEffectivePL(
-          character
-        )
-      : Number(
-          character.power
-        ) || 0;
-
-
-  // =========================================
-  // ENCOUNTER SCALING
-  // =========================================
-
-  const multipliers = {
-
-    standard:
-      1,
-
-    elite:
-      1.25,
-
-    groupBoss:
-      8,
-
-    guardBoss:
-      50
-
-  };
-
-
-  let battlePower =
-    pl *
-    (
-      multipliers[
-        encounterType
-      ] ||
-      1
-    );
-
-
-  // =========================================
-  // EXISTING SMALL ±10% BATTLE-ENTRY VARIATION
-  // =========================================
-  //
-  // Stamina is deliberately absent here.
-  //
-  // =========================================
-
-  const variation =
-    0.90 +
-    (
-      Math.random() *
-      0.20
-    );
-
-
-  battlePower *=
-    variation;
-
-
-  return Math.max(
-    1,
-    Math.round(
-      battlePower
-    )
-  );
+  // BRICK 873 — Alpha authority: Battle-entry underlying Battle PL is
+  // deterministic. Legacy encounter multipliers and ±10% random variation
+  // are retired. encounterType remains a compatibility argument only.
+  // Stamina is deliberately absent here; it mitigates incoming PL damage.
+  void encounterType;
+  return Math.max(1,Math.round(pl));
 }
 
 
@@ -71180,13 +71472,16 @@ const TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES=Object.freeze({
 // Technique machine IDs. They are contextual payoffs keyed by the exact
 // successful Gate sequence. Cataclysm retains its separately authorised ID.
 const TRIPLE_RASHOMON_SEQUENCE_PAYOFF_AUTHORITY=Object.freeze({
-  "1>2>3":Object.freeze({displayName:"Nine Hells Sanctuary",machineId:null,payoffKind:"block_next_qualifying_excess_spill",primaryDamageUnchanged:true}),
-  "1>3>2":Object.freeze({displayName:"Demon's Reversal",machineId:null,payoffKind:"redirect_qualifying_intercepted_packet",maximumRedirectRatio:0.60,requiresValidCausalSource:true}),
-  "2>1>3":Object.freeze({displayName:"Graveyard Seal",machineId:null,payoffKind:"suppress_one_exact_active_package",durationTargetActionOpportunities:1,embodimentUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true}),
-  "2>3>1":Object.freeze({displayName:"Forsaken Threshold",machineId:null,payoffKind:"deny_one_exact_authored_route",durationTargetActionOpportunities:1}),
-  "3>1>2":Object.freeze({displayName:"Maw of the Abandoned",machineId:null,payoffKind:"disperse_one_qualifying_projected_chakra_expression",reserveGain:0,healing:0,plTransfer:0}),
-  "3>2>1":Object.freeze({displayName:"Ruined Gate Cataclysm",machineId:"triple_rashomon_ruined_gate_cataclysm",payoffKind:"damage_action",authoredAttackPL:80,excess:Object.freeze({eligible:true,capRatio:0.50,absoluteCap:40})})
+  // Alpha authority: five named sequences are recognised historical patterns
+  // only. They do not create executable payoff states or inferred Technique IDs.
+  "1>2>3":Object.freeze({displayName:"Nine Hells Sanctuary",machineId:null,recognitionOnly:true,executableInAlpha:false}),
+  "1>3>2":Object.freeze({displayName:"Demon's Reversal",machineId:null,recognitionOnly:true,executableInAlpha:false}),
+  "2>1>3":Object.freeze({displayName:"Graveyard Seal",machineId:null,recognitionOnly:true,executableInAlpha:false}),
+  "2>3>1":Object.freeze({displayName:"Forsaken Threshold",machineId:null,recognitionOnly:true,executableInAlpha:false}),
+  "3>1>2":Object.freeze({displayName:"Maw of the Abandoned",machineId:null,recognitionOnly:true,executableInAlpha:false}),
+  "3>2>1":Object.freeze({displayName:"Ruined Gate Cataclysm",machineId:"triple_rashomon_ruined_gate_cataclysm",recognitionOnly:false,executableInAlpha:true,authoredAttackPL:80,excess:Object.freeze({eligible:true,capRatio:0.50,absoluteCap:40})})
 });
+
 
 function getSummonSkillDefinition(skillId) {
   return summonSkillDatabase[skillId]||null;
@@ -71546,193 +71841,8 @@ function getTripleRashomonSequencePayoffAuthority(sequenceKey) {
   return TRIPLE_RASHOMON_SEQUENCE_PAYOFF_AUTHORITY[sequenceKey]||null;
 }
 
-function getTripleRashomonContextualPayoffStates(actorId,sequenceKey=null) {
-  if (!actorId||!currentBattle.active) return [];
-  return ensureBattleRuntimeState().transientStates.filter(state=>
-    state&&state.stateKey==="triple_rashomon_sequence_payoff_ready"&&
-    state.targetRef&&state.targetRef.side==="player"&&state.targetRef.participantId===actorId&&
-    state.data&&(!sequenceKey||state.data.sequenceKey===sequenceKey)
-  );
-}
-
-function getTripleRashomonContextualPayoffState(actorId,sequenceKey) {
-  return getTripleRashomonContextualPayoffStates(actorId,sequenceKey)[0]||null;
-}
-
-function establishTripleRashomonContextualPayoff(actorId,sequenceKey,actionId=null) {
-  const authority=getTripleRashomonSequencePayoffAuthority(sequenceKey);
-  if (!authority||authority.machineId) return null;
-  const state=addBattleTransientState({
-    stateKey:"triple_rashomon_sequence_payoff_ready",
-    sourceSide:"player",sourceParticipantId:actorId,
-    targetSide:"player",targetParticipantId:actorId,
-    ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},
-    data:{
-      sequenceKey,
-      payoffName:authority.displayName,
-      payoffKind:authority.payoffKind,
-      remainingCharges:1,
-      machineId:null,
-      contextualSequenceArt:true,
-      noTechniqueIdInferred:true
-    }
-  });
-  if (state) recordBattleEvidence({
-    eventType:"triple_rashomon_contextual_payoff_ready",actionId:actionId||null,
-    actorRef:createBattleParticipantRef("player",actorId),
-    sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"}],
-    stateRefs:[state.stateId],
-    data:{sequenceKey,payoffName:authority.displayName,payoffKind:authority.payoffKind,machineId:null}
-  });
-  return state;
-}
-
-function consumeTripleRashomonContextualPayoffState(actorId,sequenceKey,eventType,actionId=null,data={}) {
-  const state=getTripleRashomonContextualPayoffState(actorId,sequenceKey);
-  if (!state) return null;
-  removeBattleTransientState(state.stateId);
-  const authority=getTripleRashomonSequencePayoffAuthority(sequenceKey);
-  recordBattleEvidence({
-    eventType:eventType||"triple_rashomon_contextual_payoff_consumed",
-    actionId:actionId||null,
-    actorRef:createBattleParticipantRef("player",actorId),
-    sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"}],
-    stateRefs:[state.stateId],
-    data:{sequenceKey,payoffName:authority&&authority.displayName||null,...cloneBattleRuntimeValue(data)}
-  });
-  return state;
-}
-
-function consumeTripleRashomonNineHellsSanctuaryOnExcess({targetSide,targetParticipantId,cappedExcess,continuationTargetParticipantId,actionId=null,skillId=null}={}) {
-  const amount=Math.max(0,Math.floor(Number(cappedExcess)||0));
-  if (targetSide!=="player"||!targetParticipantId||!continuationTargetParticipantId||amount<=0) return {blocked:false};
-  const state=getTripleRashomonContextualPayoffState(targetParticipantId,"1>2>3");
-  if (!state) return {blocked:false};
-  consumeTripleRashomonContextualPayoffState(targetParticipantId,"1>2>3","triple_rashomon_nine_hells_sanctuary_resolved",actionId,{
-    incomingSkillId:skillId||null,blockedCappedExcess:amount,primaryTargetDamageUnchanged:true,continuationTargetParticipantId
-  });
-  return {blocked:true,blockedAmount:amount,stateId:state.stateId,sequenceKey:"1>2>3",payoffName:"Nine Hells Sanctuary",primaryTargetDamageUnchanged:true};
-}
-
-function prepareTripleRashomonDemonsReversalRedirect({actorId,sourceSide,sourceParticipantId,incomingAuthoredMagnitude,mitigable=true,primaryDiscipline=null,actionId=null,incomingSkillId=null}={}) {
-  const state=getTripleRashomonContextualPayoffState(actorId,"1>3>2");
-  if (!state) return {redirected:false};
-  const source=sourceSide&&sourceParticipantId?getBattleParticipantByIdentity(sourceSide,sourceParticipantId):null;
-  const magnitude=Math.max(0,Math.floor(Number(incomingAuthoredMagnitude)||0));
-  if (!source||magnitude<=0) return {redirected:false,reason:"valid_causal_source_required"};
-  const redirectedMagnitude=Math.max(0,Math.floor(magnitude*0.60));
-  if (redirectedMagnitude<=0) return {redirected:false,reason:"redirect_magnitude_zero"};
-  consumeTripleRashomonContextualPayoffState(actorId,"1>3>2","triple_rashomon_demons_reversal_committed",actionId,{
-    incomingSkillId:incomingSkillId||null,sourceSide,sourceParticipantId,interceptedAuthoredMagnitude:magnitude,redirectedMagnitude,maximumRedirectRatio:0.60
-  });
-  return {redirected:true,stateId:state.stateId,sourceSide,sourceParticipantId,interceptedAuthoredMagnitude:magnitude,redirectedMagnitude,maximumRedirectRatio:0.60,mitigable:mitigable===true,primaryDiscipline};
-}
-
-function resolveTripleRashomonDemonsReversalRedirectDamage(redirect,defenderParticipantId,definition={}) {
-  if (!redirect||redirect.redirected!==true||!defenderParticipantId) return null;
-  const source=getBattleParticipantByIdentity(redirect.sourceSide,redirect.sourceParticipantId);
-  if (!source) return null;
-  const envelope={
-    actionId:definition.envelope&&definition.envelope.actionId||null,
-    sourceRefs:[
-      ...((definition.envelope&&Array.isArray(definition.envelope.sourceRefs))?definition.envelope.sourceRefs:[]),
-      {type:"summon_entity",id:"triple_rashomon",role:"demons_reversal_source"}
-    ]
-  };
-  const output={
-    primaryDiscipline:redirect.primaryDiscipline||definition.output&&definition.output.primaryDiscipline||null,
-    statKey:null,effectivePrimaryDiscipline:null,coefficient:null,branch:"demons_reversal_redirect",branchMultiplier:null,
-    authoredPreExecutionMagnitude:redirect.redirectedMagnitude,weaponExecutionMultiplier:null,
-    preDefenseAttackMagnitude:redirect.redirectedMagnitude,attackPL:redirect.redirectedMagnitude
-  };
-  const damage=resolveSingleBattleDamageSegment({
-    envelope,skill:null,
-    actorSide:"player",actorParticipantId:defenderParticipantId,
-    targetSide:redirect.sourceSide,targetParticipantId:redirect.sourceParticipantId,
-    output,mitigable:redirect.mitigable===true,excess:null,stateRefs:[redirect.stateId]
-  },0);
-  recordBattleEvidence({
-    eventType:"triple_rashomon_demons_reversal_resolved",actionId:envelope.actionId,
-    actorRef:createBattleParticipantRef("player",defenderParticipantId),
-    targetRef:createBattleParticipantRef(redirect.sourceSide,redirect.sourceParticipantId),
-    sourceRefs:envelope.sourceRefs,stateRefs:[redirect.stateId],
-    data:{interceptedAuthoredMagnitude:redirect.interceptedAuthoredMagnitude,redirectedMagnitude:redirect.redirectedMagnitude,maximumRedirectRatio:0.60,validCausalSource:true,damageResolved:!!damage}
-  });
-  return damage;
-}
-
-function resolveTripleRashomonGraveyardSeal({actorParticipantId,targetSide="enemy",targetParticipantId,exactPackageId,actionId=null}={}) {
-  const ready=getTripleRashomonContextualPayoffState(actorParticipantId,"2>1>3");
-  if (!ready) return {resolved:false,reason:"graveyard_seal_sequence_not_ready"};
-  if (!targetSide||!targetParticipantId||!exactPackageId) return {resolved:false,reason:"exact_active_package_required"};
-  const projection=getBattleExactActiveProjection(targetSide,targetParticipantId,exactPackageId);
-  if (!projection) return {resolved:false,reason:"exact_active_package_required"};
-  const state=addBattleTransientState({
-    stateKey:"triple_rashomon_graveyard_seal",
-    sourceSide:"player",sourceParticipantId:actorParticipantId,
-    targetSide,targetParticipantId,
-    ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},
-    data:{exactPackageId,suppressesExactRuntimePackage:true,remainingActionOpportunities:1,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true}
-  });
-  if (!state) return {resolved:false,reason:"graveyard_seal_state_failed"};
-  consumeTripleRashomonContextualPayoffState(actorParticipantId,"2>1>3","triple_rashomon_graveyard_seal_resolved",actionId,{
-    targetSide,targetParticipantId,exactPackageId,durationTargetActionOpportunities:1,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true
-  });
-  return {resolved:true,stateId:state.stateId,exactPackageId,targetSide,targetParticipantId,durationTargetActionOpportunities:1};
-}
-
-function resolveTripleRashomonForsakenThreshold({actorParticipantId,targetSide="enemy",targetParticipantId,routeId,actionId=null}={}) {
-  const ready=getTripleRashomonContextualPayoffState(actorParticipantId,"2>3>1");
-  if (!ready) return {resolved:false,reason:"forsaken_threshold_sequence_not_ready"};
-  if (!targetSide||!targetParticipantId||typeof routeId!=="string"||!routeId) return {resolved:false,reason:"exact_authored_route_required"};
-  const state=addBattleTransientState({
-    stateKey:"triple_rashomon_forsaken_threshold",
-    sourceSide:"player",sourceParticipantId:actorParticipantId,
-    targetSide,targetParticipantId,
-    ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},
-    data:{exactRouteId:routeId,deniesOneAuthoredRoute:true,remainingActionOpportunities:1,noHiddenMovementStat:true}
-  });
-  if (!state) return {resolved:false,reason:"forsaken_threshold_state_failed"};
-  consumeTripleRashomonContextualPayoffState(actorParticipantId,"2>3>1","triple_rashomon_forsaken_threshold_established",actionId,{targetSide,targetParticipantId,routeId,durationTargetActionOpportunities:1});
-  return {resolved:true,stateId:state.stateId,routeId,targetSide,targetParticipantId};
-}
-
-function isTripleRashomonAuthoredRouteDenied(side,participantId,routeId) {
-  if (!side||!participantId||!routeId||!currentBattle.active) return false;
-  return ensureBattleRuntimeState().transientStates.some(state=>
-    state&&state.stateKey==="triple_rashomon_forsaken_threshold"&&
-    state.targetRef&&state.targetRef.side===side&&state.targetRef.participantId===participantId&&
-    state.data&&state.data.exactRouteId===routeId&&state.data.deniesOneAuthoredRoute===true
-  );
-}
-
-function consumeTripleRashomonForsakenThresholdRouteDenial(side,participantId,routeId,actionId=null) {
-  const state=ensureBattleRuntimeState().transientStates.find(item=>
-    item&&item.stateKey==="triple_rashomon_forsaken_threshold"&&
-    item.targetRef&&item.targetRef.side===side&&item.targetRef.participantId===participantId&&
-    item.data&&item.data.exactRouteId===routeId&&item.data.deniesOneAuthoredRoute===true
-  )||null;
-  if (!state) return {denied:false};
-  removeBattleTransientState(state.stateId);
-  recordBattleEvidence({eventType:"triple_rashomon_forsaken_threshold_route_denied",actionId:actionId||null,targetRef:createBattleParticipantRef(side,participantId),sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"}],stateRefs:[state.stateId],data:{routeId,oneRouteOnly:true,actionOpportunityConsumptionOwnedByAttemptedActionResolver:true}});
-  return {denied:true,stateId:state.stateId,routeId};
-}
-
-function resolveTripleRashomonMawOfTheAbandoned({actorParticipantId,targetSide="enemy",targetParticipantId,projectionKey,exactPackageId,qualifyingProjectedChakraExpression=false,actionId=null}={}) {
-  const ready=getTripleRashomonContextualPayoffState(actorParticipantId,"3>1>2");
-  if (!ready) return {resolved:false,reason:"maw_of_the_abandoned_sequence_not_ready"};
-  if (qualifyingProjectedChakraExpression!==true) return {resolved:false,reason:"qualifying_projected_chakra_expression_required"};
-  if (!targetSide||!targetParticipantId||!projectionKey||!exactPackageId) return {resolved:false,reason:"exact_projected_chakra_expression_required"};
-  const projection=getBattleEffectiveStateProjection(projectionKey,targetSide,targetParticipantId);
-  if (!projection||projection.exactPackageId!==exactPackageId) return {resolved:false,reason:"exact_projected_chakra_expression_required"};
-  const removed=removeBattleEffectiveStateProjection(projectionKey,targetSide,targetParticipantId,"triple_rashomon_maw_of_the_abandoned");
-  if (removed.length!==1) return {resolved:false,reason:"projected_chakra_expression_dispersion_failed"};
-  consumeTripleRashomonContextualPayoffState(actorParticipantId,"3>1>2","triple_rashomon_maw_of_the_abandoned_resolved",actionId,{
-    targetSide,targetParticipantId,projectionKey,exactPackageId,qualifyingProjectedChakraExpression:true,reserveGain:0,healing:0,plTransfer:0,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true
-  });
-  return {resolved:true,projectionKey,exactPackageId,removedCount:1,reserveGain:0,healing:0,plTransfer:0};
-}
-
+// BRICK 874 — no contextual executable payoff store exists for the five
+// recognition-only Alpha sequences. Sequence history remains in Battle evidence.
 function appendTripleRashomonSuccessfulGate(actorId,gateNumber,actionId,incomingSkillId) {
   let state=getTripleRashomonSequenceState(actorId);
   if (!state) state=addBattleTransientState({stateKey:"triple_rashomon_sequence",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_art_source"},data:{sequence:[]}});
@@ -71742,19 +71852,24 @@ function appendTripleRashomonSuccessfulGate(actorId,gateNumber,actionId,incoming
   state.data.sequence=sequence.slice(0,3);
   const sequenceKey=state.data.sequence.join(">");
   let payoffName=null;
+  let executablePayoffAvailable=false;
   if (state.data.sequence.length===3) {
     payoffName=TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES[sequenceKey]||null;
-    recordBattleEvidence({eventType:"triple_rashomon_sequence_completed",actionId:actionId||null,actorRef:createBattleParticipantRef("player",actorId),skillId:incomingSkillId||null,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_art_source"}],stateRefs:[state.stateId],data:{successfulGateSequence:[...state.data.sequence],sequenceKey,canonicalPayoffName:payoffName,inputButtonOrderIgnored:true}});
-    if (sequenceKey==="3>2>1") {
+    executablePayoffAvailable=sequenceKey==="3>2>1";
+    recordBattleEvidence({
+      eventType:"triple_rashomon_sequence_completed",committedOccurrence:true,actionId:actionId||null,
+      actorRef:createBattleParticipantRef("player",actorId),skillId:incomingSkillId||null,
+      sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_art_source"}],stateRefs:[state.stateId],
+      data:{successfulGateSequence:[...state.data.sequence],sequenceKey,canonicalPayoffName:payoffName,inputButtonOrderIgnored:true,recognitionOnly:!executablePayoffAvailable,executablePayoffAvailable,techniqueDiscoveredAutomatically:false,techniqueAccessGranted:false}
+    });
+    if (executablePayoffAvailable) {
       const prior=findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actorId});
       if (prior) removeBattleTransientState(prior.stateId);
       addBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},data:{sequenceKey,remainingCharges:1}});
-    } else if (payoffName) {
-      establishTripleRashomonContextualPayoff(actorId,sequenceKey,actionId);
     }
     removeBattleTransientState(state.stateId);
   }
-  return {sequenceKey,payoffName};
+  return {sequenceKey,payoffName,executablePayoffAvailable};
 }
 function tryTripleRashomonInterceptIncoming({targetSide,targetParticipantId,primaryDiscipline,actionId=null,incomingSkillId=null,sourceSide=null,sourceParticipantId=null,incomingAuthoredMagnitude=0,mitigable=true}={}) {
   if (targetSide!=="player"||!targetParticipantId||!primaryDiscipline) return {intercepted:false};
@@ -71763,12 +71878,10 @@ function tryTripleRashomonInterceptIncoming({targetSide,targetParticipantId,prim
   const gateNumber=Number(state.data.gateNumber)||0;
   const gateSkillId=state.data.gateSkillId||null;
   removeBattleTransientState(state.stateId);
-  const demonsReversal=prepareTripleRashomonDemonsReversalRedirect({
-    actorId:targetParticipantId,sourceSide,sourceParticipantId,incomingAuthoredMagnitude,mitigable,primaryDiscipline,actionId,incomingSkillId
-  });
   const sequence=appendTripleRashomonSuccessfulGate(targetParticipantId,gateNumber,actionId,incomingSkillId);
-  recordBattleEvidence({eventType:"triple_rashomon_gate_intercepted",actionId:actionId||null,targetRef:createBattleParticipantRef("player",targetParticipantId),skillId:gateSkillId,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"interception_source"}],stateRefs:[state.stateId],data:{gateNumber,primaryDiscipline,incomingSkillId,attackPreventedCategorically:true,percentageGuard:false,sequenceKey:sequence&&sequence.sequenceKey||null,demonsReversalRedirectPrepared:demonsReversal.redirected===true}});
-  return {intercepted:true,gateNumber,gateSkillId,stateId:state.stateId,sequence,demonsReversal};
+  recordBattleEvidence({eventType:"triple_rashomon_gate_intercepted",committedOccurrence:true,actionId:actionId||null,targetRef:createBattleParticipantRef("player",targetParticipantId),skillId:gateSkillId,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"interception_source"}],stateRefs:[state.stateId],data:{gateNumber,primaryDiscipline,incomingSkillId,attackPreventedCategorically:true,percentageGuard:false,sequenceKey:sequence&&sequence.sequenceKey||null,recognitionOnly:!!(sequence&&sequence.payoffName&&!sequence.executablePayoffAvailable),executablePayoffAvailable:!!(sequence&&sequence.executablePayoffAvailable),noOtherAlphaSequencePayoffExecuted:true}});
+  void sourceSide;void sourceParticipantId;void incomingAuthoredMagnitude;void mitigable;
+  return {intercepted:true,gateNumber,gateSkillId,stateId:state.stateId,sequence};
 }
 function resolveTripleRashomonCataclysm(skill,actor,target,envelope) {
   const ready=findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actor.id});
@@ -79343,13 +79456,9 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
     const t=absorption.temporaryCapacityAbsorbed>0?` Temporary capacity absorbed ${absorption.temporaryCapacityAbsorbed}.`:"";
     currentBattle.battleLog.push(`Attack ${definition.output.attackPL}.${g}${e}${f}${r} Stamina blocked ${staminaResolution.mitigationAmount}.${t} ${absorption.absorbedPL} capacity lost.`);
   }
-  let rashomonRedirectDamage=null;
-  if (preDefense.rashomonGate&&preDefense.rashomonGate.demonsReversal&&preDefense.rashomonGate.demonsReversal.redirected===true) {
-    rashomonRedirectDamage=resolveTripleRashomonDemonsReversalRedirectDamage(preDefense.rashomonGate.demonsReversal,definition.targetParticipantId,definition);
-  }
   let zeroResult=null;
   if (absorption.totalCapacityAfter<=0) zeroResult=handleBattleParticipantAtZeroPL(definition.targetSide,definition.targetParticipantId,actor,definition.envelope||null);
-  return {evidence,output:definition.output,preDefense,stamina:staminaResolution,absorption,rashomonRedirectDamage,
+  return {evidence,output:definition.output,preDefense,stamina:staminaResolution,absorption,
     finalDamage:staminaResolution.finalDamage,absorbedPL:absorption.absorbedPL,residualAttackPL:absorption.residualAttackPL,
     remainingBattlePLBefore:absorption.underlyingBattlePLBefore,remainingBattlePLAfter:absorption.underlyingBattlePLAfter,zeroResult};
 }
@@ -79389,21 +79498,6 @@ function resolveBattleDamagePacket(definition) {
       continued:false,
       nonRecursive:true
     };
-
-    const nineHells=consumeTripleRashomonNineHellsSanctuaryOnExcess({
-      targetSide:definition.targetSide,
-      targetParticipantId:definition.targetParticipantId,
-      cappedExcess,
-      continuationTargetParticipantId:continuationTargetId,
-      actionId:definition.envelope?definition.envelope.actionId:null,
-      skillId:definition.skill?definition.skill.id:null
-    });
-    if (nineHells.blocked===true) {
-      excessResolution.blockedByNineHellsSanctuary=true;
-      excessResolution.blockedCappedExcess=nineHells.blockedAmount;
-      excessResolution.cappedExcess=0;
-      cappedExcess=0;
-    }
 
     if (cappedExcess>0&&continuationTargetId&&!currentBattle.battleOver) {
       const continuationOutput={
@@ -81151,6 +81245,123 @@ function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null,options=
 }
 
 // =========================================================
+// BRICK 876 — MENMA ORIGIN COMBAT READS
+// =========================================================
+const MENMA_ORIGIN_TUTORIAL_ENCOUNTER_ID="origin_academy_menma_prologue:altered_shinobi";
+
+function isMenmaOriginTutorialBattle() {
+  return currentBattle&&currentBattle.encounterId===MENMA_ORIGIN_TUTORIAL_ENCOUNTER_ID&&currentBattle.encounterEnemy&&currentBattle.encounterEnemy.id==="test_subject_altered_shinobi";
+}
+
+function getMenmaOriginBattleEvidence(records=null) {
+  const evidence=Array.isArray(records)?records:((currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence))?currentBattle.runtime.evidence:[]);
+  return evidence.filter(record=>record&&record.battleId===currentBattle.battleId);
+}
+
+function getMenmaOriginActionDefinition(skillId) {
+  if (!skillId) return null;
+  return getClosureWaveBattleSkillDefinition(skillId,"academy_menma")||getAcademyBattleSkillDefinition(skillId)||null;
+}
+
+function isMenmaOriginKinjutsuObservationQualifyingSkill(skill) {
+  if (!skill) return false;
+  if (skill.primaryDiscipline==="Kinjutsu") return true;
+  return Array.isArray(skill.traits)&&skill.traits.includes("kinjutsu_observation_qualifying");
+}
+
+function resolveMenmaOriginKinjutsuObservationRead(records=null) {
+  const evidence=getMenmaOriginBattleEvidence(records);
+  if (!isMenmaOriginTutorialBattle()) return {observed:false,occurrenceIds:[],reason:"not_menma_origin_tutorial"};
+  if (getBattleContextFact("menma_origin_anko_observation_blocked")===true) return {observed:false,occurrenceIds:[],reason:"observation_blocked"};
+  const qualifying=evidence.filter(record=>
+    record&&record.eventType==="skill_action_completed"&&record.committedOccurrence===true&&
+    record.actorRef&&record.actorRef.side==="player"&&record.actorRef.participantId==="academy_menma"&&
+    isMenmaOriginKinjutsuObservationQualifyingSkill(getMenmaOriginActionDefinition(record.skillId))
+  );
+  return {
+    observed:qualifying.length>0,
+    occurrenceIds:qualifying.map(record=>record.evidenceId),
+    observerScope:"anko_peripheral_clearing",
+    legitimateObserverAccess:true,
+    perceptible:true,
+    ownershipAloneNeverQualifies:true
+  };
+}
+
+function resolveMenmaOriginTutorialPerformance(records=null,outcomeOverride=null) {
+  const evidence=getMenmaOriginBattleEvidence(records);
+  const startMaximum=Math.max(1,Number(getBattleMaximumPL("player","academy_menma"))||0);
+  const damageRecords=evidence.filter(record=>record&&record.eventType==="damage_resolved"&&record.targetRef&&record.targetRef.side==="player"&&record.targetRef.participantId==="academy_menma");
+  const grossFinalPLDamageReceived=damageRecords.reduce((sum,record)=>sum+Math.max(0,Number(record.data&&record.data.finalDamage)||0),0);
+  const pressureRatio=grossFinalPLDamageReceived/startMaximum;
+  const criticalThreshold=startMaximum*0.25;
+  const criticalExposure=damageRecords.some(record=>Number(record.data&&record.data.remainingBattlePLAfter)<=criticalThreshold);
+
+  const playerCompletionRecords=evidence.filter(record=>record&&record.actionId&&record.actorRef&&record.actorRef.side==="player"&&record.actorRef.participantId==="academy_menma"&&["skill_action_completed","item_action_completed","summon_skill_resolved_and_returned"].includes(record.eventType));
+  const actionIds=[...new Set(playerCompletionRecords.map(record=>record.actionId))];
+  let meaningful=0;
+  actionIds.forEach(actionId=>{
+    const recordsForAction=playerCompletionRecords.filter(record=>record.actionId===actionId);
+    const completion=recordsForAction.find(record=>record.eventType==="skill_action_completed")||recordsForAction.find(record=>record.eventType==="summon_skill_resolved_and_returned")||recordsForAction.find(record=>record.eventType==="item_action_completed")||null;
+    if (!completion) return;
+    if (completion.eventType==="item_action_completed") { if (completion.data&&completion.data.resolved===true) meaningful+=1; return; }
+    const data=completion.data||{};
+    if (data.damageApplied===true) { if (Number(data.finalDamage)>0) meaningful+=1; return; }
+    if ((completion.stateRefs&&completion.stateRefs.length>0)||(completion.conditionRefs&&completion.conditionRefs.length>0)) { meaningful+=1; return; }
+    if (data.resolved===true) meaningful+=1;
+  });
+  const committedMenmaActionOpportunities=actionIds.length;
+  const actionExecutionRatio=committedMenmaActionOpportunities>0?meaningful/committedMenmaActionOpportunities:0;
+  const outcome=outcomeOverride||(currentBattle.outcome&&currentBattle.outcome.type)||null;
+  const opponentStopped=outcome==="victory"&&getBattleRemainingPL("enemy","test_subject_altered_shinobi")<=0;
+  const tutorialResult=opponentStopped?"completed":"not_completed";
+  let performanceBucket=null;
+  if (tutorialResult==="completed") {
+    if (pressureRatio<=0.30&&criticalExposure!==true&&actionExecutionRatio>=0.75) performanceBucket="high";
+    else if (pressureRatio>0.65||criticalExposure===true||actionExecutionRatio<0.50) performanceBucket="low";
+    else performanceBucket="middle";
+  }
+  const supportingOccurrenceIds=[...new Set([
+    ...damageRecords.map(record=>record.evidenceId),
+    ...playerCompletionRecords.filter(record=>record.committedOccurrence===true||record.eventType==="item_action_completed").map(record=>record.evidenceId)
+  ].filter(Boolean))];
+  return {
+    startingUnderlyingBattlePLMaximum:startMaximum,
+    grossFinalPLDamageReceived,
+    pressureRatio,
+    criticalExposure,
+    committedMenmaActionOpportunities,
+    meaningfullyResolvedMenmaActions:meaningful,
+    actionExecutionRatio,
+    tutorialResult,
+    performanceBucket,
+    supportingOccurrenceIds,
+    healingDoesNotRewriteHistoricalDamage:true
+  };
+}
+
+function createMenmaOriginTutorialResultProjection({outcome,getEvidence}={}) {
+  const performance=resolveMenmaOriginTutorialPerformance(typeof getEvidence==="function"?getEvidence():null,outcome&&outcome.type||null);
+  const kinjutsu=resolveMenmaOriginKinjutsuObservationRead(typeof getEvidence==="function"?getEvidence():null);
+  return {...performance,observedKinjutsu:kinjutsu.observed===true,kinjutsuObservationOccurrenceIds:[...(kinjutsu.occurrenceIds||[])]};
+}
+
+function recordMenmaOriginPostBattleReads() {
+  if (!isMenmaOriginTutorialBattle()) return {success:false,reason:"not_menma_origin_tutorial"};
+  const performance=resolveMenmaOriginTutorialPerformance();
+  const kinjutsu=resolveMenmaOriginKinjutsuObservationRead();
+  const existing=(currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[]).find(record=>record&&record.eventType==="menma_origin_tutorial_read_resolved"&&record.battleId===currentBattle.battleId);
+  if (existing) return {success:true,idempotent:true,evidence:existing,performance,kinjutsu};
+  const evidence=recordBattleEvidence({
+    eventType:"menma_origin_tutorial_read_resolved",committedOccurrence:false,
+    actorRef:createBattleParticipantRef("player","academy_menma"),
+    sourceRefs:[{type:"story_scene",id:"origin_academy_menma_prologue",role:"authored_tutorial_context"}],
+    data:{performanceBucket:performance.performanceBucket,tutorialResult:performance.tutorialResult,pressureRatio:performance.pressureRatio,criticalExposure:performance.criticalExposure,actionExecutionRatio:performance.actionExecutionRatio,observedKinjutsu:kinjutsu.observed===true,supportingOccurrenceIds:performance.supportingOccurrenceIds,kinjutsuObservationOccurrenceIds:kinjutsu.occurrenceIds||[]}
+  });
+  return {success:!!evidence,evidence,performance,kinjutsu};
+}
+
+// =========================================================
 // BRICK 686 — COMBAT ALPHA GENERIC ENEMY ACTION AUTHORITY
 // BRICK 687 — ALPHA BOSS ACTION PACKAGE INGESTION
 // BRICK 688 — RANDOMNESS ONLY AFTER SEMANTIC ELIGIBILITY
@@ -81328,6 +81539,11 @@ const ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES = Object.freeze({
     makeEnemyFixedDamageAction("enemy_bandit_leader_execution_cut",17,{primaryDiscipline:"Bukijutsu"}),
     makeEnemyFixedDamageAction("enemy_bandit_leader_explosive_tag_burst",14,{primaryDiscipline:"Bukijutsu",traits:["one_packet","no_automatic_burning"]}),
     makeEnemyFixedDamageAction("enemy_bandit_leader_cross_slash",15,{primaryDiscipline:"Bukijutsu",traits:["visual_two_hit_one_packet"]})
+  ]),
+  test_subject_altered_shinobi:Object.freeze([
+    Object.assign(makeEnemyFixedDamageAction("test_subject_altered_shinobi_shinobi_strike",5,{traits:["grounded_shinobi_fundamentals","no_unwritten_control_rider"]}),{authoredAttackPL:5}),
+    Object.assign(makeEnemyFixedDamageAction("test_subject_altered_shinobi_shuriken_cast",4,{traits:["projectile_presentation_one_packet"]}),{authoredAttackPL:4}),
+    Object.assign(makeEnemyFixedDamageAction("test_subject_altered_shinobi_unstable_chakra_burst",6,{traits:["one_authored_packet","no_automatic_self_damage","no_automatic_condition","no_curse_mark_escalation"]}),{authoredAttackPL:6})
   ]),
 
   undying_madara:Object.freeze([
@@ -81530,7 +81746,7 @@ function executeEnemyAuthoredActionOpportunity() {
 // Combat's final ingestion contract requires these three existing enemy records
 // to expose authoredBattleActions directly. The central package map remains the
 // source definition, while the enemy record receives the exact authored package.
-["scout","bandit","banditLeader"].forEach(enemyId=>{
+["scout","bandit","banditLeader","test_subject_altered_shinobi"].forEach(enemyId=>{
   const enemy=enemyDatabase[enemyId];
   const authored=ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES[enemyId];
   if (enemy&&Array.isArray(authored)) enemy.authoredBattleActions=[...authored];
