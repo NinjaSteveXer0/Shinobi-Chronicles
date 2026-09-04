@@ -24,12 +24,13 @@ The Brute and Unstable Test Subject are not silently instantiated into Menma's B
 
 The corrected Writing dialogue uses `MENMA: “She does.”` for the female Altered Shinobi.
 
-The Altered Shinobi action package previously closed by Combat remains authoritative:
+The Altered Shinobi Alpha action package is exactly:
 
 - `test_subject_altered_shinobi_shinobi_strike`
 - `test_subject_altered_shinobi_shuriken_cast`
 - `test_subject_altered_shinobi_unstable_chakra_burst`
-- ordinary Basic Attack / Guard where legal.
+
+These three authored Actions are sufficient for the Alpha Menma tutorial encounter. The earlier phrase **“plus ordinary Basic Attack / Guard where legal” is superseded**. There is no universal enemy Basic Attack / Guard fallback authority to infer here, and Coding must not fabricate Basic Attack or Guard machine IDs, Attack PL, guard ratios, resolver semantics, or Stat-derived fallbacks for this opponent.
 
 No boss-scale Curse Mark package, arbitrary Orochimaru high-tier inheritance, hidden instability stat, Summon package or Transformation is added.
 
