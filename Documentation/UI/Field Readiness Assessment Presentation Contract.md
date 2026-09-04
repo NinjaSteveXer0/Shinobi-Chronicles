@@ -2,7 +2,7 @@
 
 Date: 4 September 2026
 
-Status: **BINDING ALPHA UI PRESENTATION CONTRACT — PRODUCTION SEMANTICS CLOSED / BACKEND CONTRACT CODING-REPORTED IMPLEMENTED AT BRICK 878 / FIELD ORCHESTRATION + UI + GOLDEN VALIDATION REMAIN**
+Status: **BINDING ALPHA UI PRESENTATION CONTRACT — PRODUCTION SEMANTICS CLOSED / REUSABLE CONSUMER CODING-REPORTED READY / ARENA→PROMOTION ENTRY LOCKED / FIELD CONTENT + END-TO-END GOLDEN VALIDATION REMAIN**
 
 ---
 
@@ -22,23 +22,80 @@ UI consumes that contract; it does not create a second Promotion resolver.
 
 # Current implementation status
 
-Coding has reported the backend assessment/evidence/result contract implemented at **Brick 878**.
+Coding has reported the backend assessment/evidence/result contract implemented at **Brick 878** and now reports the reusable player-facing assessment consumer plus Battle-return bridge ready.
+
+Runtime entry:
+
+`openFieldReadinessAssessmentUI(ownedCharacterId?)`
+
+The consumer reads existing authoritative assessment state and exposes only observer-safe presentation including the formal mission, assessment subject, known objective progress and authoritative completed result.
+
+Coding also reports that a Battle launched from the assessment can return to the same Field Readiness assessment context through the dedicated return bridge.
 
 This status is recorded as a Coding report, not as an independent UI source audit of every runtime path.
 
-Therefore the current remaining Alpha work is not another Rank or Combat adjudication pass. It is:
+Therefore remaining Alpha work is not another Rank or Combat adjudication pass and not another assessment-state model. It is:
 
-- actual field/map/story orchestration for the assessment;
+- final field/map/story content orchestration for the assessment;
 - controlled assessment content/opposition where authored;
-- player-facing mission/evidence/result presentation;
+- player-facing polish around the already implemented reusable consumer;
 - end-to-end runtime validation;
 - SC-specific Golden regression.
 
 Canonical boundary:
 
-> **Combat authority closed ≠ Coding implemented ≠ field orchestration complete ≠ UI integrated ≠ Golden Regression passed.**
+> **Combat/Rank authority closed ≠ reusable consumer implemented ≠ authored field orchestration complete ≠ Golden Regression passed.**
 
-Do not reopen Rank/Combat criteria merely because those later integration stages remain incomplete.
+Do not reopen Rank/Combat criteria merely because later integration stages remain incomplete.
+
+---
+
+# Alpha player entry route — LOCKED
+
+The permanent Alpha player entry route for the Field Readiness Assessment is the existing **Arena → Promotion** surface.
+
+Player flow:
+
+`Arena Main`
+
+→ `Promotion`
+
+→ `FIELD READINESS ASSESSMENT`
+
+→ explicit player entry/commit
+
+→ `openFieldReadinessAssessmentUI(ownedCharacterId?)`
+
+The Promotion surface is therefore the navigation/presentation owner of assessment entry for Alpha. It does not become assessment-state, Rank, Evidence or Promotion authority.
+
+Preserve:
+
+> **UI entry point ≠ assessment authority.**
+
+> **Promotion availability ≠ forced entry.**
+
+> **inspecting the Promotion surface ≠ committing an assessment attempt.**
+
+> **mission progress presentation ≠ readiness scoring.**
+
+> **Battle ≠ Promotion.**
+
+The player must deliberately enter/commit the assessment after viewing the Promotion surface. UI must not automatically start the assessment merely because eligibility becomes true or because the player opens Arena.
+
+For Alpha, do not create a second direct assessment launcher in Shinobi Records, My Clan, the ordinary regional map event drawer, or another parallel navigation model. Other surfaces may legitimately communicate that Promotion is available or navigate the player toward the Arena/Promotion destination where authorised, but the actual assessment-launch affordance remains on the Arena → Promotion surface.
+
+If the Promotion surface can represent more than one eligible owned Academy subject, it must consume authoritative eligible-subject state. UI must not manufacture eligibility. When an exact subject is selected/known, pass that owned character identity to the existing runtime entry rather than infer another subject from portrait order, team position or Registry similarity.
+
+Battle launched during the assessment must return through Coding's Field Readiness Battle-return bridge to the **same ongoing assessment context**, not to Arena Main and not to a new assessment instance.
+
+On completed assessment resolution:
+
+- the result remains the authoritative Rank/assessment result;
+- success may continue into the authoritative Genin Roster Transition flow;
+- failure preserves the attempt/history and follows authoritative re-attempt/continuation state;
+- UI does not decide either result from Battle outcome.
+
+This route reuses the already-approved Arena/Promotion architecture and avoids creating another Promotion-specific state model.
 
 ---
 
@@ -299,7 +356,9 @@ At minimum, the SC gate should prove:
 5. only `assessmentSubjectOwnedCharacterId` receives Rank mutation;
 6. personal and protective evidence remain distinct;
 7. objective-protection evidence does not automatically mint Escort Special Jōnin qualification;
-8. UI does not expose or manufacture hidden scoring.
+8. UI does not expose or manufacture hidden scoring;
+9. assessment entry from Arena/Promotion does not itself commit an attempt until the explicit entry action;
+10. Battle returns to the same assessment context instead of creating a second attempt or returning to Arena prematurely.
 
 ---
 
@@ -314,6 +373,7 @@ Do not build:
 - one fixed route/choreography;
 - a Menma-tutorial clone;
 - hidden personality/morality scoring from route choices;
-- a second UI-owned readiness evaluator.
+- a second UI-owned readiness evaluator;
+- a second Alpha navigation route that bypasses the Arena/Promotion entry surface.
 
 Reuse existing Chronicle-aware map/event, Story Scene, Battle, Records/Knowledge and Promotion surfaces.
