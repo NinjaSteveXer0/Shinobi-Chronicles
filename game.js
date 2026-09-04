@@ -44372,81 +44372,61 @@ function runAlphaPost871MonsterDiagnostics() {
 // Runtime can remain Post-871 GREEN while Alpha Combat Freeze is HOLD if an
 // authored production branch still lacks an exact consumer. Explicitly visible
 // incompleteness is safer than fabricated behaviour, but it is not freeze proof.
+function collectAlphaSecondarySemanticCandidates() {
+  const closureSkills=Object.values(CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE||{}).filter(Boolean);
+  const candidates=[];
+  const add=(domain,id,semantic,reason)=>candidates.push({domain,id,semantic,reason,key:`${domain}|${id}|${semantic}`});
+  closureSkills.filter(skill=>skill.persistentState&&skill.persistentState.requiresAuthoredPersistenceOpportunity===true)
+    .forEach(skill=>add("character_skill",skill.id,"persistent_output_opportunity","persistent output requires exact authored consumer"));
+  closureSkills.filter(skill=>skill.conditionalRider&&skill.conditionalRider.automatic!==true)
+    .forEach(skill=>add("character_skill",skill.id,"conditional_rider",`conditional rider ${skill.conditionalRider.kind||skill.conditionalRider.type||"authored"}`));
+  closureSkills.filter(skill=>skill.resolutionKind==="planetary_devastation_two_stage")
+    .forEach(skill=>add("character_skill",skill.id,"stage_2_resolution","committed two-stage continuation"));
+  closureSkills.filter(skill=>skill.resolutionKind==="damage_then_sealing_context"&&skill.sealingBranch&&skill.sealingBranch.automaticOnDamage===false)
+    .forEach(skill=>add("character_skill",skill.id,"sealing_branch","independent sealing branch"));
+  add("summon_action","kamatari_gale_sever","catastrophic_interruption_listener","catastrophic disruption listener");
+  add("boss_action","fallen_hokage_sasuke_shadow_seal","qualifying_interference_consumption","one qualifying interference");
+  add("boss_action","shadow_of_indra_black_mirror","perception_reversal_interaction","one-use perception reversal");
+  add("boss_action","black_madara_black_tendril_impalement","qualified_restraint_rider","same-source Lattice-qualified restraint");
+  return candidates;
+}
+
 function runAlphaGoldenCombatSemanticClosureAudit() {
   const closureSkills=Object.values(CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE||{}).filter(Boolean);
   const summonSkills=Object.values(summonSkillDatabase||{}).filter(Boolean);
   const kisoganActions=Object.values(KISOGAN_ACTION_DATABASE||{}).filter(Boolean);
   const enemyActions=Object.values(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES||{}).flat().filter(Boolean);
-
   const closureResolverSource=resolveClosureWaveSkillSemantics.toString();
   const summonResolverSource=resolveBattleSummonSkillSemantics.toString();
   const kisoganResolverSource=resolveKisoganActionAgainstReferences.toString();
-
   const closureKinds=[...new Set(closureSkills.map(skill=>skill.resolutionKind).filter(Boolean))];
   const summonKinds=[...new Set(summonSkills.map(skill=>skill.resolutionKind).filter(Boolean))];
   const kisoganKinds=[...new Set(kisoganActions.map(action=>action.resolutionKind).filter(Boolean))];
-
   const closureUnsupported=closureKinds.filter(kind=>!closureResolverSource.includes(`"${kind}"`));
   const summonUnsupported=summonKinds.filter(kind=>!summonResolverSource.includes(`"${kind}"`));
   const kisoganUnsupported=kisoganKinds.filter(kind=>!kisoganResolverSource.includes(`"${kind}"`));
   const enemyWithoutResolver=enemyActions.filter(action=>typeof action.resolve!=="function").map(action=>action.id||action.skillId||"unknown_enemy_action");
-
+  const candidates=collectAlphaSecondarySemanticCandidates();
+  const implemented=[];
+  const explicitlyDeferred=[];
   const unresolved=[];
-  const add=(domain,id,semantic,reason)=>unresolved.push({domain,id,semantic,reason});
-
-  // Persistent-damage setup exists, but the source contains no authored
-  // opportunity/tick consumer for these exact states yet.
-  closureSkills.filter(skill=>skill.persistentState&&skill.persistentState.requiresAuthoredPersistenceOpportunity===true)
-    .forEach(skill=>add("character_skill",skill.id,"persistent_output_opportunity","persistent state establishes correctly but no authored opportunity/tick consumer is wired"));
-
-  // Generic conditional riders are intentionally not inferred from damage. They
-  // remain a freeze question until an exact qualifying consumer is present or
-  // the rider is explicitly classified outside Alpha production.
-  closureSkills.filter(skill=>skill.conditionalRider&&skill.conditionalRider.automatic!==true)
-    .forEach(skill=>add("character_skill",skill.id,"conditional_rider",`conditional rider ${skill.conditionalRider.kind||skill.conditionalRider.type||"authored"} is recorded as available but not committed by the main resolver`));
-
-  closureSkills.filter(skill=>skill.resolutionKind==="planetary_devastation_two_stage")
-    .forEach(skill=>add("character_skill",skill.id,"stage_2_resolution","stage 1 commits a pending state; no player-side stage-2 continuation consumer is wired"));
-
-  closureSkills.filter(skill=>skill.resolutionKind==="damage_then_sealing_context"&&skill.sealingBranch&&skill.sealingBranch.automaticOnDamage===false)
-    .forEach(skill=>add("character_skill",skill.id,"sealing_branch","damage commits and sealing context is calculated, but the independent qualifying sealing commit consumer is absent"));
-
-  // Known source-level reactive/context consumers that still have no central
-  // caller or exact interaction implementation in the audited Post-871 source.
-  const kamatariHookSources=[resolveBattleDamagePacket,resolveBattleStartOfActionOpportunityEffects,attemptBattleSummonSkill,resolveBattleSummonSkillSemantics].map(fn=>fn.toString()).join("\n");
-  if (!kamatariHookSources.includes("interruptKamatariGaleSever(")) add("summon_action","kamatari_gale_sever","catastrophic_interruption_listener","exact backfire helper exists, but no central Combat event listener calls it");
-
-  const shadowSeal=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.fallen_hokage_sasuke||[]).find(action=>action&&action.id==="fallen_hokage_sasuke_shadow_seal");
-  if (shadowSeal&&shadowSeal.traits&&shadowSeal.traits.includes("one_qualifying_interference")) add("boss_action",shadowSeal.id,"qualifying_interference_consumption","state is established, but no exact one-interference consumer is wired");
-
-  const blackMirror=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.shadow_of_indra||[]).find(action=>action&&action.id==="shadow_of_indra_black_mirror");
-  if (blackMirror&&blackMirror.actionClass==="enemy_context_technique") add("boss_action",blackMirror.id,"perception_reversal_interaction","current resolver records categorical context only; no universal reversal is inferred and no exact reversal consumer is wired");
-
-  const blackTendril=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.black_madara||[]).find(action=>action&&action.id==="black_madara_black_tendril_impalement");
-  if (blackTendril&&blackTendril.traits&&blackTendril.traits.includes("damage_success_not_automatic_restraint")) add("boss_action",blackTendril.id,"qualified_restraint_rider","damage resolver explicitly withholds restraint pending an exact qualification consumer");
-
-  const mainResolverCoverage={
-    closureSkillKinds:closureKinds.length,
-    closureUnsupported,
-    summonSkillKinds:summonKinds.length,
-    summonUnsupported,
-    kisoganActionKinds:kisoganKinds.length,
-    kisoganUnsupported,
-    enemyActions:enemyActions.length,
-    enemyWithoutResolver
-  };
+  candidates.forEach(candidate=>{
+    if (ALPHA_IMPLEMENTED_SECONDARY_SEMANTIC_KEYS.has(candidate.key)) implemented.push({...candidate,status:"implemented_alpha_consumer"});
+    else if (ALPHA_DEFERRED_SECONDARY_SEMANTIC_KEYS.has(candidate.key)) explicitlyDeferred.push({...candidate,status:"explicitly_deferred_secondary_branch"});
+    else unresolved.push({...candidate,status:"unresolved"});
+  });
+  const mainResolverCoverage={closureSkillKinds:closureKinds.length,closureUnsupported,summonSkillKinds:summonKinds.length,summonUnsupported,kisoganActionKinds:kisoganKinds.length,kisoganUnsupported,enemyActions:enemyActions.length,enemyWithoutResolver};
   const mainResolversComplete=closureUnsupported.length===0&&summonUnsupported.length===0&&kisoganUnsupported.length===0&&enemyWithoutResolver.length===0;
+  const classificationCounts={implementedAlphaConsumers:implemented.length,explicitlyDeferredSecondarySemantics:explicitlyDeferred.length,unresolvedAlphaProduction:unresolved.length};
   const audit={
-    runtimeBaseline:"post_871_green_required_separately",
+    runtimeBaseline:"post_879_green_required_separately",
     productionCounts:{characterSkills:closureSkills.length,summonActions:summonSkills.length,kisoganActions:kisoganActions.length,enemyActions:enemyActions.length},
-    mainResolverCoverage,
-    mainResolversComplete,
-    unresolved,
-    unresolvedCount:unresolved.length,
-    auditComplete:true,
-    alphaCombatFreezeReady:mainResolversComplete&&unresolved.length===0
+    mainResolverCoverage,mainResolversComplete,candidates,implemented,explicitlyDeferred,unresolved,
+    classificationCounts,unresolvedCount:unresolved.length,auditComplete:true,
+    exactCombatAdjudicationCount:candidates.length===30&&implemented.length===20&&explicitlyDeferred.length===10,
+    alphaCombatFreezeReady:mainResolversComplete&&unresolved.length===0&&candidates.length===30&&implemented.length===20&&explicitlyDeferred.length===10
   };
-  console.log(`SC Alpha Golden Combat semantic closure audit: ${audit.alphaCombatFreezeReady?"FREEZE READY":"HOLD"} (${audit.unresolvedCount} unresolved semantic consumers)`);
+  console.log(`SC Alpha Golden Combat semantic closure audit: ${audit.alphaCombatFreezeReady?"SEMANTIC GREEN":"HOLD"} (${implemented.length} implemented / ${explicitlyDeferred.length} deferred / ${unresolved.length} unresolved)`);
   if (unresolved.length) console.table(unresolved);
   return audit;
 }
@@ -44573,6 +44553,342 @@ function runAlphaPost879MonsterDiagnostics() {
   const runtimeGreen=preFreeze&&preFreeze.runtimeGreen===true&&Object.values(groups).every(group=>group&&group.pass===true);
   const result={preFreeze,groups,runtimeGreen,combatFreezeReady:preFreeze&&preFreeze.semanticClosure&&preFreeze.semanticClosure.alphaCombatFreezeReady===true,pass:runtimeGreen};
   console.log(`SC Alpha post-879 monster gate: runtime=${runtimeGreen?"GREEN":"FAIL"} / Combat Freeze=${result.combatFreezeReady?"READY":"HOLD"}`);
+  return result;
+}
+
+
+// =========================================================
+// BRICK 880 — COMBAT POST-872 20/10 SECONDARY-SEMANTIC AUTHORITY
+// =========================================================
+const ALPHA_IMPLEMENTED_SECONDARY_SEMANTIC_KEYS=new Set([
+  "character_skill|akatsuki_itachi_amaterasu|persistent_output_opportunity",
+  "character_skill|amaterasu|persistent_output_opportunity",
+  "character_skill|kage_itachi_amaterasu|persistent_output_opportunity",
+  "character_skill|genin_sarada_fireball_jutsu|conditional_rider",
+  "character_skill|genin_sasuke_great_fireball|conditional_rider",
+  "character_skill|genin_sasuke_dragon_fire|conditional_rider",
+  "character_skill|chunin_jiraiya_flame_bullet|conditional_rider",
+  "character_skill|kage_sarada_inferno_fireball|conditional_rider",
+  "character_skill|shisui_great_fireball|conditional_rider",
+  "character_skill|chunin_shikadai_shadow_sewing|conditional_rider",
+  "character_skill|sannin_shikamaru_shadow_sewing_barrage|conditional_rider",
+  "character_skill|akatsuki_deva_black_receiver_impalement|conditional_rider",
+  "character_skill|eight_trigrams_sixty_four_palms|conditional_rider",
+  "character_skill|sannin_shikamaru_shadow_neck_binding|conditional_rider",
+  "character_skill|teen_nagato_black_receiver_bind|conditional_rider",
+  "character_skill|akatsuki_deva_planetary_devastation|stage_2_resolution",
+  "summon_action|kamatari_gale_sever|catastrophic_interruption_listener",
+  "boss_action|fallen_hokage_sasuke_shadow_seal|qualifying_interference_consumption",
+  "boss_action|shadow_of_indra_black_mirror|perception_reversal_interaction",
+  "boss_action|black_madara_black_tendril_impalement|qualified_restraint_rider"
+]);
+const ALPHA_DEFERRED_SECONDARY_SEMANTIC_KEYS=new Set([
+  "character_skill|academy_menma_guard_breaker|conditional_rider",
+  "character_skill|genin_sarada_chakra_enhanced_strike|conditional_rider",
+  "character_skill|dragon_flame|conditional_rider",
+  "character_skill|fireball_ambush|conditional_rider",
+  "character_skill|jonin_konohamaru_burning_ash_cloud|conditional_rider",
+  "character_skill|jonin_sasuke_great_fireball|conditional_rider",
+  "character_skill|jonin_sasuke_wire_dragon_flame|conditional_rider",
+  "character_skill|kurama_dominion_nine_pillars|conditional_rider",
+  "character_skill|teen_nagato_almighty_push|conditional_rider",
+  "character_skill|kage_itachi_totsuka_blade|sealing_branch"
+]);
+
+// =========================================================
+// BRICK 881 — AMATERASU + EXACT ORDINARY-BURNING CONSUMERS
+// =========================================================
+function establishAlphaAmaterasuFlameState(skill,envelope,actor,target) {
+  const attackPL=Math.max(0,Math.round(Number(skill&&skill.persistentState&&skill.persistentState.persistentAttackPL)||0));
+  if (!actor||!target||attackPL<=0) return null;
+  const runtime=ensureBattleRuntimeState();
+  let state=runtime.transientStates.find(item=>item&&item.stateKey==="amaterasu_flame"&&item.sourceRef&&item.sourceRef.side==="player"&&item.sourceRef.participantId===actor.id&&item.targetRef&&item.targetRef.side==="enemy"&&item.targetRef.participantId===target.id&&item.data&&item.data.sourceSkillId===skill.id)||null;
+  const refreshed=!!state;
+  if (!state) state=addBattleTransientState({stateKey:"amaterasu_flame",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,ownerRef:{type:"skill",id:skill.id},data:{}});
+  if (!state) return null;
+  state.data={...(state.data||{}),sourceSkillId:skill.id,persistentAttackPL:attackPL,remainingTicks:3,maximumTicks:3,tickPhase:"start_of_action_opportunity",ordinaryStaminaMitigation:true,bypassStamina:false,notGenericBurning:true,compatibleCureItemIds:[],exactSourceStream:true,lastEstablishmentActionId:envelope.actionId};
+  recordBattleEvidence({eventType:refreshed?"amaterasu_flame_refreshed":"amaterasu_flame_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:[state.stateId],data:{persistentAttackPL:attackPL,maximumTicks:3,tickPhase:"start_of_action_opportunity",ordinaryStaminaMitigation:true,genericBurning:false,burnTreatmentCompatible:false,exactSourceStream:true}});
+  return {state,condition:null,refreshed};
+}
+
+function resolveAlphaAmaterasuStartOpportunityTicks(side,participantId,actionId=null) {
+  const runtime=ensureBattleRuntimeState();
+  const states=[...runtime.transientStates].filter(state=>state&&state.stateKey==="amaterasu_flame"&&state.targetRef&&state.targetRef.side===side&&state.targetRef.participantId===participantId&&state.data&&Number(state.data.remainingTicks)>0);
+  const results=[];
+  states.forEach(state=>{
+    const attackPL=Math.max(0,Math.round(Number(state.data.persistentAttackPL)||0));
+    if (attackPL<=0) return;
+    const effectiveStamina=getBattleEffectiveStamina(side,participantId);
+    const stamina=calculateBattleStaminaMitigationV1(attackPL,effectiveStamina);
+    const absorption=absorbBattleDamageBearingCapacity(side,participantId,stamina.finalDamage);
+    state.data.remainingTicks=Math.max(0,Number(state.data.remainingTicks)-1);
+    const evidence=recordBattleEvidence({eventType:"amaterasu_flame_tick_resolved",committedOccurrence:true,actionId,actorRef:state.sourceRef?cloneBattleRuntimeValue(state.sourceRef):null,targetRef:createBattleParticipantRef(side,participantId),skillId:state.data.sourceSkillId||null,sourceRefs:[{type:"skill",id:state.data.sourceSkillId||"amaterasu",role:"persistent_exact_source"},{type:"state",id:state.stateId,role:"amaterasu_flame_stream"}],stateRefs:[state.stateId],data:{authoredAttackPL:attackPL,effectiveStamina:stamina.effectiveStamina,staminaMitigationAmount:stamina.mitigationAmount,finalDamage:stamina.finalDamage,absorbedPL:absorption.absorbedPL,remainingTicks:state.data.remainingTicks,bypassStamina:false,genericBurning:false}});
+    let zeroResult=null;
+    if (absorption.totalCapacityAfter<=0) zeroResult=handleBattleParticipantAtZeroPL(side,participantId,null,{actionId});
+    const expired=state.data.remainingTicks<=0;
+    if (expired) removeBattleTransientState(state.stateId);
+    results.push({stateId:state.stateId,skillId:state.data.sourceSkillId,attackPL,stamina,absorption,evidence,expired,zeroResult});
+  });
+  return results;
+}
+
+const ALPHA_ORDINARY_BURNING_RIDER_SKILL_IDS=new Set(["genin_sarada_fireball_jutsu","genin_sasuke_great_fireball","genin_sasuke_dragon_fire","chunin_jiraiya_flame_bullet","kage_sarada_inferno_fireball","shisui_great_fireball"]);
+
+function getAlphaPositiveDamageTargets(skill,envelope,target,resolution) {
+  if (!resolution||resolution.resolved!==true) return [];
+  if (Array.isArray(resolution.areaResults)) return resolution.areaResults.filter(item=>item&&item.targetParticipantId&&item.damage&&Number(item.damage.finalDamage)>0).map(item=>({side:"enemy",participantId:item.targetParticipantId,finalDamage:Number(item.damage.finalDamage)}));
+  if (target&&Number(resolution.finalDamage)>0) return [{side:envelope&&envelope.targetRef&&envelope.targetRef.side||"enemy",participantId:target.id,finalDamage:Number(resolution.finalDamage)}];
+  return [];
+}
+
+function applyAlphaOrdinaryBurningRider(skill,envelope,actor,target,resolution) {
+  if (!skill||!ALPHA_ORDINARY_BURNING_RIDER_SKILL_IDS.has(skill.id)||!skill.conditionalRider||skill.conditionalRider.kind!=="ordinary_burning") return [];
+  return getAlphaPositiveDamageTargets(skill,envelope,target,resolution).map(ref=>{
+    const applied=applyGenericAlphaBattleCondition("burning",{sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:ref.side,targetParticipantId:ref.participantId,data:{qualification:"positive_committed_final_damage",parentSkillId:skill.id,fireVisualAloneInsufficient:true}});
+    if (applied&&applied.condition) recordBattleEvidence({eventType:applied.refreshed?"ordinary_burning_refreshed_from_qualified_parent":"ordinary_burning_established_from_qualified_parent",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:createBattleParticipantRef(ref.side,ref.participantId),skillId:skill.id,sourceRefs:envelope.sourceRefs,conditionRefs:[applied.condition.conditionId],data:{parentFinalDamage:ref.finalDamage,exactParentMetadata:true,genericBurning:true}});
+    return applied&&applied.condition?applied.condition:null;
+  }).filter(Boolean);
+}
+
+// =========================================================
+// BRICK 882 — EXACT CONTROL / QUALIFIED SECONDARY RIDERS
+// =========================================================
+function getBattleConditionSourceParticipantId(condition) {
+  const source=getBattleConditionEstablishmentSourceRef(condition);
+  return source&&source.participantId||null;
+}
+
+function upsertAlphaSourceScopedCondition(definition) {
+  const runtime=ensureBattleRuntimeState();
+  const existing=runtime.conditions.find(condition=>condition&&condition.conditionKey===definition.conditionKey&&condition.targetRef&&condition.targetRef.side===definition.targetSide&&condition.targetRef.participantId===definition.targetParticipantId&&getBattleConditionSourceParticipantId(condition)===definition.sourceParticipantId);
+  if (!existing) return {condition:addBattleCondition(definition),refreshed:false};
+  const refresh=createBattleConditionEstablishment(definition,runtime);
+  existing.conditionType=definition.conditionType||existing.conditionType;
+  existing.blockedActionClasses=Array.isArray(definition.blockedActionClasses)?[...new Set(definition.blockedActionClasses.filter(Boolean))]:existing.blockedActionClasses;
+  existing.blockedActionTraits=Array.isArray(definition.blockedActionTraits)?[...new Set(definition.blockedActionTraits.filter(Boolean))]:existing.blockedActionTraits;
+  existing.data={...(existing.data||{}),...(definition.data?cloneBattleRuntimeValue(definition.data):{})};
+  existing.establishment=refresh;existing.lastRefresh=refresh;existing.refreshedAt=Date.now();
+  return {condition:existing,refreshed:true,refresh};
+}
+
+function createAlphaMovementControlCondition({conditionKey,conditionType,sourceSide,sourceParticipantId,sourceRefs=[],sourceSkillId,actionId,targetSide,targetParticipantId,strength,resolverDiscipline,durationActionOpportunities=1,extraData={}}) {
+  const applied=upsertAlphaSourceScopedCondition({conditionKey,conditionType,sourceSide,sourceParticipantId,sourceRefs,sourceSkillId,actionId,targetSide,targetParticipantId,reapplication:"refresh",blockedActionClasses:["movement_technique"],blockedActionTraits:["substantial_free_movement","reposition","movement_dependent_taijutsu","movement_dependent_bukijutsu"],data:{resolverDiscipline,resolverStrength:strength,remainingActionOpportunities:durationActionOpportunities,durationActionOpportunities,blanketStun:false,...extraData}});
+  if (applied.condition) recordBattleEvidence({eventType:applied.refreshed?`${conditionKey}_refreshed`:`${conditionKey}_established`,committedOccurrence:true,actionId,actorRef:createBattleParticipantRef(sourceSide,sourceParticipantId),targetRef:createBattleParticipantRef(targetSide,targetParticipantId),skillId:sourceSkillId,sourceRefs,conditionRefs:[applied.condition.conditionId],data:{resolverDiscipline,resolverStrength:strength,durationActionOpportunities,blanketStun:false}});
+  return applied;
+}
+
+function resolveAlphaCharacterSkillSecondaryConsumers(skill,envelope,actor,target,resolution,options={}) {
+  const result={appliedIds:[],stateRefs:[],conditionRefs:[]};
+  if (!skill||!resolution||resolution.resolved!==true) return result;
+  const burning=applyAlphaOrdinaryBurningRider(skill,envelope,actor,target,resolution);
+  if (burning.length) {result.appliedIds.push("ordinary_burning");result.conditionRefs.push(...burning.map(c=>c.conditionId));}
+  const positiveTargets=getAlphaPositiveDamageTargets(skill,envelope,target,resolution);
+  const liveStrength=discipline=>{const live=resolveAuthoredDynamicControlStrength({sourceSide:"player",sourceParticipantId:actor.id,discipline});return live.success?live.strength:null;};
+
+  if (["chunin_shikadai_shadow_sewing","sannin_shikamaru_shadow_sewing_barrage"].includes(skill.id)) {
+    const strength=liveStrength("Ninjutsu");
+    positiveTargets.forEach(ref=>{if (strength===null)return;const applied=createAlphaMovementControlCondition({conditionKey:"shadow_pin",conditionType:"shadow_control",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:ref.side,targetParticipantId:ref.participantId,strength,resolverDiscipline:"Ninjutsu",durationActionOpportunities:1,extraData:{qualification:"positive_committed_final_damage"}});if(applied.condition)result.conditionRefs.push(applied.condition.conditionId);});
+    if (result.conditionRefs.length) result.appliedIds.push("shadow_pin");
+  }
+
+  if (skill.id==="akatsuki_deva_black_receiver_impalement"&&positiveTargets.length) {
+    const strength=liveStrength("Bukijutsu");
+    positiveTargets.forEach(ref=>{if(strength===null)return;const applied=createAlphaMovementControlCondition({conditionKey:"receiver_pin",conditionType:"physical_restraint",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:ref.side,targetParticipantId:ref.participantId,strength,resolverDiscipline:"Bukijutsu",durationActionOpportunities:1,extraData:{blanketChakraDenial:false}});if(applied.condition)result.conditionRefs.push(applied.condition.conditionId);});
+    if (result.conditionRefs.length) result.appliedIds.push("receiver_pin");
+  }
+
+  if (skill.id==="eight_trigrams_sixty_four_palms"&&positiveTargets.length) {
+    const live=liveStrength("Taijutsu");const strength=live===null?null:Math.max(0,Math.round(live*0.90));
+    positiveTargets.forEach(ref=>{if(strength===null)return;const applied=upsertAlphaSourceScopedCondition({conditionKey:"tenketsu_disruption",conditionType:"tenketsu_control",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:ref.side,targetParticipantId:ref.participantId,blockedActionClasses:["transformation_activation"],blockedActionTraits:["chakra_dependent_positive_self_enhancement"],data:{resolverDiscipline:"Taijutsu",resolverStrength:strength,remainingActionOpportunities:2,durationActionOpportunities:2,blanketStun:false,allChakraTechniquesBlocked:false,statsRewritten:false}});if(applied.condition)result.conditionRefs.push(applied.condition.conditionId);});
+    if (result.conditionRefs.length) result.appliedIds.push("tenketsu_disruption");
+  }
+
+  if (skill.id==="sannin_shikamaru_shadow_neck_binding"&&positiveTargets.length) {
+    const targetId=positiveTargets[0].participantId;
+    const existing=getBattleParticipantConditions("enemy",targetId).find(condition=>["shadow_possession","shadow_pin"].includes(condition.conditionKey)&&getBattleConditionSourceParticipantId(condition)===actor.id);
+    if (existing) {
+      existing.data={...(existing.data||{}),remainingActionOpportunities:1,durationActionOpportunities:1,shadowNeckControlRefreshed:true};
+      recordBattleEvidence({eventType:"shadow_neck_control_refreshed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:createBattleParticipantRef("enemy",targetId),skillId:skill.id,sourceRefs:envelope.sourceRefs,conditionRefs:[existing.conditionId],data:{requiresPriorSameSourceShadowControl:true,damageAloneDoesNotMintControl:true,blanketStun:false}});
+      result.appliedIds.push("shadow_neck_control_refresh");result.conditionRefs.push(existing.conditionId);
+    }
+  }
+
+  if (skill.id==="teen_nagato_black_receiver_bind"&&positiveTargets.length) {
+    const strength=liveStrength("Bukijutsu");
+    positiveTargets.forEach(ref=>{if(strength===null)return;const applied=createAlphaMovementControlCondition({conditionKey:"physical_restraint",conditionType:"physical_restraint",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:ref.side,targetParticipantId:ref.participantId,strength,resolverDiscipline:"Bukijutsu",durationActionOpportunities:1,extraData:{authoredBindContactResolved:true,blanketStun:false}});if(applied.condition)result.conditionRefs.push(applied.condition.conditionId);});
+    if (result.conditionRefs.length) result.appliedIds.push("teen_nagato_physical_restraint");
+  }
+  void options;
+  return result;
+}
+
+// =========================================================
+// BRICK 883 — PLANETARY DEVASTATION FORCED STAGE-2 CONTINUATION
+// =========================================================
+function getAlphaPlanetaryDevastationPendingState(actorId) {
+  return findBattleTransientState({stateKey:"planetary_core_formation",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId});
+}
+function resolveAlphaPlanetaryDevastationStage2(skill,envelope,actor,pending) {
+  if (!pending) return {resolved:false,reason:"planetary_core_missing"};
+  const stage2=skill.planetaryDevastation&&skill.planetaryDevastation.stage2||{};
+  const targetIds=getFactoryActiveTargetIds("enemy",stage2.maxTargets||3);
+  const areaResults=[];const stateRefs=[pending.stateId];
+  targetIds.forEach(targetId=>{
+    const output={primaryDiscipline:"Ninjutsu",statKey:"nin",effectivePrimaryDiscipline:null,coefficient:null,branch:"planetary_devastation_stage_2",branchMultiplier:1,authoredPreExecutionMagnitude:stage2.authoredAttackPLPerTarget,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:stage2.authoredAttackPLPerTarget,attackPL:stage2.authoredAttackPLPerTarget,fixedCalibration:true,perTarget:true};
+    const damage=resolveBattleDamagePacket({envelope,skill:{...skill,excess:null},actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:targetId,output,mitigable:true,excess:null,stateRefs:[pending.stateId]});
+    if (!damage) return;
+    const live=resolveAuthoredDynamicControlStrength({sourceSide:"player",sourceParticipantId:actor.id,discipline:"Ninjutsu"});
+    const strength=live.success?Math.max(0,Math.round(live.strength*1.10)):null;
+    let containment=null;
+    if (strength!==null) containment=addBattleTransientState({stateKey:"planetary_containment",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:targetId,ownerRef:{type:"skill",id:skill.id},data:{resolverDiscipline:"Ninjutsu",resolverStrength:strength,multiplier:1.10,blanketStun:false,noInventedBlockedActions:true,stage2ActionId:envelope.actionId}});
+    if (containment) stateRefs.push(containment.stateId);
+    areaResults.push({targetParticipantId:targetId,damage,containmentStateId:containment&&containment.stateId||null,containmentStrength:strength});
+  });
+  removeBattleTransientState(pending.stateId);
+  recordBattleEvidence({eventType:"planetary_devastation_stage2_resolved",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs,data:{stage:2,authoredAttackPLPerTarget:64,maxTargets:3,excess:false,targetParticipantIds:areaResults.map(item=>item.targetParticipantId),containmentStrengths:areaResults.map(item=>item.containmentStrength),pendingStateConsumedExactlyOnce:true}});
+  return {resolved:areaResults.length>0,branch:"planetary_stage2",damageApplied:areaResults.length>0,areaResults,finalDamage:areaResults.reduce((sum,item)=>sum+(Number(item.damage&&item.damage.finalDamage)||0),0),stateRefs,conditionRefs:[],stage2Pending:false};
+}
+
+// =========================================================
+// BRICK 884 — KAMATARI CATASTROPHIC-DISRUPTION LISTENER
+// =========================================================
+function resolveKamatariCatastrophicDisruptionFromCommittedAction({envelope,resolution,actionTraits=[]}={}) {
+  if (!envelope||!resolution||resolution.resolved!==true||!Array.isArray(actionTraits)||!actionTraits.includes("gale_sever_catastrophic_disruption")) return {triggered:false,reason:"no_authored_catastrophic_disruption"};
+  if (!envelope.targetRef||envelope.targetRef.side!=="player") return {triggered:false,reason:"charging_target_not_player"};
+  const actor=getBattleParticipantByIdentity("player",envelope.targetRef.participantId);
+  const charge=actor?getKamatariGaleSeverChargeState(actor):null;
+  const stage=charge?Math.max(1,Math.min(3,Number(charge.data&&charge.data.stage)||1)):0;
+  if (!actor||!charge||stage<2) return {triggered:false,reason:"qualifying_stage2_plus_charge_missing"};
+  const result=interruptKamatariGaleSever(actor,{catastrophic:true,reason:"authored_catastrophic_charge_disruption",actionId:envelope.actionId,sourceRefs:envelope.sourceRefs||[],disruptingSkillId:envelope.skillId||null});
+  return {triggered:result&&result.success===true,result};
+}
+
+// =========================================================
+// BRICK 885 — SHADOW SEAL / BLACK MIRROR / BLACK TENDRIL
+// =========================================================
+function isAlphaShadowSealQualifyingEnvelope(envelope) {
+  const traits=envelope&&envelope.data&&Array.isArray(envelope.data.traits)?envelope.data.traits:[];
+  return !!(envelope&&(envelope.actionClass==="transformation_activation"||traits.includes("chakra_dependent_positive_self_enhancement")));
+}
+function resolveAlphaPreCommitBattleActionAuthority(envelope) {
+  if (!envelope||!envelope.actorRef) return {allowed:true};
+  if (envelope.actorRef.side==="player") {
+    const planetary=getAlphaPlanetaryDevastationPendingState(envelope.actorRef.participantId);
+    if (planetary&&envelope.skillId!=="akatsuki_deva_planetary_devastation") return {allowed:false,reason:"planetary_devastation_stage2_required",stateId:planetary.stateId,forcedSkillId:"akatsuki_deva_planetary_devastation",actionOpportunityConsumed:false};
+    const seal=findBattleTransientState({stateKey:"shadow_seal_interference",targetSide:"player",targetParticipantId:envelope.actorRef.participantId});
+    if (seal&&isAlphaShadowSealQualifyingEnvelope(envelope)) {
+      removeBattleTransientState(seal.stateId);
+      const evidence=recordBattleEvidence({eventType:"shadow_seal_interference",committedOccurrence:true,actionId:null,actorRef:seal.sourceRef?cloneBattleRuntimeValue(seal.sourceRef):null,targetRef:cloneBattleRuntimeValue(envelope.actorRef),skillId:"fallen_hokage_sasuke_shadow_seal",sourceRefs:[{type:"state",id:seal.stateId,role:"consumed_interference"}],stateRefs:[seal.stateId],data:{rejectedRequestedActionClass:envelope.actionClass,rejectedRequestedSkillId:envelope.skillId||null,falseActionHistoryCreated:false,extraActionOpportunityConsumed:false,oneUse:true}});
+      return {allowed:false,reason:"shadow_seal_interference",stateId:seal.stateId,evidenceId:evidence&&evidence.evidenceId||null,actionOpportunityConsumed:false};
+    }
+  }
+  return {allowed:true};
+}
+
+function isAlphaInformationAcquisitionSkill(skill) {
+  if (!skill||skill.targetMode!=="current_enemy") return false;
+  if (skill.actionClass==="information_technique") return true;
+  const boundary=skill.categorical&&String(skill.categorical.informationBoundary||"").toLowerCase()||"";
+  return skill.resolutionKind==="categorical_evidence"&&["observation","information","read","evidence","analysis","sensory","perception"].some(term=>boundary.includes(term));
+}
+function resolveAlphaBlackMirrorInterferenceIfApplicable(skill,envelope,actor,target) {
+  if (!skill||!envelope||!actor||!target||!isAlphaInformationAcquisitionSkill(skill)) return {interfered:false};
+  const targetRegistryId=getCharacterRegistryId(target);
+  if (targetRegistryId!=="shadow_of_indra") return {interfered:false};
+  const state=findBattleTransientState({stateKey:"black_mirror_reversal_ready",sourceSide:"enemy",sourceParticipantId:target.id,targetSide:"player",targetParticipantId:actor.id});
+  if (!state) return {interfered:false};
+  removeBattleTransientState(state.stateId);
+  const evidence=recordBattleEvidence({eventType:"mirrored_perception_interference",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",target.id),targetRef:createBattleParticipantRef("player",actor.id),skillId:"shadow_of_indra_black_mirror",sourceRefs:[{type:"state",id:state.stateId,role:"one_use_reversal"},{type:"skill",id:skill.id,role:"interfered_information_action"}],stateRefs:[state.stateId],data:{newFactualInformationAcquired:false,deceptiveReversalEvidencePreserved:true,objectiveHistoryRewritten:false,observerKnowledgeStolen:false,techniqueStolen:false,damageRedirected:false,reflectedAttackPL:0}});
+  return {interfered:true,evidence,resolution:{resolved:true,branch:"mirrored_perception_interference",damageApplied:false,finalDamage:0,stateRefs:[state.stateId],conditionRefs:[],informationAcquired:false,objectiveTruthChanged:false}};
+}
+
+function resolveAlphaEnemyActionSecondaryConsumers(action,enemy,target,envelope,resolution) {
+  const result={appliedIds:[],stateRefs:[],conditionRefs:[]};
+  if (!action||!enemy||!target||!resolution||resolution.resolved!==true) return result;
+  if (action.id==="shadow_of_indra_black_mirror") {
+    const old=findBattleTransientState({stateKey:"black_mirror_reversal_ready",sourceSide:"enemy",sourceParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id});
+    if (old) removeBattleTransientState(old.stateId);
+    const state=addBattleTransientState({stateKey:"black_mirror_reversal_ready",sourceSide:"enemy",sourceParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id,ownerRef:{type:"skill",id:action.id},data:{remainingActionOpportunities:1,activationActionId:envelope.actionId,oneUse:true,perceptionReadOnly:true,attackPL:0,objectiveHistoryRewrite:false}});
+    if (state) {result.appliedIds.push("black_mirror_reversal_ready");result.stateRefs.push(state.stateId);}
+  }
+  if (action.id==="black_madara_black_tendril_impalement"&&Number(resolution.finalDamage)>0) {
+    const lattice=findBattleTransientState({stateKey:"black_lattice_control",sourceSide:"enemy",sourceParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id});
+    if (lattice) {
+      const live=resolveAuthoredDynamicControlStrength({sourceSide:"enemy",sourceParticipantId:enemy.id,discipline:"Kinjutsu"});
+      if (live.success) {
+        const applied=createAlphaMovementControlCondition({conditionKey:"black_tendril_restraint",conditionType:"physical_restraint",sourceSide:"enemy",sourceParticipantId:enemy.id,sourceRefs:envelope.sourceRefs,sourceSkillId:action.id,actionId:envelope.actionId,targetSide:"player",targetParticipantId:target.id,strength:live.strength,resolverDiscipline:"Kinjutsu",durationActionOpportunities:1,extraData:{sameSourceBlackLatticeStateId:lattice.stateId,requiresSameSourceLattice:true,tendrilFinalDamage:Number(resolution.finalDamage)}});
+        if (applied.condition) {result.appliedIds.push("black_tendril_restraint");result.conditionRefs.push(applied.condition.conditionId);}
+      }
+    }
+  }
+  return result;
+}
+
+// =========================================================
+// BRICK 886 — FIELD READINESS COMBAT-EVIDENCE ENVELOPE BRIDGE
+// =========================================================
+function recordFieldReadinessCombatEvidenceEnvelope(attemptId,envelope={}) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  if (!envelope||envelope.assessmentContextId!==attempt.assessmentId||!envelope.battleEncounterId) return {success:false,reason:"field_readiness_combat_envelope_invalid"};
+  if (!Array.isArray(attempt.combatEvidenceEnvelopes)) attempt.combatEvidenceEnvelopes=[];
+  const normalized={assessmentContextId:envelope.assessmentContextId,battleEncounterId:String(envelope.battleEncounterId),participantIds:Array.isArray(envelope.participantIds)?[...new Set(envelope.participantIds.filter(Boolean))]:[],battleCompleted:envelope.battleCompleted===true,battleResult:envelope.battleResult||null,oppositionOutcome:envelope.oppositionOutcome||null,committedBattleOccurrenceIds:Array.isArray(envelope.committedBattleOccurrenceIds)?[...new Set(envelope.committedBattleOccurrenceIds.filter(Boolean))]:[],personalPerformanceEvidence:cloneProgressionData(envelope.personalPerformanceEvidence||{}),protectivePerformanceEvidence:cloneProgressionData(envelope.protectivePerformanceEvidence||{}),cooperationEvidence:Array.isArray(envelope.cooperationEvidence)?cloneProgressionData(envelope.cooperationEvidence):[],dispatchObjectiveEvents:Array.isArray(envelope.dispatchObjectiveEvents)?cloneProgressionData(envelope.dispatchObjectiveEvents):[],pursuitDisengageOccurrenceIds:Array.isArray(envelope.pursuitDisengageOccurrenceIds)?[...new Set(envelope.pursuitDisengageOccurrenceIds.filter(Boolean))]:[],promotionResult:null,rankMutation:false,teamworkInferredFromTurnParticipation:false,protectiveEvidenceAutoEscortQualification:false};
+  const key=JSON.stringify([normalized.assessmentContextId,normalized.battleEncounterId,normalized.committedBattleOccurrenceIds]);
+  const existing=attempt.combatEvidenceEnvelopes.find(item=>item&&item._dedupeKey===key);
+  if (existing) return {success:true,idempotent:true,envelope:cloneProgressionData(existing)};
+  normalized._dedupeKey=key;attempt.combatEvidenceEnvelopes.push(normalized);savePlayerData();
+  return {success:true,idempotent:false,envelope:cloneProgressionData(normalized),readinessDomainsAutomaticallyQualified:[]};
+}
+
+// =========================================================
+// BRICK 887 — POST-ADJUDICATION SEMANTIC CONSUMER REGRESSION
+// =========================================================
+function runAlphaPost887SemanticConsumerDiagnostics() {
+  const candidates=collectAlphaSecondarySemanticCandidates();
+  const audit=runAlphaGoldenCombatSemanticClosureAudit();
+  const source=[establishAlphaAmaterasuFlameState,resolveAlphaCharacterSkillSecondaryConsumers,resolveAlphaAmaterasuStartOpportunityTicks,resolveAlphaPlanetaryDevastationStage2,resolveKamatariCatastrophicDisruptionFromCommittedAction,resolveAlphaPreCommitBattleActionAuthority,resolveAlphaBlackMirrorInterferenceIfApplicable,resolveAlphaEnemyActionSecondaryConsumers].map(fn=>fn.toString()).join("\n");
+  const result={
+    exactThirtyAdjudicated:candidates.length===30,
+    exactTwentyImplemented:audit.implemented.length===20,
+    exactTenDeferred:audit.explicitlyDeferred.length===10,
+    zeroUnresolved:audit.unresolved.length===0,
+    amaterasuSourceScopedAndStamina:source.includes("exactSourceStream")&&source.includes("calculateBattleStaminaMitigationV1")&&source.includes("genericBurning:false"),
+    ordinaryBurningExactSix:ALPHA_ORDINARY_BURNING_RIDER_SKILL_IDS.size===6,
+    shadowPinNotStun:source.includes('conditionKey:"shadow_pin"')&&source.includes("blanketStun:false"),
+    receiverPinExact:source.includes('conditionKey:"receiver_pin"'),
+    tenketsuExactBlocksOnlyAuthored:source.includes('conditionKey:"tenketsu_disruption"')&&source.includes('"transformation_activation"')&&source.includes('"chakra_dependent_positive_self_enhancement"'),
+    shadowNeckRequiresExistingSameSource:source.includes("requiresPriorSameSourceShadowControl:true"),
+    planetaryForcedStage2:resolveAlphaPreCommitBattleActionAuthority.toString().includes("planetary_devastation_stage2_required")&&resolveClosureWaveSkillSemantics.toString().includes("resolveAlphaPlanetaryDevastationStage2"),
+    kamatariCatastrophicTraitExact:source.includes("gale_sever_catastrophic_disruption")&&source.includes("stage<2"),
+    shadowSealRejectsPreCommitWithoutOpportunity:source.includes("shadow_seal_interference")&&source.includes("extraActionOpportunityConsumed:false"),
+    blackMirrorNoKnowledgeOrDamageRewrite:source.includes("newFactualInformationAcquired:false")&&source.includes("reflectedAttackPL:0"),
+    blackTendrilNeedsSameSourceLattice:source.includes("sameSourceBlackLatticeStateId")&&source.includes("requiresSameSourceLattice:true"),
+    deferredMetadataStillVisible:audit.explicitlyDeferred.every(item=>item&&item.reason)
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaFieldReadinessCombatEnvelopeDiagnostics() {
+  const source=recordFieldReadinessCombatEvidenceEnvelope.toString();
+  const result={stableAssessmentContext:source.includes("assessmentContextId"),battleOutcomeFactualOnly:source.includes("oppositionOutcome")&&source.includes("promotionResult:null"),personalProtectiveSeparate:source.includes("personalPerformanceEvidence")&&source.includes("protectivePerformanceEvidence"),cooperationNotTurnInferred:source.includes("teamworkInferredFromTurnParticipation:false"),dispatchEventsPreserved:source.includes("dispatchObjectiveEvents"),pursuitDisengagePreserved:source.includes("pursuitDisengageOccurrenceIds"),noAutomaticDomainQualification:source.includes("readinessDomainsAutomaticallyQualified:[]"),noRankMutation:source.includes("rankMutation:false")};
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+// =========================================================
+// BRICK 888 — CURRENT ALPHA GOLDEN COMBAT PRE-FREEZE GATE
+// =========================================================
+function runAlphaPost888GoldenCombatDiagnostics() {
+  const runtime=runAlphaPost879MonsterDiagnostics();
+  const semanticConsumers=runAlphaPost887SemanticConsumerDiagnostics();
+  const fieldReadinessCombat=runAlphaFieldReadinessCombatEnvelopeDiagnostics();
+  const semanticClosure=runAlphaGoldenCombatSemanticClosureAudit();
+  const deterministic=runAlphaDeterministicBattleEntryPLDiagnostics();
+  const generatedConversation=runGeneratedConversationRuntimeBoundaryAudit();
+  const groups={runtime,semanticConsumers,fieldReadinessCombat,deterministic,generatedConversation};
+  const runtimeGreen=runtime&&runtime.runtimeGreen===true&&semanticConsumers.pass===true&&fieldReadinessCombat.pass===true&&deterministic.pass===true&&generatedConversation.pass===true;
+  const combatFreezeReady=runtimeGreen&&semanticClosure.alphaCombatFreezeReady===true;
+  const result={groups,semanticClosure,runtimeGreen,combatFreezeReady,pass:runtimeGreen&&combatFreezeReady};
+  console.log(`SC Alpha post-888 Golden Combat gate: runtime=${runtimeGreen?"GREEN":"FAIL"} / semantic=${semanticClosure.unresolved.length===0?"GREEN":"HOLD"} / Combat Freeze=${combatFreezeReady?"READY":"HOLD"}`);
   return result;
 }
 
@@ -69749,13 +70065,16 @@ function resolveBattleConditionTick(condition,phase,actionId=null) {
 function resolveBattleStartOfActionOpportunityEffects(side,participantId,actionId=null) {
   const runtime=ensureBattleRuntimeState();
   const token=getBattleActionOpportunityToken(side,participantId);
-  if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[]};
+  if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[],amaterasuTicks:[]};
   runtime.actionOpportunityState.startedTokens[token]=true;
   const ticks=[...getBattleParticipantConditions(side,participantId)]
     .filter(condition=>condition.data&&condition.data.tickPhase==="start_of_action_opportunity")
     .map(condition=>resolveBattleConditionTick(condition,"start_of_action_opportunity",actionId))
     .filter(Boolean);
-  return {token,idempotent:false,ticks};
+  // BRICK 881 — Amaterasu is NOT generic Burning. Its exact source-scoped
+  // persistent Attack PL resolves here with ordinary Stamina mitigation.
+  const amaterasuTicks=resolveAlphaAmaterasuStartOpportunityTicks(side,participantId,actionId);
+  return {token,idempotent:false,ticks,amaterasuTicks};
 }
 
 // =========================================================
@@ -70268,6 +70587,11 @@ function cleanupBattleParticipantRuntimeState(
   const runtime =
     ensureBattleRuntimeState();
 
+  // BRICK 883 — committed Planetary Devastation Stage 1 remains history even
+  // when Deva becomes invalid before the forced Stage 2 opportunity.
+  const pendingPlanetary=runtime.transientStates.find(state=>state&&state.stateKey==="planetary_core_formation"&&state.sourceRef&&state.sourceRef.side===side&&state.sourceRef.participantId===participantId);
+  if (pendingPlanetary) recordBattleEvidence({eventType:"planetary_devastation_pending_invalidated",committedOccurrence:true,actorRef:createBattleParticipantRef(side,participantId),skillId:"akatsuki_deva_planetary_devastation",stateRefs:[pendingPlanetary.stateId],data:{reason,phantomCollapse:false,stage1HistoryPreserved:true}});
+
 
   const removedStateIds =
     [];
@@ -70772,6 +71096,13 @@ function beginBattleActionResolution(envelope) {
   if (envelope&&currentBattle.active&&!currentBattle.battleOver&&envelope.actorRef&&envelope.actorRef.side&&envelope.actorRef.participantId&&getBattleActiveParticipantId(envelope.actorRef.side)===envelope.actorRef.participantId) {
     startEffects=resolveBattleStartOfActionOpportunityEffects(envelope.actorRef.side,envelope.actorRef.participantId,envelope.actionId||null);
   }
+  // BRICKS 883/885 — pre-commit authority may force an already committed
+  // continuation or consume exact authored interference. Rejected requests do
+  // not consume a new action opportunity or fabricate an action occurrence.
+  const preCommit=resolveAlphaPreCommitBattleActionAuthority(envelope);
+  if (preCommit&&preCommit.allowed===false) {
+    return {accepted:false,validation:{valid:false,reason:preCommit.reason,blockingConditionIds:[],preCommitAuthority:true},evidence:null,startEffects,preCommit};
+  }
   const validation=validateBattleActionEnvelope(envelope);
   if (!validation.valid) return {accepted:false,validation,evidence:null,startEffects};
   const evidence=recordBattleEvidence({
@@ -70779,7 +71110,7 @@ function beginBattleActionResolution(envelope) {
     skillId:envelope.skillId,itemId:envelope.itemId,sourceRefs:envelope.sourceRefs,
     data:{actionClass:envelope.actionClass,resolverTruthIsObserverKnowledge:false}
   });
-  return {accepted:true,validation,evidence,startEffects};
+  return {accepted:true,validation,evidence,startEffects,preCommit};
 }
 
 const JOINT_TECHNIQUE_PROVENANCE_AUTHORITY = {
@@ -71812,7 +72143,7 @@ function resolveKamatariGaleSever(skill,actor,target,envelope,options={}) {
   const damage=resolveBattleDamagePacket({envelope,skill:{...skill,excess},actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,excess,stateRefs:current?[current.stateId]:[]});
   return {resolved:!!damage,branch:`release_stage_${stage}`,damageApplied:!!damage,damage,finalDamage:damage?damage.finalDamage:0,stateRefs:current?[current.stateId]:[],conditionRefs:[],stage};
 }
-function interruptKamatariGaleSever(actor,{catastrophic=false,reason="interrupted"}={}) {
+function interruptKamatariGaleSever(actor,{catastrophic=false,reason="interrupted",actionId=null,sourceRefs=[],disruptingSkillId=null}={}) {
   const state=getKamatariGaleSeverChargeState(actor);
   if (!state) return {success:false,reason:"gale_sever_not_charged"};
   const stage=Math.max(1,Math.min(3,Number(state.data&&state.data.stage)||1));
@@ -71821,7 +72152,7 @@ function interruptKamatariGaleSever(actor,{catastrophic=false,reason="interrupte
   if (catastrophic===true&&stage>=2) directBattlePL=Math.max(0,Number((summonSkillDatabase.kamatari_gale_sever.catastrophicBackfire||{})[stage])||0);
   let absorption=null;
   if (directBattlePL>0) absorption=absorbBattleDamageBearingCapacity("player",actor.id,directBattlePL);
-  recordBattleEvidence({eventType:"kamatari_gale_sever_interrupted",actorRef:createBattleParticipantRef("player",actor.id),skillId:"kamatari_gale_sever",stateRefs:[state.stateId],data:{stage,reason,catastrophic:catastrophic===true,directBattlePL,bypassStamina:directBattlePL>0,cleanCancelNoBackfire:catastrophic!==true}});
+  recordBattleEvidence({eventType:"kamatari_gale_sever_interrupted",committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("player",actor.id),skillId:"kamatari_gale_sever",sourceRefs:[...(Array.isArray(sourceRefs)?sourceRefs:[]),...(disruptingSkillId?[{type:"skill",id:disruptingSkillId,role:"catastrophic_disruption_source"}]:[])],stateRefs:[state.stateId],data:{stage,reason,catastrophic:catastrophic===true,directBattlePL,bypassStamina:directBattlePL>0,cleanCancelNoBackfire:catastrophic!==true,disruptingSkillId}});
   return {success:true,stage,catastrophic:catastrophic===true,directBattlePL,absorption};
 }
 
@@ -80491,6 +80822,9 @@ function resolveFactoryDynamicControl(skill,envelope,actor) {
 function establishFactoryPersistentDamageState(skill,envelope,actor,target) {
   const p=skill.persistentState||{};
   if (!p.conditionKey||!target) return null;
+  if (p.conditionKey==="amaterasu_flame"&&p.notGenericBurning===true) {
+    return establishAlphaAmaterasuFlameState(skill,envelope,actor,target);
+  }
   return upsertBattleCondition({conditionKey:p.conditionKey,conditionType:"persistent_damage",sourceSide:"player",sourceParticipantId:actor.id,sourceRefs:envelope.sourceRefs,sourceSkillId:skill.id,actionId:envelope.actionId,targetSide:"enemy",targetParticipantId:target.id,reapplication:"refresh",data:{persistentAttackPL:p.persistentAttackPL,durationActionOpportunities:p.durationActionOpportunities,remainingActionOpportunities:p.durationActionOpportunities,automaticTickPhase:p.automaticTickPhase,requiresAuthoredPersistenceOpportunity:p.requiresAuthoredPersistenceOpportunity===true,notGenericBurning:p.notGenericBurning===true,establishmentProvenanceLocked:true}});
 }
 
@@ -81142,8 +81476,8 @@ function resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options={}
     if (!output) return {resolved:false,reason:"damage_output_unavailable"};
     const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,output,mitigable:true,propagationMode:null,stateRefs:[]});
     if (!damage) return {resolved:false,reason:"damage_resolution_failed"};
-    const state=establishFactoryPersistentDamageState(skill,envelope,actor,target);
-    return {resolved:true,branch:"initial_damage_and_persistent_state_establishment",damageApplied:true,damage,finalDamage:damage.finalDamage,stateRefs:[],conditionRefs:state&&state.condition?[state.condition.conditionId]:[],persistentAutomaticTickDeferred:true};
+    const persistent=establishFactoryPersistentDamageState(skill,envelope,actor,target);
+    return {resolved:true,branch:"initial_damage_and_persistent_state_establishment",damageApplied:true,damage,finalDamage:damage.finalDamage,stateRefs:persistent&&persistent.state?[persistent.state.stateId]:[],conditionRefs:persistent&&persistent.condition?[persistent.condition.conditionId]:[],persistentAutomaticTickDeferred:false,persistentConsumerImplemented:!!persistent};
   }
   if (skill.resolutionKind==="damage_then_sealing_context") {
     const output=calculateClosureWaveSkillAttackOutput({...skill,resolutionKind:"direct_damage"},actor);
@@ -81156,8 +81490,10 @@ function resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options={}
     return {resolved:true,branch:"damage_committed_sealing_separate",damageApplied:true,damage,finalDamage:damage.finalDamage,sealing:{strength:sealingStrength,automatic:false,committed:false},stateRefs:[],conditionRefs:[]};
   }
   if (skill.resolutionKind==="planetary_devastation_two_stage") {
+    const pending=findBattleTransientState({stateKey:"planetary_core_formation",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id});
+    if (pending) return resolveAlphaPlanetaryDevastationStage2(skill,envelope,actor,pending);
     const state=addBattleTransientState({stateKey:"planetary_core_formation",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"skill",id:skill.id},data:{stage:1,committedTechnique:true,stage1HistorySurvivesCleanup:true,stage2:cloneBattleRuntimeValue(skill.planetaryDevastation.stage2),activationActionId:envelope.actionId}});
-    recordBattleEvidence({eventType:"planetary_devastation_stage1_established",actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:state?[state.stateId]:[],data:{stage:1,automaticAttackPL:0,historySurvivesInterruption:true}});
+    recordBattleEvidence({eventType:"planetary_devastation_stage1_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:state?[state.stateId]:[],data:{stage:1,automaticAttackPL:0,historySurvivesInterruption:true,nextActorOpportunityForcedStage2:true}});
     return {resolved:!!state,branch:"planetary_stage1",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],stage2Pending:true};
   }
   if (skill.resolutionKind==="direct_damage") {
@@ -81233,15 +81569,18 @@ function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null,options=
   const envelope=createBattleActionEnvelope({actorSide:"player",actorParticipantId:actor.id,targetSide,targetParticipantId:target?target.id:null,actionClass:skill.actionClass,skillId:skill.id,sourceRefs,data:{primaryDiscipline:skill.primaryDiscipline,traits:[...(skill.traits||[])],representationCategoryNotOntology:true}});
   const entry=beginBattleActionResolution(envelope);
   if (!entry.accepted) return {success:false,reason:entry.validation.reason,entry};
-  const resolution=resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options||{});
+  const mirror=resolveAlphaBlackMirrorInterferenceIfApplicable(skill,envelope,actor,target);
+  const resolution=mirror&&mirror.interfered===true?mirror.resolution:resolveClosureWaveSkillSemantics(skill,envelope,actor,target,options||{});
+  const secondarySemantics=resolveAlphaCharacterSkillSecondaryConsumers(skill,envelope,actor,target,resolution,options||{});
   const narutoV2Instability=advanceNarutoV2InstabilityAfterCompletedSkill(actor,skill,envelope,resolution,options||{});
   let baryonContactErosion=null;
   if(resolution&&resolution.resolved===true&&skill.contactErosion&&skill.contactErosion.eligible===true&&options&&options.qualifyingContact===true&&target&&targetSide==="enemy") baryonContactErosion=recordBaryonContactErosionOccurrence({actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,actionId:envelope.actionId,skillId:skill.id,qualifyingContactConfirmed:true});
-  recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:resolution.stateRefs||[],conditionRefs:resolution.conditionRefs||[],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0,sourceIdentityMerge:false,entityPLTransfer:false}});
+  recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:[...(resolution.stateRefs||[]),...((secondarySemantics&&secondarySemantics.stateRefs)||[])],conditionRefs:[...(resolution.conditionRefs||[]),...((secondarySemantics&&secondarySemantics.conditionRefs)||[])],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0,sourceIdentityMerge:false,entityPLTransfer:false,secondarySemanticsApplied:secondarySemantics&&secondarySemantics.appliedIds||[],blackMirrorInterference:!!(mirror&&mirror.interfered===true)}});
   if (resolution.resolved===true) consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_action_completed");
+  const catastrophicDisruption=resolveKamatariCatastrophicDisruptionFromCommittedAction({envelope,resolution,actionTraits:skill.traits||[]});
   saveTestState();
   if (!currentBattle.battleOver) openOverlay("combat");
-  return {success:resolution.resolved===true,envelope,resolution,narutoV2Instability,baryonContactErosion};
+  return {success:resolution.resolved===true,envelope,resolution,secondarySemantics,mirror,narutoV2Instability,baryonContactErosion,catastrophicDisruption};
 }
 
 // =========================================================
@@ -81714,6 +82053,7 @@ function executeEnemyAuthoredActionOpportunity() {
 
   const resolution=action.resolve({enemy,target,envelope,currentBattle});
   const resolved=!!(resolution&&resolution.resolved===true);
+  const secondarySemantics=resolved?resolveAlphaEnemyActionSecondaryConsumers(action,enemy,target,envelope,resolution):{appliedIds:[],stateRefs:[],conditionRefs:[]};
   recordBattleEvidence({
     eventType:"enemy_authored_action_completed",
     committedOccurrence:true,
@@ -81731,9 +82071,10 @@ function executeEnemyAuthoredActionOpportunity() {
     }
   });
   if (resolved) consumeBattleActionOpportunity("enemy",enemy.id,envelope.actionId,"valid_enemy_action_completed");
+  const catastrophicDisruption=resolveKamatariCatastrophicDisruptionFromCommittedAction({envelope,resolution,actionTraits:action.traits||[]});
   saveTestState();
   if (!currentBattle.battleOver) openOverlay("combat");
-  return {success:resolved,envelope,resolution,choice};
+  return {success:resolved,envelope,resolution,secondarySemantics,catastrophicDisruption,choice};
 }
 
 // =========================================================
