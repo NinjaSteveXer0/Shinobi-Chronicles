@@ -21,6 +21,7 @@ Shinobi Chronicles is a browser-based shinobi RPG project focused on character p
 - Chronicle Engine Bible
 - PL / Registry / Rank Alpha Authority
 - PL / Registry / Rank Post-872 Reconciliation
+- Alpha Execution Locks — Menma + Triple Rashōmon
 - Architecture Map
 - Development Milestones
 - Decision Log
