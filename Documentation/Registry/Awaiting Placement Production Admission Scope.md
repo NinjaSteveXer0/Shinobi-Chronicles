@@ -1,6 +1,6 @@
 # Shinobi Chronicles — Awaiting Placement Production Admission Scope
 
-**Status:** REGISTRY RATIFIED — COMPLETE 13-IDENTITY WAVE INTENDED; LIVE GATE REMAINS 102 PENDING ASSETS  
+**Status:** REGISTRY RATIFIED — COMPLETE 13-IDENTITY PACKAGE INTENDED; LIVE GATE REMAINS 102 PENDING ASSETS  
 **Date:** 2026-09-04
 
 This document is the current Registry production-admission authority for the Post-899 awaiting-placement work.
@@ -19,7 +19,7 @@ Assets commit:
 
 ## 1. Intended production-admission scope — OPTION B RATIFIED
 
-Registry ratifies the complete awaiting-placement wave defined by Assets:
+Registry ratifies the complete production-admission package defined by Assets:
 
 ### Characters — 12
 
@@ -127,7 +127,7 @@ Preserve:
 
 ## 4. Assets blocker — complete 13-row package still required
 
-Assets confirms visual/card direction for the 13-identity wave, but live production admission is intentionally deferred because exact repository-authoritative runtime mappings are not yet complete.
+Assets confirms visual/card direction for the 13-identity package, but live production admission is intentionally deferred because exact repository-authoritative runtime mappings are not yet complete.
 
 Before the 102 → 115 production gate may flip, Assets must close for all thirteen:
 
@@ -138,7 +138,7 @@ Before the 102 → 115 production gate may flip, Assets must close for all thirt
 
 The current ratified `uiPortrait` authority remains **102/102**.
 
-Battle/UI Portrait creation for this wave is intentionally deferred during the immediate Alpha-completion push.
+Battle/UI Portrait creation for this package is intentionally deferred during the immediate Alpha-completion push.
 
 Registry therefore does **not** ratify guessed asset paths and Coding must not fabricate them.
 
@@ -176,30 +176,51 @@ Do not half-admit the five pairing/bond consumers first.
 
 ## 6. `kurama_resonance_himawari` boundary
 
-`kurama_resonance_himawari` remains a valid separately calibrated awaiting-placement Character representation with its own Registry/PL authority.
+`kurama_resonance_himawari` is a valid separately calibrated Character representation.
 
-However, the controlling Assets scope above explicitly defines the current complete production-admission wave as the twelve Characters listed in section 1 plus `nue`.
+Registry / PL authority:
 
-Therefore `kurama_resonance_himawari` is **not part of this 115 production-admission package** and does not change its target count.
+- Stats `112/106/48/70/110/76/126`;
+- Base PL **118**.
 
-Its calibration is not deleted or superseded; its production admission remains separately deferred pending an explicit future Registry + Assets admission decision and exact asset projections.
+Its Alpha Combat semantics are now also **CLOSED** under:
+
+`Documentation/SC_Combat_Kurama_Resonance_Himawari_Closure_2026-09-04.md`
+
+Combat commit:
+
+`fc2bca7177fdcb2815e7d9b5e3f04bfdd3404f99`
+
+Combat closure does **not** change production-admission scope. Combat's document notes that the broader mechanically calibrated awaiting-placement universe would total 13 Characters + `nue`, producing a hypothetical 116 gate if all fourteen were admitted. That is not production-admission authority.
+
+The controlling Assets scope explicitly defines the current production-admission package as the twelve Characters in section 1 plus `nue`.
+
+Therefore `kurama_resonance_himawari` remains **outside the current 115 package** and separately deferred pending an explicit future Registry + Assets admission decision and exact asset projections.
+
+Its calibration and Combat closure are not deleted or superseded.
 
 Thus:
 
-**calibrated identity ≠ included in current admission wave**
+**Combat semantic closure ≠ production admission**
+
+**mechanically calibrated awaiting-placement universe ≠ current approved admission package**
 
 **deferred ≠ deleted/superseded**
+
+If Registry + Assets later explicitly add Himawari to this package, the prospective full-package gate would become **98 Characters + 18 Entities = 116**. Until such an authority change occurs, 115 remains the defined eventual gate for the current package.
 
 ---
 
 ## 7. Current status
 
 - Pairing/bond semantics: **CLOSED**
-- Awaiting-placement intended admission scope: **CLOSED — 12 Characters + Nue**
+- Kurama Resonance Himawari Combat semantics: **CLOSED**
+- Current intended production-admission package: **CLOSED — 12 Characters + Nue**
 - Eventual gate for this package: **115**
 - Current live gate: **102**
 - Exact 13 collectible-card mappings: **PENDING**
 - 13 approved `uiPortrait`s / exact mappings: **DEFERRED / PENDING**
+- `kurama_resonance_himawari` production admission: **SEPARATELY DEFERRED**
 - Live production admission: **DEFERRED**
 
-The destination is 115 for this defined wave, but Alpha completion takes priority over prematurely expanding the live roster/portrait gate.
+The destination remains 115 for the currently authorised package, while Alpha completion takes priority over prematurely expanding the live roster/portrait gate.
