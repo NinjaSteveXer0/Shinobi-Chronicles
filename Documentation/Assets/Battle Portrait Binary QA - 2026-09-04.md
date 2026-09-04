@@ -1,25 +1,17 @@
 # Shinobi Chronicles — Battle Portrait Binary QA — 2026-09-04
 
-**Status:** CODING / CI QA — FAIL, ASSET REPAIR REQUIRED  
-**Authority preserved:** 102/102 Registry → `uiPortrait` mappings remain ratified; this report does not authorise path substitution.
+**Status:** CHARACTER CREATION / ASSETS REPAIR + CODING / CI QA — PASS  
+**Authority preserved:** 102/102 Registry → `uiPortrait` mappings remain unchanged and ratified.
 
-Fresh GitHub Actions QA ran against the current repository bytes using:
+The earlier fresh binary QA failure was repaired in place under Assets authority and the canonical repository QA was rerun using:
 
 - `tools/qa_battle_portraits.py`
-- `.github/workflows/battle-portrait-qa.yml`
-- workflow run `33877639424`
+- the existing 102-row approved Assets manifest;
+- the existing Registry ratification.
 
-## Structural results
+## Repairs applied
 
-- manifest rows: **102 / 102**
-- unique Registry IDs: **102 / 102**
-- unique approved paths: **102 / 102**
-- PNGs decoding successfully: **101 / 102**
-- exact 1024 × 1024: **96 / 102**
-
-## Failing approved assets
-
-### Wrong dimensions — 1254 × 1254 instead of 1024 × 1024
+Five approved Academy portraits were resampled from **1254 × 1254** to the required **1024 × 1024** at their existing approved paths using high-quality Lanczos resampling:
 
 - `academy_iwabee` → `Assets/Portraits/Academy Student/academy_student_iwabe.png`
 - `academy_kakashi` → `Assets/Portraits/Academy Student/academy_student_kakashi.png`
@@ -27,27 +19,31 @@ Fresh GitHub Actions QA ran against the current repository bytes using:
 - `academy_metal_lee` → `Assets/Portraits/Academy Student/academy_student_metal.png`
 - `academy_obito` → `Assets/Portraits/Academy Student/academy_student_obito.png`
 
-### Decode/corruption failure
+The approved `shikamaru_avatar_yang` path remained unchanged:
 
-- `shikamaru_avatar_yang` → `Assets/Portraits/Jinchuriki/jshika_ava.png`
-  - Pillow: `OSError: Truncated File Read`
+- `Assets/Portraits/Jinchuriki/jshika_ava.png`
 
-## Required handling
+Its corrupt/truncated bytes were repaired by restoring the nearest prior decodable **1024 × 1024** revision of that same approved path from Git history.
 
-These are asset-byte failures, not Registry-identity failures.
+Restore source commit:
 
-Do **not**:
+`013b2437569627bcce64a29c0873e49bb275b53b`
 
-- change Registry IDs;
-- silently choose a different portrait;
-- derive a fallback from filenames;
-- crop a collectible Character Card;
-- silently resize/substitute at runtime.
+This is an in-place asset repair, not a Registry remap and not a portrait substitution.
 
-Character Creation / Assets should repair the approved file at the same path or explicitly supersede the mapping through the existing asset-authority process. After repair/supersession, rerun the same 102-file binary QA.
+## Final QA result
+
+- manifest rows: **102 / 102**
+- unique Registry IDs: **102 / 102**
+- unique approved paths: **102 / 102**
+- PNG decode: **102 / 102 PASS**
+- dimensions exactly 1024 × 1024: **102 / 102 PASS**
+- silent card fallback/substitution: **none authorised**
 
 Preserve:
 
-**approved mapping ≠ current bytes valid**
+**approved mapping = unchanged**
 
-**QA failure ≠ permission to substitute another asset**
+**asset repair ≠ Registry identity mutation**
+
+**asset repair ≠ permission for runtime fallback**
