@@ -19,6 +19,7 @@ Shinobi Chronicles is a browser-based shinobi RPG project focused on character p
 ## Documentation Index
 
 - Chronicle Engine Bible
+- PL / Registry / Rank Alpha Authority
 - Architecture Map
 - Development Milestones
 - Decision Log
