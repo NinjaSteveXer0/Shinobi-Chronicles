@@ -1,47 +1,46 @@
 # Shinobi Chronicles — Awaiting Placement Production Admission Scope
 
-**Status:** Registry / Acquisition scope locked; asset-path ratification pending  
+**Status:** REGISTRY RATIFIED — ALPHA OPTION A; exact asset-path projection pending before live activation  
 **Date:** 2026-09-04
 
-This document answers the Post-899 Coding admission question for the complete awaiting-placement wave and has been superseded once to include the final `kurama_resonance_himawari` card.
+This document is the current Registry production-admission authority for the Post-899 awaiting-placement work.
 
-## 1. Admission scope — COMPLETE WAVE LOCKED
+It **supersedes the earlier Registry full-wave admission intent** recorded in prior revisions of this document, including the later 14-record revision that added `kurama_resonance_himawari`.
 
-Registry selects:
+The superseding Assets/UI authority is:
 
-**Admit the complete awaiting-placement wave as one production batch.**
+`Documentation/Assets/Pairing Bond Alpha Admission Asset Boundary.md`
 
-The intended production batch is exactly:
+Assets/UI commit:
 
-### Characters — 13
+`e9acc728fd223f8813ffccf4f6b6bd60b6fd8ac4`
 
-- `chunin_iruka`
-- `sj_anko`
-- `chunin_fugaku`
-- `chunin_itama`
-- `genin_mikoto`
-- `genin_orochimaru`
-- `akatsuki_kakuzu`
+---
+
+## 1. Alpha production-admission scope — OPTION A RATIFIED
+
+Registry ratifies the exact five-identity Alpha cohort:
+
+### Characters — 4
+
 - `sj_kiba`
-- `sj_nono`
-- `sannin_tenten`
 - `sannin_hinata`
 - `sannin_sumire`
-- `kurama_resonance_himawari`
+- `akatsuki_kakuzu`
 
 ### Entity / Summon — 1
 
 - `nue`
 
-No partial admission is intended.
+No other awaiting-placement identity is admitted through this decision.
 
-When Coding actually applies this batch to the live production Registry, the production gate becomes:
+When Coding actually ingests these five after asset projection closure, the live production gate becomes:
 
-**98 Characters + 18 Entities = 116 live collectible production identities.**
+**89 Characters + 18 Entities = 107 live production identities.**
 
-Until Coding performs the admission, the current runtime gate remains **85 + 17 = 102**. Calibration approval and admission intent do not themselves mutate runtime arrays.
+Until Coding performs that admission, the current runtime gate remains:
 
-All fourteen records are intended ACTIVE on admission; none is a superseded replacement for another live Registry identity.
+**85 Characters + 17 Entities = 102.**
 
 Preserve:
 
@@ -49,32 +48,85 @@ Preserve:
 
 **production admission ≠ acquisition**
 
+**admission scope ratified ≠ runtime mutation**
+
 **Registry identity ≠ asset filename**
 
 ---
 
-## 2. Stable Registry classifications
+## 2. Exact stable Registry identity/classification authority
 
-The stable IDs/classifications above are binding.
+| Registry ID | Classification | Admission status |
+|---|---|---|
+| `sj_kiba` | Character | ALPHA COHORT — RATIFIED, ASSET PROJECTION PENDING |
+| `sannin_hinata` | Character | ALPHA COHORT — RATIFIED, ASSET PROJECTION PENDING |
+| `sannin_sumire` | Character | ALPHA COHORT — RATIFIED, ASSET PROJECTION PENDING |
+| `akatsuki_kakuzu` | Character | ALPHA COHORT — RATIFIED, ASSET PROJECTION PENDING |
+| `nue` | Entity / Summon | ALPHA COHORT — RATIFIED, ASSET PROJECTION PENDING |
 
-- the thirteen ninja are production **Character** Registry records;
-- `nue` is a production **Entity / Summon** Registry record;
-- exact Kiba ID is `sj_kiba`; do not create `s_jkiba` or another alias;
-- `sj_kiba` is the one collectible Kiba+Akamaru representation;
-- `nue` remains a separate Entity despite its intrinsic acquisition/attachment relation with `sannin_sumire`;
-- `kurama_resonance_himawari` is a dedicated hosted/resonance Character representation; it does not create or auto-acquire an additional Kurama Entity/card and already embodies the authored resonance state in its Base Stats/PL.
+Exact Kiba Registry ID is:
 
-Final superseding numerics continue to apply:
+`sj_kiba`
 
-- `sj_kiba` — composite pair Stats `50/66/52/20/34/22/70`, PL **64**;
-- `sannin_hinata` — Road-to-Ninja alternate-growth Stats `96/118/62/70/48/82/108`, PL **110**;
-- `sannin_sumire` — PL **93**;
-- `nue` — independent PL **100**;
-- `kurama_resonance_himawari` — Stats `112/106/48/70/110/76/126`, PL **118**.
+Do not create `s_jkiba` or any alias derived from display prose.
+
+The five records are intended **ACTIVE on completed admission**, but must not be marked live/ACTIVE in production Registry or asset projection until the exact approved paths exist and Coding performs ingestion.
 
 ---
 
-## 3. Akamaru source-address authority
+## 3. Numerical and pairing/bond authority remains unchanged
+
+### `sj_kiba`
+
+Composite Kiba + Akamaru representation:
+
+Stats:
+
+`50 / 66 / 52 / 20 / 34 / 22 / 70`
+
+Base PL:
+
+**64**
+
+One collectible/team/deployment slot. Akamaru is not a second collectible, Entity, Summon, Hosted Entity, turn, or PL pool.
+
+### `sannin_hinata`
+
+Road-to-Ninja alternate-growth representation:
+
+Stats:
+
+`96 / 118 / 62 / 70 / 48 / 82 / 108`
+
+Base PL:
+
+**110**
+
+PL94 is superseded and must not be layered underneath.
+
+### `sannin_sumire`
+
+Base PL:
+
+**93**
+
+Acquisition must idempotently ensure/reuse `nue` exactly once and establish the authorised default Sumire→Nue attachment.
+
+### `nue`
+
+Independent Entity / Summon Base PL:
+
+**100**
+
+Default attachment ≠ automatic Battle manifestation. Nue PL does not transfer to Sumire.
+
+### `akatsuki_kakuzu`
+
+For Alpha, masks remain embedded elemental attack/presentation sources only. No autonomous mask participant, mask turn, mask PL, heart PL, or destruction subsystem is admitted.
+
+---
+
+## 4. Akamaru source-address authority
 
 Canonical source address:
 
@@ -99,7 +151,7 @@ Meaning:
 - not an independent Battle turn;
 - not an independent PL/Battle-PL pool.
 
-Authored Kiba/Akamaru Actions and Chronicle evidence may reference `akamaru` as exact causal participant/source without requiring Entity registration.
+Authored Kiba/Akamaru actions and Chronicle evidence may reference `akamaru` as exact causal participant/source without Entity registration.
 
 Preserve:
 
@@ -109,50 +161,81 @@ Preserve:
 
 **causal source ≠ independent Battle participant**
 
-`source_only_integrated_participant` is a source/provenance classification, not a new collectible ontology.
-
 ---
 
-## 4. Asset admission blocker — exact paths still required
+## 5. Asset projection blocker — five exact mappings still required
 
-The current repository's production card/portrait directories still expose only the existing 102 production asset set. The awaiting-placement cards and portraits have not yet been supplied as a complete repository-authoritative expansion.
+Assets/UI has confirmed that the current live repository does **not** yet contain approved standalone production collectible-card + square `uiPortrait` mappings for the five ratified identities.
 
-Therefore Registry cannot honestly ratify exact **repository** collectible-card or `uiPortrait` paths for these fourteen by inference.
+Composite gallery/reference art is source/reference material only.
 
-The user's awaiting-placement folder/conversation uploads establish intended card identities, but local filenames are not repository-path authority.
+Therefore Registry ratifies the **five identities and admission cohort now**, but does not ratify any guessed asset path.
 
-Character Creation / Assets must now supply/commit the exact production mapping for all fourteen:
+Assets must publish for each of the five:
 
-`Registry ID → collectibleCard exact repository path → uiPortrait exact repository path → ACTIVE Assets status`
+`Registry ID → exact collectibleCard repository path → exact uiPortrait repository path → ACTIVE Assets status`
 
-Registry will ratify that supplied **14-row expansion** without requiring filename equality to Registry IDs.
+Once Assets supplies those five exact projections:
 
-The existing 102-row portrait manifest remains authoritative for the currently live 102 identities until the 14-row expansion is supplied and ratified.
+1. Registry ratifies the five asset projections exactly as supplied;
+2. Coding ingests the five Registry records;
+3. Coding extends the single portrait resolver / Registry gate from 102 → 107;
+4. CI extends the portrait/Golden gate to 107 exact identities and validates each projection exactly once.
 
 Do not:
 
-- derive a portrait path from a Registry ID;
-- crop collectible cards into portraits;
-- rename card files merely to match IDs;
-- silently choose a generic image fallback;
-- expand the live Golden asset count to 116 before the exact 14-row mapping is ratified.
+- infer card/portrait paths from Registry IDs;
+- crop collectible/composite art into permanent `uiPortrait` authority;
+- substitute another representation's portrait;
+- mark the five asset projections ACTIVE before Assets approval;
+- expand the live Golden gate to 107 before the exact five mappings are ratified.
 
 ---
 
-## 5. Coding sequence
+## 6. Deferred awaiting-placement identities
 
-Coding may treat the **complete fourteen-record wave** as decided now.
+The exact five-ID Alpha scope above controls admission. All other calibrated awaiting-placement identities remain **deferred / not admitted by this decision**.
 
-Final production activation sequence:
+The Assets/UI document records an earlier remainder of eight Characters because it predates the final `kurama_resonance_himawari` addition. The exact five-ID cohort is unaffected; with Himawari now included in the calibrated awaiting-placement set, the current deferred Character count is **nine**.
 
-1. consume final Combat semantic contracts for the awaiting-placement wave;
-2. receive Assets' exact 14-row collectibleCard/uiPortrait mapping;
-3. Registry ratifies those exact paths;
-4. add all thirteen Character records + `nue` as one production admission batch;
-5. update expected Registry counts to `98 Characters + 18 Entities = 116`;
-6. extend card/portrait Golden gates to 116;
-7. implement already-closed Kiba/Akamaru and Sumire/Nue acquisition/pairing semantics;
-8. implement `kurama_resonance_himawari` as a dedicated embodied hosted/resonance representation without an additive Kurama PL/package;
-9. prove no alias/duplicate/hidden PL transfer through cumulative regression.
+Deferred Characters:
 
-The intended admission **scope** is no longer open. Only downstream Combat/asset-path/implementation closure remains.
+- `chunin_iruka`
+- `sj_anko`
+- `chunin_fugaku`
+- `chunin_itama`
+- `genin_mikoto`
+- `genin_orochimaru`
+- `sj_nono`
+- `sannin_tenten`
+- `kurama_resonance_himawari`
+
+Their calibration authority remains valid. They simply do not enter the Alpha production Registry through this Option A decision.
+
+Thus:
+
+**calibrated/deferred ≠ superseded/deleted**
+
+**asset/card existence ≠ production admission**
+
+A later admission of any deferred identity requires a fresh explicit production-admission decision and exact approved asset projections.
+
+---
+
+## 7. Coding sequence
+
+Coding may now treat the **five-ID admission scope** as closed.
+
+Implementation sequence:
+
+1. preserve Post-899 / 102 live gate until asset mapping closure;
+2. consume final Combat semantics for the five affected records;
+3. receive Assets' exact five-row `collectibleCard` / `uiPortrait` projection;
+4. receive Registry ratification of those exact asset paths;
+5. admit exactly four Characters + `nue`;
+6. update expected live counts to `89 Characters + 18 Entities = 107`;
+7. extend card/portrait Golden gates to 107;
+8. implement already-closed Kiba/Akamaru and Sumire/Nue pairing/acquisition semantics;
+9. prove no alias, duplicate Nue, hidden PL transfer, or autonomous Akamaru/mask participant through cumulative regression.
+
+Do **not** admit the deferred nine Characters through this Alpha decision.
