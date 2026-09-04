@@ -73,3 +73,15 @@ Planned:
 - Relationships
 - Memories
 - Legacy progression
+
+---
+
+## Recovery Addenda
+
+This file is an early historical skeleton and does not yet contain the full recovered Chronicle Engine doctrine.
+
+Durable recovered doctrine from the original Shinobi Chronicles Combat Stuffs / Battle Systems workspace is preserved in:
+
+- [`Chronicle_Engine_Combat_Recovery_Addendum_2026-09-04.md`](./Chronicle_Engine_Combat_Recovery_Addendum_2026-09-04.md)
+
+Recovery addenda must preserve provenance and candidate boundaries rather than silently promoting unresolved game-specific material into Engine canon.
