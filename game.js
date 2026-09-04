@@ -102,6 +102,135 @@ const assetManifest = {
 
 };
 
+// =========================================================
+// BRICK 896 — RATIFIED 102/102 UI PORTRAIT AUTHORITY
+// Exact Registry representation ID -> approved uiPortrait path.
+// Paths are manifest data, never derived from identity strings.
+// =========================================================
+// UI_PORTRAIT_MANIFEST_JSON_START
+const UI_PORTRAIT_MANIFEST = Object.freeze({
+  "academy_hinata": "Assets/Portraits/Academy Student/academy_student_hinata.png",
+  "academy_iwabee": "Assets/Portraits/Academy Student/academy_student_iwabe.png",
+  "academy_izuno": "Assets/Portraits/Academy Student/academy_student_izuno.png",
+  "academy_kakashi": "Assets/Portraits/Academy Student/academy_student_kakashi.png",
+  "academy_kurenai": "Assets/Portraits/Academy Student/academy_student_kurenai.png",
+  "academy_kushina": "Assets/Portraits/Academy Student/academy_student_kushina.png",
+  "academy_menma": "Assets/Portraits/Academy Student/academy_student_menma.png",
+  "academy_metal_lee": "Assets/Portraits/Academy Student/academy_student_metal.png",
+  "academy_mirai": "Assets/Portraits/Academy Student/academy_student_mirai.png",
+  "academy_obito": "Assets/Portraits/Academy Student/academy_student_obito.png",
+  "genin_boruto": "Assets/Portraits/Genin/genin_boruto.png",
+  "genin_chocho": "Assets/Portraits/Genin/genin_chocho.png",
+  "genin_himawari": "Assets/Portraits/Genin/genin_himawari.png",
+  "genin_hoki": "Assets/Portraits/Genin/genin_hoki.png",
+  "genin_karin": "Assets/Portraits/Genin/genin_karin.png",
+  "genin_mitsuki": "Assets/Portraits/Genin/genin_mitsuki.png",
+  "genin_naruto": "Assets/Portraits/Genin/genin_naruto.png",
+  "genin_sarada": "Assets/Portraits/Genin/genin_sarada.png",
+  "genin_sasuke": "Assets/Portraits/Genin/genin_sasuke.png",
+  "chunin_boruto": "Assets/Portraits/Chunin/chunin_boruto.png",
+  "chunin_jiraiya": "Assets/Portraits/Chunin/chunin_jiraiya.png",
+  "chunin_mitsuki": "Assets/Portraits/Chunin/chunin_mitsuki.png",
+  "chunin_shikadai": "Assets/Portraits/Chunin/chunin_shikadai.png",
+  "chunin_shinki": "Assets/Portraits/Chunin/chunin_shinki.png",
+  "akatsuki_deva": "Assets/Portraits/Akatsuki/akatsuki_deva.png",
+  "akatsuki_itachi": "Assets/Portraits/Akatsuki/akatsuki_itachi.png",
+  "akatsuki_sasuke": "Assets/Portraits/Akatsuki/akatsuki_sasuke.png",
+  "akatsuki_teen_naruto": "Assets/Portraits/Akatsuki/akatsuki_naruto.png",
+  "anbu_ino": "Assets/Portraits/Anbu/anbu_leader_ino.png",
+  "anbu_menma": "Assets/Portraits/Anbu/anbu_menma.png",
+  "anbu_naruto": "Assets/Portraits/Anbu/anbu_naruto.png",
+  "anbu_sasuke": "Assets/Portraits/Anbu/anbu_sasuke.png",
+  "jonin_hanabi": "Assets/Portraits/Jonin/jonin_hanabi.png",
+  "jonin_inojin": "Assets/Portraits/Jonin/jonin_inojin.png",
+  "jonin_konohamaru": "Assets/Portraits/Jonin/jonin_kono.png",
+  "jonin_sasuke": "Assets/Portraits/Jonin/jonin_sasuke.png",
+  "jonin_shino": "Assets/Portraits/Jonin/jonin_shino.png",
+  "sj_ebisu": "Assets/Portraits/Special Jonin/sj_ebisu.png",
+  "sj_genma": "Assets/Portraits/Special Jonin/sj_genma.png",
+  "sj_ibiki": "Assets/Portraits/Special Jonin/sj_ibiki.png",
+  "sannin_sakura": "Assets/Portraits/Sannin/sannin_sakura.png",
+  "sannin_shikamaru": "Assets/Portraits/Sannin/sannin_shika.png",
+  "kage_itachi": "Assets/Portraits/Kage/kage_itachi.png",
+  "kage_kakashi": "Assets/Portraits/Kage/kage_kaka.png",
+  "kage_menma": "Assets/Portraits/Kage/kage_menma.png",
+  "kage_naruto": "Assets/Portraits/Kage/kage_naruto.png",
+  "kage_sarada": "Assets/Portraits/Kage/kage_sarada.png",
+  "black_gold_naruto": "Assets/Portraits/Rare Cards/dark_naruto_kcm.png",
+  "black_sun_himawari": "Assets/Portraits/Rare Cards/black_sun_himawari.png",
+  "serpent_ascendant": "Assets/Portraits/Rare Cards/serpent_ascended.png",
+  "shisui": "Assets/Portraits/Rare Cards/village_guardian_shisui.png",
+  "sakura_avatar": "Assets/Portraits/Jinchuriki/jsakura_ava.png",
+  "sakura_manifestation": "Assets/Portraits/Jinchuriki/jsakura_mani.png",
+  "sakura_resonance": "Assets/Portraits/Jinchuriki/jsakura_res.png",
+  "shikamaru_avatar_yang": "Assets/Portraits/Jinchuriki/jshika_ava.png",
+  "shikamaru_avatar_yin": "Assets/Portraits/Jinchuriki/jshika_ava_yin.png",
+  "shikamaru_manifestation_yang": "Assets/Portraits/Jinchuriki/jshika_mani.png",
+  "shikamaru_manifestation_yin": "Assets/Portraits/Jinchuriki/jshika_mani_yin.png",
+  "shikamaru_resonance_yang": "Assets/Portraits/Jinchuriki/jshika_res.png",
+  "shikamaru_resonance_yin": "Assets/Portraits/Jinchuriki/jshika_res_yin.png",
+  "tobirama_avatar": "Assets/Portraits/Jinchuriki/jtobi_ava.png",
+  "tobirama_manifestation": "Assets/Portraits/Jinchuriki/jtobi_mani.png",
+  "tobirama_resonance": "Assets/Portraits/Jinchuriki/jtobi_res.png",
+  "baryon_mode": "Assets/Portraits/Transformation/bayron_mode.png",
+  "cs_anko": "Assets/Portraits/Transformation/cs1_anko.png",
+  "cs_sasuke": "Assets/Portraits/Transformation/cs1_sasuke.png",
+  "curse_mark_hinata": "Assets/Portraits/Transformation/cs1_hinata.png",
+  "l2_anko": "Assets/Portraits/Transformation/cs2_anko.png",
+  "mangekyo_sarada": "Assets/Portraits/Transformation/ms_sarada.png",
+  "naruto_v1": "Assets/Portraits/Transformation/naruto_v1.png",
+  "naruto_v2": "Assets/Portraits/Transformation/naruto_v2.png",
+  "sharingan_sasuke": "Assets/Portraits/Transformation/sharingan_sasuke.png",
+  "breakout_kurama": "Assets/Portraits/Variants/outbreak_kurama.png",
+  "coercive_cloak": "Assets/Portraits/Variants/coercive_cloak.png",
+  "kurama_dominion": "Assets/Portraits/Variants/kurama_dominion.png",
+  "kurama_sovereign": "Assets/Portraits/Variants/kurama_sovreign.png",
+  "six_tail_dominion": "Assets/Portraits/Variants/dominion_six_tails.png",
+  "stolen_chakra": "Assets/Portraits/Variants/stolen_chakra.png",
+  "teen_nagato": "Assets/Portraits/Variants/teen_nagato.png",
+  "three_tail_dominion": "Assets/Portraits/Variants/dominion_three_tails.png",
+  "black_madara": "Assets/Portraits/Boss Cards/black_madara.png",
+  "failed_god_madara": "Assets/Portraits/Boss Cards/failed_god_madara.png",
+  "fallen_hokage_sasuke": "Assets/Portraits/Boss Cards/fallen_hokage.png",
+  "shadow_of_indra": "Assets/Portraits/Boss Cards/shadow_of_indra.png",
+  "sixth_shadow": "Assets/Portraits/Boss Cards/the_sixth_shadow.png",
+  "undying_madara": "Assets/Portraits/Boss Cards/undying_madara.png",
+  "de_baku": "Assets/Portraits/Summons/baku.png",
+  "gamakichi": "Assets/Portraits/Summons/gamakichi.png",
+  "ibuse": "Assets/Portraits/Summons/ibuse.png",
+  "iron_maiden": "Assets/Portraits/Summons/maiden.png",
+  "key_gero": "Assets/Portraits/Summons/geratora.png",
+  "koto_crow": "Assets/Portraits/Summons/koto_crow.png",
+  "kurama_complete": "Assets/Portraits/Summons/kurama_complete.png",
+  "menma_kurama": "Assets/Portraits/Summons/menma_kurama.png",
+  "menma_nine_tails": "Assets/Portraits/Summons/menma_nine_tails.png",
+  "mirage_clam": "Assets/Portraits/Summons/mirage_clam.png",
+  "mk_enma": "Assets/Portraits/Summons/monkey_king_enma.png",
+  "nine_tails": "Assets/Portraits/Summons/naruto_nine_tails.png",
+  "triple_rashomon": "Assets/Portraits/Summons/rashomon.png",
+  "wr_kamatari": "Assets/Portraits/Summons/kamatari.png",
+  "yang_kurama": "Assets/Portraits/Summons/kurama_yang.png",
+  "yin_kurama": "Assets/Portraits/Summons/kurama_yin.png"
+});
+// UI_PORTRAIT_MANIFEST_JSON_END
+
+function getUIPortraitAssetPath(registryId) {
+  return typeof registryId==="string"&&(UI_PORTRAIT_MANIFEST[registryId]||"")||"";
+}
+
+function getUIPortraitRegistryId(subject) {
+  if (!subject) return null;
+  if (typeof subject==="string") return Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,subject)?subject:null;
+  const candidates=[subject.registryId,subject.entityId,subject.summonId,subject.sourceEntityId,subject.id].filter(Boolean);
+  return candidates.find(id=>Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id))||null;
+}
+
+function resolveUIPortraitProjection(subject) {
+  const registryId=getUIPortraitRegistryId(subject);
+  if (!registryId) return {registryId:null,path:"",status:"missing_authority",fallbackUsed:false};
+  const path=getUIPortraitAssetPath(registryId);
+  return path?{registryId,path,status:"active",fallbackUsed:false}:{registryId,path:"",status:"missing_authority",fallbackUsed:false};
+}
 
 function getCharacterCardAssetPath(
   assetId
@@ -2141,6 +2270,250 @@ function getSpecialJoninQualificationDefinition(qualificationId) {
 }
 
 // =========================================================
+// BRICK 894 — SPECIAL JŌNIN ALPHA 11-FAMILY / 33-PATH CATALOGUE
+// Exact recovered production baseline. Historical 13/39 remains genealogy;
+// Escort / Protective Detail is post-Alpha and is not fabricated here.
+// =========================================================
+const SPECIAL_JONIN_ALPHA_CATALOGUE_ROWS = Object.freeze([
+  {
+    "familyId": "reconnaissance",
+    "qualificationId": "reconnaissance.tracker_nin",
+    "competencyATag": "trail_analysis",
+    "competencyBTag": "route_intercept_execution"
+  },
+  {
+    "familyId": "reconnaissance",
+    "qualificationId": "reconnaissance.sensor_nin",
+    "competencyATag": "signal_discrimination",
+    "competencyBTag": "sensor_application"
+  },
+  {
+    "familyId": "reconnaissance",
+    "qualificationId": "reconnaissance.surveillance_specialist",
+    "competencyATag": "observation_integrity",
+    "competencyBTag": "surveillance_reporting"
+  },
+  {
+    "familyId": "intelligence",
+    "qualificationId": "intelligence.interrogator",
+    "competencyATag": "information_extraction",
+    "competencyBTag": "credibility_assessment"
+  },
+  {
+    "familyId": "intelligence",
+    "qualificationId": "intelligence.counter_intelligence_analyst",
+    "competencyATag": "deception_detection",
+    "competencyBTag": "counter_intelligence_response"
+  },
+  {
+    "familyId": "intelligence",
+    "qualificationId": "intelligence.strategic_intelligence_analyst",
+    "competencyATag": "multi_source_analysis",
+    "competencyBTag": "strategic_assessment"
+  },
+  {
+    "familyId": "covert_operations",
+    "qualificationId": "covert_operations.assassin",
+    "competencyATag": "target_isolation",
+    "competencyBTag": "covert_execution"
+  },
+  {
+    "familyId": "covert_operations",
+    "qualificationId": "covert_operations.infiltration_specialist",
+    "competencyATag": "access_planning",
+    "competencyBTag": "undetected_penetration"
+  },
+  {
+    "familyId": "covert_operations",
+    "qualificationId": "covert_operations.extraction_specialist",
+    "competencyATag": "extraction_planning",
+    "competencyBTag": "subject_recovery"
+  },
+  {
+    "familyId": "medical_operations",
+    "qualificationId": "medical_operations.field_medic",
+    "competencyATag": "field_triage",
+    "competencyBTag": "stabilisation_execution"
+  },
+  {
+    "familyId": "medical_operations",
+    "qualificationId": "medical_operations.toxicologist",
+    "competencyATag": "toxin_identification",
+    "competencyBTag": "countermeasure_application"
+  },
+  {
+    "familyId": "medical_operations",
+    "qualificationId": "medical_operations.medical_nin_researcher",
+    "competencyATag": "medical_analysis",
+    "competencyBTag": "validated_medical_research"
+  },
+  {
+    "familyId": "fuinjutsu_operations",
+    "qualificationId": "fuinjutsu_operations.sealing_specialist",
+    "competencyATag": "seal_analysis",
+    "competencyBTag": "seal_execution"
+  },
+  {
+    "familyId": "fuinjutsu_operations",
+    "qualificationId": "fuinjutsu_operations.reverse_summoning_specialist",
+    "competencyATag": "reverse_summoning_analysis",
+    "competencyBTag": "reverse_summoning_execution"
+  },
+  {
+    "familyId": "fuinjutsu_operations",
+    "qualificationId": "fuinjutsu_operations.biju_expert",
+    "competencyATag": "biju_containment_analysis",
+    "competencyBTag": "biju_response_execution"
+  },
+  {
+    "familyId": "shinobi_engineering_and_applied_ninjutsu",
+    "qualificationId": "shinobi_engineering_and_applied_ninjutsu.fuin_toolsmith",
+    "competencyATag": "fuin_tool_design",
+    "competencyBTag": "fuin_tool_validation"
+  },
+  {
+    "familyId": "shinobi_engineering_and_applied_ninjutsu",
+    "qualificationId": "shinobi_engineering_and_applied_ninjutsu.summoning_systems_specialist",
+    "competencyATag": "summoning_system_analysis",
+    "competencyBTag": "summoning_system_implementation"
+  },
+  {
+    "familyId": "shinobi_engineering_and_applied_ninjutsu",
+    "qualificationId": "shinobi_engineering_and_applied_ninjutsu.ninjutsu_engineer",
+    "competencyATag": "ninjutsu_system_design",
+    "competencyBTag": "ninjutsu_system_validation"
+  },
+  {
+    "familyId": "instruction_and_examination",
+    "qualificationId": "instruction_and_examination.elite_instructor",
+    "competencyATag": "instructional_diagnosis",
+    "competencyBTag": "advanced_instruction"
+  },
+  {
+    "familyId": "instruction_and_examination",
+    "qualificationId": "instruction_and_examination.team_development_instructor",
+    "competencyATag": "team_diagnosis",
+    "competencyBTag": "team_development_execution"
+  },
+  {
+    "familyId": "instruction_and_examination",
+    "qualificationId": "instruction_and_examination.examination_specialist",
+    "competencyATag": "assessment_design",
+    "competencyBTag": "assessment_adjudication"
+  },
+  {
+    "familyId": "demolition_and_sabotage",
+    "qualificationId": "demolition_and_sabotage.explosive_ordnance_specialist",
+    "competencyATag": "ordnance_assessment",
+    "competencyBTag": "ordnance_execution"
+  },
+  {
+    "familyId": "demolition_and_sabotage",
+    "qualificationId": "demolition_and_sabotage.trap_specialist",
+    "competencyATag": "trap_analysis",
+    "competencyBTag": "trap_deployment_or_disarmament"
+  },
+  {
+    "familyId": "demolition_and_sabotage",
+    "qualificationId": "demolition_and_sabotage.infrastructure_saboteur",
+    "competencyATag": "infrastructure_analysis",
+    "competencyBTag": "controlled_sabotage_execution"
+  },
+  {
+    "familyId": "communications_and_cryptography",
+    "qualificationId": "communications_and_cryptography.cryptographer",
+    "competencyATag": "cipher_analysis",
+    "competencyBTag": "cipher_construction_or_break"
+  },
+  {
+    "familyId": "communications_and_cryptography",
+    "qualificationId": "communications_and_cryptography.signal_interception_specialist",
+    "competencyATag": "signal_identification",
+    "competencyBTag": "signal_interception_execution"
+  },
+  {
+    "familyId": "communications_and_cryptography",
+    "qualificationId": "communications_and_cryptography.battlefield_communications_specialist",
+    "competencyATag": "communications_planning",
+    "competencyBTag": "communications_continuity"
+  },
+  {
+    "familyId": "chakra_and_technique_research",
+    "qualificationId": "chakra_and_technique_research.bloodline_researcher",
+    "competencyATag": "bloodline_evidence_analysis",
+    "competencyBTag": "bloodline_research_validation"
+  },
+  {
+    "familyId": "chakra_and_technique_research",
+    "qualificationId": "chakra_and_technique_research.counter_technique_specialist",
+    "competencyATag": "technique_analysis",
+    "competencyBTag": "counter_technique_validation"
+  },
+  {
+    "familyId": "chakra_and_technique_research",
+    "qualificationId": "chakra_and_technique_research.technique_researcher",
+    "competencyATag": "technique_research_analysis",
+    "competencyBTag": "technique_research_validation"
+  },
+  {
+    "familyId": "diplomacy_and_negotiation",
+    "qualificationId": "diplomacy_and_negotiation.shinobi_envoy",
+    "competencyATag": "diplomatic_briefing",
+    "competencyBTag": "formal_negotiation"
+  },
+  {
+    "familyId": "diplomacy_and_negotiation",
+    "qualificationId": "diplomacy_and_negotiation.conflict_mediator",
+    "competencyATag": "conflict_analysis",
+    "competencyBTag": "mediation_execution"
+  },
+  {
+    "familyId": "diplomacy_and_negotiation",
+    "qualificationId": "diplomacy_and_negotiation.cultural_liaison",
+    "competencyATag": "cultural_context_analysis",
+    "competencyBTag": "cross_group_facilitation"
+  }
+].map(row=>Object.freeze(row)));
+
+function buildAlphaSpecialJoninQualificationDefinition(row) {
+  if (!row||!row.qualificationId||!row.familyId||!row.competencyATag||!row.competencyBTag) return null;
+  const q=row.qualificationId;
+  return {
+    qualificationId:q,
+    familyId:row.familyId,
+    requiredEvidenceTags:[`${q}:specialist_work`],
+    mandatoryCompetencyGroups:[
+      {groupId:`${q}:competency_a`,anyTags:[`${q}:${row.competencyATag}`]},
+      {groupId:`${q}:competency_b`,anyTags:[`${q}:${row.competencyBTag}`]}
+    ],
+    optionalSupportingTags:[`${q}:supporting`],
+    permittedEvidenceCategories:[],
+    capacityRequirements:[],
+    capstoneRequirement:{requiredTags:[`${q}:capstone`]}
+  };
+}
+
+function registerAlphaSpecialJoninProductionCatalogue() {
+  const registered=[];
+  SPECIAL_JONIN_ALPHA_CATALOGUE_ROWS.forEach(row=>{
+    const definition=buildAlphaSpecialJoninQualificationDefinition(row);
+    const result=registerSpecialJoninQualificationDefinition(definition);
+    if (result.success) registered.push(result.qualificationId);
+  });
+  return registered;
+}
+
+const ALPHA_SPECIAL_JONIN_REGISTERED_QUALIFICATION_IDS = Object.freeze(registerAlphaSpecialJoninProductionCatalogue());
+
+function getAlphaSpecialJoninQualificationIds() {
+  return [...ALPHA_SPECIAL_JONIN_REGISTERED_QUALIFICATION_IDS];
+}
+
+function getAlphaSpecialJoninFamilyIds() {
+  return [...new Set(SPECIAL_JONIN_ALPHA_CATALOGUE_ROWS.map(row=>row.familyId))];
+}
+
+// =========================================================
 // BRICK 521 — REQUIRED EVIDENCE-TAG COVERAGE
 // =========================================================
 function evaluateSpecialistRequiredTagCoverage(definition, evidence) {
@@ -2298,6 +2671,49 @@ function setSpecialistPracticeStatus(ownedCharacterId,qualificationId,status) {
   state.practiceStatusByOwnedCharacterId[ownedCharacterId][qualificationId]={status,updatedAt:Date.now()};
   savePlayerData();
   return {success:true,status};
+}
+
+// =========================================================
+// BRICK 895 — SPECIAL JŌNIN INSTITUTIONAL RECOGNITION BOUNDARY
+// Qualification != Recognition != formal rank.
+// =========================================================
+function getEarnedSpecialJoninQualificationRecord(ownedCharacterId,qualificationId) {
+  const state=ensureSpecialistQualificationState();
+  return state.earnedByOwnedCharacterId&&state.earnedByOwnedCharacterId[ownedCharacterId]&&state.earnedByOwnedCharacterId[ownedCharacterId][qualificationId]||null;
+}
+
+function commitSpecialJoninRecognition(ownedCharacterId,qualificationId,{institutionalAuthorityId=null,occurrenceId=null,evidenceIds=[],institutionalBlock=false}={}) {
+  const owned=getOwnedCharacterRecordById(ownedCharacterId);
+  if (!owned) return {success:false,reason:"owned_character_missing"};
+  if (!getAlphaSpecialJoninQualificationIds().includes(qualificationId)) return {success:false,reason:"alpha_special_jonin_qualification_invalid"};
+  const earned=getEarnedSpecialJoninQualificationRecord(ownedCharacterId,qualificationId);
+  if (!earned) return {success:false,reason:"special_jonin_qualification_not_earned"};
+  if (!occurrenceId) return {success:false,reason:"special_jonin_recognition_occurrence_required"};
+  const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:(playerData.activityHistory=[]);
+  const existing=history.find(record=>record&&record.type==="special_jonin_recognition"&&record.occurrenceId===occurrenceId);
+  if (existing) {
+    if (existing.ownedCharacterId!==ownedCharacterId||existing.qualificationId!==qualificationId) return {success:false,reason:"recognition_occurrence_identity_collision"};
+    return {success:true,idempotent:true,record:cloneProgressionData(existing),formalRank:getOwnedCharacterFormalRank(ownedCharacterId)};
+  }
+  const currentRank=getOwnedCharacterFormalRank(ownedCharacterId);
+  if (currentRank!=="chunin") return {success:false,reason:currentRank&&["special_jonin","jonin","anbu","kage"].includes(currentRank)?"formal_rank_not_rewritten":"chunin_formal_rank_required",formalRank:currentRank};
+  if (institutionalBlock===true) return {success:false,reason:"authored_institutional_block"};
+  if (!institutionalAuthorityId) return {success:false,reason:"institutional_authority_required"};
+  const record={
+    type:"special_jonin_recognition",occurrenceId:String(occurrenceId),ownedCharacterId,variantId:owned.variantId,qualificationId,
+    institutionalAuthorityId:String(institutionalAuthorityId),qualificationEvidenceRecordIds:[...(earned.evidenceRecordIds||[])],
+    evidenceIds:[...new Set((Array.isArray(evidenceIds)?evidenceIds:[]).filter(Boolean))],
+    historyScope:createHistoryScopeAddress("active_konoha_chronicle_occurrence",{continuityId:ACTIVE_KONOHA_CONTINUITY_ID,occurrenceType:"special_jonin_recognition"}),
+    completed:true,success:true,outcome:"special_jonin_recognised",timestamp:Date.now(),
+    qualificationDuplicated:false,plBonusGranted:0,statBonusGranted:false
+  };
+  history.push(record);
+  activityHistory=history;
+  const state=ensurePlayerAcquisitionState();
+  const priorRankRecord=state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]&&typeof state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]==="object"?state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]:{};
+  state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]={...priorRankRecord,formalRank:"special_jonin",recognisedAt:record.timestamp,recognitionOccurrenceId:record.occurrenceId,qualificationId};
+  savePlayerData();
+  return {success:true,idempotent:false,record:cloneProgressionData(record),formalRank:"special_jonin",qualificationPreserved:true,plBonusGranted:0};
 }
 
 // =========================================================
@@ -44692,7 +45108,7 @@ function runAlphaMenmaOriginProductionDiagnostics() {
     oppositionOutsideCollectibleGate:[altered,brute,unstable].every(Boolean)&&!getCharacterRegistryEntry("test_subject_altered_shinobi")&&!getCharacterRegistryEntry("test_subject_brute")&&!getCharacterRegistryEntry("test_subject_unstable"),
     exactAlteredCalibration:!!altered&&altered.power===11&&JSON.stringify([altered.stats.nin,altered.stats.tai,altered.stats.buki,altered.stats.fuin,altered.stats.kin,altered.stats.gen,altered.stats.stamina])===JSON.stringify([12,11,10,5,5,6,11]),
     exactWiderClearingCalibrations:!!brute&&brute.power===13&&JSON.stringify([brute.stats.nin,brute.stats.tai,brute.stats.buki,brute.stats.fuin,brute.stats.kin,brute.stats.gen,brute.stats.stamina])===JSON.stringify([6,14,8,4,5,4,14])&&!!unstable&&unstable.power===12&&JSON.stringify([unstable.stats.nin,unstable.stats.tai,unstable.stats.buki,unstable.stats.fuin,unstable.stats.kin,unstable.stats.gen,unstable.stats.stamina])===JSON.stringify([13,10,6,4,6,4,12]),
-    onlyAlteredGetsTutorialActionPackage:JSON.stringify(getEnemyAuthoredBattleActions(altered).map(action=>action.id))===JSON.stringify(["test_subject_altered_shinobi_shinobi_strike","test_subject_altered_shinobi_shuriken_cast","test_subject_altered_shinobi_unstable_chakra_burst"])&&getEnemyAuthoredBattleActions(brute).length===0&&getEnemyAuthoredBattleActions(unstable).length===0,
+    directTutorialPackageRemainsAlteredOnly:JSON.stringify(getEnemyAuthoredBattleActions(altered).map(action=>action.id))===JSON.stringify(["test_subject_altered_shinobi_shinobi_strike","test_subject_altered_shinobi_shuriken_cast","test_subject_altered_shinobi_unstable_chakra_burst"])&&getEnemyAuthoredBattleActions(brute).length===3&&getEnemyAuthoredBattleActions(unstable).length===3,
     alteredExactAttackPLs:JSON.stringify((ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.test_subject_altered_shinobi||[]).map(action=>action.authoredAttackPL))===JSON.stringify([5,4,6]),
     sceneRegistered:!!scene,
     directBattleExactlyMenmaVsAltered:!!battleBeat&&battleBeat.battle&&battleBeat.battle.enemyId==="test_subject_altered_shinobi"&&battleBeat.battle.encounterId===MENMA_ORIGIN_TUTORIAL_ENCOUNTER_ID&&!JSON.stringify(battleBeat.battle).includes("test_subject_brute")&&!JSON.stringify(battleBeat.battle).includes("test_subject_unstable"),
@@ -45146,6 +45562,104 @@ function runAlphaPost892FieldReadinessDiagnostics() {
   const groups={combatFreeze,altered,fieldReadiness};
   const result={groups,combatFreezePreserved:combatFreeze&&combatFreeze.pass===true,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-892 field-readiness gate: ${result.pass?"PASS":"FAIL"} / Combat Freeze baseline=${result.combatFreezePreserved?"PRESERVED":"REGRESSED"}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 893 — TEST-SUBJECT WIDER-CLEARING PACKAGE DIAGNOSTIC
+// BRICKS 894–895 — SPECIAL JŌNIN CATALOGUE / RECOGNITION DIAGNOSTIC
+// BRICKS 896–898 — uiPORTRAIT AUTHORITY / CONSUMER DIAGNOSTIC
+// BRICK 899 — POST-INTEGRATION GOLDEN GATE
+// =========================================================
+function runAlphaTestSubjectWiderClearingDiagnostics() {
+  const altered=getEnemyAuthoredBattleActions(enemyDatabase.test_subject_altered_shinobi);
+  const brute=getEnemyAuthoredBattleActions(enemyDatabase.test_subject_brute);
+  const unstable=getEnemyAuthoredBattleActions(enemyDatabase.test_subject_unstable);
+  const clinch=brute.find(action=>action.id==="test_subject_brute_crushing_clinch");
+  const menmaScene=getStorySceneDefinition("origin_academy_menma_prologue");
+  const sceneSource=menmaScene?JSON.stringify(menmaScene):"";
+  const result={
+    alteredExactThree:JSON.stringify(altered.map(a=>a.id))===JSON.stringify(["test_subject_altered_shinobi_shinobi_strike","test_subject_altered_shinobi_shuriken_cast","test_subject_altered_shinobi_unstable_chakra_burst"]),
+    bruteExactThree:JSON.stringify(brute.map(a=>a.id))===JSON.stringify(["test_subject_brute_heavy_swing","test_subject_brute_body_rush","test_subject_brute_crushing_clinch"]),
+    bruteNumerics:brute[0]&&brute[0].authoredAttackPL===7&&brute[1]&&brute[1].authoredAttackPL===6&&clinch&&clinch.authoredAttackPL===0&&clinch.semanticClass==="physical_restraint",
+    bruteControlLiveTai:!!clinch&&clinch.resolverDiscipline==="Taijutsu"&&!JSON.stringify(clinch).includes("independentRestraintScalar"),
+    unstableExactThree:JSON.stringify(unstable.map(a=>a.id))===JSON.stringify(["test_subject_unstable_frantic_rush","test_subject_unstable_chakra_spasm","test_subject_unstable_panicked_burst"]),
+    unstableNumerics:JSON.stringify(unstable.map(a=>a.authoredAttackPL))===JSON.stringify([5,6,7]),
+    widerClearingNotMenmaDeployment:sceneSource.includes("test_subject_altered_shinobi")&&!sceneSource.includes('"enemyId":"test_subject_brute"')&&!sceneSource.includes('"enemyId":"test_subject_unstable"'),
+    outsideCollectibleGate:["test_subject_altered_shinobi","test_subject_brute","test_subject_unstable"].every(id=>!ALPHA_PRODUCTION_CHARACTER_IDS.includes(id)&&!ALPHA_PRODUCTION_ENTITY_IDS.includes(id))
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function createSpecialJoninDiagnosticEvidence(qualificationId) {
+  const definition=getSpecialJoninQualificationDefinition(qualificationId);
+  if (!definition) return [];
+  const a=definition.mandatoryCompetencyGroups[0];
+  const b=definition.mandatoryCompetencyGroups[1];
+  const work=definition.requiredEvidenceTags[0];
+  const capstone=definition.capstoneRequirement.requiredTags[0];
+  return [
+    {evidenceId:`${qualificationId}:diag1`,significance:4,category:"mission",activityFamilyId:"family_a",independentSourceId:"source_a",tags:[work,...a.anyTags],competencyGroupIds:[a.groupId],verified:true,specialistLevel:false},
+    {evidenceId:`${qualificationId}:diag2`,significance:4,category:"case",activityFamilyId:"family_a",independentSourceId:"source_a",tags:[...b.anyTags],competencyGroupIds:[b.groupId],verified:true,specialistLevel:false},
+    {evidenceId:`${qualificationId}:diag3`,significance:3,category:"project",activityFamilyId:"family_b",independentSourceId:"source_b",tags:[...a.anyTags],competencyGroupIds:[a.groupId],verified:true,specialistLevel:false},
+    {evidenceId:`${qualificationId}:diag4`,significance:3,category:"mission",activityFamilyId:"family_c",independentSourceId:"source_c",tags:[...b.anyTags,capstone],competencyGroupIds:[b.groupId],verified:true,specialistLevel:true}
+  ];
+}
+
+function runAlphaSpecialJoninProductionCatalogueDiagnostics() {
+  const ids=getAlphaSpecialJoninQualificationIds();
+  const families=getAlphaSpecialJoninFamilyIds();
+  const defs=ids.map(getSpecialJoninQualificationDefinition);
+  const tracker="reconnaissance.tracker_nin";
+  const other="intelligence.interrogator";
+  const trackerEvidence=createSpecialJoninDiagnosticEvidence(tracker);
+  const result={
+    exactElevenFamilies:families.length===11,
+    exactThirtyThreePaths:ids.length===33&&new Set(ids).size===33,
+    allDefinitionsValidate:defs.every(def=>validateSpecialJoninQualificationDefinition(def).valid),
+    exactLegacyKnownIds:["instruction_and_examination.elite_instructor","instruction_and_examination.examination_specialist","intelligence.interrogator"].every(id=>ids.includes(id)),
+    escortDeferred:!ids.some(id=>/escort|protective_detail/i.test(id)),
+    noArchaeologyPlaceholders:!ids.some(id=>/unknown|placeholder|missing_history/i.test(id)),
+    noCapacityThresholds:defs.every(def=>Array.isArray(def.capacityRequirements)&&def.capacityRequirements.length===0),
+    policyExact:SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY.requiredWeightedPoints===12&&SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY.minimumDistinctEvidenceRecords===4&&SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY.minimumEvidenceCategories===2&&SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY.minimumIndependentSources===2&&SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY.activityFamilyPointCapRatio===0.50&&SPECIAL_JONIN_ALPHA_QUALIFICATION_POLICY.requiresVerifiedSpecialistCapstone===true,
+    namespacedEvidenceNoLeak:evaluateSpecialJoninQualification(other,trackerEvidence,{}).qualified===false,
+    validPathCanQualify:evaluateSpecialJoninQualification(tracker,trackerEvidence,{}).qualified===true,
+    qualificationDoesNotOwnRank:!earnSpecialJoninQualification.toString().includes("formalRankProgressionByOwnedCharacterId"),
+    recognitionSeparate:commitSpecialJoninRecognition.toString().includes('type:"special_jonin_recognition"')&&commitSpecialJoninRecognition.toString().includes('formalRank:"special_jonin"'),
+    noRecognitionPLBonus:commitSpecialJoninRecognition.toString().includes("plBonusGranted:0"),
+    difficultyOrderingNotRankAuthority:!JSON.stringify(SHINOBI_DIFFICULTIES).includes("formalRankProgressionByOwnedCharacterId")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaUIPortraitAuthorityDiagnostics() {
+  const expected=[...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+  const paths=Object.values(UI_PORTRAIT_MANIFEST);
+  const battleSource=renderBattleRosterSlot.toString();
+  const result={
+    exact102Mappings:Object.keys(UI_PORTRAIT_MANIFEST).length===102&&expected.length===102,
+    exactProductionIdSet:expected.every(id=>Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id))&&Object.keys(UI_PORTRAIT_MANIFEST).every(id=>expected.includes(id)),
+    uniquePaths:new Set(paths).size===102,
+    exactRoot:paths.every(path=>path.startsWith("Assets/Portraits/")&&path.endsWith(".png")),
+    singularTransformationFolder:getUIPortraitAssetPath("baryon_mode")==="Assets/Portraits/Transformation/bayron_mode.png",
+    deliberateMismatches:getUIPortraitAssetPath("academy_iwabee").endsWith("academy_student_iwabe.png")&&getUIPortraitAssetPath("academy_metal_lee").endsWith("academy_student_metal.png")&&getUIPortraitAssetPath("fallen_hokage_sasuke").endsWith("fallen_hokage.png")&&getUIPortraitAssetPath("sixth_shadow").endsWith("the_sixth_shadow.png")&&getUIPortraitAssetPath("kurama_sovereign").endsWith("kurama_sovreign.png"),
+    noCardFallback:!resolveUIPortraitProjection.toString().includes("getCharacterCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("subject.image"),
+    battleConsumesResolver:battleSource.includes("resolveUIPortraitProjection(participant)"),
+    missingAuthorityVisible:battleSource.includes('data-portrait-status="missing-authority"'),
+    noInventedBattleArenaFolders:!paths.some(path=>path.includes("/Battle/")||path.includes("/Arena/"))
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaPost899IntegrationDiagnostics() {
+  const post892=runAlphaPost892FieldReadinessDiagnostics();
+  const testSubjects=runAlphaTestSubjectWiderClearingDiagnostics();
+  const specialJonin=runAlphaSpecialJoninProductionCatalogueDiagnostics();
+  const portraits=runAlphaUIPortraitAuthorityDiagnostics();
+  const groups={post892,testSubjects,specialJonin,portraits};
+  const combatFreezePreserved=post892&&post892.combatFreezePreserved===true&&post892.pass===true;
+  const result={groups,combatFreezePreserved,portraitBinaryQAStatus:"external_ci_required",pass:Object.values(groups).every(group=>group&&group.pass===true)&&combatFreezePreserved};
+  console.log(`SC Alpha post-899 integration gate: ${result.pass?"PASS":"FAIL"} / Combat Freeze=${combatFreezePreserved?"PRESERVED":"REGRESSED"} / portrait binary QA=${result.portraitBinaryQAStatus}`);
   return result;
 }
 
@@ -65770,9 +66284,11 @@ function renderBattleRosterSlot(
     "UNKNOWN";
 
 
+  const portraitProjection =
+    resolveUIPortraitProjection(participant);
+
   const image =
-    participant.image ||
-    "";
+    portraitProjection.path;
 
 
   const transitionClass =
@@ -65939,9 +66455,10 @@ function renderBattleRosterSlot(
                 src="${image}"
                 alt="${name}"
                 draggable="false"
+                data-ui-portrait-registry-id="${portraitProjection.registryId}"
               >
             `
-          : ""
+          : `<div class="battle-live-roster-portrait battle-live-roster-portrait-missing" data-portrait-status="missing-authority" aria-label="Portrait authority unavailable for ${name}">忍</div>`
       }
 
       <div class="battle-live-roster-copy">
@@ -82140,6 +82657,20 @@ const ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES = Object.freeze({
     Object.assign(makeEnemyFixedDamageAction("test_subject_altered_shinobi_shinobi_strike",5,{traits:["grounded_shinobi_fundamentals","no_unwritten_control_rider"]}),{authoredAttackPL:5}),
     Object.assign(makeEnemyFixedDamageAction("test_subject_altered_shinobi_shuriken_cast",4,{traits:["projectile_presentation_one_packet"]}),{authoredAttackPL:4}),
     Object.assign(makeEnemyFixedDamageAction("test_subject_altered_shinobi_unstable_chakra_burst",6,{traits:["one_authored_packet","no_automatic_self_damage","no_automatic_condition","no_curse_mark_escalation"]}),{authoredAttackPL:6})
+  ]),
+  // =========================================================
+  // BRICK 893 — MENMA WIDER-CLEARING OPPOSITION PACKAGES
+  // These exact packages do not change Menma's one-on-one Battle deployment.
+  // =========================================================
+  test_subject_brute:Object.freeze([
+    Object.assign(makeEnemyFixedDamageAction("test_subject_brute_heavy_swing",7,{primaryDiscipline:"Taijutsu",traits:["wider_clearing_only","no_hidden_rider"]}),{authoredAttackPL:7}),
+    Object.assign(makeEnemyFixedDamageAction("test_subject_brute_body_rush",6,{primaryDiscipline:"Taijutsu",traits:["wider_clearing_only","no_automatic_stun","no_automatic_displacement"]}),{authoredAttackPL:6}),
+    Object.assign(makeEnemyDynamicControlAction("test_subject_brute_crushing_clinch","Taijutsu",{semanticClass:"physical_restraint",durationActionOpportunities:1,traits:["wider_clearing_only","no_attack_pl","live_effective_taijutsu","no_hidden_restraint_scalar","not_generic_stun"]}),{authoredAttackPL:0,semanticClass:"physical_restraint",resolverDiscipline:"Taijutsu"})
+  ]),
+  test_subject_unstable:Object.freeze([
+    Object.assign(makeEnemyFixedDamageAction("test_subject_unstable_frantic_rush",5,{primaryDiscipline:"Taijutsu",traits:["wider_clearing_only","one_authored_packet"]}),{authoredAttackPL:5}),
+    Object.assign(makeEnemyFixedDamageAction("test_subject_unstable_chakra_spasm",6,{primaryDiscipline:"Ninjutsu",traits:["wider_clearing_only","one_authored_packet","no_hidden_instability_stat"]}),{authoredAttackPL:6}),
+    Object.assign(makeEnemyFixedDamageAction("test_subject_unstable_panicked_burst",7,{primaryDiscipline:"Ninjutsu",traits:["wider_clearing_only","one_authored_packet","no_automatic_self_damage","no_automatic_condition"]}),{authoredAttackPL:7})
   ]),
 
   undying_madara:Object.freeze([
