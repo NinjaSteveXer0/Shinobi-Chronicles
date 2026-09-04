@@ -84,21 +84,45 @@ Do **not** create Alpha mechanics for:
 - independent mask turns;
 - independent mask or heart PL ledgers;
 - per-mask destruction/loss lifecycle;
+- heart-count survival;
 - elemental-access gating based on surviving masks/hearts;
 - hidden additive PL from mask count.
 
 Authored Kakuzu actions may retain exact mask/source provenance or presentation where relevant, but the masks do not become independent production participants merely because they are causally involved in an attack.
+
+Kakuzu's authored elemental Actions remain Character-owned.
 
 Deeper heart/mask mechanics are **POST-ALPHA / DEFERRED** and require fresh owning-authority ratification before implementation.
 
 Preserve:
 
 - causal source ≠ independent participant;
-- presentation ≠ participation;
+- presentation source ≠ independent participant;
 - parent Character validity ≠ autonomous sub-entity runtime;
 - deferred heart/mask mechanics ≠ concept deletion.
 
-## 5. Cross-system implementation doctrine
+## 5. Production-admission boundary
+
+The Combat semantics above are closed, but `sj_kiba` and `akatsuki_kakuzu` remain **awaiting live production admission** in the current Alpha source wave.
+
+Combat closure does **not** by itself:
+
+- add either identity to the current Alpha Registry;
+- expand the current collectible/portrait production gate;
+- author asset mappings;
+- create deployment availability;
+- create Acquisition routes;
+- imply that existing 102-wide collectible/portrait authority has already expanded.
+
+When Registry/Assets later admits these identities into live production, a new explicit handoff must expand the relevant Registry/asset/portrait authority. Assets must not invent those mappings before that admission.
+
+Preserve:
+
+- semantic closure ≠ production admission;
+- production identity definition ≠ current Registry membership;
+- Combat authority ≠ asset/portrait authority.
+
+## 6. Cross-system implementation doctrine
 
 These locks intentionally support two different bonded-companion patterns without flattening them into one generic system:
 
