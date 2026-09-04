@@ -47,10 +47,10 @@ const assetManifest = {
       "Assets/Academy Student/academy_kurenai.png",
 
     academy_iwabee:
-      "Assets/Academy Student/academy_iwabee.png",
+      "Assets/Academy Student/academy_iwabe.png",
 
     academy_metal_lee:
-      "Assets/Academy Student/academy_metal_lee.png",
+      "Assets/Academy Student/academy_metal.png",
 
     academy_kakashi:
       "Assets/Academy Student/academy_kakashi.png",
@@ -163,18 +163,17 @@ function getUIAssetPath(
 function runAcademyExpansionCardAssetDiagnostics() {
   const expected={
     academy_kurenai:"Assets/Academy Student/academy_kurenai.png",
-    academy_iwabee:"Assets/Academy Student/academy_iwabee.png",
-    academy_metal_lee:"Assets/Academy Student/academy_metal_lee.png",
+    academy_iwabee:"Assets/Academy Student/academy_iwabe.png",
+    academy_metal_lee:"Assets/Academy Student/academy_metal.png",
     academy_kakashi:"Assets/Academy Student/academy_kakashi.png",
     academy_obito:"Assets/Academy Student/academy_obito.png"
   };
   const ids=Object.keys(expected);
   const result={
     allFiveCardMappingsExact:ids.every(id=>getCharacterCardAssetPath(id)===expected[id]),
-    iwabeeFilenameCorrect:getCharacterCardAssetPath("academy_iwabee")==="Assets/Academy Student/academy_iwabee.png",
-    metalLeeFilenameCorrect:getCharacterCardAssetPath("academy_metal_lee")==="Assets/Academy Student/academy_metal_lee.png",
-    staleIwabeFilenameAbsent:!Object.values(assetManifest.characterCards).includes("Assets/Academy Student/academy_iwabe.png"),
-    staleMetalFilenameAbsent:!Object.values(assetManifest.characterCards).includes("Assets/Academy Student/academy_metal.png"),
+    iwabeeMapsPhysicalIwabeFile:getCharacterCardAssetPath("academy_iwabee")==="Assets/Academy Student/academy_iwabe.png",
+    metalLeeMapsPhysicalMetalFile:getCharacterCardAssetPath("academy_metal_lee")==="Assets/Academy Student/academy_metal.png",
+    registryIdentityIndependentFromFilename:getCharacterCardAssetPath("academy_iwabee").endsWith("academy_iwabe.png")&&getCharacterCardAssetPath("academy_metal_lee").endsWith("academy_metal.png"),
     registryIdsUnchanged:ids.every(id=>typeof characterRegistry!=="undefined"&&!!characterRegistry[id]),
     productionTargetRemains102:typeof ALPHA_PRODUCTION_CHARACTER_IDS!=="undefined"&&typeof ALPHA_PRODUCTION_ENTITY_IDS!=="undefined"&&ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length===17,
     cardAssetIsNotPortraitAuthority:ids.every(id=>typeof getCharacterCardAssetPath(id)==="string"&&getCharacterCardAssetPath(id).startsWith("Assets/Academy Student/"))
@@ -7930,6 +7929,7 @@ function claimCurrentBattleRewards() {
 
 
   savePlayerData();
+  saveTestState();
 
 
   console.log(
@@ -38098,13 +38098,6 @@ const worldRegions = {
 
         desc:
           "The main shinobi settlement of the Land of Fire and the centre of your regional progression.",
-
-        power: {
-          recommended: 0,
-          enemyMin: 0,
-          enemyMax: 0
-        },
-
         encounters: {
           count: 0,
           types: [
@@ -38166,14 +38159,6 @@ const worldRegions = {
   battle: {
 
     difficulty: "EASY",
-
-    recommendedPL: 500,
-
-    enemyPool: {
-      min: 350,
-      max: 650
-    },
-
     encounters: 4,
 
     enemyTypes: [
@@ -38237,13 +38222,6 @@ const worldRegions = {
 
         desc:
           "A concealed supply camp guarded by shinobi and mercenaries.",
-
-        power: {
-          recommended: 1500,
-          enemyMin: 1200,
-          enemyMax: 1850
-        },
-
         encounters: {
           count: 5,
           types: [
@@ -38296,13 +38274,6 @@ const worldRegions = {
 
         desc:
           "A low-risk combat training area suited to developing weaker shinobi.",
-
-        power: {
-          recommended: 400,
-          enemyMin: 250,
-          enemyMax: 550
-        },
-
         encounters: {
           count: 6,
           types: [
@@ -38347,13 +38318,6 @@ const worldRegions = {
 
         desc:
           "A dangerous regional trial that tests whether your shinobi are ready to progress.",
-
-        power: {
-          recommended: 1250,
-          enemyMin: 950,
-          enemyMax: 1600
-        },
-
         encounters: {
           count: 5,
           types: [
@@ -38405,13 +38369,6 @@ const worldRegions = {
 
         desc:
           "A mysterious cave containing dangerous encounters and exceptionally rare rewards.",
-
-        power: {
-          recommended: 2200,
-          enemyMin: 1750,
-          enemyMax: 2700
-        },
-
         encounters: {
           count: 6,
           types: [
@@ -38470,13 +38427,6 @@ const worldRegions = {
 
         desc:
           "A repeatable combat zone containing stronger roaming opponents.",
-
-        power: {
-          recommended: 900,
-          enemyMin: 650,
-          enemyMax: 1150
-        },
-
         encounters: {
           count: 8,
           types: [
@@ -38529,13 +38479,6 @@ const worldRegions = {
 
         desc:
           "Protect traders and civilians while travelling across hostile territory.",
-
-        power: {
-          recommended: 700,
-          enemyMin: 500,
-          enemyMax: 900
-        },
-
         encounters: {
           count: 4,
           types: [
@@ -38580,13 +38523,6 @@ const worldRegions = {
 
         desc:
           "Reconnaissance missions into more dangerous parts of the Land of Fire.",
-
-        power: {
-          recommended: 1650,
-          enemyMin: 1250,
-          enemyMax: 2000
-        },
-
         encounters: {
           count: 5,
           types: [
@@ -38638,13 +38574,6 @@ const worldRegions = {
 
         desc:
           "A ruined military position occupied by scavengers and rogue shinobi.",
-
-        power: {
-          recommended: 1100,
-          enemyMin: 800,
-          enemyMax: 1400
-        },
-
         encounters: {
           count: 5,
           types: [
@@ -38697,13 +38626,6 @@ const worldRegions = {
 
         desc:
           "Optional reconnaissance, surveillance and regional challenge assignments.",
-
-        power: {
-          recommended: 1350,
-          enemyMin: 1000,
-          enemyMax: 1650
-        },
-
         encounters: {
           count: 3,
           types: [
@@ -38754,13 +38676,6 @@ const worldRegions = {
 
         desc:
           "A tougher repeatable training route along the river network.",
-
-        power: {
-          recommended: 1800,
-          enemyMin: 1400,
-          enemyMax: 2200
-        },
-
         encounters: {
           count: 7,
           types: [
@@ -38806,13 +38721,6 @@ const worldRegions = {
 
         desc:
           "The fortified southern checkpoint and gateway into the Land of Fire.",
-
-        power: {
-          recommended: 300,
-          enemyMin: 200,
-          enemyMax: 450
-        },
-
         encounters: {
           count: 2,
           types: [
@@ -38854,7 +38762,6 @@ var selectedLocationNode = null;
 var selectedHotspotId = null;
 var selectedOpportunityId = null;
 var regionInfoOpen = false;
-var playerPowerLevel = 2450; // legacy presentation value; new hotspot projection never consumes it.
 var currentOverlayType = null;
 
 // =========================================================
@@ -39138,21 +39045,20 @@ function closeOverlay() {
 
 
   // =========================================
-  // VICTORY SCREEN
-  // Claim rewards before leaving
+  // BRICK 868 — VICTORY SCREEN CLOSE LOCK
   // =========================================
-
+  // Closing/dismissing Victory is not a substitute for either CLAIM or
+  // CONTINUE. The explicit two-stage lifecycle remains authoritative.
   if (
     currentOverlayType ===
     "victory"
   ) {
-
-
-    continueAfterVictory();
-
-
+    console.log(
+      currentBattle.rewards&&currentBattle.rewards.claimed===true
+        ? "Victory remains open until CONTINUE is chosen."
+        : "Victory remains open until rewards are CLAIMED, then CONTINUE is chosen."
+    );
     return;
-
   }
 
 
@@ -39910,7 +39816,7 @@ function getClanFilteredCharacters(
 
           return (
             slotNumber >= 1 &&
-            slotNumber <= 3
+            slotNumber <= 4
           );
         }
       );
@@ -39925,7 +39831,7 @@ function getClanFilteredCharacters(
             );
 
           return (
-            slotNumber >= 4 &&
+            slotNumber >= 5 &&
             slotNumber <= 6
           );
         }
@@ -43734,7 +43640,7 @@ const KISOGAN_ACTION_DATABASE = Object.freeze({
   }),
   kisogan_causal_strata_analysis:Object.freeze({
     id:"kisogan_causal_strata_analysis",displayName:"Causal Strata Analysis",phase:2,actionClass:"ability",attackPL:0,
-    minimumReferences:1,maximumReferences:3,resolutionKind:"causal_strata_analysis"
+    minimumReferences:2,maximumReferences:3,resolutionKind:"causal_strata_analysis"
   }),
   kisogan_contradiction_analysis:Object.freeze({
     id:"kisogan_contradiction_analysis",displayName:"Contradiction Analysis",phase:2,actionClass:"ability",attackPL:0,
@@ -43765,7 +43671,7 @@ function getActorKisoganAuthoritySnapshot(actor) {
     ...(record&&Array.isArray(record.abilityActionAccessIds)?record.abilityActionAccessIds:[]),
     ...(Array.isArray(actor.abilityActionAccessIds)?actor.abilityActionAccessIds:[])
   ].filter(id=>!!getKisoganActionDefinition(id)))];
-  const expressionAccess=registryAbilityIds.includes("kisogan_expression")||runtimeAbilityIds.includes("kisogan_expression")||embodiedIds.includes("kisogan_expression");
+  const expressionAccess=registryAbilityIds.includes("kisogan_expression")||runtimeAbilityIds.includes("kisogan_expression");
   const active=["player","enemy"].some(side=>!!findBattleTransientState({stateKey:"kisogan_expression_active",targetSide:side,targetParticipantId:actor.id}));
   return {
     expressionAccess,
@@ -43995,6 +43901,8 @@ function runAlphaGoldenHistoryKisoganDiagnostics() {
     noCostsNoCooldown:getKisoganAbilityDefinition().chakraCost===0&&getKisoganAbilityDefinition().staminaCost===0&&getKisoganAbilityDefinition().plSacrifice===0&&getKisoganAbilityDefinition().cooldown===null,
     zeroStatsZeroPL:Object.keys(getKisoganAbilityDefinition().statModifiers).length===0&&getKisoganAbilityDefinition().directPLContribution===0,
     expressionAccessSeparateFromActions:getActorKisoganAuthoritySnapshot({id:"diagnostic",abilityAccessIds:["kisogan_expression"],abilityActionAccessIds:[]}).expressionAccess===true&&getActorKisoganAuthoritySnapshot({id:"diagnostic",abilityAccessIds:["kisogan_expression"],abilityActionAccessIds:[]}).actionAccessIds.length===0,
+    embodiedDoesNotMintExpressionAccess:getActorKisoganAuthoritySnapshot({id:"diagnostic_embodied_only",embodiedExpressions:["kisogan_expression"],abilityAccessIds:[],abilityActionAccessIds:[]}).embodied===true&&getActorKisoganAuthoritySnapshot({id:"diagnostic_embodied_only",embodiedExpressions:["kisogan_expression"],abilityAccessIds:[],abilityActionAccessIds:[]}).expressionAccess===false,
+    causalStrataRequiresTwoToThree:getKisoganActionDefinition("kisogan_causal_strata_analysis").minimumReferences===2&&getKisoganActionDefinition("kisogan_causal_strata_analysis").maximumReferences===3,
     scopeBeforeFidelity:high.success===true&&low.success===true&&JSON.stringify(high.retainedFacts)===JSON.stringify(low.retainedFacts)&&high.scopeExpandedByFidelity===false&&low.scopeExpandedByFidelity===false,
     fidelityNeverGrantsAccess:inaccessible.success===false&&inaccessible.reason==="historical_reference_inaccessible",
     authorisedFieldsOnly:high.retainedFacts.data&&high.retainedFacts.data.visible==="retained"&&!Object.prototype.hasOwnProperty.call(high.retainedFacts.data,"hidden")&&!Object.prototype.hasOwnProperty.call(high.retainedFacts,"sourceRefs"),
@@ -44141,6 +44049,174 @@ function runAlphaPost853MonsterDiagnostics() {
 
 
 // =========================================================
+// BRICK 870 — POST-866 CORRECTIVE RECONCILIATION DIAGNOSTIC
+// =========================================================
+function runAlphaPost866CorrectiveReconciliationDiagnostics() {
+  const causal=getKisoganActionDefinition("kisogan_causal_strata_analysis");
+  const embodiedOnly=getActorKisoganAuthoritySnapshot({id:"diag_embodied_only",embodiedExpressions:["kisogan_expression"],abilityAccessIds:[],abilityActionAccessIds:[]});
+  const explicitAccess=getActorKisoganAuthoritySnapshot({id:"diag_explicit_access",embodiedExpressions:[],abilityAccessIds:["kisogan_expression"],abilityActionAccessIds:[]});
+  const clanFilterSource=getClanFilteredCharacters.toString();
+  const victoryRenderSource=renderVictoryOverlay.toString();
+  const victoryContinueSource=continueAfterVictory.toString();
+  const victoryClaimSource=claimCurrentBattleRewards.toString();
+  const victoryCloseSource=closeOverlay.toString();
+  const rashomonAuthority=TRIPLE_RASHOMON_SEQUENCE_PAYOFF_AUTHORITY;
+  const factoryShinoRefs=["jonin_shino_insect_recon","jonin_shino_swarm_reposition"].map(id=>getClosureWaveBattleSkillDefinition(id,"jonin_shino")).flatMap(skill=>skill&&Array.isArray(skill.sourceRefs)?skill.sourceRefs:[]).filter(ref=>ref&&ref.id==="kikaichu_colony");
+  const result={
+    academyAssetIdentityMapsPhysicalFiles:getCharacterCardAssetPath("academy_iwabee")==="Assets/Academy Student/academy_iwabe.png"&&getCharacterCardAssetPath("academy_metal_lee")==="Assets/Academy Student/academy_metal.png"&&!!getCharacterRegistryEntry("academy_iwabee")&&!!getCharacterRegistryEntry("academy_metal_lee"),
+    causalStrataTwoToThree:!!causal&&causal.minimumReferences===2&&causal.maximumReferences===3,
+    causalStrataOneRejectedBeforeTurn:!!causal&&1<causal.minimumReferences&&attemptBattleKisoganAction.toString().indexOf("validateKisoganReferenceSet")<attemptBattleKisoganAction.toString().indexOf("consumeBattleActionOpportunity"),
+    causalStrataTwoAndThreeEligibleByCardinality:!!causal&&2>=causal.minimumReferences&&2<=causal.maximumReferences&&3>=causal.minimumReferences&&3<=causal.maximumReferences,
+    causalStrataFourRejectedBeforeTurn:!!causal&&4>causal.maximumReferences&&attemptBattleKisoganAction.toString().indexOf("validateKisoganReferenceSet")<attemptBattleKisoganAction.toString().indexOf("consumeBattleActionOpportunity"),
+    embodimentDoesNotMintAccess:embodiedOnly.embodied===true&&embodiedOnly.expressionAccess===false,
+    explicitAbilityAccessStillWorks:explicitAccess.expressionAccess===true&&explicitAccess.embodied===false,
+    clanSlotFourActive:clanFilterSource.includes("slotNumber <= 4")&&clanFilterSource.includes("slotNumber >= 5")&&getClanCharacterTeamStatus.toString().includes("slotNumber <= 4"),
+    kikaichuFactoryClassificationExact:factoryShinoRefs.length===2&&factoryShinoRefs.every(ref=>ref.classification==="source_only_bound_collective"),
+    victoryClaimContinueSplit:victoryRenderSource.includes("claimVictoryRewardsFromOverlay")&&victoryRenderSource.includes('rewardsClaimed ? "CONTINUE" : "CLAIM"')&&!victoryContinueSource.includes("claimCurrentBattleRewards()"),
+    victoryClaimPersistsWithoutNavigation:victoryClaimSource.includes("savePlayerData();")&&victoryClaimSource.includes("saveTestState();")&&claimVictoryRewardsFromOverlay.toString().includes("navigated:false"),
+    victoryContinueRequiresClaim:victoryContinueSource.includes("victory_rewards_unclaimed")&&victoryContinueSource.includes("currentBattle.rewards.claimed !== true"),
+    victoryCloseCannotBypass:!victoryCloseSource.includes('currentOverlayType ===\n    "victory"\n  ) {\n\n\n    continueAfterVictory()'),
+    allSixRashomonAuthorities:Object.keys(rashomonAuthority).length===6&&Object.keys(TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES).every(key=>rashomonAuthority[key]&&rashomonAuthority[key].displayName===TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES[key]),
+    noInventedFiveMachineIds:["1>2>3","1>3>2","2>1>3","2>3>1","3>1>2"].every(key=>rashomonAuthority[key].machineId===null),
+    cataclysmMachineIdPreserved:rashomonAuthority["3>2>1"].machineId==="triple_rashomon_ruined_gate_cataclysm"&&rashomonAuthority["3>2>1"].authoredAttackPL===80&&rashomonAuthority["3>2>1"].excess.capRatio===0.50&&rashomonAuthority["3>2>1"].excess.absoluteCap===40,
+    nineHellsConsumerIntegrated:resolveBattleDamagePacket.toString().includes("consumeTripleRashomonNineHellsSanctuaryOnExcess")&&consumeTripleRashomonNineHellsSanctuaryOnExcess.toString().includes("primaryTargetDamageUnchanged:true"),
+    demonsReversalConsumerIntegrated:tryTripleRashomonInterceptIncoming.toString().includes("prepareTripleRashomonDemonsReversalRedirect")&&prepareTripleRashomonDemonsReversalRedirect.toString().includes("Math.floor(magnitude*0.60)")&&resolveSingleBattleDamageSegment.toString().includes("resolveTripleRashomonDemonsReversalRedirectDamage"),
+    graveyardExactPackageOnly:resolveTripleRashomonGraveyardSeal.toString().includes("getBattleExactActiveProjection")&&resolveTripleRashomonGraveyardSeal.toString().includes("suppressesExactRuntimePackage:true")&&resolveTripleRashomonGraveyardSeal.toString().includes("remainingActionOpportunities:1"),
+    forsakenExactRouteOnly:resolveTripleRashomonForsakenThreshold.toString().includes("exact_authored_route_required")&&isTripleRashomonAuthoredRouteDenied.toString().includes("exactRouteId===routeId")&&consumeTripleRashomonForsakenThresholdRouteDenial.toString().includes("oneRouteOnly:true"),
+    mawExactProjectedExpressionOnly:resolveTripleRashomonMawOfTheAbandoned.toString().includes("qualifyingProjectedChakraExpression!==true")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("removeBattleEffectiveStateProjection")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("reserveGain:0")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("healing:0")&&resolveTripleRashomonMawOfTheAbandoned.toString().includes("plTransfer:0")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPost870MonsterDiagnostics() {
+  const groups={
+    post866:runAlphaPost866MonsterDiagnostics(),
+    correctiveReconciliation:runAlphaPost866CorrectiveReconciliationDiagnostics(),
+    academyCardAssets:runAcademyExpansionCardAssetDiagnostics(),
+    kikaichu:runKikaichuSourceMigrationDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-870 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 871 — LEGACY REGION-PL RETIREMENT GATE
+// =========================================================
+function runAlphaPost871MonsterDiagnostics() {
+  const groups={
+    post870:runAlphaPost870MonsterDiagnostics(),
+    legacyRegionPL:runLegacyWorldRegionPLRetirementDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-871 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+
+// =========================================================
+// BRICK 872 — GOLDEN COMBAT SEMANTIC-CLOSURE ENUMERATION
+// =========================================================
+// This is deliberately an AUDIT, not a permissive monster-gate shortcut.
+// Runtime can remain Post-871 GREEN while Alpha Combat Freeze is HOLD if an
+// authored production branch still lacks an exact consumer. Explicitly visible
+// incompleteness is safer than fabricated behaviour, but it is not freeze proof.
+function runAlphaGoldenCombatSemanticClosureAudit() {
+  const closureSkills=Object.values(CLOSURE_WAVE_1_BATTLE_SKILL_DATABASE||{}).filter(Boolean);
+  const summonSkills=Object.values(summonSkillDatabase||{}).filter(Boolean);
+  const kisoganActions=Object.values(KISOGAN_ACTION_DATABASE||{}).filter(Boolean);
+  const enemyActions=Object.values(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES||{}).flat().filter(Boolean);
+
+  const closureResolverSource=resolveClosureWaveSkillSemantics.toString();
+  const summonResolverSource=resolveBattleSummonSkillSemantics.toString();
+  const kisoganResolverSource=resolveKisoganActionAgainstReferences.toString();
+
+  const closureKinds=[...new Set(closureSkills.map(skill=>skill.resolutionKind).filter(Boolean))];
+  const summonKinds=[...new Set(summonSkills.map(skill=>skill.resolutionKind).filter(Boolean))];
+  const kisoganKinds=[...new Set(kisoganActions.map(action=>action.resolutionKind).filter(Boolean))];
+
+  const closureUnsupported=closureKinds.filter(kind=>!closureResolverSource.includes(`"${kind}"`));
+  const summonUnsupported=summonKinds.filter(kind=>!summonResolverSource.includes(`"${kind}"`));
+  const kisoganUnsupported=kisoganKinds.filter(kind=>!kisoganResolverSource.includes(`"${kind}"`));
+  const enemyWithoutResolver=enemyActions.filter(action=>typeof action.resolve!=="function").map(action=>action.id||action.skillId||"unknown_enemy_action");
+
+  const unresolved=[];
+  const add=(domain,id,semantic,reason)=>unresolved.push({domain,id,semantic,reason});
+
+  // Persistent-damage setup exists, but the source contains no authored
+  // opportunity/tick consumer for these exact states yet.
+  closureSkills.filter(skill=>skill.persistentState&&skill.persistentState.requiresAuthoredPersistenceOpportunity===true)
+    .forEach(skill=>add("character_skill",skill.id,"persistent_output_opportunity","persistent state establishes correctly but no authored opportunity/tick consumer is wired"));
+
+  // Generic conditional riders are intentionally not inferred from damage. They
+  // remain a freeze question until an exact qualifying consumer is present or
+  // the rider is explicitly classified outside Alpha production.
+  closureSkills.filter(skill=>skill.conditionalRider&&skill.conditionalRider.automatic!==true)
+    .forEach(skill=>add("character_skill",skill.id,"conditional_rider",`conditional rider ${skill.conditionalRider.kind||skill.conditionalRider.type||"authored"} is recorded as available but not committed by the main resolver`));
+
+  closureSkills.filter(skill=>skill.resolutionKind==="planetary_devastation_two_stage")
+    .forEach(skill=>add("character_skill",skill.id,"stage_2_resolution","stage 1 commits a pending state; no player-side stage-2 continuation consumer is wired"));
+
+  closureSkills.filter(skill=>skill.resolutionKind==="damage_then_sealing_context"&&skill.sealingBranch&&skill.sealingBranch.automaticOnDamage===false)
+    .forEach(skill=>add("character_skill",skill.id,"sealing_branch","damage commits and sealing context is calculated, but the independent qualifying sealing commit consumer is absent"));
+
+  // Known source-level reactive/context consumers that still have no central
+  // caller or exact interaction implementation in the audited Post-871 source.
+  const kamatariHookSources=[resolveBattleDamagePacket,resolveBattleStartOfActionOpportunityEffects,attemptBattleSummonSkill,resolveBattleSummonSkillSemantics].map(fn=>fn.toString()).join("\n");
+  if (!kamatariHookSources.includes("interruptKamatariGaleSever(")) add("summon_action","kamatari_gale_sever","catastrophic_interruption_listener","exact backfire helper exists, but no central Combat event listener calls it");
+
+  const shadowSeal=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.fallen_hokage_sasuke||[]).find(action=>action&&action.id==="fallen_hokage_sasuke_shadow_seal");
+  if (shadowSeal&&shadowSeal.traits&&shadowSeal.traits.includes("one_qualifying_interference")) add("boss_action",shadowSeal.id,"qualifying_interference_consumption","state is established, but no exact one-interference consumer is wired");
+
+  const blackMirror=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.shadow_of_indra||[]).find(action=>action&&action.id==="shadow_of_indra_black_mirror");
+  if (blackMirror&&blackMirror.actionClass==="enemy_context_technique") add("boss_action",blackMirror.id,"perception_reversal_interaction","current resolver records categorical context only; no universal reversal is inferred and no exact reversal consumer is wired");
+
+  const blackTendril=(ALPHA_ENEMY_AUTHORED_ACTION_PACKAGES.black_madara||[]).find(action=>action&&action.id==="black_madara_black_tendril_impalement");
+  if (blackTendril&&blackTendril.traits&&blackTendril.traits.includes("damage_success_not_automatic_restraint")) add("boss_action",blackTendril.id,"qualified_restraint_rider","damage resolver explicitly withholds restraint pending an exact qualification consumer");
+
+  const mainResolverCoverage={
+    closureSkillKinds:closureKinds.length,
+    closureUnsupported,
+    summonSkillKinds:summonKinds.length,
+    summonUnsupported,
+    kisoganActionKinds:kisoganKinds.length,
+    kisoganUnsupported,
+    enemyActions:enemyActions.length,
+    enemyWithoutResolver
+  };
+  const mainResolversComplete=closureUnsupported.length===0&&summonUnsupported.length===0&&kisoganUnsupported.length===0&&enemyWithoutResolver.length===0;
+  const audit={
+    runtimeBaseline:"post_871_green_required_separately",
+    productionCounts:{characterSkills:closureSkills.length,summonActions:summonSkills.length,kisoganActions:kisoganActions.length,enemyActions:enemyActions.length},
+    mainResolverCoverage,
+    mainResolversComplete,
+    unresolved,
+    unresolvedCount:unresolved.length,
+    auditComplete:true,
+    alphaCombatFreezeReady:mainResolversComplete&&unresolved.length===0
+  };
+  console.log(`SC Alpha Golden Combat semantic closure audit: ${audit.alphaCombatFreezeReady?"FREEZE READY":"HOLD"} (${audit.unresolvedCount} unresolved semantic consumers)`);
+  if (unresolved.length) console.table(unresolved);
+  return audit;
+}
+
+function runAlphaPost872PreFreezeAudit() {
+  const runtime=runAlphaPost871MonsterDiagnostics();
+  const semanticClosure=runAlphaGoldenCombatSemanticClosureAudit();
+  const result={
+    runtime,
+    semanticClosure,
+    runtimeGreen:runtime&&runtime.pass===true,
+    alphaCombatFreezeReady:!!(runtime&&runtime.pass===true&&semanticClosure&&semanticClosure.alphaCombatFreezeReady===true)
+  };
+  console.log(`SC Alpha post-872 pre-freeze audit: runtime=${result.runtimeGreen?"GREEN":"FAIL"} / Combat Freeze=${result.alphaCombatFreezeReady?"READY":"HOLD"}`);
+  return result;
+}
+
+
+// =========================================================
 // BRICK 866 — POST-KISŌGAN / EQUIPMENT-UI GOLDEN GATE
 // =========================================================
 function runAlphaPost866MonsterDiagnostics() {
@@ -44220,68 +44296,26 @@ function renderHotspotHoverCard(hotspot) {
 }
 
 // =========================================================
-// PLAYER-TO-LOCATION THREAT
+// BRICK 871 — LEGACY WORLD-REGION PL PRESENTATION RETIRED
 // =========================================================
-
-function getLocationThreat(
-  location
-) {
-
-  const recommended =
-    location.power?.recommended || 0;
-
-
-  if (
-    recommended === 0
-  ) {
-
-    return {
-      label: "SAFE ZONE",
-      className: "safe"
-    };
-  }
-
-
-  const ratio =
-    playerPowerLevel /
-    recommended;
-
-
-  if (ratio < 0.75) {
-
-    return {
-      label: "EXTREME RISK",
-      className: "extreme"
-    };
-  }
-
-
-  if (ratio < 1) {
-
-    return {
-      label: "HIGH RISK",
-      className: "high"
-    };
-  }
-
-
-  if (ratio < 1.45) {
-
-    return {
-      label: "SUITABLE",
-      className: "suitable"
-    };
-  }
-
-
-  return {
-    label: "LOW RISK",
-    className: "low"
+// The pre-standardisation `location.power.recommended` / enemyMin / enemyMax
+// scale and getLocationThreat(playerPowerLevel/recommended) helper had no live
+// consumers in the Post-866 descendant. Current PL remains Registry/PL owned;
+// Knowledge-sensitive event/hotspot projection does not consume these fossils.
+function runLegacyWorldRegionPLRetirementDiagnostics() {
+  const locations=Object.values(worldRegions).flatMap(region=>Array.isArray(region&&region.locations)?region.locations:[]);
+  const result={
+    noLegacyLocationPowerMetadata:locations.every(location=>!location||!Object.prototype.hasOwnProperty.call(location,"power")),
+    noLegacyBattleRecommendedPL:locations.every(location=>!location||!location.battle||!Object.prototype.hasOwnProperty.call(location.battle,"recommendedPL")),
+    noLegacyBattleEnemyPool:locations.every(location=>!location||!location.battle||!Object.prototype.hasOwnProperty.call(location.battle,"enemyPool")),
+    legacyThreatHelperRetired:typeof getLocationThreat==="undefined",
+    legacyPlayerPowerPresentationScalarRetired:typeof playerPowerLevel==="undefined",
+    hotspotProjectionOwnsNoPL:getRegionHotspotProjections.toString().includes("getWorldOpportunityDefinitionsForRegion")&&!getRegionHotspotProjections.toString().includes("recommendedPL")&&!getRegionHotspotProjections.toString().includes("playerPowerLevel")
   };
-
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
 }
-
-
 
 // =========================================================
 // PL NUMBER FORMATTING
@@ -65990,6 +66024,22 @@ function renderVictoryOverlay(
     "UNKNOWN";
 
 
+  const rewardsClaimed =
+    rewards.claimed === true;
+
+  const victoryActionLabel =
+    rewardsClaimed ? "CONTINUE" : "CLAIM";
+
+  const victoryActionHandler =
+    rewardsClaimed
+      ? "continueAfterVictory()"
+      : "claimVictoryRewardsFromOverlay()";
+
+  const victoryClaimStatus =
+    rewardsClaimed
+      ? `<div class="victory-claim-status" style="margin-top:8px;color:#D6A93A;font-size:10px;font-weight:bold;letter-spacing:1.1px;">REWARDS CLAIMED • CHRONICLE RECORDED</div>`
+      : `<div class="victory-claim-status" style="margin-top:8px;color:#94A3B8;font-size:10px;letter-spacing:1.1px;">REWARDS EARNED • CLAIM PENDING</div>`;
+
 
   container.innerHTML = `
 
@@ -67432,8 +67482,10 @@ overflow:hidden;
 
 
 
+  ${victoryClaimStatus}
+
   <!-- ====================================== -->
-  <!-- CONTINUE BUTTON -->
+  <!-- CLAIM / CONTINUE BUTTON -->
   <!-- ====================================== -->
   <!-- ====================================== -->
 
@@ -67444,7 +67496,7 @@ overflow:hidden;
     "
 
     onclick="
-      continueAfterVictory()
+      ${victoryActionHandler}
     "
 
     style="
@@ -67490,7 +67542,7 @@ overflow:hidden;
     "
   >
 
-    CONTINUE
+    ${victoryActionLabel}
 
   </button>
 
@@ -67522,6 +67574,25 @@ overflow:hidden;
 
 
 // =========================================================
+// BRICK 868 — VICTORY CLAIM WITHOUT NAVIGATION
+// =========================================================
+function claimVictoryRewardsFromOverlay() {
+  if (currentOverlayType !== "victory") {
+    return {success:false,reason:"victory_overlay_not_active"};
+  }
+
+  const alreadyClaimed=!!(currentBattle.rewards&&currentBattle.rewards.claimed===true);
+  const claimed=alreadyClaimed?true:claimCurrentBattleRewards();
+  if (claimed!==true) return {success:false,reason:"victory_reward_claim_failed"};
+
+  // Re-render the same completed result. No navigation and no second claim.
+  saveTestState();
+  openOverlay("victory");
+  return {success:true,claimed:true,navigated:false};
+}
+
+
+// =========================================================
 // VICTORY CONTINUE
 // =========================================================
 
@@ -67529,18 +67600,21 @@ function continueAfterVictory() {
 
 
   // =========================================
-  // CLAIM BATTLE REWARDS FIRST
+  // CLAIM ≠ CONTINUE
   // =========================================
-  //
-  // The player earned these rewards during the completed
-  // encounter.
-  //
-  // Lifecycle progression is evaluated only AFTER the
-  // ordinary victory reward flow has completed.
-  //
+  // A completed Battle may remain on its Victory presentation after the
+  // reward entitlement has been durably claimed. Navigation is a later
+  // lifecycle transition and must never silently perform the claim.
   // =========================================
 
-  claimCurrentBattleRewards();
+  if (
+    !currentBattle.rewards ||
+    currentBattle.rewards.generated !== true ||
+    currentBattle.rewards.claimed !== true
+  ) {
+    console.log("Victory rewards must be claimed before CONTINUE.");
+    return {success:false,reason:"victory_rewards_unclaimed"};
+  }
 
 
   // =========================================
@@ -71102,6 +71176,18 @@ const TRIPLE_RASHOMON_CANONICAL_SEQUENCE_PAYOFF_NAMES=Object.freeze({
   "3>2>1":"Ruined Gate Cataclysm"
 });
 
+// BRICK 869 — the first five Sequence Arts deliberately do not invent
+// Technique machine IDs. They are contextual payoffs keyed by the exact
+// successful Gate sequence. Cataclysm retains its separately authorised ID.
+const TRIPLE_RASHOMON_SEQUENCE_PAYOFF_AUTHORITY=Object.freeze({
+  "1>2>3":Object.freeze({displayName:"Nine Hells Sanctuary",machineId:null,payoffKind:"block_next_qualifying_excess_spill",primaryDamageUnchanged:true}),
+  "1>3>2":Object.freeze({displayName:"Demon's Reversal",machineId:null,payoffKind:"redirect_qualifying_intercepted_packet",maximumRedirectRatio:0.60,requiresValidCausalSource:true}),
+  "2>1>3":Object.freeze({displayName:"Graveyard Seal",machineId:null,payoffKind:"suppress_one_exact_active_package",durationTargetActionOpportunities:1,embodimentUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true}),
+  "2>3>1":Object.freeze({displayName:"Forsaken Threshold",machineId:null,payoffKind:"deny_one_exact_authored_route",durationTargetActionOpportunities:1}),
+  "3>1>2":Object.freeze({displayName:"Maw of the Abandoned",machineId:null,payoffKind:"disperse_one_qualifying_projected_chakra_expression",reserveGain:0,healing:0,plTransfer:0}),
+  "3>2>1":Object.freeze({displayName:"Ruined Gate Cataclysm",machineId:"triple_rashomon_ruined_gate_cataclysm",payoffKind:"damage_action",authoredAttackPL:80,excess:Object.freeze({eligible:true,capRatio:0.50,absoluteCap:40})})
+});
+
 function getSummonSkillDefinition(skillId) {
   return summonSkillDatabase[skillId]||null;
 }
@@ -71456,6 +71542,197 @@ function prepareTripleRashomonGate(skill,actor,envelope) {
   const state=addBattleTransientState({stateKey:"triple_rashomon_gate_ready",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"gate_source"},data:{gateNumber:skill.gateNumber,gateSkillId:skill.id,qualifyingDisciplines:[...(skill.qualifyingDisciplines||[])],oneUse:true,inputOrderDoesNotCount:true}});
   return {resolved:!!state,branch:"rashomon_gate_prepared",damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],gateNumber:skill.gateNumber};
 }
+function getTripleRashomonSequencePayoffAuthority(sequenceKey) {
+  return TRIPLE_RASHOMON_SEQUENCE_PAYOFF_AUTHORITY[sequenceKey]||null;
+}
+
+function getTripleRashomonContextualPayoffStates(actorId,sequenceKey=null) {
+  if (!actorId||!currentBattle.active) return [];
+  return ensureBattleRuntimeState().transientStates.filter(state=>
+    state&&state.stateKey==="triple_rashomon_sequence_payoff_ready"&&
+    state.targetRef&&state.targetRef.side==="player"&&state.targetRef.participantId===actorId&&
+    state.data&&(!sequenceKey||state.data.sequenceKey===sequenceKey)
+  );
+}
+
+function getTripleRashomonContextualPayoffState(actorId,sequenceKey) {
+  return getTripleRashomonContextualPayoffStates(actorId,sequenceKey)[0]||null;
+}
+
+function establishTripleRashomonContextualPayoff(actorId,sequenceKey,actionId=null) {
+  const authority=getTripleRashomonSequencePayoffAuthority(sequenceKey);
+  if (!authority||authority.machineId) return null;
+  const state=addBattleTransientState({
+    stateKey:"triple_rashomon_sequence_payoff_ready",
+    sourceSide:"player",sourceParticipantId:actorId,
+    targetSide:"player",targetParticipantId:actorId,
+    ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},
+    data:{
+      sequenceKey,
+      payoffName:authority.displayName,
+      payoffKind:authority.payoffKind,
+      remainingCharges:1,
+      machineId:null,
+      contextualSequenceArt:true,
+      noTechniqueIdInferred:true
+    }
+  });
+  if (state) recordBattleEvidence({
+    eventType:"triple_rashomon_contextual_payoff_ready",actionId:actionId||null,
+    actorRef:createBattleParticipantRef("player",actorId),
+    sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"}],
+    stateRefs:[state.stateId],
+    data:{sequenceKey,payoffName:authority.displayName,payoffKind:authority.payoffKind,machineId:null}
+  });
+  return state;
+}
+
+function consumeTripleRashomonContextualPayoffState(actorId,sequenceKey,eventType,actionId=null,data={}) {
+  const state=getTripleRashomonContextualPayoffState(actorId,sequenceKey);
+  if (!state) return null;
+  removeBattleTransientState(state.stateId);
+  const authority=getTripleRashomonSequencePayoffAuthority(sequenceKey);
+  recordBattleEvidence({
+    eventType:eventType||"triple_rashomon_contextual_payoff_consumed",
+    actionId:actionId||null,
+    actorRef:createBattleParticipantRef("player",actorId),
+    sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"}],
+    stateRefs:[state.stateId],
+    data:{sequenceKey,payoffName:authority&&authority.displayName||null,...cloneBattleRuntimeValue(data)}
+  });
+  return state;
+}
+
+function consumeTripleRashomonNineHellsSanctuaryOnExcess({targetSide,targetParticipantId,cappedExcess,continuationTargetParticipantId,actionId=null,skillId=null}={}) {
+  const amount=Math.max(0,Math.floor(Number(cappedExcess)||0));
+  if (targetSide!=="player"||!targetParticipantId||!continuationTargetParticipantId||amount<=0) return {blocked:false};
+  const state=getTripleRashomonContextualPayoffState(targetParticipantId,"1>2>3");
+  if (!state) return {blocked:false};
+  consumeTripleRashomonContextualPayoffState(targetParticipantId,"1>2>3","triple_rashomon_nine_hells_sanctuary_resolved",actionId,{
+    incomingSkillId:skillId||null,blockedCappedExcess:amount,primaryTargetDamageUnchanged:true,continuationTargetParticipantId
+  });
+  return {blocked:true,blockedAmount:amount,stateId:state.stateId,sequenceKey:"1>2>3",payoffName:"Nine Hells Sanctuary",primaryTargetDamageUnchanged:true};
+}
+
+function prepareTripleRashomonDemonsReversalRedirect({actorId,sourceSide,sourceParticipantId,incomingAuthoredMagnitude,mitigable=true,primaryDiscipline=null,actionId=null,incomingSkillId=null}={}) {
+  const state=getTripleRashomonContextualPayoffState(actorId,"1>3>2");
+  if (!state) return {redirected:false};
+  const source=sourceSide&&sourceParticipantId?getBattleParticipantByIdentity(sourceSide,sourceParticipantId):null;
+  const magnitude=Math.max(0,Math.floor(Number(incomingAuthoredMagnitude)||0));
+  if (!source||magnitude<=0) return {redirected:false,reason:"valid_causal_source_required"};
+  const redirectedMagnitude=Math.max(0,Math.floor(magnitude*0.60));
+  if (redirectedMagnitude<=0) return {redirected:false,reason:"redirect_magnitude_zero"};
+  consumeTripleRashomonContextualPayoffState(actorId,"1>3>2","triple_rashomon_demons_reversal_committed",actionId,{
+    incomingSkillId:incomingSkillId||null,sourceSide,sourceParticipantId,interceptedAuthoredMagnitude:magnitude,redirectedMagnitude,maximumRedirectRatio:0.60
+  });
+  return {redirected:true,stateId:state.stateId,sourceSide,sourceParticipantId,interceptedAuthoredMagnitude:magnitude,redirectedMagnitude,maximumRedirectRatio:0.60,mitigable:mitigable===true,primaryDiscipline};
+}
+
+function resolveTripleRashomonDemonsReversalRedirectDamage(redirect,defenderParticipantId,definition={}) {
+  if (!redirect||redirect.redirected!==true||!defenderParticipantId) return null;
+  const source=getBattleParticipantByIdentity(redirect.sourceSide,redirect.sourceParticipantId);
+  if (!source) return null;
+  const envelope={
+    actionId:definition.envelope&&definition.envelope.actionId||null,
+    sourceRefs:[
+      ...((definition.envelope&&Array.isArray(definition.envelope.sourceRefs))?definition.envelope.sourceRefs:[]),
+      {type:"summon_entity",id:"triple_rashomon",role:"demons_reversal_source"}
+    ]
+  };
+  const output={
+    primaryDiscipline:redirect.primaryDiscipline||definition.output&&definition.output.primaryDiscipline||null,
+    statKey:null,effectivePrimaryDiscipline:null,coefficient:null,branch:"demons_reversal_redirect",branchMultiplier:null,
+    authoredPreExecutionMagnitude:redirect.redirectedMagnitude,weaponExecutionMultiplier:null,
+    preDefenseAttackMagnitude:redirect.redirectedMagnitude,attackPL:redirect.redirectedMagnitude
+  };
+  const damage=resolveSingleBattleDamageSegment({
+    envelope,skill:null,
+    actorSide:"player",actorParticipantId:defenderParticipantId,
+    targetSide:redirect.sourceSide,targetParticipantId:redirect.sourceParticipantId,
+    output,mitigable:redirect.mitigable===true,excess:null,stateRefs:[redirect.stateId]
+  },0);
+  recordBattleEvidence({
+    eventType:"triple_rashomon_demons_reversal_resolved",actionId:envelope.actionId,
+    actorRef:createBattleParticipantRef("player",defenderParticipantId),
+    targetRef:createBattleParticipantRef(redirect.sourceSide,redirect.sourceParticipantId),
+    sourceRefs:envelope.sourceRefs,stateRefs:[redirect.stateId],
+    data:{interceptedAuthoredMagnitude:redirect.interceptedAuthoredMagnitude,redirectedMagnitude:redirect.redirectedMagnitude,maximumRedirectRatio:0.60,validCausalSource:true,damageResolved:!!damage}
+  });
+  return damage;
+}
+
+function resolveTripleRashomonGraveyardSeal({actorParticipantId,targetSide="enemy",targetParticipantId,exactPackageId,actionId=null}={}) {
+  const ready=getTripleRashomonContextualPayoffState(actorParticipantId,"2>1>3");
+  if (!ready) return {resolved:false,reason:"graveyard_seal_sequence_not_ready"};
+  if (!targetSide||!targetParticipantId||!exactPackageId) return {resolved:false,reason:"exact_active_package_required"};
+  const projection=getBattleExactActiveProjection(targetSide,targetParticipantId,exactPackageId);
+  if (!projection) return {resolved:false,reason:"exact_active_package_required"};
+  const state=addBattleTransientState({
+    stateKey:"triple_rashomon_graveyard_seal",
+    sourceSide:"player",sourceParticipantId:actorParticipantId,
+    targetSide,targetParticipantId,
+    ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},
+    data:{exactPackageId,suppressesExactRuntimePackage:true,remainingActionOpportunities:1,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true}
+  });
+  if (!state) return {resolved:false,reason:"graveyard_seal_state_failed"};
+  consumeTripleRashomonContextualPayoffState(actorParticipantId,"2>1>3","triple_rashomon_graveyard_seal_resolved",actionId,{
+    targetSide,targetParticipantId,exactPackageId,durationTargetActionOpportunities:1,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true
+  });
+  return {resolved:true,stateId:state.stateId,exactPackageId,targetSide,targetParticipantId,durationTargetActionOpportunities:1};
+}
+
+function resolveTripleRashomonForsakenThreshold({actorParticipantId,targetSide="enemy",targetParticipantId,routeId,actionId=null}={}) {
+  const ready=getTripleRashomonContextualPayoffState(actorParticipantId,"2>3>1");
+  if (!ready) return {resolved:false,reason:"forsaken_threshold_sequence_not_ready"};
+  if (!targetSide||!targetParticipantId||typeof routeId!=="string"||!routeId) return {resolved:false,reason:"exact_authored_route_required"};
+  const state=addBattleTransientState({
+    stateKey:"triple_rashomon_forsaken_threshold",
+    sourceSide:"player",sourceParticipantId:actorParticipantId,
+    targetSide,targetParticipantId,
+    ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},
+    data:{exactRouteId:routeId,deniesOneAuthoredRoute:true,remainingActionOpportunities:1,noHiddenMovementStat:true}
+  });
+  if (!state) return {resolved:false,reason:"forsaken_threshold_state_failed"};
+  consumeTripleRashomonContextualPayoffState(actorParticipantId,"2>3>1","triple_rashomon_forsaken_threshold_established",actionId,{targetSide,targetParticipantId,routeId,durationTargetActionOpportunities:1});
+  return {resolved:true,stateId:state.stateId,routeId,targetSide,targetParticipantId};
+}
+
+function isTripleRashomonAuthoredRouteDenied(side,participantId,routeId) {
+  if (!side||!participantId||!routeId||!currentBattle.active) return false;
+  return ensureBattleRuntimeState().transientStates.some(state=>
+    state&&state.stateKey==="triple_rashomon_forsaken_threshold"&&
+    state.targetRef&&state.targetRef.side===side&&state.targetRef.participantId===participantId&&
+    state.data&&state.data.exactRouteId===routeId&&state.data.deniesOneAuthoredRoute===true
+  );
+}
+
+function consumeTripleRashomonForsakenThresholdRouteDenial(side,participantId,routeId,actionId=null) {
+  const state=ensureBattleRuntimeState().transientStates.find(item=>
+    item&&item.stateKey==="triple_rashomon_forsaken_threshold"&&
+    item.targetRef&&item.targetRef.side===side&&item.targetRef.participantId===participantId&&
+    item.data&&item.data.exactRouteId===routeId&&item.data.deniesOneAuthoredRoute===true
+  )||null;
+  if (!state) return {denied:false};
+  removeBattleTransientState(state.stateId);
+  recordBattleEvidence({eventType:"triple_rashomon_forsaken_threshold_route_denied",actionId:actionId||null,targetRef:createBattleParticipantRef(side,participantId),sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"}],stateRefs:[state.stateId],data:{routeId,oneRouteOnly:true,actionOpportunityConsumptionOwnedByAttemptedActionResolver:true}});
+  return {denied:true,stateId:state.stateId,routeId};
+}
+
+function resolveTripleRashomonMawOfTheAbandoned({actorParticipantId,targetSide="enemy",targetParticipantId,projectionKey,exactPackageId,qualifyingProjectedChakraExpression=false,actionId=null}={}) {
+  const ready=getTripleRashomonContextualPayoffState(actorParticipantId,"3>1>2");
+  if (!ready) return {resolved:false,reason:"maw_of_the_abandoned_sequence_not_ready"};
+  if (qualifyingProjectedChakraExpression!==true) return {resolved:false,reason:"qualifying_projected_chakra_expression_required"};
+  if (!targetSide||!targetParticipantId||!projectionKey||!exactPackageId) return {resolved:false,reason:"exact_projected_chakra_expression_required"};
+  const projection=getBattleEffectiveStateProjection(projectionKey,targetSide,targetParticipantId);
+  if (!projection||projection.exactPackageId!==exactPackageId) return {resolved:false,reason:"exact_projected_chakra_expression_required"};
+  const removed=removeBattleEffectiveStateProjection(projectionKey,targetSide,targetParticipantId,"triple_rashomon_maw_of_the_abandoned");
+  if (removed.length!==1) return {resolved:false,reason:"projected_chakra_expression_dispersion_failed"};
+  consumeTripleRashomonContextualPayoffState(actorParticipantId,"3>1>2","triple_rashomon_maw_of_the_abandoned_resolved",actionId,{
+    targetSide,targetParticipantId,projectionKey,exactPackageId,qualifyingProjectedChakraExpression:true,reserveGain:0,healing:0,plTransfer:0,embodiedIdentityUnaffected:true,permanentAccessUnaffected:true,masteryUnaffected:true
+  });
+  return {resolved:true,projectionKey,exactPackageId,removedCount:1,reserveGain:0,healing:0,plTransfer:0};
+}
+
 function appendTripleRashomonSuccessfulGate(actorId,gateNumber,actionId,incomingSkillId) {
   let state=getTripleRashomonSequenceState(actorId);
   if (!state) state=addBattleTransientState({stateKey:"triple_rashomon_sequence",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_art_source"},data:{sequence:[]}});
@@ -71472,21 +71749,26 @@ function appendTripleRashomonSuccessfulGate(actorId,gateNumber,actionId,incoming
       const prior=findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actorId});
       if (prior) removeBattleTransientState(prior.stateId);
       addBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",sourceSide:"player",sourceParticipantId:actorId,targetSide:"player",targetParticipantId:actorId,ownerRef:{type:"summon_entity",id:"triple_rashomon",role:"sequence_payoff_authority"},data:{sequenceKey,remainingCharges:1}});
+    } else if (payoffName) {
+      establishTripleRashomonContextualPayoff(actorId,sequenceKey,actionId);
     }
     removeBattleTransientState(state.stateId);
   }
   return {sequenceKey,payoffName};
 }
-function tryTripleRashomonInterceptIncoming({targetSide,targetParticipantId,primaryDiscipline,actionId=null,incomingSkillId=null}={}) {
+function tryTripleRashomonInterceptIncoming({targetSide,targetParticipantId,primaryDiscipline,actionId=null,incomingSkillId=null,sourceSide=null,sourceParticipantId=null,incomingAuthoredMagnitude=0,mitigable=true}={}) {
   if (targetSide!=="player"||!targetParticipantId||!primaryDiscipline) return {intercepted:false};
   const state=getTripleRashomonPreparedGateState(targetParticipantId);
   if (!state||!state.data||!Array.isArray(state.data.qualifyingDisciplines)||!state.data.qualifyingDisciplines.includes(primaryDiscipline)) return {intercepted:false};
   const gateNumber=Number(state.data.gateNumber)||0;
   const gateSkillId=state.data.gateSkillId||null;
   removeBattleTransientState(state.stateId);
+  const demonsReversal=prepareTripleRashomonDemonsReversalRedirect({
+    actorId:targetParticipantId,sourceSide,sourceParticipantId,incomingAuthoredMagnitude,mitigable,primaryDiscipline,actionId,incomingSkillId
+  });
   const sequence=appendTripleRashomonSuccessfulGate(targetParticipantId,gateNumber,actionId,incomingSkillId);
-  recordBattleEvidence({eventType:"triple_rashomon_gate_intercepted",actionId:actionId||null,targetRef:createBattleParticipantRef("player",targetParticipantId),skillId:gateSkillId,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"interception_source"}],stateRefs:[state.stateId],data:{gateNumber,primaryDiscipline,incomingSkillId,attackPreventedCategorically:true,percentageGuard:false,sequenceKey:sequence&&sequence.sequenceKey||null}});
-  return {intercepted:true,gateNumber,gateSkillId,stateId:state.stateId,sequence};
+  recordBattleEvidence({eventType:"triple_rashomon_gate_intercepted",actionId:actionId||null,targetRef:createBattleParticipantRef("player",targetParticipantId),skillId:gateSkillId,sourceRefs:[{type:"summon_entity",id:"triple_rashomon",role:"interception_source"}],stateRefs:[state.stateId],data:{gateNumber,primaryDiscipline,incomingSkillId,attackPreventedCategorically:true,percentageGuard:false,sequenceKey:sequence&&sequence.sequenceKey||null,demonsReversalRedirectPrepared:demonsReversal.redirected===true}});
+  return {intercepted:true,gateNumber,gateSkillId,stateId:state.stateId,sequence,demonsReversal};
 }
 function resolveTripleRashomonCataclysm(skill,actor,target,envelope) {
   const ready=findBattleTransientState({stateKey:"triple_rashomon_ruined_gate_cataclysm_ready",targetSide:"player",targetParticipantId:actor.id});
@@ -76667,8 +76949,8 @@ registerFactoryBatch([
   {id:"jonin_inojin_ink_screen",ownerRegistryId:"jonin_inojin",primaryDiscipline:"Ninjutsu",targetMode:"current_enemy",actionClass:"setup_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["temporary_visual_obstruction_evidence","does_not_auto_blind","does_not_force_miss","nonvisual_information_preserved"],requirements:[],state:{stateKey:"ink_screen",reapplication:"refresh_replace",remainingSourceActionOpportunities:1,expiry:"source_next_action_opportunity_or_invalidation"}},
   makeFactoryCategoricalSkill("jonin_hanabi_byakugan_read","jonin_hanabi",{targetMode:"current_enemy",requirements:[{kind:"embodied_expression",expressionId:"byakugan"}],traits:["legitimate_byakugan_observation_only"],informationBoundary:"categorical_byakugan_observation_only"}),
 
-  makeFactoryCategoricalSkill("jonin_shino_insect_recon","jonin_shino",{targetMode:"current_enemy",actionClass:"information_technique",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}],traits:["source_assisted_information","colony_source_only_bound_collective","no_insect_participant","no_entity_registration"],informationBoundary:"kikaichu_supported_observation_only"}),
-  makeFactoryCategoricalSkill("jonin_shino_swarm_reposition","jonin_shino",{targetMode:"self",actionClass:"movement_technique",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective_companion"}],traits:["source_assisted_reposition","no_scalar","requires_legitimate_route","colony_source_only_bound_collective","no_insect_participant","no_entity_registration"],informationBoundary:"categorical_reposition_only"}),
+  makeFactoryCategoricalSkill("jonin_shino_insect_recon","jonin_shino",{targetMode:"current_enemy",actionClass:"information_technique",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective"}],traits:["source_assisted_information","colony_source_only_bound_collective","no_insect_participant","no_entity_registration"],informationBoundary:"kikaichu_supported_observation_only"}),
+  makeFactoryCategoricalSkill("jonin_shino_swarm_reposition","jonin_shino",{targetMode:"self",actionClass:"movement_technique",sourceRefs:[{type:"bound_entity",id:"kikaichu_colony",role:"causal_participant",classification:"source_only_bound_collective"}],traits:["source_assisted_reposition","no_scalar","requires_legitimate_route","colony_source_only_bound_collective","no_insect_participant","no_entity_registration"],informationBoundary:"categorical_reposition_only"}),
   makeFactoryCategoricalSkill("jonin_konohamaru_clone_intercept","jonin_konohamaru",{targetMode:"self",actionClass:"defensive_technique",traits:["clone_construct_not_participant","no_percentage_scalar","no_automatic_counterdamage"],informationBoundary:"categorical_defensive_interposition"}),
 
   {id:"sj_ebisu_substitution_drill",ownerRegistryId:"sj_ebisu",primaryDiscipline:null,targetMode:"self",actionClass:"defensive_technique",resolutionKind:"transient_state",staminaMitigation:null,traits:["one_use_defensive_substitution_context","no_percentage_guard","no_participant_creation"],requirements:[],state:{stateKey:"ebisu_substitution_ready",reapplication:"refresh_replace",consumeOn:"qualifying_incoming_action",remainingCharges:1,expiry:"consumed_or_battle_cleanup"}},
@@ -78768,7 +79050,11 @@ function resolveBattlePreStaminaDefense(definition) {
     targetParticipantId:definition.targetParticipantId,
     primaryDiscipline:definition.primaryDiscipline||null,
     actionId:definition.actionId||null,
-    incomingSkillId:definition.skillId||null
+    incomingSkillId:definition.skillId||null,
+    sourceSide:definition.sourceSide||null,
+    sourceParticipantId:definition.sourceParticipantId||null,
+    incomingAuthoredMagnitude:incomingAttackPL,
+    mitigable:definition.mitigable===true
   });
   if (rashomon&&rashomon.intercepted===true) {
     result.resolvedAttackPL=0;
@@ -79001,7 +79287,7 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
   if (!definition || !definition.actorSide || !definition.actorParticipantId || !definition.targetSide || !definition.targetParticipantId || !definition.output) return null;
   const targetRecord=getBattleRemainingPLRecord(definition.targetSide,definition.targetParticipantId);
   if (!targetRecord) return null;
-  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId,primaryDiscipline:definition.output.primaryDiscipline||null,skillId:definition.skill&&definition.skill.id||null,actionId:definition.envelope&&definition.envelope.actionId||null});
+  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId,primaryDiscipline:definition.output.primaryDiscipline||null,skillId:definition.skill&&definition.skill.id||null,actionId:definition.envelope&&definition.envelope.actionId||null,sourceSide:definition.actorSide||null,sourceParticipantId:definition.actorParticipantId||null});
   const effectiveStamina=getBattleEffectiveStamina(definition.targetSide,definition.targetParticipantId);
   const staminaResolution=calculateBattleStaminaMitigationV1(preDefense.resolvedAttackPL,effectiveStamina);
   const absorption=absorbBattleDamageBearingCapacity(definition.targetSide,definition.targetParticipantId,staminaResolution.finalDamage);
@@ -79057,9 +79343,13 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
     const t=absorption.temporaryCapacityAbsorbed>0?` Temporary capacity absorbed ${absorption.temporaryCapacityAbsorbed}.`:"";
     currentBattle.battleLog.push(`Attack ${definition.output.attackPL}.${g}${e}${f}${r} Stamina blocked ${staminaResolution.mitigationAmount}.${t} ${absorption.absorbedPL} capacity lost.`);
   }
+  let rashomonRedirectDamage=null;
+  if (preDefense.rashomonGate&&preDefense.rashomonGate.demonsReversal&&preDefense.rashomonGate.demonsReversal.redirected===true) {
+    rashomonRedirectDamage=resolveTripleRashomonDemonsReversalRedirectDamage(preDefense.rashomonGate.demonsReversal,definition.targetParticipantId,definition);
+  }
   let zeroResult=null;
   if (absorption.totalCapacityAfter<=0) zeroResult=handleBattleParticipantAtZeroPL(definition.targetSide,definition.targetParticipantId,actor,definition.envelope||null);
-  return {evidence,output:definition.output,preDefense,stamina:staminaResolution,absorption,
+  return {evidence,output:definition.output,preDefense,stamina:staminaResolution,absorption,rashomonRedirectDamage,
     finalDamage:staminaResolution.finalDamage,absorbedPL:absorption.absorbedPL,residualAttackPL:absorption.residualAttackPL,
     remainingBattlePLBefore:absorption.underlyingBattlePLBefore,remainingBattlePLAfter:absorption.underlyingBattlePLAfter,zeroResult};
 }
@@ -79082,7 +79372,7 @@ function resolveBattleDamagePacket(definition) {
     const ratioCapAmount=Math.max(0,Math.floor(authoredPrimaryAttackPL*capRatio));
     const absoluteCap=Number.isFinite(Number(excessContract.absoluteCap))?Math.max(0,Math.floor(Number(excessContract.absoluteCap))):null;
     const capAmount=absoluteCap===null?ratioCapAmount:Math.min(ratioCapAmount,absoluteCap);
-    const cappedExcess=Math.min(rawExcess,capAmount);
+    let cappedExcess=Math.min(rawExcess,capAmount);
     const transition=primary.zeroResult&&primary.zeroResult.type==="withdrawal_queue_advance"?primary.zeroResult:null;
     const continuationTargetId=transition&&transition.replacementParticipantId?transition.replacementParticipantId:null;
 
@@ -79099,6 +79389,21 @@ function resolveBattleDamagePacket(definition) {
       continued:false,
       nonRecursive:true
     };
+
+    const nineHells=consumeTripleRashomonNineHellsSanctuaryOnExcess({
+      targetSide:definition.targetSide,
+      targetParticipantId:definition.targetParticipantId,
+      cappedExcess,
+      continuationTargetParticipantId:continuationTargetId,
+      actionId:definition.envelope?definition.envelope.actionId:null,
+      skillId:definition.skill?definition.skill.id:null
+    });
+    if (nineHells.blocked===true) {
+      excessResolution.blockedByNineHellsSanctuary=true;
+      excessResolution.blockedCappedExcess=nineHells.blockedAmount;
+      excessResolution.cappedExcess=0;
+      cappedExcess=0;
+    }
 
     if (cappedExcess>0&&continuationTargetId&&!currentBattle.battleOver) {
       const continuationOutput={
