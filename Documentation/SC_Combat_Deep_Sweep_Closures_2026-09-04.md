@@ -73,35 +73,165 @@ Therefore Alpha requires no generic seventh-slot/full-enemy-deployment insertion
 
 If later Writing/encounter authority makes forced breakout mandatory in a playable Alpha encounter, this deferral must be explicitly reopened before shipping that encounter.
 
-## Menma tutorial — Combat interface
+## Menma Origin — Test Subject deployment boundary
 
-Combat owns the tutorial performance result; Writing owns Anko's dialogue interpretation.
+Origin: `origin_academy_menma_prologue`.
 
-Return an origin-specific structured result including:
+Writing/Registry supplies three dedicated opposition identities:
 
-- `performanceBucket`: `low | middle | high`
-- authored tutorial objective result
-- meaningful personal-performance evidence
-- any authored high-performance criteria satisfied
-- evidence occurrence IDs
+- `test_subject_brute`
+- `test_subject_altered_shinobi`
+- `test_subject_unstable`
 
-Do not derive the bucket from Remaining Battle PL alone, victory alone, or UI heuristics. Protective performance remains separately classified from personal performance.
+The actual Menma tutorial Battle is one-on-one:
 
-Final concrete high-performance criteria are encounter-specific and must be authored after the exact tutorial hostile/encounter contract is supplied by Writing/Registry.
+`academy_menma` vs `test_subject_altered_shinobi`.
+
+`test_subject_brute` and `test_subject_unstable` remain legitimate members of the wider clearing occurrence / Anko opposition context, but they are not silently instantiated in Menma's Battle deployment. Preserve occurrence participation ≠ Battle-instance participation and enemy-card roster ≠ Battle deployment.
+
+Anko remains occupied with the wider hostile group. Menma receives no automatic Nine-Tails Battle assistance merely because Nine-Tails is present in the Origin narrative/relationship context.
+
+### `test_subject_altered_shinobi` — Alpha Combat package
+
+Grounded former-shinobi fundamentals plus unstable experimental chakra/body provenance. No boss-scale Curse Mark package, no arbitrary Orochimaru high-tier inheritance, no Transformation, no Summon package, no regeneration package and no hidden stat bonus.
+
+Standard legal generic actions: Basic Attack and Guard.
+
+Authored actions:
+
+1. `test_subject_altered_shinobi_shinobi_strike` — **Shinobi Strike**
+   - primary discipline: Taijutsu
+   - target: current enemy
+   - one direct Battle-PL damage packet
+   - Stamina mitigation: yes
+   - no automatic Stun, displacement, guard break or Condition.
+
+2. `test_subject_altered_shinobi_shuriken_cast` — **Shuriken Cast**
+   - primary discipline: Bukijutsu
+   - target: current enemy
+   - visible thrown-projectile attack resolving as one mechanical damage packet
+   - Stamina mitigation: yes
+   - projectile count does not multiply packets
+   - no player-Inventory consumption semantics are imported into the enemy package.
+
+3. `test_subject_altered_shinobi_unstable_chakra_burst` — **Unstable Chakra Burst**
+   - primary discipline: Ninjutsu
+   - target: current enemy
+   - one direct erratic chakra damage packet
+   - Stamina mitigation: yes
+   - trait/context: experimental chakra instability
+   - no automatic Burning, Stun, Weakened, self-damage, transformation or boss mechanic.
+
+PL owns the exact damage calibration for these three authored damaging actions after this semantic closure.
+
+### `test_subject_brute` — Alpha Combat package
+
+Failed physical augmentation expressed as crude close-pressure, not boss-scale mutation.
+
+Standard legal generic actions: Basic Attack and Guard.
+
+Authored actions:
+
+1. `test_subject_brute_heavy_swing` — **Heavy Swing**
+   - Taijutsu; current enemy; one direct damage packet; Stamina mitigation yes.
+   - no automatic Stun, displacement or guard break.
+
+2. `test_subject_brute_body_rush` — **Body Rush**
+   - Taijutsu; current enemy; movement-dependent direct damage packet; Stamina mitigation yes.
+   - successful damage does not itself establish Stun or displacement.
+
+3. `test_subject_brute_crushing_clinch` — **Crushing Clinch**
+   - physical-control action; current enemy.
+   - applies source-owned `physical_restraint` on successful control resolution.
+   - no direct damage is required by the semantic contract.
+   - restraint lasts one affected action opportunity / uses the existing physical-restraint lifecycle and must not become generic Stun.
+
+PL calibrates Heavy Swing, Body Rush and any resolver scalar genuinely required by Crushing Clinch.
+
+### `test_subject_unstable` — Alpha Combat package
+
+Severe experimental damage expressed as frightened/aggressive, erratic but still human opposition. Do not turn instability into random unsupported Conditions or a hidden Instability Stat.
+
+Standard legal generic actions: Basic Attack and Guard.
+
+Authored actions:
+
+1. `test_subject_unstable_frantic_rush` — **Frantic Rush**
+   - Taijutsu; current enemy; movement-dependent; one direct damage packet; Stamina mitigation yes.
+
+2. `test_subject_unstable_chakra_spasm` — **Chakra Spasm**
+   - Ninjutsu; current enemy; one direct unstable chakra damage packet; Stamina mitigation yes.
+   - no automatic paralysis, Stun or self-damage.
+
+3. `test_subject_unstable_panicked_burst` — **Panicked Burst**
+   - Ninjutsu; current enemy; visibly erratic/multi-pulse presentation resolving as one mechanical damage packet; Stamina mitigation yes.
+   - no automatic Burning, random status table or hidden mutation package.
+
+PL owns exact damage calibration for these three authored damaging actions.
+
+## Menma tutorial — Combat performance resolver
+
+Writing requires **high / middle / low pressured Battle performance**, not a universal character-performance Stat.
+
+This resolver is Origin/encounter-specific and must not become a generic Battle rating.
+
+Only a completed Menma victory generates the Writing performance bucket. A defeat/withdrawal/non-completed tutorial attempt returns `performanceBucket:null` / `tutorialResult:not_completed` and must not route into Writing's successful post-Battle dialogue merely by pretending it was a low-performance win.
+
+For a completed victory, Combat computes pressure from committed Battle history rather than final Remaining Battle PL alone:
+
+`pressureRatio = grossFinalPLDamageReceivedByMenma / startingUnderlyingBattlePLMaximum`
+
+Where `grossFinalPLDamageReceivedByMenma` is the sum of committed hostile `finalDamage` packets against Menma after defence/Stamina resolution and before later restoration can erase the current-state symptom. Recovery therefore cannot rewrite how much pressure actually occurred.
+
+Also track:
+
+`criticalExposure = true` if any committed post-resolution state places Menma at or below 25% of starting underlying Battle-PL maximum.
+
+Buckets:
+
+- **HIGH** — victory + `pressureRatio <= 0.30` + `criticalExposure === false`.
+- **MIDDLE** — victory + `0.30 < pressureRatio <= 0.65` + `criticalExposure === false`.
+- **LOW** — victory + `pressureRatio > 0.65` OR `criticalExposure === true`.
+
+The structured Combat read should expose at minimum:
+
+- `performanceBucket`
+- `tutorialResult`
+- `startingUnderlyingBattlePLMaximum`
+- `grossFinalPLDamageReceived`
+- `pressureRatio`
+- `criticalExposure`
+- committed victory/completion occurrence ID
+- supporting Battle occurrence IDs.
+
+This read is a contextual answer to "how pressured was Menma in this specific tutorial fight?" It is not universal performance truth. Victory remains distinct from Anko's judgement, and protective performance remains a separate evidence dimension.
 
 ## Menma tutorial — observed Kinjutsu evidence
+
+Overall Battle performance and observed Kinjutsu use are independent reads.
 
 A qualifying Anko observation requires an actual committed Battle occurrence in which:
 
 - Menma is the action actor;
-- the exact action is authored as Kinjutsu (or explicitly Kinjutsu-qualifying);
+- the exact action is authored as Kinjutsu or explicitly `kinjutsu_observation_qualifying`;
 - the occurrence reaches committed/resolved history (a legitimate resolved miss/failure may still be observed; an invalid/uncommitted selection may not);
-- Anko is an eligible observer for that occurrence;
-- no authored concealment/observation blocker invalidates the observation.
+- Anko has legitimate observer access to that occurrence from the authored clearing context;
+- the action has an overt/perceivable signature within that observer scope, and no authored concealment/occlusion/observer blocker invalidates observation.
 
-The observation record should retain occurrence ID, observer, actor, action ID, discipline/qualification, resolution and source provenance.
+Anko's presence elsewhere in the clearing does not grant omniscience: observer scope is bounded. However, Writing has authored her as physically present and occupied nearby, so Combat may treat her as a peripheral eligible observer of overt Menma actions that remain legitimately perceptible while she fights the wider group.
 
-Technique ownership/access alone never establishes observation.
+The observation record should retain:
+
+- Battle occurrence ID
+- observer identity/reference supplied by the scene/Registry
+- actor `academy_menma`
+- action ID
+- discipline / qualifying flag
+- resolution
+- observer-access basis / scene scope
+- source/provenance refs.
+
+Technique ownership, loadout presence, availability or access alone never establishes observation.
 
 ## Arena Promotion — Combat-side contract
 
