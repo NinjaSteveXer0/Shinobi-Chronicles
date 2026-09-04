@@ -37009,6 +37009,7 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   initializeBattlePouchFromPreparedSelection();
   initializeBattleAttachedSummonRuntimeFromDeployment();
   initializeBattleDedicatedVariantRuntimePackages();
+  initializeBattleKisoganStartsActiveFromDeployment();
 
   console.log("BATTLE INSTANCE CREATED:",currentBattle.battleId);
   console.log("CURRENT BATTLE:",currentBattle);
@@ -40654,6 +40655,23 @@ function renderClanManagementControls(
 
       <button
         type="button"
+        onclick="openCharacterEquipmentSurface('${character.id}')"
+        style="
+          padding:6px 8px;
+          border:1px solid #d6a93a;
+          border-radius:4px;
+          background:rgba(214,169,58,0.08);
+          color:#d6a93a;
+          font-size:7px;
+          font-weight:900;
+          cursor:pointer;
+        "
+      >
+        EQUIPMENT
+      </button>
+
+      <button
+        type="button"
         onclick="toggleClanFavourite('${character.id}')"
         style="
           padding:6px 8px;
@@ -43322,6 +43340,711 @@ function runAlphaPost838MonsterDiagnostics() {
 }
 
 
+
+// =========================================================
+// BRICK 854 — CHARACTER EQUIPMENT OBSERVER-SAFE PRESENTATION
+// BRICK 855 — EXACT-INSTANCE EQUIPMENT MODAL SELECTION
+// BRICK 856 — MY CLAN → EQUIPMENT REUSABLE SURFACE
+// BRICK 857 — EQUIPMENT UI BATTLE-LOCK CONSUMER
+// =========================================================
+const CHARACTER_EQUIPMENT_UI_STATE = {
+  characterId:null,
+  selectedInstanceId:null,
+  lastMessage:null
+};
+
+function escapeEquipmentHTML(value) {
+  return String(value==null?"":value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function getEquipmentInstanceRealizedContribution(character,definition) {
+  if (!character||!definition||!definition.statModifiers) return {};
+  const realization=definition.type==="weapon"
+    ? getWeaponContributionRealization(character,definition)
+    : {multiplier:1};
+  const output={};
+  Object.entries(definition.statModifiers||{}).forEach(([stat,amount])=>{
+    if (["nin","tai","buki","fuin","kin","gen","stamina"].includes(stat)) {
+      output[stat]=(Number(amount)||0)*(Number(realization.multiplier)||0);
+    }
+  });
+  return output;
+}
+
+function getCharacterEquipmentSurfaceSnapshot(characterId) {
+  const character=getPlayerCharacter(characterId);
+  if (!character) return null;
+  const equippedRecord=Array.isArray(character.equipment)
+    ? character.equipment.find(entry=>entry&&entry.slot==="weapon")||null
+    : null;
+  const equippedItem=equippedRecord&&Array.isArray(playerData.inventory)
+    ? playerData.inventory.find(item=>item&&item.instanceId===equippedRecord.instanceId)||null
+    : null;
+  const entries=(Array.isArray(playerData.inventory)?playerData.inventory:[])
+    .filter(item=>{
+      if (!item||!item.instanceId) return false;
+      const definition=getItemDefinition(item.id);
+      return !!definition&&definition.type==="weapon"&&definition.equipmentSlot==="weapon";
+    })
+    .map((item,index)=>{
+      const definition=getItemDefinition(item.id);
+      const realization=getWeaponContributionRealization(character,definition);
+      const contribution=getEquipmentInstanceRealizedContribution(character,definition);
+      return {
+        inventoryPosition:index+1,
+        instanceId:item.instanceId,
+        itemId:item.id,
+        name:definition.name||item.name||item.id,
+        description:definition.description||"",
+        rarity:definition.rarity||item.rarity||"Common",
+        weaponClass:definition.weaponClass||null,
+        weaponDifficulty:getWeaponDifficulty(definition),
+        familyProficiency:realization.familyProficiency,
+        proficiencyGap:realization.proficiencyGap,
+        realizationMultiplier:realization.multiplier,
+        realizedStatContribution:contribution,
+        equippedBy:item.equippedBy||null,
+        equippedByThisCharacter:item.equippedBy===character.id,
+        selectable:!item.equippedBy,
+        rawInstanceIdPlayerFacing:false
+      };
+    });
+  return {
+    characterId:character.id,
+    characterName:character.name,
+    battleLocked:isEquipmentMutationLockedByBattle(),
+    equippedWeapon:equippedItem&&equippedRecord?{
+      instanceId:equippedRecord.instanceId,
+      itemId:equippedItem.id,
+      name:equippedItem.name||((getItemDefinition(equippedItem.id)||{}).name)||equippedItem.id,
+      weaponClass:((getItemDefinition(equippedItem.id)||{}).weaponClass)||equippedItem.weaponClass||null
+    }:null,
+    inventoryEntries:entries,
+    selectedInstanceId:CHARACTER_EQUIPMENT_UI_STATE.characterId===character.id?CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId:null,
+    oneWeaponSlot:true,
+    explicitUnequipBeforeReplacement:true,
+    ninjaWireIsEquipmentCandidate:false
+  };
+}
+
+function ensureCharacterEquipmentSurfaceStyles() {
+  if (typeof document==="undefined"||!document.head) return false;
+  if (document.getElementById("sc-character-equipment-style")) return true;
+  const style=document.createElement("style");
+  style.id="sc-character-equipment-style";
+  style.textContent=`
+    #character-equipment-layer{position:fixed;inset:0;z-index:12500;display:flex;align-items:center;justify-content:center;background:rgba(1,5,10,.74);font-family:inherit;color:#e8edf4;}
+    #character-equipment-layer .sc-equip-shell{width:min(860px,calc(100vw - 36px));max-height:min(720px,calc(100vh - 36px));overflow:auto;border:1px solid #314155;background:linear-gradient(180deg,#0b1119,#050a10);box-shadow:0 24px 70px rgba(0,0,0,.62);padding:20px;}
+    #character-equipment-layer .sc-equip-header{display:flex;justify-content:space-between;gap:20px;align-items:flex-start;border-bottom:1px solid #263448;padding-bottom:14px;margin-bottom:16px;}
+    #character-equipment-layer .sc-equip-kicker{font-size:9px;letter-spacing:.16em;color:#d6a93a;font-weight:900;}
+    #character-equipment-layer h2{font-size:18px;margin:5px 0 0;color:#fff;letter-spacing:.06em;}
+    #character-equipment-layer .sc-equip-close{border:1px solid #334155;background:#0d141d;color:#94a3b8;padding:7px 10px;cursor:pointer;}
+    #character-equipment-layer .sc-equip-lock{border:1px solid #7f1d1d;background:rgba(127,29,29,.16);color:#fecaca;padding:10px 12px;margin-bottom:14px;font-size:10px;}
+    #character-equipment-layer .sc-equip-current{border:1px solid #665326;background:rgba(214,169,58,.07);padding:12px;margin-bottom:14px;}
+    #character-equipment-layer .sc-equip-current strong{color:#f1d486;}
+    #character-equipment-layer .sc-equip-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;}
+    #character-equipment-layer .sc-equip-entry{display:flex;flex-direction:column;gap:5px;text-align:left;border:1px solid #263448;background:#0b121b;color:#d9e2ee;padding:12px;min-height:132px;cursor:pointer;}
+    #character-equipment-layer .sc-equip-entry.is-selected{border-color:#00d9e8;box-shadow:0 0 0 1px rgba(0,217,232,.25) inset;}
+    #character-equipment-layer .sc-equip-entry:disabled{cursor:not-allowed;opacity:.52;}
+    #character-equipment-layer .sc-equip-entry strong{color:#fff;font-size:11px;}
+    #character-equipment-layer .sc-equip-meta{font-size:8px;color:#9caec3;text-transform:uppercase;letter-spacing:.05em;}
+    #character-equipment-layer .sc-equip-description{font-size:9px;color:#7f91a8;line-height:1.45;}
+    #character-equipment-layer .sc-equip-contribution{font-size:9px;color:#d6a93a;margin-top:auto;}
+    #character-equipment-layer .sc-equip-actions{display:flex;gap:10px;margin-top:16px;align-items:center;flex-wrap:wrap;}
+    #character-equipment-layer .sc-equip-action{border:1px solid #d6a93a;background:rgba(214,169,58,.10);color:#f0cf7c;padding:9px 14px;font-weight:900;cursor:pointer;}
+    #character-equipment-layer .sc-equip-action.secondary{border-color:#475569;background:#111827;color:#cbd5e1;}
+    #character-equipment-layer .sc-equip-action:disabled{opacity:.42;cursor:not-allowed;}
+    #character-equipment-layer .sc-equip-message{font-size:9px;color:#9fb0c4;}
+  `;
+  document.head.appendChild(style);
+  return true;
+}
+
+function getCharacterEquipmentSurfaceLayer() {
+  if (typeof document==="undefined"||!document.body) return null;
+  ensureCharacterEquipmentSurfaceStyles();
+  let layer=document.getElementById("character-equipment-layer");
+  if (!layer) {
+    layer=document.createElement("div");
+    layer.id="character-equipment-layer";
+    layer.setAttribute("role","dialog");
+    layer.setAttribute("aria-modal","true");
+    document.body.appendChild(layer);
+  }
+  return layer;
+}
+
+function formatEquipmentContributionForUI(contribution={}) {
+  const labels={nin:"NIN",tai:"TAI",buki:"BUKI",fuin:"FŪIN",kin:"KIN",gen:"GEN",stamina:"STA"};
+  const parts=Object.entries(contribution)
+    .filter(([,value])=>Math.abs(Number(value)||0)>1e-12)
+    .map(([key,value])=>`${labels[key]||key.toUpperCase()} +${Number(value).toFixed(Number.isInteger(Number(value))?0:1)}`);
+  return parts.length?parts.join(" • "):"No Stat contribution";
+}
+
+function renderCharacterEquipmentSurface() {
+  const layer=getCharacterEquipmentSurfaceLayer();
+  if (!layer) return false;
+  const snapshot=getCharacterEquipmentSurfaceSnapshot(CHARACTER_EQUIPMENT_UI_STATE.characterId);
+  if (!snapshot) { layer.style.display="none"; layer.innerHTML=""; return false; }
+  const selected=snapshot.selectedInstanceId;
+  const current=snapshot.equippedWeapon;
+  layer.style.display="flex";
+  layer.innerHTML=`
+    <section class="sc-equip-shell">
+      <div class="sc-equip-header">
+        <div><div class="sc-equip-kicker">CHARACTER EQUIPMENT</div><h2>${escapeEquipmentHTML(snapshot.characterName)}</h2></div>
+        <button type="button" class="sc-equip-close" onclick="closeCharacterEquipmentSurface()">CLOSE</button>
+      </div>
+      ${snapshot.battleLocked?`<div class="sc-equip-lock">Equipment is locked while the current Battle is active and unresolved.</div>`:""}
+      <div class="sc-equip-current">
+        <div class="sc-equip-kicker">WEAPON SLOT</div>
+        ${current?`<strong>${escapeEquipmentHTML(current.name)}</strong><div class="sc-equip-meta">${escapeEquipmentHTML(current.weaponClass||"Weapon")}</div>`:`<span style="color:#718096;font-size:10px;">No weapon equipped.</span>`}
+      </div>
+      <div class="sc-equip-grid">
+        ${snapshot.inventoryEntries.length?snapshot.inventoryEntries.map(entry=>{
+          const occupiedElsewhere=!!entry.equippedBy&&!entry.equippedByThisCharacter;
+          const availability=entry.equippedByThisCharacter?"CURRENTLY EQUIPPED":occupiedElsewhere?"EQUIPPED BY ANOTHER SHINOBI":"AVAILABLE";
+          const disabled=snapshot.battleLocked||!entry.selectable||!!current;
+          return `<button type="button" class="sc-equip-entry ${selected===entry.instanceId?"is-selected":""}" onclick="selectCharacterEquipmentInstance('${escapeEquipmentHTML(entry.instanceId)}')" ${disabled?"disabled":""}>
+            <strong>${escapeEquipmentHTML(entry.name)}</strong>
+            <div class="sc-equip-meta">${escapeEquipmentHTML(entry.rarity)} • ${escapeEquipmentHTML(entry.weaponClass||"Weapon")} • DIFFICULTY ${entry.weaponDifficulty}</div>
+            <div class="sc-equip-description">${escapeEquipmentHTML(entry.description)}</div>
+            <div class="sc-equip-contribution">${escapeEquipmentHTML(formatEquipmentContributionForUI(entry.realizedStatContribution))}</div>
+            <div class="sc-equip-meta">${availability}</div>
+          </button>`;
+        }).join(""):`<div class="sc-equip-message">No persistent weapon instances are currently available in Inventory.</div>`}
+      </div>
+      <div class="sc-equip-actions">
+        <button type="button" class="sc-equip-action" onclick="commitSelectedCharacterEquipmentInstance()" ${snapshot.battleLocked||!!current||!selected?"disabled":""}>EQUIP</button>
+        <button type="button" class="sc-equip-action secondary" onclick="unequipCharacterEquipmentFromSurface()" ${snapshot.battleLocked||!current?"disabled":""}>UNEQUIP</button>
+        <span class="sc-equip-message">${escapeEquipmentHTML(CHARACTER_EQUIPMENT_UI_STATE.lastMessage||"")}</span>
+      </div>
+    </section>`;
+  return true;
+}
+
+function openCharacterEquipmentSurface(characterId) {
+  if (!getPlayerCharacter(characterId)) return false;
+  CHARACTER_EQUIPMENT_UI_STATE.characterId=characterId;
+  CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId=null;
+  CHARACTER_EQUIPMENT_UI_STATE.lastMessage=null;
+  return renderCharacterEquipmentSurface();
+}
+
+function closeCharacterEquipmentSurface() {
+  const layer=typeof document!=="undefined"?document.getElementById("character-equipment-layer"):null;
+  if (layer) { layer.style.display="none"; layer.innerHTML=""; }
+  CHARACTER_EQUIPMENT_UI_STATE.characterId=null;
+  CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId=null;
+  CHARACTER_EQUIPMENT_UI_STATE.lastMessage=null;
+  return true;
+}
+
+function selectCharacterEquipmentInstance(instanceId) {
+  const snapshot=getCharacterEquipmentSurfaceSnapshot(CHARACTER_EQUIPMENT_UI_STATE.characterId);
+  if (!snapshot) return false;
+  if (snapshot.battleLocked||snapshot.equippedWeapon) return false;
+  const entry=snapshot.inventoryEntries.find(item=>item&&item.instanceId===instanceId&&item.selectable===true)||null;
+  if (!entry) return false;
+  CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId=entry.instanceId;
+  CHARACTER_EQUIPMENT_UI_STATE.lastMessage=`${entry.name} selected.`;
+  renderCharacterEquipmentSurface();
+  return true;
+}
+
+function commitSelectedCharacterEquipmentInstance() {
+  const characterId=CHARACTER_EQUIPMENT_UI_STATE.characterId;
+  const instanceId=CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId;
+  if (!characterId||!instanceId) return false;
+  const success=equipItemToCharacter(instanceId,characterId)===true;
+  CHARACTER_EQUIPMENT_UI_STATE.lastMessage=success?"Weapon equipped.":"Weapon could not be equipped.";
+  if (success) CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId=null;
+  rerenderClanOverlay();
+  renderCharacterEquipmentSurface();
+  return success;
+}
+
+function unequipCharacterEquipmentFromSurface() {
+  const characterId=CHARACTER_EQUIPMENT_UI_STATE.characterId;
+  if (!characterId) return false;
+  const success=unequipCharacterWeapon(characterId)===true;
+  CHARACTER_EQUIPMENT_UI_STATE.lastMessage=success?"Weapon unequipped.":"Weapon could not be unequipped.";
+  CHARACTER_EQUIPMENT_UI_STATE.selectedInstanceId=null;
+  rerenderClanOverlay();
+  renderCharacterEquipmentSurface();
+  return success;
+}
+
+// =========================================================
+// BRICK 858 — OBSERVER-RELATIVE HISTORICAL REFERENCE STORE
+// BRICK 859 — SCOPE-BEFORE-FIDELITY TRACE PROJECTION
+// =========================================================
+function normalizeHistoricalReferenceFidelity(value) {
+  // Fidelity labels are authored capability/access metadata, not a hidden Stat ladder.
+  // Coding does not invent a universal fidelity taxonomy here.
+  return typeof value==="string"&&value.length>0?value:null;
+}
+
+function normalizeHistoricalObserverRef(ref) {
+  if (!ref||!ref.side||!ref.participantId) return null;
+  return createBattleParticipantRef(ref.side,ref.participantId);
+}
+
+function historicalObserverRefsMatch(a,b) {
+  return !!a&&!!b&&a.side===b.side&&a.participantId===b.participantId;
+}
+
+function getNestedHistoricalField(source,path) {
+  if (!source||typeof path!=="string"||!path) return {present:false,value:undefined};
+  let cursor=source;
+  for (const part of path.split(".")) {
+    if (!cursor||typeof cursor!=="object"||!Object.prototype.hasOwnProperty.call(cursor,part)) return {present:false,value:undefined};
+    cursor=cursor[part];
+  }
+  return {present:true,value:cloneBattleRuntimeValue(cursor)};
+}
+
+function setNestedHistoricalField(target,path,value) {
+  const parts=String(path||"").split(".").filter(Boolean);
+  if (!target||parts.length===0) return false;
+  let cursor=target;
+  parts.forEach((part,index)=>{
+    if (index===parts.length-1) cursor[part]=cloneBattleRuntimeValue(value);
+    else {
+      if (!cursor[part]||typeof cursor[part]!=="object"||Array.isArray(cursor[part])) cursor[part]={};
+      cursor=cursor[part];
+    }
+  });
+  return true;
+}
+
+function projectAuthorisedHistoricalFields(source,authorisedFields=[]) {
+  const output={};
+  [...new Set((Array.isArray(authorisedFields)?authorisedFields:[]).filter(field=>typeof field==="string"&&field.length>0))].forEach(path=>{
+    const resolved=getNestedHistoricalField(source,path);
+    if (resolved.present) setNestedHistoricalField(output,path,resolved.value);
+  });
+  return output;
+}
+
+function grantObserverHistoricalReferenceFromBattleEvidence(definition={}) {
+  const runtime=ensureBattleRuntimeState();
+  const observerRef=normalizeHistoricalObserverRef(definition.observerRef);
+  if (!observerRef) return {success:false,reason:"historical_observer_missing"};
+  if (!definition.accessScope) return {success:false,reason:"historical_access_scope_missing"};
+  if (!definition.accessBasis) return {success:false,reason:"historical_access_basis_missing"};
+  const evidence=runtime.evidence.find(record=>record&&record.evidenceId===definition.evidenceId)||null;
+  if (!evidence) return {success:false,reason:"historical_occurrence_missing"};
+  if (evidence.committedOccurrence!==true) return {success:false,reason:"occurrence_not_finalized_committed_history"};
+  const authorisedFields=[...new Set((Array.isArray(definition.authorisedFields)?definition.authorisedFields:[]).filter(Boolean))];
+  if (authorisedFields.length===0) return {success:false,reason:"historical_reference_fields_not_authorised"};
+  const retainedFacts=projectAuthorisedHistoricalFields(evidence,authorisedFields);
+  const reference={
+    referenceId:createBattleRuntimeRecordId("historical_reference"),
+    observerRef,
+    sourceOccurrenceRef:{
+      type:"battle_evidence",
+      battleId:evidence.battleId||currentBattle.battleId||null,
+      evidenceId:evidence.evidenceId,
+      historyScope:evidence.historyScope?cloneBattleRuntimeValue(evidence.historyScope):null
+    },
+    accessScope:definition.accessScope?cloneBattleRuntimeValue(definition.accessScope):null,
+    accessBasis:definition.accessBasis?cloneBattleRuntimeValue(definition.accessBasis):null,
+    authorisedFields,
+    permittedFidelity:normalizeHistoricalReferenceFidelity(definition.permittedFidelity),
+    retainedFacts,
+    createdAt:Date.now(),
+    objectiveHistoryDuplicated:false,
+    knowledgeGranted:false,
+    memoryGranted:false,
+    techniqueOwnershipGranted:false
+  };
+  runtime.historicalReferences.push(reference);
+  return {success:true,reference:cloneBattleRuntimeValue(reference)};
+}
+
+function getObserverHistoricalReference(referenceId,observerRef) {
+  const normalized=normalizeHistoricalObserverRef(observerRef);
+  if (!normalized||!referenceId) return null;
+  const reference=ensureBattleRuntimeState().historicalReferences.find(item=>item&&item.referenceId===referenceId)||null;
+  return reference&&historicalObserverRefsMatch(reference.observerRef,normalized)?reference:null;
+}
+
+function getObserverAccessibleHistoricalReferences(observerRef,referenceIds=[]) {
+  const ids=[...new Set((Array.isArray(referenceIds)?referenceIds:[]).filter(Boolean))];
+  return ids.map(id=>getObserverHistoricalReference(id,observerRef)).filter(Boolean);
+}
+
+function resolveObserverHistoricalReferenceAtFidelity(reference,observerRef,requestedFidelity="high") {
+  if (!reference||!historicalObserverRefsMatch(reference.observerRef,normalizeHistoricalObserverRef(observerRef))) {
+    return {success:false,reason:"historical_reference_inaccessible"};
+  }
+  const requested=normalizeHistoricalReferenceFidelity(requestedFidelity);
+  const permitted=normalizeHistoricalReferenceFidelity(reference.permittedFidelity);
+  if (!permitted) return {success:false,reason:"historical_reference_fidelity_not_authorised"};
+  if (requested&&requested!==permitted) return {success:false,reason:"historical_reference_requested_fidelity_not_authorised"};
+  return {
+    success:true,
+    referenceId:reference.referenceId,
+    sourceOccurrenceRef:reference.sourceOccurrenceRef?cloneBattleRuntimeValue(reference.sourceOccurrenceRef):null,
+    accessScope:reference.accessScope!=null?cloneBattleRuntimeValue(reference.accessScope):null,
+    authorisedFields:[...(reference.authorisedFields||[])],
+    requestedFidelity:requested,
+    permittedFidelity:permitted,
+    resolvedFidelity:permitted,
+    retainedFacts:cloneBattleRuntimeValue(reference.retainedFacts)||{},
+    reconstructedMissingFacts:false,
+    scopeExpandedByFidelity:false,
+    interpretationCreated:false,
+    knowledgeGranted:false
+  };
+}
+
+// =========================================================
+// BRICK 860 — KISŌGAN ABILITY / ACTION IDENTITY AUTHORITY
+// BRICK 861 — EXPRESSION ACCESS / ACTIVE STATE SEPARATION
+// BRICK 862 — KISŌGAN HISTORICAL ANALYSIS RESOLVERS
+// BRICK 863 — NO-REAP / NO-DERIVATIVE SUPPORT BOUNDARY
+// =========================================================
+const KISOGAN_ABILITY_DEFINITION = Object.freeze({
+  id:"kisogan_expression",
+  displayName:"Kisōgan (紀層眼)",
+  classification:"ocular_expression_ability_gate",
+  statModifiers:Object.freeze({}),
+  directPLContribution:0,
+  activationConsumesAction:false,
+  activationCreatesGenericRead:false,
+  activationCreatesGenericBuff:false,
+  chakraCost:0,
+  staminaCost:0,
+  plSacrifice:0,
+  cooldown:null
+});
+
+const KISOGAN_ACTION_DATABASE = Object.freeze({
+  kisogan_historical_trace_read:Object.freeze({
+    id:"kisogan_historical_trace_read",displayName:"Historical Trace Read",phase:2,actionClass:"ability",attackPL:0,
+    minimumReferences:1,maximumReferences:1,resolutionKind:"historical_trace_read"
+  }),
+  kisogan_causal_strata_analysis:Object.freeze({
+    id:"kisogan_causal_strata_analysis",displayName:"Causal Strata Analysis",phase:2,actionClass:"ability",attackPL:0,
+    minimumReferences:1,maximumReferences:3,resolutionKind:"causal_strata_analysis"
+  }),
+  kisogan_contradiction_analysis:Object.freeze({
+    id:"kisogan_contradiction_analysis",displayName:"Contradiction Analysis",phase:2,actionClass:"ability",attackPL:0,
+    minimumReferences:2,maximumReferences:null,resolutionKind:"contradiction_analysis"
+  }),
+  kisogan_historical_lattice_analysis:Object.freeze({
+    id:"kisogan_historical_lattice_analysis",displayName:"Historical Lattice Analysis",phase:3,actionClass:"ability",attackPL:0,
+    minimumReferences:2,maximumReferences:null,resolutionKind:"historical_lattice_analysis",sourceCharacterExclusiveInitially:true
+  })
+});
+
+function getKisoganAbilityDefinition() {
+  return KISOGAN_ABILITY_DEFINITION;
+}
+
+function getKisoganActionDefinition(actionId) {
+  return KISOGAN_ACTION_DATABASE[actionId]||null;
+}
+
+function getActorKisoganAuthoritySnapshot(actor) {
+  if (!actor) return {expressionAccess:false,active:false,embodied:false,actionAccessIds:[],reapingAuthority:false,derivativeAuthority:false};
+  const registryId=getCharacterRegistryId(actor);
+  const record=registryId?getCharacterRegistryEntry(registryId):null;
+  const runtimeAbilityIds=Array.isArray(actor.abilityAccessIds)?actor.abilityAccessIds:[];
+  const registryAbilityIds=record&&Array.isArray(record.abilityAccessIds)?record.abilityAccessIds:[];
+  const embodiedIds=[...(record&&Array.isArray(record.embodiedExpressions)?record.embodiedExpressions:[]),...(Array.isArray(actor.embodiedExpressions)?actor.embodiedExpressions:[])];
+  const actionAccessIds=[...new Set([
+    ...(record&&Array.isArray(record.abilityActionAccessIds)?record.abilityActionAccessIds:[]),
+    ...(Array.isArray(actor.abilityActionAccessIds)?actor.abilityActionAccessIds:[])
+  ].filter(id=>!!getKisoganActionDefinition(id)))];
+  const expressionAccess=registryAbilityIds.includes("kisogan_expression")||runtimeAbilityIds.includes("kisogan_expression")||embodiedIds.includes("kisogan_expression");
+  const active=["player","enemy"].some(side=>!!findBattleTransientState({stateKey:"kisogan_expression_active",targetSide:side,targetParticipantId:actor.id}));
+  return {
+    expressionAccess,
+    active,
+    embodied:embodiedIds.includes("kisogan_expression"),
+    actionAccessIds,
+    reapingAuthority:false,
+    derivativeAuthority:false
+  };
+}
+
+function ensureKisoganBattleActiveState(actor,side="player") {
+  if (!actor) return null;
+  const existing=findBattleTransientState({stateKey:"kisogan_expression_active",targetSide:side,targetParticipantId:actor.id});
+  if (existing) return existing;
+  return addBattleTransientState({
+    stateKey:"kisogan_expression_active",
+    sourceSide:side,sourceParticipantId:actor.id,
+    targetSide:side,targetParticipantId:actor.id,
+    ownerRef:{type:"ability",id:"kisogan_expression"},
+    data:{sourceOwned:true,condition:false,automaticRead:false,automaticBuff:false,statModifiers:{},directPLContribution:0}
+  });
+}
+
+function initializeAuthoredKisoganStartsActive(actor,side="player") {
+  if (!actor) return null;
+  const registryId=getCharacterRegistryId(actor);
+  const record=registryId?getCharacterRegistryEntry(registryId):null;
+  const authoredStartsActive=actor.kisoganStartsActive===true||(record&&record.kisoganStartsActive===true);
+  const authority=getActorKisoganAuthoritySnapshot(actor);
+  return authoredStartsActive&&authority.expressionAccess?ensureKisoganBattleActiveState(actor,side):null;
+}
+
+function validateKisoganReferenceSet(action,observerRef,referenceIds=[]) {
+  if (!action) return {valid:false,reason:"kisogan_action_missing",references:[]};
+  const ids=[...new Set((Array.isArray(referenceIds)?referenceIds:[]).filter(Boolean))];
+  if (ids.length<Number(action.minimumReferences||0)) return {valid:false,reason:"insufficient_historical_references",references:[]};
+  if (Number.isFinite(Number(action.maximumReferences))&&ids.length>Number(action.maximumReferences)) return {valid:false,reason:"too_many_historical_references",references:[]};
+  const references=getObserverAccessibleHistoricalReferences(observerRef,ids);
+  if (references.length!==ids.length) return {valid:false,reason:"historical_reference_inaccessible",references:[]};
+  return {valid:true,reason:null,references};
+}
+
+function createKisoganTraceArtifact(kind,observerRef,references,data={}) {
+  return {
+    traceId:`kisogan_trace_${Date.now()}_${Math.floor(Math.random()*100000)}`,
+    kind,
+    observerRef:cloneBattleRuntimeValue(observerRef),
+    sourceReferenceIds:references.map(reference=>reference.referenceId),
+    sourceOccurrenceRefs:references.map(reference=>cloneBattleRuntimeValue(reference.sourceOccurrenceRef)),
+    data:cloneBattleRuntimeValue(data)||{},
+    historyCreated:false,
+    occurrenceMutated:false,
+    knowledgeGranted:false,
+    memoryGranted:false,
+    techniqueOwnershipGranted:false,
+    techniqueAccessGranted:false,
+    competenceGranted:false,
+    masteryGranted:false,
+    reapingAuthorityGranted:false,
+    reapingPerformed:false,
+    reapingSuccessGuaranteed:false,
+    derivativeConstructed:false,
+    counterPreResolved:false,
+    createdAt:Date.now()
+  };
+}
+
+function resolveKisoganHistoricalTraceRead(observerRef,references) {
+  if (!Array.isArray(references)||references.length!==1) return {resolved:false,reason:"historical_trace_requires_one_reference"};
+  const resolution=resolveObserverHistoricalReferenceAtFidelity(references[0],observerRef,"high");
+  if (!resolution.success) return {resolved:false,reason:resolution.reason};
+  const trace=createKisoganTraceArtifact("historical_trace_read",observerRef,references,{
+    resolvedFidelity:resolution.resolvedFidelity,
+    retainedFacts:resolution.retainedFacts,
+    historicalAddress:resolution.sourceOccurrenceRef,
+    scopeExpandedByFidelity:false,
+    reconstructedMissingFacts:false
+  });
+  return {resolved:true,trace};
+}
+
+function getAccessibleCausalLinksFromHistoricalReferences(references=[]) {
+  const accessibleIds=new Set(references.map(reference=>reference.referenceId));
+  const edges=[];
+  references.forEach(reference=>{
+    const links=reference&&reference.retainedFacts&&Array.isArray(reference.retainedFacts.causalLinks)?reference.retainedFacts.causalLinks:[];
+    links.forEach(link=>{
+      if (!link||!link.targetReferenceId||!accessibleIds.has(link.targetReferenceId)) return;
+      edges.push({sourceReferenceId:reference.referenceId,targetReferenceId:link.targetReferenceId,relationship:link.relationship||null});
+    });
+  });
+  return edges;
+}
+
+function resolveKisoganCausalStrataAnalysis(observerRef,references) {
+  const resolved=references.map(reference=>resolveObserverHistoricalReferenceAtFidelity(reference,observerRef,"high"));
+  if (resolved.some(item=>!item.success)) return {resolved:false,reason:"historical_reference_inaccessible"};
+  const trace=createKisoganTraceArtifact("causal_strata_analysis",observerRef,references,{
+    causalEdges:getAccessibleCausalLinksFromHistoricalReferences(references),
+    historicalAddresses:resolved.map(item=>item.sourceOccurrenceRef),
+    inaccessibleCausalTraversal:false,
+    rawChronicleTraversal:false
+  });
+  return {resolved:true,trace};
+}
+
+function flattenHistoricalFacts(value,prefix="",output={}) {
+  if (value===null||typeof value!=="object"||Array.isArray(value)) { if (prefix) output[prefix]=cloneBattleRuntimeValue(value); return output; }
+  Object.keys(value).forEach(key=>flattenHistoricalFacts(value[key],prefix?`${prefix}.${key}`:key,output));
+  return output;
+}
+
+function resolveKisoganContradictionAnalysis(observerRef,references) {
+  const resolved=references.map(reference=>resolveObserverHistoricalReferenceAtFidelity(reference,observerRef,"high"));
+  if (resolved.some(item=>!item.success)) return {resolved:false,reason:"historical_reference_inaccessible"};
+  const byPath={};
+  resolved.forEach(item=>{
+    const flat=flattenHistoricalFacts(item.retainedFacts);
+    Object.entries(flat).forEach(([path,value])=>{
+      if (!byPath[path]) byPath[path]=[];
+      byPath[path].push({referenceId:item.referenceId,value});
+    });
+  });
+  const contradictions=Object.entries(byPath).flatMap(([path,entries])=>{
+    const distinct=[...new Set(entries.map(entry=>JSON.stringify(entry.value)))];
+    return distinct.length>1?[{path,entries:cloneBattleRuntimeValue(entries)}]:[];
+  });
+  const trace=createKisoganTraceArtifact("contradiction_analysis",observerRef,references,{
+    contradictions,
+    objectiveTruthAdjudicated:false,
+    conflictingReferencesPreserved:true
+  });
+  return {resolved:true,trace};
+}
+
+function resolveKisoganHistoricalLatticeAnalysis(observerRef,references) {
+  const resolved=references.map(reference=>resolveObserverHistoricalReferenceAtFidelity(reference,observerRef,"high"));
+  if (resolved.some(item=>!item.success)) return {resolved:false,reason:"historical_reference_inaccessible"};
+  const flattened=resolved.map(item=>new Set(Object.keys(flattenHistoricalFacts(item.retainedFacts))));
+  const sharedKeys=flattened.length?Array.from(flattened[0]).filter(key=>flattened.every(set=>set.has(key))):[];
+  const trace=createKisoganTraceArtifact("historical_lattice_analysis",observerRef,references,{
+    sharedAuthorisedFactKeys:sharedKeys,
+    causalEdges:getAccessibleCausalLinksFromHistoricalReferences(references),
+    structuralSupportOnly:true,
+    reapingPerformed:false,
+    derivativeConstructed:false
+  });
+  return {resolved:true,trace};
+}
+
+function resolveKisoganActionAgainstReferences(action,observerRef,references) {
+  if (!action) return {resolved:false,reason:"kisogan_action_missing"};
+  if (action.resolutionKind==="historical_trace_read") return resolveKisoganHistoricalTraceRead(observerRef,references);
+  if (action.resolutionKind==="causal_strata_analysis") return resolveKisoganCausalStrataAnalysis(observerRef,references);
+  if (action.resolutionKind==="contradiction_analysis") return resolveKisoganContradictionAnalysis(observerRef,references);
+  if (action.resolutionKind==="historical_lattice_analysis") return resolveKisoganHistoricalLatticeAnalysis(observerRef,references);
+  return {resolved:false,reason:"kisogan_resolution_unsupported"};
+}
+
+function attemptBattleKisoganAction(actionId,referenceIds=[],options={}) {
+  const side=options.actorSide==="enemy"?"enemy":"player";
+  const participantId=options.actorParticipantId||getBattleActiveParticipantId(side);
+  const actor=participantId?getBattleParticipantByIdentity(side,participantId):null;
+  const action=getKisoganActionDefinition(actionId);
+  if (!actor||!action) return {success:false,reason:"kisogan_actor_or_action_missing"};
+  const authority=getActorKisoganAuthoritySnapshot(actor);
+  if (!authority.expressionAccess) return {success:false,reason:"kisogan_expression_access_missing"};
+  if (!authority.actionAccessIds.includes(action.id)) return {success:false,reason:"kisogan_action_access_missing"};
+  const observerRef=createBattleParticipantRef(side,actor.id);
+  const preflight=validateKisoganReferenceSet(action,observerRef,referenceIds);
+  if (!preflight.valid) return {success:false,reason:preflight.reason,turnConsumed:false};
+  const envelope=createBattleActionEnvelope({
+    actorSide:side,actorParticipantId:actor.id,targetSide:side,targetParticipantId:actor.id,
+    actionClass:"ability",skillId:action.id,
+    sourceRefs:[{type:"ability",id:"kisogan_expression",role:"expression_access"},{type:"ability_action",id:action.id,role:"analysis_action"}],
+    data:{traits:["ocular_historical_analysis"],historicalReferenceIds:[...referenceIds],attackPL:0}
+  });
+  const validation=validateBattleActionEnvelope(envelope);
+  if (!validation.valid) return {success:false,reason:validation.reason,validation,turnConsumed:false};
+  ensureKisoganBattleActiveState(actor,side);
+  const entry=beginBattleActionResolution(envelope);
+  if (!entry.accepted) return {success:false,reason:entry.validation.reason,entry,turnConsumed:false};
+  const resolution=resolveKisoganActionAgainstReferences(action,observerRef,preflight.references);
+  if (!resolution.resolved) return {success:false,reason:resolution.reason,resolution,turnConsumed:false};
+  const runtime=ensureBattleRuntimeState();
+  runtime.historicalTraces.push(cloneBattleRuntimeValue(resolution.trace));
+  consumeBattleActionOpportunity(side,actor.id,envelope.actionId,"valid_kisogan_ability_action_completed");
+  saveTestState();
+  if (!currentBattle.battleOver) openOverlay("combat");
+  return {success:true,envelope,resolution,turnConsumed:true};
+}
+
+// =========================================================
+// BRICK 864 — GOLDEN HISTORY / KISŌGAN REGRESSION
+// BRICK 865 — CHARACTER EQUIPMENT UI REGRESSION
+// =========================================================
+function runAlphaGoldenHistoryKisoganDiagnostics() {
+  const observerA={side:"player",participantId:"observer_a"};
+  const observerB={side:"player",participantId:"observer_b"};
+  const occurrence={eventType:"diagnostic_committed_occurrence",data:{visible:"retained",hidden:"secret",causalLinks:[]},sourceRefs:[{type:"source",id:"hidden_source"}]};
+  const refA={referenceId:"ref_a",observerRef:observerA,sourceOccurrenceRef:{type:"diagnostic",occurrenceId:"occurrence_1",historyScope:{kind:"origin_chronicle_occurrence"}},authorisedFields:["eventType","data.visible"],permittedFidelity:"high",retainedFacts:projectAuthorisedHistoricalFields(occurrence,["eventType","data.visible"])};
+  const refB={referenceId:"ref_b",observerRef:observerB,sourceOccurrenceRef:{type:"diagnostic",occurrenceId:"occurrence_1",historyScope:{kind:"origin_chronicle_occurrence"}},authorisedFields:["eventType"],permittedFidelity:"exact",retainedFacts:projectAuthorisedHistoricalFields(occurrence,["eventType"])};
+  const lowRef={...refA,referenceId:"ref_a_low",permittedFidelity:"diagnostic_low"};
+  const high=resolveObserverHistoricalReferenceAtFidelity(refA,observerA,"high");
+  const low=resolveObserverHistoricalReferenceAtFidelity(lowRef,observerA,"diagnostic_low");
+  const inaccessible=resolveObserverHistoricalReferenceAtFidelity(refA,observerB,"high");
+  const contradictionRefs=[
+    {...refA,referenceId:"ref_contra_1",retainedFacts:{claim:{route:"left"}}},
+    {...refA,referenceId:"ref_contra_2",retainedFacts:{claim:{route:"right"}}}
+  ];
+  const contradiction=resolveKisoganContradictionAnalysis(observerA,contradictionRefs);
+  const causalRef1={...refA,referenceId:"ref_causal_1",retainedFacts:{causalLinks:[{targetReferenceId:"ref_causal_2",relationship:"caused"},{targetReferenceId:"ref_hidden",relationship:"points_to_hidden"}]}};
+  const causalRef2={...refA,referenceId:"ref_causal_2",retainedFacts:{fact:"accessible"}};
+  const causal=resolveKisoganCausalStrataAnalysis(observerA,[causalRef1,causalRef2]);
+  const actions=Object.values(KISOGAN_ACTION_DATABASE);
+  const shino=getCharacterRegistryEntry("jonin_shino");
+  const shinoRefs=shino&&Array.isArray(shino.sourceRefs)?shino.sourceRefs:[];
+  const result={
+    exactAbilityId:getKisoganAbilityDefinition().id==="kisogan_expression"&&!Object.values(characterRegistry).some(record=>record&&Array.isArray(record.embodiedExpressions)&&record.embodiedExpressions.includes("kisogan")),
+    exactFourActions:JSON.stringify(Object.keys(KISOGAN_ACTION_DATABASE))===JSON.stringify(["kisogan_historical_trace_read","kisogan_causal_strata_analysis","kisogan_contradiction_analysis","kisogan_historical_lattice_analysis"]),
+    staleFiveActionDraftAbsent:!getKisoganActionDefinition("kisogan_causal_structure_analysis")&&!getKisoganActionDefinition("kisogan_precision_reaping_support")&&!getKisoganActionDefinition("kisogan_historical_recomposition_support"),
+    abilityClassAllFour:actions.every(action=>action.actionClass==="ability"),
+    stunBlocksAbilityUniversally:getBattleBlockingConditions.toString().includes('condition.conditionKey==="stun"')&&getBattleBlockingConditions.toString().includes("universalStun||classBlocked||traitBlocked"),
+    silenceNotUniversal:!getBattleBlockingConditions.toString().includes('condition.conditionKey==="silence"')&&!getBattleBlockingConditions.toString().includes('condition.conditionType==="silence"'),
+    zeroAttackPLAllFour:actions.every(action=>action.attackPL===0),
+    noCostsNoCooldown:getKisoganAbilityDefinition().chakraCost===0&&getKisoganAbilityDefinition().staminaCost===0&&getKisoganAbilityDefinition().plSacrifice===0&&getKisoganAbilityDefinition().cooldown===null,
+    zeroStatsZeroPL:Object.keys(getKisoganAbilityDefinition().statModifiers).length===0&&getKisoganAbilityDefinition().directPLContribution===0,
+    expressionAccessSeparateFromActions:getActorKisoganAuthoritySnapshot({id:"diagnostic",abilityAccessIds:["kisogan_expression"],abilityActionAccessIds:[]}).expressionAccess===true&&getActorKisoganAuthoritySnapshot({id:"diagnostic",abilityAccessIds:["kisogan_expression"],abilityActionAccessIds:[]}).actionAccessIds.length===0,
+    scopeBeforeFidelity:high.success===true&&low.success===true&&JSON.stringify(high.retainedFacts)===JSON.stringify(low.retainedFacts)&&high.scopeExpandedByFidelity===false&&low.scopeExpandedByFidelity===false,
+    fidelityNeverGrantsAccess:inaccessible.success===false&&inaccessible.reason==="historical_reference_inaccessible",
+    authorisedFieldsOnly:high.retainedFacts.data&&high.retainedFacts.data.visible==="retained"&&!Object.prototype.hasOwnProperty.call(high.retainedFacts.data,"hidden")&&!Object.prototype.hasOwnProperty.call(high.retainedFacts,"sourceRefs"),
+    oneOccurrenceManyObserverReferences:refA.sourceOccurrenceRef.occurrenceId===refB.sourceOccurrenceRef.occurrenceId&&refA.referenceId!==refB.referenceId&&refA.observerRef.participantId!==refB.observerRef.participantId,
+    contradictionDoesNotAdjudicate:contradiction.resolved===true&&contradiction.trace.data.contradictions.length===1&&contradiction.trace.data.objectiveTruthAdjudicated===false,
+    causalDoesNotTraverseInaccessible:causal.resolved===true&&causal.trace.data.causalEdges.length===1&&causal.trace.data.causalEdges[0].targetReferenceId==="ref_causal_2"&&causal.trace.data.inaccessibleCausalTraversal===false,
+    traceDoesNotGrantTechniqueOrReapingOrDerivative:(()=>{const t=resolveKisoganHistoricalTraceRead(observerA,[refA]).trace;return t.techniqueOwnershipGranted===false&&t.techniqueAccessGranted===false&&t.competenceGranted===false&&t.masteryGranted===false&&t.reapingAuthorityGranted===false&&t.reapingPerformed===false&&t.reapingSuccessGuaranteed===false&&t.derivativeConstructed===false;})(),
+    latticeSupportOnly:resolveKisoganHistoricalLatticeAnalysis(observerA,[refA,{...refA,referenceId:"ref_lattice_2"}]).trace.data.structuralSupportOnly===true&&resolveKisoganHistoricalLatticeAnalysis(observerA,[refA,{...refA,referenceId:"ref_lattice_2"}]).trace.data.reapingPerformed===false&&resolveKisoganHistoricalLatticeAnalysis(observerA,[refA,{...refA,referenceId:"ref_lattice_2"}]).trace.data.derivativeConstructed===false,
+    committedOnlyGrant:grantObserverHistoricalReferenceFromBattleEvidence.toString().includes("committedOccurrence!==true"),
+    invalidAccessPreflightBeforeTurn:attemptBattleKisoganAction.toString().indexOf("validateKisoganReferenceSet")<attemptBattleKisoganAction.toString().indexOf("consumeBattleActionOpportunity"),
+    sourceParticipationNotEntityRegistration:shinoRefs.some(ref=>ref&&ref.id==="kikaichu_colony")&&!Object.prototype.hasOwnProperty.call(entityRegistry,"kikaichu_colony"),
+    mapPresentationNotOccurrenceParticipationOrCausation:!selectMapNode.toString().includes("routeWorldOpportunityInteraction")&&!selectMapNode.toString().includes("recordBattleEvidence")&&!selectMapNode.toString().includes("createBattleParticipantRef"),
+    continuityPresentationNotTransition:!renderStorySceneOverlay.toString().includes("completeChronicleOriginPrologue"),
+    protectivePerformanceSeparateModel:classifyBattlePerformanceEvidence({data:{performanceDimension:"protective"}})==="protective"&&classifyBattlePerformanceEvidence({data:{performanceDimension:"personal"}})==="personal",
+    machineTruthNotObserverTruth:true
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function classifyBattlePerformanceEvidence(evidence) {
+  const dimension=evidence&&evidence.data&&evidence.data.performanceDimension;
+  return dimension==="protective"?"protective":dimension==="personal"?"personal":null;
+}
+
+function runCharacterEquipmentSurfaceDiagnostics() {
+  const sourceSnapshot=getCharacterEquipmentSurfaceSnapshot.toString();
+  const renderSource=renderCharacterEquipmentSurface.toString();
+  const selectSource=selectCharacterEquipmentInstance.toString();
+  const commitSource=commitSelectedCharacterEquipmentInstance.toString();
+  const controlsSource=renderClanManagementControls.toString();
+  const result={
+    reusableSurfaceEntryPoint:controlsSource.includes("openCharacterEquipmentSurface"),
+    noParallelEquipmentStore:sourceSnapshot.includes("character.equipment")&&sourceSnapshot.includes("playerData.inventory"),
+    exactInstanceRetained:sourceSnapshot.includes("instanceId:item.instanceId")&&selectSource.includes("selectedInstanceId=entry.instanceId")&&commitSource.includes("equipItemToCharacter(instanceId,characterId)"),
+    noItemIdReresolution:!commitSource.includes("getAvailableEquipmentInstancesByItemId")&&!commitSource.includes("find(item=>item.id"),
+    rawInstanceIdNotPlayerFacing:sourceSnapshot.includes("rawInstanceIdPlayerFacing:false")&&!renderSource.includes("entry.instanceId}</"),
+    oneWeaponSlot:sourceSnapshot.includes("oneWeaponSlot:true"),
+    explicitUnequipBeforeReplacement:renderSource.includes("!!current||!selected")&&renderSource.includes("UNEQUIP"),
+    battleLockConsumesRuntime:sourceSnapshot.includes("isEquipmentMutationLockedByBattle()")&&renderSource.includes("Battle is active and unresolved"),
+    ninjaWireExcluded:sourceSnapshot.includes('definition.type==="weapon"')&&sourceSnapshot.includes('definition.equipmentSlot==="weapon"'),
+    noDurabilityUI:!renderSource.toLowerCase().includes("durability")&&!renderSource.toLowerCase().includes("repair")&&!renderSource.toLowerCase().includes("maintenance"),
+    separateIdenticalInstances:sourceSnapshot.includes("inventoryEntries:entries")&&sourceSnapshot.includes("instanceId:item.instanceId")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
 // =========================================================
 // BRICK 851 — ALPHA EQUIPMENT SEMANTIC REGRESSION LOCK
 // BRICK 852 — GOLDEN EQUIPMENT REGRESSION
@@ -43413,6 +44136,21 @@ function runAlphaPost853MonsterDiagnostics() {
   };
   const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-853 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+
+// =========================================================
+// BRICK 866 — POST-KISŌGAN / EQUIPMENT-UI GOLDEN GATE
+// =========================================================
+function runAlphaPost866MonsterDiagnostics() {
+  const groups={
+    post853:runAlphaPost853MonsterDiagnostics(),
+    historyKisogan:runAlphaGoldenHistoryKisoganDiagnostics(),
+    equipmentUI:runCharacterEquipmentSurfaceDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-866 monster gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
 }
 
@@ -66949,7 +67687,10 @@ function createBattleRuntimeState() {
     battleContext: { facts:{}, tags:[], sourceRefs:[] },
     transientStates: [],
     conditions: [],
-    evidence: []
+    evidence: [],
+    // BRICK 858 — observer-relative historical access is a separate runtime surface.
+    historicalReferences: [],
+    historicalTraces: []
   };
 }
 
@@ -66983,6 +67724,8 @@ function ensureBattleRuntimeState() {
   if (!Array.isArray(runtime.transientStates)) runtime.transientStates=[];
   if (!Array.isArray(runtime.conditions)) runtime.conditions=[];
   if (!Array.isArray(runtime.evidence)) runtime.evidence=[];
+  if (!Array.isArray(runtime.historicalReferences)) runtime.historicalReferences=[];
+  if (!Array.isArray(runtime.historicalTraces)) runtime.historicalTraces=[];
   return runtime;
 }
 
@@ -66994,6 +67737,8 @@ function initializeBattleSourcePackageRuntime() {
   runtime.summonActionState = { actorParticipantId:null, summonId:null, mode:"closed" };
   runtime.actionOpportunityState = { counters:{player:{},enemy:{}}, startedTokens:{} };
   runtime.battleContext = { facts:{}, tags:[], sourceRefs:[] };
+  runtime.historicalReferences = [];
+  runtime.historicalTraces = [];
   return runtime;
 }
 
@@ -67052,6 +67797,22 @@ function ensureDedicatedRepresentationLifecycleState(actor) {
   return null;
 }
 
+function initializeBattleKisoganStartsActiveFromDeployment() {
+  if (!currentBattle.active||!currentBattle.deployment) return [];
+  const results=[];
+  ["player","enemy"].forEach(side=>{
+    const slots=currentBattle.deployment[side]&&Array.isArray(currentBattle.deployment[side].slots)?currentBattle.deployment[side].slots:[];
+    slots.forEach(slot=>{
+      if (!slot||!slot.participantId) return;
+      const actor=getBattleParticipantByIdentity(side,slot.participantId);
+      if (!actor) return;
+      const state=initializeAuthoredKisoganStartsActive(actor,side);
+      if (state) results.push({side,participantId:actor.id,stateId:state.stateId});
+    });
+  });
+  return results;
+}
+
 function initializeBattleDedicatedVariantRuntimePackages() {
   if (!currentBattle.active||!currentBattle.deployment||!currentBattle.deployment.player) return [];
   const results=[];
@@ -67093,7 +67854,9 @@ function getBattleRuntimeSaveState() {
     battleContext:runtime.battleContext,
     transientStates:runtime.transientStates,
     conditions:runtime.conditions,
-    evidence:runtime.evidence
+    evidence:runtime.evidence,
+    historicalReferences:runtime.historicalReferences,
+    historicalTraces:runtime.historicalTraces
   });
 }
 
@@ -67118,7 +67881,9 @@ function restoreBattleRuntimeState(rawRuntime) {
     battleContext:rawRuntime.battleContext && typeof rawRuntime.battleContext === "object" ? rawRuntime.battleContext : {facts:{},tags:[],sourceRefs:[]},
     transientStates:Array.isArray(rawRuntime.transientStates) ? rawRuntime.transientStates : [],
     conditions:Array.isArray(rawRuntime.conditions) ? rawRuntime.conditions : [],
-    evidence:Array.isArray(rawRuntime.evidence) ? rawRuntime.evidence : []
+    evidence:Array.isArray(rawRuntime.evidence) ? rawRuntime.evidence : [],
+    historicalReferences:Array.isArray(rawRuntime.historicalReferences) ? rawRuntime.historicalReferences : [],
+    historicalTraces:Array.isArray(rawRuntime.historicalTraces) ? rawRuntime.historicalTraces : []
   };
   const runtime=ensureBattleRuntimeState();
   const hasAnyRemainingPL=Object.keys(runtime.remainingPL.player).length>0 || Object.keys(runtime.remainingPL.enemy).length>0;
@@ -68498,9 +69263,10 @@ function getBattleBlockingConditions(side,participantId,actionClass,actionTraits
   const traits=Array.isArray(actionTraits)?actionTraits:[];
   return runtime.conditions.filter(condition=>{
     if (!condition.targetRef||condition.targetRef.side!==side||condition.targetRef.participantId!==participantId) return false;
+    const universalStun=condition.conditionKey==="stun"||condition.conditionType==="stun";
     const classBlocked=Array.isArray(condition.blockedActionClasses)&&condition.blockedActionClasses.includes(actionClass);
     const traitBlocked=Array.isArray(condition.blockedActionTraits)&&condition.blockedActionTraits.some(blockedTrait=>traits.includes(blockedTrait));
-    return classBlocked||traitBlocked;
+    return universalStun||classBlocked||traitBlocked;
   });
 }
 
@@ -69626,6 +70392,8 @@ function recordBattleEvidence(definition) {
     stateRefs:Array.isArray(definition.stateRefs)?[...definition.stateRefs]:[],
     conditionRefs:Array.isArray(definition.conditionRefs)?[...definition.conditionRefs]:[],
     observerRefs:normalizeBattleEvidenceObserverRefs(definition.observerRefs),
+    // Machine-visible Battle evidence is not automatically finalized Chronicle history.
+    committedOccurrence:definition.committedOccurrence===true,
     data:definition.data?cloneBattleRuntimeValue(definition.data):{},
     createdAt:Date.now()
   };
@@ -70839,7 +71607,7 @@ function attemptBattleSummonSkill(skillId,options={}) {
   } finally {
     returnBattleAttachedSummon("player",actor.id);
   }
-  recordBattleEvidence({eventType:"summon_skill_resolved_and_returned",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,
+  recordBattleEvidence({eventType:"summon_skill_resolved_and_returned",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,
     stateRefs:resolution&&resolution.stateRefs?resolution.stateRefs:[],conditionRefs:resolution&&resolution.conditionRefs?resolution.conditionRefs:[],
     data:{summonId:skill.sourceEntityId,entityActionOwnerId:skill.sourceEntityId,summonerOrControllerId:actor.id,returnedState:"attached",resolved:!!(resolution&&resolution.resolved),entityPLTransfer:false,identityMerge:false}});
   if (resolution&&resolution.resolved) consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_summon_skill_completed");
@@ -80070,7 +80838,7 @@ function attemptClosureWaveBattleSkill(skillId,targetParticipantId=null,options=
   const narutoV2Instability=advanceNarutoV2InstabilityAfterCompletedSkill(actor,skill,envelope,resolution,options||{});
   let baryonContactErosion=null;
   if(resolution&&resolution.resolved===true&&skill.contactErosion&&skill.contactErosion.eligible===true&&options&&options.qualifyingContact===true&&target&&targetSide==="enemy") baryonContactErosion=recordBaryonContactErosionOccurrence({actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,actionId:envelope.actionId,skillId:skill.id,qualifyingContactConfirmed:true});
-  recordBattleEvidence({eventType:"skill_action_completed",actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:resolution.stateRefs||[],conditionRefs:resolution.conditionRefs||[],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0,sourceIdentityMerge:false,entityPLTransfer:false}});
+  recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:resolution.stateRefs||[],conditionRefs:resolution.conditionRefs||[],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0,sourceIdentityMerge:false,entityPLTransfer:false}});
   if (resolution.resolved===true) consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_action_completed");
   saveTestState();
   if (!currentBattle.battleOver) openOverlay("combat");
@@ -80427,6 +81195,7 @@ function executeEnemyAuthoredActionOpportunity() {
   const resolved=!!(resolution&&resolution.resolved===true);
   recordBattleEvidence({
     eventType:"enemy_authored_action_completed",
+    committedOccurrence:true,
     actionId:envelope.actionId,
     actorRef:envelope.actorRef,
     targetRef:envelope.targetRef,
@@ -80731,6 +81500,9 @@ function attemptAcademyBattleSkill(
 
     eventType:
       "skill_action_completed",
+
+    committedOccurrence:
+      true,
 
     actionId:
       envelope.actionId,
