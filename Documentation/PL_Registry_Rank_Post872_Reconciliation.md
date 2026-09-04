@@ -31,7 +31,7 @@ No Base, Current, or Effective PL/Stat recalibration follows.
 
 ---
 
-## 2. FIELD READINESS ASSESSMENT — Rank resolver already CLOSED
+## 2. FIELD READINESS ASSESSMENT — Rank resolver CLOSED
 
 Stable assessment ID:
 
@@ -119,7 +119,7 @@ Preserve:
 
 ---
 
-## 3. FIELD READINESS ASSESSMENT — Combat evidence consumer contract
+## 3. FIELD READINESS ASSESSMENT — Combat evidence consumer contract CLOSED
 
 Combat owns Battle/opposition evidence only. Rank consumes it together with non-Battle evidence.
 
@@ -159,26 +159,27 @@ Where the sealed dispatch participates in Battle context, Combat may consume aut
 
 ---
 
-## 4. Special Jōnin — catalogue still OPEN, implementation gap confirmed
+## 4. Special Jōnin — Alpha production catalogue CLOSED; Coding load pending
 
-Coding confirms:
+The generic evidence-based evaluator is already implemented and accepted.
 
-`SPECIAL_JONIN_QUALIFICATION_DEFINITIONS = {}`
+Current Alpha production authority is now deliberately:
 
-while the generic evaluator exists.
+- **11 families / 33 qualification paths**;
+- based on the exactly recovered historical catalogue material;
+- encoded as current production authority in `Documentation/Rank/Special Jonin Alpha Production Catalogue.md`.
 
-Registry status remains:
+Preserve separately:
 
-- generic evidence-based evaluator — **implemented/accepted**;
-- production qualification catalogue — **not yet closed/loaded**;
-- historical exact recovery — **11 families / 33 named paths**;
-- older historical architecture claim — **13 families / 39 paths**;
-- exact remaining historical two families/six paths — **not recovered**;
-- Escort / Protective Detail — **restored direction, final catalogue position still open**.
+- **13 families / 39 paths** = historical aggregate genealogy only;
+- **2 historical families / 6 paths** = unrecovered archaeology gap;
+- those missing six are not to be fabricated as recovery.
 
-Do not manufacture a full 13/39 catalogue from memory or enemy-card concepts.
+Escort / Protective Detail remains ratified specialist semantics but is **POST-ALPHA / DEFERRED from the executable Alpha qualification catalogue** because its exact historical catalogue placement was not recoverable.
 
-Do not derive qualification paths from qualification enemies.
+Coding still needs to populate the existing declarative `SPECIAL_JONIN_QUALIFICATION_DEFINITIONS` registry with the exact 33 Alpha definitions and extend regression coverage.
+
+Qualification success remains separate from formal Rank. A separately committed institutional `special_jonin_recognition` occurrence owns any legitimate `chunin → special_jonin` formal-rank transition.
 
 Preserve:
 
@@ -186,42 +187,80 @@ Preserve:
 
 **Stats ≠ automatic qualification**
 
-**qualification ≠ Rank ≠ appointment ≠ department ≠ clearance ≠ assignment**
+**qualification ≠ Recognition ≠ Rank ≠ appointment ≠ department ≠ clearance ≠ assignment ≠ active practice**
 
 **personal performance ≠ protective performance**
 
-The `special_jonin → jonin` ordering found under `SHINOBI_DIFFICULTIES` is difficulty/presentation ordering and does not by itself justify a formal-rank topology patch. Formal rank progression remains separately stored and adjudicated.
+**difficulty ordering ≠ formal rank topology**
+
+The `special_jonin → jonin` ordering under `SHINOBI_DIFFICULTIES` does not justify a formal-rank topology patch.
 
 ---
 
-## 5. Battle Portrait authority — still awaiting Assets manifest
+## 5. Battle Portrait authority — Assets CLOSED + Registry RATIFIED; Coding/QA pending
 
-Registry contract remains:
+Character Creation / Assets has completed the full production portrait authority:
 
-`Registry representation ID → approved square uiPortrait → exact repository path`
+**102 Registry production IDs → 102 unique approved `uiPortrait` paths**
+
+Authoritative Assets manifest:
+
+`Documentation/Assets/Battle Portrait Authority and Manifest.md`
+
+Registry has ratified that exact 102-row projection without normalising filenames or deriving paths from IDs.
+
+Registry ratification:
+
+`Documentation/Assets/Battle Portrait Registry Ratification.md`
 
 Preserve:
 
-**collectible Character Card ≠ Battle Portrait**
+**collectible Character Card ≠ `uiPortrait` ≠ battlefield representation**
 
 **Registry identity ≠ asset filename**
 
-Coding must not fabricate `Assets/Portraits/...` paths, crop collectible cards, or permanently substitute generic participant image data.
+**physical file presence ≠ Assets approval**
 
-Registry cannot publish a trustworthy 102-wide portrait mapping until Character Creation / Assets supplies the approved portrait manifest.
+**Assets approval ≠ Registry ratification ≠ Coding implementation**
 
-Once supplied, Coding should wire one dedicated `uiPortrait` resolver for Battle / Stage / Arena consumers.
+Coding may now wire one dedicated `Registry representation ID → uiPortrait` resolver for Battle / Stage / Arena / Tournament consumers using the exact ratified manifest.
+
+Coding must not:
+
+- derive portrait paths heuristically from Registry IDs;
+- crop collectible cards into permanent portraits;
+- silently substitute generic participant images;
+- silently choose another portrait if binary QA fails.
+
+Fresh current-repository QA remains required before Alpha freeze:
+
+- all 102 expected paths exist;
+- all PNGs decode;
+- each is exactly 1024×1024;
+- all 102 expected Registry IDs resolve exactly once;
+- no duplicate Registry ID;
+- no duplicate approved path;
+- no silent fallback/substitution.
+
+A bad file is an explicit Assets repair/supersession problem, not a mapping-selection question.
 
 ---
 
-## 6. Freeze status
+## 6. Freeze status — refreshed after downstream closures
 
-The immediate design questions in this addendum are resolved as follows:
+Current status:
 
-- Legacy Battle-entry capacity classification — **CLOSED: retired except standard baseline; runtime cleanup still required**.
-- Field Readiness Rank interpretation — **CLOSED**.
-- Field Readiness Combat evidence contract — **CLOSED upstream and accepted as consumer evidence**.
-- Special Jōnin catalogue — **OPEN**.
-- Battle Portrait manifest — **OPEN pending Assets/Character Creation**.
+- Legacy Battle-entry capacity classification — **CLOSED: retired except standard baseline; Coding cleanup still required**.
+- Field Readiness Writing/Rank/Combat semantics — **CLOSED**.
+- Field Readiness backend — **Coding-reported implemented; field/UI orchestration + Golden proof still pending**.
+- Special Jōnin generic evaluator — **CLOSED / implemented**.
+- Special Jōnin Alpha catalogue — **CLOSED at 11 families / 33 paths; Coding population/regression pending**.
+- Historical 13/39 claim — **genealogy only, not current executable catalogue authority**.
+- Escort / Protective Detail — **ratified semantics; post-Alpha/deferred from executable Alpha catalogue**.
+- Battle Portrait Assets manifest — **CLOSED 102/102**.
+- Battle Portrait Registry ratification — **CLOSED 102/102**.
+- Battle Portrait resolver — **Coding implementation pending**.
+- Portrait binary dimension/corruption QA — **pending Coding/CI**.
+- Special Jōnin formal-rank topology patch — **not authorised / not justified by difficulty ordering**.
 
-No PL recalibration follows from the first three closure items.
+No PL recalibration follows from these closures.

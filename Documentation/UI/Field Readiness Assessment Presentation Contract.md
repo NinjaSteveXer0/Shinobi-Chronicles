@@ -2,7 +2,7 @@
 
 Date: 4 September 2026
 
-Status: **BINDING ALPHA UI PRESENTATION CONTRACT — PRODUCTION SEMANTICS CLOSED / RUNTIME IMPLEMENTATION + VALIDATION SEPARATE**
+Status: **BINDING ALPHA UI PRESENTATION CONTRACT — PRODUCTION SEMANTICS CLOSED / BACKEND CONTRACT CODING-REPORTED IMPLEMENTED AT BRICK 878 / FIELD ORCHESTRATION + UI + GOLDEN VALIDATION REMAIN**
 
 ---
 
@@ -14,9 +14,31 @@ Current Rank/Registry + Combat production authority lives in the Chronicle Engin
 
 The Bible contract is semantically closed.
 
-> **Bible closed ≠ runtime implemented/validated.**
+> **Bible closed ≠ source patched ≠ runtime Golden.**
 
 UI consumes that contract; it does not create a second Promotion resolver.
+
+---
+
+# Current implementation status
+
+Coding has reported the backend assessment/evidence/result contract implemented at **Brick 878**.
+
+This status is recorded as a Coding report, not as an independent UI source audit of every runtime path.
+
+Therefore the current remaining Alpha work is not another Rank or Combat adjudication pass. It is:
+
+- actual field/map/story orchestration for the assessment;
+- controlled assessment content/opposition where authored;
+- player-facing mission/evidence/result presentation;
+- end-to-end runtime validation;
+- SC-specific Golden regression.
+
+Canonical boundary:
+
+> **Combat authority closed ≠ Coding implemented ≠ field orchestration complete ≠ UI integrated ≠ Golden Regression passed.**
+
+Do not reopen Rank/Combat criteria merely because those later integration stages remain incomplete.
 
 ---
 

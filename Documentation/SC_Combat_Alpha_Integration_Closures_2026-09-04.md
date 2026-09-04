@@ -130,7 +130,9 @@ Current Alpha status:
 
 The five non-Cataclysm mappings are **not superseded as names/history** and are not declared permanently non-mechanical. Their older or future effect concepts are simply not current Alpha execution authority. Do not invent effects from the names.
 
-Preserve successful qualifying Gate order ≠ button/input order; hidden possible Sequence Art ≠ discovered Knowledge ≠ executable access.
+This Alpha scope **supersedes any earlier Coding/Combat instruction to implement all six Sequence-Art payoff mechanics for Alpha**. Alpha runtime may preserve successful sequence occurrence/history/Knowledge for all six, but executable access/effect exists only for `3>2>1` Ruined Gate Cataclysm. Future mechanics for the other five require fresh owning-authority ratification.
+
+Preserve successful qualifying Gate order ≠ button/input order; hidden possible Sequence Art ≠ discovered Knowledge ≠ executable access; sequence/history canon ≠ current executable action catalogue.
 
 ## 4. Field Readiness Assessment — Combat boundary
 
@@ -231,3 +233,62 @@ Preserve:
 - objective protection evidence ≠ Escort Special Jonin qualification automatically;
 - personal/offensive performance ≠ protective performance;
 - one assessment ≠ one deterministic Chronicle history.
+
+## 5. Menma Test Subject numerical closure — PL / Registry authority
+
+PL/Registry numerical calibration is now complete. Combat consumes these numbers without changing the already-locked semantic packages.
+
+### `test_subject_altered_shinobi`
+
+Stats, in canonical seven-stat order:
+
+`12 / 11 / 10 / 5 / 5 / 6 / 11`
+
+Base PL: **11**
+
+Exact Alpha Action numerics:
+
+- `test_subject_altered_shinobi_shinobi_strike` — **5 Attack PL**
+- `test_subject_altered_shinobi_shuriken_cast` — **4 Attack PL**
+- `test_subject_altered_shinobi_unstable_chakra_burst` — **6 Attack PL**
+
+This is Menma's direct tutorial opponent.
+
+### `test_subject_brute`
+
+Stats:
+
+`6 / 14 / 8 / 4 / 5 / 4 / 14`
+
+Base PL: **13**
+
+Exact Action numerics:
+
+- `test_subject_brute_heavy_swing` — **7 Attack PL**
+- `test_subject_brute_body_rush` — **6 Attack PL**
+- `test_subject_brute_crushing_clinch` — no Attack PL; use the existing `physical_restraint` lifecycle and resolve any required control contest from legitimate live Effective Taijutsu. No independent hidden restraint scalar.
+
+### `test_subject_unstable`
+
+Stats:
+
+`13 / 10 / 6 / 4 / 6 / 4 / 12`
+
+Base PL: **12**
+
+Exact Action numerics:
+
+- `test_subject_unstable_frantic_rush` — **5 Attack PL**
+- `test_subject_unstable_chakra_spasm` — **6 Attack PL**
+- `test_subject_unstable_panicked_burst` — **7 Attack PL**
+
+These three Test Subject opposition identities remain outside the 102 collectible Character/Entity production gate.
+
+Preserve:
+
+- PL numerics ≠ Combat semantic ownership;
+- opposition identity ≠ collectible production-gate membership;
+- occurrence participation ≠ Battle-instance participation;
+- Menma directly fights only `test_subject_altered_shinobi` in the locked tutorial Battle;
+- `performanceBucket` is not a Remaining-Battle-PL bucket;
+- implementation must not reopen identity, choreography, participant membership, observer semantics, or performance semantics.
