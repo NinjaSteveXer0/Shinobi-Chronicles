@@ -1,9 +1,9 @@
 # Shinobi Chronicles — Awaiting Placement Pairing and Bond Clarifications
 
-**Status:** Registry / PL supersession addendum  
+**Status:** Registry / PL / Acquisition implementation authority  
 **Date:** 2026-09-04
 
-This addendum supersedes the relevant Kiba, Hinata, Sumire/Nue, and Kakuzu notes in `Documentation/Registry/Awaiting Placement Expansion - Ten Ninja and Nue.md`.
+This addendum supersedes the relevant Kiba, Hinata, Sumire/Nue, and Kakuzu notes in `Documentation/Registry/Awaiting Placement Expansion - Ten Ninja and Nue.md` and incorporates the later Combat/Registry/PL pairing implementation lock.
 
 Canonical Stat order remains:
 
@@ -15,23 +15,28 @@ Formula v1.0 remains unchanged. No hidden direct PL bonus is introduced.
 
 ## 1. `sj_kiba` — Kiba + Akamaru integrated pair
 
+The authoritative Registry ID is exactly:
+
+`sj_kiba`
+
+Do not create aliases such as `s_jkiba` from prose/display wording.
+
 Kiba + Akamaru use the same integrated-pair architecture previously established for tightly linked pairs such as Sakon/Ukon:
 
 - one selectable collectible representation: `sj_kiba`;
 - one deployment/team position;
 - two underlying causal/participant identities: Kiba and Akamaru;
-- no separate Akamaru collectible card is required for Alpha;
+- no separate Akamaru collectible requirement for Alpha;
 - Akamaru is not a Summon and not a Hosted Entity;
 - Akamaru does not consume a second team/deployment slot;
+- Akamaru does not receive an independent Battle turn or independent Battle-PL pool;
 - paired actions may preserve Kiba/Akamaru source attribution without splitting the playable representation.
 
 ### Composite PL rule
 
-The pair does **not** receive an additive `Kiba PL + Akamaru PL` value and does not receive a hidden `+10` friendship/companion bonus.
+The pair does **not** receive an additive `Kiba PL + Akamaru PL` value and does not receive a hidden friendship/companion bonus.
 
-Instead, `sj_kiba` has authored **composite Base Stats/Base PL** representing the balanced fighting capability of Kiba + Akamaru as one integrated playable unit.
-
-This supersedes the provisional PL58 calibration.
+`sj_kiba` has authored **composite Base Stats/Base PL** representing the fighting capability of Kiba + Akamaru as one integrated playable unit.
 
 Final `sj_kiba` Base Stats:
 
@@ -41,21 +46,31 @@ Final Base PL:
 
 **64**
 
-The increase is embodied in the pair's Base Stats, primarily Taijutsu, Bukijutsu, and Stamina, rather than a post-formula bonus.
+This supersedes the provisional PL58 calibration.
+
+The increase is embodied in the pair's Base Stats rather than a post-formula bonus.
 
 If a future mechanic separates, incapacitates, or removes one member of the pair, that may project a source-owned Effective/Battle-state change. It must not rewrite the canonical composite Base PL.
 
-Stable underlying source/participant identity `akamaru` may be used for causality/history/action attribution without registering Akamaru as a separate collectible Character/Entity.
+Stable underlying source/participant identity:
+
+`akamaru`
+
+may be used for causality/history/action attribution without registering Akamaru as a separate collectible Character/Entity.
+
+Preserve:
+
+**integrated representation ≠ erased causal participant**
+
+**causal source ≠ independent turn**
+
+**one-slot composite PL ≠ additive participant PL**
 
 ---
 
 ## 2. `sannin_hinata` — Road-to-Ninja alternate growth authority
 
-The `sannin_hinata` representation is deliberately an extremely developed alternate Hinata using the Road-to-Ninja identity/direction, not merely canon Hinata with a Sannin title applied.
-
-She is intended to be **massively more developed than ordinary/canon Hinata**.
-
-This supersedes the provisional PL94 calibration.
+The `sannin_hinata` representation is deliberately an extremely developed Road-to-Ninja alternate-growth Hinata, not canon Hinata with a Sannin title applied.
 
 Final Base Stats:
 
@@ -64,6 +79,10 @@ Final Base Stats:
 Final Base PL:
 
 **110**
+
+This supersedes PL94 completely. Do not retain, layer, project, or reapply the old PL94 state underneath the final calibration.
+
+No additional alternate-growth runtime modifier is implied.
 
 Core emphasis:
 
@@ -78,27 +97,36 @@ Existing prepared Skill palette remains valid for Combat closure unless Combat i
 
 ---
 
-## 3. `sannin_sumire` + `nue` — intrinsic starting bond, separate identities
+## 3. `sannin_sumire` + `nue` — intrinsic paired acquisition, independent Summon lifecycle
 
 Sumire and Nue are intrinsically linked and begin a newly instantiated Chronicle together for this representation.
 
-They are **not** given a friendship `+10`, relationship PL bonus, or hidden Stat package merely for being bonded.
+They do **not** receive a friendship bonus, relationship PL bonus, or hidden Stat package merely for being bonded.
 
-### Acquisition / attachment contract
+### Acquisition transaction — binding Alpha contract
 
-Acquiring/instantiating `sannin_sumire` must also ensure legitimate access to and ownership/availability of the stable Entity/Summon identity:
+Acquiring/instantiating:
+
+`sannin_sumire`
+
+must idempotently ensure the stable Entity/Summon identity:
 
 `nue`
 
-Nue is automatically **equipped/attached to Sumire by default** for this representation.
+is owned/available exactly once and default-attached/equipped to Sumire.
 
-If `nue` is already owned, the transaction must not duplicate the Entity; it should establish/reaffirm the legitimate Sumire↔Nue attachment/access relation.
+Required transaction semantics:
+
+1. acquire/instantiate `sannin_sumire` through its legitimate route;
+2. query authoritative ownership for `nue` by stable Registry identity;
+3. if `nue` is absent, acquire/ensure `nue` exactly once;
+4. if `nue` already exists, reuse that exact existing identity and do not create a duplicate;
+5. establish/reaffirm the legitimate Sumire↔Nue default attachment/access relation;
+6. persist the transaction atomically enough that retry/load recovery cannot mint duplicate Nue identities.
 
 Their starting bond is authored initial provenance/current relationship state. It does not require replaying or fabricating source-era Chronicle events in Active Konoha history.
 
 ### Separate PL / lifecycle
-
-`nue` remains a separate calibrated Entity/Summon with its own Base Stats, Base PL, Battle PL, actions, manifestation/deployment state, and source provenance.
 
 Sumire remains:
 
@@ -108,33 +136,51 @@ Nue remains:
 
 `92 / 98 / 60 / 55 / 96 / 65 / 105` — Base PL **100**
 
-Do **not** add Nue's PL to Sumire's PL and do not project Nue's Stats wholesale onto Sumire.
+Do **not**:
+
+- add Nue's PL to Sumire's PL;
+- calculate Sumire + Nue as Sumire Effective/Battle PL;
+- project Nue's Stats wholesale onto Sumire;
+- create a relationship/bond PL bonus;
+- duplicate Nue because a second acquisition route refers to the same Entity.
 
 The similarity to Kiba/Akamaru is the intrinsic bond and starting-together authority. The ontology differs:
 
 - Kiba/Akamaru = one integrated collectible representation / one deployment position / composite PL;
-- Sumire/Nue = two stable Registry identities, with Nue automatically acquired/equipped/attached to Sumire, while Nue retains independent Entity/Summon PL and lifecycle.
+- Sumire/Nue = two stable Registry identities; paired acquisition/default attachment; Nue retains independent Summon/Entity PL and lifecycle.
 
 Nue may later be legitimately usable with other characters if future Acquisition/Summon/relationship authority permits it. Sumire's intrinsic bond does not make Nue ontologically exclusive to her.
 
-Automatic equipment/attachment does **not** necessarily mean Nue begins every Battle already manifested on the field. Exact Battle manifestation timing remains Summon/Combat authority unless separately authored.
+Default attachment means Sumire begins with Nue associated/available through the authorised Summon relationship. It does **not** necessarily mean Nue begins every Battle already manifested. Exact Battle manifestation/action-opportunity semantics remain Combat/Summon authority.
+
+Preserve:
+
+**paired acquisition ≠ merged identity**
+
+**default attachment ≠ automatic manifestation**
+
+**relationship ≠ PL transfer**
+
+**ownership ≠ duplicate instantiation**
 
 ---
 
 ## 4. `akatsuki_kakuzu` — Alpha mask scope simplified
 
-For Alpha, Kakuzu's masks are used as **embedded elemental attack sources/presentation** only.
+For Alpha, Kakuzu's masks are **embedded elemental attack sources/presentation only**.
 
-Do not build a separate mask/heart participant lifecycle for Alpha.
+Do not implement:
 
-Specifically:
+- autonomous mask participants;
+- mask turns;
+- separate mask PL;
+- separate heart PL;
+- mask/heart destruction tracking;
+- per-mask Battle defeat;
+- elemental-access loss from mask destruction;
+- hidden additive PL from masks/hearts.
 
-- masks are not separate collectible Entities;
-- masks do not consume Battle/team slots;
-- no per-mask Battle PL ledger is required;
-- no per-heart destruction/survival system is required for Alpha;
-- no mask destruction → elemental access gating is required for Alpha;
-- the masks simply source/present Kakuzu's authored elemental attacks where appropriate.
+Authored Actions may identify a particular mask/source for provenance or presentation. That does **not** make the mask an independent Battle participant.
 
 `earth_grudge_fear` / stitched thread-body provenance remains intrinsic to `akatsuki_kakuzu`.
 
@@ -146,17 +192,55 @@ The existing prepared palette remains:
 - `akatsuki_kakuzu_lightning_style_false_darkness`
 - `akatsuki_kakuzu_fire_style_searing_migraine`
 
-Any deeper mask/heart destruction lifecycle is POST-ALPHA and requires fresh Combat/Registry ratification.
+Any deeper mask/heart destruction lifecycle is **POST-ALPHA / DEFERRED** and requires fresh owning-authority ratification.
 
 ---
 
-## 5. Downstream handoff corrections
+## 5. Alpha bonded-companion pattern taxonomy
 
-Combat should consume these supersessions:
+Alpha explicitly supports two different bonded-companion patterns:
 
-- `sj_kiba` PL64 composite integrated pair; no separate Akamaru card/PL required;
-- `sannin_hinata` PL110 Road-to-Ninja alternate-growth representation;
-- Sumire/Nue intrinsic acquisition + default attachment, but separate PL/lifecycle;
-- Kakuzu masks elemental-source-only for Alpha; no mask/heart subsystem.
+### A. Integrated one-slot representation
 
-Coding/Acquisition should not admit or implement the awaiting-placement records until Combat semantic closure is returned, but the above identity/PL/acquisition boundaries are now authoritative.
+Kiba + Akamaru
+
+→ one deployable Character  
+→ one authored composite Base Stats/PL package  
+→ causally addressable companion inside that representation.
+
+### B. Paired acquisition + independent Summon
+
+Sumire + Nue
+
+→ Character acquisition guarantees associated Entity availability  
+→ Entity remains independently identified/calibrated  
+→ default attachment is authored  
+→ actual manifestation remains governed by Summon/Combat mechanics.
+
+Do **not** generalise either pattern to every animal companion, partner, Hosted Entity, bound source, or Summon without explicit authority.
+
+---
+
+## 6. Coding implementation handoff
+
+Coding should implement only after consuming the final Combat semantic closure for the awaiting-placement wave.
+
+Required implementation tests include:
+
+- exact Registry ID is `sj_kiba`; no `s_jkiba` alias;
+- acquiring/deploying `sj_kiba` creates one playable participant/slot and one composite PL64 ledger;
+- Akamaru may appear as causal source without independent turn/PL/collectible requirement;
+- `sannin_hinata` resolves PL110 only, with no stale PL94 stacking;
+- acquiring `sannin_sumire` idempotently ensures/reuses one `nue` identity and establishes default attachment;
+- repeated Sumire acquisition/load retry cannot duplicate Nue;
+- Nue PL100 never transfers to Sumire PL93;
+- default attachment does not automatically bypass Summon manifestation rules;
+- Kakuzu masks cannot become autonomous Alpha participants or PL ledgers.
+
+Durable Combat provenance for this lock is recorded separately in:
+
+`Documentation/SC_Combat_Pairing_Bond_Corrections_2026-09-04.md`
+
+Combat commit:
+
+`14a11d3ded878c2459c51e330adaf826174532f1`
