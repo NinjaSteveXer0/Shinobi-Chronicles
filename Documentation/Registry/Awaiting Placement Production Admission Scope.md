@@ -5,7 +5,13 @@
 
 This document is the current Registry production-admission authority for the Post-899 awaiting-placement work.
 
-It supersedes the temporary five-identity Option A admission revision.
+It supersedes the temporary five-identity Option A admission revision and all earlier conflicting admission-count revisions of this document.
+
+The former five-ID / 107-target Registry revision at commit:
+
+`cc3fb1a52250f18dc0f311a984fddd7f41253f58`
+
+is **EXPLICITLY SUPERSEDED** for production-admission scope. It remains historical provenance only and must not be consumed by Coding, Assets, Combat, CI, or Registry as current admission authority.
 
 The controlling Assets authority is:
 
@@ -14,6 +20,14 @@ The controlling Assets authority is:
 Assets commit:
 
 `0974c368641c620915ac244c3894fea10166d191`
+
+The accepted Combat reconciliation is:
+
+`Documentation/SC_Combat_Awaiting_Placement_Admission_Scope_Reconciliation_2026-09-04.md`
+
+Combat commit:
+
+`ef49d3bbdf80f40257061f267ec37cd229e83649`
 
 ---
 
@@ -191,7 +205,7 @@ Combat commit:
 
 `fc2bca7177fdcb2815e7d9b5e3f04bfdd3404f99`
 
-Combat closure does **not** change production-admission scope. Combat's document notes that the broader mechanically calibrated awaiting-placement universe would total 13 Characters + `nue`, producing a hypothetical 116 gate if all fourteen were admitted. That is not production-admission authority.
+Combat closure does **not** change production-admission scope. Combat's earlier Himawari document notes that the broader mechanically calibrated awaiting-placement universe would total 13 Characters + `nue`, producing a hypothetical 116 gate if all fourteen were admitted. That is not production-admission authority.
 
 The controlling Assets scope explicitly defines the current production-admission package as the twelve Characters in section 1 plus `nue`.
 
@@ -207,11 +221,44 @@ Thus:
 
 **deferred ≠ deleted/superseded**
 
-If Registry + Assets later explicitly add Himawari to this package, the prospective full-package gate would become **98 Characters + 18 Entities = 116**. Until such an authority change occurs, 115 remains the defined eventual gate for the current package.
+If Registry + Assets later explicitly add Himawari in addition to the complete 115 package, the resulting production count becomes:
+
+**98 Characters + 18 Entities = 116.**
+
+Until such an authority change occurs, 115 remains the defined eventual gate for the current package.
 
 ---
 
-## 7. Current status
+## 7. Final archaeology closure
+
+Registry accepts Combat reconciliation commit:
+
+`ef49d3bbdf80f40257061f267ec37cd229e83649`
+
+as consistent with this authority.
+
+The release-facing truth is now exactly:
+
+- **live gate now:** `85 Characters + 17 Entities = 102`;
+- **selected future batch:** the exact 12 Characters listed above + `nue`;
+- **target after complete future batch admission:** `97 Characters + 18 Entities = 115`;
+- **partial five-ID / 107 admission:** explicitly superseded and not authorised;
+- **`kurama_resonance_himawari`:** separate awaiting-placement identity with closed PL/Combat semantics, not an implicit member of the 115 package;
+- **possible later total if Himawari is separately admitted after/beside the 115 package:** `98 Characters + 18 Entities = 116`.
+
+Preserve:
+
+**Assets-selected scope ≠ automatic live admission**
+
+**Combat closure ≠ roster-count authority**
+
+**future 115 ≠ current live 102**
+
+**Himawari ≠ implicit member of the 115 package**
+
+---
+
+## 8. Current status
 
 - Pairing/bond semantics: **CLOSED**
 - Kurama Resonance Himawari Combat semantics: **CLOSED**
