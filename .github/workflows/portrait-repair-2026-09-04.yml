@@ -1,0 +1,185 @@
+name: One-time Battle Portrait Asset Repair 2026-09-04
+
+on:
+  push:
+    branches:
+      - assets/portrait-binary-repair-2026-09-04
+    paths:
+      - '.github/workflows/portrait-repair-2026-09-04.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  repair:
+    if: github.event.head_commit.message == 'Add one-time Battle portrait asset repair'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Repair approved portrait bytes in place
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+          import subprocess, tempfile
+
+          resize_targets = [
+              Path('Assets/Portraits/Academy Student/academy_student_iwabe.png'),
+              Path('Assets/Portraits/Academy Student/academy_student_kakashi.png'),
+              Path('Assets/Portraits/Academy Student/academy_student_kurenai.png'),
+              Path('Assets/Portraits/Academy Student/academy_student_metal.png'),
+              Path('Assets/Portraits/Academy Student/academy_student_obito.png'),
+          ]
+
+          for path in resize_targets:
+              with Image.open(path) as im:
+                  im.load()
+                  if im.size != (1254, 1254):
+                      raise SystemExit(f'Refusing unexpected resize source for {path}: {im.size}')
+                  repaired = im.resize((1024, 1024), Image.Resampling.LANCZOS)
+                  repaired.save(path, format='PNG')
+                  repaired.close()
+              with Image.open(path) as check:
+                  check.load()
+                  if check.size != (1024, 1024):
+                      raise SystemExit(f'Resize verification failed for {path}: {check.size}')
+              print(f'REPAIRED dimensions: {path}')
+
+          corrupt_path = Path('Assets/Portraits/Jinchuriki/jshika_ava.png')
+
+          def valid_png_bytes(data: bytes):
+              with tempfile.NamedTemporaryFile(suffix='.png') as tmp:
+                  tmp.write(data)
+                  tmp.flush()
+                  try:
+                      with Image.open(tmp.name) as im:
+                          im.load()
+                          return im.size == (1024, 1024)
+                  except Exception:
+                      return False
+
+          try:
+              with Image.open(corrupt_path) as current:
+                  current.load()
+                  current_valid = current.size == (1024, 1024)
+          except Exception:
+              current_valid = False
+
+          restored_from = None
+          if not current_valid:
+              history = subprocess.check_output(
+                  ['git', 'log', '--format=%H', '--follow', '--', str(corrupt_path)],
+                  text=True,
+              ).splitlines()
+              for commit in history:
+                  try:
+                      data = subprocess.check_output(['git', 'show', f'{commit}:{corrupt_path}'])
+                  except subprocess.CalledProcessError:
+                      continue
+                  if valid_png_bytes(data):
+                      corrupt_path.write_bytes(data)
+                      restored_from = commit
+                      break
+              if restored_from is None:
+                  raise SystemExit('No prior decodable 1024x1024 jshika_ava.png revision could be recovered')
+
+          with Image.open(corrupt_path) as check:
+              check.load()
+              if check.size != (1024, 1024):
+                  raise SystemExit(f'Restored jshika_ava.png has wrong dimensions: {check.size}')
+
+          if restored_from:
+              Path('/tmp/jshika_restore_source.txt').write_text(restored_from, encoding='utf-8')
+              print(f'REPAIRED corruption: {corrupt_path} restored from {restored_from}')
+          else:
+              Path('/tmp/jshika_restore_source.txt').write_text('current-bytes-already-valid', encoding='utf-8')
+              print(f'No corruption repair required: {corrupt_path}')
+          PY
+
+      - name: Run canonical 102-portrait QA
+        run: python tools/qa_battle_portraits.py
+
+      - name: Write durable PASS report
+        shell: bash
+        run: |
+          RESTORE_SOURCE="$(cat /tmp/jshika_restore_source.txt)"
+          cat > 'Documentation/Assets/Battle Portrait Binary QA - 2026-09-04.md' <<EOF
+          # Shinobi Chronicles — Battle Portrait Binary QA — 2026-09-04
+
+          **Status:** CHARACTER CREATION / ASSETS REPAIR + CODING / CI QA — PASS  
+          **Authority preserved:** 102/102 Registry → \`uiPortrait\` mappings remain unchanged and ratified.
+
+          The earlier fresh binary QA failure was repaired in place under Assets authority and the canonical repository QA was rerun using:
+
+          - \`tools/qa_battle_portraits.py\`
+          - the existing 102-row approved Assets manifest;
+          - the existing Registry ratification.
+
+          ## Repairs applied
+
+          Five approved Academy portraits were resampled from **1254 × 1254** to the required **1024 × 1024** at their existing approved paths using high-quality Lanczos resampling:
+
+          - \`academy_iwabee\` → \`Assets/Portraits/Academy Student/academy_student_iwabe.png\`
+          - \`academy_kakashi\` → \`Assets/Portraits/Academy Student/academy_student_kakashi.png\`
+          - \`academy_kurenai\` → \`Assets/Portraits/Academy Student/academy_student_kurenai.png\`
+          - \`academy_metal_lee\` → \`Assets/Portraits/Academy Student/academy_student_metal.png\`
+          - \`academy_obito\` → \`Assets/Portraits/Academy Student/academy_student_obito.png\`
+
+          The approved \`shikamaru_avatar_yang\` path remained unchanged:
+
+          - \`Assets/Portraits/Jinchuriki/jshika_ava.png\`
+
+          Its corrupt/truncated bytes were repaired by restoring the nearest prior decodable **1024 × 1024** revision of that same approved path from Git history.
+
+          Restore source commit:
+
+          \`$RESTORE_SOURCE\`
+
+          This is an in-place asset repair, not a Registry remap and not a portrait substitution.
+
+          ## Final QA result
+
+          - manifest rows: **102 / 102**
+          - unique Registry IDs: **102 / 102**
+          - unique approved paths: **102 / 102**
+          - PNG decode: **102 / 102 PASS**
+          - dimensions exactly 1024 × 1024: **102 / 102 PASS**
+          - silent card fallback/substitution: **none authorised**
+
+          Preserve:
+
+          **approved mapping = unchanged**
+
+          **asset repair ≠ Registry identity mutation**
+
+          **asset repair ≠ permission for runtime fallback**
+          EOF
+
+      - name: Commit repaired assets and QA report
+        shell: bash
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add \
+            'Assets/Portraits/Academy Student/academy_student_iwabe.png' \
+            'Assets/Portraits/Academy Student/academy_student_kakashi.png' \
+            'Assets/Portraits/Academy Student/academy_student_kurenai.png' \
+            'Assets/Portraits/Academy Student/academy_student_metal.png' \
+            'Assets/Portraits/Academy Student/academy_student_obito.png' \
+            'Assets/Portraits/Jinchuriki/jshika_ava.png' \
+            'Documentation/Assets/Battle Portrait Binary QA - 2026-09-04.md'
+          git commit -m 'Repair six Battle portrait binary QA failures'
+          git push origin HEAD:assets/portrait-binary-repair-2026-09-04
