@@ -1,9 +1,9 @@
 # Shinobi Chronicles — Awaiting Placement Final Addition: Kurama Resonance Himawari
 
-**Status:** Registry / PL authority; Combat semantic closure and Assets mapping pending  
+**Status:** Registry / PL authority; Combat semantic closure and separate production admission pending  
 **Date:** 2026-09-04
 
-This document adds one final Character representation to the awaiting-placement production wave.
+This document defines one additional calibrated Character representation that was authored after the original 12-Character + Nue awaiting-placement wave.
 
 Canonical Stat order:
 
@@ -25,7 +25,7 @@ Display title:
 
 Classification:
 
-- production Character representation on admission;
+- production Character representation on future admission;
 - dedicated hosted/resonance representation of Himawari;
 - not a separate Kurama collectible;
 - not a Sumire/Nue-style paired acquisition;
@@ -100,7 +100,7 @@ No separate activation action is required merely to turn on Kurama Resonance: th
 
 ## 4. Kurama provenance / hosted-state boundary
 
-The representation's source provenance is Kurama hosted within Himawari. For this Alpha record:
+The representation's source provenance is Kurama hosted within Himawari. For this Alpha-era record:
 
 - do not create a new Summon relationship;
 - do not auto-acquire a separate Kurama card because this Himawari is acquired;
@@ -108,26 +108,40 @@ The representation's source provenance is Kurama hosted within Himawari. For thi
 - do not infer independent Kurama turns or deployment;
 - do not duplicate the state through a runtime Kurama package after loading the dedicated representation.
 
-If a future system authors Kurama as independently manifested from this incarnation, that requires a separate Registry/Combat/CE contract. It is not part of this Alpha card.
+If a future system authors Kurama as independently manifested from this incarnation, that requires a separate Registry/Combat/CE contract. It is not part of this card's current authority.
 
 ---
 
-## 5. Admission count supersession
+## 5. Production-admission boundary — SEPARATELY DEFERRED
 
-Before this final card, the awaiting-placement admission scope contained 12 Characters + `nue`.
+The controlling Character Creation / Assets production-admission ruling defines the current awaiting-placement production wave as:
 
-This card increases the intended complete admission wave to:
+- **12 Characters**
+- **1 Entity/Summon (`nue`)**
 
-- **13 Characters**
-- **1 Entity/Summon** (`nue`)
+with an eventual gate of:
 
-When all awaiting-placement records are actually admitted by Coding, the live collectible production gate becomes:
+**97 Characters + 18 Entities = 115**
 
-**98 Characters + 18 Entities = 116 production identities.**
+`kurama_resonance_himawari` was authored after that original wave and is **not included in the current 115 admission package**.
 
-Until Coding performs that admission, the runtime gate remains 85 Characters + 17 Entities = 102.
+Therefore this Character's existence/calibration does **not** supersede the 115 target and does not change the live gate.
 
-This supersedes the previous planned 115 post-admission count.
+Current live production remains:
+
+**85 Characters + 17 Entities = 102**
+
+This Himawari remains separately awaiting future production admission.
+
+A future admission requires an explicit Registry + Assets decision and must not piggyback on the current 12-Character + Nue wave.
+
+Preserve:
+
+**calibration authority ≠ production admission**
+
+**separate final addition ≠ automatic expansion of an already-scoped admission wave**
+
+**deferred ≠ deleted/superseded**
 
 ---
 
@@ -135,7 +149,7 @@ This supersedes the previous planned 115 post-admission count.
 
 The user supplied the current collectible-card artwork as `kurama_resonance_himawari.png`, but the conversation upload is not repository-path authority.
 
-Character Creation / Assets must supply/commit the exact production mappings:
+Character Creation / Assets must later supply/commit the exact production mappings before this record can be admitted:
 
 `kurama_resonance_himawari → collectibleCard repository path → uiPortrait repository path → ACTIVE`
 
