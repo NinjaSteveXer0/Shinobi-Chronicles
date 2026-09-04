@@ -200,49 +200,96 @@ Preserve:
 
 ---
 
-## 7. Alpha Arena Promotion contract — Rank authority
+## 7. Alpha Arena Promotion — FIELD READINESS ASSESSMENT
 
-The first Alpha promotion lifecycle is Academy → Genin. The same architecture may support later promotions, but later assessments own their own content/requirements.
+Stable assessment ID:
 
-### Availability
+`academy_to_genin_field_readiness_assessment`
+
+Display title:
+
+**FIELD READINESS ASSESSMENT**
+
+Writing-locked formal mission:
+
+**Locate the missing field courier, recover the sealed dispatch, and return it to the examiner.**
+
+The controlled assessment environment may legitimately include incomplete/ambiguous trail evidence, examiner-controlled decoy leads, route choices, controlled opposition, Battle where encountered, regroup/split-role decisions, protection of the current dispatch holder, and choices between pursuing an opponent and preserving the actual mission objective.
+
+### Availability / entry
 
 Promotion Arena availability means the player is allowed to inspect/choose the assessment. It does **not** force entry.
 
-For the first Alpha promotion, minimum attempt eligibility is:
+Minimum attempt eligibility:
 
-- the exact owned candidate currently has formal rank **Academy**;
-- the Active Konoha continuity boundary has been entered;
+- the exact assessment subject currently has formal rank **Academy**;
+- Active Konoha continuity has begun;
 - mandatory Academy Team Formation is complete;
-- the authored Academy→Genin promotion assessment is currently available;
-- no unresolved promotion attempt for that candidate is already committed.
-
-Do not gate attempt eligibility through aggregate Team PL, Average PL, a hidden UI checklist, or a UI-calculated readiness score.
-
-### Entry
+- this authored Academy→Genin assessment is currently available;
+- no unresolved Promotion attempt for that subject is already committed.
 
 Entry is an explicit voluntary player action.
 
-### Resolution
+Do not gate eligibility through aggregate Team PL, Average PL, a hidden UI readiness score, or a generic enemy-defeat gate.
 
-Combat reports the Battle result and relevant Battle evidence. The Rank/Progression assessment authority decides the Promotion result from the authored assessment contract.
+### Assessment subject
 
-Preserve:
+The assessment has one explicit `assessmentSubjectOwnedCharacterId` whose formal rank may change on success. Teammates may contribute to assessment evidence, but:
 
-**Battle victory ≠ automatic Promotion**
+**team participation ≠ team-wide automatic Promotion**
 
-**Battle defeat ≠ erased attempt**
+### Formal mission objective
 
-**PL ≠ Promotion authority**
+`missionObjectiveCompleted=true` requires legitimate committed evidence that all three mission facts occurred:
+
+1. missing field courier located;
+2. sealed dispatch recovered;
+3. sealed dispatch returned to the examiner.
+
+Formal objective completion is **necessary but not sufficient** for Promotion.
+
+### Readiness evidence domains
+
+The assessment records observer/authority-legitimate evidence in six authored domains:
+
+- `mission_comprehension`
+- `information_use`
+- `team_coordination`
+- `combat_readiness`
+- `objective_protection`
+- `judgement_under_pressure`
+
+These are evidence domains, not Stats and not hidden PL modifiers.
+
+### Rank pass/fail interpretation — FINAL ALPHA RULE
+
+A valid **PASS** requires all of the following:
+
+1. `missionObjectiveCompleted=true`;
+2. qualifying evidence for **mission comprehension**;
+3. qualifying evidence for **judgement under pressure**;
+4. qualifying evidence in at least **two** of the remaining four domains:
+   - information use;
+   - team coordination;
+   - combat readiness;
+   - objective protection;
+5. no authored examiner safety/integrity abort or disqualification.
+
+This means the assessment requires at least **four distinct readiness domains**, but does not require Battle to occur. If no legitimate Battle occurs, `combat_readiness` is simply not one of the supporting domains used for that attempt.
+
+A Battle victory may supply relevant Combat evidence but does not itself satisfy the formal mission objective or the overall pass contract.
+
+Objective protection evidence may contribute here without granting Escort / Protective Detail Special Jōnin qualification.
 
 ### Success
 
 A successful assessment must atomically:
 
-- persist the committed Promotion occurrence/evidence;
-- mutate the exact owned character's formal rank from Academy to Genin;
+- persist the committed assessment/Promotion occurrence and supporting evidence references;
+- mutate only the exact `assessmentSubjectOwnedCharacterId` formal rank from Academy to Genin;
 - unlock the separate Genin Roster Transition.
 
-Promotion itself grants no direct PL/Stat increase and does not automatically replace the Registry variant.
+Promotion grants no direct PL/Stat increase and does not automatically replace the Registry variant.
 
 ### Failure
 
@@ -250,14 +297,30 @@ Failure:
 
 - does not change formal rank;
 - does not rewrite Base/Current PL or Stats;
-- does not delete ownership/team history;
+- does not delete ownership/team/Shared-History facts;
 - preserves the failed attempt and legitimate evidence/Knowledge gained.
 
 ### Re-attempt
 
-Re-attempt is permitted after the previous attempt has resolved and the authored assessment is available again. There is no universal cooldown unless a future exact assessment explicitly authors one.
+Re-attempt is permitted after the previous attempt has resolved and the assessment is available again. There is no universal cooldown unless an exact future authority explicitly authors one.
 
-Writing still owns the first actual Academy→Genin assessment fiction/content and any hidden/contextual criteria beyond this minimal Rank lifecycle.
+### Presentation / CE boundary
+
+UI may present the known mission objective, legitimate known clues, and post-assessment authorised rationale. UI must not expose an omniscient live hidden score/checklist.
+
+CE owns committed occurrences, evidence references, observer Knowledge, and Outcome semantics. Coding orchestrates the closed contract and must not invent additional criteria.
+
+Preserve:
+
+**Battle result ≠ Promotion result**
+
+**formal objective completion ≠ every assessment criterion satisfied**
+
+**failed Promotion ≠ erased attempt**
+
+**same assessment ≠ same Chronicle history**
+
+**Battle may occur ≠ Battle victory is the Promotion objective**
 
 ---
 
@@ -353,9 +416,7 @@ For current Alpha, the stable `ownedCharacterId` plus formal-rank progression re
 
 ---
 
-## 10. Menma Origin test-subject enemy identities — direct opponent CLOSED
-
-Writing and Character Creation have now closed the Menma tutorial hostile identity.
+## 10. Menma Origin test-subject enemy identities + PL calibration — CLOSED
 
 The exact direct one-on-one tutorial opponent in:
 
@@ -365,18 +426,16 @@ is:
 
 **TEST SUBJECT — ALTERED SHINOBI**
 
-Authoritative stable Enemy/Opposition Registry identity:
+Stable Enemy/Opposition Registry ID:
 
 `test_subject_altered_shinobi`
 
-This identity already exists under Registry authority and must be reused. Coding and Combat must not mint an alternate ID from prose.
-
-The wider clearing may also contain the already-authorised opposition identities:
+The wider clearing may also contain:
 
 - `test_subject_brute` — **Test Subject — Brute**
 - `test_subject_unstable` — **Test Subject — Unstable**
 
-These three are dedicated **Enemy/Opposition Registry identities**, not collectible Character/Entity identities. They do **not** alter the 85 + 17 = 102 collectible production gate.
+These are dedicated Enemy/Opposition Registry identities, not collectible Character/Entity identities. They do **not** alter the 85 + 17 = 102 collectible production gate.
 
 Narrative boundary:
 
@@ -386,13 +445,71 @@ Narrative boundary:
 - not disposable evil mutants;
 - not boss-scale/high-tier Curse Mark enemies.
 
-Writing owns exact encounter composition/dialogue beyond the locked direct opponent. Combat must now close the exact Battle package for `test_subject_altered_shinobi`; PL calibrates it only after Combat semantics/role are closed.
+### `test_subject_altered_shinobi`
+
+Base Stats, in canonical order:
+
+`12 / 11 / 10 / 5 / 5 / 6 / 11`
+
+Base PL:
+
+**11**
+
+Exact Combat numerics:
+
+- `test_subject_altered_shinobi_shinobi_strike` — **Attack PL 5**
+- `test_subject_altered_shinobi_shuriken_cast` — **Attack PL 4**
+- `test_subject_altered_shinobi_unstable_chakra_burst` — **Attack PL 6**
+
+All three are one direct Battle-PL damage packet and use standard Stamina mitigation per Combat authority. Visible projectile count does not multiply packets. Unstable Chakra Burst carries experimental-chakra provenance only; it does not create an automatic Condition, self-damage, Curse Mark escalation, or hidden instability mechanic.
+
+### `test_subject_brute`
+
+Base Stats:
+
+`6 / 14 / 8 / 4 / 5 / 4 / 14`
+
+Base PL:
+
+**13**
+
+Exact Combat numerics:
+
+- `test_subject_brute_heavy_swing` — **Attack PL 7**
+- `test_subject_brute_body_rush` — **Attack PL 6**
+- `test_subject_brute_crushing_clinch` — no Attack PL; physical-control action using the existing `physical_restraint` lifecycle.
+
+No independent restraint scalar is authored. `crushing_clinch` resolves its control contest from the Brute's legitimate live Effective **Taijutsu** under the existing physical-restraint resolver. Base Taijutsu is 14 before legitimate runtime changes.
+
+Body Rush does not automatically Stun or displace.
+
+### `test_subject_unstable`
+
+Base Stats:
+
+`13 / 10 / 6 / 4 / 6 / 4 / 12`
+
+Base PL:
+
+**12**
+
+Exact Combat numerics:
+
+- `test_subject_unstable_frantic_rush` — **Attack PL 5**
+- `test_subject_unstable_chakra_spasm` — **Attack PL 6**
+- `test_subject_unstable_panicked_burst` — **Attack PL 7**
+
+Panicked Burst's multi-pulse presentation remains one damage packet.
+
+### Global calibration locks
+
+No boss-scale Curse Mark package. No arbitrary Orochimaru high-tier inheritance. No hidden Instability Stat. No Summon/Transformation package. No Entity PL transfer.
+
+These calibrations are opposition-specific production numerics and do not reopen the collectible 102 factory.
 
 ---
 
 ## 11. Chronicle Reaper / Chronicle Wraith — resolved
-
-Writing and Character Creation agree on the representation classification.
 
 Authoritative progression:
 
@@ -555,14 +672,15 @@ Qualification remains separate from rank, department, appointment, clearance/lic
 
 The following are Coding/Combat corrections, not PL recalibration:
 
-- remove retired Battle-entry modifiers from any reachable production path;
+- remove any remaining retired Battle-entry ±10% / elite / groupBoss / guardBoss multipliers from production execution;
 - Kisōgan Causal Strata minimum reference count 1 → 2;
 - remove embodiment → Kisōgan access inference;
 - preserve exact `source_only_bound_collective` Kikaichū taxonomy;
 - reconcile My Clan Active/Reserve filtering against current queue authority;
 - implement already-ratified Triple Rashōmon payoff semantics where current working source is incomplete;
-- bind Menma's direct tutorial opponent to `test_subject_altered_shinobi` only after Combat supplies the exact action package/numerics;
-- enumerate every Alpha-production action still relying only on explicit unresolved/placeholder semantics before Golden Combat Freeze.
+- enumerate every Alpha-production action still relying only on explicit unresolved/placeholder semantics before Golden Combat Freeze;
+- implement `academy_to_genin_field_readiness_assessment` from the closed Rank/CE evidence contract without inventing extra criteria;
+- integrate `test_subject_altered_shinobi` using the closed PL numerics above once Combat package wiring is ready.
 
 A green diagnostic must not be treated as proof of semantic completeness when the diagnostic was intentionally allowed to pass explicit unresolved markers during development.
 
