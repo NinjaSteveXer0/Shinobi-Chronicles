@@ -678,3 +678,259 @@ Systems affected:
 - Entire codebase
 - Chronicle Engine development workflow
 
+
+---
+
+# Decision 009
+
+## Date
+
+2026-09-04
+
+## Category
+
+World Design / User Experience
+
+## Title
+
+World Map artwork is separated from global HUD and runtime map truth.
+
+## Decision Summary
+
+The production World Map uses a clean reusable artwork layer. Application branding, navigation, resources, region/location labels, locks, Knowledge-sensitive hotspots, Story/event/threat presentation, hover state and selection state are runtime UI and must not be baked into the map artwork.
+
+`world_map_clean.png` is the approved clean-world-art direction.
+
+Genuine cartographic/environmental decoration such as the compass, ships, birds, clouds, coastlines, terrain and physical landmarks may remain baked into the artwork.
+
+## Reasoning
+
+The former map baked global HUD and runtime semantics into the art, causing duplication, stale state and conflict with Chronicle-aware Knowledge-sensitive presentation.
+
+The clean separation allows the world artwork to remain visually stable while runtime state changes safely above it.
+
+## Final Choice
+
+Chosen:
+
+**world/map artwork ≠ application HUD ≠ runtime map presentation.**
+
+## Impact
+
+Systems affected:
+
+- World Map
+- global HUD
+- Knowledge-sensitive hotspots
+- Story/event presentation
+- map labels and locks
+- responsive UI
+- future regional-map presentation
+
+
+---
+
+# Decision 010
+
+## Date
+
+2026-09-04
+
+## Category
+
+Business/IP / User Experience
+
+## Title
+
+Concept #18 is the universal Shinobi Chronicles master franchise emblem.
+
+## Decision Summary
+
+Logo concept #18 is the preferred/winning universal **SHINOBI CHRONICLES** franchise master emblem.
+
+The global brand unit is:
+
+**#18 + SHINOBI CHRONICLES**
+
+No Japanese subtitle is used in the Alpha global HUD treatment.
+
+The franchise mark belongs to runtime application chrome and is not baked into world/map artwork.
+
+Concept #28 remains a secondary candidate for Chronicle/Renewal-system symbolism rather than the franchise masterbrand.
+
+## Reasoning
+
+#18 has the strongest franchise-level silhouette, scalability, neutrality across future games, small-size legibility and ability to remain recognisable across different Shinobi Chronicles titles.
+
+The franchise identity must remain distinct from game-specific world art and from Chronicle Engine / Chronicle Reaper symbolic identity.
+
+## Final Choice
+
+Chosen:
+
+**#18 = SHINOBI CHRONICLES master franchise mark.**
+
+Preserve:
+
+**Shinobi Chronicles franchise mark ≠ canonical Chronicle architecture emblem ≠ Chronicle Reaper-specific derivative.**
+
+## Impact
+
+Systems affected:
+
+- global HUD
+- launcher/icon identity
+- future Shinobi Chronicles titles
+- visual identity
+- World Map application chrome
+
+
+---
+
+# Decision 011
+
+## Date
+
+2026-09-04
+
+## Category
+
+Combat / User Experience
+
+## Title
+
+Battle Victory reward claim and later continuation are separate lifecycle actions.
+
+## Decision Summary
+
+For the Shinobi Chronicles staged Victory flow, earning a reward, claiming/applying that reward, remaining on the completed Victory presentation, and later navigating away are separate states/actions.
+
+Production UI must preserve:
+
+**Battle victory committed → Victory presentation → CLAIM → claimed/recorded Victory state remains visible → CONTINUE → route away.**
+
+`CLAIM` and `CONTINUE` must not be collapsed into one automatic claim-and-route action.
+
+## Reasoning
+
+The resolved Battle Outcome and reward entitlement already exist before claim. Claim commits persistent reward consequences. Navigation is a later encounter/presentation lifecycle transition and must not reapply or duplicate rewards.
+
+This separation supports reload/retry safety and matches Chronicle Engine reward-entitlement integrity doctrine.
+
+## Final Choice
+
+Chosen:
+
+**CLAIM ≠ CONTINUE.**
+
+Closing/dismissing the Victory presentation must not bypass authoritative claim/continuation state.
+
+## Impact
+
+Systems affected:
+
+- Battle Victory UI
+- reward entitlement/claim
+- persistence/save-load
+- encounter routing
+- Chronicle consequence recording
+
+
+---
+
+# Decision 012
+
+## Date
+
+2026-09-04
+
+## Category
+
+Technical / User Experience
+
+## Title
+
+Battle Portrait assets are distinct from collectible Character Card assets.
+
+## Decision Summary
+
+Square Battle Portrait assets are a separate presentation authority from premium collectible Character Card art.
+
+Battle UI must resolve an approved Battle Portrait for the exact Registry identity rather than silently crop/reuse collectible-card art or depend on an ambiguous generic participant image.
+
+Exact production repository paths remain asset-authority data and must not be invented by Coding before approved files physically exist.
+
+## Reasoning
+
+Battle portraits and collectible cards serve different compositions, crops and UI functions. Treating them as interchangeable creates visual inconsistency and can collapse representation identity into asset convenience.
+
+## Final Choice
+
+Chosen:
+
+**collectible Character Card asset ≠ Battle Portrait asset.**
+
+Use dedicated Registry-ID → approved Battle Portrait asset/path authority once the files are supplied.
+
+## Impact
+
+Systems affected:
+
+- Registry asset projection
+- Battle UI
+- asset manifests/resolvers
+- Character Card presentation
+
+
+---
+
+# Decision 013
+
+## Date
+
+2026-09-04
+
+## Category
+
+Combat / User Experience
+
+## Title
+
+Persistent Battle formation uses four active/front-queue positions and two reserve positions.
+
+## Decision Summary
+
+The authoritative six-slot formation is:
+
+1. START
+2. NEXT 1
+3. NEXT 2
+4. NEXT 3
+5. RESERVE 1
+6. RESERVE 2
+
+Runtime status semantics classify slots 1–4 as the active/front queue and slots 5–6 as reserve.
+
+Any legacy filter that treats Active as slots 1–3 and Reserve as slots 4–6 is stale and must not drive UI design or player-facing semantics.
+
+## Reasoning
+
+The permanent Battle UI and My Clan/Battle ordering already use START → NEXT 1 → NEXT 2 → NEXT 3 → RESERVE 1 → RESERVE 2. A stale filter must be corrected to match the production formation rather than causing a redesign around incorrect source behavior.
+
+## Final Choice
+
+Chosen:
+
+**ACTIVE/front queue = slots 1–4.**
+
+**RESERVE = slots 5–6.**
+
+## Impact
+
+Systems affected:
+
+- Battle queue
+- My Clan formation filters
+- roster presentation
+- runtime status/filter helpers
+- regression coverage
