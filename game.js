@@ -6205,18 +6205,214 @@ function authorFieldReadinessAssessmentAbort(attemptId,{reason,evidenceId=null,o
   return {success:true,abort:cloneProgressionData(attempt.abort)};
 }
 
+// =========================================================
+// BRICK 890 — FIELD READINESS CLOSED RANK-EVALUATION CONTRACT
+// =========================================================
+// Mission outcome != readiness interpretation != institutional Promotion.
+// Battle results are evidence only; they never directly decide Promotion.
+function evaluateFieldReadinessAttemptAgainstClosedRankContract(attempt) {
+  if (!attempt) return {valid:false,reason:"assessment_attempt_missing"};
+  const definition=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT;
+  const objectiveCompleted=definition.objectiveSteps.every(step=>attempt.objectives&&attempt.objectives[step]===true);
+  const qualifyingDomains=definition.readinessDomains.filter(domain=>Array.isArray(attempt.evidenceByDomain&&attempt.evidenceByDomain[domain])&&attempt.evidenceByDomain[domain].length>0);
+  const requiredDomainsSatisfied=definition.requiredDomains.every(domain=>qualifyingDomains.includes(domain));
+  const flexibleDomainCount=definition.flexibleDomains.filter(domain=>qualifyingDomains.includes(domain)).length;
+  const abortDisqualification=!!(attempt.abort&&attempt.abort.authored===true);
+  const passed=objectiveCompleted&&requiredDomainsSatisfied&&flexibleDomainCount>=definition.minimumFlexibleDomains&&!abortDisqualification;
+  return {valid:true,passed,objectiveCompleted,qualifyingDomains,requiredDomainsSatisfied,flexibleDomainCount,minimumFlexibleDomains:definition.minimumFlexibleDomains,abortDisqualification,battleMandatory:false,battleResultDoesNotOwnPromotion:true,teamWidePromotion:false};
+}
+
+// =========================================================
+// BRICK 891 — FIELD READINESS OBSERVER-SAFE PRESENTATION
+// =========================================================
+// UI receives formal mission/attempt/result state only. It does not receive a
+// live omniscient readiness-domain scoreboard or own Promotion interpretation.
+const FIELD_READINESS_UI_STATE={selectedOwnedCharacterId:null,lastNotice:null};
+
+function getFieldReadinessOwnedSubjectCandidates() {
+  const state=ensurePlayerAcquisitionState();
+  return Object.values(state.ownedCharactersByVariantId||{}).filter(Boolean).map(record=>{
+    const ownedCharacterId=record.ownedCharacterId;
+    const eligibility=evaluateAcademyToGeninAssessmentEntry(ownedCharacterId);
+    return {
+      ownedCharacterId,variantId:record.variantId,displayName:getProductionRuntimeDisplayName(record.variantId),formalRank:getOwnedCharacterFormalRank(ownedCharacterId),
+      eligible:eligibility.eligible===true,reasons:[...(eligibility.reasons||[])]
+    };
+  }).filter(item=>item.formalRank==="academy"||item.eligible===true);
+}
+
+function createFieldReadinessObserverSafePresentation(ownedCharacterId=null) {
+  const assessmentState=getAcademyToGeninAssessmentState();
+  const candidates=getFieldReadinessOwnedSubjectCandidates();
+  const active=assessmentState.activeAttempt||null;
+  const requested=ownedCharacterId||FIELD_READINESS_UI_STATE.selectedOwnedCharacterId||(active&&active.assessmentSubjectOwnedCharacterId)||((candidates[0]&&candidates[0].ownedCharacterId)||null);
+  const selected=candidates.find(item=>item.ownedCharacterId===requested)||null;
+  const attempts=(assessmentState.attempts||[]).filter(item=>item&&(!requested||item.assessmentSubjectOwnedCharacterId===requested));
+  const latest=attempts.length?attempts[attempts.length-1]:null;
+  const shownAttempt=(active&&(!requested||active.assessmentSubjectOwnedCharacterId===requested))?active:latest;
+  const eligibility=selected?evaluateAcademyToGeninAssessmentEntry(selected.ownedCharacterId):{eligible:false,reasons:["assessment_subject_missing"]};
+  const objectiveProgress=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.objectiveSteps.map(step=>({step,completed:!!(shownAttempt&&shownAttempt.objectives&&shownAttempt.objectives[step]===true)}));
+  let result=null;
+  if (shownAttempt&&shownAttempt.result) {
+    result={
+      status:shownAttempt.result.passed===true?"passed":"failed",
+      passed:shownAttempt.result.passed===true,
+      objectiveCompleted:shownAttempt.result.objectiveCompleted===true,
+      examinerAbort:shownAttempt.result.abortDisqualification===true,
+      explanation:shownAttempt.result.passed===true
+        ? "Promotion approved. The examiner judged the completed assessment evidence sufficient."
+        : (shownAttempt.result.abortDisqualification===true
+            ? "Promotion not approved. The assessment was halted by an authored examiner safety/integrity decision."
+            : (shownAttempt.result.objectiveCompleted===true
+                ? "Promotion not approved. The mission concluded, but the examiner did not recognise sufficient readiness evidence."
+                : "Promotion not approved. The formal assessment objective was not completed."))
+    };
+  }
+  return {
+    assessmentId:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.assessmentId,
+    displayName:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.displayName,
+    mission:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.mission,
+    selectedOwnedCharacterId:selected?selected.ownedCharacterId:null,
+    candidates,eligibility:{eligible:eligibility.eligible===true,reasons:[...(eligibility.reasons||[])]},
+    attempt:shownAttempt?{attemptId:shownAttempt.attemptId,status:shownAttempt.status,objectiveProgress,lastBattleReturn:shownAttempt.lastBattleReturn?cloneProgressionData(shownAttempt.lastBattleReturn):null}:null,
+    result,
+    liveReadinessScoringExposed:false,
+    teamPLExposed:false,
+    battleMandatory:false
+  };
+}
+
+function escapeFieldReadinessHTML(value) {
+  return String(value==null?"":value).replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+}
+
+function ensureFieldReadinessUIStyles() {
+  if (typeof document==="undefined") return null;
+  let style=document.getElementById("field-readiness-ui-styles");
+  if (style) return style;
+  style=document.createElement("style");
+  style.id="field-readiness-ui-styles";
+  style.textContent=`
+    .field-readiness-shell{display:flex;flex-direction:column;gap:16px;min-height:100%;padding:22px;color:#e8edf3;background:linear-gradient(180deg,rgba(8,17,24,.96),rgba(11,24,32,.96));}
+    .field-readiness-eyebrow{font-size:10px;letter-spacing:2px;color:#cfa94b;text-transform:uppercase;}
+    .field-readiness-title{margin:2px 0 0;font-size:24px;letter-spacing:1px;color:#f2e4b0;}
+    .field-readiness-mission{max-width:760px;color:#b8c5d1;line-height:1.55;font-size:13px;}
+    .field-readiness-row{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+    .field-readiness-card{border:1px solid rgba(207,169,75,.3);background:rgba(2,8,12,.55);padding:14px;border-radius:8px;}
+    .field-readiness-subject{min-width:190px;text-align:left;border:1px solid rgba(120,160,180,.25);background:rgba(11,30,38,.7);color:#d8e4ec;padding:10px 12px;border-radius:6px;cursor:pointer;}
+    .field-readiness-subject.selected{border-color:#d0ad55;color:#ffe9a6;}
+    .field-readiness-subject[disabled]{opacity:.45;cursor:default;}
+    .field-readiness-objectives{display:grid;gap:8px;margin-top:8px;}
+    .field-readiness-objective{display:flex;gap:8px;align-items:center;color:#aebdca;font-size:12px;}
+    .field-readiness-objective.done{color:#bfe0c1;}
+    .field-readiness-actions{display:flex;gap:10px;flex-wrap:wrap;}
+    .field-readiness-button{border:1px solid rgba(207,169,75,.5);background:#152832;color:#f0df9f;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:700;letter-spacing:.4px;}
+    .field-readiness-button.secondary{border-color:rgba(130,160,175,.35);color:#c7d6df;background:#0f2028;}
+    .field-readiness-button[disabled]{opacity:.4;cursor:default;}
+    .field-readiness-note{font-size:11px;color:#7f96a4;line-height:1.45;}
+    .field-readiness-result{font-size:13px;line-height:1.5;}
+    .field-readiness-result.pass{color:#c8e7c9}.field-readiness-result.fail{color:#e8c1b7}
+  `;
+  document.head.appendChild(style);
+  return style;
+}
+
+function formatFieldReadinessObjectiveStep(step) {
+  const labels={courier_located:"Locate the missing field courier",sealed_dispatch_recovered:"Recover the sealed dispatch",sealed_dispatch_returned_to_examiner:"Return the sealed dispatch to the examiner"};
+  return labels[step]||String(step||"").replace(/_/g," ");
+}
+
+function renderFieldReadinessAssessmentOverlay(container) {
+  if (!container) return false;
+  ensureFieldReadinessUIStyles();
+  const model=createFieldReadinessObserverSafePresentation(FIELD_READINESS_UI_STATE.selectedOwnedCharacterId);
+  if (model.selectedOwnedCharacterId) FIELD_READINESS_UI_STATE.selectedOwnedCharacterId=model.selectedOwnedCharacterId;
+  const active=model.attempt&&model.attempt.status==="in_progress";
+  const objectiveHTML=model.attempt?model.attempt.objectiveProgress.map(item=>`<div class="field-readiness-objective ${item.completed?"done":""}"><span>${item.completed?"✓":"○"}</span><span>${escapeFieldReadinessHTML(formatFieldReadinessObjectiveStep(item.step))}</span></div>`).join(""):`<div class="field-readiness-note">No assessment attempt has begun for this shinobi.</div>`;
+  const candidatesHTML=model.candidates.map(item=>`<button type="button" class="field-readiness-subject ${item.ownedCharacterId===model.selectedOwnedCharacterId?"selected":""}" onclick="selectFieldReadinessAssessmentSubject('${escapeFieldReadinessHTML(item.ownedCharacterId)}')"><strong>${escapeFieldReadinessHTML(item.displayName)}</strong><br><small>${escapeFieldReadinessHTML(item.formalRank||"academy")}</small></button>`).join("")||`<div class="field-readiness-note">No owned Academy-rank assessment subject is currently available.</div>`;
+  const resultHTML=model.result?`<div class="field-readiness-card field-readiness-result ${model.result.passed?"pass":"fail"}"><strong>${model.result.passed?"PROMOTION APPROVED":"PROMOTION NOT APPROVED"}</strong><div>${escapeFieldReadinessHTML(model.result.explanation)}</div></div>`:"";
+  const notice=FIELD_READINESS_UI_STATE.lastNotice?`<div class="field-readiness-note">${escapeFieldReadinessHTML(FIELD_READINESS_UI_STATE.lastNotice)}</div>`:"";
+  container.innerHTML=`<div class="field-readiness-shell">
+    <div><div class="field-readiness-eyebrow">ACADEMY → GENIN PROMOTION</div><h2 class="field-readiness-title">${escapeFieldReadinessHTML(model.displayName)}</h2></div>
+    <div class="field-readiness-card"><strong>FORMAL MISSION</strong><div class="field-readiness-mission">${escapeFieldReadinessHTML(model.mission)}</div></div>
+    <div><div class="field-readiness-eyebrow">ASSESSMENT SUBJECT</div><div class="field-readiness-row">${candidatesHTML}</div></div>
+    <div class="field-readiness-card"><strong>MISSION STATE</strong><div class="field-readiness-objectives">${objectiveHTML}</div></div>
+    ${resultHTML}${notice}
+    <div class="field-readiness-note">Battle is supporting content only. Examiner readiness evaluation is not exposed as a live scoring checklist.</div>
+    <div class="field-readiness-actions">
+      <button type="button" class="field-readiness-button" onclick="beginFieldReadinessAssessmentFromUI()" ${(!model.selectedOwnedCharacterId||!model.eligibility.eligible||active)?"disabled":""}>BEGIN ASSESSMENT</button>
+      <button type="button" class="field-readiness-button secondary" onclick="closeOverlay()">${active?"RETURN TO FIELD":"CLOSE"}</button>
+    </div>
+  </div>`;
+  return true;
+}
+
+function openFieldReadinessAssessmentUI(ownedCharacterId=null) {
+  FIELD_READINESS_UI_STATE.selectedOwnedCharacterId=ownedCharacterId||FIELD_READINESS_UI_STATE.selectedOwnedCharacterId||null;
+  FIELD_READINESS_UI_STATE.lastNotice=null;
+  return openOverlay("field_readiness_assessment");
+}
+
+function selectFieldReadinessAssessmentSubject(ownedCharacterId) {
+  const candidates=getFieldReadinessOwnedSubjectCandidates();
+  if (!candidates.some(item=>item.ownedCharacterId===ownedCharacterId)) return {success:false,reason:"assessment_subject_unavailable"};
+  FIELD_READINESS_UI_STATE.selectedOwnedCharacterId=ownedCharacterId;
+  FIELD_READINESS_UI_STATE.lastNotice=null;
+  const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+  if (container&&currentOverlayType==="field_readiness_assessment") renderFieldReadinessAssessmentOverlay(container);
+  return {success:true,ownedCharacterId};
+}
+
+function beginFieldReadinessAssessmentFromUI() {
+  const ownedCharacterId=FIELD_READINESS_UI_STATE.selectedOwnedCharacterId;
+  if (!ownedCharacterId) return {success:false,reason:"assessment_subject_missing"};
+  const result=startAcademyToGeninFieldReadinessAssessment(ownedCharacterId);
+  FIELD_READINESS_UI_STATE.lastNotice=result.success===true?"Assessment started. Continue through authored field/map/story content.":`Assessment unavailable: ${result.reason||"unknown"}.`;
+  const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+  if (container&&currentOverlayType==="field_readiness_assessment") renderFieldReadinessAssessmentOverlay(container);
+  return result;
+}
+
+// =========================================================
+// BRICK 892 — FIELD READINESS BATTLE RETURN-CONTEXT BRIDGE
+// =========================================================
+// Exact controlled-opposition content remains authored elsewhere. This bridge
+// accepts an exact supplied enemy/encounter and returns to the same assessment;
+// it does not infer readiness evidence from Battle victory or turn participation.
+function launchFieldReadinessBattleWithReturnContext(attemptId,{enemyId,encounterId}={}) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  if (!enemyId||!enemyDatabase[enemyId]) return {success:false,reason:"field_readiness_enemy_authority_missing"};
+  if (!encounterId) return {success:false,reason:"field_readiness_encounter_id_required"};
+  const returnContext={type:"field_readiness_assessment",assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId};
+  const launched=launchBattleWithReturnContext(enemyId,encounterId,returnContext);
+  return launched.success?{...launched,assessmentAttemptId:attempt.attemptId}:launched;
+}
+
+function resumeFieldReadinessAssessmentFromBattle(returnContext) {
+  if (!returnContext||returnContext.type!=="field_readiness_assessment") return {success:false,reason:"field_readiness_return_context_missing"};
+  const attempt=getFieldReadinessAttempt(returnContext.attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"field_readiness_attempt_not_active"};
+  if (attempt.assessmentId!==returnContext.assessmentId||attempt.assessmentSubjectOwnedCharacterId!==returnContext.assessmentSubjectOwnedCharacterId) return {success:false,reason:"field_readiness_return_context_mismatch"};
+  const outcome=currentBattle.outcome&&typeof currentBattle.outcome==="object"?currentBattle.outcome:null;
+  attempt.lastBattleReturn={battleId:currentBattle.battleId||null,encounterId:currentBattle.encounterId||null,battleResult:outcome?outcome.type:null,completedAt:outcome&&outcome.completedAt?outcome.completedAt:(currentBattle.completedAt||null),combatEvidenceEnvelopeRecorded:false};
+  currentBattle.returnContext=null;
+  FIELD_READINESS_UI_STATE.selectedOwnedCharacterId=attempt.assessmentSubjectOwnedCharacterId;
+  FIELD_READINESS_UI_STATE.lastNotice="Battle concluded. Return to the continuing Field Readiness assessment; Battle outcome alone does not determine Promotion.";
+  savePlayerData();
+  saveTestState();
+  openOverlay("field_readiness_assessment");
+  return {success:true,type:"field_readiness_assessment_resumed",attemptId:attempt.attemptId,battleReturn:cloneProgressionData(attempt.lastBattleReturn)};
+}
+
 function resolveAcademyToGeninFieldReadinessAssessment(attemptId) {
   const attempt=getFieldReadinessAttempt(attemptId);
   if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
   if (attempt.status!=="in_progress"&&attempt.result) return {success:true,idempotent:true,result:cloneProgressionData(attempt.result)};
   if (attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
   const definition=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT;
-  const objectiveCompleted=definition.objectiveSteps.every(step=>attempt.objectives&&attempt.objectives[step]===true);
-  const qualifyingDomains=definition.readinessDomains.filter(domain=>Array.isArray(attempt.evidenceByDomain&&attempt.evidenceByDomain[domain])&&attempt.evidenceByDomain[domain].length>0);
-  const requiredDomainsSatisfied=definition.requiredDomains.every(domain=>qualifyingDomains.includes(domain));
-  const flexibleCount=definition.flexibleDomains.filter(domain=>qualifyingDomains.includes(domain)).length;
-  const abortDisqualification=!!(attempt.abort&&attempt.abort.authored===true);
-  const passed=objectiveCompleted&&requiredDomainsSatisfied&&flexibleCount>=definition.minimumFlexibleDomains&&!abortDisqualification;
+  const evaluation=evaluateFieldReadinessAttemptAgainstClosedRankContract(attempt);
+  const {objectiveCompleted,qualifyingDomains,requiredDomainsSatisfied,flexibleDomainCount:flexibleCount,abortDisqualification,passed}=evaluation;
   attempt.status=passed?"passed":"failed";
   attempt.completedAt=Date.now();
   const evidenceIds=[...new Set((attempt.evidenceRefs||[]).flatMap(ref=>[ref.evidenceId,ref.occurrenceId]).filter(Boolean))];
@@ -39054,6 +39250,15 @@ function openOverlay(type) {
       break;
 
 
+    case "field_readiness_assessment":
+
+      renderFieldReadinessAssessmentOverlay(
+        container
+      );
+
+      break;
+
+
     case "battle":
 
       renderBattleOverlay(
@@ -42761,6 +42966,7 @@ function resumeBattleCallerAfterCompletion(outcomeType=null) {
   const returnContext=currentBattle.returnContext&&typeof currentBattle.returnContext==="object"?cloneBattleRuntimeValue(currentBattle.returnContext):null;
   if (!returnContext) return {success:false,reason:"battle_return_context_absent"};
   if (returnContext.type==="story_scene") return resumeStorySceneFromBattle(returnContext);
+  if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);
   return {success:false,reason:"battle_return_context_type_unhandled",type:returnContext.type||null,outcomeType};
 }
 
@@ -44889,6 +45095,57 @@ function runAlphaPost888GoldenCombatDiagnostics() {
   const combatFreezeReady=runtimeGreen&&semanticClosure.alphaCombatFreezeReady===true;
   const result={groups,semanticClosure,runtimeGreen,combatFreezeReady,pass:runtimeGreen&&combatFreezeReady};
   console.log(`SC Alpha post-888 Golden Combat gate: runtime=${runtimeGreen?"GREEN":"FAIL"} / semantic=${semanticClosure.unresolved.length===0?"GREEN":"HOLD"} / Combat Freeze=${combatFreezeReady?"READY":"HOLD"}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 889 — ALTERED SHINOBI FINAL ACTION-PACKAGE RECEIPT
+// BRICKS 890–892 — FIELD READINESS PRESENTATION / RETURN GOLDEN GATE
+// =========================================================
+function runAlphaAlteredShinobiFinalPackageDiagnostics() {
+  const actions=getEnemyAuthoredBattleActions(enemyDatabase.test_subject_altered_shinobi);
+  const schedulerSource=[evaluateEnemyActionScheduler,chooseEnemyAuthoredBattleAction,executeEnemyAuthoredActionOpportunity].map(fn=>fn.toString()).join("\n");
+  const result={
+    exactThreeActions:JSON.stringify(actions.map(action=>action.id))===JSON.stringify(["test_subject_altered_shinobi_shinobi_strike","test_subject_altered_shinobi_shuriken_cast","test_subject_altered_shinobi_unstable_chakra_burst"]),
+    noBasicAttackFallback:!actions.some(action=>/basic/i.test(action.id||""))&&!schedulerSource.includes("generic enemy Basic Attack"),
+    noGuardFallback:!actions.some(action=>/guard/i.test(action.id||""))&&!schedulerSource.includes("generic enemy Guard"),
+    schedulerFailsSafelyWithoutEligibleAction:evaluateEnemyActionScheduler.toString().includes('reason:"no_semantically_eligible_enemy_action"')&&evaluateEnemyActionScheduler.toString().includes("inventedFallback:false"),
+    noStatDerivedFallback:schedulerSource.includes("getEligibleEnemyAuthoredBattleActions")&&!schedulerSource.includes("Stat-derived fallback")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaFieldReadinessPresentationDiagnostics() {
+  const presentationSource=[createFieldReadinessObserverSafePresentation,renderFieldReadinessAssessmentOverlay].map(fn=>fn.toString()).join("\n");
+  const candidateAttempt={
+    status:"in_progress",objectives:{courier_located:true,sealed_dispatch_recovered:true,sealed_dispatch_returned_to_examiner:true},abort:null,
+    evidenceByDomain:{mission_comprehension:[{id:"m"}],information_use:[],team_coordination:[],combat_readiness:[{id:"c"}],objective_protection:[],judgement_under_pressure:[{id:"j"}]},
+    combatEvidenceEnvelopes:[{battleResult:"victory",oppositionOutcome:"neutralized"}]
+  };
+  const battleWinButInsufficient=evaluateFieldReadinessAttemptAgainstClosedRankContract(candidateAttempt);
+  const imperfectButPassing=cloneProgressionData(candidateAttempt);
+  imperfectButPassing.evidenceByDomain.information_use=[{id:"i"}];
+  const passingEvaluation=evaluateFieldReadinessAttemptAgainstClosedRankContract(imperfectButPassing);
+  const result={
+    stableAssessmentId:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.assessmentId==="academy_to_genin_field_readiness_assessment",
+    observerSafePresentationNoLiveReadinessChecklist:!presentationSource.includes("qualifyingDomains")&&!presentationSource.includes("flexibleDomainCount")&&!presentationSource.includes("minimumFlexibleDomains"),
+    noTeamPLPresentation:!presentationSource.includes("Team PL")&&!presentationSource.includes("teamPower"),
+    battleVictoryCanStillFailPromotion:battleWinButInsufficient.passed===false&&candidateAttempt.combatEvidenceEnvelopes[0].battleResult==="victory",
+    imperfectEvidenceCanStillPass:passingEvaluation.passed===true&&passingEvaluation.qualifyingDomains.length===4&&passingEvaluation.qualifyingDomains.length<ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.readinessDomains.length,
+    exactSubjectMutationAuthority:recordOwnedCharacterGeninPromotion.toString().includes("ownedCharacterId")&&resolveAcademyToGeninFieldReadinessAssessment.toString().includes("attempt.assessmentSubjectOwnedCharacterId"),
+    battleReturnSameAssessment:resumeBattleCallerAfterCompletion.toString().includes('returnContext.type==="field_readiness_assessment"')&&resumeFieldReadinessAssessmentFromBattle.toString().includes("attemptId"),
+    combatEnvelopeStillSeparate:resumeFieldReadinessAssessmentFromBattle.toString().includes("combatEvidenceEnvelopeRecorded:false")&&recordFieldReadinessCombatEvidenceEnvelope.toString().includes("promotionResult:null")
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaPost892FieldReadinessDiagnostics() {
+  const combatFreeze=runAlphaPost888GoldenCombatDiagnostics();
+  const altered=runAlphaAlteredShinobiFinalPackageDiagnostics();
+  const fieldReadiness=runAlphaFieldReadinessPresentationDiagnostics();
+  const groups={combatFreeze,altered,fieldReadiness};
+  const result={groups,combatFreezePreserved:combatFreeze&&combatFreeze.pass===true,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-892 field-readiness gate: ${result.pass?"PASS":"FAIL"} / Combat Freeze baseline=${result.combatFreezePreserved?"PRESERVED":"REGRESSED"}`);
   return result;
 }
 
