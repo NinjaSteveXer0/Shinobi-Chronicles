@@ -2,116 +2,37 @@
 
 **Date:** 2026-09-04  
 **Owner:** Character Creation / Assets  
-**Status:** **ASSETS SCOPE CLOSED; LIVE PRODUCTION ADMISSION NOT YET READY**
+**Status:** **FINAL WAVE SCOPE CLOSED — 13 CHARACTERS + NUE; LIVE GATE REMAINS 102 PENDING ASSET INGESTION / PORTRAITS**
 
 ---
 
 ## Purpose
 
-This document closes the Character Creation / Assets side of the awaiting-placement production-admission question without fabricating repository mappings or silently expanding the live production gate.
+This document is the current Character Creation / Assets authority for the complete awaiting-placement admission wave.
 
-Current live production gate remains:
+It supersedes the earlier Assets wording that stopped at **12 Characters + Nue = 115**.
 
-**85 Characters + 17 Entities = 102 production identities**
+Registry/PL has now explicitly added the final Character representation:
 
-The awaiting-placement wave is already defined upstream as:
+`kurama_resonance_himawari`
 
-**12 Characters + 1 Entity/Summon = 13 identities**
+Therefore the complete intended admission wave is now:
 
-If the complete wave is eventually admitted, the live gate becomes:
+**13 Characters + 1 Entity/Summon = 14 identities**
 
-**97 Characters + 18 Entities = 115 production identities**
+If and only if the complete wave is later admitted into live production, the production gate becomes:
 
-Character Creation / Assets confirms that the intended admission scope is the **complete 13-identity awaiting-placement wave**, not a partial Kiba/Hinata/Sumire/Kakuzu/Nue-only carveout.
+**98 Characters + 18 Entities = 116 live production identities.**
 
-However, **scope selection ≠ live admission readiness**.
+The current live gate remains:
 
----
+**85 Characters + 17 Entities = 102**
 
-## Awaiting-placement identities
-
-### Characters
-
-- `chunin_iruka`
-- `sj_anko`
-- `chunin_fugaku`
-- `chunin_itama`
-- `genin_mikoto`
-- `genin_orochimaru`
-- `akatsuki_kakuzu`
-- `sj_kiba`
-- `sj_nono`
-- `sannin_tenten`
-- `sannin_hinata`
-- `sannin_sumire`
-
-### Entity / Summon
-
-- `nue`
+until the complete runtime asset projection package is ready and Coding performs admission.
 
 Preserve:
 
-> `sj_kiba` is the only valid Kiba representation ID for this card/representation. Do not create `s_jkiba`.
-
----
-
-## Collectible-card asset status
-
-All thirteen awaiting-placement identities have an approved Character Creation visual/card direction.
-
-The eleven cards recently created/reviewed in Character Creation were explicitly approved by the user:
-
-- `chunin_fugaku`
-- `chunin_itama`
-- `genin_mikoto`
-- `genin_orochimaru`
-- `akatsuki_kakuzu`
-- `sj_kiba`
-- `sj_nono`
-- `sannin_tenten`
-- `sannin_hinata`
-- `sannin_sumire`
-- `nue`
-
-Previously approved Character Creation assets also exist for:
-
-- `chunin_iruka`
-- `sj_anko`
-
-This closes **visual approval**, not repository ingestion.
-
-No exact production `collectibleCard` repository path is authored here unless that path is separately verified in the live repository. Character Creation / Assets must not invent a path merely because a card image exists in conversation or local generation output.
-
-Likewise, visual approval of a generated image does not by itself prove that the current repository copy is already exact **980×1400** or that the correct production file has been committed.
-
-Therefore each awaiting-placement identity still requires, before live admission:
-
-1. exact production card normalization where required;
-2. explicit repository ingestion;
-3. exact verified `collectibleCard` path;
-4. ACTIVE/superseded asset status in the production manifest.
-
----
-
-## `uiPortrait` status
-
-The current ratified/approved `uiPortrait` authority remains exactly **102/102** for the current live production gate.
-
-The thirteen awaiting-placement identities do **not** currently have a Character Creation / Assets-approved production `uiPortrait` path in the 102-row manifest.
-
-The user has explicitly chosen to defer Battle/UI Portrait creation for these newly approved cards until after the immediate Alpha-completion push.
-
-Therefore Character Creation / Assets does **not** authorise:
-
-- automatic crop/reuse of collectible-card art as `uiPortrait`;
-- guessed portrait paths;
-- filename-derived portrait selection;
-- generic participant image data as permanent portrait authority;
-- silent expansion of the 102-row portrait manifest.
-
-Preserve:
-
-> **collectible Character Card ≠ `uiPortrait`**
+> **scope selection ≠ live admission readiness**
 
 > **asset approval ≠ production admission**
 
@@ -121,57 +42,204 @@ Preserve:
 
 ---
 
+## Final awaiting-placement identities
+
+### Characters — 13
+
+- `chunin_iruka`
+- `sj_anko`
+- `chunin_fugaku`
+- `chunin_itama`
+- `genin_mikoto`
+- `genin_orochimaru`
+- `akatsuki_kakuzu`
+- `sj_kiba`
+- `sj_nono`
+- `sannin_tenten`
+- `sannin_hinata`
+- `sannin_sumire`
+- `kurama_resonance_himawari`
+
+### Entity / Summon — 1
+
+- `nue`
+
+All fourteen are intended **ACTIVE when admitted**. None replaces or supersedes an existing live production identity.
+
+Exact Kiba representation ID:
+
+`sj_kiba`
+
+Do not create `s_jkiba`.
+
+Akamaru remains separately source-addressable as:
+
+`akamaru`
+
+classification:
+
+`source_only_integrated_participant`
+
+role:
+
+`companion`
+
+This does not create an additional collectible/Entity/Summon/slot/turn/PL pool.
+
+---
+
+## Character Creation visual approval
+
+Character Creation has approved the visual/card designs for the complete fourteen-identity awaiting-placement wave.
+
+Approved recent cards include:
+
+- `chunin_fugaku`
+- `chunin_itama`
+- `genin_mikoto`
+- `genin_orochimaru`
+- `akatsuki_kakuzu`
+- `sj_kiba`
+- `sj_nono`
+- `sannin_tenten`
+- `sannin_hinata`
+- `sannin_sumire`
+- `nue`
+- `kurama_resonance_himawari`
+
+Previously approved awaiting-placement cards:
+
+- `chunin_iruka`
+- `sj_anko`
+
+`kurama_resonance_himawari` is the approved premium Character card titled **KURAMA RESONANCE / HIMAWARI**. Its hosted/resonance mechanics are not inferred from artwork; Registry/PL and Combat own those semantics.
+
+The separately approved **Chakra Mode Himawari** card is **not** added to this production-admission wave by inference. It requires its own Registry/PL admission authority if it is later promoted.
+
+---
+
+## Collectible-card production status
+
+Visual approval does not by itself prove repository ingestion.
+
+The generated/approved source cards exist in Character Creation working material, and the current source images used for this wave have been checked as suitable for non-generative normalization to the locked collectible contract:
+
+**980 × 1400 exact**
+
+However, an exact runtime `collectibleCard` repository path is authoritative only after the corresponding production file is actually committed/verified in the Shinobi Chronicles repository.
+
+Assets must not publish a fake path simply because the intended category/filename appears obvious.
+
+Before live admission, each of the fourteen therefore still requires:
+
+1. exact production normalization where required;
+2. repository ingestion;
+3. exact verified `collectibleCard` repository path;
+4. explicit **ACTIVE** asset status.
+
+---
+
+## `uiPortrait` status
+
+The current approved/ratified `uiPortrait` authority remains exactly **102/102** for the current live gate.
+
+The fourteen awaiting-placement identities do **not** yet have approved production `uiPortrait` mappings in that manifest.
+
+The user has explicitly chosen:
+
+> **Alpha completion first; Battle/UI Portraits for these new cards later.**
+
+Therefore Assets does **not** authorise:
+
+- automatic card cropping as a permanent portrait;
+- guessed portrait paths;
+- filename-derived portrait selection;
+- generic participant-image fallback as portrait authority;
+- silent expansion of the current 102-row portrait manifest.
+
+Preserve:
+
+> **collectible Character Card ≠ `uiPortrait`**
+
+> **Registry identity ready ≠ portrait asset approved**
+
+> **presentation asset identity ≠ production ontology**
+
+---
+
+## Kurama Resonance Himawari boundary
+
+Stable Registry representation ID:
+
+`kurama_resonance_himawari`
+
+Display:
+
+**Kurama Resonance Himawari**
+
+Registry/PL authority supplied upstream:
+
+- Stats: `112 / 106 / 48 / 70 / 110 / 76 / 126`
+- Base PL: **118**
+
+This is a dedicated hosted/resonance Character representation.
+
+Assets must not visually or structurally imply a separate Kurama Battle participant or additional Kurama ownership transaction.
+
+Do not infer or create:
+
+- `nine_tails` projection;
+- `yang_kurama` projection;
+- `yin_kurama` projection;
+- `kurama_complete` projection;
+- second Kurama participant;
+- Sumire/Nue-style acquisition semantics.
+
+Its approved artwork is presentation only; embodied resonance authority comes from Registry/PL/Combat.
+
+---
+
 ## Production-admission ruling from Assets
 
-Character Creation / Assets closes the binary scope question as follows:
+### Intended eventual scope: **FINAL COMPLETE WAVE — 13 Characters + Nue**
 
-### Intended eventual scope: **B — complete awaiting-placement wave**
+Prospective gate after full admission:
 
-When these assets are promoted into live production, they should be admitted as the complete already-authorised wave:
+**98 Characters + 18 Entities = 116**
 
-**12 Characters + 1 Entity/Summon**
+### Immediate live gate: **remain 102**
 
-which would move the live gate from:
+Do not flip the runtime Registry/card/portrait Golden gates until the complete fourteen-row production projection is ready.
 
-**85 Characters + 17 Entities = 102**
+The outstanding Assets inputs are:
 
-→
+- exact committed/verified `collectibleCard` path + ACTIVE status for all 14;
+- approved square `uiPortrait` for all 14;
+- exact committed/verified `uiPortrait` path + ACTIVE status for all 14.
 
-**97 Characters + 18 Entities = 115**
-
-### Immediate live gate: **do not flip yet**
-
-The current live production gate must remain **102** until the complete admission prerequisites are closed.
-
-The missing Assets-side prerequisites are:
-
-- exact verified/committed `collectibleCard` repository mapping for all 13;
-- approved `uiPortrait` for all 13;
-- exact verified `uiPortrait` repository mapping/status for all 13.
-
-Because the portrait pass is intentionally deferred during the current Alpha push, Coding must not convert this eventual-scope decision into a premature live Registry/portrait gate expansion.
-
-This is not a request to reopen Combat semantics. Coding may implement already-closed pairing/bond semantics against stable IDs where architecturally appropriate, but the Golden **live production admission gate** remains 102 until Registry and Assets explicitly complete the 115 admission package.
+Because portrait production is intentionally deferred during the Alpha push, this document does **not** authorise Coding to half-admit a subset or fabricate missing projections.
 
 ---
 
 ## Downstream closure sequence
 
-1. **Character Creation / Assets** — normalize/ingest/verify the 13 collectible cards and later produce/approve 13 `uiPortrait`s.
-2. **Registry** — ratify exact identity → `collectibleCard` + `uiPortrait` mappings for the complete wave.
-3. **Coding** — extend live Registry/portrait Golden gates from 102 → 115 only after those mappings are complete.
-4. **CI** — prove exact expected counts, unique IDs/paths, decode success and required dimensions.
+1. **Assets** — ingest/verify the fourteen collectible cards.
+2. **Assets** — later create/approve fourteen square `uiPortrait`s.
+3. **Registry** — ratify exact fourteen-row identity → `collectibleCard` + `uiPortrait` mappings.
+4. **Coding** — admit all thirteen Characters + `nue` as one complete batch.
+5. Expected live counts become **98 Characters + 18 Entities = 116**.
+6. Registry/card/portrait Golden gates extend **102 → 116**.
+7. **CI** proves exact counts, unique IDs/paths, decode success, required dimensions and no alias drift.
 
 Until then:
 
-> **B is the intended admission scope, but 102 remains the live production gate.**
+> **116 is the locked destination for this wave; 102 remains the current live gate.**
 
 ---
 
 ## Ownership boundary
 
-- Character Creation / Assets owns approved visual identity, production card/portrait asset selection and supersession.
-- Registry owns production identity admission and identity → asset mapping ratification.
-- Coding owns runtime ingestion/resolution and Golden Regression.
-- Combat/PL calibration does not itself admit identities into live production.
-
+- **Character Creation / Assets:** approved visual identity, card/portrait asset selection, normalization, repository asset ingestion and supersession.
+- **Registry:** production identity admission and ratified identity → asset projections.
+- **Combat / PL:** mechanics and numerical authority; neither admits assets by itself.
+- **Coding:** runtime ingestion/resolution and Golden Regression.
