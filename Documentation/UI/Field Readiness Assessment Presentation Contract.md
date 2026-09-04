@@ -2,7 +2,21 @@
 
 Date: 4 September 2026
 
-Status: **BINDING ALPHA UI PRESENTATION CONTRACT — WRITING / RANK / REGISTRY / COMBAT AUTHORITIES EXTERNAL**
+Status: **BINDING ALPHA UI PRESENTATION CONTRACT — PRODUCTION SEMANTICS CLOSED / RUNTIME IMPLEMENTATION + VALIDATION SEPARATE**
+
+---
+
+# Owning production contract
+
+Current Rank/Registry + Combat production authority lives in the Chronicle Engine Design Bible at:
+
+`Games/Shinobi Chronicles/Academy to Genin Promotion - Field Readiness Production Contract.md`
+
+The Bible contract is semantically closed.
+
+> **Bible closed ≠ runtime implemented/validated.**
+
+UI consumes that contract; it does not create a second Promotion resolver.
 
 ---
 
@@ -30,6 +44,8 @@ UI does not own Promotion eligibility, readiness-domain interpretation, pass/fai
 
 Canonical rules:
 
+> **mission outcome ≠ readiness interpretation ≠ institutional Promotion.**
+
 > **UI presentation ≠ Promotion authority.**
 
 > **assessment criterion existence ≠ player Knowledge.**
@@ -37,6 +53,18 @@ Canonical rules:
 > **examiner observation ≠ player-facing metric.**
 
 > **Battle result ≠ Promotion result.**
+
+> **Battle victory ≠ Promotion.**
+
+> **team participation ≠ team-wide Promotion.**
+
+> **personal performance ≠ protective performance.**
+
+> **protective Promotion evidence ≠ Escort Special Jōnin evidence automatically.**
+
+> **failed Promotion ≠ erased attempt.**
+
+Battle is not mandatory.
 
 ---
 
@@ -95,7 +123,7 @@ Canonical rule:
 
 ---
 
-# Readiness domains
+# Closed Rank resolver — UI consumer boundary
 
 Rank's ratified readiness domains are:
 
@@ -106,9 +134,19 @@ Rank's ratified readiness domains are:
 - `objective_protection`
 - `judgement_under_pressure`
 
-The existence of these domains is production authority, but they are not automatically a live player-facing checklist.
+The production PASS contract is already closed by Rank/Registry:
 
-Unless Rank explicitly exposes a particular domain/status through legitimate examiner or institutional Knowledge, UI must not render internal pass/fail state for it.
+- formal mission objective complete;
+- qualifying `mission_comprehension` evidence;
+- qualifying `judgement_under_pressure` evidence;
+- qualifying evidence in at least two of `information_use`, `team_coordination`, `combat_readiness`, `objective_protection`;
+- no authored examiner safety/integrity abort/disqualification.
+
+This resolver exists as machine/institutional authority and is **not automatically a live player-facing checklist**.
+
+Unless Rank explicitly exposes a particular domain/status through legitimate examiner or institutional Knowledge, UI must not render its internal satisfied/failed state.
+
+UI does not calculate the four-domain minimum, duplicate the evaluator, or infer result from visible player actions.
 
 ---
 
@@ -138,11 +176,30 @@ Legitimate Combat outcomes may include:
 
 UI may present the factual Combat outcome where observer-safe, but must not map one of those outcomes directly to Genin Promotion.
 
-Canonical rule:
+An authored disengage/withdrawal may be valid mission behavior where preserving the actual objective requires it.
 
-> **Battle victory ≠ Promotion.**
+---
 
-> **authored disengagement can be valid mission behavior.**
+# Combat evidence consumer boundary
+
+When Battle occurs, Coding/Rank may consume Combat's closed evidence envelope including where applicable:
+
+- `assessmentContextId`;
+- `battleEncounterId`;
+- participant IDs;
+- `battleCompleted`;
+- `battleResult`;
+- `oppositionOutcome`;
+- committed Battle occurrence IDs;
+- personal-performance evidence by participant;
+- protective-performance evidence separately;
+- explicit cooperation/joint-action evidence where present;
+- dispatch/objective Battle events where present;
+- pursuit/disengage Battle occurrences where present.
+
+UI may present authorised factual outcomes/receipts from that envelope, but does not reinterpret it into Promotion scoring.
+
+Do not infer teamwork merely because multiple teammates took turns.
 
 ---
 
@@ -170,10 +227,6 @@ Promotion mutation belongs to one explicit:
 
 Team participation does not imply team-wide promotion.
 
-Canonical rule:
-
-> **team participation ≠ team-wide Promotion.**
-
 A successful assessment may promote only the authoritative subject Academy → Genin and unlock that subject's `geninRosterTransition` flow.
 
 UI must not promote teammates by visual association.
@@ -199,15 +252,32 @@ On failure:
 - preserve the attempt/history state supplied by runtime;
 - re-attempt availability is authoritative, not inferred.
 
-Canonical rules:
+Canonical regression truths:
 
-> **failed Promotion ≠ erased attempt.**
+> **winning every Battle may coexist with Promotion failure.**
+
+> **Promotion success may coexist with imperfect individual evidence when Rank's authored readiness standard is still legitimately satisfied.**
 
 > **same assessment ≠ same Chronicle history.**
 
-> **Promotion success may coexist with imperfect individual evidence when Rank's authored readiness standard is still satisfied.**
+---
 
-> **winning every Battle may coexist with Promotion failure.**
+# Regression ownership
+
+No new CE semantic family is required.
+
+This assessment should be covered through existing CE semantics plus an SC-specific Golden/release regression after Coding integration.
+
+At minimum, the SC gate should prove:
+
+1. Battle victory alone cannot produce Promotion;
+2. Promotion can succeed without Battle where the required evidence is otherwise legitimately satisfied;
+3. mission completion without required readiness evidence can fail Promotion;
+4. failed Promotion preserves the attempt/history;
+5. only `assessmentSubjectOwnedCharacterId` receives Rank mutation;
+6. personal and protective evidence remain distinct;
+7. objective-protection evidence does not automatically mint Escort Special Jōnin qualification;
+8. UI does not expose or manufacture hidden scoring.
 
 ---
 
@@ -221,6 +291,7 @@ Do not build:
 - automatic Promotion after Battle victory;
 - one fixed route/choreography;
 - a Menma-tutorial clone;
-- hidden personality/morality scoring from route choices.
+- hidden personality/morality scoring from route choices;
+- a second UI-owned readiness evaluator.
 
 Reuse existing Chronicle-aware map/event, Story Scene, Battle, Records/Knowledge and Promotion surfaces.
