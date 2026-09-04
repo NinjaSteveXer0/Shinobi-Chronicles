@@ -1,23 +1,21 @@
 # Shinobi Chronicles — PL / Registry / Rank Alpha Authority
 
-**Status:** Current production authority checkpoint
+**Status:** Current production authority checkpoint  
 **Date:** 2026-09-04
 
-This document records the current PL / Character Registry / Rank authority needed for Alpha reconciliation. It is intentionally narrower than the Chronicle Engine Bible and does not replace Combat, Writing, Character Creation, Codex, or Coding ownership.
+This document records current PL / Character Registry / Rank authority for Alpha reconciliation. It does not replace Combat, Writing, Character Creation, Codex/CE, Acquisition, UI, or Coding ownership.
 
 ---
 
-## 1. Production Registry checkpoint
+## 1. Alpha production Registry checkpoint
 
-The current live production Registry is:
+The current collectible/production Registry gate remains:
 
 - **85 Character identities**
 - **17 Entity identities**
 - **102 total production identities**
 
-The earlier **97 / 97** factory remains a closed historical production milestone. It must not be described as incomplete or restored as the current target.
-
-The five post-97 production additions are:
+The earlier **97 / 97** factory remains a closed historical milestone. The only additions that changed that gate from 97 to 102 are:
 
 - `academy_kurenai`
 - `academy_iwabee`
@@ -25,16 +23,7 @@ The five post-97 production additions are:
 - `academy_kakashi`
 - `academy_obito`
 
-The following do **not** become production Registry identities merely because they have been discussed, designed, illustrated, or used as qualification/enemy concepts:
-
-- generic qualification enemies;
-- Escort / Protective Detail challenge enemies;
-- Menma Origin Orochimaru-linked test-subject concepts;
-- Special Jōnin qualification definitions;
-- Chronicle Wraith as a narrative/designation candidate;
-- Chronicle Reaper Phase-2 / Phase-3 working asset or stage labels.
-
-A new production identity requires explicit Registry promotion.
+Generic enemies, qualification definitions, Escort challenge enemies, Menma test-subject opposition identities, and Chronicle Reaper stage labels do not silently increment this 102 collectible Character/Entity gate.
 
 Deleted identities remain deleted:
 
@@ -45,22 +34,34 @@ Surviving alternate-route boss identity:
 
 - `fallen_hokage_sasuke`
 
+`breakout_kurama` remains one stable Entity identity; removal from a Summon-card category does not delete the Entity.
+
 ---
 
 ## 2. Registry identity and presentation
 
 Preserve:
 
-**Registry identity ≠ display name ≠ collectible-card filename ≠ UI portrait filename.**
+**Registry identity ≠ represented person/source name ≠ display name ≠ collectible-card filename ≠ UI portrait filename.**
 
-Each production representation should resolve authoritative presentation assets through explicit mappings. Filename equality with the Registry ID is convenient but not ontologically required.
+`academy_izuno` is the stable machine identity representing **Wasabi Izuno**. The absence of an `academy_wasabi` ID is not evidence that Wasabi should be removed or replaced.
 
-Known current integration issue: the implemented Academy card mapping expects `academy_iwabee.png` and `academy_metal_lee.png`, while current GitHub assets use `academy_iwabe.png` and `academy_metal.png`. Coding should reconcile mapping/path reality without changing Registry IDs or card-facing display names.
-
-Card-facing display remains:
+Card-facing display remains separately authored. Known Academy examples:
 
 - `academy_iwabee` → **IWABE**
 - `academy_metal_lee` → **METAL**
+
+The current repository has a known card-file mapping mismatch for Iwabee/Metal. Coding may explicitly map the physical files or migrate filenames, but must not change Registry identity to solve an asset-path problem.
+
+### Battle portrait authority
+
+Required contract:
+
+`Registry representation ID → approved collectibleCard + approved uiPortrait`
+
+Filename equality is not required. Physical file presence, directory order, filename similarity, or collectible-card art must not select the Battle Portrait automatically. Coding must not silently crop a collectible card into a permanent portrait asset.
+
+Exact 102-wide `uiPortrait` mappings remain pending an approved Character Creation / Assets portrait manifest; Registry will not fabricate mappings from filenames.
 
 ---
 
@@ -80,11 +81,19 @@ Preserve:
 - Current PL = permanent earned development.
 - Effective PL = legitimate runtime Stat projection.
 - Battle PL = encounter-runtime operational capacity, not health.
-- Rank, appointment, department, rarity, reputation, qualification, or title grant no direct PL.
-- Resolver-local effects must not be converted into hidden Stats merely because they are numeric.
+- Rank, appointment, department, rarity, reputation, qualification, or title grants no direct PL.
+- Resolver-local effects must not become hidden Stats merely because they are numeric.
 - Entity PL never transfers wholesale to an associated Character.
 
-No current handoff in this checkpoint authorises recalibration of the locked 102 production identities.
+No current handoff authorises recalibration of the locked 102 production identities.
+
+### Legacy Battle-entry variation
+
+Legacy Battle-entry multipliers and random ±10% capacity variation, if still live, are Battle-runtime policy only. They are **not Base, Current, or Effective PL authority** and must not trigger Stat/PL recalibration. Combat must classify them KEEP / REPLACE / RETIRE / DEVELOPMENT-ONLY before Combat freeze.
+
+### Legacy world-region PL fossils
+
+Old `worldRegions` fields such as `recommendedPL`, `enemyMin`, `enemyMax`, and old `getLocationThreat()` values are **not current PL authority**. Do not recalibrate them in place. Coding must either retire the dead compatibility path or quarantine it from current Knowledge-sensitive hotspot presentation and modern PL comparisons.
 
 ---
 
@@ -92,30 +101,33 @@ No current handoff in this checkpoint authorises recalibration of the locked 102
 
 Preserve:
 
-**access ≠ active state ≠ embodied representation**
+**access ≠ active state ≠ embodied representation ≠ subordinate Technique/action access**
 
 **lineage ≠ runtime transformation**
 
-Higher-stage representations do not inherit lower-stage runtime packages merely because they share progression lineage.
+Higher-stage representations do not inherit lower-stage runtime packages merely because they share progression lineage. Historical formation provenance does not itself authorise current runtime projection. Parent Expression access does not grant every child Technique.
 
-Historical formation provenance does not itself authorise current runtime projection.
-
-Exact Technique access is required; parent Expression access does not grant all child Techniques.
+Embodiment metadata must never manufacture access authority.
 
 ---
 
 ## 5. Source-only causal identities
 
-`kikaichu_colony` remains a **source-only bound collective**.
+`kikaichu_colony` remains exactly:
+
+**source-only bound collective**
 
 It is not:
 
 - a production Entity Registry record;
-- an independent Battle participant;
 - a Summon;
+- a Companion ontology;
+- an independent Battle participant;
 - a turn owner;
 - a PL donor;
 - a hidden Shino Stat package.
+
+Any runtime wording such as `source_only_bound_collective_companion` is implementation taxonomy drift, not a second canonical classification.
 
 Preserve:
 
@@ -154,154 +166,299 @@ Initial Academy Team Formation requires:
 
 before ordinary Academy free play.
 
-Successful Genin promotion later opens a distinct Genin Roster Transition; it does not create the player's first team.
-
 ---
 
-## 7. Special Jōnin authority
+## 7. Alpha Arena Promotion contract — Rank authority
 
-The generic evidence-based qualification architecture is accepted.
+The first Alpha promotion lifecycle is Academy → Genin. The same architecture may support later promotions, but later assessments own their own content/requirements.
+
+### Availability
+
+Promotion Arena availability means the player is allowed to inspect/choose the assessment. It does **not** force entry.
+
+For the first Alpha promotion, minimum attempt eligibility is:
+
+- the exact owned candidate currently has formal rank **Academy**;
+- the Active Konoha continuity boundary has been entered;
+- mandatory Academy Team Formation is complete;
+- the authored Academy→Genin promotion assessment is currently available;
+- no unresolved promotion attempt for that candidate is already committed.
+
+Do not gate attempt eligibility through aggregate Team PL, Average PL, a hidden UI checklist, or a UI-calculated readiness score.
+
+### Entry
+
+Entry is an explicit voluntary player action.
+
+### Resolution
+
+Combat reports the Battle result and relevant Battle evidence. The Rank/Progression assessment authority decides the Promotion result from the authored assessment contract.
 
 Preserve:
 
-**earned qualification ≠ formal rank ≠ department ≠ appointment ≠ clearance/licence ≠ current assignment ≠ active practice**
+**Battle victory ≠ automatic Promotion**
 
-Stats may establish genuine readiness/safety requirements where appropriate but do not automatically grant specialist qualification.
+**Battle defeat ≠ erased attempt**
 
-Current standard Alpha qualification policy uses heterogeneous demonstrated evidence, including weighted evidence, diversity, independent contexts, mandatory competency coverage, and a verified specialist-level capstone.
+**PL ≠ Promotion authority**
 
-### Important implementation boundary
+### Success
 
-The generic evaluator exists, but the production qualification catalogue is not yet populated. Do not confuse evaluator completion with Special Jōnin catalogue completion.
+A successful assessment must atomically:
 
-### Escort / Protective Detail
+- persist the committed Promotion occurrence/evidence;
+- mutate the exact owned character's formal rank from Academy to Genin;
+- unlock the separate Genin Roster Transition.
 
-Escort / Protective Detail Specialist is restored as a legitimate specialisation family/path concept.
+Promotion itself grants no direct PL/Stat increase and does not automatically replace the Registry variant.
+
+### Failure
+
+Failure:
+
+- does not change formal rank;
+- does not rewrite Base/Current PL or Stats;
+- does not delete ownership/team history;
+- preserves the failed attempt and legitimate evidence/Knowledge gained.
+
+### Re-attempt
+
+Re-attempt is permitted after the previous attempt has resolved and the authored assessment is available again. There is no universal cooldown unless a future exact assessment explicitly authors one.
+
+Writing still owns the first actual Academy→Genin assessment fiction/content and any hidden/contextual criteria beyond this minimal Rank lifecycle.
+
+---
+
+## 8. Genin Roster Transition — Jōnin leader boundary
+
+Successful Genin promotion opens a **separate** `geninRosterTransition`.
+
+To complete the Alpha Genin Roster Transition, the player must:
+
+- keep both current Academy teammates, replace one, or replace both through the legitimate candidate/acquisition authority; and
+- select/assign **one eligible Jōnin leader**.
+
+Jōnin leader selection is therefore **mandatory for transition completion**, but it is not what causes the already-earned Genin promotion.
+
+A leader candidate must be explicitly authorised as eligible and normally hold formal rank **Jōnin**. Do not infer a universal all-Jōnin pool. Any future exception for another rank requires explicit authority.
 
 Preserve:
 
-**combat victory ≠ successful escort**
+**Academy teammate position ≠ Genin teammate position ≠ Jōnin leader role**
 
-**protected target survives ≠ automatic Escort competence**
+**Jōnin leader eligibility ≠ automatic recruitment ≠ automatic ownership ≠ automatic deployment**
 
-**escort mission participation ≠ Escort qualification**
+**Genin promotion ≠ first-team creation**
 
-**self-performance ≠ protective performance**
-
-### Open authority question
-
-The older catalogue count of **13 families / 39 paths** must not be hard-coded until the Special Jōnin workspace reconciles how restored Escort changes or restores that catalogue.
+Leadership assignment is a team/progression role, not automatically Battle slot 1 or My Clan queue position. Acquisition/CE owns candidate availability and any required transaction; Coding consumes the closed candidate list and Rank state.
 
 ---
 
-## 8. Menma Origin test-subject boundary
+## 9. Representation continuity across promotion
 
-Writing has authored Menma's Origin around Anko confronting Orochimaru-linked escaped/discarded experimental hostiles.
+Alpha rule:
 
-Current concepts include:
+**formal rank progression does not automatically replace or evolve the Registry variant.**
 
-- Brute;
-- Altered Shinobi;
-- Unstable Subject.
-
-These are **not yet production Registry identities by inference**.
-
-Correct authority order:
-
-**Writing / Character Creation closes exact representation identity and provenance**
-→ **Combat closes action semantics**
-→ **PL / Registry calibrates and registers only if a dedicated production identity is actually required**
-→ **Coding implements the closed contract**.
-
-Do not silently substitute generic Bandits if that would erase the authored Orochimaru/Anko provenance.
-
----
-
-## 9. Chronicle Reaper / Chronicle Wraith boundary
-
-Current Registry rule:
-
-`chronicle_wraith` must **not** be created as a production Registry identity by inference.
-
-Until upstream representation authority explicitly promotes it, Chronicle Wraith remains a designation / representation question rather than a registered identity.
-
-Likewise, a working asset label such as `chronicle_reaper_phase3` is not automatically a new Registry identity.
+An owned `academy_*` representation may become formally Genin through persistent progression while remaining represented by that same Registry variant. A separately authored `genin_*` collectible is not automatically substituted merely because the same fictional person progressed.
 
 Preserve:
 
-**production identity ≠ designation ≠ representation/stage ≠ persistent cross-Renewal identity proof**
+**Academy representation ≠ persistent Chronicle participant ≠ current formal rank**
 
-Kisōgan PL semantics remain closed and are not reopened by this terminology question.
+**new representation ≠ new historical person**
 
-Chronicle Reaper combat is not part of the current Alpha fight roster; representation-stage calibration can therefore wait for its complete later package rather than becoming an Alpha blocker.
+**leaving the active team ≠ deletion of prior Shared History**
+
+**representation progression ≠ replay/backfill of events that never occurred**
+
+For current Alpha, the stable `ownedCharacterId` plus formal-rank progression record supplies continuity because no automatic representation swap occurs. If a future explicit representation-evolution/switch system is authored, it must introduce an explicit stable person/participant continuity reference before switching representations; field naming remains Coding-owned.
 
 ---
 
-## 10. Kisōgan / historical-access boundary
+## 10. Menma Origin test-subject enemy identities
+
+Writing/Character Creation has established three distinct Orochimaru-linked experimental-hostile identities for Menma's Origin. Registry now promotes them as dedicated **Enemy/Opposition Registry identities**, not collectible Character/Entity identities:
+
+- `test_subject_brute` — **Test Subject — Brute**
+- `test_subject_altered_shinobi` — **Test Subject — Altered Shinobi**
+- `test_subject_unstable` — **Test Subject — Unstable**
+
+They do **not** alter the 85 + 17 = 102 collectible production gate.
+
+Narrative boundary:
+
+- victims of experimentation who are currently dangerous;
+- grounded Orochimaru-linked escaped/discarded subjects;
+- not generic Bandits;
+- not generic evil mutants;
+- not boss-scale Curse Mark monsters.
+
+Writing owns exact encounter composition/dialogue. Combat must now close their exact action packages. PL calibrates them only after Combat semantics/role are closed. Coding must not invent alternate machine IDs from prose.
+
+---
+
+## 11. Chronicle Reaper / Chronicle Wraith — resolved
+
+Writing has resolved the representation question.
+
+Authoritative progression:
+
+**CHRONICLE REAPER → CHRONICLE WRAITH → [PHASE 3 TITLE TBD]**
+
+All three stages belong to the same persistent production identity:
+
+`chronicle_reaper`
+
+`CHRONICLE WRAITH` is the **Phase-2 representation/stage title** of `chronicle_reaper`.
+
+Do **not** register a separate persistent `chronicle_wraith` Entity/Character.
+
+`chronicle_reaper_phase3` remains only a working representation/asset label until Writing locks the Phase-3 display title.
 
 Preserve:
 
-**committed occurrence ≠ historical access ≠ trace read ≠ Knowledge ≠ Reaping ≠ derivative**
+**production identity ≠ display/stage title ≠ representation ≠ persistent cross-Renewal identity proof**
 
-Historical Trace access must be bounded by legitimate scope and retained evidence. Increased fidelity never widens historical scope.
+**stage representation ≠ new Entity by default**
 
-A trace read does not itself:
+Earlier archaeology treating Chronicle Wraith only as a possible narrative designation is superseded for current phase terminology.
 
-- create a Chronicle event;
-- mutate world state;
-- grant Technique ownership;
-- perform Reaping;
-- create a derivative;
-- guarantee later counter/Reaping success.
-
-Cross-Renewal historical data retains its original scope/provenance and must not be rewritten as though it occurred in the current Renewal.
+This representation resolution does not itself add `chronicle_reaper` to the current 102 Alpha collectible Character/Entity gate and does not trigger PL recalibration.
 
 ---
 
-## 11. Outstanding cross-workspace ownership
+## 12. Kisōgan explicit access authority
 
-### Combat + PL / Rank
+Official Ability/Expression:
 
-Needs explicit authority:
+`kisogan_expression`
 
-- Menma performance bucket used by Anko's post-Battle judgement;
-- minimal Arena Promotion eligibility and result contract;
-- classification of legacy Battle-entry capacity variation (`×1`, `×1.25`, `×8`, `×50`, random ±10%) as KEEP / REPLACE / RETIRE / DEVELOPMENT-ONLY.
+Registry access capability:
 
-PL rule while those are reviewed: **do not recalibrate Base Stats or Base PL merely because a legacy Battle-entry modifier exists.**
+`kisogan_access`
 
-### Writing + Character Creation
+Embodiment of `kisogan_expression` does **not** grant `kisogan_access` and does not grant subordinate actions.
 
-Needs explicit representation closure:
+### Phase 1 — Chronicle Reaper
 
-- whether Chronicle Wraith is only a designation/stage or becomes a separately registered representation;
-- exact Menma test-subject enemy identities if dedicated representations are required.
+No Kisōgan access is inferred for Phase 1 merely from persistent identity. Current authored progression introduces the eye in Phase 2. Any Phase-1 access would require new explicit Writing/Combat authority.
 
-### Special Jōnin + Registry + Coding
+### Phase 2 — CHRONICLE WRAITH
 
-Needs closure:
+The dedicated Phase-2 representation must explicitly author:
 
-- final family/path catalogue after restored Escort;
-- stable qualification IDs and family IDs;
-- production declarative qualification definitions;
-- catalogue-completeness regression.
+- `kisogan_access`;
+- embodied `kisogan_expression` / authored starts-active state;
+- `kisogan_historical_trace_read` access;
+- `kisogan_causal_strata_analysis` access;
+- `kisogan_contradiction_analysis` access.
 
-### Combat + Coding + Codex
+It does **not** receive `kisogan_historical_lattice_analysis` by Phase-2 inference.
 
-Needs closure:
+### Phase 3
 
-- Triple Rashomon remaining five sequence payoff semantics;
-- deterministic enumeration of any Alpha-production actions still relying on explicit unresolved/placeholder semantic flags.
+The dedicated Phase-3 representation must explicitly author:
 
-These are Combat/Coding closure audits, not PL recalibration work.
+- `kisogan_access`;
+- embodied `kisogan_expression` / authored starts-active state;
+- all three Phase-2 Kisōgan actions;
+- `kisogan_historical_lattice_analysis`.
+
+Kisōgan access/actions do not grant Reaping, derivative construction, Reaper historical retention, or cross-Renewal identity.
+
+Player acquisition later must independently author `kisogan_access` plus whichever individual actions that exact route grants.
+
+### PL lock
+
+Kisōgan remains +0 to all seven Stats, +0 direct PL, and its four analysis actions remain 0 Attack PL.
+
+### Causal Strata cardinality
+
+`kisogan_causal_strata_analysis` requires **2–3** legitimately accessible committed references. One reference and four-or-more references are invalid targets and must fail without consuming an action opportunity.
 
 ---
 
-## 12. Alpha freeze principle
+## 13. Breakout Kurama manifestation boundary
 
-Do not treat a green diagnostic as proof that every production semantic is complete when the diagnostic was intentionally designed to accept explicit unresolved markers during development.
+Stable Entity identity:
 
-Before Golden Combat Regression / Alpha Combat Freeze, each Alpha-production action should be proven to either:
+`breakout_kurama`
+
+A qualifying CE breakout occurrence may authorise the already-existing `breakout_kurama` identity to become independently present as a **hostile forced manifestation**.
+
+This does not create a second Kurama ontology or another Registry Entity.
+
+Preserve:
+
+**stable Entity identity ≠ manifestation mode ≠ expression state ≠ historical occurrence identity**
+
+**hosted/bound presence ≠ independent encounter participation**
+
+**forced manifestation ≠ ordinary Summon preparation/attachment**
+
+**manifestation occurrence ≠ ownership**
+
+**Entity PL ≠ host PL**
+
+The breakout transition does not grant Summon ownership, preparation, attachment, control, cooperation, or access. CE owns the causal breakout occurrence/history. Registry owns the identity/mode linkage. Combat owns battlefield insertion, slots, turns, and encounter participation semantics. Coding must wait for those authorities to converge before implementing the bridge.
+
+---
+
+## 14. Special Jōnin catalogue recovery status
+
+The generic evidence-based qualification architecture is locked and implemented, but the production path catalogue is not yet loaded.
+
+Recovered exact historical catalogue material currently proves **11 families / 33 named paths**:
+
+1. Reconnaissance — Tracker-nin; Sensor-nin; Surveillance Specialist
+2. Intelligence — Interrogator; Counter-Intelligence Analyst; Strategic Intelligence Analyst
+3. Covert Operations — Assassin; Infiltration Specialist; Extraction Specialist
+4. Medical Operations — Field Medic; Toxicologist; Medical-Nin Researcher
+5. Fūinjutsu Operations — Sealing Specialist; Reverse-Summoning Specialist; Bijū Expert
+6. Shinobi Engineering and Applied Ninjutsu — Fūin Toolsmith; Summoning-Systems Specialist; Ninjutsu Engineer
+7. Instruction and Examination — Elite Instructor; Team Development Instructor; Examination Specialist
+8. Demolition and Sabotage — Explosive-Ordnance Specialist; Trap Specialist; Infrastructure Saboteur
+9. Communications and Cryptography — Cryptographer; Signal-Interception Specialist; Battlefield Communications Specialist
+10. Chakra and Technique Research — Bloodline Researcher; Counter-Technique Specialist; Technique Researcher
+11. Diplomacy and Negotiation — Shinobi Envoy; Conflict Mediator; Cultural Liaison
+
+Older authority also states **13 families / 39 paths**, but the exact remaining two historical families/six paths are not recoverable from the current audit record. Registry will **not invent them and mislabel the reconstruction as historical authority**.
+
+Escort / Protective Detail is restored as a legitimate Special Jōnin specialization direction, but its exact family/path placement and its effect on the old 13/39 count remain open until deliberate catalogue closure.
+
+Therefore:
+
+- do not hard-code 13 / 39 yet;
+- do not derive the catalogue from enemy cards;
+- do not load a partial catalogue as if complete;
+- challenge identity ≠ qualification path;
+- evidence opportunity ≠ institutional Recognition.
+
+Existing character qualification IDs remain valid:
+
+- `instruction_and_examination.elite_instructor`
+- `instruction_and_examination.examination_specialist`
+- `intelligence.interrogator`
+
+Qualification remains separate from rank, department, appointment, clearance/licence, current assignment, and active practice.
+
+---
+
+## 15. Alpha freeze / Coding handoff boundaries
+
+The following are Coding/Combat corrections, not PL recalibration:
+
+- Kisōgan Causal Strata minimum reference count 1 → 2;
+- remove embodiment → Kisōgan access inference;
+- preserve exact `source_only_bound_collective` Kikaichū taxonomy;
+- reconcile My Clan Active/Reserve filtering against current queue authority;
+- implement already-ratified Triple Rashōmon payoff semantics where current working source is incomplete;
+- enumerate every Alpha-production action still relying only on explicit unresolved/placeholder semantics before Golden Combat Freeze.
+
+A green diagnostic must not be treated as proof of semantic completeness when the diagnostic was intentionally allowed to pass explicit unresolved markers during development.
+
+Before Alpha Combat Freeze, each Alpha-production action must either:
 
 A. resolve through a real authorised consumer; or
 
