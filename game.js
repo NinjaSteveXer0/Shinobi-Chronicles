@@ -2443,13 +2443,16 @@ const itemDatabase = {
     equipmentSlot:
       "weapon",
 
+    weaponDifficulty:
+      1,
+
     description:
       "A short blade carried by an experienced bandit captain. Fast, compact and built for close-range combat.",
 
     statModifiers: {
 
       buki:
-        20
+        3
 
     }
 
@@ -2489,6 +2492,9 @@ const itemDatabase = {
     reusableWeapon:
       true,
 
+    weaponDifficulty:
+      0,
+
     description:
       "A reusable standard shinobi kunai. Ordinary Battle use does not consume the weapon."
 
@@ -2526,6 +2532,9 @@ const itemDatabase = {
 
     persistentWeaponSet:
       true,
+
+    weaponDifficulty:
+      0,
 
     description:
       "A prepared reusable set of standard shinobi shuriken. Throwing them during ordinary Battle does not consume the persistent set."
@@ -2715,6 +2724,21 @@ function getItemDefinitionByName(
   return getItemDefinition(
     itemId
   );
+}
+
+
+// =========================================================
+// BRICK 848 — ALPHA EQUIPMENT PRODUCTION CLOSURE
+// =========================================================
+const ALPHA_PRODUCTION_EQUIPMENT_IDS = Object.freeze([
+  "kunai",
+  "shuriken_set",
+  "ninja_wire",
+  "bandit_captains_tanto"
+]);
+
+function getAlphaProductionEquipmentDefinitions() {
+  return ALPHA_PRODUCTION_EQUIPMENT_IDS.map(itemId=>getItemDefinition(itemId)).filter(Boolean);
 }
 
 
@@ -7968,304 +7992,113 @@ function getPlayerCharacter(
 
 
 // =========================================================
-// FIND AVAILABLE INVENTORY EQUIPMENT
+// BRICK 849 — EXACT-INSTANCE PLAYER EQUIP SELECTION
+// BRICK 850 — BATTLE-TIME EQUIPMENT MUTATION LOCK
 // =========================================================
 
-function findAvailableEquipment(
-  itemId
-) {
-
-
-  return (
-    playerData.inventory.find(
-      item =>
-        item.id === itemId &&
-        item.type === "weapon" &&
-        !item.equippedBy
-    ) ||
-    null
+function isEquipmentMutationLockedByBattle() {
+  return !!(
+    typeof currentBattle!=="undefined" &&
+    currentBattle &&
+    currentBattle.active===true &&
+    currentBattle.battleOver!==true
   );
-
 }
 
+function findAvailableEquipment(instanceId) {
+  if (!instanceId || !playerData || !Array.isArray(playerData.inventory)) return null;
+  return playerData.inventory.find(item=>
+    item &&
+    item.instanceId===instanceId &&
+    item.type==="weapon" &&
+    !item.equippedBy
+  ) || null;
+}
 
+function getAvailableEquipmentInstancesByItemId(itemId) {
+  if (!itemId || !playerData || !Array.isArray(playerData.inventory)) return [];
+  return playerData.inventory.filter(item=>
+    item &&
+    item.id===itemId &&
+    item.type==="weapon" &&
+    !!item.instanceId &&
+    !item.equippedBy
+  );
+}
 
-// =========================================================
-// EQUIP ITEM TO CHARACTER
-// =========================================================
-
-function equipItemToCharacter(
-  itemId,
-  characterId
-) {
-
-
-  const character =
-    getPlayerCharacter(
-      characterId
-    );
-
-
-  if (!character) {
-
-
-    console.log(
-      "Character not found:",
-      characterId
-    );
-
-
+function equipItemToCharacter(instanceId, characterId) {
+  if (isEquipmentMutationLockedByBattle()) {
+    console.log("Equipment cannot be changed during an active unresolved Battle.");
     return false;
-
   }
 
+  const character=getPlayerCharacter(characterId);
+  if (!character) {
+    console.log("Character not found:",characterId);
+    return false;
+  }
 
-
-  const item =
-    findAvailableEquipment(
-      itemId
-    );
-
-
+  const item=findAvailableEquipment(instanceId);
   if (!item) {
-
-
-    console.log(
-      "No unequipped item available:",
-      itemId
-    );
-
-
+    console.log("No unequipped weapon instance available:",instanceId);
     return false;
-
   }
 
-
-
-  const definition =
-    getItemDefinition(
-      item.id
-    );
-
-
-  if (
-    !definition ||
-    definition.type !==
-      "weapon"
-  ) {
-
-
-    console.log(
-      "Item cannot be equipped:",
-      item.name
-    );
-
-
+  const definition=getItemDefinition(item.id);
+  if (!definition || definition.type!=="weapon" || definition.equipmentSlot!=="weapon") {
+    console.log("Item cannot be equipped:",item.name);
     return false;
-
   }
 
+  if (!Array.isArray(character.equipment)) character.equipment=[];
 
-
-  // =========================================
-  // PREPARE CHARACTER EQUIPMENT ARRAY
-  // =========================================
-
-  if (
-    !Array.isArray(
-      character.equipment
-    )
-  ) {
-
-
-    character.equipment =
-      [];
-
-  }
-
-
-
-  // =========================================
-  // CURRENTLY ONE WEAPON SLOT
-  // =========================================
-
-  const existingWeapon =
-    character.equipment.find(
-      equipment =>
-        equipment.slot ===
-        "weapon"
-    );
-
-
+  // Alpha owns one weapon slot. Replacement is never implicit.
+  const existingWeapon=character.equipment.find(equipment=>equipment&&equipment.slot==="weapon")||null;
   if (existingWeapon) {
-
-
-    console.log(
-      `${character.name} already has a weapon equipped.`
-    );
-
-
-    console.log(
-      "Unequip the current weapon first."
-    );
-
-
+    console.log(`${character.name} already has a weapon equipped.`);
+    console.log("Unequip the current weapon first.");
     return false;
-
   }
 
+  // Exact inventory instance is the equip identity. An itemId is not sufficient.
+  if (!item.instanceId || item.instanceId!==instanceId || item.equippedBy) return false;
 
-
-  // =========================================
-  // EQUIP WEAPON
-  // =========================================
-
-  item.equippedBy =
-    character.id;
-
-
-  character.equipment.push({
-
-    instanceId:
-      item.instanceId,
-
-    itemId:
-      item.id,
-
-    slot:
-      "weapon"
-
-  });
-
-
-
+  item.equippedBy=character.id;
+  character.equipment.push({instanceId:item.instanceId,itemId:item.id,slot:"weapon"});
   savePlayerData();
-
-
-
-  console.log(
-    `${item.name} equipped by ${character.name}.`
-  );
-
-
+  console.log(`${item.name} equipped by ${character.name}.`);
   return true;
-
 }
 
+function unequipCharacterWeapon(characterId) {
+  if (isEquipmentMutationLockedByBattle()) {
+    console.log("Equipment cannot be changed during an active unresolved Battle.");
+    return false;
+  }
 
-
-// =========================================================
-// UNEQUIP CHARACTER WEAPON
-// =========================================================
-
-function unequipCharacterWeapon(
-  characterId
-) {
-
-
-  const character =
-    getPlayerCharacter(
-      characterId
-    );
-
-
+  const character=getPlayerCharacter(characterId);
   if (!character) {
-
-
-    console.log(
-      "Character not found:",
-      characterId
-    );
-
-
+    console.log("Character not found:",characterId);
     return false;
-
+  }
+  if (!Array.isArray(character.equipment)||character.equipment.length===0) {
+    console.log(`${character.name} has no equipment.`);
+    return false;
   }
 
-
-
-  if (
-    !Array.isArray(
-      character.equipment
-    ) ||
-    character.equipment.length ===
-      0
-  ) {
-
-
-    console.log(
-      `${character.name} has no equipment.`
-    );
-
-
-    return false;
-
-  }
-
-
-
-  const equippedWeapon =
-    character.equipment.find(
-      equipment =>
-        equipment.slot ===
-        "weapon"
-    );
-
-
+  const equippedWeapon=character.equipment.find(equipment=>equipment&&equipment.slot==="weapon")||null;
   if (!equippedWeapon) {
-
-
-    console.log(
-      `${character.name} has no weapon equipped.`
-    );
-
-
+    console.log(`${character.name} has no weapon equipped.`);
     return false;
-
   }
 
-
-
-  const inventoryItem =
-    playerData.inventory.find(
-      item =>
-        item.instanceId ===
-        equippedWeapon.instanceId
-    );
-
-
-  if (inventoryItem) {
-
-
-    inventoryItem.equippedBy =
-      null;
-
-  }
-
-
-
-  character.equipment =
-    character.equipment.filter(
-      equipment =>
-        equipment.instanceId !==
-        equippedWeapon.instanceId
-    );
-
-
-
+  const inventoryItem=playerData.inventory.find(item=>item&&item.instanceId===equippedWeapon.instanceId)||null;
+  if (inventoryItem) inventoryItem.equippedBy=null;
+  character.equipment=character.equipment.filter(equipment=>equipment&&equipment.instanceId!==equippedWeapon.instanceId);
   savePlayerData();
-
-
-
-  console.log(
-    `${character.name}'s weapon has been unequipped.`
-  );
-
-
+  console.log(`${character.name}'s weapon has been unequipped.`);
   return true;
-
 }
-
 
 
 // =========================================================
@@ -37261,11 +37094,16 @@ function prepareAcademyPilotBattleEquipment() {
   ) {
 
 
+    const availableKunaiInstance =
+      getAvailableEquipmentInstancesByItemId("kunai")[0] || null;
+
     const equipped =
-      equipItemToCharacter(
-        "kunai",
-        mirai.id
-      );
+      availableKunaiInstance
+        ? equipItemToCharacter(
+            availableKunaiInstance.instanceId,
+            mirai.id
+          )
+        : false;
 
 
     if (
@@ -43484,6 +43322,77 @@ function runAlphaPost838MonsterDiagnostics() {
 }
 
 
+// =========================================================
+// BRICK 851 — ALPHA EQUIPMENT SEMANTIC REGRESSION LOCK
+// BRICK 852 — GOLDEN EQUIPMENT REGRESSION
+// =========================================================
+function runAlphaGoldenEquipmentDiagnostics() {
+  const kunai=getItemDefinition("kunai");
+  const shuriken=getItemDefinition("shuriken_set");
+  const wire=getItemDefinition("ninja_wire");
+  const tanto=getItemDefinition("bandit_captains_tanto");
+  const realizationProbe={weaponSpecializations:{Tanto:{level:0,exp:0}},equipment:[],stats:{nin:0,tai:0,buki:0,fuin:0,kin:0,gen:0,stamina:0}};
+  const tantoDescriptor=getEquipmentSourcePackageDescriptors({
+    ...realizationProbe,
+    equipment:[{instanceId:"diagnostic_tanto_instance",itemId:"bandit_captains_tanto",slot:"weapon"}]
+  })[0]||null;
+  const duplicateDescriptorProbe=getEquipmentSourcePackageDescriptors({
+    ...realizationProbe,
+    equipment:[
+      {instanceId:"diagnostic_tanto_instance",itemId:"bandit_captains_tanto",slot:"weapon"},
+      {instanceId:"diagnostic_tanto_instance",itemId:"bandit_captains_tanto",slot:"weapon"}
+    ]
+  });
+  const gapMultipliers=[0,1,2,3,4].map(gap=>gap>=4?0.35:WEAPON_PROFICIENCY_REALIZATION_BY_GAP[gap]);
+  const equipSource=equipItemToCharacter.toString();
+  const unequipSource=unequipCharacterWeapon.toString();
+  const throwingSource=getBattleAvailablePersistentThrowingWeaponContext.toString();
+  const toolSource=getBattleInventoryToolContext.toString();
+  const availabilitySource=evaluateAcademyBattleSkillAvailability.toString();
+  const syncSource=syncCharacterEquipmentFromSave.toString();
+  const skillOutputSource=calculateAcademySkillAttackOutput.toString();
+  const combatProgressionSources=[
+    consumeBattleActionOpportunity,
+    attemptBattlePreparedSkill,
+    attemptBattleSummonSkill,
+    attemptAcademyBattleSkill,
+    attemptClosureWaveBattleSkill,
+    resolveAcademyBattleSkillSemantics,
+    resolveClosureWaveSkillSemantics
+  ].map(fn=>fn.toString()).join("\n");
+  const result={
+    exactFourProductionDefinitions:JSON.stringify(ALPHA_PRODUCTION_EQUIPMENT_IDS)===JSON.stringify(["kunai","shuriken_set","ninja_wire","bandit_captains_tanto"])&&getAlphaProductionEquipmentDefinitions().length===4,
+    banditTantoFinalCalibration:!!tanto&&tanto.type==="weapon"&&tanto.weaponClass==="Tanto"&&tanto.rarity==="Rare"&&tanto.equipmentSlot==="weapon"&&tanto.weaponDifficulty===1&&tanto.statModifiers&&tanto.statModifiers.buki===3,
+    staleTantoTwentyDeleted:!!tanto&&(!tanto.statModifiers||tanto.statModifiers.buki!==20),
+    kunaiDifficultyZero:!!kunai&&kunai.weaponDifficulty===0&&kunai.persistentThrowingWeapon===true&&kunai.reusableWeapon===true&&!kunai.statModifiers,
+    shurikenDifficultyZero:!!shuriken&&shuriken.weaponDifficulty===0&&shuriken.persistentThrowingWeapon===true&&shuriken.reusableWeapon===true&&shuriken.persistentWeaponSet===true&&!shuriken.statModifiers,
+    ninjaWirePersistentToolOnly:!!wire&&wire.type==="tool"&&wire.stackable===false&&wire.persistentTool===true&&!wire.equipmentSlot&&!wire.battleConsumable&&!wire.statModifiers,
+    exactGapRealization:JSON.stringify(gapMultipliers)===JSON.stringify([1,0.9,0.75,0.55,0.35]),
+    tantoDifficultyOneProficiencyZeroRealizes27:!!tantoDescriptor&&tantoDescriptor.realization&&tantoDescriptor.realization.difficulty===1&&tantoDescriptor.realization.familyProficiency===0&&Math.abs(tantoDescriptor.statModifiers.buki-2.7)<1e-9,
+    fractionalEffectiveStatsPreserved:!!tantoDescriptor&&Number.isFinite(tantoDescriptor.statModifiers.buki)&&!Number.isInteger(tantoDescriptor.statModifiers.buki),
+    exactSourcePackageIdentity:!!tantoDescriptor&&tantoDescriptor.sourceId==="diagnostic_tanto_instance"&&tantoDescriptor.exactPackageId==="equipment_stat_modifiers:bandit_captains_tanto"&&tantoDescriptor.projectionKey===createEffectiveStateProjectionKey("diagnostic_tanto_instance","equipment_stat_modifiers:bandit_captains_tanto","equipped:weapon"),
+    exactSourcePackageIdempotence:duplicateDescriptorProbe.length===1&&duplicateDescriptorProbe[0].projectionKey===tantoDescriptor.projectionKey,
+    noSecondGenericProficiencyPenalty:skillOutputSource.includes("getDevelopedEffectiveCharacterStats")&&skillOutputSource.includes("getWeaponActionExecutionMultiplier")&&!skillOutputSource.includes("getWeaponContributionRealization"),
+    exactInstanceEquipSelection:equipSource.includes("findAvailableEquipment(instanceId)")&&equipSource.includes("item.instanceId!==instanceId")&&!equipSource.includes("findAvailableEquipment(\n      itemId"),
+    oneWeaponSlotExplicitUnequip:equipSource.includes('slot==="weapon"')&&equipSource.includes("Unequip the current weapon first."),
+    duplicateInstanceProtection:syncSource.includes("usedInstanceIds")&&syncSource.includes("Duplicate equipped item instance removed"),
+    battleTimeEquipRejected:equipSource.includes("isEquipmentMutationLockedByBattle()")&&unequipSource.includes("isEquipmentMutationLockedByBattle()"),
+    persistentThrowingWeaponsNotConsumed:throwingSource.includes("persistentThrowingWeapon")&&!throwingSource.includes("consumeInventoryStackQuantity")&&getWeaponExecutionContextForSkill.toString().includes("persistent_throwing_weapon"),
+    ninjaWirePersistentAvailability:toolSource.includes('definition.type !==\n      "tool"')&&toolSource.includes("playerData.inventory.find")&&!toolSource.includes("equipmentSlot"),
+    skillRequirementKindsLocked:["weapon_class","persistent_throwing_weapon","tool_item"].every(kind=>availabilitySource.includes(`requirement.kind ===\n        "${kind}"`)),
+    familyFallbackPreserved:getWeaponFamily({weaponClass:"Tanto"})==="Tanto"&&getWeaponFamily({weaponFamily:"Authored",weaponClass:"Tanto"})==="Authored",
+    noAutomaticProficiencyCombatHook:!combatProgressionSources.includes("addWeaponSpecializationExp("),
+    noDurabilityModel:[kunai,shuriken,tanto].every(def=>def&&!Object.prototype.hasOwnProperty.call(def,"durability")&&!Object.prototype.hasOwnProperty.call(def,"wear")&&!Object.prototype.hasOwnProperty.call(def,"breakage")),
+    unfamiliarExecutionExact:getWeaponActionExecutionMultiplier.toString().includes('record.state === "unfamiliar"')&&getWeaponActionExecutionMultiplier.toString().includes("multiplier:0.90"),
+    reacclimationExact:WEAPON_REACCLIMATION_EXECUTION_MULTIPLIER.minor===0.95&&WEAPON_REACCLIMATION_EXECUTION_MULTIPLIER.major===0.90&&WEAPON_REACCLIMATION_EXECUTION_MULTIPLIER.fundamental===0.85,
+    acclimationStatesMutuallyExclusive:setWeaponInstanceAcclimation.toString().includes('["unfamiliar","reacclimating"].includes(state)')&&getWeaponActionExecutionMultiplier.toString().includes('record.state === "unfamiliar"')&&getWeaponActionExecutionMultiplier.toString().includes('record.state === "reacclimating"'),
+    missingAcclimationDoesNotInferUnfamiliar:getWeaponActionExecutionMultiplier({},{instanceId:"missing_acclimation_record"}).multiplier===1
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
 function runAlphaPost846MonsterDiagnostics() {
   const groups={
     post838:runAlphaPost838MonsterDiagnostics(),
@@ -43491,6 +43400,19 @@ function runAlphaPost846MonsterDiagnostics() {
   };
   const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
   console.log(`SC Alpha post-846 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 853 — POST-EQUIPMENT GOLDEN GATE
+// =========================================================
+function runAlphaPost853MonsterDiagnostics() {
+  const groups={
+    post846:runAlphaPost846MonsterDiagnostics(),
+    equipment:runAlphaGoldenEquipmentDiagnostics()
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha post-853 monster gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
 }
 
