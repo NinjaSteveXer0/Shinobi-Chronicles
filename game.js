@@ -5956,7 +5956,13 @@ function createDefaultAcquisitionState() {
     onboardingStatus:"chronicle_origin_pending",
     formalRankProgressionByOwnedCharacterId:{},
     chronicleOrigin:{variantId:null,ownedCharacterId:null,prologueCompleted:false,completionEvidenceIds:[],activeKonohaEntered:false,activeKonohaEnteredAt:null,activeKonohaEntryBoundaryId:null},
-    academyTeamFormation:{unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],completedAt:null},
+    // BRICK 953 — formation commit receipt and post-commit continuation remain
+    // in the existing authoritative acquisition/onboarding state. UI owns no
+    // parallel semantic journey model.
+    academyTeamFormation:{
+      unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],
+      completedAt:null,confirmationReceipt:null,continuationCompleted:false,continuedAt:null
+    },
     geninRosterTransition:{
       unlocked:false,required:false,completed:false,subjectOwnedCharacterId:null,promotionEvidenceIds:[],
       eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null,
@@ -6018,7 +6024,13 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
       unlocked:source.academyTeamFormation.unlocked===true,required:source.academyTeamFormation.required===true,completed:source.academyTeamFormation.completed===true,
       selectedTeammateIds:Array.from({length:2},(_,index)=>{const id=Array.isArray(source.academyTeamFormation.selectedTeammateIds)?source.academyTeamFormation.selectedTeammateIds[index]:null;return CHRONICLE_ORIGIN_VARIANT_IDS.includes(id)?id:null;}),
       eligibleCandidateVariantIds:Array.isArray(source.academyTeamFormation.eligibleCandidateVariantIds)?[...new Set(source.academyTeamFormation.eligibleCandidateVariantIds.filter(id=>CHRONICLE_ORIGIN_VARIANT_IDS.includes(id)))]:[],
-      completedAt:source.academyTeamFormation.completedAt||null
+      completedAt:Number(source.academyTeamFormation.completedAt)||null,
+      confirmationReceipt:source.academyTeamFormation.confirmationReceipt&&typeof source.academyTeamFormation.confirmationReceipt==="object"?cloneProgressionData(source.academyTeamFormation.confirmationReceipt):null,
+      // Pre-contract completed saves already marked academy_free_play are treated
+      // as having consumed the old implicit continuation. New commits require
+      // the explicit TEAM FORMED -> CONTINUE boundary.
+      continuationCompleted:source.academyTeamFormation.continuationCompleted===true||(source.academyTeamFormation.completed===true&&!Object.prototype.hasOwnProperty.call(source.academyTeamFormation,"continuationCompleted")&&source.onboardingStatus==="academy_free_play"),
+      continuedAt:Number(source.academyTeamFormation.continuedAt)||null
     }:defaults.academyTeamFormation,
     geninRosterTransition:source.geninRosterTransition&&typeof source.geninRosterTransition==="object"?{
       unlocked:source.geninRosterTransition.unlocked===true,required:source.geninRosterTransition.required===true,completed:source.geninRosterTransition.completed===true,
@@ -6446,7 +6458,8 @@ function completeChronicleOriginPrologue(originVariantId,evidenceIds=[]) {
   if (formation.completed!==true&&formation.unlocked!==true) {
     state.academyTeamFormation={
       unlocked:true,required:true,completed:false,selectedTeammateIds:[null,null],
-      eligibleCandidateVariantIds:getAcademyTeamFormationEligibleCandidateVariantIds(originVariantId),completedAt:null
+      eligibleCandidateVariantIds:getAcademyTeamFormationEligibleCandidateVariantIds(originVariantId),
+      completedAt:null,confirmationReceipt:null,continuationCompleted:false,continuedAt:null
     };
     state.onboardingStatus="academy_team_formation_required";
     configureAcademyTeamFormationConstraint();
@@ -6460,14 +6473,47 @@ function completeChronicleOriginPrologue(originVariantId,evidenceIds=[]) {
   };
 }
 
+// =========================================================
+// BRICK 953 — AUTHORITATIVE FORMATION JOURNEY SNAPSHOT
+// =========================================================
+const ALPHA_ACADEMY_TEAM_FORMATION_CONTINUATION=Object.freeze({
+  type:"overlay",
+  overlayType:"village",
+  locationId:"konohagakure",
+  authority:"existing_konoha_navigation"
+});
+
 function getAcademyTeamFormationSnapshot() {
   const state=ensurePlayerAcquisitionState();
   const formation=state.academyTeamFormation||createDefaultAcquisitionState().academyTeamFormation;
+  const selected=Array.from({length:2},(_,index)=>Array.isArray(formation.selectedTeammateIds)?formation.selectedTeammateIds[index]||null:null);
   return {
-    originVariantId:state.chronicleOriginVariantId,unlocked:formation.unlocked===true,required:formation.required===true,completed:formation.completed===true,
-    selectedTeammateIds:[...(formation.selectedTeammateIds||[])],eligibleCandidateVariantIds:[...(formation.eligibleCandidateVariantIds||[])],
-    canConfirm:formation.unlocked===true&&formation.completed!==true&&Array.isArray(formation.selectedTeammateIds)&&formation.selectedTeammateIds.filter(Boolean).length===2&&new Set(formation.selectedTeammateIds.filter(Boolean)).size===2
+    originVariantId:state.chronicleOriginVariantId,
+    unlocked:formation.unlocked===true,
+    required:formation.required===true,
+    completed:formation.completed===true,
+    selectedTeammateIds:selected,
+    eligibleCandidateVariantIds:[...(formation.eligibleCandidateVariantIds||[])],
+    canConfirm:formation.unlocked===true&&formation.required===true&&formation.completed!==true&&selected.filter(Boolean).length===2&&new Set(selected.filter(Boolean)).size===2,
+    confirmationReceipt:formation.confirmationReceipt?cloneProgressionData(formation.confirmationReceipt):null,
+    continuationCompleted:formation.continuationCompleted===true,
+    continuedAt:Number(formation.continuedAt)||null,
+    canContinue:formation.completed===true&&!!formation.confirmationReceipt&&formation.continuationCompleted!==true,
+    continuationDestination:cloneProgressionData(ALPHA_ACADEMY_TEAM_FORMATION_CONTINUATION)
   };
+}
+
+function isAcademyTeamFormationJourneyBlockingFreePlay(acquisitionState=ensurePlayerAcquisitionState()) {
+  const state=acquisitionState&&typeof acquisitionState==="object"?acquisitionState:ensurePlayerAcquisitionState();
+  if (!state.chronicleOrigin||state.chronicleOrigin.activeKonohaEntered!==true) return false;
+  const formation=state.academyTeamFormation;
+  return !formation||formation.completed!==true||formation.continuationCompleted!==true;
+}
+
+function getAcademyTeamFormationJourneyBlockReason(acquisitionState=ensurePlayerAcquisitionState()) {
+  if (!isAcademyTeamFormationJourneyBlockingFreePlay(acquisitionState)) return null;
+  const formation=acquisitionState&&acquisitionState.academyTeamFormation;
+  return formation&&formation.completed===true?"academy_team_formation_continue_required":"academy_team_formation_required";
 }
 
 function selectAcademyTeamFormationTeammate(selectionPosition,variantId) {
@@ -6499,16 +6545,32 @@ function clearAcademyTeamFormationTeammate(selectionPosition) {
   return {success:true,selectedTeammateIds:[...formation.selectedTeammateIds]};
 }
 
-function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confirmation") {
+// =========================================================
+// BRICK 954 — EXACT SUBMITTED-SELECTION COMMIT + IDEMPOTENT RECEIPT
+// =========================================================
+function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confirmation",submittedTeammateIds=null) {
   const state=ensurePlayerAcquisitionState();
   const formation=state.academyTeamFormation;
   const originId=state.chronicleOriginVariantId;
-  const selected=formation&&Array.isArray(formation.selectedTeammateIds)?formation.selectedTeammateIds.filter(Boolean):[];
+
+  if (formation&&formation.completed===true&&formation.confirmationReceipt) {
+    return {success:true,idempotent:true,...cloneProgressionData(formation.confirmationReceipt)};
+  }
+
+  const pending=formation&&Array.isArray(formation.selectedTeammateIds)
+    ? Array.from({length:2},(_,index)=>formation.selectedTeammateIds[index]||null)
+    : [null,null];
+  const selected=Array.isArray(submittedTeammateIds)
+    ? Array.from({length:2},(_,index)=>submittedTeammateIds[index]||null)
+    : [...pending];
+
   if (!originId||!state.chronicleOrigin||state.chronicleOrigin.activeKonohaEntered!==true) return {success:false,reason:"active_konoha_not_entered"};
   if (!formation||formation.unlocked!==true||formation.required!==true||formation.completed===true) return {success:false,reason:"academy_team_formation_not_required"};
-  if (selected.length!==2||new Set(selected).size!==2) return {success:false,reason:"academy_team_requires_exactly_two_distinct_teammates"};
+  if (selected.filter(Boolean).length!==2||new Set(selected.filter(Boolean)).size!==2) return {success:false,reason:"academy_team_requires_exactly_two_distinct_teammates"};
+  if (submittedTeammateIds&&JSON.stringify(selected)!==JSON.stringify(pending)) return {success:false,reason:"academy_team_submitted_selection_mismatch"};
   if (selected.includes(originId)) return {success:false,reason:"chronicle_origin_cannot_be_teammate_selection"};
   if (!selected.every(id=>formation.eligibleCandidateVariantIds.includes(id))) return {success:false,reason:"academy_teammate_ineligible"};
+
   const snapshot=cloneProgressionData(playerData);
   try {
     const acquisitionResults=selected.map((variantId,index)=>{
@@ -6524,13 +6586,34 @@ function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confi
     const originRuntime=materializeProductionRuntimeCharacter(originId)||getRuntimeCharacterByRegistryId(originId);
     const teammateRuntimes=selected.map(id=>materializeProductionRuntimeCharacter(id)||getRuntimeCharacterByRegistryId(id));
     if (!originRuntime||teammateRuntimes.some(runtime=>!runtime)) throw new Error("academy_team_runtime_materialization_failed");
-    playerData.clan=normalizeClanManagementState({teamSlots:[originRuntime.id,teammateRuntimes[0].id,teammateRuntimes[1].id,null,null,null],favoriteIds:(playerData.clan&&playerData.clan.favoriteIds)||[]},playerData.characterOwnership);
-    formation.completed=true;formation.required=false;formation.completedAt=Date.now();
-    state.onboardingStatus="academy_free_play";
+
+    playerData.clan=normalizeClanManagementState({
+      teamSlots:[originRuntime.id,teammateRuntimes[0].id,teammateRuntimes[1].id,null,null,null],
+      favoriteIds:(playerData.clan&&playerData.clan.favoriteIds)||[]
+    },playerData.characterOwnership);
+
+    formation.completed=true;
+    formation.required=false;
+    formation.completedAt=Date.now();
+    formation.continuationCompleted=false;
+    formation.continuedAt=null;
+    formation.confirmationReceipt={
+      commitId:`academy_team_formation:${originId}:${selected.join("+")}`,
+      sourceEventId:String(sourceEventId||"academy_team_formation_confirmation"),
+      originVariantId:originId,
+      selectedTeammateIds:[...selected],
+      teamVariantIds:[originId,...selected],
+      teamRuntimeIds:[originRuntime.id,teammateRuntimes[0].id,teammateRuntimes[1].id],
+      acquisitionRecordIds:acquisitionResults.map(result=>result.record&&result.record.recordId||result.recordId||null).filter(Boolean),
+      committedAt:formation.completedAt
+    };
+    // Team formation has committed, but ordinary free play remains closed until
+    // the separate CONTINUE navigation boundary is consumed.
+    state.onboardingStatus="academy_team_formed";
     clearActiveClanFormationConstraint();
     savePlayerData();
     rerenderClanOverlay();
-    return {success:true,originVariantId:originId,selectedTeammateIds:selected,teamSlots:[...playerData.clan.teamSlots],acquisitionResults};
+    return {success:true,idempotent:false,...cloneProgressionData(formation.confirmationReceipt),teamSlots:[...playerData.clan.teamSlots],acquisitionResults};
   } catch (error) {
     playerData=snapshot;
     setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
@@ -6540,6 +6623,339 @@ function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confi
     return {success:false,reason:"academy_team_formation_rolled_back",error:String(error&&error.message||error)};
   }
 }
+
+// =========================================================
+// BRICK 955 — POST-COMMIT CONTINUATION / FREE-PLAY GATE
+// =========================================================
+function continueAcademyTeamFormationJourney() {
+  const state=ensurePlayerAcquisitionState();
+  const formation=state.academyTeamFormation;
+  if (!formation||formation.completed!==true||!formation.confirmationReceipt) return {success:false,reason:"academy_team_formation_not_committed"};
+  if (formation.continuationCompleted===true) {
+    return {success:true,idempotent:true,destination:cloneProgressionData(ALPHA_ACADEMY_TEAM_FORMATION_CONTINUATION),confirmationReceipt:cloneProgressionData(formation.confirmationReceipt)};
+  }
+  formation.continuationCompleted=true;
+  formation.continuedAt=Date.now();
+  state.onboardingStatus="academy_free_play";
+  savePlayerData();
+  return {
+    success:true,idempotent:false,
+    destination:cloneProgressionData(ALPHA_ACADEMY_TEAM_FORMATION_CONTINUATION),
+    confirmationReceipt:cloneProgressionData(formation.confirmationReceipt),
+    continuedAt:formation.continuedAt
+  };
+}
+
+// =========================================================
+// BRICKS 956–961 — ACADEMY TEAM FORMATION PRESENTATION / ROUTING
+// =========================================================
+const ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME={
+  stage:null,
+  busy:false,
+  lastError:null,
+  confirmInvocationCount:0,
+  continueInvocationCount:0
+};
+
+function escapeAcademyTeamFormationHTML(value) {
+  return String(value==null?"":value)
+    .replace(/&/g,"&amp;")
+    .replace(/</g,"&lt;")
+    .replace(/>/g,"&gt;")
+    .replace(/\"/g,"&quot;")
+    .replace(/'/g,"&#039;");
+}
+
+function getAcademyTeamFormationPresentationEntry(variantId) {
+  const registry=variantId?getCharacterRegistryEntry(variantId):null;
+  if (!registry) return null;
+  const cardPath=getCharacterCardAssetPath(variantId);
+  if (!cardPath) return null;
+  return {
+    variantId,
+    displayName:getProductionRuntimeDisplayName(variantId),
+    rankLabel:getProductionRuntimeRankLabel(variantId)||"Academy",
+    cardPath
+  };
+}
+
+// BRICK 957 — presentation consumes the exact backend snapshot; it never
+// recalculates eligibility from ownership, Registry neighbours, or card files.
+function getAcademyTeamFormationPresentationModel() {
+  const snapshot=getAcademyTeamFormationSnapshot();
+  const origin=getAcademyTeamFormationPresentationEntry(snapshot.originVariantId);
+  const rawCandidates=[...snapshot.eligibleCandidateVariantIds];
+  const candidates=rawCandidates.map(getAcademyTeamFormationPresentationEntry);
+  const selected=[...snapshot.selectedTeammateIds];
+  const selectedEntries=selected.map(id=>id?getAcademyTeamFormationPresentationEntry(id):null);
+  const candidateAuthorityValid=
+    snapshot.unlocked===true&&
+    !!origin&&
+    rawCandidates.length>=2&&
+    rawCandidates.length===new Set(rawCandidates).size&&
+    !rawCandidates.includes(snapshot.originVariantId)&&
+    candidates.every(Boolean);
+  const committedTeam=snapshot.completed===true&&snapshot.confirmationReceipt
+    ? [snapshot.confirmationReceipt.originVariantId,...snapshot.confirmationReceipt.selectedTeammateIds].map(getAcademyTeamFormationPresentationEntry)
+    : [];
+  const committedReceiptValid=snapshot.completed!==true||(
+    !!snapshot.confirmationReceipt&&
+    committedTeam.length===3&&
+    committedTeam.every(Boolean)&&
+    new Set(committedTeam.map(item=>item.variantId)).size===3&&
+    committedTeam[0].variantId===snapshot.originVariantId
+  );
+  return {
+    available:candidateAuthorityValid&&committedReceiptValid,
+    unavailableReason:!candidateAuthorityValid?"academy_team_formation_authority_unavailable":(!committedReceiptValid?"academy_team_formation_receipt_invalid":null),
+    snapshot,origin,candidates,selectedEntries,committedTeam
+  };
+}
+
+function ensureAcademyTeamFormationPresentationStyles() {
+  if (typeof document==="undefined"||!document.head) return false;
+  if (document.getElementById("sc-academy-team-formation-style")) return true;
+  const style=document.createElement("style");
+  style.id="sc-academy-team-formation-style";
+  style.textContent=`
+    #academy-team-formation-layer{position:fixed;inset:0;z-index:13000;background:radial-gradient(circle at 50% 8%,rgba(31,58,69,.34),transparent 38%),linear-gradient(145deg,#05090d 0%,#081219 48%,#04070a 100%);color:#e8e0cf;font-family:inherit;overflow:auto;display:flex;align-items:stretch;justify-content:center;}
+    #academy-team-formation-layer *{box-sizing:border-box;}
+    #academy-team-formation-layer .atf-shell{width:min(1440px,100%);min-height:100vh;padding:38px clamp(18px,4vw,58px) 46px;display:flex;flex-direction:column;gap:22px;}
+    #academy-team-formation-layer .atf-kicker{font-size:11px;letter-spacing:.24em;color:#c7a65a;text-transform:uppercase;}
+    #academy-team-formation-layer h1{margin:5px 0 0;font-size:clamp(28px,4vw,52px);letter-spacing:.07em;color:#f2e4b0;text-transform:uppercase;}
+    #academy-team-formation-layer .atf-subtitle{max-width:840px;color:#9fb0b8;line-height:1.6;font-size:13px;}
+    #academy-team-formation-layer .atf-grid{display:grid;grid-template-columns:minmax(250px,.72fr) minmax(0,1.65fr);gap:24px;align-items:start;}
+    #academy-team-formation-layer .atf-panel{border:1px solid rgba(196,157,72,.34);background:linear-gradient(180deg,rgba(9,19,25,.94),rgba(5,11,15,.96));box-shadow:inset 0 0 0 1px rgba(255,234,178,.035),0 18px 48px rgba(0,0,0,.28);padding:18px;}
+    #academy-team-formation-layer .atf-section-title{font-size:11px;letter-spacing:.18em;color:#d2b365;text-transform:uppercase;margin-bottom:12px;}
+    #academy-team-formation-layer .atf-fixed{position:relative;display:grid;gap:10px;}
+    #academy-team-formation-layer .atf-fixed::after{content:'FIXED';position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:.16em;color:#f0d88d;border:1px solid rgba(207,169,75,.46);background:rgba(9,15,18,.86);padding:5px 7px;}
+    #academy-team-formation-layer .atf-card-image{width:100%;aspect-ratio:.7/1;object-fit:cover;object-position:center top;border:1px solid rgba(207,169,75,.34);background:#05090c;display:block;}
+    #academy-team-formation-layer .atf-name{font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#f0e6ca;}
+    #academy-team-formation-layer .atf-rank{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#82a9b7;}
+    #academy-team-formation-layer .atf-slots{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:18px;}
+    #academy-team-formation-layer .atf-slot{min-height:94px;border:1px dashed rgba(142,168,177,.35);background:rgba(4,11,15,.68);padding:12px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    #academy-team-formation-layer .atf-slot.filled{border-style:solid;border-color:rgba(207,169,75,.46);background:rgba(27,25,16,.48);}
+    #academy-team-formation-layer .atf-slot-label{font-size:9px;letter-spacing:.16em;color:#849ba4;text-transform:uppercase;display:block;margin-bottom:5px;}
+    #academy-team-formation-layer .atf-remove{border:1px solid rgba(185,129,99,.45);background:rgba(39,18,15,.72);color:#e5c7b6;padding:7px 9px;cursor:pointer;}
+    #academy-team-formation-layer .atf-candidates{display:grid;grid-template-columns:repeat(auto-fit,minmax(128px,1fr));gap:12px;}
+    #academy-team-formation-layer .atf-candidate{appearance:none;border:1px solid rgba(113,151,164,.28);background:#071116;color:inherit;padding:8px;cursor:pointer;text-align:left;transition:border-color .15s,transform .15s,background .15s;}
+    #academy-team-formation-layer .atf-candidate:hover,#academy-team-formation-layer .atf-candidate:focus-visible{border-color:#d4b45e;outline:2px solid rgba(212,180,94,.25);outline-offset:2px;transform:translateY(-1px);}
+    #academy-team-formation-layer .atf-candidate[aria-pressed='true']{border-color:#e1bf62;background:rgba(47,38,18,.82);box-shadow:0 0 0 1px rgba(225,191,98,.16);}
+    #academy-team-formation-layer .atf-candidate .atf-card-image{aspect-ratio:.7/1;margin-bottom:8px;}
+    #academy-team-formation-layer .atf-candidate .atf-name{font-size:11px;}
+    #academy-team-formation-layer .atf-candidate .atf-rank{font-size:9px;margin-top:3px;}
+    #academy-team-formation-layer .atf-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;border-top:1px solid rgba(207,169,75,.18);padding-top:16px;margin-top:18px;}
+    #academy-team-formation-layer .atf-count{font-weight:800;letter-spacing:.15em;color:#e5cf91;font-size:12px;}
+    #academy-team-formation-layer .atf-primary{appearance:none;border:1px solid rgba(218,181,89,.76);background:linear-gradient(180deg,#2b2a1b,#17190f);color:#f3dfa0;padding:12px 22px;font-weight:800;letter-spacing:.09em;cursor:pointer;min-width:170px;}
+    #academy-team-formation-layer .atf-primary:hover:not(:disabled),#academy-team-formation-layer .atf-primary:focus-visible:not(:disabled){border-color:#f0d071;outline:2px solid rgba(240,208,113,.24);outline-offset:2px;}
+    #academy-team-formation-layer .atf-primary:disabled{opacity:.38;cursor:not-allowed;}
+    #academy-team-formation-layer .atf-message{min-height:18px;font-size:11px;color:#d3b87a;}
+    #academy-team-formation-layer .atf-error{border:1px solid rgba(181,102,79,.5);background:rgba(44,18,15,.74);padding:18px;color:#e8c8b8;line-height:1.55;}
+    #academy-team-formation-layer .atf-intro{margin:auto;max-width:820px;text-align:center;border:1px solid rgba(207,169,75,.42);background:linear-gradient(180deg,rgba(9,18,23,.96),rgba(4,9,12,.98));padding:clamp(34px,7vw,78px);box-shadow:0 30px 80px rgba(0,0,0,.48);}
+    #academy-team-formation-layer .atf-intro p{color:#9db0b8;line-height:1.7;max-width:590px;margin:16px auto 24px;}
+    #academy-team-formation-layer .atf-receipt-team{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:10px;}
+    #academy-team-formation-layer .atf-receipt-card{border:1px solid rgba(207,169,75,.4);background:rgba(8,16,21,.9);padding:10px;}
+    #academy-team-formation-layer .atf-receipt-card .atf-name{font-size:12px;margin-top:9px;}
+    @media(max-width:860px){#academy-team-formation-layer .atf-grid{grid-template-columns:1fr;}#academy-team-formation-layer .atf-fixed{max-width:300px;}#academy-team-formation-layer .atf-receipt-team{grid-template-columns:1fr;}.atf-receipt-card{max-width:320px;}#academy-team-formation-layer .atf-slots{grid-template-columns:1fr;}}
+  `;
+  document.head.appendChild(style);
+  return true;
+}
+
+function getAcademyTeamFormationPresentationLayer() {
+  if (typeof document==="undefined"||!document.body) return null;
+  let layer=document.getElementById("academy-team-formation-layer");
+  if (!layer) {
+    layer=document.createElement("section");
+    layer.id="academy-team-formation-layer";
+    layer.setAttribute("role","dialog");
+    layer.setAttribute("aria-modal","true");
+    layer.setAttribute("aria-labelledby","academy-team-formation-title");
+    document.body.appendChild(layer);
+  }
+  layer.style.display="flex";
+  return layer;
+}
+
+function hideAcademyTeamFormationPresentationLayer() {
+  if (typeof document==="undefined") return true;
+  const layer=document.getElementById("academy-team-formation-layer");
+  if (layer) { layer.style.display="none"; layer.innerHTML=""; }
+  ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.stage=null;
+  ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.busy=false;
+  ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.lastError=null;
+  return true;
+}
+
+function renderAcademyTeamFormationIdentityCard(entry,options={}) {
+  if (!entry) return "";
+  return `<div class="${options.receipt?"atf-receipt-card":"atf-fixed"}">
+    <img class="atf-card-image" src="${escapeAcademyTeamFormationHTML(entry.cardPath)}" alt="${escapeAcademyTeamFormationHTML(entry.displayName)} Academy character card">
+    <div class="atf-name">${escapeAcademyTeamFormationHTML(entry.displayName)}</div>
+    <div class="atf-rank">${escapeAcademyTeamFormationHTML(entry.rankLabel)}</div>
+  </div>`;
+}
+
+function renderAcademyTeamFormationUI(options={}) {
+  ensureAcademyTeamFormationPresentationStyles();
+  const layer=getAcademyTeamFormationPresentationLayer();
+  if (!layer) return {success:false,reason:"presentation_document_missing"};
+  const model=getAcademyTeamFormationPresentationModel();
+  const runtime=ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME;
+  if (options.showChronicleBegins===true&&!runtime.stage) runtime.stage="chronicle_begins";
+  if (!runtime.stage) runtime.stage=model.snapshot.completed?"receipt":"formation";
+
+  if (!model.available) {
+    runtime.stage="unavailable";
+    layer.innerHTML=`<div class="atf-shell"><div><div class="atf-kicker">OPENING JOURNEY</div><h1 id="academy-team-formation-title">ACADEMY TEAM FORMATION</h1></div><div class="atf-error" role="alert">Team Formation is currently unavailable because authoritative Origin/candidate state could not be resolved. No substitute candidates or ownership assumptions have been made.</div></div>`;
+    return {success:false,reason:model.unavailableReason};
+  }
+
+  if (runtime.stage==="chronicle_begins"&&!model.snapshot.completed) {
+    layer.innerHTML=`<div class="atf-shell"><div class="atf-intro"><div class="atf-kicker">ACTIVE KONOHA</div><h1 id="academy-team-formation-title">YOUR CHRONICLE BEGINS</h1><p>Your Origin is committed. Before ordinary Academy life opens, choose the two shinobi who will form your first three-person team.</p><button type="button" class="atf-primary" id="academy-team-begins-continue">CONTINUE</button></div></div>`;
+    const button=document.getElementById("academy-team-begins-continue");
+    if (button) button.addEventListener("click",()=>{runtime.stage="formation";renderAcademyTeamFormationUI();});
+    return {success:true,stage:"chronicle_begins"};
+  }
+
+  if (model.snapshot.completed) {
+    runtime.stage="receipt";
+    layer.innerHTML=`<div class="atf-shell">
+      <header><div class="atf-kicker">FORMATION COMMITTED</div><h1 id="academy-team-formation-title">TEAM FORMED</h1><p class="atf-subtitle">Your first Academy team is committed. Continue into Konoha; this button performs navigation only and does not reacquire or recommit the team.</p></header>
+      <section class="atf-panel"><div class="atf-section-title">COMMITTED ACADEMY TEAM</div><div class="atf-receipt-team">${model.committedTeam.map(entry=>renderAcademyTeamFormationIdentityCard(entry,{receipt:true})).join("")}</div>
+      <div class="atf-footer"><div class="atf-message" role="status" aria-live="polite">${runtime.lastError?escapeAcademyTeamFormationHTML(runtime.lastError):"Formation confirmed."}</div><button type="button" class="atf-primary" id="academy-team-continue" ${runtime.busy?"disabled":""}>CONTINUE</button></div></section>
+    </div>`;
+    const continueButton=document.getElementById("academy-team-continue");
+    if (continueButton) continueButton.addEventListener("click",continueAcademyTeamFormationFromUI);
+    return {success:true,stage:"receipt",canContinue:model.snapshot.canContinue};
+  }
+
+  runtime.stage="formation";
+  const selectedCount=model.snapshot.selectedTeammateIds.filter(Boolean).length;
+  const slots=model.selectedEntries.map((entry,index)=>`<div class="atf-slot ${entry?"filled":""}"><div><span class="atf-slot-label">TEAMMATE ${index+1}</span>${entry?`<span class="atf-name">${escapeAcademyTeamFormationHTML(entry.displayName)}</span>`:`<span style="color:#738993;font-size:12px;">EMPTY</span>`}</div>${entry?`<button type="button" class="atf-remove" data-remove-slot="${index+1}" aria-label="Remove ${escapeAcademyTeamFormationHTML(entry.displayName)} from teammate slot ${index+1}">REMOVE</button>`:""}</div>`).join("");
+  const candidates=model.candidates.map((entry,index)=>{
+    const isSelected=model.snapshot.selectedTeammateIds.includes(entry.variantId);
+    return `<button type="button" class="atf-candidate" data-candidate-index="${index}" aria-pressed="${isSelected?"true":"false"}" aria-label="${isSelected?"Remove":"Select"} ${escapeAcademyTeamFormationHTML(entry.displayName)}"><img class="atf-card-image" src="${escapeAcademyTeamFormationHTML(entry.cardPath)}" alt=""><div class="atf-name">${escapeAcademyTeamFormationHTML(entry.displayName)}</div><div class="atf-rank">${escapeAcademyTeamFormationHTML(entry.rankLabel)}</div></button>`;
+  }).join("");
+
+  layer.innerHTML=`<div class="atf-shell">
+    <header><div class="atf-kicker">OPENING JOURNEY</div><h1 id="academy-team-formation-title">ACADEMY TEAM FORMATION</h1><p class="atf-subtitle">Choose exactly two eligible Academy teammates. Candidate eligibility is supplied by the formation authority; selection is reversible and does not acquire a character until CONFIRM TEAM succeeds.</p></header>
+    <div class="atf-grid">
+      <aside class="atf-panel"><div class="atf-section-title">YOUR SHINOBI</div>${renderAcademyTeamFormationIdentityCard(model.origin)}</aside>
+      <main class="atf-panel"><div class="atf-section-title">TEAMMATE SLOTS</div><div class="atf-slots">${slots}</div><div class="atf-section-title">ELIGIBLE ACADEMY CANDIDATES</div><div class="atf-candidates">${candidates}</div>
+      <div class="atf-footer"><div><div class="atf-count" id="academy-team-selection-count" aria-live="polite">${selectedCount} / 2 SELECTED</div><div class="atf-message" id="academy-team-formation-message" role="status" aria-live="polite">${runtime.lastError?escapeAcademyTeamFormationHTML(runtime.lastError):""}</div></div><button type="button" class="atf-primary" id="academy-team-confirm" ${(!model.snapshot.canConfirm||runtime.busy)?"disabled":""}>${runtime.busy?"CONFIRMING…":"CONFIRM TEAM"}</button></div>
+      </main>
+    </div>
+  </div>`;
+
+  [...layer.querySelectorAll("[data-candidate-index]")].forEach(button=>{
+    button.addEventListener("click",()=>{
+      const index=Number(button.getAttribute("data-candidate-index"));
+      const entry=model.candidates[index];
+      if (entry) toggleAcademyTeamFormationCandidateFromUI(entry.variantId);
+    });
+  });
+  [...layer.querySelectorAll("[data-remove-slot]")].forEach(button=>{
+    button.addEventListener("click",()=>{
+      const slot=Number(button.getAttribute("data-remove-slot"));
+      clearAcademyTeamFormationTeammate(slot);
+      runtime.lastError=null;
+      renderAcademyTeamFormationUI();
+    });
+  });
+  const confirmButton=document.getElementById("academy-team-confirm");
+  if (confirmButton) confirmButton.addEventListener("click",submitAcademyTeamFormationFromUI);
+  return {success:true,stage:"formation",selectedCount,canConfirm:model.snapshot.canConfirm};
+}
+
+// BRICK 958 — selection is reversible pending state only. A third candidate
+// cannot silently replace one of two existing choices.
+function toggleAcademyTeamFormationCandidateFromUI(variantId) {
+  const snapshot=getAcademyTeamFormationSnapshot();
+  const runtime=ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME;
+  if (snapshot.completed) return {success:false,reason:"academy_team_already_formed"};
+  const existingIndex=snapshot.selectedTeammateIds.indexOf(variantId);
+  let result;
+  if (existingIndex>=0) {
+    result=clearAcademyTeamFormationTeammate(existingIndex+1);
+  } else {
+    const emptyIndex=snapshot.selectedTeammateIds.findIndex(id=>!id);
+    if (emptyIndex<0) {
+      result={success:false,reason:"academy_team_selection_full_remove_first"};
+    } else {
+      result=selectAcademyTeamFormationTeammate(emptyIndex+1,variantId);
+    }
+  }
+  runtime.lastError=result.success?null:(result.reason==="academy_team_selection_full_remove_first"?"Remove a selected teammate before choosing another.":"That teammate selection could not be applied.");
+  renderAcademyTeamFormationUI();
+  return result;
+}
+
+// BRICK 959 — one UI activation submits the exact two pending identities to
+// the authoritative commit function once. Busy state closes duplicate presses.
+function submitAcademyTeamFormationFromUI() {
+  const runtime=ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME;
+  if (runtime.busy) return {success:false,reason:"academy_team_confirmation_busy"};
+  const snapshot=getAcademyTeamFormationSnapshot();
+  if (!snapshot.canConfirm) return {success:false,reason:"academy_team_requires_exactly_two_distinct_teammates"};
+  runtime.busy=true;
+  runtime.lastError=null;
+  runtime.confirmInvocationCount+=1;
+  const result=confirmAcademyTeamFormation("academy_team_formation_ui_confirmation",[...snapshot.selectedTeammateIds]);
+  runtime.busy=false;
+  if (!result.success) runtime.lastError="Team confirmation failed. No team or ownership change was committed.";
+  renderAcademyTeamFormationUI();
+  return result;
+}
+
+function routeAcademyTeamFormationContinuationDestination(destination) {
+  if (!destination||typeof destination!=="object") return {success:false,reason:"academy_team_continuation_destination_missing"};
+  if (destination.type==="overlay"&&destination.overlayType==="village") {
+    hideAcademyTeamFormationPresentationLayer();
+    openOverlay("village");
+    return {success:true,type:"overlay",overlayType:"village",locationId:destination.locationId||null};
+  }
+  if (destination.type==="region"&&destination.regionKey&&worldRegions[destination.regionKey]) {
+    hideAcademyTeamFormationPresentationLayer();
+    openRegionHub(destination.regionKey);
+    return {success:true,type:"region",regionKey:destination.regionKey};
+  }
+  return {success:false,reason:"academy_team_continuation_destination_unhandled"};
+}
+
+// BRICK 960/961 — CONTINUE is navigation only. It consumes the authoritative
+// continuation boundary and routes to the existing canonical Konoha map.
+function continueAcademyTeamFormationFromUI() {
+  const runtime=ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME;
+  if (runtime.busy) return {success:false,reason:"academy_team_continuation_busy"};
+  runtime.busy=true;
+  runtime.lastError=null;
+  runtime.continueInvocationCount+=1;
+  const result=continueAcademyTeamFormationJourney();
+  runtime.busy=false;
+  if (!result.success) {
+    runtime.lastError="Konoha continuation is unavailable. Your committed team has not been changed.";
+    renderAcademyTeamFormationUI();
+    return result;
+  }
+  return {...result,navigationResult:routeAcademyTeamFormationContinuationDestination(result.destination)};
+}
+
+function openAcademyTeamFormationUI(options={}) {
+  if (!isAcademyTeamFormationJourneyBlockingFreePlay()) return {success:false,reason:"academy_team_formation_journey_not_required"};
+  const snapshot=getAcademyTeamFormationSnapshot();
+  ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.stage=options.showChronicleBegins===true&&!snapshot.completed?"chronicle_begins":(snapshot.completed?"receipt":"formation");
+  ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.lastError=null;
+  return renderAcademyTeamFormationUI(options);
+}
+
+// BRICK 962 — reload must resume the mandatory journey from authoritative save
+// state. No pending local UI choice is treated as ownership.
+function resumeAcademyTeamFormationJourneyAfterLoad() {
+  if (!isAcademyTeamFormationJourneyBlockingFreePlay()) return {success:true,required:false};
+  return {required:true,...openAcademyTeamFormationUI({showChronicleBegins:false})};
+}
+
 
 // =========================================================
 // BRICK 938 — EXACT PROMOTION SUBJECT → TRANSITION CONTINUITY
@@ -6580,7 +6996,7 @@ function isAcademyFreePlayAvailable() {
   const state=ensurePlayerAcquisitionState();
   const originOwnedCharacterId=state.chronicleOriginOwnedCharacterId||state.chronicleOrigin&&state.chronicleOrigin.ownedCharacterId||null;
   const formalRank=originOwnedCharacterId?String(getOwnedCharacterFormalRank(originOwnedCharacterId)||"").toLowerCase():null;
-  return !!(state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntered===true&&state.academyTeamFormation&&state.academyTeamFormation.completed===true&&formalRank==="academy"&&!(state.geninRosterTransition&&state.geninRosterTransition.unlocked===true));
+  return !!(state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntered===true&&state.academyTeamFormation&&state.academyTeamFormation.completed===true&&state.academyTeamFormation.continuationCompleted===true&&formalRank==="academy"&&!(state.geninRosterTransition&&state.geninRosterTransition.unlocked===true));
 }
 
 function recordOwnedCharacterGeninPromotion(ownedCharacterId,evidenceIds=[]) {
@@ -40433,6 +40849,13 @@ function openOverlay(type) {
     return renderStoryScenePresentationLayer();
   }
 
+  // BRICK 962 — ordinary surfaces cannot bypass the mandatory Academy Team
+  // Formation journey or its post-commit CONTINUE boundary.
+  if (isAcademyTeamFormationJourneyBlockingFreePlay()) {
+    openAcademyTeamFormationUI({showChronicleBegins:false});
+    return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
+  }
+
   if (typeof hideStoryScenePresentationLayer === "function") {
     hideStoryScenePresentationLayer({preserveRuntime:true});
   }
@@ -41243,6 +41666,12 @@ function renderVillageOverlay(
 function openKonohaExamFromVillage() {
 
 
+  if (isAcademyTeamFormationJourneyBlockingFreePlay()) {
+    openAcademyTeamFormationUI({showChronicleBegins:false});
+    return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
+  }
+
+
   const overlay =
     document.getElementById(
       "screen-overlay"
@@ -41294,6 +41723,12 @@ function openKonohaExamFromVillage() {
 
 
 function openKonohaPracticalFromVillage() {
+
+
+  if (isAcademyTeamFormationJourneyBlockingFreePlay()) {
+    openAcademyTeamFormationUI({showChronicleBegins:false});
+    return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
+  }
 
 
   const overlay =
@@ -42793,6 +43228,12 @@ function runClanBattleQueueAlignmentDiagnostics() {
 
 function openRegionHub(regionKey) {
 
+  // BRICK 962 — world/region navigation is ordinary free-play navigation.
+  if (isAcademyTeamFormationJourneyBlockingFreePlay()) {
+    openAcademyTeamFormationUI({showChronicleBegins:false});
+    return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
+  }
+
   currentOverlayType = "region";
 
   const region =
@@ -43375,8 +43816,8 @@ function commitRecruitmentOpportunity(definition,action) {
 
 function routeWorldOpportunityInteraction(opportunityId,actionId) {
   const acquisitionState=ensurePlayerAcquisitionState();
-  if (acquisitionState.chronicleOrigin&&acquisitionState.chronicleOrigin.activeKonohaEntered===true&&acquisitionState.academyTeamFormation&&acquisitionState.academyTeamFormation.required===true&&acquisitionState.academyTeamFormation.completed!==true) {
-    return {success:false,reason:"academy_team_formation_required"};
+  if (isAcademyTeamFormationJourneyBlockingFreePlay(acquisitionState)) {
+    return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(acquisitionState)};
   }
   const definition=getOpportunityDefinitionIncludingLegacy(opportunityId);
   if (!definition) return {success:false,reason:"opportunity_missing"};
@@ -44426,6 +44867,11 @@ function completeStoryScene(options={}) {
   state.active=null;
   hideStoryScenePresentationLayer({preserveRuntime:true});
   savePlayerData();
+  if (isAcademyTeamFormationJourneyBlockingFreePlay()) {
+    const formationPresentation=openAcademyTeamFormationUI({showChronicleBegins:true});
+    saveTestState();
+    return {...receipt,returnResult:{success:true,type:"academy_team_formation_required"},formationPresentation};
+  }
   const returned=resumeStorySceneReturnContext(returnContext);
   saveTestState();
   return {...receipt,returnResult:returned};
@@ -44910,7 +45356,9 @@ function runAlphaOriginTeamFormationRuntimeDiagnostics() {
     const ownershipAfter=[...(playerData.characterOwnership.ownedRegistryIds||[])].sort();
     result.confirmAcquiresExactlyChosenTwo=confirmed.success===true&&JSON.stringify(ownershipAfter)===JSON.stringify(["academy_hinata","academy_izuno","academy_menma"].sort());
     result.exactInitialAcademyTeam=confirmed.success===true&&JSON.stringify(playerData.clan.teamSlots.slice(0,3))===JSON.stringify(["academy_menma","academy_hinata","academy_izuno"])&&playerData.clan.teamSlots.slice(3).every(id=>id===null);
-    result.freePlayAfterFormation=isAcademyFreePlayAvailable()===true&&ensurePlayerAcquisitionState().academyTeamFormation.completed===true;
+    result.teamFormedStillBlocksFreePlay=isAcademyFreePlayAvailable()===false&&ensurePlayerAcquisitionState().academyTeamFormation.completed===true&&ensurePlayerAcquisitionState().academyTeamFormation.continuationCompleted!==true;
+    const continued=continueAcademyTeamFormationJourney();
+    result.freePlayAfterFormationContinuation=continued.success===true&&isAcademyFreePlayAvailable()===true&&ensurePlayerAcquisitionState().academyTeamFormation.continuationCompleted===true;
 
     const promoted=recordOwnedCharacterGeninPromotion(createOwnedCharacterIdForVariant("academy_menma"),["diagnostic_genin_promotion"]);
     const finalState=ensurePlayerAcquisitionState();
@@ -44942,9 +45390,9 @@ function runAlphaOriginTeamFormationMigrationDiagnostics() {
     allOriginsRegistryBacked:expectedOrigins.every(id=>!!getCharacterRegistryEntry(id)),
     originAcquisitionOnlyExplicitSelection:selectChronicleOrigin.toString().includes("commitCharacterAcquisition")&&!selectChronicleOrigin.toString().includes("CHRONICLE_ORIGIN_VARIANT_IDS.forEach"),
     academyFormationSeparated:createDefaultAcquisitionState().academyTeamFormation!==undefined&&createDefaultAcquisitionState().geninRosterTransition!==undefined,
-    exactTwoSelectionContract:confirmAcademyTeamFormation.toString().includes("selected.length!==2")&&selectAcademyTeamFormationTeammate.toString().includes("academy_teammate_duplicate_selection"),
+    exactTwoSelectionContract:confirmAcademyTeamFormation.toString().includes("selected.filter(Boolean).length!==2")&&selectAcademyTeamFormationTeammate.toString().includes("academy_teammate_duplicate_selection"),
     originExcludedFromTeammates:selectAcademyTeamFormationTeammate.toString().includes("chronicle_origin_cannot_be_teammate_selection"),
-    freePlayGate:isAcademyFreePlayAvailable.toString().includes("academyTeamFormation.completed===true")&&routeWorldOpportunityInteraction.toString().includes("academy_team_formation_required"),
+    freePlayGate:isAcademyFreePlayAvailable.toString().includes("academyTeamFormation.continuationCompleted===true")&&routeWorldOpportunityInteraction.toString().includes("isAcademyTeamFormationJourneyBlockingFreePlay")&&getAcademyTeamFormationJourneyBlockReason.toString().includes("academy_team_formation_required")&&getAcademyTeamFormationJourneyBlockReason.toString().includes("academy_team_formation_continue_required"),
     geninDoesNotCreateFirstAcademyTeam:recordOwnedCharacterGeninPromotion.toString().includes("geninRosterTransition.unlocked=true")&&!recordOwnedCharacterGeninPromotion.toString().includes("firstTeamFormation.unlocked=true"),
     independentFormationStates:createDefaultAcquisitionState().academyTeamFormation!==createDefaultAcquisitionState().geninRosterTransition,
     reusableSixSlotConstraint:configureAcademyTeamFormationConstraint.toString().includes("setActiveClanFormationConstraint")&&configureAcademyTeamFormationConstraint.toString().includes("availableSlotNumbers:[1,2,3]")&&configureAcademyTeamFormationConstraint.toString().includes("fixedRegistryIdBySlot:{1:originId}"),
@@ -87059,6 +87507,183 @@ function runAlphaPost952IntegrationDiagnostics() {
 }
 
 // =========================================================
+// BRICK 963 — ACADEMY TEAM FORMATION GOLDEN / PRESENTATION CONTRACT
+// =========================================================
+function runAlphaAcademyTeamFormationGoldenDiagnostics() {
+  const rollback=cloneProgressionData(playerData);
+  const playerTeamBefore=Array.isArray(playerTeam)?[...playerTeam]:[];
+  const activityHistoryBefore=typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)?[...activityHistory]:null;
+  const rawSave=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const runtimeBefore={...ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME};
+  const result={};
+  try {
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    playerData.clan=createDefaultClanManagementState(playerData.characterOwnership);
+    if (typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) activityHistory.splice(0,activityHistory.length);
+
+    const origin=selectChronicleOrigin("academy_menma","academy_team_ui_golden_origin");
+    const completion=completeChronicleOriginPrologue("academy_menma",["academy_team_ui_golden_origin_complete"]);
+    const initial=getAcademyTeamFormationSnapshot();
+    const initialModel=getAcademyTeamFormationPresentationModel();
+    const initialOwnership=JSON.stringify([...playerData.characterOwnership.ownedRegistryIds].sort());
+
+    result.exactOriginFixed=origin.success===true&&completion.success===true&&initial.originVariantId==="academy_menma"&&initialModel.origin&&initialModel.origin.variantId==="academy_menma";
+    result.onlyAuthoritativeCandidatesProjected=initialModel.available===true&&initialModel.candidates.length===initial.eligibleCandidateVariantIds.length&&initialModel.candidates.every((entry,index)=>entry.variantId===initial.eligibleCandidateVariantIds[index])&&initial.eligibleCandidateVariantIds.length===9;
+
+    const first=toggleAcademyTeamFormationCandidateFromUI("academy_kakashi");
+    const afterFirst=getAcademyTeamFormationSnapshot();
+    result.selectionDoesNotAcquire=first.success===true&&JSON.stringify([...playerData.characterOwnership.ownedRegistryIds].sort())===initialOwnership&&!isCharacterRegistryOwned("academy_kakashi");
+    result.oneSelectionCannotCommit=afterFirst.canConfirm===false;
+
+    const second=toggleAcademyTeamFormationCandidateFromUI("academy_obito");
+    const ready=getAcademyTeamFormationSnapshot();
+    result.twoDistinctEnableCommit=second.success===true&&ready.canConfirm===true&&new Set(ready.selectedTeammateIds).size===2;
+    result.duplicateIdentityRejected=selectAcademyTeamFormationTeammate(2,"academy_kakashi").reason==="academy_teammate_duplicate_selection";
+
+    const beforeFailedRecords=playerData.acquisition.records.length;
+    const beforeFailedOwnership=JSON.stringify([...playerData.characterOwnership.ownedRegistryIds].sort());
+    const beforeFailedClan=JSON.stringify(playerData.clan.teamSlots);
+    const failed=confirmAcademyTeamFormation("academy_team_ui_golden_invalid_submit",["academy_kurenai","academy_iwabee"]);
+    result.failedCommitCreatesNoOwnershipOrTeamState=failed.success===false&&failed.reason==="academy_team_submitted_selection_mismatch"&&playerData.acquisition.records.length===beforeFailedRecords&&JSON.stringify([...playerData.characterOwnership.ownedRegistryIds].sort())===beforeFailedOwnership&&JSON.stringify(playerData.clan.teamSlots)===beforeFailedClan;
+
+    ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.confirmInvocationCount=0;
+    const commit=submitAcademyTeamFormationFromUI();
+    const committed=getAcademyTeamFormationSnapshot();
+    const teamVariantIds=(committed.confirmationReceipt&&committed.confirmationReceipt.teamVariantIds)||[];
+    result.confirmInvokesAuthoritativeCommitOnce=commit.success===true&&ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.confirmInvocationCount===1&&commit.sourceEventId==="academy_team_formation_ui_confirmation";
+    result.successProducesExactThreePersonTeam=committed.completed===true&&teamVariantIds.length===3&&teamVariantIds[0]==="academy_menma"&&new Set(teamVariantIds).size===3&&playerData.clan.teamSlots.filter(Boolean).length===3;
+    result.teamFormedStillBlocksFreePlay=committed.continuationCompleted===false&&isAcademyFreePlayAvailable()===false&&getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())==="academy_team_formation_continue_required";
+
+    const recordsBeforeContinue=playerData.acquisition.records.length;
+    const ownershipBeforeContinue=JSON.stringify([...playerData.characterOwnership.ownedRegistryIds].sort());
+    const clanBeforeContinue=JSON.stringify(playerData.clan.teamSlots);
+    const confirmCountBeforeContinue=ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.confirmInvocationCount;
+    const continued=continueAcademyTeamFormationJourney();
+    result.continueDoesNotReacquireOrRecommit=continued.success===true&&playerData.acquisition.records.length===recordsBeforeContinue&&JSON.stringify([...playerData.characterOwnership.ownedRegistryIds].sort())===ownershipBeforeContinue&&JSON.stringify(playerData.clan.teamSlots)===clanBeforeContinue&&ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.confirmInvocationCount===confirmCountBeforeContinue;
+    result.continueRoutesCanonicalKonoha=continued.destination&&continued.destination.type==="overlay"&&continued.destination.overlayType==="village"&&continued.destination.locationId==="konohagakure"&&continued.destination.authority==="existing_konoha_navigation";
+    result.freePlayOpensOnlyAfterContinue=isAcademyFreePlayAvailable()===true&&ensurePlayerAcquisitionState().onboardingStatus==="academy_free_play";
+
+    const recordsBeforeReload=playerData.acquisition.records.length;
+    const clanBeforeReload=JSON.stringify(playerData.clan.teamSlots);
+    savePlayerData();
+    const reloaded=loadPlayerData();
+    playerData=reloaded;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    hydrateOwnedProductionRuntimeCharacters(playerData.characterOwnership);
+    result.reloadAfterCommitNoDuplicateAcquisitionOrMembership=playerData.acquisition.records.length===recordsBeforeReload&&JSON.stringify(playerData.clan.teamSlots)===clanBeforeReload&&playerData.acquisition.academyTeamFormation.completed===true&&playerData.acquisition.academyTeamFormation.continuationCompleted===true;
+
+    // A separate incomplete save must resume into the mandatory formation gate.
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    selectChronicleOrigin("academy_menma","academy_team_ui_golden_incomplete_origin");
+    completeChronicleOriginPrologue("academy_menma",["academy_team_ui_golden_incomplete_complete"]);
+    toggleAcademyTeamFormationCandidateFromUI("academy_kakashi");
+    savePlayerData();
+    const incompleteReload=loadPlayerData();
+    playerData=incompleteReload;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const incompleteSnapshot=getAcademyTeamFormationSnapshot();
+    result.reloadIncompleteReturnsRequiredFormation=incompleteSnapshot.required===true&&incompleteSnapshot.completed===false&&isAcademyTeamFormationJourneyBlockingFreePlay()===true;
+    result.incompleteCannotBypassFreePlay=isAcademyFreePlayAvailable()===false&&routeWorldOpportunityInteraction("diagnostic_missing_opportunity","diagnostic_action").reason==="academy_team_formation_required";
+
+    const uiSource=[getAcademyTeamFormationPresentationModel,renderAcademyTeamFormationUI,toggleAcademyTeamFormationCandidateFromUI,submitAcademyTeamFormationFromUI,continueAcademyTeamFormationFromUI].map(fn=>fn.toString()).join("\n");
+    result.noOwnershipDerivedCandidatePool=!getAcademyTeamFormationPresentationModel.toString().includes("isCharacterRegistryOwned")&&!getAcademyTeamFormationPresentationModel.toString().includes("ownedRegistryIds");
+    result.noOptimisationDashboard=!uiSource.includes("Team PL")&&!uiSource.includes("Average PL")&&!uiSource.includes("compatibility score")&&!uiSource.includes("Promotion probability");
+    result.continueSourceContainsNoAcquisitionOrConfirm=!continueAcademyTeamFormationFromUI.toString().includes("commitCharacterAcquisition")&&!continueAcademyTeamFormationFromUI.toString().includes("confirmAcademyTeamFormation(");
+    result.globalBypassGuardsInstalled=openOverlay.toString().includes("isAcademyTeamFormationJourneyBlockingFreePlay")&&openRegionHub.toString().includes("isAcademyTeamFormationJourneyBlockingFreePlay")&&openKonohaExamFromVillage.toString().includes("isAcademyTeamFormationJourneyBlockingFreePlay")&&openKonohaPracticalFromVillage.toString().includes("isAcademyTeamFormationJourneyBlockingFreePlay");
+  } finally {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (Array.isArray(playerTeam)) playerTeam.splice(0,playerTeam.length,...playerTeamBefore);
+    if (activityHistoryBefore&&typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) activityHistory.splice(0,activityHistory.length,...activityHistoryBefore);
+    Object.assign(ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME,runtimeBefore);
+    hideAcademyTeamFormationPresentationLayer();
+    if (typeof localStorage!=="undefined") {
+      if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY);
+      else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    }
+  }
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaAcademyTeamFormationDOMDiagnostics() {
+  if (typeof document==="undefined") return {pass:false,reason:"browser_document_required"};
+  const rollback=cloneProgressionData(playerData);
+  const playerTeamBefore=Array.isArray(playerTeam)?[...playerTeam]:[];
+  const rawSave=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const result={};
+  try {
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    selectChronicleOrigin("academy_menma","academy_team_dom_origin");
+    completeChronicleOriginPrologue("academy_menma",["academy_team_dom_origin_complete"]);
+    ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.stage="formation";
+    renderAcademyTeamFormationUI();
+    let layer=document.getElementById("academy-team-formation-layer");
+    const candidateButtons=layer?[...layer.querySelectorAll(".atf-candidate")]:[];
+    const fixed=layer&&layer.querySelector(".atf-fixed .atf-name");
+    const confirm=layer&&layer.querySelector("#academy-team-confirm");
+    result.fullPageSurface=!!layer&&layer.style.display==="flex"&&!!layer.querySelector("#academy-team-formation-title")&&layer.querySelector("#academy-team-formation-title").textContent.trim()==="ACADEMY TEAM FORMATION";
+    result.fixedOriginProjected=!!fixed&&fixed.textContent.trim()===getProductionRuntimeDisplayName("academy_menma");
+    result.exactNineCandidateButtons=candidateButtons.length===9;
+    result.rawRegistryIdsNotPlayerFacing=!layer.textContent.includes("academy_menma")&&!layer.textContent.includes("academy_kakashi");
+    result.confirmInitiallyDisabled=!!confirm&&confirm.disabled===true;
+    toggleAcademyTeamFormationCandidateFromUI("academy_kakashi");
+    layer=document.getElementById("academy-team-formation-layer");
+    result.oneSelectedCount=layer.querySelector("#academy-team-selection-count").textContent.trim()==="1 / 2 SELECTED"&&layer.querySelector("#academy-team-confirm").disabled===true;
+    toggleAcademyTeamFormationCandidateFromUI("academy_obito");
+    layer=document.getElementById("academy-team-formation-layer");
+    result.twoSelectedEnableRealButton=layer.querySelector("#academy-team-selection-count").textContent.trim()==="2 / 2 SELECTED"&&layer.querySelector("#academy-team-confirm").disabled===false;
+    result.accessibleSelectionState=[...layer.querySelectorAll(".atf-candidate")].every(button=>["true","false"].includes(button.getAttribute("aria-pressed")))&&!!layer.querySelector("[aria-live='polite']");
+    const commit=submitAcademyTeamFormationFromUI();
+    layer=document.getElementById("academy-team-formation-layer");
+    result.teamFormedReceiptPersistsSameSurface=commit.success===true&&!!layer&&layer.querySelector("#academy-team-formation-title").textContent.trim()==="TEAM FORMED"&&!!layer.querySelector("#academy-team-continue");
+    const beforeRecords=playerData.acquisition.records.length;
+    const beforeConfirmCount=ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.confirmInvocationCount;
+    const continued=continueAcademyTeamFormationFromUI();
+    result.continueNavigationOnly=continued.success===true&&playerData.acquisition.records.length===beforeRecords&&ACADEMY_TEAM_FORMATION_PRESENTATION_RUNTIME.confirmInvocationCount===beforeConfirmCount&&currentOverlayType==="village";
+  } finally {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (Array.isArray(playerTeam)) playerTeam.splice(0,playerTeam.length,...playerTeamBefore);
+    hideAcademyTeamFormationPresentationLayer();
+    if (typeof localStorage!=="undefined") {
+      if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY);
+      else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    }
+  }
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+// =========================================================
+// BRICK 964 — POST-FORMATION CUMULATIVE ALPHA GATE
+// =========================================================
+function runAlphaPost964IntegrationDiagnostics() {
+  const post952=runAlphaPost952IntegrationDiagnostics();
+  const formationGolden=runAlphaAcademyTeamFormationGoldenDiagnostics();
+  const formationDOM=runAlphaAcademyTeamFormationDOMDiagnostics();
+  const groups={post952,formationGolden,formationDOM};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={
+    groups,pass,
+    combatFreezePreserved:post952&&post952.combatFreezePreserved===true,
+    liveProductionGateExpected:102,
+    awaitingPlacementDestination:116,
+    nextImplementedBrick:964,
+    academyTeamFormationPresentationStatus:formationGolden.pass===true&&formationDOM.pass===true?"runtime_green":"check",
+    fieldContentOrchestrationStatus:"external_authority_required",
+    browserGoldenStatus:pass?"GREEN":"CHECK"
+  };
+  console.log(`SC Alpha post-964 integration gate: ${pass?"PASS":"FAIL"} / Academy Team Formation=${result.academyTeamFormationPresentationStatus} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Field content=${result.fieldContentOrchestrationStatus} / Browser Golden=${result.browserGoldenStatus}`);
+  return result;
+}
+
+// =========================================================
 // CORE ENGINE — GAME INITIALISATION
 // =========================================================
 
@@ -87071,6 +87696,11 @@ window.addEventListener(
 
 
     restoreTestState();
+
+
+    // BRICK 962 — authoritative reload resumption wins over stale ordinary
+    // overlay/session presentation while formation remains mandatory.
+    resumeAcademyTeamFormationJourneyAfterLoad();
 
   }
 );
