@@ -1,6 +1,6 @@
 # Shinobi Chronicles — Awaiting Placement Additions: Kage Madara + Pakkun
 
-**Status:** PL / Registry / Rank calibration authority; Kage Madara representation superseded 2026-09-05; Combat semantics and Assets admission pending  
+**Status:** PL / Registry / Rank calibration authority; Kage Madara representation superseded 2026-09-05; source collectible-card files verified; production admission still separate  
 **Date:** 2026-09-05
 
 This document registers and calibrates two awaiting-placement production candidates supplied by Character Creation:
@@ -8,7 +8,7 @@ This document registers and calibrates two awaiting-placement production candida
 - `kage_madara` — Character
 - `pakkun` — Entity / Summon
 
-Neither identity changes the current live production gate. Uploaded/generated card images are visual reference only and are not repository-path authority.
+Neither identity changes the current live production gate.
 
 Canonical Stat order:
 
@@ -59,6 +59,14 @@ Calibration rationale:
 - Kage Madara remains numerically adjacent to, but semantically distinct from, `undying_madara`.
 
 Numeric equality/adjacency never implies semantic identity.
+
+### Source-verified collectible-card file
+
+Current committed card path:
+
+`Assets/Kage/kage_madara.png`
+
+Physical source presence verifies this collectible-card file. It does not by itself create live production admission or a `uiPortrait` projection.
 
 ### Prepared Combat palette authority
 
@@ -119,7 +127,17 @@ Calibration intent:
 - tracking, route-finding, scent work and communication remain action/resolver semantics rather than hidden Stats;
 - intentionally far below the project's larger combat-oriented Summons/Entities.
 
-Prepared exact Action IDs for Combat closure:
+### Source-verified collectible-card file
+
+Current committed card path:
+
+`Assets/Summons/pakkun.png`
+
+This path aligns with the closed Entity ontology: Pakkun remains a genuine Summon, not a Hosted Entity or Familiar.
+
+Physical source presence verifies the collectible-card file. It does not by itself create live production admission or a `uiPortrait` projection.
+
+Prepared exact Action IDs:
 
 1. `pakkun_tracking_scent`
 2. `pakkun_nipping_bite`
@@ -139,23 +157,21 @@ Preserve:
 
 ## 3. Production-admission boundary
 
-Both identities are calibrated but remain **AWAITING PRODUCTION ADMISSION** unless separately admitted by current Registry + Assets authority.
+Both identities are calibrated and have source-verified collectible-card files but remain **AWAITING PRODUCTION ADMISSION** unless separately admitted by current Registry + Assets authority.
 
 Current live production remains:
 
 **85 Characters + 17 Entities = 102**
 
-The current separately locked final awaiting-placement wave is **13 Characters + Nue → eventual 116**. `kage_madara`, `pakkun`, and the later `black_zetsu` Hosted Entity are separate additions outside that 116 package unless Registry + Assets explicitly amend admission scope.
+The current separately locked final awaiting-placement wave is **13 Characters + Nue → eventual 116**. `kage_madara`, `pakkun`, `black_zetsu`, and `reborn_kurama` are separate additions outside that 116 package unless Registry + Assets explicitly amend admission scope.
 
-Before live admission, Assets must supply exact approved production mappings for each identity:
-
-`Registry ID → collectibleCard path → square uiPortrait path → ACTIVE asset status`
+Before live admission, the production projection still requires exact approved presentation authority, including any required square `uiPortrait`.
 
 Do not:
 
-- infer production paths from upload filenames;
+- infer `uiPortrait` paths from collectible-card files;
 - crop collectible cards into permanent `uiPortrait` authority;
-- increment the live Registry gate from calibration alone;
+- increment the live Registry gate from calibration/card existence alone;
 - treat Combat semantic closure as production admission;
 - treat production admission as Acquisition ownership.
 
@@ -163,7 +179,7 @@ Preserve:
 
 **calibrated ≠ admitted**
 
-**asset existence ≠ production admission**
+**source card verified ≠ complete production projection**
 
 **production admission ≠ acquisition**
 
