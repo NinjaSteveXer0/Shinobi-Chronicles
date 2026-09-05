@@ -89,23 +89,54 @@ Required behaviour:
 
 ---
 
-## Fresh binary QA remains required
+## Binary QA status — six current file defects, zero mapping defects
 
-Registry ratification closes **identity → approved portrait path authority**.
+Character Creation / Assets has confirmed that the current problem is **binary asset quality**, not Registry identity or portrait-selection authority.
 
-It does not certify current PNG bytes.
+Current QA failures:
 
-Before Alpha freeze, Coding/CI must perform a fresh current-repository QA pass across all 102 ratified portrait files proving:
+- **five dimension defects** requiring in-place normalization to the approved **1024 × 1024 frameless** portrait contract;
+- **one corruption defect** requiring recovery or explicit Assets-authorised supersession of the already-approved portrait file.
+
+Registry ruling:
+
+**NO MAPPING CHANGE.**
+
+No Registry ID changes are authorised.
+
+No `Registry representation ID → approved uiPortrait` remap is authorised.
+
+The six failed files retain their existing approved Registry projections while Coding/Assets repair the bytes.
+
+A dimension repair that preserves the approved portrait identity/path is an asset-quality correction, not a Registry event.
+
+A corrupted file may be restored at the approved path or explicitly superseded through Assets authority. If supersession changes the approved path, Assets must author that replacement and Registry must ratify the new projection before Coding consumes it.
+
+Runtime must not silently choose another portrait merely because the approved file currently fails QA.
+
+Preserve:
+
+**binary defect ≠ mapping defect**
+
+**dimension normalization ≠ portrait remap**
+
+**file corruption ≠ Registry identity change**
+
+**QA failure ≠ permission for heuristic substitution**
+
+---
+
+## Fresh binary QA requirement
+
+After repair, Coding/CI must rerun the current-repository pass across all 102 ratified portrait files proving:
 
 - path exists;
 - PNG decodes successfully / is not corrupt;
 - dimensions are exactly **1024 × 1024**;
 - all 102 expected Registry IDs resolve exactly once;
 - no duplicate Registry ID mapping;
-- no duplicate path mapping unless explicitly re-authorised (current Assets authority states 102 unique paths);
+- no duplicate path mapping unless explicitly re-authorised;
 - no stale path points to an unapproved substitute.
-
-If a file fails QA, repair or explicitly supersede that asset while retaining attributable Registry mapping history. Do not silently map the representation to a different portrait.
 
 ---
 
@@ -115,6 +146,10 @@ If a file fails QA, repair or explicitly supersede that asset while retaining at
 
 **Registry ratification: CLOSED 102 / 102**
 
-**Coding resolver: NEXT**
+**Current mapping defects: 0**
 
-**Fresh binary dimension/corruption QA: REQUIRED BEFORE ALPHA FREEZE**
+**Current binary QA defects: 6 (5 dimension, 1 corruption)**
+
+**Coding / Assets repair: REQUIRED**
+
+**Fresh 102-file binary recheck: REQUIRED BEFORE ALPHA FREEZE**
