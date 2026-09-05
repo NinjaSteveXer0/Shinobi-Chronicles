@@ -1,6 +1,6 @@
 # Shinobi Chronicles — Reborn Kurama Hosted Entity Calibration
 
-**Status:** PL / Registry / Rank authority — CLOSED for identity ontology and Base Stats/Base PL; Combat/Skills semantics downstream  
+**Status:** PL / Registry / Rank authority — CLOSED for identity ontology and Base Stats/Base PL; Combat/Skills closure consumed; production admission still separate  
 **Date:** 2026-09-05
 
 This document registers and calibrates the Himawari-era reborn Kurama representation.
@@ -142,15 +142,43 @@ A future separately manifested/deployed Reborn Kurama mode is **not authorised b
 
 ---
 
-## 5. Production / acquisition boundary
+## 5. Source-verified collectible-card projection
 
-This calibration does not itself change the live production gate.
+The ontology/card reorganisation is now committed to source.
 
-Card existence, folder placement and calibration do not equal production admission.
+Source implementation:
+
+- commit `48061d6dca9e857f08a9714ffb3d0972802880c2` — `card upgrades and reorganization`;
+- current exact collectible-card path: `Assets/Hosted Entity/hosted_entity_reborn_kurama.png`.
+
+This verifies physical repository ingestion and the intended Hosted Entity folder projection.
+
+It does **not** by itself establish:
+
+- a `uiPortrait` path;
+- live production admission;
+- independent player acquisition;
+- independent Battle manifestation.
+
+The stable Registry ID remains `reborn_kurama`; the filename is not the identity.
+
+Preserve:
+
+**Registry ID ≠ asset filename**
+
+**collectibleCard path ≠ uiPortrait path**
+
+**card existence ≠ live admission**
+
+---
+
+## 6. Production / acquisition boundary
+
+This calibration and committed card path do not themselves change the live production gate.
 
 This document does not define standalone player acquisition of `reborn_kurama`.
 
-Acquisition/Character Systems owns obtainability/ownership semantics; Assets owns exact card/portrait paths; Coding owns persistence/runtime implementation after admission authority exists.
+Acquisition/Character Systems owns obtainability/ownership semantics; Assets owns approved presentation projection and portrait authority; Coding owns persistence/runtime implementation after admission authority exists.
 
 Preserve:
 
@@ -162,17 +190,23 @@ Preserve:
 
 ---
 
-## 6. Downstream Skills / Combat handoff
+## 7. Combat / Skills closure consumed
 
-Registry/PL is closed for:
+Combat / Skills has now consumed this Registry authority in:
 
-- stable ID `reborn_kurama`;
-- Entity classification;
-- Hosted Entity lifecycle classification;
-- Kurama family continuity;
-- final Stats `110/84/30/48/118/76/116`;
-- Base PL112;
-- Himawari relationship boundary;
-- no additive PL/Stat transfer.
+`Documentation/SC_Combat_Reborn_Kurama_Hosted_Entity_Skill_Closure_2026-09-05.md`
 
-Skills/Combat may now author exact Reborn-Kurama-owned or Himawari-owned Kurama-assisted Actions and any host-expression semantics required for Alpha, while preserving the Hosted Entity boundaries above.
+Combat commit:
+
+`4e8443ee12448c61a137655492abc76194bc54b7`
+
+That closure defines:
+
+- Reborn Kurama's canonical own-action repertoire for future legitimate independent lifecycle use;
+- hosted-source requirements;
+- Chakra Mode Himawari's Reborn-Kurama-assisted palette;
+- exact `reborn_kurama` source reconciliation for Kurama Resonance Himawari;
+- no independent hosted turn/slot/PL ledger;
+- no generic synergy multiplier or PL transfer.
+
+Registry/PL therefore has no remaining Skills/Combat calibration blocker for this identity.
