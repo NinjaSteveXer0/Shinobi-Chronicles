@@ -5,6 +5,7 @@
 
 // BRICK 351 — ASSET MANIFEST FOUNDATION
 // BRICK 683 — FIVE ACADEMY COLLECTIBLE CARD ASSET MAPPINGS
+// BRICK 909 — ROOT ASSET LAYOUT MIGRATION
 // =========================================================
 //
 // Canonical presentation paths for currently wired character
@@ -90,13 +91,13 @@ const assetManifest = {
   ui: {
 
     practical:
-      "Assets/UI/practical.png",
+      "UI/practical.png",
 
     // =====================================================
     // BRICK 435 — VICTORY UI ASSET MANIFEST MIGRATION
     // =====================================================
     victory:
-      "Assets/UI/Victory.png"
+      "UI/Victory.png"
 
   }
 
@@ -109,108 +110,108 @@ const assetManifest = {
 // =========================================================
 // UI_PORTRAIT_MANIFEST_JSON_START
 const UI_PORTRAIT_MANIFEST = Object.freeze({
-  "academy_hinata": "Assets/Portraits/Academy Student/academy_student_hinata.png",
-  "academy_iwabee": "Assets/Portraits/Academy Student/academy_student_iwabe.png",
-  "academy_izuno": "Assets/Portraits/Academy Student/academy_student_izuno.png",
-  "academy_kakashi": "Assets/Portraits/Academy Student/academy_student_kakashi.png",
-  "academy_kurenai": "Assets/Portraits/Academy Student/academy_student_kurenai.png",
-  "academy_kushina": "Assets/Portraits/Academy Student/academy_student_kushina.png",
-  "academy_menma": "Assets/Portraits/Academy Student/academy_student_menma.png",
-  "academy_metal_lee": "Assets/Portraits/Academy Student/academy_student_metal.png",
-  "academy_mirai": "Assets/Portraits/Academy Student/academy_student_mirai.png",
-  "academy_obito": "Assets/Portraits/Academy Student/academy_student_obito.png",
-  "genin_boruto": "Assets/Portraits/Genin/genin_boruto.png",
-  "genin_chocho": "Assets/Portraits/Genin/genin_chocho.png",
-  "genin_himawari": "Assets/Portraits/Genin/genin_himawari.png",
-  "genin_hoki": "Assets/Portraits/Genin/genin_hoki.png",
-  "genin_karin": "Assets/Portraits/Genin/genin_karin.png",
-  "genin_mitsuki": "Assets/Portraits/Genin/genin_mitsuki.png",
-  "genin_naruto": "Assets/Portraits/Genin/genin_naruto.png",
-  "genin_sarada": "Assets/Portraits/Genin/genin_sarada.png",
-  "genin_sasuke": "Assets/Portraits/Genin/genin_sasuke.png",
-  "chunin_boruto": "Assets/Portraits/Chunin/chunin_boruto.png",
-  "chunin_jiraiya": "Assets/Portraits/Chunin/chunin_jiraiya.png",
-  "chunin_mitsuki": "Assets/Portraits/Chunin/chunin_mitsuki.png",
-  "chunin_shikadai": "Assets/Portraits/Chunin/chunin_shikadai.png",
-  "chunin_shinki": "Assets/Portraits/Chunin/chunin_shinki.png",
-  "akatsuki_deva": "Assets/Portraits/Akatsuki/akatsuki_deva.png",
-  "akatsuki_itachi": "Assets/Portraits/Akatsuki/akatsuki_itachi.png",
-  "akatsuki_sasuke": "Assets/Portraits/Akatsuki/akatsuki_sasuke.png",
-  "akatsuki_teen_naruto": "Assets/Portraits/Akatsuki/akatsuki_naruto.png",
-  "anbu_ino": "Assets/Portraits/Anbu/anbu_leader_ino.png",
-  "anbu_menma": "Assets/Portraits/Anbu/anbu_menma.png",
-  "anbu_naruto": "Assets/Portraits/Anbu/anbu_naruto.png",
-  "anbu_sasuke": "Assets/Portraits/Anbu/anbu_sasuke.png",
-  "jonin_hanabi": "Assets/Portraits/Jonin/jonin_hanabi.png",
-  "jonin_inojin": "Assets/Portraits/Jonin/jonin_inojin.png",
-  "jonin_konohamaru": "Assets/Portraits/Jonin/jonin_kono.png",
-  "jonin_sasuke": "Assets/Portraits/Jonin/jonin_sasuke.png",
-  "jonin_shino": "Assets/Portraits/Jonin/jonin_shino.png",
-  "sj_ebisu": "Assets/Portraits/Special Jonin/sj_ebisu.png",
-  "sj_genma": "Assets/Portraits/Special Jonin/sj_genma.png",
-  "sj_ibiki": "Assets/Portraits/Special Jonin/sj_ibiki.png",
-  "sannin_sakura": "Assets/Portraits/Sannin/sannin_sakura.png",
-  "sannin_shikamaru": "Assets/Portraits/Sannin/sannin_shika.png",
-  "kage_itachi": "Assets/Portraits/Kage/kage_itachi.png",
-  "kage_kakashi": "Assets/Portraits/Kage/kage_kaka.png",
-  "kage_menma": "Assets/Portraits/Kage/kage_menma.png",
-  "kage_naruto": "Assets/Portraits/Kage/kage_naruto.png",
-  "kage_sarada": "Assets/Portraits/Kage/kage_sarada.png",
-  "black_gold_naruto": "Assets/Portraits/Rare Cards/dark_naruto_kcm.png",
-  "black_sun_himawari": "Assets/Portraits/Rare Cards/black_sun_himawari.png",
-  "serpent_ascendant": "Assets/Portraits/Rare Cards/serpent_ascended.png",
-  "shisui": "Assets/Portraits/Rare Cards/village_guardian_shisui.png",
-  "sakura_avatar": "Assets/Portraits/Jinchuriki/jsakura_ava.png",
-  "sakura_manifestation": "Assets/Portraits/Jinchuriki/jsakura_mani.png",
-  "sakura_resonance": "Assets/Portraits/Jinchuriki/jsakura_res.png",
-  "shikamaru_avatar_yang": "Assets/Portraits/Jinchuriki/jshika_ava.png",
-  "shikamaru_avatar_yin": "Assets/Portraits/Jinchuriki/jshika_ava_yin.png",
-  "shikamaru_manifestation_yang": "Assets/Portraits/Jinchuriki/jshika_mani.png",
-  "shikamaru_manifestation_yin": "Assets/Portraits/Jinchuriki/jshika_mani_yin.png",
-  "shikamaru_resonance_yang": "Assets/Portraits/Jinchuriki/jshika_res.png",
-  "shikamaru_resonance_yin": "Assets/Portraits/Jinchuriki/jshika_res_yin.png",
-  "tobirama_avatar": "Assets/Portraits/Jinchuriki/jtobi_ava.png",
-  "tobirama_manifestation": "Assets/Portraits/Jinchuriki/jtobi_mani.png",
-  "tobirama_resonance": "Assets/Portraits/Jinchuriki/jtobi_res.png",
-  "baryon_mode": "Assets/Portraits/Transformation/bayron_mode.png",
-  "cs_anko": "Assets/Portraits/Transformation/cs1_anko.png",
-  "cs_sasuke": "Assets/Portraits/Transformation/cs1_sasuke.png",
-  "curse_mark_hinata": "Assets/Portraits/Transformation/cs1_hinata.png",
-  "l2_anko": "Assets/Portraits/Transformation/cs2_anko.png",
-  "mangekyo_sarada": "Assets/Portraits/Transformation/ms_sarada.png",
-  "naruto_v1": "Assets/Portraits/Transformation/naruto_v1.png",
-  "naruto_v2": "Assets/Portraits/Transformation/naruto_v2.png",
-  "sharingan_sasuke": "Assets/Portraits/Transformation/sharingan_sasuke.png",
-  "breakout_kurama": "Assets/Portraits/Variants/outbreak_kurama.png",
-  "coercive_cloak": "Assets/Portraits/Variants/coercive_cloak.png",
-  "kurama_dominion": "Assets/Portraits/Variants/kurama_dominion.png",
-  "kurama_sovereign": "Assets/Portraits/Variants/kurama_sovreign.png",
-  "six_tail_dominion": "Assets/Portraits/Variants/dominion_six_tails.png",
-  "stolen_chakra": "Assets/Portraits/Variants/stolen_chakra.png",
-  "teen_nagato": "Assets/Portraits/Variants/teen_nagato.png",
-  "three_tail_dominion": "Assets/Portraits/Variants/dominion_three_tails.png",
-  "black_madara": "Assets/Portraits/Boss Cards/black_madara.png",
-  "failed_god_madara": "Assets/Portraits/Boss Cards/failed_god_madara.png",
-  "fallen_hokage_sasuke": "Assets/Portraits/Boss Cards/fallen_hokage.png",
-  "shadow_of_indra": "Assets/Portraits/Boss Cards/shadow_of_indra.png",
-  "sixth_shadow": "Assets/Portraits/Boss Cards/the_sixth_shadow.png",
-  "undying_madara": "Assets/Portraits/Boss Cards/undying_madara.png",
-  "de_baku": "Assets/Portraits/Summons/baku.png",
-  "gamakichi": "Assets/Portraits/Summons/gamakichi.png",
-  "ibuse": "Assets/Portraits/Summons/ibuse.png",
-  "iron_maiden": "Assets/Portraits/Summons/maiden.png",
-  "key_gero": "Assets/Portraits/Summons/geratora.png",
-  "koto_crow": "Assets/Portraits/Summons/koto_crow.png",
-  "kurama_complete": "Assets/Portraits/Summons/kurama_complete.png",
-  "menma_kurama": "Assets/Portraits/Summons/menma_kurama.png",
-  "menma_nine_tails": "Assets/Portraits/Summons/menma_nine_tails.png",
-  "mirage_clam": "Assets/Portraits/Summons/mirage_clam.png",
-  "mk_enma": "Assets/Portraits/Summons/monkey_king_enma.png",
-  "nine_tails": "Assets/Portraits/Summons/naruto_nine_tails.png",
-  "triple_rashomon": "Assets/Portraits/Summons/rashomon.png",
-  "wr_kamatari": "Assets/Portraits/Summons/kamatari.png",
-  "yang_kurama": "Assets/Portraits/Summons/kurama_yang.png",
-  "yin_kurama": "Assets/Portraits/Summons/kurama_yin.png"
+  "academy_hinata": "Portraits/Academy Student/academy_student_hinata.png",
+  "academy_iwabee": "Portraits/Academy Student/academy_student_iwabe.png",
+  "academy_izuno": "Portraits/Academy Student/academy_student_izuno.png",
+  "academy_kakashi": "Portraits/Academy Student/academy_student_kakashi.png",
+  "academy_kurenai": "Portraits/Academy Student/academy_student_kurenai.png",
+  "academy_kushina": "Portraits/Academy Student/academy_student_kushina.png",
+  "academy_menma": "Portraits/Academy Student/academy_student_menma.png",
+  "academy_metal_lee": "Portraits/Academy Student/academy_student_metal.png",
+  "academy_mirai": "Portraits/Academy Student/academy_student_mirai.png",
+  "academy_obito": "Portraits/Academy Student/academy_student_obito.png",
+  "genin_boruto": "Portraits/Genin/genin_boruto.png",
+  "genin_chocho": "Portraits/Genin/genin_chocho.png",
+  "genin_himawari": "Portraits/Genin/genin_himawari.png",
+  "genin_hoki": "Portraits/Genin/genin_hoki.png",
+  "genin_karin": "Portraits/Genin/genin_karin.png",
+  "genin_mitsuki": "Portraits/Genin/genin_mitsuki.png",
+  "genin_naruto": "Portraits/Genin/genin_naruto.png",
+  "genin_sarada": "Portraits/Genin/genin_sarada.png",
+  "genin_sasuke": "Portraits/Genin/genin_sasuke.png",
+  "chunin_boruto": "Portraits/Chunin/chunin_boruto.png",
+  "chunin_jiraiya": "Portraits/Chunin/chunin_jiraiya.png",
+  "chunin_mitsuki": "Portraits/Chunin/chunin_mitsuki.png",
+  "chunin_shikadai": "Portraits/Chunin/chunin_shikadai.png",
+  "chunin_shinki": "Portraits/Chunin/chunin_shinki.png",
+  "akatsuki_deva": "Portraits/Akatsuki/akatsuki_deva.png",
+  "akatsuki_itachi": "Portraits/Akatsuki/akatsuki_itachi.png",
+  "akatsuki_sasuke": "Portraits/Akatsuki/akatsuki_sasuke.png",
+  "akatsuki_teen_naruto": "Portraits/Akatsuki/akatsuki_naruto.png",
+  "anbu_ino": "Portraits/Anbu/anbu_leader_ino.png",
+  "anbu_menma": "Portraits/Anbu/anbu_menma.png",
+  "anbu_naruto": "Portraits/Anbu/anbu_naruto.png",
+  "anbu_sasuke": "Portraits/Anbu/anbu_sasuke.png",
+  "jonin_hanabi": "Portraits/Jonin/jonin_hanabi.png",
+  "jonin_inojin": "Portraits/Jonin/jonin_inojin.png",
+  "jonin_konohamaru": "Portraits/Jonin/jonin_kono.png",
+  "jonin_sasuke": "Portraits/Jonin/jonin_sasuke.png",
+  "jonin_shino": "Portraits/Jonin/jonin_shino.png",
+  "sj_ebisu": "Portraits/Special Jonin/sj_ebisu.png",
+  "sj_genma": "Portraits/Special Jonin/sj_genma.png",
+  "sj_ibiki": "Portraits/Special Jonin/sj_ibiki.png",
+  "sannin_sakura": "Portraits/Sannin/sannin_sakura.png",
+  "sannin_shikamaru": "Portraits/Sannin/sannin_shika.png",
+  "kage_itachi": "Portraits/Kage/kage_itachi.png",
+  "kage_kakashi": "Portraits/Kage/kage_kaka.png",
+  "kage_menma": "Portraits/Kage/kage_menma.png",
+  "kage_naruto": "Portraits/Kage/kage_naruto.png",
+  "kage_sarada": "Portraits/Kage/kage_sarada.png",
+  "black_gold_naruto": "Portraits/Rare Cards/dark_naruto_kcm.png",
+  "black_sun_himawari": "Portraits/Rare Cards/black_sun_himawari.png",
+  "serpent_ascendant": "Portraits/Rare Cards/serpent_ascended.png",
+  "shisui": "Portraits/Rare Cards/village_guardian_shisui.png",
+  "sakura_avatar": "Portraits/Jinchuriki/jsakura_ava.png",
+  "sakura_manifestation": "Portraits/Jinchuriki/jsakura_mani.png",
+  "sakura_resonance": "Portraits/Jinchuriki/jsakura_res.png",
+  "shikamaru_avatar_yang": "Portraits/Jinchuriki/jshika_ava.png",
+  "shikamaru_avatar_yin": "Portraits/Jinchuriki/jshika_ava_yin.png",
+  "shikamaru_manifestation_yang": "Portraits/Jinchuriki/jshika_mani.png",
+  "shikamaru_manifestation_yin": "Portraits/Jinchuriki/jshika_mani_yin.png",
+  "shikamaru_resonance_yang": "Portraits/Jinchuriki/jshika_res.png",
+  "shikamaru_resonance_yin": "Portraits/Jinchuriki/jshika_res_yin.png",
+  "tobirama_avatar": "Portraits/Jinchuriki/jtobi_ava.png",
+  "tobirama_manifestation": "Portraits/Jinchuriki/jtobi_mani.png",
+  "tobirama_resonance": "Portraits/Jinchuriki/jtobi_res.png",
+  "baryon_mode": "Portraits/Transformation/bayron_mode.png",
+  "cs_anko": "Portraits/Transformation/cs1_anko.png",
+  "cs_sasuke": "Portraits/Transformation/cs1_sasuke.png",
+  "curse_mark_hinata": "Portraits/Transformation/cs1_hinata.png",
+  "l2_anko": "Portraits/Transformation/cs2_anko.png",
+  "mangekyo_sarada": "Portraits/Transformation/ms_sarada.png",
+  "naruto_v1": "Portraits/Transformation/naruto_v1.png",
+  "naruto_v2": "Portraits/Transformation/naruto_v2.png",
+  "sharingan_sasuke": "Portraits/Transformation/sharingan_sasuke.png",
+  "breakout_kurama": "Portraits/Variants/outbreak_kurama.png",
+  "coercive_cloak": "Portraits/Variants/coercive_cloak.png",
+  "kurama_dominion": "Portraits/Variants/kurama_dominion.png",
+  "kurama_sovereign": "Portraits/Variants/kurama_sovreign.png",
+  "six_tail_dominion": "Portraits/Variants/dominion_six_tails.png",
+  "stolen_chakra": "Portraits/Variants/stolen_chakra.png",
+  "teen_nagato": "Portraits/Variants/teen_nagato.png",
+  "three_tail_dominion": "Portraits/Variants/dominion_three_tails.png",
+  "black_madara": "Portraits/Boss Cards/black_madara.png",
+  "failed_god_madara": "Portraits/Boss Cards/failed_god_madara.png",
+  "fallen_hokage_sasuke": "Portraits/Boss Cards/fallen_hokage.png",
+  "shadow_of_indra": "Portraits/Boss Cards/shadow_of_indra.png",
+  "sixth_shadow": "Portraits/Boss Cards/the_sixth_shadow.png",
+  "undying_madara": "Portraits/Boss Cards/undying_madara.png",
+  "de_baku": "Portraits/Summons/baku.png",
+  "gamakichi": "Portraits/Summons/gamakichi.png",
+  "ibuse": "Portraits/Summons/ibuse.png",
+  "iron_maiden": "Portraits/Summons/maiden.png",
+  "key_gero": "Portraits/Summons/geratora.png",
+  "koto_crow": "Portraits/Summons/koto_crow.png",
+  "kurama_complete": "Portraits/Summons/kurama_complete.png",
+  "menma_kurama": "Portraits/Summons/menma_kurama.png",
+  "menma_nine_tails": "Portraits/Summons/menma_nine_tails.png",
+  "mirage_clam": "Portraits/Summons/mirage_clam.png",
+  "mk_enma": "Portraits/Summons/monkey_king_enma.png",
+  "nine_tails": "Portraits/Summons/naruto_nine_tails.png",
+  "triple_rashomon": "Portraits/Summons/rashomon.png",
+  "wr_kamatari": "Portraits/Summons/kamatari.png",
+  "yang_kurama": "Portraits/Summons/kurama_yang.png",
+  "yin_kurama": "Portraits/Summons/kurama_yin.png"
 });
 // UI_PORTRAIT_MANIFEST_JSON_END
 
@@ -319,9 +320,9 @@ function runAcademyExpansionCardAssetDiagnostics() {
 function runVictoryAssetManifestDiagnostics() {
   const path=getUIAssetPath("victory");
   const result={
-    manifestEntry:path==="Assets/UI/Victory.png",
-    uiScoped:typeof path==="string"&&path.startsWith("Assets/UI/"),
-    noLegacyBackgroundPath:path!=="Assets/Backgrounds/Victory.png"
+    manifestEntry:path==="UI/Victory.png",
+    uiScoped:typeof path==="string"&&path.startsWith("UI/"),
+    noLegacyBackgroundPath:path!=="Backgrounds/Victory.png"
   };
   result.pass=Object.values(result).every(value=>value===true);
   console.table(result);
@@ -5956,7 +5957,12 @@ function createDefaultAcquisitionState() {
     formalRankProgressionByOwnedCharacterId:{},
     chronicleOrigin:{variantId:null,ownedCharacterId:null,prologueCompleted:false,completionEvidenceIds:[],activeKonohaEntered:false,activeKonohaEnteredAt:null,activeKonohaEntryBoundaryId:null},
     academyTeamFormation:{unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],completedAt:null},
-    geninRosterTransition:{unlocked:false,required:false,completed:false,promotionEvidenceIds:[],eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null},
+    geninRosterTransition:{
+      unlocked:false,required:false,completed:false,promotionEvidenceIds:[],
+      eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null,
+      candidateSnapshot:null,candidateSnapshotId:null,selectedTeamVariantIds:[null,null],
+      finalTeamVariantIds:[],completedAt:null
+    },
     academyToGeninAssessment:{sequence:0,activeAttempt:null,attempts:[]},
     // Legacy compatibility only. Production semantics live in academyTeamFormation/geninRosterTransition.
     firstTeamFormation:{unlocked:false,promotionEvidenceIds:[],availableCandidateVariantIds:[],deprecated:true},
@@ -6019,7 +6025,12 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
       promotionEvidenceIds:Array.isArray(source.geninRosterTransition.promotionEvidenceIds)?[...new Set(source.geninRosterTransition.promotionEvidenceIds.filter(Boolean))]:[],
       eligibleCandidateVariantIds:Array.isArray(source.geninRosterTransition.eligibleCandidateVariantIds)?[...new Set(source.geninRosterTransition.eligibleCandidateVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
       selectedReplacementVariantIds:Array.isArray(source.geninRosterTransition.selectedReplacementVariantIds)?[...new Set(source.geninRosterTransition.selectedReplacementVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
-      joninLeaderVariantId:source.geninRosterTransition.joninLeaderVariantId&&getCharacterRegistryEntry(source.geninRosterTransition.joninLeaderVariantId)?source.geninRosterTransition.joninLeaderVariantId:null
+      joninLeaderVariantId:source.geninRosterTransition.joninLeaderVariantId&&getCharacterRegistryEntry(source.geninRosterTransition.joninLeaderVariantId)?source.geninRosterTransition.joninLeaderVariantId:null,
+      candidateSnapshot:source.geninRosterTransition.candidateSnapshot&&typeof source.geninRosterTransition.candidateSnapshot==="object"?cloneProgressionData(source.geninRosterTransition.candidateSnapshot):null,
+      candidateSnapshotId:typeof source.geninRosterTransition.candidateSnapshotId==="string"?source.geninRosterTransition.candidateSnapshotId:null,
+      selectedTeamVariantIds:Array.from({length:2},(_,index)=>{const id=Array.isArray(source.geninRosterTransition.selectedTeamVariantIds)?source.geninRosterTransition.selectedTeamVariantIds[index]:null;return id&&getCharacterRegistryEntry(id)?id:null;}),
+      finalTeamVariantIds:Array.isArray(source.geninRosterTransition.finalTeamVariantIds)?source.geninRosterTransition.finalTeamVariantIds.filter(id=>!!getCharacterRegistryEntry(id)).slice(0,2):[],
+      completedAt:Number(source.geninRosterTransition.completedAt)||null
     }:defaults.geninRosterTransition,
     academyToGeninAssessment:source.academyToGeninAssessment&&typeof source.academyToGeninAssessment==="object"?{
       sequence:Math.max(0,Number(source.academyToGeninAssessment.sequence)||0),
@@ -6772,7 +6783,7 @@ function renderFieldReadinessAssessmentOverlay(container) {
   const active=model.attempt&&model.attempt.status==="in_progress";
   const objectiveHTML=model.attempt?model.attempt.objectiveProgress.map(item=>`<div class="field-readiness-objective ${item.completed?"done":""}"><span>${item.completed?"✓":"○"}</span><span>${escapeFieldReadinessHTML(formatFieldReadinessObjectiveStep(item.step))}</span></div>`).join(""):`<div class="field-readiness-note">No assessment attempt has begun for this shinobi.</div>`;
   const candidatesHTML=model.candidates.map(item=>`<button type="button" class="field-readiness-subject ${item.ownedCharacterId===model.selectedOwnedCharacterId?"selected":""}" onclick="selectFieldReadinessAssessmentSubject('${escapeFieldReadinessHTML(item.ownedCharacterId)}')"><strong>${escapeFieldReadinessHTML(item.displayName)}</strong><br><small>${escapeFieldReadinessHTML(item.formalRank||"academy")}</small></button>`).join("")||`<div class="field-readiness-note">No owned Academy-rank assessment subject is currently available.</div>`;
-  const resultHTML=model.result?`<div class="field-readiness-card field-readiness-result ${model.result.passed?"pass":"fail"}"><strong>${model.result.passed?"PROMOTION APPROVED":"PROMOTION NOT APPROVED"}</strong><div>${escapeFieldReadinessHTML(model.result.explanation)}</div></div>`:"";
+  const resultHTML=model.result?`<div class="field-readiness-card field-readiness-result ${model.result.passed?"pass":"fail"}"><strong>${model.result.passed?"PROMOTION APPROVED":"PROMOTION NOT APPROVED"}</strong><div>${escapeFieldReadinessHTML(model.result.explanation)}</div>${model.result.passed?`<div style="margin-top:10px;"><button type="button" class="field-readiness-button" onclick="openGeninRosterTransitionUI()">CONTINUE TO GENIN ROSTER TRANSITION</button></div>`:""}</div>`:"";
   const notice=FIELD_READINESS_UI_STATE.lastNotice?`<div class="field-readiness-note">${escapeFieldReadinessHTML(FIELD_READINESS_UI_STATE.lastNotice)}</div>`:"";
   container.innerHTML=`<div class="field-readiness-shell">
     <div><div class="field-readiness-eyebrow">ACADEMY → GENIN PROMOTION</div><h2 class="field-readiness-title">${escapeFieldReadinessHTML(model.displayName)}</h2></div>
@@ -6947,6 +6958,10 @@ function renderArenaPromotionOverlay(container) {
     return `<button type="button" onclick="selectArenaPromotionSubject('${escapeFieldReadinessHTML(item.ownedCharacterId)}')" style="text-align:left;min-width:210px;border:1px solid ${selected?"rgba(207,169,75,.7)":"rgba(120,160,180,.25)"};background:${selected?"rgba(40,34,20,.72)":"rgba(11,30,38,.7)"};color:${selected?"#FFE9A6":"#D8E4EC"};padding:11px 13px;border-radius:7px;cursor:pointer;"><strong>${escapeFieldReadinessHTML(item.displayName)}</strong><br><small>${escapeFieldReadinessHTML(item.formalRank||"academy")} · ${status}</small></button>`;
   }).join("")||`<div style="color:#7F96A4;font-size:11px;">No owned Academy-rank Promotion subject is currently available.</div>`;
   const actionLabel=model.fieldReadinessInProgress?"RETURN TO FIELD READINESS ASSESSMENT":"VIEW FIELD READINESS ASSESSMENT";
+  // BRICK 936 — Arena → Promotion can resume the separate post-Promotion
+  // roster transition after reload without pretending the transition caused Promotion.
+  const geninTransition=getGeninRosterTransitionState();
+  const geninTransitionAvailable=geninTransition.unlocked===true&&(geninTransition.required===true||geninTransition.completed===true);
   container.innerHTML=`
     <div style="display:flex;flex-direction:column;flex:1;gap:16px;padding:4px 2px;">
       <div>
@@ -6966,6 +6981,7 @@ function renderArenaPromotionOverlay(container) {
       </div>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
         <button type="button" onclick="enterFieldReadinessAssessmentFromPromotion()" ${model.fieldReadinessAvailable?"":"disabled"} style="border:1px solid rgba(207,169,75,.55);background:#152832;color:#F0DF9F;padding:10px 16px;border-radius:6px;cursor:${model.fieldReadinessAvailable?"pointer":"default"};font-weight:700;opacity:${model.fieldReadinessAvailable?"1":".4"};">${actionLabel}</button>
+        ${geninTransitionAvailable?`<button type="button" onclick="openGeninRosterTransitionUI()" style="border:1px solid rgba(109,178,146,.45);background:#132A23;color:#CDEBD9;padding:10px 16px;border-radius:6px;cursor:pointer;font-weight:700;">${geninTransition.completed?"VIEW GENIN ROSTER":"CONTINUE GENIN ROSTER TRANSITION"}</button>`:""}
         <button type="button" onclick="openArenaMain()" style="border:1px solid rgba(130,160,175,.35);background:#0F2028;color:#C7D6DF;padding:10px 16px;border-radius:6px;cursor:pointer;">BACK TO ARENA MAIN</button>
       </div>
     </div>`;
@@ -7066,6 +7082,8 @@ function resolveAcademyToGeninFieldReadinessAssessment(attemptId) {
 }
 
 function setGeninRosterTransitionAvailableCandidates(variantIds) {
+  // Legacy compatibility only. A raw list is not a production candidate snapshot
+  // and cannot unlock the player-facing Genin transition by itself.
   const state=ensurePlayerAcquisitionState();
   state.geninRosterTransition.eligibleCandidateVariantIds=Array.isArray(variantIds)?[...new Set(variantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[];
   savePlayerData();
@@ -7075,6 +7093,182 @@ function setGeninRosterTransitionAvailableCandidates(variantIds) {
 function getGeninRosterTransitionCandidateVariantIds() {
   const state=ensurePlayerAcquisitionState();
   return state.geninRosterTransition.unlocked===true?[...(state.geninRosterTransition.eligibleCandidateVariantIds||[])]:[];
+}
+
+
+// =========================================================
+// BRICK 926 — GENIN ROSTER TRANSITION CANDIDATE SNAPSHOT AUTHORITY
+// BRICK 927 — SNAPSHOT VALIDATION / PERSISTENCE
+// BRICK 928 — RETAIN / REPLACE TEAMMATE SELECTION
+// BRICK 929 — MANDATORY JŌNIN LEADER SELECTION
+// BRICK 930 — TRANSITION COMPLETION VALIDATION
+// BRICK 931 — OWNERSHIP / HISTORY PRESERVATION BOUNDARY
+// BRICK 932 — PLAYER-FACING GENIN ROSTER TRANSITION UI
+// =========================================================
+
+function getGeninRosterTransitionState() {
+  const state=ensurePlayerAcquisitionState();
+  if (!state.geninRosterTransition||typeof state.geninRosterTransition!=="object") state.geninRosterTransition=createDefaultAcquisitionState().geninRosterTransition;
+  return state.geninRosterTransition;
+}
+
+function getCurrentAcademyTeammateVariantIdsForGeninTransition() {
+  const state=ensurePlayerAcquisitionState();
+  const formation=state.academyTeamFormation;
+  return formation&&Array.isArray(formation.selectedTeammateIds)
+    ? Array.from({length:2},(_,index)=>formation.selectedTeammateIds[index]||null)
+    : [null,null];
+}
+
+function normalizeGeninRosterCandidateSnapshot(snapshot) {
+  if (!snapshot||typeof snapshot!=="object"||typeof snapshot.snapshotId!=="string"||!snapshot.snapshotId.trim()) return null;
+  const cleanIds=ids=>Array.isArray(ids)?[...new Set(ids.filter(id=>typeof id==="string"&&!!getCharacterRegistryEntry(id)))]:[];
+  return {
+    snapshotId:snapshot.snapshotId.trim(),
+    subjectOwnedCharacterId:typeof snapshot.subjectOwnedCharacterId==="string"?snapshot.subjectOwnedCharacterId:null,
+    retentionEligibleVariantIds:cleanIds(snapshot.retentionEligibleVariantIds),
+    teammateCandidateVariantIds:cleanIds(snapshot.teammateCandidateVariantIds),
+    joninLeaderCandidateVariantIds:cleanIds(snapshot.joninLeaderCandidateVariantIds),
+    provenance:snapshot.provenance&&typeof snapshot.provenance==="object"?cloneProgressionData(snapshot.provenance):{},
+    createdAt:Number(snapshot.createdAt)||Date.now()
+  };
+}
+
+function applyGeninRosterTransitionCandidateSnapshot(snapshot) {
+  const transition=getGeninRosterTransitionState();
+  if (transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  const normalized=normalizeGeninRosterCandidateSnapshot(snapshot);
+  if (!normalized) return {success:false,reason:"candidate_snapshot_invalid"};
+  const promotedSubjectIds=Object.entries(ensurePlayerAcquisitionState().formalRankProgressionByOwnedCharacterId||{})
+    .filter(([,record])=>record&&record.formalRank==="genin").map(([ownedCharacterId])=>ownedCharacterId);
+  if (!normalized.subjectOwnedCharacterId||!promotedSubjectIds.includes(normalized.subjectOwnedCharacterId)) return {success:false,reason:"candidate_snapshot_subject_not_promoted_genin"};
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean);
+  if (!current.every(id=>normalized.retentionEligibleVariantIds.includes(id)||normalized.teammateCandidateVariantIds.includes(id))) {
+    return {success:false,reason:"candidate_snapshot_missing_current_teammate_eligibility"};
+  }
+  const invalidLeader=normalized.joninLeaderCandidateVariantIds.find(id=>{
+    const entry=getCharacterRegistryEntry(id);return !entry||String(entry.formalRank||"").toLowerCase()!=="jonin";
+  });
+  if (invalidLeader) return {success:false,reason:"candidate_snapshot_contains_non_jonin_leader",variantId:invalidLeader};
+  transition.candidateSnapshot=normalized;
+  transition.candidateSnapshotId=normalized.snapshotId;
+  transition.eligibleCandidateVariantIds=[...new Set([...normalized.retentionEligibleVariantIds,...normalized.teammateCandidateVariantIds])];
+  transition.selectedTeamVariantIds=Array.from({length:2},(_,index)=>current[index]||null);
+  transition.selectedReplacementVariantIds=[];
+  transition.joninLeaderVariantId=null;
+  savePlayerData();
+  return {success:true,snapshot:cloneProgressionData(normalized),selectedTeamVariantIds:[...transition.selectedTeamVariantIds]};
+}
+
+function getGeninRosterTransitionCandidateSnapshot() {
+  const transition=getGeninRosterTransitionState();
+  return transition.candidateSnapshot?cloneProgressionData(transition.candidateSnapshot):null;
+}
+
+function isVariantOwnedForGeninTransition(variantId) {
+  return !!getOwnedCharacterRecordByVariantId(variantId);
+}
+
+function selectGeninRosterTransitionTeammate(position,variantId) {
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  const slot=Number(position);
+  if (transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  if (!snapshot) return {success:false,reason:"candidate_snapshot_required"};
+  if (![1,2].includes(slot)||!getCharacterRegistryEntry(variantId)) return {success:false,reason:"genin_teammate_selection_invalid"};
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+  const retainAllowed=snapshot.retentionEligibleVariantIds.includes(variantId)&&current.includes(variantId);
+  const replacementAllowed=snapshot.teammateCandidateVariantIds.includes(variantId);
+  if (!retainAllowed&&!replacementAllowed) return {success:false,reason:"genin_teammate_not_in_authoritative_snapshot"};
+  if (!isVariantOwnedForGeninTransition(variantId)) return {success:false,reason:"acquisition_required",variantId};
+  const next=Array.from({length:2},(_,index)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[index]||current[index]||null);
+  const otherIndex=slot===1?1:0;
+  if (next[otherIndex]===variantId) return {success:false,reason:"genin_teammate_duplicate_selection"};
+  next[slot-1]=variantId;
+  transition.selectedTeamVariantIds=next;
+  transition.selectedReplacementVariantIds=next.filter(id=>id&&!current.includes(id));
+  savePlayerData();
+  return {success:true,position:slot,variantId,selectedTeamVariantIds:[...next]};
+}
+
+function selectGeninRosterTransitionJoninLeader(variantId) {
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  if (transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  if (!snapshot) return {success:false,reason:"candidate_snapshot_required"};
+  if (!snapshot.joninLeaderCandidateVariantIds.includes(variantId)) return {success:false,reason:"jonin_leader_not_in_authoritative_snapshot"};
+  const entry=getCharacterRegistryEntry(variantId);
+  if (!entry||String(entry.formalRank||"").toLowerCase()!=="jonin") return {success:false,reason:"jonin_leader_rank_invalid"};
+  if (!isVariantOwnedForGeninTransition(variantId)) return {success:false,reason:"acquisition_required",variantId};
+  transition.joninLeaderVariantId=variantId;
+  savePlayerData();
+  return {success:true,variantId};
+}
+
+function confirmGeninRosterTransition() {
+  const state=ensurePlayerAcquisitionState();
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  if (transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  if (!snapshot||transition.candidateSnapshotId!==snapshot.snapshotId) return {success:false,reason:"candidate_snapshot_required"};
+  const selected=Array.from({length:2},(_,index)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[index]||null);
+  if (selected.some(id=>!id)||new Set(selected).size!==2) return {success:false,reason:"genin_team_requires_two_distinct_teammates"};
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+  const allAllowed=selected.every(id=>(snapshot.retentionEligibleVariantIds.includes(id)&&current.includes(id))||snapshot.teammateCandidateVariantIds.includes(id));
+  if (!allAllowed) return {success:false,reason:"genin_teammate_selection_not_authorized"};
+  if (!selected.every(isVariantOwnedForGeninTransition)) return {success:false,reason:"genin_teammate_acquisition_required"};
+  const leader=transition.joninLeaderVariantId;
+  if (!leader||!snapshot.joninLeaderCandidateVariantIds.includes(leader)) return {success:false,reason:"jonin_leader_required"};
+  const leaderEntry=getCharacterRegistryEntry(leader);
+  if (!leaderEntry||String(leaderEntry.formalRank||"").toLowerCase()!=="jonin") return {success:false,reason:"jonin_leader_rank_invalid"};
+  if (!isVariantOwnedForGeninTransition(leader)) return {success:false,reason:"jonin_leader_acquisition_required",variantId:leader};
+  transition.finalTeamVariantIds=[...selected];
+  transition.completed=true;
+  transition.required=false;
+  transition.completedAt=Date.now();
+  state.joninLeadershipAssignment={
+    variantId:leader,role:"jonin_team_leader",candidateSnapshotId:snapshot.snapshotId,
+    assignedAt:transition.completedAt,doesNotOwnBattleSlot:true
+  };
+  savePlayerData();
+  return {
+    success:true,completed:true,finalTeamVariantIds:[...selected],joninLeaderVariantId:leader,
+    outgoingTeammatesRemainOwned:true,myClanQueueMutated:false,promotionAlreadyEarned:true
+  };
+}
+
+function createGeninRosterTransitionPresentationModel() {
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+  const describe=id=>{const entry=id?getCharacterRegistryEntry(id):null;return entry?{variantId:id,displayName:entry.displayName||entry.name||id,formalRank:entry.formalRank||null,owned:isVariantOwnedForGeninTransition(id)}:null;};
+  return {
+    unlocked:transition.unlocked===true,required:transition.required===true,completed:transition.completed===true,
+    candidateSnapshotId:transition.candidateSnapshotId||null,
+    authorityReady:!!snapshot,
+    authorityStatus:snapshot?"candidate_snapshot_ready":"external_authority_required",
+    currentTeammates:current.map(describe),
+    selectedTeamVariantIds:Array.from({length:2},(_,index)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[index]||current[index]||null),
+    teammateCandidates:snapshot?[...new Set([...snapshot.retentionEligibleVariantIds,...snapshot.teammateCandidateVariantIds])].map(describe).filter(Boolean):[],
+    joninLeaderCandidates:snapshot?snapshot.joninLeaderCandidateVariantIds.map(describe).filter(Boolean):[],
+    joninLeaderVariantId:transition.joninLeaderVariantId||null
+  };
+}
+
+function renderGeninRosterTransitionOverlay(container) {
+  if (!container) return false;
+  const model=createGeninRosterTransitionPresentationModel();
+  const esc=escapeFieldReadinessHTML;
+  const candidateButtons=slot=>model.teammateCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionTeammate(${slot},'${esc(item.variantId)}');openGeninRosterTransitionUI();" ${item.owned?"":"disabled"} style="padding:8px 10px;border:1px solid rgba(207,169,75,.35);background:#10242c;color:#d8e4ec;border-radius:6px;cursor:${item.owned?"pointer":"default"};opacity:${item.owned?"1":".45"};">${esc(item.displayName)}${item.owned?"":" · ACQUISITION REQUIRED"}</button>`).join("");
+  const leaders=model.joninLeaderCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionJoninLeader('${esc(item.variantId)}');openGeninRosterTransitionUI();" ${item.owned?"":"disabled"} style="padding:8px 10px;border:1px solid rgba(120,160,180,.35);background:#0f2028;color:#d8e4ec;border-radius:6px;cursor:${item.owned?"pointer":"default"};opacity:${item.owned?"1":".45"};">${esc(item.displayName)}${item.owned?"":" · ACQUISITION REQUIRED"}</button>`).join("");
+  const selectedNames=model.selectedTeamVariantIds.map(id=>{const e=id?getCharacterRegistryEntry(id):null;return e?(e.displayName||e.name||id):"UNSELECTED";});
+  const leaderEntry=model.joninLeaderVariantId?getCharacterRegistryEntry(model.joninLeaderVariantId):null;
+  container.innerHTML=`<div style="padding:24px;display:grid;gap:16px;color:#d8e4ec;overflow:auto;">\n    <div><div style="font-size:10px;letter-spacing:1.4px;color:#d0ad55;">ACADEMY → GENIN</div><h2 style="margin:3px 0;color:#f2e4b0;">GENIN ROSTER TRANSITION</h2><p style="color:#94A3B8;font-size:12px;max-width:760px;">Promotion is already earned. Finalise two teammate roles and one authorised Jōnin leader. This surface cannot manufacture ownership or candidate eligibility.</p></div>\n    ${model.authorityReady?"":`<div style="padding:14px;border:1px solid rgba(207,169,75,.35);background:rgba(20,14,5,.55);color:#e8d7a1;">Candidate authority is not yet available for this Chronicle. CE / Acquisition must supply an exact snapshot.</div>`}\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 1 — ${esc(selectedNames[0])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(1)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 2 — ${esc(selectedNames[1])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(2)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>JŌNIN LEADER — ${esc(leaderEntry?(leaderEntry.displayName||leaderEntry.name||leaderEntry.id):"UNSELECTED")}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${leaders||"No authorised Jōnin candidates supplied."}</div></div>\n    <div style="display:flex;gap:10px;"><button type="button" onclick="confirmGeninRosterTransition();openGeninRosterTransitionUI();" ${(!model.authorityReady||model.completed)?"disabled":""} style="padding:10px 16px;border:1px solid rgba(207,169,75,.55);background:#152832;color:#f0df9f;border-radius:6px;font-weight:700;">CONFIRM GENIN ROSTER</button><button type="button" onclick="openArenaPromotionSurface()" style="padding:10px 16px;border:1px solid rgba(130,160,175,.35);background:#0f2028;color:#c7d6df;border-radius:6px;">BACK</button></div>\n  </div>`;
+  return true;
+}
+
+function openGeninRosterTransitionUI() {
+  return openOverlay("genin_roster_transition");
 }
 
 // Compatibility wrappers for pre-migration callers. They no longer own first-team semantics.
@@ -7223,6 +7417,52 @@ function increaseEntityStat(entityId, statName, amount) {
   return {success:true,entityId,statName,currentValue:stats[statName],currentPL:calculateEntityCurrentPL(entityId)};
 }
 
+
+// =========================================================
+// BRICK 916 — SAVEABLE ENCOUNTER RESERVATION RUNTIME
+// =========================================================
+// Current-state persistence only. Chronicle/history remains in the existing
+// activity/evidence authorities. A reservation freezes exact opposition and
+// package identity once encounter construction crosses commitment.
+function createDefaultEncounterRuntimeState() {
+  return {
+    sequence:0,
+    reservationsByEncounterId:{},
+    lastCompletedOccurrenceByEncounterId:{}
+  };
+}
+
+function normalizeEncounterRuntimeState(savedState) {
+  const source=savedState&&typeof savedState==="object"?savedState:{};
+  const reservations={};
+  const raw=source.reservationsByEncounterId&&typeof source.reservationsByEncounterId==="object"
+    ? source.reservationsByEncounterId:{};
+  Object.entries(raw).forEach(([encounterId,reservation])=>{
+    if (!encounterId||!reservation||typeof reservation!=="object") return;
+    if (!reservation.occurrenceId||!reservation.oppositionTemplateId) return;
+    reservations[encounterId]={
+      encounterId:String(encounterId),
+      occurrenceId:String(reservation.occurrenceId),
+      oppositionTemplateId:String(reservation.oppositionTemplateId),
+      encounterStatePackageId:reservation.encounterStatePackageId?String(reservation.encounterStatePackageId):null,
+      selectionMode:reservation.selectionMode?String(reservation.selectionMode):"deterministic",
+      contextSnapshot:reservation.contextSnapshot&&typeof reservation.contextSnapshot==="object"?cloneProgressionData(reservation.contextSnapshot):{},
+      status:["reserved","started","completed"].includes(reservation.status)?reservation.status:"reserved",
+      reservedAt:Number(reservation.reservedAt)||null,
+      startedAt:Number(reservation.startedAt)||null,
+      completedAt:Number(reservation.completedAt)||null,
+      outcome:reservation.outcome?cloneProgressionData(reservation.outcome):null
+    };
+  });
+  const completed=source.lastCompletedOccurrenceByEncounterId&&typeof source.lastCompletedOccurrenceByEncounterId==="object"
+    ? cloneProgressionData(source.lastCompletedOccurrenceByEncounterId):{};
+  return {
+    sequence:Math.max(0,Math.floor(Number(source.sequence)||0)),
+    reservationsByEncounterId:reservations,
+    lastCompletedOccurrenceByEncounterId:completed
+  };
+}
+
 function createDefaultPlayerData() {
   const characterOwnership = createDefaultCharacterOwnershipState();
   setCharacterOwnershipRuntimeAuthority(characterOwnership);
@@ -7238,6 +7478,8 @@ function createDefaultPlayerData() {
     entities: createDefaultPlayerEntityState(),
     weaponAcclimation: {},
     activityHistory: [],
+    // BRICK 916 — committed encounter reservation/current-state identity.
+    encounterRuntime: createDefaultEncounterRuntimeState(),
     // BRICK 742 — STORY SCENE RUNTIME IS SAVEABLE CURRENT STATE, NOT HISTORY
     storySceneRuntime: createDefaultStorySceneRuntimeState(),
     progression: createDefaultRunProgression(),
@@ -7695,6 +7937,8 @@ function loadPlayerData() {
       entities: normalizePlayerEntityState(parsedData.entities,{legacySeedMigration}),
       weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
       activityHistory: normalizedActivityHistory,
+      // BRICK 921 — preserve reserved/started encounter identity across reload.
+      encounterRuntime: normalizeEncounterRuntimeState(parsedData.encounterRuntime),
       // BRICK 742 — restore current scene continuation state without inventing a story ledger.
       storySceneRuntime: normalizeStorySceneRuntimeState(parsedData.storySceneRuntime),
       progression: normalizeSavedRunProgression(parsedData.progression),
@@ -36635,6 +36879,7 @@ function increaseCharacterStat(
 
 // =========================================================
 // ENEMY DATABASE
+// BRICK 911 — CANONICAL COMMON ENEMY BASE PACKAGES
 // =========================================================
 
 let selectedEnemy = null;
@@ -36690,6 +36935,16 @@ let currentBattle = {
 
 
   encounterId:
+    null,
+
+  // BRICK 918 — exact encounter occurrence/projection provenance.
+  encounterOccurrenceId:
+    null,
+
+  oppositionTemplateId:
+    null,
+
+  encounterStatePackageId:
     null,
 
 
@@ -36836,14 +37091,11 @@ const enemyDatabase = {
 
     rank: "Rogue Shinobi",
 
-    power: 32,
+    power: 21,
+    calibratedBasePL: 21,
 
-
-    stats: {
-
-      stamina: 34
-
-    },
+    baseStats: {nin:18,tai:16,buki:22,fuin:8,kin:10,gen:14,stamina:20},
+    stats: {nin:18,tai:16,buki:22,fuin:8,kin:10,gen:14,stamina:20},
 
 
     image:
@@ -36914,14 +37166,11 @@ const enemyDatabase = {
 
     rank: "Outlaw",
 
-    power: 41,
+    power: 18,
+    calibratedBasePL: 18,
 
-
-    stats: {
-
-      stamina: 42
-
-    },
+    baseStats: {nin:10,tai:17,buki:19,fuin:5,kin:7,gen:6,stamina:18},
+    stats: {nin:10,tai:17,buki:19,fuin:5,kin:7,gen:6,stamina:18},
 
 
     image:
@@ -36992,14 +37241,11 @@ const enemyDatabase = {
 
     rank: "Elite Rogue",
 
-    power: 56,
+    power: 28,
+    calibratedBasePL: 28,
 
-
-    stats: {
-
-      stamina: 58
-
-    },
+    baseStats: {nin:24,tai:27,buki:30,fuin:10,kin:12,gen:12,stamina:29},
+    stats: {nin:24,tai:27,buki:30,fuin:10,kin:12,gen:12,stamina:29},
 
 
     image:
@@ -37080,6 +37326,7 @@ const enemyDatabase = {
     rank:"Experimental Hostile",
     power:11,
     calibratedBasePL:11,
+    baseStats:{nin:12,tai:11,buki:10,fuin:5,kin:5,gen:6,stamina:11},
     stats:{nin:12,tai:11,buki:10,fuin:5,kin:5,gen:6,stamina:11},
     image:null,
     rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
@@ -37092,6 +37339,7 @@ const enemyDatabase = {
     rank:"Experimental Hostile",
     power:13,
     calibratedBasePL:13,
+    baseStats:{nin:6,tai:14,buki:8,fuin:4,kin:5,gen:4,stamina:14},
     stats:{nin:6,tai:14,buki:8,fuin:4,kin:5,gen:4,stamina:14},
     image:null,
     rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
@@ -37104,6 +37352,7 @@ const enemyDatabase = {
     rank:"Experimental Hostile",
     power:12,
     calibratedBasePL:12,
+    baseStats:{nin:13,tai:10,buki:6,fuin:4,kin:6,gen:4,stamina:12},
     stats:{nin:13,tai:10,buki:6,fuin:4,kin:6,gen:4,stamina:12},
     image:null,
     rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
@@ -37145,7 +37394,14 @@ const ENCOUNTER_DATABASE = {
 
 
     enemyId:
-      "scout"
+      "scout",
+
+    selectionMode:
+      "deterministic",
+
+    candidateSet: [
+      { enemyId:"scout", weight:1 }
+    ]
 
 
   },
@@ -37168,7 +37424,14 @@ const ENCOUNTER_DATABASE = {
 
 
     enemyId:
-      "banditLeader"
+      "banditLeader",
+
+    selectionMode:
+      "deterministic",
+
+    candidateSet: [
+      { enemyId:"banditLeader", weight:1 }
+    ]
 
 
   },
@@ -37191,7 +37454,14 @@ const ENCOUNTER_DATABASE = {
 
 
     enemyId:
-      "bandit"
+      "bandit",
+
+    selectionMode:
+      "deterministic",
+
+    candidateSet: [
+      { enemyId:"bandit", weight:1 }
+    ]
 
 
   }
@@ -37202,6 +37472,221 @@ const ENCOUNTER_DATABASE = {
 
 
 
+
+
+// =========================================================
+// BRICK 912 — ENEMY OCCURRENCE EFFECTIVE-STATE PROJECTION FOUNDATION
+// BRICK 913 — AUTHORED CANDIDATE SET NORMALIZATION
+// BRICK 914 — CONTEXTUAL SEMANTIC ELIGIBILITY BEFORE RANDOMNESS
+// BRICK 915 — BOUNDED SELECTION AMONG ELIGIBLE CANDIDATES
+// BRICK 916 — COMMITTED ENCOUNTER RESERVATION / RETRY IDENTITY
+// BRICK 917 — OCCURRENCE PARTICIPANT CONSTRUCTION + PROVENANCE
+// BRICK 918 — CONSTRUCTED OCCURRENCE → COMBAT BRIDGE
+// BRICK 919 — EXISTING ENCOUNTER COMPATIBILITY MIGRATION
+// BRICK 920 — BATTLE OUTCOME CLOSES THE RESERVED OCCURRENCE
+// =========================================================
+
+const ALPHA_ENCOUNTER_STATE_PACKAGE_DATABASE=Object.freeze({});
+
+function hasCanonicalSevenStats(stats) {
+  return !!stats&&typeof stats==="object"&&PL_STAT_KEYS.every(stat=>Number.isFinite(Number(stats[stat])));
+}
+
+function getEnemyCanonicalBaseStats(enemy) {
+  if (!enemy) return null;
+  const source=hasCanonicalSevenStats(enemy.baseStats)?enemy.baseStats:(hasCanonicalSevenStats(enemy.stats)?enemy.stats:null);
+  return source?Object.fromEntries(PL_STAT_KEYS.map(stat=>[stat,Number(source[stat])])):null;
+}
+
+function getEnemyCanonicalBasePL(enemy) {
+  if (!enemy) return 0;
+  if (Number.isFinite(Number(enemy.calibratedBasePL))) return Math.max(0,Math.round(Number(enemy.calibratedBasePL)));
+  const stats=getEnemyCanonicalBaseStats(enemy);
+  if (stats) return Math.max(0,Math.round(calculateRawPLFromStats(stats)));
+  return Math.max(0,Math.round(Number(enemy.power)||0));
+}
+
+function getEncounterStatePackageDefinition(packageId) {
+  if (!packageId) return null;
+  return ALPHA_ENCOUNTER_STATE_PACKAGE_DATABASE[String(packageId)]||null;
+}
+
+function normalizeEncounterCandidateDefinition(candidate,index=0) {
+  const source=typeof candidate==="string"?{enemyId:candidate}:(candidate&&typeof candidate==="object"?candidate:null);
+  if (!source||typeof source.enemyId!=="string"||!enemyDatabase[source.enemyId]) return null;
+  const requiredContext=source.requiredContext&&typeof source.requiredContext==="object"?cloneProgressionData(source.requiredContext):{};
+  const excludedContext=source.excludedContext&&typeof source.excludedContext==="object"?cloneProgressionData(source.excludedContext):{};
+  return {
+    candidateId:source.candidateId?String(source.candidateId):`${source.enemyId}::candidate_${index+1}`,
+    enemyId:source.enemyId,
+    weight:Number.isFinite(Number(source.weight))&&Number(source.weight)>0?Number(source.weight):1,
+    requiredContext,
+    excludedContext,
+    encounterStatePackageId:source.encounterStatePackageId?String(source.encounterStatePackageId):null
+  };
+}
+
+function getAuthoredEncounterCandidateSet(encounterData) {
+  if (!encounterData||typeof encounterData!=="object") return [];
+  const authored=Array.isArray(encounterData.candidateSet)&&encounterData.candidateSet.length>0
+    ? encounterData.candidateSet
+    : (encounterData.enemyId?[encounterData.enemyId]:[]);
+  return authored.map(normalizeEncounterCandidateDefinition).filter(Boolean);
+}
+
+function encounterContextValueMatches(actual,expected) {
+  if (Array.isArray(expected)) return expected.includes(actual);
+  if (expected&&typeof expected==="object"&&Array.isArray(expected.anyOf)) return expected.anyOf.includes(actual);
+  if (expected&&typeof expected==="object"&&Array.isArray(expected.noneOf)) return !expected.noneOf.includes(actual);
+  return actual===expected;
+}
+
+function isEncounterCandidateContextuallyEligible(candidate,context={}) {
+  if (!candidate) return false;
+  const safeContext=context&&typeof context==="object"?context:{};
+  const required=candidate.requiredContext||{};
+  const excluded=candidate.excludedContext||{};
+  const requiredOk=Object.entries(required).every(([key,expected])=>encounterContextValueMatches(safeContext[key],expected));
+  if (!requiredOk) return false;
+  const excludedHit=Object.entries(excluded).some(([key,expected])=>encounterContextValueMatches(safeContext[key],expected));
+  return !excludedHit;
+}
+
+function getEligibleEncounterCandidates(encounterData,context={}) {
+  return getAuthoredEncounterCandidateSet(encounterData).filter(candidate=>isEncounterCandidateContextuallyEligible(candidate,context));
+}
+
+function selectEligibleEncounterCandidate(encounterData,eligibleCandidates,randomValue=null) {
+  const candidates=Array.isArray(eligibleCandidates)?eligibleCandidates:[];
+  if (candidates.length===0) return null;
+  const selectionMode=encounterData&&encounterData.selectionMode?String(encounterData.selectionMode):"deterministic";
+  if (selectionMode==="deterministic"||candidates.length===1) return candidates[0];
+  if (!["weighted","bounded_random"].includes(selectionMode)) return null;
+  const roll=Number.isFinite(Number(randomValue))?Math.max(0,Math.min(.999999,Number(randomValue))):Math.random();
+  if (selectionMode==="bounded_random") return candidates[Math.floor(roll*candidates.length)]||candidates[0];
+  const total=candidates.reduce((sum,candidate)=>sum+Math.max(0,Number(candidate.weight)||0),0);
+  if (total<=0) return candidates[0];
+  let cursor=roll*total;
+  for (const candidate of candidates) {
+    cursor-=Math.max(0,Number(candidate.weight)||0);
+    if (cursor<0) return candidate;
+  }
+  return candidates[candidates.length-1];
+}
+
+function ensureEncounterRuntimeState() {
+  if (!playerData.encounterRuntime||typeof playerData.encounterRuntime!=="object") playerData.encounterRuntime=createDefaultEncounterRuntimeState();
+  playerData.encounterRuntime=normalizeEncounterRuntimeState(playerData.encounterRuntime);
+  return playerData.encounterRuntime;
+}
+
+function getEncounterReservation(encounterId) {
+  const runtime=ensureEncounterRuntimeState();
+  return runtime.reservationsByEncounterId[String(encounterId)]||null;
+}
+
+function reserveEncounterOccurrence(encounterId,context={}) {
+  const encounterData=getEncounterData(encounterId);
+  if (!encounterData) return {success:false,reason:"encounter_definition_missing",encounterId};
+  const runtime=ensureEncounterRuntimeState();
+  const existing=runtime.reservationsByEncounterId[String(encounterId)]||null;
+  if (existing&&["reserved","started"].includes(existing.status)) {
+    return {success:true,idempotent:true,reservation:cloneProgressionData(existing)};
+  }
+  const eligible=getEligibleEncounterCandidates(encounterData,context);
+  if (eligible.length===0) return {success:false,reason:"no_semantically_eligible_opposition",encounterId};
+  const selected=selectEligibleEncounterCandidate(encounterData,eligible);
+  if (!selected) return {success:false,reason:"encounter_selection_mode_invalid",encounterId};
+  if (selected.encounterStatePackageId&&!getEncounterStatePackageDefinition(selected.encounterStatePackageId)) {
+    return {success:false,reason:"encounter_state_package_not_authorized",encounterStatePackageId:selected.encounterStatePackageId};
+  }
+  runtime.sequence=Math.max(0,Number(runtime.sequence)||0)+1;
+  const occurrenceId=`encounter_occurrence_${String(encounterId)}_${runtime.sequence}`;
+  const reservation={
+    encounterId:String(encounterId),occurrenceId,
+    oppositionTemplateId:selected.enemyId,
+    encounterStatePackageId:selected.encounterStatePackageId||null,
+    selectionMode:encounterData.selectionMode?String(encounterData.selectionMode):"deterministic",
+    contextSnapshot:cloneProgressionData(context&&typeof context==="object"?context:{}),
+    status:"reserved",reservedAt:Date.now(),startedAt:null,completedAt:null,outcome:null
+  };
+  runtime.reservationsByEncounterId[String(encounterId)]=reservation;
+  savePlayerData();
+  return {success:true,idempotent:false,reservation:cloneProgressionData(reservation)};
+}
+
+function applyEncounterStatePackageToEnemyOccurrence(enemy,packageId,occurrenceId) {
+  const canonical=getEnemyCanonicalBaseStats(enemy);
+  const basePL=getEnemyCanonicalBasePL(enemy);
+  if (!packageId) return {
+    stats:canonical?cloneProgressionData(canonical):cloneProgressionData(enemy.stats||{}),
+    effectivePL:basePL,
+    projection:null
+  };
+  const definition=getEncounterStatePackageDefinition(packageId);
+  if (!definition||definition.status!=="active"||definition.registryPLApproved!==true||!hasCanonicalSevenStats(definition.effectiveStats)) {
+    return null;
+  }
+  const effectiveStats=Object.fromEntries(PL_STAT_KEYS.map(stat=>[stat,Number(definition.effectiveStats[stat])]));
+  return {
+    stats:effectiveStats,
+    effectivePL:Math.max(1,Math.round(calculateRawPLFromStats(effectiveStats))),
+    projection:{
+      packageId:String(packageId),sourceId:definition.sourceId?String(definition.sourceId):String(packageId),
+      occurrenceId:String(occurrenceId),projectionType:"encounter_owned_effective_state",
+      baseStatsRewritten:false,appliedExactlyOnce:true,registryPLApproved:true
+    }
+  };
+}
+
+function constructReservedEncounterOccurrence(encounterId) {
+  const reservation=getEncounterReservation(encounterId);
+  if (!reservation||!["reserved","started"].includes(reservation.status)) return {success:false,reason:"active_encounter_reservation_missing",encounterId};
+  const template=enemyDatabase[reservation.oppositionTemplateId]||null;
+  if (!template) return {success:false,reason:"opposition_template_missing",oppositionTemplateId:reservation.oppositionTemplateId};
+  const projected=applyEncounterStatePackageToEnemyOccurrence(template,reservation.encounterStatePackageId,reservation.occurrenceId);
+  if (!projected) return {success:false,reason:"encounter_state_projection_invalid",encounterStatePackageId:reservation.encounterStatePackageId};
+  const participant={
+    ...template,
+    baseStats:getEnemyCanonicalBaseStats(template)||cloneProgressionData(template.baseStats||template.stats||{}),
+    stats:cloneProgressionData(projected.stats||{}),
+    power:projected.effectivePL,
+    calibratedBasePL:getEnemyCanonicalBasePL(template),
+    oppositionTemplateId:template.id,
+    encounterOccurrenceId:reservation.occurrenceId,
+    encounterStatePackageId:reservation.encounterStatePackageId||null,
+    encounterEffectiveStats:reservation.encounterStatePackageId?cloneProgressionData(projected.stats):null,
+    encounterProjection:projected.projection?cloneProgressionData(projected.projection):null
+  };
+  return {success:true,reservation:cloneProgressionData(reservation),participant};
+}
+
+function markEncounterReservationStarted(encounterId,occurrenceId) {
+  const runtime=ensureEncounterRuntimeState();
+  const reservation=runtime.reservationsByEncounterId[String(encounterId)]||null;
+  if (!reservation||reservation.occurrenceId!==occurrenceId) return false;
+  if (reservation.status!=="started") {
+    reservation.status="started";
+    reservation.startedAt=reservation.startedAt||Date.now();
+    savePlayerData();
+  }
+  return true;
+}
+
+function markEncounterReservationFromBattleOutcome(outcomeType) {
+  const encounterId=currentBattle&&currentBattle.encounterId?String(currentBattle.encounterId):null;
+  const occurrenceId=currentBattle&&currentBattle.encounterOccurrenceId?String(currentBattle.encounterOccurrenceId):null;
+  if (!encounterId||!occurrenceId) return false;
+  const runtime=ensureEncounterRuntimeState();
+  const reservation=runtime.reservationsByEncounterId[encounterId]||null;
+  if (!reservation||reservation.occurrenceId!==occurrenceId) return false;
+  reservation.status="completed";
+  reservation.completedAt=Date.now();
+  reservation.outcome={type:String(outcomeType||"unknown"),battleId:currentBattle.battleId||null,completedAt:reservation.completedAt};
+  runtime.lastCompletedOccurrenceByEncounterId[encounterId]=cloneProgressionData(reservation);
+  savePlayerData();
+  return true;
+}
 
 function getEncounterData(
   encounterId
@@ -37250,10 +37735,13 @@ function normalizeEncounterDefinition(
 
 
 
-  const enemy =
-    enemyDatabase[
-      encounterData.enemyId
-    ];
+  const candidateSet = getAuthoredEncounterCandidateSet(encounterData);
+
+  const primaryCandidate = candidateSet[0] || null;
+
+  const enemy = primaryCandidate
+    ? enemyDatabase[primaryCandidate.enemyId]
+    : null;
 
 
 
@@ -37296,6 +37784,12 @@ function normalizeEncounterDefinition(
 
     enemy:
       enemy,
+
+    candidateSet:
+      candidateSet,
+
+    selectionMode:
+      encounterData.selectionMode || "deterministic",
 
 
     recommendedPL:
@@ -37496,7 +37990,8 @@ function getEncounterReadiness(
 
 function startEncounterActivity(
   encounterId,
-  characterId = "naruto"
+  characterId = "naruto",
+  encounterContext = {}
 ) {
 
 
@@ -37582,14 +38077,40 @@ function startEncounterActivity(
 
 
 
-    const battle =
+  // BRICK 918 — reserve exact opposition before Battle so refresh/reload cannot reroll it.
+  // BRICK 935 — mission/world callers may provide additional authored semantic
+  // context. Map state is merged as observable runtime context; neither source
+  // is allowed to manufacture candidates outside the encounter's authored set.
+  const suppliedContext=encounterContext&&typeof encounterContext==="object"?encounterContext:{};
+  const reservationResult=reserveEncounterOccurrence(encounter.id,{
+    ...cloneProgressionData(suppliedContext),
+    encounterId:encounter.id,
+    selectedRegionKey:typeof selectedRegionKey!=="undefined"?selectedRegionKey:null,
+    selectedLocationId:typeof selectedLocationNode!=="undefined"&&selectedLocationNode?selectedLocationNode.id||null:null,
+    selectedOpportunityId:typeof selectedOpportunityId!=="undefined"?selectedOpportunityId:null
+  });
+
+  if (!reservationResult.success) {
+    console.log("Encounter construction unavailable:",reservationResult);
+    return false;
+  }
+
+  const occurrence=constructReservedEncounterOccurrence(encounter.id);
+  if (!occurrence.success) {
+    console.log("Encounter occurrence construction failed:",occurrence);
+    return false;
+  }
+
+  const battle =
     startEncounter(
 
-      encounter.enemyId,
+      occurrence.participant.oppositionTemplateId,
 
       characterId,
 
-      encounter.id
+      encounter.id,
+
+      occurrence
 
     );
 
@@ -37973,9 +38494,12 @@ function getAcademyBattlePilotParticipants() {
 // BRICK 603 — PARTICIPANT-BACKED ENEMY LAUNCH
 // =========================================================
 
-function startEncounter(enemyId, characterId = null, encounterId = null) {
+function startEncounter(enemyId, characterId = null, encounterId = null, constructedOccurrence = null) {
   console.log("START ENCOUNTER FIRED:", enemyId);
-  const enemy=enemyDatabase[enemyId];
+  const occurrenceParticipant=constructedOccurrence&&constructedOccurrence.success===true&&constructedOccurrence.participant
+    ? constructedOccurrence.participant
+    : null;
+  const enemy=occurrenceParticipant||enemyDatabase[enemyId];
   if (!enemy) { console.log("Enemy not found"); return false; }
 
   const formationValidation=validateCurrentClanFormationAgainstConstraint();
@@ -37996,6 +38520,9 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   currentBattle.active=true;
   currentBattle.battleId=createBattleInstanceId();
   currentBattle.encounterId=encounterId;
+  currentBattle.encounterOccurrenceId=constructedOccurrence&&constructedOccurrence.reservation?constructedOccurrence.reservation.occurrenceId:null;
+  currentBattle.oppositionTemplateId=enemy.oppositionTemplateId||enemyId||enemy.id||null;
+  currentBattle.encounterStatePackageId=enemy.encounterStatePackageId||null;
   currentBattle.characterId=activePlayer.id;
   currentBattle.encounterEnemy=enemy;
   setBattleEnemyParticipants([enemy]);
@@ -38028,6 +38555,10 @@ function startEncounter(enemyId, characterId = null, encounterId = null) {
   initializeBattleAttachedSummonRuntimeFromDeployment();
   initializeBattleDedicatedVariantRuntimePackages();
   initializeBattleKisoganStartsActiveFromDeployment();
+
+  if (encounterId&&currentBattle.encounterOccurrenceId) {
+    markEncounterReservationStarted(encounterId,currentBattle.encounterOccurrenceId);
+  }
 
   console.log("BATTLE INSTANCE CREATED:",currentBattle.battleId);
   console.log("CURRENT BATTLE:",currentBattle);
@@ -39074,7 +39605,7 @@ const worldRegions = {
       "A land of passion and willpower, protected by fierce ninjas and burning spirit.",
 
     mapImage:
-      "./Assets/Backgrounds/inside_LOF.png",
+      "./Backgrounds/inside_LOF.png",
 
 
     progress: {
@@ -39112,7 +39643,7 @@ const worldRegions = {
         category: "VILLAGE / CAPITAL HUB",
 
         icon:
-          "Assets/Icons/Village.png",
+          "Icons/Village.png",
 
         desc:
           "The main shinobi settlement of the Land of Fire and the centre of your regional progression.",
@@ -39160,7 +39691,7 @@ const worldRegions = {
   category: "LOOT HOTSPOT",
 
   icon:
-    "Assets/Icons/Loot.png",
+    "Icons/Loot.png",
 
   desc:
     "An outlaw camp hiding stolen equipment, materials and shinobi supplies.",
@@ -39236,7 +39767,7 @@ const worldRegions = {
         category: "LOOT HOTSPOT",
 
         icon:
-          "Assets/Icons/Loot.png",
+          "Icons/Loot.png",
 
         desc:
           "A concealed supply camp guarded by shinobi and mercenaries.",
@@ -39288,7 +39819,7 @@ const worldRegions = {
         category: "EXP / PL GRINDING",
 
         icon:
-          "Assets/Icons/EXP.png",
+          "Icons/EXP.png",
 
         desc:
           "A low-risk combat training area suited to developing weaker shinobi.",
@@ -39332,7 +39863,7 @@ const worldRegions = {
         category: "MISSION PROGRESSION",
 
         icon:
-          "Assets/Icons/Mission.png",
+          "Icons/Mission.png",
 
         desc:
           "A dangerous regional trial that tests whether your shinobi are ready to progress.",
@@ -39383,7 +39914,7 @@ const worldRegions = {
         category: "SECRET / RARE AREA",
 
         icon:
-          "Assets/Icons/Rare.png",
+          "Icons/Rare.png",
 
         desc:
           "A mysterious cave containing dangerous encounters and exceptionally rare rewards.",
@@ -39441,7 +39972,7 @@ const worldRegions = {
         category: "EXP / RYO GRINDING",
 
         icon:
-          "Assets/Icons/EXP.png",
+          "Icons/EXP.png",
 
         desc:
           "A repeatable combat zone containing stronger roaming opponents.",
@@ -39493,7 +40024,7 @@ const worldRegions = {
         category: "MISSION PROGRESSION",
 
         icon:
-          "Assets/Icons/Mission.png",
+          "Icons/Mission.png",
 
         desc:
           "Protect traders and civilians while travelling across hostile territory.",
@@ -39537,7 +40068,7 @@ const worldRegions = {
         category: "MISSION PROGRESSION",
 
         icon:
-          "Assets/Icons/Mission.png",
+          "Icons/Mission.png",
 
         desc:
           "Reconnaissance missions into more dangerous parts of the Land of Fire.",
@@ -39588,7 +40119,7 @@ const worldRegions = {
         category: "LOOT HOTSPOT",
 
         icon:
-          "Assets/Icons/Loot.png",
+          "Icons/Loot.png",
 
         desc:
           "A ruined military position occupied by scavengers and rogue shinobi.",
@@ -39640,7 +40171,7 @@ const worldRegions = {
         category: "SIDE MISSION",
 
         icon:
-          "Assets/Icons/Side.png",
+          "Icons/Side.png",
 
         desc:
           "Optional reconnaissance, surveillance and regional challenge assignments.",
@@ -39690,7 +40221,7 @@ const worldRegions = {
         category: "EXP / RYO GRINDING",
 
         icon:
-          "Assets/Icons/EXP.png",
+          "Icons/EXP.png",
 
         desc:
           "A tougher repeatable training route along the river network.",
@@ -39735,7 +40266,7 @@ const worldRegions = {
         category: "LAND OF FIRE OUTPOST",
 
         icon:
-          "Assets/Icons/Outpost.png",
+          "Icons/Outpost.png",
 
         desc:
           "The fortified southern checkpoint and gateway into the Land of Fire.",
@@ -39909,6 +40440,16 @@ function openOverlay(type) {
     case "field_readiness_assessment":
 
       renderFieldReadinessAssessmentOverlay(
+        container
+      );
+
+      break;
+
+
+    // BRICK 932 — separate post-Promotion roster transition consumer.
+    case "genin_roster_transition":
+
+      renderGeninRosterTransitionOverlay(
         container
       );
 
@@ -40450,7 +40991,7 @@ function renderGenericOverlay(
 // Canonical Konoha village presentation.
 //
 // Uses:
-// Assets/Backgrounds/konoha.png
+// Backgrounds/konoha.png
 //
 // Existing openOverlay("village") remains the
 // navigation authority.
@@ -40480,7 +41021,7 @@ function renderVillageOverlay(
 
       <img
         src="
-          Assets/Backgrounds/konoha.png
+          Backgrounds/konoha.png
         "
         alt="
           Hidden Leaf Village
@@ -42890,7 +43431,7 @@ const STORY_SCENE_PRESENTATION_MODES=Object.freeze([
 // =========================================================
 // The folder now exists in the project. This is directory authority only:
 // individual files are still registered only when approved assets actually exist.
-const ALPHA_SCENE_BACKDROP_ASSET_DIRECTORY="Assets/Scene Backdrops/";
+const ALPHA_SCENE_BACKDROP_ASSET_DIRECTORY="Scene Backdrops/";
 
 function getExpectedAlphaSceneBackdropAssetPath(assetId,extension="png") {
   if (!assetId||!ALPHA_SCENE_ENVIRONMENT_LIBRARY||!ALPHA_SCENE_ENVIRONMENT_LIBRARY[assetId]) return "";
@@ -45880,8 +46421,8 @@ function runAlphaUIPortraitAuthorityDiagnostics() {
     exact102Mappings:Object.keys(UI_PORTRAIT_MANIFEST).length===102&&expected.length===102,
     exactProductionIdSet:expected.every(id=>Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id))&&Object.keys(UI_PORTRAIT_MANIFEST).every(id=>expected.includes(id)),
     uniquePaths:new Set(paths).size===102,
-    exactRoot:paths.every(path=>path.startsWith("Assets/Portraits/")&&path.endsWith(".png")),
-    singularTransformationFolder:getUIPortraitAssetPath("baryon_mode")==="Assets/Portraits/Transformation/bayron_mode.png",
+    exactRoot:paths.every(path=>path.startsWith("Portraits/")&&path.endsWith(".png")),
+    singularTransformationFolder:getUIPortraitAssetPath("baryon_mode")==="Portraits/Transformation/bayron_mode.png",
     deliberateMismatches:getUIPortraitAssetPath("academy_iwabee").endsWith("academy_student_iwabe.png")&&getUIPortraitAssetPath("academy_metal_lee").endsWith("academy_student_metal.png")&&getUIPortraitAssetPath("fallen_hokage_sasuke").endsWith("fallen_hokage.png")&&getUIPortraitAssetPath("sixth_shadow").endsWith("the_sixth_shadow.png")&&getUIPortraitAssetPath("kurama_sovereign").endsWith("kurama_sovreign.png"),
     noCardFallback:!resolveUIPortraitProjection.toString().includes("getCharacterCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("subject.image"),
     battleConsumesResolver:battleSource.includes("resolveUIPortraitProjection(participant)"),
@@ -46101,9 +46642,16 @@ function calculateBattlePower(
   if (!character) return 0;
 
   const isPlayerCharacter = character.basePL !== undefined;
-  const pl = isPlayerCharacter
-    ? calculateEffectivePL(character)
-    : Number(character.power) || 0;
+  let pl=0;
+  if (isPlayerCharacter) {
+    pl=calculateEffectivePL(character);
+  } else if (hasCanonicalSevenStats(character.encounterEffectiveStats)) {
+    pl=Math.round(calculateRawPLFromStats(character.encounterEffectiveStats));
+  } else if (Number.isFinite(Number(character.calibratedBasePL))) {
+    pl=Math.round(Number(character.calibratedBasePL));
+  } else {
+    pl=Number(character.power)||0;
+  }
 
   // BRICK 873 — Alpha authority: Battle-entry underlying Battle PL is
   // deterministic. Legacy encounter multipliers and ±10% random variation
@@ -80699,6 +81247,7 @@ function completeBattleVictoryFromDamage(
     rewardAuthorityEnemyId:rewardSource?rewardSource.id:null
   };
   currentBattle.defeat=null;
+  markEncounterReservationFromBattleOutcome("victory");
   const rewards=generateBattleRewards(rewardSource,finishingShinobi);
   const mvp=calculateBattleMVP();
   if (rewards&&mvp) rewards.mvp=mvp;
@@ -80735,6 +81284,7 @@ function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="p
     historyPreserved:true
   };
   currentBattle.defeat=cloneBattleRuntimeValue(currentBattle.outcome);
+  markEncounterReservationFromBattleOutcome("defeat");
 
   if (Array.isArray(currentBattle.battleLog)) {
     currentBattle.battleLog.push("All deployed shinobi have reached 0 Battle PL. DEFEAT.");
@@ -85775,6 +86325,169 @@ function restoreTestState() {
     openOverlay("story_scene");
     return;
   }
+}
+
+
+// =========================================================
+// BRICK 910 — ROOT ASSET LAYOUT DIAGNOSTIC
+// =========================================================
+function runAlphaRootAssetLayoutDiagnostics() {
+  const portraitPaths=Object.values(UI_PORTRAIT_MANIFEST||{});
+  const source=[assetManifest,getUIAssetPath,getSceneBackdropAssetPath].map(value=>typeof value==="function"?value.toString():JSON.stringify(value)).join("\n");
+  const result={
+    portraitsUseRootDirectory:portraitPaths.length===102&&portraitPaths.every(path=>typeof path==="string"&&path.startsWith("Portraits/")),
+    noLegacyPortraitRoot:portraitPaths.every(path=>!path.startsWith("Assets/Portraits/")),
+    uiManifestUsesRootUI:getUIAssetPath("victory")==="UI/Victory.png"&&getUIAssetPath("practical")==="UI/practical.png",
+    noLegacyBackgroundRoot:!source.includes("Assets/Backgrounds/"),
+    noLegacyIconRoot:!source.includes("Assets/Icons/"),
+    sceneBackdropRootMigrated:ALPHA_SCENE_BACKDROP_ASSET_DIRECTORY==="Scene Backdrops/",
+    collectibleCardsRemainUnderAssets:Object.values(assetManifest.characterCards||{}).every(path=>typeof path==="string"&&path.startsWith("Assets/"))
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+// =========================================================
+// BRICK 922 — ENEMY ENCOUNTER ALPHA CONTRACT DIAGNOSTIC
+// BRICK 923 — RETIRED SCALING REGRESSION GUARD
+// =========================================================
+function runAlphaEnemyEncounterConstructionDiagnostics() {
+  const expected={
+    scout:{pl:21,stats:{nin:18,tai:16,buki:22,fuin:8,kin:10,gen:14,stamina:20}},
+    bandit:{pl:18,stats:{nin:10,tai:17,buki:19,fuin:5,kin:7,gen:6,stamina:18}},
+    banditLeader:{pl:28,stats:{nin:24,tai:27,buki:30,fuin:10,kin:12,gen:12,stamina:29}},
+    test_subject_altered_shinobi:{pl:11},test_subject_brute:{pl:13},test_subject_unstable:{pl:12}
+  };
+  const canonical=Object.entries(expected).every(([id,contract])=>{
+    const enemy=enemyDatabase[id];
+    if (!enemy||getEnemyCanonicalBasePL(enemy)!==contract.pl) return false;
+    return !contract.stats||PL_STAT_KEYS.every(stat=>Number(enemy.baseStats&&enemy.baseStats[stat])===Number(contract.stats[stat]));
+  });
+  const testSubjectsNoProjection=["test_subject_altered_shinobi","test_subject_brute","test_subject_unstable"].every(id=>{
+    const e=enemyDatabase[id];return !!e&&e.encounterStatePackageId===undefined&&getEnemyCanonicalBasePL(e)===Number(e.calibratedBasePL);
+  });
+  const encounterSources=[calculateBattlePower,reserveEncounterOccurrence,selectEligibleEncounterCandidate,applyEncounterStatePackageToEnemyOccurrence].map(fn=>fn.toString()).join("\n");
+  const result={
+    canonicalLiveEnemyPackages:canonical,
+    testSubjectsStayCanonical:testSubjectsNoProjection,
+    authoredCandidateSets:["scout_patrol","bandit_leader","hidden_cache"].every(id=>getAuthoredEncounterCandidateSet(getEncounterData(id)).length===1),
+    eligibilityBeforeSelection:reserveEncounterOccurrence.toString().indexOf("getEligibleEncounterCandidates")<reserveEncounterOccurrence.toString().indexOf("selectEligibleEncounterCandidate"),
+    noUniversalEncounterGrade:Object.keys(ALPHA_ENCOUNTER_STATE_PACKAGE_DATABASE).length===0,
+    explicitPackageRequiresAuthority:reserveEncounterOccurrence.toString().includes("encounter_state_package_not_authorized"),
+    noPlayerRelativeScaling:!encounterSources.includes("playerLevelFactor")&&!encounterSources.includes("1.25")&&!encounterSources.includes("groupBoss")&&!encounterSources.includes("guardBoss")&&!encounterSources.includes("0.9 + Math.random"),
+    baseNotRewritten:applyEncounterStatePackageToEnemyOccurrence.toString().includes("baseStatsRewritten:false"),
+    reservationPersistence:createDefaultEncounterRuntimeState().reservationsByEncounterId!==undefined&&loadPlayerData.toString().includes("normalizeEncounterRuntimeState"),
+    battleReceivesConstructedOccurrence:startEncounterActivity.toString().includes("constructReservedEncounterOccurrence")&&startEncounter.toString().includes("constructedOccurrence"),
+    committedIdentityCanClose:completeBattleVictoryFromDamage.toString().includes("markEncounterReservationFromBattleOutcome")&&completeBattleDefeat.toString().includes("markEncounterReservationFromBattleOutcome")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+// =========================================================
+// BRICK 924 — ASSET + ENCOUNTER CUMULATIVE ALPHA GATE
+// =========================================================
+function runAlphaPost924IntegrationDiagnostics() {
+  const post908=runAlphaPost908IntegrationDiagnostics();
+  const assets=runAlphaRootAssetLayoutDiagnostics();
+  const encounters=runAlphaEnemyEncounterConstructionDiagnostics();
+  const groups={post908,assets,encounters};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={groups,pass,combatFreezePreserved:post908&&post908.combatFreezePreserved===true,liveProductionGateExpected:102,awaitingPlacementDestination:116,enemyEncounterAlphaMinimum:pass?"implemented":"failed"};
+  console.log(`SC Alpha post-924 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / enemy encounters=${result.enemyEncounterAlphaMinimum}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 925 — ENCOUNTER CONTENT-ADAPTER READINESS REPORT
+// =========================================================
+function getAlphaEncounterConstructionReadiness() {
+  const diagnostics=runAlphaEnemyEncounterConstructionDiagnostics();
+  return {
+    implementationReady:diagnostics.pass===true,
+    ordinaryCanonicalPackages:true,
+    hybridCandidateSelection:true,
+    explicitOccurrenceProjectionSupported:true,
+    universalEncounterGradeRequired:false,
+    authoredEncounterPoolsStillContentOwned:true
+  };
+}
+
+// =========================================================
+// BRICK 933 — FIELD READINESS → GENIN TRANSITION HANDOFF GUARD
+// BRICK 934 — CUMULATIVE ALPHA INTEGRATION GATE
+// =========================================================
+function runAlphaGeninRosterTransitionDiagnostics() {
+  const source=[applyGeninRosterTransitionCandidateSnapshot,selectGeninRosterTransitionTeammate,selectGeninRosterTransitionJoninLeader,confirmGeninRosterTransition,renderGeninRosterTransitionOverlay].map(fn=>fn.toString()).join("\n");
+  const defaults=createDefaultAcquisitionState().geninRosterTransition;
+  const result={
+    separateTransitionState:!!defaults&&defaults.unlocked===false&&defaults.required===false,
+    candidateSnapshotRequired:selectGeninRosterTransitionTeammate.toString().includes("candidate_snapshot_required")&&selectGeninRosterTransitionJoninLeader.toString().includes("candidate_snapshot_required"),
+    noUniversalJoninPool:!source.includes("characterRegistry).filter")&&!source.includes("Object.values(characterRegistry)"),
+    noAutoAcquisition:!source.includes("commitCharacterAcquisition(")&&!source.includes("grantCharacterOwnership"),
+    retainReplaceTwoSlots:selectGeninRosterTransitionTeammate.toString().includes("[1,2]")&&confirmGeninRosterTransition.toString().includes("two_distinct_teammates"),
+    mandatoryJoninLeader:confirmGeninRosterTransition.toString().includes("jonin_leader_required"),
+    formalJoninChecked:selectGeninRosterTransitionJoninLeader.toString().includes('formalRank||"").toLowerCase()!=="jonin"'),
+    outgoingOwnershipPreserved:confirmGeninRosterTransition.toString().includes("outgoingTeammatesRemainOwned:true"),
+    myClanNotSilentlyMutated:confirmGeninRosterTransition.toString().includes("myClanQueueMutated:false"),
+    leaderNotBattleSlot:confirmGeninRosterTransition.toString().includes("doesNotOwnBattleSlot:true"),
+    fieldSuccessCanContinue:renderFieldReadinessAssessmentOverlay.toString().includes("openGeninRosterTransitionUI"),
+    overlayRoute:openOverlay.toString().includes('case "genin_roster_transition"')
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPost934IntegrationDiagnostics() {
+  const post924=runAlphaPost924IntegrationDiagnostics();
+  const geninTransition=runAlphaGeninRosterTransitionDiagnostics();
+  const groups={post924,geninTransition};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const transitionState=getGeninRosterTransitionState();
+  const candidateAuthorityStatus=transitionState.candidateSnapshot?"ready":"external_authority_required";
+  const result={
+    groups,pass,
+    combatFreezePreserved:post924&&post924.combatFreezePreserved===true,
+    liveProductionGateExpected:102,
+    awaitingPlacementDestination:116,
+    fieldContentOrchestrationStatus:"external_authority_required",
+    geninCandidateAuthorityStatus:candidateAuthorityStatus
+  };
+  console.log(`SC Alpha post-934 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Field content=${result.fieldContentOrchestrationStatus} / Genin candidates=${candidateAuthorityStatus}`);
+  return result;
+}
+
+
+// =========================================================
+// BRICK 937 — CONTEXTUAL ENCOUNTER + PROMOTION RESUME CUMULATIVE GATE
+// =========================================================
+function runAlphaPost937IntegrationDiagnostics() {
+  const post934=runAlphaPost934IntegrationDiagnostics();
+  const encounterSource=startEncounterActivity.toString();
+  const promotionSource=renderArenaPromotionOverlay.toString();
+  const additions={
+    contextualEncounterAdapter:encounterSource.includes("encounterContext = {}")&&encounterSource.includes("...cloneProgressionData(suppliedContext)"),
+    contextStillBoundedByAuthoredSet:reserveEncounterOccurrence.toString().includes("getEligibleEncounterCandidates")&&getEligibleEncounterCandidates.toString().includes("getAuthoredEncounterCandidateSet"),
+    promotionCanResumeGeninTransition:promotionSource.includes("openGeninRosterTransitionUI")&&promotionSource.includes("geninTransitionAvailable"),
+    transitionStillSeparateFromPromotion:recordOwnedCharacterGeninPromotion.toString().includes("geninRosterTransition.unlocked=true")&&!confirmGeninRosterTransition.toString().includes("recordOwnedCharacterGeninPromotion")
+  };
+  additions.pass=Object.values(additions).every(value=>value===true);
+  const pass=post934&&post934.pass===true&&additions.pass===true;
+  const result={
+    groups:{post934,additions},pass,
+    combatFreezePreserved:post934&&post934.combatFreezePreserved===true,
+    liveProductionGateExpected:102,
+    awaitingPlacementDestination:116,
+    fieldContentOrchestrationStatus:"external_authority_required",
+    geninCandidateAuthorityStatus:getGeninRosterTransitionState().candidateSnapshot?"ready":"external_authority_required",
+    repoLayoutSupportFilesStatus:"migration_package_required"
+  };
+  console.table(additions);
+  console.log(`SC Alpha post-937 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Field content=${result.fieldContentOrchestrationStatus} / Genin candidates=${result.geninCandidateAuthorityStatus} / repo support=${result.repoLayoutSupportFilesStatus}`);
+  return result;
 }
 
 // =========================================================
