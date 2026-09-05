@@ -29,9 +29,13 @@ Shinobi Chronicles is a browser-based shinobi RPG project focused on character p
 - Registry / Awaiting Placement Final Addition — Kurama Resonance Himawari
 - Registry / Awaiting Placement Additions — Kage Madara + Pakkun
 - Registry / Madara Hosted Black Zetsu and Ocular Supersession
+- Registry / Reborn Kurama Hosted Entity Calibration
+- Registry / Entity Ontology and Collectible Card Folder Reconciliation
+- Registry / Final 116 Admission Audit and Coding Handoff
 - Registry / Awaiting Placement Production Admission Scope
 - Registry / Enemy Encounter Selection and Scaling Alpha Acceptance
 - Rank / Special Jōnin Alpha Production Catalogue
+- Assets / Final 116 Asset Projection Status
 - Assets / Battle Portrait Authority and Manifest
 - Assets / Battle Portrait Registry Ratification
 - Architecture Map
