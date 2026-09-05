@@ -5958,10 +5958,10 @@ function createDefaultAcquisitionState() {
     chronicleOrigin:{variantId:null,ownedCharacterId:null,prologueCompleted:false,completionEvidenceIds:[],activeKonohaEntered:false,activeKonohaEnteredAt:null,activeKonohaEntryBoundaryId:null},
     academyTeamFormation:{unlocked:false,required:false,completed:false,selectedTeammateIds:[null,null],eligibleCandidateVariantIds:[],completedAt:null},
     geninRosterTransition:{
-      unlocked:false,required:false,completed:false,promotionEvidenceIds:[],
+      unlocked:false,required:false,completed:false,subjectOwnedCharacterId:null,promotionEvidenceIds:[],
       eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null,
       candidateSnapshot:null,candidateSnapshotId:null,selectedTeamVariantIds:[null,null],
-      finalTeamVariantIds:[],completedAt:null
+      finalTeamVariantIds:[],completedAt:null,completionReceipt:null
     },
     academyToGeninAssessment:{sequence:0,activeAttempt:null,attempts:[]},
     // Legacy compatibility only. Production semantics live in academyTeamFormation/geninRosterTransition.
@@ -6022,6 +6022,7 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
     }:defaults.academyTeamFormation,
     geninRosterTransition:source.geninRosterTransition&&typeof source.geninRosterTransition==="object"?{
       unlocked:source.geninRosterTransition.unlocked===true,required:source.geninRosterTransition.required===true,completed:source.geninRosterTransition.completed===true,
+      subjectOwnedCharacterId:typeof source.geninRosterTransition.subjectOwnedCharacterId==="string"?source.geninRosterTransition.subjectOwnedCharacterId:null,
       promotionEvidenceIds:Array.isArray(source.geninRosterTransition.promotionEvidenceIds)?[...new Set(source.geninRosterTransition.promotionEvidenceIds.filter(Boolean))]:[],
       eligibleCandidateVariantIds:Array.isArray(source.geninRosterTransition.eligibleCandidateVariantIds)?[...new Set(source.geninRosterTransition.eligibleCandidateVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
       selectedReplacementVariantIds:Array.isArray(source.geninRosterTransition.selectedReplacementVariantIds)?[...new Set(source.geninRosterTransition.selectedReplacementVariantIds.filter(id=>!!getCharacterRegistryEntry(id)))]:[],
@@ -6030,7 +6031,8 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
       candidateSnapshotId:typeof source.geninRosterTransition.candidateSnapshotId==="string"?source.geninRosterTransition.candidateSnapshotId:null,
       selectedTeamVariantIds:Array.from({length:2},(_,index)=>{const id=Array.isArray(source.geninRosterTransition.selectedTeamVariantIds)?source.geninRosterTransition.selectedTeamVariantIds[index]:null;return id&&getCharacterRegistryEntry(id)?id:null;}),
       finalTeamVariantIds:Array.isArray(source.geninRosterTransition.finalTeamVariantIds)?source.geninRosterTransition.finalTeamVariantIds.filter(id=>!!getCharacterRegistryEntry(id)).slice(0,2):[],
-      completedAt:Number(source.geninRosterTransition.completedAt)||null
+      completedAt:Number(source.geninRosterTransition.completedAt)||null,
+      completionReceipt:source.geninRosterTransition.completionReceipt&&typeof source.geninRosterTransition.completionReceipt==="object"?cloneProgressionData(source.geninRosterTransition.completionReceipt):null
     }:defaults.geninRosterTransition,
     academyToGeninAssessment:source.academyToGeninAssessment&&typeof source.academyToGeninAssessment==="object"?{
       sequence:Math.max(0,Number(source.academyToGeninAssessment.sequence)||0),
@@ -6539,23 +6541,88 @@ function confirmAcademyTeamFormation(sourceEventId="academy_team_formation_confi
   }
 }
 
+// =========================================================
+// BRICK 938 — EXACT PROMOTION SUBJECT → TRANSITION CONTINUITY
+// BRICK 939 — IDEMPOTENT FORMAL GENIN PROMOTION COMMIT
+// BRICK 940 — PENDING TRANSITION PROGRESSION GATE
+// BRICK 941 — ACADEMY FREE-PLAY CLOSES AFTER PROMOTION
+// BRICK 942 — OPERATIONAL GENIN AVAILABILITY CONTRACT
+// =========================================================
+function isGeninRosterTransitionPending() {
+  const state=ensurePlayerAcquisitionState();
+  const transition=state.geninRosterTransition;
+  return !!(transition&&transition.unlocked===true&&transition.required===true&&transition.completed!==true);
+}
+
+function isOperationalGeninProgressionAvailable(ownedCharacterId=null) {
+  const state=ensurePlayerAcquisitionState();
+  const transition=state.geninRosterTransition;
+  const subjectId=ownedCharacterId||transition&&transition.subjectOwnedCharacterId||state.chronicleOriginOwnedCharacterId||null;
+  if (!subjectId||!transition||transition.completed!==true||transition.required===true) return false;
+  if (transition.subjectOwnedCharacterId&&transition.subjectOwnedCharacterId!==subjectId) return false;
+  return String(getOwnedCharacterFormalRank(subjectId)||"").toLowerCase()==="genin";
+}
+
+function getAlphaProgressionGateState() {
+  const state=ensurePlayerAcquisitionState();
+  const transition=state.geninRosterTransition||createDefaultAcquisitionState().geninRosterTransition;
+  return {
+    onboardingStatus:state.onboardingStatus,
+    promotedSubjectOwnedCharacterId:transition.subjectOwnedCharacterId||null,
+    formalRank:transition.subjectOwnedCharacterId?getOwnedCharacterFormalRank(transition.subjectOwnedCharacterId):null,
+    geninRosterTransitionPending:isGeninRosterTransitionPending(),
+    geninRosterTransitionCompleted:transition.completed===true,
+    operationalGeninAvailable:isOperationalGeninProgressionAvailable(transition.subjectOwnedCharacterId||null)
+  };
+}
+
 function isAcademyFreePlayAvailable() {
   const state=ensurePlayerAcquisitionState();
-  return !!(state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntered===true&&state.academyTeamFormation&&state.academyTeamFormation.completed===true);
+  const originOwnedCharacterId=state.chronicleOriginOwnedCharacterId||state.chronicleOrigin&&state.chronicleOrigin.ownedCharacterId||null;
+  const formalRank=originOwnedCharacterId?String(getOwnedCharacterFormalRank(originOwnedCharacterId)||"").toLowerCase():null;
+  return !!(state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntered===true&&state.academyTeamFormation&&state.academyTeamFormation.completed===true&&formalRank==="academy"&&!(state.geninRosterTransition&&state.geninRosterTransition.unlocked===true));
 }
 
 function recordOwnedCharacterGeninPromotion(ownedCharacterId,evidenceIds=[]) {
   const state=ensurePlayerAcquisitionState();
   const owned=getOwnedCharacterRecordById(ownedCharacterId);
   if (!owned) return {success:false,reason:"owned_character_missing"};
+  const transition=state.geninRosterTransition||createDefaultAcquisitionState().geninRosterTransition;
+  state.geninRosterTransition=transition;
   const ids=Array.isArray(evidenceIds)?[...new Set(evidenceIds.filter(Boolean))]:[];
+  const existing=state.formalRankProgressionByOwnedCharacterId[ownedCharacterId];
+  if (existing&&String(existing.formalRank||"").toLowerCase()==="genin") {
+    if (transition.subjectOwnedCharacterId&&transition.subjectOwnedCharacterId!==ownedCharacterId) return {success:false,reason:"genin_roster_transition_subject_conflict"};
+    transition.subjectOwnedCharacterId=ownedCharacterId;
+    state.geninRosterTransition.unlocked=true;
+    state.geninRosterTransition.required=transition.completed!==true;
+    transition.promotionEvidenceIds=[...new Set([...(transition.promotionEvidenceIds||[]),...ids])];
+    existing.promotionEvidenceIds=[...new Set([...(existing.promotionEvidenceIds||[]),...ids])];
+    if (transition.completed===true) {
+      transition.unlocked=true;
+      transition.required=false;
+      state.onboardingStatus="operational_genin";
+    } else {
+      transition.unlocked=true;
+      transition.required=true;
+      state.onboardingStatus="genin_roster_transition_pending";
+    }
+    savePlayerData();
+    return {success:true,idempotent:true,ownedCharacterId,formalRank:"genin",geninRosterTransitionUnlocked:true,geninRosterTransitionPending:transition.completed!==true};
+  }
+  const currentRank=String(getOwnedCharacterFormalRank(ownedCharacterId)||"").toLowerCase();
+  if (currentRank!=="academy") return {success:false,reason:"academy_to_genin_subject_rank_invalid",formalRank:currentRank||null};
   state.formalRankProgressionByOwnedCharacterId[ownedCharacterId]={formalRank:"genin",promotedAt:Date.now(),promotionEvidenceIds:ids};
+  if (transition.subjectOwnedCharacterId&&transition.subjectOwnedCharacterId!==ownedCharacterId&&transition.completed!==true) return {success:false,reason:"genin_roster_transition_subject_conflict"};
+  transition.subjectOwnedCharacterId=ownedCharacterId;
   state.geninRosterTransition.unlocked=true;
   state.geninRosterTransition.required=true;
-  state.geninRosterTransition.promotionEvidenceIds=[...new Set([...(state.geninRosterTransition.promotionEvidenceIds||[]),...ids])];
-  state.onboardingStatus="genin_roster_transition_available";
+  transition.completed=false;
+  transition.promotionEvidenceIds=[...new Set([...(transition.promotionEvidenceIds||[]),...ids])];
+  transition.completionReceipt=null;
+  state.onboardingStatus="genin_roster_transition_pending";
   savePlayerData();
-  return {success:true,ownedCharacterId,formalRank:"genin",geninRosterTransitionUnlocked:true};
+  return {success:true,idempotent:false,ownedCharacterId,formalRank:"genin",geninRosterTransitionUnlocked:true,geninRosterTransitionPending:true};
 }
 
 const ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT=Object.freeze({
@@ -7134,14 +7201,18 @@ function normalizeGeninRosterCandidateSnapshot(snapshot) {
   };
 }
 
+// BRICK 944 — AUTHORITATIVE CANDIDATE SNAPSHOT COMMIT / NO RELOAD REROLL
 function applyGeninRosterTransitionCandidateSnapshot(snapshot) {
   const transition=getGeninRosterTransitionState();
   if (transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
   const normalized=normalizeGeninRosterCandidateSnapshot(snapshot);
   if (!normalized) return {success:false,reason:"candidate_snapshot_invalid"};
-  const promotedSubjectIds=Object.entries(ensurePlayerAcquisitionState().formalRankProgressionByOwnedCharacterId||{})
-    .filter(([,record])=>record&&record.formalRank==="genin").map(([ownedCharacterId])=>ownedCharacterId);
-  if (!normalized.subjectOwnedCharacterId||!promotedSubjectIds.includes(normalized.subjectOwnedCharacterId)) return {success:false,reason:"candidate_snapshot_subject_not_promoted_genin"};
+  if (!transition.subjectOwnedCharacterId||normalized.subjectOwnedCharacterId!==transition.subjectOwnedCharacterId) return {success:false,reason:"candidate_snapshot_subject_mismatch"};
+  if (String(getOwnedCharacterFormalRank(transition.subjectOwnedCharacterId)||"").toLowerCase()!=="genin") return {success:false,reason:"candidate_snapshot_subject_not_promoted_genin"};
+  if (transition.candidateSnapshot) {
+    if (transition.candidateSnapshotId===normalized.snapshotId) return {success:true,idempotent:true,snapshot:cloneProgressionData(transition.candidateSnapshot),selectedTeamVariantIds:[...(transition.selectedTeamVariantIds||[])]};
+    return {success:false,reason:"candidate_snapshot_already_committed",candidateSnapshotId:transition.candidateSnapshotId};
+  }
   const current=getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean);
   if (!current.every(id=>normalized.retentionEligibleVariantIds.includes(id)||normalized.teammateCandidateVariantIds.includes(id))) {
     return {success:false,reason:"candidate_snapshot_missing_current_teammate_eligibility"};
@@ -7205,12 +7276,21 @@ function selectGeninRosterTransitionJoninLeader(variantId) {
   return {success:true,variantId};
 }
 
+// =========================================================
+// BRICK 945 — ATOMIC FINAL GENIN ROSTER COMMIT
+// BRICK 946 — IDEMPOTENT COMPLETION RECEIPT
+// BRICK 947 — COMPLETION / SAVE-LOAD CONTINUITY
+// =========================================================
 function confirmGeninRosterTransition() {
   const state=ensurePlayerAcquisitionState();
   const transition=getGeninRosterTransitionState();
+  if (transition.completed===true&&transition.completionReceipt) {
+    return {success:true,idempotent:true,...cloneProgressionData(transition.completionReceipt)};
+  }
   const snapshot=transition.candidateSnapshot;
   if (transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
-  if (!snapshot||transition.candidateSnapshotId!==snapshot.snapshotId) return {success:false,reason:"candidate_snapshot_required"};
+  if (!transition.subjectOwnedCharacterId||String(getOwnedCharacterFormalRank(transition.subjectOwnedCharacterId)||"").toLowerCase()!=="genin") return {success:false,reason:"genin_roster_transition_subject_not_genin"};
+  if (!snapshot||transition.candidateSnapshotId!==snapshot.snapshotId||snapshot.subjectOwnedCharacterId!==transition.subjectOwnedCharacterId) return {success:false,reason:"candidate_snapshot_required"};
   const selected=Array.from({length:2},(_,index)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[index]||null);
   if (selected.some(id=>!id)||new Set(selected).size!==2) return {success:false,reason:"genin_team_requires_two_distinct_teammates"};
   const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
@@ -7222,19 +7302,36 @@ function confirmGeninRosterTransition() {
   const leaderEntry=getCharacterRegistryEntry(leader);
   if (!leaderEntry||String(leaderEntry.formalRank||"").toLowerCase()!=="jonin") return {success:false,reason:"jonin_leader_rank_invalid"};
   if (!isVariantOwnedForGeninTransition(leader)) return {success:false,reason:"jonin_leader_acquisition_required",variantId:leader};
-  transition.finalTeamVariantIds=[...selected];
-  transition.completed=true;
-  transition.required=false;
-  transition.completedAt=Date.now();
-  state.joninLeadershipAssignment={
-    variantId:leader,role:"jonin_team_leader",candidateSnapshotId:snapshot.snapshotId,
-    assignedAt:transition.completedAt,doesNotOwnBattleSlot:true
-  };
-  savePlayerData();
-  return {
-    success:true,completed:true,finalTeamVariantIds:[...selected],joninLeaderVariantId:leader,
-    outgoingTeammatesRemainOwned:true,myClanQueueMutated:false,promotionAlreadyEarned:true
-  };
+  const rollback=cloneProgressionData(playerData);
+  try {
+    const completedAt=Date.now();
+    const receipt={
+      receiptId:`genin_roster_transition:${transition.subjectOwnedCharacterId}:${snapshot.snapshotId}`,
+      completed:true,subjectOwnedCharacterId:transition.subjectOwnedCharacterId,candidateSnapshotId:snapshot.snapshotId,
+      finalTeamVariantIds:[...selected],joninLeaderVariantId:leader,completedAt,
+      outgoingTeammatesRemainOwned:true,myClanQueueMutated:false,promotionAlreadyEarned:true,
+      operationalGeninUnlocked:true,plStatTechniqueRewardGranted:false,representationRewardGranted:false,acquisitionRewardGranted:false
+    };
+    transition.finalTeamVariantIds=[...selected];
+    transition.completed=true;
+    transition.required=false;
+    transition.unlocked=true;
+    transition.completedAt=completedAt;
+    transition.completionReceipt=cloneProgressionData(receipt);
+    state.joninLeadershipAssignment={
+      variantId:leader,role:"jonin_team_leader",candidateSnapshotId:snapshot.snapshotId,
+      assignedAt:completedAt,doesNotOwnBattleSlot:true
+    };
+    state.onboardingStatus="operational_genin";
+    savePlayerData();
+    return {success:true,idempotent:false,...cloneProgressionData(receipt)};
+  } catch (error) {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    hydrateOwnedProductionRuntimeCharacters(playerData.characterOwnership);
+    savePlayerData();
+    return {success:false,reason:"genin_roster_transition_commit_rolled_back",error:String(error&&error.message||error)};
+  }
 }
 
 function createGeninRosterTransitionPresentationModel() {
@@ -7244,6 +7341,8 @@ function createGeninRosterTransitionPresentationModel() {
   const describe=id=>{const entry=id?getCharacterRegistryEntry(id):null;return entry?{variantId:id,displayName:entry.displayName||entry.name||id,formalRank:entry.formalRank||null,owned:isVariantOwnedForGeninTransition(id)}:null;};
   return {
     unlocked:transition.unlocked===true,required:transition.required===true,completed:transition.completed===true,
+    subjectOwnedCharacterId:transition.subjectOwnedCharacterId||null,
+    operationalGeninAvailable:isOperationalGeninProgressionAvailable(transition.subjectOwnedCharacterId||null),
     candidateSnapshotId:transition.candidateSnapshotId||null,
     authorityReady:!!snapshot,
     authorityStatus:snapshot?"candidate_snapshot_ready":"external_authority_required",
@@ -7263,7 +7362,7 @@ function renderGeninRosterTransitionOverlay(container) {
   const leaders=model.joninLeaderCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionJoninLeader('${esc(item.variantId)}');openGeninRosterTransitionUI();" ${item.owned?"":"disabled"} style="padding:8px 10px;border:1px solid rgba(120,160,180,.35);background:#0f2028;color:#d8e4ec;border-radius:6px;cursor:${item.owned?"pointer":"default"};opacity:${item.owned?"1":".45"};">${esc(item.displayName)}${item.owned?"":" · ACQUISITION REQUIRED"}</button>`).join("");
   const selectedNames=model.selectedTeamVariantIds.map(id=>{const e=id?getCharacterRegistryEntry(id):null;return e?(e.displayName||e.name||id):"UNSELECTED";});
   const leaderEntry=model.joninLeaderVariantId?getCharacterRegistryEntry(model.joninLeaderVariantId):null;
-  container.innerHTML=`<div style="padding:24px;display:grid;gap:16px;color:#d8e4ec;overflow:auto;">\n    <div><div style="font-size:10px;letter-spacing:1.4px;color:#d0ad55;">ACADEMY → GENIN</div><h2 style="margin:3px 0;color:#f2e4b0;">GENIN ROSTER TRANSITION</h2><p style="color:#94A3B8;font-size:12px;max-width:760px;">Promotion is already earned. Finalise two teammate roles and one authorised Jōnin leader. This surface cannot manufacture ownership or candidate eligibility.</p></div>\n    ${model.authorityReady?"":`<div style="padding:14px;border:1px solid rgba(207,169,75,.35);background:rgba(20,14,5,.55);color:#e8d7a1;">Candidate authority is not yet available for this Chronicle. CE / Acquisition must supply an exact snapshot.</div>`}\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 1 — ${esc(selectedNames[0])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(1)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 2 — ${esc(selectedNames[1])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(2)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>JŌNIN LEADER — ${esc(leaderEntry?(leaderEntry.displayName||leaderEntry.name||leaderEntry.id):"UNSELECTED")}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${leaders||"No authorised Jōnin candidates supplied."}</div></div>\n    <div style="display:flex;gap:10px;"><button type="button" onclick="confirmGeninRosterTransition();openGeninRosterTransitionUI();" ${(!model.authorityReady||model.completed)?"disabled":""} style="padding:10px 16px;border:1px solid rgba(207,169,75,.55);background:#152832;color:#f0df9f;border-radius:6px;font-weight:700;">CONFIRM GENIN ROSTER</button><button type="button" onclick="openArenaPromotionSurface()" style="padding:10px 16px;border:1px solid rgba(130,160,175,.35);background:#0f2028;color:#c7d6df;border-radius:6px;">BACK</button></div>\n  </div>`;
+  container.innerHTML=`<div style="padding:24px;display:grid;gap:16px;color:#d8e4ec;overflow:auto;">\n    <div><div style="font-size:10px;letter-spacing:1.4px;color:#d0ad55;">ACADEMY → GENIN</div><h2 style="margin:3px 0;color:#f2e4b0;">GENIN ROSTER TRANSITION</h2><p style="color:#94A3B8;font-size:12px;max-width:760px;">Promotion is already earned. Finalise two teammate roles and one authorised Jōnin leader. Ordinary operational Genin progression remains pending until this transition is committed. This surface cannot manufacture ownership or candidate eligibility.</p></div>\n    ${model.authorityReady?"":`<div style="padding:14px;border:1px solid rgba(207,169,75,.35);background:rgba(20,14,5,.55);color:#e8d7a1;">Candidate authority is not yet available for this Chronicle. CE / Acquisition must supply an exact snapshot.</div>`}\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 1 — ${esc(selectedNames[0])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(1)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 2 — ${esc(selectedNames[1])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(2)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>JŌNIN LEADER — ${esc(leaderEntry?(leaderEntry.displayName||leaderEntry.name||leaderEntry.id):"UNSELECTED")}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${leaders||"No authorised Jōnin candidates supplied."}</div></div>\n    <div style="display:flex;gap:10px;"><button type="button" onclick="confirmGeninRosterTransition();openGeninRosterTransitionUI();" ${(!model.authorityReady||model.completed)?"disabled":""} style="padding:10px 16px;border:1px solid rgba(207,169,75,.55);background:#152832;color:#f0df9f;border-radius:6px;font-weight:700;">CONFIRM GENIN ROSTER</button><button type="button" onclick="openArenaPromotionSurface()" style="padding:10px 16px;border:1px solid rgba(130,160,175,.35);background:#0f2028;color:#c7d6df;border-radius:6px;">BACK</button></div>\n  </div>`;
   return true;
 }
 
@@ -43059,8 +43158,31 @@ function shouldProjectOpportunityForObserver(definition) {
   return definition.presentation&&definition.presentation.showUnknownMarker===true;
 }
 
+// =========================================================
+// BRICK 943 — TRANSITION-RESOLUTION ACTIVITY EXCEPTION
+// BRICK 948 — OPERATIONAL GENIN CONTENT REQUIREMENT ADAPTER
+// =========================================================
+function isGeninRosterTransitionResolutionInteraction(definition,action) {
+  if (!definition||!action) return false;
+  if (definition.geninRosterTransitionResolution===true||action.geninRosterTransitionResolution===true) return true;
+  if (action.progressionGateException==="genin_roster_transition") return true;
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  const recruitmentVariantId=action&&action.recruitment&&action.recruitment.variantId||null;
+  if (snapshot&&action.kind==="recruit"&&recruitmentVariantId) {
+    return [...snapshot.teammateCandidateVariantIds,...snapshot.joninLeaderCandidateVariantIds].includes(recruitmentVariantId);
+  }
+  return false;
+}
+
+function requiresOperationalGeninProgression(definition,action) {
+  return !!(definition&&definition.requiresOperationalGenin===true||action&&action.requiresOperationalGenin===true);
+}
+
 function evaluateOpportunityActionAvailability(definition,action) {
   if (!definition||!action) return {available:false,reason:"interaction_missing",reasonVisible:false};
+  if (isGeninRosterTransitionPending()&&!isGeninRosterTransitionResolutionInteraction(definition,action)) return {available:false,reason:"genin_roster_transition_required",reasonVisible:true};
+  if (requiresOperationalGeninProgression(definition,action)&&!isOperationalGeninProgressionAvailable()) return {available:false,reason:"operational_genin_required",reasonVisible:true};
   const override=getWorldEventDimensionState("actionabilityByOpportunityId",definition.opportunityId);
   if (override.available===false) return {available:false,reason:override.reason||"unavailable",reasonVisible:override.reasonVisible===true};
   if (Array.isArray(override.legalActionIds)&&!override.legalActionIds.includes(action.id)) return {available:false,reason:override.reason||"action_unavailable",reasonVisible:override.reasonVisible===true};
@@ -43211,6 +43333,7 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
   if (!definition) return {success:false,reason:"opportunity_missing"};
   const action=definition.interactions.find(item=>item.id===actionId);
   if (!action) return {success:false,reason:"interaction_missing"};
+  if (isGeninRosterTransitionPending()&&!isGeninRosterTransitionResolutionInteraction(definition,action)) return {success:false,reason:"genin_roster_transition_required"};
   const availability=evaluateOpportunityActionAvailability(definition,action);
   if (!availability.available) return {success:false,reason:availability.reason||"interaction_unavailable"};
 
@@ -86483,10 +86606,59 @@ function runAlphaPost937IntegrationDiagnostics() {
     awaitingPlacementDestination:116,
     fieldContentOrchestrationStatus:"external_authority_required",
     geninCandidateAuthorityStatus:getGeninRosterTransitionState().candidateSnapshot?"ready":"external_authority_required",
-    repoLayoutSupportFilesStatus:"migration_package_required"
+    repoLayoutSupportFilesStatus:"external_repo_path_qa"
   };
   console.table(additions);
   console.log(`SC Alpha post-937 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Field content=${result.fieldContentOrchestrationStatus} / Genin candidates=${result.geninCandidateAuthorityStatus} / repo support=${result.repoLayoutSupportFilesStatus}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 949 — CLOSED GENIN PROGRESSION-GATE REGRESSION
+// =========================================================
+function runAlphaGeninOperationalProgressionGateDiagnostics() {
+  const defaults=createDefaultAcquisitionState().geninRosterTransition;
+  const normalizeSource=normalizeAcquisitionState.toString();
+  const promotionSource=recordOwnedCharacterGeninPromotion.toString();
+  const commitSource=confirmGeninRosterTransition.toString();
+  const opportunitySource=[evaluateOpportunityActionAvailability,routeWorldOpportunityInteraction,isGeninRosterTransitionResolutionInteraction].map(fn=>fn.toString()).join("\n");
+  const result={
+    exactSubjectPersisted:Object.prototype.hasOwnProperty.call(defaults,"subjectOwnedCharacterId")&&normalizeSource.includes("subjectOwnedCharacterId"),
+    promotionIsIdempotent:promotionSource.includes("idempotent:true")&&promotionSource.includes("existing.promotionEvidenceIds"),
+    promotionLeavesFormalGenin:promotionSource.includes('formalRank:"genin"')&&promotionSource.includes('onboardingStatus="genin_roster_transition_pending"'),
+    academyFreePlayCloses:isAcademyFreePlayAvailable.toString().includes('formalRank==="academy"')&&isAcademyFreePlayAvailable.toString().includes("geninRosterTransition.unlocked===true"),
+    operationalGeninRequiresCompletion:isOperationalGeninProgressionAvailable.toString().includes("transition.completed!==true")&&isOperationalGeninProgressionAvailable.toString().includes('toLowerCase()==="genin"'),
+    pendingTransitionBlocksOrdinaryWorld:opportunitySource.includes("genin_roster_transition_required"),
+    transitionResolutionCanRemainAvailable:opportunitySource.includes("geninRosterTransitionResolution===true")&&opportunitySource.includes('action.kind==="recruit"'),
+    operationalContentAdapter:opportunitySource.includes("requiresOperationalGenin")&&opportunitySource.includes("operational_genin_required"),
+    snapshotCannotReloadReroll:applyGeninRosterTransitionCandidateSnapshot.toString().includes("candidate_snapshot_already_committed")&&applyGeninRosterTransitionCandidateSnapshot.toString().includes("idempotent:true"),
+    snapshotBoundToExactSubject:applyGeninRosterTransitionCandidateSnapshot.toString().includes("candidate_snapshot_subject_mismatch"),
+    finalCommitAtomic:commitSource.includes("const rollback=cloneProgressionData(playerData)")&&commitSource.includes("genin_roster_transition_commit_rolled_back"),
+    finalCommitIdempotent:commitSource.includes("transition.completed===true&&transition.completionReceipt")&&commitSource.includes("idempotent:true"),
+    completionUnlocksOperationalGenin:commitSource.includes('onboardingStatus="operational_genin"')&&commitSource.includes("operationalGeninUnlocked:true"),
+    noCompletionPowerReward:commitSource.includes("plStatTechniqueRewardGranted:false")&&commitSource.includes("representationRewardGranted:false")&&commitSource.includes("acquisitionRewardGranted:false"),
+    completionReceiptPersists:Object.prototype.hasOwnProperty.call(defaults,"completionReceipt")&&normalizeSource.includes("completionReceipt")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPost949IntegrationDiagnostics() {
+  const post937=runAlphaPost937IntegrationDiagnostics();
+  const progressionGate=runAlphaGeninOperationalProgressionGateDiagnostics();
+  const groups={post937,progressionGate};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={
+    groups,pass,
+    combatFreezePreserved:post937&&post937.combatFreezePreserved===true,
+    liveProductionGateExpected:102,
+    awaitingPlacementDestination:116,
+    fieldContentOrchestrationStatus:"external_authority_required",
+    geninTransitionSemanticsStatus:progressionGate.pass===true?"implemented":"failed",
+    geninCandidateAuthorityStatus:getGeninRosterTransitionState().candidateSnapshot?"ready":"external_authority_required"
+  };
+  console.log(`SC Alpha post-949 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Genin transition=${result.geninTransitionSemanticsStatus} / Field content=${result.fieldContentOrchestrationStatus} / Genin candidates=${result.geninCandidateAuthorityStatus}`);
   return result;
 }
 
