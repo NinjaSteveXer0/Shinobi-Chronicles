@@ -7102,9 +7102,19 @@ function startAcademyToGeninFieldReadinessAssessment(ownedCharacterId) {
     evidenceByDomain:Object.fromEntries(ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.readinessDomains.map(domain=>[domain,[]])),
     evidenceRefs:[],abort:null,result:null
   };
+  attempt.fieldWorld=createFieldReadinessWorldState(attempt);
   state.activeAttempt=attempt;
   state.attempts.push(attempt);
-  appendFieldReadinessHistory({type:"academy_to_genin_assessment_started",activity:"promotion_assessment",attemptId,assessmentId:attempt.assessmentId,assessmentSubjectOwnedCharacterId:ownedCharacterId,completed:true,success:true,outcome:"attempt_started",timestamp:attempt.startedAt});
+  const started=appendFieldReadinessWorldOccurrence(attempt,FIELD_READINESS_ALPHA_EVENTS.ATTEMPT_STARTED,{
+    participantSourceIds:Object.values(FIELD_READINESS_ALPHA_WORLD_AUTHORITY.participants).map(item=>item.sourceId),
+    dispatchSourceId:attempt.fieldWorld.dispatchSourceId,
+    dispatchInstanceId:attempt.fieldWorld.dispatchInstanceId,
+    dispatchHolderParticipantId:attempt.fieldWorld.dispatchHolderParticipantId,
+    dispatchSealState:attempt.fieldWorld.dispatchSealState,
+    startingKnowledgeIds:[...attempt.fieldWorld.knownFactIds]
+  });
+  appendFieldReadinessHistory({type:"academy_to_genin_assessment_started",activity:"promotion_assessment",attemptId,assessmentId:attempt.assessmentId,assessmentSubjectOwnedCharacterId:ownedCharacterId,completed:true,success:true,outcome:"attempt_started",linkedChronicleEvidenceIds:[started.occurrence.occurrenceId],timestamp:attempt.startedAt});
+  syncFieldReadinessWorldOpportunityState(attempt,{save:false});
   savePlayerData();
   return {success:true,attempt:cloneProgressionData(attempt)};
 }
@@ -7122,6 +7132,14 @@ function addFieldReadinessEvidence(attemptId,{domain=null,evidenceId=null,occurr
   if (domain&&!definition.readinessDomains.includes(domain)) return {success:false,reason:"readiness_domain_invalid"};
   if (objectiveStep&&!definition.objectiveSteps.includes(objectiveStep)) return {success:false,reason:"objective_step_invalid"};
   if (!evidenceId&&!occurrenceId) return {success:false,reason:"assessment_evidence_reference_required"};
+  if (objectiveStep) {
+    const requiredEventId=FIELD_READINESS_OBJECTIVE_EVENT_AUTHORITY[objectiveStep];
+    const world=ensureFieldReadinessWorldState(attempt);
+    const occurrence=(world.occurrenceRefs||[]).find(item=>item&&item.occurrenceId===occurrenceId)||null;
+    if (source!=="world_authored_field_readiness"||!occurrence||occurrence.eventId!==requiredEventId) {
+      return {success:false,reason:"field_readiness_objective_requires_authored_occurrence",objectiveStep};
+    }
+  }
   const ref={evidenceId:evidenceId||null,occurrenceId:occurrenceId||null,domain:domain||null,qualifies:qualifies===true,objectiveStep:objectiveStep||null,source:String(source||"authoritative_domain")};
   const key=JSON.stringify(ref);
   const alreadyRecorded=(attempt.evidenceRefs||[]).some(existing=>JSON.stringify(existing)===key);
@@ -7139,6 +7157,490 @@ function authorFieldReadinessAssessmentAbort(attemptId,{reason,evidenceId=null,o
   attempt.abort={reason:String(reason),evidenceId:evidenceId||null,occurrenceId:occurrenceId||null,authored:true};
   savePlayerData();
   return {success:true,abort:cloneProgressionData(attempt.abort)};
+}
+
+
+// =========================================================
+// BRICKS 965–976 — FIELD READINESS RUNNABLE ALPHA AUTHORITY
+// =========================================================
+// Authority: World / Missions / Events / Rewards SEND NOW packet.
+// This is authored assessment content, not a generic mission framework.
+const FIELD_READINESS_ALPHA_WORLD_AUTHORITY=Object.freeze({
+  assessmentId:"academy_to_genin_field_readiness_assessment",
+  participants:Object.freeze({
+    examiner:Object.freeze({sourceId:"field_readiness_examiner",displayName:"Field Readiness Examiner"}),
+    courier:Object.freeze({sourceId:"field_readiness_field_courier",displayName:"Field Courier"}),
+    decoy:Object.freeze({sourceId:"field_readiness_decoy_proctor",displayName:"Possible Courier",revealedDisplayName:"Assessment Decoy"}),
+    interceptor:Object.freeze({sourceId:"field_readiness_interceptor_proctor",displayName:"Assessment Interceptor"})
+  }),
+  dispatch:Object.freeze({sourceId:"field_readiness_sealed_dispatch",displayName:"Sealed Field Dispatch"}),
+  locations:Object.freeze({
+    briefing:"KON-P07",
+    search:"KON-D12",
+    destination:"KON-O15"
+  }),
+  sites:Object.freeze({
+    splitPineFork:"field_readiness_split_pine_fork",
+    decoyCut:"field_readiness_decoy_cut",
+    courierCover:"field_readiness_courier_cover_site",
+    returnIntercept:"field_readiness_return_intercept_zone"
+  }),
+  clues:Object.freeze({
+    obviousBootprints:"field_readiness_clue_obvious_bootprints",
+    blueSealCord:"field_readiness_clue_blue_seal_cord",
+    messengerTread:"field_readiness_clue_messenger_tread"
+  }),
+  startingKnowledge:Object.freeze(["field_readiness_knowledge_blue_braided_seal_cord"]),
+  encounter:Object.freeze({
+    encounterId:"enc_field_readiness_interceptor_scout",
+    oppositionTemplateId:"scout",
+    opponentParticipantSourceId:"field_readiness_interceptor_proctor",
+    basePL:21
+  }),
+  noAdditionalReward:true
+});
+
+const FIELD_READINESS_ALPHA_EVENTS=Object.freeze({
+  ATTEMPT_STARTED:"field_readiness_attempt_started",
+  OUTER_FOREST_SEARCH:"field_readiness_outer_forest_search",
+  SPLIT_PINE_FORK:"field_readiness_split_pine_fork",
+  INSPECT_OBVIOUS:"field_readiness_inspect_obvious_trail",
+  INSPECT_SECONDARY:"field_readiness_inspect_secondary_trace",
+  SPLIT_SEARCH:"field_readiness_split_search_roles",
+  FALSE_TRAIL_CONTACT:"field_readiness_false_trail_contact",
+  DECOY_REJECTED:"field_readiness_decoy_rejected",
+  DECOY_DEAD_END:"field_readiness_decoy_chased_dead_end",
+  AUTHENTIC_TRAIL:"field_readiness_authentic_trail_committed",
+  COURIER_VERIFIED:"field_readiness_courier_verified",
+  DISPATCH_HANDOFF:"field_readiness_dispatch_handoff_committed",
+  HOLDER_HANDOFF:"field_readiness_dispatch_holder_handoff",
+  POST_RECOVERY_PRIORITY:"field_readiness_post_recovery_priority_choice",
+  RETURN_ROUTE:"field_readiness_return_route",
+  RETURN_INTERCEPTION:"field_readiness_return_interception",
+  THREAT_BREAKAWAY:"field_readiness_threat_breakaway_choice",
+  FULL_TEAM_PURSUIT:"field_readiness_full_team_pursuit",
+  DISPATCH_TURN_IN:"field_readiness_dispatch_turn_in_committed",
+  FIELD_PHASE_RESOLVED:"field_readiness_field_phase_resolved",
+  SAFETY_ABORT:"field_readiness_abort_proctor_intervention",
+  INTEGRITY_ABORT:"field_readiness_abort_deliberate_unsealing",
+  VOLUNTARY_WITHDRAWAL:"field_readiness_voluntary_withdrawal"
+});
+
+const FIELD_READINESS_ALPHA_EVIDENCE=Object.freeze({
+  trailCrosscheck:Object.freeze({evidenceId:"field_readiness_evidence_trail_crosscheck",domains:["information_use","judgement_under_pressure"]}),
+  splitSearchRegroup:Object.freeze({evidenceId:"field_readiness_evidence_split_search_regroup",domains:["team_coordination","information_use"]}),
+  decoyRejected:Object.freeze({evidenceId:"field_readiness_evidence_decoy_rejected",domains:["information_use","judgement_under_pressure"]}),
+  extractionPriority:Object.freeze({evidenceId:"field_readiness_evidence_extraction_priority",domains:["mission_comprehension","judgement_under_pressure"]}),
+  coveredReturn:Object.freeze({evidenceId:"field_readiness_evidence_covered_return",domains:["objective_protection"]}),
+  screenedReturn:Object.freeze({evidenceId:"field_readiness_evidence_screened_return",domains:["team_coordination","objective_protection"]}),
+  breakContact:Object.freeze({evidenceId:"field_readiness_evidence_break_contact_with_dispatch",domains:["mission_comprehension","objective_protection","judgement_under_pressure"]}),
+  holderHandoff:Object.freeze({evidenceId:"field_readiness_evidence_holder_handoff_under_pressure",domains:["team_coordination","objective_protection"]}),
+  postBattleExtraction:Object.freeze({evidenceId:"field_readiness_evidence_post_battle_extraction",domains:["mission_comprehension","objective_protection","judgement_under_pressure"]}),
+  splitPursuitExtraction:Object.freeze({evidenceId:"field_readiness_evidence_split_pursuit_extraction",domains:["team_coordination","objective_protection","judgement_under_pressure"]})
+});
+
+const FIELD_READINESS_OBJECTIVE_EVENT_AUTHORITY=Object.freeze({
+  courier_located:FIELD_READINESS_ALPHA_EVENTS.COURIER_VERIFIED,
+  sealed_dispatch_recovered:FIELD_READINESS_ALPHA_EVENTS.DISPATCH_HANDOFF,
+  sealed_dispatch_returned_to_examiner:FIELD_READINESS_ALPHA_EVENTS.DISPATCH_TURN_IN
+});
+
+const FIELD_READINESS_ALPHA_NODES=Object.freeze({
+  BRIEFING:"briefing",
+  OUTER_FOREST:"outer_forest_search",
+  SPLIT_PINE:"split_pine_fork",
+  DECOY:"decoy_cut",
+  AUTHENTIC_TRAIL:"authentic_trail",
+  COURIER:"courier_cover_site",
+  POST_RECOVERY:"post_recovery_priority",
+  RETURN_ROUTE:"return_route",
+  INTERCEPTION:"return_interception",
+  POST_BATTLE:"threat_breakaway_choice",
+  EXAMINER:"examiner_return",
+  RESOLVED:"field_phase_resolved",
+  ABORTED:"field_phase_aborted"
+});
+
+function createFieldReadinessAttemptParticipantRef(sourceId,attemptId) {
+  return {sourceId:String(sourceId),participantId:`${String(sourceId)}:${String(attemptId)}`,occurrenceLocal:true};
+}
+
+function getFieldReadinessAssessmentTeamOwnedCharacterIds() {
+  const state=ensurePlayerAcquisitionState();
+  const receipt=state.academyTeamFormation&&state.academyTeamFormation.confirmationReceipt;
+  const variants=receipt&&Array.isArray(receipt.teamVariantIds)?receipt.teamVariantIds:[];
+  return variants.map(variantId=>state.ownedCharactersByVariantId&&state.ownedCharactersByVariantId[variantId]).filter(Boolean).map(record=>record.ownedCharacterId).filter(Boolean);
+}
+
+function createFieldReadinessWorldState(attempt) {
+  const id=attempt.attemptId;
+  const p=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.participants;
+  const dispatch=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.dispatch;
+  return {
+    currentNode:FIELD_READINESS_ALPHA_NODES.BRIEFING,
+    currentSpatialAuthorityId:FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.briefing,
+    participantRefs:{
+      examiner:createFieldReadinessAttemptParticipantRef(p.examiner.sourceId,id),
+      courier:createFieldReadinessAttemptParticipantRef(p.courier.sourceId,id),
+      decoy:createFieldReadinessAttemptParticipantRef(p.decoy.sourceId,id),
+      interceptor:createFieldReadinessAttemptParticipantRef(p.interceptor.sourceId,id)
+    },
+    dispatchSourceId:dispatch.sourceId,
+    dispatchInstanceId:`${dispatch.sourceId}:${id}`,
+    dispatchHolderParticipantId:`${p.courier.sourceId}:${id}`,
+    dispatchSealState:"sealed",
+    teamOwnedCharacterIds:getFieldReadinessAssessmentTeamOwnedCharacterIds(),
+    discoveredClueIds:[],
+    knownFactIds:[...FIELD_READINESS_ALPHA_WORLD_AUTHORITY.startingKnowledge],
+    committedEventIds:[],
+    occurrenceRefs:[],
+    routeDecisions:[],
+    decoyState:"unknown",
+    authenticTrailIdentified:false,
+    courierVerified:false,
+    dispatchRecovered:false,
+    returnRoute:null,
+    interceptorContactState:"not_contacted",
+    pendingBattle:false,
+    battleEncounterResultRef:null,
+    fieldPhaseResolved:false,
+    fieldPhaseResolutionReason:null,
+    noAdditionalReward:true
+  };
+}
+
+function ensureFieldReadinessWorldState(attempt) {
+  if (!attempt) return null;
+  const defaults=createFieldReadinessWorldState(attempt);
+  // Normalize IN PLACE. Field-event orchestration may call helper functions that
+  // re-enter this normalizer; replacing the object would detach the caller's
+  // authoritative attempt-local reference and silently discard later mutations.
+  const world=attempt.fieldWorld&&typeof attempt.fieldWorld==="object"?attempt.fieldWorld:{};
+  Object.entries(defaults).forEach(([key,value])=>{
+    if (typeof world[key]==="undefined") world[key]=(value&&typeof value==="object")?cloneProgressionData(value):value;
+  });
+  world.participantRefs={...defaults.participantRefs,...(world.participantRefs||{})};
+  world.teamOwnedCharacterIds=Array.isArray(world.teamOwnedCharacterIds)&&world.teamOwnedCharacterIds.length?[...new Set(world.teamOwnedCharacterIds.filter(Boolean))]:defaults.teamOwnedCharacterIds;
+  world.discoveredClueIds=[...new Set((world.discoveredClueIds||[]).filter(Boolean))];
+  world.knownFactIds=[...new Set([...(world.knownFactIds||[]),...defaults.knownFactIds].filter(Boolean))];
+  world.committedEventIds=[...new Set((world.committedEventIds||[]).filter(Boolean))];
+  world.occurrenceRefs=Array.isArray(world.occurrenceRefs)?world.occurrenceRefs.filter(Boolean).map(cloneProgressionData):[];
+  world.routeDecisions=Array.isArray(world.routeDecisions)?world.routeDecisions.filter(Boolean).map(cloneProgressionData):[];
+  attempt.fieldWorld=world;
+  return world;
+}
+
+function createFieldReadinessOccurrenceId(attempt,eventId,{repeatable=false}={}) {
+  const base=`${attempt.attemptId}:${String(eventId)}`;
+  if (!repeatable) return base;
+  const world=attempt&&attempt.fieldWorld&&typeof attempt.fieldWorld==="object"?attempt.fieldWorld:null;
+  const prior=world&&Array.isArray(world.occurrenceRefs)?world.occurrenceRefs.filter(item=>item&&item.eventId===String(eventId)).length:0;
+  return `${base}:${prior+1}`;
+}
+
+function appendFieldReadinessWorldOccurrence(attempt,eventId,data={}) {
+  const world=ensureFieldReadinessWorldState(attempt);
+  const repeatable=String(eventId)===FIELD_READINESS_ALPHA_EVENTS.HOLDER_HANDOFF;
+  const occurrenceId=createFieldReadinessOccurrenceId(attempt,eventId,{repeatable});
+  const existing=repeatable?null:world.occurrenceRefs.find(item=>item&&item.occurrenceId===occurrenceId);
+  if (existing) return {occurrence:existing,idempotent:true};
+  const occurrence={
+    occurrenceId,eventId:String(eventId),assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,
+    assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,timestamp:Date.now(),data:cloneProgressionData(data)
+  };
+  world.occurrenceRefs.push(occurrence);
+  world.committedEventIds.push(String(eventId));
+  appendFieldReadinessHistory({type:"field_readiness_world_occurrence",activity:"promotion_assessment",attemptId:attempt.attemptId,assessmentId:attempt.assessmentId,eventId:String(eventId),occurrenceId,completed:true,success:true,outcome:"committed",data:cloneProgressionData(data),timestamp:occurrence.timestamp});
+  return {occurrence,idempotent:false};
+}
+
+function addFieldReadinessMappedEvidence(attempt,eventKey,occurrenceId) {
+  const definition=FIELD_READINESS_ALPHA_EVIDENCE[eventKey];
+  if (!definition) return [];
+  return definition.domains.map(domain=>addFieldReadinessEvidence(attempt.attemptId,{domain,evidenceId:definition.evidenceId,occurrenceId,qualifies:true,source:"world_authored_field_readiness"}));
+}
+
+function discoverFieldReadinessClue(attempt,clueId) {
+  const world=ensureFieldReadinessWorldState(attempt);
+  if (!Object.values(FIELD_READINESS_ALPHA_WORLD_AUTHORITY.clues).includes(clueId)) return {success:false,reason:"field_readiness_clue_unknown"};
+  const already=world.discoveredClueIds.includes(clueId);
+  if (!already) world.discoveredClueIds.push(clueId);
+  savePlayerData();
+  return {success:true,idempotent:already,clueId};
+}
+
+function commitFieldReadinessObjectiveFromAuthoredOccurrence(attempt,objectiveStep,eventId,occurrenceId) {
+  if (FIELD_READINESS_OBJECTIVE_EVENT_AUTHORITY[objectiveStep]!==eventId) return {success:false,reason:"field_readiness_objective_setter_not_authorised"};
+  return addFieldReadinessEvidence(attempt.attemptId,{objectiveStep,occurrenceId,evidenceId:`objective:${objectiveStep}`,qualifies:false,source:"world_authored_field_readiness"});
+}
+
+
+// =========================================================
+// BRICKS 977–1010 — AUTHORED FIELD EVENT ORCHESTRATION
+// =========================================================
+function commitFieldReadinessAuthoredEvent(attemptId,eventId,payload={}) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  const world=ensureFieldReadinessWorldState(attempt);
+  const E=FIELD_READINESS_ALPHA_EVENTS;
+  const C=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.clues;
+  let evidenceKey=null;
+  let objectiveStep=null;
+  let nextNode=world.currentNode;
+  let notice=null;
+  let extra={};
+
+  // Eligibility is authored per node/event. Event success never creates its own eligibility.
+  switch (eventId) {
+    case E.OUTER_FOREST_SEARCH:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.BRIEFING) return {success:false,reason:"field_readiness_outer_forest_not_available"};
+      nextNode=FIELD_READINESS_ALPHA_NODES.SPLIT_PINE; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.search;
+      notice="Outer Forest Boundary reached. The split-pine fork is now actionable.";
+      break;
+    case E.INSPECT_OBVIOUS:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.SPLIT_PINE) return {success:false,reason:"field_readiness_split_pine_required"};
+      discoverFieldReadinessClue(attempt,C.obviousBootprints); notice="Recent bootprints discovered. They prove recent movement, not courier identity.";
+      break;
+    case E.INSPECT_SECONDARY:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.SPLIT_PINE) return {success:false,reason:"field_readiness_split_pine_required"};
+      discoverFieldReadinessClue(attempt,C.blueSealCord); discoverFieldReadinessClue(attempt,C.messengerTread);
+      world.authenticTrailIdentified=true; evidenceKey="trailCrosscheck"; notice="Blue seal-cord fibre and messenger tread corroborate the authentic courier route.";
+      break;
+    case E.SPLIT_SEARCH:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.SPLIT_PINE) return {success:false,reason:"field_readiness_split_pine_required"};
+      discoverFieldReadinessClue(attempt,C.obviousBootprints); discoverFieldReadinessClue(attempt,C.blueSealCord); discoverFieldReadinessClue(attempt,C.messengerTread);
+      world.authenticTrailIdentified=true; evidenceKey="splitSearchRegroup"; world.routeDecisions.push({eventId,decision:"split_search_roles",regrouped:true});
+      notice="The team splits local search roles, exchanges findings, and regroups at the fork.";
+      break;
+    case E.FALSE_TRAIL_CONTACT:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.SPLIT_PINE||!world.discoveredClueIds.includes(C.obviousBootprints)) return {success:false,reason:"field_readiness_false_trail_not_available"};
+      nextNode=FIELD_READINESS_ALPHA_NODES.DECOY; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.sites.decoyCut; world.decoyState="possible_courier";
+      world.routeDecisions.push({eventId,decision:"follow_obvious_trail"}); notice="Possible Courier encountered. Verification remains required.";
+      break;
+    case E.DECOY_REJECTED:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.DECOY) return {success:false,reason:"field_readiness_decoy_contact_required"};
+      world.decoyState="assessment_decoy_revealed"; nextNode=FIELD_READINESS_ALPHA_NODES.SPLIT_PINE; evidenceKey="decoyRejected";
+      notice="The mismatch is verified. The contact is revealed as an Assessment Decoy.";
+      break;
+    case E.DECOY_DEAD_END:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.DECOY) return {success:false,reason:"field_readiness_decoy_contact_required"};
+      world.decoyState="dead_end_completed"; nextNode=FIELD_READINESS_ALPHA_NODES.SPLIT_PINE; world.routeDecisions.push({eventId,decision:"follow_decoy_dead_end"});
+      notice="The controlled false trail ends. The assessment remains active and the real search resumes.";
+      break;
+    case E.AUTHENTIC_TRAIL:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.SPLIT_PINE||world.authenticTrailIdentified!==true) return {success:false,reason:"field_readiness_authentic_evidence_required"};
+      nextNode=FIELD_READINESS_ALPHA_NODES.AUTHENTIC_TRAIL; world.routeDecisions.push({eventId,decision:"commit_authentic_route"}); notice="Authentic courier route committed.";
+      break;
+    case E.COURIER_VERIFIED:
+      if (![FIELD_READINESS_ALPHA_NODES.AUTHENTIC_TRAIL,FIELD_READINESS_ALPHA_NODES.COURIER].includes(world.currentNode)) return {success:false,reason:"field_readiness_authentic_route_required"};
+      nextNode=FIELD_READINESS_ALPHA_NODES.COURIER; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.sites.courierCover; world.courierVerified=true; objectiveStep="courier_located";
+      notice="The actual Field Courier is legitimately identified.";
+      break;
+    case E.DISPATCH_HANDOFF: {
+      if (world.courierVerified!==true||attempt.objectives.courier_located!==true) return {success:false,reason:"field_readiness_courier_not_verified"};
+      if (world.dispatchSealState!=="sealed"||world.dispatchRecovered===true) return {success:false,reason:"field_readiness_dispatch_handoff_unavailable"};
+      const holder=String(payload.holderOwnedCharacterId||"");
+      if (!world.teamOwnedCharacterIds.includes(holder)) return {success:false,reason:"field_readiness_dispatch_holder_not_assessment_team"};
+      world.dispatchHolderParticipantId=holder; world.dispatchRecovered=true; objectiveStep="sealed_dispatch_recovered"; nextNode=FIELD_READINESS_ALPHA_NODES.POST_RECOVERY;
+      extra={holderOwnedCharacterId:holder}; notice="The sealed dispatch is recovered into legitimate team custody.";
+      break;
+    }
+    case E.HOLDER_HANDOFF: {
+      if (world.dispatchRecovered!==true||world.dispatchSealState!=="sealed") return {success:false,reason:"field_readiness_dispatch_not_transferable"};
+      const holder=String(payload.holderOwnedCharacterId||"");
+      if (!world.teamOwnedCharacterIds.includes(holder)) return {success:false,reason:"field_readiness_dispatch_holder_not_assessment_team"};
+      if (holder===world.dispatchHolderParticipantId) return {success:true,idempotent:true,eventId,attempt:cloneProgressionData(attempt)};
+      world.dispatchHolderParticipantId=holder; extra={holderOwnedCharacterId:holder};
+      if (payload.underPressure===true) evidenceKey="holderHandoff";
+      notice="Custody of the same sealed dispatch transfers to another assessment teammate.";
+      break;
+    }
+    case E.POST_RECOVERY_PRIORITY:
+      if (world.dispatchRecovered!==true) return {success:false,reason:"field_readiness_dispatch_not_recovered"};
+      if (payload.choice==="return_now") { evidenceKey="extractionPriority"; nextNode=FIELD_READINESS_ALPHA_NODES.RETURN_ROUTE; world.routeDecisions.push({eventId,decision:"return_to_examiner_now"}); }
+      else if (payload.choice==="search_pressure_source") { nextNode=FIELD_READINESS_ALPHA_NODES.INTERCEPTION; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.sites.returnIntercept; world.routeDecisions.push({eventId,decision:"search_pressure_source"}); }
+      else return {success:false,reason:"field_readiness_post_recovery_choice_invalid"};
+      notice="Return-route planning is now available.";
+      break;
+    case E.RETURN_ROUTE:
+      if (world.dispatchRecovered!==true||world.dispatchSealState!=="sealed") return {success:false,reason:"field_readiness_return_route_unavailable"};
+      if (!["covered","direct","screened"].includes(payload.route)) return {success:false,reason:"field_readiness_return_route_invalid"};
+      world.returnRoute=payload.route; world.routeDecisions.push({eventId,decision:`${payload.route}_return`});
+      if (payload.route==="covered") { evidenceKey="coveredReturn"; nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.briefing; }
+      if (payload.route==="screened") { evidenceKey="screenedReturn"; nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.briefing; }
+      if (payload.route==="direct") { nextNode=FIELD_READINESS_ALPHA_NODES.INTERCEPTION; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.sites.returnIntercept; }
+      notice=payload.route==="direct"?"Direct Return exposes controlled interceptor contact.":"The team reaches the examiner route without mandatory Battle.";
+      break;
+    case E.RETURN_INTERCEPTION:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.INTERCEPTION) return {success:false,reason:"field_readiness_interception_not_available"};
+      world.interceptorContactState="contacted";
+      if (payload.choice==="break_contact") { evidenceKey="breakContact"; nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.briefing; world.interceptorContactState="disengaged"; }
+      else if (payload.choice==="engage") { world.pendingBattle=true; world.interceptorContactState="engaged"; }
+      else return {success:false,reason:"field_readiness_interception_choice_invalid"};
+      notice=payload.choice==="engage"?"Controlled interceptor engagement authorised.":"Contact broken while preserving the sealed dispatch.";
+      break;
+    case E.THREAT_BREAKAWAY:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.POST_BATTLE) return {success:false,reason:"field_readiness_post_battle_choice_unavailable"};
+      if (payload.choice==="return_with_dispatch") { evidenceKey="postBattleExtraction"; nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; }
+      else if (payload.choice==="split_pursuit_extraction") { evidenceKey="splitPursuitExtraction"; nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; }
+      else if (payload.choice==="full_team_pursuit") { nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; world.routeDecisions.push({eventId,decision:"full_team_pursuit"}); }
+      else return {success:false,reason:"field_readiness_post_battle_choice_invalid"};
+      world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.briefing; notice="The controlled pursuit boundary closes. Return to the examiner remains available.";
+      break;
+    case E.FULL_TEAM_PURSUIT:
+      if (world.dispatchRecovered!==true) return {success:false,reason:"field_readiness_dispatch_not_recovered"};
+      nextNode=FIELD_READINESS_ALPHA_NODES.EXAMINER; world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.locations.briefing;
+      notice="The interceptor exits the controlled pursuit boundary. No second mandatory Battle is created.";
+      break;
+    case E.DISPATCH_TURN_IN:
+      if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.EXAMINER) return {success:false,reason:"field_readiness_examiner_not_reached"};
+      if (!world.teamOwnedCharacterIds.includes(world.dispatchHolderParticipantId)) return {success:false,reason:"field_readiness_dispatch_not_held_by_team"};
+      if (world.dispatchSealState!=="sealed") return {success:false,reason:"field_readiness_dispatch_seal_broken"};
+      world.dispatchHolderParticipantId=world.participantRefs.examiner.participantId; objectiveStep="sealed_dispatch_returned_to_examiner"; nextNode=FIELD_READINESS_ALPHA_NODES.RESOLVED; world.fieldPhaseResolved=true; world.fieldPhaseResolutionReason="dispatch_returned";
+      notice="The sealed dispatch is returned to the Field Readiness Examiner.";
+      break;
+    case E.FIELD_PHASE_RESOLVED:
+      if (world.fieldPhaseResolved!==true) return {success:false,reason:"field_readiness_field_phase_not_resolved"};
+      nextNode=FIELD_READINESS_ALPHA_NODES.RESOLVED; notice="Field phase resolved. Institutional Promotion evaluation is ready.";
+      break;
+    case E.INTEGRITY_ABORT:
+      if (world.dispatchRecovered!==true||world.dispatchSealState!=="sealed") return {success:false,reason:"field_readiness_deliberate_unseal_unavailable"};
+      world.dispatchSealState="opened_by_candidate"; world.fieldPhaseResolved=true; world.fieldPhaseResolutionReason="integrity_disqualification"; nextNode=FIELD_READINESS_ALPHA_NODES.ABORTED;
+      break;
+    case E.SAFETY_ABORT:
+      world.fieldPhaseResolved=true; world.fieldPhaseResolutionReason="proctor_safety_intervention"; nextNode=FIELD_READINESS_ALPHA_NODES.ABORTED; break;
+    case E.VOLUNTARY_WITHDRAWAL:
+      world.fieldPhaseResolved=true; world.fieldPhaseResolutionReason="voluntary_withdrawal"; nextNode=FIELD_READINESS_ALPHA_NODES.ABORTED; break;
+    default:
+      return {success:false,reason:"field_readiness_event_not_authored"};
+  }
+
+  const committed=appendFieldReadinessWorldOccurrence(attempt,eventId,{...cloneProgressionData(payload),...extra,currentNodeBefore:world.currentNode,currentNodeAfter:nextNode});
+  world.currentNode=nextNode;
+  if (objectiveStep) {
+    const objective=commitFieldReadinessObjectiveFromAuthoredOccurrence(attempt,objectiveStep,eventId,committed.occurrence.occurrenceId);
+    if (!objective.success) return objective;
+  }
+  if (evidenceKey) addFieldReadinessMappedEvidence(attempt,evidenceKey,committed.occurrence.occurrenceId);
+  if (eventId===E.THREAT_BREAKAWAY&&payload.choice==="full_team_pursuit") appendFieldReadinessWorldOccurrence(attempt,E.FULL_TEAM_PURSUIT,{sourceChoiceOccurrenceId:committed.occurrence.occurrenceId,secondBattleRequired:false});
+  if (eventId===E.INTEGRITY_ABORT) authorFieldReadinessAssessmentAbort(attemptId,{reason:"deliberate_unsealing",occurrenceId:committed.occurrence.occurrenceId});
+  if (eventId===E.SAFETY_ABORT) authorFieldReadinessAssessmentAbort(attemptId,{reason:"proctor_intervention",occurrenceId:committed.occurrence.occurrenceId});
+  if (eventId===E.VOLUNTARY_WITHDRAWAL) authorFieldReadinessAssessmentAbort(attemptId,{reason:"voluntary_withdrawal",occurrenceId:committed.occurrence.occurrenceId});
+  syncFieldReadinessWorldOpportunityState(attempt,{save:false});
+  savePlayerData();
+  return {success:true,idempotent:committed.idempotent,eventId,occurrenceId:committed.occurrence.occurrenceId,notice,attempt:cloneProgressionData(attempt)};
+}
+
+function getFieldReadinessFieldPhaseActionModel(attemptId=null) {
+  const attempt=getFieldReadinessAttempt(attemptId);
+  if (!attempt||attempt.status!=="in_progress") return {active:false,actions:[]};
+  const world=ensureFieldReadinessWorldState(attempt);
+  const E=FIELD_READINESS_ALPHA_EVENTS;
+  const actions=[];
+  const push=(id,label,eventId,payload={})=>actions.push({id,label,eventId,payload});
+  switch (world.currentNode) {
+    case FIELD_READINESS_ALPHA_NODES.BRIEFING: push("enter_search","ENTER OUTER FOREST",E.OUTER_FOREST_SEARCH); break;
+    case FIELD_READINESS_ALPHA_NODES.SPLIT_PINE:
+      push("inspect_obvious","INSPECT OBVIOUS TRAIL",E.INSPECT_OBVIOUS);
+      push("inspect_secondary","INSPECT SECONDARY TRACE",E.INSPECT_SECONDARY);
+      push("split_search","SPLIT SEARCH ROLES",E.SPLIT_SEARCH);
+      if (world.discoveredClueIds.includes(FIELD_READINESS_ALPHA_WORLD_AUTHORITY.clues.obviousBootprints)) push("follow_obvious","FOLLOW OBVIOUS TRAIL",E.FALSE_TRAIL_CONTACT);
+      if (world.authenticTrailIdentified===true) push("commit_authentic","FOLLOW AUTHENTIC ROUTE",E.AUTHENTIC_TRAIL);
+      break;
+    case FIELD_READINESS_ALPHA_NODES.DECOY:
+      push("verify_decoy","OBSERVE / VERIFY",E.DECOY_REJECTED);
+      push("follow_decoy","FOLLOW",E.DECOY_DEAD_END);
+      actions.push({id:"return_search",label:"RETURN TO SEARCH",eventId:null,payload:{navigationOnly:"return_to_split_pine"}});
+      break;
+    case FIELD_READINESS_ALPHA_NODES.AUTHENTIC_TRAIL: push("verify_courier","VERIFY COURIER",E.COURIER_VERIFIED); break;
+    case FIELD_READINESS_ALPHA_NODES.COURIER:
+      world.teamOwnedCharacterIds.forEach(holder=>push(`recover_${holder}`,`RECOVER DISPATCH — ${getFieldReadinessOwnedCharacterDisplayName(holder)}`,E.DISPATCH_HANDOFF,{holderOwnedCharacterId:holder}));
+      break;
+    case FIELD_READINESS_ALPHA_NODES.POST_RECOVERY:
+      push("return_now","RETURN TO EXAMINER NOW",E.POST_RECOVERY_PRIORITY,{choice:"return_now"});
+      push("search_pressure","SEARCH FOR PRESSURE SOURCE",E.POST_RECOVERY_PRIORITY,{choice:"search_pressure_source"});
+      break;
+    case FIELD_READINESS_ALPHA_NODES.RETURN_ROUTE:
+      push("covered","COVERED RETURN",E.RETURN_ROUTE,{route:"covered"});
+      push("direct","DIRECT RETURN",E.RETURN_ROUTE,{route:"direct"});
+      push("screened","SCREENED RETURN",E.RETURN_ROUTE,{route:"screened"});
+      break;
+    case FIELD_READINESS_ALPHA_NODES.INTERCEPTION:
+      push("break_contact","BREAK CONTACT",E.RETURN_INTERCEPTION,{choice:"break_contact"});
+      push("engage","ENGAGE",E.RETURN_INTERCEPTION,{choice:"engage"});
+      break;
+    case FIELD_READINESS_ALPHA_NODES.POST_BATTLE:
+      push("return_dispatch","RETURN WITH DISPATCH",E.THREAT_BREAKAWAY,{choice:"return_with_dispatch"});
+      push("split_pursuit","SPLIT PURSUIT AND EXTRACTION",E.THREAT_BREAKAWAY,{choice:"split_pursuit_extraction"});
+      push("full_pursuit","FULL-TEAM PURSUIT",E.THREAT_BREAKAWAY,{choice:"full_team_pursuit"});
+      break;
+    case FIELD_READINESS_ALPHA_NODES.EXAMINER: push("turn_in","RETURN SEALED DISPATCH",E.DISPATCH_TURN_IN); break;
+  }
+  return {active:true,attemptId:attempt.attemptId,currentNode:world.currentNode,currentSpatialAuthorityId:world.currentSpatialAuthorityId,dispatchHolderParticipantId:world.dispatchHolderParticipantId,dispatchSealState:world.dispatchSealState,actions};
+}
+
+function getFieldReadinessOwnedCharacterDisplayName(ownedCharacterId) {
+  const record=getOwnedCharacterRecordById(ownedCharacterId);
+  return record?getProductionRuntimeDisplayName(record.variantId):String(ownedCharacterId||"TEAMMATE");
+}
+
+function executeFieldReadinessFieldAction(actionId) {
+  const attempt=getFieldReadinessAttempt();
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  const model=getFieldReadinessFieldPhaseActionModel(attempt.attemptId);
+  const action=model.actions.find(item=>item.id===actionId);
+  if (!action) return {success:false,reason:"field_readiness_action_unavailable"};
+  if (!action.eventId&&action.payload&&action.payload.navigationOnly==="return_to_split_pine") {
+    const world=ensureFieldReadinessWorldState(attempt);
+    world.currentNode=FIELD_READINESS_ALPHA_NODES.SPLIT_PINE;
+    world.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.sites.splitPineFork;
+    syncFieldReadinessWorldOpportunityState(attempt,{save:false});savePlayerData();
+    FIELD_READINESS_UI_STATE.lastNotice="Returned to the real search without converting the decoy into a committed dead-end chase.";
+    const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+    if (container&&currentOverlayType==="field_readiness_assessment") renderFieldReadinessAssessmentOverlay(container);
+    return {success:true,type:"field_navigation",destination:FIELD_READINESS_ALPHA_NODES.SPLIT_PINE};
+  }
+  if (action.eventId===FIELD_READINESS_ALPHA_EVENTS.RETURN_INTERCEPTION&&action.payload.choice==="engage") {
+    const committed=commitFieldReadinessAuthoredEvent(attempt.attemptId,action.eventId,action.payload);
+    if (!committed.success) return committed;
+    return launchFieldReadinessBattleWithReturnContext(attempt.attemptId,{enemyId:"scout",encounterId:FIELD_READINESS_ALPHA_WORLD_AUTHORITY.encounter.encounterId});
+  }
+  const result=commitFieldReadinessAuthoredEvent(attempt.attemptId,action.eventId,action.payload);
+  FIELD_READINESS_UI_STATE.lastNotice=result.success?(result.notice||null):`Field action unavailable: ${result.reason||"unknown"}.`;
+  const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+  if (container&&currentOverlayType==="field_readiness_assessment") renderFieldReadinessAssessmentOverlay(container);
+  return result;
+}
+
+function transferFieldReadinessDispatchHolder(holderOwnedCharacterId,{underPressure=false}={}) {
+  const attempt=getFieldReadinessAttempt();
+  if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
+  return commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.HOLDER_HANDOFF,{holderOwnedCharacterId,underPressure});
+}
+
+function deliberatelyUnsealFieldReadinessDispatch() {
+  const attempt=getFieldReadinessAttempt();
+  if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
+  const result=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.INTEGRITY_ABORT,{});
+  if (result.success) resolveAcademyToGeninFieldReadinessAssessment(attempt.attemptId);
+  return result;
+}
+
+function withdrawFieldReadinessAssessment() {
+  const attempt=getFieldReadinessAttempt();
+  if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
+  const result=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.VOLUNTARY_WITHDRAWAL,{});
+  if (result.success) resolveAcademyToGeninFieldReadinessAssessment(attempt.attemptId);
+  return result;
+}
+
+function resolveFieldReadinessFieldPhaseIfReady() {
+  const attempt=getFieldReadinessAttempt();
+  if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
+  const world=ensureFieldReadinessWorldState(attempt);
+  if (world.fieldPhaseResolved!==true) return {success:false,reason:"field_readiness_field_phase_not_resolved"};
+  if (!world.committedEventIds.includes(FIELD_READINESS_ALPHA_EVENTS.FIELD_PHASE_RESOLVED)) appendFieldReadinessWorldOccurrence(attempt,FIELD_READINESS_ALPHA_EVENTS.FIELD_PHASE_RESOLVED,{reason:world.fieldPhaseResolutionReason});
+  return resolveAcademyToGeninFieldReadinessAssessment(attempt.attemptId);
 }
 
 // =========================================================
@@ -7190,31 +7692,17 @@ function createFieldReadinessObserverSafePresentation(ownedCharacterId=null) {
   const objectiveProgress=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.objectiveSteps.map(step=>({step,completed:!!(shownAttempt&&shownAttempt.objectives&&shownAttempt.objectives[step]===true)}));
   let result=null;
   if (shownAttempt&&shownAttempt.result) {
-    result={
-      status:shownAttempt.result.passed===true?"passed":"failed",
-      passed:shownAttempt.result.passed===true,
-      objectiveCompleted:shownAttempt.result.objectiveCompleted===true,
-      examinerAbort:shownAttempt.result.abortDisqualification===true,
-      explanation:shownAttempt.result.passed===true
-        ? "Promotion approved. The examiner judged the completed assessment evidence sufficient."
-        : (shownAttempt.result.abortDisqualification===true
-            ? "Promotion not approved. The assessment was halted by an authored examiner safety/integrity decision."
-            : (shownAttempt.result.objectiveCompleted===true
-                ? "Promotion not approved. The mission concluded, but the examiner did not recognise sufficient readiness evidence."
-                : "Promotion not approved. The formal assessment objective was not completed."))
-    };
+    result={status:shownAttempt.result.passed===true?"passed":"failed",passed:shownAttempt.result.passed===true,objectiveCompleted:shownAttempt.result.objectiveCompleted===true,examinerAbort:shownAttempt.result.abortDisqualification===true,
+      explanation:shownAttempt.result.passed===true?"Promotion approved. The examiner judged the completed assessment evidence sufficient.":(shownAttempt.result.abortDisqualification===true?"Promotion not approved. The assessment was halted by an authored examiner safety/integrity decision.":(shownAttempt.result.objectiveCompleted===true?"Promotion not approved. The field mission concluded, but the examiner did not recognise sufficient readiness evidence.":"Promotion not approved. The formal assessment objective was not completed."))};
   }
+  const fieldWorld=shownAttempt&&shownAttempt.status==="in_progress"?ensureFieldReadinessWorldState(shownAttempt):null;
+  const fieldActions=fieldWorld?getFieldReadinessFieldPhaseActionModel(shownAttempt.attemptId):{active:false,actions:[]};
   return {
-    assessmentId:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.assessmentId,
-    displayName:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.displayName,
-    mission:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.mission,
-    selectedOwnedCharacterId:selected?selected.ownedCharacterId:null,
-    candidates,eligibility:{eligible:eligibility.eligible===true,reasons:[...(eligibility.reasons||[])]},
+    assessmentId:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.assessmentId,displayName:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.displayName,mission:ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.mission,
+    selectedOwnedCharacterId:selected?selected.ownedCharacterId:null,candidates,eligibility:{eligible:eligibility.eligible===true,reasons:[...(eligibility.reasons||[])]},
     attempt:shownAttempt?{attemptId:shownAttempt.attemptId,status:shownAttempt.status,objectiveProgress,lastBattleReturn:shownAttempt.lastBattleReturn?cloneProgressionData(shownAttempt.lastBattleReturn):null}:null,
-    result,
-    liveReadinessScoringExposed:false,
-    teamPLExposed:false,
-    battleMandatory:false
+    field:fieldWorld?{currentNode:fieldWorld.currentNode,currentSpatialAuthorityId:fieldWorld.currentSpatialAuthorityId,discoveredClueIds:[...fieldWorld.discoveredClueIds],dispatchHolderParticipantId:fieldWorld.dispatchHolderParticipantId,dispatchSealState:fieldWorld.dispatchSealState,actions:fieldActions.actions.map(cloneProgressionData),fieldPhaseResolved:fieldWorld.fieldPhaseResolved===true}:null,
+    result,liveReadinessScoringExposed:false,teamPLExposed:false,battleMandatory:false,noAdditionalReward:true
   };
 }
 
@@ -7267,19 +7755,9 @@ function renderFieldReadinessAssessmentOverlay(container) {
   const objectiveHTML=model.attempt?model.attempt.objectiveProgress.map(item=>`<div class="field-readiness-objective ${item.completed?"done":""}"><span>${item.completed?"✓":"○"}</span><span>${escapeFieldReadinessHTML(formatFieldReadinessObjectiveStep(item.step))}</span></div>`).join(""):`<div class="field-readiness-note">No assessment attempt has begun for this shinobi.</div>`;
   const candidatesHTML=model.candidates.map(item=>`<button type="button" class="field-readiness-subject ${item.ownedCharacterId===model.selectedOwnedCharacterId?"selected":""}" onclick="selectFieldReadinessAssessmentSubject('${escapeFieldReadinessHTML(item.ownedCharacterId)}')"><strong>${escapeFieldReadinessHTML(item.displayName)}</strong><br><small>${escapeFieldReadinessHTML(item.formalRank||"academy")}</small></button>`).join("")||`<div class="field-readiness-note">No owned Academy-rank assessment subject is currently available.</div>`;
   const resultHTML=model.result?`<div class="field-readiness-card field-readiness-result ${model.result.passed?"pass":"fail"}"><strong>${model.result.passed?"PROMOTION APPROVED":"PROMOTION NOT APPROVED"}</strong><div>${escapeFieldReadinessHTML(model.result.explanation)}</div>${model.result.passed?`<div style="margin-top:10px;"><button type="button" class="field-readiness-button" onclick="openGeninRosterTransitionUI()">CONTINUE TO GENIN ROSTER TRANSITION</button></div>`:""}</div>`:"";
+  const fieldHTML=model.field?`<div class="field-readiness-card"><div class="field-readiness-eyebrow">ACTIVE FIELD PHASE</div><strong>${escapeFieldReadinessHTML(String(model.field.currentNode||"").replace(/_/g," ").toUpperCase())}</strong><div class="field-readiness-note">Spatial authority: ${escapeFieldReadinessHTML(model.field.currentSpatialAuthorityId||"")} · Dispatch: ${escapeFieldReadinessHTML(model.field.dispatchSealState||"sealed")}</div><div class="field-readiness-actions" style="margin-top:10px;">${model.field.actions.map(action=>`<button type="button" class="field-readiness-button secondary" onclick="executeFieldReadinessFieldAction('${escapeFieldReadinessHTML(action.id)}')">${escapeFieldReadinessHTML(action.label)}</button>`).join("")||`<span class="field-readiness-note">No local action is currently available.</span>`}</div><div style="margin-top:10px;"><button type="button" class="field-readiness-button secondary" onclick="openFieldReadinessWorldMap()">OPEN KONOHA FIELD MAP</button></div>${model.field.dispatchHolderParticipantId&&model.field.dispatchHolderParticipantId.startsWith("owned_character_")?`<div class="field-readiness-note" style="margin-top:8px;">Current dispatch holder: ${escapeFieldReadinessHTML(getFieldReadinessOwnedCharacterDisplayName(model.field.dispatchHolderParticipantId))}</div>`:""}</div>`:"";
   const notice=FIELD_READINESS_UI_STATE.lastNotice?`<div class="field-readiness-note">${escapeFieldReadinessHTML(FIELD_READINESS_UI_STATE.lastNotice)}</div>`:"";
-  container.innerHTML=`<div class="field-readiness-shell">
-    <div><div class="field-readiness-eyebrow">ACADEMY → GENIN PROMOTION</div><h2 class="field-readiness-title">${escapeFieldReadinessHTML(model.displayName)}</h2></div>
-    <div class="field-readiness-card"><strong>FORMAL MISSION</strong><div class="field-readiness-mission">${escapeFieldReadinessHTML(model.mission)}</div></div>
-    <div><div class="field-readiness-eyebrow">ASSESSMENT SUBJECT</div><div class="field-readiness-row">${candidatesHTML}</div></div>
-    <div class="field-readiness-card"><strong>MISSION STATE</strong><div class="field-readiness-objectives">${objectiveHTML}</div></div>
-    ${resultHTML}${notice}
-    <div class="field-readiness-note">Battle is supporting content only. Examiner readiness evaluation is not exposed as a live scoring checklist.</div>
-    <div class="field-readiness-actions">
-      <button type="button" class="field-readiness-button" onclick="beginFieldReadinessAssessmentFromUI()" ${(!model.selectedOwnedCharacterId||!model.eligibility.eligible||active)?"disabled":""}>BEGIN ASSESSMENT</button>
-      <button type="button" class="field-readiness-button secondary" onclick="leaveFieldReadinessAssessmentUI()">${active?"RETURN TO FIELD":"BACK TO PROMOTION"}</button>
-    </div>
-  </div>`;
+  container.innerHTML=`<div class="field-readiness-shell"><div><div class="field-readiness-eyebrow">ACADEMY → GENIN PROMOTION</div><h2 class="field-readiness-title">${escapeFieldReadinessHTML(model.displayName)}</h2></div><div class="field-readiness-card"><strong>FORMAL MISSION</strong><div class="field-readiness-mission">${escapeFieldReadinessHTML(model.mission)}</div></div><div><div class="field-readiness-eyebrow">ASSESSMENT SUBJECT</div><div class="field-readiness-row">${candidatesHTML}</div></div><div class="field-readiness-card"><strong>MISSION STATE</strong><div class="field-readiness-objectives">${objectiveHTML}</div></div>${fieldHTML}${resultHTML}${notice}<div class="field-readiness-note">Battle is supporting content only. Examiner readiness evaluation is not exposed as a live scoring checklist. This assessment grants no separate Ryo, item, EXP, Stat, PL, Technique, acquisition, or material reward.</div><div class="field-readiness-actions"><button type="button" class="field-readiness-button" onclick="beginFieldReadinessAssessmentFromUI()" ${(!model.selectedOwnedCharacterId||!model.eligibility.eligible||active)?"disabled":""}>BEGIN ASSESSMENT</button>${active&&model.field&&model.field.fieldPhaseResolved?`<button type="button" class="field-readiness-button" onclick="resolveFieldReadinessFieldPhaseIfReady()">SUBMIT ASSESSMENT FOR EVALUATION</button>`:""}${active?`<button type="button" class="field-readiness-button secondary" onclick="withdrawFieldReadinessAssessment()">WITHDRAW</button>`:""}<button type="button" class="field-readiness-button secondary" onclick="leaveFieldReadinessAssessmentUI()">${active?"RETURN TO FIELD":"BACK TO PROMOTION"}</button></div></div>`;
   return true;
 }
 
@@ -7297,13 +7775,8 @@ function openFieldReadinessAssessmentUI(ownedCharacterId=null,{entryRoute=null}=
 // =========================================================
 function leaveFieldReadinessAssessmentUI() {
   const attempt=getFieldReadinessAttempt();
-  if (attempt&&attempt.status==="in_progress") {
-    closeOverlay();
-    return {success:true,destination:"field",attemptId:attempt.attemptId};
-  }
-  if (FIELD_READINESS_UI_STATE.entryRoute==="arena_promotion") {
-    return openArenaPromotionSurface(FIELD_READINESS_UI_STATE.selectedOwnedCharacterId);
-  }
+  if (attempt&&attempt.status==="in_progress") return openFieldReadinessWorldMap();
+  if (FIELD_READINESS_UI_STATE.entryRoute==="arena_promotion") return openArenaPromotionSurface(FIELD_READINESS_UI_STATE.selectedOwnedCharacterId);
   closeOverlay();
   return {success:true,destination:"closed"};
 }
@@ -7322,7 +7795,7 @@ function beginFieldReadinessAssessmentFromUI() {
   const ownedCharacterId=FIELD_READINESS_UI_STATE.selectedOwnedCharacterId;
   if (!ownedCharacterId) return {success:false,reason:"assessment_subject_missing"};
   const result=startAcademyToGeninFieldReadinessAssessment(ownedCharacterId);
-  FIELD_READINESS_UI_STATE.lastNotice=result.success===true?"Assessment started. Continue through authored field/map/story content.":`Assessment unavailable: ${result.reason||"unknown"}.`;
+  FIELD_READINESS_UI_STATE.lastNotice=result.success===true?"Assessment started. The Outer Forest Boundary is now available through the field map or the active field controls.":`Assessment unavailable: ${result.reason||"unknown"}.`;
   const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
   if (container&&currentOverlayType==="field_readiness_assessment") renderFieldReadinessAssessmentOverlay(container);
   return result;
@@ -7342,6 +7815,10 @@ function openArenaMain() {
 }
 
 function openArenaBattleSurface() {
+  if (isGeninRosterTransitionPending()) {
+    openGeninRosterTransitionUI();
+    return {success:false,reason:"genin_roster_transition_required"};
+  }
   return openOverlay("battle");
 }
 
@@ -7500,7 +7977,7 @@ function runAlphaArenaPromotionRouteDiagnostics() {
     noTeamPLOrHiddenScoring:!arenaSource.includes("qualifyingDomains")&&!arenaSource.includes("flexibleDomainCount")&&!arenaSource.includes("Team PL"),
     exactSubjectPassedToAssessment:enterFieldReadinessAssessmentFromPromotion.toString().includes("model.selectedOwnedCharacterId"),
     uncommittedBackToPromotion:leaveFieldReadinessAssessmentUI.toString().includes('entryRoute==="arena_promotion"'),
-    activeAssessmentReturnsToField:leaveFieldReadinessAssessmentUI.toString().includes('attempt.status==="in_progress"')&&leaveFieldReadinessAssessmentUI.toString().includes('destination:"field"'),
+    activeAssessmentReturnsToField:leaveFieldReadinessAssessmentUI.toString().includes('attempt.status==="in_progress"')&&leaveFieldReadinessAssessmentUI.toString().includes('openFieldReadinessWorldMap()'),
     battleReturnSameAssessment:fieldSource.includes("resumeFieldReadinessAssessmentFromBattle")&&resumeFieldReadinessAssessmentFromBattle.toString().includes("attemptId")&&resumeFieldReadinessAssessmentFromBattle.toString().includes('openOverlay("field_readiness_assessment")')
   };
   result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
@@ -7515,9 +7992,12 @@ function runAlphaArenaPromotionRouteDiagnostics() {
 function launchFieldReadinessBattleWithReturnContext(attemptId,{enemyId,encounterId}={}) {
   const attempt=getFieldReadinessAttempt(attemptId);
   if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
-  if (!enemyId||!enemyDatabase[enemyId]) return {success:false,reason:"field_readiness_enemy_authority_missing"};
-  if (!encounterId) return {success:false,reason:"field_readiness_encounter_id_required"};
-  const returnContext={type:"field_readiness_assessment",assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId};
+  const world=ensureFieldReadinessWorldState(attempt);
+  const exact=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.encounter;
+  if (enemyId!==exact.oppositionTemplateId||encounterId!==exact.encounterId) return {success:false,reason:"field_readiness_controlled_opposition_mismatch"};
+  if (!enemyDatabase[enemyId]||Number(enemyDatabase[enemyId].calibratedBasePL||enemyDatabase[enemyId].power)!==21) return {success:false,reason:"field_readiness_scout_authority_missing"};
+  if (world.currentNode!==FIELD_READINESS_ALPHA_NODES.INTERCEPTION||world.pendingBattle!==true) return {success:false,reason:"field_readiness_battle_not_authored_here"};
+  const returnContext={type:"field_readiness_assessment",assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,dispatchHolderParticipantId:world.dispatchHolderParticipantId,dispatchSealState:world.dispatchSealState,fieldEventId:FIELD_READINESS_ALPHA_EVENTS.RETURN_INTERCEPTION};
   const launched=launchBattleWithReturnContext(enemyId,encounterId,returnContext);
   return launched.success?{...launched,assessmentAttemptId:attempt.attemptId}:launched;
 }
@@ -7527,14 +8007,27 @@ function resumeFieldReadinessAssessmentFromBattle(returnContext) {
   const attempt=getFieldReadinessAttempt(returnContext.attemptId);
   if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"field_readiness_attempt_not_active"};
   if (attempt.assessmentId!==returnContext.assessmentId||attempt.assessmentSubjectOwnedCharacterId!==returnContext.assessmentSubjectOwnedCharacterId) return {success:false,reason:"field_readiness_return_context_mismatch"};
+  const world=ensureFieldReadinessWorldState(attempt);
+  if (returnContext.dispatchHolderParticipantId!==world.dispatchHolderParticipantId||returnContext.dispatchSealState!==world.dispatchSealState) return {success:false,reason:"field_readiness_dispatch_return_context_mismatch"};
   const outcome=currentBattle.outcome&&typeof currentBattle.outcome==="object"?currentBattle.outcome:null;
-  attempt.lastBattleReturn={battleId:currentBattle.battleId||null,encounterId:currentBattle.encounterId||null,battleResult:outcome?outcome.type:null,completedAt:outcome&&outcome.completedAt?outcome.completedAt:(currentBattle.completedAt||null),combatEvidenceEnvelopeRecorded:false};
+  const battleResult=outcome?outcome.type:null;
+  const battleOccurrenceId=`${attempt.attemptId}:battle:${currentBattle.battleId||currentBattle.encounterId||"controlled_interceptor"}`;
+  const envelope=recordFieldReadinessCombatEvidenceEnvelope(attempt.attemptId,{assessmentContextId:attempt.assessmentId,battleEncounterId:currentBattle.encounterId||FIELD_READINESS_ALPHA_WORLD_AUTHORITY.encounter.encounterId,participantIds:[attempt.assessmentSubjectOwnedCharacterId,...world.teamOwnedCharacterIds],battleCompleted:true,battleResult,oppositionOutcome:outcome&&outcome.oppositionOutcome||null,committedBattleOccurrenceIds:[battleOccurrenceId],dispatchObjectiveEvents:[],pursuitDisengageOccurrenceIds:[]});
+  attempt.lastBattleReturn={battleId:currentBattle.battleId||null,encounterId:currentBattle.encounterId||null,battleResult,completedAt:outcome&&outcome.completedAt?outcome.completedAt:(currentBattle.completedAt||null),combatEvidenceEnvelopeRecorded:envelope.success===true};
+  world.pendingBattle=false;
+  world.battleEncounterResultRef={battleId:currentBattle.battleId||null,encounterId:currentBattle.encounterId||null,battleResult,occurrenceId:battleOccurrenceId};
+  if (battleResult==="defeat") {
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.SAFETY_ABORT,{battleEncounterId:currentBattle.encounterId||null,battleResult:"team_defeated"});
+    resolveAcademyToGeninFieldReadinessAssessment(attempt.attemptId);
+  } else {
+    world.currentNode=FIELD_READINESS_ALPHA_NODES.POST_BATTLE;
+    world.interceptorContactState="battle_resolved";
+    syncFieldReadinessWorldOpportunityState(attempt,{save:false});
+  }
   currentBattle.returnContext=null;
   FIELD_READINESS_UI_STATE.selectedOwnedCharacterId=attempt.assessmentSubjectOwnedCharacterId;
-  FIELD_READINESS_UI_STATE.lastNotice="Battle concluded. Return to the continuing Field Readiness assessment; Battle outcome alone does not determine Promotion.";
-  savePlayerData();
-  saveTestState();
-  openOverlay("field_readiness_assessment");
+  FIELD_READINESS_UI_STATE.lastNotice=battleResult==="defeat"?"Proctors intervened after team defeat. The assessment has ended without Promotion.":"Battle concluded. The same assessment continues; Battle outcome alone does not determine Promotion.";
+  savePlayerData(); saveTestState(); openOverlay("field_readiness_assessment");
   return {success:true,type:"field_readiness_assessment_resumed",attemptId:attempt.attemptId,battleReturn:cloneProgressionData(attempt.lastBattleReturn)};
 }
 
@@ -7543,25 +8036,20 @@ function resolveAcademyToGeninFieldReadinessAssessment(attemptId) {
   if (!attempt) return {success:false,reason:"assessment_attempt_missing"};
   if (attempt.status!=="in_progress"&&attempt.result) return {success:true,idempotent:true,result:cloneProgressionData(attempt.result)};
   if (attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  const world=ensureFieldReadinessWorldState(attempt);
+  if (world.fieldPhaseResolved!==true&&!(attempt.abort&&attempt.abort.authored===true)) return {success:false,reason:"field_readiness_field_phase_unresolved"};
   const definition=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT;
   const evaluation=evaluateFieldReadinessAttemptAgainstClosedRankContract(attempt);
   const {objectiveCompleted,qualifyingDomains,requiredDomainsSatisfied,flexibleDomainCount:flexibleCount,abortDisqualification,passed}=evaluation;
-  attempt.status=passed?"passed":"failed";
-  attempt.completedAt=Date.now();
+  attempt.status=passed?"passed":"failed"; attempt.completedAt=Date.now();
   const evidenceIds=[...new Set((attempt.evidenceRefs||[]).flatMap(ref=>[ref.evidenceId,ref.occurrenceId]).filter(Boolean))];
-  const result={
-    assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,
-    passed,objectiveCompleted,qualifyingDomains,requiredDomainsSatisfied,flexibleDomainCount:flexibleCount,minimumFlexibleDomains:definition.minimumFlexibleDomains,
-    abortDisqualification,battleMandatory:false,battleResultDoesNotOwnPromotion:true,teamWidePromotion:false,evidenceIds
-  };
+  const result={assessmentId:attempt.assessmentId,attemptId:attempt.attemptId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,passed,objectiveCompleted,qualifyingDomains,requiredDomainsSatisfied,flexibleDomainCount:flexibleCount,minimumFlexibleDomains:definition.minimumFlexibleDomains,abortDisqualification,battleMandatory:false,battleResultDoesNotOwnPromotion:true,teamWidePromotion:false,evidenceIds,noAdditionalFieldReadinessReward:true,fieldPhaseResolutionReason:world.fieldPhaseResolutionReason||null};
   attempt.result=result;
-  const state=getAcademyToGeninAssessmentState();
-  state.activeAttempt=null;
-  appendFieldReadinessHistory({type:"academy_to_genin_assessment_resolved",activity:"promotion_assessment",attemptId:attempt.attemptId,assessmentId:attempt.assessmentId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,completed:true,success:passed,outcome:passed?"passed":"failed",qualifyingDomains:[...qualifyingDomains],objectiveCompleted,abortDisqualification,linkedChronicleEvidenceIds:evidenceIds,timestamp:attempt.completedAt});
-  let promotion=null;
-  if (passed) promotion=recordOwnedCharacterGeninPromotion(attempt.assessmentSubjectOwnedCharacterId,evidenceIds);
+  const state=getAcademyToGeninAssessmentState(); state.activeAttempt=null;
+  appendFieldReadinessHistory({type:"academy_to_genin_assessment_resolved",activity:"promotion_assessment",attemptId:attempt.attemptId,assessmentId:attempt.assessmentId,assessmentSubjectOwnedCharacterId:attempt.assessmentSubjectOwnedCharacterId,completed:true,success:passed,outcome:passed?"passed":"failed",qualifyingDomains:[...qualifyingDomains],objectiveCompleted,abortDisqualification,linkedChronicleEvidenceIds:evidenceIds,rewardPolicy:"no_additional_field_readiness_reward",timestamp:attempt.completedAt});
+  let promotion=null; if (passed) promotion=recordOwnedCharacterGeninPromotion(attempt.assessmentSubjectOwnedCharacterId,evidenceIds);
   savePlayerData();
-  return {success:true,result:cloneProgressionData(result),promotion};
+  return {success:true,result:cloneProgressionData(result),promotion,reward:{ryo:0,items:[],exp:0,stats:0,pl:0,techniques:[],acquisitions:[]}};
 }
 
 function setGeninRosterTransitionAvailableCandidates(variantIds) {
@@ -37992,6 +38480,21 @@ const ENCOUNTER_DATABASE = {
 
 
 
+
+// =========================================================
+// BRICKS 1028–1032 — CONTROLLED INTERCEPTOR BATTLE PACKAGE
+// =========================================================
+ENCOUNTER_DATABASE.enc_field_readiness_interceptor_scout={
+  id:"enc_field_readiness_interceptor_scout",
+  name:"Field Readiness Interceptor",
+  description:"Controlled Field Readiness opposition on the return route.",
+  enemyId:"scout",
+  selectionMode:"deterministic",
+  candidateSet:[{enemyId:"scout",weight:1}],
+  assessmentContextId:"academy_to_genin_field_readiness_assessment",
+  rewardsSuppressed:true
+};
+
 // =========================================================
 // BRICK 912 — ENEMY OCCURRENCE EFFECTIVE-STATE PROJECTION FOUNDATION
 // BRICK 913 — AUTHORED CANDIDATE SET NORMALIZATION
@@ -39944,6 +40447,14 @@ function generateBattleRewards(
 ) {
 
 
+  // BRICK 1033 — Controlled Field Readiness opposition grants no separate
+  // Ryo/EXP/item/material reward. Victory claim lifecycle still receives an
+  // explicit zero-value entitlement so CLAIM != CONTINUE remains intact.
+  if (currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="field_readiness_assessment"&&currentBattle.encounterId===FIELD_READINESS_ALPHA_WORLD_AUTHORITY.encounter.encounterId) {
+    currentBattle.rewards={generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:finishingShinobi?finishingShinobi.name:null,fieldReadinessNoAdditionalReward:true};
+    return currentBattle.rewards;
+  }
+
   // =========================================
   // SAFETY CHECK
   // Never generate the same rewards twice
@@ -40856,6 +41367,13 @@ function openOverlay(type) {
     return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
   }
 
+  // BRICKS 1034–1038 — Promotion recognition does not bypass the mandatory
+  // Genin Roster Transition. Only its owning/resume surfaces remain reachable.
+  if (isGeninRosterTransitionPending()&&!['genin_roster_transition','arena','arena_promotion','field_readiness_assessment'].includes(type)) {
+    openGeninRosterTransitionUI();
+    return {success:false,reason:'genin_roster_transition_required'};
+  }
+
   if (typeof hideStoryScenePresentationLayer === "function") {
     hideStoryScenePresentationLayer({preserveRuntime:true});
   }
@@ -41671,6 +42189,11 @@ function openKonohaExamFromVillage() {
     return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
   }
 
+  if (isGeninRosterTransitionPending()) {
+    openGeninRosterTransitionUI();
+    return {success:false,reason:"genin_roster_transition_required"};
+  }
+
 
   const overlay =
     document.getElementById(
@@ -41728,6 +42251,11 @@ function openKonohaPracticalFromVillage() {
   if (isAcademyTeamFormationJourneyBlockingFreePlay()) {
     openAcademyTeamFormationUI({showChronicleBegins:false});
     return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
+  }
+
+  if (isGeninRosterTransitionPending()) {
+    openGeninRosterTransitionUI();
+    return {success:false,reason:"genin_roster_transition_required"};
   }
 
 
@@ -43234,6 +43762,11 @@ function openRegionHub(regionKey) {
     return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
   }
 
+  if (isGeninRosterTransitionPending()) {
+    openGeninRosterTransitionUI();
+    return {success:false,reason:"genin_roster_transition_required"};
+  }
+
   currentOverlayType = "region";
 
   const region =
@@ -43635,12 +44168,104 @@ function registerAlphaBanditHideoutAuthoredOpportunity() {
 
 registerAlphaBanditHideoutAuthoredOpportunity();
 
+
+// =========================================================
+// BRICKS 1011–1021 — FIELD READINESS WORLD OPPORTUNITY PROJECTION
+// =========================================================
+const FIELD_READINESS_WORLD_OPPORTUNITY_IDS=Object.freeze([
+  "field_readiness_outer_forest_search",
+  "field_readiness_split_pine_fork",
+  "field_readiness_false_trail_contact",
+  "field_readiness_courier_verified",
+  "field_readiness_post_recovery_priority_choice",
+  "field_readiness_return_route",
+  "field_readiness_return_interception",
+  "field_readiness_dispatch_turn_in_committed"
+]);
+
+function getActiveFieldReadinessAttemptForWorld() {
+  const attempt=getFieldReadinessAttempt();
+  return attempt&&attempt.status==="in_progress"?attempt:null;
+}
+
+function isFieldReadinessWorldNode(...nodes) {
+  const attempt=getActiveFieldReadinessAttemptForWorld();
+  if (!attempt) return false;
+  return nodes.includes(ensureFieldReadinessWorldState(attempt).currentNode);
+}
+
+function registerAlphaFieldReadinessWorldOpportunities() {
+  const icon="Icons/Mission.png";
+  const activeAttempt=()=>getActiveFieldReadinessAttemptForWorld();
+  const commit=(eventId,payload={})=>{const attempt=activeAttempt();return attempt?commitFieldReadinessAuthoredEvent(attempt.attemptId,eventId,payload):{success:false,reason:"assessment_attempt_not_active"};};
+  const action=(id,label,eventId,payload={},available=null)=>({id,label,kind:"custom",evaluateAvailability:available||(()=>({available:true})),resolve:()=>commit(eventId,payload)});
+  const defs=[
+    {opportunityId:"field_readiness_outer_forest_search",hotspotId:"hotspot_field_readiness_outer_forest",label:"Outer Forest Boundary",summary:"Begin the courier search at the Outer Forest Boundary.",anchor:{x:42,y:48},nodes:[FIELD_READINESS_ALPHA_NODES.BRIEFING],actions:[action("enter_outer_forest","ENTER SEARCH AREA",FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH)]},
+    {opportunityId:"field_readiness_split_pine_fork",hotspotId:"hotspot_field_readiness_split_pine",label:"Split-Pine Fork",summary:"Ambiguous trail evidence branches through the assessment search area.",anchor:{x:34,y:58},nodes:[FIELD_READINESS_ALPHA_NODES.SPLIT_PINE],actions:[
+      action("inspect_obvious","INSPECT OBVIOUS TRAIL",FIELD_READINESS_ALPHA_EVENTS.INSPECT_OBVIOUS),
+      action("inspect_secondary","INSPECT SECONDARY TRACE",FIELD_READINESS_ALPHA_EVENTS.INSPECT_SECONDARY),
+      action("split_search","SPLIT SEARCH ROLES",FIELD_READINESS_ALPHA_EVENTS.SPLIT_SEARCH),
+      action("follow_obvious","FOLLOW OBVIOUS TRAIL",FIELD_READINESS_ALPHA_EVENTS.FALSE_TRAIL_CONTACT,{},()=>{const a=activeAttempt();return {available:!!(a&&ensureFieldReadinessWorldState(a).discoveredClueIds.includes(FIELD_READINESS_ALPHA_WORLD_AUTHORITY.clues.obviousBootprints))};}),
+      action("follow_authentic","FOLLOW AUTHENTIC ROUTE",FIELD_READINESS_ALPHA_EVENTS.AUTHENTIC_TRAIL,{},()=>{const a=activeAttempt();return {available:!!(a&&ensureFieldReadinessWorldState(a).authenticTrailIdentified===true)};})
+    ]},
+    {opportunityId:"field_readiness_false_trail_contact",hotspotId:"hotspot_field_readiness_decoy_cut",label:"Possible Courier",summary:"A possible courier contact waits down the obvious trail.",anchor:{x:27,y:61},nodes:[FIELD_READINESS_ALPHA_NODES.DECOY],actions:[
+      action("verify_decoy","OBSERVE / VERIFY",FIELD_READINESS_ALPHA_EVENTS.DECOY_REJECTED),
+      action("follow_decoy","FOLLOW",FIELD_READINESS_ALPHA_EVENTS.DECOY_DEAD_END),
+      {id:"return_search",label:"RETURN TO SEARCH",kind:"custom",resolve:()=>{const a=activeAttempt();if(!a)return {success:false,reason:"assessment_attempt_not_active"};const w=ensureFieldReadinessWorldState(a);w.currentNode=FIELD_READINESS_ALPHA_NODES.SPLIT_PINE;w.currentSpatialAuthorityId=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.sites.splitPineFork;syncFieldReadinessWorldOpportunityState(a,{save:false});savePlayerData();return {success:true,type:"field_navigation"};}}
+    ]},
+    {opportunityId:"field_readiness_courier_verified",hotspotId:"hotspot_field_readiness_courier_cover",label:"Courier Cover Site",summary:"The authentic trail leads toward the courier's cover site.",anchor:{x:54,y:63},nodes:[FIELD_READINESS_ALPHA_NODES.AUTHENTIC_TRAIL,FIELD_READINESS_ALPHA_NODES.COURIER],actions:[
+      action("verify_courier","VERIFY COURIER",FIELD_READINESS_ALPHA_EVENTS.COURIER_VERIFIED,{},()=>({available:isFieldReadinessWorldNode(FIELD_READINESS_ALPHA_NODES.AUTHENTIC_TRAIL)})),
+      {id:"open_dispatch_handoff",label:"RECOVER SEALED DISPATCH",kind:"custom",evaluateAvailability:()=>({available:isFieldReadinessWorldNode(FIELD_READINESS_ALPHA_NODES.COURIER)}),resolve:()=>openFieldReadinessAssessmentUI(null,{entryRoute:"field_map"})}
+    ]},
+    {opportunityId:"field_readiness_post_recovery_priority_choice",hotspotId:"hotspot_field_readiness_post_recovery",label:"Dispatch Secured",summary:"Decide whether to extract immediately or investigate the source of pressure on the courier.",anchor:{x:60,y:56},nodes:[FIELD_READINESS_ALPHA_NODES.POST_RECOVERY],actions:[
+      action("return_now","RETURN TO EXAMINER NOW",FIELD_READINESS_ALPHA_EVENTS.POST_RECOVERY_PRIORITY,{choice:"return_now"}),
+      action("search_pressure","SEARCH FOR PRESSURE SOURCE",FIELD_READINESS_ALPHA_EVENTS.POST_RECOVERY_PRIORITY,{choice:"search_pressure_source"})
+    ]},
+    {opportunityId:"field_readiness_return_route",hotspotId:"hotspot_field_readiness_return_route",label:"Return Route",summary:"Choose how the team will return the sealed dispatch to the examiner.",anchor:{x:52,y:42},nodes:[FIELD_READINESS_ALPHA_NODES.RETURN_ROUTE],actions:[
+      action("covered","COVERED RETURN",FIELD_READINESS_ALPHA_EVENTS.RETURN_ROUTE,{route:"covered"}),
+      action("direct","DIRECT RETURN",FIELD_READINESS_ALPHA_EVENTS.RETURN_ROUTE,{route:"direct"}),
+      action("screened","SCREENED RETURN",FIELD_READINESS_ALPHA_EVENTS.RETURN_ROUTE,{route:"screened"})
+    ]},
+    {opportunityId:"field_readiness_return_interception",hotspotId:"hotspot_field_readiness_return_interception",label:"Controlled Interception",summary:"An Assessment Interceptor pressures the route while the team carries the dispatch.",anchor:{x:48,y:35},nodes:[FIELD_READINESS_ALPHA_NODES.INTERCEPTION,FIELD_READINESS_ALPHA_NODES.POST_BATTLE],family:"Known Threat",actions:[
+      {id:"break_contact",label:"BREAK CONTACT",kind:"custom",evaluateAvailability:()=>({available:isFieldReadinessWorldNode(FIELD_READINESS_ALPHA_NODES.INTERCEPTION)}),resolve:()=>commit(FIELD_READINESS_ALPHA_EVENTS.RETURN_INTERCEPTION,{choice:"break_contact"})},
+      {id:"engage",label:"ENGAGE",kind:"custom",evaluateAvailability:()=>({available:isFieldReadinessWorldNode(FIELD_READINESS_ALPHA_NODES.INTERCEPTION)}),resolve:()=>{const a=activeAttempt();if(!a)return {success:false,reason:"assessment_attempt_not_active"};const c=commitFieldReadinessAuthoredEvent(a.attemptId,FIELD_READINESS_ALPHA_EVENTS.RETURN_INTERCEPTION,{choice:"engage"});return c.success?launchFieldReadinessBattleWithReturnContext(a.attemptId,{enemyId:"scout",encounterId:FIELD_READINESS_ALPHA_WORLD_AUTHORITY.encounter.encounterId}):c;}},
+      {id:"post_battle",label:"CONTINUE EXTRACTION DECISION",kind:"custom",evaluateAvailability:()=>({available:isFieldReadinessWorldNode(FIELD_READINESS_ALPHA_NODES.POST_BATTLE)}),resolve:()=>openFieldReadinessAssessmentUI(null,{entryRoute:"field_map"})}
+    ]},
+    {opportunityId:"field_readiness_dispatch_turn_in_committed",hotspotId:"hotspot_field_readiness_examiner_return",label:"Field Readiness Examiner",summary:"Return the still-sealed field dispatch to the examiner.",anchor:{x:50,y:18},nodes:[FIELD_READINESS_ALPHA_NODES.EXAMINER],actions:[action("return_dispatch","RETURN SEALED DISPATCH",FIELD_READINESS_ALPHA_EVENTS.DISPATCH_TURN_IN)]}
+  ];
+  defs.forEach(def=>registerWorldEventOpportunity({opportunityId:def.opportunityId,hotspotId:def.hotspotId,eventId:def.opportunityId,locationId:"konohagakure",regionKey:"fire",sourceKind:"story",randomPoolEligible:false,defaultDiscoveryLevel:"undiscovered",presentation:{family:def.family||"Chronicle Event",label:def.label,summary:def.summary,icon,showUnknownMarker:false},anchor:def.anchor,evaluateProjection:()=>def.nodes.some(node=>isFieldReadinessWorldNode(node)),interactions:def.actions}));
+  return {success:true,count:defs.length};
+}
+registerAlphaFieldReadinessWorldOpportunities();
+
+function syncFieldReadinessWorldOpportunityState(attempt,{save=true}={}) {
+  FIELD_READINESS_WORLD_OPPORTUNITY_IDS.forEach(id=>{
+    const definition=getRegisteredWorldEventOpportunity(id);
+    const projectable=!!(attempt&&attempt.status==="in_progress"&&definition&&typeof definition.evaluateProjection==="function"&&definition.evaluateProjection());
+    setWorldEventLifecycle(id,{projectable},{save:false});
+    setOpportunityDiscovery(id,{level:projectable?"discovered":"undiscovered"},{save:false});
+    setOpportunityTracking(id,{tracked:projectable,leadState:projectable?"active_assessment":null,mandatory:projectable},{save:false});
+  });
+  if (save) savePlayerData();
+  return true;
+}
+
+function openFieldReadinessWorldMap() {
+  const attempt=getFieldReadinessAttempt();
+  if (!attempt||attempt.status!=="in_progress") return {success:false,reason:"assessment_attempt_not_active"};
+  syncFieldReadinessWorldOpportunityState(attempt,{save:false});
+  closeOverlay();
+  openRegionHub("fire");
+  return {success:true,destination:"fire_region_map",attemptId:attempt.attemptId,currentNode:ensureFieldReadinessWorldState(attempt).currentNode};
+}
+
 function getOpportunityDiscoveryLevel(definition) {
   const state=getWorldEventDimensionState("observerDiscoveryByOpportunityId",definition.opportunityId);
   return String(state.level||definition.defaultDiscoveryLevel||"undiscovered");
 }
 
 function shouldProjectOpportunityForObserver(definition) {
+  if (definition&&typeof definition.evaluateProjection==="function"&&definition.evaluateProjection()!==true) return false;
   const discoveryLevel=getOpportunityDiscoveryLevel(definition);
   const worldState=definition.eventId?getWorldEventDimensionState("worldLifecycleByEventId",definition.eventId):{};
   if (worldState.projectable===false) return false;
@@ -46977,7 +47602,7 @@ function runAlphaFieldReadinessPresentationDiagnostics() {
     imperfectEvidenceCanStillPass:passingEvaluation.passed===true&&passingEvaluation.qualifyingDomains.length===4&&passingEvaluation.qualifyingDomains.length<ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.readinessDomains.length,
     exactSubjectMutationAuthority:recordOwnedCharacterGeninPromotion.toString().includes("ownedCharacterId")&&resolveAcademyToGeninFieldReadinessAssessment.toString().includes("attempt.assessmentSubjectOwnedCharacterId"),
     battleReturnSameAssessment:resumeBattleCallerAfterCompletion.toString().includes('returnContext.type==="field_readiness_assessment"')&&resumeFieldReadinessAssessmentFromBattle.toString().includes("attemptId"),
-    combatEnvelopeStillSeparate:resumeFieldReadinessAssessmentFromBattle.toString().includes("combatEvidenceEnvelopeRecorded:false")&&recordFieldReadinessCombatEvidenceEnvelope.toString().includes("promotionResult:null")
+    combatEnvelopeStillSeparate:resumeFieldReadinessAssessmentFromBattle.toString().includes("recordFieldReadinessCombatEvidenceEnvelope")&&resumeFieldReadinessAssessmentFromBattle.toString().includes("combatEvidenceEnvelopeRecorded:envelope.success===true")&&recordFieldReadinessCombatEvidenceEnvelope.toString().includes("promotionResult:null")&&!resumeFieldReadinessAssessmentFromBattle.toString().includes("recordOwnedCharacterGeninPromotion")
   };
   result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
 }
@@ -87680,6 +88305,230 @@ function runAlphaPost964IntegrationDiagnostics() {
     browserGoldenStatus:pass?"GREEN":"CHECK"
   };
   console.log(`SC Alpha post-964 integration gate: ${pass?"PASS":"FAIL"} / Academy Team Formation=${result.academyTeamFormationPresentationStatus} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Field content=${result.fieldContentOrchestrationStatus} / Browser Golden=${result.browserGoldenStatus}`);
+  return result;
+}
+
+// =========================================================
+// BRICKS 1039–1043 — FINAL 116 ADMISSION READINESS / FAIL-CLOSED GATE
+// =========================================================
+function getFinal116AdmissionReadinessSnapshot() {
+  const contract=FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT;
+  const requiredIds=[...(contract.characterIds||[]),...(contract.entityIds||[])];
+  return {
+    liveCharacterCount:ALPHA_PRODUCTION_CHARACTER_IDS.length,
+    liveEntityCount:ALPHA_PRODUCTION_ENTITY_IDS.length,
+    liveTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length,
+    targetCharacterCount:contract.targetCharacterCount,targetEntityCount:contract.targetEntityCount,targetTotal:contract.targetTotal,
+    requiredIds,partialAdmissionAllowed:false,admissionAuthorized:false,authorityStatus:"external_asset_projection_required",
+    blockers:[
+      {id:"collectible_card_projection_active",owner:"Assets / Registry",resolved:false},
+      {id:"ui_portrait_assets_approved",owner:"Character Creation / Assets",resolved:false},
+      {id:"ui_portrait_projection_active",owner:"Assets / Registry",resolved:false},
+      {id:"registry_projection_ratified",owner:"PL / Registry / Rank",resolved:false}
+    ]
+  };
+}
+function runAlphaFinal116AdmissionReadinessDiagnostics() {
+  const snapshot=getFinal116AdmissionReadinessSnapshot();
+  const liveIds=[...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+  const expected=["chunin_iruka","sj_anko","chunin_fugaku","chunin_itama","genin_mikoto","genin_orochimaru","akatsuki_kakuzu","sj_kiba","sj_nono","sannin_tenten","sannin_hinata","sannin_sumire","kurama_resonance_himawari","nue"];
+  const result={
+    liveGateRemains102:snapshot.liveCharacterCount===85&&snapshot.liveEntityCount===17&&snapshot.liveTotal===102,
+    exactFinalWave14:snapshot.requiredIds.length===14&&new Set(snapshot.requiredIds).size===14&&expected.every(id=>snapshot.requiredIds.includes(id)),
+    destination116:snapshot.targetCharacterCount===98&&snapshot.targetEntityCount===18&&snapshot.targetTotal===116,
+    noPartialAdmission:snapshot.partialAdmissionAllowed===false&&FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.partialAdmissionAllowed===false,
+    noWaitingIdentityLive:snapshot.requiredIds.every(id=>!liveIds.includes(id)),
+    portraitAuthorityStillLive102:Object.keys(UI_PORTRAIT_MANIFEST).length===102&&snapshot.requiredIds.every(id=>!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id)),
+    exactKibaIdOnly:snapshot.requiredIds.includes("sj_kiba")&&!snapshot.requiredIds.includes("s_jkiba"),
+    himawariInsideFinal116:snapshot.requiredIds.includes("kurama_resonance_himawari"),
+    admissionFailsClosed:snapshot.admissionAuthorized===false&&snapshot.authorityStatus==="external_asset_projection_required"&&snapshot.blockers.length===4&&snapshot.blockers.every(item=>item.resolved===false)
+  };
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+
+// =========================================================
+// BRICKS 1044–1049 — RUNNABLE FIELD READINESS GOLDEN / CUMULATIVE GATE
+// =========================================================
+function createAlphaFieldReadinessGoldenFixture() {
+  return {subjectVariantId:"academy_obito",teammateVariantIds:["academy_kakashi","academy_kurenai"]};
+}
+
+function prepareAlphaFieldReadinessGoldenState() {
+  const fixture=createAlphaFieldReadinessGoldenFixture();
+  const state=ensurePlayerAcquisitionState();
+  playerData.characterOwnership={ownedRegistryIds:[fixture.subjectVariantId,...fixture.teammateVariantIds]};
+  setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+  state.records=[];state.processedRecordKeys=[];state.ownedCharactersByVariantId={};
+  [fixture.subjectVariantId,...fixture.teammateVariantIds].forEach(id=>ensureOwnedCharacterRecord(state,id));
+  const subject=state.ownedCharactersByVariantId[fixture.subjectVariantId];
+  state.chronicleOriginVariantId=fixture.subjectVariantId;state.chronicleOriginOwnedCharacterId=subject.ownedCharacterId;
+  state.chronicleOrigin={variantId:fixture.subjectVariantId,ownedCharacterId:subject.ownedCharacterId,prologueCompleted:true,completionEvidenceIds:["golden_origin"],activeKonohaEntered:true,activeKonohaEnteredAt:1,activeKonohaEntryBoundaryId:getActiveKonohaEntryBoundaryId(fixture.subjectVariantId)};
+  const teamVariants=[fixture.subjectVariantId,...fixture.teammateVariantIds];
+  state.academyTeamFormation={unlocked:true,required:false,completed:true,selectedTeammateIds:[...fixture.teammateVariantIds],eligibleCandidateVariantIds:getAcademyTeamFormationEligibleCandidateVariantIds(fixture.subjectVariantId),completedAt:1,confirmationReceipt:{commitId:"golden_team",originVariantId:fixture.subjectVariantId,selectedTeammateIds:[...fixture.teammateVariantIds],teamVariantIds:teamVariants,teamRuntimeIds:[],acquisitionRecordIds:[],committedAt:1},continuationCompleted:true,continuedAt:1};
+  state.onboardingStatus="academy_free_play";state.formalRankProgressionByOwnedCharacterId={};state.academyToGeninAssessment={sequence:0,activeAttempt:null,attempts:[]};state.geninRosterTransition=createDefaultAcquisitionState().geninRosterTransition;
+  savePlayerData();
+  return {fixture,state,subjectOwnedCharacterId:subject.ownedCharacterId};
+}
+
+function runAlphaFieldReadinessRunnableWorldGoldenDiagnostics() {
+  const rollback=cloneProgressionData(playerData);const raw=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;const results={};
+  try {
+    const prepared=prepareAlphaFieldReadinessGoldenState();
+    const started=startAcademyToGeninFieldReadinessAssessment(prepared.subjectOwnedCharacterId);const attempt=getFieldReadinessAttempt();const world=ensureFieldReadinessWorldState(attempt);
+    results.exactAuthorityIds=FIELD_READINESS_ALPHA_WORLD_AUTHORITY.participants.examiner.sourceId==="field_readiness_examiner"&&FIELD_READINESS_ALPHA_WORLD_AUTHORITY.participants.courier.sourceId==="field_readiness_field_courier"&&FIELD_READINESS_ALPHA_WORLD_AUTHORITY.dispatch.sourceId==="field_readiness_sealed_dispatch";
+    results.startCreatesOccurrenceLocalState=started.success===true&&world.dispatchInstanceId.endsWith(attempt.attemptId)&&world.dispatchHolderParticipantId.includes("field_readiness_field_courier")&&world.dispatchSealState==="sealed";
+    results.startingKnowledgePresent=world.knownFactIds.includes("field_readiness_knowledge_blue_braided_seal_cord");
+    const illegalObjective=addFieldReadinessEvidence(attempt.attemptId,{objectiveStep:"courier_located",occurrenceId:"illegal_direct_occurrence",evidenceId:"illegal_direct",source:"world_authored_field_readiness"});
+    results.objectiveDirectSetterClosed=illegalObjective.success===false&&illegalObjective.reason==="field_readiness_objective_requires_authored_occurrence"&&attempt.objectives.courier_located===false;
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.INSPECT_SECONDARY);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.AUTHENTIC_TRAIL);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.COURIER_VERIFIED);
+    results.courierOnlyExactSetter=attempt.objectives.courier_located===true&&FIELD_READINESS_OBJECTIVE_EVENT_AUTHORITY.courier_located===FIELD_READINESS_ALPHA_EVENTS.COURIER_VERIFIED;
+    const holder=world.teamOwnedCharacterIds[0];
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.DISPATCH_HANDOFF,{holderOwnedCharacterId:holder});
+    results.dispatchRecoveredCausal=attempt.objectives.sealed_dispatch_recovered===true&&world.dispatchHolderParticipantId===holder;
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.POST_RECOVERY_PRIORITY,{choice:"return_now"});
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.RETURN_ROUTE,{route:"covered"});
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.DISPATCH_TURN_IN);
+    results.noBattleRouteCompletesObjectives=ACADEMY_TO_GENIN_FIELD_READINESS_ASSESSMENT.objectiveSteps.every(step=>attempt.objectives[step]===true)&&!(attempt.combatEvidenceEnvelopes||[]).length;
+    results.noBattleRouteHasFourDomains=evaluateFieldReadinessAttemptAgainstClosedRankContract(attempt).qualifyingDomains.length>=4;
+    const resolution=resolveFieldReadinessFieldPhaseIfReady();
+    results.noBattleRouteCanPass=resolution.success===true&&resolution.result&&resolution.result.passed===true;
+    results.noAdditionalReward=resolution.result.noAdditionalFieldReadinessReward===true&&resolution.reward.ryo===0&&resolution.reward.items.length===0&&resolution.reward.exp===0;
+    results.exactSubjectPromoted=getOwnedCharacterFormalRank(prepared.subjectOwnedCharacterId)==="genin";
+    results.geninTransitionSeparate=isGeninRosterTransitionPending()===true;
+    results.worldOpportunitiesExact=FIELD_READINESS_WORLD_OPPORTUNITY_IDS.length===8&&FIELD_READINESS_WORLD_OPPORTUNITY_IDS.every(id=>!!getRegisteredWorldEventOpportunity(id));
+    results.decoyBattleRetired=!Object.prototype.hasOwnProperty.call(ENCOUNTER_DATABASE,"enc_field_readiness_false_trail_courier");
+    results.controlledScoutExact=ENCOUNTER_DATABASE.enc_field_readiness_interceptor_scout.enemyId==="scout"&&Number(enemyDatabase.scout.calibratedBasePL||enemyDatabase.scout.power)===21;
+    results.pass=Object.values(results).every(value=>value===true);
+  } finally {
+    playerData=rollback;setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());hydrateOwnedProductionRuntimeCharacters(playerData.characterOwnership);
+    if (typeof localStorage!=="undefined") {if (raw===null)localStorage.removeItem(PLAYER_SAVE_KEY);else localStorage.setItem(PLAYER_SAVE_KEY,raw);} activityHistory=Array.isArray(playerData.activityHistory)?playerData.activityHistory:activityHistory;
+  }
+  console.table(results);return results;
+}
+
+function runAlphaFieldReadinessBranchGoldenDiagnostics() {
+  const rollback=cloneProgressionData(playerData);
+  const raw=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const playerTeamBefore=Array.isArray(playerTeam)?[...playerTeam]:[];
+  const activityHistoryBefore=typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)?cloneProgressionData({items:activityHistory}).items:null;
+  const currentBattleBefore=cloneBattleRuntimeValue(currentBattle);
+  const selectedEnemyBefore=selectedEnemy;
+  const overlayBefore=currentOverlayType;
+  const result={};
+  const fresh=()=>{
+    const prepared=prepareAlphaFieldReadinessGoldenState();
+    hydrateOwnedProductionRuntimeCharacters(playerData.characterOwnership);
+    const variants=[prepared.fixture.subjectVariantId,...prepared.fixture.teammateVariantIds];
+    const ids=variants.map(id=>materializeProductionRuntimeCharacter(id).id);
+    playerData.clan=normalizeClanManagementState({teamSlots:[ids[0],ids[1],ids[2],null,null,null],favoriteIds:[]},playerData.characterOwnership);
+    savePlayerData();
+    return prepared;
+  };
+  const pathToDispatch=prepared=>{
+    const started=startAcademyToGeninFieldReadinessAssessment(prepared.subjectOwnedCharacterId);
+    const attempt=getFieldReadinessAttempt();
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.INSPECT_SECONDARY);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.AUTHENTIC_TRAIL);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.COURIER_VERIFIED);
+    const world=ensureFieldReadinessWorldState(attempt);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.DISPATCH_HANDOFF,{holderOwnedCharacterId:world.teamOwnedCharacterIds[0]});
+    return {started,attempt,world};
+  };
+  try {
+    let prepared=fresh();
+    startAcademyToGeninFieldReadinessAssessment(prepared.subjectOwnedCharacterId);
+    let attempt=getFieldReadinessAttempt();
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.INSPECT_OBVIOUS);
+    const decoy=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.FALSE_TRAIL_CONTACT);
+    const courierBefore=attempt.objectives.courier_located;
+    const rejected=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.DECOY_REJECTED);
+    let world=ensureFieldReadinessWorldState(attempt);
+    result.decoyIsNonBattleAndCannotSetCourier=decoy.success===true&&courierBefore===false&&rejected.success===true&&world.decoyState==="assessment_decoy_revealed"&&world.currentNode===FIELD_READINESS_ALPHA_NODES.SPLIT_PINE&&!Object.prototype.hasOwnProperty.call(ENCOUNTER_DATABASE,"enc_field_readiness_false_trail_courier");
+
+    prepared=fresh();({attempt,world}=pathToDispatch(prepared));
+    const firstHolder=world.dispatchHolderParticipantId;
+    const alternate=world.teamOwnedCharacterIds.find(id=>id!==firstHolder);
+    const handoff1=transferFieldReadinessDispatchHolder(alternate,{underPressure:true});
+    const backHolder=world.teamOwnedCharacterIds.find(id=>id!==alternate);
+    const handoff2=transferFieldReadinessDispatchHolder(backHolder,{underPressure:true});
+    const holderOccurrences=world.occurrenceRefs.filter(item=>item.eventId===FIELD_READINESS_ALPHA_EVENTS.HOLDER_HANDOFF);
+    result.repeatableHolderHandoffsPreserveOneDispatch=handoff1.success===true&&handoff2.success===true&&holderOccurrences.length===2&&new Set(holderOccurrences.map(item=>item.occurrenceId)).size===2&&world.dispatchInstanceId===`${FIELD_READINESS_ALPHA_WORLD_AUTHORITY.dispatch.sourceId}:${attempt.attemptId}`;
+    const unseal=deliberatelyUnsealFieldReadinessDispatch();
+    result.deliberateUnsealFailsWithoutRankMutation=unseal.success===true&&attempt.status==="failed"&&attempt.abort&&attempt.abort.reason==="deliberate_unsealing"&&ensureFieldReadinessWorldState(attempt).dispatchSealState==="opened_by_candidate"&&getOwnedCharacterFormalRank(prepared.subjectOwnedCharacterId)==="academy"&&!isGeninRosterTransitionPending();
+
+    prepared=fresh();startAcademyToGeninFieldReadinessAssessment(prepared.subjectOwnedCharacterId);attempt=getFieldReadinessAttempt();
+    const firstAttemptId=attempt.attemptId;
+    const withdrew=withdrawFieldReadinessAssessment();
+    const retry=startAcademyToGeninFieldReadinessAssessment(prepared.subjectOwnedCharacterId);
+    result.withdrawalAllowsImmediateNewAttempt=withdrew.success===true&&attempt.status==="failed"&&retry.success===true&&retry.attempt.attemptId!==firstAttemptId&&getAcademyToGeninAssessmentState().attempts.length===2;
+
+    prepared=fresh();startAcademyToGeninFieldReadinessAssessment(prepared.subjectOwnedCharacterId);attempt=getFieldReadinessAttempt();
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.INSPECT_SECONDARY);
+    const activeAttemptId=attempt.attemptId;savePlayerData();
+    playerData=loadPlayerData();setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    attempt=getFieldReadinessAttempt();world=ensureFieldReadinessWorldState(attempt);
+    result.reloadPreservesAttemptCluesAndDispatch=attempt.attemptId===activeAttemptId&&world.discoveredClueIds.includes(FIELD_READINESS_ALPHA_WORLD_AUTHORITY.clues.blueSealCord)&&world.authenticTrailIdentified===true&&world.dispatchSealState==="sealed";
+
+    prepared=fresh();({attempt,world}=pathToDispatch(prepared));
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.POST_RECOVERY_PRIORITY,{choice:"return_now"});
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.RETURN_ROUTE,{route:"direct"});
+    const contacted=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.RETURN_INTERCEPTION,{choice:"engage"});
+    const launched=launchFieldReadinessBattleWithReturnContext(attempt.attemptId,{enemyId:"scout",encounterId:FIELD_READINESS_ALPHA_WORLD_AUTHORITY.encounter.encounterId});
+    const returnContext=cloneBattleRuntimeValue(currentBattle.returnContext);
+    const reward=generateBattleRewards(enemyDatabase.scout,getPlayerCharacter(currentBattle.characterId));
+    const rankBeforeReturn=getOwnedCharacterFormalRank(prepared.subjectOwnedCharacterId);
+    currentBattle.outcome={type:"victory",oppositionOutcome:"repelled",completedAt:Date.now()};currentBattle.completedAt=currentBattle.outcome.completedAt;
+    const resumed=resumeFieldReadinessAssessmentFromBattle(returnContext);
+    attempt=getFieldReadinessAttempt(attempt.attemptId);world=ensureFieldReadinessWorldState(attempt);
+    const postBattle=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.THREAT_BREAKAWAY,{choice:"return_with_dispatch"});
+    const turnedIn=commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.DISPATCH_TURN_IN);
+    const resolved=resolveFieldReadinessFieldPhaseIfReady();
+    result.controlledBattleReturnsSameAttemptAndNoReward=contacted.success===true&&launched.success===true&&rankBeforeReturn==="academy"&&reward.fieldReadinessNoAdditionalReward===true&&reward.ryo===0&&reward.exp===0&&reward.items.length===0&&resumed.success===true&&resumed.attemptId===attempt.attemptId&&world.battleEncounterResultRef&&world.battleEncounterResultRef.battleResult==="victory"&&Array.isArray(attempt.combatEvidenceEnvelopes)&&attempt.combatEvidenceEnvelopes.length===1&&postBattle.success===true&&turnedIn.success===true&&resolved.success===true&&resolved.result.passed===true&&getOwnedCharacterFormalRank(prepared.subjectOwnedCharacterId)==="genin";
+    result.pass=Object.values(result).every(value=>value===true);
+  } finally {
+    playerData=rollback;setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (Array.isArray(playerTeam)) playerTeam.splice(0,playerTeam.length,...playerTeamBefore);
+    if (activityHistoryBefore&&typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) activityHistory.splice(0,activityHistory.length,...activityHistoryBefore);
+    currentBattle=currentBattleBefore;selectedEnemy=selectedEnemyBefore;currentOverlayType=overlayBefore;
+    if (typeof localStorage!=="undefined") {if(raw===null)localStorage.removeItem(PLAYER_SAVE_KEY);else localStorage.setItem(PLAYER_SAVE_KEY,raw);}
+  }
+  console.table(result);return result;
+}
+
+function runAlphaFieldReadinessPersistenceContractDiagnostics() {
+  const source=[createFieldReadinessWorldState,ensureFieldReadinessWorldState,appendFieldReadinessWorldOccurrence,commitFieldReadinessAuthoredEvent,resumeFieldReadinessAssessmentFromBattle,resolveAcademyToGeninFieldReadinessAssessment].map(fn=>fn.toString()).join("\n");
+  const result={attemptLocalParticipants:source.includes("participantRefs"),dispatchIdentityStable:source.includes("dispatchSourceId")&&source.includes("dispatchInstanceId"),holderPersists:source.includes("dispatchHolderParticipantId"),sealPersists:source.includes("dispatchSealState"),cluesPersist:source.includes("discoveredClueIds"),routeDecisionsPersist:source.includes("routeDecisions"),occurrenceDedupe:appendFieldReadinessWorldOccurrence.toString().includes("occurrenceId")&&appendFieldReadinessWorldOccurrence.toString().includes("existing"),sameAttemptBattleReturn:resumeFieldReadinessAssessmentFromBattle.toString().includes("returnContext.attemptId"),noRewardContract:resolveAcademyToGeninFieldReadinessAssessment.toString().includes("noAdditionalFieldReadinessReward")};
+  result.pass=Object.values(result).every(value=>value===true);console.table(result);return result;
+}
+
+function runAlphaPost1049IntegrationDiagnostics() {
+  const post964=runAlphaPost964IntegrationDiagnostics();
+  const runnableField=runAlphaFieldReadinessRunnableWorldGoldenDiagnostics();
+  const branchGolden=runAlphaFieldReadinessBranchGoldenDiagnostics();
+  const persistence=runAlphaFieldReadinessPersistenceContractDiagnostics();
+  const final116Readiness=runAlphaFinal116AdmissionReadinessDiagnostics();
+  const routeSource=[openOverlay,routeWorldOpportunityInteraction].map(fn=>fn.toString()).join("\n");
+  const progressionGate={
+    geninTransitionBlocksOrdinaryOverlay:openOverlay.toString().includes("genin_roster_transition_required"),
+    arenaBattleDirectGuard:openArenaBattleSurface.toString().includes("genin_roster_transition_required"),
+    examDirectGuard:openKonohaExamFromVillage.toString().includes("genin_roster_transition_required"),
+    practicalDirectGuard:openKonohaPracticalFromVillage.toString().includes("genin_roster_transition_required"),
+    regionDirectGuard:openRegionHub.toString().includes("genin_roster_transition_required"),
+    worldStillHasTransitionGuard:routeWorldOpportunityInteraction.toString().includes("isGeninRosterTransitionPending"),
+    pass:true
+  };
+  progressionGate.pass=Object.entries(progressionGate).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  const groups={post964,runnableField,branchGolden,persistence,final116Readiness,progressionGate};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={groups,pass,combatFreezePreserved:post964&&post964.combatFreezePreserved===true,liveProductionGateExpected:102,awaitingPlacementDestination:116,nextImplementedBrick:1049,final116AdmissionStatus:"external_asset_projection_required",fieldContentOrchestrationStatus:pass?"implemented_runtime_validation_green":"implemented_runtime_check",fieldReadinessRewardPolicy:"no_additional_field_readiness_reward",browserGoldenStatus:pass?"GREEN":"CHECK"};
+  console.log(`SC Alpha post-1049 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / Field Readiness=${result.fieldContentOrchestrationStatus} / Browser Golden=${result.browserGoldenStatus}`);
   return result;
 }
 
