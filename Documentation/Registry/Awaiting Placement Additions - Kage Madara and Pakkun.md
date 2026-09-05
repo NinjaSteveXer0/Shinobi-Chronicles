@@ -1,14 +1,14 @@
 # Shinobi Chronicles — Awaiting Placement Additions: Kage Madara + Pakkun
 
-**Status:** PL / Registry / Rank calibration authority; Combat semantics and Assets admission pending  
+**Status:** PL / Registry / Rank calibration authority; Kage Madara representation superseded 2026-09-05; Combat semantics and Assets admission pending  
 **Date:** 2026-09-05
 
-This document registers and calibrates two new awaiting-placement production candidates supplied by Character Creation:
+This document registers and calibrates two awaiting-placement production candidates supplied by Character Creation:
 
 - `kage_madara` — Character
 - `pakkun` — Entity / Summon
 
-Neither identity changes the current live production gate. The uploaded card images are visual reference only and are not repository-path authority.
+Neither identity changes the current live production gate. Uploaded/generated card images are visual reference only and are not repository-path authority.
 
 Canonical Stat order:
 
@@ -20,7 +20,7 @@ Formula v1.0:
 
 ---
 
-## 1. `kage_madara`
+## 1. `kage_madara` — FINAL REPRESENTATION SUPERSESSION
 
 Display:
 
@@ -28,63 +28,65 @@ Display:
 
 Classification:
 
-- production Character representation on future admission;
+- future production Character representation on explicit admission;
 - formal rank/category: Kage;
 - exact alive-armoured high-Kage Madara representation;
 - distinct from `undying_madara`, `black_madara`, and `failed_god_madara`;
-- no Rinnegan, Ten-Tails/Jinchūriki, God Tree, Black-Zetsu merge, Edo/undying package, or later boss-state package is embodied by this record;
-- Sharingan / Mangekyō-era Uchiha combat provenance and Susanoo-capable presentation may be used by exact authored Skills, but do not infer later-stage packages.
+- **Eternal Mangekyō Sharingan access is explicitly embodied/authorised**;
+- **Rinnegan access is explicitly embodied/authorised**;
+- stable Hosted Entity/source `black_zetsu` is attached to and sustaining this exact representation;
+- no Ten-Tails/Jinchūriki, God Tree, Edo/undying, Failed-God or later boss-stage package is inherited merely because EMS/Rinnegan/Black Zetsu are present;
+- hosted Black Zetsu remains a distinct causal identity and is not the later `black_madara` total-control/merge state.
 
-Final Base Stats:
+This supersedes the earlier clause in this file that excluded Rinnegan and treated Black Zetsu as absent.
 
-`107 / 98 / 94 / 71 / 86 / 104 / 110`
+### Final Base Stats
 
-Final Base PL:
+`109 / 97 / 90 / 80 / 98 / 108 / 108`
+
+### Final Base PL
 
 **107**
 
-Calibration intent:
+This supersedes the earlier positional Stat vector `107 / 98 / 94 / 71 / 86 / 104 / 110` while intentionally preserving Base PL 107.
 
-- top-end Kage-tier overall capability;
-- exceptional Ninjutsu, Genjutsu/combat reading, endurance and direct martial power;
-- strong Bukijutsu/gunbai use;
-- substantial but not boss-state Fūinjutsu/Kinjutsu capability;
-- intentionally below the later Madara boss escalation while remaining among the strongest Kage representations.
+Calibration rationale:
 
-Numeric equality with another representation, if any, does not imply semantic identity.
+- Rinnegan/EMS representation requires stronger authored Ninjutsu, Kinjutsu, Fūinjutsu and ocular/Genjutsu-facing capability than the superseded non-Rinnegan calibration;
+- Bukijutsu remains strong but is no longer carrying as much of the representation's overall profile;
+- Black Zetsu's life-support role is **not** represented as additive PL or wholesale Stat donation;
+- sustaining/defeat-continuation consequences are lifecycle/resolver semantics, not a hidden PL bonus;
+- Kage Madara remains numerically adjacent to, but semantically distinct from, `undying_madara`.
 
-Prepared exact Skill IDs for Combat closure:
+Numeric equality/adjacency never implies semantic identity.
+
+### Prepared Combat palette authority
+
+Registry accepts the revised Combat staging direction as the correct prepared five-Skill identity set for this representation:
 
 1. `kage_madara_fire_style_majestic_destroyer_flame`
-   - Ninjutsu high-output fire action;
-   - Combat owns exact Attack PL, target mode, packet structure and any area semantics;
-   - no automatic Burning unless explicitly authored by Combat.
+2. `kage_madara_rinnegan_gravity_crush`
+3. `kage_madara_ems_susanoo_guard`
+4. `kage_madara_ems_susanoo_cleave`
+5. `kage_madara_black_zetsu_shadow_lattice`
 
-2. `kage_madara_gunbai_assault`
-   - Bukijutsu/Taijutsu direct weapon action;
-   - no automatic Guard break, displacement or reflection rider.
+Combat owns exact Attack PL, packet/target/control/defence/lifetime numerics. Registry's role here is to authorise the representation sources those Skills require.
 
-3. `kage_madara_sharingan_read`
-   - exact ocular combat-read / information action;
-   - no automatic Knowledge, omniscience, accuracy, Evasion or hidden Speed modifier.
-
-4. `kage_madara_susanoo_guard`
-   - source-owned defensive Susanoo action/state;
-   - Combat owns prevention/lifetime/consumption semantics;
-   - does not create a hidden Defense Stat or second participant.
-
-5. `kage_madara_susanoo_cleave`
-   - Susanoo-mediated direct attack;
-   - one authored action does not become multiple packets merely because the construct is large;
-   - Susanoo is not an independent Entity, ownership record, turn or PL pool.
+Do not infer every EMS/Rinnegan Technique merely from access.
 
 Preserve:
 
+**EMS access ≠ every EMS Technique**
+
+**Rinnegan access ≠ every Rinnegan Technique**
+
+**Hosted Black Zetsu ≠ Summon**
+
+**Hosted Black Zetsu ≠ second participant/turn/slot/PL ledger**
+
+**Black Zetsu life support ≠ PL donation**
+
 **Kage Madara ≠ Undying Madara ≠ Black Madara ≠ Failed God Madara**
-
-**Susanoo source/presentation ≠ independent Entity**
-
-**rank/title ≠ direct PL bonus**
 
 ---
 
@@ -96,10 +98,10 @@ Display:
 
 Classification:
 
-- production Entity / Summon on future admission;
+- future production Entity / Summon on explicit admission;
 - independent stable Summon identity;
 - small tracking/scouting/support Summon rather than a high-output combat beast;
-- association with Kakashi does not itself create automatic ownership, default attachment, PL transfer, item-find bonus, Battle manifestation or exclusive summoner ontology.
+- association with Kakashi does not itself create automatic ownership, default attachment, PL transfer, Battle manifestation or exclusive summoner ontology.
 
 Final Base Stats:
 
@@ -120,18 +122,8 @@ Calibration intent:
 Prepared exact Action IDs for Combat closure:
 
 1. `pakkun_tracking_scent`
-   - tracking / information / route-evidence action;
-   - no Attack PL;
-   - does not create omniscience or automatically reveal every hidden target.
-
 2. `pakkun_nipping_bite`
-   - Taijutsu direct action;
-   - Combat owns exact Attack PL and target semantics;
-   - no automatic Stun, restraint or displacement.
-
 3. `pakkun_field_guide`
-   - support/navigation/action-context utility;
-   - no hidden accuracy, Evasion, Speed, loot or PL modifier merely from being present.
 
 Preserve:
 
@@ -147,24 +139,22 @@ Preserve:
 
 ## 3. Production-admission boundary
 
-Both identities are calibrated but remain **AWAITING PRODUCTION ADMISSION**.
+Both identities are calibrated but remain **AWAITING PRODUCTION ADMISSION** unless separately admitted by current Registry + Assets authority.
 
 Current live production remains:
 
 **85 Characters + 17 Entities = 102**
 
-The currently authorised future 115 package remains unchanged. `kage_madara` and `pakkun` are separate additions outside that package unless Registry + Assets explicitly amend admission scope later.
+The current separately locked final awaiting-placement wave is **13 Characters + Nue → eventual 116**. `kage_madara`, `pakkun`, and the later `black_zetsu` Hosted Entity are separate additions outside that 116 package unless Registry + Assets explicitly amend admission scope.
 
 Before live admission, Assets must supply exact approved production mappings for each identity:
 
 `Registry ID → collectibleCard path → square uiPortrait path → ACTIVE asset status`
 
-The uploaded images do not establish those repository paths.
-
 Do not:
 
 - infer production paths from upload filenames;
-- crop the uploaded collectible cards into permanent `uiPortrait` authority;
+- crop collectible cards into permanent `uiPortrait` authority;
 - increment the live Registry gate from calibration alone;
 - treat Combat semantic closure as production admission;
 - treat production admission as Acquisition ownership.
