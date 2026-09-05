@@ -7270,10 +7270,14 @@ function selectGeninRosterTransitionJoninLeader(variantId) {
   if (!snapshot.joninLeaderCandidateVariantIds.includes(variantId)) return {success:false,reason:"jonin_leader_not_in_authoritative_snapshot"};
   const entry=getCharacterRegistryEntry(variantId);
   if (!entry||String(entry.formalRank||"").toLowerCase()!=="jonin") return {success:false,reason:"jonin_leader_rank_invalid"};
-  if (!isVariantOwnedForGeninTransition(variantId)) return {success:false,reason:"acquisition_required",variantId};
   transition.joninLeaderVariantId=variantId;
   savePlayerData();
-  return {success:true,variantId};
+  return {
+    success:true,
+    variantId,
+    assignmentMode:"institutional",
+    collectibleOwnershipRequired:false
+  };
 }
 
 // =========================================================
@@ -7301,7 +7305,6 @@ function confirmGeninRosterTransition() {
   if (!leader||!snapshot.joninLeaderCandidateVariantIds.includes(leader)) return {success:false,reason:"jonin_leader_required"};
   const leaderEntry=getCharacterRegistryEntry(leader);
   if (!leaderEntry||String(leaderEntry.formalRank||"").toLowerCase()!=="jonin") return {success:false,reason:"jonin_leader_rank_invalid"};
-  if (!isVariantOwnedForGeninTransition(leader)) return {success:false,reason:"jonin_leader_acquisition_required",variantId:leader};
   const rollback=cloneProgressionData(playerData);
   try {
     const completedAt=Date.now();
@@ -7359,7 +7362,7 @@ function renderGeninRosterTransitionOverlay(container) {
   const model=createGeninRosterTransitionPresentationModel();
   const esc=escapeFieldReadinessHTML;
   const candidateButtons=slot=>model.teammateCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionTeammate(${slot},'${esc(item.variantId)}');openGeninRosterTransitionUI();" ${item.owned?"":"disabled"} style="padding:8px 10px;border:1px solid rgba(207,169,75,.35);background:#10242c;color:#d8e4ec;border-radius:6px;cursor:${item.owned?"pointer":"default"};opacity:${item.owned?"1":".45"};">${esc(item.displayName)}${item.owned?"":" · ACQUISITION REQUIRED"}</button>`).join("");
-  const leaders=model.joninLeaderCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionJoninLeader('${esc(item.variantId)}');openGeninRosterTransitionUI();" ${item.owned?"":"disabled"} style="padding:8px 10px;border:1px solid rgba(120,160,180,.35);background:#0f2028;color:#d8e4ec;border-radius:6px;cursor:${item.owned?"pointer":"default"};opacity:${item.owned?"1":".45"};">${esc(item.displayName)}${item.owned?"":" · ACQUISITION REQUIRED"}</button>`).join("");
+  const leaders=model.joninLeaderCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionJoninLeader('${esc(item.variantId)}');openGeninRosterTransitionUI();" style="padding:8px 10px;border:1px solid rgba(120,160,180,.35);background:#0f2028;color:#d8e4ec;border-radius:6px;cursor:pointer;opacity:1;">${esc(item.displayName)} · INSTITUTIONAL ASSIGNMENT</button>`).join("");
   const selectedNames=model.selectedTeamVariantIds.map(id=>{const e=id?getCharacterRegistryEntry(id):null;return e?(e.displayName||e.name||id):"UNSELECTED";});
   const leaderEntry=model.joninLeaderVariantId?getCharacterRegistryEntry(model.joninLeaderVariantId):null;
   container.innerHTML=`<div style="padding:24px;display:grid;gap:16px;color:#d8e4ec;overflow:auto;">\n    <div><div style="font-size:10px;letter-spacing:1.4px;color:#d0ad55;">ACADEMY → GENIN</div><h2 style="margin:3px 0;color:#f2e4b0;">GENIN ROSTER TRANSITION</h2><p style="color:#94A3B8;font-size:12px;max-width:760px;">Promotion is already earned. Finalise two teammate roles and one authorised Jōnin leader. Ordinary operational Genin progression remains pending until this transition is committed. This surface cannot manufacture ownership or candidate eligibility.</p></div>\n    ${model.authorityReady?"":`<div style="padding:14px;border:1px solid rgba(207,169,75,.35);background:rgba(20,14,5,.55);color:#e8d7a1;">Candidate authority is not yet available for this Chronicle. CE / Acquisition must supply an exact snapshot.</div>`}\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 1 — ${esc(selectedNames[0])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(1)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 2 — ${esc(selectedNames[1])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(2)||"No authorised candidates supplied."}</div></div>\n    <div style="display:grid;gap:10px;"><strong>JŌNIN LEADER — ${esc(leaderEntry?(leaderEntry.displayName||leaderEntry.name||leaderEntry.id):"UNSELECTED")}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${leaders||"No authorised Jōnin candidates supplied."}</div></div>\n    <div style="display:flex;gap:10px;"><button type="button" onclick="confirmGeninRosterTransition();openGeninRosterTransitionUI();" ${(!model.authorityReady||model.completed)?"disabled":""} style="padding:10px 16px;border:1px solid rgba(207,169,75,.55);background:#152832;color:#f0df9f;border-radius:6px;font-weight:700;">CONFIRM GENIN ROSTER</button><button type="button" onclick="openArenaPromotionSurface()" style="padding:10px 16px;border:1px solid rgba(130,160,175,.35);background:#0f2028;color:#c7d6df;border-radius:6px;">BACK</button></div>\n  </div>`;
@@ -43145,6 +43148,52 @@ function getWorldOpportunityDefinitionsForRegion(regionKey,region) {
   return [...legacy,...authored];
 }
 
+// =========================================================
+// BRICK 950 — BANDIT HIDEOUT AUTHORED BATTLE ROUTE RESTORATION
+// =========================================================
+// Persistent map presence is not battle authority. Bandit Hideout is explicit
+// Alpha-authored content, so it shadows the legacy persistent-location projection
+// with one authored opportunity bound to the existing bandit_leader encounter.
+// Generic legacy type:"battle" => FIGHT inference remains forbidden.
+const ALPHA_BANDIT_HIDEOUT_OPPORTUNITY_ID="alpha_bandit_hideout_battle";
+const ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID="bandit_leader";
+
+function registerAlphaBanditHideoutAuthoredOpportunity() {
+  const location=getWorldRegionLocation("fire","bandit_hideout");
+  if (!location) return {success:false,reason:"bandit_hideout_location_missing"};
+
+  return registerWorldEventOpportunity({
+    opportunityId:ALPHA_BANDIT_HIDEOUT_OPPORTUNITY_ID,
+    hotspotId:"hotspot_fire_bandit_hideout",
+    eventId:null,
+    locationId:location.id,
+    regionKey:"fire",
+    sourceKind:"persistent_location",
+    randomPoolEligible:false,
+    defaultDiscoveryLevel:"discovered",
+    presentation:{
+      family:"Known Threat",
+      label:location.shortName||location.name||"Bandit Hideout",
+      summary:location.desc||"",
+      icon:location.icon||"",
+      showUnknownMarker:false
+    },
+    anchor:{x:Number(location.x)||0,y:Number(location.y)||0},
+    interactions:[{
+      id:"fight_bandit_hideout",
+      label:"FIGHT",
+      kind:"battle",
+      encounterId:ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID,
+      encounterContext:{
+        sourceKind:"authored_persistent_location",
+        alphaContentId:"bandit_hideout"
+      }
+    }]
+  });
+}
+
+registerAlphaBanditHideoutAuthoredOpportunity();
+
 function getOpportunityDiscoveryLevel(definition) {
   const state=getWorldEventDimensionState("observerDiscoveryByOpportunityId",definition.opportunityId);
   return String(state.level||definition.defaultDiscoveryLevel||"undiscovered");
@@ -43340,11 +43389,37 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
   let result={success:false,reason:"interaction_route_unhandled"};
   switch (action.kind) {
     case "battle": {
+      const queue=getPersistentClanBattleQueueSlots();
+      const startCharacterId=queue[0]||null;
+      if (!startCharacterId) return {success:false,reason:"clan_start_slot_empty"};
+
+      // Authored Encounter identity owns occurrence selection/reservation when supplied.
+      // This preserves exact opposition identity, provenance and retry semantics.
+      const encounterId=action.encounterId||null;
+      if (encounterId) {
+        if (!getEncounterData(encounterId)) return {success:false,reason:"battle_encounter_authority_missing"};
+        const encounterContext={
+          sourceKind:"world_opportunity",
+          regionKey:definition.regionKey,
+          locationId:definition.locationId,
+          opportunityId:definition.opportunityId,
+          eventId:definition.eventId||null,
+          ...(action.encounterContext&&typeof action.encounterContext==="object"
+            ? cloneProgressionData(action.encounterContext)
+            : {})
+        };
+        const started=startEncounterActivity(encounterId,startCharacterId,encounterContext);
+        result=started
+          ? {success:true,type:"battle",encounterId}
+          : {success:false,reason:"battle_launch_failed"};
+        break;
+      }
+
+      // Compatibility path for genuinely enemy-bound authored actions that have
+      // no Encounter definition. This is not legacy map metadata inference.
       const enemyId=action.enemyId||action.encounterRef||null;
       if (!enemyId) return {success:false,reason:"battle_encounter_authority_missing"};
-      const queue=getPersistentClanBattleQueueSlots();
-      if (!queue[0]) return {success:false,reason:"clan_start_slot_empty"};
-      const battle=startEncounter(enemyId,null,action.encounterId||definition.eventId||definition.opportunityId);
+      const battle=startEncounter(enemyId,startCharacterId,definition.eventId||definition.opportunityId);
       result=battle?{success:true,type:"battle",battle}:{success:false,reason:"battle_launch_failed"};
       break;
     }
@@ -86659,6 +86734,327 @@ function runAlphaPost949IntegrationDiagnostics() {
     geninCandidateAuthorityStatus:getGeninRosterTransitionState().candidateSnapshot?"ready":"external_authority_required"
   };
   console.log(`SC Alpha post-949 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Genin transition=${result.geninTransitionSemanticsStatus} / Field content=${result.fieldContentOrchestrationStatus} / Genin candidates=${result.geninCandidateAuthorityStatus}`);
+  return result;
+}
+
+// =========================================================
+// BRICK 951 — INSTITUTIONAL JŌNIN ASSIGNMENT GOLDEN REGRESSION
+// =========================================================
+const ALPHA_GENIN_ROSTER_CANDIDATE_POLICY_ID="alpha_genin_roster_candidate_policy_v1";
+
+const ALPHA_GENIN_ROSTER_GOLDEN_FIXTURE_V1=Object.freeze({
+  snapshotId:"grt_alpha_golden_obito_001",
+  subjectOwnedCharacterId:"owned_academy_obito_alpha_golden_001",
+  retentionEligibleVariantIds:[
+    "academy_kakashi",
+    "academy_kurenai"
+  ],
+  teammateCandidateVariantIds:[
+    "genin_sarada",
+    "genin_mitsuki"
+  ],
+  joninLeaderCandidateVariantIds:[
+    "jonin_konohamaru"
+  ],
+  provenance:{
+    candidatePolicyVersion:ALPHA_GENIN_ROSTER_CANDIDATE_POLICY_ID,
+    promotionAssessmentId:"academy_to_genin_field_readiness_assessment",
+    promotionOccurrenceId:"occ_field_readiness_obito_alpha_golden_001",
+    academyTeamVariantIds:[
+      "academy_kakashi",
+      "academy_kurenai"
+    ],
+    replacementCandidateBasis:{
+      genin_sarada:{
+        basis:"already_owned_currently_available_genin"
+      },
+      genin_mitsuki:{
+        basis:"active_authored_roster_transition_recruitment",
+        opportunityId:"recruit_genin_mitsuki_alpha_golden_001"
+      }
+    },
+    joninLeaderBasis:{
+      jonin_konohamaru:{
+        basis:"konoha_institutional_team_leader_assignment",
+        opportunityId:"assign_jonin_konohamaru_alpha_golden_001"
+      }
+    }
+  }
+});
+
+function runAlphaGeninInstitutionalLeaderGoldenFixtureDiagnostics() {
+  const rollback=cloneProgressionData(playerData);
+  const rawSave=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const playerTeamBefore=Array.isArray(playerTeam)?[...playerTeam]:[];
+  const activityHistoryBefore=typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)
+    ? cloneProgressionData(activityHistory)
+    : null;
+  const result={};
+
+  try {
+    const fixture=cloneProgressionData(ALPHA_GENIN_ROSTER_GOLDEN_FIXTURE_V1);
+    const state=ensurePlayerAcquisitionState();
+
+    playerData.characterOwnership={
+      ownedRegistryIds:[
+        "academy_obito",
+        "academy_kakashi",
+        "academy_kurenai",
+        "genin_sarada"
+      ]
+    };
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+
+    state.records=[];
+    state.processedRecordKeys=[];
+    state.ownedCharactersByVariantId={};
+    const own=(variantId,ownedCharacterId=null)=>{
+      const record=ensureOwnedCharacterRecord(state,variantId);
+      if (record&&ownedCharacterId) record.ownedCharacterId=ownedCharacterId;
+      return record;
+    };
+    own("academy_obito",fixture.subjectOwnedCharacterId);
+    own("academy_kakashi");
+    own("academy_kurenai");
+    own("genin_sarada");
+
+    state.formalRankProgressionByOwnedCharacterId={
+      [fixture.subjectOwnedCharacterId]:{
+        formalRank:"genin",
+        promotedAt:1,
+        evidenceIds:["diagnostic_obito_genin_promotion"]
+      }
+    };
+    state.chronicleOriginVariantId="academy_obito";
+    state.chronicleOriginOwnedCharacterId=fixture.subjectOwnedCharacterId;
+    state.ninjaIdentityVariantId="academy_obito";
+    state.ninjaIdentityOwnedCharacterId=fixture.subjectOwnedCharacterId;
+    state.ninjaIdentityLocked=true;
+    state.chronicleOrigin={
+      variantId:"academy_obito",
+      ownedCharacterId:fixture.subjectOwnedCharacterId,
+      prologueCompleted:true,
+      completionEvidenceIds:["diagnostic_origin_complete"],
+      activeKonohaEntered:true,
+      activeKonohaEnteredAt:1,
+      activeKonohaEntryBoundaryId:"active_konoha_entry:academy_obito"
+    };
+    state.academyTeamFormation={
+      unlocked:true,
+      required:false,
+      completed:true,
+      selectedTeammateIds:["academy_kakashi","academy_kurenai"],
+      eligibleCandidateVariantIds:getAcademyTeamFormationEligibleCandidateVariantIds("academy_obito"),
+      completedAt:1
+    };
+    state.geninRosterTransition={
+      ...createDefaultAcquisitionState().geninRosterTransition,
+      unlocked:true,
+      required:true,
+      completed:false,
+      subjectOwnedCharacterId:fixture.subjectOwnedCharacterId,
+      promotionEvidenceIds:["diagnostic_obito_genin_promotion"]
+    };
+    state.onboardingStatus="genin_roster_transition_pending";
+    playerData.clan=normalizeClanManagementState(playerData.clan,playerData.characterOwnership);
+
+    const snapshotApply=applyGeninRosterTransitionCandidateSnapshot(fixture);
+    const recordCountBeforeRetention=state.records.length;
+    const retainKakashi=selectGeninRosterTransitionTeammate(1,"academy_kakashi");
+    const recordCountAfterRetention=state.records.length;
+    const sarada=selectGeninRosterTransitionTeammate(1,"genin_sarada");
+    const mitsukiBefore=selectGeninRosterTransitionTeammate(2,"genin_mitsuki");
+    const outsideGenin=selectGeninRosterTransitionTeammate(2,"genin_boruto");
+
+    const konohamaruOwnedBefore=isCharacterRegistryOwned("jonin_konohamaru")||!!getOwnedCharacterRecordByVariantId("jonin_konohamaru");
+    const konohamaru=selectGeninRosterTransitionJoninLeader("jonin_konohamaru");
+    const outsideJonin=selectGeninRosterTransitionJoninLeader("jonin_sasuke");
+
+    const unresolvedSnapshot=cloneProgressionData(getGeninRosterTransitionCandidateSnapshot());
+    const liveAcquisition=playerData.acquisition;
+    const normalizedReload=normalizeAcquisitionState(
+      JSON.parse(JSON.stringify(playerData.acquisition)),
+      playerData.characterOwnership
+    );
+    playerData.acquisition=normalizedReload;
+    const reopenModel=createGeninRosterTransitionPresentationModel();
+    const reloadedTransition=getGeninRosterTransitionState();
+    const reloadPreserved=
+      reloadedTransition.completed!==true&&
+      reloadedTransition.required===true&&
+      reloadedTransition.candidateSnapshotId===fixture.snapshotId&&
+      JSON.stringify(reloadedTransition.candidateSnapshot)===JSON.stringify(unresolvedSnapshot)&&
+      reopenModel.candidateSnapshotId===fixture.snapshotId;
+    playerData.acquisition=liveAcquisition;
+
+    const mitsukiAcquisition=commitCharacterAcquisition({
+      variantId:"genin_mitsuki",
+      route:"genin_roster_transition_recruitment",
+      sourceEventId:"recruit_genin_mitsuki_alpha_golden_001",
+      context:{
+        opportunityId:"recruit_genin_mitsuki_alpha_golden_001",
+        candidateSnapshotId:fixture.snapshotId,
+        phase:"active_konoha_genin_roster_transition"
+      },
+      provenance:{
+        authority:"alpha_genin_roster_candidate_policy_v1",
+        candidatePolicyVersion:ALPHA_GENIN_ROSTER_CANDIDATE_POLICY_ID
+      }
+    });
+    const mitsukiAfter=selectGeninRosterTransitionTeammate(2,"genin_mitsuki");
+
+    const clanQueueBefore=JSON.stringify(playerData.clan&&playerData.clan.teamSlots||[]);
+    const finalCommit=confirmGeninRosterTransition();
+    const clanQueueAfter=JSON.stringify(playerData.clan&&playerData.clan.teamSlots||[]);
+    const finalState=ensurePlayerAcquisitionState();
+
+    result.exactFixtureAccepted=snapshotApply.success===true&&snapshotApply.snapshot&&snapshotApply.snapshot.snapshotId===fixture.snapshotId;
+    result.retentionSucceedsWithoutAcquisition=retainKakashi.success===true&&recordCountAfterRetention===recordCountBeforeRetention;
+    result.ownedSaradaReplacementSucceeds=sarada.success===true&&sarada.variantId==="genin_sarada";
+    result.unownedMitsukiRequiresAcquisition=mitsukiBefore.success===false&&mitsukiBefore.reason==="acquisition_required";
+    result.legitimateMitsukiAcquisitionSucceeds=mitsukiAcquisition.success===true&&isCharacterRegistryOwned("genin_mitsuki");
+    result.mitsukiSelectionSucceedsAfterAcquisition=mitsukiAfter.success===true&&mitsukiAfter.variantId==="genin_mitsuki";
+    result.outOfSnapshotGeninRejected=outsideGenin.success===false&&outsideGenin.reason==="genin_teammate_not_in_authoritative_snapshot";
+    result.unownedInstitutionalKonohamaruSucceeds=!konohamaruOwnedBefore&&konohamaru.success===true&&konohamaru.collectibleOwnershipRequired===false;
+    result.outOfSnapshotJoninRejected=outsideJonin.success===false&&outsideJonin.reason==="jonin_leader_not_in_authoritative_snapshot";
+    result.unresolvedSnapshotSurvivesReloadAndReopen=reloadPreserved;
+    result.finalCommitAcceptsInstitutionalLeader=finalCommit.success===true&&finalCommit.joninLeaderVariantId==="jonin_konohamaru";
+    result.replacedTeammatesRemainOwned=["academy_kakashi","academy_kurenai"].every(id=>!!getOwnedCharacterRecordByVariantId(id)&&isCharacterRegistryOwned(id));
+    result.leaderAssignmentCreatesNoCollectibleOwnership=
+      !isCharacterRegistryOwned("jonin_konohamaru")&&
+      !getOwnedCharacterRecordByVariantId("jonin_konohamaru")&&
+      finalState.joninLeadershipAssignment&&
+      finalState.joninLeadershipAssignment.variantId==="jonin_konohamaru";
+    result.leaderAssignmentCreatesNoBattleDeployment=clanQueueAfter===clanQueueBefore&&!!finalState.joninLeadershipAssignment&&finalState.joninLeadershipAssignment.doesNotOwnBattleSlot===true;
+    result.exactPolicyProvenancePreserved=
+      finalCommit.candidateSnapshotId===fixture.snapshotId&&
+      fixture.provenance.candidatePolicyVersion===ALPHA_GENIN_ROSTER_CANDIDATE_POLICY_ID;
+  } finally {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (Array.isArray(playerTeam)) playerTeam.splice(0,playerTeam.length,...playerTeamBefore);
+    if (activityHistoryBefore&&typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) {
+      activityHistory.splice(0,activityHistory.length,...activityHistoryBefore);
+    }
+    if (typeof localStorage!=="undefined") {
+      if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY);
+      else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    }
+  }
+
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+// =========================================================
+// BRICK 952 — ACADEMY NINE-OTHER LOCK + PLAYER-FACING SMOKE GATE
+// =========================================================
+function runAlphaInitialAcademyFormationCandidateLockDiagnostics() {
+  const origins=[...CHRONICLE_ORIGIN_VARIANT_IDS];
+  const result={
+    exactlyTenOrigins:origins.length===10&&new Set(origins).size===10,
+    eachOriginGetsExactlyNineOthers:origins.every(originId=>getAcademyTeamFormationEligibleCandidateVariantIds(originId).length===9),
+    selectedOriginAlwaysExcluded:origins.every(originId=>!getAcademyTeamFormationEligibleCandidateVariantIds(originId).includes(originId)),
+    everyOtherOriginAlwaysIncluded:origins.every(originId=>{
+      const candidates=getAcademyTeamFormationEligibleCandidateVariantIds(originId);
+      return origins.filter(id=>id!==originId).every(id=>candidates.includes(id));
+    }),
+    candidatePresentationDoesNotFilterOwnership:
+      getAcademyTeamFormationEligibleCandidateVariantIds.toString().includes("CHRONICLE_ORIGIN_VARIANT_IDS.filter")&&
+      !getAcademyTeamFormationEligibleCandidateVariantIds.toString().includes("isVariantOwned")&&
+      !getAcademyTeamFormationEligibleCandidateVariantIds.toString().includes("isCharacterRegistryOwned")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function getLoadedShinobiStyleSheetText() {
+  if (typeof document==="undefined"||!document.styleSheets) return "";
+  const chunks=[];
+  [...document.styleSheets].forEach(sheet=>{
+    try {
+      [...(sheet.cssRules||[])].forEach(rule=>chunks.push(rule.cssText||""));
+    } catch (error) {
+      // Browser smoke remains explicit: inaccessible CSS cannot be called GREEN.
+    }
+  });
+  return chunks.join("\n");
+}
+
+function runAlphaPlayerFacingRouteSmokeDiagnostics() {
+  const fire=worldRegions.fire||null;
+  const fireWorldButton=typeof document!=="undefined"
+    ? [...document.querySelectorAll("[onclick]")].find(node=>String(node.getAttribute("onclick")||"").replace(/\s/g,"")==="openRegionHub('fire')")
+    : null;
+  const worldMapImage=typeof document!=="undefined"?document.querySelector(".world-map-image"):null;
+  const villageLocation=fire&&Array.isArray(fire.locations)
+    ? fire.locations.find(location=>location&&location.type==="village"&&/konoha|leaf/i.test(String(location.name||location.shortName||"")))
+    : null;
+  const villageInteractions=villageLocation?getLegacyLocationInteractions("fire",villageLocation):[];
+  const banditDefinitions=fire
+    ? getWorldOpportunityDefinitionsForRegion("fire",fire).filter(definition=>definition&&definition.locationId==="bandit_hideout")
+    : [];
+  const banditDefinition=banditDefinitions.find(definition=>definition.opportunityId===ALPHA_BANDIT_HIDEOUT_OPPORTUNITY_ID)||null;
+  const banditAction=banditDefinition
+    ? banditDefinition.interactions.find(action=>action&&action.id==="fight_bandit_hideout")
+    : null;
+  const cssText=getLoadedShinobiStyleSheetText();
+
+  const result={
+    worldMapAssetResolves:
+      !!worldMapImage&&
+      worldMapImage.getAttribute("src")==="Backgrounds/WorldMap.png"&&
+      worldMapImage.complete===true&&
+      worldMapImage.naturalWidth>0,
+    landOfFireOpensFromWorldMap:!!fire&&!!fireWorldButton,
+    konohaVillageRouteOpens:
+      !!villageLocation&&
+      villageInteractions.some(action=>action.kind==="navigation"&&action.overlayType==="village"),
+    banditHideoutExposesAuthoredBattle:
+      banditDefinitions.length===1&&
+      !!banditAction&&
+      banditAction.kind==="battle"&&
+      banditAction.encounterId===ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID,
+    banditUsesAuthoritativeEncounterPackage:
+      !!getEncounterData(ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID)&&
+      getEncounterData(ALPHA_BANDIT_HIDEOUT_ENCOUNTER_ID).enemyId==="banditLeader",
+    genericLegacyBattleInferenceStillForbidden:
+      !!getWorldRegionLocation("fire","bandit_hideout")&&
+      getLegacyLocationInteractions("fire",getWorldRegionLocation("fire","bandit_hideout")).length===0,
+    authoredBattleUsesOccurrenceReservationPipeline:
+      routeWorldOpportunityInteraction.toString().includes("startEncounterActivity")&&
+      startEncounterActivity.toString().includes("reserveEncounterOccurrence")&&
+      startEncounterActivity.toString().includes("constructReservedEncounterOccurrence"),
+    examsBackgroundPathCurrent:
+      cssText.includes("UI/exams.png")&&!cssText.includes("Assets/UI/exams.png"),
+    practicalBackgroundPathCurrent:getUIAssetPath("practical")==="UI/practical.png",
+    battleBackgroundPathCurrent:cssText.includes("UI/battle.png")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPost952IntegrationDiagnostics() {
+  const post949=runAlphaPost949IntegrationDiagnostics();
+  const bandit=runAlphaPlayerFacingRouteSmokeDiagnostics();
+  const geninInstitutionalLeader=runAlphaGeninInstitutionalLeaderGoldenFixtureDiagnostics();
+  const academyFormation=runAlphaInitialAcademyFormationCandidateLockDiagnostics();
+  const groups={post949,bandit,geninInstitutionalLeader,academyFormation};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={
+    groups,
+    pass,
+    combatFreezePreserved:post949&&post949.combatFreezePreserved===true,
+    liveProductionGateExpected:102,
+    awaitingPlacementDestination:116,
+    nextImplementedBrick:952,
+    fieldContentOrchestrationStatus:"external_authority_required",
+    browserGoldenStatus:pass?"GREEN":"CHECK"
+  };
+  console.log(`SC Alpha post-952 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / deferred destination=116 / Field content=${result.fieldContentOrchestrationStatus} / Browser Golden=${result.browserGoldenStatus}`);
   return result;
 }
 
