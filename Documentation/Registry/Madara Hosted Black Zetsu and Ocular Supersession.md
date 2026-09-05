@@ -1,6 +1,6 @@
 # Shinobi Chronicles — Madara Hosted Black Zetsu and Ocular Supersession
 
-**Status:** PL / Registry / Rank authority — representation chain CLOSED; Combat implementation/final action numerics downstream  
+**Status:** PL / Registry / Rank authority — representation chain CLOSED; source card path verified; Combat implementation/final action numerics downstream  
 **Date:** 2026-09-05
 
 This document consumes the user's superseding Madara/Black-Zetsu direction and the Combat staging documents:
@@ -68,6 +68,19 @@ Calibration intent:
 
 Black Zetsu PL86 is an Entity baseline. It is **not** a PL packet available for donation to Madara.
 
+### Source-verified collectible-card projection
+
+The ontology/card reorganisation is now committed to source.
+
+Source implementation:
+
+- commit `48061d6dca9e857f08a9714ffb3d0972802880c2` — `card upgrades and reorganization`;
+- current exact collectible-card path: `Assets/Hosted Entity/hosted_entity_black_zetsu.png`.
+
+This verifies physical repository ingestion and the intended Hosted Entity folder projection. It does not itself create a `uiPortrait`, live production admission, independent ownership or a separate Battle participant.
+
+The stable Registry ID remains `black_zetsu`; the filename is presentation projection, not identity.
+
 Preserve:
 
 **Hosted Entity identity ≠ Summon**
@@ -75,6 +88,8 @@ Preserve:
 **Hosted Entity identity ≠ independent Battle participant by default**
 
 **Hosted Entity PL ≠ host PL donation**
+
+**Registry ID ≠ asset filename**
 
 **card existence ≠ live Registry admission**
 
@@ -239,11 +254,11 @@ Preserve:
 
 ## 6. Production/admission boundary
 
-`black_zetsu` is now Registry/PL calibrated as an awaiting-placement Hosted Entity identity.
+`black_zetsu` is Registry/PL calibrated and now has a source-verified collectible-card file as an awaiting-placement Hosted Entity identity.
 
 This does **not** add it to the current live production gate and does not amend the already-locked final 116 admission wave by implication.
 
-Exact asset mapping/admission must be separately authorised.
+A future production admission still requires the appropriate Assets/Registry/Coding projection, including any required portrait authority.
 
 Likewise, this semantic supersession does not itself admit `kage_madara`.
 
@@ -259,7 +274,7 @@ Preserve:
 
 ## 7. Downstream Combat closure
 
-Registry/PL has now answered the blockers in Combat's staging documents:
+Registry/PL has answered the blockers in Combat's staging documents:
 
 - stable ID `black_zetsu`: **RATIFIED**;
 - type: **Entity — Hosted Entity**;
