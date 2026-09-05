@@ -6,9 +6,9 @@ Status: **COMBAT / SUMMON REQUIREMENT — DEFERRED UNTIL ENHANCEMENT SYSTEM IS A
 
 ## Pakkun
 
-Stable production identity: **TBD by Registry/PL**.
+Stable production identity: **`pakkun`**.
 
-When Pakkun is formally calibrated/admitted as a Summon/Entity, preserve the following authored Enhancement requirement:
+Registry/PL calibration is now closed separately. Preserve the following authored Enhancement requirement:
 
 - **+5% drop chance**
 
