@@ -1,6 +1,6 @@
 # Shinobi Chronicles — Alpha Origin Cross-Workspace Status Matrix
 
-Date: 4 September 2026
+Date: 5 September 2026
 
 Status: **ALPHA COORDINATION LEDGER — EACH WORKSPACE OWNS ONLY ITS COLUMN**
 
@@ -39,16 +39,16 @@ Status: **ALPHA COORDINATION LEDGER — EACH WORKSPACE OWNS ONLY ITS COLUMN**
 
 | Origin | Writing authority | Coding story/prologue integration | UI individual scene integration | Shared Active-Konoha boundary | Runtime tested |
 |---|---|---|---|---|---|
-| `academy_hinata` | STRUCTURAL / PARTIAL | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_izuno` — Wasabi Izuno | CANDIDATE | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_mirai` | CANDIDATE | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_menma` | FINAL WRITING LOCK | generic Origin/continuity diagnostics exist; production authored prologue integration still requires explicit confirmation | NOT YET VERIFIED AS REGISTERED PRODUCTION ORIGIN SCENE | generic boundary is implemented and Menma diagnostic coverage exists | production authored end-to-end Origin not yet verified here |
-| `academy_kushina` | FINAL WRITING LOCK | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_kurenai` | STRUCTURAL / PARTIAL | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_iwabee` | STRUCTURAL / PARTIAL | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_metal_lee` | FINAL WRITING LOCK | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
-| `academy_kakashi` | NOT YET AUTHORED | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; no production content completion caller should be inferred | NOT YET VERIFIED |
-| `academy_obito` | NOT YET AUTHORED | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; no production content completion caller should be inferred | NOT YET VERIFIED |
+| `academy_hinata` | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_izuno` — Wasabi Izuno | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_mirai` | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_menma` | **FINAL WRITING LOCK — consistency GREEN** | generic Origin/continuity diagnostics exist; production authored prologue integration still requires explicit confirmation | NOT YET VERIFIED AS REGISTERED PRODUCTION ORIGIN SCENE | generic boundary is implemented and Menma diagnostic coverage exists | production authored end-to-end Origin not yet verified here |
+| `academy_kushina` | **FINAL WRITING LOCK — consistency GREEN** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_kurenai` | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_iwabee` | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_metal_lee` | **FINAL WRITING LOCK — consistency GREEN** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_kakashi` | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
+| `academy_obito` | **FINAL WRITING LOCK** | NOT YET VERIFIED IN THIS LEDGER | NOT YET VERIFIED AS PRODUCTION ORIGIN SCENE | generic boundary architecture exists; per-Origin production completion caller not yet verified here | NOT YET VERIFIED |
 
 ---
 
@@ -58,11 +58,25 @@ The authoritative Writing matrix is maintained in the Chronicle Engine Design Bi
 
 `Games/Shinobi Chronicles/Alpha Academy Origins - Writing Status Matrix.md`
 
-Writing commit supplied by the owning workspace:
+Current Writing closure commit supplied by the owning workspace:
 
-`6fd4128cc67f7b93816019099466827b47aaaab9`
+`f96c8dc6d5ee02d40e2b4e203ae2fa19506fab2a` — **Close all ten Academy Origins at Writing level**
+
+CE reconciliation commit:
+
+`3366b83d5312274058097a90e5272459889504d3` — **Reconcile Academy Origin Writing closure into production matrix**
 
 This SC ledger mirrors the status only for cross-workspace Alpha coordination. If the owning Writing matrix changes later, this file must be updated rather than treated as independent Writing authority.
+
+Writing closure does **not** imply World/Event, Combat, Progression/reward, UI, Coding, persistence, runtime or Golden completion.
+
+Preserve:
+
+- **choice ≠ personality / alignment**;
+- **occurrence ≠ interpretation**;
+- **relationship evidence ≠ automatic relationship state**;
+- **training / reward evidence ≠ automatic development**;
+- **text-choice encounter ≠ Battle runtime**.
 
 ---
 
@@ -77,6 +91,21 @@ Canonical rule:
 > **Reusable Story Scene system ready ≠ ten production Origin scenes integrated.**
 
 Do not create a parallel Origin-specific scene engine merely because individual content packages are still incomplete.
+
+---
+
+# Current integration routing state
+
+All ten Origins are now Writing-closed. Remaining Alpha work must proceed through the existing specialist owners without reopening Writing architecture:
+
+- World / Missions / Events: convert locked authored occurrence structures into production World/Event contracts where required;
+- Combat: consume only Origins containing actual Battle runtime and close resolver-specific combat contracts where still missing;
+- Progression / Development: consume explicit reward/development evidence only where authored and authorised;
+- UI / Assets: integrate the exact production Story Scene packages against the existing reusable Story Scene architecture;
+- Coding: integrate authored Origin packages, persistence and the existing Active-Konoha completion boundary;
+- runtime/testing: prove end-to-end Origin execution and Golden/regression status.
+
+The project must not infer downstream completion from the Writing lock.
 
 ---
 
