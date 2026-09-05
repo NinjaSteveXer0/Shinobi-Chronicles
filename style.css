@@ -1256,7 +1256,7 @@ body {
   overflow: hidden;
 
   background:
-    url("./Assets/UI/battle.png")
+    url("./UI/battle.png")
     center center / 100% 100%
     no-repeat;
 
@@ -6994,7 +6994,7 @@ body {
             rgba(0, 0, 0, 0.20) 55%,
             rgba(0, 0, 0, 0.58) 100%
         ),
-        url("./Assets/UI/exams.png")
+        url("./UI/exams.png")
         center center / cover no-repeat;
 
     color: #eee4ca;
