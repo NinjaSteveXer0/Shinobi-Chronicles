@@ -73,11 +73,51 @@ const assetManifest = {
 
   },
 
+  // =====================================================
+  // BRICKS 1050–1052 — ENTITY COLLECTIBLE-CARD ONTOLOGY
+  // =====================================================
+  // These are presentation paths only. Stable Registry identity, ownership,
+  // manifestation, Battle lifecycle, PL and uiPortrait authority remain
+  // separate. Folder classification must never be used as a gameplay resolver.
+  entityCollectibleCards: {
+    de_baku:"Assets/Summons/de_baku.png",
+    gamakichi:"Assets/Summons/gamakichi.png",
+    ibuse:"Assets/Summons/ibuse.png",
+    key_gero:"Assets/Summons/key_gero.png",
+    mirage_clam:"Assets/Summons/mirage_clam.png",
+    mk_enma:"Assets/Summons/mk_enma.png",
+    nue:"Assets/Summons/nue.png",
+    pakkun:"Assets/Summons/pakkun.png",
+    wr_kamatari:"Assets/Summons/wr_kamatari.png",
+    koto_crow:"Assets/Familiars/koto_crow.png",
+    iron_maiden:"Assets/Constructs/iron_maiden.png",
+    triple_rashomon:"Assets/Constructs/triple_rashomon.png",
+    breakout_kurama:"Assets/Forced Manifestations/breakout_kurama.png",
+    black_zetsu:"Assets/Hosted Entity/hosted_entity_black_zetsu.png",
+    reborn_kurama:"Assets/Hosted Entity/hosted_entity_reborn_kurama.png",
+    kurama_complete:"Assets/Tailed Beasts/kurama_complete.png",
+    menma_kurama:"Assets/Tailed Beasts/menma_kurama.png",
+    menma_nine_tails:"Assets/Tailed Beasts/menma_nine_tails.png",
+    nine_tails:"Assets/Tailed Beasts/nine_tails.png",
+    yang_kurama:"Assets/Tailed Beasts/yang_kurama.png",
+    yin_kurama:"Assets/Tailed Beasts/yin_kurama.png"
+  },
+
+  entityCollectibleOntology: {
+    de_baku:"summon",gamakichi:"summon",ibuse:"summon",key_gero:"summon",mirage_clam:"summon",mk_enma:"summon",nue:"summon",pakkun:"summon",wr_kamatari:"summon",
+    koto_crow:"familiar",
+    iron_maiden:"construct",triple_rashomon:"construct",
+    breakout_kurama:"forced_manifestation",
+    black_zetsu:"hosted_entity",reborn_kurama:"hosted_entity",
+    kurama_complete:"tailed_beast",menma_kurama:"tailed_beast",menma_nine_tails:"tailed_beast",nine_tails:"tailed_beast",yang_kurama:"tailed_beast",yin_kurama:"tailed_beast"
+  },
+
+  // Legacy explicit Story Scene asset-type bridge only. This map does not
+  // define Registry ontology and does not create Hosted-Entity gameplay state.
   hostedEntities: {
-
-    yin_kurama:
-      "Assets/Summons/yin_kurama.png"
-
+    black_zetsu:"Assets/Hosted Entity/hosted_entity_black_zetsu.png",
+    reborn_kurama:"Assets/Hosted Entity/hosted_entity_reborn_kurama.png",
+    yin_kurama:"Assets/Tailed Beasts/yin_kurama.png"
   },
 
   // =====================================================
@@ -246,16 +286,36 @@ function getCharacterCardAssetPath(
 }
 
 
-function getHostedEntityAssetPath(
-  assetId
-) {
+// =========================================================
+// BRICKS 1053–1055 — CANONICAL ENTITY COLLECTIBLE-CARD RESOLVERS
+// =========================================================
+function getEntityCollectibleCardAssetPath(assetId) {
+  return typeof assetId==="string"&&assetManifest.entityCollectibleCards&&assetManifest.entityCollectibleCards[assetId]||"";
+}
 
-  return (
-    assetManifest.hostedEntities[
-      assetId
-    ] ||
-    ""
-  );
+function getEntityCollectibleOntologyClassification(assetId) {
+  return typeof assetId==="string"&&assetManifest.entityCollectibleOntology&&assetManifest.entityCollectibleOntology[assetId]||null;
+}
+
+function getEntityCollectibleCardProjection(assetId) {
+  const registryId=typeof assetId==="string"?assetId:"";
+  const path=getEntityCollectibleCardAssetPath(registryId);
+  const ontology=getEntityCollectibleOntologyClassification(registryId);
+  const live=typeof ALPHA_PRODUCTION_ENTITY_IDS!=="undefined"&&ALPHA_PRODUCTION_ENTITY_IDS.includes(registryId);
+  const registryRecord=registryId&&typeof getEntityDefinition==="function"?getEntityDefinition(registryId):null;
+  return {
+    registryId,registryType:"Entity",ontologyClassification:ontology,collectibleCard:path,
+    collectibleCardStatus:path?"mapped":"missing_authority",
+    uiPortrait:getUIPortraitAssetPath(registryId),
+    uiPortraitStatus:getUIPortraitAssetPath(registryId)?"active":"missing_authority",
+    productionStatus:live?"live":"not_live",registryRecordPresent:!!registryRecord
+  };
+}
+
+function getHostedEntityAssetPath(assetId) {
+  // Compatibility bridge for explicitly authored Story Scene references only.
+  // It is intentionally NOT a generic lifecycle/ownership classifier.
+  return typeof assetId==="string"&&assetManifest.hostedEntities&&assetManifest.hostedEntities[assetId]||"";
 }
 
 
@@ -3409,7 +3469,7 @@ const entityRegistry = {
     "entityType": "hosted_entity_partition",
     "parentEntityId": "kurama",
     "presentation": {
-      "image": "Assets/Summons/yin_kurama.png",
+      "image": "Assets/Tailed Beasts/yin_kurama.png",
       "temporaryArtwork": false
     }
   },
@@ -44865,6 +44925,9 @@ function normalizeStoryScenePortraitProjection(ref) {
   // Collectible-card fallback is NEVER automatic. Writing/UI must explicitly
   // author that fallback kind so card art is not silently treated as portrait art.
   if (!src&&assetType==="character_card"&&assetId) src=getCharacterCardAssetPath(assetId);
+  // BRICK 1056 — entity collectible cards are resolved only when explicitly
+  // authored as entity_card. They never become automatic uiPortrait fallback.
+  if (!src&&assetType==="entity_card"&&assetId) src=getEntityCollectibleCardAssetPath(assetId);
   if (!src&&assetType==="hosted_entity"&&assetId) src=getHostedEntityAssetPath(assetId);
   if (!src&&assetType==="ui"&&assetId) src=getUIAssetPath(assetId);
   if (!src) return null;
@@ -88529,6 +88592,127 @@ function runAlphaPost1049IntegrationDiagnostics() {
   const pass=Object.values(groups).every(group=>group&&group.pass===true);
   const result={groups,pass,combatFreezePreserved:post964&&post964.combatFreezePreserved===true,liveProductionGateExpected:102,awaitingPlacementDestination:116,nextImplementedBrick:1049,final116AdmissionStatus:"external_asset_projection_required",fieldContentOrchestrationStatus:pass?"implemented_runtime_validation_green":"implemented_runtime_check",fieldReadinessRewardPolicy:"no_additional_field_readiness_reward",browserGoldenStatus:pass?"GREEN":"CHECK"};
   console.log(`SC Alpha post-1049 integration gate: ${pass?"PASS":"FAIL"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"} / live gate=102 / Field Readiness=${result.fieldContentOrchestrationStatus} / Browser Golden=${result.browserGoldenStatus}`);
+  return result;
+}
+
+
+// =========================================================
+// BRICK 1057 — ENTITY COLLECTIBLE-CARD PATH GOLDEN
+// BRICK 1058 — REGISTRY-ID / PORTRAIT NON-MUTATION GUARDS
+// BRICK 1059 — STALE OLD-PATH FALLBACK GUARD
+// BRICK 1060 — POST-1060 CUMULATIVE ALPHA GATE
+// =========================================================
+const ALPHA_MOVED_ENTITY_COLLECTIBLE_CARD_PATHS=Object.freeze({
+  iron_maiden:"Assets/Constructs/iron_maiden.png",
+  triple_rashomon:"Assets/Constructs/triple_rashomon.png",
+  koto_crow:"Assets/Familiars/koto_crow.png",
+  breakout_kurama:"Assets/Forced Manifestations/breakout_kurama.png",
+  black_zetsu:"Assets/Hosted Entity/hosted_entity_black_zetsu.png",
+  reborn_kurama:"Assets/Hosted Entity/hosted_entity_reborn_kurama.png",
+  kurama_complete:"Assets/Tailed Beasts/kurama_complete.png",
+  menma_kurama:"Assets/Tailed Beasts/menma_kurama.png",
+  menma_nine_tails:"Assets/Tailed Beasts/menma_nine_tails.png",
+  nine_tails:"Assets/Tailed Beasts/nine_tails.png",
+  yang_kurama:"Assets/Tailed Beasts/yang_kurama.png",
+  yin_kurama:"Assets/Tailed Beasts/yin_kurama.png"
+});
+
+const ALPHA_MOVED_ENTITY_COLLECTIBLE_ONTOLOGY=Object.freeze({
+  iron_maiden:"construct",triple_rashomon:"construct",koto_crow:"familiar",
+  breakout_kurama:"forced_manifestation",black_zetsu:"hosted_entity",reborn_kurama:"hosted_entity",
+  kurama_complete:"tailed_beast",menma_kurama:"tailed_beast",menma_nine_tails:"tailed_beast",
+  nine_tails:"tailed_beast",yang_kurama:"tailed_beast",yin_kurama:"tailed_beast"
+});
+
+const ALPHA_MOVED_ENTITY_UI_PORTRAIT_LOCK=Object.freeze({
+  iron_maiden:"Portraits/Summons/maiden.png",
+  triple_rashomon:"Portraits/Summons/rashomon.png",
+  koto_crow:"Portraits/Summons/koto_crow.png",
+  breakout_kurama:"Portraits/Variants/outbreak_kurama.png",
+  kurama_complete:"Portraits/Summons/kurama_complete.png",
+  menma_kurama:"Portraits/Summons/menma_kurama.png",
+  menma_nine_tails:"Portraits/Summons/menma_nine_tails.png",
+  nine_tails:"Portraits/Summons/naruto_nine_tails.png",
+  yang_kurama:"Portraits/Summons/kurama_yang.png",
+  yin_kurama:"Portraits/Summons/kurama_yin.png"
+});
+
+const ALPHA_FORBIDDEN_STALE_MOVED_ENTITY_CARD_PATHS=Object.freeze([
+  "Assets/Summons/iron_maiden.png",
+  "Assets/Summons/triple_rashomon.png",
+  "Assets/Summons/koto_crow.png",
+  "Assets/Variant/breakout_kurama.png",
+  "Assets/Summons/kurama_complete.png",
+  "Assets/Summons/menma_kurama.png",
+  "Assets/Summons/menma_nine_tails.png",
+  "Assets/Summons/nine_tails.png",
+  "Assets/Summons/yang_kurama.png",
+  "Assets/Summons/yin_kurama.png"
+]);
+
+function runAlphaEntityCollectibleCardOntologyDiagnostics() {
+  const movedEntries=Object.entries(ALPHA_MOVED_ENTITY_COLLECTIBLE_CARD_PATHS);
+  const movedLiveIds=movedEntries.map(([id])=>id).filter(id=>!['black_zetsu','reborn_kurama'].includes(id));
+  const runtimeCardSource=[assetManifest.entityCollectibleCards,assetManifest.hostedEntities,getEntityCollectibleCardAssetPath,getHostedEntityAssetPath,normalizeStoryScenePortraitProjection,entityRegistry.yin_kurama&&entityRegistry.yin_kurama.presentation].map(value=>typeof value==="function"?value.toString():JSON.stringify(value)).join("\n");
+  const result={
+    exactMovedCardPaths:movedEntries.every(([id,path])=>getEntityCollectibleCardAssetPath(id)===path),
+    exactMovedOntology:movedEntries.every(([id])=>getEntityCollectibleOntologyClassification(id)===ALPHA_MOVED_ENTITY_COLLECTIBLE_ONTOLOGY[id]),
+    explicitEntityCardRuntimeProjection:movedEntries.every(([id,path])=>{
+      const projection=normalizeStoryScenePortraitProjection({assetType:"entity_card",assetId:id});
+      return !!projection&&projection.src===path&&projection.kind==="entity_card";
+    }),
+    noAutomaticCardToPortraitFallback:!resolveUIPortraitProjection.toString().includes("getEntityCollectibleCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("entityCollectibleCards"),
+    uiPortraitMappingsUntouched:Object.entries(ALPHA_MOVED_ENTITY_UI_PORTRAIT_LOCK).every(([id,path])=>getUIPortraitAssetPath(id)===path),
+    uiPortraitAuthorityStill102:Object.keys(UI_PORTRAIT_MANIFEST).length===102,
+    liveMovedRegistryIdsStable:movedLiveIds.every(id=>!!getEntityDefinition(id)&&getEntityDefinition(id).id===id&&ALPHA_PRODUCTION_ENTITY_IDS.includes(id)),
+    awaitingHostedCardsDoNotAdmitIdentity:!ALPHA_PRODUCTION_ENTITY_IDS.includes("black_zetsu")&&!ALPHA_PRODUCTION_ENTITY_IDS.includes("reborn_kurama")&&!getEntityDefinition("black_zetsu")&&!getEntityDefinition("reborn_kurama"),
+    liveProductionCountUnchanged:ALPHA_PRODUCTION_ENTITY_IDS.length===17&&ALPHA_PRODUCTION_CHARACTER_IDS.length===85&&ALPHA_PRODUCTION_ENTITY_IDS.length+ALPHA_PRODUCTION_CHARACTER_IDS.length===102,
+    staleMovedCardFallbacksAbsent:ALPHA_FORBIDDEN_STALE_MOVED_ENTITY_CARD_PATHS.every(path=>!runtimeCardSource.includes(path)),
+    legitimateSummonFolderStillSupported:getEntityCollectibleCardAssetPath("gamakichi")==="Assets/Summons/gamakichi.png"&&getEntityCollectibleCardAssetPath("nue")==="Assets/Summons/nue.png"&&getEntityCollectibleCardAssetPath("pakkun")==="Assets/Summons/pakkun.png",
+    yinRegistryPresentationReconciled:!!getEntityDefinition("yin_kurama")&&getEntityDefinition("yin_kurama").presentation.image==="Assets/Tailed Beasts/yin_kurama.png",
+    hostedSceneBridgeUsesNewPaths:getHostedEntityAssetPath("black_zetsu")==="Assets/Hosted Entity/hosted_entity_black_zetsu.png"&&getHostedEntityAssetPath("reborn_kurama")==="Assets/Hosted Entity/hosted_entity_reborn_kurama.png"&&getHostedEntityAssetPath("yin_kurama")==="Assets/Tailed Beasts/yin_kurama.png",
+    folderClassificationNotBattleInference:!getEntityCollectibleOntologyClassification.toString().includes("isAttachableSummonEntity")&&!getEntityCollectibleCardProjection.toString().includes("attachEntitySummonToCharacter")&&!getEntityCollectibleCardProjection.toString().includes("grantEntityOwnership")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaEntityCollectibleCardProjectionDiagnostics() {
+  const moved=Object.keys(ALPHA_MOVED_ENTITY_COLLECTIBLE_CARD_PATHS);
+  const projections=moved.map(getEntityCollectibleCardProjection);
+  const result={
+    allMovedProjectAsEntity:projections.every(item=>item.registryType==="Entity"),
+    allMovedHaveExactCardAuthority:projections.every(item=>item.collectibleCardStatus==="mapped"&&item.collectibleCard===ALPHA_MOVED_ENTITY_COLLECTIBLE_CARD_PATHS[item.registryId]),
+    liveVsAwaitingSeparated:projections.filter(item=>!['black_zetsu','reborn_kurama'].includes(item.registryId)).every(item=>item.productionStatus==="live")&&projections.filter(item=>['black_zetsu','reborn_kurama'].includes(item.registryId)).every(item=>item.productionStatus==="not_live"),
+    registryPresenceMatchesProduction:projections.filter(item=>item.productionStatus==="live").every(item=>item.registryRecordPresent===true)&&projections.filter(item=>item.productionStatus==="not_live").every(item=>item.registryRecordPresent===false),
+    portraitFieldsRemainIndependent:projections.every(item=>item.collectibleCard!==item.uiPortrait),
+    noRegistryRename:moved.every(id=>getEntityCollectibleCardProjection(id).registryId===id)
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPost1060IntegrationDiagnostics() {
+  const post1049=runAlphaPost1049IntegrationDiagnostics();
+  const ontologyCards=runAlphaEntityCollectibleCardOntologyDiagnostics();
+  const projections=runAlphaEntityCollectibleCardProjectionDiagnostics();
+  const groups={post1049,ontologyCards,projections};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={
+    groups,pass,
+    combatFreezePreserved:post1049&&post1049.combatFreezePreserved===true,
+    liveProductionGateExpected:102,
+    awaitingPlacementDestination:116,
+    nextImplementedBrick:1060,
+    entityCollectibleOntologyStatus:pass?"runtime_green":"runtime_check",
+    uiPortraitRemapPerformed:false,
+    registryIdsChanged:false,
+    sourceOntologyCommit:"48061d6dca9e857f08a9714ffb3d0972802880c2",
+    browserGoldenStatus:pass?"GREEN":"CHECK"
+  };
+  console.log(`SC Alpha post-1060 integration gate: ${pass?"PASS":"FAIL"} / Entity cards=${result.entityCollectibleOntologyStatus} / Registry IDs=${result.registryIdsChanged?"CHANGED":"STABLE"} / uiPortrait remap=${result.uiPortraitRemapPerformed?"YES":"NO"} / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"}`);
   return result;
 }
 
