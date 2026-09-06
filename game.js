@@ -8667,6 +8667,10 @@ function createDefaultPlayerData() {
     entities: createDefaultPlayerEntityState(),
     weaponAcclimation: {},
     activityHistory: [],
+    // BRICKS 1690–1694 — world/event observer state is durable player state.
+    // It is separate from activityHistory: discovery/actionability/tracking/resolution
+    // are current authoritative dimensions, while history records committed occurrences.
+    worldEventRuntime: createDefaultWorldEventRuntimeState(),
     // BRICK 916 — committed encounter reservation/current-state identity.
     encounterRuntime: createDefaultEncounterRuntimeState(),
     // BRICK 742 — STORY SCENE RUNTIME IS SAVEABLE CURRENT STATE, NOT HISTORY
@@ -9128,6 +9132,10 @@ function loadPlayerData() {
       entities: normalizePlayerEntityState(parsedData.entities,{legacySeedMigration}),
       weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
       activityHistory: normalizedActivityHistory,
+      // BRICKS 1690–1694 — restore independent World/Event dimensions.
+      // Old saves with no worldEventRuntime receive the empty schema; malformed
+      // dimension tables are normalized without inventing discovery or resolution.
+      worldEventRuntime: normalizeWorldEventRuntimeState(parsedData.worldEventRuntime),
       // BRICK 921 — preserve reserved/started encounter identity across reload.
       encounterRuntime: normalizeEncounterRuntimeState(parsedData.encounterRuntime),
       // BRICK 742 — restore current scene continuation state without inventing a story ledger.
@@ -41897,15 +41905,15 @@ function closeOverlay() {
   ) {
 
 
-    // BRICK 747 — a story-owned Battle cannot be abandoned through the
-    // generic overlay close path. Withdrawal/defeat remains Battle-owned.
+    // BRICKS 1719–1722 — any authored caller-owned Battle cannot be abandoned
+    // through generic overlay close. Story, assessment, regional hotspot and
+    // mission-area hotspot callers all keep their continuation envelope.
     if (
       currentBattle.active === true &&
       currentBattle.battleOver !== true &&
-      currentBattle.returnContext &&
-      currentBattle.returnContext.type === "story_scene"
+      currentBattle.returnContext
     ) {
-      console.log("Story-scene Battle is still active; use Battle actions/Withdraw rather than closing the caller context.");
+      console.log("Caller-owned Battle is still active; use Battle actions/Withdraw rather than discarding its continuation context.");
       return;
     }
 
@@ -42056,7 +42064,7 @@ function saveTestState() {
       selectedMissionAreaId,
 
     missionAreaReturnContext:
-      selectedMissionAreaReturnContext?cloneBattleRuntimeValue(selectedMissionAreaReturnContext):null,
+      normalizePresentationReturnContext(selectedMissionAreaReturnContext),
 
     hotspotId:
       selectedHotspotId,
@@ -42154,9 +42162,7 @@ function saveTestState() {
     // BRICK 742 — preserve caller routing across refresh without copying
     // authored scene definitions or hidden story truth into Battle state.
     battleReturnContext:
-      currentBattle.returnContext
-        ? cloneBattleRuntimeValue(currentBattle.returnContext)
-        : null,
+      normalizeBattleReturnContext(currentBattle.returnContext),
 
 
     observerSafeResultContext:
@@ -44234,15 +44240,57 @@ function getLocalMissionAreaDefinition(areaId) {
   return LOCAL_MISSION_AREA_REGISTRY.get(String(areaId||""))||null;
 }
 
+// =========================================================
+// BRICKS 1690–1698 — WORLD EVENT SAVE-SCHEMA HARDENING
+// =========================================================
+const WORLD_EVENT_RUNTIME_DIMENSIONS=Object.freeze([
+  "worldLifecycleByEventId",
+  "observerDiscoveryByOpportunityId",
+  "actionabilityByOpportunityId",
+  "trackingByOpportunityId",
+  "resolutionByOpportunityId"
+]);
+
+function createDefaultWorldEventRuntimeState() {
+  return {
+    worldLifecycleByEventId:{},
+    observerDiscoveryByOpportunityId:{},
+    actionabilityByOpportunityId:{},
+    trackingByOpportunityId:{},
+    resolutionByOpportunityId:{}
+  };
+}
+
+function isSafeWorldEventRuntimeKey(key) {
+  return typeof key==="string"&&!!key&&!['__proto__','prototype','constructor'].includes(key);
+}
+
+function normalizeWorldEventDimensionTable(savedTable) {
+  const normalized={};
+  if (!savedTable||typeof savedTable!=="object"||Array.isArray(savedTable)) return normalized;
+  Object.entries(savedTable).forEach(([key,value])=>{
+    if (!isSafeWorldEventRuntimeKey(key)||!value||typeof value!=="object"||Array.isArray(value)) return;
+    normalized[key]=cloneProgressionData(value);
+  });
+  return normalized;
+}
+
+function normalizeWorldEventRuntimeState(savedState) {
+  const source=savedState&&typeof savedState==="object"&&!Array.isArray(savedState)?savedState:{};
+  const normalized=createDefaultWorldEventRuntimeState();
+  WORLD_EVENT_RUNTIME_DIMENSIONS.forEach(dimension=>{
+    normalized[dimension]=normalizeWorldEventDimensionTable(source[dimension]);
+  });
+  return normalized;
+}
+
 function ensureWorldEventRuntimeState() {
-  if (!playerData.worldEventRuntime||typeof playerData.worldEventRuntime!=="object") playerData.worldEventRuntime={};
-  const state=playerData.worldEventRuntime;
-  if (!state.worldLifecycleByEventId||typeof state.worldLifecycleByEventId!=="object") state.worldLifecycleByEventId={};
-  if (!state.observerDiscoveryByOpportunityId||typeof state.observerDiscoveryByOpportunityId!=="object") state.observerDiscoveryByOpportunityId={};
-  if (!state.actionabilityByOpportunityId||typeof state.actionabilityByOpportunityId!=="object") state.actionabilityByOpportunityId={};
-  if (!state.trackingByOpportunityId||typeof state.trackingByOpportunityId!=="object") state.trackingByOpportunityId={};
-  if (!state.resolutionByOpportunityId||typeof state.resolutionByOpportunityId!=="object") state.resolutionByOpportunityId={};
-  return state;
+  if (!playerData.worldEventRuntime||typeof playerData.worldEventRuntime!=="object"||Array.isArray(playerData.worldEventRuntime)) {
+    playerData.worldEventRuntime=createDefaultWorldEventRuntimeState();
+  }
+  const normalized=normalizeWorldEventRuntimeState(playerData.worldEventRuntime);
+  WORLD_EVENT_RUNTIME_DIMENSIONS.forEach(dimension=>{playerData.worldEventRuntime[dimension]=normalized[dimension];});
+  return playerData.worldEventRuntime;
 }
 
 function normalizeWorldOpportunityDefinition(definition) {
@@ -45868,9 +45916,11 @@ function applyStorySceneChoice(choiceId) {
 }
 
 function launchBattleWithReturnContext(enemyId,encounterId,returnContext) {
+  const normalizedReturnContext=normalizeBattleReturnContext(returnContext);
+  if (returnContext&&typeof returnContext==="object"&&!normalizedReturnContext) return {success:false,reason:"battle_return_context_invalid"};
   const battle=startEncounter(enemyId,null,encounterId||null);
   if (!battle) return {success:false,reason:"battle_launch_failed"};
-  currentBattle.returnContext=returnContext&&typeof returnContext==="object"?cloneBattleRuntimeValue(returnContext):null;
+  currentBattle.returnContext=normalizedReturnContext;
   currentBattle.observerSafeResultContext=null;
   saveTestState();
   return {success:true,battleId:currentBattle.battleId,encounterId:currentBattle.encounterId,returnContext:cloneBattleRuntimeValue(currentBattle.returnContext)};
@@ -46064,8 +46114,8 @@ function resumeMissionAreaHotspotFromBattle(returnContext,outcomeType=null) {
 }
 
 function resumeBattleCallerAfterCompletion(outcomeType=null) {
-  const returnContext=currentBattle.returnContext&&typeof currentBattle.returnContext==="object"?cloneBattleRuntimeValue(currentBattle.returnContext):null;
-  if (!returnContext) return {success:false,reason:"battle_return_context_absent"};
+  const returnContext=normalizeBattleReturnContext(currentBattle.returnContext);
+  if (!returnContext) return {success:false,reason:currentBattle.returnContext?"battle_return_context_invalid":"battle_return_context_absent"};
   if (returnContext.type==="story_scene") return resumeStorySceneFromBattle(returnContext);
   if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);
   if (returnContext.type==="region_hotspot") return resumeRegionHotspotFromBattle(returnContext,outcomeType);
@@ -69067,7 +69117,9 @@ function renderBattleRosterSlot(
 
 
   const portraitProjection =
-    resolveUIPortraitProjection(participant);
+    isPlayer
+      ? resolveUIPortraitProjection(participant)
+      : resolveBattleEnemyPortraitProjection(participant);
 
   const image =
     portraitProjection.path;
@@ -69237,7 +69289,11 @@ function renderBattleRosterSlot(
                 src="${image}"
                 alt="${name}"
                 draggable="false"
-                data-ui-portrait-registry-id="${portraitProjection.registryId}"
+                data-ui-portrait-registry-id="${portraitProjection.registryId||""}"
+                data-battle-portrait-source-id="${portraitProjection.sourceId||participant.id||""}"
+                data-ui-portrait-path="${image}"
+                onload="handleBattleRosterPortraitLoadSuccess(this)"
+                onerror="handleBattleRosterPortraitLoadError(this)"
               >
             `
           : `<div class="battle-live-roster-portrait battle-live-roster-portrait-missing" data-portrait-status="missing-authority" aria-label="Portrait authority unavailable for ${name}">忍</div>`
@@ -83246,10 +83302,10 @@ function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="p
 
   saveTestState();
 
-  // BRICK 740 — Story-owned defeat resumes the same authored caller rather
-  // than silently falling into a generic Battle catalogue. Ordinary Battles
-  // keep their existing behaviour because they have no story returnContext.
-  if (currentBattle.returnContext && currentBattle.returnContext.type === "story_scene") {
+  // BRICKS 1723–1726 — caller-owned defeat returns through the same reusable
+  // continuation architecture. Ordinary Battles remain unchanged because they
+  // have no returnContext. Defeat never manufactures a next opportunity.
+  if (currentBattle.returnContext) {
     resumeBattleCallerAfterCompletion("defeat");
   }
 
@@ -87868,17 +87924,20 @@ function restoreTestState() {
   }
 
 
-  const state =
-    JSON.parse(
-      saved
-    );
+  const parsedSessionState=parseAlphaSessionState(saved);
+  if (!parsedSessionState.success) {
+    console.warn("SC session state ignored:",parsedSessionState.reason);
+    try { sessionStorage.removeItem("shinobiTestState"); } catch (_) {}
+    return;
+  }
+  const state=parsedSessionState.state;
 
 
   // =========================================
   // LOCAL MISSION AREA PRESENTATION
   // =========================================
   selectedMissionAreaId=state.missionAreaId&&getLocalMissionAreaDefinition(state.missionAreaId)?String(state.missionAreaId):null;
-  selectedMissionAreaReturnContext=state.missionAreaReturnContext&&typeof state.missionAreaReturnContext==="object"?cloneBattleRuntimeValue(state.missionAreaReturnContext):null;
+  selectedMissionAreaReturnContext=normalizePresentationReturnContext(state.missionAreaReturnContext);
   selectedHotspotId=state.hotspotId?String(state.hotspotId):null;
   selectedOpportunityId=state.opportunityId?String(state.opportunityId):null;
 
@@ -88012,10 +88071,7 @@ function restoreTestState() {
 
 
   currentBattle.returnContext =
-    state.battleReturnContext &&
-    typeof state.battleReturnContext === "object"
-      ? cloneBattleRuntimeValue(state.battleReturnContext)
-      : null;
+    normalizeBattleReturnContext(state.battleReturnContext);
 
 
   currentBattle.observerSafeResultContext =
@@ -88154,6 +88210,9 @@ function restoreTestState() {
       : {};
 
 
+  // BRICKS 1713–1718 — stale session selection never manufactures visibility.
+  reconcileRestoredWorldPresentationSelection();
+
   // =========================================
   // RESTORE SCREEN
   // =========================================
@@ -88173,7 +88232,7 @@ function restoreTestState() {
       true;
 
 
-    if (currentBattle.returnContext && currentBattle.returnContext.type === "story_scene") {
+    if (currentBattle.returnContext) {
       const resumed=resumeBattleCallerAfterCompletion("defeat");
       if (resumed&&resumed.success===true) return;
     }
@@ -92809,6 +92868,363 @@ function runAlphaPost1689IntegrationDiagnostics() {
   };
 }
 
+
+// =========================================================
+// MONSTER BATCH VIII — ALPHA RELEASE-CANDIDATE HARDENING
+// BRICKS 1690–1779
+// =========================================================
+// Coding-owned closure work only. No unresolved Writing, UI/Assets, Registry,
+// Combat, Origin or Progression authority is invented in this wave.
+// =========================================================
+
+// =========================================================
+// BRICKS 1699–1712 — CALLER / SESSION CONTEXT NORMALIZATION
+// =========================================================
+const ALPHA_BATTLE_RETURN_CONTEXT_TYPES=Object.freeze([
+  "story_scene",
+  "field_readiness_assessment",
+  "region_hotspot",
+  "mission_area_hotspot"
+]);
+
+const ALPHA_PRESENTATION_RETURN_CONTEXT_TYPES=Object.freeze([
+  "story_scene","field_readiness_assessment","region_hotspot","mission_area_hotspot","region","overlay"
+]);
+
+function cloneSafeReturnContextRecord(source,allowedTypes) {
+  if (!source||typeof source!=="object"||Array.isArray(source)) return null;
+  const type=typeof source.type==="string"?source.type.trim():"";
+  if (!type||!allowedTypes.includes(type)) return null;
+  const copy={type};
+  Object.entries(source).forEach(([key,value])=>{
+    if (key==="type"||["__proto__","prototype","constructor","resultProjector"].includes(key)) return;
+    if (typeof value==="string") copy[key]=value.slice(0,512);
+    else if (typeof value==="number"&&Number.isFinite(value)) copy[key]=value;
+    else if (typeof value==="boolean"||value===null) copy[key]=value;
+    else if (Array.isArray(value)) copy[key]=cloneBattleRuntimeValue(value);
+    else if (value&&typeof value==="object") copy[key]=cloneBattleRuntimeValue(value);
+  });
+  return copy;
+}
+
+function normalizeBattleReturnContext(source) {
+  return cloneSafeReturnContextRecord(source,ALPHA_BATTLE_RETURN_CONTEXT_TYPES);
+}
+
+function normalizePresentationReturnContext(source) {
+  return cloneSafeReturnContextRecord(source,ALPHA_PRESENTATION_RETURN_CONTEXT_TYPES);
+}
+
+function parseAlphaSessionState(raw) {
+  if (typeof raw!=="string"||!raw) return {success:false,reason:"session_state_missing",state:null};
+  try {
+    const parsed=JSON.parse(raw);
+    if (!parsed||typeof parsed!=="object"||Array.isArray(parsed)) return {success:false,reason:"session_state_not_object",state:null};
+    return {success:true,state:parsed};
+  } catch (error) {
+    return {success:false,reason:"session_state_invalid_json",error:String(error&&error.message||error),state:null};
+  }
+}
+
+function reconcileRestoredWorldPresentationSelection() {
+  if (selectedMissionAreaId) {
+    const area=getLocalMissionAreaDefinition(selectedMissionAreaId);
+    if (!area) {
+      selectedMissionAreaId=null;selectedMissionAreaReturnContext=null;selectedHotspotId=null;selectedOpportunityId=null;
+      return {type:"mission_area",valid:false,reason:"area_missing"};
+    }
+    const hotspots=getMissionAreaHotspotProjections(selectedMissionAreaId);
+    const hotspot=selectedHotspotId?hotspots.find(item=>item.hotspotId===selectedHotspotId):null;
+    if (!hotspot) {selectedHotspotId=null;selectedOpportunityId=null;return {type:"mission_area",valid:true,selectionCleared:true};}
+    if (!selectedOpportunityId||!hotspot.opportunityIds.includes(selectedOpportunityId)) selectedOpportunityId=hotspot.opportunityIds[0]||null;
+    return {type:"mission_area",valid:true,selectionCleared:false};
+  }
+  if (selectedRegionKey&&worldRegions[selectedRegionKey]&&selectedHotspotId) {
+    const hotspot=getHotspotProjection(selectedRegionKey,selectedHotspotId);
+    if (!hotspot) {selectedHotspotId=null;selectedOpportunityId=null;return {type:"region",valid:true,selectionCleared:true};}
+    if (!selectedOpportunityId||!hotspot.opportunityIds.includes(selectedOpportunityId)) selectedOpportunityId=hotspot.opportunityIds[0]||null;
+    return {type:"region",valid:true,selectionCleared:false};
+  }
+  return {type:null,valid:true,selectionCleared:false};
+}
+
+// =========================================================
+// BRICKS 1727–1730 — NON-REGISTRY ENEMY PORTRAIT AUTHORITY
+// =========================================================
+// Enemy/opposition records are not silently promoted into the collectible
+// Registry merely to render Battle UI. Their explicitly authored enemy.image
+// field is presentation authority for that occurrence family.
+function resolveBattleEnemyPortraitProjection(enemy) {
+  if (!enemy||typeof enemy!=="object") return {sourceId:null,registryId:null,path:"",status:"missing_authority",fallbackUsed:false};
+  const sourceId=typeof enemy.id==="string"?enemy.id:null;
+  const path=typeof enemy.image==="string"?enemy.image:"";
+  return path
+    ? {sourceId,registryId:null,path,status:"authored_enemy",fallbackUsed:false}
+    : {sourceId,registryId:null,path:"",status:"missing_authority",fallbackUsed:false};
+}
+
+// =========================================================
+// BRICKS 1727–1736 — BROKEN PORTRAIT FAIL-VISIBLE PRESENTATION
+// =========================================================
+function ensureUIPortraitLoadFailureLedger() {
+  if (typeof window==="undefined") return [];
+  if (!Array.isArray(window.__SC_UI_PORTRAIT_LOAD_FAILURES__)) window.__SC_UI_PORTRAIT_LOAD_FAILURES__=[];
+  return window.__SC_UI_PORTRAIT_LOAD_FAILURES__;
+}
+
+function handleBattleRosterPortraitLoadSuccess(imageElement) {
+  if (!imageElement) return false;
+  imageElement.dataset.portraitLoadState="loaded";
+  return true;
+}
+
+function handleBattleRosterPortraitLoadError(imageElement) {
+  if (!imageElement) return false;
+  const registryId=imageElement.dataset&&imageElement.dataset.uiPortraitRegistryId||null;
+  const sourceId=imageElement.dataset&&imageElement.dataset.battlePortraitSourceId||registryId||null;
+  const path=imageElement.dataset&&imageElement.dataset.uiPortraitPath||imageElement.getAttribute("src")||null;
+  const ledger=ensureUIPortraitLoadFailureLedger();
+  const key=`${sourceId||"unknown"}|${path||""}`;
+  if (!ledger.some(item=>item&&item.key===key)) ledger.push({key,sourceId,registryId,path,at:Date.now()});
+  const replacement=document.createElement("div");
+  replacement.className="battle-live-roster-portrait battle-live-roster-portrait-missing";
+  replacement.dataset.portraitStatus="binary-load-failed";
+  replacement.dataset.uiPortraitRegistryId=registryId||"";
+  replacement.setAttribute("aria-label",`Portrait unavailable for ${imageElement.alt||registryId||"participant"}`);
+  replacement.textContent="忍";
+  imageElement.replaceWith(replacement);
+  console.warn("SC Battle portrait binary unavailable; no collectible-card fallback used.",{sourceId,registryId,path});
+  return true;
+}
+
+function getAlphaLive116RegistryIds() {
+  return [...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+}
+
+function runAlphaLive116UIPortraitManifestDiagnostics() {
+  const liveIds=getAlphaLive116RegistryIds();
+  const manifestIds=Object.keys(UI_PORTRAIT_MANIFEST||{});
+  const manifestPaths=Object.values(UI_PORTRAIT_MANIFEST||{});
+  const missingIds=liveIds.filter(id=>!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id));
+  const extraIds=manifestIds.filter(id=>!liveIds.includes(id));
+  const result={
+    liveRegistryExactly116:liveIds.length===116&&new Set(liveIds).size===116,
+    manifestExactly116:manifestIds.length===116&&new Set(manifestIds).size===116,
+    exactLiveIdSet:missingIds.length===0&&extraIds.length===0,
+    allPathsExplicitRoot:manifestPaths.every(path=>typeof path==="string"&&path.startsWith("Portraits/")),
+    allPathsUnique:new Set(manifestPaths).size===manifestPaths.length,
+    noCollectibleCardFallback:resolveUIPortraitProjection.toString().includes("fallbackUsed:false")&&!resolveUIPortraitProjection.toString().includes("getCharacterCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("getEntityCollectibleCardAssetPath"),
+    supplementalSupersessionsCurrent:runAlphaSupplemental14PortraitProjectionDiagnostics().pass===true,
+    missingIds,extraIds,
+    observedLoadFailures:typeof window!=="undefined"&&Array.isArray(window.__SC_UI_PORTRAIT_LOAD_FAILURES__)?cloneProgressionData(window.__SC_UI_PORTRAIT_LOAD_FAILURES__):[],
+    pass:false
+  };
+  result.pass=result.liveRegistryExactly116&&result.manifestExactly116&&result.exactLiveIdSet&&result.allPathsExplicitRoot&&result.allPathsUnique&&result.noCollectibleCardFallback&&result.supplementalSupersessionsCurrent;
+  return result;
+}
+
+async function runAlphaLive116UIPortraitBinaryQADiagnostics() {
+  const staticGate=runAlphaLive116UIPortraitManifestDiagnostics();
+  const results=await Promise.all(getAlphaLive116RegistryIds().map(async registryId=>{
+    const path=getUIPortraitAssetPath(registryId);
+    const loaded=path?await loadAlphaImageForBinaryQA(path):{path,decoded:false,width:0,height:0,reason:"portrait_authority_missing"};
+    return {registryId,path,...loaded,dimensionPass:loaded.decoded===true&&loaded.width===1024&&loaded.height===1024};
+  }));
+  const failures=results.filter(item=>!item.dimensionPass);
+  return {
+    staticGate,
+    results,
+    attempted:results.length,
+    decoded:results.filter(item=>item.decoded).length,
+    exact1024:results.filter(item=>item.dimensionPass).length,
+    failures,
+    pass:staticGate.pass===true&&results.length===116&&failures.length===0
+  };
+}
+
+// =========================================================
+// BRICKS 1737–1744 — ENEMY PRESENTATION ASSET TRUTH
+// =========================================================
+const ALPHA_LIVE_ENEMY_PRESENTATION_PATHS=Object.freeze({
+  scout:"Enemies/Scout.png",
+  bandit:"Enemies/Bandit.png",
+  banditLeader:"Enemies/BanditLeader.png"
+});
+
+function runAlphaEnemyPresentationPathDiagnostics() {
+  const entries=Object.entries(ALPHA_LIVE_ENEMY_PRESENTATION_PATHS);
+  const result={
+    exactEnemyPaths:entries.every(([id,path])=>enemyDatabase[id]&&enemyDatabase[id].image===path),
+    nonRegistryEnemiesRemainNonRegistry:entries.every(([id])=>!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id)),
+    battleUsesExplicitEnemyPresentation:renderBattleRosterSlot.toString().includes("resolveBattleEnemyPortraitProjection")&&entries.every(([id,path])=>resolveBattleEnemyPortraitProjection(enemyDatabase[id]).path===path),
+    noCardFallback:!renderBattleRosterSlot.toString().includes("getCharacterCardAssetPath")&&!resolveBattleEnemyPortraitProjection.toString().includes("getCharacterCardAssetPath"),
+    brokenPortraitDegradesVisibly:renderBattleRosterSlot.toString().includes("handleBattleRosterPortraitLoadError"),
+    pass:false
+  };
+  result.pass=result.exactEnemyPaths&&result.nonRegistryEnemiesRemainNonRegistry&&result.battleUsesExplicitEnemyPresentation&&result.noCardFallback&&result.brokenPortraitDegradesVisibly;
+  return result;
+}
+
+async function runAlphaEnemyPresentationBinaryQADiagnostics() {
+  const results=await Promise.all(Object.entries(ALPHA_LIVE_ENEMY_PRESENTATION_PATHS).map(async ([enemyId,path])=>({enemyId,...await loadAlphaImageForBinaryQA(path)})));
+  return {results,pass:results.length===3&&results.every(item=>item.decoded===true)};
+}
+
+// =========================================================
+// BRICKS 1745–1754 — WHISPER WOODS MAP-BINDING AUTHORITY PREFLIGHT
+// =========================================================
+// Durable UI/Assets contract currently names Backgrounds/whisper_woods.png.
+// Current GitHub source contains Konoha Locations/whisper_woods.png after a
+// later physical organisation change. Source existence alone does not silently
+// supersede the durable binding contract, so Coding reports the collision and
+// keeps production binding fail-closed until UI/Assets reconciles it.
+const ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH="Backgrounds/whisper_woods.png";
+const ARC1_M1_WHISPER_WOODS_SOURCE_OBSERVED_MAP_CANDIDATE="Konoha Locations/whisper_woods.png";
+
+function getArc1M1WhisperWoodsMapBindingAuthorityPreflight() {
+  const active=String(ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING||"");
+  const pathCollision=ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH!==ARC1_M1_WHISPER_WOODS_SOURCE_OBSERVED_MAP_CANDIDATE;
+  const activeAuthoritative=active===ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH;
+  return {
+    areaId:"whisper_woods",
+    activeBinding:active,
+    durableContractPath:ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH,
+    sourceObservedCandidate:ARC1_M1_WHISPER_WOODS_SOURCE_OBSERVED_MAP_CANDIDATE,
+    pathCollision,
+    activeAuthoritative,
+    runtimeReady:activeAuthoritative,
+    codingSafe:active===""||activeAuthoritative,
+    status:activeAuthoritative?"READY":pathCollision?"WAITING_ON_UI_ASSETS_PATH_RECONCILIATION":"WAITING_ON_MAP_BINARY"
+  };
+}
+
+// =========================================================
+// BRICKS 1755–1768 — SAVE/RELOAD ABUSE + WORLD STATE DURABILITY
+// =========================================================
+function runAlphaWorldEventPersistenceDiagnostics() {
+  if (typeof localStorage==="undefined") return {pass:false,reason:"local_storage_required"};
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const rawSave=localStorage.getItem(PLAYER_SAVE_KEY);
+  const checks={};
+  let error=null;
+  try {
+    resetAlphaDiagnosticPlayerToFreshSave();
+    setWorldEventLifecycle("diag_event",{active:true,phase:"tracking"},{save:false});
+    setOpportunityDiscovery("diag_opportunity",{level:"discovered",known:true},{save:false});
+    setOpportunityActionability("diag_opportunity",{available:true},{save:false});
+    setOpportunityTracking("diag_opportunity",{tracked:true,leadState:"active"},{save:false});
+    setOpportunityResolution("diag_opportunity",{trailConfirmed:true},{save:false});
+    savePlayerData();
+    const loaded=loadPlayerData();
+    checks.realSaveReloadPreservesWorldDimensions=!!loaded.worldEventRuntime
+      &&loaded.worldEventRuntime.worldLifecycleByEventId.diag_event.active===true
+      &&loaded.worldEventRuntime.observerDiscoveryByOpportunityId.diag_opportunity.level==="discovered"
+      &&loaded.worldEventRuntime.actionabilityByOpportunityId.diag_opportunity.available===true
+      &&loaded.worldEventRuntime.trackingByOpportunityId.diag_opportunity.tracked===true
+      &&loaded.worldEventRuntime.resolutionByOpportunityId.diag_opportunity.trailConfirmed===true;
+
+    const oldSave=createDefaultPlayerData();
+    delete oldSave.worldEventRuntime;
+    localStorage.setItem(PLAYER_SAVE_KEY,JSON.stringify(oldSave));
+    const oldLoaded=loadPlayerData();
+    checks.oldSaveBackfillsEmptyWorldSchema=WORLD_EVENT_RUNTIME_DIMENSIONS.every(key=>oldLoaded.worldEventRuntime&&oldLoaded.worldEventRuntime[key]&&Object.keys(oldLoaded.worldEventRuntime[key]).length===0);
+
+    const poisoned={
+      worldLifecycleByEventId:[],
+      observerDiscoveryByOpportunityId:{valid:{level:"discovered"},constructor:{leak:true}},
+      actionabilityByOpportunityId:"bad",
+      trackingByOpportunityId:{valid:{tracked:true}},
+      resolutionByOpportunityId:{valid:{x:1},prototype:{leak:true}}
+    };
+    const normalized=normalizeWorldEventRuntimeState(poisoned);
+    checks.malformedDimensionsNormalize=Array.isArray(normalized.worldLifecycleByEventId)===false&&Object.keys(normalized.worldLifecycleByEventId).length===0&&Object.keys(normalized.actionabilityByOpportunityId).length===0;
+    checks.prototypeKeysRejected=!Object.prototype.hasOwnProperty.call(normalized.observerDiscoveryByOpportunityId,"constructor")&&!Object.prototype.hasOwnProperty.call(normalized.resolutionByOpportunityId,"prototype");
+    checks.validRecordsSurviveNormalization=normalized.observerDiscoveryByOpportunityId.valid.level==="discovered"&&normalized.trackingByOpportunityId.valid.tracked===true&&normalized.resolutionByOpportunityId.valid.x===1;
+  } catch (caught) { error=String(caught&&caught.stack||caught); }
+  finally {
+    if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY); else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+  }
+  checks.noException=error===null;
+  return {checks,error,pass:Object.values(checks).every(value=>value===true)};
+}
+
+function runAlphaSessionStateAbuseDiagnostics() {
+  if (typeof sessionStorage==="undefined") return {pass:false,reason:"session_storage_required"};
+  const raw=sessionStorage.getItem("shinobiTestState");
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const checks={};let error=null;
+  try {
+    sessionStorage.setItem("shinobiTestState","{ definitely not json");
+    let threw=false;try{restoreTestState();}catch(_){threw=true;}
+    checks.malformedJsonDoesNotThrow=threw===false;
+    checks.malformedJsonCleared=sessionStorage.getItem("shinobiTestState")===null;
+    checks.unknownBattleCallerRejected=normalizeBattleReturnContext({type:"invented_caller",foo:"bar"})===null;
+    checks.knownMissionCallerPreserved=normalizeBattleReturnContext({type:"mission_area_hotspot",missionAreaId:"whisper_woods",hotspotId:"h",opportunityId:"o"}).missionAreaId==="whisper_woods";
+    checks.functionPayloadNotPersisted=!Object.prototype.hasOwnProperty.call(normalizeBattleReturnContext({type:"story_scene",sceneId:"x",resultProjector:()=>true}),"resultProjector");
+  } catch (caught) {error=String(caught&&caught.stack||caught);}
+  finally {
+    if (raw===null) sessionStorage.removeItem("shinobiTestState"); else sessionStorage.setItem("shinobiTestState",raw);
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+  }
+  checks.noException=error===null;
+  return {checks,error,pass:Object.values(checks).every(value=>value===true)};
+}
+
+// =========================================================
+// BRICKS 1769–1774 — CALLER LIFECYCLE REGRESSION
+// =========================================================
+function runAlphaCallerLifecycleHardeningDiagnostics() {
+  const completeDefeatSource=completeBattleDefeat.toString();
+  const closeSource=closeOverlay.toString();
+  const restoreSource=restoreTestState.toString();
+  const launchSource=launchBattleWithReturnContext.toString();
+  const result={
+    victoryClaimContinueStillSplit:renderVictoryOverlay.toString().includes("claimVictoryRewardsFromOverlay")&&renderVictoryOverlay.toString().includes('rewardsClaimed ? "CONTINUE" : "CLAIM"')&&!continueAfterVictory.toString().includes("claimCurrentBattleRewards()"),
+    genericResumeSupportsFourCallers:["story_scene","field_readiness_assessment","region_hotspot","mission_area_hotspot"].every(type=>resumeBattleCallerAfterCompletion.toString().includes(`returnContext.type===\"${type}\"`)),
+    defeatUsesGenericCallerResume:completeDefeatSource.includes('resumeBattleCallerAfterCompletion("defeat")')&&!completeDefeatSource.includes('returnContext.type === "story_scene"'),
+    reloadDefeatUsesGenericCallerResume:restoreSource.includes('resumeBattleCallerAfterCompletion("defeat")'),
+    activeCallerBattleCannotGenericClose:closeSource.includes("currentBattle.returnContext")&&!closeSource.includes('currentBattle.returnContext.type === "story_scene"'),
+    callerValidatedBeforeBattleStart:launchSource.indexOf("normalizeBattleReturnContext")<launchSource.indexOf("startEncounter("),
+    staleWorldSelectionReconciled:restoreSource.includes("reconcileRestoredWorldPresentationSelection"),
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return result;
+}
+
+// =========================================================
+// BRICKS 1775–1779 — POST-1779 ALPHA RC / CODING-WALL REPORT
+// =========================================================
+function runAlphaPost1779ReleaseCandidateDiagnostics() {
+  const post1689=runAlphaPost1689IntegrationDiagnostics();
+  const worldPersistence=runAlphaWorldEventPersistenceDiagnostics();
+  const sessionAbuse=runAlphaSessionStateAbuseDiagnostics();
+  const caller=runAlphaCallerLifecycleHardeningDiagnostics();
+  const portraits=runAlphaLive116UIPortraitManifestDiagnostics();
+  const enemies=runAlphaEnemyPresentationPathDiagnostics();
+  const mapBinding=getArc1M1WhisperWoodsMapBindingAuthorityPreflight();
+  const groups={post1689,worldPersistence,sessionAbuse,caller,portraits,enemies};
+  const codingPass=Object.values(groups).every(group=>group&&group.pass===true)&&mapBinding.codingSafe===true;
+  const externalBlockers={
+    whisperWoodsMapBinding:mapBinding.status,
+    whisperWoodsMajorContact:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId)?"AUTHORED":"WAITING_ON_WRITING",
+    practical:getPracticalDesktopSourceIntegrationPlan({}).ready?"READY":"WAITING_ON_PHYSICAL_1536x1102_MASTER",
+    originConsequences:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0?"READY":`WAITING_ON_SOURCE_OCCURRENCE_IDS_${ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length}`,
+    broadPortraitBinaryReconciliation:"RUN_REAL_BROWSER_QA_AFTER_ASSETS_AUTHORITY_SETTLES"
+  };
+  return {
+    groups,mapBinding,externalBlockers,
+    codingPass,
+    liveRegistry:{characters:ALPHA_PRODUCTION_CHARACTER_IDS.length,entities:ALPHA_PRODUCTION_ENTITY_IDS.length,total:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length},
+    worldEventPersistence:"DURABLE_LOAD_SAVE_NORMALIZED",
+    callerLifecycle:"VICTORY_AND_DEFEAT_RETURN_CONTEXT_HARDENED",
+    portraitFailurePolicy:"FAIL_VISIBLE_NO_CARD_FALLBACK",
+    combatFreezePreserved:true,
+    nextImplementedBrick:1779
+  };
+}
+
 // =========================================================
 // CORE ENGINE — GAME INITIALISATION
 // =========================================================
@@ -92843,6 +93259,16 @@ window.addEventListener(
       return;
     }
     document.documentElement.setAttribute("data-sc-supplemental10-live-portrait-qa","green");
+
+    // BRICKS 1775–1779 — cheap source-level RC status at startup. Full 116
+    // binary reconciliation remains an explicit manual/browser diagnostic so
+    // normal startup does not re-download the entire portrait catalogue.
+    window.__SC_LIVE116_PORTRAIT_STATIC_QA__=runAlphaLive116UIPortraitManifestDiagnostics();
+    window.__SC_POST1779_RC_STATIC__={
+      portraitStatic:window.__SC_LIVE116_PORTRAIT_STATIC_QA__,
+      enemyPaths:runAlphaEnemyPresentationPathDiagnostics(),
+      whisperMap:getArc1M1WhisperWoodsMapBindingAuthorityPreflight()
+    };
 
     syncCharacterEquipmentFromSave();
     restoreTestState();
