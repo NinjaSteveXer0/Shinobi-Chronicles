@@ -44993,6 +44993,35 @@ function openLocalMissionArea(areaId,{returnContext=null,hotspotId=null,opportun
   if (!restoring&&isAcademyTeamFormationJourneyBlockingFreePlay()) return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
   if (!restoring&&isGeninRosterTransitionPending()) return {success:false,reason:"genin_roster_transition_required"};
 
+  // =======================================================
+  // BRICKS 1605–1608 — REUSABLE MISSION-AREA ENTRY CONTRACT
+  // =======================================================
+  // Content may predicate legitimate entry and commit idempotent entry-side
+  // World/history state without creating a second event engine. Restoring an
+  // already-open area never re-runs the entry contract.
+  if (!restoring&&typeof area.evaluateEntry==="function") {
+    const evaluated=area.evaluateEntry({
+      area,
+      returnContext:returnContext&&typeof returnContext==="object"?cloneProgressionData(returnContext):null,
+      playerData,
+      runtime:ensureWorldEventRuntimeState()
+    });
+    if (evaluated===false) return {success:false,reason:"mission_area_entry_ineligible"};
+    if (evaluated&&typeof evaluated==="object"&&evaluated.available===false) {
+      return {success:false,reason:evaluated.reason||"mission_area_entry_ineligible"};
+    }
+  }
+  if (!restoring&&typeof area.onEnter==="function") {
+    const entered=area.onEnter({
+      area,
+      returnContext:returnContext&&typeof returnContext==="object"?cloneProgressionData(returnContext):null,
+      playerData,
+      runtime:ensureWorldEventRuntimeState()
+    });
+    if (entered===false) return {success:false,reason:"mission_area_entry_commit_failed"};
+    if (entered&&typeof entered==="object"&&entered.success===false) return entered;
+  }
+
   currentOverlayType="mission_area";
   selectedMissionAreaId=area.areaId;
   selectedMissionAreaReturnContext=returnContext&&typeof returnContext==="object"?cloneProgressionData(returnContext):(area.returnContext?cloneProgressionData(area.returnContext):null);
@@ -46067,6 +46096,21 @@ function resumeStorySceneReturnContext(returnContext) {
     return {success:true,type:"overlay_closed"};
   }
   switch (returnContext.type) {
+    // =====================================================
+    // BRICKS 1609–1611 — LOCAL AREA → ACTIVE STORY CALLER
+    // =====================================================
+    // The Story runtime remains authoritative and active while a contained
+    // area is presented. Returning restores the exact same authored scene/beat.
+    case "story_scene": {
+      const active=getActiveStorySceneRuntime();
+      if (!active) return {success:false,reason:"story_return_scene_missing"};
+      if (returnContext.sceneId&&String(returnContext.sceneId)!==String(active.sceneId)) return {success:false,reason:"story_return_scene_mismatch"};
+      if (returnContext.instanceId&&String(returnContext.instanceId)!==String(active.instanceId)) return {success:false,reason:"story_return_instance_mismatch"};
+      if (returnContext.beatId&&String(returnContext.beatId)!==String(active.beatId)) return {success:false,reason:"story_return_beat_mismatch"};
+      openOverlay("story_scene");
+      saveTestState();
+      return {success:true,type:"story_scene",sceneId:active.sceneId,beatId:active.beatId,instanceId:active.instanceId};
+    }
     case "mission_area_hotspot": {
       const areaId=returnContext.missionAreaId||null;
       if (!areaId||!getLocalMissionAreaDefinition(areaId)) return {success:false,reason:"story_return_mission_area_missing"};
@@ -92004,6 +92048,765 @@ function runAlphaPost1604IntegrationDiagnostics() {
   };
   sourceChecks.pass=Object.values(sourceChecks).every(value=>value===true);
   return {groups:{post1602,projection,sourceChecks},pass:post1602.pass===true&&projection.pass===true&&sourceChecks.pass===true,nextImplementedBrick:1604};
+}
+
+
+// =========================================================
+// BRICKS 1612–1679 — ARC 1 MISSION 1: WHISPER WOODS WORLD CONTENT
+// =========================================================
+// Authority: World / Missions / Events content lock, 2026-09-06.
+//
+// Post-1604 contained-area consumer is reused exactly:
+// LOCAL_MISSION_AREA_REGISTRY + WORLD_EVENT_OPPORTUNITY_REGISTRY.
+//
+// No bespoke Whisper Woods engine, encounter counter, boss counter,
+// secret-roll reveal, automatic Battle, automatic reward, or local quest
+// subsystem is introduced here.
+//
+// World location != local hotspot != opportunity.
+// Physical evidence != identity.
+// Opportunity category != resolver/grant authority.
+// =========================================================
+
+const ARC1_M1_WHISPER_WOODS_AUTHORITY=Object.freeze({
+  areaId:"whisper_woods",
+  displayName:"WHISPER WOODS",
+  worldLocationId:"fire_whisper_woods",
+  parentRegionKey:"fire",
+  prerequisiteFactId:"arc1_m1_caravan_three_person_trace_confirmed",
+  enteredOccurrenceId:"arc1_m1_whisper_woods_entered",
+  discoveryHistoryId:"whisper_woods_discovered",
+  searchEventId:"arc1_m1_whisper_search_event",
+  watchDiscoveryEventId:"whisper_woods_watch_ledge_discovery_event",
+  hollowDiscoveryEventId:"whisper_woods_hollow_cedar_discovery_event",
+  majorContactEventId:"arc1_m1_whisper_major_contact_event",
+  majorContactSceneId:"scene_arc1_m1_whisper_major_contact",
+  locations:Object.freeze([
+    Object.freeze({locationId:"fire_whisper_woods_south_trailhead",label:"South Trailhead",hotspotId:"whisper_woods_hotspot_south_trailhead",x:50,y:88,initialKnowledge:"known_on_entry"}),
+    Object.freeze({locationId:"fire_whisper_woods_split_cedar_fork",label:"Split-Cedar Fork",hotspotId:"whisper_woods_hotspot_split_cedar",x:48,y:66,initialKnowledge:"entry_trail_reveal"}),
+    Object.freeze({locationId:"fire_whisper_woods_old_warden_shelter",label:"Old Warden Shelter",hotspotId:"whisper_woods_hotspot_warden_shelter",x:25,y:52,initialKnowledge:"old_road_route_reveal"}),
+    Object.freeze({locationId:"fire_whisper_woods_whisper_creek_ford",label:"Whisper Creek Ford",hotspotId:"whisper_woods_hotspot_creek_ford",x:68,y:49,initialKnowledge:"evidence_route_reveal"}),
+    Object.freeze({locationId:"fire_whisper_woods_north_ravine",label:"North Ravine",hotspotId:"whisper_woods_hotspot_north_ravine",x:52,y:20,initialKnowledge:"concealed_until_evidence"}),
+    Object.freeze({locationId:"fire_whisper_woods_old_watch_ledge",label:"Old Watch Ledge",hotspotId:"whisper_woods_hotspot_watch_ledge",x:82,y:27,initialKnowledge:"secret"}),
+    Object.freeze({locationId:"fire_whisper_woods_hollow_cedar",label:"Hollow Cedar",hotspotId:"whisper_woods_hotspot_hollow_cedar",x:18,y:35,initialKnowledge:"secret"})
+  ]),
+  opportunityIds:Object.freeze({
+    entryTrace:"arc1_m1_whisper_entry_trace",
+    splitCedar:"arc1_m1_whisper_split_cedar",
+    wardenShelter:"arc1_m1_whisper_warden_shelter",
+    creekCrossing:"arc1_m1_whisper_creek_crossing",
+    watchLedge:"arc1_m1_whisper_watch_ledge",
+    hollowCedar:"arc1_m1_whisper_hollow_cedar",
+    northRavine:"arc1_m1_whisper_north_ravine",
+    majorContact:"arc1_m1_whisper_major_contact"
+  })
+});
+
+// UI / Assets owns the exact file binding. Empty is deliberate and fail-closed.
+// A later approved path is consumed literally through bindArc1M1WhisperWoodsMapImage().
+let ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING="";
+
+function getArc1M1WhisperLocation(locationId) {
+  return ARC1_M1_WHISPER_WOODS_AUTHORITY.locations.find(item=>item.locationId===String(locationId||""))||null;
+}
+
+function getArc1M1WhisperResolution(opportunityId) {
+  return getWorldEventDimensionState("resolutionByOpportunityId",String(opportunityId||""));
+}
+
+function getArc1M1WhisperDiscovery(opportunityId) {
+  return getWorldEventDimensionState("observerDiscoveryByOpportunityId",String(opportunityId||""));
+}
+
+function isArc1M1WhisperObserverKnown(opportunityId) {
+  const level=String((getArc1M1WhisperDiscovery(opportunityId)||{}).level||"undiscovered");
+  return ["rumoured","partially_known","discovered","investigated","known"].includes(level);
+}
+
+function isArc1M1WhisperSearchActive() {
+  const state=getWorldEventDimensionState("worldLifecycleByEventId",ARC1_M1_WHISPER_WOODS_AUTHORITY.searchEventId);
+  return state.active===true&&state.projectable!==false;
+}
+
+function findCommittedWorldHistoryAddress(addressId) {
+  const id=String(addressId||"");
+  if (!id) return null;
+  const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];
+  return history.find(record=>{
+    if (!record||typeof record!=="object") return false;
+    if ([record.occurrenceId,record.evidenceId,record.historyId,record.factId,record.recordId].some(value=>String(value||"")===id)) return true;
+    return Array.isArray(record.linkedChronicleEvidenceIds)&&record.linkedChronicleEvidenceIds.some(value=>String(value||"")===id);
+  })||null;
+}
+
+function hasCommittedWorldHistoryAddress(addressId) {
+  return !!findCommittedWorldHistoryAddress(addressId);
+}
+
+function commitArc1M1WhisperWorldHistoryAddress(addressId,{
+  kind="evidence",
+  opportunityId=null,
+  eventId=null,
+  locationId=null,
+  hotspotId=null
+}={}) {
+  const id=String(addressId||"");
+  if (!id) return {success:false,reason:"world_history_address_missing"};
+  const existing=findCommittedWorldHistoryAddress(id);
+  if (existing) return {success:true,idempotent:true,addressId:id,record:cloneProgressionData(existing)};
+
+  if (!playerData.activityHistory||!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const record={
+    historyScope:getCurrentChronicleOccurrenceHistoryScope(kind==="evidence"?"world_investigation":"world_occurrence"),
+    type:kind==="evidence"?"world_evidence":(kind==="discovery"?"world_discovery":"world_occurrence"),
+    activity:"world_investigation",
+    completed:true,
+    success:true,
+    outcome:id,
+    sourceEventId:eventId||ARC1_M1_WHISPER_WOODS_AUTHORITY.searchEventId,
+    opportunityId:opportunityId||null,
+    locationId:locationId||null,
+    hotspotId:hotspotId||null,
+    linkedChronicleEvidenceIds:kind==="evidence"?[id]:[],
+    timestamp:Date.now()
+  };
+  if (kind==="evidence") record.evidenceId=id;
+  else if (kind==="discovery") record.historyId=id;
+  else record.occurrenceId=id;
+
+  playerData.activityHistory.push(record);
+  activityHistory=playerData.activityHistory;
+  return {success:true,idempotent:false,addressId:id,record:cloneProgressionData(record)};
+}
+
+function revealArc1M1WhisperOpportunity(opportunityId,{save=false}={}) {
+  const definition=getRegisteredWorldEventOpportunity(opportunityId);
+  if (!definition) return {success:false,reason:"whisper_opportunity_missing"};
+  if (definition.sourceKind==="story") {
+    return ensureMandatoryStoryOpportunityDiscoverable(opportunityId,{level:"discovered",leadState:"arc1_m1_whisper_search",save});
+  }
+  setOpportunityDiscovery(opportunityId,{level:"discovered"},{save:false});
+  if (definition.eventId) setWorldEventLifecycle(definition.eventId,{projectable:true,active:true},{save:false});
+  if (save) savePlayerData();
+  return {success:true,opportunityId,level:"discovered"};
+}
+
+function commitArc1M1WhisperActionEffects({
+  opportunityId,
+  evidenceId=null,
+  discoveryHistoryId=null,
+  reveals=[]
+}={}) {
+  const definition=getRegisteredWorldEventOpportunity(opportunityId);
+  if (!definition) return {success:false,reason:"whisper_action_opportunity_missing"};
+  if (evidenceId) {
+    commitArc1M1WhisperWorldHistoryAddress(evidenceId,{
+      kind:"evidence",
+      opportunityId,
+      eventId:definition.eventId,
+      locationId:definition.locationId,
+      hotspotId:definition.hotspotId
+    });
+  }
+  if (discoveryHistoryId) {
+    commitArc1M1WhisperWorldHistoryAddress(discoveryHistoryId,{
+      kind:"discovery",
+      opportunityId,
+      eventId:definition.eventId,
+      locationId:definition.locationId,
+      hotspotId:definition.hotspotId
+    });
+  }
+  [...new Set((Array.isArray(reveals)?reveals:[]).filter(Boolean))].forEach(id=>revealArc1M1WhisperOpportunity(id,{save:false}));
+  savePlayerData();
+  return {success:true,opportunityId,evidenceId,discoveryHistoryId,reveals:[...(reveals||[])]};
+}
+
+function createArc1M1WhisperAction({
+  id,
+  label,
+  kind="investigation",
+  resolutionPatch=null,
+  evidenceId=null,
+  discoveryHistoryId=null,
+  reveals=[],
+  availabilityFlag=null,
+  resolve=null,
+  sceneId=null,
+  evaluateAvailability=null
+}) {
+  const action={id,label,kind};
+  if (resolutionPatch&&typeof resolutionPatch==="object") action.resolutionPatch=Object.freeze({...resolutionPatch});
+  if (sceneId) action.sceneId=sceneId;
+  action.evaluateAvailability=typeof evaluateAvailability==="function"
+    ? evaluateAvailability
+    : (availabilityFlag
+      ? ({definition})=>({available:getArc1M1WhisperResolution(definition.opportunityId)[availabilityFlag]!==true,reasonVisible:false})
+      : undefined);
+  if (typeof resolve==="function") action.resolve=resolve;
+  else if (!sceneId) action.resolve=()=>({success:true,type:kind});
+  if (evidenceId||discoveryHistoryId||(Array.isArray(reveals)&&reveals.length)) {
+    action.onCommitted=({definition})=>commitArc1M1WhisperActionEffects({
+      opportunityId:definition.opportunityId,
+      evidenceId,
+      discoveryHistoryId,
+      reveals
+    });
+  }
+  return action;
+}
+
+function evaluateArc1M1WhisperEntry() {
+  const previouslyDiscovered=hasCommittedWorldHistoryAddress(ARC1_M1_WHISPER_WOODS_AUTHORITY.discoveryHistoryId);
+  const prerequisiteCommitted=hasCommittedWorldHistoryAddress(ARC1_M1_WHISPER_WOODS_AUTHORITY.prerequisiteFactId);
+  return {
+    available:previouslyDiscovered||prerequisiteCommitted,
+    reason:previouslyDiscovered||prerequisiteCommitted?null:"arc1_m1_caravan_three_person_trace_not_committed"
+  };
+}
+
+function commitArc1M1WhisperEntry() {
+  const eligibility=evaluateArc1M1WhisperEntry();
+  if (!eligibility.available) return {success:false,reason:eligibility.reason};
+
+  const firstEntry=!hasCommittedWorldHistoryAddress(ARC1_M1_WHISPER_WOODS_AUTHORITY.enteredOccurrenceId);
+  const lifecycle=getWorldEventDimensionState("worldLifecycleByEventId",ARC1_M1_WHISPER_WOODS_AUTHORITY.searchEventId);
+  setWorldEventLifecycle(ARC1_M1_WHISPER_WOODS_AUTHORITY.searchEventId,{
+    active:true,
+    projectable:true,
+    startedAt:Number(lifecycle.startedAt)||(firstEntry?Date.now():null)
+  },{save:false});
+
+  if (firstEntry) {
+    commitArc1M1WhisperWorldHistoryAddress(ARC1_M1_WHISPER_WOODS_AUTHORITY.enteredOccurrenceId,{
+      kind:"occurrence",
+      eventId:ARC1_M1_WHISPER_WOODS_AUTHORITY.searchEventId,
+      locationId:ARC1_M1_WHISPER_WOODS_AUTHORITY.worldLocationId
+    });
+    commitArc1M1WhisperWorldHistoryAddress(ARC1_M1_WHISPER_WOODS_AUTHORITY.discoveryHistoryId,{
+      kind:"discovery",
+      eventId:ARC1_M1_WHISPER_WOODS_AUTHORITY.searchEventId,
+      locationId:ARC1_M1_WHISPER_WOODS_AUTHORITY.worldLocationId
+    });
+    revealArc1M1WhisperOpportunity(ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.entryTrace,{save:false});
+  }
+  savePlayerData();
+  return {success:true,idempotent:!firstEntry,firstEntry,areaId:ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId};
+}
+
+function createActiveStorySceneCallerContext() {
+  const active=getActiveStorySceneRuntime();
+  if (!active) return null;
+  return {
+    type:"story_scene",
+    sceneId:active.sceneId,
+    beatId:active.beatId,
+    instanceId:active.instanceId
+  };
+}
+
+function openArc1Mission1WhisperWoods({returnContext=null,restoring=false}={}) {
+  const caller=returnContext&&typeof returnContext==="object"
+    ? cloneProgressionData(returnContext)
+    : createActiveStorySceneCallerContext();
+  return openLocalMissionArea(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId,{
+    returnContext:caller,
+    hotspotId:restoring?selectedHotspotId:ARC1_M1_WHISPER_WOODS_AUTHORITY.locations[0].hotspotId,
+    opportunityId:restoring?selectedOpportunityId:ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.entryTrace,
+    restoring
+  });
+}
+
+function bindArc1M1WhisperWoodsMapImage(exactPath) {
+  if (!exactPath||typeof exactPath!=="string") return {success:false,reason:"whisper_woods_map_path_missing"};
+  ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING=String(exactPath);
+  const registered=registerArc1M1WhisperWoodsWorldContent({mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING});
+  return registered.success
+    ? {success:true,areaId:ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId,mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING}
+    : registered;
+}
+
+function registerArc1M1WhisperWoodsWorldContent({mapImage=ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING}={}) {
+  const A=ARC1_M1_WHISPER_WOODS_AUTHORITY;
+  const O=A.opportunityIds;
+
+  const areaResult=registerLocalMissionArea({
+    areaId:A.areaId,
+    name:"Whisper Woods",
+    description:"",
+    mapImage:String(mapImage||""),
+    parentRegionKey:A.parentRegionKey,
+    worldLocationId:A.worldLocationId,
+    locations:A.locations.map(item=>({...item})),
+    returnContext:null,
+    evaluateEntry:()=>evaluateArc1M1WhisperEntry(),
+    onEnter:()=>commitArc1M1WhisperEntry()
+  });
+  if (!areaResult.success) return areaResult;
+
+  const loc=id=>getArc1M1WhisperLocation(id);
+  const register=(definition)=>registerWorldEventOpportunity({
+    missionAreaId:A.areaId,
+    regionKey:A.parentRegionKey,
+    randomPoolEligible:false,
+    defaultDiscoveryLevel:"undiscovered",
+    ...definition
+  });
+
+  const entryLoc=loc("fire_whisper_woods_south_trailhead");
+  register({
+    opportunityId:O.entryTrace,
+    hotspotId:entryLoc.hotspotId,
+    eventId:A.searchEventId,
+    locationId:entryLoc.locationId,
+    sourceKind:"story",
+    anchor:{x:entryLoc.x,y:entryLoc.y},
+    presentation:{family:"Story",category:"INVESTIGATION",label:"Three-Person Trace",summary:"",showUnknownMarker:false},
+    evaluateProjection:()=>{
+      const r=getArc1M1WhisperResolution(O.entryTrace);
+      return isArc1M1WhisperSearchActive()&&r.trailConfirmed!==true&&r.trailFollowed!==true;
+    },
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"inspect_trace",label:"INSPECT TRACE",kind:"investigation",
+        resolutionPatch:{trailConfirmed:true},
+        availabilityFlag:"trailConfirmed",
+        evidenceId:"arc1_m1_ww_evidence_trace_continues",
+        reveals:[O.splitCedar]
+      }),
+      createArc1M1WhisperAction({
+        id:"follow_trace",label:"FOLLOW TRACE",kind:"travel",
+        resolutionPatch:{trailFollowed:true},
+        availabilityFlag:"trailFollowed",
+        reveals:[O.splitCedar]
+      })
+    ]
+  });
+
+  const splitLoc=loc("fire_whisper_woods_split_cedar_fork");
+  register({
+    opportunityId:O.splitCedar,
+    hotspotId:splitLoc.hotspotId,
+    eventId:A.searchEventId,
+    locationId:splitLoc.locationId,
+    sourceKind:"story",
+    anchor:{x:splitLoc.x,y:splitLoc.y},
+    presentation:{family:"Story",category:"INVESTIGATION",label:"Split-Cedar Tracks",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>{
+      const entry=getArc1M1WhisperResolution(O.entryTrace);
+      return isArc1M1WhisperSearchActive()&&(entry.trailConfirmed===true||entry.trailFollowed===true);
+    },
+    evaluateProjection:()=>{
+      const r=getArc1M1WhisperResolution(O.splitCedar);
+      return isArc1M1WhisperSearchActive()&&r.creekRouteConfirmed!==true&&r.shelterSpurKnown!==true;
+    },
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"inspect_old_road",label:"INSPECT OLD ROAD",kind:"investigation",
+        resolutionPatch:{oldRoadAmbiguous:true},
+        availabilityFlag:"oldRoadAmbiguous",
+        evidenceId:"arc1_m1_ww_evidence_old_road_ambiguous"
+      }),
+      createArc1M1WhisperAction({
+        id:"inspect_understory",label:"CHECK BROKEN UNDERGROWTH",kind:"investigation",
+        resolutionPatch:{creekRouteConfirmed:true},
+        availabilityFlag:"creekRouteConfirmed",
+        evidenceId:"arc1_m1_ww_evidence_creek_route",
+        reveals:[O.creekCrossing]
+      }),
+      createArc1M1WhisperAction({
+        id:"follow_shelter_spur",label:"FOLLOW OLD-ROAD SPUR",kind:"travel",
+        resolutionPatch:{shelterSpurKnown:true},
+        availabilityFlag:"shelterSpurKnown",
+        reveals:[O.wardenShelter]
+      })
+    ]
+  });
+
+  const wardenLoc=loc("fire_whisper_woods_old_warden_shelter");
+  register({
+    opportunityId:O.wardenShelter,
+    hotspotId:wardenLoc.hotspotId,
+    eventId:A.searchEventId,
+    locationId:wardenLoc.locationId,
+    sourceKind:"story",
+    anchor:{x:wardenLoc.x,y:wardenLoc.y},
+    presentation:{family:"Discovery",category:"INVESTIGATION",label:"Old Warden Shelter",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.splitCedar).shelterSpurKnown===true,
+    evaluateProjection:()=>{
+      const r=getArc1M1WhisperResolution(O.wardenShelter);
+      return isArc1M1WhisperSearchActive()&&!(r.matchingFreshPassageAbsent===true&&r.creekConnectorKnown===true);
+    },
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"inspect_recent_signs",label:"CHECK RECENT SIGNS",kind:"investigation",
+        resolutionPatch:{matchingFreshPassageAbsent:true},
+        availabilityFlag:"matchingFreshPassageAbsent",
+        evidenceId:"arc1_m1_ww_evidence_shelter_negative"
+      }),
+      createArc1M1WhisperAction({
+        id:"inspect_route_marks",label:"INSPECT OLD ROUTE MARKS",kind:"investigation",
+        resolutionPatch:{creekConnectorKnown:true,watchRouteClueFound:true,hollowCedarClueFound:true},
+        availabilityFlag:"creekConnectorKnown",
+        reveals:[O.creekCrossing,O.watchLedge,O.hollowCedar]
+      })
+    ]
+  });
+
+  const creekLoc=loc("fire_whisper_woods_whisper_creek_ford");
+  register({
+    opportunityId:O.creekCrossing,
+    hotspotId:creekLoc.hotspotId,
+    eventId:A.searchEventId,
+    locationId:creekLoc.locationId,
+    sourceKind:"story",
+    anchor:{x:creekLoc.x,y:creekLoc.y},
+    presentation:{family:"Story",category:"INVESTIGATION",label:"Creek Crossing",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>{
+      const split=getArc1M1WhisperResolution(O.splitCedar);
+      const shelter=getArc1M1WhisperResolution(O.wardenShelter);
+      return isArc1M1WhisperSearchActive()&&(split.creekRouteConfirmed===true||shelter.creekConnectorKnown===true);
+    },
+    evaluateProjection:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.creekCrossing).northTrailConfirmed!==true,
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"inspect_near_bank",label:"INSPECT NEAR BANK",kind:"investigation",
+        resolutionPatch:{threePersonCreekEntryConfirmed:true},
+        availabilityFlag:"threePersonCreekEntryConfirmed",
+        evidenceId:"arc1_m1_ww_evidence_creek_entry"
+      }),
+      createArc1M1WhisperAction({
+        id:"search_opposite_bank",label:"SEARCH OPPOSITE BANK",kind:"investigation",
+        resolutionPatch:{northTrailConfirmed:true},
+        availabilityFlag:"northTrailConfirmed",
+        evidenceId:"arc1_m1_ww_evidence_north_trail",
+        reveals:[O.northRavine]
+      }),
+      createArc1M1WhisperAction({
+        id:"inspect_high_bank",label:"CHECK HIGH BANK",kind:"investigation",
+        resolutionPatch:{watchRouteClueFound:true},
+        availabilityFlag:"watchRouteClueFound",
+        reveals:[O.watchLedge]
+      })
+    ]
+  });
+
+  const watchLoc=loc("fire_whisper_woods_old_watch_ledge");
+  register({
+    opportunityId:O.watchLedge,
+    hotspotId:watchLoc.hotspotId,
+    eventId:A.watchDiscoveryEventId,
+    locationId:watchLoc.locationId,
+    sourceKind:"authored",
+    anchor:{x:watchLoc.x,y:watchLoc.y},
+    presentation:{family:"Discovery",category:"SECRET",label:"Old Watch Ledge",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>{
+      const creek=getArc1M1WhisperResolution(O.creekCrossing);
+      const shelter=getArc1M1WhisperResolution(O.wardenShelter);
+      return isArc1M1WhisperSearchActive()&&(creek.watchRouteClueFound===true||shelter.watchRouteClueFound===true);
+    },
+    evaluateProjection:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.watchLedge).northRavineObserved!==true,
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"climb_watch_ledge",label:"CLIMB TO LEDGE",kind:"discovery",
+        resolutionPatch:{ledgeClimbed:true},
+        availabilityFlag:"ledgeClimbed",
+        discoveryHistoryId:"whisper_woods_watch_ledge_discovered"
+      }),
+      createArc1M1WhisperAction({
+        id:"observe_north",label:"OBSERVE NORTH",kind:"investigation",
+        resolutionPatch:{northRavineObserved:true},
+        availabilityFlag:"northRavineObserved",
+        evidenceId:"arc1_m1_ww_evidence_ravine_observation",
+        reveals:[O.northRavine]
+      })
+    ]
+  });
+
+  const hollowLoc=loc("fire_whisper_woods_hollow_cedar");
+  register({
+    opportunityId:O.hollowCedar,
+    hotspotId:hollowLoc.hotspotId,
+    eventId:A.hollowDiscoveryEventId,
+    locationId:hollowLoc.locationId,
+    sourceKind:"authored",
+    anchor:{x:hollowLoc.x,y:hollowLoc.y},
+    presentation:{family:"Discovery",category:"SECRET",label:"Hollow Cedar",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.wardenShelter).hollowCedarClueFound===true,
+    evaluateProjection:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.hollowCedar).hollowCedarDiscovered!==true,
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"inspect_hollow",label:"INSPECT HOLLOW",kind:"discovery",
+        resolutionPatch:{hollowCedarDiscovered:true},
+        availabilityFlag:"hollowCedarDiscovered",
+        discoveryHistoryId:"whisper_woods_hollow_cedar_discovered"
+      })
+    ]
+  });
+
+  const northLoc=loc("fire_whisper_woods_north_ravine");
+  register({
+    opportunityId:O.northRavine,
+    hotspotId:northLoc.hotspotId,
+    eventId:A.searchEventId,
+    locationId:northLoc.locationId,
+    sourceKind:"story",
+    anchor:{x:northLoc.x,y:northLoc.y},
+    presentation:{family:"Story",category:"INVESTIGATION",label:"North Ravine",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>{
+      const creek=getArc1M1WhisperResolution(O.creekCrossing);
+      const watch=getArc1M1WhisperResolution(O.watchLedge);
+      return isArc1M1WhisperSearchActive()&&(creek.northTrailConfirmed===true||watch.northRavineObserved===true);
+    },
+    evaluateProjection:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.northRavine).northRavineConfirmed!==true,
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"inspect_trail_end",label:"INSPECT TRAIL END",kind:"investigation",
+        resolutionPatch:{northRavineConfirmed:true},
+        availabilityFlag:"northRavineConfirmed",
+        evidenceId:"arc1_m1_ww_evidence_north_ravine",
+        reveals:[O.majorContact]
+      }),
+      createArc1M1WhisperAction({
+        id:"observe_quietly",label:"OBSERVE QUIETLY",kind:"investigation",
+        resolve:()=>({
+          success:true,
+          type:"investigation",
+          observerSafe:true,
+          committed:false,
+          result:"No identity or hostile intent is established by quiet observation alone."
+        })
+      })
+    ]
+  });
+
+  register({
+    opportunityId:O.majorContact,
+    hotspotId:northLoc.hotspotId,
+    eventId:A.majorContactEventId,
+    locationId:northLoc.locationId,
+    sourceKind:"story",
+    anchor:{x:northLoc.x,y:northLoc.y},
+    presentation:{family:"Story",category:"STORY",label:"Unidentified Activity",summary:"",showUnknownMarker:false},
+    revealPredicate:()=>isArc1M1WhisperSearchActive()
+      &&getArc1M1WhisperResolution(O.northRavine).northRavineConfirmed===true
+      &&isArc1M1WhisperObserverKnown(O.northRavine),
+    evaluateProjection:()=>isArc1M1WhisperSearchActive(),
+    interactions:[
+      createArc1M1WhisperAction({
+        id:"observe_contact",label:"OBSERVE",kind:"investigation",
+        resolutionPatch:{unidentifiedActivityObserved:true},
+        availabilityFlag:"unidentifiedActivityObserved",
+        evidenceId:"arc1_m1_ww_evidence_unidentified_activity"
+      }),
+      createArc1M1WhisperAction({
+        id:"approach_contact",label:"APPROACH",kind:"story_scene",
+        sceneId:A.majorContactSceneId,
+        evaluateAvailability:()=>({
+          available:typeof STORY_SCENE_REGISTRY!=="undefined"&&STORY_SCENE_REGISTRY.has(A.majorContactSceneId),
+          reason:"story_scene_not_authored",
+          reasonVisible:false
+        })
+      })
+    ]
+  });
+
+  return {
+    success:true,
+    areaId:A.areaId,
+    mapBound:!!String(mapImage||""),
+    opportunityCount:getWorldOpportunityDefinitionsForMissionArea(A.areaId).length
+  };
+}
+
+registerArc1M1WhisperWoodsWorldContent();
+
+// =========================================================
+// BRICKS 1680–1689 — WHISPER WOODS CONTENT / PERSISTENCE GOLDEN
+// =========================================================
+function runAlphaArc1M1WhisperWoodsContentDiagnostics() {
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const previousMapBinding=ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING;
+  const areaBefore=getLocalMissionAreaDefinition(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId);
+  const priorMapImage=areaBefore?areaBefore.mapImage:"";
+  const A=ARC1_M1_WHISPER_WOODS_AUTHORITY;
+  const O=A.opportunityIds;
+  const checks={};
+  let error=null;
+
+  try {
+    resetAlphaDiagnosticPlayerToFreshSave();
+
+    // The prerequisite is injected as a committed external World/history fact
+    // only for this non-production diagnostic. Production never fabricates it.
+    commitArc1M1WhisperWorldHistoryAddress(A.prerequisiteFactId,{
+      kind:"occurrence",
+      eventId:"diagnostic_pre_woods_caravan_investigation",
+      locationId:"diagnostic_pre_woods_caravan"
+    });
+
+    bindArc1M1WhisperWoodsMapImage("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==");
+
+    const definitions=getWorldOpportunityDefinitionsForMissionArea(A.areaId);
+    checks.exactAreaIdentity=!!getLocalMissionAreaDefinition(A.areaId)
+      &&getLocalMissionAreaDefinition(A.areaId).worldLocationId==="fire_whisper_woods"
+      &&getLocalMissionAreaDefinition(A.areaId).parentRegionKey==="fire";
+    checks.exactSevenStablePlaces=A.locations.length===7&&new Set(A.locations.map(item=>item.locationId)).size===7&&new Set(A.locations.map(item=>item.hotspotId)).size===7;
+    checks.exactEightAuthoredOpportunities=definitions.length===8&&Object.values(O).every(id=>definitions.some(def=>def.opportunityId===id));
+    checks.noRegionalProjectionLeak=getWorldOpportunityDefinitionsForRegion("fire",worldRegions.fire).every(def=>def.missionAreaId!==A.areaId);
+    checks.noBattleActionAuthored=definitions.every(def=>def.interactions.every(action=>action.kind!=="battle"));
+    checks.noAutomaticRewardAuthority=definitions.every(def=>!def.interactions.some(action=>action.reward||action.rewards||action.exp||action.ryo||action.itemId));
+    checks.majorContactSceneReserved=getRegisteredWorldEventOpportunity(O.majorContact).interactions.some(action=>action.id==="approach_contact"&&action.sceneId===A.majorContactSceneId);
+    checks.majorContactBattleAbsent=!getRegisteredWorldEventOpportunity(O.majorContact).interactions.some(action=>action.kind==="battle");
+
+    const beforeEntry=getMissionAreaHotspotProjections(A.areaId);
+    checks.nothingProjectsBeforeEntry=beforeEntry.length===0;
+
+    const entered=openArc1Mission1WhisperWoods({returnContext:{type:"region",regionKey:"fire"}});
+    const initial=getMissionAreaHotspotProjections(A.areaId);
+    checks.validFirstEntryCommitsHistory=entered.success===true
+      &&hasCommittedWorldHistoryAddress(A.enteredOccurrenceId)
+      &&hasCommittedWorldHistoryAddress(A.discoveryHistoryId)
+      &&isArc1M1WhisperSearchActive();
+    checks.initialProjectionOnlySouthTrailhead=initial.length===1
+      &&initial[0].hotspotId==="whisper_woods_hotspot_south_trailhead"
+      &&initial[0].opportunityIds.length===1
+      &&initial[0].opportunityIds[0]===O.entryTrace;
+    checks.initialSecretsNonLeaking=!initial.some(h=>["whisper_woods_hotspot_watch_ledge","whisper_woods_hotspot_hollow_cedar","whisper_woods_hotspot_north_ravine"].includes(h.hotspotId));
+
+    const follow=routeWorldOpportunityInteraction(O.entryTrace,"follow_trace");
+    const afterFollow=getMissionAreaHotspotProjections(A.areaId);
+    checks.followTraceRevealsSplitWithoutInspectionEvidence=follow.success===true
+      &&getArc1M1WhisperResolution(O.entryTrace).trailFollowed===true
+      &&!hasCommittedWorldHistoryAddress("arc1_m1_ww_evidence_trace_continues")
+      &&afterFollow.some(h=>h.opportunityIds.includes(O.splitCedar));
+
+    const oldRoad=routeWorldOpportunityInteraction(O.splitCedar,"inspect_old_road");
+    checks.oldRoadNegativeInferenceBounded=oldRoad.success===true
+      &&getArc1M1WhisperResolution(O.splitCedar).oldRoadAmbiguous===true
+      &&hasCommittedWorldHistoryAddress("arc1_m1_ww_evidence_old_road_ambiguous")
+      &&getArc1M1WhisperResolution(O.splitCedar).creekRouteConfirmed!==true;
+
+    const shelterRoute=routeWorldOpportunityInteraction(O.splitCedar,"follow_shelter_spur");
+    const atShelter=getMissionAreaHotspotProjections(A.areaId);
+    checks.shelterBranchLegitimate=shelterRoute.success===true&&atShelter.some(h=>h.opportunityIds.includes(O.wardenShelter));
+
+    const routeMarks=routeWorldOpportunityInteraction(O.wardenShelter,"inspect_route_marks");
+    const afterMarks=getMissionAreaHotspotProjections(A.areaId);
+    checks.routeMarksReconnectCreek=routeMarks.success===true&&afterMarks.some(h=>h.opportunityIds.includes(O.creekCrossing));
+    checks.secretCluesCommitObserverDiscovery=afterMarks.some(h=>h.opportunityIds.includes(O.watchLedge))
+      &&afterMarks.some(h=>h.opportunityIds.includes(O.hollowCedar))
+      &&isArc1M1WhisperObserverKnown(O.watchLedge)
+      &&isArc1M1WhisperObserverKnown(O.hollowCedar);
+
+    const creekNear=routeWorldOpportunityInteraction(O.creekCrossing,"inspect_near_bank");
+    const creekNorth=routeWorldOpportunityInteraction(O.creekCrossing,"search_opposite_bank");
+    const afterNorthReveal=getMissionAreaHotspotProjections(A.areaId);
+    checks.creekEvidenceExact=creekNear.success===true&&creekNorth.success===true
+      &&hasCommittedWorldHistoryAddress("arc1_m1_ww_evidence_creek_entry")
+      &&hasCommittedWorldHistoryAddress("arc1_m1_ww_evidence_north_trail")
+      &&afterNorthReveal.some(h=>h.opportunityIds.includes(O.northRavine));
+
+    const majorBefore=getMissionAreaHotspotProjections(A.areaId).some(h=>h.opportunityIds.includes(O.majorContact));
+    const trailEnd=routeWorldOpportunityInteraction(O.northRavine,"inspect_trail_end");
+    const afterMajor=getMissionAreaHotspotProjections(A.areaId);
+    const northHotspot=afterMajor.find(h=>h.hotspotId==="whisper_woods_hotspot_north_ravine");
+    checks.majorContactCausalNotCountBased=majorBefore===false&&trailEnd.success===true
+      &&getArc1M1WhisperResolution(O.northRavine).northRavineConfirmed===true
+      &&!!northHotspot&&northHotspot.opportunityIds.includes(O.majorContact);
+    checks.majorContactObserverSafe=!!northHotspot&&northHotspot.opportunities.some(item=>item.opportunity_id===O.majorContact&&item.known_label==="Unidentified Activity");
+    const majorProjection=northHotspot&&northHotspot.opportunities.find(item=>item.opportunity_id===O.majorContact);
+    checks.unwrittenApproachNotActionable=!!majorProjection&&!majorProjection.legal_actions.some(action=>action.actionId==="approach_contact");
+    checks.noAutomaticBattleAfterMajorReveal=currentBattle&&currentBattle.battleId==null;
+
+    const ryoBefore=Number(playerData.ryo)||0;
+    const expBefore=Number(playerData.exp)||0;
+    const inventoryBefore=JSON.stringify(playerData.inventory||[]);
+    const observe=routeWorldOpportunityInteraction(O.majorContact,"observe_contact");
+    checks.observeContactBounded=observe.success===true
+      &&getArc1M1WhisperResolution(O.majorContact).unidentifiedActivityObserved===true
+      &&hasCommittedWorldHistoryAddress("arc1_m1_ww_evidence_unidentified_activity");
+    checks.noAreaOrInvestigationRewards=(Number(playerData.ryo)||0)===ryoBefore
+      &&(Number(playerData.exp)||0)===expBefore
+      &&JSON.stringify(playerData.inventory||[])===inventoryBefore;
+
+    // Save/load authority is the existing World Event state plus session caller.
+    selectedHotspotId="whisper_woods_hotspot_north_ravine";
+    selectedOpportunityId=O.majorContact;
+    currentOverlayType="mission_area";
+    selectedMissionAreaId=A.areaId;
+    selectedMissionAreaReturnContext={type:"region",regionKey:"fire"};
+    savePlayerData();
+    saveTestState();
+    const savedRuntime=cloneProgressionData(playerData.worldEventRuntime);
+    const savedHistory=cloneProgressionData(playerData.activityHistory);
+    const savedSession=typeof sessionStorage!=="undefined"?sessionStorage.getItem("shinobiTestState"):null;
+    checks.persistenceUsesExistingWorldRuntime=!!savedRuntime
+      &&savedRuntime.resolutionByOpportunityId[O.northRavine].northRavineConfirmed===true
+      &&savedRuntime.observerDiscoveryByOpportunityId[O.watchLedge].level==="discovered"
+      &&Array.isArray(savedHistory)
+      &&hasCommittedWorldHistoryAddress("whisper_woods_hollow_cedar_discovered")===false;
+    checks.callerPersistenceShape=!!savedSession&&savedSession.includes('"missionAreaId":"whisper_woods"')
+      &&savedSession.includes('"hotspotId":"whisper_woods_hotspot_north_ravine"');
+
+    checks.categoriesExact=[
+      [O.entryTrace,"INVESTIGATION"],[O.splitCedar,"INVESTIGATION"],[O.wardenShelter,"INVESTIGATION"],
+      [O.creekCrossing,"INVESTIGATION"],[O.watchLedge,"SECRET"],[O.hollowCedar,"SECRET"],
+      [O.northRavine,"INVESTIGATION"],[O.majorContact,"STORY"]
+    ].every(([id,category])=>getRegisteredWorldEventOpportunity(id).presentation.category===category);
+    checks.storyOpportunitiesNeverRandomPool=[O.entryTrace,O.splitCedar,O.wardenShelter,O.creekCrossing,O.northRavine,O.majorContact]
+      .every(id=>getRegisteredWorldEventOpportunity(id).randomPoolEligible===false);
+    checks.secretsNeverRandomPool=[O.watchLedge,O.hollowCedar].every(id=>getRegisteredWorldEventOpportunity(id).randomPoolEligible===false);
+    checks.entryHooksGeneric=openLocalMissionArea.toString().includes('typeof area.evaluateEntry==="function"')
+      &&openLocalMissionArea.toString().includes('typeof area.onEnter==="function"');
+    checks.storyCallerReusable=resumeStorySceneReturnContext.toString().includes('case "story_scene"')
+      &&typeof createActiveStorySceneCallerContext==="function";
+    checks.noWhisperSpecificEngine=typeof LOCAL_MISSION_AREA_REGISTRY!=="undefined"
+      &&getWorldOpportunityDefinitionsForMissionArea(A.areaId).every(def=>def.missionAreaId===A.areaId);
+  } catch (caught) {
+    error=String(caught&&caught.stack||caught);
+  } finally {
+    ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING=previousMapBinding;
+    registerArc1M1WhisperWoodsWorldContent({mapImage:priorMapImage||previousMapBinding||""});
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+    selectedMissionAreaId=null;
+    selectedMissionAreaReturnContext=null;
+    selectedHotspotId=null;
+    selectedOpportunityId=null;
+  }
+
+  checks.noDiagnosticException=error===null;
+  const result={checks,error,pass:Object.values(checks).every(value=>value===true)};
+  console.table(checks);
+  if (error) console.error("SC Whisper Woods content diagnostic error:",error);
+  console.log(`SC Arc 1 Mission 1 Whisper Woods World-content Golden: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaPost1689IntegrationDiagnostics() {
+  const post1604=runAlphaPost1604IntegrationDiagnostics();
+  const whisperWoods=runAlphaArc1M1WhisperWoodsContentDiagnostics();
+  const A=ARC1_M1_WHISPER_WOODS_AUTHORITY;
+  const definitions=getWorldOpportunityDefinitionsForMissionArea(A.areaId);
+  const sourceChecks={
+    post1604Preserved:post1604.pass===true,
+    whisperWoodsGolden:whisperWoods.pass===true,
+    mapBindingStillFailClosed:getLocalMissionAreaDefinition(A.areaId).mapImage===ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING,
+    mapPathNotInvented:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING==="",
+    exactWorldContractLoaded:definitions.length===8&&ARC1_M1_WHISPER_WOODS_AUTHORITY.locations.length===7,
+    noBattlePayloadInvented:definitions.every(def=>def.interactions.every(action=>action.kind!=="battle")),
+    writingSceneStillExternal:!STORY_SCENE_REGISTRY.has(A.majorContactSceneId),
+    liveRegistryStill116:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18
+  };
+  sourceChecks.pass=Object.values(sourceChecks).every(value=>value===true);
+  return {
+    groups:{post1604,whisperWoods,sourceChecks},
+    pass:post1604.pass===true&&whisperWoods.pass===true&&sourceChecks.pass===true,
+    whisperWoodsStatus:"WORLD_CONTENT_IMPLEMENTED_MAP_BINDING_PENDING_WRITING_SCENE_PENDING",
+    exactBattlePackageAuthored:false,
+    mapImageBound:false,
+    nextImplementedBrick:1689
+  };
 }
 
 // =========================================================
