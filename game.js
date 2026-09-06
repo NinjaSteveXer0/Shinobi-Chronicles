@@ -189,7 +189,7 @@ const assetManifest = {
 };
 
 // =========================================================
-// BRICK 896 — RATIFIED 102/102 UI PORTRAIT AUTHORITY
+// BRICK 1325 — RATIFIED 116/116 UI PORTRAIT AUTHORITY
 // Exact Registry representation ID -> approved uiPortrait path.
 // Paths are manifest data, never derived from identity strings.
 // =========================================================
@@ -297,6 +297,20 @@ const UI_PORTRAIT_MANIFEST = Object.freeze({
   "wr_kamatari": "Portraits/Summons/kamatari.png",
   "yang_kurama": "Portraits/Summons/kurama_yang.png",
   "yin_kurama": "Portraits/Summons/kurama_yin.png"
+  ,"chunin_iruka": "Portraits/Chunin/chunin_iruka.png"
+  ,"sj_anko": "Portraits/Special Jonin/sj_anko.png"
+  ,"chunin_fugaku": "Portraits/Chunin/chunin_fugaku.png"
+  ,"chunin_itama": "Portraits/Chunin/chunin_Itama.png"
+  ,"genin_mikoto": "Portraits/Genin/genin_mikoto.png"
+  ,"genin_orochimaru": "Portraits/Genin/genin_orochimaru.png"
+  ,"akatsuki_kakuzu": "Portraits/Akatsuki/akatsuki_kakuzu.png"
+  ,"sj_kiba": "Portraits/Special Jonin/sj_kiba.png"
+  ,"sj_nono": "Portraits/Special Jonin/sj_nono.png"
+  ,"sannin_tenten": "Portraits/Sannin/sannin_tenten.png"
+  ,"sannin_hinata": "Portraits/Sannin/sannin_hinata.png"
+  ,"sannin_sumire": "Portraits/Sannin/sannin_sumire.png"
+  ,"kurama_resonance_himawari": "Portraits/Rare Cards/kurama_resonance_himawari.png"
+  ,"nue": "Portraits/Summons/nue.png"
 });
 // UI_PORTRAIT_MANIFEST_JSON_END
 
@@ -1774,6 +1788,20 @@ const characterRegistry = {
     "lifespanErosionIsAttackPL": false,
     "collapseDealsSelfDamage": false
   }
+  ,"chunin_iruka": {"id":"chunin_iruka","baseStats":{"nin":32,"tai":30,"buki":31,"fuin":26,"kin":18,"gen":27,"stamina":34},"basePL":33,"formalRank":"chunin","category":"chunin_character"}
+  ,"sj_anko": {"id":"sj_anko","baseStats":{"nin":56,"tai":52,"buki":48,"fuin":44,"kin":58,"gen":39,"stamina":55},"basePL":56,"formalRank":"special_jonin","category":"special_jonin_character","representationGuard":"untransformed_only_no_cs_or_l2_package"}
+  ,"chunin_fugaku": {"id":"chunin_fugaku","baseStats":{"nin":38,"tai":34,"buki":32,"fuin":20,"kin":26,"gen":35,"stamina":36},"basePL":37,"formalRank":"chunin","category":"chunin_character","representationGuard":"ordinary_sharingan_no_mangekyo_inference"}
+  ,"chunin_itama": {"id":"chunin_itama","baseStats":{"nin":34,"tai":36,"buki":33,"fuin":18,"kin":22,"gen":20,"stamina":38},"basePL":36,"formalRank":"chunin","category":"chunin_character","representationGuard":"no_wood_release_inference"}
+  ,"genin_mikoto": {"id":"genin_mikoto","baseStats":{"nin":24,"tai":20,"buki":19,"fuin":11,"kin":14,"gen":22,"stamina":21},"basePL":23,"formalRank":"genin","category":"genin_character","representationGuard":"ordinary_sharingan_no_mangekyo_inference"}
+  ,"genin_orochimaru": {"id":"genin_orochimaru","baseStats":{"nin":29,"tai":24,"buki":20,"fuin":18,"kin":28,"gen":25,"stamina":27},"basePL":28,"formalRank":"genin","category":"genin_character","representationGuard":"young_genin_only_no_later_orochimaru_packages"}
+  ,"akatsuki_kakuzu": {"id":"akatsuki_kakuzu","baseStats":{"nin":86,"tai":76,"buki":68,"fuin":50,"kin":88,"gen":40,"stamina":96},"basePL":91,"category":"akatsuki_character","representationGuard":"earth_grudge_fear_intrinsic_hearts_and_masks_source_only"}
+  ,"sj_kiba": {"id":"sj_kiba","baseStats":{"nin":50,"tai":66,"buki":52,"fuin":20,"kin":34,"gen":22,"stamina":70},"basePL":64,"formalRank":"special_jonin","category":"special_jonin_character_integrated_kiba_akamaru","representationGuard":"one_character_one_slot_one_pl_ledger"}
+  ,"sj_nono": {"id":"sj_nono","baseStats":{"nin":52,"tai":34,"buki":31,"fuin":58,"kin":44,"gen":40,"stamina":55},"basePL":55,"formalRank":"special_jonin","category":"special_jonin_character"}
+  ,"sannin_tenten": {"id":"sannin_tenten","baseStats":{"nin":68,"tai":62,"buki":94,"fuin":70,"kin":74,"gen":44,"stamina":80},"basePL":88,"category":"sannin_character","title":"sannin"}
+  ,"sannin_hinata": {"id":"sannin_hinata","baseStats":{"nin":96,"tai":118,"buki":62,"fuin":70,"kin":48,"gen":82,"stamina":108},"basePL":110,"category":"sannin_road_to_ninja_alternate_growth_character","title":"sannin","representationGuard":"final_pl110_supersedes_stale_pl94"}
+  ,"sannin_sumire": {"id":"sannin_sumire","baseStats":{"nin":90,"tai":72,"buki":66,"fuin":82,"kin":96,"gen":80,"stamina":90},"basePL":93,"category":"sannin_character_intrinsic_nue_bond","title":"sannin","representationGuard":"sumire_and_nue_distinct_registry_identities"}
+  ,"kurama_resonance_himawari": {"id":"kurama_resonance_himawari","baseStats":{"nin":112,"tai":106,"buki":48,"fuin":70,"kin":110,"gen":76,"stamina":126},"basePL":118,"category":"hosted_resonance_character_representation","representationGuard":"no_second_kurama_entity_slot_turn_or_pl_ledger"}
+
 };
 
 // =========================================================
@@ -3556,6 +3584,8 @@ const entityRegistry = {
     "species": "toad",
     "affiliation": "mount_myoboku"
   }
+  ,"nue": {"id":"nue","baseStats":{"nin":92,"tai":98,"buki":60,"fuin":55,"kin":96,"gen":65,"stamina":105},"basePL":100,"entityType":"summon","summonType":"creature","entityOntology":"summon","category":"independent_entity_summon","representationGuard":"independent_pl_not_sumire_pl"}
+
 };
 
 const effectiveStatePackageDatabase = {
@@ -3907,7 +3937,7 @@ const effectiveStatePackageDatabase = {
 
 // =========================================================
 // BRICK 586 — 80 + 17 = 97 PRODUCTION IDENTITY CHECKPOINT
-// BRICK 640 — 85 + 17 = 102 DETERMINISTIC ALPHA PRODUCTION REGISTRY GATE
+// BRICK 1326 — 98 + 18 = 116 DETERMINISTIC ALPHA PRODUCTION REGISTRY GATE
 // =========================================================
 const ALPHA_PRODUCTION_CHARACTER_IDS = Object.freeze([
   "academy_hinata","academy_izuno","academy_kushina","academy_menma","academy_mirai",
@@ -3927,12 +3957,14 @@ const ALPHA_PRODUCTION_CHARACTER_IDS = Object.freeze([
   "tobirama_resonance","tobirama_manifestation","tobirama_avatar",
   "stolen_chakra","coercive_cloak","three_tail_dominion","six_tail_dominion","kurama_dominion","kurama_sovereign",
   "sharingan_sasuke","cs_sasuke","naruto_v1","naruto_v2","cs_anko","curse_mark_hinata","l2_anko","mangekyo_sarada","baryon_mode",
-  "undying_madara","black_madara","failed_god_madara","fallen_hokage_sasuke","shadow_of_indra","sixth_shadow"
+  "undying_madara","black_madara","failed_god_madara","fallen_hokage_sasuke","shadow_of_indra","sixth_shadow",
+  "chunin_iruka","sj_anko","chunin_fugaku","chunin_itama","genin_mikoto","genin_orochimaru",
+  "akatsuki_kakuzu","sj_kiba","sj_nono","sannin_tenten","sannin_hinata","sannin_sumire","kurama_resonance_himawari"
 ]);
 
 const ALPHA_PRODUCTION_ENTITY_IDS = Object.freeze([
   "koto_crow","key_gero","de_baku","iron_maiden","ibuse","gamakichi","mirage_clam","wr_kamatari","mk_enma","triple_rashomon",
-  "nine_tails","breakout_kurama","menma_nine_tails","yang_kurama","yin_kurama","menma_kurama","kurama_complete"
+  "nine_tails","breakout_kurama","menma_nine_tails","yang_kurama","yin_kurama","menma_kurama","kurama_complete","nue"
 ]);
 
 // =========================================================
@@ -3942,10 +3974,11 @@ const ALPHA_PRODUCTION_ENTITY_IDS = Object.freeze([
 // batch. This metadata is intentionally NOT merged into the live production
 // arrays until the complete card/uiPortrait projection is ratified.
 const FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT=Object.freeze({
-  status:"deferred_pending_complete_asset_projection",
-  currentLiveCharacterCount:85,
-  currentLiveEntityCount:17,
-  currentLiveTotal:102,
+  status:"authorised_and_source_admitted",
+  currentLiveCharacterCount:98,
+  currentLiveEntityCount:18,
+  currentLiveTotal:116,
+  sourceAdmissionFromTotal:102,
   targetCharacterCount:98,
   targetEntityCount:18,
   targetTotal:116,
@@ -3957,7 +3990,7 @@ const FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT=Object.freeze({
   entityIds:Object.freeze(["nue"]),
   exactKibaRegistryId:"sj_kiba",
   akamaruSource:Object.freeze({sourceId:"akamaru",classification:"source_only_integrated_participant",role:"companion"}),
-  activationRequiresCompleteAssetProjection:true,
+  activationRequiresCompleteAssetProjection:false,
   partialAdmissionAllowed:false
 });
 
@@ -88834,85 +88867,85 @@ const FINAL116_STAGING_MANIFEST=Object.freeze([
   Object.freeze({
     registryId:"chunin_iruka",registryType:"Character",display:"Chūnin Iruka",formalRank:"chunin",
     category:"chunin_character",baseStats:Object.freeze({nin:32,tai:30,buki:31,fuin:26,kin:18,gen:27,stamina:34}),basePL:33,
-    collectibleCard:"Assets/Chunin/chunin_iruka.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Chunin/chunin_iruka.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Chunin/chunin_iruka.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"sj_anko",registryType:"Character",display:"Special Jōnin Anko",formalRank:"special_jonin",
     category:"special_jonin_character",representationGuard:"untransformed_only_no_cs_or_l2_package",
     baseStats:Object.freeze({nin:56,tai:52,buki:48,fuin:44,kin:58,gen:39,stamina:55}),basePL:56,
-    collectibleCard:"Assets/Special Jonin/sj_anko.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Special Jonin/sj_anko.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Special Jonin/sj_anko.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"chunin_fugaku",registryType:"Character",display:"Chūnin Fugaku",formalRank:"chunin",
     category:"chunin_character",representationGuard:"ordinary_sharingan_no_mangekyo_inference",
     baseStats:Object.freeze({nin:38,tai:34,buki:32,fuin:20,kin:26,gen:35,stamina:36}),basePL:37,
-    collectibleCard:"Assets/Chunin/chunin_fugaku.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Chunin/chunin_fugaku.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Chunin/chunin_fugaku.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"chunin_itama",registryType:"Character",display:"Chūnin Itama",formalRank:"chunin",
     category:"chunin_character",representationGuard:"no_wood_release_inference",
     baseStats:Object.freeze({nin:34,tai:36,buki:33,fuin:18,kin:22,gen:20,stamina:38}),basePL:36,
-    collectibleCard:"Assets/Chunin/chunin_itama.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Chunin/chunin_itama.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Chunin/chunin_Itama.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"genin_mikoto",registryType:"Character",display:"Genin Mikoto",formalRank:"genin",
     category:"genin_character",representationGuard:"ordinary_sharingan_no_mangekyo_inference",
     baseStats:Object.freeze({nin:24,tai:20,buki:19,fuin:11,kin:14,gen:22,stamina:21}),basePL:23,
-    collectibleCard:"Assets/Genin/genin_mikoto.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Genin/genin_mikoto.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Genin/genin_mikoto.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"genin_orochimaru",registryType:"Character",display:"Genin Orochimaru",formalRank:"genin",
     category:"genin_character",representationGuard:"young_genin_only_no_later_orochimaru_packages",
     baseStats:Object.freeze({nin:29,tai:24,buki:20,fuin:18,kin:28,gen:25,stamina:27}),basePL:28,
-    collectibleCard:"Assets/Genin/genin_orochimaru.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Genin/genin_orochimaru.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Genin/genin_orochimaru.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"akatsuki_kakuzu",registryType:"Character",display:"Akatsuki Kakuzu",
     category:"akatsuki_character",representationGuard:"earth_grudge_fear_intrinsic_hearts_and_masks_source_only",
     baseStats:Object.freeze({nin:86,tai:76,buki:68,fuin:50,kin:88,gen:40,stamina:96}),basePL:91,
-    collectibleCard:"Assets/Akatsuki/akatsuki_kakuzu.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Akatsuki/akatsuki_kakuzu.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Akatsuki/akatsuki_kakuzu.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"sj_kiba",registryType:"Character",display:"Special Jōnin Kiba",formalRank:"special_jonin",
     category:"special_jonin_character_integrated_kiba_akamaru",representationGuard:"one_character_one_slot_one_pl_ledger",
     baseStats:Object.freeze({nin:50,tai:66,buki:52,fuin:20,kin:34,gen:22,stamina:70}),basePL:64,
-    collectibleCard:"Assets/Special Jonin/sj_kiba.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Special Jonin/sj_kiba.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Special Jonin/sj_kiba.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"sj_nono",registryType:"Character",display:"Special Jōnin Nono",formalRank:"special_jonin",
     category:"special_jonin_character",
     baseStats:Object.freeze({nin:52,tai:34,buki:31,fuin:58,kin:44,gen:40,stamina:55}),basePL:55,
-    collectibleCard:"Assets/Special Jonin/sj_nono.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Special Jonin/sj_nono.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Special Jonin/sj_nono.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"sannin_tenten",registryType:"Character",display:"Sannin Tenten",
     category:"sannin_character",
     baseStats:Object.freeze({nin:68,tai:62,buki:94,fuin:70,kin:74,gen:44,stamina:80}),basePL:88,
-    collectibleCard:"Assets/Sannin/sannin_tenten.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Sannin/sannin_tenten.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Sannin/sannin_tenten.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"sannin_hinata",registryType:"Character",display:"Sannin Hinata",
     category:"sannin_road_to_ninja_alternate_growth_character",representationGuard:"final_pl110_supersedes_stale_pl94",
     baseStats:Object.freeze({nin:96,tai:118,buki:62,fuin:70,kin:48,gen:82,stamina:108}),basePL:110,
-    collectibleCard:"Assets/Sannin/sannin_hinata.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Sannin/sannin_hinata.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Sannin/sannin_hinata.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"sannin_sumire",registryType:"Character",display:"Sannin Sumire",
     category:"sannin_character_intrinsic_nue_bond",representationGuard:"sumire_and_nue_distinct_registry_identities",
     baseStats:Object.freeze({nin:90,tai:72,buki:66,fuin:82,kin:96,gen:80,stamina:90}),basePL:93,
-    collectibleCard:"Assets/Sannin/sannin_sumire.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Sannin/sannin_sumire.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Sannin/sannin_sumire.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"kurama_resonance_himawari",registryType:"Character",display:"Kurama Resonance Himawari",
     category:"hosted_resonance_character_representation",representationGuard:"no_second_kurama_entity_slot_turn_or_pl_ledger",
     baseStats:Object.freeze({nin:112,tai:106,buki:48,fuin:70,kin:110,gen:76,stamina:126}),basePL:118,
-    collectibleCard:"Assets/Rare Cards/kurama_resonance_himawari.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Rare Cards/kurama_resonance_himawari.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Rare Cards/kurama_resonance_himawari.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   }),
   Object.freeze({
     registryId:"nue",registryType:"Entity",display:"Nue",
     entityOntology:"summon",category:"independent_entity_summon",representationGuard:"independent_pl_not_sumire_pl",
     baseStats:Object.freeze({nin:92,tai:98,buki:60,fuin:55,kin:96,gen:65,stamina:105}),basePL:100,
-    collectibleCard:"Assets/Summons/nue.png",collectibleCardStatus:"ACTIVE",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Summons/nue.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Summons/nue.png",uiPortraitStatus:"ACTIVE",productionStatus:"live_admitted"
   })
 ]);
 
@@ -90431,20 +90464,372 @@ function runAlphaPost1324IntegrationDiagnostics() {
   return result;
 }
 
+
+
+// =========================================================
+// FINAL 116 ADMISSION EXECUTION WAVE — BRICKS 1325–1364
+// Registry ratification: 05bfe122e756a117a117aed7e9649f72e1e7072c
+// Assets closure:       8284611341d5491c284e745f1f445b70354cbf42
+// =========================================================
+
+const FINAL116_RATIFIED_ASSET_PROJECTION = Object.freeze([
+  Object.freeze({registryId:"chunin_iruka",collectibleCard:"Assets/Chunin/chunin_iruka.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Chunin/chunin_iruka.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"sj_anko",collectibleCard:"Assets/Special Jonin/sj_anko.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Special Jonin/sj_anko.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"chunin_fugaku",collectibleCard:"Assets/Chunin/chunin_fugaku.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Chunin/chunin_fugaku.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"chunin_itama",collectibleCard:"Assets/Chunin/chunin_itama.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Chunin/chunin_Itama.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"genin_mikoto",collectibleCard:"Assets/Genin/genin_mikoto.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Genin/genin_mikoto.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"genin_orochimaru",collectibleCard:"Assets/Genin/genin_orochimaru.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Genin/genin_orochimaru.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"akatsuki_kakuzu",collectibleCard:"Assets/Akatsuki/akatsuki_kakuzu.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Akatsuki/akatsuki_kakuzu.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"sj_kiba",collectibleCard:"Assets/Special Jonin/sj_kiba.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Special Jonin/sj_kiba.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"sj_nono",collectibleCard:"Assets/Special Jonin/sj_nono.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Special Jonin/sj_nono.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"sannin_tenten",collectibleCard:"Assets/Sannin/sannin_tenten.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Sannin/sannin_tenten.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"sannin_hinata",collectibleCard:"Assets/Sannin/sannin_hinata.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Sannin/sannin_hinata.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"sannin_sumire",collectibleCard:"Assets/Sannin/sannin_sumire.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Sannin/sannin_sumire.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"kurama_resonance_himawari",collectibleCard:"Assets/Rare Cards/kurama_resonance_himawari.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Rare Cards/kurama_resonance_himawari.png",uiPortraitStatus:"ACTIVE"}),
+  Object.freeze({registryId:"nue",collectibleCard:"Assets/Summons/nue.png",collectibleCardStatus:"ACTIVE",uiPortrait:"Portraits/Summons/nue.png",uiPortraitStatus:"ACTIVE"})
+]);
+
+const POST1364_PRE_ADMISSION_102_IDS = Object.freeze({
+  characters:Object.freeze(ALPHA_PRODUCTION_CHARACTER_IDS.filter(id=>!FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.characterIds.includes(id))),
+  entities:Object.freeze(ALPHA_PRODUCTION_ENTITY_IDS.filter(id=>!FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.entityIds.includes(id)))
+});
+const POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A = "f7931212";
+const FINAL116_PORTRAIT_DIMENSION_CONTRACT = Object.freeze({width:1024,height:1024,format:"png"});
+
+function stableAlphaRegressionStringify(value) {
+  if (Array.isArray(value)) return `[${value.map(stableAlphaRegressionStringify).join(",")}]`;
+  if (value&&typeof value==="object") return `{${Object.keys(value).sort().map(key=>`${JSON.stringify(key)}:${stableAlphaRegressionStringify(value[key])}`).join(",")}}`;
+  return JSON.stringify(value);
+}
+function fnv1a32Hex(value) {
+  const text=String(value); let hash=0x811c9dc5;
+  for (let i=0;i<text.length;i+=1) { hash^=text.charCodeAt(i); hash=Math.imul(hash,0x01000193)>>>0; }
+  return hash.toString(16).padStart(8,"0");
+}
+function getPost1364Existing102RegressionFingerprint() {
+  const charIds=[...POST1364_PRE_ADMISSION_102_IDS.characters];
+  const entIds=[...POST1364_PRE_ADMISSION_102_IDS.entities];
+  const chars=charIds.map(id=>characterRegistry[id]);
+  const ents=entIds.map(id=>entityRegistry[id]);
+  return fnv1a32Hex(stableAlphaRegressionStringify({charIds,entIds,chars,ents}));
+}
+
+// Supersedes the historical deferred-admission preflight after the ratified source commit.
+function getFinal116AtomicAdmissionPreflight(options={}) {
+  const rows=normalizeFinal116ProjectionRows(options.assetProjectionRows||FINAL116_RATIFIED_ASSET_PROJECTION);
+  const strict=validateFinal116ExternalProjectionManifest(rows,{registryRatified:options.registryRatified!==false});
+  const liveCharacters=getProductionCharacterRegistryIds();
+  const liveEntities=getProductionEntityRegistryIds();
+  const liveIds=[...liveCharacters,...liveEntities];
+  const incoming=[...FINAL116_STAGING_ID_SET];
+  const checks={
+    exactLiveCounts:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18&&ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===116,
+    registryObjectCounts:liveCharacters.length===98&&liveEntities.filter(id=>ALPHA_PRODUCTION_ENTITY_IDS.includes(id)).length===18,
+    exactFourteenRows:strict.exactSet===true,
+    ratifiedProjectionValid:strict.ready===true,
+    allIncomingLiveExactlyOnce:incoming.every(id=>liveIds.filter(value=>value===id).length===1),
+    exactKibaId:liveIds.includes("sj_kiba")&&!liveIds.includes("s_jkiba"),
+    exactItamaPortrait:getUIPortraitAssetPath("chunin_itama")==="Portraits/Chunin/chunin_Itama.png",
+    allFourteenPortraitsMapped:FINAL116_RATIFIED_ASSET_PROJECTION.every(row=>getUIPortraitAssetPath(row.registryId)===row.uiPortrait),
+    allFourteenCardsMapped:FINAL116_RATIFIED_ASSET_PROJECTION.every(row=>row.registryId==="nue"?getEntityCollectibleCardAssetPath(row.registryId)===row.collectibleCard:getCharacterCardAssetPath(row.registryId)===row.collectibleCard),
+    existing102FingerprintPreserved:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A,
+    noPartialAdmission:FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.partialAdmissionAllowed===false
+  };
+  const blockers=Object.entries(checks).filter(([,ok])=>ok!==true).map(([key])=>key);
+  return {ready:blockers.length===0,alreadyCommitted:blockers.length===0,checks,blockers,currentLiveTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length,destinationTotal:116,requiredBatchSize:14,partialAdmissionAllowed:false,mutationPerformed:false,ratificationCommit:"05bfe122e756a117a117aed7e9649f72e1e7072c"};
+}
+
+function prepareFinal116AtomicAdmissionTransaction(options={}) {
+  const preflight=getFinal116AtomicAdmissionPreflight(options);
+  if (!preflight.ready) return {success:false,reason:"final_116_source_admission_validation_failed",preflight,mutationPerformed:false};
+  return {success:true,readyForAtomicCommit:false,alreadyCommitted:true,transactionType:"registry_atomic_admission_source_commit",fromTotal:102,toTotal:116,characterIds:[...FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.characterIds],entityIds:[...FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.entityIds],records:getFinal116StagingManifest(),assetProjection:normalizeFinal116ProjectionRows(FINAL116_RATIFIED_ASSET_PROJECTION),registryRatified:true,mutationPerformed:false};
+}
+
+function attemptFinal116AtomicAdmission(options={}) {
+  const prepared=prepareFinal116AtomicAdmissionTransaction(options);
+  if (!prepared.success) return {...prepared,liveTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length};
+  return {success:true,idempotent:true,alreadyCommitted:true,reason:"final_116_atomic_source_admission_already_committed",prepared,mutationPerformed:false,liveTotal:116};
+}
+
+function runAlphaUIPortraitAuthorityDiagnostics() {
+  const expected=[...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+  const paths=Object.values(UI_PORTRAIT_MANIFEST);
+  const battleSource=renderBattleRosterSlot.toString();
+  const result={
+    exact116Mappings:Object.keys(UI_PORTRAIT_MANIFEST).length===116&&expected.length===116,
+    exactProductionIdSet:expected.every(id=>Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id))&&Object.keys(UI_PORTRAIT_MANIFEST).every(id=>expected.includes(id)),
+    uniquePaths:new Set(paths).size===116,
+    exactRoot:paths.every(path=>path.startsWith("Portraits/")&&path.endsWith(".png")),
+    ratifiedFinal14Exact:FINAL116_RATIFIED_ASSET_PROJECTION.every(row=>UI_PORTRAIT_MANIFEST[row.registryId]===row.uiPortrait),
+    exactItamaCasing:UI_PORTRAIT_MANIFEST.chunin_itama==="Portraits/Chunin/chunin_Itama.png",
+    exactKibaOnly:Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,"sj_kiba")&&!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,"s_jkiba"),
+    noCardFallback:!resolveUIPortraitProjection.toString().includes("getCharacterCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("subject.image"),
+    battleConsumesResolver:battleSource.includes("resolveUIPortraitProjection(participant)"),
+    missingAuthorityVisible:battleSource.includes('data-portrait-status="missing-authority"'),
+    noInventedBattleArenaFolders:!paths.some(path=>path.includes("/Battle/")||path.includes("/Arena/"))
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaDeferredAdmissionGateDiagnostics() {
+  const preflight=getFinal116AtomicAdmissionPreflight();
+  const waitingIds=[...FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.characterIds,...FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.entityIds];
+  const result={
+    liveGateNow116:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18,
+    exact116Total:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===116,
+    exactThirteenPlusNue:FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.characterIds.length===13&&FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.entityIds.length===1,
+    allFourteenNowLive:waitingIds.every(id=>ALPHA_PRODUCTION_CHARACTER_IDS.includes(id)||ALPHA_PRODUCTION_ENTITY_IDS.includes(id)),
+    exactKibaOnly:ALPHA_PRODUCTION_CHARACTER_IDS.includes("sj_kiba")&&!ALPHA_PRODUCTION_CHARACTER_IDS.includes("s_jkiba"),
+    noPartialAdmission:FINAL_AWAITING_PLACEMENT_ADMISSION_CONTRACT.partialAdmissionAllowed===false,
+    sourceAdmissionPreflightGreen:preflight.ready===true&&preflight.alreadyCommitted===true
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaFinal116StagingDiagnostics() {
+  const ids=FINAL116_STAGING_MANIFEST.map(record=>record.registryId);
+  const result={
+    exactFourteenRecords:ids.length===14&&new Set(ids).size===14,
+    exactThirteenPlusOne:FINAL116_STAGING_MANIFEST.filter(r=>r.registryType==="Character").length===13&&FINAL116_STAGING_MANIFEST.filter(r=>r.registryType==="Entity").length===1,
+    allRecordsValidate:FINAL116_STAGING_MANIFEST.every(record=>validateFinal116StagingRecord(record).pass===true),
+    allPortraitsRatified:FINAL116_STAGING_MANIFEST.every(record=>record.uiPortrait&&record.uiPortraitStatus==="ACTIVE"&&getUIPortraitAssetPath(record.registryId)===record.uiPortrait),
+    allNowLive:ids.every(id=>ALPHA_PRODUCTION_CHARACTER_IDS.includes(id)||ALPHA_PRODUCTION_ENTITY_IDS.includes(id)),
+    exactKibaAliasGuard:ids.includes("sj_kiba")&&!ids.includes("s_jkiba"),
+    exactItamaCasing:getUIPortraitAssetPath("chunin_itama")==="Portraits/Chunin/chunin_Itama.png"
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaFinal116AtomicAdmissionDiagnostics() {
+  const preflight=getFinal116AtomicAdmissionPreflight();
+  const attempt=attemptFinal116AtomicAdmission();
+  const result={
+    sourcePreflightGreen:preflight.ready===true,
+    sourceAlreadyCommitted:preflight.alreadyCommitted===true,
+    attemptIdempotent:attempt.success===true&&attempt.idempotent===true&&attempt.liveTotal===116,
+    exactCounts:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18,
+    exactTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===116,
+    noPartialAdmission:preflight.partialAdmissionAllowed===false,
+    noRuntimeMutationRequired:attempt.mutationPerformed===false,
+    existing102FingerprintPreserved:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaFinal116SemanticGuardDiagnostics() {
+  const sumireNue=getSanninSumireNueAcquisitionBundlePreview();
+  const result={
+    kibaOneCharacterOneSlotOneLedger:FINAL116_KIBA_AKAMARU_SOURCE.separateRegistryIdentity===false&&FINAL116_KIBA_AKAMARU_SOURCE.separateDeploymentSlot===false&&FINAL116_KIBA_AKAMARU_SOURCE.separateBattleTurn===false&&FINAL116_KIBA_AKAMARU_SOURCE.separatePLLedger===false,
+    akamaruSourceOnly:FINAL116_KIBA_AKAMARU_SOURCE.sourceId==="akamaru"&&FINAL116_KIBA_AKAMARU_SOURCE.classification==="source_only_integrated_participant",
+    noSJKibaAlias:!ALPHA_PRODUCTION_CHARACTER_IDS.includes("s_jkiba"),
+    kakuzuSourcesNotParticipants:FINAL116_KAKUZU_EMBEDDED_SOURCES.heartsAndMasksIndependentParticipants===false&&FINAL116_KAKUZU_EMBEDDED_SOURCES.heartsAndMasksIndependentTurns===false&&FINAL116_KAKUZU_EMBEDDED_SOURCES.heartsAndMasksIndependentPLPools===false,
+    himawariNoSecondKurama:FINAL116_HIMAWARI_RESONANCE_BOUNDARY.createSecondKuramaRegistryRecord===false&&FINAL116_HIMAWARI_RESONANCE_BOUNDARY.createSecondOwnershipRecord===false&&FINAL116_HIMAWARI_RESONANCE_BOUNDARY.createSecondDeploymentSlot===false&&FINAL116_HIMAWARI_RESONANCE_BOUNDARY.createSecondBattleTurn===false&&FINAL116_HIMAWARI_RESONANCE_BOUNDARY.createSecondPLLedger===false,
+    sumireNueNowRuntimeCapable:sumireNue.status==="runtime_capable",
+    attachmentDoesNotAutoManifest:sumireNue.attachmentMeansBattleManifestation===false,
+    noSumireNuePLTransfer:sumireNue.statOrPLTransfer===false
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaProductionProjectionHardeningDiagnostics() {
+  const rows=FINAL116_RATIFIED_ASSET_PROJECTION;
+  const result={
+    cardAndPortraitDistinct:rows.every(row=>row.collectibleCard!==row.uiPortrait),
+    allPortraitsLiveMapped:rows.every(row=>getUIPortraitAssetPath(row.registryId)===row.uiPortrait),
+    allCardsExact:rows.every(row=>row.registryId==="nue"?getEntityCollectibleCardAssetPath(row.registryId)===row.collectibleCard:getCharacterCardAssetPath(row.registryId)===row.collectibleCard),
+    livePortraitManifestNow116:Object.keys(UI_PORTRAIT_MANIFEST).length===116,
+    allFourteenRegistryRecordsPresent:rows.every(row=>row.registryId==="nue"?!!getEntityDefinition(row.registryId):!!getCharacterRegistryEntry(row.registryId)),
+    exactItamaPathPreserved:getUIPortraitAssetPath("chunin_itama")==="Portraits/Chunin/chunin_Itama.png",
+    existingEntityOntologyStillIndependent:getEntityCollectibleOntologyClassification("black_zetsu")==="hosted_entity"&&getEntityCollectibleOntologyClassification("pakkun")==="summon"
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaProductionPathTruthDiagnostics() {
+  const rows=FINAL116_RATIFIED_ASSET_PROJECTION;
+  const result={
+    livePortraitAuthorityNow116:Object.keys(UI_PORTRAIT_MANIFEST).length===116,
+    allRatifiedPathsExact:rows.every(row=>getUIPortraitAssetPath(row.registryId)===row.uiPortrait),
+    noCardPortraitCollapse:rows.every(row=>row.collectibleCard!==row.uiPortrait),
+    exactItamaCase:rows.find(row=>row.registryId==="chunin_itama").uiPortrait==="Portraits/Chunin/chunin_Itama.png",
+    exactKibaId:rows.some(row=>row.registryId==="sj_kiba")&&!rows.some(row=>row.registryId==="s_jkiba"),
+    noDuplicatePortraitPaths:new Set(rows.map(row=>row.uiPortrait)).size===14,
+    noDiagnosticPortraits:rows.every(row=>!row.uiPortrait.includes("/__diagnostic__/")),
+    existing102FingerprintPreserved:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function runAlphaPost1324SaveLoadAbuseDiagnostics() {
+  if (typeof localStorage==="undefined") return {pass:false,reason:"local_storage_required"};
+  const rawSave=localStorage.getItem(PLAYER_SAVE_KEY); const rollback=cloneProgressionData(playerData); const result={};
+  try {
+    playerData=createDefaultPlayerData(); setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    consumeMenmaQualifyingActionOccurrence({occurrenceId:"post1364_save_load_occurrence",committed:true,actorVariantId:"academy_menma",isKinjutsuQualifying:true,actionId:"post1364_save_load_action",resolution:"failure",ankoLegitimatelyObserved:true});
+    savePlayerData(); const loaded=loadPlayerData(); playerData=loaded; setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const replay=consumeMenmaQualifyingActionOccurrence({occurrenceId:"post1364_save_load_occurrence",committed:true,actorVariantId:"academy_menma",isKinjutsuQualifying:true,actionId:"post1364_save_load_action",resolution:"failure",ankoLegitimatelyObserved:true});
+    result.originReplayIdempotent=replay.success===true&&replay.men01.idempotent===true&&replay.men02.idempotent===true&&ensurePlayerOriginConsequenceState().receipts.length===2;
+    result.final116Remains116AcrossSaveLoad=ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18;
+    result.atomicAdmissionReplayIdempotent=attemptFinal116AtomicAdmission().idempotent===true;
+    result.existing102FingerprintPreserved=getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A;
+  } finally { playerData=rollback; setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState()); if(rawSave===null)localStorage.removeItem(PLAYER_SAVE_KEY);else localStorage.setItem(PLAYER_SAVE_KEY,rawSave); }
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+
+function runAlphaProductionRegistryGate() {
+  const characterIds=getProductionCharacterRegistryIds();
+  const entityIds=getProductionEntityRegistryIds();
+  const allIds=[...characterIds,...entityIds];
+  const expectedAll=[...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+  const missingCharacters=ALPHA_PRODUCTION_CHARACTER_IDS.filter(id=>!characterIds.includes(id));
+  const missingEntities=ALPHA_PRODUCTION_ENTITY_IDS.filter(id=>!entityIds.includes(id));
+  const unexpectedCharacters=characterIds.filter(id=>!ALPHA_PRODUCTION_CHARACTER_IDS.includes(id));
+  const unexpectedEntities=entityIds.filter(id=>!ALPHA_PRODUCTION_ENTITY_IDS.includes(id));
+  const statErrors=[];
+  ALPHA_PRODUCTION_CHARACTER_IDS.forEach(id=>validateAlphaProductionStatRecord(characterRegistry[id],id,statErrors));
+  ALPHA_PRODUCTION_ENTITY_IDS.forEach(id=>validateAlphaProductionStatRecord(entityRegistry[id],id,statErrors));
+  const referenceErrors=collectAlphaProductionReferenceErrors();
+  const result={
+    characterProductionRecords:characterIds.length===98,
+    entityProductionRecords:entityIds.length===18,
+    totalProductionIdentities:allIds.length===116,
+    expectedIdentitySet:missingCharacters.length===0&&missingEntities.length===0&&unexpectedCharacters.length===0&&unexpectedEntities.length===0,
+    uniqueProductionIds:new Set(allIds).size===116&&new Set(expectedAll).size===116,
+    exactFinal14Present:FINAL116_STAGING_ID_SET.every(id=>allIds.filter(value=>value===id).length===1),
+    exactKibaAlias:allIds.includes("sj_kiba")&&!allIds.includes("s_jkiba"),
+    canonicalStatsAndFormula:statErrors.length===0,
+    referenceResolution:referenceErrors.length===0,
+    existing102FullRecordsPreserved:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A,
+    outside116StillExcluded:["kage_madara","pakkun","black_zetsu","reborn_kurama"].every(id=>!allIds.includes(id)),
+    registryPresenceNotOwnership:true
+  };
+  result.errors={missingCharacters,missingEntities,unexpectedCharacters,unexpectedEntities,statErrors,referenceErrors};
+  result.pass=Object.entries(result).filter(([key])=>key!=="errors"&&key!=="pass").every(([,value])=>value===true);
+  console.table({...result,errors:undefined});
+  if(!result.pass) console.log("SC Alpha 116 Production Registry Gate errors:",result.errors);
+  return result;
+}
+
+function runAlphaFinal116NewRecordNumericsDiagnostics() {
+  const errors=[];
+  FINAL116_STAGING_MANIFEST.forEach(staged=>{
+    const live=staged.registryType==="Entity"?getEntityDefinition(staged.registryId):getCharacterRegistryEntry(staged.registryId);
+    if(!live){errors.push(`${staged.registryId}:missing_live_record`);return;}
+    if(Number(live.basePL)!==Number(staged.basePL)) errors.push(`${staged.registryId}:base_pl_drift`);
+    ALPHA_CANONICAL_STAT_KEYS.forEach(key=>{if(Number(live.baseStats&&live.baseStats[key])!==Number(staged.baseStats[key])) errors.push(`${staged.registryId}:${key}_drift`);});
+    if(staged.formalRank!==undefined&&live.formalRank!==staged.formalRank) errors.push(`${staged.registryId}:formal_rank_drift`);
+  });
+  const result={
+    exactFourteenCompared:FINAL116_STAGING_MANIFEST.length===14,
+    noNumericalOrAuthorisedRankDrift:errors.length===0,
+    exactNuePL:Number(getEntityDefinition("nue").basePL)===100,
+    exactKibaPL:Number(getCharacterRegistryEntry("sj_kiba").basePL)===64,
+    exactSanninHinataPL:Number(getCharacterRegistryEntry("sannin_hinata").basePL)===110,
+    exactHimawariPL:Number(getCharacterRegistryEntry("kurama_resonance_himawari").basePL)===118,
+    errors
+  };
+  result.pass=result.exactFourteenCompared&&result.noNumericalOrAuthorisedRankDrift&&result.exactNuePL&&result.exactKibaPL&&result.exactSanninHinataPL&&result.exactHimawariPL;
+  console.table({...result,errors:undefined});
+  if(errors.length) console.log("Final-116 numerical drift:",errors);
+  return result;
+}
+
+function runAlphaFinal116CardPortraitRegistryGolden() {
+  const registry=runAlphaProductionRegistryGate();
+  const numerics=runAlphaFinal116NewRecordNumericsDiagnostics();
+  const portraits=runAlphaUIPortraitAuthorityDiagnostics();
+  const pathTruth=runAlphaProductionPathTruthDiagnostics();
+  const atomic=runAlphaFinal116AtomicAdmissionDiagnostics();
+  const groups={registry,numerics,portraits,pathTruth,atomic};
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true),expectedCounts:"98/18/116",ratificationCommit:"05bfe122e756a117a117aed7e9649f72e1e7072c"};
+  console.log(`SC Final-116 Registry/Card/Portrait Golden: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaFinal116SourceAdmissionDiagnostics() {
+  const rows=FINAL116_RATIFIED_ASSET_PROJECTION;
+  const incomingIds=rows.map(row=>row.registryId);
+  const live=[...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+  const result={
+    exact98Characters:ALPHA_PRODUCTION_CHARACTER_IDS.length===98,
+    exact18Entities:ALPHA_PRODUCTION_ENTITY_IDS.length===18,
+    exact116Total:live.length===116,
+    fourteenIncomingExactlyOnce:incomingIds.every(id=>live.filter(value=>value===id).length===1),
+    noAliasSJKiba:!live.includes("s_jkiba")&&live.includes("sj_kiba"),
+    exactItamaPath:getUIPortraitAssetPath("chunin_itama")==="Portraits/Chunin/chunin_Itama.png",
+    exactRatifiedPaths:rows.every(row=>getUIPortraitAssetPath(row.registryId)===row.uiPortrait),
+    uniqueRatifiedPortraits:new Set(rows.map(row=>row.uiPortrait)).size===14,
+    existing102IdsPreserved:POST1364_PRE_ADMISSION_102_IDS.characters.every(id=>ALPHA_PRODUCTION_CHARACTER_IDS.includes(id))&&POST1364_PRE_ADMISSION_102_IDS.entities.every(id=>ALPHA_PRODUCTION_ENTITY_IDS.includes(id)),
+    existing102FullRecordsPreserved:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A,
+    outside116StillNotLive:["kage_madara","pakkun","black_zetsu","reborn_kurama"].every(id=>!live.includes(id))
+  };
+  result.pass=Object.values(result).every(value=>value===true); console.table(result); return result;
+}
+
+function loadAlphaImageForBinaryQA(path,timeoutMs=10000) {
+  return new Promise(resolve=>{
+    if (typeof Image==="undefined") return resolve({path,decoded:false,width:0,height:0,reason:"image_api_unavailable"});
+    let settled=false; const image=new Image(); const finish=value=>{if(settled)return;settled=true;clearTimeout(timer);resolve(value);};
+    const timer=setTimeout(()=>finish({path,decoded:false,width:0,height:0,reason:"timeout"}),timeoutMs);
+    image.onload=()=>finish({path,decoded:true,width:image.naturalWidth,height:image.naturalHeight,reason:null});
+    image.onerror=()=>finish({path,decoded:false,width:0,height:0,reason:"decode_or_load_error"});
+    image.src=path;
+  });
+}
+
+async function runAlphaFinal116PortraitBinaryQADiagnostics() {
+  const results=await Promise.all(FINAL116_RATIFIED_ASSET_PROJECTION.map(async row=>{
+    const loaded=await loadAlphaImageForBinaryQA(row.uiPortrait);
+    return {...loaded,registryId:row.registryId,exactPath:getUIPortraitAssetPath(row.registryId)===row.uiPortrait,dimensionPass:loaded.decoded===true&&loaded.width===FINAL116_PORTRAIT_DIMENSION_CONTRACT.width&&loaded.height===FINAL116_PORTRAIT_DIMENSION_CONTRACT.height};
+  }));
+  const result={results,allFourteenAttempted:results.length===14,allDecoded:results.every(item=>item.decoded===true),all1024Square:results.every(item=>item.dimensionPass===true),allExactPaths:results.every(item=>item.exactPath===true),uniquePaths:new Set(results.map(item=>item.path)).size===14,pass:false};
+  result.pass=result.allFourteenAttempted&&result.allDecoded&&result.all1024Square&&result.allExactPaths&&result.uniquePaths;
+  console.table(results.map(item=>({id:item.registryId,decoded:item.decoded,width:item.width,height:item.height,pass:item.dimensionPass,path:item.path})));
+  console.log(`SC Final-116 portrait binary QA: ${result.pass?"PASS":"FAIL"} / decoded=${results.filter(r=>r.decoded).length}/14 / 1024x1024=${results.filter(r=>r.dimensionPass).length}/14`);
+  return result;
+}
+
+function runAlphaPost1364Final116IntegrationDiagnostics() {
+  const sourceAdmission=runAlphaFinal116SourceAdmissionDiagnostics();
+  const registryCardPortrait=runAlphaFinal116CardPortraitRegistryGolden();
+  const portraitAuthority=runAlphaUIPortraitAuthorityDiagnostics();
+  const atomic=runAlphaFinal116AtomicAdmissionDiagnostics();
+  const semantic=runAlphaFinal116SemanticGuardDiagnostics();
+  const pathTruth=runAlphaProductionPathTruthDiagnostics();
+  const outside116=runAlphaOutside116LeakageHardeningDiagnostics();
+  const origins=runAlphaOriginConsequenceIntegrityDiagnostics();
+  const saveLoad=runAlphaPost1324SaveLoadAbuseDiagnostics();
+  const groups={sourceAdmission,registryCardPortrait,portraitAuthority,atomic,semantic,pathTruth,outside116,origins,saveLoad};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={groups,pass,liveCharacterCount:ALPHA_PRODUCTION_CHARACTER_IDS.length,liveEntityCount:ALPHA_PRODUCTION_ENTITY_IDS.length,liveTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length,final116SourceAdmission:"COMMITTED",binaryQAStatus:(window.__SC_FINAL116_BINARY_QA__&&window.__SC_FINAL116_BINARY_QA__.pass)?"GREEN":"REQUIRES_RUNTIME_ASSET_LOAD",existing102Fingerprint:getPost1364Existing102RegressionFingerprint(),combatFreezePreserved:true,practicalStatus:getPracticalDesktopSourceIntegrationPlan({}).ready?"ready":"asset_reframe_required",nextImplementedBrick:1364};
+  console.log(`SC Alpha post-1364 Final-116 source gate: ${pass?"PASS":"FAIL"} / live=${result.liveTotal} (${result.liveCharacterCount}+${result.liveEntityCount}) / binaryQA=${result.binaryQAStatus} / Practical=${result.practicalStatus}`);
+  return result;
+}
+
 // =========================================================
 // CORE ENGINE — GAME INITIALISATION
 // =========================================================
 
 window.addEventListener(
   "load",
-  () => {
+  async () => {
 
+    // BRICK 1364 — fail-closed startup proof for the ratified 14 portrait binaries.
+    // Source admission is atomic at 116; if any approved binary cannot decode or is
+    // not exactly 1024x1024, core game initialisation is withheld rather than
+    // operating a partially validated production gate.
+    const final116BinaryQA=await runAlphaFinal116PortraitBinaryQADiagnostics();
+    window.__SC_FINAL116_BINARY_QA__=final116BinaryQA;
+    if (!final116BinaryQA.pass) {
+      console.error("SC Final-116 startup blocked: portrait binary QA failed.",final116BinaryQA);
+      document.documentElement.setAttribute("data-sc-final116-binary-qa","failed");
+      return;
+    }
+    document.documentElement.setAttribute("data-sc-final116-binary-qa","green");
 
     syncCharacterEquipmentFromSave();
-
-
     restoreTestState();
-
 
     // BRICK 962 — authoritative reload resumption wins over stale ordinary
     // overlay/session presentation while formation remains mandatory.
