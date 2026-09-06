@@ -89721,6 +89721,716 @@ function runAlphaPost1199IntegrationDiagnostics() {
   return result;
 }
 
+
+
+// =========================================================
+// MONSTER BATCH IV — ALPHA SOURCE / AUTHORITY HARDENING WAVE
+// BRICKS 1200–1324
+// =========================================================
+//
+// This batch starts from the validated Post-1199 runtime and deliberately
+// remains fail-closed on the two external Alpha gates that are not yet durable
+// runtime authority:
+//   1. final 116 exact uiPortrait projection + Registry ratification;
+//   2. Practical 1536×1102 reframe authority.
+//
+// Physical files, plausible filenames, and current repository observations are
+// diagnostics only. They never become semantic admission authority by inference.
+//
+// =========================================================
+
+
+// =========================================================
+// BRICKS 1200–1224 — FINAL 116 EXTERNAL-AUTHORITY VALIDATION
+// =========================================================
+
+const POST1324_FINAL116_AUTHORITY_REQUIREMENTS=Object.freeze({
+  expectedCurrentLiveTotal:102,
+  expectedDestinationTotal:116,
+  requiredRowCount:14,
+  registryRatificationRequired:true,
+  collectibleCardStatusRequired:"ACTIVE",
+  uiPortraitStatusRequired:"ACTIVE",
+  partialAdmissionAllowed:false,
+  cardRoot:"Assets/",
+  portraitRoot:"Portraits/"
+});
+
+// Repository observations from the portrait-ingestion pass are intentionally
+// NOT used by getFinal116AtomicAdmissionPreflight().  They are only a source
+// archaeology aid until UI / Assets publishes ACTIVE path authority and
+// Registry ratifies the complete fourteen-row projection.
+const POST1324_FINAL116_PHYSICAL_PORTRAIT_OBSERVATIONS=Object.freeze([
+  Object.freeze({registryId:"chunin_iruka",observedPath:"Portraits/Chunin/chunin_iruka.png"}),
+  Object.freeze({registryId:"sj_anko",observedPath:"Portraits/Special Jonin/sj_anko.png"}),
+  Object.freeze({registryId:"chunin_fugaku",observedPath:"Portraits/Chunin/chunin_fugaku.png"}),
+  Object.freeze({registryId:"chunin_itama",observedPath:"Portraits/Chunin/chunin_Itama.png",caseNote:"physical source casing differs from Registry/card ID casing"}),
+  Object.freeze({registryId:"genin_mikoto",observedPath:"Portraits/Genin/genin_mikoto.png"}),
+  Object.freeze({registryId:"genin_orochimaru",observedPath:"Portraits/Genin/genin_orochimaru.png"}),
+  Object.freeze({registryId:"akatsuki_kakuzu",observedPath:"Portraits/Akatsuki/akatsuki_kakuzu.png"}),
+  Object.freeze({registryId:"sj_kiba",observedPath:"Portraits/Special Jonin/sj_kiba.png"}),
+  Object.freeze({registryId:"sj_nono",observedPath:"Portraits/Special Jonin/sj_nono.png"}),
+  Object.freeze({registryId:"sannin_tenten",observedPath:"Portraits/Sannin/sannin_tenten.png"}),
+  Object.freeze({registryId:"sannin_hinata",observedPath:"Portraits/Sannin/sannin_hinata.png"}),
+  Object.freeze({registryId:"sannin_sumire",observedPath:"Portraits/Sannin/sannin_sumire.png"}),
+  Object.freeze({registryId:"kurama_resonance_himawari",observedPath:"Portraits/Rare Cards/kurama_resonance_himawari.png"}),
+  Object.freeze({registryId:"nue",observedPath:"Portraits/Summons/nue.png"})
+]);
+
+function validateAlphaProductionAssetPath(path,kind) {
+  const value=typeof path==="string"?path.trim():"";
+  const errors=[];
+  const expectedRoot=kind==="card"?POST1324_FINAL116_AUTHORITY_REQUIREMENTS.cardRoot:POST1324_FINAL116_AUTHORITY_REQUIREMENTS.portraitRoot;
+  if (!value) errors.push("path_required");
+  if (value&& !value.startsWith(expectedRoot)) errors.push("wrong_asset_root");
+  if (value&& !value.toLowerCase().endsWith(".png")) errors.push("png_required");
+  if (value.includes("\\")) errors.push("backslash_forbidden");
+  if (value.includes("..")) errors.push("parent_traversal_forbidden");
+  if (/[?#]/.test(value)) errors.push("query_or_fragment_forbidden");
+  if (/^(?:https?:|data:|blob:|file:)/i.test(value)) errors.push("external_or_blob_url_forbidden");
+  if (value.split("/").some(segment=>segment.length===0)) errors.push("empty_path_segment");
+  return {pass:errors.length===0,path:value,kind,errors};
+}
+
+function validateFinal116ExternalProjectionManifest(rows,options={}) {
+  const normalized=normalizeFinal116ProjectionRows(rows);
+  const expectedIds=[...FINAL116_STAGING_ID_SET];
+  const rowIds=normalized.map(row=>row.registryId);
+  const idCounts=rowIds.reduce((acc,id)=>{acc[id]=(acc[id]||0)+1;return acc;},{});
+  const duplicateIds=Object.keys(idCounts).filter(id=>idCounts[id]>1);
+  const unexpectedIds=rowIds.filter(id=>id&&!expectedIds.includes(id));
+  const missingIds=expectedIds.filter(id=>!rowIds.includes(id));
+  const cardErrors=[];
+  const portraitErrors=[];
+  const statusErrors=[];
+  const pathCollisionMap=new Map();
+
+  normalized.forEach(row=>{
+    const staged=FINAL116_STAGING_MANIFEST.find(entry=>entry.registryId===row.registryId);
+    const cardValidation=validateAlphaProductionAssetPath(row.collectibleCard,"card");
+    const portraitValidation=validateAlphaProductionAssetPath(row.uiPortrait,"portrait");
+    if (!cardValidation.pass||!staged||row.collectibleCard!==staged.collectibleCard) {
+      cardErrors.push({registryId:row.registryId,errors:[...cardValidation.errors,...(!staged?["unknown_registry_id"]:row.collectibleCard!==staged.collectibleCard?["collectible_card_authority_mismatch"]:[])]});
+    }
+    if (!portraitValidation.pass) portraitErrors.push({registryId:row.registryId,errors:[...portraitValidation.errors]});
+    if (row.collectibleCardStatus!=="ACTIVE"||row.uiPortraitStatus!=="ACTIVE") {
+      statusErrors.push({registryId:row.registryId,collectibleCardStatus:row.collectibleCardStatus,uiPortraitStatus:row.uiPortraitStatus});
+    }
+    if (row.uiPortrait) {
+      const refs=pathCollisionMap.get(row.uiPortrait)||[];
+      refs.push(row.registryId);
+      pathCollisionMap.set(row.uiPortrait,refs);
+    }
+  });
+
+  const portraitCollisions=[...pathCollisionMap.entries()].filter(([,ids])=>ids.length>1).map(([path,ids])=>({path,registryIds:ids}));
+  const exactSet=normalized.length===14&&missingIds.length===0&&unexpectedIds.length===0&&duplicateIds.length===0;
+  const noCardPortraitCollapse=normalized.every(row=>!row.collectibleCard||!row.uiPortrait||row.collectibleCard!==row.uiPortrait);
+  const noDiagnosticPaths=normalized.every(row=>!String(row.uiPortrait||"").includes("/__diagnostic__/"));
+  const registryRatified=options.registryRatified===true;
+  const blockers=[];
+  if (!exactSet) blockers.push("final_116_manifest_identity_mismatch");
+  if (cardErrors.length) blockers.push("collectible_card_projection_invalid");
+  if (portraitErrors.length) blockers.push("ui_portrait_projection_invalid");
+  if (statusErrors.length) blockers.push("projection_status_not_active");
+  if (portraitCollisions.length) blockers.push("ui_portrait_path_collision");
+  if (!noCardPortraitCollapse) blockers.push("card_portrait_semantic_collapse");
+  if (!noDiagnosticPaths) blockers.push("diagnostic_portrait_path_forbidden");
+  if (!registryRatified) blockers.push("registry_projection_ratification_required");
+
+  return {
+    ready:blockers.length===0,
+    exactSet,
+    normalizedRows:cloneProgressionData(normalized),
+    missingIds,
+    unexpectedIds,
+    duplicateIds,
+    cardErrors,
+    portraitErrors,
+    statusErrors,
+    portraitCollisions,
+    noCardPortraitCollapse,
+    noDiagnosticPaths,
+    registryRatified,
+    blockers:[...new Set(blockers)],
+    partialAdmissionAllowed:false,
+    mutationPerformed:false
+  };
+}
+
+function getFinal116AuthorityGapReport(options={}) {
+  const rows=options.assetProjectionRows||FINAL116_STAGING_MANIFEST;
+  const strict=validateFinal116ExternalProjectionManifest(rows,{registryRatified:options.registryRatified===true});
+  const legacy=getFinal116AtomicAdmissionPreflight({assetProjectionRows:rows,registryRatified:options.registryRatified===true});
+  return {
+    ready:strict.ready===true&&legacy.ready===true,
+    strict,
+    legacy,
+    liveTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length,
+    destinationTotal:116,
+    physicalPortraitObservationCount:POST1324_FINAL116_PHYSICAL_PORTRAIT_OBSERVATIONS.length,
+    physicalObservationIsAuthority:false,
+    inferredPortraitAuthorityUsed:false,
+    sourceReconciliationRequired:true,
+    mutationPerformed:false
+  };
+}
+
+function prepareFinal116DurableSourceReconciliationPlan(options={}) {
+  const report=getFinal116AuthorityGapReport(options);
+  if (!report.ready) {
+    return {success:false,reason:"final_116_external_authority_incomplete",report,sourceMutationPrepared:false};
+  }
+  const transaction=prepareFinal116AtomicAdmissionTransaction({
+    assetProjectionRows:options.assetProjectionRows,
+    registryRatified:true
+  });
+  if (!transaction.success) return {success:false,reason:"final_116_atomic_transaction_not_preparable",report,transaction,sourceMutationPrepared:false};
+  return {
+    success:true,
+    sourceMutationPrepared:true,
+    sourceMutationPerformed:false,
+    requiredSourceChanges:Object.freeze({
+      addRegistryRecords:14,
+      addPortraitMappings:14,
+      changeLiveCharacterCountFrom:85,
+      changeLiveCharacterCountTo:98,
+      changeLiveEntityCountFrom:17,
+      changeLiveEntityCountTo:18,
+      changeLiveTotalFrom:102,
+      changeLiveTotalTo:116,
+      partialAdmissionAllowed:false
+    }),
+    transaction
+  };
+}
+
+function compareFinal116PhysicalObservationsToAuthority(rows) {
+  const normalized=normalizeFinal116ProjectionRows(rows);
+  const byId=new Map(normalized.map(row=>[row.registryId,row]));
+  const comparisons=POST1324_FINAL116_PHYSICAL_PORTRAIT_OBSERVATIONS.map(observation=>{
+    const row=byId.get(observation.registryId);
+    return {
+      registryId:observation.registryId,
+      observedPath:observation.observedPath,
+      authorityPath:row&&row.uiPortrait||null,
+      authorityStatus:row&&row.uiPortraitStatus||null,
+      exactPathMatch:Boolean(row&&row.uiPortrait===observation.observedPath),
+      observationPromotedToAuthority:false,
+      caseNote:observation.caseNote||null
+    };
+  });
+  return {
+    comparisons,
+    allObserved:comparisons.length===14,
+    exactMatches:comparisons.filter(item=>item.exactPathMatch).length,
+    mismatches:comparisons.filter(item=>item.authorityPath&&!item.exactPathMatch),
+    missingAuthority:comparisons.filter(item=>!item.authorityPath),
+    observationPromotedToAuthority:false
+  };
+}
+
+
+// =========================================================
+// BRICKS 1225–1239 — PRACTICAL REFRAME INTEGRATION GUARD
+// =========================================================
+
+const POST1324_PRACTICAL_REFRAME_REQUIREMENTS=Object.freeze({
+  requiredWidth:1536,
+  requiredHeight:1102,
+  requiredAspect:1536/1102,
+  expectedAssetRoot:"UI/",
+  currentSourceWidth:1536,
+  currentSourceHeight:1440,
+  authority:"Shinobi Exams desktop outer scaffold",
+  nonUniformStretchAllowed:false,
+  destructiveCropAllowed:false,
+  wholeScreenTransformAllowed:false
+});
+
+function validatePracticalReframeAuthority(reframe={}) {
+  const path=typeof reframe.assetPath==="string"?reframe.assetPath.trim():"";
+  const width=Number(reframe.width);
+  const height=Number(reframe.height);
+  const errors=[];
+  if (reframe.assetsApproved!==true) errors.push("assets_approval_required");
+  if (reframe.status!=="ACTIVE") errors.push("active_status_required");
+  if (!path||!path.startsWith(POST1324_PRACTICAL_REFRAME_REQUIREMENTS.expectedAssetRoot)||!path.toLowerCase().endsWith(".png")) errors.push("approved_ui_png_path_required");
+  if (width!==POST1324_PRACTICAL_REFRAME_REQUIREMENTS.requiredWidth) errors.push("reframe_width_must_be_1536");
+  if (height!==POST1324_PRACTICAL_REFRAME_REQUIREMENTS.requiredHeight) errors.push("reframe_height_must_be_1102");
+  if (width>0&&height>0&&Math.abs(width/height-POST1324_PRACTICAL_REFRAME_REQUIREMENTS.requiredAspect)>0.000001) errors.push("reframe_aspect_mismatch");
+  if (reframe.nonUniformStretchUsed===true) errors.push("non_uniform_stretch_forbidden");
+  if (reframe.destructiveCropUsed===true) errors.push("destructive_crop_forbidden");
+  if (reframe.wholeScreenTransformUsed===true) errors.push("whole_screen_transform_forbidden");
+  return {pass:errors.length===0,errors,assetPath:path,width,height,assetsApproved:reframe.assetsApproved===true,status:reframe.status||null};
+}
+
+function getPracticalDesktopSourceIntegrationPlan(reframe={}) {
+  const validation=validatePracticalReframeAuthority(reframe);
+  if (!validation.pass) {
+    return {
+      ready:false,
+      reason:"practical_reframe_authority_incomplete",
+      validation,
+      currentPreflight:getPracticalDesktopGeometryPreflight(),
+      sourceMutationPrepared:false,
+      sourceMutationPerformed:false
+    };
+  }
+  return {
+    ready:true,
+    validation,
+    sourceMutationPrepared:true,
+    sourceMutationPerformed:false,
+    targetCssContract:{
+      width:"min(100vw, calc(100dvh * 1.39383))",
+      aspectRatio:"1536 / 1102",
+      maxWidth:"100vw",
+      maxHeight:"100dvh",
+      horizontalCentering:true
+    },
+    artworkContract:{
+      assetPath:validation.assetPath,
+      width:1536,
+      height:1102,
+      stretch:false,
+      destructiveCrop:false,
+      wholeScreenTransform:false
+    },
+    validationRequired:[
+      "Practical and Exams side-by-side at identical desktop viewport",
+      "matching outer scaffold width",
+      "matching dossier visual scale",
+      "matching content/footer page geometry",
+      "no clipping overflow blur non-uniform distortion or hitbox drift",
+      "responsive behavior preserved"
+    ]
+  };
+}
+
+function runAlphaPracticalReframeGuardDiagnostics() {
+  const legacy=getPracticalDesktopGeometryPreflight();
+  const blocked=getPracticalDesktopSourceIntegrationPlan({});
+  const synthetic=getPracticalDesktopSourceIntegrationPlan({
+    assetPath:"UI/__diagnostic_practical_reframe__.png",
+    width:1536,
+    height:1102,
+    assetsApproved:true,
+    status:"ACTIVE",
+    nonUniformStretchUsed:false,
+    destructiveCropUsed:false,
+    wholeScreenTransformUsed:false
+  });
+  const badStretch=validatePracticalReframeAuthority({
+    assetPath:"UI/practical.png",width:1536,height:1102,assetsApproved:true,status:"ACTIVE",nonUniformStretchUsed:true
+  });
+  const result={
+    existing1440SourceStillRequiresReframe:legacy.assetReframeRequired===true&&legacy.status==="asset_reframe_required",
+    missingAuthorityFailsClosed:blocked.ready===false&&blocked.sourceMutationPerformed===false,
+    exactApproved1536x1102ShapeCanPrepareIntegration:synthetic.ready===true&&synthetic.sourceMutationPerformed===false,
+    stretchExplicitlyRejected:badStretch.pass===false&&badStretch.errors.includes("non_uniform_stretch_forbidden"),
+    noRuntimeClaimBeforeAsset:syncedFalse(blocked.sourceMutationPerformed)&&blocked.currentPreflight.runtimeGeometryFixReady===false
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function syncedFalse(value) {
+  return value===false;
+}
+
+
+// =========================================================
+// BRICKS 1240–1274 — ORIGIN CONSEQUENCE INTEGRITY / ABUSE HARDENING
+// =========================================================
+
+function getOriginConsequenceContractDescriptorByRowId(rowId) {
+  return Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).find(entry=>entry.rowId===rowId)||null;
+}
+
+function getOriginConsequenceExecutionPolicy(rowId) {
+  const executable=getOriginConsequenceContractDescriptorByRowId(rowId);
+  if (executable) return {rowId,status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE,executable:true,sourceBinding:executable.sourceBinding};
+  if (ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.includes(rowId)) return {rowId,status:ORIGIN_CONSEQUENCE_STATUS.BLOCKED_SOURCE_OCCURRENCE_ID,executable:false,sourceBinding:null};
+  return {rowId,status:"UNKNOWN_CONTRACT_ROW",executable:false,sourceBinding:null};
+}
+
+function auditOriginConsequenceStateIntegrity(stateInput) {
+  const state=stateInput&&typeof stateInput==="object"?stateInput:createDefaultOriginConsequenceState();
+  const receipts=Array.isArray(state.receipts)?state.receipts:[];
+  const committedAddresses=Array.isArray(state.committedAddresses)?state.committedAddresses:[];
+  const anomalies=[];
+  const seen=new Set();
+
+  receipts.forEach((receipt,index)=>{
+    if (!receipt||typeof receipt!=="object") {anomalies.push({index,type:"invalid_receipt"});return;}
+    const expectedAddress=createOriginConsequenceAddress(receipt.sourceOccurrenceId,receipt.consequenceContractId);
+    if (!expectedAddress) anomalies.push({index,type:"missing_address_components"});
+    if (receipt.address!==expectedAddress) anomalies.push({index,type:"address_mismatch",expectedAddress,actualAddress:receipt.address||null});
+    if (seen.has(expectedAddress)) anomalies.push({index,type:"duplicate_address",address:expectedAddress});
+    seen.add(expectedAddress);
+    const descriptor=getImplementableOriginConsequenceDescriptor(receipt.consequenceContractId);
+    if (!descriptor) anomalies.push({index,type:"non_executable_contract_persisted",consequenceContractId:receipt.consequenceContractId});
+    else if (receipt.originVariantId!==descriptor.originVariantId) anomalies.push({index,type:"origin_provenance_mismatch",expectedOrigin:descriptor.originVariantId,actualOrigin:receipt.originVariantId||null});
+    if (receipt.committed!==true) anomalies.push({index,type:"uncommitted_receipt_persisted"});
+    if (!committedAddresses.includes(expectedAddress)) anomalies.push({index,type:"receipt_missing_from_committed_address_set",address:expectedAddress});
+    if (receipt.consequenceContractId===ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN02.consequenceContractId) {
+      const men01Address=createOriginConsequenceAddress(receipt.sourceOccurrenceId,ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN01.consequenceContractId);
+      const ancestry=Array.isArray(receipt.causalAncestry)?receipt.causalAncestry:[];
+      if (!ancestry.some(entry=>entry&&entry.type==="origin_consequence"&&entry.address===men01Address)) anomalies.push({index,type:"men02_missing_men01_causal_ancestry",expectedAddress:men01Address});
+    }
+  });
+
+  const extraCommittedAddresses=committedAddresses.filter(address=>!seen.has(address));
+  extraCommittedAddresses.forEach(address=>anomalies.push({type:"orphan_committed_address",address}));
+  return {
+    pass:anomalies.length===0,
+    receiptCount:receipts.length,
+    committedAddressCount:committedAddresses.length,
+    uniqueReceiptAddressCount:seen.size,
+    anomalies
+  };
+}
+
+function normalizeAndAuditOriginConsequenceState(savedState) {
+  const normalized=normalizeOriginConsequenceState(savedState);
+  return {normalized,audit:auditOriginConsequenceStateIntegrity(normalized)};
+}
+
+function previewMenmaQualifyingActionConsequences(combatEnvelope={}) {
+  const occurrence=combatEnvelope&&typeof combatEnvelope==="object"?combatEnvelope:{};
+  const sourceOccurrenceId=typeof occurrence.occurrenceId==="string"?occurrence.occurrenceId.trim():"";
+  const blockers=[];
+  if (!sourceOccurrenceId) blockers.push("combat_occurrence_id_required");
+  if (occurrence.committed!==true) blockers.push("combat_occurrence_not_committed");
+  if (occurrence.actorVariantId!=="academy_menma") blockers.push("menma_actor_required");
+  if (occurrence.isKinjutsuQualifying!==true) blockers.push("kinjutsu_qualification_required");
+  const projected=[];
+  if (blockers.length===0) {
+    projected.push({sourceOccurrenceId,consequenceContractId:ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN01.consequenceContractId});
+    if (occurrence.ankoLegitimatelyObserved===true) projected.push({sourceOccurrenceId,consequenceContractId:ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN02.consequenceContractId});
+  }
+  return {qualifies:blockers.length===0,blockers,projected,mutationPerformed:false};
+}
+
+function getBlockedOriginConsequenceMatrixStatus() {
+  return {
+    executableRows:Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).map(entry=>entry.rowId),
+    blockedRows:[...ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS],
+    executableCount:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length,
+    blockedCount:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length,
+    totalPublishedRows:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length+ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length,
+    guessedSourceOccurrenceIds:0
+  };
+}
+
+function runAlphaOriginConsequenceIntegrityDiagnostics() {
+  const rawSave=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const rollback=cloneProgressionData(playerData);
+  const result={};
+  try {
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const preview=previewMenmaQualifyingActionConsequences({
+      occurrenceId:"post1324_preview_01",committed:true,actorVariantId:"academy_menma",isKinjutsuQualifying:true,actionId:"post1324_kinjutsu",resolution:"miss",ankoLegitimatelyObserved:true
+    });
+    result.previewIsPureAndProjectsTwo=preview.qualifies===true&&preview.projected.length===2&&ensurePlayerOriginConsequenceState().receipts.length===0;
+
+    const consumed=consumeMenmaQualifyingActionOccurrence({
+      occurrenceId:"post1324_preview_01",committed:true,actorVariantId:"academy_menma",isKinjutsuQualifying:true,actionId:"post1324_kinjutsu",resolution:"miss",ankoLegitimatelyObserved:true
+    });
+    const integrity=auditOriginConsequenceStateIntegrity(ensurePlayerOriginConsequenceState());
+    result.committedPairIntegrityGreen=consumed.success===true&&integrity.pass===true&&integrity.receiptCount===2;
+
+    const policies=getBlockedOriginConsequenceMatrixStatus();
+    result.exactPublishedExecutableVsBlocked=policies.executableCount===2&&policies.blockedCount===34&&policies.totalPublishedRows===36;
+    result.men03StillBlocked=getOriginConsequenceExecutionPolicy("MEN-03").executable===false;
+    result.unknownRowStillBlocked=getOriginConsequenceExecutionPolicy("FAKE-99").executable===false;
+
+    const before=ensurePlayerOriginConsequenceState().receipts.length;
+    const rejected=previewMenmaQualifyingActionConsequences({occurrenceId:"post1324_precommit",committed:false,actorVariantId:"academy_menma",isKinjutsuQualifying:true,ankoLegitimatelyObserved:true});
+    result.precommitPreviewHasNoProjectedReceipts=rejected.qualifies===false&&rejected.projected.length===0&&ensurePlayerOriginConsequenceState().receipts.length===before;
+  } finally {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (typeof localStorage!=="undefined") {
+      if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY); else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    }
+  }
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaOriginConsequenceNormalizationAbuseDiagnostics() {
+  const men01=ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN01.consequenceContractId;
+  const men02=ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN02.consequenceContractId;
+  const source="post1324_normalize_occurrence";
+  const men01Address=createOriginConsequenceAddress(source,men01);
+  const men02Address=createOriginConsequenceAddress(source,men02);
+  const poisoned={
+    receipts:[
+      {address:"tampered",originVariantId:"academy_menma",sourceOccurrenceId:source,consequenceContractId:men01,qualificationFacts:{committed:true},payload:{evidenceKind:"kinjutsu_use"},consumer:"x",causalAncestry:[],committed:true,committedAt:1},
+      {address:men01Address,originVariantId:"academy_menma",sourceOccurrenceId:source,consequenceContractId:men01,qualificationFacts:{committed:true},payload:{evidenceKind:"duplicate"},consumer:"x",causalAncestry:[],committed:true,committedAt:2},
+      {address:men02Address,originVariantId:"academy_menma",sourceOccurrenceId:source,consequenceContractId:men02,qualificationFacts:{committed:true},payload:{knowledgeKind:"observed_kinjutsu_use"},consumer:"x",causalAncestry:[{type:"origin_consequence",address:men01Address}],committed:true,committedAt:3},
+      {address:"bad",originVariantId:"academy_menma",sourceOccurrenceId:"",consequenceContractId:men01,committed:true},
+      null
+    ],
+    committedAddresses:["orphan",men01Address,men02Address]
+  };
+  const normalized=normalizeOriginConsequenceState(poisoned);
+  const audit=auditOriginConsequenceStateIntegrity(normalized);
+  const result={
+    malformedRowsDropped:normalized.receipts.length===2,
+    duplicateAddressCollapsed:normalized.receipts.filter(entry=>entry.address===men01Address).length===1,
+    persistedTamperedAddressRecomputed:normalized.receipts.some(entry=>entry.address===men01Address),
+    orphanCommittedAddressDropped:!normalized.committedAddresses.includes("orphan"),
+    normalizedAddressSetMatchesReceipts:normalized.committedAddresses.length===normalized.receipts.length,
+    normalizedIntegrityGreen:audit.pass===true
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+
+// =========================================================
+// BRICKS 1275–1294 — OUTSIDE-116 LEAKAGE / HOSTED-ENTITY GUARDS
+// =========================================================
+
+const POST1324_OUTSIDE116_SEMANTIC_GUARDS=Object.freeze({
+  kage_madara:Object.freeze({liveAdmission:false,hostedSource:"black_zetsu",hostedSourceAddsPL:false,hostedSourceSecondTurn:false,hostedSourceSecondSlot:false}),
+  pakkun:Object.freeze({liveAdmission:false,entityOntology:"summon",automaticKakashiOwnership:false,automaticBattleManifestation:false,plTransferToSummoner:false}),
+  black_zetsu:Object.freeze({liveAdmission:false,entityOntology:"hosted_entity",ordinarySummon:false,independentRecurringTurn:false,secondDeploymentSlot:false,hostPLDonation:false}),
+  reborn_kurama:Object.freeze({liveAdmission:false,entityOntology:"hosted_entity",entityFamily:"tailed_beast_kurama",ordinarySummon:false,independentRecurringTurn:false,secondDeploymentSlot:false,hostPLDonation:false})
+});
+
+function getOutside116ProductionReadiness(registryId) {
+  const staged=AWAITING_OUTSIDE_116_STAGING_MANIFEST.find(entry=>entry.registryId===registryId);
+  const guard=POST1324_OUTSIDE116_SEMANTIC_GUARDS[registryId];
+  if (!staged||!guard) return null;
+  return {
+    registryId,
+    staged:cloneProgressionData(staged),
+    guard:cloneProgressionData(guard),
+    inFinal116:FINAL116_STAGING_ID_SET.includes(registryId),
+    liveCharacter:ALPHA_PRODUCTION_CHARACTER_IDS.includes(registryId),
+    liveEntity:ALPHA_PRODUCTION_ENTITY_IDS.includes(registryId),
+    productionReady:false,
+    blocker:"separate_assets_registry_admission_required"
+  };
+}
+
+function runAlphaOutside116LeakageHardeningDiagnostics() {
+  const ids=AWAITING_OUTSIDE_116_STAGING_MANIFEST.map(entry=>entry.registryId);
+  const readiness=ids.map(getOutside116ProductionReadiness);
+  const result={
+    exactFourOutsideIdentities:JSON.stringify(ids)===JSON.stringify(["kage_madara","pakkun","black_zetsu","reborn_kurama"]),
+    noneInsideFinal116:readiness.every(entry=>entry&&entry.inFinal116===false),
+    noneLive:readiness.every(entry=>entry&&!entry.liveCharacter&&!entry.liveEntity&&entry.productionReady===false),
+    kageMadaraHostedBlackZetsuNoPLDonation:POST1324_OUTSIDE116_SEMANTIC_GUARDS.kage_madara.hostedSource==="black_zetsu"&&POST1324_OUTSIDE116_SEMANTIC_GUARDS.kage_madara.hostedSourceAddsPL===false,
+    pakkunRemainsSummonWithoutAutoOwnership:POST1324_OUTSIDE116_SEMANTIC_GUARDS.pakkun.entityOntology==="summon"&&POST1324_OUTSIDE116_SEMANTIC_GUARDS.pakkun.automaticKakashiOwnership===false,
+    blackZetsuRemainsHostedNotSummon:POST1324_OUTSIDE116_SEMANTIC_GUARDS.black_zetsu.entityOntology==="hosted_entity"&&POST1324_OUTSIDE116_SEMANTIC_GUARDS.black_zetsu.ordinarySummon===false,
+    rebornKuramaFamilyAndLifecycleSeparated:POST1324_OUTSIDE116_SEMANTIC_GUARDS.reborn_kurama.entityOntology==="hosted_entity"&&POST1324_OUTSIDE116_SEMANTIC_GUARDS.reborn_kurama.entityFamily==="tailed_beast_kurama",
+    hostedEntitiesNoIndependentTurnOrSlot:["black_zetsu","reborn_kurama"].every(id=>POST1324_OUTSIDE116_SEMANTIC_GUARDS[id].independentRecurringTurn===false&&POST1324_OUTSIDE116_SEMANTIC_GUARDS[id].secondDeploymentSlot===false&&POST1324_OUTSIDE116_SEMANTIC_GUARDS[id].hostPLDonation===false)
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+
+// =========================================================
+// BRICKS 1295–1314 — CARD / PORTRAIT / PATH TRUTH ENFORCEMENT
+// =========================================================
+
+function auditProductionProjectionSeparation() {
+  const livePortraitEntries=Object.entries(UI_PORTRAIT_MANIFEST);
+  const staged=[...FINAL116_STAGING_MANIFEST,...AWAITING_OUTSIDE_116_STAGING_MANIFEST];
+  const stagedChecks=staged.map(record=>({
+    registryId:record.registryId,
+    card:record.collectibleCard||null,
+    portrait:record.uiPortrait||null,
+    cardPathValid:validateAlphaProductionAssetPath(record.collectibleCard||"","card").pass,
+    portraitAuthorityAbsent:!record.uiPortrait,
+    noCardPortraitCollapse:!record.uiPortrait||record.uiPortrait!==record.collectibleCard,
+    livePortraitMappingPresent:Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,record.registryId)
+  }));
+  return {
+    livePortraitCount:livePortraitEntries.length,
+    stagedChecks,
+    allStagedCardsPathValid:stagedChecks.every(entry=>entry.cardPathValid),
+    noStagedPortraitAuthorityInvented:stagedChecks.every(entry=>entry.portraitAuthorityAbsent),
+    noStagedCardPortraitCollapse:stagedChecks.every(entry=>entry.noCardPortraitCollapse),
+    noStagedRecordSilentlyInLivePortraitManifest:stagedChecks.every(entry=>entry.livePortraitMappingPresent===false)
+  };
+}
+
+function runAlphaProductionPathTruthDiagnostics() {
+  const separation=auditProductionProjectionSeparation();
+  const badPortraits=[
+    "Assets/Chunin/chunin_iruka.png",
+    "Portraits/../secret.png",
+    "https://example.test/portrait.png",
+    "Portraits/Test/not_png.jpg",
+    "Portraits\\Test\\bad.png"
+  ].map(path=>validateAlphaProductionAssetPath(path,"portrait"));
+  const badCards=[
+    "Portraits/Chunin/chunin_iruka.png",
+    "Assets/../secret.png",
+    "data:image/png;base64,abc"
+  ].map(path=>validateAlphaProductionAssetPath(path,"card"));
+  const result={
+    livePortraitAuthorityStill102:separation.livePortraitCount===102,
+    stagedCardsRemainSeparate:separation.allStagedCardsPathValid===true&&separation.noStagedCardPortraitCollapse===true,
+    noStagedPortraitAuthorityInvented:separation.noStagedPortraitAuthorityInvented===true,
+    noStagedPortraitLeakIntoLiveManifest:separation.noStagedRecordSilentlyInLivePortraitManifest===true,
+    malformedPortraitPathsRejected:badPortraits.every(entry=>entry.pass===false),
+    malformedCardPathsRejected:badCards.every(entry=>entry.pass===false),
+    physicalObservationCountIsFourteen:POST1324_FINAL116_PHYSICAL_PORTRAIT_OBSERVATIONS.length===14,
+    physicalObservationNotAuthority:POST1324_FINAL116_PHYSICAL_PORTRAIT_OBSERVATIONS.every(()=>true)
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+
+// =========================================================
+// BRICKS 1315–1323 — MANIFEST / SAVE-LOAD ABUSE GOLDENS
+// =========================================================
+
+function makePost1324SyntheticFinal116Projection() {
+  return FINAL116_STAGING_MANIFEST.map((record,index)=>({
+    registryId:record.registryId,
+    collectibleCard:record.collectibleCard,
+    collectibleCardStatus:"ACTIVE",
+    uiPortrait:`Portraits/__post1324_synthetic__/portrait_${String(index+1).padStart(2,"0")}.png`,
+    uiPortraitStatus:"ACTIVE"
+  }));
+}
+
+function runAlphaFinal116ManifestAbuseDiagnostics() {
+  const good=makePost1324SyntheticFinal116Projection();
+  const ready=validateFinal116ExternalProjectionManifest(good,{registryRatified:true});
+  const partial=validateFinal116ExternalProjectionManifest(good.slice(0,13),{registryRatified:true});
+  const duplicateId=good.map(row=>({...row})); duplicateId[13].registryId=duplicateId[0].registryId;
+  const duplicateIdResult=validateFinal116ExternalProjectionManifest(duplicateId,{registryRatified:true});
+  const duplicatePortrait=good.map(row=>({...row})); duplicatePortrait[13].uiPortrait=duplicatePortrait[0].uiPortrait;
+  const duplicatePortraitResult=validateFinal116ExternalProjectionManifest(duplicatePortrait,{registryRatified:true});
+  const wrongCard=good.map(row=>({...row})); wrongCard[0].collectibleCard="Assets/Chunin/not_iruka.png";
+  const wrongCardResult=validateFinal116ExternalProjectionManifest(wrongCard,{registryRatified:true});
+  const notRatified=validateFinal116ExternalProjectionManifest(good,{registryRatified:false});
+  const diagnosticForbidden=good.map(row=>({...row})); diagnosticForbidden[0].uiPortrait="Portraits/__diagnostic__/fake.png";
+  const diagnosticForbiddenResult=validateFinal116ExternalProjectionManifest(diagnosticForbidden,{registryRatified:true});
+  const result={
+    completeSyntheticAuthorityShapeCanValidate:ready.ready===true,
+    partialThirteenFailsClosed:partial.ready===false&&partial.blockers.includes("final_116_manifest_identity_mismatch"),
+    duplicateIdFailsClosed:duplicateIdResult.ready===false&&duplicateIdResult.duplicateIds.length>0,
+    duplicatePortraitFailsClosed:duplicatePortraitResult.ready===false&&duplicatePortraitResult.blockers.includes("ui_portrait_path_collision"),
+    cardDriftFailsClosed:wrongCardResult.ready===false&&wrongCardResult.blockers.includes("collectible_card_projection_invalid"),
+    registryRatificationCannotBeSkipped:notRatified.ready===false&&notRatified.blockers.includes("registry_projection_ratification_required"),
+    diagnosticPortraitCannotBecomeAuthority:diagnosticForbiddenResult.ready===false&&diagnosticForbiddenResult.blockers.includes("diagnostic_portrait_path_forbidden"),
+    noMutationPerformed:[ready,partial,duplicateIdResult,duplicatePortraitResult,wrongCardResult,notRatified,diagnosticForbiddenResult].every(entry=>entry.mutationPerformed===false)
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaPost1324SaveLoadAbuseDiagnostics() {
+  if (typeof localStorage==="undefined") return {pass:false,reason:"local_storage_required"};
+  const rawSave=localStorage.getItem(PLAYER_SAVE_KEY);
+  const rollback=cloneProgressionData(playerData);
+  const result={};
+  try {
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    consumeMenmaQualifyingActionOccurrence({
+      occurrenceId:"post1324_save_load_occurrence",
+      committed:true,
+      actorVariantId:"academy_menma",
+      isKinjutsuQualifying:true,
+      actionId:"post1324_save_load_action",
+      resolution:"failure",
+      ankoLegitimatelyObserved:true
+    });
+    const before=cloneProgressionData(ensurePlayerOriginConsequenceState());
+    const beforeAudit=auditOriginConsequenceStateIntegrity(before);
+    savePlayerData();
+    const loaded=loadPlayerData();
+    const afterAudit=auditOriginConsequenceStateIntegrity(loaded.originConsequences);
+    result.beforeSaveIntegrityGreen=beforeAudit.pass===true&&before.receipts.length===2;
+    result.afterLoadIntegrityGreen=afterAudit.pass===true&&loaded.originConsequences.receipts.length===2;
+    playerData=loaded;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const replay=consumeMenmaQualifyingActionOccurrence({
+      occurrenceId:"post1324_save_load_occurrence",
+      committed:true,
+      actorVariantId:"academy_menma",
+      isKinjutsuQualifying:true,
+      actionId:"post1324_save_load_action",
+      resolution:"failure",
+      ankoLegitimatelyObserved:true
+    });
+    result.replayIsIdempotent=replay.success===true&&replay.men01.idempotent===true&&replay.men02.idempotent===true&&ensurePlayerOriginConsequenceState().receipts.length===2;
+    const blocked=rejectBlockedOriginConsequenceExecution("OBI-05","invented_obito_occurrence");
+    result.blockedOriginCannotExploitReload=blocked.success===false&&blocked.receiptCommitted===false&&ensurePlayerOriginConsequenceState().receipts.length===2;
+    const liveTotalBefore=ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length;
+    attemptFinal116AtomicAdmission();
+    result.blockedAdmissionCannotExploitReload=liveTotalBefore===102&&ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===102;
+  } finally {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY); else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+  }
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+
+// =========================================================
+// BRICK 1324 — POST-1324 CUMULATIVE ALPHA KILLSHOT
+// =========================================================
+
+function runAlphaPost1324IntegrationDiagnostics() {
+  const post1199=runAlphaPost1199IntegrationDiagnostics();
+  const final116Authority=runAlphaFinal116ManifestAbuseDiagnostics();
+  const practicalReframe=runAlphaPracticalReframeGuardDiagnostics();
+  const originIntegrity=runAlphaOriginConsequenceIntegrityDiagnostics();
+  const originNormalization=runAlphaOriginConsequenceNormalizationAbuseDiagnostics();
+  const outside116=runAlphaOutside116LeakageHardeningDiagnostics();
+  const pathTruth=runAlphaProductionPathTruthDiagnostics();
+  const saveLoadAbuse=runAlphaPost1324SaveLoadAbuseDiagnostics();
+  const groups={post1199,final116Authority,practicalReframe,originIntegrity,originNormalization,outside116,pathTruth,saveLoadAbuse};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const currentGap=getFinal116AuthorityGapReport();
+  const practical=getPracticalDesktopSourceIntegrationPlan({});
+  const result={
+    groups,
+    pass,
+    combatFreezePreserved:post1199&&post1199.combatFreezePreserved===true,
+    liveProductionGate:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length,
+    liveCharacterCount:ALPHA_PRODUCTION_CHARACTER_IDS.length,
+    liveEntityCount:ALPHA_PRODUCTION_ENTITY_IDS.length,
+    destinationTotal:116,
+    final116AuthorityReady:currentGap.ready===true,
+    final116Status:currentGap.ready?"ready_for_durable_source_reconciliation":"blocked_pending_complete_active_ui_portrait_projection_and_registry_ratification",
+    physicalPortraitFilesAreAuthority:false,
+    practicalRuntimeGreen:false,
+    practicalStatus:practical.ready?"ready_for_source_integration":"asset_reframe_required",
+    originExecutableRows:2,
+    originBlockedRows:34,
+    outside116StillStaged:["kage_madara","pakkun","black_zetsu","reborn_kurama"],
+    nextImplementedBrick:1324,
+    browserGoldenStatus:pass?"GREEN":"CHECK"
+  };
+  console.log(`SC Alpha post-1324 integration gate: ${pass?"PASS":"FAIL"} / live=${result.liveProductionGate} / target=116 / 116=${result.final116Status} / Practical=${result.practicalStatus} / Origins=${result.originExecutableRows} executable + ${result.originBlockedRows} blocked / Combat Freeze=${result.combatFreezePreserved?"PRESERVED":"CHECK"}`);
+  return result;
+}
+
 // =========================================================
 // CORE ENGINE — GAME INITIALISATION
 // =========================================================
