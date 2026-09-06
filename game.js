@@ -90807,6 +90807,424 @@ function runAlphaPost1364Final116IntegrationDiagnostics() {
   return result;
 }
 
+
+// =========================================================
+// MONSTER BATCH V — ALPHA JOURNEY / PERSISTENCE REGRESSION WAVE
+// BRICKS 1365–1489
+// =========================================================
+//
+// Purpose:
+//   Prove the already-authored Alpha onboarding spine as one continuous,
+//   save/load-safe journey rather than a collection of independently green
+//   subsystems. This wave adds no new gameplay semantics and does not consume
+//   unresolved Origin source-occurrence IDs or the pending Practical reframe.
+//
+// Production admission remains the Post-1364 98 Character + 18 Entity = 116
+// source state. Portrait repository reorganisation is deliberately not inferred
+// here; presentation reconciliation remains a separate exact-path authority job.
+// =========================================================
+
+const POST1489_ALPHA_JOURNEY_GOLDEN=Object.freeze({
+  originVariantId:"academy_obito",
+  teammateVariantIds:Object.freeze(["academy_kakashi","academy_kurenai"]),
+  joninLeaderVariantId:"jonin_konohamaru",
+  originSelectionEventId:"post1489_origin_selection",
+  originCompletionEvidenceId:"post1489_origin_complete",
+  teamConfirmationEventId:"post1489_academy_team_confirmation",
+  geninSnapshotId:"post1489_genin_transition_snapshot",
+  productionCharacterCount:98,
+  productionEntityCount:18,
+  productionTotal:116
+});
+
+function captureAlphaDiagnosticRuntimeEnvelope() {
+  return {
+    playerData:cloneProgressionData(playerData),
+    rawSave:typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null,
+    playerTeam:Array.isArray(playerTeam)?[...playerTeam]:null,
+    activityHistory:typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)?cloneProgressionData(activityHistory):null,
+    currentBattleRef:typeof currentBattle!=="undefined"?currentBattle:null,
+    selectedEnemyRef:typeof selectedEnemy!=="undefined"?selectedEnemy:null,
+    currentOverlayTypeValue:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
+    clanConstraint:getActiveClanFormationConstraint(),
+    fieldReadinessUI:typeof FIELD_READINESS_UI_STATE!=="undefined"?cloneProgressionData(FIELD_READINESS_UI_STATE):null
+  };
+}
+
+function restoreAlphaDiagnosticRuntimeEnvelope(snapshot) {
+  if (!snapshot||typeof snapshot!=="object") return false;
+  playerData=cloneProgressionData(snapshot.playerData||createDefaultPlayerData());
+  setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+  if (Array.isArray(snapshot.playerTeam)&&Array.isArray(playerTeam)) {
+    playerTeam.splice(0,playerTeam.length,...snapshot.playerTeam);
+  }
+  if (Array.isArray(snapshot.activityHistory)&&typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) {
+    activityHistory.splice(0,activityHistory.length,...snapshot.activityHistory);
+    playerData.activityHistory=activityHistory;
+  }
+  if (typeof currentBattle!=="undefined") currentBattle=snapshot.currentBattleRef;
+  if (typeof selectedEnemy!=="undefined") selectedEnemy=snapshot.selectedEnemyRef;
+  if (typeof currentOverlayType!=="undefined") currentOverlayType=snapshot.currentOverlayTypeValue;
+  if (snapshot.clanConstraint) setActiveClanFormationConstraint(snapshot.clanConstraint); else clearActiveClanFormationConstraint();
+  if (snapshot.fieldReadinessUI&&typeof FIELD_READINESS_UI_STATE!=="undefined") {
+    Object.keys(FIELD_READINESS_UI_STATE).forEach(key=>delete FIELD_READINESS_UI_STATE[key]);
+    Object.assign(FIELD_READINESS_UI_STATE,cloneProgressionData(snapshot.fieldReadinessUI));
+  }
+  if (typeof localStorage!=="undefined") {
+    if (snapshot.rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY);
+    else localStorage.setItem(PLAYER_SAVE_KEY,snapshot.rawSave);
+  }
+  return true;
+}
+
+function resetAlphaDiagnosticPlayerToFreshSave() {
+  playerData=createDefaultPlayerData();
+  setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+  if (typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) activityHistory.splice(0,activityHistory.length);
+  playerData.activityHistory=typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)?activityHistory:[];
+  clearActiveClanFormationConstraint();
+  if (typeof FIELD_READINESS_UI_STATE!=="undefined") {
+    FIELD_READINESS_UI_STATE.selectedOwnedCharacterId=null;
+    FIELD_READINESS_UI_STATE.lastNotice=null;
+    FIELD_READINESS_UI_STATE.entryRoute=null;
+  }
+  savePlayerData();
+  return playerData;
+}
+
+function reloadAlphaDiagnosticPlayerFromSave() {
+  savePlayerData();
+  playerData=loadPlayerData();
+  setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+  if (typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)) {
+    activityHistory.splice(0,activityHistory.length,...(Array.isArray(playerData.activityHistory)?playerData.activityHistory:[]));
+    playerData.activityHistory=activityHistory;
+  }
+  return playerData;
+}
+
+function getAlphaJourneyInvariantSnapshot(label="checkpoint") {
+  const state=ensurePlayerAcquisitionState();
+  const transition=state.geninRosterTransition||createDefaultAcquisitionState().geninRosterTransition;
+  const formation=state.academyTeamFormation||createDefaultAcquisitionState().academyTeamFormation;
+  const subjectOwnedCharacterId=state.chronicleOriginOwnedCharacterId||null;
+  const ownership=playerData.characterOwnership&&Array.isArray(playerData.characterOwnership.ownedRegistryIds)?[...playerData.characterOwnership.ownedRegistryIds]:[];
+  const teamVariants=Array.isArray(playerData.clan&&playerData.clan.teamSlots)
+    ? playerData.clan.teamSlots.map(runtimeId=>runtimeId?getCharacterRegistryId(runtimeId):null)
+    : [];
+  return {
+    label,
+    production:{characters:ALPHA_PRODUCTION_CHARACTER_IDS.length,entities:ALPHA_PRODUCTION_ENTITY_IDS.length,total:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length},
+    ownership,
+    ownershipCount:ownership.length,
+    originVariantId:state.chronicleOriginVariantId||null,
+    ninjaIdentityVariantId:state.ninjaIdentityVariantId||null,
+    onboardingStatus:state.onboardingStatus||null,
+    originPrologueCompleted:!!(state.chronicleOrigin&&state.chronicleOrigin.prologueCompleted===true),
+    activeKonohaEntered:!!(state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntered===true),
+    activeKonohaBoundaryId:state.chronicleOrigin&&state.chronicleOrigin.activeKonohaEntryBoundaryId||null,
+    formationCompleted:formation.completed===true,
+    formationContinued:formation.continuationCompleted===true,
+    teamVariantIds:teamVariants,
+    subjectOwnedCharacterId,
+    subjectFormalRank:subjectOwnedCharacterId?getOwnedCharacterFormalRank(subjectOwnedCharacterId):null,
+    geninTransitionRequired:transition.required===true,
+    geninTransitionCompleted:transition.completed===true,
+    geninCandidateSnapshotId:transition.candidateSnapshotId||null,
+    joninLeaderVariantId:transition.joninLeaderVariantId||null,
+    operationalGeninAvailable:subjectOwnedCharacterId?isOperationalGeninProgressionAvailable(subjectOwnedCharacterId):false,
+    ryo:Number(playerData.ryo)||0,
+    exp:Number(playerData.exp)||0,
+    inventoryCount:Array.isArray(playerData.inventory)?playerData.inventory.length:0
+  };
+}
+
+function advanceAlphaDiagnosticFieldReadinessNoBattle(subjectOwnedCharacterId) {
+  const started=startAcademyToGeninFieldReadinessAssessment(subjectOwnedCharacterId);
+  if (!started.success) return {success:false,stage:"start",result:started};
+  let attempt=getFieldReadinessAttempt();
+  if (!attempt) return {success:false,stage:"attempt",reason:"assessment_attempt_missing"};
+  let world=ensureFieldReadinessWorldState(attempt);
+  const events=[];
+  const commit=(eventId,payload={})=>{
+    const result=commitFieldReadinessAuthoredEvent(attempt.attemptId,eventId,payload);
+    events.push({eventId,result});
+    return result;
+  };
+
+  const first=[
+    commit(FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH),
+    commit(FIELD_READINESS_ALPHA_EVENTS.INSPECT_SECONDARY),
+    commit(FIELD_READINESS_ALPHA_EVENTS.AUTHENTIC_TRAIL),
+    commit(FIELD_READINESS_ALPHA_EVENTS.COURIER_VERIFIED)
+  ];
+  if (first.some(result=>!result.success)) return {success:false,stage:"locate_courier",events};
+
+  world=ensureFieldReadinessWorldState(attempt);
+  const holderOwnedCharacterId=world.teamOwnedCharacterIds&&world.teamOwnedCharacterIds[0]||null;
+  const handoff=commit(FIELD_READINESS_ALPHA_EVENTS.DISPATCH_HANDOFF,{holderOwnedCharacterId});
+  if (!handoff.success) return {success:false,stage:"dispatch_handoff",events};
+
+  // BRICKS 1406–1410 — mandatory mid-attempt persistence checkpoint.
+  const attemptIdBeforeReload=attempt.attemptId;
+  reloadAlphaDiagnosticPlayerFromSave();
+  attempt=getFieldReadinessAttempt(attemptIdBeforeReload);
+  world=attempt?ensureFieldReadinessWorldState(attempt):null;
+  if (!attempt||!world||attempt.attemptId!==attemptIdBeforeReload) return {success:false,stage:"mid_attempt_reload",reason:"attempt_not_restored",events};
+
+  const second=[
+    commit(FIELD_READINESS_ALPHA_EVENTS.POST_RECOVERY_PRIORITY,{choice:"return_now"}),
+    commit(FIELD_READINESS_ALPHA_EVENTS.RETURN_ROUTE,{route:"covered"}),
+    commit(FIELD_READINESS_ALPHA_EVENTS.DISPATCH_TURN_IN)
+  ];
+  if (second.some(result=>!result.success)) return {success:false,stage:"return_dispatch",events};
+
+  const resolved=resolveFieldReadinessFieldPhaseIfReady();
+  return {
+    success:resolved.success===true&&resolved.result&&resolved.result.passed===true,
+    stage:"resolved",
+    started,
+    attemptId:attempt.attemptId,
+    events,
+    resolved,
+    world:cloneProgressionData(ensureFieldReadinessWorldState(attempt))
+  };
+}
+
+function applyAlphaDiagnosticGeninRosterSnapshot(subjectOwnedCharacterId) {
+  const snapshot={
+    snapshotId:POST1489_ALPHA_JOURNEY_GOLDEN.geninSnapshotId,
+    subjectOwnedCharacterId,
+    retentionEligibleVariantIds:[...POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds],
+    teammateCandidateVariantIds:[],
+    joninLeaderCandidateVariantIds:[POST1489_ALPHA_JOURNEY_GOLDEN.joninLeaderVariantId],
+    provenance:{
+      authority:"post1489_alpha_journey_golden",
+      promotionAssessmentId:"academy_to_genin_field_readiness_assessment",
+      academyTeamVariantIds:[...POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds],
+      noEligibilityInference:true
+    },
+    createdAt:Date.now()
+  };
+  return applyGeninRosterTransitionCandidateSnapshot(snapshot);
+}
+
+function runAlphaOriginToOperationalGeninJourneyGoldenDiagnostics() {
+  if (typeof localStorage==="undefined") return {pass:false,reason:"local_storage_required"};
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const checks={};
+  const checkpoints=[];
+  let diagnosticError=null;
+
+  try {
+    resetAlphaDiagnosticPlayerToFreshSave();
+    const fresh=getAlphaJourneyInvariantSnapshot("fresh");
+    checkpoints.push(fresh);
+    checks.freshSaveHasNoAutoRoster=fresh.ownershipCount===0&&fresh.onboardingStatus==="chronicle_origin_pending";
+    checks.productionGateStartsAt116=fresh.production.characters===98&&fresh.production.entities===18&&fresh.production.total===116;
+
+    const selected=selectChronicleOrigin(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId,POST1489_ALPHA_JOURNEY_GOLDEN.originSelectionEventId);
+    const selectedRepeat=selectChronicleOrigin(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId,"post1489_origin_selection_repeat");
+    reloadAlphaDiagnosticPlayerFromSave();
+    const originSelected=getAlphaJourneyInvariantSnapshot("origin_selected_reloaded");
+    checkpoints.push(originSelected);
+    checks.originSelectionCommitsOnce=selected.success===true&&selectedRepeat.success===false&&selectedRepeat.reason==="chronicle_origin_already_confirmed"&&originSelected.ownershipCount===1&&originSelected.originVariantId===POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId&&originSelected.ninjaIdentityVariantId===POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId;
+    checks.originSelectionDoesNotFormTeam=originSelected.formationCompleted===false&&originSelected.onboardingStatus==="origin_prologue";
+
+    const completion=completeChronicleOriginPrologue(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId,[POST1489_ALPHA_JOURNEY_GOLDEN.originCompletionEvidenceId]);
+    const completionRepeat=completeChronicleOriginPrologue(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId,[POST1489_ALPHA_JOURNEY_GOLDEN.originCompletionEvidenceId]);
+    reloadAlphaDiagnosticPlayerFromSave();
+    const formationRequired=getAlphaJourneyInvariantSnapshot("formation_required_reloaded");
+    checkpoints.push(formationRequired);
+    const boundaryCount=(Array.isArray(activityHistory)?activityHistory:[]).filter(record=>record&&record.boundaryId===getActiveKonohaEntryBoundaryId(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId)).length;
+    checks.originCompletionBoundaryExactlyOnce=completion.success===true&&completionRepeat.success===true&&completionRepeat.idempotent===true&&formationRequired.activeKonohaEntered===true&&boundaryCount===1;
+    checks.originCompletionOnlyUnlocksFormation=formationRequired.onboardingStatus==="academy_team_formation_required"&&formationRequired.formationCompleted===false&&formationRequired.ownershipCount===1;
+
+    const pick1=selectAcademyTeamFormationTeammate(1,POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds[0]);
+    const duplicatePick=selectAcademyTeamFormationTeammate(2,POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds[0]);
+    const pick2=selectAcademyTeamFormationTeammate(2,POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds[1]);
+    const formed=confirmAcademyTeamFormation(POST1489_ALPHA_JOURNEY_GOLDEN.teamConfirmationEventId,[...POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds]);
+    const formedRepeat=confirmAcademyTeamFormation(POST1489_ALPHA_JOURNEY_GOLDEN.teamConfirmationEventId,[...POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds]);
+    reloadAlphaDiagnosticPlayerFromSave();
+    const teamFormed=getAlphaJourneyInvariantSnapshot("team_formed_reloaded");
+    checkpoints.push(teamFormed);
+    checks.teamSelectionRejectsDuplicate=pick1.success===true&&duplicatePick.success===false&&duplicatePick.reason==="academy_teammate_duplicate_selection"&&pick2.success===true;
+    checks.teamFormationAtomicAndIdempotent=formed.success===true&&formed.idempotent===false&&formedRepeat.success===true&&formedRepeat.idempotent===true&&teamFormed.ownershipCount===3&&teamFormed.formationCompleted===true&&teamFormed.formationContinued===false;
+    checks.confirmTeamIsNotContinue=teamFormed.onboardingStatus==="academy_team_formed"&&isAcademyFreePlayAvailable()===false;
+
+    const continued=continueAcademyTeamFormationJourney();
+    const continuedRepeat=continueAcademyTeamFormationJourney();
+    reloadAlphaDiagnosticPlayerFromSave();
+    const academyFreePlay=getAlphaJourneyInvariantSnapshot("academy_free_play_reloaded");
+    checkpoints.push(academyFreePlay);
+    checks.continueBoundaryIsSeparateAndIdempotent=continued.success===true&&continued.idempotent===false&&continuedRepeat.success===true&&continuedRepeat.idempotent===true&&academyFreePlay.formationContinued===true&&academyFreePlay.onboardingStatus==="academy_free_play"&&isAcademyFreePlayAvailable()===true;
+
+    const resourceBefore={ryo:Number(playerData.ryo)||0,exp:Number(playerData.exp)||0,inventoryCount:Array.isArray(playerData.inventory)?playerData.inventory.length:0,ownershipCount:academyFreePlay.ownershipCount};
+    const field=advanceAlphaDiagnosticFieldReadinessNoBattle(academyFreePlay.subjectOwnedCharacterId);
+    const promoted=getAlphaJourneyInvariantSnapshot("promoted_transition_pending");
+    checkpoints.push(promoted);
+    checks.fieldReadinessPassesWithoutBattle=field.success===true&&field.resolved&&field.resolved.result&&field.resolved.result.passed===true&&field.resolved.result.battleMandatory===false;
+    checks.fieldReadinessGrantsNoAdditionalReward=field.success===true&&field.resolved.reward.ryo===0&&field.resolved.reward.exp===0&&field.resolved.reward.items.length===0&&promoted.ryo===resourceBefore.ryo&&promoted.exp===resourceBefore.exp&&promoted.inventoryCount===resourceBefore.inventoryCount;
+    checks.promotionMutatesOnlySubjectRank=promoted.subjectFormalRank==="genin"&&POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds.every(id=>getOwnedCharacterFormalRank(getOwnedCharacterRecordByVariantId(id).ownedCharacterId)==="academy");
+    checks.promotionDoesNotAcquireOrSwapRepresentation=promoted.ownershipCount===resourceBefore.ownershipCount&&promoted.ninjaIdentityVariantId===POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId&&promoted.originVariantId===POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId;
+    checks.geninTransitionMandatoryAfterPromotion=promoted.geninTransitionRequired===true&&promoted.geninTransitionCompleted===false&&promoted.onboardingStatus==="genin_roster_transition_pending"&&isOperationalGeninProgressionAvailable(promoted.subjectOwnedCharacterId)===false;
+
+    reloadAlphaDiagnosticPlayerFromSave();
+    const transitionReloaded=getAlphaJourneyInvariantSnapshot("transition_pending_reloaded");
+    checkpoints.push(transitionReloaded);
+    const snapshotApplied=applyAlphaDiagnosticGeninRosterSnapshot(transitionReloaded.subjectOwnedCharacterId);
+    const snapshotReplay=applyAlphaDiagnosticGeninRosterSnapshot(transitionReloaded.subjectOwnedCharacterId);
+    const leaderSelected=selectGeninRosterTransitionJoninLeader(POST1489_ALPHA_JOURNEY_GOLDEN.joninLeaderVariantId);
+    const transitionCommitted=confirmGeninRosterTransition();
+    const transitionReplay=confirmGeninRosterTransition();
+    reloadAlphaDiagnosticPlayerFromSave();
+    const operational=getAlphaJourneyInvariantSnapshot("operational_genin_reloaded");
+    checkpoints.push(operational);
+    checks.candidateSnapshotCommitsAndCannotReroll=snapshotApplied.success===true&&snapshotApplied.idempotent!==true&&snapshotReplay.success===true&&snapshotReplay.idempotent===true&&operational.geninCandidateSnapshotId===POST1489_ALPHA_JOURNEY_GOLDEN.geninSnapshotId;
+    checks.joninLeaderAssignmentIsInstitutionalNotOwnership=leaderSelected.success===true&&leaderSelected.collectibleOwnershipRequired===false&&!operational.ownership.includes(POST1489_ALPHA_JOURNEY_GOLDEN.joninLeaderVariantId);
+    checks.geninRosterCommitIdempotent=transitionCommitted.success===true&&transitionCommitted.idempotent===false&&transitionReplay.success===true&&transitionReplay.idempotent===true;
+    checks.operationalGeninSurvivesReload=operational.onboardingStatus==="operational_genin"&&operational.geninTransitionCompleted===true&&operational.geninTransitionRequired===false&&operational.operationalGeninAvailable===true&&operational.subjectFormalRank==="genin";
+    checks.geninTransitionCreatesNoPowerOrAcquisitionReward=transitionCommitted.plStatTechniqueRewardGranted===false&&transitionCommitted.representationRewardGranted===false&&transitionCommitted.acquisitionRewardGranted===false&&operational.ownershipCount===3;
+    checks.productionRegistryNeverChangedAcrossJourney=checkpoints.every(point=>point.production.characters===98&&point.production.entities===18&&point.production.total===116)&&getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A;
+    checks.outside116StillNotAdmitted=["kage_madara","pakkun","black_zetsu","reborn_kurama"].every(id=>!ALPHA_PRODUCTION_CHARACTER_IDS.includes(id)&&!ALPHA_PRODUCTION_ENTITY_IDS.includes(id));
+  } catch (error) {
+    diagnosticError=String(error&&error.stack||error);
+  } finally {
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+  }
+
+  const pass=!diagnosticError&&Object.values(checks).every(value=>value===true);
+  const result={checks,checkpoints,diagnosticError,pass};
+  console.table(checks);
+  if (diagnosticError) console.error("SC Post-1489 journey Golden diagnostic error:",diagnosticError);
+  console.log(`SC Alpha Origin → Operational Genin journey Golden: ${pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaJourneySaveLoadBoundaryDiagnostics() {
+  if (typeof localStorage==="undefined") return {pass:false,reason:"local_storage_required"};
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const result={};
+  try {
+    resetAlphaDiagnosticPlayerToFreshSave();
+    selectChronicleOrigin(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId,"post1489_reload_origin");
+    reloadAlphaDiagnosticPlayerFromSave();
+    result.originIdentityPersists=ensurePlayerAcquisitionState().ninjaIdentityLocked===true&&ensurePlayerAcquisitionState().chronicleOriginVariantId===POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId;
+
+    completeChronicleOriginPrologue(POST1489_ALPHA_JOURNEY_GOLDEN.originVariantId,["post1489_reload_origin_complete"]);
+    reloadAlphaDiagnosticPlayerFromSave();
+    result.formationRequirementPersists=ensurePlayerAcquisitionState().academyTeamFormation.required===true&&getAcademyTeamFormationJourneyBlockReason()==="academy_team_formation_required";
+
+    selectAcademyTeamFormationTeammate(1,POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds[0]);
+    selectAcademyTeamFormationTeammate(2,POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds[1]);
+    confirmAcademyTeamFormation("post1489_reload_team",[...POST1489_ALPHA_JOURNEY_GOLDEN.teammateVariantIds]);
+    reloadAlphaDiagnosticPlayerFromSave();
+    result.formedButUncontinuedPersists=ensurePlayerAcquisitionState().academyTeamFormation.completed===true&&ensurePlayerAcquisitionState().academyTeamFormation.continuationCompleted===false&&getAcademyTeamFormationJourneyBlockReason()==="academy_team_formation_continue_required";
+
+    continueAcademyTeamFormationJourney();
+    reloadAlphaDiagnosticPlayerFromSave();
+    result.freePlayContinuationPersists=isAcademyFreePlayAvailable()===true&&ensurePlayerAcquisitionState().onboardingStatus==="academy_free_play";
+
+    const subjectId=ensurePlayerAcquisitionState().chronicleOriginOwnedCharacterId;
+    const started=startAcademyToGeninFieldReadinessAssessment(subjectId);
+    const attempt=getFieldReadinessAttempt();
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.OUTER_FOREST_SEARCH);
+    commitFieldReadinessAuthoredEvent(attempt.attemptId,FIELD_READINESS_ALPHA_EVENTS.INSPECT_SECONDARY);
+    const attemptId=attempt.attemptId;
+    reloadAlphaDiagnosticPlayerFromSave();
+    const restored=getFieldReadinessAttempt(attemptId);
+    const restoredWorld=restored&&ensureFieldReadinessWorldState(restored);
+    result.fieldAttemptPointerRelinksToAuthoritativeAttempt=started.success===true&&restored===getAcademyToGeninAssessmentState().activeAttempt&&restoredWorld.discoveredClueIds.includes(FIELD_READINESS_ALPHA_WORLD_AUTHORITY.clues.blueSealCord);
+  } finally {
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+  }
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaJourneyAuthorityBoundaryDiagnostics() {
+  const source=[
+    selectChronicleOrigin,
+    completeChronicleOriginPrologue,
+    confirmAcademyTeamFormation,
+    continueAcademyTeamFormationJourney,
+    resolveAcademyToGeninFieldReadinessAssessment,
+    recordOwnedCharacterGeninPromotion,
+    applyGeninRosterTransitionCandidateSnapshot,
+    confirmGeninRosterTransition
+  ].map(fn=>fn.toString()).join("\n");
+  const result={
+    originSelectionNotRewardSystem:!selectChronicleOrigin.toString().includes("originBonus")&&!selectChronicleOrigin.toString().includes("originXP")&&!selectChronicleOrigin.toString().includes("morality"),
+    confirmTeamNotContinue:confirmAcademyTeamFormation.toString().includes('onboardingStatus="academy_team_formed"')&&continueAcademyTeamFormationJourney.toString().includes('onboardingStatus="academy_free_play"'),
+    fieldReadinessBattleNotMandatory:evaluateFieldReadinessAttemptAgainstClosedRankContract({objectives:{},evidenceByDomain:{}}).battleMandatory===false,
+    fieldReadinessNoAdditionalReward:resolveAcademyToGeninFieldReadinessAssessment.toString().includes("noAdditionalFieldReadinessReward")&&resolveAcademyToGeninFieldReadinessAssessment.toString().includes("ryo:0"),
+    promotionNotRepresentationSwap:!recordOwnedCharacterGeninPromotion.toString().includes("ninjaIdentityVariantId=")&&!recordOwnedCharacterGeninPromotion.toString().includes("chronicleOriginVariantId="),
+    geninTransitionNotAcquisition:confirmGeninRosterTransition.toString().includes("acquisitionRewardGranted:false")&&!confirmGeninRosterTransition.toString().includes("commitCharacterAcquisition"),
+    joninLeaderAssignmentNotOwnership:selectGeninRosterTransitionJoninLeader.toString().includes("collectibleOwnershipRequired:false")&&!selectGeninRosterTransitionJoninLeader.toString().includes("grantCharacterRegistryOwnership"),
+    unresolvedOriginRowsStillBlocked:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===34&&ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
+    men01Men02StillOnlyExecutable:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===2&&Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).every(row=>row.status===ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE),
+    noPracticalAuthorityInvented:getPracticalDesktopSourceIntegrationPlan({}).ready===false,
+    production116IndependentFromPlayerOwnership:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18&&createDefaultCharacterOwnershipState().ownedRegistryIds.length===0,
+    combatFreezeNoJourneyMutation:!source.includes("random ±10%")&&!source.includes("elite*1.25")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaCurrent116AdmissionStateDiagnostics() {
+  const snapshot={
+    sourceAdmission:runAlphaFinal116SourceAdmissionDiagnostics(),
+    registry:runAlphaProductionRegistryGate(),
+    numerics:runAlphaFinal116NewRecordNumericsDiagnostics(),
+    atomic:runAlphaFinal116AtomicAdmissionDiagnostics(),
+    semantic:runAlphaFinal116SemanticGuardDiagnostics()
+  };
+  const result={
+    groups:snapshot,
+    exactCounts:ALPHA_PRODUCTION_CHARACTER_IDS.length===POST1489_ALPHA_JOURNEY_GOLDEN.productionCharacterCount&&ALPHA_PRODUCTION_ENTITY_IDS.length===POST1489_ALPHA_JOURNEY_GOLDEN.productionEntityCount,
+    exactTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===POST1489_ALPHA_JOURNEY_GOLDEN.productionTotal,
+    allGroupsGreen:Object.values(snapshot).every(group=>group&&group.pass===true),
+    original102FingerprintPreserved:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A,
+    binaryQAState:window.__SC_FINAL116_BINARY_QA__&&window.__SC_FINAL116_BINARY_QA__.pass===true?"GREEN":"RUNTIME_ASSET_LOAD_REQUIRED",
+    pass:false
+  };
+  result.pass=result.exactCounts&&result.exactTotal&&result.allGroupsGreen&&result.original102FingerprintPreserved;
+  console.log(`SC current 116 admission state: ${result.pass?"PASS":"FAIL"} / binaryQA=${result.binaryQAState}`);
+  return result;
+}
+
+function runAlphaPost1489IntegrationDiagnostics() {
+  const admission=runAlphaCurrent116AdmissionStateDiagnostics();
+  const journey=runAlphaOriginToOperationalGeninJourneyGoldenDiagnostics();
+  const reloads=runAlphaJourneySaveLoadBoundaryDiagnostics();
+  const authority=runAlphaJourneyAuthorityBoundaryDiagnostics();
+  const origins=runAlphaOriginConsequenceIntegrityDiagnostics();
+  const fieldPersistence=runAlphaFieldReadinessPersistenceContractDiagnostics();
+  const geninTransition=runAlphaGeninRosterTransitionDiagnostics();
+  const groups={admission,journey,reloads,authority,origins,fieldPersistence,geninTransition};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={
+    groups,
+    pass,
+    liveCharacterCount:ALPHA_PRODUCTION_CHARACTER_IDS.length,
+    liveEntityCount:ALPHA_PRODUCTION_ENTITY_IDS.length,
+    liveTotal:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length,
+    journeyGoldenStatus:journey.pass?"GREEN":"CHECK",
+    saveLoadBoundaryStatus:reloads.pass?"GREEN":"CHECK",
+    final116BinaryQAStatus:window.__SC_FINAL116_BINARY_QA__&&window.__SC_FINAL116_BINARY_QA__.pass===true?"GREEN":"REQUIRES_REAL_ASSET_LOAD",
+    practicalStatus:getPracticalDesktopSourceIntegrationPlan({}).ready?"READY":"WAITING_ON_PHYSICAL_1536x1102_MASTER",
+    originConsequenceStatus:"MEN-01/MEN-02 executable; 34 source-occurrence blocked",
+    portraitReconciliationStatus:"SEPARATE_CURRENT_HEAD_ASSET_RECONCILIATION_NOT_INFERRED",
+    combatFreezePreserved:true,
+    nextImplementedBrick:1489
+  };
+  console.log(`SC Alpha post-1489 integration gate: ${pass?"PASS":"FAIL"} / live=${result.liveTotal} / Journey=${result.journeyGoldenStatus} / SaveLoad=${result.saveLoadBoundaryStatus} / Practical=${result.practicalStatus} / Portrait reconciliation=${result.portraitReconciliationStatus}`);
+  return result;
+}
+
+
 // =========================================================
 // CORE ENGINE — GAME INITIALISATION
 // =========================================================
