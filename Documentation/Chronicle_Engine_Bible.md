@@ -85,3 +85,13 @@ Durable recovered doctrine from the original Shinobi Chronicles Combat Stuffs / 
 - [`Chronicle_Engine_Combat_Recovery_Addendum_2026-09-04.md`](./Chronicle_Engine_Combat_Recovery_Addendum_2026-09-04.md)
 
 Recovery addenda must preserve provenance and candidate boundaries rather than silently promoting unresolved game-specific material into Engine canon.
+
+---
+
+## Strategic Direction
+
+The competitive / uniqueness / productisation audit and the resulting preservation-first CE expansion roadmap are recorded in:
+
+- [`Chronicle_Engine_Strategic_Differentiation_and_Expansion_Plan_2026-09-06.md`](./Chronicle_Engine_Strategic_Differentiation_and_Expansion_Plan_2026-09-06.md)
+
+This strategic plan does **not** supersede current durable doctrine or production authority. It defines how CE should be strengthened without sacrificing existing semantic boundaries, and explicitly keeps serious middleware/productisation work post-Alpha.
