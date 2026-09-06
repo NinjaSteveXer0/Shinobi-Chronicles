@@ -1,15 +1,19 @@
 # Shinobi Chronicles — Awaiting Placement Production Admission Scope
 
-**Status:** **REGISTRY RATIFIED — FINAL COMPLETE WAVE = 13 CHARACTERS + NUE; LIVE GATE REMAINS 102 PENDING ASSETS / CODING**  
-**Date:** 2026-09-04
+**Status:** **REGISTRY RATIFIED — FINAL COMPLETE WAVE = 13 CHARACTERS + NUE; ASSET PROJECTION 14/14 RATIFIED; RELEASED TO CODING FOR ATOMIC 102→116 ADMISSION**  
+**Date:** 2026-09-06
 
 This document is the current Registry production-admission authority for the awaiting-placement expansion.
 
 It supersedes all earlier 5-record / 107 and 12-Characters-plus-Nue / 115 admission-scope revisions.
 
-Current Character Creation / Assets authority:
+Current complete Assets projection authority:
 
-`Documentation/Assets/Awaiting Placement Wave - Character Card and Portrait Admission Status.md`
+`Documentation/Assets/Final 116 Asset Projection Status.md`
+
+Final Registry projection ratification:
+
+`Documentation/Registry/Final 116 Asset Projection Registry Ratification.md`
 
 ---
 
@@ -39,21 +43,23 @@ Registry ratifies one complete admission batch:
 
 All fourteen are intended **ACTIVE on admission**. None replaces or supersedes an existing production identity.
 
-When Coding actually applies the complete batch, the live production gate becomes:
+When Coding applies the complete batch and validation passes, the live production gate becomes:
 
 **98 Characters + 18 Entities = 116 live production identities.**
 
-Until the complete Assets projection package is ratified and Coding performs admission, the runtime gate remains:
+Until Coding actually executes and validates that batch, current runtime remains:
 
 **85 Characters + 17 Entities = 102.**
 
-No partial five-record or thirteen-record pre-admission is authorised merely because some mechanics are already implemented.
+No partial five-record, thirteen-record or other intermediate admission is authorised.
 
 Preserve:
 
 **scope selection ≠ live admission readiness**
 
 **calibration authority ≠ production admission**
+
+**Registry ratification ≠ runtime already admitted**
 
 **production admission ≠ acquisition**
 
@@ -141,7 +147,11 @@ Combat authority is closed in:
 
 `Documentation/SC_Combat_Kurama_Resonance_Himawari_Closure_2026-09-04.md`
 
-Action IDs belong to this exact representation:
+and later source reconciliation for `reborn_kurama` is closed in:
+
+`Documentation/SC_Combat_Reborn_Kurama_Hosted_Entity_Skill_Closure_2026-09-05.md`
+
+The five Action IDs remain:
 
 - `kurama_resonance_himawari_resonant_chakra_strike`
 - `kurama_resonance_himawari_tailed_beast_bomb`
@@ -153,59 +163,84 @@ Combat closure ≠ live admission.
 
 ---
 
-## 4. Assets blocker — exact fourteen-row projection required
+## 4. Complete fourteen-row Assets projection — RATIFIED
 
-The current live card/portrait authority remains the existing **102** production set.
+UI / Assets has closed the complete fourteen-row projection in:
 
-Before the 102 → 116 gate may flip, Character Creation / Assets must close for all fourteen awaiting-placement identities:
+`Documentation/Assets/Final 116 Asset Projection Status.md`
+
+Assets closure commit:
+
+`8284611341d5491c284e745f1f445b70354cbf42`
+
+Registry has ratified that exact projection in:
+
+`Documentation/Registry/Final 116 Asset Projection Registry Ratification.md`
+
+All fourteen now have:
 
 1. exact committed/verified `collectibleCard` repository path;
-2. approved square `uiPortrait`;
+2. approved dedicated square `uiPortrait`;
 3. exact committed/verified `uiPortrait` repository path;
-4. explicit ACTIVE/superseded asset status.
+4. explicit ACTIVE Assets status;
+5. explicit Registry ratification.
 
-The user has explicitly deferred Battle/UI Portrait production for this new wave while prioritising Alpha completion.
+Critical exact-path casing:
 
-Therefore Registry does **not** ratify guessed paths and Coding must not fabricate them.
+`chunin_itama` → `Portraits/Chunin/chunin_Itama.png`
+
+Do not normalise the capital `I`.
+
+Coding must consume the exact ratified projection rather than deriving paths from Registry IDs.
 
 Do not:
 
 - derive a card/portrait path from the Registry ID;
 - infer portrait approval from filename similarity;
 - crop collectible cards into permanent `uiPortrait`s;
-- use generic participant images as portrait authority;
-- silently mark any awaiting identity live before the complete fourteen-row package is ready.
+- substitute generic participant images;
+- silently alter casing;
+- partially admit the cohort.
 
 ---
 
-## 5. Coding activation sequence
+## 5. Coding activation sequence — RELEASED
 
-Coding may treat the final admission **scope** as closed now.
+The Registry/Assets prerequisite gate is now open.
 
-Runtime activation remains gated by Assets/Registry projection closure:
+Coding is authorised to:
 
-1. preserve live gate at **102** during the immediate Alpha push;
-2. Assets ingests/verifies all fourteen collectible cards;
-3. Assets later creates/approves fourteen square `uiPortrait`s;
-4. Registry ratifies the exact fourteen-row identity → card/portrait projection;
-5. Coding admits all thirteen Characters + `nue` as one batch;
-6. expected counts become **98 Characters + 18 Entities = 116**;
-7. Registry/card/portrait Golden gates extend **102 → 116**;
-8. CI proves exact counts, unique IDs/paths, decode success, dimensions and no alias drift.
+1. consume the exact fourteen Registry records and exact ratified card/portrait paths;
+2. preserve the current 102 identities and numerics unchanged;
+3. admit all thirteen Characters + `nue` as one atomic batch;
+4. reach expected counts **98 Characters + 18 Entities = 116**;
+5. extend Registry/card/portrait Golden gates **102 → 116**;
+6. run binary decode/dimension checks, unique-ID/path checks, alias/casing checks and regression validation;
+7. declare the production move complete only when runtime/Golden validation is GREEN.
 
-Do not half-admit only the pairing/bond consumers first.
+If a validation defect is found, do not create an intermediate production gate or substitute guessed assets. Correct the exact defect and rerun the atomic gate.
+
+Preserve:
+
+**authorised ≠ implemented**
+
+**implemented ≠ runtime validated**
+
+**runtime validated ≠ Golden GREEN until tests prove it**
 
 ---
 
 ## 6. Current status
 
 - Final awaiting-placement admission scope: **CLOSED — 13 Characters + Nue**
-- Eventual gate after full admission: **116**
-- Current live gate: **102**
+- Eventual gate after successful Coding admission: **116**
+- Current live gate before Coding execution: **102**
 - All fourteen intended ACTIVE when admitted: **YES**
-- Exact fourteen `collectibleCard` repository mappings: **PENDING ASSETS INGESTION**
-- Fourteen approved `uiPortrait`s / exact mappings: **DEFERRED / PENDING**
+- Exact fourteen `collectibleCard` repository mappings: **14/14 ACTIVE / RATIFIED**
+- Exact fourteen approved `uiPortrait` mappings: **14/14 ACTIVE / RATIFIED**
 - Kurama Resonance Himawari mechanics: **CLOSED**
-- Live production admission: **DEFERRED UNTIL COMPLETE PROJECTION PACKAGE**
+- Registry/Assets admission blocker: **NONE**
+- Coding atomic admission release: **AUTHORISED — SEND NOW**
+- Partial admission: **NOT AUTHORISED**
 
-> **116 is the locked destination for this final wave; 102 remains the live runtime gate until admission actually occurs.**
+> **116 is the authorised atomic destination. The runtime remains 102 until Coding performs the batch and proves the new gate GREEN.**
