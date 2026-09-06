@@ -261,20 +261,20 @@ const UI_PORTRAIT_MANIFEST = Object.freeze({
   "baryon_mode": "Portraits/Transformation/bayron_mode.png",
   "cs_anko": "Portraits/Transformation/cs1_anko.png",
   "cs_sasuke": "Portraits/Transformation/cs1_sasuke.png",
-  "curse_mark_hinata": "Portraits/Transformation/cs1_hinata.png",
+  "curse_mark_hinata": "Portraits/Transformation/curse_mark_hinata.png",
   "l2_anko": "Portraits/Transformation/cs2_anko.png",
   "mangekyo_sarada": "Portraits/Transformation/ms_sarada.png",
   "naruto_v1": "Portraits/Transformation/naruto_v1.png",
   "naruto_v2": "Portraits/Transformation/naruto_v2.png",
   "sharingan_sasuke": "Portraits/Transformation/sharingan_sasuke.png",
-  "breakout_kurama": "Portraits/Variants/outbreak_kurama.png",
+  "breakout_kurama": "Portraits/Forced Manifestations/breakout_kurama.png",
   "coercive_cloak": "Portraits/Variants/coercive_cloak.png",
   "kurama_dominion": "Portraits/Variants/kurama_dominion.png",
   "kurama_sovereign": "Portraits/Variants/kurama_sovreign.png",
-  "six_tail_dominion": "Portraits/Variants/dominion_six_tails.png",
+  "six_tail_dominion": "Portraits/Variants/six_tail_dominion.png",
   "stolen_chakra": "Portraits/Variants/stolen_chakra.png",
   "teen_nagato": "Portraits/Variants/teen_nagato.png",
-  "three_tail_dominion": "Portraits/Variants/dominion_three_tails.png",
+  "three_tail_dominion": "Portraits/Variants/three_tail_dominion.png",
   "black_madara": "Portraits/Boss Cards/black_madara.png",
   "failed_god_madara": "Portraits/Boss Cards/failed_god_madara.png",
   "fallen_hokage_sasuke": "Portraits/Boss Cards/fallen_hokage.png",
@@ -284,16 +284,16 @@ const UI_PORTRAIT_MANIFEST = Object.freeze({
   "de_baku": "Portraits/Summons/baku.png",
   "gamakichi": "Portraits/Summons/gamakichi.png",
   "ibuse": "Portraits/Summons/ibuse.png",
-  "iron_maiden": "Portraits/Summons/maiden.png",
+  "iron_maiden": "Portraits/Constructs/iron_maiden.png",
   "key_gero": "Portraits/Summons/geratora.png",
   "koto_crow": "Portraits/Summons/koto_crow.png",
   "kurama_complete": "Portraits/Summons/kurama_complete.png",
   "menma_kurama": "Portraits/Summons/menma_kurama.png",
-  "menma_nine_tails": "Portraits/Summons/menma_nine_tails.png",
+  "menma_nine_tails": "Portraits/Tailed Beasts/menma_nine_tails.png",
   "mirage_clam": "Portraits/Summons/mirage_clam.png",
   "mk_enma": "Portraits/Summons/monkey_king_enma.png",
-  "nine_tails": "Portraits/Summons/naruto_nine_tails.png",
-  "triple_rashomon": "Portraits/Summons/rashomon.png",
+  "nine_tails": "Portraits/Tailed Beasts/nine_tails.png",
+  "triple_rashomon": "Portraits/Constructs/triple_rashomon.png",
   "wr_kamatari": "Portraits/Summons/kamatari.png",
   "yang_kurama": "Portraits/Summons/kurama_yang.png",
   "yin_kurama": "Portraits/Summons/kurama_yin.png"
@@ -41525,6 +41525,11 @@ var selectedRegionKey = null;
 var selectedLocationNode = null;
 var selectedHotspotId = null;
 var selectedOpportunityId = null;
+// BRICKS 1540–1542 — contained mission-area presentation state.
+// This is caller/UI context only; durable opportunity truth remains in
+// playerData.worldEventRuntime and the shared world opportunity registry.
+var selectedMissionAreaId = null;
+var selectedMissionAreaReturnContext = null;
 var regionInfoOpen = false;
 var currentOverlayType = null;
 
@@ -42045,6 +42050,19 @@ function saveTestState() {
 
     regionKey:
       selectedRegionKey,
+
+    // BRICKS 1569–1574 — contained mission-area UI/caller persistence.
+    missionAreaId:
+      selectedMissionAreaId,
+
+    missionAreaReturnContext:
+      selectedMissionAreaReturnContext?cloneBattleRuntimeValue(selectedMissionAreaReturnContext):null,
+
+    hotspotId:
+      selectedHotspotId,
+
+    opportunityId:
+      selectedOpportunityId,
 
 
     locationId:
@@ -44160,6 +44178,62 @@ function getRegionSymbol(type) {
 
 const WORLD_EVENT_OPPORTUNITY_REGISTRY=new Map();
 
+// =========================================================
+// BRICKS 1520–1532 — REUSABLE CONTAINED MISSION-AREA WRAPPER
+// =========================================================
+// A local mission area is presentation/context around the existing world
+// opportunity engine. It is NOT a second event engine, quest subsystem, or
+// node-resolution authority. World/Knowledge/actionability/history remain
+// owned by WORLD_EVENT_OPPORTUNITY_REGISTRY + playerData.worldEventRuntime.
+// =========================================================
+const LOCAL_MISSION_AREA_REGISTRY=new Map();
+
+const WORLD_OPPORTUNITY_CATEGORIES=Object.freeze([
+  "STORY",
+  "BATTLE",
+  "SIDE_OCCURRENCE",
+  "SECRET",
+  "LOOT",
+  "TRAINING_DEVELOPMENT",
+  "INVESTIGATION",
+  "DISCOVERY",
+  "OTHER"
+]);
+
+function normalizeWorldOpportunityCategory(value) {
+  const key=String(value||"OTHER").trim().toUpperCase().replace(/[\s-]+/g,"_");
+  return WORLD_OPPORTUNITY_CATEGORIES.includes(key)?key:"OTHER";
+}
+
+function normalizeLocalMissionAreaDefinition(definition) {
+  if (!definition||!definition.areaId) return null;
+  const areaId=String(definition.areaId);
+  return {
+    ...definition,
+    areaId,
+    name:String(definition.name||areaId),
+    description:String(definition.description||""),
+    mapImage:definition.mapImage?String(definition.mapImage):"",
+    parentRegionKey:definition.parentRegionKey?String(definition.parentRegionKey):null,
+    returnContext:definition.returnContext&&typeof definition.returnContext==="object"?cloneProgressionData(definition.returnContext):null
+  };
+}
+
+function registerLocalMissionArea(definition) {
+  const normalized=normalizeLocalMissionAreaDefinition(definition);
+  if (!normalized) return {success:false,reason:"mission_area_identity_missing"};
+  LOCAL_MISSION_AREA_REGISTRY.set(normalized.areaId,normalized);
+  return {success:true,area:normalized};
+}
+
+function unregisterLocalMissionArea(areaId) {
+  return LOCAL_MISSION_AREA_REGISTRY.delete(String(areaId||""));
+}
+
+function getLocalMissionAreaDefinition(areaId) {
+  return LOCAL_MISSION_AREA_REGISTRY.get(String(areaId||""))||null;
+}
+
 function ensureWorldEventRuntimeState() {
   if (!playerData.worldEventRuntime||typeof playerData.worldEventRuntime!=="object") playerData.worldEventRuntime={};
   const state=playerData.worldEventRuntime;
@@ -44181,6 +44255,8 @@ function normalizeWorldOpportunityDefinition(definition) {
   const sourceKind=String(definition.sourceKind||"authored");
   const presentation=definition.presentation&&typeof definition.presentation==="object"?definition.presentation:{};
   const family=WORLD_HOTSPOT_PRESENTATION_FAMILIES.includes(presentation.family)?presentation.family:"Unknown";
+  const category=normalizeWorldOpportunityCategory(presentation.category||definition.opportunityCategory||"OTHER");
+  const missionAreaId=definition.missionAreaId?String(definition.missionAreaId):null;
   return {
     ...definition,
     regionKey,
@@ -44189,8 +44265,9 @@ function normalizeWorldOpportunityDefinition(definition) {
     hotspotId,
     eventId,
     sourceKind,
+    missionAreaId,
     randomPoolEligible:sourceKind==="story"?false:definition.randomPoolEligible===true,
-    presentation:{...presentation,family},
+    presentation:{...presentation,family,category},
     interactions:Array.isArray(definition.interactions)?definition.interactions.filter(action=>action&&action.id):[],
     defaultDiscoveryLevel:String(definition.defaultDiscoveryLevel||"undiscovered")
   };
@@ -44299,13 +44376,19 @@ function createLegacyLocationOpportunityDefinition(regionKey,location) {
 }
 
 function getWorldOpportunityDefinitionsForRegion(regionKey,region) {
-  const authored=[...WORLD_EVENT_OPPORTUNITY_REGISTRY.values()].filter(def=>def.regionKey===regionKey);
+  const authored=[...WORLD_EVENT_OPPORTUNITY_REGISTRY.values()].filter(def=>def.regionKey===regionKey&&!def.missionAreaId);
   const authoredLocationIds=new Set(authored.filter(def=>def.sourceKind==="persistent_location").map(def=>def.locationId));
   const legacy=(region&&Array.isArray(region.locations)?region.locations:[])
     .filter(location=>!authoredLocationIds.has(location.id))
     .map(location=>createLegacyLocationOpportunityDefinition(regionKey,location))
     .filter(Boolean);
   return [...legacy,...authored];
+}
+
+function getWorldOpportunityDefinitionsForMissionArea(areaId) {
+  const id=String(areaId||"");
+  if (!id||!getLocalMissionAreaDefinition(id)) return [];
+  return [...WORLD_EVENT_OPPORTUNITY_REGISTRY.values()].filter(def=>def.missionAreaId===id);
 }
 
 // =========================================================
@@ -44451,6 +44534,10 @@ function getOpportunityDiscoveryLevel(definition) {
 }
 
 function shouldProjectOpportunityForObserver(definition) {
+  if (definition&&typeof definition.revealPredicate==="function") {
+    const revealed=definition.revealPredicate({definition,playerData,runtime:ensureWorldEventRuntimeState()});
+    if (revealed!==true) return false;
+  }
   if (definition&&typeof definition.evaluateProjection==="function"&&definition.evaluateProjection()!==true) return false;
   const discoveryLevel=getOpportunityDiscoveryLevel(definition);
   const worldState=definition.eventId?getWorldEventDimensionState("worldLifecycleByEventId",definition.eventId):{};
@@ -44507,6 +44594,9 @@ function createObserverSafeOpportunityProjection(definition) {
   const label=isKnown?(discovery.label||presentation.label||"Unknown"):"???";
   const summary=isKnown?(discovery.summary||presentation.summary||""):"";
   const family=isKnown?(discovery.family||presentation.family||"Unknown"):"Unknown";
+  // Category is observer-safe presentation metadata only. It never grants,
+  // resolves, reveals, or forces the authored interaction.
+  const category=isKnown?normalizeWorldOpportunityCategory(presentation.category||"OTHER"):"UNKNOWN";
   const legalActions=definition.interactions.map(action=>{
     const availability=evaluateOpportunityActionAvailability(definition,action);
     return {
@@ -44524,6 +44614,8 @@ function createObserverSafeOpportunityProjection(definition) {
     event_id:definition.eventId,
     opportunity_id:definition.opportunityId,
     presentation_family:family,
+    opportunity_category:category,
+    mission_area_id:definition.missionAreaId||null,
     known_label:label,
     known_summary:summary,
     discovery:{level,rumoured:level==="rumoured"||level==="partially_known",known:isKnown},
@@ -44537,8 +44629,8 @@ function createObserverSafeOpportunityProjection(definition) {
   };
 }
 
-function getRegionHotspotProjections(regionKey,region=worldRegions[regionKey]) {
-  const projected=getWorldOpportunityDefinitionsForRegion(regionKey,region)
+function groupObserverSafeOpportunityHotspots(definitions,{regionKey=null}={}) {
+  const projected=(Array.isArray(definitions)?definitions:[])
     .map(createObserverSafeOpportunityProjection)
     .filter(Boolean);
   const groups=new Map();
@@ -44548,7 +44640,7 @@ function getRegionHotspotProjections(regionKey,region=worldRegions[regionKey]) {
   });
   return [...groups.entries()].map(([hotspotId,opportunities])=>{
     const firstKnown=opportunities.find(item=>item.known_label!=="???")||opportunities[0];
-    const location=getWorldRegionLocation(regionKey,firstKnown.location_id);
+    const location=regionKey?getWorldRegionLocation(regionKey,firstKnown.location_id):null;
     return {
       hotspotId,
       locationId:firstKnown.location_id,
@@ -44564,6 +44656,18 @@ function getRegionHotspotProjections(regionKey,region=worldRegions[regionKey]) {
   });
 }
 
+function getRegionHotspotProjections(regionKey,region=worldRegions[regionKey]) {
+  return groupObserverSafeOpportunityHotspots(getWorldOpportunityDefinitionsForRegion(regionKey,region),{regionKey});
+}
+
+function getMissionAreaHotspotProjections(areaId) {
+  return groupObserverSafeOpportunityHotspots(getWorldOpportunityDefinitionsForMissionArea(areaId));
+}
+
+function getMissionAreaHotspotProjection(areaId,hotspotId) {
+  return getMissionAreaHotspotProjections(areaId).find(hotspot=>hotspot.hotspotId===hotspotId)||null;
+}
+
 function getHotspotProjection(regionKey,hotspotOrLocationId) {
   const projections=getRegionHotspotProjections(regionKey,worldRegions[regionKey]);
   return projections.find(hotspot=>hotspot.hotspotId===hotspotOrLocationId||hotspot.locationId===hotspotOrLocationId)||null;
@@ -44571,13 +44675,19 @@ function getHotspotProjection(regionKey,hotspotOrLocationId) {
 
 function selectHotspotOpportunity(opportunityId) {
   selectedOpportunityId=opportunityId||null;
-  if (selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  if (currentOverlayType==="mission_area"&&selectedMissionAreaId&&getLocalMissionAreaDefinition(selectedMissionAreaId)) {
+    renderLocalMissionAreaUI(selectedMissionAreaId);
+  } else if (selectedRegionKey&&worldRegions[selectedRegionKey]) {
+    renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  }
   return getSelectedOpportunityProjection();
 }
 
 function getSelectedOpportunityProjection() {
-  if (!selectedRegionKey||!selectedOpportunityId) return null;
-  const hotspot=getHotspotProjection(selectedRegionKey,selectedHotspotId);
+  if (!selectedOpportunityId) return null;
+  const hotspot=currentOverlayType==="mission_area"&&selectedMissionAreaId
+    ? getMissionAreaHotspotProjection(selectedMissionAreaId,selectedHotspotId)
+    : (selectedRegionKey?getHotspotProjection(selectedRegionKey,selectedHotspotId):null);
   return hotspot?hotspot.opportunities.find(item=>item.opportunity_id===selectedOpportunityId)||null:null;
 }
 
@@ -44636,19 +44746,24 @@ function commitRecruitmentOpportunity(definition,action) {
 // Caller restoration preserves the selected mission-area context only; it does
 // not commit a next encounter, reveal hidden truth, or resolve an opportunity.
 // =========================================================
-function createWorldOpportunityBattleReturnContext(definition,action=null) {
-  if (!definition||!definition.regionKey||!definition.hotspotId||!definition.opportunityId) {
-    return null;
-  }
-  return {
-    type:"region_hotspot",
-    regionKey:String(definition.regionKey),
+function createWorldOpportunityPresentationReturnContext(definition,action=null) {
+  if (!definition||!definition.hotspotId||!definition.opportunityId) return null;
+  const common={
     locationId:definition.locationId?String(definition.locationId):null,
     hotspotId:String(definition.hotspotId),
     opportunityId:String(definition.opportunityId),
     eventId:definition.eventId?String(definition.eventId):null,
     sourceActionId:action&&action.id?String(action.id):null
   };
+  if (definition.missionAreaId) {
+    return {type:"mission_area_hotspot",missionAreaId:String(definition.missionAreaId),regionKey:definition.regionKey?String(definition.regionKey):null,...common};
+  }
+  if (!definition.regionKey) return null;
+  return {type:"region_hotspot",regionKey:String(definition.regionKey),...common};
+}
+
+function createWorldOpportunityBattleReturnContext(definition,action=null) {
+  return createWorldOpportunityPresentationReturnContext(definition,action);
 }
 
 function attachWorldOpportunityBattleReturnContext(returnContext) {
@@ -44695,7 +44810,7 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
         action.returnContext&&typeof action.returnContext==="object"
           ? cloneProgressionData(action.returnContext)
           : createWorldOpportunityBattleReturnContext(definition,action);
-      if (!battleReturnContext) return {success:false,reason:"region_hotspot_return_context_missing"};
+      if (!battleReturnContext) return {success:false,reason:"world_opportunity_return_context_missing"};
 
       // Authored Encounter identity owns occurrence selection/reservation when supplied.
       // This preserves exact opposition identity, provenance and retry semantics.
@@ -44707,6 +44822,7 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
           regionKey:definition.regionKey,
           locationId:definition.locationId,
           opportunityId:definition.opportunityId,
+          missionAreaId:definition.missionAreaId||null,
           eventId:definition.eventId||null,
           ...(action.encounterContext&&typeof action.encounterContext==="object"
             ? cloneProgressionData(action.encounterContext)
@@ -44750,14 +44866,16 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
         entryBeatId:action.entryBeatId||null,
         sourceOpportunityId:definition.opportunityId,
         sourceEventId:definition.eventId,
-        returnContext:action.returnContext||{
-          type:"region_hotspot",
-          regionKey:definition.regionKey,
-          hotspotId:definition.hotspotId,
-          opportunityId:definition.opportunityId
-        },
+        returnContext:action.returnContext||createWorldOpportunityPresentationReturnContext(definition,action),
         context:action.sceneContext||{}
       });
+      break;
+    }
+    case "mission_area": {
+      const areaId=action.missionAreaId||action.areaId||null;
+      if (!areaId) return {success:false,reason:"mission_area_id_missing"};
+      const caller=action.returnContext||createWorldOpportunityPresentationReturnContext(definition,action);
+      result=openLocalMissionArea(areaId,{returnContext:caller});
       break;
     }
     case "navigation":
@@ -44778,7 +44896,7 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
           entryBeatId:action.entryBeatId||null,
           sourceOpportunityId:definition.opportunityId,
           sourceEventId:definition.eventId,
-          returnContext:action.returnContext||{type:"region_hotspot",regionKey:definition.regionKey,hotspotId:definition.hotspotId,opportunityId:definition.opportunityId},
+          returnContext:action.returnContext||createWorldOpportunityPresentationReturnContext(definition,action),
           context:action.sceneContext||{}
         });
         break;
@@ -44805,9 +44923,25 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
   return result;
 }
 
+function refreshActiveWorldOpportunityPresentation() {
+  if (currentOverlayType==="mission_area"&&selectedMissionAreaId&&getLocalMissionAreaDefinition(selectedMissionAreaId)) {
+    renderLocalMissionAreaUI(selectedMissionAreaId);
+    return {success:true,type:"mission_area"};
+  }
+  if (currentOverlayType==="region"&&selectedRegionKey&&worldRegions[selectedRegionKey]) {
+    renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+    return {success:true,type:"region"};
+  }
+  return {success:false,reason:"world_opportunity_presentation_not_active"};
+}
+
 function executeSelectedOpportunityAction(actionId) {
   if (!selectedOpportunityId) return {success:false,reason:"opportunity_not_selected"};
-  return routeWorldOpportunityInteraction(selectedOpportunityId,actionId);
+  const result=routeWorldOpportunityInteraction(selectedOpportunityId,actionId);
+  if (result&&result.success===true&&(currentOverlayType==="region"||currentOverlayType==="mission_area")) {
+    refreshActiveWorldOpportunityPresentation();
+  }
+  return result;
 }
 
 function renderRegionEventDrawer(regionKey) {
@@ -44823,7 +44957,7 @@ function renderRegionEventDrawer(regionKey) {
   return `
     <aside class="region-event-drawer" style="position:absolute;right:2.5%;top:13%;width:min(390px,34vw);max-height:72%;overflow:auto;z-index:40;background:rgba(6,10,16,.95);border:1px solid rgba(203,161,79,.72);box-shadow:0 16px 45px rgba(0,0,0,.55);padding:16px;color:#e9dfc8;">
       <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
-        <div><small style="opacity:.68;letter-spacing:.12em;">${selected.presentation_family}</small><h3 style="margin:4px 0 6px;">${selected.known_label}</h3></div>
+        <div><small style="opacity:.68;letter-spacing:.12em;">${selected.presentation_family}${selected.opportunity_category&&selected.opportunity_category!=="OTHER"?` • ${selected.opportunity_category.replaceAll("_"," ")}`:""}</small><h3 style="margin:4px 0 6px;">${selected.known_label}</h3></div>
         <button type="button" onclick="closeRegionEventDrawer()" aria-label="Close event drawer">✕</button>
       </div>
       ${selected.known_summary?`<p style="margin:6px 0 12px;line-height:1.45;">${selected.known_summary}</p>`:""}
@@ -44841,7 +44975,133 @@ function renderRegionEventDrawer(regionKey) {
 function closeRegionEventDrawer() {
   selectedHotspotId=null;
   selectedOpportunityId=null;
-  if (selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  if (currentOverlayType==="mission_area"&&selectedMissionAreaId) renderLocalMissionAreaUI(selectedMissionAreaId);
+  else if (selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+}
+
+// =========================================================
+// BRICKS 1533–1568 — LOCAL MISSION-AREA PRESENTATION CONSUMER
+// =========================================================
+// Reuses region hotspot CSS, Event Drawer semantics, observer-safe opportunity
+// projection, action resolvers, Story Scene callers and Battle callers.
+// No legacy activity-icon mechanics are restored.
+// =========================================================
+function openLocalMissionArea(areaId,{returnContext=null,hotspotId=null,opportunityId=null,restoring=false}={}) {
+  const area=getLocalMissionAreaDefinition(areaId);
+  if (!area) return {success:false,reason:"mission_area_missing"};
+  if (!area.mapImage) return {success:false,reason:"mission_area_map_missing"};
+  if (!restoring&&isAcademyTeamFormationJourneyBlockingFreePlay()) return {success:false,reason:getAcademyTeamFormationJourneyBlockReason(ensurePlayerAcquisitionState())};
+  if (!restoring&&isGeninRosterTransitionPending()) return {success:false,reason:"genin_roster_transition_required"};
+
+  currentOverlayType="mission_area";
+  selectedMissionAreaId=area.areaId;
+  selectedMissionAreaReturnContext=returnContext&&typeof returnContext==="object"?cloneProgressionData(returnContext):(area.returnContext?cloneProgressionData(area.returnContext):null);
+  if (area.parentRegionKey&&worldRegions[area.parentRegionKey]) selectedRegionKey=area.parentRegionKey;
+  selectedLocationNode=null;
+
+  const hotspots=getMissionAreaHotspotProjections(area.areaId);
+  if (hotspotId) selectedHotspotId=String(hotspotId);
+  if (opportunityId) selectedOpportunityId=String(opportunityId);
+  if (selectedHotspotId&&!hotspots.some(h=>h.hotspotId===selectedHotspotId)) {
+    selectedHotspotId=null;
+    selectedOpportunityId=null;
+  }
+  const selectedHotspot=selectedHotspotId?hotspots.find(h=>h.hotspotId===selectedHotspotId):null;
+  if (selectedHotspot&&(!selectedOpportunityId||!selectedHotspot.opportunityIds.includes(selectedOpportunityId))) selectedOpportunityId=selectedHotspot.opportunityIds[0]||null;
+
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if (overlay) {
+    overlay.style.display="flex";
+    overlay.classList.add("region-map-open");
+  }
+  renderLocalMissionAreaUI(area.areaId);
+  saveTestState();
+  return {success:true,type:"mission_area",missionAreaId:area.areaId,visibleHotspotIds:hotspots.map(h=>h.hotspotId)};
+}
+
+function renderLocalMissionAreaHotspot(areaId,hotspot) {
+  const hoverSide=getHotspotHoverSide(hotspot.anchor||{x:0,y:0});
+  const visualClass=getHotspotPresentationClass(hotspot.presentationFamily);
+  const label=hotspot.knownLabel||"???";
+  const aggregateSuffix=hotspot.aggregationCount>1?` +${hotspot.aggregationCount-1}`:"";
+  return `
+    <button type="button" class="region-hotspot region-hotspot-image ${visualClass} ${hoverSide}" style="left:${hotspot.anchor.x}%;top:${hotspot.anchor.y}%;" onclick="selectLocalMissionAreaHotspot('${areaId}','${hotspot.hotspotId}')" aria-label="${label}">
+      <span class="hotspot-icon-shell">${hotspot.icon?`<img src="${hotspot.icon}" alt="" class="hotspot-icon-image">`:getRegionSymbol(hotspot.presentationFamily)}</span>
+      <span class="hotspot-nameplate">${label}${aggregateSuffix}</span>
+      ${renderHotspotHoverCard(hotspot)}
+    </button>
+  `;
+}
+
+function renderLocalMissionAreaEventDrawer(areaId) {
+  if (!selectedHotspotId) return "";
+  const hotspot=getMissionAreaHotspotProjection(areaId,selectedHotspotId);
+  if (!hotspot) return "";
+  const selected=hotspot.opportunities.find(item=>item.opportunity_id===selectedOpportunityId)||hotspot.opportunities[0]||null;
+  if (!selected) return "";
+  selectedOpportunityId=selected.opportunity_id;
+  const hasBattle=selected.legal_actions.some(action=>action.kind==="battle");
+  const queue=hasBattle?getClanQueueReadModel():[];
+  return `
+    <aside class="region-event-drawer mission-area-event-drawer" style="position:absolute;right:2.5%;top:13%;width:min(390px,34vw);max-height:72%;overflow:auto;z-index:40;background:rgba(6,10,16,.95);border:1px solid rgba(203,161,79,.72);box-shadow:0 16px 45px rgba(0,0,0,.55);padding:16px;color:#e9dfc8;">
+      <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;">
+        <div><small style="opacity:.68;letter-spacing:.12em;">${selected.presentation_family}${selected.opportunity_category&&selected.opportunity_category!=="OTHER"?` • ${selected.opportunity_category.replaceAll("_"," ")}`:""}</small><h3 style="margin:4px 0 6px;">${selected.known_label}</h3></div>
+        <button type="button" onclick="closeRegionEventDrawer()" aria-label="Close event drawer">✕</button>
+      </div>
+      ${selected.known_summary?`<p style="margin:6px 0 12px;line-height:1.45;">${selected.known_summary}</p>`:""}
+      ${hotspot.aggregationCount>1?`<div style="margin:10px 0;"><small>OPPORTUNITIES AT THIS POINT</small><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${hotspot.opportunities.map(item=>`<button type="button" onclick="selectHotspotOpportunity('${item.opportunity_id}')" ${item.opportunity_id===selected.opportunity_id?'disabled':''}>${item.known_label}</button>`).join("")}</div></div>`:""}
+      ${selected.tracking.tracked?`<div style="margin:8px 0;font-size:12px;">TRACKED${selected.tracking.mandatory?" • STORY":""}${selected.tracking.lead_state?` • ${selected.tracking.lead_state}`:""}</div>`:""}
+      ${selected.actionability.known_blocker?`<div style="margin:8px 0;color:#d9b56f;">${selected.actionability.known_blocker}</div>`:""}
+      ${hasBattle?`<div style="margin:12px 0;padding:10px;border:1px solid rgba(255,255,255,.12);"><small>MY CLAN BATTLE ORDER</small>${queue.map(slot=>`<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;"><span>${slot.label}</span><strong>${slot.name||"—"}</strong></div>`).join("")}</div>`:""}
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
+        ${selected.legal_actions.length?selected.legal_actions.map(action=>`<button type="button" onclick="executeSelectedOpportunityAction('${action.actionId}')" ${action.available?'':'disabled'}>${action.label}</button>`).join(""):`<span style="opacity:.66;font-size:12px;">No authored interaction is currently available.</span>`}
+      </div>
+    </aside>
+  `;
+}
+
+function renderLocalMissionAreaUI(areaId) {
+  const area=getLocalMissionAreaDefinition(areaId);
+  const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+  if (!area||!container) return;
+  const hotspots=getMissionAreaHotspotProjections(area.areaId);
+  container.innerHTML=`
+    <div class="region-screen-header mission-area-screen-header">
+      <div><h2 class="region-screen-title">${area.name.toUpperCase()}</h2><p class="region-screen-description">${area.description}</p></div>
+    </div>
+    <div class="region-hub-container region-hub-full mission-area-hub">
+      <div class="region-map-pane mission-area-map-pane">
+        <img src="${area.mapImage}" alt="${area.name}" class="region-map-image mission-area-map-image">
+        <button type="button" class="region-world-close" onclick="leaveLocalMissionArea()" aria-label="Leave mission area" title="Leave mission area">✕</button>
+        ${hotspots.map(hotspot=>renderLocalMissionAreaHotspot(area.areaId,hotspot)).join("")}
+        ${renderLocalMissionAreaEventDrawer(area.areaId)}
+      </div>
+    </div>`;
+}
+
+function selectLocalMissionAreaHotspot(areaId,hotspotId) {
+  if (String(areaId||"")!==String(selectedMissionAreaId||"")) return null;
+  const hotspot=getMissionAreaHotspotProjection(areaId,hotspotId);
+  if (!hotspot) return null;
+  selectedHotspotId=hotspot.hotspotId;
+  selectedOpportunityId=hotspot.opportunityIds[0]||null;
+  renderLocalMissionAreaUI(areaId);
+  saveTestState();
+  return hotspot;
+}
+
+function leaveLocalMissionArea() {
+  const returnContext=selectedMissionAreaReturnContext?cloneProgressionData(selectedMissionAreaReturnContext):null;
+  selectedMissionAreaId=null;
+  selectedMissionAreaReturnContext=null;
+  selectedHotspotId=null;
+  selectedOpportunityId=null;
+  if (returnContext) return resumeStorySceneReturnContext(returnContext);
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if (overlay) overlay.style.display="none";
+  currentOverlayType=null;
+  saveTestState();
+  return {success:true,type:"mission_area_closed"};
 }
 
 // =========================================================
@@ -45146,6 +45406,8 @@ function captureStoryScenePresentationUnderlay() {
     overlayType:currentOverlayType||null,
     overlayVisible:!!(overlay&&overlay.style.display!=="none"),
     regionKey:selectedRegionKey||null,
+    missionAreaId:selectedMissionAreaId||null,
+    missionAreaReturnContext:selectedMissionAreaReturnContext?cloneProgressionData(selectedMissionAreaReturnContext):null,
     hotspotId:selectedHotspotId||null,
     opportunityId:selectedOpportunityId||null
   };
@@ -45154,6 +45416,15 @@ function captureStoryScenePresentationUnderlay() {
 function restoreStoryScenePresentationUnderlay(underlay) {
   if (!underlay||typeof underlay!=="object") return {success:true,type:"underlay_unchanged"};
   hideStoryScenePresentationLayer({preserveRuntime:true});
+
+  if (underlay.overlayType==="mission_area"&&underlay.missionAreaId&&getLocalMissionAreaDefinition(underlay.missionAreaId)) {
+    return openLocalMissionArea(underlay.missionAreaId,{
+      returnContext:underlay.missionAreaReturnContext||null,
+      hotspotId:underlay.hotspotId||null,
+      opportunityId:underlay.opportunityId||null,
+      restoring:true
+    });
+  }
 
   if (underlay.overlayType==="region"&&underlay.regionKey&&worldRegions[underlay.regionKey]) {
     openRegionHub(underlay.regionKey);
@@ -45737,12 +46008,39 @@ function resumeRegionHotspotFromBattle(returnContext,outcomeType=null) {
   };
 }
 
+function resumeMissionAreaHotspotFromBattle(returnContext,outcomeType=null) {
+  if (!returnContext||returnContext.type!=="mission_area_hotspot") return {success:false,reason:"mission_area_return_context_missing"};
+  const areaId=returnContext.missionAreaId?String(returnContext.missionAreaId):null;
+  const hotspotId=returnContext.hotspotId?String(returnContext.hotspotId):null;
+  const area=areaId?getLocalMissionAreaDefinition(areaId):null;
+  if (!area) return {success:false,reason:"mission_area_return_area_missing"};
+  if (!hotspotId) return {success:false,reason:"mission_area_return_hotspot_missing"};
+
+  const opened=openLocalMissionArea(areaId,{returnContext:selectedMissionAreaReturnContext,restoring:true});
+  if (!opened.success) return opened;
+  const hotspot=getMissionAreaHotspotProjection(areaId,hotspotId);
+  selectedHotspotId=hotspotId;
+  const priorOpportunityId=returnContext.opportunityId?String(returnContext.opportunityId):null;
+  const stillVisible=!!(hotspot&&priorOpportunityId&&hotspot.opportunities.some(item=>item.opportunity_id===priorOpportunityId));
+  selectedOpportunityId=stillVisible?priorOpportunityId:(hotspot&&hotspot.opportunityIds.length?hotspot.opportunityIds[0]:null);
+  currentBattle.returnContext=null;
+  savePlayerData();
+  saveTestState();
+  renderLocalMissionAreaUI(areaId);
+  return {
+    success:true,type:"mission_area_hotspot_resumed",outcomeType:outcomeType||null,missionAreaId:areaId,hotspotId,
+    previousOpportunityId:priorOpportunityId,selectedOpportunityId:selectedOpportunityId||null,opportunityStillVisible:stillVisible,
+    visibleOpportunityIds:hotspot?hotspot.opportunityIds.slice():[]
+  };
+}
+
 function resumeBattleCallerAfterCompletion(outcomeType=null) {
   const returnContext=currentBattle.returnContext&&typeof currentBattle.returnContext==="object"?cloneBattleRuntimeValue(currentBattle.returnContext):null;
   if (!returnContext) return {success:false,reason:"battle_return_context_absent"};
   if (returnContext.type==="story_scene") return resumeStorySceneFromBattle(returnContext);
   if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);
   if (returnContext.type==="region_hotspot") return resumeRegionHotspotFromBattle(returnContext,outcomeType);
+  if (returnContext.type==="mission_area_hotspot") return resumeMissionAreaHotspotFromBattle(returnContext,outcomeType);
   return {success:false,reason:"battle_return_context_type_unhandled",type:returnContext.type||null,outcomeType};
 }
 
@@ -45769,6 +46067,16 @@ function resumeStorySceneReturnContext(returnContext) {
     return {success:true,type:"overlay_closed"};
   }
   switch (returnContext.type) {
+    case "mission_area_hotspot": {
+      const areaId=returnContext.missionAreaId||null;
+      if (!areaId||!getLocalMissionAreaDefinition(areaId)) return {success:false,reason:"story_return_mission_area_missing"};
+      return openLocalMissionArea(areaId,{
+        returnContext:selectedMissionAreaReturnContext,
+        hotspotId:returnContext.hotspotId||null,
+        opportunityId:returnContext.opportunityId||null,
+        restoring:true
+      });
+    }
     case "region_hotspot":
       if (!returnContext.regionKey||!worldRegions[returnContext.regionKey]) return {success:false,reason:"story_return_region_missing"};
       openRegionHub(returnContext.regionKey);
@@ -48279,6 +48587,8 @@ function returnToWorldMap() {
   selectedLocationNode=null;
   selectedHotspotId=null;
   selectedOpportunityId=null;
+  selectedMissionAreaId=null;
+  selectedMissionAreaReturnContext=null;
   regionInfoOpen=false;
 }
 
@@ -87521,6 +87831,14 @@ function restoreTestState() {
 
 
   // =========================================
+  // LOCAL MISSION AREA PRESENTATION
+  // =========================================
+  selectedMissionAreaId=state.missionAreaId&&getLocalMissionAreaDefinition(state.missionAreaId)?String(state.missionAreaId):null;
+  selectedMissionAreaReturnContext=state.missionAreaReturnContext&&typeof state.missionAreaReturnContext==="object"?cloneBattleRuntimeValue(state.missionAreaReturnContext):null;
+  selectedHotspotId=state.hotspotId?String(state.hotspotId):null;
+  selectedOpportunityId=state.opportunityId?String(state.opportunityId):null;
+
+  // =========================================
   // REGION
   // =========================================
 
@@ -87891,6 +88209,20 @@ function restoreTestState() {
     return;
   }
 
+
+  if (
+    state.overlayType === "mission_area" &&
+    selectedMissionAreaId &&
+    getLocalMissionAreaDefinition(selectedMissionAreaId)
+  ) {
+    openLocalMissionArea(selectedMissionAreaId,{
+      returnContext:selectedMissionAreaReturnContext,
+      hotspotId:selectedHotspotId,
+      opportunityId:selectedOpportunityId,
+      restoring:true
+    });
+    return;
+  }
 
   if (
     state.overlayType ===
@@ -89279,22 +89611,22 @@ const AWAITING_OUTSIDE_116_STAGING_MANIFEST=Object.freeze([
     registryId:"kage_madara",registryType:"Character",display:"Kage Madara",formalRank:"kage",
     category:"kage_character_ems_rinnegan_hosted_black_zetsu",
     baseStats:Object.freeze({nin:109,tai:97,buki:90,fuin:80,kin:98,gen:108,stamina:108}),basePL:107,
-    collectibleCard:"Assets/Kage/kage_madara.png",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Kage/kage_madara.png",uiPortrait:"Portraits/Kage/kage_madara.png",uiPortraitStatus:"ASSETS_READY_RATIFIED",productionStatus:"staged_not_live"
   }),
   Object.freeze({
     registryId:"pakkun",registryType:"Entity",display:"Pakkun",entityOntology:"summon",
     baseStats:Object.freeze({nin:13,tai:16,buki:6,fuin:4,kin:4,gen:9,stamina:18}),basePL:16,
-    collectibleCard:"Assets/Summons/pakkun.png",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Summons/pakkun.png",uiPortrait:"Portraits/Summons/pakkun.png",uiPortraitStatus:"ASSETS_READY_RATIFIED",productionStatus:"staged_not_live"
   }),
   Object.freeze({
     registryId:"black_zetsu",registryType:"Entity",display:"Black Zetsu",entityOntology:"hosted_entity",
     baseStats:Object.freeze({nin:58,tai:36,buki:14,fuin:62,kin:95,gen:50,stamina:90}),basePL:86,
-    collectibleCard:"Assets/Hosted Entity/hosted_entity_black_zetsu.png",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Hosted Entity/hosted_entity_black_zetsu.png",uiPortrait:"Portraits/Hosted Entity/hosted_entity_black_zetsu.png",uiPortraitStatus:"ASSETS_READY_RATIFIED",productionStatus:"staged_not_live"
   }),
   Object.freeze({
     registryId:"reborn_kurama",registryType:"Entity",display:"Reborn Kurama",entityOntology:"hosted_entity",entityFamily:"tailed_beast_kurama",
     baseStats:Object.freeze({nin:110,tai:84,buki:30,fuin:48,kin:118,gen:76,stamina:116}),basePL:112,
-    collectibleCard:"Assets/Hosted Entity/hosted_entity_reborn_kurama.png",uiPortrait:null,uiPortraitStatus:"REQUIRED",productionStatus:"staged_not_live"
+    collectibleCard:"Assets/Hosted Entity/hosted_entity_reborn_kurama.png",uiPortrait:"Portraits/Hosted Entity/hosted_entity_reborn_kurama.png",uiPortraitStatus:"ASSETS_READY_RATIFIED",productionStatus:"staged_not_live"
   })
 ]);
 
@@ -89671,7 +90003,7 @@ function runAlphaAwaitingOutside116StagingDiagnostics() {
     exactPakkun:AWAITING_OUTSIDE_116_STAGING_MANIFEST[1].basePL===16&&AWAITING_OUTSIDE_116_STAGING_MANIFEST[1].entityOntology==="summon",
     exactBlackZetsu:AWAITING_OUTSIDE_116_STAGING_MANIFEST[2].basePL===86&&AWAITING_OUTSIDE_116_STAGING_MANIFEST[2].entityOntology==="hosted_entity",
     exactRebornKurama:AWAITING_OUTSIDE_116_STAGING_MANIFEST[3].basePL===112&&AWAITING_OUTSIDE_116_STAGING_MANIFEST[3].entityOntology==="hosted_entity",
-    allRequireSeparateAdmission:AWAITING_OUTSIDE_116_STAGING_MANIFEST.every(record=>record.productionStatus==="staged_not_live"&&record.uiPortrait===null)
+    allRequireSeparateAdmission:AWAITING_OUTSIDE_116_STAGING_MANIFEST.every(record=>record.productionStatus==="staged_not_live"&&record.uiPortraitStatus==="ASSETS_READY_RATIFIED"&&typeof record.uiPortrait==="string"&&record.uiPortrait.startsWith("Portraits/"))
   };
   result.pass=Object.values(result).every(value=>value===true);
   console.table(result);
@@ -91505,6 +91837,176 @@ function runAlphaPost1519IntegrationDiagnostics() {
 }
 
 // =========================================================
+// BRICKS 1575–1590 — SUPPLEMENTAL 14 PORTRAIT RATIFICATION
+// =========================================================
+const SUPPLEMENTAL14_RATIFIED_PORTRAIT_PROJECTION=Object.freeze([
+  Object.freeze({registryId:"triple_rashomon",uiPortrait:"Portraits/Constructs/triple_rashomon.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"iron_maiden",uiPortrait:"Portraits/Constructs/iron_maiden.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"black_sun_himawari",uiPortrait:"Portraits/Rare Cards/black_sun_himawari.png",live:true,projectionKind:"binary_supersession_same_path"}),
+  Object.freeze({registryId:"menma_nine_tails",uiPortrait:"Portraits/Tailed Beasts/menma_nine_tails.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"nine_tails",uiPortrait:"Portraits/Tailed Beasts/nine_tails.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"curse_mark_hinata",uiPortrait:"Portraits/Transformation/curse_mark_hinata.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"coercive_cloak",uiPortrait:"Portraits/Variants/coercive_cloak.png",live:true,projectionKind:"binary_supersession_same_path"}),
+  Object.freeze({registryId:"three_tail_dominion",uiPortrait:"Portraits/Variants/three_tail_dominion.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"six_tail_dominion",uiPortrait:"Portraits/Variants/six_tail_dominion.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"breakout_kurama",uiPortrait:"Portraits/Forced Manifestations/breakout_kurama.png",live:true,projectionKind:"supersession"}),
+  Object.freeze({registryId:"black_zetsu",uiPortrait:"Portraits/Hosted Entity/hosted_entity_black_zetsu.png",live:false,projectionKind:"new_dedicated"}),
+  Object.freeze({registryId:"reborn_kurama",uiPortrait:"Portraits/Hosted Entity/hosted_entity_reborn_kurama.png",live:false,projectionKind:"new_dedicated"}),
+  Object.freeze({registryId:"kage_madara",uiPortrait:"Portraits/Kage/kage_madara.png",live:false,projectionKind:"new_dedicated"}),
+  Object.freeze({registryId:"pakkun",uiPortrait:"Portraits/Summons/pakkun.png",live:false,projectionKind:"new_dedicated"})
+]);
+
+const SUPPLEMENTAL14_DEPRECATED_ACTIVE_PATHS=Object.freeze([
+  "Portraits/Constructs/rashomon.png",
+  "Portraits/Constructs/maiden.png",
+  "Portraits/Summons/rashomon.png",
+  "Portraits/Summons/maiden.png",
+  "Portraits/Summons/menma_nine_tails.png",
+  "Portraits/Summons/naruto_nine_tails.png",
+  "Portraits/Transformation/cs1_hinata.png",
+  "Portraits/Variants/dominion_three_tails.png",
+  "Portraits/Variants/dominion_six_tails.png",
+  "Portraits/Variants/outbreak_kurama.png"
+]);
+
+function runAlphaSupplemental14PortraitProjectionDiagnostics() {
+  const liveRows=SUPPLEMENTAL14_RATIFIED_PORTRAIT_PROJECTION.filter(row=>row.live);
+  const stagedRows=SUPPLEMENTAL14_RATIFIED_PORTRAIT_PROJECTION.filter(row=>!row.live);
+  const liveProductionIds=new Set([...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS]);
+  const allActivePaths=Object.values(UI_PORTRAIT_MANIFEST);
+  const stagedProjection=Object.fromEntries(AWAITING_OUTSIDE_116_STAGING_MANIFEST.map(row=>[row.registryId,row]));
+  const result={
+    exactFourteenRows:SUPPLEMENTAL14_RATIFIED_PORTRAIT_PROJECTION.length===14,
+    exactTenLiveRows:liveRows.length===10,
+    exactFourStagedRows:stagedRows.length===4,
+    tenLiveIdentitiesAlreadyLive:liveRows.every(row=>liveProductionIds.has(row.registryId)),
+    exactLiveResolverPaths:liveRows.every(row=>getUIPortraitAssetPath(row.registryId)===row.uiPortrait),
+    fourStagedPathsRecorded:stagedRows.every(row=>stagedProjection[row.registryId]&&stagedProjection[row.registryId].uiPortrait===row.uiPortrait&&stagedProjection[row.registryId].uiPortraitStatus==="ASSETS_READY_RATIFIED"),
+    fourStagedRemainNotLive:stagedRows.every(row=>!liveProductionIds.has(row.registryId)&&!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,row.registryId)),
+    noWorkspaceAliasIds:["cs1_hinata","hosted_entity_black_zetsu","kurama_reborn"].every(id=>!liveProductionIds.has(id)&&!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST,id)),
+    noDeprecatedPathActive:SUPPLEMENTAL14_DEPRECATED_ACTIVE_PATHS.every(path=>!allActivePaths.includes(path)),
+    noDuplicateSupplementalPaths:new Set(SUPPLEMENTAL14_RATIFIED_PORTRAIT_PROJECTION.map(row=>row.uiPortrait)).size===14,
+    liveRegistryCountsUnchanged:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+async function runAlphaSupplemental14PortraitBinaryQADiagnostics() {
+  const results=await Promise.all(SUPPLEMENTAL14_RATIFIED_PORTRAIT_PROJECTION.map(async row=>{
+    const loaded=await loadAlphaImageForBinaryQA(row.uiPortrait);
+    const exactLivePath=row.live?getUIPortraitAssetPath(row.registryId)===row.uiPortrait:true;
+    const dimensionPass=loaded.decoded===true&&loaded.width===1024&&loaded.height===1024;
+    return {...loaded,registryId:row.registryId,live:row.live,exactLivePath,dimensionPass};
+  }));
+  const liveResults=results.filter(row=>row.live);
+  const stagedResults=results.filter(row=>!row.live);
+  const result={
+    results,
+    allFourteenDecodeAndDimensions:results.every(row=>row.dimensionPass),
+    liveTenDecodeAndDimensions:liveResults.every(row=>row.dimensionPass),
+    liveTenExactResolvers:liveResults.every(row=>row.exactLivePath),
+    stagedFourDecodeAndDimensions:stagedResults.every(row=>row.dimensionPass),
+    pass:results.every(row=>row.dimensionPass)&&liveResults.every(row=>row.exactLivePath)
+  };
+  console.log(`SC Supplemental-14 portrait binary QA: ${result.pass?"PASS":"FAIL"} / live10=${result.liveTenDecodeAndDimensions?"GREEN":"FAIL"} / staged4=${result.stagedFourDecodeAndDimensions?"GREEN":"FAIL"}`);
+  return result;
+}
+
+// =========================================================
+// BRICKS 1591–1602 — CONTAINED MISSION-AREA GOLDEN
+// =========================================================
+function runAlphaLocalMissionAreaConsumerDiagnostics() {
+  const areaId="diagnostic_local_mission_area";
+  const regionKey="fire";
+  const knownId="diagnostic_local_known";
+  const hiddenId="diagnostic_local_hidden";
+  const siblingId="diagnostic_local_sibling";
+  const gateId="diagnostic_local_reveal_gate";
+  const rollback={
+    missionAreaId:selectedMissionAreaId,missionAreaReturnContext:cloneProgressionData(selectedMissionAreaReturnContext),
+    regionKey:selectedRegionKey,hotspotId:selectedHotspotId,opportunityId:selectedOpportunityId,overlayType:currentOverlayType,
+    gate:cloneProgressionData(getWorldEventDimensionState("resolutionByOpportunityId",gateId)),
+    discoveryKnown:cloneProgressionData(getWorldEventDimensionState("observerDiscoveryByOpportunityId",knownId)),
+    discoveryHidden:cloneProgressionData(getWorldEventDimensionState("observerDiscoveryByOpportunityId",hiddenId)),
+    discoverySibling:cloneProgressionData(getWorldEventDimensionState("observerDiscoveryByOpportunityId",siblingId))
+  };
+  let committedCount=0;
+  registerLocalMissionArea({areaId,name:"Diagnostic Local Area",description:"Contained authored area",mapImage:"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==",parentRegionKey:regionKey});
+  registerWorldEventOpportunity({opportunityId:knownId,missionAreaId:areaId,hotspotId:"diagnostic_local_point_a",eventId:"diagnostic_local_event_a",locationId:"diagnostic_local_area_location",regionKey,sourceKind:"story",defaultDiscoveryLevel:"discovered",presentation:{family:"Known Threat",category:"BATTLE",label:"Known Point",summary:"Known summary",showUnknownMarker:false},anchor:{x:30,y:40},interactions:[{id:"inspect",label:"INSPECT",kind:"investigation",resolve:()=>{committedCount+=1;setOpportunityResolution(knownId,{visibleState:"inspected"},{save:false});return {success:true,type:"investigation"};}}]});
+  registerWorldEventOpportunity({opportunityId:siblingId,missionAreaId:areaId,hotspotId:"diagnostic_local_point_a",eventId:"diagnostic_local_event_b",locationId:"diagnostic_local_area_location",regionKey,sourceKind:"story",defaultDiscoveryLevel:"discovered",presentation:{family:"Discovery",category:"LOOT",label:"Independent Lead",summary:"Sibling opportunity",showUnknownMarker:false},anchor:{x:30,y:40},interactions:[{id:"review",label:"REVIEW",kind:"custom",resolve:()=>({success:true})}]});
+  registerWorldEventOpportunity({opportunityId:hiddenId,missionAreaId:areaId,hotspotId:"diagnostic_local_secret",eventId:"diagnostic_local_event_secret",locationId:"diagnostic_local_area_location",regionKey,sourceKind:"story",defaultDiscoveryLevel:"discovered",presentation:{family:"Unknown",category:"SECRET",label:"Hidden Point",summary:"Must not leak",showUnknownMarker:false},anchor:{x:70,y:55},revealPredicate:()=>getWorldEventDimensionState("resolutionByOpportunityId",gateId).revealed===true,interactions:[{id:"discover",label:"DISCOVER",kind:"discovery",resolve:()=>({success:true})}]});
+
+  const before=getMissionAreaHotspotProjections(areaId);
+  const regionLeak=getRegionHotspotProjections(regionKey,worldRegions[regionKey]).some(h=>h.opportunityIds.some(id=>[knownId,siblingId,hiddenId].includes(id)));
+  const categoryBeforeResolution=getWorldEventDimensionState("resolutionByOpportunityId",siblingId);
+  setOpportunityResolution(gateId,{revealed:true},{save:false});
+  const after=getMissionAreaHotspotProjections(areaId);
+  const opened=openLocalMissionArea(areaId,{returnContext:{type:"region",regionKey},restoring:true});
+  const selected=selectLocalMissionAreaHotspot(areaId,"diagnostic_local_point_a");
+  const actionResult=executeSelectedOpportunityAction("inspect");
+  const returnContext=createWorldOpportunityBattleReturnContext(getRegisteredWorldEventOpportunity(knownId),{id:"battle_test"});
+  currentBattle.returnContext=cloneBattleRuntimeValue(returnContext);
+  const resumed=resumeMissionAreaHotspotFromBattle(returnContext,"victory");
+
+  const result={
+    areaRegistryReusable:!!getLocalMissionAreaDefinition(areaId)&&typeof openLocalMissionArea==="function",
+    reusesSharedOpportunityRegistry:getWorldOpportunityDefinitionsForMissionArea(areaId).length===3,
+    noRegionalLeakage:regionLeak===false,
+    hiddenPointAbsentBeforeReveal:before.every(h=>!h.opportunityIds.includes(hiddenId)),
+    hiddenPointAppearsAfterCommittedReveal:after.some(h=>h.opportunityIds.includes(hiddenId)),
+    sameHotspotSupportsIndependentOpportunities:before.some(h=>h.hotspotId==="diagnostic_local_point_a"&&h.aggregationCount===2),
+    categoryMetadataPreserved:getRegisteredWorldEventOpportunity(knownId).presentation.category==="BATTLE"&&getRegisteredWorldEventOpportunity(siblingId).presentation.category==="LOOT",
+    categoryDoesNotAutoResolve:Object.keys(categoryBeforeResolution).length===0,
+    synchronousResolverCommitsOnlyThroughResolver:actionResult.success===true&&committedCount===1&&getWorldEventDimensionState("resolutionByOpportunityId",knownId).visibleState==="inspected",
+    localAreaOpened:opened.success===true&&selectedMissionAreaId===areaId,
+    pointSelectionIsPresentation:!!selected&&selected.hotspotId==="diagnostic_local_point_a",
+    battleCallerUsesLocalArea:returnContext&&returnContext.type==="mission_area_hotspot"&&returnContext.missionAreaId===areaId,
+    battleContinueReturnsSameArea:resumed.success===true&&resumed.type==="mission_area_hotspot_resumed"&&selectedMissionAreaId===areaId&&selectedHotspotId==="diagnostic_local_point_a",
+    saveReloadShapePresent:saveTestState.toString().includes("missionAreaId")&&restoreTestState.toString().includes('state.overlayType === "mission_area"'),
+    storyReturnSupportsLocalArea:resumeStorySceneReturnContext.toString().includes('case "mission_area_hotspot"'),
+    noWhisperWoodsHardcode:![registerLocalMissionArea,openLocalMissionArea,getMissionAreaHotspotProjections].some(fn=>fn.toString().toLowerCase().includes("whisper woods")),
+    noLegacyIconResolution:!routeWorldOpportunityInteraction.toString().includes("activity-icon")&&!normalizeWorldOpportunityCategory.toString().includes("resolve")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+
+  unregisterWorldEventOpportunity(knownId);unregisterWorldEventOpportunity(hiddenId);unregisterWorldEventOpportunity(siblingId);unregisterLocalMissionArea(areaId);
+  const runtime=ensureWorldEventRuntimeState();
+  [["resolutionByOpportunityId",gateId,rollback.gate],["observerDiscoveryByOpportunityId",knownId,rollback.discoveryKnown],["observerDiscoveryByOpportunityId",hiddenId,rollback.discoveryHidden],["observerDiscoveryByOpportunityId",siblingId,rollback.discoverySibling]].forEach(([table,id,value])=>{if(value&&Object.keys(value).length)runtime[table][id]=value;else delete runtime[table][id];});
+  delete runtime.resolutionByOpportunityId[knownId];delete runtime.resolutionByOpportunityId[siblingId];delete runtime.resolutionByOpportunityId[hiddenId];
+  selectedMissionAreaId=rollback.missionAreaId;selectedMissionAreaReturnContext=rollback.missionAreaReturnContext;selectedRegionKey=rollback.regionKey;selectedHotspotId=rollback.hotspotId;selectedOpportunityId=rollback.opportunityId;currentOverlayType=rollback.overlayType;
+  return result;
+}
+
+function runAlphaPost1602IntegrationDiagnostics() {
+  const post1519=runAlphaPost1519IntegrationDiagnostics();
+  const portraitProjection=runAlphaSupplemental14PortraitProjectionDiagnostics();
+  const missionArea=runAlphaLocalMissionAreaConsumerDiagnostics();
+  const groups={post1519,portraitProjection,missionArea};
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true),liveRegistryCounts:"98/18/116",outside116AdmissionStillSeparate:true,nextImplementedBrick:1602};
+  console.log(`SC Alpha post-1602 integration gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaPost1604IntegrationDiagnostics() {
+  const post1602=runAlphaPost1602IntegrationDiagnostics();
+  const projection=runAlphaSupplemental14PortraitProjectionDiagnostics();
+  const sourceChecks={
+    supplementalBinaryQAExposed:typeof runAlphaSupplemental14PortraitBinaryQADiagnostics==="function",
+    liveTenStartupFailClosed:true,
+    stagedFourNotAdmitted:["black_zetsu","reborn_kurama","kage_madara","pakkun"].every(id=>!ALPHA_PRODUCTION_CHARACTER_IDS.includes(id)&&!ALPHA_PRODUCTION_ENTITY_IDS.includes(id)),
+    localMissionAreaConsumerReusable:typeof registerLocalMissionArea==="function"&&typeof openLocalMissionArea==="function"&&typeof getMissionAreaHotspotProjections==="function",
+    missionAreaBattleReturnReusable:resumeBattleCallerAfterCompletion.toString().includes('returnContext.type==="mission_area_hotspot"'),
+    categoryMetadataNonAuthoritative:normalizeWorldOpportunityDefinition.toString().includes("presentation:{...presentation,family,category}")&&!routeWorldOpportunityInteraction.toString().includes("opportunity_category"),
+    noWhisperWoodsSpecificRuntime:[registerLocalMissionArea,openLocalMissionArea,resumeMissionAreaHotspotFromBattle].every(fn=>!fn.toString().toLowerCase().includes("whisper woods"))
+  };
+  sourceChecks.pass=Object.values(sourceChecks).every(value=>value===true);
+  return {groups:{post1602,projection,sourceChecks},pass:post1602.pass===true&&projection.pass===true&&sourceChecks.pass===true,nextImplementedBrick:1604};
+}
+
+// =========================================================
 // CORE ENGINE — GAME INITIALISATION
 // =========================================================
 
@@ -91524,6 +92026,20 @@ window.addEventListener(
       return;
     }
     document.documentElement.setAttribute("data-sc-final116-binary-qa","green");
+
+    // BRICKS 1603–1604 — supplemental accepted portrait binary proof.
+    // Ten live supersessions are startup-critical. The four Assets-ready but
+    // non-live identities are QA'd and reported without collapsing Assets-ready
+    // into production admission.
+    const supplemental14BinaryQA=await runAlphaSupplemental14PortraitBinaryQADiagnostics();
+    window.__SC_SUPPLEMENTAL14_BINARY_QA__=supplemental14BinaryQA;
+    document.documentElement.setAttribute("data-sc-supplemental14-binary-qa",supplemental14BinaryQA.pass?"green":"failed");
+    if (!supplemental14BinaryQA.liveTenDecodeAndDimensions||!supplemental14BinaryQA.liveTenExactResolvers) {
+      console.error("SC startup blocked: live supplemental portrait QA failed.",supplemental14BinaryQA);
+      document.documentElement.setAttribute("data-sc-supplemental10-live-portrait-qa","failed");
+      return;
+    }
+    document.documentElement.setAttribute("data-sc-supplemental10-live-portrait-qa","green");
 
     syncCharacterEquipmentFromSave();
     restoreTestState();
