@@ -1,112 +1,122 @@
 # Shinobi Chronicles — Final 116 Asset Projection Status
 
-**Status:** UI / ASSETS PROJECTION AUTHORITY — COLLECTIBLE CARD MAPPING CLOSED 14/14 / `uiPortrait` PROJECTION BLOCKED 0/14 / LIVE GATE REMAINS 102  
-**Date:** 2026-09-05  
+**Status:** UI / ASSETS PROJECTION AUTHORITY — COMPLETE 14/14 / READY FOR REGISTRY RATIFICATION  
+**Date:** 2026-09-06  
 **Owner:** UI / Assets
 
-This document answers the final 116 production-admission request from SC Coding / PL-Registry.
-
-The final admission cohort is already closed upstream as **13 Characters + 1 Entity/Summon**, with an atomic destination of:
-
-**98 Characters + 18 Entities = 116**
-
-Current live production remains:
+This document closes the final UI / Assets projection required for the atomic Shinobi Chronicles production-admission move from:
 
 **85 Characters + 17 Entities = 102**
 
-No partial admission is authorised.
+into the already-authorised destination:
 
-## 1. Assets decision
+**98 Characters + 18 Entities = 116**
 
-UI / Assets can now close the **collectible-card half** of the requested projection.
+No partial live admission is authorised.
 
-All fourteen approved collectible-card binaries physically exist in current `main`, their Character Creation visual designs are already approved, and their exact repository paths are verified below.
+The fourteen production representations below now have both:
 
-UI / Assets therefore marks all fourteen `collectibleCard` projections:
+- an approved collectible-card repository projection where required; and
+- an approved dedicated square `uiPortrait` repository projection.
+
+UI / Assets therefore marks the complete fourteen-row projection:
 
 **ACTIVE — Assets approved**
 
-UI / Assets cannot truthfully close the `uiPortrait` half yet.
+This is presentation/asset authority only.
 
-A fresh recursive current-`main` repository tree audit finds **no dedicated physical portrait binary for any of these fourteen identities** in the physical `Portraits/` hierarchy. The current approved portrait authority therefore remains the existing 102-wide set.
+**Assets projection approval ≠ Registry ratification ≠ Coding live admission ≠ binary QA.**
 
-Accordingly:
+The live production gate remains **102** until Registry ratifies this exact projection and Coding performs the already-prepared atomic admission.
 
-**14/14 collectibleCard projections CLOSED / ACTIVE**
+---
 
-**0/14 new `uiPortrait` projections CLOSED**
+## 1. Current-source audit basis
 
-**full fourteen-row admission projection NOT YET COMPLETE**
+A fresh audit of the current committed repository tree confirms all fourteen dedicated portrait binaries physically exist under the production `Portraits/` hierarchy.
 
-**116 live admission remains BLOCKED**
+The portrait batch was committed together in the production source wave that added the exact fourteen required representations. The audit preserves the committed repository spelling and casing rather than deriving paths from Registry IDs.
 
-Do not invent portrait paths, derive them from Registry IDs, use generic participant imagery, or crop collectible cards into permanent portraits without explicit asset approval.
+Important exact-path example:
 
-## 2. Exact fourteen-row projection status
+`chunin_itama` → `Portraits/Chunin/chunin_Itama.png`
 
-| Registry ID | collectibleCard | collectibleCard status | uiPortrait | uiPortrait status | Row admission status |
-|---|---|---|---|---|---|
-| `chunin_iruka` | `Assets/Chunin/chunin_iruka.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `sj_anko` | `Assets/Special Jonin/sj_anko.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `chunin_fugaku` | `Assets/Chunin/chunin_fugaku.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `chunin_itama` | `Assets/Chunin/chunin_itama.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `genin_mikoto` | `Assets/Genin/genin_mikoto.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `genin_orochimaru` | `Assets/Genin/genin_orochimaru.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `akatsuki_kakuzu` | `Assets/Akatsuki/akatsuki_kakuzu.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `sj_kiba` | `Assets/Special Jonin/sj_kiba.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `sj_nono` | `Assets/Special Jonin/sj_nono.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `sannin_tenten` | `Assets/Sannin/sannin_tenten.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `sannin_hinata` | `Assets/Sannin/sannin_hinata.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `sannin_sumire` | `Assets/Sannin/sannin_sumire.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `kurama_resonance_himawari` | `Assets/Rare Cards/kurama_resonance_himawari.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
-| `nue` | `Assets/Summons/nue.png` | **ACTIVE — Assets approved** | `null` | **REQUIRED — no approved production portrait path exists** | **BLOCKED** |
+The capital `I` in `chunin_Itama.png` is authoritative for the current committed file.
 
-Exact Kiba production identity remains:
+Exact Kiba Registry identity remains:
 
 `sj_kiba`
 
-Do not create `s_jkiba`.
+Never create `s_jkiba`.
 
-## 3. Machine-consumable projection
+---
 
-The following JSON is the exact Assets projection state for the fourteen-row wave as of this authority:
+## 2. Complete fourteen-row production projection
+
+| Registry ID | collectibleCard | uiPortrait | Assets status |
+|---|---|---|---|
+| `chunin_iruka` | `Assets/Chunin/chunin_iruka.png` | `Portraits/Chunin/chunin_iruka.png` | **ACTIVE** |
+| `sj_anko` | `Assets/Special Jonin/sj_anko.png` | `Portraits/Special Jonin/sj_anko.png` | **ACTIVE** |
+| `chunin_fugaku` | `Assets/Chunin/chunin_fugaku.png` | `Portraits/Chunin/chunin_fugaku.png` | **ACTIVE** |
+| `chunin_itama` | `Assets/Chunin/chunin_itama.png` | `Portraits/Chunin/chunin_Itama.png` | **ACTIVE** |
+| `genin_mikoto` | `Assets/Genin/genin_mikoto.png` | `Portraits/Genin/genin_mikoto.png` | **ACTIVE** |
+| `genin_orochimaru` | `Assets/Genin/genin_orochimaru.png` | `Portraits/Genin/genin_orochimaru.png` | **ACTIVE** |
+| `akatsuki_kakuzu` | `Assets/Akatsuki/akatsuki_kakuzu.png` | `Portraits/Akatsuki/akatsuki_kakuzu.png` | **ACTIVE** |
+| `sj_kiba` | `Assets/Special Jonin/sj_kiba.png` | `Portraits/Special Jonin/sj_kiba.png` | **ACTIVE** |
+| `sj_nono` | `Assets/Special Jonin/sj_nono.png` | `Portraits/Special Jonin/sj_nono.png` | **ACTIVE** |
+| `sannin_tenten` | `Assets/Sannin/sannin_tenten.png` | `Portraits/Sannin/sannin_tenten.png` | **ACTIVE** |
+| `sannin_hinata` | `Assets/Sannin/sannin_hinata.png` | `Portraits/Sannin/sannin_hinata.png` | **ACTIVE** |
+| `sannin_sumire` | `Assets/Sannin/sannin_sumire.png` | `Portraits/Sannin/sannin_sumire.png` | **ACTIVE** |
+| `kurama_resonance_himawari` | `Assets/Rare Cards/kurama_resonance_himawari.png` | `Portraits/Rare Cards/kurama_resonance_himawari.png` | **ACTIVE** |
+| `nue` | `Assets/Summons/nue.png` | `Portraits/Summons/nue.png` | **ACTIVE** |
+
+All fourteen rows are now complete.
+
+No path in this table is inferred from a naming convention. These are the exact current committed repository paths selected by UI / Assets authority.
+
+---
+
+## 3. Machine-consumable fourteen-row manifest
 
 ```json
 [
-  {"registryId":"chunin_iruka","collectibleCard":"Assets/Chunin/chunin_iruka.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"sj_anko","collectibleCard":"Assets/Special Jonin/sj_anko.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"chunin_fugaku","collectibleCard":"Assets/Chunin/chunin_fugaku.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"chunin_itama","collectibleCard":"Assets/Chunin/chunin_itama.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"genin_mikoto","collectibleCard":"Assets/Genin/genin_mikoto.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"genin_orochimaru","collectibleCard":"Assets/Genin/genin_orochimaru.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"akatsuki_kakuzu","collectibleCard":"Assets/Akatsuki/akatsuki_kakuzu.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"sj_kiba","collectibleCard":"Assets/Special Jonin/sj_kiba.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"sj_nono","collectibleCard":"Assets/Special Jonin/sj_nono.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"sannin_tenten","collectibleCard":"Assets/Sannin/sannin_tenten.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"sannin_hinata","collectibleCard":"Assets/Sannin/sannin_hinata.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"sannin_sumire","collectibleCard":"Assets/Sannin/sannin_sumire.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"kurama_resonance_himawari","collectibleCard":"Assets/Rare Cards/kurama_resonance_himawari.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"},
-  {"registryId":"nue","collectibleCard":"Assets/Summons/nue.png","collectibleCardStatus":"ACTIVE","uiPortrait":null,"uiPortraitStatus":"REQUIRED"}
+  {"registryId":"chunin_iruka","collectibleCard":"Assets/Chunin/chunin_iruka.png","uiPortrait":"Portraits/Chunin/chunin_iruka.png","status":"ACTIVE"},
+  {"registryId":"sj_anko","collectibleCard":"Assets/Special Jonin/sj_anko.png","uiPortrait":"Portraits/Special Jonin/sj_anko.png","status":"ACTIVE"},
+  {"registryId":"chunin_fugaku","collectibleCard":"Assets/Chunin/chunin_fugaku.png","uiPortrait":"Portraits/Chunin/chunin_fugaku.png","status":"ACTIVE"},
+  {"registryId":"chunin_itama","collectibleCard":"Assets/Chunin/chunin_itama.png","uiPortrait":"Portraits/Chunin/chunin_Itama.png","status":"ACTIVE"},
+  {"registryId":"genin_mikoto","collectibleCard":"Assets/Genin/genin_mikoto.png","uiPortrait":"Portraits/Genin/genin_mikoto.png","status":"ACTIVE"},
+  {"registryId":"genin_orochimaru","collectibleCard":"Assets/Genin/genin_orochimaru.png","uiPortrait":"Portraits/Genin/genin_orochimaru.png","status":"ACTIVE"},
+  {"registryId":"akatsuki_kakuzu","collectibleCard":"Assets/Akatsuki/akatsuki_kakuzu.png","uiPortrait":"Portraits/Akatsuki/akatsuki_kakuzu.png","status":"ACTIVE"},
+  {"registryId":"sj_kiba","collectibleCard":"Assets/Special Jonin/sj_kiba.png","uiPortrait":"Portraits/Special Jonin/sj_kiba.png","status":"ACTIVE"},
+  {"registryId":"sj_nono","collectibleCard":"Assets/Special Jonin/sj_nono.png","uiPortrait":"Portraits/Special Jonin/sj_nono.png","status":"ACTIVE"},
+  {"registryId":"sannin_tenten","collectibleCard":"Assets/Sannin/sannin_tenten.png","uiPortrait":"Portraits/Sannin/sannin_tenten.png","status":"ACTIVE"},
+  {"registryId":"sannin_hinata","collectibleCard":"Assets/Sannin/sannin_hinata.png","uiPortrait":"Portraits/Sannin/sannin_hinata.png","status":"ACTIVE"},
+  {"registryId":"sannin_sumire","collectibleCard":"Assets/Sannin/sannin_sumire.png","uiPortrait":"Portraits/Sannin/sannin_sumire.png","status":"ACTIVE"},
+  {"registryId":"kurama_resonance_himawari","collectibleCard":"Assets/Rare Cards/kurama_resonance_himawari.png","uiPortrait":"Portraits/Rare Cards/kurama_resonance_himawari.png","status":"ACTIVE"},
+  {"registryId":"nue","collectibleCard":"Assets/Summons/nue.png","uiPortrait":"Portraits/Summons/nue.png","status":"ACTIVE"}
 ]
 ```
 
-This payload is machine-consumable for **staging / diagnostics only**. It is deliberately **not** a Registry-ratifiable live-admission projection because `uiPortrait` is unresolved for every row.
+This payload is now suitable for **Registry ratification**.
 
-## 4. Portrait requirement
+Coding must consume the ratified projection exactly; it must not regenerate paths from IDs, normalize filename casing, substitute a different portrait, or derive a portrait from collectible-card art.
 
-Every new production representation requires one explicitly approved dedicated square `uiPortrait` projection under the existing Battle/UI portrait contract:
+---
 
-- exact **1024×1024**;
-- frameless square composition;
-- correct representation identity;
-- exact committed repository path;
-- explicit **ACTIVE — Assets approved** status;
-- unique Registry ID and unique path;
-- binary decode/dimension QA before the 116 gate goes live.
+## 4. Binary QA boundary
 
-Physical repository root for current portrait binaries is `Portraits/`.
+This closure confirms the **Assets selection/projection** and exact committed paths.
 
-This document does **not** pre-authorise filenames or category subpaths for the missing fourteen portraits. Exact paths must be published only after the actual approved binaries are committed.
+It does **not** claim that UI / Assets independently decoded and dimension-checked all fourteen PNG binaries in this pass. Binary decode, exact 1024×1024 verification, duplicate-path checks and resolver-Golden verification remain Coding / CI validation before or as part of the 116 live-admission gate.
+
+If binary QA finds a bad file:
+
+- do not change the Registry ID;
+- do not silently substitute another portrait;
+- do not crop a collectible card as fallback;
+- repair the approved file in place or explicitly supersede it through Assets authority.
+
+---
 
 ## 5. Non-collapse rules
 
@@ -116,26 +126,26 @@ Preserve:
 
 **Registry identity ≠ asset filename**
 
-**physical file presence ≠ portrait approval**
+**physical file presence ≠ mechanical authority**
 
-**collectible mapping approval ≠ complete admission projection**
+**Assets approval ≠ Registry ratification**
 
-**asset approval ≠ mechanical authority**
+**Registry ratification ≠ Coding live admission**
 
 **production admission ≠ acquisition**
 
-**partial asset readiness ≠ partial live admission**
+**partial readiness ≠ partial live admission**
 
-## 6. Final gate
+---
 
-The current exact Assets blocker is now reduced to one thing:
+## 6. Final Assets gate
 
-> **Create/approve/commit fourteen dedicated square `uiPortrait` binaries and publish their exact paths as ACTIVE.**
+UI / Assets final-116 projection is now:
 
-Once all fourteen exist, UI / Assets can replace each `null` above with the exact approved repository path and publish the complete fourteen-row ACTIVE projection for Registry ratification.
+**14/14 COMPLETE — ACTIVE — READY FOR REGISTRY RATIFICATION**
 
-Until then:
+After Registry ratifies this exact fourteen-row manifest, Coding may execute the already-prepared atomic production move:
 
-**102 remains live.**
+**102 → 116**
 
-**116 is the locked atomic destination, not a partially live state.**
+There is no authorised intermediate live gate.
