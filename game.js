@@ -44625,6 +44625,49 @@ function commitRecruitmentOpportunity(definition,action) {
   return result;
 }
 
+
+// =========================================================
+// BRICKS 1490–1495 — WORLD OPPORTUNITY BATTLE CALLER CONTEXT
+// =========================================================
+// Ordinary regional/map opportunities reuse the same Battle caller contract
+// already used by Story Scene and Field Readiness callers.
+//
+// Location != hotspot != opportunity.
+// Caller restoration preserves the selected mission-area context only; it does
+// not commit a next encounter, reveal hidden truth, or resolve an opportunity.
+// =========================================================
+function createWorldOpportunityBattleReturnContext(definition,action=null) {
+  if (!definition||!definition.regionKey||!definition.hotspotId||!definition.opportunityId) {
+    return null;
+  }
+  return {
+    type:"region_hotspot",
+    regionKey:String(definition.regionKey),
+    locationId:definition.locationId?String(definition.locationId):null,
+    hotspotId:String(definition.hotspotId),
+    opportunityId:String(definition.opportunityId),
+    eventId:definition.eventId?String(definition.eventId):null,
+    sourceActionId:action&&action.id?String(action.id):null
+  };
+}
+
+function attachWorldOpportunityBattleReturnContext(returnContext) {
+  if (!currentBattle||!currentBattle.battleId) {
+    return {success:false,reason:"battle_not_active_for_return_context"};
+  }
+  if (!returnContext||typeof returnContext!=="object") {
+    return {success:false,reason:"battle_return_context_missing"};
+  }
+  currentBattle.returnContext=cloneBattleRuntimeValue(returnContext);
+  currentBattle.observerSafeResultContext=null;
+  saveTestState();
+  return {
+    success:true,
+    battleId:currentBattle.battleId,
+    returnContext:cloneBattleRuntimeValue(currentBattle.returnContext)
+  };
+}
+
 function routeWorldOpportunityInteraction(opportunityId,actionId) {
   const acquisitionState=ensurePlayerAcquisitionState();
   if (isAcademyTeamFormationJourneyBlockingFreePlay(acquisitionState)) {
@@ -44645,6 +44688,15 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
       const startCharacterId=queue[0]||null;
       if (!startCharacterId) return {success:false,reason:"clan_start_slot_empty"};
 
+      // BRICKS 1496–1499 — preserve the exact regional hotspot caller before
+      // leaving the Event Drawer. An authored explicit returnContext may
+      // override the default, but no path is inferred from UI sequence.
+      const battleReturnContext=
+        action.returnContext&&typeof action.returnContext==="object"
+          ? cloneProgressionData(action.returnContext)
+          : createWorldOpportunityBattleReturnContext(definition,action);
+      if (!battleReturnContext) return {success:false,reason:"region_hotspot_return_context_missing"};
+
       // Authored Encounter identity owns occurrence selection/reservation when supplied.
       // This preserves exact opposition identity, provenance and retry semantics.
       const encounterId=action.encounterId||null;
@@ -44661,9 +44713,14 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
             : {})
         };
         const started=startEncounterActivity(encounterId,startCharacterId,encounterContext);
-        result=started
-          ? {success:true,type:"battle",encounterId}
-          : {success:false,reason:"battle_launch_failed"};
+        if (!started) {
+          result={success:false,reason:"battle_launch_failed"};
+          break;
+        }
+        const attached=attachWorldOpportunityBattleReturnContext(battleReturnContext);
+        result=attached.success
+          ? {success:true,type:"battle",encounterId,returnContext:attached.returnContext}
+          : attached;
         break;
       }
 
@@ -44672,7 +44729,14 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
       const enemyId=action.enemyId||action.encounterRef||null;
       if (!enemyId) return {success:false,reason:"battle_encounter_authority_missing"};
       const battle=startEncounter(enemyId,startCharacterId,definition.eventId||definition.opportunityId);
-      result=battle?{success:true,type:"battle",battle}:{success:false,reason:"battle_launch_failed"};
+      if (!battle) {
+        result={success:false,reason:"battle_launch_failed"};
+        break;
+      }
+      const attached=attachWorldOpportunityBattleReturnContext(battleReturnContext);
+      result=attached.success
+        ? {success:true,type:"battle",battle,returnContext:attached.returnContext}
+        : attached;
       break;
     }
     case "recruit":
@@ -45612,11 +45676,73 @@ function resumeStorySceneFromBattle(returnContext) {
   return {success:true,type:"story_scene_resumed",beatId:nextBeatId,result:cloneProgressionData(safeResult)};
 }
 
+
+// =========================================================
+// BRICKS 1500–1508 — REGION HOTSPOT BATTLE RETURN / RE-EVALUATION
+// =========================================================
+// Victory CLAIM remains separate. CONTINUE restores the exact region/hotspot
+// caller, then recomputes the observer-safe opportunity projection from the
+// current authoritative World / Knowledge / history state.
+//
+// The previously selected opportunity is retained only if it still projects.
+// Otherwise the first currently visible opportunity at the same hotspot is
+// selected. No completion counter, forced next encounter, or omniscient reveal
+// is manufactured here.
+// =========================================================
+function resumeRegionHotspotFromBattle(returnContext,outcomeType=null) {
+  if (!returnContext||returnContext.type!=="region_hotspot") {
+    return {success:false,reason:"region_hotspot_return_context_missing"};
+  }
+  const regionKey=returnContext.regionKey?String(returnContext.regionKey):null;
+  const hotspotId=returnContext.hotspotId?String(returnContext.hotspotId):null;
+  if (!regionKey||!worldRegions[regionKey]) {
+    return {success:false,reason:"region_hotspot_return_region_missing"};
+  }
+  if (!hotspotId) {
+    return {success:false,reason:"region_hotspot_return_hotspot_missing"};
+  }
+
+  // Re-open the same regional map surface. This is the existing map engine,
+  // not a new activity or sub-map instance.
+  const opened=openRegionHub(regionKey);
+  if (opened&&opened.success===false) return opened;
+
+  // Re-evaluate after Battle consequences/claim have already committed.
+  const hotspot=getHotspotProjection(regionKey,hotspotId);
+  selectedRegionKey=regionKey;
+  selectedHotspotId=hotspotId;
+  selectedLocationNode=hotspot?getWorldRegionLocation(regionKey,hotspot.locationId):null;
+
+  const priorOpportunityId=returnContext.opportunityId?String(returnContext.opportunityId):null;
+  const stillVisible=!!(hotspot&&priorOpportunityId&&hotspot.opportunities.some(item=>item.opportunity_id===priorOpportunityId));
+  selectedOpportunityId=stillVisible
+    ? priorOpportunityId
+    : (hotspot&&hotspot.opportunityIds.length?hotspot.opportunityIds[0]:null);
+
+  currentBattle.returnContext=null;
+  savePlayerData();
+  saveTestState();
+  renderRegionHubUI(regionKey,worldRegions[regionKey]);
+
+  return {
+    success:true,
+    type:"region_hotspot_resumed",
+    outcomeType:outcomeType||null,
+    regionKey,
+    hotspotId,
+    previousOpportunityId:priorOpportunityId,
+    selectedOpportunityId:selectedOpportunityId||null,
+    opportunityStillVisible:stillVisible,
+    visibleOpportunityIds:hotspot?hotspot.opportunityIds.slice():[]
+  };
+}
+
 function resumeBattleCallerAfterCompletion(outcomeType=null) {
   const returnContext=currentBattle.returnContext&&typeof currentBattle.returnContext==="object"?cloneBattleRuntimeValue(currentBattle.returnContext):null;
   if (!returnContext) return {success:false,reason:"battle_return_context_absent"};
   if (returnContext.type==="story_scene") return resumeStorySceneFromBattle(returnContext);
   if (returnContext.type==="field_readiness_assessment") return resumeFieldReadinessAssessmentFromBattle(returnContext);
+  if (returnContext.type==="region_hotspot") return resumeRegionHotspotFromBattle(returnContext,outcomeType);
   return {success:false,reason:"battle_return_context_type_unhandled",type:returnContext.type||null,outcomeType};
 }
 
@@ -91224,6 +91350,159 @@ function runAlphaPost1489IntegrationDiagnostics() {
   return result;
 }
 
+
+
+// =========================================================
+// BRICKS 1509–1519 — REGIONAL HOTSPOT BATTLE RETURN GOLDEN
+// =========================================================
+// Verification target for Arc 1 Mission 1 / Whisper Woods choreography.
+// This creates no Whisper Woods content. It proves the ordinary reusable
+// regional hotspot -> Battle -> CLAIM -> CONTINUE -> same hotspot pipeline.
+// =========================================================
+function runAlphaRegionHotspotBattleReturnDiagnostics() {
+  const opportunityA="diagnostic_region_battle_return_a";
+  const opportunityB="diagnostic_region_battle_return_b";
+  const hotspotId="diagnostic_region_battle_return_hotspot";
+  const locationId="diagnostic_region_battle_return_location";
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const selectionRollback={
+    selectedRegionKey,
+    selectedLocationNode,
+    selectedHotspotId,
+    selectedOpportunityId,
+    regionInfoOpen,
+    currentOverlayType,
+    battleReturnContext:currentBattle&&currentBattle.returnContext?cloneBattleRuntimeValue(currentBattle.returnContext):null,
+    observerSafeResultContext:currentBattle&&currentBattle.observerSafeResultContext?cloneBattleRuntimeValue(currentBattle.observerSafeResultContext):null
+  };
+  const runtime=ensureWorldEventRuntimeState();
+  const runtimeRollback={
+    discoveryA:cloneProgressionData(runtime.observerDiscoveryByOpportunityId[opportunityA]||null),
+    discoveryB:cloneProgressionData(runtime.observerDiscoveryByOpportunityId[opportunityB]||null),
+    actionA:cloneProgressionData(runtime.actionabilityByOpportunityId[opportunityA]||null),
+    actionB:cloneProgressionData(runtime.actionabilityByOpportunityId[opportunityB]||null),
+    resolutionA:cloneProgressionData(runtime.resolutionByOpportunityId[opportunityA]||null),
+    resolutionB:cloneProgressionData(runtime.resolutionByOpportunityId[opportunityB]||null)
+  };
+  const checks={};
+  let diagnosticError=null;
+  try {
+    resetAlphaDiagnosticPlayerToFreshSave();
+    registerWorldEventOpportunity({
+      opportunityId:opportunityA,
+      hotspotId,
+      locationId,
+      regionKey:"fire",
+      sourceKind:"authored",
+      defaultDiscoveryLevel:"discovered",
+      presentation:{family:"Known Threat",label:"Diagnostic Contact A",summary:"A",showUnknownMarker:false},
+      anchor:{x:47,y:52},
+      interactions:[{id:"diagnostic_battle_a",label:"ENGAGE",kind:"battle",enemyId:"scout"}]
+    });
+    registerWorldEventOpportunity({
+      opportunityId:opportunityB,
+      hotspotId,
+      locationId,
+      regionKey:"fire",
+      sourceKind:"authored",
+      defaultDiscoveryLevel:"discovered",
+      presentation:{family:"Investigation",label:"Diagnostic Lead B",summary:"B",showUnknownMarker:false},
+      anchor:{x:47,y:52},
+      interactions:[{id:"diagnostic_investigate_b",label:"INVESTIGATE",kind:"investigation",resolve:()=>({success:true})}]
+    });
+
+    setOpportunityDiscovery(opportunityA,{level:"discovered"},{save:false});
+    setOpportunityDiscovery(opportunityB,{level:"discovered"},{save:false});
+    const definitionA=getRegisteredWorldEventOpportunity(opportunityA);
+    const built=createWorldOpportunityBattleReturnContext(definitionA,definitionA.interactions[0]);
+    checks.exactStableCallerKeys=!!built&&built.type==="region_hotspot"&&built.regionKey==="fire"&&built.hotspotId===hotspotId&&built.opportunityId===opportunityA&&built.locationId===locationId&&built.sourceActionId==="diagnostic_battle_a";
+
+    const groupedBefore=getHotspotProjection("fire",hotspotId);
+    checks.singleHotspotCanExposeIndependentOpportunities=!!groupedBefore&&groupedBefore.aggregationCount===2&&new Set(groupedBefore.opportunityIds).size===2;
+
+    // Simulate a committed post-Battle World/Knowledge change that removes the
+    // original opportunity from this observer while leaving an independent lead.
+    setOpportunityDiscovery(opportunityA,{level:"undiscovered"},{save:false});
+    currentBattle.returnContext=cloneBattleRuntimeValue(built);
+    const resumedFallback=resumeRegionHotspotFromBattle(built,"victory");
+    checks.sameRegionHotspotRestored=resumedFallback.success===true&&resumedFallback.type==="region_hotspot_resumed"&&selectedRegionKey==="fire"&&selectedHotspotId===hotspotId;
+    checks.opportunitySetReevaluatedAfterBattle=resumedFallback.opportunityStillVisible===false&&selectedOpportunityId===opportunityB&&JSON.stringify(resumedFallback.visibleOpportunityIds)===JSON.stringify([opportunityB]);
+    checks.noOmniscientRevealAfterBattle=!resumedFallback.visibleOpportunityIds.includes(opportunityA);
+    checks.returnContextConsumedExactlyOnce=currentBattle.returnContext===null;
+
+    // If the authored opportunity remains legitimately visible, CONTINUE keeps
+    // that exact opportunity selected instead of forcing a different encounter.
+    setOpportunityDiscovery(opportunityA,{level:"discovered"},{save:false});
+    currentBattle.returnContext=cloneBattleRuntimeValue(built);
+    const resumedSame=resumeRegionHotspotFromBattle(built,"victory");
+    checks.sameOpportunityRetainedWhenStillVisible=resumedSame.success===true&&resumedSame.opportunityStillVisible===true&&selectedOpportunityId===opportunityA;
+
+    const routerSource=routeWorldOpportunityInteraction.toString();
+    const callerSource=resumeBattleCallerAfterCompletion.toString();
+    const resumeSource=resumeRegionHotspotFromBattle.toString();
+    const continueSource=continueAfterVictory.toString();
+    const saveSource=saveTestState.toString();
+    const restoreSource=restoreTestState.toString();
+    checks.bothOrdinaryBattleLaunchPathsAttachCaller=(routerSource.match(/attachWorldOpportunityBattleReturnContext\(battleReturnContext\)/g)||[]).length===2;
+    checks.encounterContextKeepsWorldProvenance=routerSource.includes('sourceKind:"world_opportunity"')&&routerSource.includes("opportunityId:definition.opportunityId")&&routerSource.includes("eventId:definition.eventId||null");
+    checks.victoryContinueUsesCallerBeforeGenericFallback=continueSource.includes('resumeBattleCallerAfterCompletion("victory")')&&continueSource.indexOf('resumeBattleCallerAfterCompletion("victory")')<continueSource.lastIndexOf('openOverlay(\n    "battle"');
+    checks.regionCallerHandledByExistingContinuation=callerSource.includes('returnContext.type==="region_hotspot"')&&callerSource.includes("resumeRegionHotspotFromBattle");
+    checks.storyAndFieldCallersPreserved=callerSource.includes('returnContext.type==="story_scene"')&&callerSource.includes('returnContext.type==="field_readiness_assessment"');
+    checks.callerPersistsAcrossBattleSaveLoad=saveSource.includes("battleReturnContext")&&restoreSource.includes("battleReturnContext")&&restoreSource.includes("currentBattle.returnContext");
+    checks.resumeDoesNotResolveOpportunity=!resumeSource.includes("setOpportunityResolution")&&!resumeSource.includes("commitWorld")&&!resumeSource.includes("completeStoryScene");
+    checks.noEncounterCountBossUnlock=!["completedEncounters","encounterCount","bossVisible","bossUnlocked","three encounters"].some(token=>resumeSource.toLowerCase().includes(token.toLowerCase()));
+    checks.invalidCallerFailsClosed=resumeRegionHotspotFromBattle({type:"region_hotspot",regionKey:"missing_region",hotspotId},"victory").success===false;
+    checks.claimStillSeparateFromContinue=claimVictoryRewardsFromOverlay.toString().includes("navigated:false")&&continueSource.includes("victory_rewards_unclaimed")&&!continueSource.includes("claimCurrentBattleRewards()");
+  } catch (error) {
+    diagnosticError=String(error&&error.stack||error);
+  } finally {
+    unregisterWorldEventOpportunity(opportunityA);
+    unregisterWorldEventOpportunity(opportunityB);
+    const restoredRuntime=ensureWorldEventRuntimeState();
+    const restoreDimension=(table,key,value)=>{if(value) table[key]=value;else delete table[key];};
+    restoreDimension(restoredRuntime.observerDiscoveryByOpportunityId,opportunityA,runtimeRollback.discoveryA);
+    restoreDimension(restoredRuntime.observerDiscoveryByOpportunityId,opportunityB,runtimeRollback.discoveryB);
+    restoreDimension(restoredRuntime.actionabilityByOpportunityId,opportunityA,runtimeRollback.actionA);
+    restoreDimension(restoredRuntime.actionabilityByOpportunityId,opportunityB,runtimeRollback.actionB);
+    restoreDimension(restoredRuntime.resolutionByOpportunityId,opportunityA,runtimeRollback.resolutionA);
+    restoreDimension(restoredRuntime.resolutionByOpportunityId,opportunityB,runtimeRollback.resolutionB);
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+    selectedRegionKey=selectionRollback.selectedRegionKey;
+    selectedLocationNode=selectionRollback.selectedLocationNode;
+    selectedHotspotId=selectionRollback.selectedHotspotId;
+    selectedOpportunityId=selectionRollback.selectedOpportunityId;
+    regionInfoOpen=selectionRollback.regionInfoOpen;
+    currentOverlayType=selectionRollback.currentOverlayType;
+    if (currentBattle) {
+      currentBattle.returnContext=selectionRollback.battleReturnContext;
+      currentBattle.observerSafeResultContext=selectionRollback.observerSafeResultContext;
+    }
+  }
+  checks.noDiagnosticException=diagnosticError===null;
+  const pass=Object.values(checks).every(value=>value===true);
+  const result={checks,diagnosticError,pass};
+  console.table(checks);
+  if (diagnosticError) console.error("SC regional hotspot Battle return diagnostic error:",diagnosticError);
+  console.log(`SC regional hotspot Battle return Golden: ${pass?"PASS":"FAIL"}`);
+  return result;
+}
+
+function runAlphaPost1519IntegrationDiagnostics() {
+  const post1489=runAlphaPost1489IntegrationDiagnostics();
+  const regionBattleReturn=runAlphaRegionHotspotBattleReturnDiagnostics();
+  const groups={post1489,regionBattleReturn};
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  return {
+    groups,
+    pass,
+    worldOpportunityBattleReturnStatus:regionBattleReturn.pass?"GREEN":"CHECK",
+    architecture:"existing regional hotspot/Event Drawer + existing Battle caller continuation",
+    bespokeMapEngineAdded:false,
+    automaticNextEncounterAdded:false,
+    encounterCountBossGateAdded:false,
+    nextImplementedBrick:1519
+  };
+}
 
 // =========================================================
 // CORE ENGINE — GAME INITIALISATION
