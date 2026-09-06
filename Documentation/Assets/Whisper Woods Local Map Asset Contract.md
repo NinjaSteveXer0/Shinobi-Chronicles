@@ -2,7 +2,7 @@
 
 Date: 6 September 2026
 
-Status: **UI / ASSETS DESIGN + TARGET BINDING LOCKED — MAP BINARY NOT YET CREATED / RUNTIME BINDING NOT YET LIVE**
+Status: **UI / ASSETS CLOSED — MAP BINARY LANDED / EXACT `mapImage` BINDING ACTIVE FOR CODING CONSUMPTION**
 
 ---
 
@@ -62,23 +62,31 @@ Approved master format:
 - full environmental composition;
 - no baked runtime HUD, markers, labels, quest state, participants, clues, rewards, or event-state overlays.
 
-UI / Assets approved target repository binding:
+Exact ACTIVE production repository binding:
+
+`Konoha Locations/whisper_woods.png`
+
+Current committed blob:
+
+`4a44b9f6a15dd5ab529994c43f62e42c37fdb8c1`
+
+Assets state:
+
+**ACTIVE — UI / Assets approved production `mapImage` binding.**
+
+The previously reserved target:
 
 `Backgrounds/whisper_woods.png`
 
-Current state of that path:
+is **SUPERSEDED / STALE — DO NOT USE FOR PRODUCTION BINDING**.
 
-**RESERVED TARGET — BINARY DOES NOT YET EXIST.**
-
-Coding must not activate this `mapImage` binding until the binary is committed and verified. The current reusable mission-area consumer rejects a missing/empty map image, so a textual path reservation is not equivalent to a live asset.
-
-No parallel `UI/`, `Maps/`, `Mission Areas/`, or event-specific duplicate image path is authorised for Alpha unless an actual repository migration is explicitly approved later.
+No duplicate copy is required at the superseded path. Runtime should consume the exact committed ACTIVE path above rather than migrating or deriving a different path for convenience.
 
 ---
 
 ## 4. Locked map topology
 
-The artwork must support the World-owned normalized anchor targets exactly; UI / Assets does not move them to make the painting easier.
+The artwork supports the World-owned normalized anchor targets exactly; UI / Assets does not move them to make the painting easier.
 
 | Stable place | Hotspot ID | X | Y | Environmental reading |
 |---|---|---:|---:|---|
@@ -107,13 +115,13 @@ Optional environmental support:
 - Watch Ledge overlooks the northern woods;
 - Hollow Cedar sits off the older western patrol route.
 
-The painting must not imply a linear `Battle 1 → Battle 2 → Battle 3 → Boss` topology.
+The painting does not imply a linear `Battle 1 → Battle 2 → Battle 3 → Boss` topology.
 
 ---
 
 ## 5. Environmental visual brief
 
-The reusable master should depict:
+The approved reusable master depicts/supports:
 
 - dense Fire Country woodland;
 - one readable dirt/trade trail entering from the south;
@@ -124,17 +132,17 @@ The reusable master should depict:
 - elevated ridge terrain capable of supporting Old Watch Ledge;
 - dense western woodland capable of concealing Hollow Cedar.
 
-The environment should remain readable under runtime hotspot overlays and the existing contained mission-area Event Drawer.
+The environment remains intended to be readable under runtime hotspot overlays and the existing contained mission-area Event Drawer.
 
-Art direction should preserve natural geographic continuity rather than looking like seven isolated encounter islands. Routes may narrow, disappear under foliage, reconnect, cross shallow water, or become difficult to read naturally, but the stable anchors must still make physical sense relative to one another.
+Art direction preserves natural geographic continuity rather than looking like seven isolated encounter islands. Routes may narrow, disappear under foliage, reconnect, cross shallow water, or become difficult to read naturally, while the stable anchors remain physically coherent relative to one another.
 
 No unique environmental variant is required for each discovery state.
 
 ---
 
-## 6. Hard exclusions — do not bake into the master
+## 6. Hard exclusions — not baked into the master
 
-Do not bake:
+The approved production master does not author runtime truth through baked:
 
 - characters;
 - enemies;
@@ -159,7 +167,7 @@ Do not bake:
 - objective text;
 - success/failure state.
 
-Environmental objects may exist naturally where geographically appropriate, but they must not encode the current observer-safe event truth.
+Environmental objects may exist naturally where geographically appropriate, but they do not encode the current observer-safe event truth.
 
 ---
 
@@ -212,36 +220,49 @@ Secret opportunities that are not yet discovered project nothing.
 
 ---
 
-## 9. Target binding / activation rule
+## 9. ACTIVE target binding
 
-Once the approved binary exists, the local-area registration may consume:
+The local-area registration is authorised to consume exactly:
 
 ```text
-mapImage: "Backgrounds/whisper_woods.png"
+mapImage: "Konoha Locations/whisper_woods.png"
 ```
 
-Until then, the binding is not runtime-live.
+This binding is now **ACTIVE for Coding consumption**.
 
-No placeholder production image should silently stand in for Whisper Woods. Diagnostic data-URI coverage in the reusable runtime is not production asset authority.
+Do not substitute:
+
+```text
+Backgrounds/whisper_woods.png
+```
+
+That earlier reservation is superseded.
+
+Do not derive a filename from `whisper_woods`, copy the binary into another directory merely to simplify code, or silently fall back to a placeholder.
+
+Diagnostic data-URI coverage in the reusable runtime is not production asset authority.
 
 ---
 
-## 10. Binary QA gate
+## 10. Binary / runtime QA gate
 
-Before Coding treats the target binding as production-valid, verify:
+Assets path reconciliation is closed. Coding/runtime validation remains a separate downstream gate.
 
-1. file exists at exactly `Backgrounds/whisper_woods.png`;
-2. PNG decodes successfully;
-3. dimensions are exactly 1536 × 1024;
-4. no baked characters, markers, labels, clues, rewards, event state, battle state, or secret advertisement;
-5. all seven normalized anchor targets land on physically plausible geography;
-6. the South → Fork → Creek/Ravine route reads coherently;
-7. the west Shelter route is plausible and can visually reconnect toward Creek;
-8. Watch Ledge and Hollow Cedar are environmentally present without being visually exposed as secrets;
-9. runtime hotspot overlays remain legible at the locked coordinates;
-10. one master remains reusable after Mission 1.
+Before Golden closure, verify:
 
-A failed binary QA result reopens the asset file, not the World geography.
+1. file exists at exactly `Konoha Locations/whisper_woods.png`;
+2. committed blob matches the approved binary authority where relevant: `4a44b9f6a15dd5ab529994c43f62e42c37fdb8c1`;
+3. PNG decodes successfully;
+4. dimensions are exactly 1536 × 1024;
+5. no baked characters, markers, labels, clues, rewards, event state, battle state, or secret advertisement becomes runtime-semantic truth;
+6. all seven normalized anchor targets land on physically plausible geography;
+7. the South → Fork → Creek/Ravine route reads coherently;
+8. the west Shelter route is plausible and can visually reconnect toward Creek;
+9. Watch Ledge and Hollow Cedar remain environmentally present without being prematurely exposed by runtime presentation;
+10. runtime hotspot overlays remain legible at the locked coordinates;
+11. one master remains reusable after Mission 1.
+
+A failed runtime/binary QA result reopens the relevant implementation or asset defect only; it does not reopen World geography or this exact path selection without new evidence.
 
 ---
 
@@ -253,7 +274,11 @@ A failed binary QA result reopens the asset file, not the World geography.
 
 **Master dimensions/aspect:** CLOSED — 1536 × 1024 / 3:2.
 
-**Target production path:** CLOSED — `Backgrounds/whisper_woods.png`.
+**Exact production path:** **ACTIVE — `Konoha Locations/whisper_woods.png`.**
+
+**Committed production blob:** `4a44b9f6a15dd5ab529994c43f62e42c37fdb8c1`.
+
+**Previous `Backgrounds/whisper_woods.png` reservation:** SUPERSEDED / STALE.
 
 **Environmental content brief:** CLOSED.
 
@@ -261,10 +286,10 @@ A failed binary QA result reopens the asset file, not the World geography.
 
 **Secret presentation rule:** CLOSED.
 
-**Actual map binary:** NOT YET CREATED.
+**Actual map binary:** **LANDED.**
 
-**Runtime `mapImage` activation:** NOT YET LIVE.
+**Runtime `mapImage` authority:** **ACTIVE FOR CODING CONSUMPTION.**
 
 **Coding implementation / runtime validation / Golden:** separate downstream gates.
 
-The current remaining UI / Assets blocker is therefore only the production binary itself. Under the project image lock, image generation is not authorised until Stephen uses the exact phrase `generate now`.
+There is no remaining UI / Assets path/binary blocker for Whisper Woods. Coding may bind the contained mission area to the exact ACTIVE path and proceed with runtime/browser/Golden validation.
