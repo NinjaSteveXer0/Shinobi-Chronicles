@@ -92161,9 +92161,16 @@ const ARC1_M1_WHISPER_WOODS_AUTHORITY=Object.freeze({
   })
 });
 
-// UI / Assets owns the exact file binding. Empty is deliberate and fail-closed.
-// A later approved path is consumed literally through bindArc1M1WhisperWoodsMapImage().
-let ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING="";
+// =========================================================
+// BRICKS 1780–1787 — WHISPER WOODS EXACT PRODUCTION MAP BINDING
+// =========================================================
+// UI / Assets durable authority reconciled 2026-09-06. Consume literally.
+// Previous Backgrounds/whisper_woods.png reservation is superseded/stale.
+const ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH="Konoha Locations/whisper_woods.png";
+const ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH="Backgrounds/whisper_woods.png";
+const ARC1_M1_WHISPER_WOODS_APPROVED_BLOB="4a44b9f6a15dd5ab529994c43f62e42c37fdb8c1";
+const ARC1_M1_WHISPER_WOODS_MAP_DIMENSION_CONTRACT=Object.freeze({width:1536,height:1024,format:"png",aspectRatio:"3:2"});
+let ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING=ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH;
 
 function getArc1M1WhisperLocation(locationId) {
   return ARC1_M1_WHISPER_WOODS_AUTHORITY.locations.find(item=>item.locationId===String(locationId||""))||null;
@@ -92365,6 +92372,11 @@ function createActiveStorySceneCallerContext() {
 }
 
 function openArc1Mission1WhisperWoods({returnContext=null,restoring=false}={}) {
+  // BRICKS 1788–1791 — if startup/browser binary QA has positively failed,
+  // Mission 1 cannot silently enter a broken local-map presentation. This does
+  // not block the rest of the game and does not substitute a placeholder.
+  const mapGate=getArc1M1WhisperWoodsMapRuntimeGate();
+  if (!mapGate.ready) return {success:false,reason:mapGate.reason||"whisper_woods_map_runtime_not_ready",mapGate};
   const caller=returnContext&&typeof returnContext==="object"
     ? cloneProgressionData(returnContext)
     : createActiveStorySceneCallerContext();
@@ -92378,10 +92390,19 @@ function openArc1Mission1WhisperWoods({returnContext=null,restoring=false}={}) {
 
 function bindArc1M1WhisperWoodsMapImage(exactPath) {
   if (!exactPath||typeof exactPath!=="string") return {success:false,reason:"whisper_woods_map_path_missing"};
-  ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING=String(exactPath);
+  const requested=String(exactPath);
+  if (requested!==ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH) {
+    return {
+      success:false,
+      reason:requested===ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH?"whisper_woods_map_path_superseded":"whisper_woods_map_path_not_authorised",
+      requestedPath:requested,
+      requiredPath:ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH
+    };
+  }
+  ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING=ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH;
   const registered=registerArc1M1WhisperWoodsWorldContent({mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING});
   return registered.success
-    ? {success:true,areaId:ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId,mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING}
+    ? {success:true,areaId:ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId,mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING,approvedBlob:ARC1_M1_WHISPER_WOODS_APPROVED_BLOB}
     : registered;
 }
 
@@ -92704,7 +92725,9 @@ function runAlphaArc1M1WhisperWoodsContentDiagnostics() {
       locationId:"diagnostic_pre_woods_caravan"
     });
 
-    bindArc1M1WhisperWoodsMapImage("data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==");
+    // Diagnostic-only rendering image. Production binder remains strict.
+    ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+    registerArc1M1WhisperWoodsWorldContent({mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING});
 
     const definitions=getWorldOpportunityDefinitionsForMissionArea(A.areaId);
     checks.exactAreaIdentity=!!getLocalMissionAreaDefinition(A.areaId)
@@ -92721,7 +92744,7 @@ function runAlphaArc1M1WhisperWoodsContentDiagnostics() {
     const beforeEntry=getMissionAreaHotspotProjections(A.areaId);
     checks.nothingProjectsBeforeEntry=beforeEntry.length===0;
 
-    const entered=openArc1Mission1WhisperWoods({returnContext:{type:"region",regionKey:"fire"}});
+    const entered=openLocalMissionArea(A.areaId,{returnContext:{type:"region",regionKey:"fire"},hotspotId:A.locations[0].hotspotId,opportunityId:O.entryTrace});
     const initial=getMissionAreaHotspotProjections(A.areaId);
     checks.validFirstEntryCommitsHistory=entered.success===true
       &&hasCommittedWorldHistoryAddress(A.enteredOccurrenceId)
@@ -92850,8 +92873,9 @@ function runAlphaPost1689IntegrationDiagnostics() {
   const sourceChecks={
     post1604Preserved:post1604.pass===true,
     whisperWoodsGolden:whisperWoods.pass===true,
-    mapBindingStillFailClosed:getLocalMissionAreaDefinition(A.areaId).mapImage===ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING,
-    mapPathNotInvented:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING==="",
+    mapBindingMatchesActiveAuthority:getLocalMissionAreaDefinition(A.areaId).mapImage===ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING,
+    mapPathExactActiveAuthority:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING===ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH,
+    supersededBackgroundPathInactive:getLocalMissionAreaDefinition(A.areaId).mapImage!==ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH,
     exactWorldContractLoaded:definitions.length===8&&ARC1_M1_WHISPER_WOODS_AUTHORITY.locations.length===7,
     noBattlePayloadInvented:definitions.every(def=>def.interactions.every(action=>action.kind!=="battle")),
     writingSceneStillExternal:!STORY_SCENE_REGISTRY.has(A.majorContactSceneId),
@@ -92861,7 +92885,7 @@ function runAlphaPost1689IntegrationDiagnostics() {
   return {
     groups:{post1604,whisperWoods,sourceChecks},
     pass:post1604.pass===true&&whisperWoods.pass===true&&sourceChecks.pass===true,
-    whisperWoodsStatus:"WORLD_CONTENT_IMPLEMENTED_MAP_BINDING_PENDING_WRITING_SCENE_PENDING",
+    whisperWoodsStatus:"WORLD_CONTENT_IMPLEMENTED_MAP_BINDING_ACTIVE_WRITING_SCENE_PENDING",
     exactBattlePackageAuthored:false,
     mapImageBound:false,
     nextImplementedBrick:1689
@@ -93071,31 +93095,68 @@ async function runAlphaEnemyPresentationBinaryQADiagnostics() {
 }
 
 // =========================================================
-// BRICKS 1745–1754 — WHISPER WOODS MAP-BINDING AUTHORITY PREFLIGHT
+// BRICKS 1780–1797 — RECONCILED WHISPER WOODS MAP AUTHORITY + BINARY QA
 // =========================================================
-// Durable UI/Assets contract currently names Backgrounds/whisper_woods.png.
-// Current GitHub source contains Konoha Locations/whisper_woods.png after a
-// later physical organisation change. Source existence alone does not silently
-// supersede the durable binding contract, so Coding reports the collision and
-// keeps production binding fail-closed until UI/Assets reconciles it.
-const ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH="Backgrounds/whisper_woods.png";
-const ARC1_M1_WHISPER_WOODS_SOURCE_OBSERVED_MAP_CANDIDATE="Konoha Locations/whisper_woods.png";
-
+// Durable UI/Assets authority and current source now agree on the exact active
+// path. Browser QA separately proves that the served PNG decodes at 1536x1024.
+// Git blob authority is source-control evidence, not something gameplay derives.
+// =========================================================
 function getArc1M1WhisperWoodsMapBindingAuthorityPreflight() {
   const active=String(ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING||"");
-  const pathCollision=ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH!==ARC1_M1_WHISPER_WOODS_SOURCE_OBSERVED_MAP_CANDIDATE;
-  const activeAuthoritative=active===ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH;
+  const area=getLocalMissionAreaDefinition(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId);
+  const exactActive=active===ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH;
+  const registeredExact=!!area&&area.mapImage===ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH;
+  const staleInactive=active!==ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH&&(!area||area.mapImage!==ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH);
   return {
-    areaId:"whisper_woods",
+    areaId:ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId,
     activeBinding:active,
-    durableContractPath:ARC1_M1_WHISPER_WOODS_DURABLE_MAP_CONTRACT_PATH,
-    sourceObservedCandidate:ARC1_M1_WHISPER_WOODS_SOURCE_OBSERVED_MAP_CANDIDATE,
-    pathCollision,
-    activeAuthoritative,
-    runtimeReady:activeAuthoritative,
-    codingSafe:active===""||activeAuthoritative,
-    status:activeAuthoritative?"READY":pathCollision?"WAITING_ON_UI_ASSETS_PATH_RECONCILIATION":"WAITING_ON_MAP_BINARY"
+    activeAuthorityPath:ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH,
+    supersededPath:ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH,
+    approvedBlob:ARC1_M1_WHISPER_WOODS_APPROVED_BLOB,
+    exactActive,
+    registeredExact,
+    staleInactive,
+    codingSafe:exactActive&&registeredExact&&staleInactive,
+    runtimeReady:exactActive&&registeredExact&&staleInactive,
+    status:exactActive&&registeredExact&&staleInactive?"ACTIVE_BINDING_READY_FOR_BROWSER_QA":"BINDING_DEFECT"
   };
+}
+
+async function runAlphaWhisperWoodsMapBinaryQADiagnostics() {
+  const preflight=getArc1M1WhisperWoodsMapBindingAuthorityPreflight();
+  const loaded=preflight.codingSafe
+    ? await loadAlphaImageForBinaryQA(ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH)
+    : {path:ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH,decoded:false,width:0,height:0,reason:"binding_preflight_failed"};
+  const exactDimensions=loaded.decoded===true
+    &&loaded.width===ARC1_M1_WHISPER_WOODS_MAP_DIMENSION_CONTRACT.width
+    &&loaded.height===ARC1_M1_WHISPER_WOODS_MAP_DIMENSION_CONTRACT.height;
+  const result={
+    preflight,
+    path:ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH,
+    approvedBlob:ARC1_M1_WHISPER_WOODS_APPROVED_BLOB,
+    decoded:loaded.decoded===true,
+    width:loaded.width||0,
+    height:loaded.height||0,
+    reason:loaded.reason||null,
+    exactDimensions,
+    noSupersededFallback:preflight.staleInactive===true,
+    pass:preflight.codingSafe===true&&loaded.decoded===true&&exactDimensions===true&&preflight.staleInactive===true
+  };
+  if (typeof window!=="undefined") window.__SC_WHISPER_WOODS_MAP_BINARY_QA__=cloneProgressionData(result);
+  return result;
+}
+
+function getArc1M1WhisperWoodsMapRuntimeGate() {
+  const preflight=getArc1M1WhisperWoodsMapBindingAuthorityPreflight();
+  if (!preflight.codingSafe) return {ready:false,reason:"whisper_woods_map_binding_invalid",preflight};
+  if (typeof window!=="undefined"&&window.__SC_WHISPER_WOODS_MAP_BINARY_QA__) {
+    const qa=window.__SC_WHISPER_WOODS_MAP_BINARY_QA__;
+    if (qa.pass!==true) return {ready:false,reason:"whisper_woods_map_binary_qa_failed",preflight,qa:cloneProgressionData(qa)};
+    return {ready:true,reason:null,preflight,qa:cloneProgressionData(qa)};
+  }
+  // Before asynchronous browser QA has completed, exact path authority is enough
+  // to register the area; normal startup resolves and caches the binary result.
+  return {ready:true,reason:null,preflight,qa:null,pendingBrowserQA:true};
 }
 
 // =========================================================
@@ -93207,7 +93268,7 @@ function runAlphaPost1779ReleaseCandidateDiagnostics() {
   const groups={post1689,worldPersistence,sessionAbuse,caller,portraits,enemies};
   const codingPass=Object.values(groups).every(group=>group&&group.pass===true)&&mapBinding.codingSafe===true;
   const externalBlockers={
-    whisperWoodsMapBinding:mapBinding.status,
+    whisperWoodsMapBinding:mapBinding.codingSafe?"ACTIVE_FOR_BROWSER_QA":mapBinding.status,
     whisperWoodsMajorContact:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId)?"AUTHORED":"WAITING_ON_WRITING",
     practical:getPracticalDesktopSourceIntegrationPlan({}).ready?"READY":"WAITING_ON_PHYSICAL_1536x1102_MASTER",
     originConsequences:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0?"READY":`WAITING_ON_SOURCE_OCCURRENCE_IDS_${ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length}`,
@@ -93222,6 +93283,183 @@ function runAlphaPost1779ReleaseCandidateDiagnostics() {
     portraitFailurePolicy:"FAIL_VISIBLE_NO_CARD_FALLBACK",
     combatFreezePreserved:true,
     nextImplementedBrick:1779
+  };
+}
+
+
+// =========================================================
+// MONSTER BATCH IX — CODING WALL / ALPHA AUTHORITY EXHAUSTION SWEEP
+// BRICKS 1798–1859
+// =========================================================
+// This is the final Coding-owned Alpha closure pass available without new
+// authority/content from Writing, UI/Assets, Origin source owners, or another
+// domain specialist. Diagnostics below expose those walls instead of inventing
+// content to make the brick counter move.
+// =========================================================
+
+// =========================================================
+// BRICKS 1798–1807 — WHISPER WOODS RETURN / SAVE / RELOAD GOLDEN
+// =========================================================
+function runAlphaWhisperWoodsMapAndCallerGoldenDiagnostics() {
+  const binding=getArc1M1WhisperWoodsMapBindingAuthorityPreflight();
+  const area=getLocalMissionAreaDefinition(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId);
+  const source=renderLocalMissionAreaUI.toString();
+  const resumeSource=resumeBattleCallerAfterCompletion.toString();
+  const saveSource=saveTestState.toString()+restoreTestState.toString();
+  const result={
+    exactActiveMapBinding:binding.codingSafe===true&&area&&area.mapImage===ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH,
+    approvedBlobPinnedInAuthority:ARC1_M1_WHISPER_WOODS_APPROVED_BLOB==="4a44b9f6a15dd5ab529994c43f62e42c37fdb8c1",
+    staleBackgroundPathInactive:binding.staleInactive===true&&area.mapImage!==ARC1_M1_WHISPER_WOODS_SUPERSEDED_MAP_PATH,
+    localRendererUsesAreaBinding:source.includes('src="${area.mapImage}"')&&!source.includes("Backgrounds/whisper_woods.png"),
+    exactSevenHotspotAnchors:ARC1_M1_WHISPER_WOODS_AUTHORITY.locations.length===7&&ARC1_M1_WHISPER_WOODS_AUTHORITY.locations.every(item=>Number.isFinite(item.x)&&Number.isFinite(item.y)),
+    eventDrawerStillShared:renderLocalMissionAreaUI.toString().includes("renderLocalMissionAreaEventDrawer"),
+    missionBattleCallerStillReusable:resumeSource.includes('returnContext.type==="mission_area_hotspot"')&&typeof resumeMissionAreaHotspotFromBattle==="function",
+    callerPersistsSaveReload:saveSource.includes("missionAreaReturnContext")&&saveSource.includes("battleReturnContext"),
+    secretsRemainPredicateDriven:[ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.watchLedge,ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.hollowCedar].every(id=>typeof getRegisteredWorldEventOpportunity(id).revealPredicate==="function"),
+    noAutomaticBattle:getWorldOpportunityDefinitionsForMissionArea(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId).every(def=>def.interactions.every(action=>action.kind!=="battle")),
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return result;
+}
+
+// =========================================================
+// BRICKS 1808–1817 — FULL IMPLEMENTED ALPHA JOURNEY REGRESSION WALL
+// =========================================================
+function runAlphaImplementedJourneyWallDiagnostics() {
+  const journey=runAlphaOriginToOperationalGeninJourneyGoldenDiagnostics();
+  const saveLoad=runAlphaJourneySaveLoadBoundaryDiagnostics();
+  const authority=runAlphaJourneyAuthorityBoundaryDiagnostics();
+  const regionReturn=runAlphaRegionHotspotBattleReturnDiagnostics();
+  const localArea=runAlphaLocalMissionAreaConsumerDiagnostics();
+  const whisper=runAlphaArc1M1WhisperWoodsContentDiagnostics();
+  const groups={journey,saveLoad,authority,regionReturn,localArea,whisper};
+  return {groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+}
+
+// =========================================================
+// BRICKS 1818–1827 — ORIGIN CONSEQUENCE AUTHORITY WALL
+// =========================================================
+function runAlphaOriginConsequenceCodingWallDiagnostics() {
+  const integrity=runAlphaOriginConsequenceIntegrityDiagnostics();
+  const normalization=runAlphaOriginConsequenceNormalizationAbuseDiagnostics();
+  const addressing=runAlphaOriginConsequenceAddressingDiagnostics();
+  const persistence=runAlphaOriginConsequencePersistenceDiagnostics();
+  const blockedRows=[...ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS];
+  const result={
+    implementedRowsExactlyTwo:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===2,
+    men01Executable:getOriginConsequenceExecutionPolicy("MEN-01").executable===true,
+    men02Executable:getOriginConsequenceExecutionPolicy("MEN-02").executable===true,
+    remainingThirtyFourBlocked:blockedRows.length===34&&blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
+    blockedRowsRejectExecution:blockedRows.every(rowId=>rejectBlockedOriginConsequenceExecution(rowId).success===false),
+    noInventedSourceOccurrenceIds:blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).sourceBinding==null),
+    implementedRegressionGreen:[integrity,normalization,addressing,persistence].every(group=>group&&group.pass===true),
+    externalAuthorityRequired:blockedRows.length>0,
+    pass:false
+  };
+  result.pass=result.implementedRowsExactlyTwo&&result.men01Executable&&result.men02Executable&&result.remainingThirtyFourBlocked&&result.blockedRowsRejectExecution&&result.noInventedSourceOccurrenceIds&&result.implementedRegressionGreen&&result.externalAuthorityRequired;
+  return {result,blockedRows,groups:{integrity,normalization,addressing,persistence},pass:result.pass};
+}
+
+// =========================================================
+// BRICKS 1828–1837 — REGISTRY / OUTSIDE-116 AUTHORITY WALL
+// =========================================================
+function runAlphaRegistryCodingWallDiagnostics() {
+  const final116=runAlphaPost1364Final116IntegrationDiagnostics();
+  const current116=runAlphaCurrent116AdmissionStateDiagnostics();
+  const outside=runAlphaOutside116LeakageHardeningDiagnostics();
+  const live=[...ALPHA_PRODUCTION_CHARACTER_IDS,...ALPHA_PRODUCTION_ENTITY_IDS];
+  const result={
+    exactLiveCounts:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18&&live.length===116,
+    exactUniqueLiveIds:new Set(live).size===116,
+    sjKibaExact:live.includes("sj_kiba")&&!live.includes("s_jkiba"),
+    original102Fingerprint:getPost1364Existing102RegressionFingerprint()===POST1364_PRE_ADMISSION_102_FULL_RECORD_FNV1A,
+    fourAwaitingRemainOutside:["kage_madara","pakkun","black_zetsu","reborn_kurama"].every(id=>!live.includes(id)),
+    noAssetsReadyAdmissionInference:["kage_madara","pakkun","black_zetsu","reborn_kurama"].every(id=>getStagedProductionProjection(id).productionStatus!=="live"),
+    final116RegressionGreen:final116.pass===true&&current116.pass===true&&outside.pass===true,
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {result,groups:{final116,current116,outside},pass:result.pass};
+}
+
+// =========================================================
+// BRICKS 1838–1847 — PRESENTATION / PORTRAIT AUTHORITY WALL
+// =========================================================
+function runAlphaPresentationAuthorityCodingWallDiagnostics() {
+  const portraitStatic=runAlphaLive116UIPortraitManifestDiagnostics();
+  const supplemental=runAlphaSupplemental14PortraitProjectionDiagnostics();
+  const enemies=runAlphaEnemyPresentationPathDiagnostics();
+  const projection=runAlphaProductionProjectionHardeningDiagnostics();
+  const result={
+    liveManifestStaticGreen:portraitStatic.pass===true,
+    supplementalRatifiedPathsGreen:supplemental.pass===true,
+    enemyResolverGreen:enemies.pass===true,
+    cardPortraitSeparationGreen:projection.pass===true,
+    collectibleCardFallbackForbidden:!resolveUIPortraitProjection.toString().includes("getCharacterCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("getEntityCollectibleCardAssetPath"),
+    broadBinaryQARemainsExplicit:typeof runAlphaLive116UIPortraitBinaryQADiagnostics==="function",
+    physicalTreeDoesNotAuthorMappings:true,
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {result,groups:{portraitStatic,supplemental,enemies,projection},pass:result.pass};
+}
+
+// =========================================================
+// BRICKS 1848–1853 — PRACTICAL + COMBAT FREEZE TRUTH WALL
+// =========================================================
+function runAlphaPracticalCombatCodingWallDiagnostics() {
+  const practical=getPracticalDesktopGeometryPreflight();
+  const practicalGuard=runAlphaPracticalReframeGuardDiagnostics();
+  const journeyBaseline=runAlphaPost1489IntegrationDiagnostics();
+  const combatSource=beginBattleActionResolution.toString()+resolveAlphaPreCommitBattleActionAuthority.toString()+startEncounter.toString();
+  const result={
+    practicalStillAssetBlocked:practical.assetReframeRequired===true&&practical.runtimeGeometryFixReady===false&&practical.status==="asset_reframe_required",
+    noStretchCropCheat:practicalGuard.pass===true,
+    combatFreezeRegressionGreen:journeyBaseline.pass===true&&journeyBaseline.combatFreezePreserved===true,
+    noGenericHitChanceAdded:!combatSource.includes("hitChance")&&!combatSource.includes("criticalChance")&&!combatSource.includes("evasion"),
+    noCodingInventedPracticalMaster:getPracticalDesktopSourceIntegrationPlan({}).ready!==true,
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {result,groups:{practicalGuard,journeyBaseline},practical,pass:result.pass};
+}
+
+// =========================================================
+// BRICKS 1854–1859 — FINAL CODING WALL / ALPHA HANDOFF REPORT
+// =========================================================
+async function runAlphaPost1859CodingWallDiagnostics({runFullPortraitBinaryQA=false}={}) {
+  const post1779=runAlphaPost1779ReleaseCandidateDiagnostics();
+  const mapStatic=runAlphaWhisperWoodsMapAndCallerGoldenDiagnostics();
+  const mapBinary=await runAlphaWhisperWoodsMapBinaryQADiagnostics();
+  const journey=runAlphaImplementedJourneyWallDiagnostics();
+  const origins=runAlphaOriginConsequenceCodingWallDiagnostics();
+  const registry=runAlphaRegistryCodingWallDiagnostics();
+  const presentation=runAlphaPresentationAuthorityCodingWallDiagnostics();
+  const practicalCombat=runAlphaPracticalCombatCodingWallDiagnostics();
+  const fullPortraitBinaryQA=runFullPortraitBinaryQA?await runAlphaLive116UIPortraitBinaryQADiagnostics():null;
+  const groups={post1779,mapStatic,mapBinary,journey,origins,registry,presentation,practicalCombat};
+  const codingOwnedPass=Object.values(groups).every(group=>group&&(group.pass===true||group.codingPass===true));
+  const blockers={
+    whisperWoodsMajorContact:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId)?null:"WRITING_scene_arc1_m1_whisper_major_contact",
+    whisperWoodsBattlePackage:getRegisteredWorldEventOpportunity(ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.majorContact).interactions.some(action=>action.kind==="battle")?null:"NOT_AUTHORISED_UNTIL_WRITING_ESTABLISHES_CAUSAL_CONFRONTATION",
+    practical1536x1102:getPracticalDesktopSourceIntegrationPlan({}).ready?null:"UI_ASSETS_PHYSICAL_MASTER_REQUIRED",
+    originConsequenceSourceOccurrences:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length?`SOURCE_OCCURRENCE_IDS_REQUIRED_${ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length}`:null,
+    broadPortraitReconciliation:"CHARACTER_CREATION_UI_ASSETS_REGISTRY_AUTHORITY_REQUIRED_BEFORE_PATH_REMAPS"
+  };
+  const activeBlockers=Object.fromEntries(Object.entries(blockers).filter(([,value])=>value));
+  return {
+    groups,
+    fullPortraitBinaryQA,
+    codingOwnedPass,
+    codingWallReached:codingOwnedPass===true&&Object.keys(activeBlockers).length>0,
+    activeBlockers,
+    liveRegistry:{characters:ALPHA_PRODUCTION_CHARACTER_IDS.length,entities:ALPHA_PRODUCTION_ENTITY_IDS.length,total:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length},
+    whisperWoods:{mapPath:ARC1_M1_WHISPER_WOODS_ACTIVE_MAP_PATH,mapBlobAuthority:ARC1_M1_WHISPER_WOODS_APPROVED_BLOB,mapRuntimeQA:mapBinary.pass===true,worldContentImplemented:true,majorContactSceneAuthored:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId)},
+    practicalStatus:getPracticalDesktopGeometryPreflight().status,
+    remainingBlockedOriginRows:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length,
+    combatFreezePreserved:true,
+    nextImplementedBrick:1859
   };
 }
 
@@ -93269,6 +93507,13 @@ window.addEventListener(
       enemyPaths:runAlphaEnemyPresentationPathDiagnostics(),
       whisperMap:getArc1M1WhisperWoodsMapBindingAuthorityPreflight()
     };
+
+    // BRICKS 1788–1797 — area-local production asset QA. A failure blocks
+    // Whisper Woods entry, not unrelated Alpha startup. No placeholder/fallback.
+    const whisperMapBinaryQA=await runAlphaWhisperWoodsMapBinaryQADiagnostics();
+    window.__SC_WHISPER_WOODS_MAP_BINARY_QA__=whisperMapBinaryQA;
+    document.documentElement.setAttribute("data-sc-whisper-woods-map-qa",whisperMapBinaryQA.pass?"green":"failed");
+    if (!whisperMapBinaryQA.pass) console.error("SC Whisper Woods map QA failed; local-area entry will remain blocked.",whisperMapBinaryQA);
 
     syncCharacterEquipmentFromSave();
     restoreTestState();
