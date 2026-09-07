@@ -14361,12 +14361,10 @@ body {
      Genjutsu. The existing Fuinjutsu-specific calibration remains intact.
    ========================================================= */
 
-
    /* TAIJUTSU MASTERY */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(1) .practical-mastery {
-    left: 3.% !important;
-     top: 66% !important;
+    left: 3.4% !important;
 }
 
 /* BUKIJUTSU MASTERY */
@@ -14380,7 +14378,6 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(3) .practical-mastery {
     left: 3.40% !important;
-     top: 62.5% !important;
 }
 
 /* -------------------------
@@ -14752,5 +14749,271 @@ body {
             translateX(-50%)
             translateY(18px);
     }
+}
+
+/* =========================================================
+   POST-1985 — PRACTICAL SELECTION / ACTION CONTROL POLISH
+   =========================================================
+
+   Current UI/practical.png has removed the baked Begin/Batch legends.
+   Runtime DOM controls therefore return to visible presentation authority.
+   Gameplay/click handlers remain unchanged.
+
+   Fine tuning:
+   - selected bar: smaller bottom = DOWN, larger bottom = UP
+   - Begin Practical: left/top/width/height own the centre action box
+   - batch group: left/top/width/height own the three right action boxes
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   INDEPENDENT PRACTICAL SELECTED-DISCIPLINE BAR POSITIONS
+   --------------------------------------------------------- */
+
+/* TAIJUTSU SELECTED BAR */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(1).selected::after {
+    bottom:
+        0.20% !important;
+}
+
+/* BUKIJUTSU SELECTED BAR */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2).selected::after {
+    bottom:
+        0.20% !important;
+}
+
+/* SURVIVAL SELECTED BAR */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3).selected::after {
+    bottom:
+        0.20% !important;
+}
+
+/* ---------------------------------------------------------
+   BEGIN PRACTICAL — VISIBLE, WORKING DOM BUTTON
+   Existing onclick="executeKonohaPracticalTraining()" remains authority.
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button {
+    left:
+        50.50% !important;
+
+    top:
+        90.35% !important;
+
+    width:
+        30.00% !important;
+
+    height:
+        7.25% !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    color:
+        transparent !important;
+
+    font-size:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    cursor:
+        pointer !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button::after {
+    content:
+        "BEGIN PRACTICAL" !important;
+
+    display:
+        block !important;
+
+    color:
+        #5cebf0 !important;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-size:
+        clamp(14px, 1.55vw, 27px) !important;
+
+    font-weight:
+        950 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.035em !important;
+
+    text-shadow:
+        0 0 5px rgba(74, 232, 237, 0.55),
+        0 2px 5px rgba(0, 0, 0, 0.92) !important;
+
+    pointer-events:
+        none !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:hover:not(:disabled)::after,
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:focus-visible:not(:disabled)::after {
+    color:
+        #8ff7fa !important;
+
+    text-shadow:
+        0 0 7px rgba(91, 239, 244, 0.72),
+        0 2px 5px rgba(0, 0, 0, 0.94) !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:hover:not(:disabled),
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:focus-visible:not(:disabled) {
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-begin-button:disabled::after {
+    color:
+        rgba(167, 176, 175, 0.62) !important;
+
+    text-shadow:
+        none !important;
+}
+
+/* ---------------------------------------------------------
+   ×1 / ×5 / ×10 — VISIBLE TEXT INSIDE BAKED EMPTY BOXES
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-controls {
+    left:
+        69.15% !important;
+
+    top:
+        91.00% !important;
+
+    width:
+        22.85% !important;
+
+    height:
+        6.55% !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button {
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
+
+    padding:
+        0 !important;
+
+    color:
+        #e8cb75 !important;
+
+    font-family:
+        Georgia,
+        "Times New Roman",
+        serif !important;
+
+    font-size:
+        clamp(13px, 1.32vw, 23px) !important;
+
+    font-weight:
+        950 !important;
+
+    line-height:
+        1 !important;
+
+    text-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.95) !important;
+
+    background:
+        transparent !important;
+
+    border:
+        none !important;
+
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    cursor:
+        pointer !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button:hover,
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button:focus-visible {
+    color:
+        #f6dfa0 !important;
+
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    text-shadow:
+        0 0 5px rgba(232, 203, 117, 0.42),
+        0 1px 3px rgba(0, 0, 0, 0.95) !important;
+}
+
+/* Selected batch gets text emphasis only — NO cyan rectangle. */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button.selected,
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button.active {
+    color:
+        #62edf1 !important;
+
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    text-shadow:
+        0 0 6px rgba(74, 232, 237, 0.72),
+        0 1px 3px rgba(0, 0, 0, 0.95) !important;
 }
 
