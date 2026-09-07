@@ -14347,3 +14347,388 @@ body {
         rgba(83, 230, 234, 0.025) !important;
 }
 
+/* =========================================================
+   POST-1982 — PRACTICAL RESULT / SELECTION FINAL POLISH
+   =========================================================
+
+   Scope:
+   - Practical PASS / FAIL presentation mirrors the established Exam
+     result lifecycle without changing training resolution semantics.
+   - Practical selected discipline uses violet/lilac contrast so the
+     marker remains legible across red / blue / green baked panels.
+   - Practical mastery values receive a small horizontal centering nudge.
+   - Exam selected marker is nudged slightly downward for Ninjutsu /
+     Genjutsu. The existing Fuinjutsu-specific calibration remains intact.
+   ========================================================= */
+
+/* -------------------------
+   EXAM SELECTION MARKER — SMALL DOWNWARD NUDGE
+   ------------------------- */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select.selected
+.exam-discipline-card::after {
+    bottom:
+        2% !important;
+}
+
+/* Preserve the authored Fuinjutsu exception from the earlier authority. */
+#konoha-activity-screen[data-service-id="exams"]
+.exam-discipline-select:nth-of-type(3).selected
+.exam-discipline-card::after {
+    bottom:
+        20% !important;
+}
+
+/* -------------------------
+   PRACTICAL MASTERY — SMALL RIGHTWARD NUDGE
+   ------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-mastery,
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2) .practical-mastery,
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3) .practical-mastery {
+    left:
+        4.60% !important;
+}
+
+/* -------------------------
+   PRACTICAL SELECTED DISCIPLINE — HIGH-CONTRAST VIOLET
+   ------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select.selected::after {
+    left:
+        0.5% !important;
+
+    bottom:
+        0.6% !important;
+
+    width:
+        98.5% !important;
+
+    height:
+        3px !important;
+
+    opacity:
+        0.96 !important;
+
+    border-radius:
+        999px !important;
+
+    background:
+        linear-gradient(
+            90deg,
+            rgba(154, 84, 232, 0) 0%,
+            rgba(166, 91, 242, 0.96) 15%,
+            rgba(219, 127, 255, 1) 38%,
+            rgba(246, 220, 255, 1) 50%,
+            rgba(219, 127, 255, 1) 62%,
+            rgba(166, 91, 242, 0.96) 85%,
+            rgba(154, 84, 232, 0) 100%
+        ) !important;
+
+    box-shadow:
+        0 0 5px rgba(218, 123, 255, 0.72),
+        0 0 12px rgba(166, 91, 242, 0.38) !important;
+}
+
+/* -------------------------
+   PRACTICAL RESULT STAGE
+   ------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-stage {
+    left:
+        50% !important;
+
+    top:
+        84.10% !important;
+
+    bottom:
+        auto !important;
+
+    width:
+        42% !important;
+
+    min-height:
+        5.8% !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    gap:
+        2px !important;
+
+    transform:
+        translateX(-50%) !important;
+
+    pointer-events:
+        none !important;
+
+    z-index:
+        26 !important;
+
+    text-align:
+        center !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-stage.visible {
+    animation:
+        practical-result-stage-lifecycle
+        2.8s
+        ease
+        both !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-primary {
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        baseline !important;
+
+    justify-content:
+        center !important;
+
+    font-size:
+        clamp(20px, 2vw, 32px) !important;
+
+    font-weight:
+        950 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        0.04em !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-letter {
+    display:
+        inline-block !important;
+
+    min-width:
+        0 !important;
+
+    transform-origin:
+        center bottom !important;
+
+    animation:
+        practical-result-letter-bounce
+        460ms
+        cubic-bezier(
+            0.22,
+            1.35,
+            0.45,
+            1
+        )
+        both !important;
+
+    animation-delay:
+        calc(
+            var(
+                --practical-result-letter-index
+            ) *
+            34ms
+        ) !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-primary.pass {
+    color:
+        #66edf0 !important;
+
+    text-shadow:
+        0 0 7px rgba(65, 229, 233, 0.48),
+        0 2px 6px rgba(0, 0, 0, 0.92) !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-primary.fail {
+    color:
+        #df8c7e !important;
+
+    text-shadow:
+        0 0 7px rgba(183, 79, 67, 0.34),
+        0 2px 6px rgba(0, 0, 0, 0.92) !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-primary.mixed {
+    color:
+        #e2c46f !important;
+
+    text-shadow:
+        0 0 7px rgba(214, 169, 58, 0.30),
+        0 2px 6px rgba(0, 0, 0, 0.92) !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-reward {
+    margin-top:
+        5px !important;
+
+    color:
+        #d8c17d !important;
+
+    font-size:
+        clamp(8px, 0.68vw, 13px) !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1 !important;
+
+    text-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.9) !important;
+
+    opacity:
+        0;
+
+    animation:
+        practical-result-detail-arrive
+        320ms
+        ease
+        420ms
+        forwards !important;
+}
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-error {
+    margin-top:
+        4px !important;
+
+    color:
+        #d69b53 !important;
+
+    font-size:
+        clamp(7px, 0.52vw, 10px) !important;
+
+    font-weight:
+        700 !important;
+
+    line-height:
+        1.1 !important;
+
+    opacity:
+        0;
+
+    animation:
+        practical-result-detail-arrive
+        320ms
+        ease
+        420ms
+        forwards !important;
+}
+
+@keyframes practical-result-letter-bounce {
+    0% {
+        opacity:
+            0;
+
+        transform:
+            translateY(14px)
+            scale(0.68);
+    }
+
+    48% {
+        opacity:
+            1;
+
+        transform:
+            translateY(-7px)
+            scale(1.12);
+    }
+
+    72% {
+        transform:
+            translateY(3px)
+            scale(0.96);
+    }
+
+    88% {
+        transform:
+            translateY(-2px)
+            scale(1.03);
+    }
+
+    100% {
+        opacity:
+            1;
+
+        transform:
+            translateY(0)
+            scale(1);
+    }
+}
+
+@keyframes practical-result-detail-arrive {
+    from {
+        opacity:
+            0;
+
+        transform:
+            translateY(5px);
+    }
+
+    to {
+        opacity:
+            1;
+
+        transform:
+            translateY(0);
+    }
+}
+
+@keyframes practical-result-stage-lifecycle {
+    0%,
+    72% {
+        opacity:
+            1;
+
+        transform:
+            translateX(-50%)
+            translateY(0);
+    }
+
+    84% {
+        opacity:
+            1;
+
+        transform:
+            translateX(-50%)
+            translateY(0);
+    }
+
+    100% {
+        opacity:
+            0;
+
+        transform:
+            translateX(-50%)
+            translateY(18px);
+    }
+}
+

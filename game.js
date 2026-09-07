@@ -64958,6 +64958,60 @@ function renderKonohaPracticalSpecialNotifications(
 // =========================================================
 
 
+function renderKonohaPracticalAnimatedResultText(
+  text
+) {
+
+
+  return Array.from(
+    String(
+      text || ""
+    )
+  )
+    .map(
+      (
+        character,
+        index
+      ) => {
+
+
+        const visibleCharacter =
+          character === " "
+            ? "&nbsp;"
+            : character;
+
+
+        return `
+
+          <span
+            class="
+              practical-result-letter
+            "
+            style="
+              --practical-result-letter-index:
+              ${index};
+            "
+            aria-hidden="
+              true
+            "
+          >
+            ${visibleCharacter}
+          </span>
+
+        `;
+
+      }
+    )
+    .join("");
+
+}
+
+
+// =========================================================
+// PRACTICAL ORDINARY RESULT SUMMARY
+// =========================================================
+
+
 function renderKonohaPracticalResultSummary() {
 
 
@@ -64985,6 +65039,17 @@ function renderKonohaPracticalResultSummary() {
       : [];
 
 
+  if (
+    results.length ===
+      0
+  ) {
+
+
+    return "";
+
+  }
+
+
   const successfulResults =
     results.filter(
       result =>
@@ -64994,27 +65059,51 @@ function renderKonohaPracticalResultSummary() {
     );
 
 
+  const failedResults =
+    results.filter(
+      result =>
+        !result ||
+        result.success !==
+          true
+    );
+
+
+  let primaryResult =
+    "FAIL";
+
+
+  let resultClass =
+    "fail";
+
+
   if (
     successfulResults.length ===
+      results.length
+  ) {
+
+
+    primaryResult =
+      "PASS";
+
+
+    resultClass =
+      "pass";
+
+
+  }
+  else if (
+    successfulResults.length >
       0
   ) {
 
 
-    const failedResult =
-      results.find(
-        result =>
-          result &&
-          result.success !==
-            true
-      );
+    primaryResult =
+      `${successfulResults.length} PASS · ${failedResults.length} FAIL`;
 
 
-    return failedResult &&
-      failedResult.reason
+    resultClass =
+      "mixed";
 
-      ? `TRAINING UNAVAILABLE — ${failedResult.reason}`
-
-      : "TRAINING UNAVAILABLE";
 
   }
 
@@ -65037,14 +65126,95 @@ function renderKonohaPracticalResultSummary() {
 
   const disciplineName =
     String(
-      successfulResults[
-        successfulResults.length - 1
-      ].disciplineName ||
+      (
+        successfulResults[
+          successfulResults.length - 1
+        ] ||
+        results[
+          results.length - 1
+        ] ||
+        {}
+      ).disciplineName ||
       getKonohaPracticalSelectedDisciplineId()
     ).toUpperCase();
 
 
-  return `+${totalExp} ${disciplineName} EXP`;
+  const failedReasonResult =
+    failedResults.find(
+      result =>
+        result &&
+        result.reason
+    );
+
+
+  const failedReason =
+    failedReasonResult
+      ? String(
+          failedReasonResult.reason ||
+          ""
+        )
+      : "";
+
+
+  return `
+
+    <div
+      class="
+        practical-result-primary
+        ${resultClass}
+      "
+      aria-label="
+        ${primaryResult}
+      "
+    >
+      ${renderKonohaPracticalAnimatedResultText(
+        primaryResult
+      )}
+    </div>
+
+
+    ${
+      totalExp >
+        0
+
+        ? `
+
+          <div
+            class="
+              practical-result-reward
+            "
+          >
+            +${totalExp}
+            ${disciplineName}
+            EXP
+          </div>
+
+        `
+
+        : ""
+    }
+
+
+    ${
+      failedReason
+
+        ? `
+
+          <div
+            class="
+              practical-result-error
+            "
+          >
+            TRAINING UNAVAILABLE —
+            ${failedReason}
+          </div>
+
+        `
+
+        : ""
+    }
+
+  `;
 
 }
 
