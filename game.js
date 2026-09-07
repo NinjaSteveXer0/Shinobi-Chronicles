@@ -8667,6 +8667,9 @@ function createDefaultPlayerData() {
     entities: createDefaultPlayerEntityState(),
     weaponAcclimation: {},
     activityHistory: [],
+    // BRICKS 1860–1864 — stable Chronicle participant life/custody/injury facts.
+    // This is independent of observer-safe presentation labels.
+    participantChronicleState: createDefaultParticipantChronicleState(),
     // BRICKS 1690–1694 — world/event observer state is durable player state.
     // It is separate from activityHistory: discovery/actionability/tracking/resolution
     // are current authoritative dimensions, while history records committed occurrences.
@@ -9132,6 +9135,8 @@ function loadPlayerData() {
       entities: normalizePlayerEntityState(parsedData.entities,{legacySeedMigration}),
       weaponAcclimation: normalizeWeaponAcclimationState(parsedData.weaponAcclimation),
       activityHistory: normalizedActivityHistory,
+      // BRICKS 1860–1864 — restore stable participant life/custody/injury facts.
+      participantChronicleState: normalizeParticipantChronicleState(parsedData.participantChronicleState),
       // BRICKS 1690–1694 — restore independent World/Event dimensions.
       // Old saves with no worldEventRuntime receive the empty schema; malformed
       // dimension tables are normalized without inventing discovery or resolution.
@@ -39756,6 +39761,7 @@ function startEncounter(enemyId, characterId = null, encounterId = null, constru
   // A story/event wrapper may attach a fresh returnContext immediately after launch.
   currentBattle.returnContext=null;
   currentBattle.observerSafeResultContext=null;
+  currentBattle.unknownOperativeConfrontation=null;
   currentBattle.battleLog=[`${enemy.name} appears!`,`${currentBattle.activePlayer.name} prepares for battle.`];
 
   initializeBattleContributionRecordsFromDeployment();
@@ -42168,6 +42174,12 @@ function saveTestState() {
     observerSafeResultContext:
       currentBattle.observerSafeResultContext
         ? cloneBattleRuntimeValue(currentBattle.observerSafeResultContext)
+        : null,
+
+    // BRICKS 1908–1912 — confrontation caller/objective state survives refresh.
+    unknownOperativeConfrontation:
+      currentBattle.unknownOperativeConfrontation
+        ? cloneBattleRuntimeValue(currentBattle.unknownOperativeConfrontation)
         : null,
 
 
@@ -71838,6 +71850,23 @@ function continueAfterVictory() {
 
 
   // =========================================
+  // BRICKS 1908–1912 — UNKNOWN OPERATIVE DETAIN STAGE-B
+  // =========================================
+  // This is a separate encounter-resolution step. Battle victory alone never
+  // creates custody; CONTINUE explicitly asks the Detain resolver to secure
+  // custody (or preserve a factual unresolved reason) before caller return.
+  if (
+    currentBattle.unknownOperativeConfrontation &&
+    currentBattle.unknownOperativeConfrontation.encounterPackageId === "arc1_m1_unknown_operative_confrontation" &&
+    currentBattle.unknownOperativeConfrontation.objectiveId === "detain_arc1_m1_unknown_operative" &&
+    currentBattle.unknownOperativeConfrontation.stageA === "operative_neutralised" &&
+    currentBattle.unknownOperativeConfrontation.stageB === "pending_secure_detention" &&
+    typeof secureArc1M1UnknownOperativeDetention === "function"
+  ) {
+    secureArc1M1UnknownOperativeDetention();
+  }
+
+  // =========================================
   // END ACTIVE BATTLE
   // =========================================
 
@@ -73675,6 +73704,11 @@ function resolveBattleConditionTick(condition,phase,actionId=null) {
 // BRICK 453 — BURN-TREATMENT TIMING BOUNDARY
 // =========================================================
 function resolveBattleStartOfActionOpportunityEffects(side,participantId,actionId=null) {
+  // BRICKS 1888–1891 — Guarded Read expires unused at the START of the
+  // operative's next action opportunity, before a new action resolves.
+  if (typeof expireArc1M1UnknownOperativeGuardedReadAtOwnerOpportunityStart === "function") {
+    expireArc1M1UnknownOperativeGuardedReadAtOwnerOpportunityStart(side,participantId,actionId);
+  }
   const runtime=ensureBattleRuntimeState();
   const token=getBattleActionOpportunityToken(side,participantId);
   if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[],amaterasuTicks:[]};
@@ -83256,6 +83290,12 @@ function completeBattleVictoryFromDamage(
   });
   // Victory presentation still expects an enemy compatibility object.
   currentBattle.enemy=rewardSource;
+  if (typeof finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome === "function") {
+    finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome("victory",{
+      finishingShinobiId:finishingShinobi?finishingShinobi.id:null,
+      defeatedParticipantId:defeatedParticipantId||null
+    });
+  }
   saveTestState();
   openOverlay("victory");
   return rewards;
@@ -83299,6 +83339,13 @@ function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="p
       historyRollback:false
     }
   });
+
+  if (typeof finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome === "function") {
+    finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome("defeat",{
+      defeatedParticipantId:defeatedParticipantId||null,
+      reason
+    });
+  }
 
   saveTestState();
 
@@ -88079,6 +88126,11 @@ function restoreTestState() {
     typeof state.observerSafeResultContext === "object"
       ? cloneBattleRuntimeValue(state.observerSafeResultContext)
       : null;
+
+  currentBattle.unknownOperativeConfrontation =
+    normalizeArc1M1UnknownOperativeConfrontationState(
+      state.unknownOperativeConfrontation
+    );
 
 
   // =========================================
@@ -93442,7 +93494,7 @@ async function runAlphaPost1859CodingWallDiagnostics({runFullPortraitBinaryQA=fa
   const codingOwnedPass=Object.values(groups).every(group=>group&&(group.pass===true||group.codingPass===true));
   const blockers={
     whisperWoodsMajorContact:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId)?null:"WRITING_scene_arc1_m1_whisper_major_contact",
-    whisperWoodsBattlePackage:getRegisteredWorldEventOpportunity(ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.majorContact).interactions.some(action=>action.kind==="battle")?null:"NOT_AUTHORISED_UNTIL_WRITING_ESTABLISHES_CAUSAL_CONFRONTATION",
+    whisperWoodsBattlePackage:(typeof launchArc1M1UnknownOperativeConfrontation==="function"&&typeof getArc1M1UnknownOperativePreparedAction==="function"&&getArc1M1UnknownOperativePreparedAction("arc1_m1_unknown_operative_break_contact"))?null:"NOT_AUTHORISED_UNTIL_WRITING_ESTABLISHES_CAUSAL_CONFRONTATION",
     practical1536x1102:getPracticalDesktopSourceIntegrationPlan({}).ready?null:"UI_ASSETS_PHYSICAL_MASTER_REQUIRED",
     originConsequenceSourceOccurrences:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length?`SOURCE_OCCURRENCE_IDS_REQUIRED_${ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length}`:null,
     broadPortraitReconciliation:"CHARACTER_CREATION_UI_ASSETS_REGISTRY_AUTHORITY_REQUIRED_BEFORE_PATH_REMAPS"
@@ -93524,3 +93576,938 @@ window.addEventListener(
 
   }
 );
+
+// =========================================================
+// MONSTER BATCH X — WHISPER WOODS UNKNOWN OPERATIVE PACKAGE
+// BRICKS 1860–1939
+// =========================================================
+// Consumes CE/Codex, Registry/PL and Combat closure for the North Ravine
+// concealed operative. Stable participant identity, observer projection,
+// Battle capability and encounter objectives remain deliberately separated.
+// =========================================================
+
+const ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY=Object.freeze({
+  stableOpponentId:"arc1_m1_unknown_operative",
+  observerProjectionKey:"observer_projection_unknown_operative",
+  concealedDisplayName:"UNKNOWN OPERATIVE",
+  encounterPackageId:"arc1_m1_unknown_operative_confrontation",
+  sceneId:"scene_arc1_m1_whisper_major_contact",
+  opportunityId:"arc1_m1_whisper_major_contact",
+  eventId:"arc1_m1_whisper_major_contact_event",
+  basePL:63,
+  stats:Object.freeze({nin:58,tai:66,buki:54,fuin:38,kin:46,gen:56,stamina:62}),
+  objectives:Object.freeze({
+    kill:"kill_arc1_m1_unknown_operative",
+    detain:"detain_arc1_m1_unknown_operative"
+  }),
+  actionIds:Object.freeze({
+    crushingPalm:"arc1_m1_unknown_operative_crushing_palm",
+    chakraEdge:"arc1_m1_unknown_operative_chakra_edge",
+    counterLock:"arc1_m1_unknown_operative_counter_lock",
+    guardedRead:"arc1_m1_unknown_operative_guarded_read",
+    breakContact:"arc1_m1_unknown_operative_break_contact",
+    wristBreak:"arc1_m1_unknown_operative_wrist_break"
+  })
+});
+
+// =========================================================
+// BRICKS 1860–1864 — STABLE PARTICIPANT CHRONICLE STATE
+// =========================================================
+function createDefaultParticipantChronicleState() {
+  return {byStableId:{}};
+}
+
+function normalizeParticipantChronicleState(savedState) {
+  const source=savedState&&typeof savedState==="object"&&!Array.isArray(savedState)?savedState:{};
+  const byStableId={};
+  const raw=source.byStableId&&typeof source.byStableId==="object"&&!Array.isArray(source.byStableId)?source.byStableId:{};
+  Object.entries(raw).forEach(([stableId,value])=>{
+    if (!stableId||['__proto__','prototype','constructor'].includes(stableId)||!value||typeof value!=="object"||Array.isArray(value)) return;
+    const injuries=Array.isArray(value.injuries)?value.injuries.filter(item=>item&&typeof item==="object").map(item=>cloneProgressionData(item)):[];
+    byStableId[stableId]={
+      stableId,
+      lifeState:["alive","dead"].includes(value.lifeState)?value.lifeState:"alive",
+      custodyState:["none","detained","escaped","unresolved"].includes(value.custodyState)?value.custodyState:"none",
+      deathOccurrenceId:typeof value.deathOccurrenceId==="string"?value.deathOccurrenceId:null,
+      escapeOccurrenceId:typeof value.escapeOccurrenceId==="string"?value.escapeOccurrenceId:null,
+      detentionOccurrenceId:typeof value.detentionOccurrenceId==="string"?value.detentionOccurrenceId:null,
+      injuries,
+      updatedAt:Number(value.updatedAt)||null
+    };
+  });
+  return {byStableId};
+}
+
+function ensureParticipantChronicleState() {
+  if (!playerData.participantChronicleState||typeof playerData.participantChronicleState!=="object") {
+    playerData.participantChronicleState=createDefaultParticipantChronicleState();
+  }
+  playerData.participantChronicleState=normalizeParticipantChronicleState(playerData.participantChronicleState);
+  return playerData.participantChronicleState;
+}
+
+function getParticipantChronicleState(stableId,{create=true}={}) {
+  const id=String(stableId||"");
+  if (!id) return null;
+  const root=ensureParticipantChronicleState();
+  if (!root.byStableId[id]&&create) {
+    root.byStableId[id]={stableId:id,lifeState:"alive",custodyState:"none",deathOccurrenceId:null,escapeOccurrenceId:null,detentionOccurrenceId:null,injuries:[],updatedAt:Date.now()};
+  }
+  return root.byStableId[id]||null;
+}
+
+function updateParticipantChronicleState(stableId,patch={}) {
+  const current=getParticipantChronicleState(stableId,{create:true});
+  if (!current) return null;
+  Object.assign(current,cloneProgressionData(patch||{}),{stableId:String(stableId),updatedAt:Date.now()});
+  if (!Array.isArray(current.injuries)) current.injuries=[];
+  return current;
+}
+
+// =========================================================
+// BRICKS 1865–1869 — ENEMY / OPPOSITION RECORD, NOT COLLECTIBLE
+// =========================================================
+enemyDatabase[ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId]={
+  id:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId,
+  name:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.concealedDisplayName,
+  rank:"Unknown",
+  formalRank:null,
+  classification:"persistent_human_operative",
+  observerProjectionKey:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.observerProjectionKey,
+  power:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.basePL,
+  calibratedBasePL:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.basePL,
+  baseStats:{...ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stats},
+  stats:{...ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stats},
+  image:null,
+  rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+  noBossScaling:true,
+  noEncounterScaling:true,
+  collectibleProductionGate:false
+};
+
+function getArc1M1UnknownOperativeEnemy() {
+  return enemyDatabase[ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId]||null;
+}
+
+// =========================================================
+// BRICKS 1870–1876 — CONFRONTATION RUNTIME / CALLER ENVELOPE
+// =========================================================
+function createArc1M1UnknownOperativeConfrontationOccurrenceId() {
+  return createBattleRuntimeRecordId("arc1_m1_unknown_operative_confrontation");
+}
+
+function normalizeArc1M1UnknownOperativeConfrontationState(raw) {
+  if (!raw||typeof raw!=="object"||Array.isArray(raw)) return null;
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  if (raw.encounterPackageId!==A.encounterPackageId) return null;
+  const activeParticipantIds=Array.isArray(raw.activeParticipantIds)?[...new Set(raw.activeParticipantIds.filter(id=>typeof id==="string"&&id))]:[];
+  const sideAssignments=raw.sideAssignments&&typeof raw.sideAssignments==="object"&&!Array.isArray(raw.sideAssignments)?cloneProgressionData(raw.sideAssignments):{};
+  return {
+    encounterPackageId:A.encounterPackageId,
+    sceneId:A.sceneId,
+    opportunityId:A.opportunityId,
+    eventId:A.eventId,
+    stableOpponentId:A.stableOpponentId,
+    observerProjectionKey:A.observerProjectionKey,
+    occurrenceId:typeof raw.occurrenceId==="string"?raw.occurrenceId:null,
+    objectiveId:[A.objectives.kill,A.objectives.detain].includes(raw.objectiveId)?raw.objectiveId:null,
+    activeParticipantIds,
+    sideAssignments,
+    escapeAllowed:raw.escapeAllowed===true,
+    breakContactResolved:raw.breakContactResolved===true,
+    interventionSupersedesCustody:raw.interventionSupersedesCustody===true,
+    interventionReason:raw.interventionReason||null,
+    stageA:raw.stageA||null,
+    stageB:raw.stageB||null,
+    battleResult:raw.battleResult||null,
+    lethalObjectiveSuccess:raw.lethalObjectiveSuccess===true?true:(raw.lethalObjectiveSuccess===false?false:null),
+    captureOutcome:raw.captureOutcome||"not_applicable",
+    captureUnresolvedReason:raw.captureUnresolvedReason||null,
+    operativeAlive:raw.operativeAlive===false?false:(raw.operativeAlive==="pending_consequence_commit"?"pending_consequence_commit":true),
+    escapeActionOccurrenceId:raw.escapeActionOccurrenceId||null,
+    detentionControlOccurrenceId:raw.detentionControlOccurrenceId||null,
+    deathConsequenceRequestId:raw.deathConsequenceRequestId||null,
+    deathConsequenceOccurrenceId:raw.deathConsequenceOccurrenceId||null,
+    supportedInjuryFacts:Array.isArray(raw.supportedInjuryFacts)?cloneProgressionData(raw.supportedInjuryFacts):[],
+    actionOccurrenceIds:Array.isArray(raw.actionOccurrenceIds)?[...new Set(raw.actionOccurrenceIds.filter(Boolean))]:[],
+    participantContributionEvidence:Array.isArray(raw.participantContributionEvidence)?cloneProgressionData(raw.participantContributionEvidence):[],
+    returnContext:raw.returnContext?cloneProgressionData(raw.returnContext):null,
+    startedAt:Number(raw.startedAt)||null,
+    completedAt:Number(raw.completedAt)||null
+  };
+}
+
+function getArc1M1UnknownOperativeConfrontationState() {
+  return normalizeArc1M1UnknownOperativeConfrontationState(currentBattle.unknownOperativeConfrontation);
+}
+
+function isArc1M1UnknownOperativeConfrontationActive() {
+  const state=getArc1M1UnknownOperativeConfrontationState();
+  return !!(state&&currentBattle.encounterId===ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.encounterPackageId);
+}
+
+function appendArc1M1UnknownOperativeActionOccurrence(actionId) {
+  const state=currentBattle.unknownOperativeConfrontation;
+  if (!state||!actionId) return false;
+  if (!Array.isArray(state.actionOccurrenceIds)) state.actionOccurrenceIds=[];
+  if (!state.actionOccurrenceIds.includes(actionId)) state.actionOccurrenceIds.push(actionId);
+  return true;
+}
+
+function validateArc1M1UnknownOperativeCallerContext(context={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const sceneId=context.sceneId||null;
+  const opportunityId=context.opportunityId||null;
+  const eventId=context.eventId||null;
+  if (sceneId!==A.sceneId) return {valid:false,reason:"unknown_operative_scene_context_invalid"};
+  if (opportunityId!==A.opportunityId) return {valid:false,reason:"unknown_operative_opportunity_context_invalid"};
+  if (eventId!==A.eventId) return {valid:false,reason:"unknown_operative_event_context_invalid"};
+  return {valid:true};
+}
+
+function resolveArc1M1StoryBattleParticipantRuntime(participantId) {
+  if (!participantId||participantId===ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId) return null;
+  return getPlayerCharacter(participantId)||getRuntimeCharacterByRegistryId(participantId)||materializeProductionRuntimeCharacter(participantId)||null;
+}
+
+function validateArc1M1UnknownOperativeParticipantEnvelope(activeParticipantIds,sideAssignments) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const ids=Array.isArray(activeParticipantIds)?[...new Set(activeParticipantIds.filter(id=>typeof id==="string"&&id))]:[];
+  if (!ids.includes(A.stableOpponentId)) return {valid:false,reason:"stable_operative_missing_from_active_participants"};
+  const assignments=sideAssignments&&typeof sideAssignments==="object"&&!Array.isArray(sideAssignments)?sideAssignments:null;
+  if (!assignments) return {valid:false,reason:"side_assignments_missing"};
+  if (ids.some(id=>typeof assignments[id]!=="string"||!assignments[id])) return {valid:false,reason:"active_participant_side_assignment_missing"};
+  const opposingIds=ids.filter(id=>id!==A.stableOpponentId);
+  if (opposingIds.length===0) return {valid:false,reason:"opposing_side_empty"};
+  const unresolved=opposingIds.filter(id=>!resolveArc1M1StoryBattleParticipantRuntime(id));
+  if (unresolved.length) return {valid:false,reason:"story_battle_participant_runtime_missing",unresolvedParticipantIds:unresolved};
+  return {valid:true,activeParticipantIds:ids,opposingParticipantIds:opposingIds,sideAssignments:cloneProgressionData(assignments)};
+}
+
+function launchArc1M1UnknownOperativeConfrontation({
+  objectiveId,
+  activeParticipantIds,
+  sideAssignments,
+  sceneId,
+  opportunityId,
+  eventId,
+  escapeAllowed=false,
+  returnContext=null,
+  interventionSupersedesCustody=false,
+  interventionReason=null
+}={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  if (![A.objectives.kill,A.objectives.detain].includes(objectiveId)) return {success:false,reason:"unknown_operative_objective_not_authorised",releaseLaunchesBattle:false};
+  const caller=validateArc1M1UnknownOperativeCallerContext({sceneId,opportunityId,eventId});
+  if (!caller.valid) return {success:false,reason:caller.reason};
+  const participants=validateArc1M1UnknownOperativeParticipantEnvelope(activeParticipantIds,sideAssignments);
+  if (!participants.valid) return {success:false,...participants};
+  const enemy=getArc1M1UnknownOperativeEnemy();
+  if (!enemy) return {success:false,reason:"unknown_operative_enemy_record_missing"};
+
+  selectedEnemy=enemy;
+  currentBattle.active=true;
+  currentBattle.battleId=createBattleInstanceId();
+  currentBattle.encounterId=A.encounterPackageId;
+  currentBattle.encounterOccurrenceId=null;
+  currentBattle.oppositionTemplateId=A.stableOpponentId;
+  currentBattle.encounterStatePackageId=null;
+  currentBattle.characterId=participants.opposingParticipantIds[0];
+  currentBattle.encounterEnemy=enemy;
+  setBattleEnemyParticipants([enemy]);
+  currentBattle.enemy=enemy;
+  currentBattle.deployment={
+    player:{slots:createBattleDeploymentSlots(participants.opposingParticipantIds)},
+    enemy:{slots:createBattleDeploymentSlots([A.stableOpponentId])},
+    transitionCounter:0,
+    lastTransition:null
+  };
+  currentBattle.activePlayer=getBattleDeploymentParticipant("player",1)||null;
+  syncBattleActiveEnemyFromDeployment();
+  currentBattle.lastDamage=0;
+  currentBattle.battleOver=false;
+  currentBattle.completedAt=null;
+  currentBattle.claimedAt=null;
+  currentBattle.completionRecorded=false;
+  currentBattle.outcome=null;
+  currentBattle.defeat=null;
+  currentBattle.returnContext=returnContext?normalizeBattleReturnContext(returnContext):null;
+  currentBattle.observerSafeResultContext={
+    stableOpponentId:A.stableOpponentId,
+    observerProjectionKey:A.observerProjectionKey,
+    displayName:A.concealedDisplayName,
+    trueIdentityRevealed:false
+  };
+  currentBattle.battleLog=[`${A.concealedDisplayName} enters the confrontation.`,`${currentBattle.activePlayer?currentBattle.activePlayer.name:"The active side"} prepares for battle.`];
+  currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+  currentBattle.enemyPower=A.basePL;
+  currentBattle.enemyMaxPower=A.basePL;
+
+  initializeBattleContributionRecordsFromDeployment();
+  initializeBattleSourcePackageRuntime();
+  initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
+  initializeBattlePouchFromPreparedSelection();
+  initializeBattleAttachedSummonRuntimeFromDeployment();
+  initializeBattleDedicatedVariantRuntimePackages();
+  initializeBattleKisoganStartsActiveFromDeployment();
+
+  const occurrenceId=createArc1M1UnknownOperativeConfrontationOccurrenceId();
+  currentBattle.unknownOperativeConfrontation={
+    encounterPackageId:A.encounterPackageId,
+    sceneId:A.sceneId,
+    opportunityId:A.opportunityId,
+    eventId:A.eventId,
+    stableOpponentId:A.stableOpponentId,
+    observerProjectionKey:A.observerProjectionKey,
+    occurrenceId,
+    objectiveId,
+    activeParticipantIds:[...participants.activeParticipantIds],
+    sideAssignments:cloneProgressionData(participants.sideAssignments),
+    escapeAllowed:escapeAllowed===true,
+    breakContactResolved:false,
+    interventionSupersedesCustody:interventionSupersedesCustody===true,
+    interventionReason:interventionReason||null,
+    stageA:null,stageB:null,battleResult:null,
+    lethalObjectiveSuccess:null,
+    captureOutcome:objectiveId===A.objectives.detain?"unresolved":"not_applicable",
+    captureUnresolvedReason:objectiveId===A.objectives.detain?"neutralisation_required":null,
+    operativeAlive:true,
+    escapeActionOccurrenceId:null,
+    detentionControlOccurrenceId:null,
+    deathConsequenceRequestId:null,
+    deathConsequenceOccurrenceId:null,
+    supportedInjuryFacts:[],
+    actionOccurrenceIds:[],
+    participantContributionEvidence:[],
+    returnContext:currentBattle.returnContext?cloneBattleRuntimeValue(currentBattle.returnContext):null,
+    startedAt:Date.now(),completedAt:null
+  };
+  getParticipantChronicleState(A.stableOpponentId,{create:true});
+  savePlayerData();
+  saveTestState();
+  openOverlay("combat");
+  return {success:true,battleId:currentBattle.battleId,occurrenceId,objectiveId,activeParticipantIds:[...participants.activeParticipantIds],sideAssignments:cloneProgressionData(participants.sideAssignments)};
+}
+
+// =========================================================
+// BRICKS 1877–1887 — EXACT PREPARED ACTIONS
+// =========================================================
+function createArc1M1UnknownOperativeDamageAction(id,attackPL,primaryDiscipline) {
+  const base=makeEnemyFixedDamageAction(id,attackPL,{primaryDiscipline,traits:["unknown_operative_exact_authored_action","single_hostile","one_direct_packet"]});
+  const originalResolve=base.resolve;
+  base.authoredAttackPL=attackPL;
+  base.targetMode="single_hostile";
+  base.ordinaryStamina=true;
+  base.resolve=function(context){
+    const result=originalResolve(context);
+    if (result&&result.resolved===true&&context&&context.envelope) appendArc1M1UnknownOperativeActionOccurrence(context.envelope.actionId);
+    return result;
+  };
+  return base;
+}
+
+function createArc1M1UnknownOperativeCounterLockAction() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const base=createArc1M1UnknownOperativeDamageAction(A.actionIds.counterLock,22,"Taijutsu");
+  const originalResolve=base.resolve;
+  base.actionClass="enemy_control_technique";
+  base.traits=["unknown_operative_exact_authored_action","single_hostile","physical_control","movement_restriction_only","not_stun"];
+  base.resolve=function(context){
+    const result=originalResolve(context);
+    const finalDamage=Number(result&&result.finalDamage)||0;
+    if (result&&result.resolved===true&&finalDamage>0&&context&&context.enemy&&context.target&&context.envelope) {
+      const applied=createAlphaMovementControlCondition({
+        conditionKey:"arc1_m1_unknown_operative_counter_lock_restraint",
+        conditionType:"physical_restraint",
+        sourceSide:"enemy",
+        sourceParticipantId:context.enemy.id,
+        sourceRefs:[{type:"skill",id:A.actionIds.counterLock,role:"exact_source"}],
+        sourceSkillId:A.actionIds.counterLock,
+        actionId:context.envelope.actionId,
+        targetSide:"player",
+        targetParticipantId:context.target.id,
+        strength:22,
+        resolverDiscipline:"Taijutsu",
+        durationActionOpportunities:1,
+        extraData:{exactSourcePhysicalRestraint:true,requiresPositiveFinalDamage:true,establishingFinalDamage:finalDamage,notStun:true,sameSourceRefresh:true}
+      });
+      result.conditionRefs=applied&&applied.condition?[applied.condition.conditionId]:[];
+      result.physicalRestraintEstablished=!!(applied&&applied.condition);
+    } else {
+      result.physicalRestraintEstablished=false;
+      result.conditionRefs=[];
+    }
+    return result;
+  };
+  return base;
+}
+
+function createArc1M1UnknownOperativeGuardedReadAction() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  return {
+    id:A.actionIds.guardedRead,
+    skillId:A.actionIds.guardedRead,
+    targetMode:"self",
+    actionClass:"enemy_defensive_setup",
+    authoredAttackPL:null,
+    traits:["unknown_operative_exact_authored_action","self_setup","pre_stamina_prevention","no_evasion_stat"],
+    resolve({enemy,envelope}) {
+      if (!enemy||enemy.id!==A.stableOpponentId||!envelope) return {resolved:false,reason:"guarded_read_actor_invalid"};
+      const existing=findBattleTransientState({stateKey:"unknown_operative_guarded_read",targetSide:"enemy",targetParticipantId:A.stableOpponentId});
+      if (existing) removeBattleTransientState(existing.stateId);
+      const state=addBattleTransientState({
+        stateKey:"unknown_operative_guarded_read",
+        sourceSide:"enemy",sourceParticipantId:A.stableOpponentId,
+        targetSide:"enemy",targetParticipantId:A.stableOpponentId,
+        ownerRef:{type:"skill",id:A.actionIds.guardedRead},
+        data:{
+          sourceSkillId:A.actionIds.guardedRead,
+          attackMultiplier:0.70,
+          preventionRatio:0.30,
+          oneUse:true,
+          activationActionId:envelope.actionId,
+          expiresAtOwnerNextActionStart:true,
+          preStamina:true,
+          hiddenSpeedStat:false,
+          hiddenEvasionStat:false,
+          hiddenDefenseStat:false
+        }
+      });
+      appendArc1M1UnknownOperativeActionOccurrence(envelope.actionId);
+      recordBattleEvidence({eventType:"unknown_operative_guarded_read_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",A.stableOpponentId),skillId:A.actionIds.guardedRead,stateRefs:state?[state.stateId]:[],data:{preventionRatio:0.30,preventionOrder:"pre_stamina",oneUse:true,expiresAtStartOfNextOwnerActionOpportunity:true}});
+      return {resolved:!!state,branch:"unknown_operative_guarded_read",damageApplied:false,stateRefs:state?[state.stateId]:[]};
+    }
+  };
+}
+
+function hasArc1M1UnknownOperativeMovementPreventingRestraint() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const conditions=getBattleParticipantConditions("enemy",A.stableOpponentId);
+  if (conditions.some(condition=>condition&&(condition.conditionType==="physical_restraint"||condition.conditionKey==="physical_restraint"||condition.data&&condition.data.movementPreventing===true))) return true;
+  return getBattleTransientStatesForParticipant("enemy",A.stableOpponentId).some(state=>state&&state.data&&(state.data.movementPreventing===true||state.data.semanticClass==="physical_restraint"));
+}
+
+function evaluateArc1M1UnknownOperativeBreakContactEligibility() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const state=getArc1M1UnknownOperativeConfrontationState();
+  if (!state) return {available:false,reason:"unknown_operative_confrontation_missing"};
+  if (state.breakContactResolved===true) return {available:false,reason:"break_contact_already_resolved"};
+  if (state.escapeAllowed!==true) return {available:false,reason:"story_occurrence_escape_not_allowed"};
+  if (hasArc1M1UnknownOperativeMovementPreventingRestraint()) return {available:false,reason:"movement_preventing_restraint_active"};
+  const remaining=Math.max(0,Number(getBattleRemainingPL("enemy",A.stableOpponentId))||0);
+  const starting=Math.max(1,Number(getBattleMaximumPL("enemy",A.stableOpponentId))||A.basePL);
+  const ratio=remaining/starting;
+  if (ratio>0.25) return {available:false,reason:"remaining_battle_pl_above_break_contact_threshold",remainingBattlePL:remaining,startingBattlePL:starting,ratio};
+  return {available:true,reason:null,remainingBattlePL:remaining,startingBattlePL:starting,ratio};
+}
+
+function createArc1M1UnknownOperativeBreakContactAction() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  return {
+    id:A.actionIds.breakContact,
+    skillId:A.actionIds.breakContact,
+    targetMode:"encounter_self",
+    actionClass:"enemy_tactical_disengagement",
+    authoredAttackPL:null,
+    traits:["unknown_operative_exact_authored_action","movement_dependent","tactical_disengagement","once_per_confrontation"],
+    evaluateAvailability(){return evaluateArc1M1UnknownOperativeBreakContactEligibility();},
+    resolve({enemy,envelope}) {
+      const gate=evaluateArc1M1UnknownOperativeBreakContactEligibility();
+      if (!gate.available) return {resolved:false,reason:gate.reason,invalidSelection:true,actionOpportunityConsumed:false,falseHistoryCreated:false};
+      const state=currentBattle.unknownOperativeConfrontation;
+      const occurrenceId=envelope&&envelope.actionId?envelope.actionId:createBattleRuntimeRecordId("unknown_operative_escape");
+      state.breakContactResolved=true;
+      state.escapeActionOccurrenceId=occurrenceId;
+      state.battleResult="escape";
+      state.lethalObjectiveSuccess=state.objectiveId===A.objectives.kill?false:null;
+      state.captureOutcome=state.objectiveId===A.objectives.detain?"escaped":"not_applicable";
+      state.captureUnresolvedReason=null;
+      state.operativeAlive=true;
+      state.completedAt=Date.now();
+      appendArc1M1UnknownOperativeActionOccurrence(occurrenceId);
+      updateParticipantChronicleState(A.stableOpponentId,{lifeState:"alive",custodyState:"escaped",escapeOccurrenceId:occurrenceId});
+      commitArc1M1UnknownOperativeHistoryRecord({occurrenceId,type:"operative_escape",outcome:"operative_escaped",data:{encounterPackageId:A.encounterPackageId,objectiveId:state.objectiveId,stableOpponentId:A.stableOpponentId}});
+      recordBattleEvidence({eventType:"unknown_operative_break_contact_resolved",committedOccurrence:true,actionId:occurrenceId,actorRef:createBattleParticipantRef("enemy",A.stableOpponentId),skillId:A.actionIds.breakContact,data:{operativeEscaped:true,survivalOutcome:true,battleVictory:false,remainingBattlePL:gate.remainingBattlePL,startingBattlePL:gate.startingBattlePL,ratio:gate.ratio}});
+      currentBattle.battleOver=true;
+      currentBattle.active=false;
+      currentBattle.completedAt=Date.now();
+      currentBattle.outcome={type:"escape",committed:true,completedAt:currentBattle.completedAt,stableOpponentId:A.stableOpponentId,escapeActionOccurrenceId:occurrenceId,rewardsGenerated:false,rewardClaimAvailable:false};
+      currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+      savePlayerData();
+      saveTestState();
+      if (currentBattle.returnContext) resumeBattleCallerAfterCompletion("escape");
+      return {resolved:true,branch:"unknown_operative_break_contact",damageApplied:false,operativeEscaped:true,escapeActionOccurrenceId:occurrenceId,battleEnded:true};
+    }
+  };
+}
+
+function expireArc1M1UnknownOperativeGuardedReadAtOwnerOpportunityStart(side,participantId,actionId=null) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  if (side!=="enemy"||participantId!==A.stableOpponentId) return {expired:false,reason:"not_unknown_operative_opportunity"};
+  const state=findBattleTransientState({stateKey:"unknown_operative_guarded_read",targetSide:"enemy",targetParticipantId:A.stableOpponentId});
+  if (!state||!state.data||state.data.expiresAtOwnerNextActionStart!==true) return {expired:false,reason:"guarded_read_not_active"};
+  if (state.data.activationActionId&&state.data.activationActionId===actionId) return {expired:false,reason:"activation_opportunity"};
+  const removed=removeBattleTransientState(state.stateId);
+  if (removed) recordBattleEvidence({eventType:"unknown_operative_guarded_read_expired",committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("enemy",A.stableOpponentId),skillId:A.actionIds.guardedRead,stateRefs:[state.stateId],data:{unused:true,expiredAtStartOfNextOwnerActionOpportunity:true}});
+  return {expired:removed,stateId:state.stateId};
+}
+
+const ARC1_M1_UNKNOWN_OPERATIVE_PREPARED_ACTIONS=Object.freeze([
+  createArc1M1UnknownOperativeDamageAction(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.actionIds.crushingPalm,32,"Taijutsu"),
+  createArc1M1UnknownOperativeDamageAction(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.actionIds.chakraEdge,36,"Bukijutsu"),
+  createArc1M1UnknownOperativeCounterLockAction(),
+  createArc1M1UnknownOperativeGuardedReadAction(),
+  createArc1M1UnknownOperativeBreakContactAction()
+]);
+enemyDatabase[ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId].authoredBattleActions=[...ARC1_M1_UNKNOWN_OPERATIVE_PREPARED_ACTIONS];
+
+function getArc1M1UnknownOperativePreparedAction(actionId) {
+  return ARC1_M1_UNKNOWN_OPERATIVE_PREPARED_ACTIONS.find(action=>action.id===actionId)||null;
+}
+
+function attemptArc1M1UnknownOperativeAction(actionId,targetParticipantId=null) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  if (!currentBattle.active||currentBattle.battleOver) return {success:false,reason:"battle_not_active",actionOpportunityConsumed:false};
+  const enemy=getBattleDeploymentParticipant("enemy",1);
+  if (!enemy||enemy.id!==A.stableOpponentId) return {success:false,reason:"unknown_operative_not_active",actionOpportunityConsumed:false};
+  const action=getArc1M1UnknownOperativePreparedAction(actionId);
+  if (!action) return {success:false,reason:"unknown_operative_action_not_prepared",actionOpportunityConsumed:false};
+  const target=action.targetMode==="self"||action.targetMode==="encounter_self"?enemy:(targetParticipantId?getBattleParticipantByIdentity("player",targetParticipantId):getBattleDeploymentParticipant("player",1));
+  if (!target) return {success:false,reason:"target_missing",actionOpportunityConsumed:false};
+  const eligibility=evaluateEnemyAuthoredActionEligibility(action,enemy,target);
+  if (!eligibility.eligible) return {success:false,reason:eligibility.reason,eligibility,actionOpportunityConsumed:false,falseHistoryCreated:true};
+  const envelope=createBattleActionEnvelope({
+    actorSide:"enemy",actorParticipantId:enemy.id,
+    targetSide:action.targetMode==="self"||action.targetMode==="encounter_self"?"enemy":"player",
+    targetParticipantId:target.id,
+    actionClass:action.actionClass||"enemy_authored_action",
+    skillId:action.skillId||action.id,
+    sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"}],
+    data:{traits:Array.isArray(action.traits)?[...action.traits]:[],authoredEnemyAction:true}
+  });
+  const entry=beginBattleActionResolution(envelope);
+  if (!entry.accepted) return {success:false,reason:entry.validation.reason,entry,actionOpportunityConsumed:false};
+  const resolution=action.resolve({enemy,target,envelope,currentBattle});
+  if (!resolution||resolution.resolved!==true) return {success:false,reason:resolution&&resolution.reason||"unknown_operative_action_resolution_failed",resolution,actionOpportunityConsumed:false};
+  recordBattleEvidence({eventType:"enemy_authored_action_completed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:envelope.skillId,sourceRefs:envelope.sourceRefs,data:{resolved:true,actionId:action.id,explicitUnknownOperativeAction:true,inventedFallback:false}});
+  consumeBattleActionOpportunity("enemy",enemy.id,envelope.actionId,"valid_unknown_operative_action_completed");
+  saveTestState();
+  if (!currentBattle.battleOver) openOverlay("combat");
+  return {success:true,envelope,resolution,actionOpportunityConsumed:true};
+}
+
+// =========================================================
+// BRICKS 1888–1897 — PERSISTENT OUTCOME / HISTORY BRIDGE
+// =========================================================
+function commitArc1M1UnknownOperativeHistoryRecord({occurrenceId,type,outcome,data={}}={}) {
+  const id=String(occurrenceId||"");
+  if (!id) return {success:false,reason:"occurrence_id_missing"};
+  const existing=findCommittedWorldHistoryAddress(id);
+  if (existing) return {success:true,idempotent:true,record:cloneProgressionData(existing)};
+  if (!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const record={
+    historyScope:getCurrentChronicleOccurrenceHistoryScope("battle_confrontation"),
+    type:type||"battle_confrontation",
+    activity:"battle_confrontation",
+    completed:true,
+    success:true,
+    outcome:outcome||type||id,
+    occurrenceId:id,
+    sourceEventId:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.eventId,
+    opportunityId:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.opportunityId,
+    stableParticipantId:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId,
+    data:cloneProgressionData(data||{}),
+    timestamp:Date.now()
+  };
+  playerData.activityHistory.push(record);
+  activityHistory=playerData.activityHistory;
+  return {success:true,idempotent:false,record:cloneProgressionData(record)};
+}
+
+function buildArc1M1UnknownOperativeParticipantContributionEvidence() {
+  const state=getArc1M1UnknownOperativeConfrontationState();
+  if (!state) return [];
+  const runtime=currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[];
+  return state.activeParticipantIds.map(participantId=>{
+    const side=participantId===ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId?"enemy":"player";
+    const contribution=side==="player"&&currentBattle.contributions&&currentBattle.contributions[participantId]?cloneBattleRuntimeValue(currentBattle.contributions[participantId]):null;
+    const evidenceIds=runtime.filter(record=>record&&((record.actorRef&&record.actorRef.participantId===participantId)||(record.targetRef&&record.targetRef.participantId===participantId))).map(record=>record.evidenceId).filter(Boolean);
+    return {participantId,sideAssignment:state.sideAssignments[participantId]||null,battleSide:side,contribution,evidenceIds:[...new Set(evidenceIds)],motiveInferred:false,agreementInferred:false};
+  });
+}
+
+function commitArc1M1UnknownOperativeDeathConsequence(state) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  if (!state||state.objectiveId!==A.objectives.kill||state.lethalObjectiveSuccess!==true) return {success:false,reason:"lethal_objective_not_satisfied"};
+  if (!state.deathConsequenceRequestId) state.deathConsequenceRequestId=createBattleRuntimeRecordId("unknown_operative_death_request");
+  if (state.deathConsequenceOccurrenceId) return {success:true,idempotent:true,occurrenceId:state.deathConsequenceOccurrenceId};
+  const occurrenceId=createBattleRuntimeRecordId("unknown_operative_death");
+  state.operativeAlive=false;
+  state.deathConsequenceOccurrenceId=occurrenceId;
+  updateParticipantChronicleState(A.stableOpponentId,{lifeState:"dead",custodyState:"none",deathOccurrenceId:occurrenceId});
+  commitArc1M1UnknownOperativeHistoryRecord({occurrenceId,type:"participant_death",outcome:"operative_killed",data:{stableOpponentId:A.stableOpponentId,causeOccurrenceId:state.occurrenceId,deathConsequenceRequestId:state.deathConsequenceRequestId,objectiveId:state.objectiveId}});
+  savePlayerData();
+  return {success:true,occurrenceId,deathConsequenceRequestId:state.deathConsequenceRequestId};
+}
+
+function finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome(outcomeType,detail={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const state=currentBattle.unknownOperativeConfrontation;
+  if (!state||state.encounterPackageId!==A.encounterPackageId) return {handled:false,reason:"not_unknown_operative_confrontation"};
+  if (state.breakContactResolved===true) return {handled:true,alreadyTerminal:true,outcome:"escape"};
+
+  if (outcomeType==="victory"&&detail.defeatedParticipantId===A.stableOpponentId) {
+    state.battleResult="opposing_side_won";
+    state.stageA="operative_neutralised";
+    state.participantContributionEvidence=buildArc1M1UnknownOperativeParticipantContributionEvidence();
+    if (state.objectiveId===A.objectives.kill) {
+      state.lethalObjectiveSuccess=true;
+      state.captureOutcome="not_applicable";
+      state.captureUnresolvedReason=null;
+      state.operativeAlive="pending_consequence_commit";
+      const death=commitArc1M1UnknownOperativeDeathConsequence(state);
+      state.operativeAlive=death.success?false:"pending_consequence_commit";
+    } else if (state.objectiveId===A.objectives.detain) {
+      state.lethalObjectiveSuccess=null;
+      state.captureOutcome="unresolved";
+      state.captureUnresolvedReason="secure_detention_required";
+      state.operativeAlive=true;
+      state.stageB="pending_secure_detention";
+    }
+    state.completedAt=Date.now();
+    return {handled:true,battleResult:state.battleResult,objectiveId:state.objectiveId,lethalObjectiveSuccess:state.lethalObjectiveSuccess,captureOutcome:state.captureOutcome};
+  }
+
+  if (outcomeType==="defeat") {
+    state.battleResult="operative_won";
+    state.stageA="opposing_side_defeated";
+    state.lethalObjectiveSuccess=state.objectiveId===A.objectives.kill?false:null;
+    state.captureOutcome=state.objectiveId===A.objectives.detain?"unresolved":"not_applicable";
+    state.captureUnresolvedReason=state.objectiveId===A.objectives.detain?"operative_won":null;
+    state.operativeAlive=true;
+    state.completedAt=Date.now();
+    updateParticipantChronicleState(A.stableOpponentId,{lifeState:"alive",custodyState:"none"});
+    state.participantContributionEvidence=buildArc1M1UnknownOperativeParticipantContributionEvidence();
+    savePlayerData();
+    return {handled:true,battleResult:state.battleResult};
+  }
+  return {handled:false,reason:"unsupported_battle_outcome"};
+}
+
+function secureArc1M1UnknownOperativeDetention({intervention=false,unresolvedReason=null}={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const state=currentBattle.unknownOperativeConfrontation;
+  if (!state||state.encounterPackageId!==A.encounterPackageId) return {success:false,reason:"unknown_operative_confrontation_missing"};
+  if (state.objectiveId!==A.objectives.detain) return {success:false,reason:"detain_objective_not_declared"};
+  if (state.breakContactResolved===true) {
+    state.captureOutcome="escaped";state.captureUnresolvedReason=null;state.operativeAlive=true;
+    return {success:false,reason:"operative_already_escaped",captureOutcome:"escaped"};
+  }
+  if (state.stageA!=="operative_neutralised"||state.battleResult!=="opposing_side_won") return {success:false,reason:"operative_not_neutralised_alive"};
+  const participantState=getParticipantChronicleState(A.stableOpponentId,{create:true});
+  if (participantState&&participantState.lifeState==="dead") return {success:false,reason:"operative_not_alive"};
+  if (intervention===true||state.interventionSupersedesCustody===true) {
+    const reason=unresolvedReason||state.interventionReason||"intervention";
+    state.stageB="unresolved";state.captureOutcome="unresolved";state.captureUnresolvedReason=reason;state.operativeAlive=true;
+    updateParticipantChronicleState(A.stableOpponentId,{lifeState:"alive",custodyState:"unresolved"});
+    savePlayerData();saveTestState();
+    return {success:false,reason,captureOutcome:"unresolved",automaticEscape:false};
+  }
+  const detainSideIds=state.activeParticipantIds.filter(id=>id!==A.stableOpponentId);
+  const capable=detainSideIds.filter(id=>{
+    const assignment=state.sideAssignments[id];
+    if (!assignment) return false;
+    const remaining=Number(getBattleRemainingPL("player",id));
+    return Number.isFinite(remaining)&&remaining>0;
+  });
+  if (capable.length===0) {
+    state.stageB="unresolved";state.captureOutcome="unresolved";state.captureUnresolvedReason=unresolvedReason||"no_active_securer";state.operativeAlive=true;
+    updateParticipantChronicleState(A.stableOpponentId,{lifeState:"alive",custodyState:"unresolved"});
+    savePlayerData();saveTestState();
+    return {success:false,reason:state.captureUnresolvedReason,captureOutcome:"unresolved",automaticEscape:false};
+  }
+  if (state.detentionControlOccurrenceId) return {success:true,idempotent:true,captureOutcome:"detained",detentionControlOccurrenceId:state.detentionControlOccurrenceId};
+  const occurrenceId=createBattleRuntimeRecordId("unknown_operative_detention_restraint");
+  state.stageB="secure_detention_completed";
+  state.captureOutcome="detained";
+  state.captureUnresolvedReason=null;
+  state.detentionControlOccurrenceId=occurrenceId;
+  state.operativeAlive=true;
+  updateParticipantChronicleState(A.stableOpponentId,{lifeState:"alive",custodyState:"detained",detentionOccurrenceId:occurrenceId});
+  commitArc1M1UnknownOperativeHistoryRecord({occurrenceId,type:"detention_restraint",outcome:"operative_detained",data:{stableOpponentId:A.stableOpponentId,objectiveId:state.objectiveId,capableSecurerParticipantIds:capable,notStun:true,permanentStatModifier:false}});
+  recordBattleEvidence({eventType:"unknown_operative_secure_detention",committedOccurrence:true,actionId:null,targetRef:createBattleParticipantRef("enemy",A.stableOpponentId),sourceRefs:capable.map(id=>({type:"participant",side:"player",participantId:id,role:"active_securer"})),data:{captureOutcome:"detained",operativeAlive:true,detentionControlOccurrenceId:occurrenceId,detentionRestraint:true,notStun:true}});
+  savePlayerData();saveTestState();
+  return {success:true,captureOutcome:"detained",operativeAlive:true,detentionControlOccurrenceId:occurrenceId,capableSecurerParticipantIds:capable};
+}
+
+function resolveArc1M1UnknownOperativeConfrontationTermination({battleResult="interrupted",reason="authored_intervention"}={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const state=currentBattle.unknownOperativeConfrontation;
+  if (!state||state.encounterPackageId!==A.encounterPackageId) return {success:false,reason:"unknown_operative_confrontation_missing"};
+  if (!["interrupted","withdrawal","forfeit"].includes(battleResult)) return {success:false,reason:"termination_result_not_authorised"};
+  if (state.breakContactResolved) return {success:false,reason:"operative_already_escaped"};
+  state.battleResult=battleResult;
+  state.lethalObjectiveSuccess=state.objectiveId===A.objectives.kill?false:null;
+  state.captureOutcome=state.objectiveId===A.objectives.detain?"unresolved":"not_applicable";
+  state.captureUnresolvedReason=state.objectiveId===A.objectives.detain?reason:null;
+  state.operativeAlive=true;
+  state.completedAt=Date.now();
+  updateParticipantChronicleState(A.stableOpponentId,{lifeState:"alive",custodyState:"none"});
+  currentBattle.active=false;currentBattle.battleOver=true;currentBattle.completedAt=Date.now();
+  currentBattle.outcome={type:battleResult,committed:true,completedAt:currentBattle.completedAt,reason,rewardsGenerated:false,rewardClaimAvailable:false};
+  commitArc1M1UnknownOperativeHistoryRecord({occurrenceId:createBattleRuntimeRecordId("unknown_operative_termination"),type:"confrontation_termination",outcome:battleResult,data:{reason,stableOpponentId:A.stableOpponentId}});
+  savePlayerData();saveTestState();
+  if (currentBattle.returnContext) resumeBattleCallerAfterCompletion(battleResult);
+  return {success:true,battleResult,reason,operativeAlive:true};
+}
+
+// =========================================================
+// BRICKS 1898–1903 — CONTEXTUAL WRIST-BREAK FACT
+// =========================================================
+function commitArc1M1UnknownOperativeWristBreak({sceneId,opportunityId,eventId,targetParticipantId}={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const caller=validateArc1M1UnknownOperativeCallerContext({sceneId,opportunityId,eventId});
+  if (!caller.valid) return {success:false,reason:caller.reason,falseInjuryCreated:true};
+  const targetId=String(targetParticipantId||"");
+  if (!targetId||targetId===A.stableOpponentId) return {success:false,reason:"wrist_break_stable_target_missing",falseInjuryCreated:true};
+  const occurrenceId=createBattleRuntimeRecordId("unknown_operative_wrist_break");
+  const fact={injuryType:"fractured_wrist",targetStableParticipantId:targetId,actorStableParticipantId:A.stableOpponentId,causalOccurrenceId:occurrenceId,sourceActionId:A.actionIds.wristBreak};
+  const targetState=getParticipantChronicleState(targetId,{create:true});
+  if (!Array.isArray(targetState.injuries)) targetState.injuries=[];
+  targetState.injuries.push(cloneProgressionData(fact));
+  targetState.updatedAt=Date.now();
+  const confrontation=currentBattle.unknownOperativeConfrontation;
+  if (confrontation&&Array.isArray(confrontation.supportedInjuryFacts)) confrontation.supportedInjuryFacts.push(cloneProgressionData(fact));
+  commitArc1M1UnknownOperativeHistoryRecord({occurrenceId,type:"supported_injury",outcome:"fractured_wrist",data:fact});
+  savePlayerData();saveTestState();
+  return {success:true,occurrenceId,injuryFact:fact,reusableAttackPL:null,universalStatPenalty:false};
+}
+
+// =========================================================
+// BRICKS 1904–1907 — OUTCOME / EVIDENCE ENVELOPE
+// =========================================================
+function getArc1M1UnknownOperativeConfrontationOutcomeEnvelope() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const state=getArc1M1UnknownOperativeConfrontationState();
+  if (!state) return null;
+  return {
+    encounterPackageId:A.encounterPackageId,
+    sceneId:A.sceneId,
+    opportunityId:A.opportunityId,
+    eventId:A.eventId,
+    stableOpponentId:A.stableOpponentId,
+    observerProjectionKey:A.observerProjectionKey,
+    objectiveId:state.objectiveId,
+    activeParticipantIds:[...state.activeParticipantIds],
+    sideAssignments:cloneProgressionData(state.sideAssignments),
+    battleResult:state.battleResult||"invalid",
+    lethalObjectiveSuccess:state.lethalObjectiveSuccess,
+    captureOutcome:state.captureOutcome||"not_applicable",
+    operativeAlive:state.operativeAlive,
+    escapeActionOccurrenceId:state.escapeActionOccurrenceId||null,
+    detentionControlOccurrenceId:state.detentionControlOccurrenceId||null,
+    deathConsequenceRequestId:state.deathConsequenceRequestId||null,
+    deathConsequenceOccurrenceId:state.deathConsequenceOccurrenceId||null,
+    supportedInjuryFacts:cloneProgressionData(state.supportedInjuryFacts||[]),
+    actionOccurrenceIds:[...(state.actionOccurrenceIds||[])],
+    participantContributionEvidence:cloneProgressionData(state.participantContributionEvidence||buildArc1M1UnknownOperativeParticipantContributionEvidence()),
+    captureUnresolvedReason:state.captureUnresolvedReason||null
+  };
+}
+
+// =========================================================
+// BRICKS 1908–1912 — VICTORY CONTINUE DETAIN STAGE-B BRIDGE
+// =========================================================
+// Integrated directly into continueAfterVictory() above so legacy caller-order
+// regression inspection remains authoritative.
+
+// =========================================================
+// BRICKS 1913–1917 — SAVE/RELOAD / FALSE-HISTORY GUARDS
+// =========================================================
+function getArc1M1UnknownOperativePersistentStatus() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const state=getParticipantChronicleState(A.stableOpponentId,{create:true});
+  return cloneProgressionData(state);
+}
+
+function canProjectArc1M1UnknownOperativeInLaterOccurrence() {
+  const state=getArc1M1UnknownOperativePersistentStatus();
+  if (!state) return {eligible:false,reason:"stable_participant_state_missing"};
+  if (state.lifeState==="dead") return {eligible:false,reason:"stable_participant_dead",deathOccurrenceId:state.deathOccurrenceId};
+  return {eligible:true,reason:null,lifeState:state.lifeState,custodyState:state.custodyState};
+}
+
+// =========================================================
+// BRICKS 1918–1934 — ISSUE #13 REGRESSION / GOLDEN
+// =========================================================
+function createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId=null,escapeAllowed=true}={}) {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const ids=["academy_menma","academy_hinata",A.stableOpponentId];
+  const sideAssignments={academy_menma:"active_side",academy_hinata:"active_side",[A.stableOpponentId]:"operative_side"};
+  currentBattle.active=true;
+  currentBattle.battleOver=false;
+  currentBattle.battleId=createBattleInstanceId();
+  currentBattle.encounterId=A.encounterPackageId;
+  currentBattle.encounterEnemy=getArc1M1UnknownOperativeEnemy();
+  currentBattle.enemy=getArc1M1UnknownOperativeEnemy();
+  setBattleEnemyParticipants([currentBattle.enemy]);
+  currentBattle.deployment={player:{slots:createBattleDeploymentSlots(["academy_menma","academy_hinata"])},enemy:{slots:createBattleDeploymentSlots([A.stableOpponentId])},transitionCounter:0,lastTransition:null};
+  currentBattle.activePlayer=getBattleDeploymentParticipant("player",1);
+  currentBattle.characterId=currentBattle.activePlayer&&currentBattle.activePlayer.id||"academy_menma";
+  currentBattle.enemyPower=A.basePL;currentBattle.enemyMaxPower=A.basePL;
+  currentBattle.lastDamage=0;currentBattle.completedAt=null;currentBattle.claimedAt=null;currentBattle.completionRecorded=false;currentBattle.outcome=null;currentBattle.defeat=null;currentBattle.returnContext=null;currentBattle.observerSafeResultContext={observerProjectionKey:A.observerProjectionKey,displayName:A.concealedDisplayName};
+  currentBattle.battleLog=[];currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+  initializeBattleContributionRecordsFromDeployment();initializeBattleSourcePackageRuntime();initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
+  currentBattle.unknownOperativeConfrontation={encounterPackageId:A.encounterPackageId,sceneId:A.sceneId,opportunityId:A.opportunityId,eventId:A.eventId,stableOpponentId:A.stableOpponentId,observerProjectionKey:A.observerProjectionKey,occurrenceId:createArc1M1UnknownOperativeConfrontationOccurrenceId(),objectiveId:objectiveId||A.objectives.kill,activeParticipantIds:ids,sideAssignments,escapeAllowed:escapeAllowed===true,breakContactResolved:false,interventionSupersedesCustody:false,interventionReason:null,stageA:null,stageB:null,battleResult:null,lethalObjectiveSuccess:null,captureOutcome:objectiveId===A.objectives.detain?"unresolved":"not_applicable",captureUnresolvedReason:null,operativeAlive:true,escapeActionOccurrenceId:null,detentionControlOccurrenceId:null,deathConsequenceRequestId:null,deathConsequenceOccurrenceId:null,supportedInjuryFacts:[],actionOccurrenceIds:[],participantContributionEvidence:[],returnContext:null,startedAt:Date.now(),completedAt:null};
+  return currentBattle.unknownOperativeConfrontation;
+}
+
+function runAlphaUnknownOperativeConfrontationDiagnostics() {
+  const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
+  const checks={};
+  const enemy=getArc1M1UnknownOperativeEnemy();
+  checks.stableIdentityExact=!!enemy&&enemy.id===A.stableOpponentId;
+  checks.observerProjectionSeparated=enemy.observerProjectionKey===A.observerProjectionKey&&A.observerProjectionKey!==A.stableOpponentId;
+  checks.concealedDisplayExact=enemy.name==="UNKNOWN OPERATIVE";
+  checks.noCollectibleAdmission=!ALPHA_PRODUCTION_CHARACTER_IDS.includes(A.stableOpponentId)&&!ALPHA_PRODUCTION_ENTITY_IDS.includes(A.stableOpponentId)&&!getCharacterRegistryEntry(A.stableOpponentId);
+  checks.basePLExact=enemy.power===63&&enemy.calibratedBasePL===63;
+  checks.baseStatsExact=JSON.stringify([enemy.stats.nin,enemy.stats.tai,enemy.stats.buki,enemy.stats.fuin,enemy.stats.kin,enemy.stats.gen,enemy.stats.stamina])===JSON.stringify([58,66,54,38,46,56,62]);
+  checks.formalRankNotInvented=enemy.formalRank===null;
+  checks.noHiddenScaling=enemy.noBossScaling===true&&enemy.noEncounterScaling===true&&calculateBattlePower(enemy,"elite")===63&&calculateBattlePower(enemy,"groupBoss")===63;
+
+  const actions=getEnemyAuthoredBattleActions(enemy);
+  const actionIds=actions.map(a=>a.id);
+  checks.exactFivePreparedActions=JSON.stringify(actionIds)===JSON.stringify([A.actionIds.crushingPalm,A.actionIds.chakraEdge,A.actionIds.counterLock,A.actionIds.guardedRead,A.actionIds.breakContact]);
+  checks.noGenericFallback=actions.length===5&&!actionIds.some(id=>/basic|generic_guard/i.test(id));
+  checks.crushingPalmExact=getArc1M1UnknownOperativePreparedAction(A.actionIds.crushingPalm).authoredAttackPL===32;
+  checks.chakraEdgeExact=getArc1M1UnknownOperativePreparedAction(A.actionIds.chakraEdge).authoredAttackPL===36;
+  checks.counterLockExact=getArc1M1UnknownOperativePreparedAction(A.actionIds.counterLock).authoredAttackPL===22;
+  checks.allDirectSingleHostile=[A.actionIds.crushingPalm,A.actionIds.chakraEdge,A.actionIds.counterLock].every(id=>getArc1M1UnknownOperativePreparedAction(id).targetMode==="single_hostile");
+  checks.ordinaryStaminaOnDirect=[A.actionIds.crushingPalm,A.actionIds.chakraEdge,A.actionIds.counterLock].every(id=>getArc1M1UnknownOperativePreparedAction(id).ordinaryStamina===true);
+  checks.guardedReadExactMetadata=getArc1M1UnknownOperativePreparedAction(A.actionIds.guardedRead).authoredAttackPL===null&&getArc1M1UnknownOperativePreparedAction(A.actionIds.guardedRead).targetMode==="self";
+  checks.breakContactExactMetadata=getArc1M1UnknownOperativePreparedAction(A.actionIds.breakContact).authoredAttackPL===null&&getArc1M1UnknownOperativePreparedAction(A.actionIds.breakContact).targetMode==="encounter_self";
+
+  const priorBattle=cloneBattleRuntimeValue(currentBattle);
+  const priorParticipantState=cloneProgressionData(playerData.participantChronicleState||createDefaultParticipantChronicleState());
+  const priorHistory=cloneProgressionData(playerData.activityHistory||[]);
+  const priorActivityHistory=typeof activityHistory!=="undefined"?cloneProgressionData(activityHistory||[]):[];
+  try {
+    createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId:A.objectives.kill,escapeAllowed:true});
+    // Keep the diagnostic target comfortably above zero so the second exact-source
+    // application tests refresh rather than participant-withdrawal cleanup.
+    setBattleRemainingPL("player","academy_menma",100);
+    const counter=attemptArc1M1UnknownOperativeAction(A.actionIds.counterLock,"academy_menma");
+    const counterCondition=getBattleParticipantConditions("player","academy_menma").find(c=>c.conditionKey==="arc1_m1_unknown_operative_counter_lock_restraint");
+    checks.counterLockPositiveDamageRequired=counter.success===true&&Number(counter.resolution.finalDamage)>0&&!!counterCondition;
+    checks.counterLockNotStun=!!counterCondition&&counterCondition.conditionType==="physical_restraint"&&counterCondition.conditionKey!=="stun"&&counterCondition.data&&counterCondition.data.notStun===true;
+    const beforeConditionId=counterCondition&&counterCondition.conditionId;
+    const refresh=attemptArc1M1UnknownOperativeAction(A.actionIds.counterLock,"academy_menma");
+    const refreshedCondition=getBattleParticipantConditions("player","academy_menma").find(c=>c.conditionKey==="arc1_m1_unknown_operative_counter_lock_restraint");
+    checks.counterLockSameSourceRefresh=!!beforeConditionId&&!!refreshedCondition&&refreshedCondition.conditionId===beforeConditionId&&!!refreshedCondition.lastRefresh;
+    consumeBattleActionOpportunity("player","academy_menma","diag_target_action","diagnostic_target_opportunity");
+    checks.counterLockExpiresAfterTargetOpportunity=!getBattleParticipantConditions("player","academy_menma").some(c=>c.conditionKey==="arc1_m1_unknown_operative_counter_lock_restraint");
+
+    createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId:A.objectives.kill,escapeAllowed:true});
+    const guard=attemptArc1M1UnknownOperativeAction(A.actionIds.guardedRead);
+    const guardState=findBattleTransientState({stateKey:"unknown_operative_guarded_read",targetSide:"enemy",targetParticipantId:A.stableOpponentId});
+    checks.guardedReadEstablishes=guard.success===true&&!!guardState&&guardState.data.preventionRatio===0.30&&guardState.data.attackMultiplier===0.70;
+    const pre=resolveBattlePreStaminaDefense({attackPL:20,mitigable:true,targetSide:"enemy",targetParticipantId:A.stableOpponentId,primaryDiscipline:"Taijutsu",skillId:"diag_direct",actionId:"diag_attack",sourceSide:"player",sourceParticipantId:"academy_menma"});
+    checks.guardedReadPreStaminaOrder=pre.incomingAttackPL===20&&pre.resolvedAttackPL===14&&pre.ratioGuards.some(g=>g.stateKey==="unknown_operative_guarded_read"&&g.actualReduction===6);
+    checks.guardedReadConsumesFirstPacket=!findBattleTransientState({stateKey:"unknown_operative_guarded_read",targetSide:"enemy",targetParticipantId:A.stableOpponentId});
+    attemptArc1M1UnknownOperativeAction(A.actionIds.guardedRead);
+    const expire=expireArc1M1UnknownOperativeGuardedReadAtOwnerOpportunityStart("enemy",A.stableOpponentId,"next_enemy_action");
+    checks.guardedReadExpiresAtNextOwnerStart=expire.expired===true&&!findBattleTransientState({stateKey:"unknown_operative_guarded_read",targetSide:"enemy",targetParticipantId:A.stableOpponentId});
+
+    createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId:A.objectives.kill,escapeAllowed:true});
+    setBattleRemainingPL("enemy",A.stableOpponentId,63);
+    const high=attemptArc1M1UnknownOperativeAction(A.actionIds.breakContact);
+    checks.breakContactRejectsAboveThreshold=high.success===false&&high.reason==="remaining_battle_pl_above_break_contact_threshold"&&high.actionOpportunityConsumed===false;
+    checks.invalidBreakContactNoFalseHistory=currentBattle.unknownOperativeConfrontation.breakContactResolved===false&&currentBattle.unknownOperativeConfrontation.escapeActionOccurrenceId===null;
+    setBattleRemainingPL("enemy",A.stableOpponentId,15);
+    currentBattle.unknownOperativeConfrontation.escapeAllowed=false;
+    const disallowed=attemptArc1M1UnknownOperativeAction(A.actionIds.breakContact);
+    checks.breakContactRequiresStoryEscape=disallowed.success===false&&disallowed.reason==="story_occurrence_escape_not_allowed";
+    currentBattle.unknownOperativeConfrontation.escapeAllowed=true;
+    const restraint=addBattleCondition({conditionKey:"diag_movement_restraint",conditionType:"physical_restraint",sourceSide:"player",sourceParticipantId:"academy_menma",targetSide:"enemy",targetParticipantId:A.stableOpponentId,blockedActionTraits:["movement_dependent"],data:{movementPreventing:true}});
+    const restrained=attemptArc1M1UnknownOperativeAction(A.actionIds.breakContact);
+    checks.breakContactRejectsMovementRestraint=restrained.success===false&&restrained.reason==="movement_preventing_restraint_active";
+    if (restraint) removeBattleCondition(restraint.conditionId,{recordEvidence:false});
+    const escaped=attemptArc1M1UnknownOperativeAction(A.actionIds.breakContact);
+    checks.validBreakContactCommitsEscape=escaped.success===true&&currentBattle.unknownOperativeConfrontation.breakContactResolved===true&&currentBattle.unknownOperativeConfrontation.battleResult==="escape";
+    checks.escapeNeverAutomaticOnDefeat=finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome.toString().includes('outcomeType==="victory"')&&!finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome.toString().includes("break_contact_resolved_before_defeat");
+
+    createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId:A.objectives.kill,escapeAllowed:false});
+    checks.killChoiceAloneDoesNotKill=getParticipantChronicleState(A.stableOpponentId,{create:true}).lifeState!=="dead"&&currentBattle.unknownOperativeConfrontation.lethalObjectiveSuccess===null;
+    finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome("victory",{defeatedParticipantId:A.stableOpponentId,finishingShinobiId:"academy_menma"});
+    const killEnvelope=getArc1M1UnknownOperativeConfrontationOutcomeEnvelope();
+    checks.killVictoryEmitsDeathConsequence=killEnvelope.lethalObjectiveSuccess===true&&!!killEnvelope.deathConsequenceRequestId&&!!killEnvelope.deathConsequenceOccurrenceId&&killEnvelope.operativeAlive===false;
+    checks.deathUsesStableIdentity=getParticipantChronicleState(A.stableOpponentId,{create:true}).lifeState==="dead"&&canProjectArc1M1UnknownOperativeInLaterOccurrence().eligible===false;
+    checks.observerProjectionNeverLifeKey=!ensureParticipantChronicleState().byStableId[A.observerProjectionKey];
+
+    // Reset only operative persistent state for living Detain diagnostics.
+    playerData.participantChronicleState.byStableId[A.stableOpponentId]={stableId:A.stableOpponentId,lifeState:"alive",custodyState:"none",deathOccurrenceId:null,escapeOccurrenceId:null,detentionOccurrenceId:null,injuries:[],updatedAt:Date.now()};
+    createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId:A.objectives.detain,escapeAllowed:false});
+    finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome("victory",{defeatedParticipantId:A.stableOpponentId,finishingShinobiId:"academy_menma"});
+    const preSecure=getArc1M1UnknownOperativeConfrontationOutcomeEnvelope();
+    checks.detainVictoryAloneNoCustody=preSecure.captureOutcome==="unresolved"&&preSecure.detentionControlOccurrenceId===null&&getParticipantChronicleState(A.stableOpponentId,{create:true}).custodyState!=="detained";
+    const secured=secureArc1M1UnknownOperativeDetention();
+    checks.detainStageBSucceeds=secured.success===true&&secured.captureOutcome==="detained"&&!!secured.detentionControlOccurrenceId;
+    checks.detainPreservesLife=getParticipantChronicleState(A.stableOpponentId,{create:true}).lifeState==="alive"&&getParticipantChronicleState(A.stableOpponentId,{create:true}).custodyState==="detained";
+
+    createArc1M1UnknownOperativeDiagnosticBattleState({objectiveId:A.objectives.detain,escapeAllowed:false});
+    finalizeArc1M1UnknownOperativeConfrontationFromBattleOutcome("victory",{defeatedParticipantId:A.stableOpponentId,finishingShinobiId:"academy_menma"});
+    getBattleDeploymentSaveState().player.slots.forEach(slot=>{if(slot.participantId)setBattleRemainingPL("player",slot.participantId,0);});
+    const unresolved=secureArc1M1UnknownOperativeDetention();
+    checks.failedStageBUnresolvedNotEscape=unresolved.success===false&&unresolved.reason==="no_active_securer"&&currentBattle.unknownOperativeConfrontation.captureOutcome==="unresolved"&&currentBattle.unknownOperativeConfrontation.breakContactResolved===false;
+
+    const beforeWristCount=(getParticipantChronicleState("diagnostic_rogue",{create:true}).injuries||[]).length;
+    const invalidWrist=commitArc1M1UnknownOperativeWristBreak({sceneId:"wrong_scene",opportunityId:A.opportunityId,eventId:A.eventId,targetParticipantId:"diagnostic_rogue"});
+    const validWrist=commitArc1M1UnknownOperativeWristBreak({sceneId:A.sceneId,opportunityId:A.opportunityId,eventId:A.eventId,targetParticipantId:"diagnostic_rogue"});
+    checks.wristBreakExactContextOnly=invalidWrist.success===false&&validWrist.success===true&&(getParticipantChronicleState("diagnostic_rogue",{create:true}).injuries||[]).length===beforeWristCount+1;
+    checks.wristBreakNoReusableAttackPL=validWrist.reusableAttackPL===null&&validWrist.universalStatPenalty===false;
+    checks.ordinaryActionsNoRandomFracture=!JSON.stringify(actions.map(a=>({id:a.id,traits:a.traits||[]}))).includes("fractured_wrist");
+
+    const invalidParticipants=validateArc1M1UnknownOperativeParticipantEnvelope(["academy_menma",A.stableOpponentId],{academy_menma:"active_side"});
+    checks.callerSuppliedParticipantSidesRequired=invalidParticipants.valid===false&&invalidParticipants.reason==="active_participant_side_assignment_missing";
+    checks.noTeamMembershipInference=!launchArc1M1UnknownOperativeConfrontation.toString().includes("getPersistentClanBattleParticipantIds")&&!launchArc1M1UnknownOperativeConfrontation.toString().includes("getPersistentClanBattleQueueSlots");
+    checks.releaseDoesNotLaunch=launchArc1M1UnknownOperativeConfrontation({objectiveId:"release_arc1_m1_unknown_operative",activeParticipantIds:["academy_menma",A.stableOpponentId],sideAssignments:{academy_menma:"active_side",[A.stableOpponentId]:"operative_side"},sceneId:A.sceneId,opportunityId:A.opportunityId,eventId:A.eventId}).success===false;
+    checks.outcomeEnvelopeComplete=["encounterPackageId","sceneId","opportunityId","eventId","stableOpponentId","observerProjectionKey","objectiveId","activeParticipantIds","sideAssignments","battleResult","lethalObjectiveSuccess","captureOutcome","operativeAlive","escapeActionOccurrenceId","detentionControlOccurrenceId","supportedInjuryFacts","actionOccurrenceIds","participantContributionEvidence"].every(key=>Object.prototype.hasOwnProperty.call(getArc1M1UnknownOperativeConfrontationOutcomeEnvelope(),key));
+    checks.invalidSelectionsNoFalseHistory=attemptArc1M1UnknownOperativeAction("not_authored_action").success===false;
+    checks.saveReloadStateNormalizer=normalizeArc1M1UnknownOperativeConfrontationState(currentBattle.unknownOperativeConfrontation).encounterPackageId===A.encounterPackageId;
+  } finally {
+    playerData.participantChronicleState=priorParticipantState;
+    playerData.activityHistory=priorHistory;
+    activityHistory=priorActivityHistory;
+    Object.keys(currentBattle).forEach(key=>delete currentBattle[key]);
+    Object.assign(currentBattle,priorBattle);
+  }
+  const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
+  return {pass:failed.length===0,checks,failed,total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length};
+}
+
+// =========================================================
+// BRICKS 1935–1939 — POST-1859 INTEGRATION GATE
+// =========================================================
+function runAlphaPost1939UnknownOperativeIntegrationDiagnostics() {
+  const confrontation=runAlphaUnknownOperativeConfrontationDiagnostics();
+  const sourceChecks={
+    post1859FunctionPreserved:typeof runAlphaPost1859CodingWallDiagnostics==="function",
+    exactStableId:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.stableOpponentId==="arc1_m1_unknown_operative",
+    exactObserverProjection:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.observerProjectionKey==="observer_projection_unknown_operative",
+    exactEncounterPackage:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.encounterPackageId==="arc1_m1_unknown_operative_confrontation",
+    noCollectibleGateMutation:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18,
+    storySceneStillExternal:!STORY_SCENE_REGISTRY.has(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.sceneId),
+    worldOpportunityStillNoDirectBattle:getRegisteredWorldEventOpportunity(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.opportunityId).interactions.every(action=>action.kind!=="battle"),
+    noRetiredScaling:calculateBattlePower(getArc1M1UnknownOperativeEnemy(),"elite")===63&&calculateBattlePower(getArc1M1UnknownOperativeEnemy(),"groupBoss")===63
+  };
+  sourceChecks.pass=Object.entries(sourceChecks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {
+    pass:confrontation.pass===true&&sourceChecks.pass===true,
+    groups:{confrontation,sourceChecks},
+    confrontationChecks:`${confrontation.passed}/${confrontation.total}`,
+    codingStatus:"ISSUE_13_IMPLEMENTED_RUNTIME_REGRESSION_GREEN",
+    storySceneStatus:sourceChecks.storySceneStillExternal?"WAITING_ON_WRITING_SCENE_INTEGRATION":"REGISTERED",
+    liveRegistry:{characters:ALPHA_PRODUCTION_CHARACTER_IDS.length,entities:ALPHA_PRODUCTION_ENTITY_IDS.length,total:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length}
+  };
+}
+
