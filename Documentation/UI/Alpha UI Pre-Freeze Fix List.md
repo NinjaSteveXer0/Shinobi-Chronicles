@@ -1,67 +1,31 @@
 # Shinobi Chronicles — Alpha UI Pre-Freeze Fix List
 
-**Status:** ACTIVE UI / ASSETS ALPHA CLEANUP LIST  
+**Status:** CLOSED — CURRENTLY NO OPEN UI / ASSETS ITEMS IN THIS LIST  
 **Owner:** UI / Assets  
-**Purpose:** Track presentation defects that must be corrected before Shinobi Chronicles Alpha is considered visually/runtime-ready for freeze. This list does not imply Coding implementation is complete until source/runtime validation confirms it.
+**Purpose:** Preserve the presentation defects that were required to be corrected before Shinobi Chronicles Alpha UI freeze, together with their final closure state. A closed item must not be reopened without new runtime evidence or a genuine regression.
 
 ---
 
-## 1. Practical Training desktop geometry drift — MUST FIX BEFORE ALPHA
+## 1. Practical Training desktop geometry drift — CLOSED / BROWSER VALIDATED
 
-### Current defect
+### Historical defect
 
-The current Practical Training surface renders materially narrower than the Shinobi Exams surface at the same desktop viewport.
+Practical Training previously rendered materially narrower than Shinobi Exams at the same desktop viewport because the two screens were using different outer scaffold geometry.
 
-Observed comparison from current runtime screenshots:
+Observed before correction:
 
 - Shinobi Exams outer desktop shell: approximately 1210–1220 px wide;
 - Practical Training outer desktop shell: approximately 930 px wide;
-- Practical therefore renders at roughly 76–77% of the Exams width;
-- Practical has substantially larger black side gutters and visibly undersized dossier, PL module, discipline panels, typography and artwork.
+- Practical therefore rendered at roughly 76–77% of the Exams width;
+- Practical showed substantially larger black side gutters and visibly undersized dossier, PL module, discipline panels, typography and artwork.
 
-This is classified as **layout/geometry drift**, not an intentional stylistic difference.
+This was correctly classified as **layout/geometry drift**, not an intentional stylistic difference.
 
-### Current source diagnosis
+### Closed correction authority
 
-Current `style.css` confirms the visual mismatch is structural rather than incidental.
+**Shinobi Exams remains the sibling desktop outer-scaffold geometry authority.**
 
-Shinobi Exams currently uses the wide reference-fit scaffold:
-
-```css
-#konoha-activity-screen[data-service-id="exams"]
-.konoha-exam-screen {
-    width: min(100vw, calc(100dvh * 1.39383));
-    aspect-ratio: 1536 / 1102;
-    max-width: 100vw;
-    max-height: 100dvh;
-}
-```
-
-Practical Training currently declares an independent narrow reference canvas:
-
-```css
-#konoha-activity-screen[data-service-id="practical"]
-.konoha-practical-screen {
-    width: min(100vw, calc(100dvh * 1.0666667));
-    aspect-ratio: 16 / 15;
-    max-width: 100vw;
-    max-height: 100dvh;
-}
-```
-
-The Practical block also explicitly documents the underlying `practical.png` reference as **1536 × 1440** and states that Practical owns independent geometry while Exams remains untouched.
-
-That old independence is now superseded for Alpha desktop presentation by this fix-list authority:
-
-**Shinobi Exams is the sibling outer-scaffold geometry authority.**
-
-At a height-limited desktop viewport, `1.0666667 / 1.39383 ≈ 0.765`, which directly explains the observed Practical width of roughly 76–77% of Exams.
-
-### Alpha correction authority
-
-**Shinobi Exams is the desktop geometry authority.**
-
-Practical Training must use the same approved desktop page scaffold for:
+Practical Training uses the same intended desktop page-scale family for:
 
 - overall outer width / max-width;
 - horizontal centering;
@@ -76,71 +40,44 @@ Content remains distinct:
 - Exams: Ninjutsu / Genjutsu / Fūinjutsu;
 - Practical: Taijutsu / Bukijutsu / Stamina.
 
-### Surgical implementation guardrail
-
-Do **not** treat this as permission to mechanically replace Practical's `16 / 15` aspect ratio with `1536 / 1102` while leaving the 1536×1440 baked Practical artwork stretched to `100% × 100%`.
-
-That would remove the side gutters but non-uniformly distort baked typography, ornamentation and artwork, which is not an acceptable Alpha fix.
-
-Likewise, do not solve the problem by:
-
-- whole-screen `transform: scale(...)` enlargement;
-- arbitrary horizontal stretching;
-- destructive top/bottom cropping that removes the header, footer or discipline presentation;
-- cloning every internal Exams coordinate into Practical;
-- changing Practical content or semantics.
-
-The implementation must instead establish the **same wide outer desktop scaffold and sibling dossier/content scale** while preserving Practical's approved visual proportions. Practical-specific internal overlays may be recalibrated proportionally against the corrected scaffold where required.
-
-If the current baked `practical.png` cannot be presented at the shared scaffold without unacceptable stretch or clipping, that is a presentation-asset reframing problem and must be returned to UI / Assets rather than hidden with distortion.
-
-### Non-redesign rule
-
-Do **not** redesign Practical Training.
-
-Preserve its approved:
-
-- visual identity;
-- artwork family;
-- discipline content;
-- colours;
-- typography;
-- controls;
-- ornamentation;
-- semantic hierarchy.
-
-Practical remains the sibling training surface, not an Exams clone.
-
 Preserve:
 
 **Shinobi Exams scaffold authority ≠ clone every internal Practical element**
 
 **geometry correction ≠ visual redesign**
 
-### Required validation
+### Physical asset / implementation closure
 
-Before Alpha freeze, verify at minimum:
+The accepted Practical production asset is bound at:
 
-1. Practical and Exams render with matching intended outer desktop scaffold width at the same viewport;
-2. left dossier widths/visual scale align to the approved sibling architecture;
-3. content columns and footer controls align to the same page geometry;
-4. no new clipping, overflow, blur, non-uniform distortion or hitbox drift is introduced;
-5. responsive behavior remains functional at supported widths;
-6. Practical-specific content remains unchanged except where geometry requires proportional layout correction;
-7. the corrected Practical screen is runtime/browser-validated side-by-side against Exams at the same desktop viewport used for the original defect comparison.
+`UI/practical.png`
 
-Preserve:
+GitHub Issue #9 records the completed physical-master and runtime integration loop:
 
-**shared sibling scaffold ≠ identical content**
+- the Practical physical master landed at the production path under the locked wide-scaffold reframe contract;
+- the accepted integration path remained `UI/practical.png` through subsequent UI / Assets refinements;
+- Coding recalibrated Practical to the 1536×1102 sibling scaffold family;
+- card / PL / mastery / EXP geometry, independent batch controls, result routing, Special Notifications and visible character navigation were integrated through the final Practical polish loop;
+- Stephen browser-validated the completed Practical screen in runtime.
 
-**geometry correction ≠ redesign**
+No further Practical remaster, geometry correction or UI / Assets action is required for Alpha.
 
-**visual approval ≠ runtime validation**
+### Final state
+
+**Design:** CLOSED  
+**Production asset:** LANDED  
+**Coding integration:** COMPLETE  
+**Runtime/browser validation:** GREEN  
+**Alpha UI / Assets status:** **100% COMPLETE FOR THIS ITEM**
+
+Do not reopen this item because of historical references to the old 16:15 / narrow Practical geometry. Those references are superseded by the completed production/runtime result.
 
 ---
 
 ## Completion gate
 
-UI / Assets has now closed the **diagnosis and correction contract**.
+The Practical Training pre-freeze blocker is fully consumed and closed.
 
-This item remains **OPEN — MUST FIX BEFORE ALPHA FREEZE** until SC Coding implements the corrected Practical geometry and returns runtime/browser evidence showing the side-by-side validation is GREEN.
+This file currently contains **no open UI / Assets Alpha pre-freeze defect**.
+
+Future defects belong here only when supported by new current-source/runtime evidence.
