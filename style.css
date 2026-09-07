@@ -14998,3 +14998,101 @@ body {
     background: transparent !important;
     box-shadow: none !important;
 }
+
+/* =========================================================
+   PRACTICAL EXP BARS — FINAL INDEPENDENT POSITION AUTHORITY
+   ========================================================= */
+
+/* ---------------------------------------------------------
+   POWER LEVEL PROGRESS
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-character-pl-progress {
+    left: 4.7% !important;
+    top: 69.65% !important;
+    width: 19% !important;
+    height: 6px !important;
+}
+
+
+/* ---------------------------------------------------------
+   TAIJUTSU EXP BAR
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(1)
+.practical-progress-track {
+    left: 15.6% !important;
+    top: 85% !important;
+    width: 19% !important;
+    height: 6px !important;
+}
+
+
+/* ---------------------------------------------------------
+   BUKIJUTSU EXP BAR
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2)
+.practical-progress-track {
+    left: 15.8% !important;
+    top: 86.5% !important;
+    width: 19% !important;
+    height: 6px !important;
+}
+
+
+/* ---------------------------------------------------------
+   SURVIVAL EXP BAR
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3)
+.practical-progress-track {
+    left: 15.8% !important;
+    top: 83.5% !important;
+    width: 18.8%!important;
+    height: 6px !important;
+}
+
+/* =========================================================
+   PRACTICAL RESULT — SURVIVAL ARTWORK RESULT ZONE
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-stage {
+    left: 80% !important;
+    top: 37% !important;
+
+    bottom: auto !important;
+
+    width: 17.5% !important;
+    min-height: 10% !important;
+
+    transform: translateX(-50%) !important;
+
+    z-index: 40 !important;
+
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 1px !important;
+
+    text-align: center !important;
+    pointer-events: none !important;
+}
+
+/* =========================================================
+   PRACTICAL RESULT — SUBTEXT DARKER
+   ========================================================= */
+
+#konoha-activity-screen[data-service-id="practical"]
+.practical-result-reward {
+    color: #FFD447 !important;
+    text-shadow:
+        0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}

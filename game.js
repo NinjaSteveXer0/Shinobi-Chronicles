@@ -64614,6 +64614,276 @@ function changeKonohaPracticalCharacter(
 // =========================================================
 
 
+// =========================================================
+// POST-1986 — PRACTICAL RESULT → SPECIAL NOTIFICATIONS
+// =========================================================
+//
+// Routine Practical outcome feedback no longer floats over the
+// authored training artwork. One batch-summary notification is
+// projected into the existing Special Notifications feed instead.
+//
+// The notification is presentation only. PASS/FAIL authority remains
+// the Post-1983 attempt resolver; EXP/PL authority remains unchanged.
+// =========================================================
+
+
+function buildKonohaPracticalBatchResultNotification(
+  characterId
+) {
+
+
+  const meta =
+    KONOHA_PRACTICAL_UI_STATE
+      .lastBatchMeta;
+
+
+  const results =
+    Array.isArray(
+      KONOHA_PRACTICAL_UI_STATE
+        .lastBatch
+    )
+
+      ? KONOHA_PRACTICAL_UI_STATE
+          .lastBatch
+
+      : [];
+
+
+  if (
+    !meta ||
+    meta.characterId !==
+      characterId ||
+    results.length ===
+      0
+  ) {
+
+
+    return null;
+
+  }
+
+
+  const successfulResults =
+    results.filter(
+      result =>
+        result &&
+        result.success ===
+          true
+    );
+
+
+  const failedResults =
+    results.filter(
+      result =>
+        !result ||
+        result.success !==
+          true
+    );
+
+
+  let title =
+    "FAIL";
+
+
+  let type =
+    "result-fail";
+
+
+  if (
+    successfulResults.length ===
+      results.length
+  ) {
+
+
+    title =
+      "PASS";
+
+
+    type =
+      "result-pass";
+
+  }
+  else if (
+    successfulResults.length >
+      0
+  ) {
+
+
+    title =
+      `${successfulResults.length} PASS · ${failedResults.length} FAIL`;
+
+
+    type =
+      "result-mixed";
+
+  }
+
+
+  const totalExp =
+    successfulResults.reduce(
+      (
+        total,
+        result
+      ) =>
+        total +
+        (
+          Number(
+            result.expGained
+          ) || 0
+        ),
+      0
+    );
+
+
+  const finalResult =
+    successfulResults[
+      successfulResults.length - 1
+    ] ||
+    results[
+      results.length - 1
+    ] ||
+    {};
+
+
+  const disciplineName =
+    String(
+      finalResult.disciplineName ||
+      meta.disciplineId ||
+      getKonohaPracticalSelectedDisciplineId()
+    ).toUpperCase();
+
+
+  const detailParts = [
+
+    totalExp > 0
+
+      ? `+${totalExp} ${disciplineName} EXP`
+
+      : `0 ${disciplineName} EXP`
+
+  ];
+
+
+  if (
+    meta.beforePL &&
+    meta.afterPL
+  ) {
+
+
+    const beforeDisplayed =
+      Number(
+        meta.beforePL.displayedPL
+      ) || 0;
+
+
+    const afterDisplayed =
+      Number(
+        meta.afterPL.displayedPL
+      ) || beforeDisplayed;
+
+
+    if (
+      afterDisplayed >
+        beforeDisplayed
+    ) {
+
+
+      detailParts.push(
+        `POWER LEVEL ${beforeDisplayed} → ${afterDisplayed}`
+      );
+
+    }
+    else {
+
+
+      const beforeRaw =
+        Number(
+          meta.beforePL.rawPL
+        ) || 0;
+
+
+      const afterRaw =
+        Number(
+          meta.afterPL.rawPL
+        ) || beforeRaw;
+
+
+      const rawDifference =
+        Math.max(
+          0,
+          afterRaw -
+          beforeRaw
+        );
+
+
+      const progressGain =
+        rawDifference *
+        100;
+
+
+      detailParts.push(
+        progressGain > 0
+
+          ? `PL PROGRESS +${progressGain.toFixed(2)}%`
+
+          : "NO PL DEVELOPMENT"
+      );
+
+    }
+
+  }
+
+
+  const failedReasonResult =
+    failedResults.find(
+      result =>
+        result &&
+        result.reason
+    );
+
+
+  if (
+    failedReasonResult &&
+    failedReasonResult.reason
+  ) {
+
+
+    detailParts.push(
+      `TRAINING UNAVAILABLE — ${String(
+        failedReasonResult.reason
+      )}`
+    );
+
+  }
+
+
+  return {
+
+    id:
+      `practical-result-${characterId}-${meta.disciplineId}-${Date.now()}`,
+
+    characterId:
+      characterId,
+
+    type:
+      type,
+
+    title:
+      title,
+
+    detail:
+      detailParts.join(
+        " · "
+      ),
+
+    timestamp:
+      Date.now()
+
+  };
+
+}
+
+
 function buildKonohaPracticalSpecialNotifications(
   characterId
 ) {
@@ -64648,6 +64918,22 @@ function buildKonohaPracticalSpecialNotifications(
 
 
     return notifications;
+
+  }
+
+
+  const batchResult =
+    buildKonohaPracticalBatchResultNotification(
+      characterId
+    );
+
+
+  if (batchResult) {
+
+
+    notifications.push(
+      batchResult
+    );
 
   }
 
@@ -64724,57 +65010,6 @@ function buildKonohaPracticalSpecialNotifications(
         Date.now()
 
     });
-
-  }
-
-
-  if (
-    meta.beforePL &&
-    meta.afterPL
-  ) {
-
-
-    const plBefore =
-      Number(
-        meta.beforePL.displayedPL
-      ) || 0;
-
-
-    const plAfter =
-      Number(
-        meta.afterPL.displayedPL
-      ) || plBefore;
-
-
-    if (
-      plAfter >
-        plBefore
-    ) {
-
-
-      notifications.push({
-
-        id:
-          `practical-power-${characterId}-${plAfter}-${Date.now()}`,
-
-        characterId:
-          characterId,
-
-        type:
-          "power",
-
-        title:
-          "POWER LEVEL INCREASED",
-
-        detail:
-          `POWER LEVEL ${plBefore} → ${plAfter}`,
-
-        timestamp:
-          Date.now()
-
-      });
-
-    }
 
   }
 
@@ -66195,10 +66430,11 @@ function executeKonohaPracticalTraining() {
     };
 
 
+  // POST-1986: routine PASS/FAIL now lives in Special Notifications.
+  // No floating ordinary-result stage remains active.
   KONOHA_PRACTICAL_UI_STATE
     .resultVisible =
-      results.length >
-        0;
+      false;
 
 
   recordKonohaPracticalSpecialNotifications(
@@ -66259,8 +66495,7 @@ function executeKonohaPracticalTraining() {
 // - live PL presentation
 // - live Discipline presentation
 // - batch controls
-// - ordinary training result
-// - Special Notifications
+// - Special Notifications, including ordinary PASS/FAIL batch feedback
 // - BEGIN TRAINING interaction
 //
 // Gameplay progression remains external.
@@ -66347,10 +66582,6 @@ function renderKonohaPracticalVisualScreen() {
         ) || 0
       )
     );
-
-
-  const resultSummary =
-    renderKonohaPracticalResultSummary();
 
 
   const specialNotifications =
@@ -66649,26 +66880,9 @@ function renderKonohaPracticalVisualScreen() {
 
 
       <!-- =====================================
-           ORDINARY TRAINING RESULT
+           PRACTICAL RESULT FEEDBACK
+           Routed to Special Notifications by Post-1986.
            ===================================== -->
-
-      <div
-        class="
-          practical-result-stage
-          ${
-            resultSummary
-              ? "visible"
-              : "empty"
-          }
-        "
-        aria-live="
-          polite
-        "
-      >
-
-        ${resultSummary}
-
-      </div>
 
 
       <!-- =====================================
@@ -66790,7 +67004,7 @@ function renderKonohaPracticalVisualScreen() {
 // Persistent character progression remains untouched.
 //
 // Cleared on entry:
-// - old ordinary result
+// - old batch-result projection state
 // - old batch result metadata
 //
 // Preserved:
@@ -67313,7 +67527,7 @@ function validateKonohaPracticalFinalReadiness() {
 
 
     resultPresentation:
-      typeof renderKonohaPracticalResultSummary ===
+      typeof buildKonohaPracticalBatchResultNotification ===
         "function",
 
 
