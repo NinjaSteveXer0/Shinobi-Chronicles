@@ -13958,8 +13958,14 @@ body {
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(1) {
+    left:
+        29.00% !important;
+
     top:
         14.10% !important;
+
+    width:
+        68.00% !important;
 
     height:
         23.55% !important;
@@ -13967,8 +13973,14 @@ body {
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(2) {
+    left:
+        29.00% !important;
+
     top:
         40.35% !important;
+
+    width:
+        68.00% !important;
 
     height:
         22.60% !important;
@@ -13976,8 +13988,14 @@ body {
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(3) {
+    left:
+        29.00% !important;
+
     top:
         66.10% !important;
+
+    width:
+        68.00% !important;
 
     height:
         21.65% !important;
