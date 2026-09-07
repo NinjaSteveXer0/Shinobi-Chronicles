@@ -93292,6 +93292,36 @@ async function runAlphaLive116UIPortraitBinaryQADiagnostics() {
 }
 
 // =========================================================
+// BRICKS 1970–1972 — LIVE-116 PORTRAIT NO-REMAP AUTHORITY CONSUMPTION
+// =========================================================
+const LIVE116_PORTRAIT_REPRESENTATION_AUTHORITY = Object.freeze({
+  status:"NO_FURTHER_REMAP_REQUIRED_FOR_ALPHA",
+  authorityDocument:"Documentation/Assets/Live 116 Battle Portrait Representation Audit 2026-09-07.md",
+  authorityCommit:"788a82435b2435ca8f805c81f84b9a0dc93473b0",
+  physicalTreeCorrectionCommit:"aa422f1d0f74f5d210e0d1678fd57c46a20b2277",
+  pathRemapRequired:false,
+  inferMappingsFromPhysicalTree:false,
+  collectibleCardFallbackAllowed:false
+});
+
+function runAlphaLive116PortraitNoRemapAuthorityDiagnostics() {
+  const authority=LIVE116_PORTRAIT_REPRESENTATION_AUTHORITY;
+  const staticGate=runAlphaLive116UIPortraitManifestDiagnostics();
+  const result={
+    exactVerdict:authority.status==="NO_FURTHER_REMAP_REQUIRED_FOR_ALPHA",
+    noPathRemapRequired:authority.pathRemapRequired===false,
+    physicalTreeInferenceForbidden:authority.inferMappingsFromPhysicalTree===false,
+    collectibleCardFallbackForbidden:authority.collectibleCardFallbackAllowed===false&&staticGate.noCollectibleCardFallback===true,
+    live116ManifestStillExact:staticGate.pass===true,
+    exactAuthorityCommit:authority.authorityCommit==="788a82435b2435ca8f805c81f84b9a0dc93473b0",
+    exactPhysicalTreeCorrectionCommit:authority.physicalTreeCorrectionCommit==="aa422f1d0f74f5d210e0d1678fd57c46a20b2277",
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {authority,staticGate,result,pass:result.pass};
+}
+
+// =========================================================
 // BRICKS 1737–1744 — ENEMY PRESENTATION ASSET TRUTH
 // =========================================================
 const ALPHA_LIVE_ENEMY_PRESENTATION_PATHS=Object.freeze({
@@ -93617,18 +93647,20 @@ function runAlphaPresentationAuthorityCodingWallDiagnostics() {
   const supplemental=runAlphaSupplemental14PortraitProjectionDiagnostics();
   const enemies=runAlphaEnemyPresentationPathDiagnostics();
   const projection=runAlphaProductionProjectionHardeningDiagnostics();
+  const representationAuthority=runAlphaLive116PortraitNoRemapAuthorityDiagnostics();
   const result={
     liveManifestStaticGreen:portraitStatic.pass===true,
     supplementalRatifiedPathsGreen:supplemental.pass===true,
     enemyResolverGreen:enemies.pass===true,
     cardPortraitSeparationGreen:projection.pass===true,
+    noRemapRepresentationAuthorityGreen:representationAuthority.pass===true,
     collectibleCardFallbackForbidden:!resolveUIPortraitProjection.toString().includes("getCharacterCardAssetPath")&&!resolveUIPortraitProjection.toString().includes("getEntityCollectibleCardAssetPath"),
     broadBinaryQARemainsExplicit:typeof runAlphaLive116UIPortraitBinaryQADiagnostics==="function",
-    physicalTreeDoesNotAuthorMappings:true,
+    physicalTreeDoesNotAuthorMappings:LIVE116_PORTRAIT_REPRESENTATION_AUTHORITY.inferMappingsFromPhysicalTree===false,
     pass:false
   };
   result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
-  return {result,groups:{portraitStatic,supplemental,enemies,projection},pass:result.pass};
+  return {result,groups:{portraitStatic,supplemental,enemies,projection,representationAuthority},pass:result.pass};
 }
 
 // =========================================================
@@ -93666,17 +93698,21 @@ async function runAlphaPost1859CodingWallDiagnostics({runFullPortraitBinaryQA=fa
   const fullPortraitBinaryQA=runFullPortraitBinaryQA?await runAlphaLive116UIPortraitBinaryQADiagnostics():null;
   const groups={post1779,mapStatic,mapBinary,journey,origins,registry,presentation,practicalCombat};
   const codingOwnedPass=Object.values(groups).every(group=>group&&(group.pass===true||group.codingPass===true));
+  const portraitNoRemapAuthority=runAlphaLive116PortraitNoRemapAuthorityDiagnostics();
   const blockers={
     whisperWoodsMajorContact:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId)?null:"WRITING_scene_arc1_m1_whisper_major_contact",
     whisperWoodsBattlePackage:(typeof launchArc1M1UnknownOperativeConfrontation==="function"&&typeof getArc1M1UnknownOperativePreparedAction==="function"&&getArc1M1UnknownOperativePreparedAction("arc1_m1_unknown_operative_break_contact"))?null:"NOT_AUTHORISED_UNTIL_WRITING_ESTABLISHES_CAUSAL_CONFRONTATION",
     practical1536x1102:getPracticalDesktopSourceIntegrationPlan({}).ready?null:"UI_ASSETS_PHYSICAL_MASTER_REQUIRED",
     originConsequenceSourceOccurrences:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length?`SOURCE_OCCURRENCE_IDS_REQUIRED_${ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length}`:null,
-    broadPortraitReconciliation:"CHARACTER_CREATION_UI_ASSETS_REGISTRY_AUTHORITY_REQUIRED_BEFORE_PATH_REMAPS"
+    live116PortraitBinaryRuntimeQA:portraitNoRemapAuthority.pass!==true
+      ?"LIVE116_PORTRAIT_REPRESENTATION_AUTHORITY_REGRESSED"
+      :(runFullPortraitBinaryQA?(fullPortraitBinaryQA&&fullPortraitBinaryQA.pass===true?null:"LIVE116_PORTRAIT_BINARY_QA_FAILED"):"LIVE116_PORTRAIT_BINARY_QA_REQUIRED")
   };
   const activeBlockers=Object.fromEntries(Object.entries(blockers).filter(([,value])=>value));
   return {
     groups,
     fullPortraitBinaryQA,
+    portraitNoRemapAuthority,
     codingOwnedPass,
     codingWallReached:codingOwnedPass===true&&Object.keys(activeBlockers).length>0,
     activeBlockers,
@@ -93686,6 +93722,44 @@ async function runAlphaPost1859CodingWallDiagnostics({runFullPortraitBinaryQA=fa
     remainingBlockedOriginRows:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length,
     combatFreezePreserved:true,
     nextImplementedBrick:1859
+  };
+}
+
+// =========================================================
+// BRICKS 1973–1979 — LIVE-116 PORTRAIT QA / CODING-WALL CLOSURE
+// =========================================================
+async function runAlphaPost1979PortraitAuthorityIntegrationDiagnostics({runFullPortraitBinaryQA=false}={}) {
+  const post1969=runAlphaPost1969MEN03IntegrationDiagnostics();
+  const representationAuthority=runAlphaLive116PortraitNoRemapAuthorityDiagnostics();
+  const staticManifest=runAlphaLive116UIPortraitManifestDiagnostics();
+  const presentationWall=runAlphaPresentationAuthorityCodingWallDiagnostics();
+  const post1859=await runAlphaPost1859CodingWallDiagnostics({runFullPortraitBinaryQA});
+  const binary=post1859.fullPortraitBinaryQA;
+  const result={
+    post1969Preserved:post1969.pass===true,
+    noRemapAuthorityConsumed:representationAuthority.pass===true,
+    exactLive116StaticManifest:staticManifest.pass===true,
+    presentationAuthorityWallGreen:presentationWall.pass===true,
+    staleBroadRemapBlockerRemoved:!Object.prototype.hasOwnProperty.call(post1859.activeBlockers,"broadPortraitReconciliation"),
+    binaryQABlockerTruthful:runFullPortraitBinaryQA
+      ?(binary&&binary.pass===true&&!Object.prototype.hasOwnProperty.call(post1859.activeBlockers,"live116PortraitBinaryRuntimeQA"))
+      :post1859.activeBlockers.live116PortraitBinaryRuntimeQA==="LIVE116_PORTRAIT_BINARY_QA_REQUIRED",
+    noCollectibleCardFallback:staticManifest.noCollectibleCardFallback===true,
+    noPathMutationPerformed:LIVE116_PORTRAIT_REPRESENTATION_AUTHORITY.pathRemapRequired===false,
+    exactRegistryCount:getAlphaLive116RegistryIds().length===116,
+    pass:false
+  };
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {
+    result,
+    post1969,
+    representationAuthority,
+    staticManifest,
+    presentationWall,
+    binary,
+    post1859ActiveBlockers:post1859.activeBlockers,
+    nextImplementedBrick:1979,
+    pass:result.pass
   };
 }
 
