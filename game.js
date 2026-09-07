@@ -65220,6 +65220,636 @@ function renderKonohaPracticalResultSummary() {
 
 
 // =========================================================
+// POST-1983 — PRACTICAL PASS / FAIL BALANCE AUTHORITY
+// =========================================================
+//
+// Practical now resolves genuine attempts with the same balance model
+// established by Konoha Exams:
+// - hidden mastery-scaled difficulty;
+// - natural Stat contribution;
+// - Discipline Mastery contribution;
+// - recent-history failure assist / confidence bonus;
+// - one bounded random contribution;
+// - EXP only on a resolved pass.
+//
+// Practical history remains source-specific. Exam history does not alter
+// Practical resolution and Practical history does not alter Exam resolution.
+// Failed completed attempts are Chronicle evidence but grant zero EXP.
+// =========================================================
+
+function createKonohaPracticalAttemptContext(
+  characterId,
+  disciplineId
+) {
+
+  const eligibility =
+    getTrainingEligibility(
+      characterId,
+      disciplineId,
+      "practical"
+    );
+
+  if (
+    !eligibility ||
+    eligibility.allowed !== true
+  ) {
+
+    return null;
+
+  }
+
+  const character =
+    getPlayerCharacter(
+      characterId
+    );
+
+  const discipline =
+    getShinobiDiscipline(
+      disciplineId
+    );
+
+  const progression =
+    getCharacterDisciplineProgression(
+      characterId,
+      disciplineId
+    );
+
+  if (
+    !character ||
+    !discipline ||
+    !progression
+  ) {
+
+    return null;
+
+  }
+
+  return {
+
+    activity:
+      "practical",
+
+    characterId:
+      character.id,
+
+    disciplineId:
+      discipline.id,
+
+    disciplineName:
+      discipline.name,
+
+    disciplineLevel:
+      Number(
+        progression.level
+      ) || 1,
+
+    disciplineExp:
+      Number(
+        progression.exp
+      ) || 0,
+
+    statValue:
+      Number(
+        character.stats[
+          disciplineId
+        ]
+      ) || 0,
+
+    createdAt:
+      Date.now()
+
+  };
+
+}
+
+
+function getKonohaPracticalHistoryPressure(
+  characterId,
+  disciplineId
+) {
+
+  const history =
+    getActivityHistory()
+      .filter(
+        entry =>
+          entry &&
+          entry.activity ===
+            "practical" &&
+          entry.character ===
+            characterId &&
+          entry.practical &&
+          entry.practical.disciplineId ===
+            disciplineId
+      )
+      .slice(
+        -5
+      );
+
+  let consecutiveFailures =
+    0;
+
+  for (
+    let index =
+      history.length - 1;
+    index >= 0;
+    index -= 1
+  ) {
+
+    if (
+      history[index].success ===
+        false
+    ) {
+
+      consecutiveFailures +=
+        1;
+
+    }
+    else {
+
+      break;
+
+    }
+
+  }
+
+  const recentSuccesses =
+    history.filter(
+      entry =>
+        entry.success ===
+          true
+    ).length;
+
+  return {
+
+    recentAttempts:
+      history.length,
+
+    consecutiveFailures:
+      consecutiveFailures,
+
+    recentSuccesses:
+      recentSuccesses,
+
+    failureAssist:
+      Math.min(
+        24,
+        consecutiveFailures * 8
+      ),
+
+    confidenceBonus:
+      Math.min(
+        6,
+        recentSuccesses * 2
+      )
+
+  };
+
+}
+
+
+function resolveKonohaPracticalAttempt(
+  context
+) {
+
+  if (!context) {
+
+    return null;
+
+  }
+
+  // Exact hidden-difficulty curve already proven by Exams.
+  const difficulty =
+    getKonohaExamHiddenDifficulty(
+      context
+    );
+
+  const history =
+    getKonohaPracticalHistoryPressure(
+      context.characterId,
+      context.disciplineId
+    );
+
+  // Keep Practical resolution numerically identical to the Exam model.
+  const statContribution =
+    Math.min(
+      34,
+      context.statValue * 0.34
+    );
+
+  const masteryContribution =
+    Math.min(
+      24,
+      context.disciplineLevel * 2.4
+    );
+
+  const randomContribution =
+    Math.random() * 42;
+
+  const score =
+    statContribution +
+    masteryContribution +
+    history.failureAssist +
+    history.confidenceBonus +
+    randomContribution;
+
+  const passed =
+    score >= difficulty;
+
+  return {
+
+    passed:
+      passed,
+
+    outcome:
+      passed
+        ? "pass"
+        : "fail",
+
+    difficulty:
+      difficulty,
+
+    score:
+      Number(
+        score.toFixed(
+          2
+        )
+      ),
+
+    history:
+      history
+
+  };
+
+}
+
+
+function recordKonohaPracticalAttempt(
+  context,
+  resolution,
+  rewardExp
+) {
+
+  if (
+    !context ||
+    !resolution
+  ) {
+
+    return false;
+
+  }
+
+  const successful =
+    resolution.passed ===
+      true;
+
+  const progressionRewards =
+    successful &&
+    rewardExp > 0
+
+      ? [
+          {
+            type:
+              "discipline",
+
+            id:
+              context.disciplineId,
+
+            amount:
+              rewardExp
+          }
+        ]
+
+      : [];
+
+  activityHistory.push({
+
+    activity:
+      "practical",
+
+    character:
+      context.characterId,
+
+    completed:
+      true,
+
+    success:
+      successful,
+
+    outcome:
+      resolution.outcome,
+
+    practical: {
+
+      disciplineId:
+        context.disciplineId,
+
+      disciplineName:
+        context.disciplineName,
+
+      disciplineLevel:
+        context.disciplineLevel,
+
+      statValue:
+        context.statValue
+
+    },
+
+    rewards: {
+
+      exp:
+        0,
+
+      ryo:
+        0,
+
+      items:
+        [],
+
+      progression:
+        progressionRewards
+
+    },
+
+    timestamp:
+      Date.now()
+
+  });
+
+  syncActivityHistory();
+  savePlayerData();
+
+  return true;
+
+}
+
+
+function executeKonohaPracticalAttempt(
+  characterId,
+  disciplineId
+) {
+
+  const context =
+    createKonohaPracticalAttemptContext(
+      characterId,
+      disciplineId
+    );
+
+  if (!context) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "practical_context_invalid"
+
+    };
+
+  }
+
+  const before =
+    getTrainingActionData(
+      characterId,
+      disciplineId
+    );
+
+  if (!before) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "practical_training_snapshot_failed"
+
+    };
+
+  }
+
+  const resolution =
+    resolveKonohaPracticalAttempt(
+      context
+    );
+
+  if (!resolution) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "practical_resolution_failed"
+
+    };
+
+  }
+
+  const activity =
+    getActivityData(
+      "practical"
+    );
+
+  const rewardDefinition =
+    activity &&
+    Array.isArray(
+      activity.rewards
+    )
+
+      ? activity.rewards.find(
+          reward =>
+            reward &&
+            reward.type ===
+              "discipline" &&
+            reward.id ===
+              disciplineId
+        )
+
+      : null;
+
+  const rewardExp =
+    rewardDefinition
+
+      ? Number(
+          rewardDefinition.amount
+        ) || 0
+
+      : 0;
+
+  if (
+    resolution.passed ===
+      true
+  ) {
+
+    const progressionApplied =
+      addDisciplineExp(
+        characterId,
+        disciplineId,
+        rewardExp,
+        "practical"
+      );
+
+    if (!progressionApplied) {
+
+      return {
+
+        success:
+          false,
+
+        completed:
+          false,
+
+        reason:
+          "practical_progression_failed"
+
+      };
+
+    }
+
+  }
+
+  const recorded =
+    recordKonohaPracticalAttempt(
+      context,
+      resolution,
+      resolution.passed
+        ? rewardExp
+        : 0
+    );
+
+  if (!recorded) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "practical_history_failed"
+
+    };
+
+  }
+
+  const after =
+    getTrainingActionData(
+      characterId,
+      disciplineId
+    );
+
+  if (!after) {
+
+    return {
+
+      success:
+        false,
+
+      completed:
+        false,
+
+      reason:
+        "practical_post_snapshot_failed"
+
+    };
+
+  }
+
+  return {
+
+    success:
+      resolution.passed,
+
+    completed:
+      true,
+
+    outcome:
+      resolution.outcome,
+
+    characterId:
+      characterId,
+
+    characterName:
+      after.characterName,
+
+    disciplineId:
+      disciplineId,
+
+    disciplineName:
+      after.disciplineName,
+
+    source:
+      "practical",
+
+    expGained:
+      resolution.passed
+        ? rewardExp
+        : 0,
+
+    rewardExp:
+      rewardExp,
+
+    previousLevel:
+      before.trainingLevel,
+
+    newLevel:
+      after.trainingLevel,
+
+    levelsGained:
+      after.trainingLevel -
+      before.trainingLevel,
+
+    leveledUp:
+      after.trainingLevel >
+      before.trainingLevel,
+
+    previousStat:
+      before.naturalStat,
+
+    newStat:
+      after.naturalStat,
+
+    statPointsGained:
+      after.naturalStat -
+      before.naturalStat,
+
+    previousExp:
+      before.exp,
+
+    currentExp:
+      after.exp,
+
+    expToNext:
+      after.expToNext,
+
+    difficulty:
+      resolution.difficulty,
+
+    score:
+      resolution.score,
+
+    historyPressure:
+      resolution.history
+
+  };
+
+}
+
+
+// =========================================================
 // PRACTICAL TRAINING EXECUTION
 // =========================================================
 
@@ -65316,10 +65946,9 @@ function executeKonohaPracticalTraining() {
 
 
     const result =
-      performDisciplineTraining(
+      executeKonohaPracticalAttempt(
         characterId,
-        disciplineId,
-        "practical"
+        disciplineId
       );
 
 
@@ -65329,7 +65958,22 @@ function executeKonohaPracticalTraining() {
 
 
     if (
-      result &&
+      !result ||
+      result.completed !==
+        true
+    ) {
+
+
+      failedAttempts +=
+        1;
+
+
+      break;
+
+    }
+
+
+    if (
       result.success ===
         true
     ) {
@@ -65338,14 +65982,12 @@ function executeKonohaPracticalTraining() {
       successfulAttempts +=
         1;
 
-    } else {
+    }
+    else {
 
 
       failedAttempts +=
         1;
-
-
-      break;
 
     }
 
@@ -65488,6 +66130,8 @@ function executeKonohaPracticalTraining() {
 // - BEGIN TRAINING interaction
 //
 // Gameplay progression remains external.
+// Practical pass/fail resolution is owned by the Post-1983 attempt resolver;
+// addDisciplineExp() remains persistent Discipline progression authority.
 //
 // =========================================================
 
