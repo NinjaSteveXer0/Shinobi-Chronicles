@@ -1,26 +1,40 @@
 #!/usr/bin/env python3
-"""Shinobi Chronicles Battle Portrait QA.
+"""Shinobi Chronicles live-116 Battle/UI portrait QA.
 
-Validates the ratified 102-row uiPortrait manifest against current repository
-bytes. This is presentation/asset QA only; it never derives Registry identity
-from filenames and never substitutes another file when a mapping fails.
+Production authority is the explicit UI_PORTRAIT_MANIFEST in game.js, which is
+already ratified as the live 116 mapping. This tool never derives a mapping from
+filenames or folders and never substitutes collectible-card art.
+
+Checks:
+- exact 98 Character + 18 Entity = 116 production Registry IDs;
+- exact 116-entry explicit uiPortrait manifest with the same ID set;
+- unique approved paths rooted at Portraits/;
+- every approved file exists, is PNG, decodes, and is exactly 1024x1024;
+- runtime resolver remains manifest-backed and explicitly no-fallback;
+- Battle roster presentation continues to consume resolveUIPortraitProjection.
+
+Any physical failure is reported against the exact approved Registry row/path.
+A failure is not permission for Coding to choose a replacement portrait.
 """
 from __future__ import annotations
 
+import argparse
+import json
 import re
 import sys
 from pathlib import Path
+from typing import Iterable
+
 from PIL import Image
 
 ROOT = Path(__file__).resolve().parents[1]
-MANIFEST = ROOT / "Documentation/Assets/Battle Portrait Authority and Manifest.md"
 GAME_JS = ROOT / "game.js"
 EXPECTED_SIZE = (1024, 1024)
-EXPECTED_COUNT = 102
-
-ROW_RE = re.compile(
-    r"^\|\s*`([^`]+)`\s*\|\s*`([^`]+\.png)`\s*\|\s*`(Assets/Portraits/[^`]+\.png)`\s*\|\s*\*\*ACTIVE — Assets approved\*\*\s*\|$"
-)
+EXPECTED_CHARACTERS = 98
+EXPECTED_ENTITIES = 18
+EXPECTED_COUNT = 116
+MANIFEST_START = "// UI_PORTRAIT_MANIFEST_JSON_START"
+MANIFEST_END = "// UI_PORTRAIT_MANIFEST_JSON_END"
 
 
 def extract_production_ids(source: str, constant_name: str) -> list[str]:
@@ -34,89 +48,204 @@ def extract_production_ids(source: str, constant_name: str) -> list[str]:
     return re.findall(r'"([^"]+)"', match.group(1))
 
 
+def extract_manifest(source: str) -> dict[str, str]:
+    start = source.find(MANIFEST_START)
+    end = source.find(MANIFEST_END)
+    if start < 0 or end < 0 or end <= start:
+        raise RuntimeError("live116 uiPortrait manifest markers missing")
+    section = source[start:end]
+    match = re.search(
+        r"const\s+UI_PORTRAIT_MANIFEST\s*=\s*Object\.freeze\((\{.*?\})\);",
+        section,
+        re.S,
+    )
+    if not match:
+        raise RuntimeError("UI_PORTRAIT_MANIFEST object missing between markers")
+    try:
+        manifest = json.loads(match.group(1))
+    except json.JSONDecodeError as exc:
+        raise RuntimeError(f"UI_PORTRAIT_MANIFEST is not machine-readable JSON: {exc}") from exc
+    if not isinstance(manifest, dict):
+        raise RuntimeError("UI_PORTRAIT_MANIFEST must decode to an object")
+    return {str(key): str(value) for key, value in manifest.items()}
+
+
+def extract_js_function(source: str, function_name: str) -> str:
+    marker = f"function {function_name}("
+    start = source.find(marker)
+    if start < 0:
+        raise RuntimeError(f"missing runtime function: {function_name}")
+    brace = source.find("{", start)
+    if brace < 0:
+        raise RuntimeError(f"missing body for runtime function: {function_name}")
+    depth = 0
+    quote: str | None = None
+    escaped = False
+    for index in range(brace, len(source)):
+        ch = source[index]
+        if quote is not None:
+            if escaped:
+                escaped = False
+            elif ch == "\\":
+                escaped = True
+            elif ch == quote:
+                quote = None
+            continue
+        if ch in {'"', "'", "`"}:
+            quote = ch
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return source[start : index + 1]
+    raise RuntimeError(f"unterminated runtime function: {function_name}")
+
+
+def append_set_diff_errors(
+    errors: list[str],
+    expected: Iterable[str],
+    actual: Iterable[str],
+    missing_label: str,
+    extra_label: str,
+) -> None:
+    expected_set = set(expected)
+    actual_set = set(actual)
+    missing = sorted(expected_set - actual_set)
+    extra = sorted(actual_set - expected_set)
+    if missing:
+        errors.append(missing_label + ":" + ",".join(missing))
+    if extra:
+        errors.append(extra_label + ":" + ",".join(extra))
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--static-only",
+        action="store_true",
+        help="validate source/manifest/resolver authority without opening PNG binaries",
+    )
+    args = parser.parse_args()
+
     errors: list[str] = []
-    if not MANIFEST.is_file():
-        print(f"ERROR: manifest missing: {MANIFEST}")
-        return 1
     if not GAME_JS.is_file():
         print(f"ERROR: game.js missing: {GAME_JS}")
         return 1
 
-    rows: list[tuple[str, str, str]] = []
-    for line in MANIFEST.read_text(encoding="utf-8").splitlines():
-        match = ROW_RE.match(line.strip())
-        if match:
-            rows.append(match.groups())
-
-    ids = [row[0] for row in rows]
-    paths = [row[2] for row in rows]
-
-    if len(rows) != EXPECTED_COUNT:
-        errors.append(f"manifest_row_count:{len(rows)}!={EXPECTED_COUNT}")
-    if len(set(ids)) != len(ids):
-        errors.append("duplicate_registry_id_mapping")
-    if len(set(paths)) != len(paths):
-        errors.append("duplicate_portrait_path_mapping")
-
     source = GAME_JS.read_text(encoding="utf-8")
     try:
-        production_ids = extract_production_ids(source, "ALPHA_PRODUCTION_CHARACTER_IDS") + extract_production_ids(
-            source, "ALPHA_PRODUCTION_ENTITY_IDS"
-        )
+        character_ids = extract_production_ids(source, "ALPHA_PRODUCTION_CHARACTER_IDS")
+        entity_ids = extract_production_ids(source, "ALPHA_PRODUCTION_ENTITY_IDS")
+        manifest = extract_manifest(source)
+        resolver_source = extract_js_function(source, "resolveUIPortraitProjection")
+        roster_source = extract_js_function(source, "renderBattleRosterSlot")
     except RuntimeError as exc:
-        errors.append(str(exc))
-        production_ids = []
+        print("FAIL")
+        print(" -", exc)
+        return 1
 
-    if production_ids:
-        if len(production_ids) != EXPECTED_COUNT:
-            errors.append(f"production_id_count:{len(production_ids)}!={EXPECTED_COUNT}")
-        if len(set(production_ids)) != len(production_ids):
-            errors.append("duplicate_production_registry_id")
-        missing = sorted(set(production_ids) - set(ids))
-        extra = sorted(set(ids) - set(production_ids))
-        if missing:
-            errors.append("manifest_missing_ids:" + ",".join(missing))
-        if extra:
-            errors.append("manifest_nonproduction_ids:" + ",".join(extra))
+    production_ids = character_ids + entity_ids
+    manifest_ids = list(manifest)
+    paths = list(manifest.values())
+
+    if len(character_ids) != EXPECTED_CHARACTERS:
+        errors.append(f"production_character_count:{len(character_ids)}!={EXPECTED_CHARACTERS}")
+    if len(entity_ids) != EXPECTED_ENTITIES:
+        errors.append(f"production_entity_count:{len(entity_ids)}!={EXPECTED_ENTITIES}")
+    if len(production_ids) != EXPECTED_COUNT:
+        errors.append(f"production_total:{len(production_ids)}!={EXPECTED_COUNT}")
+    if len(set(production_ids)) != len(production_ids):
+        errors.append("duplicate_production_registry_id")
+
+    if len(manifest) != EXPECTED_COUNT:
+        errors.append(f"manifest_row_count:{len(manifest)}!={EXPECTED_COUNT}")
+    if len(set(manifest_ids)) != len(manifest_ids):
+        errors.append("duplicate_manifest_registry_id")
+    if len(set(paths)) != len(paths):
+        errors.append("duplicate_portrait_path_mapping")
+    append_set_diff_errors(
+        errors,
+        production_ids,
+        manifest_ids,
+        "manifest_missing_ids",
+        "manifest_nonproduction_ids",
+    )
+
+    for registry_id, path in manifest.items():
+        if not path.startswith("Portraits/") or not path.lower().endswith(".png"):
+            errors.append(f"invalid_approved_path:{registry_id}:{path}")
+
+    resolver_lower = resolver_source.lower()
+    if "getuiportraitassetpath" not in resolver_lower:
+        errors.append("runtime_resolver_not_manifest_backed")
+    if resolver_source.count("fallbackUsed:false") < 2:
+        errors.append("runtime_resolver_no_fallback_contract_missing")
+    if "getCharacterCardAssetPath" in resolver_source or "getEntityCollectibleCardAssetPath" in resolver_source:
+        errors.append("runtime_resolver_collectible_card_fallback_detected")
+    if "resolveUIPortraitProjection(participant)" not in roster_source:
+        errors.append("battle_roster_not_consuming_ui_portrait_resolver")
+    if "getCharacterCardAssetPath" in roster_source or "getEntityCollectibleCardAssetPath" in roster_source:
+        errors.append("battle_roster_collectible_card_fallback_detected")
 
     decoded = 0
     dimension_ok = 0
-    for registry_id, approved_file, relative_path in rows:
-        file_path = ROOT / relative_path
-        if Path(relative_path).name != approved_file:
-            errors.append(f"filename_column_mismatch:{registry_id}:{approved_file}:{relative_path}")
-        if not file_path.is_file():
-            errors.append(f"missing_path:{registry_id}:{relative_path}")
-            continue
-        try:
-            with Image.open(file_path) as image:
-                if image.format != "PNG":
-                    errors.append(f"not_png:{registry_id}:{relative_path}:{image.format}")
-                dimensions = image.size
-                image.verify()
-            decoded += 1
-            if dimensions != EXPECTED_SIZE:
-                errors.append(f"bad_dimensions:{registry_id}:{relative_path}:{dimensions[0]}x{dimensions[1]}")
-            else:
-                dimension_ok += 1
-        except Exception as exc:  # Pillow exposes several decode-specific exceptions.
-            errors.append(f"decode_failure:{registry_id}:{relative_path}:{type(exc).__name__}:{exc}")
+    binary_failures: list[str] = []
+    if not args.static_only:
+        for registry_id, relative_path in manifest.items():
+            file_path = ROOT / relative_path
+            if not file_path.is_file():
+                binary_failures.append(f"missing_path:{registry_id}:{relative_path}")
+                continue
+            try:
+                with Image.open(file_path) as image:
+                    image_format = image.format
+                    dimensions = image.size
+                    image.verify()
+                if image_format != "PNG":
+                    binary_failures.append(
+                        f"not_png:{registry_id}:{relative_path}:{image_format}"
+                    )
+                    continue
+                decoded += 1
+                if dimensions != EXPECTED_SIZE:
+                    binary_failures.append(
+                        f"bad_dimensions:{registry_id}:{relative_path}:{dimensions[0]}x{dimensions[1]}"
+                    )
+                else:
+                    dimension_ok += 1
+            except Exception as exc:  # Pillow exposes decode-specific exceptions.
+                binary_failures.append(
+                    f"decode_failure:{registry_id}:{relative_path}:{type(exc).__name__}:{exc}"
+                )
+        errors.extend(binary_failures)
 
-    print("SC Battle Portrait QA")
-    print(f"manifest rows: {len(rows)}/{EXPECTED_COUNT}")
-    print(f"unique IDs: {len(set(ids))}/{EXPECTED_COUNT}")
+    print("SC Live-116 Battle Portrait QA")
+    print(f"production characters: {len(character_ids)}/{EXPECTED_CHARACTERS}")
+    print(f"production entities: {len(entity_ids)}/{EXPECTED_ENTITIES}")
+    print(f"production total: {len(production_ids)}/{EXPECTED_COUNT}")
+    print(f"manifest rows: {len(manifest)}/{EXPECTED_COUNT}")
     print(f"unique paths: {len(set(paths))}/{EXPECTED_COUNT}")
-    print(f"decoded PNGs: {decoded}/{EXPECTED_COUNT}")
-    print(f"1024x1024: {dimension_ok}/{EXPECTED_COUNT}")
+    print("runtime resolver: explicit manifest-backed / no collectible-card fallback")
+    if args.static_only:
+        print("binary decode: SKIPPED (--static-only)")
+    else:
+        print(f"decoded PNGs: {decoded}/{EXPECTED_COUNT}")
+        print(f"1024x1024: {dimension_ok}/{EXPECTED_COUNT}")
 
     if errors:
         print(f"FAIL ({len(errors)} issues)")
         for error in errors:
             print(" -", error)
+        if binary_failures:
+            print("FAILURE POLICY: return these exact approved rows to Assets; do not remap in Coding.")
         return 1
 
-    print("PASS — 102/102 ratified uiPortrait mappings exist, decode, and are exactly 1024x1024.")
+    if args.static_only:
+        print("PASS — live-116 manifest/Registry/resolver authority is exact; binary QA not run.")
+    else:
+        print("PASS — 116/116 approved uiPortraits exist, decode as PNG, are exactly 1024x1024, and runtime source remains no-fallback.")
     return 0
 
 
