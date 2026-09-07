@@ -14780,7 +14780,7 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(2).selected::after {
     bottom:
-        0.20% !important;
+        -1% !important;
 }
 
 /* SURVIVAL SELECTED BAR */
