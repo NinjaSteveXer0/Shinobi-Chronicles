@@ -14365,7 +14365,8 @@ body {
    /* TAIJUTSU MASTERY */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(1) .practical-mastery {
-    left: 3.4% !important;
+    left: 3.% !important;
+     top: 66% !important;
 }
 
 /* BUKIJUTSU MASTERY */
@@ -14379,6 +14380,7 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(3) .practical-mastery {
     left: 3.40% !important;
+     top: 62.5% !important;
 }
 
 /* -------------------------
