@@ -14365,13 +14365,14 @@ body {
    /* TAIJUTSU MASTERY */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(1) .practical-mastery {
-    left: 2% !important;
+    left: 3.4% !important;
 }
 
 /* BUKIJUTSU MASTERY */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-discipline-select:nth-child(2) .practical-mastery {
     left: 2% !important;
+    top: 66% !important;
 }
 
 /* SURVIVAL MASTERY — LOCKED */
