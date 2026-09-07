@@ -85334,6 +85334,7 @@ function resolveMenmaOriginTutorialPerformance(records=null,outcomeOverride=null
     meaningfullyResolvedMenmaActions:meaningful,
     actionExecutionRatio,
     tutorialResult,
+    objectiveCompleted:opponentStopped===true,
     performanceBucket,
     supportingOccurrenceIds,
     healingDoesNotRewriteHistoricalDamage:true
@@ -85350,15 +85351,41 @@ function recordMenmaOriginPostBattleReads() {
   if (!isMenmaOriginTutorialBattle()) return {success:false,reason:"not_menma_origin_tutorial"};
   const performance=resolveMenmaOriginTutorialPerformance();
   const kinjutsu=resolveMenmaOriginKinjutsuObservationRead();
-  const existing=(currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[]).find(record=>record&&record.eventType==="menma_origin_tutorial_read_resolved"&&record.battleId===currentBattle.battleId);
-  if (existing) return {success:true,idempotent:true,evidence:existing,performance,kinjutsu};
-  const evidence=recordBattleEvidence({
-    eventType:"menma_origin_tutorial_read_resolved",committedOccurrence:false,
-    actorRef:createBattleParticipantRef("player","academy_menma"),
-    sourceRefs:[{type:"story_scene",id:"origin_academy_menma_prologue",role:"authored_tutorial_context"}],
-    data:{performanceBucket:performance.performanceBucket,tutorialResult:performance.tutorialResult,pressureRatio:performance.pressureRatio,criticalExposure:performance.criticalExposure,actionExecutionRatio:performance.actionExecutionRatio,observedKinjutsu:kinjutsu.observed===true,supportingOccurrenceIds:performance.supportingOccurrenceIds,kinjutsuObservationOccurrenceIds:kinjutsu.occurrenceIds||[]}
-  });
-  return {success:!!evidence,evidence,performance,kinjutsu};
+
+  let evidence=(currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[]).find(record=>record&&record.eventType==="menma_origin_tutorial_read_resolved"&&record.battleId===currentBattle.battleId)||null;
+  const evidenceIdempotent=!!evidence;
+  if (!evidence) {
+    evidence=recordBattleEvidence({
+      eventType:"menma_origin_tutorial_read_resolved",committedOccurrence:false,
+      actorRef:createBattleParticipantRef("player","academy_menma"),
+      sourceRefs:[{type:"story_scene",id:"origin_academy_menma_prologue",role:"authored_tutorial_context"}],
+      data:{
+        performanceBucket:performance.performanceBucket,
+        tutorialResult:performance.tutorialResult,
+        objectiveCompleted:performance.objectiveCompleted===true,
+        pressureRatio:performance.pressureRatio,
+        criticalExposure:performance.criticalExposure,
+        actionExecutionRatio:performance.actionExecutionRatio,
+        observedKinjutsu:kinjutsu.observed===true,
+        supportingOccurrenceIds:performance.supportingOccurrenceIds,
+        kinjutsuObservationOccurrenceIds:kinjutsu.occurrenceIds||[]
+      }
+    });
+  }
+
+  // BRICKS 1955–1960 — commit the fixed aggregate source only after Combat has
+  // finalised a completed tutorial performance, then consume MEN-03 idempotently.
+  const aggregate=commitAndConsumeMenmaOriginTutorialPerformance(performance);
+
+  return {
+    success:!!evidence&&aggregate.success===true,
+    idempotent:evidenceIdempotent&&aggregate.source&&aggregate.source.idempotent===true&&aggregate.men03&&aggregate.men03.idempotent===true,
+    evidence,
+    performance,
+    kinjutsu,
+    aggregateSource:aggregate.source,
+    men03:aggregate.men03
+  };
 }
 
 // =========================================================
@@ -89871,6 +89898,14 @@ const ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS=Object.freeze({
     sourceBinding:"combat.qualifyingActionOccurrence.occurrenceId",
     consumer:"CE Knowledge / Relationships / Contextual Opportunity",
     status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE
+  }),
+  MEN03:Object.freeze({
+    rowId:"MEN-03",
+    originVariantId:"academy_menma",
+    consequenceContractId:"academy_menma_tutorial_performance_evidence",
+    sourceBinding:"combat_academy_menma_tutorial_performance_resolved",
+    consumer:"Combat → CE Origin Historical Evidence",
+    status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE
   })
 });
 
@@ -89878,7 +89913,7 @@ const ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS=Object.freeze([
   "HIN-01","HIN-02","HIN-03",
   "IZU-01","IZU-02","IZU-03","IZU-04",
   "MIR-01","MIR-02","MIR-03",
-  "MEN-03","MEN-04","MEN-05",
+  "MEN-04","MEN-05",
   "KUS-01","KUS-02","KUS-03","KUS-04","KUS-05",
   "KUR-01","KUR-02",
   "IWA-01","IWA-02",
@@ -90011,6 +90046,144 @@ function consumeMenmaQualifyingActionOccurrence(combatEnvelope={}) {
     men02,
     receipts
   };
+}
+
+
+// =========================================================
+// BRICKS 1940–1954 — MEN-03 AGGREGATE COMBAT SOURCE OCCURRENCE
+// =========================================================
+// Combat authority fixes this occurrence ID. It is neither the Battle ID nor
+// any supporting Action/Battle evidence ID. The aggregate occurrence persists
+// independently, then MEN-03 consumes it through the CE address pair.
+const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID="combat_academy_menma_tutorial_performance_resolved";
+const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_ORIGIN_ID="origin_academy_menma_prologue";
+const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID="test_subject_altered_shinobi";
+const MENMA_ORIGIN_TUTORIAL_PERFORMANCE_BUCKETS=Object.freeze(["low","middle","high"]);
+
+function getMenmaOriginTutorialPerformanceSourceOccurrence() {
+  const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];
+  const record=history.find(entry=>
+    entry&&entry.occurrenceId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID&&
+    entry.occurrenceType==="tutorial_performance_resolved"&&
+    entry.originId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_ORIGIN_ID&&
+    entry.actorId==="academy_menma"&&
+    entry.opponentId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID
+  );
+  return record?cloneProgressionData(record):null;
+}
+
+function validateMenmaOriginTutorialPerformanceAggregateCommit(performance={}) {
+  const p=performance&&typeof performance==="object"?performance:{};
+  if (!isMenmaOriginTutorialBattle()) return {valid:false,reason:"not_menma_origin_tutorial"};
+  if (!currentBattle.outcome||currentBattle.outcome.type!=="victory") return {valid:false,reason:"tutorial_battle_not_committed_victory"};
+  if (p.tutorialResult!=="completed") return {valid:false,reason:"tutorial_result_not_completed"};
+  if (p.objectiveCompleted!==true) return {valid:false,reason:"tutorial_objective_not_completed"};
+  if (!MENMA_ORIGIN_TUTORIAL_PERFORMANCE_BUCKETS.includes(p.performanceBucket)) return {valid:false,reason:"performance_bucket_not_final"};
+  const numericFields=[
+    "startingUnderlyingBattlePLMaximum",
+    "grossFinalPLDamageReceived",
+    "pressureRatio",
+    "committedMenmaActionOpportunities",
+    "meaningfullyResolvedMenmaActions",
+    "actionExecutionRatio"
+  ];
+  if (!numericFields.every(key=>Number.isFinite(Number(p[key])))) return {valid:false,reason:"performance_metrics_not_final"};
+  if (p.criticalExposure!==true&&p.criticalExposure!==false) return {valid:false,reason:"critical_exposure_not_final"};
+  if (!Array.isArray(p.supportingOccurrenceIds)||p.supportingOccurrenceIds.length===0||p.supportingOccurrenceIds.some(id=>typeof id!=="string"||!id)) {
+    return {valid:false,reason:"supporting_occurrence_ancestry_required"};
+  }
+  return {valid:true,reason:null};
+}
+
+function commitMenmaOriginTutorialPerformanceSourceOccurrence(performance={}) {
+  const validation=validateMenmaOriginTutorialPerformanceAggregateCommit(performance);
+  if (!validation.valid) return {success:false,reason:validation.reason,sourceOccurrenceId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID};
+
+  const existing=getMenmaOriginTutorialPerformanceSourceOccurrence();
+  if (existing) return {success:true,idempotent:true,sourceOccurrenceId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,record:existing};
+
+  if (!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const supportingOccurrenceIds=[...new Set(performance.supportingOccurrenceIds.filter(Boolean))];
+  const record={
+    historyScope:getCurrentChronicleOccurrenceHistoryScope("origin_tutorial_performance"),
+    type:"combat_origin_tutorial_performance",
+    activity:"origin_tutorial",
+    completed:true,
+    success:true,
+    committed:true,
+    outcome:"tutorial_performance_resolved",
+    sourceOccurrenceId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,
+    occurrenceId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,
+    occurrenceType:"tutorial_performance_resolved",
+    originId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_ORIGIN_ID,
+    actorId:"academy_menma",
+    opponentId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID,
+    tutorialResult:"completed",
+    objectiveCompleted:true,
+    performanceBucket:performance.performanceBucket,
+    startingUnderlyingBattlePLMaximum:Number(performance.startingUnderlyingBattlePLMaximum),
+    grossFinalPLDamageReceived:Number(performance.grossFinalPLDamageReceived),
+    pressureRatio:Number(performance.pressureRatio),
+    criticalExposure:performance.criticalExposure===true,
+    committedMenmaActionOpportunities:Number(performance.committedMenmaActionOpportunities),
+    meaningfullyResolvedMenmaActions:Number(performance.meaningfullyResolvedMenmaActions),
+    actionExecutionRatio:Number(performance.actionExecutionRatio),
+    supportingOccurrenceIds,
+    linkedChronicleEvidenceIds:[...supportingOccurrenceIds],
+    timestamp:Date.now()
+  };
+  playerData.activityHistory.push(record);
+  activityHistory=playerData.activityHistory;
+  savePlayerData();
+  return {success:true,idempotent:false,sourceOccurrenceId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,record:cloneProgressionData(record)};
+}
+
+function consumeMenmaTutorialPerformanceSourceOccurrence(sourceOccurrence=null) {
+  const occurrence=sourceOccurrence&&typeof sourceOccurrence==="object"
+    ? sourceOccurrence
+    : getMenmaOriginTutorialPerformanceSourceOccurrence();
+  if (!occurrence) return {success:false,reason:"men03_source_occurrence_missing"};
+  if (occurrence.occurrenceId!==MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID||occurrence.sourceOccurrenceId!==MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID) {
+    return {success:false,reason:"men03_source_occurrence_id_mismatch"};
+  }
+  if (occurrence.committed!==true||occurrence.completed!==true||occurrence.tutorialResult!=="completed"||occurrence.objectiveCompleted!==true) {
+    return {success:false,reason:"men03_source_occurrence_not_committed_complete"};
+  }
+  if (!MENMA_ORIGIN_TUTORIAL_PERFORMANCE_BUCKETS.includes(occurrence.performanceBucket)) return {success:false,reason:"men03_performance_bucket_invalid"};
+
+  return commitOriginConsequenceReceipt({
+    sourceOccurrenceId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,
+    consequenceContractId:ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId,
+    qualificationFacts:{
+      committed:true,
+      originId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_ORIGIN_ID,
+      actorVariantId:"academy_menma",
+      opponentId:MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID,
+      tutorialResult:"completed",
+      objectiveCompleted:true,
+      performanceBucket:occurrence.performanceBucket
+    },
+    payload:{
+      evidenceKind:"tutorial_performance_resolved",
+      performanceBucket:occurrence.performanceBucket,
+      startingUnderlyingBattlePLMaximum:occurrence.startingUnderlyingBattlePLMaximum,
+      grossFinalPLDamageReceived:occurrence.grossFinalPLDamageReceived,
+      pressureRatio:occurrence.pressureRatio,
+      criticalExposure:occurrence.criticalExposure,
+      committedMenmaActionOpportunities:occurrence.committedMenmaActionOpportunities,
+      meaningfullyResolvedMenmaActions:occurrence.meaningfullyResolvedMenmaActions,
+      actionExecutionRatio:occurrence.actionExecutionRatio,
+      supportingOccurrenceIds:[...(occurrence.supportingOccurrenceIds||[])]
+    },
+    causalAncestry:(occurrence.supportingOccurrenceIds||[]).map(id=>({type:"battle_evidence",id}))
+  });
+}
+
+function commitAndConsumeMenmaOriginTutorialPerformance(performance={}) {
+  const source=commitMenmaOriginTutorialPerformanceSourceOccurrence(performance);
+  if (!source.success) return {success:false,source,men03:null};
+  const men03=consumeMenmaTutorialPerformanceSourceOccurrence(source.record);
+  return {success:men03.success===true,source,men03};
 }
 
 function rejectBlockedOriginConsequenceExecution(rowId,sourceOccurrenceId) {
@@ -90248,13 +90421,13 @@ function runAlphaOriginConsequenceAddressingDiagnostics() {
     });
     result.distinctOccurrenceCreatesDistinctReceipt=other.success===true&&ensurePlayerOriginConsequenceState().receipts.filter(entry=>entry.consequenceContractId==="academy_menma_kinjutsu_use_evidence").length===3;
 
-    const blocked=rejectBlockedOriginConsequenceExecution("MEN-03","guessed_from_story_scene");
+    const blocked=rejectBlockedOriginConsequenceExecution("MEN-04","guessed_from_story_scene");
     result.blockedRowCannotExecute=blocked.success===false&&blocked.reason==="source_occurrence_binding_blocked"&&blocked.guessedAddressUsed===false;
 
     const addr=createOriginConsequenceAddress("combat_occurrence_42","academy_menma_kinjutsu_use_evidence");
     result.addressUsesSourcePlusContract=addr.includes("combat_occurrence_42")&&addr.includes("academy_menma_kinjutsu_use_evidence")&&!addr.includes("academy_menma::");
-    result.exactTwoExecutableContracts=Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===2;
-    result.remainingThirtyFourRowsBlocked=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===34;
+    result.exactThreeExecutableContracts=Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3;
+    result.remainingThirtyThreeRowsBlocked=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33;
 
     const runtimeSource=[createOriginConsequenceAddress,commitOriginConsequenceReceipt,consumeMenmaQualifyingActionOccurrence].map(fn=>fn.toString()).join("\n");
     result.noGenericOriginRewardSystem=!runtimeSource.includes("originBonus")&&!runtimeSource.includes("Origin XP")&&!runtimeSource.includes("morality")&&!runtimeSource.includes("genericOrigin");
@@ -90790,8 +90963,8 @@ function runAlphaOriginConsequenceIntegrityDiagnostics() {
     result.committedPairIntegrityGreen=consumed.success===true&&integrity.pass===true&&integrity.receiptCount===2;
 
     const policies=getBlockedOriginConsequenceMatrixStatus();
-    result.exactPublishedExecutableVsBlocked=policies.executableCount===2&&policies.blockedCount===34&&policies.totalPublishedRows===36;
-    result.men03StillBlocked=getOriginConsequenceExecutionPolicy("MEN-03").executable===false;
+    result.exactPublishedExecutableVsBlocked=policies.executableCount===3&&policies.blockedCount===33&&policies.totalPublishedRows===36;
+    result.men03Executable=getOriginConsequenceExecutionPolicy("MEN-03").executable===true&&getOriginConsequenceExecutionPolicy("MEN-03").sourceBinding===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID;
     result.unknownRowStillBlocked=getOriginConsequenceExecutionPolicy("FAKE-99").executable===false;
 
     const before=ensurePlayerOriginConsequenceState().receipts.length;
@@ -91775,8 +91948,8 @@ function runAlphaJourneyAuthorityBoundaryDiagnostics() {
     promotionNotRepresentationSwap:!recordOwnedCharacterGeninPromotion.toString().includes("ninjaIdentityVariantId=")&&!recordOwnedCharacterGeninPromotion.toString().includes("chronicleOriginVariantId="),
     geninTransitionNotAcquisition:confirmGeninRosterTransition.toString().includes("acquisitionRewardGranted:false")&&!confirmGeninRosterTransition.toString().includes("commitCharacterAcquisition"),
     joninLeaderAssignmentNotOwnership:selectGeninRosterTransitionJoninLeader.toString().includes("collectibleOwnershipRequired:false")&&!selectGeninRosterTransitionJoninLeader.toString().includes("grantCharacterRegistryOwnership"),
-    unresolvedOriginRowsStillBlocked:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===34&&ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
-    men01Men02StillOnlyExecutable:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===2&&Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).every(row=>row.status===ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE),
+    unresolvedOriginRowsStillBlocked:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33&&ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
+    men01Men02Men03Executable:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3&&Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).every(row=>row.status===ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE),
     noPracticalAuthorityInvented:getPracticalDesktopSourceIntegrationPlan({}).ready===false,
     production116IndependentFromPlayerOwnership:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18&&createDefaultCharacterOwnershipState().ownedRegistryIds.length===0,
     combatFreezeNoJourneyMutation:!source.includes("random ±10%")&&!source.includes("elite*1.25")
@@ -93399,17 +93572,18 @@ function runAlphaOriginConsequenceCodingWallDiagnostics() {
   const persistence=runAlphaOriginConsequencePersistenceDiagnostics();
   const blockedRows=[...ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS];
   const result={
-    implementedRowsExactlyTwo:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===2,
+    implementedRowsExactlyThree:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3,
     men01Executable:getOriginConsequenceExecutionPolicy("MEN-01").executable===true,
     men02Executable:getOriginConsequenceExecutionPolicy("MEN-02").executable===true,
-    remainingThirtyFourBlocked:blockedRows.length===34&&blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
+    men03Executable:getOriginConsequenceExecutionPolicy("MEN-03").executable===true,
+    remainingThirtyThreeBlocked:blockedRows.length===33&&blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
     blockedRowsRejectExecution:blockedRows.every(rowId=>rejectBlockedOriginConsequenceExecution(rowId).success===false),
     noInventedSourceOccurrenceIds:blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).sourceBinding==null),
     implementedRegressionGreen:[integrity,normalization,addressing,persistence].every(group=>group&&group.pass===true),
     externalAuthorityRequired:blockedRows.length>0,
     pass:false
   };
-  result.pass=result.implementedRowsExactlyTwo&&result.men01Executable&&result.men02Executable&&result.remainingThirtyFourBlocked&&result.blockedRowsRejectExecution&&result.noInventedSourceOccurrenceIds&&result.implementedRegressionGreen&&result.externalAuthorityRequired;
+  result.pass=result.implementedRowsExactlyThree&&result.men01Executable&&result.men02Executable&&result.men03Executable&&result.remainingThirtyThreeBlocked&&result.blockedRowsRejectExecution&&result.noInventedSourceOccurrenceIds&&result.implementedRegressionGreen&&result.externalAuthorityRequired;
   return {result,blockedRows,groups:{integrity,normalization,addressing,persistence},pass:result.pass};
 }
 
@@ -94483,6 +94657,162 @@ function runAlphaUnknownOperativeConfrontationDiagnostics() {
   }
   const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
   return {pass:failed.length===0,checks,failed,total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length};
+}
+
+
+// =========================================================
+// BRICKS 1961–1967 — MEN-03 SOURCE / DEDUPE / SAVE-LOAD GOLDEN
+// =========================================================
+function createMenmaOriginTutorialPerformanceDiagnosticBattleState({outcomeType="victory"}={}) {
+  currentBattle.active=true;
+  currentBattle.battleOver=outcomeType==="victory";
+  currentBattle.battleId="diag_men03_tutorial_battle";
+  currentBattle.encounterId=MENMA_ORIGIN_TUTORIAL_ENCOUNTER_ID;
+  currentBattle.encounterEnemy=enemyDatabase[MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID];
+  currentBattle.enemy=currentBattle.encounterEnemy;
+  currentBattle.outcome={type:outcomeType};
+  currentBattle.runtime=createBattleRuntimeState();
+  currentBattle.runtime.battleId=currentBattle.battleId;
+  currentBattle.runtime.remainingPL.player.academy_menma={current:20,maximum:20};
+  currentBattle.runtime.remainingPL.enemy[MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID]={current:outcomeType==="victory"?0:5,maximum:11};
+  return currentBattle;
+}
+
+function createMenmaOriginTutorialPerformanceDiagnosticPayload(overrides={}) {
+  return {
+    startingUnderlyingBattlePLMaximum:20,
+    grossFinalPLDamageReceived:4,
+    pressureRatio:0.20,
+    criticalExposure:false,
+    committedMenmaActionOpportunities:4,
+    meaningfullyResolvedMenmaActions:4,
+    actionExecutionRatio:1,
+    tutorialResult:"completed",
+    objectiveCompleted:true,
+    performanceBucket:"high",
+    supportingOccurrenceIds:["diag_men03_action_1","diag_men03_action_2"],
+    ...cloneProgressionData(overrides||{})
+  };
+}
+
+function runAlphaMen03TutorialPerformanceSourceDiagnostics() {
+  const rawSave=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const priorPlayer=cloneProgressionData(playerData);
+  const priorBattle=cloneBattleRuntimeValue(currentBattle);
+  const priorActivity=typeof activityHistory!=="undefined"&&Array.isArray(activityHistory)?cloneProgressionData(activityHistory):[];
+  const checks={};
+  try {
+    playerData=createDefaultPlayerData();
+    activityHistory=playerData.activityHistory;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+
+    createMenmaOriginTutorialPerformanceDiagnosticBattleState({outcomeType:"defeat"});
+    const defeat=commitMenmaOriginTutorialPerformanceSourceOccurrence(createMenmaOriginTutorialPerformanceDiagnosticPayload());
+    checks.defeatCreatesNoAggregate=defeat.success===false&&!getMenmaOriginTutorialPerformanceSourceOccurrence()&&ensurePlayerOriginConsequenceState().receipts.length===0;
+
+    createMenmaOriginTutorialPerformanceDiagnosticBattleState({outcomeType:"victory"});
+    const nullBucket=commitMenmaOriginTutorialPerformanceSourceOccurrence(createMenmaOriginTutorialPerformanceDiagnosticPayload({performanceBucket:null}));
+    checks.nullBucketCreatesNoAggregate=nullBucket.success===false&&!getMenmaOriginTutorialPerformanceSourceOccurrence();
+
+    const incomplete=commitMenmaOriginTutorialPerformanceSourceOccurrence(createMenmaOriginTutorialPerformanceDiagnosticPayload({tutorialResult:"not_completed",objectiveCompleted:false}));
+    checks.notCompletedCreatesNoAggregate=incomplete.success===false&&!getMenmaOriginTutorialPerformanceSourceOccurrence();
+
+    const committed=commitAndConsumeMenmaOriginTutorialPerformance(createMenmaOriginTutorialPerformanceDiagnosticPayload());
+    const source=getMenmaOriginTutorialPerformanceSourceOccurrence();
+    const receipt=getOriginConsequenceReceiptByAddress(MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId);
+    checks.exactSourceOccurrenceCommitted=committed.success===true&&!!source&&source.occurrenceId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID&&source.occurrenceType==="tutorial_performance_resolved";
+    checks.requiredAggregatePayloadPreserved=!!source&&source.originId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_ORIGIN_ID&&source.actorId==="academy_menma"&&source.opponentId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID&&source.tutorialResult==="completed"&&source.objectiveCompleted===true&&source.performanceBucket==="high"&&source.startingUnderlyingBattlePLMaximum===20&&source.grossFinalPLDamageReceived===4&&source.pressureRatio===0.2&&source.criticalExposure===false&&source.committedMenmaActionOpportunities===4&&source.meaningfullyResolvedMenmaActions===4&&source.actionExecutionRatio===1&&source.supportingOccurrenceIds.length===2;
+    checks.men03ReceiptExactAddress=!!receipt&&receipt.address===createOriginConsequenceAddress(MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,"academy_menma_tutorial_performance_evidence")&&receipt.sourceOccurrenceId!==receipt.consequenceContractId;
+    checks.men03PayloadNotDirectDevelopment=!!receipt&&receipt.payload.performanceBucket==="high"&&!Object.prototype.hasOwnProperty.call(receipt.payload,"statGrowth")&&!Object.prototype.hasOwnProperty.call(receipt.payload,"plGrowth");
+
+    const historyCount=playerData.activityHistory.filter(record=>record&&record.occurrenceId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID).length;
+    const receiptCount=ensurePlayerOriginConsequenceState().receipts.filter(record=>record&&record.consequenceContractId===ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId).length;
+    const retry=commitAndConsumeMenmaOriginTutorialPerformance(createMenmaOriginTutorialPerformanceDiagnosticPayload({performanceBucket:"low",pressureRatio:0.9,criticalExposure:true}));
+    checks.retryReusesSameSource=retry.success===true&&retry.source.idempotent===true&&retry.men03.idempotent===true&&playerData.activityHistory.filter(record=>record&&record.occurrenceId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID).length===historyCount&&ensurePlayerOriginConsequenceState().receipts.filter(record=>record&&record.consequenceContractId===ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId).length===receiptCount;
+    checks.retryDoesNotRewriteCommittedBucket=getMenmaOriginTutorialPerformanceSourceOccurrence().performanceBucket==="high"&&getOriginConsequenceReceiptByAddress(MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId).payload.performanceBucket==="high";
+
+    savePlayerData();
+    const savedRaw=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+    if (savedRaw&&typeof localStorage!=="undefined") {
+      playerData=JSON.parse(savedRaw);
+      playerData.originConsequences=normalizeOriginConsequenceState(playerData.originConsequences);
+      playerData.activityHistory=normalizeActivityHistoryForChronicleContinuity(playerData.activityHistory,playerData.acquisition);
+      activityHistory=playerData.activityHistory;
+    }
+    checks.saveLoadPreservesSourceAndReceipt=!!getMenmaOriginTutorialPerformanceSourceOccurrence()&&!!getOriginConsequenceReceiptByAddress(MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId);
+    checks.supportingIdsRemainAncestry=receipt&&Array.isArray(receipt.causalAncestry)&&receipt.causalAncestry.length===2&&receipt.causalAncestry.every(ref=>ref.type==="battle_evidence")&&receipt.causalAncestry.every(ref=>ref.id!==MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID);
+    checks.aggregateNotBattleOrActionId=source&&source.occurrenceId!==currentBattle.battleId&&source.supportingOccurrenceIds.every(id=>id!==source.occurrenceId);
+
+    // Exercise the actual Story post-Battle hook, not only the direct aggregate API.
+    playerData.originConsequences=createDefaultOriginConsequenceState();
+    playerData.activityHistory=[];
+    activityHistory=playerData.activityHistory;
+    createMenmaOriginTutorialPerformanceDiagnosticBattleState({outcomeType:"victory"});
+    currentBattle.runtime.evidence.push({
+      evidenceId:"diag_men03_hook_action",
+      battleId:currentBattle.battleId,
+      actionId:"diag_men03_hook_action",
+      eventType:"skill_action_completed",
+      committedOccurrence:true,
+      actorRef:createBattleParticipantRef("player","academy_menma"),
+      targetRef:createBattleParticipantRef("enemy",MENMA_ORIGIN_TUTORIAL_PERFORMANCE_OPPONENT_ID),
+      skillId:null,
+      sourceRefs:[],
+      stateRefs:["diag_resolved_state"],
+      conditionRefs:[],
+      observerRefs:[],
+      data:{resolved:true,damageApplied:false}
+    });
+    const hook=recordMenmaOriginPostBattleReads();
+    const hookSource=getMenmaOriginTutorialPerformanceSourceOccurrence();
+    const hookReceipt=getOriginConsequenceReceiptByAddress(MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId);
+    checks.postBattleHookCommitsMEN03=hook.success===true&&!!hookSource&&!!hookReceipt&&hook.performance.tutorialResult==="completed"&&hook.performance.objectiveCompleted===true&&MENMA_ORIGIN_TUTORIAL_PERFORMANCE_BUCKETS.includes(hook.performance.performanceBucket);
+    const hookRetry=recordMenmaOriginPostBattleReads();
+    checks.postBattleHookIsIdempotent=hookRetry.success===true&&hookRetry.idempotent===true&&playerData.activityHistory.filter(record=>record&&record.occurrenceId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID).length===1&&ensurePlayerOriginConsequenceState().receipts.filter(record=>record&&record.consequenceContractId===ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId).length===1;
+
+    checks.men03PolicyExecutable=getOriginConsequenceExecutionPolicy("MEN-03").executable===true&&getOriginConsequenceExecutionPolicy("MEN-03").sourceBinding===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID;
+    checks.remainingBlockedRowsExactly33=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33&&!ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.includes("MEN-03");
+  } finally {
+    playerData=priorPlayer;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    activityHistory=priorActivity;
+    Object.keys(currentBattle).forEach(key=>delete currentBattle[key]);
+    Object.assign(currentBattle,priorBattle||{});
+    if (typeof localStorage!=="undefined") {
+      if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY); else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    }
+  }
+  const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
+  return {pass:failed.length===0,checks,failed,total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length};
+}
+
+// =========================================================
+// BRICKS 1968–1969 — POST-1939 MEN-03 INTEGRATION GATE
+// =========================================================
+function runAlphaPost1969MEN03IntegrationDiagnostics() {
+  const post1939=runAlphaPost1939UnknownOperativeIntegrationDiagnostics();
+  const men03=runAlphaMen03TutorialPerformanceSourceDiagnostics();
+  const originWall=runAlphaOriginConsequenceCodingWallDiagnostics();
+  const checks={
+    post1939Preserved:post1939.pass===true,
+    men03GoldenGreen:men03.pass===true,
+    exactExecutableRows:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3,
+    exactRemainingBlockedRows:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33,
+    exactMen03Binding:ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.sourceBinding===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,
+    originWallStillGreen:originWall.pass===true,
+    noStatsOrPLGrant:!commitMenmaOriginTutorialPerformanceSourceOccurrence.toString().includes("statGrowth")&&!commitMenmaOriginTutorialPerformanceSourceOccurrence.toString().includes("plGrowth"),
+    registryStill116:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return {
+    pass:checks.pass===true,
+    checks,
+    groups:{post1939,men03,originWall},
+    men03Checks:`${men03.passed}/${men03.total}`,
+    codingStatus:"ISSUE_14_MEN03_IMPLEMENTED_RUNTIME_REGRESSION_GREEN",
+    remainingBlockedOriginRows:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length,
+    nextImplementedBrick:1969
+  };
 }
 
 // =========================================================
