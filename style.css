@@ -7891,64 +7891,6 @@ body {
 */
 
 
-#konoha-activity-screen[data-service-id="exams"]
-.exam-character-selector {
-
-    position:
-        absolute !important;
-
-    /*
-       MANUAL FINE TUNE — PAIR POSITION
-    */
-
-    left:
-        -7% !important;
-
-    top:
-        46% !important;
-
-    /*
-       MANUAL FINE TUNE — DISTANCE BETWEEN ARROWS
-
-       Increase this to move BOTH arrows
-       farther away from the card.
-    */
-
-    width:
-        114% !important;
-
-    height:
-        auto !important;
-
-    right:
-        auto !important;
-
-    display:
-        flex !important;
-
-    align-items:
-        center !important;
-
-    justify-content:
-        space-between !important;
-
-    padding:
-        0 !important;
-
-    margin:
-        0 !important;
-
-    transform:
-        translateY(-50%) !important;
-
-    pointer-events:
-        none !important;
-
-    z-index:
-        12 !important;
-}
-
-
 /* =========================================
    CHARACTER ARROWS
    ========================================= */
@@ -9114,38 +9056,6 @@ body {
    ========================================================= */
 
 #konoha-activity-screen[data-service-id="practical"]
-.practical-character-selector {
-
-    position:
-        absolute !important;
-
-    left:
-        -10% !important;
-
-    top:
-        50% !important;
-
-    width:
-        120% !important;
-
-    display:
-        flex !important;
-
-    justify-content:
-        space-between !important;
-
-    transform:
-        translateY(-50%) !important;
-
-    pointer-events:
-        none !important;
-
-    z-index:
-        8 !important;
-}
-
-
-#konoha-activity-screen[data-service-id="practical"]
 .practical-character-arrow {
 
     border:
@@ -10098,20 +10008,6 @@ body {
 /* =========================================================
    CHARACTER ARROWS
    ========================================================= */
-
-#konoha-activity-screen[data-service-id="practical"]
-.practical-character-selector {
-
-    left:
-        -10% !important;
-
-    top:
-        49% !important;
-
-    width:
-        116% !important;
-}
-
 
 /* =========================================================
    POWER LEVEL NUMBER
@@ -13777,27 +13673,6 @@ body {
 
 /* Baked cyan arrows remain visible; DOM buttons are hitboxes only. */
 #konoha-activity-screen[data-service-id="practical"]
-.practical-character-selector {
-    left:
-        -12% !important;
-
-    top:
-        50% !important;
-
-    width:
-        124% !important;
-
-    height:
-        34% !important;
-
-    align-items:
-        center !important;
-
-    pointer-events:
-        none !important;
-}
-
-#konoha-activity-screen[data-service-id="practical"]
 .practical-character-arrow {
     width:
         clamp(34px, 3.2vw, 52px) !important;
@@ -15098,14 +14973,14 @@ body {
 }
 
 /* =========================================================
-   POST-1988 — EXAMS + PRACTICAL CHARACTER ARROWS
-   FINAL PRESENTATION / POSITION AUTHORITY
+   POST-1989 — EXAMS + PRACTICAL CHARACTER ARROWS
+   SINGLE FINAL PRESENTATION / POSITION AUTHORITY
    =========================================================
 
    IMPORTANT:
-   Earlier CHARACTER NAVIGATION blocks remain historical scaffold.
-   DO NOT fine-tune those earlier selectors. This bottom block is the
-   final cascade authority for both Exams and Practical.
+   Historical selector-position blocks have been retired.
+   This is now the ONLY Practical selector-position authority and
+   the ONLY Exam selector-position authority in the stylesheet.
 
    PRACTICAL selector is INSIDE .practical-character-image-wrap.
    Therefore its left/top/width values are CARD-RELATIVE, not
@@ -15124,6 +14999,17 @@ body {
 /* ---------------------------------------------------------
    PRACTICAL — CARD-RELATIVE PAIR GEOMETRY
    --------------------------------------------------------- */
+
+/*
+   POST-1989 CLIP FIX:
+   The selector lives inside the character image wrapper. Earlier
+   1536x1102 integration clipped that wrapper, which prevented arrows
+   positioned outside the card edge from being visible.
+*/
+#konoha-activity-screen[data-service-id="practical"]
+.practical-character-image-wrap {
+    overflow: visible !important;
+}
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-selector {
