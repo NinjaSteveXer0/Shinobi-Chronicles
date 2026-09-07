@@ -65008,7 +65008,11 @@ function renderKonohaPracticalAnimatedResultText(
 
 
 // =========================================================
-// PRACTICAL ORDINARY RESULT SUMMARY
+// POST-1984 — PRACTICAL RESULT PL CONSEQUENCE PARITY
+// =========================================================
+// Mirrors Exams result metadata projection: POWER LEVEL X → Y,
+// PL PROGRESS +N.NN%, or NO PL DEVELOPMENT.
+// Uses existing beforePL / afterPL batch metadata only; no new progression semantics.
 // =========================================================
 
 
@@ -65139,6 +65143,115 @@ function renderKonohaPracticalResultSummary() {
     ).toUpperCase();
 
 
+  const meta =
+    KONOHA_PRACTICAL_UI_STATE
+      .lastBatchMeta ||
+      null;
+
+
+  let powerResult =
+    "";
+
+
+  let powerResultClass =
+    "progress";
+
+
+  if (
+    meta &&
+    meta.beforePL &&
+    meta.afterPL
+  ) {
+
+
+    const beforeDisplayed =
+      Number(
+        meta.beforePL
+          .displayedPL
+      ) || 0;
+
+
+    const afterDisplayed =
+      Number(
+        meta.afterPL
+          .displayedPL
+      ) || 0;
+
+
+    if (
+      afterDisplayed >
+      beforeDisplayed
+    ) {
+
+
+      powerResult =
+        `POWER LEVEL ${beforeDisplayed} → ${afterDisplayed}`;
+
+
+      powerResultClass =
+        "level-up";
+
+
+    }
+    else {
+
+
+      const beforeRaw =
+        Number(
+          meta.beforePL
+            .rawPL
+        ) || 0;
+
+
+      const afterRaw =
+        Number(
+          meta.afterPL
+            .rawPL
+        ) || 0;
+
+
+      const rawDifference =
+        Math.max(
+          0,
+          afterRaw -
+          beforeRaw
+        );
+
+
+      const progressGain =
+        rawDifference *
+        100;
+
+
+      if (
+        progressGain >
+          0
+      ) {
+
+
+        powerResult =
+          `PL PROGRESS +${progressGain.toFixed(
+            2
+          )}%`;
+
+
+      }
+      else {
+
+
+        powerResult =
+          "NO PL DEVELOPMENT";
+
+
+      }
+
+
+    }
+
+
+  }
+
+
   const failedReasonResult =
     failedResults.find(
       result =>
@@ -65187,6 +65300,27 @@ function renderKonohaPracticalResultSummary() {
             +${totalExp}
             ${disciplineName}
             EXP
+          </div>
+
+        `
+
+        : ""
+    }
+
+
+    ${
+      powerResult
+
+        ? `
+
+          <div
+            class="
+              practical-result-reward
+              practical-result-power
+              ${powerResultClass}
+            "
+          >
+            ${powerResult}
           </div>
 
         `

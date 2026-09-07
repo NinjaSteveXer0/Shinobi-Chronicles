@@ -1,19 +1,19 @@
-SHINOBI CHRONICLES — POST-1980 PRACTICAL 1536x1102 STYLE INTEGRATION
+SHINOBI CHRONICLES — POST-1984 PRACTICAL RESULT PL CONSEQUENCE PARITY
 
-SOURCE AUTHORITY
-- Input stylesheet normalizes exactly to GitHub style.css blob 44d27b755c41f931d556d3c3f6fa86242bf82bef before this change.
-- Accepted UI/practical.png is live on main at Git blob 87b3a21ac2b015b788c12ede633ffe9daabba149.
-- Accepted source master: 1536x1102 RGBA, 3,803,339 bytes, SHA-256 7933d4e6b1613adaff2b39ab08a426b54e2e80ab478296d33bdc02db2247fabb.
+BASE
+- Built on Post-1983 Practical PASS/FAIL balance game.js.
 
-CHANGES
-- Practical outer canvas now uses 1.39383 and aspect-ratio 1536 / 1102.
-- No unrelated selector family is intentionally modified.
-- Practical card/PL/progress/notification overlays recalibrated to the new master.
-- Practical discipline hitboxes/mastery/EXP/progress overlays recalibrated.
-- Baked Back/Begin/x1/x5/x10 legends remain visual authority; live DOM text is hidden while click targets remain active.
-- Selected/hover states use restrained live outlines/glows rather than duplicate text.
+CHANGE
+- Practical result summary now consumes existing lastBatchMeta.beforePL / afterPL.
+- Mirrors Exams projection semantics:
+  * POWER LEVEL X → Y when displayed PL increases
+  * PL PROGRESS +N.NN% when raw PL rises without displayed PL increase
+  * NO PL DEVELOPMENT when no PL movement occurred
+- Power result also carries practical-result-reward so it remains visibly styled with the current Post-1982 CSS even before any optional dedicated power styling.
+- No new progression formula or mutation introduced.
+- Practical PASS/FAIL / EXP balance from Post-1983 preserved.
 
-STATIC VALIDATION
-- Full replacement style.css generated from the exact current GitHub stylesheet after LF normalization.
-- Opening/closing CSS brace counts match.
-- Browser Golden is NOT claimed yet. Next evidence is a fresh local Practical screenshot at normal browser viewport, followed by any micro-calibration required.
+VALIDATION
+- node --check game.js: PASS
+- practical-result-power emitted once in renderer: PASS
+- beforePL / afterPL remain execution-owned batch metadata: PASS

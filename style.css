@@ -13847,10 +13847,10 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-pl {
     left:
-        7.15% !important;
+        7.55% !important;
 
     top:
-        52.50% !important;
+        50.75% !important;
 
     width:
         13.80% !important;
@@ -14360,6 +14360,25 @@ body {
    - Exam selected marker is nudged slightly downward for Ninjutsu /
      Genjutsu. The existing Fuinjutsu-specific calibration remains intact.
    ========================================================= */
+
+
+   /* TAIJUTSU MASTERY */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(1) .practical-mastery {
+    left: 2% !important;
+}
+
+/* BUKIJUTSU MASTERY */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(2) .practical-mastery {
+    left: 2% !important;
+}
+
+/* SURVIVAL MASTERY — LOCKED */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-discipline-select:nth-child(3) .practical-mastery {
+    left: 3.40% !important;
+}
 
 /* -------------------------
    EXAM SELECTION MARKER — SMALL DOWNWARD NUDGE
