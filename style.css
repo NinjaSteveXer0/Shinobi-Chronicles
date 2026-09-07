@@ -15098,29 +15098,41 @@ body {
 }
 
 /* =========================================================
-   POST-1987 — PRACTICAL CHARACTER ARROWS
+   POST-1988 — EXAMS + PRACTICAL CHARACTER ARROWS
+   FINAL PRESENTATION / POSITION AUTHORITY
    =========================================================
 
-   Existing Practical DOM already owns Previous / Next shinobi
-   controls using ‹ and ›. Earlier 1536×1102 integration hid
-   the glyphs because arrows were expected to be baked into the
-   raster. The current Practical artwork has no visible arrows,
-   so DOM returns to visual authority.
+   IMPORTANT:
+   Earlier CHARACTER NAVIGATION blocks remain historical scaffold.
+   DO NOT fine-tune those earlier selectors. This bottom block is the
+   final cascade authority for both Exams and Practical.
+
+   PRACTICAL selector is INSIDE .practical-character-image-wrap.
+   Therefore its left/top/width values are CARD-RELATIVE, not
+   full-screen percentages.
 
    Fine tuning:
-   - selector left/top/width = move the complete arrow pair
-   - smaller width = arrows closer to the card
-   - larger width = arrows farther from the card
-   - higher top = pair moves DOWN
-   - lower top = pair moves UP
+   left  = move complete arrow pair LEFT / RIGHT
+   top   = move complete arrow pair UP / DOWN
+   width = distance between left and right arrow
+
+   Higher top = DOWN. Lower top = UP.
+   More-negative left = pair farther LEFT.
+   Larger width = arrows farther APART.
    ========================================================= */
+
+/* ---------------------------------------------------------
+   PRACTICAL — CARD-RELATIVE PAIR GEOMETRY
+   --------------------------------------------------------- */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-selector {
-    left: 2.0% !important;
-    top: 28.6% !important;
-    width: 24.5% !important;
-    height: 8.0% !important;
+    position: absolute !important;
+
+    left: -12% !important;
+    top: 50% !important;
+    width: 124% !important;
+    height: 34% !important;
 
     display: flex !important;
     align-items: center !important;
@@ -15128,13 +15140,51 @@ body {
 
     transform: translateY(-50%) !important;
 
+    padding: 0 !important;
+    margin: 0 !important;
+
     pointer-events: none !important;
-    z-index: 14 !important;
+    z-index: 18 !important;
 }
 
+/* ---------------------------------------------------------
+   EXAMS — PRESERVE APPROVED CARD-RELATIVE PAIR GEOMETRY
+   --------------------------------------------------------- */
+
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-selector {
+    position: absolute !important;
+
+    left: -7% !important;
+    top: 46% !important;
+    width: 114% !important;
+    height: auto !important;
+
+    right: auto !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+
+    transform: translateY(-50%) !important;
+
+    padding: 0 !important;
+    margin: 0 !important;
+
+    pointer-events: none !important;
+    z-index: 18 !important;
+}
+
+/* ---------------------------------------------------------
+   SHARED PREMIUM CYAN ARROW PRESENTATION
+   --------------------------------------------------------- */
+
 #konoha-activity-screen[data-service-id="practical"]
-.practical-character-arrow {
+.practical-character-arrow,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-arrow {
     width: clamp(34px, 3.0vw, 48px) !important;
+    min-width: 34px !important;
     height: clamp(44px, 4.0vw, 62px) !important;
 
     padding: 0 !important;
@@ -15142,6 +15192,8 @@ body {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
+
+    position: relative !important;
 
     color: #45e5e9 !important;
 
@@ -15161,6 +15213,7 @@ body {
 
     background: transparent !important;
     border: none !important;
+    border-radius: 0 !important;
     outline: none !important;
     box-shadow: none !important;
 
@@ -15168,6 +15221,8 @@ body {
 
     cursor: pointer !important;
     pointer-events: auto !important;
+
+    z-index: 19 !important;
 
     transition:
         color 120ms ease,
@@ -15178,11 +15233,14 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-character-arrow:hover,
 #konoha-activity-screen[data-service-id="practical"]
-.practical-character-arrow:focus-visible {
+.practical-character-arrow:focus-visible,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-arrow:hover,
+#konoha-activity-screen[data-service-id="exams"]
+.exam-character-arrow:focus-visible {
     color: #8ff7fa !important;
 
     outline: none !important;
-
     background: transparent !important;
     box-shadow: none !important;
 
@@ -15193,3 +15251,4 @@ body {
 
     transform: scale(1.08) !important;
 }
+
