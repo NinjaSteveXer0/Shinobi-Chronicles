@@ -62445,7 +62445,8 @@ function executeKonohaExamBatch(
   // - Discipline Mastery increased
   // - Current PL increased
   //
-  // Ordinary PASS / FAIL remains separate.
+  // Ordinary PASS / FAIL is projected into the same
+  // Special Notifications feed by Post-1990.
   // =========================================
 
   recordKonohaExamSpecialNotifications(
@@ -63030,21 +63031,16 @@ function beginKonohaExamFromUI() {
 
 
   // =========================================
-  // TEMPORARY RESULT PRESENTATION
+  // POST-1990 RESULT PRESENTATION
+  // =========================================
+  //
+  // Ordinary PASS / FAIL now lives in Special Notifications.
+  // The historical floating result-stage state remains retired.
   // =========================================
 
-  if (
-    results.length >
-      0
-  ) {
-
-
-    showKonohaExamResultPresentation(
-      2800
-    );
-
-
-  }
+  KONOHA_EXAM_ATTEMPT_STATE
+    .resultVisible =
+      false;
 
 
   renderKonohaExamVisualScreen();
@@ -63096,7 +63092,7 @@ function beginKonohaExamFromUI() {
 // - batch execution
 // - x1 / x5 / x10 support
 // - Chronicle recording
-// - result rendering
+// - result notification projection
 // - Special Notification rendering
 //
 // =========================================================
@@ -63203,7 +63199,7 @@ function validateKonohaExamGameplaySystem() {
         "function",
 
     resultRenderer:
-      typeof renderKonohaExamResultStrip ===
+      typeof buildKonohaExamBatchResultNotification ===
         "function",
 
     specialNotificationRenderer:
@@ -63252,15 +63248,16 @@ function validateKonohaExamGameplaySystem() {
 //
 // IMPORTANT:
 //
-// Ordinary progression noise is deliberately excluded.
+// The feed now also owns ordinary Exam batch-result feedback.
 //
-// Current supported significant events:
+// Current supported entries:
 //
-// - Current PL increased
+// - PASS / FAIL / mixed Exam batch outcome
+// - Discipline EXP gained
+// - PL increase / PL progress projection
 //
-// Discipline Mastery increases are NOT retained here.
-// They remain visible through the ordinary Exam progression
-// UI and result stage.
+// Discipline Mastery increases are still NOT retained here.
+// Their live value remains visible in the Exam progression UI.
 //
 // Future systems may add genuinely significant events such as:
 //
@@ -63276,43 +63273,40 @@ function validateKonohaExamGameplaySystem() {
 // =========================================================
 
 
-function buildKonohaExamSpecialNotifications(
+function buildKonohaExamBatchResultNotification(
   characterId
 ) {
 
 
   const results =
-    KONOHA_EXAM_ATTEMPT_STATE
-      .lastBatch;
+    Array.isArray(
+      KONOHA_EXAM_ATTEMPT_STATE
+        .lastBatch
+    )
+
+      ? KONOHA_EXAM_ATTEMPT_STATE
+          .lastBatch
+
+      : [];
 
 
   const meta =
     KONOHA_EXAM_ATTEMPT_STATE
       .lastBatchMeta ||
-    null;
+      null;
 
 
   if (
-    !Array.isArray(
-      results
-    ) ||
+    !meta ||
+    meta.characterId !==
+      characterId ||
     results.length ===
       0
   ) {
 
-    return [];
 
-  }
+    return null;
 
-
-  if (
-    meta &&
-    meta.characterId &&
-    meta.characterId !==
-      characterId
-  ) {
-
-    return [];
 
   }
 
@@ -63326,83 +63320,235 @@ function buildKonohaExamSpecialNotifications(
     );
 
 
+  const passedResults =
+    completedResults.filter(
+      result =>
+        result.success ===
+          true
+    );
+
+
+  const failedResults =
+    completedResults.filter(
+      result =>
+        result.success !==
+          true
+    );
+
+
+  const incompleteCount =
+    Math.max(
+      0,
+      results.length -
+      completedResults.length
+    );
+
+
+  let title =
+    "ERROR";
+
+
+  let type =
+    "result-error";
+
+
   if (
     completedResults.length ===
+      1 &&
+    results.length ===
+      1
+  ) {
+
+
+    if (
+      passedResults.length ===
+        1
+    ) {
+
+
+      title =
+        "PASS";
+
+
+      type =
+        "result-pass";
+
+
+    }
+    else {
+
+
+      title =
+        "FAIL";
+
+
+      type =
+        "result-fail";
+
+
+    }
+
+
+  }
+  else if (
+    completedResults.length >
       0
   ) {
 
-    return [];
+
+    title =
+      `${passedResults.length} PASS · ${failedResults.length} FAIL`;
+
+
+    type =
+      failedResults.length ===
+        0
+
+        ? "result-pass"
+
+        : (
+            passedResults.length ===
+              0
+
+              ? "result-fail"
+
+              : "result-mixed"
+          );
+
 
   }
 
 
-  const notifications =
-    [];
+  const totalRewardExp =
+    passedResults.reduce(
+      (
+        total,
+        result
+      ) =>
+        total +
+        (
+          Number(
+            result.rewardExp
+          ) || 0
+        ),
+      0
+    );
 
 
-  // =========================================
-  // POWER LEVEL INCREASE
-  // =========================================
-  //
-  // PL crossing is significant enough to enter
-  // the persistent recent-history feed.
-  //
-  // Ordinary Discipline Mastery increases are
-  // deliberately NOT recorded here.
-  // =========================================
+  const disciplineId =
+    completedResults[0]
+      ? completedResults[0]
+          .disciplineId
+      : meta.disciplineId;
+
+
+  const discipline =
+    disciplineId
+      ? getShinobiDiscipline(
+          disciplineId
+        )
+      : null;
+
+
+  const disciplineName =
+    String(
+      discipline &&
+      discipline.name
+        ? discipline.name
+        : (
+            disciplineId ||
+            "Exam"
+          )
+    ).toUpperCase();
+
+
+  const detailParts = [
+
+
+    totalRewardExp >
+      0
+
+      ? `+${totalRewardExp} ${disciplineName} EXP`
+
+      : `0 ${disciplineName} EXP`
+
+
+  ];
 
 
   if (
-    meta &&
     meta.beforePL &&
     meta.afterPL
   ) {
 
 
-    const plBefore =
+    const beforeDisplayed =
       Number(
         meta.beforePL
           .displayedPL
       ) || 0;
 
 
-    const plAfter =
+    const afterDisplayed =
       Number(
         meta.afterPL
           .displayedPL
-      ) || plBefore;
+      ) || beforeDisplayed;
 
 
     if (
-      plAfter >
-        plBefore
+      afterDisplayed >
+        beforeDisplayed
     ) {
 
 
-      notifications.push({
+      detailParts.push(
+        `POWER LEVEL ${beforeDisplayed} → ${afterDisplayed}`
+      );
 
-        id:
-          `power-${characterId}-${plAfter}-${Date.now()}`,
 
-        characterId:
-          characterId,
+    }
+    else {
 
-        type:
-          "power",
 
-        significance:
-          "major",
+      const beforeRaw =
+        Number(
+          meta.beforePL
+            .rawPL
+        ) || 0;
 
-        title:
-          "POWER LEVEL INCREASED",
 
-        detail:
-          `POWER LEVEL ${plBefore} → ${plAfter}`,
+      const afterRaw =
+        Number(
+          meta.afterPL
+            .rawPL
+        ) || beforeRaw;
 
-        timestamp:
-          Date.now()
 
-      });
+      const rawDifference =
+        Math.max(
+          0,
+          afterRaw -
+          beforeRaw
+        );
+
+
+      const progressGain =
+        rawDifference *
+        100;
+
+
+      detailParts.push(
+        progressGain >
+          0
+
+          ? `PL PROGRESS +${progressGain.toFixed(
+              2
+            )}%`
+
+          : "NO PL DEVELOPMENT"
+      );
+
 
     }
 
@@ -63410,10 +63556,106 @@ function buildKonohaExamSpecialNotifications(
   }
 
 
-  return notifications;
+  if (
+    incompleteCount >
+      0
+  ) {
+
+
+    detailParts.push(
+      `${incompleteCount} INCOMPLETE`
+    );
+
+
+  }
+
+
+  return {
+
+    id:
+      `exam-result-${characterId}-${meta.disciplineId}-${Date.now()}`,
+
+    characterId:
+      characterId,
+
+    type:
+      type,
+
+    significance:
+      "activity-result",
+
+    title:
+      title,
+
+    detail:
+      detailParts.join(
+        " · "
+      ),
+
+    timestamp:
+      Date.now()
+
+  };
+
 
 }
 
+
+// =========================================================
+// POST-1990 — EXAM RESULT → SPECIAL NOTIFICATIONS
+// =========================================================
+//
+// Routine Exam PASS / FAIL feedback now lives in the existing
+// Special Notifications history feed rather than floating over
+// the authored Exam artwork.
+//
+// PASS / FAIL resolution, reward EXP, PL derivation and Chronicle
+// recording remain owned by their existing gameplay authorities.
+//
+// The batch notification carries the same useful result payload
+// previously shown by the floating result stage:
+//
+// - PASS / FAIL / mixed batch count
+// - Discipline EXP gained
+// - PL increase or PL progress
+// - incomplete attempt count when applicable
+//
+// A separate POWER LEVEL INCREASED notification is no longer
+// emitted for the same batch because that would duplicate the
+// batch result notification.
+// =========================================================
+
+
+function buildKonohaExamSpecialNotifications(
+  characterId
+) {
+
+
+  const notifications =
+    [];
+
+
+  const batchResult =
+    buildKonohaExamBatchResultNotification(
+      characterId
+    );
+
+
+  if (batchResult) {
+
+
+    notifications.push(
+      batchResult
+    );
+
+
+  }
+
+
+  return notifications;
+
+
+}
 
 // =========================================================
 // RECORD SIGNIFICANT EXAM HISTORY
@@ -64080,7 +64322,11 @@ function renderKonohaExamVisualScreen() {
             </div>
 
 
-            ${renderKonohaExamResultStrip()}
+            <!--
+               POST-1990:
+               Ordinary Exam PASS / FAIL feedback is projected
+               into Special Notifications.
+            -->
 
 
             <div
