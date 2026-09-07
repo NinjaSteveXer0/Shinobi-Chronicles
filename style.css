@@ -14798,10 +14798,10 @@ body {
 #konoha-activity-screen[data-service-id="practical"]
 .practical-begin-button {
     left:
-        50.50% !important;
+        50% !important;
 
     top:
-        90.35% !important;
+        89.7% !important;
 
     width:
         30.00% !important;
@@ -14905,115 +14905,96 @@ body {
         none !important;
 }
 
-/* ---------------------------------------------------------
-   ×1 / ×5 / ×10 — VISIBLE TEXT INSIDE BAKED EMPTY BOXES
-   --------------------------------------------------------- */
+/* -------------------------
+   PRACTICAL BATCH CONTROLS — INDEPENDENT BOX AUTHORITY
+   ------------------------- */
 
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-controls {
-    left:
-        69.15% !important;
+    position: absolute !important;
 
-    top:
-        91.00% !important;
+    left: 69.15% !important;
+    top: 91.00% !important;
 
-    width:
-        22.85% !important;
+    width: 22.85% !important;
+    height: 6.55% !important;
 
-    height:
-        6.55% !important;
+    display: block !important;
+    pointer-events: none !important;
 }
 
+/* Base style for all three */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-button {
-    display:
-        flex !important;
+    position: absolute !important;
+    top: 0 !important;
 
-    align-items:
-        center !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    padding: 0 !important;
 
-    justify-content:
-        center !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 
-    width:
-        100% !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
 
-    height:
-        100% !important;
+    color: #e5c66d !important;
+    font-size: clamp(16px, 1.45vw, 28px) !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-align: center !important;
+    text-shadow: 0 0 6px rgba(0, 0, 0, 0.55) !important;
 
-    padding:
-        0 !important;
-
-    color:
-        #e8cb75 !important;
-
-    font-family:
-        Georgia,
-        "Times New Roman",
-        serif !important;
-
-    font-size:
-        clamp(13px, 1.32vw, 23px) !important;
-
-    font-weight:
-        950 !important;
-
-    line-height:
-        1 !important;
-
-    text-shadow:
-        0 1px 3px rgba(0, 0, 0, 0.95) !important;
-
-    background:
-        transparent !important;
-
-    border:
-        none !important;
-
-    outline:
-        none !important;
-
-    box-shadow:
-        none !important;
-
-    cursor:
-        pointer !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
+/* ×1 box */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button:nth-child(1) {
+    top: -7% !important;
+    left: 0% !important;
+    width: 29.6% !important;
+}
+
+/* ×5 box */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button:nth-child(2) {
+    top: -7% !important;
+    left: 34% !important;
+    width: 29.6% !important;
+}
+
+/* ×10 box */
+#konoha-activity-screen[data-service-id="practical"]
+.practical-batch-button:nth-child(3) {
+    top: -7% !important;
+    left: 67% !important;
+    width: 29.6% !important;
+}
+
+/* hover / focus — no cyan rectangle */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-button:hover,
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-button:focus-visible {
-    color:
-        #f6dfa0 !important;
-
-    outline:
-        none !important;
-
-    box-shadow:
-        none !important;
-
-    text-shadow:
-        0 0 5px rgba(232, 203, 117, 0.42),
-        0 1px 3px rgba(0, 0, 0, 0.95) !important;
+    outline: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
 
-/* Selected batch gets text emphasis only — NO cyan rectangle. */
+/* selected / active — cyan text only, no box */
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-button.selected,
 #konoha-activity-screen[data-service-id="practical"]
 .practical-batch-button.active {
-    color:
-        #62edf1 !important;
-
-    outline:
-        none !important;
-
-    box-shadow:
-        none !important;
-
+    color: #45e5e9 !important;
     text-shadow:
-        0 0 6px rgba(74, 232, 237, 0.72),
-        0 1px 3px rgba(0, 0, 0, 0.95) !important;
+        0 0 7px rgba(69, 229, 233, 0.34),
+        0 0 14px rgba(69, 229, 233, 0.18) !important;
+    background: transparent !important;
+    box-shadow: none !important;
 }
-
