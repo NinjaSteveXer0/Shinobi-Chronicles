@@ -15,6 +15,114 @@
     rel="stylesheet"
     href="style.css"
   >
+
+  <!-- =====================================================
+       POST-1992 — WORLD MAP HEADER + LOWER-GUTTER CLEANUP
+
+       UI / Assets authority:
+       - baked World Map masterbrand is the visible brand authority
+       - legacy coded brand/logo block is retired on this shell
+       - redundant bottom dock is removed
+       - World Map terminates cleanly without a lower utility gutter
+       - map canvas/aspect/hotspot geometry remain untouched
+       ===================================================== -->
+  <style id="world-map-shell-cleanup-post-1992">
+    .game-header {
+      gap: 14px;
+      padding-left: 14px;
+    }
+
+    .header-ornament {
+      position: relative;
+      flex: 0 0 108px;
+      width: 108px;
+      height: 30px;
+      overflow: hidden;
+      border-left: 1px solid rgba(214, 169, 58, 0.42);
+      border-right: 1px solid rgba(38, 52, 72, 0.72);
+      background:
+        linear-gradient(
+          90deg,
+          rgba(214, 169, 58, 0.05),
+          rgba(0, 217, 232, 0.025) 58%,
+          transparent
+        );
+      pointer-events: none;
+    }
+
+    .header-ornament::before {
+      content: "";
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      top: 50%;
+      height: 1px;
+      transform: translateY(-50%);
+      background:
+        linear-gradient(
+          90deg,
+          transparent,
+          rgba(214, 169, 58, 0.72) 24%,
+          rgba(0, 217, 232, 0.42) 68%,
+          transparent
+        );
+      box-shadow: 0 0 7px rgba(214, 169, 58, 0.16);
+    }
+
+    .header-ornament::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 7px;
+      height: 7px;
+      transform: translate(-50%, -50%) rotate(45deg);
+      border: 1px solid rgba(214, 169, 58, 0.72);
+      background: rgba(5, 8, 12, 0.96);
+      box-shadow:
+        0 0 5px rgba(214, 169, 58, 0.22),
+        0 0 8px rgba(0, 217, 232, 0.08);
+    }
+
+    /*
+       Removing the retired 48px footer lets the World Map viewport
+       consume the shell directly. Preserve the existing map canvas
+       sizing rule; do not stretch/crop/re-scale the approved map.
+    */
+    .world-map-viewport {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    .world-map-display {
+      padding-bottom: 0;
+    }
+
+    @media (max-width: 1320px) {
+      .game-header {
+        gap: 10px;
+        padding-left: 10px;
+        padding-right: 12px;
+      }
+
+      .header-ornament {
+        flex-basis: 58px;
+        width: 58px;
+      }
+    }
+
+    @media (max-width: 1120px) {
+      .header-ornament {
+        flex-basis: 28px;
+        width: 28px;
+      }
+
+      .header-ornament::before {
+        left: 5px;
+        right: 5px;
+      }
+    }
+  </style>
 </head>
 
 
@@ -32,24 +140,15 @@
     <header class="game-header">
 
 
-      <!-- BRAND -->
-      <div class="header-brand">
-
-        <span class="brand-logo">🍥</span>
-
-        <div class="brand-text">
-
-          <h1 class="brand-title">
-            SHINOBI CHRONICLES
-          </h1>
-
-          <span class="brand-subtitle">
-            忍者年代記
-          </span>
-
-        </div>
-
-      </div>
+      <!--
+        POST-1992: coded SHINOBI CHRONICLES / ramen-logo placeholder
+        removed. The approved masterbrand is baked into WorldMap.png.
+        This slim ornament preserves deliberate visual balance only.
+      -->
+      <div
+        class="header-ornament"
+        aria-hidden="true"
+      ></div>
 
 
       <!-- =================================================
@@ -427,51 +526,12 @@
 
 </main>
 
-     <!-- =====================================================
-         BOTTOM GAME DOCK
-         ===================================================== -->
-    <footer class="game-footer">
 
-
-      <div
-        class="footer-action-item"
-        onclick="claimDailyReward()"
-      >
-
-        <span>
-          🎁 Daily Reward
-        </span>
-
-      </div>
-
-
-      <div
-        class="footer-action-item"
-        onclick="openOverlay('events')"
-      >
-
-        <span>
-          ⚔️ Events
-        </span>
-
-      </div>
-
-
-      <div
-        class="footer-action-item"
-        onclick="openOverlay('shop')"
-      >
-
-        <span>
-          🛒 Special Shop
-        </span>
-
-      </div>
-
-
-    </footer>
-
-
+    <!--
+      POST-1992: legacy bottom game dock removed.
+      Daily Reward / Events / Special Shop remain available from
+      the existing Quick Links panel in the left sidebar.
+    -->
 
 
     <!-- =====================================================
