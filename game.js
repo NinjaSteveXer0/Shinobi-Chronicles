@@ -40307,6 +40307,16 @@ function advanceBattleDeploymentQueue(side,participantId,reason="zero_remaining_
   if (options.requireSuccessor===true&&!hasBattleDeploymentSuccessor(side,removedSlot)) return false;
 
   const participant=getBattleParticipantByIdentity(side,participantId);
+  const withdrawnCardProjection=getBattleActiveCardProjection(side,participant);
+  const withdrawnPortraitProjection=participant
+    ? (side==="player"?resolveUIPortraitProjection(participant):resolveBattleEnemyPortraitProjection(participant))
+    : {path:""};
+  const withdrawnPresentation=participant?{
+    id:participant.id||participantId,
+    name:participant.name||participant.id||participantId,
+    cardPath:withdrawnCardProjection.path||"",
+    portraitPath:withdrawnPortraitProjection.path||""
+  }:null;
   const runtimeCleanup=cleanupBattleParticipantRuntimeState(side,participantId,reason);
   const movements=[];
 
@@ -40338,6 +40348,7 @@ function advanceBattleDeploymentQueue(side,participantId,reason="zero_remaining_
     vacatedSlot:removedSlot,
     replacementParticipantId,
     movements,
+    withdrawnPresentation,
     runtimeCleanup,
     createdAt:Date.now()
   };
@@ -70281,542 +70292,213 @@ function createCharacterCard(character) {
 // =========================================================
 
 function getBattlePlayerSlotPresentation() {
-
-
-  const visualOrder = [
-    3,
-    2,
-    1,
-    4,
-    5,
-    6
-  ];
-
-
-  return visualOrder.map(
-    slotNumber => {
-
-
-      const slot =
-        getBattleDeploymentSlot(
-          "player",
-          slotNumber
-        );
-
-
-      const member =
-        getBattleDeploymentParticipant(
-          "player",
-          slotNumber
-        );
-
-
-      return {
-
-        slotNumber:
-          slotNumber,
-
-        participantId:
-          slot
-            ? slot.participantId
-            : null,
-
-        member:
-          member,
-
-        active:
-          !!(
-            member &&
-            slotNumber === 1
-          )
-
-      };
-    }
-  );
+  // POST-1993: Active Slot 1 is projected in the central premium-card stage.
+  // The side sleeve is the waiting formation only.
+  return [2,3,4,5,6].map(slotNumber=>{
+    const slot=getBattleDeploymentSlot("player",slotNumber);
+    const member=getBattleDeploymentParticipant("player",slotNumber);
+    return {
+      slotNumber,
+      participantId:slot?slot.participantId:null,
+      member,
+      active:false,
+      queueRole:(getClanBattleQueueSlotDefinition(slotNumber)||{}).battleRole||null
+    };
+  });
 }
-
 
 function getBattleEnemySlotPresentation() {
-
-
-  const visualOrder = [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6
-  ];
-
-
-  return visualOrder.map(
-    slotNumber => {
-
-
-      const slot =
-        getBattleDeploymentSlot(
-          "enemy",
-          slotNumber
-        );
-
-
-      const enemy =
-        getBattleDeploymentParticipant(
-          "enemy",
-          slotNumber
-        );
-
-
-      return {
-
-        slotNumber:
-          slotNumber,
-
-        participantId:
-          slot
-            ? slot.participantId
-            : null,
-
-        enemy:
-          enemy,
-
-        active:
-          !!(
-            enemy &&
-            slotNumber === 1
-          )
-
-      };
-    }
-  );
+  // POST-1993: Mirror the player projection. Enemy Slot 1 is the central
+  // opponent card; Slots 2–6 remain the waiting formation.
+  return [2,3,4,5,6].map(slotNumber=>{
+    const slot=getBattleDeploymentSlot("enemy",slotNumber);
+    const enemy=getBattleDeploymentParticipant("enemy",slotNumber);
+    return {
+      slotNumber,
+      participantId:slot?slot.participantId:null,
+      enemy,
+      active:false,
+      queueRole:(getClanBattleQueueSlotDefinition(slotNumber)||{}).battleRole||null
+    };
+  });
 }
-
 
 // =========================================================
 // BRICK 301 — QUEUE TRANSITION PRESENTATION LOOKUP
 // =========================================================
 
-function getBattleRosterTransitionClass(
-  slot,
-  participant,
-  side
-) {
-
-
-  const deployment =
-    currentBattle.deployment;
-
-
-  const transition =
-    deployment &&
-    deployment.lastTransition
-
-      ? deployment.lastTransition
-
-      : null;
-
-
-  if (
-    !transition ||
-    transition.side !==
-      side ||
-    !participant ||
-    !Array.isArray(
-      transition.movements
-    )
-  ) {
-
-    return "";
-  }
-
-
-  const movement =
-    transition.movements.find(
-      entry =>
-        entry.participantId ===
-          participant.id &&
-        Number(
-          entry.toSlot
-        ) ===
-        Number(
-          slot.slotNumber
-        )
-    ) ||
-    null;
-
-
-  if (
-    !movement
-  ) {
-
-    return "";
-  }
-
-
-  switch (
-    movement.movementType
-  ) {
-
-
-    case "active_slide":
-
-      return "transition-active-slide";
-
-
+function getBattleRosterTransitionClass(slot,participant,side) {
+  const deployment=currentBattle.deployment;
+  const transition=deployment&&deployment.lastTransition?deployment.lastTransition:null;
+  if (!transition||transition.side!==side||!participant||!Array.isArray(transition.movements)) return "";
+  const movement=transition.movements.find(entry=>entry.participantId===participant.id&&Number(entry.toSlot)===Number(slot.slotNumber))||null;
+  if (!movement) return "";
+  switch (movement.movementType) {
+    case "next_queue_advance":
+      return "transition-next-queue-advance";
     case "reserve_promotion":
-
       return "transition-reserve-promotion";
-
-
+    case "queue_advance":
+      return "transition-queue-advance";
+    // Compatibility with historical transition names.
+    case "active_slide":
+      return "transition-next-queue-advance";
     case "reserve_slide":
-
-      return "transition-reserve-slide";
-
-
+      return "transition-queue-advance";
     default:
-
       return "";
   }
 }
-
 
 // =========================================================
 // BRICK 297 — LIVE BATTLE ROSTER SLEEVE RENDERER
 // =========================================================
 
-function renderBattleRosterSlot(
-  slot,
-  side
-) {
+function getBattleQueuePresentationLabel(slotNumber) {
+  const definition=getClanBattleQueueSlotDefinition(slotNumber);
+  return definition&&definition.label?definition.label:`SLOT ${slotNumber}`;
+}
 
+function getBattleActiveCardProjection(side,participant) {
+  if (!participant) return {side,path:"",status:"missing_participant",registryId:null,sourceId:null};
+  if (side==="player") {
+    const registryId=getCharacterRegistryId(participant);
+    const mapped=registryId?getCharacterCardAssetPath(registryId):"";
+    const runtimeCard=typeof participant.image==="string"&&participant.image.startsWith("Assets/")?participant.image:"";
+    const path=mapped||runtimeCard;
+    return {
+      side,
+      registryId:registryId||null,
+      sourceId:participant.id||registryId||null,
+      path,
+      status:path?"active":"missing_card_authority",
+      authority:mapped?"character_card_manifest":runtimeCard?"runtime_collectible_card":"missing"
+    };
+  }
+  const path=typeof participant.image==="string"?participant.image:"";
+  return {
+    side,
+    registryId:null,
+    sourceId:participant.id||null,
+    path,
+    status:path?"active":"missing_authored_enemy_image",
+    authority:path?"authored_enemy_image":"missing"
+  };
+}
 
-  const isPlayer =
-    side ===
-    "player";
+function getBattleParticipantTargetInteractionState(side,participantId) {
+  const pouchTargetState=getBattlePouchTargetPresentationState(side,participantId);
+  const skillTargetState=getBattleSkillTargetPresentationState(side,participantId);
+  const interaction=pouchTargetState.valid?"item":skillTargetState.valid?"skill":null;
+  return {pouchTargetState,skillTargetState,interaction};
+}
 
+function renderBattleRosterSlot(slot,side) {
+  const isPlayer=side==="player";
+  const participant=isPlayer?slot.member:slot.enemy;
+  const reserve=slot.slotNumber>=5;
+  const label=getBattleQueuePresentationLabel(slot.slotNumber);
 
-  const participant =
-    isPlayer
-      ? slot.member
-      : slot.enemy;
-
-
-  const compact =
-    slot.slotNumber >=
-    4;
-
-
-  if (
-    !participant
-  ) {
-
-
+  if (!participant) {
     return `
-      <div
-        class="
-          battle-live-roster-slot
-          ${compact ? "compact" : "full"}
-          is-empty
-        "
-        data-side="${side}"
-        data-slot="${slot.slotNumber}"
-      >
-
-        <span class="battle-live-slot-number">
-          ${slot.slotNumber}
-        </span>
-
+      <div class="battle-live-roster-slot ${reserve?"reserve":"next"} is-empty" data-side="${side}" data-slot="${slot.slotNumber}">
+        <span class="battle-live-queue-label">${label}</span>
       </div>
     `;
   }
 
-
-  const name =
-    participant.name ||
-    "UNKNOWN";
-
-
-  const portraitProjection =
-    isPlayer
-      ? resolveUIPortraitProjection(participant)
-      : resolveBattleEnemyPortraitProjection(participant);
-
-  const image =
-    portraitProjection.path;
-
-
-  const transitionClass =
-    getBattleRosterTransitionClass(
-      slot,
-      participant,
-      side
-    );
-
-
-  const pouchTargetState =
-    getBattlePouchTargetPresentationState(
-      side,
-      participant.id
-    );
-
-
-  const skillTargetState =
-    getBattleSkillTargetPresentationState(
-      side,
-      participant.id
-    );
-
-
-  const targetInteraction =
-    pouchTargetState.valid
-      ? "item"
-      : skillTargetState.valid
-        ? "skill"
-        : null;
-
-
-  let primaryValue =
-    "";
-
-
-  let secondaryValue =
-    "";
-
-
-  if (
-    isPlayer
-  ) {
-
-
-    const currentPower =
-      getBattleRemainingPL(
-        "player",
-        participant.id
-      );
-
-
-    const maxPower =
-      getBattleMaximumPL(
-        "player",
-        participant.id
-      );
-
-
-    primaryValue =
-      `PL ${currentPower}`;
-
-
-    secondaryValue =
-      `/ ${maxPower}`;
-  }
-
-  else {
-
-
-    const currentPower =
-      getBattleRemainingPL(
-        "enemy",
-        participant.id
-      );
-
-
-    const maxPower =
-      getBattleMaximumPL(
-        "enemy",
-        participant.id
-      );
-
-
-    primaryValue =
-      `PL ${currentPower}`;
-
-
-    secondaryValue =
-      `/ ${maxPower}`;
-  }
-
+  const name=participant.name||"UNKNOWN";
+  const portraitProjection=isPlayer?resolveUIPortraitProjection(participant):resolveBattleEnemyPortraitProjection(participant);
+  const image=portraitProjection.path;
+  const transitionClass=getBattleRosterTransitionClass(slot,participant,side);
+  const targetState=getBattleParticipantTargetInteractionState(side,participant.id);
+  const targetInteraction=targetState.interaction;
+  const currentPower=getBattleRemainingPL(side,participant.id);
+  const maxPower=getBattleMaximumPL(side,participant.id);
 
   return `
     <div
-      class="
-        battle-live-roster-slot
-        ${compact ? "compact" : "full"}
-        ${slot.active ? "is-active" : ""}
-        ${transitionClass}
-        ${
-          pouchTargetState.valid
-            ? "is-item-target"
-            : ""
-        }
-        ${
-          skillTargetState.valid
-            ? "is-skill-target"
-            : ""
-        }
-        ${
-          skillTargetState.selected
-            ? "is-selected-skill-target"
-            : ""
-        }
-      "
+      class="battle-live-roster-slot ${reserve?"reserve":"next"} ${transitionClass} ${targetState.pouchTargetState.valid?"is-item-target":""} ${targetState.skillTargetState.valid?"is-skill-target":""} ${targetState.skillTargetState.selected?"is-selected-skill-target":""}"
       data-side="${side}"
       data-slot="${slot.slotNumber}"
-      aria-current="${slot.active ? "true" : "false"}"
-      ${
-        targetInteraction
-          ? `
-              role="button"
-              tabindex="0"
-              aria-label="${
-                targetInteraction === "item"
-                  ? `Use selected Battle Pouch item on ${name}`
-                  : `Select ${name} as Skill target`
-              }"
-              onclick="
-                ${
-                  targetInteraction === "item"
-                    ? `confirmSelectedBattlePouchTarget('${side}','${participant.id}')`
-                    : `setSelectedBattleSkillTarget('${side}','${participant.id}')`
-                }
-              "
-              onkeydown="
-                if (
-                  event.key === 'Enter' ||
-                  event.key === ' '
-                ) {
-                  event.preventDefault();
-                  ${
-                    targetInteraction === "item"
-                      ? `confirmSelectedBattlePouchTarget('${side}','${participant.id}')`
-                      : `setSelectedBattleSkillTarget('${side}','${participant.id}')`
-                  };
-                }
-              "
-            `
-          : ""
-      }
+      ${targetInteraction?`role="button" tabindex="0" aria-label="${targetInteraction==="item"?`Use selected Battle Pouch item on ${name}`:`Select ${name} as Skill target`}" onclick="${targetInteraction==="item"?`confirmSelectedBattlePouchTarget('${side}','${participant.id}')`:`setSelectedBattleSkillTarget('${side}','${participant.id}')`}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();${targetInteraction==="item"?`confirmSelectedBattlePouchTarget('${side}','${participant.id}')`:`setSelectedBattleSkillTarget('${side}','${participant.id}')`};}"`:""}
     >
-
-      <span class="battle-live-slot-number">
-        ${slot.slotNumber}
-      </span>
-
-      ${
-        image
-          ? `
-              <img
-                class="battle-live-roster-portrait"
-                src="${image}"
-                alt="${name}"
-                draggable="false"
-                data-ui-portrait-registry-id="${portraitProjection.registryId||""}"
-                data-battle-portrait-source-id="${portraitProjection.sourceId||participant.id||""}"
-                data-ui-portrait-path="${image}"
-                onload="handleBattleRosterPortraitLoadSuccess(this)"
-                onerror="handleBattleRosterPortraitLoadError(this)"
-              >
-            `
-          : `<div class="battle-live-roster-portrait battle-live-roster-portrait-missing" data-portrait-status="missing-authority" aria-label="Portrait authority unavailable for ${name}">忍</div>`
-      }
-
+      <span class="battle-live-queue-label">${label}</span>
+      ${image?`<img class="battle-live-roster-portrait" src="${image}" alt="${name}" draggable="false" data-ui-portrait-registry-id="${portraitProjection.registryId||""}" data-battle-portrait-source-id="${portraitProjection.sourceId||participant.id||""}" data-ui-portrait-path="${image}" onload="handleBattleRosterPortraitLoadSuccess(this)" onerror="handleBattleRosterPortraitLoadError(this)">`:`<div class="battle-live-roster-portrait battle-live-roster-portrait-missing" data-portrait-status="missing-authority" aria-label="Portrait authority unavailable for ${name}">忍</div>`}
       <div class="battle-live-roster-copy">
-
-        <div class="battle-live-roster-name">
-          ${name}
-        </div>
-
-        <div class="battle-live-roster-power">
-
-          ${primaryValue}
-
-          ${
-            secondaryValue
-              ? `<span>${secondaryValue}</span>`
-              : ""
-          }
-
-        </div>
-
+        <div class="battle-live-roster-name">${name}</div>
+        <div class="battle-live-roster-power">PL ${currentPower}<span>/ ${maxPower}</span></div>
       </div>
-
     </div>
   `;
 }
-
-
 
 // =========================================================
 // BRICK 301 — WITHDRAWAL PRESENTATION ECHO
 // =========================================================
 
-function renderBattleWithdrawalEcho() {
-
-
-  const deployment =
-    currentBattle.deployment;
-
-
-  const transition =
-    deployment &&
-    deployment.lastTransition
-
-      ? deployment.lastTransition
-
-      : null;
-
-
-  if (
-    !transition ||
-    transition.type !==
-      "withdrawal_queue_advance" ||
-    transition.side !==
-      "player" ||
-    !transition
-      .withdrawnParticipantId
-  ) {
-
-    return "";
-  }
-
-
-  const withdrawnPlayer =
-    getPlayerCharacter(
-      transition
-        .withdrawnParticipantId
-    );
-
-
-  if (
-    !withdrawnPlayer
-  ) {
-
-    return "";
-  }
-
-
+function renderBattleActiveCard(side,participant) {
+  if (!participant) return `<div class="battle-live-active-card battle-live-active-card-${side} is-empty" data-side="${side}"></div>`;
+  const projection=getBattleActiveCardProjection(side,participant);
+  const targetState=getBattleParticipantTargetInteractionState(side,participant.id);
+  const targetInteraction=targetState.interaction;
+  const name=participant.name||"UNKNOWN";
+  const transition=currentBattle.deployment&&currentBattle.deployment.lastTransition||null;
+  const promoting=!!(transition&&transition.side===side&&Number(transition.vacatedSlot)===1&&transition.replacementParticipantId===participant.id);
   return `
-    <div class="battle-live-withdraw-echo">
-
-      ${
-        withdrawnPlayer.image
-          ? `
-              <img
-                src="${withdrawnPlayer.image}"
-                alt=""
-                draggable="false"
-              >
-            `
-          : ""
-      }
-
-      <span>
-        WITHDRAW
-      </span>
-
+    <div
+      class="battle-live-active-card battle-live-active-card-${side} ${promoting?"is-promoting":""} ${targetState.pouchTargetState.valid?"is-item-target":""} ${targetState.skillTargetState.valid?"is-skill-target":""} ${targetState.skillTargetState.selected?"is-selected-skill-target":""}"
+      data-side="${side}"
+      data-participant-id="${participant.id}"
+      ${targetInteraction?`role="button" tabindex="0" aria-label="${targetInteraction==="item"?`Use selected Battle Pouch item on ${name}`:`Select ${name} as Skill target`}" onclick="${targetInteraction==="item"?`confirmSelectedBattlePouchTarget('${side}','${participant.id}')`:`setSelectedBattleSkillTarget('${side}','${participant.id}')`}" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();${targetInteraction==="item"?`confirmSelectedBattlePouchTarget('${side}','${participant.id}')`:`setSelectedBattleSkillTarget('${side}','${participant.id}')`};}"`:""}
+    >
+      <span class="battle-live-active-card-heading">${side==="player"?"CURRENT ACTOR":"CURRENT OPPONENT"}</span>
+      ${projection.path?`<img class="battle-live-active-card-image" src="${projection.path}" alt="${name}" draggable="false" data-card-authority="${projection.authority}">`:`<div class="battle-live-active-card-missing" aria-label="Collectible card authority unavailable for ${name}">CARD AUTHORITY MISSING</div>`}
+      <div class="battle-live-active-nameplate">${name}</div>
     </div>
   `;
 }
 
+function getBattleTransitionWithdrawnParticipant(transition) {
+  if (!transition||!transition.withdrawnParticipantId) return null;
+  if (transition.withdrawnPresentation&&transition.withdrawnPresentation.name) return transition.withdrawnPresentation;
+  const participant=transition.side==="player"?getPlayerCharacter(transition.withdrawnParticipantId):null;
+  if (!participant) return null;
+  const card=getBattleActiveCardProjection(transition.side,participant);
+  return {id:participant.id,name:participant.name||participant.id,cardPath:card.path||"",portraitPath:(resolveUIPortraitProjection(participant)||{}).path||""};
+}
+
+function renderBattleWithdrawalEcho() {
+  const deployment=currentBattle.deployment;
+  const transition=deployment&&deployment.lastTransition?deployment.lastTransition:null;
+  if (!transition||transition.type!=="withdrawal_queue_advance"||!transition.withdrawnParticipantId||Number(transition.vacatedSlot)!==1) return "";
+  const withdrawn=getBattleTransitionWithdrawnParticipant(transition);
+  if (!withdrawn||!withdrawn.cardPath) return "";
+  const defeat=transition.reason==="zero_remaining_battle_pl";
+  return `
+    <div class="battle-live-active-exit-echo battle-live-active-exit-echo-${transition.side} ${defeat?"is-defeated":"is-withdrawn"}" aria-hidden="true">
+      <img src="${withdrawn.cardPath}" alt="" draggable="false">
+      <span>${defeat?"DEFEATED":"WITHDRAW"}</span>
+    </div>
+  `;
+}
+
+function renderBattlePromotionEcho(side) {
+  const deployment=currentBattle.deployment;
+  const transition=deployment&&deployment.lastTransition?deployment.lastTransition:null;
+  if (!transition||transition.type!=="withdrawal_queue_advance"||transition.side!==side||Number(transition.vacatedSlot)!==1||!transition.replacementParticipantId) return "";
+  const participant=getBattleParticipantByIdentity(side,transition.replacementParticipantId);
+  if (!participant) return "";
+  const portrait=side==="player"?resolveUIPortraitProjection(participant):resolveBattleEnemyPortraitProjection(participant);
+  const card=getBattleActiveCardProjection(side,participant);
+  if (!card.path) return "";
+  return `
+    <div class="battle-live-promotion-echo battle-live-promotion-echo-${side}" aria-hidden="true">
+      ${portrait.path?`<img class="battle-live-promotion-portrait" src="${portrait.path}" alt="" draggable="false">`:""}
+      <img class="battle-live-promotion-card" src="${card.path}" alt="" draggable="false">
+    </div>
+  `;
+}
 
 // =========================================================
 // BRICK 298 — LIVE SIX-SLOT BATTLE ROSTERS
@@ -70824,421 +70506,62 @@ function renderBattleWithdrawalEcho() {
 // BRICK 309 — TEMPORARY PREPARED SKILL DECK
 // =========================================================
 
-function renderCombatOverlay(
-  container
-) {
-
-
-  const enemy =
-    currentBattle.enemy ||
-    selectedEnemy;
-
-
-  if (
-    !enemy
-  ) {
-
-
-    container.innerHTML = `
-      <div class="battle-live-error">
-        NO ENEMY SELECTED
-      </div>
-    `;
-
-
+function renderCombatOverlay(container) {
+  const enemy=currentBattle.enemy||selectedEnemy;
+  if (!enemy) {
+    container.innerHTML=`<div class="battle-live-error">NO ENEMY SELECTED</div>`;
     return;
   }
 
-
-  if (
-    !currentBattle.deployment
-  ) {
-
-
-    currentBattle.deployment =
-      createBattleDeployment(
-        enemy,
-        currentBattle.activePlayer
-
-          ? currentBattle
-              .activePlayer
-              .id
-
-          : currentBattle
-              .characterId
-      );
-
-
+  if (!currentBattle.deployment) {
+    currentBattle.deployment=createBattleDeployment(enemy,currentBattle.activePlayer?currentBattle.activePlayer.id:currentBattle.characterId);
     syncBattleActivePlayerFromDeployment();
+    if (typeof syncBattleActiveEnemyFromDeployment==="function") syncBattleActiveEnemyFromDeployment();
   }
 
-
-  const activePlayer =
-    currentBattle.activePlayer ||
-    null;
-
-
-  const region =
-    selectedRegionKey &&
-    worldRegions[
-      selectedRegionKey
-    ]
-
-      ? worldRegions[
-          selectedRegionKey
-        ]
-
-      : null;
-
-
-  const location =
-    selectedLocationNode ||
-    null;
-
-
-  const playerBattlePL =
-    activePlayer
-
-      ? getBattleRemainingPL(
-          "player",
-          activePlayer.id
-        )
-
-      : 0;
-
-
-  const playerMaxBattlePL =
-    activePlayer
-
-      ? getBattleMaximumPL(
-          "player",
-          activePlayer.id
-        )
-
-      : 0;
-
-
-  const enemyPower =
-    getBattleRemainingPL(
-      "enemy",
-      enemy.id
-    );
-
-
-  const enemyMaxPower =
-    getBattleMaximumPL(
-      "enemy",
-      enemy.id
-    );
-
-
-  const battleLog =
-    Array.isArray(
-      currentBattle.battleLog
-    )
-
-      ? currentBattle.battleLog
-
-      : [];
-
-
-  const playerSlots =
-    getBattlePlayerSlotPresentation();
-
-
-  const enemySlots =
-    getBattleEnemySlotPresentation();
-
-
-  const activePlayerSlot =
-    playerSlots.find(
-      slot =>
-        slot &&
-        slot.active
-    ) ||
-    null;
-
-
-  const activeEnemySlot =
-    enemySlots.find(
-      slot =>
-        slot &&
-        slot.active
-    ) ||
-    null;
-
-
-  const playerRosterMarkup =
-    playerSlots
-      .map(
-        slot =>
-          renderBattleRosterSlot(
-            slot,
-            "player"
-          )
-      )
-      .join("");
-
-
-  const enemyRosterMarkup =
-    enemySlots
-      .map(
-        slot =>
-          renderBattleRosterSlot(
-            slot,
-            "enemy"
-          )
-      )
-      .join("");
-
-
-  const regionLabel =
-    region
-
-      ? region.name
-          .toUpperCase()
-
-      : "BATTLE";
-
-
-  const locationLabel =
-    location
-
-      ? location.name
-
-      : enemy.name;
-
-
-  const playerLabel =
-    activePlayer
-
-      ? activePlayer.name
-
-      : "NO ACTIVE SHINOBI";
-
-
-  const enemyLabel =
-    enemy.name ||
-    "UNKNOWN ENEMY";
-
-
-  const battleLogMarkup =
-    battleLog.length > 0
-
-      ? battleLog
-          .slice(
-            -8
-          )
-          .map(
-            entry => `
-              <div class="battle-live-log-entry">
-                ${entry}
-              </div>
-            `
-          )
-          .join("")
-
-      : `
-          <div class="battle-live-log-entry muted">
-            Battle begins...
-          </div>
-        `;
-
-
-  const canWithdraw =
-    canWithdrawActiveBattleFighter();
-
-
-  const withdrawalEcho =
-    renderBattleWithdrawalEcho();
-
-
-  // =======================================================
-  // BRICK 352 — SHARED BATTLE ACTION REGION
-  // =======================================================
-
-  const actionRegionMarkup =
-    renderBattleActionRegion(
-      activePlayer,
-      enemy
-    );
-
-
-  container.innerHTML = `
-
-    <section
-      class="battle-live-screen"
-      aria-label="Active Battle"
-    >
-
+  const activePlayer=currentBattle.activePlayer||getBattleDeploymentParticipant("player",1)||null;
+  const activeEnemy=getBattleDeploymentParticipant("enemy",1)||currentBattle.enemy||enemy;
+  const region=selectedRegionKey&&worldRegions[selectedRegionKey]?worldRegions[selectedRegionKey]:null;
+  const location=selectedLocationNode||null;
+  const playerBattlePL=activePlayer?getBattleRemainingPL("player",activePlayer.id):0;
+  const playerMaxBattlePL=activePlayer?getBattleMaximumPL("player",activePlayer.id):0;
+  const enemyPower=activeEnemy?getBattleRemainingPL("enemy",activeEnemy.id):0;
+  const enemyMaxPower=activeEnemy?getBattleMaximumPL("enemy",activeEnemy.id):0;
+  const playerSlots=getBattlePlayerSlotPresentation();
+  const enemySlots=getBattleEnemySlotPresentation();
+  const playerRosterMarkup=playerSlots.map(slot=>renderBattleRosterSlot(slot,"player")).join("");
+  const enemyRosterMarkup=enemySlots.map(slot=>renderBattleRosterSlot(slot,"enemy")).join("");
+  const regionLabel=region?region.name.toUpperCase():"BATTLE";
+  const locationLabel=location?location.name:(activeEnemy&&activeEnemy.name?activeEnemy.name:"ENCOUNTER");
+  const playerLabel=activePlayer?activePlayer.name:"NO ACTIVE SHINOBI";
+  const enemyLabel=activeEnemy&&activeEnemy.name?activeEnemy.name:"UNKNOWN ENEMY";
+  const actionRegionMarkup=renderBattleActionRegion(activePlayer,activeEnemy);
+
+  container.innerHTML=`
+    <section class="battle-live-screen" aria-label="Active Battle">
       <div class="battle-live-stage">
+        <div class="battle-live-location"><strong>${regionLabel}</strong><span>${locationLabel}</span></div>
+        <div class="battle-live-status"><strong>PLAYER ACTION</strong><span>${playerLabel} VS ${enemyLabel}</span></div>
 
+        <div class="battle-live-roster battle-live-roster-player">${playerRosterMarkup}</div>
+        <div class="battle-live-roster battle-live-roster-enemy">${enemyRosterMarkup}</div>
 
-        <div
-          class="
-            battle-live-heading
-            battle-live-heading-player
-          "
-        >
-          YOUR TEAM
-        </div>
+        ${renderBattleActiveCard("player",activePlayer)}
+        ${renderBattleActiveCard("enemy",activeEnemy)}
 
+        ${renderBattleWithdrawalEcho()}
+        ${renderBattlePromotionEcho("player")}
+        ${renderBattlePromotionEcho("enemy")}
 
-        <div
-          class="
-            battle-live-heading
-            battle-live-heading-enemy
-          "
-        >
-          ENEMY TEAM
-        </div>
-
-
-        <div class="battle-live-location">
-
-          <strong>
-            ${regionLabel}
-          </strong>
-
-          <span>
-            ${locationLabel}
-          </span>
-
-        </div>
-
-
-        <div class="battle-live-status">
-
-          <strong>
-            BATTLE ACTIVE
-          </strong>
-
-          <span>
-            ${playerLabel} VS ${enemyLabel}
-          </span>
-
-        </div>
-
-
-        <div
-          class="
-            battle-live-roster
-            battle-live-roster-player
-          "
-        >
-          ${playerRosterMarkup}
-        </div>
-
-
-        <div
-          class="
-            battle-live-roster
-            battle-live-roster-enemy
-          "
-        >
-          ${enemyRosterMarkup}
-        </div>
-
-
-        ${withdrawalEcho}
-
-
-        <div
-          class="
-            battle-live-active-label
-            battle-live-active-player
-          "
-        >
-
-          ACTIVE: ${
-            activePlayerSlot
-              ? activePlayerSlot
-                  .slotNumber
-              : "—"
-          }
-
-        </div>
-
-
-        <div
-          class="
-            battle-live-active-label
-            battle-live-active-enemy
-          "
-        >
-
-          ACTIVE: ${
-            activeEnemySlot
-              ? activeEnemySlot
-                  .slotNumber
-              : "—"
-          }
-
-        </div>
-
-
-        <div
-          class="
-            battle-live-power
-            battle-live-power-player
-          "
-        >
-
-          <strong>
-            ${playerBattlePL}
-          </strong>
-
-          <span>
-            / ${playerMaxBattlePL} PL
-          </span>
-
-        </div>
-
-
-        <div
-          class="
-            battle-live-power
-            battle-live-power-enemy
-          "
-        >
-
-          <strong>
-            ${enemyPower}
-          </strong>
-
-          <span>
-            / ${enemyMaxPower}
-          </span>
-
-        </div>
-
+        <div class="battle-live-power battle-live-power-player"><strong>${playerBattlePL}</strong><span>/ ${playerMaxBattlePL} PL</span></div>
+        <div class="battle-live-power battle-live-power-enemy"><strong>${enemyPower}</strong><span>/ ${enemyMaxPower} PL</span></div>
 
         ${renderBattleActionFamilyRow(activePlayer)}
-
         ${actionRegionMarkup}
-
-
-        <div class="battle-live-log">
-
-          <div class="battle-live-log-title">
-            BATTLE LOG
-          </div>
-
-          <div class="battle-live-log-feed">
-            ${battleLogMarkup}
-          </div>
-
-        </div>
-
-
       </div>
-
     </section>
   `;
 }
-
-
-
 
 // =========================================================
 // UI MODULE — VICTORY RESULTS SCREEN

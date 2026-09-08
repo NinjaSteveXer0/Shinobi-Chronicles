@@ -15138,3 +15138,780 @@ body {
     transform: scale(1.08) !important;
 }
 
+
+/* =========================================================
+   POST-1993 — BATTLE UI PREMIUM ACTOR / FIVE-PORTRAIT QUEUE
+   FINAL BATTLE PRESENTATION AUTHORITY
+   =========================================================
+
+   Runtime authority preserved:
+   START -> active premium card
+   NEXT 1/2/3 -> waiting uiPortraits
+   RESERVE 1/2 -> compact waiting uiPortraits
+
+   Representation roles remain distinct:
+   collectibleCard != uiPortrait
+   ========================================================= */
+
+/* Retire stale headings / labels / permanent log from the prior shell. */
+.battle-live-heading,
+.battle-live-active-label,
+.battle-live-log {
+  display: none !important;
+}
+
+.battle-live-location {
+  top: 0.9% !important;
+  width: 26% !important;
+}
+
+.battle-live-location strong {
+  font-size: clamp(11px, 1.22vw, 20px) !important;
+}
+
+.battle-live-location span {
+  font-size: clamp(6px, 0.62vw, 10px) !important;
+}
+
+.battle-live-status {
+  top: 6.2% !important;
+  width: 24% !important;
+}
+
+.battle-live-status strong {
+  color: #50dff1 !important;
+  font-size: clamp(8px, 0.86vw, 14px) !important;
+}
+
+.battle-live-status span {
+  margin-top: 1.1% !important;
+  color: #e7c36f !important;
+  font-size: clamp(5px, 0.53vw, 9px) !important;
+}
+
+/* =========================================================
+   ACTIVE PREMIUM CARD STAGE
+   ========================================================= */
+
+.battle-live-active-card {
+  position: absolute;
+  top: 15.25%;
+  width: 21.65%;
+  height: 35.95%;
+  z-index: 12;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.battle-live-active-card-player {
+  left: 19.65%;
+}
+
+.battle-live-active-card-enemy {
+  left: 58.95%;
+}
+
+.battle-live-active-card-heading {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -8.2%;
+  color: #d8b76a;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(8px, 0.9vw, 15px);
+  font-weight: 900;
+  letter-spacing: 0.055em;
+  text-align: center;
+  text-shadow: 0 2px 4px #000;
+  pointer-events: none;
+}
+
+.battle-live-active-card-player .battle-live-active-card-heading {
+  color: #55dff1;
+}
+
+.battle-live-active-card-enemy .battle-live-active-card-heading {
+  color: #f05643;
+}
+
+.battle-live-active-card-image {
+  position: absolute;
+  inset: 1.2%;
+  width: 97.6%;
+  height: 97.6%;
+  display: block;
+  object-fit: contain;
+  object-position: center center;
+  filter: drop-shadow(0 7px 12px rgba(0,0,0,0.6));
+  user-select: none;
+  pointer-events: none;
+}
+
+.battle-live-active-card-missing {
+  position: absolute;
+  inset: 4%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8%;
+  color: #ef6c57;
+  background: rgba(5,8,11,0.92);
+  border: 1px dashed rgba(239,108,87,0.7);
+  font-size: clamp(7px, 0.65vw, 11px);
+  font-weight: 900;
+  text-align: center;
+}
+
+.battle-live-active-nameplate {
+  position: absolute;
+  left: 25%;
+  bottom: -13.4%;
+  width: 70%;
+  height: 9.8%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4%;
+  color: #eee7d8;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(7px, 0.8vw, 13px);
+  font-weight: 900;
+  letter-spacing: 0.025em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 4px #000;
+  pointer-events: none;
+}
+
+.battle-live-active-card-player .battle-live-active-nameplate {
+  color: #d9f9ff;
+}
+
+.battle-live-active-card-enemy .battle-live-active-nameplate {
+  color: #ffe0d8;
+}
+
+.battle-live-active-card.is-item-target,
+.battle-live-active-card.is-skill-target {
+  cursor: pointer;
+}
+
+.battle-live-active-card.is-item-target::after,
+.battle-live-active-card.is-skill-target::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(93,231,244,0.82);
+  box-shadow: 0 0 18px rgba(49,209,232,0.34), inset 0 0 16px rgba(49,209,232,0.08);
+  pointer-events: none;
+}
+
+.battle-live-active-card-enemy.is-item-target::after,
+.battle-live-active-card-enemy.is-skill-target::after {
+  border-color: rgba(244,102,76,0.86);
+  box-shadow: 0 0 18px rgba(232,74,48,0.34), inset 0 0 16px rgba(232,74,48,0.08);
+}
+
+.battle-live-active-card.is-selected-skill-target::after {
+  border-color: #fff1a8;
+  box-shadow: 0 0 22px rgba(255,221,99,0.52), inset 0 0 18px rgba(255,221,99,0.1);
+}
+
+/* =========================================================
+   WAITING FORMATION — 3 NEXT + 2 RESERVE PORTRAITS
+   ========================================================= */
+
+.battle-live-roster {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 15 !important;
+  pointer-events: none !important;
+}
+
+.battle-live-roster-slot {
+  position: absolute !important;
+  height: 15.15% !important;
+  width: 10.75% !important;
+  overflow: visible !important;
+  pointer-events: auto !important;
+  background: transparent !important;
+}
+
+.battle-live-roster-player .battle-live-roster-slot {
+  left: 3.78% !important;
+}
+
+.battle-live-roster-enemy .battle-live-roster-slot {
+  left: 85.45% !important;
+}
+
+.battle-live-roster-player [data-slot="2"],
+.battle-live-roster-enemy [data-slot="2"] {
+  top: 5.35% !important;
+}
+
+.battle-live-roster-player [data-slot="3"],
+.battle-live-roster-enemy [data-slot="3"] {
+  top: 24.05% !important;
+}
+
+.battle-live-roster-player [data-slot="4"],
+.battle-live-roster-enemy [data-slot="4"] {
+  top: 42.75% !important;
+}
+
+/* Reserve portraits remain visible but compact beneath NEXT 3. */
+.battle-live-roster-player [data-slot="5"],
+.battle-live-roster-enemy [data-slot="5"],
+.battle-live-roster-player [data-slot="6"],
+.battle-live-roster-enemy [data-slot="6"] {
+  top: 55.15% !important;
+  width: 4.85% !important;
+  height: 7.25% !important;
+}
+
+.battle-live-roster-player [data-slot="5"] { left: 3.82% !important; }
+.battle-live-roster-player [data-slot="6"] { left: 9.48% !important; }
+.battle-live-roster-enemy [data-slot="5"] { left: 85.48% !important; }
+.battle-live-roster-enemy [data-slot="6"] { left: 91.10% !important; }
+
+.battle-live-queue-label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -11.5%;
+  z-index: 6;
+  color: #e2be63;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(6px, 0.68vw, 11px);
+  font-weight: 900;
+  letter-spacing: 0.035em;
+  text-align: center;
+  text-shadow: 0 2px 3px #000;
+  pointer-events: none;
+}
+
+.battle-live-roster-player .battle-live-queue-label {
+  color: #55dff1;
+}
+
+.battle-live-roster-enemy .battle-live-queue-label {
+  color: #f05242;
+}
+
+.battle-live-roster-slot.reserve .battle-live-queue-label {
+  top: -20%;
+  font-size: clamp(4px, 0.46vw, 8px);
+}
+
+.battle-live-slot-number {
+  display: none !important;
+}
+
+.battle-live-roster-portrait {
+  position: absolute !important;
+  left: 3.5% !important;
+  top: 3.5% !important;
+  width: 93% !important;
+  height: 80% !important;
+  display: block !important;
+  object-fit: cover !important;
+  object-position: 50% 24% !important;
+  background: rgba(2,5,7,0.96) !important;
+  filter: contrast(1.035) saturate(0.98) !important;
+  pointer-events: none !important;
+}
+
+.battle-live-roster-slot.reserve .battle-live-roster-portrait {
+  left: 2% !important;
+  top: 2% !important;
+  width: 96% !important;
+  height: 96% !important;
+  border-radius: 2px;
+}
+
+.battle-live-roster-copy {
+  position: absolute !important;
+  left: 2% !important;
+  right: 2% !important;
+  top: auto !important;
+  bottom: 0 !important;
+  height: 20% !important;
+  z-index: 5 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 3% !important;
+  background: rgba(2,5,8,0.88) !important;
+  overflow: hidden !important;
+}
+
+.battle-live-roster-name {
+  width: 100%;
+  color: #eee7da !important;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(5px, 0.58vw, 9px) !important;
+  font-weight: 800 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.battle-live-roster-power {
+  display: none !important;
+}
+
+.battle-live-roster-slot.reserve .battle-live-roster-copy {
+  display: none !important;
+}
+
+.battle-live-roster-slot.is-empty {
+  opacity: 0.28;
+}
+
+.battle-live-roster-slot.is-empty::after {
+  content: "—";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(190,184,169,0.65);
+  font-size: clamp(8px, 1vw, 16px);
+}
+
+.battle-live-roster-slot.is-item-target,
+.battle-live-roster-slot.is-skill-target {
+  cursor: pointer !important;
+  box-shadow: 0 0 16px rgba(67,218,238,0.32);
+}
+
+.battle-live-roster-enemy .battle-live-roster-slot.is-item-target,
+.battle-live-roster-enemy .battle-live-roster-slot.is-skill-target {
+  box-shadow: 0 0 16px rgba(235,81,54,0.34);
+}
+
+/* =========================================================
+   CENTRAL PL MEDALLIONS
+   ========================================================= */
+
+.battle-live-power {
+  top: 56.35% !important;
+  width: 6.45% !important;
+  height: 8.2% !important;
+  transform: translateY(-50%) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  z-index: 18 !important;
+}
+
+.battle-live-power-player {
+  left: 27.10% !important;
+}
+
+.battle-live-power-enemy {
+  right: 27.10% !important;
+}
+
+.battle-live-power strong {
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(15px, 1.7vw, 28px) !important;
+  line-height: 0.92 !important;
+}
+
+.battle-live-power span {
+  margin-top: 3% !important;
+  font-size: clamp(4px, 0.43vw, 7px) !important;
+}
+
+/* =========================================================
+   QUEUE / ACTIVE TRANSITIONS
+   ========================================================= */
+
+.battle-live-roster-slot.transition-next-queue-advance {
+  animation: battlePost1993NextAdvance 560ms cubic-bezier(0.18,0.78,0.22,1) both;
+}
+
+.battle-live-roster-slot.transition-reserve-promotion {
+  animation: battlePost1993ReservePromotion 660ms cubic-bezier(0.16,0.82,0.22,1) both;
+}
+
+.battle-live-roster-slot.transition-queue-advance {
+  animation: battlePost1993QueueAdvance 520ms cubic-bezier(0.2,0.72,0.24,1) both;
+}
+
+@keyframes battlePost1993NextAdvance {
+  0% { opacity: 0.42; transform: translateY(38%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes battlePost1993ReservePromotion {
+  0% { opacity: 0; transform: translateY(80%) scale(0.72); filter: brightness(1.5); }
+  60% { opacity: 1; transform: translateY(-5%) scale(1.04); }
+  100% { opacity: 1; transform: translateY(0) scale(1); filter: brightness(1); }
+}
+
+@keyframes battlePost1993QueueAdvance {
+  0% { opacity: 0.5; transform: translateY(28%); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Active card remains beneath the promotion echo until it lands. */
+.battle-live-active-card.is-promoting {
+  animation: battlePost1993ActiveSettle 720ms ease-out both;
+}
+
+@keyframes battlePost1993ActiveSettle {
+  0%, 72% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.battle-live-promotion-echo {
+  position: absolute;
+  top: 5.35%;
+  width: 10.75%;
+  height: 15.15%;
+  z-index: 80;
+  transform-origin: center center;
+  pointer-events: none;
+  animation-duration: 720ms;
+  animation-timing-function: cubic-bezier(0.16,0.78,0.18,1);
+  animation-fill-mode: both;
+}
+
+.battle-live-promotion-echo-player {
+  left: 3.78%;
+  animation-name: battlePost1993PromotePlayer;
+}
+
+.battle-live-promotion-echo-enemy {
+  left: 85.45%;
+  animation-name: battlePost1993PromoteEnemy;
+}
+
+.battle-live-promotion-echo img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 12px rgba(0,0,0,0.62));
+}
+
+.battle-live-promotion-portrait {
+  animation: battlePost1993PortraitCrossfade 720ms ease both;
+}
+
+.battle-live-promotion-card {
+  opacity: 0;
+  animation: battlePost1993CardCrossfade 720ms ease both;
+}
+
+@keyframes battlePost1993PromotePlayer {
+  0% { left: 3.78%; top: 5.35%; width: 10.75%; height: 15.15%; }
+  52% { left: 13.5%; top: 13%; width: 15.4%; height: 24%; }
+  100% { left: 19.65%; top: 15.25%; width: 21.65%; height: 35.95%; }
+}
+
+@keyframes battlePost1993PromoteEnemy {
+  0% { left: 85.45%; top: 5.35%; width: 10.75%; height: 15.15%; }
+  52% { left: 71.8%; top: 13%; width: 15.4%; height: 24%; }
+  100% { left: 58.95%; top: 15.25%; width: 21.65%; height: 35.95%; }
+}
+
+@keyframes battlePost1993PortraitCrossfade {
+  0%, 42% { opacity: 1; }
+  68%, 100% { opacity: 0; }
+}
+
+@keyframes battlePost1993CardCrossfade {
+  0%, 44% { opacity: 0; }
+  74%, 100% { opacity: 1; }
+}
+
+.battle-live-active-exit-echo {
+  position: absolute;
+  top: 15.25%;
+  width: 21.65%;
+  height: 35.95%;
+  z-index: 79;
+  pointer-events: none;
+  transform-origin: center center;
+}
+
+.battle-live-active-exit-echo-player { left: 19.65%; }
+.battle-live-active-exit-echo-enemy { left: 58.95%; }
+
+.battle-live-active-exit-echo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 9px 16px rgba(0,0,0,0.68));
+}
+
+.battle-live-active-exit-echo span {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 43%;
+  color: #ff6c4f;
+  font-size: clamp(12px, 1.5vw, 24px);
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-shadow: 0 2px 4px #000, 0 0 14px rgba(255,65,37,0.7);
+}
+
+.battle-live-active-exit-echo-player.is-defeated {
+  animation: battlePost1993KnockPlayer 700ms cubic-bezier(0.2,0.68,0.28,1) both;
+}
+
+.battle-live-active-exit-echo-enemy.is-defeated {
+  animation: battlePost1993KnockEnemy 700ms cubic-bezier(0.2,0.68,0.28,1) both;
+}
+
+.battle-live-active-exit-echo-player.is-withdrawn {
+  animation: battlePost1993WithdrawPlayer 620ms ease-in both;
+}
+
+.battle-live-active-exit-echo-enemy.is-withdrawn {
+  animation: battlePost1993WithdrawEnemy 620ms ease-in both;
+}
+
+@keyframes battlePost1993KnockPlayer {
+  0% { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); }
+  18% { transform: translate(-3%,1%) rotate(-3deg) scale(1.03); }
+  100% { opacity: 0; transform: translate(-150%,42%) rotate(-24deg) scale(0.72); }
+}
+
+@keyframes battlePost1993KnockEnemy {
+  0% { opacity: 1; transform: translate(0,0) rotate(0deg) scale(1); }
+  18% { transform: translate(3%,1%) rotate(3deg) scale(1.03); }
+  100% { opacity: 0; transform: translate(150%,42%) rotate(24deg) scale(0.72); }
+}
+
+@keyframes battlePost1993WithdrawPlayer {
+  0% { opacity: 1; transform: translateX(0) scale(1); }
+  100% { opacity: 0; transform: translateX(-80%) scale(0.85); }
+}
+
+@keyframes battlePost1993WithdrawEnemy {
+  0% { opacity: 1; transform: translateX(0) scale(1); }
+  100% { opacity: 0; transform: translateX(80%) scale(0.85); }
+}
+
+/* =========================================================
+   ACTION FAMILY / FIVE-CARD DECK
+   ========================================================= */
+
+.battle-live-action-family-row {
+  position: absolute;
+  left: 2.55%;
+  top: 61.75%;
+  width: 57.8%;
+  height: 4.65%;
+  z-index: 30;
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 0.6%;
+  pointer-events: auto;
+}
+
+.battle-live-action-family {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #d7b66c;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(7px, 0.82vw, 13px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  text-shadow: 0 2px 4px #000;
+}
+
+.battle-live-action-family:hover:not(:disabled),
+.battle-live-action-family:focus-visible:not(:disabled),
+.battle-live-action-family.is-selected {
+  color: #62e8f4;
+  outline: none;
+  background: linear-gradient(180deg,rgba(30,164,190,0.14),rgba(5,16,22,0.02));
+  box-shadow: inset 0 -2px 0 rgba(68,224,240,0.84), 0 0 12px rgba(43,193,216,0.12);
+}
+
+.battle-live-withdraw-action:hover:not(:disabled),
+.battle-live-withdraw-action:focus-visible:not(:disabled) {
+  color: #f0c261;
+  box-shadow: inset 0 -2px 0 rgba(228,177,70,0.85);
+}
+
+.battle-live-action-family:disabled {
+  opacity: 0.34;
+  cursor: not-allowed;
+}
+
+.battle-live-skill-deck {
+  left: 3.55% !important;
+  top: 68.35% !important;
+  width: 55.75% !important;
+  height: 23.65% !important;
+  gap: 1.35% !important;
+  z-index: 31 !important;
+}
+
+.battle-dev-skill-card {
+  padding: 7% 6% !important;
+  background: rgba(3,8,12,0.34) !important;
+  border-color: rgba(207,159,64,0.2) !important;
+  border-radius: 1px !important;
+}
+
+.battle-dev-skill-card.is-ready {
+  border-color: rgba(77,213,231,0.46) !important;
+}
+
+.battle-dev-skill-card.is-selected {
+  border-color: rgba(87,231,246,0.94) !important;
+  box-shadow: 0 0 15px rgba(56,215,235,0.34), inset 0 0 16px rgba(31,182,206,0.12) !important;
+}
+
+/* =========================================================
+   SKILL DETAILS — RIGHT BAKED PANEL
+   ========================================================= */
+
+.battle-live-skill-details {
+  position: absolute;
+  left: 62.55%;
+  top: 61.65%;
+  width: 34.8%;
+  height: 31.2%;
+  z-index: 32;
+  display: flex;
+  flex-direction: column;
+  padding: 2.2% 2.3% 1.9%;
+  overflow: hidden;
+  color: #ded6ca;
+  pointer-events: auto;
+}
+
+.battle-live-skill-details-title {
+  color: #ead6f7;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(9px, 1.1vw, 18px);
+  font-weight: 900;
+  letter-spacing: 0.045em;
+}
+
+.battle-live-skill-details-name {
+  margin-top: 6%;
+  color: #f0e7d9;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(10px, 1.25vw, 20px);
+}
+
+.battle-live-skill-details-type,
+.battle-live-skill-details-target,
+.battle-live-skill-details-empty {
+  margin-top: 4%;
+  color: #b9ad98;
+  font-size: clamp(6px, 0.64vw, 10px);
+  line-height: 1.3;
+}
+
+.battle-live-skill-details-type {
+  color: #58dce9;
+  text-transform: uppercase;
+}
+
+.battle-live-skill-mode-list {
+  margin-top: 5%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2%;
+}
+
+.battle-live-skill-mode {
+  padding: 2% 4%;
+  border: 1px solid rgba(191,135,231,0.55);
+  background: rgba(31,15,43,0.7);
+  color: #cfa8eb;
+  font-size: clamp(5px, 0.52vw, 8px);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.battle-live-skill-mode.is-selected {
+  border-color: #dca9ff;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(177,91,231,0.35);
+}
+
+.battle-live-skill-details-actions {
+  margin-top: auto;
+  height: 18%;
+  display: grid;
+  grid-template-columns: 1.2fr 0.9fr;
+  gap: 4%;
+}
+
+.battle-live-use-skill,
+.battle-live-cancel-skill {
+  border: 0;
+  background: transparent;
+  color: #eee5da;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(7px, 0.82vw, 13px);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.battle-live-use-skill {
+  color: #eadcff;
+  text-shadow: 0 0 8px rgba(182,103,236,0.42);
+}
+
+.battle-live-use-skill:hover:not(:disabled),
+.battle-live-use-skill:focus-visible:not(:disabled) {
+  color: #fff;
+  outline: 1px solid rgba(198,123,244,0.7);
+}
+
+.battle-live-use-skill:disabled {
+  opacity: 0.34;
+  cursor: not-allowed;
+}
+
+.battle-live-cancel-skill:hover,
+.battle-live-cancel-skill:focus-visible {
+  color: #f1cd7e;
+  outline: 1px solid rgba(214,169,58,0.5);
+}
+
+/* Bring Item family into the same lower-left action canvas. */
+.battle-live-pouch {
+  left: 3.55% !important;
+  top: 68.35% !important;
+  width: 55.75% !important;
+  height: 23.65% !important;
+  z-index: 31 !important;
+}
+
+/* =========================================================
+   RESPONSIVE — preserve 3:2 stage; only typography/compact reserves adapt.
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .battle-live-roster-slot.reserve .battle-live-queue-label,
+  .battle-live-active-card-heading {
+    display: none;
+  }
+
+  .battle-live-action-family-row {
+    grid-template-columns: repeat(4,minmax(0,1fr));
+  }
+}
