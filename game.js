@@ -9115,10 +9115,31 @@ function loadPlayerData() {
   try {
     const parsedData = JSON.parse(savedData);
     console.log("Player save loaded:", parsedData);
-    const legacySeedMigration = !parsedData.acquisition;
-    const characterOwnership = normalizeCharacterOwnershipState(
-      parsedData.characterOwnership || (legacySeedMigration ? {ownedRegistryIds:[...LEGACY_ALPHA_SEED_CHARACTER_REGISTRY_IDS]} : null)
-    );
+
+    // POST-1994 — mixed-era save repair.
+    // Fresh/current saves always own an explicit characterOwnership field, even
+    // when intentionally empty. Older Alpha saves may already contain the newer
+    // acquisition object while still lacking characterOwnership entirely. The old
+    // gate only checked !parsedData.acquisition, which stranded those saves with
+    // zero manageable My Clan characters and therefore no legal Battle START.
+    // Missing ownership schema is the migration signal; explicit empty ownership
+    // remains authoritative and is never auto-seeded.
+    const ownershipSchemaMissing = !Object.prototype.hasOwnProperty.call(parsedData,"characterOwnership");
+    const acquisitionMigration = parsedData.acquisition && parsedData.acquisition.migration && typeof parsedData.acquisition.migration === "object"
+      ? parsedData.acquisition.migration
+      : null;
+    const preservedLegacyVariantIds = acquisitionMigration && acquisitionMigration.source === "pre_acquisition_alpha_seed" && Array.isArray(acquisitionMigration.preservedVariantIds)
+      ? acquisitionMigration.preservedVariantIds.filter(registryId=>typeof registryId === "string" && !!getCharacterRegistryEntry(registryId))
+      : [];
+    const explicitOwnershipIds = parsedData.characterOwnership && Array.isArray(parsedData.characterOwnership.ownedRegistryIds)
+      ? parsedData.characterOwnership.ownedRegistryIds
+      : [];
+    const repairPreservedLegacyOwnership = !ownershipSchemaMissing && explicitOwnershipIds.length === 0 && preservedLegacyVariantIds.length > 0;
+    const legacySeedMigration = ownershipSchemaMissing;
+    const ownershipLoadSource = repairPreservedLegacyOwnership
+      ? {ownedRegistryIds:[...preservedLegacyVariantIds]}
+      : (parsedData.characterOwnership || (legacySeedMigration ? {ownedRegistryIds:[...LEGACY_ALPHA_SEED_CHARACTER_REGISTRY_IDS]} : null));
+    const characterOwnership = normalizeCharacterOwnershipState(ownershipLoadSource);
     setCharacterOwnershipRuntimeAuthority(characterOwnership);
     hydrateOwnedProductionRuntimeCharacters(characterOwnership);
     const acquisition = normalizeAcquisitionState(parsedData.acquisition,characterOwnership,{legacySeedMigration});
@@ -41550,6 +41571,7 @@ var selectedRegionKey = null;
 var selectedLocationNode = null;
 var selectedHotspotId = null;
 var selectedOpportunityId = null;
+var selectedOpportunityActionFeedback = null;
 // BRICKS 1540–1542 — contained mission-area presentation state.
 // This is caller/UI context only; durable opportunity truth remains in
 // playerData.worldEventRuntime and the shared world opportunity registry.
@@ -44746,6 +44768,7 @@ function getHotspotProjection(regionKey,hotspotOrLocationId) {
 
 function selectHotspotOpportunity(opportunityId) {
   selectedOpportunityId=opportunityId||null;
+  selectedOpportunityActionFeedback=null;
   if (currentOverlayType==="mission_area"&&selectedMissionAreaId&&getLocalMissionAreaDefinition(selectedMissionAreaId)) {
     renderLocalMissionAreaUI(selectedMissionAreaId);
   } else if (selectedRegionKey&&worldRegions[selectedRegionKey]) {
@@ -45006,10 +45029,51 @@ function refreshActiveWorldOpportunityPresentation() {
   return {success:false,reason:"world_opportunity_presentation_not_active"};
 }
 
+function getWorldOpportunityActionFailurePresentation(reason) {
+  switch (String(reason||"")) {
+    case "clan_start_slot_empty":
+      return {
+        title:"BATTLE ORDER REQUIRED",
+        detail:"Assign an owned shinobi to START in My Clan before entering Battle.",
+        clanRoute:true
+      };
+    case "battle_launch_failed":
+      return {
+        title:"BATTLE COULD NOT START",
+        detail:"Your current My Clan formation is not legal for this Battle context.",
+        clanRoute:true
+      };
+    case "academy_team_formation_required":
+    case "academy_team_formation_continue_required":
+      return {title:"TEAM FORMATION REQUIRED",detail:"Complete the Academy Team Formation journey before entering free-play Battle.",clanRoute:false};
+    case "genin_roster_transition_required":
+      return {title:"ROSTER TRANSITION REQUIRED",detail:"Complete the required Genin roster transition before entering Battle.",clanRoute:false};
+    default:
+      return {title:"ACTION UNAVAILABLE",detail:String(reason||"The selected action could not be completed.").replaceAll("_"," ").toUpperCase(),clanRoute:false};
+  }
+}
+
 function executeSelectedOpportunityAction(actionId) {
   if (!selectedOpportunityId) return {success:false,reason:"opportunity_not_selected"};
+  const opportunityIdAtInvocation=selectedOpportunityId;
   const result=routeWorldOpportunityInteraction(selectedOpportunityId,actionId);
-  if (result&&result.success===true&&(currentOverlayType==="region"||currentOverlayType==="mission_area")) {
+
+  if (result&&result.success===true) {
+    selectedOpportunityActionFeedback=null;
+    // startEncounter() switches currentOverlayType to combat synchronously.
+    // Only repaint the originating World presentation when the action stayed on it.
+    if (currentOverlayType==="region"||currentOverlayType==="mission_area") {
+      refreshActiveWorldOpportunityPresentation();
+    }
+    return result;
+  }
+
+  selectedOpportunityActionFeedback={
+    opportunityId:opportunityIdAtInvocation,
+    actionId:String(actionId||""),
+    reason:result&&result.reason?String(result.reason):"interaction_route_failed"
+  };
+  if (currentOverlayType==="region"||currentOverlayType==="mission_area") {
     refreshActiveWorldOpportunityPresentation();
   }
   return result;
@@ -45035,6 +45099,7 @@ function renderRegionEventDrawer(regionKey) {
       ${hotspot.aggregationCount>1?`<div style="margin:10px 0;"><small>OPPORTUNITIES AT THIS HOTSPOT</small><div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">${hotspot.opportunities.map(item=>`<button type="button" onclick="selectHotspotOpportunity('${item.opportunity_id}')" ${item.opportunity_id===selected.opportunity_id?'disabled':''}>${item.known_label}</button>`).join("")}</div></div>`:""}
       ${selected.tracking.tracked?`<div style="margin:8px 0;font-size:12px;">TRACKED${selected.tracking.mandatory?" • STORY":""}${selected.tracking.lead_state?` • ${selected.tracking.lead_state}`:""}</div>`:""}
       ${selected.actionability.known_blocker?`<div style="margin:8px 0;color:#d9b56f;">${selected.actionability.known_blocker}</div>`:""}
+      ${selectedOpportunityActionFeedback&&selectedOpportunityActionFeedback.opportunityId===selected.opportunity_id?(()=>{const feedback=getWorldOpportunityActionFailurePresentation(selectedOpportunityActionFeedback.reason);return `<div style="margin:10px 0;padding:10px;border:1px solid rgba(215,79,59,.72);background:rgba(78,18,14,.34);"><strong style="display:block;color:#f0b36a;font-size:12px;letter-spacing:.08em;">${feedback.title}</strong><div style="margin-top:5px;font-size:12px;line-height:1.4;color:#e6d8c2;">${feedback.detail}</div>${feedback.clanRoute?`<button type="button" onclick="openOverlay('clan')" style="margin-top:8px;">OPEN MY CLAN</button>`:""}</div>`;})():""}
       ${hasBattle?`<div style="margin:12px 0;padding:10px;border:1px solid rgba(255,255,255,.12);"><small>MY CLAN BATTLE ORDER</small>${queue.map(slot=>`<div style="display:flex;justify-content:space-between;font-size:12px;margin-top:4px;"><span>${slot.label}</span><strong>${slot.name||"—"}</strong></div>`).join("")}</div>`:""}
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;">
         ${selected.legal_actions.length?selected.legal_actions.map(action=>`<button type="button" onclick="executeSelectedOpportunityAction('${action.actionId}')" ${action.available?'':'disabled'}>${action.label}</button>`).join(""):`<span style="opacity:.66;font-size:12px;">No authored interaction is currently available.</span>`}
@@ -45046,6 +45111,7 @@ function renderRegionEventDrawer(regionKey) {
 function closeRegionEventDrawer() {
   selectedHotspotId=null;
   selectedOpportunityId=null;
+  selectedOpportunityActionFeedback=null;
   if (currentOverlayType==="mission_area"&&selectedMissionAreaId) renderLocalMissionAreaUI(selectedMissionAreaId);
   else if (selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
 }
