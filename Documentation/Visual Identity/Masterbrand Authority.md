@@ -1,8 +1,8 @@
 # Shinobi Chronicles — Masterbrand Authority
 
-Date: 4 September 2026
+Date: 8 September 2026
 
-Status: **BINDING FRANCHISE VISUAL-IDENTITY AUTHORITY**
+Status: **BINDING FRANCHISE VISUAL-IDENTITY AUTHORITY — SUPERSEDES 4 SEPTEMBER CONCEPT #18 AUTHORITY**
 
 ---
 
@@ -10,11 +10,21 @@ Status: **BINDING FRANCHISE VISUAL-IDENTITY AUTHORITY**
 
 The universal Shinobi Chronicles masterbrand direction is:
 
+**Concept 5 — THE DUAL PATH + SHINOBI CHRONICLES**
+
+This replaces the earlier franchise-masterbrand decision:
+
 **concept #18 + SHINOBI CHRONICLES**
 
-No Japanese subtitle is part of the universal masterbrand treatment.
+Concept #18 is now **SUPERSEDED / HISTORICAL ONLY** and must not be restored by stale documentation, old mockups, cached assets, runtime fallbacks or filename inference.
+
+The later Dual Path decision was explicitly chosen after concept #18 was abandoned in the UI / Assets workspace and has already been used in the later World Map visual direction. This document makes that later decision durable production authority.
+
+No Japanese subtitle is part of the universal masterbrand treatment unless separately reopened by Brand authority.
 
 For Alpha global application chrome, the brand unit remains presentation-only and non-clickable unless a future global Home/navigation destination is explicitly authored.
+
+Exact physical emblem asset path/geometry remains UI / Assets projection authority. Do not infer a master asset path merely from the World Map raster or from concept numbering.
 
 ---
 
@@ -24,7 +34,7 @@ Preserve permanently:
 
 > **Shinobi Chronicles franchise mark ≠ generic Chronicle / Chronicle Engine emblem ≠ Chronicle Reaper-specific treatment.**
 
-Concept #18 is the **Shinobi Chronicles franchise master mark**.
+The Dual Path mark is the **Shinobi Chronicles franchise master mark**.
 
 It must not be silently promoted into the generic Chronicle/CE emblem role merely because both systems require symbolic identity.
 
@@ -34,10 +44,29 @@ Chronicle Reaper may use a distinct derivative or appropriative treatment where 
 
 ---
 
+# Historical supersession note
+
+`Decision_Log.md` Decision 010 records the earlier 4 September choice of concept #18. That entry remains valid as historical genealogy only and is **superseded by this 8 September authority**.
+
+Any current consumer must use this file as the live Brand authority rather than treating Decision 010 as current production direction.
+
+Concept #28 remains only a separate historical/secondary candidate for Chronicle/Renewal-system symbolism and is not the franchise masterbrand.
+
+---
+
 # Persistence across future titles
 
-Concept #18 is intended to remain the recognisable franchise mark across Shinobi Chronicles games.
+The Dual Path mark is intended to remain the recognisable franchise mark across Shinobi Chronicles games unless Brand authority explicitly reopens that decision.
 
-Individual titles may later introduce subtitles, secondary emblems, palettes or motifs without replacing #18 as the franchise identity unless Brand authority explicitly reopens that decision.
+Individual titles may later introduce subtitles, secondary emblems, palettes or motifs without replacing the Dual Path franchise identity by implication.
 
-Concept #28 remains a secondary candidate for Chronicle/Renewal-system symbolism and is not the master franchise mark.
+---
+
+# Final status
+
+- current franchise masterbrand: **Concept 5 — THE DUAL PATH + SHINOBI CHRONICLES**
+- concept #18: **SUPERSEDED / HISTORICAL ONLY**
+- Decision Log 010: **historical genealogy, not live production authority**
+- generic Chronicle / CE emblem: **separate authority**
+- Chronicle Reaper treatment: **separate/derivative authority where authored**
+- exact master asset path: **must come from UI / Assets; not inferred here**
