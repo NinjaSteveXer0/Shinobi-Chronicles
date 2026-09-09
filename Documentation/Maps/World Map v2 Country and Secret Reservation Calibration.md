@@ -2,18 +2,16 @@
 
 **Date:** 9 September 2026  
 **Owner:** UI / Assets  
-**Primary consumers:** World / Missions / Events / Hotspots; Coding after final terrain binding  
-**Status:** **CURRENT WORLD MAP V2 CANDIDATE SPATIAL PLAN — NOT YET FINAL TERRAIN / BORDER / RUNTIME AUTHORITY**
+**Primary consumers:** World / Missions / Events / Hotspots; Coding after World consumes the final binding  
+**Status:** **FINAL WORLD MAP V2 PRODUCTION GEOMETRY AUTHORITY — BINARY PROMOTED / REVALIDATED**
 
 ---
 
 ## 1. Purpose
 
-This document removes ambiguity about where the **16 named countries** and the current high-profile **secret-area reservations** belong on the approved World Map v2 candidate composition.
+This document is the final UI / Assets spatial authority for the **16 named countries** and the current high-profile **secret-area reservations** on the production World Map v2 terrain master.
 
-It exists so World / Missions / Events / Hotspots can author against stable spatial addresses instead of guessing from chat or from visual appearance.
-
-This is deliberately a **candidate-map calibration**, not a claim that the current terrain image is already the final production world map.
+It exists so World / Missions / Events / Hotspots and downstream Coding can author against stable spatial addresses instead of guessing from chat, filenames, or visual appearance.
 
 Preserve:
 
@@ -27,25 +25,32 @@ Preserve:
 >
 > **visible `????` halo != secret name disclosure**
 >
-> **terrain-master approval != runtime implementation != Golden GREEN**
+> **final asset committed != runtime validated != Golden GREEN**
 
 ---
 
-## 2. Exact candidate-image binding
+## 2. Exact final production-image binding
 
-The coordinates below are authored against the current UI / Assets World Map v2 secret-geography candidate generated on 9 September 2026.
+The final World Map v2 terrain master is now the exact binary already present at the established runtime path:
 
-- Native canvas: **1672 × 941 px**
-- Coordinate origin: top-left `(0,0)`
-- SHA-256 of exact candidate PNG bytes:  
+- **Authoritative production asset:** `Backgrounds/WorldMap.png`
+- **Git blob:** `102ff62f8849bce76b83424140091b37f235401b`
+- **Native canvas:** **1672 × 941 px**
+- **Coordinate origin:** top-left `(0,0)`
+- **SHA-256 of exact production PNG bytes:**  
   `309445068decdf433b6011d8254b127cf3e358890972c584ba8278a99f2eedeb`
-- Current workspace filename:  
+- **Production-ingest commit:**  
+  `48e7954ce77ec9590f0b9e9dad34b6493af425c7` — `new world map and all enemy battle portraits`
+- **Original UI / Assets workspace filename / source provenance:**  
   `a_wide_cinematic_high_detail_fantasy_realistic_c.png`
-- Repository binary status at time of this calibration: **NOT YET INGESTED AS FINAL PRODUCTION BACKGROUND**
 
-Any later terrain refinement, crop, aspect-ratio change, or replacement image requires visual revalidation before these pixel coordinates can become production geometry authority.
+The repository `Backgrounds/WorldMap.png` bytes are the exact calibrated candidate bytes: the repository Git blob matches the locally calculated Git blob for the 3,134,576-byte candidate, and the native dimensions + SHA-256 match the original calibration binding exactly.
 
-For responsive projection once a final repository asset is bound:
+Therefore no crop, resize, recompression, or replacement occurred between candidate calibration and final production ingestion.
+
+Any future terrain replacement, crop, resize, or binary supersession requires a fresh UI / Assets geometry revalidation before these coordinates can be carried forward.
+
+For responsive projection:
 
 `renderedX = imageLeft + (nativeX / 1672) × renderedImageWidth`
 
@@ -55,11 +60,26 @@ Coding must project against the actual rendered image-content box, including any
 
 All rectangles below use `x1,y1 → x2,y2`.
 
+### 2.1 Final revalidation result
+
+The candidate calibration was visually rechecked against the exact repository production binary before promotion to final geometry authority.
+
+Result:
+
+- **16 / 16 country placement envelopes:** revalidated;
+- **16 / 16 country anchors:** revalidated;
+- **7 / 7 physical secret reservation regions:** revalidated;
+- **7 / 7 gold-halo / suspicion anchors:** revalidated;
+- **1 / 1 non-physical realm reservation (`world:S08`):** confirmed to retain **no terrain anchor**;
+- **0 coordinate changes required.**
+
+The final repository binary is byte-for-byte the image for which these coordinates were originally authored, and each anchor remains visually aligned with its intended geographic role.
+
 ---
 
 ## 3. Country-placement contract
 
-The sixteen country regions below are **placement envelopes** over the terrain candidate. They establish where each country belongs geographically and where a future country label/focus anchor should centre.
+The sixteen country regions below are **placement envelopes** over the final production terrain master. They establish where each country belongs geographically and where its macro-map label/focus anchor centres.
 
 They do **not** establish:
 
@@ -72,11 +92,11 @@ They do **not** establish:
 - territorial accessibility;
 - alliance/hostility state.
 
-World may author exact political-border semantics later, but should preserve these macro placements unless a real terrain/canon contradiction is found.
+World may author exact political-border semantics later, but should preserve these macro placements unless a real canon or final-terrain contradiction is found.
 
 ### 3.1 Sixteen named countries
 
-| ID | Country | Tier | Placement envelope | Country anchor | Normalised anchor | Geographic role on v2 candidate |
+| ID | Country | Tier | Placement envelope | Country anchor | Normalised anchor | Geographic role on v2 production master |
 |---|---|---|---|---|---|---|
 | `world:C01` | **Land of Earth** | Five Great | `30,70 → 520,365` | `285,225` | `17.0%, 23.9%` | North-western continental plateau, canyon and stone highlands. |
 | `world:C02` | **Land of Wind** | Five Great | `20,380 → 540,760` | `285,555` | `17.0%, 59.0%` | South-western desert/canyon expanse with harsh exposed approaches. |
@@ -97,7 +117,7 @@ World may author exact political-border semantics later, but should preserve the
 
 ### 3.2 Intended macro adjacency
 
-The current candidate should broadly read as:
+The final production master should be consumed as:
 
 - **Earth** dominates the north-western stone/plateau system;
 - **Wind** dominates the south-western arid system;
@@ -117,7 +137,7 @@ Country terrain is not required to be one biome per polity. Natural terrain may 
 
 The following are **authorised strategic secret reservations** for the World Map v2 surface.
 
-Stephen's current UI direction is that the listed physical secret areas should be intentionally **teased before identity/access requirements are met**:
+Stephen's current UI direction is that the listed physical secret areas should be intentionally **teased before identity/access requirements are met**.
 
 ### `KNOWN_UNKNOWN_LOCKED` presentation
 
@@ -196,23 +216,32 @@ The middle and final states may coincide only if the owning system explicitly sa
 
 ## 7. Authority status / what this closes
 
-This document closes the current **"where the hell are the 16 countries and the major secret reservations on World Map v2?"** ambiguity for the candidate terrain.
+This document now closes the production UI / Assets ambiguity for:
 
-It does **not** yet close:
+- the exact **World Map v2 terrain master**;
+- the exact production path / Git blob / dimensions / SHA-256 binding;
+- all **16 named country placement envelopes and anchors**;
+- all **7 physical high-profile secret reservation regions and halo anchors**;
+- `world:S08` remaining non-physical;
+- the `KNOWN_UNKNOWN_LOCKED` gold-halo + `????` projection geometry.
 
-- final World Map v2 terrain-master approval;
-- final political borders;
-- exact country shapes;
+It does **not** close:
+
+- final political-border polygons;
+- exact country shapes beyond the macro placement envelopes;
 - capital/Hidden Village coordinates;
 - runtime implementation;
 - reveal/access requirements for secret areas;
 - exact World/Story content packages at the secret areas;
+- browser/runtime validation;
 - Golden/regression validation.
 
-Once the final terrain image is committed to the repository, UI / Assets must revalidate this calibration against that exact binary and promote or revise coordinates accordingly.
+No further UI / Assets terrain generation or refinement is required for the Alpha World Map v2 unless a genuine implementation or canon contradiction emerges.
 
 ---
 
 ## 8. Routing
 
-**Routing:** QUEUED — World / Missions / Events / Hotspots may consume this document as current candidate spatial planning authority. No immediate semantic decision is required from another owner merely for UI / Assets to retain the map candidate.
+**Routing: SEND NOW → World / Missions / Events / Rewards**
+
+Consume the final production binding above, then route the consolidated implementation packet to Coding under World ownership. UI / Assets geometry is no longer the blocker.
