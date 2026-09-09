@@ -96,6 +96,34 @@ The forward continuity should distinguish true death from later restoration.
 - Therefore Hashirama can be restored while Naruto later becomes Asura's reincarnation.
 - Menma should currently be treated as **neither Asura nor Indra**. His identity/path is earned through his own Chronicle rather than inherited as another turn of Hagoromo's family conflict.
 
+## Naruto / Menma Family Contrast — Story Foundation, Relationship CE-Owned
+
+- Naruto and Menma are intended as twin sons of Minato Namikaze and Kushina Uzumaki.
+- Story must NOT hard-code their long-term relationship as loving, hostile, rivalrous, estranged, loyal, or reconciled. Their actual bond is a Chronicle relationship and belongs to CE state/history.
+- Their baseline contrast at Story start may be authored as different temperaments and life experiences, not as a predetermined emotional outcome.
+- Menma is the more solitary, inward, naturally gifted/technical brother and is more comfortable being left to his own devices.
+- Naruto is the louder, more outgoing, boisterous brother and is characterised by exceptional persistence and willingness to gain power through hard work.
+- Menma actively wants to explore and use dangerous/latent power; Naruto is more inclined to earn capability through training and effort.
+- They are treated differently by Minato and Kushina.
+- Naruto may reasonably perceive that Menma received unusual specialist attention because adults constantly monitored, tested or discussed Menma's dangerous capabilities.
+- Menma may reasonably perceive Naruto as receiving more ordinary parental attention while Menma was simultaneously more supervised/restricted whenever he tried to explore his own powers.
+- These perceptions are allowed to conflict. Neither viewpoint is automatically objective Truth.
+- Menma's core wound is not "Naruto was loved and I was not". It is closer to: **Naruto was allowed to become himself while other people kept deciding what Menma was allowed to become.**
+- Kushina may resonate more naturally with Menma's curiosity about dangerous power because of her Uzumaki sealing heritage, while still refusing or stopping reckless experimentation when appropriate.
+- Menma's personality resemblance trends more toward Minato: quieter, more controlled, technical, solitary.
+- Naruto's personality resemblance trends more toward Kushina: louder, expressive, stubborn, socially outward.
+
+### Yin / Yang Kurama contrast
+- Menma carries **Yin Kurama**.
+- Naruto carries **Yang Kurama**.
+- Menma already knowing the personal name **Kurama** before the main Story implies a longstanding pre-Story relationship/acquaintance with Yin Kurama.
+- Naruto/Yang Kurama relationship state must remain dependent on Naruto's eventual Origin and should not be assumed to match Menma/Yin Kurama.
+- Strong thematic direction: the two Kurama halves should develop meaningfully different emotional relationships with their hosts rather than behaving as interchangeable copies.
+- Possible explanation worth preserving for later deliberate lock: Yang Kurama senses Asura's chakra/connection in Naruto and may react with jealousy, resentment, grief or distance because Naruto carries a deeper echo of Hagoromo's lineage.
+- Complementary possible explanation: Yin Kurama may identify more strongly with Menma through mutual feelings of being the "lesser"/less-favoured half and through Menma's own alienation from inherited destiny.
+- These Kurama emotional motives are strong Story hypotheses, not yet hard canon until Naruto Origin / Hosted Entity authority reconciles them.
+- Kurama Complete remains the eventual resolved single-entity state when legitimate Yin/Yang requirements are met; Yin Kurama and Yang Kurama are not separate species/people invented for convenience.
+
 ## Madara / Black Zetsu Direction
 
 - Veto Obito-transfer/Hashirama-transfer solutions for handing Indra/Asura chakra to later reincarnations.
@@ -192,6 +220,15 @@ A card does not automatically make its state canon or guaranteed. It establishes
 - Undying/Failed God/Black Madara support reserving Madara for a much later layered endgame rather than spending him in Arc 3.
 - Chunin Itama confirms the altered Senju continuity must preserve him as a living participant/state.
 - Chunin Jiraiya/Fugaku reinforce the general rule that historic characters can have SC-specific rank-state representations and should be integrated through Chronicle opportunity rather than canon policing.
+
+## Arc 2 Danger / Development Escalation
+
+- Arc 2 Missions 1-3 may remain Konoha-centred political/aftermath pressure.
+- From Mission 4 onward the world should become substantially more dangerous and less institutionally controlled: rising crime, smuggling, missing-nin/mercenary work, black-market weapons/seals, destabilised roads, opportunistic factions and weaker guarantees of Konoha resupply/protection.
+- Returning to Konoha later may temporarily reduce pressure but must not reset the world to safety or undo the sense of escalation.
+- This is the Story point where Crafting, Fuuinjutsu crafting, equipment preparation, contacts, development and deliberate power growth should become materially important to survival and mission readiness.
+- Story must not collapse mission completion into progression automatically. It should create credible pressure/opportunity so Development/Crafting systems become valuable and earned.
+- Team Anko should increasingly need to prepare, grind, train and improve because the world itself is getting harder, not because enemies silently mutate to match player level.
 
 ## Immediate Writing Planning Direction
 
