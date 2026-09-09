@@ -42331,6 +42331,12 @@ function saveTestState() {
         ? cloneBattleRuntimeValue(currentBattle.mission7SanitisationEncounter)
         : null,
 
+    // Mission 5 Female Operator exact caller / encounter state.
+    mission5FemaleOperatorEncounter:
+      currentBattle.mission5FemaleOperatorEncounter
+        ? cloneBattleRuntimeValue(currentBattle.mission5FemaleOperatorEncounter)
+        : null,
+
 
     battleLog:
       currentBattle.battleLog,
@@ -74666,6 +74672,9 @@ function resolveBattleStartOfActionOpportunityEffects(side,participantId,actionI
   if (typeof expireArc1M7SanitisationOwnerDefenceAtOpportunityStart === "function") {
     expireArc1M7SanitisationOwnerDefenceAtOpportunityStart(side,participantId,actionId);
   }
+  if (typeof resolveArc1M5FemaleOperatorStartOpportunity === "function") {
+    resolveArc1M5FemaleOperatorStartOpportunity(side,participantId,actionId);
+  }
   const runtime=ensureBattleRuntimeState();
   const token=getBattleActionOpportunityToken(side,participantId);
   if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[],amaterasuTicks:[]};
@@ -84260,6 +84269,12 @@ function completeBattleVictoryFromDamage(
       defeatedParticipantId:defeatedParticipantId||null
     });
   }
+  if (typeof finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome === "function") {
+    finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome("victory",{
+      finishingShinobiId:finishingShinobi?finishingShinobi.id:null,
+      defeatedParticipantId:defeatedParticipantId||null
+    });
+  }
   saveTestState();
   openOverlay("victory");
   return rewards;
@@ -84316,6 +84331,12 @@ function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="p
       reason
     });
   }
+  if (typeof finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome === "function") {
+    finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome("defeat",{
+      defeatedParticipantId:defeatedParticipantId||null,
+      reason
+    });
+  }
 
   saveTestState();
 
@@ -84342,6 +84363,9 @@ function handleBattleParticipantAtZeroPL(
   if (side==="enemy") {
     if (typeof recordArc1M7SanitisationOperativeNeutralized === "function") {
       recordArc1M7SanitisationOperativeNeutralized(participantId,envelope||null);
+    }
+    if (typeof recordArc1M5FemaleOperatorNeutralized === "function") {
+      recordArc1M5FemaleOperatorNeutralized(participantId,envelope||null);
     }
     const bossTransition=tryAdvanceAuthoritativeBossStage(participantId,envelope||null);
     if (bossTransition&&bossTransition.success===true) return bossTransition;
@@ -86696,6 +86720,9 @@ function chooseEnemyAuthoredBattleAction(schedulerState=null) {
 }
 
 function executeEnemyAuthoredActionOpportunity() {
+  if (typeof isArc1M5FemaleOperatorEncounterActive === "function"&&isArc1M5FemaleOperatorEncounterActive()) {
+    return executeArc1M5FemaleOperatorActionOpportunity();
+  }
   if (typeof isArc1M7SanitisationEncounterActive === "function"&&isArc1M7SanitisationEncounterActive()) {
     return executeArc1M7SanitisationEnemyActionOpportunity();
   }
@@ -89138,6 +89165,11 @@ function restoreTestState() {
   currentBattle.mission7SanitisationEncounter =
     typeof normalizeArc1M7SanitisationEncounterState === "function"
       ? normalizeArc1M7SanitisationEncounterState(state.mission7SanitisationEncounter)
+      : null;
+
+  currentBattle.mission5FemaleOperatorEncounter =
+    typeof normalizeArc1M5FemaleOperatorEncounterState === "function"
+      ? normalizeArc1M5FemaleOperatorEncounterState(state.mission5FemaleOperatorEncounter)
       : null;
 
 
@@ -96826,6 +96858,820 @@ function runAlphaPostIssue35Mission1StoryCallerDiagnostics() {
   return {pass:failed.length===0,checks,failed,groups:{caller,combat,world}};
 }
 
+
+
+
+// =========================================================
+// ARC 1 MISSION 5 — FEMALE OPERATOR ENCOUNTER PACKAGE
+// GitHub Issue #52
+// =========================================================
+// Implements the closed Mission-5 Story -> Battle -> same-Story seam without
+// authoring the later Story-owned calibration-redirection / Third-Bell facts.
+// Stable person, observer projection, Base PL, Battle state, and Story facts
+// remain separate authorities.
+// =========================================================
+
+const ARC1_M5_FEMALE_OPERATOR_AUTHORITY=Object.freeze({
+  missionId:"arc1_m5_academy",
+  sceneId:"scene_arc1_m5_academy_third_bell",
+  confrontationOccurrenceId:"occ_arc1_m5_female_operator_confrontation_reached",
+  storyBattleSeamId:"battle_seam_arc1_m5_female_operator_confrontation",
+  encounterPackageId:"arc1_m5_female_operator_confrontation_encounter",
+  objectiveId:"resolve_female_operator_hostile_confrontation",
+  stableParticipantId:"arc1_female_operator",
+  observerProjectionKey:"observer_projection_female_operator",
+  unleashedObserverProjectionKey:"observer_projection_female_operator_unleashed",
+  observerLabel:"FEMALE OPERATOR",
+  unleashedObserverLabel:"FEMALE OPERATOR — UNLEASHED",
+  basePL:56,
+  stats:Object.freeze({nin:48,tai:44,buki:42,fuin:57,kin:58,gen:52,stamina:50}),
+  actionIds:Object.freeze({
+    calibrationLance:"arc1_female_operator_calibration_lance",
+    recognitionBind:"arc1_female_operator_recognition_bind",
+    calibrationSeize:"arc1_female_operator_calibration_seize",
+    threadedPulse:"arc1_female_operator_threaded_pulse",
+    countersealGuard:"arc1_female_operator_counterseal_guard"
+  }),
+  unleashedStateId:"arc1_female_operator_unleashed_commitment",
+  storyOwnedOccurrenceIds:Object.freeze([
+    "occ_arc1_m5_calibration_redirected_into_receiver",
+    "occ_arc1_m5_third_bell_propagation_accepted"
+  ])
+});
+
+function createArc1M5FemaleOperatorEnemyRecord(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return {
+    id:A.stableParticipantId,
+    name:A.observerLabel,
+    rank:"Unknown",
+    formalRank:null,
+    affiliation:null,
+    classification:"persistent_human_operative",
+    observerProjectionKey:A.observerProjectionKey,
+    unleashedObserverProjectionKey:A.unleashedObserverProjectionKey,
+    power:A.basePL,
+    calibratedBasePL:A.basePL,
+    baseStats:{...A.stats},
+    stats:{...A.stats},
+    image:null,
+    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    noBossScaling:true,
+    noEncounterScaling:true,
+    collectibleProductionGate:false,
+    hiddenFactionInferenceForbidden:true,
+    observerProjectionIsNotPersistenceIdentity:true,
+    mission5FemaleOperator:true
+  };
+}
+enemyDatabase[ARC1_M5_FEMALE_OPERATOR_AUTHORITY.stableParticipantId]=createArc1M5FemaleOperatorEnemyRecord();
+
+function normalizeArc1M5UniqueStrings(value){
+  return Array.isArray(value)?[...new Set(value.filter(item=>typeof item==="string"&&item))]:[];
+}
+
+function normalizeArc1M5FemaleOperatorEncounterState(raw){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  if(!raw||typeof raw!=="object"||Array.isArray(raw)||raw.encounterPackageId!==A.encounterPackageId)return null;
+  const activeParticipantIds=normalizeArc1M5UniqueStrings(raw.activeParticipantIds);
+  const sideAssignments=raw.sideAssignments&&typeof raw.sideAssignments==="object"&&!Array.isArray(raw.sideAssignments)?cloneBattleRuntimeValue(raw.sideAssignments):{};
+  const routeRefs={};
+  if(raw.recognitionRouteRefsByParticipant&&typeof raw.recognitionRouteRefsByParticipant==="object"&&!Array.isArray(raw.recognitionRouteRefsByParticipant)){
+    Object.entries(raw.recognitionRouteRefsByParticipant).forEach(([participantId,ref])=>{
+      if(typeof participantId!=="string"||!participantId||!ref)return;
+      if(typeof ref==="string"&&ref)routeRefs[participantId]={refId:ref,compatible:true};
+      else if(typeof ref==="object"&&!Array.isArray(ref)){
+        const refId=typeof ref.refId==="string"&&ref.refId?ref.refId:(typeof ref.id==="string"&&ref.id?ref.id:null);
+        if(refId)routeRefs[participantId]={refId,compatible:ref.compatible!==false,routeType:typeof ref.routeType==="string"?ref.routeType:null,sourceOccurrenceId:typeof ref.sourceOccurrenceId==="string"?ref.sourceOccurrenceId:null};
+      }
+    });
+  }
+  const calibrationControlState=["not_applicable","untouched","operator_controlled","cleared"].includes(raw.calibrationControlState)?raw.calibrationControlState:(raw.calibrationContextRef?"untouched":"not_applicable");
+  return {
+    encounterPackageId:A.encounterPackageId,
+    occurrenceId:typeof raw.occurrenceId==="string"&&raw.occurrenceId?raw.occurrenceId:null,
+    missionId:A.missionId,
+    sceneId:A.sceneId,
+    confrontationOccurrenceId:A.confrontationOccurrenceId,
+    storyBattleSeamId:A.storyBattleSeamId,
+    objectiveId:A.objectiveId,
+    stableParticipantId:A.stableParticipantId,
+    activeParticipantIds,
+    sideAssignments,
+    recognitionRouteRefsByParticipant:routeRefs,
+    calibrationContextRef:raw.calibrationContextRef?cloneBattleRuntimeValue(raw.calibrationContextRef):null,
+    calibrationContextExposed:raw.calibrationContextExposed===true,
+    calibrationControlState,
+    calibrationControlOccurrenceId:typeof raw.calibrationControlOccurrenceId==="string"?raw.calibrationControlOccurrenceId:null,
+    calibrationControlClearedOccurrenceId:typeof raw.calibrationControlClearedOccurrenceId==="string"?raw.calibrationControlClearedOccurrenceId:null,
+    actionOccurrenceIds:normalizeArc1M5UniqueStrings(raw.actionOccurrenceIds),
+    recognitionInterferenceOccurrenceIds:normalizeArc1M5UniqueStrings(raw.recognitionInterferenceOccurrenceIds),
+    recognitionInterferenceConditionIds:normalizeArc1M5UniqueStrings(raw.recognitionInterferenceConditionIds),
+    unleashedCommitted:raw.unleashedCommitted===true,
+    unleashedTransitionOccurrenceId:typeof raw.unleashedTransitionOccurrenceId==="string"?raw.unleashedTransitionOccurrenceId:null,
+    unleashedCommittedAt:Number(raw.unleashedCommittedAt)||null,
+    finalObserverProjectionKey:raw.finalObserverProjectionKey===A.unleashedObserverProjectionKey?A.unleashedObserverProjectionKey:A.observerProjectionKey,
+    startingUnderlyingBattlePLMaximum:Number(raw.startingUnderlyingBattlePLMaximum)||A.basePL,
+    operatorCombatOutcome:["active","neutralized","operator_victory","withdrawn","escaped"].includes(raw.operatorCombatOutcome)?raw.operatorCombatOutcome:"active",
+    supportedInjuryFacts:Array.isArray(raw.supportedInjuryFacts)?cloneBattleRuntimeValue(raw.supportedInjuryFacts):[],
+    supportedDeathFacts:Array.isArray(raw.supportedDeathFacts)?cloneBattleRuntimeValue(raw.supportedDeathFacts):[],
+    supportedCustodyFacts:Array.isArray(raw.supportedCustodyFacts)?cloneBattleRuntimeValue(raw.supportedCustodyFacts):[],
+    supportedEscapeFacts:Array.isArray(raw.supportedEscapeFacts)?cloneBattleRuntimeValue(raw.supportedEscapeFacts):[],
+    callerContext:raw.callerContext?cloneBattleRuntimeValue(raw.callerContext):null,
+    returnContext:raw.returnContext?normalizeBattleReturnContext(raw.returnContext):null,
+    battleCompleted:raw.battleCompleted===true,
+    battleResult:typeof raw.battleResult==="string"?raw.battleResult:null,
+    returnEnvelope:raw.returnEnvelope&&typeof raw.returnEnvelope==="object"?cloneBattleRuntimeValue(raw.returnEnvelope):null,
+    startedAt:Number(raw.startedAt)||null,
+    completedAt:Number(raw.completedAt)||null
+  };
+}
+
+function getArc1M5FemaleOperatorEncounterState(){
+  return normalizeArc1M5FemaleOperatorEncounterState(currentBattle.mission5FemaleOperatorEncounter);
+}
+
+function isArc1M5FemaleOperatorEncounterActive(){
+  const state=getArc1M5FemaleOperatorEncounterState();
+  return !!(state&&currentBattle.encounterId===ARC1_M5_FEMALE_OPERATOR_AUTHORITY.encounterPackageId&&currentBattle.active&&!currentBattle.battleOver);
+}
+
+function resolveArc1M5StoryBattleParticipantRuntime(participantId){
+  if(!participantId||participantId===ARC1_M5_FEMALE_OPERATOR_AUTHORITY.stableParticipantId)return null;
+  return getPlayerCharacter(participantId)||null;
+}
+
+function validateArc1M5FemaleOperatorParticipantEnvelope(activeParticipantIds,sideAssignments){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const ids=Array.isArray(activeParticipantIds)?[...new Set(activeParticipantIds.filter(id=>typeof id==="string"&&id))]:[];
+  if(!ids.includes(A.stableParticipantId))return{valid:false,reason:"mission5_female_operator_missing_from_caller_set"};
+  const playerIds=ids.filter(id=>id!==A.stableParticipantId);
+  if(playerIds.length===0)return{valid:false,reason:"mission5_caller_active_side_empty"};
+  if(playerIds.length>6)return{valid:false,reason:"mission5_player_deployment_exceeds_six",participantIds:playerIds};
+  const unresolved=playerIds.filter(id=>!resolveArc1M5StoryBattleParticipantRuntime(id));
+  if(unresolved.length)return{valid:false,reason:"mission5_story_battle_participant_runtime_missing",unresolvedParticipantIds:unresolved};
+  const assignments=sideAssignments&&typeof sideAssignments==="object"&&!Array.isArray(sideAssignments)?sideAssignments:null;
+  if(!assignments)return{valid:false,reason:"mission5_side_assignments_missing"};
+  if(ids.some(id=>typeof assignments[id]!=="string"||!assignments[id]))return{valid:false,reason:"mission5_active_participant_side_assignment_missing"};
+  const operatorSide=assignments[A.stableParticipantId];
+  if(playerIds.every(id=>assignments[id]===operatorSide))return{valid:false,reason:"mission5_caller_sides_do_not_oppose"};
+  return{valid:true,activeParticipantIds:ids,playerParticipantIds:playerIds,enemyParticipantIds:[A.stableParticipantId],sideAssignments:cloneBattleRuntimeValue(assignments)};
+}
+
+function normalizeArc1M5RecognitionRouteRefsByParticipant(raw){
+  const refs={};
+  if(!raw||typeof raw!=="object"||Array.isArray(raw))return refs;
+  Object.entries(raw).forEach(([participantId,value])=>{
+    if(typeof participantId!=="string"||!participantId||!value)return;
+    if(typeof value==="string"&&value){refs[participantId]={refId:value,compatible:true};return;}
+    if(typeof value!=="object"||Array.isArray(value))return;
+    const refId=typeof value.refId==="string"&&value.refId?value.refId:(typeof value.id==="string"&&value.id?value.id:null);
+    if(!refId)return;
+    refs[participantId]={refId,compatible:value.compatible!==false,routeType:typeof value.routeType==="string"?value.routeType:null,sourceOccurrenceId:typeof value.sourceOccurrenceId==="string"?value.sourceOccurrenceId:null};
+  });
+  return refs;
+}
+
+function normalizeArc1M5CalibrationContextRef(value){
+  if(!value)return null;
+  if(typeof value==="string"&&value)return{refId:value};
+  if(typeof value!=="object"||Array.isArray(value))return null;
+  const refId=typeof value.refId==="string"&&value.refId?value.refId:(typeof value.id==="string"&&value.id?value.id:null);
+  if(!refId)return null;
+  return{...cloneBattleRuntimeValue(value),refId};
+}
+
+function launchArc1M5FemaleOperatorEncounter({
+  missionId=null,
+  sceneId=null,
+  confrontationOccurrenceId=null,
+  storyBattleSeamId=null,
+  activeParticipantIds,
+  sideAssignments,
+  recognitionRouteRefsByParticipant={},
+  calibrationContextRef=null,
+  calibrationContextExposed=false,
+  callerContext=null,
+  returnContext=null
+}={}){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  if(missionId&&missionId!==A.missionId)return{success:false,reason:"mission5_mission_id_mismatch"};
+  if(sceneId&&sceneId!==A.sceneId)return{success:false,reason:"mission5_scene_id_mismatch"};
+  if(confrontationOccurrenceId&&confrontationOccurrenceId!==A.confrontationOccurrenceId)return{success:false,reason:"mission5_confrontation_occurrence_mismatch"};
+  if(storyBattleSeamId&&storyBattleSeamId!==A.storyBattleSeamId)return{success:false,reason:"mission5_story_battle_seam_mismatch"};
+  const participants=validateArc1M5FemaleOperatorParticipantEnvelope(activeParticipantIds,sideAssignments);
+  if(!participants.valid)return{success:false,...participants};
+  const enemy=enemyDatabase[A.stableParticipantId];
+  if(!enemy)return{success:false,reason:"mission5_female_operator_record_missing"};
+  const activePlayer=resolveArc1M5StoryBattleParticipantRuntime(participants.playerParticipantIds[0]);
+  if(!activePlayer)return{success:false,reason:"mission5_start_participant_missing"};
+
+  selectedEnemy=enemy;
+  currentBattle.active=true;
+  currentBattle.battleId=createBattleInstanceId();
+  currentBattle.encounterId=A.encounterPackageId;
+  currentBattle.encounterOccurrenceId=null;
+  currentBattle.oppositionTemplateId=A.encounterPackageId;
+  currentBattle.encounterStatePackageId=null;
+  currentBattle.characterId=participants.playerParticipantIds[0];
+  currentBattle.encounterEnemy=enemy;
+  setBattleEnemyParticipants([enemy]);
+  currentBattle.enemy=enemy;
+  currentBattle.deployment={player:{slots:createBattleDeploymentSlots(participants.playerParticipantIds)},enemy:{slots:createBattleDeploymentSlots([A.stableParticipantId])},transitionCounter:0,lastTransition:null};
+  currentBattle.activePlayer=getBattleDeploymentParticipant("player",1)||activePlayer;
+  syncBattleActiveEnemyFromDeployment();
+  currentBattle.lastDamage=0;
+  currentBattle.battleOver=false;
+  currentBattle.completedAt=null;
+  currentBattle.claimedAt=null;
+  currentBattle.completionRecorded=false;
+  currentBattle.outcome=null;
+  currentBattle.defeat=null;
+  currentBattle.returnContext=returnContext?normalizeBattleReturnContext(returnContext):null;
+  currentBattle.unknownOperativeConfrontation=null;
+  currentBattle.mission7SanitisationEncounter=null;
+  currentBattle.observerSafeResultContext={
+    encounterPackageId:A.encounterPackageId,
+    opponentStableParticipantId:A.stableParticipantId,
+    observerProjectionKey:A.observerProjectionKey,
+    displayName:A.observerLabel,
+    trueIdentityRevealed:false,
+    factionRevealed:false,
+    formalRankRevealed:false
+  };
+  currentBattle.battleLog=[`${A.observerLabel} enters the Academy confrontation.`,`${currentBattle.activePlayer?currentBattle.activePlayer.name:"The active side"} prepares for battle.`];
+  currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+  currentBattle.enemyPower=A.basePL;
+  currentBattle.enemyMaxPower=A.basePL;
+
+  initializeBattleContributionRecordsFromDeployment();
+  initializeBattleSourcePackageRuntime();
+  initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
+  initializeBattlePouchFromPreparedSelection();
+  initializeBattleAttachedSummonRuntimeFromDeployment();
+  initializeBattleDedicatedVariantRuntimePackages();
+  initializeBattleKisoganStartsActiveFromDeployment();
+
+  const normalizedCalibration=normalizeArc1M5CalibrationContextRef(calibrationContextRef);
+  const occurrenceId=createBattleRuntimeRecordId("arc1_m5_female_operator_confrontation");
+  currentBattle.mission5FemaleOperatorEncounter={
+    encounterPackageId:A.encounterPackageId,
+    occurrenceId,
+    missionId:A.missionId,
+    sceneId:A.sceneId,
+    confrontationOccurrenceId:A.confrontationOccurrenceId,
+    storyBattleSeamId:A.storyBattleSeamId,
+    objectiveId:A.objectiveId,
+    stableParticipantId:A.stableParticipantId,
+    activeParticipantIds:[...participants.activeParticipantIds],
+    sideAssignments:cloneBattleRuntimeValue(participants.sideAssignments),
+    recognitionRouteRefsByParticipant:normalizeArc1M5RecognitionRouteRefsByParticipant(recognitionRouteRefsByParticipant),
+    calibrationContextRef:normalizedCalibration,
+    calibrationContextExposed:calibrationContextExposed===true&&!!normalizedCalibration,
+    calibrationControlState:normalizedCalibration?"untouched":"not_applicable",
+    calibrationControlOccurrenceId:null,
+    calibrationControlClearedOccurrenceId:null,
+    actionOccurrenceIds:[],
+    recognitionInterferenceOccurrenceIds:[],
+    recognitionInterferenceConditionIds:[],
+    unleashedCommitted:false,
+    unleashedTransitionOccurrenceId:null,
+    unleashedCommittedAt:null,
+    finalObserverProjectionKey:A.observerProjectionKey,
+    startingUnderlyingBattlePLMaximum:A.basePL,
+    operatorCombatOutcome:"active",
+    supportedInjuryFacts:[],supportedDeathFacts:[],supportedCustodyFacts:[],supportedEscapeFacts:[],
+    callerContext:callerContext?cloneBattleRuntimeValue(callerContext):null,
+    returnContext:currentBattle.returnContext?cloneBattleRuntimeValue(currentBattle.returnContext):null,
+    battleCompleted:false,battleResult:null,returnEnvelope:null,
+    startedAt:Date.now(),completedAt:null
+  };
+  getParticipantChronicleState(A.stableParticipantId,{create:true});
+  recordBattleEvidence({eventType:"mission5_female_operator_encounter_started",committedOccurrence:true,actionId:occurrenceId,actorRef:createBattleParticipantRef("enemy",A.stableParticipantId),sourceRefs:[{type:"story_occurrence",id:A.confrontationOccurrenceId,role:"caller_boundary"},{type:"story_battle_seam",id:A.storyBattleSeamId,role:"caller_boundary"}],data:{activeParticipantIds:[...participants.activeParticipantIds],sideAssignments:cloneBattleRuntimeValue(participants.sideAssignments),basePL:A.basePL,hiddenScaling:false,calibrationContextSupplied:!!normalizedCalibration}});
+  savePlayerData();saveTestState();openOverlay("combat");
+  return{success:true,battleId:currentBattle.battleId,occurrenceId,encounterId:A.encounterPackageId,encounterPackageId:A.encounterPackageId,activeParticipantIds:[...participants.activeParticipantIds],sideAssignments:cloneBattleRuntimeValue(participants.sideAssignments)};
+}
+
+function getArc1M5RecognitionInterferenceCondition(targetParticipantId){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return getBattleParticipantConditions("player",targetParticipantId).find(condition=>condition&&condition.conditionKey==="recognition_interference"&&getBattleConditionSourceParticipantId(condition)===A.stableParticipantId)||null;
+}
+
+function getArc1M5RecognitionRouteRef(targetParticipantId){
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state||!state.recognitionRouteRefsByParticipant)return null;
+  const ref=state.recognitionRouteRefsByParticipant[targetParticipantId];
+  return ref&&ref.compatible!==false?ref:null;
+}
+
+function establishArc1M5RecognitionInterference(enemy,target,envelope){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const routeRef=getArc1M5RecognitionRouteRef(target&&target.id);
+  if(!enemy||!target||!envelope||!routeRef)return{condition:null,reason:"recognition_compatible_route_missing"};
+  const applied=upsertAlphaSourceScopedCondition({
+    conditionKey:"recognition_interference",
+    conditionType:"recognition_route_interference",
+    sourceSide:"enemy",sourceParticipantId:A.stableParticipantId,
+    sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"},{type:"recognition_route",id:routeRef.refId,role:"exact_caller_supplied_route"}],
+    sourceSkillId:A.actionIds.recognitionBind,actionId:envelope.actionId,
+    targetSide:"player",targetParticipantId:target.id,reapplication:"refresh",
+    blockedActionClasses:[],
+    blockedActionTraits:["requiresRecognitionRoute","requiresCalibrationRoute"],
+    data:{remainingActionOpportunities:1,durationActionOpportunities:1,blanketStun:false,notStun:true,chakraSuppression:false,universalSealLock:false,ordinaryActionsAllowed:true,hostedRoutesBlockedByDefault:false,sameSourceRefresh:true,exactRouteRef:cloneBattleRuntimeValue(routeRef)}
+  });
+  if(applied.condition){
+    const evidence=recordBattleEvidence({eventType:applied.refreshed?"mission5_recognition_interference_refreshed":"mission5_recognition_interference_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),skillId:A.actionIds.recognitionBind,sourceRefs:[{type:"recognition_route",id:routeRef.refId,role:"exact_caller_supplied_route"}],conditionRefs:[applied.condition.conditionId],data:{blocksRecognitionRoute:true,blocksCalibrationRoute:true,blanketStun:false,chakraSuppression:false,universalSealLock:false,throughTargetNextActionOpportunity:true}});
+    const state=currentBattle.mission5FemaleOperatorEncounter;
+    if(state){
+      if(!state.recognitionInterferenceConditionIds.includes(applied.condition.conditionId))state.recognitionInterferenceConditionIds.push(applied.condition.conditionId);
+      if(evidence&&!state.recognitionInterferenceOccurrenceIds.includes(evidence.evidenceId))state.recognitionInterferenceOccurrenceIds.push(evidence.evidenceId);
+    }
+  }
+  return applied;
+}
+
+function isArc1M5FemaleOperatorUnleashed(){
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  return !!(state&&state.unleashedCommitted===true);
+}
+
+function getArc1M5CalibrationLanceAttackPL(targetParticipantId){
+  const interference=!!getArc1M5RecognitionInterferenceCondition(targetParticipantId);
+  if(isArc1M5FemaleOperatorUnleashed())return interference?39:34;
+  return interference?35:30;
+}
+
+function getArc1M5ThreadedPulseAttackPL(){
+  return isArc1M5FemaleOperatorUnleashed()?27:24;
+}
+
+function getArc1M5CountersealGuardPreventionRatio(){
+  return isArc1M5FemaleOperatorUnleashed()?0.35:0.30;
+}
+
+function resolveArc1M5DirectDamage({enemy,target,envelope,attackPL,primaryDiscipline,skillId,area=false}={}){
+  if(!enemy||!target||!envelope||!Number.isFinite(Number(attackPL))||Number(attackPL)<=0)return{resolved:false,reason:"mission5_direct_damage_context_missing"};
+  const magnitude=Math.max(0,Math.round(Number(attackPL)||0));
+  const skill={id:skillId,mechanicalPacketCount:1,traits:area?["one_authored_area_action"]:[]};
+  const output={primaryDiscipline,statKey:getBattlePrimaryDisciplineStatKey(primaryDiscipline),effectivePrimaryDiscipline:null,coefficient:null,branch:"fixed_authored_mission5_output",branchMultiplier:1,authoredPreExecutionMagnitude:magnitude,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:magnitude,attackPL:magnitude,fixedCalibration:true,perTarget:area===true};
+  const damage=resolveBattleDamagePacket({envelope,skill,actorSide:"enemy",actorParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id,output,mitigable:true,excess:null,stateRefs:[]});
+  if(!damage)return{resolved:false,reason:"mission5_damage_resolution_failed"};
+  return{resolved:true,branch:"mission5_fixed_enemy_damage",damageApplied:true,authoredAttackPL:magnitude,damage,finalDamage:damage.finalDamage};
+}
+
+function createArc1M5CalibrationLanceAction(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return{id:A.actionIds.calibrationLance,skillId:A.actionIds.calibrationLance,displayName:"Calibration Lance",targetMode:"single_hostile",actionClass:"enemy_authored_action",authoredAttackPL:"dynamic_exact",ordinaryStamina:true,traits:["mission5_female_operator_exact_authored_action","one_direct_packet","fuinjutsu_kinjutsu_supported"],resolve({enemy,target,envelope}){const attackPL=getArc1M5CalibrationLanceAttackPL(target.id);const result=resolveArc1M5DirectDamage({enemy,target,envelope,attackPL,primaryDiscipline:"Fūinjutsu",skillId:A.actionIds.calibrationLance});return{...result,recognitionInterferenceUsed:!!getArc1M5RecognitionInterferenceCondition(target.id),unleashed:isArc1M5FemaleOperatorUnleashed()};}};
+}
+
+function createArc1M5RecognitionBindAction(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return{id:A.actionIds.recognitionBind,skillId:A.actionIds.recognitionBind,displayName:"Recognition Bind",targetMode:"single_hostile",actionClass:"enemy_control_technique",authoredAttackPL:null,traits:["mission5_female_operator_exact_authored_action","recognition_route_control","not_stun","not_chakra_suppression","not_universal_seal_lock"],evaluateAvailability({target}){return getArc1M5RecognitionRouteRef(target&&target.id)?{available:true,reason:null}:{available:false,reason:"recognition_compatible_route_missing"};},resolve({enemy,target,envelope}){const applied=establishArc1M5RecognitionInterference(enemy,target,envelope);return{resolved:!!applied.condition,branch:"recognition_interference",damageApplied:false,conditionRefs:applied.condition?[applied.condition.conditionId]:[],refreshed:applied.refreshed===true};}};
+}
+
+function getArc1M5CalibrationContext(){
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  return state&&state.calibrationContextExposed===true&&state.calibrationContextRef?state.calibrationContextRef:null;
+}
+
+function createArc1M5CalibrationSeizeAction(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return{id:A.actionIds.calibrationSeize,skillId:A.actionIds.calibrationSeize,displayName:"Calibration Seize",targetMode:"system_context",actionClass:"enemy_contextual_control",authoredAttackPL:null,traits:["mission5_female_operator_exact_authored_action","academy_system_context_only","no_story_occurrence_collapse"],evaluateAvailability(){const state=currentBattle.mission5FemaleOperatorEncounter;if(!state)return{available:false,reason:"mission5_encounter_state_missing"};if(!getArc1M5CalibrationContext())return{available:false,reason:"academy_calibration_context_not_exposed"};if(state.calibrationControlState==="operator_controlled")return{available:false,reason:"operator_calibration_control_already_live"};return{available:true,reason:null};},resolve({enemy,envelope}){const state=currentBattle.mission5FemaleOperatorEncounter;const context=getArc1M5CalibrationContext();if(!enemy||!envelope||!state||!context)return{resolved:false,reason:"academy_calibration_context_not_exposed",invalidSelection:true};const occurrence=recordBattleEvidence({eventType:"mission5_operator_calibration_control_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:A.actionIds.calibrationSeize,sourceRefs:[{type:"academy_calibration_context",id:context.refId,role:"exact_caller_supplied_context"}],data:{calibrationContextRef:cloneBattleRuntimeValue(context),storyCalibrationRedirected:false,storyThirdBellAccepted:false,permanentSystemOwnership:false,hiddenPLMutation:false}});if(!occurrence)return{resolved:false,reason:"operator_calibration_control_commit_failed"};state.calibrationControlState="operator_controlled";state.calibrationControlOccurrenceId=occurrence.evidenceId;return{resolved:true,branch:"operator_calibration_control",damageApplied:false,calibrationContextRef:cloneBattleRuntimeValue(context),stateOccurrenceId:occurrence.evidenceId};}};
+}
+
+function createArc1M5ThreadedPulseAction(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return{id:A.actionIds.threadedPulse,skillId:A.actionIds.threadedPulse,displayName:"Threaded Pulse",targetMode:"up_to_two_hostiles",actionClass:"enemy_authored_action",authoredAttackPL:"dynamic_exact_per_target",maxTargets:2,ordinaryStamina:true,traits:["mission5_female_operator_exact_authored_action","one_authored_area_action","max_two_targets","no_rider"],resolve({enemy,envelope,targetParticipantIds=[]}){const ids=[...new Set((Array.isArray(targetParticipantIds)?targetParticipantIds:[]).filter(Boolean))].slice(0,2);if(ids.length===0)return{resolved:false,reason:"threaded_pulse_targets_missing"};const attackPL=getArc1M5ThreadedPulseAttackPL();const areaResults=[];ids.forEach(id=>{const target=getBattleParticipantByIdentity("player",id);if(!target)return;const result=resolveArc1M5DirectDamage({enemy,target,envelope,attackPL,primaryDiscipline:"Ninjutsu",skillId:A.actionIds.threadedPulse,area:true});if(result.resolved)areaResults.push({targetParticipantId:id,authoredAttackPL:attackPL,damage:result.damage,finalDamage:result.finalDamage});});return{resolved:areaResults.length>0,branch:"threaded_pulse",damageApplied:areaResults.length>0,authoredAttackPLPerTarget:attackPL,areaResults,maxTargets:2,noRider:true};}};
+}
+
+function createArc1M5CountersealGuardAction(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  return{id:A.actionIds.countersealGuard,skillId:A.actionIds.countersealGuard,displayName:"Counterseal Guard",targetMode:"self",actionClass:"enemy_defensive_setup",authoredAttackPL:null,traits:["mission5_female_operator_exact_authored_action","self_setup","pre_stamina_prevention","one_qualifying_direct_packet"],evaluateAvailability(){const existing=findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});return existing?{available:false,reason:"counterseal_guard_already_active"}:{available:true,reason:null};},resolve({enemy,envelope}){if(!enemy||!envelope)return{resolved:false,reason:"counterseal_guard_context_missing"};const preventionRatio=getArc1M5CountersealGuardPreventionRatio();const state=addBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",sourceSide:"enemy",sourceParticipantId:A.stableParticipantId,targetSide:"enemy",targetParticipantId:A.stableParticipantId,ownerRef:{type:"skill",id:A.actionIds.countersealGuard},data:{sourceSkillId:A.actionIds.countersealGuard,attackMultiplier:1-preventionRatio,preventionRatio,oneUse:true,activationActionId:envelope.actionId,activationOpportunityIndex:getBattleActionOpportunityIndex("enemy",A.stableParticipantId),expiresAtOwnerNextActionStart:true,requiresDirectAttackPLPacket:true,preStamina:true}});if(state)recordBattleEvidence({eventType:"mission5_counterseal_guard_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",A.stableParticipantId),skillId:A.actionIds.countersealGuard,stateRefs:[state.stateId],data:{preventionRatio,preventionOrder:"pre_stamina",oneUse:true,qualifyingDirectAttackPLPacketOnly:true,expiresAtStartOfNextOwnerActionOpportunity:true,unleashed:isArc1M5FemaleOperatorUnleashed()}});return{resolved:!!state,branch:"counterseal_guard",damageApplied:false,stateRefs:state?[state.stateId]:[],preventionRatio};}};
+}
+
+const ARC1_M5_FEMALE_OPERATOR_PREPARED_ACTIONS=Object.freeze([
+  createArc1M5CalibrationLanceAction(),
+  createArc1M5RecognitionBindAction(),
+  createArc1M5CalibrationSeizeAction(),
+  createArc1M5ThreadedPulseAction(),
+  createArc1M5CountersealGuardAction()
+]);
+enemyDatabase[ARC1_M5_FEMALE_OPERATOR_AUTHORITY.stableParticipantId].authoredBattleActions=[...ARC1_M5_FEMALE_OPERATOR_PREPARED_ACTIONS];
+
+function getArc1M5FemaleOperatorPreparedActions(){return[...ARC1_M5_FEMALE_OPERATOR_PREPARED_ACTIONS];}
+function getArc1M5FemaleOperatorPreparedAction(actionId){return ARC1_M5_FEMALE_OPERATOR_PREPARED_ACTIONS.find(action=>action.id===actionId)||null;}
+
+function expireArc1M5CountersealGuardAtOwnerOpportunityStart(side,participantId,actionId=null){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  if(side!=="enemy"||participantId!==A.stableParticipantId)return{expired:false,reason:"not_mission5_female_operator"};
+  const state=findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});
+  if(!state||!state.data||state.data.expiresAtOwnerNextActionStart!==true)return{expired:false,reason:"counterseal_guard_not_live"};
+  const currentIndex=getBattleActionOpportunityIndex("enemy",A.stableParticipantId);
+  const activationIndex=Number(state.data.activationOpportunityIndex);
+  if(Number.isFinite(activationIndex)&&currentIndex<=activationIndex)return{expired:false,reason:"activation_opportunity_still_current"};
+  const removed=removeBattleTransientState(state.stateId);
+  if(removed)recordBattleEvidence({eventType:"mission5_counterseal_guard_expired",committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("enemy",A.stableParticipantId),skillId:A.actionIds.countersealGuard,stateRefs:[state.stateId],data:{unused:true,expiredAtStartOfNextOwnerActionOpportunity:true}});
+  return{expired:removed===true,stateIds:removed?[state.stateId]:[]};
+}
+
+function resolveArc1M5FemaleOperatorStartOpportunity(side,participantId,actionId=null){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  if(side!=="enemy"||participantId!==A.stableParticipantId||!isArc1M5FemaleOperatorEncounterActive())return{handled:false};
+  const guardExpiry=expireArc1M5CountersealGuardAtOwnerOpportunityStart(side,participantId,actionId);
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state||state.unleashedCommitted===true)return{handled:true,guardExpiry,unleashedCommitted:state&&state.unleashedCommitted===true,idempotent:true};
+  const remaining=getBattleRemainingPL("enemy",A.stableParticipantId);
+  const maximum=Number(state.startingUnderlyingBattlePLMaximum)||getBattleMaximumPL("enemy",A.stableParticipantId)||A.basePL;
+  if(!(Number(remaining)>0)||Number(remaining)>maximum*0.50)return{handled:true,guardExpiry,unleashedCommitted:false,thresholdMet:false,remaining,maximum};
+  const beforeRemaining=remaining;
+  const beforeMax=getBattleMaximumPL("enemy",A.stableParticipantId);
+  const occurrenceId=createBattleRuntimeRecordId(A.unleashedStateId);
+  state.unleashedCommitted=true;
+  state.unleashedTransitionOccurrenceId=occurrenceId;
+  state.unleashedCommittedAt=Date.now();
+  state.finalObserverProjectionKey=A.unleashedObserverProjectionKey;
+  currentBattle.observerSafeResultContext={...(currentBattle.observerSafeResultContext||{}),opponentStableParticipantId:A.stableParticipantId,observerProjectionKey:A.unleashedObserverProjectionKey,displayName:A.unleashedObserverLabel,trueIdentityRevealed:false,factionRevealed:false,formalRankRevealed:false};
+  const evidence=recordBattleEvidence({eventType:A.unleashedStateId,committedOccurrence:true,actionId:occurrenceId,actorRef:createBattleParticipantRef("enemy",A.stableParticipantId),sourceRefs:[{type:"participant",side:"enemy",participantId:A.stableParticipantId,role:"same_persistent_person"},{type:"encounter_package",id:A.encounterPackageId,role:"bounded_commitment_source"}],data:{remainingUnderlyingBattlePL:remaining,startingUnderlyingBattlePLMaximum:maximum,thresholdRatio:0.50,observerProjectionKey:A.unleashedObserverProjectionKey,basePL:A.basePL,baseStats:{...A.stats},capacityRefilled:false,secondLedgerCreated:false,secondParticipantCreated:false,extraActionOpportunityGranted:false}});
+  const afterRemaining=getBattleRemainingPL("enemy",A.stableParticipantId);
+  const afterMax=getBattleMaximumPL("enemy",A.stableParticipantId);
+  return{handled:true,guardExpiry,unleashedCommitted:true,idempotent:false,occurrenceId,evidenceId:evidence&&evidence.evidenceId||null,remainingUnchanged:beforeRemaining===afterRemaining,maximumUnchanged:beforeMax===afterMax};
+}
+
+function clearArc1M5OperatorCalibrationControl(reason="battle_end",actionId=null){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state)return{cleared:false,reason:"mission5_encounter_state_missing"};
+  if(state.calibrationControlState!=="operator_controlled")return{cleared:false,reason:"operator_calibration_control_not_live",state:state.calibrationControlState};
+  const occurrence=recordBattleEvidence({eventType:"mission5_operator_calibration_control_cleared",committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("enemy",A.stableParticipantId),sourceRefs:[{type:"academy_calibration_context",id:state.calibrationContextRef&&state.calibrationContextRef.refId||"caller_context",role:"exact_caller_supplied_context"}],data:{reason,storyCalibrationRedirected:false,storyThirdBellAccepted:false,battleEndCleanup:reason==="battle_end"||reason==="operator_neutralized"}});
+  state.calibrationControlState="cleared";
+  state.calibrationControlClearedOccurrenceId=occurrence&&occurrence.evidenceId||createBattleRuntimeRecordId("mission5_calibration_control_cleared");
+  return{cleared:true,occurrenceId:state.calibrationControlClearedOccurrenceId};
+}
+
+function evaluateArc1M5FemaleOperatorActionScheduler(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  if(!isArc1M5FemaleOperatorEncounterActive())return{ready:false,reason:"mission5_female_operator_encounter_not_active"};
+  const enemy=getBattleDeploymentParticipant("enemy",1);
+  if(!enemy||enemy.id!==A.stableParticipantId)return{ready:false,reason:"mission5_female_operator_not_active"};
+  const targets=getFactoryActiveTargetIds("player",6).map(id=>getBattleParticipantByIdentity("player",id)).filter(Boolean);
+  if(targets.length===0)return{ready:false,reason:"mission5_no_active_hostile_targets"};
+  const candidates=[];
+  const lance=getArc1M5FemaleOperatorPreparedAction(A.actionIds.calibrationLance);
+  targets.forEach(target=>candidates.push({action:lance,targetParticipantId:target.id}));
+  const bind=getArc1M5FemaleOperatorPreparedAction(A.actionIds.recognitionBind);
+  targets.forEach(target=>{const gate=bind.evaluateAvailability({enemy,target,currentBattle});if(gate&&gate.available===true)candidates.push({action:bind,targetParticipantId:target.id});});
+  const seize=getArc1M5FemaleOperatorPreparedAction(A.actionIds.calibrationSeize);
+  const seizeGate=seize.evaluateAvailability({enemy,target:null,currentBattle});
+  if(seizeGate&&seizeGate.available===true)candidates.push({action:seize});
+  const pulse=getArc1M5FemaleOperatorPreparedAction(A.actionIds.threadedPulse);
+  candidates.push({action:pulse,targetParticipantIds:targets.slice(0,2).map(target=>target.id)});
+  const guard=getArc1M5FemaleOperatorPreparedAction(A.actionIds.countersealGuard);
+  const guardGate=guard.evaluateAvailability({enemy,target:enemy,currentBattle});
+  if(guardGate&&guardGate.available===true)candidates.push({action:guard});
+  if(candidates.length===0)return{ready:false,reason:"no_semantically_eligible_enemy_action",inventedFallback:false};
+  return{ready:true,enemyId:enemy.id,candidates,eligibleActionIds:[...new Set(candidates.map(candidate=>candidate.action.id))],randomnessApplied:false,inventedFallback:false};
+}
+
+function chooseArc1M5FemaleOperatorAction(schedulerState=null){
+  const state=schedulerState&&schedulerState.ready===true?schedulerState:evaluateArc1M5FemaleOperatorActionScheduler();
+  if(!state.ready)return{success:false,...state};
+  const candidates=state.candidates||[];
+  if(candidates.length===0)return{success:false,reason:"no_semantically_eligible_enemy_action"};
+  const index=Math.floor(Math.random()*candidates.length);
+  return{success:true,candidate:candidates[index],eligibleActionIds:state.eligibleActionIds,randomnessAppliedAfterEligibility:true,equalSelectionWeight:true};
+}
+
+function appendArc1M5ActionOccurrence(actionId){
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state||!actionId)return;
+  if(!Array.isArray(state.actionOccurrenceIds))state.actionOccurrenceIds=[];
+  if(!state.actionOccurrenceIds.includes(actionId))state.actionOccurrenceIds.push(actionId);
+}
+
+function attemptArc1M5FemaleOperatorAction(actionId,{targetParticipantId=null,targetParticipantIds=null,automatic=false}={}){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  if(!isArc1M5FemaleOperatorEncounterActive())return{success:false,reason:"mission5_female_operator_encounter_not_active",actionOpportunityConsumed:false,falseHistoryCreated:false};
+  const enemy=getBattleDeploymentParticipant("enemy",1);
+  if(!enemy||enemy.id!==A.stableParticipantId)return{success:false,reason:"mission5_female_operator_not_active",actionOpportunityConsumed:false,falseHistoryCreated:false};
+  const action=getArc1M5FemaleOperatorPreparedAction(actionId);
+  if(!action)return{success:false,reason:"mission5_action_not_prepared",actionOpportunityConsumed:false,falseHistoryCreated:false};
+
+  let target=null;let ids=[];
+  if(action.targetMode==="single_hostile"){
+    target=targetParticipantId?getBattleParticipantByIdentity("player",targetParticipantId):getBattleDeploymentParticipant("player",1);
+    if(!target)return{success:false,reason:"mission5_action_target_missing",actionOpportunityConsumed:false,falseHistoryCreated:false};
+  }else if(action.targetMode==="up_to_two_hostiles"){
+    ids=[...new Set((Array.isArray(targetParticipantIds)&&targetParticipantIds.length?targetParticipantIds:getFactoryActiveTargetIds("player",2)).filter(Boolean))];
+    if(ids.length===0||ids.length>2)return{success:false,reason:"threaded_pulse_target_count_invalid",actionOpportunityConsumed:false,falseHistoryCreated:false};
+    const invalid=ids.filter(id=>!getBattleParticipantByIdentity("player",id));
+    if(invalid.length)return{success:false,reason:"threaded_pulse_target_invalid",invalidParticipantIds:invalid,actionOpportunityConsumed:false,falseHistoryCreated:false};
+  }else if(action.targetMode==="self")target=enemy;
+
+  if(typeof action.evaluateAvailability==="function"){
+    const gate=action.evaluateAvailability({enemy,target,currentBattle});
+    if(!gate||gate.available!==true)return{success:false,reason:gate&&gate.reason||"mission5_action_unavailable",actionOpportunityConsumed:false,falseHistoryCreated:false};
+  }
+
+  // Unleashed is a start-of-opportunity state. Resolve it before the current
+  // authored output magnitude is read, but keep invalid requests precommit-safe.
+  resolveBattleStartOfActionOpportunityEffects("enemy",A.stableParticipantId,null);
+
+  const targetSide=action.targetMode==="self"?"enemy":(action.targetMode==="system_context"?null:"player");
+  const targetId=action.targetMode==="self"?A.stableParticipantId:(action.targetMode==="single_hostile"?target.id:null);
+  const envelope=createBattleActionEnvelope({actorSide:"enemy",actorParticipantId:A.stableParticipantId,targetSide,targetParticipantId:targetId,actionClass:action.actionClass||"enemy_authored_action",skillId:action.id,sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"}],data:{traits:[...(action.traits||[])],authoredEnemyAction:true,mission5FemaleOperator:true,automatic:automatic===true,targetParticipantIds:ids}});
+  const entry=beginBattleActionResolution(envelope);
+  if(!entry.accepted)return{success:false,reason:entry.validation.reason,entry,actionOpportunityConsumed:false,falseHistoryCreated:false};
+
+  const resolution=action.resolve({enemy,target,envelope,currentBattle,targetParticipantIds:ids});
+  if(!resolution||resolution.resolved!==true)return{success:false,reason:resolution&&resolution.reason||"mission5_action_resolution_failed",resolution,actionOpportunityConsumed:false,falseHistoryCreated:false};
+  recordBattleEvidence({eventType:"enemy_authored_action_completed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:envelope.skillId,sourceRefs:envelope.sourceRefs,conditionRefs:Array.isArray(resolution.conditionRefs)?resolution.conditionRefs:[],stateRefs:Array.isArray(resolution.stateRefs)?resolution.stateRefs:[],data:{resolved:true,actionId:action.id,mission5FemaleOperator:true,authoredAttackPL:resolution.authoredAttackPL||resolution.authoredAttackPLPerTarget||null,randomnessAppliedAfterEligibility:automatic===true,inventedFallback:false}});
+  appendArc1M5ActionOccurrence(envelope.actionId);
+  consumeBattleActionOpportunity("enemy",A.stableParticipantId,envelope.actionId,"valid_mission5_female_operator_action_completed");
+  saveTestState();if(!currentBattle.battleOver)openOverlay("combat");
+  return{success:true,envelope,resolution,actionOpportunityConsumed:true,falseHistoryCreated:false};
+}
+
+function executeArc1M5FemaleOperatorActionOpportunity(){
+  const scheduler=evaluateArc1M5FemaleOperatorActionScheduler();
+  if(!scheduler.ready){recordBattleEvidence({eventType:"enemy_action_scheduler_waiting_for_authority",actorRef:getBattleActiveParticipantId("enemy")?createBattleParticipantRef("enemy",getBattleActiveParticipantId("enemy")):null,data:{reason:scheduler.reason||null,mission5FemaleOperator:true,inventedFallback:false}});return{success:false,...scheduler};}
+  const choice=chooseArc1M5FemaleOperatorAction(scheduler);if(!choice.success)return choice;
+  const candidate=choice.candidate;
+  const result=attemptArc1M5FemaleOperatorAction(candidate.action.id,{targetParticipantId:candidate.targetParticipantId||null,targetParticipantIds:candidate.targetParticipantIds||null,automatic:true});
+  return{...result,choice};
+}
+
+function recordArc1M5FemaleOperatorNeutralized(participantId,envelope=null){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state||participantId!==A.stableParticipantId)return{handled:false};
+  if(state.operatorCombatOutcome==="neutralized")return{handled:true,idempotent:true};
+  state.operatorCombatOutcome="neutralized";
+  clearArc1M5OperatorCalibrationControl("operator_neutralized",envelope&&envelope.actionId||null);
+  const evidence=recordBattleEvidence({eventType:"mission5_female_operator_neutralized",committedOccurrence:true,actionId:envelope&&envelope.actionId||null,targetRef:createBattleParticipantRef("enemy",A.stableParticipantId),data:{stableParticipantId:A.stableParticipantId,battlePLDefeatOnly:true,deathInferred:false,injuryInferred:false,custodyInferred:false,escapeInferred:false}});
+  return{handled:true,evidenceId:evidence&&evidence.evidenceId||null};
+}
+
+function buildArc1M5FemaleOperatorStoryReturnEnvelope(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state)return null;
+  return{
+    encounterPackageId:A.encounterPackageId,
+    storyBattleSeamId:A.storyBattleSeamId,
+    missionId:A.missionId,
+    sceneId:A.sceneId,
+    confrontationOccurrenceId:A.confrontationOccurrenceId,
+    occurrenceId:state.occurrenceId,
+    activeParticipantIds:[...state.activeParticipantIds],
+    sideAssignments:cloneBattleRuntimeValue(state.sideAssignments),
+    stableFemaleOperatorParticipantId:A.stableParticipantId,
+    finalObserverProjection:state.finalObserverProjectionKey,
+    battleCompleted:state.battleCompleted===true,
+    battleResult:state.battleResult||null,
+    operatorCombatOutcome:state.operatorCombatOutcome,
+    remainingBattlePL:getBattleRemainingPL("enemy",A.stableParticipantId),
+    unleashedCommitted:state.unleashedCommitted===true,
+    unleashedTransitionOccurrenceId:state.unleashedTransitionOccurrenceId||null,
+    recognitionInterferenceOccurrenceIds:[...state.recognitionInterferenceOccurrenceIds],
+    recognitionInterferenceConditionIds:[...state.recognitionInterferenceConditionIds],
+    calibrationContextRef:state.calibrationContextRef?cloneBattleRuntimeValue(state.calibrationContextRef):null,
+    calibrationControlState:state.calibrationControlState,
+    calibrationControlOccurrenceId:state.calibrationControlOccurrenceId||null,
+    calibrationControlClearedOccurrenceId:state.calibrationControlClearedOccurrenceId||null,
+    actionOccurrenceIds:[...state.actionOccurrenceIds],
+    supportingCommittedBattleOccurrenceIds:[...new Set([state.occurrenceId,state.unleashedTransitionOccurrenceId,state.calibrationControlOccurrenceId,state.calibrationControlClearedOccurrenceId,...state.actionOccurrenceIds,...state.recognitionInterferenceOccurrenceIds].filter(Boolean))],
+    supportedInjuryFacts:cloneBattleRuntimeValue(state.supportedInjuryFacts),
+    supportedDeathFacts:cloneBattleRuntimeValue(state.supportedDeathFacts),
+    supportedCustodyFacts:cloneBattleRuntimeValue(state.supportedCustodyFacts),
+    supportedEscapeFacts:cloneBattleRuntimeValue(state.supportedEscapeFacts),
+    storyCalibrationRedirectedOccurrenceEmitted:false,
+    storyThirdBellAcceptedOccurrenceEmitted:false,
+    missionOutcomeInferred:false,
+    affiliationRevealed:false,
+    formalRankRevealed:false,
+    stableIdentityChangedByProjection:false,
+    callerContinuationContext:state.returnContext?cloneBattleRuntimeValue(state.returnContext):null
+  };
+}
+
+function finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome(outcomeType,detail={}){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const state=currentBattle.mission5FemaleOperatorEncounter;
+  if(!state||state.encounterPackageId!==A.encounterPackageId)return{handled:false,reason:"not_mission5_female_operator_encounter"};
+  if(state.battleCompleted===true&&state.returnEnvelope)return{handled:true,idempotent:true,returnEnvelope:cloneBattleRuntimeValue(state.returnEnvelope)};
+  if(!["victory","defeat","withdrawal","escape","interrupted"].includes(outcomeType))return{handled:false,reason:"mission5_battle_outcome_invalid"};
+  if(outcomeType==="escape"&&!detail.operatorEscapeOccurrenceId)return{handled:false,reason:"mission5_operator_escape_requires_exact_occurrence"};
+  state.battleCompleted=true;
+  state.battleResult=outcomeType;
+  state.completedAt=Date.now();
+  if(outcomeType==="victory"&&state.operatorCombatOutcome==="active")state.operatorCombatOutcome="neutralized";
+  if(outcomeType==="defeat")state.operatorCombatOutcome="operator_victory";
+  if(outcomeType==="escape"){state.operatorCombatOutcome="escaped";state.supportedEscapeFacts.push({participantId:A.stableParticipantId,occurrenceId:detail.operatorEscapeOccurrenceId});}
+  if(outcomeType==="withdrawal"&&detail.operatorWithdrawal===true)state.operatorCombatOutcome="withdrawn";
+  clearArc1M5OperatorCalibrationControl("battle_end",detail.actionId||null);
+  state.returnEnvelope=buildArc1M5FemaleOperatorStoryReturnEnvelope();
+  currentBattle.observerSafeResultContext={...(currentBattle.observerSafeResultContext||{}),encounterPackageId:A.encounterPackageId,opponentStableParticipantId:A.stableParticipantId,observerProjectionKey:state.finalObserverProjectionKey,battleResult:outcomeType,missionOutcomeInferred:false,storyCalibrationRedirected:false,storyThirdBellAccepted:false};
+  recordBattleEvidence({eventType:"mission5_female_operator_return_envelope_ready",committedOccurrence:true,data:{battleResult:outcomeType,operatorCombatOutcome:state.operatorCombatOutcome,unleashedCommitted:state.unleashedCommitted===true,calibrationControlState:state.calibrationControlState,missionOutcomeInferred:false,storyCalibrationRedirected:false,storyThirdBellAccepted:false}});
+  saveTestState();
+  return{handled:true,returnEnvelope:cloneBattleRuntimeValue(state.returnEnvelope)};
+}
+
+function resolveArc1M5FemaleOperatorEncounterTermination({battleResult,reason=null,operatorEscapeOccurrenceId=null,operatorWithdrawal=false}={}){
+  const allowed=["withdrawal","escape","interrupted"];
+  if(!allowed.includes(battleResult))return{success:false,reason:"mission5_manual_termination_invalid"};
+  const finalized=finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome(battleResult,{reason,operatorEscapeOccurrenceId,operatorWithdrawal});
+  if(!finalized.handled)return{success:false,...finalized};
+  currentBattle.battleOver=true;currentBattle.active=false;currentBattle.completedAt=Date.now();currentBattle.outcome={type:battleResult==="escape"?"defeat":(battleResult==="withdrawal"?"defeat":"defeat"),committed:true,completedAt:currentBattle.completedAt,reason:reason||battleResult,historyPreserved:true};
+  if(currentBattle.returnContext)resumeBattleCallerAfterCompletion("defeat");
+  return{success:true,returnEnvelope:finalized.returnEnvelope};
+}
+
+function launchArc1M5FemaleOperatorStoryEncounter({active,returnContext,sceneContext}={}){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const context=active&&active.localContext&&typeof active.localContext==="object"?active.localContext:(sceneContext&&sceneContext.localContext||{});
+  return launchArc1M5FemaleOperatorEncounter({
+    missionId:A.missionId,
+    sceneId:A.sceneId,
+    confrontationOccurrenceId:A.confrontationOccurrenceId,
+    storyBattleSeamId:A.storyBattleSeamId,
+    activeParticipantIds:context.activeParticipantIds,
+    sideAssignments:context.sideAssignments,
+    recognitionRouteRefsByParticipant:context.recognitionRouteRefsByParticipant||{},
+    calibrationContextRef:context.calibrationContextRef||null,
+    calibrationContextExposed:context.calibrationContextExposed===true,
+    callerContext:{storySceneInstanceId:active&&active.instanceId||null,sourceBeatId:returnContext&&returnContext.sourceBeatId||null},
+    returnContext
+  });
+}
+
+function projectArc1M5FemaleOperatorBattleResult(){
+  return buildArc1M5FemaleOperatorStoryReturnEnvelope();
+}
+
+function createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute=true,withCalibrationContext=true}={}){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const enemy=enemyDatabase[A.stableParticipantId];
+  const playerIds=["academy_menma","academy_hinata"];
+  const ids=[...playerIds,A.stableParticipantId];
+  const sideAssignments={academy_menma:"allied_side",academy_hinata:"allied_side",[A.stableParticipantId]:"operator_side"};
+  currentBattle.active=true;currentBattle.battleOver=false;currentBattle.battleId=createBattleInstanceId();currentBattle.encounterId=A.encounterPackageId;currentBattle.encounterEnemy=enemy;currentBattle.enemy=enemy;setBattleEnemyParticipants([enemy]);
+  currentBattle.deployment={player:{slots:createBattleDeploymentSlots(playerIds)},enemy:{slots:createBattleDeploymentSlots([A.stableParticipantId])},transitionCounter:0,lastTransition:null};
+  currentBattle.activePlayer=getBattleDeploymentParticipant("player",1);currentBattle.characterId=currentBattle.activePlayer&&currentBattle.activePlayer.id||"academy_menma";
+  currentBattle.enemyPower=A.basePL;currentBattle.enemyMaxPower=A.basePL;currentBattle.lastDamage=0;currentBattle.completedAt=null;currentBattle.claimedAt=null;currentBattle.completionRecorded=false;currentBattle.outcome=null;currentBattle.defeat=null;currentBattle.returnContext=null;
+  currentBattle.observerSafeResultContext={encounterPackageId:A.encounterPackageId,opponentStableParticipantId:A.stableParticipantId,observerProjectionKey:A.observerProjectionKey,displayName:A.observerLabel};
+  currentBattle.battleLog=[];currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+  initializeBattleContributionRecordsFromDeployment();initializeBattleSourcePackageRuntime();initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
+  currentBattle.unknownOperativeConfrontation=null;currentBattle.mission7SanitisationEncounter=null;
+  currentBattle.mission5FemaleOperatorEncounter=normalizeArc1M5FemaleOperatorEncounterState({
+    encounterPackageId:A.encounterPackageId,occurrenceId:"diag_m5_encounter",activeParticipantIds:ids,sideAssignments,
+    recognitionRouteRefsByParticipant:withRecognitionRoute?{academy_menma:{refId:"diag_m5_receiver_route",compatible:true,routeType:"recognition_receiver"}}:{},
+    calibrationContextRef:withCalibrationContext?{refId:"diag_m5_academy_calibration_context"}:null,
+    calibrationContextExposed:withCalibrationContext,
+    calibrationControlState:withCalibrationContext?"untouched":"not_applicable",
+    actionOccurrenceIds:[],recognitionInterferenceOccurrenceIds:[],recognitionInterferenceConditionIds:[],
+    unleashedCommitted:false,finalObserverProjectionKey:A.observerProjectionKey,startingUnderlyingBattlePLMaximum:A.basePL,operatorCombatOutcome:"active",
+    supportedInjuryFacts:[],supportedDeathFacts:[],supportedCustodyFacts:[],supportedEscapeFacts:[],battleCompleted:false,startedAt:Date.now()
+  });
+  return currentBattle.mission5FemaleOperatorEncounter;
+}
+
+function runAlphaMission5FemaleOperatorEncounterDiagnostics(){
+  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+  const checks={};
+  const enemy=enemyDatabase[A.stableParticipantId];
+  const actions=getArc1M5FemaleOperatorPreparedActions();
+  const actionIds=actions.map(action=>action.id);
+  checks.stableIdentityExact=!!enemy&&enemy.id===A.stableParticipantId;
+  checks.observerProjectionSeparate=enemy.observerProjectionKey===A.observerProjectionKey&&enemy.unleashedObserverProjectionKey===A.unleashedObserverProjectionKey&&A.stableParticipantId!==A.observerProjectionKey;
+  checks.exactBaseStats=JSON.stringify(enemy.baseStats)===JSON.stringify(A.stats);
+  checks.exactBasePL=enemy.power===56&&enemy.calibratedBasePL===56;
+  checks.noHiddenScaling=enemy.noBossScaling===true&&enemy.noEncounterScaling===true&&calculateBattlePower(enemy,"elite")===56&&calculateBattlePower(enemy,"groupBoss")===56;
+  checks.rankAffiliationConcealed=enemy.formalRank===null&&enemy.affiliation===null;
+  checks.noCollectibleAdmission=enemy.collectibleProductionGate===false&&!ALPHA_PRODUCTION_CHARACTER_IDS.includes(A.stableParticipantId)&&!ALPHA_PRODUCTION_ENTITY_IDS.includes(A.stableParticipantId);
+  checks.exactPreparedPalette=JSON.stringify(actionIds)===JSON.stringify([A.actionIds.calibrationLance,A.actionIds.recognitionBind,A.actionIds.calibrationSeize,A.actionIds.threadedPulse,A.actionIds.countersealGuard]);
+  checks.noGenericFallback=actions.length===5&&!actionIds.some(id=>/basic|generic|fallback/i.test(id));
+
+  const priorBattle=cloneBattleRuntimeValue(currentBattle);
+  try{
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    setBattleRemainingPL("player","academy_menma",200);setBattleRemainingPL("player","academy_hinata",200);
+    const lanceOrdinary=attemptArc1M5FemaleOperatorAction(A.actionIds.calibrationLance,{targetParticipantId:"academy_hinata"});
+    checks.lanceOrdinary30=lanceOrdinary.success===true&&lanceOrdinary.resolution.authoredAttackPL===30;
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    setBattleRemainingPL("player","academy_menma",200);
+    const bind=attemptArc1M5FemaleOperatorAction(A.actionIds.recognitionBind,{targetParticipantId:"academy_menma"});
+    const condition=getArc1M5RecognitionInterferenceCondition("academy_menma");
+    checks.recognitionBindExact=bind.success===true&&!!condition&&condition.conditionType==="recognition_route_interference"&&condition.data.notStun===true&&condition.data.chakraSuppression===false&&condition.blockedActionClasses.length===0&&JSON.stringify(condition.blockedActionTraits)===JSON.stringify(["requiresRecognitionRoute","requiresCalibrationRoute"]);
+    const blockedEnvelope=createBattleActionEnvelope({actorSide:"player",actorParticipantId:"academy_menma",targetSide:"enemy",targetParticipantId:A.stableParticipantId,actionClass:"skill",skillId:"diag_requires_recognition",data:{traits:["requiresRecognitionRoute"]}});
+    const ordinaryEnvelope=createBattleActionEnvelope({actorSide:"player",actorParticipantId:"academy_menma",targetSide:"enemy",targetParticipantId:A.stableParticipantId,actionClass:"skill",skillId:"diag_ordinary",data:{traits:["ordinary_ninjutsu"]}});
+    checks.routeBoundOnly=validateBattleActionEnvelope(blockedEnvelope).valid===false&&validateBattleActionEnvelope(ordinaryEnvelope).valid===true;
+    const lanceEnhanced=attemptArc1M5FemaleOperatorAction(A.actionIds.calibrationLance,{targetParticipantId:"academy_menma"});
+    checks.lanceRecognition35=lanceEnhanced.success===true&&lanceEnhanced.resolution.authoredAttackPL===35;
+    consumeBattleActionOpportunity("player","academy_menma","diag_target_action","diagnostic_target_opportunity");
+    checks.recognitionExpiresAfterTargetOpportunity=!getArc1M5RecognitionInterferenceCondition("academy_menma");
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:false,withCalibrationContext:true});
+    const beforeEvidence=(currentBattle.runtime&&currentBattle.runtime.evidence||[]).length;
+    const invalidBind=attemptArc1M5FemaleOperatorAction(A.actionIds.recognitionBind,{targetParticipantId:"academy_menma"});
+    checks.invalidRecognitionPrecommitNoHistory=invalidBind.success===false&&invalidBind.actionOpportunityConsumed===false&&((currentBattle.runtime&&currentBattle.runtime.evidence||[]).length===beforeEvidence);
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:false});
+    const beforeSeizeEvidence=(currentBattle.runtime&&currentBattle.runtime.evidence||[]).length;
+    const invalidSeize=attemptArc1M5FemaleOperatorAction(A.actionIds.calibrationSeize,{});
+    checks.calibrationSeizeRequiresExactContext=invalidSeize.success===false&&invalidSeize.actionOpportunityConsumed===false&&((currentBattle.runtime&&currentBattle.runtime.evidence||[]).length===beforeSeizeEvidence);
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    const seize=attemptArc1M5FemaleOperatorAction(A.actionIds.calibrationSeize,{});
+    checks.calibrationSeizeExact=seize.success===true&&currentBattle.mission5FemaleOperatorEncounter.calibrationControlState==="operator_controlled";
+    checks.noStoryOccurrenceCollapse=!A.storyOwnedOccurrenceIds.some(id=>(currentBattle.runtime&&currentBattle.runtime.evidence||[]).some(record=>record&&(record.evidenceId===id||record.actionId===id||record.eventType===id)));
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    setBattleRemainingPL("player","academy_menma",200);setBattleRemainingPL("player","academy_hinata",200);
+    const pulse=attemptArc1M5FemaleOperatorAction(A.actionIds.threadedPulse,{targetParticipantIds:["academy_menma","academy_hinata"]});
+    checks.threadedPulse24Max2=pulse.success===true&&pulse.resolution.authoredAttackPLPerTarget===24&&pulse.resolution.areaResults.length===2&&pulse.resolution.noRider===true;
+    const invalidPulse=attemptArc1M5FemaleOperatorAction(A.actionIds.threadedPulse,{targetParticipantIds:["academy_menma","academy_hinata","academy_obito"]});
+    checks.threadedPulseRejectsMoreThanTwo=invalidPulse.success===false&&invalidPulse.actionOpportunityConsumed===false;
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    const guard=attemptArc1M5FemaleOperatorAction(A.actionIds.countersealGuard,{});
+    const guardState=findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});
+    checks.guardOrdinary30=guard.success===true&&!!guardState&&guardState.data.preventionRatio===0.30&&guardState.data.attackMultiplier===0.70;
+    const pre=resolveBattlePreStaminaDefense({attackPL:20,mitigable:true,targetSide:"enemy",targetParticipantId:A.stableParticipantId,primaryDiscipline:"Taijutsu",skillId:"diag_direct",actionId:"diag_attack",sourceSide:"player",sourceParticipantId:"academy_menma",qualifyingDirectAttackPLPacket:true});
+    checks.guardOnePacketPreStamina=pre.resolvedAttackPL===14&&pre.ratioGuards.some(g=>g.stateKey==="mission5_female_operator_counterseal_guard"&&g.actualReduction===6)&&!findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    attemptArc1M5FemaleOperatorAction(A.actionIds.countersealGuard,{});
+    const guardExpiry=resolveBattleStartOfActionOpportunityEffects("enemy",A.stableParticipantId,"diag_next_start");
+    checks.guardExpiresAtNextOwnerStart=!findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    setBattleRemainingPL("enemy",A.stableParticipantId,29);
+    const beforeHigh=resolveArc1M5FemaleOperatorStartOpportunity("enemy",A.stableParticipantId,"diag_high");
+    checks.unleashedNotAboveHalf=beforeHigh.unleashedCommitted===false&&currentBattle.mission5FemaleOperatorEncounter.unleashedCommitted===false;
+    setBattleRemainingPL("enemy",A.stableParticipantId,28);
+    const beforeRemaining=getBattleRemainingPL("enemy",A.stableParticipantId);
+    const beforeMax=getBattleMaximumPL("enemy",A.stableParticipantId);
+    const unleashed=resolveArc1M5FemaleOperatorStartOpportunity("enemy",A.stableParticipantId,"diag_unleashed");
+    checks.unleashedAtHalfOnce=unleashed.unleashedCommitted===true&&currentBattle.mission5FemaleOperatorEncounter.unleashedCommitted===true&&!!currentBattle.mission5FemaleOperatorEncounter.unleashedTransitionOccurrenceId;
+    checks.unleashedNoRefillOrBaseMutation=getBattleRemainingPL("enemy",A.stableParticipantId)===beforeRemaining&&getBattleMaximumPL("enemy",A.stableParticipantId)===beforeMax&&enemy.calibratedBasePL===56&&JSON.stringify(enemy.baseStats)===JSON.stringify(A.stats);
+    checks.unleashedProjectionSamePerson=currentBattle.mission5FemaleOperatorEncounter.finalObserverProjectionKey===A.unleashedObserverProjectionKey&&currentBattle.mission5FemaleOperatorEncounter.stableParticipantId===A.stableParticipantId;
+    const transitionId=currentBattle.mission5FemaleOperatorEncounter.unleashedTransitionOccurrenceId;
+    const repeat=resolveArc1M5FemaleOperatorStartOpportunity("enemy",A.stableParticipantId,"diag_unleashed_retry");
+    checks.unleashedIdempotent=repeat.idempotent===true&&currentBattle.mission5FemaleOperatorEncounter.unleashedTransitionOccurrenceId===transitionId;
+    checks.unleashedLance34=getArc1M5CalibrationLanceAttackPL("academy_hinata")===34;
+    const bindUnleashed=attemptArc1M5FemaleOperatorAction(A.actionIds.recognitionBind,{targetParticipantId:"academy_menma"});
+    checks.unleashedLance39=bindUnleashed.success===true&&getArc1M5CalibrationLanceAttackPL("academy_menma")===39;
+    checks.unleashedPulse27=getArc1M5ThreadedPulseAttackPL()===27;
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    setBattleRemainingPL("enemy",A.stableParticipantId,28);resolveArc1M5FemaleOperatorStartOpportunity("enemy",A.stableParticipantId,"diag_unleashed_guard");
+    const unleashedGuard=attemptArc1M5FemaleOperatorAction(A.actionIds.countersealGuard,{});
+    const unleashedGuardState=findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});
+    checks.unleashedGuard35=unleashedGuard.success===true&&!!unleashedGuardState&&unleashedGuardState.data.preventionRatio===0.35&&unleashedGuardState.data.attackMultiplier===0.65;
+
+    const normalizedSave=normalizeArc1M5FemaleOperatorEncounterState(cloneBattleRuntimeValue(currentBattle.mission5FemaleOperatorEncounter));
+    checks.saveLoadUnleashedIdempotence=normalizedSave.unleashedCommitted===true&&normalizedSave.unleashedTransitionOccurrenceId===currentBattle.mission5FemaleOperatorEncounter.unleashedTransitionOccurrenceId&&saveTestState.toString().includes("mission5FemaleOperatorEncounter")&&restoreTestState.toString().includes("normalizeArc1M5FemaleOperatorEncounterState");
+
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    const seizeForReturn=attemptArc1M5FemaleOperatorAction(A.actionIds.calibrationSeize,{});
+    const participantStateBefore=getParticipantChronicleState(A.stableParticipantId,{create:true});
+    const lifeBefore=participantStateBefore.lifeState;const custodyBefore=participantStateBefore.custodyState;
+    recordArc1M5FemaleOperatorNeutralized(A.stableParticipantId,null);
+    const final=finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome("victory",{});
+    const envelope=final.returnEnvelope;
+    const participantStateAfter=getParticipantChronicleState(A.stableParticipantId,{create:true});
+    checks.returnEnvelopeExact=seizeForReturn.success===true&&final.handled===true&&envelope.encounterPackageId===A.encounterPackageId&&envelope.storyBattleSeamId===A.storyBattleSeamId&&envelope.stableFemaleOperatorParticipantId===A.stableParticipantId&&envelope.calibrationControlState==="cleared";
+    checks.battleDefeatNoFalseLifeFacts=envelope.supportedInjuryFacts.length===0&&envelope.supportedDeathFacts.length===0&&envelope.supportedCustodyFacts.length===0&&envelope.supportedEscapeFacts.length===0&&participantStateAfter.lifeState===lifeBefore&&participantStateAfter.custodyState===custodyBefore;
+    checks.storyFactsNotEmitted=envelope.storyCalibrationRedirectedOccurrenceEmitted===false&&envelope.storyThirdBellAcceptedOccurrenceEmitted===false&&A.storyOwnedOccurrenceIds.every(id=>!envelope.supportingCommittedBattleOccurrenceIds.includes(id));
+    checks.callerSetPreserved=JSON.stringify(envelope.activeParticipantIds)===JSON.stringify(["academy_menma","academy_hinata",A.stableParticipantId])&&envelope.sideAssignments[A.stableParticipantId]==="operator_side";
+  }finally{
+    Object.keys(currentBattle).forEach(key=>delete currentBattle[key]);
+    Object.assign(currentBattle,priorBattle||{});
+  }
+  const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
+  return{pass:failed.length===0,checks,failed,total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length,encounterPackageId:A.encounterPackageId};
+}
+
+function runAlphaPostIssue52Mission5IntegrationDiagnostics(){
+  const mission5=runAlphaMission5FemaleOperatorEncounterDiagnostics();
+  const mission1=typeof runAlphaPostIssue35Mission1StoryCallerDiagnostics==="function"?runAlphaPostIssue35Mission1StoryCallerDiagnostics():{pass:true};
+  const mission7=typeof runAlphaMission7SanitisationSourceDiagnostics==="function"?runAlphaMission7SanitisationSourceDiagnostics():{pass:true};
+  const origin=typeof runAlphaOriginConsequenceCodingWallDiagnostics==="function"?runAlphaOriginConsequenceCodingWallDiagnostics():{pass:true};
+  const prior=typeof runAlphaPost2500PlayabilityMonsterDiagnostics==="function"?runAlphaPost2500PlayabilityMonsterDiagnostics():{pass:true};
+  const checks={
+    mission5Green:mission5.pass===true,
+    mission1Preserved:mission1.pass===true,
+    mission7Preserved:mission7.pass===true,
+    originPreserved:origin.pass===true,
+    priorPost2500Preserved:prior.pass===true,
+    exactLiveProductionCounts:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18,
+    noSecondBattleSubsystem:executeEnemyAuthoredActionOpportunity.toString().includes("executeArc1M5FemaleOperatorActionOpportunity")&&typeof launchArc1M5FemaleOperatorEncounter==="function",
+    noStoryFactCollapse:ARC1_M5_FEMALE_OPERATOR_AUTHORITY.storyOwnedOccurrenceIds.every(id=>!finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome.toString().includes(`eventType:"${id}"`))
+  };
+  const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
+  return{pass:failed.length===0,checks,failed,groups:{mission5,mission1,mission7,origin,prior}};
+}
 
 
 // =========================================================
