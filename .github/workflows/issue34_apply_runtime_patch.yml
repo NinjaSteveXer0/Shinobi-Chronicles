@@ -1,0 +1,45 @@
+name: Issue 34 Runtime Patch Apply
+
+on:
+  push:
+    paths:
+      - '.github/issue34/APPLY'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify runtime baseline and apply validated patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_blob='62b98639d1aad530e0b80723e417eb68edaa7080'
+          actual_blob="$(git hash-object game.js)"
+          if [[ "$actual_blob" != "$expected_blob" ]]; then
+            echo "game.js moved: expected $expected_blob, got $actual_blob" >&2
+            exit 1
+          fi
+          base64 -d .github/issue34/issue34.patch.gz.b64 | gzip -d > /tmp/issue34.patch
+          echo 'fe4a287c9e86a021e3045a34e4af6b4a354972def3ced5d00679725ecfda00e3  /tmp/issue34.patch' | sha256sum -c -
+          git apply --check /tmp/issue34.patch
+          git apply /tmp/issue34.patch
+          node --check game.js
+          python tools/qa_battle_portraits.py --static-only
+          test "$(git hash-object game.js)" = '7d923bd5e9162385988ad43730ece8c2eda28897'
+      - name: Commit Issue 34 runtime implementation and clean bootstrap files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/issue34/issue34.patch.gz.b64 .github/issue34/APPLY .github/workflows/issue34_apply_runtime_patch.yml
+          rmdir .github/issue34 2>/dev/null || true
+          git config user.name 'Shinobi Chronicles Coding Runtime'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A game.js .github
+          git commit -m 'runtime: implement Academy Origin source bindings (#34)'
+          git push origin HEAD:main
