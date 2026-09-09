@@ -39783,6 +39783,7 @@ function startEncounter(enemyId, characterId = null, encounterId = null, constru
   currentBattle.returnContext=null;
   currentBattle.observerSafeResultContext=null;
   currentBattle.unknownOperativeConfrontation=null;
+  currentBattle.mission7SanitisationEncounter=null;
   currentBattle.battleLog=[`${enemy.name} appears!`,`${currentBattle.activePlayer.name} prepares for battle.`];
 
   initializeBattleContributionRecordsFromDeployment();
@@ -42213,6 +42214,14 @@ function saveTestState() {
     unknownOperativeConfrontation:
       currentBattle.unknownOperativeConfrontation
         ? cloneBattleRuntimeValue(currentBattle.unknownOperativeConfrontation)
+        : null,
+
+    // POST-1995 / BRICKS 1995–2074 — Mission 7 sanitisation-trio caller,
+    // evidence-target and source-owned state survives refresh without
+    // manufacturing World/Object persistence.
+    mission7SanitisationEncounter:
+      currentBattle.mission7SanitisationEncounter
+        ? cloneBattleRuntimeValue(currentBattle.mission7SanitisationEncounter)
         : null,
 
 
@@ -74506,6 +74515,9 @@ function resolveBattleStartOfActionOpportunityEffects(side,participantId,actionI
   if (typeof expireArc1M1UnknownOperativeGuardedReadAtOwnerOpportunityStart === "function") {
     expireArc1M1UnknownOperativeGuardedReadAtOwnerOpportunityStart(side,participantId,actionId);
   }
+  if (typeof expireArc1M7SanitisationOwnerDefenceAtOpportunityStart === "function") {
+    expireArc1M7SanitisationOwnerDefenceAtOpportunityStart(side,participantId,actionId);
+  }
   const runtime=ensureBattleRuntimeState();
   const token=getBattleActionOpportunityToken(side,participantId);
   if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[],amaterasuTicks:[]};
@@ -84010,7 +84022,8 @@ function resolveBattlePreStaminaDefense(definition) {
 
   const ratioGuardStates=ensureBattleRuntimeState().transientStates.filter(state=>
     state&&state.targetRef&&state.targetRef.side===definition.targetSide&&state.targetRef.participantId===definition.targetParticipantId&&
-    state.data&&Number.isFinite(Number(state.data.attackMultiplier))&&Number(state.data.attackMultiplier)>0&&Number(state.data.attackMultiplier)<1
+    state.data&&Number.isFinite(Number(state.data.attackMultiplier))&&Number(state.data.attackMultiplier)>0&&Number(state.data.attackMultiplier)<1&&
+    (state.data.requiresDirectAttackPLPacket!==true||definition.qualifyingDirectAttackPLPacket===true)
   );
   ratioGuardStates.forEach(state=>{
     if (result.resolvedAttackPL<=0) return;
@@ -84093,6 +84106,12 @@ function completeBattleVictoryFromDamage(
       defeatedParticipantId:defeatedParticipantId||null
     });
   }
+  if (typeof finalizeArc1M7SanitisationEncounterFromBattleOutcome === "function") {
+    finalizeArc1M7SanitisationEncounterFromBattleOutcome("victory",{
+      finishingShinobiId:finishingShinobi?finishingShinobi.id:null,
+      defeatedParticipantId:defeatedParticipantId||null
+    });
+  }
   saveTestState();
   openOverlay("victory");
   return rewards;
@@ -84143,6 +84162,12 @@ function completeBattleDefeat(defeatedParticipantId=null,envelope=null,reason="p
       reason
     });
   }
+  if (typeof finalizeArc1M7SanitisationEncounterFromBattleOutcome === "function") {
+    finalizeArc1M7SanitisationEncounterFromBattleOutcome("defeat",{
+      defeatedParticipantId:defeatedParticipantId||null,
+      reason
+    });
+  }
 
   saveTestState();
 
@@ -84167,6 +84192,9 @@ function handleBattleParticipantAtZeroPL(
   if (!slotNumber) return null;
 
   if (side==="enemy") {
+    if (typeof recordArc1M7SanitisationOperativeNeutralized === "function") {
+      recordArc1M7SanitisationOperativeNeutralized(participantId,envelope||null);
+    }
     const bossTransition=tryAdvanceAuthoritativeBossStage(participantId,envelope||null);
     if (bossTransition&&bossTransition.success===true) return bossTransition;
 
@@ -84189,7 +84217,7 @@ function resolveSingleBattleDamageSegment(definition, segmentIndex = 0) {
   if (!definition || !definition.actorSide || !definition.actorParticipantId || !definition.targetSide || !definition.targetParticipantId || !definition.output) return null;
   const targetRecord=getBattleRemainingPLRecord(definition.targetSide,definition.targetParticipantId);
   if (!targetRecord) return null;
-  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId,primaryDiscipline:definition.output.primaryDiscipline||null,skillId:definition.skill&&definition.skill.id||null,actionId:definition.envelope&&definition.envelope.actionId||null,sourceSide:definition.actorSide||null,sourceParticipantId:definition.actorParticipantId||null});
+  const preDefense=resolveBattlePreStaminaDefense({attackPL:definition.output.attackPL,mitigable:definition.mitigable===true,targetSide:definition.targetSide,targetParticipantId:definition.targetParticipantId,primaryDiscipline:definition.output.primaryDiscipline||null,skillId:definition.skill&&definition.skill.id||null,actionId:definition.envelope&&definition.envelope.actionId||null,sourceSide:definition.actorSide||null,sourceParticipantId:definition.actorParticipantId||null,qualifyingDirectAttackPLPacket:!(definition.output&&definition.output.perTarget===true)&&!(definition.skill&&Array.isArray(definition.skill.traits)&&definition.skill.traits.includes("one_authored_area_action"))});
   const effectiveStamina=getBattleEffectiveStamina(definition.targetSide,definition.targetParticipantId);
   const staminaResolution=calculateBattleStaminaMitigationV1(preDefense.resolvedAttackPL,effectiveStamina);
   const absorption=absorbBattleDamageBearingCapacity(definition.targetSide,definition.targetParticipantId,staminaResolution.finalDamage);
@@ -86520,6 +86548,9 @@ function chooseEnemyAuthoredBattleAction(schedulerState=null) {
 }
 
 function executeEnemyAuthoredActionOpportunity() {
+  if (typeof isArc1M7SanitisationEncounterActive === "function"&&isArc1M7SanitisationEncounterActive()) {
+    return executeArc1M7SanitisationEnemyActionOpportunity();
+  }
   const scheduler=evaluateEnemyActionScheduler();
   if (!scheduler.ready) {
     recordBattleEvidence({
@@ -88955,6 +88986,11 @@ function restoreTestState() {
     normalizeArc1M1UnknownOperativeConfrontationState(
       state.unknownOperativeConfrontation
     );
+
+  currentBattle.mission7SanitisationEncounter =
+    typeof normalizeArc1M7SanitisationEncounterState === "function"
+      ? normalizeArc1M7SanitisationEncounterState(state.mission7SanitisationEncounter)
+      : null;
 
 
   // =========================================
@@ -94877,6 +94913,7 @@ function launchArc1M1UnknownOperativeConfrontation({
   currentBattle.outcome=null;
   currentBattle.defeat=null;
   currentBattle.returnContext=returnContext?normalizeBattleReturnContext(returnContext):null;
+  currentBattle.mission7SanitisationEncounter=null;
   currentBattle.observerSafeResultContext={
     stableOpponentId:A.stableOpponentId,
     observerProjectionKey:A.observerProjectionKey,
@@ -95712,3 +95749,722 @@ function runAlphaPost1939UnknownOperativeIntegrationDiagnostics() {
   };
 }
 
+
+
+// =========================================================
+// POST-1995 — MONSTER BATCH M7 SANITISATION TRIO
+// BRICKS 1995–2074
+// =========================================================
+// Consumes Issue #31 / Combat closure for Arc 1 Mission 7 — The Dead Transfer.
+//
+// Design-closed semantics consumed here:
+// - three stable human opposition identities, not one PL pool
+// - exact authored prepared actions only; no Basic/Guard fallback
+// - Story supplies exact participants and exact evidence/object targets
+// - observer projection never becomes persistence identity
+// - source-owned control/defence/tag provenance survives refresh
+// - Battle result != sanitisation outcome != Mission result
+// =========================================================
+
+const ARC1_M7_SANITISATION_AUTHORITY=Object.freeze({
+  encounterPackageId:"arc1_m7_chain_sanitisation_active_encounter",
+  participantIds:Object.freeze({
+    sealer:"arc1_m7_sanitisation_sealer_01",
+    breacher:"arc1_m7_sanitisation_breacher_01",
+    warden:"arc1_m7_sanitisation_warden_01"
+  }),
+  observerProjectionKeys:Object.freeze({
+    sealer:"observer_projection_sanitisation_operative_sealer",
+    breacher:"observer_projection_sanitisation_operative_breacher",
+    warden:"observer_projection_sanitisation_operative_warden"
+  }),
+  concealedLabels:Object.freeze({
+    sealer:"SANITISATION OPERATIVE — SEALER",
+    breacher:"SANITISATION OPERATIVE — BREACHER",
+    warden:"SANITISATION OPERATIVE — WARDEN"
+  }),
+  basePL:Object.freeze({sealer:47,breacher:47,warden:46}),
+  stats:Object.freeze({
+    sealer:Object.freeze({nin:42,tai:31,buki:34,fuin:50,kin:42,gen:37,stamina:44}),
+    breacher:Object.freeze({nin:36,tai:46,buki:49,fuin:22,kin:29,gen:25,stamina:46}),
+    warden:Object.freeze({nin:40,tai:44,buki:42,fuin:31,kin:35,gen:37,stamina:48})
+  }),
+  actionIds:Object.freeze({
+    sealShock:"arc1_m7_sanitisation_sealer_seal_shock",
+    bindingScript:"arc1_m7_sanitisation_sealer_binding_script",
+    sanitisationTag:"arc1_m7_sanitisation_sealer_sanitisation_tag",
+    purgeCommit:"arc1_m7_sanitisation_sealer_purge_commit",
+    breachBlade:"arc1_m7_sanitisation_breacher_breach_blade",
+    drivingKnee:"arc1_m7_sanitisation_breacher_driving_knee",
+    pursuitCut:"arc1_m7_sanitisation_breacher_pursuit_cut",
+    guardedEntry:"arc1_m7_sanitisation_breacher_guarded_entry",
+    interceptingStrike:"arc1_m7_sanitisation_warden_intercepting_strike",
+    containmentClamp:"arc1_m7_sanitisation_warden_containment_clamp",
+    exitDenial:"arc1_m7_sanitisation_warden_exit_denial",
+    bracedIntercept:"arc1_m7_sanitisation_warden_braced_intercept"
+  })
+});
+
+function getArc1M7SanitisationStableParticipantIds(){
+  const ids=ARC1_M7_SANITISATION_AUTHORITY.participantIds;
+  return [ids.sealer,ids.breacher,ids.warden];
+}
+
+function isArc1M7SanitisationStableParticipantId(participantId){
+  return getArc1M7SanitisationStableParticipantIds().includes(participantId);
+}
+
+function createArc1M7SanitisationEnemyRecord(role){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  const id=A.participantIds[role];
+  return {
+    id,
+    name:A.concealedLabels[role],
+    rank:"Unknown",
+    formalRank:null,
+    affiliation:null,
+    classification:"persistent_human_operative",
+    observerProjectionKey:A.observerProjectionKeys[role],
+    power:A.basePL[role],
+    calibratedBasePL:A.basePL[role],
+    baseStats:{...A.stats[role]},
+    stats:{...A.stats[role]},
+    image:null,
+    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
+    noBossScaling:true,
+    noEncounterScaling:true,
+    collectibleProductionGate:false,
+    mission7SanitisationRole:role,
+    hiddenFactionInferenceForbidden:true,
+    observerProjectionIsNotPersistenceIdentity:true
+  };
+}
+
+["sealer","breacher","warden"].forEach(role=>{
+  const record=createArc1M7SanitisationEnemyRecord(role);
+  enemyDatabase[record.id]=record;
+});
+
+function normalizeArc1M7SanitisationEvidenceTarget(raw){
+  if (!raw||typeof raw!=="object"||Array.isArray(raw)) return null;
+  const targetId=typeof raw.targetId==="string"&&raw.targetId
+    ?raw.targetId
+    :(typeof raw.objectId==="string"&&raw.objectId?raw.objectId:(typeof raw.occurrenceId==="string"&&raw.occurrenceId?raw.occurrenceId:null));
+  if (!targetId) return null;
+  const explicitNonLiving=raw.nonLiving===true||raw.targetType==="evidence_object"||raw.targetType==="non_living_object";
+  const liveTag=raw.liveTag&&typeof raw.liveTag==="object"&&!Array.isArray(raw.liveTag)
+    ?{
+      sourceParticipantId:typeof raw.liveTag.sourceParticipantId==="string"?raw.liveTag.sourceParticipantId:null,
+      establishingOccurrenceId:typeof raw.liveTag.establishingOccurrenceId==="string"?raw.liveTag.establishingOccurrenceId:null,
+      encounterId:raw.liveTag.encounterId===ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId?raw.liveTag.encounterId:null,
+      active:raw.liveTag.active===true
+    }
+    :null;
+  const tagHistory=Array.isArray(raw.tagHistory)?raw.tagHistory.filter(item=>item&&typeof item==="object").map(item=>cloneBattleRuntimeValue(item)):[];
+  const sanitisationState=["untouched","tagged","purge_completed"].includes(raw.sanitisationState)
+    ?raw.sanitisationState
+    :(raw.purgeCompleted===true?"purge_completed":(liveTag&&liveTag.active?"tagged":"untouched"));
+  return {
+    targetId,
+    targetType:explicitNonLiving?"evidence_object":(typeof raw.targetType==="string"?raw.targetType:null),
+    nonLiving:explicitNonLiving,
+    present:raw.present===true,
+    addressable:raw.addressable===true,
+    sanitisationEligible:raw.sanitisationEligible===true||raw.exposedForSanitisation===true,
+    holderContext:raw.holderContext?cloneBattleRuntimeValue(raw.holderContext):null,
+    locationContext:raw.locationContext?cloneBattleRuntimeValue(raw.locationContext):null,
+    sanitisationState,
+    liveTag:sanitisationState==="purge_completed"?null:liveTag,
+    tagHistory,
+    purgeOccurrenceId:typeof raw.purgeOccurrenceId==="string"?raw.purgeOccurrenceId:null,
+    currentEncounterPayloadAvailable:raw.currentEncounterPayloadAvailable!==false&&sanitisationState!=="purge_completed",
+    physicalAnnihilation:false,
+    priorHistoryErased:false,
+    priorKnowledgeErased:false,
+    ownershipTransferred:false,
+    hostedLivingCarrierTargeted:false
+  };
+}
+
+function normalizeArc1M7SanitisationEncounterState(raw){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  if (!raw||typeof raw!=="object"||Array.isArray(raw)||raw.encounterPackageId!==A.encounterPackageId) return null;
+  const activeParticipantIds=Array.isArray(raw.activeParticipantIds)?[...new Set(raw.activeParticipantIds.filter(id=>typeof id==="string"&&id))]:[];
+  const sideAssignments=raw.sideAssignments&&typeof raw.sideAssignments==="object"&&!Array.isArray(raw.sideAssignments)?cloneBattleRuntimeValue(raw.sideAssignments):{};
+  const evidenceTargets=Array.isArray(raw.evidenceTargets)?raw.evidenceTargets.map(normalizeArc1M7SanitisationEvidenceTarget).filter(Boolean):[];
+  const seenTargets=new Set();
+  const uniqueTargets=evidenceTargets.filter(target=>{if(seenTargets.has(target.targetId))return false;seenTargets.add(target.targetId);return true;});
+  const operativeOutcomes={};
+  getArc1M7SanitisationStableParticipantIds().forEach(id=>{
+    const value=raw.operativeOutcomes&&raw.operativeOutcomes[id];
+    operativeOutcomes[id]=["active","neutralized","withdrawn","escaped","captured","dead"].includes(value)?value:"active";
+  });
+  const uniqueStrings=value=>Array.isArray(value)?[...new Set(value.filter(item=>typeof item==="string"&&item))]:[];
+  const requests=Array.isArray(raw.objectConsequenceRequests)?raw.objectConsequenceRequests.filter(item=>item&&typeof item==="object").map(item=>cloneBattleRuntimeValue(item)):[];
+  const uniqueRequests=[];const seenRequests=new Set();
+  requests.forEach(item=>{const key=item.requestId||item.purgeOccurrenceId||JSON.stringify(item);if(seenRequests.has(key))return;seenRequests.add(key);uniqueRequests.push(item);});
+  return {
+    encounterPackageId:A.encounterPackageId,
+    occurrenceId:typeof raw.occurrenceId==="string"?raw.occurrenceId:null,
+    activeParticipantIds,
+    sideAssignments,
+    evidenceTargets:uniqueTargets,
+    operativeOutcomes,
+    actionOccurrenceIds:uniqueStrings(raw.actionOccurrenceIds),
+    stateOccurrenceIds:uniqueStrings(raw.stateOccurrenceIds),
+    pursuitOccurrenceIds:uniqueStrings(raw.pursuitOccurrenceIds),
+    purgeOccurrenceIds:uniqueStrings(raw.purgeOccurrenceIds),
+    objectConsequenceRequests:uniqueRequests,
+    supportedInjuryFacts:Array.isArray(raw.supportedInjuryFacts)?cloneBattleRuntimeValue(raw.supportedInjuryFacts):[],
+    supportedCustodyFacts:Array.isArray(raw.supportedCustodyFacts)?cloneBattleRuntimeValue(raw.supportedCustodyFacts):[],
+    callerContext:raw.callerContext?cloneBattleRuntimeValue(raw.callerContext):null,
+    returnContext:raw.returnContext?normalizeBattleReturnContext(raw.returnContext):null,
+    battleCompleted:raw.battleCompleted===true,
+    battleResult:typeof raw.battleResult==="string"?raw.battleResult:null,
+    returnEnvelope:raw.returnEnvelope&&typeof raw.returnEnvelope==="object"?cloneBattleRuntimeValue(raw.returnEnvelope):null,
+    lastActionCompletedAtByOperative:raw.lastActionCompletedAtByOperative&&typeof raw.lastActionCompletedAtByOperative==="object"&&!Array.isArray(raw.lastActionCompletedAtByOperative)?cloneBattleRuntimeValue(raw.lastActionCompletedAtByOperative):{},
+    startedAt:Number(raw.startedAt)||null,
+    completedAt:Number(raw.completedAt)||null
+  };
+}
+
+function getArc1M7SanitisationEncounterState(){
+  return normalizeArc1M7SanitisationEncounterState(currentBattle.mission7SanitisationEncounter);
+}
+
+function isArc1M7SanitisationEncounterActive(){
+  const state=getArc1M7SanitisationEncounterState();
+  return !!(state&&currentBattle.encounterId===ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId&&currentBattle.active&&!currentBattle.battleOver);
+}
+
+function resolveArc1M7StoryBattleParticipantRuntime(participantId){
+  if (!participantId||isArc1M7SanitisationStableParticipantId(participantId)) return null;
+  // Current Battle player-side deployment resolves through owned runtime characters.
+  // Fail closed rather than pretending a non-owned Story NPC can be deployed by this
+  // player-side resolver; a future authored ally runtime needs its own explicit bridge.
+  return getPlayerCharacter(participantId)||null;
+}
+
+function validateArc1M7SanitisationParticipantEnvelope(activeParticipantIds,sideAssignments){
+  const exactEnemyIds=getArc1M7SanitisationStableParticipantIds();
+  const ids=Array.isArray(activeParticipantIds)?[...new Set(activeParticipantIds.filter(id=>typeof id==="string"&&id))]:[];
+  if (!exactEnemyIds.every(id=>ids.includes(id))) return {valid:false,reason:"mission7_exact_opposition_set_incomplete",requiredOppositionIds:exactEnemyIds};
+  const extraOpposition=ids.filter(id=>isArc1M7SanitisationStableParticipantId(id)&&!exactEnemyIds.includes(id));
+  if (extraOpposition.length) return {valid:false,reason:"mission7_unexpected_opposition_participant",unexpectedParticipantIds:extraOpposition};
+  const playerIds=ids.filter(id=>!exactEnemyIds.includes(id));
+  if (playerIds.length===0) return {valid:false,reason:"mission7_caller_active_side_empty"};
+  if (playerIds.length>6) return {valid:false,reason:"mission7_player_deployment_exceeds_six",participantIds:playerIds};
+  const unresolved=playerIds.filter(id=>!resolveArc1M7StoryBattleParticipantRuntime(id));
+  if (unresolved.length) return {valid:false,reason:"mission7_story_battle_participant_runtime_missing",unresolvedParticipantIds:unresolved};
+  const assignments=sideAssignments&&typeof sideAssignments==="object"&&!Array.isArray(sideAssignments)?sideAssignments:null;
+  if (!assignments) return {valid:false,reason:"mission7_side_assignments_missing"};
+  if (ids.some(id=>typeof assignments[id]!=="string"||!assignments[id])) return {valid:false,reason:"mission7_active_participant_side_assignment_missing"};
+  return {valid:true,activeParticipantIds:ids,playerParticipantIds:playerIds,enemyParticipantIds:exactEnemyIds,sideAssignments:cloneBattleRuntimeValue(assignments)};
+}
+
+function normalizeArc1M7CallerEvidenceTargets(targets){
+  const raw=Array.isArray(targets)?targets:[];
+  const normalized=raw.map(normalizeArc1M7SanitisationEvidenceTarget).filter(Boolean);
+  const seen=new Set();
+  return normalized.filter(target=>{if(seen.has(target.targetId))return false;seen.add(target.targetId);return true;});
+}
+
+function launchArc1M7SanitisationEncounter({
+  activeParticipantIds,
+  sideAssignments,
+  evidenceTargets=[],
+  callerContext=null,
+  returnContext=null
+}={}){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  const participants=validateArc1M7SanitisationParticipantEnvelope(activeParticipantIds,sideAssignments);
+  if (!participants.valid) return {success:false,...participants};
+  const targets=normalizeArc1M7CallerEvidenceTargets(evidenceTargets);
+  const enemies=participants.enemyParticipantIds.map(id=>enemyDatabase[id]).filter(Boolean);
+  if (enemies.length!==3) return {success:false,reason:"mission7_enemy_records_missing"};
+  const activePlayer=resolveArc1M7StoryBattleParticipantRuntime(participants.playerParticipantIds[0]);
+  if (!activePlayer) return {success:false,reason:"mission7_start_participant_missing"};
+
+  selectedEnemy=enemies[0];
+  currentBattle.active=true;
+  currentBattle.battleId=createBattleInstanceId();
+  currentBattle.encounterId=A.encounterPackageId;
+  currentBattle.encounterOccurrenceId=null;
+  currentBattle.oppositionTemplateId=A.encounterPackageId;
+  currentBattle.encounterStatePackageId=null;
+  currentBattle.characterId=participants.playerParticipantIds[0];
+  currentBattle.encounterEnemy=enemies[0];
+  setBattleEnemyParticipants(enemies);
+  currentBattle.enemy=enemies[0];
+  currentBattle.deployment={
+    player:{slots:createBattleDeploymentSlots(participants.playerParticipantIds)},
+    enemy:{slots:createBattleDeploymentSlots(participants.enemyParticipantIds)},
+    transitionCounter:0,lastTransition:null
+  };
+  currentBattle.activePlayer=getBattleDeploymentParticipant("player",1)||activePlayer;
+  syncBattleActiveEnemyFromDeployment();
+  currentBattle.lastDamage=0;
+  currentBattle.battleOver=false;
+  currentBattle.completedAt=null;
+  currentBattle.claimedAt=null;
+  currentBattle.completionRecorded=false;
+  currentBattle.outcome=null;
+  currentBattle.defeat=null;
+  currentBattle.returnContext=returnContext?normalizeBattleReturnContext(returnContext):null;
+  currentBattle.unknownOperativeConfrontation=null;
+  currentBattle.observerSafeResultContext={
+    encounterPackageId:A.encounterPackageId,
+    opponentStableParticipantIds:[...participants.enemyParticipantIds],
+    observerProjectionKeys:participants.enemyParticipantIds.map(id=>enemyDatabase[id].observerProjectionKey),
+    trueIdentityRevealed:false,
+    factionRevealed:false
+  };
+  currentBattle.battleLog=[`${enemies[0].name} enters the sanitisation confrontation.`,`${currentBattle.activePlayer?currentBattle.activePlayer.name:"The active side"} prepares for battle.`];
+  currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};
+  currentBattle.enemyPower=A.basePL.sealer;
+  currentBattle.enemyMaxPower=A.basePL.sealer;
+
+  initializeBattleContributionRecordsFromDeployment();
+  initializeBattleSourcePackageRuntime();
+  initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});
+  initializeBattlePouchFromPreparedSelection();
+  initializeBattleAttachedSummonRuntimeFromDeployment();
+  initializeBattleDedicatedVariantRuntimePackages();
+  initializeBattleKisoganStartsActiveFromDeployment();
+
+  const occurrenceId=createBattleRuntimeRecordId("arc1_m7_chain_sanitisation_active_encounter");
+  const operativeOutcomes={};participants.enemyParticipantIds.forEach(id=>operativeOutcomes[id]="active");
+  currentBattle.mission7SanitisationEncounter={
+    encounterPackageId:A.encounterPackageId,
+    occurrenceId,
+    activeParticipantIds:[...participants.activeParticipantIds],
+    sideAssignments:cloneBattleRuntimeValue(participants.sideAssignments),
+    evidenceTargets:targets.map(target=>cloneBattleRuntimeValue(target)),
+    operativeOutcomes,
+    actionOccurrenceIds:[],stateOccurrenceIds:[],pursuitOccurrenceIds:[],purgeOccurrenceIds:[],
+    objectConsequenceRequests:[],supportedInjuryFacts:[],supportedCustodyFacts:[],
+    callerContext:callerContext?cloneBattleRuntimeValue(callerContext):null,
+    returnContext:currentBattle.returnContext?cloneBattleRuntimeValue(currentBattle.returnContext):null,
+    battleCompleted:false,battleResult:null,returnEnvelope:null,
+    lastActionCompletedAtByOperative:{},
+    startedAt:Date.now(),completedAt:null
+  };
+  participants.enemyParticipantIds.forEach(id=>getParticipantChronicleState(id,{create:true}));
+  savePlayerData();saveTestState();openOverlay("combat");
+  return {success:true,battleId:currentBattle.battleId,occurrenceId,encounterPackageId:A.encounterPackageId,activeParticipantIds:[...participants.activeParticipantIds],sideAssignments:cloneBattleRuntimeValue(participants.sideAssignments),evidenceTargetIds:targets.map(target=>target.targetId)};
+}
+
+function getArc1M7EvidenceTarget(targetId){
+  const state=currentBattle.mission7SanitisationEncounter;
+  if (!state||!Array.isArray(state.evidenceTargets)||!targetId) return null;
+  return state.evidenceTargets.find(target=>target&&target.targetId===targetId)||null;
+}
+
+function updateArc1M7EvidenceTargetRuntime(targetId,patch={}){
+  const target=getArc1M7EvidenceTarget(targetId);if(!target)return {success:false,reason:"mission7_evidence_target_missing"};
+  if (Object.prototype.hasOwnProperty.call(patch,"present")) target.present=patch.present===true;
+  if (Object.prototype.hasOwnProperty.call(patch,"addressable")) target.addressable=patch.addressable===true;
+  if (Object.prototype.hasOwnProperty.call(patch,"sanitisationEligible")) target.sanitisationEligible=patch.sanitisationEligible===true;
+  if (Object.prototype.hasOwnProperty.call(patch,"holderContext")) target.holderContext=cloneBattleRuntimeValue(patch.holderContext);
+  if (Object.prototype.hasOwnProperty.call(patch,"locationContext")) target.locationContext=cloneBattleRuntimeValue(patch.locationContext);
+  saveTestState();return {success:true,target:cloneBattleRuntimeValue(target)};
+}
+
+function appendArc1M7UniqueStateValue(key,value){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state||!value)return false;
+  if(!Array.isArray(state[key]))state[key]=[];if(!state[key].includes(value))state[key].push(value);return true;
+}
+
+function recordArc1M7ActionCompletion(actionId,actorId,resolution={}){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state||!actionId)return false;
+  appendArc1M7UniqueStateValue("actionOccurrenceIds",actionId);
+  (Array.isArray(resolution.stateRefs)?resolution.stateRefs:[]).forEach(id=>appendArc1M7UniqueStateValue("stateOccurrenceIds",id));
+  (Array.isArray(resolution.conditionRefs)?resolution.conditionRefs:[]).forEach(id=>appendArc1M7UniqueStateValue("stateOccurrenceIds",id));
+  if(actorId)state.lastActionCompletedAtByOperative[actorId]=Date.now();
+  if(resolution.qualifyingMovementOccurrenceId)appendArc1M7UniqueStateValue("pursuitOccurrenceIds",resolution.qualifyingMovementOccurrenceId);
+  if(resolution.purgeOccurrenceId)appendArc1M7UniqueStateValue("purgeOccurrenceIds",resolution.purgeOccurrenceId);
+  return true;
+}
+
+function getArc1M7SanitisationTagEligibleTargetIds(){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state)return [];
+  return state.evidenceTargets.filter(target=>target&&target.nonLiving===true&&target.present===true&&target.addressable===true&&target.sanitisationEligible===true&&target.sanitisationState!=="purge_completed").map(target=>target.targetId);
+}
+
+function getArc1M7SanitisationPurgeEligibleTargetIds(sourceParticipantId=ARC1_M7_SANITISATION_AUTHORITY.participantIds.sealer){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state)return [];
+  return state.evidenceTargets.filter(target=>target&&target.present===true&&target.addressable===true&&target.sanitisationState==="tagged"&&target.liveTag&&target.liveTag.active===true&&target.liveTag.sourceParticipantId===sourceParticipantId&&target.liveTag.encounterId===ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId).map(target=>target.targetId);
+}
+
+function isArc1M7OperativeCapableToAct(participantId){
+  const state=currentBattle.mission7SanitisationEncounter;
+  if(!state||!currentBattle.active||currentBattle.battleOver||!isArc1M7SanitisationStableParticipantId(participantId))return false;
+  if(state.operativeOutcomes[participantId]!=="active")return false;
+  if(getBattleActiveParticipantId("enemy")!==participantId)return false;
+  return Number(getBattleRemainingPL("enemy",participantId))>0;
+}
+
+function establishArc1M7SanitisationBinding(enemy,target,envelope){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  const applied=upsertAlphaSourceScopedCondition({
+    conditionKey:"sanitisation_binding",conditionType:"sanitisation_binding",
+    sourceSide:"enemy",sourceParticipantId:A.participantIds.sealer,
+    sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"},{type:"skill",id:A.actionIds.bindingScript,role:"exact_source"}],
+    sourceSkillId:A.actionIds.bindingScript,actionId:envelope.actionId,
+    targetSide:"player",targetParticipantId:target.id,reapplication:"refresh",
+    blockedActionClasses:["movement_technique","disengage","break_contact","escape","encounter_exit","route_exit"],
+    blockedActionTraits:["substantial_free_movement","reposition","voluntary_movement","movement_required","movement_dependent_taijutsu","movement_dependent_bukijutsu","voluntary_encounter_exit"],
+    data:{remainingActionOpportunities:1,durationActionOpportunities:1,blanketStun:false,notStun:true,sourceOwned:true,blocksOrdinaryAttacks:false,blocksItems:false,blocksTransformationByDefault:false}
+  });
+  if(applied.condition)recordBattleEvidence({eventType:applied.refreshed?"sanitisation_binding_refreshed":"sanitisation_binding_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),skillId:A.actionIds.bindingScript,conditionRefs:[applied.condition.conditionId],data:{throughTargetNextActionOpportunity:true,blanketStun:false,sameSourceRefresh:true}});
+  return applied;
+}
+
+function establishArc1M7WardenExitDenial(enemy,target,envelope){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  const applied=upsertAlphaSourceScopedCondition({
+    conditionKey:"warden_exit_denial",conditionType:"encounter_exit_control",
+    sourceSide:"enemy",sourceParticipantId:A.participantIds.warden,
+    sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"},{type:"skill",id:A.actionIds.exitDenial,role:"exact_source"}],
+    sourceSkillId:A.actionIds.exitDenial,actionId:envelope.actionId,
+    targetSide:"player",targetParticipantId:target.id,reapplication:"refresh",
+    blockedActionClasses:["disengage","break_contact","escape","encounter_exit","route_exit"],
+    blockedActionTraits:["voluntary_encounter_exit","route_exit"],
+    data:{remainingActionOpportunities:1,durationActionOpportunities:1,blanketStun:false,notStun:true,targetLocalOnly:true,ordinaryAttacksAllowed:true,itemsAllowed:true,nonExitActionsAllowed:true}
+  });
+  if(applied.condition)recordBattleEvidence({eventType:applied.refreshed?"warden_exit_denial_refreshed":"warden_exit_denial_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),skillId:A.actionIds.exitDenial,conditionRefs:[applied.condition.conditionId],data:{targetLocalOnly:true,blanketStun:false,invalidExitConsumesNoAction:true}});
+  return applied;
+}
+
+function establishArc1M7PhysicalRestraint(enemy,target,envelope,finalDamage){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  const applied=upsertAlphaSourceScopedCondition({
+    conditionKey:"physical_restraint",conditionType:"physical_restraint",
+    sourceSide:"enemy",sourceParticipantId:A.participantIds.warden,
+    sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"},{type:"skill",id:A.actionIds.containmentClamp,role:"exact_source"}],
+    sourceSkillId:A.actionIds.containmentClamp,actionId:envelope.actionId,
+    targetSide:"player",targetParticipantId:target.id,reapplication:"refresh",
+    blockedActionClasses:["movement_technique","disengage","break_contact","escape","encounter_exit","route_exit"],
+    blockedActionTraits:["substantial_free_movement","reposition","voluntary_movement","movement_required","movement_dependent_taijutsu","movement_dependent_bukijutsu","voluntary_encounter_exit"],
+    data:{remainingActionOpportunities:1,durationActionOpportunities:1,requiresPositiveFinalDamage:true,establishingFinalDamage:finalDamage,blanketStun:false,notStun:true,sameSourceRefresh:true,noHiddenControlScalar:true}
+  });
+  if(applied.condition)recordBattleEvidence({eventType:applied.refreshed?"physical_restraint_refreshed":"physical_restraint_established",committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",enemy.id),targetRef:createBattleParticipantRef("player",target.id),skillId:A.actionIds.containmentClamp,conditionRefs:[applied.condition.conditionId],data:{requiresPositiveFinalDamage:true,establishingFinalDamage:finalDamage,blanketStun:false,noHiddenControlScalar:true}});
+  return applied;
+}
+
+function createArc1M7FixedDamageAction(id,displayName,attackPL,primaryDiscipline,traits=[]){
+  const base=makeEnemyFixedDamageAction(id,attackPL,{primaryDiscipline,traits:["mission7_sanitisation_exact_authored_action","one_direct_packet",...traits]});
+  base.displayName=displayName;base.authoredAttackPL=attackPL;base.targetMode="single_hostile";base.ordinaryStamina=true;return base;
+}
+
+function createArc1M7BindingAction(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  return {id:A.actionIds.bindingScript,skillId:A.actionIds.bindingScript,displayName:"Binding Script",targetMode:"single_hostile",actionClass:"enemy_control_technique",authoredAttackPL:null,traits:["mission7_sanitisation_exact_authored_action","fuinjutsu_control","voluntary_movement_restriction_only","not_stun"],resolve({enemy,target,envelope}){if(!enemy||!target||!envelope)return{resolved:false,reason:"binding_context_missing"};const applied=establishArc1M7SanitisationBinding(enemy,target,envelope);return{resolved:!!applied.condition,branch:"sanitisation_binding",damageApplied:false,conditionRefs:applied.condition?[applied.condition.conditionId]:[],refreshed:applied.refreshed===true};}};
+}
+
+function createArc1M7SanitisationTagAction(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  return {id:A.actionIds.sanitisationTag,skillId:A.actionIds.sanitisationTag,displayName:"Sanitisation Tag",targetMode:"evidence_object",actionClass:"enemy_evidence_procedure",authoredAttackPL:null,traits:["mission7_sanitisation_exact_authored_action","explicit_non_living_evidence_target_required","no_automatic_purge","hosted_entity_not_implicit_target"],resolve({enemy,envelope,targetEvidenceId}){
+    if(!enemy||enemy.id!==A.participantIds.sealer||!envelope)return{resolved:false,reason:"sanitisation_tag_actor_invalid"};
+    const target=getArc1M7EvidenceTarget(targetEvidenceId);if(!target)return{resolved:false,reason:"sanitisation_target_not_supplied",invalidSelection:true};
+    if(target.nonLiving!==true)return{resolved:false,reason:"sanitisation_target_not_non_living",invalidSelection:true,hostedLivingCarrierTargeted:false};
+    if(target.present!==true||target.addressable!==true||target.sanitisationEligible!==true)return{resolved:false,reason:"sanitisation_target_not_currently_eligible",invalidSelection:true};
+    if(target.sanitisationState==="purge_completed")return{resolved:false,reason:"sanitisation_target_already_purged",invalidSelection:true};
+    const refreshed=!!(target.liveTag&&target.liveTag.active===true&&target.liveTag.sourceParticipantId===enemy.id);
+    const priorTag=refreshed?cloneBattleRuntimeValue(target.liveTag):null;
+    const occurrenceId=envelope.actionId;
+    target.liveTag={sourceParticipantId:enemy.id,establishingOccurrenceId:occurrenceId,encounterId:A.encounterPackageId,active:true};
+    if(!Array.isArray(target.tagHistory))target.tagHistory=[];
+    target.tagHistory.push({sourceParticipantId:enemy.id,establishingOccurrenceId:occurrenceId,encounterId:A.encounterPackageId,refreshed,priorEstablishingOccurrenceId:priorTag&&priorTag.establishingOccurrenceId||null,createdAt:Date.now()});
+    target.sanitisationState="tagged";target.currentEncounterPayloadAvailable=true;
+    const evidence=recordBattleEvidence({eventType:refreshed?"sanitisation_tag_refreshed":"sanitisation_tagged",committedOccurrence:true,actionId:occurrenceId,actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:A.actionIds.sanitisationTag,sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"},{type:"evidence_object",id:target.targetId,role:"explicit_caller_supplied_target"}],data:{targetEvidenceObjectId:target.targetId,sourceParticipantId:enemy.id,encounterPackageId:A.encounterPackageId,refreshNotStack:refreshed,automaticPurge:false,physicalAnnihilation:false,priorHistoryErased:false,priorKnowledgeErased:false,ownershipTransferred:false,hostedLivingCarrierTargeted:false}});
+    return{resolved:!!evidence,branch:"sanitisation_tag",damageApplied:false,targetEvidenceId:target.targetId,tagOccurrenceId:occurrenceId,refreshed,automaticPurge:false};
+  }};
+}
+
+function createArc1M7PurgeCommitAction(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  return {id:A.actionIds.purgeCommit,skillId:A.actionIds.purgeCommit,displayName:"Purge Commit",targetMode:"evidence_object",actionClass:"enemy_evidence_procedure",authoredAttackPL:null,traits:["mission7_sanitisation_exact_authored_action","same_source_live_tag_required","object_consequence_request_only","no_history_erasure"],resolve({enemy,envelope,targetEvidenceId}){
+    if(!enemy||enemy.id!==A.participantIds.sealer||!envelope)return{resolved:false,reason:"purge_commit_actor_invalid"};
+    if(!isArc1M7OperativeCapableToAct(enemy.id))return{resolved:false,reason:"purge_commit_sealer_not_capable",invalidSelection:true};
+    const target=getArc1M7EvidenceTarget(targetEvidenceId);if(!target)return{resolved:false,reason:"purge_target_not_supplied",invalidSelection:true};
+    if(target.present!==true||target.addressable!==true)return{resolved:false,reason:"purge_target_not_present_addressable",invalidSelection:true};
+    const tag=target.liveTag;
+    if(!tag||tag.active!==true||tag.sourceParticipantId!==enemy.id||tag.encounterId!==A.encounterPackageId)return{resolved:false,reason:"purge_same_source_live_tag_missing",invalidSelection:true};
+    tag.active=false;
+    const purgeOccurrenceId=envelope.actionId;
+    target.sanitisationState="purge_completed";target.purgeOccurrenceId=purgeOccurrenceId;target.currentEncounterPayloadAvailable=false;
+    target.physicalAnnihilation=false;target.priorHistoryErased=false;target.priorKnowledgeErased=false;target.ownershipTransferred=false;target.hostedLivingCarrierTargeted=false;
+    const evidence=recordBattleEvidence({eventType:"sanitisation_purge_completed",committedOccurrence:true,actionId:purgeOccurrenceId,actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:A.actionIds.purgeCommit,sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"},{type:"evidence_object",id:target.targetId,role:"exact_purge_target"},{type:"battle_action",id:tag.establishingOccurrenceId,role:"same_source_tag_establishment"}],data:{targetEvidenceObjectId:target.targetId,sourceParticipantId:enemy.id,tagEstablishingOccurrenceId:tag.establishingOccurrenceId,currentEncounterPayloadAvailable:false,priorChronicleHistoryErased:false,priorObserverKnowledgeErased:false,physicalAnnihilation:false,ownershipTransferred:false,missionOutcomeInferred:false}});
+    if(!evidence)return{resolved:false,reason:"purge_occurrence_commit_failed"};
+    const requestId=createBattleRuntimeRecordId("sanitisation_object_consequence_request");
+    const request={requestId,purgeOccurrenceId,targetEvidenceObjectId:target.targetId,sourceParticipantId:enemy.id,encounterPackageId:A.encounterPackageId,consequenceType:"current_encounter_evidentiary_payload_sanitised",persistentObjectAuthorityRequired:true,physicalAnnihilationNotImplied:true,priorHistoryRollbackForbidden:true,createdAt:Date.now()};
+    currentBattle.mission7SanitisationEncounter.objectConsequenceRequests.push(request);
+    recordBattleEvidence({eventType:"sanitisation_object_consequence_requested",committedOccurrence:true,actionId:purgeOccurrenceId,actorRef:createBattleParticipantRef("enemy",enemy.id),skillId:A.actionIds.purgeCommit,sourceRefs:[{type:"evidence_object",id:target.targetId,role:"owning_authority_request_target"}],data:cloneBattleRuntimeValue(request)});
+    return{resolved:true,branch:"sanitisation_purge_commit",damageApplied:false,targetEvidenceId:target.targetId,purgeOccurrenceId,objectConsequenceRequest:cloneBattleRuntimeValue(request),missionOutcomeInferred:false};
+  }};
+}
+
+function findArc1M7QualifyingMovementOccurrence(targetParticipantId){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;const state=currentBattle.mission7SanitisationEncounter;if(!state||!targetParticipantId)return null;
+  const since=Number(state.lastActionCompletedAtByOperative[A.participantIds.breacher])||Number(state.startedAt)||0;
+  const evidence=currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[];
+  const completedActionIds=new Set(evidence.filter(record=>record&&record.committedOccurrence===true&&record.actorRef&&record.actorRef.side==="player"&&record.actorRef.participantId===targetParticipantId&&["skill_action_completed","item_action_completed","summon_skill_resolved_and_returned","movement_occurrence_committed"].includes(record.eventType)&&Number(record.createdAt)>=since).map(record=>record.actionId||record.evidenceId).filter(Boolean));
+  const attempted=evidence.filter(record=>record&&record.eventType==="action_attempted"&&record.actorRef&&record.actorRef.side==="player"&&record.actorRef.participantId===targetParticipantId&&completedActionIds.has(record.actionId)&&Number(record.createdAt)>=since);
+  for(let i=attempted.length-1;i>=0;i-=1){
+    const record=attempted[i];const actionClass=record.data&&record.data.actionClass||null;
+    if(["movement_technique","disengage","break_contact","escape","encounter_exit","route_exit"].includes(actionClass))return{occurrenceId:record.actionId,actionClass,createdAt:record.createdAt};
+    const actor=getBattleParticipantByIdentity("player",targetParticipantId);const skill=actor&&record.skillId?getBattlePreparedSkillDefinition(actor,record.skillId):null;
+    const traits=skill&&Array.isArray(skill.traits)?skill.traits:[];
+    if(traits.some(trait=>["substantial_free_movement","reposition","voluntary_movement","contextual_traversal_reposition","categorical_reposition_only","formation_reposition"].includes(trait)))return{occurrenceId:record.actionId,actionClass,createdAt:record.createdAt};
+  }
+  const explicit=evidence.filter(record=>record&&record.eventType==="movement_occurrence_committed"&&record.committedOccurrence===true&&record.actorRef&&record.actorRef.side==="player"&&record.actorRef.participantId===targetParticipantId&&Number(record.createdAt)>=since).pop();
+  return explicit?{occurrenceId:explicit.actionId||explicit.evidenceId,actionClass:explicit.data&&explicit.data.actionClass||"movement_occurrence",createdAt:explicit.createdAt}:null;
+}
+
+function recordArc1M7VoluntaryMovementOccurrence(participantId,{actionId=null,actionClass="movement_technique",sourceRefs=[]}={}){
+  if(!isArc1M7SanitisationEncounterActive())return{success:false,reason:"mission7_sanitisation_encounter_not_active"};
+  const participant=getBattleParticipantByIdentity("player",participantId);if(!participant)return{success:false,reason:"movement_participant_not_deployed"};
+  const occurrence=recordBattleEvidence({eventType:"movement_occurrence_committed",committedOccurrence:true,actionId:actionId||createBattleRuntimeRecordId("movement_occurrence"),actorRef:createBattleParticipantRef("player",participantId),sourceRefs,data:{actionClass,voluntaryMovement:true,visualPositionNotAuthority:true}});
+  return occurrence?{success:true,occurrence}:{success:false,reason:"movement_occurrence_commit_failed"};
+}
+
+function evaluateArc1M7PursuitCutEligibility(targetParticipantId){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;
+  if(!isArc1M7SanitisationEncounterActive())return{available:false,reason:"mission7_sanitisation_encounter_not_active"};
+  if(getBattleActiveParticipantId("enemy")!==A.participantIds.breacher)return{available:false,reason:"breacher_not_active"};
+  const target=targetParticipantId?getBattleParticipantByIdentity("player",targetParticipantId):getBattleDeploymentParticipant("player",1);
+  if(!target)return{available:false,reason:"pursuit_target_missing"};
+  const movement=findArc1M7QualifyingMovementOccurrence(target.id);
+  if(!movement)return{available:false,reason:"qualifying_committed_target_movement_missing",hiddenSpeedStat:false,hiddenEvasionStat:false};
+  return{available:true,reason:null,targetParticipantId:target.id,qualifyingMovementOccurrenceId:movement.occurrenceId,hiddenSpeedStat:false,hiddenEvasionStat:false};
+}
+
+function createArc1M7PursuitCutAction(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;const base=createArc1M7FixedDamageAction(A.actionIds.pursuitCut,"Pursuit Cut",24,"Bukijutsu",["pursuit_action","qualifying_committed_movement_required","no_hidden_speed","no_hidden_evasion"]);const original=base.resolve;
+  base.resolve=function(context){const gate=evaluateArc1M7PursuitCutEligibility(context&&context.target&&context.target.id);if(!gate.available)return{resolved:false,reason:gate.reason,invalidSelection:true,actionOpportunityConsumed:false,falseHistoryCreated:true};const result=original(context);if(result&&result.resolved===true){result.qualifyingMovementOccurrenceId=gate.qualifyingMovementOccurrenceId;recordBattleEvidence({eventType:"pursuit_cut_resolved_from_committed_movement",committedOccurrence:true,actionId:context.envelope.actionId,actorRef:createBattleParticipantRef("enemy",A.participantIds.breacher),targetRef:createBattleParticipantRef("player",context.target.id),skillId:A.actionIds.pursuitCut,sourceRefs:[{type:"battle_action",id:gate.qualifyingMovementOccurrenceId,role:"qualifying_prior_movement"}],data:{priorMovementOccurrencePreserved:true,hiddenSpeedStat:false,hiddenEvasionStat:false,movementRewound:false}});}return result;};return base;
+}
+
+function createArc1M7OwnerDefenceAction(role,id,displayName,preventionRatio,stateKey){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;const ownerId=A.participantIds[role];
+  return{id,skillId:id,displayName,targetMode:"self",actionClass:"enemy_defensive_setup",authoredAttackPL:null,preventionRatio,stateKey,traits:["mission7_sanitisation_exact_authored_action","self_setup","pre_stamina_prevention","one_qualifying_direct_packet","no_hidden_defense_stat"],evaluateAvailability(){const existing=findBattleTransientState({stateKey,targetSide:"enemy",targetParticipantId:ownerId});return existing?{available:false,reason:"mission7_defence_already_active"}:{available:true,reason:null};},resolve({enemy,envelope}){if(!enemy||enemy.id!==ownerId||!envelope)return{resolved:false,reason:"mission7_defence_actor_invalid"};const state=addBattleTransientState({stateKey,sourceSide:"enemy",sourceParticipantId:ownerId,targetSide:"enemy",targetParticipantId:ownerId,ownerRef:{type:"skill",id},data:{sourceSkillId:id,attackMultiplier:1-preventionRatio,preventionRatio,oneUse:true,activationActionId:envelope.actionId,expiresAtOwnerNextActionStart:true,requiresDirectAttackPLPacket:true,preStamina:true,hiddenDefenseStat:false,hiddenSpeedStat:false,hiddenEvasionStat:false}});if(state)recordBattleEvidence({eventType:`${stateKey}_established`,committedOccurrence:true,actionId:envelope.actionId,actorRef:createBattleParticipantRef("enemy",ownerId),skillId:id,stateRefs:[state.stateId],data:{preventionRatio,preventionOrder:"pre_stamina",oneUse:true,qualifyingDirectAttackPLPacketOnly:true,expiresAtStartOfNextOwnerActionOpportunity:true}});return{resolved:!!state,branch:stateKey,damageApplied:false,stateRefs:state?[state.stateId]:[]};}};
+}
+
+function expireArc1M7SanitisationOwnerDefenceAtOpportunityStart(side,participantId,actionId=null){
+  if(side!=="enemy"||!isArc1M7SanitisationStableParticipantId(participantId))return{expired:false,reason:"not_mission7_operational_owner"};
+  const keys=["breacher_guarded_entry","warden_braced_intercept"];const expired=[];
+  keys.forEach(stateKey=>{const state=findBattleTransientState({stateKey,targetSide:"enemy",targetParticipantId:participantId});if(!state||!state.data||state.data.expiresAtOwnerNextActionStart!==true)return;if(state.data.activationActionId&&state.data.activationActionId===actionId)return;const removed=removeBattleTransientState(state.stateId);if(removed){expired.push(state.stateId);recordBattleEvidence({eventType:`${stateKey}_expired`,committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("enemy",participantId),skillId:state.data.sourceSkillId||null,stateRefs:[state.stateId],data:{unused:true,expiredAtStartOfNextOwnerActionOpportunity:true}});}});
+  return{expired:expired.length>0,stateIds:expired};
+}
+
+function createArc1M7ContainmentClampAction(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;const base=createArc1M7FixedDamageAction(A.actionIds.containmentClamp,"Containment Clamp",17,"Taijutsu",["control_direct_action","restraint_requires_positive_final_damage","not_stun"]);const original=base.resolve;
+  base.resolve=function(context){const result=original(context);const finalDamage=Number(result&&result.finalDamage)||0;if(result&&result.resolved===true&&finalDamage>0){const applied=establishArc1M7PhysicalRestraint(context.enemy,context.target,context.envelope,finalDamage);result.conditionRefs=applied&&applied.condition?[applied.condition.conditionId]:[];result.physicalRestraintEstablished=!!(applied&&applied.condition);}else{result.conditionRefs=[];result.physicalRestraintEstablished=false;}return result;};return base;
+}
+
+function createArc1M7ExitDenialAction(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;return{id:A.actionIds.exitDenial,skillId:A.actionIds.exitDenial,displayName:"Exit Denial",targetMode:"single_hostile",actionClass:"enemy_control_technique",authoredAttackPL:null,traits:["mission7_sanitisation_exact_authored_action","target_local_exit_control","not_stun","non_exit_actions_allowed"],resolve({enemy,target,envelope}){if(!enemy||!target||!envelope)return{resolved:false,reason:"exit_denial_context_missing"};const applied=establishArc1M7WardenExitDenial(enemy,target,envelope);return{resolved:!!applied.condition,branch:"warden_exit_denial",damageApplied:false,conditionRefs:applied.condition?[applied.condition.conditionId]:[],refreshed:applied.refreshed===true};}};
+}
+
+const ARC1_M7_SANITISATION_PREPARED_ACTIONS_BY_ACTOR=Object.freeze({
+  [ARC1_M7_SANITISATION_AUTHORITY.participantIds.sealer]:Object.freeze([
+    createArc1M7FixedDamageAction(ARC1_M7_SANITISATION_AUTHORITY.actionIds.sealShock,"Seal Shock",20,"Ninjutsu",["fuinjutsu_assisted","no_automatic_rider","does_not_establish_sanitisation_tag"]),
+    createArc1M7BindingAction(),createArc1M7SanitisationTagAction(),createArc1M7PurgeCommitAction()
+  ]),
+  [ARC1_M7_SANITISATION_AUTHORITY.participantIds.breacher]:Object.freeze([
+    createArc1M7FixedDamageAction(ARC1_M7_SANITISATION_AUTHORITY.actionIds.breachBlade,"Breach Blade",25,"Bukijutsu",["no_automatic_guard_break","no_automatic_bleeding","no_automatic_displacement"]),
+    createArc1M7FixedDamageAction(ARC1_M7_SANITISATION_AUTHORITY.actionIds.drivingKnee,"Driving Knee",22,"Taijutsu",["no_automatic_stun","no_automatic_knockback","no_automatic_fracture"]),
+    createArc1M7PursuitCutAction(),
+    createArc1M7OwnerDefenceAction("breacher",ARC1_M7_SANITISATION_AUTHORITY.actionIds.guardedEntry,"Guarded Entry",0.25,"breacher_guarded_entry")
+  ]),
+  [ARC1_M7_SANITISATION_AUTHORITY.participantIds.warden]:Object.freeze([
+    createArc1M7FixedDamageAction(ARC1_M7_SANITISATION_AUTHORITY.actionIds.interceptingStrike,"Intercepting Strike",21,"Taijutsu",["bukijutsu_assisted","no_automatic_restraint","no_automatic_exit_denial"]),
+    createArc1M7ContainmentClampAction(),createArc1M7ExitDenialAction(),
+    createArc1M7OwnerDefenceAction("warden",ARC1_M7_SANITISATION_AUTHORITY.actionIds.bracedIntercept,"Braced Intercept",0.30,"warden_braced_intercept")
+  ])
+});
+
+Object.entries(ARC1_M7_SANITISATION_PREPARED_ACTIONS_BY_ACTOR).forEach(([participantId,actions])=>{
+  if(enemyDatabase[participantId])enemyDatabase[participantId].authoredBattleActions=[...actions];
+});
+
+function getArc1M7PreparedActionsForActor(participantId){return ARC1_M7_SANITISATION_PREPARED_ACTIONS_BY_ACTOR[participantId]?[...ARC1_M7_SANITISATION_PREPARED_ACTIONS_BY_ACTOR[participantId]]:[];}
+function getArc1M7PreparedAction(actionId){for(const actions of Object.values(ARC1_M7_SANITISATION_PREPARED_ACTIONS_BY_ACTOR)){const found=actions.find(action=>action.id===actionId);if(found)return found;}return null;}
+function getArc1M7PreparedActionOwnerId(actionId){for(const [participantId,actions] of Object.entries(ARC1_M7_SANITISATION_PREPARED_ACTIONS_BY_ACTOR)){if(actions.some(action=>action.id===actionId))return participantId;}return null;}
+
+function getArc1M7ActionEligibilityCandidates(enemy,target){
+  if(!enemy||!isArc1M7SanitisationStableParticipantId(enemy.id))return [];
+  const A=ARC1_M7_SANITISATION_AUTHORITY;const candidates=[];
+  getArc1M7PreparedActionsForActor(enemy.id).forEach(action=>{
+    if(action.id===A.actionIds.sanitisationTag){getArc1M7SanitisationTagEligibleTargetIds().forEach(targetEvidenceId=>candidates.push({action,targetEvidenceId,targetParticipantId:null}));return;}
+    if(action.id===A.actionIds.purgeCommit){getArc1M7SanitisationPurgeEligibleTargetIds(enemy.id).forEach(targetEvidenceId=>candidates.push({action,targetEvidenceId,targetParticipantId:null}));return;}
+    if(action.id===A.actionIds.pursuitCut){const gate=evaluateArc1M7PursuitCutEligibility(target&&target.id);if(gate.available)candidates.push({action,targetEvidenceId:null,targetParticipantId:gate.targetParticipantId,qualifyingMovementOccurrenceId:gate.qualifyingMovementOccurrenceId});return;}
+    if(typeof action.evaluateAvailability==="function"){const result=action.evaluateAvailability({enemy,target,currentBattle});if(!result||result.available!==true)return;}
+    if(action.targetMode==="self")candidates.push({action,targetEvidenceId:null,targetParticipantId:enemy.id});
+    else if(target)candidates.push({action,targetEvidenceId:null,targetParticipantId:target.id});
+  });
+  return candidates;
+}
+
+function evaluateArc1M7SanitisationEnemyActionScheduler(){
+  if(!isArc1M7SanitisationEncounterActive())return{ready:false,reason:"mission7_sanitisation_encounter_not_active"};
+  const enemy=getBattleDeploymentParticipant("enemy",1);const target=getBattleDeploymentParticipant("player",1);
+  if(!enemy)return{ready:false,reason:"enemy_actor_missing"};if(!target)return{ready:false,reason:"player_target_missing"};
+  const authored=getArc1M7PreparedActionsForActor(enemy.id);if(authored.length===0)return{ready:false,reason:"enemy_action_authority_missing",enemyId:enemy.id,inventedFallback:false};
+  const candidates=getArc1M7ActionEligibilityCandidates(enemy,target);if(candidates.length===0)return{ready:false,reason:"no_semantically_eligible_enemy_action",enemyId:enemy.id,authoredActionIds:authored.map(action=>action.id),inventedFallback:false};
+  return{ready:true,enemyId:enemy.id,targetParticipantId:target.id,candidates,eligibleActionIds:[...new Set(candidates.map(candidate=>candidate.action.id))],randomnessApplied:false,inventedFallback:false};
+}
+
+function chooseArc1M7SanitisationEnemyAction(schedulerState=null){
+  const state=schedulerState&&schedulerState.ready===true?schedulerState:evaluateArc1M7SanitisationEnemyActionScheduler();if(!state.ready)return{success:false,...state};
+  const candidates=state.candidates||[];if(candidates.length===0)return{success:false,reason:"no_semantically_eligible_enemy_action"};
+  const index=Math.floor(Math.random()*candidates.length);return{success:true,candidate:candidates[index],eligibleActionIds:state.eligibleActionIds,randomnessAppliedAfterEligibility:true,equalSelectionWeight:true};
+}
+
+function attemptArc1M7SanitisationAction(actionId,{targetParticipantId=null,targetEvidenceId=null,automatic=false}={}){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;if(!isArc1M7SanitisationEncounterActive())return{success:false,reason:"mission7_sanitisation_encounter_not_active",actionOpportunityConsumed:false};
+  const enemy=getBattleDeploymentParticipant("enemy",1);if(!enemy)return{success:false,reason:"enemy_actor_missing",actionOpportunityConsumed:false};
+  const ownerId=getArc1M7PreparedActionOwnerId(actionId);if(ownerId!==enemy.id)return{success:false,reason:"mission7_action_owner_not_active",actionOpportunityConsumed:false};
+  const action=getArc1M7PreparedAction(actionId);if(!action)return{success:false,reason:"mission7_action_not_prepared",actionOpportunityConsumed:false};
+  let target=null;
+  if(action.targetMode==="self")target=enemy;
+  else if(action.targetMode!=="evidence_object")target=targetParticipantId?getBattleParticipantByIdentity("player",targetParticipantId):getBattleDeploymentParticipant("player",1);
+  if(action.targetMode!=="evidence_object"&&!target)return{success:false,reason:"mission7_action_target_missing",actionOpportunityConsumed:false};
+
+  if(action.id===A.actionIds.sanitisationTag&&!getArc1M7SanitisationTagEligibleTargetIds().includes(targetEvidenceId))return{success:false,reason:"sanitisation_target_not_supplied_or_eligible",actionOpportunityConsumed:false,falseHistoryCreated:true};
+  if(action.id===A.actionIds.purgeCommit&&!getArc1M7SanitisationPurgeEligibleTargetIds(enemy.id).includes(targetEvidenceId))return{success:false,reason:"purge_same_source_live_tag_missing_or_target_invalid",actionOpportunityConsumed:false,falseHistoryCreated:true};
+  if(action.id===A.actionIds.pursuitCut){const gate=evaluateArc1M7PursuitCutEligibility(target&&target.id);if(!gate.available)return{success:false,reason:gate.reason,actionOpportunityConsumed:false,falseHistoryCreated:true};}
+  if(typeof action.evaluateAvailability==="function"){const gate=action.evaluateAvailability({enemy,target,currentBattle});if(!gate||gate.available!==true)return{success:false,reason:gate&&gate.reason||"mission7_action_unavailable",actionOpportunityConsumed:false,falseHistoryCreated:true};}
+
+  const envelope=createBattleActionEnvelope({actorSide:"enemy",actorParticipantId:enemy.id,targetSide:action.targetMode==="self"?"enemy":(action.targetMode==="evidence_object"?null:"player"),targetParticipantId:action.targetMode==="self"?enemy.id:(action.targetMode==="evidence_object"?null:target.id),actionClass:action.actionClass||"enemy_authored_action",skillId:action.id,sourceRefs:[{type:"encounter_package",id:A.encounterPackageId,role:"combat_authority"}],data:{traits:[...(action.traits||[])],authoredEnemyAction:true,mission7Sanitisation:true,targetEvidenceId:targetEvidenceId||null,automatic:automatic===true}});
+  const entry=beginBattleActionResolution(envelope);if(!entry.accepted)return{success:false,reason:entry.validation.reason,entry,actionOpportunityConsumed:false};
+  const resolution=action.resolve({enemy,target,envelope,currentBattle,targetEvidenceId});if(!resolution||resolution.resolved!==true)return{success:false,reason:resolution&&resolution.reason||"mission7_action_resolution_failed",resolution,actionOpportunityConsumed:false};
+  recordBattleEvidence({eventType:"enemy_authored_action_completed",committedOccurrence:true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:envelope.skillId,sourceRefs:envelope.sourceRefs,data:{resolved:true,actionId:action.id,mission7Sanitisation:true,targetEvidenceId:targetEvidenceId||null,randomnessAppliedAfterEligibility:automatic===true,inventedFallback:false}});
+  recordArc1M7ActionCompletion(envelope.actionId,enemy.id,resolution);
+  consumeBattleActionOpportunity("enemy",enemy.id,envelope.actionId,"valid_mission7_sanitisation_action_completed");
+  saveTestState();if(!currentBattle.battleOver)openOverlay("combat");
+  return{success:true,envelope,resolution,actionOpportunityConsumed:true};
+}
+
+function executeArc1M7SanitisationEnemyActionOpportunity(){
+  const scheduler=evaluateArc1M7SanitisationEnemyActionScheduler();
+  if(!scheduler.ready){recordBattleEvidence({eventType:"enemy_action_scheduler_waiting_for_authority",actorRef:getBattleActiveParticipantId("enemy")?createBattleParticipantRef("enemy",getBattleActiveParticipantId("enemy")):null,targetRef:getBattleActiveParticipantId("player")?createBattleParticipantRef("player",getBattleActiveParticipantId("player")):null,data:{reason:scheduler.reason||null,mission7Sanitisation:true,inventedFallback:false}});return{success:false,...scheduler};}
+  const choice=chooseArc1M7SanitisationEnemyAction(scheduler);if(!choice.success)return choice;const candidate=choice.candidate;
+  const result=attemptArc1M7SanitisationAction(candidate.action.id,{targetParticipantId:candidate.targetParticipantId,targetEvidenceId:candidate.targetEvidenceId,automatic:true});return{...result,choice};
+}
+
+function recordArc1M7SanitisationOperativeNeutralized(participantId,envelope=null){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state||state.encounterPackageId!==ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId||!isArc1M7SanitisationStableParticipantId(participantId))return{handled:false};
+  if(state.operativeOutcomes[participantId]!=="active")return{handled:true,idempotent:true,outcome:state.operativeOutcomes[participantId]};
+  state.operativeOutcomes[participantId]="neutralized";
+  const evidence=recordBattleEvidence({eventType:"mission7_sanitisation_operative_neutralized",committedOccurrence:true,actionId:envelope&&envelope.actionId||null,targetRef:createBattleParticipantRef("enemy",participantId),data:{stableParticipantId:participantId,battlePLDefeatOnly:true,deathInferred:false,captureInferred:false,escapeInferred:false}});
+  return{handled:true,outcome:"neutralized",evidenceId:evidence&&evidence.evidenceId||null};
+}
+
+function recordArc1M7SanitisationOperativeOutcome(participantId,outcome,{occurrenceId=null,sourceRefs=[]}={}){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state||!isArc1M7SanitisationStableParticipantId(participantId))return{success:false,reason:"mission7_operative_state_missing"};
+  if(!["active","neutralized","withdrawn","escaped","captured","dead"].includes(outcome))return{success:false,reason:"mission7_operative_outcome_invalid"};
+  const id=occurrenceId||createBattleRuntimeRecordId(`mission7_operative_${outcome}`);state.operativeOutcomes[participantId]=outcome;
+  if(outcome==="dead")updateParticipantChronicleState(participantId,{lifeState:"dead",custodyState:"none",deathOccurrenceId:id});
+  else if(outcome==="captured")updateParticipantChronicleState(participantId,{lifeState:"alive",custodyState:"detained",detentionOccurrenceId:id});
+  else if(outcome==="escaped")updateParticipantChronicleState(participantId,{lifeState:"alive",custodyState:"escaped",escapeOccurrenceId:id});
+  else updateParticipantChronicleState(participantId,{lifeState:"alive"});
+  const evidence=recordBattleEvidence({eventType:`mission7_sanitisation_operative_${outcome}`,committedOccurrence:true,actionId:id,targetRef:createBattleParticipantRef("enemy",participantId),sourceRefs,data:{stableParticipantId:participantId,observerProjectionPersistenceKey:false,externallyAuthorisedOutcome:true}});
+  savePlayerData();saveTestState();return{success:true,occurrenceId:id,evidence};
+}
+
+function getArc1M7SanitisationOutcome(){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state)return"not_applicable";const targets=state.evidenceTargets||[];if(targets.length===0)return"not_applicable";const purged=targets.filter(target=>target&&target.sanitisationState==="purge_completed").length;if(purged===0)return"none";if(purged===targets.length)return"complete";return"partial";
+}
+
+function buildArc1M7SanitisationStoryReturnEnvelope(){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state)return null;
+  const perTarget={};(state.evidenceTargets||[]).forEach(target=>{perTarget[target.targetId]=target.sanitisationState||"untouched";});
+  const lifeCustodyFacts=getArc1M7SanitisationStableParticipantIds().map(id=>{const s=getParticipantChronicleState(id,{create:false});return{participantId:id,lifeState:s&&s.lifeState||"alive",custodyState:s&&s.custodyState||"none",deathOccurrenceId:s&&s.deathOccurrenceId||null,escapeOccurrenceId:s&&s.escapeOccurrenceId||null,detentionOccurrenceId:s&&s.detentionOccurrenceId||null};});
+  return{
+    encounterPackageId:ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId,
+    occurrenceId:state.occurrenceId,
+    activeParticipantIds:[...state.activeParticipantIds],
+    sideAssignments:cloneBattleRuntimeValue(state.sideAssignments),
+    battleCompleted:state.battleCompleted===true,
+    battleResult:state.battleResult||null,
+    operativeOutcomes:cloneBattleRuntimeValue(state.operativeOutcomes),
+    actionOccurrenceIds:[...state.actionOccurrenceIds],
+    controlDefenseStateOccurrenceIds:[...state.stateOccurrenceIds],
+    evidenceTargetIds:(state.evidenceTargets||[]).map(target=>target.targetId),
+    perTargetSanitisationState:perTarget,
+    sanitisationOutcome:getArc1M7SanitisationOutcome(),
+    pursuitOccurrenceIds:[...state.pursuitOccurrenceIds],
+    purgeOccurrenceIds:[...state.purgeOccurrenceIds],
+    objectConsequenceRequests:cloneBattleRuntimeValue(state.objectConsequenceRequests),
+    supportedInjuryFacts:cloneBattleRuntimeValue(state.supportedInjuryFacts),
+    supportedCustodyFacts:cloneBattleRuntimeValue(state.supportedCustodyFacts),
+    lifeCustodyFacts,
+    callerContext:state.callerContext?cloneBattleRuntimeValue(state.callerContext):null,
+    returnContext:state.returnContext?cloneBattleRuntimeValue(state.returnContext):null,
+    missionSuccessInferred:false,
+    evidencePreservationInferredFromBattleVictory:false,
+    factionRevealInferred:false,
+    participantDeathInferredFromBattlePLDefeat:false
+  };
+}
+
+function getArc1M7SanitisationStoryReturnEnvelope(){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state)return null;return state.returnEnvelope?cloneBattleRuntimeValue(state.returnEnvelope):buildArc1M7SanitisationStoryReturnEnvelope();
+}
+
+function getArc1M7PendingObjectConsequenceRequests(){
+  const state=currentBattle.mission7SanitisationEncounter;return state&&Array.isArray(state.objectConsequenceRequests)?cloneBattleRuntimeValue(state.objectConsequenceRequests):[];
+}
+
+function finalizeArc1M7SanitisationEncounterFromBattleOutcome(outcomeType,detail={}){
+  const state=currentBattle.mission7SanitisationEncounter;if(!state||state.encounterPackageId!==ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId)return{handled:false,reason:"not_mission7_sanitisation_encounter"};
+  if(state.battleCompleted===true&&state.returnEnvelope)return{handled:true,idempotent:true,returnEnvelope:cloneBattleRuntimeValue(state.returnEnvelope)};
+  state.battleCompleted=["victory","defeat","escape","interrupted"].includes(outcomeType);
+  state.battleResult=outcomeType||currentBattle.outcome&&currentBattle.outcome.type||null;
+  state.completedAt=state.battleCompleted?Date.now():null;
+  state.returnEnvelope=buildArc1M7SanitisationStoryReturnEnvelope();
+  currentBattle.observerSafeResultContext={...(currentBattle.observerSafeResultContext||{}),encounterPackageId:ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId,battleResult:state.battleResult,sanitisationOutcome:state.returnEnvelope.sanitisationOutcome,missionOutcomeInferred:false};
+  recordBattleEvidence({eventType:"mission7_sanitisation_encounter_return_envelope_ready",committedOccurrence:true,data:{battleResult:state.battleResult,sanitisationOutcome:state.returnEnvelope.sanitisationOutcome,missionOutcomeInferred:false,exactCallerParticipantSetPreserved:true,evidenceTargetCount:state.returnEnvelope.evidenceTargetIds.length}});
+  saveTestState();return{handled:true,returnEnvelope:cloneBattleRuntimeValue(state.returnEnvelope),detail:cloneBattleRuntimeValue(detail)};
+}
+
+function runAlphaMission7SanitisationSourceDiagnostics(){
+  const A=ARC1_M7_SANITISATION_AUTHORITY;const ids=A.participantIds;
+  const sealer=enemyDatabase[ids.sealer],breacher=enemyDatabase[ids.breacher],warden=enemyDatabase[ids.warden];
+  const action=id=>getArc1M7PreparedAction(id);const source=[launchArc1M7SanitisationEncounter,createArc1M7SanitisationTagAction,createArc1M7PurgeCommitAction,evaluateArc1M7PursuitCutEligibility,createArc1M7OwnerDefenceAction,createArc1M7ContainmentClampAction,createArc1M7ExitDenialAction,buildArc1M7SanitisationStoryReturnEnvelope,normalizeArc1M7SanitisationEncounterState].map(fn=>fn.toString()).join("\n");
+  const checks={
+    exactStableParticipants:getArc1M7SanitisationStableParticipantIds().join("|")===[ids.sealer,ids.breacher,ids.warden].join("|"),
+    exactStatsAndPL:sealer.calibratedBasePL===47&&JSON.stringify(sealer.baseStats)===JSON.stringify(A.stats.sealer)&&breacher.calibratedBasePL===47&&JSON.stringify(breacher.baseStats)===JSON.stringify(A.stats.breacher)&&warden.calibratedBasePL===46&&JSON.stringify(warden.baseStats)===JSON.stringify(A.stats.warden),
+    noHiddenScaling:[sealer,breacher,warden].every(enemy=>enemy.noBossScaling===true&&enemy.noEncounterScaling===true&&calculateBattlePower(enemy,"groupBoss")===enemy.calibratedBasePL),
+    sealShockExact:action(A.actionIds.sealShock).authoredAttackPL===20&&action(A.actionIds.sealShock).ordinaryStamina===true,
+    bindingScopedNotStun:action(A.actionIds.bindingScript).traits.includes("not_stun")&&establishArc1M7SanitisationBinding.toString().includes('remainingActionOpportunities:1')&&!establishArc1M7SanitisationBinding.toString().includes('conditionType:"stun"'),
+    tagExplicitNonLivingOnly:createArc1M7SanitisationTagAction.toString().includes('target.nonLiving!==true')&&createArc1M7SanitisationTagAction.toString().includes('sanitisation_target_not_supplied'),
+    tagDoesNotCollapseToPurge:action(A.actionIds.sanitisationTag).id!==action(A.actionIds.purgeCommit).id&&createArc1M7SanitisationTagAction.toString().includes('automaticPurge:false'),
+    purgeSameSourceAndNoHistoryErase:createArc1M7PurgeCommitAction.toString().includes('tag.sourceParticipantId!==enemy.id')&&createArc1M7PurgeCommitAction.toString().includes('priorChronicleHistoryErased:false'),
+    hostedCarrierNotImplicit:createArc1M7SanitisationTagAction.toString().includes('hostedLivingCarrierTargeted:false'),
+    breacherExactDamage:action(A.actionIds.breachBlade).authoredAttackPL===25&&action(A.actionIds.drivingKnee).authoredAttackPL===22&&action(A.actionIds.pursuitCut).authoredAttackPL===24,
+    pursuitRequiresCommittedMovement:evaluateArc1M7PursuitCutEligibility.toString().includes('qualifying_committed_target_movement_missing')&&!evaluateArc1M7PursuitCutEligibility.toString().includes('speed')&&!evaluateArc1M7PursuitCutEligibility.toString().includes('evasion'),
+    guardedEntryExact:action(A.actionIds.guardedEntry).preventionRatio===0.25&&action(A.actionIds.guardedEntry).traits.includes("one_qualifying_direct_packet")&&createArc1M7OwnerDefenceAction.toString().includes('requiresDirectAttackPLPacket:true'),
+    wardenExactDamage:action(A.actionIds.interceptingStrike).authoredAttackPL===21&&action(A.actionIds.containmentClamp).authoredAttackPL===17,
+    clampPositiveDamageNotStun:createArc1M7ContainmentClampAction.toString().includes('finalDamage>0')&&action(A.actionIds.containmentClamp).traits.includes("not_stun"),
+    exitDenialTargetLocalOnly:createArc1M7ExitDenialAction.toString().includes('target_local_exit_control')&&establishArc1M7WardenExitDenial.toString().includes('ordinaryAttacksAllowed:true')&&establishArc1M7WardenExitDenial.toString().includes('itemsAllowed:true'),
+    bracedInterceptExact:action(A.actionIds.bracedIntercept).preventionRatio===0.30&&createArc1M7OwnerDefenceAction.toString().includes('expiresAtOwnerNextActionStart:true'),
+    exactPreparedPalettesNoFallback:[ids.sealer,ids.breacher,ids.warden].every(id=>getArc1M7PreparedActionsForActor(id).length===4&&getArc1M7PreparedActionsForActor(id).every(item=>item.id!=="basic_attack"&&item.id!=="guard")),
+    callerSetNotClanInferred:!launchArc1M7SanitisationEncounter.toString().includes("getPersistentClanBattle")&&launchArc1M7SanitisationEncounter.toString().includes("activeParticipantIds"),
+    observerProjectionNotPersistenceKey:getArc1M7SanitisationStableParticipantIds().every(id=>enemyDatabase[id].id===id&&enemyDatabase[id].observerProjectionKey!==id&&enemyDatabase[id].observerProjectionIsNotPersistenceIdentity===true),
+    battleVsSanitisationVsMissionSeparated:buildArc1M7SanitisationStoryReturnEnvelope.toString().includes("sanitisationOutcome")&&buildArc1M7SanitisationStoryReturnEnvelope.toString().includes("missionSuccessInferred:false"),
+    saveLoadStateContract:saveTestState.toString().includes("mission7SanitisationEncounter")&&restoreTestState.toString().includes("normalizeArc1M7SanitisationEncounterState")&&normalizeArc1M7SanitisationEvidenceTarget.toString().includes("tagHistory")
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  const resultEntries=Object.entries(checks).filter(([key])=>key!=="pass");
+  return{pass:checks.pass,checks,total:resultEntries.length,passed:resultEntries.filter(([,value])=>value===true).length,encounterPackageId:A.encounterPackageId,codingStatus:checks.pass?"ISSUE_31_IMPLEMENTED_SOURCE_REGRESSION_GREEN":"ISSUE_31_SOURCE_REGRESSION_FAILED",nextImplementedBrick:2074};
+}
+
+function runAlphaPost2074Mission7IntegrationDiagnostics(){
+  const mission7=runAlphaMission7SanitisationSourceDiagnostics();
+  const prior=runAlphaPost1969MEN03IntegrationDiagnostics();
+  const checks={mission7SourceGreen:mission7.pass===true,priorPost1969Preserved:prior.pass===true,registryCollectibleCountsUnchanged:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18,exactEncounterPackage:ARC1_M7_SANITISATION_AUTHORITY.encounterPackageId==="arc1_m7_chain_sanitisation_active_encounter",noSecondStoryEngine:true};
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  return{pass:checks.pass,checks,groups:{mission7,prior},codingStatus:checks.pass?"POST_2074_MISSION7_IMPLEMENTATION_GATE_GREEN":"POST_2074_MISSION7_IMPLEMENTATION_GATE_FAILED",nextImplementedBrick:2074};
+}
