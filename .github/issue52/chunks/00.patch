@@ -1,0 +1,191 @@
+--- /mnt/data/sc_work/issue35/game.js	2026-09-09 12:51:36.020971152 +0000
++++ /mnt/data/sc_work/issue52/game.js	2026-09-09 13:37:49.977752180 +0000
+@@ -42331,6 +42331,12 @@
+         ? cloneBattleRuntimeValue(currentBattle.mission7SanitisationEncounter)
+         : null,
+ 
++    // Mission 5 Female Operator exact caller / encounter state.
++    mission5FemaleOperatorEncounter:
++      currentBattle.mission5FemaleOperatorEncounter
++        ? cloneBattleRuntimeValue(currentBattle.mission5FemaleOperatorEncounter)
++        : null,
++
+ 
+     battleLog:
+       currentBattle.battleLog,
+@@ -74666,6 +74672,9 @@
+   if (typeof expireArc1M7SanitisationOwnerDefenceAtOpportunityStart === "function") {
+     expireArc1M7SanitisationOwnerDefenceAtOpportunityStart(side,participantId,actionId);
+   }
++  if (typeof resolveArc1M5FemaleOperatorStartOpportunity === "function") {
++    resolveArc1M5FemaleOperatorStartOpportunity(side,participantId,actionId);
++  }
+   const runtime=ensureBattleRuntimeState();
+   const token=getBattleActionOpportunityToken(side,participantId);
+   if (runtime.actionOpportunityState.startedTokens[token]) return {token,idempotent:true,ticks:[],amaterasuTicks:[]};
+@@ -84260,6 +84269,12 @@
+       defeatedParticipantId:defeatedParticipantId||null
+     });
+   }
++  if (typeof finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome === "function") {
++    finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome("victory",{
++      finishingShinobiId:finishingShinobi?finishingShinobi.id:null,
++      defeatedParticipantId:defeatedParticipantId||null
++    });
++  }
+   saveTestState();
+   openOverlay("victory");
+   return rewards;
+@@ -84316,6 +84331,12 @@
+       reason
+     });
+   }
++  if (typeof finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome === "function") {
++    finalizeArc1M5FemaleOperatorEncounterFromBattleOutcome("defeat",{
++      defeatedParticipantId:defeatedParticipantId||null,
++      reason
++    });
++  }
+ 
+   saveTestState();
+ 
+@@ -84343,6 +84364,9 @@
+     if (typeof recordArc1M7SanitisationOperativeNeutralized === "function") {
+       recordArc1M7SanitisationOperativeNeutralized(participantId,envelope||null);
+     }
++    if (typeof recordArc1M5FemaleOperatorNeutralized === "function") {
++      recordArc1M5FemaleOperatorNeutralized(participantId,envelope||null);
++    }
+     const bossTransition=tryAdvanceAuthoritativeBossStage(participantId,envelope||null);
+     if (bossTransition&&bossTransition.success===true) return bossTransition;
+ 
+@@ -86696,6 +86720,9 @@
+ }
+ 
+ function executeEnemyAuthoredActionOpportunity() {
++  if (typeof isArc1M5FemaleOperatorEncounterActive === "function"&&isArc1M5FemaleOperatorEncounterActive()) {
++    return executeArc1M5FemaleOperatorActionOpportunity();
++  }
+   if (typeof isArc1M7SanitisationEncounterActive === "function"&&isArc1M7SanitisationEncounterActive()) {
+     return executeArc1M7SanitisationEnemyActionOpportunity();
+   }
+@@ -89140,6 +89167,11 @@
+       ? normalizeArc1M7SanitisationEncounterState(state.mission7SanitisationEncounter)
+       : null;
+ 
++  currentBattle.mission5FemaleOperatorEncounter =
++    typeof normalizeArc1M5FemaleOperatorEncounterState === "function"
++      ? normalizeArc1M5FemaleOperatorEncounterState(state.mission5FemaleOperatorEncounter)
++      : null;
++
+ 
+   // =========================================
+   // BATTLE POWER
+@@ -96828,6 +96860,820 @@
+ 
+ 
+ 
++
++// =========================================================
++// ARC 1 MISSION 5 — FEMALE OPERATOR ENCOUNTER PACKAGE
++// GitHub Issue #52
++// =========================================================
++// Implements the closed Mission-5 Story -> Battle -> same-Story seam without
++// authoring the later Story-owned calibration-redirection / Third-Bell facts.
++// Stable person, observer projection, Base PL, Battle state, and Story facts
++// remain separate authorities.
++// =========================================================
++
++const ARC1_M5_FEMALE_OPERATOR_AUTHORITY=Object.freeze({
++  missionId:"arc1_m5_academy",
++  sceneId:"scene_arc1_m5_academy_third_bell",
++  confrontationOccurrenceId:"occ_arc1_m5_female_operator_confrontation_reached",
++  storyBattleSeamId:"battle_seam_arc1_m5_female_operator_confrontation",
++  encounterPackageId:"arc1_m5_female_operator_confrontation_encounter",
++  objectiveId:"resolve_female_operator_hostile_confrontation",
++  stableParticipantId:"arc1_female_operator",
++  observerProjectionKey:"observer_projection_female_operator",
++  unleashedObserverProjectionKey:"observer_projection_female_operator_unleashed",
++  observerLabel:"FEMALE OPERATOR",
++  unleashedObserverLabel:"FEMALE OPERATOR — UNLEASHED",
++  basePL:56,
++  stats:Object.freeze({nin:48,tai:44,buki:42,fuin:57,kin:58,gen:52,stamina:50}),
++  actionIds:Object.freeze({
++    calibrationLance:"arc1_female_operator_calibration_lance",
++    recognitionBind:"arc1_female_operator_recognition_bind",
++    calibrationSeize:"arc1_female_operator_calibration_seize",
++    threadedPulse:"arc1_female_operator_threaded_pulse",
++    countersealGuard:"arc1_female_operator_counterseal_guard"
++  }),
++  unleashedStateId:"arc1_female_operator_unleashed_commitment",
++  storyOwnedOccurrenceIds:Object.freeze([
++    "occ_arc1_m5_calibration_redirected_into_receiver",
++    "occ_arc1_m5_third_bell_propagation_accepted"
++  ])
++});
++
++function createArc1M5FemaleOperatorEnemyRecord(){
++  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
++  return {
++    id:A.stableParticipantId,
++    name:A.observerLabel,
++    rank:"Unknown",
++    formalRank:null,
++    affiliation:null,
++    classification:"persistent_human_operative",
++    observerProjectionKey:A.observerProjectionKey,
++    unleashedObserverProjectionKey:A.unleashedObserverProjectionKey,
++    power:A.basePL,
++    calibratedBasePL:A.basePL,
++    baseStats:{...A.stats},
++    stats:{...A.stats},
++    image:null,
++    rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},
++    noBossScaling:true,
++    noEncounterScaling:true,
++    collectibleProductionGate:false,
++    hiddenFactionInferenceForbidden:true,
++    observerProjectionIsNotPersistenceIdentity:true,
++    mission5FemaleOperator:true
++  };
++}
++enemyDatabase[ARC1_M5_FEMALE_OPERATOR_AUTHORITY.stableParticipantId]=createArc1M5FemaleOperatorEnemyRecord();
++
++function normalizeArc1M5UniqueStrings(value){
++  return Array.isArray(value)?[...new Set(value.filter(item=>typeof item==="string"&&item))]:[];
++}
++
++function normalizeArc1M5FemaleOperatorEncounterState(raw){
++  const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
++  if(!raw||typeof raw!=="object"||Array.isArray(raw)||raw.encounterPackageId!==A.encounterPackageId)return null;
++  const activeParticipantIds=normalizeArc1M5UniqueStrings(raw.activeParticipantIds);
++  const sideAssignments=raw.sideAssignments&&typeof raw.sideAssignments==="object"&&!Array.isArray(raw.sideAssignments)?cloneBattleRuntimeValue(raw.sideAssignments):{};
++  const routeRefs={};
++  if(raw.recognitionRouteRefsByParticipant&&typeof raw.recognitionRouteRefsByParticipant==="object"&&!Array.isArray(raw.recognitionRouteRefsByParticipant)){
++    Object.entries(raw.recognitionRouteRefsByParticipant).forEach(([participantId,ref])=>{
++      if(typeof participantId!=="string"||!participantId||!ref)return;
++      if(typeof ref==="string"&&ref)routeRefs[participantId]={refId:ref,compatible:true};
++      else if(typeof ref==="object"&&!Array.isArray(ref)){
++        const refId=typeof ref.refId==="string"&&ref.refId?ref.refId:(typeof ref.id==="string"&&ref.id?ref.id:null);
++        if(refId)routeRefs[participantId]={refId,compatible:ref.compatible!==false,routeType:typeof ref.routeType==="string"?ref.routeType:null,sourceOccurrenceId:typeof ref.sourceOccurrenceId==="string"?ref.sourceOccurrenceId:null};
++      }
++    });
++  }
++  const calibrationControlState=["not_applicable","untouched","operator_controlled","cleared"].includes(raw.calibrationControlState)?raw.calibrationControlState:(raw.calibrationContextRef?"untouched":"not_applicable");
++  return {
++    encounterPackageId:A.encounterPackageId,
++    occurrenceId:typeof raw.occurrenceId==="string"&&raw.occurrenceId?raw.occurrenceId:null,
++    missionId:A.missionId,
++    sceneId:A.sceneId,
++    confrontationOccurrenceId:A.confrontationOccurrenceId,
++    storyBattleSeamId:A.storyBattleSeamId,
++    objectiveId:A.objectiveId,
++    stableParticipantId:A.stableParticipantId,
++    activeParticipantIds,
++    sideAssignments,
++    recognitionRouteRefsByParticipant:routeRefs,
++    calibrationContextRef:raw.calibrationContextRef?cloneBattleRuntimeValue(raw.calibrationContextRef):null,
++    calibrationContextExposed:raw.calibrationContextExposed===true,
++    calibrationControlState,
++    calibrationControlOccurrenceId:typeof raw.calibrationControlOccurrenceId==="string"?raw.calibrationControlOccurrenceId:null,
++    calibrationControlClearedOccurrenceId:typeof raw.calibrationControlClearedOccurrenceId==="string"?raw.calibrationControlClearedOccurrenceId:null,
