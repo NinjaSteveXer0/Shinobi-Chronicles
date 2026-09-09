@@ -45083,12 +45083,16 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
     case "story_scene": {
       const sceneId=action.sceneId||action.storySceneId||null;
       if (!sceneId) return {success:false,reason:"story_scene_id_missing"};
+      const resolvedSceneContext=typeof action.sceneContextResolver==="function"
+        ? action.sceneContextResolver({definition,action,playerData,currentBattle,queue:getClanQueueReadModel()})
+        : (action.sceneContext||{});
+      if (!resolvedSceneContext||typeof resolvedSceneContext!=="object"||Array.isArray(resolvedSceneContext)) return {success:false,reason:"story_scene_context_invalid"};
       result=startStoryScene(sceneId,{
         entryBeatId:action.entryBeatId||null,
         sourceOpportunityId:definition.opportunityId,
         sourceEventId:definition.eventId,
         returnContext:action.returnContext||createWorldOpportunityPresentationReturnContext(definition,action),
-        context:action.sceneContext||{}
+        context:resolvedSceneContext
       });
       break;
     }
@@ -45113,12 +45117,16 @@ function routeWorldOpportunityInteraction(opportunityId,actionId) {
       // BRICK 737 — authored narrative opportunities may opt into the same
       // reusable Story Scene runtime without changing their interaction family.
       if (action.sceneId||action.storySceneId) {
+        const resolvedSceneContext=typeof action.sceneContextResolver==="function"
+          ? action.sceneContextResolver({definition,action,playerData,currentBattle,queue:getClanQueueReadModel()})
+          : (action.sceneContext||{});
+        if (!resolvedSceneContext||typeof resolvedSceneContext!=="object"||Array.isArray(resolvedSceneContext)) return {success:false,reason:"story_scene_context_invalid"};
         result=startStoryScene(action.sceneId||action.storySceneId,{
           entryBeatId:action.entryBeatId||null,
           sourceOpportunityId:definition.opportunityId,
           sourceEventId:definition.eventId,
           returnContext:action.returnContext||createWorldOpportunityPresentationReturnContext(definition,action),
-          context:action.sceneContext||{}
+          context:resolvedSceneContext
         });
         break;
       }
@@ -45770,6 +45778,10 @@ function normalizeStorySceneBattleContract(contract) {
   return {
     enemyId:contract.enemyId?String(contract.enemyId):null,
     encounterId:contract.encounterId?String(contract.encounterId):null,
+    // Authored encounter packages with their own exact participant/objective caller
+    // may provide one launcher. This is still the same Story -> Battle -> same Story
+    // bridge; it does not create a second Battle subsystem.
+    launchResolver:typeof contract.launchResolver==="function"?contract.launchResolver:null,
     victoryBeatId:contract.victoryBeatId?String(contract.victoryBeatId):null,
     defeatBeatId:contract.defeatBeatId?String(contract.defeatBeatId):null,
     postBattleBeatId:contract.postBattleBeatId?String(contract.postBattleBeatId):null,
@@ -46057,7 +46069,7 @@ function createStorySceneObserverSafeProjection() {
     transition_instruction:createStorySceneTransitionInstruction(beat),
     has_next:!!beat.nextBeatId||beat.exitScene===true,
     battle_transition:beat.mode==="battle_transition"&&beat.battle?{
-      available:!!beat.battle.enemyId,
+      available:!!beat.battle.enemyId||typeof beat.battle.launchResolver==="function",
       action_label:beat.battle.actionLabel,
       encounter_ref:beat.battle.encounterId||null
     }:null,
@@ -46147,7 +46159,7 @@ function launchStorySceneBattle() {
   const beat=getCurrentStorySceneBeat();
   if (!active||!beat) return {success:false,reason:"story_scene_not_active"};
   if (beat.mode!=="battle_transition"||!beat.battle) return {success:false,reason:"story_beat_not_battle_transition"};
-  if (!beat.battle.enemyId) return {success:false,reason:"story_battle_enemy_authority_missing"};
+  if (!beat.battle.enemyId&&typeof beat.battle.launchResolver!=="function") return {success:false,reason:"story_battle_enemy_authority_missing"};
   if (active.pendingBattle&&active.pendingBattle.battleId) return {success:false,reason:"story_battle_already_pending"};
 
   const returnContext={
@@ -46161,16 +46173,33 @@ function launchStorySceneBattle() {
     exposeFinisher:beat.battle.exposeFinisher===true,
     resultProjector:beat.battle.resultProjector||null
   };
-  // Functions cannot survive save serialization; keep the executable projector on the
-  // authored beat and store only stable routing fields in Battle/current scene state.
+  // Functions cannot survive save serialization; keep executable authored resolvers
+  // on the registered beat and persist only stable routing fields.
   const saveableReturnContext={...returnContext};
   delete saveableReturnContext.resultProjector;
   hideStoryScenePresentationLayer({preserveRuntime:true});
-  const launched=launchBattleWithReturnContext(beat.battle.enemyId,beat.battle.encounterId||active.sourceEventId||active.sceneId,saveableReturnContext);
-  if (!launched.success) return launched;
+
+  let launched=null;
+  if (typeof beat.battle.launchResolver==="function") {
+    launched=beat.battle.launchResolver({
+      active:cloneProgressionData(active),
+      beatId:beat.beatId,
+      returnContext:cloneProgressionData(saveableReturnContext),
+      sceneContext:getStorySceneRuntimeContext(),
+      playerData,
+      currentBattle
+    })||{success:false,reason:"story_battle_authored_launcher_no_result"};
+  } else {
+    launched=launchBattleWithReturnContext(beat.battle.enemyId,beat.battle.encounterId||active.sourceEventId||active.sceneId,saveableReturnContext);
+  }
+  if (!launched||launched.success!==true) {
+    restoreStoryScenePresentationUnderlay(active.presentationUnderlay);
+    openOverlay("story_scene");
+    return launched||{success:false,reason:"story_battle_launch_failed"};
+  }
   active.pendingBattle={
-    battleId:launched.battleId,
-    encounterId:launched.encounterId,
+    battleId:launched.battleId||currentBattle.battleId||null,
+    encounterId:launched.encounterId||currentBattle.encounterId||beat.battle.encounterId||null,
     sourceBeatId:beat.beatId,
     victoryBeatId:beat.battle.victoryBeatId,
     defeatBeatId:beat.battle.defeatBeatId,
@@ -46178,7 +46207,7 @@ function launchStorySceneBattle() {
   };
   savePlayerData();
   saveTestState();
-  return {success:true,type:"battle_transition",battleId:launched.battleId};
+  return {success:true,type:"battle_transition",battleId:active.pendingBattle.battleId,encounterId:active.pendingBattle.encounterId};
 }
 
 function getStorySceneBattleResultProjector(returnContext) {
@@ -93673,11 +93702,14 @@ function createArc1M1WhisperAction({
   availabilityFlag=null,
   resolve=null,
   sceneId=null,
+  sceneContextResolver=null,
+  onCommitted=null,
   evaluateAvailability=null
 }) {
   const action={id,label,kind};
   if (resolutionPatch&&typeof resolutionPatch==="object") action.resolutionPatch=Object.freeze({...resolutionPatch});
   if (sceneId) action.sceneId=sceneId;
+  if (typeof sceneContextResolver==="function") action.sceneContextResolver=sceneContextResolver;
   action.evaluateAvailability=typeof evaluateAvailability==="function"
     ? evaluateAvailability
     : (availabilityFlag
@@ -93685,13 +93717,20 @@ function createArc1M1WhisperAction({
       : undefined);
   if (typeof resolve==="function") action.resolve=resolve;
   else if (!sceneId) action.resolve=()=>({success:true,type:kind});
-  if (evidenceId||discoveryHistoryId||(Array.isArray(reveals)&&reveals.length)) {
-    action.onCommitted=({definition})=>commitArc1M1WhisperActionEffects({
-      opportunityId:definition.opportunityId,
-      evidenceId,
-      discoveryHistoryId,
-      reveals
-    });
+  const standardCommittedEffects=(evidenceId||discoveryHistoryId||(Array.isArray(reveals)&&reveals.length))
+    ? ({definition})=>commitArc1M1WhisperActionEffects({
+        opportunityId:definition.opportunityId,
+        evidenceId,
+        discoveryHistoryId,
+        reveals
+      })
+    : null;
+  if (standardCommittedEffects||typeof onCommitted==="function") {
+    action.onCommitted=(context)=>{
+      const standard=standardCommittedEffects?standardCommittedEffects(context):{success:true};
+      if (!standard||standard.success!==true) return standard||{success:false,reason:"whisper_standard_commit_failed"};
+      return typeof onCommitted==="function"?(onCommitted(context)||{success:false,reason:"whisper_authored_commit_no_result"}):standard;
+    };
   }
   return action;
 }
@@ -94045,7 +94084,7 @@ function registerArc1M1WhisperWoodsWorldContent({mapImage=ARC1_M1_WHISPER_WOODS_
     revealPredicate:()=>isArc1M1WhisperSearchActive()
       &&getArc1M1WhisperResolution(O.northRavine).northRavineConfirmed===true
       &&isArc1M1WhisperObserverKnown(O.northRavine),
-    evaluateProjection:()=>isArc1M1WhisperSearchActive(),
+    evaluateProjection:()=>isArc1M1WhisperSearchActive()&&getArc1M1WhisperResolution(O.majorContact).majorContactResolved!==true,
     interactions:[
       createArc1M1WhisperAction({
         id:"observe_contact",label:"OBSERVE",kind:"investigation",
@@ -94056,11 +94095,9 @@ function registerArc1M1WhisperWoodsWorldContent({mapImage=ARC1_M1_WHISPER_WOODS_
       createArc1M1WhisperAction({
         id:"approach_contact",label:"APPROACH",kind:"story_scene",
         sceneId:A.majorContactSceneId,
-        evaluateAvailability:()=>({
-          available:typeof STORY_SCENE_REGISTRY!=="undefined"&&STORY_SCENE_REGISTRY.has(A.majorContactSceneId),
-          reason:"story_scene_not_authored",
-          reasonVisible:false
-        })
+        sceneContextResolver:()=>createArc1M1WhisperMajorContactSceneContext(),
+        onCommitted:({definition,result})=>commitArc1M1WhisperMajorContactSceneTransitionSource({definition,result}),
+        evaluateAvailability:()=>evaluateArc1M1WhisperMajorContactApproachAvailability()
       })
     ]
   });
@@ -94172,7 +94209,7 @@ function runAlphaArc1M1WhisperWoodsContentDiagnostics() {
       &&!!northHotspot&&northHotspot.opportunityIds.includes(O.majorContact);
     checks.majorContactObserverSafe=!!northHotspot&&northHotspot.opportunities.some(item=>item.opportunity_id===O.majorContact&&item.known_label==="Unidentified Activity");
     const majorProjection=northHotspot&&northHotspot.opportunities.find(item=>item.opportunity_id===O.majorContact);
-    checks.unwrittenApproachNotActionable=!!majorProjection&&!majorProjection.legal_actions.some(action=>action.actionId==="approach_contact");
+    checks.approachFailsClosedWithoutStoryProtagonist=!!majorProjection&&!majorProjection.legal_actions.some(action=>action.actionId==="approach_contact");
     checks.noAutomaticBattleAfterMajorReveal=currentBattle&&currentBattle.battleId==null;
 
     const ryoBefore=Number(playerData.ryo)||0;
@@ -95823,23 +95860,31 @@ function resolveArc1M1UnknownOperativeConfrontationTermination({battleResult="in
 // =========================================================
 // BRICKS 1898–1903 — CONTEXTUAL WRIST-BREAK FACT
 // =========================================================
-function commitArc1M1UnknownOperativeWristBreak({sceneId,opportunityId,eventId,targetParticipantId}={}) {
+function commitArc1M1UnknownOperativeWristBreak({sceneId,opportunityId,eventId,targetParticipantId,sourceOccurrenceId=null}={}) {
   const A=ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY;
   const caller=validateArc1M1UnknownOperativeCallerContext({sceneId,opportunityId,eventId});
   if (!caller.valid) return {success:false,reason:caller.reason,falseInjuryCreated:true};
   const targetId=String(targetParticipantId||"");
   if (!targetId||targetId===A.stableOpponentId) return {success:false,reason:"wrist_break_stable_target_missing",falseInjuryCreated:true};
-  const occurrenceId=createBattleRuntimeRecordId("unknown_operative_wrist_break");
+  const occurrenceId=sourceOccurrenceId?String(sourceOccurrenceId):createBattleRuntimeRecordId("unknown_operative_wrist_break");
+  const existing=findCommittedWorldHistoryAddress(occurrenceId);
+  if (existing) {
+    const existingTarget=existing.data&&existing.data.targetStableParticipantId||null;
+    if (existingTarget&&existingTarget!==targetId) return {success:false,reason:"wrist_break_source_target_mismatch",falseInjuryCreated:true,occurrenceId};
+    const targetState=getParticipantChronicleState(targetId,{create:true});
+    const existingFact=(targetState.injuries||[]).find(item=>item&&item.causalOccurrenceId===occurrenceId)||null;
+    return {success:true,idempotent:true,occurrenceId,injuryFact:existingFact?cloneProgressionData(existingFact):(existing.data?cloneProgressionData(existing.data):null),reusableAttackPL:null,universalStatPenalty:false};
+  }
   const fact={injuryType:"fractured_wrist",targetStableParticipantId:targetId,actorStableParticipantId:A.stableOpponentId,causalOccurrenceId:occurrenceId,sourceActionId:A.actionIds.wristBreak};
   const targetState=getParticipantChronicleState(targetId,{create:true});
   if (!Array.isArray(targetState.injuries)) targetState.injuries=[];
-  targetState.injuries.push(cloneProgressionData(fact));
+  if (!targetState.injuries.some(item=>item&&item.causalOccurrenceId===occurrenceId)) targetState.injuries.push(cloneProgressionData(fact));
   targetState.updatedAt=Date.now();
   const confrontation=currentBattle.unknownOperativeConfrontation;
-  if (confrontation&&Array.isArray(confrontation.supportedInjuryFacts)) confrontation.supportedInjuryFacts.push(cloneProgressionData(fact));
+  if (confrontation&&Array.isArray(confrontation.supportedInjuryFacts)&&!confrontation.supportedInjuryFacts.some(item=>item&&item.causalOccurrenceId===occurrenceId)) confrontation.supportedInjuryFacts.push(cloneProgressionData(fact));
   commitArc1M1UnknownOperativeHistoryRecord({occurrenceId,type:"supported_injury",outcome:"fractured_wrist",data:fact});
   savePlayerData();saveTestState();
-  return {success:true,occurrenceId,injuryFact:fact,reusableAttackPL:null,universalStatPenalty:false};
+  return {success:true,idempotent:false,occurrenceId,injuryFact:fact,reusableAttackPL:null,universalStatPenalty:false};
 }
 
 // =========================================================
@@ -96211,7 +96256,7 @@ function runAlphaPost1939UnknownOperativeIntegrationDiagnostics() {
     exactObserverProjection:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.observerProjectionKey==="observer_projection_unknown_operative",
     exactEncounterPackage:ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.encounterPackageId==="arc1_m1_unknown_operative_confrontation",
     noCollectibleGateMutation:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18,
-    storySceneStillExternal:!STORY_SCENE_REGISTRY.has(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.sceneId),
+    storySceneIntegrated:STORY_SCENE_REGISTRY.has(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.sceneId),
     worldOpportunityStillNoDirectBattle:getRegisteredWorldEventOpportunity(ARC1_M1_UNKNOWN_OPERATIVE_AUTHORITY.opportunityId).interactions.every(action=>action.kind!=="battle"),
     noRetiredScaling:calculateBattlePower(getArc1M1UnknownOperativeEnemy(),"elite")===63&&calculateBattlePower(getArc1M1UnknownOperativeEnemy(),"groupBoss")===63
   };
@@ -96221,9 +96266,564 @@ function runAlphaPost1939UnknownOperativeIntegrationDiagnostics() {
     groups:{confrontation,sourceChecks},
     confrontationChecks:`${confrontation.passed}/${confrontation.total}`,
     codingStatus:"ISSUE_13_IMPLEMENTED_RUNTIME_REGRESSION_GREEN",
-    storySceneStatus:sourceChecks.storySceneStillExternal?"WAITING_ON_WRITING_SCENE_INTEGRATION":"REGISTERED",
+    storySceneStatus:sourceChecks.storySceneIntegrated?"REGISTERED":"MISSING",
     liveRegistry:{characters:ALPHA_PRODUCTION_CHARACTER_IDS.length,entities:ALPHA_PRODUCTION_ENTITY_IDS.length,total:ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length}
   };
+}
+
+
+// =========================================================
+// ISSUE #35 — ARC 1 MISSION 1 WHISPER WOODS MAJOR-CONTACT STORY CALLER
+// =========================================================
+// Consumes the exact Writing + World caller authority for:
+// World occurrence -> one Story Scene -> optional exact Unknown Operative
+// confrontation -> the SAME Story Scene instance.
+//
+// Presence != Battle participation.
+// Player intent != party-wide command.
+// Observer projection != stable participant identity.
+// Battle result != wider Mission resolution.
+// =========================================================
+
+const ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY=Object.freeze({
+  sceneId:"scene_arc1_m1_whisper_major_contact",
+  opportunityId:"arc1_m1_whisper_major_contact",
+  eventId:"arc1_m1_whisper_major_contact_event",
+  missionAreaId:"whisper_woods",
+  locationId:"fire_whisper_woods_north_ravine",
+  hotspotId:"whisper_woods_hotspot_north_ravine",
+  transitionSourceOccurrenceId:"occ_arc1_m1_whisper_major_contact_scene_transition",
+  rogueParticipantId:"arc1_m1_whisper_rogue_shinobi_01",
+  smugglerParticipantId:"arc1_m1_whisper_injured_smuggler_01",
+  operativeParticipantId:"arc1_m1_unknown_operative",
+  operativeObserverProjectionId:"observer_projection_unknown_operative",
+  wristBreakOccurrenceId:"occ_arc1_m1_whisper_unknown_operative_wrist_break",
+  killIntentOccurrenceId:"occ_arc1_m1_whisper_kill_intent_declared",
+  detainIntentOccurrenceId:"occ_arc1_m1_whisper_detain_intent_declared",
+  releaseOccurrenceId:"occ_arc1_m1_whisper_release_resolution",
+  encounterPackageId:"arc1_m1_unknown_operative_confrontation",
+  killObjectiveId:"kill_arc1_m1_unknown_operative",
+  detainObjectiveId:"detain_arc1_m1_unknown_operative"
+});
+
+function getArc1M1WhisperCurrentProtagonistParticipantId() {
+  const state=ensurePlayerAcquisitionState();
+  return state.ninjaIdentityVariantId||state.chronicleOriginVariantId||null;
+}
+
+function getArc1M1WhisperCurrentStoryTeamParticipantIds() {
+  const state=ensurePlayerAcquisitionState();
+  const protagonistId=getArc1M1WhisperCurrentProtagonistParticipantId();
+  if (!protagonistId) return [];
+  const ids=[protagonistId];
+  const transition=state.geninRosterTransition&&typeof state.geninRosterTransition==="object"?state.geninRosterTransition:null;
+  if (transition&&transition.completed===true&&Array.isArray(transition.finalTeamVariantIds)) {
+    ids.push(...transition.finalTeamVariantIds.filter(Boolean));
+    const leaderId=state.joninLeadershipAssignment&&state.joninLeadershipAssignment.variantId
+      ?state.joninLeadershipAssignment.variantId
+      :(transition.joninLeaderVariantId||null);
+    if (leaderId) ids.push(leaderId);
+  } else {
+    const formation=state.academyTeamFormation&&typeof state.academyTeamFormation==="object"?state.academyTeamFormation:null;
+    if (formation&&formation.completed===true&&Array.isArray(formation.selectedTeammateIds)) ids.push(...formation.selectedTeammateIds.filter(Boolean));
+  }
+  return [...new Set(ids.filter(id=>typeof id==="string"&&id))];
+}
+
+function createArc1M1WhisperMajorContactSceneContext() {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const protagonistParticipantId=getArc1M1WhisperCurrentProtagonistParticipantId();
+  const storyTeamParticipantIds=getArc1M1WhisperCurrentStoryTeamParticipantIds();
+  const localParticipantRefs=[A.rogueParticipantId,A.smugglerParticipantId,A.operativeParticipantId];
+  return {
+    sourceOccurrenceId:A.transitionSourceOccurrenceId,
+    missionAreaId:A.missionAreaId,
+    locationId:A.locationId,
+    hotspotId:A.hotspotId,
+    eventId:A.eventId,
+    opportunityId:A.opportunityId,
+    sceneId:A.sceneId,
+    protagonistParticipantId,
+    physicallyPresentTeamParticipantIds:[...storyTeamParticipantIds],
+    localParticipantRefs:[...localParticipantRefs],
+    physicallyPresentParticipantIds:[...new Set([...storyTeamParticipantIds,...localParticipantRefs])],
+    operativeObserverProjectionId:A.operativeObserverProjectionId,
+    // A later CE behaviour projection may populate exact positive ally commitments.
+    // Empty means no ally is silently converted from presence/team membership into
+    // Battle participation; it is not a historical refusal record.
+    activeBattleAllyParticipantIds:[],
+    participantAutonomyProjection:"fail_closed_positive_commitments_only",
+    participantPresenceBasis:"current_story_team_assignment_plus_world_occurrence_instances"
+  };
+}
+
+function evaluateArc1M1WhisperMajorContactApproachAvailability() {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  if (typeof STORY_SCENE_REGISTRY==="undefined"||!STORY_SCENE_REGISTRY.has(A.sceneId)) return {available:false,reason:"story_scene_not_registered",reasonVisible:false};
+  const protagonistId=getArc1M1WhisperCurrentProtagonistParticipantId();
+  if (!protagonistId||!resolveArc1M1StoryBattleParticipantRuntime(protagonistId)) return {available:false,reason:"story_protagonist_runtime_missing",reasonVisible:false};
+  const persistent=getParticipantChronicleState(A.operativeParticipantId,{create:false});
+  if (persistent&&persistent.lifeState==="dead") return {available:false,reason:"unknown_operative_dead",reasonVisible:false};
+  if (persistent&&persistent.custodyState==="detained") return {available:false,reason:"unknown_operative_already_detained",reasonVisible:false};
+  return {available:true,reason:null,reasonVisible:false};
+}
+
+function commitArc1M1WhisperMajorContactSceneTransitionSource({definition=null,result=null}={}) {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==A.sceneId) return {success:false,reason:"major_contact_story_transition_not_active"};
+  if (active.sourceEventId!==A.eventId||active.sourceOpportunityId!==A.opportunityId) return {success:false,reason:"major_contact_story_transition_ancestry_mismatch"};
+  const context=active.localContext&&typeof active.localContext==="object"?active.localContext:{};
+  const requiredLocal=[A.rogueParticipantId,A.smugglerParticipantId,A.operativeParticipantId];
+  const localRefs=Array.isArray(context.localParticipantRefs)?context.localParticipantRefs:[];
+  if (!requiredLocal.every(id=>localRefs.includes(id))) return {success:false,reason:"major_contact_world_participant_binding_missing"};
+  if (context.sceneId!==A.sceneId||context.eventId!==A.eventId||context.opportunityId!==A.opportunityId) return {success:false,reason:"major_contact_context_identity_mismatch"};
+
+  const existing=findCommittedWorldHistoryAddress(A.transitionSourceOccurrenceId);
+  if (existing) {
+    const existingRefs=Array.isArray(existing.participantRefs)?existing.participantRefs:[];
+    const exactExisting=requiredLocal.every(id=>existingRefs.includes(id));
+    return exactExisting
+      ? {success:true,idempotent:true,occurrenceId:A.transitionSourceOccurrenceId,record:cloneProgressionData(existing)}
+      : {success:false,reason:"major_contact_transition_existing_participant_mismatch"};
+  }
+
+  if (!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const participantRefs=[...new Set((context.physicallyPresentParticipantIds||[]).filter(id=>typeof id==="string"&&id))];
+  const record={
+    historyScope:getCurrentChronicleOccurrenceHistoryScope("world_occurrence"),
+    type:"world_story_transition",
+    activity:"story_transition",
+    completed:true,
+    success:true,
+    outcome:"story_scene_transition_committed",
+    occurrenceId:A.transitionSourceOccurrenceId,
+    sourceOccurrenceId:A.transitionSourceOccurrenceId,
+    missionAreaId:A.missionAreaId,
+    eventId:A.eventId,
+    sourceEventId:A.eventId,
+    opportunityId:A.opportunityId,
+    sceneId:A.sceneId,
+    locationId:A.locationId,
+    hotspotId:A.hotspotId,
+    participantRefs,
+    localParticipantRefs:[...requiredLocal],
+    protagonistParticipantId:context.protagonistParticipantId||null,
+    storySceneInstanceId:active.instanceId,
+    observerProjectionId:A.operativeObserverProjectionId,
+    observerProjectionIsStableIdentity:false,
+    timestamp:Date.now()
+  };
+  playerData.activityHistory.push(record);
+  activityHistory=playerData.activityHistory;
+  savePlayerData();
+  return {success:true,idempotent:false,occurrenceId:A.transitionSourceOccurrenceId,record:cloneProgressionData(record),routeResult:result?cloneProgressionData(result):null,definitionId:definition&&definition.opportunityId||null};
+}
+
+function commitArc1M1WhisperStoryOccurrence(occurrenceId,type,data={}) {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const id=String(occurrenceId||"");
+  if (!id) return {success:false,reason:"story_occurrence_id_missing"};
+  const existing=findCommittedWorldHistoryAddress(id);
+  if (existing) return {success:true,idempotent:true,occurrenceId:id,record:cloneProgressionData(existing)};
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==A.sceneId) return {success:false,reason:"major_contact_story_not_active"};
+  if (!Array.isArray(playerData.activityHistory)) playerData.activityHistory=[];
+  const record={
+    historyScope:getCurrentChronicleOccurrenceHistoryScope("story_occurrence"),
+    type:type||"story_occurrence",
+    activity:"story_scene",
+    completed:true,
+    success:true,
+    outcome:type||id,
+    occurrenceId:id,
+    sourceOccurrenceId:A.transitionSourceOccurrenceId,
+    sourceEventId:A.eventId,
+    opportunityId:A.opportunityId,
+    sceneId:A.sceneId,
+    storySceneInstanceId:active.instanceId,
+    protagonistParticipantId:active.localContext&&active.localContext.protagonistParticipantId||null,
+    data:cloneProgressionData(data||{}),
+    timestamp:Date.now()
+  };
+  playerData.activityHistory.push(record);
+  activityHistory=playerData.activityHistory;
+  savePlayerData();
+  return {success:true,idempotent:false,occurrenceId:id,record:cloneProgressionData(record)};
+}
+
+function commitArc1M1WhisperWristBreakFromStory() {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==A.sceneId) return {success:false,reason:"major_contact_story_not_active"};
+  const refs=active.localContext&&Array.isArray(active.localContext.localParticipantRefs)?active.localContext.localParticipantRefs:[];
+  if (!refs.includes(A.rogueParticipantId)) return {success:false,reason:"major_contact_rogue_instance_missing"};
+  return commitArc1M1UnknownOperativeWristBreak({
+    sceneId:A.sceneId,
+    opportunityId:A.opportunityId,
+    eventId:A.eventId,
+    targetParticipantId:A.rogueParticipantId,
+    sourceOccurrenceId:A.wristBreakOccurrenceId
+  });
+}
+
+function commitArc1M1WhisperResolutionIntent(intent) {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const normalized=String(intent||"").toLowerCase();
+  if (normalized==="kill") return commitArc1M1WhisperStoryOccurrence(A.killIntentOccurrenceId,"kill_intent_declared",{intent:"kill",deathGuaranteed:false,partyCommand:false});
+  if (normalized==="detain") return commitArc1M1WhisperStoryOccurrence(A.detainIntentOccurrenceId,"detain_intent_declared",{intent:"detain",custodyGuaranteed:false,partyCommand:false});
+  if (normalized==="release") return commitArc1M1WhisperStoryOccurrence(A.releaseOccurrenceId,"release_resolution",{intent:"release",battleLaunched:false,trustGranted:false,allianceGranted:false});
+  return {success:false,reason:"major_contact_resolution_intent_invalid"};
+}
+
+function resolveArc1M1WhisperBattleParticipantEnvelope() {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==A.sceneId) return {valid:false,reason:"major_contact_story_not_active"};
+  const context=active.localContext&&typeof active.localContext==="object"?active.localContext:{};
+  const protagonistId=context.protagonistParticipantId||null;
+  if (!protagonistId||!resolveArc1M1StoryBattleParticipantRuntime(protagonistId)) return {valid:false,reason:"major_contact_protagonist_runtime_missing"};
+  const present=new Set(Array.isArray(context.physicallyPresentParticipantIds)?context.physicallyPresentParticipantIds:[]);
+  const explicitAllies=Array.isArray(context.activeBattleAllyParticipantIds)
+    ? context.activeBattleAllyParticipantIds.filter(id=>id&&id!==protagonistId&&id!==A.operativeParticipantId&&present.has(id)&&!!resolveArc1M1StoryBattleParticipantRuntime(id))
+    : [];
+  const activeSideIds=[...new Set([protagonistId,...explicitAllies])];
+  const activeParticipantIds=[...activeSideIds,A.operativeParticipantId];
+  const sideAssignments={};
+  activeSideIds.forEach(id=>{sideAssignments[id]="active_side";});
+  sideAssignments[A.operativeParticipantId]="operative_side";
+  const uncommittedPresentAllyIds=(context.physicallyPresentTeamParticipantIds||[]).filter(id=>id!==protagonistId&&!activeSideIds.includes(id));
+  return {
+    valid:true,
+    activeParticipantIds,
+    sideAssignments,
+    activeSideIds,
+    uncommittedPresentAllyIds,
+    presenceDoesNotImplyParticipation:true,
+    allyNonParticipationDoesNotImplyRefusal:true
+  };
+}
+
+function launchArc1M1WhisperStoryConfrontation({returnContext}={}) {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==A.sceneId) return {success:false,reason:"major_contact_story_not_active"};
+  const intent=active.localContext&&active.localContext.resolutionIntent||null;
+  const objectiveId=intent==="kill"?A.killObjectiveId:(intent==="detain"?A.detainObjectiveId:null);
+  if (!objectiveId) return {success:false,reason:"major_contact_battle_intent_missing"};
+  const participants=resolveArc1M1WhisperBattleParticipantEnvelope();
+  if (!participants.valid) return {success:false,reason:participants.reason||"major_contact_participant_envelope_invalid"};
+  const launched=launchArc1M1UnknownOperativeConfrontation({
+    objectiveId,
+    activeParticipantIds:participants.activeParticipantIds,
+    sideAssignments:participants.sideAssignments,
+    sceneId:A.sceneId,
+    opportunityId:A.opportunityId,
+    eventId:A.eventId,
+    escapeAllowed:true,
+    returnContext
+  });
+  if (!launched.success) return launched;
+  active.localContext.lastBattleParticipantEnvelope=cloneProgressionData(participants);
+  savePlayerData();
+  return {...launched,encounterId:A.encounterPackageId,participantEnvelope:cloneProgressionData(participants)};
+}
+
+function projectArc1M1WhisperConfrontationBattleResult() {
+  const envelope=getArc1M1UnknownOperativeConfrontationOutcomeEnvelope();
+  return envelope?cloneProgressionData(envelope):null;
+}
+
+function getArc1M1WhisperMajorContactPostBattlePresentation(context) {
+  const authored=context&&context.battleResume&&context.battleResume.authored||null;
+  if (!authored) return {title:"WHISPER WOODS",text:"The confrontation returns to the same unresolved contact occurrence."};
+  let text="The confrontation ends. The Chronicle preserves the factual outcome without turning Battle victory into a wider Mission result.";
+  if (authored.operativeAlive===false) text="The Unknown Operative is dead through the accepted lethal consequence. The wider Whisper Woods investigation remains separate.";
+  else if (authored.captureOutcome==="detained") text="The Unknown Operative is detained. Custody is preserved as a factual result, separate from the remaining Whisper Woods objectives.";
+  else if (authored.battleResult==="escape") text="The Unknown Operative escapes. His survival and escape remain part of this Chronicle.";
+  else if (authored.battleResult==="operative_won") text="The Unknown Operative wins the confrontation. The Mission continues from that factual loss rather than rewriting it.";
+  else if (authored.battleResult==="interrupted"||authored.captureOutcome==="unresolved") text="The confrontation remains unresolved. Control returns with the exact interruption/custody facts preserved.";
+  return {title:"WHISPER WOODS — MAJOR CONTACT",text};
+}
+
+function commitArc1M1WhisperMajorContactStoryCompletion() {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const active=getActiveStorySceneRuntime();
+  if (!active||active.sceneId!==A.sceneId) return {success:false,reason:"major_contact_story_not_active"};
+  const intent=active.localContext&&active.localContext.resolutionIntent||null;
+  if (intent==="release") {
+    setOpportunityResolution(A.opportunityId,{majorContactResolved:true,resolutionClass:"release",resolvedAt:Date.now()},{save:false});
+    savePlayerData();
+    return {success:true,resolved:true,resolutionClass:"release"};
+  }
+  const envelope=active.battleResume&&active.battleResume.authored||null;
+  if (!envelope) return {success:true,resolved:false,reason:"battle_result_not_present"};
+  const unresolved=envelope.battleResult==="interrupted"||(envelope.battleResult==="opposing_side_won"&&envelope.captureOutcome==="unresolved");
+  if (unresolved) {
+    setOpportunityResolution(A.opportunityId,{majorContactInterrupted:true,lastBattleResult:envelope.battleResult||null,lastCaptureOutcome:envelope.captureOutcome||null},{save:false});
+    savePlayerData();
+    return {success:true,resolved:false,resolutionClass:"unresolved"};
+  }
+  setOpportunityResolution(A.opportunityId,{majorContactResolved:true,resolutionClass:envelope.battleResult||"battle",captureOutcome:envelope.captureOutcome||null,operativeAlive:envelope.operativeAlive, resolvedAt:Date.now()},{save:false});
+  savePlayerData();
+  return {success:true,resolved:true,resolutionClass:envelope.battleResult||"battle"};
+}
+
+function registerArc1M1WhisperMajorContactStoryScene() {
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  return registerStoryScene({
+    sceneId:A.sceneId,
+    eventId:A.eventId,
+    title:"WHISPER WOODS — MAJOR CONTACT",
+    entryBeatId:"major_contact_observed",
+    locationId:A.locationId,
+    environmentRef:{mode:"inherit_current",locationId:A.locationId},
+    participants:[
+      {sourceId:A.rogueParticipantId,physicalPresence:true,visible:true,role:"rogue_shinobi",displayName:"ROGUE SHINOBI"},
+      {sourceId:A.smugglerParticipantId,physicalPresence:true,visible:true,role:"injured_smuggler",displayName:"INJURED SMUGGLER"},
+      {sourceId:A.operativeParticipantId,physicalPresence:true,visible:true,role:"external_actor",displayName:"UNKNOWN OPERATIVE"}
+    ],
+    contextResolver:({active})=>({
+      sourceOccurrenceId:active&&active.localContext&&active.localContext.sourceOccurrenceId||null,
+      protagonistParticipantId:active&&active.localContext&&active.localContext.protagonistParticipantId||null,
+      physicallyPresentParticipantIds:active&&active.localContext&&Array.isArray(active.localContext.physicallyPresentParticipantIds)?[...active.localContext.physicallyPresentParticipantIds]:[],
+      activeBattleParticipantIds:active&&active.localContext&&active.localContext.lastBattleParticipantEnvelope?cloneProgressionData(active.localContext.lastBattleParticipantEnvelope.activeParticipantIds||[]):[],
+      observerProjectionId:A.operativeObserverProjectionId,
+      stableOperativeId:A.operativeParticipantId
+    }),
+    beats:[
+      {
+        beatId:"major_contact_observed",
+        mode:"narration",
+        text:"The concealed operative and the Rogue Shinobi collide at the ravine. The operative's identity remains unknown.",
+        nextBeatId:"major_contact_resolution_choice",
+        onAdvanceConsequences:[{
+          requestId:"arc1_m1_major_contact_wrist_break_fact",
+          kind:"custom",
+          resolve:()=>commitArc1M1WhisperWristBreakFromStory()
+        }]
+      },
+      {
+        beatId:"major_contact_resolution_choice",
+        mode:"choice",
+        text:"Choose the protagonist's intent. Present allies remain independent participants; this choice is not a party-wide command.",
+        choices:[
+          {
+            choiceId:"kill",
+            label:"KILL",
+            nextBeatId:"major_contact_battle_transition",
+            contextPatch:{resolutionIntent:"kill"},
+            consequenceRequests:[{requestId:"arc1_m1_major_contact_kill_intent",kind:"custom",resolve:()=>commitArc1M1WhisperResolutionIntent("kill")}]
+          },
+          {
+            choiceId:"detain",
+            label:"DETAIN",
+            nextBeatId:"major_contact_battle_transition",
+            contextPatch:{resolutionIntent:"detain"},
+            consequenceRequests:[{requestId:"arc1_m1_major_contact_detain_intent",kind:"custom",resolve:()=>commitArc1M1WhisperResolutionIntent("detain")}]
+          },
+          {
+            choiceId:"release",
+            label:"RELEASE",
+            nextBeatId:"major_contact_release_resolution",
+            contextPatch:{resolutionIntent:"release"},
+            consequenceRequests:[{requestId:"arc1_m1_major_contact_release_resolution",kind:"custom",resolve:()=>commitArc1M1WhisperResolutionIntent("release")}]
+          }
+        ]
+      },
+      {
+        beatId:"major_contact_battle_transition",
+        mode:"battle_transition",
+        text:"The confrontation begins only for the exact active participant set committed by Story.",
+        battle:{
+          encounterId:A.encounterPackageId,
+          launchResolver:launchArc1M1WhisperStoryConfrontation,
+          postBattleBeatId:"major_contact_post_battle",
+          resultProjector:projectArc1M1WhisperConfrontationBattleResult,
+          exposeFinisher:false,
+          actionLabel:"BEGIN CONFRONTATION"
+        }
+      },
+      {
+        beatId:"major_contact_post_battle",
+        mode:"post_battle",
+        presentationResolver:getArc1M1WhisperMajorContactPostBattlePresentation,
+        text:"The confrontation returns to the same Story occurrence.",
+        exitScene:true
+      },
+      {
+        beatId:"major_contact_release_resolution",
+        mode:"narration",
+        text:"You do not initiate the confrontation. Release does not imply trust, alliance, or hidden identity knowledge.",
+        exitScene:true
+      }
+    ],
+    onCompleteConsequences:[{
+      requestId:"arc1_m1_major_contact_story_completion",
+      kind:"custom",
+      resolve:()=>commitArc1M1WhisperMajorContactStoryCompletion()
+    }]
+  });
+}
+
+registerArc1M1WhisperMajorContactStoryScene();
+
+function prepareArc1M1WhisperMajorContactDiagnosticFixture() {
+  resetAlphaDiagnosticPlayerToFreshSave();
+  Object.keys(currentBattle).forEach(key=>delete currentBattle[key]);
+  Object.assign(currentBattle,{active:false,battleId:null,encounterId:null,returnContext:null,outcome:null,rewards:{generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]}});
+  const origin=selectChronicleOrigin("academy_menma","diag_m1_origin");
+  if (!origin.success) return {success:false,stage:"origin",result:origin};
+  const prologue=completeChronicleOriginPrologue("academy_menma",["diag_m1_origin_complete"]);
+  if (!prologue.success) return {success:false,stage:"prologue",result:prologue};
+  const t1=selectAcademyTeamFormationTeammate(1,"academy_hinata");
+  const t2=selectAcademyTeamFormationTeammate(2,"academy_kurenai");
+  if (!t1.success||!t2.success) return {success:false,stage:"team_select",t1,t2};
+  const formed=confirmAcademyTeamFormation("diag_m1_team");
+  const continued=continueAcademyTeamFormationJourney();
+  if (!formed.success||!continued.success) return {success:false,stage:"team_commit",formed,continued};
+  materializeProductionRuntimeCharacter("academy_menma");
+  materializeProductionRuntimeCharacter("academy_hinata");
+  materializeProductionRuntimeCharacter("academy_kurenai");
+
+  commitArc1M1WhisperWorldHistoryAddress(ARC1_M1_WHISPER_WOODS_AUTHORITY.prerequisiteFactId,{kind:"occurrence",eventId:"diag_m1_pre_whisper",locationId:"diag_m1_pre_whisper"});
+  ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+  registerArc1M1WhisperWoodsWorldContent({mapImage:ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING});
+  const opened=openLocalMissionArea(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId,{returnContext:{type:"region",regionKey:"fire"},hotspotId:"whisper_woods_hotspot_north_ravine",opportunityId:ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.majorContact});
+  if (!opened.success) return {success:false,stage:"open_area",opened};
+  setOpportunityResolution(ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.northRavine,{northRavineConfirmed:true},{save:false});
+  setOpportunityDiscovery(ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.northRavine,{level:"discovered"},{save:false});
+  revealArc1M1WhisperOpportunity(ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.majorContact,{save:false});
+  selectedHotspotId="whisper_woods_hotspot_north_ravine";
+  selectedOpportunityId=ARC1_M1_WHISPER_WOODS_AUTHORITY.opportunityIds.majorContact;
+  savePlayerData();
+  return {success:true};
+}
+
+function runAlphaArc1M1WhisperMajorContactStoryCallerDiagnostics() {
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const priorBattle=cloneBattleRuntimeValue(currentBattle);
+  const previousMapBinding=ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING;
+  const areaBefore=getLocalMissionAreaDefinition(ARC1_M1_WHISPER_WOODS_AUTHORITY.areaId);
+  const priorMapImage=areaBefore?areaBefore.mapImage:"";
+  const priorSelection={selectedMissionAreaId,selectedMissionAreaReturnContext:cloneProgressionData(selectedMissionAreaReturnContext),selectedHotspotId,selectedOpportunityId,selectedRegionKey,currentOverlayType};
+  const A=ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY;
+  const checks={};
+  let error=null;
+  try {
+    const fixture=prepareArc1M1WhisperMajorContactDiagnosticFixture();
+    checks.fixtureReady=fixture.success===true;
+    if (!fixture.success) throw new Error(`fixture_failed:${fixture.stage||fixture.result&&fixture.result.reason||"unknown"}`);
+
+    const majorProjection=getMissionAreaHotspotProjection(A.missionAreaId,A.hotspotId);
+    const projectedAction=majorProjection&&majorProjection.opportunities.find(item=>item.opportunity_id===A.opportunityId);
+    checks.approachProjectsOnlyWithValidStoryCaller=!!projectedAction&&projectedAction.legal_actions.some(action=>action.actionId==="approach_contact");
+
+    const approached=routeWorldOpportunityInteraction(A.opportunityId,"approach_contact");
+    const activeStart=getActiveStorySceneRuntime();
+    const firstInstanceId=activeStart&&activeStart.instanceId||null;
+    const transitionRecord=findCommittedWorldHistoryAddress(A.transitionSourceOccurrenceId);
+    checks.worldToStoryTransitionExact=approached.success===true&&!!activeStart&&activeStart.sceneId===A.sceneId&&activeStart.sourceEventId===A.eventId&&activeStart.sourceOpportunityId===A.opportunityId;
+    checks.exactWorldSourceCommittedOnce=!!transitionRecord&&transitionRecord.occurrenceId===A.transitionSourceOccurrenceId&&transitionRecord.sceneId===A.sceneId&&transitionRecord.storySceneInstanceId===firstInstanceId;
+    checks.exactStableLocalParticipants=!!transitionRecord&&[A.rogueParticipantId,A.smugglerParticipantId,A.operativeParticipantId].every(id=>transitionRecord.participantRefs.includes(id));
+    checks.observerProjectionSeparate=transitionRecord&&transitionRecord.observerProjectionId===A.operativeObserverProjectionId&&transitionRecord.observerProjectionIsStableIdentity===false&&A.operativeObserverProjectionId!==A.operativeParticipantId;
+
+    savePlayerData();
+    reloadAlphaDiagnosticPlayerFromSave();
+    const afterLoad=getActiveStorySceneRuntime();
+    checks.saveLoadPreservesSameStoryInstance=!!afterLoad&&afterLoad.instanceId===firstInstanceId&&afterLoad.sceneId===A.sceneId&&afterLoad.localContext.sourceOccurrenceId===A.transitionSourceOccurrenceId;
+    const transitionRetry=commitArc1M1WhisperMajorContactSceneTransitionSource({});
+    checks.transitionRetryIdempotent=transitionRetry.success===true&&transitionRetry.idempotent===true&&playerData.activityHistory.filter(item=>item&&item.occurrenceId===A.transitionSourceOccurrenceId).length===1;
+
+    const wristAdvance=advanceStoryScene();
+    const rogueState=getParticipantChronicleState(A.rogueParticipantId,{create:false});
+    checks.exactWristBreakSource=wristAdvance.success===true&&!!findCommittedWorldHistoryAddress(A.wristBreakOccurrenceId)&&!!rogueState&&rogueState.injuries.filter(item=>item&&item.causalOccurrenceId===A.wristBreakOccurrenceId&&item.injuryType==="fractured_wrist").length===1;
+    const wristRetry=commitArc1M1WhisperWristBreakFromStory();
+    checks.wristBreakRetryNoDuplicate=wristRetry.success===true&&wristRetry.idempotent===true&&getParticipantChronicleState(A.rogueParticipantId,{create:false}).injuries.filter(item=>item&&item.causalOccurrenceId===A.wristBreakOccurrenceId).length===1;
+
+    const killChoice=applyStorySceneChoice("kill");
+    const battleBeat=getCurrentStorySceneBeat();
+    checks.killIntentIsIntentOnly=killChoice.success===true&&!!findCommittedWorldHistoryAddress(A.killIntentOccurrenceId)&&battleBeat&&battleBeat.mode==="battle_transition"&&getArc1M1UnknownOperativePersistentStatus().lifeState!=="dead";
+    const launched=launchStorySceneBattle();
+    const confrontation=getArc1M1UnknownOperativeConfrontationState();
+    checks.optionalExactBattleLaunch=launched.success===true&&!!confrontation&&confrontation.encounterPackageId===A.encounterPackageId&&confrontation.objectiveId===A.killObjectiveId;
+    checks.presenceDoesNotAutoDeployAllies=!!confrontation&&confrontation.activeParticipantIds.includes("academy_menma")&&confrontation.activeParticipantIds.includes(A.operativeParticipantId)&&!confrontation.activeParticipantIds.includes("academy_hinata")&&!confrontation.activeParticipantIds.includes("academy_kurenai");
+    checks.localWorldParticipantsNotBattleParticipants=!!confrontation&&!confrontation.activeParticipantIds.includes(A.rogueParticipantId)&&!confrontation.activeParticipantIds.includes(A.smugglerParticipantId);
+    checks.sameStoryReturnContext=currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"&&currentBattle.returnContext.sceneId===A.sceneId&&currentBattle.returnContext.sceneInstanceId===firstInstanceId;
+
+    const interrupted=resolveArc1M1UnknownOperativeConfrontationTermination({battleResult:"interrupted",reason:"diagnostic_interrupt"});
+    const resumed=getActiveStorySceneRuntime();
+    checks.battleReturnsSameStoryOccurrence=interrupted.success===true&&!!resumed&&resumed.instanceId===firstInstanceId&&resumed.sceneId===A.sceneId&&resumed.beatId==="major_contact_post_battle"&&resumed.battleResume&&resumed.battleResume.authored&&resumed.battleResume.authored.battleResult==="interrupted";
+    const completedInterrupted=advanceStoryScene();
+    checks.interruptionDoesNotFabricateFinalResolution=completedInterrupted.success===true&&getArc1M1WhisperResolution(A.opportunityId).majorContactResolved!==true;
+
+    // Re-enter the SAME World occurrence after interruption. Stable source + wrist
+    // fact remain idempotent, then Release resolves without any Battle launch.
+    const reApproach=routeWorldOpportunityInteraction(A.opportunityId,"approach_contact");
+    const secondInstance=getActiveStorySceneRuntime();
+    checks.retryUsesSameWorldSource=reApproach.success===true&&!!secondInstance&&secondInstance.instanceId!==firstInstanceId&&playerData.activityHistory.filter(item=>item&&item.occurrenceId===A.transitionSourceOccurrenceId).length===1;
+    advanceStoryScene();
+    const battleIdBeforeRelease=currentBattle.battleId;
+    const releaseChoice=applyStorySceneChoice("release");
+    const releaseBeat=getCurrentStorySceneBeat();
+    const releaseComplete=advanceStoryScene();
+    checks.releaseNeverLaunchesBattle=releaseChoice.success===true&&releaseBeat&&releaseBeat.beatId==="major_contact_release_resolution"&&currentBattle.battleId===battleIdBeforeRelease&&findCommittedWorldHistoryAddress(A.releaseOccurrenceId)!=null;
+    checks.releaseResolvesMajorContactOnly=releaseComplete.success===true&&getArc1M1WhisperResolution(A.opportunityId).majorContactResolved===true&&getArc1M1WhisperResolution(A.opportunityId).resolutionClass==="release";
+    checks.noDuplicateWristOrTransitionHistory=playerData.activityHistory.filter(item=>item&&item.occurrenceId===A.transitionSourceOccurrenceId).length===1&&playerData.activityHistory.filter(item=>item&&item.occurrenceId===A.wristBreakOccurrenceId).length===1;
+
+    // Separate Detain launch proves objective selection is independent from Kill.
+    const detainFixture=prepareArc1M1WhisperMajorContactDiagnosticFixture();
+    checks.detainFixtureReady=detainFixture.success===true;
+    const detainApproach=routeWorldOpportunityInteraction(A.opportunityId,"approach_contact");
+    advanceStoryScene();
+    const detainChoice=applyStorySceneChoice("detain");
+    const detainLaunch=launchStorySceneBattle();
+    const detainState=getArc1M1UnknownOperativeConfrontationState();
+    checks.detainLaunchUsesExactObjective=detainApproach.success===true&&detainChoice.success===true&&detainLaunch.success===true&&!!detainState&&detainState.objectiveId===A.detainObjectiveId&&!!findCommittedWorldHistoryAddress(A.detainIntentOccurrenceId);
+    checks.detainIntentDoesNotCreateCustody=getArc1M1UnknownOperativePersistentStatus().custodyState!=="detained";
+
+    const ryo=Number(playerData.ryo)||0;
+    const exp=Number(playerData.exp)||0;
+    checks.noHiddenRewardOrPLMutation=ryo===0&&exp===0&&!commitArc1M1WhisperResolutionIntent.toString().includes("power")&&!commitArc1M1WhisperResolutionIntent.toString().includes("statGrowth")&&!commitArc1M1WhisperResolutionIntent.toString().includes("plGrowth");
+    checks.worldOpportunityStillNoDirectBattle=getRegisteredWorldEventOpportunity(A.opportunityId).interactions.every(action=>action.kind!=="battle");
+    checks.storySceneUsesExistingBattlePackage=typeof getStorySceneDefinition(A.sceneId).beatMap.get("major_contact_battle_transition").battle.launchResolver==="function"&&getStorySceneDefinition(A.sceneId).beatMap.get("major_contact_battle_transition").battle.encounterId===A.encounterPackageId;
+  } catch (caught) {
+    error=String(caught&&caught.stack||caught);
+  } finally {
+    ARC1_M1_WHISPER_WOODS_MAP_IMAGE_BINDING=previousMapBinding;
+    registerArc1M1WhisperWoodsWorldContent({mapImage:priorMapImage||previousMapBinding||""});
+    Object.keys(currentBattle).forEach(key=>delete currentBattle[key]);
+    Object.assign(currentBattle,priorBattle||{});
+    restoreAlphaDiagnosticRuntimeEnvelope(rollback);
+    selectedMissionAreaId=priorSelection.selectedMissionAreaId;
+    selectedMissionAreaReturnContext=priorSelection.selectedMissionAreaReturnContext;
+    selectedHotspotId=priorSelection.selectedHotspotId;
+    selectedOpportunityId=priorSelection.selectedOpportunityId;
+    selectedRegionKey=priorSelection.selectedRegionKey;
+    currentOverlayType=priorSelection.currentOverlayType;
+  }
+  const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
+  return {pass:failed.length===0&&!error,checks,failed,total:Object.keys(checks).length,passed:Object.keys(checks).length-failed.length,error};
+}
+
+function runAlphaPostIssue35Mission1StoryCallerDiagnostics() {
+  const caller=runAlphaArc1M1WhisperMajorContactStoryCallerDiagnostics();
+  const combat=runAlphaUnknownOperativeConfrontationDiagnostics();
+  const world=runAlphaArc1M1WhisperWoodsContentDiagnostics();
+  const checks={
+    issue35CallerGreen:caller.pass===true,
+    existingUnknownOperativeCombatGreen:combat.pass===true,
+    existingWhisperWorldGreen:world.pass===true,
+    exactSceneRegistered:STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY.sceneId),
+    exactWorldSource:ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY.transitionSourceOccurrenceId==="occ_arc1_m1_whisper_major_contact_scene_transition",
+    exactStableRogue:ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY.rogueParticipantId==="arc1_m1_whisper_rogue_shinobi_01",
+    exactStableSmuggler:ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY.smugglerParticipantId==="arc1_m1_whisper_injured_smuggler_01",
+    exactStableOperative:ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY.operativeParticipantId==="arc1_m1_unknown_operative",
+    noParallelBattleSubsystem:launchArc1M1WhisperStoryConfrontation.toString().includes("launchArc1M1UnknownOperativeConfrontation")&&launchStorySceneBattle.toString().includes("launchResolver"),
+    noDirectWorldBattle:getRegisteredWorldEventOpportunity("arc1_m1_whisper_major_contact").interactions.every(action=>action.kind!=="battle")
+  };
+  const failed=Object.entries(checks).filter(([,value])=>value!==true).map(([key])=>key);
+  return {pass:failed.length===0,checks,failed,groups:{caller,combat,world}};
 }
 
 
