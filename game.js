@@ -8637,6 +8637,8 @@ function normalizeOriginConsequenceState(savedState) {
       originVariantId:typeof raw.originVariantId==="string"?raw.originVariantId:"",
       sourceOccurrenceId,
       consequenceContractId,
+      rowId:typeof raw.rowId==="string"?raw.rowId:"",
+      exclusivityFamily:typeof raw.exclusivityFamily==="string"?raw.exclusivityFamily:null,
       qualificationFacts:raw.qualificationFacts&&typeof raw.qualificationFacts==="object"?cloneProgressionData(raw.qualificationFacts):{},
       payload:raw.payload&&typeof raw.payload==="object"?cloneProgressionData(raw.payload):{},
       consumer:typeof raw.consumer==="string"?raw.consumer:"",
@@ -90843,13 +90845,51 @@ const ORIGIN_CONSEQUENCE_STATUS=Object.freeze({
   BLOCKED_SOURCE_OCCURRENCE_ID:"BLOCKED_SOURCE_OCCURRENCE_ID"
 });
 
+const ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS=Object.freeze([
+  "occ_origin_obito_furniture_assistance_resolution",
+  "occ_origin_obito_scattered_vegetables_resolution",
+  "occ_origin_obito_lost_academy_equipment_resolution",
+  "occ_origin_obito_overturned_delivery_resolution",
+  "occ_origin_obito_runaway_cart_resolution"
+]);
+
+function createStaticOriginConsequenceDescriptor(rowId,originVariantId,consequenceContractId,sourceOccurrenceIds,consumer,options={}) {
+  const exactSources=Object.freeze([...(Array.isArray(sourceOccurrenceIds)?sourceOccurrenceIds:[sourceOccurrenceIds]).filter(Boolean)]);
+  return Object.freeze({
+    rowId,
+    originVariantId,
+    consequenceContractId,
+    sourceBinding:exactSources.length===1?exactSources[0]:"exact_authoritative_source_set",
+    sourceOccurrenceIds:exactSources,
+    consumer,
+    exclusivityFamily:options.exclusivityFamily||null,
+    multiSourceSameContract:options.multiSourceSameContract===true,
+    status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE
+  });
+}
+
 const ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS=Object.freeze({
+  HIN01:createStaticOriginConsequenceDescriptor("HIN-01","academy_hinata","academy_hinata_taijutsu_application_evidence","occ_origin_hinata_controlled_hyuga_spar_resolution","Progression / Historical Evidence"),
+  HIN02:createStaticOriginConsequenceDescriptor("HIN-02","academy_hinata","academy_hinata_observational_taijutsu_development","occ_origin_hinata_younger_student_practice_resolution","Progression"),
+  HIN03:createStaticOriginConsequenceDescriptor("HIN-03","academy_hinata","academy_hinata_younger_student_teaching_history","occ_origin_hinata_younger_student_practice_resolution","CE Relationships / Shared History"),
+
+  IZU01:createStaticOriginConsequenceDescriptor("IZU-01","academy_izuno","academy_izuno_tracking_evidence","occ_origin_izuno_pursuit_tracking_resolution","Progression / Contextual Opportunity"),
+  IZU02:createStaticOriginConsequenceDescriptor("IZU-02","academy_izuno","academy_izuno_intercept_inference_evidence","occ_origin_izuno_intercept_prediction_resolution","Progression / Contextual Opportunity"),
+  IZU03:createStaticOriginConsequenceDescriptor("IZU-03","academy_izuno","academy_izuno_cooperation_shared_history","occ_origin_izuno_pursuit_cooperation_resolution","CE Relationships / Shared History"),
+  IZU04:createStaticOriginConsequenceDescriptor("IZU-04","academy_izuno","academy_izuno_rogue_genin_intervention_evidence","occ_origin_izuno_rogue_genin_interruption_resolution","World / CE History; Combat evidence remains Combat-owned when Battle occurs"),
+
+  MIR01:createStaticOriginConsequenceDescriptor("MIR-01","academy_mirai","academy_mirai_identity_verification_evidence","occ_origin_mirai_substitution_verification_resolution","Progression + CE Knowledge / Contextual Opportunity",{exclusivityFamily:"academy_mirai_escort_resolution"}),
+  MIR02:createStaticOriginConsequenceDescriptor("MIR-02","academy_mirai","academy_mirai_changed_chakra_evidence","occ_origin_mirai_changed_chakra_observation","CE Knowledge"),
+  MIR03:createStaticOriginConsequenceDescriptor("MIR-03","academy_mirai","academy_mirai_physical_escort_evidence","occ_origin_mirai_checkpoint_escort_resolution","Progression + CE History",{exclusivityFamily:"academy_mirai_escort_resolution"}),
+
   MEN01:Object.freeze({
     rowId:"MEN-01",
     originVariantId:"academy_menma",
     consequenceContractId:"academy_menma_kinjutsu_use_evidence",
     sourceBinding:"combat.qualifyingActionOccurrence.occurrenceId",
+    sourceOccurrenceIds:Object.freeze([]),
     consumer:"Combat/Skills → Progression Historical Evidence",
+    exclusivityFamily:null,
     status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE
   }),
   MEN02:Object.freeze({
@@ -90857,7 +90897,9 @@ const ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS=Object.freeze({
     originVariantId:"academy_menma",
     consequenceContractId:"academy_menma_anko_kinjutsu_observation_evidence",
     sourceBinding:"combat.qualifyingActionOccurrence.occurrenceId",
+    sourceOccurrenceIds:Object.freeze([]),
     consumer:"CE Knowledge / Relationships / Contextual Opportunity",
+    exclusivityFamily:null,
     status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE
   }),
   MEN03:Object.freeze({
@@ -90865,23 +90907,43 @@ const ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS=Object.freeze({
     originVariantId:"academy_menma",
     consequenceContractId:"academy_menma_tutorial_performance_evidence",
     sourceBinding:"combat_academy_menma_tutorial_performance_resolved",
+    sourceOccurrenceIds:Object.freeze(["combat_academy_menma_tutorial_performance_resolved"]),
     consumer:"Combat → CE Origin Historical Evidence",
+    exclusivityFamily:"academy_menma_tutorial_performance",
     status:ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE
-  })
+  }),
+  MEN04:createStaticOriginConsequenceDescriptor("MEN-04","academy_menma","academy_menma_anko_training_interest_context","occ_origin_menma_anko_training_interest_response","Progression / Contextual Opportunity"),
+  MEN05:createStaticOriginConsequenceDescriptor("MEN-05","academy_menma","academy_menma_nine_tails_origin_history","occ_origin_menma_nine_tails_internal_exchange","CE History / Relationships"),
+
+  KUS01:createStaticOriginConsequenceDescriptor("KUS-01","academy_kushina","academy_kushina_fuinjutsu_application_evidence","occ_origin_kushina_residual_seal_work_resolution","Progression"),
+  KUS02:createStaticOriginConsequenceDescriptor("KUS-02","academy_kushina","academy_kushina_gerotora_identity_knowledge","occ_origin_kushina_gerotora_identity_disclosure","CE Knowledge"),
+  KUS03:createStaticOriginConsequenceDescriptor("KUS-03","academy_kushina","academy_kushina_gerotora_causal_knowledge","occ_origin_kushina_gerotora_causal_explanation","CE Knowledge"),
+  KUS04:createStaticOriginConsequenceDescriptor("KUS-04","academy_kushina","academy_kushina_gerotora_joint_sealing_history","occ_origin_kushina_joint_residual_seal_closure","Progression Evidence + CE Relationships / Shared History"),
+  KUS05:createStaticOriginConsequenceDescriptor("KUS-05","academy_kushina","academy_kushina_gerotora_first_contact_history","occ_origin_kushina_gerotora_first_contact","CE History / Relationships"),
+
+  KUR01:createStaticOriginConsequenceDescriptor("KUR-01","academy_kurenai","academy_kurenai_applied_genjutsu_attempt_evidence","occ_origin_kurenai_bell_test_resolution","Progression Historical Evidence",{exclusivityFamily:"academy_kurenai_bell_test_resolution"}),
+  KUR02:createStaticOriginConsequenceDescriptor("KUR-02","academy_kurenai","academy_kurenai_applied_genjutsu_development","occ_origin_kurenai_bell_test_resolution","Progression",{exclusivityFamily:"academy_kurenai_bell_test_resolution"}),
+
+  IWA01:createStaticOriginConsequenceDescriptor("IWA-01","academy_iwabee","academy_iwabee_practical_ninjutsu_development","occ_origin_iwabee_training_ground_reshape_resolution","Progression"),
+  IWA02:createStaticOriginConsequenceDescriptor("IWA-02","academy_iwabee","academy_iwabee_adaptive_earth_release_evidence","occ_origin_iwabee_rogue_genin_response_resolution","Progression Historical Evidence"),
+
+  MET01:createStaticOriginConsequenceDescriptor("MET-01","academy_metal_lee","academy_metal_private_training_development_evidence","occ_origin_metal_private_training_resolution","Progression"),
+  MET02:createStaticOriginConsequenceDescriptor("MET-02","academy_metal_lee","academy_metal_contextual_performance_evidence","occ_origin_metal_pressured_performance_resolution","Combat / Progression evidence consumers",{exclusivityFamily:"academy_metal_pressured_performance"}),
+  MET03:createStaticOriginConsequenceDescriptor("MET-03","academy_metal_lee","academy_metal_protective_response_evidence","occ_origin_metal_protective_response_resolution","Progression / Contextual Qualification Opportunity"),
+  MET04:createStaticOriginConsequenceDescriptor("MET-04","academy_metal_lee","academy_metal_genin_prior_contact_history","occ_origin_metal_inviting_genin_prior_contact","CE Relationships / Shared History"),
+
+  KAK01:createStaticOriginConsequenceDescriptor("KAK-01","academy_kakashi","academy_kakashi_package_disposition_evidence","occ_origin_kakashi_anbu_retrieval_resolution","World / CE History",{exclusivityFamily:"academy_kakashi_package_disposition"}),
+  KAK02:createStaticOriginConsequenceDescriptor("KAK-02","academy_kakashi","academy_kakashi_retrieval_intelligence_evidence","occ_origin_kakashi_anbu_retrieval_resolution","CE Knowledge / Progression Contextual Opportunity",{exclusivityFamily:"academy_kakashi_retrieval_intelligence_resolution"}),
+  KAK03:createStaticOriginConsequenceDescriptor("KAK-03","academy_kakashi","academy_kakashi_retrieval_participation_history","occ_origin_kakashi_anbu_retrieval_resolution","CE History / Relationships / Knowledge"),
+
+  OBI01:createStaticOriginConsequenceDescriptor("OBI-01","academy_obito","academy_obito_diversion_contribution_evidence",ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS,"World / CE History / Progression contextual consumers",{multiSourceSameContract:true}),
+  OBI02:createStaticOriginConsequenceDescriptor("OBI-02","academy_obito","academy_obito_formal_training_full_stats","occ_origin_obito_formal_training_entitlement_resolution","Progression → PL/Registry Current-Stat application",{exclusivityFamily:"academy_obito_formal_training_development"}),
+  OBI03:createStaticOriginConsequenceDescriptor("OBI-03","academy_obito","academy_obito_formal_training_substantial_stats","occ_origin_obito_formal_training_entitlement_resolution","Progression → PL/Registry Current-Stat application",{exclusivityFamily:"academy_obito_formal_training_development"}),
+  OBI04:createStaticOriginConsequenceDescriptor("OBI-04","academy_obito","academy_obito_formal_training_reduced_stats","occ_origin_obito_formal_training_entitlement_resolution","Progression → PL/Registry Current-Stat application",{exclusivityFamily:"academy_obito_formal_training_development"}),
+  OBI05:createStaticOriginConsequenceDescriptor("OBI-05","academy_obito","academy_obito_formal_training_minimal_stats","occ_origin_obito_formal_training_entitlement_resolution","Progression → PL/Registry Current-Stat application",{exclusivityFamily:"academy_obito_formal_training_development"})
 });
 
-const ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS=Object.freeze([
-  "HIN-01","HIN-02","HIN-03",
-  "IZU-01","IZU-02","IZU-03","IZU-04",
-  "MIR-01","MIR-02","MIR-03",
-  "MEN-04","MEN-05",
-  "KUS-01","KUS-02","KUS-03","KUS-04","KUS-05",
-  "KUR-01","KUR-02",
-  "IWA-01","IWA-02",
-  "MET-01","MET-02","MET-03","MET-04",
-  "KAK-01","KAK-02","KAK-03",
-  "OBI-01","OBI-02","OBI-03","OBI-04","OBI-05"
-]);
+const ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS=Object.freeze([]);
 
 function createOriginConsequenceAddress(sourceOccurrenceId,consequenceContractId) {
   const source=typeof sourceOccurrenceId==="string"?sourceOccurrenceId.trim():"";
@@ -90910,6 +90972,106 @@ function getImplementableOriginConsequenceDescriptor(consequenceContractId) {
   return Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).find(entry=>entry.consequenceContractId===consequenceContractId)||null;
 }
 
+
+function cloneOriginConsequenceValue(value) {
+  if (value===undefined) return null;
+  return value&&typeof value==="object"?cloneProgressionData(value):value;
+}
+
+function getOriginSourceOccurrenceId(sourceEnvelope={}) {
+  const source=sourceEnvelope&&typeof sourceEnvelope==="object"?sourceEnvelope:{};
+  const sourceOccurrenceId=typeof source.sourceOccurrenceId==="string"?source.sourceOccurrenceId.trim():"";
+  const occurrenceId=typeof source.occurrenceId==="string"?source.occurrenceId.trim():"";
+  if (sourceOccurrenceId&&occurrenceId&&sourceOccurrenceId!==occurrenceId) return "";
+  return sourceOccurrenceId||occurrenceId;
+}
+
+function getOriginSourceFacts(sourceEnvelope={}) {
+  const source=sourceEnvelope&&typeof sourceEnvelope==="object"?sourceEnvelope:{};
+  if (source.fact&&typeof source.fact==="object") return source.fact;
+  if (source.facts&&typeof source.facts==="object") return source.facts;
+  return source;
+}
+
+function isAuthoritativeStaticOriginSourceForDescriptor(descriptor,sourceOccurrenceId) {
+  if (!descriptor||!sourceOccurrenceId) return false;
+  const exact=Array.isArray(descriptor.sourceOccurrenceIds)?descriptor.sourceOccurrenceIds:[];
+  return exact.length>0&&exact.includes(sourceOccurrenceId);
+}
+
+function evaluateStaticOriginConsequenceQualification(rowId,sourceEnvelope={}) {
+  const descriptor=getOriginConsequenceContractDescriptorByRowId(rowId);
+  if (!descriptor) return {qualifies:false,reason:"origin_consequence_row_unknown"};
+  const sourceOccurrenceId=getOriginSourceOccurrenceId(sourceEnvelope);
+  if (!sourceOccurrenceId) return {qualifies:false,reason:"source_occurrence_id_required"};
+  if (!isAuthoritativeStaticOriginSourceForDescriptor(descriptor,sourceOccurrenceId)) return {qualifies:false,reason:"source_occurrence_id_not_authoritative",sourceOccurrenceId};
+  if (sourceEnvelope.committed!==true) return {qualifies:false,reason:"source_occurrence_not_committed",sourceOccurrenceId};
+  if (sourceEnvelope.actorVariantId!==descriptor.originVariantId) return {qualifies:false,reason:"source_actor_mismatch",sourceOccurrenceId};
+  const fact=getOriginSourceFacts(sourceEnvelope);
+  let qualifies=false;
+  let payload=null;
+
+  switch(rowId) {
+    case "HIN-01": qualifies=fact.controlledSparCompleted===true; payload={evidenceKind:"taijutsu_application",controlledSparCompleted:true,demonstratedResponses:cloneOriginConsequenceValue(fact.demonstratedResponses)}; break;
+    case "HIN-02": qualifies=fact.youngerStudentChoice==="stay_and_watch"&&fact.selfTaijutsuLearningOccurred===true; payload={developmentKind:"taijutsu_observational_learning",magnitudeAuthority:"Progression",currentStatDelta:null,directPLGrant:null}; break;
+    case "HIN-03": qualifies=["show_movement","explain_error"].includes(fact.youngerStudentChoice); payload={historyKind:"teaching_or_explanation",participantRef:fact.youngerStudentParticipantRef||null,choice:fact.youngerStudentChoice||null}; break;
+    case "IZU-01": qualifies=fact.reliableEnvironmentalTrackingEstablished===true||fact.falseTrailCorrectlyDiscovered===true; payload={evidenceKind:"tracking_intelligence",environmentalTracking:fact.reliableEnvironmentalTrackingEstablished===true,falseTrailDiscovered:fact.falseTrailCorrectlyDiscovered===true}; break;
+    case "IZU-02": qualifies=fact.interceptReachedByPrediction===true; payload={evidenceKind:"intercept_inference",predictionSucceeded:true,speedStatCheck:false}; break;
+    case "IZU-03": qualifies=fact.cooperatedWithAcademyStudents===true; payload={historyKind:"pursuit_cooperation",participantRefs:Array.isArray(fact.cooperatingParticipantRefs)?cloneProgressionData(fact.cooperatingParticipantRefs):[]}; break;
+    case "IZU-04": qualifies=fact.rogueGeninInterruptionResolvedByWasabiAction===true; payload={evidenceKind:"secondary_occurrence_response",response:fact.rogueGeninResponse||null,battleOccurrenceIds:Array.isArray(fact.battleOccurrenceIds)?cloneProgressionData(fact.battleOccurrenceIds):[]}; break;
+    case "MIR-01": qualifies=fact.substitutionVerifiedBeforeCheckpoint===true; payload={evidenceKind:"identity_verification",verifiedBeforeCheckpoint:true,verificationBasis:cloneOriginConsequenceValue(fact.verificationBasis)}; break;
+    case "MIR-02": qualifies=fact.changedOrUnfamiliarChakraObserved===true; payload={knowledgeKind:"changed_chakra_evidence",identityTruthGranted:false,observedDifference:cloneOriginConsequenceValue(fact.observedChakraDifference)}; break;
+    case "MIR-03": qualifies=fact.personTravellingWithMiraiReachedCheckpointProtected===true&&fact.substitutionVerifiedBeforeCheckpoint===false; payload={evidenceKind:"physical_escort",protectedToCheckpoint:true,identityVerificationSucceeded:false}; break;
+    case "MEN-04": qualifies=fact.ankoTrainingInterestExpressed===true; payload={contextKind:"future_anko_training_interest",guaranteedOpportunity:false,accessGranted:false}; break;
+    case "MEN-05": qualifies=fact.nineTailsInternalExchangeOccurred===true; payload={historyKind:"internal_relationship_exchange",sourceRef:"nine_tails",battleAssistanceGranted:false,techniqueAccessGranted:false,transformationAccessGranted:false}; break;
+    case "KUS-01": qualifies=fact.qualifyingFuinjutsuWorkCompleted===true; payload={developmentKind:"fuinjutsu_application",currentStatDelta:null,directPLGrant:null,techniqueAccessGranted:false}; break;
+    case "KUS-02": qualifies=fact.gerotoraCommunicatedOwnIdentity===true; payload={knowledgeKind:"entity_identity",entityRef:"key_gero",displayIdentity:"Gerotora"}; break;
+    case "KUS-03": qualifies=fact.gerotoraExplainedResidualFormulaInference===true; payload={knowledgeKind:"bounded_reverse_summon_cause",speakerRef:"key_gero",hiddenTruthAccess:false}; break;
+    case "KUS-04": qualifies=fact.jointResidualSealClosureWithGerotora===true; payload={historyKind:"joint_sealing_first_contact",otherParticipantRef:"key_gero",summonContractGranted:false,techniqueOwnershipGranted:false,masteryGranted:false}; break;
+    case "KUS-05": qualifies=fact.gerotoraFirstContactOccurred===true; payload={historyKind:"first_contact",otherParticipantRef:"key_gero",summonContractGranted:false,recruitmentGranted:false,futureRouteGuaranteed:false}; break;
+    case "KUR-01": qualifies=fact.bellTestOutcomeClass==="complete_loss"; payload={evidenceKind:"applied_genjutsu_attempt",outcomeClass:"complete_loss",developmentEligible:false}; break;
+    case "KUR-02": qualifies=["partial_loss","partial_win","complete_win"].includes(fact.bellTestOutcomeClass); payload={developmentKind:"applied_genjutsu",outcomeClass:fact.bellTestOutcomeClass||null,currentStatDelta:null,directPLGrant:null,techniqueAccessGranted:false,masteryGranted:false}; break;
+    case "IWA-01": qualifies=fact.trainingGroundReshapeObjectiveCompletedByIwabee===true; payload={developmentKind:"practical_ninjutsu_earth_release",currentStatDelta:null,directPLGrant:null}; break;
+    case "IWA-02": qualifies=fact.earthReleaseUsedToConstrainRogueGenin===true; payload={evidenceKind:"adaptive_earth_release",context:"rogue_genin_escape_constraint",additionalOriginDevelopmentPayout:false}; break;
+    case "MET-01": qualifies=fact.qualifyingPrivateTaijutsuOrConditioningWorkCompleted===true&&fact.observerDiscoveryOccurredAfterQualifyingPrivateWork===true; payload={developmentKind:"private_taijutsu_conditioning",currentStatDelta:null,directPLGrant:null}; break;
+    case "MET-02": qualifies=["strong","mixed","rough"].includes(fact.pressuredPerformanceClass); payload={evidenceKind:"contextual_performance",performanceClass:fact.pressuredPerformanceClass||null,underlyingCapabilityRewrite:false,permanentAnxietyState:false}; break;
+    case "MET-03": qualifies=fact.protectiveResponseAttempted===true; payload={evidenceKind:"protective_intervention",attempt:fact.protectiveResponseKind||null,outcome:fact.protectiveResponseOutcome||null,protectorIdentityGranted:false,qualificationGranted:false}; break;
+    case "MET-04": qualifies=fact.invitingGeninEncounterOccurred===true; payload={historyKind:"prior_contact",otherParticipantRef:fact.invitingGeninParticipantRef||null,relationshipStateGranted:false,futureReunionGuaranteed:false}; break;
+    case "KAK-01": qualifies=["secured","lost","unresolved"].includes(fact.packageDisposition); payload={evidenceKind:"package_disposition",packageDisposition:fact.packageDisposition||null,packageInstanceRef:fact.packageInstanceRef||null}; break;
+    case "KAK-02": qualifies=["low","mixed","high"].includes(fact.retrievalIntelligenceClass); payload={evidenceKind:"retrieval_intelligence",intelligenceClass:fact.retrievalIntelligenceClass||null,observerKnowledgeBasis:cloneOriginConsequenceValue(fact.observerKnowledgeBasis),intelligenceStatGranted:false}; break;
+    case "KAK-03": qualifies=fact.qualifyingParticipantOrCustodyInteractionOccurred===true; payload={historyKind:"retrieval_participation_and_custody",participantRefs:Array.isArray(fact.participantRefs)?cloneProgressionData(fact.participantRefs):[],packageInstanceRef:fact.packageInstanceRef||null,custodyFacts:cloneOriginConsequenceValue(fact.custodyFacts)}; break;
+    case "OBI-01": qualifies=fact.obitoCausalContributionEstablished===true; payload={evidenceKind:"diversion_contribution",contribution:cloneOriginConsequenceValue(fact.obitoContribution),beneficiaryRefs:Array.isArray(fact.beneficiaryRefs)?cloneProgressionData(fact.beneficiaryRefs):[],delayConsequence:cloneOriginConsequenceValue(fact.delayConsequence),worldOutcome:cloneOriginConsequenceValue(fact.worldOutcome)}; break;
+    case "OBI-02": qualifies=fact.formalTrainingEntitlement==="FULL"; payload={currentStatDeltas:{Ninjutsu:1,Taijutsu:1,Bukijutsu:1,Stamina:1},directPLGrant:null,recomputeCurrentPL:true}; break;
+    case "OBI-03": qualifies=fact.formalTrainingEntitlement==="SUBSTANTIAL"; payload={currentStatDeltas:{Ninjutsu:1,Taijutsu:1,Bukijutsu:1},directPLGrant:null,recomputeCurrentPL:true}; break;
+    case "OBI-04": qualifies=fact.formalTrainingEntitlement==="REDUCED"; payload={currentStatDeltas:{Ninjutsu:1,Taijutsu:1},directPLGrant:null,recomputeCurrentPL:true}; break;
+    case "OBI-05": qualifies=fact.formalTrainingEntitlement==="MINIMAL"; payload={currentStatDeltas:{Taijutsu:1},directPLGrant:null,recomputeCurrentPL:true}; break;
+    default: return {qualifies:false,reason:"origin_consequence_not_static_source_bound",sourceOccurrenceId};
+  }
+
+  return {
+    qualifies:qualifies===true,
+    reason:qualifies===true?null:"qualification_predicate_not_satisfied",
+    rowId,
+    sourceOccurrenceId,
+    descriptor,
+    qualificationFacts:{committed:true,actorVariantId:descriptor.originVariantId,...cloneProgressionData(fact)},
+    payload:payload||{}
+  };
+}
+
+function consumeStaticOriginSourceOccurrence(rowId,sourceEnvelope={}) {
+  const evaluated=evaluateStaticOriginConsequenceQualification(rowId,sourceEnvelope);
+  if (!evaluated.qualifies) return {success:false,reason:evaluated.reason||"qualification_predicate_not_satisfied",rowId,sourceOccurrenceId:evaluated.sourceOccurrenceId||null,receipt:null};
+  const committed=commitOriginConsequenceReceipt({
+    sourceOccurrenceId:evaluated.sourceOccurrenceId,
+    consequenceContractId:evaluated.descriptor.consequenceContractId,
+    qualificationFacts:evaluated.qualificationFacts,
+    payload:evaluated.payload,
+    causalAncestry:Array.isArray(sourceEnvelope.causalAncestry)?sourceEnvelope.causalAncestry:(Array.isArray(sourceEnvelope.sourceRefs)?sourceEnvelope.sourceRefs:[])
+  });
+  return {...committed,rowId,sourceOccurrenceId:evaluated.sourceOccurrenceId};
+}
+
 function commitOriginConsequenceReceipt(request={}) {
   const sourceOccurrenceId=typeof request.sourceOccurrenceId==="string"?request.sourceOccurrenceId.trim():"";
   const consequenceContractId=typeof request.consequenceContractId==="string"?request.consequenceContractId.trim():"";
@@ -90918,17 +91080,40 @@ function commitOriginConsequenceReceipt(request={}) {
 
   const descriptor=getImplementableOriginConsequenceDescriptor(consequenceContractId);
   if (!descriptor) return {success:false,reason:"consequence_contract_not_executable"};
+  if (Array.isArray(descriptor.sourceOccurrenceIds)&&descriptor.sourceOccurrenceIds.length>0&&!descriptor.sourceOccurrenceIds.includes(sourceOccurrenceId)) {
+    return {success:false,reason:"source_occurrence_id_not_authoritative"};
+  }
 
   const address=createOriginConsequenceAddress(sourceOccurrenceId,consequenceContractId);
   const state=ensurePlayerOriginConsequenceState();
   const existing=state.receipts.find(entry=>entry.address===address);
   if (existing) return {success:true,idempotent:true,receipt:cloneProgressionData(existing)};
 
+  if (descriptor.exclusivityFamily) {
+    const exclusiveConflict=state.receipts.find(entry=>{
+      const otherDescriptor=getImplementableOriginConsequenceDescriptor(entry.consequenceContractId);
+      return otherDescriptor&&
+        otherDescriptor.originVariantId===descriptor.originVariantId&&
+        otherDescriptor.exclusivityFamily===descriptor.exclusivityFamily&&
+        entry.consequenceContractId!==consequenceContractId;
+    });
+    if (exclusiveConflict) {
+      return {
+        success:false,
+        reason:"exclusive_origin_consequence_already_committed",
+        exclusivityFamily:descriptor.exclusivityFamily,
+        existingAddress:exclusiveConflict.address
+      };
+    }
+  }
+
   const receipt={
     address,
     originVariantId:descriptor.originVariantId,
     sourceOccurrenceId,
     consequenceContractId,
+    rowId:descriptor.rowId,
+    exclusivityFamily:descriptor.exclusivityFamily||null,
     qualificationFacts:request.qualificationFacts&&typeof request.qualificationFacts==="object"?cloneProgressionData(request.qualificationFacts):{},
     payload:request.payload&&typeof request.payload==="object"?cloneProgressionData(request.payload):{},
     consumer:descriptor.consumer,
@@ -91383,12 +91568,12 @@ function runAlphaOriginConsequenceAddressingDiagnostics() {
     result.distinctOccurrenceCreatesDistinctReceipt=other.success===true&&ensurePlayerOriginConsequenceState().receipts.filter(entry=>entry.consequenceContractId==="academy_menma_kinjutsu_use_evidence").length===3;
 
     const blocked=rejectBlockedOriginConsequenceExecution("MEN-04","guessed_from_story_scene");
-    result.blockedRowCannotExecute=blocked.success===false&&blocked.reason==="source_occurrence_binding_blocked"&&blocked.guessedAddressUsed===false;
+    result.guessedSourceRejected=consumeStaticOriginSourceOccurrence("MEN-04",{sourceOccurrenceId:"guessed_from_story_scene",committed:true,actorVariantId:"academy_menma",fact:{ankoTrainingInterestExpressed:true}}).reason==="source_occurrence_id_not_authoritative";
 
     const addr=createOriginConsequenceAddress("combat_occurrence_42","academy_menma_kinjutsu_use_evidence");
     result.addressUsesSourcePlusContract=addr.includes("combat_occurrence_42")&&addr.includes("academy_menma_kinjutsu_use_evidence")&&!addr.includes("academy_menma::");
-    result.exactThreeExecutableContracts=Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3;
-    result.remainingThirtyThreeRowsBlocked=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33;
+    result.exactThirtySixExecutableContracts=Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===36;
+    result.noOriginSourceRowsBlocked=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0;
 
     const runtimeSource=[createOriginConsequenceAddress,commitOriginConsequenceReceipt,consumeMenmaQualifyingActionOccurrence].map(fn=>fn.toString()).join("\n");
     result.noGenericOriginRewardSystem=!runtimeSource.includes("originBonus")&&!runtimeSource.includes("Origin XP")&&!runtimeSource.includes("morality")&&!runtimeSource.includes("genericOrigin");
@@ -91492,7 +91677,7 @@ function runAlphaPost1199IntegrationDiagnostics() {
     final116UiPortraitAuthority:"0/14 DURABLY RATIFIED",
     final116AdmissionStatus:"blocked_ui_portrait_projection_and_registry_ratification",
     practicalGeometryStatus:"asset_reframe_required",
-    originConsequenceStatus:"MEN-01/MEN-02 runtime_ready; 34 rows source-occurrence blocked",
+    originConsequenceStatus:"36/36 source-addressable; owner-domain effects remain authority-owned",
     outside116AwaitingPlacement:["kage_madara","pakkun","black_zetsu","reborn_kurama"],
     nextImplementedBrick:1199,
     browserGoldenStatus:pass?"GREEN":"CHECK"
@@ -91852,7 +92037,10 @@ function auditOriginConsequenceStateIntegrity(stateInput) {
     seen.add(expectedAddress);
     const descriptor=getImplementableOriginConsequenceDescriptor(receipt.consequenceContractId);
     if (!descriptor) anomalies.push({index,type:"non_executable_contract_persisted",consequenceContractId:receipt.consequenceContractId});
-    else if (receipt.originVariantId!==descriptor.originVariantId) anomalies.push({index,type:"origin_provenance_mismatch",expectedOrigin:descriptor.originVariantId,actualOrigin:receipt.originVariantId||null});
+    else {
+      if (receipt.originVariantId!==descriptor.originVariantId) anomalies.push({index,type:"origin_provenance_mismatch",expectedOrigin:descriptor.originVariantId,actualOrigin:receipt.originVariantId||null});
+      if (Array.isArray(descriptor.sourceOccurrenceIds)&&descriptor.sourceOccurrenceIds.length>0&&!descriptor.sourceOccurrenceIds.includes(receipt.sourceOccurrenceId)) anomalies.push({index,type:"non_authoritative_source_occurrence_id",sourceOccurrenceId:receipt.sourceOccurrenceId,rowId:descriptor.rowId});
+    }
     if (receipt.committed!==true) anomalies.push({index,type:"uncommitted_receipt_persisted"});
     if (!committedAddresses.includes(expectedAddress)) anomalies.push({index,type:"receipt_missing_from_committed_address_set",address:expectedAddress});
     if (receipt.consequenceContractId===ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN02.consequenceContractId) {
@@ -91924,7 +92112,7 @@ function runAlphaOriginConsequenceIntegrityDiagnostics() {
     result.committedPairIntegrityGreen=consumed.success===true&&integrity.pass===true&&integrity.receiptCount===2;
 
     const policies=getBlockedOriginConsequenceMatrixStatus();
-    result.exactPublishedExecutableVsBlocked=policies.executableCount===3&&policies.blockedCount===33&&policies.totalPublishedRows===36;
+    result.exactPublishedExecutableVsBlocked=policies.executableCount===36&&policies.blockedCount===0&&policies.totalPublishedRows===36;
     result.men03Executable=getOriginConsequenceExecutionPolicy("MEN-03").executable===true&&getOriginConsequenceExecutionPolicy("MEN-03").sourceBinding===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID;
     result.unknownRowStillBlocked=getOriginConsequenceExecutionPolicy("FAKE-99").executable===false;
 
@@ -92909,8 +93097,8 @@ function runAlphaJourneyAuthorityBoundaryDiagnostics() {
     promotionNotRepresentationSwap:!recordOwnedCharacterGeninPromotion.toString().includes("ninjaIdentityVariantId=")&&!recordOwnedCharacterGeninPromotion.toString().includes("chronicleOriginVariantId="),
     geninTransitionNotAcquisition:confirmGeninRosterTransition.toString().includes("acquisitionRewardGranted:false")&&!confirmGeninRosterTransition.toString().includes("commitCharacterAcquisition"),
     joninLeaderAssignmentNotOwnership:selectGeninRosterTransitionJoninLeader.toString().includes("collectibleOwnershipRequired:false")&&!selectGeninRosterTransitionJoninLeader.toString().includes("grantCharacterRegistryOwnership"),
-    unresolvedOriginRowsStillBlocked:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33&&ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
-    men01Men02Men03Executable:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3&&Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).every(row=>row.status===ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE),
+    allOriginRowsSourceBound:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0&&Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===36,
+    allOriginRowsExecutable:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===36&&Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).every(row=>row.status===ORIGIN_CONSEQUENCE_STATUS.IMPLEMENTABLE),
     noPracticalAuthorityInvented:getPracticalDesktopSourceIntegrationPlan({}).ready===false,
     production116IndependentFromPlayerOwnership:ALPHA_PRODUCTION_CHARACTER_IDS.length===98&&ALPHA_PRODUCTION_ENTITY_IDS.length===18&&createDefaultCharacterOwnershipState().ownedRegistryIds.length===0,
     combatFreezeNoJourneyMutation:!source.includes("random ±10%")&&!source.includes("elite*1.25")
@@ -92962,7 +93150,7 @@ function runAlphaPost1489IntegrationDiagnostics() {
     saveLoadBoundaryStatus:reloads.pass?"GREEN":"CHECK",
     final116BinaryQAStatus:window.__SC_FINAL116_BINARY_QA__&&window.__SC_FINAL116_BINARY_QA__.pass===true?"GREEN":"REQUIRES_REAL_ASSET_LOAD",
     practicalStatus:getPracticalDesktopSourceIntegrationPlan({}).ready?"READY":"WAITING_ON_PHYSICAL_1536x1102_MASTER",
-    originConsequenceStatus:"MEN-01/MEN-02 executable; 34 source-occurrence blocked",
+    originConsequenceStatus:"36/36 source-addressable; owner-domain effects remain authority-owned",
     portraitReconciliationStatus:"SEPARATE_CURRENT_HEAD_ASSET_RECONCILIATION_NOT_INFERRED",
     combatFreezePreserved:true,
     nextImplementedBrick:1489
@@ -94556,6 +94744,167 @@ function runAlphaImplementedJourneyWallDiagnostics() {
 // =========================================================
 // BRICKS 1818–1827 — ORIGIN CONSEQUENCE AUTHORITY WALL
 // =========================================================
+const ACADEMY_ORIGIN_ISSUE34_EXPECTED_SOURCE_BINDINGS=Object.freeze({
+  "HIN-01":Object.freeze(["occ_origin_hinata_controlled_hyuga_spar_resolution"]),
+  "HIN-02":Object.freeze(["occ_origin_hinata_younger_student_practice_resolution"]),
+  "HIN-03":Object.freeze(["occ_origin_hinata_younger_student_practice_resolution"]),
+  "IZU-01":Object.freeze(["occ_origin_izuno_pursuit_tracking_resolution"]),
+  "IZU-02":Object.freeze(["occ_origin_izuno_intercept_prediction_resolution"]),
+  "IZU-03":Object.freeze(["occ_origin_izuno_pursuit_cooperation_resolution"]),
+  "IZU-04":Object.freeze(["occ_origin_izuno_rogue_genin_interruption_resolution"]),
+  "MIR-01":Object.freeze(["occ_origin_mirai_substitution_verification_resolution"]),
+  "MIR-02":Object.freeze(["occ_origin_mirai_changed_chakra_observation"]),
+  "MIR-03":Object.freeze(["occ_origin_mirai_checkpoint_escort_resolution"]),
+  "MEN-04":Object.freeze(["occ_origin_menma_anko_training_interest_response"]),
+  "MEN-05":Object.freeze(["occ_origin_menma_nine_tails_internal_exchange"]),
+  "KUS-01":Object.freeze(["occ_origin_kushina_residual_seal_work_resolution"]),
+  "KUS-02":Object.freeze(["occ_origin_kushina_gerotora_identity_disclosure"]),
+  "KUS-03":Object.freeze(["occ_origin_kushina_gerotora_causal_explanation"]),
+  "KUS-04":Object.freeze(["occ_origin_kushina_joint_residual_seal_closure"]),
+  "KUS-05":Object.freeze(["occ_origin_kushina_gerotora_first_contact"]),
+  "KUR-01":Object.freeze(["occ_origin_kurenai_bell_test_resolution"]),
+  "KUR-02":Object.freeze(["occ_origin_kurenai_bell_test_resolution"]),
+  "IWA-01":Object.freeze(["occ_origin_iwabee_training_ground_reshape_resolution"]),
+  "IWA-02":Object.freeze(["occ_origin_iwabee_rogue_genin_response_resolution"]),
+  "MET-01":Object.freeze(["occ_origin_metal_private_training_resolution"]),
+  "MET-02":Object.freeze(["occ_origin_metal_pressured_performance_resolution"]),
+  "MET-03":Object.freeze(["occ_origin_metal_protective_response_resolution"]),
+  "MET-04":Object.freeze(["occ_origin_metal_inviting_genin_prior_contact"]),
+  "KAK-01":Object.freeze(["occ_origin_kakashi_anbu_retrieval_resolution"]),
+  "KAK-02":Object.freeze(["occ_origin_kakashi_anbu_retrieval_resolution"]),
+  "KAK-03":Object.freeze(["occ_origin_kakashi_anbu_retrieval_resolution"]),
+  "OBI-01":ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS,
+  "OBI-02":Object.freeze(["occ_origin_obito_formal_training_entitlement_resolution"]),
+  "OBI-03":Object.freeze(["occ_origin_obito_formal_training_entitlement_resolution"]),
+  "OBI-04":Object.freeze(["occ_origin_obito_formal_training_entitlement_resolution"]),
+  "OBI-05":Object.freeze(["occ_origin_obito_formal_training_entitlement_resolution"])
+});
+
+function buildIssue34OriginSourceDiagnosticEnvelope(rowId,sourceOccurrenceIdOverride=null,factOverride=null) {
+  const descriptor=getOriginConsequenceContractDescriptorByRowId(rowId);
+  const sourceOccurrenceId=sourceOccurrenceIdOverride||(descriptor&&descriptor.sourceOccurrenceIds&&descriptor.sourceOccurrenceIds[0])||"";
+  const facts={
+    "HIN-01":{controlledSparCompleted:true,demonstratedResponses:["observe","adapt"]},
+    "HIN-02":{youngerStudentChoice:"stay_and_watch",selfTaijutsuLearningOccurred:true},
+    "HIN-03":{youngerStudentChoice:"show_movement",youngerStudentParticipantRef:"diag_younger_student"},
+    "IZU-01":{reliableEnvironmentalTrackingEstablished:true,falseTrailCorrectlyDiscovered:false},
+    "IZU-02":{interceptReachedByPrediction:true},
+    "IZU-03":{cooperatedWithAcademyStudents:true,cooperatingParticipantRefs:["diag_student_a"]},
+    "IZU-04":{rogueGeninInterruptionResolvedByWasabiAction:true,rogueGeninResponse:"intervened",battleOccurrenceIds:[]},
+    "MIR-01":{substitutionVerifiedBeforeCheckpoint:true,verificationBasis:"diag_basis"},
+    "MIR-02":{changedOrUnfamiliarChakraObserved:true,observedChakraDifference:"diag_difference"},
+    "MIR-03":{personTravellingWithMiraiReachedCheckpointProtected:true,substitutionVerifiedBeforeCheckpoint:false},
+    "MEN-04":{ankoTrainingInterestExpressed:true},
+    "MEN-05":{nineTailsInternalExchangeOccurred:true},
+    "KUS-01":{qualifyingFuinjutsuWorkCompleted:true},
+    "KUS-02":{gerotoraCommunicatedOwnIdentity:true},
+    "KUS-03":{gerotoraExplainedResidualFormulaInference:true},
+    "KUS-04":{jointResidualSealClosureWithGerotora:true},
+    "KUS-05":{gerotoraFirstContactOccurred:true},
+    "KUR-01":{bellTestOutcomeClass:"complete_loss"},
+    "KUR-02":{bellTestOutcomeClass:"partial_win"},
+    "IWA-01":{trainingGroundReshapeObjectiveCompletedByIwabee:true},
+    "IWA-02":{earthReleaseUsedToConstrainRogueGenin:true,rogueGeninParticipantRef:"iwabee_origin_rogue_genin_01"},
+    "MET-01":{qualifyingPrivateTaijutsuOrConditioningWorkCompleted:true,observerDiscoveryOccurredAfterQualifyingPrivateWork:true},
+    "MET-02":{pressuredPerformanceClass:"strong"},
+    "MET-03":{protectiveResponseAttempted:true,protectiveResponseKind:"intercept",protectiveResponseOutcome:"protected"},
+    "MET-04":{invitingGeninEncounterOccurred:true,invitingGeninParticipantRef:"metal_origin_inviting_genin"},
+    "KAK-01":{packageDisposition:"secured",packageInstanceRef:"kakashi_origin_outer_route_packet"},
+    "KAK-02":{retrievalIntelligenceClass:"mixed",observerKnowledgeBasis:"diag_observation"},
+    "KAK-03":{qualifyingParticipantOrCustodyInteractionOccurred:true,participantRefs:["kakashi_origin_information_broker"],packageInstanceRef:"kakashi_origin_outer_route_packet",custodyFacts:["broker_to_kakashi"]},
+    "OBI-01":{diversionType:"furniture_assistance",obitoCausalContributionEstablished:true,obitoContribution:"assisted",beneficiaryRefs:["obito_origin_furniture_civilian"],delayConsequence:"delayed",worldOutcome:"resolved"},
+    "OBI-02":{formalTrainingEntitlement:"FULL"},
+    "OBI-03":{formalTrainingEntitlement:"SUBSTANTIAL"},
+    "OBI-04":{formalTrainingEntitlement:"REDUCED"},
+    "OBI-05":{formalTrainingEntitlement:"MINIMAL"}
+  };
+  return {sourceOccurrenceId,committed:true,actorVariantId:descriptor?descriptor.originVariantId:null,fact:factOverride||facts[rowId]||{}};
+}
+
+function runAlphaIssue34OriginSourceBindingDiagnostics() {
+  const rawSave=typeof localStorage!=="undefined"?localStorage.getItem(PLAYER_SAVE_KEY):null;
+  const rollback=cloneProgressionData(playerData);
+  const result={};
+  try {
+    playerData=createDefaultPlayerData();
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const staticRows=Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).filter(row=>!["MEN-01","MEN-02","MEN-03"].includes(row.rowId));
+    result.exactThirtyThreeStaticRows=staticRows.length===33;
+    result.allThirtyThreeHaveExactAuthority=staticRows.every(row=>Array.isArray(row.sourceOccurrenceIds)&&row.sourceOccurrenceIds.length>=1&&row.sourceOccurrenceIds.every(id=>typeof id==="string"&&id.startsWith("occ_origin_")));
+    result.exactThirtyThreeMatrixMatchesDurableAuthority=Object.keys(ACADEMY_ORIGIN_ISSUE34_EXPECTED_SOURCE_BINDINGS).length===33&&staticRows.every(row=>JSON.stringify(row.sourceOccurrenceIds)===JSON.stringify(ACADEMY_ORIGIN_ISSUE34_EXPECTED_SOURCE_BINDINGS[row.rowId]));
+    result.allThirtyThreeExactPredicatesQualify=staticRows.every(row=>evaluateStaticOriginConsequenceQualification(row.rowId,buildIssue34OriginSourceDiagnosticEnvelope(row.rowId)).qualifies===true);
+    result.obi01ExactFiveIndependentSources=JSON.stringify(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.OBI01.sourceOccurrenceIds)===JSON.stringify(ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS)&&ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS.length===5;
+    result.noBlockedSourceRowsRemain=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0;
+
+    const nonExclusiveRows=staticRows.filter(row=>!["MIR-03","KUR-02","OBI-03","OBI-04","OBI-05"].includes(row.rowId));
+    const commits=nonExclusiveRows.map(row=>consumeStaticOriginSourceOccurrence(row.rowId,buildIssue34OriginSourceDiagnosticEnvelope(row.rowId)));
+    result.authoritativeRowsCommitOnlyWhenQualified=commits.every(entry=>entry.success===true);
+
+    const beforeWrong=ensurePlayerOriginConsequenceState().receipts.length;
+    const wrong=consumeStaticOriginSourceOccurrence("HIN-01",buildIssue34OriginSourceDiagnosticEnvelope("HIN-01","scene_origin_hinata_guessed"));
+    result.guessedOrDerivedSourceRejected=wrong.success===false&&wrong.reason==="source_occurrence_id_not_authoritative"&&ensurePlayerOriginConsequenceState().receipts.length===beforeWrong;
+    const directWrong=commitOriginConsequenceReceipt({sourceOccurrenceId:"guessed_direct_source",consequenceContractId:"academy_hinata_taijutsu_application_evidence",qualificationFacts:{committed:true},payload:{}});
+    result.lowLevelCommitCannotBypassSourceAuthority=directWrong.success===false&&directWrong.reason==="source_occurrence_id_not_authoritative";
+
+    const precommit=consumeStaticOriginSourceOccurrence("MEN-04",{...buildIssue34OriginSourceDiagnosticEnvelope("MEN-04"),committed:false});
+    result.precommitCreatesNoConsequence=precommit.success===false&&precommit.reason==="source_occurrence_not_committed";
+
+    const noPredicate=consumeStaticOriginSourceOccurrence("HIN-02",buildIssue34OriginSourceDiagnosticEnvelope("HIN-02",null,{youngerStudentChoice:"leave_them_to_figure_it_out",selfTaijutsuLearningOccurred:false}));
+    result.factualOccurrenceDoesNotAutoQualify=noPredicate.success===false&&noPredicate.reason==="qualification_predicate_not_satisfied";
+
+    const kakSource="occ_origin_kakashi_anbu_retrieval_resolution";
+    const kakReceipts=ensurePlayerOriginConsequenceState().receipts.filter(entry=>entry.sourceOccurrenceId===kakSource);
+    result.kakashiSameSourceThreeMeaningsRemainSeparate=kakReceipts.length===3&&new Set(kakReceipts.map(entry=>entry.consequenceContractId)).size===3&&kakReceipts.some(entry=>entry.payload.evidenceKind==="package_disposition")&&kakReceipts.some(entry=>entry.payload.evidenceKind==="retrieval_intelligence")&&kakReceipts.some(entry=>entry.payload.historyKind==="retrieval_participation_and_custody");
+
+    const obiBaseCount=ensurePlayerOriginConsequenceState().receipts.filter(entry=>entry.consequenceContractId==="academy_obito_diversion_contribution_evidence").length;
+    ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS.slice(1).forEach((sourceId,index)=>{
+      consumeStaticOriginSourceOccurrence("OBI-01",buildIssue34OriginSourceDiagnosticEnvelope("OBI-01",sourceId,{diversionType:["scattered_vegetables","lost_academy_equipment","overturned_delivery","runaway_cart"][index],obitoCausalContributionEstablished:true,obitoContribution:"diag",beneficiaryRefs:[`diag_beneficiary_${index}`],delayConsequence:"diag_delay",worldOutcome:"diag_resolved"}));
+    });
+    const obiReceipts=ensurePlayerOriginConsequenceState().receipts.filter(entry=>entry.consequenceContractId==="academy_obito_diversion_contribution_evidence");
+    result.obi01IndependentOccurrencesNotAggregate=obiBaseCount===1&&obiReceipts.length===5&&new Set(obiReceipts.map(entry=>entry.sourceOccurrenceId)).size===5&&!JSON.stringify(obiReceipts).includes("helpCount");
+
+    const retrySource=ACADEMY_ORIGIN_OBITO_DIVERSION_SOURCE_OCCURRENCE_IDS[0];
+    const receiptCountBeforeRetry=ensurePlayerOriginConsequenceState().receipts.length;
+    const retry=consumeStaticOriginSourceOccurrence("OBI-01",buildIssue34OriginSourceDiagnosticEnvelope("OBI-01",retrySource));
+    result.retryUsesSameCommittedAddress=retry.success===true&&retry.idempotent===true&&ensurePlayerOriginConsequenceState().receipts.length===receiptCountBeforeRetry;
+
+    const mir01=consumeStaticOriginSourceOccurrence("MIR-01",buildIssue34OriginSourceDiagnosticEnvelope("MIR-01"));
+    const mir03=consumeStaticOriginSourceOccurrence("MIR-03",buildIssue34OriginSourceDiagnosticEnvelope("MIR-03"));
+    result.miraiExclusiveFinalResolutionGuard=mir01.success===true&&mir03.success===false&&mir03.reason==="exclusive_origin_consequence_already_committed";
+
+    const kur01=consumeStaticOriginSourceOccurrence("KUR-01",buildIssue34OriginSourceDiagnosticEnvelope("KUR-01"));
+    const kur02=consumeStaticOriginSourceOccurrence("KUR-02",buildIssue34OriginSourceDiagnosticEnvelope("KUR-02"));
+    result.kurenaiExclusiveFinalResolutionGuard=kur01.success===true&&kur02.success===false&&kur02.reason==="exclusive_origin_consequence_already_committed";
+
+    const obi02=consumeStaticOriginSourceOccurrence("OBI-02",buildIssue34OriginSourceDiagnosticEnvelope("OBI-02"));
+    const obi03=consumeStaticOriginSourceOccurrence("OBI-03",buildIssue34OriginSourceDiagnosticEnvelope("OBI-03"));
+    result.obitoTrainingTierExclusiveGuard=obi02.success===true&&obi03.success===false&&obi03.reason==="exclusive_origin_consequence_already_committed";
+    const obitoReceipt=ensurePlayerOriginConsequenceState().receipts.find(entry=>entry.consequenceContractId==="academy_obito_formal_training_full_stats");
+    result.obitoPayloadIsAuthorityReceiptNotHiddenMutation=!!obitoReceipt&&obitoReceipt.payload.directPLGrant===null&&obitoReceipt.payload.recomputeCurrentPL===true&&JSON.stringify(obitoReceipt.payload.currentStatDeltas)===JSON.stringify({Ninjutsu:1,Taijutsu:1,Bukijutsu:1,Stamina:1});
+
+    const beforeSave=cloneProgressionData(ensurePlayerOriginConsequenceState());
+    savePlayerData();
+    const loaded=loadPlayerData();
+    playerData=loaded;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership);
+    const afterLoad=ensurePlayerOriginConsequenceState();
+    result.saveLoadPreservesExactAddresses=afterLoad.receipts.length===beforeSave.receipts.length&&JSON.stringify(afterLoad.committedAddresses.slice().sort())===JSON.stringify(beforeSave.committedAddresses.slice().sort());
+    result.saveLoadIntegrityGreen=auditOriginConsequenceStateIntegrity(afterLoad).pass===true;
+
+    const runtimeSource=[evaluateStaticOriginConsequenceQualification,consumeStaticOriginSourceOccurrence].map(fn=>fn.toString()).join("\n");
+    result.noGenericOriginRewardOrHelperAggregate=!runtimeSource.includes("defaultOriginReward")&&!runtimeSource.includes("originBonus")&&!runtimeSource.includes("helpCount")&&!runtimeSource.includes("morality");
+  } finally {
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    if (typeof localStorage!=="undefined") {
+      if (rawSave===null) localStorage.removeItem(PLAYER_SAVE_KEY); else localStorage.setItem(PLAYER_SAVE_KEY,rawSave);
+    }
+  }
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
 function runAlphaOriginConsequenceCodingWallDiagnostics() {
   const integrity=runAlphaOriginConsequenceIntegrityDiagnostics();
   const normalization=runAlphaOriginConsequenceNormalizationAbuseDiagnostics();
@@ -94563,18 +94912,18 @@ function runAlphaOriginConsequenceCodingWallDiagnostics() {
   const persistence=runAlphaOriginConsequencePersistenceDiagnostics();
   const blockedRows=[...ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS];
   const result={
-    implementedRowsExactlyThree:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3,
+    implementedRowsExactlyThirtySix:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===36,
     men01Executable:getOriginConsequenceExecutionPolicy("MEN-01").executable===true,
     men02Executable:getOriginConsequenceExecutionPolicy("MEN-02").executable===true,
     men03Executable:getOriginConsequenceExecutionPolicy("MEN-03").executable===true,
-    remainingThirtyThreeBlocked:blockedRows.length===33&&blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).executable===false),
-    blockedRowsRejectExecution:blockedRows.every(rowId=>rejectBlockedOriginConsequenceExecution(rowId).success===false),
-    noInventedSourceOccurrenceIds:blockedRows.every(rowId=>getOriginConsequenceExecutionPolicy(rowId).sourceBinding==null),
+    noRemainingOriginSourceRowsBlocked:blockedRows.length===0,
+    allPublishedRowsExecutable:Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).every(row=>getOriginConsequenceExecutionPolicy(row.rowId).executable===true),
+    exactStaticSourcesPublished:Object.values(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).filter(row=>!["MEN-01","MEN-02"].includes(row.rowId)).every(row=>Array.isArray(row.sourceOccurrenceIds)&&row.sourceOccurrenceIds.length>0),
     implementedRegressionGreen:[integrity,normalization,addressing,persistence].every(group=>group&&group.pass===true),
     externalAuthorityRequired:blockedRows.length>0,
     pass:false
   };
-  result.pass=result.implementedRowsExactlyThree&&result.men01Executable&&result.men02Executable&&result.men03Executable&&result.remainingThirtyThreeBlocked&&result.blockedRowsRejectExecution&&result.noInventedSourceOccurrenceIds&&result.implementedRegressionGreen&&result.externalAuthorityRequired;
+  result.pass=result.implementedRowsExactlyThirtySix&&result.men01Executable&&result.men02Executable&&result.men03Executable&&result.noRemainingOriginSourceRowsBlocked&&result.allPublishedRowsExecutable&&result.exactStaticSourcesPublished&&result.implementedRegressionGreen&&result.externalAuthorityRequired===false;
   return {result,blockedRows,groups:{integrity,normalization,addressing,persistence},pass:result.pass};
 }
 
@@ -95807,7 +96156,7 @@ function runAlphaMen03TutorialPerformanceSourceDiagnostics() {
     checks.postBattleHookIsIdempotent=hookRetry.success===true&&hookRetry.idempotent===true&&playerData.activityHistory.filter(record=>record&&record.occurrenceId===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID).length===1&&ensurePlayerOriginConsequenceState().receipts.filter(record=>record&&record.consequenceContractId===ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.consequenceContractId).length===1;
 
     checks.men03PolicyExecutable=getOriginConsequenceExecutionPolicy("MEN-03").executable===true&&getOriginConsequenceExecutionPolicy("MEN-03").sourceBinding===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID;
-    checks.remainingBlockedRowsExactly33=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33&&!ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.includes("MEN-03");
+    checks.remainingBlockedRowsExactlyZero=ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0;
   } finally {
     playerData=priorPlayer;
     setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
@@ -95832,8 +96181,8 @@ function runAlphaPost1969MEN03IntegrationDiagnostics() {
   const checks={
     post1939Preserved:post1939.pass===true,
     men03GoldenGreen:men03.pass===true,
-    exactExecutableRows:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===3,
-    exactRemainingBlockedRows:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===33,
+    exactExecutableRows:Object.keys(ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS).length===36,
+    exactRemainingBlockedRows:ALPHA_BLOCKED_ORIGIN_CONSEQUENCE_ROWS.length===0,
     exactMen03Binding:ALPHA_IMPLEMENTABLE_ORIGIN_CONSEQUENCE_CONTRACTS.MEN03.sourceBinding===MENMA_ORIGIN_TUTORIAL_PERFORMANCE_SOURCE_OCCURRENCE_ID,
     originWallStillGreen:originWall.pass===true,
     noStatsOrPLGrant:!commitMenmaOriginTutorialPerformanceSourceOccurrence.toString().includes("statGrowth")&&!commitMenmaOriginTutorialPerformanceSourceOccurrence.toString().includes("plGrowth"),

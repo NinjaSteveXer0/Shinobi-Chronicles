@@ -1,3 +1,0 @@
-Issue #34 guarded runtime patch trigger — retry 2 after installing Pillow.
-Expected baseline game.js blob: 62b98639d1aad530e0b80723e417eb68edaa7080
-Expected patched game.js blob: 7d923bd5e9162385988ad43730ece8c2eda28897
