@@ -97538,3 +97538,192 @@ function runAlphaPost2174ProjectionMonsterDiagnostics(){
   console.log(`SC Alpha POST-2175 projection monster gate: ${result.pass?"PASS":"FAIL"}`);
   return result;
 }
+
+
+// =========================================================
+// POST-2250 — MY CLAN VISUAL PREVIEW + MASTER MASKING MONSTER
+// BRICKS 2250–2324
+// =========================================================
+// Browser follow-up to POST-2175.
+//
+// Goals:
+// - keep UI master art as an optional placement/polish layer;
+// - never mutate ownership merely to make the roster look populated;
+// - provide localhost-only visual card samples when a save owns zero shinobi;
+// - keep those samples non-interactive and explicitly non-authoritative;
+// - fully mask illustrative baked toolbar/counter copy with runtime controls;
+// - increase browse card scale so full collectibleCard geometry is readable;
+// - keep master-off code-only mode functional.
+// =========================================================
+
+const ALPHA_MY_CLAN_VISUAL_PREVIEW_IDS=Object.freeze([
+  "academy_hinata",
+  "academy_menma",
+  "jonin_sasuke",
+  "sannin_sakura",
+  "kage_naruto"
+]);
+
+const ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE={enabled:null};
+
+function isMyClanLocalVisualPreviewEnvironment(){
+  if (typeof window==="undefined"||!window.location) return false;
+  const host=String(window.location.hostname||"").toLowerCase();
+  return host==="127.0.0.1"||host==="localhost"||host==="::1"||window.location.protocol==="file:";
+}
+
+function setMyClanVisualPreviewEnabled(enabled=true){
+  ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled=enabled===true;
+  if (typeof currentOverlayType!=="undefined"&&(currentOverlayType==="clan"||currentOverlayType==="roster")) rerenderClanOverlay();
+  return {
+    success:true,
+    enabled:ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled,
+    ownershipMutated:false,
+    saveStateMutated:false,
+    presentationOnly:true
+  };
+}
+
+function clearMyClanVisualPreviewOverride(){
+  ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled=null;
+  if (typeof currentOverlayType!=="undefined"&&(currentOverlayType==="clan"||currentOverlayType==="roster")) rerenderClanOverlay();
+  return {success:true,mode:"automatic_localhost_only",ownershipMutated:false};
+}
+
+function isMyClanVisualPreviewEnabled(rosterCount=getClanManageableRosterCharacters().length){
+  if (ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled===true) return rosterCount===0;
+  if (ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled===false) return false;
+  return rosterCount===0&&isMyClanLocalVisualPreviewEnvironment();
+}
+
+function isMyClanVisualPreviewProjectionEligible(){
+  return String(CLAN_UI_STATE.searchText||"").trim()===""&&
+    (CLAN_UI_STATE.railFilter||"all")==="all"&&
+    (CLAN_UI_STATE.rankFilter||"all")==="all"&&
+    (CLAN_UI_STATE.affiliationFilter||"all")==="all"&&
+    (CLAN_UI_STATE.filterId||"all")==="all";
+}
+
+function getMyClanVisualPreviewEntries(){
+  return ALPHA_MY_CLAN_VISUAL_PREVIEW_IDS.map(registryId=>{
+    const registry=typeof getCharacterRegistryEntry==="function"?getCharacterRegistryEntry(registryId):null;
+    const cardPath=typeof getCharacterCardAssetPath==="function"
+      ?getCharacterCardAssetPath(registryId)
+      :(assetManifest&&assetManifest.characterCards?assetManifest.characterCards[registryId]:null);
+    if (!cardPath) return null;
+    const name=registry&&(registry.name||registry.displayName||registry.characterName)
+      ?String(registry.name||registry.displayName||registry.characterName)
+      :registryId.replace(/_/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+    return {registryId,name,cardPath};
+  }).filter(Boolean);
+}
+
+function createMyClanVisualPreviewCard(entry){
+  if (!entry) return "";
+  return `<article class="my-clan-roster-card is-visual-preview" aria-label="${escapeStorySceneHTML(entry.name)} visual preview only; not owned">
+    <div class="my-clan-card-hitbox my-clan-preview-card-hitbox" aria-disabled="true">
+      <img class="my-clan-collectible-card" src="${escapeStorySceneHTML(entry.cardPath)}" alt="${escapeStorySceneHTML(entry.name)} collectible card visual preview" draggable="false">
+      <span class="my-clan-preview-card-badge">PREVIEW</span>
+    </div>
+  </article>`;
+}
+
+function getMyClanRosterProjectionMarkup(roster,visible){
+  if (visible.length) return {markup:visible.map(createClanCard).join(""),preview:false,previewCount:0};
+  const previewEligible=roster.length===0&&isMyClanVisualPreviewEnabled(roster.length)&&isMyClanVisualPreviewProjectionEligible();
+  if (previewEligible) {
+    const entries=getMyClanVisualPreviewEntries();
+    if (entries.length) {
+      return {
+        markup:`<div class="my-clan-preview-banner"><strong>VISUAL PREVIEW</strong><span>${entries.length} approved collectible cards · not owned · no save-state mutation</span></div>${entries.map(createMyClanVisualPreviewCard).join("")}`,
+        preview:true,
+        previewCount:entries.length
+      };
+    }
+  }
+  return {markup:`<div class="my-clan-empty-roster">No owned shinobi match the current filters.</div>`,preview:false,previewCount:0};
+}
+
+function refreshMyClanRosterProjection(){
+  if (typeof document==="undefined") return false;
+  const grid=document.querySelector(".my-clan-roster-grid");
+  const showing=document.querySelector("[data-my-clan-showing-count]");
+  const owned=document.querySelector("[data-my-clan-owned-count]");
+  if (!grid) return false;
+  const roster=getClanManageableRosterCharacters();
+  const visible=getMyClanVisibleCharacters();
+  const projection=getMyClanRosterProjectionMarkup(roster,visible);
+  grid.innerHTML=projection.markup;
+  grid.classList.toggle("is-visual-preview",projection.preview===true);
+  if (showing) showing.textContent=String(visible.length);
+  if (owned) owned.textContent=String(roster.length);
+  return true;
+}
+
+function renderClanOverlay(container){
+  if (!container) return false;
+  ensureClanManagementState();
+  ensureMyClanAdaptiveStaging();
+  const roster=getClanManageableRosterCharacters();
+  if (CLAN_UI_STATE.selectedCharacterId&&!roster.some(character=>character.id===CLAN_UI_STATE.selectedCharacterId)) {
+    CLAN_UI_STATE.viewMode="browse";
+    CLAN_UI_STATE.selectedCharacterId=null;
+    CLAN_UI_STATE.inspectionTab="overview";
+  }
+  const inspection=CLAN_UI_STATE.viewMode==="inspection"&&!!CLAN_UI_STATE.selectedCharacterId;
+  const selected=inspection?getPlayerCharacter(CLAN_UI_STATE.selectedCharacterId):null;
+  const visible=getMyClanVisibleCharacters();
+  const projection=getMyClanRosterProjectionMarkup(roster,visible);
+  const options=getMyClanRosterFilterOptions();
+  const assetPath=inspection?ALPHA_MY_CLAN_ASSETS.inspection:ALPHA_MY_CLAN_ASSETS.browse;
+  const masterEnabled=isAlphaUIMasterEnabled("myClan");
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if (overlay) overlay.classList.add("my-clan-adaptive-open");
+  container.innerHTML=`<div class="my-clan-adaptive-screen ${inspection?"is-inspection":"is-browse"}" data-my-clan-state="${inspection?"inspection":"browse"}">
+    <div class="my-clan-stage ${masterEnabled?"is-master-art-on":"is-master-art-off"}" style="--my-clan-master:${masterEnabled?`url('${assetPath}')`:"none"}">
+      <div class="my-clan-fallback-title" aria-hidden="true"><strong>MY CLAN</strong><span>Operational roster and formation</span></div>
+      <button type="button" class="my-clan-screen-close" onclick="closeOverlay()" aria-label="Close My Clan">✕</button>
+      <div class="my-clan-runtime-owned-count"><span>OWNED SHINOBI</span><strong data-my-clan-owned-count>${roster.length}</strong></div>
+      <section class="my-clan-formation" aria-label="Battle Formation">${Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>createMyClanFormationSlot(index+1)).join("")}</section>
+      <div class="my-clan-formation-actions" aria-label="Formation actions">
+        <button type="button" class="my-clan-clear" onclick="clearMyClanStagedFormation()"><span>CLEAR TEAM</span></button>
+        <button type="button" class="my-clan-save" onclick="saveMyClanStagedFormation()" ${CLAN_UI_STATE.formationDirty?"":"disabled"}><span>SAVE FORMATION</span></button>
+        ${CLAN_UI_STATE.formationDirty?`<button type="button" class="my-clan-reset" onclick="resetMyClanStagedFormation()">RESET</button><span class="my-clan-dirty is-dirty">UNSAVED</span>`:""}
+      </div>
+      ${createMyClanRailHitLayer()}
+      ${createMyClanRuntimeToolbar(options)}
+      <div class="my-clan-runtime-showing-count">SHOWING <strong data-my-clan-showing-count>${visible.length}</strong></div>
+      <section class="my-clan-roster-workspace" aria-label="Owned Shinobi roster">
+        <div class="my-clan-roster-grid ${projection.preview?"is-visual-preview":""}">${projection.markup}</div>
+      </section>
+      ${inspection?renderMyClanInspectionContent(selected):""}
+      ${CLAN_UI_STATE.feedback?`<div class="my-clan-feedback is-${escapeStorySceneHTML(CLAN_UI_STATE.feedback.type)}">${escapeStorySceneHTML(CLAN_UI_STATE.feedback.message)}</div>`:""}
+    </div>
+  </div>`;
+  return true;
+}
+
+function runAlphaPost2250MyClanPreviewDiagnostics(){
+  const renderSource=renderClanOverlay.toString();
+  const previewSource=getMyClanRosterProjectionMarkup.toString();
+  const previewCardSource=createMyClanVisualPreviewCard.toString();
+  const result={
+    previewUsesApprovedCardAssets:getMyClanVisualPreviewEntries().length>=5,
+    previewNeverMutatesOwnership:!setMyClanVisualPreviewEnabled.toString().includes("grant")&&!setMyClanVisualPreviewEnabled.toString().includes("ownedRegistryIds")&&setMyClanVisualPreviewEnabled.toString().includes("ownershipMutated:false"),
+    previewNeverMutatesSave:!setMyClanVisualPreviewEnabled.toString().includes("savePlayerData")&&setMyClanVisualPreviewEnabled.toString().includes("saveStateMutated:false"),
+    previewOnlyWhenOwnedRosterEmpty:previewSource.includes("roster.length===0")&&isMyClanVisualPreviewEnabled.toString().includes("rosterCount===0"),
+    localhostAutomaticOnly:isMyClanVisualPreviewEnabled.toString().includes("isMyClanLocalVisualPreviewEnvironment"),
+    previewCardsNotDraggable:!previewCardSource.includes('draggable="true"')&&!previewCardSource.includes("beginMyClanCharacterDrag"),
+    previewCardsNoInspectionMutation:!previewCardSource.includes("selectMyClanCharacterForInspection")&&!previewCardSource.includes("openMyClanCodexShortcut"),
+    runtimeOwnedCountStillAuthority:renderSource.includes("data-my-clan-owned-count>${roster.length}")&&!renderSource.includes("OWNED SHINOBI</span><strong data-my-clan-owned-count>5"),
+    runtimeShowingCountStillOwnedVisible:renderSource.includes("data-my-clan-showing-count>${visible.length}"),
+    masterStillOptional:renderSource.includes("isAlphaUIMasterEnabled")&&typeof setMyClanMasterArtEnabled==="function",
+    fullCardProjectionPreserved:previewCardSource.includes("my-clan-collectible-card")&&createClanCard.toString().includes("my-clan-collectible-card"),
+    filtersDoNotPretendToOwnPreview:isMyClanVisualPreviewProjectionEligible.toString().includes("railFilter")&&isMyClanVisualPreviewProjectionEligible.toString().includes("searchText"),
+    priorProjectionGateGreen:typeof runAlphaPost2174ProjectionMonsterDiagnostics==="function"?runAlphaPost2174ProjectionMonsterDiagnostics().pass===true:true
+  };
+  result.pass=Object.values(result).every(Boolean);
+  console.table(result);
+  return result;
+}
+

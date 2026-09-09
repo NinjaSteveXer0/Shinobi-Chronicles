@@ -16425,3 +16425,90 @@ body {
   .my-clan-runtime-toolbar .my-clan-select,
   .my-clan-runtime-toolbar .my-clan-filter-trigger { padding:0 5px; }
 }
+
+
+/* =========================================================
+   POST-2250 — MY CLAN VISUAL PREVIEW + MASTER MASKING MONSTER
+   BRICKS 2250–2324
+   ========================================================= */
+
+/* Fully cover illustrative placeholder copy inside the master wells. */
+.my-clan-stage.is-master-art-on .my-clan-runtime-toolbar .my-clan-search,
+.my-clan-stage.is-master-art-on .my-clan-runtime-toolbar .my-clan-select,
+.my-clan-stage.is-master-art-on .my-clan-runtime-toolbar .my-clan-filter-trigger {
+  background:linear-gradient(180deg,rgba(8,15,20,.985),rgba(5,11,15,.985));
+  box-shadow:inset 0 0 0 1px rgba(93,121,128,.36),0 1px 3px rgba(0,0,0,.42);
+  color:#cdd7d6;
+}
+.my-clan-stage.is-master-art-on .my-clan-runtime-toolbar .my-clan-search::placeholder { color:#829093; opacity:1; }
+
+/* Runtime counts deliberately mask illustrative baked numbers/text. */
+.my-clan-runtime-owned-count {
+  left:87.0%; top:1.65%; width:9.8%; height:7.25%;
+  background:linear-gradient(180deg,rgba(5,11,15,.995),rgba(4,9,13,.995));
+  box-shadow:0 0 0 1px rgba(176,141,68,.18),0 3px 9px rgba(0,0,0,.28);
+}
+.my-clan-runtime-showing-count {
+  left:82.0%; top:32.85%; width:12.5%; height:4.45%;
+  background:linear-gradient(180deg,rgba(5,11,15,.985),rgba(4,9,13,.985));
+  padding-right:.7%;
+}
+
+/* Full collectible cards are intentionally large; scrolling handles quantity. */
+.my-clan-roster-grid {
+  grid-template-columns:repeat(auto-fill,minmax(clamp(175px,13vw,205px),clamp(175px,13vw,205px)));
+  gap:clamp(12px,1.05vw,17px);
+  padding:1.4% 1.2% 3.0% 1.0%;
+}
+.my-clan-adaptive-screen.is-inspection .my-clan-roster-grid {
+  grid-template-columns:repeat(auto-fill,minmax(clamp(148px,10.2vw,170px),clamp(148px,10.2vw,170px)));
+  gap:clamp(9px,.78vw,13px);
+}
+
+/* Development-only visual samples. They are cards, not ownership. */
+.my-clan-preview-banner {
+  grid-column:1/-1;
+  min-height:28px;
+  display:flex; align-items:center; gap:10px;
+  padding:5px 9px;
+  border-left:2px solid rgba(209,173,79,.74);
+  background:linear-gradient(90deg,rgba(7,14,18,.92),rgba(7,14,18,.44) 72%,transparent);
+  color:#819396;
+  font-size:clamp(7px,.56vw,9px);
+  letter-spacing:.03em;
+}
+.my-clan-preview-banner strong { color:#dfbe65; letter-spacing:.09em; }
+.my-clan-roster-card.is-visual-preview { opacity:.94; }
+.my-clan-preview-card-hitbox { cursor:default; }
+.my-clan-preview-card-hitbox:hover { transform:none; filter:drop-shadow(0 10px 12px rgba(0,0,0,.45)); }
+.my-clan-preview-card-badge {
+  position:absolute; z-index:5; right:4%; top:3%;
+  min-width:48px; height:22px; padding:0 7px;
+  display:flex; align-items:center; justify-content:center;
+  border:1px solid rgba(215,181,92,.78);
+  background:rgba(3,8,11,.92);
+  color:#e2c672;
+  font-size:8px; font-weight:900; letter-spacing:.08em;
+  pointer-events:none;
+}
+
+/* Keep master-off mode genuinely usable rather than merely technically alive. */
+.my-clan-stage.is-master-art-off .my-clan-formation {
+  padding:.8%; border:1px solid rgba(177,142,65,.28); background:rgba(5,11,15,.50);
+}
+.my-clan-stage.is-master-art-off .my-clan-roster-workspace {
+  border:1px solid rgba(177,142,65,.25); background:rgba(4,10,14,.44);
+}
+.my-clan-stage.is-master-art-off .my-clan-runtime-owned-count,
+.my-clan-stage.is-master-art-off .my-clan-runtime-showing-count {
+  background:rgba(5,11,15,.92);
+}
+
+@media(max-width:1100px) {
+  .my-clan-roster-grid {
+    grid-template-columns:repeat(auto-fill,minmax(clamp(150px,15vw,180px),clamp(150px,15vw,180px)));
+  }
+  .my-clan-adaptive-screen.is-inspection .my-clan-roster-grid {
+    grid-template-columns:repeat(auto-fill,minmax(clamp(135px,13vw,155px),clamp(135px,13vw,155px)));
+  }
+}
