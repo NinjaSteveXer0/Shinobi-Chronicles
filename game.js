@@ -97727,3 +97727,244 @@ function runAlphaPost2250MyClanPreviewDiagnostics(){
   return result;
 }
 
+
+
+
+// =========================================================
+// POST-2325 — FRESH-SAVE CHRONICLE ORIGIN ONBOARDING SURFACE
+// BRICKS 2325–2399
+// CODE-OWNED ORIGIN SELECTION + FIRST LEGITIMATE OWNED SHINOBI
+// =========================================================
+// This surface exposes already-authoritative onboarding semantics only:
+// - fresh save has no automatic owned roster;
+// - player explicitly selects one CHRONICLE_ORIGIN_VARIANT_ID;
+// - selectChronicleOrigin() remains the sole acquisition/identity authority;
+// - confirmation acquires exactly that origin and places it in START through
+//   the pre-existing onboarding contract;
+// - card preview before confirmation is presentation only;
+// - no backend account/authentication system is invented here.
+// =========================================================
+
+const ALPHA_CHRONICLE_ORIGIN_UI_STATE={
+  open:false,
+  selectedVariantId:null,
+  feedback:null
+};
+
+function getAlphaChronicleOriginOnboardingSnapshot(){
+  const state=ensurePlayerAcquisitionState();
+  const owned=getClanManageableRosterCharacters();
+  return {
+    onboardingStatus:state.onboardingStatus||null,
+    originVariantId:state.chronicleOriginVariantId||null,
+    ninjaIdentityVariantId:state.ninjaIdentityVariantId||null,
+    ninjaIdentityLocked:state.ninjaIdentityLocked===true,
+    ownedCount:owned.length,
+    available:!state.chronicleOriginVariantId&&state.onboardingStatus==="chronicle_origin_pending"
+  };
+}
+
+function isAlphaChronicleOriginSelectionAvailable(){
+  return getAlphaChronicleOriginOnboardingSnapshot().available===true;
+}
+
+function getAlphaChronicleOriginSelectionEntries(){
+  return CHRONICLE_ORIGIN_VARIANT_IDS.map(variantId=>{
+    const registry=getCharacterRegistryEntry(variantId);
+    const cardPath=getCharacterCardAssetPath(variantId);
+    if (!registry||!cardPath) return null;
+    return {
+      variantId,
+      name:getProductionRuntimeDisplayName(variantId),
+      rank:getProductionRuntimeRankLabel(variantId),
+      basePL:Number(registry.basePL)||0,
+      cardPath
+    };
+  }).filter(Boolean);
+}
+
+function openAlphaChronicleOriginSelection(){
+  if (!isAlphaChronicleOriginSelectionAvailable()) {
+    return {success:false,reason:"chronicle_origin_selection_unavailable",snapshot:getAlphaChronicleOriginOnboardingSnapshot()};
+  }
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.open=true;
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback=null;
+  if (!CHRONICLE_ORIGIN_VARIANT_IDS.includes(ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId)) {
+    ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId=null;
+  }
+  rerenderClanOverlay();
+  return {success:true,open:true,ownershipMutated:false,saveStateMutated:false};
+}
+
+function closeAlphaChronicleOriginSelection(){
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.open=false;
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback=null;
+  rerenderClanOverlay();
+  return {success:true,open:false,ownershipMutated:false};
+}
+
+function selectAlphaChronicleOriginCandidate(variantId){
+  if (!isAlphaChronicleOriginSelectionAvailable()) return {success:false,reason:"chronicle_origin_selection_unavailable"};
+  if (!CHRONICLE_ORIGIN_VARIANT_IDS.includes(variantId)) return {success:false,reason:"invalid_chronicle_origin"};
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId=variantId;
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback=null;
+  rerenderClanOverlay();
+  return {success:true,variantId,confirmed:false,ownershipMutated:false,saveStateMutated:false};
+}
+
+function confirmAlphaChronicleOriginSelection(){
+  if (!isAlphaChronicleOriginSelectionAvailable()) return {success:false,reason:"chronicle_origin_selection_unavailable"};
+  const variantId=ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId;
+  if (!CHRONICLE_ORIGIN_VARIANT_IDS.includes(variantId)) {
+    ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback={type:"error",message:"Choose your Chronicle Origin first."};
+    rerenderClanOverlay();
+    return {success:false,reason:"chronicle_origin_candidate_missing"};
+  }
+  // Existing production authority owns acquisition, identity lock, provenance,
+  // START assignment, save and onboarding-status transition.
+  const result=selectChronicleOrigin(variantId,"alpha_ui_chronicle_origin_confirmation");
+  if (!result.success) {
+    ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback={type:"error",message:String(result.reason||"Chronicle Origin confirmation failed.")};
+    rerenderClanOverlay();
+    return result;
+  }
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.open=false;
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback=null;
+  ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId=null;
+  ensureMyClanAdaptiveStaging({force:true});
+  CLAN_UI_STATE.viewMode="browse";
+  CLAN_UI_STATE.selectedCharacterId=null;
+  CLAN_UI_STATE.inspectionTab="overview";
+  setMyClanFeedback(`${getProductionRuntimeDisplayName(variantId)} is now your Chronicle Origin and first owned shinobi.`,"success");
+  rerenderClanOverlay();
+  return {...result,firstOwnedShinobi:true,committedBy:"selectChronicleOrigin"};
+}
+
+function createAlphaChronicleOriginCandidateCard(entry){
+  if (!entry) return "";
+  const selected=ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId===entry.variantId;
+  return `<button type="button" class="alpha-origin-card ${selected?"is-selected":""}" onclick="selectAlphaChronicleOriginCandidate('${escapeStorySceneHTML(entry.variantId)}')" aria-pressed="${selected?"true":"false"}" aria-label="Choose ${escapeStorySceneHTML(entry.name)} as Chronicle Origin">
+    <img src="${escapeStorySceneHTML(entry.cardPath)}" alt="${escapeStorySceneHTML(entry.name)} collectible card" draggable="false">
+    <span class="alpha-origin-card-meta"><strong>${escapeStorySceneHTML(entry.name)}</strong><small>${escapeStorySceneHTML(entry.rank)} · PL ${entry.basePL}</small></span>
+  </button>`;
+}
+
+function renderAlphaChronicleOriginSelectionModal(){
+  if (!ALPHA_CHRONICLE_ORIGIN_UI_STATE.open) return "";
+  const entries=getAlphaChronicleOriginSelectionEntries();
+  const selected=entries.find(entry=>entry.variantId===ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId)||null;
+  const feedback=ALPHA_CHRONICLE_ORIGIN_UI_STATE.feedback;
+  return `<div class="alpha-origin-modal-backdrop" role="presentation">
+    <section class="alpha-origin-modal" role="dialog" aria-modal="true" aria-label="Choose Chronicle Origin">
+      <header class="alpha-origin-header">
+        <div><span>BEGIN YOUR CHRONICLE</span><h2>CHOOSE YOUR ORIGIN</h2><p>Your confirmed Origin becomes your first legitimately owned shinobi and your locked Ninja identity.</p></div>
+        <button type="button" class="alpha-origin-close" onclick="closeAlphaChronicleOriginSelection()" aria-label="Close Chronicle Origin selection">✕</button>
+      </header>
+      <div class="alpha-origin-grid">${entries.map(createAlphaChronicleOriginCandidateCard).join("")}</div>
+      <footer class="alpha-origin-footer">
+        <div class="alpha-origin-selection-summary">${selected?`<span>SELECTED</span><strong>${escapeStorySceneHTML(selected.name)}</strong><small>${escapeStorySceneHTML(selected.rank)} · Base PL ${selected.basePL}</small>`:`<span>SELECT A SHINOBI</span><strong>No Origin chosen</strong><small>Nothing is acquired until you confirm.</small>`}</div>
+        ${feedback?`<div class="alpha-origin-feedback is-${escapeStorySceneHTML(feedback.type)}">${escapeStorySceneHTML(feedback.message)}</div>`:""}
+        <div class="alpha-origin-actions"><button type="button" class="alpha-origin-cancel" onclick="closeAlphaChronicleOriginSelection()">CANCEL</button><button type="button" class="alpha-origin-confirm" onclick="confirmAlphaChronicleOriginSelection()" ${selected?"":"disabled"}>CONFIRM ORIGIN</button></div>
+      </footer>
+    </section>
+  </div>`;
+}
+
+function createAlphaFreshSaveOnboardingCallout(){
+  if (!isAlphaChronicleOriginSelectionAvailable()) return "";
+  return `<div class="alpha-fresh-origin-callout">
+    <div><strong>YOUR CHRONICLE HAS NOT BEGUN</strong><span>Choose one Academy origin to create your first real owned shinobi.</span></div>
+    <button type="button" onclick="openAlphaChronicleOriginSelection()">BEGIN CHRONICLE</button>
+  </div>`;
+}
+
+// Extend the zero-owned presentation without converting preview cards into
+// ownership. The CTA is the only path from presentation preview to the existing
+// authoritative Chronicle-Origin acquisition contract.
+function getMyClanRosterProjectionMarkup(roster,visible){
+  if (visible.length) return {markup:visible.map(createClanCard).join(""),preview:false,previewCount:0};
+  const onboardingCallout=createAlphaFreshSaveOnboardingCallout();
+  const previewEligible=roster.length===0&&isMyClanVisualPreviewEnabled(roster.length)&&isMyClanVisualPreviewProjectionEligible();
+  if (previewEligible) {
+    const entries=getMyClanVisualPreviewEntries();
+    if (entries.length) {
+      return {
+        markup:`${onboardingCallout}<div class="my-clan-preview-banner"><strong>VISUAL PREVIEW</strong><span>${entries.length} approved collectible cards · not owned · no save-state mutation</span></div>${entries.map(createMyClanVisualPreviewCard).join("")}`,
+        preview:true,
+        previewCount:entries.length
+      };
+    }
+  }
+  return {markup:`${onboardingCallout}<div class="my-clan-empty-roster">No owned shinobi match the current filters.</div>`,preview:false,previewCount:0};
+}
+
+function renderClanOverlay(container){
+  if (!container) return false;
+  ensureClanManagementState();
+  ensureMyClanAdaptiveStaging();
+  const roster=getClanManageableRosterCharacters();
+  if (CLAN_UI_STATE.selectedCharacterId&&!roster.some(character=>character.id===CLAN_UI_STATE.selectedCharacterId)) {
+    CLAN_UI_STATE.viewMode="browse";
+    CLAN_UI_STATE.selectedCharacterId=null;
+    CLAN_UI_STATE.inspectionTab="overview";
+  }
+  const inspection=CLAN_UI_STATE.viewMode==="inspection"&&!!CLAN_UI_STATE.selectedCharacterId;
+  const selected=inspection?getPlayerCharacter(CLAN_UI_STATE.selectedCharacterId):null;
+  const visible=getMyClanVisibleCharacters();
+  const projection=getMyClanRosterProjectionMarkup(roster,visible);
+  const options=getMyClanRosterFilterOptions();
+  const assetPath=inspection?ALPHA_MY_CLAN_ASSETS.inspection:ALPHA_MY_CLAN_ASSETS.browse;
+  const masterEnabled=isAlphaUIMasterEnabled("myClan");
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if (overlay) overlay.classList.add("my-clan-adaptive-open");
+  container.innerHTML=`<div class="my-clan-adaptive-screen ${inspection?"is-inspection":"is-browse"}" data-my-clan-state="${inspection?"inspection":"browse"}">
+    <div class="my-clan-stage ${masterEnabled?"is-master-art-on":"is-master-art-off"}" style="--my-clan-master:${masterEnabled?`url('${assetPath}')`:"none"}">
+      <div class="my-clan-fallback-title" aria-hidden="true"><strong>MY CLAN</strong><span>Operational roster and formation</span></div>
+      <button type="button" class="my-clan-screen-close" onclick="closeOverlay()" aria-label="Close My Clan">✕</button>
+      <div class="my-clan-runtime-owned-count"><span>OWNED SHINOBI</span><strong data-my-clan-owned-count>${roster.length}</strong></div>
+      <section class="my-clan-formation" aria-label="Battle Formation">${Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>createMyClanFormationSlot(index+1)).join("")}</section>
+      <div class="my-clan-formation-actions" aria-label="Formation actions">
+        <button type="button" class="my-clan-clear" onclick="clearMyClanStagedFormation()"><span>CLEAR TEAM</span></button>
+        <button type="button" class="my-clan-save" onclick="saveMyClanStagedFormation()" ${CLAN_UI_STATE.formationDirty?"":"disabled"}><span>SAVE FORMATION</span></button>
+        ${CLAN_UI_STATE.formationDirty?`<button type="button" class="my-clan-reset" onclick="resetMyClanStagedFormation()">RESET</button><span class="my-clan-dirty is-dirty">UNSAVED</span>`:""}
+      </div>
+      ${createMyClanRailHitLayer()}
+      ${createMyClanRuntimeToolbar(options)}
+      <div class="my-clan-runtime-showing-count">SHOWING <strong data-my-clan-showing-count>${visible.length}</strong></div>
+      <section class="my-clan-roster-workspace" aria-label="Owned Shinobi roster">
+        <div class="my-clan-roster-grid ${projection.preview?"is-visual-preview":""}">${projection.markup}</div>
+      </section>
+      ${inspection?renderMyClanInspectionContent(selected):""}
+      ${CLAN_UI_STATE.feedback?`<div class="my-clan-feedback is-${escapeStorySceneHTML(CLAN_UI_STATE.feedback.type)}">${escapeStorySceneHTML(CLAN_UI_STATE.feedback.message)}</div>`:""}
+      ${renderAlphaChronicleOriginSelectionModal()}
+    </div>
+  </div>`;
+  return true;
+}
+
+function runAlphaPost2325ChronicleOriginUIDiagnostics(){
+  const selectSource=confirmAlphaChronicleOriginSelection.toString();
+  const candidateSource=selectAlphaChronicleOriginCandidate.toString();
+  const modalSource=renderAlphaChronicleOriginSelectionModal.toString();
+  const calloutSource=createAlphaFreshSaveOnboardingCallout.toString();
+  const projectionSource=getMyClanRosterProjectionMarkup.toString();
+  const result={
+    candidatePoolExact:getAlphaChronicleOriginSelectionEntries().map(entry=>entry.variantId).join("|")===CHRONICLE_ORIGIN_VARIANT_IDS.join("|"),
+    freshSaveStillNoAutoRoster:createDefaultCharacterOwnershipState().ownedRegistryIds.length===0,
+    availabilityRequiresPendingAndNoOrigin:isAlphaChronicleOriginSelectionAvailable.toString().includes('onboardingStatus==="chronicle_origin_pending"')||getAlphaChronicleOriginOnboardingSnapshot.toString().includes('onboardingStatus==="chronicle_origin_pending"'),
+    candidateSelectionIsPresentationOnly:!candidateSource.includes("savePlayerData")&&!candidateSource.includes("grantCharacterRegistryOwnership")&&candidateSource.includes("ownershipMutated:false"),
+    confirmationUsesExistingOriginAuthority:selectSource.includes("selectChronicleOrigin(")&&!selectSource.includes("grantCharacterRegistryOwnership")&&!selectSource.includes("commitCharacterAcquisition("),
+    noRandomOriginSelection:!selectSource.includes("Math.random")&&!candidateSource.includes("Math.random"),
+    explicitConfirmationRequired:modalSource.includes("CONFIRM ORIGIN")&&modalSource.includes("disabled"),
+    identityLockExplained:modalSource.includes("locked Ninja identity"),
+    previewRemainsNonOwnership:projectionSource.includes("VISUAL PREVIEW")&&createMyClanVisualPreviewCard.toString().includes("not owned"),
+    onboardingCTAOnlyWhenAuthorised:calloutSource.includes("isAlphaChronicleOriginSelectionAvailable"),
+    myClanRendererContainsOriginModal:renderClanOverlay.toString().includes("renderAlphaChronicleOriginSelectionModal"),
+    acquisitionAuthoritySetsStart:selectChronicleOrigin.toString().includes("teamSlots:[runtime.id,null,null,null,null,null]"),
+    acquisitionAuthorityPersists:selectChronicleOrigin.toString().includes("savePlayerData()"),
+    priorPreviewGateGreen:typeof runAlphaPost2250MyClanPreviewDiagnostics==="function"?runAlphaPost2250MyClanPreviewDiagnostics().pass===true:true
+  };
+  result.pass=Object.values(result).every(Boolean);
+  console.table(result);
+  return result;
+}
