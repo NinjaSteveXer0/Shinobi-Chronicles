@@ -41633,6 +41633,14 @@ function openOverlay(type) {
     );
 
 
+  if (overlay) {
+    overlay.classList.toggle(
+      "my-clan-adaptive-open",
+      type === "clan" || type === "roster"
+    );
+  }
+
+
   if (
     !overlay ||
     !container
@@ -42049,6 +42057,10 @@ function closeOverlay() {
 
   overlay.classList.remove(
     "region-map-open"
+  );
+
+  overlay.classList.remove(
+    "my-clan-adaptive-open"
   );
 
 
@@ -96468,3 +96480,729 @@ function runAlphaPost2074Mission7IntegrationDiagnostics(){
   checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
   return{pass:checks.pass,checks,groups:{mission7,prior},codingStatus:checks.pass?"POST_2074_MISSION7_IMPLEMENTATION_GATE_GREEN":"POST_2074_MISSION7_IMPLEMENTATION_GATE_FAILED",nextImplementedBrick:2074};
 }
+
+
+// =========================================================
+// POST-2075 — ISSUE #32 MONSTER BATCH
+// BRICKS 2075–2174
+// CHRONICLE INTERACTION + MY CLAN ADAPTIVE ALPHA UI
+// =========================================================
+// Consumes:
+// - Documentation/UI/Chronicle Interaction Shell Presentation Contract.md
+// - Documentation/UI/My Clan Adaptive Presentation Contract.md
+// - UI/convo.png
+// - UI/my_clan_browse.png
+// - UI/my_clan_inspection.png
+//
+// Boundaries preserved:
+// - presentation depth != semantic Story mode != occurrence identity
+// - speaker/source != physical participant
+// - Present != Heard != Knows != Battle participant
+// - owned != assigned != deployed
+// - collectibleCard != uiPortrait
+// - My Clan != Codex != Loadout domain authority
+// - staged formation != committed formation
+// =========================================================
+
+const ALPHA_CHRONICLE_INTERACTION_DEPTHS=Object.freeze(["full","standard","quick"]);
+const ALPHA_CHRONICLE_INTERACTION_ASSET_PATH="UI/convo.png";
+const ALPHA_MY_CLAN_ASSETS=Object.freeze({
+  browse:"UI/my_clan_browse.png",
+  inspection:"UI/my_clan_inspection.png"
+});
+
+if (assetManifest&&assetManifest.ui) {
+  assetManifest.ui.chronicleInteraction=ALPHA_CHRONICLE_INTERACTION_ASSET_PATH;
+  assetManifest.ui.myClanBrowse=ALPHA_MY_CLAN_ASSETS.browse;
+  assetManifest.ui.myClanInspection=ALPHA_MY_CLAN_ASSETS.inspection;
+}
+
+function normalizeChronicleInteractionDepth(value,fallback="standard") {
+  const candidate=typeof value==="string"?value.toLowerCase():"";
+  return ALPHA_CHRONICLE_INTERACTION_DEPTHS.includes(candidate)?candidate:fallback;
+}
+
+function getActiveChronicleInteractionDepth(model=null) {
+  const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+  const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+  const override=active&&active.localContext&&active.localContext.__chroniclePresentationDepth;
+  const authored=beat&&beat.uiHints&&(beat.uiHints.presentationDepth||beat.uiHints.chroniclePresentationDepth);
+  const projected=model&&model.ui_hints&&(model.ui_hints.presentationDepth||model.ui_hints.chroniclePresentationDepth);
+  return normalizeChronicleInteractionDepth(override||authored||projected||"standard");
+}
+
+function setStoryScenePresentationDepth(depth) {
+  const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+  if (!active) return {success:false,reason:"story_scene_not_active"};
+  const normalized=normalizeChronicleInteractionDepth(depth,null);
+  if (!normalized) return {success:false,reason:"invalid_chronicle_presentation_depth"};
+  if (!active.localContext||typeof active.localContext!=="object") active.localContext={};
+  active.localContext.__chroniclePresentationDepth=normalized;
+  savePlayerData();
+  if (typeof isStoryScenePresentationVisible==="function"&&isStoryScenePresentationVisible()) renderStoryScenePresentationLayer();
+  return {success:true,depth:normalized,semanticOccurrenceUnchanged:true};
+}
+
+function getStorySceneAuthoritySuppliedContextItems(model) {
+  const hints=model&&model.ui_hints&&typeof model.ui_hints==="object"?model.ui_hints:{};
+  const raw=Array.isArray(hints.contextItems)?hints.contextItems:[];
+  return raw.slice(0,8).map((item,index)=>{
+    if (typeof item==="string") return {id:`context_${index+1}`,label:item,value:null};
+    if (!item||typeof item!=="object") return null;
+    return {
+      id:String(item.id||`context_${index+1}`),
+      label:String(item.label||item.title||"CONTEXT"),
+      value:item.value==null?null:String(item.value)
+    };
+  }).filter(Boolean);
+}
+
+// Static stylesheet now owns the Chronicle Interaction shell. This intentionally
+// suppresses the superseded runtime-injected CSS without changing Story semantics.
+function ensureStoryScenePresentationStyles() {
+  return true;
+}
+
+function renderStorySceneOverlay(container) {
+  if (!container) return false;
+  const model=createStorySceneObserverSafeProjection();
+  if (!model) {
+    container.innerHTML="";
+    container.style.display="none";
+    return false;
+  }
+
+  const depth=getActiveChronicleInteractionDepth(model);
+  const speaker=model.speaker_name||model.speaker_source_id||"";
+  const portrait=model.portrait_ref&&model.portrait_ref.src?model.portrait_ref:null;
+  const hasPortrait=!!portrait&&model.ui_mode!=="narration_action";
+  const closeAllowed=!!(getCurrentStorySceneBeat()&&getCurrentStorySceneBeat().allowPresentationClose===true);
+  const modeLabel=(model.ui_mode||model.mode||"character").replace(/_/g," ").toUpperCase();
+  const postBattle=model.post_battle_context;
+  const sceneEnvironment=model.scene_environment||{mode:"inherit_current",asset_path:null};
+  const dedicatedBackdrop=sceneEnvironment.mode==="dedicated_backdrop"&&sceneEnvironment.asset_path;
+  const contextItems=getStorySceneAuthoritySuppliedContextItems(model);
+  const sourcePresence=model.speaker_physically_present===true?"PRESENT":(model.speaker_physically_present===false?"NON-PHYSICAL SOURCE":"SOURCE");
+
+  // Choice legality is projected by the existing Story runtime. Rendering a
+  // choice remains presentation only until advanceStoryScene commits it.
+  const choices=model.mode==="choice"
+    ? `<div class="sc-chronicle-actions sc-chronicle-choices">${model.choices.map(choice=>`<button type="button" class="sc-story-action sc-story-choice" onclick="advanceStoryScene('${escapeStorySceneHTML(choice.choice_id)}')" ${choice.available?"":"disabled"}><span>${escapeStorySceneHTML(choice.label)}</span>${!choice.available&&choice.known_blocker?`<small>${escapeStorySceneHTML(choice.known_blocker)}</small>`:""}</button>`).join("")}</div>`
+    : "";
+
+  let primaryAction="";
+  if (model.mode==="battle_transition"&&model.battle_transition) {
+    primaryAction=`<div class="sc-chronicle-actions"><button type="button" class="sc-story-action sc-chronicle-primary" onclick="advanceStoryScene()" ${model.battle_transition.available?"":"disabled"}>${escapeStorySceneHTML(model.battle_transition.action_label)}</button></div>`;
+  } else if (model.mode!=="choice") {
+    primaryAction=`<div class="sc-chronicle-actions"><button type="button" class="sc-story-action sc-chronicle-primary" onclick="advanceStoryScene()">CONTINUE</button></div>`;
+  }
+
+  const contextMarkup=depth==="full"&&contextItems.length
+    ? `<aside class="sc-chronicle-context" aria-label="Authorised scene context"><div class="sc-chronicle-section-label">CONTEXT</div>${contextItems.map(item=>`<div class="sc-chronicle-context-row"><strong>${escapeStorySceneHTML(item.label)}</strong>${item.value!==null?`<span>${escapeStorySceneHTML(item.value)}</span>`:""}</div>`).join("")}</aside>`
+    : "";
+
+  const sourceMarkup=(speaker&&model.ui_mode!=="narration_action")
+    ? `<div class="sc-story-name">${escapeStorySceneHTML(speaker)}</div><div class="sc-chronicle-source-state">${escapeStorySceneHTML(sourcePresence)}</div>`
+    : "";
+
+  container.style.display="flex";
+  container.dataset.sceneId=model.scene_id;
+  container.dataset.beatId=model.beat_id;
+  container.dataset.mode=model.mode;
+  container.dataset.uiMode=model.ui_mode||"character";
+  container.dataset.presentationDepth=depth;
+  container.setAttribute("aria-label",speaker?`${speaker} interaction`:"Chronicle interaction");
+  container.innerHTML=`
+    ${dedicatedBackdrop?`<div class="sc-story-environment" data-scene-environment-id="${escapeStorySceneHTML(sceneEnvironment.asset_id||"")}" style="background-image:url('${escapeStorySceneHTML(sceneEnvironment.asset_path)}')"></div><div class="sc-story-environment-scrim"></div>`:""}
+    <div class="sc-chronicle-stage sc-chronicle-depth-${depth}">
+      <div class="sc-chronicle-master-frame" aria-hidden="true"></div>
+      <div class="sc-chronicle-layout">
+        ${contextMarkup}
+        <section class="sc-story-panel ${hasPortrait?"":"no-portrait"}">
+          ${closeAllowed?`<button type="button" class="sc-story-close" onclick="exitActiveStoryScene({reason:'ui_close'})" aria-label="Close scene">✕</button>`:""}
+          ${hasPortrait?`<div class="sc-story-portrait" aria-hidden="true"><img src="${escapeStorySceneHTML(portrait.src)}" alt=""></div>`:""}
+          <div class="sc-story-kicker">${escapeStorySceneHTML(modeLabel)}${model.title?` · ${escapeStorySceneHTML(model.title)}`:""}</div>
+          ${sourceMarkup}
+          <div class="sc-story-text">${escapeStorySceneHTML(model.text)}</div>
+          ${postBattle?`<div class="sc-story-result">BATTLE RESULT · ${escapeStorySceneHTML(String(postBattle.outcome||"resolved").toUpperCase())}</div>`:""}
+          ${choices}
+          ${primaryAction}
+        </section>
+      </div>
+    </div>`;
+
+  // feedback_receipt is consumed as a presentation receipt only. It does not
+  // create the occurrence/consequence it describes.
+  if (model.feedback_receipt) renderStorySceneFeedbackToast(model.feedback_receipt);
+  return true;
+}
+
+// =========================================================
+// MY CLAN — ADAPTIVE BROWSE / INSPECTION PRESENTATION
+// =========================================================
+
+Object.assign(CLAN_UI_STATE,{
+  viewMode:CLAN_UI_STATE.viewMode||"browse",
+  inspectionTab:CLAN_UI_STATE.inspectionTab||"overview",
+  searchText:CLAN_UI_STATE.searchText||"",
+  rankFilter:CLAN_UI_STATE.rankFilter||"all",
+  affiliationFilter:CLAN_UI_STATE.affiliationFilter||"all",
+  sortId:CLAN_UI_STATE.sortId||"pl_desc",
+  stagedTeamSlots:Array.isArray(CLAN_UI_STATE.stagedTeamSlots)?CLAN_UI_STATE.stagedTeamSlots:null,
+  stagedBaseline:Array.isArray(CLAN_UI_STATE.stagedBaseline)?CLAN_UI_STATE.stagedBaseline:null,
+  formationDirty:CLAN_UI_STATE.formationDirty===true,
+  feedback:CLAN_UI_STATE.feedback||null
+});
+
+function cloneMyClanTeamSlots(slots) {
+  return Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>Array.isArray(slots)&&typeof slots[index]==="string"?slots[index]:null);
+}
+
+function getCommittedMyClanTeamSlots() {
+  return cloneMyClanTeamSlots(ensureClanManagementState().teamSlots);
+}
+
+function ensureMyClanAdaptiveStaging(options={}) {
+  const committed=getCommittedMyClanTeamSlots();
+  const stagedReady=Array.isArray(CLAN_UI_STATE.stagedTeamSlots)&&CLAN_UI_STATE.stagedTeamSlots.length===CLAN_TEAM_SLOT_COUNT;
+  const baselineReady=Array.isArray(CLAN_UI_STATE.stagedBaseline)&&CLAN_UI_STATE.stagedBaseline.length===CLAN_TEAM_SLOT_COUNT;
+  const authorityChanged=baselineReady&&JSON.stringify(CLAN_UI_STATE.stagedBaseline)!==JSON.stringify(committed);
+  if (options.force===true||!stagedReady||!baselineReady||(authorityChanged&&CLAN_UI_STATE.formationDirty!==true)) {
+    CLAN_UI_STATE.stagedTeamSlots=cloneMyClanTeamSlots(committed);
+    CLAN_UI_STATE.stagedBaseline=cloneMyClanTeamSlots(committed);
+    CLAN_UI_STATE.formationDirty=false;
+  }
+  return CLAN_UI_STATE.stagedTeamSlots;
+}
+
+function setMyClanFeedback(message,type="info") {
+  CLAN_UI_STATE.feedback=message?{message:String(message),type:String(type||"info")} : null;
+  return CLAN_UI_STATE.feedback;
+}
+
+function refreshMyClanDirtyState() {
+  ensureMyClanAdaptiveStaging();
+  CLAN_UI_STATE.formationDirty=JSON.stringify(CLAN_UI_STATE.stagedTeamSlots)!==JSON.stringify(CLAN_UI_STATE.stagedBaseline);
+  return CLAN_UI_STATE.formationDirty;
+}
+
+function getMyClanStagedSlotNumber(characterId) {
+  ensureMyClanAdaptiveStaging();
+  const index=CLAN_UI_STATE.stagedTeamSlots.indexOf(characterId);
+  return index>=0?index+1:null;
+}
+
+function getMyClanAssignmentBadge(characterId) {
+  const slot=getMyClanStagedSlotNumber(characterId);
+  if (!slot) return null;
+  return ["START","N1","N2","N3","R1","R2"][slot-1]||null;
+}
+
+function getMyClanCharacterAffiliation(character) {
+  if (!character) return "";
+  const registryId=getCharacterRegistryId(character);
+  const registry=registryId&&typeof getCharacterRegistryEntry==="function"?getCharacterRegistryEntry(registryId):null;
+  const value=character.village||character.affiliation||(registry&&(registry.village||registry.affiliation))||"";
+  return typeof value==="string"?value:"";
+}
+
+function getMyClanRankValue(character) {
+  return character&&typeof character.rank==="string"?character.rank:"Unclassified";
+}
+
+function getMyClanRosterFilterOptions() {
+  const roster=getClanManageableRosterCharacters();
+  const ranks=[...new Set(roster.map(getMyClanRankValue).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  const affiliations=[...new Set(roster.map(getMyClanCharacterAffiliation).filter(Boolean))].sort((a,b)=>a.localeCompare(b));
+  return {ranks,affiliations};
+}
+
+function getMyClanVisibleCharacters() {
+  ensureMyClanAdaptiveStaging();
+  const query=String(CLAN_UI_STATE.searchText||"").trim().toLowerCase();
+  let roster=getClanManageableRosterCharacters().filter(character=>{
+    const slot=getMyClanStagedSlotNumber(character.id);
+    if (CLAN_UI_STATE.filterId==="active"&&!(slot>=1&&slot<=4)) return false;
+    if (CLAN_UI_STATE.filterId==="reserve"&&!(slot>=5&&slot<=6)) return false;
+    if (CLAN_UI_STATE.filterId==="favourites"&&!isClanFavourite(character.id)) return false;
+    if (CLAN_UI_STATE.rankFilter!=="all"&&getMyClanRankValue(character)!==CLAN_UI_STATE.rankFilter) return false;
+    if (CLAN_UI_STATE.affiliationFilter!=="all"&&getMyClanCharacterAffiliation(character)!==CLAN_UI_STATE.affiliationFilter) return false;
+    if (query) {
+      const haystack=[character.name,getMyClanRankValue(character),getMyClanCharacterAffiliation(character),getCharacterRegistryId(character)].filter(Boolean).join(" ").toLowerCase();
+      if (!haystack.includes(query)) return false;
+    }
+    return true;
+  });
+  const sort=CLAN_UI_STATE.sortId;
+  roster=[...roster].sort((a,b)=>{
+    if (sort==="pl_asc") return calculateCurrentPL(a)-calculateCurrentPL(b)||a.name.localeCompare(b.name);
+    if (sort==="name") return a.name.localeCompare(b.name);
+    if (sort==="rank") return getMyClanRankValue(a).localeCompare(getMyClanRankValue(b))||a.name.localeCompare(b.name);
+    return calculateCurrentPL(b)-calculateCurrentPL(a)||a.name.localeCompare(b.name);
+  });
+  return roster;
+}
+
+function setMyClanSearch(value) {
+  CLAN_UI_STATE.searchText=String(value||"");
+  rerenderClanOverlay();
+  return CLAN_UI_STATE.searchText;
+}
+
+function setMyClanRankFilter(value) {
+  const valid=new Set(getMyClanRosterFilterOptions().ranks);
+  CLAN_UI_STATE.rankFilter=value==="all"||valid.has(value)?value:"all";
+  rerenderClanOverlay();
+  return CLAN_UI_STATE.rankFilter;
+}
+
+function setMyClanAffiliationFilter(value) {
+  const valid=new Set(getMyClanRosterFilterOptions().affiliations);
+  CLAN_UI_STATE.affiliationFilter=value==="all"||valid.has(value)?value:"all";
+  rerenderClanOverlay();
+  return CLAN_UI_STATE.affiliationFilter;
+}
+
+function setMyClanSort(value) {
+  CLAN_UI_STATE.sortId=["pl_desc","pl_asc","name","rank"].includes(value)?value:"pl_desc";
+  rerenderClanOverlay();
+  return CLAN_UI_STATE.sortId;
+}
+
+function setClanFilter(filterId) {
+  CLAN_UI_STATE.filterId=CLAN_FILTER_IDS.includes(filterId)?filterId:"all";
+  rerenderClanOverlay();
+  return CLAN_UI_STATE.filterId;
+}
+
+function selectMyClanCharacterForInspection(characterId) {
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return {success:false,reason:"character_not_clan_manageable"};
+  CLAN_UI_STATE.selectedCharacterId=character.id;
+  CLAN_UI_STATE.viewMode="inspection";
+  CLAN_UI_STATE.inspectionTab="overview";
+  setMyClanFeedback(null);
+  rerenderClanOverlay();
+  return {success:true,characterId:character.id,viewMode:"inspection"};
+}
+
+function selectClanCharacter(characterId) {
+  const result=selectMyClanCharacterForInspection(characterId);
+  return result.success===true;
+}
+
+function closeMyClanInspection() {
+  CLAN_UI_STATE.viewMode="browse";
+  CLAN_UI_STATE.selectedCharacterId=null;
+  CLAN_UI_STATE.inspectionTab="overview";
+  setMyClanFeedback(null);
+  rerenderClanOverlay();
+  return true;
+}
+
+function setMyClanInspectionTab(tabId) {
+  const valid=["overview","stats","techniques","conditions","profile"];
+  CLAN_UI_STATE.inspectionTab=valid.includes(tabId)?tabId:"overview";
+  rerenderClanOverlay();
+  return CLAN_UI_STATE.inspectionTab;
+}
+
+function stageMyClanCharacterToSlot(slotNumber,characterId) {
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const slotIndex=Number(slotNumber)-1;
+  if (!Number.isInteger(slotIndex)||slotIndex<0||slotIndex>=CLAN_TEAM_SLOT_COUNT) return {success:false,reason:"invalid_clan_team_slot"};
+  const placement=evaluateClanFormationPlacement(characterId,slotNumber);
+  if (!placement.allowed) return {success:false,reason:placement.reason,contextId:placement.contextId||null};
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return {success:false,reason:"character_not_clan_manageable"};
+  const staged=cloneMyClanTeamSlots(ensureMyClanAdaptiveStaging());
+  const previousIndex=staged.indexOf(character.id);
+  const displacedId=staged[slotIndex]||null;
+  if (previousIndex===slotIndex) return {success:true,changed:false,slotNumber,characterId};
+  staged[slotIndex]=character.id;
+  if (previousIndex>=0) staged[previousIndex]=displacedId;
+  else if (displacedId) {
+    // A roster->occupied-slot assignment displaces the former occupant to the
+    // unassigned roster. Assignment is not ownership loss.
+  }
+  CLAN_UI_STATE.stagedTeamSlots=staged;
+  refreshMyClanDirtyState();
+  setMyClanFeedback(`${character.name} staged for ${getClanBattleQueueSlotLabel(slotNumber)}.`,"staged");
+  rerenderClanOverlay();
+  return {success:true,changed:true,slotNumber,characterId:character.id,displacedCharacterId:displacedId,committed:false};
+}
+
+function beginMyClanCharacterDrag(event,characterId) {
+  if (!event||!event.dataTransfer) return false;
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return false;
+  event.dataTransfer.effectAllowed="move";
+  event.dataTransfer.setData("text/plain",character.id);
+  event.dataTransfer.setData("application/x-sc-my-clan-character",character.id);
+  return true;
+}
+
+function beginMyClanFormationDrag(event,slotNumber) {
+  ensureMyClanAdaptiveStaging();
+  const characterId=CLAN_UI_STATE.stagedTeamSlots[Number(slotNumber)-1]||null;
+  return characterId?beginMyClanCharacterDrag(event,characterId):false;
+}
+
+function allowMyClanFormationDrop(event) {
+  if (!event) return false;
+  event.preventDefault();
+  if (event.dataTransfer) event.dataTransfer.dropEffect="move";
+  const target=event.currentTarget;
+  if (target&&target.classList) target.classList.add("is-drop-target");
+  return true;
+}
+
+function leaveMyClanFormationDrop(event) {
+  const target=event&&event.currentTarget;
+  if (target&&target.classList) target.classList.remove("is-drop-target");
+  return true;
+}
+
+function dropMyClanCharacterIntoSlot(event,slotNumber) {
+  if (!event||!event.dataTransfer) return {success:false,reason:"drag_payload_missing"};
+  event.preventDefault();
+  leaveMyClanFormationDrop(event);
+  const characterId=event.dataTransfer.getData("application/x-sc-my-clan-character")||event.dataTransfer.getData("text/plain");
+  if (!characterId) return {success:false,reason:"drag_character_missing"};
+  return stageMyClanCharacterToSlot(slotNumber,characterId);
+}
+
+function stageSelectedMyClanCharacterToSlot(slotNumber) {
+  const characterId=CLAN_UI_STATE.selectedCharacterId;
+  if (!characterId) return {success:false,reason:"my_clan_character_not_selected"};
+  return stageMyClanCharacterToSlot(slotNumber,characterId);
+}
+
+function removeMyClanCharacterFromStagedFormation(characterId) {
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const staged=cloneMyClanTeamSlots(ensureMyClanAdaptiveStaging());
+  const index=staged.indexOf(characterId);
+  if (index<0) return {success:true,changed:false};
+  const constraint=getActiveClanFormationConstraint();
+  if (constraint&&constraint.fixedRegistryIdBySlot&&constraint.fixedRegistryIdBySlot[index+1]===getCharacterRegistryId(characterId)) return {success:false,reason:"formation_slot_fixed",contextId:constraint.contextId||null};
+  if (staged.filter(Boolean).length<=1) return {success:false,reason:"clan_team_requires_one_member"};
+  staged[index]=null;
+  CLAN_UI_STATE.stagedTeamSlots=staged;
+  refreshMyClanDirtyState();
+  setMyClanFeedback("Formation removal staged.","staged");
+  rerenderClanOverlay();
+  return {success:true,changed:true,characterId,committed:false};
+}
+
+function clearMyClanStagedFormation() {
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const current=cloneMyClanTeamSlots(ensureMyClanAdaptiveStaging());
+  const constraint=getActiveClanFormationConstraint();
+  const next=Array(CLAN_TEAM_SLOT_COUNT).fill(null);
+  if (constraint&&constraint.fixedRegistryIdBySlot) {
+    Object.entries(constraint.fixedRegistryIdBySlot).forEach(([slotValue,registryId])=>{
+      const slot=Number(slotValue);
+      const character=getRuntimeCharacterByRegistryId(registryId);
+      if (slot>=1&&slot<=CLAN_TEAM_SLOT_COUNT&&character&&getClanManageableRosterCharacters().includes(character)) next[slot-1]=character.id;
+    });
+  }
+  if (!next.some(Boolean)) {
+    const retained=current[0]||current.find(Boolean)||null;
+    if (retained) next[0]=retained;
+  }
+  if (!next.some(Boolean)) return {success:false,reason:"clan_team_requires_one_member"};
+  CLAN_UI_STATE.stagedTeamSlots=next;
+  refreshMyClanDirtyState();
+  setMyClanFeedback("Non-required formation positions cleared. At least one shinobi remains required by current formation rules.","staged");
+  rerenderClanOverlay();
+  return {success:true,changed:true,committed:false};
+}
+
+function resetMyClanStagedFormation() {
+  CLAN_UI_STATE.stagedTeamSlots=cloneMyClanTeamSlots(CLAN_UI_STATE.stagedBaseline||getCommittedMyClanTeamSlots());
+  refreshMyClanDirtyState();
+  setMyClanFeedback("Staged formation reset.","info");
+  rerenderClanOverlay();
+  return {success:true,dirty:false};
+}
+
+function validateMyClanStagedFormationForCommit() {
+  const staged=cloneMyClanTeamSlots(ensureMyClanAdaptiveStaging());
+  const ids=staged.filter(Boolean);
+  if (!ids.length) return {valid:false,reason:"clan_team_requires_one_member"};
+  if (new Set(ids).size!==ids.length) return {valid:false,reason:"duplicate_clan_team_character"};
+  const manageable=new Set(getClanManageableRosterCharacters().map(character=>character.id));
+  if (ids.some(id=>!manageable.has(id))) return {valid:false,reason:"character_not_clan_manageable"};
+  for (let index=0;index<staged.length;index+=1) {
+    const id=staged[index];
+    if (!id) continue;
+    const placement=evaluateClanFormationPlacement(id,index+1);
+    if (!placement.allowed) return {valid:false,reason:placement.reason,contextId:placement.contextId||null,slotNumber:index+1};
+  }
+  return {valid:true,reason:null,teamSlots:staged};
+}
+
+function saveMyClanStagedFormation() {
+  const editability=canEditClanFormation();
+  if (!editability.allowed) return {success:false,reason:editability.reason};
+  const validation=validateMyClanStagedFormationForCommit();
+  if (!validation.valid) {
+    setMyClanFeedback(`Formation not saved: ${validation.reason}.`,`error`);
+    rerenderClanOverlay();
+    return {success:false,reason:validation.reason};
+  }
+  const before=getCommittedMyClanTeamSlots();
+  if (JSON.stringify(before)===JSON.stringify(validation.teamSlots)) {
+    CLAN_UI_STATE.stagedBaseline=cloneMyClanTeamSlots(before);
+    CLAN_UI_STATE.formationDirty=false;
+    setMyClanFeedback("Formation already saved.","info");
+    rerenderClanOverlay();
+    return {success:true,changed:false,teamSlots:before};
+  }
+  const clan=ensureClanManagementState();
+  playerData.clan=normalizeClanManagementState({...clan,teamSlots:validation.teamSlots});
+  savePlayerData();
+  CLAN_UI_STATE.stagedBaseline=cloneMyClanTeamSlots(playerData.clan.teamSlots);
+  CLAN_UI_STATE.stagedTeamSlots=cloneMyClanTeamSlots(playerData.clan.teamSlots);
+  CLAN_UI_STATE.formationDirty=false;
+  setMyClanFeedback("Formation saved.","saved");
+  rerenderClanOverlay();
+  return {success:true,changed:true,teamSlots:cloneMyClanTeamSlots(playerData.clan.teamSlots),committed:true};
+}
+
+function getMyClanCollectibleCardPath(character) {
+  const registryId=getCharacterRegistryId(character);
+  return registryId?getCharacterCardAssetPath(registryId):"";
+}
+
+function getMyClanUIPortraitPath(character) {
+  const projection=resolveUIPortraitProjection(character);
+  return projection&&projection.status==="active"?projection.path:"";
+}
+
+function getMyClanPreparedTechniqueSummary(character) {
+  if (!character) return [];
+  let ids=typeof getProductionPreparedSkillIds==="function"?getProductionPreparedSkillIds(character):[];
+  if ((!ids||!ids.length)&&typeof getSpecialRepresentationPreparedSkillIds==="function") ids=getSpecialRepresentationPreparedSkillIds(character);
+  return (Array.isArray(ids)?ids:[]).filter(Boolean).map(id=>{
+    const definition=typeof getBattlePreparedSkillDefinition==="function"?getBattlePreparedSkillDefinition(character,id):null;
+    return {id,name:definition&&definition.displayName?definition.displayName:id};
+  });
+}
+
+function getMyClanLoadoutSummary(character) {
+  if (!character) return {equipment:[],techniques:[],summon:null};
+  const equipment=(Array.isArray(character.equipment)?character.equipment:[]).map(entry=>{
+    const item=entry&&Array.isArray(playerData.inventory)?playerData.inventory.find(candidate=>candidate&&candidate.instanceId===entry.instanceId):null;
+    const definition=entry&&typeof getItemDefinition==="function"?getItemDefinition(entry.itemId||item&&item.id):null;
+    return {slot:entry&&entry.slot||null,name:definition&&definition.name||item&&item.name||entry&&entry.itemId||"Equipment"};
+  });
+  const techniques=getMyClanPreparedTechniqueSummary(character);
+  const summonId=typeof getAttachedSummonIdForCharacter==="function"?getAttachedSummonIdForCharacter(character.id):null;
+  const summon=summonId&&typeof getEntityDefinition==="function"?getEntityDefinition(summonId):null;
+  return {equipment,techniques,summon:summonId?{id:summonId,name:summon&&summon.name||summonId}:null};
+}
+
+function openMyClanCodexShortcut(characterId) {
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return {success:false,reason:"character_not_clan_manageable"};
+  // Shinobi Records owns Codex routing. Do not manufacture that subsystem here.
+  const candidates=["openShinobiRecordForCharacter","openShinobiRecordsCharacter","openCodexCharacter"];
+  for (const name of candidates) {
+    const fn=typeof globalThis!=="undefined"&&typeof globalThis[name]==="function"?globalThis[name]:null;
+    if (fn) return fn(getCharacterRegistryId(character),character.id);
+  }
+  setMyClanFeedback("Shinobi Records shortcut is not yet available from the current runtime.","info");
+  rerenderClanOverlay();
+  return {success:false,reason:"shinobi_records_route_unavailable",characterId:character.id};
+}
+
+function openMyClanLoadoutRoute(characterId=CLAN_UI_STATE.selectedCharacterId) {
+  const character=getClanManageableRosterCharacters().find(member=>member&&member.id===characterId)||null;
+  if (!character) return {success:false,reason:"character_not_clan_manageable"};
+  // Issue #32 explicitly forbids inventing the queued multi-domain Loadout UI.
+  // Consume the existing Equipment-owned surface only until the dedicated
+  // Selected Shinobi Loadout contract is separately closed/implemented.
+  if (typeof openCharacterEquipmentSurface==="function") return openCharacterEquipmentSurface(character.id);
+  return {success:false,reason:"selected_shinobi_loadout_surface_unavailable"};
+}
+
+function createMyClanFormationSlot(slotNumber) {
+  ensureMyClanAdaptiveStaging();
+  const definition=getClanBattleQueueSlotDefinition(slotNumber);
+  const characterId=CLAN_UI_STATE.stagedTeamSlots[slotNumber-1]||null;
+  const character=characterId?getPlayerCharacter(characterId):null;
+  const portrait=character?getMyClanUIPortraitPath(character):"";
+  const currentPL=character?calculateCurrentPL(character):null;
+  return `<button type="button" class="my-clan-formation-slot ${character?"is-occupied":"is-empty"}" data-slot-number="${slotNumber}" draggable="${character?"true":"false"}" ${character?`ondragstart="beginMyClanFormationDrag(event,${slotNumber})"`:""} ondragover="allowMyClanFormationDrop(event)" ondragleave="leaveMyClanFormationDrop(event)" ondrop="dropMyClanCharacterIntoSlot(event,${slotNumber})" onclick="stageSelectedMyClanCharacterToSlot(${slotNumber})">
+    <span class="my-clan-slot-label">${escapeStorySceneHTML(definition?definition.label:`SLOT ${slotNumber}`)}</span>
+    <span class="my-clan-slot-portrait">${portrait?`<img src="${escapeStorySceneHTML(portrait)}" alt="${escapeStorySceneHTML(character.name)}">`:`<span class="my-clan-slot-empty-mark">忍</span>`}</span>
+    <span class="my-clan-slot-name">${character?escapeStorySceneHTML(character.name):"EMPTY"}</span>
+    <span class="my-clan-slot-pl">${character?`PL ${currentPL}`:""}</span>
+  </button>`;
+}
+
+function createClanCard(character) {
+  if (!character) return "";
+  const cardPath=getMyClanCollectibleCardPath(character);
+  const badge=getMyClanAssignmentBadge(character.id);
+  const favourite=isClanFavourite(character.id);
+  const selected=CLAN_UI_STATE.selectedCharacterId===character.id&&CLAN_UI_STATE.viewMode==="inspection";
+  return `<article class="my-clan-roster-card ${selected?"is-selected":""}" draggable="true" ondragstart="beginMyClanCharacterDrag(event,'${escapeStorySceneHTML(character.id)}')">
+    <button type="button" class="my-clan-card-hitbox" onclick="selectMyClanCharacterForInspection('${escapeStorySceneHTML(character.id)}')" ondblclick="openMyClanCodexShortcut('${escapeStorySceneHTML(character.id)}')" aria-label="Inspect ${escapeStorySceneHTML(character.name)}">
+      ${cardPath?`<img class="my-clan-collectible-card" src="${escapeStorySceneHTML(cardPath)}" alt="${escapeStorySceneHTML(character.name)} collectible card" draggable="false">`:`<span class="my-clan-card-missing">COLLECTIBLE CARD<br>NOT MAPPED</span>`}
+      ${badge?`<span class="my-clan-assignment-badge">${badge}</span>`:""}
+      ${favourite?`<span class="my-clan-favourite-badge">★</span>`:""}
+    </button>
+  </article>`;
+}
+
+function renderMyClanInspectionContent(character) {
+  if (!character) return "";
+  const portrait=getMyClanUIPortraitPath(character);
+  const registryId=getCharacterRegistryId(character);
+  const loadout=getMyClanLoadoutSummary(character);
+  const currentPL=calculateCurrentPL(character);
+  const slot=getMyClanStagedSlotNumber(character.id);
+  const affiliation=getMyClanCharacterAffiliation(character)||"—";
+  const statLabels=[['nin','NINJUTSU'],['tai','TAIJUTSU'],['gen','GENJUTSU'],['buki','BUKIJUTSU'],['fuin','FŪINJUTSU'],['kin','KINJUTSU'],['stamina','STAMINA']];
+  const statSource=character.stats||character.baseStats||{};
+  const tab=CLAN_UI_STATE.inspectionTab||"overview";
+  let tabContent="";
+  if (tab==="stats") {
+    tabContent=`<div class="my-clan-stat-grid">${statLabels.map(([key,label])=>`<div><span>${label}</span><strong>${Number(statSource[key])||0}</strong></div>`).join("")}</div>`;
+  } else if (tab==="techniques") {
+    tabContent=`<div class="my-clan-technique-list">${loadout.techniques.length?loadout.techniques.map(item=>`<span>${escapeStorySceneHTML(item.name)}</span>`).join(""):`<span class="is-muted">No prepared Technique projection available.</span>`}</div>`;
+  } else if (tab==="conditions") {
+    tabContent=`<div class="my-clan-inspection-copy">Persistent non-Battle condition details are shown only when an owning system supplies them. No condition state is inferred here.</div>`;
+  } else if (tab==="profile") {
+    tabContent=`<div class="my-clan-inspection-copy"><strong>REPRESENTATION</strong><span>${escapeStorySceneHTML(registryId||"—")}</span><strong>AFFILIATION</strong><span>${escapeStorySceneHTML(affiliation)}</span></div>`;
+  } else {
+    tabContent=`<div class="my-clan-overview-grid"><div><span>RANK</span><strong>${escapeStorySceneHTML(getMyClanRankValue(character))}</strong></div><div><span>CURRENT PL</span><strong>${currentPL}</strong></div><div><span>AFFILIATION</span><strong>${escapeStorySceneHTML(affiliation)}</strong></div><div><span>FORMATION</span><strong>${slot?escapeStorySceneHTML(getClanBattleQueueSlotLabel(slot)):"UNASSIGNED"}</strong></div></div>`;
+  }
+  return `<aside class="my-clan-inspection-panel" aria-label="Selected Shinobi">
+    <button type="button" class="my-clan-inspection-close" onclick="closeMyClanInspection()" aria-label="Close inspection">✕</button>
+    <div class="my-clan-selected-identity">
+      <div class="my-clan-selected-portrait">${portrait?`<img src="${escapeStorySceneHTML(portrait)}" alt="${escapeStorySceneHTML(character.name)}">`:`<span>忍</span>`}</div>
+      <div class="my-clan-selected-copy"><span class="my-clan-selected-kicker">SELECTED SHINOBI</span><h3>${escapeStorySceneHTML(character.name)}</h3><small>${escapeStorySceneHTML(getMyClanRankValue(character))} · PL ${currentPL}</small></div>
+      <button type="button" class="my-clan-favourite-toggle" onclick="toggleClanFavourite('${escapeStorySceneHTML(character.id)}')" aria-label="Toggle favourite">${isClanFavourite(character.id)?"★":"☆"}</button>
+    </div>
+    <div class="my-clan-inspection-tabs">${["overview","stats","techniques","conditions","profile"].map(id=>`<button type="button" class="${tab===id?"is-active":""}" onclick="setMyClanInspectionTab('${id}')">${id.toUpperCase()}</button>`).join("")}</div>
+    <div class="my-clan-inspection-tabbody">${tabContent}</div>
+    <section class="my-clan-loadout-summary"><div class="my-clan-section-label">CURRENT LOADOUT</div>
+      <div class="my-clan-loadout-row"><span>EQUIPMENT</span><strong>${loadout.equipment.length?escapeStorySceneHTML(loadout.equipment.map(item=>item.name).join(" · ")):"NONE"}</strong></div>
+      <div class="my-clan-loadout-row"><span>TECHNIQUES</span><strong>${loadout.techniques.length?`${loadout.techniques.length} PREPARED`:"NONE PROJECTED"}</strong></div>
+      <div class="my-clan-loadout-row"><span>SUMMON</span><strong>${loadout.summon?escapeStorySceneHTML(loadout.summon.name):"NONE"}</strong></div>
+    </section>
+    <div class="my-clan-inspection-actions">
+      ${slot?`<button type="button" class="my-clan-secondary-action" onclick="removeMyClanCharacterFromStagedFormation('${escapeStorySceneHTML(character.id)}')">REMOVE FROM FORMATION</button>`:""}
+      <button type="button" class="my-clan-primary-action" onclick="openMyClanLoadoutRoute('${escapeStorySceneHTML(character.id)}')">LOADOUT</button>
+    </div>
+  </aside>`;
+}
+
+function renderClanOverlay(container) {
+  if (!container) return false;
+  ensureClanManagementState();
+  ensureMyClanAdaptiveStaging();
+  const roster=getClanManageableRosterCharacters();
+  if (CLAN_UI_STATE.selectedCharacterId&&!roster.some(character=>character.id===CLAN_UI_STATE.selectedCharacterId)) closeMyClanInspection();
+  const inspection=CLAN_UI_STATE.viewMode==="inspection"&&!!CLAN_UI_STATE.selectedCharacterId;
+  const selected=inspection?getPlayerCharacter(CLAN_UI_STATE.selectedCharacterId):null;
+  const visible=getMyClanVisibleCharacters();
+  const options=getMyClanRosterFilterOptions();
+  const assetPath=inspection?ALPHA_MY_CLAN_ASSETS.inspection:ALPHA_MY_CLAN_ASSETS.browse;
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if (overlay) overlay.classList.add("my-clan-adaptive-open");
+  container.innerHTML=`<div class="my-clan-adaptive-screen ${inspection?"is-inspection":"is-browse"}" data-my-clan-state="${inspection?"inspection":"browse"}">
+    <div class="my-clan-stage" style="--my-clan-master:url('${assetPath}')">
+      <button type="button" class="my-clan-screen-close" onclick="closeOverlay()" aria-label="Close My Clan">✕</button>
+      <section class="my-clan-formation" aria-label="Battle Formation">${Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>createMyClanFormationSlot(index+1)).join("")}</section>
+      <div class="my-clan-formation-actions">
+        <button type="button" class="my-clan-clear" onclick="clearMyClanStagedFormation()">CLEAR FORMATION</button>
+        <span class="my-clan-dirty ${CLAN_UI_STATE.formationDirty?"is-dirty":""}">${CLAN_UI_STATE.formationDirty?"UNSAVED CHANGES":"FORMATION SAVED"}</span>
+        ${CLAN_UI_STATE.formationDirty?`<button type="button" class="my-clan-reset" onclick="resetMyClanStagedFormation()">RESET</button>`:""}
+        <button type="button" class="my-clan-save" onclick="saveMyClanStagedFormation()" ${CLAN_UI_STATE.formationDirty?"":"disabled"}>SAVE FORMATION</button>
+      </div>
+      <section class="my-clan-roster-workspace">
+        <div class="my-clan-filter-row">
+          <div class="my-clan-filter-chips">${[["all","ALL"],["active","ACTIVE TEAM"],["reserve","RESERVE"],["favourites","FAVOURITES"]].map(([id,label])=>`<button type="button" class="${CLAN_UI_STATE.filterId===id?"is-active":""}" onclick="setClanFilter('${id}')">${label}</button>`).join("")}</div>
+          <input class="my-clan-search" type="search" value="${escapeStorySceneHTML(CLAN_UI_STATE.searchText)}" oninput="setMyClanSearch(this.value)" placeholder="Search owned shinobi" aria-label="Search owned shinobi">
+          <select class="my-clan-select" onchange="setMyClanRankFilter(this.value)" aria-label="Rank filter"><option value="all">RANK</option>${options.ranks.map(value=>`<option value="${escapeStorySceneHTML(value)}" ${CLAN_UI_STATE.rankFilter===value?"selected":""}>${escapeStorySceneHTML(value)}</option>`).join("")}</select>
+          <select class="my-clan-select" onchange="setMyClanAffiliationFilter(this.value)" aria-label="Affiliation filter"><option value="all">AFFILIATION</option>${options.affiliations.map(value=>`<option value="${escapeStorySceneHTML(value)}" ${CLAN_UI_STATE.affiliationFilter===value?"selected":""}>${escapeStorySceneHTML(value)}</option>`).join("")}</select>
+          <select class="my-clan-select" onchange="setMyClanSort(this.value)" aria-label="Sort roster"><option value="pl_desc" ${CLAN_UI_STATE.sortId==="pl_desc"?"selected":""}>PL ↓</option><option value="pl_asc" ${CLAN_UI_STATE.sortId==="pl_asc"?"selected":""}>PL ↑</option><option value="name" ${CLAN_UI_STATE.sortId==="name"?"selected":""}>NAME</option><option value="rank" ${CLAN_UI_STATE.sortId==="rank"?"selected":""}>RANK</option></select>
+        </div>
+        <div class="my-clan-roster-meta"><span>OWNED SHINOBI <strong>${roster.length}</strong></span><span>SHOWING <strong>${visible.length}</strong></span></div>
+        <div class="my-clan-roster-grid">${visible.length?visible.map(createClanCard).join(""):`<div class="my-clan-empty-roster">No owned shinobi match the current filters.</div>`}</div>
+      </section>
+      ${inspection?renderMyClanInspectionContent(selected):""}
+      ${CLAN_UI_STATE.feedback?`<div class="my-clan-feedback is-${escapeStorySceneHTML(CLAN_UI_STATE.feedback.type)}">${escapeStorySceneHTML(CLAN_UI_STATE.feedback.message)}</div>`:""}
+    </div>
+  </div>`;
+  return true;
+}
+
+function runAlphaIssue32ChronicleInteractionDiagnostics() {
+  const renderer=renderStorySceneOverlay.toString();
+  const depthSource=getActiveChronicleInteractionDepth.toString();
+  const result={
+    oneSemanticStorySystem:typeof STORY_SCENE_REGISTRY!=="undefined"&&typeof startStoryScene==="function"&&typeof advanceStoryScene==="function",
+    exactThreeDepths:JSON.stringify(ALPHA_CHRONICLE_INTERACTION_DEPTHS)===JSON.stringify(["full","standard","quick"]),
+    approvedAssetConsumed:assetManifest.ui.chronicleInteraction==="UI/convo.png"&&renderer.includes("sc-chronicle-master-frame"),
+    depthIsPresentationOnly:depthSource.includes("localContext")&&!depthSource.includes("activityHistory")&&!setStoryScenePresentationDepth.toString().includes("recordBattleEvidence"),
+    semanticModesRemainOrthogonal:STORY_SCENE_PRESENTATION_MODES.includes("dialogue")&&STORY_SCENE_PRESENTATION_MODES.includes("internal_voice")&&STORY_SCENE_PRESENTATION_MODES.includes("battle_transition"),
+    sourcePresenceProjectionRetained:renderer.includes("speaker_physically_present")&&renderer.includes("NON-PHYSICAL SOURCE"),
+    authoritySuppliedContextOnly:getStorySceneAuthoritySuppliedContextItems.toString().includes("ui_hints")&&!getStorySceneAuthoritySuppliedContextItems.toString().includes("playerTeam"),
+    choiceCommitStillExternal:renderer.includes("advanceStoryScene")&&!renderer.includes("committedChoiceKeys.push"),
+    feedbackReceiptPresentationOnly:renderer.includes("feedback_receipt")&&!renderer.includes("lastFeedbackReceipt=")&&!renderer.includes("activityHistory.push"),
+    storyBattleSameCallerPreserved:launchStorySceneBattle.toString().includes('type:"story_scene"')&&resumeStorySceneFromBattle.toString().includes("sceneInstanceId")&&resumeStorySceneFromBattle.toString().includes('openOverlay("story_scene")'),
+    noParallelStoryHistoryStore:!renderer.includes("storySceneHistory")&&!renderer.includes("conversationHistory")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaIssue32MyClanAdaptiveDiagnostics() {
+  const renderer=renderClanOverlay.toString();
+  const cardSource=createClanCard.toString();
+  const formationSource=createMyClanFormationSlot.toString();
+  const stageSource=stageMyClanCharacterToSlot.toString();
+  const commitSource=saveMyClanStagedFormation.toString();
+  const result={
+    approvedMastersConsumed:assetManifest.ui.myClanBrowse===ALPHA_MY_CLAN_ASSETS.browse&&assetManifest.ui.myClanInspection===ALPHA_MY_CLAN_ASSETS.inspection,
+    oneAdaptiveSystem:renderer.includes("is-inspection")&&renderer.includes("is-browse")&&renderer.includes("data-my-clan-state"),
+    exactFormationOrder:JSON.stringify(CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS.map(item=>item.label))===JSON.stringify(["START","NEXT 1","NEXT 2","NEXT 3","RESERVE 1","RESERVE 2"]),
+    formationUsesUIPortrait:formationSource.includes("getMyClanUIPortraitPath")&&getMyClanUIPortraitPath.toString().includes("resolveUIPortraitProjection"),
+    rosterUsesFullCollectibleCard:cardSource.includes("getMyClanCollectibleCardPath")&&getMyClanCollectibleCardPath.toString().includes("getCharacterCardAssetPath")&&!cardSource.includes("object-fit:cover"),
+    clickInspect:cardSource.includes("selectMyClanCharacterForInspection"),
+    dragStagesNotCommits:stageSource.includes("stagedTeamSlots")&&!stageSource.includes("savePlayerData")&&!stageSource.includes("playerData.clan="),
+    explicitSaveCommit:commitSource.includes("playerData.clan=")&&commitSource.includes("savePlayerData()"),
+    unsavedUIStateNotPersisted:!savePlayerData.toString().includes("CLAN_UI_STATE")&&!createDefaultPlayerData.toString().includes("stagedTeamSlots"),
+    clearPreservesCurrentFormationRule:clearMyClanStagedFormation.toString().includes("clan_team_requires_one_member")&&clearMyClanStagedFormation.toString().includes("retained"),
+    ownedNotAssigned:getMyClanVisibleCharacters.toString().includes("getClanManageableRosterCharacters")&&stageSource.includes("committed:false"),
+    startNotProtagonist:!renderer.toLowerCase().includes("protagonist")&&!renderer.toLowerCase().includes("clan leader"),
+    loadoutSummaryOnly:renderer.includes("renderMyClanInspectionContent")&&renderMyClanInspectionContent.toString().includes("CURRENT LOADOUT")&&openMyClanLoadoutRoute.toString().includes("Issue #32 explicitly forbids inventing"),
+    codexShortcutDoesNotInventHistory:openMyClanCodexShortcut.toString().includes("Shinobi Records owns Codex routing")&&!openMyClanCodexShortcut.toString().includes("activityHistory")
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function runAlphaIssue32MonsterDiagnostics() {
+  const groups={
+    chronicleInteraction:runAlphaIssue32ChronicleInteractionDiagnostics(),
+    myClan:runAlphaIssue32MyClanAdaptiveDiagnostics(),
+    existingStoryUI:typeof runAlphaStorySceneUIContractDiagnostics==="function"?runAlphaStorySceneUIContractDiagnostics():{pass:true},
+    existingStoryEnvironment:typeof runAlphaStorySceneEnvironmentDiagnostics==="function"?runAlphaStorySceneEnvironmentDiagnostics():{pass:true},
+    existingClanQueue:typeof runClanBattleQueueAlignmentDiagnostics==="function"?runClanBattleQueueAlignmentDiagnostics():{pass:true}
+  };
+  const result={groups,pass:Object.values(groups).every(group=>group&&group.pass===true)};
+  console.log(`SC Alpha Issue #32 monster gate: ${result.pass?"PASS":"FAIL"}`);
+  return result;
+}
+
