@@ -100613,3 +100613,322 @@ function runAlphaPost2500PlayabilityMonsterDiagnostics(){
   return {pass:checks.pass,checks,map,nextImplementedBrick:3499};
 }
 
+
+// =========================================================
+// ISSUE #32 — MY CLAN OPERATIONAL GAMEPLAY PASS (2026-09-10)
+// =========================================================
+// Browser/playability hardening over the already-closed adaptive My Clan
+// contract. This pass does not create a second roster, formation, ownership,
+// deployment, Codex, Equipment, Skill, Summon, or Battle authority.
+// =========================================================
+
+Object.assign(CLAN_UI_STATE,{
+  closeConfirmPending:CLAN_UI_STATE.closeConfirmPending===true,
+  closeBypass:false
+});
+
+// The old POST-2250 preview remains available as an explicit developer visual
+// tool, but localhost no longer implies fake cards on an ordinary fresh save.
+// Fresh-save play now defaults to the real Chronicle Origin onboarding CTA.
+ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.automaticLocalhost=false;
+
+function isMyClanVisualPreviewEnabled(rosterCount=getClanManageableRosterCharacters().length){
+  if (ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled===true) return rosterCount===0;
+  if (ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.enabled===false) return false;
+  const localEnvironment=isMyClanLocalVisualPreviewEnvironment();
+  return rosterCount===0&&localEnvironment&&ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.automaticLocalhost===true;
+}
+
+function getMyClanFormationLockFeedback(reason){
+  if (reason==="clan_team_locked_during_battle") return "Formation is locked while a Battle is active.";
+  if (reason==="formation_slot_fixed") return "That formation position is fixed by the current caller.";
+  if (reason==="clan_team_requires_one_member") return "At least one shinobi must remain in the formation.";
+  return "That formation change is not currently available.";
+}
+
+function activateMyClanFormationSlot(slotNumber){
+  ensureMyClanAdaptiveStaging();
+  const slotIndex=Number(slotNumber)-1;
+  if (!Number.isInteger(slotIndex)||slotIndex<0||slotIndex>=CLAN_TEAM_SLOT_COUNT) return {success:false,reason:"invalid_clan_team_slot"};
+  const editability=canEditClanFormation();
+  if (!editability.allowed) {
+    setMyClanFeedback(getMyClanFormationLockFeedback(editability.reason),"error");
+    rerenderClanOverlay();
+    return {success:false,reason:editability.reason};
+  }
+  const selectedId=CLAN_UI_STATE.selectedCharacterId||null;
+  if (selectedId) return stageMyClanCharacterToSlot(slotNumber,selectedId);
+  const occupantId=CLAN_UI_STATE.stagedTeamSlots[slotIndex]||null;
+  if (occupantId) return selectMyClanCharacterForInspection(occupantId);
+  setMyClanFeedback("Select an owned shinobi, then choose a formation slot.","info");
+  rerenderClanOverlay();
+  return {success:false,reason:"my_clan_character_not_selected"};
+}
+
+function removeMyClanCharacterFromInspection(characterId){
+  const editability=canEditClanFormation();
+  if (!editability.allowed) {
+    setMyClanFeedback(getMyClanFormationLockFeedback(editability.reason),"error");
+    rerenderClanOverlay();
+    return {success:false,reason:editability.reason};
+  }
+  const result=removeMyClanCharacterFromStagedFormation(characterId);
+  if (result&&result.success!==true&&result.reason) {
+    setMyClanFeedback(getMyClanFormationLockFeedback(result.reason),"error");
+    rerenderClanOverlay();
+  }
+  return result;
+}
+
+function createMyClanFormationSlot(slotNumber){
+  ensureMyClanAdaptiveStaging();
+  const definition=getClanBattleQueueSlotDefinition(slotNumber);
+  const label=definition?definition.label:`SLOT ${slotNumber}`;
+  const characterId=CLAN_UI_STATE.stagedTeamSlots[slotNumber-1]||null;
+  const character=characterId?getPlayerCharacter(characterId):null;
+  const portrait=character?getMyClanUIPortraitPath(character):"";
+  const currentPL=character?calculateCurrentPL(character):null;
+  const editability=canEditClanFormation();
+  const editable=editability.allowed===true;
+  const selectedId=CLAN_UI_STATE.selectedCharacterId||null;
+  const placement=editable&&selectedId?evaluateClanFormationPlacement(selectedId,slotNumber):null;
+  const assignmentTarget=!!(selectedId&&placement&&placement.allowed===true&&selectedId!==characterId);
+  const aria=selectedId&&editable
+    ? `${label}: ${character?character.name:"empty"}. Assign selected shinobi to this position.`
+    : character
+      ? `${label}: ${character.name}, PL ${currentPL}. Inspect this shinobi.`
+      : `${label}: empty. Select an owned shinobi before assigning.`;
+  const dragAttrs=character&&editable
+    ? `draggable="true" ondragstart="beginMyClanFormationDrag(event,${slotNumber})" ondragover="allowMyClanFormationDrop(event)" ondragleave="leaveMyClanFormationDrop(event)" ondrop="dropMyClanCharacterIntoSlot(event,${slotNumber})"`
+    : `draggable="false"`;
+  return `<button type="button" class="my-clan-formation-slot ${character?"is-occupied":"is-empty"} ${assignmentTarget?"is-assignment-target":""} ${editable?"":"is-locked"}" data-slot-number="${slotNumber}" ${dragAttrs} onclick="activateMyClanFormationSlot(${slotNumber})" aria-label="${escapeStorySceneHTML(aria)}">
+    <span class="my-clan-slot-fallback-label" aria-hidden="true">${escapeStorySceneHTML(label)}</span>
+    ${portrait?`<span class="my-clan-slot-portrait"><img src="${escapeStorySceneHTML(portrait)}" alt="${escapeStorySceneHTML(character.name)}"></span>`:""}
+    ${character?`<span class="my-clan-slot-runtime-meta"><b>${escapeStorySceneHTML(character.name)}</b><small>PL ${currentPL}</small></span>`:""}
+  </button>`;
+}
+
+function createClanCard(character){
+  const cardPath=getMyClanCollectibleCardPath(character);
+  const badge=getMyClanAssignmentBadge(character.id);
+  const favourite=isClanFavourite(character.id);
+  const selected=CLAN_UI_STATE.selectedCharacterId===character.id&&CLAN_UI_STATE.viewMode==="inspection";
+  const editable=canEditClanFormation().allowed===true;
+  return `<article class="my-clan-roster-card ${selected?"is-selected":""} ${editable?"":"is-formation-locked"}" draggable="${editable?"true":"false"}" ${editable?`ondragstart="beginMyClanCharacterDrag(event,'${escapeStorySceneHTML(character.id)}')"`:""}>
+    <button type="button" class="my-clan-card-hitbox" onclick="selectMyClanCharacterForInspection('${escapeStorySceneHTML(character.id)}')" ondblclick="openMyClanCodexShortcut('${escapeStorySceneHTML(character.id)}')" aria-label="Inspect ${escapeStorySceneHTML(character.name)}" aria-pressed="${selected?"true":"false"}">
+      ${cardPath?`<img class="my-clan-collectible-card" src="${escapeStorySceneHTML(cardPath)}" alt="${escapeStorySceneHTML(character.name)} collectible card" draggable="false">`:`<span class="my-clan-card-missing">COLLECTIBLE CARD<br>NOT MAPPED</span>`}
+      ${badge?`<span class="my-clan-assignment-badge">${badge}</span>`:""}
+      ${favourite?`<span class="my-clan-favourite-badge">★</span>`:""}
+    </button>
+  </article>`;
+}
+
+function renderMyClanInspectionContent(character){
+  if (!character) return "";
+  const portrait=getMyClanUIPortraitPath(character);
+  const registryId=getCharacterRegistryId(character);
+  const loadout=getMyClanLoadoutSummary(character);
+  const currentPL=calculateCurrentPL(character);
+  const slot=getMyClanStagedSlotNumber(character.id);
+  const affiliation=getMyClanCharacterAffiliation(character)||"—";
+  const tab=CLAN_UI_STATE.inspectionTab||"overview";
+  const statSource=character.baseStats||character.stats||{};
+  const statLabels=[["nin","NIN"],["tai","TAI"],["gen","GEN"],["buki","BUKI"],["fuin","FŪIN"],["kin","KIN"],["stamina","STAMINA"]];
+  const editable=canEditClanFormation().allowed===true;
+  let tabContent="";
+  if (tab==="stats") {
+    tabContent=`<div class="my-clan-stat-grid">${statLabels.map(([key,label])=>`<div><span>${label}</span><strong>${Number(statSource[key])||0}</strong></div>`).join("")}</div>`;
+  } else if (tab==="techniques") {
+    tabContent=`<div class="my-clan-technique-list">${loadout.techniques.length?loadout.techniques.map(item=>`<span>${escapeStorySceneHTML(item.name)}</span>`).join(""):`<span class="is-muted">No prepared Technique projection available.</span>`}</div>`;
+  } else if (tab==="conditions") {
+    tabContent=`<div class="my-clan-inspection-copy">Persistent condition detail appears only when an owning system supplies it.</div>`;
+  } else if (tab==="profile") {
+    tabContent=`<div class="my-clan-inspection-copy"><strong>REPRESENTATION</strong><span>${escapeStorySceneHTML(registryId||"—")}</span><strong>AFFILIATION</strong><span>${escapeStorySceneHTML(affiliation)}</span></div>`;
+  } else {
+    tabContent=`<div class="my-clan-overview-grid"><div><span>FORMATION</span><strong>${slot?escapeStorySceneHTML(getClanBattleQueueSlotLabel(slot)):"UNASSIGNED"}</strong></div><div><span>RANK</span><strong>${escapeStorySceneHTML(getMyClanRankValue(character))}</strong></div><div><span>CURRENT PL</span><strong>${currentPL}</strong></div><div><span>AFFILIATION</span><strong>${escapeStorySceneHTML(affiliation)}</strong></div></div>`;
+  }
+  return `<aside class="my-clan-inspection-panel" aria-label="Selected Shinobi">
+    <button type="button" class="my-clan-inspection-close" onclick="closeMyClanInspection()" aria-label="Close inspection">✕</button>
+    <button type="button" class="my-clan-favourite-toggle ${isClanFavourite(character.id)?"is-active":""}" onclick="toggleClanFavourite('${escapeStorySceneHTML(character.id)}')" aria-label="${isClanFavourite(character.id)?"Remove from favourites":"Add to favourites"}" title="Favourite">${isClanFavourite(character.id)?"★":"☆"}</button>
+    <div class="my-clan-selected-portrait">${portrait?`<img src="${escapeStorySceneHTML(portrait)}" alt="${escapeStorySceneHTML(character.name)}">`:""}</div>
+    <div class="my-clan-identity-values">
+      <div><span>NAME</span><strong>${escapeStorySceneHTML(character.name)}</strong></div>
+      <div><span>RANK</span><strong>${escapeStorySceneHTML(getMyClanRankValue(character))}</strong></div>
+      <div><span>CURRENT PL</span><strong>${currentPL}</strong></div>
+      <div><span>VILLAGE / AFFILIATION</span><strong>${escapeStorySceneHTML(affiliation)}</strong></div>
+      <div><span>REPRESENTATION</span><strong>${escapeStorySceneHTML(registryId||"—")}</strong></div>
+    </div>
+    <div class="my-clan-inspection-tabs">${["overview","stats","techniques","conditions","profile"].map(id=>`<button type="button" class="${tab===id?"is-active":""}" onclick="setMyClanInspectionTab('${id}')">${id.toUpperCase()}</button>`).join("")}</div>
+    <div class="my-clan-inspection-tabbody">${tabContent}</div>
+    <section class="my-clan-loadout-summary"><span class="my-clan-fallback-section-heading">CURRENT LOADOUT</span>
+      <div class="my-clan-loadout-runtime-cell"><span>EQUIPMENT</span><strong>${loadout.equipment.length?escapeStorySceneHTML(loadout.equipment.map(item=>item.name).join(" · ")):"NONE"}</strong></div>
+      <div class="my-clan-loadout-runtime-cell"><span>TECHNIQUES</span><strong>${loadout.techniques.length?`${loadout.techniques.length} PREPARED`:"NONE PROJECTED"}</strong></div>
+      <div class="my-clan-loadout-runtime-cell"><span>SUMMON</span><strong>${loadout.summon?escapeStorySceneHTML(loadout.summon.name):"NONE"}</strong></div>
+    </section>
+    <div class="my-clan-operational-actions">
+      ${slot?`<button type="button" class="my-clan-inspection-remove" onclick="removeMyClanCharacterFromInspection('${escapeStorySceneHTML(character.id)}')" ${editable?"":"disabled"}>REMOVE FROM FORMATION</button>`:`<span class="my-clan-assignment-help">Select a formation slot above to assign this shinobi.</span>`}
+      <button type="button" class="my-clan-loadout-action" onclick="openMyClanLoadoutRoute('${escapeStorySceneHTML(character.id)}')">LOADOUT</button>
+    </div>
+  </aside>`;
+}
+
+function renderMyClanCloseConfirmation(){
+  if (CLAN_UI_STATE.closeConfirmPending!==true) return "";
+  return `<div class="my-clan-unsaved-backdrop" role="presentation">
+    <section class="my-clan-unsaved-dialog" role="dialog" aria-modal="true" aria-labelledby="my-clan-unsaved-title">
+      <span class="my-clan-unsaved-kicker">FORMATION NOT SAVED</span>
+      <h3 id="my-clan-unsaved-title">Keep your changes?</h3>
+      <p>Your staged formation has not been committed. Leaving without saving will discard these edits.</p>
+      <div class="my-clan-unsaved-actions">
+        <button type="button" class="is-secondary" onclick="cancelMyClanCloseConfirmation()">KEEP EDITING</button>
+        <button type="button" class="is-danger" onclick="discardMyClanChangesAndClose()">DISCARD</button>
+        <button type="button" class="is-primary" onclick="saveMyClanChangesAndClose()">SAVE &amp; CLOSE</button>
+      </div>
+    </section>
+  </div>`;
+}
+
+function cancelMyClanCloseConfirmation(){
+  CLAN_UI_STATE.closeConfirmPending=false;
+  rerenderClanOverlay();
+  return {success:true,closed:false,dirty:CLAN_UI_STATE.formationDirty===true};
+}
+
+let MY_CLAN_OPERATIONAL_CLOSE_BYPASS=false;
+const MY_CLAN_OPERATIONAL_PRE_CLOSE_OVERLAY=closeOverlay;
+
+function forceCloseMyClanOverlay(){
+  MY_CLAN_OPERATIONAL_CLOSE_BYPASS=true;
+  CLAN_UI_STATE.closeConfirmPending=false;
+  try {
+    return MY_CLAN_OPERATIONAL_PRE_CLOSE_OVERLAY();
+  } finally {
+    MY_CLAN_OPERATIONAL_CLOSE_BYPASS=false;
+  }
+}
+
+function requestCloseMyClan(){
+  if (typeof currentOverlayType!=="undefined"&&currentOverlayType!=="clan") return MY_CLAN_OPERATIONAL_PRE_CLOSE_OVERLAY();
+  if (CLAN_UI_STATE.formationDirty!==true) return forceCloseMyClanOverlay();
+  CLAN_UI_STATE.closeConfirmPending=true;
+  setMyClanFeedback("Formation changes are still staged.","info");
+  rerenderClanOverlay();
+  return {success:false,reason:"my_clan_unsaved_changes",confirmationRequired:true};
+}
+
+function discardMyClanChangesAndClose(){
+  CLAN_UI_STATE.stagedTeamSlots=cloneMyClanTeamSlots(CLAN_UI_STATE.stagedBaseline||getCommittedMyClanTeamSlots());
+  refreshMyClanDirtyState();
+  CLAN_UI_STATE.closeConfirmPending=false;
+  return forceCloseMyClanOverlay();
+}
+
+function saveMyClanChangesAndClose(){
+  const result=saveMyClanStagedFormation();
+  if (!result||result.success!==true) {
+    CLAN_UI_STATE.closeConfirmPending=true;
+    return result||{success:false,reason:"my_clan_save_failed"};
+  }
+  CLAN_UI_STATE.closeConfirmPending=false;
+  forceCloseMyClanOverlay();
+  return {...result,closed:true};
+}
+
+closeOverlay=function(){
+  if (MY_CLAN_OPERATIONAL_CLOSE_BYPASS===true) return MY_CLAN_OPERATIONAL_PRE_CLOSE_OVERLAY();
+  if (typeof currentOverlayType!=="undefined"&&currentOverlayType==="clan") return requestCloseMyClan();
+  return MY_CLAN_OPERATIONAL_PRE_CLOSE_OVERLAY();
+};
+
+function renderClanOverlay(container){
+  if (!container) return false;
+  ensureClanManagementState();
+  ensureMyClanAdaptiveStaging();
+  const roster=getClanManageableRosterCharacters();
+  if (CLAN_UI_STATE.selectedCharacterId&&!roster.some(character=>character.id===CLAN_UI_STATE.selectedCharacterId)) {
+    CLAN_UI_STATE.viewMode="browse";
+    CLAN_UI_STATE.selectedCharacterId=null;
+    CLAN_UI_STATE.inspectionTab="overview";
+  }
+  const inspection=CLAN_UI_STATE.viewMode==="inspection"&&!!CLAN_UI_STATE.selectedCharacterId;
+  const selected=inspection?getPlayerCharacter(CLAN_UI_STATE.selectedCharacterId):null;
+  const visible=getMyClanVisibleCharacters();
+  const projection=getMyClanRosterProjectionMarkup(roster,visible);
+  const options=getMyClanRosterFilterOptions();
+  const assetPath=inspection?ALPHA_MY_CLAN_ASSETS.inspection:ALPHA_MY_CLAN_ASSETS.browse;
+  const masterEnabled=isAlphaUIMasterEnabled("myClan");
+  const editability=canEditClanFormation();
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if (overlay) overlay.classList.add("my-clan-adaptive-open");
+  container.innerHTML=`<div class="my-clan-adaptive-screen ${inspection?"is-inspection":"is-browse"}" data-my-clan-state="${inspection?"inspection":"browse"}">
+    <div class="my-clan-stage ${masterEnabled?"is-master-art-on":"is-master-art-off"}" style="--my-clan-master:${masterEnabled?`url('${assetPath}')`:"none"}">
+      <div class="my-clan-fallback-title" aria-hidden="true"><strong>MY CLAN</strong><span>Operational roster and formation</span></div>
+      <button type="button" class="my-clan-screen-close" onclick="requestCloseMyClan()" aria-label="Close My Clan">✕</button>
+      <div class="my-clan-runtime-owned-count"><span>OWNED SHINOBI</span><strong data-my-clan-owned-count>${roster.length}</strong></div>
+      <section class="my-clan-formation ${editability.allowed?"":"is-edit-locked"}" aria-label="Battle Formation">${Array.from({length:CLAN_TEAM_SLOT_COUNT},(_,index)=>createMyClanFormationSlot(index+1)).join("")}</section>
+      <div class="my-clan-formation-actions" aria-label="Formation actions">
+        <button type="button" class="my-clan-clear" onclick="clearMyClanStagedFormation()" ${editability.allowed?"":"disabled"}><span>CLEAR TEAM</span></button>
+        <button type="button" class="my-clan-save" onclick="saveMyClanStagedFormation()" ${CLAN_UI_STATE.formationDirty&&editability.allowed?"":"disabled"}><span>SAVE FORMATION</span></button>
+        ${CLAN_UI_STATE.formationDirty?`<button type="button" class="my-clan-reset" onclick="resetMyClanStagedFormation()">RESET</button><span class="my-clan-dirty is-dirty">UNSAVED</span>`:""}
+        ${editability.allowed?"":`<span class="my-clan-formation-lock-notice">FORMATION LOCKED IN BATTLE</span>`}
+      </div>
+      ${createMyClanRailHitLayer()}
+      ${createMyClanRuntimeToolbar(options)}
+      <div class="my-clan-runtime-showing-count">SHOWING <strong data-my-clan-showing-count>${visible.length}</strong></div>
+      <section class="my-clan-roster-workspace" aria-label="Owned Shinobi roster">
+        <div class="my-clan-roster-grid ${projection.preview?"is-visual-preview":""}">${projection.markup}</div>
+      </section>
+      ${inspection?renderMyClanInspectionContent(selected):""}
+      ${CLAN_UI_STATE.feedback?`<div class="my-clan-feedback is-${escapeStorySceneHTML(CLAN_UI_STATE.feedback.type)}">${escapeStorySceneHTML(CLAN_UI_STATE.feedback.message)}</div>`:""}
+      ${renderAlphaChronicleOriginSelectionModal()}
+      ${renderMyClanCloseConfirmation()}
+    </div>
+  </div>`;
+  return true;
+}
+
+function runAlphaMyClanOperationalGameplayDiagnostics(){
+  const renderer=renderClanOverlay.toString();
+  const slotSource=createMyClanFormationSlot.toString();
+  const cardSource=createClanCard.toString();
+  const inspectionSource=renderMyClanInspectionContent.toString();
+  const closeSource=requestCloseMyClan.toString();
+  const previewSource=isMyClanVisualPreviewEnabled.toString();
+  const checks={
+    defaultLocalhostPreviewDisabled:ALPHA_MY_CLAN_VISUAL_PREVIEW_STATE.automaticLocalhost===false&&previewSource.includes("automaticLocalhost===true"),
+    explicitDeveloperPreviewStillPossible:previewSource.includes("enabled===true")&&previewSource.includes("rosterCount===0"),
+    freshSaveOriginCTAStillAuthoritative:getMyClanRosterProjectionMarkup.toString().includes("createAlphaFreshSaveOnboardingCallout")&&createAlphaFreshSaveOnboardingCallout.toString().includes("BEGIN CHRONICLE"),
+    exactSixPositionOrder:JSON.stringify(CLAN_BATTLE_QUEUE_SLOT_DEFINITIONS.map(item=>item.label))===JSON.stringify(["START","NEXT 1","NEXT 2","NEXT 3","RESERVE 1","RESERVE 2"]),
+    formationStillUsesUIPortrait:slotSource.includes("getMyClanUIPortraitPath"),
+    rosterStillUsesFullCollectibleCard:cardSource.includes("getMyClanCollectibleCardPath")&&cardSource.includes("my-clan-collectible-card"),
+    slotClickHasPlayableActivation:slotSource.includes("activateMyClanFormationSlot")&&activateMyClanFormationSlot.toString().includes("selectMyClanCharacterForInspection")&&activateMyClanFormationSlot.toString().includes("stageMyClanCharacterToSlot"),
+    dragLockedDuringBattle:slotSource.includes("canEditClanFormation")&&slotSource.includes('draggable="false"')&&cardSource.includes("canEditClanFormation"),
+    favouriteControlReachable:inspectionSource.includes("toggleClanFavourite")&&inspectionSource.includes("my-clan-favourite-toggle"),
+    removeFormationControlReachable:inspectionSource.includes("removeMyClanCharacterFromInspection")&&inspectionSource.includes("REMOVE FROM FORMATION"),
+    dirtyCloseRequiresDecision:closeSource.includes("formationDirty")&&closeSource.includes("confirmationRequired:true"),
+    discardDoesNotCommit:!discardMyClanChangesAndClose.toString().includes("savePlayerData")&&discardMyClanChangesAndClose.toString().includes("stagedBaseline"),
+    saveCloseUsesExactCommitAuthority:saveMyClanChangesAndClose.toString().includes("saveMyClanStagedFormation"),
+    rendererUsesOperationalClose:renderer.includes("requestCloseMyClan")&&renderer.includes("renderMyClanCloseConfirmation"),
+    savedFormationStillExplicit:saveMyClanStagedFormation.toString().includes("savePlayerData()")&&saveMyClanStagedFormation.toString().includes("playerData.clan="),
+    loadoutRemainsSeparate:openMyClanLoadoutRoute.toString().includes("Issue #32 explicitly forbids inventing"),
+    pendingBattleStillRequiresSavedStart:typeof continueAlphaPendingBattleFromMyClan==="function"&&continueAlphaPendingBattleFromMyClan.toString().includes("formationDirty")&&continueAlphaPendingBattleFromMyClan.toString().includes("getSavedClanStartCharacterId"),
+    noAutoBestTeam:!renderer.toLowerCase().includes("best team")&&!stageMyClanCharacterToSlot.toString().includes("Math.random")
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(checks);
+  return {pass:checks.pass,checks,codingStatus:checks.pass?"MY_CLAN_OPERATIONAL_GAMEPLAY_GREEN":"MY_CLAN_OPERATIONAL_GAMEPLAY_FAILED"};
+}
+
+function runAlphaMyClanOperationalIntegrationDiagnostics(){
+  const groups={
+    operational:runAlphaMyClanOperationalGameplayDiagnostics(),
+    issue32:typeof runAlphaIssue32MyClanAdaptiveDiagnostics==="function"?runAlphaIssue32MyClanAdaptiveDiagnostics():{pass:true},
+    post2174:typeof runAlphaPost2174ProjectionMonsterDiagnostics==="function"?runAlphaPost2174ProjectionMonsterDiagnostics():{pass:true},
+    post2250:typeof runAlphaPost2250MyClanPreviewDiagnostics==="function"?runAlphaPost2250MyClanPreviewDiagnostics():{pass:true},
+    post2325:typeof runAlphaPost2325ChronicleOriginUIDiagnostics==="function"?runAlphaPost2325ChronicleOriginUIDiagnostics():{pass:true},
+    post2500:typeof runAlphaPost2500PlayabilityMonsterDiagnostics==="function"?runAlphaPost2500PlayabilityMonsterDiagnostics():{pass:true}
+  };
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  console.log(`SC Alpha My Clan operational integration gate: ${pass?"PASS":"FAIL"}`);
+  return {pass,groups,codingStatus:pass?"MY_CLAN_OPERATIONAL_INTEGRATION_GREEN":"MY_CLAN_OPERATIONAL_INTEGRATION_FAILED"};
+}
