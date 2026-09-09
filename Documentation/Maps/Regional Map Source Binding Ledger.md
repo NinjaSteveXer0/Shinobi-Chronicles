@@ -1,8 +1,8 @@
 # Shinobi Chronicles — Regional Map Source Binding Ledger
 
-Date: 4 September 2026
+Date: 9 September 2026
 
-Status: **ASSET / MAP-PROVENANCE AUTHORITY — COORDINATE REVALIDATION REQUIRED FOR LATER REGIONAL MASTERS**
+Status: **ASSET / MAP-PROVENANCE AUTHORITY — LAND OF FIRE REVALIDATED; OTHER LATER REGIONAL MASTERS STILL REQUIRE REVALIDATION**
 
 ---
 
@@ -42,15 +42,41 @@ Later UI/asset authority identifies newer regional masters:
 
 | Country | Later master revision | Current coordinate status |
 |---|---|---|
-| Land of Fire | Fire `(10)` | **REVALIDATION REQUIRED** |
+| Land of Fire | Fire `(10)` | **REVALIDATED — v2 CURRENT PRODUCTION AUTHORITY** |
 | Land of Earth | Earth `(6)` | **REVALIDATION REQUIRED** |
 | Land of Lightning | Lightning `(3)` | **REVALIDATION REQUIRED** |
 | Land of Water | Water `(4)` | **REVALIDATION REQUIRED** |
 | Land of Wind | Wind `(7)` | **REVALIDATION REQUIRED** |
 
-Do not copy v1 pixel coordinates or percentages onto these masters until the exact later source asset has been visually matched and each anchor/interaction region has been checked.
+Do not copy v1 pixel coordinates or percentages onto a later master until the exact later source asset has been visually matched and each anchor/interaction region has been checked.
 
 This is **asset/document provenance drift**, not a new map architecture.
+
+---
+
+## Land of Fire current production binding
+
+Land of Fire Fire `(10)` has completed the required source/geometry revalidation.
+
+Current production authority:
+
+- **Asset path:** `Backgrounds/inside_LOF.png`
+- **Git blob:** `b1300c48e786981f610f7a46c82d92c245da2d1c`
+- **Native canvas:** **1536 × 1024**
+- **Geometry authority:** `Documentation/Maps/Land of Fire Regional Hotspot Calibration v2.md`
+- **Revalidation date:** 9 September 2026
+
+The current binary entered the interactive-map lineage at commit `94cddaf818d2b2c873ecd4ad7d53c6f0a116b851` and was later moved to the present `Backgrounds/` path without binary change at commit `04975a8d3f837509c0eb3b79aac1c33fec9e2b26`.
+
+The v2 calibration explicitly revalidated all regional zones, public anchors/interaction regions, service anchors, optional anchors/interaction regions, concealed/event reservations/suspicion anchors, and all twelve route control-point chains against this exact Fire `(10)` master. No geometry changes were required after revalidation.
+
+Therefore:
+
+> **Land of Fire v2 is the current production geometry/source-binding authority.**
+
+> **Land of Fire v1 remains historical provenance for `inside_LOF(9).PNG` and must not regain current-master authority.**
+
+This closes source binding and presentation geometry only. Runtime responsive alignment, input/focus/accessibility non-leakage, and Golden/regression status remain separate implementation verification.
 
 ---
 
@@ -122,4 +148,4 @@ Before promoting a later regional master to production source binding:
 8. retain the old binding as historical provenance rather than silently rewriting which art it described;
 9. run responsive/unknown-location non-leakage checks after implementation.
 
-Until that process completes, the later artwork may be visually preferred while the old coordinate set remains **not automatically transferable**.
+Until that process completes for a later artwork master, that artwork may be visually preferred while its old coordinate set remains **not automatically transferable**.
