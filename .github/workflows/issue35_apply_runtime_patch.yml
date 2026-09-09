@@ -1,0 +1,47 @@
+name: Issue 35 Runtime Patch Apply
+
+on:
+  push:
+    paths:
+      - '.github/issue35/APPLY'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install portrait QA dependency
+        run: python -m pip install pillow
+      - name: Verify runtime baseline and apply validated patch
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_blob='7d923bd5e9162385988ad43730ece8c2eda28897'
+          actual_blob="$(git hash-object game.js)"
+          if [[ "$actual_blob" != "$expected_blob" ]]; then
+            echo "game.js moved: expected $expected_blob, got $actual_blob" >&2
+            exit 1
+          fi
+          base64 -d .github/issue35/issue35.patch.gz.b64 | gzip -d > /tmp/issue35.patch
+          echo 'e8441bb27e81674d0849985a8c93bc94335be67a5757df179ecfd36c2332438e  /tmp/issue35.patch' | sha256sum -c -
+          git apply --check /tmp/issue35.patch
+          git apply /tmp/issue35.patch
+          node --check game.js
+          python tools/qa_battle_portraits.py --static-only
+          test "$(git hash-object game.js)" = '1c211bbef432946d92083b3473ae6bc140a44d7d'
+      - name: Commit Issue 35 runtime implementation and clean bootstrap files
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -f .github/issue35/issue35.patch.gz.b64 .github/issue35/APPLY .github/workflows/issue35_apply_runtime_patch.yml
+          rmdir .github/issue35 2>/dev/null || true
+          git config user.name 'Shinobi Chronicles Coding Runtime'
+          git config user.email 'actions@users.noreply.github.com'
+          git add -A game.js .github
+          git commit -m 'runtime: wire Whisper Woods major-contact Story caller (#35)'
+          git push origin HEAD:main
