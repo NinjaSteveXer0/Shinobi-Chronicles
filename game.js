@@ -98126,3 +98126,695 @@ function runAlphaFiveNationInteractiveGeographyDiagnostics() {
   console.table(checks);
   return {pass:checks.pass,checks,regions:Object.keys(expectedRegions),villages:Object.keys(expectedVillageAssets),codingStatus:checks.pass?"POST_2400_FIVE_NATION_GEOGRAPHY_GREEN":"POST_2400_FIVE_NATION_GEOGRAPHY_FAILED",nextImplementedBrick:2499};
 }
+
+
+// =========================================================
+// POST-2500 — ALPHA PLAYABILITY / MAP / MY CLAN / ARENA MONSTER
+// BRICKS 2500–3499
+// =========================================================
+// Production goals from browser validation:
+// - Land of Fire uses low-noise golden halo hotspots instead of icon/rune soup;
+// - ordinary single-click no longer opens the Event Drawer;
+// - deliberate double-click directly enters an unambiguous location/action;
+// - ambiguous aggregated/multi-action hotspots still open the shared Event Drawer;
+// - Konoha regional anchor is moved from the Hokage mountain onto the physical village;
+// - Konoha village gains physical golden-halo routes for Exams, Practical and Arena;
+// - localhost-only drag calibration can tune presentation coordinates without
+//   mutating World/Event/Knowledge/ownership authority;
+// - a Battle attempt blocked by empty START can hand off to My Clan and resume
+//   after an explicitly saved formation;
+// - approved Arena masters become live presentation surfaces while existing
+//   Battle/Promotion authorities remain the semantic owners.
+// =========================================================
+
+// ---------------------------------------------------------
+// 2500–2575 — PRODUCTION MAP CALIBRATION CORRECTIONS
+// ---------------------------------------------------------
+
+const ALPHA_POST2500_KONOHA_REGION_ANCHOR=Object.freeze({x:46.3,y:42.6});
+const ALPHA_POST2500_KONOHA_VILLAGE_HOTSPOTS=Object.freeze({
+  practical:Object.freeze({
+    id:"practical",
+    label:"PRACTICAL TRAINING",
+    x:14.8,
+    y:64.6,
+    route:"practical"
+  }),
+  exams:Object.freeze({
+    id:"exams",
+    label:"SHINOBI EXAMS",
+    x:18.0,
+    y:80.2,
+    route:"exams"
+  }),
+  arena:Object.freeze({
+    id:"arena",
+    label:"KONOHA ARENA",
+    x:81.4,
+    y:36.4,
+    route:"arena"
+  })
+});
+
+function applyAlphaPost2500ProductionMapCorrections(){
+  const konoha=getWorldRegionLocation("fire","konohagakure");
+  if (konoha) {
+    konoha.x=ALPHA_POST2500_KONOHA_REGION_ANCHOR.x;
+    konoha.y=ALPHA_POST2500_KONOHA_REGION_ANCHOR.y;
+    konoha.spatialAnchorStatus="current_master_visual_revalidated";
+  }
+  return {success:!!konoha,konoha:konoha?{x:konoha.x,y:konoha.y}:null};
+}
+
+applyAlphaPost2500ProductionMapCorrections();
+
+// ---------------------------------------------------------
+// 2576–2649 — LOCALHOST-ONLY HOTSPOT CALIBRATION TOOL
+// ---------------------------------------------------------
+// Calibration edits presentation coordinates only. Nothing here commits
+// World Truth, events, discovery, ownership, progression, or player save data.
+
+const ALPHA_MAP_CALIBRATION_RUNTIME={
+  enabled:false,
+  overrides:Object.create(null),
+  drag:null
+};
+
+function isAlphaLocalCalibrationHost(){
+  if (typeof window==="undefined"||!window.location) return false;
+  const host=String(window.location.hostname||"").toLowerCase();
+  return host==="127.0.0.1"||host==="localhost"||host==="::1"||window.location.protocol==="file:";
+}
+
+function getAlphaMapCalibrationKey(scope,mapId,hotspotId){
+  return `${String(scope||"map")}:${String(mapId||"unknown")}:${String(hotspotId||"unknown")}`;
+}
+
+function getAlphaMapCalibrationAnchor(scope,mapId,hotspotId,fallback){
+  const key=getAlphaMapCalibrationKey(scope,mapId,hotspotId);
+  const override=ALPHA_MAP_CALIBRATION_RUNTIME.overrides[key];
+  if (override&&Number.isFinite(Number(override.x))&&Number.isFinite(Number(override.y))) {
+    return {x:Number(override.x),y:Number(override.y)};
+  }
+  return {x:Number(fallback&&fallback.x)||0,y:Number(fallback&&fallback.y)||0};
+}
+
+function toggleAlphaMapCalibrationMode(enabled=!ALPHA_MAP_CALIBRATION_RUNTIME.enabled){
+  if (!isAlphaLocalCalibrationHost()) return {success:false,reason:"calibration_localhost_only"};
+  ALPHA_MAP_CALIBRATION_RUNTIME.enabled=enabled===true;
+  ALPHA_MAP_CALIBRATION_RUNTIME.drag=null;
+  if (typeof document!=="undefined") document.documentElement.classList.toggle("alpha-map-calibration-on",ALPHA_MAP_CALIBRATION_RUNTIME.enabled);
+  if (currentOverlayType==="region"&&selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  if (currentOverlayType==="village") {
+    const container=document.getElementById("overlay-content-container");
+    if (container) renderVillageOverlay(container);
+  }
+  console.log(`Alpha hotspot calibration ${ALPHA_MAP_CALIBRATION_RUNTIME.enabled?"ENABLED":"DISABLED"}.`);
+  return {success:true,enabled:ALPHA_MAP_CALIBRATION_RUNTIME.enabled,presentationOnly:true};
+}
+
+function beginAlphaMapCalibrationDrag(event,scope,mapId,hotspotId){
+  if (!ALPHA_MAP_CALIBRATION_RUNTIME.enabled||!isAlphaLocalCalibrationHost()) return true;
+  if (!event||!event.currentTarget) return false;
+  const element=event.currentTarget;
+  const map=element.closest(".region-map-pane,.village-map-screen");
+  if (!map) return false;
+  event.preventDefault();
+  event.stopPropagation();
+  const key=getAlphaMapCalibrationKey(scope,mapId,hotspotId);
+  const update=pointerEvent=>{
+    const rect=map.getBoundingClientRect();
+    if (!rect.width||!rect.height) return;
+    const x=Math.max(0,Math.min(100,((pointerEvent.clientX-rect.left)/rect.width)*100));
+    const y=Math.max(0,Math.min(100,((pointerEvent.clientY-rect.top)/rect.height)*100));
+    const rounded={x:Math.round(x*10)/10,y:Math.round(y*10)/10};
+    ALPHA_MAP_CALIBRATION_RUNTIME.overrides[key]=rounded;
+    element.style.left=`${rounded.x}%`;
+    element.style.top=`${rounded.y}%`;
+    element.dataset.calibrationX=String(rounded.x);
+    element.dataset.calibrationY=String(rounded.y);
+  };
+  const end=pointerEvent=>{
+    update(pointerEvent);
+    window.removeEventListener("pointermove",update,true);
+    window.removeEventListener("pointerup",end,true);
+    window.removeEventListener("pointercancel",end,true);
+    ALPHA_MAP_CALIBRATION_RUNTIME.drag=null;
+    console.log("Alpha map calibration anchor",key,ALPHA_MAP_CALIBRATION_RUNTIME.overrides[key]);
+  };
+  ALPHA_MAP_CALIBRATION_RUNTIME.drag={key,scope,mapId,hotspotId};
+  update(event);
+  window.addEventListener("pointermove",update,true);
+  window.addEventListener("pointerup",end,true);
+  window.addEventListener("pointercancel",end,true);
+  return false;
+}
+
+function exportAlphaMapCalibration(){
+  const payload={
+    exportedAt:new Date().toISOString(),
+    presentationOnly:true,
+    overrides:Object.fromEntries(Object.entries(ALPHA_MAP_CALIBRATION_RUNTIME.overrides).map(([key,value])=>[key,{x:value.x,y:value.y}]))
+  };
+  const json=JSON.stringify(payload,null,2);
+  console.log(json);
+  if (typeof navigator!=="undefined"&&navigator.clipboard&&typeof navigator.clipboard.writeText==="function") {
+    navigator.clipboard.writeText(json).catch(()=>{});
+  }
+  return payload;
+}
+
+function clearAlphaMapCalibration(){
+  ALPHA_MAP_CALIBRATION_RUNTIME.overrides=Object.create(null);
+  if (currentOverlayType==="region"&&selectedRegionKey&&worldRegions[selectedRegionKey]) renderRegionHubUI(selectedRegionKey,worldRegions[selectedRegionKey]);
+  if (currentOverlayType==="village") {
+    const container=document.getElementById("overlay-content-container");
+    if (container) renderVillageOverlay(container);
+  }
+  return {success:true,presentationOnly:true};
+}
+
+if (typeof document!=="undefined") {
+  document.addEventListener("keydown",event=>{
+    if (event.ctrlKey&&event.shiftKey&&String(event.key||"").toLowerCase()==="h"&&isAlphaLocalCalibrationHost()) {
+      event.preventDefault();
+      toggleAlphaMapCalibrationMode();
+    }
+  });
+}
+
+// ---------------------------------------------------------
+// 2650–2749 — GOLDEN HALO REGIONAL HOTSPOTS + DOUBLE-CLICK
+// ---------------------------------------------------------
+
+function getAlphaRegionDisplayAnchor(regionKey,hotspot){
+  return getAlphaMapCalibrationAnchor("region",regionKey,hotspot&&hotspot.hotspotId,hotspot&&hotspot.anchor||{x:0,y:0});
+}
+
+function renderHotspotHoverCard(hotspot){
+  const label=hotspot.knownLabel||"???";
+  const summary=hotspot.knownSummary||"";
+  const deliberateHint=hotspot.aggregationCount>1?"DOUBLE-CLICK TO REVIEW":"DOUBLE-CLICK TO ENTER";
+  return `
+    <span class="hotspot-hover-card">
+      <span class="hover-card-top">
+        <span><strong class="hover-card-name">${escapeStorySceneHTML(label)}</strong><small class="hover-card-category">${escapeStorySceneHTML(hotspot.presentationFamily||"Unknown")}</small></span>
+      </span>
+      ${summary?`<span class="hover-card-divider"></span><span class="hover-info-row"><small>${escapeStorySceneHTML(summary)}</small></span>`:""}
+      ${hotspot.aggregationCount>1?`<span class="hover-info-row"><small>Known opportunities</small><strong>${hotspot.aggregationCount}</strong></span>`:""}
+      <span class="hover-card-footer">${deliberateHint}</span>
+    </span>
+  `;
+}
+
+function renderRegionHotspot(regionKey,hotspot){
+  const anchor=getAlphaRegionDisplayAnchor(regionKey,hotspot);
+  const hoverSide=getHotspotHoverSide(anchor);
+  const visualClass=getHotspotPresentationClass(hotspot.presentationFamily);
+  const label=hotspot.knownLabel||"???";
+  const aggregateSuffix=hotspot.aggregationCount>1?` +${hotspot.aggregationCount-1}`:"";
+  return `
+    <button type="button"
+      class="region-hotspot region-hotspot-golden-halo ${visualClass} ${hoverSide}"
+      style="left:${anchor.x}%;top:${anchor.y}%;"
+      data-hotspot-id="${escapeStorySceneHTML(hotspot.hotspotId)}"
+      data-region-key="${escapeStorySceneHTML(regionKey)}"
+      ondblclick="activateAlphaRegionHotspot(event,'${escapeStorySceneHTML(regionKey)}','${escapeStorySceneHTML(hotspot.hotspotId)}')"
+      onkeydown="handleAlphaRegionHotspotKeyboard(event,'${escapeStorySceneHTML(regionKey)}','${escapeStorySceneHTML(hotspot.hotspotId)}')"
+      onpointerdown="beginAlphaMapCalibrationDrag(event,'region','${escapeStorySceneHTML(regionKey)}','${escapeStorySceneHTML(hotspot.hotspotId)}')"
+      aria-label="${escapeStorySceneHTML(label)}. Double-click to enter.">
+      <span class="region-golden-halo-ring" aria-hidden="true"><span></span></span>
+      <span class="hotspot-nameplate">${escapeStorySceneHTML(label)}${escapeStorySceneHTML(aggregateSuffix)}</span>
+      ${renderHotspotHoverCard(hotspot)}
+    </button>
+  `;
+}
+
+function handleAlphaRegionHotspotKeyboard(event,regionKey,hotspotId){
+  if (!event) return false;
+  if (event.key==="Enter"||event.key===" ") {
+    event.preventDefault();
+    return activateAlphaRegionHotspot(event,regionKey,hotspotId);
+  }
+  return false;
+}
+
+// ---------------------------------------------------------
+// 2750–2824 — BATTLE → MY CLAN → BATTLE CONTINUATION
+// ---------------------------------------------------------
+
+const ALPHA_PENDING_BATTLE_ROUTE_STATE={route:null};
+
+function getSavedClanStartCharacterId(){
+  const queue=getPersistentClanBattleQueueSlots();
+  return Array.isArray(queue)?queue[0]||null:null;
+}
+
+function setAlphaPendingBattleRoute(route){
+  ALPHA_PENDING_BATTLE_ROUTE_STATE.route=route&&typeof route==="object"?cloneProgressionData(route):null;
+  return ALPHA_PENDING_BATTLE_ROUTE_STATE.route;
+}
+
+function clearAlphaPendingBattleRoute(){
+  ALPHA_PENDING_BATTLE_ROUTE_STATE.route=null;
+  return true;
+}
+
+function openMyClanForPendingBattle(route){
+  setAlphaPendingBattleRoute(route);
+  setMyClanFeedback("Battle is waiting for a saved START formation.","info");
+  const result=openOverlay("clan");
+  if (typeof queueMicrotask==="function") queueMicrotask(injectAlphaPendingBattleControl);
+  else setTimeout(injectAlphaPendingBattleControl,0);
+  return result||{success:true,type:"clan",pendingBattle:true};
+}
+
+function renderAlphaPendingBattleControl(){
+  const route=ALPHA_PENDING_BATTLE_ROUTE_STATE.route;
+  if (!route) return "";
+  const savedStartId=getSavedClanStartCharacterId();
+  const startCharacter=savedStartId?getPlayerCharacter(savedStartId):null;
+  const dirty=CLAN_UI_STATE.formationDirty===true;
+  const ready=!!savedStartId&&!dirty;
+  let destination="BATTLE";
+  if (route.kind==="arena_battle_surface") destination="ARENA BATTLE";
+  else if (route.label) destination=String(route.label).toUpperCase();
+  return `<div class="my-clan-pending-battle-control ${ready?"is-ready":"is-blocked"}">
+    <div><span>${escapeStorySceneHTML(destination)} WAITING</span><strong>${startCharacter?`START · ${escapeStorySceneHTML(startCharacter.name)}`:"ASSIGN START"}</strong><small>${dirty?"Save the staged formation before continuing.":(savedStartId?"Saved formation is ready.":"Battle consumes the saved START slot.")}</small></div>
+    <button type="button" onclick="continueAlphaPendingBattleFromMyClan()" ${ready?"":"disabled"}>CONTINUE</button>
+    <button type="button" class="is-cancel" onclick="cancelAlphaPendingBattleFromMyClan()">CANCEL</button>
+  </div>`;
+}
+
+function injectAlphaPendingBattleControl(){
+  if (typeof document==="undefined"||currentOverlayType!=="clan") return false;
+  const stage=document.querySelector(".my-clan-stage");
+  if (!stage) return false;
+  const old=stage.querySelector(".my-clan-pending-battle-control");
+  if (old) old.remove();
+  const markup=renderAlphaPendingBattleControl();
+  if (!markup) return true;
+  stage.insertAdjacentHTML("beforeend",markup);
+  return true;
+}
+
+const ALPHA_PRE2500_RERENDER_CLAN_OVERLAY=rerenderClanOverlay;
+rerenderClanOverlay=function(){
+  const result=ALPHA_PRE2500_RERENDER_CLAN_OVERLAY();
+  injectAlphaPendingBattleControl();
+  return result;
+};
+
+function cancelAlphaPendingBattleFromMyClan(){
+  clearAlphaPendingBattleRoute();
+  setMyClanFeedback("Pending Battle route cancelled.","info");
+  rerenderClanOverlay();
+  return {success:true,cancelled:true};
+}
+
+function continueAlphaPendingBattleFromMyClan(){
+  const route=ALPHA_PENDING_BATTLE_ROUTE_STATE.route;
+  if (!route) return {success:false,reason:"pending_battle_route_missing"};
+  if (CLAN_UI_STATE.formationDirty===true) {
+    setMyClanFeedback("Save the staged formation before continuing to Battle.","error");
+    rerenderClanOverlay();
+    return {success:false,reason:"clan_formation_unsaved"};
+  }
+  if (!getSavedClanStartCharacterId()) {
+    setMyClanFeedback("Assign an owned shinobi to START and save the formation first.","error");
+    rerenderClanOverlay();
+    return {success:false,reason:"clan_start_slot_empty"};
+  }
+
+  if (route.kind==="arena_battle_surface") {
+    clearAlphaPendingBattleRoute();
+    return openOverlay("battle")||{success:true,type:"battle"};
+  }
+
+  if (route.kind==="world_opportunity"&&route.opportunityId&&route.actionId) {
+    if (route.regionKey&&worldRegions[route.regionKey]) selectedRegionKey=route.regionKey;
+    selectedHotspotId=route.hotspotId||null;
+    selectedOpportunityId=route.opportunityId;
+    selectedLocationNode=route.regionKey&&route.locationId?getWorldRegionLocation(route.regionKey,route.locationId):selectedLocationNode;
+    const result=routeWorldOpportunityInteraction(route.opportunityId,route.actionId);
+    if (result&&result.success===true) clearAlphaPendingBattleRoute();
+    else {
+      setMyClanFeedback(`Battle could not continue: ${result&&result.reason||"unknown"}.`,"error");
+      rerenderClanOverlay();
+    }
+    return result;
+  }
+  return {success:false,reason:"pending_battle_route_unknown"};
+}
+
+const ALPHA_PRE2500_EXECUTE_SELECTED_OPPORTUNITY_ACTION=executeSelectedOpportunityAction;
+executeSelectedOpportunityAction=function(actionId){
+  const context={
+    kind:"world_opportunity",
+    regionKey:selectedRegionKey,
+    hotspotId:selectedHotspotId,
+    opportunityId:selectedOpportunityId,
+    actionId:String(actionId||""),
+    locationId:selectedLocationNode&&selectedLocationNode.id||null,
+    label:selectedLocationNode&&selectedLocationNode.name||"Battle"
+  };
+  const result=ALPHA_PRE2500_EXECUTE_SELECTED_OPPORTUNITY_ACTION(actionId);
+  if (result&&result.success===false&&result.reason==="clan_start_slot_empty") setAlphaPendingBattleRoute(context);
+  return result;
+};
+
+function activateAlphaRegionHotspot(event,regionKey,hotspotId){
+  if (event&&typeof event.preventDefault==="function") event.preventDefault();
+  if (event&&typeof event.stopPropagation==="function") event.stopPropagation();
+  if (ALPHA_MAP_CALIBRATION_RUNTIME.enabled) return {success:false,reason:"calibration_mode_active",presentationOnly:true};
+
+  const region=worldRegions[regionKey];
+  const hotspot=getHotspotProjection(regionKey,hotspotId);
+  if (!region||!hotspot) return {success:false,reason:"hotspot_missing"};
+
+  selectedRegionKey=regionKey;
+  selectedHotspotId=hotspot.hotspotId;
+  selectedLocationNode=getWorldRegionLocation(regionKey,hotspot.locationId);
+  const selected=hotspot.opportunities[0]||null;
+  selectedOpportunityId=selected&&selected.opportunity_id||null;
+
+  // More than one independent opportunity or more than one currently available
+  // action is deliberately NOT auto-resolved. The shared drawer remains the
+  // disambiguation surface for those cases.
+  if (hotspot.aggregationCount>1) {
+    renderRegionHubUI(regionKey,region);
+    return {success:true,type:"event_drawer",reason:"multiple_opportunities"};
+  }
+
+  if (selected) {
+    const availableActions=(selected.legal_actions||[]).filter(action=>action.available===true);
+    if (availableActions.length>1) {
+      renderRegionHubUI(regionKey,region);
+      return {success:true,type:"event_drawer",reason:"multiple_available_actions"};
+    }
+    if (availableActions.length===1) {
+      const action=availableActions[0];
+      if (action.kind==="battle"&&!getSavedClanStartCharacterId()) {
+        return openMyClanForPendingBattle({
+          kind:"world_opportunity",
+          regionKey,
+          hotspotId:hotspot.hotspotId,
+          opportunityId:selected.opportunity_id,
+          actionId:action.actionId,
+          locationId:hotspot.locationId,
+          label:selected.known_label||selectedLocationNode&&selectedLocationNode.name||"Battle"
+        });
+      }
+      const result=routeWorldOpportunityInteraction(selected.opportunity_id,action.actionId);
+      if (result&&result.success===false&&result.reason==="clan_start_slot_empty") {
+        return openMyClanForPendingBattle({
+          kind:"world_opportunity",
+          regionKey,
+          hotspotId:hotspot.hotspotId,
+          opportunityId:selected.opportunity_id,
+          actionId:action.actionId,
+          locationId:hotspot.locationId,
+          label:selected.known_label||selectedLocationNode&&selectedLocationNode.name||"Battle"
+        });
+      }
+      if (result&&result.success===true) return result;
+      // Known blocker or non-auto-safe failure remains inspectable rather than
+      // silently throwing the player somewhere else.
+      selectedOpportunityActionFeedback=result&&result.reason?{
+        opportunityId:selected.opportunity_id,
+        actionId:action.actionId,
+        reason:String(result.reason)
+      }:null;
+      renderRegionHubUI(regionKey,region);
+      return result||{success:false,reason:"interaction_route_failed"};
+    }
+  }
+
+  if (selectedLocationNode) {
+    handleNodeNavigation();
+    saveTestState();
+    return {success:true,type:"location_navigation",locationId:selectedLocationNode.id};
+  }
+
+  renderRegionHubUI(regionKey,region);
+  return {success:true,type:"event_drawer",reason:"no_direct_location_route"};
+}
+
+// ---------------------------------------------------------
+// 2825–2949 — KONOHA PHYSICAL HALO NAVIGATION
+// ---------------------------------------------------------
+
+function getAlphaKonohaVillageHotspotAnchor(hotspot){
+  return getAlphaMapCalibrationAnchor("village","konohagakure",hotspot.id,{x:hotspot.x,y:hotspot.y});
+}
+
+function activateAlphaKonohaVillageHotspot(event,hotspotId){
+  if (event&&typeof event.preventDefault==="function") event.preventDefault();
+  if (event&&typeof event.stopPropagation==="function") event.stopPropagation();
+  if (ALPHA_MAP_CALIBRATION_RUNTIME.enabled) return {success:false,reason:"calibration_mode_active",presentationOnly:true};
+  const hotspot=ALPHA_POST2500_KONOHA_VILLAGE_HOTSPOTS[hotspotId];
+  if (!hotspot) return {success:false,reason:"konoha_hotspot_missing"};
+  if (hotspot.route==="practical") return openKonohaPracticalFromVillage();
+  if (hotspot.route==="exams") return openKonohaExamFromVillage();
+  if (hotspot.route==="arena") return openArenaMain();
+  return {success:false,reason:"konoha_hotspot_route_unknown"};
+}
+
+function handleAlphaKonohaVillageHotspotKeyboard(event,hotspotId){
+  if (!event) return false;
+  if (event.key==="Enter"||event.key===" ") {
+    event.preventDefault();
+    return activateAlphaKonohaVillageHotspot(event,hotspotId);
+  }
+  return false;
+}
+
+function renderAlphaKonohaVillageHotspots(){
+  return Object.values(ALPHA_POST2500_KONOHA_VILLAGE_HOTSPOTS).map(hotspot=>{
+    const anchor=getAlphaKonohaVillageHotspotAnchor(hotspot);
+    return `<button type="button" class="village-golden-halo village-golden-halo-${escapeStorySceneHTML(hotspot.id)}"
+      style="left:${anchor.x}%;top:${anchor.y}%;"
+      data-village-hotspot-id="${escapeStorySceneHTML(hotspot.id)}"
+      ondblclick="activateAlphaKonohaVillageHotspot(event,'${escapeStorySceneHTML(hotspot.id)}')"
+      onkeydown="handleAlphaKonohaVillageHotspotKeyboard(event,'${escapeStorySceneHTML(hotspot.id)}')"
+      onpointerdown="beginAlphaMapCalibrationDrag(event,'village','konohagakure','${escapeStorySceneHTML(hotspot.id)}')"
+      aria-label="${escapeStorySceneHTML(hotspot.label)}. Double-click to enter.">
+      <span class="village-golden-halo-ring" aria-hidden="true"><span></span></span>
+      <span class="village-golden-halo-label">${escapeStorySceneHTML(hotspot.label)}</span>
+    </button>`;
+  }).join("");
+}
+
+const ALPHA_PRE2500_RENDER_VILLAGE_OVERLAY=renderVillageOverlay;
+renderVillageOverlay=function(container){
+  if (!container) return false;
+  const definition=getActiveVillageMapDefinition();
+  if (!definition) {
+    renderGenericOverlay(container,"VILLAGE MAP","No village map is registered for the selected location.");
+    return false;
+  }
+  const region=worldRegions[definition.regionKey];
+  selectedRegionKey=definition.regionKey;
+  selectedLocationNode=getWorldRegionLocation(definition.regionKey,definition.locationId)||selectedLocationNode;
+  const knownOpportunityCount=getVillageKnownOpportunityCount(definition);
+  const operationalHotspots=definition.locationId==="konohagakure"?renderAlphaKonohaVillageHotspots():"";
+  container.innerHTML=`
+    <div class="village-map-screen village-map-${definition.locationId}" data-village-id="${definition.locationId}" data-region-key="${definition.regionKey}">
+      <img src="${definition.mapImage}" alt="${escapeStorySceneHTML(definition.epithet)}" class="village-map-image">
+      <button type="button" class="village-map-return" onclick="returnToActiveRegionFromVillage()" aria-label="Return to ${escapeStorySceneHTML(region.name)}">${escapeStorySceneHTML(region.name.toUpperCase())}</button>
+      <button type="button" class="village-info-toggle ${villageInfoOpen?"active":""}" onclick="toggleVillageInfo()" aria-expanded="${villageInfoOpen?"true":"false"}">◈ VILLAGE INFO</button>
+      <aside class="village-info-drawer ${villageInfoOpen?"open":""}" aria-label="Village information">
+        <strong>${escapeStorySceneHTML(definition.name)}</strong>
+        <span>${escapeStorySceneHTML(definition.epithet)}</span>
+        <small>${escapeStorySceneHTML(region.name)}</small>
+        <div class="village-info-rule"></div>
+        <div><span>Known local opportunities</span><b>${knownOpportunityCount}</b></div>
+        <p>Story, mission and activity interactions appear only when their owning systems authorise them.</p>
+      </aside>
+      ${operationalHotspots}
+      ${definition.locationId==="konohagakure"?`<div class="village-double-click-hint">DOUBLE-CLICK A GOLDEN HALO TO ENTER</div>`:""}
+    </div>`;
+  saveTestState();
+  return true;
+};
+
+// ---------------------------------------------------------
+// 2950–3249 — APPROVED ARENA MASTER SURFACES
+// ---------------------------------------------------------
+
+Object.assign(assetManifest.ui,{
+  arenaMain:"UI/arena_main.png",
+  arenaPromotion:"UI/arena_promotion.png",
+  arenaPVP:"UI/pvp.png",
+  arenaStagedBattles:"UI/staged_battles.png",
+  arenaVillageTournament:"UI/village_tournament.png"
+});
+
+const ALPHA_POST2500_ARENA_RUNTIME={surface:"main"};
+const ALPHA_PRE2500_RENDER_ARENA_PROMOTION=renderArenaPromotionOverlay;
+
+function getAlphaArenaMasterAsset(surface){
+  switch (surface) {
+    case "promotion": return assetManifest.ui.arenaPromotion;
+    case "pvp": return assetManifest.ui.arenaPVP;
+    case "staged": return assetManifest.ui.arenaStagedBattles;
+    case "tournament": return assetManifest.ui.arenaVillageTournament;
+    default: return assetManifest.ui.arenaMain;
+  }
+}
+
+openArenaMain=function(){
+  ARENA_ALPHA_UI_STATE.selectedPromotionOwnedCharacterId=null;
+  ALPHA_POST2500_ARENA_RUNTIME.surface="main";
+  return openOverlay("arena");
+};
+
+function openAlphaArenaUtilitySurface(surface){
+  if (!["main","staged","tournament","pvp"].includes(surface)) return {success:false,reason:"arena_surface_unknown"};
+  ALPHA_POST2500_ARENA_RUNTIME.surface=surface;
+  return openOverlay("arena")||{success:true,type:"arena",surface};
+}
+
+openArenaBattleSurface=function(){
+  if (isGeninRosterTransitionPending()) {
+    openGeninRosterTransitionUI();
+    return {success:false,reason:"genin_roster_transition_required"};
+  }
+  if (!getSavedClanStartCharacterId()) {
+    return openMyClanForPendingBattle({kind:"arena_battle_surface",label:"Arena Battle"});
+  }
+  return openOverlay("battle")||{success:true,type:"battle"};
+};
+
+function renderAlphaArenaMasterStage(container,{surface="main",assetPath,title="ARENA",subtitle="",body="",actions=""}={}){
+  if (!container) return false;
+  container.innerHTML=`<div class="alpha-arena-master-screen alpha-arena-surface-${escapeStorySceneHTML(surface)}" data-arena-surface="${escapeStorySceneHTML(surface)}">
+    <div class="alpha-arena-master-stage">
+      <img src="${escapeStorySceneHTML(assetPath)}" alt="${escapeStorySceneHTML(title)}" class="alpha-arena-master-image">
+      <section class="alpha-arena-runtime-panel">
+        <div class="alpha-arena-runtime-heading"><span>KONOHA ARENA</span><strong>${escapeStorySceneHTML(title)}</strong>${subtitle?`<small>${escapeStorySceneHTML(subtitle)}</small>`:""}</div>
+        ${body}
+        ${actions?`<div class="alpha-arena-runtime-actions">${actions}</div>`:""}
+      </section>
+    </div>
+  </div>`;
+  return true;
+}
+
+renderArenaMainOverlay=function(container){
+  if (!container) return false;
+  const surface=ALPHA_POST2500_ARENA_RUNTIME.surface||"main";
+  if (surface!=="main") {
+    const definitions={
+      staged:{title:"STAGED BATTLES",subtitle:"Authored encounter staging surface",copy:"This surface is wired to the approved master. No staged encounter is manufactured here; authored encounter/runtime authority must supply a real occurrence before START can become available."},
+      tournament:{title:"VILLAGE TOURNAMENT",subtitle:"Tournament presentation surface",copy:"The approved tournament master is live. Tournament brackets, eligibility, opponents and rewards remain empty until their owning systems provide real Alpha content."},
+      pvp:{title:"PVP",subtitle:"Player-versus-player presentation surface",copy:"The approved PVP master is live. No fake network opponent, ladder result or matchmaking state is generated by the local Alpha runtime."}
+    };
+    const definition=definitions[surface]||definitions.staged;
+    return renderAlphaArenaMasterStage(container,{
+      surface,
+      assetPath:getAlphaArenaMasterAsset(surface),
+      title:definition.title,
+      subtitle:definition.subtitle,
+      body:`<div class="alpha-arena-status-copy">${escapeStorySceneHTML(definition.copy)}</div>`,
+      actions:`<button type="button" onclick="openArenaMain()">BACK TO ARENA MAIN</button>`
+    });
+  }
+
+  const startId=getSavedClanStartCharacterId();
+  const startCharacter=startId?getPlayerCharacter(startId):null;
+  const body=`<div class="alpha-arena-readiness ${startId?"is-ready":"is-blocked"}"><span>BATTLE ORDER</span><strong>${startCharacter?`START · ${escapeStorySceneHTML(startCharacter.name)}`:"START NOT ASSIGNED"}</strong><small>${startId?"Saved My Clan formation will be consumed by Battle.":"Battle routes to My Clan until START is saved."}</small></div>`;
+  const actions=`
+    <button type="button" class="is-primary" onclick="openArenaBattleSurface()">BATTLE</button>
+    <button type="button" onclick="openArenaPromotionSurface()">PROMOTION</button>
+    <button type="button" onclick="openAlphaArenaUtilitySurface('staged')">STAGED BATTLES</button>
+    <button type="button" onclick="openAlphaArenaUtilitySurface('tournament')">VILLAGE TOURNAMENT</button>
+    <button type="button" onclick="openAlphaArenaUtilitySurface('pvp')">PVP</button>`;
+  return renderAlphaArenaMasterStage(container,{
+    surface:"main",
+    assetPath:getAlphaArenaMasterAsset("main"),
+    title:"ARENA MAIN",
+    subtitle:"Operational Arena command surface",
+    body,
+    actions
+  });
+};
+
+renderArenaPromotionOverlay=function(container){
+  if (!container) return false;
+  const temp=typeof document!=="undefined"?document.createElement("div"):null;
+  if (!temp) return ALPHA_PRE2500_RENDER_ARENA_PROMOTION(container);
+  ALPHA_PRE2500_RENDER_ARENA_PROMOTION(temp);
+  container.innerHTML=`<div class="alpha-arena-master-screen alpha-arena-surface-promotion" data-arena-surface="promotion">
+    <div class="alpha-arena-master-stage">
+      <img src="${escapeStorySceneHTML(getAlphaArenaMasterAsset("promotion"))}" alt="Arena Promotion" class="alpha-arena-master-image">
+      <section class="alpha-arena-promotion-runtime">${temp.innerHTML}</section>
+    </div>
+  </div>`;
+  return true;
+};
+
+// ---------------------------------------------------------
+// 3250–3399 — UPDATED FIVE-NATION / PLAYABILITY DIAGNOSTICS
+// ---------------------------------------------------------
+
+runAlphaFiveNationInteractiveGeographyDiagnostics=function(){
+  const expectedRegions={
+    fire:{asset:"./Backgrounds/inside_LOF.png",village:"konohagakure"},
+    earth:{asset:"./Backgrounds/inside_LOE.png",village:"iwagakure"},
+    wind:{asset:"./Backgrounds/inside_LOW.png",village:"sunagakure"},
+    water:{asset:"./Backgrounds/inside_LOWA.png",village:"kirigakure"},
+    lightning:{asset:"./Backgrounds/inside_LOL.png",village:"kumogakure"}
+  };
+  const konoha=getWorldRegionLocation("fire","konohagakure");
+  const checks={
+    fiveMajorRegionsRegistered:Object.keys(expectedRegions).every(key=>!!worldRegions[key]),
+    exactRegionalAssets:Object.entries(expectedRegions).every(([key,value])=>worldRegions[key]&&worldRegions[key].mapImage===value.asset),
+    exactCapitalVillageIdentity:Object.entries(expectedRegions).every(([key,value])=>worldRegions[key]&&worldRegions[key].capitalVillageId===value.village),
+    unvalidatedForeignRegionCoordinatesRemainUninvented:["earth","wind","water","lightning"].every(key=>worldRegions[key].locations.every(location=>!hasAuthoritativeRegionAnchor(location))),
+    pendingForeignMapsUseNonSpatialDestinations:["earth","wind","water","lightning"].every(key=>getRegionNonSpatialDestinations(key).length===1),
+    konohaRegionalAnchorMovedToPhysicalVillage:!!konoha&&Math.abs(konoha.x-ALPHA_POST2500_KONOHA_REGION_ANCHOR.x)<0.01&&Math.abs(konoha.y-ALPHA_POST2500_KONOHA_REGION_ANCHOR.y)<0.01,
+    regionalProjectionUsesGoldenHalos:renderRegionHotspot.toString().includes("region-golden-halo-ring")&&!renderRegionHotspot.toString().includes("hotspot-runtime-rune")&&!renderRegionHotspot.toString().includes("hotspot-icon-image"),
+    ordinarySingleClickDoesNotOpenDrawer:!renderRegionHotspot.toString().includes('onclick="selectMapNode'),
+    deliberateDoubleClickRoute:renderRegionHotspot.toString().includes("ondblclick")&&typeof activateAlphaRegionHotspot==="function",
+    threeKonohaOperationalHalos:Object.keys(ALPHA_POST2500_KONOHA_VILLAGE_HOTSPOTS).join("|")==="practical|exams|arena",
+    arenaPhysicalHotspotRegistered:ALPHA_POST2500_KONOHA_VILLAGE_HOTSPOTS.arena.route==="arena",
+    calibrationPresentationOnly:typeof toggleAlphaMapCalibrationMode==="function"&&exportAlphaMapCalibration.toString().includes("presentationOnly:true")&&!exportAlphaMapCalibration.toString().includes("savePlayerData"),
+    villageRefreshRestoreInstalled:restoreTestState.toString().includes('state.overlayType === "village"'),
+    locationEventNonCollapsePreserved:!openRegionDestination.toString().includes("completeLocation")&&!openRegionDestination.toString().includes("executePlayerActivity")
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(checks);
+  return {pass:checks.pass,checks,codingStatus:checks.pass?"POST_2500_MAP_INTERACTION_GREEN":"POST_2500_MAP_INTERACTION_FAILED",nextImplementedBrick:3399};
+};
+
+function runAlphaPost2500PlayabilityMonsterDiagnostics(){
+  const map=runAlphaFiveNationInteractiveGeographyDiagnostics();
+  const arenaAssets={
+    main:"UI/arena_main.png",
+    promotion:"UI/arena_promotion.png",
+    pvp:"UI/pvp.png",
+    staged:"UI/staged_battles.png",
+    tournament:"UI/village_tournament.png"
+  };
+  const checks={
+    map:map.pass===true,
+    myClanAdaptiveRuntimePresent:typeof renderClanOverlay==="function"&&typeof stageMyClanCharacterToSlot==="function"&&typeof saveMyClanStagedFormation==="function"&&typeof beginMyClanCharacterDrag==="function",
+    myClanExplicitSaveModel:saveMyClanStagedFormation.toString().includes("savePlayerData")&&validateMyClanStagedFormationForCommit.toString().includes("duplicate_clan_team_character"),
+    myClanFreshChronicleAuthorityPreserved:typeof renderAlphaChronicleOriginSelectionModal==="function"&&selectChronicleOrigin.toString().includes("teamSlots:[runtime.id,null,null,null,null,null]"),
+    pendingBattleCanRouteToClan:openMyClanForPendingBattle.toString().includes('openOverlay("clan")'),
+    pendingBattleRequiresSavedStart:continueAlphaPendingBattleFromMyClan.toString().includes("getSavedClanStartCharacterId")&&continueAlphaPendingBattleFromMyClan.toString().includes("formationDirty"),
+    banditDirectDoubleClickCanLaunchAuthoredBattle:activateAlphaRegionHotspot.toString().includes("routeWorldOpportunityInteraction")&&activateAlphaRegionHotspot.toString().includes("action.kind===\"battle\""),
+    arenaMastersAllWired:assetManifest.ui.arenaMain===arenaAssets.main&&assetManifest.ui.arenaPromotion===arenaAssets.promotion&&assetManifest.ui.arenaPVP===arenaAssets.pvp&&assetManifest.ui.arenaStagedBattles===arenaAssets.staged&&assetManifest.ui.arenaVillageTournament===arenaAssets.tournament,
+    arenaBattleRetainsExistingBattleSurface:openArenaBattleSurface.toString().includes('openOverlay("battle")'),
+    arenaPromotionRetainsExistingAuthority:renderArenaPromotionOverlay.toString().includes("ALPHA_PRE2500_RENDER_ARENA_PROMOTION"),
+    arenaInactiveModesInventNoResults:renderArenaMainOverlay.toString().includes("No fake network opponent")&&renderArenaMainOverlay.toString().includes("No staged encounter is manufactured"),
+    noAutoBestTeam:!String(renderClanOverlay).includes("best team")&&!String(stageMyClanCharacterToSlot).includes("Math.random"),
+    startIdentityNotLeaderCollapsed:!String(saveMyClanStagedFormation).includes("leader")
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(checks);
+  console.log(`SC Alpha POST-2500 playability monster gate: ${checks.pass?"PASS":"FAIL"}`);
+  return {pass:checks.pass,checks,map,nextImplementedBrick:3499};
+}
+
