@@ -41564,6 +41564,98 @@ const worldRegions = {
 
 
 // =========================================================
+// POST-2400 — FIVE-NATION INTERACTIVE GEOGRAPHY FOUNDATION
+// BRICKS 2400–2499
+// =========================================================
+// The four additional major Lands are real Alpha world surfaces.
+// Their artwork is already production-present, but spatial hotspot calibration
+// against the current masters is not yet authoritative. Therefore:
+// - the regional artwork may be opened now;
+// - the major village may be reached through a non-spatial destination dock;
+// - no fake map pin coordinates are invented;
+// - later coordinate revalidation can add true spatial hotspots without
+//   changing region/village identity or navigation semantics.
+// =========================================================
+
+const ALPHA_MAJOR_REGION_SURFACE_DEFINITIONS=Object.freeze({
+  earth:Object.freeze({
+    name:"Land of Earth",
+    description:"Major shinobi nation and home region of Iwagakure.",
+    mapImage:"./Backgrounds/inside_LOE.png",
+    capitalVillageId:"iwagakure",
+    spatialCalibrationStatus:"pending_revalidation",
+    locations:Object.freeze([
+      Object.freeze({
+        id:"iwagakure",name:"Iwagakure",shortName:"Iwagakure",type:"village",
+        category:"VILLAGE / CAPITAL HUB",desc:"The Hidden Stone Village.",
+        spatialAnchorStatus:"pending_revalidation"
+      })
+    ])
+  }),
+  wind:Object.freeze({
+    name:"Land of Wind",
+    description:"Major shinobi nation and home region of Sunagakure.",
+    mapImage:"./Backgrounds/inside_LOW.png",
+    capitalVillageId:"sunagakure",
+    spatialCalibrationStatus:"pending_revalidation",
+    locations:Object.freeze([
+      Object.freeze({
+        id:"sunagakure",name:"Sunagakure",shortName:"Sunagakure",type:"village",
+        category:"VILLAGE / CAPITAL HUB",desc:"The Hidden Sand Village.",
+        spatialAnchorStatus:"pending_revalidation"
+      })
+    ])
+  }),
+  water:Object.freeze({
+    name:"Land of Water",
+    description:"Major shinobi nation and home region of Kirigakure.",
+    mapImage:"./Backgrounds/inside_LOWA.png",
+    capitalVillageId:"kirigakure",
+    spatialCalibrationStatus:"pending_revalidation",
+    locations:Object.freeze([
+      Object.freeze({
+        id:"kirigakure",name:"Kirigakure",shortName:"Kirigakure",type:"village",
+        category:"VILLAGE / CAPITAL HUB",desc:"The Hidden Mist Village.",
+        spatialAnchorStatus:"pending_revalidation"
+      })
+    ])
+  }),
+  lightning:Object.freeze({
+    name:"Land of Lightning",
+    description:"Major shinobi nation and home region of Kumogakure.",
+    mapImage:"./Backgrounds/inside_LOL.png",
+    capitalVillageId:"kumogakure",
+    spatialCalibrationStatus:"pending_revalidation",
+    locations:Object.freeze([
+      Object.freeze({
+        id:"kumogakure",name:"Kumogakure",shortName:"Kumogakure",type:"village",
+        category:"VILLAGE / CAPITAL HUB",desc:"The Hidden Cloud Village.",
+        spatialAnchorStatus:"pending_revalidation"
+      })
+    ])
+  })
+});
+
+Object.entries(ALPHA_MAJOR_REGION_SURFACE_DEFINITIONS).forEach(([regionKey,definition])=>{
+  if (worldRegions[regionKey]) return;
+  worldRegions[regionKey]={
+    name:definition.name,
+    description:definition.description,
+    mapImage:definition.mapImage,
+    capitalVillageId:definition.capitalVillageId,
+    spatialCalibrationStatus:definition.spatialCalibrationStatus,
+    progress:null,
+    locations:definition.locations.map(location=>({...location}))
+  };
+});
+
+// Existing Fire runtime remains the only currently spatially-populated major
+// regional surface. This flag records presentation provenance only.
+worldRegions.fire.capitalVillageId="konohagakure";
+worldRegions.fire.spatialCalibrationStatus=worldRegions.fire.spatialCalibrationStatus||"existing_runtime_projection";
+
+
+// =========================================================
 // 2. ACTIVE REGION / LOCATION STATE
 // BRICK 694 — KNOWLEDGE-SENSITIVE HOTSPOT SELECTION STATE
 // =========================================================
@@ -41579,6 +41671,7 @@ var selectedOpportunityActionFeedback = null;
 var selectedMissionAreaId = null;
 var selectedMissionAreaReturnContext = null;
 var regionInfoOpen = false;
+var villageInfoOpen = false;
 var currentOverlayType = null;
 
 // =========================================================
@@ -42318,139 +42411,99 @@ function renderGenericOverlay(
 // =========================================================
 
 
-function renderVillageOverlay(
-  container
-) {
+const ALPHA_VILLAGE_MAP_DEFINITIONS=Object.freeze({
+  konohagakure:Object.freeze({
+    locationId:"konohagakure",regionKey:"fire",name:"Konohagakure",epithet:"Hidden Leaf Village",
+    mapImage:"Backgrounds/konoha.png",spatialCalibrationStatus:"konoha_v2",supportsKonohaActivities:true
+  }),
+  iwagakure:Object.freeze({
+    locationId:"iwagakure",regionKey:"earth",name:"Iwagakure",epithet:"Hidden Stone Village",
+    mapImage:"Backgrounds/iwa.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
+  }),
+  sunagakure:Object.freeze({
+    locationId:"sunagakure",regionKey:"wind",name:"Sunagakure",epithet:"Hidden Sand Village",
+    mapImage:"Backgrounds/suna.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
+  }),
+  kirigakure:Object.freeze({
+    locationId:"kirigakure",regionKey:"water",name:"Kirigakure",epithet:"Hidden Mist Village",
+    mapImage:"Backgrounds/kiri.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
+  }),
+  kumogakure:Object.freeze({
+    locationId:"kumogakure",regionKey:"lightning",name:"Kumogakure",epithet:"Hidden Cloud Village",
+    mapImage:"Backgrounds/kumo.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
+  })
+});
 
-
-  if (!container) {
-
-    return false;
-
-  }
-
-
-  container.innerHTML = `
-
-    <div
-      class="
-        konoha-map-screen
-      "
-    >
-
-      <img
-        src="
-          Backgrounds/konoha.png
-        "
-        alt="
-          Hidden Leaf Village
-        "
-        class="
-          konoha-map-image
-        "
-      >
-
-
-      <!-- =====================================
-           LAND OF FIRE RETURN
-           ===================================== -->
-
-      <button
-        type="button"
-        class="
-          konoha-map-return
-        "
-        onclick="
-          closeOverlay()
-        "
-        aria-label="
-          Return to Land of Fire
-        "
-        title="
-          Return to Land of Fire
-        "
-      >
-
-        LAND OF FIRE
-
-      </button>
-
-
-      <!-- =====================================
-           SHINOBI EXAMS HOTSPOT
-           ===================================== -->
-
-      <button
-        type="button"
-        class="
-          konoha-map-hotspot
-          konoha-map-hotspot-exams
-        "
-        onclick="
-          openKonohaExamFromVillage()
-        "
-        aria-label="
-          Enter Shinobi Exams
-        "
-        title="
-          Shinobi Exams
-        "
-      >
-
-        <span
-          class="
-            konoha-map-hotspot-label
-          "
-        >
-          SHINOBI EXAMS
-        </span>
-
-      </button>
-
-
-      <!-- =====================================
-           PRACTICAL TRAINING DEV HOTSPOT
-           ===================================== -->
-
-      <button
-        type="
-          button
-        "
-        class="
-          konoha-map-hotspot
-          konoha-map-hotspot-practical
-        "
-        onclick="
-          openKonohaPracticalFromVillage()
-        "
-        aria-label="
-          Enter Practical Training
-        "
-        title="
-          Practical Training
-        "
-      >
-
-        <span
-          class="
-            konoha-map-hotspot-label
-          "
-        >
-          PRACTICAL TRAINING
-        </span>
-
-      </button>
-
-
-    </div>
-
-  `;
-
-
-  return true;
-
+function getActiveVillageMapDefinition() {
+  const locationId=selectedLocationNode&&selectedLocationNode.type==="village"?selectedLocationNode.id:null;
+  if (locationId&&ALPHA_VILLAGE_MAP_DEFINITIONS[locationId]) return ALPHA_VILLAGE_MAP_DEFINITIONS[locationId];
+  const region=selectedRegionKey&&worldRegions[selectedRegionKey]?worldRegions[selectedRegionKey]:null;
+  const capitalId=region&&region.capitalVillageId||null;
+  if (capitalId&&ALPHA_VILLAGE_MAP_DEFINITIONS[capitalId]) return ALPHA_VILLAGE_MAP_DEFINITIONS[capitalId];
+  // Compatibility: the existing global VILLAGE nav has historically opened
+  // Konoha when no regional caller is active. Current Alpha Origins are Konoha-
+  // rooted, so preserve that route without claiming that every future Origin is.
+  return ALPHA_VILLAGE_MAP_DEFINITIONS.konohagakure;
 }
 
+function getVillageKnownOpportunityCount(definition) {
+  if (!definition||!worldRegions[definition.regionKey]) return 0;
+  return getWorldOpportunityDefinitionsForRegion(definition.regionKey,worldRegions[definition.regionKey])
+    .filter(opportunity=>opportunity&&opportunity.locationId===definition.locationId&&opportunity.sourceKind!=="persistent_location")
+    .filter(opportunity=>shouldProjectOpportunityForObserver(opportunity)).length;
+}
+
+function toggleVillageInfo() {
+  villageInfoOpen=!villageInfoOpen;
+  const container=document.getElementById("overlay-content-container");
+  if (container) renderVillageOverlay(container);
+  return villageInfoOpen;
+}
+
+function returnToActiveRegionFromVillage() {
+  const definition=getActiveVillageMapDefinition();
+  const regionKey=definition&&definition.regionKey||selectedRegionKey;
+  if (!regionKey||!worldRegions[regionKey]) {
+    returnToWorldMap();
+    return {success:true,destination:"world_map"};
+  }
+  openRegionHub(regionKey);
+  return {success:true,destination:"region",regionKey};
+}
+
+function renderVillageOverlay(container) {
+  if (!container) return false;
+  const definition=getActiveVillageMapDefinition();
+  if (!definition) {
+    renderGenericOverlay(container,"VILLAGE MAP","No village map is registered for the selected location.");
+    return false;
+  }
+  const region=worldRegions[definition.regionKey];
+  selectedRegionKey=definition.regionKey;
+  selectedLocationNode=getWorldRegionLocation(definition.regionKey,definition.locationId)||selectedLocationNode;
+  const knownOpportunityCount=getVillageKnownOpportunityCount(definition);
+  const konohaActivityHotspots=definition.supportsKonohaActivities?`
+      <button type="button" class="village-map-hotspot konoha-map-hotspot konoha-map-hotspot-exams" onclick="openKonohaExamFromVillage()" aria-label="Enter Shinobi Exams" title="Shinobi Exams"><span class="village-map-hotspot-label konoha-map-hotspot-label">SHINOBI EXAMS</span></button>
+      <button type="button" class="village-map-hotspot konoha-map-hotspot konoha-map-hotspot-practical" onclick="openKonohaPracticalFromVillage()" aria-label="Enter Practical Training" title="Practical Training"><span class="village-map-hotspot-label konoha-map-hotspot-label">PRACTICAL TRAINING</span></button>`:"";
+
+  container.innerHTML=`
+    <div class="village-map-screen village-map-${definition.locationId}" data-village-id="${definition.locationId}" data-region-key="${definition.regionKey}">
+      <img src="${definition.mapImage}" alt="${escapeStorySceneHTML(definition.epithet)}" class="village-map-image">
+      <button type="button" class="village-map-return" onclick="returnToActiveRegionFromVillage()" aria-label="Return to ${escapeStorySceneHTML(region.name)}">${escapeStorySceneHTML(region.name.toUpperCase())}</button>
+      <button type="button" class="village-info-toggle ${villageInfoOpen?"active":""}" onclick="toggleVillageInfo()" aria-expanded="${villageInfoOpen?"true":"false"}">◈ VILLAGE INFO</button>
+      <aside class="village-info-drawer ${villageInfoOpen?"open":""}" aria-label="Village information">
+        <strong>${escapeStorySceneHTML(definition.name)}</strong>
+        <span>${escapeStorySceneHTML(definition.epithet)}</span>
+        <small>${escapeStorySceneHTML(region.name)}</small>
+        <div class="village-info-rule"></div>
+        <div><span>Known local opportunities</span><b>${knownOpportunityCount}</b></div>
+        <p>Story, mission and activity interactions appear only when their owning systems authorise them.</p>
+      </aside>
+      ${konohaActivityHotspots}
+    </div>`;
+  saveTestState();
+  return true;
+}
 
 // =========================================================
 // KONOHA → EXAMS
@@ -44103,8 +44156,48 @@ function openRegionHub(regionKey) {
 
 
 // =========================================================
+// POST-2400 — NON-SPATIAL KNOWN DESTINATION BRIDGE
+// =========================================================
+// A known destination can be opened before its current artwork coordinates are
+// ratified. This is intentionally not represented as a fake map pin.
+function getRegionNonSpatialDestinations(regionKey,region=worldRegions[regionKey]) {
+  if (!region||!Array.isArray(region.locations)) return [];
+  return region.locations.filter(location=>
+    location&&location.type==="village"&&!hasAuthoritativeRegionAnchor(location)
+  );
+}
+
+function openRegionDestination(regionKey,locationId) {
+  const region=worldRegions[regionKey];
+  const location=getWorldRegionLocation(regionKey,locationId);
+  if (!region||!location) return {success:false,reason:"world_destination_missing"};
+  selectedRegionKey=regionKey;
+  selectedLocationNode=location;
+  selectedHotspotId=null;
+  selectedOpportunityId=null;
+  regionInfoOpen=false;
+  villageInfoOpen=false;
+  saveTestState();
+  if (location.type==="village") {
+    openOverlay("village");
+    return {success:true,type:"navigation",regionKey,locationId,spatialAnchorCommitted:false};
+  }
+  return {success:false,reason:"world_destination_route_not_registered"};
+}
+
+function renderRegionKnownDestinations(regionKey,region) {
+  const destinations=getRegionNonSpatialDestinations(regionKey,region);
+  if (!destinations.length) return "";
+  return `<aside class="region-known-destinations" aria-label="Known destinations">
+    <div class="region-known-destinations-title">KNOWN DESTINATIONS</div>
+    ${destinations.map(location=>`<button type="button" class="region-known-destination" onclick="openRegionDestination('${regionKey}','${location.id}')"><strong>${escapeStorySceneHTML(location.shortName||location.name)}</strong><small>${escapeStorySceneHTML(location.category||"VILLAGE")}</small></button>`).join("")}
+  </aside>`;
+}
+
+// =========================================================
 // RENDER REGION MAP
 // BRICK 694 — RUNTIME HOTSPOT PROJECTION SURFACE
+// POST-2400 — FIVE-NATION ARTWORK + SAFE DESTINATION PROJECTION
 // =========================================================
 
 function renderRegionHubUI(regionKey, region) {
@@ -44137,6 +44230,8 @@ function renderRegionHubUI(regionKey, region) {
         </aside>
 
         ${hotspotProjections.map(hotspot=>renderRegionHotspot(regionKey,hotspot)).join("")}
+
+        ${renderRegionKnownDestinations(regionKey,region)}
 
         ${renderRegionEventDrawer(regionKey)}
 
@@ -44457,6 +44552,14 @@ function getLegacyLocationPresentationFamily(location) {
   return "Discovery";
 }
 
+
+function hasAuthoritativeRegionAnchor(location) {
+  if (!location||location.spatialAnchorStatus==="pending_revalidation") return false;
+  const x=Number(location.x);
+  const y=Number(location.y);
+  return Number.isFinite(x)&&Number.isFinite(y)&&x>=0&&x<=100&&y>=0&&y<=100;
+}
+
 function getLegacyLocationInteractions(regionKey,location) {
   if (!location) return [];
   if (location.type==="village") return [{id:"enter_location",label:"ENTER LOCATION",kind:"navigation",overlayType:"village"}];
@@ -44468,6 +44571,7 @@ function getLegacyLocationInteractions(regionKey,location) {
 
 function createLegacyLocationOpportunityDefinition(regionKey,location) {
   if (!location||!location.id) return null;
+  if (!hasAuthoritativeRegionAnchor(location)) return null;
   return normalizeWorldOpportunityDefinition({
     opportunityId:`location_opportunity_${regionKey}_${location.id}`,
     hotspotId:`hotspot_${regionKey}_${location.id}`,
@@ -48620,10 +48724,11 @@ function renderRegionHotspot(regionKey,hotspot) {
   const visualClass=getHotspotPresentationClass(hotspot.presentationFamily);
   const label=hotspot.knownLabel||"???";
   const aggregateSuffix=hotspot.aggregationCount>1?` +${hotspot.aggregationCount-1}`:"";
+  const symbol=getRegionSymbol(hotspot.presentationFamily);
   return `
-    <button type="button" class="region-hotspot region-hotspot-image ${visualClass} ${hoverSide}" style="left:${hotspot.anchor.x}%;top:${hotspot.anchor.y}%;" onclick="selectMapNode('${regionKey}','${hotspot.hotspotId}')" aria-label="${label}">
-      <span class="hotspot-icon-shell">${hotspot.icon?`<img src="${hotspot.icon}" alt="" class="hotspot-icon-image">`:getRegionSymbol(hotspot.presentationFamily)}</span>
-      <span class="hotspot-nameplate">${label}${aggregateSuffix}</span>
+    <button type="button" class="region-hotspot region-hotspot-compact ${visualClass} ${hoverSide}" style="left:${hotspot.anchor.x}%;top:${hotspot.anchor.y}%;" onclick="selectMapNode('${regionKey}','${hotspot.hotspotId}')" aria-label="${escapeStorySceneHTML(label)}">
+      <span class="hotspot-icon-shell hotspot-runtime-rune" aria-hidden="true">${escapeStorySceneHTML(symbol)}</span>
+      <span class="hotspot-nameplate">${escapeStorySceneHTML(label)}${escapeStorySceneHTML(aggregateSuffix)}</span>
       ${renderHotspotHoverCard(hotspot)}
     </button>
   `;
@@ -89252,6 +89357,17 @@ function restoreTestState() {
   }
 
   if (
+    state.overlayType === "village" &&
+    selectedRegionKey &&
+    selectedLocationNode &&
+    selectedLocationNode.type === "village"
+  ) {
+    openOverlay("village");
+    return;
+  }
+
+
+  if (
     state.overlayType ===
       "region" &&
     selectedRegionKey
@@ -97967,4 +98083,46 @@ function runAlphaPost2325ChronicleOriginUIDiagnostics(){
   result.pass=Object.values(result).every(Boolean);
   console.table(result);
   return result;
+}
+
+
+// =========================================================
+// POST-2400 — FIVE-NATION / FIVE-VILLAGE ALPHA DIAGNOSTICS
+// =========================================================
+function runAlphaFiveNationInteractiveGeographyDiagnostics() {
+  const expectedRegions={
+    fire:{asset:"./Backgrounds/inside_LOF.png",village:"konohagakure"},
+    earth:{asset:"./Backgrounds/inside_LOE.png",village:"iwagakure"},
+    wind:{asset:"./Backgrounds/inside_LOW.png",village:"sunagakure"},
+    water:{asset:"./Backgrounds/inside_LOWA.png",village:"kirigakure"},
+    lightning:{asset:"./Backgrounds/inside_LOL.png",village:"kumogakure"}
+  };
+  const expectedVillageAssets={
+    konohagakure:"Backgrounds/konoha.png",
+    iwagakure:"Backgrounds/iwa.png",
+    sunagakure:"Backgrounds/suna.png",
+    kirigakure:"Backgrounds/kiri.png",
+    kumogakure:"Backgrounds/kumo.png"
+  };
+  const checks={
+    fiveMajorRegionsRegistered:Object.keys(expectedRegions).every(key=>!!worldRegions[key]),
+    exactRegionalAssets:Object.entries(expectedRegions).every(([key,value])=>worldRegions[key]&&worldRegions[key].mapImage===value.asset),
+    exactCapitalVillageIdentity:Object.entries(expectedRegions).every(([key,value])=>worldRegions[key]&&worldRegions[key].capitalVillageId===value.village),
+    fiveVillageMapsRegistered:Object.keys(expectedVillageAssets).every(id=>!!ALPHA_VILLAGE_MAP_DEFINITIONS[id]),
+    exactVillageAssets:Object.entries(expectedVillageAssets).every(([id,path])=>ALPHA_VILLAGE_MAP_DEFINITIONS[id].mapImage===path),
+    noInventedNewRegionCoordinates:["earth","wind","water","lightning"].every(key=>worldRegions[key].locations.every(location=>!hasAuthoritativeRegionAnchor(location))),
+    pendingMapsUseNonSpatialDestinations:["earth","wind","water","lightning"].every(key=>getRegionNonSpatialDestinations(key).length===1),
+    unvalidatedPersistentLocationsDoNotBecomeZeroZeroHotspots:["earth","wind","water","lightning"].every(key=>getWorldOpportunityDefinitionsForRegion(key,worldRegions[key]).every(def=>def.sourceKind!=="persistent_location")),
+    fireSpatialProjectionPreserved:getWorldOpportunityDefinitionsForRegion("fire",worldRegions.fire).some(def=>def.locationId==="konohagakure"&&def.sourceKind==="persistent_location"),
+    regionHotspotsAreCodeRunes:renderRegionHotspot.toString().includes("hotspot-runtime-rune")&&!renderRegionHotspot.toString().includes("hotspot-icon-image"),
+    villageRendererIsGeneric:renderVillageOverlay.toString().includes("getActiveVillageMapDefinition")&&renderVillageOverlay.toString().includes("village-map-image"),
+    konohaAuthoredActivityHotspotsPreserved:renderVillageOverlay.toString().includes("openKonohaExamFromVillage")&&renderVillageOverlay.toString().includes("openKonohaPracticalFromVillage"),
+    otherVillagesDoNotInventActivities:Object.values(ALPHA_VILLAGE_MAP_DEFINITIONS).filter(def=>!def.supportsKonohaActivities).every(def=>def.spatialCalibrationStatus==="pending_revalidation"),
+    worldDestinationNavigationDoesNotCommitFakeAnchor:openRegionDestination.toString().includes("spatialAnchorCommitted:false"),
+    villageRefreshRestoreInstalled:restoreTestState.toString().includes('state.overlayType === "village"'),
+    locationEventNonCollapsePreserved:!openRegionDestination.toString().includes("completeLocation")&&!openRegionDestination.toString().includes("executePlayerActivity")
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(checks);
+  return {pass:checks.pass,checks,regions:Object.keys(expectedRegions),villages:Object.keys(expectedVillageAssets),codingStatus:checks.pass?"POST_2400_FIVE_NATION_GEOGRAPHY_GREEN":"POST_2400_FIVE_NATION_GEOGRAPHY_FAILED",nextImplementedBrick:2499};
 }
