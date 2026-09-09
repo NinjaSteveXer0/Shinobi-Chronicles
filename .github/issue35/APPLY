@@ -1,0 +1,3 @@
+Issue #35 guarded runtime patch trigger.
+Expected baseline game.js blob: 7d923bd5e9162385988ad43730ece8c2eda28897
+Expected patched game.js blob: 1c211bbef432946d92083b3473ae6bc140a44d7d
