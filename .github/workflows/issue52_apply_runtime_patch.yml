@@ -1,0 +1,52 @@
+name: Issue 52 Runtime Patch Apply
+on:
+  push:
+    paths:
+      - '.github/issue52/trigger.txt'
+permissions:
+  contents: write
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Install portrait QA dependency
+        run: python -m pip install pillow
+      - name: Verify baseline, patch, and QA
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_base='1c211bbef432946d92083b3473ae6bc140a44d7d'
+          expected_target='85aab6580c2022da1447facf48536d27bd02a7d0'
+          patch_sha='141adee7b0f77fce53c04bafe147c7699f8068623531db1c13905a9d62961685'
+          test "$(git hash-object game.js)" = "$expected_base"
+          echo "$patch_sha  .github/issue52/issue52.patch" | sha256sum -c -
+          git apply --check .github/issue52/issue52.patch
+          git apply .github/issue52/issue52.patch
+          node --check game.js
+          python tools/qa_battle_portraits.py --static-only
+          test "$(git hash-object game.js)" = "$expected_target"
+      - name: Commit and push guarded runtime result
+        shell: bash
+        run: |
+          set -euo pipefail
+          expected_base='1c211bbef432946d92083b3473ae6bc140a44d7d'
+          expected_target='85aab6580c2022da1447facf48536d27bd02a7d0'
+          rm -f .github/issue52/issue52.patch .github/issue52/trigger.txt .github/workflows/issue52_apply_runtime_patch.yml
+          rmdir .github/issue52 2>/dev/null || true
+          git config user.name 'NinjaSteveXer0'
+          git config user.email 'sc-runtime@users.noreply.github.com'
+          git add game.js .github
+          git commit -m 'runtime: implement Mission 5 Female Operator encounter (#52)'
+          git fetch origin main
+          remote_blob="$(git show origin/main:game.js | git hash-object --stdin)"
+          if [[ "$remote_blob" != "$expected_base" ]]; then
+            echo "Remote game.js moved during guarded apply: $remote_blob" >&2
+            exit 1
+          fi
+          git rebase origin/main
+          test "$(git hash-object game.js)" = "$expected_target"
+          node --check game.js
+          git push origin HEAD:main
