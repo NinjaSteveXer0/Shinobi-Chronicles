@@ -44447,7 +44447,10 @@ function normalizeWorldEventDimensionTable(savedTable) {
 function normalizeWorldEventRuntimeState(savedState) {
   const source=savedState&&typeof savedState==="object"&&!Array.isArray(savedState)?savedState:{};
   const normalized=createDefaultWorldEventRuntimeState();
-  WORLD_EVENT_RUNTIME_DIMENSIONS.forEach(dimension=>{
+  // BRICK 3500 — early save restore runs before the later const is initialized.
+  // Keep the exact schema local here so startup has no temporal-dead-zone dependency.
+  const dimensions=["worldLifecycleByEventId","observerDiscoveryByOpportunityId","actionabilityByOpportunityId","trackingByOpportunityId","resolutionByOpportunityId"];
+  dimensions.forEach(dimension=>{
     normalized[dimension]=normalizeWorldEventDimensionTable(source[dimension]);
   });
   return normalized;
@@ -100856,6 +100859,7 @@ function renderClanOverlay(container){
   const projection=getMyClanRosterProjectionMarkup(roster,visible);
   const options=getMyClanRosterFilterOptions();
   const assetPath=inspection?ALPHA_MY_CLAN_ASSETS.inspection:ALPHA_MY_CLAN_ASSETS.browse;
+  if(typeof probeAlphaMasterAsset==="function") probeAlphaMasterAsset("myClan",assetPath);
   const masterEnabled=isAlphaUIMasterEnabled("myClan");
   const editability=canEditClanFormation();
   const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
@@ -100932,3 +100936,325 @@ function runAlphaMyClanOperationalIntegrationDiagnostics(){
   console.log(`SC Alpha My Clan operational integration gate: ${pass?"PASS":"FAIL"}`);
   return {pass,groups,codingStatus:pass?"MY_CLAN_OPERATIONAL_INTEGRATION_GREEN":"MY_CLAN_OPERATIONAL_INTEGRATION_FAILED"};
 }
+
+// =========================================================
+// BRICKS 3500–4499 — ALPHA PLAYABLE MONSTER
+// My Clan master independence + Arena + Training Grounds +
+// first-run mission command surface / startup hardening.
+// =========================================================
+
+// BRICKS 3501–3525 — optional-master availability registry.
+Object.assign(ALPHA_UI_MASTER_PRESENTATION_STATE,{arena:true,trainingGrounds:true,weaponsTraining:true,sparring:true,mentorship:true});
+const ALPHA_MASTER_ASSET_HEALTH=Object.create(null);
+function markAlphaMasterAssetUnavailable(surfaceId){
+  ALPHA_MASTER_ASSET_HEALTH[surfaceId]=false;
+  if(Object.prototype.hasOwnProperty.call(ALPHA_UI_MASTER_PRESENTATION_STATE,surfaceId)) ALPHA_UI_MASTER_PRESENTATION_STATE[surfaceId]=false;
+  if(typeof currentOverlayType!=="undefined"&&currentOverlayType==="clan"&&surfaceId==="myClan") rerenderClanOverlay();
+  if(typeof currentOverlayType!=="undefined"&&currentOverlayType==="arena"&&surfaceId==="arena") openOverlay("arena");
+  if(typeof currentOverlayType!=="undefined"&&currentOverlayType==="training") renderTrainingOverlay(document.getElementById("overlay-content-container"));
+  return {success:true,surfaceId,masterAvailable:false,semanticsUnchanged:true};
+}
+function probeAlphaMasterAsset(surfaceId,assetPath){
+  if(typeof Image==="undefined"||!assetPath||ALPHA_MASTER_ASSET_HEALTH[surfaceId]!==undefined) return;
+  ALPHA_MASTER_ASSET_HEALTH[surfaceId]=true;
+  const image=new Image();
+  image.onerror=()=>markAlphaMasterAssetUnavailable(surfaceId);
+  image.src=assetPath;
+}
+
+// BRICKS 3526–3599 — Arena is code-owned even when its raster is absent.
+function setArenaMasterArtEnabled(enabled=true){ return setAlphaUIMasterEnabled("arena",enabled); }
+const ALPHA_PRE3500_RENDER_ARENA_STAGE=renderAlphaArenaMasterStage;
+renderAlphaArenaMasterStage=function(container,options={}){
+  const assetPath=options.assetPath||getAlphaArenaMasterAsset(options.surface||"main");
+  probeAlphaMasterAsset("arena",assetPath);
+  const master=isAlphaUIMasterEnabled("arena");
+  const title=options.title||"ARENA";
+  const body=options.body||"";
+  const actions=options.actions||"";
+  container.innerHTML=`<div class="alpha-arena-master-screen ${master?"is-master-art-on":"is-master-art-off"} alpha-arena-surface-${escapeStorySceneHTML(options.surface||"main")}">
+    <div class="alpha-arena-master-stage" style="--arena-master:${master?`url('${assetPath}')`:"none"}">
+      <div class="alpha-arena-code-shell"><header><span>KONOHA</span><h2>${escapeStorySceneHTML(title)}</h2><button type="button" onclick="closeOverlay()" aria-label="Close Arena">✕</button></header>
+      <section class="alpha-arena-runtime-panel"><div class="alpha-arena-runtime-heading"><span>KONOHA ARENA</span><strong>${escapeStorySceneHTML(title)}</strong>${options.subtitle?`<small>${escapeStorySceneHTML(options.subtitle)}</small>`:""}</div>${body}${actions?`<div class="alpha-arena-runtime-actions">${actions}</div>`:""}</section></div>
+    </div></div>`;
+  return true;
+};
+
+// BRICKS 3600–3899 — Training Grounds three-surface runtime.
+Object.assign(assetManifest.ui,{trainingGrounds:"UI/training_grounds.png",weaponsTraining:"UI/weapons_training.png",sparring:"UI/sparring.png",mentorship:"UI/mentorship.png"});
+const ALPHA_TRAINING_RUNTIME={surface:"hub",selectedShinobiId:null,fighter1Id:null,fighter2Id:null,instructorId:null,studentId:null,feedback:null};
+function setTrainingMasterArtEnabled(surface,enabled=true){
+  const key=surface==="hub"?"trainingGrounds":surface;
+  return setAlphaUIMasterEnabled(key,enabled);
+}
+function getAlphaTrainingAsset(surface){
+  return surface==="weaponsTraining"?assetManifest.ui.weaponsTraining:surface==="sparring"?assetManifest.ui.sparring:surface==="mentorship"?assetManifest.ui.mentorship:assetManifest.ui.trainingGrounds;
+}
+function getAlphaTrainingRoster(){ return typeof getClanManageableRosterCharacters==="function"?getClanManageableRosterCharacters():[]; }
+function getAlphaTrainingCharacter(id){ return id?getPlayerCharacter(id):null; }
+function getAlphaTrainingPortrait(character){
+  if(!character) return "";
+  try{return getMyClanUIPortraitPath(character)||"";}catch(_){return "";}
+}
+function getAlphaTrainingCard(character){
+  if(!character) return "";
+  try{return getMyClanCollectibleCardPath(character)||getCharacterCardAssetPath(character)||"";}catch(_){return "";}
+}
+function getAlphaTrainingSelectOptions(selectedId,excludeId=null){
+  return [`<option value="">SELECT SHINOBI</option>`,...getAlphaTrainingRoster().filter(c=>c.id!==excludeId).map(c=>`<option value="${escapeStorySceneHTML(c.id)}" ${c.id===selectedId?"selected":""}>${escapeStorySceneHTML(c.name)} · PL ${calculateCurrentPL(c)}</option>`)].join("");
+}
+function openTrainingGrounds(surface="hub"){
+  ALPHA_TRAINING_RUNTIME.surface=["hub","weaponsTraining","sparring","mentorship"].includes(surface)?surface:"hub";
+  return openOverlay("training");
+}
+function selectAlphaTrainingCharacter(field,id){
+  if(!["selectedShinobiId","fighter1Id","fighter2Id","instructorId","studentId"].includes(field)) return false;
+  ALPHA_TRAINING_RUNTIME[field]=id||null; ALPHA_TRAINING_RUNTIME.feedback=null;
+  const container=document.getElementById("overlay-content-container"); if(container) renderTrainingOverlay(container); return true;
+}
+function alphaTrainingUnsupported(action){
+  const messages={weapon_train:"Weapon proficiency training consequence is not yet authored; no XP/cost has been fabricated.",spar:"Controlled owned-vs-owned spar consequence/reward contract is not yet authored; Battle history is not fabricated.",mentorship:"Mentorship knowledge-transfer consequence is not yet authored; no mastery/proficiency transfer is fabricated."};
+  ALPHA_TRAINING_RUNTIME.feedback=messages[action]||"This training action is not yet authorised.";
+  const c=document.getElementById("overlay-content-container"); if(c) renderTrainingOverlay(c);
+  return {success:false,reason:`${action}_authority_pending`,historyCommitted:false};
+}
+function renderAlphaTrainingMaster(container,surface,content){
+  const key=surface==="hub"?"trainingGrounds":surface;
+  const asset=getAlphaTrainingAsset(surface); probeAlphaMasterAsset(key,asset);
+  const master=isAlphaUIMasterEnabled(key);
+  container.innerHTML=`<div class="alpha-training-screen training-${escapeStorySceneHTML(surface)} ${master?"is-master-art-on":"is-master-art-off"}"><div class="alpha-training-stage" style="--training-master:${master?`url('${asset}')`:"none"}">
+    <header class="alpha-training-code-header"><span>KONOHA</span><strong>${surface==="hub"?"TRAINING GROUNDS":surface==="weaponsTraining"?"WEAPONS TRAINING":surface.toUpperCase()}</strong><button onclick="closeOverlay()" aria-label="Close Training">✕</button></header>${content}
+    ${ALPHA_TRAINING_RUNTIME.feedback?`<div class="alpha-training-feedback">${escapeStorySceneHTML(ALPHA_TRAINING_RUNTIME.feedback)}</div>`:""}
+  </div></div>`; return true;
+}
+function renderAlphaTrainingHub(container){
+  const cards=[
+    ["weaponsTraining","WEAPONS TRAINING","Train with equipped weapons and inspect current family proficiency.","⚔"],
+    ["mentorship","MENTORSHIP","Prepare instructor/student pairings without inventing development outcomes.","◈"],
+    ["sparring","SPARRING","Prepare two owned shinobi for controlled combat.","⚔"]
+  ];
+  return renderAlphaTrainingMaster(container,"hub",`<main class="alpha-training-hub"><div class="alpha-training-hub-intro"><h2>TRAINING GROUNDS</h2><p>Sharpen your skills. Master your weapons. Test your team.</p></div><div class="alpha-training-options">${cards.map(([id,title,copy,icon])=>`<button type="button" onclick="openTrainingGrounds('${id}')"><b>${icon}</b><strong>${title}</strong><span>${copy}</span><em>SELECT OPTION ›</em></button>`).join("")}</div><button class="alpha-training-practical-link" onclick="openKonohaPracticalFromVillage()">PRACTICAL EXERCISES</button></main>`);
+}
+function renderAlphaWeaponsTraining(container){
+  const roster=getAlphaTrainingRoster(); if(!ALPHA_TRAINING_RUNTIME.selectedShinobiId&&roster[0]) ALPHA_TRAINING_RUNTIME.selectedShinobiId=roster[0].id;
+  const c=getAlphaTrainingCharacter(ALPHA_TRAINING_RUNTIME.selectedShinobiId); const weapon=c?getEquippedWeaponDefinition(c):null; const family=weapon?getWeaponFamily(weapon):null; const rec=c&&family?getWeaponSpecializationRecord(c,family):null;
+  const req=rec&&rec.level<WEAPON_SPECIALIZATION_MAX_LEVEL?getWeaponSpecializationExpRequired(rec.level):0; const pct=rec&&req?Math.min(100,(rec.exp/req)*100):(rec&&rec.level>=WEAPON_SPECIALIZATION_MAX_LEVEL?100:0);
+  return renderAlphaTrainingMaster(container,"weaponsTraining",`<main class="alpha-weapons-runtime"><section class="training-character-panel"><h3>SELECTED SHINOBI</h3>${c?`<img src="${escapeStorySceneHTML(getAlphaTrainingPortrait(c))}" alt=""><strong>${escapeStorySceneHTML(c.name)}</strong><span>PL ${calculateCurrentPL(c)}</span>`:`<p>No owned shinobi.</p>`}<select onchange="selectAlphaTrainingCharacter('selectedShinobiId',this.value)">${getAlphaTrainingSelectOptions(c&&c.id)}</select></section><section class="training-progress-panel"><button class="training-back" onclick="openTrainingGrounds('hub')">‹ TRAINING GROUNDS</button><h2>${weapon?escapeStorySceneHTML(weapon.name||weapon.id||"EQUIPPED WEAPON"):"NO WEAPON EQUIPPED"}</h2><div class="training-proficiency"><strong>${rec?`${rec.level} / ${WEAPON_SPECIALIZATION_MAX_LEVEL}`:"—"}</strong><div><i style="width:${pct}%"></i></div><small>${family?escapeStorySceneHTML(family):"Equip a weapon to inspect proficiency"}</small></div><button class="training-primary" ${c&&weapon?"":"disabled"} onclick="alphaTrainingUnsupported('weapon_train')">TRAIN WITH WEAPON</button></section><section class="training-weapon-panel"><h3>SELECTED WEAPON</h3><strong>${weapon?escapeStorySceneHTML(weapon.name||"Weapon"):"NONE"}</strong><span>${family?`Family: ${escapeStorySceneHTML(family)}`:"No current weapon family"}</span><p>Runtime displays current authoritative equipment and proficiency only. Training rewards remain fail-closed until Progression owns the consequence.</p></section></main>`);
+}
+function renderAlphaSparring(container){
+  const roster=getAlphaTrainingRoster(); if(!ALPHA_TRAINING_RUNTIME.fighter1Id&&roster[0]) ALPHA_TRAINING_RUNTIME.fighter1Id=roster[0].id; if(!ALPHA_TRAINING_RUNTIME.fighter2Id&&roster[1]) ALPHA_TRAINING_RUNTIME.fighter2Id=roster[1].id;
+  const a=getAlphaTrainingCharacter(ALPHA_TRAINING_RUNTIME.fighter1Id),b=getAlphaTrainingCharacter(ALPHA_TRAINING_RUNTIME.fighter2Id);
+  const fighter=(c,field,other)=>`<section class="training-fighter"><h3>${field==="fighter1Id"?"FIGHTER 1":"FIGHTER 2"}</h3>${c?`<img src="${escapeStorySceneHTML(getAlphaTrainingPortrait(c))}" alt=""><strong>${escapeStorySceneHTML(c.name)}</strong><span>PL ${calculateCurrentPL(c)}</span>`:`<p>Choose an owned shinobi.</p>`}<select onchange="selectAlphaTrainingCharacter('${field}',this.value)">${getAlphaTrainingSelectOptions(c&&c.id,other)}</select></section>`;
+  return renderAlphaTrainingMaster(container,"sparring",`<main class="alpha-spar-runtime">${fighter(a,"fighter1Id",b&&b.id)}<section class="training-spar-center"><button class="training-back" onclick="openTrainingGrounds('hub')">‹ TRAINING GROUNDS</button><h2>VS</h2><p>Owned ≠ assigned ≠ deployed. A controlled spar needs an authored encounter/consequence contract before Battle history or rewards can commit.</p><button class="training-primary" ${a&&b&&a.id!==b.id?"":"disabled"} onclick="alphaTrainingUnsupported('spar')">BEGIN SPAR</button></section>${fighter(b,"fighter2Id",a&&a.id)}</main>`);
+}
+function renderAlphaMentorship(container){
+  const roster=getAlphaTrainingRoster(); if(!ALPHA_TRAINING_RUNTIME.instructorId&&roster[0]) ALPHA_TRAINING_RUNTIME.instructorId=roster[0].id; if(!ALPHA_TRAINING_RUNTIME.studentId&&roster[1]) ALPHA_TRAINING_RUNTIME.studentId=roster[1].id;
+  const a=getAlphaTrainingCharacter(ALPHA_TRAINING_RUNTIME.instructorId),b=getAlphaTrainingCharacter(ALPHA_TRAINING_RUNTIME.studentId);
+  const card=(c,title,field,other)=>`<section class="training-mentor-person"><h3>${title}</h3>${c?`<img src="${escapeStorySceneHTML(getAlphaTrainingPortrait(c))}" alt=""><strong>${escapeStorySceneHTML(c.name)}</strong><span>PL ${calculateCurrentPL(c)}</span>`:`<p>Choose an owned shinobi.</p>`}<select onchange="selectAlphaTrainingCharacter('${field}',this.value)">${getAlphaTrainingSelectOptions(c&&c.id,other)}</select></section>`;
+  return renderAlphaTrainingMaster(container,"mentorship",`<main class="alpha-mentorship-runtime">${card(a,"INSTRUCTOR","instructorId",b&&b.id)}<section class="training-mentor-center"><button class="training-back" onclick="openTrainingGrounds('hub')">‹ TRAINING GROUNDS</button><h2>KNOWLEDGE TRANSFER</h2><p>Knowledge ≠ Access ≠ Competence ≠ Power ≠ Mastery. Selection is operational; transfer consequences remain closed until authored.</p><button class="training-primary" ${a&&b&&a.id!==b.id?"":"disabled"} onclick="alphaTrainingUnsupported('mentorship')">BEGIN MENTORSHIP</button></section>${card(b,"STUDENT","studentId",a&&a.id)}</main>`);
+}
+const ALPHA_PRE3500_RENDER_TRAINING=renderTrainingOverlay;
+renderTrainingOverlay=function(container){
+  const surface=ALPHA_TRAINING_RUNTIME.surface||"hub";
+  if(surface==="weaponsTraining") return renderAlphaWeaponsTraining(container);
+  if(surface==="sparring") return renderAlphaSparring(container);
+  if(surface==="mentorship") return renderAlphaMentorship(container);
+  return renderAlphaTrainingHub(container);
+};
+
+// BRICKS 3900–3999 — Mission command surface: factual runtime state only.
+function hasAlphaHistoryAddress(id){
+  if(!id) return false; const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];
+  return history.some(r=>r&&(r.occurrenceId===id||r.sourceOccurrenceId===id||r.id===id||r.factId===id));
+}
+function getAlphaArc1PlayableStatus(){
+  const roster=getAlphaTrainingRoster();
+  const trace=hasAlphaHistoryAddress("arc1_m1_caravan_three_person_trace_confirmed");
+  const m1Complete=hasAlphaHistoryAddress("occ_arc1_m1_whisper_major_contact_story_completed")||hasAlphaHistoryAddress("arc1_m1_whisper_major_contact_story_completed");
+  return {rosterCount:roster.length,originReady:roster.length>0,trace,m1Complete,earliestBlocker:roster.length===0?"chronicle_origin_required":!trace?"pre_whisper_three_person_trace_producer_pending":null};
+}
+function continueAlphaArc1(){
+  const s=getAlphaArc1PlayableStatus();
+  if(!s.originReady) return openOverlay("clan")||{success:false,reason:"chronicle_origin_required"};
+  if(!s.trace) return {success:false,reason:"pre_whisper_three_person_trace_producer_pending",issue:58};
+  if(typeof openArc1Mission1WhisperWoods==="function") return openArc1Mission1WhisperWoods();
+  return {success:false,reason:"arc1_mission1_runtime_missing"};
+}
+function renderAlphaMissionCommand(container){
+  const s=getAlphaArc1PlayableStatus();
+  const state=!s.originReady?"BEGIN YOUR CHRONICLE":!s.trace?"PRE-WHISPER INVESTIGATION":s.m1Complete?"MISSION 1 COMPLETE":"MISSION 1 · WHISPER WOODS";
+  const detail=!s.originReady?"Choose an Academy Origin in My Clan first.":!s.trace?"The three-person physical-trace producer is the earliest remaining authority blocker (#58). Coding will not inject the diagnostic fact into a real save.":s.m1Complete?"Mission 2–10 machine authority exists upstream; orchestration is being integrated into the Alpha run.":"Whisper Woods is legitimately actionable from current Chronicle state.";
+  container.innerHTML=`<div class="alpha-mission-command"><header><span>ARC 1</span><h2>KONOHA CHRONICLE</h2><button onclick="closeOverlay()">✕</button></header><section><small>CURRENT PLAYABLE FRONTIER</small><strong>${escapeStorySceneHTML(state)}</strong><p>${escapeStorySceneHTML(detail)}</p><div class="alpha-mission-status"><b>Origin</b><span>${s.originReady?"READY":"REQUIRED"}</span><b>Pre-Whisper Trace</b><span>${s.trace?"COMMITTED":"PENDING AUTHORITY"}</span><b>Mission 1 Runtime</b><span>${typeof openArc1Mission1WhisperWoods==="function"?"WIRED":"MISSING"}</span></div><button class="is-primary" onclick="continueAlphaArc1()">${s.originReady&&s.trace?"CONTINUE ARC 1":"RESOLVE NEXT REQUIREMENT"}</button></section></div>`;
+  return true;
+}
+
+// Replace the generic Mission Board renderer without creating a second overlay system.
+const ALPHA_PRE3500_OPEN_OVERLAY=openOverlay;
+openOverlay=function(type){
+  const result=ALPHA_PRE3500_OPEN_OVERLAY(type);
+  if(type==="missions"&&typeof document!=="undefined"){
+    const c=document.getElementById("overlay-content-container"); if(c) renderAlphaMissionCommand(c);
+  }
+  return result;
+};
+
+// BRICKS 4000–4099 — deterministic monster diagnostics.
+function runAlphaBricks3500To4499MonsterDiagnostics(){
+  const normalizer=normalizeWorldEventRuntimeState.toString();
+  const training=renderTrainingOverlay.toString()+renderAlphaTrainingHub.toString()+renderAlphaWeaponsTraining.toString()+renderAlphaSparring.toString()+renderAlphaMentorship.toString();
+  const arena=renderAlphaArenaMasterStage.toString();
+  const mission=renderAlphaMissionCommand.toString()+continueAlphaArc1.toString();
+  const checks={
+    worldEventStartupTDZRemoved:normalizer.includes('const dimensions=[')&&!normalizer.includes('WORLD_EVENT_RUNTIME_DIMENSIONS.forEach'),
+    myClanMasterFailureFailover:renderClanOverlay.toString().includes('probeAlphaMasterAsset("myClan"'),
+    masterToggleNoPersistence:!setAlphaUIMasterEnabled.toString().includes("savePlayerData"),
+    arenaCodeShellIndependent:arena.includes("alpha-arena-code-shell")&&arena.includes("is-master-art-off"),
+    arenaBattleStillUsesExistingAuthority:openArenaBattleSurface.toString().includes('openOverlay("battle")'),
+    arenaInactiveModesStillFailClosed:renderArenaMainOverlay.toString().includes("No fake network opponent"),
+    exactTrainingAssets:assetManifest.ui.trainingGrounds==="UI/training_grounds.png"&&assetManifest.ui.weaponsTraining==="UI/weapons_training.png"&&assetManifest.ui.sparring==="UI/sparring.png"&&assetManifest.ui.mentorship==="UI/mentorship.png",
+    trainingHubThreeModes:training.includes("WEAPONS TRAINING")&&training.includes("MENTORSHIP")&&training.includes("SPARRING"),
+    weaponTrainingConsumesExistingProficiency:renderAlphaWeaponsTraining.toString().includes("getWeaponSpecializationRecord")&&renderAlphaWeaponsTraining.toString().includes("getEquippedWeaponDefinition"),
+    unsupportedTrainingCreatesNoHistory:alphaTrainingUnsupported.toString().includes("historyCommitted:false")&&!alphaTrainingUnsupported.toString().includes("savePlayerData")&&!alphaTrainingUnsupported.toString().includes("activityHistory"),
+    sparRequiresTwoDistinctOwned:renderAlphaSparring.toString().includes("a.id!==b.id")&&getAlphaTrainingSelectOptions.toString().includes("getAlphaTrainingRoster"),
+    mentorshipDoesNotInventTransfer:alphaTrainingUnsupported.toString().includes("Mentorship knowledge-transfer consequence is not yet authored"),
+    missionConsoleDoesNotInjectTrace:mission.includes("pre_whisper_three_person_trace_producer_pending")&&!continueAlphaArc1.toString().includes("activityHistory.push"),
+    mission1ExistingRuntimeReused:continueAlphaArc1.toString().includes("openArc1Mission1WhisperWoods"),
+    backendNotRequiredForLocalPersistence:typeof savePlayerData==="function"&&typeof restoreTestState==="function"
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
+  console.table(checks);
+  return {pass:checks.pass,checks,codingStatus:checks.pass?"BRICKS_3500_4499_MONSTER_GREEN":"BRICKS_3500_4499_MONSTER_FAILED",nextImplementedBrick:4499};
+}
+
+// =========================================================
+// BRICKS 4100–4399 — ARC 1 MISSION 11/12 COMBAT AUTHORITY
+// Issue #41 — executable encounter packages / no Story invention.
+// =========================================================
+const ARC1_M11_RECALL_AUTHORITY=Object.freeze({
+  encounterId:"arc1_m11_pump_four_recall_encounter",
+  participants:Object.freeze({kagawa:"mizue_kagawa",medic:"arc1_m11_recall_medic_01",field:"arc1_m11_field_operative_01"}),
+  basePL:Object.freeze({mizue_kagawa:53,arc1_m11_recall_medic_01:46,arc1_m11_field_operative_01:51}),
+  stats:Object.freeze({
+    mizue_kagawa:Object.freeze({nin:49,tai:48,buki:45,fuin:43,kin:50,gen:54,stamina:52}),
+    arc1_m11_recall_medic_01:Object.freeze({nin:43,tai:34,buki:37,fuin:46,kin:48,gen:35,stamina:44}),
+    arc1_m11_field_operative_01:Object.freeze({nin:45,tai:50,buki:52,fuin:31,kin:38,gen:40,stamina:51})
+  }),
+  recall:Object.freeze({contact:"arc1_m11_recall_medic_recall_contact",refusal:"arc1_m11_echo_recall_refusal",substitution:"arc1_m11_menma_recognition_substitution",resolve:"arc1_m11_recall_medic_resolve_retrieval",profile:"menma_normal_no_carrier"}),
+  actions:Object.freeze({
+    precision:"mizue_kagawa_precision_strike",falseOpening:"mizue_kagawa_false_opening",binding:"mizue_kagawa_binding_mark",guard:"mizue_kagawa_guarded_read",
+    scalpel:"arc1_m11_recall_medic_chakra_scalpel",retrieval:"arc1_m11_recall_medic_retrieval_bind",stabilise:"arc1_m11_recall_medic_emergency_stabilisation",
+    edge:"arc1_m11_field_operative_edge_cut",driving:"arc1_m11_field_operative_driving_strike",intercept:"arc1_m11_field_operative_intercept_hold",screen:"arc1_m11_field_operative_protective_screen"
+  })
+});
+function createArc1M11Enemy(id,name,projectionKey=null){
+  const A=ARC1_M11_RECALL_AUTHORITY,pl=A.basePL[id],stats=A.stats[id];
+  return {id,name,rank:"Unknown",formalRank:null,affiliation:null,power:pl,calibratedBasePL:pl,basePL:pl,baseStats:{...stats},stats:{...stats},observerProjectionKey:projectionKey,image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},noBossScaling:true,noEncounterScaling:true,collectibleProductionGate:false,mission11Recall:true};
+}
+enemyDatabase.mizue_kagawa=createArc1M11Enemy("mizue_kagawa","Mizue Kagawa");
+enemyDatabase.arc1_m11_recall_medic_01=createArc1M11Enemy("arc1_m11_recall_medic_01","RECALL MEDIC","observer_projection_recall_medic");
+enemyDatabase.arc1_m11_field_operative_01=createArc1M11Enemy("arc1_m11_field_operative_01","FIELD OPERATIVE","observer_projection_field_operative");
+function getArc1M11EnemyIds(){const p=ARC1_M11_RECALL_AUTHORITY.participants;return[p.kagawa,p.medic,p.field];}
+function resolveArc1M11ParticipantRuntime(id){return getPlayerCharacter(id)||getBattleParticipantByIdentity("player",id)||null;}
+function validateArc1M11Caller(activeParticipantIds,sideAssignments){
+  const ids=[...new Set((Array.isArray(activeParticipantIds)?activeParticipantIds:[]).filter(Boolean))], enemyIds=getArc1M11EnemyIds();
+  if(enemyIds.some(id=>!ids.includes(id)))return{valid:false,reason:"mission11_exact_opposition_missing"};
+  const sides=sideAssignments&&typeof sideAssignments==="object"?sideAssignments:{};
+  const enemies=ids.filter(id=>enemyIds.includes(id)), players=ids.filter(id=>!enemyIds.includes(id));
+  if(!players.length)return{valid:false,reason:"mission11_allied_participant_missing"};
+  if(enemies.some(id=>!sides[id])||players.some(id=>!sides[id]))return{valid:false,reason:"mission11_side_assignment_missing"};
+  const enemySide=new Set(enemies.map(id=>sides[id])), playerSide=new Set(players.map(id=>sides[id]));
+  if(enemySide.size!==1||playerSide.size!==1||[...enemySide][0]===[...playerSide][0])return{valid:false,reason:"mission11_side_assignment_invalid"};
+  return{valid:true,ids,enemies,players,sides:cloneBattleRuntimeValue(sides)};
+}
+function createArc1M11Fixed(id,name,pl,discipline,traits=[]){const a=makeEnemyFixedDamageAction(id,pl,{primaryDiscipline:discipline,traits:["arc1_m11_exact_authored_action","one_direct_packet",...traits]});a.displayName=name;a.authoredAttackPL=pl;a.targetMode="single_hostile";return a;}
+function createArc1M11Guard(ownerId,id,ratio,stateKey,targetId=ownerId){return{id,skillId:id,displayName:id,targetMode:"self",actionClass:"enemy_defensive_setup",authoredAttackPL:null,traits:["pre_stamina_prevention","one_direct_packet"],resolve({enemy,envelope}){const state=addBattleTransientState({stateKey,sourceSide:"enemy",sourceParticipantId:ownerId,targetSide:"enemy",targetParticipantId:targetId,ownerRef:{type:"skill",id},data:{sourceSkillId:id,attackMultiplier:1-ratio,preventionRatio:ratio,oneUse:true,preStamina:true,requiresDirectAttackPLPacket:true,activationActionId:envelope.actionId,expiresAtOwnerNextActionStart:true}});return{resolved:!!state,damageApplied:false,stateRefs:state?[state.stateId]:[],preventionRatio:ratio};}};}
+function establishArc1M11MovementCondition(key,sourceId,targetId,skillId,extraTraits=[]){return upsertAlphaSourceScopedCondition({conditionKey:key,conditionType:key,sourceSide:"enemy",sourceParticipantId:sourceId,sourceRefs:[{type:"encounter_package",id:ARC1_M11_RECALL_AUTHORITY.encounterId,role:"combat_authority"},{type:"skill",id:skillId,role:"exact_source"}],sourceSkillId:skillId,targetSide:"player",targetParticipantId:targetId,reapplication:"refresh",blockedActionClasses:["movement_technique","reposition","disengage","escape"],blockedActionTraits:["voluntary_movement","reposition","disengage",...extraTraits],data:{remainingActionOpportunities:1,durationActionOpportunities:1,notStun:true,blanketStun:false,blocksOrdinaryAttacks:false,sourceOwned:true}});}
+function createArc1M11Control(id,name,sourceId,key,extraTraits=[]){return{id,skillId:id,displayName:name,targetMode:"single_hostile",actionClass:"enemy_control_technique",authoredAttackPL:null,traits:["not_stun","movement_route_control"],resolve({target}){if(!target)return{resolved:false,reason:"mission11_control_target_missing"};const applied=establishArc1M11MovementCondition(key,sourceId,target.id,id,extraTraits);return{resolved:!!applied.condition,damageApplied:false,conditionRefs:applied.condition?[applied.condition.conditionId]:[]};}};}
+const ARC1_M11_ACTIONS=Object.freeze({
+  [ARC1_M11_RECALL_AUTHORITY.participants.kagawa]:Object.freeze([
+    createArc1M11Fixed(ARC1_M11_RECALL_AUTHORITY.actions.precision,"Precision Strike",28,"Taijutsu"),
+    {id:ARC1_M11_RECALL_AUTHORITY.actions.falseOpening,skillId:ARC1_M11_RECALL_AUTHORITY.actions.falseOpening,displayName:"False Opening",targetMode:"single_hostile",authoredAttackPL:null,resolve({enemy,target,envelope}){if(!target)return{resolved:false,reason:"false_opening_target_missing"};const st=addBattleTransientState({stateKey:"m11_kagawa_false_opening",sourceSide:"enemy",sourceParticipantId:enemy.id,targetSide:"player",targetParticipantId:target.id,ownerRef:{type:"skill",id:ARC1_M11_RECALL_AUTHORITY.actions.falseOpening},data:{nextSameTargetPrecisionStrikePL:33,oneUse:true,activationActionId:envelope.actionId}});return{resolved:!!st,damageApplied:false,stateRefs:st?[st.stateId]:[]};}},
+    createArc1M11Control(ARC1_M11_RECALL_AUTHORITY.actions.binding,"Binding Mark",ARC1_M11_RECALL_AUTHORITY.participants.kagawa,"m11_kagawa_binding_mark"),
+    createArc1M11Guard(ARC1_M11_RECALL_AUTHORITY.participants.kagawa,ARC1_M11_RECALL_AUTHORITY.actions.guard,0.30,"m11_kagawa_guarded_read")
+  ]),
+  [ARC1_M11_RECALL_AUTHORITY.participants.medic]:Object.freeze([
+    createArc1M11Fixed(ARC1_M11_RECALL_AUTHORITY.actions.scalpel,"Chakra Scalpel",22,"Ninjutsu"),
+    createArc1M11Control(ARC1_M11_RECALL_AUTHORITY.actions.retrieval,"Retrieval Bind",ARC1_M11_RECALL_AUTHORITY.participants.medic,"m11_recall_retrieval_bind",["requiresFreeHostRoute"]),
+    {id:ARC1_M11_RECALL_AUTHORITY.actions.stabilise,skillId:ARC1_M11_RECALL_AUTHORITY.actions.stabilise,displayName:"Emergency Stabilisation",targetMode:"self",authoredAttackPL:null,resolve({enemy}){const state=currentBattle.mission11RecallEncounter;if(!state||state.emergencyStabilisationUsed)return{resolved:false,reason:"emergency_stabilisation_already_used"};const before=getBattleRemainingPL("enemy",enemy.id);const max=getBattleMaximumPL("enemy",enemy.id)||ARC1_M11_RECALL_AUTHORITY.basePL[enemy.id];setBattleRemainingPL("enemy",enemy.id,Math.min(max,before+9));state.emergencyStabilisationUsed=true;return{resolved:true,damageApplied:false,restored:Math.min(9,Math.max(0,max-before))};}}
+  ]),
+  [ARC1_M11_RECALL_AUTHORITY.participants.field]:Object.freeze([
+    createArc1M11Fixed(ARC1_M11_RECALL_AUTHORITY.actions.edge,"Edge Cut",28,"Bukijutsu"),createArc1M11Fixed(ARC1_M11_RECALL_AUTHORITY.actions.driving,"Driving Strike",25,"Taijutsu"),
+    createArc1M11Fixed(ARC1_M11_RECALL_AUTHORITY.actions.intercept,"Intercept Hold",20,"Taijutsu",["restraint_only_on_positive_final_damage"]),
+    createArc1M11Guard(ARC1_M11_RECALL_AUTHORITY.participants.field,ARC1_M11_RECALL_AUTHORITY.actions.screen,0.25,"m11_field_protective_screen")
+  ])
+});
+
+// Exact conditional M11 branches layered onto the prepared action objects.
+{
+  const A=ARC1_M11_RECALL_AUTHORITY;
+  const precision=ARC1_M11_ACTIONS[A.participants.kagawa].find(a=>a.id===A.actions.precision);
+  const precision28=precision.resolve;
+  const precision33=makeEnemyFixedDamageAction(A.actions.precision,33,{primaryDiscipline:"Taijutsu",traits:["arc1_m11_exact_authored_action","one_direct_packet","same_target_false_opening_consumed"]});
+  precision.authoredAttackPL="28_or_33_same_target";
+  precision.resolve=({enemy,target,envelope,currentBattle})=>{
+    const setup=findBattleTransientState({stateKey:"m11_kagawa_false_opening",targetSide:"player",targetParticipantId:target&&target.id});
+    const result=setup?precision33.resolve({enemy,target,envelope,currentBattle}):precision28({enemy,target,envelope,currentBattle});
+    if(setup&&result&&result.resolved===true)consumeBattleTransientState(setup.stateId,"player",target.id);
+    return {...result,authoredAttackPL:setup?33:28,falseOpeningConsumed:!!setup};
+  };
+  const intercept=ARC1_M11_ACTIONS[A.participants.field].find(a=>a.id===A.actions.intercept);
+  const interceptBase=intercept.resolve;
+  intercept.resolve=({enemy,target,envelope,currentBattle})=>{
+    const result=interceptBase({enemy,target,envelope,currentBattle});
+    const finalDamage=Number(result&&result.finalDamage||result&&result.damage&&result.damage.finalDamage)||0;
+    if(finalDamage<=0)return {...result,physicalRestraintEstablished:false};
+    const applied=upsertAlphaSourceScopedCondition({conditionKey:"m11_field_intercept_restraint",conditionType:"physical_restraint",sourceSide:"enemy",sourceParticipantId:A.participants.field,sourceRefs:[{type:"skill",id:A.actions.intercept,role:"exact_source"}],sourceSkillId:A.actions.intercept,targetSide:"player",targetParticipantId:target.id,reapplication:"refresh",blockedActionClasses:["movement_technique","reposition","disengage","escape"],blockedActionTraits:["voluntary_movement","reposition","disengage"],data:{remainingActionOpportunities:1,requiresPositiveFinalDamage:true,establishingFinalDamage:finalDamage,notStun:true,blanketStun:false}});
+    return {...result,physicalRestraintEstablished:!!applied.condition,conditionRefs:[...(result.conditionRefs||[]),...(applied.condition?[applied.condition.conditionId]:[])]};
+  };
+  const screen=ARC1_M11_ACTIONS[A.participants.field].find(a=>a.id===A.actions.screen);
+  screen.targetMode="one_exact_ally";
+  screen.resolve=({enemy,envelope})=>{
+    const candidates=[A.participants.kagawa,A.participants.medic].filter(id=>Number(getBattleRemainingPL("enemy",id))>0);
+    if(!candidates.length)return{resolved:false,reason:"protective_screen_exact_ally_missing"};
+    candidates.sort((x,y)=>getBattleRemainingPL("enemy",x)-getBattleRemainingPL("enemy",y));
+    const targetId=candidates[0];
+    const st=addBattleTransientState({stateKey:"m11_field_protective_screen",sourceSide:"enemy",sourceParticipantId:A.participants.field,targetSide:"enemy",targetParticipantId:targetId,ownerRef:{type:"skill",id:A.actions.screen},data:{sourceSkillId:A.actions.screen,attackMultiplier:.75,preventionRatio:.25,oneUse:true,preStamina:true,requiresDirectAttackPLPacket:true,activationActionId:envelope.actionId,noAura:true,noRedirect:true}});
+    return{resolved:!!st,damageApplied:false,targetAllyParticipantId:targetId,stateRefs:st?[st.stateId]:[],preventionRatio:.25,noAura:true,noRedirect:true};
+  };
+}
+Object.entries(ARC1_M11_ACTIONS).forEach(([id,actions])=>enemyDatabase[id].authoredBattleActions=[...actions]);
+function getArc1M11PreparedActions(id){return ARC1_M11_ACTIONS[id]?[...ARC1_M11_ACTIONS[id]]:[];}
+function commitArc1M11RecallFact(type,data={}){const state=currentBattle.mission11RecallEncounter;if(!state)return null;const id=createBattleRuntimeRecordId(type);const ev=recordBattleEvidence({eventType:type,committedOccurrence:true,actionId:id,data:cloneBattleRuntimeValue(data)});if(ev)state.recallOccurrenceIds.push(ev.evidenceId||id);return ev;}
+function resolveArc1M11RecognitionSubstitution({participantId,linkedRecallContactId,profile="menma_normal_no_carrier"}={}){
+  const state=currentBattle.mission11RecallEncounter,A=ARC1_M11_RECALL_AUTHORITY;if(!state)return{success:false,reason:"mission11_recall_state_missing"};
+  if(profile!==A.recall.profile)return{success:false,reason:"recognition_substitution_profile_invalid",historyCommitted:false};
+  if(!linkedRecallContactId||linkedRecallContactId!==state.linkedRecallContactId)return{success:false,reason:"recognition_substitution_contact_mismatch",historyCommitted:false};
+  const ev=commitArc1M11RecallFact(A.recall.substitution,{participantId,profile,linkedRecallContactId,identityChanged:false,echoDetached:false,universalBypass:false});
+  state.recognitionSubstitution={participantId,profile,linkedRecallContactId,occurrenceId:ev&&ev.evidenceId||null};return{success:!!ev,occurrenceId:ev&&ev.evidenceId||null};
+}
+function launchArc1M11PumpFourEncounter({activeParticipantIds,sideAssignments,linkedRecallContactId=null,returnContext=null,callerContext=null}={}){
+  const A=ARC1_M11_RECALL_AUTHORITY,v=validateArc1M11Caller(activeParticipantIds,sideAssignments);if(!v.valid)return{success:false,...v};
+  const active=resolveArc1M11ParticipantRuntime(v.players[0]);if(!active)return{success:false,reason:"mission11_start_participant_missing"};const enemies=v.enemies.map(id=>enemyDatabase[id]);
+  selectedEnemy=enemies[0];currentBattle.active=true;currentBattle.battleId=createBattleInstanceId();currentBattle.encounterId=A.encounterId;currentBattle.characterId=v.players[0];setBattleEnemyParticipants(enemies);currentBattle.enemy=enemies[0];currentBattle.encounterEnemy=enemies[0];currentBattle.deployment={player:{slots:createBattleDeploymentSlots(v.players)},enemy:{slots:createBattleDeploymentSlots(v.enemies)},transitionCounter:0,lastTransition:null};currentBattle.activePlayer=getBattleDeploymentParticipant("player",1)||active;syncBattleActiveEnemyFromDeployment();currentBattle.lastDamage=0;currentBattle.battleOver=false;currentBattle.outcome=null;currentBattle.defeat=null;currentBattle.returnContext=returnContext?normalizeBattleReturnContext(returnContext):null;currentBattle.rewards={generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null};currentBattle.enemyPower=A.basePL[v.enemies[0]];currentBattle.enemyMaxPower=currentBattle.enemyPower;
+  initializeBattleContributionRecordsFromDeployment();initializeBattleSourcePackageRuntime();initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});initializeBattlePouchFromPreparedSelection();initializeBattleAttachedSummonRuntimeFromDeployment();
+  currentBattle.mission11RecallEncounter={encounterId:A.encounterId,occurrenceId:createBattleRuntimeRecordId("arc1_m11_pump_four"),activeParticipantIds:[...v.ids],sideAssignments:v.sides,linkedRecallContactId,recallOccurrenceIds:[],carrierResponse:null,recallResult:null,recognitionSubstitution:null,emergencyStabilisationUsed:false,battleCompleted:false,battleResult:null,callerContext:callerContext?cloneBattleRuntimeValue(callerContext):null,returnContext:currentBattle.returnContext?cloneBattleRuntimeValue(currentBattle.returnContext):null};
+  saveTestState();openOverlay("combat");return{success:true,battleId:currentBattle.battleId,encounterId:A.encounterId,occurrenceId:currentBattle.mission11RecallEncounter.occurrenceId};
+}
+function buildArc1M11ReturnEnvelope(){const s=currentBattle.mission11RecallEncounter;if(!s)return null;return{encounterId:s.encounterId,occurrenceId:s.occurrenceId,activeParticipantIds:[...s.activeParticipantIds],sideAssignments:cloneBattleRuntimeValue(s.sideAssignments),battleCompleted:s.battleCompleted===true,battleResult:s.battleResult,carrierResponse:s.carrierResponse,recallResult:s.recallResult,recognitionSubstitution:cloneBattleRuntimeValue(s.recognitionSubstitution),recallOccurrenceIds:[...s.recallOccurrenceIds],missionOutcomeInferred:false,custodyInferred:false,escapeInferred:false,deathInferred:false,returnContext:cloneBattleRuntimeValue(s.returnContext)};}
+
+const ARC1_M12_AUTHORITY=Object.freeze({master:"arc1_m12_better_host_climax",ren:"arc1_ren",renEcho:"arc1_ren_conditioned_echo",menmaEcho:"arc1_menma_echo",stages:Object.freeze({1:"arc1_m12_ren_stage_1_battle",2:"arc1_m12_ren_stage_2_battle",3:"arc1_m12_ren_stage_3_battle"}),renBase:Object.freeze({stats:{nin:42,tai:45,buki:40,fuin:38,kin:46,gen:37,stamina:47},pl:46}),renProjection:Object.freeze({1:{key:"arc1_ren_stage_1_conditioned_echo",stats:{nin:49,tai:50,buki:43,fuin:44,kin:54,gen:39,stamina:56},pl:54},2:{key:"arc1_ren_stage_2_advanced_optimisation",stats:{nin:55,tai:58,buki:46,fuin:49,kin:62,gen:42,stamina:60},pl:60},3:{key:"arc1_ren_stage_3_terminal_optimisation",stats:{nin:64,tai:68,buki:50,fuin:58,kin:76,gen:46,stamina:70},pl:73}}),borrowedKurama:Object.freeze({key:"arc1_m12_menma_echo_borrowed_kurama",effectiveStats:{nin:80,tai:64,buki:39,fuin:57,kin:74,gen:35,stamina:85},effectivePL:80,modifiers:{nin:20,tai:12,buki:0,fuin:0,kin:8,gen:0,stamina:22}})});
+function projectArc1M12RenStage(stage){const A=ARC1_M12_AUTHORITY,p=A.renProjection[stage];if(!p)return null;const enemy=enemyDatabase[A.ren]||{id:A.ren,name:"Ren",rank:"Unknown",formalRank:null,affiliation:null,image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}};Object.assign(enemy,{baseRegistryPL:A.renBase.pl,baseRegistryStats:{...A.renBase.stats},power:p.pl,calibratedBasePL:p.pl,basePL:A.renBase.pl,baseStats:{...A.renBase.stats},stats:{...p.stats},effectiveProjectionKey:p.key,noBossScaling:true,noEncounterScaling:true,collectibleProductionGate:false});enemyDatabase[A.ren]=enemy;return enemy;}
+function getArc1M12RenActions(stage){const A=ARC1_M12_AUTHORITY;if(stage===1)return[createArc1M11Fixed("arc1_ren_s1_conditioned_vector_strike","Conditioned Vector Strike",30,"Kinjutsu"),createArc1M11Fixed("arc1_ren_s1_retention_clamp","Retention Clamp",21,"Kinjutsu",["hosted_route_suppression_on_positive_damage"]),createArc1M11Guard(A.ren,"arc1_ren_s1_optimised_guard",.30,"m12_ren_s1_guard")];if(stage===2)return[createArc1M11Fixed("arc1_ren_s2_advanced_vector_cleave","Advanced Vector Cleave",35,"Kinjutsu"),createArc1M11Fixed("arc1_ren_s2_advanced_retention_break","Advanced Retention Break",27,"Kinjutsu",["hosted_route_suppression_on_positive_damage"]),createArc1M11Fixed("arc1_ren_s2_counterflow","Counterflow",32,"Kinjutsu",["normal_selected_action_not_reaction"]),createArc1M11Guard(A.ren,"arc1_ren_s2_predictive_guard",.35,"m12_ren_s2_guard")];return[createArc1M11Fixed("arc1_ren_s3_terminal_pathway_break","Terminal Pathway Break",44,"Kinjutsu"),createArc1M11Fixed("arc1_ren_s3_terminal_retention_lattice","Terminal Retention Lattice",30,"Kinjutsu",["hosted_and_borrowed_route_suppression_on_positive_damage"]),createArc1M11Fixed("arc1_ren_s3_terminal_overclock_burst","Terminal Overclock Burst",48,"Kinjutsu"),createArc1M11Guard(A.ren,"arc1_ren_s3_terminal_brace",.40,"m12_ren_s3_guard")];}
+function getArc1M12MenmaAdditionalActions(stage,{borrowedKurama=false}={}){if(stage===1)return[{id:"arc1_m12_early_echo_guided_strike",attackPL:19,sharedReadAttackPL:23,requiresHostedRoute:true},{id:"arc1_m12_early_echo_route_warning",preventionRatio:.20},{id:"arc1_m12_early_echo_shared_read",setup:true}];if(stage===2)return[{id:"echo_menma_reciprocal_chakra_strike",attackPL:34,requiresHostedRoute:true},{id:"echo_menma_threaded_route_burst",attackPL:37,readAttackPL:42,requiresHostedRoute:true},{id:"echo_menma_route_read",setup:true},{id:"echo_menma_reciprocal_guard",preventionRatio:.35},{id:"echo_menma_adaptive_reroute",oncePerBattle:true,bypassableStateOnly:true}];const base=[];if(borrowedKurama)base.push({id:"arc1_m12_echo_kurama_routed_burst",attackPL:52,packetCount:1,requiresBorrowedKuramaRoute:true},{id:"arc1_m12_borrowed_kurama_chakra_strike",attackPL:46,requiresBorrowedKuramaRoute:true},{id:"arc1_m12_borrowed_kurama_shroud",preventionRatio:.45},{id:"arc1_m12_echo_kurama_compensatory_recovery",restore:12,oncePerBattle:true});return base;}
+function launchArc1M12RenStage({stage,alliedParticipantIds,sideAssignments,borrowedKurama=false,loanOccurrenceId=null,returnContext=null}={}){const A=ARC1_M12_AUTHORITY;if(![1,2,3].includes(stage))return{success:false,reason:"mission12_stage_invalid"};const allies=[...new Set((Array.isArray(alliedParticipantIds)?alliedParticipantIds:[]).filter(Boolean))];if(!allies.length)return{success:false,reason:"mission12_allied_participant_missing"};if(stage===3&&borrowedKurama&&!loanOccurrenceId)return{success:false,reason:"mission12_borrowed_kurama_requires_exact_loan_occurrence",historyCommitted:false};const active=resolveArc1M11ParticipantRuntime(allies[0]);if(!active)return{success:false,reason:"mission12_start_participant_missing"};const ren=projectArc1M12RenStage(stage);ren.authoredBattleActions=getArc1M12RenActions(stage);const ids=[...allies,A.ren],sides=sideAssignments&&typeof sideAssignments==="object"?sideAssignments:{};if(ids.some(id=>!sides[id]))return{success:false,reason:"mission12_side_assignment_missing"};selectedEnemy=ren;currentBattle.active=true;currentBattle.battleId=createBattleInstanceId();currentBattle.encounterId=A.stages[stage];currentBattle.characterId=allies[0];setBattleEnemyParticipants([ren]);currentBattle.enemy=ren;currentBattle.encounterEnemy=ren;currentBattle.deployment={player:{slots:createBattleDeploymentSlots(allies)},enemy:{slots:createBattleDeploymentSlots([A.ren])},transitionCounter:0,lastTransition:null};currentBattle.activePlayer=getBattleDeploymentParticipant("player",1)||active;syncBattleActiveEnemyFromDeployment();currentBattle.battleOver=false;currentBattle.outcome=null;currentBattle.defeat=null;currentBattle.returnContext=returnContext?normalizeBattleReturnContext(returnContext):null;currentBattle.enemyPower=A.renProjection[stage].pl;currentBattle.enemyMaxPower=currentBattle.enemyPower;initializeBattleContributionRecordsFromDeployment();initializeBattleSourcePackageRuntime();initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true});initializeBattlePouchFromPreparedSelection();
+  currentBattle.mission12Climax={masterSequenceId:A.master,stage,battleId:A.stages[stage],stableRenId:A.ren,renProjectionKey:A.renProjection[stage].key,renEffectivePL:A.renProjection[stage].pl,hostedEntityTurnSlotsCreated:false,playerAdditionalActions:getArc1M12MenmaAdditionalActions(stage,{borrowedKurama}),borrowedKurama:stage===3&&borrowedKurama?{projectionKey:A.borrowedKurama.key,loanOccurrenceId,effectiveStats:{...A.borrowedKurama.effectiveStats},effectivePL:80,modifiers:{...A.borrowedKurama.modifiers},temporary:true,cleanupRequired:true}:null,battleCompleted:false,battleResult:null,terminalObjective:stage===3?"break_terminal_optimisation":null,returnContext:currentBattle.returnContext?cloneBattleRuntimeValue(currentBattle.returnContext):null};saveTestState();openOverlay("combat");return{success:true,stage,battleId:currentBattle.battleId,encounterId:A.stages[stage],renStableParticipantId:A.ren,renEffectivePL:A.renProjection[stage].pl,borrowedKuramaEffectivePL:currentBattle.mission12Climax.borrowedKurama?80:null};}
+function cleanupArc1M12BorrowedKurama(){const s=currentBattle.mission12Climax;if(!s||!s.borrowedKurama)return{success:true,idempotent:true};const history={projectionKey:s.borrowedKurama.projectionKey,loanOccurrenceId:s.borrowedKurama.loanOccurrenceId,effectivePL:s.borrowedKurama.effectivePL,endedAt:Date.now()};s.borrowedKuramaHistory=history;s.borrowedKurama=null;s.playerAdditionalActions=(s.playerAdditionalActions||[]).filter(a=>!a.requiresBorrowedKuramaRoute);return{success:true,history,persistentUnlockGranted:false};}
+function buildArc1M12ReturnEnvelope(){const s=currentBattle.mission12Climax;if(!s)return null;return{masterSequenceId:s.masterSequenceId,stage:s.stage,battleId:s.battleId,stableRenParticipantId:ARC1_M12_AUTHORITY.ren,renProjectionKey:s.renProjectionKey,renEffectivePL:s.renEffectivePL,battleCompleted:s.battleCompleted===true,battleResult:s.battleResult,objective:s.terminalObjective,renDeathInferred:false,renInjuryInferred:false,renCustodyInferred:false,conditionedEchoDetachedInferred:false,hostedEntityIndependentTurnCreated:false,borrowedKuramaStillLive:!!s.borrowedKurama,borrowedKuramaHistory:cloneBattleRuntimeValue(s.borrowedKuramaHistory||null),persistentKuramaUnlockGranted:false,returnContext:cloneBattleRuntimeValue(s.returnContext)};}
+function finalizeArc1M12Stage(outcome){const s=currentBattle.mission12Climax;if(!s)return{handled:false,reason:"mission12_stage_not_active"};if(s.battleCompleted)return{handled:true,idempotent:true,returnEnvelope:buildArc1M12ReturnEnvelope()};s.battleCompleted=true;s.battleResult=outcome;if(s.stage===3)cleanupArc1M12BorrowedKurama();s.returnEnvelope=buildArc1M12ReturnEnvelope();return{handled:true,returnEnvelope:cloneBattleRuntimeValue(s.returnEnvelope)};}
+
+// Preserve M11/M12 exact state through the existing Battle save envelope.
+const ALPHA_PRE4100_BATTLE_RUNTIME_SAVE=getBattleRuntimeSaveState;
+getBattleRuntimeSaveState=function(){const out=ALPHA_PRE4100_BATTLE_RUNTIME_SAVE();out.mission11RecallEncounter=currentBattle.mission11RecallEncounter?cloneBattleRuntimeValue(currentBattle.mission11RecallEncounter):null;out.mission12Climax=currentBattle.mission12Climax?cloneBattleRuntimeValue(currentBattle.mission12Climax):null;return out;};
+const ALPHA_PRE4100_RESTORE_BATTLE_RUNTIME=restoreBattleRuntimeState;
+restoreBattleRuntimeState=function(raw){const out=ALPHA_PRE4100_RESTORE_BATTLE_RUNTIME(raw);currentBattle.mission11RecallEncounter=raw&&raw.mission11RecallEncounter?cloneBattleRuntimeValue(raw.mission11RecallEncounter):null;currentBattle.mission12Climax=raw&&raw.mission12Climax?cloneBattleRuntimeValue(raw.mission12Climax):null;return out;};
+function runAlphaIssue41SourceDiagnostics(){const A=ARC1_M11_RECALL_AUTHORITY,M=ARC1_M12_AUTHORITY;const checks={m11ExactIds:getArc1M11EnemyIds().join("|")==="mizue_kagawa|arc1_m11_recall_medic_01|arc1_m11_field_operative_01",m11ExactPL:getArc1M11EnemyIds().every(id=>enemyDatabase[id].calibratedBasePL===A.basePL[id]),m11NoScaling:getArc1M11EnemyIds().every(id=>enemyDatabase[id].noBossScaling&&enemyDatabase[id].noEncounterScaling),recallSubstitutionExactProfile:A.recall.profile==="menma_normal_no_carrier"&&resolveArc1M11RecognitionSubstitution.toString().includes("contact_mismatch"),m11ActionPL:getArc1M11PreparedActions(A.participants.kagawa).some(a=>a.id===A.actions.precision&&a.authoredAttackPL==="28_or_33_same_target")&&getArc1M11PreparedActions(A.participants.medic).some(a=>a.id===A.actions.scalpel&&a.authoredAttackPL===22),m12OneRen:M.ren==="arc1_ren"&&M.renProjection[1].pl===54&&M.renProjection[2].pl===60&&M.renProjection[3].pl===73,m12BorrowedExact80:M.borrowedKurama.effectivePL===80&&JSON.stringify(M.borrowedKurama.effectiveStats)===JSON.stringify({nin:80,tai:64,buki:39,fuin:57,kin:74,gen:35,stamina:85}),noIndependentHostedSlots:launchArc1M12RenStage.toString().includes("hostedEntityTurnSlotsCreated:false"),routedBurstOnePacket:getArc1M12MenmaAdditionalActions(3,{borrowedKurama:true}).some(a=>a.id==="arc1_m12_echo_kurama_routed_burst"&&a.attackPL===52&&a.packetCount===1),loanCleanup:cleanupArc1M12BorrowedKurama.toString().includes("persistentUnlockGranted:false"),sazanNotCombatant:!getArc1M12RenActions.toString().includes("arc1_dr_sazan"),battleDefeatNoDeath:buildArc1M12ReturnEnvelope.toString().includes("renDeathInferred:false"),saveLoadState:getBattleRuntimeSaveState.toString().includes("mission12Climax")&&restoreBattleRuntimeState.toString().includes("mission11RecallEncounter")};checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);console.table(checks);return{pass:checks.pass,checks,codingStatus:checks.pass?"ISSUE_41_SOURCE_PACKAGE_GREEN":"ISSUE_41_SOURCE_PACKAGE_FAILED",runtimeBattleRoundTripStillRequired:true};}

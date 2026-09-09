@@ -1,0 +1,170 @@
+SHINOBI CHRONICLES — CODING/RUNTIME REVISION MANIFEST
+========================================================
+
+DELIVERY
+--------
+Brick range: BRICKS 3500–4499
+Package: Shinobi_Chronicles_BRICKS_3500-4499_ALPHA_PLAYABLE_MONSTER.zip
+Scope: Alpha playability monster — My Clan, Arena, Training Grounds, startup hardening,
+       first-run mission front door, and partial Issue #41 Mission 11/12 Combat package.
+
+IMPORTANT WINDOWS NOTE
+----------------------
+UNBLOCK THIS ZIP BEFORE EXTRACTION:
+Right-click ZIP -> Properties -> Unblock -> Apply -> Extract.
+
+LIVE AUTHORITY BASELINE
+-----------------------
+Monster work began against main:
+  5d65c0c0975218c305d2ab454c8e3a26dabc10bc
+
+Final GitHub guard observed main at:
+  57c592eece803377a76c0eec74584110feb9becb
+
+The production source files used as the implementation baseline did NOT move during that interval:
+  game.js baseline blob: 22c57a86b73530f9537ec0983f2eb8eb810f3ddd
+  style.css baseline blob: 2fd6390611d6f4b5a25e6c506ba94d0ccf43c02a
+  index.html baseline blob: 01e1cde1c8541e3031b9f7a7b76988a034f1a26a
+
+RESULT FILE BLOBS
+-----------------
+  game.js   7a9df48c2e495fe573cce0b9e68009194542c28c
+  style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
+  index.html 47d8016edbed6b08f3fc03275449acbb1c0007cb
+
+RESULT SHA-256
+--------------
+  game.js   a9e28b3f2ae273bf0060d3295f0a20f4daf071c4a95292e2ca8567a8e7caa3e1
+  style.css 57fc59f8977a3f116a0afb1a4a4cd1f0250f8d1869c1b96cda9364ffb7f03793
+  index.html c5bb19d47fa21777c2d4c477bd14b28dcf8acdbe23459d67687a56e9f1eb49eb
+
+BRICK SCOPE / IMPLEMENTED
+-------------------------
+BRICK 3500
+- Fixed startup TDZ crash in World Event save-state restore:
+  normalizeWorldEventRuntimeState no longer dereferences WORLD_EVENT_RUNTIME_DIMENSIONS
+  before that const has initialized.
+
+BRICKS 3501–3525
+- Optional UI-master availability registry.
+- My Clan probes its current Browse/Inspection master directly from the real renderer.
+- Missing master automatically falls back to code-owned shell without ownership/formation mutation.
+
+BRICKS 3526–3599
+- Arena code-owned/master-independent shell.
+- Existing Arena Battle and Promotion authority retained.
+- Inactive modes remain fail-closed; no fake opponent/bracket/result generation.
+
+BRICKS 3600–3899
+- Training Grounds code-owned runtime.
+- Training Grounds hub.
+- Weapons Training selection/proficiency projection.
+- Sparring fighter-selection shell.
+- Mentorship instructor/student selection shell.
+- Existing owned-roster and weapon-proficiency authorities consumed.
+- Training consequences that lack closed gameplay authority fail closed and commit no history.
+- Added top-nav TRAINING route.
+- Added existing Practical route from Training hub.
+
+BRICKS 3900–4099
+- Missions command/front-door surface.
+- Fresh Chronicle / roster state projected truthfully.
+- Current Arc-1 frontier reported instead of fabricating progress.
+- Reuses existing Mission-1 Whisper Woods runtime once legal prerequisite exists.
+- Does NOT inject the missing pre-Whisper three-person trace.
+
+BRICKS 4100–4399 — ISSUE #41 SOURCE IMPLEMENTATION (PARTIAL)
+- Mission 11 Pump Four stable opposition and exact Base PL packages:
+  Mizue Kagawa PL53
+  Recall Medic PL46
+  Field Operative PL51
+- Exact Recall/Recognition Substitution addresses and bounded profile.
+- Exact M11 authored action source package.
+- M11 caller validation and exact participant/side-set Battle launch.
+- M11 return envelope keeps Battle / Recall / carrier / custody/death inference separate.
+- Mission 12 one-stable-Ren source package:
+  Ren Base PL46
+  Stage 1 Effective PL54
+  Stage 2 Effective PL60
+  Stage 3 Effective PL73
+- Temporary borrowed-Kurama projection:
+  Effective Stats 80/64/39/57/74/35/85
+  Effective PL80
+  Routed Burst one PL52 packet
+  cleanup explicitly grants no persistent Kurama unlock.
+- M11/M12 runtime state added to the existing Battle save envelope.
+
+VALIDATION COMPLETED
+--------------------
+node --check game.js: PASS
+
+Deterministic source/runtime diagnostics:
+  BRICKS 3500–4499 monster gate: PASS
+  My Clan operational gameplay: PASS
+  Issue #32 My Clan adaptive semantics: PASS
+  Post-2500 cumulative playability: PASS
+  Issue #41 source-package diagnostic: PASS
+
+CSS structural brace balance: PASS
+TRAINING navigation binding present: PASS
+
+BROWSER STATUS
+--------------
+NOT CLAIMED GREEN.
+
+The available Chromium environment is organization-policy blocked from loading 127.0.0.1,
+so a genuine browser integration run could not be completed here. Stephen's local browser
+remains the current browser-validation authority for this revision.
+
+ALPHA / ARC 1 STATUS
+--------------------
+This package materially advances Alpha, but FULL ARC-1 PLAYTHROUGH IS NOT YET CLAIMED.
+
+Earliest fresh-save blocker:
+  GitHub Issue #58
+  [HANDOFF][TO: CE-COORDINATION][SEND NOW]
+  Close pre-Whisper three-person trace producer for Arc 1 first run
+
+Required missing committed fact:
+  arc1_m1_caravan_three_person_trace_confirmed
+
+Coding intentionally DOES NOT fabricate that fact.
+
+Issue #41 status:
+  Source package: implemented / deterministic diagnostic GREEN
+  Full M11/M12 Battle round-trip: STILL REQUIRED
+  Full Story caller/return integration: STILL REQUIRED
+  Therefore Issue #41 must remain OPEN.
+
+M2–M10:
+  Writing machine-addressability: CLOSED
+  Progression Identity Rebinding semantics: CLOSED
+  World source/object/location binding: CLOSED
+  Final consolidated CE->Coding runtime reconciliation remains outstanding in parent #36.
+  Coding must not silently invent the remaining cross-system caller sequencing.
+
+TRAINING CONSEQUENCES
+---------------------
+The new Training Grounds / Weapons / Sparring / Mentorship UI is operational as a
+selection/navigation/runtime projection surface.
+
+Where exact progression/reward/mentorship/spar consequence authority is not closed,
+the action fails closed rather than inventing XP, proficiency, mastery, relationship,
+rewards or Battle results.
+
+BACKEND
+-------
+NO PAID BACKEND IS REQUIRED FOR THE CURRENT LOCAL ALPHA GOAL.
+
+Existing browser/local persistence can support:
+New Game -> Origin -> owned roster -> My Clan -> local UI -> Story/Battle -> save/load.
+
+A backend becomes relevant later for accounts/authentication, cloud saves, multiplayer,
+authoritative server economy/security, or remote persistence/services.
+
+Do not buy backend infrastructure merely to unblock the current Arc-1 local Alpha.
+
+ROLLBACK RULE
+-------------
+This ZIP is the rollback/search address for BRICKS 3500–4499.
+Do not treat Brick numbering itself as proof of Golden status.
