@@ -1,0 +1,39 @@
+name: Alpha Genin Expansion 25 Asset QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'Assets/Genin/**'
+      - 'Portraits/Genin/**'
+      - 'Documentation/Assets/Alpha Genin Expansion 25 Row Assets Projection and QA 2026-09-10.md'
+      - 'Documentation/Registry/Alpha Genin Expansion 25 Row Registry and PL Admission 2026-09-10.md'
+      - 'tools/qa_genin_expansion_assets.py'
+      - '.github/workflows/genin-expansion-assets-qa.yml'
+  pull_request:
+    paths:
+      - 'Assets/Genin/**'
+      - 'Portraits/Genin/**'
+      - 'Documentation/Assets/Alpha Genin Expansion 25 Row Assets Projection and QA 2026-09-10.md'
+      - 'Documentation/Registry/Alpha Genin Expansion 25 Row Registry and PL Admission 2026-09-10.md'
+      - 'tools/qa_genin_expansion_assets.py'
+      - '.github/workflows/genin-expansion-assets-qa.yml'
+
+jobs:
+  genin-expansion-asset-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Pillow
+        run: python -m pip install --disable-pip-version-check pillow
+
+      - name: Validate exact 25-row collectible cards and UI portraits
+        run: python tools/qa_genin_expansion_assets.py
