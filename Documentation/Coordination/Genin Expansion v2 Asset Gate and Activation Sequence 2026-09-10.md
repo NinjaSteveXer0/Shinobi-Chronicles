@@ -2,13 +2,13 @@
 
 **Date:** 2026-09-10  
 **Owner:** CE / Codex / Coordination  
-**Status:** **BINDING ALPHA COORDINATION — REGISTRY/PL CLOSED / ASSET PROJECTION GATE ACTIVE / V2 CANDIDATE AUTHORITY NOT YET PUBLISHED**  
-**Source handoff:** GitHub issue #73  
+**Status:** **BINDING ALPHA COORDINATION — REGISTRY/PL CLOSED / ASSET PROJECTION GATE ACTIVE / COMBAT-READINESS GATE QUEUED / V2 CANDIDATE AUTHORITY NOT YET PUBLISHED**  
+**Source handoff:** GitHub issue #73; sequencing amendment from GitHub issue #81  
 **Upstream:** #70 ← #69
 
 ## 1. Purpose
 
-This document consumes the completed 25-row Registry / PL / Rank admission and fixes the next production sequence for the commissioned historical-Konoha Genin expansion.
+This document consumes the completed 25-row Registry / PL / Rank admission and fixes the production sequence for the commissioned historical-Konoha Genin expansion.
 
 Registry/PL authority is closed in:
 
@@ -20,12 +20,15 @@ commit:
 
 All 25 rows now have exact stable-person linkage, exact `genin_*` representation IDs, baseline formal Rank, seven Base Stats and Formula-v1.0 Base PL.
 
-That closure does **not** activate the rows in the current candidate universe by itself.
+That closure does **not** activate the rows in the current candidate universe by itself. Issue #81 further establishes that production-ready Assets also do **not** prove Battle readiness: the 25 rows must pass an explicit Combat / Skills readiness gate before CE publishes them as playable v2 teammate candidates.
 
 Preserve:
 
 **Registry admission ≠ production activation**  
 **Registry admission ≠ candidate inclusion**  
+**Assets readiness ≠ Combat readiness**  
+**Stats ≠ Skills**  
+**lineage ≠ Access**  
 **candidate universe ≠ concrete snapshot**  
 **candidate eligibility ≠ ownership ≠ assignment ≠ deployment**  
 **current v1 ≠ rewritten by v2**
@@ -34,7 +37,7 @@ Preserve:
 
 ## 2. Current candidate-content authority remains v1
 
-Until the asset gate in this document closes, the active first-production policy remains:
+Until both the asset gate and Combat-readiness gate in this document close, the active first-production policy remains:
 
 `alpha_genin_roster_first_production_content_v1`
 
@@ -44,7 +47,7 @@ Do not mutate that policy in place.
 
 Historical snapshots created under v1 must remain interpretable as v1 snapshots after a future expanded policy is published.
 
-The commissioned 25-row expansion will be introduced through a **new versioned candidate-content authority** after production-ready collectible and `uiPortrait` projection is complete.
+The commissioned 25-row expansion will be introduced through a **new versioned candidate-content authority** only after production-ready collectible / `uiPortrait` projection **and** representation-level Battle readiness are both closed.
 
 ---
 
@@ -102,7 +105,7 @@ Therefore physical file presence is not enough to publish the expanded candidate
 
 ## 5. Asset gate
 
-The next owner is UI / Assets through GitHub issue #74.
+The current active owner is UI / Assets through GitHub issue #74.
 
 UI / Assets must publish one exact 25-row production projection/QA authority that closes, for every admitted representation:
 
@@ -144,11 +147,46 @@ Do not satisfy this by cropping collectible-card art.
 
 ---
 
-## 6. Full-wave activation decision
+## 6. Combat / Skills readiness gate — queued behind #74
+
+Issue #81 establishes a second required production gate before the 25-row wave becomes playable.
+
+This gate does **not** interrupt active #74 and does **not** block current-v1 runtime work. It activates after #74 returns to CE.
+
+Before CE publishes the expanded candidate-content authority, CE must first inspect current durable Combat / Skills / Progression / Bloodline authority for all 25 admitted representations and determine whether each row has an exact currently legal Alpha Battle repertoire.
+
+The audit must not infer capability from:
+
+- seven Base Stats;
+- adult/future versions of the same person;
+- famous canon reputation;
+- clan/lineage name;
+- card art or visible eye/state;
+- Registry admission;
+- candidate eligibility.
+
+Where exact representation-level repertoire authority already exists, consume it rather than duplicating it.
+
+Where it is absent, CE will create **one consolidated SEND NOW Combat / Skills handoff** for the missing rows after #74 closes. Combat may author only the legitimate baseline prepared palette supported by current capability authority. If a particular technique, bloodline, transformation or source requires separate Progression/Bloodline Access, that gate remains authoritative and Combat must not silently grant it.
+
+Hard examples:
+
+- `genin_mukai` single visible Byakugan remains possession/representation only unless Access is separately authorised;
+- `genin_hiashi` does not automatically receive active Byakugan;
+- `genin_kagami` does not automatically receive Sharingan;
+- `genin_hashirama` and `genin_yamato` do not automatically receive Wood Release;
+- `genin_shibi` does not automatically gain an independently acting kikaichū participant/source package;
+- Akimichi / Inuzuka / Yamanaka identity does not create hidden modifiers or Skills.
+
+Battle-readiness closure must identify, for every v2 row, an executable baseline palette or an explicit lawful reason a capability remains unavailable. It does not author ownership, assignment, deployment, Rank, Base Stats or PL.
+
+---
+
+## 7. Full-wave activation decision
 
 For this Alpha content pass, CE chooses **full-wave activation** rather than silent partial promotion.
 
-The future v2 candidate-content authority will contain the intended 25-row expansion only after all 25 rows are production-ready under the asset gate.
+The future v2 candidate-content authority will contain the intended 25-row expansion only after all 25 rows are production-ready under **both** the asset gate and Combat-readiness gate.
 
 Do not silently omit Chōza, Kosuke or another unresolved row while still describing the policy as the full commissioned expansion.
 
@@ -158,7 +196,7 @@ This decision does **not** block already-authorised v1 runtime work.
 
 ---
 
-## 7. Candidate-policy sequencing after asset closure
+## 8. Candidate-policy sequencing
 
 Required sequence:
 
@@ -169,20 +207,26 @@ Registry/PL semantic admission
 UI/Assets exact production projection + remediation
     ACTIVE — #74
         ↓
+CE audits exact representation-level Combat/Skills authority
+        ↓
+Combat/Skills closes missing baseline prepared palettes
+    QUEUED — activation triggered only after #74 returns
+        ↓
 CE publishes NEW versioned expanded candidate-content authority
         ↓
-Coding consumes exact expanded policy through existing geninRosterTransition machinery
+Coding consumes exact expanded policy + exact Battle packages
+    through existing geninRosterTransition / Battle machinery
         ↓
 runtime / save-load / browser / Golden validation
 ```
 
-No new roster subsystem is authorised.
+No new roster system and no generic capability-inference system are authorised.
 
 The existing candidate snapshot contract, same-person collision rules, causal assigned-elsewhere/unavailable handling, retention separation, 2-Genin replacement floor and 1 eligible leader/teacher floor remain unchanged unless a separate durable authority explicitly changes them.
 
 ---
 
-## 8. Mukai boundary
+## 9. Mukai boundary
 
 `genin_mukai` is now semantically admitted under Registry/PL authority.
 
@@ -202,13 +246,20 @@ Any later capability activation remains with the proper Progression/Bloodline/Co
 
 ---
 
-## 9. Non-collapse and regression guard
+## 10. Non-collapse and regression guard
 
 Preserve throughout the next steps:
 
 - persistent person ≠ representation;
 - representation ≠ Registry admission;
 - Registry admission ≠ candidate inclusion;
+- Registry admission ≠ Combat readiness;
+- Assets GREEN ≠ Combat readiness;
+- Stats ≠ Skills;
+- lineage ≠ Access;
+- representation possession ≠ capability activation;
+- adult/future repertoire ≠ Genin repertoire;
+- card art ≠ Skill authority;
 - candidate universe ≠ snapshot;
 - candidate eligibility ≠ ownership;
 - ownership ≠ assignment ≠ deployment;
@@ -220,17 +271,21 @@ Preserve throughout the next steps:
 - same-path Menma visual change ≠ new identity;
 - `collectibleCard` ≠ `uiPortrait`;
 - 1024×1024 portrait master remains binding;
+- Combat closure ≠ ownership/assignment/deployment authority;
 - UI/Assets GREEN ≠ runtime/browser/Golden GREEN;
+- Combat/Skills GREEN ≠ runtime/browser/Golden GREEN;
 - v2 publication ≠ historical v1 snapshot rewrite.
 
 ---
 
-## 10. Current coordination state
+## 11. Current coordination state
 
 Registry / PL / Rank work from #70 is consumed.
 
 **WAITING ON UI / ASSETS via #74.**
 
-When #74 returns GREEN with the exact 25-row production projection, CE will publish the new versioned candidate-content authority and route the minimum Coding consumption directly.
+Issue #81 is consumed as a sequencing correction: the Combat / Skills readiness gate is queued immediately behind #74 and becomes the next CE activation step before v2 publication.
+
+When #74 returns GREEN, CE will **not** publish v2 immediately. CE will first inspect exact repertoire authority and route one consolidated Combat / Skills package only for rows that still need closure. After that gate closes, CE may publish the versioned expanded candidate-content authority and route the minimum Coding consumption directly.
 
 Stephen relay: **NONE**.
