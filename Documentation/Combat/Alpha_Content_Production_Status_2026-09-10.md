@@ -2,34 +2,45 @@
 
 **Owner:** Combat / Skills / Items / Weapons
 
-## Completed this pass
+## Completed content authority
 
-- Wood Release possession attached to `genin_hashirama` and `genin_yamato`; use remains access-gated.
+- Wood Release possession attached to `genin_hashirama` and `genin_yamato`; executable use remains access-gated.
 - Text-first Alpha presentation locked for Skills, Items, Weapons and Gear.
-- Four rarity levels locked: `normal`, `common`, `rare`, `legendary`.
-- **260 stable Skill definitions authored.**
-- 96 stable Item/Weapon/Gear/Material definitions authored.
+- Rarity ladder locked: `normal -> common -> rare -> legendary`.
+- **320 stable Skill definitions authored.**
+- **96 stable Item/Weapon/Gear/Material definitions authored.**
 - Kinjutsu / Echo / Tailed-Beast catalogue boundary closed.
-- 30 new general Kinjutsu/Echo-interface Skills authored as rows 201–230.
-- 30 new Menma/Echo/Hosted-Tailed-Beast/Kurama Skills authored as rows 231–260.
-- Existing Arc-1 Echo Menma and borrowed-Kurama action packages preserved unchanged.
-- Master catalogue index updated to **356 total authored definitions**.
+- Contextual Skill modes closed: `passive_contextual`, `active_contextual`, `hybrid_contextual` alongside existing `battle_active`.
+- Wave 7 adds 30 passive contextual/event Skills, including flagship `skill_false_identity`.
+- Wave 8 adds 30 active/hybrid contextual/event Skills, including reusable Recognition Substitution, Identity Rebinding profile actions, barrier/seal investigation, traversal, tracking, Echo interaction and Kurama negotiation.
+- Existing Arc-1 Mission-11 Recognition Substitution occurrence and Mission-12 Echo/Kurama actions remain historically unchanged.
+- Master catalogue now contains **416 authored definitions total**.
+
+## False Identity status
+
+Combat/Skills semantics are closed:
+- passive `skill_false_identity` derives from earned Identity Rebinding capability for current Arc-1 Menma;
+- passive applicability requires a legitimate current recognised false profile and compatible recognition query;
+- system resolution remains target-owned and may accept/reject/challenge/partially resolve;
+- no stable identity rewrite, forged legal authority, universal stealth or guaranteed bypass;
+- active `skill_false_identity_recognition_substitution` remains separate from the passive.
 
 ## Not claimed
 
-- no blanket player ownership;
-- no blanket Skill unlock;
-- no blanket shop/drop/reward binding;
-- no blanket character prepared palettes;
-- no standing Kurama access from prior Mission-12 experience;
+- no blanket player ownership or Skill unlock;
+- no blanket mission/training reward binding;
+- no blanket prepared palettes;
+- no standing Kurama access from historical experience;
 - no universal Echo/Kinjutsu/Tailed-Beast repertoire;
-- no catalogue-wide runtime implementation;
-- no catalogue-wide Golden/regression result.
+- no contextual dispatcher/runtime implementation claim;
+- no catalogue-wide Golden/regression claim.
 
-## Next Combat-local work when authority is available
+## Next Combat-local work when authority arrives
 
 1. 25-row new Genin exact prepared palettes after CE repertoire audit.
-2. Missing exact character-specific signatures not represented by the 260-row library.
-3. Mission/training Skill effect authoring when a real source/development seam calls for additional distinct techniques.
-4. Exact acquisition/source bindings remain with World/Progression/Acquisition owners; Combat should not fabricate them.
-5. Further catalogue expansion remains welcome when caller-driven or semantically distinct; do not pad counts with near-duplicates.
+2. Missing character-specific signatures not represented by the 320-row library.
+3. Additional mission/training/event Skill effects only when a real source/development seam needs a distinct definition.
+4. Item/Weapon/Gear additions when real reward/shop/crafting/world consumers call them.
+5. Respond to Coding if contextual evaluator implementation exposes a real semantic contradiction.
+
+Do not inflate catalogue counts with near-duplicates merely because text-first authoring is cheap.
