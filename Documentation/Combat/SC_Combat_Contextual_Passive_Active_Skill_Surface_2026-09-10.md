@@ -267,3 +267,39 @@ At minimum it should support:
 - observer Knowledge != World Truth;
 - contextual effect authorship != event/source authorship;
 - authored != implemented != runtime validated != Golden GREEN.
+
+## 13. Capability-diverse event affordance doctrine
+
+Stephen has explicitly directed that future World/Story/Event authoring should deliberately create **special-condition event affordances for different earned character histories**, so alternate player routes remain mechanically and narratively meaningful rather than converging into one privileged build.
+
+False Identity is the reference pattern, not the universal answer.
+
+Required doctrine:
+
+1. Do **not** solve route diversity by granting every Character the same special Skill.
+2. When a genuinely distinct capability, relationship, bloodline development, learned technique, hosted-source relationship, equipment provenance, investigation skill, social history, medical knowledge, tracking talent, transformation state or other legitimate Chronicle-earned property exists, future events may expose special conditions that recognise it.
+3. Different routes may therefore unlock different options, warnings, interpretations, approaches, negotiations, traversal methods, countermeasures, risks or outcomes in the same broad event family.
+4. No single special capability should become the mandatory canonical route through all future content. A player who never develops False Identity should still encounter other meaningful capability-sensitive opportunities appropriate to that Character's own history.
+5. Event authors should prefer **distinct affordances** over cosmetic dialogue swaps. A special route should matter because the Character can genuinely perceive, attempt, resist, negotiate, reinterpret or interact differently.
+6. Alternate affordances need not be equal in shape or outcome. One route may reveal information, another avoid a hazard, another provoke a relationship response, another create a Battle advantage, another unlock a safer retreat, and another fail spectacularly while producing valuable Chronicle evidence.
+7. Capability-sensitive routing must still preserve exact eligibility. A Skill/relationship/history does not create the event, guarantee success or override contradictory World Truth.
+8. Repeated event families should draw from the Character's actual accumulated state so long-term Chronicles increasingly feel authored by that Character's history rather than by one global checklist.
+
+Design target:
+
+> **Different histories should create different verbs.**
+
+The player should be able to look at a later event and realise that an option exists because of something their Character specifically learned, survived, stole, studied, bonded with, developed, equipped, remembered or became.
+
+This is not a promise that every event supports every Skill. It is a content-authoring doctrine that, across the event pool, materially different character routes should continue to receive meaningful capability-sensitive opportunities.
+
+Preserve:
+
+- route diversity != universal Skill distribution;
+- special condition != guaranteed success;
+- different affordance != numerically equal affordance;
+- capability-sensitive event != bespoke event required for every Character;
+- world opportunity != Skill ownership;
+- Skill ownership != event existence;
+- event eligibility != outcome;
+- accumulated Chronicle history != one mandatory build path.
