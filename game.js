@@ -41838,6 +41838,13 @@ function openOverlay(type) {
     );
   }
 
+  if (overlay) {
+    overlay.classList.toggle(
+      "shinobi-record-open",
+      type === "shinobi_record"
+    );
+  }
+
 
   if (
     !overlay ||
@@ -41898,6 +41905,16 @@ function openOverlay(type) {
         container,
         "MISSION BOARD",
         "Choose story missions, side missions and regional assignments."
+      );
+
+      break;
+
+
+    // BRICKS 6500–7299 — live Shinobi Record / Codex shell.
+    case "shinobi_record":
+
+      renderShinobiRecordOverlay(
+        container
       );
 
       break;
@@ -99124,6 +99141,7 @@ function renderMyClanInspectionContent(character) {
     </section>
     <div class="my-clan-inspection-actions">
       ${slot?`<button type="button" class="my-clan-secondary-action" onclick="removeMyClanCharacterFromStagedFormation('${escapeStorySceneHTML(character.id)}')">REMOVE FROM FORMATION</button>`:""}
+      <button type="button" class="my-clan-secondary-action" onclick="openShinobiRecordForCharacter('${escapeStorySceneHTML(registryId||'')}','${escapeStorySceneHTML(character.id)}')">SHINOBI RECORD</button>
       <button type="button" class="my-clan-primary-action" onclick="openMyClanLoadoutRoute('${escapeStorySceneHTML(character.id)}')">LOADOUT</button>
     </div>
   </aside>`;
@@ -102653,3 +102671,441 @@ renderGeninRosterTransitionOverlay=function(container){
   container.innerHTML=`<div style="padding:24px;display:grid;gap:16px;color:#d8e4ec;overflow:auto;"><div><div style="font-size:10px;letter-spacing:1.4px;color:#d0ad55;">ACADEMY → GENIN</div><h2 style="margin:3px 0;color:#f2e4b0;">GENIN ROSTER TRANSITION</h2><p style="color:#94A3B8;font-size:12px;max-width:760px;">Promotion is already earned. Finalise two teammate roles and one snapshot-authorised Jōnin / Special Jōnin leader. Leader assignment does not grant collectible ownership or Battle deployment.</p></div>${model.authorityReady?"":`<div style="padding:14px;border:1px solid rgba(207,169,75,.35);background:rgba(20,14,5,.55);color:#e8d7a1;">Exact production candidate authority has not yet been supplied for this Chronicle. The runtime will not scan Registry order or invent candidates.</div>`}<div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 1 — ${esc(selectedNames[0])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(1)||"No authorised candidates supplied."}</div></div><div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 2 — ${esc(selectedNames[1])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(2)||"No authorised candidates supplied."}</div></div><div style="display:grid;gap:10px;"><strong>LEADER / TEACHER — ${esc(leaderEntry?(leaderEntry.displayName||leaderEntry.name||leaderEntry.id):"UNSELECTED")}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${leaders||"No authorised Jōnin / Special Jōnin leaders supplied."}</div></div><div style="display:flex;gap:10px;"><button type="button" onclick="confirmGeninRosterTransition();openGeninRosterTransitionUI();" ${(!model.authorityReady||model.completed)?"disabled":""} style="padding:10px 16px;border:1px solid rgba(207,169,75,.55);background:#152832;color:#f0df9f;border-radius:6px;font-weight:700;">CONFIRM GENIN ROSTER</button><button type="button" onclick="openArenaPromotionSurface()" style="padding:10px 16px;border:1px solid rgba(130,160,175,.35);background:#0f2028;color:#c7d6df;border-radius:6px;">BACK</button></div></div>`;
   return true;
 };
+
+// =========================================================
+// BRICKS 6500–7299 — SHINOBI RECORD LIVE RUNTIME UI
+// GITHUB ISSUE #66
+// =========================================================
+// Visual authority:
+// - approved Missions + Development Shinobi Record concepts
+// - shared dark blue-black dossier surfaces
+// - parchment/ivory section headers
+// - thin gold/brass linework
+// - compact modular rows / left index rail / right detail rail
+//
+// This module is presentation-only. It reads existing Chronicle, ownership,
+// mission, World, Progression and Battle evidence. It does not grant rewards,
+// create knowledge, unlock access, mutate Rank or manufacture history.
+// =========================================================
+
+const ALPHA_SHINOBI_RECORD_TABS=Object.freeze([
+  Object.freeze({id:"overview",label:"OVERVIEW"}),
+  Object.freeze({id:"missions",label:"MISSIONS"}),
+  Object.freeze({id:"intelligence",label:"INTELLIGENCE"}),
+  Object.freeze({id:"chronicle",label:"CHRONICLE"}),
+  Object.freeze({id:"development",label:"DEVELOPMENT"})
+]);
+
+const ALPHA_SHINOBI_RECORD_STATE={
+  activeTab:"overview",
+  subjectOwnedCharacterId:null,
+  selectedMissionKey:null,
+  selectedIntelligenceKey:null,
+  selectedChronicleKey:null,
+  selectedDevelopmentKey:null,
+  searchText:"",
+  categoryFilter:"all",
+  statusFilter:"all",
+  viewMode:"list"
+};
+
+function shinobiRecordEscape(value){
+  if(typeof escapeStorySceneHTML==="function") return escapeStorySceneHTML(String(value??""));
+  return String(value??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+}
+
+function shinobiRecordHumanize(value){
+  const raw=String(value??"").trim();
+  if(!raw) return "—";
+  return raw.replace(/^occ_/i,"").replace(/^arc1_/i,"").replace(/[_-]+/g," ").replace(/\b\w/g,c=>c.toUpperCase());
+}
+
+function getShinobiRecordOwnedRoster(){
+  if(typeof getClanManageableRosterCharacters==="function") return getClanManageableRosterCharacters().filter(Boolean);
+  if(playerData&&Array.isArray(playerData.characters)) return playerData.characters.filter(Boolean);
+  return [];
+}
+
+function resolveShinobiRecordSubject(characterId=null,registryId=null){
+  const roster=getShinobiRecordOwnedRoster();
+  let subject=null;
+  const requested=characterId||ALPHA_SHINOBI_RECORD_STATE.subjectOwnedCharacterId;
+  if(requested&&typeof getPlayerCharacter==="function") subject=getPlayerCharacter(requested);
+  if(!subject&&registryId&&typeof getCharacterRegistryId==="function") subject=roster.find(item=>getCharacterRegistryId(item)===registryId)||null;
+  if(!subject&&roster.length) subject=roster[0];
+  if(subject) ALPHA_SHINOBI_RECORD_STATE.subjectOwnedCharacterId=subject.id;
+  return subject||null;
+}
+
+function getShinobiRecordHistory(){
+  const source=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];
+  return source.filter(record=>record&&typeof record==="object").slice().sort((a,b)=>(Number(b.timestamp)||0)-(Number(a.timestamp)||0));
+}
+
+function getShinobiRecordOccurrenceKey(record,index=0){
+  if(!record) return `record_${index}`;
+  return String(record.occurrenceId||record.id||record.factId||record.boundaryId||record.attemptId||record.recordKey||`record_${index}`);
+}
+
+function getShinobiRecordTitle(record){
+  if(!record) return "UNRECORDED OCCURRENCE";
+  const data=record.data&&typeof record.data==="object"?record.data:{};
+  return String(record.title||record.displayName||record.missionTitle||data.title||record.outcome||record.activity||record.type||record.occurrenceId||record.id||"Recorded Occurrence");
+}
+
+function getShinobiRecordMissionId(record){
+  if(!record) return null;
+  const data=record.data&&typeof record.data==="object"?record.data:{};
+  return record.missionId||data.missionId||null;
+}
+
+function getShinobiRecordLocation(record){
+  if(!record) return null;
+  const data=record.data&&typeof record.data==="object"?record.data:{};
+  if(data.semanticLocationId) return data.semanticLocationId;
+  if(data.locationId) return data.locationId;
+  if(record.locationId) return record.locationId;
+  const refs=Array.isArray(record.sourceRefs)?record.sourceRefs:[];
+  const locationRef=refs.find(ref=>ref&&["location","world_location","mission_location"].includes(String(ref.type||"")));
+  return locationRef&&locationRef.id||null;
+}
+
+function getShinobiRecordParticipants(record){
+  if(!record) return [];
+  const data=record.data&&typeof record.data==="object"?record.data:{};
+  const values=[];
+  [data.participants,data.participantRefs,data.observingParticipantRefs,data.storyTeamParticipantRefs,record.participants].forEach(list=>{
+    if(Array.isArray(list)) values.push(...list);
+  });
+  [data.creatorParticipantRef,data.sarutobiParticipantRef,data.observerParticipantRef,record.assessmentSubjectOwnedCharacterId].forEach(id=>{if(id) values.push(id);});
+  return [...new Set(values.filter(Boolean).map(String))];
+}
+
+function getShinobiRecordSourceRefs(record){
+  const refs=record&&Array.isArray(record.sourceRefs)?record.sourceRefs:[];
+  return refs.filter(ref=>ref&&typeof ref==="object"&&ref.id).map(ref=>({type:String(ref.type||"source"),id:String(ref.id),role:String(ref.role||"")}));
+}
+
+function getShinobiRecordChannels(record){
+  if(!record) return [];
+  const data=record.data&&typeof record.data==="object"?record.data:{};
+  const text=`${record.type||""} ${record.activity||""} ${record.outcome||""}`.toLowerCase();
+  const channels=new Set();
+  if(/history|chronicle|occurrence|mission|assessment|battle|origin/.test(text)||record.committed===true) channels.add("history");
+  if(/knowledge|intelligence|evidence|discovery|investigat|observed|lead/.test(text)||data.knownFactIds||data.knowledge||data.intelligence) channels.add("knowledge");
+  if(/access|unlock|actionable|available|opportunity/.test(text)||data.access||data.deadTransferLeadActionable===true) channels.add("access");
+  if(/development|progress|competence|mastery|training|qualification|proficien/.test(text)||data.creationDevelopmentOccurred===true||data.competence) channels.add("development");
+  if(/recognition|promotion|rank|commendation|service/.test(text)||record.formalRank||data.recognition) channels.add("recognition");
+  if(/relationship|shared|bond|team/.test(text)||data.relationship||data.sharedHistory) channels.add("relationship");
+  if(/reward|item|weapon|material|ryo|claim/.test(text)||record.rewards||data.rewards||data.ryo||data.items||data.weapon) channels.add("reward");
+  return [...channels];
+}
+
+function getShinobiRecordStatus(record){
+  if(!record) return "UNRECORDED";
+  if(record.status) return String(record.status).toUpperCase();
+  if(record.success===false) return "UNSUCCESSFUL";
+  if(record.completed===true||record.committed===true) return "RECORDED";
+  return "ACTIVE";
+}
+
+function getShinobiRecordSubjectSnapshot(){
+  const subject=resolveShinobiRecordSubject();
+  if(!subject) return {subject:null,name:"NO OWNED SHINOBI",rank:"—",pl:"—",affiliation:"—",team:"—",location:"—",portrait:"",registryId:null};
+  const registryId=typeof getCharacterRegistryId==="function"?getCharacterRegistryId(subject):null;
+  const rank=typeof getOwnedCharacterFormalRank==="function"?getOwnedCharacterFormalRank(subject.id):(typeof getMyClanRankValue==="function"?getMyClanRankValue(subject):"—");
+  const pl=typeof calculateCurrentPL==="function"?calculateCurrentPL(subject):"—";
+  const affiliation=typeof getMyClanCharacterAffiliation==="function"?getMyClanCharacterAffiliation(subject):"—";
+  const portrait=typeof getMyClanUIPortraitPath==="function"?getMyClanUIPortraitPath(subject):"";
+  const committedSlots=playerData&&playerData.clan&&Array.isArray(playerData.clan.teamSlots)?playerData.clan.teamSlots:[];
+  const slotIndex=committedSlots.indexOf(subject.id);
+  const team=slotIndex>=0&&typeof getClanBattleQueueSlotLabel==="function"?getClanBattleQueueSlotLabel(slotIndex+1):"UNASSIGNED";
+  let location="—";
+  if(selectedLocationNode&&selectedLocationNode.name) location=selectedLocationNode.name;
+  else if(selectedRegionKey&&worldRegions&&worldRegions[selectedRegionKey]) location=worldRegions[selectedRegionKey].name;
+  return {subject,name:subject.name||shinobiRecordHumanize(registryId||subject.id),rank:rank||"—",pl,affiliation:affiliation||"—",team,location,portrait,registryId};
+}
+
+function setShinobiRecordTab(tabId){
+  if(!ALPHA_SHINOBI_RECORD_TABS.some(tab=>tab.id===tabId)) return false;
+  ALPHA_SHINOBI_RECORD_STATE.activeTab=tabId;
+  ALPHA_SHINOBI_RECORD_STATE.searchText="";
+  ALPHA_SHINOBI_RECORD_STATE.categoryFilter="all";
+  ALPHA_SHINOBI_RECORD_STATE.statusFilter="all";
+  rerenderShinobiRecord();
+  return true;
+}
+
+function setShinobiRecordSearch(value){ALPHA_SHINOBI_RECORD_STATE.searchText=String(value||"");rerenderShinobiRecord();}
+function setShinobiRecordCategoryFilter(value){ALPHA_SHINOBI_RECORD_STATE.categoryFilter=String(value||"all");rerenderShinobiRecord();}
+function setShinobiRecordStatusFilter(value){ALPHA_SHINOBI_RECORD_STATE.statusFilter=String(value||"all");rerenderShinobiRecord();}
+function setShinobiRecordViewMode(value){ALPHA_SHINOBI_RECORD_STATE.viewMode=value==="grid"?"grid":"list";rerenderShinobiRecord();}
+
+function openShinobiRecord(tabId="overview",characterId=null){
+  if(ALPHA_SHINOBI_RECORD_TABS.some(tab=>tab.id===tabId)) ALPHA_SHINOBI_RECORD_STATE.activeTab=tabId;
+  if(characterId) ALPHA_SHINOBI_RECORD_STATE.subjectOwnedCharacterId=characterId;
+  return openOverlay("shinobi_record");
+}
+
+function openShinobiRecordForCharacter(registryId,characterId){
+  resolveShinobiRecordSubject(characterId,registryId);
+  ALPHA_SHINOBI_RECORD_STATE.activeTab="overview";
+  return openOverlay("shinobi_record");
+}
+
+function openShinobiRecordsCharacter(registryId,characterId){return openShinobiRecordForCharacter(registryId,characterId);}
+
+function rerenderShinobiRecord(){
+  if(currentOverlayType!=="shinobi_record") return false;
+  const container=document.getElementById("overlay-content-container");
+  if(!container) return false;
+  return renderShinobiRecordOverlay(container);
+}
+
+function renderShinobiRecordShellHeader(snapshot){
+  return `<header class="sr-header">
+    <div class="sr-brand-mark" aria-hidden="true">忍</div>
+    <div class="sr-heading"><h1>SHINOBI RECORD</h1><p>OFFICIAL FIELD DOSSIER / CHRONICLE ARCHIVE</p></div>
+    <div class="sr-subject-chip"><span class="sr-subject-avatar">${snapshot.portrait?`<img src="${shinobiRecordEscape(snapshot.portrait)}" alt="">`:`忍`}</span><span><strong>${shinobiRecordEscape(snapshot.name)}</strong><small>${shinobiRecordEscape(snapshot.rank)} · PL ${shinobiRecordEscape(snapshot.pl)}</small></span></div>
+  </header>`;
+}
+
+function renderShinobiRecordTabs(){
+  return `<nav class="sr-tabs" aria-label="Shinobi Record tabs">${ALPHA_SHINOBI_RECORD_TABS.map(tab=>`<button type="button" class="${ALPHA_SHINOBI_RECORD_STATE.activeTab===tab.id?"is-active":""}" onclick="setShinobiRecordTab('${tab.id}')">${tab.label}</button>`).join("")}</nav>`;
+}
+
+function srSection(title,body,className=""){
+  return `<section class="sr-panel ${className}"><div class="sr-panel-header">${shinobiRecordEscape(title)}</div><div class="sr-panel-body">${body}</div></section>`;
+}
+
+function srEmpty(message="No authorised record data is available."){
+  return `<div class="sr-empty"><span>—</span><p>${shinobiRecordEscape(message)}</p></div>`;
+}
+
+function srKeyValueRows(rows){
+  return `<div class="sr-kv-list">${rows.map(([label,value])=>`<div class="sr-kv-row"><span>${shinobiRecordEscape(label)}</span><strong>${shinobiRecordEscape(value??"—")}</strong></div>`).join("")}</div>`;
+}
+
+function srOutcomeStrip(history){
+  const counts={reward:0,knowledge:0,history:0,access:0,relationship:0,recognition:0,development:0};
+  history.forEach(record=>getShinobiRecordChannels(record).forEach(channel=>{if(Object.prototype.hasOwnProperty.call(counts,channel)) counts[channel]+=1;}));
+  const labels=[
+    ["reward","RYŌ / MATERIAL"],["knowledge","KNOWLEDGE"],["history","HISTORY"],["access","ACCESS"],["relationship","RELATIONSHIP"],["recognition","RECOGNITION"],["development","DEVELOPMENT"]
+  ];
+  return `<div class="sr-outcome-strip">${labels.map(([id,label])=>`<div class="sr-outcome-cell"><span>${label}</span><strong>${counts[id]||"—"}</strong></div>`).join("")}</div>`;
+}
+
+function getShinobiRecordFilteredHistory(){
+  const search=ALPHA_SHINOBI_RECORD_STATE.searchText.trim().toLowerCase();
+  const category=ALPHA_SHINOBI_RECORD_STATE.categoryFilter;
+  const status=ALPHA_SHINOBI_RECORD_STATE.statusFilter;
+  return getShinobiRecordHistory().filter(record=>{
+    if(search){
+      const hay=[getShinobiRecordTitle(record),record.type,record.activity,record.outcome,getShinobiRecordMissionId(record),getShinobiRecordLocation(record),getShinobiRecordOccurrenceKey(record)].join(" ").toLowerCase();
+      if(!hay.includes(search)) return false;
+    }
+    if(category!=="all"&&!getShinobiRecordChannels(record).includes(category)) return false;
+    if(status!=="all"&&getShinobiRecordStatus(record).toLowerCase()!==status) return false;
+    return true;
+  });
+}
+
+function renderShinobiRecordOverview(snapshot){
+  const history=getShinobiRecordHistory();
+  const recent=history.slice(0,6);
+  const active=history.find(record=>getShinobiRecordStatus(record)==="ACTIVE")||recent[0]||null;
+  const intelligence=history.filter(record=>getShinobiRecordChannels(record).includes("knowledge")).slice(0,4);
+  const leads=history.filter(record=>getShinobiRecordChannels(record).includes("access")).slice(0,3);
+  const locations=[...new Set(history.map(getShinobiRecordLocation).filter(Boolean))].slice(0,3);
+  const updates=[
+    ["HISTORY",history.find(r=>getShinobiRecordChannels(r).includes("history"))],
+    ["KNOWLEDGE",history.find(r=>getShinobiRecordChannels(r).includes("knowledge"))],
+    ["ACCESS",history.find(r=>getShinobiRecordChannels(r).includes("access"))],
+    ["REWARD",history.find(r=>getShinobiRecordChannels(r).includes("reward"))],
+    ["DEVELOPMENT",history.find(r=>getShinobiRecordChannels(r).includes("development"))],
+    ["RECOGNITION",history.find(r=>getShinobiRecordChannels(r).includes("recognition"))]
+  ];
+  const assignment=active?getShinobiRecordTitle(active):"No current committed assignment";
+  return `<div class="sr-overview-layout">
+    ${srSection("SHINOBI DOSSIER",`<div class="sr-dossier-card"><div class="sr-dossier-portrait">${snapshot.portrait?`<img src="${shinobiRecordEscape(snapshot.portrait)}" alt="${shinobiRecordEscape(snapshot.name)}">`:`<span>忍</span>`}</div>${srKeyValueRows([["NAME",snapshot.name],["VILLAGE",snapshot.affiliation],["CURRENT RANK",snapshot.rank],["TEAM / ASSIGNMENT",snapshot.team],["CURRENT LOCATION",snapshot.location],["SPECIALIZATION","—"],["ACTIVE STATUS",snapshot.subject?"OWNED / ACTIVE":"—"],["POWER LEVEL",snapshot.pl]])}</div>`,"sr-overview-dossier")}
+    ${srSection("ACTIVE RECORD",`<div class="sr-active-record"><div class="sr-subhead">CURRENT ASSIGNMENT</div><strong>${shinobiRecordEscape(assignment)}</strong><div class="sr-subhead">ACTIVE INVESTIGATION</div>${intelligence.length?intelligence.slice(0,3).map(r=>`<div class="sr-compact-row"><span>◌</span><b>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(r)))}</b></div>`).join(""):srEmpty("No committed active investigation is recorded.")}<div class="sr-subhead">ACTIVE LEADS</div>${leads.length?leads.map(r=>`<div class="sr-compact-row"><span>◌</span><b>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(r)))}</b></div>`).join(""):srEmpty("No committed actionable lead is recorded.")}<div class="sr-subhead">KNOWN RELEVANT LOCATIONS</div>${locations.length?locations.map(id=>`<div class="sr-compact-row"><span>◌</span><b>${shinobiRecordEscape(shinobiRecordHumanize(id))}</b></div>`).join(""):srEmpty("No location evidence is recorded.")}</div>`,"sr-overview-active")}
+    ${srSection("RECENT RECORD UPDATES",`<div class="sr-update-list">${updates.map(([label,record])=>`<div class="sr-update-row"><span>${label}</span><strong>${record?shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(record))):"—"}</strong></div>`).join("")}</div>`,"sr-overview-updates")}
+    ${srSection("CURRENT INTELLIGENCE",intelligence.length?intelligence.map(record=>`<button type="button" class="sr-jump-row" onclick="setShinobiRecordTab('intelligence')"><span>${shinobiRecordEscape(shinobiRecordHumanize(record.type||"KNOWLEDGE"))}</span><strong>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(record)))}</strong></button>`).join(""):srEmpty(),"sr-overview-intel")}
+    ${srSection("YOUR CHRONICLE",recent.length?recent.slice(0,5).map(record=>`<button type="button" class="sr-jump-row" onclick="setShinobiRecordTab('chronicle')"><span>${shinobiRecordEscape(shinobiRecordHumanize(record.type||"HISTORY"))}</span><strong>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(record)))}</strong></button>`).join(""):srEmpty(),"sr-overview-chronicle")}
+    ${srSection("RECENT OUTCOMES",srOutcomeStrip(history),"sr-overview-outcomes")}
+  </div>`;
+}
+
+function getShinobiRecordMissionEntries(){
+  const history=getShinobiRecordHistory();
+  const map=new Map();
+  history.forEach(record=>{
+    const missionId=getShinobiRecordMissionId(record);
+    if(!missionId) return;
+    if(!map.has(missionId)) map.set(missionId,{key:missionId,missionId,title:shinobiRecordHumanize(missionId),records:[]});
+    map.get(missionId).records.push(record);
+  });
+  if(typeof ARC1_M2_M10_RUNTIME_AUTHORITY!=="undefined"){
+    Object.values(ARC1_M2_M10_RUNTIME_AUTHORITY).forEach(authority=>{
+      if(!authority||!authority.missionId) return;
+      if(!map.has(authority.missionId)) map.set(authority.missionId,{key:authority.missionId,missionId:authority.missionId,title:authority.title||shinobiRecordHumanize(authority.missionId),records:[],authority});
+      else map.get(authority.missionId).authority=authority;
+    });
+  }
+  const entries=[...map.values()].map(entry=>{
+    const latest=entry.records.slice().sort((a,b)=>(Number(b.timestamp)||0)-(Number(a.timestamp)||0))[0]||null;
+    const completed=entry.records.some(record=>record.completed===true||record.committed===true);
+    return {...entry,latest,status:completed?"RESOLVED":(latest?getShinobiRecordStatus(latest):"KNOWN")};
+  });
+  return entries.sort((a,b)=>String(a.missionId).localeCompare(String(b.missionId),undefined,{numeric:true}));
+}
+
+function selectShinobiRecordMission(key){ALPHA_SHINOBI_RECORD_STATE.selectedMissionKey=String(key||"");rerenderShinobiRecord();}
+
+function renderShinobiRecordMissions(){
+  let entries=getShinobiRecordMissionEntries();
+  const search=ALPHA_SHINOBI_RECORD_STATE.searchText.trim().toLowerCase();
+  if(search) entries=entries.filter(entry=>`${entry.title} ${entry.missionId}`.toLowerCase().includes(search));
+  const category=ALPHA_SHINOBI_RECORD_STATE.categoryFilter;
+  if(category!=="all") entries=entries.filter(entry=>category==="resolved"?entry.status==="RESOLVED":category==="active"?entry.status!=="RESOLVED":true);
+  let selected=entries.find(entry=>entry.key===ALPHA_SHINOBI_RECORD_STATE.selectedMissionKey)||entries[0]||null;
+  if(selected) ALPHA_SHINOBI_RECORD_STATE.selectedMissionKey=selected.key;
+  const selectedRecords=selected?selected.records:[];
+  const latest=selected&&selected.latest||null;
+  const refs=latest?getShinobiRecordSourceRefs(latest):[];
+  const data=latest&&latest.data&&typeof latest.data==="object"?latest.data:{};
+  const objectives=Object.entries(data).filter(([key,value])=>typeof value==="boolean"&&/(objective|recovered|located|returned|discovered|observed|activated|acquired|established|understood)/i.test(key)).slice(0,6);
+  const statuses=["all","active","resolved"];
+  return `<div class="sr-three-column sr-missions-layout">
+    <aside class="sr-index-rail">${srSection("MISSION INDEX",`<input class="sr-search" type="search" value="${shinobiRecordEscape(ALPHA_SHINOBI_RECORD_STATE.searchText)}" oninput="setShinobiRecordSearch(this.value)" placeholder="SEARCH RECORD..."><div class="sr-index-list">${[["all","ALL ACTIVE"],["active","CURRENT / KNOWN"],["resolved","RESOLVED HISTORY"]].map(([id,label])=>`<button type="button" class="${ALPHA_SHINOBI_RECORD_STATE.categoryFilter===id?"is-active":""}" onclick="setShinobiRecordCategoryFilter('${id}')">${label}<span>›</span></button>`).join("")}</div>`)}${srSection("STATUS FILTER",statuses.map(id=>`<button type="button" class="sr-status-line ${ALPHA_SHINOBI_RECORD_STATE.categoryFilter===id?"is-active":""}" onclick="setShinobiRecordCategoryFilter('${id}')"><span class="sr-status-dot is-${id}"></span>${id.toUpperCase()}</button>`).join(""))}</aside>
+    <main class="sr-ledger-column">${srSection("CURRENT OPERATIONS",`<div class="sr-ledger-toolbar"><div class="sr-chip-row"><button class="is-active">ALL</button><button>STORY</button><button>FORMAL</button><button>WORLD</button><button>SIDE</button><button>INVESTIGATION</button><button>TRAINING</button></div><div class="sr-view-toggle"><button onclick="setShinobiRecordViewMode('list')" class="${ALPHA_SHINOBI_RECORD_STATE.viewMode==='list'?'is-active':''}">☷</button><button onclick="setShinobiRecordViewMode('grid')" class="${ALPHA_SHINOBI_RECORD_STATE.viewMode==='grid'?'is-active':''}">▦</button></div></div><div class="sr-ledger-list ${ALPHA_SHINOBI_RECORD_STATE.viewMode==='grid'?'is-grid':''}">${entries.length?entries.map(entry=>`<button type="button" class="sr-ledger-card ${selected&&selected.key===entry.key?"is-selected":""}" onclick="selectShinobiRecordMission('${shinobiRecordEscape(entry.key)}')"><span class="sr-ledger-icon">◉</span><span class="sr-ledger-main"><strong>${shinobiRecordEscape(entry.title)}</strong><small>${shinobiRecordEscape(entry.missionId)}</small></span><span class="sr-ledger-state"><b>${entry.status}</b><small>${entry.records.length} RECORD${entry.records.length===1?"":"S"}</small></span><span class="sr-ledger-chevron">›</span></button>`).join(""):srEmpty("No mission record matches the current filter.")}</div>`)}${srSection("OPERATION BRIEF",selected?`<div class="sr-operation-brief"><div class="sr-brief-art">忍</div>${srKeyValueRows([["MISSION TITLE",selected.title],["MISSION TYPE","STORY / RECORDED"],["ISSUED BY / SOURCE",latest&&latest.sourceOccurrenceId||"—"],["START LOCATION",getShinobiRecordLocation(latest)||selected.authority&&selected.authority.locationId||"—"],["CURRENT REGION","—"],["CURRENT PHASE",selected.status],["STATUS",selected.status]])}<div class="sr-known-brief"><span>KNOWN BRIEF</span><p>${latest?shinobiRecordHumanize(getShinobiRecordTitle(latest)):"No committed brief record is available."}</p></div></div>`:srEmpty())}</main>
+    <aside class="sr-detail-column">${srSection("KNOWN OBJECTIVES",selected?`<div class="sr-objective-group"><div class="sr-subhead">PRIMARY OBJECTIVES</div>${objectives.length?objectives.slice(0,3).map(([key,value])=>`<div class="sr-objective"><span>${value?"●":"○"}</span><b>${shinobiRecordEscape(shinobiRecordHumanize(key))}</b></div>`).join(""):srEmpty("No objective completion facts are committed in the selected record.")}<div class="sr-subhead">SECONDARY / OPTIONAL OBJECTIVES</div>${objectives.length>3?objectives.slice(3).map(([key,value])=>`<div class="sr-objective"><span>${value?"●":"○"}</span><b>${shinobiRecordEscape(shinobiRecordHumanize(key))}</b></div>`).join(""):srEmpty("No secondary objective facts are committed.")}</div>`:srEmpty())}${srSection("RELEVANT INFORMATION",refs.length?`<div class="sr-info-icons">${refs.slice(0,5).map(ref=>`<div><span>＋</span><small>${shinobiRecordEscape(shinobiRecordHumanize(ref.role||ref.type))}</small><b>${shinobiRecordEscape(shinobiRecordHumanize(ref.id))}</b></div>`).join("")}</div>`:srEmpty("No source references are attached to the selected mission record."))}${srSection("POTENTIAL OUTCOMES",`<div class="sr-info-icons">${["KNOWLEDGE","ACCESS","ITEMS","RELATIONSHIPS","RECOGNITION"].map(label=>`<div><span>＋</span><small>${label}</small><b>—</b></div>`).join("")}</div><p class="sr-caution">Potential outcomes remain blank unless an owning system authorises them.</p>`)}${srSection("MISSION HISTORY",selectedRecords.length?selectedRecords.slice(0,5).map(record=>`<div class="sr-history-line"><span class="sr-status-dot is-resolved"></span><b>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(record)))}</b><small>${getShinobiRecordStatus(record)}</small></div>`).join(""):srEmpty())}</aside>
+  </div>`;
+}
+
+function getShinobiRecordIntelligenceEntries(){
+  return getShinobiRecordHistory().filter(record=>{
+    const channels=getShinobiRecordChannels(record);
+    return channels.includes("knowledge")||getShinobiRecordSourceRefs(record).length>0;
+  }).map((record,index)=>({key:getShinobiRecordOccurrenceKey(record,index),record}));
+}
+
+function selectShinobiRecordIntelligence(key){ALPHA_SHINOBI_RECORD_STATE.selectedIntelligenceKey=String(key||"");rerenderShinobiRecord();}
+
+function renderShinobiRecordIntelligence(){
+  let entries=getShinobiRecordIntelligenceEntries();
+  const search=ALPHA_SHINOBI_RECORD_STATE.searchText.trim().toLowerCase();
+  if(search) entries=entries.filter(({record})=>`${getShinobiRecordTitle(record)} ${record.type||""} ${getShinobiRecordLocation(record)||""}`.toLowerCase().includes(search));
+  const selected=entries.find(entry=>entry.key===ALPHA_SHINOBI_RECORD_STATE.selectedIntelligenceKey)||entries[0]||null;
+  if(selected) ALPHA_SHINOBI_RECORD_STATE.selectedIntelligenceKey=selected.key;
+  const record=selected&&selected.record||null;
+  const refs=record?getShinobiRecordSourceRefs(record):[];
+  const participants=record?getShinobiRecordParticipants(record):[];
+  const data=record&&record.data&&typeof record.data==="object"?record.data:{};
+  const evidenceChain=[
+    ["SOURCE",refs.length>0],["OBSERVATION",/observ/i.test(String(record&&record.type||""))||!!data.observed],["EVIDENCE",refs.length>0||/evidence/i.test(String(record&&record.type||""))],["CORROBORATION",refs.length>1||!!data.corroboratingEvidence],["CURRENT UNDERSTANDING",!!record]
+  ];
+  const technical=getShinobiRecordHistory().filter(r=>getShinobiRecordChannels(r).includes("development")||/technique|seal|weapon|kinjutsu|fuinjutsu/i.test(`${r.type||""} ${JSON.stringify(r.data||{})}`));
+  return `<div class="sr-three-column sr-intelligence-layout">
+    <aside class="sr-index-rail">${srSection("INTELLIGENCE INDEX",`<input class="sr-search" type="search" value="${shinobiRecordEscape(ALPHA_SHINOBI_RECORD_STATE.searchText)}" oninput="setShinobiRecordSearch(this.value)" placeholder="SEARCH KNOWLEDGE..."><div class="sr-index-list">${["ALL","PEOPLE","LOCATIONS","FACTIONS","MISSIONS","THREATS","TECHNIQUES","FŪINJUTSU","KINJUTSU","DOCUMENTS","RUMOURS"].map(label=>`<button type="button">${label}<span>›</span></button>`).join("")}</div>`)}</aside>
+    <main class="sr-ledger-column">${srSection("KNOWLEDGE LEDGER",`<div class="sr-ledger-list">${entries.length?entries.slice(0,12).map(entry=>{const r=entry.record;const refs=getShinobiRecordSourceRefs(r);return `<button type="button" class="sr-knowledge-card ${selected&&selected.key===entry.key?"is-selected":""}" onclick="selectShinobiRecordIntelligence('${shinobiRecordEscape(entry.key)}')"><span class="sr-ledger-icon">▤</span><span><small>SUBJECT</small><strong>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(r)))}</strong><small>WHAT IS KNOWN</small><b>${shinobiRecordEscape(shinobiRecordHumanize(r.type||"RECORDED EVIDENCE"))}</b></span><span><small>KNOWLEDGE TYPE</small><b>${shinobiRecordEscape(shinobiRecordHumanize(r.type||"EVIDENCE"))}</b><small>SOURCE</small><b>${refs.length?shinobiRecordEscape(shinobiRecordHumanize(refs[0].id)):"—"}</b></span><span><small>WHERE ACQUIRED</small><b>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordLocation(r)||"—"))}</b><small>STATUS</small><b>${getShinobiRecordStatus(r)}</b></span></button>`;}).join(""):srEmpty("No committed knowledge/evidence record matches the current search.")}</div>`)}${srSection("TECHNICAL KNOWLEDGE",`<div class="sr-tech-grid">${["FŪINJUTSU","KINJUTSU","BLOODLINE OBSERVATIONS","WEAPON / TOOL KNOWLEDGE","TACTICAL METHODS"].map(label=>`<div><span>${label}</span><strong>${technical.filter(r=>`${r.type||""} ${JSON.stringify(r.data||{})}`.toLowerCase().includes(label.split(" ")[0].toLowerCase())).length||"—"}</strong></div>`).join("")}</div>`)}${srSection("ACTIVE LEADS",getShinobiRecordHistory().filter(r=>getShinobiRecordChannels(r).includes("access")).slice(0,5).map(r=>`<div class="sr-history-line"><span>◌</span><b>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(r)))}</b><small>${getShinobiRecordStatus(r)}</small></div>`).join("")||srEmpty())}</main>
+    <aside class="sr-detail-column">${srSection("SOURCE & PROVENANCE",record?srKeyValueRows([["SOURCE",refs[0]&&refs[0].id||record.sourceOccurrenceId||"—"],["METHOD ACQUIRED",refs[0]&&refs[0].role||record.type||"—"],["DATE / OCCURRENCE",record.occurrenceId||record.id||"—"],["LOCATION",getShinobiRecordLocation(record)||"—"],["OBSERVER",participants.join(" · ")||"—"],["CORROBORATING EVIDENCE",refs.slice(1).map(ref=>ref.id).join(" · ")||"—"],["CONTRADICTING EVIDENCE",data.contradictingEvidence||"—"]]):srEmpty())}${srSection("EVIDENCE CHAIN",`<div class="sr-evidence-chain">${evidenceChain.map(([label,active],index)=>`<div class="${active?"is-active":""}"><span>${index===0?"▤":index===1?"◉":index===2?"▣":index===3?"●":"◎"}</span><small>${label}</small></div>${index<evidenceChain.length-1?`<b>→</b>`:""}`).join("")}</div>`)}${srSection("RECENT OUTCOMES",srOutcomeStrip(getShinobiRecordHistory()))}</aside>
+  </div>`;
+}
+
+function selectShinobiRecordChronicle(key){ALPHA_SHINOBI_RECORD_STATE.selectedChronicleKey=String(key||"");rerenderShinobiRecord();}
+
+function renderShinobiRecordChronicle(){
+  let history=getShinobiRecordFilteredHistory();
+  const selectedEntry=history.map((record,index)=>({key:getShinobiRecordOccurrenceKey(record,index),record})).find(entry=>entry.key===ALPHA_SHINOBI_RECORD_STATE.selectedChronicleKey)||null;
+  const selected=selectedEntry?selectedEntry.record:(history[0]||null);
+  if(selected) ALPHA_SHINOBI_RECORD_STATE.selectedChronicleKey=getShinobiRecordOccurrenceKey(selected,0);
+  const channels=selected?getShinobiRecordChannels(selected):[];
+  const refs=selected?getShinobiRecordSourceRefs(selected):[];
+  const data=selected&&selected.data&&typeof selected.data==="object"?selected.data:{};
+  const rewards=selected&&selected.rewards||data.rewards||{};
+  const categories=[["history","CHRONICLE HISTORY"],["knowledge","KNOWLEDGE / INTELLIGENCE"],["relationship","RELATIONSHIP / SHARED HISTORY"],["recognition","REPUTATION / RECOGNITION EVIDENCE"],["access","ACCESS / NEW OPPORTUNITIES"],["development","DEVELOPMENT EVIDENCE"],["reward","MATERIAL REWARD"]];
+  return `<div class="sr-chronicle-layout">
+    <aside class="sr-chronicle-left">${srSection("CHRONICLE FILTERS",`<div class="sr-index-list">${[["all","STORY"],["history","FORMAL MISSIONS"],["knowledge","WORLD EVENTS"],["access","SIDE OCCURRENCES"],["development","TRAINING / EXAM"],["relationship","PERSONAL HISTORY"]].map(([id,label])=>`<button type="button" class="${ALPHA_SHINOBI_RECORD_STATE.categoryFilter===id?"is-active":""}" onclick="setShinobiRecordCategoryFilter('${id}')">${label}<span>›</span></button>`).join("")}</div>`)}${srSection("ACTION STATUS",["ACTED","INTERVENED","OBSERVED","DECLINED","WITHHELD ACTION","LET THE EVENT PROCEED","LEFT UNRESOLVED","WITHDREW","DID NOT PURSUE"].map(label=>`<div class="sr-action-status"><span>●</span>${label}</div>`).join(""))}${srSection("SHINOBI DEVELOPMENT",selected?srKeyValueRows([["QUALIFICATION PATH",data.qualificationPath||"—"],["DEMONSTRATED COMPETENCY",data.competence||"—"],["EVIDENCE SOURCE",selected.occurrenceId||selected.id||"—"],["OCCURRENCE",selected.type||"—"],["CURRENT RECOGNITION / QUALIFICATION STATE",data.recognition||"—"]]):srEmpty())}</aside>
+    <main class="sr-chronicle-center">${srSection("YOUR CHRONICLE",`<div class="sr-ledger-toolbar"><input class="sr-search" type="search" value="${shinobiRecordEscape(ALPHA_SHINOBI_RECORD_STATE.searchText)}" oninput="setShinobiRecordSearch(this.value)" placeholder="SEARCH CHRONICLE..."><div class="sr-view-toggle"><button class="${ALPHA_SHINOBI_RECORD_STATE.viewMode==='list'?'is-active':''}" onclick="setShinobiRecordViewMode('list')">☷</button><button class="${ALPHA_SHINOBI_RECORD_STATE.viewMode==='grid'?'is-active':''}" onclick="setShinobiRecordViewMode('grid')">▦</button></div></div><div class="sr-chronicle-feed ${ALPHA_SHINOBI_RECORD_STATE.viewMode==='grid'?'is-grid':''}">${history.length?history.slice(0,30).map((record,index)=>{const key=getShinobiRecordOccurrenceKey(record,index);return `<button type="button" class="sr-chronicle-card ${selected===record?"is-selected":""}" onclick="selectShinobiRecordChronicle('${shinobiRecordEscape(key)}')"><span class="sr-timeline-node"></span><span class="sr-chronicle-icon">✦</span><span class="sr-chronicle-main"><strong>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(record)))}</strong><small>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordLocation(record)||"LOCATION UNRECORDED"))} · ${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordMissionId(record)||record.type||"CHRONICLE"))}</small><b>${shinobiRecordEscape(getShinobiRecordParticipants(record).map(shinobiRecordHumanize).join(" · ")||"PARTICIPANTS UNRECORDED")}</b></span><span class="sr-chronicle-outcome"><small>FACTUAL OUTCOME</small><b>${shinobiRecordEscape(shinobiRecordHumanize(record.outcome||record.type||getShinobiRecordStatus(record)))}</b><small>IMPORTANT CONSEQUENCE</small><b>${getShinobiRecordChannels(record).map(ch=>ch.toUpperCase()).join(" · ")||"—"}</b></span><span class="sr-ledger-chevron">›</span></button>`;}).join(""):srEmpty("No Chronicle history matches the active filters.")}</div>`)}<div class="sr-chronicle-lower">${srSection("CHRONICLE ECHOES",selected?srKeyValueRows([["TITLE",getShinobiRecordTitle(selected)],["ORIGINATING PARTICIPANT",getShinobiRecordParticipants(selected).join(" · ")||"—"],["SOURCE CHRONICLE / OCCURRENCES",selected.occurrenceId||selected.id||"—"],["AUTHORIZED DESCRIPTION",selected.outcome||selected.type||"—"],["CURRENT STATUS",getShinobiRecordStatus(selected)]]):srEmpty())}${srSection("SERVICE & RECOGNITION",selected?srKeyValueRows([["AUTHORITY WITNESSED",refs[0]&&refs[0].id||"—"],["MISSION RESULT RECORDED",getShinobiRecordMissionId(selected)||"—"],["SPECIALIST ACTION DOCUMENTED",data.competence||"—"],["SERVICE COMMENDATION",data.commendation||"—"],["QUALIFICATION EVIDENCE",data.qualificationEvidence||"—"]]):srEmpty())}</div></main>
+    <aside class="sr-chronicle-right">${srSection("OUTCOME CHANNELS",`<div class="sr-channel-grid">${categories.map(([id,label])=>`<div class="${channels.includes(id)?"is-active":""}"><span>${channels.includes(id)?"●":"○"}</span><b>${label}</b></div>`).join("")}</div>`)}${srSection("MATERIAL REWARDS",srKeyValueRows([["RYŌ",rewards.ryo||data.ryo||"—"],["ITEMS",Array.isArray(rewards.items)?rewards.items.length:(data.items?JSON.stringify(data.items):"—")],["MATERIALS",data.materials||"—"],["WEAPONS",data.weapon||data.weapons||"—"],["EQUIPMENT",data.equipment||"—"],["OTHER AUTHORIZED REWARDS",data.otherRewards||"—"]]))}${srSection("KNOWLEDGE CONSEQUENCES",srKeyValueRows([["FŪINJUTSU KNOWLEDGE",/fuin|seal/i.test(JSON.stringify(data))?"RECORDED":"—"],["KINJUTSU KNOWLEDGE",/kinjutsu/i.test(JSON.stringify(data))?"RECORDED":"—"],["TACTICAL INTELLIGENCE",channels.includes("knowledge")?"RECORDED":"—"],["LOCATION KNOWLEDGE",getShinobiRecordLocation(selected)?"RECORDED":"—"],["PERSON / FACTION INTELLIGENCE",getShinobiRecordParticipants(selected).length?"RECORDED":"—"]]))}${srSection("NEWLY ACTIONABLE",srKeyValueRows([["LOCATION DISCOVERED",channels.includes("access")&&getShinobiRecordLocation(selected)?getShinobiRecordLocation(selected):"—"],["CONTACT AVAILABLE",data.contactAvailable||"—"],["NEW INVESTIGATION",data.investigationAvailable||"—"],["SERVICE ACCESS",data.serviceAccess||"—"],["TRAINING OPPORTUNITY",data.trainingOpportunity||"—"],["FOLLOW-UP EVENT",data.followUpEvent||"—"]]))}</aside>
+    <div class="sr-chronicle-outcomes">${srSection("RECENT OUTCOMES",srOutcomeStrip(getShinobiRecordHistory()))}</div>
+  </div>`;
+}
+
+function getShinobiRecordDevelopmentEntries(){
+  const history=getShinobiRecordHistory();
+  const entries=history.filter(record=>getShinobiRecordChannels(record).includes("development")||getShinobiRecordChannels(record).includes("recognition"));
+  const acclimation=playerData&&playerData.weaponAcclimation&&typeof playerData.weaponAcclimation==="object"?playerData.weaponAcclimation:{};
+  Object.entries(acclimation).forEach(([key,value],index)=>{
+    entries.push({id:`weapon_acclimation_${key}`,type:"weapon_acclimation",timestamp:0,data:{path:key,proficiency:value,domain:"WEAPONS",source:"weaponAcclimation"},committed:true,completed:true});
+  });
+  return entries.map((record,index)=>({key:getShinobiRecordOccurrenceKey(record,index),record}));
+}
+
+function selectShinobiRecordDevelopment(key){ALPHA_SHINOBI_RECORD_STATE.selectedDevelopmentKey=String(key||"");rerenderShinobiRecord();}
+
+function renderShinobiRecordDevelopment(snapshot){
+  let entries=getShinobiRecordDevelopmentEntries();
+  const search=ALPHA_SHINOBI_RECORD_STATE.searchText.trim().toLowerCase();
+  if(search) entries=entries.filter(({record})=>`${getShinobiRecordTitle(record)} ${record.type||""} ${JSON.stringify(record.data||{})}`.toLowerCase().includes(search));
+  const selected=entries.find(entry=>entry.key===ALPHA_SHINOBI_RECORD_STATE.selectedDevelopmentKey)||entries[0]||null;
+  if(selected) ALPHA_SHINOBI_RECORD_STATE.selectedDevelopmentKey=selected.key;
+  const record=selected&&selected.record||null;
+  const data=record&&record.data&&typeof record.data==="object"?record.data:{};
+  const allHistory=getShinobiRecordHistory();
+  const evidenceCounts={missions:allHistory.filter(r=>!!getShinobiRecordMissionId(r)).length,training:allHistory.filter(r=>/training|assessment/i.test(`${r.type||""} ${r.activity||""}`)).length,service:allHistory.filter(r=>/service/i.test(`${r.type||""} ${r.activity||""}`)).length,knowledge:allHistory.filter(r=>getShinobiRecordChannels(r).includes("knowledge")).length,recognition:allHistory.filter(r=>getShinobiRecordChannels(r).includes("recognition")).length,chronicle:allHistory.length};
+  return `<div class="sr-three-column sr-development-layout">
+    <aside class="sr-index-rail">${srSection("DEVELOPMENT INDEX",`<input class="sr-search" type="search" value="${shinobiRecordEscape(ALPHA_SHINOBI_RECORD_STATE.searchText)}" oninput="setShinobiRecordSearch(this.value)" placeholder="SEARCH RECORD..."><div class="sr-index-list">${["ALL PATHS","RANK","SPECIAL JŌNIN","COMBAT","TECHNICAL","WEAPONS","FŪINJUTSU","KINJUTSU","SERVICE / EXAM","ARCHIVED"].map(label=>`<button type="button">${label}<span>›</span></button>`).join("")}</div>`)}${srSection("STATUS FILTER",["ACTIVE","IN REVIEW","RECOGNIZED","POTENTIAL","ARCHIVED","ON HOLD"].map(label=>`<div class="sr-action-status"><span>●</span>${label}</div>`).join(""))}</aside>
+    <main class="sr-ledger-column">${srSection("DEVELOPMENT LEDGER",`<div class="sr-ledger-toolbar"><div class="sr-chip-row"><button class="is-active">ALL</button><button>ACTIVE</button><button>RECOGNIZED</button><button>IN REVIEW</button><button>POTENTIAL</button></div><div class="sr-view-toggle"><button class="${ALPHA_SHINOBI_RECORD_STATE.viewMode==='list'?'is-active':''}" onclick="setShinobiRecordViewMode('list')">☷</button><button class="${ALPHA_SHINOBI_RECORD_STATE.viewMode==='grid'?'is-active':''}" onclick="setShinobiRecordViewMode('grid')">▦</button></div></div><div class="sr-ledger-list ${ALPHA_SHINOBI_RECORD_STATE.viewMode==='grid'?'is-grid':''}">${entries.length?entries.slice(0,20).map(entry=>{const r=entry.record;return `<button type="button" class="sr-ledger-card ${selected&&selected.key===entry.key?"is-selected":""}" onclick="selectShinobiRecordDevelopment('${shinobiRecordEscape(entry.key)}')"><span class="sr-ledger-icon">◇</span><span class="sr-ledger-main"><strong>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(r)))}</strong><small>${shinobiRecordEscape(shinobiRecordHumanize(r.type||data.domain||"DEVELOPMENT"))}</small></span><span class="sr-ledger-state"><b>${getShinobiRecordStatus(r)}</b><small>QUALIFICATION STATE</small></span><span class="sr-ledger-chevron">›</span></button>`;}).join(""):srEmpty("No authorised development record is available.")}</div>`)}${srSection("SELECTED DEVELOPMENT DOSSIER",record?`<div class="sr-development-dossier"><div class="sr-brief-art">忍</div>${srKeyValueRows([["QUALIFICATION PATH",data.qualificationPath||data.path||"—"],["DOMAIN",data.domain||record.type||"—"],["CURRENT STATE",data.currentState||getShinobiRecordStatus(record)],["REVIEWING AUTHORITY",data.reviewingAuthority||"—"],["RELATED OCCURRENCE",record.occurrenceId||record.id||"—"],["EVIDENCE SOURCE",getShinobiRecordSourceRefs(record).map(ref=>ref.id).join(" · ")||"—"],["DEMONSTRATED COMPETENCY",data.competence||"—"],["LATEST RECOGNITION",data.recognition||"—"]])}<div class="sr-known-brief"><span>DOCUMENTED EVIDENCE</span><p>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(record)))}</p></div><div class="sr-known-brief"><span>AUTHORIZED NOTES</span><p>${data.masteryGranted===false?"Mastery not granted by this evidence.":"No additional authorised note is recorded."}</p></div></div>`:srEmpty())}</main>
+    <aside class="sr-detail-column">${srSection("CURRENT RECOGNITION",srKeyValueRows([["CURRENT RANK",snapshot.rank],["ACTIVE SPECIALIZATION","—"],["QUALIFICATION STATE",record?getShinobiRecordStatus(record):"—"],["SERVICE STANDING","—"],["LATEST REVIEW",record&&record.occurrenceId||record&&record.id||"—"]]))}${srSection("DEVELOPMENT EVIDENCE",`<div class="sr-info-icons">${Object.entries(evidenceCounts).map(([label,count])=>`<div><span>${count||"＋"}</span><small>${label.toUpperCase()}</small><b>${count||"—"}</b></div>`).join("")}</div>`)}${srSection("AUTHORIZED OUTCOMES",`<div class="sr-info-icons">${["QUALIFICATION","ACCESS","TECHNIQUE","EQUIPMENT","REPUTATION","OTHER"].map(label=>`<div><span>＋</span><small>${label}</small><b>—</b></div>`).join("")}</div><p class="sr-caution">Blank unless an owning authority has granted the outcome.</p>`)}${srSection("DEVELOPMENT HISTORY",entries.slice(0,6).map(entry=>`<div class="sr-history-line"><span class="sr-status-dot is-resolved"></span><b>${shinobiRecordEscape(shinobiRecordHumanize(getShinobiRecordTitle(entry.record)))}</b><small>${getShinobiRecordStatus(entry.record)}</small></div>`).join("")||srEmpty())}</aside>
+  </div>`;
+}
+
+function renderShinobiRecordOverlay(container){
+  if(!container) return false;
+  const snapshot=getShinobiRecordSubjectSnapshot();
+  let content="";
+  if(ALPHA_SHINOBI_RECORD_STATE.activeTab==="missions") content=renderShinobiRecordMissions();
+  else if(ALPHA_SHINOBI_RECORD_STATE.activeTab==="intelligence") content=renderShinobiRecordIntelligence();
+  else if(ALPHA_SHINOBI_RECORD_STATE.activeTab==="chronicle") content=renderShinobiRecordChronicle();
+  else if(ALPHA_SHINOBI_RECORD_STATE.activeTab==="development") content=renderShinobiRecordDevelopment(snapshot);
+  else content=renderShinobiRecordOverview(snapshot);
+  container.innerHTML=`<div class="shinobi-record-screen" data-tab="${shinobiRecordEscape(ALPHA_SHINOBI_RECORD_STATE.activeTab)}">
+    ${renderShinobiRecordShellHeader(snapshot)}
+    ${renderShinobiRecordTabs()}
+    <div class="sr-workspace">${content}</div>
+    <footer class="sr-footer"><span>INFORMATION LEADS TO CHOICE. CHOICE BUILDS HISTORY.</span><span>WORLD TRUTH ≠ KNOWLEDGE ≠ ACCESS ≠ COMPETENCE ≠ POWER ≠ MASTERY</span></footer>
+  </div>`;
+  return true;
+}
+
+function runAlphaIssue66ShinobiRecordDiagnostics(){
+  const source=renderShinobiRecordOverlay.toString();
+  const shell=renderShinobiRecordShellHeader.toString();
+  const overview=renderShinobiRecordOverview.toString();
+  const missions=renderShinobiRecordMissions.toString();
+  const intelligence=renderShinobiRecordIntelligence.toString();
+  const chronicle=renderShinobiRecordChronicle.toString();
+  const development=renderShinobiRecordDevelopment.toString();
+  const result={
+    fiveSharedTabs:ALPHA_SHINOBI_RECORD_TABS.map(tab=>tab.id).join("|")==="overview|missions|intelligence|chronicle|development",
+    oneLiveCodedShell:source.includes("shinobi-record-screen")&&shell.includes("OFFICIAL FIELD DOSSIER / CHRONICLE ARCHIVE"),
+    noBakedTabMasters:!source.includes("background-image")&&!source.includes("missions(1).png")&&!source.includes("development(1).png"),
+    missionsGrammar:misisonsSafe(missions),
+    developmentGrammar:development.includes("DEVELOPMENT LEDGER")&&development.includes("CURRENT RECOGNITION")&&development.includes("DEVELOPMENT EVIDENCE"),
+    overviewInformationPreserved:overview.includes("SHINOBI DOSSIER")&&overview.includes("ACTIVE RECORD")&&overview.includes("RECENT RECORD UPDATES")&&overview.includes("CURRENT INTELLIGENCE")&&overview.includes("YOUR CHRONICLE")&&overview.includes("RECENT OUTCOMES"),
+    intelligenceInformationPreserved:intelligence.includes("INTELLIGENCE INDEX")&&intelligence.includes("KNOWLEDGE LEDGER")&&intelligence.includes("SOURCE & PROVENANCE")&&intelligence.includes("EVIDENCE CHAIN")&&intelligence.includes("TECHNICAL KNOWLEDGE")&&intelligence.includes("ACTIVE LEADS"),
+    chronicleInformationPreserved:chronicle.includes("CHRONICLE FILTERS")&&chronicle.includes("ACTION STATUS")&&chronicle.includes("YOUR CHRONICLE")&&chronicle.includes("OUTCOME CHANNELS")&&chronicle.includes("MATERIAL REWARDS")&&chronicle.includes("CHRONICLE ECHOES")&&chronicle.includes("SERVICE & RECOGNITION")&&chronicle.includes("KNOWLEDGE CONSEQUENCES")&&chronicle.includes("NEWLY ACTIONABLE"),
+    presentationReadsHistoryOnly:renderShinobiRecordChronicle.toString().includes("getShinobiRecordFilteredHistory")&&!renderShinobiRecordChronicle.toString().includes("activityHistory.push"),
+    noRewardMutation:!source.includes("grantReward")&&!source.includes("claimReward")&&!source.includes("playerData.ryo+=")&&!source.includes("playerData.inventory.push"),
+    noKnowledgeCreation:!source.includes("knownFactIds.push")&&!source.includes("commitAlphaArc1HistoryRecord"),
+    noRankMutation:!source.includes("formalRankProgressionByOwnedCharacterId")&&!source.includes("promote"),
+    myClanShortcutNowResolves:typeof openShinobiRecordForCharacter==="function"
+  };
+  result.pass=Object.values(result).every(value=>value===true);
+  console.table(result);
+  return result;
+}
+
+function misisonsSafe(source){return source.includes("MISSION INDEX")&&source.includes("CURRENT OPERATIONS")&&source.includes("OPERATION BRIEF")&&source.includes("KNOWN OBJECTIVES")&&source.includes("RELEVANT INFORMATION")&&source.includes("POTENTIAL OUTCOMES")&&source.includes("MISSION HISTORY");}

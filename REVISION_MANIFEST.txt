@@ -3,10 +3,9 @@ SHINOBI CHRONICLES — CODING/RUNTIME REVISION MANIFEST
 
 DELIVERY
 --------
-Brick range: BRICKS 5800–6499
-Package: Shinobi_Chronicles_BRICKS_5800-6499_UI_RUNTIME_CONSOLIDATION_MONSTER.zip
-Scope: World Map presentation correction + Arena diagram navigation + Training Grounds fit-to-view
-       + My Clan operational completion controls + GitHub Issue #63 dynamic Genin candidate machinery.
+Brick range: BRICKS 6500–7299
+Package: Shinobi_Chronicles_BRICKS_6500-7299_SHINOBI_RECORD_UI_MONSTER.zip
+Scope: GitHub Issue #66 — complete live-coded five-tab Shinobi Record UI family.
 
 WINDOWS
 -------
@@ -16,134 +15,211 @@ Right-click ZIP -> Properties -> Unblock -> Apply -> Extract.
 LIVE PRODUCTION BASELINE
 ------------------------
 Final main guard:
-  117ebe58420c0469aad18f9ce8565024ff9b50f0
-  "docs: lock Mukai Byakugan gating and Obito identity separation"
+  f7a5f28d055a56b49db03e6ec043a165f7751158
+  "docs: close first production Genin roster candidate content"
 
-Production runtime/UI files remained exactly the BRICKS 5500–5799 checkpoint:
-  game.js   9f04edf38a584334459b396cea69a9050227b9f6
-  index.html 492278fb07f66573cbc9423e8106378b95e6f01b
-  style.css 4884398fb17f0972eaa34b49cb9a62433a9c588f
-
-RESULT BLOBS
-------------
+The production runtime/UI files remained exactly BRICKS 5800–6499 underneath this build:
   game.js   ae8714284b2652571e403fc86a576f40c0163f0f
   index.html 492278fb07f66573cbc9423e8106378b95e6f01b
   style.css 4d4ba78e88a3898c56c88f957aba3d3e19a41a4d
 
+NOTE:
+The new first-production Genin/leader candidate authority landed during this build as
+documentation only. It did not change the three production files above and is not
+silently folded into this Record-focused tranche. It is ready for the next Coding pass.
+
+RESULT BLOBS
+------------
+  game.js   a4fa9cbb9aac0260842098548d5fe5a5ed75e841
+  index.html 01bad9eb78c2f66272a3a00c40db2c5466f8080a
+  style.css 249f2038547318890085fe298f79ae743cd4cc8e
+
 RESULT SHA-256
 --------------
-  game.js   d39d81172177d033147c3cc5a560c881941dd5f43e8c1cfe112f960892a9bb85
-  index.html 09903661126c6edf43b6700068cea60a2d0605fc1706bdf295d5837a42ef953a
-  style.css 7ba2e8f315718391d9d39d6de1eaff3ce823b919ce31dc8423afd5f2951aeed9
+  game.js   44b3677a0f00bed396f5e6c45ab1bc437a1402af5c40830fef5fe7da62fced70
+  index.html 3813040cac33dfa6f1d4c529f7950428ee0fcd6d5cbc2f474c3b1106d3315061
+  style.css 5142a0dc79b609781a4d5773b48e8963b71c295731827fb3682416c563710b56
 
-BRICKS 5800–5824 — WORLD MAP COLLISION CORRECTION
---------------------------------------------------
-- Keeps world:S01 semantic reservation anchor unchanged at the authoritative calibrated point.
-- Applies presentation-only +40 X / -10 Y native-pixel displacement to the locked ???? halo.
-- Land of Grass country anchor remains unchanged.
-- No secret identity/access/travel semantic changes.
+VISUAL AUTHORITY / ISSUE #66
+----------------------------
+- Approved Missions tab concept = KEEP.
+- Approved Development tab concept = KEEP.
+- Overview / Intelligence / Chronicle retain their information architecture but
+  are rebuilt into the Missions/Development visual family.
+- One reusable coded shell/component vocabulary is used across all five tabs.
+- No full-screen Record PNG is required at runtime.
 
-BRICKS 5825–5899 — MY CLAN COMPLETION CONTROLS
-------------------------------------------------
-- Selected-shinobi inspection now exposes direct SET AS START.
-- ASSIGN NEXT OPEN stages the selected owned shinobi into the first free formation position.
-- FAVOURITE / UNFAVOURITE is directly actionable from the inspection workbench.
-- SAVE FORMATION remains explicit and only enables for dirty editable formation state.
-- Existing REMOVE FROM FORMATION and LOADOUT controls remain.
-- Battle edit lock remains authoritative.
-- Formation staging remains separate from persistence until explicit save.
+LOCKED SHARED VISUAL GRAMMAR
+----------------------------
+- dark blue-black operational surfaces;
+- parchment/ivory section header strips;
+- thin gold/brass linework;
+- rectangular modular panel geometry;
+- compact left index/filter rail;
+- dense readable ledger/data rows;
+- consistent icon containers;
+- restrained status colours;
+- shared spacing / card proportions;
+- premium archival shinobi-record language without the older brown dossier treatment.
 
-BRICKS 5900–6099 — ARENA FIT-TO-VIEW FOUR-WAY DIAGRAM
-------------------------------------------------------
-- Arena main now uses the approved master as a direct four-section interaction diagram.
-- Promotion quadrant -> existing Promotion UI.
-- Staged Battles quadrant -> approved staged-battles UI.
-- PVP quadrant -> approved PVP UI.
-- Village Tournament quadrant -> approved tournament UI.
-- Whole Arena main is fit-to-view / non-scrolling on ordinary desktop layouts.
-- Hover/focus affordance reveals OPEN without obscuring the baked master.
-- Child panels may use bounded internal overflow when their real content exceeds the panel.
-- No fake PVP opponent, tournament bracket, staged encounter or reward state is created.
+BRICKS 6500–6599 — SHARED CODED RECORD SHELL
+---------------------------------------------
+- SHINOBI RECORD header + official dossier/archive subtitle.
+- Runtime subject chip using owned shinobi projection.
+- Five shared tabs: Overview / Missions / Intelligence / Chronicle / Development.
+- Tab switching is presentation-only.
+- Shared panel / header / rail / ledger / outcome components.
+- Desktop fit-to-view first; compact viewport gets bounded fallback scrolling.
 
-BRICKS 6100–6199 — TRAINING GROUNDS FIT-TO-VIEW
-------------------------------------------------
-- Training hub and Weapons / Mentorship / Sparring screens fit the ordinary desktop overlay.
-- Master-art title duplication is suppressed while the approved raster is active.
-- TRAINING GROUNDS back control is contained inside the centre panel instead of overlapping Fighter/Shinobi 1.
-- Runtime portraits/selectors/text are density-reduced to stay inside the master geometry.
-- Desktop outer scroll is disabled.
-- Compact/mobile or very short viewports retain a bounded scroll fallback rather than clipping the system.
-- Training consequence semantics remain fail-closed where Progression/Combat authority is still absent.
+BRICKS 6600–6749 — OVERVIEW
+----------------------------
+Preserves:
+- Shinobi Dossier
+- Active Record
+- Current Assignment
+- Active Investigation
+- Active Leads
+- Known Relevant Locations
+- Recent Record Updates
+- Current Intelligence
+- Your Chronicle
+- Recent Outcomes
 
-BRICKS 6200–6499 — GITHUB ISSUE #63
-------------------------------------
-- Preserves the existing candidate snapshot architecture; does not create a second roster system.
-- Candidate state vocabulary: available / assigned_to_player / assigned_elsewhere / unavailable.
-- Current two Academy teammates derive retention and are protected from CE background consumption.
-- Candidate discovery is explicit-authority only; no production Registry/rank/asset scan.
-- Same unresolved authoritative snapshot is idempotent.
-- Material candidate-state changes require a new snapshotId, supersedesSnapshotId, occurrenceId and causalReason.
-- Prior snapshots are persisted in candidateSnapshotHistory.
-- Autonomous candidate consumption enforces remaining replacement floor:
-    2 Genin replacement candidates
-    1 leader/teacher candidate
-- Leader/teacher source rank union is { jonin, special_jonin }.
-- Rank alone does not create eligibility; presence in the authoritative candidate snapshot is required.
-- Snapshot-authorised Jōnin/Special Jōnin leader assignment does not grant collectible ownership.
-- Leader assignment does not create Battle deployment.
-- Special Jōnin keeps formal Rank special_jonin; assignment does not mutate Rank/PL/Stats/qualification.
-- Unowned replacement path remains acquisition_required.
-- Outgoing teammates remain owned.
-- Stale snapshot selections fail closed.
+BRICKS 6750–6899 — MISSIONS
+----------------------------
+Implements the approved Missions grammar as live UI:
+- Mission Index
+- Current Operations
+- list/grid view
+- Operation Brief
+- Known Objectives
+- Relevant Information
+- Potential Outcomes
+- Mission History
 
-DOWNSTREAM CONTENT DEPENDENCY
+Mission inspection is read-only and does not start/commit a mission.
+
+BRICKS 6900–7049 — INTELLIGENCE
+--------------------------------
+Preserves:
+- Intelligence Index
+- Knowledge Ledger
+- Source & Provenance
+- Evidence Chain
+- Technical Knowledge
+- Active Leads
+- Recent Outcomes
+
+Knowledge projection reads committed observer/history/source evidence only.
+
+BRICKS 7050–7149 — CHRONICLE
 -----------------------------
-- Exact first-production post-Promotion candidate IDs/content remain absent from durable authority.
-- Coding created GitHub Issue #65 directly to CE / Codex / Coordination.
-- The runtime does not invent that candidate field.
-- Therefore true fresh-save post-Promotion Golden is NOT yet claimed.
+Preserves:
+- Chronicle Filters
+- Action Status
+- Your Chronicle timeline
+- Outcome Channels
+- Material Rewards
+- Shinobi Development
+- Chronicle Echoes
+- Service & Recognition
+- Knowledge Consequences
+- Newly Actionable
+- Recent Outcomes
+
+BRICKS 7150–7249 — DEVELOPMENT
+-------------------------------
+Implements the approved Development grammar as live UI:
+- Development Index
+- Status Filter
+- Development Ledger
+- Selected Development Dossier
+- Current Recognition
+- Development Evidence
+- Authorized Outcomes
+- Development History
+
+BRICKS 7250–7299 — ACCESS / INTEGRATION
+----------------------------------------
+- Added Shinobi Record to World Map Quick Links.
+- Added explicit SHINOBI RECORD button to My Clan inspection.
+- Existing My Clan double-click Codex shortcut now resolves through the Record.
+- Added global overlay route `shinobi_record`.
+- No second ownership/mission/history/progression system was created.
+
+SEMANTIC PRESERVATION
+---------------------
+- presentation does not create authority;
+- World Truth != Knowledge != Access != Competence != Power != Mastery;
+- qualification evidence != Rank;
+- reward display != reward grant;
+- mission inspection != mission start;
+- history display != history commit;
+- Record subject != Battle deployment;
+- UI filter/view state != semantic history.
 
 VALIDATION
 ----------
-node --check game.js: PASS
-tinycss2 stylesheet parse errors: 0
-Static/deterministic contract gate: 23/23 PASS
-  S01 semantic anchor remains authoritative: PASS
-  S01 display collision offset +40/-10 native px: PASS
-  Arena four diagram destinations: PASS
-  Arena Promotion route: PASS
-  Arena Staged route: PASS
-  Arena Tournament route: PASS
-  Arena PVP route: PASS
-  Training/Arena desktop fit-first CSS: PASS
-  Compact viewport scroll fallback: PASS
-  Training back control contained: PASS
-  My Clan Set Start: PASS
-  My Clan Assign Next Open: PASS
-  My Clan Save Formation: PASS
-  My Clan Favourite control: PASS
-  Issue63 candidate-state vocabulary: PASS
-  Issue63 leader rank union: PASS
-  Issue63 2 Genin + 1 leader floor: PASS
-  Issue63 causal snapshot supersession: PASS
-  Issue63 snapshot history persisted through load: PASS
-  Issue63 stale selection fail-close: PASS
-  Issue63 leader ownership not granted: PASS
-  Issue63 Special Jonin rank preserved: PASS
-  No production candidate IDs fabricated: PASS
+Exact packaged game.js:
+  node --check: PASS
+
+Exact packaged style.css:
+  tinycss2 top-level parse errors: 0
+
+Isolated live Record runtime harness:
+  Overview render: PASS
+  Missions render: PASS
+  Intelligence render: PASS
+  Chronicle render: PASS
+  Development render: PASS
+  Issue #66 semantic/presentation diagnostic: PASS
+
+Static/delivery contract gate:
+  18/18 PASS
+  Five shared Record tabs: PASS
+  One live coded Record shell: PASS
+  Missions visual grammar: PASS
+  Development visual grammar: PASS
+  Overview information preserved: PASS
+  Intelligence information preserved: PASS
+  Chronicle information preserved: PASS
+  Shared modern palette variables: PASS
+  Ivory modular panel header: PASS
+  Blue-black modular panels: PASS
+  Record overlay fit-to-view: PASS
+  Compact viewport fallback: PASS
+  No baked Record runtime master path: PASS
+  My Clan explicit Record button: PASS
+  My Clan double-click Record route resolves: PASS
+  World Map Quick Link: PASS
+  Overlay route: PASS
+  Issue #66 diagnostic present: PASS
 
 BROWSER / GOLDEN STATUS
 -----------------------
-Browser integration against this exact candidate: NOT YET CLAIMED.
+Browser visual integration against this exact package: NOT YET CLAIMED.
 Whole-Alpha Golden: NOT CLAIMED.
-Stephen's local browser remains the current visual/browser integration authority.
+
+The supplied reference screenshots are visual specification only.
+No screenshot is required by the runtime.
+
+ISSUE #66 STATUS
+----------------
+Implementation candidate complete.
+Close #66 only after this exact replacement is committed to production and live-browser
+validation confirms the five-tab family.
+
+NEXT CODING AUTHORITY
+---------------------
+Exact first-production Genin roster / leader candidate content has now landed on main
+documentation and is ready for the next Coding pass.
 
 ROLLBACK
 --------
-BRICKS 5500–5799 production game.js:
-  9f04edf38a584334459b396cea69a9050227b9f6
-
-BRICKS 5800–6499 candidate game.js:
+BRICKS 5800–6499 production game.js:
   ae8714284b2652571e403fc86a576f40c0163f0f
+
+BRICKS 6500–7299 candidate game.js:
+  a4fa9cbb9aac0260842098548d5fe5a5ed75e841
 
 Brick numbering is a rollback/search address, not a Golden claim.
