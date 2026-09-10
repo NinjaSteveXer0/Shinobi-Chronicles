@@ -3,7 +3,7 @@
 **Date:** 2026-09-10  
 **Owner:** CE / Codex / Coordination  
 **Status:** **BINDING ALPHA COORDINATION — REGISTRY/PL CLOSED / ASSET PROJECTION GATE ACTIVE / COMBAT-READINESS GATE QUEUED / V2 CANDIDATE AUTHORITY NOT YET PUBLISHED**  
-**Source handoff:** GitHub issue #73; sequencing amendment from GitHub issue #81  
+**Source handoff:** GitHub issue #73; sequencing amendment from #81; capability correction from #85  
 **Upstream:** #70 ← #69
 
 ## 1. Purpose
@@ -22,13 +22,15 @@ All 25 rows now have exact stable-person linkage, exact `genin_*` representation
 
 That closure does **not** activate the rows in the current candidate universe by itself. Issue #81 further establishes that production-ready Assets also do **not** prove Battle readiness: the 25 rows must pass an explicit Combat / Skills readiness gate before CE publishes them as playable v2 teammate candidates.
 
+Issue #85 corrects one capability example inside that gate: `genin_hashirama` and `genin_yamato` **possess Wood Release from representation start**, but possession does not grant executable Access, Competence, Power, Mastery or prepared Wood Release Skills.
+
 Preserve:
 
 **Registry admission ≠ production activation**  
 **Registry admission ≠ candidate inclusion**  
 **Assets readiness ≠ Combat readiness**  
 **Stats ≠ Skills**  
-**lineage ≠ Access**  
+**possession ≠ Access ≠ Competence ≠ Power ≠ Mastery**  
 **candidate universe ≠ concrete snapshot**  
 **candidate eligibility ≠ ownership ≠ assignment ≠ deployment**  
 **current v1 ≠ rewritten by v2**
@@ -153,9 +155,9 @@ Issue #81 establishes a second required production gate before the 25-row wave b
 
 This gate does **not** interrupt active #74 and does **not** block current-v1 runtime work. It activates after #74 returns to CE.
 
-Before CE publishes the expanded candidate-content authority, CE must first inspect current durable Combat / Skills / Progression / Bloodline authority for all 25 admitted representations and determine whether each row has an exact currently legal Alpha Battle repertoire.
+Before CE publishes the expanded candidate-content authority, CE must inspect current durable Combat / Skills / Progression / Bloodline authority for all 25 admitted representations and determine whether each row has an exact currently legal Alpha Battle repertoire.
 
-The audit must not infer capability from:
+The audit must not infer executable capability from:
 
 - seven Base Stats;
 - adult/future versions of the same person;
@@ -169,12 +171,30 @@ Where exact representation-level repertoire authority already exists, consume it
 
 Where it is absent, CE will create **one consolidated SEND NOW Combat / Skills handoff** for the missing rows after #74 closes. Combat may author only the legitimate baseline prepared palette supported by current capability authority. If a particular technique, bloodline, transformation or source requires separate Progression/Bloodline Access, that gate remains authoritative and Combat must not silently grant it.
 
-Hard examples:
+### Possession / Access correction from #85
+
+For `genin_hashirama` and `genin_yamato`, current authority is now explicit:
+
+```text
+capability.wood_release.possessed = true
+capability.wood_release.access = false by default
+```
+
+Their Wood Release is therefore a **possessed capability/source from representation start**, not an absent capability. However, no Wood Release action is executable until legitimate Development/Bloodline/Progression authority satisfies the Access requirement. Possession alone does not grant starting Wood Release Skills, prepared-palette membership, Competence, Power, Mastery, Stat modifiers or hidden PL.
+
+Binding capability authority:
+
+`Documentation/SC_Combat_Genin_Hashirama_Yamato_Wood_Release_Possession_Access_Boundary_2026-09-10.md`
+
+commit `1bc85d3fb16088da72df9712e0b8494b3d2a3b9a`.
+
+The Alpha text-first catalogue may contain Wood Release techniques, but **catalogue presence ≠ learned/prepared Skill ≠ executable Access**.
+
+Other hard examples remain:
 
 - `genin_mukai` single visible Byakugan remains possession/representation only unless Access is separately authorised;
-- `genin_hiashi` does not automatically receive active Byakugan;
-- `genin_kagami` does not automatically receive Sharingan;
-- `genin_hashirama` and `genin_yamato` do not automatically receive Wood Release;
+- `genin_hiashi` lineage/representation does not by itself grant executable active Byakugan;
+- `genin_kagami` lineage/representation does not by itself grant executable Sharingan;
 - `genin_shibi` does not automatically gain an independently acting kikaichū participant/source package;
 - Akimichi / Inuzuka / Yamanaka identity does not create hidden modifiers or Skills.
 
@@ -208,6 +228,7 @@ UI/Assets exact production projection + remediation
     ACTIVE — #74
         ↓
 CE audits exact representation-level Combat/Skills authority
+    including possession-vs-Access boundaries from #85
         ↓
 Combat/Skills closes missing baseline prepared palettes
     QUEUED — activation triggered only after #74 returns
@@ -256,10 +277,11 @@ Preserve throughout the next steps:
 - Registry admission ≠ Combat readiness;
 - Assets GREEN ≠ Combat readiness;
 - Stats ≠ Skills;
-- lineage ≠ Access;
-- representation possession ≠ capability activation;
+- possession ≠ Access ≠ Competence ≠ Power ≠ Mastery;
 - adult/future repertoire ≠ Genin repertoire;
 - card art ≠ Skill authority;
+- catalogue presence ≠ learned/prepared Skill;
+- Base PL ≠ active capability projection;
 - candidate universe ≠ snapshot;
 - candidate eligibility ≠ ownership;
 - ownership ≠ assignment ≠ deployment;
@@ -285,6 +307,8 @@ Registry / PL / Rank work from #70 is consumed.
 **WAITING ON UI / ASSETS via #74.**
 
 Issue #81 is consumed as a sequencing correction: the Combat / Skills readiness gate is queued immediately behind #74 and becomes the next CE activation step before v2 publication.
+
+Issue #85 is consumed as a capability-state correction within that queued gate: Hashirama/Yamato Wood Release possession is YES from representation start; executable Access remains gated.
 
 When #74 returns GREEN, CE will **not** publish v2 immediately. CE will first inspect exact repertoire authority and route one consolidated Combat / Skills package only for rows that still need closure. After that gate closes, CE may publish the versioned expanded candidate-content authority and route the minimum Coding consumption directly.
 
