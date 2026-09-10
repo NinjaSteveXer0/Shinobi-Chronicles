@@ -3,194 +3,171 @@ SHINOBI CHRONICLES — CODING/RUNTIME REVISION MANIFEST
 
 DELIVERY
 --------
-Brick range: BRICKS 4500–5499
-Package: Shinobi_Chronicles_BRICKS_4500-5499_ALPHA_ARC1_RUNTIME_MONSTER.zip
-Primary objective: advance the first true playable Arc 1 runtime from the committed
-BRICKS 3500–4499 checkpoint while preserving exact Story / World / Progression /
-Combat ownership boundaries.
+Brick range: BRICKS 5500–5799
+Package: Shinobi_Chronicles_BRICKS_5500-5799_WORLD_MAP_SEVEN_REGION_MONSTER.zip
+Scope: World Map v2 implementation + Land of Grass + Land of Rain + Kusagakure + Amegakure.
 
 WINDOWS
 -------
 UNBLOCK THIS ZIP BEFORE EXTRACTION.
 Right-click ZIP -> Properties -> Unblock -> Apply -> Extract.
 
-PRODUCTION BASELINE
--------------------
-GitHub production checkpoint:
-  c4406bfffa47322b3ac149bd3c790a7669288acd
-  commit message: 3500-4499
+LIVE PRODUCTION BASELINE
+------------------------
+Current main at final packaging guard:
+  45a9ef04bb18f0e66ccdf7ea312e3c9af66f77c3
+  "Close Acquisition dynamic Genin roster candidate contract"
 
-Exact baseline production blobs:
-  game.js   7a9df48c2e495fe573cce0b9e68009194542c28c
-  style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
+The production UI/runtime files were unchanged underneath this candidate:
+  game.js   4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
   index.html 47d8016edbed6b08f3fc03275449acbb1c0007cb
-
-Final live GitHub guard before packaging confirmed those three production files had
-not moved underneath this candidate.
+  style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
 
 RESULT BLOBS
 ------------
-  game.js   4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
-  style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
-  index.html 47d8016edbed6b08f3fc03275449acbb1c0007cb
+  game.js   9f04edf38a584334459b396cea69a9050227b9f6
+  index.html 492278fb07f66573cbc9423e8106378b95e6f01b
+  style.css 4884398fb17f0972eaa34b49cb9a62433a9c588f
 
 RESULT SHA-256
 --------------
-  game.js   f72ff7edcbcd5ad964943f00bf874da294f37c47d394642f7957cba3caec3d1c
-  style.css 57fc59f8977a3f116a0afb1a4a4cd1f0250f8d1869c1b96cda9364ffb7f03793
-  index.html c5bb19d47fa21777c2d4c477bd14b28dcf8acdbe23459d67687a56e9f1eb49eb
+  game.js   a39ace4d43c50b58ff1e4383fc7fd8a2d4bbe3022ffdf4dda7b669da2af17032
+  index.html 09903661126c6edf43b6700068cea60a2d0605fc1706bdf295d5837a42ef953a
+  style.css d392b2d14dd0725c0910d9f4211ca40e1aca5bf47d02213e6a1b55e02ac5003b
 
-CHANGED PRODUCTION FILES
-------------------------
-  game.js
+AUTHORITY CONSUMED
+------------------
+World Map v2:
+- Backgrounds/WorldMap.png
+- native 1672 x 941
+- production blob 102ff62f8849bce76b83424140091b37f235401b
+- 16 country anchors: world:C01 -> world:C16
+- 7 physical secret reservations: world:S01 -> world:S07
+- world:S08 remains non-physical / no ordinary terrain anchor
+- Coding handoff: GitHub Issue #54
 
-Unchanged full replacements carried for straightforward deployment:
-  style.css
-  index.html
+New regional/village assets already present in repository:
+- Land of Grass regional master: Backgrounds/inside_LOG.png
+- Land of Rain regional master: Backgrounds/inside_LOR.png
+- Kusagakure village master: Backgrounds/kusa.png
+- Amegakure village master: Backgrounds/ame.png
 
-BRICKS 4500–4899 — ARC 1 M2–M10 STORY RUNTIME
-----------------------------------------------
-- Registered exact machine-addressed Story runtime surfaces for Missions 2–10.
-- Story Scene IDs and World source/object refs consume current durable authority.
-- M2 / M3 / M4 / M6 / M8 / M9 / M10 do not invent Battles.
-- M5 calls the existing Mission-5 Female Operator encounter package.
-- M7 calls the existing Chain Sanitisation encounter package.
-- M9 consumes persisted M7 Battle/sanitisation facts instead of replaying the fight.
-- World occurrence identity remains separate from Story occurrence identity.
-- Map geometry remains presentation-owned; semantic addresses survive map replacement.
-
-BRICKS 4900–5099 — IDENTITY REBINDING / FALSE IDENTITY PERSISTENCE
-------------------------------------------------------------------
-- Exact authoritative development source:
-  occ_arc1_m6_identity_rebinding_seal_created
-- Persistent capability:
-  false_identity_seals.identity_rebinding_seal
-- Access: GRANTED
-- Competence: INITIAL_OPERATIONAL_COMPETENCE
-- Mastery: NOT GRANTED
-- Generic XP: NONE
-- Direct Stat gain: NONE
-- Direct PL gain: NONE
-- M3–M5 evidence is preserved only when it actually exists in the route.
-- Cipher Menma requires truthful current body-inscribed state + committed Cipher history.
-- Representation changes do not erase learned Identity Rebinding history.
-- Mission-11 Recognition Substitution requires the earned persistent capability predicate.
-
-BRICKS 5100–5299 — MISSION 11 RECALL / ACTION HARDENING
--------------------------------------------------------
-- Recall Contact uses exact host relationship host_rel_menma_arc1_echo.
-- Echo Recall Refusal remains a Hosted-Entity response, not an independent turn.
-- Recognition Substitution remains exact profile menma_normal_no_carrier.
-- carrierResponse and recallResult remain separate facts.
-- Kagawa False Opening is same-target and expires at the following owner action
-  opportunity if unused.
-- M11 transient action state expiry uses the real transientStates runtime collection.
-- No Battle victory -> death/custody/faction-truth/Recall-success collapse.
-
-BRICKS 5300–5499 — MISSION 12 EXECUTABLE STAGED COMBAT
+BRICKS 5500–5599 — GRASS + RAIN REGIONAL REGISTRATION
 ------------------------------------------------------
-Stable person: arc1_ren
+- Added region key `grass`.
+- Added region key `rain`.
+- Bound Grass to Backgrounds/inside_LOG.png.
+- Bound Rain to Backgrounds/inside_LOR.png.
+- Reused existing regional-map architecture; no second navigation system.
+- Did NOT invent exact village pixel anchors while no calibrated regional coordinates exist.
+- Villages remain legitimate known destinations through existing non-spatial destination bridge.
 
-Exact runtime calibrations:
-  Menma Stage 1 representation: Base PL36
-  Echo Menma: Base PL63
-  Ren Stage 1: Effective PL54
-  Ren Stage 2: Effective PL60
-  Ren Stage 3: Effective PL73
-  Borrowed-Kurama climax projection: Effective PL80
-  Borrowed-Kurama effective Stats: 80/64/39/57/74/35/85
+BRICKS 5600–5649 — VILLAGE PROJECTION
+-------------------------------------
+- Registered Kusagakure with Backgrounds/kusa.png.
+- Registered Amegakure with Backgrounds/ame.png.
+- Reused generic village renderer.
+- Village identity remains separate from country macro anchor.
 
-Stage safeguards:
-- Stage 2 and Stage 3 require explicit factual Story transition authority.
-- Direct stage skipping is fail-closed.
-- one Ren historical person is preserved across all stages.
-- Hosted Entities create no extra recurring turns / slots / PL ledgers.
-- Stage-1 Shared Read: Guided Strike 19 -> 23 against exact same target.
-- Stage-2 Route Read: Threaded Route Burst 37 -> 42 against exact same target.
-- Stage-2 Adaptive Reroute removes only explicitly reroute-bypassable adverse route state.
-- Stage-2 Counterflow is a normal selected action gated by prior hosted-route use.
-- Stage-3 Emergency Reroute is <=50%, restores exactly 12, once, normal selected action.
-- Stage-3 route disruption blocks only authored hosted / borrowed-Kurama route traits.
-- Route suppression requires positive final damage, is not Stun, and is reroute-bypassable.
-- Routed Burst is one PL52 packet.
-- Temporary Kurama actions coexist with the permanent Echo Menma action package.
-- Stage-3 Battle palette is not capped to the ordinary five-card deck.
-- Borrowed-Kurama cleanup grants no persistent Kurama unlock.
-- Save restoration rematerialises the transient Mission-12 Menma Battle projection.
+BRICKS 5650–5749 — WORLD MAP V2 PROJECTION
+-------------------------------------------
+- Retired old five hardcoded country pins from index.html.
+- Added code-owned runtime marker layer.
+- Added code-owned focus card.
+- Corrected World Map canvas ratio from obsolete 3:2 to exact 1672:941.
+- Registered all 16 known country identities at final production anchors.
+- Current actionable regional surfaces:
+    earth
+    wind
+    grass
+    rain
+    fire
+    lightning
+    water
+- Remaining nine countries are known geography but not actionable.
+- Known geography does not fabricate region map, village, capital, mission, event, or travel access.
 
-FINAL DELIVERY HARDENING
-------------------------
-Four implementation defects in the in-progress candidate were caught and corrected
-before this ZIP:
-1. wrong stat-key helper reference in custom M12 fixed-PL player actions;
-2. ordinary five-card renderer hiding the four temporary Stage-3 Kurama actions;
-3. Ren retention actions not yet establishing exact positive-damage route Conditions;
-4. M11/M12 expiry helpers reading nonexistent runtime.states instead of transientStates.
+BRICKS 5750–5799 — SECRET RESERVATIONS + PERSISTENCE
+-----------------------------------------------------
+- Added seven locked gold-halo `????` projections for world:S01 -> world:S07.
+- Locked projection does not include canonical secret identity in player-facing renderer.
+- Locked halo does not create travel/access.
+- world:S08 receives no ordinary terrain marker.
+- Added worldMapRuntime persistence schema / normalisation for reveal/access state.
+- Presentation refresh does not reroll semantic state.
+
+PRESERVES
+---------
+- country anchor != village anchor
+- country marker != travel access
+- country != regional map
+- known geography != actionable destination
+- secret reservation != discovered identity
+- discovered identity != actionability
+- `????` halo != access
+- world truth != observer Knowledge != presentation
+- World Map != regional standing-event pool
+- presentation refresh != semantic reroll/recommit
+- final asset committed != runtime/browser validated != Golden GREEN
 
 VALIDATION
 ----------
-Exact final candidate:
-  node --check game.js: PASS
+Exact packaged game.js:
+- node --check: PASS
 
-Deterministic/static delivery gate:
-  one M2–M10 authority registry: PASS
-  no invalid runtime.states access: PASS
-  M12 player fixed-attack stat resolver: PASS
-  Stage-3 full authored palette projection: PASS
-  Stage-1 hosted-route suppression contract: PASS
-  Stage-3 hosted + borrowed-route suppression contract: PASS
-  Adaptive-Reroute bypass metadata: PASS
-  M12 Battle restore rematerialisation hook: PASS
-  M5 existing encounter reuse: PASS
-  M7 existing encounter reuse: PASS
-  Issue-58 fail-close preserved: PASS
-  PL36 / PL63 / PL54 / PL60 / PL73 / PL80 constants: PASS
-  Routed Burst PL52 single-packet source: PASS
-  no persistent Kurama unlock: PASS
+Exact packaged style.css:
+- tinycss2 top-level parse errors: 0
 
-Earlier in this implementation cycle, M2 -> M3 -> M4 scene progression and an actual
-Mission-12 Stage-1 authored action were exercised successfully in the local runtime
-harness. Full browser Golden is NOT claimed.
+Delivery/static contract checks:
+  world_map_runtime_layer: PASS
+  world_map_focus_card: PASS
+  obsolete_five_pin_markup_removed: PASS
+  world_map_exact_aspect: PASS
+  sixteen_country_registry: PASS
+  grass_country: PASS
+  rain_country: PASS
+  grass_region_asset: PASS
+  rain_region_asset: PASS
+  kusagakure_asset: PASS
+  amegakure_asset: PASS
+  seven_locked_secret_projection: PASS
+  s08_nonphysical: PASS
+  secret_zero_leak_diagnostic: PASS
+  world_map_save_schema: PASS
+  seven_region_diagnostic_present: PASS
+
+The candidate also contains:
+  runAlphaSevenNationAndWorldMapV2Diagnostics()
+
+That diagnostic covers exact native dimensions, all 16 country addresses/anchors,
+Grass/Rain/village registration, seven playable regions, nine known-only countries,
+seven physical secret anchors, secret-name/address leakage protection, locked access,
+S08 non-physical behavior, persistence schema, runtime marker-layer use, and legacy
+Five-Nation regression.
 
 BROWSER / GOLDEN STATUS
 -----------------------
 Browser Golden: NOT CLAIMED.
 Whole-Alpha Golden: NOT CLAIMED.
 
-The available sandbox Chromium environment is policy-blocked for the normal local-host
-integration route, so Stephen's local browser remains the browser-integration authority.
+Stephen's local browser remains the final integration authority for this package.
 
-OPEN ARC-1 BLOCKERS
--------------------
-#58 remains unresolved at packaging time:
-  [HANDOFF][TO: CE-COORDINATION][SEND NOW]
-  Close pre-Whisper three-person trace producer for Arc 1 first run
+OUTSIDE THIS TRANCHE
+--------------------
+This delivery does not claim completion of:
+- Land of Fire standing ecology Issue #44;
+- the fresh-save Arc-1 blocker chain;
+- dynamic post-Promotion candidate implementation returned from Acquisition;
+- whole-Alpha browser/Golden regression.
 
-Missing legitimate fresh-run producer:
-  arc1_m1_caravan_three_person_trace_confirmed
-
-Coding intentionally does not inject that fact.
-
-#41 remains OPEN at packaging time.
-This package materially implements/hardens M11/M12 Combat runtime, but full Story
-caller/return + save/load/browser regression proof has not yet been claimed complete.
-
-M11/M12 machine-addressed Story caller/transition authority remains the next Story-side
-runtime seam after M10. Coding does not invent it from the narrative skeleton.
-
-BACKEND
--------
-No paid backend is required for the current local Alpha target.
-Current browser/local persistence remains sufficient for the intended single-machine
-Alpha flow. Add a backend only when account/cloud/multiplayer/server authority
-requirements actually demand one.
+Those continue in Brick 5800+ work.
 
 ROLLBACK
 --------
-BRICKS 3500–4499:
-  committed production checkpoint c4406bfffa47322b3ac149bd3c790a7669288acd
+BRICKS 4500–5499 production game.js:
+  4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
 
-BRICKS 4500–5499:
-  this ZIP / candidate result game.js blob 4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
+BRICKS 5500–5799 candidate game.js:
+  9f04edf38a584334459b396cea69a9050227b9f6
 
-Brick numbering is a revision/search address, not a Golden claim.
+Brick numbering is a rollback/search address, not a Golden claim.

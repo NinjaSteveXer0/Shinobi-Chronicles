@@ -694,21 +694,17 @@ body {
 
 
 /*
-   THIS IS THE IMPORTANT PART.
+   BRICKS 5500+ — WORLD MAP V2 EXACT IMAGE RECTANGLE
 
-   Your artwork is 3:2.
-
-   All pins now calculate their percentages from this exact
-   map rectangle.
+   Production authority is 1672 x 941. Country and secret coordinates
+   are normalised against this exact image-content rectangle.
 */
 
 .world-map-canvas {
-  width: min(
-    100%,
-    calc((100vh - 120px) * 1.5)
-  );
+  width: 100%;
+  max-width: calc((100vh - 78px) * 1.7768331562);
 
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 1672 / 941;
 
   position: relative;
 
@@ -733,7 +729,7 @@ body {
 
   display: block;
 
-  object-fit: fill;
+  object-fit: contain;
 
   filter:
   brightness(1.00)
@@ -17392,3 +17388,206 @@ body {
 .alpha-weapons-runtime,.alpha-spar-runtime,.alpha-mentorship-runtime{position:absolute;inset:10% 1.3% 2%;display:grid;grid-template-columns:27% 1fr 27%;gap:1%;min-height:0}.training-character-panel,.training-weapon-panel,.training-fighter,.training-mentor-person,.training-progress-panel,.training-spar-center,.training-mentor-center{border:1px solid rgba(186,145,61,.55);background:rgba(3,9,13,.82);padding:5%;display:flex;flex-direction:column;gap:10px;min-height:0}.training-progress-panel,.training-spar-center,.training-mentor-center{align-items:center;justify-content:center;text-align:center}.training-character-panel img,.training-fighter img,.training-mentor-person img{width:72%;aspect-ratio:1;object-fit:cover;align-self:center;border:1px solid #927039}.training-character-panel strong,.training-fighter strong,.training-mentor-person strong,.training-weapon-panel strong{font:700 clamp(16px,1.5vw,26px) Georgia,serif}.alpha-training-screen select{width:100%;min-height:36px;background:#061017;color:#dae1df;border:1px solid #49616c;padding:6px}.training-proficiency{width:90%;display:grid;gap:8px}.training-proficiency>strong{font-size:clamp(28px,4vw,64px);color:#bd77e9}.training-proficiency>div{height:12px;background:#111;border:1px solid #695132}.training-proficiency i{display:block;height:100%;background:linear-gradient(90deg,#7040a5,#b96ff0)}.training-back{position:absolute;top:2%;left:2%;background:transparent;border:0;color:#d4ae59;cursor:pointer}.training-spar-center h2{font:700 clamp(48px,7vw,110px) Georgia,serif;color:#ffd274;text-shadow:0 0 22px #c67d18}.training-mentor-center h2{font:700 clamp(24px,3vw,46px) Georgia,serif;color:#e0b65d}.alpha-training-feedback{position:absolute;left:50%;bottom:1.5%;transform:translateX(-50%);max-width:70%;padding:8px 15px;background:#071218;border:1px solid #c08f36;color:#e8c878;font-size:11px;z-index:20}.training-primary:disabled{opacity:.35;cursor:not-allowed}
 .alpha-mission-command{width:min(900px,92vw);margin:auto;padding:30px;border:1px solid #9b762f;background:linear-gradient(180deg,#081117,#03070a);color:#d9e0dd}.alpha-mission-command header{display:flex;align-items:center;border-bottom:1px solid #4d3c20;padding-bottom:15px}.alpha-mission-command header span{color:#d3aa51;font-weight:900}.alpha-mission-command header h2{margin:auto;font:700 34px Georgia,serif;color:#f0d991}.alpha-mission-command header button{width:40px}.alpha-mission-command section{display:grid;gap:14px;padding:30px}.alpha-mission-command section>small{color:#6fc9da;letter-spacing:.12em}.alpha-mission-command section>strong{font-size:26px}.alpha-mission-command p{color:#9fadb0;line-height:1.55}.alpha-mission-status{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px;background:#061016;border:1px solid #233947}.alpha-mission-status span{text-align:right;color:#d8b75d}
 @media(max-width:900px){.alpha-weapons-runtime,.alpha-spar-runtime,.alpha-mentorship-runtime{grid-template-columns:1fr;overflow:auto}.alpha-training-stage{aspect-ratio:auto;min-height:760px}.alpha-training-options{grid-template-columns:1fr}.alpha-arena-runtime-panel{left:5%;right:5%}}
+
+
+/* =========================================================
+   BRICKS 5500–5799 — WORLD MAP V2 RUNTIME PROJECTION
+   ========================================================= */
+
+.world-map-runtime-markers {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+
+.world-country-marker,
+.world-secret-halo {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: auto;
+  font: inherit;
+}
+
+.world-country-marker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.world-country-marker-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.92);
+  background: #64748b;
+  box-shadow: 0 0 8px rgba(148,163,184,.5);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+}
+
+.world-country-marker-label {
+  display: block;
+  max-width: 116px;
+  padding: 2px 5px;
+  border: 1px solid rgba(38,52,72,.82);
+  border-radius: 3px;
+  background: rgba(4,7,11,.86);
+  color: rgba(255,255,255,.88);
+  font-size: 7px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: .25px;
+  text-align: center;
+  white-space: nowrap;
+  box-shadow: 0 2px 7px rgba(0,0,0,.42);
+}
+
+.world-country-marker.is-five-great .world-country-marker-dot {
+  background: #d6a93a;
+  box-shadow: 0 0 8px rgba(214,169,58,.85), 0 0 15px rgba(214,169,58,.36);
+}
+
+.world-country-marker.is-smaller .world-country-marker-dot {
+  width: 10px;
+  height: 10px;
+  background: #64748b;
+  box-shadow: 0 0 7px rgba(148,163,184,.48);
+}
+
+.world-country-marker.is-actionable .world-country-marker-dot {
+  background: #00d9e8;
+  box-shadow: 0 0 8px rgba(0,217,232,.9), 0 0 16px rgba(0,217,232,.4);
+}
+
+.world-country-marker.is-actionable .world-country-marker-label {
+  border-color: rgba(0,217,232,.42);
+  color: #e9fdff;
+}
+
+.world-country-marker.is-known-only {
+  cursor: default;
+  opacity: .78;
+}
+
+.world-country-marker:hover .world-country-marker-dot,
+.world-country-marker:focus-visible .world-country-marker-dot {
+  transform: scale(1.22);
+  box-shadow: 0 0 10px rgba(214,169,58,.9), 0 0 19px rgba(214,169,58,.42);
+}
+
+.world-country-marker:hover .world-country-marker-label,
+.world-country-marker:focus-visible .world-country-marker-label {
+  color: #f5d773;
+  border-color: rgba(214,169,58,.7);
+}
+
+.world-country-marker:focus-visible,
+.world-secret-halo:focus-visible {
+  outline: 1px solid rgba(255,255,255,.9);
+  outline-offset: 4px;
+}
+
+.world-secret-halo {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(214,169,58,.95);
+  background: radial-gradient(circle, rgba(214,169,58,.13) 0%, rgba(214,169,58,.04) 42%, rgba(0,0,0,0) 72%);
+  color: #f0c54e;
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(214,169,58,.55), 0 0 17px rgba(214,169,58,.22), inset 0 0 7px rgba(214,169,58,.16);
+  animation: worldSecretHaloPulse 2.6s ease-in-out infinite;
+}
+
+.world-secret-halo::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(214,169,58,.42);
+  border-radius: 50%;
+}
+
+.world-secret-halo-label {
+  position: absolute;
+  top: 31px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 2px 5px;
+  border: 1px solid rgba(214,169,58,.46);
+  border-radius: 3px;
+  background: rgba(4,7,11,.92);
+  color: #f0c54e;
+  font-size: 7px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  white-space: nowrap;
+  box-shadow: 0 2px 7px rgba(0,0,0,.5);
+}
+
+@keyframes worldSecretHaloPulse {
+  0%,100% { transform: translate(-50%, -50%) scale(.94); opacity: .82; }
+  50% { transform: translate(-50%, -50%) scale(1.08); opacity: 1; }
+}
+
+.world-map-focus-card {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 9;
+  width: min(280px, 36%);
+  padding: 12px 14px;
+  border: 1px solid rgba(214,169,58,.5);
+  border-radius: 6px;
+  background: linear-gradient(145deg, rgba(7,11,17,.97), rgba(4,7,11,.96));
+  box-shadow: 0 10px 28px rgba(0,0,0,.52), 0 0 18px rgba(214,169,58,.08);
+}
+
+.world-map-focus-card[hidden] {
+  display: none !important;
+}
+
+.world-map-focus-card strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #f5d773;
+  font-size: 11px;
+  letter-spacing: .5px;
+}
+
+.world-map-focus-card span {
+  display: block;
+  margin-bottom: 7px;
+  color: #00d9e8;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .8px;
+}
+
+.world-map-focus-card p {
+  color: #a7b2c2;
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1180px) {
+  .world-country-marker-label {
+    max-width: 92px;
+    font-size: 6px;
+    padding: 2px 4px;
+  }
+  .world-secret-halo {
+    width: 24px;
+    height: 24px;
+  }
+  .world-secret-halo-label {
+    top: 25px;
+    font-size: 6px;
+  }
+}

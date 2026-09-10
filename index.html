@@ -334,14 +334,14 @@
       </div>
 
       <div class="progress-block">
-        <span>Regions Discovered</span>
-        <b>18 / 42</b>
+        <span>Known Countries</span>
+        <b>16 / 16</b>
       </div>
 
       <div class="progress-bar-shell">
         <div
           class="progress-bar-fill"
-          style="width: 42%;"
+          style="width: 100%;"
         ></div>
       </div>
 
@@ -350,14 +350,14 @@
         class="progress-block"
         style="margin-top: 11px;"
       >
-        <span>Missions Completed</span>
-        <b>84 / 350</b>
+        <span>Playable Regional Surfaces</span>
+        <b>7 / 16</b>
       </div>
 
       <div class="progress-bar-shell">
         <div
           class="progress-bar-fill"
-          style="width: 24%;"
+          style="width: 43.75%;"
         ></div>
       </div>
 
@@ -375,32 +375,27 @@
 
         <div class="legend-row">
           <span class="legend-dot unlocked"></span>
-          <span>Unlocked Region</span>
+          <span>Playable Region</span>
         </div>
 
         <div class="legend-row">
           <span class="legend-dot locked"></span>
-          <span>Locked Region</span>
+          <span>Known Geography</span>
         </div>
 
         <div class="legend-row">
           <span class="legend-dot premium"></span>
-          <span>Premium Area</span>
-        </div>
-
-        <div class="legend-row">
-          <span class="legend-dot threat"></span>
-          <span>High Threat</span>
+          <span>Five Great Country</span>
         </div>
 
         <div class="legend-row">
           <span class="legend-dot main"></span>
-          <span>Main Story</span>
+          <span>Smaller Country</span>
         </div>
 
         <div class="legend-row">
           <span class="legend-dot special"></span>
-          <span>Special Area</span>
+          <span>???? — Unknown Special Location</span>
         </div>
 
       </div>
@@ -455,7 +450,7 @@
       Therefore marker percentages are percentages of the MAP,
       not percentages of the browser viewport.
     -->
-    <div class="world-map-canvas">
+    <div class="world-map-canvas" aria-label="Shinobi Chronicles world geography">
 
       <img
         class="world-map-image"
@@ -463,70 +458,24 @@
         alt="Shinobi Chronicles World Map"
       >
 
+      <!--
+        BRICKS 5500+ — WORLD MAP V2 RUNTIME PROJECTION
+        Countries and high-profile known-unknown reservations are code-owned.
+        The terrain PNG is presentation only; runtime markers are projected
+        against its exact 1672 x 941 image rectangle.
+      -->
+      <div
+        id="world-map-runtime-markers"
+        class="world-map-runtime-markers"
+        aria-label="World locations"
+      ></div>
 
-      <!-- LAND OF EARTH -->
-<button
-  type="button"
-  class="map-node-pin pin-earth"
-  style="left: 17%; top: 27%;"
-  onclick="openRegionHub('earth')"
-  aria-label="Open Land of Earth"
->
-  <span class="pin-glow"></span>
-  <span class="pin-label">Land of Earth</span>
-</button>
-
-
-<!-- LAND OF WIND -->
-<button
-  type="button"
-  class="map-node-pin pin-wind"
-  style="left: 18%; top: 43%;"
-  onclick="openRegionHub('wind')"
-  aria-label="Open Land of Wind"
->
-  <span class="pin-glow"></span>
-  <span class="pin-label">Land of Wind</span>
-</button>
-
-
-<!-- LAND OF FIRE -->
-<button
-  type="button"
-  class="map-node-pin pin-fire"
-  style="left: 36%; top: 48%;"
-  onclick="openRegionHub('fire')"
-  aria-label="Open Land of Fire"
->
-  <span class="pin-glow"></span>
-  <span class="pin-label">Land of Fire</span>
-</button>
-
-
-<!-- LAND OF WATER -->
-<button
-  type="button"
-  class="map-node-pin pin-water"
-  style="left: 53%; top: 59%;"
-  onclick="openRegionHub('water')"
-  aria-label="Open Land of Water"
->
-  <span class="pin-glow"></span>
-  <span class="pin-label">Land of Water</span>
-</button>
-
-
-<!-- LAND OF LIGHTNING -->
-<button
-  type="button"
-  class="map-node-pin pin-lightning"
-  style="left: 69%; top: 58%;"
-  onclick="openRegionHub('lightning')"
-  aria-label="Open Land of Lightning"
->
-  <span class="pin-glow"></span>
-  <span class="pin-label">Land of Lightning</span>
-</button>
+      <aside
+        id="world-map-focus-card"
+        class="world-map-focus-card"
+        aria-live="polite"
+        hidden
+      ></aside>
 
 </div> <!-- CLOSE .world-map-canvas -->
 

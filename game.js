@@ -8654,6 +8654,53 @@ function normalizeOriginConsequenceState(savedState) {
   };
 }
 
+
+// =========================================================
+// BRICKS 5500–5508 — WORLD MAP V2 SAVEABLE PRESENTATION STATE
+// =========================================================
+// This state owns only map-projection continuity. It does not grant travel,
+// discovery Knowledge, event eligibility, village access or secret identity.
+// The seven current high-profile secret reservations intentionally begin in
+// KNOWN_UNKNOWN_LOCKED and remain there until another owning system supplies
+// an exact reveal/access consequence.
+function createDefaultWorldMapRuntimeState() {
+  return {
+    secretProjectionByAddress:{
+      "world:S01":{state:"KNOWN_UNKNOWN_LOCKED"},
+      "world:S02":{state:"KNOWN_UNKNOWN_LOCKED"},
+      "world:S03":{state:"KNOWN_UNKNOWN_LOCKED"},
+      "world:S04":{state:"KNOWN_UNKNOWN_LOCKED"},
+      "world:S05":{state:"KNOWN_UNKNOWN_LOCKED"},
+      "world:S06":{state:"KNOWN_UNKNOWN_LOCKED"},
+      "world:S07":{state:"KNOWN_UNKNOWN_LOCKED"}
+    }
+  };
+}
+
+function normalizeWorldMapRuntimeState(savedState) {
+  const defaults=createDefaultWorldMapRuntimeState();
+  const source=savedState&&typeof savedState==="object"&&!Array.isArray(savedState)?savedState:{};
+  const raw=source.secretProjectionByAddress&&typeof source.secretProjectionByAddress==="object"&&!Array.isArray(source.secretProjectionByAddress)
+    ? source.secretProjectionByAddress
+    : {};
+  const secretProjectionByAddress={};
+  Object.keys(defaults.secretProjectionByAddress).forEach(address=>{
+    const candidate=raw[address]&&typeof raw[address]==="object"?raw[address]:{};
+    // No reveal predicate is yet implemented for this family. Fail closed.
+    secretProjectionByAddress[address]={state:"KNOWN_UNKNOWN_LOCKED"};
+    void candidate;
+  });
+  return {secretProjectionByAddress};
+}
+
+function ensureWorldMapRuntimeState() {
+  if (!playerData.worldMapRuntime||typeof playerData.worldMapRuntime!=="object"||Array.isArray(playerData.worldMapRuntime)) {
+    playerData.worldMapRuntime=createDefaultWorldMapRuntimeState();
+  }
+  playerData.worldMapRuntime=normalizeWorldMapRuntimeState(playerData.worldMapRuntime);
+  return playerData.worldMapRuntime;
+}
+
 function createDefaultPlayerData() {
   const characterOwnership = createDefaultCharacterOwnershipState();
   setCharacterOwnershipRuntimeAuthority(characterOwnership);
@@ -8676,6 +8723,8 @@ function createDefaultPlayerData() {
     // It is separate from activityHistory: discovery/actionability/tracking/resolution
     // are current authoritative dimensions, while history records committed occurrences.
     worldEventRuntime: createDefaultWorldEventRuntimeState(),
+    // BRICKS 5500–5508 — saveable World Map v2 projection continuity.
+    worldMapRuntime: createDefaultWorldMapRuntimeState(),
     // BRICK 916 — committed encounter reservation/current-state identity.
     encounterRuntime: createDefaultEncounterRuntimeState(),
     // BRICK 742 — STORY SCENE RUNTIME IS SAVEABLE CURRENT STATE, NOT HISTORY
@@ -9164,6 +9213,8 @@ function loadPlayerData() {
       // Old saves with no worldEventRuntime receive the empty schema; malformed
       // dimension tables are normalized without inventing discovery or resolution.
       worldEventRuntime: normalizeWorldEventRuntimeState(parsedData.worldEventRuntime),
+      // BRICKS 5500–5508 — restore World Map projection state without inventing reveal/access.
+      worldMapRuntime: normalizeWorldMapRuntimeState(parsedData.worldMapRuntime),
       // BRICK 921 — preserve reserved/started encounter identity across reload.
       encounterRuntime: normalizeEncounterRuntimeState(parsedData.encounterRuntime),
       // BRICK 742 — restore current scene continuation state without inventing a story ledger.
@@ -41651,6 +41702,57 @@ Object.entries(ALPHA_MAJOR_REGION_SURFACE_DEFINITIONS).forEach(([regionKey,defin
   };
 });
 
+// =========================================================
+// BRICKS 5509–5535 — LAND OF GRASS / LAND OF RAIN SURFACES
+// =========================================================
+// Current repository authority now contains both smaller-country regional
+// masters plus their village masters. No regional/village pixel coordinate is
+// inferred here; each village uses the existing non-spatial known-destination
+// bridge until a dedicated calibration is authored.
+const ALPHA_ADDITIONAL_REGION_SURFACE_DEFINITIONS=Object.freeze({
+  grass:Object.freeze({
+    name:"Land of Grass",
+    description:"A fertile west-central transition country linking larger powers.",
+    mapImage:"./Backgrounds/inside_LOG.png",
+    capitalVillageId:"kusagakure",
+    spatialCalibrationStatus:"pending_revalidation",
+    locations:Object.freeze([
+      Object.freeze({
+        id:"kusagakure",name:"Kusagakure",shortName:"Kusagakure",type:"village",
+        category:"HIDDEN VILLAGE",desc:"The Hidden Grass Village.",
+        spatialAnchorStatus:"pending_revalidation"
+      })
+    ])
+  }),
+  rain:Object.freeze({
+    name:"Land of Rain",
+    description:"A river-heavy geopolitical crossroads between western and central powers.",
+    mapImage:"./Backgrounds/inside_LOR.png",
+    capitalVillageId:"amegakure",
+    spatialCalibrationStatus:"pending_revalidation",
+    locations:Object.freeze([
+      Object.freeze({
+        id:"amegakure",name:"Amegakure",shortName:"Amegakure",type:"village",
+        category:"HIDDEN VILLAGE",desc:"The Hidden Rain Village.",
+        spatialAnchorStatus:"pending_revalidation"
+      })
+    ])
+  })
+});
+
+Object.entries(ALPHA_ADDITIONAL_REGION_SURFACE_DEFINITIONS).forEach(([regionKey,definition])=>{
+  if (worldRegions[regionKey]) return;
+  worldRegions[regionKey]={
+    name:definition.name,
+    description:definition.description,
+    mapImage:definition.mapImage,
+    capitalVillageId:definition.capitalVillageId,
+    spatialCalibrationStatus:definition.spatialCalibrationStatus,
+    progress:null,
+    locations:definition.locations.map(location=>({...location}))
+  };
+});
+
 // Existing Fire runtime remains the only currently spatially-populated major
 // regional surface. This flag records presentation provenance only.
 worldRegions.fire.capitalVillageId="konohagakure";
@@ -42439,6 +42541,14 @@ const ALPHA_VILLAGE_MAP_DEFINITIONS=Object.freeze({
   kumogakure:Object.freeze({
     locationId:"kumogakure",regionKey:"lightning",name:"Kumogakure",epithet:"Hidden Cloud Village",
     mapImage:"Backgrounds/kumo.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
+  }),
+  kusagakure:Object.freeze({
+    locationId:"kusagakure",regionKey:"grass",name:"Kusagakure",epithet:"Hidden Grass Village",
+    mapImage:"Backgrounds/kusa.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
+  }),
+  amegakure:Object.freeze({
+    locationId:"amegakure",regionKey:"rain",name:"Amegakure",epithet:"Hidden Rain Village",
+    mapImage:"Backgrounds/ame.png",spatialCalibrationStatus:"pending_revalidation",supportsKonohaActivities:false
   })
 });
 
@@ -101855,3 +101965,230 @@ function runAlphaBrick5499DeliveryHardeningDiagnostics(){
   checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
   console.table(checks);return{pass:checks.pass,checks};
 }
+
+// =========================================================
+// BRICKS 5536–5799 — WORLD MAP V2 COUNTRY / SECRET PROJECTION
+// =========================================================
+// Final production authority consumed:
+// - Backgrounds/WorldMap.png = 1672 x 941
+// - world:C01 -> world:C16 known country anchors
+// - world:S01 -> world:S07 known-unknown locked halo anchors
+// - world:S08 remains non-physical / no terrain marker
+//
+// Country presentation != actionability.
+// The five Great Countries plus the newly supplied Grass/Rain regional surfaces
+// are currently navigable. The remaining smaller countries stay known geography
+// with no fabricated regional map or travel action.
+// =========================================================
+
+const WORLD_MAP_V2_NATIVE_SIZE=Object.freeze({width:1672,height:941});
+
+const WORLD_MAP_V2_COUNTRY_DEFINITIONS=Object.freeze([
+  Object.freeze({address:"world:C01",markerId:"world_country_earth",name:"Land of Earth",tier:"Five Great",x:17.0,y:23.9,regionKey:"earth"}),
+  Object.freeze({address:"world:C02",markerId:"world_country_wind",name:"Land of Wind",tier:"Five Great",x:17.0,y:59.0,regionKey:"wind"}),
+  Object.freeze({address:"world:C03",markerId:"world_country_snow",name:"Land of Snow",tier:"Smaller",x:42.2,y:10.1,regionKey:null}),
+  Object.freeze({address:"world:C04",markerId:"world_country_iron",name:"Land of Iron",tier:"Smaller",x:43.1,y:21.8,regionKey:null}),
+  Object.freeze({address:"world:C05",markerId:"world_country_sound",name:"Land of Sound",tier:"Smaller",x:32.0,y:26.0,regionKey:null}),
+  Object.freeze({address:"world:C06",markerId:"world_country_grass",name:"Land of Grass",tier:"Smaller",x:31.1,y:38.3,regionKey:"grass"}),
+  Object.freeze({address:"world:C07",markerId:"world_country_rain",name:"Land of Rain",tier:"Smaller",x:42.2,y:42.5,regionKey:"rain"}),
+  Object.freeze({address:"world:C08",markerId:"world_country_fire",name:"Land of Fire",tier:"Five Great",x:51.1,y:44.6,regionKey:"fire"}),
+  Object.freeze({address:"world:C09",markerId:"world_country_valleys",name:"Land of Valleys",tier:"Smaller",x:39.5,y:59.0,regionKey:null}),
+  Object.freeze({address:"world:C10",markerId:"world_country_rivers",name:"Land of Rivers",tier:"Smaller",x:49.9,y:62.2,regionKey:null}),
+  Object.freeze({address:"world:C11",markerId:"world_country_hot_water",name:"Land of Hot Water",tier:"Smaller",x:61.9,y:30.3,regionKey:null}),
+  Object.freeze({address:"world:C12",markerId:"world_country_lightning",name:"Land of Lightning",tier:"Five Great",x:70.3,y:15.9,regionKey:"lightning"}),
+  Object.freeze({address:"world:C13",markerId:"world_country_waterfall",name:"Land of Waterfall",tier:"Smaller",x:71.5,y:36.1,regionKey:null}),
+  Object.freeze({address:"world:C14",markerId:"world_country_tea",name:"Land of Tea",tier:"Smaller",x:65.5,y:81.3,regionKey:null}),
+  Object.freeze({address:"world:C15",markerId:"world_country_whirlpool",name:"Land of Whirlpool",tier:"Smaller",x:86.7,y:55.3,regionKey:null}),
+  Object.freeze({address:"world:C16",markerId:"world_country_water",name:"Land of Water",tier:"Five Great",x:90.9,y:28.7,regionKey:"water"})
+]);
+
+// Intentionally contains no canonical secret names. While locked, the World Map
+// needs only opaque authoring addresses + geometry + the player-facing ???? state.
+const WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS=Object.freeze([
+  Object.freeze({address:"world:S01",x:31.1,y:35.1}),
+  Object.freeze({address:"world:S02",x:57.1,y:15.4}),
+  Object.freeze({address:"world:S03",x:58.3,y:53.7}),
+  Object.freeze({address:"world:S04",x:23.9,y:32.4}),
+  Object.freeze({address:"world:S05",x:55.3,y:85.0}),
+  Object.freeze({address:"world:S06",x:70.0,y:36.7}),
+  Object.freeze({address:"world:S07",x:47.8,y:18.1})
+]);
+
+var selectedWorldMapCountryAddress=null;
+
+function getWorldMapV2CountryDefinition(addressOrMarkerId) {
+  const key=String(addressOrMarkerId||"");
+  return WORLD_MAP_V2_COUNTRY_DEFINITIONS.find(country=>country.address===key||country.markerId===key)||null;
+}
+
+function isWorldMapCountryCurrentlyActionable(country) {
+  if (!country||!country.regionKey) return false;
+  const region=worldRegions[country.regionKey];
+  return !!(region&&region.mapImage);
+}
+
+function renderWorldMapFocusCard({title="",status="",body=""}={}) {
+  if (typeof document==="undefined") return false;
+  const card=document.getElementById("world-map-focus-card");
+  if (!card) return false;
+  card.hidden=false;
+  card.innerHTML=`<strong>${escapeStorySceneHTML(title)}</strong><span>${escapeStorySceneHTML(status)}</span><p>${escapeStorySceneHTML(body)}</p>`;
+  return true;
+}
+
+function clearWorldMapFocusCard() {
+  if (typeof document==="undefined") return false;
+  const card=document.getElementById("world-map-focus-card");
+  if (!card) return false;
+  card.hidden=true;
+  card.innerHTML="";
+  selectedWorldMapCountryAddress=null;
+  return true;
+}
+
+function handleWorldMapCountryActivation(address) {
+  const country=getWorldMapV2CountryDefinition(address);
+  if (!country) return {success:false,reason:"world_country_marker_missing"};
+  selectedWorldMapCountryAddress=country.address;
+  if (isWorldMapCountryCurrentlyActionable(country)) {
+    clearWorldMapFocusCard();
+    openRegionHub(country.regionKey);
+    return {success:true,type:"region_navigation",address:country.address,regionKey:country.regionKey};
+  }
+  renderWorldMapFocusCard({
+    title:country.name,
+    status:"KNOWN GEOGRAPHY / NOT YET ACTIONABLE",
+    body:"This country is known on the world map, but no current regional travel surface is authorised."
+  });
+  return {success:true,type:"country_focus",address:country.address,actionable:false};
+}
+
+function focusWorldMapLockedSecret() {
+  selectedWorldMapCountryAddress=null;
+  renderWorldMapFocusCard({
+    title:"????",
+    status:"UNKNOWN SPECIAL LOCATION",
+    body:"A special destination is known to exist in this vicinity. Its identity and access requirements remain undiscovered."
+  });
+  return {success:true,type:"locked_secret_focus",identityRevealed:false,actionable:false};
+}
+
+function renderWorldMapV2CountryMarker(country) {
+  const actionable=isWorldMapCountryCurrentlyActionable(country);
+  const tierClass=country.tier==="Five Great"?"is-five-great":"is-smaller";
+  const actionClass=actionable?"is-actionable":"is-known-only";
+  const aria=actionable
+    ? `Open ${country.name} regional map`
+    : `${country.name}, known geography, regional travel unavailable`;
+  return `<button type="button" class="world-country-marker ${tierClass} ${actionClass}" style="left:${country.x}%;top:${country.y}%;" onclick="handleWorldMapCountryActivation('${country.address}')" aria-label="${escapeStorySceneHTML(aria)}" title="${escapeStorySceneHTML(country.name)}"><span class="world-country-marker-dot" aria-hidden="true"></span><span class="world-country-marker-label">${escapeStorySceneHTML(country.name)}</span></button>`;
+}
+
+function renderWorldMapV2LockedSecretMarker(secret,index) {
+  const runtime=ensureWorldMapRuntimeState();
+  const state=runtime.secretProjectionByAddress&&runtime.secretProjectionByAddress[secret.address]
+    ? runtime.secretProjectionByAddress[secret.address].state
+    : "KNOWN_UNKNOWN_LOCKED";
+  if (state!=="KNOWN_UNKNOWN_LOCKED") return "";
+  // No secret address/name is exposed through DOM id, dataset, tooltip or aria.
+  return `<button type="button" class="world-secret-halo" style="left:${secret.x}%;top:${secret.y}%;" onclick="focusWorldMapLockedSecret()" aria-label="Unknown special location" title="Unknown special location"><span class="world-secret-halo-label">????</span></button>`;
+}
+
+function renderWorldMapV2Projection() {
+  if (typeof document==="undefined") return {success:false,reason:"dom_unavailable"};
+  const layer=document.getElementById("world-map-runtime-markers");
+  if (!layer) return {success:false,reason:"world_map_runtime_layer_missing"};
+  ensureWorldMapRuntimeState();
+  const countryMarkup=WORLD_MAP_V2_COUNTRY_DEFINITIONS.map(renderWorldMapV2CountryMarker).join("");
+  const secretMarkup=WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS.map(renderWorldMapV2LockedSecretMarker).join("");
+  layer.innerHTML=countryMarkup+secretMarkup;
+  return {
+    success:true,
+    countries:WORLD_MAP_V2_COUNTRY_DEFINITIONS.length,
+    actionableCountries:WORLD_MAP_V2_COUNTRY_DEFINITIONS.filter(isWorldMapCountryCurrentlyActionable).length,
+    physicalSecretHalos:WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS.length,
+    nonPhysicalRealmMarkers:0
+  };
+}
+
+function getWorldMapV2ProjectionSnapshot() {
+  return {
+    nativeSize:{...WORLD_MAP_V2_NATIVE_SIZE},
+    countries:WORLD_MAP_V2_COUNTRY_DEFINITIONS.map(country=>({
+      address:country.address,
+      markerId:country.markerId,
+      name:country.name,
+      tier:country.tier,
+      x:country.x,
+      y:country.y,
+      regionKey:country.regionKey,
+      actionable:isWorldMapCountryCurrentlyActionable(country)
+    })),
+    physicalSecrets:WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS.map(secret=>({
+      address:secret.address,
+      x:secret.x,
+      y:secret.y,
+      state:"KNOWN_UNKNOWN_LOCKED"
+    })),
+    nonPhysicalRealmAddress:"world:S08",
+    nonPhysicalRealmHasTerrainMarker:false
+  };
+}
+
+function runAlphaSevenNationAndWorldMapV2Diagnostics() {
+  const expectedCountryAnchors={
+    "world:C01":[17.0,23.9],"world:C02":[17.0,59.0],"world:C03":[42.2,10.1],"world:C04":[43.1,21.8],
+    "world:C05":[32.0,26.0],"world:C06":[31.1,38.3],"world:C07":[42.2,42.5],"world:C08":[51.1,44.6],
+    "world:C09":[39.5,59.0],"world:C10":[49.9,62.2],"world:C11":[61.9,30.3],"world:C12":[70.3,15.9],
+    "world:C13":[71.5,36.1],"world:C14":[65.5,81.3],"world:C15":[86.7,55.3],"world:C16":[90.9,28.7]
+  };
+  const expectedSecretAnchors=[[31.1,35.1],[57.1,15.4],[58.3,53.7],[23.9,32.4],[55.3,85.0],[70.0,36.7],[47.8,18.1]];
+  const secretRendererSource=renderWorldMapV2LockedSecretMarker.toString();
+  const forbiddenSecretNames=["Ryūchi","Ryuichi","Myōboku","Myoboku","Shikkotsu","Akatsuki","Jinchūriki","Jinchuriki","Valley of the End","Sage of Six Paths"];
+  const checks={
+    exactWorldMapNativeSize:WORLD_MAP_V2_NATIVE_SIZE.width===1672&&WORLD_MAP_V2_NATIVE_SIZE.height===941,
+    allSixteenCountriesRegistered:WORLD_MAP_V2_COUNTRY_DEFINITIONS.length===16,
+    exactCountryAddresses:WORLD_MAP_V2_COUNTRY_DEFINITIONS.every((country,index)=>country.address===`world:C${String(index+1).padStart(2,"0")}`),
+    exactCountryAnchors:WORLD_MAP_V2_COUNTRY_DEFINITIONS.every(country=>expectedCountryAnchors[country.address]&&Math.abs(country.x-expectedCountryAnchors[country.address][0])<0.001&&Math.abs(country.y-expectedCountryAnchors[country.address][1])<0.001),
+    grassRegionRegistered:!!worldRegions.grass&&worldRegions.grass.mapImage==="./Backgrounds/inside_LOG.png"&&worldRegions.grass.capitalVillageId==="kusagakure",
+    rainRegionRegistered:!!worldRegions.rain&&worldRegions.rain.mapImage==="./Backgrounds/inside_LOR.png"&&worldRegions.rain.capitalVillageId==="amegakure",
+    grassVillageRegistered:!!ALPHA_VILLAGE_MAP_DEFINITIONS.kusagakure&&ALPHA_VILLAGE_MAP_DEFINITIONS.kusagakure.mapImage==="Backgrounds/kusa.png",
+    rainVillageRegistered:!!ALPHA_VILLAGE_MAP_DEFINITIONS.amegakure&&ALPHA_VILLAGE_MAP_DEFINITIONS.amegakure.mapImage==="Backgrounds/ame.png",
+    noInventedGrassRainVillageCoordinates:["grass","rain"].every(regionKey=>getRegionNonSpatialDestinations(regionKey).length===1&&worldRegions[regionKey].locations.every(location=>!hasAuthoritativeRegionAnchor(location))),
+    sevenCurrentPlayableRegions:WORLD_MAP_V2_COUNTRY_DEFINITIONS.filter(isWorldMapCountryCurrentlyActionable).length===7,
+    grassRainMacroAnchorsStayCountryAnchors:getWorldMapV2CountryDefinition("world:C06").regionKey==="grass"&&getWorldMapV2CountryDefinition("world:C07").regionKey==="rain",
+    nineKnownOnlyCountries:WORLD_MAP_V2_COUNTRY_DEFINITIONS.filter(country=>!isWorldMapCountryCurrentlyActionable(country)).length===9,
+    sevenPhysicalSecretReservations:WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS.length===7,
+    exactSecretAnchors:WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS.every((secret,index)=>Math.abs(secret.x-expectedSecretAnchors[index][0])<0.001&&Math.abs(secret.y-expectedSecretAnchors[index][1])<0.001),
+    secretCanonicalNamesAbsentFromProjection:forbiddenSecretNames.every(name=>!secretRendererSource.includes(name))&&WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS.every(secret=>Object.keys(secret).every(key=>key!=="name"&&key!=="identity")),
+    secretDOMDoesNotExposeOpaqueAddress:!renderWorldMapV2LockedSecretMarker(WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS[0],0).includes("world:S01")&&!secretRendererSource.includes("data-secret"),
+    lockedSecretHasNoAccessAction:focusWorldMapLockedSecret.toString().includes("actionable:false")&&!focusWorldMapLockedSecret.toString().includes("openRegionHub"),
+    s08HasNoTerrainMarker:getWorldMapV2ProjectionSnapshot().nonPhysicalRealmHasTerrainMarker===false,
+    worldMapRuntimeDefaultsLocked:Object.values(createDefaultWorldMapRuntimeState().secretProjectionByAddress).every(record=>record.state==="KNOWN_UNKNOWN_LOCKED"),
+    worldMapSaveSchemaInstalled:createDefaultPlayerData.toString().includes("worldMapRuntime")&&loadPlayerData.toString().includes("normalizeWorldMapRuntimeState(parsedData.worldMapRuntime)"),
+    rendererUsesRuntimeLayer:renderWorldMapV2Projection.toString().includes('getElementById("world-map-runtime-markers")'),
+    countryActionabilityDoesNotInventMissingRegions:handleWorldMapCountryActivation.toString().includes("isWorldMapCountryCurrentlyActionable")&&handleWorldMapCountryActivation.toString().includes("KNOWN GEOGRAPHY / NOT YET ACTIONABLE"),
+    oldFiveNationRegressionStillGreen:typeof runAlphaFiveNationInteractiveGeographyDiagnostics==="function"?runAlphaFiveNationInteractiveGeographyDiagnostics().pass===true:true
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(checks);
+  return {
+    pass:checks.pass,
+    checks,
+    codingStatus:checks.pass?"BRICKS_5500_5799_WORLD_MAP_V2_SEVEN_REGION_GREEN":"BRICKS_5500_5799_WORLD_MAP_V2_SEVEN_REGION_FAILED",
+    actionableRegions:WORLD_MAP_V2_COUNTRY_DEFINITIONS.filter(isWorldMapCountryCurrentlyActionable).map(country=>country.regionKey),
+    nextImplementedBrick:5799
+  };
+}
+
+function installWorldMapV2RuntimeProjection() {
+  if (typeof document==="undefined") return false;
+  const run=()=>{ renderWorldMapV2Projection(); };
+  if (document.readyState==="loading") {
+    document.addEventListener("DOMContentLoaded",run,{once:true});
+  } else {
+    run();
+  }
+  return true;
+}
+
+installWorldMapV2RuntimeProjection();
