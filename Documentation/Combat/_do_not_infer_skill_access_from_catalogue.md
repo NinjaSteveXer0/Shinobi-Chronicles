@@ -1,0 +1,1 @@
+Catalogue presence is not Skill access. Use exact Progression/capability source authority before preparing or executing a gated technique.

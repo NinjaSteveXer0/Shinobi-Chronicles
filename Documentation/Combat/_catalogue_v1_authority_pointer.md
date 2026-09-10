@@ -1,0 +1,1 @@
+Authoritative index: `Documentation/Combat/Alpha_Text_First_Combat_Content_Catalogue_v1_Index_2026-09-10.md`.
