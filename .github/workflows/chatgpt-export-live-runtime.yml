@@ -1,0 +1,35 @@
+name: ChatGPT Export Live Runtime
+
+on:
+  push:
+    branches:
+      - chatgpt-export-7300-12299-20260910
+
+permissions:
+  contents: read
+
+jobs:
+  export-runtime:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout exact branch state
+        uses: actions/checkout@v4
+      - name: Record source fingerprints
+        shell: bash
+        run: |
+          sha1sum game.js style.css index.html > source-sha1.txt
+          sha256sum game.js style.css index.html > source-sha256.txt
+          git rev-parse HEAD > source-commit.txt
+      - name: Upload runtime source
+        uses: actions/upload-artifact@v4
+        with:
+          name: sc-live-runtime-export
+          path: |
+            game.js
+            style.css
+            index.html
+            source-sha1.txt
+            source-sha256.txt
+            source-commit.txt
+          if-no-files-found: error
+          retention-days: 1
