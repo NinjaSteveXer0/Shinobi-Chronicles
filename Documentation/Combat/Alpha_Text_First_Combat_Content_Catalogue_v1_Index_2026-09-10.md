@@ -2,171 +2,136 @@
 
 **Date:** 2026-09-10  
 **Owner:** Combat / Skills / Items / Weapons  
-**Status:** **CONTENT INDEX — 356 DEFINITIONS AUTHORED / ACTIVATION AND GOLDEN SEPARATE**
+**Status:** **CONTENT INDEX — 416 DEFINITIONS AUTHORED / ACTIVATION AND GOLDEN SEPARATE**
 
 ## 1. Current authored catalogue
 
-The Alpha text-first catalogue now contains exactly:
+The text-first catalogue now contains exactly:
 
-- **260 Skills / Techniques**;
+- **320 Skills / Techniques**;
 - **24 Consumables**;
 - **28 Weapons**;
 - **28 Gear pieces**;
 - **16 crafting/training Materials**;
-- **356 total authored definitions**.
+- **416 total authored definitions**.
 
-These are durable content definitions, not automatic player unlocks and not a claim that all 356 rows are runtime-implemented or Golden.
+These are durable definitions, not automatic ownership/access and not a claim that all rows are runtime implemented or Golden.
 
-## 2. Presentation / rarity authority
+## 2. Presentation / rarity
 
+Binding rarity/presentation authority:
 `Documentation/Combat/Alpha_Text_First_Items_Weapons_Gear_Rarity_Contract_2026-09-10.md`
-
-Commit: `7c4f65f1fdf1d68502d93b25228c283117e0ff74`
+commit `7c4f65f1fdf1d68502d93b25228c283117e0ff74`
 
 Rarity ladder:
-
 `normal -> common -> rare -> legendary`
 
-No dedicated image asset is required for Skills, Items, Weapons or Gear in Alpha. Rarity may be projected through text colour, but the rarity label remains available and rarity itself is not an automatic PL/Stat/damage/access multiplier.
+No dedicated image asset is required for Skills, Items, Weapons or Gear in Alpha. Rarity is presentation/classification, not an automatic power/access multiplier.
 
-## 3. Skill catalogue
+## 3. Skill catalogue waves
 
-### Wave 1 — 001–050
-`Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave1_001-050.md`  
-commit `b833b146aa72da7c311f6dc649fe547715f7e873`
+- **001–050** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave1_001-050.md` — commit `b833b146aa72da7c311f6dc649fe547715f7e873` — core shinobi, Taijutsu, Bukijutsu, opening Fire.
+- **051–100** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave2_051-100.md` — commit `241aad55fe7f0069e82f5836f313b9a69f97b340` — Fire/Water/Wind/opening Lightning.
+- **101–150** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave3_101-150.md` — commit `dcad377e58c4eb2ad7a444793ce7afa55fb1fdf1` — Lightning/Earth/Genjutsu.
+- **151–200** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave4_151-200.md` — commit `65203534e11ac855859f6b59a353558a3bcd0ecb` — Fūinjutsu, medical/sensory, Wood Release, clan/bloodline-gated examples.
+- **201–230** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave5_201-230_Kinjutsu_Echo.md` — commit `4076279ffb4bc09539183f7ec56088af4b0e208c` — general Kinjutsu + Echo-interface Kinjutsu.
+- **231–260** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave6_231-260_Menma_Echo_TailedBeast.md` — commit `7f9716480ab2fb6bb904cc16c306516ef0a51542` — Menma/Echo development + Hosted Tailed-Beast/Kurama/three-source techniques.
+- **261–290** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave7_261-290_Passive_Contextual.md` — commit `7ad174525d46b44e548592e2ebed8c43fbb2a774` — passive contextual/event Skills; flagship `skill_false_identity`.
+- **291–320** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave8_291-320_Active_Hybrid_Contextual.md` — commit `098a6af4ee43ecd2a695bbc04cd7747a79c2b542` — active/hybrid contextual/event Skills including Recognition Substitution, barrier/seal investigation, traversal, Echo interaction and Kurama negotiation.
 
-Coverage: core shinobi practice, Taijutsu, Bukijutsu, opening Fire Style.
+All catalogue rows preserve stable identity, rarity, source/acquisition family, access predicate and exact effect. Catalogue presence never grants the Skill.
 
-### Wave 2 — 051–100
-`Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave2_051-100.md`  
-commit `241aad55fe7f0069e82f5836f313b9a69f97b340`
+## 4. Contextual Skill surface
 
-Coverage: expanded Fire, Water, Wind, opening Lightning.
+Binding contextual execution authority:
+`Documentation/Combat/SC_Combat_Contextual_Passive_Active_Skill_Surface_2026-09-10.md`
+commit `8d9e29bac13adaf9868f4f09f960f61e366b73ff`
 
-### Wave 3 — 101–150
-`Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave3_101-150.md`  
-commit `dcad377e58c4eb2ad7a444793ce7afa55fb1fdf1`
+Modes:
+- `battle_active`;
+- `passive_contextual`;
+- `active_contextual`;
+- `hybrid_contextual`.
 
-Coverage: expanded Lightning, Earth, Genjutsu.
+Core rules:
+- passive eligibility checks are side-effect-free;
+- event/context existence remains Story/World/Mission/Event authority;
+- passive/event Skills may expose bounded evidence/options but do not manufacture Story conclusions;
+- active contextual Skills require an exact current caller-supplied opportunity/target/query;
+- contextual actions outside Battle do not consume Battle turns;
+- invocation inside Battle consumes the ordinary Character action unless exact authority says otherwise;
+- contextual occurrence history commits only when the Skill materially participates in a factual resolution.
 
-### Wave 4 — 151–200
-`Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave4_151-200.md`  
-commit `65203534e11ac855859f6b59a353558a3bcd0ecb`
+### False Identity
 
-Coverage: Fūinjutsu, medical/sensory, Wood Release, capability-gated Sharingan / Byakugan / Gentle Fist / Nara / Yamanaka / Akimichi / Inuzuka / kikaichū / Ink Arts / Uzumaki Chains / Eight Gates examples.
+`skill_false_identity` is the passive contextual surface of earned Identity Rebinding capability for current Arc-1 Menma. It may present an exact legitimate current recognised false-identity profile to a compatible recognition query. The target system still resolves normally.
 
-### Wave 5 — 201–230
-`Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave5_201-230_Kinjutsu_Echo.md`  
-commit `4076279ffb4bc09539183f7ec56088af4b0e208c`
+It does not rewrite stable identity/World Truth, forge legal authority, make informed humans forget Menma, universally hide Hosted Entities/chakra or guarantee bypass.
 
-Coverage:
-- 15 general Kinjutsu techniques;
-- 15 Echo-interface / relationship techniques;
-- exact Technique-local self-cost/risk where authored;
-- bounded source/Memory/causal reads rather than omniscience;
-- no automatic Echo ownership/turn/PL.
+`skill_false_identity_recognition_substitution` is the separate deliberate active evolution. Historical Mission-11 action `arc1_m11_menma_recognition_substitution` remains its exact historical action ID and may link to the reusable catalogue Skill without being renamed/recommitted.
 
-### Wave 6 — 231–260
-`Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave6_231-260_Menma_Echo_TailedBeast.md`  
-commit `7f9716480ab2fb6bb904cc16c306516ef0a51542`
+## 5. Kinjutsu / Echo / Tailed-Beast boundary
 
-Coverage:
-- 15 Menma / `arc1_menma_echo` later-development techniques;
-- 10 reusable Hosted-Tailed-Beast technique families;
-- Kurama-specific hosted techniques;
-- Menma + Echo + voluntary-Kurama three-source techniques;
-- exact current-source predicates preventing prior Mission-12 experience from becoming standing Kurama access.
-
-Kinjutsu/Echo/Tailed-Beast boundary:
-
-`Documentation/Combat/SC_Combat_Kinjutsu_Echo_Tailed_Beast_Catalogue_Boundary_2026-09-10.md`  
+`Documentation/Combat/SC_Combat_Kinjutsu_Echo_Tailed_Beast_Catalogue_Boundary_2026-09-10.md`
 commit `c7f80c56b1ec364386947a8cf7f01b66d58e5e84`
 
-Every Skill row keeps stable identity, rarity, acquisition/source family, access predicate and exact Combat-facing semantics. Catalogue presence does not grant the Skill.
+Preserve:
+- Kinjutsu Stat != repertoire;
+- Echo relationship != every Echo Skill;
+- Hosted Entity PL != host PL;
+- source participation != second turn;
+- prior Kurama-loan experience != current Kurama access;
+- new Menma/Echo/Kurama actions require their exact current source predicates.
 
-## 4. Item / Weapon / Gear / Material catalogue
+Existing Mission-12 Echo Menma / borrowed-Kurama actions remain unchanged.
 
-### Wave 1 — 001–048
-`Documentation/Combat/Alpha_Item_Weapon_Gear_Catalogue_v1_Wave1_001-048.md`  
-commit `d690875a738c75b0bba69ffc2f60b6286e8e953c`
+## 6. Item / Weapon / Gear / Material catalogue
 
-Contains 24 Consumables and first 24 Weapons. Existing Alpha-live rows remain:
-`field_recovery_pill`, `standard_antidote`, `burn_treatment`, `kunai`, `shuriken_set`, `ninja_wire`, `bandit_captains_tanto`.
+- **001–048** — `Documentation/Combat/Alpha_Item_Weapon_Gear_Catalogue_v1_Wave1_001-048.md` — commit `d690875a738c75b0bba69ffc2f60b6286e8e953c` — 24 Consumables + first 24 Weapons.
+- **049–096** — `Documentation/Combat/Alpha_Item_Weapon_Gear_Catalogue_v1_Wave2_049-096.md` — commit `7409b9a5d32da23bfd99e37364252d26a7ca2a14` — final 4 Weapons +28 Gear +16 Materials.
 
-### Wave 2 — 049–096
-`Documentation/Combat/Alpha_Item_Weapon_Gear_Catalogue_v1_Wave2_049-096.md`  
-commit `7409b9a5d32da23bfd99e37364252d26a7ca2a14`
+Existing already-live Alpha rows remain unchanged. New catalogue-only rows require legitimate acquisition/runtime activation.
 
-Contains final 4 Weapons, 28 Gear pieces and 16 crafting/training Materials. Equipment modifiers affect Effective State only and preserve exact-instance/proficiency/acclimation doctrine.
+## 7. Hashirama / Yamato Wood Release
 
-## 5. Hashirama / Yamato Wood Release
-
-`Documentation/SC_Combat_Genin_Hashirama_Yamato_Wood_Release_Possession_Access_Boundary_2026-09-10.md`  
+`Documentation/SC_Combat_Genin_Hashirama_Yamato_Wood_Release_Possession_Access_Boundary_2026-09-10.md`
 commit `1bc85d3fb16088da72df9712e0b8494b3d2a3b9a`
 
-Binding rule:
+`genin_hashirama` and `genin_yamato` possess Wood Release from representation start, while executable Access remains requirement-gated. Possession does not mutate Base Stats/PL or automatically prepare Wood Release Skills.
 
-- `genin_hashirama` possesses Wood Release from representation start;
-- `genin_yamato` possesses Wood Release from representation start;
-- executable access remains locked behind legitimate requirements;
-- possession does not alter current Base Stats/Base PL;
-- failed access checks reject before action/history commit.
+## 8. Production strategy
 
-## 6. Menma / Echo / Kurama preservation
+1. Author stable distinct definitions.
+2. Story/World/Training/Missions provide legitimate opportunities/sources.
+3. Progression supplies learned/development/access authority.
+4. Acquisition/Inventory supplies ownership where applicable.
+5. Combat/Skills supplies exact effect/compatibility.
+6. Coding implements reusable resolver/evaluator families.
+7. Runtime/Golden proves only activated slices; catalogue breadth itself is not a GREEN claim.
 
-Existing Mission-12 Combat authority remains unchanged. In particular, the catalogue does not replace or rename:
+The next major character consumer remains the 25-Genin prepared-palette wave after CE's repertoire/capability audit.
 
-- `echo_menma_reciprocal_chakra_strike`;
-- `echo_menma_threaded_route_burst`;
-- `echo_menma_route_read`;
-- `echo_menma_reciprocal_guard`;
-- `echo_menma_adaptive_reroute`;
-- `arc1_m12_echo_kurama_routed_burst`;
-- `arc1_m12_borrowed_kurama_chakra_strike`;
-- `arc1_m12_borrowed_kurama_shroud`;
-- `arc1_m12_echo_kurama_compensatory_recovery`.
-
-`progression_receipt_arc1_m12_coordinated_kurama_loan_experience` remains historical repeatability evidence, not current Kurama Access. Any new three-source Skill still requires a new current authorised voluntary Kurama source.
-
-## 7. Production strategy
-
-A large authored catalogue is desirable; a requirement to bespoke-integrate every row before Alpha is not.
-
-Use this sequence:
-
-1. author stable distinct definitions;
-2. bind only legitimate source/development opportunities;
-3. grant/own through proper authority;
-4. prepare/equip separately;
-5. execute only when Battle predicates are satisfied;
-6. implement generic resolver families where possible;
-7. prove activated slices through runtime/Golden rather than claiming catalogue-wide GREEN.
-
-The next major Combat consumer remains the 25-Genin prepared-palette wave after CE's exact repertoire audit. This 260-Skill catalogue is the reusable source library for that work.
-
-## 8. Status distinction
+## 9. Status distinction
 
 - text-first Alpha presentation: **DESIGN CLOSED**;
 - rarity ladder: **DESIGN CLOSED**;
-- 260 Skill catalogue definitions: **AUTHORED / DURABLE**;
-- 96 Item/Weapon/Gear/Material definitions: **AUTHORED / DURABLE**;
-- Kinjutsu/Echo/Tailed-Beast expansion boundary: **CLOSED**;
-- Hashirama/Yamato Wood Release possession: **CLOSED**;
-- catalogue-wide acquisition/source bindings: **NOT YET CLOSED**;
-- catalogue-wide runtime implementation: **NOT CLAIMED**;
-- catalogue-wide Golden/regression: **NOT CLAIMED**.
+- **320 Skill definitions: AUTHORED / DURABLE**;
+- **96 Item/Weapon/Gear/Material definitions: AUTHORED / DURABLE**;
+- contextual passive/active Skill modes: **DESIGN CLOSED**;
+- False Identity passive semantics: **COMBAT/SKILLS CLOSED**;
+- Kinjutsu/Echo/Tailed-Beast boundary: **CLOSED**;
+- catalogue-wide source/acquisition binding: **NOT CLAIMED**;
+- catalogue-wide implementation: **NOT CLAIMED**;
+- catalogue-wide runtime/Golden: **NOT CLAIMED**.
 
-## 9. Non-collapse
+## 10. Non-collapse
 
-- catalogue != ownership;
-- catalogue != prepared palette;
-- source eligibility != grant;
-- mission completion != Skill unlock automatically;
-- training attempt != mastery;
+- catalogue != ownership/access/prepared palette;
+- passive evaluation != committed history;
+- event eligibility != event success;
+- contextual Skill != Battle action automatically;
+- False Identity != stable identity rewrite or universal bypass;
+- Recognition Substitution != passive False Identity;
+- request != consent;
 - rarity != power automatically;
-- Kinjutsu Stat != Kinjutsu repertoire;
-- Echo relationship != every Echo Skill;
-- Hosted Entity PL != host PL;
-- prior Kurama-loan experience != current Kurama access;
-- source participation != second turn;
 - authored != implemented != runtime validated != Golden GREEN.
