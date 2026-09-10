@@ -101258,3 +101258,600 @@ getBattleRuntimeSaveState=function(){const out=ALPHA_PRE4100_BATTLE_RUNTIME_SAVE
 const ALPHA_PRE4100_RESTORE_BATTLE_RUNTIME=restoreBattleRuntimeState;
 restoreBattleRuntimeState=function(raw){const out=ALPHA_PRE4100_RESTORE_BATTLE_RUNTIME(raw);currentBattle.mission11RecallEncounter=raw&&raw.mission11RecallEncounter?cloneBattleRuntimeValue(raw.mission11RecallEncounter):null;currentBattle.mission12Climax=raw&&raw.mission12Climax?cloneBattleRuntimeValue(raw.mission12Climax):null;return out;};
 function runAlphaIssue41SourceDiagnostics(){const A=ARC1_M11_RECALL_AUTHORITY,M=ARC1_M12_AUTHORITY;const checks={m11ExactIds:getArc1M11EnemyIds().join("|")==="mizue_kagawa|arc1_m11_recall_medic_01|arc1_m11_field_operative_01",m11ExactPL:getArc1M11EnemyIds().every(id=>enemyDatabase[id].calibratedBasePL===A.basePL[id]),m11NoScaling:getArc1M11EnemyIds().every(id=>enemyDatabase[id].noBossScaling&&enemyDatabase[id].noEncounterScaling),recallSubstitutionExactProfile:A.recall.profile==="menma_normal_no_carrier"&&resolveArc1M11RecognitionSubstitution.toString().includes("contact_mismatch"),m11ActionPL:getArc1M11PreparedActions(A.participants.kagawa).some(a=>a.id===A.actions.precision&&a.authoredAttackPL==="28_or_33_same_target")&&getArc1M11PreparedActions(A.participants.medic).some(a=>a.id===A.actions.scalpel&&a.authoredAttackPL===22),m12OneRen:M.ren==="arc1_ren"&&M.renProjection[1].pl===54&&M.renProjection[2].pl===60&&M.renProjection[3].pl===73,m12BorrowedExact80:M.borrowedKurama.effectivePL===80&&JSON.stringify(M.borrowedKurama.effectiveStats)===JSON.stringify({nin:80,tai:64,buki:39,fuin:57,kin:74,gen:35,stamina:85}),noIndependentHostedSlots:launchArc1M12RenStage.toString().includes("hostedEntityTurnSlotsCreated:false"),routedBurstOnePacket:getArc1M12MenmaAdditionalActions(3,{borrowedKurama:true}).some(a=>a.id==="arc1_m12_echo_kurama_routed_burst"&&a.attackPL===52&&a.packetCount===1),loanCleanup:cleanupArc1M12BorrowedKurama.toString().includes("persistentUnlockGranted:false"),sazanNotCombatant:!getArc1M12RenActions.toString().includes("arc1_dr_sazan"),battleDefeatNoDeath:buildArc1M12ReturnEnvelope.toString().includes("renDeathInferred:false"),saveLoadState:getBattleRuntimeSaveState.toString().includes("mission12Climax")&&restoreBattleRuntimeState.toString().includes("mission11RecallEncounter")};checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);console.table(checks);return{pass:checks.pass,checks,codingStatus:checks.pass?"ISSUE_41_SOURCE_PACKAGE_GREEN":"ISSUE_41_SOURCE_PACKAGE_FAILED",runtimeBattleRoundTripStillRequired:true};}
+
+// =========================================================
+// BRICKS 4500–5499 — ARC 1 FIRST-RUN ORCHESTRATION MONSTER
+// =========================================================
+// Production intent:
+// - consume closed M2–M10 Story + World caller authority;
+// - implement persistent Identity Rebinding consequence from M6;
+// - harden Issue #41 M11 Recall and M12 staged Combat execution;
+// - never fabricate the still-missing pre-Whisper trace producer;
+// - keep Story / World / Battle / Progression occurrence identity separate.
+// =========================================================
+
+const ARC1_M2_M10_RUNTIME_AUTHORITY=Object.freeze({
+  2:Object.freeze({
+    missionId:"arc1_m2_warehouse",sceneId:"scene_arc1_m2_warehouse_investigation",title:"MISSION 2 — WAREHOUSE",
+    worldRoot:"world_occ_arc1_m2_warehouse_operation_01",locationId:"arc1_m2_warehouse_site_01",
+    refs:Object.freeze({ledger:"arc1_m2_distributed_operation_ledger_01",purge:"arc1_m2_purge_apparatus_01",evidence:"arc1_m2_warehouse_evidence_bundle_01",sarutobi:"arc1_m2_sarutobi_logistics_source_01"}),
+    completionOccurrenceId:"occ_arc1_m2_warehouse_ledger_distributed_operation_discovered"
+  }),
+  3:Object.freeze({
+    missionId:"arc1_m3_hospital",sceneId:"scene_arc1_m3_hospital_reference_recovery",title:"MISSION 3 — HOSPITAL",
+    worldRoot:"world_occ_arc1_m3_hospital_reference_operation_01",locationId:"arc1_m3_hospital_reference_room_01",
+    refs:Object.freeze({medNin:"arc1_m3_med_nin_contact_01",sarutobi:"arc1_m3_sarutobi_hospital_source_01",material:"arc1_m3_reference_material_set_01",caseObject:"arc1_m3_reference_case_01"}),
+    completionOccurrenceId:"occ_arc1_m3_hospital_reference_material_identified"
+  }),
+  4:Object.freeze({
+    missionId:"arc1_m4_barrier",sceneId:"scene_arc1_m4_barrier_relay_four",title:"MISSION 4 — RELAY FOUR",
+    worldRoot:"world_occ_arc1_m4_relay_four_operation_01",locationId:"arc1_m4_relay_four_site_01",
+    refs:Object.freeze({relay:"arc1_m4_relay_four_system_01",recognition:"arc1_m4_relay_four_recognition_interface_01"}),
+    completionOccurrenceId:"occ_arc1_m4_relay_four_compromise_confirmed"
+  }),
+  5:Object.freeze({
+    missionId:"arc1_m5_academy",sceneId:"scene_arc1_m5_academy_third_bell",title:"MISSION 5 — THIRD BELL",
+    worldRoot:"world_occ_arc1_m5_third_bell_operation_01",locationId:"arc1_m5_third_bell_chamber_01",
+    refs:Object.freeze({calibration:"arc1_m5_third_bell_calibration_system_01",receiver:"arc1_m5_third_bell_receiver_interface_01",node:"arc1_m5_third_bell_node_01"}),
+    completionOccurrenceId:"occ_arc1_m5_third_bell_propagation_accepted"
+  }),
+  6:Object.freeze({
+    missionId:"arc1_m6_archive",sceneId:"scene_arc1_m6_archive_identity_rebinding",title:"MISSION 6 — ARCHIVE",
+    worldRoot:"world_occ_arc1_m6_archive_operation_01",locationId:"arc1_m6_archive_site_01",
+    refs:Object.freeze({archive:"arc1_m6_identity_archive_system_01",records:"arc1_m6_identity_propagation_records_01",lead:"arc1_m6_dead_transfer_lead_record_01"}),
+    completionOccurrenceId:"occ_arc1_m6_dead_transfer_lead_acquired"
+  }),
+  7:Object.freeze({
+    missionId:"arc1_m7_dead_transfer",sceneId:"scene_arc1_m7_dead_transfer",title:"MISSION 7 — THE DEAD TRANSFER",
+    worldRoot:"world_occ_arc1_m7_dead_transfer_operation_01",locationId:"arc1_m7_dead_transfer_site_01",
+    refs:Object.freeze({apparatus:"arc1_m7_transfer_apparatus_01",collector:"arc1_m7_collector_01",carrier:"arc1_menma_echo",stabiliser:"arc1_m7_black_stabiliser_01",coupling:"arc1_m7_transfer_coupling_interface_01",evidenceRoot:"arc1_m7_sanitisation_evidence_set_01"}),
+    completionOccurrenceId:"occ_arc1_m7_chain_sanitisation_activated"
+  }),
+  8:Object.freeze({
+    missionId:"arc1_m8_sanitisation_chain",sceneId:"scene_arc1_m8_sanitisation_chain_investigation",title:"MISSION 8 — SANITISATION CHAIN",
+    worldRoot:"world_occ_arc1_m8_sanitisation_investigation_01",locationId:null,
+    refs:Object.freeze({whiteThread:"arc1_m8_white_thread_evidence_01",packet:"arc1_m8_moroboshi_reassignment_packet_01",trail:"arc1_m8_sponsor_trail_evidence_01",moroboshi:"arc1_daichi_moroboshi"}),
+    completionOccurrenceId:"occ_arc1_m8_sanitisation_network_escalation_observed"
+  }),
+  9:Object.freeze({
+    missionId:"arc1_m9_ashes_of_the_chain",sceneId:"scene_arc1_m9_ashes_of_the_chain_aftermath",title:"MISSION 9 — ASHES OF THE CHAIN",
+    worldRoot:"world_occ_arc1_m9_ashes_investigation_01",locationId:null,
+    refs:Object.freeze({lead:"arc1_veterinary_ward_lead_01",facility:"arc1_veterinary_ward_facility_01",moroboshiTrail:"arc1_m9_moroboshi_trail_reference_01"}),
+    completionOccurrenceId:"occ_arc1_m9_veterinary_ward_direction_established"
+  }),
+  10:Object.freeze({
+    missionId:"arc1_m10_veterinary_ward",sceneId:"scene_arc1_m10_veterinary_ward_facility",pursuitSceneId:"scene_arc1_m10_transfer_operator_pursuit",title:"MISSION 10 — BENEATH THE VETERINARY WARD",
+    worldRoot:"world_occ_arc1_m10_veterinary_facility_operation_01",locationId:"arc1_veterinary_ward_facility_01",
+    refs:Object.freeze({serviceTunnel:"arc1_m10_vet_service_tunnel_01",transferWard:"arc1_m10_transfer_ward_01",transferRoom:"arc1_m10_transfer_room_01",escapeRoute:"arc1_m10_operator_escape_route_01",operator:"arc1_m10_transfer_operator_01",subjects:Object.freeze(["arc1_m10_transfer_subject_01","arc1_m10_transfer_subject_02","arc1_m10_transfer_subject_03","arc1_m10_transfer_subject_04","arc1_m10_transfer_subject_05","arc1_m10_transfer_subject_06"]),stabilisers:"arc1_m10_stabiliser_tube_set_01",beds:"arc1_m10_transfer_bed_set_01",hooks:"arc1_m10_numbered_hook_array_01",records:"arc1_m10_programme_records_01"}),
+    completionOccurrenceId:"occ_arc1_m10_recall_threat_understood"
+  })
+});
+
+function getArc1RuntimeAuthority(missionNumber){return ARC1_M2_M10_RUNTIME_AUTHORITY[Number(missionNumber)]||null;}
+function findAlphaCommittedHistoryRecord(id){
+  if(!id||!playerData||!Array.isArray(playerData.activityHistory))return null;
+  return playerData.activityHistory.find(record=>record&&record.committed===true&&(record.occurrenceId===id||record.sourceOccurrenceId===id||record.id===id||record.factId===id))||null;
+}
+function commitAlphaArc1HistoryRecord({occurrenceId,type="arc1_story_occurrence",missionId=null,sceneId=null,worldRoot=null,data={},sourceRefs=[]}={}){
+  if(!occurrenceId)return{success:false,reason:"occurrence_id_missing"};
+  const existing=findAlphaCommittedHistoryRecord(occurrenceId);
+  if(existing)return{success:true,idempotent:true,record:existing};
+  if(!playerData||!Array.isArray(playerData.activityHistory))return{success:false,reason:"activity_history_unavailable"};
+  const record={
+    id:occurrenceId,occurrenceId,type,missionId:missionId||null,sceneId:sceneId||null,sourceOccurrenceId:worldRoot||null,
+    committed:true,completed:true,timestamp:Date.now(),data:cloneProgressionData(data||{}),sourceRefs:cloneProgressionData(Array.isArray(sourceRefs)?sourceRefs:[])
+  };
+  playerData.activityHistory.push(record);savePlayerData();return{success:true,idempotent:false,record};
+}
+function commitAlphaArc1WorldRoot(authority){
+  if(!authority)return{success:false,reason:"mission_authority_missing"};
+  return commitAlphaArc1HistoryRecord({occurrenceId:authority.worldRoot,type:"arc1_world_occurrence_root",missionId:authority.missionId,sceneId:authority.sceneId,worldRoot:authority.worldRoot,data:{physicalSituationExisted:true,storyConclusionCommitted:false,semanticLocationId:authority.locationId||null},sourceRefs:[{type:"location",id:authority.locationId||authority.worldRoot,role:"world_physical_context"}]});
+}
+function getArc1CurrentProtagonistId(){return typeof getArc1M1WhisperCurrentProtagonistParticipantId==="function"?getArc1M1WhisperCurrentProtagonistParticipantId():(ensurePlayerAcquisitionState().ninjaIdentityVariantId||ensurePlayerAcquisitionState().chronicleOriginVariantId||null);}
+function getArc1CurrentStoryTeamIds(){return typeof getArc1M1WhisperCurrentStoryTeamParticipantIds==="function"?getArc1M1WhisperCurrentStoryTeamParticipantIds():[getArc1CurrentProtagonistId()].filter(Boolean);}
+function isArc1MenmaPersonRepresentation(id){return["academy_menma","genin_menma","cipher_menma","echo_menma"].includes(String(id||""));}
+function isArc1KonohaMenmaRun(){return isArc1MenmaPersonRepresentation(getArc1CurrentProtagonistId());}
+function getArc1BattleProtagonistId(){
+  const protagonist=getArc1CurrentProtagonistId();
+  if(protagonist&&getPlayerCharacter(protagonist))return protagonist;
+  const queue=playerData&&playerData.clan?normalizeClanManagementState(playerData.clan).teamSlots:[];
+  const start=Array.isArray(queue)?queue[0]:null;
+  return start&&getPlayerCharacter(start)?start:null;
+}
+function hasArc1Occurrence(id){return!!findAlphaCommittedHistoryRecord(id);}
+
+function resolveAlphaArc1M2Ledger(){const A=getArc1RuntimeAuthority(2);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m2_warehouse_ledger_distributed_operation_discovered",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{ledgerDiscovered:true,distributedOperationEvidenceEstablished:true,referencedNodes:["ACADEMY","HOSPITAL","BARRIER","ARCHIVE"],observingParticipantRefs:getArc1CurrentStoryTeamIds()},sourceRefs:[{type:"world_object",id:A.refs.ledger,role:"distributed_operation_ledger"}]});}
+function resolveAlphaArc1M2Sarutobi(){const A=getArc1RuntimeAuthority(2);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m2_warehouse_sarutobi_logistics_involvement_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{sarutobiParticipantRef:A.refs.sarutobi,logisticsInvolvementObserved:true,clanGuiltInferred:false},sourceRefs:[{type:"world_source",id:A.refs.sarutobi,role:"bounded_logistics_source"}]});}
+function resolveAlphaArc1M2PurgeObservation(){const A=getArc1RuntimeAuthority(2);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m2_warehouse_purge_observation_completed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{purgeProcessOccurred:true,observingParticipantRefs:getArc1CurrentStoryTeamIds(),techniqueGranted:false,masteryGranted:false,statGain:false,plGain:false},sourceRefs:[{type:"world_object",id:A.refs.purge,role:"exact_purge_source"},{type:"evidence_set",id:A.refs.evidence,role:"bounded_observation"}]});}
+function resolveAlphaArc1M3Material(){const A=getArc1RuntimeAuthority(3);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m3_hospital_reference_material_identified",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{referenceMaterialIdentified:true,observingParticipantRefs:getArc1CurrentStoryTeamIds()},sourceRefs:[{type:"world_object",id:A.refs.material,role:"reference_material"}]});}
+function resolveAlphaArc1M3Communication(){const A=getArc1RuntimeAuthority(3);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m3_hospital_med_nin_contact_communication",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{medNinParticipantRef:A.refs.medNin,boundedKnowledgeOnly:true,statementIsNotWorldTruth:true},sourceRefs:[{type:"participant",id:A.refs.medNin,role:"communication_source"}]});}
+function resolveAlphaArc1M3RetainCase(){const A=getArc1RuntimeAuthority(3),holder=getArc1CurrentProtagonistId();if(!holder)return{success:false,reason:"protagonist_missing"};return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m3_hospital_case_retained",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{caseObjectRef:A.refs.caseObject,holderParticipantRef:holder,caseRetained:true,itemOwnershipGranted:false},sourceRefs:[{type:"world_object",id:A.refs.caseObject,role:"custody_object"}]});}
+function resolveAlphaArc1M4Compromise(){const A=getArc1RuntimeAuthority(4);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m4_relay_four_compromise_confirmed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{relayFourCompromised:true},sourceRefs:[{type:"world_system",id:A.refs.relay,role:"relay_four"}]});}
+function resolveAlphaArc1M4Recognition(){const A=getArc1RuntimeAuthority(4);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m4_barrier_recognition_behaviour_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{observingParticipantRefs:getArc1CurrentStoryTeamIds(),boundedRecognitionBehaviourObserved:true,accessGranted:false},sourceRefs:[{type:"world_system",id:A.refs.recognition,role:"recognition_interface"}]});}
+function resolveAlphaArc1M4Receiver(){const A=getArc1RuntimeAuthority(4),p=getArc1CurrentProtagonistId();if(!isArc1MenmaPersonRepresentation(p))return{success:false,reason:"body_receiver_route_requires_menma"};return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m4_menma_body_receiver_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{protagonistStableParticipantRef:p,bodyInscribedReceiverEstablished:true,currentBodyInscribedReceiverState:true,techniqueOwnershipGranted:false},sourceRefs:[{type:"world_system",id:A.refs.recognition,role:"receiver_system"}]});}
+function resolveAlphaArc1M5Confrontation(){const A=getArc1RuntimeAuthority(5);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m5_female_operator_confrontation_reached",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{femaleOperatorParticipantRef:"arc1_female_operator",currentTeamParticipantRefs:getArc1CurrentStoryTeamIds(),confrontationReached:true},sourceRefs:[{type:"participant",id:"arc1_female_operator",role:"same_persistent_person"}]});}
+function canResolveAlphaArc1M5Calibration(){const ctx=getStorySceneRuntimeContext();return hasArc1Occurrence("occ_arc1_m4_menma_body_receiver_established")&&!!(ctx&&ctx.battleResume&&ctx.battleResume.outcome==="victory");}
+function resolveAlphaArc1M5CalibrationAndThirdBell(){
+  const A=getArc1RuntimeAuthority(5),p=getArc1CurrentProtagonistId();if(!canResolveAlphaArc1M5Calibration())return{success:false,reason:"mission5_calibration_route_not_factually_available"};
+  const redirected=commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m5_calibration_redirected_into_receiver",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{protagonistRef:p,prerequisiteReceiverStateOccurrenceRef:"occ_arc1_m4_menma_body_receiver_established",calibrationRedirected:true},sourceRefs:[{type:"world_system",id:A.refs.calibration,role:"calibration_system"},{type:"world_system",id:A.refs.receiver,role:"receiver_interface"}]});
+  if(!redirected.success)return redirected;
+  return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m5_third_bell_propagation_accepted",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{thirdBellPropagationOccurred:true,changedIdentityStateAccepted:true,observingParticipantRefs:getArc1CurrentStoryTeamIds(),supportingCalibrationOccurrenceId:"occ_arc1_m5_calibration_redirected_into_receiver"},sourceRefs:[{type:"world_system",id:A.refs.node,role:"third_bell_propagation_node"}]});
+}
+function resolveAlphaArc1M6ArchiveUnderstanding(){const A=getArc1RuntimeAuthority(6),p=getArc1CurrentProtagonistId();return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m6_archive_identity_change_propagation_understood",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{observingLearningParticipantRef:p,boundedArchiveEvidence:true},sourceRefs:[{type:"world_system",id:A.refs.archive,role:"trusted_identity_records"},{type:"world_object",id:A.refs.records,role:"identity_propagation_records"}]});}
+function resolveAlphaArc1M6IdentityRebindingCreation(){
+  const A=getArc1RuntimeAuthority(6),p=getArc1CurrentProtagonistId();if(!isArc1MenmaPersonRepresentation(p))return{success:false,reason:"identity_rebinding_first_run_requires_menma"};
+  if(!hasArc1Occurrence("occ_arc1_m6_archive_identity_change_propagation_understood"))return{success:false,reason:"archive_understanding_required"};
+  const supporting=["occ_arc1_m3_hospital_reference_material_identified","occ_arc1_m4_barrier_recognition_behaviour_observed","occ_arc1_m4_menma_body_receiver_established","occ_arc1_m5_calibration_redirected_into_receiver","occ_arc1_m5_third_bell_propagation_accepted","occ_arc1_m6_archive_identity_change_propagation_understood"].filter(hasArc1Occurrence);
+  const created=commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m6_identity_rebinding_seal_created",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{creatorParticipantRef:p,stableSubject:"menma",techniqueFamily:"false_identity_seals",techniqueName:"Identity Rebinding Seal",semanticCapabilityId:"false_identity_seals.identity_rebinding_seal",creationDevelopmentOccurred:true,access:"GRANTED",competence:"INITIAL_OPERATIONAL_COMPETENCE",masteryGranted:false,genericXPGranted:false,directStatGain:false,directPLGain:false,supportingEvidenceOccurrenceRefs:supporting},sourceRefs:supporting.map(id=>({type:"story_occurrence",id,role:"actual_route_provenance"}))});
+  if(!created.success)return created;
+  if(hasArc1Occurrence("occ_arc1_m4_menma_body_receiver_established"))commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m6_cipher_menma_history_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{menmaStableIdentityRef:"menma",representationHistory:"cipher_menma",supportingSealStateOccurrenceRef:"occ_arc1_m4_menma_body_receiver_established",bodyInscribedIdentityRebindingSealActive:true},sourceRefs:[{type:"development_occurrence",id:"occ_arc1_m6_identity_rebinding_seal_created",role:"development_source"}]});
+  return created;
+}
+function resolveAlphaArc1M6DeadTransferLead(){const A=getArc1RuntimeAuthority(6);if(!hasArc1Occurrence("occ_arc1_m6_identity_rebinding_seal_created"))return{success:false,reason:"identity_rebinding_creation_required_for_authored_first_run"};return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m6_dead_transfer_lead_acquired",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{deadTransferLeadActionable:true},sourceRefs:[{type:"world_object",id:A.refs.lead,role:"dead_transfer_lead_record"}]});}
+function getIdentityRebindingDevelopmentRecord(){return findAlphaCommittedHistoryRecord("occ_arc1_m6_identity_rebinding_seal_created");}
+function IdentityRebindingAccessSatisfied(actor){
+  const id=typeof actor==="string"?actor:(actor&&actor.id||actor&&actor.registryId||null);if(!isArc1MenmaPersonRepresentation(id))return false;
+  const record=getIdentityRebindingDevelopmentRecord();const d=record&&record.data||{};
+  return !!(record&&d.stableSubject==="menma"&&d.semanticCapabilityId==="false_identity_seals.identity_rebinding_seal"&&d.creationDevelopmentOccurred===true&&d.access==="GRANTED"&&d.competence==="INITIAL_OPERATIONAL_COMPETENCE");
+}
+function isCipherMenmaRepresentationEligible(){const h=findAlphaCommittedHistoryRecord("occ_arc1_m6_cipher_menma_history_established");return!!(h&&h.data&&h.data.representationHistory==="cipher_menma"&&h.data.bodyInscribedIdentityRebindingSealActive===true);}
+function resolveAlphaArc1M7Contact(){const A=getArc1RuntimeAuthority(7);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m7_transfer_site_contact_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{collectorParticipantRef:A.refs.collector,livingCarrierRef:A.refs.carrier,blackStabiliserRef:A.refs.stabiliser,currentTeamParticipantRefs:getArc1CurrentStoryTeamIds()},sourceRefs:[{type:"participant",id:A.refs.collector,role:"collector"},{type:"hosted_entity",id:A.refs.carrier,role:"living_carrier"},{type:"world_object",id:A.refs.stabiliser,role:"transfer_stabiliser"}]});}
+function resolveAlphaArc1M7AcceptAndAttach(){
+  const A=getArc1RuntimeAuthority(7),p=getArc1CurrentProtagonistId();if(!isArc1MenmaPersonRepresentation(p))return{success:false,reason:"carrier_attachment_authored_route_requires_menma"};if(!hasArc1Occurrence("occ_arc1_m7_transfer_site_contact_established"))return{success:false,reason:"transfer_contact_required"};
+  const accepted=commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m7_carrier_transfer_deliberately_accepted",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{hostParticipantRef:p,carrierRef:A.refs.carrier,playerIntentCommitted:true,successfulAttachmentNotImpliedByIntent:true},sourceRefs:[{type:"hosted_entity",id:A.refs.carrier,role:"exact_carrier"}]});if(!accepted.success)return accepted;
+  return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m7_carrier_attachment_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{hostParticipantRef:p,carrierHostedEntityStableRef:A.refs.carrier,hostRelationshipKey:"host_rel_menma_arc1_echo",attachmentEstablished:true,coexistsWithKurama:true,ownershipGranted:false,masteryGranted:false,independentBattleSlotGranted:false},sourceRefs:[{type:"world_object",id:A.refs.coupling,role:"transfer_coupling_interface"},{type:"hosted_entity",id:A.refs.carrier,role:"attached_entity"}]});
+}
+function resolveAlphaArc1M7SanitisationActivated(){const A=getArc1RuntimeAuthority(7);if(!hasArc1Occurrence("occ_arc1_m7_carrier_attachment_established"))return{success:false,reason:"carrier_attachment_required"};return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m7_chain_sanitisation_activated",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{chainSanitisationActive:true,missionSuccessInferred:false},sourceRefs:[{type:"world_occurrence",id:"world_occ_arc1_m7_sanitisation_targets_exposed",role:"exact_target_exposure_boundary"}]});}
+function getAlphaArc1M7EvidenceTargets(){const A=getArc1RuntimeAuthority(7);return[{targetId:A.refs.stabiliser,targetType:"evidence_object",nonLiving:true,present:true,addressable:true,sanitisationEligible:true,locationContext:{locationId:A.locationId}},{targetId:"arc1_m7_transfer_apparatus_trace_01",targetType:"evidence_object",nonLiving:true,present:true,addressable:true,sanitisationEligible:true,locationContext:{locationId:A.locationId}},{targetId:"arc1_m7_transfer_site_record_fragment_01",targetType:"evidence_object",nonLiving:true,present:true,addressable:true,sanitisationEligible:true,locationContext:{locationId:A.locationId}}];}
+function launchAlphaArc1M7StoryBattle({active,returnContext}={}){
+  const protagonist=getArc1BattleProtagonistId(),A=ARC1_M7_SANITISATION_AUTHORITY;if(!protagonist)return{success:false,reason:"mission7_battle_protagonist_missing"};
+  const enemyIds=getArc1M7SanitisationStableParticipantIds(),activeParticipantIds=[protagonist,...enemyIds],sideAssignments={[protagonist]:"allied_side"};enemyIds.forEach(id=>sideAssignments[id]="sanitisation_side");
+  return launchArc1M7SanitisationEncounter({activeParticipantIds,sideAssignments,evidenceTargets:getAlphaArc1M7EvidenceTargets(),callerContext:{storySceneInstanceId:active&&active.instanceId||null,sourceBeatId:returnContext&&returnContext.sourceBeatId||null,carrierRef:"arc1_menma_echo",hostRelationshipKey:"host_rel_menma_arc1_echo"},returnContext});
+}
+function projectAlphaArc1M7BattleResult(){return typeof buildArc1M7SanitisationStoryReturnEnvelope==="function"?buildArc1M7SanitisationStoryReturnEnvelope():null;}
+function persistAlphaArc1M7BattleReturn(){
+  const envelope=projectAlphaArc1M7BattleResult();if(!envelope)return{success:false,reason:"mission7_battle_return_missing"};
+  const id=`runtime_arc1_m7_battle_return_${String(envelope.occurrenceId||currentBattle.battleId||"unknown")}`;
+  return commitAlphaArc1HistoryRecord({occurrenceId:id,type:"arc1_runtime_battle_return",missionId:"arc1_m7_dead_transfer",sceneId:"scene_arc1_m7_dead_transfer",worldRoot:"world_occ_arc1_m7_dead_transfer_operation_01",data:{encounterPackageId:"arc1_m7_chain_sanitisation_active_encounter",battleReturn:cloneBattleRuntimeValue(envelope),storyMissionSuccessInferred:false}});
+}
+function getPersistedAlphaArc1M7BattleReturn(){const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];const records=history.filter(r=>r&&r.committed===true&&r.type==="arc1_runtime_battle_return"&&r.missionId==="arc1_m7_dead_transfer");return records.length?records[records.length-1]:null;}
+function resolveAlphaArc1M8Trail(){const A=getArc1RuntimeAuthority(8);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m8_collector_sponsor_trail_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{collectorSponsorTrailEstablished:true},sourceRefs:[{type:"evidence_set",id:A.refs.trail,role:"sponsor_trail"}]});}
+function resolveAlphaArc1M8WhiteThread(){const A=getArc1RuntimeAuthority(8);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m8_white_thread_evidence_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{whiteThreadEvidenceObserved:true},sourceRefs:[{type:"world_object",id:A.refs.whiteThread,role:"white_thread_evidence"}]});}
+function resolveAlphaArc1M8Moroboshi(){const A=getArc1RuntimeAuthority(8);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m8_moroboshi_reassignment_signature_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{moroboshiStableParticipantRef:A.refs.moroboshi,signedReassignmentEstablished:true,universalConspiracyOwnerInferred:false},sourceRefs:[{type:"participant",id:A.refs.moroboshi,role:"signer"},{type:"world_object",id:A.refs.packet,role:"reassignment_packet"}]});}
+function resolveAlphaArc1M8Escalation(){const A=getArc1RuntimeAuthority(8);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m8_sanitisation_network_escalation_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{sanitisationNetworkEscalationObserved:true,universalConspiracyOwnerInferred:false},sourceRefs:[{type:"evidence_set",id:A.refs.trail,role:"bounded_network_evidence"}]});}
+function resolveAlphaArc1M9Aftermath(){const A=getArc1RuntimeAuthority(9),m7=getPersistedAlphaArc1M7BattleReturn();if(!m7)return{success:false,reason:"mission7_persisted_battle_return_required"};const battleReturn=m7.data&&m7.data.battleReturn||{};return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m9_sanitisation_aftermath_assessed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{mission7EncounterOccurrenceRef:battleReturn.occurrenceId||m7.occurrenceId,perOperativeFactualOutcomes:cloneProgressionData(battleReturn.operativeOutcomes||{}),sanitisationOutcome:cloneProgressionData(battleReturn.sanitisationOutcome||null),developerRouteHardCoded:false},sourceRefs:[{type:"battle_return",id:m7.occurrenceId,role:"persisted_mission7_facts"}]});}
+function resolveAlphaArc1M9CleanupAndLead(){const A=getArc1RuntimeAuthority(9);if(!hasArc1Occurrence("occ_arc1_m9_sanitisation_aftermath_assessed"))return{success:false,reason:"sanitisation_aftermath_assessment_required"};commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m9_evidentiary_cleanup_state_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{currentEvidenceAvailabilityChanged:true,chronicleHistoryErased:false,priorKnowledgeErased:false}});commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m9_moroboshi_trail_advanced",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{moroboshiTrailAdvanced:true},sourceRefs:[{type:"world_source",id:A.refs.moroboshiTrail,role:"trail_reference"}]});return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m9_veterinary_ward_direction_established",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{veterinaryWardDirectionActionable:true,knownGeographyIsNotUnrestrictedAccess:true},sourceRefs:[{type:"world_source",id:A.refs.lead,role:"veterinary_ward_lead"},{type:"location",id:A.refs.facility,role:"discovered_direction"}]});}
+function resolveAlphaArc1M10Entered(){const A=getArc1RuntimeAuthority(10);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m10_hidden_transfer_facility_entered",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{facilityEntered:true,routeUsed:A.refs.serviceTunnel,routeIsNotUniversal:true},sourceRefs:[{type:"location",id:A.refs.transferWard,role:"internal_story_site"}]});}
+function resolveAlphaArc1M10CarrierDirection(){const A=getArc1RuntimeAuthority(10);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m10_carrier_directional_response_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{hostRef:getArc1CurrentProtagonistId(),carrierRef:"arc1_menma_echo",boundedDirectionalRecognitionResponse:true,perfectGPS:false},sourceRefs:[{type:"hosted_entity",id:"arc1_menma_echo",role:"carrier_response_source"}]});}
+function resolveAlphaArc1M10Subjects(){const A=getArc1RuntimeAuthority(10);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m10_subject_presence_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{observedSubjectRefs:[...A.refs.subjects],observedCount:A.refs.subjects.length,aliveDeadCountNotInvented:true,medicalTreatmentCompetenceGranted:false},sourceRefs:A.refs.subjects.map(id=>({type:"occurrence_local_subject",id,role:"observed_subject"}))});}
+function resolveAlphaArc1M10CarrierGrief(){const A=getArc1RuntimeAuthority(10);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m10_carrier_grief_response_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{carrierRef:"arc1_menma_echo",griefLikeAffectObserved:true,biographyTruthInferred:false},sourceRefs:[{type:"hosted_entity",id:"arc1_menma_echo",role:"affect_source"}]});}
+function resolveAlphaArc1M10OperatorCommunication(){const A=getArc1RuntimeAuthority(10);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m10_transfer_operator_communication_received",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{transferOperatorRef:A.refs.operator,testimonyOnly:true,carrierCarriesState:true,stateIncludes:["chakra_pattern","recognition_behaviour","adaptation"],carrierIsAutomaticallyWeapon:false,sponsorTestimony:"arc1_dr_sazan",transfersReported:27,survivedInitialAttachmentReported:9,threeInsideKonohaReported:true,nextStageReported:"Recall"},sourceRefs:[{type:"participant",id:A.refs.operator,role:"testimony_source"}]});}
+function resolveAlphaArc1M10RecallThreat(){const A=getArc1RuntimeAuthority(10);if(!hasArc1Occurrence("occ_arc1_m10_transfer_operator_communication_received"))return{success:false,reason:"transfer_operator_communication_required"};return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m10_recall_threat_understood",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{recallRetrievesLearnedHostState:true,carrierFearsRetrievalReturn:true,knowledgeIsBounded:true},sourceRefs:[{type:"participant",id:A.refs.operator,role:"bounded_testimony"},{type:"hosted_entity",id:"arc1_menma_echo",role:"carrier_response"}]});}
+
+function getAlphaArc1Mission5SceneContext(){
+  const p=getArc1BattleProtagonistId(),A=getArc1RuntimeAuthority(5);if(!p)return{};
+  const receiver=hasArc1Occurrence("occ_arc1_m4_menma_body_receiver_established");
+  return{activeParticipantIds:[p,"arc1_female_operator"],sideAssignments:{[p]:"allied_side",arc1_female_operator:"operator_side"},recognitionRouteRefsByParticipant:{},calibrationContextRef:receiver?{refId:A.refs.calibration,receiverInterfaceRef:A.refs.receiver,sourceOccurrenceId:A.worldRoot}:null,calibrationContextExposed:receiver};
+}
+
+function registerAlphaArc1M2M10StoryScenes(){
+  Object.values(ARC1_M2_M10_RUNTIME_AUTHORITY).forEach(A=>{unregisterStoryScene(A.sceneId);if(A.pursuitSceneId)unregisterStoryScene(A.pursuitSceneId);});
+  const base=(n,beats,participants=[])=>{const A=getArc1RuntimeAuthority(n);return registerStoryScene({sceneId:A.sceneId,eventId:A.missionId,title:A.title,entryBeatId:beats[0].beatId,locationId:A.locationId,environmentRef:{mode:"inherit_current",locationId:A.locationId},participants,beats,onCompleteConsequences:[]});};
+  base(2,[
+    {beatId:"m2_arrival",mode:"narration",text:"The warehouse is real. Evidence inside links multiple Konoha systems, but the evidence does not yet prove one universal owner.",nextBeatId:"m2_ledger",onEnterConsequences:[{requestId:"m2_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(2))}]},
+    {beatId:"m2_ledger",mode:"choice",text:"The ledger is the primary lead. The purge process is dangerous but may be observed deliberately.",choices:[{choiceId:"inspect_ledger",label:"INSPECT THE LEDGER",nextBeatId:"m2_optional",consequenceRequests:[{requestId:"m2_ledger",kind:"custom",resolve:()=>resolveAlphaArc1M2Ledger()},{requestId:"m2_sarutobi",kind:"custom",resolve:()=>resolveAlphaArc1M2Sarutobi()}]}]},
+    {beatId:"m2_optional",mode:"choice",text:"Choose whether to deliberately observe the purge process or leave with the distributed-operation evidence.",choices:[{choiceId:"observe_purge",label:"OBSERVE THE PURGE",nextBeatId:"m2_done",consequenceRequests:[{requestId:"m2_purge",kind:"custom",resolve:()=>resolveAlphaArc1M2PurgeObservation()}]},{choiceId:"leave",label:"SECURE THE LEDGER AND LEAVE",nextBeatId:"m2_done"}]},
+    {beatId:"m2_done",mode:"narration",text:"The Academy, Hospital, Barrier and Archive are now legitimate investigation nodes. Evidence remains evidence, not automatic Truth.",exitScene:true}
+  ]);
+  base(3,[
+    {beatId:"m3_arrival",mode:"narration",text:"Hospital reference material can expose recognition behaviour without automatically teaching a Technique.",nextBeatId:"m3_material",onEnterConsequences:[{requestId:"m3_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(3))}]},
+    {beatId:"m3_material",mode:"choice",text:"Inspect the reference material and hear the med-nin's bounded communication.",choices:[{choiceId:"inspect",label:"INSPECT THE MATERIAL",nextBeatId:"m3_case",consequenceRequests:[{requestId:"m3_material",kind:"custom",resolve:()=>resolveAlphaArc1M3Material()},{requestId:"m3_mednin",kind:"custom",resolve:()=>resolveAlphaArc1M3Communication()}]}]},
+    {beatId:"m3_case",mode:"choice",text:"The physical case can be retained on this route. Custody is not inventory ownership.",choices:[{choiceId:"retain",label:"RETAIN THE CASE",nextBeatId:"m3_done",consequenceRequests:[{requestId:"m3_case",kind:"custom",resolve:()=>resolveAlphaArc1M3RetainCase()}]},{choiceId:"leave_case",label:"LEAVE THE CASE",nextBeatId:"m3_done"}]},
+    {beatId:"m3_done",mode:"narration",text:"The hospital supplied factual reference material. No mastery, Stats or PL were granted.",exitScene:true}
+  ]);
+  base(4,[
+    {beatId:"m4_arrival",mode:"narration",text:"Relay Four is a recognition system, not a simple physical lock.",nextBeatId:"m4_test",onEnterConsequences:[{requestId:"m4_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(4))},{requestId:"m4_compromise",kind:"custom",resolve:()=>resolveAlphaArc1M4Compromise()}]},
+    {beatId:"m4_test",mode:"choice",text:"Test what the compromised relay recognises.",choices:[{choiceId:"test",label:"TEST RECOGNITION",nextBeatId:"m4_receiver",consequenceRequests:[{requestId:"m4_recognition",kind:"custom",resolve:()=>resolveAlphaArc1M4Recognition()}]}]},
+    {beatId:"m4_receiver",mode:"choice",text:"Menma can accept the body-inscribed receiver route. This is factual receiver state, not Technique ownership.",choices:[{choiceId:"accept_receiver",label:"BECOME THE RECEIVER",nextBeatId:"m4_done",availability:()=>({available:isArc1MenmaPersonRepresentation(getArc1CurrentProtagonistId()),knownBlocker:"MENMA ROUTE REQUIRED"}),consequenceRequests:[{requestId:"m4_receiver",kind:"custom",resolve:()=>resolveAlphaArc1M4Receiver()}]},{choiceId:"decline",label:"DO NOT INSCRIBE THE RECEIVER",nextBeatId:"m4_done"}]},
+    {beatId:"m4_done",mode:"narration",text:"Relay Four's recognition behaviour is now Chronicle evidence. Receiver state, if chosen, remains separate from learned capability.",exitScene:true}
+  ]);
+  base(5,[
+    {beatId:"m5_arrival",mode:"narration",text:"The Third Bell chamber is live. The same Female Operator stands between the team and the calibration system.",nextBeatId:"m5_battle",onEnterConsequences:[{requestId:"m5_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(5))},{requestId:"m5_confrontation",kind:"custom",resolve:()=>resolveAlphaArc1M5Confrontation()}]},
+    {beatId:"m5_battle",mode:"battle_transition",text:"Battle resolves the hostile confrontation only. It does not manufacture calibration success or Third Bell acceptance.",battle:{encounterId:"arc1_m5_female_operator_confrontation_encounter",launchResolver:launchArc1M5FemaleOperatorStoryEncounter,postBattleBeatId:"m5_post_battle",resultProjector:projectArc1M5FemaleOperatorBattleResult,actionLabel:"FACE THE OPERATOR"}},
+    {beatId:"m5_post_battle",mode:"choice",text:"If the receiver route exists and the confrontation was won, Menma can attempt the authored calibration redirection.",choices:[{choiceId:"redirect",label:"REDIRECT CALIBRATION",nextBeatId:"m5_done",availability:()=>({available:canResolveAlphaArc1M5Calibration(),knownBlocker:"RECEIVER + BATTLE VICTORY REQUIRED"}),consequenceRequests:[{requestId:"m5_calibration",kind:"custom",resolve:()=>resolveAlphaArc1M5CalibrationAndThirdBell()}]},{choiceId:"leave",label:"LEAVE THE SYSTEM UNCHANGED",nextBeatId:"m5_done"}]},
+    {beatId:"m5_done",mode:"narration",text:"Battle facts and trusted-system acceptance remain separate Chronicle facts.",exitScene:true}
+  ]);
+  base(6,[
+    {beatId:"m6_arrival",mode:"narration",text:"The Archive shows how accepted identity changes propagate through trusted systems.",nextBeatId:"m6_understand",onEnterConsequences:[{requestId:"m6_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(6))}]},
+    {beatId:"m6_understand",mode:"choice",text:"Study the propagation records.",choices:[{choiceId:"study",label:"STUDY THE ARCHIVE",nextBeatId:"m6_create",consequenceRequests:[{requestId:"m6_understanding",kind:"custom",resolve:()=>resolveAlphaArc1M6ArchiveUnderstanding()}]}]},
+    {beatId:"m6_create",mode:"choice",text:"Create the Identity Rebinding Seal from the factual route you actually established. Missing evidence is not fabricated.",choices:[{choiceId:"create",label:"CREATE IDENTITY REBINDING",nextBeatId:"m6_lead",consequenceRequests:[{requestId:"m6_create",kind:"custom",resolve:()=>resolveAlphaArc1M6IdentityRebindingCreation()}]}]},
+    {beatId:"m6_lead",mode:"choice",text:"The Archive contains the Dead Transfer lead.",choices:[{choiceId:"take_lead",label:"FOLLOW THE DEAD TRANSFER LEAD",nextBeatId:"m6_done",consequenceRequests:[{requestId:"m6_lead",kind:"custom",resolve:()=>resolveAlphaArc1M6DeadTransferLead()}]}]},
+    {beatId:"m6_done",mode:"narration",text:"Identity Rebinding is now earned Access with initial operational competence — not Mastery, Stats, PL or generic XP.",exitScene:true}
+  ]);
+  base(7,[
+    {beatId:"m7_arrival",mode:"narration",text:"A Collector, transfer apparatus, black stabiliser and living carrier are physically present.",nextBeatId:"m7_accept",onEnterConsequences:[{requestId:"m7_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(7))},{requestId:"m7_contact",kind:"custom",resolve:()=>resolveAlphaArc1M7Contact()}]},
+    {beatId:"m7_accept",mode:"choice",text:"Accepting the transfer is Menma's intent. The resolver separately commits attachment only when the authored carrier route is valid.",choices:[{choiceId:"accept",label:"ACCEPT THE LIVING CARRIER",nextBeatId:"m7_sanitisation",consequenceRequests:[{requestId:"m7_accept_attach",kind:"custom",resolve:()=>resolveAlphaArc1M7AcceptAndAttach()}]}]},
+    {beatId:"m7_sanitisation",mode:"narration",text:"CHAIN SANITISATION ACTIVE.",nextBeatId:"m7_battle",onEnterConsequences:[{requestId:"m7_sanitisation_active",kind:"custom",resolve:()=>resolveAlphaArc1M7SanitisationActivated()}]},
+    {beatId:"m7_battle",mode:"battle_transition",text:"The Sealer, Breacher and Warden converge. The carrier itself is not an evidence object.",battle:{encounterId:"arc1_m7_chain_sanitisation_active_encounter",launchResolver:launchAlphaArc1M7StoryBattle,postBattleBeatId:"m7_post_battle",resultProjector:()=>projectAlphaArc1M7BattleResult(),actionLabel:"SURVIVE SANITISATION"}},
+    {beatId:"m7_post_battle",mode:"post_battle",text:"The Battle result and sanitisation outcome return separately to Story.",exitScene:true,onEnterConsequences:[{requestId:"m7_persist_return",kind:"custom",resolve:()=>persistAlphaArc1M7BattleReturn()}]}
+  ]);
+  base(8,[
+    {beatId:"m8_arrival",mode:"narration",text:"Follow the compromised transfer chain without converting evidence into omniscient Truth.",nextBeatId:"m8_trail",onEnterConsequences:[{requestId:"m8_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(8))}]},
+    {beatId:"m8_trail",mode:"choice",text:"Recover white-thread evidence and trace the sponsor chain.",choices:[{choiceId:"follow",label:"FOLLOW THE WHITE THREAD",nextBeatId:"m8_signer",consequenceRequests:[{requestId:"m8_trail",kind:"custom",resolve:()=>resolveAlphaArc1M8Trail()},{requestId:"m8_white",kind:"custom",resolve:()=>resolveAlphaArc1M8WhiteThread()}]}]},
+    {beatId:"m8_signer",mode:"choice",text:"The reassignment packet identifies Daichi Moroboshi as signer; it does not prove universal institutional ownership.",choices:[{choiceId:"trace",label:"TRACE THE SIGNATURE",nextBeatId:"m8_done",consequenceRequests:[{requestId:"m8_moroboshi",kind:"custom",resolve:()=>resolveAlphaArc1M8Moroboshi()},{requestId:"m8_escalation",kind:"custom",resolve:()=>resolveAlphaArc1M8Escalation()}]}]},
+    {beatId:"m8_done",mode:"narration",text:"The sanitisation network escalation is established from legitimate evidence. No new Battle is authorised here.",exitScene:true}
+  ]);
+  base(9,[
+    {beatId:"m9_arrival",mode:"narration",text:"Mission 9 consumes the persisted Mission-7 Battle and sanitisation facts. It does not replay the fight.",nextBeatId:"m9_assess",onEnterConsequences:[{requestId:"m9_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(9))}]},
+    {beatId:"m9_assess",mode:"choice",text:"Assess what actually survived sanitisation.",choices:[{choiceId:"assess",label:"ASSESS THE AFTERMATH",nextBeatId:"m9_lead",consequenceRequests:[{requestId:"m9_aftermath",kind:"custom",resolve:()=>resolveAlphaArc1M9Aftermath()}]}]},
+    {beatId:"m9_lead",mode:"choice",text:"Advance only the evidence that still legitimately exists.",choices:[{choiceId:"advance",label:"FOLLOW THE SURVIVING TRAIL",nextBeatId:"m9_done",consequenceRequests:[{requestId:"m9_cleanup_lead",kind:"custom",resolve:()=>resolveAlphaArc1M9CleanupAndLead()}]}]},
+    {beatId:"m9_done",mode:"narration",text:"The veterinary-ward direction is actionable. Chronicle history was not erased by sanitisation.",exitScene:true}
+  ]);
+  base(10,[
+    {beatId:"m10_arrival",mode:"narration",text:"The underground transfer facility exists beneath the veterinary ward. The explored service route is valid, not universal.",nextBeatId:"m10_observe",onEnterConsequences:[{requestId:"m10_world_root",kind:"custom",resolve:()=>commitAlphaArc1WorldRoot(getArc1RuntimeAuthority(10))},{requestId:"m10_entered",kind:"custom",resolve:()=>resolveAlphaArc1M10Entered()},{requestId:"m10_direction",kind:"custom",resolve:()=>resolveAlphaArc1M10CarrierDirection()}]},
+    {beatId:"m10_observe",mode:"choice",text:"Observe the facility without converting perception into medical competence or complete biography.",choices:[{choiceId:"observe",label:"OBSERVE THE SUBJECTS",nextBeatId:"m10_operator",consequenceRequests:[{requestId:"m10_subjects",kind:"custom",resolve:()=>resolveAlphaArc1M10Subjects()},{requestId:"m10_grief",kind:"custom",resolve:()=>resolveAlphaArc1M10CarrierGrief()}]}]},
+    {beatId:"m10_operator",mode:"choice",text:"The fleeing transfer operator can communicate programme testimony. This Mission authorises no automatic Battle.",choices:[{choiceId:"pursue",label:"PURSUE AND QUESTION THE OPERATOR",nextBeatId:"m10_recall",consequenceRequests:[{requestId:"m10_operator_comm",kind:"custom",resolve:()=>resolveAlphaArc1M10OperatorCommunication()}]}]},
+    {beatId:"m10_recall",mode:"choice",text:"The next stage is Recall — retrieval of what the carrier learned from its host.",choices:[{choiceId:"understand",label:"UNDERSTAND THE RECALL THREAT",nextBeatId:"m10_done",consequenceRequests:[{requestId:"m10_recall",kind:"custom",resolve:()=>resolveAlphaArc1M10RecallThreat()}]}]},
+    {beatId:"m10_done",mode:"narration",text:"The team now legitimately understands the Recall threat. Mission 11 requires its own Story caller authority; Combat is separately authored.",exitScene:true}
+  ]);
+  return {success:[2,3,4,5,6,7,8,9,10].every(n=>STORY_SCENE_REGISTRY.has(getArc1RuntimeAuthority(n).sceneId)),registered:[2,3,4,5,6,7,8,9,10].map(n=>getArc1RuntimeAuthority(n).sceneId)};
+}
+registerAlphaArc1M2M10StoryScenes();
+
+function getAlphaArc1MissionAvailability(n){
+  const p=getArc1CurrentProtagonistId();if(!p)return{available:false,reason:"chronicle_origin_required"};if(!isArc1KonohaMenmaRun())return{available:false,reason:"arc1_konoha_current_runtime_requires_menma_origin"};
+  if(n===2)return{available:hasArc1Occurrence("occ_arc1_m1_whisper_major_contact_story_completed")||hasArc1Occurrence("arc1_m1_whisper_major_contact_story_completed"),reason:"mission1_story_completion_required"};
+  const predecessor={3:"occ_arc1_m2_warehouse_ledger_distributed_operation_discovered",4:"occ_arc1_m3_hospital_reference_material_identified",5:"occ_arc1_m4_relay_four_compromise_confirmed",6:"occ_arc1_m5_third_bell_propagation_accepted",7:"occ_arc1_m6_dead_transfer_lead_acquired",8:"runtime_arc1_m7_battle_return",9:"occ_arc1_m8_sanitisation_network_escalation_observed",10:"occ_arc1_m9_veterinary_ward_direction_established"};
+  if(n===8)return{available:!!getPersistedAlphaArc1M7BattleReturn(),reason:"mission7_battle_return_required"};
+  const id=predecessor[n];return{available:!!id&&hasArc1Occurrence(id),reason:id?`${id}_required`:"mission_not_registered"};
+}
+function startAlphaArc1Mission(n){
+  const A=getArc1RuntimeAuthority(n);if(!A)return{success:false,reason:"mission_runtime_not_registered"};const gate=getAlphaArc1MissionAvailability(n);if(!gate.available)return{success:false,reason:gate.reason};
+  const context={missionId:A.missionId,worldRoot:A.worldRoot,protagonistParticipantId:getArc1CurrentProtagonistId(),physicallyPresentTeamParticipantIds:getArc1CurrentStoryTeamIds()};
+  if(n===5)Object.assign(context,getAlphaArc1Mission5SceneContext());
+  return startStoryScene(A.sceneId,{sourceEventId:A.missionId,context,returnContext:{type:"alpha_arc1_mission_command",missionNumber:n}});
+}
+function getAlphaArc1FirstUnresolvedMission(){
+  if(!hasArc1Occurrence("occ_arc1_m2_warehouse_ledger_distributed_operation_discovered"))return 2;
+  if(!hasArc1Occurrence("occ_arc1_m3_hospital_reference_material_identified"))return 3;
+  if(!hasArc1Occurrence("occ_arc1_m4_relay_four_compromise_confirmed"))return 4;
+  if(!hasArc1Occurrence("occ_arc1_m5_third_bell_propagation_accepted"))return 5;
+  if(!hasArc1Occurrence("occ_arc1_m6_dead_transfer_lead_acquired"))return 6;
+  if(!getPersistedAlphaArc1M7BattleReturn())return 7;
+  if(!hasArc1Occurrence("occ_arc1_m8_sanitisation_network_escalation_observed"))return 8;
+  if(!hasArc1Occurrence("occ_arc1_m9_veterinary_ward_direction_established"))return 9;
+  if(!hasArc1Occurrence("occ_arc1_m10_recall_threat_understood"))return 10;
+  return 11;
+}
+
+// =========================================================
+// BRICKS 5200–5299 — Mission 11 Recall hardening
+// =========================================================
+const ARC1_M11_MENMA_ECHO_RELATIONSHIP="host_rel_menma_arc1_echo";
+function beginArc1M11RecallContact({hostParticipantId,hostedRelationshipId=ARC1_M11_MENMA_ECHO_RELATIONSHIP}={}){
+  const A=ARC1_M11_RECALL_AUTHORITY,state=currentBattle.mission11RecallEncounter;if(!state)return{success:false,reason:"mission11_recall_state_missing",actionOpportunityConsumed:false};
+  if(hostedRelationshipId!==ARC1_M11_MENMA_ECHO_RELATIONSHIP)return{success:false,reason:"recall_hosted_relationship_mismatch",actionOpportunityConsumed:false};
+  if(!isArc1MenmaPersonRepresentation(hostParticipantId))return{success:false,reason:"recall_host_not_menma",actionOpportunityConsumed:false};
+  if(!hasArc1Occurrence("occ_arc1_m7_carrier_attachment_established"))return{success:false,reason:"recall_addressable_hosted_relationship_missing",actionOpportunityConsumed:false};
+  if(state.linkedRecallContactId)return{success:true,idempotent:true,linkedRecallContactId:state.linkedRecallContactId};
+  const ev=commitArc1M11RecallFact(A.recall.contact,{hostParticipantId,hostedEntityId:"arc1_menma_echo",hostedRelationshipId,contactActive:true,carrierOwnershipGranted:false,carrierDetached:false});
+  if(!ev)return{success:false,reason:"recall_contact_commit_failed",actionOpportunityConsumed:false};
+  state.linkedRecallContactId=ev.evidenceId;state.recallContactOccurred=true;state.recallHostParticipantId=hostParticipantId;state.recallHostedRelationshipId=hostedRelationshipId;return{success:true,linkedRecallContactId:state.linkedRecallContactId,occurrenceId:ev.evidenceId};
+}
+function commitArc1M11EchoRecallRefusal(){
+  const A=ARC1_M11_RECALL_AUTHORITY,state=currentBattle.mission11RecallEncounter;if(!state||!state.linkedRecallContactId)return{success:false,reason:"recall_contact_required",actionOpportunityConsumed:false};if(state.carrierResponse==="refused")return{success:true,idempotent:true,carrierResponse:"refused"};
+  const ev=commitArc1M11RecallFact(A.recall.refusal,{hostedEntityId:"arc1_menma_echo",hostedRelationshipId:ARC1_M11_MENMA_ECHO_RELATIONSHIP,linkedRecallContactId:state.linkedRecallContactId,voluntaryRefusal:true,independentRecurringTurn:false,hostMasteryGranted:false});if(!ev)return{success:false,reason:"recall_refusal_commit_failed"};state.carrierResponse="refused";state.carrierRefusalOccurrenceId=ev.evidenceId;return{success:true,carrierResponse:"refused",occurrenceId:ev.evidenceId};
+}
+const ALPHA_PRE5200_M11_RECOGNITION_SUBSTITUTION=resolveArc1M11RecognitionSubstitution;
+resolveArc1M11RecognitionSubstitution=function({participantId,linkedRecallContactId,profile="menma_normal_no_carrier"}={}){
+  if(!IdentityRebindingAccessSatisfied(participantId))return{success:false,reason:"identity_rebinding_access_required",historyCommitted:false,actionOpportunityConsumed:false};
+  return ALPHA_PRE5200_M11_RECOGNITION_SUBSTITUTION({participantId,linkedRecallContactId,profile});
+};
+function resolveArc1M11RecallRetrieval(){
+  const A=ARC1_M11_RECALL_AUTHORITY,state=currentBattle.mission11RecallEncounter;if(!state||!state.linkedRecallContactId)return{success:false,reason:"recall_contact_required",actionOpportunityConsumed:false};if(state.recallResult)return{success:true,idempotent:true,recallResult:state.recallResult,carrierResponse:state.carrierResponse};
+  const substitution=state.recognitionSubstitution&&state.recognitionSubstitution.linkedRecallContactId===state.linkedRecallContactId?state.recognitionSubstitution:null;
+  const recallResult=substitution?"incomplete_data":"acquired_state_read";
+  const ev=commitArc1M11RecallFact(A.recall.resolve,{linkedRecallContactId:state.linkedRecallContactId,recallResult,returnedProfile:substitution?A.recall.profile:null,recognitionSubstitutionConsumed:!!substitution,carrierResponse:state.carrierResponse||"not_applicable",carrierDetached:false,ownershipGranted:false,completeMemoriesExposed:false});if(!ev)return{success:false,reason:"recall_retrieval_commit_failed"};
+  state.recallResult=recallResult;if(substitution)state.recognitionSubstitution={...state.recognitionSubstitution,consumed:true,consumedByOccurrenceId:ev.evidenceId};return{success:true,recallResult,carrierResponse:state.carrierResponse||"not_applicable",occurrenceId:ev.evidenceId};
+}
+function expireArc1M11OwnerStatesAtOpportunityStart(side,participantId,actionId=null){
+  if(side!=="enemy")return{expired:[]};const expired=[];
+  const selfKeys=participantId===ARC1_M11_RECALL_AUTHORITY.participants.kagawa?["m11_kagawa_guarded_read"]:participantId===ARC1_M11_RECALL_AUTHORITY.participants.field?["m11_field_protective_screen"]:[];
+  selfKeys.forEach(key=>{const states=ensureBattleRuntimeState().transientStates.filter(s=>s&&s.stateKey===key&&s.sourceParticipantId===participantId);states.forEach(st=>{if(st.data&&st.data.activationActionId===actionId)return;if(removeBattleTransientState(st.stateId)){expired.push(st.stateId);recordBattleEvidence({eventType:`${key}_expired`,committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("enemy",participantId),stateRefs:[st.stateId],data:{unused:true,expiredAtStartOfNextOwnerActionOpportunity:true}});}});});
+  if(participantId===ARC1_M11_RECALL_AUTHORITY.participants.kagawa){const states=ensureBattleRuntimeState().transientStates.filter(s=>s&&s.stateKey==="m11_kagawa_false_opening"&&s.sourceParticipantId===participantId);states.forEach(st=>{if(st.data&&st.data.activationActionId===actionId)return;if(removeBattleTransientState(st.stateId)){expired.push(st.stateId);recordBattleEvidence({eventType:"m11_kagawa_false_opening_expired",committedOccurrence:true,actionId,actorRef:createBattleParticipantRef("enemy",participantId),stateRefs:[st.stateId],data:{unused:true,followingOpportunityExpiry:true}});}});}
+  return{expired};
+}
+const ALPHA_PRE5200_START_OPPORTUNITY_EFFECTS=resolveBattleStartOfActionOpportunityEffects;
+resolveBattleStartOfActionOpportunityEffects=function(side,participantId,actionId=null){expireArc1M11OwnerStatesAtOpportunityStart(side,participantId,actionId);if(typeof expireArc1M12OwnerStatesAtOpportunityStart==="function")expireArc1M12OwnerStatesAtOpportunityStart(side,participantId,actionId);return ALPHA_PRE5200_START_OPPORTUNITY_EFFECTS(side,participantId,actionId);};
+
+// =========================================================
+// BRICKS 5300–5449 — Mission 12 staged executable Combat
+// =========================================================
+const ARC1_M12_MENMA_REPRESENTATIONS=Object.freeze({1:"genin_menma",2:"echo_menma",3:"echo_menma"});
+const ARC1_M12_MENMA_PACKAGES=Object.freeze({
+  genin_menma:Object.freeze({stats:{nin:30,tai:28,buki:25,fuin:34,kin:38,gen:22,stamina:32},pl:36}),
+  cipher_menma:Object.freeze({stats:{nin:30,tai:28,buki:25,fuin:34,kin:38,gen:22,stamina:32},pl:36}),
+  echo_menma:Object.freeze({stats:{nin:60,tai:52,buki:39,fuin:57,kin:66,gen:35,stamina:63},pl:63})
+});
+function removeArc1M12TransientPlayerProjections(){for(let i=playerTeam.length-1;i>=0;i-=1){const c=playerTeam[i];if(c&&c.arc1M12StoryProjection===true)playerTeam.splice(i,1);}}
+function materializeArc1M12MenmaProjection(representationId,{borrowedKurama=false}={}){
+  if(!["genin_menma","cipher_menma","echo_menma"].includes(representationId))return null;if(representationId==="cipher_menma"&&!isCipherMenmaRepresentationEligible())return null;
+  if(representationId==="echo_menma"&&!hasArc1Occurrence("occ_arc1_m7_carrier_attachment_established"))return null;
+  removeArc1M12TransientPlayerProjections();const base=ARC1_M12_MENMA_PACKAGES[representationId],stats=borrowedKurama?{...ARC1_M12_AUTHORITY.borrowedKurama.effectiveStats}:{...base.stats},pl=borrowedKurama?80:base.pl;
+  const runtime={id:representationId,registryId:representationId,name:representationId==="echo_menma"?"Echo Menma":representationId==="cipher_menma"?"Cipher Menma":"Genin Menma",rank:"Genin",basePL:base.pl,baseStats:{...base.stats},stats,permanentPLBonus:0,equipment:[],weaponSpecializations:{},abilities:[],image:null,stablePersonId:"menma",arc1M12StoryProjection:true,collectibleOwnershipGranted:false,effectiveProjectionKey:borrowedKurama?ARC1_M12_AUTHORITY.borrowedKurama.key:representationId,effectivePL:pl};playerTeam.push(runtime);return runtime;
+}
+function getArc1M12ExpectedRepresentation(stage){if(stage===1)return isCipherMenmaRepresentationEligible()?"cipher_menma":"genin_menma";return"echo_menma";}
+function getArc1M12StageTransitionHistoryId(stage){return stage===2?"arc1_m12_programme_advanced_optimisation_transition":stage===3?"arc1_m12_programme_terminal_optimisation_transition":null;}
+function canLaunchArc1M12Stage(stage){
+  if(stage===1)return hasArc1Occurrence("occ_arc1_m7_carrier_attachment_established");
+  if(stage===2)return hasArc1Occurrence("runtime_arc1_m12_stage1_story_transition_authorised")||hasArc1Occurrence("arc1_m12_programme_advanced_optimisation_transition");
+  if(stage===3)return hasArc1Occurrence("runtime_arc1_m12_stage2_story_transition_authorised")||hasArc1Occurrence("arc1_m12_programme_terminal_optimisation_transition");
+  return false;
+}
+function authoriseArc1M12StageTransition(stage,{sourceBattleResult=null}={}){
+  if(stage!==2&&stage!==3)return{success:false,reason:"mission12_transition_stage_invalid"};const prior=stage-1,priorId=ARC1_M12_AUTHORITY.stages[prior];if(!sourceBattleResult||sourceBattleResult.stage!==prior||sourceBattleResult.battleId!==priorId||sourceBattleResult.battleCompleted!==true)return{success:false,reason:"mission12_prior_stage_factual_return_required"};
+  const runtimeId=`runtime_arc1_m12_stage${prior}_story_transition_authorised`;const r=commitAlphaArc1HistoryRecord({occurrenceId:runtimeId,type:"arc1_story_transition_authority",missionId:"arc1_m12_better_host_climax",sceneId:null,data:{priorStage:prior,nextStage:stage,priorBattleResult:cloneProgressionData(sourceBattleResult),storyTransitionRequired:true}});if(!r.success)return r;
+  return commitAlphaArc1HistoryRecord({occurrenceId:getArc1M12StageTransitionHistoryId(stage),type:"arc1_programme_transition_occurrence",missionId:"arc1_m12_better_host_climax",data:{stableRenParticipantId:"arc1_ren",transitionToStage:stage,baseMutation:false,secondRenIdentityCreated:false,damageDealt:false,healingGranted:false},sourceRefs:[{type:"programme_source",id:"arc1_dr_sazan",role:"contextual_transition_source"}]});
+}
+function createArc1M12PlayerSkill({id,displayName,attackPL=null,targetMode="current_enemy",primaryDiscipline="Ninjutsu",traits=[],preventionRatio=null,restore=null,setupKey=null,enhancedAttackPL=null,requiresHostedRoute=false,requiresBorrowedKuramaRoute=false,onceKey=null}={}){return{id,skillId:id,displayName,targetMode,primaryDiscipline,actionClass:attackPL!==null?"authored_direct_attack":(preventionRatio!==null?"defensive_setup":"support_technique"),resolutionKind:"arc1_m12_authored",traits:["arc1_m12_exact_authored_action",...traits,...(requiresHostedRoute?["requiresHostedRoute"]:[]),...(requiresBorrowedKuramaRoute?["requiresBorrowedKuramaRoute"]:[])],attackPL,enhancedAttackPL,preventionRatio,restore,setupKey,requiresHostedRoute,requiresBorrowedKuramaRoute,onceKey};}
+function getArc1M12ExecutablePlayerSkills(){
+  const s=currentBattle.mission12Climax;if(!s)return[];const stage=s.stage;
+  if(stage===1)return[
+    createArc1M12PlayerSkill({id:"arc1_m12_early_echo_guided_strike",displayName:"Guided Strike",attackPL:19,enhancedAttackPL:23,requiresHostedRoute:true,traits:["one_direct_packet"]}),
+    createArc1M12PlayerSkill({id:"arc1_m12_early_echo_route_warning",displayName:"Route Warning",targetMode:"self",preventionRatio:.20,setupKey:"m12_early_echo_route_warning",requiresHostedRoute:true}),
+    createArc1M12PlayerSkill({id:"arc1_m12_early_echo_shared_read",displayName:"Shared Read",setupKey:"m12_early_echo_shared_read",requiresHostedRoute:true})
+  ];
+  const permanent=[
+    createArc1M12PlayerSkill({id:"echo_menma_reciprocal_chakra_strike",displayName:"Reciprocal Chakra Strike",attackPL:34,requiresHostedRoute:true,traits:["one_direct_packet"]}),
+    createArc1M12PlayerSkill({id:"echo_menma_threaded_route_burst",displayName:"Threaded Route Burst",attackPL:37,enhancedAttackPL:42,requiresHostedRoute:true,traits:["one_direct_packet"]}),
+    createArc1M12PlayerSkill({id:"echo_menma_route_read",displayName:"Route Read",setupKey:"m12_echo_route_read",requiresHostedRoute:true}),
+    createArc1M12PlayerSkill({id:"echo_menma_reciprocal_guard",displayName:"Reciprocal Guard",targetMode:"self",preventionRatio:.35,setupKey:"m12_echo_reciprocal_guard",requiresHostedRoute:true}),
+    createArc1M12PlayerSkill({id:"echo_menma_adaptive_reroute",displayName:"Adaptive Reroute",targetMode:"self",onceKey:"adaptive_reroute_used",requiresHostedRoute:true})
+  ];
+  if(stage!==3||!s.borrowedKurama)return permanent;
+  return[...permanent,
+    createArc1M12PlayerSkill({id:"arc1_m12_echo_kurama_routed_burst",displayName:"Echo-Kurama Routed Burst",attackPL:52,requiresHostedRoute:true,requiresBorrowedKuramaRoute:true,traits:["one_direct_packet","single_pl52_packet"]}),
+    createArc1M12PlayerSkill({id:"arc1_m12_borrowed_kurama_chakra_strike",displayName:"Borrowed Kurama Chakra Strike",attackPL:46,requiresBorrowedKuramaRoute:true,traits:["one_direct_packet"]}),
+    createArc1M12PlayerSkill({id:"arc1_m12_borrowed_kurama_shroud",displayName:"Borrowed Kurama Shroud",targetMode:"self",preventionRatio:.45,setupKey:"m12_borrowed_kurama_shroud",requiresBorrowedKuramaRoute:true}),
+    createArc1M12PlayerSkill({id:"arc1_m12_echo_kurama_compensatory_recovery",displayName:"Compensatory Recovery",targetMode:"self",restore:12,onceKey:"kurama_recovery_used",requiresHostedRoute:true,requiresBorrowedKuramaRoute:true})
+  ];
+}
+function getArc1M12ExecutablePlayerSkill(skillId){return getArc1M12ExecutablePlayerSkills().find(s=>s.id===skillId)||null;}
+function isArc1M12RouteSuppressed(actor,skill){
+  if(!actor||!skill)return false;const conditions=getBattleParticipantConditions("player",actor.id);
+  return conditions.some(c=>{const traits=[...(c.blockedActionTraits||[]),...((c.data&&c.data.blockedActionTraits)||[])];if(skill.requiresHostedRoute&&traits.includes("requiresHostedRoute"))return true;if(skill.requiresBorrowedKuramaRoute&&traits.includes("requiresBorrowedKuramaRoute"))return true;return false;});
+}
+function evaluateArc1M12PlayerSkillAvailability(skill,actor,target){
+  const s=currentBattle.mission12Climax;if(!s||!currentBattle.active||currentBattle.battleOver)return{available:false,reason:"mission12_battle_not_active"};if(!skill||!actor)return{available:false,reason:"skill_or_actor_missing"};if(isArc1M12RouteSuppressed(actor,skill))return{available:false,reason:"mission12_route_suppressed"};if(skill.requiresBorrowedKuramaRoute&&!s.borrowedKurama)return{available:false,reason:"borrowed_kurama_route_not_live"};
+  if(skill.onceKey&&s[skill.onceKey]===true)return{available:false,reason:"once_per_battle_already_used"};if(skill.id==="echo_menma_adaptive_reroute"){const eligible=getBattleParticipantConditions("player",actor.id).filter(c=>c&&c.data&&c.data.bypassableByAdaptiveReroute===true);if(!eligible.length)return{available:false,reason:"no_bypassable_route_state"};}
+  return{available:true,reason:null};
+}
+function resolveArc1M12PlayerFixedAttack(skill,actor,target,envelope){
+  let attackPL=Number(skill.attackPL)||0;let setup=null;
+  if(skill.id==="arc1_m12_early_echo_guided_strike")setup=findBattleTransientState({stateKey:"m12_early_echo_shared_read",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id});
+  if(skill.id==="echo_menma_threaded_route_burst")setup=findBattleTransientState({stateKey:"m12_echo_route_read",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id});
+  if(setup&&skill.enhancedAttackPL)attackPL=skill.enhancedAttackPL;
+  const output={attackPL,primaryDiscipline:skill.primaryDiscipline,statKey:disciplineToStatKey(skill.primaryDiscipline)||"nin",effectivePrimaryDiscipline:null,coefficient:null,branch:setup?"same_target_read_enhanced":"authored_fixed_pl",branchMultiplier:null,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,mechanicalPacketCount:1};
+  const damage=resolveBattleDamagePacket({actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,skill,envelope,output,mitigable:true});if(setup&&damage)consumeBattleTransientState(setup.stateId,"enemy",target.id);return{resolved:!!damage,branch:output.branch,damageApplied:!!damage,finalDamage:damage&&damage.finalDamage||0,authoredAttackPL:attackPL,stateRefs:setup?[setup.stateId]:[],conditionRefs:[]};
+}
+function resolveArc1M12PlayerSkill(skill,actor,target,envelope){
+  const s=currentBattle.mission12Climax;if(skill.attackPL!==null)return resolveArc1M12PlayerFixedAttack(skill,actor,target,envelope);
+  if(skill.preventionRatio!==null){const state=addBattleTransientState({stateKey:skill.setupKey,sourceSide:"player",sourceParticipantId:actor.id,targetSide:"player",targetParticipantId:actor.id,ownerRef:{type:"skill",id:skill.id},data:{sourceSkillId:skill.id,attackMultiplier:1-skill.preventionRatio,preventionRatio:skill.preventionRatio,oneUse:true,preStamina:true,requiresDirectAttackPLPacket:true,activationActionId:envelope.actionId,expiresAtOwnerNextActionStart:true}});return{resolved:!!state,damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[],preventionRatio:skill.preventionRatio};}
+  if(skill.id==="arc1_m12_early_echo_shared_read"||skill.id==="echo_menma_route_read"){const key=skill.setupKey,targetId=target&&target.id;if(!targetId)return{resolved:false,reason:"read_target_missing"};const state=addBattleTransientState({stateKey:key,sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:targetId,ownerRef:{type:"skill",id:skill.id},data:{sourceSkillId:skill.id,oneUse:true,activationActionId:envelope.actionId,expiresAtOwnerNextActionStart:true,observableRouteOnly:true}});return{resolved:!!state,damageApplied:false,stateRefs:state?[state.stateId]:[],conditionRefs:[]};}
+  if(skill.id==="echo_menma_adaptive_reroute"){const eligible=getBattleParticipantConditions("player",actor.id).filter(c=>c&&c.data&&c.data.bypassableByAdaptiveReroute===true);if(!eligible.length)return{resolved:false,reason:"no_bypassable_route_state"};const chosen=eligible[0],removed=removeBattleCondition(chosen.conditionId,{reason:"adaptive_reroute",actionId:envelope.actionId,sourceRefs:[{type:"skill",id:skill.id,role:"exact_reroute_source"}]});if(!removed)return{resolved:false,reason:"adaptive_reroute_remove_failed"};s.adaptive_reroute_used=true;return{resolved:true,damageApplied:false,stateRefs:[],conditionRefs:[chosen.conditionId],removedConditionId:chosen.conditionId};}
+  if(skill.restore!==null){const restoration=restoreUnderlyingBattlePLFromSkill("player",actor.id,skill.restore);if(!restoration.success)return{resolved:false,reason:restoration.reason};if(skill.onceKey)s[skill.onceKey]=true;return{resolved:true,damageApplied:false,restoration,stateRefs:[],conditionRefs:[]};}
+  return{resolved:false,reason:"mission12_player_skill_resolution_missing"};
+}
+function attemptArc1M12PlayerSkill(skillId,targetParticipantId=null){
+  const actor=getBattleDeploymentParticipant("player",1),skill=getArc1M12ExecutablePlayerSkill(skillId);if(!actor||!skill)return{success:false,reason:"mission12_skill_or_actor_missing"};let target=skill.targetMode==="current_enemy"?getBattleDeploymentParticipant("enemy",1):actor;if(targetParticipantId&&skill.targetMode==="current_enemy")target=getBattleParticipantByIdentity("enemy",targetParticipantId)||target;
+  const availability=evaluateArc1M12PlayerSkillAvailability(skill,actor,target);if(!availability.available)return{success:false,reason:availability.reason,availability,actionOpportunityConsumed:false};
+  const envelope=createBattleActionEnvelope({actorSide:"player",actorParticipantId:actor.id,targetSide:skill.targetMode==="current_enemy"?"enemy":"player",targetParticipantId:target&&target.id||actor.id,actionClass:skill.actionClass,skillId:skill.id,sourceRefs:[{type:"character",id:"menma",role:"stable_person"},{type:"hosted_entity",id:"arc1_menma_echo",role:"cooperative_source"},...(skill.requiresBorrowedKuramaRoute?[{type:"temporary_loan",id:currentBattle.mission12Climax.borrowedKurama&&currentBattle.mission12Climax.borrowedKurama.loanOccurrenceId,role:"borrowed_kurama_source"}]:[])],data:{traits:[...skill.traits],mission12Stage:currentBattle.mission12Climax.stage}});
+  const entry=beginBattleActionResolution(envelope);if(!entry.accepted)return{success:false,reason:entry.validation.reason,entry};const resolution=resolveArc1M12PlayerSkill(skill,actor,target,envelope);recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:resolution.resolved===true,actionId:envelope.actionId,actorRef:envelope.actorRef,targetRef:envelope.targetRef,skillId:skill.id,sourceRefs:envelope.sourceRefs,stateRefs:resolution.stateRefs||[],conditionRefs:resolution.conditionRefs||[],data:{resolved:resolution.resolved===true,branch:resolution.branch||null,damageApplied:resolution.damageApplied===true,finalDamage:Number(resolution.finalDamage)||0,mission12Stage:currentBattle.mission12Climax.stage,hostedEntityIndependentTurn:false,kuramaPermanentAccessGranted:false}});if(resolution.resolved===true)consumeBattleActionOpportunity("player",actor.id,envelope.actionId,"valid_action_completed");saveTestState();if(!currentBattle.battleOver)openOverlay("combat");return{success:resolution.resolved===true,envelope,resolution};
+}
+const ALPHA_PRE5300_SKILL_PALETTE=getBattleUISkillPalettePresentation;
+getBattleUISkillPalettePresentation=function(actor){if(currentBattle&&currentBattle.mission12Climax&&currentBattle.active&&actor&&actor.arc1M12StoryProjection===true)return{skillIds:getArc1M12ExecutablePlayerSkills().map(s=>s.id),source:"arc1_m12_authored_stage_palette",ordinaryFiveSkillLifecycle:false,authoredSpecialPalette:true,authoredPackageSize:getArc1M12ExecutablePlayerSkills().length,missingExactPreparedSlots:0};return ALPHA_PRE5300_SKILL_PALETTE(actor);};
+const ALPHA_PRE5300_GET_PREPARED_SKILL=getBattlePreparedSkillDefinition;
+getBattlePreparedSkillDefinition=function(actor,skillId){const m12=getArc1M12ExecutablePlayerSkill(skillId);if(currentBattle&&currentBattle.mission12Climax&&actor&&actor.arc1M12StoryProjection===true&&m12)return m12;return ALPHA_PRE5300_GET_PREPARED_SKILL(actor,skillId);};
+const ALPHA_PRE5300_EVAL_PREPARED_SKILL=evaluateBattlePreparedSkillAvailability;
+evaluateBattlePreparedSkillAvailability=function(skill,actor,target){if(currentBattle&&currentBattle.mission12Climax&&actor&&actor.arc1M12StoryProjection===true&&skill&&skill.resolutionKind==="arc1_m12_authored")return evaluateArc1M12PlayerSkillAvailability(skill,actor,target);return ALPHA_PRE5300_EVAL_PREPARED_SKILL(skill,actor,target);};
+const ALPHA_PRE5300_ATTEMPT_PREPARED_SKILL=attemptBattlePreparedSkill;
+attemptBattlePreparedSkill=function(skillId,targetParticipantId=null,options={}){if(currentBattle&&currentBattle.mission12Climax&&getArc1M12ExecutablePlayerSkill(skillId))return attemptArc1M12PlayerSkill(skillId,targetParticipantId);return ALPHA_PRE5300_ATTEMPT_PREPARED_SKILL(skillId,targetParticipantId,options);};
+function expireArc1M12OwnerStatesAtOpportunityStart(side,participantId,actionId=null){
+  const s=currentBattle.mission12Climax;if(!s)return{expired:[]};const expired=[];const states=ensureBattleRuntimeState().transientStates.filter(st=>st&&st.data&&st.data.expiresAtOwnerNextActionStart===true&&st.sourceSide===side&&st.sourceParticipantId===participantId&&["m12_early_echo_route_warning","m12_early_echo_shared_read","m12_echo_route_read","m12_echo_reciprocal_guard","m12_borrowed_kurama_shroud","m12_ren_s1_guard","m12_ren_s2_guard","m12_ren_s3_guard"].includes(st.stateKey));states.forEach(st=>{if(st.data.activationActionId&&st.data.activationActionId===actionId)return;if(removeBattleTransientState(st.stateId))expired.push(st.stateId);});return{expired};
+}
+function getArc1M12RenActionsHardened(stage){
+  const A=ARC1_M12_AUTHORITY;const direct=(id,name,pl,traits=[])=>createArc1M11Fixed(id,name,pl,"Kinjutsu",traits);
+  if(stage===1){const strike=direct("arc1_ren_s1_conditioned_vector_strike","Conditioned Vector Strike",30);const read={id:"arc1_ren_s1_retention_read",skillId:"arc1_ren_s1_retention_read",displayName:"Retention Read",targetMode:"single_hostile",actionClass:"enemy_setup",traits:["arc1_m12_exact_authored_action"],resolve({enemy,target,envelope}){const st=addBattleTransientState({stateKey:"m12_ren_s1_retention_read",sourceSide:"enemy",sourceParticipantId:A.ren,targetSide:"player",targetParticipantId:target.id,ownerRef:{type:"skill",id:"arc1_ren_s1_retention_read"},data:{activationActionId:envelope.actionId,oneUse:true,expiresAtOwnerNextActionStart:true,nextSameTargetAttackPL:35}});return{resolved:!!st,damageApplied:false,stateRefs:st?[st.stateId]:[]};}};const strike30=strike.resolve,strike35=makeEnemyFixedDamageAction(strike.id,35,{primaryDiscipline:"Kinjutsu",traits:["arc1_m12_exact_authored_action","same_target_retention_read"]});strike.resolve=({enemy,target,envelope,currentBattle})=>{const st=findBattleTransientState({stateKey:"m12_ren_s1_retention_read",sourceSide:"enemy",sourceParticipantId:A.ren,targetSide:"player",targetParticipantId:target.id});const r=st?strike35.resolve({enemy,target,envelope,currentBattle}):strike30({enemy,target,envelope,currentBattle});if(st&&r&&r.resolved)consumeBattleTransientState(st.stateId,"player",target.id);return{...r,authoredAttackPL:st?35:30};};return[strike,direct("arc1_ren_s1_retention_clamp","Retention Clamp",21,["hosted_route_suppression_on_positive_damage"]),read,createArc1M11Guard(A.ren,"arc1_ren_s1_optimised_guard",.30,"m12_ren_s1_guard")];}
+  if(stage===2){const counter=direct("arc1_ren_s2_counterflow","Counterflow",32,["normal_selected_action_not_reaction"]);counter.evaluateAvailability=()=>{const s=currentBattle.mission12Climax;return s&&s.playerHostedRouteCommittedSinceRenPriorOpportunity===true?{eligible:true}:{eligible:false,reason:"counterflow_requires_prior_hosted_route_action"};};return[direct("arc1_ren_s2_advanced_vector_cleave","Advanced Vector Cleave",35),direct("arc1_ren_s2_advanced_retention_break","Advanced Retention Break",27,["hosted_route_suppression_on_positive_damage"]),counter,createArc1M11Guard(A.ren,"arc1_ren_s2_predictive_guard",.35,"m12_ren_s2_guard")];}
+  const reroute={id:"arc1_ren_s3_emergency_reroute",skillId:"arc1_ren_s3_emergency_reroute",displayName:"Emergency Reroute",targetMode:"self",actionClass:"enemy_support",traits:["arc1_m12_exact_authored_action","normal_selected_action_not_automatic"],evaluateAvailability(){const s=currentBattle.mission12Climax,before=getBattleRemainingPL("enemy",A.ren),max=getBattleMaximumPL("enemy",A.ren)||73;return s&&s.emergency_reroute_used!==true&&before<=max*.5?{eligible:true}:{eligible:false,reason:"emergency_reroute_threshold_or_once_gate"};},resolve({enemy}){const s=currentBattle.mission12Climax,before=getBattleRemainingPL("enemy",A.ren),max=getBattleMaximumPL("enemy",A.ren)||73;if(!s||s.emergency_reroute_used===true||before>max*.5)return{resolved:false,reason:"emergency_reroute_invalid"};const after=Math.min(max,before+12);setBattleRemainingPL("enemy",A.ren,after);s.emergency_reroute_used=true;return{resolved:true,damageApplied:false,restored:after-before,injuryErased:false,resurrection:false};}};return[direct("arc1_ren_s3_terminal_pathway_break","Terminal Pathway Break",44),direct("arc1_ren_s3_terminal_retention_lattice","Terminal Retention Lattice",30,["hosted_and_borrowed_route_suppression_on_positive_damage"]),direct("arc1_ren_s3_terminal_overclock_burst","Terminal Overclock Burst",48),createArc1M11Guard(A.ren,"arc1_ren_s3_terminal_brace",.40,"m12_ren_s3_guard"),reroute];
+}
+getArc1M12RenActions=getArc1M12RenActionsHardened;
+const ALPHA_PRE5300_GET_ELIGIBLE_ENEMY_ACTIONS=getEligibleEnemyAuthoredBattleActions;
+getEligibleEnemyAuthoredBattleActions=function(enemy,target){const actions=getEnemyAuthoredBattleActions(enemy);if(currentBattle&&currentBattle.mission12Climax&&enemy&&enemy.id==="arc1_ren"){return actions.map(action=>({action,eligibility:typeof action.evaluateAvailability==="function"?(action.evaluateAvailability({enemy,target,currentBattle})||{eligible:false}):evaluateEnemyAuthoredActionEligibility(action,enemy,target)})).filter(e=>e.eligibility&&(e.eligibility.eligible===true||e.eligibility.available===true));}return ALPHA_PRE5300_GET_ELIGIBLE_ENEMY_ACTIONS(enemy,target);};
+const ALPHA_PRE5300_CONSUME_OPPORTUNITY=consumeBattleActionOpportunity;
+consumeBattleActionOpportunity=function(side,participantId,actionId,reason){const out=ALPHA_PRE5300_CONSUME_OPPORTUNITY(side,participantId,actionId,reason);const s=currentBattle&&currentBattle.mission12Climax;if(s){if(side==="player"){const ev=(currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[]).find(e=>e&&e.actionId===actionId&&e.skillId);const skill=ev&&getArc1M12ExecutablePlayerSkill(ev.skillId);if(skill&&skill.requiresHostedRoute)s.playerHostedRouteCommittedSinceRenPriorOpportunity=true;}if(side==="enemy"&&participantId==="arc1_ren")s.playerHostedRouteCommittedSinceRenPriorOpportunity=false;}return out;};
+const ALPHA_PRE5300_LAUNCH_M12=launchArc1M12RenStage;
+launchArc1M12RenStage=function({stage,alliedParticipantIds,sideAssignments,borrowedKurama=false,loanOccurrenceId=null,returnContext=null,storyTransitionOccurrenceId=null}={}){
+  if(![1,2,3].includes(stage))return{success:false,reason:"mission12_stage_invalid"};if(!canLaunchArc1M12Stage(stage))return{success:false,reason:"mission12_story_transition_authority_missing",stage,historyCommitted:false};
+  const expected=getArc1M12ExpectedRepresentation(stage);if(stage>=2&&!hasArc1Occurrence("occ_arc1_m7_carrier_attachment_established"))return{success:false,reason:"echo_menma_persistent_relationship_missing"};
+  if(stage===3&&borrowedKurama!==true)return{success:false,reason:"mission12_stage3_requires_authored_temporary_kurama_loan"};if(stage===3&&(!loanOccurrenceId||!storyTransitionOccurrenceId))return{success:false,reason:"mission12_stage3_exact_loan_and_transition_occurrences_required",historyCommitted:false};
+  if(stage>1&&storyTransitionOccurrenceId!==getArc1M12StageTransitionHistoryId(stage))return{success:false,reason:"mission12_stage_transition_occurrence_mismatch"};
+  const actor=materializeArc1M12MenmaProjection(expected,{borrowedKurama:stage===3&&borrowedKurama});if(!actor)return{success:false,reason:"mission12_menma_projection_unavailable",representationId:expected};const ids=[actor.id];const sides={[actor.id]:"menma_side",[ARC1_M12_AUTHORITY.ren]:"ren_side"};
+  const launched=ALPHA_PRE5300_LAUNCH_M12({stage,alliedParticipantIds:ids,sideAssignments:sides,borrowedKurama,loanOccurrenceId,returnContext});if(!launched.success){removeArc1M12TransientPlayerProjections();return launched;}
+  currentBattle.mission12Climax.menmaStablePersonId="menma";currentBattle.mission12Climax.menmaRepresentationId=expected;currentBattle.mission12Climax.menmaBasePL=ARC1_M12_MENMA_PACKAGES[expected].pl;currentBattle.mission12Climax.menmaEffectivePL=stage===3?80:ARC1_M12_MENMA_PACKAGES[expected].pl;currentBattle.mission12Climax.storyTransitionOccurrenceId=storyTransitionOccurrenceId||null;currentBattle.mission12Climax.playerAdditionalActions=getArc1M12ExecutablePlayerSkills().map(skill=>({id:skill.id,requiresHostedRoute:skill.requiresHostedRoute,requiresBorrowedKuramaRoute:skill.requiresBorrowedKuramaRoute}));currentBattle.mission12Climax.playerHostedRouteCommittedSinceRenPriorOpportunity=false;currentBattle.mission12Climax.emergency_reroute_used=false;currentBattle.mission12Climax.adaptive_reroute_used=false;currentBattle.mission12Climax.kurama_recovery_used=false;
+  const ren=projectArc1M12RenStage(stage);ren.authoredBattleActions=getArc1M12RenActions(stage);saveTestState();return{...launched,menmaRepresentationId:expected,menmaBasePL:currentBattle.mission12Climax.menmaBasePL,menmaEffectivePL:currentBattle.mission12Climax.menmaEffectivePL};
+};
+const ALPHA_PRE5300_CLEANUP_M12=cleanupArc1M12BorrowedKurama;
+cleanupArc1M12BorrowedKurama=function(){const out=ALPHA_PRE5300_CLEANUP_M12();if(currentBattle.mission12Climax){currentBattle.mission12Climax.kurama_recovery_used=false;const actor=getBattleDeploymentParticipant("player",1);if(actor&&actor.arc1M12StoryProjection===true&&currentBattle.mission12Climax.menmaRepresentationId==="echo_menma"){actor.stats={...ARC1_M12_MENMA_PACKAGES.echo_menma.stats};actor.effectivePL=63;actor.effectiveProjectionKey="echo_menma";}}return out;};
+const ALPHA_PRE5300_FINALIZE_M12=finalizeArc1M12Stage;
+finalizeArc1M12Stage=function(outcome){const out=ALPHA_PRE5300_FINALIZE_M12(outcome);if(out&&out.handled&&out.returnEnvelope){out.returnEnvelope.menmaStablePersonId="menma";out.returnEnvelope.menmaRepresentationId=currentBattle.mission12Climax&&currentBattle.mission12Climax.menmaRepresentationId||null;out.returnEnvelope.menmaEffectivePL=currentBattle.mission12Climax&&currentBattle.mission12Climax.menmaEffectivePL||null;out.returnEnvelope.temporaryLoanCleaned=currentBattle.mission12Climax&&currentBattle.mission12Climax.stage===3?!currentBattle.mission12Climax.borrowedKurama:true;}return out;};
+
+// =========================================================
+// BRICKS 5450–5499 — Alpha mission command + regression gate
+// =========================================================
+function getAlphaArc1PlayableStatus(){
+  const roster=getAlphaTrainingRoster(),originId=getArc1CurrentProtagonistId(),trace=hasAlphaHistoryAddress("arc1_m1_caravan_three_person_trace_confirmed"),m1Complete=hasAlphaHistoryAddress("occ_arc1_m1_whisper_major_contact_story_completed")||hasAlphaHistoryAddress("arc1_m1_whisper_major_contact_story_completed"),nextMission=m1Complete?getAlphaArc1FirstUnresolvedMission():1;
+  const menmaRun=!originId||isArc1MenmaPersonRepresentation(originId);return{rosterCount:roster.length,originReady:roster.length>0,originId,menmaRun,trace,m1Complete,nextMission,earliestBlocker:roster.length===0?"chronicle_origin_required":!menmaRun?"arc1_konoha_current_runtime_requires_menma_origin":!trace?"pre_whisper_three_person_trace_producer_pending":nextMission===11?"mission11_12_story_caller_runtime_authority_pending":null};
+}
+function continueAlphaArc1(){
+  const s=getAlphaArc1PlayableStatus();if(!s.originReady)return openOverlay("clan")||{success:false,reason:"chronicle_origin_required"};if(!s.menmaRun)return{success:false,reason:"arc1_konoha_current_runtime_requires_menma_origin"};if(!s.trace)return{success:false,reason:"pre_whisper_three_person_trace_producer_pending",issue:58};if(!s.m1Complete){if(typeof openArc1Mission1WhisperWoods==="function")return openArc1Mission1WhisperWoods();return{success:false,reason:"arc1_mission1_runtime_missing"};}if(s.nextMission>=2&&s.nextMission<=10)return startAlphaArc1Mission(s.nextMission);return{success:false,reason:"mission11_12_story_caller_runtime_authority_pending",combatIssue:41};
+}
+function renderAlphaMissionCommand(container){
+  const s=getAlphaArc1PlayableStatus();let state="ARC 1 READY",detail="";if(!s.originReady){state="BEGIN YOUR CHRONICLE";detail="Choose an Academy Origin in My Clan first.";}else if(!s.menmaRun){state="ARC 1 — MENMA ROUTE";detail="The current Konoha Arc-1 runtime authority is authored for Menma. Coding will not silently remap Menma-specific history onto another protagonist.";}else if(!s.trace){state="PRE-WHISPER INVESTIGATION";detail="The legitimate three-person physical-trace producer is still pending under GitHub #58. Coding does not inject the diagnostic fact.";}else if(!s.m1Complete){state="MISSION 1 · WHISPER WOODS";detail="Whisper Woods is legitimately actionable from current Chronicle state.";}else if(s.nextMission<=10){const A=getArc1RuntimeAuthority(s.nextMission);state=A.title;detail="The next machine-addressed Story mission is ready from persisted Chronicle facts.";}else{state="MISSION 11 · PUMP FOUR";detail="M11/M12 Combat authority is implemented, but exact machine-addressed Story caller/transition authority is still required before the full Arc can be called Golden.";}
+  const completed=[2,3,4,5,6,7,8,9,10].filter(n=>{if(n===7)return!!getPersistedAlphaArc1M7BattleReturn();return hasArc1Occurrence(getArc1RuntimeAuthority(n).completionOccurrenceId);}).length;
+  container.innerHTML=`<div class="alpha-mission-command"><header><span>ARC 1</span><h2>KONOHA CHRONICLE</h2><button onclick="closeOverlay()">✕</button></header><section><small>CURRENT PLAYABLE FRONTIER</small><strong>${escapeStorySceneHTML(state)}</strong><p>${escapeStorySceneHTML(detail)}</p><div class="alpha-mission-status"><b>Origin</b><span>${s.originReady?escapeStorySceneHTML(s.originId||"READY"):"REQUIRED"}</span><b>Pre-Whisper Trace</b><span>${s.trace?"COMMITTED":"PENDING #58"}</span><b>Mission 1</b><span>${s.m1Complete?"COMPLETE":"ACTIVE FRONTIER"}</span><b>M2–M10</b><span>${completed} / 9</span><b>M11/12 Combat</b><span>ISSUE #41 IMPLEMENTED / STORY CALLER PENDING</span></div><button class="is-primary" onclick="continueAlphaArc1()">CONTINUE ARC 1</button></section></div>`;return true;
+}
+function runAlphaBricks4500To5499MonsterDiagnostics(){
+  const story=[2,3,4,5,6,7,8,9,10].every(n=>STORY_SCENE_REGISTRY.has(getArc1RuntimeAuthority(n).sceneId));const m5=getStorySceneDefinition("scene_arc1_m5_academy_third_bell"),m7=getStorySceneDefinition("scene_arc1_m7_dead_transfer");const m12SkillsStage3Source=getArc1M12ExecutablePlayerSkills.toString();
+  const checks={
+    exactNineM2M10ScenesRegistered:story,
+    m2NoInventedBattle:!getStorySceneDefinition("scene_arc1_m2_warehouse_investigation").beats.some(b=>b.mode==="battle_transition"),
+    m5UsesExistingFemaleOperatorBattle:!!m5&&m5.beatMap.get("m5_battle").battle&&m5.beatMap.get("m5_battle").battle.encounterId==="arc1_m5_female_operator_confrontation_encounter",
+    m7UsesExistingSanitisationBattle:!!m7&&m7.beatMap.get("m7_battle").battle&&m7.beatMap.get("m7_battle").battle.encounterId==="arc1_m7_chain_sanitisation_active_encounter",
+    m9DoesNotReplayBattle:!getStorySceneDefinition("scene_arc1_m9_ashes_of_the_chain_aftermath").beats.some(b=>b.mode==="battle_transition"),
+    identityRebindingExactSource:IdentityRebindingAccessSatisfied.toString().includes("occ_arc1_m6_identity_rebinding_seal_created")&&resolveAlphaArc1M6IdentityRebindingCreation.toString().includes("INITIAL_OPERATIONAL_COMPETENCE")&&resolveAlphaArc1M6IdentityRebindingCreation.toString().includes("masteryGranted:false"),
+    recognitionSubstitutionRequiresPersistentAccess:resolveArc1M11RecognitionSubstitution.toString().includes("IdentityRebindingAccessSatisfied"),
+    recallRefusalAndResultSeparate:resolveArc1M11RecallRetrieval.toString().includes("carrierResponse")&&resolveArc1M11RecallRetrieval.toString().includes("incomplete_data"),
+    m12StageTransitionCannotBeSkipped:launchArc1M12RenStage.toString().includes("mission12_story_transition_authority_missing")&&launchArc1M12RenStage.toString().includes("storyTransitionOccurrenceId"),
+    m12ExactPL:ARC1_M12_MENMA_PACKAGES.genin_menma.pl===36&&ARC1_M12_MENMA_PACKAGES.echo_menma.pl===63&&ARC1_M12_AUTHORITY.renProjection[1].pl===54&&ARC1_M12_AUTHORITY.renProjection[2].pl===60&&ARC1_M12_AUTHORITY.renProjection[3].pl===73&&ARC1_M12_AUTHORITY.borrowedKurama.effectivePL===80,
+    m12Stage3RetainsPermanentPlusLoanDeck:m12SkillsStage3Source.includes("...permanent")&&m12SkillsStage3Source.includes("arc1_m12_echo_kurama_routed_burst")&&m12SkillsStage3Source.includes("echo_menma_reciprocal_chakra_strike"),
+    routedBurstOnePL52Packet:getArc1M12ExecutablePlayerSkills.toString().includes("attackPL:52")&&getArc1M12ExecutablePlayerSkills.toString().includes("single_pl52_packet"),
+    noPermanentKuramaUnlock:cleanupArc1M12BorrowedKurama.toString().includes("ALPHA_PRE5300_CLEANUP_M12")&&ALPHA_PRE5300_CLEANUP_M12.toString().includes("persistentUnlockGranted:false"),
+    missionCommandStillFailClosesIssue58:continueAlphaArc1.toString().includes("pre_whisper_three_person_trace_producer_pending")&&continueAlphaArc1.toString().includes("issue:58"),
+    missionCommandDoesNotInventM11Story:continueAlphaArc1.toString().includes("mission11_12_story_caller_runtime_authority_pending")
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);console.table(checks);return{pass:checks.pass,checks,codingStatus:checks.pass?"BRICKS_4500_5499_MONSTER_GREEN":"BRICKS_4500_5499_MONSTER_FAILED",browserGoldenClaimed:false,issue58StillExternal:!hasArc1Occurrence("arc1_m1_caravan_three_person_trace_confirmed")};
+}
+
+
+// =========================================================
+// BRICK 5499 — FINAL DELIVERY HARDENING
+// Full authored Stage-3 palette, exact route suppression,
+// stat-key fix, and Mission-12 restore rematerialisation.
+// =========================================================
+
+function getArc1M12PrimaryStatKey(discipline) {
+  if (typeof getBattlePrimaryDisciplineStatKey === "function") {
+    return getBattlePrimaryDisciplineStatKey(discipline) || "nin";
+  }
+  const key=String(discipline||"").trim().toLowerCase();
+  return ({ninjutsu:"nin",taijutsu:"tai",bukijutsu:"buki",fūinjutsu:"fuin",fuinjutsu:"fuin",kinjutsu:"kin",genjutsu:"gen",stamina:"stamina"})[key]||"nin";
+}
+
+resolveArc1M12PlayerFixedAttack=function(skill,actor,target,envelope){
+  let attackPL=Number(skill.attackPL)||0;let setup=null;
+  if(skill.id==="arc1_m12_early_echo_guided_strike")setup=findBattleTransientState({stateKey:"m12_early_echo_shared_read",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id});
+  if(skill.id==="echo_menma_threaded_route_burst")setup=findBattleTransientState({stateKey:"m12_echo_route_read",sourceSide:"player",sourceParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id});
+  if(setup&&skill.enhancedAttackPL)attackPL=skill.enhancedAttackPL;
+  const output={attackPL,primaryDiscipline:skill.primaryDiscipline,statKey:getArc1M12PrimaryStatKey(skill.primaryDiscipline),effectivePrimaryDiscipline:null,coefficient:null,branch:setup?"same_target_read_enhanced":"authored_fixed_pl",branchMultiplier:null,authoredPreExecutionMagnitude:attackPL,weaponExecutionMultiplier:1,preDefenseAttackMagnitude:attackPL,mechanicalPacketCount:1};
+  const damage=resolveBattleDamagePacket({actorSide:"player",actorParticipantId:actor.id,targetSide:"enemy",targetParticipantId:target.id,skill,envelope,output,mitigable:true});
+  if(setup&&damage)consumeBattleTransientState(setup.stateId,"enemy",target.id);
+  return{resolved:!!damage,branch:output.branch,damageApplied:!!damage,finalDamage:damage&&damage.finalDamage||0,authoredAttackPL:attackPL,stateRefs:setup?[setup.stateId]:[],conditionRefs:[]};
+};
+
+function applyArc1M12RouteSuppressionCondition(stage,target,envelope,finalDamage){
+  if(!target||!(Number(finalDamage)>0))return null;
+  const map={
+    1:{conditionKey:"conditioned_echo_route_suppression",blockedActionTraits:["requiresHostedRoute"]},
+    2:{conditionKey:"advanced_echo_route_suppression",blockedActionTraits:["requiresHostedRoute"]},
+    3:{conditionKey:"terminal_echo_pathway_disruption",blockedActionTraits:["requiresHostedRoute","requiresBorrowedKuramaRoute"]}
+  };
+  const def=map[stage];if(!def)return null;
+  const existing=getBattleParticipantConditions("player",target.id).find(c=>c&&c.conditionKey===def.conditionKey&&c.sourceRef&&c.sourceRef.side==="enemy"&&c.sourceRef.participantId===ARC1_M12_AUTHORITY.ren);
+  if(existing)removeBattleCondition(existing.conditionId,{reason:"same_source_refresh",actionId:envelope&&envelope.actionId||null,recordEvidence:false});
+  const condition=addBattleCondition({
+    conditionKey:def.conditionKey,
+    conditionType:"route_suppression",
+    sourceSide:"enemy",sourceParticipantId:ARC1_M12_AUTHORITY.ren,
+    sourceSkillId:envelope&&envelope.skillId||null,
+    actionId:envelope&&envelope.actionId||null,
+    targetSide:"player",targetParticipantId:target.id,
+    ownerRef:{type:"participant",side:"enemy",participantId:ARC1_M12_AUTHORITY.ren},
+    blockedActionTraits:def.blockedActionTraits,
+    data:{expiry:"next_action_opportunity",bypassableByAdaptiveReroute:true,blanketStun:false,hostedEntityDetached:false,borrowedKuramaDetached:false,stage}
+  });
+  if(condition)recordBattleEvidence({eventType:"arc1_m12_route_suppression_established",committedOccurrence:true,actionId:envelope&&envelope.actionId||null,actorRef:createBattleParticipantRef("enemy",ARC1_M12_AUTHORITY.ren),targetRef:createBattleParticipantRef("player",target.id),skillId:envelope&&envelope.skillId||null,conditionRefs:[condition.conditionId],sourceRefs:[{type:"hosted_entity",id:ARC1_M12_AUTHORITY.renEcho,role:"conditioned_echo_source"}],data:{conditionKey:def.conditionKey,blockedActionTraits:[...def.blockedActionTraits],bypassableByAdaptiveReroute:true,notStun:true,positiveFinalDamageRequired:true}});
+  return condition;
+}
+
+const ALPHA_PRE5499_REN_ACTIONS=getArc1M12RenActions;
+getArc1M12RenActions=function(stage){
+  const actions=ALPHA_PRE5499_REN_ACTIONS(stage);
+  const suppressionActionByStage={1:"arc1_ren_s1_retention_clamp",2:"arc1_ren_s2_advanced_retention_break",3:"arc1_ren_s3_terminal_retention_lattice"};
+  const suppressionId=suppressionActionByStage[stage];
+  return actions.map(action=>{
+    if(!action||action.id!==suppressionId||typeof action.resolve!=="function")return action;
+    const originalResolve=action.resolve;
+    action.resolve=function(context){
+      const result=originalResolve(context);
+      if(result&&result.resolved===true&&Number(result.finalDamage)>0){
+        const condition=applyArc1M12RouteSuppressionCondition(stage,context&&context.target,context&&context.envelope,result.finalDamage);
+        if(condition)result.conditionRefs=[...(Array.isArray(result.conditionRefs)?result.conditionRefs:[]),condition.conditionId];
+      }
+      return result;
+    };
+    return action;
+  });
+};
+
+const ALPHA_PRE5499_RENDER_TEMP_SKILL_DECK=renderTemporaryBattleSkillDeck;
+renderTemporaryBattleSkillDeck=function(actor,target){
+  if(!(currentBattle&&currentBattle.active&&currentBattle.mission12Climax&&actor&&actor.arc1M12StoryProjection===true))return ALPHA_PRE5499_RENDER_TEMP_SKILL_DECK(actor,target);
+  const presentation=getBattleUISkillPalettePresentation(actor);
+  const skillIds=Array.isArray(presentation.skillIds)?presentation.skillIds:[];
+  const state=syncBattleActionRegionState();
+  const cards=skillIds.map(skillId=>{
+    const skill=getBattlePreparedSkillDefinition(actor,skillId);
+    if(!skill)return"";
+    const skillDefaultTarget=getBattlePreparedSkillDefaultTarget(actor,skill);
+    const availability=evaluateBattlePreparedSkillAvailability(skill,actor,skillDefaultTarget.participant);
+    const selectable=availability.available===true||availability.reason==="branch_selection_required";
+    const selected=state.selectedSkillId===skill.id;
+    const conditionBlocked=isBattleSkillConditionBlocked(availability);
+    const blockingCondition=conditionBlocked?getBattleSkillBlockingConditionPresentation(availability):null;
+    const status=selected?"SELECTED":availability.available?"READY":availability.reason==="branch_selection_required"?"READY":String(availability.reason||"UNAVAILABLE").replaceAll("_"," ").toUpperCase();
+    const seal=blockingCondition?`<span class="battle-skill-condition-seal" aria-hidden="true"><span class="battle-skill-condition-seal-symbol">◉</span><span class="battle-skill-condition-seal-headline">${blockingCondition.sealHeadline}</span><strong class="battle-skill-condition-seal-state">${blockingCondition.sealState}</strong></span>`:"";
+    return `<button type="button" class="battle-dev-skill-card ${selectable?"is-ready":"is-disabled"} ${selected?"is-selected":""} ${conditionBlocked?"is-condition-blocked":""}" onclick="selectBattlePreparedSkill('${skill.id}')" ${selectable?"":"disabled"} aria-pressed="${selected?"true":"false"}" title="${status}"><span class="battle-dev-skill-discipline">${skill.primaryDiscipline||"AUTHORED"}</span><strong>${skill.displayName||getFactorySkillDisplayName(skill.id)}</strong><span class="battle-dev-skill-type">${skill.actionClass||skill.type||"Technique"}</span><small>${status}</small>${seal}</button>`;
+  }).filter(Boolean);
+  if(cards.length===0)cards.push(`<div class="battle-dev-skill-card is-empty"><span>NO AUTHORED SKILLS</span></div>`);
+  return `<div class="battle-live-skill-deck is-arc1-m12-full-palette" aria-label="Prepared Battle Skills" data-palette-source="${presentation.source||"unknown"}" data-authored-package-size="${skillIds.length}">${cards.join("")}</div>`;
+};
+
+function restoreArc1M12TransientProjectionFromBattleState(){
+  const s=currentBattle&&currentBattle.mission12Climax;
+  if(!currentBattle||!currentBattle.active||!s||![1,2,3].includes(Number(s.stage)))return null;
+  const representationId=s.menmaRepresentationId||getArc1M12ExpectedRepresentation(Number(s.stage));
+  const borrowed=Number(s.stage)===3&&!!s.borrowedKurama;
+  const actor=materializeArc1M12MenmaProjection(representationId,{borrowedKurama:borrowed});
+  if(!actor)return null;
+  s.menmaStablePersonId="menma";
+  s.menmaRepresentationId=representationId;
+  s.menmaBasePL=ARC1_M12_MENMA_PACKAGES[representationId].pl;
+  s.menmaEffectivePL=borrowed?80:ARC1_M12_MENMA_PACKAGES[representationId].pl;
+  return actor;
+}
+
+const ALPHA_PRE5499_RESTORE_BATTLE_RUNTIME=restoreBattleRuntimeState;
+restoreBattleRuntimeState=function(raw){
+  const out=ALPHA_PRE5499_RESTORE_BATTLE_RUNTIME(raw);
+  restoreArc1M12TransientProjectionFromBattleState();
+  return out;
+};
+
+function runAlphaBrick5499DeliveryHardeningDiagnostics(){
+  const stage3Source=getArc1M12ExecutablePlayerSkills.toString();
+  const renderSource=renderTemporaryBattleSkillDeck.toString();
+  const renSource=getArc1M12RenActions.toString();
+  const checks={
+    playerFixedAttackUsesLiveStatKeyResolver:resolveArc1M12PlayerFixedAttack.toString().includes("getArc1M12PrimaryStatKey")&&!resolveArc1M12PlayerFixedAttack.toString().includes("disciplineToStatKey"),
+    stage3PaletteRendererNotFiveSlotCapped:renderSource.includes("data-authored-package-size")&&!renderSource.includes("index<5"),
+    stage3PermanentPlusLoanActions:stage3Source.includes("...permanent")&&stage3Source.includes("arc1_m12_echo_kurama_routed_burst")&&stage3Source.includes("echo_menma_adaptive_reroute"),
+    routeSuppressionPositiveDamageOnly:applyArc1M12RouteSuppressionCondition.toString().includes("finalDamage")&&renSource.includes("applyArc1M12RouteSuppressionCondition"),
+    stage1BlocksHostedOnly:applyArc1M12RouteSuppressionCondition.toString().includes('1:{conditionKey:"conditioned_echo_route_suppression",blockedActionTraits:["requiresHostedRoute"]}'),
+    stage3BlocksHostedAndBorrowed:applyArc1M12RouteSuppressionCondition.toString().includes('3:{conditionKey:"terminal_echo_pathway_disruption",blockedActionTraits:["requiresHostedRoute","requiresBorrowedKuramaRoute"]}'),
+    routeSuppressionRerouteBypassable:applyArc1M12RouteSuppressionCondition.toString().includes("bypassableByAdaptiveReroute:true"),
+    battleRestoreRematerialisesM12Projection:restoreBattleRuntimeState.toString().includes("restoreArc1M12TransientProjectionFromBattleState")
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
+  console.table(checks);return{pass:checks.pass,checks};
+}

@@ -3,168 +3,194 @@ SHINOBI CHRONICLES — CODING/RUNTIME REVISION MANIFEST
 
 DELIVERY
 --------
-Brick range: BRICKS 3500–4499
-Package: Shinobi_Chronicles_BRICKS_3500-4499_ALPHA_PLAYABLE_MONSTER.zip
-Scope: Alpha playability monster — My Clan, Arena, Training Grounds, startup hardening,
-       first-run mission front door, and partial Issue #41 Mission 11/12 Combat package.
+Brick range: BRICKS 4500–5499
+Package: Shinobi_Chronicles_BRICKS_4500-5499_ALPHA_ARC1_RUNTIME_MONSTER.zip
+Primary objective: advance the first true playable Arc 1 runtime from the committed
+BRICKS 3500–4499 checkpoint while preserving exact Story / World / Progression /
+Combat ownership boundaries.
 
-IMPORTANT WINDOWS NOTE
-----------------------
-UNBLOCK THIS ZIP BEFORE EXTRACTION:
+WINDOWS
+-------
+UNBLOCK THIS ZIP BEFORE EXTRACTION.
 Right-click ZIP -> Properties -> Unblock -> Apply -> Extract.
 
-LIVE AUTHORITY BASELINE
------------------------
-Monster work began against main:
-  5d65c0c0975218c305d2ab454c8e3a26dabc10bc
+PRODUCTION BASELINE
+-------------------
+GitHub production checkpoint:
+  c4406bfffa47322b3ac149bd3c790a7669288acd
+  commit message: 3500-4499
 
-Final GitHub guard observed main at:
-  57c592eece803377a76c0eec74584110feb9becb
-
-The production source files used as the implementation baseline did NOT move during that interval:
-  game.js baseline blob: 22c57a86b73530f9537ec0983f2eb8eb810f3ddd
-  style.css baseline blob: 2fd6390611d6f4b5a25e6c506ba94d0ccf43c02a
-  index.html baseline blob: 01e1cde1c8541e3031b9f7a7b76988a034f1a26a
-
-RESULT FILE BLOBS
------------------
+Exact baseline production blobs:
   game.js   7a9df48c2e495fe573cce0b9e68009194542c28c
+  style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
+  index.html 47d8016edbed6b08f3fc03275449acbb1c0007cb
+
+Final live GitHub guard before packaging confirmed those three production files had
+not moved underneath this candidate.
+
+RESULT BLOBS
+------------
+  game.js   4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
   style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
   index.html 47d8016edbed6b08f3fc03275449acbb1c0007cb
 
 RESULT SHA-256
 --------------
-  game.js   a9e28b3f2ae273bf0060d3295f0a20f4daf071c4a95292e2ca8567a8e7caa3e1
+  game.js   f72ff7edcbcd5ad964943f00bf874da294f37c47d394642f7957cba3caec3d1c
   style.css 57fc59f8977a3f116a0afb1a4a4cd1f0250f8d1869c1b96cda9364ffb7f03793
   index.html c5bb19d47fa21777c2d4c477bd14b28dcf8acdbe23459d67687a56e9f1eb49eb
 
-BRICK SCOPE / IMPLEMENTED
--------------------------
-BRICK 3500
-- Fixed startup TDZ crash in World Event save-state restore:
-  normalizeWorldEventRuntimeState no longer dereferences WORLD_EVENT_RUNTIME_DIMENSIONS
-  before that const has initialized.
+CHANGED PRODUCTION FILES
+------------------------
+  game.js
 
-BRICKS 3501–3525
-- Optional UI-master availability registry.
-- My Clan probes its current Browse/Inspection master directly from the real renderer.
-- Missing master automatically falls back to code-owned shell without ownership/formation mutation.
+Unchanged full replacements carried for straightforward deployment:
+  style.css
+  index.html
 
-BRICKS 3526–3599
-- Arena code-owned/master-independent shell.
-- Existing Arena Battle and Promotion authority retained.
-- Inactive modes remain fail-closed; no fake opponent/bracket/result generation.
+BRICKS 4500–4899 — ARC 1 M2–M10 STORY RUNTIME
+----------------------------------------------
+- Registered exact machine-addressed Story runtime surfaces for Missions 2–10.
+- Story Scene IDs and World source/object refs consume current durable authority.
+- M2 / M3 / M4 / M6 / M8 / M9 / M10 do not invent Battles.
+- M5 calls the existing Mission-5 Female Operator encounter package.
+- M7 calls the existing Chain Sanitisation encounter package.
+- M9 consumes persisted M7 Battle/sanitisation facts instead of replaying the fight.
+- World occurrence identity remains separate from Story occurrence identity.
+- Map geometry remains presentation-owned; semantic addresses survive map replacement.
 
-BRICKS 3600–3899
-- Training Grounds code-owned runtime.
-- Training Grounds hub.
-- Weapons Training selection/proficiency projection.
-- Sparring fighter-selection shell.
-- Mentorship instructor/student selection shell.
-- Existing owned-roster and weapon-proficiency authorities consumed.
-- Training consequences that lack closed gameplay authority fail closed and commit no history.
-- Added top-nav TRAINING route.
-- Added existing Practical route from Training hub.
+BRICKS 4900–5099 — IDENTITY REBINDING / FALSE IDENTITY PERSISTENCE
+------------------------------------------------------------------
+- Exact authoritative development source:
+  occ_arc1_m6_identity_rebinding_seal_created
+- Persistent capability:
+  false_identity_seals.identity_rebinding_seal
+- Access: GRANTED
+- Competence: INITIAL_OPERATIONAL_COMPETENCE
+- Mastery: NOT GRANTED
+- Generic XP: NONE
+- Direct Stat gain: NONE
+- Direct PL gain: NONE
+- M3–M5 evidence is preserved only when it actually exists in the route.
+- Cipher Menma requires truthful current body-inscribed state + committed Cipher history.
+- Representation changes do not erase learned Identity Rebinding history.
+- Mission-11 Recognition Substitution requires the earned persistent capability predicate.
 
-BRICKS 3900–4099
-- Missions command/front-door surface.
-- Fresh Chronicle / roster state projected truthfully.
-- Current Arc-1 frontier reported instead of fabricating progress.
-- Reuses existing Mission-1 Whisper Woods runtime once legal prerequisite exists.
-- Does NOT inject the missing pre-Whisper three-person trace.
+BRICKS 5100–5299 — MISSION 11 RECALL / ACTION HARDENING
+-------------------------------------------------------
+- Recall Contact uses exact host relationship host_rel_menma_arc1_echo.
+- Echo Recall Refusal remains a Hosted-Entity response, not an independent turn.
+- Recognition Substitution remains exact profile menma_normal_no_carrier.
+- carrierResponse and recallResult remain separate facts.
+- Kagawa False Opening is same-target and expires at the following owner action
+  opportunity if unused.
+- M11 transient action state expiry uses the real transientStates runtime collection.
+- No Battle victory -> death/custody/faction-truth/Recall-success collapse.
 
-BRICKS 4100–4399 — ISSUE #41 SOURCE IMPLEMENTATION (PARTIAL)
-- Mission 11 Pump Four stable opposition and exact Base PL packages:
-  Mizue Kagawa PL53
-  Recall Medic PL46
-  Field Operative PL51
-- Exact Recall/Recognition Substitution addresses and bounded profile.
-- Exact M11 authored action source package.
-- M11 caller validation and exact participant/side-set Battle launch.
-- M11 return envelope keeps Battle / Recall / carrier / custody/death inference separate.
-- Mission 12 one-stable-Ren source package:
-  Ren Base PL46
-  Stage 1 Effective PL54
-  Stage 2 Effective PL60
-  Stage 3 Effective PL73
-- Temporary borrowed-Kurama projection:
-  Effective Stats 80/64/39/57/74/35/85
-  Effective PL80
-  Routed Burst one PL52 packet
-  cleanup explicitly grants no persistent Kurama unlock.
-- M11/M12 runtime state added to the existing Battle save envelope.
+BRICKS 5300–5499 — MISSION 12 EXECUTABLE STAGED COMBAT
+------------------------------------------------------
+Stable person: arc1_ren
 
-VALIDATION COMPLETED
---------------------
-node --check game.js: PASS
+Exact runtime calibrations:
+  Menma Stage 1 representation: Base PL36
+  Echo Menma: Base PL63
+  Ren Stage 1: Effective PL54
+  Ren Stage 2: Effective PL60
+  Ren Stage 3: Effective PL73
+  Borrowed-Kurama climax projection: Effective PL80
+  Borrowed-Kurama effective Stats: 80/64/39/57/74/35/85
 
-Deterministic source/runtime diagnostics:
-  BRICKS 3500–4499 monster gate: PASS
-  My Clan operational gameplay: PASS
-  Issue #32 My Clan adaptive semantics: PASS
-  Post-2500 cumulative playability: PASS
-  Issue #41 source-package diagnostic: PASS
+Stage safeguards:
+- Stage 2 and Stage 3 require explicit factual Story transition authority.
+- Direct stage skipping is fail-closed.
+- one Ren historical person is preserved across all stages.
+- Hosted Entities create no extra recurring turns / slots / PL ledgers.
+- Stage-1 Shared Read: Guided Strike 19 -> 23 against exact same target.
+- Stage-2 Route Read: Threaded Route Burst 37 -> 42 against exact same target.
+- Stage-2 Adaptive Reroute removes only explicitly reroute-bypassable adverse route state.
+- Stage-2 Counterflow is a normal selected action gated by prior hosted-route use.
+- Stage-3 Emergency Reroute is <=50%, restores exactly 12, once, normal selected action.
+- Stage-3 route disruption blocks only authored hosted / borrowed-Kurama route traits.
+- Route suppression requires positive final damage, is not Stun, and is reroute-bypassable.
+- Routed Burst is one PL52 packet.
+- Temporary Kurama actions coexist with the permanent Echo Menma action package.
+- Stage-3 Battle palette is not capped to the ordinary five-card deck.
+- Borrowed-Kurama cleanup grants no persistent Kurama unlock.
+- Save restoration rematerialises the transient Mission-12 Menma Battle projection.
 
-CSS structural brace balance: PASS
-TRAINING navigation binding present: PASS
+FINAL DELIVERY HARDENING
+------------------------
+Four implementation defects in the in-progress candidate were caught and corrected
+before this ZIP:
+1. wrong stat-key helper reference in custom M12 fixed-PL player actions;
+2. ordinary five-card renderer hiding the four temporary Stage-3 Kurama actions;
+3. Ren retention actions not yet establishing exact positive-damage route Conditions;
+4. M11/M12 expiry helpers reading nonexistent runtime.states instead of transientStates.
 
-BROWSER STATUS
---------------
-NOT CLAIMED GREEN.
+VALIDATION
+----------
+Exact final candidate:
+  node --check game.js: PASS
 
-The available Chromium environment is organization-policy blocked from loading 127.0.0.1,
-so a genuine browser integration run could not be completed here. Stephen's local browser
-remains the current browser-validation authority for this revision.
+Deterministic/static delivery gate:
+  one M2–M10 authority registry: PASS
+  no invalid runtime.states access: PASS
+  M12 player fixed-attack stat resolver: PASS
+  Stage-3 full authored palette projection: PASS
+  Stage-1 hosted-route suppression contract: PASS
+  Stage-3 hosted + borrowed-route suppression contract: PASS
+  Adaptive-Reroute bypass metadata: PASS
+  M12 Battle restore rematerialisation hook: PASS
+  M5 existing encounter reuse: PASS
+  M7 existing encounter reuse: PASS
+  Issue-58 fail-close preserved: PASS
+  PL36 / PL63 / PL54 / PL60 / PL73 / PL80 constants: PASS
+  Routed Burst PL52 single-packet source: PASS
+  no persistent Kurama unlock: PASS
 
-ALPHA / ARC 1 STATUS
---------------------
-This package materially advances Alpha, but FULL ARC-1 PLAYTHROUGH IS NOT YET CLAIMED.
+Earlier in this implementation cycle, M2 -> M3 -> M4 scene progression and an actual
+Mission-12 Stage-1 authored action were exercised successfully in the local runtime
+harness. Full browser Golden is NOT claimed.
 
-Earliest fresh-save blocker:
-  GitHub Issue #58
+BROWSER / GOLDEN STATUS
+-----------------------
+Browser Golden: NOT CLAIMED.
+Whole-Alpha Golden: NOT CLAIMED.
+
+The available sandbox Chromium environment is policy-blocked for the normal local-host
+integration route, so Stephen's local browser remains the browser-integration authority.
+
+OPEN ARC-1 BLOCKERS
+-------------------
+#58 remains unresolved at packaging time:
   [HANDOFF][TO: CE-COORDINATION][SEND NOW]
   Close pre-Whisper three-person trace producer for Arc 1 first run
 
-Required missing committed fact:
+Missing legitimate fresh-run producer:
   arc1_m1_caravan_three_person_trace_confirmed
 
-Coding intentionally DOES NOT fabricate that fact.
+Coding intentionally does not inject that fact.
 
-Issue #41 status:
-  Source package: implemented / deterministic diagnostic GREEN
-  Full M11/M12 Battle round-trip: STILL REQUIRED
-  Full Story caller/return integration: STILL REQUIRED
-  Therefore Issue #41 must remain OPEN.
+#41 remains OPEN at packaging time.
+This package materially implements/hardens M11/M12 Combat runtime, but full Story
+caller/return + save/load/browser regression proof has not yet been claimed complete.
 
-M2–M10:
-  Writing machine-addressability: CLOSED
-  Progression Identity Rebinding semantics: CLOSED
-  World source/object/location binding: CLOSED
-  Final consolidated CE->Coding runtime reconciliation remains outstanding in parent #36.
-  Coding must not silently invent the remaining cross-system caller sequencing.
-
-TRAINING CONSEQUENCES
----------------------
-The new Training Grounds / Weapons / Sparring / Mentorship UI is operational as a
-selection/navigation/runtime projection surface.
-
-Where exact progression/reward/mentorship/spar consequence authority is not closed,
-the action fails closed rather than inventing XP, proficiency, mastery, relationship,
-rewards or Battle results.
+M11/M12 machine-addressed Story caller/transition authority remains the next Story-side
+runtime seam after M10. Coding does not invent it from the narrative skeleton.
 
 BACKEND
 -------
-NO PAID BACKEND IS REQUIRED FOR THE CURRENT LOCAL ALPHA GOAL.
+No paid backend is required for the current local Alpha target.
+Current browser/local persistence remains sufficient for the intended single-machine
+Alpha flow. Add a backend only when account/cloud/multiplayer/server authority
+requirements actually demand one.
 
-Existing browser/local persistence can support:
-New Game -> Origin -> owned roster -> My Clan -> local UI -> Story/Battle -> save/load.
+ROLLBACK
+--------
+BRICKS 3500–4499:
+  committed production checkpoint c4406bfffa47322b3ac149bd3c790a7669288acd
 
-A backend becomes relevant later for accounts/authentication, cloud saves, multiplayer,
-authoritative server economy/security, or remote persistence/services.
+BRICKS 4500–5499:
+  this ZIP / candidate result game.js blob 4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
 
-Do not buy backend infrastructure merely to unblock the current Arc-1 local Alpha.
-
-ROLLBACK RULE
--------------
-This ZIP is the rollback/search address for BRICKS 3500–4499.
-Do not treat Brick numbering itself as proof of Golden status.
+Brick numbering is a revision/search address, not a Golden claim.
