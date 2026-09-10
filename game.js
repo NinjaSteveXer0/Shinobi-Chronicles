@@ -103109,3 +103109,390 @@ function runAlphaIssue66ShinobiRecordDiagnostics(){
 }
 
 function misisonsSafe(source){return source.includes("MISSION INDEX")&&source.includes("CURRENT OPERATIONS")&&source.includes("OPERATION BRIEF")&&source.includes("KNOWN OBJECTIVES")&&source.includes("RELEVANT INFORMATION")&&source.includes("POTENTIAL OUTCOMES")&&source.includes("MISSION HISTORY");}
+
+
+// =========================================================
+// BRICKS 7300–12299 — FINAL PRE-ALPHA PLAYABILITY MONSTER
+// =========================================================
+// Live baseline: 4930e8ce0be919c0fae4f0c6e9ee3c89bdfc2fd5
+// This module deliberately reuses existing semantic/runtime authorities.
+// It owns presentation, first-production candidate-content consumption,
+// collision hardening, and focused diagnostics only.
+// =========================================================
+
+// ---------------------------------------------------------
+// 7300–7899 — ISSUE #63 FIRST-PRODUCTION CANDIDATE CONTENT
+// ---------------------------------------------------------
+const ALPHA_GENIN_FIRST_PRODUCTION_CONTENT_POLICY_ID="alpha_genin_roster_first_production_content_v1";
+const ALPHA_GENIN_FIRST_PRODUCTION_TEAMMATE_VARIANT_IDS=Object.freeze([
+  "genin_boruto","genin_chocho","genin_himawari","genin_hinata","genin_hoki","genin_karin","genin_menma",
+  "genin_mikoto","genin_mitsuki","genin_naruto","genin_orochimaru","genin_sarada","genin_sasuke"
+]);
+const ALPHA_GENIN_FIRST_PRODUCTION_LEADER_VARIANT_IDS=Object.freeze([
+  "jonin_hanabi","jonin_inojin","jonin_konohamaru","jonin_kushina","jonin_sasuke","jonin_shikaku","jonin_shino",
+  "sj_anko","sj_ebisu","sj_genma","sj_ibiki","sj_kiba","sj_nono"
+]);
+
+// Explicit first-production stable-person equivalence table. This is not
+// Registry discovery and does not make every same-suffix representation a candidate.
+const ALPHA_GENIN_FIRST_PRODUCTION_STABLE_PERSON_BY_VARIANT=Object.freeze({
+  academy_hinata:"hinata",genin_hinata:"hinata",
+  academy_menma:"menma",genin_menma:"menma",
+  academy_kushina:"kushina",jonin_kushina:"kushina",
+  academy_izuno:"izuno",academy_mirai:"mirai",academy_kurenai:"kurenai",academy_iwabee:"iwabee",
+  academy_metal_lee:"metal_lee",academy_kakashi:"kakashi",academy_obito:"obito",
+  genin_boruto:"boruto",genin_chocho:"chocho",genin_himawari:"himawari",genin_hoki:"hoki",genin_karin:"karin",
+  genin_mikoto:"mikoto",genin_mitsuki:"mitsuki",genin_naruto:"naruto",genin_orochimaru:"orochimaru",
+  genin_sarada:"sarada",genin_sasuke:"sasuke",jonin_sasuke:"sasuke",
+  jonin_hanabi:"hanabi",jonin_inojin:"inojin",jonin_konohamaru:"konohamaru",jonin_shikaku:"shikaku",jonin_shino:"shino",
+  sj_anko:"anko",sj_ebisu:"ebisu",sj_genma:"genma",sj_ibiki:"ibiki",sj_kiba:"kiba",sj_nono:"nono"
+});
+
+function getAlphaFirstProductionStablePersonKey(variantId){
+  if(!variantId) return null;
+  return ALPHA_GENIN_FIRST_PRODUCTION_STABLE_PERSON_BY_VARIANT[variantId]||`representation:${variantId}`;
+}
+
+function getAlphaFirstProductionSubjectVariantId(){
+  const transition=getGeninRosterTransitionState();
+  const record=transition.subjectOwnedCharacterId?getOwnedCharacterRecordById(transition.subjectOwnedCharacterId):null;
+  return record&&record.variantId?record.variantId:null;
+}
+
+function getAlphaFirstProductionCommittedPreSnapshotCandidateState(variantId){
+  // Future CE/team-preparation bridges may persist exact committed facts here.
+  // Absent committed facts deliberately means AVAILABLE; no elapsed-time/random removal.
+  const transition=getGeninRosterTransitionState();
+  const facts=Array.isArray(transition.candidatePreparationFacts)?transition.candidatePreparationFacts:[];
+  const relevant=facts.filter(f=>f&&f.committed===true&&f.variantId===variantId&&["assigned_elsewhere","unavailable"].includes(f.state));
+  return relevant.length?relevant[relevant.length-1]:null;
+}
+
+function buildAlphaFirstProductionGeninCandidateSnapshot(){
+  const transition=getGeninRosterTransitionState();
+  if(transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  if(!transition.subjectOwnedCharacterId||String(getOwnedCharacterFormalRank(transition.subjectOwnedCharacterId)||"").toLowerCase()!=="genin") return {success:false,reason:"genin_roster_transition_subject_not_promoted_genin"};
+
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean);
+  const subjectVariantId=getAlphaFirstProductionSubjectVariantId();
+  const occupiedStablePeople=new Set([subjectVariantId,...current].filter(Boolean).map(getAlphaFirstProductionStablePersonKey));
+  const exclusions=[];
+  const consumedPreparation=[];
+
+  const replacement=[];
+  for(const variantId of ALPHA_GENIN_FIRST_PRODUCTION_TEAMMATE_VARIANT_IDS){
+    const stablePersonKey=getAlphaFirstProductionStablePersonKey(variantId);
+    if(occupiedStablePeople.has(stablePersonKey)){exclusions.push({variantId,stablePersonKey,reason:"stable_person_already_in_subject_or_current_team"});continue;}
+    const entry=getCharacterRegistryEntry(variantId);
+    if(!entry){exclusions.push({variantId,reason:"authored_acquisition_or_representation_eligibility_not_runtime_admitted"});continue;}
+    const prepared=getAlphaFirstProductionCommittedPreSnapshotCandidateState(variantId);
+    if(prepared){exclusions.push({variantId,reason:prepared.state,occurrenceId:prepared.occurrenceId||null});consumedPreparation.push(prepared);continue;}
+    replacement.push(variantId);
+  }
+
+  const leaders=[];
+  for(const variantId of ALPHA_GENIN_FIRST_PRODUCTION_LEADER_VARIANT_IDS){
+    const stablePersonKey=getAlphaFirstProductionStablePersonKey(variantId);
+    if(occupiedStablePeople.has(stablePersonKey)){exclusions.push({variantId,stablePersonKey,reason:"stable_person_already_in_subject_or_current_team"});continue;}
+    const entry=getCharacterRegistryEntry(variantId);
+    if(!entry){exclusions.push({variantId,reason:"authored_leader_eligibility_not_runtime_admitted"});continue;}
+    if(!isIssue63LeaderRankAllowed(variantId)){exclusions.push({variantId,reason:"authored_leader_formal_rank_invalid"});continue;}
+    const prepared=getAlphaFirstProductionCommittedPreSnapshotCandidateState(variantId);
+    if(prepared){exclusions.push({variantId,reason:prepared.state,occurrenceId:prepared.occurrenceId||null});consumedPreparation.push(prepared);continue;}
+    leaders.push(variantId);
+  }
+
+  if(replacement.length<2) return {success:false,reason:"genin_candidate_floor_not_met",remaining:replacement.length,minimum:2,exclusions};
+  if(leaders.length<1) return {success:false,reason:"leader_candidate_floor_not_met",remaining:leaders.length,minimum:1,exclusions};
+
+  const formation=ensurePlayerAcquisitionState().academyTeamFormation||{};
+  const receipt=formation.confirmationReceipt&&typeof formation.confirmationReceipt==="object"?formation.confirmationReceipt:null;
+  const promotionEvidenceIds=[...new Set((transition.promotionEvidenceIds||[]).filter(Boolean))];
+  const snapshotToken=String(receipt&&receipt.receiptId||formation.completedAt||promotionEvidenceIds[0]||"promotion").replace(/[^a-zA-Z0-9:_-]/g,"_");
+  const snapshotId=`${ALPHA_GENIN_FIRST_PRODUCTION_CONTENT_POLICY_ID}:${transition.subjectOwnedCharacterId}:${snapshotToken}`;
+  const candidateStates={};
+  for(const id of current) candidateStates[id]="assigned_to_player";
+  for(const id of [...replacement,...leaders]) candidateStates[id]="available";
+
+  return {success:true,snapshot:{
+    snapshotId,
+    subjectOwnedCharacterId:transition.subjectOwnedCharacterId,
+    retentionEligibleVariantIds:[...current],
+    teammateCandidateVariantIds:replacement,
+    joninLeaderCandidateVariantIds:leaders,
+    candidateStates,
+    provenance:{
+      candidateContentPolicyId:ALPHA_GENIN_FIRST_PRODUCTION_CONTENT_POLICY_ID,
+      acquisitionPolicyId:"alpha_genin_roster_dynamic_candidate_policy_v1",
+      promotionAssessmentId:"academy_to_genin_field_readiness_assessment",
+      promotionEvidenceIds,
+      academyTeamFormationReceiptId:receipt&&receipt.receiptId||null,
+      academyTeamFormationCompletedAt:Number(formation.completedAt)||null,
+      academyTeamVariantIds:[...current],
+      candidatePreparationOccurrenceIds:consumedPreparation.map(f=>f.occurrenceId).filter(Boolean),
+      stablePersonExclusions:exclusions.map(item=>cloneProgressionData(item)),
+      sourceAuthority:"Documentation/Coordination/First Production Genin Roster Candidate Content Authority 2026-09-10.md",
+      presentationRefreshCreatesNoReroll:true,
+      grantsOwnership:false,grantsRank:false,grantsBattleDeployment:false
+    },
+    createdAt:Date.now()
+  },exclusions};
+}
+
+function ensureAlphaFirstProductionGeninCandidateSnapshot(){
+  const transition=getGeninRosterTransitionState();
+  if(transition.candidateSnapshot) return {success:true,idempotent:true,snapshot:cloneProgressionData(transition.candidateSnapshot)};
+  const built=buildAlphaFirstProductionGeninCandidateSnapshot();
+  if(!built.success) return built;
+  const applied=applyGeninRosterTransitionCandidateSnapshot(built.snapshot);
+  return applied&&applied.success?{...applied,contentPolicyId:ALPHA_GENIN_FIRST_PRODUCTION_CONTENT_POLICY_ID,exclusions:built.exclusions}:applied;
+}
+
+function validateAlphaGeninFinalStablePersonSelection({teammates=null,leader=null}={}){
+  const transition=getGeninRosterTransitionState();
+  const subjectVariantId=getAlphaFirstProductionSubjectVariantId();
+  const selected=Array.isArray(teammates)?teammates:Array.from({length:2},(_,i)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[i]||null);
+  const leaderVariantId=leader!==null?leader:transition.joninLeaderVariantId;
+  const roles=[{role:"subject",variantId:subjectVariantId},...selected.filter(Boolean).map((variantId,index)=>({role:`teammate_${index+1}`,variantId})),...(leaderVariantId?[{role:"leader",variantId:leaderVariantId}]:[])];
+  const seen=new Map();
+  for(const item of roles){
+    if(!item.variantId) continue;
+    const stablePersonKey=getAlphaFirstProductionStablePersonKey(item.variantId);
+    if(seen.has(stablePersonKey)) return {valid:false,reason:"stable_person_representation_collision",stablePersonKey,first:seen.get(stablePersonKey),second:item};
+    seen.set(stablePersonKey,item);
+  }
+  return {valid:true};
+}
+
+const ALPHA_PRE7300_OPEN_GENIN_ROSTER_TRANSITION_UI=openGeninRosterTransitionUI;
+openGeninRosterTransitionUI=function(){
+  ensureAlphaFirstProductionGeninCandidateSnapshot();
+  return ALPHA_PRE7300_OPEN_GENIN_ROSTER_TRANSITION_UI();
+};
+const ALPHA_PRE7300_RENDER_GENIN_ROSTER_TRANSITION=renderGeninRosterTransitionOverlay;
+renderGeninRosterTransitionOverlay=function(container){
+  ensureAlphaFirstProductionGeninCandidateSnapshot();
+  return ALPHA_PRE7300_RENDER_GENIN_ROSTER_TRANSITION(container);
+};
+const ALPHA_PRE7300_SELECT_GENIN_TEAMMATE=selectGeninRosterTransitionTeammate;
+selectGeninRosterTransitionTeammate=function(position,variantId,expectedSnapshotId=null){
+  const transition=getGeninRosterTransitionState();
+  const next=Array.from({length:2},(_,i)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[i]||null);
+  const slot=Number(position);
+  if([1,2].includes(slot)) next[slot-1]=variantId;
+  const collision=validateAlphaGeninFinalStablePersonSelection({teammates:next,leader:transition.joninLeaderVariantId||null});
+  if(!collision.valid) return {success:false,...collision};
+  return ALPHA_PRE7300_SELECT_GENIN_TEAMMATE(position,variantId,expectedSnapshotId);
+};
+const ALPHA_PRE7300_SELECT_GENIN_LEADER=selectGeninRosterTransitionJoninLeader;
+selectGeninRosterTransitionJoninLeader=function(variantId,expectedSnapshotId=null){
+  const collision=validateAlphaGeninFinalStablePersonSelection({leader:variantId});
+  if(!collision.valid) return {success:false,...collision};
+  return ALPHA_PRE7300_SELECT_GENIN_LEADER(variantId,expectedSnapshotId);
+};
+const ALPHA_PRE7300_CONFIRM_GENIN_ROSTER_TRANSITION=confirmGeninRosterTransition;
+confirmGeninRosterTransition=function(){
+  const collision=validateAlphaGeninFinalStablePersonSelection();
+  if(!collision.valid) return {success:false,...collision};
+  return ALPHA_PRE7300_CONFIRM_GENIN_ROSTER_TRANSITION();
+};
+
+function runAlphaFirstProductionGeninCandidateDiagnostics(){
+  const teammateExpected="genin_boruto|genin_chocho|genin_himawari|genin_hinata|genin_hoki|genin_karin|genin_menma|genin_mikoto|genin_mitsuki|genin_naruto|genin_orochimaru|genin_sarada|genin_sasuke";
+  const leaderExpected="jonin_hanabi|jonin_inojin|jonin_konohamaru|jonin_kushina|jonin_sasuke|jonin_shikaku|jonin_shino|sj_anko|sj_ebisu|sj_genma|sj_ibiki|sj_kiba|sj_nono";
+  const source=buildAlphaFirstProductionGeninCandidateSnapshot.toString();
+  const checks={
+    exactAuthoredTeammates:ALPHA_GENIN_FIRST_PRODUCTION_TEAMMATE_VARIANT_IDS.join("|")===teammateExpected,
+    exactAuthoredLeaders:ALPHA_GENIN_FIRST_PRODUCTION_LEADER_VARIANT_IDS.join("|")===leaderExpected,
+    noRegistryDiscoveryScan:!source.includes("Object.keys(character")&&!source.includes("Object.values(character")&&!source.includes("Assets/")&&!source.includes("Portraits/"),
+    currentTeamRetentionSeparated:source.includes("retentionEligibleVariantIds:[...current]")&&source.includes("teammateCandidateVariantIds:replacement"),
+    explicitContentPolicy:source.includes("candidateContentPolicyId:ALPHA_GENIN_FIRST_PRODUCTION_CONTENT_POLICY_ID"),
+    promotionProvenance:source.includes("promotionEvidenceIds")&&source.includes("promotionAssessmentId"),
+    noDefaultAssignedElsewhere:getAlphaFirstProductionCommittedPreSnapshotCandidateState.toString().includes("Absent committed facts deliberately means AVAILABLE"),
+    replacementFloor:source.includes("replacement.length<2"),leaderFloor:source.includes("leaders.length<1"),
+    stablePersonCollision:validateAlphaGeninFinalStablePersonSelection.toString().includes("stable_person_representation_collision"),
+    sasukeCrossRepresentationCollision:getAlphaFirstProductionStablePersonKey("genin_sasuke")===getAlphaFirstProductionStablePersonKey("jonin_sasuke"),
+    retentionSamePersonExclusion:getAlphaFirstProductionStablePersonKey("academy_hinata")===getAlphaFirstProductionStablePersonKey("genin_hinata"),
+    inclusionGrantsNothing:source.includes("grantsOwnership:false")&&source.includes("grantsRank:false")&&source.includes("grantsBattleDeployment:false")
+  };
+  checks.pass=Object.values(checks).every(Boolean);console.table(checks);return {pass:checks.pass,checks,contentPolicyId:ALPHA_GENIN_FIRST_PRODUCTION_CONTENT_POLICY_ID,runtimeFreshChronicleValidationStillRequired:true};
+}
+
+// ---------------------------------------------------------
+// 7900–8899 — CODE-OWNED EXAMS / PRACTICAL SURFACES
+// ---------------------------------------------------------
+function escapeAlphaActivityHTML(value){
+  return String(value??"").replace(/[&<>"']/g,char=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[char]);
+}
+function renderAlphaActivityNotifications(serviceId,characterId){
+  const source=serviceId==="exams"?KONOHA_EXAM_ATTEMPT_STATE:KONOHA_PRACTICAL_UI_STATE;
+  const history=Array.isArray(source.specialNotificationHistory)?source.specialNotificationHistory:[];
+  const items=history.filter(n=>n&&n.characterId===characterId).slice(0,10);
+  if(!items.length) return `<div class="alpha-activity-empty">No recent activity results.</div>`;
+  return items.map((n,index)=>`<article class="alpha-activity-notice ${index===0?"is-newest":""}"><strong>${escapeAlphaActivityHTML(n.title||"ACTIVITY UPDATE")}</strong><span>${escapeAlphaActivityHTML(n.detail||"")}</span></article>`).join("");
+}
+function renderAlphaActivitySubject(character,serviceId){
+  if(!character) return "";
+  const p=character.plProgress||{};
+  const percent=Math.max(0,Math.min(100,Number(p.progressPercent)||0));
+  const change=serviceId==="exams"?"changeKonohaExamCharacter":"changeKonohaPracticalCharacter";
+  return `<aside class="alpha-activity-subject">
+    <div class="alpha-activity-section-title">SUBJECT DOSSIER</div>
+    <div class="alpha-activity-character-card">
+      ${character.image?`<img src="${escapeAlphaActivityHTML(character.image)}" alt="${escapeAlphaActivityHTML(character.name)}">`:`<div class="alpha-activity-character-missing">忍</div>`}
+      <button type="button" class="alpha-activity-arrow is-left" onclick="${change}(-1)" aria-label="Previous shinobi">‹</button>
+      <button type="button" class="alpha-activity-arrow is-right" onclick="${change}(1)" aria-label="Next shinobi">›</button>
+    </div>
+    <h2>${escapeAlphaActivityHTML(character.name)}</h2><div class="alpha-activity-rank">${escapeAlphaActivityHTML(character.rank||"")}</div>
+    <div class="alpha-activity-pl-row"><span>CURRENT PL</span><strong>${Number(p.currentPL??character.currentPL)||0}</strong></div>
+    <div class="alpha-activity-progress-label"><span>PROGRESS TO NEXT PL</span><span>${percent.toFixed(1)}%</span></div>
+    <div class="alpha-activity-progress"><i style="width:${percent}%"></i></div>
+    <div class="alpha-activity-notifications"><div class="alpha-activity-section-title">SPECIAL NOTIFICATIONS</div>${renderAlphaActivityNotifications(serviceId,character.id)}</div>
+  </aside>`;
+}
+function renderAlphaActivityDisciplineRows(data,selectedId,serviceId){
+  const selectFn=serviceId==="exams"?"selectKonohaExamDiscipline":"selectKonohaPracticalDiscipline";
+  return data.disciplines.map(d=>`<button type="button" class="alpha-activity-discipline ${d.id===selectedId?"is-selected":""}" onclick="${selectFn}('${escapeAlphaActivityHTML(d.id)}')" aria-pressed="${d.id===selectedId}">
+    <span class="alpha-activity-discipline-name">${escapeAlphaActivityHTML(d.name)}</span>
+    <span class="alpha-activity-mastery">MASTERY <strong>${Number(d.level)||1}</strong></span>
+    <span class="alpha-activity-exp">DISCIPLINE EXP <b>${Number(d.exp)||0} / ${Number(d.expRequired)||0}</b></span>
+    <span class="alpha-activity-discipline-track"><i style="width:${Math.max(0,Math.min(100,Number(d.progressPercent)||0))}%"></i></span>
+  </button>`).join("");
+}
+function renderAlphaActivityBatchControls(serviceId,batchSize){
+  const setFn=serviceId==="exams"?"setKonohaExamBatchSize":"setKonohaPracticalBatchSize";
+  return [1,5,10].map(amount=>`<button type="button" class="alpha-activity-batch ${batchSize===amount?"is-selected":""}" onclick="${setFn}(${amount})" aria-pressed="${batchSize===amount}">×${amount}</button>`).join("");
+}
+
+const ALPHA_PRE7300_EXAM_VISUAL_RENDERER=renderKonohaExamVisualScreen;
+renderKonohaExamVisualScreen=function(){
+  const root=ensureKonohaActivityUIRoot();const session=getKonohaActivityUISessionState();const data=getKonohaExamUIScreenData(session.characterId);
+  if(!data) return false;
+  const selected=getKonohaExamSelectedDisciplineId();const raw=Number(KONOHA_EXAM_ATTEMPT_STATE.batchSize);const batch=[1,5,10].includes(raw)?raw:1;
+  root.dataset.serviceId="exams";root.style.display="block";
+  root.innerHTML=`<section class="alpha-activity-screen alpha-exam-code-screen" aria-label="Shinobi Examination Archive">
+    <header class="alpha-activity-header"><div><span>KONOHA · OFFICIAL RECORD</span><h1>SHINOBI EXAMINATION ARCHIVE</h1><p>Discipline examination · runtime-owned progression record</p></div><button type="button" onclick="returnToKonohaFromActivityUI()">← KONOHA</button></header>
+    <main class="alpha-activity-grid">${renderAlphaActivitySubject(data.character,"exams")}<section class="alpha-activity-workbench">
+      <div class="alpha-activity-section-title">DISCIPLINE EXAMINATION</div><div class="alpha-activity-discipline-list">${renderAlphaActivityDisciplineRows(data,selected,"exams")}</div>
+      <div class="alpha-activity-authority-note"><strong>EXAM AUTHORITY</strong><span>Exam success records discipline examination outcomes. It does not itself grant Promotion or Rank.</span></div>
+      <footer class="alpha-activity-actions"><div class="alpha-activity-batches" aria-label="Exam attempt count">${renderAlphaActivityBatchControls("exams",batch)}</div><button type="button" class="alpha-activity-primary" onclick="beginKonohaExamFromUI()" ${data.canExecute?"":"disabled"}>BEGIN EXAM</button></footer>
+    </section></main></section>`;
+  return true;
+};
+
+const ALPHA_PRE7300_PRACTICAL_VISUAL_RENDERER=renderKonohaPracticalVisualScreen;
+renderKonohaPracticalVisualScreen=function(){
+  const root=ensureKonohaActivityUIRoot();const session=getKonohaActivityUISessionState();const data=getKonohaPracticalUIScreenData(session.characterId);
+  if(!data) return false;
+  const selected=getKonohaPracticalSelectedDisciplineId();const batch=getKonohaPracticalBatchSize();
+  root.dataset.serviceId="practical";root.style.display="block";
+  root.innerHTML=`<section class="alpha-activity-screen alpha-practical-code-screen" aria-label="Konoha Training Compound">
+    <header class="alpha-activity-header"><div><span>KONOHA · TRAINING COMPOUND</span><h1>PRACTICAL EXERCISES</h1><p>Applied discipline training · live progression authority</p></div><button type="button" onclick="returnToKonohaFromActivityUI()">← KONOHA</button></header>
+    <main class="alpha-activity-grid">${renderAlphaActivitySubject(data.character,"practical")}<section class="alpha-activity-workbench">
+      <div class="alpha-activity-section-title">TRAINING DISCIPLINES</div><div class="alpha-activity-discipline-list">${renderAlphaActivityDisciplineRows(data,selected,"practical")}</div>
+      <div class="alpha-activity-authority-note"><strong>PRACTICAL AUTHORITY</strong><span>Only the existing Practical resolver may award configured discipline EXP. No weapon EXP, mentorship transfer, relationship gain, or spar reward is invented here.</span></div>
+      <footer class="alpha-activity-actions"><div class="alpha-activity-batches" aria-label="Practical attempt count">${renderAlphaActivityBatchControls("practical",batch)}</div><button type="button" class="alpha-activity-primary" onclick="executeKonohaPracticalTraining()" ${data.canExecute?"":"disabled"}>BEGIN TRAINING</button></footer>
+    </section></main></section>`;
+  return true;
+};
+
+function runAlphaCodeOwnedActivitySurfaceDiagnostics(){
+  const exam=renderKonohaExamVisualScreen.toString(),practical=renderKonohaPracticalVisualScreen.toString();
+  const checks={examNoBakedMaster:!exam.includes("getUIAssetPath")&&!exam.includes("exams.png"),practicalNoBakedMaster:!practical.includes("getUIAssetPath")&&!practical.includes("practical.png"),examUsesExistingData:exam.includes("getKonohaExamUIScreenData")&&exam.includes("beginKonohaExamFromUI"),practicalUsesExistingData:practical.includes("getKonohaPracticalUIScreenData")&&practical.includes("executeKonohaPracticalTraining"),batchSizesPreserved:renderAlphaActivityBatchControls.toString().includes("[1,5,10]"),specialNotificationsPreserved:renderAlphaActivitySubject.toString().includes("SPECIAL NOTIFICATIONS"),examNonCollapse:exam.includes("does not itself grant Promotion or Rank"),practicalFailClosed:practical.includes("No weapon EXP")};
+  checks.pass=Object.values(checks).every(Boolean);console.table(checks);return checks;
+}
+
+// ---------------------------------------------------------
+// 8900–10499 — MASTER-INDEPENDENT PLAYABLE BATTLE SURFACE
+// ---------------------------------------------------------
+function getAlphaBattleActivePortraitProjection(side,participant){
+  if(!participant) return {path:"",authority:"missing"};
+  const portrait=side==="player"?resolveUIPortraitProjection(participant):resolveBattleEnemyPortraitProjection(participant);
+  if(portrait&&portrait.path) return {...portrait,authority:side==="player"?"uiPortrait":"enemyPortrait"};
+  const fallback=getBattleActiveCardProjection(side,participant);
+  return {...fallback,authority:`fallback:${fallback.authority||"collectible"}`};
+}
+renderBattleActiveCard=function(side,participant){
+  if(!participant) return `<div class="battle-live-active-card battle-live-active-card-${side} is-empty" data-side="${side}"></div>`;
+  const projection=getAlphaBattleActivePortraitProjection(side,participant);const targetState=getBattleParticipantTargetInteractionState(side,participant.id);const targetInteraction=targetState.interaction;const name=participant.name||"UNKNOWN";const transition=currentBattle.deployment&&currentBattle.deployment.lastTransition||null;const promoting=!!(transition&&transition.side===side&&Number(transition.vacatedSlot)===1&&transition.replacementParticipantId===participant.id);
+  return `<div class="battle-live-active-card battle-live-active-card-${side} ${promoting?"is-promoting":""} ${targetState.pouchTargetState.valid?"is-item-target":""} ${targetState.skillTargetState.valid?"is-skill-target":""} ${targetState.skillTargetState.selected?"is-selected-skill-target":""}" data-side="${side}" data-participant-id="${participant.id}" ${targetInteraction?`role="button" tabindex="0" aria-label="${targetInteraction==="item"?`Use selected Battle Pouch item on ${name}`:`Select ${name} as Skill target`}" onclick="${targetInteraction==="item"?`confirmSelectedBattlePouchTarget('${side}','${participant.id}')`:`setSelectedBattleSkillTarget('${side}','${participant.id}')`}"`:""}>
+    <span class="battle-live-active-card-heading">${side==="player"?"CURRENT ACTOR":"CURRENT OPPONENT"}</span>${projection.path?`<img class="battle-live-active-card-image" src="${projection.path}" alt="${escapeAlphaActivityHTML(name)}" draggable="false" data-battle-portrait-authority="${projection.authority}">`:`<div class="battle-live-active-card-missing">PORTRAIT AUTHORITY MISSING</div>`}<div class="battle-live-active-nameplate">${escapeAlphaActivityHTML(name)}</div></div>`;
+};
+function renderAlphaBattleCombatLog(){
+  const lines=Array.isArray(currentBattle.battleLog)?currentBattle.battleLog.slice(-7):[];
+  return `<aside class="battle-runtime-log" aria-live="polite"><div class="battle-runtime-panel-title">COMBAT FEED</div>${lines.length?lines.map((line,index)=>`<div class="battle-runtime-log-line ${index===lines.length-1?"is-latest":""}">${escapeAlphaActivityHTML(line)}</div>`).join(""):`<div class="battle-runtime-log-empty">Awaiting committed action.</div>`}</aside>`;
+}
+const ALPHA_PRE7300_RENDER_COMBAT_OVERLAY=renderCombatOverlay;
+renderCombatOverlay=function(container){
+  const enemy=currentBattle.enemy||selectedEnemy;if(!enemy){container.innerHTML=`<div class="battle-live-error">NO ENEMY SELECTED</div>`;return;}
+  if(!currentBattle.deployment){currentBattle.deployment=createBattleDeployment(enemy,currentBattle.activePlayer?currentBattle.activePlayer.id:currentBattle.characterId);syncBattleActivePlayerFromDeployment();if(typeof syncBattleActiveEnemyFromDeployment==="function")syncBattleActiveEnemyFromDeployment();}
+  const activePlayer=currentBattle.activePlayer||getBattleDeploymentParticipant("player",1)||null;const activeEnemy=getBattleDeploymentParticipant("enemy",1)||currentBattle.enemy||enemy;const region=selectedRegionKey&&worldRegions[selectedRegionKey]?worldRegions[selectedRegionKey]:null;const location=selectedLocationNode||null;
+  const playerBattlePL=activePlayer?getBattleRemainingPL("player",activePlayer.id):0,playerMaxBattlePL=activePlayer?getBattleMaximumPL("player",activePlayer.id):0,enemyPower=activeEnemy?getBattleRemainingPL("enemy",activeEnemy.id):0,enemyMaxPower=activeEnemy?getBattleMaximumPL("enemy",activeEnemy.id):0;
+  const playerSlots=getBattlePlayerSlotPresentation(),enemySlots=getBattleEnemySlotPresentation();const regionLabel=region?region.name.toUpperCase():"BATTLE",locationLabel=location?location.name:(activeEnemy&&activeEnemy.name?activeEnemy.name:"ENCOUNTER");const playerLabel=activePlayer?activePlayer.name:"NO ACTIVE SHINOBI",enemyLabel=activeEnemy&&activeEnemy.name?activeEnemy.name:"UNKNOWN ENEMY";
+  container.innerHTML=`<section class="battle-live-screen alpha-code-battle-screen" aria-label="Active Battle"><div class="battle-live-stage alpha-code-battle-stage">
+    <header class="battle-code-header"><div class="battle-live-location"><strong>${escapeAlphaActivityHTML(regionLabel)}</strong><span>${escapeAlphaActivityHTML(locationLabel)}</span></div><div class="battle-live-status"><strong>PLAYER ACTION</strong><span>${escapeAlphaActivityHTML(playerLabel)} VS ${escapeAlphaActivityHTML(enemyLabel)}</span></div></header>
+    <div class="battle-live-roster battle-live-roster-player">${playerSlots.map(slot=>renderBattleRosterSlot(slot,"player")).join("")}</div><div class="battle-live-roster battle-live-roster-enemy">${enemySlots.map(slot=>renderBattleRosterSlot(slot,"enemy")).join("")}</div>
+    ${renderBattleActiveCard("player",activePlayer)}${renderBattleActiveCard("enemy",activeEnemy)}<div class="battle-code-vs" aria-hidden="true">VS</div>${renderBattleWithdrawalEcho()}${renderBattlePromotionEcho("player")}${renderBattlePromotionEcho("enemy")}
+    <div class="battle-live-power battle-live-power-player"><strong>${playerBattlePL}</strong><span>/ ${playerMaxBattlePL} BATTLE PL</span><i style="width:${playerMaxBattlePL?Math.max(0,Math.min(100,playerBattlePL/playerMaxBattlePL*100)):0}%"></i></div>
+    <div class="battle-live-power battle-live-power-enemy"><strong>${enemyPower}</strong><span>/ ${enemyMaxPower} BATTLE PL</span><i style="width:${enemyMaxPower?Math.max(0,Math.min(100,enemyPower/enemyMaxPower*100)):0}%"></i></div>
+    ${renderAlphaBattleCombatLog()}${renderBattleActionFamilyRow(activePlayer)}${renderBattleActionRegion(activePlayer,activeEnemy)}
+  </div></section>`;
+};
+function runAlphaBattlePresentationDiagnostics(){
+  const source=renderCombatOverlay.toString(),active=renderBattleActiveCard.toString();
+  const checks={masterIndependent:!source.includes("battle.png")&&!source.includes("getUIAssetPath"),portraitFirst:active.includes("getAlphaBattleActivePortraitProjection"),uiPortraitAuthority:getAlphaBattleActivePortraitProjection.toString().includes("resolveUIPortraitProjection"),authoredActionsPreserved:source.includes("renderBattleActionRegion")&&source.includes("renderBattleActionFamilyRow"),withdrawalPreserved:renderBattleActionFamilyRow.toString().includes("invokeBattleWithdrawAction"),combatLogVisible:source.includes("renderAlphaBattleCombatLog"),battlePLPresented:source.includes("getBattleRemainingPL")&&source.includes("getBattleMaximumPL"),resolverNotRebuilt:source.includes("renderBattleActionRegion")&&!source.includes("applyBattleDamage")&&!source.includes("resolveBattleSkill")};checks.pass=Object.values(checks).every(Boolean);console.table(checks);return checks;
+}
+
+// ---------------------------------------------------------
+// 10500–10999 — MY CLAN INSPECTION DENSITY HARDENING
+// ---------------------------------------------------------
+function runAlphaMyClanCompletionLayoutDiagnostics(){
+  const source=renderMyClanInspectionContent.toString();const checks={quickActionsPresent:source.includes("my-clan-completion-actions"),setStart:source.includes("SET AS START"),assignNext:source.includes("ASSIGN NEXT OPEN"),favourite:source.includes("FAVOURITE"),saveFormation:source.includes("SAVE FORMATION")};checks.pass=Object.values(checks).every(Boolean);console.table(checks);return checks;
+}
+
+// ---------------------------------------------------------
+// 11000–12299 — MONSTER CUMULATIVE SOURCE DIAGNOSTIC
+// ---------------------------------------------------------
+function runAlphaBricks7300To12299MonsterDiagnostics(){
+  const genin=runAlphaFirstProductionGeninCandidateDiagnostics();const activity=runAlphaCodeOwnedActivitySurfaceDiagnostics();const battle=runAlphaBattlePresentationDiagnostics();const clan=runAlphaMyClanCompletionLayoutDiagnostics();const issue41=typeof runAlphaIssue41SourceDiagnostics==="function"?runAlphaIssue41SourceDiagnostics():{pass:false,reason:"issue41_diagnostic_missing"};
+  const checks={geninCandidateAuthority:genin.pass===true,codeOwnedActivities:activity.pass===true,playableBattlePresentation:battle.pass===true,myClanCompletionControls:clan.pass===true,mission11Mission12SourcePackage:issue41.pass===true,shinobiRecordTopLeftHook:typeof openShinobiRecord==="function"};checks.pass=Object.values(checks).every(Boolean);console.table(checks);return {pass:checks.pass,checks,genin,activity,battle,clan,issue41,browserValidationRequired:true,golden:false};
+}
+
+// ---------------------------------------------------------
+// BRICK 12299 — ISSUE #41 DIAGNOSTIC CHAIN-AWARE HARDENING
+// ---------------------------------------------------------
+// Later Arc-1 bricks legitimately wrap the original M11/M12 functions. The
+// earlier diagnostic inspected only the outermost wrapper source, producing
+// false negatives even when the semantic delegate remained intact. This gate
+// validates the complete active wrapper/delegate chain without relaxing any
+// authored requirement.
+runAlphaIssue41SourceDiagnostics=function(){
+  const A=ARC1_M11_RECALL_AUTHORITY,M=ARC1_M12_AUTHORITY;
+  const recallOuter=resolveArc1M11RecognitionSubstitution.toString();
+  const recallExact=typeof ALPHA_PRE5200_M11_RECOGNITION_SUBSTITUTION==="function"?ALPHA_PRE5200_M11_RECOGNITION_SUBSTITUTION.toString():recallOuter;
+  const launchOuter=launchArc1M12RenStage.toString();
+  const launchExact=typeof ALPHA_PRE5300_LAUNCH_M12==="function"?ALPHA_PRE5300_LAUNCH_M12.toString():launchOuter;
+  const cleanupOuter=cleanupArc1M12BorrowedKurama.toString();
+  const cleanupExact=typeof ALPHA_PRE5300_CLEANUP_M12==="function"?ALPHA_PRE5300_CLEANUP_M12.toString():cleanupOuter;
+  const restoreOuter=restoreBattleRuntimeState.toString();
+  const restoreIssue41=typeof ALPHA_PRE5499_RESTORE_BATTLE_RUNTIME==="function"?ALPHA_PRE5499_RESTORE_BATTLE_RUNTIME.toString():restoreOuter;
+  const saveSource=getBattleRuntimeSaveState.toString();
+  const checks={
+    m11ExactIds:getArc1M11EnemyIds().join("|")==="mizue_kagawa|arc1_m11_recall_medic_01|arc1_m11_field_operative_01",
+    m11ExactPL:getArc1M11EnemyIds().every(id=>enemyDatabase[id].calibratedBasePL===A.basePL[id]),
+    m11NoScaling:getArc1M11EnemyIds().every(id=>enemyDatabase[id].noBossScaling&&enemyDatabase[id].noEncounterScaling),
+    recallSubstitutionExactProfile:A.recall.profile==="menma_normal_no_carrier"&&recallExact.includes("recognition_substitution_contact_mismatch")&&recallExact.includes("linkedRecallContactId")&&recallOuter.includes("IdentityRebindingAccessSatisfied"),
+    m11ActionPL:getArc1M11PreparedActions(A.participants.kagawa).some(a=>a.id===A.actions.precision&&a.authoredAttackPL==="28_or_33_same_target")&&getArc1M11PreparedActions(A.participants.medic).some(a=>a.id===A.actions.scalpel&&a.authoredAttackPL===22),
+    m12OneRen:M.ren==="arc1_ren"&&M.renProjection[1].pl===54&&M.renProjection[2].pl===60&&M.renProjection[3].pl===73,
+    m12BorrowedExact80:M.borrowedKurama.effectivePL===80&&JSON.stringify(M.borrowedKurama.effectiveStats)===JSON.stringify({nin:80,tai:64,buki:39,fuin:57,kin:74,gen:35,stamina:85}),
+    noIndependentHostedSlots:launchExact.includes("hostedEntityTurnSlotsCreated:false")&&launchOuter.includes("const ids=[actor.id]")&&!launchOuter.includes("arc1_menma_echo]")&&!launchOuter.includes("host_rel_menma_arc1_echo]"),
+    routedBurstOnePacket:getArc1M12MenmaAdditionalActions(3,{borrowedKurama:true}).some(a=>a.id==="arc1_m12_echo_kurama_routed_burst"&&a.attackPL===52&&a.packetCount===1),
+    loanCleanup:cleanupOuter.includes("ALPHA_PRE5300_CLEANUP_M12")&&cleanupExact.includes("persistentUnlockGranted:false")&&cleanupOuter.includes("effectivePL=63")&&cleanupOuter.includes('effectiveProjectionKey="echo_menma"'),
+    sazanNotCombatant:!getArc1M12RenActions.toString().includes("arc1_dr_sazan"),
+    battleDefeatNoDeath:buildArc1M12ReturnEnvelope.toString().includes("renDeathInferred:false"),
+    saveLoadState:saveSource.includes("mission11RecallEncounter")&&saveSource.includes("mission12Climax")&&restoreIssue41.includes("mission11RecallEncounter")&&restoreIssue41.includes("mission12Climax")&&restoreOuter.includes("restoreArc1M12TransientProjectionFromBattleState")
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
+  console.table(checks);
+  return{pass:checks.pass,checks,codingStatus:checks.pass?"ISSUE_41_SOURCE_PACKAGE_GREEN":"ISSUE_41_SOURCE_PACKAGE_FAILED",runtimeBattleRoundTripStillRequired:true,diagnosticMode:"active_wrapper_delegate_chain"};
+};

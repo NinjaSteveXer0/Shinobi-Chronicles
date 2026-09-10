@@ -47,7 +47,35 @@
           rgba(0, 217, 232, 0.025) 58%,
           transparent
         );
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: pointer;
+      color: #e7d49a;
+      font: 800 9px/1.05 Georgia, "Times New Roman", serif;
+      letter-spacing: .105em;
+      text-transform: uppercase;
+      text-align: center;
+      padding: 0 13px;
+      appearance: none;
+      transition: color 140ms ease, border-color 140ms ease, background 140ms ease, box-shadow 140ms ease;
+    }
+
+    .header-ornament:hover,
+    .header-ornament:focus-visible {
+      color: #71e6ef;
+      border-left-color: rgba(214, 169, 58, 0.78);
+      border-right-color: rgba(72, 215, 230, 0.52);
+      background: linear-gradient(90deg, rgba(214,169,58,.11), rgba(0,217,232,.08), rgba(5,8,12,.1));
+      box-shadow: inset 0 -1px 0 rgba(69,220,232,.42);
+      outline: none;
+    }
+
+    .header-ornament span {
+      position: relative;
+      z-index: 3;
+      display: inline-block;
+      padding: 2px 4px;
+      background: rgba(5, 8, 12, .76);
+      text-shadow: 0 1px 3px #000;
     }
 
     .header-ornament::before {
@@ -67,6 +95,7 @@
           transparent
         );
       box-shadow: 0 0 7px rgba(214, 169, 58, 0.16);
+      opacity: .5;
     }
 
     .header-ornament::after {
@@ -82,6 +111,7 @@
       box-shadow:
         0 0 5px rgba(214, 169, 58, 0.22),
         0 0 8px rgba(0, 217, 232, 0.08);
+      opacity: .42;
     }
 
     /*
@@ -106,15 +136,25 @@
       }
 
       .header-ornament {
-        flex-basis: 58px;
-        width: 58px;
+        flex-basis: 76px;
+        width: 76px;
+        padding: 0 5px;
+        font-size: 7px;
       }
     }
 
     @media (max-width: 1120px) {
       .header-ornament {
-        flex-basis: 28px;
-        width: 28px;
+        flex-basis: 48px;
+        width: 48px;
+        padding: 0 2px;
+        font-size: 0;
+      }
+
+      .header-ornament span::after {
+        content: "REC";
+        font-size: 7px;
+        letter-spacing: .08em;
       }
 
       .header-ornament::before {
@@ -145,10 +185,13 @@
         removed. The approved masterbrand is baked into WorldMap.png.
         This slim ornament preserves deliberate visual balance only.
       -->
-      <div
-        class="header-ornament"
-        aria-hidden="true"
-      ></div>
+      <button
+        type="button"
+        class="header-ornament header-record-access"
+        onclick="openShinobiRecord('overview')"
+        aria-label="Open Shinobi Record"
+        title="Shinobi Record"
+      ><span>SHINOBI RECORD</span></button>
 
 
       <!-- =================================================
