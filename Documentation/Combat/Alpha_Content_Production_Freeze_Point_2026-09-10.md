@@ -1,12 +1,23 @@
-# Shinobi Chronicles — Initial Combat Content Production Freeze Point
+# Shinobi Chronicles — Combat Content Production Checkpoint
 
 **Date:** 2026-09-10
 
-Initial broad text-first catalogue production is complete at:
+The earlier initial broad text-first checkpoint was:
 - 200 Skills;
 - 96 Items / Weapons / Gear / Materials;
 - 296 total authored definitions.
 
-Do not add near-duplicate content solely to increase the count. Further expansion should be caller-driven or clearly add a distinct technique/equipment identity.
+That checkpoint was never a hard catalogue cap. It prohibited adding near-duplicate content solely to increase the number.
 
-This is a content-authoring freeze point only, not runtime/Golden freeze.
+Stephen has since explicitly called for a semantically distinct Kinjutsu / Echo / Menma / Tailed-Beast expansion. That caller-driven expansion is valid under the original rule.
+
+Current authored catalogue is now:
+- **260 Skills**;
+- **96 Items / Weapons / Gear / Materials**;
+- **356 total definitions**.
+
+Future expansion remains allowed when it adds a genuinely distinct character, mission, training, Kinjutsu, bloodline, Hosted-Entity, weapon/equipment or progression-facing technique identity.
+
+Do not pad the catalogue with renamed duplicates merely to hit a larger number.
+
+This remains a content-authoring checkpoint only, not runtime/Golden freeze.
