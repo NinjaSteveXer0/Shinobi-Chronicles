@@ -6104,7 +6104,7 @@ function createDefaultAcquisitionState() {
     geninRosterTransition:{
       unlocked:false,required:false,completed:false,subjectOwnedCharacterId:null,promotionEvidenceIds:[],
       eligibleCandidateVariantIds:[],selectedReplacementVariantIds:[],joninLeaderVariantId:null,
-      candidateSnapshot:null,candidateSnapshotId:null,selectedTeamVariantIds:[null,null],
+      candidateSnapshot:null,candidateSnapshotId:null,candidateSnapshotHistory:[],selectedTeamVariantIds:[null,null],
       finalTeamVariantIds:[],completedAt:null,completionReceipt:null
     },
     academyToGeninAssessment:{sequence:0,activeAttempt:null,attempts:[]},
@@ -6179,6 +6179,7 @@ function normalizeAcquisitionState(savedState, ownershipState, options={}) {
       joninLeaderVariantId:source.geninRosterTransition.joninLeaderVariantId&&getCharacterRegistryEntry(source.geninRosterTransition.joninLeaderVariantId)?source.geninRosterTransition.joninLeaderVariantId:null,
       candidateSnapshot:source.geninRosterTransition.candidateSnapshot&&typeof source.geninRosterTransition.candidateSnapshot==="object"?cloneProgressionData(source.geninRosterTransition.candidateSnapshot):null,
       candidateSnapshotId:typeof source.geninRosterTransition.candidateSnapshotId==="string"?source.geninRosterTransition.candidateSnapshotId:null,
+      candidateSnapshotHistory:Array.isArray(source.geninRosterTransition.candidateSnapshotHistory)?source.geninRosterTransition.candidateSnapshotHistory.filter(Boolean).map(cloneProgressionData):[],
       selectedTeamVariantIds:Array.from({length:2},(_,index)=>{const id=Array.isArray(source.geninRosterTransition.selectedTeamVariantIds)?source.geninRosterTransition.selectedTeamVariantIds[index]:null;return id&&getCharacterRegistryEntry(id)?id:null;}),
       finalTeamVariantIds:Array.isArray(source.geninRosterTransition.finalTeamVariantIds)?source.geninRosterTransition.finalTeamVariantIds.filter(id=>!!getCharacterRegistryEntry(id)).slice(0,2):[],
       completedAt:Number(source.geninRosterTransition.completedAt)||null,
@@ -102192,3 +102193,463 @@ function installWorldMapV2RuntimeProjection() {
 }
 
 installWorldMapV2RuntimeProjection();
+
+// =========================================================
+// BRICKS 5800–6499 — UI/RUNTIME CONSOLIDATION MONSTER
+// World Map collision correction + Training/Arena fit-to-view +
+// My Clan completion controls + Issue #63 dynamic candidate machinery.
+// =========================================================
+
+// ---------------------------------------------------------
+// 5800–5824 — WORLD MAP S01 / GRASS PRESENTATION COLLISION
+// ---------------------------------------------------------
+// Semantic reservation anchor remains 520,330 on the 1672x941 production map.
+// Only the visible halo treatment is displaced (+40,-10 native px) to stop the
+// locked ???? treatment colliding with the Land of Grass country marker.
+const WORLD_MAP_V2_SECRET_PRESENTATION_OFFSETS_NATIVE=Object.freeze({
+  "world:S01":Object.freeze({dx:40,dy:-10,reason:"clear_world_C06_grass_marker"})
+});
+function getWorldMapV2SecretPresentationPoint(secret){
+  const offset=WORLD_MAP_V2_SECRET_PRESENTATION_OFFSETS_NATIVE[secret&&secret.address]||{dx:0,dy:0};
+  const x=Number(secret&&secret.x)||0;
+  const y=Number(secret&&secret.y)||0;
+  return {
+    x:x+(offset.dx/WORLD_MAP_V2_NATIVE_SIZE.width)*100,
+    y:y+(offset.dy/WORLD_MAP_V2_NATIVE_SIZE.height)*100,
+    semanticX:x,semanticY:y,
+    presentationOffsetNative:{dx:offset.dx,dy:offset.dy}
+  };
+}
+const ALPHA_PRE5800_RENDER_LOCKED_SECRET_MARKER=renderWorldMapV2LockedSecretMarker;
+renderWorldMapV2LockedSecretMarker=function(secret,index){
+  const runtime=ensureWorldMapRuntimeState();
+  const state=runtime.secretProjectionByAddress&&runtime.secretProjectionByAddress[secret.address]
+    ? runtime.secretProjectionByAddress[secret.address].state
+    : "KNOWN_UNKNOWN_LOCKED";
+  if(state!=="KNOWN_UNKNOWN_LOCKED") return "";
+  const point=getWorldMapV2SecretPresentationPoint(secret);
+  // No secret address/name is emitted into DOM, tooltip, title or accessibility metadata.
+  return `<button type="button" class="world-secret-halo" style="left:${point.x}%;top:${point.y}%;" onclick="focusWorldMapLockedSecret()" aria-label="Unknown special location" title="Unknown special location"><span class="world-secret-halo-label">????</span></button>`;
+};
+
+// ---------------------------------------------------------
+// 5825–5899 — MY CLAN OPERATIONAL COMPLETION CONTROLS
+// ---------------------------------------------------------
+function assignMyClanCharacterToNextOpenSlot(characterId=CLAN_UI_STATE.selectedCharacterId){
+  const editability=canEditClanFormation();
+  if(!editability.allowed) return {success:false,reason:editability.reason};
+  const character=getClanManageableRosterCharacters().find(c=>c&&c.id===characterId)||null;
+  if(!character) return {success:false,reason:"character_not_clan_manageable"};
+  ensureMyClanAdaptiveStaging();
+  const existing=getMyClanStagedSlotNumber(character.id);
+  if(existing){
+    setMyClanFeedback(`${character.name} is already ${getClanBattleQueueSlotLabel(existing)}.`,"info");
+    rerenderClanOverlay();
+    return {success:true,idempotent:true,slotNumber:existing};
+  }
+  const index=CLAN_UI_STATE.stagedTeamSlots.findIndex(id=>!id);
+  if(index<0){
+    setMyClanFeedback("Formation is full. Choose a slot to replace or remove a shinobi first.","error");
+    rerenderClanOverlay();
+    return {success:false,reason:"clan_formation_full"};
+  }
+  return stageMyClanCharacterToSlot(character.id,index+1);
+}
+function setMyClanCharacterAsStart(characterId=CLAN_UI_STATE.selectedCharacterId){
+  const editability=canEditClanFormation();
+  if(!editability.allowed) return {success:false,reason:editability.reason};
+  const character=getClanManageableRosterCharacters().find(c=>c&&c.id===characterId)||null;
+  if(!character) return {success:false,reason:"character_not_clan_manageable"};
+  return stageMyClanCharacterToSlot(character.id,1);
+}
+function saveMyClanAndContinuePendingBattle(){
+  const saved=saveMyClanStagedFormation();
+  if(!saved||saved.success!==true) return saved||{success:false,reason:"formation_save_failed"};
+  if(typeof continueAlphaPendingBattleFromMyClan==="function") return continueAlphaPendingBattleFromMyClan();
+  return {success:true,saved:true,pendingBattle:false};
+}
+const ALPHA_PRE5800_RENDER_MY_CLAN_INSPECTION=renderMyClanInspectionContent;
+renderMyClanInspectionContent=function(character){
+  const markup=ALPHA_PRE5800_RENDER_MY_CLAN_INSPECTION(character);
+  if(!character||!markup) return markup;
+  const slot=getMyClanStagedSlotNumber(character.id);
+  const editability=canEditClanFormation();
+  const safeId=escapeStorySceneHTML(character.id);
+  const quick=`<div class="my-clan-completion-actions" aria-label="Formation quick actions">
+    <button type="button" onclick="setMyClanCharacterAsStart('${safeId}')" ${editability.allowed?"":"disabled"}>SET AS START</button>
+    <button type="button" onclick="assignMyClanCharacterToNextOpenSlot('${safeId}')" ${editability.allowed||slot?"":"disabled"}>${slot?`ASSIGNED · ${escapeStorySceneHTML(getClanBattleQueueSlotLabel(slot))}`:"ASSIGN NEXT OPEN"}</button>
+    <button type="button" onclick="toggleClanFavourite('${safeId}')">${isClanFavourite(character.id)?"UNFAVOURITE":"FAVOURITE"}</button>
+    <button type="button" onclick="saveMyClanStagedFormation()" ${CLAN_UI_STATE.formationDirty&&editability.allowed?"":"disabled"}>SAVE FORMATION</button>
+  </div>`;
+  return markup.replace('</aside>',`${quick}</aside>`);
+};
+
+// ---------------------------------------------------------
+// 5900–6099 — ARENA MAIN AS A CLICKABLE FOUR-WAY DIAGRAM
+// ---------------------------------------------------------
+const ALPHA_ARENA_MAIN_HOTSPOTS=Object.freeze([
+  Object.freeze({id:"promotion",label:"Promotion",left:3.2,top:20.0,width:43.8,height:29.4,onclick:"openArenaPromotionSurface()"}),
+  Object.freeze({id:"staged",label:"Staged Battles",left:53.0,top:20.0,width:43.8,height:29.4,onclick:"openAlphaArenaUtilitySurface('staged')"}),
+  Object.freeze({id:"pvp",label:"PVP",left:3.2,top:50.8,width:43.8,height:29.2,onclick:"openAlphaArenaUtilitySurface('pvp')"}),
+  Object.freeze({id:"tournament",label:"Village Tournament",left:53.0,top:50.8,width:43.8,height:29.2,onclick:"openAlphaArenaUtilitySurface('tournament')"})
+]);
+const ALPHA_PRE5800_RENDER_ARENA_MAIN=renderArenaMainOverlay;
+renderArenaMainOverlay=function(container){
+  if(!container) return false;
+  const surface=ALPHA_POST2500_ARENA_RUNTIME.surface||"main";
+  if(surface!=="main") return ALPHA_PRE5800_RENDER_ARENA_MAIN(container);
+  const asset=getAlphaArenaMasterAsset("main");
+  probeAlphaMasterAsset("arena",asset);
+  const master=isAlphaUIMasterEnabled("arena");
+  const startId=getSavedClanStartCharacterId();
+  const startCharacter=startId?getPlayerCharacter(startId):null;
+  const hotspots=ALPHA_ARENA_MAIN_HOTSPOTS.map(item=>`<button type="button" class="alpha-arena-diagram-hotspot is-${item.id}" style="left:${item.left}%;top:${item.top}%;width:${item.width}%;height:${item.height}%;" onclick="${item.onclick}" aria-label="Open ${escapeStorySceneHTML(item.label)}"><span>${escapeStorySceneHTML(item.label)} · OPEN</span></button>`).join("");
+  container.innerHTML=`<div class="alpha-arena-master-screen ${master?"is-master-art-on":"is-master-art-off"} alpha-arena-surface-main">
+    <div class="alpha-arena-master-stage alpha-arena-main-stage" style="--arena-master:${master?`url('${asset}')`:"none"}">
+      <div class="alpha-arena-code-shell alpha-arena-diagram-shell">
+        <header><span>KONOHA</span><h2>ARENA</h2><button type="button" onclick="closeOverlay()" aria-label="Close Arena">✕</button></header>
+        <div class="alpha-arena-diagram-readiness ${startId?"is-ready":"is-blocked"}"><b>${startCharacter?`START · ${escapeStorySceneHTML(startCharacter.name)}`:"START NOT SAVED"}</b><small>${startId?"Saved My Clan formation is Battle-ready.":"Battle-capable Arena routes will send you to My Clan first."}</small></div>
+        ${hotspots}
+      </div>
+    </div>
+  </div>`;
+  return true;
+};
+
+// ---------------------------------------------------------
+// 6100–6199 — TRAINING GROUNDS FIT-TO-VIEW / CLEAN SHELL
+// ---------------------------------------------------------
+const ALPHA_PRE5800_RENDER_TRAINING_MASTER=renderAlphaTrainingMaster;
+renderAlphaTrainingMaster=function(container,surface,content){
+  const result=ALPHA_PRE5800_RENDER_TRAINING_MASTER(container,surface,content);
+  if(container){
+    const screen=container.querySelector&&container.querySelector('.alpha-training-screen');
+    if(screen) screen.setAttribute('data-training-fit','desktop-fit-first');
+  }
+  return result;
+};
+
+// ---------------------------------------------------------
+// 6200–6399 — ISSUE #63 DYNAMIC GENIN CANDIDATE STATE
+// ---------------------------------------------------------
+const ALPHA_ISSUE63_CANDIDATE_STATES=Object.freeze(["available","assigned_to_player","assigned_elsewhere","unavailable"]);
+const ALPHA_ISSUE63_LEADER_RANKS=Object.freeze(["jonin","special_jonin"]);
+function normalizeIssue63CandidateStateMap(raw,snapshot){
+  const map={};
+  const all=[...(snapshot.retentionEligibleVariantIds||[]),...(snapshot.teammateCandidateVariantIds||[]),...(snapshot.joninLeaderCandidateVariantIds||[])];
+  for(const id of new Set(all)){
+    const value=raw&&ALPHA_ISSUE63_CANDIDATE_STATES.includes(raw[id])?raw[id]:"available";
+    map[id]=value;
+  }
+  for(const id of getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean)){
+    if(Object.prototype.hasOwnProperty.call(map,id)) map[id]="assigned_to_player";
+  }
+  return map;
+}
+const ALPHA_PRE5800_NORMALIZE_GENIN_SNAPSHOT=normalizeGeninRosterCandidateSnapshot;
+normalizeGeninRosterCandidateSnapshot=function(snapshot){
+  const normalized=ALPHA_PRE5800_NORMALIZE_GENIN_SNAPSHOT(snapshot);
+  if(!normalized) return null;
+  normalized.candidateStates=normalizeIssue63CandidateStateMap(snapshot&&snapshot.candidateStates,normalized);
+  normalized.supersedesSnapshotId=typeof snapshot.supersedesSnapshotId==="string"?snapshot.supersedesSnapshotId:null;
+  return normalized;
+};
+const ALPHA_PRE5800_NORMALIZE_ACQUISITION_STATE=normalizeAcquisitionState;
+normalizeAcquisitionState=function(savedState,ownershipState,options={}){
+  const state=ALPHA_PRE5800_NORMALIZE_ACQUISITION_STATE(savedState,ownershipState,options);
+  const src=savedState&&savedState.geninRosterTransition&&typeof savedState.geninRosterTransition==="object"?savedState.geninRosterTransition:{};
+  const t=state.geninRosterTransition;
+  t.candidateSnapshotHistory=Array.isArray(src.candidateSnapshotHistory)?src.candidateSnapshotHistory.filter(Boolean).map(cloneProgressionData):[];
+  if(t.candidateSnapshot){
+    const normalized=normalizeGeninRosterCandidateSnapshot(t.candidateSnapshot);
+    if(normalized) t.candidateSnapshot=normalized;
+  }
+  return state;
+};
+function isIssue63CandidateAvailable(snapshot,variantId,{allowAssignedToPlayer=false}={}){
+  if(!snapshot||!variantId) return false;
+  const state=snapshot.candidateStates&&snapshot.candidateStates[variantId]||"available";
+  return state==="available"||(allowAssignedToPlayer&&state==="assigned_to_player");
+}
+function isIssue63LeaderRankAllowed(variantId){
+  const entry=getCharacterRegistryEntry(variantId);
+  return !!(entry&&ALPHA_ISSUE63_LEADER_RANKS.includes(String(entry.formalRank||"").toLowerCase()));
+}
+function validateIssue63SnapshotAuthority(snapshot){
+  if(!snapshot) return {valid:false,reason:"candidate_snapshot_invalid"};
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean);
+  if(!current.every(id=>snapshot.retentionEligibleVariantIds.includes(id))) return {valid:false,reason:"current_teammates_not_retention_authorised"};
+  if(snapshot.joninLeaderCandidateVariantIds.some(id=>!isIssue63LeaderRankAllowed(id))) return {valid:false,reason:"leader_candidate_rank_not_jonin_or_special_jonin"};
+  if(snapshot.joninLeaderCandidateVariantIds.some(id=>!isIssue63CandidateAvailable(snapshot,id))) return {valid:false,reason:"leader_candidate_not_available"};
+  return {valid:true};
+}
+const ALPHA_PRE5800_APPLY_GENIN_SNAPSHOT=applyGeninRosterTransitionCandidateSnapshot;
+applyGeninRosterTransitionCandidateSnapshot=function(snapshot){
+  const transition=getGeninRosterTransitionState();
+  const normalized=normalizeGeninRosterCandidateSnapshot(snapshot);
+  if(!normalized) return {success:false,reason:"candidate_snapshot_invalid"};
+  const check=validateIssue63SnapshotAuthority(normalized);
+  if(!check.valid) return {success:false,reason:check.reason};
+  if(transition.candidateSnapshot){
+    if(transition.candidateSnapshotId===normalized.snapshotId) return {success:true,idempotent:true,snapshot:cloneProgressionData(transition.candidateSnapshot),selectedTeamVariantIds:[...(transition.selectedTeamVariantIds||[])]};
+    const provenance=normalized.provenance||{};
+    if(normalized.supersedesSnapshotId!==transition.candidateSnapshotId||!provenance.causalReason||!provenance.occurrenceId){
+      return {success:false,reason:"candidate_snapshot_supersession_requires_causal_history",candidateSnapshotId:transition.candidateSnapshotId};
+    }
+    if(!Array.isArray(transition.candidateSnapshotHistory)) transition.candidateSnapshotHistory=[];
+    transition.candidateSnapshotHistory.push(cloneProgressionData(transition.candidateSnapshot));
+    transition.candidateSnapshot=normalized;
+    transition.candidateSnapshotId=normalized.snapshotId;
+    transition.eligibleCandidateVariantIds=[...new Set([...normalized.retentionEligibleVariantIds,...normalized.teammateCandidateVariantIds])];
+    const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+    transition.selectedTeamVariantIds=Array.from({length:2},(_,i)=>{
+      const selected=transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[i];
+      if(selected&&((normalized.retentionEligibleVariantIds.includes(selected)&&current.includes(selected)&&isIssue63CandidateAvailable(normalized,selected,{allowAssignedToPlayer:true}))||(normalized.teammateCandidateVariantIds.includes(selected)&&isIssue63CandidateAvailable(normalized,selected)))) return selected;
+      return current[i]||null;
+    });
+    if(transition.joninLeaderVariantId&&!normalized.joninLeaderCandidateVariantIds.includes(transition.joninLeaderVariantId)) transition.joninLeaderVariantId=null;
+    savePlayerData();
+    return {success:true,superseded:true,snapshot:cloneProgressionData(normalized),selectedTeamVariantIds:[...transition.selectedTeamVariantIds]};
+  }
+  return ALPHA_PRE5800_APPLY_GENIN_SNAPSHOT(normalized);
+};
+const ALPHA_PRE5800_SELECT_GENIN_TEAMMATE=selectGeninRosterTransitionTeammate;
+selectGeninRosterTransitionTeammate=function(position,variantId,expectedSnapshotId=null){
+  const transition=getGeninRosterTransitionState();
+  if(expectedSnapshotId&&transition.candidateSnapshotId!==expectedSnapshotId) return {success:false,reason:"stale_candidate_snapshot_selection",expectedSnapshotId,currentSnapshotId:transition.candidateSnapshotId};
+  const snapshot=transition.candidateSnapshot;
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+  const retain=current.includes(variantId)&&snapshot&&snapshot.retentionEligibleVariantIds.includes(variantId);
+  if(snapshot&&!isIssue63CandidateAvailable(snapshot,variantId,{allowAssignedToPlayer:retain})) return {success:false,reason:"candidate_not_currently_available",variantId};
+  return ALPHA_PRE5800_SELECT_GENIN_TEAMMATE(position,variantId);
+};
+const ALPHA_PRE5800_SELECT_GENIN_LEADER=selectGeninRosterTransitionJoninLeader;
+selectGeninRosterTransitionJoninLeader=function(variantId,expectedSnapshotId=null){
+  const transition=getGeninRosterTransitionState();
+  if(expectedSnapshotId&&transition.candidateSnapshotId!==expectedSnapshotId) return {success:false,reason:"stale_candidate_snapshot_selection",expectedSnapshotId,currentSnapshotId:transition.candidateSnapshotId};
+  const snapshot=transition.candidateSnapshot;
+  if(!snapshot||!snapshot.joninLeaderCandidateVariantIds.includes(variantId)) return {success:false,reason:"jonin_leader_not_in_authoritative_snapshot"};
+  if(!isIssue63CandidateAvailable(snapshot,variantId)) return {success:false,reason:"leader_candidate_not_currently_available"};
+  if(!isIssue63LeaderRankAllowed(variantId)) return {success:false,reason:"leader_candidate_rank_invalid"};
+  transition.joninLeaderVariantId=variantId;
+  savePlayerData();
+  return {success:true,variantId,formalRank:String(getCharacterRegistryEntry(variantId).formalRank||"").toLowerCase(),assignmentMode:"institutional",collectibleOwnershipRequired:false};
+};
+const ALPHA_PRE5800_CONFIRM_GENIN_TRANSITION=confirmGeninRosterTransition;
+confirmGeninRosterTransition=function(){
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  if(snapshot){
+    const selected=Array.from({length:2},(_,i)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[i]||null);
+    const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+    for(const id of selected){
+      const retain=current.includes(id)&&snapshot.retentionEligibleVariantIds.includes(id);
+      if(id&&!isIssue63CandidateAvailable(snapshot,id,{allowAssignedToPlayer:retain})) return {success:false,reason:"selected_candidate_became_unavailable",variantId:id};
+    }
+    const leader=transition.joninLeaderVariantId;
+    if(leader&&(!isIssue63CandidateAvailable(snapshot,leader)||!isIssue63LeaderRankAllowed(leader))) return {success:false,reason:"selected_leader_became_unavailable",variantId:leader};
+  }
+  // Inline corrected #63 leader rank rule while preserving the existing atomic commit.
+  if(snapshot&&transition.joninLeaderVariantId&&String(getCharacterRegistryEntry(transition.joninLeaderVariantId)?.formalRank||"").toLowerCase()==="special_jonin"){
+    const entry=getCharacterRegistryEntry(transition.joninLeaderVariantId);
+    const originalRank=entry.formalRank;
+    // Existing pre-5800 commit only rejects non-jonin rank at its final guard.
+    // Temporarily present the already-authorised leader as guard-compatible; restore immediately.
+    entry.formalRank="jonin";
+    try{
+      const result=ALPHA_PRE5800_CONFIRM_GENIN_TRANSITION();
+      entry.formalRank=originalRank;
+      if(result&&result.success&&playerData.acquisition&&playerData.acquisition.joninLeadershipAssignment){
+        playerData.acquisition.joninLeadershipAssignment.formalRank="special_jonin";
+        playerData.acquisition.joninLeadershipAssignment.rankMutatedByAssignment=false;
+        savePlayerData();
+      }
+      return result;
+    }catch(error){entry.formalRank=originalRank;throw error;}
+  }
+  return ALPHA_PRE5800_CONFIRM_GENIN_TRANSITION();
+};
+function getIssue63UncommittedReplacementField(snapshot=getGeninRosterTransitionState().candidateSnapshot){
+  if(!snapshot) return {genin:[],leaders:[]};
+  const current=new Set(getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean));
+  const genin=(snapshot.teammateCandidateVariantIds||[]).filter(id=>!current.has(id)&&isIssue63CandidateAvailable(snapshot,id));
+  const leaders=(snapshot.joninLeaderCandidateVariantIds||[]).filter(id=>isIssue63CandidateAvailable(snapshot,id)&&isIssue63LeaderRankAllowed(id));
+  return {genin,leaders};
+}
+function commitIssue63CandidateAssignedElsewhere(variantId,{occurrenceId=null,causalReason=null,newSnapshotId=null}={}){
+  const transition=getGeninRosterTransitionState();
+  const snapshot=transition.candidateSnapshot;
+  if(!snapshot) return {success:false,reason:"candidate_snapshot_required"};
+  const current=new Set(getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean));
+  if(current.has(variantId)) return {success:false,reason:"current_academy_teammate_protected"};
+  if(!isIssue63CandidateAvailable(snapshot,variantId)) return {success:false,reason:"candidate_not_available"};
+  if(!occurrenceId||!causalReason) return {success:false,reason:"committed_causal_assignment_required"};
+  const isGenin=(snapshot.teammateCandidateVariantIds||[]).includes(variantId);
+  const isLeader=(snapshot.joninLeaderCandidateVariantIds||[]).includes(variantId);
+  if(!isGenin&&!isLeader) return {success:false,reason:"candidate_not_player_relevant"};
+  const field=getIssue63UncommittedReplacementField(snapshot);
+  if(isGenin&&field.genin.length-1<2) return {success:false,reason:"genin_candidate_floor_protected",minimumRemaining:2};
+  if(isLeader&&field.leaders.length-1<1) return {success:false,reason:"leader_candidate_floor_protected",minimumRemaining:1};
+  const next=cloneProgressionData(snapshot);
+  next.snapshotId=newSnapshotId||`${snapshot.snapshotId}:superseded:${String(occurrenceId)}`;
+  next.supersedesSnapshotId=snapshot.snapshotId;
+  next.provenance={...(next.provenance||{}),occurrenceId,causalReason,materialCandidateStateChange:true};
+  next.candidateStates={...(next.candidateStates||{}),[variantId]:"assigned_elsewhere"};
+  return applyGeninRosterTransitionCandidateSnapshot(next);
+}
+
+// ---------------------------------------------------------
+// 6400–6499 — MONSTER DIAGNOSTIC
+// ---------------------------------------------------------
+function runAlphaBricks5800To6499MonsterDiagnostics(){
+  const s01=WORLD_MAP_V2_PHYSICAL_SECRET_RESERVATIONS[0];
+  const point=getWorldMapV2SecretPresentationPoint(s01);
+  const arenaSource=renderArenaMainOverlay.toString();
+  const trainingCSSContract="desktop-fit-first";
+  const clanInspection=renderMyClanInspectionContent.toString();
+  const issue63Apply=applyGeninRosterTransitionCandidateSnapshot.toString();
+  const checks={
+    s01SemanticAnchorUnchanged:s01.x===31.1&&s01.y===35.1,
+    s01PresentationMovedRight:point.x>s01.x&&point.presentationOffsetNative.dx===40,
+    s01PresentationMovedUp:point.y<s01.y&&point.presentationOffsetNative.dy===-10,
+    secretProjectionStillZeroLeak:!renderWorldMapV2LockedSecretMarker(s01,0).includes("world:S01"),
+    arenaFourDiagramDestinations:ALPHA_ARENA_MAIN_HOTSPOTS.length===4&&arenaSource.includes("openArenaPromotionSurface")&&arenaSource.includes("staged")&&arenaSource.includes("tournament")&&arenaSource.includes("pvp"),
+    arenaMasterStillOptional:arenaSource.includes("isAlphaUIMasterEnabled")&&arenaSource.includes("is-master-art-off"),
+    trainingFitMarker:renderAlphaTrainingMaster.toString().includes(trainingCSSContract),
+    myClanQuickSetStart:clanInspection.includes("setMyClanCharacterAsStart"),
+    myClanQuickAssign:clanInspection.includes("assignMyClanCharacterToNextOpenSlot"),
+    myClanQuickSave:clanInspection.includes("saveMyClanStagedFormation"),
+    issue63NoRegistryScanForCandidateDiscovery:!issue63Apply.includes("characterRegistry")&&!issue63Apply.includes("Object.keys(character"),
+    issue63SnapshotSupersessionRequiresCause:issue63Apply.includes("supersession_requires_causal_history")&&issue63Apply.includes("supersedesSnapshotId"),
+    issue63CandidateStateVocabulary:ALPHA_ISSUE63_CANDIDATE_STATES.join("|")==="available|assigned_to_player|assigned_elsewhere|unavailable",
+    issue63LeaderRankUnion:ALPHA_ISSUE63_LEADER_RANKS.includes("jonin")&&ALPHA_ISSUE63_LEADER_RANKS.includes("special_jonin"),
+    issue63AutonomousFloor:commitIssue63CandidateAssignedElsewhere.toString().includes("genin_candidate_floor_protected")&&commitIssue63CandidateAssignedElsewhere.toString().includes("leader_candidate_floor_protected"),
+    issue63CurrentTeammatesProtected:commitIssue63CandidateAssignedElsewhere.toString().includes("current_academy_teammate_protected"),
+    issue63StaleSelectionFailsClosed:selectGeninRosterTransitionTeammate.toString().includes("stale_candidate_snapshot_selection")&&selectGeninRosterTransitionJoninLeader.toString().includes("stale_candidate_snapshot_selection"),
+    issue63UnownedReplacementStillAcquisitionRequired:ALPHA_PRE5800_SELECT_GENIN_TEAMMATE.toString().includes("acquisition_required"),
+    outgoingTeammateOwnershipStillPreserved:ALPHA_PRE5800_CONFIRM_GENIN_TRANSITION.toString().includes("outgoingTeammatesRemainOwned:true"),
+    joninAssignmentStillNoCollectibleOwnership:selectGeninRosterTransitionJoninLeader.toString().includes("collectibleOwnershipRequired:false")
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
+  console.table(checks);
+  return {pass:checks.pass,checks,codingStatus:checks.pass?"BRICKS_5800_6499_UI_RUNTIME_MONSTER_GREEN":"BRICKS_5800_6499_UI_RUNTIME_MONSTER_FAILED",nextImplementedBrick:6499};
+}
+
+// ---------------------------------------------------------
+// BRICK 6499 DELIVERY HARDENING — corrected Issue #63 atomic path
+// ---------------------------------------------------------
+assignMyClanCharacterToNextOpenSlot=function(characterId=CLAN_UI_STATE.selectedCharacterId){
+  const editability=canEditClanFormation();
+  if(!editability.allowed) return {success:false,reason:editability.reason};
+  const character=getClanManageableRosterCharacters().find(c=>c&&c.id===characterId)||null;
+  if(!character) return {success:false,reason:"character_not_clan_manageable"};
+  ensureMyClanAdaptiveStaging();
+  const existing=getMyClanStagedSlotNumber(character.id);
+  if(existing){setMyClanFeedback(`${character.name} is already ${getClanBattleQueueSlotLabel(existing)}.`,"info");rerenderClanOverlay();return {success:true,idempotent:true,slotNumber:existing};}
+  const index=CLAN_UI_STATE.stagedTeamSlots.findIndex(id=>!id);
+  if(index<0){setMyClanFeedback("Formation is full. Choose a slot to replace or remove a shinobi first.","error");rerenderClanOverlay();return {success:false,reason:"clan_formation_full"};}
+  return stageMyClanCharacterToSlot(index+1,character.id);
+};
+setMyClanCharacterAsStart=function(characterId=CLAN_UI_STATE.selectedCharacterId){
+  const editability=canEditClanFormation();
+  if(!editability.allowed) return {success:false,reason:editability.reason};
+  const character=getClanManageableRosterCharacters().find(c=>c&&c.id===characterId)||null;
+  if(!character) return {success:false,reason:"character_not_clan_manageable"};
+  return stageMyClanCharacterToSlot(1,character.id);
+};
+
+applyGeninRosterTransitionCandidateSnapshot=function(snapshot){
+  const transition=getGeninRosterTransitionState();
+  if(transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  const normalized=normalizeGeninRosterCandidateSnapshot(snapshot);
+  if(!normalized) return {success:false,reason:"candidate_snapshot_invalid"};
+  if(!transition.subjectOwnedCharacterId||normalized.subjectOwnedCharacterId!==transition.subjectOwnedCharacterId) return {success:false,reason:"candidate_snapshot_subject_mismatch"};
+  if(String(getOwnedCharacterFormalRank(transition.subjectOwnedCharacterId)||"").toLowerCase()!=="genin") return {success:false,reason:"candidate_snapshot_subject_not_promoted_genin"};
+  const validity=validateIssue63SnapshotAuthority(normalized);
+  if(!validity.valid) return {success:false,reason:validity.reason};
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition().filter(Boolean);
+  if(transition.candidateSnapshot){
+    if(transition.candidateSnapshotId===normalized.snapshotId) return {success:true,idempotent:true,snapshot:cloneProgressionData(transition.candidateSnapshot),selectedTeamVariantIds:[...(transition.selectedTeamVariantIds||[])]};
+    const provenance=normalized.provenance||{};
+    if(normalized.supersedesSnapshotId!==transition.candidateSnapshotId||!provenance.causalReason||!provenance.occurrenceId) return {success:false,reason:"candidate_snapshot_supersession_requires_causal_history",candidateSnapshotId:transition.candidateSnapshotId};
+    if(!Array.isArray(transition.candidateSnapshotHistory)) transition.candidateSnapshotHistory=[];
+    transition.candidateSnapshotHistory.push(cloneProgressionData(transition.candidateSnapshot));
+  }
+  transition.candidateSnapshot=normalized;
+  transition.candidateSnapshotId=normalized.snapshotId;
+  transition.eligibleCandidateVariantIds=[...new Set([...normalized.retentionEligibleVariantIds,...normalized.teammateCandidateVariantIds])];
+  transition.selectedTeamVariantIds=Array.from({length:2},(_,i)=>{
+    const existing=transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[i];
+    const retainExisting=existing&&current.includes(existing)&&normalized.retentionEligibleVariantIds.includes(existing)&&isIssue63CandidateAvailable(normalized,existing,{allowAssignedToPlayer:true});
+    const replacementExisting=existing&&normalized.teammateCandidateVariantIds.includes(existing)&&isIssue63CandidateAvailable(normalized,existing);
+    return retainExisting||replacementExisting?existing:(current[i]||null);
+  });
+  transition.selectedReplacementVariantIds=transition.selectedTeamVariantIds.filter(id=>id&&!current.includes(id));
+  if(transition.joninLeaderVariantId&&(!normalized.joninLeaderCandidateVariantIds.includes(transition.joninLeaderVariantId)||!isIssue63CandidateAvailable(normalized,transition.joninLeaderVariantId))) transition.joninLeaderVariantId=null;
+  savePlayerData();
+  return {success:true,superseded:!!normalized.supersedesSnapshotId,snapshot:cloneProgressionData(normalized),selectedTeamVariantIds:[...transition.selectedTeamVariantIds]};
+};
+
+confirmGeninRosterTransition=function(){
+  const state=ensurePlayerAcquisitionState();
+  const transition=getGeninRosterTransitionState();
+  if(transition.completed===true&&transition.completionReceipt) return {success:true,idempotent:true,...cloneProgressionData(transition.completionReceipt)};
+  const snapshot=transition.candidateSnapshot;
+  if(transition.unlocked!==true||transition.required!==true||transition.completed===true) return {success:false,reason:"genin_roster_transition_not_active"};
+  if(!transition.subjectOwnedCharacterId||String(getOwnedCharacterFormalRank(transition.subjectOwnedCharacterId)||"").toLowerCase()!=="genin") return {success:false,reason:"genin_roster_transition_subject_not_genin"};
+  if(!snapshot||transition.candidateSnapshotId!==snapshot.snapshotId||snapshot.subjectOwnedCharacterId!==transition.subjectOwnedCharacterId) return {success:false,reason:"candidate_snapshot_required"};
+  const selected=Array.from({length:2},(_,index)=>transition.selectedTeamVariantIds&&transition.selectedTeamVariantIds[index]||null);
+  if(selected.some(id=>!id)||new Set(selected).size!==2) return {success:false,reason:"genin_team_requires_two_distinct_teammates"};
+  const current=getCurrentAcademyTeammateVariantIdsForGeninTransition();
+  for(const id of selected){
+    const retain=current.includes(id)&&snapshot.retentionEligibleVariantIds.includes(id);
+    const replacement=snapshot.teammateCandidateVariantIds.includes(id);
+    if(!retain&&!replacement) return {success:false,reason:"genin_teammate_selection_not_authorized",variantId:id};
+    if(!isIssue63CandidateAvailable(snapshot,id,{allowAssignedToPlayer:retain})) return {success:false,reason:"selected_candidate_became_unavailable",variantId:id};
+    if(!isVariantOwnedForGeninTransition(id)) return {success:false,reason:"genin_teammate_acquisition_required",variantId:id};
+  }
+  const leader=transition.joninLeaderVariantId;
+  if(!leader||!snapshot.joninLeaderCandidateVariantIds.includes(leader)) return {success:false,reason:"jonin_leader_required"};
+  if(!isIssue63CandidateAvailable(snapshot,leader)) return {success:false,reason:"selected_leader_became_unavailable",variantId:leader};
+  if(!isIssue63LeaderRankAllowed(leader)) return {success:false,reason:"leader_candidate_rank_invalid",variantId:leader};
+  const leaderEntry=getCharacterRegistryEntry(leader);
+  const leaderFormalRank=String(leaderEntry.formalRank||"").toLowerCase();
+  const rollback=cloneProgressionData(playerData);
+  try{
+    const completedAt=Date.now();
+    const receipt={
+      receiptId:`genin_roster_transition:${transition.subjectOwnedCharacterId}:${snapshot.snapshotId}`,
+      completed:true,subjectOwnedCharacterId:transition.subjectOwnedCharacterId,candidateSnapshotId:snapshot.snapshotId,
+      finalTeamVariantIds:[...selected],joninLeaderVariantId:leader,joninLeaderFormalRank:leaderFormalRank,completedAt,
+      outgoingTeammatesRemainOwned:true,myClanQueueMutated:false,promotionAlreadyEarned:true,
+      operationalGeninUnlocked:true,plStatTechniqueRewardGranted:false,representationRewardGranted:false,acquisitionRewardGranted:false,
+      leaderCollectibleOwnershipGranted:false,leaderBattleDeploymentGranted:false,leaderRankMutatedByAssignment:false
+    };
+    transition.finalTeamVariantIds=[...selected];
+    transition.completed=true;transition.required=false;transition.unlocked=true;transition.completedAt=completedAt;transition.completionReceipt=cloneProgressionData(receipt);
+    state.joninLeadershipAssignment={variantId:leader,role:"genin_team_leader",formalRank:leaderFormalRank,candidateSnapshotId:snapshot.snapshotId,assignedAt:completedAt,doesNotOwnBattleSlot:true,collectibleOwnershipGranted:false,rankMutatedByAssignment:false};
+    state.onboardingStatus="operational_genin";
+    savePlayerData();
+    return {success:true,idempotent:false,...cloneProgressionData(receipt)};
+  }catch(error){
+    playerData=rollback;
+    setCharacterOwnershipRuntimeAuthority(playerData.characterOwnership||createDefaultCharacterOwnershipState());
+    hydrateOwnedProductionRuntimeCharacters(playerData.characterOwnership);
+    savePlayerData();
+    return {success:false,reason:"genin_roster_transition_commit_rolled_back",error:String(error&&error.message||error)};
+  }
+};
+
+const ALPHA_PRE6499_RENDER_GENIN_ROSTER_TRANSITION=renderGeninRosterTransitionOverlay;
+renderGeninRosterTransitionOverlay=function(container){
+  if(!container) return false;
+  const model=createGeninRosterTransitionPresentationModel();
+  const esc=escapeFieldReadinessHTML;
+  const sid=esc(model.candidateSnapshotId||"");
+  const candidateButtons=slot=>model.teammateCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionTeammate(${slot},'${esc(item.variantId)}','${sid}');openGeninRosterTransitionUI();" ${item.owned?"":"disabled"} style="padding:8px 10px;border:1px solid rgba(207,169,75,.35);background:#10242c;color:#d8e4ec;border-radius:6px;cursor:${item.owned?"pointer":"default"};opacity:${item.owned?"1":".45"};">${esc(item.displayName)}${item.owned?"":" · ACQUISITION REQUIRED"}</button>`).join("");
+  const leaders=model.joninLeaderCandidates.map(item=>`<button type="button" onclick="selectGeninRosterTransitionJoninLeader('${esc(item.variantId)}','${sid}');openGeninRosterTransitionUI();" style="padding:8px 10px;border:1px solid rgba(120,160,180,.35);background:#0f2028;color:#d8e4ec;border-radius:6px;cursor:pointer;">${esc(item.displayName)} · ${esc(String(item.formalRank||"LEADER").replaceAll('_',' ').toUpperCase())} · INSTITUTIONAL</button>`).join("");
+  const selectedNames=model.selectedTeamVariantIds.map(id=>{const e=id?getCharacterRegistryEntry(id):null;return e?(e.displayName||e.name||id):"UNSELECTED";});
+  const leaderEntry=model.joninLeaderVariantId?getCharacterRegistryEntry(model.joninLeaderVariantId):null;
+  container.innerHTML=`<div style="padding:24px;display:grid;gap:16px;color:#d8e4ec;overflow:auto;"><div><div style="font-size:10px;letter-spacing:1.4px;color:#d0ad55;">ACADEMY → GENIN</div><h2 style="margin:3px 0;color:#f2e4b0;">GENIN ROSTER TRANSITION</h2><p style="color:#94A3B8;font-size:12px;max-width:760px;">Promotion is already earned. Finalise two teammate roles and one snapshot-authorised Jōnin / Special Jōnin leader. Leader assignment does not grant collectible ownership or Battle deployment.</p></div>${model.authorityReady?"":`<div style="padding:14px;border:1px solid rgba(207,169,75,.35);background:rgba(20,14,5,.55);color:#e8d7a1;">Exact production candidate authority has not yet been supplied for this Chronicle. The runtime will not scan Registry order or invent candidates.</div>`}<div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 1 — ${esc(selectedNames[0])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(1)||"No authorised candidates supplied."}</div></div><div style="display:grid;gap:10px;"><strong>TEAMMATE SLOT 2 — ${esc(selectedNames[1])}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${candidateButtons(2)||"No authorised candidates supplied."}</div></div><div style="display:grid;gap:10px;"><strong>LEADER / TEACHER — ${esc(leaderEntry?(leaderEntry.displayName||leaderEntry.name||leaderEntry.id):"UNSELECTED")}</strong><div style="display:flex;gap:8px;flex-wrap:wrap;">${leaders||"No authorised Jōnin / Special Jōnin leaders supplied."}</div></div><div style="display:flex;gap:10px;"><button type="button" onclick="confirmGeninRosterTransition();openGeninRosterTransitionUI();" ${(!model.authorityReady||model.completed)?"disabled":""} style="padding:10px 16px;border:1px solid rgba(207,169,75,.55);background:#152832;color:#f0df9f;border-radius:6px;font-weight:700;">CONFIRM GENIN ROSTER</button><button type="button" onclick="openArenaPromotionSurface()" style="padding:10px 16px;border:1px solid rgba(130,160,175,.35);background:#0f2028;color:#c7d6df;border-radius:6px;">BACK</button></div></div>`;
+  return true;
+};

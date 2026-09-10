@@ -17591,3 +17591,221 @@ body {
     font-size: 6px;
   }
 }
+
+/* =========================================================
+   BRICKS 5800–6499 — FIT-TO-VIEW UI CONSOLIDATION
+   ========================================================= */
+
+/* Arena / Training consume the overlay viewport instead of making the whole
+   master stage vertically scroll. Child detail regions may still use bounded
+   internal overflow if content genuinely exceeds their panel. */
+.alpha-arena-master-screen,
+.alpha-training-screen{
+  width:100%;
+  height:100%;
+  min-height:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden !important;
+  padding:0 !important;
+  background:#030609;
+}
+.alpha-arena-master-stage,
+.alpha-training-stage{
+  position:relative;
+  height:100%;
+  width:auto;
+  max-width:100%;
+  max-height:100%;
+  aspect-ratio:3/2;
+  flex:0 1 auto;
+  margin:auto;
+  overflow:hidden !important;
+  background-position:center;
+  background-size:100% 100%;
+  background-repeat:no-repeat;
+}
+
+/* The approved raster already carries the large decorative title/header.
+   Runtime keeps the close control and semantics but does not double-print it. */
+.alpha-arena-master-screen.is-master-art-on .alpha-arena-code-shell>header,
+.alpha-training-screen.is-master-art-on .alpha-training-code-header{
+  background:transparent;
+  border-bottom-color:transparent;
+  pointer-events:none;
+}
+.alpha-arena-master-screen.is-master-art-on .alpha-arena-code-shell>header>span,
+.alpha-arena-master-screen.is-master-art-on .alpha-arena-code-shell>header>h2,
+.alpha-training-screen.is-master-art-on .alpha-training-code-header>span,
+.alpha-training-screen.is-master-art-on .alpha-training-code-header>strong{
+  visibility:hidden;
+}
+.alpha-arena-master-screen.is-master-art-on .alpha-arena-code-shell>header>button,
+.alpha-training-screen.is-master-art-on .alpha-training-code-header>button{
+  visibility:visible;
+  pointer-events:auto;
+}
+
+/* Arena main becomes the actual four-way diagram. */
+.alpha-arena-diagram-shell{position:absolute;inset:0;z-index:4;}
+.alpha-arena-diagram-hotspot{
+  position:absolute;
+  z-index:8;
+  border:1px solid transparent;
+  border-radius:6px;
+  background:transparent;
+  cursor:pointer;
+  color:#f1d57f;
+  transition:background .14s ease,border-color .14s ease,box-shadow .14s ease,filter .14s ease;
+}
+.alpha-arena-diagram-hotspot span{
+  position:absolute;
+  right:2.5%;
+  bottom:3%;
+  opacity:0;
+  padding:5px 8px;
+  border:1px solid rgba(210,168,68,.72);
+  border-radius:3px;
+  background:rgba(3,8,11,.88);
+  font-size:clamp(7px,.56vw,10px);
+  font-weight:900;
+  letter-spacing:.05em;
+  pointer-events:none;
+}
+.alpha-arena-diagram-hotspot:hover,
+.alpha-arena-diagram-hotspot:focus-visible{
+  outline:none;
+  border-color:rgba(231,188,82,.78);
+  background:rgba(233,185,68,.045);
+  box-shadow:inset 0 0 28px rgba(230,181,63,.08),0 0 18px rgba(0,0,0,.32);
+}
+.alpha-arena-diagram-hotspot:hover span,
+.alpha-arena-diagram-hotspot:focus-visible span{opacity:1;}
+.alpha-arena-diagram-readiness{
+  position:absolute;
+  z-index:9;
+  left:50%;
+  top:2.0%;
+  transform:translateX(-50%);
+  min-width:28%;
+  max-width:44%;
+  display:flex;
+  gap:10px;
+  align-items:center;
+  justify-content:center;
+  padding:5px 9px;
+  border:1px solid rgba(115,139,147,.32);
+  border-radius:3px;
+  background:rgba(2,8,11,.72);
+  color:#aab8ba;
+  pointer-events:none;
+}
+.alpha-arena-diagram-readiness.is-ready{border-color:rgba(79,190,156,.58);}
+.alpha-arena-diagram-readiness b{color:#e3c875;font-size:clamp(7px,.56vw,10px);}
+.alpha-arena-diagram-readiness small{font-size:clamp(6px,.48vw,8px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Arena child surfaces do not scroll the whole master. */
+.alpha-arena-runtime-panel,
+.alpha-arena-promotion-runtime{max-height:62%;overflow:auto;overscroll-behavior:contain;}
+
+/* Training hub: preserve the artwork as the diagram and fit all three choices. */
+.alpha-training-hub{overflow:hidden;}
+.alpha-training-screen.is-master-art-on .alpha-training-hub-intro{
+  flex:0 0 9%;
+  min-height:0;
+  padding:0;
+  visibility:hidden;
+}
+.alpha-training-options{min-height:0;overflow:hidden;}
+.alpha-training-options button{min-height:0;overflow:hidden;}
+.alpha-training-options b{font-size:clamp(24px,3.1vw,44px);}
+.alpha-training-options strong{font-size:clamp(14px,1.55vw,25px);}
+.alpha-training-options span{font-size:clamp(7px,.65vw,11px);line-height:1.25;}
+.alpha-training-options em{margin-top:8px;font-size:clamp(7px,.58vw,10px);}
+.alpha-training-practical-link{margin-top:6px;min-height:30px;}
+
+/* Keep the back control inside the centre panel instead of floating over the
+   left character panel (the source of the TRAINING GROUNDS overlap shown). */
+.training-progress-panel,
+.training-spar-center,
+.training-mentor-center{position:relative;}
+.training-back{top:8px;left:10px;z-index:6;}
+
+.alpha-weapons-runtime,
+.alpha-spar-runtime,
+.alpha-mentorship-runtime{overflow:hidden;}
+.training-character-panel,
+.training-weapon-panel,
+.training-fighter,
+.training-mentor-person,
+.training-progress-panel,
+.training-spar-center,
+.training-mentor-center{
+  padding:clamp(7px,1.1vw,15px);
+  gap:clamp(4px,.55vw,9px);
+  overflow:hidden;
+}
+.training-character-panel h3,
+.training-weapon-panel h3,
+.training-fighter h3,
+.training-mentor-person h3{margin:0;font-size:clamp(10px,1vw,17px);}
+.training-character-panel img,
+.training-fighter img,
+.training-mentor-person img{
+  width:min(58%,180px);
+  max-height:34%;
+  aspect-ratio:1;
+  object-fit:cover;
+}
+.training-character-panel strong,
+.training-fighter strong,
+.training-mentor-person strong,
+.training-weapon-panel strong{font-size:clamp(12px,1.25vw,21px);}
+.alpha-training-screen select{min-height:30px;padding:4px;font-size:clamp(8px,.68vw,11px);}
+.training-progress-panel p,
+.training-spar-center p,
+.training-mentor-center p,
+.training-weapon-panel p{font-size:clamp(8px,.72vw,12px);line-height:1.32;margin:4px 0;}
+.training-proficiency>strong{font-size:clamp(20px,2.8vw,44px);}
+.training-spar-center h2{font-size:clamp(42px,5.8vw,88px);margin:2px 0;}
+.training-mentor-center h2{font-size:clamp(21px,2.5vw,38px);margin:2px 0;}
+.training-primary{min-height:34px;padding:4px 12px;}
+
+/* My Clan completion controls stay within the inspection workbench. */
+.my-clan-completion-actions{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:5px;
+  margin-top:6px;
+}
+.my-clan-completion-actions button{
+  min-height:27px;
+  border:1px solid rgba(190,153,67,.48);
+  border-radius:3px;
+  background:rgba(5,11,14,.76);
+  color:#d8bd76;
+  font-size:clamp(5.5px,.46vw,7.5px);
+  font-weight:900;
+  cursor:pointer;
+}
+.my-clan-completion-actions button:hover:not(:disabled){background:rgba(39,30,12,.88);border-color:rgba(226,184,78,.76);}
+.my-clan-completion-actions button:disabled{opacity:.34;cursor:not-allowed;}
+
+/* Only compact/mobile layouts fall back to bounded scrolling. */
+@media(max-width:900px),(max-height:650px){
+  .alpha-training-screen,.alpha-arena-master-screen{overflow:auto !important;align-items:flex-start;}
+  .alpha-training-stage,.alpha-arena-master-stage{height:auto;min-height:700px;width:1050px;max-width:none;flex:0 0 auto;}
+  .alpha-weapons-runtime,.alpha-spar-runtime,.alpha-mentorship-runtime{overflow:auto;}
+}
+
+/* My Clan inspection density correction for the added functional controls. */
+.my-clan-inspection-panel .my-clan-loadout-summary{height:13% !important;}
+.my-clan-inspection-panel .my-clan-operational-actions{bottom:13.5% !important;height:7% !important;}
+.my-clan-inspection-panel .my-clan-completion-actions{
+  position:absolute;
+  left:4%;right:4%;bottom:2%;height:10%;
+  margin:0;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:4px;
+}

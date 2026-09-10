@@ -3,9 +3,10 @@ SHINOBI CHRONICLES — CODING/RUNTIME REVISION MANIFEST
 
 DELIVERY
 --------
-Brick range: BRICKS 5500–5799
-Package: Shinobi_Chronicles_BRICKS_5500-5799_WORLD_MAP_SEVEN_REGION_MONSTER.zip
-Scope: World Map v2 implementation + Land of Grass + Land of Rain + Kusagakure + Amegakure.
+Brick range: BRICKS 5800–6499
+Package: Shinobi_Chronicles_BRICKS_5800-6499_UI_RUNTIME_CONSOLIDATION_MONSTER.zip
+Scope: World Map presentation correction + Arena diagram navigation + Training Grounds fit-to-view
+       + My Clan operational completion controls + GitHub Issue #63 dynamic Genin candidate machinery.
 
 WINDOWS
 -------
@@ -14,160 +15,135 @@ Right-click ZIP -> Properties -> Unblock -> Apply -> Extract.
 
 LIVE PRODUCTION BASELINE
 ------------------------
-Current main at final packaging guard:
-  45a9ef04bb18f0e66ccdf7ea312e3c9af66f77c3
-  "Close Acquisition dynamic Genin roster candidate contract"
+Final main guard:
+  117ebe58420c0469aad18f9ce8565024ff9b50f0
+  "docs: lock Mukai Byakugan gating and Obito identity separation"
 
-The production UI/runtime files were unchanged underneath this candidate:
-  game.js   4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
-  index.html 47d8016edbed6b08f3fc03275449acbb1c0007cb
-  style.css 530b8ed5ecc5e6bf786d3ad5571db8d89896dd35
-
-RESULT BLOBS
-------------
+Production runtime/UI files remained exactly the BRICKS 5500–5799 checkpoint:
   game.js   9f04edf38a584334459b396cea69a9050227b9f6
   index.html 492278fb07f66573cbc9423e8106378b95e6f01b
   style.css 4884398fb17f0972eaa34b49cb9a62433a9c588f
 
+RESULT BLOBS
+------------
+  game.js   ae8714284b2652571e403fc86a576f40c0163f0f
+  index.html 492278fb07f66573cbc9423e8106378b95e6f01b
+  style.css 4d4ba78e88a3898c56c88f957aba3d3e19a41a4d
+
 RESULT SHA-256
 --------------
-  game.js   a39ace4d43c50b58ff1e4383fc7fd8a2d4bbe3022ffdf4dda7b669da2af17032
+  game.js   d39d81172177d033147c3cc5a560c881941dd5f43e8c1cfe112f960892a9bb85
   index.html 09903661126c6edf43b6700068cea60a2d0605fc1706bdf295d5837a42ef953a
-  style.css d392b2d14dd0725c0910d9f4211ca40e1aca5bf47d02213e6a1b55e02ac5003b
+  style.css 7ba2e8f315718391d9d39d6de1eaff3ce823b919ce31dc8423afd5f2951aeed9
 
-AUTHORITY CONSUMED
-------------------
-World Map v2:
-- Backgrounds/WorldMap.png
-- native 1672 x 941
-- production blob 102ff62f8849bce76b83424140091b37f235401b
-- 16 country anchors: world:C01 -> world:C16
-- 7 physical secret reservations: world:S01 -> world:S07
-- world:S08 remains non-physical / no ordinary terrain anchor
-- Coding handoff: GitHub Issue #54
+BRICKS 5800–5824 — WORLD MAP COLLISION CORRECTION
+--------------------------------------------------
+- Keeps world:S01 semantic reservation anchor unchanged at the authoritative calibrated point.
+- Applies presentation-only +40 X / -10 Y native-pixel displacement to the locked ???? halo.
+- Land of Grass country anchor remains unchanged.
+- No secret identity/access/travel semantic changes.
 
-New regional/village assets already present in repository:
-- Land of Grass regional master: Backgrounds/inside_LOG.png
-- Land of Rain regional master: Backgrounds/inside_LOR.png
-- Kusagakure village master: Backgrounds/kusa.png
-- Amegakure village master: Backgrounds/ame.png
+BRICKS 5825–5899 — MY CLAN COMPLETION CONTROLS
+------------------------------------------------
+- Selected-shinobi inspection now exposes direct SET AS START.
+- ASSIGN NEXT OPEN stages the selected owned shinobi into the first free formation position.
+- FAVOURITE / UNFAVOURITE is directly actionable from the inspection workbench.
+- SAVE FORMATION remains explicit and only enables for dirty editable formation state.
+- Existing REMOVE FROM FORMATION and LOADOUT controls remain.
+- Battle edit lock remains authoritative.
+- Formation staging remains separate from persistence until explicit save.
 
-BRICKS 5500–5599 — GRASS + RAIN REGIONAL REGISTRATION
+BRICKS 5900–6099 — ARENA FIT-TO-VIEW FOUR-WAY DIAGRAM
 ------------------------------------------------------
-- Added region key `grass`.
-- Added region key `rain`.
-- Bound Grass to Backgrounds/inside_LOG.png.
-- Bound Rain to Backgrounds/inside_LOR.png.
-- Reused existing regional-map architecture; no second navigation system.
-- Did NOT invent exact village pixel anchors while no calibrated regional coordinates exist.
-- Villages remain legitimate known destinations through existing non-spatial destination bridge.
+- Arena main now uses the approved master as a direct four-section interaction diagram.
+- Promotion quadrant -> existing Promotion UI.
+- Staged Battles quadrant -> approved staged-battles UI.
+- PVP quadrant -> approved PVP UI.
+- Village Tournament quadrant -> approved tournament UI.
+- Whole Arena main is fit-to-view / non-scrolling on ordinary desktop layouts.
+- Hover/focus affordance reveals OPEN without obscuring the baked master.
+- Child panels may use bounded internal overflow when their real content exceeds the panel.
+- No fake PVP opponent, tournament bracket, staged encounter or reward state is created.
 
-BRICKS 5600–5649 — VILLAGE PROJECTION
--------------------------------------
-- Registered Kusagakure with Backgrounds/kusa.png.
-- Registered Amegakure with Backgrounds/ame.png.
-- Reused generic village renderer.
-- Village identity remains separate from country macro anchor.
+BRICKS 6100–6199 — TRAINING GROUNDS FIT-TO-VIEW
+------------------------------------------------
+- Training hub and Weapons / Mentorship / Sparring screens fit the ordinary desktop overlay.
+- Master-art title duplication is suppressed while the approved raster is active.
+- TRAINING GROUNDS back control is contained inside the centre panel instead of overlapping Fighter/Shinobi 1.
+- Runtime portraits/selectors/text are density-reduced to stay inside the master geometry.
+- Desktop outer scroll is disabled.
+- Compact/mobile or very short viewports retain a bounded scroll fallback rather than clipping the system.
+- Training consequence semantics remain fail-closed where Progression/Combat authority is still absent.
 
-BRICKS 5650–5749 — WORLD MAP V2 PROJECTION
--------------------------------------------
-- Retired old five hardcoded country pins from index.html.
-- Added code-owned runtime marker layer.
-- Added code-owned focus card.
-- Corrected World Map canvas ratio from obsolete 3:2 to exact 1672:941.
-- Registered all 16 known country identities at final production anchors.
-- Current actionable regional surfaces:
-    earth
-    wind
-    grass
-    rain
-    fire
-    lightning
-    water
-- Remaining nine countries are known geography but not actionable.
-- Known geography does not fabricate region map, village, capital, mission, event, or travel access.
+BRICKS 6200–6499 — GITHUB ISSUE #63
+------------------------------------
+- Preserves the existing candidate snapshot architecture; does not create a second roster system.
+- Candidate state vocabulary: available / assigned_to_player / assigned_elsewhere / unavailable.
+- Current two Academy teammates derive retention and are protected from CE background consumption.
+- Candidate discovery is explicit-authority only; no production Registry/rank/asset scan.
+- Same unresolved authoritative snapshot is idempotent.
+- Material candidate-state changes require a new snapshotId, supersedesSnapshotId, occurrenceId and causalReason.
+- Prior snapshots are persisted in candidateSnapshotHistory.
+- Autonomous candidate consumption enforces remaining replacement floor:
+    2 Genin replacement candidates
+    1 leader/teacher candidate
+- Leader/teacher source rank union is { jonin, special_jonin }.
+- Rank alone does not create eligibility; presence in the authoritative candidate snapshot is required.
+- Snapshot-authorised Jōnin/Special Jōnin leader assignment does not grant collectible ownership.
+- Leader assignment does not create Battle deployment.
+- Special Jōnin keeps formal Rank special_jonin; assignment does not mutate Rank/PL/Stats/qualification.
+- Unowned replacement path remains acquisition_required.
+- Outgoing teammates remain owned.
+- Stale snapshot selections fail closed.
 
-BRICKS 5750–5799 — SECRET RESERVATIONS + PERSISTENCE
------------------------------------------------------
-- Added seven locked gold-halo `????` projections for world:S01 -> world:S07.
-- Locked projection does not include canonical secret identity in player-facing renderer.
-- Locked halo does not create travel/access.
-- world:S08 receives no ordinary terrain marker.
-- Added worldMapRuntime persistence schema / normalisation for reveal/access state.
-- Presentation refresh does not reroll semantic state.
-
-PRESERVES
----------
-- country anchor != village anchor
-- country marker != travel access
-- country != regional map
-- known geography != actionable destination
-- secret reservation != discovered identity
-- discovered identity != actionability
-- `????` halo != access
-- world truth != observer Knowledge != presentation
-- World Map != regional standing-event pool
-- presentation refresh != semantic reroll/recommit
-- final asset committed != runtime/browser validated != Golden GREEN
+DOWNSTREAM CONTENT DEPENDENCY
+-----------------------------
+- Exact first-production post-Promotion candidate IDs/content remain absent from durable authority.
+- Coding created GitHub Issue #65 directly to CE / Codex / Coordination.
+- The runtime does not invent that candidate field.
+- Therefore true fresh-save post-Promotion Golden is NOT yet claimed.
 
 VALIDATION
 ----------
-Exact packaged game.js:
-- node --check: PASS
-
-Exact packaged style.css:
-- tinycss2 top-level parse errors: 0
-
-Delivery/static contract checks:
-  world_map_runtime_layer: PASS
-  world_map_focus_card: PASS
-  obsolete_five_pin_markup_removed: PASS
-  world_map_exact_aspect: PASS
-  sixteen_country_registry: PASS
-  grass_country: PASS
-  rain_country: PASS
-  grass_region_asset: PASS
-  rain_region_asset: PASS
-  kusagakure_asset: PASS
-  amegakure_asset: PASS
-  seven_locked_secret_projection: PASS
-  s08_nonphysical: PASS
-  secret_zero_leak_diagnostic: PASS
-  world_map_save_schema: PASS
-  seven_region_diagnostic_present: PASS
-
-The candidate also contains:
-  runAlphaSevenNationAndWorldMapV2Diagnostics()
-
-That diagnostic covers exact native dimensions, all 16 country addresses/anchors,
-Grass/Rain/village registration, seven playable regions, nine known-only countries,
-seven physical secret anchors, secret-name/address leakage protection, locked access,
-S08 non-physical behavior, persistence schema, runtime marker-layer use, and legacy
-Five-Nation regression.
+node --check game.js: PASS
+tinycss2 stylesheet parse errors: 0
+Static/deterministic contract gate: 23/23 PASS
+  S01 semantic anchor remains authoritative: PASS
+  S01 display collision offset +40/-10 native px: PASS
+  Arena four diagram destinations: PASS
+  Arena Promotion route: PASS
+  Arena Staged route: PASS
+  Arena Tournament route: PASS
+  Arena PVP route: PASS
+  Training/Arena desktop fit-first CSS: PASS
+  Compact viewport scroll fallback: PASS
+  Training back control contained: PASS
+  My Clan Set Start: PASS
+  My Clan Assign Next Open: PASS
+  My Clan Save Formation: PASS
+  My Clan Favourite control: PASS
+  Issue63 candidate-state vocabulary: PASS
+  Issue63 leader rank union: PASS
+  Issue63 2 Genin + 1 leader floor: PASS
+  Issue63 causal snapshot supersession: PASS
+  Issue63 snapshot history persisted through load: PASS
+  Issue63 stale selection fail-close: PASS
+  Issue63 leader ownership not granted: PASS
+  Issue63 Special Jonin rank preserved: PASS
+  No production candidate IDs fabricated: PASS
 
 BROWSER / GOLDEN STATUS
 -----------------------
-Browser Golden: NOT CLAIMED.
+Browser integration against this exact candidate: NOT YET CLAIMED.
 Whole-Alpha Golden: NOT CLAIMED.
-
-Stephen's local browser remains the final integration authority for this package.
-
-OUTSIDE THIS TRANCHE
---------------------
-This delivery does not claim completion of:
-- Land of Fire standing ecology Issue #44;
-- the fresh-save Arc-1 blocker chain;
-- dynamic post-Promotion candidate implementation returned from Acquisition;
-- whole-Alpha browser/Golden regression.
-
-Those continue in Brick 5800+ work.
+Stephen's local browser remains the current visual/browser integration authority.
 
 ROLLBACK
 --------
-BRICKS 4500–5499 production game.js:
-  4c05672eba2dcea822fe4b0e87b6ccf05b5f8039
-
-BRICKS 5500–5799 candidate game.js:
+BRICKS 5500–5799 production game.js:
   9f04edf38a584334459b396cea69a9050227b9f6
+
+BRICKS 5800–6499 candidate game.js:
+  ae8714284b2652571e403fc86a576f40c0163f0f
 
 Brick numbering is a rollback/search address, not a Golden claim.
