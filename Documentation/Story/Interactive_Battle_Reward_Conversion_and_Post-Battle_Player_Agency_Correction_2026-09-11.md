@@ -27,6 +27,25 @@ For the current `arc2_m2_the_leak` Unknown Boy encounter:
 - Interrogation can become threatening, manipulative, physically coercive, psychologically coercive, or otherwise darker where legitimate to the scene and player choice. Shinobi Chronicles does not need to flatten these scenes into PG-safe polite questioning.
 - Consequences still matter: methods can affect relationships, personality evolution, future willingness to cooperate, injury, escape/rescue opportunity, political fallout, and later Chronicle history.
 
+## Contaminated-choice rollback rule
+
+If an authored branch is explicitly rejected or rolled back, choices made only in reaction to that rejected branch do not automatically survive the rollback.
+
+Return to the last clean committed player-decision boundary and re-offer player agency from there unless Stephen explicitly preserves a later choice.
+
+For this live test, the clean rollback point is:
+
+`Menma wins the Battle cleanly -> Unknown Boy is restrained -> player chooses the first interrogation action.`
+
+Therefore the following are also non-canonical unless the player chooses them again from the clean interrogation state:
+
+- invoking Kurama;
+- asking Kurama to induce fear;
+- any name reveal produced by that fear tactic;
+- any interrogation question or answer authored after the rejected post-Battle branch.
+
+At the clean interrogation start, no interrogation method has yet been chosen and Unknown Boy's name remains unknown to Menma/player.
+
 ## Cadence rule
 
 After a major player-earned result:
