@@ -18905,3 +18905,35 @@ body {
 
 /* ---------- My Clan right drawer: stop completion controls from colliding ---------- */
 .my-clan-inspection-panel{padding-bottom:1.25%!important}.my-clan-inspection-panel .my-clan-inspection-tabbody{min-height:70px!important;max-height:92px!important}.my-clan-inspection-panel .my-clan-loadout-summary{height:auto!important;min-height:10%!important;margin-top:4px!important}.my-clan-inspection-panel .my-clan-operational-actions{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;height:auto!important;margin-top:5px!important}.my-clan-inspection-panel .my-clan-completion-actions{position:relative!important;left:auto!important;right:auto!important;bottom:auto!important;height:auto!important;margin-top:5px!important;grid-template-columns:repeat(2,minmax(0,1fr))!important}.my-clan-inspection-panel .my-clan-completion-actions button{min-height:25px!important;white-space:normal!important;line-height:1.1!important;padding:3px!important}
+
+/* =========================================================
+   BRICKS 12380–12499 — KONOHA v3 MAP PROJECTION
+   ========================================================= */
+.konoha-v3-anchor.is-static {
+  cursor: default;
+  touch-action: auto;
+}
+.konoha-v3-anchor.is-static .village-golden-halo-ring {
+  opacity: .78;
+}
+.konoha-v3-anchor.is-restricted .village-golden-halo-ring {
+  border-style: dashed;
+  opacity: .9;
+}
+@keyframes konoha-v3-known-unknown-pulse {
+  0%,100% { transform: scale(.92); filter: brightness(.9); }
+  50% { transform: scale(1.12); filter: brightness(1.22); }
+}
+.konoha-v3-anchor.is-known-unknown .village-golden-halo-ring {
+  animation: konoha-v3-known-unknown-pulse 1.8s ease-in-out infinite;
+  border-style: solid;
+}
+.konoha-v3-anchor.is-known-unknown .village-golden-halo-label {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%,0);
+  letter-spacing: .16em;
+}
+.alpha-map-calibration-on .konoha-v3-anchor.is-known-unknown .village-golden-halo-ring {
+  animation: none;
+}

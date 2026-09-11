@@ -103496,3 +103496,532 @@ runAlphaIssue41SourceDiagnostics=function(){
   console.table(checks);
   return{pass:checks.pass,checks,codingStatus:checks.pass?"ISSUE_41_SOURCE_PACKAGE_GREEN":"ISSUE_41_SOURCE_PACKAGE_FAILED",runtimeBattleRoundTripStillRequired:true,diagnosticMode:"active_wrapper_delegate_chain"};
 };
+
+// =========================================================
+// BRICKS 12300–12499 — M1 PRE-WHISPER PRODUCER + KONOHA v3
+// Authority consumed 2026-09-10:
+// - GitHub #90 / bc962bf07937aec5697419449ccab9efacf1b225
+// - GitHub #84 / 4b775dd998a79b3d16fd19f24e61b46473fce121
+// =========================================================
+
+// ---------------------------------------------------------
+// 12300–12379 — MISSION 1 PRE-WHISPER THREE-PERSON TRACE
+// ---------------------------------------------------------
+
+const ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY=Object.freeze({
+  opportunityId:"arc1_m1_pre_whisper_caravan_trace",
+  eventId:"arc1_m1_pre_whisper_caravan_trace_event",
+  actionId:"investigate_three_person_trace",
+  sourceOccurrenceId:"arc1_m1_caravan_three_person_trace_confirmed",
+  evidenceRefs:Object.freeze([
+    "arc1_m1_caravan_trace_signature_01",
+    "arc1_m1_caravan_trace_signature_02",
+    "arc1_m1_caravan_trace_signature_03"
+  ]),
+  routeId:"fire:R13",
+  destinationId:"fire:O21",
+  containedAreaId:"whisper_woods",
+  firstEntryHistoryId:"whisper_woods_discovered"
+});
+
+function getAlphaM1PreWhisperTraceRecord(){
+  return findAlphaCommittedHistoryRecord(ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.sourceOccurrenceId);
+}
+
+function isAlphaM1PreWhisperMissionLegitimate(){
+  const roster=typeof getAlphaTrainingRoster==="function"?getAlphaTrainingRoster():[];
+  const protagonist=typeof getArc1CurrentProtagonistId==="function"?getArc1CurrentProtagonistId():null;
+  const m1Complete=hasArc1Occurrence("occ_arc1_m1_whisper_major_contact_story_completed")||hasArc1Occurrence("arc1_m1_whisper_major_contact_story_completed");
+  const supportedOrigin=!protagonist||typeof isArc1MenmaPersonRepresentation!=="function"||isArc1MenmaPersonRepresentation(protagonist);
+  return roster.length>0&&!!protagonist&&supportedOrigin&&!m1Complete;
+}
+
+function getAlphaM1WhisperApproachSuppressionRecord(){
+  const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];
+  return history.find(record=>{
+    if(!record||record.committed!==true)return false;
+    const data=record.data&&typeof record.data==="object"?record.data:{};
+    if(data.suppressesMission1WhisperApproach===true)return true;
+    const routes=Array.isArray(data.suppressedRouteIds)?data.suppressedRouteIds:[];
+    const destinations=Array.isArray(data.suppressedDestinationIds)?data.suppressedDestinationIds:[];
+    return routes.includes(ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.routeId)||destinations.includes(ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.destinationId);
+  })||null;
+}
+
+function Mission1WhisperApproachActionable(actor){
+  if(!isAlphaM1PreWhisperMissionLegitimate())return false;
+  const protagonist=getArc1CurrentProtagonistId();
+  const actorId=typeof actor==="string"?actor:(actor&&typeof actor==="object"?(actor.id||actor.registryId||actor.variantId||null):protagonist);
+  if(actorId&&actorId!==protagonist){
+    const sameSupportedPerson=typeof isArc1MenmaPersonRepresentation==="function"&&isArc1MenmaPersonRepresentation(actorId)&&isArc1MenmaPersonRepresentation(protagonist);
+    if(!sameSupportedPerson)return false;
+  }
+  if(!getAlphaM1PreWhisperTraceRecord())return false;
+  return !getAlphaM1WhisperApproachSuppressionRecord();
+}
+
+function validateAlphaM1PreWhisperEvidenceBundle({
+  eventId=ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.eventId,
+  opportunityId=ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.opportunityId,
+  actionId=ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.actionId,
+  evidenceRefs=ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.evidenceRefs,
+  distinctTraceCount=3,
+  traceDirectionSupportsWhisperWoodsApproach=true,
+  factualConfirmationResolved=true
+}={}){
+  const A=ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY;
+  if(eventId!==A.eventId)return{valid:false,reason:"pre_whisper_event_not_authorised"};
+  if(opportunityId!==A.opportunityId)return{valid:false,reason:"pre_whisper_opportunity_not_authorised"};
+  if(actionId!==A.actionId)return{valid:false,reason:"pre_whisper_action_not_authorised"};
+  const refs=Array.isArray(evidenceRefs)?evidenceRefs.map(String):[];
+  const unique=[...new Set(refs)];
+  if(refs.length!==3||unique.length!==3)return{valid:false,reason:"pre_whisper_three_distinct_signatures_required",historyCommitted:false};
+  if(A.evidenceRefs.some(id=>!unique.includes(id)))return{valid:false,reason:"pre_whisper_exact_evidence_refs_required",historyCommitted:false};
+  if(Number(distinctTraceCount)!==3)return{valid:false,reason:"pre_whisper_distinct_trace_count_invalid",historyCommitted:false};
+  if(traceDirectionSupportsWhisperWoodsApproach!==true)return{valid:false,reason:"pre_whisper_direction_not_confirmed",historyCommitted:false};
+  if(factualConfirmationResolved!==true)return{valid:false,reason:"pre_whisper_confirmation_unresolved",historyCommitted:false};
+  return{valid:true,evidenceRefs:[...A.evidenceRefs]};
+}
+
+function commitAlphaM1PreWhisperTraceOccurrence(input={}){
+  const A=ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY;
+  const existing=getAlphaM1PreWhisperTraceRecord();
+  if(existing)return{success:true,idempotent:true,record:cloneProgressionData(existing),approachActionable:Mission1WhisperApproachActionable(getArc1CurrentProtagonistId())};
+  if(!isAlphaM1PreWhisperMissionLegitimate())return{success:false,reason:"arc1_m1_caravan_investigation_not_current",historyCommitted:false};
+  const validation=validateAlphaM1PreWhisperEvidenceBundle(input);
+  if(!validation.valid)return{success:false,...validation};
+  if(!playerData||!Array.isArray(playerData.activityHistory))return{success:false,reason:"activity_history_unavailable",historyCommitted:false};
+
+  const protagonist=getArc1CurrentProtagonistId();
+  // The baseline mandatory investigation establishes protagonist Knowledge only.
+  // Teammate presence/hearing is not fabricated; separately authorised callers may
+  // enrich observer transfer later through their own committed occurrence.
+  const observers=protagonist?[protagonist]:[];
+  const record={
+    id:A.sourceOccurrenceId,
+    occurrenceId:A.sourceOccurrenceId,
+    sourceOccurrenceId:A.sourceOccurrenceId,
+    type:"world_investigation_occurrence",
+    activity:"world_investigation",
+    missionId:"arc1_m1",
+    eventId:A.eventId,
+    opportunityId:A.opportunityId,
+    actionId:A.actionId,
+    committed:true,
+    completed:true,
+    success:true,
+    evidenceRefs:[...A.evidenceRefs],
+    linkedChronicleEvidenceIds:[...A.evidenceRefs],
+    distinctTraceCount:3,
+    traceDirectionSupportsWhisperWoodsApproach:true,
+    protagonistStableParticipantRef:protagonist,
+    factualObserverParticipantRefs:observers,
+    causalParentContextRef:{arcId:"arc1",missionNumber:1,phase:"pre_whisper_caravan_smuggling_investigation"},
+    data:{
+      evidenceRefs:[...A.evidenceRefs],
+      distinctTraceCount:3,
+      traceDirectionSupportsWhisperWoodsApproach:true,
+      factualConfirmationResolved:true,
+      protagonistStableParticipantRef:protagonist,
+      factualObserverParticipantRefs:observers,
+      observerKnowledgeByParticipantId:Object.fromEntries(observers.map(id=>[id,{
+        threeDistinctPhysicalMovementSignaturesConfirmed:true,
+        directionTowardWhisperWoodsApproachConfirmed:true,
+        identitiesKnown:false,
+        factionsKnown:false,
+        motivesKnown:false,
+        hiddenWhisperLocationsRevealed:false,
+        unrestrictedAccessGranted:false
+      }])),
+      battleStarted:false,
+      rewardGranted:false,
+      rankChanged:false,
+      plChanged:false,
+      statsChanged:false,
+      progressionGranted:false,
+      acquisitionGranted:false,
+      relationshipChanged:false
+    },
+    sourceRefs:A.evidenceRefs.map(id=>({type:"world_evidence",id,role:"distinct_physical_movement_signature"})),
+    timestamp:Date.now()
+  };
+  playerData.activityHistory.push(record);
+  if(typeof activityHistory!=="undefined")activityHistory=playerData.activityHistory;
+  savePlayerData();
+  return{success:true,idempotent:false,record:cloneProgressionData(record),approachActionable:Mission1WhisperApproachActionable(protagonist),whisperWoodsDiscovered:hasArc1Occurrence(A.firstEntryHistoryId)};
+}
+
+function resolveAlphaM1PreWhisperInvestigation(input={}){
+  return commitAlphaM1PreWhisperTraceOccurrence({
+    eventId:input.eventId||ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.eventId,
+    opportunityId:input.opportunityId||ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.opportunityId,
+    actionId:input.actionId||ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.actionId,
+    evidenceRefs:Object.prototype.hasOwnProperty.call(input,"evidenceRefs")?input.evidenceRefs:ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.evidenceRefs,
+    distinctTraceCount:Object.prototype.hasOwnProperty.call(input,"distinctTraceCount")?input.distinctTraceCount:3,
+    traceDirectionSupportsWhisperWoodsApproach:Object.prototype.hasOwnProperty.call(input,"traceDirectionSupportsWhisperWoodsApproach")?input.traceDirectionSupportsWhisperWoodsApproach:true,
+    factualConfirmationResolved:Object.prototype.hasOwnProperty.call(input,"factualConfirmationResolved")?input.factualConfirmationResolved:true
+  });
+}
+
+function renderAlphaM1PreWhisperInvestigationResult(container,result){
+  if(!container)return false;
+  const success=result&&result.success===true;
+  container.innerHTML=`<div class="alpha-mission-command alpha-pre-whisper-investigation"><header><span>ARC 1 · MISSION 1</span><h2>CARAVAN TRACE</h2><button onclick="renderAlphaMissionCommand(document.getElementById('overlay-content-container'))">✕</button></header><section><small>WORLD INVESTIGATION</small><strong>${success?"THREE-PERSON TRACE CONFIRMED":"TRACE NOT COMMITTED"}</strong><p>${success?"Three distinct physical movement signatures continue toward the forest approach. Their identities, faction and motives remain unknown.":escapeStorySceneHTML(result&&result.reason||"The investigation did not reach factual confirmation.")}</p><div class="alpha-mission-status"><b>Physical signatures</b><span>${success?"3 DISTINCT":"UNCONFIRMED"}</span><b>Direction</b><span>${success?"FOREST APPROACH":"UNCONFIRMED"}</span><b>Identity</b><span>UNKNOWN</span><b>Whisper Woods</b><span>${success?"APPROACH ACTIONABLE / NOT YET DISCOVERED":"NOT ACTIONABLE"}</span></div>${success?`<button class="is-primary" onclick="continueAlphaArc1()">FOLLOW THE TRACE</button>`:`<button class="is-primary" onclick="openAlphaM1PreWhisperInvestigation()">RETURN TO INVESTIGATION</button>`}</section></div>`;
+  return true;
+}
+
+function performAlphaM1PreWhisperInvestigation(){
+  const result=resolveAlphaM1PreWhisperInvestigation();
+  const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+  if(container)renderAlphaM1PreWhisperInvestigationResult(container,result);
+  return result;
+}
+
+function openAlphaM1PreWhisperInvestigation(){
+  if(!isAlphaM1PreWhisperMissionLegitimate())return{success:false,reason:"arc1_m1_caravan_investigation_not_current",historyCommitted:false};
+  const existing=getAlphaM1PreWhisperTraceRecord();
+  if(existing){
+    const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+    const result={success:true,idempotent:true,record:cloneProgressionData(existing),approachActionable:Mission1WhisperApproachActionable(getArc1CurrentProtagonistId())};
+    if(container)renderAlphaM1PreWhisperInvestigationResult(container,result);
+    return result;
+  }
+  if(typeof document==="undefined")return{success:true,presentationOnly:true,opportunityId:ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.opportunityId};
+  const overlay=document.getElementById("screen-overlay");
+  const container=document.getElementById("overlay-content-container");
+  if(!container)return{success:false,reason:"mission_overlay_container_missing",historyCommitted:false};
+  if(overlay)overlay.style.display="flex";
+  currentOverlayType="missions";
+  container.innerHTML=`<div class="alpha-mission-command alpha-pre-whisper-investigation"><header><span>ARC 1 · MISSION 1</span><h2>CARAVAN TRACE</h2><button onclick="renderAlphaMissionCommand(document.getElementById('overlay-content-container'))">✕</button></header><section><small>WORLD OPPORTUNITY</small><strong>TRACE THE CARAVAN ROUTE</strong><p>The caravan and smuggling lead is active. Investigate the physical movement evidence before committing to the forest approach.</p><div class="alpha-mission-status"><b>Event</b><span>PRE-WHISPER CARAVAN TRACE</span><b>Action</b><span>INVESTIGATE</span><b>Current evidence</b><span>UNRESOLVED</span><b>Whisper Woods</b><span>NOT YET ACTIONABLE</span></div><button class="is-primary" onclick="performAlphaM1PreWhisperInvestigation()">INVESTIGATE THREE-PERSON TRACE</button></section></div>`;
+  saveTestState();
+  return{success:true,presentationOnly:true,opportunityId:ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.opportunityId,eventId:ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.eventId,historyCommitted:false};
+}
+
+// Replace the stale Issue-58 fail-closed presentation with the now-authorised
+// factual World investigation. Later M1/M2+ routing remains delegated.
+const ALPHA_PRE12300_GET_ALPHA_ARC1_PLAYABLE_STATUS=getAlphaArc1PlayableStatus;
+getAlphaArc1PlayableStatus=function(){
+  const base=ALPHA_PRE12300_GET_ALPHA_ARC1_PLAYABLE_STATUS();
+  const trace=!!getAlphaM1PreWhisperTraceRecord();
+  const actionable=Mission1WhisperApproachActionable(getArc1CurrentProtagonistId());
+  return{...base,trace,preWhisperProducerReady:true,whisperApproachActionable:actionable,earliestBlocker:base.originReady&&base.menmaRun&&!trace?null:base.earliestBlocker};
+};
+
+const ALPHA_PRE12300_CONTINUE_ALPHA_ARC1=continueAlphaArc1;
+continueAlphaArc1=function(){
+  const s=getAlphaArc1PlayableStatus();
+  if(!s.originReady)return openOverlay("clan")||{success:false,reason:"chronicle_origin_required"};
+  if(!s.menmaRun)return{success:false,reason:"arc1_konoha_current_runtime_requires_menma_origin"};
+  if(!s.trace)return openAlphaM1PreWhisperInvestigation();
+  if(!s.m1Complete){
+    if(!Mission1WhisperApproachActionable(s.originId))return{success:false,reason:"mission1_whisper_approach_not_actionable"};
+    if(typeof openArc1Mission1WhisperWoods==="function")return openArc1Mission1WhisperWoods();
+    return{success:false,reason:"arc1_mission1_runtime_missing"};
+  }
+  return ALPHA_PRE12300_CONTINUE_ALPHA_ARC1();
+};
+
+const ALPHA_PRE12300_RENDER_ALPHA_MISSION_COMMAND=renderAlphaMissionCommand;
+renderAlphaMissionCommand=function(container){
+  if(!container)return false;
+  const s=getAlphaArc1PlayableStatus();
+  if(!s.originReady||!s.menmaRun||s.m1Complete)return ALPHA_PRE12300_RENDER_ALPHA_MISSION_COMMAND(container);
+  const state=s.trace?"MISSION 1 · WHISPER WOODS":"MISSION 1 · PRE-WHISPER INVESTIGATION";
+  const detail=s.trace?"Three distinct physical traces are committed. The Whisper Woods approach is actionable; first entry remains separate discovery history.":"Investigate the caravan movement evidence. Ordinary investigation is sufficient; no specialist Skill is required for this mandatory Story gate.";
+  container.innerHTML=`<div class="alpha-mission-command"><header><span>ARC 1</span><h2>KONOHA CHRONICLE</h2><button onclick="closeOverlay()">✕</button></header><section><small>CURRENT PLAYABLE FRONTIER</small><strong>${escapeStorySceneHTML(state)}</strong><p>${escapeStorySceneHTML(detail)}</p><div class="alpha-mission-status"><b>Origin</b><span>${escapeStorySceneHTML(s.originId||"READY")}</span><b>Pre-Whisper Trace</b><span>${s.trace?"COMMITTED":"READY TO INVESTIGATE"}</span><b>Whisper approach</b><span>${s.whisperApproachActionable?"ACTIONABLE":"CLOSED"}</span><b>Whisper discovery</b><span>${hasArc1Occurrence(ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.firstEntryHistoryId)?"DISCOVERED":"NOT YET DISCOVERED"}</span></div><button class="is-primary" onclick="continueAlphaArc1()">${s.trace?"FOLLOW TRACE TO WHISPER WOODS":"BEGIN INVESTIGATION"}</button></section></div>`;
+  return true;
+};
+
+function runAlphaIssue90PreWhisperTraceDiagnostics(){
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const priorOverlay=currentOverlayType;
+  const checks={};
+  let error=null;
+  try{
+    resetAlphaDiagnosticPlayerToFreshSave();
+    const origin=selectChronicleOrigin("academy_menma","diag_issue90_origin");
+    const prologue=origin.success?completeChronicleOriginPrologue("academy_menma",["diag_issue90_origin_complete"]):origin;
+    const t1=prologue.success?selectAcademyTeamFormationTeammate(1,"academy_hinata"):prologue;
+    const t2=t1.success?selectAcademyTeamFormationTeammate(2,"academy_kurenai"):t1;
+    const formed=t2.success?confirmAcademyTeamFormation("diag_issue90_team"):t2;
+    const continued=formed.success?continueAcademyTeamFormationJourney():formed;
+    checks.freshMissionFixture=continued.success===true&&isAlphaM1PreWhisperMissionLegitimate()===true;
+    checks.caravanLeadAloneClosed=!Mission1WhisperApproachActionable(getArc1CurrentProtagonistId())&&!getAlphaM1PreWhisperTraceRecord();
+
+    const invalid=resolveAlphaM1PreWhisperInvestigation({evidenceRefs:[ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.evidenceRefs[0],ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.evidenceRefs[0],ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.evidenceRefs[2]]});
+    checks.duplicateAliasCannotQualify=invalid.success===false&&invalid.historyCommitted===false&&!getAlphaM1PreWhisperTraceRecord();
+
+    const committed=resolveAlphaM1PreWhisperInvestigation();
+    const record=getAlphaM1PreWhisperTraceRecord();
+    checks.validInvestigationCommitsOnce=committed.success===true&&committed.idempotent===false&&!!record;
+    checks.exactSourceIdentity=record&&record.sourceOccurrenceId===ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.sourceOccurrenceId&&record.occurrenceId===ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.sourceOccurrenceId;
+    checks.exactThreeEvidenceRefs=record&&Array.isArray(record.evidenceRefs)&&record.evidenceRefs.length===3&&new Set(record.evidenceRefs).size===3&&ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.evidenceRefs.every(id=>record.evidenceRefs.includes(id));
+    checks.boundedProtagonistKnowledge=record&&record.data&&record.data.observerKnowledgeByParticipantId&&Object.values(record.data.observerKnowledgeByParticipantId).every(k=>k.threeDistinctPhysicalMovementSignaturesConfirmed===true&&k.directionTowardWhisperWoodsApproachConfirmed===true&&k.identitiesKnown===false&&k.factionsKnown===false&&k.hiddenWhisperLocationsRevealed===false&&k.unrestrictedAccessGranted===false);
+    checks.approachDerivedActionable=Mission1WhisperApproachActionable(getArc1CurrentProtagonistId())===true;
+    checks.traceDoesNotDiscoverWhisperWoods=!hasArc1Occurrence(ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.firstEntryHistoryId);
+    const retry=resolveAlphaM1PreWhisperInvestigation();
+    const count=playerData.activityHistory.filter(r=>r&&r.committed===true&&(r.occurrenceId===ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.sourceOccurrenceId||r.sourceOccurrenceId===ALPHA_M1_PRE_WHISPER_TRACE_AUTHORITY.sourceOccurrenceId)).length;
+    checks.retryIdempotent=retry.success===true&&retry.idempotent===true&&count===1;
+
+    const saved=cloneProgressionData(record);
+    const serialized=JSON.parse(JSON.stringify(playerData));
+    playerData=serialized;
+    if(typeof activityHistory!=="undefined")activityHistory=playerData.activityHistory;
+    const restored=getAlphaM1PreWhisperTraceRecord();
+    checks.saveLoadShapePreservesEvidence=!!restored&&JSON.stringify(restored.evidenceRefs)===JSON.stringify(saved.evidenceRefs)&&restored.distinctTraceCount===3&&restored.traceDirectionSupportsWhisperWoodsApproach===true;
+    checks.regionalGeometryNotRequired=Mission1WhisperApproachActionable.toString().includes("getAlphaM1PreWhisperTraceRecord")&&!Mission1WhisperApproachActionable.toString().includes("region-map")&&!Mission1WhisperApproachActionable.toString().includes("mapImage");
+    checks.majorContactAuthorityUntouched=typeof registerArc1M1WhisperMajorContactStoryScene==="function"&&STORY_SCENE_REGISTRY.has(ARC1_M1_WHISPER_WOODS_AUTHORITY.majorContactSceneId);
+    checks.noAutomaticCrossDomainMutation=record&&record.data&&record.data.battleStarted===false&&record.data.rewardGranted===false&&record.data.rankChanged===false&&record.data.plChanged===false&&record.data.statsChanged===false&&record.data.progressionGranted===false&&record.data.acquisitionGranted===false&&record.data.relationshipChanged===false;
+  }catch(err){error=String(err&&err.message||err);}
+  finally{restoreAlphaDiagnosticRuntimeEnvelope(rollback);currentOverlayType=priorOverlay;}
+  checks.pass=!error&&Object.values(checks).every(v=>v===true);
+  console.table(checks);
+  return{pass:checks.pass,checks,error,codingStatus:checks.pass?"ISSUE_90_SOURCE_RUNTIME_GREEN":"ISSUE_90_SOURCE_RUNTIME_FAILED",browserGoldenClaimed:false};
+}
+
+// ---------------------------------------------------------
+// 12380–12489 — KONOHA HOTSPOT CALIBRATION v3
+// ---------------------------------------------------------
+
+const ALPHA_KONOHA_V3_AUTHORITY=Object.freeze({
+  calibrationVersion:"konoha_v3",
+  mapImage:"Backgrounds/konoha.png",
+  mapBlob:"3b02a4b48fd15f095150634a0592b0984ac78408",
+  width:1536,
+  height:1024,
+  publicLocations:Object.freeze([
+    Object.freeze({id:"KON-P01",name:"Hokage Administration",x:52.41,y:20.02,route:null}),
+    Object.freeze({id:"KON-P02",name:"Konoha Arena",x:83.33,y:32.23,route:"arena"}),
+    Object.freeze({id:"KON-P03",name:"Konoha Hospital",x:66.73,y:41.99,route:null}),
+    Object.freeze({id:"KON-P04",name:"Konoha Craftsmen's Quarter",x:39.71,y:59.57,route:null}),
+    Object.freeze({id:"KON-P05",name:"Public Fūinjutsu Sealing Workshop",x:58.59,y:59.08,route:null}),
+    Object.freeze({id:"KON-P06",name:"Shinobi Academy",x:15.95,y:31.25,route:"exams"}),
+    Object.freeze({id:"KON-P07",name:"General Training Ground",x:27.67,y:52.25,route:"training"}),
+    Object.freeze({id:"KON-P08",name:"Weapons Training Ground",x:28.97,y:56.15,route:"weaponsTraining"}),
+    Object.freeze({id:"KON-P09",name:"Central Commercial District",x:42.64,y:53.71,route:null}),
+    Object.freeze({id:"KON-P10",name:"Main Village Gate",x:48.50,y:83.50,route:null}),
+    Object.freeze({id:"KON-P11",name:"Mission Assignment Hall",x:52.08,y:25.39,route:null}),
+    Object.freeze({id:"KON-P12",name:"Central Bath and Hot Springs",x:36.46,y:46.88,route:null})
+  ]),
+  serviceSubhosts:Object.freeze([
+    Object.freeze({id:"KON-A01",name:"Academy Examination Hall",parent:"KON-P06",x:15.30,y:30.27}),
+    Object.freeze({id:"KON-A02",name:"Practical Training Compound",parent:"KON-P07",x:25.39,y:50.29}),
+    Object.freeze({id:"KON-A03",name:"Sparring and Mentorship Court",parent:"KON-P07",x:30.27,y:50.29}),
+    Object.freeze({id:"KON-A04",name:"Weapons Proficiency Range",parent:"KON-P08",x:29.62,y:56.15}),
+    Object.freeze({id:"KON-A05",name:"Forge and Equipment Workshop",parent:"KON-P04",x:37.43,y:61.52}),
+    Object.freeze({id:"KON-A06",name:"Fūin Craft and Seal Attachment",parent:"KON-P05",x:58.59,y:59.57}),
+    Object.freeze({id:"KON-A07",name:"Hospital Treatment Services",parent:"KON-P03",x:66.73,y:42.97}),
+    Object.freeze({id:"KON-A08",name:"Shinobi Record Archive — Legacy Chamber",parent:"KON-P01",x:53.71,y:20.51})
+  ]),
+  optionalLocations:Object.freeze([
+    Object.freeze({id:"KON-O01",name:"Sakura Garden",x:36.13,y:45.41}),Object.freeze({id:"KON-O02",name:"Ichiraku Alley",x:41.02,y:55.66}),Object.freeze({id:"KON-O03",name:"Naka River Walk",x:65.43,y:63.48}),Object.freeze({id:"KON-O04",name:"Memorial Stone Terrace",x:13.35,y:51.27}),Object.freeze({id:"KON-O05",name:"Inuzuka Kennel Grounds",x:78.12,y:68.36}),Object.freeze({id:"KON-O06",name:"Aburame Conservatory",x:88.54,y:64.94}),Object.freeze({id:"KON-O07",name:"Nara Medicinal Grove",x:16.93,y:71.78}),Object.freeze({id:"KON-O08",name:"Yamanaka Flower House",x:41.02,y:47.36}),Object.freeze({id:"KON-O09",name:"Hyūga Training Court",x:84.64,y:54.20}),Object.freeze({id:"KON-O10",name:"Uchiha District Remnants",x:92.77,y:68.36}),Object.freeze({id:"KON-O11",name:"Tenten's Equipment Stall",x:42.32,y:60.06}),Object.freeze({id:"KON-O12",name:"Riverside Teahouse",x:58.27,y:53.22}),Object.freeze({id:"KON-O13",name:"Toad Oil Curio Stall",x:37.76,y:57.62}),Object.freeze({id:"KON-O14",name:"Fire Temple Liaison House",x:71.94,y:40.53}),Object.freeze({id:"KON-O15",name:"Outer Watch Post",x:9.77,y:12.21}),Object.freeze({id:"KON-O16",name:"Old Canal Maintenance Route",x:71.61,y:68.85}),Object.freeze({id:"KON-O17",name:"Academy Archive Annex",x:22.79,y:32.71}),Object.freeze({id:"KON-O18",name:"Village Messenger Roost",x:58.59,y:35.16}),Object.freeze({id:"KON-O19",name:"Old Storehouse Row",x:48.83,y:70.80}),Object.freeze({id:"KON-O20",name:"East River Pump Works",x:79.10,y:70.31}),Object.freeze({id:"KON-O21",name:"Veterinary Service Ward",x:73.24,y:67.38})
+  ]),
+  secretLocations:Object.freeze([
+    Object.freeze({id:"KON-S01",name:"Forest of Death Entrance",x:15.95,y:17.09,defaultState:"known_restricted"}),
+    Object.freeze({id:"KON-S02",name:"Orochimaru's Forgotten Laboratory",x:94.40,y:78.61,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S03",name:"ANBU Headquarters Entrance",x:63.80,y:18.55,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S04",name:"Root Headquarters Entrance",x:40.69,y:19.04,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S05",name:"Monument Substructure",x:54.04,y:10.25,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S06",name:"Hokage Emergency Passage",x:55.99,y:27.83,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S07",name:"Sealed Uchiha Archive",x:92.45,y:62.01,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S08",name:"Uzumaki Seal Chamber",x:62.50,y:57.13,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S09",name:"Hyūga Branch Record Vault",x:86.26,y:54.69,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S10",name:"Aburame Black-Hive Room",x:88.54,y:68.36,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S11",name:"Nara Moonlit Medicine Cellar",x:18.55,y:89.36,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S12",name:"Drowned Naka Archive",x:67.06,y:81.05,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S13",name:"Forgotten War Tunnel",x:29.30,y:84.47,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S14",name:"Old Smugglers' Rootway",x:6.18,y:45.41,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S15",name:"Silent Shrine",x:13.35,y:56.64,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S16",name:"Mask-Maker's Hidden Room",x:44.27,y:61.04,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S17",name:"Abandoned Surveillance Loft",x:75.20,y:40.53,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S18",name:"Sealed Interrogation Annex",x:69.01,y:30.76,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S19",name:"White Snake Drain",x:79.43,y:70.80,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S20",name:"Toad Contract Waystone",x:29.95,y:18.07,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S21",name:"Nine-Tails Memorial Cavity",x:44.60,y:12.21,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S22",name:"Missing Names Wall",x:61.85,y:23.44,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S23",name:"False Training Boundary",x:23.76,y:55.66,defaultState:"unrecognised"}),
+    Object.freeze({id:"KON-S24",name:"Underground Medical Store",x:66.73,y:47.85,defaultState:"unrecognised"})
+  ]),
+  arc1HostBindings:Object.freeze({2:"KON-O19",3:"KON-P03",4:"KON-O20",5:"KON-P06",6:"KON-P01",7:"KON-O19",9:"KON-O21",10:"KON-O21",11:"KON-O20"})
+});
+
+const ALPHA_KONOHA_V3_MAP_DEFINITION=Object.freeze({
+  locationId:"konohagakure",regionKey:"fire",name:"Konohagakure",epithet:"Hidden Leaf Village",
+  mapImage:ALPHA_KONOHA_V3_AUTHORITY.mapImage,spatialCalibrationStatus:"konoha_v3",supportsKonohaActivities:true,
+  mapBlobAuthority:ALPHA_KONOHA_V3_AUTHORITY.mapBlob,mapWidth:1536,mapHeight:1024
+});
+
+const ALPHA_PRE12380_GET_ACTIVE_VILLAGE_MAP_DEFINITION=getActiveVillageMapDefinition;
+getActiveVillageMapDefinition=function(){
+  const base=ALPHA_PRE12380_GET_ACTIVE_VILLAGE_MAP_DEFINITION();
+  return base&&base.locationId==="konohagakure"?ALPHA_KONOHA_V3_MAP_DEFINITION:base;
+};
+
+function getAlphaKonohaV3Location(locationId){
+  const id=String(locationId||"");
+  return [...ALPHA_KONOHA_V3_AUTHORITY.publicLocations,...ALPHA_KONOHA_V3_AUTHORITY.serviceSubhosts,...ALPHA_KONOHA_V3_AUTHORITY.optionalLocations,...ALPHA_KONOHA_V3_AUTHORITY.secretLocations].find(item=>item.id===id)||null;
+}
+
+function normalizeAlphaKonohaV3EpistemicState(value){
+  const state=String(value||"").trim().toLowerCase().replace(/[\s-]+/g,"_");
+  if(["known_unknown","suspected","partially_known","rumoured"].includes(state))return"known_unknown";
+  if(["identified","discovered","known"].includes(state))return"identified";
+  if(state==="actionable")return"actionable";
+  if(["known_restricted","known_restricted_geography","restricted"].includes(state))return"known_restricted";
+  return"unrecognised";
+}
+
+function getAlphaKonohaV3ExplicitKnowledgeState(locationId){
+  const id=String(locationId||"");
+  const history=playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];
+  const candidates=history.filter(record=>{
+    if(!record||record.committed!==true)return false;
+    const data=record.data&&typeof record.data==="object"?record.data:{};
+    const refs=Array.isArray(record.sourceRefs)?record.sourceRefs:[];
+    const locationReferenced=record.locationId===id||data.locationId===id||data.konohaLocationId===id||refs.some(ref=>ref&&ref.type==="location"&&ref.id===id);
+    if(!locationReferenced)return false;
+    const explicit=record.konohaSpatialKnowledgeState||data.konohaSpatialKnowledgeState||data.locationKnowledgeState||data.epistemicState||null;
+    return !!explicit;
+  });
+  if(!candidates.length)return null;
+  const latest=candidates[candidates.length-1];
+  const data=latest.data&&typeof latest.data==="object"?latest.data:{};
+  return normalizeAlphaKonohaV3EpistemicState(latest.konohaSpatialKnowledgeState||data.konohaSpatialKnowledgeState||data.locationKnowledgeState||data.epistemicState);
+}
+
+function getAlphaKonohaV3SecretProjection(location){
+  if(!location)return null;
+  const explicit=getAlphaKonohaV3ExplicitKnowledgeState(location.id);
+  const state=explicit||normalizeAlphaKonohaV3EpistemicState(location.defaultState);
+  if(state==="unrecognised")return null;
+  if(state==="known_unknown")return{state,label:"????",x:location.x,y:location.y,canonicalIdentityPlayerVisible:false,actionable:false};
+  return{state,label:location.name,x:location.x,y:location.y,canonicalIdentityPlayerVisible:true,actionable:state==="actionable"};
+}
+
+function getAlphaKonohaV3OptionalProjection(location){
+  if(!location)return null;
+  const explicit=getAlphaKonohaV3ExplicitKnowledgeState(location.id);
+  if(!explicit||explicit==="unrecognised")return null;
+  if(explicit==="known_unknown")return{state:"known_unknown",label:"????",x:location.x,y:location.y,canonicalIdentityPlayerVisible:false,actionable:false};
+  return{state:explicit,label:location.name,x:location.x,y:location.y,canonicalIdentityPlayerVisible:true,actionable:explicit==="actionable"};
+}
+
+function getAlphaKonohaV3KnownUnknownProjections(){
+  const optional=ALPHA_KONOHA_V3_AUTHORITY.optionalLocations.map(getAlphaKonohaV3OptionalProjection);
+  const secrets=ALPHA_KONOHA_V3_AUTHORITY.secretLocations.slice(1).map(getAlphaKonohaV3SecretProjection);
+  return[...optional,...secrets].filter(p=>p&&p.state==="known_unknown").slice(0,3);
+}
+
+function getAlphaKonohaV3Arc1HostBinding(missionNumber){
+  return ALPHA_KONOHA_V3_AUTHORITY.arc1HostBindings[Number(missionNumber)]||null;
+}
+
+function activateAlphaKonohaV3PublicLocation(event,locationId){
+  if(event&&typeof event.preventDefault==="function")event.preventDefault();
+  if(event&&typeof event.stopPropagation==="function")event.stopPropagation();
+  if(ALPHA_MAP_CALIBRATION_RUNTIME.enabled)return{success:false,reason:"calibration_mode_active",presentationOnly:true};
+  const location=ALPHA_KONOHA_V3_AUTHORITY.publicLocations.find(item=>item.id===locationId);
+  if(!location)return{success:false,reason:"konoha_v3_public_location_missing"};
+  if(location.route==="arena")return openArenaMain();
+  if(location.route==="exams")return openKonohaExamFromVillage();
+  if(location.route==="training")return openTrainingGrounds("hub");
+  if(location.route==="weaponsTraining")return openTrainingGrounds("weaponsTraining");
+  return{success:false,reason:"konoha_v3_location_identified_not_actionable",locationId:location.id,presentationOnly:true};
+}
+
+function handleAlphaKonohaV3PublicLocationKeyboard(event,locationId){
+  if(!event)return false;
+  if(event.key==="Enter"||event.key===" "){
+    event.preventDefault();
+    return activateAlphaKonohaV3PublicLocation(event,locationId);
+  }
+  return false;
+}
+
+function renderAlphaKonohaV3IdentifiedAnchor(location,{restricted=false}={}){
+  const anchor=getAlphaMapCalibrationAnchor("village","konohagakure",location.id,{x:location.x,y:location.y});
+  const actionable=!!location.route;
+  if(actionable){
+    return `<button type="button" class="village-golden-halo konoha-v3-anchor is-identified is-actionable" style="left:${anchor.x}%;top:${anchor.y}%;" data-village-hotspot-id="${escapeStorySceneHTML(location.id)}" ondblclick="activateAlphaKonohaV3PublicLocation(event,'${escapeStorySceneHTML(location.id)}')" onkeydown="handleAlphaKonohaV3PublicLocationKeyboard(event,'${escapeStorySceneHTML(location.id)}')" onpointerdown="beginAlphaMapCalibrationDrag(event,'village','konohagakure','${escapeStorySceneHTML(location.id)}')" aria-label="${escapeStorySceneHTML(location.name)}. Double-click to enter."><span class="village-golden-halo-ring" aria-hidden="true"><span></span></span><span class="village-golden-halo-label">${escapeStorySceneHTML(location.name)}</span></button>`;
+  }
+  return `<span class="village-golden-halo konoha-v3-anchor is-identified is-static ${restricted?"is-restricted":""}" style="left:${anchor.x}%;top:${anchor.y}%;" role="img" aria-label="${escapeStorySceneHTML(location.name)}${restricted?". Restricted geography.":"."}"><span class="village-golden-halo-ring" aria-hidden="true"><span></span></span><span class="village-golden-halo-label">${escapeStorySceneHTML(location.name)}</span></span>`;
+}
+
+function renderAlphaKonohaV3SecretProjection(projection){
+  if(!projection)return"";
+  if(projection.state==="known_unknown"){
+    // Do not place canonical secret ID or name anywhere in the DOM/ARIA/handler.
+    return `<span class="village-golden-halo konoha-v3-anchor is-known-unknown is-static" style="left:${projection.x}%;top:${projection.y}%;" role="img" aria-label="????"><span class="village-golden-halo-ring" aria-hidden="true"><span></span></span><span class="village-golden-halo-label">????</span></span>`;
+  }
+  return `<span class="village-golden-halo konoha-v3-anchor is-identified is-static" style="left:${projection.x}%;top:${projection.y}%;" role="img" aria-label="${escapeStorySceneHTML(projection.label)}"><span class="village-golden-halo-ring" aria-hidden="true"><span></span></span><span class="village-golden-halo-label">${escapeStorySceneHTML(projection.label)}</span></span>`;
+}
+
+renderAlphaKonohaVillageHotspots=function(){
+  const s01=ALPHA_KONOHA_V3_AUTHORITY.secretLocations[0];
+  const publicActionable=ALPHA_KONOHA_V3_AUTHORITY.publicLocations.filter(location=>!!location.route);
+  const publicStatic=ALPHA_KONOHA_V3_AUTHORITY.publicLocations.filter(location=>!location.route);
+  const optional=ALPHA_KONOHA_V3_AUTHORITY.optionalLocations.map(getAlphaKonohaV3OptionalProjection).filter(Boolean);
+  const secrets=ALPHA_KONOHA_V3_AUTHORITY.secretLocations.slice(1).map(getAlphaKonohaV3SecretProjection).filter(Boolean);
+  const discovered=[...optional,...secrets].filter(p=>p.state!=="known_unknown");
+
+  // Normal overview remains bounded at <=13 identified anchors. Preserve the four
+  // currently actionable public routes first, then legitimately discovered
+  // optional/secret geography, Forest of Death, and remaining public context.
+  const identifiedMarkup=[
+    ...publicActionable.map(location=>renderAlphaKonohaV3IdentifiedAnchor(location)),
+    ...discovered.map(renderAlphaKonohaV3SecretProjection),
+    renderAlphaKonohaV3IdentifiedAnchor({...s01,route:null},{restricted:true}),
+    ...publicStatic.map(location=>renderAlphaKonohaV3IdentifiedAnchor(location))
+  ].slice(0,13);
+  const knownUnknown=getAlphaKonohaV3KnownUnknownProjections().map(renderAlphaKonohaV3SecretProjection);
+  return[...identifiedMarkup,...knownUnknown].join("");
+};
+
+function runAlphaIssue84KonohaV3Diagnostics(){
+  const rollback=captureAlphaDiagnosticRuntimeEnvelope();
+  const checks={};
+  let error=null;
+  try{
+    resetAlphaDiagnosticPlayerToFreshSave();
+    checks.exactProductionMaster=ALPHA_KONOHA_V3_AUTHORITY.mapImage==="Backgrounds/konoha.png"&&ALPHA_KONOHA_V3_AUTHORITY.mapBlob==="3b02a4b48fd15f095150634a0592b0984ac78408"&&ALPHA_KONOHA_V3_AUTHORITY.width===1536&&ALPHA_KONOHA_V3_AUTHORITY.height===1024;
+    const expectedPublic={"KON-P01":[52.41,20.02],"KON-P02":[83.33,32.23],"KON-P03":[66.73,41.99],"KON-P04":[39.71,59.57],"KON-P05":[58.59,59.08],"KON-P06":[15.95,31.25],"KON-P07":[27.67,52.25],"KON-P08":[28.97,56.15],"KON-P09":[42.64,53.71],"KON-P10":[48.50,83.50],"KON-P11":[52.08,25.39],"KON-P12":[36.46,46.88]};
+    checks.exactTwelvePublicAnchors=ALPHA_KONOHA_V3_AUTHORITY.publicLocations.length===12&&ALPHA_KONOHA_V3_AUTHORITY.publicLocations.every(p=>expectedPublic[p.id]&&Math.abs(p.x-expectedPublic[p.id][0])<.001&&Math.abs(p.y-expectedPublic[p.id][1])<.001);
+    checks.exactServiceSubhostCount=ALPHA_KONOHA_V3_AUTHORITY.serviceSubhosts.length===8;
+    checks.exactOptionalCount=ALPHA_KONOHA_V3_AUTHORITY.optionalLocations.length===21;
+    checks.exactSecretReservationCount=ALPHA_KONOHA_V3_AUTHORITY.secretLocations.length===24;
+    checks.forestOfDeathKnownRestricted=getAlphaKonohaV3SecretProjection(ALPHA_KONOHA_V3_AUTHORITY.secretLocations[0]).state==="known_restricted";
+    const initialMarkup=renderAlphaKonohaVillageHotspots();
+    checks.zeroLeakBeforeKnowledge=ALPHA_KONOHA_V3_AUTHORITY.secretLocations.slice(1).every(secret=>!initialMarkup.includes(secret.id)&&!initialMarkup.includes(secret.name));
+    checks.normalOverviewThirteenIdentified=ALPHA_KONOHA_V3_AUTHORITY.publicLocations.length===12&&getAlphaKonohaV3SecretProjection(ALPHA_KONOHA_V3_AUTHORITY.secretLocations[0]).state==="known_restricted"&&!initialMarkup.includes("????");
+
+    playerData.activityHistory.push({id:"diag_konoha_v3_known_unknown",occurrenceId:"diag_konoha_v3_known_unknown",committed:true,type:"diagnostic_knowledge",locationId:"KON-S02",data:{konohaSpatialKnowledgeState:"known_unknown"},sourceRefs:[{type:"location",id:"KON-S02",role:"diagnostic_spatial_entitlement"}]});
+    const unknownMarkup=renderAlphaKonohaVillageHotspots();
+    checks.knownUnknownRendersQuestionHalo=unknownMarkup.includes('aria-label="????"')&&unknownMarkup.includes(">????</span>");
+    checks.knownUnknownDoesNotLeakCanonicalIdentity=!unknownMarkup.includes("KON-S02")&&!unknownMarkup.includes("Orochimaru's Forgotten Laboratory");
+    checks.knownUnknownBoundedToThree=getAlphaKonohaV3KnownUnknownProjections().length<=3;
+    checks.accessDoesNotCollapseToActionable=normalizeAlphaKonohaV3EpistemicState("accessible")!=="actionable";
+
+    playerData.activityHistory.push({id:"diag_konoha_v3_optional",occurrenceId:"diag_konoha_v3_optional",committed:true,type:"diagnostic_knowledge",locationId:"KON-O19",data:{konohaSpatialKnowledgeState:"identified"},sourceRefs:[{type:"location",id:"KON-O19",role:"diagnostic_spatial_entitlement"}]});
+    checks.optionalAbsentUntilKnowledge=initialMarkup.indexOf("Old Storehouse Row")===-1&&renderAlphaKonohaVillageHotspots().includes("Old Storehouse Row");
+
+    playerData.activityHistory[ playerData.activityHistory.findIndex(r=>r&&r.id==="diag_konoha_v3_known_unknown") ].data.konohaSpatialKnowledgeState="identified";
+    const identifiedMarkup=renderAlphaKonohaVillageHotspots();
+    checks.identityAppearsOnlyAfterExplicitDiscovery=getAlphaKonohaV3SecretProjection(ALPHA_KONOHA_V3_AUTHORITY.secretLocations[1]).label===ALPHA_KONOHA_V3_AUTHORITY.secretLocations[1].name&&identifiedMarkup.includes("Forgotten Laboratory");
+    checks.normalOverviewIdentifiedBounded=(identifiedMarkup.match(/is-identified/g)||[]).length<=13;
+    checks.v3MapDefinitionConsumed=getActiveVillageMapDefinition().locationId==="konohagakure"&&getActiveVillageMapDefinition().spatialCalibrationStatus==="konoha_v3"&&getActiveVillageMapDefinition().mapBlobAuthority===ALPHA_KONOHA_V3_AUTHORITY.mapBlob;
+    checks.facilityRoutesPreserveOwners=ALPHA_KONOHA_V3_AUTHORITY.publicLocations.find(p=>p.id==="KON-P02").route==="arena"&&ALPHA_KONOHA_V3_AUTHORITY.publicLocations.find(p=>p.id==="KON-P06").route==="exams"&&ALPHA_KONOHA_V3_AUTHORITY.publicLocations.find(p=>p.id==="KON-P07").route==="training"&&ALPHA_KONOHA_V3_AUTHORITY.publicLocations.find(p=>p.id==="KON-P08").route==="weaponsTraining";
+    checks.arc1ReusableHostsRecorded=getAlphaKonohaV3Arc1HostBinding(2)==="KON-O19"&&getAlphaKonohaV3Arc1HostBinding(3)==="KON-P03"&&getAlphaKonohaV3Arc1HostBinding(11)==="KON-O20";
+    checks.hiddenProjectionHasNoHandlers=renderAlphaKonohaV3SecretProjection({state:"known_unknown",label:"????",x:50,y:50}).indexOf("onclick")===-1&&renderAlphaKonohaV3SecretProjection({state:"known_unknown",label:"????",x:50,y:50}).indexOf("ondblclick")===-1;
+  }catch(err){error=String(err&&err.message||err);}
+  finally{restoreAlphaDiagnosticRuntimeEnvelope(rollback);}
+  checks.pass=!error&&Object.values(checks).every(v=>v===true);
+  console.table(checks);
+  return{pass:checks.pass,checks,error,codingStatus:checks.pass?"ISSUE_84_KONOHA_V3_SOURCE_RUNTIME_GREEN":"ISSUE_84_KONOHA_V3_SOURCE_RUNTIME_FAILED",browserGeometryValidationRequired:true,browserGoldenClaimed:false};
+}
+
+function runAlphaBricks12300To12499Diagnostics(){
+  const issue90=runAlphaIssue90PreWhisperTraceDiagnostics();
+  const issue84=runAlphaIssue84KonohaV3Diagnostics();
+  const pass=issue90.pass===true&&issue84.pass===true;
+  return{pass,issue90,issue84,codingStatus:pass?"BRICKS_12300_12499_SOURCE_RUNTIME_GREEN":"BRICKS_12300_12499_FAILED",browserGoldenClaimed:false};
+}
