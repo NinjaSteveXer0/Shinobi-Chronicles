@@ -1,5 +1,6 @@
 name: Live 115 Battle Portrait QA
 
+# UI/Assets current-main verification trigger after physical repair.
 on:
   workflow_dispatch:
   push:
