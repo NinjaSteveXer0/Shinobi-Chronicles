@@ -10,33 +10,23 @@ permissions:
   contents: read
 
 jobs:
-  export-current-live115-failures:
+  export-accepted-missing-five:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Export current approved wrong-size portrait binaries
+      - name: Checkout accepted supplemental portrait wave
+        uses: actions/checkout@v4
+        with:
+          ref: f36a0f4cbef77d3820b56389dbde4265feb5f346
+          path: accepted
+      - name: Export exact accepted binaries for current missing live-115 paths
         uses: actions/upload-artifact@v4
         with:
-          name: live115-current-wrongsize-portraits
+          name: live115-accepted-missing-five
           if-no-files-found: error
           retention-days: 1
           path: |
-            Portraits/Rare Cards/black_sun_himawari.png
-            Portraits/Variants/coercive_cloak.png
-            Portraits/Constructs/iron_maiden.png
-            Portraits/Tailed Beasts/menma_nine_tails.png
-            Portraits/Constructs/triple_rashomon.png
-            Portraits/Chunin/chunin_iruka.png
-            Portraits/Special Jonin/sj_anko.png
-            Portraits/Chunin/chunin_fugaku.png
-            Portraits/Chunin/chunin_Itama.png
-            Portraits/Genin/genin_mikoto.png
-            Portraits/Genin/genin_orochimaru.png
-            Portraits/Akatsuki/akatsuki_kakuzu.png
-            Portraits/Special Jonin/sj_kiba.png
-            Portraits/Special Jonin/sj_nono.png
-            Portraits/Sannin/sannin_tenten.png
-            Portraits/Sannin/sannin_hinata.png
-            Portraits/Sannin/sannin_sumire.png
-            Portraits/Rare Cards/kurama_resonance_himawari.png
-            Portraits/Summons/nue.png
+            accepted/Portraits/Transformation/curse_mark_hinata.png
+            accepted/Portraits/Forced Manifestations/breakout_kurama.png
+            accepted/Portraits/Variants/six_tail_dominion.png
+            accepted/Portraits/Variants/three_tail_dominion.png
+            accepted/Portraits/Tailed Beasts/nine_tails.png
