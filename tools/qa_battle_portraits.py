@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
-"""Shinobi Chronicles live-116 Battle/UI portrait QA.
+"""Shinobi Chronicles live-115 Battle/UI portrait QA.
 
-Production authority is the explicit UI_PORTRAIT_MANIFEST in game.js, which is
-already ratified as the live 116 mapping. This tool never derives a mapping from
-filenames or folders and never substitutes collectible-card art.
+Production authority is the explicit UI_PORTRAIT_MANIFEST in game.js, which must
+match the current live 97 Character + 18 Entity = 115 production baseline. This
+tool never derives a mapping from filenames or folders and never substitutes
+collectible-card art.
 
 Checks:
-- exact 98 Character + 18 Entity = 116 production Registry IDs;
-- exact 116-entry explicit uiPortrait manifest with the same ID set;
+- exact 97 Character + 18 Entity = 115 production Registry IDs;
+- exact 115-entry explicit uiPortrait manifest with the same ID set;
+- retired Teen Nagato remains absent from production IDs and the active manifest;
 - unique approved paths rooted at Portraits/;
 - every approved file exists, is PNG, decodes, and is exactly 1024x1024;
 - runtime resolver remains manifest-backed and explicitly no-fallback;
@@ -30,9 +32,10 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 GAME_JS = ROOT / "game.js"
 EXPECTED_SIZE = (1024, 1024)
-EXPECTED_CHARACTERS = 98
+EXPECTED_CHARACTERS = 97
 EXPECTED_ENTITIES = 18
-EXPECTED_COUNT = 116
+EXPECTED_COUNT = 115
+RETIRED_IDS = frozenset({"teen_nagato"})
 MANIFEST_START = "// UI_PORTRAIT_MANIFEST_JSON_START"
 MANIFEST_END = "// UI_PORTRAIT_MANIFEST_JSON_END"
 
@@ -52,7 +55,7 @@ def extract_manifest(source: str) -> dict[str, str]:
     start = source.find(MANIFEST_START)
     end = source.find(MANIFEST_END)
     if start < 0 or end < 0 or end <= start:
-        raise RuntimeError("live116 uiPortrait manifest markers missing")
+        raise RuntimeError("live115 uiPortrait manifest markers missing")
     section = source[start:end]
     match = re.search(
         r"const\s+UI_PORTRAIT_MANIFEST\s*=\s*Object\.freeze\((\{.*?\})\);",
@@ -173,6 +176,13 @@ def main() -> int:
         "manifest_nonproduction_ids",
     )
 
+    retired_in_production = sorted(RETIRED_IDS.intersection(production_ids))
+    retired_in_manifest = sorted(RETIRED_IDS.intersection(manifest_ids))
+    if retired_in_production:
+        errors.append("retired_registry_id_in_production:" + ",".join(retired_in_production))
+    if retired_in_manifest:
+        errors.append("retired_registry_id_in_manifest:" + ",".join(retired_in_manifest))
+
     for registry_id, path in manifest.items():
         if not path.startswith("Portraits/") or not path.lower().endswith(".png"):
             errors.append(f"invalid_approved_path:{registry_id}:{path}")
@@ -221,12 +231,13 @@ def main() -> int:
                 )
         errors.extend(binary_failures)
 
-    print("SC Live-116 Battle Portrait QA")
+    print("SC Live-115 Battle Portrait QA")
     print(f"production characters: {len(character_ids)}/{EXPECTED_CHARACTERS}")
     print(f"production entities: {len(entity_ids)}/{EXPECTED_ENTITIES}")
     print(f"production total: {len(production_ids)}/{EXPECTED_COUNT}")
     print(f"manifest rows: {len(manifest)}/{EXPECTED_COUNT}")
     print(f"unique paths: {len(set(paths))}/{EXPECTED_COUNT}")
+    print("retired Teen Nagato: absent from production IDs and active portrait manifest")
     print("runtime resolver: explicit manifest-backed / no collectible-card fallback")
     if args.static_only:
         print("binary decode: SKIPPED (--static-only)")
@@ -243,9 +254,9 @@ def main() -> int:
         return 1
 
     if args.static_only:
-        print("PASS — live-116 manifest/Registry/resolver authority is exact; binary QA not run.")
+        print("PASS — live-115 manifest/Registry/resolver authority is exact; binary QA not run.")
     else:
-        print("PASS — 116/116 approved uiPortraits exist, decode as PNG, are exactly 1024x1024, and runtime source remains no-fallback.")
+        print("PASS — 115/115 approved uiPortraits exist, decode as PNG, are exactly 1024x1024, and runtime source remains no-fallback.")
     return 0
 
 

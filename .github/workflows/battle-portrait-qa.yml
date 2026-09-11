@@ -1,4 +1,4 @@
-name: Live 116 Battle Portrait QA
+name: Live 115 Battle Portrait QA
 
 on:
   workflow_dispatch:
@@ -8,6 +8,7 @@ on:
       - 'Portraits/**'
       - 'Documentation/Assets/Battle Portrait Authority and Manifest.md'
       - 'Documentation/Assets/Live 116 Battle Portrait Representation Audit 2026-09-07.md'
+      - 'Documentation/Registry/Teen Nagato Retirement and Live 115 Cardinality Ratification 2026-09-11.md'
       - 'tools/qa_battle_portraits.py'
       - '.github/workflows/battle-portrait-qa.yml'
       - 'game.js'
@@ -16,6 +17,7 @@ on:
       - 'Portraits/**'
       - 'Documentation/Assets/Battle Portrait Authority and Manifest.md'
       - 'Documentation/Assets/Live 116 Battle Portrait Representation Audit 2026-09-07.md'
+      - 'Documentation/Registry/Teen Nagato Retirement and Live 115 Cardinality Ratification 2026-09-11.md'
       - 'tools/qa_battle_portraits.py'
       - '.github/workflows/battle-portrait-qa.yml'
       - 'game.js'
@@ -35,5 +37,5 @@ jobs:
       - name: Install Pillow
         run: python -m pip install --disable-pip-version-check pillow
 
-      - name: Validate 116 ratified Battle/UI portraits
+      - name: Validate 115 ratified Battle/UI portraits
         run: python tools/qa_battle_portraits.py
