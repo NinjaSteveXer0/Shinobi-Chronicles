@@ -1,88 +1,116 @@
-SHINOBI CHRONICLES — BRICKS 12300–12499
-Generated: 2026-09-10
+SHINOBI CHRONICLES — BRICKS 12500–22499
+TAILED BEAST / MEGA KAGE / MOON DESTROYER MONSTER
+Generated: 2026-09-11
 Owner: Coding / Runtime
 
-PURPOSE
-- GitHub #90: implement Arc 1 Mission 1 pre-Whisper three-person trace producer.
-- GitHub #84: consume Konoha Hotspot Calibration v3 and reusable known-unknown halo projection.
+STATUS
+- IMPLEMENTED IN THIS DELIVERY PACKAGE: YES
+- SOURCE/HEADLESS RUNTIME VALIDATED: YES
+- FRESH SINGLE-CHAIN ARC 1 M1→M12 VALIDATED: YES
+- PRODUCTION BROWSER GOLDEN: NOT CLAIMED
+- GITHUB RUNTIME SOURCE COMMIT FOR THIS PACKAGE: NOT YET CREATED
 
-LIVE BASELINE BEFORE THIS PACKAGE
-- game.js Git blob: e2fa7613d2ce6cd3c058228b616173f63dfdacb0
-- BRICKS 7300–12299 implementation commit: ce16a76aefae5bacb5702a28e27e019a8146b084
-- index.html: unchanged by BRICKS 12300–12499
+LIVE BASELINE CONSUMED
+- GitHub main checked immediately before freeze: ef15f7f298772461bf381a34f2e3c621a487633c
+- baseline game.js Git blob: e74a10f8a36da08ee8ead31f0ee1d485e9dba593
+- baseline local package: BRICKS 12300–12499
+- style.css and index.html remain byte-identical to BRICKS 12300–12499.
 
-UPSTREAM DURABLE AUTHORITY
-- #90 producer contract commit: bc962bf07937aec5697419449ccab9efacf1b225
-  Documentation/Coordination/Arc 1 Mission 1 Pre-Whisper Three-Person Trace Producer Contract 2026-09-10.md
-- #84 Konoha v3 authority commit: 4b775dd998a79b3d16fd19f24e61b46473fce121
-  Documentation/Maps/Konoha Hotspot Calibration v3.md
-- Konoha production master: Backgrounds/konoha.png
-  Git blob: 3b02a4b48fd15f095150634a0592b0984ac78408
-  Native canvas: 1536x1024
+UPSTREAM DURABLE AUTHORITY CONSUMED
+- Writing M11/M12 machine-addressable Story contract:
+  Documentation/Story/Arc1_Missions11-12_Machine_Addressable_Story_Runtime_Contract_2026-09-11.md
+  commit 59b18d8717b921839d1c6df8e84a820c6ac064a5
+- World M11/M12 Pump Four / Better Host bindings:
+  Documentation/World/Arc 1 Missions 11-12 Pump Four Better Host World Source Object Location Binding Contract 2026-09-11.md
+  commit ef15f7f298772461bf381a34f2e3c621a487633c
+- Combat M11/M12 closure:
+  Documentation/SC_Combat_Arc1_Mission11_12_Battle_Closure_2026-09-09.md
+  commit f474788cb553980e0dec6760ac747871a42de3c2
+- Registry / PL M11/M12 ratification:
+  Documentation/Registry/Arc 1 Echo Mission 11 12 Registry and PL Ratification.md
+  commit 074ad7bd2f3435e7e88dd1d04f1ee45867a4fefe
+- Progression Echo reciprocity / Kurama repeatability:
+  Documentation/Progression/Arc 1 Echo Reciprocity and Kurama Repeatability Progression Contract 2026-09-10.md
+  commit 28a402c40704b9f32b82bf4c8057c77a130926c0
+- Teen Nagato retirement source commit:
+  02bbed2c3fc14aca822acdc8accb7f6350cb3b04
 
-FILES
-- game.js  SHA-256: 8a7639570a68fa6806b9e51e6dcc0d08666193eaba1023f4235df0084a6eed34
-- style.css SHA-256: 4f251349e9b24c865bcd19394d8f2b5822a1fefba6e431dc11cf00cae79da1e7
-- index.html SHA-256: 8db4699e4a514ccfcfa6a53565a0f278f76dd49a2cbf8d3a2a89052a058a33b4 (byte-identical to pre-12300 local/live-equivalent file)
+PRIMARY IMPLEMENTATION
+1. Arc 1 runtime frontier extended through Mission 12 and exact Arc-1 completion.
+2. Mission 11 Story → Pump Four World context → existing Combat → same Story return.
+3. Battle result / Recall result / carrier response / access resolution remain separate.
+4. Same Pump Four lower-facility World instance persists M11→M12.
+5. Mission 12 Stage 1 / Stage 2 / Stage 3 callers use existing Ren Battle packages.
+6. Echo reciprocity commits separately from Battle and gates permanent Echo Menma eligibility.
+7. Echo Menma consumes Registry-authored Base PL63; no hidden +27 PL mutation.
+8. Voluntary Kurama loan requires exact Story source occurrence.
+9. Temporary Stage-3 projection reaches authored Effective PL80 only while the loan is live.
+10. Stage-3 cleanup removes temporary Kurama package while preserving legitimate historical experience only.
+11. Echo personal naming seam persists Chronicle-relative name without changing stable Entity ID.
+12. Exact Mission-12 completion and occ_arc1_arc1_story_complete are separate from Stage-3 Battle end.
+13. Mission surface / conductor now runs 12-row Arc-1 frontier and resolves to mission frontier 13 after completion.
+14. Teen Nagato retired from live Registry/production/default ownership/card/portrait/runtime binding/Skill-owner projection while generic Nagato semantics remain untouched.
+15. Battle portrait authority remains strict: missing portrait fails visibly; collectible-card fallback is not silently substituted.
+16. #32 diagnostics are wrapper/delegate-aware rather than producing stale false negatives.
+17. M1→M2 fresh-chain blocker fixed: Mission-1 completion derives from the factual major-contact resolution already authored by M1, rather than depending on a nonexistent fabricated Story-completion occurrence ID.
 
-ISSUE #90 IMPLEMENTATION
-- exact opportunity/event/action/source IDs consumed
-- exact three evidence refs required and de-duplicated
-- protagonist-only baseline Knowledge projection; teammate witness Knowledge is not fabricated
-- trace source commits exactly once and survives serialization shape
-- caravan lead alone does not make Whisper Woods actionable
-- Mission1WhisperApproachActionable(actor) is derived state, not a second occurrence
-- whisper_woods_discovered remains separate and first-entry-owned
-- regional pixel geometry is not required for the contained-area causal transition
-- no automatic Battle / Rank / PL / Stat / Progression / Acquisition / reward / relationship side effects
-- stale #58 presentation/routing replaced by the now-authorised investigation producer
+IMPORTANT SEMANTIC NON-COLLAPSES PRESERVED
+- Battle victory != Mission completion.
+- Battle defeat != death/injury/custody automatically.
+- Battle victory != Recall success.
+- Recall result != carrier obedience.
+- Story occurrence != World occurrence != Battle occurrence.
+- testimony != World Truth.
+- protagonist intent != party-wide command.
+- physical/team presence != Battle participation.
+- reciprocal cooperation != fusion/ownership/mastery.
+- temporary Kurama loan != persistent Kurama Access.
+- representation unlock != hidden PL mutation.
+- collectibleCard != uiPortrait.
+- map geometry != semantic World identity.
+- Stage-3 Battle end != Mission-12 completion != Arc-1 completion.
 
-ISSUE #84 IMPLEMENTATION
-- Konoha map definition now consumes spatialCalibrationStatus=konoha_v3
-- exact 12 public P anchors, 8 A subhosts, 21 O locations, 24 S reservations recorded
-- KON-S01 is known restricted geography
-- KON-S02..S24 default to zero-leak unrecognised
-- unrecognised secrets produce no marker/hover/focus/handler/DOM identity
-- known-unknown projection is pulsing golden halo with player-facing label exactly ????
-- known-unknown markup contains no canonical secret ID/name and no input handlers
-- discovered identity remains separate from access/actionability
-- accessible is NOT normalized to actionable
-- optional locations remain absent until explicit committed Knowledge state
-- normal overview is bounded to <=13 identified anchors and <=3 known-unknown halos
-- four existing authorised public routes retained: Arena, Exams via Academy, General Training, Weapons Training
-- Arc 1 reusable host bindings recorded without turning host location into Story occurrence
-
-VALIDATION
+FINAL VALIDATION
 - node --check game.js: PASS
-- runAlphaIssue90PreWhisperTraceDiagnostics(): PASS (14/14 checks)
-  status: ISSUE_90_SOURCE_RUNTIME_GREEN
-- runAlphaIssue84KonohaV3Diagnostics(): PASS (19/19 checks)
-  status: ISSUE_84_KONOHA_V3_SOURCE_RUNTIME_GREEN
-- runAlphaBricks12300To12499Diagnostics(): PASS
-- runAlphaArc1M1WhisperWoodsContentDiagnostics(): PASS
-- runAlphaArc1M1WhisperMajorContactStoryCallerDiagnostics(): PASS (27/27)
-- runAlphaIssue41SourceDiagnostics(): PASS (13/13)
-- runAlphaBrick5499DeliveryHardeningDiagnostics(): PASS
-- runAlphaSevenNationAndWorldMapV2Diagnostics(): PASS
-- runAlphaBricks7300To12299MonsterDiagnostics(): PASS
+- runAlphaTailedBeastMonsterDiagnostics(): PASS
+  - #32: PASS
+  - Mission 5: PASS
+  - M11/M12 Combat source package: PASS
+  - M11/M12 hardening: PASS
+  - World Map v2: PASS
+  - Genin v1: PASS
+  - #90 pre-Whisper producer: PASS
+  - #84 Konoha v3: PASS
+  - Teen Nagato retirement: PASS
+  - M11/M12 Story/World/Progression integration: PASS
+- live production diagnostic count after Teen Nagato retirement: 97 Characters + 18 Entities = 115
+- FULL_FRESH_ARC1_M1_TO_M12_PASS: PASS
+  - M1 through M12 all true
+  - real M5 Battle seam exercised
+  - real M7 Battle seam exercised
+  - real M11 Battle seam exercised
+  - all three real M12 Ren Battle seams exercised
+  - Arc 1 complete = true
+  - next mission frontier = 13
+  - Echo personal name persisted = Kageko
+  - reciprocity = true
+  - coordinated Kurama-loan history = true
+  - temporary Kurama package cleaned = true
 
-REAL CHROMIUM CHECK
-- self-contained Chromium execution of current index/CSS/game source: zero script exceptions after test storage shim
-- #90 diagnostic: PASS
-- #84 diagnostic: PASS
-- aggregate 12300–12499 diagnostic: PASS
-- Mission-1 major-contact diagnostic: PASS 27/27
-- fresh Konoha DOM: 13 identified anchors, 0 known-unknown halos, 4 actionable public buttons
-- no KON-S02 ID or Orochimaru Forgotten Laboratory name present in fresh DOM
+FILE HASHES
+- game.js SHA-256: 0f607ce887b29a42f35d8b08118b993b24741c76553d2e48bcf7d991117916ca
+- game.js Git blob: 2cd609833cf390c647a55e62e2c4b602f805d9e0
+- style.css SHA-256: 4f251349e9b24c865bcd19394d8f2b5822a1fefba6e431dc11cf00cae79da1e7
+- index.html SHA-256: 8db4699e4a514ccfcfa6a53565a0f278f76dd49a2cbf8d3a2a89052a058a33b4
 
 LIMITS / GOLDEN STATUS
-- Browser/runtime logic evidence is GREEN, but full production browser Golden is NOT claimed.
-- The sandbox browser cannot load the repository image master through its administrator network policy, so visual pixel-to-art alignment for Backgrounds/konoha.png still requires Stephen's installed-browser check.
-- Fresh-save end-to-end human browser playthrough remains required before Golden claim.
-- #90 and #84 should remain open until the implementation is committed to current GitHub main and the remaining browser evidence is recorded.
+- This delivery has source/headless runtime proof and a deterministic full M1→M12 Chronicle-chain proof.
+- Production browser Golden is NOT claimed.
+- Human installed-browser playthrough remains the next validation layer.
+- Current GitHub runtime source still points to the pre-package game.js blob until this package is installed/committed; do not treat package generation alone as a GitHub implementation commit.
 
 INSTALL
 1. UNBLOCK THE ZIP BEFORE EXTRACTION.
-2. Replace game.js, style.css, and index.html at repository root with the files in this package.
-3. Keep revision_manifest.txt as delivery evidence if desired.
-4. Launch in browser and verify Konoha anchors/halos plus fresh-save Mission 1 transition.
+2. Replace repository-root game.js, style.css and index.html with the files in this package.
+3. Keep revision_manifest.txt as delivery evidence.
+4. Launch a fresh Chronicle and validate the player-facing M1→M12 flow in the installed browser.

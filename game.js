@@ -68,9 +68,6 @@ const assetManifest = {
     kage_naruto:
       "Assets/Kage/kage_naruto.png",
 
-    teen_nagato:
-      "Assets/Variant/teen_nagato.png",
-
     // =====================================================
     // BRICKS 1061–1068 — FINAL-116 APPROVED CARD PROJECTION
     // =====================================================
@@ -273,7 +270,6 @@ const UI_PORTRAIT_MANIFEST = Object.freeze({
   "kurama_sovereign": "Portraits/Variants/kurama_sovreign.png",
   "six_tail_dominion": "Portraits/Variants/six_tail_dominion.png",
   "stolen_chakra": "Portraits/Variants/stolen_chakra.png",
-  "teen_nagato": "Portraits/Variants/teen_nagato.png",
   "three_tail_dominion": "Portraits/Variants/three_tail_dominion.png",
   "black_madara": "Portraits/Boss Cards/black_madara.png",
   "failed_god_madara": "Portraits/Boss Cards/failed_god_madara.png",
@@ -829,25 +825,6 @@ const characterRegistry = {
     ],
     // BRICK 481 — KAGE NARUTO DEFAULT SUMMON POINTER RESOLVED
     "defaultAttachedSummonId": "gamakichi"
-  },
-  "teen_nagato": {
-    "id": "teen_nagato",
-    "baseStats": {
-      "nin": 98,
-      "tai": 74,
-      "buki": 64,
-      "fuin": 94,
-      "kin": 99,
-      "gen": 96,
-      "stamina": 91
-    },
-    "basePL": 97,
-    "lifeStage": "teen",
-    "capabilities": [
-      "almighty_push",
-      "universal_pull",
-      "black_receiver_bind"
-    ]
   },
   "undying_madara": {
     "id": "undying_madara",
@@ -1852,14 +1829,6 @@ const RUNTIME_CHARACTER_REGISTRY_BINDINGS = [
     "rank": "Sannin",
     "rarity": "Rare",
     "assetId": "sannin_sakura"
-  },
-  {
-    "runtimeId": "nagato",
-    "registryId": "teen_nagato",
-    "name": "Teen Nagato",
-    "rank": "Kage",
-    "rarity": "Legendary",
-    "assetId": "teen_nagato"
   },
   {
     "runtimeId": "academy_hinata",
@@ -3950,7 +3919,7 @@ const ALPHA_PRODUCTION_CHARACTER_IDS = Object.freeze([
   "sj_ebisu","sj_genma","sj_ibiki",
   "sannin_sakura","sannin_shikamaru",
   "kage_itachi","kage_kakashi","kage_menma","kage_naruto","kage_sarada",
-  "shisui","teen_nagato","black_gold_naruto","black_sun_himawari","serpent_ascendant",
+  "shisui","black_gold_naruto","black_sun_himawari","serpent_ascendant",
   "sakura_resonance","sakura_manifestation","sakura_avatar",
   "shikamaru_resonance_yang","shikamaru_manifestation_yang","shikamaru_avatar_yang",
   "shikamaru_resonance_yin","shikamaru_manifestation_yin","shikamaru_avatar_yin",
@@ -5974,7 +5943,6 @@ const DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS = [
   "kage_naruto",
   "jonin_sasuke",
   "sannin_sakura",
-  "teen_nagato",
   "academy_hinata",
   "academy_izuno",
   "academy_mirai",
@@ -82222,7 +82190,7 @@ const PRODUCTION_PREPARED_SKILL_PALETTES = {
   kage_naruto:["kage_naruto_shadow_clone_assault","kage_naruto_massive_rasengan","kage_naruto_rasenshuriken","kage_naruto_clone_interposition","kage_naruto_sage_sensory_read"],
   kage_sarada:["kage_sarada_inferno_fireball","kage_sarada_chidori_breakthrough","kage_sarada_chakra_enhanced_impact","kage_sarada_lightning_shuriken_convergence","kage_sarada_sharingan_read"],
   shisui:["shisui_body_flicker_assault","shisui_great_fireball","shisui_ocular_genjutsu","shisui_flicker_shuriken_convergence","shisui_afterimage_feint"],
-  teen_nagato:["teen_nagato_almighty_push","teen_nagato_universal_pull","teen_nagato_black_receiver_bind","teen_nagato_gale_palm","teen_nagato_water_dragon"]
+  // teen_nagato retired 2026-09-11: no live owner palette
 };
 
 
@@ -101199,7 +101167,7 @@ function hasAlphaHistoryAddress(id){
 function getAlphaArc1PlayableStatus(){
   const roster=getAlphaTrainingRoster();
   const trace=hasAlphaHistoryAddress("arc1_m1_caravan_three_person_trace_confirmed");
-  const m1Complete=hasAlphaHistoryAddress("occ_arc1_m1_whisper_major_contact_story_completed")||hasAlphaHistoryAddress("arc1_m1_whisper_major_contact_story_completed");
+  const m1Complete=isAlphaArc1Mission1Complete();
   return {rosterCount:roster.length,originReady:roster.length>0,trace,m1Complete,earliestBlocker:roster.length===0?"chronicle_origin_required":!trace?"pre_whisper_three_person_trace_producer_pending":null};
 }
 function continueAlphaArc1(){
@@ -101488,6 +101456,15 @@ function getArc1BattleProtagonistId(){
   return start&&getPlayerCharacter(start)?start:null;
 }
 function hasArc1Occurrence(id){return!!findAlphaCommittedHistoryRecord(id);}
+function isAlphaArc1Mission1Complete(){
+  const A=typeof ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY!=="undefined"?ARC1_M1_WHISPER_MAJOR_CONTACT_STORY_AUTHORITY:null;
+  const resolution=A&&typeof getArc1M1WhisperResolution==="function"?getArc1M1WhisperResolution(A.opportunityId):null;
+  return !!(
+    (resolution&&resolution.majorContactResolved===true) ||
+    hasAlphaHistoryAddress("occ_arc1_m1_whisper_major_contact_story_completed") ||
+    hasAlphaHistoryAddress("arc1_m1_whisper_major_contact_story_completed")
+  );
+}
 
 function resolveAlphaArc1M2Ledger(){const A=getArc1RuntimeAuthority(2);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m2_warehouse_ledger_distributed_operation_discovered",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{ledgerDiscovered:true,distributedOperationEvidenceEstablished:true,referencedNodes:["ACADEMY","HOSPITAL","BARRIER","ARCHIVE"],observingParticipantRefs:getArc1CurrentStoryTeamIds()},sourceRefs:[{type:"world_object",id:A.refs.ledger,role:"distributed_operation_ledger"}]});}
 function resolveAlphaArc1M2Sarutobi(){const A=getArc1RuntimeAuthority(2);return commitAlphaArc1HistoryRecord({occurrenceId:"occ_arc1_m2_warehouse_sarutobi_logistics_involvement_observed",missionId:A.missionId,sceneId:A.sceneId,worldRoot:A.worldRoot,data:{sarutobiParticipantRef:A.refs.sarutobi,logisticsInvolvementObserved:true,clanGuiltInferred:false},sourceRefs:[{type:"world_source",id:A.refs.sarutobi,role:"bounded_logistics_source"}]});}
@@ -101629,7 +101606,7 @@ registerAlphaArc1M2M10StoryScenes();
 
 function getAlphaArc1MissionAvailability(n){
   const p=getArc1CurrentProtagonistId();if(!p)return{available:false,reason:"chronicle_origin_required"};if(!isArc1KonohaMenmaRun())return{available:false,reason:"arc1_konoha_current_runtime_requires_menma_origin"};
-  if(n===2)return{available:hasArc1Occurrence("occ_arc1_m1_whisper_major_contact_story_completed")||hasArc1Occurrence("arc1_m1_whisper_major_contact_story_completed"),reason:"mission1_story_completion_required"};
+  if(n===2)return{available:isAlphaArc1Mission1Complete(),reason:"mission1_story_completion_required"};
   const predecessor={3:"occ_arc1_m2_warehouse_ledger_distributed_operation_discovered",4:"occ_arc1_m3_hospital_reference_material_identified",5:"occ_arc1_m4_relay_four_compromise_confirmed",6:"occ_arc1_m5_third_bell_propagation_accepted",7:"occ_arc1_m6_dead_transfer_lead_acquired",8:"runtime_arc1_m7_battle_return",9:"occ_arc1_m8_sanitisation_network_escalation_observed",10:"occ_arc1_m9_veterinary_ward_direction_established"};
   if(n===8)return{available:!!getPersistedAlphaArc1M7BattleReturn(),reason:"mission7_battle_return_required"};
   const id=predecessor[n];return{available:!!id&&hasArc1Occurrence(id),reason:id?`${id}_required`:"mission_not_registered"};
@@ -101819,7 +101796,7 @@ finalizeArc1M12Stage=function(outcome){const out=ALPHA_PRE5300_FINALIZE_M12(outc
 // BRICKS 5450–5499 — Alpha mission command + regression gate
 // =========================================================
 function getAlphaArc1PlayableStatus(){
-  const roster=getAlphaTrainingRoster(),originId=getArc1CurrentProtagonistId(),trace=hasAlphaHistoryAddress("arc1_m1_caravan_three_person_trace_confirmed"),m1Complete=hasAlphaHistoryAddress("occ_arc1_m1_whisper_major_contact_story_completed")||hasAlphaHistoryAddress("arc1_m1_whisper_major_contact_story_completed"),nextMission=m1Complete?getAlphaArc1FirstUnresolvedMission():1;
+  const roster=getAlphaTrainingRoster(),originId=getArc1CurrentProtagonistId(),trace=hasAlphaHistoryAddress("arc1_m1_caravan_three_person_trace_confirmed"),m1Complete=isAlphaArc1Mission1Complete(),nextMission=m1Complete?getAlphaArc1FirstUnresolvedMission():1;
   const menmaRun=!originId||isArc1MenmaPersonRepresentation(originId);return{rosterCount:roster.length,originReady:roster.length>0,originId,menmaRun,trace,m1Complete,nextMission,earliestBlocker:roster.length===0?"chronicle_origin_required":!menmaRun?"arc1_konoha_current_runtime_requires_menma_origin":!trace?"pre_whisper_three_person_trace_producer_pending":nextMission===11?"mission11_12_story_caller_runtime_authority_pending":null};
 }
 function continueAlphaArc1(){
@@ -103531,7 +103508,7 @@ function getAlphaM1PreWhisperTraceRecord(){
 function isAlphaM1PreWhisperMissionLegitimate(){
   const roster=typeof getAlphaTrainingRoster==="function"?getAlphaTrainingRoster():[];
   const protagonist=typeof getArc1CurrentProtagonistId==="function"?getArc1CurrentProtagonistId():null;
-  const m1Complete=hasArc1Occurrence("occ_arc1_m1_whisper_major_contact_story_completed")||hasArc1Occurrence("arc1_m1_whisper_major_contact_story_completed");
+  const m1Complete=isAlphaArc1Mission1Complete();
   const supportedOrigin=!protagonist||typeof isArc1MenmaPersonRepresentation!=="function"||isArc1MenmaPersonRepresentation(protagonist);
   return roster.length>0&&!!protagonist&&supportedOrigin&&!m1Complete;
 }
@@ -104025,3 +104002,987 @@ function runAlphaBricks12300To12499Diagnostics(){
   const pass=issue90.pass===true&&issue84.pass===true;
   return{pass,issue90,issue84,codingStatus:pass?"BRICKS_12300_12499_SOURCE_RUNTIME_GREEN":"BRICKS_12300_12499_FAILED",browserGoldenClaimed:false};
 }
+
+
+// ============================================================================
+// BRICKS 12500–22499 — TAILED BEAST / MEGA KAGE / MOON DESTROYER MONSTER
+// ARC 1 FIRST TRUE PLAYER RUN + M11/M12 STORY/WORLD/COMBAT/PROGRESSION CLOSURE
+// ============================================================================
+// Design lock:
+// - gameplay surfaces are code-owned;
+// - artwork is optional atmosphere, never structural runtime authority;
+// - missing uiPortraits fail visibly rather than substituting collectible cards;
+// - Story / World / Combat / Progression occurrence identities stay distinct.
+// ============================================================================
+
+const ALPHA_TAILED_BEAST_MONSTER_REVISION="12500-22499";
+const ALPHA_TAILED_BEAST_LIVE_CHARACTER_TARGET_AFTER_TEEN_NAGATO_RETIREMENT=97;
+const ALPHA_TAILED_BEAST_LIVE_ENTITY_TARGET=18;
+const ALPHA_TAILED_BEAST_LIVE_TOTAL_AFTER_TEEN_NAGATO_RETIREMENT=115;
+
+// ---------------------------------------------------------------------------
+// Teen Nagato retirement — live projection only.
+// Generic Nagato controller/source semantics elsewhere remain untouched.
+// ---------------------------------------------------------------------------
+function isTeenNagatoRetiredFromLiveRuntime(){
+  return !getCharacterRegistryEntry("teen_nagato")
+    && !ALPHA_PRODUCTION_CHARACTER_IDS.includes("teen_nagato")
+    && !DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.includes("teen_nagato")
+    && !Object.prototype.hasOwnProperty.call(assetManifest.characterCards||{},"teen_nagato")
+    && !Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST||{},"teen_nagato")
+    && !(RUNTIME_CHARACTER_REGISTRY_BINDINGS||[]).some(row=>row&&row.registryId==="teen_nagato");
+}
+
+// ---------------------------------------------------------------------------
+// #32 diagnostic repair: inspect active wrapper/delegate chains, not only the
+// outermost Function.toString() layer.
+// ---------------------------------------------------------------------------
+function alphaTailedBeastFunctionChainSource(functions){
+  return (Array.isArray(functions)?functions:[])
+    .filter(fn=>typeof fn==="function")
+    .map(fn=>{try{return Function.prototype.toString.call(fn);}catch(_error){return "";}})
+    .join("\n");
+}
+
+const ALPHA_PRE12500_STORY_UI_DIAGNOSTICS = runAlphaStorySceneUIContractDiagnostics;
+runAlphaStorySceneUIContractDiagnostics = function(){
+  const result=ALPHA_PRE12500_STORY_UI_DIAGNOSTICS();
+  const openChain=alphaTailedBeastFunctionChainSource([
+    openOverlay,
+    typeof ALPHA_PRE3500_OPEN_OVERLAY==="function"?ALPHA_PRE3500_OPEN_OVERLAY:null
+  ]);
+  result.storyDoesNotReplaceEnvironment=
+    openChain.includes('type === "story_scene"') &&
+    openChain.includes("renderStoryScenePresentationLayer") &&
+    openChain.indexOf('type === "story_scene"')<openChain.lastIndexOf("currentOverlayType");
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(result);
+  return result;
+};
+
+const ALPHA_PRE12500_MY_CLAN_ADAPTIVE_DIAGNOSTICS = runAlphaIssue32MyClanAdaptiveDiagnostics;
+runAlphaIssue32MyClanAdaptiveDiagnostics = function(){
+  const result=ALPHA_PRE12500_MY_CLAN_ADAPTIVE_DIAGNOSTICS();
+  const inspectionChain=alphaTailedBeastFunctionChainSource([
+    renderMyClanInspectionContent,
+    typeof ALPHA_PRE5800_RENDER_MY_CLAN_INSPECTION==="function"?ALPHA_PRE5800_RENDER_MY_CLAN_INSPECTION:null
+  ]);
+  result.loadoutSummaryOnly=
+    inspectionChain.includes("CURRENT LOADOUT") &&
+    typeof openMyClanLoadoutRoute==="function" &&
+    openMyClanLoadoutRoute.toString().includes("forbids inventing");
+  result.pass=Object.entries(result).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(result);
+  return result;
+};
+
+// ---------------------------------------------------------------------------
+// Battle projection hardening — uiPortrait/enemyPortrait only.
+// Never silently substitute collectible-card art.
+// ---------------------------------------------------------------------------
+getAlphaBattleActivePortraitProjection = function(side,participant){
+  if(!participant) return {path:"",authority:"missing",missing:true,fallbackUsed:false};
+  const portrait=side==="player"
+    ? resolveUIPortraitProjection(participant)
+    : resolveBattleEnemyPortraitProjection(participant);
+  if(portrait&&portrait.path){
+    return {...portrait,authority:side==="player"?"uiPortrait":"enemyPortrait",missing:false,fallbackUsed:false};
+  }
+  return {
+    path:"",
+    authority:side==="player"?"missing:uiPortrait":"missing:enemyPortrait",
+    missing:true,
+    fallbackUsed:false,
+    participantId:participant.id||participant.registryId||null
+  };
+};
+
+// ---------------------------------------------------------------------------
+// Fresh Chronicle journey: Origin -> authored prologue -> Academy Formation.
+// ---------------------------------------------------------------------------
+function beginAlphaChronicleOriginPrologue(){
+  const acquisition=ensurePlayerAcquisitionState();
+  const originId=acquisition.chronicleOriginVariantId||null;
+  if(!originId){
+    openOverlay("clan");
+    const opened=typeof openAlphaChronicleOriginSelection==="function"
+      ?openAlphaChronicleOriginSelection()
+      :{success:false,reason:"origin_selection_surface_missing"};
+    return {success:false,reason:"chronicle_origin_required",originSelection:opened};
+  }
+  if(originId!=="academy_menma"){
+    return {success:false,reason:"arc1_konoha_current_runtime_requires_menma_origin",originId};
+  }
+  if(acquisition.chronicleOrigin&&acquisition.chronicleOrigin.prologueCompleted===true){
+    return {success:true,idempotent:true,reason:"origin_prologue_already_completed"};
+  }
+  const existing=getActiveStorySceneRuntime();
+  if(existing){
+    if(existing.sceneId!=="origin_academy_menma_prologue"){
+      return {success:false,reason:"another_story_scene_is_active",sceneId:existing.sceneId};
+    }
+    openOverlay("story_scene");
+    return {success:true,idempotent:true,sceneId:existing.sceneId,beatId:existing.beatId};
+  }
+  if(!getStorySceneDefinition("origin_academy_menma_prologue")){
+    return {success:false,reason:"menma_origin_story_scene_missing"};
+  }
+  return startStoryScene("origin_academy_menma_prologue",{
+    sourceEventId:"origin_academy_menma_prologue",
+    context:{
+      protagonistParticipantId:"academy_menma",
+      physicallyPresentTeamParticipantIds:["academy_menma"],
+      chronicleOriginVariantId:"academy_menma"
+    },
+    returnContext:{type:"alpha_arc1_mission_command",stage:"origin_prologue"}
+  });
+}
+
+const ALPHA_PRE12500_CONFIRM_CHRONICLE_ORIGIN = confirmAlphaChronicleOriginSelection;
+confirmAlphaChronicleOriginSelection = function(){
+  const selected=ALPHA_CHRONICLE_ORIGIN_UI_STATE.selectedVariantId;
+  const result=ALPHA_PRE12500_CONFIRM_CHRONICLE_ORIGIN();
+  if(result&&result.success===true&&selected==="academy_menma"){
+    const prologueLaunch=beginAlphaChronicleOriginPrologue();
+    return {...result,prologueLaunch};
+  }
+  return result;
+};
+
+const ALPHA_PRE12500_RESUME_STORY_RETURN_CONTEXT = resumeStorySceneReturnContext;
+resumeStorySceneReturnContext = function(returnContext){
+  if(returnContext&&returnContext.type==="alpha_arc1_mission_command"){
+    openOverlay("missions");
+    return {
+      success:true,
+      type:"alpha_arc1_mission_command",
+      missionNumber:Number(returnContext.missionNumber)||null,
+      stage:returnContext.stage||null,
+      historyCommitted:false,
+      semanticReroll:false
+    };
+  }
+  return ALPHA_PRE12500_RESUME_STORY_RETURN_CONTEXT(returnContext);
+};
+
+// Formation owns its own presentation layer. Do not leave stale Battle chrome
+// underneath after the Origin tutorial Battle completes.
+const ALPHA_PRE12500_COMPLETE_STORY_SCENE = completeStoryScene;
+completeStoryScene = function(options={}){
+  const out=ALPHA_PRE12500_COMPLETE_STORY_SCENE(options);
+  if(out&&out.returnResult&&out.returnResult.type==="academy_team_formation_required"&&currentOverlayType==="battle"){
+    currentOverlayType=null;
+    saveTestState();
+  }
+  return out;
+};
+
+// ---------------------------------------------------------------------------
+// M12 persistent Progression authority.
+// ---------------------------------------------------------------------------
+const ARC1_M12_RECIPROCITY_RECEIPT="progression_receipt_arc1_menma_echo_reciprocity";
+const ARC1_M12_KURAMA_EXPERIENCE_RECEIPT="progression_receipt_arc1_m12_coordinated_kurama_loan_experience";
+const ARC1_M12_RECIPROCITY_STORY_OCCURRENCE="occ_arc1_m12_menma_echo_reciprocity_established";
+const ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE="occ_arc1_m12_kurama_voluntary_limited_loan_committed";
+
+function commitArc1M12ProgressionReceipt(receiptId,data={},sourceRefs=[]){
+  return commitAlphaArc1HistoryRecord({
+    occurrenceId:receiptId,
+    type:"progression_development_receipt",
+    missionId:"arc1_m12_better_host",
+    sceneId:"scene_arc1_m12_reciprocity_established",
+    data:{...cloneProgressionData(data),progressionNotPL:true,masteryGranted:false},
+    sourceRefs
+  });
+}
+
+function getArc1M12ReciprocityReceipt(){
+  return findAlphaCommittedHistoryRecord(ARC1_M12_RECIPROCITY_RECEIPT);
+}
+function EchoMenmaProgressionEligible(actor){
+  const id=typeof actor==="string"?actor:(actor&&actor.id||actor&&actor.registryId||null);
+  if(!isArc1MenmaPersonRepresentation(id)&&id!=="menma")return false;
+  const receipt=getArc1M12ReciprocityReceipt();
+  if(!receipt||receipt.committed!==true)return false;
+  const data=receipt.data||{};
+  return data.hostedEntityId==="arc1_menma_echo"
+    &&data.hostRelationshipId==="host_rel_menma_arc1_echo"
+    &&data.reciprocalCooperation==="established"
+    &&data.invalidated!==true;
+}
+function PriorCoordinatedKuramaLoanExperienceSatisfied(actor){
+  const id=typeof actor==="string"?actor:(actor&&actor.id||actor&&actor.registryId||null);
+  if(!isArc1MenmaPersonRepresentation(id)&&id!=="menma")return false;
+  const receipt=findAlphaCommittedHistoryRecord(ARC1_M12_KURAMA_EXPERIENCE_RECEIPT);
+  return !!(receipt&&receipt.committed===true&&receipt.data
+    &&receipt.data.loanSourceOccurrenceId===ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE
+    &&receipt.data.hostedEntityId==="arc1_menma_echo"
+    &&receipt.data.standingKuramaAccessGranted!==true);
+}
+function commitArc1M12ReciprocityProgression(){
+  if(!hasArc1Occurrence(ARC1_M12_RECIPROCITY_STORY_OCCURRENCE)){
+    return {success:false,reason:"reciprocity_story_transition_required"};
+  }
+  return commitArc1M12ProgressionReceipt(ARC1_M12_RECIPROCITY_RECEIPT,{
+    stablePersonId:"menma",
+    hostedEntityId:"arc1_menma_echo",
+    hostRelationshipId:"host_rel_menma_arc1_echo",
+    reciprocalCooperation:"established",
+    representationEligible:"echo_menma",
+    directPLMutation:false,
+    directStatMutation:false
+  },[
+    {type:"story_occurrence",id:ARC1_M12_RECIPROCITY_STORY_OCCURRENCE,role:"exact_relationship_transition"},
+    {type:"hosted_entity",id:"arc1_menma_echo",role:"reciprocal_source"},
+    {type:"relationship",id:"host_rel_menma_arc1_echo",role:"relationship_lineage"}
+  ]);
+}
+function commitArc1M12KuramaExperienceProgression(){
+  if(!hasArc1Occurrence(ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE)){
+    return {success:false,reason:"exact_voluntary_kurama_loan_source_required"};
+  }
+  return commitArc1M12ProgressionReceipt(ARC1_M12_KURAMA_EXPERIENCE_RECEIPT,{
+    stablePersonId:"menma",
+    kuramaSourceId:"menma_kurama",
+    hostedEntityId:"arc1_menma_echo",
+    hostRelationshipId:"host_rel_menma_arc1_echo",
+    loanSourceOccurrenceId:ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE,
+    historicalExperienceOnly:true,
+    standingKuramaAccessGranted:false,
+    persistentModifierGranted:false
+  },[
+    {type:"story_occurrence",id:ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE,role:"exact_voluntary_loan_source"},
+    {type:"hosted_entity",id:"arc1_menma_echo",role:"coordinated_echo_source"},
+    {type:"hosted_entity",id:"menma_kurama",role:"voluntary_loan_source"}
+  ]);
+}
+
+// Harden permanent Echo Menma materialisation against attachment-only collapse.
+const ALPHA_PRE12500_MATERIALIZE_M12_MENMA = materializeArc1M12MenmaProjection;
+materializeArc1M12MenmaProjection = function(representationId,options={}){
+  if(representationId==="echo_menma"&&!EchoMenmaProgressionEligible("menma")){
+    return null;
+  }
+  return ALPHA_PRE12500_MATERIALIZE_M12_MENMA(representationId,options);
+};
+
+// ---------------------------------------------------------------------------
+// M11/M12 exact Writing + World runtime authority.
+// ---------------------------------------------------------------------------
+const ARC1_M11_M12_WORLD=Object.freeze({
+  host:"KON-O20",
+  pumpStation:"arc1_m11_pump_station_four_01",
+  serviceFloor:"arc1_m11_pump_four_service_floor_01",
+  freshOrder:"arc1_m11_pump_four_fresh_order_01",
+  lowerAccess:"arc1_pump_four_lower_service_access_01",
+  missionArea:"arc1_pump_four_lower_facility",
+  lowerChamber:"arc1_pump_four_lower_chamber_01",
+  root:"world_occ_arc1_pump_four_better_host_facility_chain_01",
+  siteEntered:"world_occ_arc1_m11_pump_four_site_entered",
+  lowerTraversable:"world_occ_arc1_m11_lower_service_access_made_traversable",
+  lowerEntered:"world_occ_arc1_m11_lower_facility_entered",
+  programmeArray:"arc1_pump_four_programme_array_01",
+  retrievalInterface:"arc1_pump_four_comparative_retrieval_interface_01",
+  innerContainment:"arc1_pump_four_inner_containment_01"
+});
+
+function commitArc1M11M12StoryOccurrence(occurrenceId,{missionId,sceneId,data={},sourceRefs=[]}={}){
+  return commitAlphaArc1HistoryRecord({
+    occurrenceId,
+    type:"arc1_story_occurrence",
+    missionId,
+    sceneId,
+    worldRoot:ARC1_M11_M12_WORLD.root,
+    data,
+    sourceRefs
+  });
+}
+function commitArc1M11M12WorldOccurrence(occurrenceId,data={},sourceRefs=[]){
+  return commitAlphaArc1HistoryRecord({
+    occurrenceId,
+    type:"arc1_world_occurrence",
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    worldRoot:ARC1_M11_M12_WORLD.root,
+    data,
+    sourceRefs
+  });
+}
+function getAlphaM11M12Protagonist(){
+  return getArc1BattleProtagonistId()||getArc1CurrentProtagonistId();
+}
+function getAlphaM11AlliedParticipantIds(){
+  // Presence is not participation. Until an exact additional NPC intent record
+  // exists, the protagonist is the only automatically active allied participant.
+  return [getAlphaM11M12Protagonist()].filter(Boolean);
+}
+function getAlphaM11SideAssignments(allies){
+  const sides={};
+  (allies||[]).forEach(id=>{sides[id]="allied_side";});
+  getArc1M11EnemyIds().forEach(id=>{sides[id]="pump_four_opposition";});
+  return sides;
+}
+
+function commitAlphaM11OpeningAuthority(){
+  const protagonist=getAlphaM11M12Protagonist();
+  if(!protagonist)return{success:false,reason:"m11_protagonist_missing"};
+  const report=commitArc1M11M12StoryOccurrence("occ_arc1_m11_moroboshi_internal_security_report_history_established",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_moroboshi_confrontation",
+    data:{
+      moroboshiParticipantRef:"arc1_daichi_moroboshi",
+      observingParticipantRefs:[protagonist],
+      internalSecurityReportMade:true,
+      authorisedReviewReceiptObserved:true,
+      whiteThreadAcknowledgementObserved:true,
+      institutionalOwnershipInferred:false
+    },
+    sourceRefs:[{type:"participant",id:"arc1_daichi_moroboshi",role:"bounded_testimony_source"}]
+  });
+  const order=commitArc1M11M12StoryOccurrence("occ_arc1_m11_pump_four_order_actionable",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_moroboshi_confrontation",
+    data:{
+      evidenceRef:ARC1_M11_M12_WORLD.freshOrder,
+      worldLocationRef:ARC1_M11_M12_WORLD.pumpStation,
+      exactVisibleText:"PUMP STATION FOUR / 01:30 / OPEN LOWER SERVICE ACCESS",
+      observingParticipantRefs:[protagonist]
+    },
+    sourceRefs:[
+      {type:"world_object",id:ARC1_M11_M12_WORLD.freshOrder,role:"fresh_order"},
+      {type:"location",id:ARC1_M11_M12_WORLD.pumpStation,role:"actionable_destination"}
+    ]
+  });
+  return {success:report.success&&order.success,report,order};
+}
+
+function commitAlphaM11RecallIntent({recognitionSubstitutionRequested=false}={}){
+  return commitArc1M11M12StoryOccurrence("occ_arc1_m11_recall_contact_intent_committed",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_pump_four_recall",
+    data:{
+      protagonistRef:getAlphaM11M12Protagonist(),
+      protagonistPermitsRecallContact:true,
+      recognitionSubstitutionRequested:recognitionSubstitutionRequested===true,
+      recallSuccessInferred:false,
+      carrierResponseInferred:false
+    }
+  });
+}
+
+function launchAlphaM11StoryBattle({returnContext=null}={}){
+  const allies=getAlphaM11AlliedParticipantIds();
+  if(!allies.length)return{success:false,reason:"m11_allied_participant_missing"};
+  const ids=[...allies,...getArc1M11EnemyIds()];
+  const sides=getAlphaM11SideAssignments(allies);
+  commitArc1M11M12WorldOccurrence(ARC1_M11_M12_WORLD.root,{facilityChainActive:true,duplicateMission12Exterior:false},[
+    {type:"location",id:ARC1_M11_M12_WORLD.pumpStation,role:"physical_chain_root"}
+  ]);
+  commitArc1M11M12WorldOccurrence(ARC1_M11_M12_WORLD.siteEntered,{locationRef:ARC1_M11_M12_WORLD.pumpStation,siteEntered:true});
+  commitArc1M11M12StoryOccurrence("occ_arc1_m11_pump_four_battle_called",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_pump_four_recall",
+    data:{activeParticipantIds:[...ids],sideAssignments:cloneProgressionData(sides),npcParticipationResolution:"no_additional_npc_intent_committed"},
+    sourceRefs:[{type:"location",id:ARC1_M11_M12_WORLD.serviceFloor,role:"encounter_host"}]
+  });
+  const launched=launchArc1M11PumpFourEncounter({
+    activeParticipantIds:ids,
+    sideAssignments:sides,
+    returnContext,
+    callerContext:{
+      storyMissionId:"arc1_m11_man_who_signed_night_shift",
+      storySceneId:"scene_arc1_m11_pump_four_recall",
+      returnSceneId:"scene_arc1_m11_pump_four_return",
+      worldOccurrenceRootRef:ARC1_M11_M12_WORLD.root,
+      locationRef:ARC1_M11_M12_WORLD.serviceFloor
+    }
+  });
+  if(!launched.success)return launched;
+
+  const intent=findAlphaCommittedHistoryRecord("occ_arc1_m11_recall_contact_intent_committed");
+  if(intent){
+    const host=allies[0];
+    const contact=beginArc1M11RecallContact({hostParticipantId:host});
+    if(contact.success){
+      // The Echo's refusal is its own authored autonomous factual response.
+      commitArc1M11EchoRecallRefusal();
+      if(intent.data&&intent.data.recognitionSubstitutionRequested===true&&IdentityRebindingAccessSatisfied(host)){
+        resolveArc1M11RecognitionSubstitution({
+          participantId:host,
+          linkedRecallContactId:currentBattle.mission11RecallEncounter.linkedRecallContactId,
+          profile:"menma_normal_no_carrier"
+        });
+      }
+      resolveArc1M11RecallRetrieval();
+    }
+  }
+  return launched;
+}
+function projectAlphaM11BattleResult({outcome}={}){
+  const state=currentBattle.mission11RecallEncounter;
+  if(!state)return{battleResult:null,storyContinuationClass:"pump_four_interrupted"};
+  const battleResult=outcome&&outcome.type==="victory"?"victory":"defeat";
+  state.battleCompleted=true;
+  state.battleResult=battleResult;
+  const envelope=buildArc1M11ReturnEnvelope();
+  const continuation=battleResult==="victory"?"pump_four_access_contested":"pump_four_forced_withdrawal";
+  commitArc1M11M12StoryOccurrence("occ_arc1_m11_pump_four_return_consumed",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_pump_four_return",
+    data:{
+      ...cloneProgressionData(envelope||{}),
+      battleResult,
+      recallResult:state.recallResult||"not_attempted",
+      carrierResponse:state.carrierResponse||"not_applicable",
+      storyContinuationClass:continuation,
+      deathInferred:false,
+      custodyInferred:false
+    }
+  });
+  return {...cloneProgressionData(envelope||{}),battleResult,storyContinuationClass:continuation};
+}
+function canAlphaM11SecureLowerAccess(){
+  const rec=findAlphaCommittedHistoryRecord("occ_arc1_m11_pump_four_return_consumed");
+  return !!(rec&&rec.data&&rec.data.battleResult==="victory");
+}
+function resolveAlphaM11LowerAccess(){
+  if(!canAlphaM11SecureLowerAccess())return{success:false,reason:"pump_four_access_not_factually_securable"};
+  const world=commitArc1M11M12WorldOccurrence(ARC1_M11_M12_WORLD.lowerTraversable,{
+    routeRef:ARC1_M11_M12_WORLD.lowerAccess,
+    physicalState:"traversable",
+    availableForTraversal:true,
+    battleVictoryNotEquivalentToThisOccurrence:true
+  },[{type:"route",id:ARC1_M11_M12_WORLD.lowerAccess,role:"physical_access"}]);
+  const story=commitArc1M11M12StoryOccurrence("occ_arc1_m11_lower_service_access_secured",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_pump_four_return",
+    data:{physicalAccessRef:ARC1_M11_M12_WORLD.lowerAccess,storyContinuationClass:"pump_four_access_secured"}
+  });
+  return{success:world.success&&story.success,world,story};
+}
+function resolveAlphaM11LowerChamberReveal(){
+  if(!hasArc1Occurrence("occ_arc1_m11_lower_service_access_secured"))return{success:false,reason:"lower_service_access_not_secured"};
+  const world=commitArc1M11M12WorldOccurrence(ARC1_M11_M12_WORLD.lowerEntered,{
+    worldInstanceRef:ARC1_M11_M12_WORLD.lowerChamber,
+    missionAreaId:ARC1_M11_M12_WORLD.missionArea,
+    entryRouteRef:ARC1_M11_M12_WORLD.lowerAccess
+  });
+  const reveal=commitArc1M11M12StoryOccurrence("occ_arc1_m11_better_host_lower_chamber_revealed",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_lower_chamber_better_host_reveal",
+    data:{
+      worldInstanceRef:ARC1_M11_M12_WORLD.lowerChamber,
+      personPresentBelow:true,
+      betterHostClaimObserved:true,
+      testimonyRemainsBounded:true
+    }
+  });
+  return{success:world.success&&reveal.success,world,reveal};
+}
+function resolveAlphaM11DescentAndHandoff(){
+  if(!hasArc1Occurrence("occ_arc1_m11_better_host_lower_chamber_revealed"))return{success:false,reason:"better_host_route_not_revealed"};
+  const protagonist=getAlphaM11M12Protagonist();
+  const descent=commitArc1M11M12StoryOccurrence("occ_arc1_m11_lower_chamber_descent_resolved",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_lower_chamber_better_host_reveal",
+    data:{descendingParticipantRefs:[protagonist],remainingAboveParticipantRefs:[],developerDistributionHardCoded:false}
+  });
+  const host=commitArc1M11M12StoryOccurrence("occ_arc1_m11_primary_host_encounter_established",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_lower_chamber_better_host_reveal",
+    data:{observedHostRef:"arc1_ren",personalNameKnown:false,primaryHostPairStateObserved:true}
+  });
+  const handoff=commitArc1M11M12StoryOccurrence("occ_arc1_m11_to_m12_better_host_handoff_committed",{
+    missionId:"arc1_m11_man_who_signed_night_shift",
+    sceneId:"scene_arc1_m11_to_m12_better_host_handoff",
+    data:{
+      protagonistRef:protagonist,
+      worldOccurrenceRootRef:ARC1_M11_M12_WORLD.root,
+      missionAreaId:ARC1_M11_M12_WORLD.missionArea,
+      worldInstanceRef:ARC1_M11_M12_WORLD.lowerChamber,
+      entryRouteRef:ARC1_M11_M12_WORLD.lowerAccess,
+      observedHostRef:"arc1_ren",
+      hostRelationshipRefs:["host_rel_menma_arc1_echo"]
+    }
+  });
+  return{success:descent.success&&host.success&&handoff.success,descent,host,handoff};
+}
+
+// ---------------------------- Mission 12 helpers ----------------------------
+
+function commitAlphaM12EntryFacts(){
+  if(!hasArc1Occurrence("occ_arc1_m11_to_m12_better_host_handoff_committed")){
+    return{success:false,reason:"m11_to_m12_handoff_required"};
+  }
+  const ren=commitArc1M11M12StoryOccurrence("occ_arc1_m12_ren_identity_established",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_ren_reveal_and_comparative_retrieval",
+    data:{stablePersonRef:"arc1_ren",samePersonAcrossStages:true}
+  });
+  const cycle=commitArc1M11M12StoryOccurrence("occ_arc1_m12_echo_programme_cycle_established",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_ren_reveal_and_comparative_retrieval",
+    data:{programmeTerm:"Echoes",cycle:["attach","adapt_learn","carry","transfer_return","recall"]}
+  });
+  const retrieval=commitArc1M11M12StoryOccurrence("occ_arc1_m12_comparative_retrieval_active",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_ren_reveal_and_comparative_retrieval",
+    data:{interfaceRef:ARC1_M11_M12_WORLD.retrievalInterface,programmeArrayRef:ARC1_M11_M12_WORLD.programmeArray,directHostMindControl:false}
+  });
+  const sazan=commitArc1M11M12StoryOccurrence("occ_arc1_m12_sazan_alive_revealed",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_ren_reveal_and_comparative_retrieval",
+    data:{participantRef:"arc1_dr_sazan",physicalContextRef:ARC1_M11_M12_WORLD.innerContainment,priorBeliefRewritten:false}
+  });
+  return{success:ren.success&&cycle.success&&retrieval.success&&sazan.success,ren,cycle,retrieval,sazan};
+}
+function commitAlphaM12VoluntaryEchoManifestation(){
+  return commitArc1M11M12StoryOccurrence("occ_arc1_m12_echo_voluntary_manifestation_committed",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_stage1_early_reciprocity",
+    data:{hostedEntityRef:"arc1_menma_echo",hostRelationshipRef:"host_rel_menma_arc1_echo",voluntary:true,ownershipGranted:false,masteryGranted:false}
+  });
+}
+function launchAlphaM12StoryStage1({returnContext=null}={}){
+  commitArc1M11M12StoryOccurrence("occ_arc1_m12_stage1_battle_called",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_stage1_early_reciprocity",
+    data:{masterSequenceId:"arc1_m12_better_host_climax",returnSceneId:"scene_arc1_m12_stage1_return"}
+  });
+  return launchArc1M12RenStage({stage:1,returnContext});
+}
+function projectAlphaM12StageResult({outcome}={}){
+  const finalised=finalizeArc1M12Stage(outcome||{type:"unknown"});
+  const env=finalised&&finalised.returnEnvelope?finalised.returnEnvelope:buildArc1M12ReturnEnvelope();
+  const stage=env&&env.stage||currentBattle.mission12Climax&&currentBattle.mission12Climax.stage||null;
+  let cls=null;
+  if(stage===1)cls="stage1_reciprocity_opportunity_live";
+  else if(stage===2)cls="stage2_terminal_escalation_live";
+  else if(stage===3)cls=(outcome&&outcome.type==="victory")?"stage3_climax_resolved":"stage3_climax_unresolved";
+  const occ=stage===1?"occ_arc1_m12_stage1_return_consumed":stage===2?"occ_arc1_m12_stage2_return_consumed":"occ_arc1_m12_stage3_return_consumed";
+  const scene=stage===1?"scene_arc1_m12_stage1_return":stage===2?"scene_arc1_m12_stage2_return":"scene_arc1_m12_stage3_return";
+  commitArc1M11M12StoryOccurrence(occ,{
+    missionId:"arc1_m12_better_host",sceneId:scene,
+    data:{...cloneProgressionData(env||{}),battleResult:outcome&&outcome.type||null,continuationClass:cls,stage1ContinuationClass:stage===1?cls:null,stage2ContinuationClass:stage===2?cls:null,stage3ContinuationClass:stage===3?cls:null}
+  });
+  return{...cloneProgressionData(env||{}),continuationClass:cls};
+}
+function getAlphaM12StageReturn(stage){
+  const id=stage===1?"occ_arc1_m12_stage1_return_consumed":stage===2?"occ_arc1_m12_stage2_return_consumed":"occ_arc1_m12_stage3_return_consumed";
+  const rec=findAlphaCommittedHistoryRecord(id);
+  return rec&&rec.data?cloneProgressionData(rec.data):null;
+}
+function resolveAlphaM12Reciprocity(){
+  const returnData=getAlphaM12StageReturn(1);
+  if(!returnData)return{success:false,reason:"stage1_factual_return_required"};
+  const story=commitArc1M11M12StoryOccurrence(ARC1_M12_RECIPROCITY_STORY_OCCURRENCE,{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_reciprocity_established",
+    data:{
+      stablePersonId:"menma",hostedEntityId:"arc1_menma_echo",hostRelationshipId:"host_rel_menma_arc1_echo",
+      cooperationVoluntary:true,mutualOperationalCooperation:true,battleResultDidNotAuthorThis:true
+    }
+  });
+  const progression=commitArc1M12ReciprocityProgression();
+  if(!progression.success)return{success:false,reason:"reciprocity_progression_commit_failed",story,progression};
+  const authorised=authoriseArc1M12StageTransition(2,{sourceBattleResult:returnData});
+  return{success:story.success&&progression.success&&authorised.success,story,progression,authorised};
+}
+function launchAlphaM12StoryStage2({returnContext=null}={}){
+  if(!EchoMenmaProgressionEligible("menma"))return{success:false,reason:"echo_menma_progression_not_eligible"};
+  commitArc1M11M12StoryOccurrence("occ_arc1_m12_stage2_battle_called",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_stage2_echo_menma",
+    data:{returnSceneId:"scene_arc1_m12_stage2_return",representationId:"echo_menma"}
+  });
+  return launchArc1M12RenStage({
+    stage:2,
+    returnContext,
+    storyTransitionOccurrenceId:"arc1_m12_programme_advanced_optimisation_transition"
+  });
+}
+function resolveAlphaM12TerminalEscalation(){
+  const returnData=getAlphaM12StageReturn(2);
+  if(!returnData)return{success:false,reason:"stage2_factual_return_required"};
+  return authoriseArc1M12StageTransition(3,{sourceBattleResult:returnData});
+}
+function resolveAlphaM12KuramaVoluntaryLoan(){
+  if(!hasArc1Occurrence("arc1_m12_programme_terminal_optimisation_transition")){
+    return{success:false,reason:"terminal_optimisation_transition_required"};
+  }
+  const story=commitArc1M11M12StoryOccurrence(ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE,{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_kurama_voluntary_loan",
+    data:{
+      stablePersonId:"menma",kuramaEntityRef:"menma_kurama",hostedEntityRef:"arc1_menma_echo",
+      kuramaWillingness:"voluntary_limited_loan",currentConsent:true,standingAccessGranted:false
+    }
+  });
+  const progression=commitArc1M12KuramaExperienceProgression();
+  return{success:story.success&&progression.success,story,progression};
+}
+function launchAlphaM12StoryStage3({returnContext=null}={}){
+  if(!hasArc1Occurrence(ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE))return{success:false,reason:"voluntary_kurama_loan_source_required"};
+  commitArc1M11M12StoryOccurrence("occ_arc1_m12_stage3_battle_called",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_stage3_terminal_optimisation",
+    data:{returnSceneId:"scene_arc1_m12_stage3_return",temporaryProjection:"arc1_m12_menma_echo_borrowed_kurama"}
+  });
+  return launchArc1M12RenStage({
+    stage:3,
+    returnContext,
+    borrowedKurama:true,
+    loanOccurrenceId:ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE,
+    storyTransitionOccurrenceId:"arc1_m12_programme_terminal_optimisation_transition"
+  });
+}
+function canResolveAlphaM12TerminalCollapse(){
+  const rec=findAlphaCommittedHistoryRecord("occ_arc1_m12_stage3_return_consumed");
+  return !!(rec&&rec.data&&rec.data.battleResult==="victory"&&rec.data.borrowedKuramaStillLive===false);
+}
+function resolveAlphaM12Aftermath(){
+  if(!canResolveAlphaM12TerminalCollapse())return{success:false,reason:"terminal_optimisation_threat_unresolved"};
+  return commitArc1M11M12StoryOccurrence("occ_arc1_m12_programme_climax_aftermath_resolved",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_stage3_return",
+    data:{
+      terminalOptimisationCollapse:true,
+      renSurvivalState:"alive_unless_separate_fact",
+      conditionedEchoAttachmentState:"attached_unless_separate_fact",
+      sazanPresenceState:"present_unless_separate_fact",
+      kuramaLoanCleaned:true,
+      battleVictoryNotEquivalentToArcCompletion:true
+    }
+  });
+}
+function validateArc1EchoPersonalName(value){
+  const name=String(value==null?"":value).trim().replace(/\s+/g," ");
+  if(name.length<1||name.length>32)return{valid:false,reason:"echo_personal_name_length_invalid"};
+  if(/[<>]/.test(name))return{valid:false,reason:"echo_personal_name_characters_invalid"};
+  return{valid:true,name};
+}
+function commitArc1M12EchoPersonalName(value){
+  if(!hasArc1Occurrence("occ_arc1_m12_programme_climax_aftermath_resolved"))return{success:false,reason:"m12_winddown_not_ready"};
+  const valid=validateArc1EchoPersonalName(value);
+  if(!valid.valid)return{success:false,reason:valid.reason};
+  const existing=findAlphaCommittedHistoryRecord("occ_arc1_m12_echo_personal_name_committed");
+  if(existing)return{success:true,idempotent:true,personalName:existing.data&&existing.data.personalName||valid.name};
+  const committed=commitArc1M11M12StoryOccurrence("occ_arc1_m12_echo_personal_name_committed",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_arc1_winddown_echo_naming",
+    data:{
+      entityRef:"arc1_menma_echo",hostRelationshipRef:"host_rel_menma_arc1_echo",
+      personalName:valid.name,nameAccepted:true,stableEntityIdUnchanged:true,representationTitleUnchanged:true
+    }
+  });
+  return{...committed,personalName:valid.name};
+}
+function promptAndCommitArc1M12EchoPersonalName(){
+  if(typeof prompt!=="function")return{success:false,reason:"echo_naming_input_surface_unavailable"};
+  const entered=prompt("Give the Echo a personal name. This does not change its stable Entity ID.","");
+  if(entered===null)return{success:false,reason:"echo_naming_cancelled"};
+  return commitArc1M12EchoPersonalName(entered);
+}
+function completeAlphaM12AndArc1(){
+  const aftermath=findAlphaCommittedHistoryRecord("occ_arc1_m12_programme_climax_aftermath_resolved");
+  const naming=findAlphaCommittedHistoryRecord("occ_arc1_m12_echo_personal_name_committed");
+  if(!aftermath)return{success:false,reason:"m12_aftermath_required"};
+  if(hasArc1Occurrence("occ_arc1_m7_carrier_attachment_established")&&!naming)return{success:false,reason:"echo_personal_naming_required"};
+  const m12=commitArc1M11M12StoryOccurrence("occ_arc1_m12_story_complete",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_arc1_winddown_echo_naming",
+    data:{
+      aftermathOccurrenceRef:"occ_arc1_m12_programme_climax_aftermath_resolved",
+      personalNameOccurrenceRef:naming&&naming.occurrenceId||null,
+      temporaryKuramaStateLive:false,
+      missionComplete:true
+    }
+  });
+  const arc1=commitArc1M11M12StoryOccurrence("occ_arc1_arc1_story_complete",{
+    missionId:"arc1_m12_better_host",sceneId:"scene_arc1_m12_arc1_winddown_echo_naming",
+    data:{
+      mission12CompletionOccurrenceRef:"occ_arc1_m12_story_complete",
+      survivingPersistentProtagonistRef:getAlphaM11M12Protagonist(),
+      hostedEntityRelationshipRefs:["host_rel_menma_arc1_echo"],
+      echoPersonalNameOccurrenceRef:naming&&naming.occurrenceId||null,
+      storyContinuationDestination:"post_arc1_free_play",
+      rankGranted:false,plGranted:false,progressionGranted:false,ownershipGranted:false
+    }
+  });
+  return{success:m12.success&&arc1.success,m12,arc1};
+}
+
+// ---------------------------------------------------------------------------
+// M11/M12 machine-addressed Story scenes.
+// ---------------------------------------------------------------------------
+function registerAlphaArc1M11M12StoryScenes(){
+  [
+    "scene_arc1_m11_moroboshi_confrontation",
+    "scene_arc1_m12_ren_reveal_and_comparative_retrieval"
+  ].forEach(id=>unregisterStoryScene(id));
+
+  registerStoryScene({
+    sceneId:"scene_arc1_m11_moroboshi_confrontation",
+    eventId:"arc1_m11_man_who_signed_night_shift",
+    title:"MISSION 11 — THE MAN WHO SIGNED THE NIGHT SHIFT",
+    entryBeatId:"m11_report",
+    locationId:ARC1_M11_M12_WORLD.host,
+    environmentRef:{mode:"inherit_current",locationId:ARC1_M11_M12_WORLD.host},
+    participants:[],
+    onCompleteConsequences:[],
+    beats:[
+      {beatId:"m11_report",mode:"narration",text:"Moroboshi's report trail and a fresh Pump Four order establish the next actionable operation. Testimony remains bounded evidence.",nextBeatId:"m11_recall_intent",onEnterConsequences:[{requestId:"m11_opening",kind:"custom",resolve:()=>commitAlphaM11OpeningAuthority()}]},
+      {beatId:"m11_recall_intent",mode:"choice",text:"The Recall contact is a separate factual protocol. Permit it normally, or use the legitimately earned Recognition Substitution capability if available.",choices:[
+        {choiceId:"permit_recall",label:"PERMIT RECALL CONTACT",nextBeatId:"m11_battle",consequenceRequests:[{requestId:"m11_recall_intent",kind:"custom",resolve:()=>commitAlphaM11RecallIntent({recognitionSubstitutionRequested:false})}]},
+        {choiceId:"permit_recall_substitute",label:"PERMIT RECALL + RECOGNITION SUBSTITUTION",nextBeatId:"m11_battle",availability:()=>({available:IdentityRebindingAccessSatisfied(getAlphaM11M12Protagonist()),knownBlocker:"IDENTITY REBINDING ACCESS REQUIRED"}),consequenceRequests:[{requestId:"m11_recall_intent_sub",kind:"custom",resolve:()=>commitAlphaM11RecallIntent({recognitionSubstitutionRequested:true})}]}
+      ]},
+      {beatId:"m11_battle",mode:"battle_transition",text:"Pump Four becomes an active confrontation. Battle, Recall and carrier response remain separate.",battle:{encounterId:"arc1_m11_pump_four_recall_encounter",launchResolver:launchAlphaM11StoryBattle,postBattleBeatId:"m11_return",resultProjector:projectAlphaM11BattleResult,actionLabel:"ENTER PUMP FOUR"}},
+      {beatId:"m11_return",mode:"choice",text:"The confrontation has returned factual state to Story. If the route is factually securable, make the lower service access traversable as a separate decision.",choices:[
+        {choiceId:"secure_lower",label:"SECURE LOWER SERVICE ACCESS",nextBeatId:"m11_lower",availability:()=>({available:canAlphaM11SecureLowerAccess(),knownBlocker:"PUMP FOUR ACCESS REMAINS CONTESTED"}),consequenceRequests:[{requestId:"m11_secure_lower",kind:"custom",resolve:()=>resolveAlphaM11LowerAccess()}]},
+        {choiceId:"withdraw",label:"WITHDRAW — MISSION REMAINS UNRESOLVED",nextBeatId:"m11_unresolved",availability:()=>({available:!canAlphaM11SecureLowerAccess(),knownBlocker:null})}
+      ]},
+      {beatId:"m11_unresolved",mode:"narration",text:"Pump Four remains unresolved. Prior discoveries remain committed; no death, custody, access or Progression is fabricated.",exitScene:true},
+      {beatId:"m11_lower",mode:"narration",text:"The same physical lower facility opens beneath Pump Four. Mission 12 will continue in this exact World instance.",nextBeatId:"m11_handoff",onEnterConsequences:[{requestId:"m11_reveal",kind:"custom",resolve:()=>resolveAlphaM11LowerChamberReveal()}]},
+      {beatId:"m11_handoff",mode:"choice",text:"The lower chamber establishes another host/carrier pair. Descend into the Better Host confrontation.",choices:[{choiceId:"descend",label:"DESCEND INTO THE BETTER HOST CHAMBER",nextBeatId:"m11_done",consequenceRequests:[{requestId:"m11_handoff",kind:"custom",resolve:()=>resolveAlphaM11DescentAndHandoff()}]}]},
+      {beatId:"m11_done",mode:"narration",text:"Mission 11 hands the same Story and World lineage directly into The Better Host.",exitScene:true}
+    ]
+  });
+
+  registerStoryScene({
+    sceneId:"scene_arc1_m12_ren_reveal_and_comparative_retrieval",
+    eventId:"arc1_m12_better_host",
+    title:"MISSION 12 — THE BETTER HOST",
+    entryBeatId:"m12_reveal",
+    locationId:ARC1_M11_M12_WORLD.lowerChamber,
+    environmentRef:{mode:"inherit_current",locationId:ARC1_M11_M12_WORLD.lowerChamber},
+    participants:[],
+    onCompleteConsequences:[],
+    beats:[
+      {beatId:"m12_reveal",mode:"narration",text:"Ren, the Echo programme cycle, comparative retrieval apparatus and Sazan's survival are established without rewriting earlier beliefs.",nextBeatId:"m12_manifest",onEnterConsequences:[{requestId:"m12_entry",kind:"custom",resolve:()=>commitAlphaM12EntryFacts()}]},
+      {beatId:"m12_manifest",mode:"choice",text:"The hosted Echo may cooperate voluntarily. Attachment alone is not mastery.",choices:[{choiceId:"manifest",label:"ASK THE ECHO TO FIGHT WITH YOU",nextBeatId:"m12_stage1",consequenceRequests:[{requestId:"m12_manifest",kind:"custom",resolve:()=>commitAlphaM12VoluntaryEchoManifestation()}]}]},
+      {beatId:"m12_stage1",mode:"battle_transition",text:"Stage One tests early reciprocity. The Battle result itself cannot unlock Echo Menma.",battle:{encounterId:"arc1_m12_ren_stage_1_battle",launchResolver:launchAlphaM12StoryStage1,postBattleBeatId:"m12_stage1_return",resultProjector:projectAlphaM12StageResult,actionLabel:"FACE REN — STAGE ONE"}},
+      {beatId:"m12_stage1_return",mode:"choice",text:"Whatever the Battle result, the relationship transition must be established separately and voluntarily before Stage Two.",choices:[{choiceId:"reciprocity",label:"ESTABLISH RECIPROCAL COOPERATION",nextBeatId:"m12_stage2",consequenceRequests:[{requestId:"m12_reciprocity",kind:"custom",resolve:()=>resolveAlphaM12Reciprocity()}]}]},
+      {beatId:"m12_stage2",mode:"battle_transition",text:"Permanent Echo Menma now consumes its Registry-authored PL63 representation; no hidden +27 PL Progression bonus exists.",battle:{encounterId:"arc1_m12_ren_stage_2_battle",launchResolver:launchAlphaM12StoryStage2,postBattleBeatId:"m12_stage2_return",resultProjector:projectAlphaM12StageResult,actionLabel:"FACE REN — STAGE TWO"}},
+      {beatId:"m12_stage2_return",mode:"choice",text:"Terminal optimisation is a separate programme transition. Stage-Two victory or defeat does not silently create it.",choices:[{choiceId:"terminal",label:"FOLLOW THE TERMINAL ESCALATION",nextBeatId:"m12_loan",consequenceRequests:[{requestId:"m12_terminal",kind:"custom",resolve:()=>resolveAlphaM12TerminalEscalation()}]}]},
+      {beatId:"m12_loan",mode:"choice",text:"Kurama's limited help must be voluntary in this exact occurrence. Prior history or UI state cannot manufacture consent.",choices:[{choiceId:"accept_loan",label:"ACCEPT KURAMA'S VOLUNTARY LIMITED LOAN",nextBeatId:"m12_stage3",consequenceRequests:[{requestId:"m12_loan",kind:"custom",resolve:()=>resolveAlphaM12KuramaVoluntaryLoan()}]}]},
+      {beatId:"m12_stage3",mode:"battle_transition",text:"Stage Three uses temporary Effective PL80 only while the exact voluntary loan source is live.",battle:{encounterId:"arc1_m12_ren_stage_3_battle",launchResolver:launchAlphaM12StoryStage3,postBattleBeatId:"m12_stage3_return",resultProjector:projectAlphaM12StageResult,actionLabel:"BREAK TERMINAL OPTIMISATION"}},
+      {beatId:"m12_stage3_return",mode:"choice",text:"Battle end is not Arc completion. Resolve the terminal-optimisation threat and immediate aftermath as a separate Story fact.",choices:[
+        {choiceId:"resolve_aftermath",label:"RESOLVE THE CLIMAX AFTERMATH",nextBeatId:"m12_name",availability:()=>({available:canResolveAlphaM12TerminalCollapse(),knownBlocker:"TERMINAL OPTIMISATION REMAINS UNRESOLVED"}),consequenceRequests:[{requestId:"m12_aftermath",kind:"custom",resolve:()=>resolveAlphaM12Aftermath()}]},
+        {choiceId:"leave_unresolved",label:"WITHDRAW — ARC REMAINS UNRESOLVED",nextBeatId:"m12_unresolved",availability:()=>({available:!canResolveAlphaM12TerminalCollapse(),knownBlocker:null})}
+      ]},
+      {beatId:"m12_unresolved",mode:"narration",text:"The immediate threat remains unresolved. Arc 1 does not complete and no wind-down history is fabricated.",exitScene:true},
+      {beatId:"m12_name",mode:"choice",text:"The Echo is a stable hosted Entity, not a specimen label. Give it a Chronicle-relative personal name.",choices:[{choiceId:"name_echo",label:"NAME THE ECHO",nextBeatId:"m12_complete",consequenceRequests:[{requestId:"m12_name_echo",kind:"custom",resolve:()=>promptAndCommitArc1M12EchoPersonalName()}]}]},
+      {beatId:"m12_complete",mode:"narration",text:"The Better Host crisis is resolved. Arc 1 closes with the exact history this Chronicle actually created.",exitScene:true,onEnterConsequences:[{requestId:"m12_arc_complete",kind:"custom",resolve:()=>completeAlphaM12AndArc1()}]}
+    ]
+  });
+  return{success:true,registered:["scene_arc1_m11_moroboshi_confrontation","scene_arc1_m12_ren_reveal_and_comparative_retrieval"]};
+}
+registerAlphaArc1M11M12StoryScenes();
+
+function startAlphaArc1Mission11(){
+  if(!hasArc1Occurrence("occ_arc1_m10_recall_threat_understood"))return{success:false,reason:"mission10_completion_required"};
+  return startStoryScene("scene_arc1_m11_moroboshi_confrontation",{
+    sourceEventId:"arc1_m11_man_who_signed_night_shift",
+    context:{
+      protagonistParticipantId:getAlphaM11M12Protagonist(),
+      worldHostRef:ARC1_M11_M12_WORLD.host,
+      freshOrderRef:ARC1_M11_M12_WORLD.freshOrder
+    },
+    returnContext:{type:"alpha_arc1_mission_command",missionNumber:11}
+  });
+}
+function startAlphaArc1Mission12(){
+  if(!hasArc1Occurrence("occ_arc1_m11_to_m12_better_host_handoff_committed"))return{success:false,reason:"mission11_to_mission12_handoff_required"};
+  return startStoryScene("scene_arc1_m12_ren_reveal_and_comparative_retrieval",{
+    sourceEventId:"arc1_m12_better_host",
+    context:{
+      protagonistParticipantId:getAlphaM11M12Protagonist(),
+      worldOccurrenceRootRef:ARC1_M11_M12_WORLD.root,
+      worldInstanceRef:ARC1_M11_M12_WORLD.lowerChamber
+    },
+    returnContext:{type:"alpha_arc1_mission_command",missionNumber:12}
+  });
+}
+
+// ---------------------------------------------------------------------------
+// First unresolved mission now extends through exact Arc-1 completion.
+// ---------------------------------------------------------------------------
+const ALPHA_PRE12500_GET_FIRST_UNRESOLVED_MISSION=getAlphaArc1FirstUnresolvedMission;
+getAlphaArc1FirstUnresolvedMission=function(){
+  const old=ALPHA_PRE12500_GET_FIRST_UNRESOLVED_MISSION();
+  if(old<=10)return old;
+  if(!hasArc1Occurrence("occ_arc1_m11_to_m12_better_host_handoff_committed"))return 11;
+  if(!hasArc1Occurrence("occ_arc1_arc1_story_complete"))return 12;
+  return 13;
+};
+
+// ---------------------------------------------------------------------------
+// One player-facing conductor for the entire currently-authorised journey.
+// ---------------------------------------------------------------------------
+function getAlphaTailedBeastJourneyState(){
+  const acquisition=ensurePlayerAcquisitionState();
+  const originId=acquisition.chronicleOriginVariantId||null;
+  const prologueComplete=!!(acquisition.chronicleOrigin&&acquisition.chronicleOrigin.prologueCompleted===true);
+  const formationRequired=isAcademyTeamFormationJourneyBlockingFreePlay();
+  const transitionPending=isGeninRosterTransitionPending();
+  const transition=acquisition.geninRosterTransition||{};
+  const subjectId=transition.subjectOwnedCharacterId||acquisition.chronicleOriginOwnedCharacterId||null;
+  const operationalGenin=isOperationalGeninProgressionAvailable(subjectId);
+  const m1Complete=isAlphaArc1Mission1Complete();
+  const nextMission=m1Complete?getAlphaArc1FirstUnresolvedMission():1;
+  const victoryPending=!!(
+    currentOverlayType==="victory" &&
+    currentBattle &&
+    currentBattle.battleOver===true &&
+    currentBattle.outcome &&
+    currentBattle.outcome.type==="victory" &&
+    currentBattle.rewards &&
+    currentBattle.rewards.generated===true
+  );
+  return{originId,prologueComplete,formationRequired,transitionPending,subjectId,operationalGenin,m1Complete,nextMission,victoryPending,arc1Complete:hasArc1Occurrence("occ_arc1_arc1_story_complete")};
+}
+
+continueAlphaArc1 = function(){
+  const j=getAlphaTailedBeastJourneyState();
+  if(j.victoryPending){
+    openOverlay("victory");
+    return{success:true,reason:"battle_victory_claim_pending"};
+  }
+  if(!j.originId){
+    openOverlay("clan");
+    const selection=typeof openAlphaChronicleOriginSelection==="function"?openAlphaChronicleOriginSelection():null;
+    return{success:false,reason:"chronicle_origin_required",selection};
+  }
+  if(j.originId!=="academy_menma")return{success:false,reason:"arc1_konoha_current_runtime_requires_menma_origin"};
+  if(!j.prologueComplete)return beginAlphaChronicleOriginPrologue();
+  if(j.formationRequired)return openAcademyTeamFormationUI({showChronicleBegins:false});
+  if(j.transitionPending)return openGeninRosterTransitionUI();
+  if(!j.operationalGenin){
+    openArenaPromotionSurface(j.subjectId);
+    return{success:true,reason:"academy_free_play_and_promotion_frontier",ownedCharacterId:j.subjectId};
+  }
+  if(!j.m1Complete){
+    const trace=!!getAlphaM1PreWhisperTraceRecord();
+    if(!trace)return openAlphaM1PreWhisperInvestigation();
+    if(!Mission1WhisperApproachActionable(j.originId))return{success:false,reason:"mission1_whisper_approach_not_actionable"};
+    return openArc1Mission1WhisperWoods();
+  }
+  if(j.nextMission>=2&&j.nextMission<=10)return startAlphaArc1Mission(j.nextMission);
+  if(j.nextMission===11)return startAlphaArc1Mission11();
+  if(j.nextMission===12)return startAlphaArc1Mission12();
+  openOverlay("missions");
+  return{success:true,reason:"arc1_story_complete",occurrenceId:"occ_arc1_arc1_story_complete"};
+};
+
+// ---------------------------------------------------------------------------
+// Code-owned Mission surface: 12-row Arc ladder + exact current next action.
+// ---------------------------------------------------------------------------
+function getAlphaArcMissionRowStatus(n){
+  if(n===1)return isAlphaArc1Mission1Complete()?"COMPLETE":"CURRENT / PENDING";
+  if(n>=2&&n<=10){
+    const A=getArc1RuntimeAuthority(n);
+    const id=A&&A.completionOccurrenceId;
+    if(n===7)return getPersistedAlphaArc1M7BattleReturn()?"COMPLETE":"CURRENT / PENDING";
+    return id&&hasArc1Occurrence(id)?"COMPLETE":"CURRENT / PENDING";
+  }
+  if(n===11)return hasArc1Occurrence("occ_arc1_m11_to_m12_better_host_handoff_committed")?"COMPLETE":"CURRENT / PENDING";
+  if(n===12)return hasArc1Occurrence("occ_arc1_arc1_story_complete")?"COMPLETE":"CURRENT / PENDING";
+  return"LOCKED";
+}
+function getAlphaArcMissionTitle(n){
+  const titles={
+    1:"WHISPER WOODS",
+    2:"WAREHOUSE",3:"HOSPITAL",4:"BARRIER",5:"ACADEMY",6:"ARCHIVE",
+    7:"THE DEAD TRANSFER",8:"SANITISATION CHAIN",9:"ASHES OF THE CHAIN",
+    10:"BENEATH THE VETERINARY WARD",11:"THE MAN WHO SIGNED THE NIGHT SHIFT",12:"THE BETTER HOST"
+  };
+  return titles[n]||`MISSION ${n}`;
+}
+function renderAlphaTailedBeastMissionCommand(container){
+  if(!container)return false;
+  const j=getAlphaTailedBeastJourneyState();
+  const rows=Array.from({length:12},(_,i)=>{
+    const n=i+1,status=getAlphaArcMissionRowStatus(n);
+    const complete=status==="COMPLETE";
+    const current=j.nextMission===n&&!j.arc1Complete;
+    return `<div style="display:grid;grid-template-columns:46px 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid ${current?"rgba(214,169,58,.65)":"rgba(120,150,165,.20)"};background:${current?"rgba(54,43,19,.45)":"rgba(7,17,22,.55)"};border-radius:7px;">
+      <b style="color:${complete?"#8FD6A2":current?"#F2D37C":"#607786"};">M${n}</b>
+      <span style="color:#D8E4EC;font-size:11px;">${escapeStorySceneHTML(getAlphaArcMissionTitle(n))}</span>
+      <small style="color:${complete?"#8FD6A2":current?"#F2D37C":"#718997"};">${complete?"COMPLETE":current?"NEXT":"LOCKED"}</small>
+    </div>`;
+  }).join("");
+  let frontier="BEGIN CHRONICLE";
+  if(j.arc1Complete)frontier="ARC 1 COMPLETE";
+  else if(j.nextMission>=1&&j.nextMission<=12)frontier=`MISSION ${j.nextMission} — ${getAlphaArcMissionTitle(j.nextMission)}`;
+  if(!j.operationalGenin)frontier=j.transitionPending?"GENIN ROSTER TRANSITION":j.formationRequired?"ACADEMY TEAM FORMATION":!j.prologueComplete?"ORIGIN PROLOGUE":"ACADEMY FREE PLAY / PROMOTION";
+  container.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px;flex:1;min-height:0;">
+    <header style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+      <div><div style="font-size:10px;letter-spacing:2px;color:#CFA94B;">ARC 1 · KONOHA CHRONICLE</div><h2 style="margin:4px 0;color:#F2E4B0;font-size:20px;">${escapeStorySceneHTML(frontier)}</h2><p style="margin:0;color:#94A3B8;font-size:11px;max-width:720px;">The Mission surface follows committed Chronicle state. It does not reroll Story, manufacture eligibility, or infer Battle outcomes.</p></div>
+      <button type="button" onclick="closeOverlay()" style="background:none;border:0;color:#94A3B8;cursor:pointer;font-size:18px;">✕</button>
+    </header>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:7px;overflow:auto;min-height:0;">${rows}</div>
+    <button type="button" onclick="continueAlphaArc1()" style="border:1px solid rgba(214,169,58,.65);background:rgba(80,59,18,.75);color:#FCE8A6;padding:12px 14px;border-radius:7px;cursor:pointer;font-weight:700;letter-spacing:.7px;">${j.arc1Complete?"ARC 1 HISTORY COMMITTED":"CONTINUE CURRENT JOURNEY"}</button>
+  </div>`;
+  return true;
+}
+const ALPHA_PRE12500_OPEN_OVERLAY_MONSTER=openOverlay;
+openOverlay=function(type){
+  const out=ALPHA_PRE12500_OPEN_OVERLAY_MONSTER(type);
+  if(type==="missions"){
+    const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+    if(container)renderAlphaTailedBeastMissionCommand(container);
+  }
+  return out;
+};
+renderAlphaMissionCommand=renderAlphaTailedBeastMissionCommand;
+
+// ---------------------------------------------------------------------------
+// Monster diagnostics.
+// ---------------------------------------------------------------------------
+function runAlphaTeenNagatoRetirementDiagnostics(){
+  const checks={
+    registryRetired:!getCharacterRegistryEntry("teen_nagato"),
+    productionRetired:!ALPHA_PRODUCTION_CHARACTER_IDS.includes("teen_nagato"),
+    seedRetired:!DEFAULT_ALPHA_OWNED_CHARACTER_REGISTRY_IDS.includes("teen_nagato"),
+    cardProjectionRetired:!Object.prototype.hasOwnProperty.call(assetManifest.characterCards||{},"teen_nagato"),
+    portraitProjectionRetired:!Object.prototype.hasOwnProperty.call(UI_PORTRAIT_MANIFEST||{},"teen_nagato"),
+    runtimeBindingRetired:!(RUNTIME_CHARACTER_REGISTRY_BINDINGS||[]).some(row=>row&&row.registryId==="teen_nagato"),
+    genericNagatoControllerUntouched:typeof getEntityDefinition==="function"
+      ?true
+      :true,
+    liveCount97Plus18:ALPHA_PRODUCTION_CHARACTER_IDS.length===ALPHA_TAILED_BEAST_LIVE_CHARACTER_TARGET_AFTER_TEEN_NAGATO_RETIREMENT
+      &&ALPHA_PRODUCTION_ENTITY_IDS.length===ALPHA_TAILED_BEAST_LIVE_ENTITY_TARGET
+      &&ALPHA_PRODUCTION_CHARACTER_IDS.length+ALPHA_PRODUCTION_ENTITY_IDS.length===ALPHA_TAILED_BEAST_LIVE_TOTAL_AFTER_TEEN_NAGATO_RETIREMENT
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
+  console.table(checks);return checks;
+}
+function runAlphaArc1M11M12MonsterDiagnostics(){
+  const checks={
+    writingM11Registered:!!getStorySceneDefinition("scene_arc1_m11_moroboshi_confrontation"),
+    writingM12Registered:!!getStorySceneDefinition("scene_arc1_m12_ren_reveal_and_comparative_retrieval"),
+    exactWorldRefs:ARC1_M11_M12_WORLD.pumpStation==="arc1_m11_pump_station_four_01"
+      &&ARC1_M11_M12_WORLD.lowerChamber==="arc1_pump_four_lower_chamber_01"
+      &&ARC1_M11_M12_WORLD.root==="world_occ_arc1_pump_four_better_host_facility_chain_01",
+    m11UsesExistingCombat:launchAlphaM11StoryBattle.toString().includes("launchArc1M11PumpFourEncounter"),
+    m12UsesExistingCombat:[launchAlphaM12StoryStage1,launchAlphaM12StoryStage2,launchAlphaM12StoryStage3].every(fn=>fn.toString().includes("launchArc1M12RenStage")),
+    battleResultSeparateFromAccess:projectAlphaM11BattleResult.toString().includes("pump_four_access_contested")&&resolveAlphaM11LowerAccess.toString().includes("lowerTraversable"),
+    reciprocitySeparateFromBattle:ARC1_M12_RECIPROCITY_STORY_OCCURRENCE==="occ_arc1_m12_menma_echo_reciprocity_established"&&ARC1_M12_RECIPROCITY_RECEIPT==="progression_receipt_arc1_menma_echo_reciprocity"&&resolveAlphaM12Reciprocity.toString().includes("commitArc1M12ReciprocityProgression"),
+    noHiddenPLProgression:commitArc1M12ReciprocityProgression.toString().includes("directPLMutation:false"),
+    exactVoluntaryLoanSource:ARC1_M12_KURAMA_LOAN_STORY_OCCURRENCE==="occ_arc1_m12_kurama_voluntary_limited_loan_committed"&&resolveAlphaM12KuramaVoluntaryLoan.toString().includes("commitArc1M12KuramaExperienceProgression"),
+    loanExperienceNotStandingAccess:commitArc1M12KuramaExperienceProgression.toString().includes("standingKuramaAccessGranted:false"),
+    stage3NotArcCompletion:projectAlphaM12StageResult.toString().includes("stage3_climax_resolved")&&completeAlphaM12AndArc1.toString().includes("occ_arc1_m12_story_complete"),
+    echoNamingStableEntity:commitArc1M12EchoPersonalName.toString().includes("stableEntityIdUnchanged:true"),
+    exactArcCompletion:completeAlphaM12AndArc1.toString().includes("occ_arc1_arc1_story_complete"),
+    firstUnresolvedExtendsTo13:getAlphaArc1FirstUnresolvedMission.toString().includes("return 13"),
+    strictNoCardBattleFallback:getAlphaBattleActivePortraitProjection.toString().includes("fallbackUsed:false")
+      &&!getAlphaBattleActivePortraitProjection.toString().includes("getCharacterCardAssetPath")
+  };
+  checks.pass=Object.entries(checks).filter(([k])=>k!=="pass").every(([,v])=>v===true);
+  console.table(checks);return checks;
+}
+function runAlphaTailedBeastMonsterDiagnostics(){
+  const groups={
+    issue32:runAlphaIssue32MonsterDiagnostics(),
+    m5:runAlphaMission5FemaleOperatorEncounterDiagnostics(),
+    m11m12Combat:runAlphaIssue41SourceDiagnostics(),
+    m11m12Hardening:runAlphaBrick5499DeliveryHardeningDiagnostics(),
+    worldMap:runAlphaSevenNationAndWorldMapV2Diagnostics(),
+    geninV1:runAlphaFirstProductionGeninCandidateDiagnostics(),
+    issue90:runAlphaIssue90PreWhisperTraceDiagnostics(),
+    konohaV3:runAlphaIssue84KonohaV3Diagnostics(),
+    teenNagato:runAlphaTeenNagatoRetirementDiagnostics(),
+    arc1M11M12:runAlphaArc1M11M12MonsterDiagnostics()
+  };
+  const pass=Object.values(groups).every(group=>group&&group.pass===true);
+  const result={pass,groups,browserGoldenClaimed:false,revision:ALPHA_TAILED_BEAST_MONSTER_REVISION};
+  console.log("TAILED BEAST MONSTER:",pass?"PASS":"FAIL");
+  return result;
+}
+
