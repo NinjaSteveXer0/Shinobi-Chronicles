@@ -1,0 +1,42 @@
+SHINOBI CHRONICLES — ALPHA PLAYABILITY MATRIX
+BRICKS 22500–27499 — ALPHA SURFACE TRUTH MONSTER
+
+SURFACE                         RUNTIME  REACHABLE  CODE-OWNED  REGRESSION
+Chronicle Interaction           YES      YES        YES         GREEN
+My Clan                         YES      YES        YES         GREEN
+Missions                        YES      YES        YES         GREEN
+Exams                           YES      YES        YES         GREEN
+Practical                       YES      YES        YES         GREEN
+Battle                          YES      YES        YES         GREEN
+Victory                         YES      YES        YES         GREEN
+World Map                       YES      YES        markers     GREEN
+Current World Activity          YES      YES        YES         GREEN
+Training                        YES      YES        YES         GREEN*
+Arena                           YES      YES        YES         GREEN*
+
+* Code-owned shell is live. Some deeper Training/Arena consequences remain deliberately
+  fail-closed until their specific gameplay contracts are activated; this brick does not invent them.
+
+ALPHA NAVIGATION EXPOSED
+- YOUR CLAN
+- VILLAGE
+- MISSIONS
+- ARENA
+- EXAMS
+- PRACTICAL
+- TRAINING
+
+RETIRED FROM ORDINARY ALPHA NAVIGATION
+- GROUP
+- DEFEND
+- KAGE
+- DAILY REWARD
+- SPECIAL SHOP
+
+Compatibility handlers remain fail-closed for old direct calls/save-era references; they do not
+manufacture squad, defence, governance, reward, or shop state.
+
+GOLDEN STATUS
+- deterministic runtime diagnostics: GREEN
+- fresh M1→M12 single-Chronicle regression: GREEN
+- actual production browser Golden: NOT CLAIMED

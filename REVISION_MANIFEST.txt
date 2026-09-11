@@ -1,116 +1,91 @@
-SHINOBI CHRONICLES — BRICKS 12500–22499
-TAILED BEAST / MEGA KAGE / MOON DESTROYER MONSTER
+SHINOBI CHRONICLES — BRICKS 22500–27499
+ALPHA SURFACE TRUTH MONSTER
 Generated: 2026-09-11
 Owner: Coding / Runtime
 
-STATUS
-- IMPLEMENTED IN THIS DELIVERY PACKAGE: YES
-- SOURCE/HEADLESS RUNTIME VALIDATED: YES
-- FRESH SINGLE-CHAIN ARC 1 M1→M12 VALIDATED: YES
-- PRODUCTION BROWSER GOLDEN: NOT CLAIMED
-- GITHUB RUNTIME SOURCE COMMIT FOR THIS PACKAGE: NOT YET CREATED
+DESIGN LOCK
+- Code owns gameplay interaction/state.
+- Artwork/background masters are optional atmosphere/presentation enhancement.
+- A missing decorative master must not make an authorised gameplay surface disappear.
+- Every visible Alpha control must be real, state-locked, or absent.
+- Presentation refresh never commits semantic history.
 
 LIVE BASELINE CONSUMED
-- GitHub main checked immediately before freeze: ef15f7f298772461bf381a34f2e3c621a487633c
-- baseline game.js Git blob: e74a10f8a36da08ee8ead31f0ee1d485e9dba593
-- baseline local package: BRICKS 12300–12499
-- style.css and index.html remain byte-identical to BRICKS 12300–12499.
-
-UPSTREAM DURABLE AUTHORITY CONSUMED
-- Writing M11/M12 machine-addressable Story contract:
-  Documentation/Story/Arc1_Missions11-12_Machine_Addressable_Story_Runtime_Contract_2026-09-11.md
-  commit 59b18d8717b921839d1c6df8e84a820c6ac064a5
-- World M11/M12 Pump Four / Better Host bindings:
-  Documentation/World/Arc 1 Missions 11-12 Pump Four Better Host World Source Object Location Binding Contract 2026-09-11.md
-  commit ef15f7f298772461bf381a34f2e3c621a487633c
-- Combat M11/M12 closure:
-  Documentation/SC_Combat_Arc1_Mission11_12_Battle_Closure_2026-09-09.md
-  commit f474788cb553980e0dec6760ac747871a42de3c2
-- Registry / PL M11/M12 ratification:
-  Documentation/Registry/Arc 1 Echo Mission 11 12 Registry and PL Ratification.md
-  commit 074ad7bd2f3435e7e88dd1d04f1ee45867a4fefe
-- Progression Echo reciprocity / Kurama repeatability:
-  Documentation/Progression/Arc 1 Echo Reciprocity and Kurama Repeatability Progression Contract 2026-09-10.md
-  commit 28a402c40704b9f32b82bf4c8057c77a130926c0
-- Teen Nagato retirement source commit:
-  02bbed2c3fc14aca822acdc8accb7f6350cb3b04
+- Runtime monster commit on main: ee14b9b9350d9d5366f73e94766c2059858b3a71 (12500-22499)
+- Latest checked main after monster: 2f32f9962266ffbd31fa35f085a8893e1ab7f31a
+- Commits after runtime monster were merge/documentation only; no runtime-file mutation was consumed.
+- Previous game.js SHA-256: 0f607ce887b29a42f35d8b08118b993b24741c76553d2e48bcf7d991117916ca
 
 PRIMARY IMPLEMENTATION
-1. Arc 1 runtime frontier extended through Mission 12 and exact Arc-1 completion.
-2. Mission 11 Story → Pump Four World context → existing Combat → same Story return.
-3. Battle result / Recall result / carrier response / access resolution remain separate.
-4. Same Pump Four lower-facility World instance persists M11→M12.
-5. Mission 12 Stage 1 / Stage 2 / Stage 3 callers use existing Ren Battle packages.
-6. Echo reciprocity commits separately from Battle and gates permanent Echo Menma eligibility.
-7. Echo Menma consumes Registry-authored Base PL63; no hidden +27 PL mutation.
-8. Voluntary Kurama loan requires exact Story source occurrence.
-9. Temporary Stage-3 projection reaches authored Effective PL80 only while the loan is live.
-10. Stage-3 cleanup removes temporary Kurama package while preserving legitimate historical experience only.
-11. Echo personal naming seam persists Chronicle-relative name without changing stable Entity ID.
-12. Exact Mission-12 completion and occ_arc1_arc1_story_complete are separate from Stage-3 Battle end.
-13. Mission surface / conductor now runs 12-row Arc-1 frontier and resolves to mission frontier 13 after completion.
-14. Teen Nagato retired from live Registry/production/default ownership/card/portrait/runtime binding/Skill-owner projection while generic Nagato semantics remain untouched.
-15. Battle portrait authority remains strict: missing portrait fails visibly; collectible-card fallback is not silently substituted.
-16. #32 diagnostics are wrapper/delegate-aware rather than producing stale false negatives.
-17. M1→M2 fresh-chain blocker fixed: Mission-1 completion derives from the factual major-contact resolution already authored by M1, rather than depending on a nonexistent fabricated Story-completion occurrence ID.
+1. Alpha-facing UI master art defaults OFF for My Clan, Chronicle Interaction, Arena and Training family.
+2. Header navigation reduced to seven truthful routes:
+   YOUR CLAN / VILLAGE / MISSIONS / ARENA / EXAMS / PRACTICAL / TRAINING.
+3. GROUP / DEFEND / KAGE removed from ordinary navigation.
+4. Daily Reward and Special Shop removed from ordinary Alpha Quick Links.
+5. Quick Links now expose Continue Chronicle, Current World Activity and Shinobi Record.
+6. HUD values now derive from runtime state instead of baked/demo values:
+   Ryō / formal Rank / Chronicle frontier.
+7. Current World Activity is a read-only observer-safe projection over committed World opportunity state.
+   Opening/refeshing it commits no event/history and rerolls nothing.
+8. Legacy placeholder routes remain compatibility-only and fail closed without manufacturing state.
+9. Victory is fully code-owned: opponent portrait authority, rewards, MVP/final strike receipt,
+   explicit CLAIM then CONTINUE discipline; no baked Victory master dependency.
+10. Victory overlay cannot be dismissed around reward claim/Story return with generic close.
+11. Missions is a fully code-owned 12-row journey conductor over the current Chronicle frontier.
+12. Existing Exams / Practical / Battle code-owned surfaces remain authoritative and unchanged semantically.
+13. Strict uiPortrait authority remains: missing portraits fail visibly; collectible-card art is not automatic fallback.
+14. World Map v2 runtime projection and zero-leak locked-secret rules remain GREEN.
+15. #32 wrapper/delegate-aware Chronicle Interaction + My Clan regressions remain GREEN.
 
-IMPORTANT SEMANTIC NON-COLLAPSES PRESERVED
-- Battle victory != Mission completion.
-- Battle defeat != death/injury/custody automatically.
-- Battle victory != Recall success.
-- Recall result != carrier obedience.
-- Story occurrence != World occurrence != Battle occurrence.
-- testimony != World Truth.
-- protagonist intent != party-wide command.
-- physical/team presence != Battle participation.
-- reciprocal cooperation != fusion/ownership/mastery.
-- temporary Kurama loan != persistent Kurama Access.
-- representation unlock != hidden PL mutation.
-- collectibleCard != uiPortrait.
-- map geometry != semantic World identity.
-- Stage-3 Battle end != Mission-12 completion != Arc-1 completion.
+EXPLICIT NON-GOALS / FAIL-CLOSED AREAS
+- This brick does not invent Group/squad semantics, Village Defence, Kage governance, Daily Reward economics,
+  Special Shop inventory/economy, or unsupported Training consequences.
+- Weapons Training / Sparring / Mentorship deeper consequence implementations remain separate authorised work.
+- Genin v2 25-row activation remains blocked on its active Assets→Combat→CE sequence; v1 remains production authority.
+- Land of Fire standing-event geometry is not rebound to stale Fire (10) coordinates here.
+- Arc 2 documentation landed after the runtime monster, but this brick does not invent new Arc-2 runtime authority.
 
-FINAL VALIDATION
+VALIDATION
 - node --check game.js: PASS
-- runAlphaTailedBeastMonsterDiagnostics(): PASS
-  - #32: PASS
-  - Mission 5: PASS
-  - M11/M12 Combat source package: PASS
-  - M11/M12 hardening: PASS
-  - World Map v2: PASS
-  - Genin v1: PASS
-  - #90 pre-Whisper producer: PASS
-  - #84 Konoha v3: PASS
-  - Teen Nagato retirement: PASS
-  - M11/M12 Story/World/Progression integration: PASS
-- live production diagnostic count after Teen Nagato retirement: 97 Characters + 18 Entities = 115
+- runAlphaSurfaceTruthMonsterDiagnostics(): PASS
+  - prior BRICKS 12500–22499 Tailed Beast monster: PASS
+  - Issue #32 monster regression: PASS
+  - World Map v2 regression: PASS
+  - Exams/Practical code-owned surface regression: PASS
+  - Battle presentation regression: PASS
+  - truthful primary route list: PASS
+  - World Activity observer-safe/read-only source checks: PASS
+  - Victory code-owned / strict portrait / explicit-exit checks: PASS
+  - Mission conductor code-owned checks: PASS
+  - runtime HUD source checks: PASS
+  - no collectible-card Battle portrait fallback: PASS
 - FULL_FRESH_ARC1_M1_TO_M12_PASS: PASS
   - M1 through M12 all true
-  - real M5 Battle seam exercised
-  - real M7 Battle seam exercised
-  - real M11 Battle seam exercised
-  - all three real M12 Ren Battle seams exercised
-  - Arc 1 complete = true
-  - next mission frontier = 13
-  - Echo personal name persisted = Kageko
-  - reciprocity = true
-  - coordinated Kurama-loan history = true
-  - temporary Kurama package cleaned = true
+  - Arc 1 completion occurrence true
+  - next mission frontier 13
+  - Echo personal name persisted
+  - reciprocity true
+  - coordinated Kurama-loan history true
+  - temporary Kurama package cleaned true
+- static DOM/navigation probe: PASS
+  - exactly seven data-alpha-route navigation controls
+  - runtime HUD IDs present
+  - Daily Reward / Special Shop / GROUP / DEFEND / KAGE absent from player-facing HTML
+- live production population after Teen Nagato retirement: 97 Characters + 18 Entities = 115
+
+BROWSER STATUS
+- Production browser Golden is NOT CLAIMED.
+- This container's Chromium process hangs before DOM dump even on the targeted probe and was terminated by timeout.
+- The failure is browser-environment infrastructure, not treated as game PASS or game FAIL.
+- Stephen's installed-browser smoke/Golden remains required before closing browser-dependent issues.
 
 FILE HASHES
-- game.js SHA-256: 0f607ce887b29a42f35d8b08118b993b24741c76553d2e48bcf7d991117916ca
-- game.js Git blob: 2cd609833cf390c647a55e62e2c4b602f805d9e0
-- style.css SHA-256: 4f251349e9b24c865bcd19394d8f2b5822a1fefba6e431dc11cf00cae79da1e7
-- index.html SHA-256: 8db4699e4a514ccfcfa6a53565a0f278f76dd49a2cbf8d3a2a89052a058a33b4
-
-LIMITS / GOLDEN STATUS
-- This delivery has source/headless runtime proof and a deterministic full M1→M12 Chronicle-chain proof.
-- Production browser Golden is NOT claimed.
-- Human installed-browser playthrough remains the next validation layer.
-- Current GitHub runtime source still points to the pre-package game.js blob until this package is installed/committed; do not treat package generation alone as a GitHub implementation commit.
+- game.js SHA-256: 705764af89914dcc65a5f7fb81b437715acbb917047efca16b9b7b27195cc430
+- style.css SHA-256: d0414c2fa8294315b818032a87f36c7bb7edbd0bfc7ed99aa9d3df36824296fe
+- index.html SHA-256: 35415974fd46135fcf0f943aafb8121c169549ea3068d65d736cd066f4f4de13
 
 INSTALL
 1. UNBLOCK THE ZIP BEFORE EXTRACTION.
-2. Replace repository-root game.js, style.css and index.html with the files in this package.
-3. Keep revision_manifest.txt as delivery evidence.
-4. Launch a fresh Chronicle and validate the player-facing M1→M12 flow in the installed browser.
+2. Replace root game.js, style.css, index.html with the files in this package.
+3. Keep revision_manifest.txt and ALPHA_PLAYABILITY_MATRIX.txt as delivery evidence.
+4. Commit the replacements to GitHub before treating this brick as durable production authority.

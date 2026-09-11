@@ -18937,3 +18937,334 @@ body {
 .alpha-map-calibration-on .konoha-v3-anchor.is-known-unknown .village-golden-halo-ring {
   animation: none;
 }
+
+
+/* ========================================================================== 
+   BRICKS 22500–27499 — ALPHA SURFACE TRUTH MONSTER
+   Code owns the interface. Artwork is optional atmosphere only.
+   ========================================================================== */
+
+/* ---------- Header / navigation truth ---------- */
+.header-nav-tabs{
+  min-width:0;
+  gap:clamp(3px,.42vw,7px);
+}
+.header-nav-tabs .nav-btn{
+  min-width:0;
+  padding-inline:clamp(7px,.72vw,13px);
+  transition:color 140ms ease,border-color 140ms ease,background 140ms ease,box-shadow 140ms ease;
+}
+.header-nav-tabs .nav-btn.active{
+  color:#f2d47e;
+  border-color:rgba(215,174,72,.74);
+  background:linear-gradient(180deg,rgba(72,55,20,.54),rgba(8,15,20,.82));
+  box-shadow:inset 0 -2px 0 rgba(218,176,74,.62),0 0 12px rgba(218,176,74,.08);
+}
+.header-right{
+  gap:clamp(7px,.65vw,12px);
+}
+.header-right .currency-display{
+  min-width:max-content;
+}
+#hud-arc{
+  color:#8fe1e7;
+}
+
+/* ---------- All optional-master Alpha surfaces default to their coded shell ---------- */
+.sc-chronicle-stage.is-master-art-off,
+.my-clan-stage.is-master-art-off,
+.alpha-arena-master-screen.is-master-art-off .alpha-arena-master-stage,
+.alpha-training-master-screen.is-master-art-off .alpha-training-master-stage{
+  background:
+    radial-gradient(circle at 76% 18%,rgba(20,110,124,.12),transparent 34%),
+    radial-gradient(circle at 17% 78%,rgba(186,145,54,.10),transparent 33%),
+    linear-gradient(145deg,#071018 0%,#08131a 44%,#04090d 100%);
+}
+.sc-chronicle-stage.is-master-art-off,
+.my-clan-stage.is-master-art-off{
+  box-shadow:inset 0 0 0 1px rgba(170,139,65,.18),inset 0 0 70px rgba(0,0,0,.40);
+}
+.sc-chronicle-stage.is-master-art-off .sc-chronicle-layout{
+  padding:clamp(22px,3.4vw,58px);
+}
+.sc-chronicle-stage.is-master-art-off .sc-story-panel{
+  border:1px solid rgba(115,175,187,.30);
+  background:linear-gradient(180deg,rgba(7,17,24,.94),rgba(4,10,15,.97));
+  box-shadow:0 22px 70px rgba(0,0,0,.46),inset 0 0 0 1px rgba(220,181,80,.04);
+}
+.sc-chronicle-stage.is-master-art-off .sc-chronicle-context{
+  border:1px solid rgba(188,151,67,.28);
+  background:rgba(5,12,17,.86);
+}
+.my-clan-stage.is-master-art-off .my-clan-fallback-title{
+  color:#d9bd72;
+}
+
+/* ---------- Victory: fully code-owned ---------- */
+.screen-overlay.alpha-victory-open .overlay-close-btn{
+  display:none !important;
+}
+.alpha-victory-code-screen{
+  flex:1;
+  min-height:0;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr) auto;
+  overflow:hidden;
+  border:1px solid rgba(196,156,65,.34);
+  background:
+    radial-gradient(circle at 50% 5%,rgba(214,169,58,.12),transparent 34%),
+    linear-gradient(160deg,#071018 0%,#08131a 48%,#04080c 100%);
+  color:#dbe7ea;
+  box-shadow:inset 0 0 90px rgba(0,0,0,.42);
+}
+.alpha-victory-code-screen.is-error{
+  place-items:center;
+  color:#f39a8f;
+}
+.alpha-victory-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:20px;
+  padding:clamp(18px,2vw,30px) clamp(20px,2.6vw,42px);
+  border-bottom:1px solid rgba(198,159,70,.22);
+  background:linear-gradient(90deg,rgba(37,29,13,.52),rgba(4,12,17,.18));
+}
+.alpha-victory-header span,
+.alpha-victory-opponent>span,
+.alpha-victory-chronicle>span{
+  color:#c7a653;
+  font-size:clamp(8px,.58vw,10px);
+  font-weight:900;
+  letter-spacing:.14em;
+}
+.alpha-victory-header h1{
+  margin:4px 0 5px;
+  color:#f2dc96;
+  font:900 clamp(30px,4vw,66px)/.95 Georgia,"Times New Roman",serif;
+  letter-spacing:.07em;
+}
+.alpha-victory-header p{
+  margin:0;
+  max-width:660px;
+  color:#81969d;
+  font-size:clamp(9px,.68vw,12px);
+}
+.alpha-victory-claim-state{
+  flex:0 0 auto;
+  padding:8px 11px;
+  border:1px solid rgba(112,139,148,.34);
+  background:rgba(4,10,14,.72);
+  color:#83949a;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.1em;
+}
+.alpha-victory-claim-state.is-claimed{
+  border-color:rgba(194,158,70,.58);
+  color:#e2c46e;
+}
+.alpha-victory-body{
+  min-height:0;
+  display:grid;
+  grid-template-columns:minmax(220px,.9fr) minmax(360px,1.55fr) minmax(230px,.9fr);
+  gap:clamp(14px,1.7vw,30px);
+  align-items:stretch;
+  padding:clamp(18px,2.5vw,40px);
+  overflow:auto;
+}
+.alpha-victory-opponent,
+.alpha-victory-rewards,
+.alpha-victory-chronicle{
+  min-width:0;
+  border:1px solid rgba(100,139,151,.22);
+  background:rgba(5,13,18,.72);
+  box-shadow:0 14px 42px rgba(0,0,0,.24);
+}
+.alpha-victory-opponent{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:18px;
+}
+.alpha-victory-portrait{
+  width:min(100%,260px);
+  aspect-ratio:1/1;
+  margin-bottom:16px;
+  overflow:hidden;
+  border:1px solid rgba(178,145,66,.32);
+  background:rgba(1,5,8,.82);
+}
+.alpha-victory-portrait img{
+  width:100%;height:100%;object-fit:cover;object-position:center top;display:block;
+}
+.alpha-victory-portrait-missing{
+  width:100%;height:100%;display:grid;place-items:center;padding:16px;
+  color:#bd8078;font-size:10px;font-weight:900;letter-spacing:.08em;text-align:center;
+}
+.alpha-victory-opponent h2{
+  margin:5px 0;
+  color:#e4d9bd;
+  font-size:clamp(18px,1.7vw,28px);
+  text-transform:uppercase;
+}
+.alpha-victory-opponent small{color:#637981;font-size:8px;letter-spacing:.07em;}
+.alpha-victory-rewards{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  grid-template-rows:auto minmax(0,1fr);
+  gap:12px;
+  padding:clamp(16px,1.8vw,26px);
+}
+.alpha-victory-metric{
+  min-height:110px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(194,158,70,.22);
+  background:linear-gradient(180deg,rgba(36,29,13,.44),rgba(4,11,15,.58));
+}
+.alpha-victory-metric span,
+.alpha-victory-list>span{
+  color:#7f9399;font-size:9px;font-weight:900;letter-spacing:.12em;
+}
+.alpha-victory-metric strong{
+  margin-top:6px;color:#f1e3ba;font-size:clamp(26px,3vw,50px);line-height:1;
+}
+.alpha-victory-list{
+  min-height:130px;
+  padding:14px;
+  border:1px solid rgba(94,135,146,.20);
+  background:rgba(3,9,13,.54);
+}
+.alpha-victory-list>div{display:flex;flex-direction:column;gap:6px;margin-top:12px;color:#cdd9d9;font-size:10px;}
+.alpha-victory-list.is-rare{border-color:rgba(194,158,70,.22);}
+.alpha-victory-list.is-rare>span{color:#c5a354;}
+.alpha-victory-list .is-empty{color:#566a72;}
+.alpha-victory-chronicle{padding:20px;}
+.alpha-victory-chronicle dl{margin:16px 0 0;display:grid;gap:9px;}
+.alpha-victory-chronicle dl div{padding:10px 0;border-bottom:1px solid rgba(111,144,151,.16);}
+.alpha-victory-chronicle dt{color:#63777e;font-size:8px;letter-spacing:.1em;}
+.alpha-victory-chronicle dd{margin:4px 0 0;color:#d9dfd8;font-size:11px;font-weight:800;overflow-wrap:anywhere;}
+.alpha-victory-footer{
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+  padding:14px clamp(20px,2.6vw,42px);
+  border-top:1px solid rgba(198,159,70,.22);
+  background:rgba(3,9,13,.76);
+}
+.alpha-victory-footer p{margin:0;color:#71868d;font-size:9px;max-width:720px;}
+.alpha-victory-footer .victory-continue{
+  opacity:1 !important;
+  animation:none !important;
+  min-width:190px;
+  padding:11px 18px;
+  border:1px solid rgba(218,177,72,.70);
+  background:linear-gradient(180deg,rgba(83,64,21,.96),rgba(36,27,11,.98));
+  color:#f0d47e;
+  font-size:10px;font-weight:900;letter-spacing:.09em;cursor:pointer;
+}
+
+/* ---------- Missions: code-owned journey conductor ---------- */
+.alpha-mission-code-screen{
+  flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;overflow:hidden;
+  border:1px solid rgba(184,146,61,.26);
+  background:
+    radial-gradient(circle at 85% 6%,rgba(23,116,128,.12),transparent 30%),
+    linear-gradient(150deg,#071018,#08131a 48%,#04090d);
+  color:#dce6e8;
+}
+.alpha-mission-code-screen>header{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:18px;
+  padding:20px clamp(22px,2.4vw,38px) 17px;border-bottom:1px solid rgba(188,149,62,.22);
+}
+.alpha-mission-code-screen>header span{color:#c9a854;font-size:9px;font-weight:900;letter-spacing:.15em;}
+.alpha-mission-code-screen>header h1{margin:5px 0 4px;color:#ebd99e;font:900 clamp(20px,2.1vw,34px)/1.05 Georgia,"Times New Roman",serif;}
+.alpha-mission-code-screen>header p{margin:0;color:#81959b;font-size:10px;}
+.alpha-mission-code-screen>header button{border:0;background:transparent;color:#768990;font-size:18px;cursor:pointer;}
+.alpha-mission-journey-strip{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  margin:0;background:rgba(90,119,127,.18);border-bottom:1px solid rgba(97,128,136,.18);
+}
+.alpha-mission-journey-strip>div{padding:10px 15px;background:rgba(5,12,17,.88);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.alpha-mission-journey-strip span{color:#60767d;font-size:8px;letter-spacing:.1em;}
+.alpha-mission-journey-strip strong{color:#bfcac8;font-size:9px;}
+.alpha-mission-code-screen>main{
+  min-height:0;overflow:auto;padding:clamp(16px,2vw,28px);
+  display:grid;grid-template-columns:repeat(2,minmax(280px,1fr));gap:9px;align-content:start;
+}
+.alpha-mission-row{
+  min-height:68px;display:grid;grid-template-columns:46px minmax(0,1fr) auto;align-items:center;gap:12px;
+  padding:10px 13px;border:1px solid rgba(100,137,147,.17);background:rgba(5,13,18,.60);
+}
+.alpha-mission-number{display:grid;place-items:center;width:38px;height:38px;border:1px solid rgba(102,137,146,.24);color:#627880;font-size:10px;font-weight:900;}
+.alpha-mission-row div{min-width:0;display:flex;flex-direction:column;gap:4px;}
+.alpha-mission-row div strong{color:#a8b6b9;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.alpha-mission-row div small{color:#536970;font-size:8px;}
+.alpha-mission-row>b{color:#52676e;font-size:8px;letter-spacing:.08em;}
+.alpha-mission-row.is-current{border-color:rgba(209,169,70,.62);background:linear-gradient(90deg,rgba(58,44,17,.52),rgba(6,16,21,.72));}
+.alpha-mission-row.is-current .alpha-mission-number,.alpha-mission-row.is-current>b{color:#e0bf68;border-color:rgba(209,169,70,.48);}
+.alpha-mission-row.is-current div strong{color:#eadcae;}
+.alpha-mission-row.is-complete{border-color:rgba(93,159,117,.24);}
+.alpha-mission-row.is-complete .alpha-mission-number,.alpha-mission-row.is-complete>b{color:#7bc18f;border-color:rgba(93,159,117,.30);}
+.alpha-mission-code-screen>footer{
+  display:flex;justify-content:space-between;align-items:center;gap:18px;
+  padding:13px clamp(22px,2.4vw,38px);border-top:1px solid rgba(188,149,62,.20);background:rgba(3,9,13,.75);
+}
+.alpha-mission-code-screen>footer>div{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.alpha-mission-code-screen>footer strong{color:#caa957;font-size:8px;letter-spacing:.1em;}
+.alpha-mission-code-screen>footer span{color:#748990;font-size:9px;}
+.alpha-mission-code-screen>footer button{
+  min-width:220px;padding:11px 16px;font-size:9px;font-weight:900;letter-spacing:.08em;cursor:pointer;
+  border:1px solid rgba(200,160,67,.55);background:rgba(60,46,17,.78);color:#e7cb76;
+}
+.alpha-mission-code-screen>footer button.is-teal{border-color:rgba(54,174,185,.48);background:rgba(10,53,60,.74);color:#8ce3e8;}
+.alpha-mission-code-screen>footer button.is-green{border-color:rgba(91,161,111,.48);background:rgba(18,59,31,.74);color:#91d3a4;}
+
+/* ---------- Current World Activity ---------- */
+.alpha-world-events-screen{
+  flex:1;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr);overflow:hidden;
+  border:1px solid rgba(100,143,153,.24);
+  background:linear-gradient(150deg,#071018,#071219 50%,#04090d);color:#dce5e7;
+}
+.alpha-world-events-screen>header{display:flex;justify-content:space-between;align-items:flex-start;gap:18px;padding:20px 28px;border-bottom:1px solid rgba(102,142,151,.20);}
+.alpha-world-events-screen>header span{color:#69c7d0;font-size:8px;font-weight:900;letter-spacing:.14em;}
+.alpha-world-events-screen>header h2{margin:5px 0 4px;color:#dfe6df;font-size:24px;}
+.alpha-world-events-screen>header p{margin:0;max-width:760px;color:#788d94;font-size:9px;}
+.alpha-world-events-screen>header button{border:0;background:transparent;color:#75888f;font-size:18px;cursor:pointer;}
+.alpha-world-events-summary{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid rgba(100,140,149,.16);}
+.alpha-world-events-summary>div{display:flex;align-items:center;justify-content:center;gap:8px;padding:9px;background:rgba(4,11,15,.72);border-right:1px solid rgba(100,140,149,.14);}
+.alpha-world-events-summary strong{color:#d4bd73;font-size:16px;}.alpha-world-events-summary span{color:#62777e;font-size:8px;letter-spacing:.08em;}
+.alpha-world-events-screen>main{min-height:0;overflow:auto;padding:20px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:10px;align-content:start;}
+.alpha-world-activity-card{min-height:180px;display:flex;flex-direction:column;padding:14px;border:1px solid rgba(94,133,143,.22);background:rgba(5,13,18,.70);}
+.alpha-world-activity-card.is-actionable{border-color:rgba(198,159,69,.42);box-shadow:inset 3px 0 0 rgba(198,159,69,.56);}
+.alpha-world-activity-meta{display:flex;justify-content:space-between;gap:10px;color:#657a81;font-size:7px;letter-spacing:.08em;}.alpha-world-activity-meta b{color:#c5a95f;}
+.alpha-world-activity-card h3{margin:9px 0 6px;color:#d9e0dc;font-size:14px;}.alpha-world-activity-card p{margin:0;flex:1;color:#71868d;font-size:9px;line-height:1.5;}
+.alpha-world-activity-flags{display:flex;flex-wrap:wrap;gap:5px;margin:10px 0;}.alpha-world-activity-flags span{padding:3px 5px;border:1px solid rgba(91,130,139,.20);color:#688087;font-size:7px;}
+.alpha-world-activity-card button{align-self:flex-start;padding:7px 10px;border:1px solid rgba(96,174,185,.38);background:rgba(10,44,51,.76);color:#82d8df;font-size:8px;font-weight:900;cursor:pointer;}
+.alpha-world-events-empty{grid-column:1/-1;min-height:180px;display:grid;place-items:center;text-align:center;align-content:center;gap:7px;border:1px dashed rgba(103,138,146,.24);color:#657a81;}.alpha-world-events-empty strong{color:#a8b5b5;font-size:11px;}.alpha-world-events-empty span{max-width:480px;font-size:9px;}
+
+/* ---------- Compatibility-only retired routes ---------- */
+.alpha-retired-route-screen{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;
+  padding:40px;background:linear-gradient(150deg,#071018,#04090d);border:1px solid rgba(120,141,146,.20);color:#8a9da1;
+}
+.alpha-retired-route-screen>span{color:#b4934d;font-size:8px;font-weight:900;letter-spacing:.14em;}
+.alpha-retired-route-screen h2{margin:0;color:#cfd8d5;font-size:24px;}.alpha-retired-route-screen p{margin:0;max-width:680px;font-size:10px;line-height:1.6;}
+.alpha-retired-route-screen button{margin-top:10px;padding:9px 15px;border:1px solid rgba(119,155,163,.36);background:rgba(7,23,29,.78);color:#8ebfc4;cursor:pointer;}
+
+@media(max-width:1050px){
+  .alpha-victory-body{grid-template-columns:minmax(190px,.8fr) minmax(330px,1.4fr);}
+  .alpha-victory-chronicle{grid-column:1/-1;}
+  .alpha-mission-code-screen>main{grid-template-columns:1fr;}
+  .header-nav-tabs .nav-btn{font-size:7px;padding-inline:5px;}
+}
+@media(max-width:780px){
+  .alpha-victory-body{grid-template-columns:1fr;}
+  .alpha-victory-rewards{grid-template-columns:1fr 1fr;}
+  .alpha-mission-journey-strip{grid-template-columns:1fr 1fr;}
+  .alpha-mission-code-screen>footer,.alpha-victory-footer{align-items:stretch;flex-direction:column;}
+  .alpha-mission-code-screen>footer button,.alpha-victory-footer .victory-continue{width:100%;min-width:0;}
+}

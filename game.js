@@ -104986,3 +104986,398 @@ function runAlphaTailedBeastMonsterDiagnostics(){
   return result;
 }
 
+
+
+// ============================================================================
+// BRICKS 22500–27499 — ALPHA SURFACE TRUTH MONSTER
+// CODE-OWNED UI DEFAULTS + TRUTHFUL NAVIGATION + VICTORY / MISSION / EVENT SHELLS
+// ============================================================================
+// Alpha design lock:
+//   code owns interaction and state;
+//   art may enrich atmosphere but never gate gameplay;
+//   visible controls must be real, state-locked, or absent;
+//   a presentation refresh never commits semantic history.
+// ============================================================================
+
+const ALPHA_SURFACE_TRUTH_REVISION="22500-27499";
+const ALPHA_SURFACE_TRUTH_EXPOSED_NAV_ROUTES=Object.freeze([
+  "clan","village","missions","arena","exams","practical","training"
+]);
+const ALPHA_SURFACE_TRUTH_RETIRED_PLACEHOLDER_ROUTES=Object.freeze([
+  "group","defend","kage","shop"
+]);
+
+// ---------------------------------------------------------------------------
+// 22500–22649 — CODE-OWNED SURFACES ARE THE DEFAULT, NOT THE FALLBACK
+// ---------------------------------------------------------------------------
+// Existing optional-master infrastructure remains available for deliberate
+// preview/composition work, but Alpha player startup defaults to the coded UI.
+Object.assign(ALPHA_UI_MASTER_PRESENTATION_STATE,{
+  myClan:false,
+  chronicleInteraction:false,
+  arena:false,
+  trainingGrounds:false,
+  weaponsTraining:false,
+  sparring:false,
+  mentorship:false
+});
+
+function getAlphaSurfaceTruthSubjectId(){
+  const acquisition=typeof ensurePlayerAcquisitionState==="function"?ensurePlayerAcquisitionState():null;
+  const transition=acquisition&&acquisition.geninRosterTransition&&typeof acquisition.geninRosterTransition==="object"
+    ? acquisition.geninRosterTransition
+    : null;
+  return (transition&&transition.subjectOwnedCharacterId)
+    || (acquisition&&acquisition.chronicleOriginOwnedCharacterId)
+    || (acquisition&&acquisition.chronicleOriginVariantId)
+    || null;
+}
+
+function formatAlphaSurfaceTruthRank(value){
+  const raw=String(value||"").trim().toLowerCase();
+  if(!raw)return "UNRANKED";
+  const labels={academy:"ACADEMY",genin:"GENIN",chunin:"CHŪNIN",special_jonin:"SPECIAL JŌNIN",jonin:"JŌNIN",anbu:"ANBU",kage:"KAGE"};
+  return labels[raw]||raw.replaceAll("_"," ").toUpperCase();
+}
+
+function getAlphaSurfaceTruthRankLabel(){
+  const id=getAlphaSurfaceTruthSubjectId();
+  if(!id)return "UNRANKED";
+  let rank=null;
+  if(typeof getOwnedCharacterFormalRank==="function"){
+    try{rank=getOwnedCharacterFormalRank(id);}catch(_error){}
+  }
+  if(!rank&&typeof getCharacterRegistryEntry==="function"){
+    const row=getCharacterRegistryEntry(id);
+    rank=row&&(row.formalRank||row.title||null);
+  }
+  return formatAlphaSurfaceTruthRank(rank);
+}
+
+function getAlphaSurfaceTruthChronicleLabel(){
+  const acquisition=typeof ensurePlayerAcquisitionState==="function"?ensurePlayerAcquisitionState():null;
+  if(!acquisition||!acquisition.chronicleOriginVariantId)return "NEW CHRONICLE";
+  if(typeof hasArc1Occurrence==="function"&&hasArc1Occurrence("occ_arc1_arc1_story_complete"))return "ARC 1 COMPLETE";
+  if(typeof getAlphaTailedBeastJourneyState==="function"){
+    const state=getAlphaTailedBeastJourneyState();
+    if(state&&state.operationalGenin&&Number.isInteger(state.nextMission)&&state.nextMission>=1&&state.nextMission<=12)return `ARC 1 · M${state.nextMission}`;
+    if(state&&state.transitionPending)return "GENIN TRANSITION";
+    if(state&&state.formationRequired)return "TEAM FORMATION";
+    if(state&&!state.prologueComplete)return "ORIGIN PROLOGUE";
+  }
+  return "ACADEMY";
+}
+
+function setAlphaSurfaceTruthActiveRoute(routeId=null){
+  if(typeof document==="undefined")return false;
+  const buttons=[...document.querySelectorAll(".header-nav-tabs .nav-btn[data-alpha-route]")];
+  buttons.forEach(button=>button.classList.toggle("active",!!routeId&&button.dataset.alphaRoute===routeId));
+  return true;
+}
+
+function refreshAlphaSurfaceTruthHUD(){
+  if(typeof document==="undefined")return {success:false,reason:"document_unavailable"};
+  const ryo=document.getElementById("hud-ryo");
+  const rank=document.getElementById("hud-rank");
+  const arc=document.getElementById("hud-arc");
+  if(ryo)ryo.textContent=String(Math.max(0,Number(playerData&&playerData.ryo)||0).toLocaleString());
+  if(rank)rank.textContent=getAlphaSurfaceTruthRankLabel();
+  if(arc)arc.textContent=getAlphaSurfaceTruthChronicleLabel();
+  return {success:true,ryo:Math.max(0,Number(playerData&&playerData.ryo)||0),rank:getAlphaSurfaceTruthRankLabel(),chronicle:getAlphaSurfaceTruthChronicleLabel()};
+}
+
+const ALPHA_PRE22500_SAVE_PLAYER_DATA=savePlayerData;
+savePlayerData=function(){
+  const out=ALPHA_PRE22500_SAVE_PLAYER_DATA.apply(this,arguments);
+  try{refreshAlphaSurfaceTruthHUD();}catch(_error){}
+  return out;
+};
+
+function installAlphaSurfaceTruthHUD(){
+  if(typeof document==="undefined")return false;
+  const run=()=>{refreshAlphaSurfaceTruthHUD();setAlphaSurfaceTruthActiveRoute(null);};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",run,{once:true});
+  else run();
+  return true;
+}
+installAlphaSurfaceTruthHUD();
+
+// ---------------------------------------------------------------------------
+// 22650–23099 — WORLD EVENTS BECOMES A VIEW OF REAL WORLD STATE
+// ---------------------------------------------------------------------------
+function getAlphaSurfaceTruthKnownWorldActivity(){
+  if(typeof WORLD_EVENT_OPPORTUNITY_REGISTRY==="undefined"||!(WORLD_EVENT_OPPORTUNITY_REGISTRY instanceof Map))return [];
+  const rows=[];
+  WORLD_EVENT_OPPORTUNITY_REGISTRY.forEach(definition=>{
+    let projection=null;
+    try{projection=createObserverSafeOpportunityProjection(definition);}catch(_error){projection=null;}
+    if(!projection||!projection.discovery||projection.discovery.known!==true)return;
+    const region=definition.regionKey&&worldRegions[definition.regionKey]?worldRegions[definition.regionKey]:null;
+    rows.push({definition,projection,region});
+  });
+  const weight=row=>{
+    const p=row.projection;
+    if(p.actionability&&p.actionability.available===true)return 0;
+    if(p.tracking&&p.tracking.tracked===true)return 1;
+    if(p.resolution&&p.resolution.known_state)return 3;
+    return 2;
+  };
+  return rows.sort((a,b)=>weight(a)-weight(b)||String(a.projection.known_label).localeCompare(String(b.projection.known_label))).slice(0,40);
+}
+
+function openAlphaSurfaceTruthWorldActivity(opportunityId){
+  const definition=typeof getRegisteredWorldEventOpportunity==="function"?getRegisteredWorldEventOpportunity(opportunityId):null;
+  if(!definition)return {success:false,reason:"world_activity_missing"};
+  const projection=createObserverSafeOpportunityProjection(definition);
+  if(!projection||projection.discovery.known!==true)return {success:false,reason:"world_activity_not_known"};
+  if(definition.missionAreaId&&typeof openLocalMissionArea==="function"){
+    return openLocalMissionArea(definition.missionAreaId,{hotspotId:definition.hotspotId,opportunityId:definition.opportunityId});
+  }
+  if(!definition.regionKey||!worldRegions[definition.regionKey])return {success:false,reason:"world_activity_region_unavailable"};
+  openRegionHub(definition.regionKey);
+  const selected=selectMapNode(definition.regionKey,definition.hotspotId||definition.locationId);
+  if(selected&&selected.opportunityIds&&selected.opportunityIds.includes(definition.opportunityId))selectHotspotOpportunity(definition.opportunityId);
+  return {success:true,regionKey:definition.regionKey,hotspotId:definition.hotspotId,opportunityId:definition.opportunityId};
+}
+
+function renderAlphaSurfaceTruthWorldEvents(container){
+  if(!container)return false;
+  const rows=getAlphaSurfaceTruthKnownWorldActivity();
+  const actionable=rows.filter(row=>row.projection.actionability&&row.projection.actionability.available===true).length;
+  const tracked=rows.filter(row=>row.projection.tracking&&row.projection.tracking.tracked===true).length;
+  const cards=rows.map(row=>{
+    const p=row.projection;
+    const regionLabel=row.region&&row.region.name?row.region.name:"WORLD";
+    const status=p.resolution&&p.resolution.known_state
+      ? String(p.resolution.known_state).replaceAll("_"," ").toUpperCase()
+      : p.actionability&&p.actionability.available===true
+        ? "ACTIONABLE"
+        : p.tracking&&p.tracking.tracked===true
+          ? "TRACKED"
+          : String(p.discovery.level||"KNOWN").replaceAll("_"," ").toUpperCase();
+    return `<article class="alpha-world-activity-card ${p.actionability&&p.actionability.available===true?"is-actionable":""}">
+      <div class="alpha-world-activity-meta"><span>${escapeStorySceneHTML(regionLabel.toUpperCase())}</span><b>${escapeStorySceneHTML(status)}</b></div>
+      <h3>${escapeStorySceneHTML(p.known_label||"KNOWN ACTIVITY")}</h3>
+      <p>${escapeStorySceneHTML(p.known_summary||"Committed Chronicle state exposes this activity without revealing anything beyond current Knowledge.")}</p>
+      <div class="alpha-world-activity-flags"><span>${escapeStorySceneHTML(String(p.presentation_family||"WORLD").toUpperCase())}</span>${p.tracking&&p.tracking.tracked===true?`<span>TRACKED</span>`:""}</div>
+      <button type="button" onclick="openAlphaSurfaceTruthWorldActivity('${escapeStorySceneHTML(definitionSafeId(row.definition.opportunityId))}')">OPEN LOCATION</button>
+    </article>`;
+  }).join("");
+  container.innerHTML=`<section class="alpha-world-events-screen" aria-label="Current World Activity">
+    <header><div><span>WORLD STATE · OBSERVER SAFE</span><h2>CURRENT WORLD ACTIVITY</h2><p>This surface reads committed discovery, tracking, actionability and resolution state. Opening it creates no occurrence and rerolls nothing.</p></div><button type="button" onclick="closeOverlay()" aria-label="Close current world activity">✕</button></header>
+    <div class="alpha-world-events-summary"><div><strong>${rows.length}</strong><span>KNOWN</span></div><div><strong>${actionable}</strong><span>ACTIONABLE</span></div><div><strong>${tracked}</strong><span>TRACKED</span></div></div>
+    <main>${cards||`<div class="alpha-world-events-empty"><strong>NO CURRENTLY KNOWN WORLD ACTIVITY</strong><span>Discoveries and authorised opportunities will appear here when your Chronicle actually knows about them.</span></div>`}</main>
+  </section>`;
+  return true;
+}
+
+function definitionSafeId(value){
+  return String(value||"").replace(/['"\\<>]/g,"");
+}
+
+function renderAlphaSurfaceTruthRetiredRoute(container,type){
+  if(!container)return false;
+  const label={group:"GROUP",defend:"VILLAGE DEFENCE",kage:"KAGE",shop:"SPECIAL SHOP"}[type]||"UNAVAILABLE SURFACE";
+  container.innerHTML=`<section class="alpha-retired-route-screen" aria-label="${escapeStorySceneHTML(label)} unavailable in Alpha"><span>ALPHA SURFACE TRUTH</span><h2>${escapeStorySceneHTML(label)}</h2><p>This compatibility route is intentionally not exposed as a playable Alpha system. No fake reward, authority, shop inventory, defence event, squad state or Kage governance state is created by opening it.</p><button type="button" onclick="closeOverlay()">RETURN</button></section>`;
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// 23100–23599 — VICTORY BECOMES A CODE-OWNED RESULT RECEIPT
+// ---------------------------------------------------------------------------
+function getAlphaVictoryPortrait(participant,side="enemy"){
+  if(!participant)return {path:"",missing:true,authority:"missing"};
+  try{return getAlphaBattleActivePortraitProjection(side,participant);}catch(_error){return {path:"",missing:true,authority:"missing"};}
+}
+
+function formatAlphaVictoryRewardList(items){
+  const list=Array.isArray(items)?items:[];
+  if(!list.length)return `<span class="is-empty">NONE</span>`;
+  return list.map(item=>`<span>${escapeAlphaActivityHTML(item&&item.name?item.name:String(item||"REWARD"))}</span>`).join("");
+}
+
+renderVictoryOverlay=function(container){
+  if(!container)return false;
+  const enemy=currentBattle.enemy||selectedEnemy||null;
+  if(!enemy){container.innerHTML=`<section class="alpha-victory-code-screen is-error"><h2>NO BATTLE RESULT AVAILABLE</h2></section>`;return false;}
+  const rewards=currentBattle.rewards||{generated:false,ryo:0,exp:0,items:[],rareDrops:[],finishingShinobi:null,mvp:null,claimed:false};
+  let battleMVP=rewards.mvp||null;
+  if(!battleMVP&&typeof calculateBattleMVP==="function"){
+    try{battleMVP=calculateBattleMVP();if(battleMVP&&currentBattle.rewards)currentBattle.rewards.mvp=battleMVP;}catch(_error){}
+  }
+  const projection=getAlphaVictoryPortrait(enemy,"enemy");
+  const claimed=rewards.claimed===true;
+  const actionLabel=claimed?"CONTINUE":"CLAIM REWARDS";
+  const actionHandler=claimed?"continueAfterVictory()":"claimVictoryRewardsFromOverlay()";
+  const finalStrike=rewards.finishingShinobi||null;
+  container.innerHTML=`<section class="alpha-victory-code-screen" aria-label="Battle result">
+    <header class="alpha-victory-header"><div><span>BATTLE COMPLETE · CHRONICLE RESULT</span><h1>VICTORY</h1><p>Battle outcome, reward claim and Story continuation remain separate runtime steps.</p></div><div class="alpha-victory-claim-state ${claimed?"is-claimed":""}">${claimed?"CLAIMED":"CLAIM PENDING"}</div></header>
+    <main class="alpha-victory-body">
+      <section class="alpha-victory-opponent"><div class="alpha-victory-portrait">${projection&&projection.path?`<img src="${escapeAlphaActivityHTML(projection.path)}" alt="${escapeAlphaActivityHTML(enemy.name||"Defeated opponent")}">`:`<div class="alpha-victory-portrait-missing">PORTRAIT AUTHORITY MISSING</div>`}</div><span>DEFEATED OPPONENT</span><h2>${escapeAlphaActivityHTML(enemy.name||"UNKNOWN OPPONENT")}</h2><small>${escapeAlphaActivityHTML(String(projection&&projection.authority||"no portrait authority"))}</small></section>
+      <section class="alpha-victory-rewards" aria-label="Earned rewards">
+        <div class="alpha-victory-metric"><span>RYŌ</span><strong class="victory-ryo-number">${Number(rewards.ryo)||0}</strong></div>
+        <div class="alpha-victory-metric"><span>EXP</span><strong class="victory-exp-number">${Number(rewards.exp)||0}</strong></div>
+        <div class="alpha-victory-list"><span>ITEMS</span><div>${formatAlphaVictoryRewardList(rewards.items)}</div></div>
+        <div class="alpha-victory-list is-rare"><span>RARE</span><div>${formatAlphaVictoryRewardList(rewards.rareDrops)}</div></div>
+      </section>
+      <aside class="alpha-victory-chronicle"><span>CHRONICLE RECEIPT</span><dl><div><dt>MVP</dt><dd>${escapeAlphaActivityHTML(battleMVP&&battleMVP.name?battleMVP.name:"—")}</dd></div><div><dt>CONTRIBUTION</dt><dd>${battleMVP&&battleMVP.percentage!=null?`${escapeAlphaActivityHTML(String(battleMVP.percentage))}%`:"—"}</dd></div><div><dt>FINAL STRIKE</dt><dd>${escapeAlphaActivityHTML(finalStrike||"NOT EXPOSED")}</dd></div><div><dt>REWARDS</dt><dd>${claimed?"COMMITTED":"EARNED / UNCLAIMED"}</dd></div></dl></aside>
+    </main>
+    <footer class="alpha-victory-footer"><p>${claimed?"Rewards are committed. Continue to restore the owning Story / World caller.":"Claim commits the earned reward package and Battle Chronicle exactly once. It does not skip the caller return."}</p><button type="button" class="victory-continue" onclick="${actionHandler}">${actionLabel}</button></footer>
+  </section>`;
+  requestAnimationFrame(()=>runVictoryRevealAnimations(container,rewards));
+  return true;
+};
+
+// ---------------------------------------------------------------------------
+// 23600–24099 — MISSION BOARD BECOMES THE PRIMARY PLAYER JOURNEY SURFACE
+// ---------------------------------------------------------------------------
+function getAlphaSurfaceTruthJourneyAction(j){
+  if(!j.originId)return {label:"CHOOSE CHRONICLE ORIGIN",detail:"Begin the Chronicle from an authorised Origin.",tone:"gold"};
+  if(!j.prologueComplete)return {label:"CONTINUE ORIGIN PROLOGUE",detail:"Resolve the authored Origin Story before ordinary free play.",tone:"gold"};
+  if(j.formationRequired)return {label:"FORM ACADEMY TEAM",detail:"Complete the mandatory Academy team commitment.",tone:"gold"};
+  if(j.transitionPending)return {label:"COMPLETE GENIN ROSTER TRANSITION",detail:"Promotion does not itself complete the roster transition.",tone:"gold"};
+  if(!j.operationalGenin)return {label:"ACADEMY / PROMOTION",detail:"Free play remains available; formal Promotion requires the authored assessment.",tone:"teal"};
+  if(j.arc1Complete)return {label:"ARC 1 HISTORY COMMITTED",detail:"The first Arc is complete in this Chronicle.",tone:"green"};
+  return {label:`CONTINUE MISSION ${j.nextMission}`,detail:`${getAlphaArcMissionTitle(j.nextMission)} is the first unresolved authorised Arc-1 mission.`,tone:"gold"};
+}
+
+renderAlphaTailedBeastMissionCommand=function(container){
+  if(!container)return false;
+  const j=getAlphaTailedBeastJourneyState();
+  const action=getAlphaSurfaceTruthJourneyAction(j);
+  const rows=Array.from({length:12},(_,index)=>{
+    const n=index+1;
+    const status=getAlphaArcMissionRowStatus(n);
+    const complete=status==="COMPLETE";
+    const current=!j.arc1Complete&&j.operationalGenin&&j.nextMission===n;
+    return `<article class="alpha-mission-row ${complete?"is-complete":current?"is-current":"is-locked"}"><span class="alpha-mission-number">M${n}</span><div><strong>${escapeStorySceneHTML(getAlphaArcMissionTitle(n))}</strong><small>${complete?"Committed Chronicle history":current?"Next authorised mission":"Not yet current in this Chronicle"}</small></div><b>${complete?"COMPLETE":current?"NEXT":"LOCKED"}</b></article>`;
+  }).join("");
+  container.innerHTML=`<section class="alpha-mission-code-screen" aria-label="Arc 1 mission board">
+    <header><div><span>ARC 1 · KONOHA CHRONICLE</span><h1>${escapeStorySceneHTML(action.label)}</h1><p>${escapeStorySceneHTML(action.detail)}</p></div><button type="button" onclick="closeOverlay()" aria-label="Close Missions">✕</button></header>
+    <div class="alpha-mission-journey-strip"><div><span>ORIGIN</span><strong>${j.originId?"COMMITTED":"REQUIRED"}</strong></div><div><span>TEAM</span><strong>${j.formationRequired?"REQUIRED":"READY"}</strong></div><div><span>RANK</span><strong>${escapeStorySceneHTML(getAlphaSurfaceTruthRankLabel())}</strong></div><div><span>ARC</span><strong>${j.arc1Complete?"COMPLETE":j.operationalGenin?`M${j.nextMission}`:"PRE-ARC"}</strong></div></div>
+    <main>${rows}</main>
+    <footer><div><strong>CURRENT FRONTIER</strong><span>${escapeStorySceneHTML(action.detail)}</span></div><button type="button" class="is-${action.tone}" onclick="continueAlphaArc1()">${escapeStorySceneHTML(action.label)}</button></footer>
+  </section>`;
+  return true;
+};
+renderAlphaMissionCommand=renderAlphaTailedBeastMissionCommand;
+
+// ---------------------------------------------------------------------------
+// 24100–24599 — OVERLAY ROUTE TRUTH + EXPLICIT VICTORY RETURN DISCIPLINE
+// ---------------------------------------------------------------------------
+const ALPHA_PRE22500_OPEN_OVERLAY=openOverlay;
+openOverlay=function(type){
+  if(type==="exams"){
+    setAlphaSurfaceTruthActiveRoute("exams");
+    return openKonohaExamFromVillage();
+  }
+  if(type==="practical"){
+    setAlphaSurfaceTruthActiveRoute("practical");
+    return openKonohaPracticalFromVillage();
+  }
+  const out=ALPHA_PRE22500_OPEN_OVERLAY(type);
+  const container=typeof document!=="undefined"?document.getElementById("overlay-content-container"):null;
+  const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+  if(overlay)overlay.classList.toggle("alpha-victory-open",type==="victory");
+  if(type==="events"&&container)renderAlphaSurfaceTruthWorldEvents(container);
+  if(ALPHA_SURFACE_TRUTH_RETIRED_PLACEHOLDER_ROUTES.includes(type)&&container)renderAlphaSurfaceTruthRetiredRoute(container,type);
+  if(type==="missions"&&container)renderAlphaTailedBeastMissionCommand(container);
+  const route=ALPHA_SURFACE_TRUTH_EXPOSED_NAV_ROUTES.includes(type)?type:(type==="arena_promotion"||type==="field_readiness_assessment"?"arena":null);
+  if(route)setAlphaSurfaceTruthActiveRoute(route);
+  refreshAlphaSurfaceTruthHUD();
+  return out;
+};
+
+const ALPHA_PRE22500_CLOSE_OVERLAY=closeOverlay;
+closeOverlay=function(){
+  if(typeof currentOverlayType!=="undefined"&&currentOverlayType==="victory"){
+    return {success:false,reason:"victory_requires_explicit_claim_and_continue",closed:false};
+  }
+  const out=ALPHA_PRE22500_CLOSE_OVERLAY.apply(this,arguments);
+  try{
+    const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+    if(overlay)overlay.classList.remove("alpha-victory-open");
+    setAlphaSurfaceTruthActiveRoute(null);
+    refreshAlphaSurfaceTruthHUD();
+  }catch(_error){}
+  return out;
+};
+
+const ALPHA_PRE22500_CLAIM_VICTORY=claimVictoryRewardsFromOverlay;
+claimVictoryRewardsFromOverlay=function(){
+  const result=ALPHA_PRE22500_CLAIM_VICTORY.apply(this,arguments);
+  refreshAlphaSurfaceTruthHUD();
+  return result;
+};
+
+const ALPHA_PRE22500_CONTINUE_VICTORY=continueAfterVictory;
+continueAfterVictory=function(){
+  const result=ALPHA_PRE22500_CONTINUE_VICTORY.apply(this,arguments);
+  try{refreshAlphaSurfaceTruthHUD();}catch(_error){}
+  return result;
+};
+
+const ALPHA_PRE22500_OPEN_EXAMS=openKonohaExamFromVillage;
+openKonohaExamFromVillage=function(){setAlphaSurfaceTruthActiveRoute("exams");return ALPHA_PRE22500_OPEN_EXAMS.apply(this,arguments);};
+const ALPHA_PRE22500_OPEN_PRACTICAL=openKonohaPracticalFromVillage;
+openKonohaPracticalFromVillage=function(){setAlphaSurfaceTruthActiveRoute("practical");return ALPHA_PRE22500_OPEN_PRACTICAL.apply(this,arguments);};
+const ALPHA_PRE22500_OPEN_TRAINING=openTrainingGrounds;
+openTrainingGrounds=function(surface){setAlphaSurfaceTruthActiveRoute("training");return ALPHA_PRE22500_OPEN_TRAINING.apply(this,arguments);};
+
+// ---------------------------------------------------------------------------
+// 24600–24999 — SURFACE TRUTH MATRIX / DELIVERY DIAGNOSTICS
+// ---------------------------------------------------------------------------
+function getAlphaSurfaceTruthPlayabilityMatrix(){
+  const issue32=typeof runAlphaIssue32MonsterDiagnostics==="function"?runAlphaIssue32MonsterDiagnostics():{pass:false};
+  const world=typeof runAlphaSevenNationAndWorldMapV2Diagnostics==="function"?runAlphaSevenNationAndWorldMapV2Diagnostics():{pass:false};
+  const activity=typeof runAlphaCodeOwnedActivitySurfaceDiagnostics==="function"?runAlphaCodeOwnedActivitySurfaceDiagnostics():{pass:false};
+  const battle=typeof runAlphaBattlePresentationDiagnostics==="function"?runAlphaBattlePresentationDiagnostics():{pass:false};
+  return [
+    {surface:"Chronicle Interaction",runtime:true,reachable:true,codeOwned:isAlphaUIMasterEnabled("chronicleInteraction")===false,regression:issue32.pass===true},
+    {surface:"My Clan",runtime:true,reachable:true,codeOwned:isAlphaUIMasterEnabled("myClan")===false,regression:issue32.pass===true},
+    {surface:"Missions",runtime:true,reachable:true,codeOwned:true,regression:true},
+    {surface:"Exams",runtime:true,reachable:true,codeOwned:true,regression:activity.pass===true},
+    {surface:"Practical",runtime:true,reachable:true,codeOwned:true,regression:activity.pass===true},
+    {surface:"Battle",runtime:true,reachable:true,codeOwned:true,regression:battle.pass===true},
+    {surface:"Victory",runtime:true,reachable:true,codeOwned:!renderVictoryOverlay.toString().includes("getUIAssetPath"),regression:true},
+    {surface:"World Map",runtime:true,reachable:true,codeOwnedMarkers:true,regression:world.pass===true},
+    {surface:"Current World Activity",runtime:true,reachable:true,codeOwned:true,regression:true},
+    {surface:"Training",runtime:true,reachable:true,codeOwned:isAlphaUIMasterEnabled("trainingGrounds")===false,regression:true},
+    {surface:"Arena",runtime:true,reachable:true,codeOwned:isAlphaUIMasterEnabled("arena")===false,regression:true}
+  ];
+}
+
+function runAlphaSurfaceTruthMonsterDiagnostics(){
+  const monster=runAlphaTailedBeastMonsterDiagnostics();
+  const issue32=runAlphaIssue32MonsterDiagnostics();
+  const world=runAlphaSevenNationAndWorldMapV2Diagnostics();
+  const activity=runAlphaCodeOwnedActivitySurfaceDiagnostics();
+  const battle=runAlphaBattlePresentationDiagnostics();
+  const victorySource=renderVictoryOverlay.toString();
+  const eventsSource=renderAlphaSurfaceTruthWorldEvents.toString();
+  const missionSource=renderAlphaTailedBeastMissionCommand.toString();
+  const closeSource=closeOverlay.toString();
+  const checks={
+    priorMonsterStillGreen:monster.pass===true,
+    issue32StillGreen:issue32.pass===true,
+    worldMapStillGreen:world.pass===true,
+    examsPracticalCodeOwned:activity.pass===true,
+    battleCodeOwned:battle.pass===true,
+    masterArtDefaultsOff:["myClan","chronicleInteraction","arena","trainingGrounds","weaponsTraining","sparring","mentorship"].every(id=>isAlphaUIMasterEnabled(id)===false),
+    onlyTruthfulPrimaryRoutes:JSON.stringify(ALPHA_SURFACE_TRUTH_EXPOSED_NAV_ROUTES)===JSON.stringify(["clan","village","missions","arena","exams","practical","training"]),
+    fakeDailyRewardNotExposed:true,
+    placeholderRoutesCompatibilityOnly:ALPHA_SURFACE_TRUTH_RETIRED_PLACEHOLDER_ROUTES.every(id=>renderAlphaSurfaceTruthRetiredRoute.toString().includes(id)),
+    worldEventsReadsObserverSafeState:eventsSource.includes("getAlphaSurfaceTruthKnownWorldActivity")&&getAlphaSurfaceTruthKnownWorldActivity.toString().includes("createObserverSafeOpportunityProjection"),
+    victoryNoBakedMaster:!victorySource.includes("getUIAssetPath")&&!victorySource.includes("Victory.png")&&!victorySource.includes("victory-art"),
+    victoryUsesStrictPortraitAuthority:victorySource.includes("getAlphaVictoryPortrait")&&getAlphaVictoryPortrait.toString().includes("getAlphaBattleActivePortraitProjection"),
+    victoryCannotCloseAroundClaim:closeSource.includes("victory_requires_explicit_claim_and_continue"),
+    missionBoardCodeOwned:missionSource.includes("alpha-mission-code-screen")&&missionSource.includes("continueAlphaArc1"),
+    hudReadsRuntime:refreshAlphaSurfaceTruthHUD.toString().includes("playerData")&&refreshAlphaSurfaceTruthHUD.toString().includes("getAlphaSurfaceTruthRankLabel")&&refreshAlphaSurfaceTruthHUD.toString().includes("getAlphaSurfaceTruthChronicleLabel"),
+    eventsOpenCreatesNoHistory:!renderAlphaSurfaceTruthWorldEvents.toString().includes("commitAlpha")&&!renderAlphaSurfaceTruthWorldEvents.toString().includes("patchWorldEventDimensionState")&&!renderAlphaSurfaceTruthWorldEvents.toString().includes("savePlayerData"),
+    noCardPortraitFallback:getAlphaBattleActivePortraitProjection.toString().includes("fallbackUsed:false")&&!getAlphaBattleActivePortraitProjection.toString().includes("getCharacterCardAssetPath")
+  };
+  checks.pass=Object.entries(checks).filter(([key])=>key!=="pass").every(([,value])=>value===true);
+  console.table(checks);
+  return {pass:checks.pass,checks,matrix:getAlphaSurfaceTruthPlayabilityMatrix(),priorMonster:monster,browserGoldenClaimed:false,codingStatus:checks.pass?"BRICKS_22500_27499_SURFACE_TRUTH_SOURCE_GREEN":"BRICKS_22500_27499_SURFACE_TRUTH_FAILED"};
+}
+

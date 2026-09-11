@@ -202,6 +202,7 @@
   <button
     type="button"
     class="nav-btn nav-btn-clan"
+    data-alpha-route="clan"
     onclick="openOverlay('clan')"
   >
     YOUR CLAN
@@ -210,6 +211,7 @@
   <button
     type="button"
     class="nav-btn active"
+    data-alpha-route="village"
     onclick="openOverlay('village')"
   >
     VILLAGE
@@ -218,6 +220,7 @@
   <button
     type="button"
     class="nav-btn"
+    data-alpha-route="missions"
     onclick="openOverlay('missions')"
   >
     MISSIONS
@@ -226,6 +229,7 @@
   <button
     type="button"
     class="nav-btn"
+    data-alpha-route="arena"
     onclick="openOverlay('arena')"
   >
     ARENA
@@ -234,6 +238,7 @@
   <button
     type="button"
     class="nav-btn"
+    data-alpha-route="exams"
     onclick="openKonohaExamFromVillage()"
   >
     EXAMS
@@ -242,6 +247,7 @@
   <button
     type="button"
     class="nav-btn"
+    data-alpha-route="practical"
     onclick="openKonohaPracticalFromVillage()"
   >
     PRACTICAL
@@ -250,34 +256,12 @@
   <button
     type="button"
     class="nav-btn"
+    data-alpha-route="training"
     onclick="openTrainingGrounds('hub')"
   >
     TRAINING
   </button>
 
-  <button
-    type="button"
-    class="nav-btn"
-    onclick="openOverlay('group')"
-  >
-    GROUP
-  </button>
-
-  <button
-    type="button"
-    class="nav-btn"
-    onclick="openOverlay('defend')"
-  >
-    DEFEND
-  </button>
-
-  <button
-    type="button"
-    class="nav-btn"
-    onclick="openOverlay('kage')"
-  >
-    KAGE
-  </button>
 
 </nav>
 
@@ -286,44 +270,22 @@
      PLAYER HUD
      ================================================= -->
 
-      <div class="header-right">
-
+      <div class="header-right" aria-label="Current Chronicle status">
 
         <div class="currency-display">
-
-          <span>RYO:</span>
-
-          <b id="hud-ryo">
-            14,500
-          </b>
-
+          <span>RYŌ:</span>
+          <b id="hud-ryo">0</b>
         </div>
 
-
         <div class="currency-display">
-
-          <span>CHAKRA:</span>
-
-          <b id="hud-chakra">
-            1200/1200
-          </b>
-
-        </div>
-
-
-        <div class="currency-display">
-
           <span>RANK:</span>
-
-          <b
-            id="hud-rank"
-            style="color: #D6A93A;"
-          >
-            Kage
-          </b>
-
+          <b id="hud-rank" style="color: #D6A93A;">UNRANKED</b>
         </div>
 
+        <div class="currency-display">
+          <span>CHRONICLE:</span>
+          <b id="hud-arc">NEW</b>
+        </div>
 
       </div>
 
@@ -446,43 +408,35 @@
     </section>
 
 
-    <!-- QUICK LINKS -->
+    <!-- QUICK LINKS — ALPHA SURFACE TRUTH -->
     <section class="sidebar-card sidebar-quick-links">
 
       <div class="sidebar-title">
-        QUICK LINKS
+        CHRONICLE ACCESS
       </div>
 
       <button
         class="sidebar-link"
-        onclick="claimDailyReward()"
+        onclick="openOverlay('missions')"
       >
-        <span>🎁</span>
-        <span>Daily Reward</span>
+        <span>▶</span>
+        <span>Continue Chronicle</span>
       </button>
 
       <button
         class="sidebar-link"
         onclick="openOverlay('events')"
       >
-        <span>⚔️</span>
-        <span>World Events</span>
+        <span>◈</span>
+        <span>Current World Activity</span>
       </button>
 
       <button
         class="sidebar-link"
         onclick="openShinobiRecord('overview')"
       >
-        <span>📜</span>
+        <span>▤</span>
         <span>Shinobi Record</span>
-      </button>
-
-      <button
-        class="sidebar-link"
-        onclick="openOverlay('shop')"
-      >
-        <span>🛒</span>
-        <span>Special Shop</span>
       </button>
 
     </section>
@@ -537,8 +491,8 @@
 
     <!--
       POST-1992: legacy bottom game dock removed.
-      Daily Reward / Events / Special Shop remain available from
-      the existing Quick Links panel in the left sidebar.
+      Only truthful Alpha Chronicle routes remain exposed in the
+      Quick Links panel. Placeholder reward/shop routes are retired.
     -->
 
 
