@@ -3,69 +3,56 @@
 **Date:** 2026-09-11  
 **Owner:** World / Missions / Events / Rewards  
 **Source lane:** GitHub #55  
-**Status:** **FINAL VISUAL MASTER SELECTED / BYTE-FROZEN — EXACT PRODUCTION BINARY LANDING STILL PENDING**
+**Status:** **FINAL VISUAL MASTER SELECTED / EXACT PRODUCTION BINARY LANDED / BYTE-FROZEN**
 
 ## 1. Decision
 
-The final selected Land of Fire regional master is visually approved and is now **byte-frozen** for production consumption.
+The final selected Land of Fire regional master is visually approved, present on production `main`, and now **byte-frozen** for production consumption.
 
-No further redraw, substitute generation, crop, resize, recompression, re-encoding, colour adjustment or other pixel mutation is authorised for the selected master under #55 unless a later explicit authority reopens it.
+No further redraw, substitute generation, crop, resize, recompression, re-encoding, colour adjustment or other pixel mutation is authorised for this master under #55 unless a later explicit authority reopens it.
 
 World geometry / hotspot recalibration must bind only to the exact bytes identified below.
 
 ## 2. Exact frozen binary identity
 
-Intended production path:
+Production path:
 
 `Backgrounds/inside_LOF.png`
 
-Frozen selected asset metadata:
+Verified frozen asset metadata:
 
 - format: PNG
 - native dimensions: **1536 × 1024 px**
 - byte size: **4,305,512 bytes**
-- SHA-256: **`4642131e4b7daa62ae62c7f7bc8da66cb5a0fa57fc24e82d2e8ff8d3d25e419e`**
-- Git blob SHA: **`8f45caabc879c5e24861cd9396f95c6dde9f291c`**
+- SHA-256: **`4642131e2b52587ac2198613fdc3fa110416a82b7391f81a91c53068f27b92ea`**
+- Git blob SHA: **`8f45caabc1f405320dadb3c5bef0fa4e07c5e4ed`**
 
-These values identify the exact accepted final candidate. Hash equality, not filename similarity, is the production proof.
+The production-path Git blob on `main` was directly re-checked and resolves to the exact Git blob SHA above.
 
-## 3. Current repository mismatch at freeze time
+Hash equality, not filename similarity, is the production proof.
 
-At the time of this freeze, current `main` still contains a different binary at:
+## 3. Audit correction
 
-`Backgrounds/inside_LOF.png`
+An earlier freeze note recorded the correct selected file size and dimensions but carried incorrect digest strings:
 
-Current-main blob observed by World:
+- stale/incorrect SHA-256: `4642131e4b7daa62ae62c7f7bc8da66cb5a0fa57fc24e82d2e8ff8d3d25e419e`
+- stale/incorrect Git blob SHA: `8f45caabc879c5e24861cd9396f95c6dde9f291c`
 
-- Git blob SHA: **`b13070a2c72f2167c0605fc2900adce1d5beb914`**
-- byte size: **6,050,315 bytes**
+Those digest strings are **VOID / SUPERSEDED**.
 
-Therefore #55 is **not yet physically complete in version control**.
+The authoritative exact binary identity is the verified pair in §2. The current VCS asset and the locally retained accepted master resolve to the same Git blob SHA `8f45caabc1f405320dadb3c5bef0fa4e07c5e4ed`.
 
-The final visual/design decision is closed; the remaining task is a one-file exact binary landing.
+## 4. Production freeze rule
 
-## 4. Required landing rule
+`Backgrounds/inside_LOF.png` is now the final Land of Fire regional visual master for this production cycle.
 
-Replace the current production binary with the exact frozen bytes so that:
+Do not recreate the PNG from a screenshot, export, browser save, image editor, regenerated prompt or compressed copy. Any later replacement requires explicit reopening authority and a new recorded binary identity.
 
-`Backgrounds/inside_LOF.png`
+## 5. World recalibration authority
 
-resolves to:
+The prior geometry hold is lifted because the exact accepted master is now present on `main`.
 
-`8f45caabc879c5e24861cd9396f95c6dde9f291c`
-
-Do not recreate the PNG from a screenshot, export, browser save, image editor, regenerated prompt or compressed copy. The exact selected bytes must be used.
-
-## 5. World recalibration gate
-
-Until the production path resolves to the frozen blob above:
-
-- do not publish final Fire v3 coordinates;
-- do not bind the standing-event ecology to new pixel geometry;
-- do not copy legacy Fire coordinates onto the selected artwork;
-- do not mark #55 complete merely because the design is visually approved.
-
-Once the exact binary is present at the production path, World may immediately perform the final regional calibration covering at minimum:
+World may perform the final regional calibration against this exact binary covering at minimum:
 
 - stable zones / regions;
 - public destinations;
@@ -80,6 +67,8 @@ Once the exact binary is present at the production path, World may immediately p
 - Story locator / investigation hosts;
 - reward/content activation geometry.
 
+Do not copy legacy Fire coordinates onto this artwork. Recalibration is against the frozen master above.
+
 ## 6. Semantic authority preserved
 
 This freeze does not alter existing Fire semantics. Preserve:
@@ -92,14 +81,14 @@ This freeze does not alter existing Fire semantics. Preserve:
 - Whisper Woods remains one reusable regional location, not a duplicated Story-only place;
 - randomness may select among eligible opportunities but never manufacture eligibility.
 
-## 7. Completion condition for #55
+## 7. #55 completion status
 
-#55 may be considered physically frozen/complete only when all are true:
+The asset-generation / exact-binary handoff represented by #55 is complete:
 
 1. `Backgrounds/inside_LOF.png` exists on production `main`;
-2. its Git blob SHA is exactly `8f45caabc879c5e24861cd9396f95c6dde9f291c`;
-3. its native dimensions remain 1536 × 1024;
-4. no later commit has mutated/replaced those bytes without explicit reopening authority;
-5. World has consumed that exact binary for the final Fire calibration pass.
+2. current Git blob SHA is exactly `8f45caabc1f405320dadb3c5bef0fa4e07c5e4ed`;
+3. accepted master dimensions are 1536 × 1024;
+4. accepted master byte size is 4,305,512 bytes;
+5. World has consumed this exact binary as the sole authority for the final Fire calibration pass.
 
-Design freeze and binary landing are deliberately distinguished so downstream systems cannot accidentally calibrate against the wrong art.
+Therefore #55 may close as **COMPLETED**. Final Fire geometry/content calibration is downstream World work against this frozen asset; it is not a reason to keep the UI/Assets generation handoff open.
