@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Physical production QA for the Alpha Genin v2 25-row asset gate (#74).
 
-This script validates only physical/format constraints and one explicit visual-authority
-rejection already owned by #69/#74. It does not infer Registry identity, candidate
-membership, ownership, or representation semantics from filenames.
+This script validates exact production paths, PNG decode/format, and locked master
+sizes only. Representation approval is owned by the current durable visual authority;
+this QA must not preserve superseded rejection state in code or infer Registry identity,
+candidate membership, ownership, or representation semantics from filenames.
 """
 
 from __future__ import annotations
@@ -44,12 +45,6 @@ TARGET_IDS = [
 CARD_SIZE = (980, 1400)
 PORTRAIT_SIZE = (1024, 1024)
 
-# Durable Character Creation / CE / Registry authority: the current Chōza binary
-# must remain non-authoritative even if it is physically a valid PNG.
-CARD_AUTHORITY_REJECTIONS = {
-    "genin_choza": "current collectible visual rejected by #69/#74; replacement required",
-}
-
 
 def inspect_png(path: Path, expected_size: tuple[int, int]) -> tuple[bool, str]:
     if not path.is_file():
@@ -89,11 +84,6 @@ def main() -> int:
         card_ok, card_detail = inspect_png(card_path, CARD_SIZE)
         portrait_ok, portrait_detail = inspect_png(portrait_path, PORTRAIT_SIZE)
 
-        if representation_id in CARD_AUTHORITY_REJECTIONS:
-            rejection = CARD_AUTHORITY_REJECTIONS[representation_id]
-            card_ok = False
-            card_detail = f"AUTHORITY_REJECTED: {rejection}; physical={card_detail}"
-
         if card_ok:
             card_green += 1
         else:
@@ -110,7 +100,7 @@ def main() -> int:
         )
 
     print()
-    print(f"collectibleCard physical/authority GREEN: {card_green}/25")
+    print(f"collectibleCard physical GREEN: {card_green}/25")
     print(f"uiPortrait physical GREEN: {portrait_green}/25")
     print(f"total blocking rows/channels: {len(errors)}")
 
