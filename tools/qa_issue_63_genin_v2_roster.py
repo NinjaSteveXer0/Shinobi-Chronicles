@@ -21,7 +21,11 @@ V2_NEW=[
 LEADERS=['jonin_hanabi','jonin_inojin','jonin_konohamaru','jonin_kushina','jonin_sasuke','jonin_shikaku','jonin_shino','sj_anko','sj_ebisu','sj_genma','sj_ibiki','sj_kiba','sj_nono']
 checks={}
 checks['audited_game_blob_preserved']=git_blob_sha(game)=='9a95e018ac76b993c22b62ed6aa02be5520e97b1'
-checks['script_loaded_after_111_112']=index.index('runtime/alpha-world-konoha-112.js') < index.index('runtime/alpha-genin-roster-63.js')
+core_pos=index.find('runtime/alpha-world-konoha-112-core.js')
+fix_pos=index.find('runtime/alpha-world-konoha-112-fix.js')
+roster_pos=index.find('runtime/alpha-genin-roster-63.js')
+checks['script_loaded_after_112_core_fix']=core_pos>=0 and fix_pos>=0 and roster_pos>=0 and core_pos < fix_pos < roster_pos
+checks['legacy_112_dynamic_bootstrap_retired']='src="runtime/alpha-world-konoha-112.js"' not in index and "src='runtime/alpha-world-konoha-112.js'" not in index
 checks['v1_policy_preserved']='alpha_genin_roster_first_production_content_v1' in patch
 checks['v2_policy_exact']='alpha_genin_roster_first_production_content_v2' in patch
 checks['exact_v1_ids']=all(f'"{x}"' in patch for x in V1)
