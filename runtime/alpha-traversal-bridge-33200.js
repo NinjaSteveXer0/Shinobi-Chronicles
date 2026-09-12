@@ -96,7 +96,7 @@
 // activation. This does not recreate the retired #112 parser-dependency pattern.
 // ============================================================================
 (function activateAlphaFrontDoor33300(){
-  if(typeof document==="undefined")return;
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
   if(globalThis.SC_ALPHA_FRONT_DOOR_33300||document.getElementById("sc-alpha-front-door-33300-script"))return;
   const script=document.createElement("script");
   script.id="sc-alpha-front-door-33300-script";
