@@ -136,7 +136,7 @@
       &&JSON.stringify(a.returnCallerRef||null)===JSON.stringify(b.returnCallerRef||null);
   }
 
-  function persistEnvelope(areaId,envelope){
+  function persistEnvelope(areaId,envelope,{saveState=true}={}){
     const state=ensureState();
     const existing=state.areas[areaId]||null;
     if(existing&&existing.expired!==true&&sameSemanticEnvelope(existing,envelope))return{success:true,idempotent:true,state:clone(existing)};
@@ -153,7 +153,7 @@
       exteriorLocationConfirmed:false
     };
     state.areas[areaId]=next;
-    save();
+    if(saveState)save();
     return{success:true,idempotent:false,state:clone(next)};
   }
 
@@ -289,7 +289,7 @@
       checks.noAccessNoProjection=getMissionAreaHotspotProjections("konoha_anbu_hq").length===0&&getMissionAreaHotspotProjections("konoha_root_hq").length===0;
       const fakeCaller={type:"story_scene",sceneId:"diagnostic_story",beatId:"diagnostic_beat"};
       const env={missionAreaId:"konoha_anbu_hq",worldInstanceRef:"diag_anbu_instance",entryRouteRef:"anbu_hq_hotspot_secure_threshold",storyAuthorizedHotspotIds:["anbu_hq_hotspot_secure_threshold","anbu_hq_hotspot_briefing_chamber"],accessState:"ESCORTED_TEMPORARY",localActionability:"STORY_ONLY",returnCallerRef:fakeCaller,authorityOccurrenceId:"diag_occ_anbu_access"};
-      const valid=validateEnvelope(env.missionAreaId,env);persistEnvelope(env.missionAreaId,canonicalEnvelope(env.missionAreaId,env,valid.storyAuthorizedHotspotIds));
+      const valid=validateEnvelope(env.missionAreaId,env);persistEnvelope(env.missionAreaId,canonicalEnvelope(env.missionAreaId,env,valid.storyAuthorizedHotspotIds),{saveState:false});
       const visible=getMissionAreaHotspotProjections("konoha_anbu_hq").map(h=>h.hotspotId).sort();
       checks.strictSubsetProjection=visible.join("|")==="anbu_hq_hotspot_briefing_chamber|anbu_hq_hotspot_secure_threshold";
       checks.rootIndependent=getMissionAreaHotspotProjections("konoha_root_hq").length===0;
