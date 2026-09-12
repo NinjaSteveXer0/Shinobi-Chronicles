@@ -30,6 +30,25 @@ if(typeof renderAlphaTailedBeastMissionCommand==="function"){
   };
 }
 
+// 32800 was authored while #135 was unresolved. Once 32900 is present, its
+// diagnostic must recognise the now-integrated nine Origins rather than report
+// the deliberately old fail-closed state as a regression.
+if(typeof runAlphaJourneySurface32800Diagnostics==="function"){
+  const PRE328_DIAG=runAlphaJourneySurface32800Diagnostics;
+  runAlphaJourneySurface32800Diagnostics=function alpha329Journey32800CompatibilityDiagnostics(){
+    const result=PRE328_DIAG();
+    if(result&&result.checks){
+      result.checks.missingNineFailClosed=true;
+      result.checks.nineOriginPackagesNowIntegrated=Object.keys(A.sceneByVariant).length===10&&A.registrations.length===9;
+      result.failed=Object.entries(result.checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
+      result.pass=result.failed.length===0;
+      result.coordinationIssue=135;
+      result.coordinationIssueResolved=true;
+    }
+    return result;
+  };
+}
+
 function getAlphaOriginScene32900Status(){
   return Object.entries(A.sceneByVariant).map(([originId,sceneId])=>({
     originId,sceneId,
@@ -56,6 +75,7 @@ function runAlphaOriginScene32900Diagnostics(){
   };
   return{patchId:A.patchId,pass:Object.entries(checks).filter(([k])=>k!=="browserGoldenClaimed").every(([,v])=>v===true),checks,registrations:A.clone(A.registrations),status,browserGolden:false};
 }
+globalThis.SC_ALPHA_ORIGIN_SCENE_IDS=Object.freeze({...A.sceneByVariant});
 globalThis.ALPHA_ORIGIN_SCENE_BY_VARIANT_32900=A.sceneByVariant;
 globalThis.getAlphaOriginScene32900Status=getAlphaOriginScene32900Status;
 globalThis.runAlphaOriginScene32900Diagnostics=runAlphaOriginScene32900Diagnostics;
