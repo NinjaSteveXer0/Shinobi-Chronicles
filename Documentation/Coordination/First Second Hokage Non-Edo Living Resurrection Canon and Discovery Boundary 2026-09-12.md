@@ -1,432 +1,337 @@
-# Shinobi Chronicles — First / Second Hokage Non-Edo Living Resurrection Canon and Discovery Boundary
+# Shinobi Chronicles — First / Second Hokage Living Resurrection Canon and Discovery Boundary
 
 **Date:** 2026-09-12  
 **Owner:** CE / Codex / Coordination  
-**Status:** **BINDING MINIMAL CANON — MECHANISM / PERFORMER / REPRODUCIBILITY DETAILS PROTECTED GAP**  
-**Source:** GitHub #129
+**Status:** **BINDING CANON — HISTORICAL CHAIN CLOSED; EXACT FORMULA / COST / REPRODUCIBILITY REMAIN PROTECTED**  
+**Supersedes:** the earlier minimal-canon version of this document which treated performer/method/timing as unresolved.
 
 ---
 
-## 1. Purpose
+## 1. Canonical shorthand
 
-This document reconciles the existing Shinobi Chronicles premise that the **First Hokage, Hashirama Senju, and Second Hokage, Tobirama Senju, are genuinely alive in the current period after having previously died**, and that their return was **not Edo Tensei**.
+> **Hashirama and Madara both survived the Valley of the End. Hashirama returned to Konoha using Asura's chakra and Sage chakra. Later, Hashirama deliberately allowed his life to end naturally under a resurrection plan devised with Mito Uzumaki and Tobirama Senju. Mito's Uzumaki Fūinjutsu/Kinjutsu and Tobirama's knowledge gained through Edo Tensei research were used to restore Hashirama to genuine living life — not Edo Tensei. Hashirama then let the world believe the First Hokage was dead and disappeared into the world. Years later Tobirama died after naming Hiruzen the Third Hokage during the Kinkaku-squad ambush; Hashirama and Mito then used the same resurrection principle to restore Tobirama to genuine living life.**
 
-A current archaeology pass of live GitHub authority plus accessible Project/Library history did **not** recover durable exact canon for:
-
-- the resurrection method;
-- who performed it;
-- exact date/timing;
-- exact biological / soul-interface procedure;
-- costs;
-- limits;
-- reproducibility;
-- whether Hashirama/Tobirama know the full method;
-- whether the method can ever become player-accessible.
-
-Those missing details are therefore a **PROTECTED CANON GAP**, not permission to invent them.
-
-Canonical shorthand:
-
-> **They died. They were later truly restored to living state. They are the same people. The method was not Edo Tensei. Everything more specific requires later authority.**
+Hashirama and Tobirama after resurrection are the same persistent people who previously died.
 
 ---
 
-## 2. Identity and historical continuity
+## 2. Valley of the End — survival, not death
 
-### 2.1 Original deaths remain real
+### 2.1 Hashirama
 
-Hashirama's and Tobirama's original deaths remain real historical occurrences.
+Hashirama Senju **does not die at the Valley of the End** in Shinobi Chronicles history.
 
-Their resurrection does not erase, retcon or rewrite those deaths.
+After the battle, Hashirama uses **Asura's chakra together with Sage chakra** to make his way back to Konoha.
+
+The Valley of the End is therefore not Hashirama's historical death occurrence.
+
+### 2.2 Madara
+
+Madara Uchiha likewise **does not die at the Valley of the End**.
+
+His survival and subsequent trajectory through **Black Zetsu** remain part of the separate Madara history/canon line. This document does not redefine the later Madara sequence beyond locking that Valley-of-the-End death is false for this Chronicle.
 
 Preserve:
 
-**death happened != death erased**
-
-### 2.2 Same persistent persons
-
-Their return does **not** create replacement people, clones, renewed counterparts, collectible-only alternates or second Registry identities.
-
-Hashirama after resurrection is the same persistent Hashirama Senju who previously died.
-
-Tobirama after resurrection is the same persistent Tobirama Senju who previously died.
-
-Therefore the semantic history is:
-
-`alive -> death occurrence -> dead historical state -> non-Edo resurrection occurrence -> alive current state`
-
-not:
-
-`dead person -> new duplicate person`
-
-Current Registry same-person linkage rules remain applicable. Existing stable person identity must be reused; do not mint a second embodied person merely because a post-resurrection representation exists.
-
-For Hashirama, current Registry authority already uses stable person key:
-
-`person_hashirama_senju`
-
-For Tobirama, consume the current canonical stable person identity from Registry/source when needed rather than inventing a new key in CE.
+**Valley of the End defeat/disappearance != historical death for Hashirama or Madara.**
 
 ---
 
-## 3. True living resurrection — not Edo persistence
+## 3. Hashirama's planned death and true restoration
 
-The current state is a **true living return**, not a dead-person manifestation.
+After returning to Konoha, Hashirama eventually reaches the conclusion that the **Will of Fire must continue beyond him** and that he should not simply remain First Hokage forever.
 
-Minimal metaphysical distinction from Edo Tensei:
+Mito Uzumaki and Tobirama Senju collaborate with Hashirama on a plan built around allowing Hashirama to **die normally** and then genuinely restoring him to life.
 
-### Non-Edo living resurrection
+### 3.1 Knowledge/capability basis
 
-- the person is alive in the ordinary Chronicle life/death sense;
-- the living state is self-sustaining rather than a continuously maintained summoning manifestation;
-- the person is not semantically `dead + active Edo manifestation`;
-- no automatic caster control / release clause is implied;
-- no Edo-style persistence state is required to explain current presence;
-- ordinary future death remains possible unless later exact authority says otherwise;
-- their original death remains part of Chronicle history.
+The resurrection plan combines:
 
-### Edo Tensei / reanimation remains separate
+- **Uzumaki Fūinjutsu**;
+- **Uzumaki Kinjutsu / forbidden sealing knowledge**;
+- Mito's Uzumaki expertise;
+- Tobirama's knowledge of death/soul interaction derived in part from his development and understanding of **Edo Tensei**.
 
-Existing project doctrine for Edo-style reanimation remains conceptually distinct:
+This does **not** mean the resulting restoration is Edo Tensei.
 
-- dead person remains historically dead;
-- an active reanimated manifestation may exist;
-- release returns to dead state;
-- reanimation does not equal true life restoration.
+Tobirama's Edo-Tensei knowledge contributes to understanding the boundary between life, death, soul, body and return; the actual Hashirama restoration is a separate **true-living resurrection outcome**.
 
-Do not collapse the First/Second premise into Edo merely because both involve a historically dead person becoming present again.
+### 3.2 Hashirama dies for real
 
----
+Hashirama eventually allows his life to end naturally as intended by the plan.
 
-## 4. Protected canon gap — method / performer / timing
+That death is a real historical death occurrence.
 
-No current durable authority recovered by this reconciliation proves:
+Semantic history:
 
-- who performed the resurrection;
-- exact technique name;
-- exact Medicine / Fūinjutsu / Kinjutsu mechanism;
-- whether one person, group, relic, experiment, event or other source caused it;
-- exact historical date;
-- whether both were restored together or separately;
-- whether Hashirama/Tobirama know the full process;
-- exact resource/sacrifice/cost;
-- exact failure modes;
-- whether another person could be restored the same way.
+`alive after Valley of the End -> planned natural death -> dead -> true living resurrection -> alive`
 
-Therefore all of the above remain **UNRESOLVED / PROTECTED**.
+### 3.3 Mito + Tobirama restore Hashirama
 
-Writing, World, Combat, Progression and Coding must not infer those details from the fact that resurrection occurred.
+After Hashirama's genuine death, **Mito Uzumaki and Tobirama Senju** perform the resurrection plan and restore Hashirama to genuine living state.
+
+Hashirama is not:
+
+- an Edo Tensei manifestation;
+- a clone;
+- a replacement person;
+- a duplicate Registry identity;
+- a continuously maintained summon.
+
+He is alive again in the ordinary Chronicle life/death sense.
 
 ---
 
-## 5. Reproducibility and player-access boundary
+## 4. Hashirama leaves the First Hokage identity behind
 
-Current production authority does **not** authorize non-Edo resurrection as a general player mechanic.
+After being restored, Hashirama no longer believes he can or should simply resume life publicly as the First Hokage.
 
-For current Alpha / active production semantics:
+He deliberately allows the world to continue believing **Hashirama Senju / the First Hokage is dead** and disappears into the wider world.
 
-- `evidence of resurrection` may become discoverable;
-- `understanding that resurrection occurred` may become possible;
-- `partial understanding of one component/provenance` may become possible where later authored;
-- `ability to reproduce the resurrection` is **NOT AUTHORIZED**;
-- absence of explicit future authority must fail closed.
+This creates an intentional separation between:
 
-Canonical separation:
+- World Truth: Hashirama is alive;
+- public historical belief: Hashirama died;
+- observer Knowledge: only people with legitimate evidence/encounter history know otherwise.
 
-**understands evidence != understands method**  
-**understands method != can perform component**  
-**can perform component != can reproduce resurrection**  
-**historical precedent != player capability**
+Hashirama changes his appearance/presentation sufficiently to move anonymously.
 
-Future post-Alpha design may deliberately decide otherwise, but that would require explicit owner closure rather than inheritance from this historical anomaly.
+A preserved story possibility discussed in this canon is that **Hashirama attends his own funeral anonymously**, with nobody recognising him because of the changes he has made to his appearance and public identity.
+
+Until a precise scene is authored, treat the funeral attendance itself as a **locked intended historical beat / presentation opportunity**, while exact dialogue, witnesses, disguise details and occurrence IDs remain Writing authority.
 
 ---
 
-## 6. Capability-responsive discovery lenses
+## 5. Tobirama's death
 
-The triad **Medicine + Fūinjutsu + Kinjutsu** is accepted as a strong multi-discipline investigation framework around this historical anomaly.
+Years later, Tobirama Senju and his group are ambushed by the **Kinkaku squad**.
 
-It is **not** a resurrection recipe.
+Tobirama makes the decision to remain behind so the others can survive.
 
-### 6.1 Medicine
+Before doing so, he names **Hiruzen Sarutobi as the Third Hokage**.
 
-Where exact factual evidence exists and the Character has legitimate medical capability, Medicine may support bounded observations such as:
+Tobirama then goes to his death.
 
-- the subject is biologically alive rather than an animated corpse/construct;
-- circulation / tissue viability / healing / trauma state behaves as living biology;
-- chakra-system / organ / tissue state is inconsistent with an ordinary corpse-manifestation model;
-- reconstruction, restoration or unusual biological continuity evidence exists where specifically authored;
-- scars, interventions, treatment history or anomalous viability may be preserved/compared where exact evidence survives.
-
-Medicine does **not** automatically reveal:
-
-- who performed the resurrection;
-- the soul mechanism;
-- exact forbidden technique;
-- reproducibility;
-- complete historical truth.
-
-### 6.2 Fūinjutsu
-
-Where exact seal/interface evidence exists and legitimate Fūinjutsu capability supports it, Fūinjutsu may reveal bounded facts such as:
-
-- soul/body anchoring or continuity architecture may have been involved;
-- containment / transfer / interface / stabilisation patterns may exist;
-- residue/provenance may distinguish the occurrence from standard Edo-style binding;
-- identity-continuity or state-preservation structures may be recognisable without being reproducible;
-- a surviving seal/object/location may preserve partial causal evidence.
-
-Fūinjutsu does **not** automatically grant resurrection Access or prove a complete method.
-
-### 6.3 Kinjutsu
-
-Where exact provenance/historical evidence exists and legitimate Kinjutsu Knowledge/Access supports it, Kinjutsu may reveal bounded facts such as:
-
-- prohibited life/death manipulation is implicated;
-- the occurrence does not fit standard permitted medical/sealing doctrine;
-- known Edo/reanimation models do not fully explain the current living state;
-- a forbidden lineage, historical body of research or dangerous conceptual family may be relevant;
-- risks/unknowns exist even when execution details remain unavailable.
-
-Kinjutsu does **not** automatically mean the Character knows or can perform the resurrection technique.
-
-### 6.4 Compound triad
-
-Where the authored evidence genuinely supports all three lenses, **Medicine + Fūinjutsu + Kinjutsu** may allow a stronger factual conclusion than any one discipline alone.
-
-Example legitimate conclusion class:
-
-> `This body is genuinely alive; the continuity cannot be explained by Edo-style manifestation; surviving evidence indicates deliberate life/death + soul/body intervention.`
-
-That does **not** automatically reveal performer, exact method or reproducibility.
+This is a genuine historical death occurrence.
 
 Preserve:
 
-**compound evidence != universal solve button**
+**naming Hiruzen Third Hokage -> Tobirama's sacrifice/death remains real history.**
+
+The later resurrection does not erase that succession event or make Hiruzen's appointment false.
 
 ---
 
-## 7. World Truth / Knowledge separation
+## 6. Hashirama + Mito restore Tobirama
 
-### 7.1 World Truth
+Hashirama and Mito had an agreement that if Tobirama died, the same resurrection principle previously used for Hashirama would be used on Tobirama.
 
-The following are current binding World Truth:
+Following Tobirama's Kinkaku-squad death, **Hashirama and Mito** perform the corresponding true-living resurrection process and restore Tobirama to life.
 
-- Hashirama Senju died historically;
-- Tobirama Senju died historically;
-- each later returned to genuine living state;
-- each remains the same persistent person;
-- the return was not Edo Tensei.
+Again:
 
-### 7.2 Public / institutional / restricted Knowledge
+- this is **not Edo Tensei**;
+- Tobirama is genuinely alive;
+- Tobirama remains the same persistent person;
+- Tobirama's historical death still happened;
+- Hiruzen remains legitimately installed as Third Hokage;
+- resurrection does not automatically return Tobirama to the office of Second Hokage.
 
-No blanket public-Knowledge package is created by this document.
+Semantic history:
 
-Observers may legitimately know that Hashirama/Tobirama are alive if they have directly encountered them or consumed authorised public/institutional information.
+`Second Hokage -> names Hiruzen successor -> Kinkaku-squad death -> dead -> true living resurrection -> alive`
 
-Knowing they are alive does **not** imply knowing:
+---
 
-- how;
-- who performed it;
-- when;
-- whether it is reproducible;
-- whether either Hokage knows the method;
-- exact costs or risks.
+## 7. Identity / Registry continuity
 
-Public history, restricted institutional archives, clan Knowledge, ANBU/Root Knowledge, medical Knowledge and private witness Knowledge remain separate observer-relative layers.
+Hashirama after resurrection is the same persistent **Hashirama Senju**.
+
+Tobirama after resurrection is the same persistent **Tobirama Senju**.
+
+Do not create a second embodied person merely because there is a post-resurrection representation.
 
 Preserve:
 
-**World Truth != public history != institutional Knowledge != observer Knowledge != presentation**
+**death occurrence != identity deletion**  
+**resurrection occurrence != new person**  
+**same persistent person != same representation**
+
+Historical / Hokage / anonymous post-resurrection / later collectible representations may differ without becoming separate people.
 
 ---
 
-## 8. Evidence / provenance classes
+## 8. True resurrection vs Edo Tensei
 
-Future Story/World content may author evidence in one or more of these classes where factually justified:
+The restoration technique is informed partly by knowledge Tobirama gained through Edo-Tensei research, but the outcome is categorically different.
 
-- medical records / treatment notes;
-- biological samples or diagnostic observations;
-- chakra-system observations;
-- seals / formula residue / interface remnants;
-- tools / instruments / facilities;
-- damaged or partial forbidden-research records;
-- witness testimony;
-- institutional archives;
-- clan/private records;
-- places where the resurrection or related research occurred;
-- objects/components carrying provenance;
-- inconsistencies between historical death records and current living observations.
+### True-living restoration
 
-These are **candidate evidence classes**, not automatic proof that every resurrection left every type of evidence.
+- the person returns to ordinary living state;
+- the body/life state is self-sustaining;
+- the person is not semantically `dead + active manifestation`;
+- no caster-control state is implied;
+- no Edo-release clause is required to remain alive;
+- ordinary future death remains possible;
+- the prior death remains historical fact.
 
-Do not generate evidence merely because a player has the corresponding Skill.
+### Edo Tensei
 
----
-
-## 9. History-generated investigation lineage
-
-World's recommendation is accepted: if/when this becomes active content, use a **history-generated investigation lineage**, not a one-scene exposition dump.
-
-A legitimate progression may include, where authored:
-
-1. historical contradiction;
-2. living/medical anomaly;
-3. seal/interface provenance;
-4. forbidden-method family recognition;
-5. witness/archive/location discovery;
-6. proof that historical death was followed by true life restoration without Edo;
-7. separate later investigations into `who`, `how`, `why`, `cost`, and `can it happen again`.
-
-Different Chronicle builds may learn different subsets or create different consequences.
-
-Potential eligible consumers include:
-
-- Medicine;
-- Fūinjutsu;
-- Kinjutsu;
-- Tracking;
-- rare Knowledge;
-- clan history;
-- service/political recognition;
-- ANBU/Root historical access;
-- False Identity;
-- relationships / witnesses;
-- provenance/crafting analysis where exact objects exist.
-
-Not every route reaches the same truth at the same time.
-
----
-
-## 10. Knowledge-to-power ladder
-
-The investigation must preserve the project-wide separation:
-
-`evidence`  
-→ `bounded observation`  
-→ `inference`  
-→ `verified historical fact`  
-→ `partial method Knowledge`  
-→ `component Access`  
-→ `Competence`  
-→ `Power`  
-→ `Mastery / reproducibility`
-
-No earlier stage implies the later stage.
-
-The final reproduction step remains **unauthorised / fail-closed** under current production authority.
-
----
-
-## 11. Costs / risks / institutional consequence
-
-Exact resurrection-method costs are currently unknown and must not be invented.
-
-Investigation/use of related evidence may nevertheless create ordinary factual consequences where authored, including:
-
-- exposing rare forbidden Knowledge;
-- drawing institutional attention;
-- changing what witnesses or political actors know;
-- creating custody/disclosure disputes over evidence;
-- risking contamination/destruction of irreplaceable provenance;
-- creating obligations or conflict over access to archives/objects/people;
-- causing later adversaries to prepare against the investigator's demonstrated capabilities.
-
-No universal good/evil or morality score is implied.
-
----
-
-## 12. Registry / Rank / PL / representation consequences
-
-### Identity
-
-Resurrection does **not** create a new persistent person.
-
-A post-resurrection Character representation must link to the same stable person as the historical/pre-death person.
-
-### Death/history
-
-Registry/Chronicle history must be able to preserve both:
-
-- historical death occurrence;
-- later resurrection occurrence/current living state.
-
-`currently alive` does not erase `previously died`.
-
-### Formal Rank / office
-
-Resurrection alone does not automatically restore a former office, command authority or current appointment.
-
-Historical title `First Hokage` / `Second Hokage` remains historical identity/context; any current formal office/appointment is separate Rank/World authority.
-
-### Base Stats / PL
-
-This CE canon does **not** recalculate or mutate Base Stats or Base PL.
-
-Exact current representation Stats/PL remain Registry/PL authority.
-
-Do not apply a direct resurrection PL bonus or penalty.
-
-### Age / body / representation
-
-Exact post-resurrection biological age, body age, visual age, health condition and representation package remain unresolved unless already closed by a specific Registry/Character authority.
-
-Do not infer immortal youth, restored prime, accelerated ageing or unchanged corpse-age from the resurrection premise alone.
-
-### Variants
-
-A historical, Genin, Hokage, Jinchūriki, post-resurrection or other collectible representation may differ, but representation difference does not create a second persistent person unless explicit authority says it is an alternate Chronicle person.
-
----
-
-## 13. Hard non-collapse rules
+- remains a separate reanimation method;
+- does not itself equal genuine restoration to ordinary life.
 
 Preserve:
 
-- death happened != death erased;
-- resurrection != Edo Tensei;
+**Tobirama used knowledge from Edo Tensei != Hashirama/Tobirama were resurrected by Edo Tensei.**
+
+---
+
+## 9. Closed causal participants
+
+### Hashirama restoration
+
+Known participants:
+
+- Hashirama Senju — planned subject / later restored living person;
+- Mito Uzumaki — resurrection-plan collaborator and performer;
+- Tobirama Senju — resurrection-plan collaborator and performer, contributing Edo-derived life/death/soul knowledge.
+
+### Tobirama restoration
+
+Known participants:
+
+- Tobirama Senju — deceased subject / later restored living person;
+- Hashirama Senju — performer/collaborator;
+- Mito Uzumaki — performer/collaborator.
+
+Do not replace these participants with an unknown third-party performer unless later explicit canon adds another necessary participant.
+
+---
+
+## 10. Remaining protected gaps
+
+The following are still **NOT closed** by this authority:
+
+- exact technique/formula name;
+- exact Uzumaki seal array/formula;
+- exact Kinjutsu components;
+- exact body/soul mechanics;
+- exact resource, sacrifice, chakra or life cost;
+- exact preparation time;
+- failure modes;
+- whether every dead person is compatible;
+- how long after death the process remains viable;
+- exact biological age/body-state after restoration;
+- full public/institutional Knowledge state;
+- whether the method survives intact in records;
+- whether either Hashirama or Tobirama can reproduce it alone;
+- whether any player Character can ever learn or reproduce it.
+
+Absence of those details must fail closed rather than invite invention.
+
+---
+
+## 11. Capability-responsive discovery
+
+The closed historical method now gives stronger factual grounding to future investigation while preserving the project ladder:
+
+**Knowledge != Access != Competence != Power != Mastery.**
+
+### Fūinjutsu
+
+May recognise Uzumaki sealing lineage, soul/body continuity structures, anchoring, transfer, stabilisation, residue or surviving formula fragments where authored evidence exists.
+
+### Kinjutsu
+
+May recognise forbidden life/death manipulation, conceptual overlap with Tobirama's reanimation research, risk/provenance and why the process is outside ordinary sealing/medical practice.
+
+### Medicine
+
+May recognise genuine living biological state, restored body viability and distinctions from corpse/reanimation states where evidence supports it.
+
+### Combined expertise
+
+A Character with sufficiently developed Fūinjutsu/Kinjutsu/Medicine and legitimate evidence may reach stronger conclusions than a generalist, but:
+
+**recognising the historical process != learning the resurrection technique.**
+
+This follows the capability-responsive Story rule: different builds may uncover different kinds of evidence/rewards rather than all receiving the same result.
+
+---
+
+## 12. Public truth / secrecy
+
+Hashirama deliberately lets the world believe he is dead after his restoration.
+
+Tobirama's post-resurrection public state is not fully specified here beyond the fact that his historical death remains publicly meaningful and Hiruzen's succession remains legitimate.
+
+Do not assume every modern Konoha character automatically knows either resurrection occurred.
+
+Preserve:
+
+**World Truth != public history != institutional Knowledge != observer Knowledge != presentation.**
+
+Hashirama/Tobirama may appear in current Story only where the current observer has a legitimate route to that encounter/Knowledge or the scene itself establishes it.
+
+---
+
+## 13. Madara boundary
+
+Madara's Valley-of-the-End survival is locked here only to prevent false history that he died there.
+
+His later evolution/trajectory through Black Zetsu belongs to the Madara/Story/Codex history line and should be reconciled there rather than expanded speculatively in this resurrection authority.
+
+Do not use Hashirama's resurrection technique to explain Madara's survival or later state unless separate canon explicitly does so.
+
+---
+
+## 14. Hard non-collapse rules
+
+Preserve:
+
+- Hashirama did not die at Valley of the End;
+- Madara did not die at Valley of the End;
+- Hashirama's later natural death was genuine;
+- Tobirama's Kinkaku-squad death was genuine;
+- resurrection does not erase either death;
+- true restoration != Edo Tensei;
+- Edo-Tensei-derived knowledge != Edo-Tensei outcome;
 - same persistent person != same representation;
-- historical title != current appointment;
-- World Truth != observer Knowledge;
-- Knowledge != Access != Competence != Power != Mastery;
-- recognition of resurrection != resurrection capability;
-- partial method Knowledge != reproducibility;
-- Medicine != resurrection;
-- Fūinjutsu != resurrection;
-- Kinjutsu != resurrection;
-- Medicine + Fūinjutsu + Kinjutsu != resurrection button;
-- exceptional historical occurrence != universal player mechanic;
-- discovering truth != publicising truth;
-- capability eligibility != automatic evidence/success;
-- current living state != original death retconned;
+- historical Hokage title != current appointment;
+- Hashirama's hidden survival != universal public Knowledge;
+- Hiruzen becoming Third Hokage remains legitimate;
 - resurrection state != direct PL bonus;
-- authored investigation != generic morality system.
+- historical technique precedent != player capability;
+- evidence != complete formula;
+- Knowledge != Access != Competence != Power != Mastery.
 
 ---
 
-## 14. Current disposition
+## 15. Current disposition
 
-**Closed now:**
+### Closed now
 
-- true non-Edo living resurrection premise;
-- same-person continuity;
-- original deaths remain real;
-- minimal distinction from Edo persistence;
-- current fail-closed player reproducibility boundary;
-- Medicine/Fūinjutsu/Kinjutsu investigation lenses;
-- World Truth / observer-Knowledge separation;
-- history-generated investigation architecture;
-- Registry/PL non-mutation boundary.
+- Hashirama survives Valley of the End;
+- Madara survives Valley of the End;
+- Hashirama returns to Konoha using Asura's chakra + Sage chakra;
+- Hashirama/Mito/Tobirama deliberately plan a genuine death-and-restoration route;
+- Uzumaki Fūinjutsu/Kinjutsu + Tobirama's Edo-Tensei-derived knowledge are foundational to the process;
+- Hashirama genuinely dies naturally;
+- Mito + Tobirama restore Hashirama to true living state;
+- Hashirama abandons public First-Hokage life and allows the world to believe him dead;
+- anonymous attendance at his own funeral is a locked intended historical beat, exact scene TBD;
+- Tobirama names Hiruzen Third Hokage during the Kinkaku-squad crisis and genuinely dies;
+- Hashirama + Mito restore Tobirama using the same resurrection principle;
+- Hashirama/Tobirama remain the same persistent people;
+- neither restoration is Edo Tensei.
 
-**Protected canon gap:**
+### Protected
 
-- performer;
-- exact method;
-- exact timing;
-- exact costs/limits;
+- exact formula/name;
+- exact costs and failure conditions;
+- exact biological mechanics;
 - exact reproducibility;
-- Hashirama/Tobirama's own method Knowledge;
-- exact current public/institutional secrecy state;
-- exact post-resurrection body/age semantics.
-
-These may be closed later only by explicit new evidence/authoring, not inference.
+- complete surviving documentation;
+- player Access/Mastery;
+- precise current public/institutional Knowledge packages;
+- exact funeral scene execution.
