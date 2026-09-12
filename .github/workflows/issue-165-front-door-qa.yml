@@ -1,0 +1,43 @@
+name: Issue 165 Alpha Front Door QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'runtime/alpha-front-door-33300.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_165_front_door.py'
+      - 'tools/qa_issue_165_front_door_runtime.js'
+      - '.github/workflows/issue-165-front-door-qa.yml'
+  pull_request:
+    paths:
+      - 'runtime/alpha-front-door-33300.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_165_front_door.py'
+      - 'tools/qa_issue_165_front_door_runtime.js'
+      - '.github/workflows/issue-165-front-door-qa.yml'
+
+jobs:
+  front-door-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Source and load-seam gate
+        run: python tools/qa_issue_165_front_door.py
+
+      - name: Runtime boot/reset/origin delegation harness
+        run: node tools/qa_issue_165_front_door_runtime.js
