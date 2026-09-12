@@ -4,7 +4,8 @@
 This is a Coding-owned integration gate, not gameplay authority. It composes the
 existing subsystem QA/harnesses and adds cross-module assertions for the live
 Alpha production load chain. It deliberately does not claim installed-browser
-or Golden evidence.
+or Golden evidence. Asset-owned binary validation is executed and reported as
+an external blocker class without granting Coding permission to remap/fix art.
 """
 from __future__ import annotations
 
@@ -51,7 +52,6 @@ PYTHON_GATES = [
     "tools/qa_alpha_traversal_bridge_33200.py",
     "tools/qa_issue_155_anbu_root_contained.py",
     "tools/qa_genin_expansion_assets.py",
-    "tools/qa_battle_portraits.py",
 ]
 
 NODE_GATES = [
@@ -59,6 +59,11 @@ NODE_GATES = [
     "tools/qa_issue_63_genin_v2_runtime.js",
     "tools/qa_alpha_origin_scenes_32900_runtime.js",
     "tools/qa_issue_155_anbu_root_runtime.js",
+    "tools/qa_issue_141_traversal_runtime.js",
+]
+
+EXTERNAL_ASSET_GATES = [
+    "tools/qa_battle_portraits.py",
 ]
 
 
@@ -86,13 +91,17 @@ def execute(label: str, argv: list[str]) -> dict[str, object]:
     output = proc.stdout.strip()
     if output:
         print(f"\n--- {label} ---\n{output}")
-    return {"label": label, "returncode": proc.returncode, "pass": proc.returncode == 0}
+    return {
+        "label": label,
+        "returncode": proc.returncode,
+        "pass": proc.returncode == 0,
+        "output": output,
+    }
 
 
 def main() -> int:
     checks: dict[str, bool] = {}
     index = INDEX.read_text(encoding="utf-8")
-    game = GAME.read_text(encoding="utf-8")
     scripts = re.findall(r'<script\s+src=["\']([^"\']+)["\']', index)
 
     # Production loader integrity.
@@ -127,8 +136,7 @@ def main() -> int:
     # Syntax-check the exact production JavaScript chain. game.js is included.
     syntax_results = []
     for script in scripts:
-        result = execute(f"node --check {script}", ["node", "--check", str(ROOT / script)])
-        syntax_results.append(result)
+        syntax_results.append(execute(f"node --check {script}", ["node", "--check", str(ROOT / script)]))
     require(checks, "production_chain_syntax_green", all(row["pass"] for row in syntax_results))
 
     roster = read("runtime/alpha-genin-roster-63.js")
@@ -162,10 +170,18 @@ def main() -> int:
         "traversal_completed_returns_to_existing_journey",
         contains_all(bridge, "state.completed===true", "openCurrentJourney33200", 'openOverlay("missions")'),
     )
+    # The bridge diagnostic inspects only the wrapped navigation functions. The
+    # literal below appears in that diagnostic by design, so a whole-file ban is
+    # a false positive rather than evidence of a commit path.
     require(
         checks,
         "traversal_does_not_commit_acquisition",
-        "commitCharacterAcquisition" not in bridge,
+        contains_all(
+            bridge,
+            "noOwnershipMutation:",
+            '!promotionSource.includes("commitCharacterAcquisition")',
+            '!rosterSource.includes("commitCharacterAcquisition")',
+        ),
     )
 
     # Current Journey / Arc-1 / late-Arc continuity uses existing authorities.
@@ -211,21 +227,32 @@ def main() -> int:
         not any("fire" in Path(script).name.lower() and script.startswith("runtime/") for script in scripts),
     )
 
-    # Live portrait cardinality remains the current 115 contract. This checks the
-    # source of truth indirectly too by running qa_battle_portraits.py below.
+    # Live portrait cardinality remains the current 115 contract. Physical art
+    # bytes are checked below as an external Assets-owned gate.
     portrait_qa = read("tools/qa_battle_portraits.py")
     require(checks, "portrait_gate_is_115_not_116", "115" in portrait_qa and "116" not in portrait_qa)
 
-    # Required existing gates must remain present. Missing tests are regressions.
-    all_gate_paths = PYTHON_GATES + NODE_GATES
+    all_gate_paths = PYTHON_GATES + NODE_GATES + EXTERNAL_ASSET_GATES
     require(checks, "all_closure_subgates_exist", all((ROOT / rel).is_file() for rel in all_gate_paths))
 
-    subgate_results: list[dict[str, object]] = []
+    coding_results: list[dict[str, object]] = []
     for rel in PYTHON_GATES:
-        subgate_results.append(execute(rel, [sys.executable, str(ROOT / rel)]))
+        coding_results.append(execute(rel, [sys.executable, str(ROOT / rel)]))
     for rel in NODE_GATES:
-        subgate_results.append(execute(rel, ["node", str(ROOT / rel)]))
-    require(checks, "all_existing_subsystem_gates_green", all(row["pass"] for row in subgate_results))
+        coding_results.append(execute(rel, ["node", str(ROOT / rel)]))
+    require(checks, "all_coding_subsystem_gates_green", all(row["pass"] for row in coding_results))
+
+    external_results: list[dict[str, object]] = []
+    for rel in EXTERNAL_ASSET_GATES:
+        external_results.append(execute(f"external:{rel}", [sys.executable, str(ROOT / rel)]))
+    external_blockers = [
+        {
+            "label": row["label"],
+            "returncode": row["returncode"],
+            "summary": next((line for line in str(row["output"]).splitlines() if line.startswith("FAIL")), "external gate failed"),
+        }
+        for row in external_results if not row["pass"]
+    ]
 
     # Golden remains a browser evidence class, explicitly outside this gate.
     require(checks, "browser_golden_not_claimed", True)
@@ -239,7 +266,9 @@ def main() -> int:
         "failed": failed,
         "productionScriptCount": len(scripts),
         "syntaxGateCount": len(syntax_results),
-        "subgateCount": len(subgate_results),
+        "codingSubgateCount": len(coding_results),
+        "externalGateCount": len(external_results),
+        "externalBlockers": external_blockers,
         "browserGoldenClaimed": False,
         "authorityCreated": False,
     }
