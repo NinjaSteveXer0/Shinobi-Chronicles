@@ -87,20 +87,41 @@
 })();
 
 // ============================================================================
-// ISSUE #165 — TERMINAL FRONT-DOOR ACTIVATION
+// ISSUE #165 — TERMINAL FRONT-DOOR + INSTALLED-BROWSER CORRECTION ACTIVATION
 //
-// 33300 is a terminal presentation/boot gate, not a dependency provider for any
-// later gameplay module. Load it from the existing Coding-owned traversal seam
-// without changing parser authority for World/Story/Battle. The script marks
-// itself through SC_ALPHA_FRONT_DOOR_33300 and the id below prevents duplicate
-// activation. This does not recreate the retired #112 parser-dependency pattern.
+// 33300 remains the first terminal presentation gate. 33400 loads only after
+// 33300 has finished, then replaces that temporary save chooser with the real
+// new-player flow and installs the Coding-owned enemy-turn / PL calibration
+// corrections. Neither terminal layer is a dependency provider for downstream
+// gameplay modules. Headless harnesses without a real document.head no-op here.
 // ============================================================================
-(function activateAlphaFrontDoor33300(){
+(function activateAlphaBrowserTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
-  if(globalThis.SC_ALPHA_FRONT_DOOR_33300||document.getElementById("sc-alpha-front-door-33300-script"))return;
-  const script=document.createElement("script");
-  script.id="sc-alpha-front-door-33300-script";
-  script.src="runtime/alpha-front-door-33300.js";
-  script.async=false;
-  document.head.appendChild(script);
+
+  function load33400(){
+    if(globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400||document.getElementById("sc-alpha-browser-onboarding-fixes-33400-script"))return;
+    const fix=document.createElement("script");
+    fix.id="sc-alpha-browser-onboarding-fixes-33400-script";
+    fix.src="runtime/alpha-browser-onboarding-fixes-33400.js";
+    fix.async=false;
+    document.head.appendChild(fix);
+  }
+
+  if(globalThis.SC_ALPHA_FRONT_DOOR_33300){
+    load33400();
+    return;
+  }
+
+  const existing=document.getElementById("sc-alpha-front-door-33300-script");
+  if(existing){
+    existing.addEventListener("load",load33400,{once:true});
+    return;
+  }
+
+  const front=document.createElement("script");
+  front.id="sc-alpha-front-door-33300-script";
+  front.src="runtime/alpha-front-door-33300.js";
+  front.async=false;
+  front.addEventListener("load",load33400,{once:true});
+  document.head.appendChild(front);
 })();
