@@ -329,16 +329,128 @@ Canonical rule:
 
 ---
 
-## 14. Automatic production-idea durability rule
+## 14. Automatic production-idea recognition and durability rule
 
-Every specialist workspace must automatically preserve a production-relevant idea before moving past it when any of the following is true:
+### 14.1 Stephen does not have to say `save this`
 
-- Stephen explicitly approves it, says to keep it, calls it canon, locks it, or asks to revisit/use it later;
-- the specialist itself declares it closed/approved/authoritative;
-- it changes future Story, World, Character, Registry, Combat, Progression, Acquisition, UI, Runtime or CE behavior;
-- losing it would force Stephen to reconstruct the idea from memory later;
-- it creates a future content lane, mechanic, event family, lore/canon fact, capability interaction, exception, or non-collapse rule;
-- another specialist could reasonably need it later.
+The specialist owns recognition.
+
+Stephen may explicitly say `keep this`, `lock this`, `save this`, `canon`, `we need this later`, or equivalent, and those statements are mandatory capture triggers. But **absence of those words is not permission to leave an important idea chat-only**.
+
+Every specialist must continuously classify its own conversation using the three-gate test below.
+
+### 14.2 Gate One — SHOULD THIS SURVIVE THIS CHAT?
+
+A specialist must make an idea/decision durable when **any** of the following is true:
+
+- Stephen approves it, positively selects it over alternatives, or builds later reasoning on top of it;
+- the specialist itself describes it as closed, approved, locked, canonical, authoritative, final, accepted, required, preserved, or a future plan;
+- it establishes or changes a factual Story/canon/World/Character history;
+- it changes future gameplay, runtime behavior, content eligibility, capability semantics, progression, acquisition, Registry, Rank, PL, Battle, UI, asset use, persistence, or CE architecture;
+- it creates an exception, edge-case rule, non-collapse boundary, fallback, precedence rule, or protected gap;
+- it creates a named mechanic, route, event family, system, content lane, variant, representation, relationship, faction fact, location fact, mission beat, reward concept, or future hook;
+- it introduces exact IDs, formulas, numerical packages, required assets, file paths, schemas, state transitions, or validation requirements that future work may depend on;
+- another specialist could reasonably make a different decision if they did not know this information;
+- later implementation/content would be wrong, weaker, contradictory, or incomplete without it;
+- the idea has been discussed more than once or survives comparison against alternatives;
+- Stephen reacts in a way that clearly adopts the idea even without formal words such as `save` or `lock`;
+- losing it would plausibly force Stephen to reconstruct it from memory;
+- reproducing it later would require meaningful creative/design effort rather than trivial re-derivation.
+
+A practical one-line test is:
+
+> **If a competent successor specialist would want to know this before making a future production decision, preserve it.**
+
+Another equivalent test is:
+
+> **If losing this would annoy Stephen because he already spent real thought deciding it, preserve it.**
+
+### 14.3 What does NOT need automatic durable capture
+
+Do not flood GitHub with every conversational fragment.
+
+Durable capture is normally unnecessary for:
+
+- clearly rejected ideas whose rejection itself has no future semantic importance;
+- throwaway examples used only to explain an already-durable rule;
+- ordinary factual questions that do not change project authority;
+- transient wording/style alternatives that were never selected;
+- duplicate reinforcement of authority already durable and current;
+- casual reactions with no production consequence;
+- speculative brainstorming that is immediately abandoned and creates no useful future lane.
+
+If rejection itself matters because the project must **not** revisit the idea, record the rejection/supersession rather than discarding it silently.
+
+### 14.4 Uncertain importance defaults to preservation without promotion
+
+When a specialist is genuinely unsure whether an idea is important enough, the safe default is:
+
+**preserve lightly; do not promote.**
+
+That means record it as `DISCUSSION`, `CANDIDATE`, `PROPOSAL`, `PROTECTED GAP`, `POST-ALPHA`, or another truthful non-binding status rather than either:
+
+- losing it completely; or
+- falsely declaring it canon.
+
+Durability and authority level are separate questions.
+
+**preserved != approved**  
+**approved != implemented**  
+**implemented != runtime validated**  
+**runtime validated != Golden**
+
+### 14.5 Gate Two — DOES CE NEED TO REVIEW IT?
+
+After deciding an idea should survive the chat, ask whether it requires CE / Codex / Coordination review.
+
+Route one consolidated `[IDEA-REVIEW][TO: CE-CODEX-COORDINATION]` issue when the preserved idea:
+
+- changes or creates canon / Recorded History / chronology;
+- changes terminology or Codex meaning;
+- crosses more than one specialist ownership boundary;
+- creates reusable Chronicle Engine semantics;
+- creates a systemic capability rather than one isolated content instance;
+- introduces a new exception/non-collapse rule that other systems must respect;
+- could contradict or supersede existing durable authority;
+- changes identity, Knowledge, Access, ownership, assignment, deployment, Rank, PL, Progression, Battle, World, Story, relationship, provenance, persistence, or event semantics outside one owner's isolated implementation detail;
+- appears useful beyond the immediate scene/character/item/mission;
+- materially simplifies or improves existing architecture;
+- could create hidden downstream technical/content debt if accepted carelessly;
+- or would benefit from CE checking whether the idea can be made more general, safer, cleaner, or more powerful without breaking owner boundaries.
+
+CE review is **not** required merely because an idea is interesting. Purely local specialist content may be made durable by its owner without CE traffic.
+
+### 14.6 Gate Three — DOES SOMEONE NEED TO ACT NOW?
+
+After durability and CE-review classification, determine traffic priority:
+
+- **SEND NOW** — another owner must act before current Alpha work can continue;
+- **QUEUE** — genuine future action/review exists but does not block the current task;
+- **RECORD ONLY** — preservation is sufficient; nobody needs to act now.
+
+This prevents automatic preservation from becoming automatic interruption.
+
+### 14.7 Automatic capture flow
+
+The expected specialist behavior is:
+
+`conversation produces idea/decision`
+
+→ **Gate One:** would future production benefit from remembering it?
+
+→ if YES, preserve it with truthful status
+
+→ **Gate Two:** is it cross-system / canon / reusable / collision-prone?
+
+→ if YES, route one CE idea-review issue
+
+→ **Gate Three:** does anybody need to act now?
+
+→ SEND NOW / QUEUE / RECORD ONLY
+
+Stephen should not have to trigger any of these steps manually.
+
+### 14.8 Durability mechanisms
 
 Durability may be satisfied by:
 
@@ -407,6 +519,6 @@ No Stephen relay is required after the protocol is adopted.
 
 Each specialist workspace must receive this rule once, either through Project/workspace instructions or one initial bootstrap message:
 
-> **Use `Documentation/Coordination/Specialist_GitHub_Handoff_Protocol.md` as active coordination authority. GitHub Issues are your cross-workspace inbox/outbox and GitHub documents/commits are durable production memory. Before asking Stephen to relay a dependency or reporting that another owner has not responded, check open issues for your owner token and current relevant GitHub authority. When your work creates a SEND NOW dependency for another owner, create the GitHub issue yourself; when you complete an incoming handoff, comment with evidence, close it, and create the next downstream issue directly if genuinely required. Additionally, no production-relevant idea may remain chat-only once it is approved, closed, explicitly preserved by Stephen, or important enough that losing it would harm future work. Make it durable automatically. If the idea changes canon, crosses owner boundaries, introduces reusable CE semantics, creates a systemic capability, risks a semantic collision, or could materially improve the wider project, create/update one consolidated `[IDEA-REVIEW][TO: CE-CODEX-COORDINATION]` issue. CE may ACCEPT, REFINE/IMPROVE, RETURN TO OWNER, VETO/SUPERSEDE with evidence, or DEFER/RECORD ONLY while preserving specialist ownership. Stephen is fallback transport only if GitHub tooling is unavailable.**
+> **Use `Documentation/Coordination/Specialist_GitHub_Handoff_Protocol.md` as active coordination authority. GitHub Issues are your cross-workspace inbox/outbox and GitHub documents/commits are durable production memory. Stephen does NOT need to say `save this`: you are responsible for automatically recognising production-relevant ideas using the protocol's three-gate test. If a competent successor would need an idea/decision to make correct future production choices, preserve it with its truthful status. If it changes canon, crosses owner boundaries, creates reusable CE semantics/systemic capability, risks a semantic collision, or could materially improve the wider project, create/update one consolidated `[IDEA-REVIEW][TO: CE-CODEX-COORDINATION]` issue. CE may ACCEPT, REFINE/IMPROVE, RETURN TO OWNER, VETO/SUPERSEDE with evidence, or DEFER/RECORD ONLY while preserving specialist ownership. Before asking Stephen to relay a dependency or reporting that another owner has not responded, check open issues for your owner token and current relevant GitHub authority. When your work creates a SEND NOW dependency for another owner, create the GitHub issue yourself; when you complete an incoming handoff, comment with evidence, close it, and create the next downstream issue directly if genuinely required. Stephen is fallback transport only if GitHub tooling is unavailable.**
 
 This is a one-time protocol adoption step, not recurring message-bus work for Stephen.
