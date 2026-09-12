@@ -24,7 +24,11 @@ if (ROOT/'runtime/alpha-journey-surface-32800.js').exists():
  checks['32800_modern_world_dossier']='alpha328-event' in s and 'executeSelectedOpportunityAction' in s
  checks['32800_journey_frontier']='CURRENT FRONTIER' in s and 'UNLOCKS AFTER GENIN TEAM' in s
  checks['32800_arena_four_routes']=all(x in s for x in ['openArenaPromotionSurface','staged','pvp','tournament'])
- checks['32800_no_arena_main_asset_dependency']='arena_main.png' not in s
+ arena_start=s.find('renderArenaMainOverlay=function alpha328ArenaMain(container)')
+ arena_end=s.find('\n\n  function runAlphaJourneySurface32800Diagnostics()',arena_start)
+ arena_body=s[arena_start:arena_end] if arena_start>=0 and arena_end>arena_start else ''
+ checks['32800_arena_override_found']=bool(arena_body)
+ checks['32800_no_arena_main_asset_dependency']=bool(arena_body) and 'getAlphaArenaMasterAsset("main")' not in arena_body and 'arena_main.png' not in arena_body
 for rel in FILES[1:6]:
  p=ROOT/rel
  if p.exists():
