@@ -19,9 +19,18 @@ def syntax(path:Path)->bool:
     return subprocess.run(["node","--check",str(path)],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True).returncode==0
 
 
+def function_slice(source:str,start:str,end:str)->str:
+    left=source.find(start)
+    if left<0:
+        return ""
+    right=source.find(end,left+len(start))
+    return source[left:right if right>=0 else len(source)]
+
+
 def main()->int:
     front=FRONT.read_text(encoding="utf-8") if FRONT.is_file() else ""
     bridge=BRIDGE.read_text(encoding="utf-8") if BRIDGE.is_file() else ""
+    reset_source=function_slice(front,"function resetChronicle33300()","function confirmNinja33300()")
     checks={
         "front_runtime_exists":FRONT.is_file(),
         "runtime_harness_exists":HARNESS.is_file(),
@@ -31,9 +40,11 @@ def main()->int:
         "exact_boot_sequence":all(token in front for token in ["landing","ninja_id","village","ninja"]),
         "existing_save_has_continue":"CONTINUE CHRONICLE" in front and "NEW CHRONICLE" in front,
         "fresh_save_has_begin":"BEGIN CHRONICLE" in front,
-        "reset_exact_player_save":"shinobiChroniclesPlayerSave" in front,
-        "reset_exact_session_resume":"shinobiTestState" in front,
-        "reset_not_blanket_storage_clear":"localStorage.clear" not in front and "sessionStorage.clear" not in front,
+        "reset_function_found":bool(reset_source),
+        "reset_exact_player_save":"PLAYER_SAVE_KEY_33300" in reset_source,
+        "reset_exact_session_resume":"SESSION_RESUME_KEY_33300" in reset_source,
+        "reset_exact_profile":"PROFILE_KEY_33300" in reset_source,
+        "reset_not_blanket_storage_clear":"localStorage.clear" not in reset_source and "sessionStorage.clear" not in reset_source,
         "ninja_id_profile_separate":"shinobiChroniclesFrontDoorProfileV1" in front and "presentationOnly:true" in front,
         "konoha_only_enabled":'id:"konoha",name:"HIDDEN LEAF",country:"LAND OF FIRE",enabled:true' in front,
         "other_four_fail_closed":sum(front.count(f'id:"{v}"') for v in ["suna","kiri","kumo","iwa"])==4 and front.count("enabled:false")>=4,
