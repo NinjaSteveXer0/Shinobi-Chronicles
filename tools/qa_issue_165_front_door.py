@@ -40,7 +40,9 @@ def main()->int:
         "reuses_existing_origin_entries":"getAlphaChronicleOriginSelectionEntries" in front,
         "reuses_existing_origin_commit":"selectChronicleOrigin" in front,
         "reuses_existing_origin_dispatcher":"beginAlphaChronicleOriginPrologue" in front,
-        "no_second_acquisition_commit":"commitCharacterAcquisition" not in front and "grantCharacterRegistryOwnership" not in front,
+        # Diagnostic strings name the forbidden authorities deliberately; reject
+        # actual direct calls instead of whole-file string mentions.
+        "no_second_acquisition_commit":"commitCharacterAcquisition(" not in front and "grantCharacterRegistryOwnership(" not in front,
         "underlying_game_inert_while_front_door":"game.inert=true" in front and "game.inert=false" in front,
         "bridge_terminal_loader_exact":bridge.count('script.src="runtime/alpha-front-door-33300.js"')==1,
         "bridge_loader_duplicate_guard":"sc-alpha-front-door-33300-script" in bridge and "SC_ALPHA_FRONT_DOOR_33300" in bridge,
