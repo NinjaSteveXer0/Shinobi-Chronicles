@@ -1,0 +1,48 @@
+name: Issue 112 Konoha World QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/alpha-world-konoha-112-core.js'
+      - 'runtime/alpha-world-konoha-112-fix.js'
+      - 'runtime/alpha-world-konoha-112.js'
+      - 'tools/qa_issue_112_konoha_world.py'
+      - 'tools/qa_issue_112_story_locator_runtime.js'
+      - '.github/workflows/issue-112-konoha-world-qa.yml'
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/alpha-world-konoha-112-core.js'
+      - 'runtime/alpha-world-konoha-112-fix.js'
+      - 'runtime/alpha-world-konoha-112.js'
+      - 'tools/qa_issue_112_konoha_world.py'
+      - 'tools/qa_issue_112_story_locator_runtime.js'
+      - '.github/workflows/issue-112-konoha-world-qa.yml'
+
+jobs:
+  source-headless-qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Run recovered source and load-chain gate
+        run: python tools/qa_issue_112_konoha_world.py
+
+      - name: Run Mission 9 causal locator harness
+        run: node tools/qa_issue_112_story_locator_runtime.js
