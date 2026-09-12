@@ -21,10 +21,19 @@ def syntax(path:Path)->bool:
     return path.is_file() and subprocess.run(["node","--check",str(path)],cwd=ROOT,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True).returncode==0
 
 
+def function_slice(source:str,start:str,end:str)->str:
+    left=source.find(start)
+    if left<0:
+        return ""
+    right=source.find(end,left+len(start))
+    return source[left:right if right>=0 else len(source)]
+
+
 def main()->int:
     front=FRONT.read_text(encoding="utf-8") if FRONT.is_file() else ""
     fix=FIX.read_text(encoding="utf-8") if FIX.is_file() else ""
     bridge=BRIDGE.read_text(encoding="utf-8") if BRIDGE.is_file() else ""
+    reset_source=function_slice(fix,"function startNewChronicle33400()","function beginSelectedOrigin33400()")
     checks={
         "legacy_front_runtime_present":FRONT.is_file() and syntax(FRONT),
         "browser_fix_runtime_present":FIX.is_file() and syntax(FIX),
@@ -36,8 +45,9 @@ def main()->int:
         "truthful_browser_local_alpha":"browser-local" in fix and "No online account, password or server authentication" in fix,
         "exact_new_player_sequence":all(f'{stage}:' in fix for stage in ["account","ninja_id","village","ninja","intro"]),
         "fresh_pending_shell_not_begun":"chronicle_origin_pending" in fix and "pendingShell:pending" in fix and "const begun=locked===true" in fix,
-        "force_new_survives_reload":"shinobiChroniclesForceNewOnboardingV2" in fix and "location.reload" in fix,
-        "reset_is_exact_not_blanket":"localStorage.clear" not in fix and "sessionStorage.clear" not in fix and all(token in fix for token in ["PLAYER_SAVE_KEY","PROFILE_KEY","SESSION_RESUME_KEY"]),
+        "force_new_survives_reload":"shinobiChroniclesForceNewOnboardingV2" in fix and "location.reload" in reset_source,
+        "reset_function_found":bool(reset_source),
+        "reset_is_exact_not_blanket":bool(reset_source) and "localStorage.clear" not in reset_source and "sessionStorage.clear" not in reset_source and all(token in reset_source for token in ["PLAYER_SAVE_KEY","PROFILE_KEY","SESSION_RESUME_KEY"]),
         "ninja_id_is_presentation_only":"presentationOnly:true" in fix and "authenticationScope:\"alpha_browser_local_profile\"" in fix,
         "konoha_only_alpha_start":'id:"konoha",name:"HIDDEN LEAF",country:"LAND OF FIRE",enabled:true' in fix and fix.count("enabled:false")>=4,
         "exact_origin_authority_reused":"getAlphaChronicleOriginSelectionEntries" in fix,
