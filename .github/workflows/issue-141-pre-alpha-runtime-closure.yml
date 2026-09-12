@@ -1,0 +1,45 @@
+name: Issue 141 Pre-Alpha Runtime Closure
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/**'
+      - 'tools/qa_*.py'
+      - 'tools/qa_*.js'
+      - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/**'
+      - 'tools/qa_*.py'
+      - 'tools/qa_*.js'
+      - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
+
+jobs:
+  pre-alpha-runtime-closure:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install image QA dependency
+        run: python -m pip install --disable-pip-version-check Pillow
+
+      - name: Execute complete source/headless Alpha closure spine
+        run: python tools/qa_issue_141_pre_alpha_runtime_closure.py
