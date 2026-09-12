@@ -10,11 +10,13 @@ This audit is an execution ledger, not a design summary. It incorporates the pre
 
 ## 1. Exact HEAD
 
-The exact runtime/source baseline used for the final publication pass is:
+The exact pre-document repository HEAD used for the final publication pass is:
 
-`fbf0ea94853471477995b7ef32f29e33d0a87909` — `qa: reconcile #112 gate to recovered runtime and parser order`.
+`4e578f58706d2308478961fb45838423efcef853` — `qa: add #112 M9 causal locator runtime harness`.
 
-Its parent chain includes the live #112 repair sequence produced/reconciled during this sweep:
+The last runtime/source-changing commit before that harness is `3605d174a1df8324ce6a57ca9966e4c19f2e4604`; the last #112 static QA reconciliation before the focused harness is `fbf0ea94853471477995b7ef32f29e33d0a87909`.
+
+The live #112 repair/reconciliation chain produced or consumed during this sweep is:
 
 | Commit | Meaning |
 |---|---|
@@ -23,9 +25,10 @@ Its parent chain includes the live #112 repair sequence produced/reconciled duri
 | `11477323624ace012cc67dbd6c6333e3acd747df` | gate M9 Story locator on exact veterinary lead |
 | `3605d174a1df8324ce6a57ca9966e4c19f2e4604` | make #112 production load order parser-deterministic |
 | `9af1fadd82e28f0edd9bde51c2d60a877ff46f53` | cover M9 causal locator gate in #112 QA |
-| `fbf0ea94853471477995b7ef32f29e33d0a87909` | reconcile #112 QA to recovered runtime + direct parser load order |
+| `fbf0ea94853471477995b7ef32f29e33d0a87909` | reconcile #112 static QA to recovered runtime + direct parser load order |
+| `4e578f58706d2308478961fb45838423efcef853` | add focused executable M9 causal-locator runtime harness |
 
-This document is intentionally documentation-only on top of that audited runtime baseline; therefore repository HEAD after publication will be newer than the source baseline named above.
+This document is documentation-only on top of that audited implementation/test baseline; therefore repository HEAD after publication is newer than the baseline named above.
 
 ## 2. Runtime snapshot
 
@@ -40,7 +43,7 @@ The predecessor successor card is intentionally stale archaeology: it records `7
 | Issue | Current Coding classification | Evidence boundary / remaining work |
 |---|---|---|
 | #111 Academy Menma tutorial | **COMPLETE / RECORD ONLY** | Runtime + QA consumed; 23/23 recorded QA, exact five ordinary Menma start palette, no generic fallback; issue closed. |
-| #112 Konoha World package | **IMPLEMENTATION PRESENT / SOURCE REPAIRED / VALIDATION ONLY** | Corrupt tail recovered; Byakugan ID fixed; 24 rows / 13 standing / 4 pressure / 7 responsive protected; KOH-X24 bounded; M9 locator causally gated; direct core→fix production load; fresh updated QA execution + installed browser/Golden still required. |
+| #112 Konoha World package | **IMPLEMENTATION PRESENT / SOURCE REPAIRED / VALIDATION ONLY** | Corrupt tail recovered; Byakugan ID fixed; 24 rows / 13 standing / 4 pressure / 7 responsive protected; KOH-X24 bounded; M9 locator causally gated; direct core→fix production load; focused runtime harness added; fresh execution output + installed browser/Golden still required. |
 | #63 Genin roster v2 | **VALIDATION ONLY** | v2 runtime, recruitment/reservation SAVE-reserves-CONTINUE-assigns semantics, save/load headless evidence and traversal bridge exist; fresh installed-browser post-Promotion v2 round-trip remains. |
 | #90 M1 pre-Whisper trace | **VALIDATION ONLY** | Source/headless path exists; fresh installed browser visibility/use/persistence remains. |
 | #54 World Map v2 | **VALIDATION ONLY** | Source/headless diagnostics recorded GREEN; responsive browser geometry, pointer/keyboard/focus, save/load and Golden remain. |
@@ -86,7 +89,7 @@ No broad missing-runtime rebuild was discovered after reconciliation. The remain
 
 | Missing / unresolved item | Type |
 |---|---|
-| Fresh execution of the newly reconciled #112 QA gate after the final recovery/load-order/M9 changes | source/headless validation |
+| Fresh execution output from the reconciled #112 static QA and focused M9 runtime harness after the final recovery/load-order/M9 changes | source/headless validation |
 | Installed-browser end-to-end traversal and responsive interaction proof across current Alpha | browser validation |
 | Golden evidence for the Arc-1/onboarding/World/contained-map lanes | Golden |
 | Fire ecology calibration against replacement Fire master | World-owned authority |
@@ -97,9 +100,11 @@ No broad missing-runtime rebuild was discovered after reconciliation. The remain
 
 Recorded prior issue evidence distinguishes deterministic/source validation from browser validation. #111, #63, #41, #52, #54, #84, #105 and #155 each have source/headless or dedicated diagnostic evidence in their issue/commit history; those results remain useful unless newer source invalidates the tested surface.
 
-For #112, older validation cannot be blindly inherited because the core and load chain changed during this sweep. The current dedicated gate `tools/qa_issue_112_konoha_world.py` now checks UTF-8/C0 corruption, Node syntax for core and fix, reuse of existing World registry/runtime, schemas/manifest, exact row/pool cardinality, public/restricted Knowledge projections, hidden-name non-leakage, KOH-X24 boundaries, exact Byakugan requirement, semantic overlay classes, no presentation population, no Fire standing geometry, one-shot Ryō, no cross-domain reward mutation, responsive fail-closed semantics, withheld authoring checkpoint, locator non-teleport behaviour, direct production core→fix parser order, M1 seam, semantic refill timing, idempotent migration, M9 exact lead/committed-history/no-focus gate, and explicit browser-Golden non-claim.
+For #112, older validation cannot be blindly inherited because the core and load chain changed during this sweep. The current dedicated gate `tools/qa_issue_112_konoha_world.py` checks UTF-8/C0 corruption, Node syntax for core and fix, reuse of existing World registry/runtime, schemas/manifest, exact row/pool cardinality, public/restricted Knowledge projections, hidden-name non-leakage, KOH-X24 boundaries, exact Byakugan requirement, semantic overlay classes, no presentation population, no Fire standing geometry, one-shot Ryō, no cross-domain reward mutation, responsive fail-closed semantics, withheld authoring checkpoint, locator non-teleport behaviour, direct production core→fix parser order, M1 seam, semantic refill timing, idempotent migration, M9 exact lead/committed-history/no-focus gate, and explicit browser-Golden non-claim.
 
-**Important:** this audit does not claim that final current #112 gate was independently executed after its last reconciliation commit. Presence of the gate is test-definition evidence, not execution evidence.
+The focused executable harness `tools/qa_issue_112_story_locator_runtime.js` executes the live correction module with a minimal World-runtime shim and asserts: no lead fails closed; unrelated `KON-O21` history is insufficient; uncommitted exact lead is insufficient; exact committed lead unlocks the existing locator; exact committed source-ref provenance also unlocks it; diagnostics pass; locator checks write no save; browser Golden remains unclaimed.
+
+**Important:** the existence of these final current gates is test-definition evidence. This audit does not claim their final current output was independently executed after the last reconciliation commit unless exact execution output is subsequently attached.
 
 The repository’s code-search index returned no `TODO` or `HACK` results during this sweep, but that search facility also failed to return known `catch` strings and is therefore not strong enough to prove global absence. Known #112 catch sites fail closed rather than silently granting capability. No claim of a repository-wide “zero silent catches” proof is made without a byte-level clone/runner pass.
 
@@ -123,7 +128,7 @@ No new Golden was produced by this sweep because this environment did not provid
 
 Persistence-sensitive semantics recovered/revalidated from current evidence include: #63 incomplete team reservation surviving SAVE/CONTINUE until final assignment; #112 semantic refill only after committed action; one-time #112 existing-save pressure migration receipt `world_activation_konoha_v1_pressure_migration_2026_09_12`; #155 preference/save-load harness evidence; #105 consequences avoiding direct PL mutation.
 
-The #112 M9 gate reads only committed activity-history addresses for the exact veterinary lead, so unrelated presentation/open/render state is insufficient to reveal the M9 Main Story locator.
+The #112 M9 gate reads only committed activity-history addresses for the exact veterinary lead, so unrelated presentation/open/render state is insufficient to reveal the M9 Main Story locator. The focused harness explicitly asserts that merely querying this locator performs zero save writes.
 
 Fresh installed-browser SAVE/reload round-trips are still required before these can be called browser-Golden.
 
@@ -179,7 +184,7 @@ There is no single discovered Coding source defect comparable to the repaired #1
 
 | Blocker | Owner / resolution |
 |---|---|
-| Fresh final #112 QA execution after recovery + parser-order changes | Coding/runtime validation environment |
+| Fresh final #112 static QA + focused M9 harness execution output after recovery/parser-order changes | Coding/runtime validation environment |
 | Installed-browser consolidated traversal / responsive / accessibility pass | Coding/browser validation / #141 + #36 umbrella |
 | Golden evidence for current Alpha path | validation owners |
 | Fire ecology geometry calibration | World |
@@ -189,7 +194,7 @@ The absence of those validation artifacts prevents a claim that *every exact his
 
 ## 16. Next execution order
 
-1. Run `tools/qa_issue_112_konoha_world.py` against the current repository with Node available; attach exact output to #112. Do not close #112 if this is not GREEN.
+1. Run `tools/qa_issue_112_konoha_world.py` and `tools/qa_issue_112_story_locator_runtime.js` against the current repository with Node available; attach exact output to #112. Do not close #112 if either gate is not GREEN.
 2. Run the consolidated installed-browser path through #141/#36, explicitly exercising #63 reservation persistence, #90 transition, World/Konoha marker zero-leak, M11/M12 return, and current portrait resolver.
 3. Convert each already-implemented open ticket from validation-only to closed only when its own browser/Golden acceptance evidence exists; do not rewrite settled implementation just to satisfy stale issue titles.
 4. Keep #44 blocked until World returns replacement-Fire calibration. Keep #121/#151/#23/#86 queued unless a current Alpha consumer elevates them. Keep #42 behind exact Story boundary.
