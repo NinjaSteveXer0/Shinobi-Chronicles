@@ -1,8 +1,9 @@
 # Shinobi Chronicles / Chronicle Engine — Specialist GitHub Handoff Protocol
 
 **Date:** 6 September 2026  
+**Updated:** 12 September 2026  
 **Status:** **COORDINATION AUTHORITY — ACTIVE**  
-**Purpose:** remove Stephen from routine specialist-to-specialist message relaying while preserving owner boundaries, durable authority, and Alpha-first traffic discipline.
+**Purpose:** remove Stephen from routine specialist-to-specialist message relaying while preserving owner boundaries, durable authority, Alpha-first traffic discipline, and automatic capture of production-relevant ideas before they can be lost in chat history.
 
 ---
 
@@ -10,17 +11,17 @@
 
 GitHub is the shared asynchronous transport between specialist workspaces.
 
-**Documents / source / commits remain durable authority. GitHub Issues carry active cross-workspace action traffic.**
+**Documents / source / commits remain durable authority. GitHub Issues carry active cross-workspace action traffic and CE review traffic.**
 
 A specialist must not rely on Stephen to copy a SEND NOW or QUEUE handoff into another workspace when the GitHub connector is available.
 
 The default flow is:
 
-`SPECIALIST DECISION / IMPLEMENTATION`
+`SPECIALIST DECISION / IMPLEMENTATION / PRODUCTION-RELEVANT IDEA`
 
 → durable source/document/commit where appropriate
 
-→ GitHub handoff issue targeted to the owner that must act
+→ GitHub handoff/review issue targeted to the owner that must act
 
 → recipient checks its open handoff issues before declaring itself blocked or asking Stephen to relay anything
 
@@ -38,7 +39,7 @@ Stephen is not the message bus.
 
 ## 2. When an issue is required
 
-Create a GitHub handoff issue only for a genuine dependency:
+Create a GitHub handoff issue only for a genuine dependency or required CE review:
 
 ### SEND NOW
 Another owner must act before current Alpha work can proceed.
@@ -48,12 +49,27 @@ Create an open issue immediately.
 ### QUEUE
 Real future work exists but does not block the current task.
 
-Create an issue only when preserving the future action is useful enough to justify durable queue traffic. Mark it `QUEUE` in the title/body. Do not interrupt Stephen merely to relay it.
+Create an issue when preserving the future action is useful enough to justify durable queue traffic. Mark it `QUEUE` in the title/body. Do not interrupt Stephen merely to relay it.
+
+### CE REVIEW
+A production-relevant idea is closed/promising enough to preserve and it:
+
+- changes or could change canon;
+- crosses specialist ownership boundaries;
+- introduces or alters reusable Chronicle Engine semantics;
+- creates a new systemic capability or non-collapse rule;
+- changes identity / Registry / PL / Rank / Acquisition / Progression / Battle / Knowledge / World / Story semantics outside the originating owner's sole boundary;
+- could materially improve or simplify existing architecture;
+- could conflict with existing durable authority;
+- may become important later even if it is not Alpha-critical now;
+- or Stephen explicitly says to keep, lock, preserve, develop, revisit, or have CE review it.
+
+In those cases, make the idea durable and route **one consolidated review issue** to `CE-CODEX-COORDINATION` unless an existing CE review issue already covers it.
 
 ### RECORD ONLY
-No owner currently needs to act.
+No owner currently needs to act and no CE review is required.
 
-Do **not** create a handoff issue. Preserve the information in the appropriate durable document/source if needed.
+Do **not** create a handoff issue merely for traffic. Preserve production-relevant information in the appropriate durable document/source when needed.
 
 Repeated closed information is reinforcement/validation, not a new issue.
 
@@ -69,17 +85,23 @@ or:
 
 `[HANDOFF][TO: <OWNER>][QUEUE] <short action>`
 
+For production-relevant idea review use:
+
+`[IDEA-REVIEW][TO: CE-CODEX-COORDINATION][QUEUE] <short idea>`
+
+or `SEND NOW` only when the review truly blocks active Alpha work.
+
 Examples:
 
 `[HANDOFF][TO: UI-ASSETS][SEND NOW] Commit Whisper Woods map binary`
 
 `[HANDOFF][TO: CODING][SEND NOW] Activate Whisper Woods map binding`
 
-`[HANDOFF][TO: CE-COORDINATION][QUEUE] Review generational epistemic inheritance`
+`[IDEA-REVIEW][TO: CE-CODEX-COORDINATION][QUEUE] Bloodline use creates observer Knowledge and future counter-preparation`
 
 Owner tokens should be stable and obvious:
 
-- `CE-COORDINATION`
+- `CE-CODEX-COORDINATION`
 - `CODING`
 - `WRITING`
 - `WORLD-MISSIONS-EVENTS`
@@ -90,22 +112,23 @@ Owner tokens should be stable and obvious:
 - `COMBAT-SKILLS-ITEMS-WEAPONS`
 - `CHARACTER-CREATION-VISUALS`
 
-If several owners may be involved, route one issue to `CE-COORDINATION` rather than creating parallel handoffs.
+If several owners may be involved, route one issue to `CE-CODEX-COORDINATION` rather than creating parallel handoffs.
 
 ---
 
 ## 4. Required issue body
 
-Every actionable handoff issue must state:
+Every actionable handoff or idea-review issue must state:
 
 - **FROM:** originating specialist/workspace;
 - **TO:** exact owner;
 - **PRIORITY:** SEND NOW or QUEUE;
-- **WHY THIS OWNER MUST ACT:** one concise dependency statement;
+- **WHY THIS OWNER MUST ACT / WHY CE SHOULD REVIEW:** one concise dependency or semantic statement;
 - **AUTHORITATIVE INPUTS:** exact document paths, commit SHAs, IDs, paths, contracts, or current source refs;
-- **REQUESTED ACTION:** implementation/decision/verification required;
+- **IDEA / REQUESTED ACTION:** implementation, decision, verification, refinement, or reconciliation required;
+- **WHAT STEPHEN ACTUALLY APPROVED OR SAID:** when the idea originated directly from Stephen, preserve the substance faithfully and do not silently broaden it;
 - **DO NOT INVENT / PRESERVE:** critical non-collapse boundaries;
-- **COMPLETION CRITERIA:** exact evidence that closes the dependency;
+- **COMPLETION CRITERIA:** exact evidence that closes the dependency/review;
 - **DOWNSTREAM OWNER:** next owner if already known, otherwise `NONE / TBD`;
 - **SUPERSEDES / DEPENDS ON:** related issue numbers when relevant.
 
@@ -131,6 +154,12 @@ Example query concept:
 
 `is:issue is:open "[HANDOFF][TO: CODING]"`
 
+CE / Codex / Coordination must additionally inspect open:
+
+`[IDEA-REVIEW][TO: CE-CODEX-COORDINATION]`
+
+traffic during coordination/traffic checks.
+
 The recipient must not assume that absence from conversation memory means absence from the project.
 
 ---
@@ -151,7 +180,7 @@ Example:
 
 Writing creates issue to UI / Assets.
 
-UI / Assets commits the binary, comments/ closes Writing→UI issue, then creates a new issue to Coding with exact approved path + asset commit.
+UI / Assets commits the binary, comments/closes Writing→UI issue, then creates a new issue to Coding with exact approved path + asset commit.
 
 Coding consumes that issue, implements/binds/tests, comments/closes it.
 
@@ -174,27 +203,33 @@ This rule exists specifically to prevent the failure mode where work is correctl
 
 ---
 
-## 8. No conversation-only dependency traffic
+## 8. No conversation-only dependency or canon traffic
 
-A message in a specialist chat is not sufficient cross-workspace delivery.
+A message in a specialist chat is not sufficient cross-workspace delivery **and is not sufficient durable preservation of production-relevant canon/design**.
 
-Conversation may explain or discuss a handoff, but any genuine SEND NOW dependency must be represented by the GitHub issue when the connector is available.
+Conversation may explain, explore or discuss an idea, but:
 
-If GitHub issue creation/search is unavailable in a particular workspace, Stephen relay is an explicit **fallback**, not the normal workflow.
+- any genuine SEND NOW dependency must be represented by a GitHub issue when the connector is available;
+- any closed/approved production-relevant Story, canon, system, semantic or cross-owner decision must be written to durable GitHub authority before the workspace treats it as safely preserved;
+- any production-relevant idea meeting the CE REVIEW criteria in Section 2 must be routed to CE automatically without waiting for Stephen to remember it later.
+
+If GitHub issue/file creation/search is unavailable in a particular workspace, Stephen relay is an explicit **fallback**, not the normal workflow.
 
 ---
 
 ## 9. Duplicate / stale traffic rule
 
-Before creating a handoff issue, search for an existing open issue for the same target/topic.
+Before creating a handoff or idea-review issue, search for an existing open issue for the same target/topic.
 
 If one exists:
 
-- update/comment on the existing issue when the dependency is the same;
+- update/comment on the existing issue when the dependency/review is the same;
 - create a new issue only when new evidence creates a genuinely distinct action;
 - close superseded duplicates with a reference to the surviving issue.
 
 Once an issue is closed, do not reopen it merely to route a new owner. Create the next issue and reference the prior one. This preserves handoff lineage.
+
+For idea capture, prefer **one consolidated issue per coherent idea/topic**, not one issue per conversational sentence or brainstorm fragment.
 
 ---
 
@@ -216,10 +251,11 @@ A `traffic check` should inspect:
 
 1. open SEND NOW issues targeted to the current owner;
 2. open QUEUE issues targeted to the current owner;
-3. duplicate/superseded issues;
-4. latest relevant commits/source that may already satisfy an issue;
-5. consumed issues that should now be closed;
-6. whether completion creates exactly one necessary downstream issue.
+3. open IDEA-REVIEW issues targeted to CE when the current owner is CE / Codex / Coordination;
+4. duplicate/superseded issues;
+5. latest relevant commits/source that may already satisfy an issue;
+6. consumed issues that should now be closed;
+7. whether completion creates exactly one necessary downstream issue.
 
 Return Stephen only what he personally must decide or do. Prefer zero manual relay messages.
 
@@ -227,20 +263,127 @@ Return Stephen only what he personally must decide or do. Prefer zero manual rel
 
 ## 12. Alpha discipline
 
-This protocol changes coordination transport, not ownership or Alpha scope.
+This protocol changes coordination transport and durability, not ownership or Alpha scope.
 
 Preserve:
 
 - GitHub source > durable CE/SC documents > current specialist decisions > Project memory;
 - design closed ≠ implemented ≠ runtime validated ≠ Golden/regression GREEN;
 - cross-system relevance ≠ handoff required;
+- idea preservation ≠ Alpha implementation requirement;
+- CE review ≠ automatic promotion into Alpha scope;
 - no speculative system becomes an Alpha blocker merely because an issue can be created;
 - direct specialist → specialist routing only when there is one obvious recipient;
 - otherwise route to CE / Codex / Coordination.
 
 ---
 
-## 13. Immediate Whisper Woods example
+## 13. CE / Codex / Coordination idea-review authority
+
+CE / Codex / Coordination is the **review and reconciliation hub** for production-relevant ideas that meet the CE REVIEW criteria.
+
+This does **not** erase specialist ownership.
+
+The originating specialist remains authoritative for its own domain content unless a higher durable authority or cross-system contradiction requires reconciliation.
+
+For each incoming idea, CE must inspect current GitHub authority and choose one explicit disposition:
+
+### ACCEPT
+The idea is compatible and valuable as-is.
+
+CE may make the reusable/cross-system semantic contract durable and route owner-specific implementation/content work.
+
+### REFINE / IMPROVE
+The idea is valuable but can be made stronger, more reusable, clearer, safer from semantic collapse, or better integrated with existing systems.
+
+CE may improve the **cross-system contract / canon framing / reusable architecture / non-collapse boundaries**, while preserving the originating owner's domain ownership.
+
+If refinement changes an owner-specific design decision rather than merely reconciling it, route the changed decision back to that owner or Stephen when required.
+
+### RETURN TO OWNER
+The idea is sound but needs exact domain content/decision from the proper specialist before CE can close the cross-system layer.
+
+CE routes one issue to the relevant owner and avoids inventing their content.
+
+### VETO / SUPERSEDE
+CE may reject or supersede an idea when current durable authority proves it would:
+
+- contradict canon/Recorded History;
+- collapse protected semantics;
+- duplicate an existing system unnecessarily;
+- violate ownership/identity/state boundaries;
+- create an Alpha-breaking contradiction;
+- fabricate authority or Knowledge;
+- or conflict with newer binding authority.
+
+The veto must cite the exact durable contradiction/reason. `CE does not like it` is not sufficient.
+
+### DEFER / RECORD ONLY
+The idea is worthwhile but not appropriate for current Alpha scope or does not yet require action.
+
+Preserve it durably with enough context for later recovery; do not turn it into an Alpha blocker.
+
+Canonical rule:
+
+> **Specialists create and close domain ideas. CE/Codex/Coordination protects the whole system: it may accept, strengthen, reconcile, return, veto/supersede, or defer cross-system production ideas — but it must not silently steal owner authority or invent missing domain content.**
+
+---
+
+## 14. Automatic production-idea durability rule
+
+Every specialist workspace must automatically preserve a production-relevant idea before moving past it when any of the following is true:
+
+- Stephen explicitly approves it, says to keep it, calls it canon, locks it, or asks to revisit/use it later;
+- the specialist itself declares it closed/approved/authoritative;
+- it changes future Story, World, Character, Registry, Combat, Progression, Acquisition, UI, Runtime or CE behavior;
+- losing it would force Stephen to reconstruct the idea from memory later;
+- it creates a future content lane, mechanic, event family, lore/canon fact, capability interaction, exception, or non-collapse rule;
+- another specialist could reasonably need it later.
+
+Durability may be satisfied by:
+
+1. updating an existing authoritative document and committing it;
+2. creating a new durable document and committing it;
+3. for a not-yet-closed idea, creating/updating a GitHub issue that preserves the exact idea and its status (`PROPOSAL`, `DISCUSSION`, `CANDIDATE`, etc.).
+
+Do **not** promote uncertain discussion into canon merely to preserve it. Preserve the status faithfully.
+
+Use exact state labels where useful:
+
+- `DISCUSSION` — explored, not approved;
+- `CANDIDATE` — promising, not closed;
+- `CLOSED / BINDING` — approved durable authority;
+- `SUPERSEDED` — no longer current;
+- `PROTECTED GAP` — intentionally unresolved;
+- `POST-ALPHA` — preserved, not current scope.
+
+The goal is not to upload every thought. The goal is:
+
+> **No production-relevant idea should exist only in chat once it matters enough that losing it would hurt the project.**
+
+---
+
+## 15. Workspace archive / context-limit safety rule
+
+Before a specialist workspace is archived, replaced, or reaches a practical context limit, it must perform a final durability sweep of its accessible history.
+
+It must recover any production-relevant material that is:
+
+- chat-only;
+- approved but uncommitted;
+- discussed repeatedly but never classified;
+- partially handed off;
+- superseded without a durable supersession record;
+- implemented without durable design provenance;
+- or likely to be lost when the workspace disappears.
+
+Recovered material must be classified and made durable before archive where possible.
+
+If exact recovery is impossible, record a **PROTECTED RECOVERY GAP** rather than fabricating a replacement and calling it recovered authority.
+
+---
+
+## 16. Immediate Whisper Woods example
 
 The intended chain is:
 
@@ -260,10 +403,10 @@ No Stephen relay is required after the protocol is adopted.
 
 ---
 
-## 14. Workspace bootstrap requirement
+## 17. Workspace bootstrap requirement
 
 Each specialist workspace must receive this rule once, either through Project/workspace instructions or one initial bootstrap message:
 
-> **Use `Documentation/Coordination/Specialist_GitHub_Handoff_Protocol.md` as active coordination authority. GitHub Issues are your cross-workspace inbox/outbox. Before asking Stephen to relay a dependency or reporting that another owner has not responded, check open `[HANDOFF][TO: <YOUR OWNER TOKEN>]` issues and current relevant GitHub authority. When your work creates a SEND NOW dependency for another owner, create the GitHub issue yourself; when you complete an incoming handoff, comment with evidence, close it, and create the next downstream issue directly if one is genuinely required. Stephen is fallback transport only if GitHub issue tooling is unavailable.**
+> **Use `Documentation/Coordination/Specialist_GitHub_Handoff_Protocol.md` as active coordination authority. GitHub Issues are your cross-workspace inbox/outbox and GitHub documents/commits are durable production memory. Before asking Stephen to relay a dependency or reporting that another owner has not responded, check open issues for your owner token and current relevant GitHub authority. When your work creates a SEND NOW dependency for another owner, create the GitHub issue yourself; when you complete an incoming handoff, comment with evidence, close it, and create the next downstream issue directly if genuinely required. Additionally, no production-relevant idea may remain chat-only once it is approved, closed, explicitly preserved by Stephen, or important enough that losing it would harm future work. Make it durable automatically. If the idea changes canon, crosses owner boundaries, introduces reusable CE semantics, creates a systemic capability, risks a semantic collision, or could materially improve the wider project, create/update one consolidated `[IDEA-REVIEW][TO: CE-CODEX-COORDINATION]` issue. CE may ACCEPT, REFINE/IMPROVE, RETURN TO OWNER, VETO/SUPERSEDE with evidence, or DEFER/RECORD ONLY while preserving specialist ownership. Stephen is fallback transport only if GitHub tooling is unavailable.**
 
 This is a one-time protocol adoption step, not recurring message-bus work for Stephen.
