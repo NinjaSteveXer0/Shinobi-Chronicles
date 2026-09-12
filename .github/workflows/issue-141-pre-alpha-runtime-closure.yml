@@ -43,3 +43,6 @@ jobs:
 
       - name: Execute complete source/headless Alpha closure spine
         run: python tools/qa_issue_141_pre_alpha_runtime_closure.py
+
+      - name: Execute Promotion roster reload Journey integration seam
+        run: node tools/qa_issue_141_traversal_runtime.js
