@@ -1,79 +1,6 @@
-// ===============================================================================
-// ISSUE #112 â€” KONOHA WORLD INFO / MARKERS / STORY LOCATOR / ACTIVATION WAVE 1
-// Authority: Documentation/World/Alpha Village Region Info Marker Story Locator
-// and Executable Activation Package 2026-09-11.md
-// ============================================================================
-(function installKonohaWorld112(){
+// Issue #112 bootstrap: preserve the reviewed implementation as a core module, then apply the live-runtime seam correction.
+(function(){
   "use strict";
-  const INFO_SCHEMA="sc.worldInfoProjection.v1";
-  const LOCATOR_SCHEMA="sc.worldStoryLocator.v1";
-  const MANIFEST_ID="sc_world_alpha_activation_konoha_v1_2026_09_11";
-  const STANDING="konoha_alpha_standing_pool_v1";
-  const PRESSURE="konoha_arc1_pressure_pool_v1";
-  const RESPONSIVE="konoha_capability_responsive_pool_v1";
-  const ACTIVATION_RECEIPT="world_activation_konoha_v1_2026_09_11";
-
-  const ROWS=Object.freeze([
-    {id:"konoha_alpha_gate_delivery_assistance",pool:STANDING,host:"KON-P10",category:"SIDE_OCCURRENCE",reward:120,rewardAction:"complete_delivery",actions:["verify_destination","complete_delivery","return_sender","decline"]},
-    {id:"konoha_alpha_market_lost_parcel",pool:STANDING,host:"KON-P09",category:"INVESTIGATION",reward:100,rewardAction:"return_parcel",actions:["inspect_last_known","ask_witnesses","locate_parcel","return_parcel","leave"]},
-    {id:"konoha_alpha_hospital_supply_run",pool:STANDING,host:"KON-P03",category:"SIDE_OCCURRENCE",reward:150,rewardAction:"deliver_supplies",actions:["accept_delivery","verify_destination","deliver_supplies","report_delay","decline"]},
-    {id:"konoha_alpha_river_satchel_recovery",pool:STANDING,host:"KON-O03",category:"INVESTIGATION",reward:100,rewardAction:"return_satchel",actions:["assess_current","recover_safe","report_location","return_satchel","leave"]},
-    {id:"konoha_alpha_crafts_shipment_delay",pool:STANDING,host:"KON-P04",secondary:"KON-O19",category:"INVESTIGATION",reward:180,rewardAction:"complete_logistics",actions:["inspect_paperwork","check_storehouse","locate_shipment","complete_logistics","report_discrepancy","decline"]},
-    {id:"konoha_alpha_messenger_roost_delay",pool:STANDING,host:"KON-O18",category:"INVESTIGATION",reward:140,rewardAction:"assist_dispatch",actions:["hear_report","inspect_dispatch","check_route","assist_dispatch","report","leave"]},
-    {id:"konoha_alpha_storehouse_inventory_discrepancy",pool:STANDING,host:"KON-O19",category:"INVESTIGATION",reward:220,rewardAction:"formal_report",actions:["compare_records","inspect_count","ask_custodians","preserve_discrepancy","formal_report","decline"]},
-    {id:"konoha_alpha_pump_maintenance_alarm",pool:STANDING,host:"KON-O20",category:"INVESTIGATION",reward:180,rewardAction:"complete_civic_assistance",actions:["inspect_surface","identify_fault","warn_workers","request_specialist","complete_civic_assistance","report","leave"]},
-    {id:"konoha_alpha_veterinary_runaway_animal",pool:STANDING,host:"KON-O21",category:"INVESTIGATION",reward:120,rewardAction:"return_animal",actions:["ask_handler","inspect_tracks","search","return_animal","report","decline"]},
-    {id:"konoha_alpha_memorial_record_request",pool:STANDING,host:"KON-O04",category:"INVESTIGATION",reward:0,actions:["locate_inscription","compare_reference","listen","decline"]},
-    {id:"konoha_alpha_academy_lost_equipment",pool:STANDING,host:"KON-P06",secondary:"KON-O17",category:"INVESTIGATION",reward:0,actions:["hear_report","inspect_last_known","recover_equipment","return_equipment","report","decline"]},
-    {id:"konoha_alpha_training_observation_drill",pool:STANDING,host:"KON-P07",category:"TRAINING_DEVELOPMENT",reward:0,actions:["accept","observe","record_details","report","end"]},
-    {id:"fire_arc1_pressure_marked_residence",pool:PRESSURE,host:"KON-P09",category:"INVESTIGATION",reward:0,actions:["inspect_mark","watch","ask_occupant","remove_or_alter","report","ignore"]},
-    {id:"fire_arc1_pressure_records_tampering",pool:PRESSURE,host:"KON-P01",category:"INVESTIGATION",reward:0,actions:["inspect_entry","compare_record","question_custodian","preserve_tamper","report"]},
-    {id:"fire_arc1_pressure_rooftop_observer",pool:PRESSURE,host:"KON-P09",category:"INVESTIGATION",reward:0,actions:["approach","flank_if_route","pretend_unaware","observe_target","report","leave"]},
-    {id:"fire_arc1_pressure_false_patrol",pool:PRESSURE,host:"KON-P10",category:"INVESTIGATION",reward:0,actions:["accept_explanation","verify_credentials","route_question","observe_or_follow","challenge","report_or_leave"]},
-    {id:"konoha_resp_false_identity_gate_ledger",pool:RESPONSIVE,host:"KON-P10",category:"INVESTIGATION",reward:0,requires:["skill_false_identity","false_profile"],actions:["answer_ordinary","use_false_profile","preserve_contradiction","leave"]},
-    {id:"konoha_resp_false_identity_counterwatch",pool:RESPONSIVE,host:"KON-P09",alternate:"KON-O15",category:"INVESTIGATION",reward:0,requires:["skill_false_identity","false_profile","skill_counter_surveillance_habit"],actions:["observe_tail","preserve_alias","misdirect_legal","confront","report","leave"]},
-    {id:"konoha_resp_false_identity_fuin_ward",pool:RESPONSIVE,host:"KON-P05",category:"DISCOVERY",reward:0,requires:["skill_false_identity","false_profile","skill_seal_pattern_literacy"],actions:["inspect_ward","profile_query","compare_structure","leave_unchanged","report_discrepancy"]},
-    {id:"konoha_resp_medical_poison_recovery",pool:RESPONSIVE,host:"KON-P03",category:"INVESTIGATION",reward:0,requires:["skill_medical_triage_instinct","skill_poison_symptom_recognition"],actions:["assess","recognise_possible_poison","preserve_sample","call_authority","decline"]},
-    {id:"konoha_resp_tracking_evidence_three_trails",pool:RESPONSIVE,host:"KON-O15",category:"INVESTIGATION",reward:0,requires:["skill_scent_pursuit","skill_evidence_thread_reconstruction","evidence_2_3"],actions:["pursue_scent","compare_evidence","reconstruct_sequence","report","stop"]},
-    {id:"konoha_resp_fuin_barrier_service_ward",pool:RESPONSIVE,host:"KON-O20",category:"DISCOVERY",reward:0,requires:["skill_seal_pattern_literacy","skill_barrier_recognition_intuition"],actions:["inspect_pattern","observe_recognition","record_response","report","leave"]},
-    {id:"konoha_resp_byakugan_peripheral_discrepancy",pool:RESPONSIVE,host:"KON-O09",category:"TRAINING_DEVELOPMENT",reward:0,requires:["skil_byakugan_peripheral_detail","active_byakugan_context"],actions:["authorised_observation","report_peripheral_detail","compare_ordinary_view","end_observation"]},
-    {id:"konoha_alpha_eastern_drainage_trace",pool:STANDING,host:"KON-O16",category:"DISCOVERY‹™]Ø\™Œš[š]NYKXÝ[ÛœÎ–Èš[œÜXÝÝ˜XÙH‹œ™\Ù\™WÜ™\Ü‹™›ÛÝ×ÜX›X×Ü›Ý]H‹˜ÛÛ[Z]ÜÝ\ÜXÚ[Û—Ý˜XÙH‹›X]™H—_BˆJNÂ‚ˆÛÛœÝTÔVOSØš™XÝ™œ™Y^™JÂˆÛÛ›ÚWØ[WÙØ]WÙ[]™\žWØ\ÜÚ\Ý[˜ÙNˆ‘Ø]H[]™\žH\ÜÚ\Ý[˜ÙH‹ÛÛ›ÚWØ[WÛX\šÙ]ÛÜÝÜ\˜Ù[ˆ“ÜÝX\šÙ]\˜Ù[‹ÛÛ›ÚWØ[WÚÜÜ][ÜÝ\WÜ[Žˆ’ÜÜ][Ý\H[ˆ‹ÛÛ›ÚWØ[WÜš]™\—ÜØ]Ú[Ü™XÛÝ™\žNˆ”š]™\ˆØ]Ú[™XÛÝ™\žH‹ÛÛ›ÚWØ[WØÜ˜Y×ÜÚ\Y[Ù[^NˆÜ˜YÛY[ˆÚ\Y[[^H‹ÛÛ›ÚWØ[WÛY\ÜÙ[™Ù\—Ü›ÛÜÝÙ[^Nˆ“Y\ÜÙ[™Ù\ˆ›ÛÜÝ[^H‹ÛÛ›ÚWØ[WÜÝÜ™ZÝ\ÙWÚ[™[ÜžWÙ\ØÜ™\[˜ÞNˆ”ÝÜ™ZÝ\ÙH[™[ÜžH\ØÜ™\[˜ÞH‹ÛÛ›ÚWØ[WÜ[\ÛXZ[[˜[˜ÙWØ[\›Nˆ”[\XZ[[˜[˜ÙH[\›H‹ÛÛ›ÚWØ[WÝ™]\š[˜\žWÜ[˜]Ø^WØ[š[X[ˆ”[˜]Ø^H™]\š[˜\žH[š[X[‹ÛÛ›ÚWØ[WÛY[[ÜšX[Ü™XÛÜ™Ü™\]Y\Ýˆ“Y[[ÜšX[™XÛÜ™™\]Y\Ý‹ÛÛ›ÚWØ[WØXØY[^WÛÜÝÙ\]Z\Y[ˆXØY[^HÜÝ\]Z\Y[‹ÛÛ›ÚWØ[WÝ˜Z[š[™×ÛØœÙ\˜][Û—Ùš[ˆ“ØœÙ\˜][Ûˆš[‹š\™WØ\˜ÌWÜ™\ÜÝ\™WÛX\šÙYÜ™\ÚY[˜ÙNˆ“X\šÙY™\ÚY[˜ÙH‹š\™WØ\˜ÌWÜ™\ÜÝ\™WÜ™XÛÜ™×Ý[\\š[™Îˆ”™XÛÜ™È[\\š[™È‹š\™WØ\˜ÌWÜ™\ÜÝ\™WÜ›ÛÙÜÛØœÙ\™\Žˆ”›ÛÙÜØœÙ\™\ˆ‹š\™WØ\˜ÌWÜ™\ÜÝ\™WÙ˜[ÙWÜ]›Ûˆ‘˜[ÙH]›Û]HØ]H‹ÛÛ›ÚWÜ™\ÜÙ˜[ÙWÚY[]WÙØ]WÛYÙ\Žˆ•H˜[YHÛˆHØ]HYÙ\ˆ‹ÛÛ›ÚWÜ™\ÜÙ˜[ÙWÚY[]WØÛÝ[\Ø]Úˆ•HØ]Ú\ˆÚÈÙÙÙYHÜ›Û™È\œÛÛˆ‹ÛÛ›ÚWÜ™\ÜÙ˜[ÙWÚY[]WÙZ[—ÝØ\™ˆH˜[YHÜš][ˆ[ÈHØ\™‹ÛÛ›ÚWÜ™\ÜÛYYXØ[ÜÚ\ÛÛ—Ü™XÛÝ™\žNˆ•H]Y[ÚÈÚÝ[™H™XÛÝ™\š[™È‹ÛÛ›ÚWÜ™\ÜÝ˜XÚÚ[™×Ù]šY[˜ÙWÝ™YWÝ˜Z[Îˆ•™YH˜Z[ËÛ™H›ÙH‹ÛÛ›ÚWÜ™\ÜÙZ[—Ø˜\œšY\—ÜÙ\šXÙWÝØ\™ˆ“ÛÙ\šXÙHØ\™[™ÚZÙH‹ÛÛ›ÚWÜ™\ÜØžXZÝYØ[—Ü\š\\˜[Ù\ØÜ™\[˜ÞNˆ’qjYØH\š\\˜[\ØÜ™\[˜ÞH‹ÛÛ›ÚWØ[WÙX\Ý\›—Ù˜Z[˜YÙWÝ˜XÙNˆ‘X\Ý\›ˆ˜Z[˜YÙH˜XÙH‚ˆJNÂ‚ˆ[˜Ý[Ûˆ\ÝÜžJ
-^Ü™]\›ˆ^Y\‘]I‰\œ˜^Kš\Ð\œ˜^J^Y\‘]K˜XÝ]š]R\ÝÜžJOÜ^Y\‘]K˜XÝ]š]R\ÝÜžN–×NßBˆ[˜Ý[ÛˆÛÛ[Z]Y
-Y
-^Ü™]\›ˆ\ÝÜžJ
-KœÛÛYJOœ‰‰œ‹˜ÛÛ[Z]YOO]YI‰Š‹šYOOZY‹›ØØÝ\œ™[˜ÙRYOOZY‹œÛÝ\˜ÙSØØÝ\œ™[˜ÙRYOOZY
-JNßBˆ[˜Ý[Ûˆ™XÛÜ™
-™XÊ^ÚYŠP\œ˜^Kš\Ð\œ˜^J^Y\‘]K˜XÝ]š]R\ÝÜžJJ\^Y\‘]K˜XÝ]š]R\ÝÜžOV×NÚYŠXÛÛ[Z]Y
-™XË›ØØÝ\œ™[˜ÙRY™XËšY
-J\^Y\‘]K˜XÝ]š]R\ÝÜžKœ\Ú
-™XÊNßBˆ[˜Ý[ÛˆØÊY
-^Ü™]\›ˆ\[ÙˆÙ][RÛÛ›ÚUŒÓØØ][ÛOOH™[˜Ý[ÛˆÙÙ][RÛÛ›ÚUŒÓØØ][ÛŠY
-N›[ßBˆ[˜Ý[Ûˆ[˜ÚÜŠY
-^ØÛÛœÝ[ØÊY
-NÜ™]\›ˆÞÞ›žN›ž_N›[ßBˆ[˜Ý[ÛˆÛ›ÝÛYÙJY
-^ÂˆYŠ×’ÓÓ‹T
-ÉË\Ý
-Y
-J\™]\›ˆšY[YšYYŽÂˆYŠYOOH’ÓÓ‹TÌHŠ\™]\›ˆšÛ›ÝÛ—Ü™\ÝšXÝYŽÂˆYŠ\[ÙˆÙ][RÛÛ›ÚUŒÑ^XÚ]Û›ÝÛYÙTÝ]OOOH™[˜Ý[ÛˆŠ\™]\›ˆÙ][RÛÛ›ÚUŒÑ^XÚ]Û›ÝÛYÙTÝ]JY
-_[œ™XÛÙÛš\ÙYŽÂˆ™]\›ˆ[œ™XÛÙÛš\ÙYŽÂˆBˆ[˜Ý[ÛˆÜÝÛ›ÝÛXØÙ\ÜÚX›JY
-^Ü™]\›ˆÈšY[YšYY‹˜XÝ[Û˜X›H—Kš[˜ÛY\ÊÛ›ÝÛYÙJY
-JNßBˆ[˜Ý[ÛˆXÜ]Z\Ú][ÛŠ
-^Ü™]\›ˆ\[Ùˆ[œÝ\™T^Y\XÜ]Z\Ú][Û”Ý]OOOH™[˜Ý[ÛˆÙ[œÝ\™T^Y\XÜ]Z\Ú][Û”Ý]J
-N›[ßBˆ[˜Ý[ÛˆÛÛ›ÚQœ™YT^J
-^ÂˆÛÛœÝOXXÜ]Z\Ú][ÛŠ
-NÂˆ™]\›ˆHJI‰˜K˜Ú›ÛšXÛSÜšYÚ[‰‰˜K˜Ú›ÛšXÛSÜšYÚ[‹˜XÝ]™RÛÛ›ÚQ[\™YOO]YI‰˜K˜XØY[^UX[Q›Ü›X][Û‰‰˜K˜XØY[^UX[Q›Ü›X][Û‹˜ÛÛ\]YOO]YI‰˜K˜XØY[^UX[Q›Ü›X][Û‹˜ÛÛ[X][ÛÛÛ\]YOO]YI‰ˆJK™Ù[š[”›ÜÝ\•˜[œÚ][Û‰‰˜K™Ù[š[”›ÜÝ\•˜[œÚ][Û‹[›ØÚÙYOO]YI‰ˆXK™Ù[š[”›ÜÝ\•˜[œÚ][Û‹˜ÛÛ\]Y
-JNÂˆBˆ[˜Ý[Ûˆ\˜ÌPY\“LŠ
-^Ü™]\›ˆ\[Ùˆ\Ð\˜ÌSØØÝ\œ™[˜ÙOOOH™[˜Ý[Ûˆ‰‰Š\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛLWÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛL—ÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛL×ÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛMÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛMWÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛM—ÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛM×ÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛNÜÝÜžWØÛÛ\]Š_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛNWÜÝÜžWØÛÛ\]Š_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛLLÜÝÜžWØÛÛ\]HŠ_\Ð\˜ÌSØØÝ\œ™[˜ÙJ›ØØ×Ø\˜ÌWÛLLWÜÝÜžWØÛÛ\]ŠJNßBˆ[˜Ý[Ûˆ\ÔÚÚ[XØÙ\ÜÊÚÚ[Y
-^Âˆ›ÜŠÛÛœÝ›ˆÙˆÈš\ÓX\›™YÚÚ[XØÙ\ÜÈ‹š\ÔÚÚ[XØÙ\ÜÈ‹œ^Y\’\ÔÚÚ[XØÙ\ÜÈ—J^ÚYŠ\[ÙˆÛØ˜[\ÖÙ›—OOOH™[˜Ý[ÛˆŠ^Ýž^ÚYŠÛØ˜[\ÖÙ›—JÚÚ[Y
-OOO]YJ\™]\›ˆYNßXØ]Ú
-ÙJ^ß__Bˆ™]\›ˆ\ÝÜžJ
-KœÛÛYJOžÚYŠ\Ÿ‹˜ÛÛ[Z]YOO]YJ\™]\›ˆ˜[ÙNØÛÛœÝ\‹™]I‰\[Ùˆ‹™]OOOH›Øš™XÝÜ‹™]NžßNØÛÛœÝ™YœÏP\œ˜^Kš\Ð\œ˜^J‹œÛÝ\˜ÙT™YœÊOÜ‹œÛÝ\˜ÙT™YœÎ–×NØÛÛœÝ^XÝJ‹œÚÚ[YOO\ÚÚ[YœÚÚ[YOO\ÚÚ[YXÚš\]YRYOO\ÚÚ[YœÙ[X[XÐØ\Xš[]RYOO\ÚÚ[Y™YœËœÛÛYJOž	‰–ÈœÚÚ[‹XÚš\]YH‹˜Ø\Xš[]H—Kš[˜ÛY\Ê\JI‰žšYOO\ÚÚ[Y
-JNÜ™]\›ˆ^XÝ	‰Š‹˜XØÙ\ÜÏOOH‘ÔS•QŸ˜XØÙ\ÜÏOOH‘ÔS•QŸ˜XØÙ\ÜÑÜ˜[YOO]Y_›X\›™YOO]Y_›ÝÛ™YOO]YJNßJNÂˆBˆ[˜Ý[Ûˆ\Ñ˜[ÙT›Ùš[J
-^Ü™]\›ˆ\ÝÜžJ
-KœÛÛYJOžÚYŠ\Ÿ‹˜ÛÛ[Z]YOO]YJ\™]\›ˆ˜[ÙNØÛÛœÝ\‹™]I‰\[Ùˆ‹™]OOOH›Øš™XÝÜ‹™]NžßNÜ™]\›ˆ™˜[ÙT›Ùš[PXÝ]™OOO]Y_™˜[ÙT›Ùš[RY›YÚ][X]Q˜[ÙT›Ùš[OOO]Y_‹\OOOH™˜[ÙWÚY[]WÜ›Ùš[WØÛÛ[Z]YŽßJNßBˆ[˜Ý[Ûˆ\Ñ]šY[˜ÙLÌÊ
-^ØÛÛœÝ™YœÏ[™]ÈÙ]
-
-NÚ\ÝÜžJ
-K™›Ü‘XXÚ
-OžÚYŠ\Ÿ‹˜ÛÛ[Z]YOO]YJ\™]\›ŽÊ‹œÛÝ\˜ÙT™Yœß×JK™›Ü‘XXÚ
-OžÚYŠ	‰ž
+  function load(src,onload){const s=document.createElement("script");s.src=src;s.async=false;if(onload)s.onload=onload;s.onerror=()=>console.error("SC #112 runtime module failed to load",src);document.head.appendChild(s);}
+  load("runtime/alpha-world-konoha-112-core.js",()=>load("runtime/alpha-world-konoha-112-fix.js"));
+})();
