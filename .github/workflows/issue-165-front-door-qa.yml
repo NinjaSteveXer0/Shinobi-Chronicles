@@ -6,16 +6,20 @@ on:
     branches: [main]
     paths:
       - 'runtime/alpha-front-door-33300.js'
+      - 'runtime/alpha-browser-onboarding-fixes-33400.js'
       - 'runtime/alpha-traversal-bridge-33200.js'
       - 'tools/qa_issue_165_front_door.py'
       - 'tools/qa_issue_165_front_door_runtime.js'
+      - 'tools/qa_issue_165_front_door_v2_runtime.js'
       - '.github/workflows/issue-165-front-door-qa.yml'
   pull_request:
     paths:
       - 'runtime/alpha-front-door-33300.js'
+      - 'runtime/alpha-browser-onboarding-fixes-33400.js'
       - 'runtime/alpha-traversal-bridge-33200.js'
       - 'tools/qa_issue_165_front_door.py'
       - 'tools/qa_issue_165_front_door_runtime.js'
+      - 'tools/qa_issue_165_front_door_v2_runtime.js'
       - '.github/workflows/issue-165-front-door-qa.yml'
 
 jobs:
@@ -39,5 +43,8 @@ jobs:
       - name: Source and load-seam gate
         run: python tools/qa_issue_165_front_door.py
 
-      - name: Runtime boot/reset/origin delegation harness
+      - name: Legacy front-door regression harness
         run: node tools/qa_issue_165_front_door_runtime.js
+
+      - name: Real new-player and enemy-turn V2 harness
+        run: node tools/qa_issue_165_front_door_v2_runtime.js
