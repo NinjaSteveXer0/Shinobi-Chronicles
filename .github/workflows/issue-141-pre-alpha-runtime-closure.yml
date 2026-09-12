@@ -46,3 +46,6 @@ jobs:
 
       - name: Execute Promotion roster reload Journey integration seam
         run: node tools/qa_issue_141_traversal_runtime.js
+
+      - name: Execute Arc-1 and exact Story Battle return runtime seam
+        run: node tools/qa_issue_141_arc1_battle_return_runtime.js
