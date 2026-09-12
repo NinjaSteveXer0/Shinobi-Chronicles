@@ -51,6 +51,10 @@ checks={
  'semantic_refill_after_committed_action':'executeSelectedOpportunityAction' in fix and 'result&&result.success===true' in fix and 'semanticRefill' in fix,
  'presentation_does_not_refill':not any(name in fix for name in ['renderVillageOverlay=function','renderAlphaKonohaVillageHotspots=function']),
  'existing_save_migration_idempotent':'world_activation_konoha_v1_pressure_migration_2026_09_12' in fix and 'if(!migrated' in fix,
+ 'm9_exact_veterinary_lead':'arc1_veterinary_ward_lead_01' in fix and 'story_locator_arc1_m9_veterinary_lead' in fix,
+ 'm9_lead_requires_committed_history':'row.committed!==true' in fix and 'function hasCommittedAddress' in fix,
+ 'm9_locator_fail_closed_without_lead':all(x in fix for x in ['story_locator_arc1_m9_no_current_focus','NO_CURRENT_MAP_FOCUS','hostLocationRef:null','localInstanceRef:null']),
+ 'correction_diagnostic_exported':'runIssue112CorrectionDiagnostics' in fix and 'window.runIssue112CorrectionDiagnostics=' in fix,
 }
 failed=[k for k,v in checks.items() if not v]
 for k,v in checks.items(): print(('PASS' if v else 'FAIL'),k)
