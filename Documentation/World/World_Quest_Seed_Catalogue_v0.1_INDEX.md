@@ -1,11 +1,13 @@
 # Shinobi Chronicles — 500 World Quest / Event / Opportunity Seed Catalogue v0.1 — Index
 
 **Owner:** World / Missions / Events / Rewards  
-**Status:** AUTHORED CONTENT SEEDS — NOT AUTOMATIC RUNTIME ACTIVATION
+**Status:** **HISTORICAL 500-SEED RESERVOIR INTENT — DETAILED 001–500 FILES NOT PRESENT ON CURRENT MAIN**
+
+> **2026-09-13 audit note:** current `main` contains this index and the 500-seed activation policy, but does not contain the five detailed `001–100` through `401–500` catalogue files listed below. Therefore this index is authority for the intended 500-seed reservoir structure, not proof that 500 detailed legacy rows survived. Current fully detailed expansion authority begins at `World_Quest_Seed_Catalogue_v0.2_INDEX.md` for seeds `501–710`.
 
 ## Scope
 
-World is authoring a **500-entry** reservoir of Formal Missions, World Events, Side Quests, Investigations, Discoveries, Training Opportunities, Character Matters, Threats, Service Matters and Chronicle chains.
+World authored an intended **500-entry** reservoir of Formal Missions, World Events, Side Quests, Investigations, Discoveries, Training Opportunities, Character Matters, Threats, Service Matters and Chronicle chains.
 
 Distribution target:
 
@@ -50,7 +52,7 @@ The fourteen production surfaces are:
 
 ## Production strategy
 
-500 authored seeds are a content reservoir, **not an Alpha implementation mandate**. Alpha should activate coherent high-value slices through the existing mission/event/opportunity architecture. The remainder stays as authored reserve so the world can expand without inventing content ad hoc.
+500 authored seeds were a content-reservoir target, **not an Alpha implementation mandate**. Alpha should activate coherent high-value slices through the existing mission/event/opportunity architecture. The remainder stays as authored reserve so the world can expand without inventing content ad hoc.
 
 Each activated row still requires:
 
@@ -64,9 +66,9 @@ Each activated row still requires:
 8. save/load persistence and no reroll/duplication;
 9. runtime/browser validation before GREEN.
 
-## Wave files
+## Historical intended wave files
 
-The detailed catalogue is intentionally split into five 100-entry files so later owner review and activation can occur in manageable waves:
+The v0.1 catalogue was intended to be split into five 100-entry files:
 
 - `Documentation/World/World_Quest_Seed_Catalogue_v0.1_001-100.md`
 - `Documentation/World/World_Quest_Seed_Catalogue_v0.1_101-200.md`
@@ -74,4 +76,8 @@ The detailed catalogue is intentionally split into five 100-entry files so later
 - `Documentation/World/World_Quest_Seed_Catalogue_v0.1_301-400.md`
 - `Documentation/World/World_Quest_Seed_Catalogue_v0.1_401-500.md`
 
-Do not treat the index alone as proof that all five detailed files have landed. Their individual commits remain separate durable evidence.
+These files are **not present on current `main` as of the 2026-09-13 audit**. Do not cite their existence or use them as production content unless they are later recovered/reconstructed and committed.
+
+For current detailed content, use:
+
+`Documentation/World/World_Quest_Seed_Catalogue_v0.2_INDEX.md`.
