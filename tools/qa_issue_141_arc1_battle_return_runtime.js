@@ -10,6 +10,13 @@ const game = fs.readFileSync(path.join(root, "game.js"), "utf8");
 const sprint = fs.readFileSync(path.join(root, "runtime", "alpha-alpha-sprint-33100.js"), "utf8");
 
 const storage = new Map();
+const sessionStore = new Map();
+const storageShim = map => ({
+  getItem: key => map.has(key) ? map.get(key) : null,
+  setItem: (key, value) => map.set(key, String(value)),
+  removeItem: key => map.delete(key),
+  clear: () => map.clear(),
+});
 const dummy = () => ({
   style: {}, dataset: {}, classList: { add(){}, remove(){}, toggle(){} },
   appendChild(){}, remove(){}, setAttribute(){}, getAttribute(){ return null; },
@@ -20,12 +27,8 @@ const dummy = () => ({
 const silentConsole = { log(){}, info(){}, warn(){}, error(){}, table(){} };
 const context = {
   console: silentConsole,
-  localStorage: {
-    getItem: key => storage.has(key) ? storage.get(key) : null,
-    setItem: (key, value) => storage.set(key, String(value)),
-    removeItem: key => storage.delete(key),
-    clear: () => storage.clear(),
-  },
+  localStorage: storageShim(storage),
+  sessionStorage: storageShim(sessionStore),
   document: {
     getElementById(){ return null; }, querySelector(){ return null; }, querySelectorAll(){ return []; },
     createElement(){ return dummy(); }, body: dummy(),
