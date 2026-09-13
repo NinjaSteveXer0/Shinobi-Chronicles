@@ -212,3 +212,36 @@
   const base=document.getElementById("sc-alpha-origin-browser-realisation-33500-script");
   if(base)base.addEventListener("load",load33510,{once:true});
 })();
+
+// ============================================================================
+// ISSUE #105 / #121 / #170 — FINAL EARLY-STORY EXPRESSION CONSUMPTION
+//
+// 33600 must run after 33510 because it is the final Writing-owned expression
+// layer over the already-reconciled Origin graphs. 33600 also activates the
+// early-Arc #121 semantic-intent adapter after the generic CE engine is ready.
+// ============================================================================
+(function activateEarlyStoryModernization33600From33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+
+  function load33600(){
+    if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600||document.getElementById("sc-alpha-early-story-modernization-33600-script"))return;
+    const script=document.createElement("script");
+    script.id="sc-alpha-early-story-modernization-33600-script";
+    script.src="runtime/alpha-early-story-modernization-33600.js";
+    script.async=false;
+    document.head.appendChild(script);
+  }
+
+  if(globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510){load33600();return;}
+  const prior=document.getElementById("sc-alpha-origin-choice-reaction-33510-script");
+  if(prior){prior.addEventListener("load",load33600,{once:true});return;}
+
+  const base=document.getElementById("sc-alpha-origin-browser-realisation-33500-script");
+  if(base){
+    base.addEventListener("load",()=>{
+      const reaction=document.getElementById("sc-alpha-origin-choice-reaction-33510-script");
+      if(globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510)load33600();
+      else if(reaction)reaction.addEventListener("load",load33600,{once:true});
+    },{once:true});
+  }
+})();
