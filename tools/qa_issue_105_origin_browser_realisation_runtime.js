@@ -62,16 +62,18 @@ function selectOrigin(id){playerData.activityHistory.length=0;playerData.acquisi
 function beginOrigin(id){selectOrigin(id);const r=context.beginAlphaChronicleOriginPrologue();if(!r||r.success!==true)throw new Error(`origin start failed ${id}: ${JSON.stringify(r)}`);return r;}
 
 try{
-  // Exact production Origin package order, then the browser-realisation patch.
+  // Exact production Origin package order, then both browser-realisation layers.
   load("runtime/alpha-origin-scenes-32900-core.js");
   registerStoryScene({sceneId:"origin_academy_menma_prologue",entryBeatId:"menma",beats:[{beatId:"menma",mode:"narration",text:"Menma",exitScene:true}],onCompleteConsequences:[]});
-  load("runtime/alpha-origin-scenes-32900-a.js");load("runtime/alpha-origin-scenes-32900-b.js");load("runtime/alpha-origin-scenes-32900-c.js");load("runtime/alpha-origin-scenes-32900-integrator.js");load("runtime/alpha-origin-browser-realisation-33500.js");
+  load("runtime/alpha-origin-scenes-32900-a.js");load("runtime/alpha-origin-scenes-32900-b.js");load("runtime/alpha-origin-scenes-32900-c.js");load("runtime/alpha-origin-scenes-32900-integrator.js");load("runtime/alpha-origin-browser-realisation-33500.js");load("runtime/alpha-origin-choice-reaction-33510.js");
 
   const diag=context.runAlphaOriginBrowserRealisation33500Diagnostics();
+  const diag2=context.runAlphaOriginChoiceReaction33510Diagnostics();
   assert("33500_diagnostics_green",diag.pass===true,diag);
+  assert("33510_diagnostics_green",diag2.pass===true,diag2);
   const style=document.getElementById("sc-alpha-origin-story-presentation-33500-style");
   assert("story_backdrop_stack_above_world",!!style&&style.textContent.includes("z-index:0!important")&&style.textContent.includes("z-index:2!important"));
-  assert("browser_golden_not_claimed",diag.browserGoldenClaimed===false);
+  assert("browser_golden_not_claimed",diag.browserGoldenClaimed===false&&diag2.browserGoldenClaimed===false);
 
   // Public Origin dispatcher -> rendered DOM choice -> public advance handler.
   beginOrigin("academy_kushina");
@@ -80,6 +82,10 @@ try{
   assert("one_click_reaches_exact_next_beat",render.beatId==="kus_reverse"&&render.text.includes("reverse-summoning"),render);
   clickContinue();
   assert("continue_does_not_skip_multiple_beats",render.beatId==="kus_gero_1"&&render.text.includes("not where I was"),render);
+  clickContinue();clickContinue();clickContinue();
+  assert("kushina_second_choice_is_rendered",render.beatId==="kus_contact_choice"&&render.buttons.length===4,render);
+  clickChoice("ask_who");
+  assert("kushina_second_choice_has_visible_consequence",render.beatId==="kus_contact_result"&&render.text.includes("gives his name: Gerotora"),render);
 
   // Two materially different Kurenai player routes must produce visibly different DOM sequences.
   beginOrigin("academy_kurenai");clickContinue();clickChoice("false_kurenai");clickChoice("rush_bell");
@@ -105,6 +111,10 @@ try{
   assert("wasabi_route_choice_has_visible_successor",render.beatId==="izu_route_result"&&render.text.includes("false trail"),render);
   beginOrigin("academy_iwabee");clickContinue();clickChoice("build_path");
   assert("iwabee_terrain_choice_changes_visible_world_result",render.beatId==="iwa_expose"&&render.text.includes("builds a stable path"),render);
+
+  // Kakashi's route now visibly reports both objective disposition and intelligence quality.
+  beginOrigin("academy_kakashi");clickContinue();clickChoice("shadow_the_clerk");clickContinue();clickChoice("secure_package");
+  assert("kakashi_debrief_consumes_actual_route",render.beatId==="kak_debrief"&&render.text.includes("PACKAGE SECURED")&&render.text.includes("RETRIEVAL INTELLIGENCE HIGH"),render);
 
   console.log(JSON.stringify({pass:true,kind:"dom_event_public_story_handler_harness",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
