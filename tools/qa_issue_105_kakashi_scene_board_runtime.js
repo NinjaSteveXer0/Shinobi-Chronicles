@@ -40,12 +40,16 @@ function projection(beatId,ctx={}){active.beatId=beatId;active.localContext={...
 try{
   const terminalSource=read("runtime/alpha-traversal-bridge-33200.js");
   const restorationSource=read("runtime/alpha-kakashi-original-origin-restoration-33800.js");
-  const i336=terminalSource.indexOf("runtime/alpha-early-story-modernization-33600.js");
-  const i337=terminalSource.indexOf("runtime/alpha-origin-screen-first-33700.js");
-  const i338=terminalSource.indexOf("runtime/alpha-kakashi-original-origin-restoration-33800.js");
-  assert("production_terminal_chain_orders_336_337_338",i336>=0&&i337>i336&&i338>i337,{i336,i337,i338});
-  assert("production_337_waits_for_336",terminalSource.includes('prior.addEventListener("load",load33700,{once:true})'),null);
-  assert("production_338_waits_for_337",terminalSource.includes('script.addEventListener("load",load33800,{once:true})'),null);
+  assert("production_terminal_chain_references_336_337_338",
+    terminalSource.includes('runtime/alpha-early-story-modernization-33600.js')&&
+    terminalSource.includes('runtime/alpha-origin-screen-first-33700.js')&&
+    terminalSource.includes('runtime/alpha-kakashi-original-origin-restoration-33800.js'));
+  assert("production_337_waits_for_336",
+    terminalSource.includes('if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600){load33700();return;}')&&
+    terminalSource.includes('prior.addEventListener("load",load33700,{once:true})'));
+  assert("production_338_waits_for_337",
+    terminalSource.includes('if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700){load33800();return;}')&&
+    terminalSource.includes('script.addEventListener("load",load33800,{once:true})'));
   assert("restoration_activates_33900",restorationSource.includes('runtime/alpha-story-scene-board-33900.js'),null);
 
   load("runtime/alpha-kakashi-original-origin-restoration-33800.js");
