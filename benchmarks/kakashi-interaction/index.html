@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Kakashi Interaction Benchmark | Shinobi Chronicles</title>
+  <link rel="stylesheet" href="./benchmark.css">
+</head>
+<body>
+  <main class="stage" id="stage">
+    <div class="stage__backdrop" aria-hidden="true"></div>
+    <div class="stage__shade" aria-hidden="true"></div>
+
+    <header class="context" aria-label="Scene context">
+      <span class="context__primary">Interaction</span>
+      <span class="context__secondary">Story</span>
+    </header>
+
+    <section class="dialogue" aria-live="polite" aria-atomic="true">
+      <p class="dialogue__speaker" id="speaker">Kakashi Hatake</p>
+      <h1 class="dialogue__line" id="line">...You're late.</h1>
+    </section>
+
+    <div class="actor" aria-hidden="true">
+      <img class="actor__image" src="../../NPC/Konoha%20Anbu_NPC.png" alt="">
+    </div>
+
+    <div class="choice-wrap">
+      <button class="choice" id="choice" type="button" aria-describedby="key-hint">
+        <span class="choice__marker" aria-hidden="true"></span>
+        <span class="choice__label" id="choice-label">Remain silent.</span>
+        <span class="choice__submit" aria-hidden="true">→</span>
+      </button>
+    </div>
+
+    <footer class="controls">
+      <button class="back" id="back" type="button" disabled>
+        <span aria-hidden="true">←</span>
+        Back
+      </button>
+      <p class="key-hint" id="key-hint">
+        <kbd>F</kbd>
+        <span>Continue</span>
+      </p>
+    </footer>
+  </main>
+
+  <script src="./benchmark.js"></script>
+</body>
+</html>
