@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-13  
 **Owner:** CE / Codex / Coordination  
-**Status:** **BINDING COORDINATION GUARD — EXPRESSION REWRITE MAY NOT INVALIDATE LOCKED SCENE GEOGRAPHY/TIME WITHOUT APPROVAL**
+**Status:** **BINDING COORDINATION GUARD — EXPRESSION REWRITE MAY NOT INVALIDATE RECOVERED/APPROVED SCENE GEOGRAPHY/TIME WITHOUT APPROVAL**
 
 ## Purpose
 
@@ -12,15 +12,20 @@ That is not authorised.
 
 The correct authority order for this lane is:
 
-`closed Origin factual/scene-setting authority + approved UI environment/backdrop authority`
+`recovered/approved Origin factual + scene-setting authority + approved UI environment/backdrop authority`
 >
 `candidate expression rewrite`.
 
+For current per-Origin geography/backdrop recovery, consume:
+
+`Documentation/Story/Academy_Origin_Scene_Location_and_Backdrop_Recovery_Manifest_2026-09-13.md`
+commit `75fe3a890a75e722d1bb5759fdb9cb5f8a1664c3`.
+
 Canonical rule:
 
-> **A player-facing expression rewrite must fit the already-authorised scene geography/time unless Stephen explicitly approves changing that scene setting.**
+> **A player-facing expression rewrite must fit the recovered/approved scene geography/time unless Stephen explicitly approves changing that scene setting.**
 
-If candidate prose conflicts with a locked backdrop/scene anchor, the candidate prose is corrected. The existing asset is not automatically declared obsolete.
+If candidate prose conflicts with recovered/approved scene geography, the candidate prose is corrected. The existing asset is preserved, but asset existence alone never grants Story or mapping authority.
 
 ## Existing preserved backdrop work
 
@@ -41,83 +46,111 @@ Preserve:
 **candidate prose != new World location**  
 **expression rewrite != geography rewrite**  
 **body-language/cadence rewrite != time-of-day rewrite**  
-**different wording != different environment**.
+**different wording != different environment**  
+**reconstructed Story != recovered original Story**.
 
 ## Origin preservation expectations
 
 ### Academy Hinata
 
-The Hyūga compound / training-courtyard setting remains the intended environment family. Candidate prose should be written to this setting unless Stephen explicitly changes the Origin location.
+The recovered Hyūga compound / training-courtyard setting remains the Story location family.
 
-`Scene backdrops/hyuga_compound.png` is preserved as the relevant physical asset candidate.
+`Scene backdrops/hyuga_compound.png` is preserved as the strong intended physical candidate. Exact mapping still follows normal approval where not separately closed.
 
 ### Academy Wasabi Izuno
 
-The daytime Konoha-outskirts pursuit / river-route setting remains the intended environment family for the route presentation where applicable.
+Recovered Story geography is a pursuit/tracking trial distributed across Konoha traversal, including a river-route beat among other route families.
 
-`Scene backdrops/river_route_day.png` is preserved as the relevant physical asset candidate.
+`Scene backdrops/river_route_day.png` is preserved for the river-route presentation where applicable. It is not authority to render the entire Origin on the river.
 
-### Academy Obito
+### Academy Obito — CORRECTED
 
-The authorised temporal progression remains a presentation concern with DAY / LATE_AFTERNOON / DUSK coverage where required by the existing scene sequence.
+Original Obito choreography/backdrop mapping remains **UNKNOWN**.
 
-Current physical assets include:
+The September 12 Kakashi/Obito package explicitly classified its Obito sequence as **NEW FINAL PRODUCTION AUTHORING — replaces missing durable package, not recovered original**.
+
+Therefore the later `DAY -> LATE_AFTERNOON -> DUSK` training-ground progression must not be described as recovered/authorised original Story merely because it was implemented or because assets were created for it.
+
+Preserve these physical assets:
 
 - `training_grounds_day.png`
 - `training_grounds_late_afternoon.png`
 - `training_grounds_dusk.png`
 
-Candidate prose must not erase or relocate the temporal progression merely for stylistic convenience.
+Do not delete or regenerate them. Their exact Obito mapping remains candidate/reconstructed presentation until original choreography is recovered or Stephen explicitly approves that reconstructed sequence.
 
-### Academy Kakashi
+### Academy Kakashi — CORRECTED
 
-The Origin remains a Konoha logistics / exchange / Academy-debrief / Hatake-home-threshold sequence under existing factual authority.
+The recovered accepted Story geography is:
 
-`broken_exchange_lane.png` now physically exists and must be preserved as a candidate exact/reusable exchange-lane presentation asset. Existing general Konoha street/route/interior assets remain valid reusable coverage candidates where semantically appropriate.
+1. Konoha rooftop — masked ANBU operative, sealed envelope, Hokage-authorised limited assignment;
+2. pursuit through Konoha — Kakashi tails the pictured target;
+3. Konoha alley — target meets a second man, package exchange, then the later complication.
 
-Writing may improve scene choreography and dialogue without relocating the operation simply because a different location is easier to write.
+Authority:
+
+`Documentation/Story/Academy_Kakashi_Original_Rooftop_ANBU_Hokage_Order_Restoration_2026-09-13.md`.
+
+The rejected replacement `Academy evaluator / logistics assessment / Academy debrief / Hatake-home-threshold` sequence is not Story-location authority and must not drive backdrop binding.
+
+Current asset status:
+
+- `Scene backdrops/hokage_district_exterior.png` is only provisional rooftop reuse;
+- `Scene backdrops/broken_exchange_lane.png` is a strong alley candidate but is not automatically approved exact mapping;
+- pursuit beat-by-beat mapping remains unresolved where not independently recovered.
+
+Writing may improve scene choreography and dialogue without changing rooftop -> pursuit -> alley unless Stephen explicitly changes the Story.
 
 ### Other Origins
 
-For Menma, Mirai, Kushina, Kurenai, Iwabee and Metal Lee, existing approved/reuse-first environment families remain protected. Expression rewriting may add physical movement **within** the authorised environment but may not create a new location/time requirement without explicit authority.
+Consume the Writing recovery manifest rather than assuming every previously suggested reuse family was approved.
 
-Kushina's courtyard/classroom mapping remains a UI/Coding binding question; a prose rewrite does not make either physical asset missing.
+Current important states include:
 
-Iwabee occurrence-specific terrain damage remains event state and must not be baked into a new reusable environment solely because revised prose dramatizes the damage more vividly.
+- Mirai: exact backdrop mapping UNKNOWN;
+- Menma: sequence recovered but DAY/NIGHT conflict unresolved;
+- Kushina: APPROVED exact courtyard/day mapping to `Scene backdrops/academy_training_ground_courtyard.png`;
+- Kurenai: exact location/backdrop UNKNOWN;
+- Iwabee: damaged-training-ground location family recovered, exact asset UNKNOWN;
+- Metal Lee: structure recovered, exact location/backdrop UNKNOWN.
+
+Iwabee occurrence-specific terrain damage remains event state and must not automatically be baked into a reusable generic master backdrop.
 
 ## Rewrite acceptance check
 
 Every substantial Origin expression candidate must now answer:
 
 1. What is the authoritative scene environment/location for this beat?
-2. What approved physical backdrop or reusable environment family already covers it?
-3. Did the candidate prose change only expression/performance, or did it silently change geography/time?
-4. If geography/time changed, where is Stephen/owner approval for that change?
-5. If no approval exists, revise the prose back to the existing scene anchor.
+2. Is that state `APPROVED`, `RECOVERED`, or `UNKNOWN`?
+3. What independently supported physical backdrop mapping already covers it, if any?
+4. Did the candidate prose change only expression/performance, or did it silently change geography/time?
+5. If geography/time changed, where is Stephen/owner approval for that change?
+6. If mapping remains UNKNOWN, is runtime leaving it unbound rather than guessing?
 
 No new asset backlog may be created by unauthorised expression drift.
 
 ## Coding / UI boundary
 
-Coding may continue implementing existing environment IDs / backdrop mappings against the preserved scene anchors.
+Coding may continue implementing environment IDs / backdrop mappings where scene geography/time and the mapping are independently closed.
 
-Coding does **not** need to wait for every prose sentence to be final before implementing a scene backdrop whose geography/time is already independently closed.
+Coding does **not** need to wait for every prose sentence to be final before implementing a scene backdrop whose geography/time and exact mapping are already authoritative.
 
 However:
 
-- candidate prose must not be treated as authority for a new environment;
+- candidate or reconstructed prose must not be treated as authority for a new environment;
 - exact mapping remains UI/Assets authority where not already closed;
-- browser validation remains required to prove the backdrop actually renders and occludes underlying World presentation correctly;
+- `UNKNOWN` remains unbound rather than invented;
+- browser validation remains required to prove the backdrop actually renders correctly;
 - no backdrop is Golden merely because its file exists.
 
 ## Current coordination consequence
 
-Issue #181 remains the central containment lane for unapproved Origin expression rewrites.
+Issue #181 remains the containment lane for the unapproved Origin-expression incident and approval-gate correction.
 
-This guard extends that containment:
+Corrected doctrine:
 
-> **Freeze prose drift, not asset implementation. Preserve the backdrop investment.**
+> **Freeze prose drift, not independently valid asset implementation. Preserve the backdrop investment without letting art invent Story.**
 
-Do not restart backdrop generation. Do not discard existing Origin art. Do not make Coding wait on stylistic recovery when the underlying scene-setting authority is already closed.
+Do not restart backdrop generation. Do not discard existing Origin art. Do not make Coding wait on stylistic recovery where underlying scene-setting and exact mapping authority are genuinely closed. Where Story/location/mapping is UNKNOWN, leave it explicitly unresolved rather than hardening a guess.
 
 Stephen relay: NONE.
