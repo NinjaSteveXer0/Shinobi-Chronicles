@@ -1,0 +1,37 @@
+name: Issue 173 Altered Shinobi Presentation QA
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'game.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_173_altered_shinobi_presentation_runtime.js'
+      - 'Enemies Portraits/test_subject_altered_shinobi.png'
+      - 'Documentation/UI/Altered Shinobi Battle Presentation Asset Binding 2026-09-13.md'
+      - '.github/workflows/issue-173-altered-shinobi-presentation.yml'
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_173_altered_shinobi_presentation_runtime.js'
+      - 'Enemies Portraits/test_subject_altered_shinobi.png'
+      - 'Documentation/UI/Altered Shinobi Battle Presentation Asset Binding 2026-09-13.md'
+      - '.github/workflows/issue-173-altered-shinobi-presentation.yml'
+
+jobs:
+  altered-shinobi-presentation-qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Exact Battle and Victory presentation contract
+        run: node tools/qa_issue_173_altered_shinobi_presentation_runtime.js
