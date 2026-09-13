@@ -59,3 +59,10 @@ jobs:
         run: |
           node --check runtime/alpha-origin-screen-first-33700.js
           node tools/qa_issue_105_origin_screen_first_activation.js
+
+      - name: Execute Kakashi interactive Story scene-board benchmark
+        run: |
+          node --check runtime/alpha-kakashi-original-origin-restoration-33800.js
+          node --check runtime/alpha-story-scene-board-33900.js
+          node --check tools/qa_issue_105_kakashi_scene_board_runtime.js
+          node tools/qa_issue_105_kakashi_scene_board_runtime.js

@@ -118,3 +118,18 @@ function runAlphaKakashiOriginal33800Diagnostics(){
 globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,browserGoldenClaimed:false});
 globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800Diagnostics;
 })();
+
+// ISSUE #105 / #175 benchmark presentation loads only after accepted Kakashi
+// Story authority has won the expression chain. The 33900 module is a generic
+// projection adapter over the existing Story renderer; it does not remap the
+// still-provisional Kakashi backdrop inventory or create a second Story engine.
+(function activateStorySceneBoard33900AfterKakashi33800(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  const SCRIPT_ID="sc-story-scene-board-33900-script";
+  if(globalThis.SC_STORY_SCENE_BOARD_33900||document.getElementById(SCRIPT_ID))return;
+  const script=document.createElement("script");
+  script.id=SCRIPT_ID;
+  script.src="runtime/alpha-story-scene-board-33900.js";
+  script.async=false;
+  document.head.appendChild(script);
+})();
