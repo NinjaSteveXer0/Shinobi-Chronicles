@@ -41,6 +41,7 @@ function projection(beatId,ctx={}){active.beatId=beatId;active.localContext={...
 try{
   const terminalSource=read("runtime/alpha-traversal-bridge-33200.js");
   const restorationSource=read("runtime/alpha-kakashi-original-origin-restoration-33800.js");
+  const sceneBoardSource=read("runtime/alpha-story-scene-board-33900.js");
   assert("production_terminal_chain_references_336_337_338",
     terminalSource.includes('runtime/alpha-early-story-modernization-33600.js')&&
     terminalSource.includes('runtime/alpha-origin-screen-first-33700.js')&&
@@ -69,6 +70,15 @@ try{
   const d339=context.runStorySceneBoard33900Diagnostics();
   assert("33800_diagnostics_green",d338.pass===true,d338);
   assert("33900_diagnostics_green",d339.pass===true,d339);
+  assert("scene_board_reads_exact_rooftop_backdrop",
+    context.resolveStorySceneBoardBackdropPath(active)==="Kakashi Origin Backdrop/rooftop_night.png",
+    context.resolveStorySceneBoardBackdropPath(active));
+  assert("scene_board_neutralizes_opaque_master_shell",
+    sceneBoardSource.includes('.sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}'));
+  assert("scene_board_mirrors_authoritative_backdrop_onto_stage",
+    sceneBoardSource.includes('[data-sc-scene-board-backdrop="dedicated"]')&&sceneBoardSource.includes('var(--sc-scene-board-backdrop)'));
+  assert("kakashi_square_portrait_has_square_scene_slot",
+    sceneBoardSource.includes('[data-actor-id="academy_kakashi"]{width:min(80%,292px);aspect-ratio:1/1;max-height:292px;}'));
   assert("kakashi_rooftop_backdrop_exact",backdrops.get("kakashi_origin_rooftop_night")==="Kakashi Origin Backdrop/rooftop_night.png",[...backdrops]);
   assert("kakashi_alley_backdrop_exact",backdrops.get("kakashi_origin_konoha_alleyway")==="Kakashi Origin Backdrop/konoha_alleyway.png",[...backdrops]);
   assert("kakashi_sakura_backdrop_exact",backdrops.get("kakashi_origin_sakura_tree_night")==="Kakashi Origin Backdrop/sakura_tree_night.png",[...backdrops]);
@@ -102,5 +112,5 @@ try{
   assert("source_occurrence_not_derived_or_renamed",history.length===1&&history[0].sourceOccurrenceId==="occ_origin_kakashi_anbu_retrieval_resolution",history);
   assert("browser_golden_not_claimed",d338.browserGoldenClaimed===false&&d339.browserGoldenClaimed===false);
 
-  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark_with_production_activation_and_backdrop_resolution",browserGoldenClaimed:false},null,2));
+  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark_with_production_activation_backdrop_and_stage_composition",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
