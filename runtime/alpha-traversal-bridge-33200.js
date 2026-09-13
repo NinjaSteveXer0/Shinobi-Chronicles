@@ -253,15 +253,19 @@
 // accepted Kakashi authority wins over the superseded evaluator rewrite. 33800
 // then activates reusable scene-board projection 33900. Keep this sequence in
 // the terminal loader rather than parser-ordering these dynamic modules.
+// Cache-bust these terminal dynamic modules so browser replay cannot silently
+// reuse an older presentation payload after a runtime correction.
 // ============================================================================
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+
+  const SCENE_BOARD_BUILD="scene-board-20260914-4";
 
   function load33800(){
     if(globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800||document.getElementById("sc-alpha-kakashi-original-33800-script"))return;
     const script=document.createElement("script");
     script.id="sc-alpha-kakashi-original-33800-script";
-    script.src="runtime/alpha-kakashi-original-origin-restoration-33800.js";
+    script.src=`runtime/alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}`;
     script.async=false;
     document.head.appendChild(script);
   }
@@ -272,7 +276,7 @@
     if(existing){existing.addEventListener("load",load33800,{once:true});return;}
     const script=document.createElement("script");
     script.id="sc-alpha-origin-screen-first-33700-script";
-    script.src="runtime/alpha-origin-screen-first-33700.js";
+    script.src=`runtime/alpha-origin-screen-first-33700.js?v=${SCENE_BOARD_BUILD}`;
     script.async=false;
     script.addEventListener("load",load33800,{once:true});
     document.head.appendChild(script);
