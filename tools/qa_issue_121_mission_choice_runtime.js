@@ -62,3 +62,8 @@ assert.strictEqual(api.completeMission('arc_test','m1',{ready:false}).success,fa
 assert.strictEqual(api.completeMission('arc_test','m1',{ready:true}).success,true);
 
 console.log(JSON.stringify({pass:true,diagnostics:diag.checks,saveWrites:sandbox.saveWrites},null,2));
+
+// Production binding regression is chained here so the existing #121 workflow
+// proves both the generic CE semantic-choice engine and its first live Story
+// consumer without requiring a second workflow definition.
+require('./qa_issue_121_production_binding_runtime.js');
