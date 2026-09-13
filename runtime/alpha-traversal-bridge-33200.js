@@ -245,3 +245,49 @@
     },{once:true});
   }
 })();
+
+// ============================================================================
+// ISSUE #105 / #175 / #181 — TERMINAL ORIGIN SCENE-BOARD ACTIVATION
+//
+// 33700 is the final screen-first expression layer. 33800 must run after it so
+// accepted Kakashi authority wins over the superseded evaluator rewrite. 33800
+// then activates reusable scene-board projection 33900. Keep this sequence in
+// the terminal loader rather than parser-ordering these dynamic modules.
+// ============================================================================
+(function activateOriginSceneBoardTerminalChain33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+
+  function load33800(){
+    if(globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800||document.getElementById("sc-alpha-kakashi-original-33800-script"))return;
+    const script=document.createElement("script");
+    script.id="sc-alpha-kakashi-original-33800-script";
+    script.src="runtime/alpha-kakashi-original-origin-restoration-33800.js";
+    script.async=false;
+    document.head.appendChild(script);
+  }
+
+  function load33700(){
+    if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700){load33800();return;}
+    const existing=document.getElementById("sc-alpha-origin-screen-first-33700-script");
+    if(existing){existing.addEventListener("load",load33800,{once:true});return;}
+    const script=document.createElement("script");
+    script.id="sc-alpha-origin-screen-first-33700-script";
+    script.src="runtime/alpha-origin-screen-first-33700.js";
+    script.async=false;
+    script.addEventListener("load",load33800,{once:true});
+    document.head.appendChild(script);
+  }
+
+  if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600){load33700();return;}
+  const prior=document.getElementById("sc-alpha-early-story-modernization-33600-script");
+  if(prior){prior.addEventListener("load",load33700,{once:true});return;}
+
+  const reaction=document.getElementById("sc-alpha-origin-choice-reaction-33510-script");
+  if(reaction){
+    reaction.addEventListener("load",()=>{
+      const modernization=document.getElementById("sc-alpha-early-story-modernization-33600-script");
+      if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600)load33700();
+      else if(modernization)modernization.addEventListener("load",load33700,{once:true});
+    },{once:true});
+  }
+})();
