@@ -34,6 +34,11 @@ const backdropPaths=Object.freeze({
   [alley.assetId]:"Kakashi Origin Backdrop/konoha_alleyway.png",
   [sakura.assetId]:"Kakashi Origin Backdrop/sakura_tree_night.png"
 });
+const kakashiEnvironmentDefinitions=Object.freeze({
+  [rooftop.assetId]:Object.freeze({assetId:rooftop.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true}),
+  [alley.assetId]:Object.freeze({assetId:alley.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true}),
+  [sakura.assetId]:Object.freeze({assetId:sakura.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true})
+});
 
 try{
   const reg=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
@@ -41,6 +46,53 @@ try{
     Object.entries(backdropPaths).forEach(([assetId,path])=>reg(assetId,path));
   }
 }catch(_error){}
+
+// Core Story environment projection only recognises the original frozen Alpha
+// environment library. These three approved Kakashi-only assets were authored
+// later, so bridge their exact assetIds through that existing resolver instead
+// of mutating the frozen core library or remapping an unrelated global backdrop.
+const priorEnvironmentResolver33800=typeof resolveStorySceneEnvironmentProjection==="function"?resolveStorySceneEnvironmentProjection:null;
+function requestedEnvironmentAssetId33800(authoredPresentation={},beat=null,definition=null){
+  const refs=[
+    authoredPresentation&&(authoredPresentation.environmentRef||authoredPresentation.sceneEnvironmentRef)||null,
+    beat&&beat.environmentRef||null,
+    definition&&definition.environmentRef||null
+  ];
+  for(const ref of refs){
+    if(typeof ref==="string")return ref;
+    if(ref&&typeof ref==="object"&&ref.assetId)return String(ref.assetId);
+  }
+  return null;
+}
+function resolveKakashiOriginEnvironment33800(authoredPresentation={},beat=null,definition=null,active=null){
+  const assetId=requestedEnvironmentAssetId33800(authoredPresentation,beat,definition);
+  const environment=assetId?kakashiEnvironmentDefinitions[assetId]||null:null;
+  if(environment){
+    let assetPath=backdropPaths[assetId]||null;
+    try{
+      if(typeof getSceneBackdropAssetPath==="function")assetPath=getSceneBackdropAssetPath(assetId)||assetPath;
+    }catch(_error){}
+    return{
+      mode:"dedicated_backdrop",
+      asset_id:environment.assetId,
+      asset_path:assetPath,
+      location_id:null,
+      status:environment.status,
+      aspect_ratio:environment.aspectRatio,
+      master_resolution:{width:environment.masterWidth,height:environment.masterHeight},
+      dialogue_safe_lower_ratio:environment.dialogueSafeLowerRatio,
+      story_only:environment.storyOnly===true,
+      never_battle_surface:environment.neverBattleSurface===true,
+      world_identity_unchanged:true
+    };
+  }
+  if(priorEnvironmentResolver33800)return priorEnvironmentResolver33800.apply(this,arguments);
+  return{mode:"inherit_current",asset_id:null,asset_path:null,location_id:null,world_identity_unchanged:true};
+}
+if(priorEnvironmentResolver33800){
+  globalThis.resolveStorySceneEnvironmentProjection=resolveKakashiOriginEnvironment33800;
+  try{resolveStorySceneEnvironmentProjection=resolveKakashiOriginEnvironment33800;}catch(_error){}
+}
 
 const result=R(
   "kakashi_original_retrieval_resolution_33800",
@@ -106,12 +158,21 @@ A.register({
   onCompleteConsequences:[X("academy_kakashi",[occurrence])]
 });
 
+// If this correction arrives while Kakashi's Story layer is already open,
+// rebuild the existing Story presentation once so the newly resolvable backdrop
+// appears immediately. This is presentation-only; no beat or consequence runs.
+try{
+  const active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;
+  if(active&&active.sceneId===scene&&typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();
+}catch(_error){}
+
 function runAlphaKakashiOriginal33800Diagnostics(){
   const d=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(scene):null;
   const m=d&&d.beatMap instanceof Map?d.beatMap:null;
   const action=m&&m.get("kak_original_action"),major=m&&m.get("kak_original_major_choice");
   const rooftopBeat=m&&m.get("kak_original_rooftop"),tailBeat=m&&m.get("kak_original_tail"),transferBeat=m&&m.get("kak_original_transfer");
   const getPath=typeof getSceneBackdropAssetPath==="function"?getSceneBackdropAssetPath:null;
+  const rooftopProjection=resolveKakashiOriginEnvironment33800({environmentRef:rooftop},null,null,null);
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_original_origin_33800_2026_09_13",
     authorityPinned:AUTHORITY_COMMIT==="04efa8c7b3faa5ec71b0191dcb673ebf3a60bbba",
@@ -127,6 +188,11 @@ function runAlphaKakashiOriginal33800Diagnostics(){
       &&getPath(rooftop.assetId)===backdropPaths[rooftop.assetId]
       &&getPath(alley.assetId)===backdropPaths[alley.assetId]
       &&getPath(sakura.assetId)===backdropPaths[sakura.assetId],
+    dedicatedBackdropActuallyResolvable:!!priorEnvironmentResolver33800
+      &&rooftopProjection&&rooftopProjection.mode==="dedicated_backdrop"
+      &&rooftopProjection.asset_id===rooftop.assetId
+      &&rooftopProjection.asset_path===backdropPaths[rooftop.assetId]
+      &&rooftopProjection.world_identity_unchanged===true,
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
