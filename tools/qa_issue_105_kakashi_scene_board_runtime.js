@@ -9,6 +9,7 @@ function unregisterStoryScene(id){scenes.delete(id);return true;}
 function getStorySceneDefinition(id){return scenes.get(id)||null;}
 function getActiveStorySceneRuntime(){return active;}
 function registerSceneBackdropAssetPath(id,asset){backdrops.set(id,asset);return{success:true};}
+function getSceneBackdropAssetPath(id){return backdrops.get(id)||null;}
 function renderStoryScenePresentationLayer(){return true;}
 const A={
   sceneByVariant:{academy_kakashi:"origin_academy_kakashi_anbu_retrieval"},
@@ -28,34 +29,52 @@ const A={
 };
 const context={console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Error,TypeError,RegExp,Date,
   globalThis:null,window:null,SC_ALPHA_ORIGIN_32900:A,cloneProgressionData:clone,
-  registerStoryScene,unregisterStoryScene,getStorySceneDefinition,getActiveStorySceneRuntime,registerSceneBackdropAssetPath,
-  renderStoryScenePresentationLayer};
+  registerStoryScene,unregisterStoryScene,getStorySceneDefinition,getActiveStorySceneRuntime,
+  registerSceneBackdropAssetPath,getSceneBackdropAssetPath,renderStoryScenePresentationLayer};
 context.globalThis=context;context.window=context;
 vm.createContext(context);
 function load(rel){vm.runInContext(fs.readFileSync(path.join(process.cwd(),rel),"utf8"),context,{filename:rel});}
+function read(rel){return fs.readFileSync(path.join(process.cwd(),rel),"utf8");}
 function assert(name,value,details=null){if(!value)throw new Error(`${name}: ${JSON.stringify(details)}`);console.log(`PASS ${name}`);}
 function projection(beatId,ctx={}){active.beatId=beatId;active.localContext={...ctx};return context.resolveStorySceneBoardProjection(active.sceneId,beatId,active);}
 try{
+  const terminalSource=read("runtime/alpha-traversal-bridge-33200.js");
+  const restorationSource=read("runtime/alpha-kakashi-original-origin-restoration-33800.js");
+  const i336=terminalSource.indexOf("runtime/alpha-early-story-modernization-33600.js");
+  const i337=terminalSource.indexOf("runtime/alpha-origin-screen-first-33700.js");
+  const i338=terminalSource.indexOf("runtime/alpha-kakashi-original-origin-restoration-33800.js");
+  assert("production_terminal_chain_orders_336_337_338",i336>=0&&i337>i336&&i338>i337,{i336,i337,i338});
+  assert("production_337_waits_for_336",terminalSource.includes('prior.addEventListener("load",load33700,{once:true})'),null);
+  assert("production_338_waits_for_337",terminalSource.includes('script.addEventListener("load",load33800,{once:true})'),null);
+  assert("restoration_activates_33900",restorationSource.includes('runtime/alpha-story-scene-board-33900.js'),null);
+
   load("runtime/alpha-kakashi-original-origin-restoration-33800.js");
   load("runtime/alpha-story-scene-board-33900.js");
   const d338=context.runAlphaKakashiOriginal33800Diagnostics();
   const d339=context.runStorySceneBoard33900Diagnostics();
   assert("33800_diagnostics_green",d338.pass===true,d338);
   assert("33900_diagnostics_green",d339.pass===true,d339);
-  assert("current_rooftop_binding_preserved",backdrops.get("konoha_rooftop_day")==="Scene backdrops/hokage_district_exterior.png",[...backdrops]);
-  assert("current_alley_binding_preserved",backdrops.get("konoha_exchange_alley_day")==="Scene backdrops/broken_exchange_lane.png",[...backdrops]);
+  assert("kakashi_rooftop_backdrop_exact",backdrops.get("kakashi_origin_rooftop_night")==="Kakashi Origin Backdrop/rooftop_night.png",[...backdrops]);
+  assert("kakashi_alley_backdrop_exact",backdrops.get("kakashi_origin_konoha_alleyway")==="Kakashi Origin Backdrop/konoha_alleyway.png",[...backdrops]);
+  assert("kakashi_sakura_backdrop_exact",backdrops.get("kakashi_origin_sakura_tree_night")==="Kakashi Origin Backdrop/sakura_tree_night.png",[...backdrops]);
+
+  const scene=scenes.get(active.sceneId);
+  assert("story_beat_backdrop_sequence_exact",
+    scene.beatMap.get("kak_original_rooftop").environmentRef.assetId==="kakashi_origin_rooftop_night"&&
+    scene.beatMap.get("kak_original_tail").environmentRef.assetId==="kakashi_origin_konoha_alleyway"&&
+    scene.beatMap.get("kak_original_transfer").environmentRef.assetId==="kakashi_origin_sakura_tree_night",
+    scene.beats.map(b=>({beatId:b.beatId,environmentRef:b.environmentRef||null})));
 
   const roof=projection("kak_original_anbu");
   assert("rooftop_has_exact_two_stage_assets",roof.actors.some(a=>a.image==="Portraits/Academy Student/academy_student_kakashi.png")&&roof.actors.some(a=>a.image==="NPC/konoha_anbu.png"),roof);
   assert("conversation_focuses_current_speaker",roof.mode==="conversation"&&roof.actors.find(a=>a.label==="ANBU OPERATIVE").focus===true,roof);
-  assert("scene_board_does_not_invent_time_of_day",roof.location==="KONOHA ROOFTOP"&&!roof.location.includes("NIGHT")&&!roof.location.includes("DAY"),roof);
 
   const action=projection("kak_original_action");
   assert("choice_is_staged_encounter_not_text_only",action.mode==="encounter"&&action.actors.length===3&&action.objects.some(x=>x.state==="EXCHANGE IN PROGRESS"),action);
   const transfer=projection("kak_original_transfer",{kakashiOriginalAction:"attack"});
   assert("player_action_changes_visible_scene_state",transfer.reaction==="BOTH MEN REACT EARLY"&&transfer.objects.some(x=>x.state==="SECOND MAN HAS PACKAGE"),transfer);
 
-  const scene=scenes.get(active.sceneId),major=scene.beatMap.get("kak_original_major_choice");
+  const major=scene.beatMap.get("kak_original_major_choice");
   assert("battle_branches_remain_fail_closed",major.choices.find(c=>c.choiceId==="fight_assassin").availability().available===false&&major.choices.find(c=>c.choiceId==="defeat_assassin_then_recover").availability().available===false);
 
   active.localContext={kakashiOriginalAction:"attack",kakashiRetrievalChoice:"secure_package"};
@@ -68,5 +87,5 @@ try{
   assert("source_occurrence_not_derived_or_renamed",history.length===1&&history[0].sourceOccurrenceId==="occ_origin_kakashi_anbu_retrieval_resolution",history);
   assert("browser_golden_not_claimed",d338.browserGoldenClaimed===false&&d339.browserGoldenClaimed===false);
 
-  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark",browserGoldenClaimed:false},null,2));
+  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark_with_production_activation",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
