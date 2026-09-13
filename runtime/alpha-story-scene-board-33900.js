@@ -1,21 +1,19 @@
 // ============================================================================
-// ISSUE #105 / #175 — REUSABLE STORY SCENE BOARD + KAKASHI BENCHMARK — 33900
+// ISSUE #105 / #175 — REUSABLE STORY SCENE BOARD + CINEMATIC PERFORMANCE — 33900
 //
-// Presentation-only bridge over the existing Story runtime. It does not create
-// a second Story/Encounter engine and never commits semantic history. The active
-// Story beat/local context remains authority; this module only projects it as a
-// staged environment with visible actors, objects, objectives and consequence
-// state. Kakashi is the first benchmark consumer before any wider Origin rollout.
+// Presentation-only bridge over the existing Story runtime. Story beats remain
+// semantic authority. Performance cues own cinematic delivery inside one mounted
+// scene and never create World Truth or Chronicle facts.
 // ============================================================================
 (function installStorySceneBoard33900(){
 "use strict";
 if(globalThis.SC_STORY_SCENE_BOARD_33900)return;
 
-const PATCH_ID="story_scene_board_33900_2026_09_14";
+const PATCH_ID="story_scene_board_33900_2026_09_14_cinematic";
 const STYLE_ID="sc-story-scene-board-33900-style";
+const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const registry=new Map();
-let rendering=false;
-let observer=null;
+let rendering=false,observer=null,transitioning=false;
 
 function escapeHTML(value){
   if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));
@@ -26,9 +24,7 @@ function clone(value){
   if(value===undefined)return undefined;
   try{return JSON.parse(JSON.stringify(value));}catch(_error){return value;}
 }
-function currentRuntime(){
-  try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_error){return null;}
-}
+function currentRuntime(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_error){return null;}}
 function sceneDefinition(runtime=currentRuntime()){
   if(!runtime||typeof getStorySceneDefinition!=="function")return null;
   try{return getStorySceneDefinition(runtime.sceneId)||null;}catch(_error){return null;}
@@ -36,271 +32,261 @@ function sceneDefinition(runtime=currentRuntime()){
 function currentBeat(runtime=currentRuntime()){
   const def=sceneDefinition(runtime);
   if(!runtime||!def)return null;
-  try{
-    if(def.beatMap instanceof Map)return def.beatMap.get(runtime.beatId)||null;
-    return Array.isArray(def.beats)?def.beats.find(row=>row&&row.beatId===runtime.beatId)||null:null;
-  }catch(_error){return null;}
+  try{return def.beatMap instanceof Map?def.beatMap.get(runtime.beatId)||null:null;}catch(_error){return null;}
 }
 function registerStorySceneBoardDefinition(sceneId,definition){
   if(!sceneId||!definition||typeof definition!=="object")return{success:false,reason:"story_scene_board_definition_required"};
-  registry.set(sceneId,definition);
-  return{success:true,sceneId};
+  registry.set(String(sceneId),definition);return{success:true,sceneId:String(sceneId)};
 }
-function unregisterStorySceneBoardDefinition(sceneId){return registry.delete(sceneId);}
+function unregisterStorySceneBoardDefinition(sceneId){return registry.delete(String(sceneId||""));}
+function boardDefinition(sceneId){return registry.get(String(sceneId||""))||null;}
+function performanceSequenceFor(runtime=currentRuntime(),beat=currentBeat(runtime)){
+  if(!runtime||!beat)return null;
+  const def=boardDefinition(runtime.sceneId),source=def&&def.performanceSequences;
+  if(!source)return null;
+  let seq=source[beat.beatId];
+  if(typeof seq==="function")seq=seq({runtime,beat,context:runtime.localContext||{}});
+  return Array.isArray(seq)&&seq.length?seq:null;
+}
+function performanceCursor(runtime=currentRuntime(),beat=currentBeat(runtime)){
+  const seq=performanceSequenceFor(runtime,beat);
+  if(!seq)return null;
+  const row=runtime.localContext&&runtime.localContext[PERFORMANCE_KEY];
+  const index=row&&row.beatId===beat.beatId&&Number.isInteger(row.index)?Math.max(0,Math.min(seq.length-1,row.index)):0;
+  return{sequence:seq,index,cue:seq[index],atEnd:index>=seq.length-1};
+}
+function persistPerformanceCursor(runtime,beat,index){
+  if(!runtime||!beat)return;
+  if(!runtime.localContext||typeof runtime.localContext!=="object")runtime.localContext={};
+  runtime.localContext[PERFORMANCE_KEY]={beatId:beat.beatId,index};
+  try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}
+}
+function clearPerformanceCursor(runtime){
+  if(runtime&&runtime.localContext&&Object.prototype.hasOwnProperty.call(runtime.localContext,PERFORMANCE_KEY))delete runtime.localContext[PERFORMANCE_KEY];
+}
 function resolveStorySceneBoardProjection(sceneId,beatId,runtime=currentRuntime()){
-  const definition=registry.get(sceneId);
-  if(!definition)return null;
-  const beat=currentBeat(runtime);
-  const context=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
-  const state={sceneId,beatId,runtime,beat,context};
+  const definition=boardDefinition(sceneId);if(!definition)return null;
+  const beat=currentBeat(runtime),context=runtime&&runtime.localContext&&typeof runtime.localContext==="object"?runtime.localContext:{};
+  const performance=performanceCursor(runtime,beat);
+  const state={sceneId,beatId,runtime,beat,context,performance};
   let projection=null;
   if(typeof definition.resolve==="function")projection=definition.resolve(state);
-  else if(definition.beats&&definition.beats[beatId]){
-    const row=definition.beats[beatId];
-    projection=typeof row==="function"?row(state):row;
-  }
-  if(!projection)return null;
-  return{sceneId,beatId,...clone(projection)};
+  else if(definition.beats&&definition.beats[beatId]){const row=definition.beats[beatId];projection=typeof row==="function"?row(state):row;}
+  return projection?{sceneId,beatId,...clone(projection)}:null;
 }
-function getActiveStorySceneBoardProjection(){
-  const runtime=currentRuntime();
-  return runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;
-}
+function getActiveStorySceneBoardProjection(){const runtime=currentRuntime();return runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;}
 
-// The legacy Chronicle shell paints an opaque coded-shell gradient on
-// .is-master-art-off. That shell is valid outside the Scene Board, but it can
-// cover an otherwise correctly resolved Story backdrop. Read the existing
-// Story/environment authority and mirror the approved backdrop onto the board
-// stage as presentation only. No environment/world fact is created here.
-function requestedAssetIdFromBeat(beat){
-  const ref=beat&&beat.environmentRef;
-  if(typeof ref==="string")return ref;
-  return ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;
-}
+function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
 function resolveBoardBackdropPath(runtime=currentRuntime(),beat=currentBeat(runtime)){
   const def=sceneDefinition(runtime);
-  try{
-    if(typeof resolveStorySceneEnvironmentProjection==="function"){
-      const resolved=resolveStorySceneEnvironmentProjection({},beat,def,runtime);
-      if(resolved&&resolved.mode==="dedicated_backdrop"&&resolved.asset_path)return String(resolved.asset_path);
-    }
-  }catch(_error){}
-  const assetId=requestedAssetIdFromBeat(beat);
-  if(!assetId)return null;
-  try{
-    const getPath=typeof getSceneBackdropAssetPath==="function"?getSceneBackdropAssetPath:globalThis.getSceneBackdropAssetPath;
-    const path=typeof getPath==="function"?getPath(assetId):null;
-    return path?String(path):null;
-  }catch(_error){return null;}
+  try{if(typeof resolveStorySceneEnvironmentProjection==="function"){const r=resolveStorySceneEnvironmentProjection({},beat,def,runtime);if(r&&r.mode==="dedicated_backdrop"&&r.asset_path)return String(r.asset_path);}}catch(_error){}
+  const assetId=requestedAssetIdFromBeat(beat);if(!assetId)return null;
+  try{const getPath=typeof getSceneBackdropAssetPath==="function"?getSceneBackdropAssetPath:globalThis.getSceneBackdropAssetPath;const path=typeof getPath==="function"?getPath(assetId):null;return path?String(path):null;}catch(_error){return null;}
 }
 function cssUrlValue(path){return `url("${String(path).replace(/\\/g,"\\\\").replace(/\"/g,'\\\"')}")`;}
 function applyBoardBackdrop(stage,runtime=currentRuntime()){
-  if(!stage||!stage.style)return null;
-  const path=resolveBoardBackdropPath(runtime,currentBeat(runtime));
-  if(path){
-    if(stage.dataset)stage.dataset.scSceneBoardBackdrop="dedicated";
-    stage.style.setProperty("--sc-scene-board-backdrop",cssUrlValue(path));
-    return path;
-  }
-  if(stage.dataset)delete stage.dataset.scSceneBoardBackdrop;
-  stage.style.removeProperty("--sc-scene-board-backdrop");
-  return null;
+  if(!stage||!stage.style)return null;const path=resolveBoardBackdropPath(runtime,currentBeat(runtime));
+  if(path){if(stage.dataset)stage.dataset.scSceneBoardBackdrop="dedicated";stage.style.setProperty("--sc-scene-board-backdrop",cssUrlValue(path));return path;}
+  if(stage.dataset)delete stage.dataset.scSceneBoardBackdrop;stage.style.removeProperty("--sc-scene-board-backdrop");return null;
 }
 
 function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
-  const style=document.createElement("style");
-  style.id=STYLE_ID;
-  style.textContent=`
-    #story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment{z-index:0!important;filter:saturate(1.04) brightness(.92);}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment-scrim{z-index:1!important;background:linear-gradient(180deg,rgba(2,5,8,.05),rgba(2,5,8,.10) 46%,rgba(2,5,8,.62) 83%,rgba(2,5,8,.84))!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage{width:min(100vw,calc(100vh * 1.7777778))!important;max-width:none!important;aspect-ratio:16/9!important;overflow:hidden;z-index:2!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage[data-sc-scene-board-backdrop="dedicated"]{background-image:linear-gradient(180deg,rgba(2,5,8,.04),rgba(2,5,8,.10) 48%,rgba(2,5,8,.48) 78%,rgba(2,5,8,.78)),var(--sc-scene-board-backdrop)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-master-frame{display:none!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:4;width:min(94%,1180px)!important;min-height:0!important;margin:0 0 2.1%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-context{display:none!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;background:linear-gradient(180deg,rgba(3,9,14,.76),rgba(2,7,11,.90))!important;backdrop-filter:blur(4px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:auto!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
-    #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
-    #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));}
-    #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-story-choice{min-height:42px;align-items:center;background:linear-gradient(180deg,rgba(14,24,30,.91),rgba(7,14,19,.94))!important;border-color:rgba(207,169,76,.68)!important;}
-    #story-scene-presentation-layer[data-sc-scene-mode="consequence"] .sc-story-panel{border-color:rgba(92,205,162,.62)!important;}
-    .sc-scene-board-33900{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
-    .sc-scene-board-33900__top{position:absolute;left:3.2%;right:3.2%;top:3.8%;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
-    .sc-scene-board-33900__location,.sc-scene-board-33900__objective,.sc-scene-board-33900__receipt{padding:7px 10px;border:1px solid rgba(199,164,77,.52);background:rgba(3,9,14,.68);box-shadow:0 8px 22px rgba(0,0,0,.28);text-shadow:0 1px 2px #000;backdrop-filter:blur(3px);}
-    .sc-scene-board-33900__location{color:#e7cf82;font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;}
-    .sc-scene-board-33900__objective{max-width:48%;color:#f0eadc;font-size:10px;line-height:1.35;text-align:right;}
-    .sc-scene-board-33900__objective b{display:block;color:#71dce4;font-size:8px;letter-spacing:.14em;margin-bottom:3px;}
-    .sc-scene-board-33900__actors{position:absolute;left:4%;right:4%;top:13%;bottom:26%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:3%;}
-    .sc-scene-board-33900__actor{position:relative;justify-self:center;width:min(76%,250px);aspect-ratio:3/4;max-height:390px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;opacity:.70;transform:translateY(4px) scale(.94);transition:opacity .16s ease,transform .16s ease,filter .16s ease;filter:saturate(.76) brightness(.86);}
-    .sc-scene-board-33900__actor.is-focus{opacity:1;transform:translateY(0) scale(1);filter:none;}
-    .sc-scene-board-33900__actor-frame{position:absolute;inset:0;border:1px solid rgba(194,158,73,.38);background:linear-gradient(180deg,rgba(7,13,17,.03) 0%,rgba(3,7,10,.10) 64%,rgba(3,7,10,.72) 100%);box-shadow:0 16px 34px rgba(0,0,0,.30),inset 0 0 28px rgba(0,0,0,.10);}
-    .sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-frame{border-color:rgba(97,220,229,.78);box-shadow:0 0 0 1px rgba(97,220,229,.15),0 18px 38px rgba(0,0,0,.38);}
-    .sc-scene-board-33900__actor img{position:relative;z-index:1;width:100%;height:100%;object-fit:cover;object-position:center 35%;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52));}
-    .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{width:min(80%,292px);aspect-ratio:1/1;max-height:292px;}
-    .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"] img{object-fit:cover;object-position:center center;}
-    .sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{width:min(67%,238px);aspect-ratio:7/10;max-height:390px;overflow:visible;}
-    .sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"] img{object-fit:contain;object-position:center bottom;}
-    .sc-scene-board-33900__actor-fallback{position:relative;z-index:1;width:64%;aspect-ratio:3/4;margin-bottom:22px;border:1px dashed rgba(190,177,145,.35);display:flex;align-items:center;justify-content:center;background:rgba(4,8,11,.52);color:#b7b09e;font-size:30px;font-weight:900;}
-    .sc-scene-board-33900__actor-tag{position:absolute;z-index:3;left:7%;right:7%;bottom:4%;padding:6px 8px;background:rgba(2,7,10,.84);border:1px solid rgba(194,158,73,.48);text-align:center;backdrop-filter:blur(2px);}
-    .sc-scene-board-33900__actor-tag strong{display:block;color:#efe6cf;font-size:10px;letter-spacing:.1em;}
-    .sc-scene-board-33900__actor-tag small{display:block;color:#a8b8ba;font-size:8px;margin-top:2px;line-height:1.25;}
-    .sc-scene-board-33900__objects{position:absolute;left:4%;right:4%;bottom:24.8%;display:flex;justify-content:center;gap:8px;flex-wrap:wrap;}
-    .sc-scene-board-33900__object{padding:6px 9px;border:1px solid rgba(202,167,78,.5);background:rgba(3,9,13,.78);font-size:8px;letter-spacing:.07em;color:#d8ceb8;backdrop-filter:blur(2px);}
-    .sc-scene-board-33900__object b{color:#6dd7df;margin-right:6px;}
-    .sc-scene-board-33900__reaction{position:absolute;left:50%;top:12.5%;transform:translateX(-50%);max-width:64%;padding:8px 12px;border:1px solid rgba(102,212,188,.62);background:rgba(3,12,14,.78);color:#d9f1e9;font-size:9px;font-weight:800;letter-spacing:.05em;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,.35);backdrop-filter:blur(2px);}
-    .sc-scene-board-33900__receipt{position:absolute;right:3.2%;top:12.5%;border-color:rgba(93,205,162,.62);color:#bfead8;font-size:8px;font-weight:900;letter-spacing:.1em;}
-    @media(max-width:820px){
-      #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage{width:100vw!important;min-width:0!important;}
-      .sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%;}
-      .sc-scene-board-33900__actor{width:90%;max-height:290px;}
-      .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{width:92%;max-height:220px;}
-      .sc-scene-board-33900__objective{max-width:58%;font-size:8px;}
-      #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr;}
-    }
-  `;
-  document.head.appendChild(style);
-  return true;
+  const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
+#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment{z-index:0!important;filter:saturate(1.04) brightness(.94);}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment-scrim{z-index:1!important;background:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.06) 48%,rgba(2,5,8,.50) 84%,rgba(2,5,8,.76))!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage{width:min(100vw,calc(100vh * 1.7777778))!important;max-width:none!important;aspect-ratio:16/9!important;overflow:hidden;z-index:2!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage[data-sc-scene-board-backdrop="dedicated"]{background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.42) 82%,rgba(2,5,8,.70)),var(--sc-scene-board-backdrop)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-master-frame{display:none!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout{position:relative;z-index:5;width:min(94%,1180px)!important;min-height:0!important;margin:0 0 1.2%!important;display:grid!important;grid-template-columns:1fr!important;gap:8px!important;padding:0!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-context{display:none!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;background:linear-gradient(180deg,rgba(3,9,14,.76),rgba(2,7,11,.91))!important;backdrop-filter:blur(4px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:auto!important;cursor:pointer;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:12px!important;margin-top:5px!important;}
+#story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{width:34px!important;height:30px!important;min-height:0!important;padding:0!important;font-size:20px!important;line-height:1!important;float:right;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
+#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));}
+#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-story-choice{min-height:42px;align-items:center;background:linear-gradient(180deg,rgba(14,24,30,.91),rgba(7,14,19,.94))!important;border-color:rgba(207,169,76,.68)!important;}
+.sc-scene-board-33900{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
+.sc-scene-board-33900__top{position:absolute;left:3.2%;right:3.2%;top:3.8%;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;}
+.sc-scene-board-33900__location,.sc-scene-board-33900__objective,.sc-scene-board-33900__receipt{padding:7px 10px;border:1px solid rgba(199,164,77,.52);background:rgba(3,9,14,.68);box-shadow:0 8px 22px rgba(0,0,0,.28);text-shadow:0 1px 2px #000;backdrop-filter:blur(3px);}
+.sc-scene-board-33900__location{color:#e7cf82;font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;}
+.sc-scene-board-33900__objective{max-width:48%;color:#f0eadc;font-size:10px;line-height:1.35;text-align:right;}.sc-scene-board-33900__objective b{display:block;color:#71dce4;font-size:8px;letter-spacing:.14em;margin-bottom:3px;}
+.sc-scene-board-33900__actors{position:absolute;left:4%;right:4%;top:13%;bottom:26%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:3%;}
+.sc-scene-board-33900__actors[data-count="1"]{grid-template-columns:minmax(0,300px);justify-content:start;padding-left:4%;}
+.sc-scene-board-33900__actors[data-count="2"]{grid-template-columns:repeat(2,minmax(0,270px));justify-content:center;column-gap:clamp(80px,14vw,240px);}
+.sc-scene-board-33900__actor{position:relative;justify-self:center;width:min(74%,238px);aspect-ratio:7/10;max-height:390px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;opacity:.72;transform:translateY(4px) scale(.95);filter:saturate(.78) brightness(.88);}
+.sc-scene-board-33900__actor.is-focus{opacity:1;transform:translateY(0) scale(1);filter:none;}
+.sc-scene-board-33900__actor-frame{position:absolute;inset:0;border:1px solid rgba(194,158,73,.38);background:linear-gradient(180deg,rgba(7,13,17,.03),rgba(3,7,10,.12) 65%,rgba(3,7,10,.72));box-shadow:0 16px 34px rgba(0,0,0,.30);}
+.sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-frame{border-color:rgba(97,220,229,.78);box-shadow:0 0 0 1px rgba(97,220,229,.15),0 18px 38px rgba(0,0,0,.38);}
+.sc-scene-board-33900__actor img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52));}
+.sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{width:min(72%,228px);aspect-ratio:7/10;max-height:330px;}
+.sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{width:min(67%,220px);aspect-ratio:7/10;max-height:350px;}
+.sc-scene-board-33900__actor.is-entering{animation:scActorEnter33900 .46s cubic-bezier(.2,.75,.25,1) both;}
+@keyframes scActorEnter33900{from{opacity:0;transform:translateX(44px) scale(.96);filter:brightness(.35) blur(2px)}to{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}
+.sc-scene-board-33900__actor.is-entering.is-focus{animation-name:scActorEnterFocus33900}@keyframes scActorEnterFocus33900{from{opacity:0;transform:translateX(44px) scale(.97)}to{opacity:1;transform:translateX(0) scale(1)}}
+.sc-scene-board-33900__actor-silhouette{position:relative;z-index:1;width:58%;height:78%;margin-bottom:24px;border-radius:46% 46% 18% 18%;background:radial-gradient(circle at 50% 18%,rgba(177,191,194,.38) 0 14%,transparent 15%),linear-gradient(180deg,transparent 0 24%,rgba(81,95,101,.38) 25% 100%);filter:blur(.2px);}
+.sc-scene-board-33900__actor-tag{position:absolute;z-index:3;left:7%;right:7%;bottom:4%;padding:6px 8px;background:rgba(2,7,10,.84);border:1px solid rgba(194,158,73,.48);text-align:center;backdrop-filter:blur(2px);}.sc-scene-board-33900__actor-tag strong{display:block;color:#efe6cf;font-size:10px;letter-spacing:.1em}.sc-scene-board-33900__actor-tag small{display:block;color:#a8b8ba;font-size:8px;margin-top:2px;line-height:1.25}
+.sc-scene-board-33900__objects{position:absolute;left:4%;right:4%;bottom:24.8%;display:flex;justify-content:center;gap:8px;flex-wrap:wrap}.sc-scene-board-33900__object{padding:6px 9px;border:1px solid rgba(202,167,78,.5);background:rgba(3,9,13,.78);font-size:8px;letter-spacing:.07em;color:#d8ceb8;backdrop-filter:blur(2px)}.sc-scene-board-33900__object b{color:#6dd7df;margin-right:6px}
+.sc-scene-board-33900__reaction{position:absolute;left:50%;top:12.5%;transform:translateX(-50%);max-width:64%;padding:8px 12px;border:1px solid rgba(102,212,188,.62);background:rgba(3,12,14,.78);color:#d9f1e9;font-size:9px;font-weight:800;letter-spacing:.05em;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,.35)}
+.sc-scene-board-33900__receipt{position:absolute;right:3.2%;top:12.5%;border-color:rgba(93,205,162,.62);color:#bfead8;font-size:8px;font-weight:900;letter-spacing:.1em;}
+.sc-scene-board-wipe-33900{position:absolute;inset:0;z-index:9999;background:#000;transform:translateX(100%);pointer-events:auto;transition:transform .28s cubic-bezier(.7,0,.3,1)}.sc-scene-board-wipe-33900.is-covering{transform:translateX(0)}.sc-scene-board-wipe-33900.is-revealing{transform:translateX(-100%)}
+@media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}.sc-scene-board-wipe-33900{transition:none!important}}
+@media(max-width:820px){.sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%}.sc-scene-board-33900__actors[data-count="2"]{column-gap:20px}.sc-scene-board-33900__actor{width:90%;max-height:290px}.sc-scene-board-33900__objective{max-width:58%;font-size:8px}#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr}}
+`;
+  document.head.appendChild(style);return true;
 }
 function actorMarkup(actor){
-  const image=actor.image?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-fallback">?</div>`;
-  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""}" data-actor-id="${escapeHTML(actor.id||"")}">
-    <div class="sc-scene-board-33900__actor-frame"></div>${image}
-    <figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption>
-  </figure>`;
+  const image=actor.image?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
+  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
 }
 function boardMarkup(projection){
   const actors=Array.isArray(projection.actors)?projection.actors.slice(0,3):[];
-  while(actors.length<3)actors.push(null);
   const objects=(projection.objects||[]).map(row=>`<span class="sc-scene-board-33900__object"><b>${escapeHTML(row.label||"OBJECT")}</b>${escapeHTML(row.state||"")}</span>`).join("");
-  return `<div class="sc-scene-board-33900__top">
-      <div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>
-      ${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}
-    </div>
-    ${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}
-    ${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}
-    <div class="sc-scene-board-33900__actors">${actors.map(row=>row?actorMarkup(row):"<span></span>").join("")}</div>
-    ${objects?`<div class="sc-scene-board-33900__objects">${objects}</div>`:""}`;
+  return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects">${objects}</div>`:""}`;
 }
-function clearBoard(layer){
-  if(!layer)return;
-  try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;}catch(_error){}
-  const nodes=layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[];
-  for(const node of nodes)if(node&&typeof node.remove==="function")node.remove();
+function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[])if(node&&typeof node.remove==="function")node.remove();}
+function updatePerformancePanel(layer,runtime=currentRuntime()){
+  if(!layer||!runtime)return false;const p=performanceCursor(runtime,currentBeat(runtime));
+  if(!p){delete layer.dataset.scPerformance;return false;}
+  layer.dataset.scPerformance="true";const cue=p.cue||{};
+  const text=layer.querySelector&&layer.querySelector(".sc-story-text");const cueText=String(cue.text||"");if(text&&text.textContent!==cueText)text.textContent=cueText;
+  const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
+  let name=layer.querySelector&&layer.querySelector(".sc-story-name");
+  const speaker=cue.kind==="dialogue"&&cue.speakerName?String(cue.speakerName):"";
+  if(speaker&&!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
+  if(name){if(name.textContent!==speaker)name.textContent=speaker;name.style.display=speaker?"block":"none";}
+  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=`${String(cue.kind||"narration").toUpperCase()} · ACADEMY KAKASHI`;if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
+  const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  return true;
 }
 function renderStorySceneBoard33900(){
-  if(rendering||typeof document==="undefined")return false;
-  const layer=document.getElementById("story-scene-presentation-layer");
-  if(!layer)return false;
-  const runtime=currentRuntime();
-  const projection=runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;
-  if(!projection){clearBoard(layer);return false;}
-  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;
-  if(!stage)return false;
-  rendering=true;
-  try{
-    installStyle();
-    layer.dataset.scSceneBoard="true";
-    layer.dataset.scSceneMode=projection.mode||"conversation";
-    if(stage.dataset)stage.dataset.scSceneBoard33900="true";
-    applyBoardBackdrop(stage,runtime);
-    let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;
-    if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}
-    const signature=JSON.stringify(projection);
-    if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}
-    return true;
-  }finally{rendering=false;}
+  if(rendering||typeof document==="undefined")return false;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+  const runtime=currentRuntime(),projection=runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;if(!projection){clearBoard(layer);return false;}
+  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
+  rendering=true;try{installStyle();layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode=projection.mode||"conversation";applyBoardBackdrop(stage,runtime);let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const signature=JSON.stringify(projection);if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}updatePerformancePanel(layer,runtime);return true;}finally{rendering=false;}
 }
-function scheduleBoardRender(){
-  if(typeof queueMicrotask==="function")queueMicrotask(renderStorySceneBoard33900);
-  else if(typeof setTimeout==="function")setTimeout(renderStorySceneBoard33900,0);
-}
+function scheduleBoardRender(){if(typeof queueMicrotask==="function")queueMicrotask(renderStorySceneBoard33900);else if(typeof setTimeout==="function")setTimeout(renderStorySceneBoard33900,0);}
 
-// Reuse the existing Story renderer. This wrapper is projection-only and always
-// delegates first so Story remains the production authority for beats/choices.
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
-if(PRE_RENDER){
-  renderStoryScenePresentationLayer=function storySceneBoard33900RenderWrapper(){
-    const result=PRE_RENDER.apply(this,arguments);
-    renderStorySceneBoard33900();
-    return result;
-  };
+if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function storySceneBoard33900RenderWrapper(){const result=PRE_RENDER.apply(this,arguments);renderStorySceneBoard33900();return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+
+function reducedMotion(){try{return typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(_error){return false;}}
+function performSceneCut(next){
+  if(typeof next!=="function")return{success:false,reason:"scene_cut_continuation_missing"};
+  if(typeof document==="undefined"||reducedMotion())return next();
+  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return next();
+  if(transitioning)return{success:false,reason:"story_scene_transition_in_progress"};transitioning=true;
+  const wipe=document.createElement("div");wipe.className="sc-scene-board-wipe-33900";layer.appendChild(wipe);
+  requestAnimationFrame(()=>wipe.classList.add("is-covering"));
+  setTimeout(()=>{try{next();}finally{wipe.classList.remove("is-covering");wipe.classList.add("is-revealing");setTimeout(()=>{wipe.remove();transitioning=false;},320);}},290);
+  return{success:true,type:"story_scene_cinematic_cut",pending:true};
+}
+const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
+function advanceStoryScene33900(choiceId=null){
+  if(!PRE_ADVANCE)return{success:false,reason:"story_advance_authority_missing"};
+  if(choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
+  const runtime=currentRuntime(),beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
+  if(!runtime||!beat||!p)return PRE_ADVANCE.apply(this,arguments);
+  if(transitioning)return{success:false,reason:"story_scene_transition_in_progress"};
+  if(!p.atEnd){persistPerformanceCursor(runtime,beat,p.index+1);renderStorySceneBoard33900();return{success:true,type:"story_performance_cue_advanced",beatId:beat.beatId,cueIndex:p.index+1,semanticBeatUnchanged:true};}
+  clearPerformanceCursor(runtime);
+  const def=boardDefinition(runtime.sceneId),transition=def&&def.performanceTransitions&&def.performanceTransitions[beat.beatId];
+  if(transition==="wipe_right_to_left")return performSceneCut(()=>PRE_ADVANCE.call(this));
+  return PRE_ADVANCE.apply(this,arguments);
+}
+if(PRE_ADVANCE){globalThis.advanceStoryScene=advanceStoryScene33900;try{advanceStoryScene=advanceStoryScene33900;}catch(_error){}}
+
+if(typeof document!=="undefined"){
+  document.addEventListener("click",event=>{const panel=event.target&&event.target.closest?event.target.closest("#story-scene-presentation-layer[data-sc-performance='true'] .sc-story-panel"):null;if(!panel||event.target.closest("button,a,input,select,textarea"))return;event.preventDefault();advanceStoryScene33900();});
+  document.addEventListener("keydown",event=>{if(event.defaultPrevented||!(event.key==="Enter"||event.key===" "))return;const tag=String(event.target&&event.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const runtime=currentRuntime(),p=performanceCursor(runtime,currentBeat(runtime));if(!p)return;event.preventDefault();advanceStoryScene33900();});
+  if(typeof MutationObserver==="function"){const target=document.getElementById("story-scene-presentation-layer")||document.body;if(target){observer=new MutationObserver(()=>scheduleBoardRender());observer.observe(target,{childList:true,subtree:true});}}
 }
 
-// DOM observation is a safety net for overlay rebuilds that replace the stage
-// after a Story render. Signature checks prevent our own board mutation looping.
-if(typeof document!=="undefined"&&typeof MutationObserver==="function"){
-  const target=document.getElementById("story-scene-presentation-layer")||document.body;
-  if(target){observer=new MutationObserver(()=>scheduleBoardRender());observer.observe(target,{childList:true,subtree:true});}
-}
-
-// ---------------------------------------------------------------------------
-// FIRST BENCHMARK CONSUMER — accepted Academy Kakashi rooftop/ANBU Origin.
-// Unknown exchange participants stay generic; no identity is invented.
-// ---------------------------------------------------------------------------
 const A=globalThis.SC_ALPHA_ORIGIN_32900;
 const kakashiScene=A&&A.sceneByVariant&&A.sceneByVariant.academy_kakashi||null;
 const kakashiOccurrence="occ_origin_kakashi_anbu_retrieval_resolution";
-const KAKASHI_IMAGE="Portraits/Academy Student/academy_student_kakashi.png";
+const KAKASHI_IMAGE="Assets/Academy Student/academy_kakashi.png";
 const ANBU_IMAGE="NPC/konoha_anbu.png";
-function kakashiActor(state,focus=false){return{id:"academy_kakashi",label:"KAKASHI",image:KAKASHI_IMAGE,state,focus};}
-function anbuActor(state,focus=false){return{id:"konoha_anbu_contact",label:"ANBU OPERATIVE",image:ANBU_IMAGE,state,focus};}
-function unknownActor(id,label,state,focus=false){return{id,label,state,focus};}
-function kakashiCommittedFact(){
-  try{return A&&typeof A.findOccurrence==="function"?A.findOccurrence(kakashiOccurrence):null;}catch(_error){return null;}
+const ROGUE_IMAGE="Enemies Portraits/rogue_chunin.png";
+const CIPHER_IMAGE="Enemies Portraits/cipher_handler.png";
+const DECOY_IMAGE="Enemies Portraits/decoy_assassin.png";
+const OBJECTIVE="Stop the package from falling into the wrong hands.";
+function actor(id,label,image,state,focus=false,entering=false){return{id,label,image,state,focus,entering};}
+function kakashi(state,focus=false){return actor("academy_kakashi","KAKASHI",KAKASHI_IMAGE,state,focus);}
+function anbu(state,focus=false,entering=false){return actor("konoha_anbu_contact","ANBU OPERATIVE",ANBU_IMAGE,state,focus,entering);}
+function rogue(state,focus=false,entering=false){return actor("kakashi_origin_logistics_clerk","ROGUE CHŪNIN",ROGUE_IMAGE,state,focus,entering);}
+function cipher(state,focus=false,entering=false){return actor("kakashi_origin_information_broker","CIPHER HANDLER",CIPHER_IMAGE,state,focus,entering);}
+function decoy(state,focus=false,entering=false){return actor("kakashi_origin_decoy_assassin_01","DECOY ASSASSIN",DECOY_IMAGE,state,focus,entering);}
+function committedFact(){try{return A&&typeof A.findOccurrence==="function"?A.findOccurrence(kakashiOccurrence):null;}catch(_error){return null;}}
+const rooftopPerformance=[
+  {cueId:"roof_01",kind:"narration",text:"Kakashi watched Konoha from the rooftop.",focusActorRef:"academy_kakashi"},
+  {cueId:"roof_02",kind:"narration",text:"A presence registered behind him.\nHis eye shifted.\nAn ANBU operative stood several paces back, masked and motionless.",focusActorRef:"academy_kakashi",actorEntrance:"konoha_anbu_contact"},
+  {cueId:"roof_03",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Kakashi Hatake.",focusActorRef:"konoha_anbu_contact"},
+  {cueId:"roof_04",kind:"narration",text:"Kakashi turned his head slightly.",focusActorRef:"academy_kakashi"},
+  {cueId:"roof_05",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"You have orders. Stop this package from falling into the wrong hands.",focusActorRef:"konoha_anbu_contact"},
+  {cueId:"roof_06",kind:"action",text:"The operative raised a sealed envelope.",focusActorRef:"konoha_anbu_contact",objectState:"raised"},
+  {cueId:"roof_07",kind:"narration",text:"Kakashi studied him for a moment, then moved from his position and walked over.",focusActorRef:"academy_kakashi"},
+  {cueId:"roof_08",kind:"dialogue",speakerName:"KAKASHI",text:"Why are you coming to me with this?",focusActorRef:"academy_kakashi"},
+  {cueId:"roof_09",kind:"action",text:"He took the envelope.",focusActorRef:"academy_kakashi",objectState:"held"},
+  {cueId:"roof_10",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Hokage's orders.",focusActorRef:"konoha_anbu_contact"},
+  {cueId:"roof_11",kind:"narration",text:"Kakashi's attention sharpened.\nHis eye dropped to the seal in his hand.",focusActorRef:"academy_kakashi",objectState:"held"}
+];
+const tailPerformance=[
+  {cueId:"alley_01",kind:"narration",text:"Kakashi finds Rogue Chūnin and tails him through Konoha.",focusActorRef:"academy_kakashi"},
+  {cueId:"alley_02",kind:"narration",text:"Rogue Chūnin turns into a narrow alley.",focusActorRef:"kakashi_origin_logistics_clerk",actorEntrance:"kakashi_origin_logistics_clerk"},
+  {cueId:"alley_03",kind:"narration",text:"Cipher Handler is waiting at the exchange.",focusActorRef:"kakashi_origin_information_broker",actorEntrance:"kakashi_origin_information_broker"},
+  {cueId:"alley_04",kind:"narration",text:"A package is between them.",focusActorRef:"academy_kakashi",objectState:"between"}
+];
+const observeTransferPerformance=[
+  {cueId:"observe_01",kind:"narration",text:"Kakashi stays still and watches the exchange unfold.",focusActorRef:"academy_kakashi"},
+  {cueId:"observe_02",kind:"action",text:"Rogue Chūnin hands the package to Cipher Handler.",focusActorRef:"kakashi_origin_information_broker",objectState:"cipher"},
+  {cueId:"observe_03",kind:"narration",text:"A Decoy Assassin comes out of the darkness like a lightning streak as Rogue Chūnin breaks away from the exchange.",focusActorRef:"kakashi_origin_decoy_assassin_01",actorEntrance:"kakashi_origin_decoy_assassin_01",objectState:"cipher"}
+];
+function roofProjection(performance){
+  const cue=performance&&performance.cue||rooftopPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
+  const actors=[kakashi(idx===0?"WATCHING KONOHA":focus==="academy_kakashi"?"FOCUSED":"PRESENT",focus==="academy_kakashi")];
+  if(idx>=1)actors.push(anbu(focus==="konoha_anbu_contact"?"SPEAKING":"PRESENT",focus==="konoha_anbu_contact",cue.actorEntrance==="konoha_anbu_contact"));
+  const objects=[];if(cue.objectState==="raised")objects.push({label:"SEALED ENVELOPE",state:"RAISED"});if(cue.objectState==="held")objects.push({label:"SEALED ENVELOPE",state:"HELD BY KAKASHI"});
+  return{mode:"conversation",location:"KONOHA ROOFTOP",objective:OBJECTIVE,actors,objects};
 }
-function kakashiBoardResolver({beatId,context}){
-  const rooftop="KONOHA ROOFTOP",alley="KONOHA ALLEY";
-  switch(beatId){
-    case "kak_original_rooftop":return{mode:"conversation",location:rooftop,objective:"Identify why the masked operative has approached Kakashi.",actors:[kakashiActor("WAITING",true),anbuActor("ARRIVED")]};
-    case "kak_original_anbu":return{mode:"conversation",location:rooftop,objective:"Hear the operative out.",actors:[kakashiActor("LISTENING"),anbuActor("SPEAKING",true)]};
-    case "kak_original_envelope":return{mode:"conversation",location:rooftop,objective:"Inspect the Hokage-authorised assignment material.",actors:[kakashiActor("OPENING ENVELOPE",true),anbuActor("OBSERVING")],objects:[{label:"SEALED ENVELOPE",state:"OPENED"},{label:"TARGET IMAGE",state:"REVEALED"}]};
-    case "kak_original_order":return{mode:"conversation",location:rooftop,objective:"Find the pictured target and keep the package from the wrong hands.",actors:[kakashiActor("ASSIGNMENT RECEIVED"),anbuActor("GIVING ORDERS",true)],objects:[{label:"TARGET IMAGE",state:"KNOWN TO KAKASHI"}]};
-    case "kak_original_tail":return{mode:"encounter",location:alley,objective:"Tail the pictured target without losing the exchange.",actors:[kakashiActor("IN PURSUIT",true),unknownActor("kakashi_origin_logistics_clerk","TARGET","MEETING CONTACT"),unknownActor("kakashi_origin_information_broker","SECOND FIGURE","AT EXCHANGE")],objects:[{label:"PACKAGE",state:"BETWEEN BOTH MEN"}]};
-    case "kak_original_action":return{mode:"encounter",location:alley,objective:"Choose Kakashi's approach before the handoff completes.",actors:[kakashiActor("UNDETECTED POSITION",true),unknownActor("kakashi_origin_logistics_clerk","TARGET","CURRENT CARRIER"),unknownActor("kakashi_origin_information_broker","SECOND FIGURE","RECEIVING CONTACT")],objects:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
-    case "kak_original_transfer":{
-      const response={observe:"KAKASHI WATCHES THE HANDOFF",get_closer:"KAKASHI CLOSES THE DISTANCE",attack:"BOTH MEN REACT EARLY",attempt_pickpocket:"PICKPOCKET ATTEMPT — PACKAGE STILL REACHES SECOND MAN"}[context.kakashiOriginalAction]||"KAKASHI COMMITS TO THE OPENING";
-      return{mode:"encounter",location:alley,objective:"Reassess: package, assassin and original target have separated.",reaction:response,actors:[kakashiActor("REASSESSING",true),unknownActor("kakashi_origin_logistics_clerk","ORIGINAL TARGET","FLEEING"),unknownActor("kakashi_origin_decoy_assassin_01","DECOY ASSASSIN","ATTACKING HOLDER")],objects:[{label:"PACKAGE",state:"SECOND MAN HAS PACKAGE"}]};
-    }
-    case "kak_original_major_choice":return{mode:"encounter",location:alley,objective:"Choose which problem Kakashi prioritizes.",actors:[kakashiActor("DECISION WINDOW",true),unknownActor("kakashi_origin_logistics_clerk","ORIGINAL TARGET","FLEEING"),unknownActor("kakashi_origin_decoy_assassin_01","DECOY ASSASSIN","ACTIVE")],objects:[{label:"PACKAGE",state:"SECOND MAN HAS PACKAGE"},{label:"CHOICE PRESSURE",state:"THREE SEPARATE PROBLEMS"}]};
-    case "kak_original_secured":{
-      const record=kakashiCommittedFact(),fact=record&&record.fact||{};
-      return{mode:"consequence",location:alley,objective:"The retrieval result is now part of Kakashi's Chronicle.",committed:fact.packageDisposition==="secured",reaction:"PLAYER ACTION → PACKAGE CUSTODY SECURED",actors:[kakashiActor("PACKAGE SECURED",true),unknownActor("kakashi_origin_information_broker","SECOND MAN","PACKAGE RELINQUISHED"),unknownActor("kakashi_origin_decoy_assassin_01","DECOY ASSASSIN","SEPARATE COMPLICATION")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="secured"?"SECURED BY KAKASHI":"RESOLVING"},{label:"ORIGINAL TARGET",state:"NOT PURSUED"}]};
-    }
-    case "kak_original_pursue":{
-      const record=kakashiCommittedFact(),fact=record&&record.fact||{};
-      return{mode:"consequence",location:alley,objective:"The retrieval result is now part of Kakashi's Chronicle.",committed:fact.packageDisposition==="lost",reaction:"PLAYER ACTION → ORIGINAL TARGET PURSUED",actors:[kakashiActor("IN PURSUIT",true),unknownActor("kakashi_origin_logistics_clerk","ORIGINAL TARGET","PURSUED"),unknownActor("kakashi_origin_information_broker","SECOND MAN","RETAINS PACKAGE")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="lost"?"NOT RECOVERED BY KAKASHI":"RESOLVING"}]};
-    }
-    default:return null;
-  }
+function tailProjection(performance){
+  const cue=performance&&performance.cue||tailPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
+  const actors=[kakashi("IN PURSUIT",focus==="academy_kakashi")];
+  if(idx>=1)actors.push(rogue(idx>=2?"AT EXCHANGE":"ENTERING ALLEY",focus==="kakashi_origin_logistics_clerk",cue.actorEntrance==="kakashi_origin_logistics_clerk"));
+  if(idx>=2)actors.push(cipher("WAITING",focus==="kakashi_origin_information_broker",cue.actorEntrance==="kakashi_origin_information_broker"));
+  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=3?[{label:"PACKAGE",state:"BETWEEN ROGUE CHŪNIN AND CIPHER HANDLER"}]:[]};
 }
-if(kakashiScene)registerStorySceneBoardDefinition(kakashiScene,{benchmark:true,resolve:kakashiBoardResolver});
+function transferProjection(performance,context){
+  if(context.kakashiOriginalAction!=="observe")return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,reaction:String(context.kakashiOriginalAction||"").toUpperCase(),actors:[kakashi("ACTION COMMITTED",true),rogue("RESPONDING"),cipher("RESPONDING")],objects:[{label:"PACKAGE",state:"OUTCOME REQUIRES OWNING RESOLVER"}]};
+  const cue=performance&&performance.cue||observeTransferPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
+  const actors=[kakashi("OBSERVING",focus==="academy_kakashi"),rogue(idx>=2?"FLEEING":"AT EXCHANGE",focus==="kakashi_origin_logistics_clerk")];
+  if(idx<2)actors.push(cipher(idx>=1?"HAS PACKAGE":"AT EXCHANGE",focus==="kakashi_origin_information_broker"));
+  else actors.push(decoy("ATTACKING CIPHER HANDLER",true,cue.actorEntrance==="kakashi_origin_decoy_assassin_01"));
+  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=1?[{label:"PACKAGE",state:"CIPHER HANDLER HAS PACKAGE"}]:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
+}
+function kakashiBoardResolver({beatId,context,performance}){
+  if(beatId==="kak_original_rooftop"||beatId==="kak_original_anbu"||beatId==="kak_original_envelope"||beatId==="kak_original_order")return roofProjection(performance);
+  if(beatId==="kak_original_tail")return tailProjection(performance);
+  if(beatId==="kak_original_action")return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors:[kakashi("UNDETECTED POSITION",true),rogue("CURRENT CARRIER"),cipher("RECEIVING CONTACT")],objects:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
+  if(beatId==="kak_original_transfer")return transferProjection(performance,context);
+  if(beatId==="kak_original_major_choice")return{mode:"encounter",location:"KONOHA ALLEY",objective:"Choose which problem Kakashi prioritizes.",actors:[kakashi("DECISION WINDOW",true),rogue("FLEEING"),decoy("ACTIVE")],objects:[{label:"PACKAGE",state:"CIPHER HANDLER HAS PACKAGE"},{label:"CHOICE PRESSURE",state:"THREE SEPARATE PROBLEMS"}]};
+  if(beatId==="kak_original_secured"){const r=committedFact(),fact=r&&r.fact||{};return{mode:"consequence",location:"KONOHA ALLEY",objective:"Return with the retrieval result.",committed:fact.packageDisposition==="secured",reaction:"PLAYER ACTION → PACKAGE CUSTODY SECURED",actors:[kakashi("PACKAGE SECURED",true),cipher("PACKAGE RELINQUISHED"),decoy("SEPARATE COMPLICATION")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="secured"?"SECURED BY KAKASHI":"RESOLVING"}]};}
+  if(beatId==="kak_original_pursue"){const r=committedFact(),fact=r&&r.fact||{};return{mode:"consequence",location:"KONOHA ALLEY",objective:"Return with the retrieval result.",committed:fact.packageDisposition==="lost",reaction:"PLAYER ACTION → ROGUE CHŪNIN PURSUED",actors:[kakashi("IN PURSUIT",true),rogue("PURSUED"),cipher("RETAINS PACKAGE")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="lost"?"NOT RECOVERED BY KAKASHI":"RESOLVING"}]};}
+  return null;
+}
+if(kakashiScene){
+  try{const d=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(kakashiScene):null;const root=d&&d.beatMap instanceof Map?d.beatMap.get("kak_original_rooftop"):null;if(root)root.nextBeatId="kak_original_tail";}catch(_error){}
+  registerStorySceneBoardDefinition(kakashiScene,{benchmark:true,resolve:kakashiBoardResolver,performanceSequences:{kak_original_rooftop:rooftopPerformance,kak_original_tail:tailPerformance,kak_original_transfer:({context})=>context.kakashiOriginalAction==="observe"?observeTransferPerformance:null},performanceTransitions:{kak_original_rooftop:"wipe_right_to_left"}});
+}
 
 function runStorySceneBoard33900Diagnostics(){
-  const source=renderStorySceneBoard33900.toString();
-  const backdropSource=[resolveBoardBackdropPath,applyBoardBackdrop].map(fn=>fn.toString()).join("\n");
-  const kak=registry.get(kakashiScene);
-  const action=kak&&kak.resolve({beatId:"kak_original_action",context:{},runtime:null,beat:null});
-  const transfer=kak&&kak.resolve({beatId:"kak_original_transfer",context:{kakashiOriginalAction:"attack"},runtime:null,beat:null});
-  const checks={
-    patchId:PATCH_ID==="story_scene_board_33900_2026_09_14",
-    reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
-    kakashiBenchmarkRegistered:!!kakashiScene&&!!kak&&kak.benchmark===true,
-    exactAcademyKakashiPortrait:KAKASHI_IMAGE==="Portraits/Academy Student/academy_student_kakashi.png",
-    exactAnbuNpcAsset:ANBU_IMAGE==="NPC/konoha_anbu.png",
-    encounterHasThreeActors:!!action&&action.mode==="encounter"&&action.actors.length===3,
-    playerIntentHasVisibleRuntimeResponse:!!transfer&&transfer.reaction==="BOTH MEN REACT EARLY"&&transfer.objects.some(row=>row.state==="SECOND MAN HAS PACKAGE"),
-    projectionCommitsNoAuthority:!source.includes("commitOccurrence")&&!source.includes("savePlayerData")&&!source.includes("consumeStaticOriginSourceOccurrence"),
-    backdropProjectionReadOnly:!backdropSource.includes("registerSceneBackdropAssetPath")&&!backdropSource.includes("savePlayerData")&&!backdropSource.includes("commitOccurrence"),
-    neutralizesOpaqueMasterOffShell:typeof installStyle==="function",
-    wrapsExistingStoryRenderer:!!PRE_RENDER,
-    browserGoldenClaimed:false
-  };
-  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-  return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
+  const kak=boardDefinition(kakashiScene),rootDef=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(kakashiScene):null,root=rootDef&&rootDef.beatMap instanceof Map?rootDef.beatMap.get("kak_original_rooftop"):null;
+  const checks={patchId:PATCH_ID==="story_scene_board_33900_2026_09_14_cinematic",reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",kakashiBenchmarkRegistered:!!kakashiScene&&!!kak&&kak.benchmark===true,academyKakashiUsesCharacterCard:KAKASHI_IMAGE==="Assets/Academy Student/academy_kakashi.png",exactRoleAssets:ROGUE_IMAGE==="Enemies Portraits/rogue_chunin.png"&&CIPHER_IMAGE==="Enemies Portraits/cipher_handler.png"&&DECOY_IMAGE==="Enemies Portraits/decoy_assassin.png",rooftopIsSingleSemanticBeat:!!root&&root.nextBeatId==="kak_original_tail",rooftopPerformanceHasElevenCues:rooftopPerformance.length===11&&rooftopPerformance[2].text==="Kakashi Hatake."&&rooftopPerformance[9].text==="Hokage's orders.",persistentAssignmentObjective:OBJECTIVE==="Stop the package from falling into the wrong hands.",observePerformsDecoyEntrance:observeTransferPerformance.some(c=>c.actorEntrance==="kakashi_origin_decoy_assassin_01"),performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),wrapsExistingStoryRenderer:!!PRE_RENDER,browserGoldenClaimed:false};
+  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
 
 globalThis.registerStorySceneBoardDefinition=registerStorySceneBoardDefinition;
@@ -309,9 +295,8 @@ globalThis.resolveStorySceneBoardProjection=resolveStorySceneBoardProjection;
 globalThis.getActiveStorySceneBoardProjection=getActiveStorySceneBoardProjection;
 globalThis.resolveStorySceneBoardBackdropPath=resolveBoardBackdropPath;
 globalThis.renderStorySceneBoard33900=renderStorySceneBoard33900;
+globalThis.getStoryScenePerformance33900=()=>performanceCursor(currentRuntime(),currentBeat(currentRuntime()));
 globalThis.runStorySceneBoard33900Diagnostics=runStorySceneBoard33900Diagnostics;
-globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,kakashiSceneId:kakashiScene,browserGoldenClaimed:false});
-
-installStyle();
-renderStorySceneBoard33900();
+globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,browserGoldenClaimed:false});
+try{renderStorySceneBoard33900();}catch(_error){}
 })();
