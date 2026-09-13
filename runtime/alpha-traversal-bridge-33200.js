@@ -88,12 +88,6 @@
 
 // ============================================================================
 // ISSUE #165 — TERMINAL FRONT-DOOR + INSTALLED-BROWSER CORRECTION ACTIVATION
-//
-// 33300 remains the first terminal presentation gate. 33400 loads only after
-// 33300 has finished, then replaces that temporary save chooser with the real
-// new-player flow and installs the Coding-owned enemy-turn / PL calibration
-// corrections. Neither terminal layer is a dependency provider for downstream
-// gameplay modules. Headless harnesses without a real document.head no-op here.
 // ============================================================================
 (function activateAlphaBrowserTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
@@ -107,17 +101,9 @@
     document.head.appendChild(fix);
   }
 
-  if(globalThis.SC_ALPHA_FRONT_DOOR_33300){
-    load33400();
-    return;
-  }
-
+  if(globalThis.SC_ALPHA_FRONT_DOOR_33300){load33400();return;}
   const existing=document.getElementById("sc-alpha-front-door-33300-script");
-  if(existing){
-    existing.addEventListener("load",load33400,{once:true});
-    return;
-  }
-
+  if(existing){existing.addEventListener("load",load33400,{once:true});return;}
   const front=document.createElement("script");
   front.id="sc-alpha-front-door-33300-script";
   front.src="runtime/alpha-front-door-33300.js";
@@ -128,10 +114,6 @@
 
 // ============================================================================
 // ISSUE #121 — MISSION-SKELETON-DRIVEN CE LIVE CHOICE ENGINE ACTIVATION
-//
-// This is a terminal Story-runtime extension. It consumes the already-loaded
-// Story Scene machinery and does not provide dependencies to later gameplay
-// modules. Headless harnesses without a real document head intentionally no-op.
 // ============================================================================
 (function activateMissionChoiceGeneration121From33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
@@ -145,10 +127,6 @@
 
 // ============================================================================
 // ISSUE #121 — FIRST PRODUCTION STORY BINDING ACTIVATION
-//
-// The binding adapter consumes the #121 engine, so load it only after the
-// engine script has completed. It remains terminal: no downstream production
-// module depends on it during parser-time initialisation.
 // ============================================================================
 (function activateMissionChoiceProductionBindings121From33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
@@ -162,25 +140,13 @@
     document.head.appendChild(binding);
   }
 
-  if(globalThis.SC_ALPHA_MISSION_CHOICE_121){
-    loadBindings121();
-    return;
-  }
-
+  if(globalThis.SC_ALPHA_MISSION_CHOICE_121){loadBindings121();return;}
   const engine=document.getElementById("sc-alpha-mission-choice-121-script");
-  if(engine){
-    engine.addEventListener("load",loadBindings121,{once:true});
-  }
+  if(engine)engine.addEventListener("load",loadBindings121,{once:true});
 })();
 
 // ============================================================================
 // ISSUE #173 — ALTERED SHINOBI BATTLE / VICTORY PRESENTATION AUTHORITY
-//
-// UI / Assets final authority b02b41c9 maps the stable opposition identity
-// test_subject_altered_shinobi to the exact existing enemy portrait below.
-// This consumes the existing enemy.image presentation seam only. It does not
-// admit the enemy to the playable Registry/UI portrait manifest, change Combat
-// semantics, or create ownership/acquisition state.
 // ============================================================================
 (function bindAlteredShinobiPresentation173(){
   "use strict";
@@ -213,13 +179,6 @@
 
 // ============================================================================
 // ISSUE #105 / #175 — ORIGIN BROWSER REALISATION + STORY BACKDROP STACKING
-//
-// Installed-browser evidence showed that dedicated Story backdrops were placed
-// behind the translucent Story layer, allowing World map markers to bleed into
-// Origin scenes. The same pass exposed static/reconvergent presentation in the
-// 32900 Origins. 33500 is a terminal Story presentation/graph reconciliation:
-// it consumes already-registered Origin scenes and their existing consequence
-// authorities. It does not turn Origins into Missions or create new history.
 // ============================================================================
 (function activateOriginBrowserRealisation33500From33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
@@ -229,4 +188,27 @@
   script.src="runtime/alpha-origin-browser-realisation-33500.js";
   script.async=false;
   document.head.appendChild(script);
+})();
+
+// ============================================================================
+// ISSUE #105 / #175 — REMAINING 32900 ORIGIN CHOICE-REACTION ACTIVATION
+//
+// 33510 consumes the 33500-patched registry, so it waits on that script rather
+// than racing the parser/dynamic loader. It adds no Mission or history owner.
+// ============================================================================
+(function activateOriginChoiceReaction33510From33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+
+  function load33510(){
+    if(globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510||document.getElementById("sc-alpha-origin-choice-reaction-33510-script"))return;
+    const script=document.createElement("script");
+    script.id="sc-alpha-origin-choice-reaction-33510-script";
+    script.src="runtime/alpha-origin-choice-reaction-33510.js";
+    script.async=false;
+    document.head.appendChild(script);
+  }
+
+  if(globalThis.SC_ALPHA_ORIGIN_BROWSER_REALISATION_33500){load33510();return;}
+  const base=document.getElementById("sc-alpha-origin-browser-realisation-33500-script");
+  if(base)base.addEventListener("load",load33510,{once:true});
 })();
