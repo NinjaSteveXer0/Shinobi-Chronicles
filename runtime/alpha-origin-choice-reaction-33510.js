@@ -103,3 +103,37 @@ function runAlphaOriginChoiceReaction33510Diagnostics(){const A=globalThis.SC_AL
 globalThis.SC_ALPHA_ORIGIN_CHOICE_REACTION_33510=Object.freeze({patchId:PATCH_ID,result:{...result},browserGoldenClaimed:false});
 globalThis.runAlphaOriginChoiceReaction33510Diagnostics=runAlphaOriginChoiceReaction33510Diagnostics;
 })();
+
+// ============================================================================
+// ISSUE #105 / #170 — ACTIVATE SCREEN-FIRST ORIGIN PERFORMANCE AFTER 33600
+//
+// 33700 is the terminal Origin expression layer. It must run after 33600 so the
+// v2 screen-first Writing package wins over the earlier modernization layer.
+// This activation deliberately chains from the existing 33510 -> 33600 load
+// event rather than creating another independent bootstrap path.
+// ============================================================================
+(function activateOriginScreenFirst33700After33600(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+
+  function load33700(){
+    if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700||document.getElementById("sc-alpha-origin-screen-first-33700-script"))return;
+    const script=document.createElement("script");
+    script.id="sc-alpha-origin-screen-first-33700-script";
+    script.src="runtime/alpha-origin-screen-first-33700.js";
+    script.async=false;
+    document.head.appendChild(script);
+  }
+
+  function waitFor33600(){
+    if(globalThis.SC_ALPHA_EARLY_STORY_MODERNIZATION_33600){load33700();return;}
+    const modern=document.getElementById("sc-alpha-early-story-modernization-33600-script");
+    if(modern)modern.addEventListener("load",load33700,{once:true});
+  }
+
+  const current=document.currentScript;
+  if(current&&typeof current.addEventListener==="function"){
+    current.addEventListener("load",waitFor33600,{once:true});
+  }else{
+    waitFor33600();
+  }
+})();
