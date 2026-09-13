@@ -210,3 +210,23 @@
 
   globalThis.runIssue173AlteredShinobiPresentationDiagnostics=runIssue173AlteredShinobiPresentationDiagnostics;
 })();
+
+// ============================================================================
+// ISSUE #105 / #175 — ORIGIN BROWSER REALISATION + STORY BACKDROP STACKING
+//
+// Installed-browser evidence showed that dedicated Story backdrops were placed
+// behind the translucent Story layer, allowing World map markers to bleed into
+// Origin scenes. The same pass exposed static/reconvergent presentation in the
+// 32900 Origins. 33500 is a terminal Story presentation/graph reconciliation:
+// it consumes already-registered Origin scenes and their existing consequence
+// authorities. It does not turn Origins into Missions or create new history.
+// ============================================================================
+(function activateOriginBrowserRealisation33500From33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  if(globalThis.SC_ALPHA_ORIGIN_BROWSER_REALISATION_33500||document.getElementById("sc-alpha-origin-browser-realisation-33500-script"))return;
+  const script=document.createElement("script");
+  script.id="sc-alpha-origin-browser-realisation-33500-script";
+  script.src="runtime/alpha-origin-browser-realisation-33500.js";
+  script.async=false;
+  document.head.appendChild(script);
+})();
