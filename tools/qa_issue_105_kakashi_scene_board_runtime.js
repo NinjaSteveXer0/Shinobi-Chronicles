@@ -77,8 +77,11 @@ try{
     sceneBoardSource.includes('.sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}'));
   assert("scene_board_mirrors_authoritative_backdrop_onto_stage",
     sceneBoardSource.includes('[data-sc-scene-board-backdrop="dedicated"]')&&sceneBoardSource.includes('var(--sc-scene-board-backdrop)'));
-  assert("kakashi_square_portrait_has_square_scene_slot",
-    sceneBoardSource.includes('[data-actor-id="academy_kakashi"]{width:min(80%,292px);aspect-ratio:1/1;max-height:292px;}'));
+  assert("kakashi_character_card_has_card_scene_slot",
+    sceneBoardSource.includes('[data-actor-id="academy_kakashi"]{width:min(72%,228px);aspect-ratio:7/10;max-height:330px;}'));
+  assert("cinematic_black_wipe_is_registered",
+    sceneBoardSource.includes('performanceTransitions:{kak_original_rooftop:"wipe_right_to_left"}')&&
+    sceneBoardSource.includes('sc-scene-board-wipe-33900'));
   assert("kakashi_rooftop_backdrop_exact",backdrops.get("kakashi_origin_rooftop_night")==="Kakashi Origin Backdrop/rooftop_night.png",[...backdrops]);
   assert("kakashi_alley_backdrop_exact",backdrops.get("kakashi_origin_konoha_alleyway")==="Kakashi Origin Backdrop/konoha_alleyway.png",[...backdrops]);
   assert("kakashi_sakura_backdrop_exact",backdrops.get("kakashi_origin_sakura_tree_night")==="Kakashi Origin Backdrop/sakura_tree_night.png",[...backdrops]);
@@ -91,13 +94,25 @@ try{
     scene.beats.map(b=>({beatId:b.beatId,environmentRef:b.environmentRef||null})));
 
   const roof=projection("kak_original_anbu");
-  assert("rooftop_has_exact_two_stage_assets",roof.actors.some(a=>a.image==="Portraits/Academy Student/academy_student_kakashi.png")&&roof.actors.some(a=>a.image==="NPC/konoha_anbu.png"),roof);
+  assert("rooftop_has_character_card_and_anbu_assets",
+    roof.actors.some(a=>a.image==="Assets/Academy Student/academy_kakashi.png")&&
+    roof.actors.some(a=>a.image==="NPC/konoha_anbu.png"),roof);
   assert("conversation_focuses_current_speaker",roof.mode==="conversation"&&roof.actors.find(a=>a.label==="ANBU OPERATIVE").focus===true,roof);
 
   const action=projection("kak_original_action");
-  assert("choice_is_staged_encounter_not_text_only",action.mode==="encounter"&&action.actors.length===3&&action.objects.some(x=>x.state==="EXCHANGE IN PROGRESS"),action);
-  const transfer=projection("kak_original_transfer",{kakashiOriginalAction:"attack"});
-  assert("player_action_changes_visible_scene_state",transfer.reaction==="BOTH MEN REACT EARLY"&&transfer.objects.some(x=>x.state==="SECOND MAN HAS PACKAGE"),transfer);
+  assert("choice_stages_named_exchange_participants",
+    action.mode==="encounter"&&action.actors.length===3&&
+    action.actors.some(a=>a.label==="ROGUE CHŪNIN")&&
+    action.actors.some(a=>a.label==="CIPHER HANDLER")&&
+    action.objects.some(x=>x.state==="EXCHANGE IN PROGRESS"),action);
+  const transfer=projection("kak_original_transfer",{
+    kakashiOriginalAction:"observe",
+    __storyPerformanceCursor33900:{beatId:"kak_original_transfer",index:2}
+  });
+  assert("decoy_enters_after_cipher_receives_package",
+    transfer.actors.some(a=>a.label==="DECOY ASSASSIN"&&a.state==="ATTACKING CIPHER HANDLER"&&a.entering===true)&&
+    transfer.actors.some(a=>a.label==="ROGUE CHŪNIN"&&a.state==="FLEEING")&&
+    transfer.objects.some(x=>x.state==="CIPHER HANDLER HAS PACKAGE"),transfer);
 
   const major=scene.beatMap.get("kak_original_major_choice");
   assert("battle_branches_remain_fail_closed",major.choices.find(c=>c.choiceId==="fight_assassin").availability().available===false&&major.choices.find(c=>c.choiceId==="defeat_assassin_then_recover").availability().available===false);
@@ -112,5 +127,5 @@ try{
   assert("source_occurrence_not_derived_or_renamed",history.length===1&&history[0].sourceOccurrenceId==="occ_origin_kakashi_anbu_retrieval_resolution",history);
   assert("browser_golden_not_claimed",d338.browserGoldenClaimed===false&&d339.browserGoldenClaimed===false);
 
-  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark_with_production_activation_backdrop_and_stage_composition",browserGoldenClaimed:false},null,2));
+  console.log(JSON.stringify({pass:true,kind:"kakashi_cinematic_story_scene_board_benchmark_with_character_card_named_actors_and_animated_decoy",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
