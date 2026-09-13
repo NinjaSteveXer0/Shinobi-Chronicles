@@ -374,3 +374,36 @@
 
   globalThis.runIssue155KnowledgeHardeningDiagnostics=runIssue155KnowledgeHardeningDiagnostics;
 })();
+
+// ============================================================================
+// ISSUE #105 / #181 — KAKASHI ORIGINAL ORIGIN RESTORATION ACTIVATION
+//
+// This terminal loader deliberately waits until the candidate 33700 screen-first
+// layer has finished, then applies the Stephen-approved restored rooftop/ANBU
+// Kakashi Story override. It exists here because this file is already in the
+// deterministic production script chain after the dynamic Origin bootstrap.
+// ============================================================================
+(function activateKakashiOriginalOriginRestoration33800(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  const SCRIPT_ID="sc-alpha-kakashi-original-origin-restoration-33800-script";
+  function load(){
+    if(globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800||document.getElementById(SCRIPT_ID))return;
+    const script=document.createElement("script");
+    script.id=SCRIPT_ID;
+    script.src="runtime/alpha-kakashi-original-origin-restoration-33800.js";
+    script.async=false;
+    document.head.appendChild(script);
+  }
+  function after33700(){
+    if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700){load();return;}
+    const existing=document.getElementById("sc-alpha-origin-screen-first-33700-script");
+    if(existing){existing.addEventListener("load",load,{once:true});return;}
+    let attempts=0;
+    const timer=setInterval(()=>{
+      attempts+=1;
+      if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700){clearInterval(timer);load();}
+      else if(attempts>=200)clearInterval(timer);
+    },25);
+  }
+  after33700();
+})();
