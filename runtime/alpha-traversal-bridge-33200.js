@@ -172,3 +172,41 @@
     engine.addEventListener("load",loadBindings121,{once:true});
   }
 })();
+
+// ============================================================================
+// ISSUE #173 — ALTERED SHINOBI BATTLE / VICTORY PRESENTATION AUTHORITY
+//
+// UI / Assets final authority b02b41c9 maps the stable opposition identity
+// test_subject_altered_shinobi to the exact existing enemy portrait below.
+// This consumes the existing enemy.image presentation seam only. It does not
+// admit the enemy to the playable Registry/UI portrait manifest, change Combat
+// semantics, or create ownership/acquisition state.
+// ============================================================================
+(function bindAlteredShinobiPresentation173(){
+  "use strict";
+  const ENEMY_ID="test_subject_altered_shinobi";
+  const APPROVED_PATH="Enemies Portraits/test_subject_altered_shinobi.png";
+  const enemy=(typeof enemyDatabase==="object"&&enemyDatabase)?enemyDatabase[ENEMY_ID]:null;
+
+  if(enemy)enemy.image=APPROVED_PATH;
+
+  function runIssue173AlteredShinobiPresentationDiagnostics(){
+    const row=(typeof enemyDatabase==="object"&&enemyDatabase)?enemyDatabase[ENEMY_ID]:null;
+    const direct=typeof resolveBattleEnemyPortraitProjection==="function"&&row?resolveBattleEnemyPortraitProjection(row):null;
+    const battle=typeof getAlphaBattleActivePortraitProjection==="function"&&row?getAlphaBattleActivePortraitProjection("enemy",row):null;
+    const victory=typeof getAlphaVictoryPortrait==="function"&&row?getAlphaVictoryPortrait(row,"enemy"):null;
+    const checks={
+      enemyExists:!!row,
+      exactApprovedPath:!!row&&row.image===APPROVED_PATH,
+      directEnemyAuthority:!!direct&&direct.path===APPROVED_PATH&&direct.status==="authored_enemy"&&direct.fallbackUsed===false,
+      battleUsesEnemyPortrait:!!battle&&battle.path===APPROVED_PATH&&battle.authority==="enemyPortrait",
+      victoryUsesSamePresentation:!!victory&&victory.path===APPROVED_PATH&&victory.authority==="enemyPortrait",
+      noPlayableRegistryAdmission:typeof getCharacterRegistryEntry!="function"||!getCharacterRegistryEntry(ENEMY_ID),
+      browserGoldenClaimed:false
+    };
+    const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
+    return{pass:failed.length===0,checks,failed,enemyId:ENEMY_ID,path:APPROVED_PATH,browserGoldenClaimed:false};
+  }
+
+  globalThis.runIssue173AlteredShinobiPresentationDiagnostics=runIssue173AlteredShinobiPresentationDiagnostics;
+})();
