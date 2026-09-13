@@ -125,3 +125,20 @@
   front.addEventListener("load",load33400,{once:true});
   document.head.appendChild(front);
 })();
+
+// ============================================================================
+// ISSUE #121 — MISSION-SKELETON-DRIVEN CE LIVE CHOICE ENGINE ACTIVATION
+//
+// This is a terminal Story-runtime extension. It consumes the already-loaded
+// Story Scene machinery and does not provide dependencies to later gameplay
+// modules. Headless harnesses without a real document head intentionally no-op.
+// ============================================================================
+(function activateMissionChoiceGeneration121From33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  if(globalThis.SC_ALPHA_MISSION_CHOICE_121||document.getElementById("sc-alpha-mission-choice-121-script"))return;
+  const script=document.createElement("script");
+  script.id="sc-alpha-mission-choice-121-script";
+  script.src="runtime/alpha-mission-choice-generation-121.js";
+  script.async=false;
+  document.head.appendChild(script);
+})();
