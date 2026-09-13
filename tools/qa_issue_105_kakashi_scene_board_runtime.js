@@ -10,6 +10,7 @@ function getStorySceneDefinition(id){return scenes.get(id)||null;}
 function getActiveStorySceneRuntime(){return active;}
 function registerSceneBackdropAssetPath(id,asset){backdrops.set(id,asset);return{success:true};}
 function getSceneBackdropAssetPath(id){return backdrops.get(id)||null;}
+function resolveStorySceneEnvironmentProjection(){return{mode:"inherit_current",asset_id:null,asset_path:null,location_id:null,world_identity_unchanged:true};}
 function renderStoryScenePresentationLayer(){return true;}
 const A={
   sceneByVariant:{academy_kakashi:"origin_academy_kakashi_anbu_retrieval"},
@@ -30,7 +31,7 @@ const A={
 const context={console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Error,TypeError,RegExp,Date,
   globalThis:null,window:null,SC_ALPHA_ORIGIN_32900:A,cloneProgressionData:clone,
   registerStoryScene,unregisterStoryScene,getStorySceneDefinition,getActiveStorySceneRuntime,
-  registerSceneBackdropAssetPath,getSceneBackdropAssetPath,renderStoryScenePresentationLayer};
+  registerSceneBackdropAssetPath,getSceneBackdropAssetPath,resolveStorySceneEnvironmentProjection,renderStoryScenePresentationLayer};
 context.globalThis=context;context.window=context;
 vm.createContext(context);
 function load(rel){vm.runInContext(fs.readFileSync(path.join(process.cwd(),rel),"utf8"),context,{filename:rel});}
@@ -53,6 +54,16 @@ try{
   assert("restoration_activates_33900",restorationSource.includes('runtime/alpha-story-scene-board-33900.js'),null);
 
   load("runtime/alpha-kakashi-original-origin-restoration-33800.js");
+  const rooftopEnvironment=context.resolveStorySceneEnvironmentProjection({environmentRef:{assetId:"kakashi_origin_rooftop_night"}},null,null,active);
+  const unknownEnvironment=context.resolveStorySceneEnvironmentProjection({environmentRef:{assetId:"not_a_kakashi_origin_asset"}},null,null,active);
+  assert("kakashi_rooftop_resolves_dedicated_backdrop",
+    rooftopEnvironment&&rooftopEnvironment.mode==="dedicated_backdrop"&&
+    rooftopEnvironment.asset_id==="kakashi_origin_rooftop_night"&&
+    rooftopEnvironment.asset_path==="Kakashi Origin Backdrop/rooftop_night.png"&&
+    rooftopEnvironment.world_identity_unchanged===true,
+    rooftopEnvironment);
+  assert("non_kakashi_environment_delegates_to_core",unknownEnvironment&&unknownEnvironment.mode==="inherit_current",unknownEnvironment);
+
   load("runtime/alpha-story-scene-board-33900.js");
   const d338=context.runAlphaKakashiOriginal33800Diagnostics();
   const d339=context.runStorySceneBoard33900Diagnostics();
@@ -91,5 +102,5 @@ try{
   assert("source_occurrence_not_derived_or_renamed",history.length===1&&history[0].sourceOccurrenceId==="occ_origin_kakashi_anbu_retrieval_resolution",history);
   assert("browser_golden_not_claimed",d338.browserGoldenClaimed===false&&d339.browserGoldenClaimed===false);
 
-  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark_with_production_activation",browserGoldenClaimed:false},null,2));
+  console.log(JSON.stringify({pass:true,kind:"kakashi_story_scene_board_benchmark_with_production_activation_and_backdrop_resolution",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
