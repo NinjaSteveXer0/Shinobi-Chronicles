@@ -125,3 +125,50 @@
   front.addEventListener("load",load33400,{once:true});
   document.head.appendChild(front);
 })();
+
+// ============================================================================
+// ISSUE #121 — MISSION-SKELETON-DRIVEN CE LIVE CHOICE ENGINE ACTIVATION
+//
+// This is a terminal Story-runtime extension. It consumes the already-loaded
+// Story Scene machinery and does not provide dependencies to later gameplay
+// modules. Headless harnesses without a real document head intentionally no-op.
+// ============================================================================
+(function activateMissionChoiceGeneration121From33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  if(globalThis.SC_ALPHA_MISSION_CHOICE_121||document.getElementById("sc-alpha-mission-choice-121-script"))return;
+  const script=document.createElement("script");
+  script.id="sc-alpha-mission-choice-121-script";
+  script.src="runtime/alpha-mission-choice-generation-121.js";
+  script.async=false;
+  document.head.appendChild(script);
+})();
+
+// ============================================================================
+// ISSUE #121 — FIRST PRODUCTION STORY BINDING ACTIVATION
+//
+// The binding adapter consumes the #121 engine, so load it only after the
+// engine script has completed. It remains terminal: no downstream production
+// module depends on it during parser-time initialisation.
+// ============================================================================
+(function activateMissionChoiceProductionBindings121From33200(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+
+  function loadBindings121(){
+    if(globalThis.SC_ALPHA_MISSION_CHOICE_BINDINGS_121||document.getElementById("sc-alpha-mission-choice-bindings-121-script"))return;
+    const binding=document.createElement("script");
+    binding.id="sc-alpha-mission-choice-bindings-121-script";
+    binding.src="runtime/alpha-mission-choice-production-bindings-121.js";
+    binding.async=false;
+    document.head.appendChild(binding);
+  }
+
+  if(globalThis.SC_ALPHA_MISSION_CHOICE_121){
+    loadBindings121();
+    return;
+  }
+
+  const engine=document.getElementById("sc-alpha-mission-choice-121-script");
+  if(engine){
+    engine.addEventListener("load",loadBindings121,{once:true});
+  }
+})();

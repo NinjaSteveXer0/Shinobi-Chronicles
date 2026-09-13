@@ -12,33 +12,56 @@ const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A)
   const joint="occ_origin_kushina_joint_residual_seal_closure";
   const contact="occ_origin_kushina_gerotora_first_contact";
   const scene=A.sceneByVariant.academy_kushina;
+  const courtyard=Object.freeze({environmentId:"konoha_academy_courtyard_day"});
+  const courtyardBackdrop="Scene backdrops/academy_training_ground_courtyard.png";
+  try{
+    const registerBackdrop=typeof registerSceneBackdropAssetPath==="function"
+      ?registerSceneBackdropAssetPath
+      :(typeof globalThis.registerSceneBackdropAssetPath==="function"?globalThis.registerSceneBackdropAssetPath:null);
+    if(registerBackdrop)registerBackdrop(courtyard.environmentId,courtyardBackdrop);
+  }catch(_error){}
   const sealCommit=R("kushina_seal_resolution_32900","academy_kushina",seal,
     ctx=>({qualifyingFuinjutsuWorkCompleted:["correct_formula","contain_damaged_seal"].includes(ctx.kushinaCrisisChoice),crisisChoice:ctx.kushinaCrisisChoice||null}),
     ctx=>["correct_formula","contain_damaged_seal"].includes(ctx.kushinaCrisisChoice)?["KUS-01"]:[]);
   A.register({sceneId:scene,eventId:scene,title:"ACADEMY KUSHINA",entryBeatId:"kus_crisis",participants:[],beats:[
-    {beatId:"kus_crisis",mode:"choice",text:"An Academy sealing exercise destabilises around another student. Choose a response to the unstable formula.",choices:[
+    {beatId:"kus_crisis",mode:"choice",environmentRef:courtyard,text:"An Academy sealing exercise destabilises around another student. Choose a response to the unstable formula.",choices:[
       C("correct_formula","Correct the sealing formula through Fūinjutsu","kus_reverse",{kushinaCrisisChoice:"correct_formula"}),
-      C("protect_student","Physically remove / protect the endangered student","kus_ordinary_end",{kushinaCrisisChoice:"protect_student"}),
-      C("contain_damaged_seal","Complete / contain the damaged seal","kus_ordinary_end",{kushinaCrisisChoice:"contain_damaged_seal"}),
-      C("move_unstable_object","Move the unstable object to a safer place","kus_ordinary_end",{kushinaCrisisChoice:"move_unstable_object"})]},
-    {beatId:"kus_ordinary_end",mode:"narration",text:"The immediate crisis is resolved by the action Kushina actually took. No unchosen summon history is fabricated.",onEnterConsequences:[sealCommit],exitScene:true},
-    {beatId:"kus_reverse",mode:"narration",text:"The corrected formula flashes and folds inward through a connection it was never meant to reach. A genuine accidental reverse-summoning occurrence opens.",onEnterConsequences:[
+      C("protect_student","Physically remove / protect the endangered student","kus_protect_student_01",{kushinaCrisisChoice:"protect_student"}),
+      C("contain_damaged_seal","Complete / contain the damaged seal","kus_contain_seal_01",{kushinaCrisisChoice:"contain_damaged_seal"}),
+      C("move_unstable_object","Move the unstable object to a safer place","kus_move_object_01",{kushinaCrisisChoice:"move_unstable_object"})]},
+
+    {beatId:"kus_protect_student_01",mode:"narration",environmentRef:courtyard,text:"The formula bucks hard enough to lift one edge of the scroll. Ink crawls past the guide marks toward the student beside it. Kushina catches them by the arm and yanks them clear before the next pulse reaches the stone where they were kneeling.",nextBeatId:"kus_protect_student_02"},
+    {beatId:"kus_protect_student_02",mode:"dialogue",speakerName:"CLASSMATE",environmentRef:courtyard,text:"I could've moved.",nextBeatId:"kus_protect_student_03"},
+    {beatId:"kus_protect_student_03",mode:"dialogue",speakerName:"KUSHINA",environmentRef:courtyard,text:"You were still staring at it.",nextBeatId:"kus_protect_student_04"},
+    {beatId:"kus_protect_student_04",mode:"narration",environmentRef:courtyard,text:"With the student out of the danger zone, the instructor steps in and secures the damaged scroll. Kushina never corrected the formula; she made sure it did not get a second chance at somebody.",onEnterConsequences:[sealCommit],exitScene:true},
+
+    {beatId:"kus_contain_seal_01",mode:"narration",environmentRef:courtyard,text:"Kushina drops beside the scroll instead of backing away. The original pattern is already torn, so she stops trying to restore the exercise exactly as written and closes the broken containment boundary around the leaking chakra.",nextBeatId:"kus_contain_seal_02"},
+    {beatId:"kus_contain_seal_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"That's not the original formula.",nextBeatId:"kus_contain_seal_03"},
+    {beatId:"kus_contain_seal_03",mode:"dialogue",speakerName:"KUSHINA",environmentRef:courtyard,text:"It doesn't need to be pretty. It needs to stop leaking.",nextBeatId:"kus_contain_seal_04"},
+    {beatId:"kus_contain_seal_04",mode:"narration",environmentRef:courtyard,text:"The loose chakra folds back inside the completed boundary and goes still. The exercise ends with the scroll contained, the classmate safe, and the original formula still damaged.",onEnterConsequences:[sealCommit],exitScene:true},
+
+    {beatId:"kus_move_object_01",mode:"narration",environmentRef:courtyard,text:"Kushina does not wait for the formula to settle. She snatches the unstable scroll off the practice stand and throws it into the cleared safety lane at the edge of the exercise area before the next discharge can catch the student beside it.",nextBeatId:"kus_move_object_02"},
+    {beatId:"kus_move_object_02",mode:"dialogue",speakerName:"INSTRUCTOR",environmentRef:courtyard,text:"That was not the assignment.",nextBeatId:"kus_move_object_03"},
+    {beatId:"kus_move_object_03",mode:"dialogue",speakerName:"KUSHINA",environmentRef:courtyard,text:"Neither was exploding.",nextBeatId:"kus_move_object_04"},
+    {beatId:"kus_move_object_04",mode:"narration",environmentRef:courtyard,text:"The scroll flares once inside the empty lane. The instructor secures it there while Kushina watches from outside the discharge. She never fixed the formula; she moved the danger somewhere it could not hurt anybody first.",onEnterConsequences:[sealCommit],exitScene:true},
+
+    {beatId:"kus_reverse",mode:"narration",environmentRef:courtyard,text:"The corrected formula flashes and folds inward through a connection it was never meant to reach. A genuine accidental reverse-summoning occurrence opens.",onEnterConsequences:[
       sealCommit,
       R("kushina_first_contact_32900","academy_kushina",contact,{gerotoraFirstContactOccurred:true},["KUS-05"],{participantRefs:["key_gero"]})],nextBeatId:"kus_gero_1"},
-    {beatId:"kus_gero_1",mode:"dialogue",speakerName:"GEROTORA",text:"...That is not where I was.",nextBeatId:"kus_gero_2"},
-    {beatId:"kus_gero_2",mode:"dialogue",speakerName:"KUSHINA",text:"You're a toad.",nextBeatId:"kus_gero_3"},
-    {beatId:"kus_gero_3",mode:"dialogue",speakerName:"GEROTORA",text:"Excellent observation.",nextBeatId:"kus_contact_choice"},
-    {beatId:"kus_contact_choice",mode:"choice",text:"Gerotora studies the residual seal. What does Kushina do?",choices:[
+    {beatId:"kus_gero_1",mode:"dialogue",speakerName:"GEROTORA",environmentRef:courtyard,text:"...That is not where I was.",nextBeatId:"kus_gero_2"},
+    {beatId:"kus_gero_2",mode:"dialogue",speakerName:"KUSHINA",environmentRef:courtyard,text:"You're a toad.",nextBeatId:"kus_gero_3"},
+    {beatId:"kus_gero_3",mode:"dialogue",speakerName:"GEROTORA",environmentRef:courtyard,text:"Excellent observation.",nextBeatId:"kus_contact_choice"},
+    {beatId:"kus_contact_choice",mode:"choice",environmentRef:courtyard,text:"Gerotora studies the residual seal. What does Kushina do?",choices:[
       C("ask_what_happened","Ask what happened.","kus_close",{kushinaGerotoraChoice:"ask_what_happened"}),
       C("ask_who","Ask who he is.","kus_close",{kushinaGerotoraChoice:"ask_who"}),
       C("help_close","Help stabilise / close the residual seal.","kus_close",{kushinaGerotoraChoice:"help_close"}),
       C("send_back","Try to send him back / tell him to go back.","kus_close",{kushinaGerotoraChoice:"send_back"})]},
-    {beatId:"kus_close",mode:"dialogue",speakerName:"GEROTORA",text:"Next time you touch a formula you don't understand, try not to drag somebody through it.",onEnterConsequences:[
+    {beatId:"kus_close",mode:"dialogue",speakerName:"GEROTORA",environmentRef:courtyard,text:"Next time you touch a formula you don't understand, try not to drag somebody through it.",onEnterConsequences:[
       R("kushina_identity_32900","academy_kushina",identity,ctx=>({gerotoraCommunicatedOwnIdentity:ctx.kushinaGerotoraChoice==="ask_who"}),ctx=>ctx.kushinaGerotoraChoice==="ask_who"?["KUS-02"]:[],{participantRefs:["key_gero"]}),
       R("kushina_cause_32900","academy_kushina",cause,ctx=>({gerotoraExplainedResidualFormulaInference:ctx.kushinaGerotoraChoice==="ask_what_happened"}),ctx=>ctx.kushinaGerotoraChoice==="ask_what_happened"?["KUS-03"]:[],{participantRefs:["key_gero"]}),
       R("kushina_joint_32900","academy_kushina",joint,ctx=>({jointResidualSealClosureWithGerotora:ctx.kushinaGerotoraChoice==="help_close"}),ctx=>ctx.kushinaGerotoraChoice==="help_close"?["KUS-04"]:[],{participantRefs:["key_gero"]})],nextBeatId:"kus_answer"},
-    {beatId:"kus_answer",mode:"dialogue",speakerName:"KUSHINA",text:"I understood it.",nextBeatId:"kus_last"},
-    {beatId:"kus_last",mode:"dialogue",speakerName:"GEROTORA",text:"That's what worries me.",exitScene:true}
+    {beatId:"kus_answer",mode:"dialogue",speakerName:"KUSHINA",environmentRef:courtyard,text:"I understood it.",nextBeatId:"kus_last"},
+    {beatId:"kus_last",mode:"dialogue",speakerName:"GEROTORA",environmentRef:courtyard,text:"That's what worries me.",exitScene:true}
   ],onCompleteConsequences:[X("academy_kushina",[seal,identity,cause,joint,contact])]});
 })();
 

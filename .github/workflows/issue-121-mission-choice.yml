@@ -1,0 +1,31 @@
+name: Issue 121 Mission Choice QA
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'runtime/alpha-mission-choice-generation-121.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_121_mission_choice.py'
+      - 'tools/qa_issue_121_mission_choice_runtime.js'
+      - '.github/workflows/issue-121-mission-choice.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  issue-121-mission-choice:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source and activation gate
+        run: python tools/qa_issue_121_mission_choice.py
+      - name: Runtime semantic-choice harness
+        run: node tools/qa_issue_121_mission_choice_runtime.js
