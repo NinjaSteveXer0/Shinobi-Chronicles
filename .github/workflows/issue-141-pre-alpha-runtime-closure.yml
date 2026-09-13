@@ -54,3 +54,8 @@ jobs:
         run: |
           node --check runtime/alpha-origin-browser-realisation-33500.js
           node tools/qa_issue_105_origin_browser_realisation_runtime.js
+
+      - name: Execute screen-first Origin activation seam
+        run: |
+          node --check runtime/alpha-origin-screen-first-33700.js
+          node tools/qa_issue_105_origin_screen_first_activation.js
