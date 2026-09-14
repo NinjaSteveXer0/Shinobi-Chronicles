@@ -70,11 +70,29 @@ Requirements:
 - failed kill attempts remain `intent -> resolver -> survival` and may be revealed later through CE history rather than forcing Kakashi to know the attempt failed in the moment;
 - the emotional weight does not change resolver ownership: intent is authored, factual death/survival is committed by the owning resolver.
 
-Current Kakashi benchmark:
+## Shinobi-world lethal-context boundary
+
+Serious emotional weight must **not** be confused with modern peacetime moral framing.
+
+Shinobi are trained combatants in a world where lethal force, wartime death, assassination and dying on mission are understood occupational realities. Writing must not repeatedly signal that killing a defeated combatant is shocking merely because combat has technically stopped, nor use dialogue such as `The fight is over` as a generic moral veto.
+
+Do not import a universal rule that:
+
+- a defeated shinobi automatically expects mercy;
+- lethal intent after a tactical defeat is inherently incomprehensible;
+- a trained operative must plead that the fight has ended;
+- Minato, ANBU or other shinobi react as though killing itself is alien to their profession.
+
+Instead, reaction weight should come from the **specific context**: who was killed, why, whether the mission required it, whether the target was one of Konoha's own, whether the actor was restrained or helpless, whether there was operational necessity, whether the killer knew the true identity, prior relationships, age, proportionality, and the Chronicle history created.
+
+For Academy Kakashi's evaluation, the emotional shock is not `a ninja killed someone after winning a fight`. The shock is that Kakashi unknowingly killed or attempted to kill a **Konoha operative participating in Minato's evaluation**, creating a grave consequence inside what the player believed was a real mission.
+
+## Current Kakashi benchmark
 
 - successful post-Battle kill: the absence of the operative, ANBU confirmation and Minato's shocked reaction carry the scene;
 - failed post-Battle kill: Kakashi may still report the target as dead if he reasonably believes the attempt succeeded, while the player later learns otherwise when the surviving operative appears in the Hokage's office, visibly injured and furious;
-- accompanying actors should not crowd the scene with commentary merely because they are present.
+- accompanying actors should not crowd the scene with commentary merely because they are present;
+- do not have defeated operatives generically protest `the fight is over` or otherwise impose a non-shinobi mercy expectation unless that specific character/context genuinely warrants it.
 
 ## Current Kakashi benchmark example
 
@@ -112,5 +130,7 @@ It extends the existing Storywide Interactive Presence / screen-first doctrine. 
 > **Important Story information should be performed through character expression, body language, timing, movement and vocal reaction as well as dialogue.**
 >
 > **Kill and attempted-kill scenes must carry appropriate seriousness and emotional weight.**
+>
+> **Seriousness must come from the actual shinobi-world context, not a generic assumption that lethal force after defeat is inherently unthinkable.**
 >
 > **Do not write every character as permanently dead-faced, solemn or motionless merely because the scene is serious.**
