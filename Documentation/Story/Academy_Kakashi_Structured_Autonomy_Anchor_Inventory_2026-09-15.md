@@ -19,6 +19,7 @@ Consumes current authority including:
 - `Documentation/Coordination/Structured Story Autonomy Arc 1-3 Route History and Authored Geography Contract 2026-09-10.md`;
 - `Documentation/Story/Interactive_Story_Player_Agency_Character_Autonomy_Cadence_and_Earned_Possibility_Authority_2026-09-11.md`;
 - `Documentation/Story/Participant_First_Structured_Autonomy_and_Kakashi_Take_Him_Down_Correction_2026-09-15.md`;
+- `Documentation/Story/Academy_Kakashi_Seven_Remaining_Substantial_Branch_Closure_2026-09-15.md`;
 - current Academy Kakashi branch, Pakkun, Knowledge, Battle, disposition and branch-isolation authorities.
 
 ---
@@ -378,24 +379,193 @@ Battle turn count controls catch-up eligibility:
 
 Exact Battle actions are Combat-owned.
 
-The downstream quick-win Package Smuggler confrontation remains an authoring gap and must receive its own autonomy anchors when closed.
+The downstream quick-win Package Smuggler confrontation is now closed by `AK_SA_022` below.
+
+---
+
+## `AK_SA_016` — Get Closer failure → Stop Package Smuggler
+
+**Class:** `STORY_FIXED_PARTICIPANT_ACTION` + `BATTLE_OWNED_AUTONOMY`
+
+Kakashi deliberately abandons immediate pursuit of ANBU Marked Target and chooses Package Smuggler.
+
+Authored fixed consequence:
+
+- ANBU Marked Target continues escaping with the package while Kakashi commits to Package Smuggler.
+
+This escape progression is not rerolled as an autonomy choice merely because ANBU Marked Target is an autonomous participant; it is the direct temporal consequence of Kakashi's selected priority.
+
+Kakashi vs Package Smuggler then becomes PL Battle-owned.
+
+Victory/defeat consumes the locked Story exit states from the seven-branch closure authority.
+
+No Pakkun eligibility is created because Kakashi never reaches ANBU Marked Target.
+
+---
+
+## `AK_SA_017` — Get Closer failure → Cut Them Off at the Sakura Tree
+
+**Class:** `STORY_FIXED_PARTICIPANT_ACTION` into `BATTLE_OWNED_AUTONOMY`
+
+Authored convergence state:
+
+- Kakashi cuts across both fleeing/separating participants rather than selecting one to follow;
+- ANBU Marked Target and Package Smuggler are prevented from cleanly separating;
+- Kakashi legitimately reaches ANBU Marked Target, satisfying Pakkun's authored presence predicate;
+- Pakkun's first-contact/interception staging commits;
+- the resulting Battle caller is Kakashi + temporary Pakkun vs ANBU Marked Target + Package Smuggler.
+
+The convergence and Battle sides are Story-fixed.
+
+Exact tactical actions inside the PL Battle are Battle-owned. Do not grant Pakkun extra free Story actions merely because he is autonomous.
+
+Victory may make the existing four-way ANBU Marked Target disposition family eligible only when the locked package + target custody predicates have committed.
+
+---
+
+## `AK_SA_018` — Ask Where the Package Was Going
+
+**Class:** `STORY_FIXED_PARTICIPANT_ACTION` for Knowledge payoff; `PARTICIPANT_AUTONOMY` resumes afterward
+
+ANBU Marked Target's limited answer is authored Knowledge payoff, not a social/compliance resolver:
+
+- he carried the package to Package Smuggler;
+- his intended role ended at the handoff;
+- he does not know the downstream destination;
+- Package Smuggler did not tell him where it goes next.
+
+This exchange must not manufacture a hidden destination or evaluation truth.
+
+Because custody/position do not materially change, the route legitimately reconverges to:
+
+- Demand the Package;
+- Take Him Down.
+
+Pakkun remains present and autonomous around unfixed reactions, but neither Pakkun nor ANBU Marked Target may select Kakashi's next physical intent for him.
+
+---
+
+## `AK_SA_019` — Observe → Stop the Assassin
+
+**Class:** `STORY_FIXED_PARTICIPANT_ACTION` + `BATTLE_OWNED_AUTONOMY`
+
+Kakashi chooses the apparent immediate attacker rather than preserving package pursuit.
+
+Authored fixed consequence:
+
+- Package Smuggler uses that commitment window to escape cleanly with the package;
+- this branch does **not** receive the 1–4-turn catch-up privilege belonging to `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE`.
+
+Kakashi vs Masked Interceptor is then Battle-owned.
+
+Victory/defeat must preserve the apparent cover story and factual Knowledge boundaries.
+
+No Pakkun eligibility is created because Kakashi does not reach ANBU Marked Target.
+
+---
+
+## `AK_SA_020` — Observe → Secure the Package Before the Assassin
+
+**Class:** owning interception-resolver seam; success commits package extraction, failure reconverges to `AK_SA_014`
+
+The player chooses to race/intercept the package before Masked Interceptor can close on Package Smuggler.
+
+The interception resolver decides whether Kakashi gets there first.
+
+### Success
+
+- package custody commits to Kakashi;
+- Kakashi withdraws with the objective;
+- ANBU Marked Target escapes;
+- Package Smuggler + Masked Interceptor remain behind;
+- their exact later resolution is outside Kakashi Knowledge unless another authority later observes it.
+
+Do not hard-script an off-screen autonomous fight merely to complete their state.
+
+### Failure
+
+Failure creates the existing 2-v-1 pressure state and must reconverge to `AK_SA_014` / Observe → Secure the Package.
+
+Do not duplicate or reroll a second independent branch state when the established 2-v-1 authority already owns it.
+
+---
+
+## `AK_SA_021` — Observe → Go After the Original Target
+
+**Class:** `STORY_FIXED_PARTICIPANT_ACTION` + pursuit resolver + conditional `BATTLE_OWNED_AUTONOMY`
+
+Authored tradeoff:
+
+- Kakashi turns away from current package custody to pursue ANBU Marked Target;
+- Package Smuggler remains the last known package holder;
+- Masked Interceptor remains behind in the observed exchange space.
+
+The pursuit resolver determines whether Kakashi legitimately reaches ANBU Marked Target.
+
+### Pursuit failure
+
+- no Pakkun;
+- no target custody;
+- package remains unrecovered;
+- later state is factual debrief only.
+
+### Pursuit success
+
+- Pakkun presence becomes mandatory under the existing reach predicate;
+- first-contact staging commits;
+- ANBU Marked Target is empty-handed and refuses Kakashi's attempt to take him back;
+- PL Battle begins: Kakashi + temporary Pakkun vs ANBU Marked Target.
+
+Exact tactical actions are Battle-owned.
+
+Even Battle victory does **not** unlock the package-secured four-way disposition family because package custody is absent. The locked route instead returns captured ANBU Marked Target to ANBU authority while recording mission-objective failure.
+
+---
+
+## `AK_SA_022` — Quick-win Package Smuggler catch-up after Masked Interceptor Battle
+
+**Class:** owning catch-up-resolver seam + conditional `BATTLE_OWNED_AUTONOMY`
+
+Entry requires the already-locked state:
+
+- Kakashi defeated Masked Interceptor in 1–4 Battle turns;
+- Package Smuggler escaped during that Battle;
+- catch-up remains possible.
+
+Fast victory grants **opportunity**, not automatic package recovery.
+
+Catch-up resolver determines success/failure.
+
+### Catch-up failure
+
+- Package Smuggler escapes with package;
+- no second Battle;
+- no Pakkun;
+- later debrief consumes Kakashi's factual Masked Interceptor and pursuit history.
+
+### Catch-up success
+
+- Kakashi reaches Package Smuggler;
+- PL Battle begins: Kakashi vs Package Smuggler;
+- exact tactical action is Battle-owned;
+- post-Battle package custody consumes the locked Story result.
+
+Do not fabricate Pakkun merely because other Kakashi endgame branches include him; Kakashi does not reach ANBU Marked Target on this route.
 
 ---
 
 # 4. Current unresolved/future anchor obligations
 
-The following branch families are not fully authored yet and therefore must **not** receive invented exact autonomy behaviour in this inventory:
+After Stephen's approval of the seven-branch closure batch, the only remaining exact branch-realisation obligations are:
 
-- Get Closer failure -> Stop Package Smuggler;
-- Get Closer failure -> Cut Them Off at the Sakura Tree;
-- pursuit success -> Ask Where the Package Was Going;
-- Observe -> Stop the Assassin;
-- Observe -> Secure the Package Before the Assassin;
-- Observe -> Go After the Original Target;
-- Observe -> Defeat Assassin then Secure Package -> quick-win Package Smuggler catch-up confrontation;
-- exact downstream Attack/Pickpocket realizations where current resolver state remains open.
+- direct first-choice `ATTACK` resolver-driven player-facing realisation / return envelope;
+- direct first-choice `ATTEMPT PICKPOCKET` resolver-driven player-facing realisation / return envelope.
 
-**Authoring rule from this point forward:** whenever one of these families is closed, Writing must classify every material decision/reaction seam into the four anchor classes above and append/reconcile this inventory before calling Academy Kakashi Origin Writing-closed.
+Pickpocket is intentionally allowed to remain last because Stephen expects it to be the fastest remaining branch.
+
+The final Academy Kakashi audit may identify exact defects or missing explicit-departure/autonomy receipts, but it must not invent new branch families merely to expand scope.
+
+**Authoring rule:** when Attack and Pickpocket are closed, Writing must classify any newly material decision/reaction seam into the anchor classes above, then perform one final reconciliation before declaring this inventory complete.
 
 ---
 
@@ -450,7 +620,7 @@ Alpha-safe implementation may remain bounded/deterministic and use authored sema
 
 **Design / current anchor identification:** CLOSED FOR CURRENT AUTHORED MATERIAL.
 
-**Academy Kakashi final anchor inventory:** NOT YET CLOSED — more branches remain to be authored.
+**Academy Kakashi final anchor inventory:** NOT YET CLOSED — Attack/Pickpocket + final audit remain.
 
 **Coding implementation:** QUEUED / DO NOT ACTIVATE FROM THIS DOCUMENT ALONE.
 
@@ -477,4 +647,6 @@ Preserve:
 >
 > **Pakkun recovering the neutral package during Take Him Down is a canonical example of a legitimate CE realisation, not a scripted Kakashi branch outcome.**
 >
-> **This inventory must be finalized when the Origin is Writing-closed, then consumed by Coding through reusable CE runtime architecture.**
+> **The seven substantial branch families now have explicit autonomy/resolver/Battle anchors.**
+>
+> **This inventory must be finalized when Attack/Pickpocket and the final Origin audit are complete, then consumed by Coding through reusable CE runtime architecture.**
