@@ -79,4 +79,18 @@ globalThis.SC_ALPHA_ORIGIN_SCENE_IDS=Object.freeze({...A.sceneByVariant});
 globalThis.ALPHA_ORIGIN_SCENE_BY_VARIANT_32900=A.sceneByVariant;
 globalThis.getAlphaOriginScene32900Status=getAlphaOriginScene32900Status;
 globalThis.runAlphaOriginScene32900Diagnostics=runAlphaOriginScene32900Diagnostics;
+
+// #188 neutral Story Decision Realisation loads after the existing Origin
+// packages. It is a semantic coordinator only; it does not turn Origins into
+// Missions or replace any 32900 source occurrence/completion authority.
+(function activateStoryDecisionRealisation34000AfterOrigins(){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  if(globalThis.SC_STORY_DECISION_REALISATION_34000)return;
+  const SCRIPT_ID="sc-story-decision-realisation-34000-script";
+  if(document.getElementById(SCRIPT_ID))return;
+  const script=document.createElement("script");
+  script.id=SCRIPT_ID;script.async=false;
+  script.src="runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260915-1";
+  document.head.appendChild(script);
+})();
 })();

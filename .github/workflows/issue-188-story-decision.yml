@@ -1,0 +1,33 @@
+name: Issue 188 Story Decision QA
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'runtime/alpha-origin-scenes-32900-integrator.js'
+      - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
+      - 'tools/qa_issue_188_story_decision_runtime.js'
+      - '.github/workflows/issue-188-story-decision.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  issue-188-story-decision:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Source syntax and activation gate
+        run: |
+          node --check runtime/alpha-origin-scenes-32900-integrator.js
+          node --check runtime/alpha-story-decision-realisation-34000.js
+          node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
+      - name: Neutral Story decision and Kakashi autonomy harness
+        run: node tools/qa_issue_188_story_decision_runtime.js
