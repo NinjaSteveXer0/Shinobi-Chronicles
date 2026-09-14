@@ -54,6 +54,28 @@ Examples:
 
 Do not flatten every character into the same stoic delivery style.
 
+## Lethal-intent emotional-weight requirement
+
+Kill and attempted-kill scenes must carry substantially greater seriousness and emotional weight than ordinary branch outcomes.
+
+When a character is killed, or when a player attempts to kill someone and the resolver determines that person survives, the immediate scene and later reveal must treat that as a consequential event affecting real people rather than as another flavour choice.
+
+Requirements:
+
+- surviving victims may show fear, anger, shock, pain or betrayal appropriate to what happened;
+- witnesses and colleagues should react according to their actual relationship and Knowledge, not as morality meters or comic sidekicks;
+- Minato or other authority figures may visibly break composure when the history genuinely warrants it;
+- humour may exist elsewhere in the route, but the immediate murder / attempted-murder reveal should not be undercut by throwaway jokes, smirks or redundant exposition unless the specific character and moment genuinely justify it;
+- do not explain obvious facts back to the player when the scene has already shown them;
+- failed kill attempts remain `intent -> resolver -> survival` and may be revealed later through CE history rather than forcing Kakashi to know the attempt failed in the moment;
+- the emotional weight does not change resolver ownership: intent is authored, factual death/survival is committed by the owning resolver.
+
+Current Kakashi benchmark:
+
+- successful post-Battle kill: the absence of the operative, ANBU confirmation and Minato's shocked reaction carry the scene;
+- failed post-Battle kill: Kakashi may still report the target as dead if he reasonably believes the attempt succeeded, while the player later learns otherwise when the surviving operative appears in the Hokage's office, visibly injured and furious;
+- accompanying actors should not crowd the scene with commentary merely because they are present.
+
 ## Current Kakashi benchmark example
 
 For the Minato evaluation reveal, flat delivery such as:
@@ -88,5 +110,7 @@ It extends the existing Storywide Interactive Presence / screen-first doctrine. 
 > **Characters should not just speak. They should react.**
 >
 > **Important Story information should be performed through character expression, body language, timing, movement and vocal reaction as well as dialogue.**
+>
+> **Kill and attempted-kill scenes must carry appropriate seriousness and emotional weight.**
 >
 > **Do not write every character as permanently dead-faced, solemn or motionless merely because the scene is serious.**
