@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-14  
 **Owner:** Writing / Story — Konoha  
-**Status:** **OPEN — STRUCTURE CORRECTED, AWAITING STORY SIGN-OFF**
+**Status:** **OPEN — AUTHORING / AWAITING STORY SIGN-OFF**
 
 ## Timeline isolation
 
@@ -16,24 +16,39 @@ From Academy Kakashi Origin → Observe:
 
 - ANBU Marked Target has handed the package to Package Smuggler;
 - ANBU Marked Target flees;
-- Masked Interceptor is present;
+- Masked Interceptor enters the situation;
 - Kakashi chooses **Secure the package.**
 
-## User-locked structure
+## Apparent cover-story truth
 
-Kakashi rushes to secure the package by fighting **Package Smuggler**.
+From Kakashi's perspective, the Masked Interceptor is on her own mission and **Package Smuggler is her apparent target**.
 
-Masked Interceptor becomes enraged and joins the fight **against Kakashi**.
+That is why her anger can intensify when Kakashi rushes Package Smuggler: Kakashi is interfering with the person she is pursuing as part of her apparent mission.
 
-Do not invent or state a hidden reason for her anger before the reveal. In particular, do not imply that she is protecting Package Smuggler, allied with him, or acting from knowledge Kakashi/player should not yet have.
+This belongs entirely to the cover story. It does **not** imply that Kakashi knows the three participants are Konoha operatives, that Minato staged the encounter, or that this is an ANBU evaluation.
 
-The resulting Battle is:
+## Locked action
+
+Kakashi's primary target is **Package Smuggler**, because the package is his immediate priority.
+
+He does **not** prioritize Masked Interceptor first.
+
+Kakashi rushes Package Smuggler and initiates the confrontation over possession of the package.
+
+Masked Interceptor sees Kakashi interfering with **her apparent target**, becomes enraged, and joins against Kakashi, turning the encounter into:
 
 **Kakashi Hatake vs Package Smuggler + Masked Interceptor**
 
 This is a 2-v-1 Battle.
 
-The branch is defined by Kakashi choosing the package/Package Smuggler as his immediate action. Masked Interceptor joins the fight afterward as her own action.
+### Mandatory distinction from Stop / Attack the Assassin
+
+These choices must not collapse into the same staging.
+
+- **Stop / Attack the Assassin:** Kakashi deliberately prioritizes Masked Interceptor first.
+- **Secure the package:** Kakashi deliberately prioritizes Package Smuggler first; Masked Interceptor joins because Kakashi is interfering with her apparent mission target.
+
+Pre-reveal presentation must preserve the cover story. Dialogue and reaction may establish that Package Smuggler is Masked Interceptor's apparent target, but must not reveal cooperation, evaluation structure, Minato's setup, or hidden participant identities.
 
 ## Kakashi victory
 
@@ -41,33 +56,32 @@ If Kakashi wins:
 
 - Package Smuggler is defeated;
 - Masked Interceptor is defeated;
-- Kakashi can safely take the package;
-- Kakashi can then go after ANBU Marked Target.
+- Kakashi safely secures the package;
+- ANBU Marked Target is still ahead;
+- Kakashi can continue after the ANBU Marked Target with the package secured.
 
-Further pursuit resolution must be authored from this exact timeline only.
+Further pursuit resolution remains authored from this exact timeline only.
 
 ## Kakashi loss
 
 If Kakashi loses:
 
 - ANBU Marked Target gets away;
-- Package Smuggler gets away with the package;
-- Masked Interceptor ties Kakashi up;
-- Masked Interceptor leaves him there while she ostensibly "chases" Package Smuggler;
+- Package Smuggler escapes with the package;
+- Masked Interceptor restrains / ties Kakashi up;
+- Masked Interceptor then leaves Kakashi there under the cover that she is pursuing Package Smuggler, her apparent target;
 - Kakashi does not learn the hidden evaluation truth from this outcome.
 
 Any later ANBU debrief must report only what Kakashi actually observed and knows.
 
-## Authoring caution
+## Final lock pending sign-off
 
-Do not add dialogue, motive, alliance implication, blocking choreography, or explanatory causality that was not supplied by the branch facts above.
-
-The pre-reveal scene must preserve ambiguity and cover-story integrity.
-
-## Current lock
-
-> **Observe → Secure the package:** Kakashi rushes Package Smuggler to secure the package. Masked Interceptor becomes enraged and joins against Kakashi, creating a 2-v-1.
+> **Observe → Secure the package = Kakashi prioritizes Package Smuggler first.**
 >
-> **Win:** Kakashi safely takes the package and can go after ANBU Marked Target.
+> **Masked Interceptor becomes enraged because Package Smuggler is her apparent mission target and Kakashi is interfering with that pursuit. She joins against Kakashi, producing Kakashi vs Package Smuggler + Masked Interceptor.**
 >
-> **Loss:** Marked Target escapes, Package Smuggler escapes with the package, and Masked Interceptor ties Kakashi up before leaving while she "chases" Package Smuggler.
+> **This motive belongs to the cover story and must not reveal the hidden evaluation.**
+>
+> **Win: Kakashi safely secures the package and can pursue ANBU Marked Target.**
+>
+> **Loss: Marked Target escapes, Smuggler escapes with the package, and Masked Interceptor ties Kakashi up before leaving under the cover of chasing her apparent target.**
