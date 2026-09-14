@@ -21,17 +21,28 @@ From Academy Kakashi Origin → Observe:
 
 ## Locked action
 
-Kakashi rushes Package Smuggler to secure the package.
+Kakashi's primary target is **Package Smuggler**, because the package is his immediate priority.
 
-Masked Interceptor becomes enraged and joins the fight against Kakashi.
+He does **not** stop to confront, block, or attack Masked Interceptor first.
 
-The resulting Battle is:
+Kakashi rushes Package Smuggler and initiates the fight over possession of the package.
+
+Masked Interceptor then becomes enraged by Kakashi attacking the package-holder and **joins the already-started fight**, turning it into:
 
 **Kakashi Hatake vs Package Smuggler + Masked Interceptor**
 
 This is a 2-v-1 Battle.
 
-Pre-reveal presentation must preserve the cover story. Masked Interceptor may attack Kakashi in pursuit of the package / because he interfered, but dialogue must not reveal cooperation, evaluation structure, Minato's setup, or hidden participant relationships.
+### Mandatory distinction from Stop / Attack the Assassin
+
+These choices must not collapse into the same staging.
+
+- **Stop / Attack the Assassin:** Kakashi deliberately prioritizes Masked Interceptor as his first opponent. Package Smuggler remains a separate moving objective and may escape while Kakashi deals with her.
+- **Secure the package:** Kakashi deliberately prioritizes Package Smuggler and attacks him first. Masked Interceptor enters second as an enraged additional combatant, creating the 2-v-1.
+
+Therefore Masked Interceptor must **not** cut Kakashi off and demand that he move before Battle, because that would make her the initiating obstacle and collapse this branch into the Stop / Attack the Assassin route.
+
+Pre-reveal presentation must preserve the cover story. Masked Interceptor may attack Kakashi because he interferes with the package-holder, but dialogue must not reveal cooperation, evaluation structure, Minato's setup, or hidden participant relationships.
 
 ## Kakashi victory
 
@@ -59,7 +70,9 @@ Any later ANBU debrief must report only what Kakashi actually observed and knows
 
 ## Final lock
 
-> **Observe → Secure the package = immediate 2-v-1 Battle: Kakashi vs Package Smuggler + Masked Interceptor.**
+> **Observe → Secure the package = Kakashi attacks Package Smuggler first; Masked Interceptor joins second, creating Kakashi vs Package Smuggler + Masked Interceptor.**
+>
+> **Do not stage Masked Interceptor as the first obstacle in this branch. That belongs to Stop / Attack the Assassin.**
 >
 > **Win: Kakashi safely secures the package and can pursue ANBU Marked Target.**
 >
