@@ -1,69 +1,63 @@
 # Shinobi Chronicles — Academy Kakashi Final Origin Expression Precedence Correction
 
-**Date:** 2026-09-13  
-**Owner:** Writing — Konoha  
-**Status:** **BINDING PRECEDENCE CORRECTION — PLAYER-FACING EXPRESSION ONLY**
+**Date:** 2026-09-14  
+**Owner:** Stephen / Writing — Konoha  
+**Status:** **BINDING CURRENT PRECEDENCE CORRECTION — PLAYER-FACING EXPRESSION**
 
 ## Why this correction exists
 
-Installed-browser review showed Academy Kakashi opening with the earlier benchmark text:
+This file previously told runtime to project the September 13 Academy-evaluator / route-map retrieval-assessment substitute as final Academy Kakashi expression.
 
-> The evaluator sets a sealed packet on the table between them, then slides it into the hands of a waiting logistics clerk.
+Later archaeology and Stephen-directed restoration established that premise was not the recovered original Kakashi Origin.
 
-That wording comes from the earlier Kakashi-only benchmark authority:
+Therefore the older precedence recorded here is superseded.
 
-`Documentation/Story/Origin_Prologue_Screen_First_Scene_Performance_Rewrite_v2_2026-09-13.md`
-commit `c774cd1582b267fb5afbc67bc3bb8556bea71449`
+## Current Kakashi player-facing expression precedence
 
-That file was an intermediate benchmark used to establish the screen-first performance standard.
+For Academy Kakashi, use:
 
-It does **not** override the later completed 10/10 Origin package.
+1. `Documentation/Story/Academy_Kakashi_Existing_Material_Player_Facing_Retrofit_and_Remaining_Branch_Inventory_2026-09-14.md` for current retrofitted player-facing expression of already-authored material;
+2. Stephen-approved Kakashi disposition branch authorities for signed post-capture endings;
+3. `Documentation/Story/Academy_Kakashi_Original_Rooftop_ANBU_Hokage_Order_Restoration_2026-09-13.md` and current Kakashi causal/continuity locks for factual Story authority;
+4. older candidate / production expression only where it does not conflict with the above.
 
-## Final player-facing Kakashi authority
+The following older files remain useful provenance but are **not current final Kakashi expression authority** where they contain the substitute evaluator story:
 
-The later and final Origin expression authority is:
+- `Academy_Origins_Screen_First_Player_Facing_Story_Rewrite_2026-09-13.md` (`a08dcf...` candidate lineage);
+- `Origin_Prologue_Screen_First_Scene_Performance_Rewrite_v2_2026-09-13.md` (`c774cd...` candidate lineage);
+- older modernization/runtime prose built around the same substitute premise.
 
-`Documentation/Story/Academy_Origins_Screen_First_Player_Facing_Story_Rewrite_2026-09-13.md`
-commit `a08dcf50f67d264497944af761475865dff8dc81`
+## Current opening
 
-For `academy_kakashi`, the Kakashi section in that file supersedes the earlier Kakashi-only v2 benchmark wherever wording differs.
+Academy Kakashi begins:
 
-Precedence for Kakashi player-facing expression is therefore:
+**Konoha rooftop -> Kakashi registers a presence -> masked ANBU operative -> sealed envelope -> Hokage authority -> objective to stop the package falling into the wrong hands.**
 
-> **Academy_Origins_Screen_First_Player_Facing_Story_Rewrite (`a08dcf...`) > Origin_Prologue_Screen_First_Scene_Performance_Rewrite_v2 (`c774cd...`) > earlier modernization/runtime prose.**
+Current first-card / opening projection pointer:
 
-This is expression precedence only. Existing semantic IDs, choices, consequence/source-occurrence bindings, custody/intelligence facts, Battle boundaries, World Truth, Knowledge, PL/Stats, Progression, Acquisition, living-Sakumo divergence and completion semantics remain unchanged.
+`Documentation/Story/Kakashi_Origin_First_Card_Expected_Player_Facing_Projection_2026-09-13.md`
 
-## Exact opening that should appear
+Current retrofit authority:
 
-The final `kak_brief` presentation begins with:
+`Documentation/Story/Academy_Kakashi_Existing_Material_Player_Facing_Retrofit_and_Remaining_Branch_Inventory_2026-09-14.md`
 
-> The Academy evaluator lays a small route map on the table. A thumb-sized seal marks the packet.
+## Explicitly superseded Kakashi substitute material
+
+Do not project as current Academy Kakashi Story:
+
+- Academy evaluator briefing;
+- route-map retrieval assessment;
+- `Recover the packet.` substitute objective;
+- `Bring back what you can prove. Not what you assume.` substitute framing;
+- evaluator/reflection questionnaire;
+- Sakumo closing ending introduced by that substitute package.
+
+This correction is expression precedence only. It does not reopen current semantic IDs, branch facts, Battle/resolver boundaries, Knowledge, custody, PL/Stats, Progression, Acquisition or other owning-system truth.
+
+## Final lock
+
+> **The restored rooftop ANBU / Hokage-order Origin is current Academy Kakashi Story.**
 >
-> He slides both toward Kakashi.
+> **The Academy-evaluator retrieval-assessment substitute is superseded and must not be treated as final Kakashi expression authority.**
 >
-> **ACADEMY EVALUATOR:** “Recover the packet.”
->
-> Kakashi looks at the map once.
->
-> The evaluator keeps one finger on it.
->
-> **ACADEMY EVALUATOR:** “And Hatake? Bring back what you can prove. Not what you assume.”
->
-> Kakashi lifts his eyes to him.
->
-> **KAKASHI:** “Those are usually the same thing.”
->
-> The evaluator releases the map.
->
-> **ACADEMY EVALUATOR:** “Today would be a good day to learn the difference.”
-
-If the installed browser instead begins with `The evaluator sets a sealed packet on the table between them...`, Coding is consuming the superseded Kakashi-only benchmark rather than final Origin expression authority.
-
-## Runtime implication
-
-Current runtime layer `runtime/alpha-origin-screen-first-33700.js` must not treat `c774cd...` as a Kakashi override over `a08dcf...`.
-
-Coding should project the final Kakashi row from `a08dcf...` while preserving all existing semantic state and resolver boundaries.
-
-Writing does not claim runtime application or browser Golden.
+> **Runtime / Coding should consume the current retrofit and approved branch authorities rather than the superseded candidate packages.**
