@@ -20,7 +20,7 @@ It consumes and preserves:
 
 No Story fact outside this branch is reopened.
 
-## Knowledge correction — Pakkun / Kakashi name
+## Knowledge correction — Kakashi / Pakkun names
 
 The recovered first-contact Pakkun authority establishes only:
 
@@ -28,13 +28,15 @@ The recovered first-contact Pakkun authority establishes only:
 > **KAKASHI:** “Apparently.”  
 > **KAKASHI:** “Thanks.”
 
-Current authority does **not** establish that Kakashi introduces himself to Pakkun before this branch scene, nor that Pakkun otherwise knows Kakashi's name at first contact.
+Current authority does **not** establish a name exchange before this branch scene. It does not establish that Kakashi introduces himself to Pakkun, that Pakkun otherwise knows Kakashi's name, or that Kakashi has learned Pakkun's name.
 
-Therefore the approved draft line in which Pakkun addressed him as `Kakashi` is removed.
+Therefore the approved draft line in which Pakkun addressed him as `Kakashi` is removed, and Kakashi's in-character dialogue/reporting does not identify Pakkun by name before legitimate name Knowledge exists.
 
 Binding guard:
 
-> **Pakkun must not address Kakashi by name during this first-contact sequence unless separate authority first establishes how Pakkun legitimately knows it.**
+> **Do not infer reciprocal name Knowledge from actor identity. Until a name exchange or another legitimate Knowledge source is established, neither Kakashi nor Pakkun uses the other's name in character dialogue merely because the Chronicle knows who they are.**
+
+The Chronicle / narrative authority may still identify the actor as **Pakkun** where observer Knowledge is not being projected as Kakashi's spoken Knowledge.
 
 This is a Knowledge-safety correction only. It does not alter Pakkun's presence, autonomy, first-contact exchange or later continuity.
 
@@ -276,7 +278,7 @@ Kakashi eventually turns toward the ANBU operative again.
 
 A small pause.
 
-“Pakkun caught up with him.”
+“He caught up with him.”
 
 Pakkun looks satisfied.
 
@@ -388,7 +390,7 @@ Masked Interceptor.
 
 The package.
 
-Pakkun.
+The ninken beside him.
 
 His own decision.
 
@@ -460,13 +462,13 @@ Kakashi nods.
 
 Pakkun starts away.
 
-Kakashi watches him go.
+Three steps.
 
-“Pakkun.”
-
-One ear turns back.
+Kakashi speaks.
 
 “Thanks.”
+
+One ear turns back.
 
 A pause.
 
@@ -510,7 +512,7 @@ His eyes continue down the page.
 
 Original target pursued.
 
-Pakkun encountered.
+Ninken intervention noted.
 
 Minato pauses.
 
@@ -618,7 +620,7 @@ He reported Package Smuggler.
 
 He reported Masked Interceptor.
 
-He reported Pakkun.
+He reported the ninken's involvement.
 
 And when asked what happened to the original target—
 
@@ -638,6 +640,6 @@ he told them exactly what he'd done.
 >
 > **Pakkun remains visibly present through the release, ANBU report and aftermath until his explicit departure.**
 >
-> **Pakkun does not address Kakashi by name during first-contact continuity unless separate authority establishes legitimate Knowledge of that name.**
+> **Current first-contact authority does not establish a name exchange. Do not make Kakashi or Pakkun use the other's name in character dialogue until legitimate Knowledge is established.**
 >
 > **The player-facing expression above is Stephen-approved Story authority.**
