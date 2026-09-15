@@ -1,17 +1,18 @@
 // ============================================================================
-// ISSUES #188 + #192 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
+// ISSUES #188 + #192 + #201 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
 //
 // The final semantic adapter is preserved byte-for-byte in the 34100 core file.
-// This stable front-door loads that core first, then the fail-closed 34200
-// final-authority guard. Browser and headless QA therefore consume the same
-// adapter without copying or re-authoring its semantics.
+// Browser order is: semantic core -> stale-authority guard -> Combat deployment.
+// Headless semantic QA loads only core + guard; full Battle QA loads 34300 with
+// game.js so the Combat bridge is validated against the real Battle engine.
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
 
 const CORE_PATH="runtime/alpha-kakashi-final-origin-adapter-34100-core.js";
 const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
-const BUILD="kakashi-final-20260915-3";
+const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
+const BUILD="kakashi-final-20260915-4";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -32,12 +33,23 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadBattle(){
+  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300||document.getElementById("sc-alpha-kakashi-origin-battle-deployment-34300-script"))return;
+  const battle=document.createElement("script");
+  battle.id="sc-alpha-kakashi-origin-battle-deployment-34300-script";
+  battle.src=`${BATTLE_PATH}?sc=${BUILD}`;
+  battle.async=false;
+  document.head.appendChild(battle);
+}
 function loadGuard(){
-  if(globalThis.SC_ALPHA_KAKASHI_FINAL_GUARD_34200||document.getElementById("sc-alpha-kakashi-final-authority-guard-34200-script"))return;
+  if(globalThis.SC_ALPHA_KAKASHI_FINAL_GUARD_34200){loadBattle();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-final-authority-guard-34200-script");
+  if(existing){existing.addEventListener("load",loadBattle,{once:true});return;}
   const guard=document.createElement("script");
   guard.id="sc-alpha-kakashi-final-authority-guard-34200-script";
   guard.src=`${GUARD_PATH}?sc=${BUILD}`;
   guard.async=false;
+  guard.addEventListener("load",loadBattle,{once:true});
   document.head.appendChild(guard);
 }
 
