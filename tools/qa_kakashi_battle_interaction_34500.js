@@ -21,6 +21,19 @@ const exactFive=[
   "academy_kakashi_prodigy_read"
 ];
 
+// Source probe kept intentionally narrow: when a browser card label and its
+// internal Skill ID drift, the CI checkout reports the canonical game.js IDs
+// rather than letting QA silently invent an identifier.
+const gameKakashiIds=[...new Set(gameSrc.match(/\bacademy_kakashi_[a-z0-9_]+\b/g)||[])].sort();
+const prodigySource=[];
+for(const rel of ["game.js",...fs.readdirSync(path.join(root,"runtime")).filter(name=>name.endsWith(".js")).map(name=>`runtime/${name}`)]){
+  const text=fs.readFileSync(path.join(root,rel),"utf8");
+  text.split(/\r?\n/).forEach((line,index)=>{
+    if(/prodig/i.test(line))prodigySource.push({file:rel,line:index+1,text:line.trim().slice(0,500)});
+  });
+}
+console.log("KAKASHI_BATTLE_SOURCE_PROBE "+JSON.stringify({gameKakashiIds,prodigySource},null,2));
+
 // Source contract: canonical five-skill source first, late DOM/deployment repair,
 // both card generations, presentation-only hover, capture-owned click, and no
 // replacement Battle resolver.
