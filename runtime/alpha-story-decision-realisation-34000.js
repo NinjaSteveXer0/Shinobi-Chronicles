@@ -82,7 +82,7 @@ function stableRef(prefix,payload){return`${prefix}:${hash(payload)}`;}
 function normalizeRefs(values){return[...new Set((Array.isArray(values)?values:[]).filter(Boolean).map(String))];}
 function normalizeChoice(choice,index){
   if(!choice||typeof choice!=="object")throw new Error("semantic_choice_object_required");
-  if(!choice.choiceId)throw new Error("semantic_choice_id_required");
+  if(!choice.choiceId)throw new Error(`semantic_choice_id_required:${choice.choiceId}`);
   if(!choice.intentType)throw new Error(`semantic_intent_type_required:${choice.choiceId}`);
   if(!choice.resolverBindingRef)throw new Error(`resolver_binding_required:${choice.choiceId}`);
   return{
@@ -364,7 +364,7 @@ globalThis.runStoryDecisionRealisation34000Diagnostics=runStoryDecisionRealisati
       const id="sc-alpha-kakashi-final-34100-script";
       if(document.getElementById(id))return;
       const script=document.createElement("script");script.id=id;script.async=false;
-      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-1";
+      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-10";
       document.head.appendChild(script);return;
     }
     attempts+=1;if(attempts<240&&typeof setTimeout==="function")setTimeout(tryLoad,50);
