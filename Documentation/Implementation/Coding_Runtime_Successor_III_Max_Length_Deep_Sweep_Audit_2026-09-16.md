@@ -18,7 +18,7 @@ Also reconciled:
 
 ## CURRENT HEAD
 
-Final pre-write live `main`:
+Final pre-write live `main` / runtime snapshot:
 
 `2b6a0abb8e43905b83cb03ae402bbd0885ee4d49`
 
@@ -32,15 +32,19 @@ All runtime/source responsibility claims in this audit are evaluated against tha
 
 ## POST-COMMIT HEAD
 
-`PENDING_POST_WRITE_RECONCILIATION`
+Initial audit-write commit / immediate post-write HEAD:
 
-This field is intentionally reconciled immediately after the initial audit write. The post-write SHA and any concurrent delta must be inserted into this file before archive safety is final.
+`fbc1c2d3738ceede0455dbea1f5c65b3823da00b`
+
+Mandatory post-write re-fetch returned exactly `fbc1c2d...`, whose sole parent is audited head `2b6a0abb...`. No concurrent commit landed between the final audited snapshot and the initial durable audit write. This revision records that reconciliation; its own commit is documentation-only and does not alter the audited runtime snapshot.
 
 ## ARCHIVE SAFETY
 
-**PROVISIONAL: NO until the mandatory post-commit HEAD reconciliation is complete.**
+**YES.**
 
-If the post-write check shows no unreconciled production-relevant commit, this audit may be reconciled to **YES**. Alpha / Golden remains RED regardless.
+All material chat-only retirement conclusions are durable; live HEAD was inspected; the complete post-Successor-II delta was reconciled; the pre-write race was caught and resolved; the post-write race check was clean; issue traffic was refreshed; patch/shim/guard ownership is classified; source/headless/browser/Golden states remain distinct; and no production-critical fact is known to exist only in this chat.
+
+**ALPHA / GOLDEN remains RED / NOT CLAIMED.**
 
 ---
 
@@ -116,7 +120,7 @@ The material Coding delta is:
 | `34430354...` | Gate shim QA under #141 | Workflow | QA | Aggregate source gate | NO |
 | `1e37cb47...` | Consume all-route Battle composition closure | `34300` expands from 7 to 10 configs | CANONICAL IMPLEMENTATION | #201 functional composition gap closed | NO current replay |
 | `fa4d180e...` | Cover ten-config surface | Battle deployment QA | QA | `Issue 188 Story Decision QA` run `35004619176` SUCCESS; #141 run `35004619132` SUCCESS | NO |
-| `0e0fafdd...` | Add ten new card/hosted-entity/tailed-beast PNGs | Assets only | RECORD ONLY / ASSET | Side branch from `14d24dda...`; no runtime JS/docs/QA delta | N/A |
+| `0e0fafdd...` | Add ten new card/hosted-entity/tailed-beast PNGs | Assets only | RECORD ONLY / ASSET | Side branch from `14d24dda...`; no runtime JS/docs/QA delta relative to `fa4d180...` | N/A |
 | `2b6a0abb...` | Merge asset side branch with runtime line | Merge only relative to `fa4d180...` | MERGE / RACE RECONCILIATION | `fa4d180... -> 2b6a0abb...` diff is ten PNG additions only | N/A |
 
 The exact-head `fa4d180...` workflows remain the latest relevant runtime QA evidence. GitHub reports no workflow runs for merge head `2b6a0abb...`; because the only delta from `fa4d180...` is asset-only, runtime source identity remains unchanged, but this must not be mislabeled as exact-current-head CI.
@@ -205,7 +209,7 @@ Cache identity remains **distributed**, not centralized:
 
 An old browser can therefore receive a mixed-generation runtime when a parent loader is cached while a child changes. The repeated cache-bust commits in this delta are a symptom of loader-generation fragmentation, not evidence that each underlying defect was cache-only.
 
-Retirement target: after functional closure, centralize/flatten one bounded Kakashi loader generation at a time. Do **not** redesign the whole boot system during Alpha closure.
+Retirement target: after functional closure, centralize/flatten one bounded Kakashi loader generation at a time. Do not redesign the whole boot system during Alpha closure.
 
 ---
 
@@ -228,7 +232,7 @@ Retirement target: after functional closure, centralize/flatten one bounded Kaka
 | Neutral factual outcome selection + idempotent receipt | `runtime/alpha-story-factual-resolver-34600.js` | `registerStoryFactualResolverBinding`, `resolveStoryFactualAction`, `finalizeSelectedReceipt` | CANONICAL neutral factual provider |
 | Kakashi factual envelopes | `runtime/alpha-kakashi-factual-bindings-34700.js` | `register(...)` into 34600; nine current registrations | CANONICAL but PARTIAL |
 | Final ending / debrief | No single complete current owner | `34410` stops at `kak_seq_debrief_pending`; `34000` terminal guard blocks premature close | MISSING COMPLETE PLAYER CLOSURE |
-| Chronicle Receipt projection | Existing Origin/Chronicle receipt substrate plus final semantic state | Read-only receipt path remains existing runtime; Kakashi final semantic material must be fully bridged first | SUBSTRATE EXISTS; final Kakashi proof PARTIAL |
+| Chronicle Receipt projection | Existing Origin/Chronicle receipt substrate plus final semantic state | read-only receipt path remains existing runtime; Kakashi final semantic material must be fully bridged first | SUBSTRATE EXISTS; final Kakashi proof PARTIAL |
 
 Important override truth:
 
@@ -946,7 +950,11 @@ Therefore this audit reset its AUDITED HEAD to `2b6a0abb...` and retained the al
 
 The final pre-write re-fetch remained `2b6a0abb...`.
 
-A mandatory post-write re-fetch still follows this initial commit. If another relevant source commit lands, reconcile it durably or set ARCHIVE SAFETY = NO.
+Initial audit write:
+
+`fbc1c2d3738ceede0455dbea1f5c65b3823da00b`
+
+Immediate mandatory post-write re-fetch returned exactly that SHA with sole parent `2b6a0abb...`. Therefore **no second concurrent source race occurred**. No addendum is required for runtime reconciliation; this documentation-only revision records the clean post-write check.
 
 ---
 
@@ -1022,6 +1030,6 @@ Alpha / Golden:
 
 **RED / NOT CLAIMED.**
 
-Archive safety remains provisional until the post-commit race check is durably reconciled.
+**ARCHIVE SAFETY: YES.**
 
 **Routing:** Coding successor -> #188 first; #209 remains genuine SEND NOW Coding work after/alongside current Kakashi closure; #201 stays closed; #141/#105 remain browser/Golden proof lanes. **Stephen relay: NONE.**
