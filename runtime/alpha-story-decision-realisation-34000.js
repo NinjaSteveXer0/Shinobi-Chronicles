@@ -82,7 +82,7 @@ function stableRef(prefix,payload){return`${prefix}:${hash(payload)}`;}
 function normalizeRefs(values){return[...new Set((Array.isArray(values)?values:[]).filter(Boolean).map(String))];}
 function normalizeChoice(choice,index){
   if(!choice||typeof choice!=="object")throw new Error("semantic_choice_object_required");
-  if(!choice.choiceId)throw new Error(`semantic_choice_id_required:${choice.choiceId}`);
+  if(!choice.choiceId)throw new Error("semantic_choice_id_required");
   if(!choice.intentType)throw new Error(`semantic_intent_type_required:${choice.choiceId}`);
   if(!choice.resolverBindingRef)throw new Error(`resolver_binding_required:${choice.choiceId}`);
   return{
