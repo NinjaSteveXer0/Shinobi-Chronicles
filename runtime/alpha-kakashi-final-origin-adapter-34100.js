@@ -4,7 +4,8 @@
 // The final semantic adapter is preserved byte-for-byte in the 34100 core file.
 // Browser order is:
 // semantic core -> stale-authority guard -> Combat deployment -> exact
-// sequential Story/Battle consumer -> installed-browser presentation fixes.
+// sequential Story/Battle consumer -> installed-browser presentation fixes ->
+// installed-browser Battle interaction correction.
 // Headless semantic QA loads only core + guard; dedicated harnesses load 34300
 // and 34410 with game.js to validate the real Battle/Story seams.
 // ============================================================================
@@ -16,7 +17,8 @@ const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
 const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
 const SEQUENTIAL_PATH="runtime/alpha-kakashi-final-sequential-consumer-34410.js";
 const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
-const BUILD="kakashi-final-20260915-6";
+const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-34500.js";
+const BUILD="kakashi-final-20260915-7";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -37,12 +39,23 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadBattleInteraction(){
+  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_INTERACTION_34500||document.getElementById("sc-alpha-kakashi-battle-interaction-hotfix-34500-script"))return;
+  const fix=document.createElement("script");
+  fix.id="sc-alpha-kakashi-battle-interaction-hotfix-34500-script";
+  fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`;
+  fix.async=false;
+  document.head.appendChild(fix);
+}
 function loadBrowserFix(){
-  if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400||document.getElementById("sc-alpha-kakashi-browser-red-fixes-34400-script"))return;
+  if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400){loadBattleInteraction();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-browser-red-fixes-34400-script");
+  if(existing){existing.addEventListener("load",loadBattleInteraction,{once:true});return;}
   const fix=document.createElement("script");
   fix.id="sc-alpha-kakashi-browser-red-fixes-34400-script";
   fix.src=`${BROWSER_FIX_PATH}?sc=${BUILD}`;
   fix.async=false;
+  fix.addEventListener("load",loadBattleInteraction,{once:true});
   document.head.appendChild(fix);
 }
 function loadSequential(){
