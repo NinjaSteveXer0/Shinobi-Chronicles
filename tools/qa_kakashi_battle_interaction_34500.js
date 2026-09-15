@@ -72,10 +72,10 @@ assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js
   "34000 must request the current 34100 cache identity");
 assert(!decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-1"'),
   "34000 must not retain the stale 34100 cache identity");
-assert(adapterLoaderSrc.includes('const BUILD="kakashi-final-20260915-10";'),
-  "34100 must request current Kakashi runtime children including 34500");
-assert(!adapterLoaderSrc.includes('const BUILD="kakashi-final-20260915-9";'),
-  "34100 must not retain the stale child cache identity");
+assert(adapterLoaderSrc.includes('const BUILD="kakashi-final-20260916-11";'),
+  "34100 must request current Kakashi runtime children including 34500 and 34120");
+assert(!adapterLoaderSrc.includes('const BUILD="kakashi-final-20260915-10";'),
+  "34100 must not retain the prior child cache identity");
 
 // Headless semantic bridge. The exact Kakashi launcher deliberately attaches
 // deployment metadata only when it returns; 34500 must wrap that seam without
