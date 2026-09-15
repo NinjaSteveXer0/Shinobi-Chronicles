@@ -1,7 +1,10 @@
 // ============================================================================
-// ISSUE #105 / #181 — ACADEMY KAKASHI ORIGINAL ORIGIN RESTORATION — 33800
+// ISSUE #105 / #181 / #192 — ACADEMY KAKASHI ORIGINAL ORIGIN RESTORATION — 33800
 // Authority: Documentation/Story/Academy_Kakashi_Original_Rooftop_ANBU_Hokage_Order_Restoration_2026-09-13.md
 // commit 04efa8c7b3faa5ec71b0191dcb673ebf3a60bbba
+// Choice-expression authority:
+// Documentation/Story/Academy_Kakashi_Player_Facing_Choice_Label_Modernization_Lock_2026-09-15.md
+// commit 21e0574c7efeb2257924d581370225ad92ab4fe9
 //
 // Restores the accepted rooftop -> ANBU -> sealed envelope -> Hokage-approved
 // limited assignment -> target tail -> alley -> package/assassin choice Story.
@@ -25,6 +28,7 @@ if(!scene)return;
 
 const PATCH_ID="alpha_kakashi_original_origin_33800_2026_09_13";
 const AUTHORITY_COMMIT="04efa8c7b3faa5ec71b0191dcb673ebf3a60bbba";
+const CHOICE_LABEL_AUTHORITY_COMMIT="21e0574c7efeb2257924d581370225ad92ab4fe9";
 const occurrence="occ_origin_kakashi_anbu_retrieval_resolution";
 const rooftop=Object.freeze({assetId:"kakashi_origin_rooftop_night"});
 const alley=Object.freeze({assetId:"kakashi_origin_konoha_alleyway"});
@@ -131,10 +135,10 @@ A.register({
     {beatId:"kak_original_order",mode:"dialogue",speakerName:"ANBU OPERATIVE",environmentRef:rooftop,text:"The Hokage approved you to assist us on this assignment. The man in that picture is carrying something important. Don't let it fall into the wrong hands.",nextBeatId:"kak_original_tail"},
     {beatId:"kak_original_tail",mode:"narration",environmentRef:alley,text:"Kakashi finds the target and tails him through Konoha. The man turns into a narrow alley and meets a second figure. A package is between them.",nextBeatId:"kak_original_action"},
     {beatId:"kak_original_action",mode:"choice",environmentRef:alley,text:"Kakashi has a few seconds before the exchange is complete.",choices:[
-      C("observe","Observe.","kak_original_transfer",{kakashiOriginalAction:"observe"}),
-      C("get_closer","Get closer.","kak_original_transfer",{kakashiOriginalAction:"get_closer"}),
-      C("attack","Attack.","kak_original_transfer",{kakashiOriginalAction:"attack"}),
-      C("attempt_pickpocket","Attempt to pickpocket the package.","kak_original_transfer",{kakashiOriginalAction:"attempt_pickpocket"})
+      C("observe","WATCH THE EXCHANGE","kak_original_transfer",{kakashiOriginalAction:"observe"}),
+      C("get_closer","MOVE IN CLOSER","kak_original_transfer",{kakashiOriginalAction:"get_closer"}),
+      C("attack","STRIKE BEFORE THE HANDOFF","kak_original_transfer",{kakashiOriginalAction:"attack"}),
+      C("attempt_pickpocket","SLIP IN FOR THE PACKAGE","kak_original_transfer",{kakashiOriginalAction:"attempt_pickpocket"})
     ]},
     {beatId:"kak_original_transfer",mode:"narration",environmentRef:sakura,presentationResolver:()=>{
       const action=A.local().kakashiOriginalAction;
@@ -147,10 +151,10 @@ A.register({
       return{text:`${reaction}\n\nThe package reaches the second man. Then the situation changes again: a decoy assassin attacks the current holder while the original carrier bolts from the alley.`};
     },nextBeatId:"kak_original_major_choice"},
     {beatId:"kak_original_major_choice",mode:"choice",environmentRef:sakura,text:"The package, the assassin and the fleeing original target are now three different problems.",choices:[
-      C("fight_assassin","Fight Assassin","kak_original_major_choice",null,{availability:A.unavailableBattle(scene,"Battle route unavailable until the restored Kakashi caller is rebound.")}),
-      C("secure_package","Secure Package","kak_original_secured",{kakashiRetrievalChoice:"secure_package"}),
-      C("defeat_assassin_then_recover","Defeat Assassin then Recover Package","kak_original_major_choice",null,{availability:A.unavailableBattle(scene,"Battle-return route unavailable until the restored Kakashi caller is rebound.")}),
-      C("pursue_original_target","Pursue Original Target","kak_original_pursue",{kakashiRetrievalChoice:"pursue_original_target"})
+      C("fight_assassin","CUT HER OFF","kak_original_major_choice",null,{availability:A.unavailableBattle(scene,"Battle route unavailable until the restored Kakashi caller is rebound.")}),
+      C("secure_package","GO FOR THE PACKAGE","kak_original_secured",{kakashiRetrievalChoice:"secure_package"}),
+      C("defeat_assassin_then_recover","DEAL WITH HER FIRST, THEN CHASE THE PACKAGE","kak_original_major_choice",null,{availability:A.unavailableBattle(scene,"Battle-return route unavailable until the restored Kakashi caller is rebound.")}),
+      C("pursue_original_target","STAY ON THE FIRST MAN","kak_original_pursue",{kakashiRetrievalChoice:"pursue_original_target"})
     ]},
     {beatId:"kak_original_secured",mode:"narration",environmentRef:sakura,text:"Kakashi stays on the package instead of chasing the fleeing carrier. He secures it from the second man while the assassin complication remains separate from the custody result.",onEnterConsequences:[result],exitScene:true},
     {beatId:"kak_original_pursue",mode:"narration",environmentRef:sakura,text:"Kakashi breaks from the package and goes after the original target. The pursuit does not put the package in his hands; the retrieval ends without Kakashi recovering it.",onEnterConsequences:[result],exitScene:true}
@@ -176,9 +180,12 @@ function runAlphaKakashiOriginal33800Diagnostics(){
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_original_origin_33800_2026_09_13",
     authorityPinned:AUTHORITY_COMMIT==="04efa8c7b3faa5ec71b0191dcb673ebf3a60bbba",
+    choiceLabelAuthorityPinned:CHOICE_LABEL_AUTHORITY_COMMIT==="21e0574c7efeb2257924d581370225ad92ab4fe9",
     rooftopEntry:!!d&&d.entryBeatId==="kak_original_rooftop",
     originalActionFamily:!!action&&action.choices.map(c=>c.choiceId).join("|")==="observe|get_closer|attack|attempt_pickpocket",
+    modernizedActionLabels:!!action&&action.choices.map(c=>c.label).join("|")==="WATCH THE EXCHANGE|MOVE IN CLOSER|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",
     originalMajorChoiceFamily:!!major&&major.choices.map(c=>c.choiceId).join("|")==="fight_assassin|secure_package|defeat_assassin_then_recover|pursue_original_target",
+    modernizedMajorChoiceLabels:!!major&&major.choices.map(c=>c.label).join("|")==="CUT HER OFF|GO FOR THE PACKAGE|DEAL WITH HER FIRST, THEN CHASE THE PACKAGE|STAY ON THE FIRST MAN",
     noSubstituteEvaluator:!!m&&!Array.from(m.values()).some(b=>String(b.speakerName||"").includes("EVALUATOR")),
     kakashiSpecificBackdropSequence:!!rooftopBeat&&!!tailBeat&&!!transferBeat
       &&rooftopBeat.environmentRef&&rooftopBeat.environmentRef.assetId===rooftop.assetId
@@ -199,7 +206,7 @@ function runAlphaKakashiOriginal33800Diagnostics(){
   return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false,backdropPaths:{...backdropPaths}};
 }
 
-globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,backdropPaths:{...backdropPaths},browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,choiceLabelAuthorityCommit:CHOICE_LABEL_AUTHORITY_COMMIT,backdropPaths:{...backdropPaths},browserGoldenClaimed:false});
 globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800Diagnostics;
 })();
 
@@ -212,7 +219,7 @@ globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800D
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
   const SCRIPT_ID="sc-story-scene-board-33900-script";
   const POLISH_ID="sc-kakashi-scene-board-polish-33910-script";
-  const BUILD="scene-board-20260915-1";
+  const BUILD="scene-board-20260915-2";
 
   function load33910(){
     if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910||document.getElementById(POLISH_ID))return;
