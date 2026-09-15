@@ -12,10 +12,12 @@ on:
       - 'runtime/alpha-kakashi-origin-battle-deployment-34300.js'
       - 'runtime/alpha-kakashi-browser-red-fixes-34400.js'
       - 'runtime/alpha-kakashi-final-sequential-consumer-34410.js'
+      - 'runtime/alpha-kakashi-battle-interaction-hotfix-34500.js'
       - 'tools/qa_issue_188_story_decision_runtime.js'
       - 'tools/qa_issue_188_kakashi_final_guard.js'
       - 'tools/qa_academy_kakashi_origin_battle_deployment.js'
       - 'tools/qa_academy_kakashi_sequential_consumer.js'
+      - 'tools/qa_kakashi_battle_interaction_34500.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
 
@@ -40,10 +42,12 @@ jobs:
           node --check runtime/alpha-kakashi-origin-battle-deployment-34300.js
           node --check runtime/alpha-kakashi-browser-red-fixes-34400.js
           node --check runtime/alpha-kakashi-final-sequential-consumer-34410.js
+          node --check runtime/alpha-kakashi-battle-interaction-hotfix-34500.js
           node --check tools/qa_issue_188_story_decision_runtime.js
           node --check tools/qa_issue_188_kakashi_final_guard.js
           node --check tools/qa_academy_kakashi_origin_battle_deployment.js
           node --check tools/qa_academy_kakashi_sequential_consumer.js
+          node --check tools/qa_kakashi_battle_interaction_34500.js
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -51,6 +55,7 @@ jobs:
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-sequential-consumer-34410.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-browser-red-fixes-34400.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-battle-interaction-hotfix-34500.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
       - name: Neutral Story decision and Kakashi autonomy harness
         run: node tools/qa_issue_188_story_decision_runtime.js
       - name: Kakashi stale-terminal final-authority guard
@@ -59,3 +64,5 @@ jobs:
         run: node tools/qa_academy_kakashi_origin_battle_deployment.js
       - name: Kakashi sequential Story Battle consumer harness
         run: node tools/qa_academy_kakashi_sequential_consumer.js
+      - name: Kakashi Battle browser interaction contract
+        run: node tools/qa_kakashi_battle_interaction_34500.js
