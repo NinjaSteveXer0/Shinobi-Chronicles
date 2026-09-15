@@ -2,10 +2,10 @@
 // ISSUE #188 / #175 — ACADEMY KAKASHI FACTUAL RESOLVER BINDINGS — 34700
 //
 // Consumes the neutral 34600 provider and the closed Kakashi Writing envelopes.
-// This layer registers factual possibility sets only. It does NOT infer success
-// from choice labels, resolve Battle, or commit World/Knowledge/custody facts.
-// Those owning-system commits remain downstream requirements before a branch may
-// be exposed as a complete player route.
+// Bindings remain factual possibility sets. A binding may attach an explicit
+// downstream authoritative commit owner supplied by the canonical Kakashi
+// adapter family; otherwise it remains selection-only and cannot by itself
+// commit World/Knowledge/custody facts.
 // ============================================================================
 (function installAcademyKakashiFactualBindings34700(){
 "use strict";
@@ -13,6 +13,7 @@ if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700)return;
 
 const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 if(!PROVIDER||typeof PROVIDER.registerStoryFactualResolverBinding!=="function")throw new Error("story_factual_resolver_34600_required");
+const FACTUAL_STATE=globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120||null;
 
 const PATCH_ID="alpha_kakashi_factual_bindings_34700_2026_09_15";
 const AUTHORITY=Object.freeze({
@@ -29,12 +30,24 @@ const registrations=[];
 function outcome(outcomeRef,result,successorSituationRef=null,extra={}){
   return Object.freeze({outcomeRef,resultPayloadTemplate:Object.freeze({...result}),successorSituationRef,...extra});
 }
+function commitOwnerFor(bindingRef){
+  return FACTUAL_STATE&&typeof FACTUAL_STATE.getCommitResult==="function"
+    ?FACTUAL_STATE.getCommitResult(bindingRef)
+    :null;
+}
 function register(bindingRef,outcomes,metadata={}){
+  const commitResult=commitOwnerFor(bindingRef);
   const result=PROVIDER.registerStoryFactualResolverBinding(bindingRef,{
     ownerRef:OWNER,
     authorityVersionRefs:auth,
     outcomes,
-    metadata:{storyUnitRef:"academy_kakashi",selectionOnly:true,...metadata}
+    commitResult:typeof commitResult==="function"?commitResult:null,
+    metadata:{
+      storyUnitRef:"academy_kakashi",
+      selectionOnly:typeof commitResult!=="function",
+      authoritativeCommitOwnerRef:typeof commitResult==="function"&&FACTUAL_STATE?FACTUAL_STATE.patchId:null,
+      ...metadata
+    }
   });
   registrations.push(result);
   if(!result||result.success!==true)throw new Error(`kakashi_factual_binding_registration_failed:${bindingRef}:${result&&result.reason||"unknown"}`);
@@ -117,6 +130,13 @@ const DEFERRED_EXACT_ENVELOPE_BINDINGS=Object.freeze([
   "academy_kakashi.resolver.pursue_original_target"
 ]);
 
+const consumerInstall=FACTUAL_STATE&&typeof FACTUAL_STATE.installGetCloserStoryConsumer==="function"
+  ?FACTUAL_STATE.installGetCloserStoryConsumer()
+  :null;
+if(FACTUAL_STATE&&(!consumerInstall||consumerInstall.success!==true)){
+  throw new Error(`kakashi_get_closer_story_consumer_install_failed:${consumerInstall&&consumerInstall.reason||"unknown"}`);
+}
+
 function diagnostics(){
   const registered=PROVIDER.getRegisteredStoryFactualBindings();
   const byRef=new Map(registered.map(row=>[row.bindingRef,row]));
@@ -132,14 +152,33 @@ function diagnostics(){
     pursuitPakkunPredicateSeparated:!!pursuit&&pursuit.outcomeRefs.includes("PURSUIT_SUCCESS_AMT_REACHED")&&pursuit.outcomeRefs.includes("PURSUIT_FAILURE_AMT_ESCAPES_WITH_PACKAGE"),
     dispositionsDeterministic:["academy_kakashi.resolver.disposition_police","academy_kakashi.resolver.disposition_release","academy_kakashi.resolver.disposition_return_anbu"].every(ref=>byRef.get(ref)&&byRef.get(ref).outcomeRefs.length===1),
     deferredExactEnvelopesFailClosed:DEFERRED_EXACT_ENVELOPE_BINDINGS.every(ref=>!byRef.has(ref)),
-    selectionOnlyNoWorldCommit:registrations.every(Boolean),
+    commitOwnerOptionalByLoadContext:!FACTUAL_STATE||typeof FACTUAL_STATE.getCommitResult==="function",
+    getCloserConsumerInstalledWhenCommitOwnerPresent:!FACTUAL_STATE||!!consumerInstall&&consumerInstall.success===true,
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-  return{pass:failed.length===0,checks,failed,registeredBindingRefs:registrations.map(row=>row.bindingRef),deferredExactEnvelopeBindings:[...DEFERRED_EXACT_ENVELOPE_BINDINGS],browserGoldenClaimed:false};
+  return{
+    pass:failed.length===0,
+    checks,
+    failed,
+    registeredBindingRefs:registrations.map(row=>row.bindingRef),
+    deferredExactEnvelopeBindings:[...DEFERRED_EXACT_ENVELOPE_BINDINGS],
+    factualCommitOwnerPresent:!!FACTUAL_STATE,
+    consumerInstall:consumerInstall?{...consumerInstall}:null,
+    browserGoldenClaimed:false
+  };
 }
 
-const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,registrations:Object.freeze(registrations.slice()),deferredExactEnvelopeBindings:DEFERRED_EXACT_ENVELOPE_BINDINGS,diagnostics,browserGoldenClaimed:false});
+const api=Object.freeze({
+  patchId:PATCH_ID,
+  authority:AUTHORITY,
+  registrations:Object.freeze(registrations.slice()),
+  deferredExactEnvelopeBindings:DEFERRED_EXACT_ENVELOPE_BINDINGS,
+  factualCommitOwnerPresent:!!FACTUAL_STATE,
+  consumerInstall,
+  diagnostics,
+  browserGoldenClaimed:false
+});
 globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700=api;
 globalThis.runAcademyKakashiFactualBindings34700Diagnostics=diagnostics;
 })();
