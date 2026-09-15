@@ -22,7 +22,7 @@ const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-3
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
 const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
-const BUILD="kakashi-final-20260916-11";
+const BUILD="kakashi-final-20260916-12";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
