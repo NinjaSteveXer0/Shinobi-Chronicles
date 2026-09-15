@@ -237,12 +237,14 @@ function clearStoryFactualResolverReceiptsForDiagnostics(){ensureRoot().receipts
 
 function runStoryFactualResolver34600Diagnostics(){
   const source=resolveStoryFactualAction.toString();
+  const persistIndex=source.lastIndexOf("root.receipts[key]=receipt;save()");
+  const newSelectionFinalizeIndex=source.lastIndexOf("return finalizeSelectedReceipt(binding,receipt");
   const checks={
     patchId:PATCH_ID==="story_factual_resolver_34600_2026_09_15",
     semanticProviderId:PROVIDER_ID==="ce.neutral_story_factual_resolver.v1",
     authorityPinned:AUTHORITY==="f2291162085cb3a35fc2a8e49df7ed905c214c85",
     eligibilityBeforeSelection:source.indexOf("evaluateOutcomeEligibility")<source.indexOf("selectOutcome"),
-    receiptPersistedBeforeCommit:source.indexOf("root.receipts[key]=receipt;save()")<source.indexOf("finalizeSelectedReceipt"),
+    receiptPersistedBeforeCommit:persistIndex>=0&&newSelectionFinalizeIndex>persistIndex,
     noMathRandom:!resolveStoryFactualAction.toString().includes("Math.random")&&!stableDraw.toString().includes("Math.random"),
     idempotenceLookupBeforeSelection:source.indexOf("existing=root.receipts[key]")<source.indexOf("evaluateOutcomeEligibility"),
     browserGoldenClaimed:false
