@@ -18,7 +18,7 @@ const exactFive=[
   "academy_kakashi_clone_feint",
   "academy_kakashi_opening_exploit",
   "academy_kakashi_wire_snare",
-  "academy_kakashi_prodigy_read"
+  "academy_kakashi_prodigys_read"
 ];
 
 // Source probe kept intentionally narrow: when a browser card label and its
