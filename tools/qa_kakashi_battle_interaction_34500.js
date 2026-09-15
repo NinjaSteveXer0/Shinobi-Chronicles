@@ -14,7 +14,8 @@ assert(src.includes('data-battle-skill-id'),"battleSkillId dataset generation mu
 assert(src.includes('data-skill-id'),"skillId dataset generation must be accepted");
 assert(src.includes('visibleBattleSkills34500'),"listener-driven cards need active-actor Skill fallback");
 assert(src.includes('renderTemporaryBattleSkillGuide'),"hover/focus must use the native Skill Guide renderer");
-assert(!src.match(/function renderGuide34500[\s\S]*?\n  }[\s\S]*?selectBattlePreparedSkill\(/),"hover must not select a Skill");
+const guideBody=src.slice(src.indexOf("function renderGuide34500"),src.indexOf("function activate34500"));
+assert(guideBody.length>0&&!guideBody.includes("selectBattlePreparedSkill("),"hover must not select a Skill");
 assert(src.includes('activateBattlePreparedSkillCard'),"click should prefer the existing one-click Battle bridge");
 assert(src.includes('confirmSelectedBattleSkill'),"fallback click must still reach native Battle confirmation");
 assert(src.includes('stopImmediatePropagation'),"capture click must suppress competing select-only listeners");
