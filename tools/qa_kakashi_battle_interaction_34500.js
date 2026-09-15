@@ -4,16 +4,35 @@ const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("ass
 const root=path.resolve(__dirname,"..");
 const file=path.join(root,"runtime","alpha-kakashi-battle-interaction-hotfix-34500.js");
 const gameFile=path.join(root,"game.js");
+const originIntegratorFile=path.join(root,"runtime","alpha-origin-scenes-32900-integrator.js");
+const decisionFile=path.join(root,"runtime","alpha-story-decision-realisation-34000.js");
+const adapterLoaderFile=path.join(root,"runtime","alpha-kakashi-final-origin-adapter-34100.js");
 const src=fs.readFileSync(file,"utf8");
 const gameSrc=fs.readFileSync(gameFile,"utf8");
+const originIntegratorSrc=fs.readFileSync(originIntegratorFile,"utf8");
+const decisionSrc=fs.readFileSync(decisionFile,"utf8");
+const adapterLoaderSrc=fs.readFileSync(adapterLoaderFile,"utf8");
 
 const exactFive=[
   "academy_kakashi_kunai_quickdraw",
   "academy_kakashi_clone_feint",
   "academy_kakashi_opening_exploit",
   "academy_kakashi_wire_snare",
-  "academy_kakashi_prodigy_read"
+  "academy_kakashi_prodigys_read"
 ];
+
+// Source probe kept intentionally narrow: when a browser card label and its
+// internal Skill ID drift, the CI checkout reports the canonical game.js IDs
+// rather than letting QA silently invent an identifier.
+const gameKakashiIds=[...new Set(gameSrc.match(/\bacademy_kakashi_[a-z0-9_]+\b/g)||[])].sort();
+const prodigySource=[];
+for(const rel of ["game.js",...fs.readdirSync(path.join(root,"runtime")).filter(name=>name.endsWith(".js")).map(name=>`runtime/${name}`)]){
+  const text=fs.readFileSync(path.join(root,rel),"utf8");
+  text.split(/\r?\n/).forEach((line,index)=>{
+    if(/prodig/i.test(line))prodigySource.push({file:rel,line:index+1,text:line.trim().slice(0,500)});
+  });
+}
+console.log("KAKASHI_BATTLE_SOURCE_PROBE "+JSON.stringify({gameKakashiIds,prodigySource},null,2));
 
 // Source contract: canonical five-skill source first, late DOM/deployment repair,
 // both card generations, presentation-only hover, capture-owned click, and no
@@ -41,6 +60,22 @@ assert(src.includes('browserGoldenClaimed:false'),"browser Golden must remain un
 for(const id of exactFive){
   assert(gameSrc.includes(id),`canonical game.js Battle authority must contain ${id}`);
 }
+
+// Production browser delivery contract. A changed child runtime is not a real
+// browser repair if an unchanged versioned parent URL can keep serving the old
+// loader/child from cache. Gate each dynamic boundary that delivers 34500.
+assert(originIntegratorSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260915-2'),
+  "32900 must request the current 34000 cache identity");
+assert(!originIntegratorSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260915-1"'),
+  "32900 must not retain the stale 34000 cache identity");
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-10'),
+  "34000 must request the current 34100 cache identity");
+assert(!decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-1"'),
+  "34000 must not retain the stale 34100 cache identity");
+assert(adapterLoaderSrc.includes('const BUILD="kakashi-final-20260915-10";'),
+  "34100 must request current Kakashi runtime children including 34500");
+assert(!adapterLoaderSrc.includes('const BUILD="kakashi-final-20260915-9";'),
+  "34100 must not retain the stale child cache identity");
 
 // Headless semantic bridge. The exact Kakashi launcher deliberately attaches
 // deployment metadata only when it returns; 34500 must wrap that seam without
@@ -120,6 +155,7 @@ console.log(JSON.stringify({
   pass:true,
   patch:"34500-v3",
   exactFiveSkillsCanonical:true,
+  browserCacheIdentityChainCurrent:true,
   lateDOMObserved:true,
   postDeploymentHardening:true,
   bothCardGenerationsCovered:true,
