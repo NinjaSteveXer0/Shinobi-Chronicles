@@ -64,14 +64,14 @@ for(const id of exactFive){
 // Production browser delivery contract. A changed child runtime is not a real
 // browser repair if an unchanged versioned parent URL can keep serving the old
 // loader/child from cache. Gate each dynamic boundary that delivers 34500.
-assert(originIntegratorSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260915-2'),
+assert(originIntegratorSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-3'),
   "32900 must request the current 34000 cache identity");
-assert(!originIntegratorSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260915-1"'),
-  "32900 must not retain the stale 34000 cache identity");
-assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-10'),
+assert(!originIntegratorSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260915-2"'),
+  "32900 must not retain the prior 34000 cache identity");
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-11'),
   "34000 must request the current 34100 cache identity");
-assert(!decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-1"'),
-  "34000 must not retain the stale 34100 cache identity");
+assert(!decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260915-10"'),
+  "34000 must not retain the prior 34100 cache identity");
 assert(adapterLoaderSrc.includes('const BUILD="kakashi-final-20260916-11";'),
   "34100 must request current Kakashi runtime children including 34500 and 34120");
 assert(!adapterLoaderSrc.includes('const BUILD="kakashi-final-20260915-10";'),
