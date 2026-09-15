@@ -10,6 +10,7 @@ on:
       - 'runtime/alpha-kakashi-final-origin-adapter-34100-core.js'
       - 'runtime/alpha-kakashi-final-authority-guard-34200.js'
       - 'runtime/alpha-kakashi-origin-battle-deployment-34300.js'
+      - 'runtime/alpha-kakashi-browser-red-fixes-34400.js'
       - 'tools/qa_issue_188_story_decision_runtime.js'
       - 'tools/qa_issue_188_kakashi_final_guard.js'
       - 'tools/qa_academy_kakashi_origin_battle_deployment.js'
@@ -35,6 +36,7 @@ jobs:
           node --check runtime/alpha-kakashi-final-origin-adapter-34100-core.js
           node --check runtime/alpha-kakashi-final-authority-guard-34200.js
           node --check runtime/alpha-kakashi-origin-battle-deployment-34300.js
+          node --check runtime/alpha-kakashi-browser-red-fixes-34400.js
           node --check tools/qa_issue_188_story_decision_runtime.js
           node --check tools/qa_issue_188_kakashi_final_guard.js
           node --check tools/qa_academy_kakashi_origin_battle_deployment.js
@@ -43,6 +45,7 @@ jobs:
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-browser-red-fixes-34400.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
       - name: Neutral Story decision and Kakashi autonomy harness
         run: node tools/qa_issue_188_story_decision_runtime.js
       - name: Kakashi stale-terminal final-authority guard
