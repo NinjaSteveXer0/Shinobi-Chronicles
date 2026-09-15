@@ -21,9 +21,6 @@ const exactFive=[
   "academy_kakashi_prodigys_read"
 ];
 
-// Source contract: browser interaction only. 34500 may route a rendered card to
-// native Battle selection/confirmation, but may never become a damage/state
-// resolver itself.
 assert(src.includes('const VERSION="34500-v4"'),"34500 v4 not active");
 assert(src.includes('document.addEventListener("click",delegatedClick34500,true)'),"document capture delegation missing");
 assert(src.includes('resolveDelegatedCard34500'),"rendered-card delegation missing");
@@ -40,14 +37,18 @@ assert(gameSrc.includes("function confirmSelectedBattleSkill()"),"native confirm
 assert(gameSrc.includes("const result=attemptBattlePreparedSkill(skillId,targetParticipantId,options)"),"native confirm no longer dispatches through Battle skill authority");
 assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/closure Battle resolver missing");
 
-// Delivery identity: a changed child is not browser-visible if an unchanged
-// versioned parent can serve an older 34100/34500 chain.
-assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),
-  "32900 must request current 34000 cache identity");
-assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-12'),
-  "34000 must request current 34100 cache identity");
+// Preserve the already-proven parent semantic identities; only the 34100 child
+// build advances for this Battle interaction correction. Ctrl+F5 revalidates
+// the parent chain, while BUILD=12 gives every Kakashi child (including 34500)
+// a new concrete URL.
+assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-3'),
+  "32900 Story-decision parent identity drifted unexpectedly");
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-11'),
+  "34000 Kakashi adapter parent identity drifted unexpectedly");
 assert(adapterSrc.includes('const BUILD="kakashi-final-20260916-12";'),
   "34100 must request current 34500 child cache identity");
+assert(adapterSrc.includes('fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`'),
+  "34500 child is not versioned by current Kakashi BUILD");
 
 function makeClassList(classes=[]){
   const set=new Set(classes);
@@ -106,10 +107,6 @@ function buildContext({nativeActivator=true}={}){
   };
 }
 
-// The prior QA only called the exported activator directly. This is the browser
-// regression that matters: a rendered card exists, 34500 installs document
-// capture, and an actual click delivered through that listener reaches the
-// native action bridge exactly once.
 const delegated=buildContext({nativeActivator:true});
 assert((delegated.listeners.click||[]).some(row=>row.capture===true),"document capture click listener not installed");
 const click=delegated.dispatchClick();
@@ -121,20 +118,16 @@ assert.strictEqual(delegated.counts().selectCalls,0,"native bridge path must not
 assert.strictEqual(delegated.counts().confirmCalls,0,"native bridge path must not double-confirm");
 assert.strictEqual(click.lastResult.success,true,"rendered delegated click must report action success");
 
-// If 32700's convenience activator is absent, the same rendered click must still
-// traverse the canonical select -> confirm path exactly once.
 const fallback=buildContext({nativeActivator:false});
 const fallbackClick=fallback.dispatchClick();
 assert.strictEqual(fallbackClick.lastResult.success,true,"rendered fallback click failed");
 assert.strictEqual(fallback.counts().selectCalls,1,"rendered fallback click must select exactly once");
 assert.strictEqual(fallback.counts().confirmCalls,1,"rendered fallback click must confirm exactly once");
 
-// Hover/focus remains presentation only and must never commit a Battle action.
 for(const fn of delegated.cardListeners.mouseenter||[])fn({target:delegated.card});
 assert.strictEqual(delegated.counts().guideCalls,1,"hover must reach native guide once");
 assert.strictEqual(delegated.counts().nativeCalls,1,"hover must not execute a Skill");
 
-// Scope must fail closed outside the exact Kakashi Origin deployment.
 delegated.context.currentBattle.kakashiOriginDeployment.controllerParticipantId="other_controller";
 const blocked=delegated.context.activateAcademyKakashiBattleSkill34500(exactFive[0]);
 assert.strictEqual(blocked.success,false,"34500 must not leak outside Kakashi Origin Battle");
@@ -153,6 +146,6 @@ console.log(JSON.stringify({
   selectConfirmFallbackExactlyOnce:true,
   hoverPresentationOnly:true,
   resolverSemanticsUntouched:true,
-  cacheDeliveryIdentityCurrent:true,
+  kakashiChildCacheIdentity:"kakashi-final-20260916-12",
   browserGoldenClaimed:false
 },null,2));
