@@ -1,15 +1,15 @@
 // ============================================================================
-// ACADEMY KAKASHI BATTLE INTERACTION HOTFIX — 34500 v2
+// ACADEMY KAKASHI BATTLE INTERACTION HOTFIX — 34500 v3
 // Installed-browser evidence: 2026-09-15 Stephen Kakashi Origin replay.
 //
 // Contract:
 //   HOVER / FOCUS = LEARN (presentation only; never selects/commits)
 //   CLICK          = ACT   (reuse native Battle selection/confirmation)
 //
-// The live Battle deck may be inserted/replaced after this script installs.
-// This patch therefore observes DOM replacement, recognizes both Battle-card
-// generations, and owns Kakashi-Origin card interaction in capture phase so a
-// select-only legacy listener cannot swallow the same click.
+// The live Battle deck may be inserted/replaced before Kakashi's exact
+// deployment metadata is attached. This compatibility bridge therefore reads
+// the canonical Battle five-skill palette first, observes DOM replacement, and
+// hardens the deck again after the exact Kakashi launcher returns.
 //
 // This file does NOT resolve damage, setup, control, targeting, conditions,
 // Battle PL, rewards, custody, or Story outcomes. Native Battle authority does.
@@ -19,8 +19,8 @@
   "use strict";
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_INTERACTION_34500)return;
 
-  const VERSION="34500-v2";
-  const PATCH_ID="alpha_kakashi_battle_interaction_hotfix_34500_v2_2026_09_15";
+  const VERSION="34500-v3";
+  const PATCH_ID="alpha_kakashi_battle_interaction_hotfix_34500_v3_2026_09_15";
   const KAKASHI="academy_kakashi";
   const boundCards=new WeakSet();
   let observer=null;
@@ -39,17 +39,60 @@
     return controller===KAKASHI;
   }
 
+  function activeActor34500(){
+    const battle=battle34500();
+    if(!battle)return null;
+    if(typeof getBattleDeploymentParticipant==="function"){
+      try{
+        const participant=getBattleDeploymentParticipant("player",1);
+        if(participant)return participant;
+      }catch(_error){}
+    }
+    if(Array.isArray(battle.playerParticipants)){
+      const kakashi=battle.playerParticipants.find(row=>row&&String(row.id||row.participantId||"")===KAKASHI);
+      if(kakashi)return kakashi;
+    }
+    return battle.activePlayer||null;
+  }
+
   function normalizeText34500(value){
     return String(value||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
+  }
+
+  function canonicalBattleSkills34500(actor){
+    if(!actor||typeof getBattleUISkillPalettePresentation!=="function"||typeof getBattlePreparedSkillDefinition!=="function")return[];
+    try{
+      const palette=getBattleUISkillPalettePresentation(actor);
+      const ids=palette&&Array.isArray(palette.skillIds)?palette.skillIds.filter(Boolean):[];
+      if(!ids.length)return[];
+      return ids.map(id=>{
+        const definition=getBattlePreparedSkillDefinition(actor,String(id));
+        if(definition&&typeof definition==="object")return Object.assign({id:String(id)},definition);
+        return{id:String(id),name:String(id)};
+      });
+    }catch(_error){return[];}
   }
 
   function visibleBattleSkills34500(){
     const battle=battle34500();
     if(!battle)return[];
-    const actor=battle.activePlayer
-      ||(Array.isArray(battle.playerParticipants)&&battle.playerParticipants.find(row=>row&&row.id===KAKASHI))
-      ||null;
-    const pools=[actor&&actor.skills,battle.preparedSkills,battle.playerSkills];
+    const actor=activeActor34500();
+
+    // Canonical source: the exact same palette/definition pair used by the
+    // production Battle deck renderer. Compatibility pools remain fallback
+    // only for older Battle generations.
+    const canonical=canonicalBattleSkills34500(actor);
+    if(canonical.length)return canonical;
+
+    const pools=[
+      actor&&actor.battlePreparedSkills,
+      actor&&actor.preparedSkills,
+      actor&&actor.skills,
+      battle.battlePreparedSkills,
+      battle.preparedSkills,
+      battle.playerSkills,
+      battle.skills
+    ];
     for(const pool of pools){
       if(Array.isArray(pool)&&pool.length)return pool.filter(Boolean);
     }
@@ -87,7 +130,7 @@
     if(match)return String(match[1]||"").trim()||null;
 
     // Listener-driven cards can have no dataset/inline handler. Resolve the
-    // visible card title against the active actor's already-authored Skills.
+    // visible card title against the active actor's canonical authored Skills.
     const label=normalizeText34500(cardLabel34500(card));
     if(label){
       const skill=visibleBattleSkills34500().find(row=>{
@@ -121,8 +164,9 @@
   function activate34500(skillId){
     if(!activeKakashiBattle34500()||!skillId)return{success:false,reason:"kakashi_origin_battle_not_active"};
 
-    // 32700's one-click bridge is the canonical browser path: select then
-    // confirm unless the Skill explicitly requires a branch/mode choice.
+    // If the native one-click bridge exists, prefer it. Otherwise use the
+    // canonical select+confirm path; Skills requiring an authored mode/branch
+    // remain waiting for explicit player selection.
     if(typeof activateBattlePreparedSkillCard==="function"){
       const out=activateBattlePreparedSkillCard(String(skillId));
       return out&&typeof out==="object"
@@ -257,6 +301,25 @@
     return true;
   }
 
+  function wrapKakashiLaunch34500(){
+    const name="launchAcademyKakashiOriginPlBattle";
+    const prior=globalThis[name];
+    if(typeof prior!=="function"||prior.__scKakashiBattleInteraction34500)return false;
+    const wrapped=function(){
+      const result=prior.apply(this,arguments);
+      if(result&&typeof result.then==="function"){
+        return result.then(value=>{scheduleHarden34500();return value;});
+      }
+      // 34300 attaches currentBattle.kakashiOriginDeployment immediately before
+      // returning. Harden only now so the scope predicate can see that fact.
+      scheduleHarden34500();
+      return result;
+    };
+    wrapped.__scKakashiBattleInteraction34500=true;
+    globalThis[name]=wrapped;
+    return true;
+  }
+
   function installObserver34500(){
     if(typeof MutationObserver!=="function"||typeof document==="undefined")return false;
     const target=document.body||document.documentElement;
@@ -272,6 +335,7 @@
   wrapRender34500("refreshBattleActionRegionPresentation");
   wrapRender34500("refreshBattleLiveDOM33000");
   wrapRender34500("renderBattle");
+  wrapKakashiLaunch34500();
   installObserver34500();
   scheduleHarden34500();
 
@@ -279,9 +343,12 @@
     const parser=skillIdFromCard34500.toString();
     const activation=activate34500.toString();
     const binding=bindCard34500.toString();
+    const skillSource=visibleBattleSkills34500.toString();
+    const launchWrapper=wrapKakashiLaunch34500.toString();
     const checks={
-      patchId:PATCH_ID==="alpha_kakashi_battle_interaction_hotfix_34500_v2_2026_09_15",
+      patchId:PATCH_ID==="alpha_kakashi_battle_interaction_hotfix_34500_v3_2026_09_15",
       exactKakashiScope:activeKakashiBattle34500.toString().includes("controllerParticipantId")&&activeKakashiBattle34500.toString().includes("academy_kakashi")===false,
+      canonicalPaletteFirst:skillSource.includes("canonicalBattleSkills34500")&&canonicalBattleSkills34500.toString().includes("getBattleUISkillPalettePresentation")&&canonicalBattleSkills34500.toString().includes("getBattlePreparedSkillDefinition"),
       acceptsBothHandlerGenerations:parser.includes("activateBattlePreparedSkillCard")&&parser.includes("selectBattlePreparedSkill"),
       acceptsBothDatasetGenerations:parser.includes("battleSkillId")&&parser.includes("skillId"),
       listenerDrivenTitleFallback:parser.includes("visibleBattleSkills34500"),
@@ -289,6 +356,7 @@
       clickPrefersNativeActivator:activation.includes("activateBattlePreparedSkillCard"),
       clickFallbackUsesNativeCommit:activation.includes("selectBattlePreparedSkill")&&activation.includes("confirmSelectedBattleSkill"),
       clickOwnsCapturePhase:binding.includes("stopImmediatePropagation")&&binding.includes("addEventListener(\"click\",act,true)"),
+      postDeploymentLaunchHardening:launchWrapper.includes("launchAcademyKakashiOriginPlBattle")&&launchWrapper.includes("scheduleHarden34500"),
       observesLateDOM:typeof MutationObserver!=="undefined"?!!observer:true,
       broadBattleCardCoverage:cardCandidates34500.toString().includes("battle-live-skill-card")&&cardCandidates34500.toString().includes("battle-dev-skill-card"),
       noDirectDamageResolver:!activation.includes("resolveBattleDamagePacket")&&!activation.includes("applyBattleDamage")&&!activation.includes("recordBattleEvidence"),
