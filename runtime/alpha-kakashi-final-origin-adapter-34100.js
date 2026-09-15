@@ -11,18 +11,23 @@
 
 const CORE_PATH="runtime/alpha-kakashi-final-origin-adapter-34100-core.js";
 const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
-const BUILD="kakashi-final-20260915-2";
+const BUILD="kakashi-final-20260915-3";
 
+function builtin(name){
+  if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
+  const req=typeof globalThis.require==="function"?globalThis.require:null;
+  return req?req(name):null;
+}
 function loadHeadless(path){
-  if(typeof require!=="function")return false;
-  const fs=require("fs"),vm=require("vm"),pathModule=require("path");
+  const fs=builtin("fs"),vm=builtin("vm"),pathModule=builtin("path");
+  if(!fs||!vm||!pathModule||typeof process==="undefined")return false;
   const absolute=pathModule.resolve(process.cwd(),path);
   vm.runInThisContext(fs.readFileSync(absolute,"utf8"),{filename:path});
   return true;
 }
 
 if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function"){
-  if(!globalThis.SC_ALPHA_KAKASHI_FINAL_34100)loadHeadless(CORE_PATH);
+  if(!globalThis.SC_ALPHA_KAKASHI_FINAL_34100&&!loadHeadless(CORE_PATH))return;
   if(!globalThis.SC_ALPHA_KAKASHI_FINAL_GUARD_34200)loadHeadless(GUARD_PATH);
   return;
 }
