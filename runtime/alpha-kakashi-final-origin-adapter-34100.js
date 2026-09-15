@@ -6,7 +6,7 @@
 // semantic core -> stale-authority guard -> Combat deployment -> exact
 // sequential Story/Battle consumer -> installed-browser presentation fixes ->
 // installed-browser Battle interaction correction -> neutral factual provider ->
-// Kakashi factual binding registrations.
+// canonical Kakashi factual-state commit owner -> Kakashi factual bindings.
 // Headless semantic QA loads only core + guard; dedicated harnesses load later
 // layers explicitly so each ownership seam remains independently testable.
 // ============================================================================
@@ -20,8 +20,9 @@ const SEQUENTIAL_PATH="runtime/alpha-kakashi-final-sequential-consumer-34410.js"
 const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
 const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-34500.js";
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
+const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
-const BUILD="kakashi-final-20260915-10";
+const BUILD="kakashi-final-20260916-11";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -50,15 +51,26 @@ function loadKakashiFactualBindings(){
   bindings.async=false;
   document.head.appendChild(bindings);
 }
-function loadFactualProvider(){
-  if(globalThis.SC_STORY_FACTUAL_RESOLVER_34600){loadKakashiFactualBindings();return;}
-  const existing=document.getElementById("sc-story-factual-resolver-34600-script");
+function loadFactualState(){
+  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120){loadKakashiFactualBindings();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-factual-state-34120-script");
   if(existing){existing.addEventListener("load",loadKakashiFactualBindings,{once:true});return;}
+  const state=document.createElement("script");
+  state.id="sc-alpha-kakashi-factual-state-34120-script";
+  state.src=`${FACTUAL_STATE_PATH}?sc=${BUILD}`;
+  state.async=false;
+  state.addEventListener("load",loadKakashiFactualBindings,{once:true});
+  document.head.appendChild(state);
+}
+function loadFactualProvider(){
+  if(globalThis.SC_STORY_FACTUAL_RESOLVER_34600){loadFactualState();return;}
+  const existing=document.getElementById("sc-story-factual-resolver-34600-script");
+  if(existing){existing.addEventListener("load",loadFactualState,{once:true});return;}
   const factual=document.createElement("script");
   factual.id="sc-story-factual-resolver-34600-script";
   factual.src=`${FACTUAL_PROVIDER_PATH}?sc=${BUILD}`;
   factual.async=false;
-  factual.addEventListener("load",loadKakashiFactualBindings,{once:true});
+  factual.addEventListener("load",loadFactualState,{once:true});
   document.head.appendChild(factual);
 }
 function loadBattleInteraction(){
