@@ -2,7 +2,8 @@
 // ISSUES #188 + #192 + #201 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
 //
 // The final semantic adapter is preserved byte-for-byte in the 34100 core file.
-// Browser order is: semantic core -> stale-authority guard -> Combat deployment.
+// Browser order is:
+// semantic core -> stale-authority guard -> Combat deployment -> browser RED fixes.
 // Headless semantic QA loads only core + guard; full Battle QA loads 34300 with
 // game.js so the Combat bridge is validated against the real Battle engine.
 // ============================================================================
@@ -12,7 +13,8 @@
 const CORE_PATH="runtime/alpha-kakashi-final-origin-adapter-34100-core.js";
 const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
 const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
-const BUILD="kakashi-final-20260915-4";
+const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
+const BUILD="kakashi-final-20260915-5";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -33,12 +35,23 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadBrowserFix(){
+  if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400||document.getElementById("sc-alpha-kakashi-browser-red-fixes-34400-script"))return;
+  const fix=document.createElement("script");
+  fix.id="sc-alpha-kakashi-browser-red-fixes-34400-script";
+  fix.src=`${BROWSER_FIX_PATH}?sc=${BUILD}`;
+  fix.async=false;
+  document.head.appendChild(fix);
+}
 function loadBattle(){
-  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300||document.getElementById("sc-alpha-kakashi-origin-battle-deployment-34300-script"))return;
+  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300){loadBrowserFix();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-origin-battle-deployment-34300-script");
+  if(existing){existing.addEventListener("load",loadBrowserFix,{once:true});return;}
   const battle=document.createElement("script");
   battle.id="sc-alpha-kakashi-origin-battle-deployment-34300-script";
   battle.src=`${BATTLE_PATH}?sc=${BUILD}`;
   battle.async=false;
+  battle.addEventListener("load",loadBrowserFix,{once:true});
   document.head.appendChild(battle);
 }
 function loadGuard(){
