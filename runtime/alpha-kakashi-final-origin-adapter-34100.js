@@ -18,7 +18,7 @@ const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
 const SEQUENTIAL_PATH="runtime/alpha-kakashi-final-sequential-consumer-34410.js";
 const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
 const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-34500.js";
-const BUILD="kakashi-final-20260915-7";
+const BUILD="kakashi-final-20260915-8";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
