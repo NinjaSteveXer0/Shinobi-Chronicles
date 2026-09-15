@@ -3,9 +3,10 @@
 //
 // The final semantic adapter is preserved byte-for-byte in the 34100 core file.
 // Browser order is:
-// semantic core -> stale-authority guard -> Combat deployment -> browser RED fixes.
-// Headless semantic QA loads only core + guard; full Battle QA loads 34300 with
-// game.js so the Combat bridge is validated against the real Battle engine.
+// semantic core -> stale-authority guard -> Combat deployment -> exact
+// sequential Story/Battle consumer -> installed-browser presentation fixes.
+// Headless semantic QA loads only core + guard; dedicated harnesses load 34300
+// and 34410 with game.js to validate the real Battle/Story seams.
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -13,8 +14,9 @@
 const CORE_PATH="runtime/alpha-kakashi-final-origin-adapter-34100-core.js";
 const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
 const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
+const SEQUENTIAL_PATH="runtime/alpha-kakashi-final-sequential-consumer-34410.js";
 const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
-const BUILD="kakashi-final-20260915-5";
+const BUILD="kakashi-final-20260915-6";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -43,15 +45,26 @@ function loadBrowserFix(){
   fix.async=false;
   document.head.appendChild(fix);
 }
-function loadBattle(){
-  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300){loadBrowserFix();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-origin-battle-deployment-34300-script");
+function loadSequential(){
+  if(globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410){loadBrowserFix();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-final-sequential-consumer-34410-script");
   if(existing){existing.addEventListener("load",loadBrowserFix,{once:true});return;}
+  const sequential=document.createElement("script");
+  sequential.id="sc-alpha-kakashi-final-sequential-consumer-34410-script";
+  sequential.src=`${SEQUENTIAL_PATH}?sc=${BUILD}`;
+  sequential.async=false;
+  sequential.addEventListener("load",loadBrowserFix,{once:true});
+  document.head.appendChild(sequential);
+}
+function loadBattle(){
+  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300){loadSequential();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-origin-battle-deployment-34300-script");
+  if(existing){existing.addEventListener("load",loadSequential,{once:true});return;}
   const battle=document.createElement("script");
   battle.id="sc-alpha-kakashi-origin-battle-deployment-34300-script";
   battle.src=`${BATTLE_PATH}?sc=${BUILD}`;
   battle.async=false;
-  battle.addEventListener("load",loadBrowserFix,{once:true});
+  battle.addEventListener("load",loadSequential,{once:true});
   document.head.appendChild(battle);
 }
 function loadGuard(){
