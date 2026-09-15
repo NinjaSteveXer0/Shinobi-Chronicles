@@ -207,13 +207,29 @@ globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800D
 // Story authority has won the expression chain. The 33900 module is a generic
 // projection adapter over the existing Story renderer and consumes these exact
 // Kakashi-Origin-specific backdrop bindings; it does not create a second Story engine.
+// 33910 is a surgical presentation correction loaded only after 33900 is ready.
 (function activateStorySceneBoard33900AfterKakashi33800(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
   const SCRIPT_ID="sc-story-scene-board-33900-script";
-  if(globalThis.SC_STORY_SCENE_BOARD_33900||document.getElementById(SCRIPT_ID))return;
+  const POLISH_ID="sc-kakashi-scene-board-polish-33910-script";
+  const BUILD="scene-board-20260915-1";
+
+  function load33910(){
+    if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910||document.getElementById(POLISH_ID))return;
+    const polish=document.createElement("script");
+    polish.id=POLISH_ID;
+    polish.src=`runtime/alpha-kakashi-scene-board-polish-33910.js?v=${BUILD}`;
+    polish.async=false;
+    document.head.appendChild(polish);
+  }
+
+  if(globalThis.SC_STORY_SCENE_BOARD_33900){load33910();return;}
+  const existing=document.getElementById(SCRIPT_ID);
+  if(existing){existing.addEventListener("load",load33910,{once:true});return;}
   const script=document.createElement("script");
   script.id=SCRIPT_ID;
-  script.src="runtime/alpha-story-scene-board-33900.js";
+  script.src=`runtime/alpha-story-scene-board-33900.js?v=${BUILD}`;
   script.async=false;
+  script.addEventListener("load",load33910,{once:true});
   document.head.appendChild(script);
 })();
