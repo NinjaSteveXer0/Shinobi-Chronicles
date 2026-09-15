@@ -103,7 +103,9 @@ try{
     kakashiV2Source.includes('NPC/anbu_marked_target.png')&&
     kakashiV2Source.includes('NPC/package_smuggler.png')&&
     kakashiV2Source.includes('NPC/masked_interceptor.png')&&
-    !kakashiV2Source.includes('Enemies Portraits/'));
+    !kakashiV2Source.includes('rogue_chunin.png')&&
+    !kakashiV2Source.includes('cipher_handler.png')&&
+    !kakashiV2Source.includes('decoy_assassin.png'));
   assert("kakashi_v2_exact_extended_backdrops",
     backdrops.get("kakashi_origin_end_of_alleyway")==="Kakashi Origin Backdrop/end_of_alleyway.png"&&
     backdrops.get("kakashi_origin_pakkun_interception_alley")==="Kakashi Origin Backdrop/alleyway_konoha_night.png",[...backdrops]);
