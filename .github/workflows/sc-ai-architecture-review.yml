@@ -41,9 +41,14 @@ jobs:
 
       - name: Resolve exact review range
         shell: bash
+        env:
+          BASE_INPUT: ${{ inputs.base_ref }}
         run: |
           set -euo pipefail
-          BASE_INPUT='${{ inputs.base_ref }}'
+          if [[ -z "${BASE_INPUT}" ]]; then
+            echo "base_ref cannot be empty." >&2
+            exit 1
+          fi
           if ! BASE_SHA="$(git rev-parse "${BASE_INPUT}^{commit}" 2>/dev/null)"; then
             echo "Could not resolve base_ref: ${BASE_INPUT}" >&2
             exit 1
