@@ -95,7 +95,7 @@ const loader=fs.readFileSync(path.resolve(process.cwd(),'runtime/alpha-kakashi-f
 assert(loader.includes('alpha-story-factual-resolver-34600.js'),'browser loader does not include 34600 provider');
 assert(loader.includes('alpha-kakashi-factual-bindings-34700.js'),'browser loader does not include 34700 Kakashi bindings');
 assert(loader.indexOf('loadFactualProvider')<loader.indexOf('function loadBattleInteraction')||loader.includes('loadFactualProvider();return;'),'factual loader seam missing');
-assert(loader.includes('const BUILD="kakashi-final-20260916-13"'),'Kakashi child cache identity not advanced');
+assert(loader.includes('const BUILD="kakashi-final-20260916-14"'),'Kakashi child cache identity not advanced');
 
 console.log(JSON.stringify({
   pass:true,
@@ -105,5 +105,6 @@ console.log(JSON.stringify({
   improvedFailureConfig:improvedFail.result.battleConfigId,
   stableGetCloserOutcome:stableA.receipt.selectedOutcomeRef,
   deferredExactEnvelopeBindings:api.deferredExactEnvelopeBindings,
+  kakashiChildCacheIdentity:'kakashi-final-20260916-14',
   browserGoldenClaimed:false
 },null,2));
