@@ -2,6 +2,8 @@
 // ISSUE #112 — LIVE ARC-1 PRESSURE / SEMANTIC REFILL CORRECTION
 // This file does not create a second World system. It only drives the already
 // registered #112 opportunities through the existing worldEventRuntime setters.
+// Issue #209 adds one onboarding boundary: ordinary standing opportunities do
+// not refill while the mandatory first-team orientation is pending.
 // =========================================================
 (function installKonohaWorld112Correction(){
   "use strict";
@@ -9,6 +11,7 @@
   const STANDING="konoha_alpha_standing_pool_v1";
   const PRESSURE="konoha_arc1_pressure_pool_v1";
   const M9_LEAD="arc1_veterinary_ward_lead_01";
+  const FIRST_TEAM_PENDING="academy_first_konoha_tutorial_pending";
 
   function rows(){return Array.isArray(window.SC_KONOHA_ALPHA_WORLD_ROWS)?window.SC_KONOHA_ALPHA_WORLD_ROWS:[];}
   function state(id,dimension){return typeof getWorldEventDimensionState==="function"?getWorldEventDimensionState(dimension,id):{};}
@@ -17,6 +20,12 @@
     if(/^KON-P\d+$/.test(id))return true;
     if(typeof getAlphaKonohaV3ExplicitKnowledgeState!=="function")return false;
     return ["identified","actionable"].includes(getAlphaKonohaV3ExplicitKnowledgeState(id));
+  }
+  function isFirstTeamOrientationPending(){
+    try{
+      const acquisition=typeof ensurePlayerAcquisitionState==="function"?ensurePlayerAcquisitionState():null;
+      return !!(acquisition&&acquisition.onboardingStatus===FIRST_TEAM_PENDING);
+    }catch(_error){return false;}
   }
   function nextOccurrence(row){const prior=state(row.id,"resolutionByOpportunityId");const sequence=(Number(prior.sequence)||0)+1;return {sequence,occurrenceId:`${row.id}::${sequence}`,prior};}
   function activate(row){
@@ -33,6 +42,7 @@
     return true;
   }
   function refillStanding({suppressOpportunityId=null}={}){
+    if(isFirstTeamOrientationPending())return 0;
     const all=rows(),active=all.filter(r=>r.pool===STANDING&&isActive(r));
     const hostCounts=new Map();active.forEach(r=>hostCounts.set(r.host,(hostCounts.get(r.host)||0)+1));
     let count=active.length;
@@ -116,6 +126,7 @@
     const locatorSource=priorStoryLocator?globalThis.getCurrentWorldStoryLocator.toString():"";
     const checks={
       semanticRefillAfterCommittedAction:typeof executeSelectedOpportunityAction==="function"&&semanticRefill.toString().includes("refillStanding"),
+      standingRefillHonorsFirstTeamBoundary:refillStanding.toString().includes("isFirstTeamOrientationPending()"),
       pressureUsesLiveM1Seam:ensurePressure.toString().includes("isAlphaArc1Mission1Complete"),
       migrationReceiptPinned:RECEIPT==="world_activation_konoha_v1_pressure_migration_2026_09_12",
       m9ExactLeadAddress:M9_LEAD==="arc1_veterinary_ward_lead_01",
@@ -124,7 +135,7 @@
       browserGoldenClaimed:false
     };
     const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-    return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
+    return{patchId:"issue112-correction-plus-209-boundary",pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
   }
 
   window.ensureKonohaAlphaWorldSemanticRefill=semanticRefill;
