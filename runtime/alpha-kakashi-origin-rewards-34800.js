@@ -1,24 +1,27 @@
 // ============================================================================
-// ISSUE #188 / #197 / #199 — ACADEMY KAKASHI ORIGIN REWARD/DEVELOPMENT OWNER
-// 34800
+// ISSUE #188 / #197 / #199 — ACADEMY KAKASHI ORIGIN REWARD ADAPTER — 34800
 //
-// Consumes durable World / Combat / Progression / Acquisition authority.
-// This module does NOT make Battle victory equal Origin reward entitlement.
-// It projects only exact source-owned development/reward facts and keeps
-// terminal-debrief grants separate from ordinary Battle Victory claim.
+// Context-specific consumer of existing Progression / Inventory / Reward owners.
+// It does NOT create a second reward, Inventory or Progression system.
+// It supplies source-scoped/idempotent Kakashi Origin receipts and routes the
+// closed owner values into the existing canonical mutation APIs.
+//
+// Battle victory != terminal Origin reward entitlement.
+// Terminal debrief rewards are evaluated/committed only from exact factual input.
 // ============================================================================
 (function installAcademyKakashiOriginRewards34800(){
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800)return;
 
-const PATCH_ID="alpha_kakashi_origin_rewards_34800_v1_2026_09_17";
+const PATCH_ID="alpha_kakashi_origin_rewards_34800_v2_2026_09_17";
 const ROUTE="academy_kakashi_origin_reward";
 const KAKASHI="academy_kakashi";
 const ITEM_SOURCE="kak_origin_item_field_recovery_resupply";
 const WEAPON_SOURCE="kak_origin_weapon_exceptional_training_tanto";
 const ITEM_ID="field_recovery_pill";
 const WEAPON_ID="academy_training_tanto";
-const TECHNICAL_DISCIPLINES=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
+const TERMINAL_SOURCE="kak_origin_terminal_debrief_reward";
+const DISCIPLINE_ID=Object.freeze({ninjutsu:"nin",taijutsu:"tai",genjutsu:"gen",bukijutsu:"buki",fuinjutsu:"fuin",kinjutsu:"kin",stamina:"stamina"});
 const WORLD_AUTHORITY_COMMIT="91f5969b20e270b3ef7d148342f28a1668b4eba1";
 const COMBAT_AUTHORITY_COMMIT="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8";
 const PROGRESSION_AUTHORITY_COMMIT="54314cc29e1374783cae0a0d90654cc9a2316a45";
@@ -27,116 +30,96 @@ const ACQUISITION_AUTHORITY_COMMIT="b83884adb70f1e74e62f96ab96848c1ec33704f9";
 function clone(v){try{return JSON.parse(JSON.stringify(v));}catch(_error){return v;}}
 function ensureRoot(){
   if(typeof playerData!=="object"||!playerData)return null;
-  playerData.kakashiOriginRewards=playerData.kakashiOriginRewards&&typeof playerData.kakashiOriginRewards==="object"?playerData.kakashiOriginRewards:{};
-  const root=playerData.kakashiOriginRewards;
+  playerData.kakashiOriginRewardReceipts=playerData.kakashiOriginRewardReceipts&&typeof playerData.kakashiOriginRewardReceipts==="object"?playerData.kakashiOriginRewardReceipts:{};
+  const root=playerData.kakashiOriginRewardReceipts;
   root.route=ROUTE;
-  root.sourceReceipts=root.sourceReceipts&&typeof root.sourceReceipts==="object"?root.sourceReceipts:{};
-  root.disciplineDevelopment=root.disciplineDevelopment&&typeof root.disciplineDevelopment==="object"?root.disciplineDevelopment:{};
-  root.fieldcraftEvidence=root.fieldcraftEvidence&&typeof root.fieldcraftEvidence==="object"?root.fieldcraftEvidence:{};
+  root.sources=root.sources&&typeof root.sources==="object"?root.sources:{};
+  root.battleDisciplineTotals=root.battleDisciplineTotals&&typeof root.battleDisciplineTotals==="object"?root.battleDisciplineTotals:{};
+  root.battleStaminaTotals=root.battleStaminaTotals&&typeof root.battleStaminaTotals==="object"?root.battleStaminaTotals:{};
+  root.fieldcraft=root.fieldcraft&&typeof root.fieldcraft==="object"?root.fieldcraft:{};
   root.entitlements=root.entitlements&&typeof root.entitlements==="object"?root.entitlements:{};
   root.grants=root.grants&&typeof root.grants==="object"?root.grants:{};
   return root;
 }
-function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){} try{if(typeof saveTestState==="function")saveTestState();}catch(_error){}}
+function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}try{if(typeof saveTestState==="function")saveTestState();}catch(_error){}}
 function sourceKey(kind,sourceId,subjectId=KAKASHI){return `${ROUTE}::${String(kind||"")}::${String(sourceId||"")}::${String(subjectId||"")}`;}
-function registerSourceOnce(kind,sourceId,payload={}){
-  const root=ensureRoot();if(!root||!sourceId)return{success:false,reason:"kakashi_reward_state_missing"};
-  const key=sourceKey(kind,sourceId,payload.subjectId||KAKASHI);
-  if(root.sourceReceipts[key])return{success:true,idempotent:true,receipt:clone(root.sourceReceipts[key])};
-  const receipt={sourceKey:key,route:ROUTE,kind:String(kind||""),sourceId:String(sourceId),subjectId:String(payload.subjectId||KAKASHI),payload:clone(payload),authority:{world:WORLD_AUTHORITY_COMMIT,combat:COMBAT_AUTHORITY_COMMIT,progression:PROGRESSION_AUTHORITY_COMMIT,acquisition:ACQUISITION_AUTHORITY_COMMIT}};
-  root.sourceReceipts[key]=receipt;save();return{success:true,idempotent:false,receipt:clone(receipt)};
+function sourceReceipt(kind,sourceId,subjectId=KAKASHI){const root=ensureRoot();return root&&root.sources[sourceKey(kind,sourceId,subjectId)]||null;}
+function registerSource(kind,sourceId,payload={}){
+  const root=ensureRoot();if(!root||!sourceId)return{success:false,reason:"kakashi_reward_receipt_store_missing"};
+  const subjectId=String(payload.subjectId||KAKASHI),key=sourceKey(kind,sourceId,subjectId);
+  if(root.sources[key])return{success:true,idempotent:true,receipt:clone(root.sources[key])};
+  const receipt={sourceKey:key,route:ROUTE,kind:String(kind),sourceId:String(sourceId),subjectId,payload:clone(payload),authority:{world:WORLD_AUTHORITY_COMMIT,combat:COMBAT_AUTHORITY_COMMIT,progression:PROGRESSION_AUTHORITY_COMMIT,acquisition:ACQUISITION_AUTHORITY_COMMIT}};
+  root.sources[key]=receipt;save();return{success:true,idempotent:false,receipt:clone(receipt)};
 }
 function normalizeDiscipline(value){return String(value||"").trim().toLowerCase().replace(/ū/g,"u");}
+function progressionAvailable(){return typeof addDisciplineExp==="function"&&typeof getCharacterDisciplineProgression==="function";}
 function recordTechnicalDisciplineDevelopment({sourceId,discipline,executionClass="attempt",subjectId=KAKASHI,battleOccurrenceId=null}={}){
-  const key=normalizeDiscipline(discipline);
-  if(!TECHNICAL_DISCIPLINES.has(key))return{success:false,reason:"technical_discipline_not_authored",discipline:key};
-  const amount=executionClass==="exceptional"?3:executionClass==="effective"?2:executionClass==="attempt"?1:0;
-  if(amount<=0)return{success:false,reason:"development_execution_not_material"};
-  const registered=registerSourceOnce("discipline_development",sourceId,{subjectId,discipline:key,executionClass,battleOccurrenceId});
-  if(!registered.success)return registered;
-  const root=ensureRoot();
-  if(registered.idempotent===true)return{success:true,idempotent:true,discipline:key,amount:0,total:Number(root.disciplineDevelopment[key]||0)};
-  const battleKey=battleOccurrenceId?String(battleOccurrenceId):null;
-  const capKey=battleKey?`${key}::${battleKey}`:null;
-  root.disciplineBattleTotals=root.disciplineBattleTotals&&typeof root.disciplineBattleTotals==="object"?root.disciplineBattleTotals:{};
-  const used=capKey?Number(root.disciplineBattleTotals[capKey]||0):0;
-  const granted=capKey?Math.max(0,Math.min(amount,6-used)):amount;
-  root.disciplineDevelopment[key]=Number(root.disciplineDevelopment[key]||0)+granted;
-  if(capKey)root.disciplineBattleTotals[capKey]=used+granted;
-  save();
-  return{success:true,idempotent:false,discipline:key,amount:granted,total:root.disciplineDevelopment[key],battleCap:capKey?6:null};
+  const key=normalizeDiscipline(discipline),disciplineId=DISCIPLINE_ID[key];
+  if(!disciplineId||key==="stamina")return{success:false,reason:"technical_discipline_not_authored",discipline:key};
+  if(!sourceId||!progressionAvailable())return{success:false,reason:"canonical_progression_api_missing"};
+  const authoredAmount=executionClass==="exceptional"?3:executionClass==="effective"?2:executionClass==="attempt"?1:0;
+  if(authoredAmount<=0)return{success:false,reason:"development_execution_not_material"};
+  if(sourceReceipt("discipline_development",sourceId,subjectId))return{success:true,idempotent:true,discipline:key,amount:0};
+  const root=ensureRoot(),battleKey=battleOccurrenceId?`${String(battleOccurrenceId)}::${key}`:null;
+  const used=battleKey?Number(root.battleDisciplineTotals[battleKey]||0):0;
+  const amount=battleKey?Math.max(0,Math.min(authoredAmount,6-used)):authoredAmount;
+  if(amount<=0){registerSource("discipline_development",sourceId,{subjectId,discipline:key,executionClass,battleOccurrenceId,amount:0,capReached:true});return{success:true,idempotent:false,discipline:key,amount:0,battleCap:6};}
+  const applied=addDisciplineExp(subjectId,disciplineId,amount,"kakashi_origin_action_development");
+  if(applied===false||applied==null)return{success:false,reason:"canonical_progression_commit_failed",discipline:key};
+  if(battleKey)root.battleDisciplineTotals[battleKey]=used+amount;
+  registerSource("discipline_development",sourceId,{subjectId,discipline:key,disciplineId,executionClass,battleOccurrenceId,amount});save();
+  return{success:true,idempotent:false,discipline:key,disciplineId,amount,progression:clone(getCharacterDisciplineProgression(subjectId,disciplineId))};
 }
 function recordStaminaDevelopment({sourceId,mitigationAmount,battleOccurrenceId,subjectId=KAKASHI}={}){
-  if(!(Number(mitigationAmount)>0)||!battleOccurrenceId)return{success:false,reason:"stamina_mitigation_fact_required"};
-  const registered=registerSourceOnce("stamina_development",sourceId,{subjectId,mitigationAmount:Number(mitigationAmount),battleOccurrenceId:String(battleOccurrenceId)});
-  const root=ensureRoot();if(!registered.success)return registered;
-  root.staminaBattleTotals=root.staminaBattleTotals&&typeof root.staminaBattleTotals==="object"?root.staminaBattleTotals:{};
-  const battleKey=String(battleOccurrenceId),used=Number(root.staminaBattleTotals[battleKey]||0);
-  if(registered.idempotent===true)return{success:true,idempotent:true,amount:0,total:Number(root.disciplineDevelopment.stamina||0)};
-  const granted=used<2?1:0;
-  root.disciplineDevelopment.stamina=Number(root.disciplineDevelopment.stamina||0)+granted;
-  root.staminaBattleTotals[battleKey]=used+granted;save();
-  return{success:true,idempotent:false,amount:granted,total:root.disciplineDevelopment.stamina,battleCap:2};
+  if(!sourceId||!(Number(mitigationAmount)>0)||!battleOccurrenceId)return{success:false,reason:"stamina_mitigation_fact_required"};
+  if(!progressionAvailable())return{success:false,reason:"canonical_progression_api_missing"};
+  if(sourceReceipt("stamina_development",sourceId,subjectId))return{success:true,idempotent:true,amount:0};
+  const root=ensureRoot(),battleKey=String(battleOccurrenceId),used=Number(root.battleStaminaTotals[battleKey]||0),amount=used<2?1:0;
+  if(amount>0){
+    const applied=addDisciplineExp(subjectId,DISCIPLINE_ID.stamina,1,"kakashi_origin_stamina_mitigation");
+    if(applied===false||applied==null)return{success:false,reason:"canonical_stamina_progression_commit_failed"};
+    root.battleStaminaTotals[battleKey]=used+1;
+  }
+  registerSource("stamina_development",sourceId,{subjectId,battleOccurrenceId:battleKey,mitigationAmount:Number(mitigationAmount),amount,capReached:amount===0});save();
+  return{success:true,idempotent:false,amount,progression:clone(getCharacterDisciplineProgression(subjectId,DISCIPLINE_ID.stamina))};
 }
 function recordFieldcraftEvidence({sourceId,family,evidenceType,significance=1,subjectId=KAKASHI}={}){
-  const allowed={
-    "fieldcraft.stealth_approach":new Set(["covert_approach_attempt","undetected_positioning","covert_route_execution"]),
-    "fieldcraft.covert_acquisition":new Set(["covert_acquisition_attempt","unnoticed_transfer_execution","sleight_of_hand_control"])
-  };
-  if(!allowed[family]||!allowed[family].has(String(evidenceType||"")))return{success:false,reason:"fieldcraft_evidence_not_authorised"};
+  const allowed={"fieldcraft.stealth_approach":new Set(["covert_approach_attempt","undetected_positioning","covert_route_execution"]),"fieldcraft.covert_acquisition":new Set(["covert_acquisition_attempt","unnoticed_transfer_execution","sleight_of_hand_control"])};
+  if(!sourceId||!allowed[family]||!allowed[family].has(String(evidenceType||"")))return{success:false,reason:"fieldcraft_evidence_not_authorised"};
   const sig=Math.max(1,Math.min(3,Number(significance)||1));
-  const registered=registerSourceOnce("fieldcraft_evidence",sourceId,{subjectId,family,evidenceType,significance:sig});
-  const root=ensureRoot();if(!registered.success)return registered;
-  const current=root.fieldcraftEvidence[family]||{family,significance:0,evidenceTypes:[],sourceIds:[]};
-  if(!registered.idempotent){
-    current.significance=Math.max(Number(current.significance||0),sig);
-    if(!current.evidenceTypes.includes(evidenceType))current.evidenceTypes.push(evidenceType);
-    if(!current.sourceIds.includes(String(sourceId)))current.sourceIds.push(String(sourceId));
-    root.fieldcraftEvidence[family]=current;save();
-  }
-  return{success:true,idempotent:registered.idempotent===true,evidence:clone(current)};
+  if(sourceReceipt("fieldcraft_evidence",sourceId,subjectId))return{success:true,idempotent:true,evidence:clone(ensureRoot().fieldcraft[family]||null)};
+  const root=ensureRoot(),current=root.fieldcraft[family]||{family,subjectId,significance:0,evidenceTypes:[],sourceIds:[]};
+  current.significance=Math.max(Number(current.significance||0),sig);
+  if(!current.evidenceTypes.includes(evidenceType))current.evidenceTypes.push(evidenceType);
+  if(!current.sourceIds.includes(String(sourceId)))current.sourceIds.push(String(sourceId));
+  root.fieldcraft[family]=current;registerSource("fieldcraft_evidence",sourceId,{subjectId,family,evidenceType,significance:sig});save();
+  return{success:true,idempotent:false,evidence:clone(current)};
 }
-function getInventoryContainer(){
-  if(typeof playerData!=="object"||!playerData)return null;
-  if(playerData.inventory&&typeof playerData.inventory==="object")return playerData.inventory;
-  playerData.inventory={};return playerData.inventory;
+function inventoryQuantity(itemId){
+  if(typeof playerData!=="object"||!playerData||!Array.isArray(playerData.inventory))return 0;
+  return playerData.inventory.filter(row=>row&&String(row.id||"")===String(itemId)).reduce((sum,row)=>sum+Math.max(1,Number(row.quantity)||1),0);
 }
-function grantPersistentItemQuantity(itemId,quantity){
-  const inventory=getInventoryContainer();if(!inventory)return{success:false,reason:"persistent_inventory_missing"};
-  const q=Math.max(0,Number(quantity)||0);if(q<=0)return{success:false,reason:"invalid_reward_quantity"};
-  if(inventory.items&&typeof inventory.items==="object"&&!Array.isArray(inventory.items)){
-    inventory.items[itemId]=Number(inventory.items[itemId]||0)+q;return{success:true,quantity:q,total:inventory.items[itemId]};
-  }
-  if(Array.isArray(inventory.items)){
-    const row=inventory.items.find(entry=>entry&&String(entry.id||entry.itemId||"")===itemId);
-    if(row){row.quantity=Number(row.quantity||0)+q;return{success:true,quantity:q,total:row.quantity};}
-    inventory.items.push({id:itemId,quantity:q});return{success:true,quantity:q,total:q};
-  }
-  inventory.items={[itemId]:q};return{success:true,quantity:q,total:q};
-}
-function grantSingletonWeapon(weaponId){
-  const inventory=getInventoryContainer();if(!inventory)return{success:false,reason:"persistent_inventory_missing"};
-  if(Array.isArray(inventory.weapons)){
-    const exists=inventory.weapons.some(row=>String(row&&row.id||row||"")===weaponId);
-    if(!exists)inventory.weapons.push(weaponId);
-    return{success:true,alreadyOwned:exists,weaponId};
-  }
-  inventory.weapons=inventory.weapons&&typeof inventory.weapons==="object"?inventory.weapons:{};
-  const exists=!!inventory.weapons[weaponId];inventory.weapons[weaponId]=inventory.weapons[weaponId]||{id:weaponId,owned:true};
-  return{success:true,alreadyOwned:exists,weaponId};
+function grantCatalogueItem(itemId){
+  if(typeof addItemToInventory!=="function"||typeof getItemDefinition!=="function")return{success:false,reason:"canonical_inventory_api_missing"};
+  const definition=getItemDefinition(itemId);if(!definition)return{success:false,reason:"reward_catalogue_definition_missing",itemId};
+  const before=inventoryQuantity(itemId);
+  try{addItemToInventory(clone(definition));}catch(error){return{success:false,reason:"canonical_inventory_commit_threw",detail:String(error&&error.message||error)};}
+  const after=inventoryQuantity(itemId);
+  if(after<=before)return{success:false,reason:"canonical_inventory_commit_failed",itemId,before,after};
+  return{success:true,itemId,quantityAdded:after-before,total:after};
 }
 function commitOriginInventoryEntitlement({sourceId,kind}={}){
-  const root=ensureRoot();if(!root)return{success:false,reason:"kakashi_reward_state_missing"};
-  const definition=kind==="field_recovery_pill"?{sourceId:ITEM_SOURCE,itemId:ITEM_ID,quantity:1}:kind==="academy_training_tanto"?{sourceId:WEAPON_SOURCE,weaponId:WEAPON_ID}:null;
-  if(!definition||String(sourceId||"")!==definition.sourceId)return{success:false,reason:"reward_entitlement_source_mismatch"};
-  const registered=registerSourceOnce("inventory_entitlement",definition.sourceId,{subjectId:KAKASHI,kind});
-  if(!registered.success)return registered;
-  if(root.grants[definition.sourceId])return{success:true,idempotent:true,grant:clone(root.grants[definition.sourceId])};
-  const grant=definition.itemId?grantPersistentItemQuantity(definition.itemId,definition.quantity):grantSingletonWeapon(definition.weaponId);
-  if(!grant.success)return{success:false,reason:"persistent_inventory_grant_failed",detail:grant,pendingEntitlement:true};
-  root.entitlements[definition.sourceId]={sourceId:definition.sourceId,kind,entitled:true};
-  root.grants[definition.sourceId]={sourceId:definition.sourceId,kind,grant:clone(grant),committed:true};save();
-  return{success:true,idempotent:false,grant:clone(root.grants[definition.sourceId])};
+  const root=ensureRoot();if(!root)return{success:false,reason:"kakashi_reward_receipt_store_missing"};
+  const exact=kind==="field_recovery_pill"?{sourceId:ITEM_SOURCE,itemId:ITEM_ID}:kind==="academy_training_tanto"?{sourceId:WEAPON_SOURCE,itemId:WEAPON_ID}:null;
+  if(!exact||String(sourceId||"")!==exact.sourceId)return{success:false,reason:"reward_entitlement_source_mismatch"};
+  if(root.grants[exact.sourceId])return{success:true,idempotent:true,grant:clone(root.grants[exact.sourceId])};
+  root.entitlements[exact.sourceId]=root.entitlements[exact.sourceId]||{sourceId:exact.sourceId,kind,entitled:true,pending:true};
+  const granted=grantCatalogueItem(exact.itemId);
+  if(!granted.success){save();return{success:false,reason:granted.reason,detail:granted,pendingEntitlement:true};}
+  registerSource("inventory_entitlement",exact.sourceId,{subjectId:KAKASHI,kind,itemId:exact.itemId});
+  root.entitlements[exact.sourceId]={sourceId:exact.sourceId,kind,entitled:true,pending:false};
+  root.grants[exact.sourceId]={sourceId:exact.sourceId,kind,itemId:exact.itemId,grant:clone(granted),committed:true};save();
+  return{success:true,idempotent:false,grant:clone(root.grants[exact.sourceId])};
 }
 function evaluateTerminalDebriefRewards(facts={}){
   if(facts.terminalDebriefReached!==true)return{success:false,reason:"terminal_debrief_required"};
@@ -145,28 +128,25 @@ function evaluateTerminalDebriefRewards(facts={}){
 }
 function commitTerminalDebriefRewards(facts={}){
   const evaluated=evaluateTerminalDebriefRewards(facts);if(!evaluated.success)return evaluated;
-  const root=ensureRoot();
-  const receipt=registerSourceOnce("terminal_debrief_reward","kak_origin_terminal_debrief_reward",{subjectId:KAKASHI,ryo:evaluated.ryo,facts:clone(facts)});
-  if(!receipt.success)return receipt;
-  if(receipt.idempotent!==true){
-    playerData.ryo=Number(playerData.ryo||0)+evaluated.ryo;
-    root.terminalDebrief={ryo:evaluated.ryo,committed:true};
-  }
+  if(typeof playerData!=="object"||!playerData)return{success:false,reason:"player_data_missing"};
+  const root=ensureRoot(),existing=sourceReceipt("terminal_debrief_reward",TERMINAL_SOURCE,KAKASHI);let ryoGranted=0;
+  if(!existing){playerData.ryo=Number(playerData.ryo||0)+evaluated.ryo;ryoGranted=evaluated.ryo;registerSource("terminal_debrief_reward",TERMINAL_SOURCE,{subjectId:KAKASHI,ryo:evaluated.ryo,facts:clone(facts)});root.terminalDebrief={ryo:evaluated.ryo,committed:true};}
   const grants=[];
   if(evaluated.fieldRecoveryPillEligible)grants.push(commitOriginInventoryEntitlement({sourceId:ITEM_SOURCE,kind:"field_recovery_pill"}));
   if(evaluated.academyTrainingTantoEligible)grants.push(commitOriginInventoryEntitlement({sourceId:WEAPON_SOURCE,kind:"academy_training_tanto"}));
-  save();
-  return{success:true,idempotent:receipt.idempotent===true,ryo:receipt.idempotent===true?0:evaluated.ryo,totalRyo:Number(playerData.ryo||0),grants};
+  save();return{success:true,idempotent:!!existing,ryo:ryoGranted,totalRyo:Number(playerData.ryo||0),grants};
 }
 function snapshot(){const root=ensureRoot();return root?clone(root):null;}
 function diagnostics(){
   const checks={
+    contextAdapterNotSecondSystem:typeof addDisciplineExp==="function"&&typeof addItemToInventory==="function",
     routeExact:ROUTE==="academy_kakashi_origin_reward",
     terminalDebriefSeparated:evaluateTerminalDebriefRewards({terminalDebriefReached:false}).success===false,
     ryoMax250:evaluateTerminalDebriefRewards({terminalDebriefReached:true,packageRecovered:true,verifiedActionableIntelligence:true,liveCustodyEstablished:true,exceptionalFieldExecution:true}).ryo===250,
     itemSourceExact:ITEM_SOURCE==="kak_origin_item_field_recovery_resupply"&&ITEM_ID==="field_recovery_pill",
     weaponSourceExact:WEAPON_SOURCE==="kak_origin_weapon_exceptional_training_tanto"&&WEAPON_ID==="academy_training_tanto",
-    technicalValues:recordTechnicalDisciplineDevelopment.toString().includes('executionClass==="exceptional"?3')&&recordTechnicalDisciplineDevelopment.toString().includes('executionClass==="effective"?2'),
+    developmentUsesCanonicalProgression:recordTechnicalDisciplineDevelopment.toString().includes("addDisciplineExp")&&recordStaminaDevelopment.toString().includes("addDisciplineExp"),
+    inventoryUsesCanonicalGrant:grantCatalogueItem.toString().includes("addItemToInventory")&&grantCatalogueItem.toString().includes("getItemDefinition"),
     technicalBattleCap:recordTechnicalDisciplineDevelopment.toString().includes("6-used"),
     staminaBattleCap:recordStaminaDevelopment.toString().includes("used<2?1:0"),
     noBattleVictoryRewardInference:!commitTerminalDebriefRewards.toString().includes("battleOver")&&!commitTerminalDebriefRewards.toString().includes("outcome"),
