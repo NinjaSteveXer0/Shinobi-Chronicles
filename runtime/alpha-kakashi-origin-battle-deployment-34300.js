@@ -1,11 +1,21 @@
 // ============================================================================
-// ISSUE #201 — ACADEMY KAKASHI ORIGIN BATTLE DEPLOYMENT — 34300
+// ISSUE #188 / #201 — ACADEMY KAKASHI ORIGIN BATTLE DEPLOYMENT — 34300
 //
-// Combat authority:
+// Base deployment authority:
 // Documentation/Combat/SC_Combat_Academy_Kakashi_Origin_Runtime_Battle_Deployment_and_Result_Contract_2026-09-15.md
 // commit 6c0037db3531d38890447a4e86c2e7e8c80e6e2e
 // Documentation/Combat/SC_Combat_Academy_Kakashi_Origin_Battle_Config_Composition_Gap_Addendum_2026-09-15.md
 // commit 3f7502e4b41b1f58c88fe83e89f9839ed0607ef4
+//
+// Sequential occurrence calibration / tuning authority:
+// Documentation/Registry/Academy Kakashi Origin Sequential Opposition Registry and PL Calibration 2026-09-16.md
+// commit 930c5048453d0034b2856ad3ddfa5ea65fdede7b
+// Documentation/Combat/SC_Combat_Academy_Kakashi_Sequential_MI_PS_Action_Tuning_and_AMT_Viability_2026-09-16.md
+// commit 4ef10cc556790a35e692b6a10f2733846809b494
+// Documentation/Registry/Academy Kakashi Origin ANBU Marked Target Registry and PL Calibration 2026-09-16.md
+// commit 0a0bbaf3c3c2395e22977a41da0892a209a73994
+// Documentation/Combat/SC_Combat_Academy_Kakashi_Sequential_AMT_Pakkun_Final_Viability_Closure_2026-09-16.md
+// commit 32f79944304ea30689d87a4b1f7b48f84fb2734e
 //
 // This module binds Combat's published Kakashi battle configurations to the
 // existing Battle engine. It does not own Story outcomes, package custody,
@@ -15,9 +25,13 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300)return;
 
-const PATCH_ID="alpha_kakashi_origin_battle_deployment_34300_2026_09_15";
+const PATCH_ID="alpha_kakashi_origin_battle_deployment_34300_v2_2026_09_16";
 const AUTHORITY_COMMIT="6c0037db3531d38890447a4e86c2e7e8c80e6e2e";
 const CONFIG_AUTHORITY_COMMIT="3f7502e4b41b1f58c88fe83e89f9839ed0607ef4";
+const SEQUENTIAL_REGISTRY_COMMIT="930c5048453d0034b2856ad3ddfa5ea65fdede7b";
+const SEQUENTIAL_MI_PS_COMBAT_COMMIT="4ef10cc556790a35e692b6a10f2733846809b494";
+const AMT_REGISTRY_COMMIT="0a0bbaf3c3c2395e22977a41da0892a209a73994";
+const AMT_COMBAT_COMMIT="32f79944304ea30689d87a4b1f7b48f84fb2734e";
 const STORY_SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const KAKASHI="academy_kakashi";
 const PAKKUN="pakkun_origin_unfamiliar_ninken";
@@ -25,7 +39,9 @@ const AMT="academy_kakashi_origin_amt";
 const PS="academy_kakashi_origin_package_smuggler";
 const MI="academy_kakashi_origin_masked_interceptor";
 
-const PROFILE_IDS=Object.freeze({
+// Generic opposition profiles remain derivation/provenance only. The exact
+// Academy-Origin participant IDs below own the occurrence calibration.
+const DERIVATION_PROFILE_IDS=Object.freeze({
   [AMT]:"anbu_style_operative",
   [PS]:"fuinjutsu_smuggler",
   [MI]:"decoy_assassin"
@@ -55,9 +71,25 @@ function transientFor(side,participantId,key){
   if(typeof findBattleTransientState!=="function")return null;
   return findBattleTransientState({stateKey:key,targetSide:side,targetParticipantId:participantId});
 }
+function originCombatState34300(){
+  if(!currentBattle)return null;
+  currentBattle.kakashiOriginCombat=currentBattle.kakashiOriginCombat||{};
+  return currentBattle.kakashiOriginCombat;
+}
+function originActionUsed34300(actionId){
+  const state=originCombatState34300();
+  return !!(state&&Array.isArray(state.oncePerBattleActionIds)&&state.oncePerBattleActionIds.includes(String(actionId||"")));
+}
+function markOriginActionUsed34300(actionId){
+  const state=originCombatState34300();
+  if(!state||!actionId)return false;
+  state.oncePerBattleActionIds=Array.isArray(state.oncePerBattleActionIds)?state.oncePerBattleActionIds:[];
+  if(!state.oncePerBattleActionIds.includes(String(actionId)))state.oncePerBattleActionIds.push(String(actionId));
+  return true;
+}
 function direct(id,baseAttackPL,discipline,{boostMarker=null,boost=0}={}){
   const base=makeEnemyFixedDamageAction(id,baseAttackPL,{primaryDiscipline:discipline});
-  return {...base,authoredAttackPL:baseAttackPL,resolve(args){
+  return {...base,authoredAttackPL:baseAttackPL,conditionalBoostMarker:boostMarker,conditionalBoostAttackPL:boost,resolve(args){
     let magnitude=baseAttackPL,marker=null;
     if(boostMarker&&args&&args.enemy){
       marker=transientFor("enemy",args.enemy.id,boostMarker);
@@ -69,13 +101,21 @@ function direct(id,baseAttackPL,discipline,{boostMarker=null,boost=0}={}){
     return {...out,authoredAttackPL:magnitude,baseAuthoredAttackPL:baseAttackPL,conditionalBoostApplied:!!marker};
   }};
 }
-function movementControl(id,discipline,conditionKey){
+function movementControl(id,discipline,conditionKey,{oncePerBattle=false}={}){
   return {
-    id,skillId:id,actionClass:"enemy_authored_action",primaryDiscipline:discipline,targetMode:"current_enemy",traits:["control_only","not_generic_stun"],authoredAttackPL:0,
-    evaluateAvailability({enemy,target}){return target&&!conditionFor(target.id,conditionKey,enemy&&enemy.id)?{available:true}:{available:false,reason:`${conditionKey}_already_live`};},
+    id,skillId:id,actionClass:"enemy_authored_action",primaryDiscipline:discipline,targetMode:"current_enemy",traits:["control_only","movement_only_control","not_generic_stun"],authoredAttackPL:0,oncePerBattle:oncePerBattle===true,
+    evaluateAvailability({enemy,target}){
+      if(oncePerBattle===true&&originActionUsed34300(id))return{available:false,reason:`${conditionKey}_once_per_battle_used`};
+      return target&&!conditionFor(target.id,conditionKey,enemy&&enemy.id)?{available:true}:{available:false,reason:`${conditionKey}_already_live`};
+    },
     resolve({enemy,target,envelope}){
       if(!enemy||!target||typeof createAlphaMovementControlCondition!=="function")return{resolved:false,reason:"movement_control_runtime_missing"};
-      const applied=createAlphaMovementControlCondition({conditionKey,conditionType:"physical_restraint",sourceSide:"enemy",sourceParticipantId:enemy.id,sourceRefs:[{type:"enemy_profile",id:PROFILE_IDS[enemy.id]||enemy.id,role:"combat_authority"}],sourceSkillId:id,actionId:envelope&&envelope.actionId||null,targetSide:"player",targetParticipantId:target.id,strength:0,resolverDiscipline:discipline,durationActionOpportunities:1,extraData:{sourceOwned:true,blanketStun:false,noDirectBattlePLDamage:true}});
+      const sourceRefs=[
+        {type:"story_battle_occurrence_participant",id:enemy.id,role:"combat_authority"},
+        {type:"enemy_profile",id:DERIVATION_PROFILE_IDS[enemy.id]||enemy.id,role:"derivation_provenance"}
+      ];
+      const applied=createAlphaMovementControlCondition({conditionKey,conditionType:"physical_restraint",sourceSide:"enemy",sourceParticipantId:enemy.id,sourceRefs,sourceSkillId:id,actionId:envelope&&envelope.actionId||null,targetSide:"player",targetParticipantId:target.id,strength:0,resolverDiscipline:discipline,durationActionOpportunities:1,extraData:{sourceOwned:true,blanketStun:false,noDirectBattlePLDamage:true,movementOnlyControl:true,noCustodyInference:true}});
+      if(applied&&applied.condition&&oncePerBattle===true)markOriginActionUsed34300(id);
       return{resolved:!!(applied&&applied.condition),damageApplied:false,finalDamage:0,conditionRefs:applied&&applied.condition?[applied.condition.conditionId]:[],stateRefs:[]};
     }
   };
@@ -132,14 +172,14 @@ function decoyGuard(){
 function registerProfiles(){
   if(!runtimeAvailable())return{success:false,reason:"battle_runtime_authority_missing"};
   const rows={
-    [AMT]:{id:AMT,name:"ANBU MARKED TARGET",rank:"Story Opposition",power:49,calibratedBasePL:49,baseStats:{nin:50,tai:47,buki:48,fuin:34,kin:43,gen:46,stamina:49},stats:{nin:50,tai:47,buki:48,fuin:34,kin:43,gen:46,stamina:49},image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},provenance:{combatSourceProfileId:"anbu_style_operative",storyParticipantRef:AMT,profileIntegratedTools:"profile_integrated_tanto_wire_tools"}},
-    [PS]:{id:PS,name:"PACKAGE SMUGGLER",rank:"Story Opposition",power:36,calibratedBasePL:36,baseStats:{nin:29,tai:24,buki:27,fuin:38,kin:33,gen:22,stamina:31},stats:{nin:29,tai:24,buki:27,fuin:38,kin:33,gen:22,stamina:31},image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},provenance:{combatSourceProfileId:"fuinjutsu_smuggler",storyParticipantRef:PS,profileIntegratedTools:"profile_integrated_seal_tools"}},
-    [MI]:{id:MI,name:"MASKED INTERCEPTOR",rank:"Story Opposition",power:45,calibratedBasePL:45,baseStats:{nin:43,tai:44,buki:46,fuin:24,kin:38,gen:42,stamina:41},stats:{nin:43,tai:44,buki:46,fuin:24,kin:38,gen:42,stamina:41},image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},provenance:{combatSourceProfileId:"decoy_assassin",storyParticipantRef:MI,profileIntegratedTools:"profile_integrated_concealed_blade_decoy_tools"}}
+    [AMT]:{id:AMT,name:"ANBU MARKED TARGET",rank:"Story Opposition",power:18,calibratedBasePL:18,baseStats:{nin:14,tai:17,buki:19,fuin:10,kin:11,gen:13,stamina:17},stats:{nin:14,tai:17,buki:19,fuin:10,kin:11,gen:13,stamina:17},image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},provenance:{combatSourceProfileId:AMT,derivationProfileId:"anbu_style_operative",storyParticipantRef:AMT,profileIntegratedTools:"profile_integrated_tanto_wire_tools",registryAuthorityCommit:AMT_REGISTRY_COMMIT,combatAuthorityCommit:AMT_COMBAT_COMMIT}},
+    [PS]:{id:PS,name:"PACKAGE SMUGGLER",rank:"Story Opposition",power:10,calibratedBasePL:10,baseStats:{nin:9,tai:7,buki:8,fuin:11,kin:9,gen:6,stamina:10},stats:{nin:9,tai:7,buki:8,fuin:11,kin:9,gen:6,stamina:10},image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},provenance:{combatSourceProfileId:PS,derivationProfileId:"fuinjutsu_smuggler",storyParticipantRef:PS,profileIntegratedTools:"profile_integrated_seal_tools",registryAuthorityCommit:SEQUENTIAL_REGISTRY_COMMIT,combatAuthorityCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT}},
+    [MI]:{id:MI,name:"MASKED INTERCEPTOR",rank:"Story Opposition",power:14,calibratedBasePL:14,baseStats:{nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13},stats:{nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13},image:null,rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]},provenance:{combatSourceProfileId:MI,derivationProfileId:"decoy_assassin",storyParticipantRef:MI,profileIntegratedTools:"profile_integrated_concealed_blade_decoy_tools",registryAuthorityCommit:SEQUENTIAL_REGISTRY_COMMIT,combatAuthorityCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT}}
   };
   Object.entries(rows).forEach(([id,row])=>{enemyDatabase[id]={...(enemyDatabase[id]||{}),...row};});
-  enemyDatabase[AMT].authoredBattleActions=[movementControl("enemy_anbu_style_operative_wire_capture","Bukijutsu","wire_capture"),setupMarker("enemy_anbu_style_operative_silent_body_flicker","silent_body_flicker_position","Ninjutsu"),direct("enemy_anbu_style_operative_tanto_flash",26,"Bukijutsu",{boostMarker:"silent_body_flicker_position",boost:4})];
-  enemyDatabase[PS].authoredBattleActions=[sealRelease(),movementControl("enemy_fuinjutsu_smuggler_binding_tag","Fuinjutsu","binding_tag"),direct("enemy_fuinjutsu_smuggler_contraband_seal_burst",22,"Fuinjutsu")];
-  enemyDatabase[MI].authoredBattleActions=[decoyGuard(),setupMarker("enemy_decoy_assassin_false_retreat","false_retreat_opening",null),direct("enemy_decoy_assassin_concealed_blade",26,"Bukijutsu",{boostMarker:"false_retreat_opening",boost:4})];
+  enemyDatabase[AMT].authoredBattleActions=[movementControl("enemy_anbu_style_operative_wire_capture","Bukijutsu","wire_capture",{oncePerBattle:true}),setupMarker("enemy_anbu_style_operative_silent_body_flicker","silent_body_flicker_position","Ninjutsu"),direct("enemy_anbu_style_operative_tanto_flash",6,"Bukijutsu",{boostMarker:"silent_body_flicker_position",boost:2})];
+  enemyDatabase[PS].authoredBattleActions=[sealRelease(),movementControl("enemy_fuinjutsu_smuggler_binding_tag","Fuinjutsu","binding_tag"),direct("enemy_fuinjutsu_smuggler_contraband_seal_burst",5,"Fuinjutsu")];
+  enemyDatabase[MI].authoredBattleActions=[decoyGuard(),setupMarker("enemy_decoy_assassin_false_retreat","false_retreat_opening",null),direct("enemy_decoy_assassin_concealed_blade",5,"Bukijutsu",{boostMarker:"false_retreat_opening",boost:2})];
   return{success:true,participantIds:[AMT,PS,MI]};
 }
 
@@ -147,17 +187,38 @@ const priorChoose=typeof chooseEnemyAuthoredBattleAction==="function"?chooseEnem
 function chooseKakashiEnemyAction34300(schedulerState=null){
   const state=schedulerState&&schedulerState.ready===true?schedulerState:(typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null);
   if(!state||state.ready!==true)return priorChoose?priorChoose(schedulerState):{success:false,reason:"enemy_scheduler_unavailable"};
-  const ids=(state.eligibleActions||[]).map(a=>a&&a.id).filter(Boolean);
-  let priority=null;
-  if(state.enemyId===AMT)priority=["enemy_anbu_style_operative_wire_capture","enemy_anbu_style_operative_tanto_flash","enemy_anbu_style_operative_silent_body_flicker"];
-  if(state.enemyId===PS)priority=["enemy_fuinjutsu_smuggler_seal_release","enemy_fuinjutsu_smuggler_binding_tag","enemy_fuinjutsu_smuggler_contraband_seal_burst"];
-  if(state.enemyId===MI)priority=["enemy_decoy_assassin_decoy_substitution","enemy_decoy_assassin_false_retreat","enemy_decoy_assassin_concealed_blade"];
-  if(!priority)return priorChoose?priorChoose(state):{success:false,reason:"enemy_scheduler_authority_missing"};
-  // AMT special rule: Body Flicker becomes preferred after a direct attack when
-  // capture is already live and no setup marker exists.
-  if(state.enemyId===AMT&&currentBattle&&currentBattle.kakashiOriginCombat&&currentBattle.kakashiOriginCombat.lastEnemyActionByParticipant&&currentBattle.kakashiOriginCombat.lastEnemyActionByParticipant[AMT]==="enemy_anbu_style_operative_tanto_flash")priority=["enemy_anbu_style_operative_wire_capture","enemy_anbu_style_operative_silent_body_flicker","enemy_anbu_style_operative_tanto_flash"];
-  const selectedId=priority.find(id=>ids.includes(id));
-  const action=(state.eligibleActions||[]).find(a=>a&&a.id===selectedId)||null;
+  const eligible=state.eligibleActions||[];
+  const ids=eligible.map(a=>a&&a.id).filter(Boolean);
+  const actionFor=id=>eligible.find(a=>a&&a.id===id)||null;
+  let selectedId=null;
+
+  if(state.enemyId===AMT){
+    const wire="enemy_anbu_style_operative_wire_capture";
+    const flicker="enemy_anbu_style_operative_silent_body_flicker";
+    const tanto="enemy_anbu_style_operative_tanto_flash";
+    const flickerLive=!!transientFor("enemy",AMT,"silent_body_flicker_position");
+    const prior=currentBattle&&currentBattle.kakashiOriginCombat&&currentBattle.kakashiOriginCombat.lastEnemyActionByParticipant&&currentBattle.kakashiOriginCombat.lastEnemyActionByParticipant[AMT]||null;
+    if(flickerLive&&ids.includes(tanto))selectedId=tanto;
+    else if(!originActionUsed34300(wire)&&ids.includes(wire))selectedId=wire;
+    else if(prior===tanto&&ids.includes(flicker))selectedId=flicker;
+    else if(ids.includes(tanto))selectedId=tanto;
+    else if(ids.includes(flicker))selectedId=flicker;
+  }else if(state.enemyId===PS){
+    selectedId=["enemy_fuinjutsu_smuggler_seal_release","enemy_fuinjutsu_smuggler_binding_tag","enemy_fuinjutsu_smuggler_contraband_seal_burst"].find(id=>ids.includes(id))||null;
+  }else if(state.enemyId===MI){
+    const decoy="enemy_decoy_assassin_decoy_substitution";
+    const retreat="enemy_decoy_assassin_false_retreat";
+    const blade="enemy_decoy_assassin_concealed_blade";
+    const openingLive=!!transientFor("enemy",MI,"false_retreat_opening");
+    if(openingLive&&ids.includes(blade))selectedId=blade;
+    else if(ids.includes(decoy))selectedId=decoy;
+    else if(ids.includes(retreat))selectedId=retreat;
+    else if(ids.includes(blade))selectedId=blade;
+  }else{
+    return priorChoose?priorChoose(state):{success:false,reason:"enemy_scheduler_authority_missing"};
+  }
+
+  const action=selectedId?actionFor(selectedId):null;
   return action?{success:true,action,eligibleActionIds:ids,randomnessAppliedAfterEligibility:false,equalSelectionWeight:false,deterministicKakashiOriginAI:true}:priorChoose?priorChoose(state):{success:false,reason:"no_semantically_eligible_enemy_action"};
 }
 if(priorChoose){globalThis.chooseEnemyAuthoredBattleAction=chooseKakashiEnemyAction34300;try{chooseEnemyAuthoredBattleAction=chooseKakashiEnemyAction34300;}catch(_e){}}
@@ -204,28 +265,13 @@ function launchAcademyKakashiOriginPlBattle(spec={}){
   const primary=config.opposition[0];
   const launched=launchBattleWithReturnContext(primary,{encounterId:config.id,storyOccurrenceId:spec.storyOccurrenceId,sourceAnchorRef:spec.sourceAnchorRef,bindingRef:spec.bindingRef},returnContext);
   if(!launched||launched.success!==true)return launched||{success:false,reason:"kakashi_battle_launch_failed"};
-    const composed=configureBattleEnemyParticipants(config.opposition);
-  const composedIds=Array.isArray(composed)
-    ?composed.map(row=>row&&row.id).filter(Boolean)
-    :[];
-
-  const compositionExact=
-    composedIds.length===config.opposition.length &&
-    config.opposition.every(
-      (participantId,index)=>composedIds[index]===participantId
-    );
-
-  if(!compositionExact){
-    return{
-      success:false,
-      reason:"kakashi_opposition_composition_failed",
-      expectedParticipantIds:[...config.opposition],
-      actualParticipantIds:composedIds
-    };
-  }
+  const composed=configureBattleEnemyParticipants(config.opposition);
+  const composedIds=Array.isArray(composed)?composed.map(row=>row&&row.id).filter(Boolean):[];
+  const compositionExact=composedIds.length===config.opposition.length&&config.opposition.every((participantId,index)=>composedIds[index]===participantId);
+  if(!compositionExact)return{success:false,reason:"kakashi_opposition_composition_failed",expectedParticipantIds:[...config.opposition],actualParticipantIds:composedIds};
   const occurrenceId=currentBattle.battleId||launched.battleId||`kakashi-origin-battle-${Date.now()}`;
   currentBattle.encounterId=config.id;
-  currentBattle.kakashiOriginDeployment={battleConfigId:config.id,battleOccurrenceId:occurrenceId,storyOccurrenceId:String(spec.storyOccurrenceId),sourceAnchorRef:String(spec.sourceAnchorRef),bindingRef:String(spec.bindingRef),returnToken:spec.returnToken?String(spec.returnToken):null,controllerParticipantId:KAKASHI,oppositionParticipantIds:[...config.opposition],pakkunAuthorized:config.pakkun===true,temporaryPakkun:config.pakkun?{participantRef:PAKKUN,basePL:16,remainingBattlePL:16,ownershipGranted:false,independentInitiative:false}:null,timingGate:clone(config.timingGate),playerActionOpportunityCount:0,countedControllerActionIds:[],packageCustodyDelta:"none",authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT};
+  currentBattle.kakashiOriginDeployment={battleConfigId:config.id,battleOccurrenceId:occurrenceId,storyOccurrenceId:String(spec.storyOccurrenceId),sourceAnchorRef:String(spec.sourceAnchorRef),bindingRef:String(spec.bindingRef),returnToken:spec.returnToken?String(spec.returnToken):null,controllerParticipantId:KAKASHI,oppositionParticipantIds:[...config.opposition],pakkunAuthorized:config.pakkun===true,temporaryPakkun:config.pakkun?{participantRef:PAKKUN,basePL:16,remainingBattlePL:16,ownershipGranted:false,independentInitiative:false}:null,timingGate:clone(config.timingGate),playerActionOpportunityCount:0,countedControllerActionIds:[],packageCustodyDelta:"none",authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,sequentialRegistryCommit:SEQUENTIAL_REGISTRY_COMMIT,sequentialMiPsCombatCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT,amtRegistryCommit:AMT_REGISTRY_COMMIT,amtCombatCommit:AMT_COMBAT_COMMIT};
   playerData.kakashiOriginBattleLaunches[key]={battleOccurrenceId:occurrenceId,battleConfigId:config.id,createdAt:Date.now()};
   if(typeof savePlayerData==="function")savePlayerData();
   return{success:true,battleId:occurrenceId,encounterId:config.id,battleConfigId:config.id,oppositionParticipantIds:[...config.opposition],pakkunTemporaryParticipation:config.pakkun===true};
@@ -265,19 +311,55 @@ function projectAcademyKakashiOriginBattleResult(){
   const participants=[];
   const pRem=typeof getBattleRemainingPL==="function"?getBattleRemainingPL("player",KAKASHI):null;
   participants.push({participantRef:KAKASHI,combatSourceProfileId:"current_authoritative_representation",side:"player",deploymentRole:"controller",basePLAtEntry:null,remainingBattlePL:pRem,battleStatus:pRem!==null&&pRem<=0?"defeated":"active",lifeState:"unresolved",custodyState:"unresolved",actionOccurrenceRefs:evidence.filter(e=>e&&e.actorRef&&e.actorRef.participantId===KAKASHI).map(e=>e.actionId).filter(Boolean)});
-  dep.oppositionParticipantIds.forEach(id=>{const rem=typeof getBattleRemainingPL==="function"?getBattleRemainingPL("enemy",id):null;participants.push({participantRef:id,combatSourceProfileId:PROFILE_IDS[id],side:"opposition",deploymentRole:"hostile",basePLAtEntry:enemyDatabase[id]&&enemyDatabase[id].calibratedBasePL||null,remainingBattlePL:rem,battleStatus:rem!==null&&rem<=0?"defeated":"active",lifeState:"unresolved",custodyState:"unresolved",actionOccurrenceRefs:evidence.filter(e=>e&&e.actorRef&&e.actorRef.participantId===id).map(e=>e.actionId).filter(Boolean)});});
+  dep.oppositionParticipantIds.forEach(id=>{const rem=typeof getBattleRemainingPL==="function"?getBattleRemainingPL("enemy",id):null;participants.push({participantRef:id,combatSourceProfileId:id,derivationProfileId:DERIVATION_PROFILE_IDS[id]||null,side:"opposition",deploymentRole:"hostile",basePLAtEntry:enemyDatabase[id]&&enemyDatabase[id].calibratedBasePL||null,remainingBattlePL:rem,battleStatus:rem!==null&&rem<=0?"defeated":"active",lifeState:"unresolved",custodyState:"unresolved",actionOccurrenceRefs:evidence.filter(e=>e&&e.actorRef&&e.actorRef.participantId===id).map(e=>e.actionId).filter(Boolean)});});
   if(dep.pakkunAuthorized)participants.push({participantRef:PAKKUN,combatSourceProfileId:"pakkun_summon_action_closure",side:"player",deploymentRole:"temporary_action_source",basePLAtEntry:16,remainingBattlePL:dep.temporaryPakkun&&dep.temporaryPakkun.remainingBattlePL||16,battleStatus:"temporary_participation_ended",lifeState:"unresolved",custodyState:"not_applicable",actionOccurrenceRefs:evidence.filter(e=>e&&Array.isArray(e.sourceRefs)&&e.sourceRefs.some(r=>r&&r.id===PAKKUN)).map(e=>e.actionId).filter(Boolean)});
   return{battleConfigId:dep.battleConfigId,battleOccurrenceId:dep.battleOccurrenceId,storyOccurrenceId:dep.storyOccurrenceId,sourceAnchorRef:dep.sourceAnchorRef,bindingRef:dep.bindingRef,resultState:outcome,playerActionOpportunityCount:Number(dep.playerActionOpportunityCount)||0,participants,actionOccurrenceRefs:evidence.map(e=>e&&e.actionId).filter(Boolean),packageCustodyDelta:"none",temporaryParticipationEnded:dep.pakkunAuthorized===true,rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false,storyObjectiveCommitted:false,timingGate:clone(dep.timingGate)};
 }
 
 function runAcademyKakashiOriginBattleDeployment34300Diagnostics(){
   const registered=registerProfiles();
-  const checks={patchId:PATCH_ID==="alpha_kakashi_origin_battle_deployment_34300_2026_09_15",authorityPinned:AUTHORITY_COMMIT==="6c0037db3531d38890447a4e86c2e7e8c80e6e2e",configAuthorityPinned:CONFIG_AUTHORITY_COMMIT==="3f7502e4b41b1f58c88fe83e89f9839ed0607ef4",tenPublishedConfigs:Object.keys(CONFIGS).length===10,exactAMT:!!enemyDatabase[AMT]&&enemyDatabase[AMT].calibratedBasePL===49&&JSON.stringify(enemyDatabase[AMT].baseStats)===JSON.stringify({nin:50,tai:47,buki:48,fuin:34,kin:43,gen:46,stamina:49}),exactPS:!!enemyDatabase[PS]&&enemyDatabase[PS].calibratedBasePL===36,exactMI:!!enemyDatabase[MI]&&enemyDatabase[MI].calibratedBasePL===45,exactActionCounts:enemyDatabase[AMT].authoredBattleActions.length===3&&enemyDatabase[PS].authoredBattleActions.length===3&&enemyDatabase[MI].authoredBattleActions.length===3,direct3v1Exact:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_amt_ps_mi_3v1.opposition)===JSON.stringify([AMT,PS,MI]),improved2v1Exact:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_amt_ps_2v1.opposition)===JSON.stringify([AMT,PS]),observePackage2v1Exact:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_ps_mi_2v1.opposition)===JSON.stringify([PS,MI])&&CONFIGS.academy_kakashi_origin_battle_ps_mi_2v1.timingGate===null,directMI1v1Untimed:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_mi_1v1.opposition)===JSON.stringify([MI])&&CONFIGS.academy_kakashi_origin_battle_mi_1v1.timingGate===null,directPS1v1Untimed:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_ps_1v1.opposition)===JSON.stringify([PS])&&CONFIGS.academy_kakashi_origin_battle_ps_1v1.timingGate===null,pakkunNoIndependentInitiative:CONFIGS.academy_kakashi_origin_battle_kakashi_pakkun_vs_amt.pakkun===true&&attemptAcademyKakashiPakkunBattleAction.toString().includes('consumeBattleActionOpportunity("player",kakashi.id'),timingExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3,noLoot:[AMT,PS,MI].every(id=>enemyDatabase[id].rewards&&enemyDatabase[id].rewards.ryo.min===0&&enemyDatabase[id].rewards.commonDrops.length===0),browserGoldenClaimed:false};
+  const amtActions=enemyDatabase[AMT]&&enemyDatabase[AMT].authoredBattleActions||[];
+  const psActions=enemyDatabase[PS]&&enemyDatabase[PS].authoredBattleActions||[];
+  const miActions=enemyDatabase[MI]&&enemyDatabase[MI].authoredBattleActions||[];
+  const byId=(rows,id)=>rows.find(row=>row&&row.id===id)||null;
+  const amtWire=byId(amtActions,"enemy_anbu_style_operative_wire_capture");
+  const amtTanto=byId(amtActions,"enemy_anbu_style_operative_tanto_flash");
+  const psBurst=byId(psActions,"enemy_fuinjutsu_smuggler_contraband_seal_burst");
+  const miBlade=byId(miActions,"enemy_decoy_assassin_concealed_blade");
+  const checks={
+    patchId:PATCH_ID==="alpha_kakashi_origin_battle_deployment_34300_v2_2026_09_16",
+    authorityPinned:AUTHORITY_COMMIT==="6c0037db3531d38890447a4e86c2e7e8c80e6e2e",
+    configAuthorityPinned:CONFIG_AUTHORITY_COMMIT==="3f7502e4b41b1f58c88fe83e89f9839ed0607ef4",
+    sequentialAuthorityPinned:SEQUENTIAL_REGISTRY_COMMIT==="930c5048453d0034b2856ad3ddfa5ea65fdede7b"&&SEQUENTIAL_MI_PS_COMBAT_COMMIT==="4ef10cc556790a35e692b6a10f2733846809b494"&&AMT_REGISTRY_COMMIT==="0a0bbaf3c3c2395e22977a41da0892a209a73994"&&AMT_COMBAT_COMMIT==="32f79944304ea30689d87a4b1f7b48f84fb2734e",
+    tenPublishedConfigs:Object.keys(CONFIGS).length===10,
+    exactAMT:!!enemyDatabase[AMT]&&enemyDatabase[AMT].calibratedBasePL===18&&JSON.stringify(enemyDatabase[AMT].baseStats)===JSON.stringify({nin:14,tai:17,buki:19,fuin:10,kin:11,gen:13,stamina:17}),
+    exactPS:!!enemyDatabase[PS]&&enemyDatabase[PS].calibratedBasePL===10&&JSON.stringify(enemyDatabase[PS].baseStats)===JSON.stringify({nin:9,tai:7,buki:8,fuin:11,kin:9,gen:6,stamina:10}),
+    exactMI:!!enemyDatabase[MI]&&enemyDatabase[MI].calibratedBasePL===14&&JSON.stringify(enemyDatabase[MI].baseStats)===JSON.stringify({nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13}),
+    occurrenceSourceNotGeneric:[AMT,PS,MI].every(id=>enemyDatabase[id]&&enemyDatabase[id].provenance&&enemyDatabase[id].provenance.combatSourceProfileId===id&&enemyDatabase[id].provenance.derivationProfileId===DERIVATION_PROFILE_IDS[id]),
+    exactActionCounts:amtActions.length===3&&psActions.length===3&&miActions.length===3,
+    amtTuning:!!amtTanto&&amtTanto.authoredAttackPL===6&&amtTanto.conditionalBoostAttackPL===2&&amtTanto.conditionalBoostMarker==="silent_body_flicker_position"&&!!amtWire&&amtWire.oncePerBattle===true,
+    psTuning:!!psBurst&&psBurst.authoredAttackPL===5,
+    miTuning:!!miBlade&&miBlade.authoredAttackPL===5&&miBlade.conditionalBoostAttackPL===2&&miBlade.conditionalBoostMarker==="false_retreat_opening",
+    movementControlNotStun:movementControl.toString().includes('movementOnlyControl:true')&&movementControl.toString().includes('blanketStun:false')&&!movementControl.toString().includes('all_actions'),
+    amtAiNoWireRefreshLoop:chooseKakashiEnemyAction34300.toString().includes("flickerLive")&&chooseKakashiEnemyAction34300.toString().includes("!originActionUsed34300(wire)")&&chooseKakashiEnemyAction34300.toString().includes("prior===tanto"),
+    miAiConsumesOpeningFirst:chooseKakashiEnemyAction34300.toString().includes("openingLive&&ids.includes(blade)"),
+    direct3v1Exact:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_amt_ps_mi_3v1.opposition)===JSON.stringify([AMT,PS,MI]),
+    improved2v1Exact:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_amt_ps_2v1.opposition)===JSON.stringify([AMT,PS]),
+    observePackage2v1Exact:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_ps_mi_2v1.opposition)===JSON.stringify([PS,MI])&&CONFIGS.academy_kakashi_origin_battle_ps_mi_2v1.timingGate===null,
+    directMI1v1Untimed:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_mi_1v1.opposition)===JSON.stringify([MI])&&CONFIGS.academy_kakashi_origin_battle_mi_1v1.timingGate===null,
+    directPS1v1Untimed:JSON.stringify(CONFIGS.academy_kakashi_origin_battle_ps_1v1.opposition)===JSON.stringify([PS])&&CONFIGS.academy_kakashi_origin_battle_ps_1v1.timingGate===null,
+    pakkunNoIndependentInitiative:CONFIGS.academy_kakashi_origin_battle_kakashi_pakkun_vs_amt.pakkun===true&&attemptAcademyKakashiPakkunBattleAction.toString().includes('consumeBattleActionOpportunity("player",kakashi.id')&&attemptAcademyKakashiPakkunBattleAction.toString().includes('actionClass:"temporary_participant_action"'),
+    pakkunBiteExact:attemptAcademyKakashiPakkunBattleAction.toString().includes('attackPL:7')&&attemptAcademyKakashiPakkunBattleAction.toString().includes('skill:{id:actionId,excess:null}'),
+    timingExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3&&CONFIGS.academy_kakashi_origin_battle_seq_amt_pakkun.timingGate===null,
+    noLoot:[AMT,PS,MI].every(id=>enemyDatabase[id].rewards&&enemyDatabase[id].rewards.ryo.min===0&&enemyDatabase[id].rewards.commonDrops.length===0),
+    compositionUsesExactArray:launchAcademyKakashiOriginPlBattle.toString().includes("configureBattleEnemyParticipants(config.opposition)"),
+    browserGoldenClaimed:false
+  };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
   return{pass:failed.length===0,checks,failed,registered,configIds:Object.keys(CONFIGS),browserGoldenClaimed:false};
 }
 
-const api=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,configs:CONFIGS,participantRefs:Object.freeze({kakashi:KAKASHI,pakkun:PAKKUN,amt:AMT,packageSmuggler:PS,maskedInterceptor:MI}),registerProfiles,getConfig,launchAcademyKakashiOriginPlBattle,attemptAcademyKakashiPakkunBattleAction,projectAcademyKakashiOriginBattleResult,browserGoldenClaimed:false});
+const api=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,sequentialRegistryCommit:SEQUENTIAL_REGISTRY_COMMIT,sequentialMiPsCombatCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT,amtRegistryCommit:AMT_REGISTRY_COMMIT,amtCombatCommit:AMT_COMBAT_COMMIT,configs:CONFIGS,participantRefs:Object.freeze({kakashi:KAKASHI,pakkun:PAKKUN,amt:AMT,packageSmuggler:PS,maskedInterceptor:MI}),registerProfiles,getConfig,launchAcademyKakashiOriginPlBattle,attemptAcademyKakashiPakkunBattleAction,projectAcademyKakashiOriginBattleResult,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300=api;
 globalThis.launchAcademyKakashiOriginPlBattle=launchAcademyKakashiOriginPlBattle;
 globalThis.attemptAcademyKakashiPakkunBattleAction=attemptAcademyKakashiPakkunBattleAction;
