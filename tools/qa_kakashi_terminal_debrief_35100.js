@@ -34,9 +34,12 @@ function addItemToInventory(item){playerData.inventory=Array.isArray(playerData.
 function addDisciplineExp(subjectId,disciplineId,amount){const k=subjectId+"::"+disciplineId;__qaProgression[k]=Number(__qaProgression[k]||0)+Number(amount||0);return true;}
 function getCharacterDisciplineProgression(subjectId,disciplineId){const k=subjectId+"::"+disciplineId;return{characterId:subjectId,disciplineId,exp:Number(__qaProgression[k]||0)};}
 function completeChronicleOriginPrologue(originId,evidenceIds){__qaCompletionCalls.push({originId,evidenceIds:[...(evidenceIds||[])]});return{success:true,originId,evidenceIds:[...(evidenceIds||[])]};}
-function resetQA(instanceId){
+function resetDataQA(instanceId){
   playerData={activityHistory:[],inventory:[],ryo:0};activityHistory=playerData.activityHistory;__qaProgression={};__qaCompletionCalls=[];
   __qaRuntime={sceneId:"origin_academy_kakashi_anbu_retrieval",instanceId,beatId:"kak_seq_debrief_pending",localContext:{},battleResume:null};
+}
+function resetQA(instanceId){
+  resetDataQA(instanceId);
   const beat=id=>({beatId:id,mode:"narration",text:id,onEnterConsequences:[]});
   __qaScene={sceneId:"origin_academy_kakashi_anbu_retrieval",beatMap:new Map(),onCompleteConsequences:[]};
   ["kak_seq_debrief_pending","kak_observe_secure_package_return","kak_observe_secure_package_amt_return","kak_seq_mi_return","kak_seq_ps_return","kak_seq_amt_return"].forEach(id=>__qaScene.beatMap.set(id,beat(id)));
@@ -122,7 +125,7 @@ assert(context.__qaCompletionCalls[0].evidenceIds.some(id=>String(id).includes("
 assert(context.__qaCompletionCalls[0].evidenceIds.some(id=>String(id).includes("chronicle_receipt_35100")));
 
 // Pakkun-bearing secure pursuit cannot seal the Receipt before explicit departure.
-run(`resetQA("qa-pakkun-35100");
+run(`resetDataQA("qa-pakkun-35100");
 qaCommitOccurrence("academy_kakashi","occ-secure-package-pakkun",{factClass:"academy_kakashi_secure_package_amt_pursuit_factual_state",storySceneInstanceId:__qaRuntime.instanceId,packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI"},worldFacts:{packageCustody:"KAKASHI"}},[],{type:"origin_story_factual_occurrence",outcome:"secure_pursuit"});
 __qaRuntime.localContext.kakashiObserveSecurePackageAmtPursuitOccurrenceId="occ-secure-package-pakkun";
 __qaRuntime.localContext.kakashiObserveSecurePackageAmtPursuitOutcome="SECURE_PACKAGE_AMT_PURSUIT_SUCCESS_REACHED";
@@ -144,7 +147,7 @@ assert.strictEqual(pakkunReward.success,true);
 assert.strictEqual(Number(context.playerData.ryo||0),175);
 
 // Exact sequential timing facts survive, but do NOT bypass unresolved package custody.
-run(`resetQA("qa-sequential-35100");
+run(`resetDataQA("qa-sequential-35100");
 __qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-seq-mi",battleConfigId:"academy_kakashi_origin_battle_seq_mi",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_015",bindingRef:"academy_kakashi.battle.observe_sequential",resultState:"player_side_victory",playerActionOpportunityCount:4,participants:[],rewardGranted:false,lootGranted:false}};`);
 assert.strictEqual(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_seq_mi")`).success,true);
 run(`__qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-seq-ps",battleConfigId:"academy_kakashi_origin_battle_seq_ps",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_022",bindingRef:"academy_kakashi.battle.observe_sequential",resultState:"player_side_victory",playerActionOpportunityCount:3,participants:[],rewardGranted:false,lootGranted:false}};`);
