@@ -10,7 +10,12 @@ assert(src.includes('const ITEM_SOURCE="kak_origin_item_field_recovery_resupply"
 assert(src.includes('const WEAPON_SOURCE="kak_origin_weapon_exceptional_training_tanto"'));
 assert(src.includes("addDisciplineExp"),"34800 must consume canonical discipline Progression");
 assert(src.includes("addItemToInventory"),"34800 must consume canonical Inventory grant");
-assert(!src.includes("battleOver")&&!src.includes("outcome===\"victory\""),"34800 must not infer terminal rewards from Battle victory");
+const terminalStart=src.indexOf("function commitTerminalDebriefRewards");
+const terminalEnd=src.indexOf("function snapshot",terminalStart);
+assert(terminalStart>=0&&terminalEnd>terminalStart,"terminal debrief commit owner missing");
+const terminalSource=src.slice(terminalStart,terminalEnd);
+assert(!terminalSource.includes("battleOver")&&!terminalSource.includes('outcome===\"victory\"'),"terminal reward commit must not infer entitlement from Battle victory");
+assert(src.includes('if(facts.terminalDebriefReached!==true)return{success:false,reason:"terminal_debrief_required"}'),"terminal debrief factual gate missing");
 
 const characterProgression={nin:{exp:0},tai:{exp:0},gen:{exp:0},buki:{exp:0},fuin:{exp:0},kin:{exp:0},stamina:{exp:0}};
 const playerData={ryo:0,inventory:[]};
