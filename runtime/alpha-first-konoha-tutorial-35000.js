@@ -264,13 +264,14 @@ if(priorTrainingRender){renderTrainingOverlay=function issue209TrainingTutorialP
 
 function diagnostics(){
   const row=tutorialState();
+  const operationalSource=[continueFirstKonohaTutorial,focusHost,enterCompound,beginOrientation,resolveObservation,reportReady].map(fn=>fn.toString()).join("\n");
   const checks={
     patchId:PATCH_ID,
     stableTutorialId:TUTORIAL_ID==="konoha_onboarding_first_team_orientation_v1",
     stableCompletionReceipt:COMPLETION_RECEIPT_ID==="konoha_onboarding_first_team_orientation_completed_v1",
     exactHosts:HOST==="KON-P07"&&LOCAL_HOST==="KON-A02",
     continuationSuperseded:typeof continueAcademyTeamFormationJourney==="function"&&continueAcademyTeamFormationJourney!==priorContinue,
-    battleAbsent:!installFirstKonohaTutorial35000.toString().includes("startBattle(")&&!installFirstKonohaTutorial35000.toString().includes("resolveBattleDamagePacket("),
+    battleAbsent:!operationalSource.includes("startBattle(")&&!operationalSource.includes("resolveBattleDamagePacket("),
     completionRequiresReadiness:reportReady.toString().includes("orientationStarted!==true||row.observationResolved!==true"),
     freePlayAfterReceipt:reportReady.toString().indexOf("row.completionReceipt=completion")<reportReady.toString().indexOf("state.onboardingStatus=FREE_PLAY_STATUS"),
     legacyFreePlayNotRewound:true,
