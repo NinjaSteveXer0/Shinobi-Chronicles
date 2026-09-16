@@ -1,21 +1,21 @@
 // ============================================================================
-// ISSUE #188 / #201 — ACADEMY KAKASHI OBSERVE STORY->BATTLE CONSUMER — 34410 v3
+// ISSUE #188 / #201 — ACADEMY KAKASHI OBSERVE STORY->BATTLE CONSUMER — 34410 v4
 //
 // Canonical Kakashi Observe Battle consumer. It currently owns:
 // - released sequential DEAL WITH HER FIRST, THEN CHASE THE PACKAGE route;
-// - prepared-but-guarded GO FOR THE PACKAGE exact 2-v-1 Battle seam.
+// - prepared-but-guarded GO FOR THE PACKAGE exact 2-v-1 Battle seam;
+// - AK_SA_025 fixed package custody + independent post-Battle classification.
 //
 // Both routes preserve the neutral 34000 semantic-intent transaction and the
-// factual 34300 Battle receipt. GO FOR THE PACKAGE is deliberately NOT released
-// until AK_SA_025 post-resolution classification/custody commit exists; this
-// file must not invent package custody, participant custody, death, rewards or
-// Story success from Battle victory/defeat alone.
+// factual 34300 Battle receipt. GO FOR THE PACKAGE remains guarded until its
+// lawful post-AK_SA_025 protagonist continuation is installed. 34410 does not
+// infer participant custody/death, rewards or Story success from Battle alone.
 // ============================================================================
 (function installAcademyKakashiSequentialConsumer34410(){
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410)return;
 
-const PATCH_ID="alpha_kakashi_final_sequential_consumer_34410_v3_2026_09_16";
+const PATCH_ID="alpha_kakashi_final_sequential_consumer_34410_v4_2026_09_16";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STORY_UNIT_REF="academy_kakashi";
 const OBSERVE_BEAT="kak_get_closer_handoff_observe_escalation";
@@ -25,6 +25,9 @@ const SEQUENTIAL_INTENT_REQUEST="kakashi_observe_sequential_intent_34410";
 const SEQUENTIAL_BATTLE_RETURN_REQUEST="kakashi_observe_sequential_mi_battle_return_34410";
 const SECURE_PACKAGE_INTENT_REQUEST="kakashi_observe_secure_package_intent_34410";
 const SECURE_PACKAGE_BATTLE_RETURN_REQUEST="kakashi_observe_secure_package_battle_return_34410";
+const SECURE_PACKAGE_POST_RESOLUTION_REQUEST="kakashi_observe_secure_package_ak_sa_025_34410";
+const PACKAGE_SMUGGLER_REF="academy_kakashi_origin_package_smuggler";
+const MASKED_INTERCEPTOR_REF="academy_kakashi_origin_masked_interceptor";
 const SAKURA={assetId:"kakashi_origin_sakura_tree_night"};
 const CONFIG=Object.freeze({
   securePackage:"academy_kakashi_origin_battle_ps_mi_2v1",
@@ -180,6 +183,43 @@ function closeSecurePackageIntentFromBattle34410(){
     resolvedContextPatch:{kakashiObserveSecurePackageBattleIntentResolved:true}
   });
 }
+function classifySecurePackageDefeatedParticipant34410(result,participantRef,committedStateRef){
+  const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
+  if(!CORE||typeof CORE.recordParticipantClassification!=="function")return{success:false,reason:"neutral_post_resolution_classification_authority_missing"};
+  const participant=Array.isArray(result&&result.participants)?result.participants.find(row=>row&&row.participantRef===participantRef)||null:null;
+  if(!participant)return{success:false,reason:"secure_package_post_resolution_participant_missing",participantRef};
+  if(participant.battleStatus!=="defeated")return{success:false,reason:"secure_package_post_resolution_defeated_fact_required",participantRef};
+  if(participant.lifeState!=="unresolved"||participant.custodyState!=="unresolved")return{success:false,reason:"secure_package_post_resolution_story_state_not_unresolved",participantRef};
+  const resultRef=typeof CORE.stableRef==="function"?CORE.stableRef("sc34410-ak-sa-023",{battleOccurrenceId:String(result.battleOccurrenceId||""),participantRef,committedStateRef:String(committedStateRef||"")}):`${String(result.battleOccurrenceId||"")}::${participantRef}::AK_SA_023`;
+  const classified=CORE.recordParticipantClassification({storyUnitRef:STORY_UNIT_REF,participantRef,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef});
+  return classified&&classified.success===true?{success:true,participantRef,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef,state:classified.state}:classified||{success:false,reason:"secure_package_post_resolution_classification_failed",participantRef};
+}
+function resolveSecurePackagePostBattle34410(){
+  const closed=closeSecurePackageIntentFromBattle34410();
+  if(!closed||closed.success!==true)return closed||{success:false,reason:"secure_package_battle_intent_close_failed"};
+  const rt=active(),result=latestResult();
+  if(!rt||!result)return{success:false,reason:"secure_package_post_resolution_battle_receipt_missing"};
+  if(!isVictory(result)){
+    rt.localContext={...(rt.localContext||{}),kakashiObserveSecurePackagePostBattleOutcome:"opposition_side_victory",kakashiObserveSecurePackagePostResolutionCommitted:false};
+    save();
+    return{success:true,battleOccurrenceId:String(result.battleOccurrenceId||""),resultState:String(result.resultState||""),packageCustodyDelta:"none",participantClassificationRefs:[],postResolutionCommitted:false};
+  }
+  const FACTUAL=globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120;
+  if(!FACTUAL||typeof FACTUAL.commitSecurePackage2v1Victory!=="function")return{success:false,reason:"kakashi_secure_package_ak_sa_025_factual_owner_missing"};
+  const factual=FACTUAL.commitSecurePackage2v1Victory({battleResult:result});
+  if(!factual||factual.success!==true)return factual||{success:false,reason:"kakashi_secure_package_ak_sa_025_factual_commit_failed"};
+  const ps=classifySecurePackageDefeatedParticipant34410(result,PACKAGE_SMUGGLER_REF,factual.occurrenceId);if(!ps||ps.success!==true)return ps;
+  const mi=classifySecurePackageDefeatedParticipant34410(result,MASKED_INTERCEPTOR_REF,factual.occurrenceId);if(!mi||mi.success!==true)return mi;
+  rt.localContext={
+    ...(rt.localContext||{}),
+    kakashiObserveSecurePackagePostBattleOutcome:"player_side_victory",
+    kakashiObserveSecurePackagePostResolutionCommitted:true,
+    kakashiObserveSecurePackageOccurrenceId:factual.occurrenceId,
+    kakashiObserveSecurePackageParticipantClassificationRefs:[ps.resultRef,mi.resultRef]
+  };
+  save();
+  return{success:true,battleOccurrenceId:String(result.battleOccurrenceId||""),resultState:String(result.resultState||""),postResolutionOccurrenceId:factual.occurrenceId,packageCustodyDelta:"PACKAGE_SMUGGLER_TO_KAKASHI",participantClassifications:[ps,mi],postResolutionCommitted:true};
+}
 
 function observeBeatAndChoice(choiceId){
   const def=scene();
@@ -230,8 +270,8 @@ function install(){
       text:"Kakashi commits to the package. The Masked Interceptor joins the Package Smuggler before he can disengage.",
       battle:{encounterId:CONFIG.securePackage,launchResolver:ctx=>launchSecurePackage34410(ctx),postBattleBeatId:"kak_observe_secure_package_return",resultProjector:projector,actionLabel:"SECURE THE PACKAGE"}},
     {beatId:"kak_observe_secure_package_return",mode:"narration",environmentRef:SAKURA,
-      onEnterConsequences:[{requestId:SECURE_PACKAGE_BATTLE_RETURN_REQUEST,kind:"domain",resolve:()=>closeSecurePackageIntentFromBattle34410()}],
-      presentationResolver:()=>{const r=latestResult();if(!r)return{text:"The 2-v-1 confrontation has not returned a factual result."};return isVictory(r)?{text:"Kakashi wins the 2-v-1. The Battle receipt is committed; package custody and both defeated participants still require the authorised AK_SA_025 post-resolution classification before another Story choice may open."}:{text:"Kakashi is forced to withdraw from the 2-v-1. Battle defeat is committed, but Story still must consume the exact package and participant state before debrief can proceed."};},
+      onEnterConsequences:[{requestId:SECURE_PACKAGE_POST_RESOLUTION_REQUEST,kind:"domain",resolve:()=>resolveSecurePackagePostBattle34410()}],
+      presentationResolver:()=>{const r=latestResult(),rt=active();if(!r)return{text:"The 2-v-1 confrontation has not returned a factual result."};if(isVictory(r)){const committed=!!(rt&&rt.localContext&&rt.localContext.kakashiObserveSecurePackagePostResolutionCommitted);return committed?{text:"Kakashi has the package. The Package Smuggler and Masked Interceptor are each Battle-defeated but not controlled; neither custody nor death is inferred. The next lawful Kakashi continuation is still guarded until due autonomy and the immediate pursuit window are consumed."}:{text:"Kakashi wins the 2-v-1. AK_SA_025 factual post-resolution is still committing before Story may continue."};}return{text:"Kakashi is forced to withdraw from the 2-v-1. The Battle changes no package custody and commits no injury, death or participant custody; the already-completed handoff remains the last package fact."};},
       text:"The package confrontation returns to Story for factual post-resolution classification.",exitScene:false,allowPresentationClose:false},
     {beatId:"kak_seq_mi_battle",mode:"battle_transition",environmentRef:SAKURA,
       text:"The Masked Interceptor cuts across Kakashi's line. If he wants the package trail, he has to get through her now.",
@@ -278,7 +318,7 @@ function diagnostics(){
     secure.nextBeatId==="kak_observe_secure_package_battle"&&Array.isArray(secure.consequenceRequests)&&secure.consequenceRequests.some(r=>r&&r.requestId===SECURE_PACKAGE_INTENT_REQUEST);
   const secureReturn=def&&def.beatMap instanceof Map?def.beatMap.get("kak_observe_secure_package_return"):null;
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_final_sequential_consumer_34410_v3_2026_09_16",
+    patchId:PATCH_ID==="alpha_kakashi_final_sequential_consumer_34410_v4_2026_09_16",
     legacySequentialChoiceStillBound:!!legacy&&legacy.nextBeatId==="kak_seq_mi_battle"&&typeof legacy.availability==="function"&&legacy.availability().available===true,
     factualObserveSequentialEitherNotYetCreatedOrBound:!observe||!!sequential&&sequential.nextBeatId==="kak_seq_mi_battle"&&typeof sequential.availability==="function"&&sequential.availability().available===true,
     securePackageExactConfig:CONFIG.securePackage==="academy_kakashi_origin_battle_ps_mi_2v1",
@@ -286,7 +326,10 @@ function diagnostics(){
     securePackageBindingExact:BINDING.securePackage==="academy_kakashi.battle.secure_package",
     securePackageChoiceGuardedOrExact:secureBound,
     securePackageReturnFailClosed:!!secureReturn&&secureReturn.exitScene===false&&secureReturn.allowPresentationClose===false&&!secureReturn.nextBeatId,
-    securePackageNoWorldTruthInvented:!closeSecurePackageIntentFromBattle34410.toString().includes("commitOccurrence")&&!closeSecurePackageIntentFromBattle34410.toString().includes("packageCustody"),
+    securePackageAkSa025OwnerWired:resolveSecurePackagePostBattle34410.toString().includes("commitSecurePackage2v1Victory")&&resolveSecurePackagePostBattle34410.toString().includes("SC_ALPHA_KAKASHI_FACTUAL_STATE_34120"),
+    securePackageClassificationsIndependent:resolveSecurePackagePostBattle34410.toString().includes("PACKAGE_SMUGGLER_REF")&&resolveSecurePackagePostBattle34410.toString().includes("MASKED_INTERCEPTOR_REF")&&classifySecurePackageDefeatedParticipant34410.toString().includes("recordParticipantClassification"),
+    securePackageNoControlledInference:classifySecurePackageDefeatedParticipant34410.toString().includes('stateClass:"DEFEATED_BUT_NOT_CONTROLLED"')&&!classifySecurePackageDefeatedParticipant34410.toString().includes("CONTROLLED_DEFEATED"),
+    securePackageDefeatNoStateFabrication:resolveSecurePackagePostBattle34410.toString().includes('packageCustodyDelta:"none"')&&!resolveSecurePackagePostBattle34410.toString().includes("participantDeathCommitted=true"),
     securePackageSemanticIntentBeforeBattle:ensureSecurePackageObserveIntent34410.toString().includes("ensureObserveIntentForChoice34410")&&ensureObserveIntentForChoice34410.toString().includes("commitStoryIntent"),
     securePackageFactualBattleReceiptClosesIntent:closeObserveBattleIntent34410.toString().includes("battleOccurrenceId")&&closeObserveBattleIntent34410.toString().includes("dispatchCommittedIntent"),
     exactThreeSequentialConfigs:[CONFIG.mi,CONFIG.ps,CONFIG.amt].every(Boolean),
@@ -312,6 +355,7 @@ globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410=Object.freeze({
   ensureSecurePackageObserveIntent:ensureSecurePackageObserveIntent34410,
   closeObserveIntentFromMiBattle:closeObserveIntentFromMiBattle34410,
   closeSecurePackageIntentFromBattle:closeSecurePackageIntentFromBattle34410,
+  resolveSecurePackagePostBattle:resolveSecurePackagePostBattle34410,
   browserGoldenClaimed:false
 });
 })();
