@@ -245,17 +245,99 @@ function interceptor(state,focus=false,entering=false){return actor("masked_inte
 function committedFact(){try{return A&&typeof A.findOccurrence==="function"?A.findOccurrence(kakashiOccurrence):null;}catch(_error){return null;}}
 
 const rooftopPerformance=[
-  {cueId:"roof_01",kind:"narration",text:"Kakashi watched Konoha from the rooftop.",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_02",kind:"narration",text:"A presence registered behind him.\nHis eye shifted.\nAn ANBU operative stood several paces back, masked and motionless.",focusActorRef:"academy_kakashi",actorEntrance:"konoha_anbu_contact"},
-  {cueId:"roof_03",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Kakashi Hatake.",focusActorRef:"konoha_anbu_contact"},
-  {cueId:"roof_04",kind:"narration",text:"Kakashi turned his head slightly.",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_05",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"You have orders. Stop this package from falling into the wrong hands.",focusActorRef:"konoha_anbu_contact"},
-  {cueId:"roof_06",kind:"action",text:"The operative raised a sealed envelope.",focusActorRef:"konoha_anbu_contact",objectState:"raised"},
-  {cueId:"roof_07",kind:"narration",text:"Kakashi studied him for a moment, then moved from his position and walked over.",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_08",kind:"dialogue",speakerName:"KAKASHI",text:"Why are you coming to me with this?",focusActorRef:"academy_kakashi"},
-  {cueId:"roof_09",kind:"action",text:"He took the envelope.",focusActorRef:"academy_kakashi",objectState:"held"},
-  {cueId:"roof_10",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Hokage's orders.",focusActorRef:"konoha_anbu_contact"},
-  {cueId:"roof_11",kind:"narration",text:"Kakashi's attention sharpened.\nHis eye dropped to the seal in his hand.",focusActorRef:"academy_kakashi",objectState:"held"}
+  {
+    cueId:"roof_01",
+    kind:"narration",
+    text:"Kakashi watched Konoha from the rooftop.",
+    focusActorRef:"academy_kakashi"
+  },
+
+  {
+    cueId:"roof_02",
+    kind:"narration",
+    text:"A presence registered behind him.\nHis eye shifted.\nAn ANBU operative stood several paces back, masked and motionless.",
+    focusActorRef:"academy_kakashi",
+    actorEntrance:"konoha_anbu_contact"
+  },
+
+  {
+    cueId:"roof_03",
+    kind:"dialogue",
+    speakerName:"ANBU OPERATIVE",
+    text:"Kakashi Hatake.",
+    focusActorRef:"konoha_anbu_contact"
+  },
+
+  {
+    cueId:"roof_04",
+    kind:"narration",
+    text:"Kakashi turned his head slightly.",
+    focusActorRef:"academy_kakashi"
+  },
+
+  {
+    cueId:"roof_05",
+    kind:"dialogue",
+    speakerName:"KAKASHI",
+    text:"What do you want?",
+    focusActorRef:"academy_kakashi"
+  },
+
+  {
+    cueId:"roof_06",
+    kind:"dialogue",
+    speakerName:"ANBU OPERATIVE",
+    text:"You have an assignment.",
+    focusActorRef:"konoha_anbu_contact"
+  },
+
+  {
+    cueId:"roof_07",
+    kind:"action",
+    text:"The operative raised a sealed envelope.",
+    focusActorRef:"konoha_anbu_contact",
+    objectState:"raised"
+  },
+
+  {
+    cueId:"roof_08",
+    kind:"narration",
+    text:"Kakashi took the envelope, broke the seal and looked at the photograph inside.",
+    focusActorRef:"academy_kakashi",
+    objectState:"held"
+  },
+
+  {
+    cueId:"roof_09",
+    kind:"dialogue",
+    speakerName:"KAKASHI",
+    text:"Why bring this to me?",
+    focusActorRef:"academy_kakashi"
+  },
+
+  {
+    cueId:"roof_10",
+    kind:"dialogue",
+    speakerName:"ANBU OPERATIVE",
+    text:"The Hokage approved you to assist us.",
+    focusActorRef:"konoha_anbu_contact"
+  },
+
+  {
+    cueId:"roof_11",
+    kind:"dialogue",
+    speakerName:"KAKASHI",
+    text:"And the man in the photograph?",
+    focusActorRef:"academy_kakashi"
+  },
+
+  {
+    cueId:"roof_12",
+    kind:"dialogue",
+    speakerName:"ANBU OPERATIVE",
+    text:"He's carrying something important. Don't let it fall into the wrong hands.",
+    focusActorRef:"konoha_anbu_contact"
+  }
 ];
 const tailPerformance=[
   {cueId:"alley_01",kind:"narration",text:"Kakashi finds ANBU Marked Target and tails him through Konoha.",focusActorRef:"academy_kakashi"},
@@ -311,6 +393,30 @@ function kakashiBoardResolver({beatId,context,performance}){
   }
   return null;
 }
+
+/*
+The performed rooftop replaces the old multi-beat rooftop delivery.
+
+33800 still retains kak_original_anbu / kak_original_envelope /
+kak_original_order as legacy semantic presentation beats. Once the
+cinematic rooftop performance finishes, continue directly to the tail
+instead of replaying those lines a second time.
+*/
+try{
+  const definition=
+    typeof getStorySceneDefinition==="function"
+      ?getStorySceneDefinition(scene)
+      :null;
+
+  const root=
+    definition&&definition.beatMap instanceof Map
+      ?definition.beatMap.get("kak_original_rooftop")
+      :null;
+
+  if(root){
+    root.nextBeatId="kak_original_tail";
+  }
+}catch(_error){}
 
 registerStorySceneBoardDefinition(scene,{
   benchmark:true,
@@ -396,6 +502,22 @@ function makeNarrationPanel(cue){
   const copy=document.createElement("div");copy.className="sc-narration-copy-33910";copy.textContent=escapeText(cue&&cue.text||"");
   panel.append(kicker,copy,makeAdvanceButton());return panel;
 }
+
+function isDialogueCue33910(cue){
+  if(!cue)return false;
+
+  /*
+  Dialogue classification is explicit.
+
+  speakerName/focusActorRef may exist on action or narration cues
+  to identify the participant performing the action. They must NOT
+  promote physical prose into a spoken dialogue box.
+  */
+  return String(cue.kind||"")
+    .trim()
+    .toLowerCase()==="dialogue";
+}
+
 function renderPerformanceSurface(layer,stage,performance,projection){
   let surface=stage.querySelector(`.${OVERLAY_CLASS}`);
   const cue=performance&&performance.cue||null;
@@ -403,7 +525,7 @@ function renderPerformanceSurface(layer,stage,performance,projection){
   if(surface&&surface.dataset.signature===signature)return;
   if(surface)surface.remove();
   surface=document.createElement("div");surface.className=OVERLAY_CLASS;surface.dataset.signature=signature;
-  if(cue&&cue.kind==="dialogue"){
+  if(isDialogueCue33910(cue)){
     const prev=previousDialogue(performance);if(prev)surface.appendChild(makeDialoguePanel(prev,false,projection));
     surface.appendChild(makeDialoguePanel(cue,true,projection));
   }else surface.appendChild(makeNarrationPanel(cue||{}));
@@ -454,7 +576,11 @@ function syncPresentation(){
   const stage=layer.querySelector(".sc-chronicle-stage")||layer.querySelector(".sc-story-stage")||layer;
   const beat=currentBeat(runtime),performance=typeof getStoryScenePerformance33900==="function"?getStoryScenePerformance33900():null,projection=currentProjection();
   let mode="narration";
-  if(performance&&performance.cue)mode=performance.cue.kind==="dialogue"?"dialogue":"performance_narration";
+  if(performance&&performance.cue){
+  mode=isDialogueCue33910(performance.cue)
+    ?"dialogue"
+    :"performance_narration";
+}
   else if(beat&&beat.mode==="choice")mode="decision";
   layer.dataset.scBoardUiMode=mode;
   const signature=`${runtime.beatId}:${mode}:${performance&&performance.index}`;

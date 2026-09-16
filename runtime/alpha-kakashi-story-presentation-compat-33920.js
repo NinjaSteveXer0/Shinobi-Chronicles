@@ -17,6 +17,7 @@ const PATCH_ID="academy_kakashi_story_presentation_compat_33920_v2_2026_09_16";
 const STYLE_ID="sc-kakashi-story-presentation-compat-33920-style";
 const boundStages=new WeakSet();
 let retainedDialogue33920=[];
+let retainedDialogueBeatId33920=null;
 
 function isKakashiScene33920(){
   try{
@@ -53,42 +54,147 @@ function installStyle33920(){
   display:block!important;margin:0 0 5px!important;font-size:10px!important;letter-spacing:.14em!important;
 }
 
-/* Conversation lane: one readable central stack between the two character cards. */
+/* Conversation lane: one spoken line, visibly moving with the speaker. */
 #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910{
-  width:min(42%,620px)!important;min-height:108px!important;
+  width:min(34%,540px)!important;
+  min-height:104px!important;
   padding:17px 22px 16px!important;
-  clip-path:none!important;border-radius:8px!important;
-  background:linear-gradient(180deg,rgba(4,12,18,.95),rgba(5,15,21,.90))!important;
-  box-shadow:0 18px 48px rgba(0,0,0,.42)!important;
-}
-#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-current.is-left,
-#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-current.is-right{
-  left:50%!important;right:auto!important;top:27%!important;bottom:auto!important;
-  transform:translateX(-50%)!important;
-}
-#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-previous.is-left,
-#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-previous.is-right{
-  left:50%!important;right:auto!important;top:45%!important;bottom:auto!important;
-  transform:translateX(-50%) scale(.98)!important;
-}
-#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-previous{
-  opacity:.68!important;filter:none!important;
-}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-dialogue-status-33910{display:none!important;}
 
-/* Narration stays low, while the conversation remains visible above it. */
-#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-narration-panel-33910{
-  width:min(72%,980px)!important;min-height:82px!important;padding:15px 22px!important;
-  clip-path:none!important;border-radius:8px!important;
+  clip-path:none!important;
+  border-radius:8px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4,12,18,.95),
+      rgba(5,15,21,.90)
+    )!important;
+
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.42)!important;
+
+  transition:
+    left .18s ease,
+    right .18s ease,
+    opacity .18s ease,
+    transform .18s ease!important;
 }
-#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained{
-  left:50%!important;right:auto!important;width:min(42%,620px)!important;min-height:92px!important;
-  padding:14px 20px!important;clip-path:none!important;border-radius:8px!important;
-  transform:translateX(-50%)!important;opacity:.58!important;filter:saturate(.72) brightness(.90)!important;
-  pointer-events:none!important;background:linear-gradient(180deg,rgba(4,12,18,.88),rgba(5,15,21,.80))!important;
+
+/* Kakashi speaks from the left side of the conversation lane. */
+#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"]
+.sc-dialogue-panel-33910.is-current.is-left{
+  left:29%!important;
+  right:auto!important;
+  top:27%!important;
+  bottom:auto!important;
+  transform:none!important;
 }
-#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained.retained-0-33920{top:25%!important;bottom:auto!important;}
-#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained.retained-1-33920{top:42%!important;bottom:auto!important;opacity:.43!important;}
+
+/* ANBU speaks from the right side. */
+#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"]
+.sc-dialogue-panel-33910.is-current.is-right{
+  right:29%!important;
+  left:auto!important;
+  top:27%!important;
+  bottom:auto!important;
+  transform:none!important;
+}
+
+/* Never stack yesterday's spoken line underneath today's. */
+#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"]
+.sc-dialogue-panel-33910.is-previous{
+  display:none!important;
+}
+
+#story-scene-presentation-layer[data-sc-scene-board="true"]
+.sc-dialogue-status-33910{
+  display:none!important;
+}
+
+
+/* Narration occupies the lower cinematic lane. */
+#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+.sc-narration-panel-33910{
+  left:50%!important;
+  bottom:4.3%!important;
+
+  transform:translateX(-50%)!important;
+
+  width:min(72%,980px)!important;
+  min-height:82px!important;
+  padding:15px 22px!important;
+
+  clip-path:none!important;
+  border-radius:8px!important;
+}
+
+
+/*
+The immediately preceding spoken line may remain while narration happens,
+but it stays on the side of the character who actually said it.
+*/
+#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+.sc-dialogue-panel-33910.is-retained{
+  width:min(34%,540px)!important;
+  min-height:92px!important;
+  padding:14px 20px!important;
+
+  top:27%!important;
+  bottom:auto!important;
+
+  clip-path:none!important;
+  border-radius:8px!important;
+
+  opacity:.72!important;
+  filter:none!important;
+  pointer-events:none!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(4,12,18,.92),
+      rgba(5,15,21,.86)
+    )!important;
+}
+
+#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+.sc-dialogue-panel-33910.is-retained.is-left{
+  left:29%!important;
+  right:auto!important;
+  transform:none!important;
+}
+
+#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+.sc-dialogue-panel-33910.is-retained.is-right{
+  right:29%!important;
+  left:auto!important;
+  transform:none!important;
+}
+
+/* There can never be a second retained spoken line. */
+#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+.retained-1-33920{
+  display:none!important;
+}
+
+@media(max-width:1000px){
+  #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"]
+  .sc-dialogue-panel-33910.is-current.is-left,
+
+  #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"]
+  .sc-dialogue-panel-33910.is-current.is-right,
+
+  #story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+  .sc-dialogue-panel-33910.is-retained.is-left,
+
+  #story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"]
+  .sc-dialogue-panel-33910.is-retained.is-right{
+    left:50%!important;
+    right:auto!important;
+    width:52%!important;
+    transform:translateX(-50%)!important;
+  }
+}
 
 /* Decision cards should not inherit the cut-corner treatment either. */
 #story-scene-presentation-layer[data-sc-board-ui-mode="decision"] .sc-story-choice{
@@ -124,40 +230,182 @@ function removeAdvanceButtons33920(layer){
   return nodes.length;
 }
 
+function activeBeatId33920(){
+  try{
+    const runtime=
+      typeof getActiveStorySceneRuntime==="function"
+        ?getActiveStorySceneRuntime()
+        :null;
+
+    return runtime&&runtime.beatId
+      ?String(runtime.beatId)
+      :null;
+  }catch(_error){
+    return null;
+  }
+}
+
+function isDialogueCue33920(cue){
+  if(!cue)return false;
+
+  return String(cue.kind||"")
+    .trim()
+    .toLowerCase()==="dialogue";
+}
+
+function dialogueSide33920(speakerName){
+  const speaker=String(speakerName||"")
+    .trim()
+    .toUpperCase();
+
+  if(
+    speaker==="KAKASHI" ||
+    speaker==="KAKASHI HATAKE"
+  ){
+    return "left";
+  }
+
+  return "right";
+}
+
 function captureDialogue33920(layer){
-  if(!layer||!layer.dataset||String(layer.dataset.scBoardUiMode||"")!=="dialogue"||typeof layer.querySelectorAll!=="function")return false;
-  const panels=Array.from(layer.querySelectorAll(".sc-dialogue-panel-33910"));
-  if(!panels.length)return false;
-  const rows=panels.map(panel=>{
-    const speaker=panel.querySelector&&panel.querySelector(".sc-dialogue-speaker-33910");
-    const copy=panel.querySelector&&panel.querySelector(".sc-dialogue-copy-33910");
-    return{
-      speaker:String(speaker&&speaker.textContent||""),
-      copy:String(copy&&copy.textContent||""),
-      current:!!(panel.classList&&panel.classList.contains&&panel.classList.contains("is-current"))
-    };
-  }).filter(row=>row.copy);
-  if(!rows.length)return false;
-  retainedDialogue33920=rows.sort((a,b)=>Number(b.current)-Number(a.current)).slice(0,2);
+  if(
+    !layer ||
+    !layer.dataset ||
+    String(layer.dataset.scBoardUiMode||"")!=="dialogue"
+  ){
+    return false;
+  }
+
+  /*
+  IMPORTANT:
+  Read the authoritative current performance cue.
+
+  Do not scrape transient DOM panels here. The DOM is being rebuilt
+  while cues advance and can briefly contain the outgoing/incoming
+  presentation at the same time.
+  */
+  const performance=
+    typeof getStoryScenePerformance33900==="function"
+      ?getStoryScenePerformance33900()
+      :null;
+
+  const cue=
+    performance&&performance.cue
+      ?performance.cue
+      :null;
+
+  if(!isDialogueCue33920(cue)){
+    return false;
+  }
+
+  const copy=
+    String(cue.text||"").trim();
+
+  if(!copy){
+    return false;
+  }
+
+  retainedDialogue33920=[{
+    speaker:String(cue.speakerName||""),
+    copy,
+    side:dialogueSide33920(cue.speakerName)
+  }];
+
+  retainedDialogueBeatId33920=
+    activeBeatId33920();
+
   return true;
 }
 
-function makeRetainedDialogue33920(row,index){
+function makeRetainedDialogue33920(row,index=0){
   const panel=document.createElement("section");
-  panel.className=`sc-dialogue-panel-33910 is-retained retained-${index}-33920`;
-  const speaker=document.createElement("div");speaker.className="sc-dialogue-speaker-33910";speaker.textContent=String(row&&row.speaker||"");
-  const copy=document.createElement("div");copy.className="sc-dialogue-copy-33910";copy.textContent=String(row&&row.copy||"");
+
+  const side=
+    row&&row.side==="right"
+      ?"right"
+      :"left";
+
+  panel.className=
+    `sc-dialogue-panel-33910 is-retained is-${side} retained-${index}-33920`;
+
+  const speaker=document.createElement("div");
+  speaker.className="sc-dialogue-speaker-33910";
+  speaker.textContent=String(row&&row.speaker||"");
+
+  const copy=document.createElement("div");
+  copy.className="sc-dialogue-copy-33910";
+  copy.textContent=String(row&&row.copy||"");
+
   panel.append(speaker,copy);
+
   return panel;
 }
 
 function injectRetainedDialogue33920(layer){
-  if(!layer||!layer.dataset||String(layer.dataset.scBoardUiMode||"")!=="performance_narration"||!retainedDialogue33920.length)return false;
-  const stage=layer.querySelector&&layer.querySelector(".sc-chronicle-stage");
-  const surface=stage&&stage.querySelector?stage.querySelector(".sc-performance-surface-33910"):null;
-  if(!surface||typeof surface.querySelector!=="function")return false;
-  if(surface.querySelector(".sc-dialogue-panel-33910.is-retained"))return true;
-  retainedDialogue33920.forEach((row,index)=>surface.appendChild(makeRetainedDialogue33920(row,index)));
+  if(
+    !layer ||
+    !layer.dataset ||
+    String(layer.dataset.scBoardUiMode||"")!=="performance_narration" ||
+    !retainedDialogue33920.length
+  ){
+    return false;
+  }
+
+  /*
+  A spoken line may survive only inside the semantic beat that owns it.
+
+  Rooftop dialogue therefore cannot leak into Konoha Alley,
+  another backdrop, another decision beat, etc.
+  */
+  const currentBeatId=activeBeatId33920();
+
+  if(
+    retainedDialogueBeatId33920 &&
+    currentBeatId!==retainedDialogueBeatId33920
+  ){
+    retainedDialogue33920=[];
+    retainedDialogueBeatId33920=null;
+    return false;
+  }
+
+  const stage=
+    layer.querySelector&&
+    (
+      layer.querySelector(".sc-chronicle-stage") ||
+      layer.querySelector(".sc-story-stage")
+    );
+
+  const surface=
+    stage&&stage.querySelector
+      ?stage.querySelector(
+          ".sc-performance-surface-33910"
+        )
+      :null;
+
+  if(
+    !surface ||
+    typeof surface.querySelector!=="function"
+  ){
+    return false;
+  }
+
+  if(
+    surface.querySelector(
+      ".sc-dialogue-panel-33910.is-retained"
+    )
+  ){
+    return true;
+  }
+
+  const row=retainedDialogue33920[0];
+
+  if(!row)return false;
+
+  surface.appendChild(
+    makeRetainedDialogue33920(row,0)
+  );
+
   return true;
 }
 
@@ -178,15 +426,110 @@ function bindStage33920(stage,layer){
 
 function sync33920(){
   if(typeof document==="undefined")return false;
-  const layer=document.getElementById("story-scene-presentation-layer");
-  if(!layer||!isKakashiScene33920())return false;
+  const layer=
+  document.getElementById(
+    "story-scene-presentation-layer"
+  );
+
+if(!layer||!isKakashiScene33920()){
+  retainedDialogue33920=[];
+  retainedDialogueBeatId33920=null;
+  return false;
+}
   const stage=layer.querySelector(".sc-chronicle-stage")||layer.querySelector(".sc-story-stage")||layer;
   bindStage33920(stage,layer);
   removeAdvanceButtons33920(layer);
-  const mode=layer.dataset?String(layer.dataset.scBoardUiMode||""):"";
-  if(mode==="dialogue")captureDialogue33920(layer);
-  if(mode==="performance_narration")injectRetainedDialogue33920(layer);
-  if(mode==="decision")retainedDialogue33920=[];
+  const mode=
+  layer.dataset
+    ?String(layer.dataset.scBoardUiMode||"")
+    :"";
+
+const currentBeatId=
+  activeBeatId33920();
+
+const performance=
+  typeof getStoryScenePerformance33900==="function"
+    ?getStoryScenePerformance33900()
+    :null;
+
+const cue=
+  performance&&performance.cue
+    ?performance.cue
+    :null;
+
+const cueKind=
+  String(cue&&cue.kind||"")
+    .trim()
+    .toLowerCase();
+
+
+/*
+Never carry retained speech into another semantic beat.
+*/
+if(
+  retainedDialogueBeatId33920 &&
+  currentBeatId &&
+  retainedDialogueBeatId33920!==currentBeatId
+){
+  retainedDialogue33920=[];
+  retainedDialogueBeatId33920=null;
+}
+
+
+/*
+Dialogue:
+capture the current legitimate spoken line.
+*/
+if(mode==="dialogue"){
+  captureDialogue33920(layer);
+}
+
+
+/*
+Narration:
+the immediately preceding spoken line may remain above
+while the narration plays below.
+*/
+if(
+  mode==="performance_narration" &&
+  cueKind==="narration"
+){
+  injectRetainedDialogue33920(layer);
+}
+
+
+/*
+Action:
+physical activity owns the lower ACTION lane by itself.
+
+Do not leave a dialogue box hanging above it.
+*/
+if(
+  mode==="performance_narration" &&
+  cueKind==="action"
+){
+  retainedDialogue33920=[];
+  retainedDialogueBeatId33920=null;
+
+  if(layer.querySelectorAll){
+    layer
+      .querySelectorAll(
+        ".sc-dialogue-panel-33910.is-retained"
+      )
+      .forEach(node=>{
+        try{node.remove();}catch(_error){}
+      });
+  }
+}
+
+
+/*
+A decision also ends any retained conversational line.
+*/
+if(mode==="decision"){
+  retainedDialogue33920=[];
+  retainedDialogueBeatId33920=null;
+}
   return true;
 }
 
