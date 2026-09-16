@@ -7,7 +7,8 @@
 // sequential Story/Battle consumer -> installed-browser presentation fixes ->
 // Kakashi Substitution supersession -> installed-browser Battle interaction ->
 // neutral factual provider -> canonical Kakashi factual-state commit owner ->
-// Kakashi factual bindings.
+// Kakashi factual bindings -> Kakashi reward adapter -> factual terminal debrief
+// / Chronicle Receipt bridge.
 // Headless semantic QA loads only core + guard; dedicated harnesses load later
 // layers explicitly so each ownership seam remains independently testable.
 // ============================================================================
@@ -24,9 +25,9 @@ const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-3
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
 const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
-// Source/headless tranche only: preserve the current family cache identity until
-// the later #188 reward + browser-release tranche advances the full parent chain.
-const BUILD="kakashi-final-20260916-14";
+const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
+const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
+const BUILD="kakashi-final-20260917-15";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -47,12 +48,34 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadTerminalDebrief(){
+  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100||document.getElementById("sc-alpha-kakashi-terminal-debrief-35100-script"))return;
+  const terminal=document.createElement("script");
+  terminal.id="sc-alpha-kakashi-terminal-debrief-35100-script";
+  terminal.src=`${TERMINAL_DEBRIEF_PATH}?sc=${BUILD}`;
+  terminal.async=false;
+  document.head.appendChild(terminal);
+}
+function loadRewards(){
+  if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800){loadTerminalDebrief();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-origin-rewards-34800-script");
+  if(existing){existing.addEventListener("load",loadTerminalDebrief,{once:true});return;}
+  const rewards=document.createElement("script");
+  rewards.id="sc-alpha-kakashi-origin-rewards-34800-script";
+  rewards.src=`${REWARD_PATH}?sc=${BUILD}`;
+  rewards.async=false;
+  rewards.addEventListener("load",loadTerminalDebrief,{once:true});
+  document.head.appendChild(rewards);
+}
 function loadKakashiFactualBindings(){
-  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700||document.getElementById("sc-alpha-kakashi-factual-bindings-34700-script"))return;
+  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadRewards();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-factual-bindings-34700-script");
+  if(existing){existing.addEventListener("load",loadRewards,{once:true});return;}
   const bindings=document.createElement("script");
   bindings.id="sc-alpha-kakashi-factual-bindings-34700-script";
   bindings.src=`${KAKASHI_FACTUAL_BINDINGS_PATH}?sc=${BUILD}`;
   bindings.async=false;
+  bindings.addEventListener("load",loadRewards,{once:true});
   document.head.appendChild(bindings);
 }
 function loadFactualState(){
