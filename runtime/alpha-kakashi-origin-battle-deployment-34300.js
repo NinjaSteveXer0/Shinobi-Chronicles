@@ -204,8 +204,25 @@ function launchAcademyKakashiOriginPlBattle(spec={}){
   const primary=config.opposition[0];
   const launched=launchBattleWithReturnContext(primary,{encounterId:config.id,storyOccurrenceId:spec.storyOccurrenceId,sourceAnchorRef:spec.sourceAnchorRef,bindingRef:spec.bindingRef},returnContext);
   if(!launched||launched.success!==true)return launched||{success:false,reason:"kakashi_battle_launch_failed"};
-  const composed=configureBattleEnemyParticipants({enemyIds:config.opposition});
-  if(!composed||composed.success!==true)return{success:false,reason:"kakashi_opposition_composition_failed",detail:composed||null};
+    const composed=configureBattleEnemyParticipants(config.opposition);
+  const composedIds=Array.isArray(composed)
+    ?composed.map(row=>row&&row.id).filter(Boolean)
+    :[];
+
+  const compositionExact=
+    composedIds.length===config.opposition.length &&
+    config.opposition.every(
+      (participantId,index)=>composedIds[index]===participantId
+    );
+
+  if(!compositionExact){
+    return{
+      success:false,
+      reason:"kakashi_opposition_composition_failed",
+      expectedParticipantIds:[...config.opposition],
+      actualParticipantIds:composedIds
+    };
+  }
   const occurrenceId=currentBattle.battleId||launched.battleId||`kakashi-origin-battle-${Date.now()}`;
   currentBattle.encounterId=config.id;
   currentBattle.kakashiOriginDeployment={battleConfigId:config.id,battleOccurrenceId:occurrenceId,storyOccurrenceId:String(spec.storyOccurrenceId),sourceAnchorRef:String(spec.sourceAnchorRef),bindingRef:String(spec.bindingRef),returnToken:spec.returnToken?String(spec.returnToken):null,controllerParticipantId:KAKASHI,oppositionParticipantIds:[...config.opposition],pakkunAuthorized:config.pakkun===true,temporaryPakkun:config.pakkun?{participantRef:PAKKUN,basePL:16,remainingBattlePL:16,ownershipGranted:false,independentInitiative:false}:null,timingGate:clone(config.timingGate),playerActionOpportunityCount:0,countedControllerActionIds:[],packageCustodyDelta:"none",authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT};
