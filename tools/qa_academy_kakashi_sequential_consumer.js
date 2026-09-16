@@ -11,7 +11,7 @@ const loader=fs.readFileSync(path.join(root,"runtime","alpha-kakashi-final-origi
 const storage=new Map(),session=new Map();
 const store=map=>({getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k),clear:()=>map.clear()});
 const dummy=()=>({style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},appendChild(){},remove(){},setAttribute(){},getAttribute(){return null;},querySelector(){return null;},querySelectorAll(){return[];},addEventListener(){},removeEventListener(){},focus(){},click(){},innerHTML:"",textContent:"",value:"",checked:false,disabled:false});
-const context={console:{log(){},info(){},warn(){},error(){},table(){}},localStorage:store(storage),sessionStorage:store(session),document:{getElementById(){return null;},querySelector(){return null;},querySelectorAll(){return[];},createElement(){return dummy();},body:dummy(),head:dummy(),addEventListener(){},removeEventListener(){}},requestAnimationFrame(){return 0;},cancelAnimationFrame(){},alert(){},confirm(){return true;},prompt(){return null;},Image:function(){return dummy();},navigator:{userAgent:"node-kakashi-sequential"},location:{reload(){},href:"http://localhost/"},addEventListener(){},removeEventListener(){},setTimeout,clearTimeout,setInterval,clearInterval,Date,Math,JSON,Object,Array,Set,Map,Number,String,Boolean,RegExp,Error,TypeError,parseInt,parseFloat,Infinity,NaN};
+const context={console:{log(){},info(){},warn(){},error(){},table(){}},localStorage:store(storage),sessionStorage:store(session),document:{getElementById(){return null;},querySelector(){return null;},querySelectorAll(){return[];},createElement(){return dummy();},body:dummy(),head:dummy(),addEventListener(){},removeEventListener(){}},requestAnimationFrame(){return 0;},cancelAnimationFrame(){},alert(){},confirm(){return true;},prompt(){return null;},Image:function(){return dummy();},navigator:{userAgent:"node-kakashi-observe-battle"},location:{reload(){},href:"http://localhost/"},addEventListener(){},removeEventListener(){},setTimeout,clearTimeout,setInterval,clearInterval,Date,Math,JSON,Object,Array,Set,Map,Number,String,Boolean,RegExp,Error,TypeError,parseInt,parseFloat,Infinity,NaN};
 context.window=context;context.globalThis=context;vm.createContext(context);
 function run(src,file){return vm.runInContext(src,context,{filename:file});}
 function plain(expr,file="plain.js"){return JSON.parse(JSON.stringify(run(expr,file)));}
@@ -21,16 +21,17 @@ run(consumer,"runtime/alpha-kakashi-final-sequential-consumer-34410.js");
 
 const initialReport=plain(`runAcademyKakashiSequentialConsumer34410Diagnostics()`,`diag-initial.js`);
 assert.strictEqual(initialReport.pass,true,`34410 initial diagnostics failed: ${initialReport.failed.join(",")}`);
-const surface=plain(`(()=>{const d=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval"),m=d.beatMap,c=m.get("kak_original_major_choice").choices.find(x=>x.choiceId==="defeat_assassin_then_recover");return{choice:{label:c.label,nextBeatId:c.nextBeatId,available:c.availability().available},mi:m.get("kak_seq_mi_battle").battle,ps:m.get("kak_seq_ps_battle").battle,amt:m.get("kak_seq_amt_battle").battle,debrief:m.get("kak_seq_debrief_pending")};})()`,`surface.js`);
+const surface=plain(`(()=>{const d=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval"),m=d.beatMap,c=m.get("kak_original_major_choice").choices.find(x=>x.choiceId==="defeat_assassin_then_recover");return{choice:{label:c.label,nextBeatId:c.nextBeatId,available:c.availability().available},secureBattle:m.get("kak_observe_secure_package_battle").battle,secureReturn:m.get("kak_observe_secure_package_return"),mi:m.get("kak_seq_mi_battle").battle,ps:m.get("kak_seq_ps_battle").battle,amt:m.get("kak_seq_amt_battle").battle,debrief:m.get("kak_seq_debrief_pending")};})()`,`surface.js`);
 assert.strictEqual(surface.choice.available,true);assert.strictEqual(surface.choice.nextBeatId,"kak_seq_mi_battle");
+assert.strictEqual(surface.secureBattle.encounterId,"academy_kakashi_origin_battle_ps_mi_2v1","GO FOR THE PACKAGE prepared wrong Battle config");
+assert.strictEqual(surface.secureBattle.postBattleBeatId,"kak_observe_secure_package_return");
+assert.strictEqual(surface.secureReturn.exitScene,false,"secure-package return must not falsely terminal-complete");
+assert.strictEqual(surface.secureReturn.allowPresentationClose,false,"secure-package return must stay fail-closed pending AK_SA_025");
 assert.strictEqual(surface.mi.encounterId,"academy_kakashi_origin_battle_seq_mi");
 assert.strictEqual(surface.ps.encounterId,"academy_kakashi_origin_battle_seq_ps");
 assert.strictEqual(surface.amt.encounterId,"academy_kakashi_origin_battle_seq_amt_pakkun");
 assert.strictEqual(surface.debrief.exitScene,false,"consumer must not falsely terminal-complete unresolved package/participant facts");
 
-// Model the factual handoff menu that 34120 creates later in production load
-// order. 34410 must be able to bind exactly its proven route after that beat
-// exists, leaving the other four choices fail-closed.
 run(`(()=>{const d=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval");const blocked=()=>({available:false,knownBlocker:"guarded"});d.beatMap.set("kak_get_closer_handoff_observe_escalation",{beatId:"kak_get_closer_handoff_observe_escalation",mode:"choice",choices:[
 {choiceId:"stop_assassin",label:"CUT HER OFF",nextBeatId:"kak_get_closer_handoff_observe_escalation",availability:blocked,consequenceRequests:[]},
 {choiceId:"secure_package",label:"GO FOR THE PACKAGE",nextBeatId:"kak_get_closer_handoff_observe_escalation",availability:blocked,consequenceRequests:[]},
@@ -40,34 +41,49 @@ run(`(()=>{const d=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieva
 ]});})()`,`factual-menu.js`);
 const bind=plain(`SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410.bindObserveEscalationChoice()`,`bind-observe.js`);
 assert.strictEqual(bind.success,true,`factual Observe bind failed: ${JSON.stringify(bind)}`);
-const factualMenu=plain(`(()=>{const m=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_get_closer_handoff_observe_escalation");return m.choices.map(c=>({id:c.choiceId,label:c.label,next:c.nextBeatId,available:c.availability().available,requests:(c.consequenceRequests||[]).map(r=>r.requestId)}));})()`,`factual-menu-report.js`);
+let factualMenu=plain(`(()=>{const m=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_get_closer_handoff_observe_escalation");return m.choices.map(c=>({id:c.choiceId,label:c.label,next:c.nextBeatId,available:c.availability().available,requests:(c.consequenceRequests||[]).map(r=>r.requestId)}));})()`,`factual-menu-report.js`);
 const sequential=factualMenu.find(row=>row.id==="defeat_assassin_then_secure");
+const secureGuarded=factualMenu.find(row=>row.id==="secure_package");
 assert(sequential,"factual sequential choice missing");
 assert.strictEqual(sequential.available,true,"factual sequential choice remained guarded");
 assert.strictEqual(sequential.next,"kak_seq_mi_battle","factual sequential choice did not enter exact MI Battle");
 assert.deepStrictEqual(sequential.requests,["kakashi_observe_sequential_intent_34410"],"factual sequential choice missing semantic intent transaction");
+assert.strictEqual(secureGuarded.available,false,"GO FOR THE PACKAGE released before AK_SA_025 closure");
 assert(factualMenu.filter(row=>row.id!=="defeat_assassin_then_secure").every(row=>row.available===false),"unimplemented Observe choices were released");
+
+const securePrepared=plain(`SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410.bindObserveSecurePackageChoice({release:false})`,`secure-prepared.js`);
+assert.strictEqual(securePrepared.success,true);assert.strictEqual(securePrepared.prepared,true);assert.strictEqual(securePrepared.released,false);
+const secureBind=plain(`SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410.bindObserveSecurePackageChoice({release:true})`,`secure-bind.js`);
+assert.strictEqual(secureBind.success,true);assert.strictEqual(secureBind.released,true);
+factualMenu=plain(`(()=>{const m=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_get_closer_handoff_observe_escalation");return m.choices.map(c=>({id:c.choiceId,next:c.nextBeatId,available:c.availability().available,requests:(c.consequenceRequests||[]).map(r=>r.requestId)}));})()`,`factual-menu-secure-report.js`);
+const secure=factualMenu.find(row=>row.id==="secure_package");
+assert.strictEqual(secure.available,true,"prepared secure-package binder could not activate exact route");
+assert.strictEqual(secure.next,"kak_observe_secure_package_battle");
+assert.deepStrictEqual(secure.requests,["kakashi_observe_secure_package_intent_34410"]);
+assert(factualMenu.filter(row=>!["secure_package","defeat_assassin_then_secure"].includes(row.id)).every(row=>row.available===false),"secure-package preparation released unrelated Observe choices");
 const boundReport=plain(`runAcademyKakashiSequentialConsumer34410Diagnostics()`,`diag-bound.js`);
 assert.strictEqual(boundReport.pass,true,`34410 bound diagnostics failed: ${boundReport.failed.join(",")}`);
 
-// Installed-browser delivery contract. The prior browser RED proved that direct
-// execution of 34410 in this harness was not enough: production parent URLs
-// could still serve an older 34000/34100 chain. Pin the complete fresh chain.
-assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),"32900 integrator still delivers stale 34000 identity");
-assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14'),"34000 still delivers stale Kakashi adapter identity");
-assert.ok(loader.includes('const BUILD="kakashi-final-20260916-14"'),"34100 child cache identity is stale");
-assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"34100 production loader missing 34410 sequential consumer");
+assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-5'),"32900 integrator still delivers stale 34000 identity");
+assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-15'),"34000 still delivers stale Kakashi adapter identity");
+assert.ok(loader.includes('const BUILD="kakashi-final-20260916-15"'),"34100 child cache identity is stale");
+assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"34100 production loader missing 34410 Observe Battle consumer");
 assert.ok(loader.includes('alpha-kakashi-factual-bindings-34700.js'),"34100 production loader missing terminal factual binding layer");
-assert.ok(!storyDecision.includes('kakashi-final-20260916-11'),"stale Kakashi parent delivery identity remains active");
+assert.ok(!storyDecision.includes('kakashi-final-20260916-14'),"stale Kakashi parent delivery identity remains active");
 
 const source=consumer;
 assert.ok(source.includes('sourceAnchorRef:spec.anchor'));
-assert.ok(source.includes('bindingRef:BINDING'));
+assert.ok(source.includes('bindingRef:BINDING.sequential'));
 assert.ok(source.includes('pakkunAuthorized:spec.pakkun'));
 assert.ok(source.includes('Number(result.playerActionOpportunityCount)<=max'));
-assert.ok(source.includes('commitStoryIntent'),"Observe route must commit semantic intent before Battle");
-assert.ok(source.includes('dispatchCommittedIntent'),"MI factual Battle receipt must close semantic intent");
+assert.ok(source.includes('sourceAnchorRef:"AK_SA_014"'),"GO FOR THE PACKAGE must use exact AK_SA_014 authority");
+assert.ok(source.includes('bindingRef:BINDING.securePackage'),"GO FOR THE PACKAGE missing Battle-owned semantic binding");
+assert.ok(source.includes('battleConfigId:CONFIG.securePackage'),"GO FOR THE PACKAGE missing exact 2-v-1 config");
+assert.ok(source.includes('kakashi_observe_secure_package_intent_34410'),"GO FOR THE PACKAGE intent transaction missing");
+assert.ok(source.includes('kakashi_observe_secure_package_battle_return_34410'),"GO FOR THE PACKAGE Battle-return transaction missing");
+assert.ok(source.includes('commitStoryIntent'),"Observe routes must commit semantic intent before Battle");
+assert.ok(source.includes('dispatchCommittedIntent'),"factual Battle receipts must close semantic intent");
 assert.ok(source.includes('battleOccurrenceId'),"semantic Battle return must reference factual Battle receipt");
-assert.ok(source.includes('kakashi_observe_sequential_mi_battle_return_34410'),"MI return consequence request missing");
+assert.ok(!source.includes('commitOccurrence('),"34410 must not invent post-Battle World Truth before AK_SA_025 classification owner exists");
 assert.ok(!source.includes('completeChronicleOriginPrologue('));
-console.log(JSON.stringify({pass:true,patch:"34410-v2",legacySequentialChoiceActionable:true,factualObserveSequentialChoiceActionable:true,otherObserveChoicesFailClosed:true,semanticIntentBeforeBattle:true,factualMiBattleReceiptClosesIntent:true,productionDeliveryCacheChainAdvanced:true,miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
+console.log(JSON.stringify({pass:true,patch:"34410-v3",legacySequentialChoiceActionable:true,factualObserveSequentialChoiceActionable:true,securePackage2v1Prepared:true,securePackageProductionRelease:false,securePackageExactAnchor:"AK_SA_014",securePackageExactConfig:"academy_kakashi_origin_battle_ps_mi_2v1",securePackageSemanticIntentBeforeBattle:true,securePackageFactualBattleReceiptReturn:true,securePackageWorldTruthStillFailClosed:true,otherObserveChoicesFailClosed:true,productionDeliveryCacheChainAdvanced:true,miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
