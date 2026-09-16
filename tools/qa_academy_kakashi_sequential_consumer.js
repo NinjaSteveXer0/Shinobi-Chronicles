@@ -5,6 +5,9 @@ const root=path.resolve(__dirname,"..");
 const game=fs.readFileSync(path.join(root,"game.js"),"utf8");
 const deployment=fs.readFileSync(path.join(root,"runtime","alpha-kakashi-origin-battle-deployment-34300.js"),"utf8");
 const consumer=fs.readFileSync(path.join(root,"runtime","alpha-kakashi-final-sequential-consumer-34410.js"),"utf8");
+const integrator=fs.readFileSync(path.join(root,"runtime","alpha-origin-scenes-32900-integrator.js"),"utf8");
+const storyDecision=fs.readFileSync(path.join(root,"runtime","alpha-story-decision-realisation-34000.js"),"utf8");
+const loader=fs.readFileSync(path.join(root,"runtime","alpha-kakashi-final-origin-adapter-34100.js"),"utf8");
 const storage=new Map(),session=new Map();
 const store=map=>({getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k),clear:()=>map.clear()});
 const dummy=()=>({style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},appendChild(){},remove(){},setAttribute(){},getAttribute(){return null;},querySelector(){return null;},querySelectorAll(){return[];},addEventListener(){},removeEventListener(){},focus(){},click(){},innerHTML:"",textContent:"",value:"",checked:false,disabled:false});
@@ -47,6 +50,16 @@ assert(factualMenu.filter(row=>row.id!=="defeat_assassin_then_secure").every(row
 const boundReport=plain(`runAcademyKakashiSequentialConsumer34410Diagnostics()`,`diag-bound.js`);
 assert.strictEqual(boundReport.pass,true,`34410 bound diagnostics failed: ${boundReport.failed.join(",")}`);
 
+// Installed-browser delivery contract. The prior browser RED proved that direct
+// execution of 34410 in this harness was not enough: production parent URLs
+// could still serve an older 34000/34100 chain. Pin the complete fresh chain.
+assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),"32900 integrator still delivers stale 34000 identity");
+assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14'),"34000 still delivers stale Kakashi adapter identity");
+assert.ok(loader.includes('const BUILD="kakashi-final-20260916-14"'),"34100 child cache identity is stale");
+assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"34100 production loader missing 34410 sequential consumer");
+assert.ok(loader.includes('alpha-kakashi-factual-bindings-34700.js'),"34100 production loader missing terminal factual binding layer");
+assert.ok(!storyDecision.includes('kakashi-final-20260916-11'),"stale Kakashi parent delivery identity remains active");
+
 const source=consumer;
 assert.ok(source.includes('sourceAnchorRef:spec.anchor'));
 assert.ok(source.includes('bindingRef:BINDING'));
@@ -57,4 +70,4 @@ assert.ok(source.includes('dispatchCommittedIntent'),"MI factual Battle receipt 
 assert.ok(source.includes('battleOccurrenceId'),"semantic Battle return must reference factual Battle receipt");
 assert.ok(source.includes('kakashi_observe_sequential_mi_battle_return_34410'),"MI return consequence request missing");
 assert.ok(!source.includes('completeChronicleOriginPrologue('));
-console.log(JSON.stringify({pass:true,patch:"34410-v2",legacySequentialChoiceActionable:true,factualObserveSequentialChoiceActionable:true,otherObserveChoicesFailClosed:true,semanticIntentBeforeBattle:true,factualMiBattleReceiptClosesIntent:true,miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
+console.log(JSON.stringify({pass:true,patch:"34410-v2",legacySequentialChoiceActionable:true,factualObserveSequentialChoiceActionable:true,otherObserveChoicesFailClosed:true,semanticIntentBeforeBattle:true,factualMiBattleReceiptClosesIntent:true,productionDeliveryCacheChainAdvanced:true,miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
