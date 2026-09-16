@@ -2,10 +2,7 @@ const fs=require('fs');
 const vm=require('vm');
 const path=require('path');
 
-function load(rel){
-  const abs=path.resolve(process.cwd(),rel);
-  vm.runInThisContext(fs.readFileSync(abs,'utf8'),{filename:rel});
-}
+function load(rel){const abs=path.resolve(process.cwd(),rel);vm.runInThisContext(fs.readFileSync(abs,'utf8'),{filename:rel});}
 function assert(condition,message){if(!condition)throw new Error(message);}
 
 globalThis.playerData={};
@@ -22,22 +19,13 @@ assert(diag&&diag.pass===true,`34700 diagnostics failed: ${JSON.stringify(diag&&
 const provider=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const bindings=provider.getRegisteredStoryFactualBindings();
 const byRef=new Map(bindings.map(row=>[row.bindingRef,row]));
-assert(byRef.size===10,`expected 10 Kakashi factual bindings, got ${byRef.size}`);
+assert(byRef.size===11,`expected 11 Kakashi factual bindings, got ${byRef.size}`);
 assert(!byRef.has('academy_kakashi.resolver.secure_package_before_assassin'),'unclosed exact envelope must stay fail-closed');
 assert(!byRef.has('academy_kakashi.resolver.pursue_original_target'),'unclosed exact envelope must stay fail-closed');
+assert(byRef.has('academy_kakashi.resolver.secure_package_amt_pursuit'),'secure-package AMT pursuit envelope missing');
 
 function resolve(bindingRef,eligibleOutcomeRefs,key){
-  return provider.resolveStoryFactualAction({
-    storyDecisionReceiptId:`decision:${key}`,
-    bindingRef,
-    actorRef:'academy_kakashi',
-    intentCommitRef:`intent:${key}`,
-    attemptOrdinal:1,
-    idempotenceKey:`idem:${key}`,
-    eligibleOutcomeRefs,
-    authorityVersionRefs:['qa-kakashi-34700'],
-    committedAtOccurrenceRef:'occ_origin_kakashi_qa'
-  });
+  return provider.resolveStoryFactualAction({storyDecisionReceiptId:`decision:${key}`,bindingRef,actorRef:'academy_kakashi',intentCommitRef:`intent:${key}`,attemptOrdinal:1,idempotenceKey:`idem:${key}`,eligibleOutcomeRefs,authorityVersionRefs:['qa-kakashi-34700'],committedAtOccurrenceRef:'occ_origin_kakashi_qa'});
 }
 
 const handoff=resolve('academy_kakashi.story_fixed.let_handoff_happen',null,'get-closer-handoff');
@@ -71,16 +59,22 @@ assert(improvedFail.result.pakkunPresent===false,'Pakkun leaked into improved-po
 const pursuitFail=resolve('academy_kakashi.resolver.stay_on_package_pursuit',['PURSUIT_FAILURE_AMT_ESCAPES_WITH_PACKAGE'],'pursuit-fail');
 assert(pursuitFail.success===true,'pursuit failure did not resolve');
 assert(pursuitFail.result.amtReached===false&&pursuitFail.result.pakkunPresent===false,'Pakkun must require legitimate downstream reach');
-
 const pursuitSuccess=resolve('academy_kakashi.resolver.stay_on_package_pursuit',['PURSUIT_SUCCESS_AMT_REACHED'],'pursuit-success');
 assert(pursuitSuccess.success===true,'pursuit success did not resolve');
 assert(pursuitSuccess.result.amtReached===true&&pursuitSuccess.result.pakkunPresent===true,'legitimate AMT reach must carry Pakkun presence');
 
-for(const [bindingRef,outcomeRef] of [
-  ['academy_kakashi.resolver.disposition_police','DISPOSITION_POLICE'],
-  ['academy_kakashi.resolver.disposition_release','DISPOSITION_RELEASE'],
-  ['academy_kakashi.resolver.disposition_return_anbu','DISPOSITION_RETURN_ANBU']
-]){
+const securePursuitFail=resolve('academy_kakashi.resolver.secure_package_amt_pursuit',['SECURE_PACKAGE_AMT_PURSUIT_FAILURE_ESCAPED'],'secure-pursuit-fail');
+assert(securePursuitFail.success===true,'secure-package pursuit failure did not resolve');
+assert(securePursuitFail.result.packageCustody==='KAKASHI','secure-package pursuit failure lost package custody');
+assert(securePursuitFail.result.amtReached===false&&securePursuitFail.result.amtEscaped===true&&securePursuitFail.result.pakkunPresent===false,'secure-package pursuit failure facts wrong');
+assert(securePursuitFail.result.battleRequired===false,'secure-package pursuit failure invented Battle');
+const securePursuitSuccess=resolve('academy_kakashi.resolver.secure_package_amt_pursuit',['SECURE_PACKAGE_AMT_PURSUIT_SUCCESS_REACHED'],'secure-pursuit-success');
+assert(securePursuitSuccess.success===true,'secure-package pursuit success did not resolve');
+assert(securePursuitSuccess.result.packageCustody==='KAKASHI','secure-package pursuit success lost package custody');
+assert(securePursuitSuccess.result.amtReached===true&&securePursuitSuccess.result.pakkunPresent===true,'secure-package pursuit success must commit legitimate AMT reach + Pakkun');
+assert(securePursuitSuccess.result.battleConfigId==='academy_kakashi_origin_battle_kakashi_pakkun_vs_amt','secure-package pursuit success must publish exact Pakkun-vs-AMT config');
+
+for(const [bindingRef,outcomeRef] of [['academy_kakashi.resolver.disposition_police','DISPOSITION_POLICE'],['academy_kakashi.resolver.disposition_release','DISPOSITION_RELEASE'],['academy_kakashi.resolver.disposition_return_anbu','DISPOSITION_RETURN_ANBU']]){
   const row=resolve(bindingRef,[outcomeRef],outcomeRef.toLowerCase());
   assert(row.success===true&&row.receipt.resolutionMode==='deterministic_single',`${bindingRef} must be deterministic once state-eligible`);
 }
@@ -95,16 +89,6 @@ const loader=fs.readFileSync(path.resolve(process.cwd(),'runtime/alpha-kakashi-f
 assert(loader.includes('alpha-story-factual-resolver-34600.js'),'browser loader does not include 34600 provider');
 assert(loader.includes('alpha-kakashi-factual-bindings-34700.js'),'browser loader does not include 34700 Kakashi bindings');
 assert(loader.indexOf('loadFactualProvider')<loader.indexOf('function loadBattleInteraction')||loader.includes('loadFactualProvider();return;'),'factual loader seam missing');
-assert(loader.includes('const BUILD="kakashi-final-20260916-14"'),'Kakashi child cache identity not advanced');
+assert(loader.includes('const BUILD="kakashi-final-20260916-14"'),'guarded tranche must not advance Kakashi child cache identity');
 
-console.log(JSON.stringify({
-  pass:true,
-  registeredBindingCount:byRef.size,
-  handoffOutcome:handoff.receipt.selectedOutcomeRef,
-  directFailureConfig:directFail.result.battleConfigId,
-  improvedFailureConfig:improvedFail.result.battleConfigId,
-  stableGetCloserOutcome:stableA.receipt.selectedOutcomeRef,
-  deferredExactEnvelopeBindings:api.deferredExactEnvelopeBindings,
-  kakashiChildCacheIdentity:'kakashi-final-20260916-14',
-  browserGoldenClaimed:false
-},null,2));
+console.log(JSON.stringify({pass:true,registeredBindingCount:byRef.size,handoffOutcome:handoff.receipt.selectedOutcomeRef,directFailureConfig:directFail.result.battleConfigId,improvedFailureConfig:improvedFail.result.battleConfigId,securePackagePursuitSuccess:securePursuitSuccess.receipt.selectedOutcomeRef,securePackagePursuitFailure:securePursuitFail.receipt.selectedOutcomeRef,stableGetCloserOutcome:stableA.receipt.selectedOutcomeRef,deferredExactEnvelopeBindings:api.deferredExactEnvelopeBindings,kakashiChildCacheIdentity:'kakashi-final-20260916-14',browserGoldenClaimed:false},null,2));
