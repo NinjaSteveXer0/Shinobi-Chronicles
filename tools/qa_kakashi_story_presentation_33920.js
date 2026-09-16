@@ -25,14 +25,17 @@ for(const forbidden of ["commitStoryIntent","resolveStoryFactualAction","launchA
   assert(!compat.includes(forbidden),`33920 must remain presentation-only: ${forbidden}`);
 }
 
-// Production delivery contract. The parent Scene Board cache identity remains
-// stable for this browser-only shim correction; Ctrl+F5 is the explicit replay
-// boundary for this tranche.
+// Production delivery contract. Installed-browser RED proved that directly
+// loading the corrected child in QA is insufficient when its parent dynamic
+// URLs retain an older cache identity. Both terminal parent and Scene Board
+// children must advance together for this corrective tranche.
 assert(restoration.includes('alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}'),"33800 must load 33920 from the Scene Board chain");
-assert(restoration.includes('const BUILD="scene-board-20260916-3";'),"33800 Scene Board parent identity drifted unexpectedly");
+assert(restoration.includes('const BUILD="scene-board-20260916-4";'),"33800 Scene Board child identity was not advanced");
 assert(restoration.includes('polish.addEventListener("load",load33920,{once:true})'),"33920 must wait until the live 33910 consumer is loaded");
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260916-3";'),"33200 Scene Board parent identity drifted unexpectedly");
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260916-4";'),"33200 Scene Board parent identity was not advanced");
 assert(traversal.includes('alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}'),"33200 must deliver 33800 through the versioned terminal chain");
+assert(!restoration.includes('const BUILD="scene-board-20260916-3";'),"stale Scene Board child identity remains active");
+assert(!traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260916-3";'),"stale Scene Board parent identity remains active");
 
 // Minimal installed-DOM semantic harness: non-interactive dialogue/narration
 // clicks advance once; actual controls and decision mode do not. The shim must
@@ -96,7 +99,7 @@ console.log(JSON.stringify({
   dialoguePersistsDuringNarration:true,
   clickAnywhereDialogueAndNarration:true,
   controlsProtected:true,
-  sceneBoardParentCacheIdentityPreserved:true,
+  sceneBoardParentCacheIdentityAdvanced:true,
   compatibilityShim:true,
   retireAfterBrowserAcceptance:true,
   browserGoldenClaimed:false
