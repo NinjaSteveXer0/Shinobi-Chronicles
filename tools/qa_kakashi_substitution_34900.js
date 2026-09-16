@@ -103,9 +103,11 @@ assert.strictEqual(afterHover.confirmCalls,beforeHover.confirmCalls);
 assert.strictEqual(p.panel.dataset.previewSkillId,NEW);
 assert(p.panel.innerHTML.includes("NEXT DIRECT HIT -50%"));
 
-// Exercise the shipped generic Battle resolver directly. This is deliberately
-// separate from the Kakashi projection context: 34900 supplies only the guard
-// definition; game.js remains the sole owner of packet qualification/consumption.
+// Exercise the shipped generic Battle resolver inside a canonical Battle
+// occurrence that the engine itself creates. 34900 owns the exact Kakashi Skill
+// definition; game.js remains the sole owner of transient-state packet
+// qualification/consumption. Reusing the existing Mission-5 diagnostic Battle
+// avoids inventing an invalid ad-hoc currentBattle shape in this harness.
 const storage=new Map(),session=new Map();
 const store=map=>({getItem:k=>map.has(k)?map.get(k):null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k),clear:()=>map.clear()});
 const dummy=()=>({style:{},dataset:{},classList:{add(){},remove(){},toggle(){}},appendChild(){},remove(){},setAttribute(){},getAttribute(){return null;},querySelector(){return null;},querySelectorAll(){return[];},addEventListener(){},removeEventListener(){},focus(){},click(){},innerHTML:"",textContent:"",value:"",checked:false,disabled:false});
@@ -113,24 +115,34 @@ const native={console:{log(){},info(){},warn(){},error(){},table(){}},localStora
 native.window=native;native.globalThis=native;vm.createContext(native);
 function run(code,file="native-probe.js"){return vm.runInContext(code,native,{filename:file});}
 run(gameSrc,"game.js");
-const apis=run(`({add:typeof addBattleTransientState,find:typeof findBattleTransientState,pre:typeof resolveBattlePreStaminaDefense})`);
-assert.deepStrictEqual(JSON.parse(JSON.stringify(apis)),{add:"function",find:"function",pre:"function"},"generic guard APIs missing");
+const apis=run(`({
+  find:typeof findBattleTransientState,
+  pre:typeof resolveBattlePreStaminaDefense,
+  createDiagnostic:typeof createArc1M5FemaleOperatorDiagnosticBattleState,
+  attemptM5:typeof attemptArc1M5FemaleOperatorAction,
+  authority:typeof ARC1_M5_FEMALE_OPERATOR_AUTHORITY
+})`);
+assert.deepStrictEqual(JSON.parse(JSON.stringify(apis)),{find:"function",pre:"function",createDiagnostic:"function",attemptM5:"function",authority:"object"},"canonical generic guard diagnostic APIs missing");
 
 function resetNativeGuard(){
-  run(`
-    currentBattle={active:true,battleOver:false,battleLog:[],playerParticipants:[{id:"academy_kakashi",stats:{stamina:15},hp:15,maxHp:15}],enemyParticipants:[{id:"diag_enemy",stats:{stamina:10},hp:10,maxHp:10}]};
-    addBattleTransientState({
-      stateKey:"academy_kakashi_substitution_guard",
-      sourceSide:"player",sourceParticipantId:"academy_kakashi",
-      targetSide:"player",targetParticipantId:"academy_kakashi",
-      ownerRef:{type:"skill",id:"academy_kakashi_substitution_jutsu"},
-      data:{sourceSkillId:"academy_kakashi_substitution_jutsu",preventionRatio:0.50,oneUse:true,sourceOwned:true,selfTargetOnly:true,requiresDirectAttackPLPacket:true,consumedByTargetParticipantOnly:true,staminaOrder:"pre_stamina"}
-    });
-  `);
+  const result=JSON.parse(JSON.stringify(run(`
+    createArc1M5FemaleOperatorDiagnosticBattleState({withRecognitionRoute:true,withCalibrationContext:true});
+    (()=>{
+      const A=ARC1_M5_FEMALE_OPERATOR_AUTHORITY;
+      const attempt=attemptArc1M5FemaleOperatorAction(A.actionIds.countersealGuard,{});
+      const state=findBattleTransientState({stateKey:"mission5_female_operator_counterseal_guard",targetSide:"enemy",targetParticipantId:A.stableParticipantId});
+      if(!attempt||attempt.success!==true||!state)return{success:false,attempt,stateFound:!!state};
+      state.stateKey="academy_kakashi_substitution_guard";
+      state.data={...(state.data||{}),sourceSkillId:"academy_kakashi_substitution_jutsu",attackMultiplier:0.50,preventionRatio:0.50,oneUse:true,requiresDirectAttackPLPacket:true,preStamina:true,staminaOrder:"pre_stamina"};
+      return{success:true,targetParticipantId:A.stableParticipantId};
+    })()
+  `)));
+  assert.strictEqual(result.success,true,"canonical Battle state must establish a reusable one-use guard state");
+  return result.targetParticipantId;
 }
-function guardExists(){return !!run(`findBattleTransientState({stateKey:"academy_kakashi_substitution_guard",targetSide:"player",targetParticipantId:"academy_kakashi"})`);}
+function guardExists(){return !!run(`findBattleTransientState({stateKey:"academy_kakashi_substitution_guard",targetSide:"enemy",targetParticipantId:ARC1_M5_FEMALE_OPERATOR_AUTHORITY.stableParticipantId})`);}
 function pre(attackPL,qualifying,actionId){
-  return JSON.parse(JSON.stringify(run(`resolveBattlePreStaminaDefense({attackPL:${attackPL},mitigable:true,targetSide:"player",targetParticipantId:"academy_kakashi",primaryDiscipline:"Taijutsu",skillId:"diag_direct",actionId:${JSON.stringify(actionId)},sourceSide:"enemy",sourceParticipantId:"diag_enemy",qualifyingDirectAttackPLPacket:${qualifying?"true":"false"}})`)));
+  return JSON.parse(JSON.stringify(run(`resolveBattlePreStaminaDefense({attackPL:${attackPL},mitigable:true,targetSide:"enemy",targetParticipantId:ARC1_M5_FEMALE_OPERATOR_AUTHORITY.stableParticipantId,primaryDiscipline:"Taijutsu",skillId:"diag_direct",actionId:${JSON.stringify(actionId)},sourceSide:"player",sourceParticipantId:"academy_menma",qualifyingDirectAttackPLPacket:${qualifying?"true":"false"}})`)));
 }
 
 resetNativeGuard();
@@ -164,6 +176,7 @@ console.log(JSON.stringify({
   legacyAnalyzeHistoryPreserved:true,
   staleRenderedAnalyzeIntercepted:true,
   exactYouthCopy:true,
+  canonicalBattleStateUsed:true,
   genericRatioGuardReused:true,
   nonQualifyingPacketDoesNotConsume:true,
   serializedUnresolvedGuardPersists:true,
