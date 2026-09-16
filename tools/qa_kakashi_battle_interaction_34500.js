@@ -37,16 +37,15 @@ assert(gameSrc.includes("function confirmSelectedBattleSkill()"),"native confirm
 assert(gameSrc.includes("const result=attemptBattlePreparedSkill(skillId,targetParticipantId,options)"),"native confirm no longer dispatches through Battle skill authority");
 assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/closure Battle resolver missing");
 
-// Preserve the already-proven parent semantic identities; only the 34100 child
-// build advances for this Battle interaction correction. Ctrl+F5 revalidates
-// the parent chain, while BUILD=12 gives every Kakashi child (including 34500)
-// a new concrete URL.
+// Preserve the already-proven parent semantic identities. The Kakashi child
+// build advances whenever any loaded child changes so Ctrl+F5 requests one
+// coherent child generation, including the unchanged 34500 interaction layer.
 assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-3'),
   "32900 Story-decision parent identity drifted unexpectedly");
 assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-11'),
   "34000 Kakashi adapter parent identity drifted unexpectedly");
-assert(adapterSrc.includes('const BUILD="kakashi-final-20260916-12";'),
-  "34100 must request current 34500 child cache identity");
+assert(adapterSrc.includes('const BUILD="kakashi-final-20260916-13";'),
+  "34100 must request current Kakashi child cache identity");
 assert(adapterSrc.includes('fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`'),
   "34500 child is not versioned by current Kakashi BUILD");
 
@@ -146,6 +145,6 @@ console.log(JSON.stringify({
   selectConfirmFallbackExactlyOnce:true,
   hoverPresentationOnly:true,
   resolverSemanticsUntouched:true,
-  kakashiChildCacheIdentity:"kakashi-final-20260916-12",
+  kakashiChildCacheIdentity:"kakashi-final-20260916-13",
   browserGoldenClaimed:false
 },null,2));
