@@ -67,6 +67,25 @@ register("academy_kakashi.resolver.get_closer",[
   },"academy_kakashi.decision.get_closer_failure")
 ],{anchorRefs:["AK_SA_005","AK_SA_006"]});
 
+register("academy_kakashi.story_fixed.let_handoff_happen",[
+  outcome("GET_CLOSER_SUCCESS_HANDOFF_COMPLETED",{
+    outcomeClass:"GET_CLOSER_SUCCESS_HANDOFF_COMPLETED",
+    handoffCompleted:true,
+    packageCustody:"PACKAGE_SMUGGLER",
+    retainsGetCloserKnowledge:true,
+    observeEscalationActive:true,
+    maskedInterceptorVisible:true,
+    pakkunPresent:false,
+    battleRequired:false,
+    nextDecisionPointRef:"OBSERVE_ESCALATION"
+  },"academy_kakashi.decision.observe_escalation")
+],{
+  anchorRefs:["AK_SA_005","AK_SA_002"],
+  deterministicStoryFixed:true,
+  requiresGetCloserSuccess:true,
+  maskedInterceptorVisibleOnlyAfterCompletedTransfer:true
+});
+
 register("academy_kakashi.resolver.pickpocket_direct",[
   outcome("PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION",{
     outcomeClass:"PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION",packageCustody:"KAKASHI",
@@ -140,12 +159,15 @@ if(FACTUAL_STATE&&(!consumerInstall||consumerInstall.success!==true)){
 function diagnostics(){
   const registered=PROVIDER.getRegisteredStoryFactualBindings();
   const byRef=new Map(registered.map(row=>[row.bindingRef,row]));
+  const handoff=byRef.get("academy_kakashi.story_fixed.let_handoff_happen");
   const direct=byRef.get("academy_kakashi.resolver.pickpocket_direct");
   const improved=byRef.get("academy_kakashi.resolver.pickpocket_improved");
   const pursuit=byRef.get("academy_kakashi.resolver.stay_on_package_pursuit");
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_factual_bindings_34700_2026_09_15",
-    allRegistrationsGreen:registrations.length===9&&registrations.every(row=>row&&row.success===true),
+    allRegistrationsGreen:registrations.length===10&&registrations.every(row=>row&&row.success===true),
+    handoffDeterministicExact:!!handoff&&JSON.stringify(handoff.outcomeRefs)===JSON.stringify(["GET_CLOSER_SUCCESS_HANDOFF_COMPLETED"]),
+    handoffCommitOwnerOptionalByLoadContext:!FACTUAL_STATE||typeof FACTUAL_STATE.getCommitResult("academy_kakashi.story_fixed.let_handoff_happen")==="function",
     directPickpocketExact:!!direct&&JSON.stringify(direct.outcomeRefs)===JSON.stringify(["PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION","PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1"]),
     improvedPickpocketExact:!!improved&&JSON.stringify(improved.outcomeRefs)===JSON.stringify(["PICKPOCKET_IMPROVED_SUCCESS_CLEAN_EXTRACTION","PICKPOCKET_IMPROVED_FAILURE_DETECTED_2V1"]),
     improvedDoesNotRegisterMI:!!improved&&!JSON.stringify(improved).includes("masked_interceptor"),
