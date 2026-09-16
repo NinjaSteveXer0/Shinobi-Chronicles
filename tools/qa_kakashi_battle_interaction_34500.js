@@ -37,14 +37,15 @@ assert(gameSrc.includes("function confirmSelectedBattleSkill()"),"native confirm
 assert(gameSrc.includes("const result=attemptBattlePreparedSkill(skillId,targetParticipantId,options)"),"native confirm no longer dispatches through Battle skill authority");
 assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/closure Battle resolver missing");
 
-// Preserve the already-proven parent semantic identities. The Kakashi child
-// build advances whenever any loaded child changes so Ctrl+F5 requests one
-// coherent child generation, including the unchanged 34500 interaction layer.
-assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-3'),
-  "32900 Story-decision parent identity drifted unexpectedly");
-assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-11'),
-  "34000 Kakashi adapter parent identity drifted unexpectedly");
-assert(adapterSrc.includes('const BUILD="kakashi-final-20260916-13";'),
+// Browser RED on the Story/continuation lane proved the production parent URLs
+// must advance with the Kakashi children. Keep the Battle interaction layer on
+// that same coherent fresh delivery generation even though 34500 semantics did
+// not change in this tranche.
+assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),
+  "32900 Story-decision parent identity is stale");
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14'),
+  "34000 Kakashi adapter parent identity is stale");
+assert(adapterSrc.includes('const BUILD="kakashi-final-20260916-14";'),
   "34100 must request current Kakashi child cache identity");
 assert(adapterSrc.includes('fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`'),
   "34500 child is not versioned by current Kakashi BUILD");
@@ -145,6 +146,6 @@ console.log(JSON.stringify({
   selectConfirmFallbackExactlyOnce:true,
   hoverPresentationOnly:true,
   resolverSemanticsUntouched:true,
-  kakashiChildCacheIdentity:"kakashi-final-20260916-13",
+  kakashiChildCacheIdentity:"kakashi-final-20260916-14",
   browserGoldenClaimed:false
 },null,2));
