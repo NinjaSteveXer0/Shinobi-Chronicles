@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+"use strict";
+const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("assert");
+const root=path.resolve(__dirname,"..");
+const runtimePath=path.join(root,"runtime","alpha-kakashi-origin-rewards-34800.js");
+const src=fs.readFileSync(runtimePath,"utf8");
+assert(src.includes("ACADEMY KAKASHI ORIGIN REWARD ADAPTER"));
+assert(src.includes('const ROUTE="academy_kakashi_origin_reward"'));
+assert(src.includes('const ITEM_SOURCE="kak_origin_item_field_recovery_resupply"'));
+assert(src.includes('const WEAPON_SOURCE="kak_origin_weapon_exceptional_training_tanto"'));
+assert(src.includes("addDisciplineExp"),"34800 must consume canonical discipline Progression");
+assert(src.includes("addItemToInventory"),"34800 must consume canonical Inventory grant");
+assert(!src.includes("battleOver")&&!src.includes("outcome===\"victory\""),"34800 must not infer terminal rewards from Battle victory");
+
+const characterProgression={nin:{exp:0},tai:{exp:0},gen:{exp:0},buki:{exp:0},fuin:{exp:0},kin:{exp:0},stamina:{exp:0}};
+const playerData={ryo:0,inventory:[]};
+const defs={
+  field_recovery_pill:{id:"field_recovery_pill",name:"Field Recovery Pill",type:"consumable",stackable:true},
+  academy_training_tanto:{id:"academy_training_tanto",name:"Academy Training Tanto",type:"weapon",weaponClass:"Tanto",stackable:false,statModifiers:{buki:1}}
+};
+let saves=0;
+const context={
+  console,globalThis:null,window:null,Set,Object,Array,String,Number,Boolean,JSON,Math,Date,Error,
+  playerData,
+  savePlayerData(){saves+=1;},
+  saveTestState(){},
+  addDisciplineExp(characterId,disciplineId,amount){
+    assert.strictEqual(characterId,"academy_kakashi");
+    if(!characterProgression[disciplineId])return false;
+    characterProgression[disciplineId].exp+=Number(amount)||0;
+    return {success:true,exp:characterProgression[disciplineId].exp};
+  },
+  getCharacterDisciplineProgression(characterId,disciplineId){
+    assert.strictEqual(characterId,"academy_kakashi");
+    return characterProgression[disciplineId]||null;
+  },
+  getItemDefinition(id){return defs[id]||null;},
+  addItemToInventory(item){
+    if(item.stackable){
+      const existing=playerData.inventory.find(row=>row.id===item.id&&!row.instanceId);
+      if(existing)existing.quantity=Number(existing.quantity||1)+1;
+      else playerData.inventory.push({...item,quantity:1});
+      return true;
+    }
+    playerData.inventory.push({...item,instanceId:`${item.id}_${playerData.inventory.length+1}`});
+    return true;
+  }
+};
+context.globalThis=context;context.window=context;
+vm.createContext(context);vm.runInContext(src,context,{filename:"alpha-kakashi-origin-rewards-34800.js"});
+
+const diag=JSON.parse(JSON.stringify(context.runAcademyKakashiOriginRewards34800Diagnostics()));
+assert.strictEqual(diag.pass,true,`34800 diagnostics failed: ${(diag.failed||[]).join(",")}`);
+assert.strictEqual(diag.browserGoldenClaimed,false);
+
+// Battle victory alone is not a terminal reward source.
+assert.strictEqual(context.evaluateAcademyKakashiTerminalDebriefRewards34800({terminalDebriefReached:false}).success,false);
+
+// Exact technical action development: effective +2, idempotent retry +0.
+let r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action1",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
+assert.strictEqual(r.success,true);assert.strictEqual(r.amount,2);assert.strictEqual(characterProgression.buki.exp,2);
+r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action1",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
+assert.strictEqual(r.idempotent,true);assert.strictEqual(characterProgression.buki.exp,2);
+context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action2",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
+context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action3",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
+r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action4",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
+assert.strictEqual(characterProgression.buki.exp,6);assert.strictEqual(r.amount,0,"technical discipline Battle cap must be 6");
+
+// Stamina development: positive mitigation only, max 2 per causal Battle.
+assert.strictEqual(context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam0",mitigationAmount:0,battleOccurrenceId:"battle1"}).success,false);
+context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam1",mitigationAmount:1,battleOccurrenceId:"battle1"});
+context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam2",mitigationAmount:2,battleOccurrenceId:"battle1"});
+r=context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam3",mitigationAmount:3,battleOccurrenceId:"battle1"});
+assert.strictEqual(characterProgression.stamina.exp,2);assert.strictEqual(r.amount,0);
+
+// Fieldcraft is evidence, not generic XP, and strengthens rather than duplicates.
+context.recordAcademyKakashiFieldcraftEvidence34800({sourceId:"approach1",family:"fieldcraft.stealth_approach",evidenceType:"covert_approach_attempt",significance:1});
+r=context.recordAcademyKakashiFieldcraftEvidence34800({sourceId:"approach2",family:"fieldcraft.stealth_approach",evidenceType:"undetected_positioning",significance:2});
+assert.strictEqual(r.evidence.significance,2);assert.strictEqual(r.evidence.sourceIds.length,2);
+
+// Terminal debrief package: exact max 250 and source-scoped Inventory grants once.
+const facts={terminalDebriefReached:true,packageRecovered:true,verifiedActionableIntelligence:true,liveCustodyEstablished:true,exceptionalFieldExecution:true,materiallyParticipatedInPlBattle:true,exceptionalTrainingTantoPredicate:true};
+r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
+assert.strictEqual(r.success,true);assert.strictEqual(r.ryo,250);assert.strictEqual(playerData.ryo,250);
+assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1);
+assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1);
+r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
+assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,250);
+assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1,"same-source retry must not duplicate weapon grant");
+
+console.log(JSON.stringify({pass:true,adapter:"34800-v2",canonicalProgression:true,canonicalInventory:true,technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,sourceScopedIdempotence:true,battleVictoryNotTerminalReward:true,browserGoldenClaimed:false,saves},null,2));
