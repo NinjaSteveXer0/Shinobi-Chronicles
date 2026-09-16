@@ -1,0 +1,78 @@
+name: SC AI Architecture & Contract Review v1
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_ref:
+        description: 'Git ref/SHA to compare against the checked-out HEAD'
+        required: false
+        default: 'HEAD^'
+        type: string
+      model:
+        description: 'OpenAI model ID available to this API project'
+        required: true
+        default: 'gpt-5.6-luna'
+        type: string
+      max_diff_chars:
+        description: 'Maximum textual diff characters sent to the API (10000-250000)'
+        required: true
+        default: '90000'
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  advisory-review:
+    name: Advisory architecture review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Resolve exact review range
+        shell: bash
+        run: |
+          set -euo pipefail
+          BASE_INPUT='${{ inputs.base_ref }}'
+          if ! BASE_SHA="$(git rev-parse "${BASE_INPUT}^{commit}" 2>/dev/null)"; then
+            echo "Could not resolve base_ref: ${BASE_INPUT}" >&2
+            exit 1
+          fi
+          HEAD_SHA="$(git rev-parse HEAD)"
+          if [[ "${BASE_SHA}" == "${HEAD_SHA}" ]]; then
+            echo "Base and head resolve to the same commit; nothing to review." >&2
+            exit 1
+          fi
+          echo "SC_REVIEW_BASE=${BASE_SHA}" >> "${GITHUB_ENV}"
+          echo "SC_REVIEW_HEAD=${HEAD_SHA}" >> "${GITHUB_ENV}"
+          echo "Review range: ${BASE_SHA}..${HEAD_SHA}"
+
+      - name: Validate reviewer source
+        run: node --check tools/sc_ai_architecture_review.mjs
+
+      - name: Run OpenAI advisory review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_REVIEW_MODEL: ${{ inputs.model }}
+          SC_REVIEW_MAX_DIFF_CHARS: ${{ inputs.max_diff_chars }}
+          SC_REVIEW_OUTPUT: sc-ai-review.md
+        run: node tools/sc_ai_architecture_review.mjs
+
+      - name: Upload review artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sc-ai-architecture-review
+          path: sc-ai-review.md
+          if-no-files-found: ignore
+          retention-days: 14
