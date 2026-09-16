@@ -4,47 +4,35 @@ const fs=require("fs"),path=require("path");
 const root=path.resolve(__dirname,"..");
 const game=fs.readFileSync(path.join(root,"game.js"),"utf8");
 
-function excerpt(label,needle,radius=4500){
+function excerpt(label,needle,radius=4200){
   const index=game.indexOf(needle);
   console.log(`\n===== ${label} :: ${needle} :: index=${index} =====`);
   if(index<0)return;
   console.log(game.slice(Math.max(0,index-radius),Math.min(game.length,index+radius)));
 }
-function occurrences(label,needle,radius=2200){
-  let from=0,count=0,index=-1;
-  while((index=game.indexOf(needle,from))>=0){
-    count+=1;
-    console.log(`\n===== ${label} #${count} :: ${needle} :: index=${index} =====`);
-    console.log(game.slice(Math.max(0,index-radius),Math.min(game.length,index+radius)));
-    from=index+needle.length;
-    if(count>=12)break;
-  }
-  console.log(`\n===== ${label} COUNT=${count} =====`);
+function namedFunctions(pattern){
+  const rows=[];
+  const re=/function\s+([A-Za-z_$][\w$]*)\s*\(/g;
+  for(const match of game.matchAll(re))if(pattern.test(match[1]))rows.push({name:match[1],index:match.index});
+  return rows;
 }
 
-// Bootstrap probe for Issue #209. This file will become the permanent
-// deterministic acceptance QA after the implementation seam is identified.
-// Keep the probe read-only: it must not mutate repository/runtime state.
-excerpt("TEAM_FORMATION_CONTINUE","continueAcademyTeamFormationJourney",7000);
-excerpt("TEAM_FORMATION_DESTINATION","ALPHA_ACADEMY_TEAM_FORMATION_CONTINUATION",5000);
-excerpt("TEAM_FORMATION_PRESENTATION_CONTINUE","continueInvocationCount",6500);
-excerpt("TEAM_FORMATION_BLOCKER","academy_team_formation_continue_required",4500);
-excerpt("TEAM_FORMATION_STATE","academyTeamFormation",5000);
-occurrences("ACADEMY_FREE_PLAY_OCCURRENCES","academy_free_play",2600);
-occurrences("ONBOARDING_STATUS_FREE_PLAY","onboardingStatus===\"academy_free_play\"",2600);
-occurrences("ONBOARDING_STATUS_FREE_PLAY_LOOSE","onboardingStatus==\"academy_free_play\"",2600);
-excerpt("KONOHA_STANDING_POOL","konoha_alpha_standing_pool_v1",4500);
-excerpt("KONOHA_P07","KON-P07",3500);
-excerpt("KONOHA_A02","KON-A02",3500);
-excerpt("KONOHA_X12","KOH-X12",3500);
+console.log("===== ISSUE 209 MAP/NAV FUNCTION NAMES =====");
+console.log(JSON.stringify(namedFunctions(/Konoha|Village|Location|Hotspot|World|Training/i).slice(0,220),null,2));
+excerpt("VILLAGE_OVERLAY_RENDER","renderVillage",6000);
+excerpt("KONOHA_V3_RENDER","ALPHA_KONOHA_V3_AUTHORITY",6500);
+excerpt("LOCATION_DATASET","data-location-id",6000);
+excerpt("HOTSPOT_DATASET","data-hotspot",6000);
+excerpt("GENERAL_TRAINING_NAME","General Training Ground",6500);
+excerpt("PRACTICAL_COMPOUND_NAME","Practical Training Compound",5000);
+excerpt("WORLD_OPPORTUNITY_ROUTE","routeWorldOpportunityInteraction",5000);
+excerpt("FREE_PLAY_AVAILABILITY","isAcademyFreePlayAvailable",5000);
 
 console.log(JSON.stringify({
   probe:true,
   issue:209,
   foundContinue:game.includes("continueAcademyTeamFormationJourney"),
-  foundTeamFormation:game.includes("academyTeamFormation"),
-  foundAcademyFreePlay:game.includes("academy_free_play"),
-  foundDestination:game.includes("ALPHA_ACADEMY_TEAM_FORMATION_CONTINUATION"),
   foundKonohaP07:game.includes("KON-P07"),
-  foundKonohaA02:game.includes("KON-A02")
+  foundKonohaA02:game.includes("KON-A02"),
+  candidateFunctionCount:namedFunctions(/Konoha|Village|Location|Hotspot|World|Training/i).length
 },null,2));
