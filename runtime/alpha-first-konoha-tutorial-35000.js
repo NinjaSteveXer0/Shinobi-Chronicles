@@ -162,9 +162,9 @@ function resolveObservation(){
   if(row.orientationStarted!==true)return {success:false,reason:"first_team_orientation_not_started"};
   row.observationResolved=true;touch(row,"observation_resolved");save();projectCurrentSurface();return {success:true,phase:row.phase,battleStarted:false,rewardGranted:false,performanceFailure:false};
 }
-function historyHas(id){const history=globalThis.playerData&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];return history.some(item=>item&&item.committed===true&&(item.id===id||item.occurrenceId===id));}
+function historyHas(id){const history=typeof playerData!=="undefined"&&Array.isArray(playerData.activityHistory)?playerData.activityHistory:[];return history.some(item=>item&&item.committed===true&&(item.id===id||item.occurrenceId===id));}
 function appendCompletionHistory(row,completion){
-  if(!globalThis.playerData||!Array.isArray(playerData.activityHistory))return false;
+  if(typeof playerData==="undefined"||!Array.isArray(playerData.activityHistory))return false;
   const historyId=`${COMPLETION_RECEIPT_ID}::${row.academyTeamFormationReceiptRef}`;
   if(historyHas(historyId))return false;
   playerData.activityHistory.push({
