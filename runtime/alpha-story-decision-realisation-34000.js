@@ -364,7 +364,7 @@ globalThis.runStoryDecisionRealisation34000Diagnostics=runStoryDecisionRealisati
       const id="sc-alpha-kakashi-final-34100-script";
       if(document.getElementById(id))return;
       const script=document.createElement("script");script.id=id;script.async=false;
-      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-11";
+      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14";
       document.head.appendChild(script);return;
     }
     attempts+=1;if(attempts<240&&typeof setTimeout==="function")setTimeout(tryLoad,50);
