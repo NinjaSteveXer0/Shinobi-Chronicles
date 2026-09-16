@@ -13,25 +13,30 @@ const traversal=fs.readFileSync(traversalPath,"utf8");
 assert(compat.includes("compatibilityShim:true"),"33920 must identify itself as a compatibility shim");
 assert(compat.includes("retireAfterBrowserAcceptance:true"),"33920 must declare its retirement condition");
 assert(compat.includes("sc-scene-board-33900__actor-tag")&&compat.includes("display:none!important"),"runtime actor name overlay must be suppressed on collectible cards");
-assert(compat.includes("clip-path:none!important")&&compat.includes("border-radius:7px!important"),"cut-corner dialogue treatment must be removed");
-assert(compat.includes("is-current.is-left")&&compat.includes("top:25%!important"),"Kakashi-side current dialogue must be raised");
-assert(compat.includes("left:31%!important")&&compat.includes("right:31%!important"),"current dialogue surfaces must occupy the central conversation lane");
-assert(compat.includes("opacity:.72!important")&&compat.includes("filter:none!important"),"previous dialogue must remain readable instead of card-overlapping ghost treatment");
+assert(compat.includes("sc-performance-next-33910")&&compat.includes("removeAdvanceButtons33920"),"redundant dialogue/narration arrow must be removed");
+assert(compat.includes("min-width:240px!important")&&compat.includes("font-size:11px!important"),"scene object/instruction plate must be materially larger");
+assert(compat.includes("clip-path:none!important")&&compat.includes("border-radius:8px!important"),"cut-corner dialogue treatment must be removed");
+assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the central conversation stack");
+assert(compat.includes("sc-dialogue-status-33910")&&compat.includes("display:none!important"),"SPEAKING/PREVIOUS micro-labels must be removed");
+assert(compat.includes("captureDialogue33920")&&compat.includes("injectRetainedDialogue33920")&&compat.includes("is-retained"),"dialogue must persist visually while narration continues");
 assert(compat.includes("globalThis.advanceStoryScene"),"Story stage click must use the existing Story advance authority");
 assert(compat.includes("interactiveTarget33920"),"interactive controls must be protected from stage-wide advance");
 for(const forbidden of ["commitStoryIntent","resolveStoryFactualAction","launchAcademyKakashiOriginPlBattle","commitCharacterAcquisition","awardOriginRewards"]){
   assert(!compat.includes(forbidden),`33920 must remain presentation-only: ${forbidden}`);
 }
 
-// Production delivery / cache identity contract.
+// Production delivery contract. The parent Scene Board cache identity remains
+// stable for this browser-only shim correction; Ctrl+F5 is the explicit replay
+// boundary for this tranche.
 assert(restoration.includes('alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}'),"33800 must load 33920 from the Scene Board chain");
-assert(restoration.includes('const BUILD="scene-board-20260916-3";'),"33800 must carry the current Scene Board child cache identity");
+assert(restoration.includes('const BUILD="scene-board-20260916-3";'),"33800 Scene Board parent identity drifted unexpectedly");
 assert(restoration.includes('polish.addEventListener("load",load33920,{once:true})'),"33920 must wait until the live 33910 consumer is loaded");
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260916-3";'),"33200 must request the current 33800 cache identity");
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260916-3";'),"33200 Scene Board parent identity drifted unexpectedly");
 assert(traversal.includes('alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}'),"33200 must deliver 33800 through the versioned terminal chain");
 
 // Minimal installed-DOM semantic harness: non-interactive dialogue/narration
-// clicks advance once; actual controls and decision mode do not.
+// clicks advance once; actual controls and decision mode do not. The shim must
+// remain safe when the compact test DOM does not provide rich querySelectorAll.
 const nodes=new Map();
 let stageClick=null,advanceCalls=0;
 const stage={
@@ -45,7 +50,7 @@ const layer={
 const head={appendChild(node){if(node&&node.id)nodes.set(node.id,node);return node;}};
 const document={
   head,body:{},
-  createElement(tag){return{id:"",textContent:"",remove(){if(this.id)nodes.delete(this.id);}};},
+  createElement(){return{id:"",className:"",textContent:"",append(){},appendChild(){},remove(){if(this.id)nodes.delete(this.id);}};},
   getElementById(id){if(id==="story-scene-presentation-layer")return layer;return nodes.get(id)||null;}
 };
 const context={
@@ -84,14 +89,14 @@ assert.strictEqual(diag.browserGoldenClaimed,false,"browser Golden must remain u
 
 console.log(JSON.stringify({
   pass:true,
-  patch:"33920",
-  collectibleNameOverlayRemoved:true,
-  cutCornersRemoved:true,
-  kakashiDialogueRaised:true,
-  centralConversationLane:true,
+  patch:"33920-v2",
+  redundantArrowRemoved:true,
+  instructionPlateReadable:true,
+  dialogueCentralStack:true,
+  dialoguePersistsDuringNarration:true,
   clickAnywhereDialogueAndNarration:true,
   controlsProtected:true,
-  sceneBoardCacheIdentityCurrent:true,
+  sceneBoardParentCacheIdentityPreserved:true,
   compatibilityShim:true,
   retireAfterBrowserAcceptance:true,
   browserGoldenClaimed:false
