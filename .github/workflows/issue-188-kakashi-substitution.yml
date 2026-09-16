@@ -1,0 +1,33 @@
+name: Issue 188 Kakashi Substitution QA
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'game.js'
+      - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
+      - 'runtime/alpha-kakashi-substitution-34900.js'
+      - 'tools/qa_kakashi_substitution_34900.js'
+      - '.github/workflows/issue-188-kakashi-substitution.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  kakashi-substitution:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax and production-load gate
+        run: |
+          node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
+          node --check runtime/alpha-kakashi-substitution-34900.js
+          node --check tools/qa_kakashi_substitution_34900.js
+          grep -Fq 'alpha-kakashi-substitution-34900.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'loadSubstitution' runtime/alpha-kakashi-final-origin-adapter-34100.js
+      - name: Kakashi Substitution semantic and native-guard proof
+        run: node tools/qa_kakashi_substitution_34900.js

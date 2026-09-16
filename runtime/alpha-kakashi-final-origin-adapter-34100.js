@@ -5,8 +5,9 @@
 // Browser order is:
 // semantic core -> stale-authority guard -> Combat deployment -> exact
 // sequential Story/Battle consumer -> installed-browser presentation fixes ->
-// installed-browser Battle interaction correction -> neutral factual provider ->
-// canonical Kakashi factual-state commit owner -> Kakashi factual bindings.
+// Kakashi Substitution supersession -> installed-browser Battle interaction ->
+// neutral factual provider -> canonical Kakashi factual-state commit owner ->
+// Kakashi factual bindings.
 // Headless semantic QA loads only core + guard; dedicated harnesses load later
 // layers explicitly so each ownership seam remains independently testable.
 // ============================================================================
@@ -18,10 +19,13 @@ const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
 const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
 const SEQUENTIAL_PATH="runtime/alpha-kakashi-final-sequential-consumer-34410.js";
 const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
+const SUBSTITUTION_PATH="runtime/alpha-kakashi-substitution-34900.js";
 const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-34500.js";
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
 const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
+// Source/headless tranche only: preserve the current family cache identity until
+// the later #188 reward + browser-release tranche advances the full parent chain.
 const BUILD="kakashi-final-20260916-14";
 
 function builtin(name){
@@ -84,15 +88,26 @@ function loadBattleInteraction(){
   fix.addEventListener("load",loadFactualProvider,{once:true});
   document.head.appendChild(fix);
 }
-function loadBrowserFix(){
-  if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400){loadBattleInteraction();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-browser-red-fixes-34400-script");
+function loadSubstitution(){
+  if(globalThis.SC_ALPHA_KAKASHI_SUBSTITUTION_34900){loadBattleInteraction();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-substitution-34900-script");
   if(existing){existing.addEventListener("load",loadBattleInteraction,{once:true});return;}
+  const substitution=document.createElement("script");
+  substitution.id="sc-alpha-kakashi-substitution-34900-script";
+  substitution.src=`${SUBSTITUTION_PATH}?sc=${BUILD}`;
+  substitution.async=false;
+  substitution.addEventListener("load",loadBattleInteraction,{once:true});
+  document.head.appendChild(substitution);
+}
+function loadBrowserFix(){
+  if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400){loadSubstitution();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-browser-red-fixes-34400-script");
+  if(existing){existing.addEventListener("load",loadSubstitution,{once:true});return;}
   const fix=document.createElement("script");
   fix.id="sc-alpha-kakashi-browser-red-fixes-34400-script";
   fix.src=`${BROWSER_FIX_PATH}?sc=${BUILD}`;
   fix.async=false;
-  fix.addEventListener("load",loadBattleInteraction,{once:true});
+  fix.addEventListener("load",loadSubstitution,{once:true});
   document.head.appendChild(fix);
 }
 function loadSequential(){
