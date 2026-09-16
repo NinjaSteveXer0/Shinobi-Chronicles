@@ -21,13 +21,16 @@ const exactFive=[
   "academy_kakashi_prodigys_read"
 ];
 
-assert(src.includes('const VERSION="34500-v4"'),"34500 v4 not active");
-assert(src.includes('document.addEventListener("click",delegatedClick34500,true)'),"document capture delegation missing");
+assert(src.includes('const VERSION="34500-v5"'),"34500 v5 not active");
+assert(src.includes('document.addEventListener(\n      "pointerover",'),"delegated pointer hover missing");
+assert(src.includes('document.addEventListener(\n      "focusin",'),"delegated focus learning missing");
+assert(src.includes('document.addEventListener(\n      "click",'),"delegated click missing");
 assert(src.includes('resolveDelegatedCard34500'),"rendered-card delegation missing");
 assert(src.includes('stopImmediatePropagation'),"competing select-only handlers must be suppressed");
-assert(src.includes('activateBattlePreparedSkillCard'),"native one-click Battle bridge must remain preferred");
-assert(src.includes('confirmSelectedBattleSkill'),"native select/confirm fallback must remain available");
-assert(src.includes('renderTemporaryBattleSkillGuide'),"hover/focus must remain native presentation");
+assert(src.includes('previewBattlePreparedSkill33000'),"modern exact-id Skill Guide path missing");
+assert(src.includes('renderTemporaryBattleSkillGuide'),"native Skill Guide fallback missing");
+assert(src.includes('selectBattlePreparedSkill'),"native Battle selection authority missing");
+assert(src.includes('confirmSelectedBattleSkill'),"native Battle confirmation authority missing");
 assert(src.includes('launchAcademyKakashiOriginPlBattle'),"post-deployment hardening must remain bound");
 for(const forbidden of ["resolveBattleDamagePacket(","applyBattleDamage(","recordBattleEvidence(","consumeBattleActionOpportunity("]){
   assert(!src.includes(forbidden),`34500 must not own Battle semantics: ${forbidden}`);
@@ -39,8 +42,7 @@ assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/clos
 
 // Browser RED on the Story/continuation lane proved the production parent URLs
 // must advance with the Kakashi children. Keep the Battle interaction layer on
-// that same coherent fresh delivery generation even though 34500 semantics did
-// not change in this tranche.
+// that same coherent delivery generation until the next deliberate cache bump.
 assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),
   "32900 Story-decision parent identity is stale");
 assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14'),
@@ -55,19 +57,21 @@ function makeClassList(classes=[]){
   return{contains:name=>set.has(name),add:name=>set.add(name),remove:name=>set.delete(name)};
 }
 
-function buildContext({nativeActivator=true}={}){
+function buildContext(){
   const listeners={};
   const cardListeners={};
   const actor={id:"academy_kakashi"};
   const definitions=Object.fromEntries(exactFive.map(id=>[id,{id,displayName:id,ownerRegistryId:"academy_kakashi"}]));
+  const style={setProperty(){}};
   const card={
-    disabled:false,dataset:{skillId:exactFive[0]},classList:makeClassList(["battle-dev-skill-card","is-ready"]),textContent:"Academy Kakashi Kunai Quickdraw",
-    getAttribute(name){return name==="onclick"?`selectBattlePreparedSkill('${exactFive[0]}')`:null;},
-    setAttribute(){},removeAttribute(){},querySelector(){return null;},
+    disabled:false,dataset:{skillId:exactFive[0]},classList:makeClassList(["battle-dev-skill-card","is-ready"]),textContent:"Academy Kakashi Kunai Quickdraw",style,
+    getAttribute(name){return name==="onclick"?`selectBattlePreparedSkill('${this.dataset.skillId}')`:null;},
+    setAttribute(){},removeAttribute(){},querySelector(){return null;},contains(node){return node===this;},
     addEventListener(type,fn){(cardListeners[type]||(cardListeners[type]=[])).push(fn);},
     closest(){return card;}
   };
   const stage={
+    classList:makeClassList(),
     querySelector(){return null;},querySelectorAll(){return[card];},contains(node){return node===card;},matches(sel){return sel===".alpha-code-battle-stage";}
   };
   const document={
@@ -76,7 +80,7 @@ function buildContext({nativeActivator=true}={}){
     querySelector(selector){return selector===".alpha-code-battle-stage"?stage:null;},
     getElementById(){return null;}
   };
-  let nativeCalls=0,selectCalls=0,confirmCalls=0,guideCalls=0,launchCalls=0;
+  let selectCalls=0,confirmCalls=0,guideCalls=0,launchCalls=0;
   const context={
     console,document,window:null,globalThis:null,WeakSet,Set,Map,Object,Array,String,Number,Boolean,RegExp,Date,Math,JSON,Error,
     queueMicrotask(fn){fn();},setTimeout(fn){fn();return 1;},clearTimeout(){},MutationObserver:undefined,
@@ -84,67 +88,90 @@ function buildContext({nativeActivator=true}={}){
     getBattleDeploymentParticipant(side,slot){return side==="player"&&slot===1?actor:null;},
     getBattleUISkillPalettePresentation(){return{skillIds:[...exactFive]};},
     getBattlePreparedSkillDefinition(row,id){assert.strictEqual(row,actor);return definitions[id]||null;},
+    getBattlePreparedSkillDefaultTarget(){return{participant:{id:"masked_interceptor"}};},
+    evaluateBattlePreparedSkillAvailability(){return{available:true};},
+    previewBattlePreparedSkill33000(id){guideCalls+=1;assert(exactFive.includes(id));return true;},
     renderTemporaryBattleSkillGuide(id){guideCalls+=1;assert(exactFive.includes(id));},
     selectBattlePreparedSkill(id){selectCalls+=1;context.currentBattle.selectedSkillId=id;return{success:true,skillId:id};},
-    confirmSelectedBattleSkill(){confirmCalls+=1;context.currentBattle.selectedSkillId=null;return{success:true,executed:true};},
+    syncBattleActionRegionState(){return{selectedSkillId:context.currentBattle.selectedSkillId};},
+    confirmSelectedBattleSkill(){confirmCalls+=1;const id=context.currentBattle.selectedSkillId;context.currentBattle.selectedSkillId=null;return{success:true,executed:true,skillId:id};},
     launchAcademyKakashiOriginPlBattle(){launchCalls+=1;return{success:true};}
   };
-  if(nativeActivator){
-    context.activateBattlePreparedSkillCard=id=>{nativeCalls+=1;context.currentBattle.selectedSkillId=null;return{success:true,executed:true,skillId:id};};
-  }
   context.window=context;context.globalThis=context;
   vm.createContext(context);
   vm.runInContext(src,context,{filename:"runtime/alpha-kakashi-battle-interaction-hotfix-34500.js"});
+  function dispatch(type,{relatedTarget=null}={}){
+    let prevented=0,stopped=0,immediate=0,lastResult=null;
+    const event={target:card,relatedTarget,preventDefault(){prevented+=1;},stopPropagation(){stopped+=1;},stopImmediatePropagation(){immediate+=1;}};
+    for(const row of listeners[type]||[])lastResult=row.fn(event);
+    return{prevented,stopped,immediate,lastResult};
+  }
   return{
     context,card,stage,listeners,cardListeners,
-    counts:()=>({nativeCalls,selectCalls,confirmCalls,guideCalls,launchCalls}),
-    dispatchClick(){
-      let prevented=0,stopped=0,immediate=0,lastResult=null;
-      const event={target:card,preventDefault(){prevented+=1;},stopPropagation(){stopped+=1;},stopImmediatePropagation(){immediate+=1;}};
-      for(const row of listeners.click||[])lastResult=row.fn(event);
-      return{prevented,stopped,immediate,lastResult};
-    }
+    counts:()=>({selectCalls,confirmCalls,guideCalls,launchCalls}),
+    dispatch
   };
 }
 
-const delegated=buildContext({nativeActivator:true});
+const delegated=buildContext();
+assert((delegated.listeners.pointerover||[]).some(row=>row.capture===true),"document capture pointerover listener not installed");
+assert((delegated.listeners.focusin||[]).some(row=>row.capture===true),"document capture focusin listener not installed");
 assert((delegated.listeners.click||[]).some(row=>row.capture===true),"document capture click listener not installed");
-const click=delegated.dispatchClick();
+
+// Delegated hover must use the exact rendered card identity and remain presentation-only.
+delegated.card.dataset.skillId=exactFive[2];
+const hover=delegated.dispatch("pointerover");
+assert.strictEqual(delegated.counts().guideCalls,1,"delegated hover must render exactly one Skill Guide");
+assert.strictEqual(delegated.counts().selectCalls,0,"hover must not select a Skill");
+assert.strictEqual(delegated.counts().confirmCalls,0,"hover must not commit a Skill");
+assert(hover.lastResult&&hover.lastResult.success===true,"hover must report presentation success");
+
+// Focus is a second learn path and must also remain presentation-only.
+delegated.card.dataset.skillId=exactFive[4];
+const focus=delegated.dispatch("focusin");
+assert.strictEqual(delegated.counts().guideCalls,2,"delegated focus must render the focused Skill Guide");
+assert.strictEqual(delegated.counts().selectCalls,0,"focus must not select a Skill");
+assert.strictEqual(delegated.counts().confirmCalls,0,"focus must not commit a Skill");
+assert(focus.lastResult&&focus.lastResult.success===true,"focus must report presentation success");
+
+// Click must suppress competing select-only handlers and explicitly select+confirm once.
+delegated.card.dataset.skillId=exactFive[0];
+const click=delegated.dispatch("click");
 assert.strictEqual(click.prevented,1,"delegated click must prevent select-only default path");
 assert.strictEqual(click.stopped,1,"delegated click must stop bubbling competitor");
 assert.strictEqual(click.immediate,1,"delegated click must stop same-target competitor");
-assert.strictEqual(delegated.counts().nativeCalls,1,"rendered click must reach native one-click Battle bridge exactly once");
-assert.strictEqual(delegated.counts().selectCalls,0,"native bridge path must not double-select");
-assert.strictEqual(delegated.counts().confirmCalls,0,"native bridge path must not double-confirm");
+assert.strictEqual(delegated.counts().selectCalls,1,"rendered click must select exactly once");
+assert.strictEqual(delegated.counts().confirmCalls,1,"rendered click must confirm exactly once");
 assert.strictEqual(click.lastResult.success,true,"rendered delegated click must report action success");
+assert.strictEqual(delegated.context.currentBattle.selectedSkillId,null,"committed direct click must not leave stale selected Skill state");
 
-const fallback=buildContext({nativeActivator:false});
-const fallbackClick=fallback.dispatchClick();
-assert.strictEqual(fallbackClick.lastResult.success,true,"rendered fallback click failed");
-assert.strictEqual(fallback.counts().selectCalls,1,"rendered fallback click must select exactly once");
-assert.strictEqual(fallback.counts().confirmCalls,1,"rendered fallback click must confirm exactly once");
+// Already-bound cards can have 33000 handlers reintroduced; a harden pass must clear them again.
+delegated.card.onmouseenter=()=>{};
+delegated.card.onfocus=()=>{};
+delegated.context.hardenAcademyKakashiBattleDOM34500(delegated.stage);
+assert.strictEqual(delegated.card.onmouseenter,null,"harden pass must clear competing mouseenter handler");
+assert.strictEqual(delegated.card.onfocus,null,"harden pass must clear competing focus handler");
 
-for(const fn of delegated.cardListeners.mouseenter||[])fn({target:delegated.card});
-assert.strictEqual(delegated.counts().guideCalls,1,"hover must reach native guide once");
-assert.strictEqual(delegated.counts().nativeCalls,1,"hover must not execute a Skill");
-
+// Scope must remain exact to Academy Kakashi Origin Battles.
 delegated.context.currentBattle.kakashiOriginDeployment.controllerParticipantId="other_controller";
 const blocked=delegated.context.activateAcademyKakashiBattleSkill34500(exactFive[0]);
 assert.strictEqual(blocked.success,false,"34500 must not leak outside Kakashi Origin Battle");
 
-const diagnostics=JSON.parse(JSON.stringify(fallback.context.runAcademyKakashiBattleInteraction34500Diagnostics()));
+const diagnostics=JSON.parse(JSON.stringify(delegated.context.runAcademyKakashiBattleInteraction34500Diagnostics()));
 assert.strictEqual(diagnostics.pass,true,`34500 diagnostics failed: ${(diagnostics.failed||[]).join(",")}`);
 assert.strictEqual(diagnostics.browserGoldenClaimed,false);
 
 console.log(JSON.stringify({
   pass:true,
-  patch:"34500-v4",
+  patch:"34500-v5",
   exactFiveSkillsCanonical:true,
+  renderedDomHoverExercised:true,
+  renderedDomFocusExercised:true,
   renderedDomClickExercised:true,
   documentCaptureDelegation:true,
-  nativeOneClickExactlyOnce:true,
-  selectConfirmFallbackExactlyOnce:true,
+  explicitSelectConfirmExactlyOnce:true,
   hoverPresentationOnly:true,
+  rerenderHandlerHardening:true,
   resolverSemanticsUntouched:true,
   kakashiChildCacheIdentity:"kakashi-final-20260916-14",
   browserGoldenClaimed:false
