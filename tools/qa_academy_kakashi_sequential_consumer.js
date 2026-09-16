@@ -64,12 +64,14 @@ assert(factualMenu.filter(row=>!["secure_package","defeat_assassin_then_secure"]
 const boundReport=plain(`runAcademyKakashiSequentialConsumer34410Diagnostics()`,`diag-bound.js`);
 assert.strictEqual(boundReport.pass,true,`34410 bound diagnostics failed: ${boundReport.failed.join(",")}`);
 
-assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-5'),"32900 integrator still delivers stale 34000 identity");
-assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-15'),"34000 still delivers stale Kakashi adapter identity");
-assert.ok(loader.includes('const BUILD="kakashi-final-20260916-15"'),"34100 child cache identity is stale");
+// This preparation tranche does not release GO FOR THE PACKAGE in production,
+// so it deliberately leaves the current browser cache generation unchanged.
+// The later AK_SA_025 release tranche must advance this full chain.
+assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),"unexpected Story decision cache generation drift during guarded preparation");
+assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14'),"unexpected Kakashi parent cache generation drift during guarded preparation");
+assert.ok(loader.includes('const BUILD="kakashi-final-20260916-14"'),"unexpected Kakashi child cache generation drift during guarded preparation");
 assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"34100 production loader missing 34410 Observe Battle consumer");
 assert.ok(loader.includes('alpha-kakashi-factual-bindings-34700.js'),"34100 production loader missing terminal factual binding layer");
-assert.ok(!storyDecision.includes('kakashi-final-20260916-14'),"stale Kakashi parent delivery identity remains active");
 
 const source=consumer;
 assert.ok(source.includes('sourceAnchorRef:spec.anchor'));
@@ -86,4 +88,4 @@ assert.ok(source.includes('dispatchCommittedIntent'),"factual Battle receipts mu
 assert.ok(source.includes('battleOccurrenceId'),"semantic Battle return must reference factual Battle receipt");
 assert.ok(!source.includes('commitOccurrence('),"34410 must not invent post-Battle World Truth before AK_SA_025 classification owner exists");
 assert.ok(!source.includes('completeChronicleOriginPrologue('));
-console.log(JSON.stringify({pass:true,patch:"34410-v3",legacySequentialChoiceActionable:true,factualObserveSequentialChoiceActionable:true,securePackage2v1Prepared:true,securePackageProductionRelease:false,securePackageExactAnchor:"AK_SA_014",securePackageExactConfig:"academy_kakashi_origin_battle_ps_mi_2v1",securePackageSemanticIntentBeforeBattle:true,securePackageFactualBattleReceiptReturn:true,securePackageWorldTruthStillFailClosed:true,otherObserveChoicesFailClosed:true,productionDeliveryCacheChainAdvanced:true,miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
+console.log(JSON.stringify({pass:true,patch:"34410-v3",legacySequentialChoiceActionable:true,factualObserveSequentialChoiceActionable:true,securePackage2v1Prepared:true,securePackageProductionRelease:false,securePackageExactAnchor:"AK_SA_014",securePackageExactConfig:"academy_kakashi_origin_battle_ps_mi_2v1",securePackageSemanticIntentBeforeBattle:true,securePackageFactualBattleReceiptReturn:true,securePackageWorldTruthStillFailClosed:true,otherObserveChoicesFailClosed:true,productionDeliveryGenerationIntentionallyUnchanged:true,miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
