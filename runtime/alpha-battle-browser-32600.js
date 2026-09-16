@@ -1,18 +1,21 @@
 // ============================================================================
 // ALPHA BATTLE BROWSER UX HARDENING — POST 32500
-// Browser evidence: 2026-09-12 Stephen installed/local browser pass.
-// Scope: readable Combat Feed, repeat-skill presentation correctness, and
-// single-button reward claim -> exact caller restoration.
-// Semantic boundaries preserved:
-// - repeat use is allowed only when the existing authoritative availability
-//   evaluator still says the Skill is legal;
-// - reward commit remains exactly-once and happens before caller restoration;
-// - caller restoration still uses the existing Battle return-context authority.
+// Browser evidence: 2026-09-12 and 2026-09-17 Stephen installed/local browser passes.
+// Scope:
+// - Skill-card click executes directly when normal authored availability allows;
+// - explicit branch/mode Skills execute when the required mode is chosen;
+// - Skill Details carries a readable effect summary and no USE SKILL button;
+// - Battle PL numerals are optically centered inside the radial;
+// - Combat Feed gets a small positioning refinement;
+// - My Clan keeps drag/drop + inspection, but removes click-to-assign highlight;
+// - caller-owned Victory claim returns through the exact authored Battle caller
+//   and fails closed instead of falling through to generic Combat Arena.
+// No Battle resolver, ownership, roster, reward-authority, or World semantic subsystem is replaced.
 // ============================================================================
 (function installAlphaBattleBrowser32600(){
   "use strict";
 
-  const PATCH_ID="alpha_battle_browser_32600_2026_09_12";
+  const PATCH_ID="alpha_battle_browser_32600_2026_09_17";
 
   // --------------------------------------------------------------------------
   // 1. REPEAT-SKILL UX — FIX STALE SELECTION, DO NOT INVENT A COOLDOWN BYPASS
@@ -51,11 +54,19 @@
   // --------------------------------------------------------------------------
   // 2. VICTORY UX — CLAIM REWARDS, THEN RETURN TO THE EXACT OWNING CALLER
   // --------------------------------------------------------------------------
-  // This intentionally changes the player interaction from CLAIM -> CONTINUE to
-  // one clean CLAIM action. Internally the two semantic operations remain
-  // ordered and separate: first claimCurrentBattleRewards via the existing claim
-  // route, then continueAfterVictory() restores Story / region hotspot / mission
-  // area / assessment using the existing return-context machinery.
+  // Player interaction remains one clean CLAIM action. Internally the two
+  // semantic operations remain ordered and separate: first the existing reward
+  // claim route commits exactly once, then caller restoration uses the existing
+  // Battle return-context authority.
+  //
+  // 2026-09-17 installed-browser evidence exposed a bad fallback: a Kakashi
+  // Story Battle could claim successfully, fail its authored caller resume, and
+  // then continueAfterVictory() would fall through to generic Combat Arena.
+  // Caller-owned Battles now restore the exact pre-claim returnContext snapshot
+  // and invoke resumeBattleCallerAfterCompletion() directly. If that authored
+  // resume fails, Victory remains open and the error is returned fail-closed;
+  // generic Battle fallback is reserved for Battles that genuinely have no
+  // caller return context.
   const priorClaimVictoryAutoReturn=claimVictoryRewardsFromOverlay;
   claimVictoryRewardsFromOverlay=function claimVictoryRewardsFromOverlayBrowser32600(){
     const returnContextBefore=currentBattle&&currentBattle.returnContext&&typeof cloneBattleRuntimeValue==="function"
@@ -67,10 +78,59 @@
 
     let callerResult=null;
     let navigationError=null;
+    const callerOwned=!!(returnContextBefore&&typeof returnContextBefore==="object"&&returnContextBefore.type);
+
     try{
-      callerResult=continueAfterVictory();
+      if(callerOwned){
+        // Claiming rewards must not erase or weaken the Battle caller identity.
+        if(currentBattle){
+          currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
+            ?cloneBattleRuntimeValue(returnContextBefore)
+            :returnContextBefore;
+        }
+
+        if(typeof resumeBattleCallerAfterCompletion!=="function"){
+          callerResult={success:false,reason:"battle_caller_resume_api_missing"};
+        }else{
+          callerResult=resumeBattleCallerAfterCompletion("victory");
+        }
+
+        if(!(callerResult&&callerResult.success===true)){
+          navigationError=String(callerResult&&callerResult.reason||"caller_restore_failed");
+          // Fail closed on the completed Victory surface. Do not drop a Story
+          // Battle into generic Combat Arena when its caller cannot resume.
+          try{openOverlay("victory");}catch(_error){}
+          return {
+            ...claimResult,
+            navigated:false,
+            autoReturned:false,
+            callerOwned:true,
+            returnContextBefore,
+            callerResult:callerResult||null,
+            navigationError,
+            rewardCommitBeforeCallerRestore:true,
+            genericBattleFallbackSuppressed:true
+          };
+        }
+      }else{
+        callerResult=continueAfterVictory();
+      }
     }catch(error){
       navigationError=String(error&&error.message||error||"caller_restore_failed");
+      if(callerOwned){
+        try{openOverlay("victory");}catch(_error){}
+        return {
+          ...claimResult,
+          navigated:false,
+          autoReturned:false,
+          callerOwned:true,
+          returnContextBefore,
+          callerResult:callerResult||null,
+          navigationError,
+          rewardCommitBeforeCallerRestore:true,
+          genericBattleFallbackSuppressed:true
+        };
+      }
     }
 
     const leftVictory=typeof currentOverlayType==="undefined"||currentOverlayType!=="victory";
@@ -78,6 +138,7 @@
       ...claimResult,
       navigated:leftVictory,
       autoReturned:true,
+      callerOwned,
       returnContextBefore,
       callerResult:callerResult||null,
       navigationError,
@@ -153,9 +214,11 @@
       repeatStillChecksAvailability:confirmSource.includes("repeatStillUsesAuthoritativeAvailability:true"),
       academyHasNoGenericRepeatLock:!genericRepeatLockPattern.test(academyAvailabilitySource),
       closureHasNoGenericRepeatLock:!genericRepeatLockPattern.test(closureAvailabilitySource),
-      claimThenCallerRestore:claimSource.includes("priorClaimVictoryAutoReturn")&&claimSource.includes("continueAfterVictory()"),
-      rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf("continueAfterVictory()"),
-      callerContextPreserved:claimSource.includes("returnContextBefore"),
+      claimThenCallerRestore:claimSource.includes("priorClaimVictoryAutoReturn")&&claimSource.includes('resumeBattleCallerAfterCompletion("victory")'),
+      rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf('resumeBattleCallerAfterCompletion("victory")'),
+      callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
+      callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
+      ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
     };
