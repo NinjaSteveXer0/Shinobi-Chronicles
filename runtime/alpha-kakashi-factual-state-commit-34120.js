@@ -1,15 +1,11 @@
 // ============================================================================
-// ISSUE #188 — ACADEMY KAKASHI FACTUAL STATE COMMIT OWNER — 34120
+// ISSUE #188 — ACADEMY KAKASHI FACTUAL STATE COMMIT OWNER — 34120 v2
 //
 // Canonical Kakashi Origin adapter child for authoritative non-Battle factual
 // commits. 34600 selects an authorised factual outcome; this owner commits that
 // outcome through the existing 32900 Origin occurrence ledger before Story may
 // advance. It does not replace playerData/savePlayerData, 32900 history, 34000,
 // 34600, Battle, or the native Story engine.
-//
-// Released routes:
-// - opening MOVE IN CLOSER;
-// - Get Closer SUCCESS -> LET THEM MAKE THE HANDOFF.
 // ============================================================================
 (function installAcademyKakashiFactualStateCommit34120(){
 "use strict";
@@ -23,7 +19,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function")throw new Error("alpha_origin_32900_occurrence_authority_required");
 if(!CORE||!KAK||!GUARD||!PROVIDER)throw new Error("kakashi_factual_state_34120_dependency_missing");
 
-const PATCH_ID="alpha_kakashi_factual_state_commit_34120_2026_09_16";
+const PATCH_ID="alpha_kakashi_factual_state_commit_34120_v2_2026_09_16";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const GET_CLOSER_BINDING="academy_kakashi.resolver.get_closer";
@@ -32,6 +28,7 @@ const GET_CLOSER_REQUEST_ID="kakashi_get_closer_factual_commit_34120";
 const HANDOFF_BINDING="academy_kakashi.story_fixed.let_handoff_happen";
 const HANDOFF_CHOICE_ID="let_handoff_happen";
 const HANDOFF_REQUEST_ID="kakashi_get_closer_handoff_factual_commit_34120";
+const SECURE_PACKAGE_AMT_PURSUIT_BINDING="academy_kakashi.resolver.secure_package_amt_pursuit";
 const SUCCESS_BEAT="kak_get_closer_success";
 const FAILURE_BEAT="kak_get_closer_failure";
 const HANDOFF_BEAT="kak_get_closer_handoff_observe_escalation";
@@ -47,6 +44,8 @@ const SECURE_PACKAGE_BATTLE_CONFIG="academy_kakashi_origin_battle_ps_mi_2v1";
 const SECURE_PACKAGE_BATTLE_BINDING="academy_kakashi.battle.secure_package";
 const PACKAGE_SMUGGLER_REF="academy_kakashi_origin_package_smuggler";
 const MASKED_INTERCEPTOR_REF="academy_kakashi_origin_masked_interceptor";
+const AMT_REF="academy_kakashi_origin_amt";
+const PAKKUN_REF="pakkun_origin_unfamiliar_ninken";
 const PARTICIPANT_REFS=Object.freeze([
   ORIGIN_ID,
   "kakashi_origin_logistics_clerk",
@@ -90,6 +89,14 @@ function securePackageVictoryOccurrenceRef(rt,parentOccurrenceId,battleResult){
     anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR
   });
 }
+function securePackageAmtPursuitOccurrenceRef(rt,parentOccurrenceId,receipt){
+  return PROVIDER.stableRef("occ_origin_kakashi_secure_package_amt_pursuit",{
+    storySceneInstanceId:String(rt&&rt.instanceId||""),
+    parentOccurrenceId:String(parentOccurrenceId||""),
+    storyFactualResolverReceiptId:String(receipt&&receipt.storyFactualResolverReceiptId||""),
+    anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR
+  });
+}
 function existingDecisionReceipt(contextStateRef,choiceId,bindingRef){
   const snapshot=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{};
   const receipts=Object.values(snapshot.decisionReceipts||{});
@@ -110,20 +117,11 @@ function ensureOpeningIntent(rt){
   });
   if(!opened||opened.success!==true)return opened||{success:false,reason:"kakashi_get_closer_choice_set_open_failed"};
 
-  const committed=CORE.commitStoryIntent({
-    storyUnitRef:ORIGIN_ID,
-    choiceSetId:opened.choiceSet.choiceSetId,
-    choiceId:GET_CLOSER_CHOICE_ID
-  });
+  const committed=CORE.commitStoryIntent({storyUnitRef:ORIGIN_ID,choiceSetId:opened.choiceSet.choiceSetId,choiceId:GET_CLOSER_CHOICE_ID});
   if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_get_closer_intent_commit_failed"};
 
   receipt=committed.receipt;
-  rt.localContext={
-    ...(rt.localContext||{}),
-    kakashiGetCloserContextStateRef:contextStateRef,
-    kakashiGetCloserStoryDecisionReceiptId:receipt.storyDecisionReceiptId,
-    kakashiGetCloserIntentCommitRef:receipt.intentCommitRef
-  };
+  rt.localContext={...(rt.localContext||{}),kakashiGetCloserContextStateRef:contextStateRef,kakashiGetCloserStoryDecisionReceiptId:receipt.storyDecisionReceiptId,kakashiGetCloserIntentCommitRef:receipt.intentCommitRef};
   save();
   return{success:true,contextStateRef,receipt};
 }
@@ -133,9 +131,7 @@ function requireGetCloserSuccessParent(rt){
   const parent=A.findOccurrence(parentOccurrenceId);
   if(!parent)return{success:false,reason:"kakashi_get_closer_success_parent_occurrence_missing"};
   const fact=factOf(parent);
-  if(String(parent.storySceneInstanceId||"")!==String(rt.instanceId||"")||String(fact.storySceneInstanceId||"")!==String(rt.instanceId||"")){
-    return{success:false,reason:"kakashi_get_closer_success_parent_story_instance_mismatch"};
-  }
+  if(String(parent.storySceneInstanceId||"")!==String(rt.instanceId||"")||String(fact.storySceneInstanceId||"")!==String(rt.instanceId||""))return{success:false,reason:"kakashi_get_closer_success_parent_story_instance_mismatch"};
   if(String(fact.selectedOutcomeRef||"")!=="GET_CLOSER_SUCCESS")return{success:false,reason:"kakashi_get_closer_handoff_requires_success_parent"};
   if(fact.packageState&&fact.packageState.handoffCompleted===true)return{success:false,reason:"kakashi_get_closer_parent_handoff_already_completed"};
   return{success:true,parentOccurrenceId,parent,fact};
@@ -144,27 +140,12 @@ function ensureHandoffIntent(rt,parentOccurrenceId){
   const contextStateRef=String(parentOccurrenceId||"");
   let receipt=existingDecisionReceipt(contextStateRef,HANDOFF_CHOICE_ID,HANDOFF_BINDING);
   if(receipt)return{success:true,idempotent:true,contextStateRef,receipt};
-
-  const opened=KAK.openDecisionPoint("AK_SA_005",{
-    committedStateRef:contextStateRef,
-    beatRef:SUCCESS_BEAT,
-    sourceOccurrenceRefs:[contextStateRef]
-  });
+  const opened=KAK.openDecisionPoint("AK_SA_005",{committedStateRef:contextStateRef,beatRef:SUCCESS_BEAT,sourceOccurrenceRefs:[contextStateRef]});
   if(!opened||opened.success!==true)return opened||{success:false,reason:"kakashi_get_closer_handoff_choice_set_open_failed"};
-  const committed=CORE.commitStoryIntent({
-    storyUnitRef:ORIGIN_ID,
-    choiceSetId:opened.choiceSet.choiceSetId,
-    choiceId:HANDOFF_CHOICE_ID
-  });
+  const committed=CORE.commitStoryIntent({storyUnitRef:ORIGIN_ID,choiceSetId:opened.choiceSet.choiceSetId,choiceId:HANDOFF_CHOICE_ID});
   if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_get_closer_handoff_intent_commit_failed"};
-
   receipt=committed.receipt;
-  rt.localContext={
-    ...(rt.localContext||{}),
-    kakashiGetCloserHandoffContextStateRef:contextStateRef,
-    kakashiGetCloserHandoffStoryDecisionReceiptId:receipt.storyDecisionReceiptId,
-    kakashiGetCloserHandoffIntentCommitRef:receipt.intentCommitRef
-  };
+  rt.localContext={...(rt.localContext||{}),kakashiGetCloserHandoffContextStateRef:contextStateRef,kakashiGetCloserHandoffStoryDecisionReceiptId:receipt.storyDecisionReceiptId,kakashiGetCloserHandoffIntentCommitRef:receipt.intentCommitRef};
   save();
   return{success:true,contextStateRef,receipt};
 }
@@ -174,23 +155,10 @@ function getCloserFact(selectedOutcomeRef,result,rt,decisionReceipt,factualRecei
   const failure=selectedOutcomeRef==="GET_CLOSER_FAILURE";
   if(!success&&!failure)return null;
   return{
-    factClass:"academy_kakashi_get_closer_factual_state",
-    selectedOutcomeRef,
-    storyDecisionReceiptId:decisionReceipt.storyDecisionReceiptId,
-    storyFactualResolverReceiptId:factualReceipt.storyFactualResolverReceiptId,
-    storySceneInstanceId:String(rt.instanceId),
+    factClass:"academy_kakashi_get_closer_factual_state",selectedOutcomeRef,
+    storyDecisionReceiptId:decisionReceipt.storyDecisionReceiptId,storyFactualResolverReceiptId:factualReceipt.storyFactualResolverReceiptId,storySceneInstanceId:String(rt.instanceId),
     packageState:{objectRef:WORLD_OBJECT_REF,currentHolderClass:"ANBU_MARKED_TARGET",handoffCompleted:false},
-    participantStateByRole:success?{
-      academy_kakashi:{positionClass:"IMPROVED_CONCEALED_POSITION",detectionState:"UNDETECTED"},
-      anbu_marked_target:{roleState:"CURRENT_PACKAGE_HOLDER"},
-      package_smuggler:{roleState:"HANDOFF_PENDING"},
-      masked_interceptor:{visibilityState:"UNSEEN"}
-    }:{
-      academy_kakashi:{positionClass:"APPROACH_COMPROMISED",detectionState:"DETECTED"},
-      anbu_marked_target:{roleState:"CURRENT_PACKAGE_HOLDER"},
-      package_smuggler:{positionClass:"REMAINS_AT_EXCHANGE"},
-      masked_interceptor:{visibilityState:"UNSEEN"}
-    },
+    participantStateByRole:success?{academy_kakashi:{positionClass:"IMPROVED_CONCEALED_POSITION",detectionState:"UNDETECTED"},anbu_marked_target:{roleState:"CURRENT_PACKAGE_HOLDER"},package_smuggler:{roleState:"HANDOFF_PENDING"},masked_interceptor:{visibilityState:"UNSEEN"}}:{academy_kakashi:{positionClass:"APPROACH_COMPROMISED",detectionState:"DETECTED"},anbu_marked_target:{roleState:"CURRENT_PACKAGE_HOLDER"},package_smuggler:{positionClass:"REMAINS_AT_EXCHANGE"},masked_interceptor:{visibilityState:"UNSEEN"}},
     knowledgeStateByObserver:{academy_kakashi:{fullerContingencyKnowledge:success===true,maskedInterceptorVisible:false}},
     worldFacts:success?{concealmentPreserved:true,improvedPosition:true,handoffCompleted:false,maskedInterceptorVisible:false}:{approachDetected:true,handoffAborted:true,packageSmugglerRemainsBehind:true,maskedInterceptorVisible:false},
     nextDecisionPointRef:String(result&&result.nextDecisionPointRef||"")
@@ -199,68 +167,41 @@ function getCloserFact(selectedOutcomeRef,result,rt,decisionReceipt,factualRecei
 function handoffFact(result,rt,parentOccurrenceId,decisionReceipt,factualReceipt){
   if(String(factualReceipt&&factualReceipt.selectedOutcomeRef||"")!==HANDOFF_OUTCOME)return null;
   return{
-    factClass:"academy_kakashi_get_closer_handoff_factual_state",
-    selectedOutcomeRef:HANDOFF_OUTCOME,
-    parentOccurrenceRef:String(parentOccurrenceId||""),
-    storyDecisionReceiptId:decisionReceipt.storyDecisionReceiptId,
-    storyFactualResolverReceiptId:factualReceipt.storyFactualResolverReceiptId,
-    storySceneInstanceId:String(rt.instanceId),
+    factClass:"academy_kakashi_get_closer_handoff_factual_state",selectedOutcomeRef:HANDOFF_OUTCOME,parentOccurrenceRef:String(parentOccurrenceId||""),storyDecisionReceiptId:decisionReceipt.storyDecisionReceiptId,storyFactualResolverReceiptId:factualReceipt.storyFactualResolverReceiptId,storySceneInstanceId:String(rt.instanceId),
     packageState:{objectRef:WORLD_OBJECT_REF,previousHolderClass:"ANBU_MARKED_TARGET",currentHolderClass:"PACKAGE_SMUGGLER",handoffCompleted:true},
-    participantStateByRole:{
-      academy_kakashi:{positionClass:"IMPROVED_CONCEALED_POSITION",detectionState:"UNDETECTED"},
-      anbu_marked_target:{roleState:"HANDOFF_COMPLETED_SOURCE"},
-      package_smuggler:{roleState:"CURRENT_PACKAGE_HOLDER"},
-      masked_interceptor:{visibilityState:"VISIBLE_AFTER_COMPLETED_TRANSFER"}
-    },
+    participantStateByRole:{academy_kakashi:{positionClass:"IMPROVED_CONCEALED_POSITION",detectionState:"UNDETECTED"},anbu_marked_target:{roleState:"HANDOFF_COMPLETED_SOURCE"},package_smuggler:{roleState:"CURRENT_PACKAGE_HOLDER"},masked_interceptor:{visibilityState:"VISIBLE_AFTER_COMPLETED_TRANSFER"}},
     knowledgeStateByObserver:{academy_kakashi:{fullerContingencyKnowledge:true,maskedInterceptorVisible:true}},
-    worldFacts:{concealmentPreserved:true,improvedPosition:true,handoffCompleted:true,packageHolderClass:"PACKAGE_SMUGGLER",observeEscalationActive:true,maskedInterceptorVisible:true},
-    nextDecisionPointRef:String(result&&result.nextDecisionPointRef||OBSERVE_DECISION_REF)
+    worldFacts:{concealmentPreserved:true,improvedPosition:true,handoffCompleted:true,packageHolderClass:"PACKAGE_SMUGGLER",observeEscalationActive:true,maskedInterceptorVisible:true},nextDecisionPointRef:String(result&&result.nextDecisionPointRef||OBSERVE_DECISION_REF)
   };
 }
 
 function commitGetCloser({receipt,request,result}={}){
-  const rt=active();
-  const requestedInstance=String(request&&request.context&&request.context.storySceneInstanceId||"");
+  const rt=active();const requestedInstance=String(request&&request.context&&request.context.storySceneInstanceId||"");
   if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_get_closer_story_instance_missing"};
   if(!requestedInstance||requestedInstance!==String(rt.instanceId||""))return{success:false,reason:"kakashi_get_closer_story_instance_mismatch"};
   const occurrenceId=String(request&&request.committedAtOccurrenceRef||getCloserOccurrenceRef(rt,{storyDecisionReceiptId:receipt&&receipt.storyDecisionReceiptId}));
   const fact=getCloserFact(receipt&&receipt.selectedOutcomeRef,result,rt,{storyDecisionReceiptId:receipt&&receipt.storyDecisionReceiptId},receipt);
   if(!fact)return{success:false,reason:"kakashi_get_closer_outcome_not_authorised"};
   let existing=A.findOccurrence(occurrenceId);
-  if(existing){
-    const existingFact=factOf(existing);
-    if(String(existing.storySceneInstanceId||"")!==requestedInstance||String(existingFact.selectedOutcomeRef||"")!==String(receipt.selectedOutcomeRef||""))return{success:false,reason:"kakashi_get_closer_occurrence_replay_mismatch"};
-  }else{
-    const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:String(receipt.selectedOutcomeRef||""),participantRefs:[...PARTICIPANT_REFS],sourceRefs:[{type:"world_object",id:WORLD_OBJECT_REF},{type:"story_decision_receipt",id:String(receipt.storyDecisionReceiptId||"")},{type:"story_factual_resolver_receipt",id:String(receipt.storyFactualResolverReceiptId||"")} ]});
-    if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_get_closer_occurrence_commit_failed"};
-    existing=committed.record;
-  }
+  if(existing){const existingFact=factOf(existing);if(String(existing.storySceneInstanceId||"")!==requestedInstance||String(existingFact.selectedOutcomeRef||"")!==String(receipt.selectedOutcomeRef||""))return{success:false,reason:"kakashi_get_closer_occurrence_replay_mismatch"};}
+  else{const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:String(receipt.selectedOutcomeRef||""),participantRefs:[...PARTICIPANT_REFS],sourceRefs:[{type:"world_object",id:WORLD_OBJECT_REF},{type:"story_decision_receipt",id:String(receipt.storyDecisionReceiptId||"")},{type:"story_factual_resolver_receipt",id:String(receipt.storyFactualResolverReceiptId||"")} ]});if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_get_closer_occurrence_commit_failed"};existing=committed.record;}
   const participantStateRef=PROVIDER.stableRef("sc34120-participant-state",{occurrenceId,outcomeRef:receipt.selectedOutcomeRef});
   const worldStateRef=PROVIDER.stableRef("sc34120-world-state",{occurrenceId,outcomeRef:receipt.selectedOutcomeRef});
   const knowledgeRefs=receipt.selectedOutcomeRef==="GET_CLOSER_SUCCESS"?[PROVIDER.stableRef("sc34120-knowledge",{occurrenceId,observerRef:ORIGIN_ID,knowledgeClass:"FULLER_CONTINGENCY_KNOWLEDGE"})]:[];
   return{success:true,occurrenceId,consequenceRefs:[occurrenceId],stateDeltaRefs:[worldStateRef],knowledgeDeltaRefs:knowledgeRefs,relationshipHistoryRefs:[],objectiveDeltaRefs:[],objectCustodyDeltaRefs:[],participantStateDeltaRefs:[participantStateRef],successorSituationRef:String(receipt.successorSituationRef||"")};
 }
 function commitGetCloserHandoff({receipt,request,result}={}){
-  const rt=active();
-  const requestedInstance=String(request&&request.context&&request.context.storySceneInstanceId||"");
+  const rt=active();const requestedInstance=String(request&&request.context&&request.context.storySceneInstanceId||"");
   if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_get_closer_handoff_story_instance_missing"};
   if(!requestedInstance||requestedInstance!==String(rt.instanceId||""))return{success:false,reason:"kakashi_get_closer_handoff_story_instance_mismatch"};
   const parentId=String(request&&request.context&&request.context.parentOccurrenceRef||rt.localContext&&rt.localContext.kakashiGetCloserOccurrenceId||"");
-  const parentCheck=requireGetCloserSuccessParent(rt);
-  if(!parentCheck||parentCheck.success!==true)return parentCheck||{success:false,reason:"kakashi_get_closer_handoff_parent_invalid"};
+  const parentCheck=requireGetCloserSuccessParent(rt);if(!parentCheck||parentCheck.success!==true)return parentCheck||{success:false,reason:"kakashi_get_closer_handoff_parent_invalid"};
   if(parentId&&parentId!==parentCheck.parentOccurrenceId)return{success:false,reason:"kakashi_get_closer_handoff_parent_ref_mismatch"};
   const occurrenceId=String(request&&request.committedAtOccurrenceRef||handoffOccurrenceRef(rt,parentCheck.parentOccurrenceId,{storyDecisionReceiptId:receipt&&receipt.storyDecisionReceiptId}));
-  const fact=handoffFact(result,rt,parentCheck.parentOccurrenceId,{storyDecisionReceiptId:receipt&&receipt.storyDecisionReceiptId},receipt);
-  if(!fact)return{success:false,reason:"kakashi_get_closer_handoff_outcome_not_authorised"};
+  const fact=handoffFact(result,rt,parentCheck.parentOccurrenceId,{storyDecisionReceiptId:receipt&&receipt.storyDecisionReceiptId},receipt);if(!fact)return{success:false,reason:"kakashi_get_closer_handoff_outcome_not_authorised"};
   let existing=A.findOccurrence(occurrenceId);
-  if(existing){
-    const existingFact=factOf(existing);
-    if(String(existing.storySceneInstanceId||"")!==requestedInstance||String(existingFact.selectedOutcomeRef||"")!==HANDOFF_OUTCOME||String(existingFact.parentOccurrenceRef||"")!==parentCheck.parentOccurrenceId)return{success:false,reason:"kakashi_get_closer_handoff_occurrence_replay_mismatch"};
-  }else{
-    const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:HANDOFF_OUTCOME,participantRefs:[...PARTICIPANT_REFS],sourceRefs:[{type:"origin_occurrence",id:parentCheck.parentOccurrenceId},{type:"world_object",id:WORLD_OBJECT_REF},{type:"story_decision_receipt",id:String(receipt.storyDecisionReceiptId||"")},{type:"story_factual_resolver_receipt",id:String(receipt.storyFactualResolverReceiptId||"")} ]});
-    if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_get_closer_handoff_occurrence_commit_failed"};
-    existing=committed.record;
-  }
+  if(existing){const existingFact=factOf(existing);if(String(existing.storySceneInstanceId||"")!==requestedInstance||String(existingFact.selectedOutcomeRef||"")!==HANDOFF_OUTCOME||String(existingFact.parentOccurrenceRef||"")!==parentCheck.parentOccurrenceId)return{success:false,reason:"kakashi_get_closer_handoff_occurrence_replay_mismatch"};}
+  else{const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:HANDOFF_OUTCOME,participantRefs:[...PARTICIPANT_REFS],sourceRefs:[{type:"origin_occurrence",id:parentCheck.parentOccurrenceId},{type:"world_object",id:WORLD_OBJECT_REF},{type:"story_decision_receipt",id:String(receipt.storyDecisionReceiptId||"")},{type:"story_factual_resolver_receipt",id:String(receipt.storyFactualResolverReceiptId||"")} ]});if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_get_closer_handoff_occurrence_commit_failed"};existing=committed.record;}
   const worldStateRef=PROVIDER.stableRef("sc34120-handoff-world-state",{occurrenceId,outcomeRef:HANDOFF_OUTCOME});
   const participantStateRef=PROVIDER.stableRef("sc34120-handoff-participant-state",{occurrenceId,outcomeRef:HANDOFF_OUTCOME});
   const custodyRef=PROVIDER.stableRef("sc34120-handoff-custody",{occurrenceId,objectRef:WORLD_OBJECT_REF,from:"ANBU_MARKED_TARGET",to:"PACKAGE_SMUGGLER"});
@@ -275,81 +216,73 @@ function commitSecurePackage2v1Victory({battleResult}={}){
   if(String(result.sourceAnchorRef||"")!==SECURE_PACKAGE_BATTLE_ANCHOR||String(result.bindingRef||"")!==SECURE_PACKAGE_BATTLE_BINDING)return{success:false,reason:"kakashi_secure_package_post_battle_authority_mismatch"};
   if(String(result.resultState||"")!=="player_side_victory")return{success:false,reason:"kakashi_secure_package_post_battle_victory_required"};
   if(result.participantDeathCommitted===true||result.participantCustodyCommitted===true)return{success:false,reason:"kakashi_secure_package_battle_receipt_illegally_collapsed_participant_state"};
-  const parentOccurrenceId=String(rt.localContext&&rt.localContext.kakashiGetCloserHandoffOccurrenceId||"");
-  if(!parentOccurrenceId)return{success:false,reason:"kakashi_secure_package_handoff_parent_missing"};
+  const parentOccurrenceId=String(rt.localContext&&rt.localContext.kakashiGetCloserHandoffOccurrenceId||"");if(!parentOccurrenceId)return{success:false,reason:"kakashi_secure_package_handoff_parent_missing"};
   const parent=A.findOccurrence(parentOccurrenceId);if(!parent)return{success:false,reason:"kakashi_secure_package_handoff_parent_occurrence_missing"};
-  const parentFact=factOf(parent),parentPackage=parentFact.packageState||{};
-  if(parentPackage.handoffCompleted!==true||String(parentPackage.currentHolderClass||"")!=="PACKAGE_SMUGGLER")return{success:false,reason:"kakashi_secure_package_handoff_parent_custody_mismatch"};
-  const participants=Array.isArray(result.participants)?result.participants:[];
-  const ps=participants.find(row=>row&&row.participantRef===PACKAGE_SMUGGLER_REF)||null;
-  const mi=participants.find(row=>row&&row.participantRef===MASKED_INTERCEPTOR_REF)||null;
+  const parentFact=factOf(parent),parentPackage=parentFact.packageState||{};if(parentPackage.handoffCompleted!==true||String(parentPackage.currentHolderClass||"")!=="PACKAGE_SMUGGLER")return{success:false,reason:"kakashi_secure_package_handoff_parent_custody_mismatch"};
+  const participants=Array.isArray(result.participants)?result.participants:[];const ps=participants.find(row=>row&&row.participantRef===PACKAGE_SMUGGLER_REF)||null;const mi=participants.find(row=>row&&row.participantRef===MASKED_INTERCEPTOR_REF)||null;
   if(!ps||!mi)return{success:false,reason:"kakashi_secure_package_post_battle_participants_missing"};
   if(ps.battleStatus!=="defeated"||mi.battleStatus!=="defeated")return{success:false,reason:"kakashi_secure_package_post_battle_defeat_facts_missing"};
   if(ps.lifeState!=="unresolved"||mi.lifeState!=="unresolved"||ps.custodyState!=="unresolved"||mi.custodyState!=="unresolved")return{success:false,reason:"kakashi_secure_package_post_battle_participant_resolution_not_story_owned"};
   const occurrenceId=securePackageVictoryOccurrenceRef(rt,parentOccurrenceId,result);
-  const fact={
-    factClass:"academy_kakashi_secure_package_2v1_post_battle_factual_state",
-    anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR,
-    sourceBattleAnchorRef:SECURE_PACKAGE_BATTLE_ANCHOR,
-    battleConfigId:SECURE_PACKAGE_BATTLE_CONFIG,
-    battleOccurrenceId:String(result.battleOccurrenceId||""),
-    battleResultState:"player_side_victory",
-    parentOccurrenceRef:parentOccurrenceId,
-    storySceneInstanceId:String(rt.instanceId||""),
-    packageState:{objectRef:WORLD_OBJECT_REF,previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",handoffCompleted:true},
-    participantBattleStateByRef:{
-      [PACKAGE_SMUGGLER_REF]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},
-      [MASKED_INTERCEPTOR_REF]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}
-    },
-    worldFacts:{packageCustody:"KAKASHI",packageLocation:"KAKASHI_PERSON",participantCustodyCommitted:false,participantDeathCommitted:false,storyObjectiveCommitted:false},
-    nextPostResolutionAnchorRef:"AK_SA_023"
-  };
+  const fact={factClass:"academy_kakashi_secure_package_2v1_post_battle_factual_state",anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR,sourceBattleAnchorRef:SECURE_PACKAGE_BATTLE_ANCHOR,battleConfigId:SECURE_PACKAGE_BATTLE_CONFIG,battleOccurrenceId:String(result.battleOccurrenceId||""),battleResultState:"player_side_victory",parentOccurrenceRef:parentOccurrenceId,storySceneInstanceId:String(rt.instanceId||""),packageState:{objectRef:WORLD_OBJECT_REF,previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",handoffCompleted:true},participantBattleStateByRef:{[PACKAGE_SMUGGLER_REF]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},[MASKED_INTERCEPTOR_REF]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}},worldFacts:{packageCustody:"KAKASHI",packageLocation:"KAKASHI_PERSON",participantCustodyCommitted:false,participantDeathCommitted:false,storyObjectiveCommitted:false},nextPostResolutionAnchorRef:"AK_SA_023"};
   let existing=A.findOccurrence(occurrenceId);
-  if(existing){
-    const existingFact=factOf(existing),existingPackage=existingFact.packageState||{};
-    if(String(existing.storySceneInstanceId||"")!==String(rt.instanceId||"")||String(existingFact.battleOccurrenceId||"")!==String(result.battleOccurrenceId||"")||String(existingPackage.currentHolderClass||"")!=="KAKASHI")return{success:false,reason:"kakashi_secure_package_post_battle_occurrence_replay_mismatch"};
-  }else{
-    const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:"SECURE_PACKAGE_2V1_VICTORY_PACKAGE_SECURED",participantRefs:[ORIGIN_ID,PACKAGE_SMUGGLER_REF,MASKED_INTERCEPTOR_REF],sourceRefs:[{type:"origin_occurrence",id:parentOccurrenceId},{type:"battle_occurrence",id:String(result.battleOccurrenceId||"")},{type:"story_autonomy_anchor",id:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR},{type:"world_object",id:WORLD_OBJECT_REF}]});
-    if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_secure_package_post_battle_occurrence_commit_failed"};
-    existing=committed.record;
-  }
+  if(existing){const existingFact=factOf(existing),existingPackage=existingFact.packageState||{};if(String(existing.storySceneInstanceId||"")!==String(rt.instanceId||"")||String(existingFact.battleOccurrenceId||"")!==String(result.battleOccurrenceId||"")||String(existingPackage.currentHolderClass||"")!=="KAKASHI")return{success:false,reason:"kakashi_secure_package_post_battle_occurrence_replay_mismatch"};}
+  else{const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:"SECURE_PACKAGE_2V1_VICTORY_PACKAGE_SECURED",participantRefs:[ORIGIN_ID,PACKAGE_SMUGGLER_REF,MASKED_INTERCEPTOR_REF],sourceRefs:[{type:"origin_occurrence",id:parentOccurrenceId},{type:"battle_occurrence",id:String(result.battleOccurrenceId||"")},{type:"story_autonomy_anchor",id:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR},{type:"world_object",id:WORLD_OBJECT_REF}]});if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_secure_package_post_battle_occurrence_commit_failed"};existing=committed.record;}
   const materialState=typeof CORE.recordMaterialState==="function"?CORE.recordMaterialState({storyUnitRef:ORIGIN_ID,materialRef:WORLD_OBJECT_REF,resolved:true,stateRef:occurrenceId,value:{custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",sourceAnchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR}}):{success:false,reason:"neutral_material_state_authority_missing"};
   if(!materialState||materialState.success!==true)return materialState||{success:false,reason:"kakashi_secure_package_material_state_commit_failed"};
-  const custodyRef=PROVIDER.stableRef("sc34120-secure-package-custody",{occurrenceId,objectRef:WORLD_OBJECT_REF,from:"PACKAGE_SMUGGLER",to:"KAKASHI"});
-  const worldStateRef=PROVIDER.stableRef("sc34120-secure-package-world-state",{occurrenceId,anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR});
+  const custodyRef=PROVIDER.stableRef("sc34120-secure-package-custody",{occurrenceId,objectRef:WORLD_OBJECT_REF,from:"PACKAGE_SMUGGLER",to:"KAKASHI"});const worldStateRef=PROVIDER.stableRef("sc34120-secure-package-world-state",{occurrenceId,anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR});
   return{success:true,occurrenceId,consequenceRefs:[occurrenceId],stateDeltaRefs:[worldStateRef],knowledgeDeltaRefs:[],relationshipHistoryRefs:[],objectiveDeltaRefs:[],objectCustodyDeltaRefs:[custodyRef],participantStateDeltaRefs:[],materialState:clone(materialState.state||null),successorSituationRef:"AK_SA_023"};
 }
+function commitSecurePackageAmtPursuit({receipt,request,result}={}){
+  const rt=active();const requestedInstance=String(request&&request.context&&request.context.storySceneInstanceId||"");
+  if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_secure_package_amt_pursuit_story_instance_missing"};
+  if(!requestedInstance||requestedInstance!==String(rt.instanceId||""))return{success:false,reason:"kakashi_secure_package_amt_pursuit_story_instance_mismatch"};
+  const parentOccurrenceId=String(request&&request.context&&request.context.securePackageOccurrenceRef||rt.localContext&&rt.localContext.kakashiObserveSecurePackageOccurrenceId||"");
+  if(!parentOccurrenceId)return{success:false,reason:"kakashi_secure_package_amt_pursuit_parent_missing"};
+  const parent=A.findOccurrence(parentOccurrenceId);if(!parent)return{success:false,reason:"kakashi_secure_package_amt_pursuit_parent_occurrence_missing"};
+  const parentFact=factOf(parent),parentPackage=parentFact.packageState||{};
+  if(String(parentFact.anchorRef||"")!==SECURE_PACKAGE_POST_RESOLUTION_ANCHOR||String(parentPackage.currentHolderClass||"")!=="KAKASHI")return{success:false,reason:"kakashi_secure_package_amt_pursuit_requires_committed_package_custody"};
+  const selected=String(receipt&&receipt.selectedOutcomeRef||"");
+  const reached=selected==="SECURE_PACKAGE_AMT_PURSUIT_SUCCESS_REACHED";
+  const escaped=selected==="SECURE_PACKAGE_AMT_PURSUIT_FAILURE_ESCAPED";
+  if(!reached&&!escaped)return{success:false,reason:"kakashi_secure_package_amt_pursuit_outcome_not_authorised"};
+  if(!result||result.packageCustody!=="KAKASHI"||result.amtReached!==reached)return{success:false,reason:"kakashi_secure_package_amt_pursuit_result_mismatch"};
+  if(reached&&result.pakkunPresent!==true)return{success:false,reason:"kakashi_secure_package_amt_pursuit_success_requires_pakkun_entry"};
+  if(escaped&&result.pakkunPresent===true)return{success:false,reason:"kakashi_secure_package_amt_pursuit_failure_cannot_invent_pakkun"};
+  const occurrenceId=String(request&&request.committedAtOccurrenceRef||securePackageAmtPursuitOccurrenceRef(rt,parentOccurrenceId,receipt));
+  const fact={factClass:"academy_kakashi_secure_package_amt_pursuit_factual_state",anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR,parentOccurrenceRef:parentOccurrenceId,storyDecisionReceiptId:String(receipt&&receipt.storyDecisionReceiptId||""),storyFactualResolverReceiptId:String(receipt&&receipt.storyFactualResolverReceiptId||""),selectedOutcomeRef:selected,storySceneInstanceId:String(rt.instanceId||""),packageState:{objectRef:WORLD_OBJECT_REF,currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON"},participantStateByRef:{[AMT_REF]:{reachState:reached?"REACHED":"ESCAPED"},[PAKKUN_REF]:{presenceState:reached?"PRESENT":"NOT_PRESENT"}},worldFacts:{packageCustody:"KAKASHI",amtReached:reached,amtEscaped:escaped,pakkunPresent:reached},nextSituationRef:reached?"academy_kakashi.pakkun_intercept":"academy_kakashi.debrief"};
+  let existing=A.findOccurrence(occurrenceId);
+  if(existing){const ef=factOf(existing);if(String(ef.selectedOutcomeRef||"")!==selected||String(ef.parentOccurrenceRef||"")!==parentOccurrenceId)return{success:false,reason:"kakashi_secure_package_amt_pursuit_occurrence_replay_mismatch"};}
+  else{const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_factual_occurrence",outcome:selected,participantRefs:reached?[ORIGIN_ID,AMT_REF,PAKKUN_REF]:[ORIGIN_ID,AMT_REF],sourceRefs:[{type:"origin_occurrence",id:parentOccurrenceId},{type:"story_decision_receipt",id:String(receipt&&receipt.storyDecisionReceiptId||"")},{type:"story_factual_resolver_receipt",id:String(receipt&&receipt.storyFactualResolverReceiptId||"")},{type:"world_object",id:WORLD_OBJECT_REF}]});if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_secure_package_amt_pursuit_occurrence_commit_failed"};existing=committed.record;}
+  const worldStateRef=PROVIDER.stableRef("sc34120-secure-package-amt-pursuit-world",{occurrenceId,selected});
+  const participantStateRef=PROVIDER.stableRef("sc34120-secure-package-amt-pursuit-participant",{occurrenceId,selected});
+  return{success:true,occurrenceId,consequenceRefs:[occurrenceId],stateDeltaRefs:[worldStateRef],knowledgeDeltaRefs:[],relationshipHistoryRefs:[],objectiveDeltaRefs:[],objectCustodyDeltaRefs:[],participantStateDeltaRefs:[participantStateRef],successorSituationRef:reached?"academy_kakashi.pakkun_intercept":"academy_kakashi.debrief"};
+}
 
-function getCommitResult(bindingRef){const ref=String(bindingRef||"");if(ref===GET_CLOSER_BINDING)return commitGetCloser;if(ref===HANDOFF_BINDING)return commitGetCloserHandoff;return null;}
+function getCommitResult(bindingRef){const ref=String(bindingRef||"");if(ref===GET_CLOSER_BINDING)return commitGetCloser;if(ref===HANDOFF_BINDING)return commitGetCloserHandoff;if(ref===SECURE_PACKAGE_AMT_PURSUIT_BINDING)return commitSecurePackageAmtPursuit;return null;}
 function bridgeResult(factual){const receipt=factual.receipt||{};return{success:true,resolverResultRef:receipt.storyFactualResolverReceiptId||null,consequenceRefs:receipt.consequenceRefs||[],stateDeltaRefs:receipt.stateDeltaRefs||[],knowledgeDeltaRefs:receipt.knowledgeDeltaRefs||[],relationshipHistoryRefs:receipt.relationshipHistoryRefs||[],objectiveDeltaRefs:receipt.objectiveDeltaRefs||[],successorSituationRef:receipt.successorSituationRef||null,result:clone(factual.result||receipt.result||null)};}
 function resolveOpeningGetCloser(choice){
-  const rt=active();
-  if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!=="kak_original_action")return{success:false,reason:"kakashi_get_closer_opening_context_missing"};
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!=="kak_original_action")return{success:false,reason:"kakashi_get_closer_opening_context_missing"};
   const intent=ensureOpeningIntent(rt);if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_get_closer_intent_unavailable"};
   const occurrenceId=getCloserOccurrenceRef(rt,intent.receipt);
   const factual=PROVIDER.resolveStoryFactualAction({storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,bindingRef:GET_CLOSER_BINDING,actorRef:ORIGIN_ID,intentCommitRef:intent.receipt.intentCommitRef,attemptOrdinal:1,idempotenceKey:PROVIDER.stableRef("sc34120-get-closer-idempotence",{storySceneInstanceId:String(rt.instanceId),storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId}),authorityVersionRefs:[FINAL_WRITING,DECISION_MATRIX,FACTUAL_PROVIDER_AUTHORITY],inputStateRefs:[intent.contextStateRef],continuityLineageRef:String(rt.instanceId),committedAtOccurrenceRef:occurrenceId,context:{storySceneInstanceId:String(rt.instanceId),sceneId:SCENE_ID,beatId:rt.beatId}});
   if(!factual||factual.success!==true)return factual||{success:false,reason:"kakashi_get_closer_factual_resolution_failed"};
   const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN_ID,receiptId:intent.receipt.storyDecisionReceiptId,state:{resolverResults:{[GET_CLOSER_BINDING]:bridgeResult(factual)}},context:{sceneRef:SCENE_ID,originId:ORIGIN_ID,storySceneInstanceId:String(rt.instanceId)}});
   if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"kakashi_get_closer_semantic_dispatch_failed"};
-  const nextDecisionPointRef=String(factual.result&&factual.result.nextDecisionPointRef||"");
-  const successor=KAK.openDecisionPoint(nextDecisionPointRef,{committedStateRef:occurrenceId,beatRef:nextDecisionPointRef==="AK_SA_005"?SUCCESS_BEAT:FAILURE_BEAT,sourceOccurrenceRefs:[occurrenceId]});
-  if(!successor||successor.success!==true)return successor||{success:false,reason:"kakashi_get_closer_successor_choice_set_failed"};
+  const nextDecisionPointRef=String(factual.result&&factual.result.nextDecisionPointRef||"");const successor=KAK.openDecisionPoint(nextDecisionPointRef,{committedStateRef:occurrenceId,beatRef:nextDecisionPointRef==="AK_SA_005"?SUCCESS_BEAT:FAILURE_BEAT,sourceOccurrenceRefs:[occurrenceId]});if(!successor||successor.success!==true)return successor||{success:false,reason:"kakashi_get_closer_successor_choice_set_failed"};
   const selected=String(factual.receipt&&factual.receipt.selectedOutcomeRef||"");choice.nextBeatId=selected==="GET_CLOSER_SUCCESS"?SUCCESS_BEAT:selected==="GET_CLOSER_FAILURE"?FAILURE_BEAT:null;if(!choice.nextBeatId)return{success:false,reason:"kakashi_get_closer_successor_beat_unknown"};
   rt.localContext={...(rt.localContext||{}),kakashiGetCloserOutcomeRef:selected,kakashiGetCloserOccurrenceId:occurrenceId,kakashiGetCloserSuccessorDecisionPointRef:nextDecisionPointRef,kakashiGetCloserSuccessorChoiceSetId:successor.choiceSet.choiceSetId};save();
   return{success:true,occurrenceId,selectedOutcomeRef:selected,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,storyFactualResolverReceiptId:factual.receipt.storyFactualResolverReceiptId,successorChoiceSetId:successor.choiceSet.choiceSetId,nextBeatId:choice.nextBeatId};
 }
 function resolveGetCloserHandoff(choice){
-  const rt=active();
-  if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!==SUCCESS_BEAT)return{success:false,reason:"kakashi_get_closer_handoff_context_missing"};
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!==SUCCESS_BEAT)return{success:false,reason:"kakashi_get_closer_handoff_context_missing"};
   const parent=requireGetCloserSuccessParent(rt);if(!parent||parent.success!==true)return parent||{success:false,reason:"kakashi_get_closer_handoff_parent_missing"};
   const intent=ensureHandoffIntent(rt,parent.parentOccurrenceId);if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_get_closer_handoff_intent_unavailable"};
   const occurrenceId=handoffOccurrenceRef(rt,parent.parentOccurrenceId,intent.receipt);
   const factual=PROVIDER.resolveStoryFactualAction({storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,bindingRef:HANDOFF_BINDING,actorRef:ORIGIN_ID,intentCommitRef:intent.receipt.intentCommitRef,attemptOrdinal:1,idempotenceKey:PROVIDER.stableRef("sc34120-get-closer-handoff-idempotence",{storySceneInstanceId:String(rt.instanceId),parentOccurrenceId:parent.parentOccurrenceId,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId}),authorityVersionRefs:[FINAL_WRITING,DECISION_MATRIX,FACTUAL_PROVIDER_AUTHORITY],inputStateRefs:[parent.parentOccurrenceId],continuityLineageRef:String(rt.instanceId),committedAtOccurrenceRef:occurrenceId,context:{storySceneInstanceId:String(rt.instanceId),sceneId:SCENE_ID,beatId:rt.beatId,parentOccurrenceRef:parent.parentOccurrenceId}});
   if(!factual||factual.success!==true)return factual||{success:false,reason:"kakashi_get_closer_handoff_factual_resolution_failed"};
-  const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN_ID,receiptId:intent.receipt.storyDecisionReceiptId,state:{resolverResults:{[HANDOFF_BINDING]:bridgeResult(factual)}},context:{sceneRef:SCENE_ID,originId:ORIGIN_ID,storySceneInstanceId:String(rt.instanceId)}});
-  if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"kakashi_get_closer_handoff_semantic_dispatch_failed"};
-  const successor=KAK.openDecisionPoint(OBSERVE_DECISION_REF,{committedStateRef:occurrenceId,beatRef:HANDOFF_BEAT,sourceOccurrenceRefs:[parent.parentOccurrenceId,occurrenceId]});
-  if(!successor||successor.success!==true)return successor||{success:false,reason:"kakashi_get_closer_handoff_observe_choice_set_failed"};
+  const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN_ID,receiptId:intent.receipt.storyDecisionReceiptId,state:{resolverResults:{[HANDOFF_BINDING]:bridgeResult(factual)}},context:{sceneRef:SCENE_ID,originId:ORIGIN_ID,storySceneInstanceId:String(rt.instanceId)}});if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"kakashi_get_closer_handoff_semantic_dispatch_failed"};
+  const successor=KAK.openDecisionPoint(OBSERVE_DECISION_REF,{committedStateRef:occurrenceId,beatRef:HANDOFF_BEAT,sourceOccurrenceRefs:[parent.parentOccurrenceId,occurrenceId]});if(!successor||successor.success!==true)return successor||{success:false,reason:"kakashi_get_closer_handoff_observe_choice_set_failed"};
   choice.nextBeatId=HANDOFF_BEAT;rt.localContext={...(rt.localContext||{}),kakashiGetCloserHandoffOccurrenceId:occurrenceId,kakashiGetCloserHandoffOutcomeRef:HANDOFF_OUTCOME,kakashiObserveEscalationChoiceSetId:successor.choiceSet.choiceSetId};save();
   return{success:true,occurrenceId,parentOccurrenceId:parent.parentOccurrenceId,selectedOutcomeRef:HANDOFF_OUTCOME,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,storyFactualResolverReceiptId:factual.receipt.storyFactualResolverReceiptId,successorChoiceSetId:successor.choiceSet.choiceSetId,nextBeatId:HANDOFF_BEAT};
 }
@@ -376,11 +309,11 @@ function installGetCloserStoryConsumer(){
 
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null;const action=map&&map.get("kak_original_action");const openingChoice=action&&Array.isArray(action.choices)?action.choices.find(row=>row&&row.choiceId===GET_CLOSER_CHOICE_ID):null;const successBeat=map&&map.get(SUCCESS_BEAT),failureBeat=map&&map.get(FAILURE_BEAT),handoffBeat=map&&map.get(HANDOFF_BEAT);const handoffChoice=successBeat&&Array.isArray(successBeat.choices)?successBeat.choices.find(row=>row&&row.choiceId===HANDOFF_CHOICE_ID):null;const guardState=typeof GUARD.getGuardState==="function"?GUARD.getGuardState():{};
-  const checks={patchId:PATCH_ID==="alpha_kakashi_factual_state_commit_34120_2026_09_16",originOccurrenceOwner:typeof A.commitOccurrence==="function"&&typeof A.findOccurrence==="function",neutralFactualProvider:PROVIDER.providerId==="ce.neutral_story_factual_resolver.v1",getCloserCommitOwner:getCommitResult(GET_CLOSER_BINDING)===commitGetCloser,handoffCommitOwner:getCommitResult(HANDOFF_BINDING)===commitGetCloserHandoff,securePackageVictoryCommitOwner:typeof commitSecurePackage2v1Victory==="function"&&commitSecurePackage2v1Victory.toString().includes('anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR'),securePackageCustodyExact:commitSecurePackage2v1Victory.toString().includes('currentHolderClass:"KAKASHI"')&&commitSecurePackage2v1Victory.toString().includes('locationClass:"KAKASHI_PERSON"'),securePackageNoParticipantCollapse:!commitSecurePackage2v1Victory.toString().includes("CONTROLLED_DEFEATED")&&!commitSecurePackage2v1Victory.toString().includes('lifeState:"dead"')&&commitSecurePackage2v1Victory.toString().includes('custodyState:"unresolved"'),exactOpeningLabel:!!openingChoice&&openingChoice.label==="MOVE IN CLOSER",exactCommitRequest:!!openingChoice&&Array.isArray(openingChoice.consequenceRequests)&&openingChoice.consequenceRequests.some(row=>row&&row.requestId===GET_CLOSER_REQUEST_ID),openingReleasedThrough34200:!!openingChoice&&typeof openingChoice.availability==="function"&&openingChoice.availability().available===true&&Array.isArray(guardState.releasedInitialChoiceIds)&&guardState.releasedInitialChoiceIds.includes(GET_CLOSER_CHOICE_ID),successorBeatsPresent:!!successBeat&&!!failureBeat&&!!handoffBeat,exactSuccessLabels:!!successBeat&&successBeat.choices.map(row=>row.label).join("|")==="LET THEM MAKE THE HANDOFF|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",exactFailureLabels:!!failureBeat&&failureBeat.choices.map(row=>row.label).join("|")==="STAY WITH THE PACKAGE|STOP THE MAN WHO SPOTTED YOU|CUT THEM OFF AT THE SAKURA TREE",handoffReleased:!!handoffChoice&&typeof handoffChoice.availability==="function"&&handoffChoice.availability().available===true&&Array.isArray(handoffChoice.consequenceRequests)&&handoffChoice.consequenceRequests.some(row=>row&&row.requestId===HANDOFF_REQUEST_ID),remainingGetCloserSuccessorsFailClosed:!!successBeat&&successBeat.choices.filter(row=>row.choiceId!==HANDOFF_CHOICE_ID).every(row=>typeof row.availability==="function"&&row.availability().available===false),getCloserFailureSuccessorsFailClosed:!!failureBeat&&failureBeat.choices.every(row=>typeof row.availability==="function"&&row.availability().available===false),exactObserveEscalationLabels:!!handoffBeat&&handoffBeat.choices.map(row=>row.label).join("|")==="CUT HER OFF|GO FOR THE PACKAGE|BEAT HER TO THE PACKAGE|DEAL WITH HER FIRST, THEN CHASE THE PACKAGE|STAY ON THE FIRST MAN",observeEscalationStillFailClosed:!!handoffBeat&&handoffBeat.choices.every(row=>typeof row.availability==="function"&&row.availability().available===false),noBattleInvented:!resolveOpeningGetCloser.toString().includes("launchAcademyKakashiOriginPlBattle")&&!resolveGetCloserHandoff.toString().includes("launchAcademyKakashiOriginPlBattle"),browserGoldenClaimed:false};
+  const checks={patchId:PATCH_ID==="alpha_kakashi_factual_state_commit_34120_v2_2026_09_16",originOccurrenceOwner:typeof A.commitOccurrence==="function"&&typeof A.findOccurrence==="function",neutralFactualProvider:PROVIDER.providerId==="ce.neutral_story_factual_resolver.v1",getCloserCommitOwner:getCommitResult(GET_CLOSER_BINDING)===commitGetCloser,handoffCommitOwner:getCommitResult(HANDOFF_BINDING)===commitGetCloserHandoff,securePackageAmtPursuitCommitOwner:getCommitResult(SECURE_PACKAGE_AMT_PURSUIT_BINDING)===commitSecurePackageAmtPursuit,securePackageVictoryCommitOwner:typeof commitSecurePackage2v1Victory==="function"&&commitSecurePackage2v1Victory.toString().includes('anchorRef:SECURE_PACKAGE_POST_RESOLUTION_ANCHOR'),securePackageCustodyExact:commitSecurePackage2v1Victory.toString().includes('currentHolderClass:"KAKASHI"')&&commitSecurePackage2v1Victory.toString().includes('locationClass:"KAKASHI_PERSON"'),securePackageNoParticipantCollapse:!commitSecurePackage2v1Victory.toString().includes("CONTROLLED_DEFEATED")&&!commitSecurePackage2v1Victory.toString().includes('lifeState:"dead"')&&commitSecurePackage2v1Victory.toString().includes('custodyState:"unresolved"'),securePackageAmtPursuitPreservesCustody:commitSecurePackageAmtPursuit.toString().includes('currentHolderClass:"KAKASHI"')&&commitSecurePackageAmtPursuit.toString().includes('packageCustody:"KAKASHI"'),securePackageAmtPursuitPakkunPredicate:commitSecurePackageAmtPursuit.toString().includes('presenceState:reached?"PRESENT":"NOT_PRESENT"'),exactOpeningLabel:!!openingChoice&&openingChoice.label==="MOVE IN CLOSER",exactCommitRequest:!!openingChoice&&Array.isArray(openingChoice.consequenceRequests)&&openingChoice.consequenceRequests.some(row=>row&&row.requestId===GET_CLOSER_REQUEST_ID),openingReleasedThrough34200:!!openingChoice&&typeof openingChoice.availability==="function"&&openingChoice.availability().available===true&&Array.isArray(guardState.releasedInitialChoiceIds)&&guardState.releasedInitialChoiceIds.includes(GET_CLOSER_CHOICE_ID),successorBeatsPresent:!!successBeat&&!!failureBeat&&!!handoffBeat,exactSuccessLabels:!!successBeat&&successBeat.choices.map(row=>row.label).join("|")==="LET THEM MAKE THE HANDOFF|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",exactFailureLabels:!!failureBeat&&failureBeat.choices.map(row=>row.label).join("|")==="STAY WITH THE PACKAGE|STOP THE MAN WHO SPOTTED YOU|CUT THEM OFF AT THE SAKURA TREE",handoffReleased:!!handoffChoice&&typeof handoffChoice.availability==="function"&&handoffChoice.availability().available===true&&Array.isArray(handoffChoice.consequenceRequests)&&handoffChoice.consequenceRequests.some(row=>row&&row.requestId===HANDOFF_REQUEST_ID),remainingGetCloserSuccessorsFailClosed:!!successBeat&&successBeat.choices.filter(row=>row.choiceId!==HANDOFF_CHOICE_ID).every(row=>typeof row.availability==="function"&&row.availability().available===false),getCloserFailureSuccessorsFailClosed:!!failureBeat&&failureBeat.choices.every(row=>typeof row.availability==="function"&&row.availability().available===false),exactObserveEscalationLabels:!!handoffBeat&&handoffBeat.choices.map(row=>row.label).join("|")==="CUT HER OFF|GO FOR THE PACKAGE|BEAT HER TO THE PACKAGE|DEAL WITH HER FIRST, THEN CHASE THE PACKAGE|STAY ON THE FIRST MAN",observeEscalationStillFailClosed:!!handoffBeat&&handoffBeat.choices.every(row=>typeof row.availability==="function"&&row.availability().available===false),noBattleInvented:!resolveOpeningGetCloser.toString().includes("launchAcademyKakashiOriginPlBattle")&&!resolveGetCloserHandoff.toString().includes("launchAcademyKakashiOriginPlBattle"),browserGoldenClaimed:false};
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
 
-const api=Object.freeze({patchId:PATCH_ID,bindingRef:GET_CLOSER_BINDING,handoffBindingRef:HANDOFF_BINDING,getCommitResult,commitGetCloser,commitGetCloserHandoff,commitSecurePackage2v1Victory,installGetCloserStoryConsumer,diagnostics,browserGoldenClaimed:false});
+const api=Object.freeze({patchId:PATCH_ID,bindingRef:GET_CLOSER_BINDING,handoffBindingRef:HANDOFF_BINDING,securePackageAmtPursuitBindingRef:SECURE_PACKAGE_AMT_PURSUIT_BINDING,getCommitResult,commitGetCloser,commitGetCloserHandoff,commitSecurePackage2v1Victory,commitSecurePackageAmtPursuit,installGetCloserStoryConsumer,diagnostics,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120=api;
 globalThis.runAcademyKakashiFactualState34120Diagnostics=diagnostics;
 })();
