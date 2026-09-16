@@ -1,0 +1,26 @@
+name: Issue 209 First Konoha Tutorial QA
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'game.js'
+      - 'runtime/alpha-first-konoha-tutorial-35000.js'
+      - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
+      - 'tools/qa_first_konoha_tutorial_35000.js'
+      - '.github/workflows/issue-209-first-konoha-tutorial.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  first-konoha-tutorial:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Issue 209 deterministic source/headless QA
+        run: node tools/qa_first_konoha_tutorial_35000.js
