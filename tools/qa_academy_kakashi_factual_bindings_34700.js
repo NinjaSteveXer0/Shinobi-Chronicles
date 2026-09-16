@@ -22,7 +22,7 @@ assert(diag&&diag.pass===true,`34700 diagnostics failed: ${JSON.stringify(diag&&
 const provider=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const bindings=provider.getRegisteredStoryFactualBindings();
 const byRef=new Map(bindings.map(row=>[row.bindingRef,row]));
-assert(byRef.size===9,`expected 9 Kakashi factual bindings, got ${byRef.size}`);
+assert(byRef.size===10,`expected 10 Kakashi factual bindings, got ${byRef.size}`);
 assert(!byRef.has('academy_kakashi.resolver.secure_package_before_assassin'),'unclosed exact envelope must stay fail-closed');
 assert(!byRef.has('academy_kakashi.resolver.pursue_original_target'),'unclosed exact envelope must stay fail-closed');
 
@@ -39,6 +39,17 @@ function resolve(bindingRef,eligibleOutcomeRefs,key){
     committedAtOccurrenceRef:'occ_origin_kakashi_qa'
   });
 }
+
+const handoff=resolve('academy_kakashi.story_fixed.let_handoff_happen',null,'get-closer-handoff');
+assert(handoff.success===true,'Get Closer handoff did not resolve');
+assert(handoff.receipt.resolutionMode==='deterministic_single','Get Closer handoff must be deterministic');
+assert(handoff.receipt.selectedOutcomeRef==='GET_CLOSER_SUCCESS_HANDOFF_COMPLETED','wrong Get Closer handoff outcome');
+assert(handoff.result.handoffCompleted===true,'Get Closer handoff did not complete transfer');
+assert(handoff.result.packageCustody==='PACKAGE_SMUGGLER','Get Closer handoff did not move package to Package Smuggler');
+assert(handoff.result.retainsGetCloserKnowledge===true,'Get Closer handoff lost fuller Knowledge');
+assert(handoff.result.maskedInterceptorVisible===true,'MI should become visible only after completed transfer');
+assert(handoff.result.battleRequired===false,'Get Closer handoff invented Battle');
+assert(handoff.result.nextDecisionPointRef==='OBSERVE_ESCALATION','Get Closer handoff did not reach Observe escalation');
 
 const directFail=resolve('academy_kakashi.resolver.pickpocket_direct',['PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1'],'direct-fail');
 assert(directFail.success===true,'direct Pickpocket failure did not resolve');
@@ -84,10 +95,12 @@ const loader=fs.readFileSync(path.resolve(process.cwd(),'runtime/alpha-kakashi-f
 assert(loader.includes('alpha-story-factual-resolver-34600.js'),'browser loader does not include 34600 provider');
 assert(loader.includes('alpha-kakashi-factual-bindings-34700.js'),'browser loader does not include 34700 Kakashi bindings');
 assert(loader.indexOf('loadFactualProvider')<loader.indexOf('function loadBattleInteraction')||loader.includes('loadFactualProvider();return;'),'factual loader seam missing');
+assert(loader.includes('const BUILD="kakashi-final-20260916-13"'),'Kakashi child cache identity not advanced');
 
 console.log(JSON.stringify({
   pass:true,
   registeredBindingCount:byRef.size,
+  handoffOutcome:handoff.receipt.selectedOutcomeRef,
   directFailureConfig:directFail.result.battleConfigId,
   improvedFailureConfig:improvedFail.result.battleConfigId,
   stableGetCloserOutcome:stableA.receipt.selectedOutcomeRef,
