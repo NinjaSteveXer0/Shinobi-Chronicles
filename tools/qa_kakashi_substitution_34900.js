@@ -65,7 +65,7 @@ function projectionContext(){
 
 const p=projectionContext();
 const projected=p.context.getBattleUISkillPalettePresentation(p.actor);
-assert.deepStrictEqual(projected.skillIds,[...p.firstFour,NEW],"unresolved Kakashi palette must project Analyze -> Substitution deterministically");
+assert.deepStrictEqual(Array.from(projected.skillIds),[...p.firstFour,NEW],"unresolved Kakashi palette must project Analyze -> Substitution deterministically");
 const newDef=p.context.getBattlePreparedSkillDefinition(p.actor,NEW);
 assert.strictEqual(newDef.displayName,"Substitution Jutsu");
 assert.strictEqual(newDef.resolutionKind,"ratio_guard_state");
