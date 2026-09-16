@@ -204,7 +204,7 @@ function diagnostics(){
     factualObserveChoiceEitherNotYetCreatedOrBound:!observe||!!factual&&factual.nextBeatId==="kak_seq_mi_battle"&&typeof factual.availability==="function"&&factual.availability().available===true,
     exactThreeConfigs:[CONFIG.mi,CONFIG.ps,CONFIG.amt].every(Boolean),
     allInserted:["kak_seq_mi_battle","kak_seq_mi_return","kak_seq_ps_battle","kak_seq_ps_return","kak_seq_pakkun_arrival","kak_seq_amt_battle","kak_seq_amt_return","kak_seq_debrief_pending"].every(id=>ids.includes(id)),
-    semanticIntentBeforeBattle:ensureObserveIntent34410.toString().includes("commitStoryIntent")&&bindObserveEscalationChoice34410.toString().includes(OBSERVE_INTENT_REQUEST),
+    semanticIntentBeforeBattle:ensureObserveIntent34410.toString().includes("commitStoryIntent")&&bindObserveEscalationChoice34410.toString().includes("OBSERVE_INTENT_REQUEST"),
     factualMiBattleReceiptClosesIntent:closeObserveIntentFromMiBattle34410.toString().includes("battleOccurrenceId")&&closeObserveIntentFromMiBattle34410.toString().includes("dispatchCommittedIntent"),
     miGate4:within({resultState:"player_side_victory",playerActionOpportunityCount:4},4)&&!within({resultState:"player_side_victory",playerActionOpportunityCount:5},4),
     psGate3:within({resultState:"player_side_victory",playerActionOpportunityCount:3},3)&&!within({resultState:"player_side_victory",playerActionOpportunityCount:4},3),
