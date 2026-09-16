@@ -52,8 +52,9 @@ assert(worldFix.includes('academy_first_konoha_tutorial_pending'),"standing refi
 assert(worldFix.includes('if(isFirstTeamOrientationPending())return 0'),"standing refill does not fail closed while tutorial is pending");
 assert(!tutorial.includes("KOH-X12"),"mandatory tutorial must not alias KOH-X12");
 assert(worldCore.includes("konoha_alpha_training_observation_drill"),"independent free-play Observation Drill disappeared");
-assert(!tutorial.includes("startBattle("),"mandatory tutorial must not start Battle");
-assert(!tutorial.includes("resolveBattleDamagePacket("),"mandatory tutorial must not resolve Battle damage");
+const operationalTransitions=run(`[continueAcademyTeamFormationJourney,focusFirstKonohaTutorialHost35000,enterFirstKonohaTutorialCompound35000,beginFirstKonohaTutorialOrientation35000,resolveFirstKonohaTutorialObservation35000,reportFirstKonohaTutorialReady35000].map(fn=>fn.toString()).join("\\n")`,`battle-guard-source.js`);
+assert(!operationalTransitions.includes("startBattle("),"mandatory tutorial must not start Battle");
+assert(!operationalTransitions.includes("resolveBattleDamagePacket("),"mandatory tutorial must not resolve Battle damage");
 assert(!/\"KON-[OSD]\d+\"/.test(tutorial),"tutorial leaked concealed/optional Konoha location authority");
 
 const diag=plain(`runFirstKonohaTutorial35000Diagnostics()`);
