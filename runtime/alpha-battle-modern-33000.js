@@ -152,10 +152,20 @@
       summary="Use a context Skill that changes what can be learned or acted on in this Battle.";
       details=["It only gives the information or effect written into this Skill.","It does not reveal hidden facts automatically."],tags=["UTILITY","CONTEXT"];
     }else{
-      const older=typeof getBattleSkillPlainLanguageSummary==="function"?getBattleSkillPlainLanguageSummary(skill):"";
-      if(older)summary=sentence33000(older);
-      details=["Availability, target and result still follow the normal Battle rules."];
-    }
+  /*
+  Safe generic presentation fallback.
+
+  Do not call any global or previously wrapped summary function here.
+  33000 is presentation-only, so an unknown Skill kind can use generic
+  explanatory copy without touching Battle resolution or availability.
+  */
+  summary="Use this authored Battle technique.";
+
+  details=[
+    "Availability, target and result still follow the normal Battle rules."
+  ];
+
+}
 
     return {title:skill.displayName||skill.id,summary,details,kind:skillKind33000(skill),attackPL:attack,tags:[...new Set(tags)]};
   }

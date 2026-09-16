@@ -23,8 +23,8 @@
   "use strict";
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_INTERACTION_34500)return;
 
-  const VERSION="34500-v4";
-  const PATCH_ID="alpha_kakashi_battle_interaction_hotfix_34500_v4_2026_09_16";
+  const VERSION="34500-v5";
+  const PATCH_ID="alpha_kakashi_battle_interaction_hotfix_34500_v5_2026_09_16";
   const KAKASHI="academy_kakashi";
   const EXACT_KAKASHI_SKILLS=new Set([
     "academy_kakashi_kunai_quickdraw",
@@ -46,6 +46,7 @@
   let observer=null;
   let hardenScheduled=false;
   let delegatedClickInstalled=false;
+let delegatedLearnInstalled=false;
 
   function battle34500(){
     try{return typeof currentBattle!=="undefined"?currentBattle:null;}catch(_error){return null;}
@@ -128,31 +129,94 @@
   }
 
   function skillIdFromCard34500(card){
-    if(!card)return null;
-    const dataset=card.dataset||{};
-    const direct=String(dataset.skillId||dataset.battleSkillId||"").trim();
-    if(direct)return direct;
-    if(card.querySelector){
-      const child=card.querySelector("[data-skill-id],[data-battle-skill-id]");
-      if(child&&child.dataset){
-        const nested=String(child.dataset.skillId||child.dataset.battleSkillId||"").trim();
-        if(nested)return nested;
-      }
+  if(!card)return null;
+
+  /*
+  The rendered handler is regenerated with the actual card.
+  Prefer it over dataset metadata, which can survive/re-enter stale.
+  */
+  const handler=String(
+    card.getAttribute &&
+    card.getAttribute("onclick") ||
+    ""
+  );
+
+  const handlerMatch=handler.match(
+    /(?:activateBattlePreparedSkillCard|selectBattlePreparedSkill)\(['"]([^'"]+)['"]\)/
+  );
+
+  if(handlerMatch){
+    const id=String(handlerMatch[1]||"").trim();
+    if(id)return id;
+  }
+
+  const dataset=card.dataset||{};
+  const direct=String(
+    dataset.skillId ||
+    dataset.battleSkillId ||
+    ""
+  ).trim();
+
+  if(direct)return direct;
+
+  if(card.querySelector){
+    const child=card.querySelector(
+      "[data-skill-id],[data-battle-skill-id]"
+    );
+
+    if(child&&child.dataset){
+      const nested=String(
+        child.dataset.skillId ||
+        child.dataset.battleSkillId ||
+        ""
+      ).trim();
+
+      if(nested)return nested;
     }
-    const handler=String(card.getAttribute&&card.getAttribute("onclick")||"");
-    const match=handler.match(/(?:activateBattlePreparedSkillCard|selectBattlePreparedSkill)\(['\"]([^'\"]+)['\"]\)/);
-    if(match)return String(match[1]||"").trim()||null;
-    const label=normalizeText34500(cardLabel34500(card));
-    if(label){
-      const skill=visibleBattleSkills34500().find(row=>{
+  }
+
+  const label=normalizeText34500(
+    cardLabel34500(card)
+  );
+
+  if(label){
+    const skill=visibleBattleSkills34500()
+      .find(row=>{
         if(!row)return false;
-        const names=[row.name,row.label,row.title,row.displayName,row.skillName].filter(Boolean).map(normalizeText34500);
-        return names.some(name=>name&&((label===name)||label.includes(name)||name.includes(label)));
+
+        const names=[
+          row.name,
+          row.label,
+          row.title,
+          row.displayName,
+          row.skillName
+        ]
+          .filter(Boolean)
+          .map(normalizeText34500);
+
+        return names.some(
+          name=>
+            name &&
+            (
+              label===name ||
+              label.includes(name) ||
+              name.includes(label)
+            )
+        );
       });
-      const id=skill&&String(skill.id||skill.skillId||"").trim();
-      if(id)return id;
-    }
-    return null;
+
+    const id=
+      skill &&
+      String(
+        skill.id ||
+        skill.skillId ||
+        ""
+      ).trim();
+
+    if(id)return id;
+  }
+
+  return null;
   }
 
   function exactKakashiSkill34500(skillId){
@@ -160,19 +224,64 @@
   }
 
   function renderGuide34500(skillId){
-    if(!activeKakashiBattle34500()||!exactKakashiSkill34500(skillId))return{success:false,reason:"kakashi_origin_battle_not_active"};
-    const battle=battle34500();
-    if(typeof renderTemporaryBattleSkillGuide==="function"){
-      battle.skillGuideSkillId=String(skillId);
-      renderTemporaryBattleSkillGuide(String(skillId));
-      return{success:true,mode:"native_skill_guide",skillId:String(skillId)};
-    }
-    if(typeof previewBattlePreparedSkill33000==="function"){
-      const out=previewBattlePreparedSkill33000(String(skillId));
-      return out&&typeof out==="object"?out:{success:out!==false,mode:"modern_skill_inspector",skillId:String(skillId)};
-    }
-    return{success:false,reason:"battle_skill_guide_unavailable"};
+  if(
+    !activeKakashiBattle34500() ||
+    !exactKakashiSkill34500(skillId)
+  ){
+    return {
+      success:false,
+      reason:"kakashi_origin_battle_not_active"
+    };
   }
+
+  const id=String(skillId);
+
+  /*
+  33000 owns the visible modern Skill Guide.
+  Use its exact-id preview directly instead of going through
+  an older/mutable presentation bridge first.
+  */
+  if(
+    typeof previewBattlePreparedSkill33000==="function"
+  ){
+    const out=
+      previewBattlePreparedSkill33000(id);
+
+    if(out!==false){
+      return {
+        success:true,
+        mode:"modern_skill_inspector",
+        skillId:id
+      };
+    }
+  }
+
+  /*
+  Compatibility fallback only.
+  */
+  const battle=battle34500();
+
+  if(
+    typeof renderTemporaryBattleSkillGuide==="function"
+  ){
+    if(battle){
+      battle.skillGuideSkillId=id;
+    }
+
+    renderTemporaryBattleSkillGuide(id);
+
+    return {
+      success:true,
+      mode:"native_skill_guide_fallback",
+      skillId:id
+    };
+  }
+
+  return {
+    success:false,
+    reason:"battle_skill_guide_unavailable"
+  };
+}
 
   function rememberActivation34500(result,skillId,source){
     const battle=battle34500();
@@ -187,139 +296,782 @@
   }
 
   function activate34500(skillId){
-    if(!activeKakashiBattle34500()||!exactKakashiSkill34500(skillId))return{success:false,reason:"kakashi_origin_battle_not_active"};
-    const id=String(skillId);
-
-    // 32700 is the canonical browser one-click bridge. Use it when present;
-    // otherwise preserve the native select -> confirm contract explicitly.
-    if(typeof activateBattlePreparedSkillCard==="function"){
-      const out=activateBattlePreparedSkillCard(id);
-      const normalized=out&&typeof out==="object"
-        ?Object.assign({},out,{alpha34500DirectClick:true,selectedSkillId:id,nativeActivator:true})
-        :{success:out!==false,alpha34500DirectClick:true,selectedSkillId:id,nativeActivator:true};
-      return rememberActivation34500(normalized,id,"native_one_click");
-    }
-
-    if(typeof selectBattlePreparedSkill!=="function"||typeof confirmSelectedBattleSkill!=="function"){
-      return rememberActivation34500({success:false,reason:"battle_skill_commit_path_missing"},id,"select_confirm_missing");
-    }
-    const battle=battle34500();
-    const selected=selectBattlePreparedSkill(id);
-    const selectionSucceeded=(selected&&selected.success===true)||String(battle&&battle.selectedSkillId||"")===id;
-    if(!selectionSucceeded)return rememberActivation34500(selected||{success:false,reason:"battle_skill_selection_failed"},id,"selection_failed");
-    if(selected&&selected.branchSelectionRequired===true){
-      renderGuide34500(id);
-      return rememberActivation34500(Object.assign({},selected,{success:true,awaitingExplicitMode:true,actionCommitted:false}),id,"explicit_mode_required");
-    }
-    const committed=confirmSelectedBattleSkill();
-    const normalized=committed&&typeof committed==="object"
-      ?Object.assign({},committed,{alpha34500DirectClick:true,selectedSkillId:id,nativeActivator:false})
-      :{success:committed!==false,alpha34500DirectClick:true,selectedSkillId:id,nativeActivator:false};
-    return rememberActivation34500(normalized,id,"native_select_confirm");
+  if(
+    !activeKakashiBattle34500() ||
+    !exactKakashiSkill34500(skillId)
+  ){
+    return {
+      success:false,
+      reason:"kakashi_origin_battle_not_active"
+    };
   }
 
-  function cardIsUsable34500(card){
-    if(!card||card.disabled===true)return false;
-    if(card.classList&&(card.classList.contains("is-empty")||card.classList.contains("empty")||card.classList.contains("is-disabled")))return false;
-    return true;
+  const id=String(skillId);
+
+  if(
+    typeof selectBattlePreparedSkill!=="function" ||
+    typeof confirmSelectedBattleSkill!=="function"
+  ){
+    return rememberActivation34500(
+      {
+        success:false,
+        reason:"battle_skill_commit_path_missing"
+      },
+      id,
+      "select_confirm_missing"
+    );
   }
 
-  function bindCard34500(card){
-    if(!cardIsUsable34500(card)||boundCards.has(card))return false;
-    const skillId=skillIdFromCard34500(card);
-    if(!exactKakashiSkill34500(skillId))return false;
-    boundCards.add(card);
-    card.dataset.skillId=String(skillId);
-    card.dataset.alpha34500Bound="true";
-    if(card.setAttribute){
-      card.setAttribute("role","button");
-      card.setAttribute("tabindex",card.getAttribute&&card.getAttribute("tabindex")||"0");
-      card.setAttribute("aria-description","Hover or focus to learn what this Skill does. Click to use it if legal.");
+  const battle=battle34500();
+
+  const selected=
+    selectBattlePreparedSkill(id);
+
+  let actionState=null;
+
+  try{
+    actionState=
+      typeof syncBattleActionRegionState==="function"
+        ?syncBattleActionRegionState()
+        :null;
+  }catch(_error){
+    actionState=null;
+  }
+
+  const selectionSucceeded=
+    !!(
+      selected &&
+      selected.success===true
+    ) ||
+    String(
+      actionState &&
+      actionState.selectedSkillId ||
+      ""
+    )===id ||
+    String(
+      battle &&
+      battle.selectedSkillId ||
+      ""
+    )===id;
+
+  if(!selectionSucceeded){
+    return rememberActivation34500(
+      selected || {
+        success:false,
+        reason:"battle_skill_selection_failed"
+      },
+      id,
+      "selection_failed"
+    );
+  }
+
+  /*
+  Genuine second-order mode selection remains explicit.
+  */
+  if(
+    selected &&
+    selected.branchSelectionRequired===true
+  ){
+    renderGuide34500(id);
+
+    return rememberActivation34500(
+      Object.assign(
+        {},
+        selected,
+        {
+          success:true,
+          awaitingExplicitMode:true,
+          actionCommitted:false
+        }
+      ),
+      id,
+      "explicit_mode_required"
+    );
+  }
+
+  /*
+  This is the authoritative action commit.
+  No damage/resolver logic is duplicated here.
+  */
+  const committed=
+    confirmSelectedBattleSkill();
+
+  const normalized=
+    committed &&
+    typeof committed==="object"
+      ?Object.assign(
+          {},
+          committed,
+          {
+            alpha34500DirectClick:true,
+            selectedSkillId:id,
+            nativeActivator:false,
+            explicitSelectConfirm:true
+          }
+        )
+      :{
+          success:committed!==false,
+          alpha34500DirectClick:true,
+          selectedSkillId:id,
+          nativeActivator:false,
+          explicitSelectConfirm:true
+        };
+
+  return rememberActivation34500(
+    normalized,
+    id,
+    "native_select_confirm"
+  );
+}
+
+  function cardIsPresentable34500(card){
+  if(!card)return false;
+
+  if(
+    card.classList &&
+    (
+      card.classList.contains("is-empty") ||
+      card.classList.contains("empty")
+    )
+  ){
+    return false;
+  }
+
+  return true;
+}
+
+
+/*
+Rendered DOM state is presentation.
+
+The authoritative answer to "can Kakashi use this Skill right now?"
+comes from the existing Battle availability evaluator.
+*/
+function authoritativeSkillAvailability34500(skillId){
+  const actor=activeActor34500();
+
+  if(
+    !actor ||
+    !skillId ||
+    typeof getBattlePreparedSkillDefinition!=="function" ||
+    typeof evaluateBattlePreparedSkillAvailability!=="function"
+  ){
+    return {
+      known:false,
+      available:false,
+      reason:"battle_availability_api_missing"
+    };
+  }
+
+  const skill=
+    getBattlePreparedSkillDefinition(
+      actor,
+      String(skillId)
+    );
+
+  if(!skill){
+    return {
+      known:false,
+      available:false,
+      reason:"battle_skill_definition_missing"
+    };
+  }
+
+  let target=null;
+
+  try{
+    if(typeof getBattlePreparedSkillDefaultTarget==="function"){
+      const defaultTarget=
+        getBattlePreparedSkillDefaultTarget(
+          actor,
+          skill
+        );
+
+      target=
+        defaultTarget &&
+        defaultTarget.participant
+          ?defaultTarget.participant
+          :null;
     }
-    const showGuide=()=>renderGuide34500(skillId);
-    if(card.addEventListener){
-      card.addEventListener("mouseenter",showGuide);
-      card.addEventListener("focus",showGuide);
-      card.addEventListener("keydown",event=>{
-        if(event&&(event.key==="Enter"||event.key===" ")){
-          if(typeof event.preventDefault==="function")event.preventDefault();
-          if(typeof event.stopPropagation==="function")event.stopPropagation();
-          if(typeof event.stopImmediatePropagation==="function")event.stopImmediatePropagation();
+  }catch(_error){
+    target=null;
+  }
+
+  try{
+    const result=
+      evaluateBattlePreparedSkillAvailability(
+        skill,
+        actor,
+        target
+      ) || {};
+
+    const available=
+      result.available===true ||
+      result.reason==="branch_selection_required";
+
+    return {
+      known:true,
+      available,
+      reason:result.reason||null,
+      raw:result
+    };
+  }catch(error){
+    return {
+      known:false,
+      available:false,
+      reason:String(
+        error&&error.message ||
+        error ||
+        "battle_availability_failed"
+      )
+    };
+  }
+}
+
+
+/*
+A stale renderer is allowed to LOOK stale.
+
+It is not allowed to leave an authoritatively available Skill as a
+native disabled <button>, because disabled browser controls can swallow
+the pointer/click event before our delegated Battle input ever sees it.
+
+We only re-enable the DOM control when Battle's own evaluator says the
+Skill is currently legal.
+*/
+function normalizeRenderedCard34500(
+  card,
+  skillId
+){
+  if(
+    !cardIsPresentable34500(card) ||
+    !exactKakashiSkill34500(skillId)
+  ){
+    return false;
+  }
+
+  card.dataset.skillId=String(skillId);
+
+  const availability=
+    authoritativeSkillAvailability34500(skillId);
+
+  card.dataset.alpha34500AvailabilityKnown=
+    availability.known?"true":"false";
+
+  card.dataset.alpha34500AuthorityAvailable=
+    availability.available?"true":"false";
+
+  card.dataset.alpha34500AvailabilityReason=
+    String(availability.reason||"");
+
+  /*
+  Preserve native resolver authority:
+  only remove stale DOM disablement when the native evaluator says READY.
+  */
+  if(
+    availability.known===true &&
+    availability.available===true
+  ){
+    try{
+      card.disabled=false;
+      card.removeAttribute("disabled");
+      card.setAttribute("aria-disabled","false");
+
+      if(card.classList){
+        card.classList.remove("is-disabled");
+        card.classList.add("is-ready");
+      }
+    }catch(_error){}
+  }
+
+  /*
+  Input hardening is scoped to the live Kakashi Battle cards.
+  */
+  try{
+    card.style.setProperty(
+      "pointer-events",
+      "auto",
+      "important"
+    );
+
+    card.style.setProperty(
+      "position",
+      "relative",
+      "important"
+    );
+
+    card.style.setProperty(
+      "z-index",
+      "2",
+      "important"
+    );
+  }catch(_error){}
+
+  return true;
+}
+
+
+function bindCard34500(card){
+  if(!cardIsPresentable34500(card))return false;
+
+  const skillId=
+    skillIdFromCard34500(card);
+
+  if(!exactKakashiSkill34500(skillId)){
+    return false;
+  }
+
+  /*
+  Always normalize first.
+
+  The same physical DOM node can survive while Battle availability changes.
+  */
+  normalizeRenderedCard34500(
+  card,
+  skillId
+);
+
+/*
+33000 installs per-card hover/focus properties.
+They can overwrite the delegated exact-id preview after pointerover.
+34500 now owns Kakashi hover/focus through delegation only.
+*/
+try{
+  card.onmouseenter=null;
+  card.onfocus=null;
+}catch(_error){}
+
+if(boundCards.has(card)){
+  return true;
+}
+
+  boundCards.add(card);
+
+  card.dataset.skillId=
+    String(skillId);
+
+  card.dataset.alpha34500Bound=
+    "true";
+
+  if(card.setAttribute){
+    card.setAttribute(
+      "role",
+      "button"
+    );
+
+    card.setAttribute(
+      "tabindex",
+      card.getAttribute &&
+      card.getAttribute("tabindex") ||
+      "0"
+    );
+
+    card.setAttribute(
+      "aria-description",
+      "Hover or focus to learn what this Skill does. Click to use it if legal."
+    );
+  }
+
+  /*
+  Keyboard remains attached to the card itself.
+  Mouse/pointer learning and activation are delegated below so replacing
+  this card in the live Battle DOM cannot destroy those routes.
+  */
+  if(card.addEventListener){
+    card.addEventListener(
+      "keydown",
+      event=>{
+        if(
+          event &&
+          (
+            event.key==="Enter" ||
+            event.key===" "
+          )
+        ){
+          if(
+            typeof event.preventDefault==="function"
+          ){
+            event.preventDefault();
+          }
+
+          if(
+            typeof event.stopPropagation==="function"
+          ){
+            event.stopPropagation();
+          }
+
+          if(
+            typeof event.stopImmediatePropagation==="function"
+          ){
+            event.stopImmediatePropagation();
+          }
+
           activate34500(skillId);
         }
-      },true);
-    }else{
-      card.onmouseenter=showGuide;
-      card.onfocus=showGuide;
-    }
-    return true;
+      },
+      true
+    );
   }
 
-  function cardCandidates34500(root){
-    if(!root||!root.querySelectorAll)return[];
-    return Array.from(root.querySelectorAll(CARD_SELECTOR));
+  return true;
+}
+
+
+function cardCandidates34500(root){
+  if(
+    !root ||
+    !root.querySelectorAll
+  ){
+    return [];
   }
 
-  function stageRoot34500(root=null){
-    if(root&&root.matches&&root.matches(".alpha-code-battle-stage"))return root;
-    if(root&&root.querySelector){
-      const nested=root.querySelector(".alpha-code-battle-stage");
-      if(nested)return nested;
-    }
-    if(typeof document==="undefined")return null;
-    return document.querySelector(".alpha-code-battle-stage")
-      ||document.getElementById("battle-modal")
-      ||document.getElementById("combat-overlay")
-      ||document.getElementById("battle-live")
-      ||null;
+  return Array.from(
+    root.querySelectorAll(
+      CARD_SELECTOR
+    )
+  );
+}
+
+
+function stageRoot34500(root=null){
+  if(
+    root &&
+    root.matches &&
+    root.matches(
+      ".alpha-code-battle-stage"
+    )
+  ){
+    return root;
   }
 
-  function hardenBattleDOM34500(root=null){
-    if(typeof document==="undefined"||!activeKakashiBattle34500())return false;
-    const stage=stageRoot34500(root);
-    if(!stage)return false;
-    let bound=0;
-    cardCandidates34500(stage).forEach(card=>{if(bindCard34500(card))bound+=1;});
-    return bound>0;
+  if(
+    root &&
+    root.querySelector
+  ){
+    const nested=
+      root.querySelector(
+        ".alpha-code-battle-stage"
+      );
+
+    if(nested)return nested;
   }
 
-  function scheduleHarden34500(root=null){
-    if(hardenScheduled)return;
-    hardenScheduled=true;
-    const run=()=>{
-      hardenScheduled=false;
-      try{hardenBattleDOM34500(root);}catch(_error){}
-    };
-    if(typeof queueMicrotask==="function")queueMicrotask(run);
-    else if(typeof setTimeout==="function")setTimeout(run,0);
-    else run();
+  if(typeof document==="undefined"){
+    return null;
   }
 
-  function resolveDelegatedCard34500(target){
-    if(!target||typeof target.closest!=="function")return null;
-    try{return target.closest(CARD_SELECTOR);}catch(_error){return null;}
+  return (
+    document.querySelector(
+      ".alpha-code-battle-stage"
+    ) ||
+    document.getElementById(
+      "battle-modal"
+    ) ||
+    document.getElementById(
+      "combat-overlay"
+    ) ||
+    document.getElementById(
+      "battle-live"
+    ) ||
+    null
+  );
+}
+
+
+function hardenBattleDOM34500(root=null){
+  if(
+    typeof document==="undefined" ||
+    !activeKakashiBattle34500()
+  ){
+    return false;
   }
 
-  function delegatedClick34500(event){
-    if(!activeKakashiBattle34500())return null;
-    const card=resolveDelegatedCard34500(event&&event.target);
-    if(!card||!cardIsUsable34500(card))return null;
-    const stage=stageRoot34500();
-    if(stage&&typeof stage.contains==="function"&&!stage.contains(card))return null;
-    const skillId=skillIdFromCard34500(card);
-    if(!exactKakashiSkill34500(skillId))return null;
-    if(event&&typeof event.preventDefault==="function")event.preventDefault();
-    if(event&&typeof event.stopPropagation==="function")event.stopPropagation();
-    if(event&&typeof event.stopImmediatePropagation==="function")event.stopImmediatePropagation();
-    return activate34500(skillId);
+  const stage=
+    stageRoot34500(root);
+
+  if(!stage)return false;
+
+  try{
+    stage.classList.add(
+      "sc-kakashi-battle-input-34500"
+    );
+  }catch(_error){}
+
+  /*
+  Keep the actionable deck above decorative Battle presentation.
+  This does not change Battle semantics.
+  */
+  const deck=
+    stage.querySelector &&
+    stage.querySelector(
+      ".battle-live-skill-deck"
+    );
+
+  if(deck&&deck.style){
+    try{
+      deck.style.setProperty(
+        "pointer-events",
+        "auto",
+        "important"
+      );
+
+      deck.style.setProperty(
+        "z-index",
+        "45",
+        "important"
+      );
+
+      deck.style.setProperty(
+        "isolation",
+        "isolate"
+      );
+    }catch(_error){}
   }
 
-  function installDelegatedClick34500(){
-    if(delegatedClickInstalled||typeof document==="undefined"||typeof document.addEventListener!=="function")return false;
-    document.addEventListener("click",delegatedClick34500,true);
-    delegatedClickInstalled=true;
-    return true;
+  let bound=0;
+
+  cardCandidates34500(stage)
+    .forEach(card=>{
+      if(bindCard34500(card)){
+        bound+=1;
+      }
+    });
+
+  return bound>0;
+}
+
+
+function scheduleHarden34500(root=null){
+  if(hardenScheduled)return;
+
+  hardenScheduled=true;
+
+  const run=()=>{
+    hardenScheduled=false;
+
+    try{
+      hardenBattleDOM34500(root);
+    }catch(_error){}
+  };
+
+  if(
+    typeof queueMicrotask==="function"
+  ){
+    queueMicrotask(run);
+  }else if(
+    typeof setTimeout==="function"
+  ){
+    setTimeout(run,0);
+  }else{
+    run();
   }
+}
+
+
+function resolveDelegatedCard34500(target){
+  if(
+    !target ||
+    typeof target.closest!=="function"
+  ){
+    return null;
+  }
+
+  try{
+    return target.closest(
+      CARD_SELECTOR
+    );
+  }catch(_error){
+    return null;
+  }
+}
+
+
+/*
+HOVER / FOCUS = LEARN
+
+Use delegated browser input instead of per-card mouseenter/focus handlers.
+That means a newly replaced card immediately works without waiting for a
+MutationObserver rebinding pass.
+
+Learning is allowed even when a Skill is unavailable.
+Hovering never commits or selects anything.
+*/
+function delegatedLearn34500(event){
+  if(!activeKakashiBattle34500()){
+    return null;
+  }
+
+  const card=
+    resolveDelegatedCard34500(
+      event&&event.target
+    );
+
+  if(!cardIsPresentable34500(card)){
+    return null;
+  }
+
+  const stage=
+    stageRoot34500();
+
+  if(
+    stage &&
+    typeof stage.contains==="function" &&
+    !stage.contains(card)
+  ){
+    return null;
+  }
+
+  /*
+  pointerover bubbles. Ignore movement between descendants of the
+  same Skill card so the inspector does not continually rebuild.
+  */
+  if(
+    event &&
+    event.type==="pointerover" &&
+    event.relatedTarget &&
+    card.contains &&
+    card.contains(event.relatedTarget)
+  ){
+    return null;
+  }
+
+  const skillId=
+    skillIdFromCard34500(card);
+
+  if(!exactKakashiSkill34500(skillId)){
+    return null;
+  }
+
+  normalizeRenderedCard34500(
+    card,
+    skillId
+  );
+
+  return renderGuide34500(skillId);
+}
+
+
+function installDelegatedLearn34500(){
+  if(
+    delegatedLearnInstalled ||
+    typeof document==="undefined" ||
+    typeof document.addEventListener!=="function"
+  ){
+    return false;
+  }
+
+  document.addEventListener(
+    "pointerover",
+    delegatedLearn34500,
+    true
+  );
+
+  document.addEventListener(
+    "focusin",
+    delegatedLearn34500,
+    true
+  );
+
+  delegatedLearnInstalled=true;
+
+  return true;
+}
+
+
+/*
+CLICK = ACT
+
+Do not use the rendered button's stale disabled/is-disabled state as the
+semantic authority.
+
+The native Battle activation path below performs the real availability,
+targeting, branch-mode and resolver validation.
+*/
+function delegatedClick34500(event){
+  if(!activeKakashiBattle34500()){
+    return null;
+  }
+
+  const card=
+    resolveDelegatedCard34500(
+      event&&event.target
+    );
+
+  if(!cardIsPresentable34500(card)){
+    return null;
+  }
+
+  const stage=
+    stageRoot34500();
+
+  if(
+    stage &&
+    typeof stage.contains==="function" &&
+    !stage.contains(card)
+  ){
+    return null;
+  }
+
+  const skillId=
+    skillIdFromCard34500(card);
+
+  if(!exactKakashiSkill34500(skillId)){
+    return null;
+  }
+
+  /*
+  Reconcile stale DOM disablement against Battle's actual availability
+  immediately before activation.
+  */
+  normalizeRenderedCard34500(
+    card,
+    skillId
+  );
+
+  if(
+    event &&
+    typeof event.preventDefault==="function"
+  ){
+    event.preventDefault();
+  }
+
+  if(
+    event &&
+    typeof event.stopPropagation==="function"
+  ){
+    event.stopPropagation();
+  }
+
+  if(
+    event &&
+    typeof event.stopImmediatePropagation==="function"
+  ){
+    event.stopImmediatePropagation();
+  }
+
+  return activate34500(skillId);
+}
+
+
+function installDelegatedClick34500(){
+  if(
+    delegatedClickInstalled ||
+    typeof document==="undefined" ||
+    typeof document.addEventListener!=="function"
+  ){
+    return false;
+  }
+
+  document.addEventListener(
+    "click",
+    delegatedClick34500,
+    true
+  );
+
+  delegatedClickInstalled=true;
+
+  return true;
+}
 
   function wrapRender34500(name){
     const prior=globalThis[name];
@@ -363,13 +1115,20 @@
   }
 
   wrapRender34500("renderCombatOverlay");
-  wrapRender34500("refreshBattleActionRegionPresentation");
-  wrapRender34500("refreshBattleLiveDOM33000");
-  wrapRender34500("renderBattle");
-  wrapKakashiLaunch34500();
-  installDelegatedClick34500();
-  installObserver34500();
-  scheduleHarden34500();
+wrapRender34500("refreshBattleActionRegionPresentation");
+wrapRender34500("refreshBattleLiveDOM33000");
+wrapRender34500("renderBattle");
+
+wrapKakashiLaunch34500();
+
+/*
+Delegated input survives live Battle DOM replacement.
+*/
+installDelegatedLearn34500();
+installDelegatedClick34500();
+
+installObserver34500();
+scheduleHarden34500();
 
   function runAcademyKakashiBattleInteraction34500Diagnostics(){
     const parser=skillIdFromCard34500.toString();
