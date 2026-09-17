@@ -1,5 +1,5 @@
 // ============================================================================
-// ISSUE #105 / #188 / #192 — KAKASHI SCENE-BOARD PRESENTATION MODEL V3 — 33910
+// ISSUE #105 / #188 / #192 — KAKASHI SCENE-BOARD PRESENTATION MODEL V4 — 33910
 //
 // Canonical Kakashi consumer of the reusable 33900 Story Scene Board.
 // Presentation only: no Story outcome, Battle, custody, reward, Progression,
@@ -8,13 +8,17 @@
 // Scene 1 player-facing authority:
 // Documentation/Story/Academy_Kakashi_Origin_Scene_01_Rooftop_Verbatim_Lock_2026-09-17.md
 // commit d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91
+// Scene 2 player-facing authority:
+// Documentation/Story/Academy_Kakashi_Origin_Scene_02_The_Tail_Verbatim_Lock_2026-09-17.md
+// commit 6e87a8c3364e22e696e0a9c120c51bc0c57e9881
 // ============================================================================
 (function installKakashiSceneBoardPolish33910(){
 "use strict";
 if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910)return;
 
-const PATCH_ID="kakashi_scene_board_model_v3_33910_2026_09_17";
+const PATCH_ID="kakashi_scene_board_model_v4_33910_2026_09_17";
 const SCENE_01_AUTHORITY="d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91";
+const SCENE_02_AUTHORITY="6e87a8c3364e22e696e0a9c120c51bc0c57e9881";
 const STYLE_ID="sc-kakashi-scene-board-polish-33910-style";
 const OVERLAY_CLASS="sc-performance-surface-33910";
 const A=globalThis.SC_ALPHA_ORIGIN_32900;
@@ -103,12 +107,22 @@ const rooftopPerformance=Object.freeze([
   Object.freeze({cueId:"scene01_09",kind:"narration",text:"Kakashi looks down at the seal.",focusActorRef:"academy_kakashi",objectState:"held"}),
   Object.freeze({cueId:"scene01_10",kind:"narration",text:"He breaks it. A target photograph waits inside.",focusActorRef:"academy_kakashi",objectState:"opened"})
 ]);
-const tailPerformance=[
-  {cueId:"alley_01",kind:"narration",text:"Kakashi finds ANBU Marked Target and tails him through Konoha.",focusActorRef:"academy_kakashi"},
-  {cueId:"alley_02",kind:"narration",text:"ANBU Marked Target turns into a narrow alley.",focusActorRef:"anbu_marked_target",actorEntrance:"anbu_marked_target"},
-  {cueId:"alley_03",kind:"narration",text:"Package Smuggler is waiting at the exchange.",focusActorRef:"package_smuggler",actorEntrance:"package_smuggler"},
-  {cueId:"alley_04",kind:"narration",text:"A package is between them.",focusActorRef:"academy_kakashi",objectState:"between"}
-];
+
+// Stephen-approved Scene 2 — exact wording and exact order. Narration only.
+const tailPerformance=Object.freeze([
+  Object.freeze({cueId:"scene02_01",kind:"narration",text:"Kakashi did not need long to find the man from the envelope.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_02",kind:"narration",text:"The difficult part was making sure the man never realised he had been found.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_03",kind:"narration",text:"Konoha changed shape when Kakashi followed someone through it. Streets stopped being streets and became sightlines. Crowds became cover. Roof edges became distances to clear before the person below could turn his head.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_04",kind:"narration",text:"ANBU Marked Target moved without the nervous scanning of someone who expected immediate pursuit.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene02_05",kind:"narration",text:"Kakashi kept it that way.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_06",kind:"narration",text:"He followed from above until the route tightened into older streets and narrower angles, then dropped lower when the rooftops would have made him too obvious.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_07",kind:"narration",text:"The target never looked directly at him.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene02_08",kind:"narration",text:"Not once.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene02_09",kind:"narration",text:"That did not make Kakashi relax.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_10",kind:"narration",text:"It made him wonder who the man expected to meet.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_11",kind:"narration",text:"By the time the route bent toward the Sakura tree and the alley beyond it, Kakashi had his answer.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene02_12",kind:"narration",text:"Someone was waiting.",focusActorRef:"academy_kakashi"})
+]);
 const observeTransferPerformance=[
   {cueId:"observe_01",kind:"narration",text:"Kakashi stays still and watches the exchange unfold.",focusActorRef:"academy_kakashi"},
   {cueId:"observe_02",kind:"action",text:"ANBU Marked Target hands the package to Package Smuggler.",focusActorRef:"package_smuggler",objectState:"smuggler"},
@@ -126,11 +140,8 @@ function roofProjection(performance){
   return{mode:"conversation",location:"KONOHA ROOFTOP",objective:OBJECTIVE,actors,objects};
 }
 function tailProjection(performance){
-  const cue=performance&&performance.cue||tailPerformance[0],idx=performance?performance.index:0,focus=cue.focusActorRef;
-  const actors=[kakashi("IN PURSUIT",focus==="academy_kakashi")];
-  if(idx>=1)actors.push(amt(idx>=2?"AT EXCHANGE":"ENTERING ALLEY",focus==="anbu_marked_target",cue.actorEntrance==="anbu_marked_target"));
-  if(idx>=2)actors.push(smuggler("WAITING",focus==="package_smuggler",cue.actorEntrance==="package_smuggler"));
-  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=3?[{label:"PACKAGE",state:"BETWEEN ANBU MARKED TARGET AND PACKAGE SMUGGLER"}]:[]};
+  const cue=performance&&performance.cue||tailPerformance[0],focus=cue.focusActorRef;
+  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors:[kakashi("TAILING",focus==="academy_kakashi"),amt("UNAWARE",focus==="anbu_marked_target")],objects:[]};
 }
 function transferProjection(performance,context){
   if(context.kakashiOriginalAction!=="observe")return{mode:"encounter",location:context.kakashiOriginalAction==="get_closer"?"END OF ALLEY":"KONOHA ALLEY",objective:OBJECTIVE,reaction:String(context.kakashiOriginalAction||"").toUpperCase(),actors:[kakashi("ACTION COMMITTED",true),amt("RESPONDING"),smuggler("RESPONDING")],objects:[{label:"PACKAGE",state:"OUTCOME REQUIRES OWNING RESOLVER"}]};
@@ -198,13 +209,16 @@ if(PRE_RENDER_33910){function renderStoryScenePresentationLayer33910(){const bef
 if(typeof document!=="undefined"&&typeof MutationObserver==="function"){const target=document.getElementById("story-scene-presentation-layer")||document.body;if(target){const observer=new MutationObserver(()=>scheduleSync());observer.observe(target,{childList:true,subtree:true});}}
 
 function runKakashiSceneBoardPolish33910Diagnostics(){
-  const texts=rooftopPerformance.map(row=>row.text);
-  const expected=["Kakashi stands alone on a Konoha rooftop, the village lights spread out below him. A masked ANBU operative lands behind him without warning.","Kakashi Hatake.","Kakashi turns to face him.","You have orders. Stop this package from falling into the wrong hands.","The operative holds out a sealed envelope.","Kakashi crosses the rooftop and takes it.","Why are you coming to me with this?","Hokage's orders.","Kakashi looks down at the seal.","He breaks it. A target photograph waits inside."];
-  const checks={patchId:PATCH_ID==="kakashi_scene_board_model_v3_33910_2026_09_17",scene01AuthorityPinned:SCENE_01_AUTHORITY==="d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91",scene01TenCues:rooftopPerformance.length===10,scene01Verbatim:JSON.stringify(texts)===JSON.stringify(expected),scene01OnlyFourSpoken:rooftopPerformance.filter(row=>row.kind==="dialogue").map(row=>`${row.speakerName}:${row.text}`).join("|")==="ANBU OPERATIVE:Kakashi Hatake.|ANBU OPERATIVE:You have orders. Stop this package from falling into the wrong hands.|KAKASHI:Why are you coming to me with this?|ANBU OPERATIVE:Hokage's orders.",prohibitedStaleRooftopCopyAbsent:!["What do you want?","Why bring this to me?","The Hokage approved you to assist us."].some(text=>texts.includes(text)),narrationNotPromotedToDialogue:rooftopPerformance.filter(row=>row.kind==="dialogue").every(row=>!!row.speakerName),previousDialogueStopsAtNarrationBoundary:previousDialogue.toString().includes('cue.kind!=="dialogue"'),exactReplacementCardAssets:AMT_IMAGE==="NPC/anbu_marked_target.png"&&PS_IMAGE==="NPC/package_smuggler.png"&&MI_IMAGE==="NPC/masked_interceptor.png",browserGoldenClaimed:false};
+  const scene01Texts=rooftopPerformance.map(row=>row.text);
+  const scene01Expected=["Kakashi stands alone on a Konoha rooftop, the village lights spread out below him. A masked ANBU operative lands behind him without warning.","Kakashi Hatake.","Kakashi turns to face him.","You have orders. Stop this package from falling into the wrong hands.","The operative holds out a sealed envelope.","Kakashi crosses the rooftop and takes it.","Why are you coming to me with this?","Hokage's orders.","Kakashi looks down at the seal.","He breaks it. A target photograph waits inside."];
+  const scene02Texts=tailPerformance.map(row=>row.text);
+  const scene02Expected=["Kakashi did not need long to find the man from the envelope.","The difficult part was making sure the man never realised he had been found.","Konoha changed shape when Kakashi followed someone through it. Streets stopped being streets and became sightlines. Crowds became cover. Roof edges became distances to clear before the person below could turn his head.","ANBU Marked Target moved without the nervous scanning of someone who expected immediate pursuit.","Kakashi kept it that way.","He followed from above until the route tightened into older streets and narrower angles, then dropped lower when the rooftops would have made him too obvious.","The target never looked directly at him.","Not once.","That did not make Kakashi relax.","It made him wonder who the man expected to meet.","By the time the route bent toward the Sakura tree and the alley beyond it, Kakashi had his answer.","Someone was waiting."];
+  let tailBeat=null;try{const d=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(scene):null;tailBeat=d&&d.beatMap instanceof Map?d.beatMap.get("kak_original_tail")||null:null;}catch(_error){}
+  const checks={patchId:PATCH_ID==="kakashi_scene_board_model_v4_33910_2026_09_17",scene01AuthorityPinned:SCENE_01_AUTHORITY==="d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91",scene01TenCues:rooftopPerformance.length===10,scene01Verbatim:JSON.stringify(scene01Texts)===JSON.stringify(scene01Expected),scene01OnlyFourSpoken:rooftopPerformance.filter(row=>row.kind==="dialogue").map(row=>`${row.speakerName}:${row.text}`).join("|")==="ANBU OPERATIVE:Kakashi Hatake.|ANBU OPERATIVE:You have orders. Stop this package from falling into the wrong hands.|KAKASHI:Why are you coming to me with this?|ANBU OPERATIVE:Hokage's orders.",prohibitedStaleRooftopCopyAbsent:!["What do you want?","Why bring this to me?","The Hokage approved you to assist us."].some(text=>scene01Texts.includes(text)),narrationNotPromotedToDialogue:rooftopPerformance.filter(row=>row.kind==="dialogue").every(row=>!!row.speakerName),previousDialogueStopsAtNarrationBoundary:previousDialogue.toString().includes('cue.kind!=="dialogue"'),scene02AuthorityPinned:SCENE_02_AUTHORITY==="6e87a8c3364e22e696e0a9c120c51bc0c57e9881",scene02TwelveCues:tailPerformance.length===12,scene02Verbatim:JSON.stringify(scene02Texts)===JSON.stringify(scene02Expected),scene02NarrationOnly:tailPerformance.every(row=>row.kind==="narration"&&!row.speakerName),scene02NoChoices:!!tailBeat&&tailBeat.mode==="narration"&&(!Array.isArray(tailBeat.choices)||tailBeat.choices.length===0),scene02AlleyBackdrop:!!tailBeat&&environmentId(tailBeat)==="kakashi_origin_konoha_alleyway",scene02NoPrematureExchangeReveal:tailProjection({cue:tailPerformance[11],index:11}).actors.every(row=>row.id!=="package_smuggler")&&tailProjection({cue:tailPerformance[11],index:11}).objects.length===0,exactReplacementCardAssets:AMT_IMAGE==="NPC/anbu_marked_target.png"&&PS_IMAGE==="NPC/package_smuggler.png"&&MI_IMAGE==="NPC/masked_interceptor.png",browserGoldenClaimed:false};
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
-  return{pass:failed.length===0,checks,failed,patchId:PATCH_ID,scene01Authority:SCENE_01_AUTHORITY,browserGoldenClaimed:false};
+  return{pass:failed.length===0,checks,failed,patchId:PATCH_ID,scene01Authority:SCENE_01_AUTHORITY,scene02Authority:SCENE_02_AUTHORITY,browserGoldenClaimed:false};
 }
 globalThis.runKakashiSceneBoardPolish33910Diagnostics=runKakashiSceneBoardPolish33910Diagnostics;
-globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910=Object.freeze({patchId:PATCH_ID,model:"scene_board_v3",scene01Authority:SCENE_01_AUTHORITY,browserGoldenClaimed:false});
+globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910=Object.freeze({patchId:PATCH_ID,model:"scene_board_v4",scene01Authority:SCENE_01_AUTHORITY,scene02Authority:SCENE_02_AUTHORITY,browserGoldenClaimed:false});
 try{if(typeof renderStorySceneBoard33900==="function")renderStorySceneBoard33900();syncPresentation();}catch(_error){}
 })();
