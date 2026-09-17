@@ -161,11 +161,12 @@ function autonomyResultFor(anchorId,state){
 }
 for(const spec of ANCHORS){
   const battleOwned=spec.classes.includes(A.BATTLE_OWNED_AUTONOMY);
+  const participantAutonomy=spec.classes.includes(A.PARTICIPANT_AUTONOMY);
   CORE.registerAutonomyAnchor(STORY_UNIT_REF,{
     anchorId:spec.anchorId,classes:spec.classes,actorRef:spec.actorRef||null,battleOwned,
     priority:Number(spec.priority||100),orderRef:spec.orderRef||null,
     due:state=>stateSaysDue(spec.anchorId,state),
-    resolve:battleOwned?null:({state})=>autonomyResultFor(spec.anchorId,state),
+    resolve:(!battleOwned||participantAutonomy)?({state})=>autonomyResultFor(spec.anchorId,state):null,
     metadata:{summary:spec.summary,conditional:spec.conditional===true,recurring:spec.recurring===true,timingGate:spec.timingGate===true,sequentialTimingGates:spec.sequentialTimingGates===true}
   });
 }
