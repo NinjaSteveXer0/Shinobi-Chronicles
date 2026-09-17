@@ -79,6 +79,7 @@ assert(A&&CORE&&KAK&&GUARD&&PROVIDER&&STATE&&BINDINGS,"#188 Kakashi factual rout
 assert.strictEqual(BINDINGS.factualCommitOwnerPresent,true,"34700 did not bind the canonical 34120 commit owner");
 assert.strictEqual(STATE.diagnostics().pass,true,`34120 diagnostics failed: ${JSON.stringify(STATE.diagnostics().failed)}`);
 assert.strictEqual(BINDINGS.diagnostics().pass,true,`34700 diagnostics failed: ${JSON.stringify(BINDINGS.diagnostics().failed)}`);
+assert.strictEqual(typeof STATE.getCommitResult("academy_kakashi.resolver.stay_on_package_pursuit"),"function","stay-on-package pursuit has no authoritative 34120 commit owner");
 
 function getOpeningChoice(id){
   const action=definition.beatMap.get("kak_original_action");
@@ -111,18 +112,26 @@ function assertSuccessorMenus(){
   const success=definition.beatMap.get("kak_get_closer_success");
   const failure=definition.beatMap.get("kak_get_closer_failure");
   const observe=definition.beatMap.get("kak_get_closer_handoff_observe_escalation");
-  assert(success&&failure&&observe,"Get Closer factual continuation beats missing");
+  const intercept=definition.beatMap.get("kak_get_closer_failure_stay_package_intercept");
+  assert(success&&failure&&observe&&intercept,"Get Closer factual continuation beats missing");
   assert.strictEqual(success.choices.map(row=>row.label).join("|"),"LET THEM MAKE THE HANDOFF|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE");
   assert.strictEqual(failure.choices.map(row=>row.label).join("|"),"STAY WITH THE PACKAGE|STOP THE MAN WHO SPOTTED YOU|CUT THEM OFF AT THE SAKURA TREE");
   assert.strictEqual(observe.choices.map(row=>row.label).join("|"),"CUT HER OFF|GO FOR THE PACKAGE|BEAT HER TO THE PACKAGE|DEAL WITH HER FIRST, THEN CHASE THE PACKAGE|STAY ON THE FIRST MAN");
+  assert.strictEqual(intercept.choices.map(row=>row.label).join("|"),"DEMAND THE PACKAGE|TAKE HIM DOWN|ASK WHERE THE PACKAGE WAS GOING");
   const handoff=success.choices.find(row=>row.choiceId==="let_handoff_happen");
-  assert(handoff,"Get Closer handoff choice missing");
+  const stay=failure.choices.find(row=>row.choiceId==="stay_on_package");
+  assert(handoff&&stay,"Get Closer released successor choice missing");
   assert.strictEqual(handoff.availability().available,true,"LET THEM MAKE THE HANDOFF should be released");
   assert.strictEqual(handoff.consequenceRequests.length,1,"handoff must have one authoritative consequence request");
   assert.strictEqual(handoff.consequenceRequests[0].requestId,"kakashi_get_closer_handoff_factual_commit_34120");
+  assert.strictEqual(stay.availability().available,true,"STAY WITH THE PACKAGE should be released");
+  assert.strictEqual(stay.consequenceRequests.length,1,"stay-on-package must have one authoritative pursuit request");
+  assert.strictEqual(stay.consequenceRequests[0].requestId,"kakashi_get_closer_stay_package_pursuit_34120");
   assert(success.choices.filter(row=>row.choiceId!=="let_handoff_happen").every(row=>row.availability().available===false),"other Get Closer success routes released prematurely");
-  assert(failure.choices.every(row=>row.availability().available===false),"Get Closer failure route released prematurely");
+  assert(failure.choices.filter(row=>row.choiceId!=="stay_on_package").every(row=>row.availability().available===false),"other Get Closer failure routes released prematurely");
+  assert(intercept.choices.every(row=>row.availability().available===false),"Pakkun-intercept downstream choice released before its implementation owner");
   assert(observe.choices.every(row=>row.availability().available===false),"Observe escalation route released prematurely");
+  assert.strictEqual(Object.prototype.hasOwnProperty.call(intercept,"environmentRef"),false,"missing alleyway_konoha_night repo path must not be replaced by an invented/substitute environment binding");
 }
 function bridge(factual){
   const receipt=factual.receipt||{};
@@ -226,52 +235,82 @@ assert.strictEqual(failure.row.fact.knowledgeStateByObserver.academy_kakashi.ful
 assert.strictEqual(failure.row.fact.worldFacts.handoffAborted,true);
 assert.strictEqual(failure.result.receipt.knowledgeDeltaRefs.length,0,"Get Closer failure invented fuller Knowledge");
 
-function primeSemanticGetCloserSuccess(instanceId){
+function primeSemanticGetCloser(instanceId,outcomeRef,decisionPointRef,beatId,key){
   resetRuntime(instanceId);
-  const contextStateRef=PROVIDER.stableRef("sc34120-kakashi-get-closer-entry",{
-    sceneId:definition.sceneId,storySceneInstanceId:instanceId,beatId:"kak_original_action"
-  });
+  const contextStateRef=PROVIDER.stableRef("sc34120-kakashi-get-closer-entry",{sceneId:definition.sceneId,storySceneInstanceId:instanceId,beatId:"kak_original_action"});
   const opened=KAK.openDecisionPoint("AK_SA_001",{committedStateRef:contextStateRef,beatRef:"kak_original_action",sourceOccurrenceRefs:[]});
   assert.strictEqual(opened.success,true,"failed to open semantic Get Closer choice set");
   const intent=CORE.commitStoryIntent({storyUnitRef:"academy_kakashi",choiceSetId:opened.choiceSet.choiceSetId,choiceId:"get_closer"});
   assert.strictEqual(intent.success,true,"failed to commit semantic Get Closer intent");
-  const occurrenceId=PROVIDER.stableRef("occ_origin_kakashi_get_closer",{
-    storySceneInstanceId:instanceId,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId
-  });
-  const factual=PROVIDER.resolveStoryFactualAction({
-    storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,
-    bindingRef:"academy_kakashi.resolver.get_closer",
-    actorRef:"academy_kakashi",
-    intentCommitRef:intent.receipt.intentCommitRef,
-    attemptOrdinal:1,
-    idempotenceKey:`qa-prime-success:${instanceId}`,
-    eligibleOutcomeRefs:["GET_CLOSER_SUCCESS"],
-    authorityVersionRefs:["qa-34120-handoff"],
-    inputStateRefs:[contextStateRef],
-    continuityLineageRef:instanceId,
-    committedAtOccurrenceRef:occurrenceId,
-    context:{storySceneInstanceId:instanceId,sceneId:definition.sceneId,beatId:"kak_original_action"}
-  });
-  assert.strictEqual(factual.success,true,"failed to force semantic Get Closer success");
-  const dispatched=CORE.dispatchCommittedIntent({
-    storyUnitRef:"academy_kakashi",
-    receiptId:intent.receipt.storyDecisionReceiptId,
-    state:{resolverResults:{"academy_kakashi.resolver.get_closer":bridge(factual)}},
-    context:{sceneRef:definition.sceneId,originId:"academy_kakashi",storySceneInstanceId:instanceId}
-  });
-  assert.strictEqual(dispatched.success,true,"failed to dispatch semantic Get Closer success");
-  const successor=KAK.openDecisionPoint("AK_SA_005",{committedStateRef:occurrenceId,beatRef:"kak_get_closer_success",sourceOccurrenceRefs:[occurrenceId]});
-  assert.strictEqual(successor.success,true,"failed to open Get Closer success choice set");
-  active.beatId="kak_get_closer_success";
-  active.localContext={
-    ...(active.localContext||{}),
-    kakashiGetCloserOutcomeRef:"GET_CLOSER_SUCCESS",
-    kakashiGetCloserOccurrenceId:occurrenceId,
-    kakashiGetCloserSuccessorDecisionPointRef:"AK_SA_005",
-    kakashiGetCloserSuccessorChoiceSetId:successor.choiceSet.choiceSetId
-  };
+  const occurrenceId=PROVIDER.stableRef("occ_origin_kakashi_get_closer",{storySceneInstanceId:instanceId,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId});
+  const factual=PROVIDER.resolveStoryFactualAction({storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,bindingRef:"academy_kakashi.resolver.get_closer",actorRef:"academy_kakashi",intentCommitRef:intent.receipt.intentCommitRef,attemptOrdinal:1,idempotenceKey:`qa-prime-${key}:${instanceId}`,eligibleOutcomeRefs:[outcomeRef],authorityVersionRefs:["qa-34120-successor"],inputStateRefs:[contextStateRef],continuityLineageRef:instanceId,committedAtOccurrenceRef:occurrenceId,context:{storySceneInstanceId:instanceId,sceneId:definition.sceneId,beatId:"kak_original_action"}});
+  assert.strictEqual(factual.success,true,`failed to force semantic ${outcomeRef}`);
+  const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:"academy_kakashi",receiptId:intent.receipt.storyDecisionReceiptId,state:{resolverResults:{"academy_kakashi.resolver.get_closer":bridge(factual)}},context:{sceneRef:definition.sceneId,originId:"academy_kakashi",storySceneInstanceId:instanceId}});
+  assert.strictEqual(dispatched.success,true,`failed to dispatch semantic ${outcomeRef}`);
+  const successor=KAK.openDecisionPoint(decisionPointRef,{committedStateRef:occurrenceId,beatRef:beatId,sourceOccurrenceRefs:[occurrenceId]});
+  assert.strictEqual(successor.success,true,`failed to open ${decisionPointRef} successor choice set`);
+  active.beatId=beatId;
+  active.localContext={...(active.localContext||{}),kakashiGetCloserOutcomeRef:outcomeRef,kakashiGetCloserOccurrenceId:occurrenceId,kakashiGetCloserSuccessorDecisionPointRef:decisionPointRef,kakashiGetCloserSuccessorChoiceSetId:successor.choiceSet.choiceSetId};
   return{occurrenceId,intent,factual,successor};
 }
+function primeSemanticGetCloserSuccess(instanceId){return primeSemanticGetCloser(instanceId,"GET_CLOSER_SUCCESS","AK_SA_005","kak_get_closer_success","success");}
+function primeSemanticGetCloserFailure(instanceId){return primeSemanticGetCloser(instanceId,"GET_CLOSER_FAILURE","AK_SA_006","kak_get_closer_failure","failure");}
+
+function assertStayPackageCommittedOutcome(outcomeRef,instanceId,key){
+  const primed=primeSemanticGetCloserFailure(instanceId);
+  const pursuitIntent=CORE.commitStoryIntent({storyUnitRef:"academy_kakashi",choiceSetId:primed.successor.choiceSet.choiceSetId,choiceId:"stay_on_package"});
+  assert.strictEqual(pursuitIntent.success,true,"failed to commit stay-on-package semantic intent");
+  const reached=outcomeRef==="PURSUIT_SUCCESS_AMT_REACHED";
+  const factualId=`qa-stay-package-factual:${key}`;
+  const occurrenceId=PROVIDER.stableRef("qa-stay-package-occurrence",{instanceId,outcomeRef});
+  const resultPayload=reached?{outcomeClass:outcomeRef,amtReached:true,pakkunPresent:true}:{outcomeClass:outcomeRef,amtReached:false,amtEscapesWithPackage:true,pakkunPresent:false};
+  const committed=STATE.commitStayOnPackagePursuit({receipt:{selectedOutcomeRef:outcomeRef,storyDecisionReceiptId:pursuitIntent.receipt.storyDecisionReceiptId,storyFactualResolverReceiptId:factualId,successorSituationRef:reached?"academy_kakashi.pakkun_intercept":"academy_kakashi.debrief"},request:{committedAtOccurrenceRef:occurrenceId,context:{storySceneInstanceId:instanceId,parentOccurrenceRef:primed.occurrenceId}},result:resultPayload});
+  assert.strictEqual(committed.success,true,`stay-on-package ${outcomeRef} factual commit failed: ${JSON.stringify(committed)}`);
+  assert.deepStrictEqual(committed.objectCustodyDeltaRefs,[],"pursuit must not invent a package custody transfer");
+  const row=A.findOccurrence(occurrenceId);assert(row,"stay-on-package authoritative occurrence missing");
+  assert.strictEqual(row.fact.packageState.currentHolderClass,"ANBU_MARKED_TARGET","pursuit changed package holder without authority");
+  assert.strictEqual(row.fact.worldFacts.packageRecovered,false,"pursuit incorrectly marked package recovered");
+  assert.strictEqual(row.fact.worldFacts.maskedInterceptorVisible,false,"MI leaked into Get Closer FAILURE pursuit");
+  assert.strictEqual(row.fact.worldFacts.pakkunPresent,reached,"Pakkun presence did not follow legitimate reach predicate");
+  assert.strictEqual(row.fact.participantStateByRef.pakkun_origin_unfamiliar_ninken.presenceState,reached?"PRESENT":"NOT_PRESENT");
+  assert.strictEqual(row.fact.participantStateByRef.academy_kakashi_origin_amt.reachState,reached?"REACHED":"ESCAPED");
+  assert(committed.materialState&&committed.materialState.resolved===true,"pursuit package material state not resolved");
+  assert.strictEqual(committed.materialState.value.custodyClass,"ANBU_MARKED_TARGET");
+  return{primed,pursuitIntent,committed,row};
+}
+
+const pursuitSuccess=assertStayPackageCommittedOutcome("PURSUIT_SUCCESS_AMT_REACHED","qa-stay-package-success","success");
+const pursuitFailure=assertStayPackageCommittedOutcome("PURSUIT_FAILURE_AMT_ESCAPES_WITH_PACKAGE","qa-stay-package-failure","failure");
+assert.strictEqual(pursuitSuccess.row.fact.nextAnchorRef,"AK_SA_008","successful pursuit must reach Pakkun interception authority");
+assert.strictEqual(pursuitFailure.row.fact.nextSituationRef,"academy_kakashi.debrief","failed pursuit must return to debrief");
+
+const routed=primeSemanticGetCloserFailure("qa-stay-package-route");
+assertSuccessorMenus();
+const failureBeat=definition.beatMap.get("kak_get_closer_failure");
+const stayChoice=failureBeat.choices.find(row=>row.choiceId==="stay_on_package");
+const routedResult=stayChoice.consequenceRequests[0].resolve();
+assert.strictEqual(routedResult.success,true,`stay-on-package end-to-end route failed: ${JSON.stringify(routedResult)}`);
+assert(["PURSUIT_SUCCESS_AMT_REACHED","PURSUIT_FAILURE_AMT_ESCAPES_WITH_PACKAGE"].includes(routedResult.selectedOutcomeRef),"stay-on-package resolver returned unauthorised outcome");
+assert.strictEqual(routedResult.packageHolderClass,"ANBU_MARKED_TARGET");
+assert(active.localContext.kakashiGetCloserStayPackagePursuitOccurrenceId,"route did not persist pursuit occurrence ref");
+assert.strictEqual(active.localContext.kakashiGetCloserStayPackagePursuitOutcomeRef,routedResult.selectedOutcomeRef);
+const routedOccurrence=A.findOccurrence(routedResult.occurrenceId);assert(routedOccurrence,"routed pursuit occurrence missing");
+assert.strictEqual(routedOccurrence.fact.packageState.currentHolderClass,"ANBU_MARKED_TARGET");
+assert.strictEqual(routedOccurrence.fact.worldFacts.maskedInterceptorVisible,false);
+if(routedResult.selectedOutcomeRef==="PURSUIT_SUCCESS_AMT_REACHED"){
+  assert.strictEqual(routedResult.nextBeatId,"kak_get_closer_failure_stay_package_intercept");
+  assert.strictEqual(routedResult.pakkunPresent,true);
+  assert(active.localContext.kakashiGetCloserStayPackageInterceptionChoiceSetId,"successful pursuit did not open AK_SA_008 choice set");
+}else{
+  assert.strictEqual(routedResult.nextBeatId,"kak_seq_debrief_pending");
+  assert.strictEqual(routedResult.pakkunPresent,false);
+  assert.strictEqual(active.localContext.kakashiGetCloserStayPackageInterceptionChoiceSetId,null);
+}
+const routedReceipt=factualReceipts().find(row=>row.bindingRef==="academy_kakashi.resolver.stay_on_package_pursuit");
+assert(routedReceipt&&routedReceipt.status==="resolved","stay-on-package 34600 receipt did not resolve through 34120 owner");
+assert.deepStrictEqual(routedReceipt.objectCustodyDeltaRefs,[],"routed pursuit invented custody delta");
+const routedDecision=Object.values(CORE.getStoryUnitSnapshot("academy_kakashi").decisionReceipts||{}).find(row=>row.selectedChoiceId==="stay_on_package");
+assert(routedDecision&&routedDecision.status==="resolved","stay-on-package semantic intent did not close through 34000");
 
 const primed=primeSemanticGetCloserSuccess("qa-get-closer-handoff-main");
 assertSuccessorMenus();
@@ -333,17 +372,30 @@ assert(loader.includes('const BUILD="kakashi-final-20260917-16"'),"Kakashi child
 
 console.log(JSON.stringify({
   pass:true,
+  patch:"34120-v3",
   fullRouteOutcome:full.selectedOutcomeRef,
   authoritativeOccurrenceOwner:"SC_ALPHA_ORIGIN_32900.commitOccurrence",
   persistentSaveOwner:"playerData/savePlayerData",
   successKnowledgeDeltaCount:success.result.receipt.knowledgeDeltaRefs.length,
   failureKnowledgeDeltaCount:failure.result.receipt.knowledgeDeltaRefs.length,
+  stayPackagePursuitCommitOwner:true,
+  stayPackageSuccessPackageHolder:pursuitSuccess.row.fact.packageState.currentHolderClass,
+  stayPackageFailurePackageHolder:pursuitFailure.row.fact.packageState.currentHolderClass,
+  stayPackageSuccessPakkun:true,
+  stayPackageFailurePakkun:false,
+  stayPackageNoCustodyTransfer:true,
+  stayPackageMaskedInterceptorUnseen:true,
+  stayPackageRouteOutcome:routedResult.selectedOutcomeRef,
+  stayPackageSemanticIntentResolved:true,
+  interceptionDownstreamChoicesGuarded:true,
+  interceptionAssetPathStillUnbound:true,
   handoffOutcome:handoff.selectedOutcomeRef,
   handoffCustodyDeltaCount:handoffFactual.objectCustodyDeltaRefs.length,
   exactStoryInstancePreserved:true,
   saveLoadNoReroll:true,
   onlyGetCloserOpeningGuardReleased:true,
   handoffSuccessorReleased:true,
+  stayPackageFailureSuccessorReleased:true,
   remainingGetCloserSuccessorsFailClosed:true,
   observeEscalationStillFailClosed:true,
   browserGoldenClaimed:false
