@@ -18,6 +18,7 @@ on:
       - 'runtime/alpha-kakashi-factual-bindings-34700.js'
       - 'runtime/alpha-kakashi-direct-opening-consumer-34710.js'
       - 'runtime/alpha-kakashi-origin-rewards-34800.js'
+      - 'runtime/alpha-kakashi-terminal-debrief-35100.js'
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-battle-browser-32600.js'
       - 'tools/qa_issue_188_story_decision_runtime.js'
@@ -30,6 +31,7 @@ on:
       - 'tools/qa_academy_kakashi_factual_bindings_34700.js'
       - 'tools/qa_academy_kakashi_scene02_direct_choices_34710.js'
       - 'tools/qa_kakashi_origin_rewards_34800.js'
+      - 'tools/qa_kakashi_direct_pickpocket_terminal_35100.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
@@ -61,6 +63,7 @@ jobs:
           node --check runtime/alpha-kakashi-factual-bindings-34700.js
           node --check runtime/alpha-kakashi-direct-opening-consumer-34710.js
           node --check runtime/alpha-kakashi-origin-rewards-34800.js
+          node --check runtime/alpha-kakashi-terminal-debrief-35100.js
           node --check runtime/alpha-kakashi-scene03a-35700.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -73,11 +76,12 @@ jobs:
           node --check tools/qa_academy_kakashi_factual_bindings_34700.js
           node --check tools/qa_academy_kakashi_scene02_direct_choices_34710.js
           node --check tools/qa_kakashi_origin_rewards_34800.js
+          node --check tools/qa_kakashi_direct_pickpocket_terminal_35100.js
           node --check tools/qa_academy_kakashi_scene03a_35700.js
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-22' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'const BUILD="kakashi-final-20260917-22";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-23' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fq 'const BUILD="kakashi-final-20260917-23";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -91,6 +95,7 @@ jobs:
           grep -Fq 'alpha-kakashi-factual-state-commit-34120.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-factual-bindings-34700.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-direct-opening-consumer-34710.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-terminal-debrief-35100.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-scene03a-35700.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
       - name: Neutral Story decision and Kakashi autonomy harness
         run: node tools/qa_issue_188_story_decision_runtime.js
@@ -112,5 +117,7 @@ jobs:
         run: node tools/qa_academy_kakashi_scene02_direct_choices_34710.js
       - name: Academy Kakashi reward and development adapter
         run: node tools/qa_kakashi_origin_rewards_34800.js
+      - name: Academy Kakashi direct Pickpocket terminal consumption
+        run: node tools/qa_kakashi_direct_pickpocket_terminal_35100.js
       - name: Academy Kakashi Scene 03A exact runtime
         run: node tools/qa_academy_kakashi_scene03a_35700.js
