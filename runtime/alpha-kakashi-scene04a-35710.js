@@ -1,0 +1,212 @@
+// ============================================================================
+// ISSUE #188 / #201 — ACADEMY KAKASHI SCENE 04A: STOP THE ASSASSIN — 35710
+//
+// Binding Writing authority:
+// Documentation/Story/Academy_Kakashi_Origin_Scene_04A_Stop_The_Assassin_Verbatim_Lock_2026-09-18.md
+// commit 64966fb33590d09e7ae16a33d51d0e7262b5891d
+//
+// Battle authority:
+// - AK_SA_019 Observe -> Stop Assassin
+// - binding academy_kakashi.battle.stop_assassin
+// - direct/non-sequential config academy_kakashi_origin_battle_mi_1v1
+// - Kakashi Hatake vs Masked Interceptor, 1-v-1
+//
+// Scope:
+// - wire only the already-authored STOP THE ASSASSIN Scene 03A choice;
+// - play exact Scene 04A narration with no invented dialogue or choices;
+// - commit protagonist intent before Battle;
+// - launch the exact 1-v-1 PL Battle through the canonical 34300 deployment;
+// - return to the same Scene 04A branch and consume the factual Battle result;
+// - do not infer death, custody, package recovery, reward or later Story prose.
+// ============================================================================
+(function installAcademyKakashiScene04A35710(){
+"use strict";
+if(globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710)return;
+
+const A=globalThis.SC_ALPHA_ORIGIN_32900;
+const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
+const KAK=globalThis.SC_ALPHA_KAKASHI_FINAL_34100;
+const SCENE03A=globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700;
+if(!A||!CORE||!KAK||!SCENE03A)throw new Error("kakashi_scene04a_runtime_dependencies_missing");
+
+const PATCH_ID="alpha_kakashi_scene04a_35710_2026_09_18";
+const AUTHORITY="64966fb33590d09e7ae16a33d51d0e7262b5891d";
+const ORIGIN_ID="academy_kakashi";
+const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
+const MAJOR_BEAT="kak_original_major_choice";
+const SCENE04A_BEAT="kak_scene04a_stop_assassin";
+const BATTLE_BEAT="kak_scene04a_stop_assassin_battle";
+const RETURN_BEAT="kak_scene04a_stop_assassin_return";
+const CHOICE_ID="stop_assassin";
+const BINDING="academy_kakashi.battle.stop_assassin";
+const SOURCE_ANCHOR="AK_SA_019";
+const BATTLE_CONFIG="academy_kakashi_origin_battle_mi_1v1";
+const INTENT_REQUEST="kakashi_scene04a_stop_assassin_intent_35710";
+const RETURN_REQUEST="kakashi_scene04a_stop_assassin_return_35710";
+const CURSOR_KEY="__kakashiScene04A35710Cursor";
+const OBJECTIVE="Retrieve the package.";
+const SAKURA=Object.freeze({assetId:"kakashi_origin_sakura_tree_night"});
+const STYLE_ID="sc-kakashi-scene04a-35710-style";
+
+const CUES=Object.freeze([
+  Object.freeze({cueId:"scene04a_01",kind:"narration",text:"Kakashi moves.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene04a_02",kind:"narration",text:"Not toward ANBU Marked Target.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene04a_03",kind:"narration",text:"Not toward the package.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene04a_04",kind:"narration",text:"Toward Masked Interceptor.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene04a_05",kind:"narration",text:"She is already closing on Package Smuggler when Kakashi drops between them.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene04a_06",kind:"narration",text:"Package Smuggler sees the opening immediately.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene04a_07",kind:"narration",text:"He turns and runs.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene04a_08",kind:"narration",text:"The package goes with him.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene04a_09",kind:"narration",text:"Kakashi does not follow.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene04a_10",kind:"narration",text:"Masked Interceptor changes direction without hesitation.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene04a_11",kind:"narration",text:"Her attention settles on Kakashi.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene04a_12",kind:"narration",text:"He has made himself the obstacle now.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene04a_13",kind:"narration",text:"She comes straight through him.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene04a_14",kind:"narration",text:"Kakashi meets her head-on.",focusActorRef:"academy_kakashi"})
+]);
+
+function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_error){return null;}}
+function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
+function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}}
+function isScene04A(rt=active()){return!!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SCENE04A_BEAT;}
+function cursor(rt=active()){const raw=rt&&rt.localContext?Number(rt.localContext[CURSOR_KEY]):0;return Number.isInteger(raw)?Math.max(0,Math.min(CUES.length-1,raw)):0;}
+function performance(rt=active()){const index=cursor(rt);return{sequence:CUES,index,cue:CUES[index],atEnd:index>=CUES.length-1};}
+function escapeHTML(value){return String(value??"").replace(/[&<>\"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[ch]));}
+
+function ensureObjectiveEmphasis35710(){
+  if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
+  const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
+.sc-scene-board-33900__objective{min-width:190px!important;padding:9px 13px!important;font-size:11px!important;line-height:1.4!important;box-shadow:0 10px 26px rgba(0,0,0,.34)!important;}
+.sc-scene-board-33900__objective b{font-size:9px!important;margin-bottom:4px!important;}
+`;
+  document.head.appendChild(style);return true;
+}
+
+function ensureStopAssassinIntent35710(){
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!==MAJOR_BEAT)return{success:false,reason:"kakashi_scene04a_choice_context_missing"};
+  rt.localContext=rt.localContext&&typeof rt.localContext==="object"?rt.localContext:{};
+  const existingId=String(rt.localContext.kakashiScene04AStoryDecisionReceiptId||"");
+  if(existingId){
+    const snapshot=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{};
+    const existing=snapshot.decisionReceipts&&snapshot.decisionReceipts[existingId]||null;
+    if(existing&&existing.selectedChoiceId===CHOICE_ID&&existing.resolverBindingRef===BINDING)return{success:true,idempotent:true,receipt:existing};
+  }
+  const committedStateRef=String(rt.localContext.kakashiObserveScene03AOccurrenceId||"");
+  if(!committedStateRef)return{success:false,reason:"kakashi_scene04a_scene03a_committed_state_missing"};
+  let choiceSetId=String(rt.localContext.kakashiObserveEscalationChoiceSetId||"");
+  if(!choiceSetId){
+    const opened=KAK.openDecisionPoint("OBSERVE_ESCALATION",{committedStateRef,beatRef:MAJOR_BEAT,sourceOccurrenceRefs:[committedStateRef]});
+    if(!opened||opened.success!==true)return opened||{success:false,reason:"kakashi_scene04a_choice_set_open_failed"};
+    choiceSetId=opened.choiceSet.choiceSetId;
+  }
+  const committed=CORE.commitStoryIntent({storyUnitRef:ORIGIN_ID,choiceSetId,choiceId:CHOICE_ID});
+  if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_scene04a_intent_commit_failed"};
+  rt.localContext={...rt.localContext,kakashiObserveEscalationChoiceSetId:choiceSetId,kakashiScene04AStoryDecisionReceiptId:committed.receipt.storyDecisionReceiptId,kakashiScene04AIntentCommitRef:committed.receipt.intentCommitRef};
+  save();return{success:true,receipt:committed.receipt,choiceSetId};
+}
+
+function launchScene04ABattle35710({active:rt,returnContext}={}){
+  if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_scene04a_story_occurrence_missing"};
+  if(typeof launchAcademyKakashiOriginPlBattle!=="function")return{success:false,reason:"kakashi_scene04a_battle_deployment_missing"};
+  return launchAcademyKakashiOriginPlBattle({
+    storyOccurrenceId:String(rt.instanceId||""),sourceAnchorRef:SOURCE_ANCHOR,bindingRef:BINDING,battleConfigId:BATTLE_CONFIG,
+    returnToken:`${String(rt.instanceId||"")}:scene04a:stop_assassin`,returnContext,pakkunAuthorized:false
+  });
+}
+function projectScene04ABattle35710(){return typeof projectAcademyKakashiOriginBattleResult==="function"?projectAcademyKakashiOriginBattleResult():null;}
+
+function consumeScene04ABattleReturn35710(){
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!==RETURN_BEAT)return{success:false,reason:"kakashi_scene04a_return_context_missing"};
+  rt.localContext=rt.localContext&&typeof rt.localContext==="object"?rt.localContext:{};
+  if(rt.localContext.kakashiScene04ABattleIntentResolved===true)return{success:true,idempotent:true,battleOccurrenceId:rt.localContext.kakashiScene04ABattleOccurrenceId||null};
+  const receiptId=String(rt.localContext.kakashiScene04AStoryDecisionReceiptId||"");
+  if(!receiptId)return{success:false,reason:"kakashi_scene04a_story_decision_receipt_missing"};
+  const authored=rt.battleResume&&rt.battleResume.authored&&typeof rt.battleResume.authored==="object"?rt.battleResume.authored:null;
+  if(!authored||!authored.battleOccurrenceId)return{success:false,reason:"kakashi_scene04a_factual_battle_result_missing"};
+  if(String(authored.bindingRef||"")!==BINDING||String(authored.battleConfigId||"")!==BATTLE_CONFIG||String(authored.sourceAnchorRef||"")!==SOURCE_ANCHOR)return{success:false,reason:"kakashi_scene04a_battle_result_mismatch"};
+  const battleOccurrenceId=String(authored.battleOccurrenceId);
+  const bridge={success:true,resolverResultRef:battleOccurrenceId,consequenceRefs:[battleOccurrenceId],stateDeltaRefs:[],knowledgeDeltaRefs:[],relationshipHistoryRefs:[],objectiveDeltaRefs:[],successorSituationRef:"academy_kakashi.scene04a.stop_assassin_battle_return",result:authored};
+  const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN_ID,receiptId,state:{resolverResults:{[BINDING]:bridge}},context:{sceneRef:SCENE_ID,originId:ORIGIN_ID,storySceneInstanceId:String(rt.instanceId||""),selectedChoiceId:CHOICE_ID,battleOccurrenceId}});
+  if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"kakashi_scene04a_semantic_battle_dispatch_failed"};
+  rt.localContext={...rt.localContext,kakashiScene04ABattleIntentResolved:true,kakashiScene04ABattleOccurrenceId:battleOccurrenceId,kakashiScene04ABattleResultState:String(authored.resultState||"unresolved")};
+  save();return{success:true,battleOccurrenceId,resultState:String(authored.resultState||"unresolved"),storyDecisionReceiptId:receiptId};
+}
+
+function installSemanticSurface35710(){
+  const def=scene();if(!def||!(def.beatMap instanceof Map))return{success:false,reason:"kakashi_scene04a_story_definition_missing"};
+  const major=def.beatMap.get(MAJOR_BEAT);if(!major||!Array.isArray(major.choices))return{success:false,reason:"kakashi_scene04a_major_choice_missing"};
+  const choice=major.choices.find(row=>row&&row.choiceId===CHOICE_ID);if(!choice)return{success:false,reason:"kakashi_scene04a_stop_assassin_choice_missing"};
+  choice.label="STOP THE ASSASSIN";choice.nextBeatId=SCENE04A_BEAT;choice.availability=()=>({available:true,knownBlocker:null});choice.knownBlocker=null;
+  choice.consequenceRequests=Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.filter(row=>row&&row.requestId!==INTENT_REQUEST):[];
+  choice.consequenceRequests.push({requestId:INTENT_REQUEST,kind:"domain",resolve:()=>ensureStopAssassinIntent35710()});
+  def.beatMap.set(SCENE04A_BEAT,{
+    beatId:SCENE04A_BEAT,mode:"narration",environmentRef:SAKURA,text:"",nextBeatId:BATTLE_BEAT,exitScene:false,allowPresentationClose:false,
+    onEnterConsequences:[],onAdvanceConsequences:[],choices:[]
+  });
+  def.beatMap.set(BATTLE_BEAT,{
+    beatId:BATTLE_BEAT,mode:"battle_transition",environmentRef:SAKURA,text:"PL BATTLE: Kakashi Hatake vs Masked Interceptor",nextBeatId:null,exitScene:false,allowPresentationClose:false,
+    battle:{encounterId:BATTLE_CONFIG,launchResolver:launchScene04ABattle35710,postBattleBeatId:RETURN_BEAT,resultProjector:projectScene04ABattle35710,exposeFinisher:false,actionLabel:"BEGIN PL BATTLE"},choices:[]
+  });
+  def.beatMap.set(RETURN_BEAT,{
+    beatId:RETURN_BEAT,mode:"post_battle",environmentRef:SAKURA,text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,
+    onEnterConsequences:[{requestId:RETURN_REQUEST,kind:"domain",resolve:()=>consumeScene04ABattleReturn35710()}],choices:[]
+  });
+  return{success:true,choiceId:CHOICE_ID,scene04ABeatId:SCENE04A_BEAT,battleBeatId:BATTLE_BEAT,returnBeatId:RETURN_BEAT,battleConfigId:BATTLE_CONFIG};
+}
+
+function actorMarkup35710(id,label,image,state,focus=false){return `<figure class="sc-scene-board-33900__actor ${focus?"is-focus":""}" data-actor-id="${escapeHTML(id)}"><div class="sc-scene-board-33900__actor-frame"></div><img src="${escapeHTML(image)}" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(label)}</strong><small>${escapeHTML(state)}</small></figcaption></figure>`;}
+function boardMarkup35710(rt){
+  const p=isScene04A(rt)?performance(rt):null,index=p?p.index:CUES.length-1,focus=p&&p.cue&&p.cue.focusActorRef||"academy_kakashi";
+  const actors=[];
+  actors.push(actorMarkup35710("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png",rt.beatId===BATTLE_BEAT?"ENGAGING MASKED INTERCEPTOR":focus==="academy_kakashi"?"FOCUSED":"PRESENT",focus==="academy_kakashi"));
+  if(index<=8&&rt.beatId===SCENE04A_BEAT)actors.push(actorMarkup35710("package_smuggler","PACKAGE SMUGGLER","Enemies Portraits/cipher_handler.png",index>=6?"ESCAPING WITH PACKAGE":"CURRENT PACKAGE HOLDER",focus==="package_smuggler"));
+  if(index>=3||rt.beatId!==SCENE04A_BEAT)actors.push(actorMarkup35710("masked_interceptor","MASKED INTERCEPTOR","Enemies Portraits/decoy_assassin.png",rt.beatId===RETURN_BEAT?"BATTLE RESULT COMMITTED":index>=9||rt.beatId===BATTLE_BEAT?"ENGAGING KAKASHI":"PRESSING PACKAGE SMUGGLER",focus==="masked_interceptor"||rt.beatId===BATTLE_BEAT));
+  const packageObject=index<=7&&rt.beatId===SCENE04A_BEAT?`<div class="sc-scene-board-33900__objects"><span class="sc-scene-board-33900__object"><b>PACKAGE</b>PACKAGE SMUGGLER HAS PACKAGE</span></div>`:"";
+  return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(OBJECTIVE)}</div></div><div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.join("")}</div>${packageObject}`;
+}
+function renderScene04APresentation35710(){
+  if(typeof document==="undefined")return false;const rt=active();if(!rt||rt.sceneId!==SCENE_ID||![SCENE04A_BEAT,BATTLE_BEAT,RETURN_BEAT].includes(rt.beatId))return false;
+  ensureObjectiveEmphasis35710();
+  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;
+  if(!stage)return false;layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
+  let board=stage.querySelector&&stage.querySelector(".sc-scene-board-33900");if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const markup=boardMarkup35710(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
+  if(isScene04A(rt)){
+    const p=performance(rt),cue=p.cue||{};layer.dataset.scPerformance="true";
+    const text=layer.querySelector&&layer.querySelector(".sc-story-text");if(text&&text.textContent!==cue.text)text.textContent=cue.text;
+    const name=layer.querySelector&&layer.querySelector(".sc-story-name");if(name){name.textContent="";name.style.display="none";}
+    const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";
+    const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  }
+  return true;
+}
+
+let hooksInstalled=false,hookAttempts=0;
+function installPresentationHooks35710(){
+  if(hooksInstalled)return true;
+  if(typeof globalThis.getStoryScenePerformance33900!=="function"||typeof globalThis.advanceStoryScene!=="function")return false;
+  const PRE_GET=globalThis.getStoryScenePerformance33900,PRE_ADVANCE=globalThis.advanceStoryScene,PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+  globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35710(){const rt=active();return isScene04A(rt)?performance(rt):PRE_GET.apply(this,arguments);};
+  globalThis.advanceStoryScene=function advanceStoryScene35710(choiceId=null){
+    const rt=active();if(!isScene04A(rt)||choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
+    const p=performance(rt);if(!p.atEnd){const next=p.index+1;rt.localContext={...(rt.localContext||{}),[CURSOR_KEY]:next};save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return{success:true,type:"kakashi_scene04a_performance_cue_advanced",beatId:SCENE04A_BEAT,cueIndex:next,semanticBeatUnchanged:true};}
+    if(rt.localContext)delete rt.localContext[CURSOR_KEY];save();return PRE_ADVANCE.apply(this,arguments);
+  };
+  try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
+  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35710(){const result=PRE_RENDER.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(renderScene04APresentation35710);else setTimeout(renderScene04APresentation35710,0);return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  hooksInstalled=true;ensureObjectiveEmphasis35710();renderScene04APresentation35710();return true;
+}
+function ensurePresentationHooks35710(){if(installPresentationHooks35710())return;if(typeof setTimeout==="function"&&hookAttempts++<80)setTimeout(ensurePresentationHooks35710,25);}
+
+function diagnostics(){
+  const def=scene(),major=def&&def.beatMap instanceof Map?def.beatMap.get(MAJOR_BEAT):null,choice=major&&Array.isArray(major.choices)?major.choices.find(row=>row&&row.choiceId===CHOICE_ID):null,battle=def&&def.beatMap instanceof Map?def.beatMap.get(BATTLE_BEAT):null,ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null;
+  const exact=["Kakashi moves.","Not toward ANBU Marked Target.","Not toward the package.","Toward Masked Interceptor.","She is already closing on Package Smuggler when Kakashi drops between them.","Package Smuggler sees the opening immediately.","He turns and runs.","The package goes with him.","Kakashi does not follow.","Masked Interceptor changes direction without hesitation.","Her attention settles on Kakashi.","He has made himself the obstacle now.","She comes straight through him.","Kakashi meets her head-on."];
+  const checks={patchId:PATCH_ID==="alpha_kakashi_scene04a_35710_2026_09_18",authorityPinned:AUTHORITY==="64966fb33590d09e7ae16a33d51d0e7262b5891d",exactFourteenNarrationCues:CUES.length===14&&JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exact)&&CUES.every(row=>row.kind==="narration"&&!row.speakerName),stopAssassinWired:!!choice&&choice.nextBeatId===SCENE04A_BEAT&&Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>row&&row.requestId===INTENT_REQUEST),intentBeforeBattle:ensureStopAssassinIntent35710.toString().includes("commitStoryIntent"),exactBattleConfig:!!battle&&battle.mode==="battle_transition"&&battle.battle&&battle.battle.encounterId===BATTLE_CONFIG&&BATTLE_CONFIG==="academy_kakashi_origin_battle_mi_1v1",exactBattleBinding:BINDING==="academy_kakashi.battle.stop_assassin"&&SOURCE_ANCHOR==="AK_SA_019",noPakkun:launchScene04ABattle35710.toString().includes("pakkunAuthorized:false"),returnsSameBranch:!!battle&&battle.battle.postBattleBeatId===RETURN_BEAT&&!!ret&&ret.mode==="post_battle",battleReturnConsumed:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(row=>row&&row.requestId===RETURN_REQUEST)&&consumeScene04ABattleReturn35710.toString().includes("dispatchCommittedIntent"),noBattleOutcomeOverreach:consumeScene04ABattleReturn35710.toString().includes("resultState")&&!consumeScene04ABattleReturn35710.toString().includes("participantDeathCommitted:true")&&!consumeScene04ABattleReturn35710.toString().includes("participantCustodyCommitted:true"),objectiveExact:OBJECTIVE==="Retrieve the package.",browserGoldenClaimed:false};
+  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,browserGoldenClaimed:false};
+}
+
+const installed=installSemanticSurface35710();if(!installed||installed.success!==true)throw new Error(`kakashi_scene04a_surface_install_failed:${installed&&installed.reason||"unknown"}`);
+ensurePresentationHooks35710();
+globalThis.runAcademyKakashiScene04A35710Diagnostics=diagnostics;
+globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:CUES.length,choiceId:CHOICE_ID,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,objective:OBJECTIVE,browserGoldenClaimed:false});
+})();
