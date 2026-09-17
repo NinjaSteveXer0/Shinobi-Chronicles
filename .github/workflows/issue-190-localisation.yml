@@ -1,0 +1,30 @@
+name: Issue 190 Pre-Public Alpha Localisation QA
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'runtime/alpha-localisation-35500.js'
+      - 'runtime/alpha-origin-scenes-32900-core.js'
+      - 'tools/qa_issue_190_localisation_35500.js'
+      - '.github/workflows/issue-190-localisation.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  localisation-core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check localisation runtime
+        run: |
+          node --check runtime/alpha-localisation-35500.js
+          node --check runtime/alpha-origin-scenes-32900-core.js
+          node --check tools/qa_issue_190_localisation_35500.js
+      - name: Issue 190 localisation core QA
+        run: node tools/qa_issue_190_localisation_35500.js
