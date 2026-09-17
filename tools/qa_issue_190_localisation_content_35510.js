@@ -35,9 +35,9 @@ function collect(source,re,index=1,set=new Set()){
 }
 function collectOriginPresentation(source){
   const out=new Set();
-  collect(source,/title:"([^"]+)"/g,1,out);
-  collect(source,/speakerName:"([^"]+)"/g,1,out);
-  collect(source,/text:"([^"]+)"/g,1,out);
+  collect(source,/(?:^|[,{])\s*title:"([^"]+)"/gm,1,out);
+  collect(source,/(?:^|[,{])\s*speakerName:"([^"]+)"/gm,1,out);
+  collect(source,/(?:^|[,{])\s*text:"([^"]+)"/gm,1,out);
   collect(source,/C\("[^"]+","([^"]+)"/g,1,out);
   collect(source,/A\.unavailableBattle\(scene,"([^"]+)"/g,1,out);
   collect(source,/knownBlocker:"([^"]+)"/g,1,out);
