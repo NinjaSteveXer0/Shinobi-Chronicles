@@ -8,6 +8,8 @@
 // - Battle victory is never terminal reward entitlement.
 // - Package custody must already be factually committed before debrief closes.
 // - Participant defeat is not death/custody.
+// - Direct Pickpocket clean-success / exact 3-v-1 return package facts are read
+//   from 34710 without relabelling them as Observe/sequential history.
 // - Sequential MI -> PS -> AMT timing facts are preserved, but that route stays
 //   fail-closed until its separately required post-PS package state is committed.
 // - Pakkun temporary participation never becomes ownership/acquisition.
@@ -24,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v2_2026_09_17";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v3_2026_09_17";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -50,6 +52,7 @@ const SEQ_MI_CONFIG="academy_kakashi_origin_battle_seq_mi";
 const SEQ_PS_CONFIG="academy_kakashi_origin_battle_seq_ps";
 const SEQ_AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
 const HARD_3V1_CONFIG="academy_kakashi_origin_battle_amt_ps_mi_3v1";
+const DIRECT_PICKPOCKET_RETURN_BEAT="kak_scene03d_pickpocket_failure_3v1_return_34710";
 const SECURE_PURSUIT_REACHED="SECURE_PACKAGE_AMT_PURSUIT_SUCCESS_REACHED";
 const SECURE_PURSUIT_ESCAPED="SECURE_PACKAGE_AMT_PURSUIT_FAILURE_ESCAPED";
 const STAY_PACKAGE_PURSUIT_REACHED="PURSUIT_SUCCESS_AMT_REACHED";
@@ -123,7 +126,7 @@ function supplementCurrentBattleCapture(){
 }
 function committedPackageState(){
   const l=local();if(!l)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
-  const candidateIds=[l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
+  const candidateIds=[l.kakashiDirectPickpocketPackageOccurrenceId,l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
   for(const id of candidateIds){
     const row=occurrence(id),fact=factOf(row),pkg=fact&&fact.packageState||{};
     if(!row||!pkg.objectRef||String(pkg.objectRef)!==PACKAGE_REF||!pkg.currentHolderClass)continue;
@@ -290,6 +293,7 @@ function installTerminalBeats35100(){
   appendCapture(map,"kak_seq_mi_return",SEQ_MI_CONFIG);
   appendCapture(map,"kak_seq_ps_return",SEQ_PS_CONFIG);
   appendCapture(map,"kak_seq_amt_return",SEQ_AMT_CONFIG);
+  appendCapture(map,DIRECT_PICKPOCKET_RETURN_BEAT,HARD_3V1_CONFIG);
   const seqAmt=map.get("kak_seq_amt_battle");
   if(seqAmt&&seqAmt.battle&&typeof seqAmt.battle.launchResolver==="function"&&!seqAmt.battle.__terminal35100Wrapped){
     const prior=seqAmt.battle.launchResolver;
@@ -320,12 +324,14 @@ function installTerminalBeats35100(){
   return{success:true,beatIds:beats.map(row=>row.beatId),pendingBeatId:PENDING_BEAT};
 }
 function diagnostics(){
-  const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT);
+  const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v2_2026_09_17",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v3_2026_09_17",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
+    directPickpocketPackageStateConsumed:committedPackageState.toString().includes("kakashiDirectPickpocketPackageOccurrenceId"),
+    directPickpocketBattleCaptured:!directPickReturn||Array.isArray(directPickReturn.onEnterConsequences)&&directPickReturn.onEnterConsequences.some(row=>row&&row.requestId===`kakashi_terminal_capture_35100::${DIRECT_PICKPOCKET_RETURN_BEAT}`),
     stayPackagePursuitStateConsumed:committedPackageState.toString().includes("kakashiGetCloserStayPackagePursuitOccurrenceId"),
     battleVictoryNotTerminalEntitlement:!deriveTerminalFacts35100.toString().includes("terminalDebriefReached:false")&&!commitTerminalDebrief35100.toString().includes("resultState===\"player_side_victory\""),
     exactSequentialBenchmark:sequentialBenchmark.toString().includes("<=4")&&sequentialBenchmark.toString().includes("<=3")&&sequentialBenchmark.toString().includes("kakashiTerminalSequentialAmtReached35100"),
