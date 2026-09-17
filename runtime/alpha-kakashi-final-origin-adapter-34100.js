@@ -7,13 +7,13 @@
 // provider -> Kakashi factual state/bindings -> direct Scene 02 Attack/Pickpocket
 // consumer -> sequential post-PS package recovery -> Pakkun interception ->
 // reward adapter -> terminal debrief -> terminal Scene Board asset binding ->
-// locked Scene 03A consumer -> locked Scene 04A Stop Assassin consumer.
+// locked Scene 03A consumer -> locked Scene 04A Stop Assassin consumer ->
+// installed-browser Objective presentation acceptance fix.
 //
-// Generation 24 adds the approved Scene 04A Stop the Assassin path and its
-// exact direct/non-sequential Masked Interceptor 1-v-1 PL Battle, while
-// preserving Direct Attack fail-closed and leaving the other Scene 03A choices
-// contained until their own authored successors are consumed. Browser Golden
-// remains separately unclaimed.
+// Generation 25 consumes Stephen's fight_at_sakura_tree backdrop, launches the
+// Scene 04A Masked Interceptor 1-v-1 PL Battle immediately after the locked
+// build-up, and keeps the Rooftop objective hidden until Kakashi actually opens
+// the sealed envelope. Browser Golden remains separately unclaimed.
 //
 // Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
@@ -22,6 +22,7 @@
 // const BUILD="kakashi-final-20260917-21";
 // const BUILD="kakashi-final-20260917-22";
 // const BUILD="kakashi-final-20260917-23";
+// const BUILD="kakashi-final-20260917-24";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -43,7 +44,8 @@ const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
 const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
 const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
 const SCENE04A_PATH="runtime/alpha-kakashi-scene04a-35710.js";
-const BUILD="kakashi-final-20260917-24";
+const OBJECTIVE_PRESENTATION_PATH="runtime/alpha-kakashi-objective-presentation-35720.js";
+const BUILD="kakashi-final-20260918-25";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -73,9 +75,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadObjectivePresentation(){
+  if(globalThis.SC_ALPHA_KAKASHI_OBJECTIVE_PRESENTATION_35720)return;
+  appendScript("sc-alpha-kakashi-objective-presentation-35720-script",OBJECTIVE_PRESENTATION_PATH);
+}
 function loadScene04A(){
-  if(globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710)return;
-  appendScript("sc-alpha-kakashi-scene04a-35710-script",SCENE04A_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710){loadObjectivePresentation();return;}
+  appendScript("sc-alpha-kakashi-scene04a-35710-script",SCENE04A_PATH,loadObjectivePresentation);
 }
 function loadScene03A(){
   if(globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700){loadScene04A();return;}
