@@ -27,6 +27,16 @@
        - map canvas/aspect/hotspot geometry remain untouched
        ===================================================== -->
   <style id="world-map-shell-cleanup-post-1992">
+    /*
+       Alpha boot gate: the static World Map exists before the browser-local
+       Register/Login runtime mounts. Keep the underlying game invisible while
+       either front-door owner marks it locked; their existing unlock path
+       removes this data attribute when the Chronicle is actually released.
+    */
+    .game-container[data-alpha-front-door-locked] {
+      visibility: hidden !important;
+    }
+
     .game-header {
       gap: 14px;
       padding-left: 14px;
@@ -171,7 +181,7 @@
   <!-- =====================================================
        MAIN GAME CONTAINER
        ===================================================== -->
-  <div class="game-container">
+  <div class="game-container" data-alpha-front-door-locked="boot">
 
 
     <!-- =====================================================
