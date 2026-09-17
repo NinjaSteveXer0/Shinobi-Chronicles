@@ -13,6 +13,7 @@
 // layers explicitly so each ownership seam remains independently testable.
 // Generation 18 consumes the closed AK_SA_008/009/010/011/018/024 interception
 // tranche while Browser Golden remains separately unclaimed.
+// Exact-head validation trigger after generation-18 QA alignment.
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
