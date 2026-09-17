@@ -1,5 +1,5 @@
 // ============================================================================
-// ACADEMY KAKASHI STORY PRESENTATION COMPATIBILITY SHIM — 33920 v3
+// ACADEMY KAKASHI STORY PRESENTATION COMPATIBILITY SHIM — 33920 v4
 //
 // Temporary, explicit compatibility layer over the current 33910 Scene Board
 // consumer. It exists only to correct installed-browser presentation defects
@@ -13,7 +13,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_STORY_PRESENTATION_COMPAT_33920)return;
 
-const PATCH_ID="academy_kakashi_story_presentation_compat_33920_v3_2026_09_17";
+const PATCH_ID="academy_kakashi_story_presentation_compat_33920_v4_2026_09_17";
 const STYLE_ID="sc-kakashi-story-presentation-compat-33920-style";
 const boundStages=new WeakSet();
 let retainedDialogue33920=[];
@@ -54,9 +54,10 @@ function installStyle33920(){
   display:block!important;margin:0 0 5px!important;font-size:10px!important;letter-spacing:.14em!important;
 }
 
-/* Conversation lane: one spoken line, visibly moving with the speaker. */
+/* Conversation lane: one spoken line, anchored centrally between both cards. */
 #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910{
-  width:min(34%,540px)!important;
+  width:min(32%,500px)!important;
+  box-sizing:border-box!important;
   min-height:104px!important;
   padding:17px 22px 16px!important;
   clip-path:none!important;
@@ -65,11 +66,9 @@ function installStyle33920(){
   box-shadow:0 18px 48px rgba(0,0,0,.42)!important;
   transition:left .18s ease,right .18s ease,opacity .18s ease,transform .18s ease!important;
 }
-#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-current.is-left{
-  left:29%!important;right:auto!important;top:27%!important;bottom:auto!important;transform:none!important;
-}
+#story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-current.is-left,
 #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-current.is-right{
-  right:29%!important;left:auto!important;top:27%!important;bottom:auto!important;transform:none!important;
+  left:50%!important;right:auto!important;top:27%!important;bottom:auto!important;transform:translateX(-50%)!important;
 }
 #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910.is-previous{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-dialogue-status-33910{display:none!important;}
@@ -83,16 +82,14 @@ function installStyle33920(){
 
 /* The immediately preceding spoken line may remain while narration happens. */
 #story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained{
-  width:min(34%,540px)!important;min-height:92px!important;padding:14px 20px!important;
+  width:min(32%,500px)!important;box-sizing:border-box!important;min-height:92px!important;padding:14px 20px!important;
   top:27%!important;bottom:auto!important;clip-path:none!important;border-radius:8px!important;
   opacity:.72!important;filter:none!important;pointer-events:none!important;
   background:linear-gradient(180deg,rgba(4,12,18,.92),rgba(5,15,21,.86))!important;
 }
-#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained.is-left{
-  left:29%!important;right:auto!important;transform:none!important;
-}
+#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained.is-left,
 #story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained.is-right{
-  right:29%!important;left:auto!important;transform:none!important;
+  left:50%!important;right:auto!important;transform:translateX(-50%)!important;
 }
 #story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .retained-1-33920{display:none!important;}
 
@@ -240,12 +237,12 @@ function runAcademyKakashiStoryPresentationCompat33920Diagnostics(){
   const css=typeof document!=="undefined"&&document.getElementById(STYLE_ID)?document.getElementById(STYLE_ID).textContent:"";
   const click=bindStage33920.toString();const sync=sync33920.toString();
   const checks={
-    patchId:PATCH_ID==="academy_kakashi_story_presentation_compat_33920_v3_2026_09_17",
+    patchId:PATCH_ID==="academy_kakashi_story_presentation_compat_33920_v4_2026_09_17",
     collectibleNameOverlayRemoved:css.includes("sc-scene-board-33900__actor-tag")&&css.includes("display:none!important"),
     redundantArrowRemoved:css.includes("sc-performance-next-33910")&&removeAdvanceButtons33920.toString().includes("node.remove"),
     instructionPlateReadable:css.includes("min-width:240px!important")&&css.includes("font-size:11px!important")&&css.includes("sc-scene-board-33900__object b"),
     cutCornersRemoved:css.includes("clip-path:none!important")&&css.includes("border-radius:8px!important"),
-    dialogueCentralStack:css.includes("left:50%!important")&&css.includes("translateX(-50%)"),
+    dialogueCentralStack:css.includes("width:min(32%,500px)!important")&&css.includes("box-sizing:border-box!important")&&css.includes("left:50%!important")&&css.includes("transform:translateX(-50%)!important")&&!css.includes("left:29%!important")&&!css.includes("right:29%!important"),
     dialogueStatusRemoved:css.includes("sc-dialogue-status-33910")&&css.includes("display:none!important"),
     narrationRetainsDialogue:injectRetainedDialogue33920.toString().includes("retainedDialogue33920")&&css.includes("is-retained"),
     nativePerformanceLayoutSuppressed:sync.includes("syncNativeLayoutVisibility33920")&&syncNativeLayoutVisibility33920.toString().includes('setProperty("display","none","important")'),
