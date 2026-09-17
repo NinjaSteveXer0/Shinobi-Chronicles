@@ -39,6 +39,7 @@ EXPECTED_RUNTIME_ORDER = [
     "runtime/alpha-traversal-bridge-33200.js",
     "runtime/alpha-anbu-root-contained-155.js",
     "runtime/alpha-anbu-root-contained-155-knowledge-fix.js",
+    "runtime/alpha-arc1-reward-evaluation-35400.js",
 ]
 
 PYTHON_GATES = [
@@ -60,6 +61,7 @@ NODE_GATES = [
     "tools/qa_alpha_origin_scenes_32900_runtime.js",
     "tools/qa_issue_155_anbu_root_runtime.js",
     "tools/qa_issue_141_traversal_runtime.js",
+    "tools/qa_issue_151_arc1_reward_exact_head.js",
 ]
 
 EXTERNAL_ASSET_GATES = [
