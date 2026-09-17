@@ -45,9 +45,9 @@ assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/clos
 // that same coherent delivery generation until the next deliberate cache bump.
 assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),
   "32900 Story-decision parent identity is stale");
-assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-17'),
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-18'),
   "34000 Kakashi adapter parent identity is stale");
-assert(adapterSrc.includes('const BUILD="kakashi-final-20260917-17";'),
+assert(adapterSrc.includes('const BUILD="kakashi-final-20260917-18";'),
   "34100 must request current Kakashi child cache identity");
 assert(adapterSrc.includes('fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`'),
   "34500 child is not versioned by current Kakashi BUILD");
@@ -118,7 +118,6 @@ assert((delegated.listeners.pointerover||[]).some(row=>row.capture===true),"docu
 assert((delegated.listeners.focusin||[]).some(row=>row.capture===true),"document capture focusin listener not installed");
 assert((delegated.listeners.click||[]).some(row=>row.capture===true),"document capture click listener not installed");
 
-// Delegated hover must use the exact rendered card identity and remain presentation-only.
 delegated.card.dataset.skillId=exactFive[2];
 const hover=delegated.dispatch("pointerover");
 assert.strictEqual(delegated.counts().guideCalls,1,"delegated hover must render exactly one Skill Guide");
@@ -126,7 +125,6 @@ assert.strictEqual(delegated.counts().selectCalls,0,"hover must not select a Ski
 assert.strictEqual(delegated.counts().confirmCalls,0,"hover must not commit a Skill");
 assert(hover.lastResult&&hover.lastResult.success===true,"hover must report presentation success");
 
-// Focus is a second learn path and must also remain presentation-only.
 delegated.card.dataset.skillId=exactFive[4];
 const focus=delegated.dispatch("focusin");
 assert.strictEqual(delegated.counts().guideCalls,2,"delegated focus must render the focused Skill Guide");
@@ -134,7 +132,6 @@ assert.strictEqual(delegated.counts().selectCalls,0,"focus must not select a Ski
 assert.strictEqual(delegated.counts().confirmCalls,0,"focus must not commit a Skill");
 assert(focus.lastResult&&focus.lastResult.success===true,"focus must report presentation success");
 
-// Click must suppress competing select-only handlers and explicitly select+confirm once.
 delegated.card.dataset.skillId=exactFive[0];
 const click=delegated.dispatch("click");
 assert.strictEqual(click.prevented,1,"delegated click must prevent select-only default path");
@@ -145,14 +142,12 @@ assert.strictEqual(delegated.counts().confirmCalls,1,"rendered click must confir
 assert.strictEqual(click.lastResult.success,true,"rendered delegated click must report action success");
 assert.strictEqual(delegated.context.currentBattle.selectedSkillId,null,"committed direct click must not leave stale selected Skill state");
 
-// Already-bound cards can have 33000 handlers reintroduced; a harden pass must clear them again.
 delegated.card.onmouseenter=()=>{};
 delegated.card.onfocus=()=>{};
 delegated.context.hardenAcademyKakashiBattleDOM34500(delegated.stage);
 assert.strictEqual(delegated.card.onmouseenter,null,"harden pass must clear competing mouseenter handler");
 assert.strictEqual(delegated.card.onfocus,null,"harden pass must clear competing focus handler");
 
-// Scope must remain exact to Academy Kakashi Origin Battles.
 delegated.context.currentBattle.kakashiOriginDeployment.controllerParticipantId="other_controller";
 const blocked=delegated.context.activateAcademyKakashiBattleSkill34500(exactFive[0]);
 assert.strictEqual(blocked.success,false,"34500 must not leak outside Kakashi Origin Battle");
@@ -173,6 +168,6 @@ console.log(JSON.stringify({
   hoverPresentationOnly:true,
   rerenderHandlerHardening:true,
   resolverSemanticsUntouched:true,
-  kakashiChildCacheIdentity:"kakashi-final-20260917-17",
+  kakashiChildCacheIdentity:"kakashi-final-20260917-18",
   browserGoldenClaimed:false
 },null,2));

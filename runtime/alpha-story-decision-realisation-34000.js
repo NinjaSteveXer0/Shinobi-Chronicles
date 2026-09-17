@@ -267,7 +267,8 @@ function consumeNextAutonomy(spec={}){
   if(!evaluation.due.length)return{success:true,noneDue:true};
   const next=evaluation.due[0];
   const anchor=anchorsByStoryUnit.get(storyUnitRef).get(next.anchorId);
-  if(anchor.battleOwned===true||state.battleLive===true){
+  const preBattleMixedAutonomy=anchor.battleOwned===true&&Array.isArray(anchor.classes)&&anchor.classes.includes("PARTICIPANT_AUTONOMY")&&String(state.autonomyPhase||"")==="pre_battle";
+  if(state.battleLive===true||(anchor.battleOwned===true&&!preBattleMixedAutonomy)){
     return{success:false,reason:"battle_owns_action_economy",anchorId:anchor.anchorId,battleOwned:true};
   }
   const store=unitStore(storyUnitRef);
@@ -280,7 +281,7 @@ function consumeNextAutonomy(spec={}){
   if(!result||result.success!==true)return{success:false,reason:result&&result.reason||"autonomy_resolver_failed",anchorId:anchor.anchorId,result:clone(result)};
   const receipt={
     autonomyReceiptId:windowKey,storyUnitRef,anchorId:anchor.anchorId,actorRef:anchor.actorRef,
-    committedStateRef:String(state.committedStateRef||state.stateRef||"unversioned"),
+    committedStateRef:String(state.committedStateRef||state.stateRef||"unversioned"),autonomyPhaseRef:String(state.autonomyPhase||"pre_story"),
     participantIntentRef:result.participantIntentRef?String(result.participantIntentRef):null,
     resolverResultRef:String(result.resolverResultRef||stableRef("sc340-autonomy-result",{windowKey,result:result.result||result.outcome||null})),
     consequenceRefs:normalizeRefs(result.consequenceRefs),status:"resolved",createdAt:Date.now()
@@ -331,7 +332,7 @@ function runStoryDecisionRealisation34000Diagnostics(){
     participantFirstAuthorityPinned:AUTHORITY.participantFirst==="06566ee81fe7c7856fd513d0225e621273f4bfaa",
     stableHashDeterministic:hash({b:2,a:1})===hash({a:1,b:2}),
     noMissionStorageDependency:!unitStore.toString().includes("missionId")&&!unitStore.toString().includes("ceMissionChoice121"),
-    battleBoundaryExplicit:consumeNextAutonomy.toString().includes("battle_owns_action_economy"),
+    battleBoundaryExplicit:consumeNextAutonomy.toString().includes("battle_owns_action_economy")&&consumeNextAutonomy.toString().includes("preBattleMixedAutonomy"),
     terminalGuardExists:typeof terminalSemanticGuard==="function",
     browserGoldenClaimed:false
   };
@@ -364,7 +365,7 @@ globalThis.runStoryDecisionRealisation34000Diagnostics=runStoryDecisionRealisati
       const id="sc-alpha-kakashi-final-34100-script";
       if(document.getElementById(id))return;
       const script=document.createElement("script");script.id=id;script.async=false;
-      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-17";
+      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-18";
       document.head.appendChild(script);return;
     }
     attempts+=1;if(attempts<240&&typeof setTimeout==="function")setTimeout(tryLoad,50);

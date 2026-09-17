@@ -7,11 +7,12 @@
 // sequential Story/Battle consumer -> installed-browser presentation fixes ->
 // Kakashi Substitution supersession -> installed-browser Battle interaction ->
 // neutral factual provider -> canonical Kakashi factual-state commit owner ->
-// Kakashi factual bindings -> Kakashi reward adapter -> factual terminal debrief
-// / Chronicle Receipt bridge.
+// Kakashi factual bindings -> Pakkun interception consumer -> Kakashi reward
+// adapter -> factual terminal debrief / Chronicle Receipt bridge.
 // Headless semantic QA loads only core + guard; dedicated harnesses load later
 // layers explicitly so each ownership seam remains independently testable.
-// Final exact-head CI trigger after generation-17 QA alignment: #188 Story + terminal + #141.
+// Generation 18 consumes the closed AK_SA_008/009/010/011/018/024 interception
+// tranche while Browser Golden remains separately unclaimed.
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -26,9 +27,10 @@ const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-3
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
 const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
+const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
-const BUILD="kakashi-final-20260917-17";
+const BUILD="kakashi-final-20260917-18";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -68,15 +70,26 @@ function loadRewards(){
   rewards.addEventListener("load",loadTerminalDebrief,{once:true});
   document.head.appendChild(rewards);
 }
-function loadKakashiFactualBindings(){
-  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadRewards();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-factual-bindings-34700-script");
+function loadInterception(){
+  if(globalThis.SC_ALPHA_KAKASHI_PAKKUN_INTERCEPTION_35300){loadRewards();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-pakkun-interception-35300-script");
   if(existing){existing.addEventListener("load",loadRewards,{once:true});return;}
+  const interception=document.createElement("script");
+  interception.id="sc-alpha-kakashi-pakkun-interception-35300-script";
+  interception.src=`${INTERCEPTION_PATH}?sc=${BUILD}`;
+  interception.async=false;
+  interception.addEventListener("load",loadRewards,{once:true});
+  document.head.appendChild(interception);
+}
+function loadKakashiFactualBindings(){
+  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadInterception();return;}
+  const existing=document.getElementById("sc-alpha-kakashi-factual-bindings-34700-script");
+  if(existing){existing.addEventListener("load",loadInterception,{once:true});return;}
   const bindings=document.createElement("script");
   bindings.id="sc-alpha-kakashi-factual-bindings-34700-script";
   bindings.src=`${KAKASHI_FACTUAL_BINDINGS_PATH}?sc=${BUILD}`;
   bindings.async=false;
-  bindings.addEventListener("load",loadRewards,{once:true});
+  bindings.addEventListener("load",loadInterception,{once:true});
   document.head.appendChild(bindings);
 }
 function loadFactualState(){
