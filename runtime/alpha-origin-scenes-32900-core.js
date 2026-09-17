@@ -61,6 +61,8 @@ globalThis.SC_ALPHA_ORIGIN_32900=A;
 // dependency on Origin semantics. 35510 owns broad base Story/Journey strings;
 // 35520 owns the final Writing-approved 33600 expression pass and is loaded
 // strictly after 35510 has registered its catalogue.
+// Exact-head bridge: this production seam is watched by both the focused #190
+// workflow and the global #141 runtime-closure workflow so both certify one SHA.
 // ============================================================================
 (function activateAlphaLocalisation35500From32900Core(){
   "use strict";
