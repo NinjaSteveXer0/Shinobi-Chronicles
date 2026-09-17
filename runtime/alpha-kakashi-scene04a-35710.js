@@ -29,7 +29,7 @@ const KAK=globalThis.SC_ALPHA_KAKASHI_FINAL_34100;
 const SCENE03A=globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700;
 if(!A||!CORE||!KAK||!SCENE03A)throw new Error("kakashi_scene04a_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene04a_35710_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene04a_35710_v2_2026_09_18";
 const AUTHORITY="64966fb33590d09e7ae16a33d51d0e7262b5891d";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
@@ -45,8 +45,16 @@ const INTENT_REQUEST="kakashi_scene04a_stop_assassin_intent_35710";
 const RETURN_REQUEST="kakashi_scene04a_stop_assassin_return_35710";
 const CURSOR_KEY="__kakashiScene04A35710Cursor";
 const OBJECTIVE="Retrieve the package.";
-const SAKURA=Object.freeze({assetId:"kakashi_origin_sakura_tree_night"});
+const FIGHT_BACKDROP_ID="kakashi_origin_fight_at_sakura_tree";
+const FIGHT_BACKDROP_PATH="Kakashi Origin Backdrop/fight_at_sakura_tree.png";
+const FIGHT_BACKDROP=Object.freeze({assetId:FIGHT_BACKDROP_ID});
 const STYLE_ID="sc-kakashi-scene04a-35710-style";
+const BOARD_CLASS="sc-kakashi-scene04a-board-35710";
+
+try{
+  const register=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;
+  if(typeof register==="function")register(FIGHT_BACKDROP_ID,FIGHT_BACKDROP_PATH);
+}catch(_error){}
 
 const CUES=Object.freeze([
   Object.freeze({cueId:"scene04a_01",kind:"narration",text:"Kakashi moves.",focusActorRef:"academy_kakashi"}),
@@ -69,17 +77,43 @@ function active(){try{return typeof getActiveStorySceneRuntime==="function"?getA
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}}
 function isScene04A(rt=active()){return!!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SCENE04A_BEAT;}
+function isScene04AFamily(rt=active()){return!!rt&&rt.sceneId===SCENE_ID&&[SCENE04A_BEAT,BATTLE_BEAT,RETURN_BEAT].includes(rt.beatId);}
 function cursor(rt=active()){const raw=rt&&rt.localContext?Number(rt.localContext[CURSOR_KEY]):0;return Number.isInteger(raw)?Math.max(0,Math.min(CUES.length-1,raw)):0;}
 function performance(rt=active()){const index=cursor(rt);return{sequence:CUES,index,cue:CUES[index],atEnd:index>=CUES.length-1};}
 function escapeHTML(value){return String(value??"").replace(/[&<>\"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'\"':"&quot;","'":"&#39;"}[ch]));}
+function cssUrlValue(value){return `url("${String(value||"").replace(/\\/g,"\\\\").replace(/\"/g,'\\\"')}")`;}
 
-function ensureObjectiveEmphasis35710(){
+function ensurePresentationStyle35710(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
-.sc-scene-board-33900__objective{min-width:190px!important;padding:9px 13px!important;font-size:11px!important;line-height:1.4!important;box-shadow:0 10px 26px rgba(0,0,0,.34)!important;}
-.sc-scene-board-33900__objective b{font-size:9px!important;margin-bottom:4px!important;}
+.${BOARD_CLASS}{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden;}
+#story-scene-presentation-layer .sc-chronicle-stage[data-sc-kakashi-scene04a-fight="true"]{
+  background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.40) 82%,rgba(2,5,8,.68)),var(--sc-kakashi-scene04a-fight-backdrop)!important;
+  background-position:center!important;
+  background-size:cover!important;
+  background-repeat:no-repeat!important;
+}
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__objective{box-shadow:0 11px 28px rgba(0,0,0,.36)!important;}
 `;
   document.head.appendChild(style);return true;
+}
+function fightBackdropPath35710(){
+  try{if(typeof getSceneBackdropAssetPath==="function")return getSceneBackdropAssetPath(FIGHT_BACKDROP_ID)||FIGHT_BACKDROP_PATH;}catch(_error){}
+  try{if(typeof globalThis.getSceneBackdropAssetPath==="function")return globalThis.getSceneBackdropAssetPath(FIGHT_BACKDROP_ID)||FIGHT_BACKDROP_PATH;}catch(_error){}
+  return FIGHT_BACKDROP_PATH;
+}
+function applyFightBackdrop35710(stage){
+  if(!stage||!stage.style)return false;
+  stage.dataset.scKakashiScene04aFight="true";
+  stage.style.setProperty("--sc-kakashi-scene04a-fight-backdrop",cssUrlValue(fightBackdropPath35710()));
+  return true;
+}
+function clearFightBackdrop35710(stage){
+  if(!stage||!stage.style)return false;
+  try{delete stage.dataset.scKakashiScene04aFight;}catch(_error){}
+  stage.style.removeProperty("--sc-kakashi-scene04a-fight-backdrop");
+  for(const board of stage.querySelectorAll?stage.querySelectorAll(`.${BOARD_CLASS}`):[])board.remove();
+  return true;
 }
 
 function ensureStopAssassinIntent35710(){
@@ -140,18 +174,18 @@ function installSemanticSurface35710(){
   choice.consequenceRequests=Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.filter(row=>row&&row.requestId!==INTENT_REQUEST):[];
   choice.consequenceRequests.push({requestId:INTENT_REQUEST,kind:"domain",resolve:()=>ensureStopAssassinIntent35710()});
   def.beatMap.set(SCENE04A_BEAT,{
-    beatId:SCENE04A_BEAT,mode:"narration",environmentRef:SAKURA,text:"",nextBeatId:BATTLE_BEAT,exitScene:false,allowPresentationClose:false,
+    beatId:SCENE04A_BEAT,mode:"narration",environmentRef:FIGHT_BACKDROP,text:"",nextBeatId:BATTLE_BEAT,exitScene:false,allowPresentationClose:false,
     onEnterConsequences:[],onAdvanceConsequences:[],choices:[]
   });
   def.beatMap.set(BATTLE_BEAT,{
-    beatId:BATTLE_BEAT,mode:"battle_transition",environmentRef:SAKURA,text:"PL BATTLE: Kakashi Hatake vs Masked Interceptor",nextBeatId:null,exitScene:false,allowPresentationClose:false,
+    beatId:BATTLE_BEAT,mode:"battle_transition",environmentRef:FIGHT_BACKDROP,text:"PL BATTLE: Kakashi Hatake vs Masked Interceptor",nextBeatId:null,exitScene:false,allowPresentationClose:false,
     battle:{encounterId:BATTLE_CONFIG,launchResolver:launchScene04ABattle35710,postBattleBeatId:RETURN_BEAT,resultProjector:projectScene04ABattle35710,exposeFinisher:false,actionLabel:"BEGIN PL BATTLE"},choices:[]
   });
   def.beatMap.set(RETURN_BEAT,{
-    beatId:RETURN_BEAT,mode:"post_battle",environmentRef:SAKURA,text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,
+    beatId:RETURN_BEAT,mode:"post_battle",environmentRef:FIGHT_BACKDROP,text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,
     onEnterConsequences:[{requestId:RETURN_REQUEST,kind:"domain",resolve:()=>consumeScene04ABattleReturn35710()}],choices:[]
   });
-  return{success:true,choiceId:CHOICE_ID,scene04ABeatId:SCENE04A_BEAT,battleBeatId:BATTLE_BEAT,returnBeatId:RETURN_BEAT,battleConfigId:BATTLE_CONFIG};
+  return{success:true,choiceId:CHOICE_ID,scene04ABeatId:SCENE04A_BEAT,battleBeatId:BATTLE_BEAT,returnBeatId:RETURN_BEAT,battleConfigId:BATTLE_CONFIG,fightBackdropId:FIGHT_BACKDROP_ID};
 }
 
 function actorMarkup35710(id,label,image,state,focus=false){return `<figure class="sc-scene-board-33900__actor ${focus?"is-focus":""}" data-actor-id="${escapeHTML(id)}"><div class="sc-scene-board-33900__actor-frame"></div><img src="${escapeHTML(image)}" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(label)}</strong><small>${escapeHTML(state)}</small></figcaption></figure>`;}
@@ -159,26 +193,44 @@ function boardMarkup35710(rt){
   const p=isScene04A(rt)?performance(rt):null,index=p?p.index:CUES.length-1,focus=p&&p.cue&&p.cue.focusActorRef||"academy_kakashi";
   const actors=[];
   actors.push(actorMarkup35710("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png",rt.beatId===BATTLE_BEAT?"ENGAGING MASKED INTERCEPTOR":focus==="academy_kakashi"?"FOCUSED":"PRESENT",focus==="academy_kakashi"));
-  if(index<=8&&rt.beatId===SCENE04A_BEAT)actors.push(actorMarkup35710("package_smuggler","PACKAGE SMUGGLER","Enemies Portraits/cipher_handler.png",index>=6?"ESCAPING WITH PACKAGE":"CURRENT PACKAGE HOLDER",focus==="package_smuggler"));
-  if(index>=3||rt.beatId!==SCENE04A_BEAT)actors.push(actorMarkup35710("masked_interceptor","MASKED INTERCEPTOR","Enemies Portraits/decoy_assassin.png",rt.beatId===RETURN_BEAT?"BATTLE RESULT COMMITTED":index>=9||rt.beatId===BATTLE_BEAT?"ENGAGING KAKASHI":"PRESSING PACKAGE SMUGGLER",focus==="masked_interceptor"||rt.beatId===BATTLE_BEAT));
+  if(index<=8&&rt.beatId===SCENE04A_BEAT)actors.push(actorMarkup35710("package_smuggler","PACKAGE SMUGGLER","NPC/package_smuggler.png",index>=6?"ESCAPING WITH PACKAGE":"CURRENT PACKAGE HOLDER",focus==="package_smuggler"));
+  if(index>=3||rt.beatId!==SCENE04A_BEAT)actors.push(actorMarkup35710("masked_interceptor","MASKED INTERCEPTOR","NPC/masked_interceptor.png",rt.beatId===RETURN_BEAT?"BATTLE RESULT COMMITTED":index>=9||rt.beatId===BATTLE_BEAT?"ENGAGING KAKASHI":"PRESSING PACKAGE SMUGGLER",focus==="masked_interceptor"||rt.beatId===BATTLE_BEAT));
   const packageObject=index<=7&&rt.beatId===SCENE04A_BEAT?`<div class="sc-scene-board-33900__objects"><span class="sc-scene-board-33900__object"><b>PACKAGE</b>PACKAGE SMUGGLER HAS PACKAGE</span></div>`:"";
   return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(OBJECTIVE)}</div></div><div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.join("")}</div>${packageObject}`;
 }
 function renderScene04APresentation35710(){
-  if(typeof document==="undefined")return false;const rt=active();if(!rt||rt.sceneId!==SCENE_ID||![SCENE04A_BEAT,BATTLE_BEAT,RETURN_BEAT].includes(rt.beatId))return false;
-  ensureObjectiveEmphasis35710();
+  if(typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
-  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;
-  if(!stage)return false;layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
-  let board=stage.querySelector&&stage.querySelector(".sc-scene-board-33900");if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const markup=boardMarkup35710(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
+  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
+  const rt=active();
+  if(!isScene04AFamily(rt)){clearFightBackdrop35710(stage);return false;}
+  ensurePresentationStyle35710();applyFightBackdrop35710(stage);
+  layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
+  let board=stage.querySelector&&stage.querySelector(`.${BOARD_CLASS}`);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;board.setAttribute("aria-hidden","true");stage.appendChild(board);}const markup=boardMarkup35710(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
   if(isScene04A(rt)){
     const p=performance(rt),cue=p.cue||{};layer.dataset.scPerformance="true";
     const text=layer.querySelector&&layer.querySelector(".sc-story-text");if(text&&text.textContent!==cue.text)text.textContent=cue.text;
     const name=layer.querySelector&&layer.querySelector(".sc-story-name");if(name){name.textContent="";name.style.display="none";}
     const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";
     const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  }else{
+    try{delete layer.dataset.scPerformance;delete layer.dataset.scBoardUiMode;}catch(_error){}
+    for(const node of stage.querySelectorAll?stage.querySelectorAll(".sc-performance-surface-33910"):[])node.remove();
   }
   return true;
+}
+
+function launchBattleAfterFinalCue35710(transition){
+  const after=active();if(!transition||transition.success!==true||!after||after.sceneId!==SCENE_ID||after.beatId!==BATTLE_BEAT)return transition;
+  const launcher=typeof globalThis.launchStorySceneBattle==="function"?globalThis.launchStorySceneBattle:(typeof launchStorySceneBattle==="function"?launchStorySceneBattle:null);
+  if(typeof launcher!=="function"){
+    try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}
+    return{...transition,battleLaunchPending:true,battleLaunchReason:"story_battle_launcher_missing"};
+  }
+  const launched=launcher.call(globalThis);
+  if(launched&&launched.success===true)return{...launched,autoLaunchedFromScene04A:true,storyTransition:transition};
+  try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}
+  return launched||{success:false,reason:"kakashi_scene04a_story_battle_launch_failed",storyTransition:transition};
 }
 
 let hooksInstalled=false,hookAttempts=0;
@@ -190,23 +242,26 @@ function installPresentationHooks35710(){
   globalThis.advanceStoryScene=function advanceStoryScene35710(choiceId=null){
     const rt=active();if(!isScene04A(rt)||choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
     const p=performance(rt);if(!p.atEnd){const next=p.index+1;rt.localContext={...(rt.localContext||{}),[CURSOR_KEY]:next};save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return{success:true,type:"kakashi_scene04a_performance_cue_advanced",beatId:SCENE04A_BEAT,cueIndex:next,semanticBeatUnchanged:true};}
-    if(rt.localContext)delete rt.localContext[CURSOR_KEY];save();return PRE_ADVANCE.apply(this,arguments);
+    if(rt.localContext)delete rt.localContext[CURSOR_KEY];save();
+    const transition=PRE_ADVANCE.apply(this,arguments);
+    return launchBattleAfterFinalCue35710(transition);
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
   if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35710(){const result=PRE_RENDER.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(renderScene04APresentation35710);else setTimeout(renderScene04APresentation35710,0);return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
-  hooksInstalled=true;ensureObjectiveEmphasis35710();renderScene04APresentation35710();return true;
+  hooksInstalled=true;ensurePresentationStyle35710();renderScene04APresentation35710();return true;
 }
 function ensurePresentationHooks35710(){if(installPresentationHooks35710())return;if(typeof setTimeout==="function"&&hookAttempts++<80)setTimeout(ensurePresentationHooks35710,25);}
 
 function diagnostics(){
-  const def=scene(),major=def&&def.beatMap instanceof Map?def.beatMap.get(MAJOR_BEAT):null,choice=major&&Array.isArray(major.choices)?major.choices.find(row=>row&&row.choiceId===CHOICE_ID):null,battle=def&&def.beatMap instanceof Map?def.beatMap.get(BATTLE_BEAT):null,ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null;
+  const def=scene(),major=def&&def.beatMap instanceof Map?def.beatMap.get(MAJOR_BEAT):null,choice=major&&Array.isArray(major.choices)?major.choices.find(row=>row&&row.choiceId===CHOICE_ID):null,battle=def&&def.beatMap instanceof Map?def.beatMap.get(BATTLE_BEAT):null,ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null,scene04=def&&def.beatMap instanceof Map?def.beatMap.get(SCENE04A_BEAT):null;
   const exact=["Kakashi moves.","Not toward ANBU Marked Target.","Not toward the package.","Toward Masked Interceptor.","She is already closing on Package Smuggler when Kakashi drops between them.","Package Smuggler sees the opening immediately.","He turns and runs.","The package goes with him.","Kakashi does not follow.","Masked Interceptor changes direction without hesitation.","Her attention settles on Kakashi.","He has made himself the obstacle now.","She comes straight through him.","Kakashi meets her head-on."];
-  const checks={patchId:PATCH_ID==="alpha_kakashi_scene04a_35710_2026_09_18",authorityPinned:AUTHORITY==="64966fb33590d09e7ae16a33d51d0e7262b5891d",exactFourteenNarrationCues:CUES.length===14&&JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exact)&&CUES.every(row=>row.kind==="narration"&&!row.speakerName),stopAssassinWired:!!choice&&choice.nextBeatId===SCENE04A_BEAT&&Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>row&&row.requestId===INTENT_REQUEST),intentBeforeBattle:ensureStopAssassinIntent35710.toString().includes("commitStoryIntent"),exactBattleConfig:!!battle&&battle.mode==="battle_transition"&&battle.battle&&battle.battle.encounterId===BATTLE_CONFIG&&BATTLE_CONFIG==="academy_kakashi_origin_battle_mi_1v1",exactBattleBinding:BINDING==="academy_kakashi.battle.stop_assassin"&&SOURCE_ANCHOR==="AK_SA_019",noPakkun:launchScene04ABattle35710.toString().includes("pakkunAuthorized:false"),returnsSameBranch:!!battle&&battle.battle.postBattleBeatId===RETURN_BEAT&&!!ret&&ret.mode==="post_battle",battleReturnConsumed:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(row=>row&&row.requestId===RETURN_REQUEST)&&consumeScene04ABattleReturn35710.toString().includes("dispatchCommittedIntent"),noBattleOutcomeOverreach:consumeScene04ABattleReturn35710.toString().includes("resultState")&&!consumeScene04ABattleReturn35710.toString().includes("participantDeathCommitted:true")&&!consumeScene04ABattleReturn35710.toString().includes("participantCustodyCommitted:true"),objectiveExact:OBJECTIVE==="Retrieve the package.",browserGoldenClaimed:false};
-  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,browserGoldenClaimed:false};
+  const envId=beat=>beat&&beat.environmentRef&&beat.environmentRef.assetId||null;
+  const checks={patchId:PATCH_ID==="alpha_kakashi_scene04a_35710_v2_2026_09_18",authorityPinned:AUTHORITY==="64966fb33590d09e7ae16a33d51d0e7262b5891d",exactFourteenNarrationCues:CUES.length===14&&JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exact)&&CUES.every(row=>row.kind==="narration"&&!row.speakerName),stopAssassinWired:!!choice&&choice.nextBeatId===SCENE04A_BEAT&&Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>row&&row.requestId===INTENT_REQUEST),intentBeforeBattle:ensureStopAssassinIntent35710.toString().includes("commitStoryIntent"),fightBackdropBound:envId(scene04)===FIGHT_BACKDROP_ID&&envId(battle)===FIGHT_BACKDROP_ID&&envId(ret)===FIGHT_BACKDROP_ID&&FIGHT_BACKDROP_PATH==="Kakashi Origin Backdrop/fight_at_sakura_tree.png",persistentScene04ABoard:BOARD_CLASS==="sc-kakashi-scene04a-board-35710"&&renderScene04APresentation35710.toString().includes("BOARD_CLASS"),exactBattleConfig:!!battle&&battle.mode==="battle_transition"&&battle.battle&&battle.battle.encounterId===BATTLE_CONFIG&&BATTLE_CONFIG==="academy_kakashi_origin_battle_mi_1v1",exactBattleBinding:BINDING==="academy_kakashi.battle.stop_assassin"&&SOURCE_ANCHOR==="AK_SA_019",finalCueAutoLaunch:launchBattleAfterFinalCue35710.toString().includes("launchStorySceneBattle")&&globalThis.advanceStoryScene.toString().includes("launchBattleAfterFinalCue35710"),noPakkun:launchScene04ABattle35710.toString().includes("pakkunAuthorized:false"),returnsSameBranch:!!battle&&battle.battle.postBattleBeatId===RETURN_BEAT&&!!ret&&ret.mode==="post_battle",battleReturnConsumed:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(row=>row&&row.requestId===RETURN_REQUEST)&&consumeScene04ABattleReturn35710.toString().includes("dispatchCommittedIntent"),noBattleOutcomeOverreach:consumeScene04ABattleReturn35710.toString().includes("resultState")&&!consumeScene04ABattleReturn35710.toString().includes("participantDeathCommitted:true")&&!consumeScene04ABattleReturn35710.toString().includes("participantCustodyCommitted:true"),objectiveExact:OBJECTIVE==="Retrieve the package.",browserGoldenClaimed:false};
+  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,fightBackdropId:FIGHT_BACKDROP_ID,fightBackdropPath:FIGHT_BACKDROP_PATH,browserGoldenClaimed:false};
 }
 
 const installed=installSemanticSurface35710();if(!installed||installed.success!==true)throw new Error(`kakashi_scene04a_surface_install_failed:${installed&&installed.reason||"unknown"}`);
 ensurePresentationHooks35710();
 globalThis.runAcademyKakashiScene04A35710Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:CUES.length,choiceId:CHOICE_ID,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,objective:OBJECTIVE,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:CUES.length,choiceId:CHOICE_ID,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,objective:OBJECTIVE,fightBackdropId:FIGHT_BACKDROP_ID,fightBackdropPath:FIGHT_BACKDROP_PATH,browserGoldenClaimed:false});
 })();
