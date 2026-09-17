@@ -9,16 +9,18 @@
 // reward adapter -> terminal debrief -> terminal Scene Board asset binding ->
 // locked Scene 03A consumer.
 //
-// Generation 22 adds only the proof-bearing Scene 02 direct Attack/Pickpocket
-// consumer after the existing factual bindings. Scene 03A downstream choices
-// remain deliberately untouched. The old 34400 browser-red overlay remains
-// de-loaded. Browser Golden remains separately unclaimed.
+// Generation 23 delivers the completed direct Pickpocket factual/Battle return
+// and terminal consumption while preserving Direct Attack fail-closed at its
+// exact missing resolver position/resistance/Battle-state seam. Scene 03A
+// downstream choices remain deliberately untouched. The old 34400 browser-red
+// overlay remains de-loaded. Browser Golden remains separately unclaimed.
 //
 // Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
 // const BUILD="kakashi-final-20260917-19";
 // const BUILD="kakashi-final-20260917-20";
 // const BUILD="kakashi-final-20260917-21";
+// const BUILD="kakashi-final-20260917-22";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -39,7 +41,7 @@ const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
 const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
 const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
-const BUILD="kakashi-final-20260917-22";
+const BUILD="kakashi-final-20260917-23";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
