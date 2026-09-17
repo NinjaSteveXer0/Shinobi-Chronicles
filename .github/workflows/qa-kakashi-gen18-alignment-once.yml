@@ -43,11 +43,17 @@ jobs:
 
           path = Path("tools/qa_kakashi_pakkun_interception_35300.js")
           text = path.read_text()
-          old_assert = "assert(!consumer.includes('attemptAcademyKakashiPakkunBattleAction'),\"pre-Battle autonomy must not grant a free Battle action\");"
-          new_assert = "const resolveTakeStart=consumer.indexOf('function resolveTake(choice)');\nconst resolveAskStart=consumer.indexOf('function resolveAsk(choice)');\nassert(resolveTakeStart>=0&&resolveAskStart>resolveTakeStart,\"resolveTake function boundary missing\");\nconst resolveTakeSource=consumer.slice(resolveTakeStart,resolveAskStart);\nassert(!resolveTakeSource.includes('attemptAcademyKakashiPakkunBattleAction'),\"pre-Battle autonomy must not grant a free Battle action\");"
-          if text.count(old_assert) != 1:
+          old_free = "assert(!consumer.includes('attemptAcademyKakashiPakkunBattleAction'),\"pre-Battle autonomy must not grant a free Battle action\");"
+          new_free = "const resolveTakeStart=consumer.indexOf('function resolveTake(choice)');\nconst resolveAskStart=consumer.indexOf('function resolveAsk(choice)');\nassert(resolveTakeStart>=0&&resolveAskStart>resolveTakeStart,\"resolveTake function boundary missing\");\nconst resolveTakeSource=consumer.slice(resolveTakeStart,resolveAskStart);\nassert(!resolveTakeSource.includes('attemptAcademyKakashiPakkunBattleAction'),\"pre-Battle autonomy must not grant a free Battle action\");"
+          if text.count(old_free) != 1:
               raise SystemExit("35300 QA: expected one whole-file no-free-action assertion")
-          path.write_text(text.replace(old_assert, new_assert))
+          text = text.replace(old_free, new_free)
+
+          old_intel = "assert(!consumer.includes('verifiedActionableIntelligence:true'),\"Ask Destination must not silently grant intelligence reward predicate\");"
+          new_intel = "const closeBattleStart=consumer.indexOf('function closeBattleIntent(');\nassert(resolveAskStart>=0&&closeBattleStart>resolveAskStart,\"resolveAsk function boundary missing\");\nconst resolveAskSource=consumer.slice(resolveAskStart,closeBattleStart);\nassert(!resolveAskSource.includes('verifiedActionableIntelligence:true'),\"Ask Destination must not silently grant intelligence reward predicate\");"
+          if text.count(old_intel) != 1:
+              raise SystemExit("35300 QA: expected one whole-file intelligence assertion")
+          path.write_text(text.replace(old_intel, new_intel))
 
           stale=[]
           for path in Path("tools").glob("qa*.js"):
