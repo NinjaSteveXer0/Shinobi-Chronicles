@@ -4,6 +4,7 @@ on:
   push:
     branches: [ main ]
     paths:
+      - 'index.html'
       - 'runtime/alpha-arc1-reward-evaluation-35400.js'
       - 'tools/qa_arc1_reward_evaluation_35400.js'
       - 'tools/qa_issue_151_arc1_reward_exact_head.js'
