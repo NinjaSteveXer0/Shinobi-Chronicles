@@ -11,8 +11,7 @@
 // - direct Observe intent provenance and factual handoff/escalation commit;
 // - no unauthorised successor-scene prose;
 // - no Battle, reward, custody inference beyond the locked completed handoff;
-// - presentation-only suppression of the rooftop objective before the ANBU
-//   actually states the assignment.
+// - presentation-only objective projection follows the committed handoff state.
 // ============================================================================
 (function installAcademyKakashiScene03A35700(){
 "use strict";
@@ -40,7 +39,8 @@ const WORLD_OBJECT_REF="kakashi_origin_outer_route_packet";
 const CUSTOM_CURSOR="__kakashiScene03A35700Cursor";
 const NATIVE_CURSOR="__storyPerformanceCursor33900";
 const SAKURA=Object.freeze({assetId:"kakashi_origin_sakura_tree_night"});
-const BLOCKER="This branch scene has not yet received its locked player-facing Writing implementation.";
+const INITIAL_OBJECTIVE="Stop the package from falling into the wrong hands.";
+const POST_HANDOFF_OBJECTIVE="Retrieve the package.";
 
 const CUES=Object.freeze([
   Object.freeze({cueId:"scene03a_01",kind:"narration",text:"Kakashi stays where he is.",focusActorRef:"academy_kakashi"}),
@@ -74,13 +74,19 @@ const CHOICE_SPECS=Object.freeze([
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_error){return null;}}
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}}
-function factOf(row){return row&&(row.fact||row.data)||{};}
 function isScene03A(rt=active()){return!!rt&&rt.sceneId===SCENE_ID&&rt.beatId===TRANSFER_BEAT&&String(rt.localContext&&rt.localContext.kakashiOriginalAction||"")===OBSERVE_CHOICE;}
 function cursor(rt=active()){const raw=rt&&rt.localContext?Number(rt.localContext[CUSTOM_CURSOR]):0;return Number.isInteger(raw)?Math.max(0,Math.min(CUES.length-1,raw)):0;}
 function performance(rt=active()){const index=cursor(rt);return{sequence:CUES,index,cue:CUES[index],atEnd:index>=CUES.length-1};}
 function coarseNativeIndex(index){if(index<=2)return 0;if(index<=9)return 1;return 2;}
 function syncNativeCursor(rt,index){if(!rt)return;rt.localContext=rt.localContext&&typeof rt.localContext==="object"?rt.localContext:{};rt.localContext[NATIVE_CURSOR]={beatId:TRANSFER_BEAT,index:coarseNativeIndex(index)};}
-function blockedAvailability(){return{available:true,knownBlocker:null};}
+function availableChoice(){return{available:true,knownBlocker:null};}
+function objectiveForState35700(rt=active()){
+  if(!rt||rt.sceneId!==SCENE_ID)return null;
+  if(String(rt.localContext&&rt.localContext.kakashiOriginalAction||"")!==OBSERVE_CHOICE)return INITIAL_OBJECTIVE;
+  if(rt.beatId===MAJOR_BEAT)return POST_HANDOFF_OBJECTIVE;
+  if(rt.beatId===TRANSFER_BEAT&&cursor(rt)>=3)return POST_HANDOFF_OBJECTIVE;
+  return INITIAL_OBJECTIVE;
+}
 
 function openingContextRef(rt){return PROVIDER.stableRef("sc35700-kakashi-observe-entry",{sceneId:SCENE_ID,storySceneInstanceId:String(rt&&rt.instanceId||""),beatId:OPENING_BEAT});}
 function existingDecisionReceipt(contextStateRef){
@@ -129,7 +135,7 @@ function commitScene03A35700(){
     occurrence=A.findOccurrence(occurrenceId)||committed.record||null;
   }
   const result={outcomeClass:"OBSERVE_TRANSFER_ESCALATION",handoffCompleted:true,packageCustody:"PACKAGE_SMUGGLER",packageRecipientObserved:true,maskedInterceptorVisible:true,nextDecisionPointRef:"OBSERVE_ESCALATION"};
-  const bridge={success:true,resolverResultRef:occurrenceId,consequenceRefs:[occurrenceId],stateDeltaRefs:[occurrenceId],knowledgeDeltaRefs:[occurrenceId],relationshipHistoryRefs:[],objectiveDeltaRefs:[],successorSituationRef:"academy_kakashi.decision.observe_escalation",result};
+  const bridge={success:true,resolverResultRef:occurrenceId,consequenceRefs:[occurrenceId],stateDeltaRefs:[occurrenceId],knowledgeDeltaRefs:[occurrenceId],relationshipHistoryRefs:[],objectiveDeltaRefs:[occurrenceId],successorSituationRef:"academy_kakashi.decision.observe_escalation",result};
   const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN_ID,receiptId:String(receipt.storyDecisionReceiptId),state:{resolverResults:{[OBSERVE_BINDING]:bridge}},context:{sceneRef:SCENE_ID,originId:ORIGIN_ID,storySceneInstanceId:String(rt.instanceId),selectedChoiceId:OBSERVE_CHOICE,committedStateRef:occurrenceId}});
   if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"kakashi_scene03a_semantic_dispatch_failed"};
   const opened=ensureObserveEscalationChoiceSet(rt,occurrenceId);if(!opened||opened.success!==true)return opened;
@@ -149,15 +155,25 @@ function installSemanticSurface35700(){
   major.mode="choice";major.environmentRef=SAKURA;major.text="";major.presentationResolver=null;major.exitScene=false;major.allowPresentationClose=false;major.nextBeatId=null;
   major.onEnterConsequences=Array.isArray(major.onEnterConsequences)?major.onEnterConsequences.filter(row=>row&&row.requestId!==COMMIT_REQUEST):[];
   major.onEnterConsequences.push({requestId:COMMIT_REQUEST,kind:"domain",resolve:()=>commitScene03A35700()});
-  major.choices=CHOICE_SPECS.map(spec=>({choiceId:spec.choiceId,label:spec.label,nextBeatId:MAJOR_BEAT,availability:blockedAvailability,knownBlocker:null}));
+  major.choices=CHOICE_SPECS.map(spec=>({choiceId:spec.choiceId,label:spec.label,nextBeatId:MAJOR_BEAT,availability:availableChoice,knownBlocker:null}));
   return{success:true,observeChoiceId:OBSERVE_CHOICE,majorChoiceIds:major.choices.map(row=>row.choiceId)};
 }
 
 let presentationHooksInstalled=false;let hookAttempts=0;
-function syncObjectiveVisibility35700(){
+function setObjectiveText35700(node,text){
+  if(!node||!text)return false;
+  const label=node.querySelector&&node.querySelector("b");
+  if(!label){node.textContent=text;return true;}
+  while(label.nextSibling)label.nextSibling.remove();
+  node.appendChild(document.createTextNode(text));
+  return true;
+}
+function syncObjective35700(){
   if(typeof document==="undefined")return false;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
   const node=layer.querySelector&&layer.querySelector(".sc-scene-board-33900__objective");if(!node)return false;
-  const rt=active();if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!=="kak_original_rooftop"){node.style.removeProperty("display");return true;}
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID){return false;}
+  const objective=objectiveForState35700(rt)||INITIAL_OBJECTIVE;setObjectiveText35700(node,objective);
+  if(rt.beatId!=="kak_original_rooftop"){node.style.removeProperty("display");return true;}
   const p=typeof globalThis.getStoryScenePerformance33900==="function"?globalThis.getStoryScenePerformance33900():null;
   const reveal=!!p&&Number(p.index)>=3;node.style.setProperty("display",reveal?"":"none",reveal?"":"important");if(reveal)node.style.removeProperty("display");return true;
 }
@@ -172,21 +188,24 @@ function installPresentationHooks35700(){
     syncNativeCursor(rt,CUES.length-1);save();const result=PRE_ADVANCE.apply(this,arguments);const after=active();if(!after||after.sceneId!==SCENE_ID||after.beatId!==TRANSFER_BEAT){try{if(rt.localContext){delete rt.localContext[CUSTOM_CURSOR];delete rt.localContext[NATIVE_CURSOR];}save();}catch(_error){}}return result;
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35700(){const result=PRE_RENDER.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(syncObjectiveVisibility35700);else setTimeout(syncObjectiveVisibility35700,0);return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
-  if(typeof document!=="undefined"&&typeof MutationObserver==="function"){const root=document.getElementById("story-scene-presentation-layer")||document.body;if(root){const observer=new MutationObserver(()=>syncObjectiveVisibility35700());observer.observe(root,{childList:true,subtree:true});}}
-  presentationHooksInstalled=true;syncObjectiveVisibility35700();return true;
+  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35700(){const result=PRE_RENDER.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(syncObjective35700);else setTimeout(syncObjective35700,0);return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  if(typeof document!=="undefined"&&typeof MutationObserver==="function"){const root=document.getElementById("story-scene-presentation-layer")||document.body;if(root){const observer=new MutationObserver(()=>syncObjective35700());observer.observe(root,{childList:true,subtree:true});}}
+  presentationHooksInstalled=true;syncObjective35700();return true;
 }
 function ensurePresentationHooks35700(){if(installPresentationHooks35700())return;if(typeof setTimeout==="function"&&hookAttempts++<80)setTimeout(ensurePresentationHooks35700,25);}
 
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,action=map&&map.get(OPENING_BEAT),observe=action&&Array.isArray(action.choices)?action.choices.find(row=>row&&row.choiceId===OBSERVE_CHOICE):null,major=map&&map.get(MAJOR_BEAT);
   const exactTexts=["Kakashi stays where he is.","Not passive.","Watching.","ANBU Marked Target shifts the package from beneath his clothing and places it into Package Smuggler's hand.","The moment custody changes, the whole problem changes with it.","Kakashi's eye follows the package.","ANBU Marked Target is already moving away.","Package Smuggler turns in the opposite direction.","Kakashi has one additional fact now—who received the package—and less control over the situation than he had a few seconds earlier.","The trade was information for escalation.","Then the darkness beside the alley moved.","Not slowly.","A figure tore out of it like a lightning streak.","Masked Interceptor hit the new situation at speed, driving straight toward Package Smuggler and forcing him to react before he had properly cleared the exchange.","ANBU Marked Target broke away.","Package Smuggler tightened around the package.","Masked Interceptor cut across his escape line.","And Kakashi, still unseen for one more heartbeat, had to choose what mattered most now."];
-  const checks={patchId:PATCH_ID==="alpha_kakashi_scene03a_35700_2026_09_17",authorityPinned:AUTHORITY==="ebc5f9ed1575ac01f72fd24487c3e38f09112117",scene03AEighteenCues:CUES.length===18,scene03AVerbatim:JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exactTexts),scene03ANarrationOnly:CUES.every(row=>row.kind==="narration"&&!row.speakerName),observeIntentProvenance:!!observe&&Array.isArray(observe.consequenceRequests)&&observe.consequenceRequests.some(row=>row&&row.requestId===OBSERVE_REQUEST),scene03AFiveChoices:!!major&&major.choices.map(row=>row.choiceId).join("|")==="stop_assassin|secure_package|secure_package_before_assassin|defeat_assassin_then_secure|go_after_original_target",scene03AChoiceLabelsExact:!!major&&major.choices.map(row=>row.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",scene03AFiveChoicesAvailable:!!major&&major.choices.every(row=>typeof row.availability==="function"&&row.availability().available===true&&row.knownBlocker===null),unauthorisedSuccessorsRemainContained:!!major&&major.choices.every(row=>row.nextBeatId===MAJOR_BEAT&&(!Array.isArray(row.consequenceRequests)||row.consequenceRequests.length===0)),factualCommitBeforeChoice:!!major&&Array.isArray(major.onEnterConsequences)&&major.onEnterConsequences.some(row=>row&&row.requestId===COMMIT_REQUEST),noScene03ADialogue:CUES.every(row=>row.kind!=="dialogue"),rooftopObjectiveRevealAfterAssignment:syncObjectiveVisibility35700.toString().includes("Number(p.index)>=3"),presentationHookReadyOrHeadless:typeof document==="undefined"||presentationHooksInstalled,browserGoldenClaimed:false};
-  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,choiceIds:CHOICE_SPECS.map(row=>row.choiceId),browserGoldenClaimed:false};
+  const beforeHandoff={sceneId:SCENE_ID,beatId:TRANSFER_BEAT,localContext:{kakashiOriginalAction:OBSERVE_CHOICE,[CUSTOM_CURSOR]:2}};
+  const atHandoff={sceneId:SCENE_ID,beatId:TRANSFER_BEAT,localContext:{kakashiOriginalAction:OBSERVE_CHOICE,[CUSTOM_CURSOR]:3}};
+  const afterHandoff={sceneId:SCENE_ID,beatId:MAJOR_BEAT,localContext:{kakashiOriginalAction:OBSERVE_CHOICE}};
+  const checks={patchId:PATCH_ID==="alpha_kakashi_scene03a_35700_2026_09_17",authorityPinned:AUTHORITY==="ebc5f9ed1575ac01f72fd24487c3e38f09112117",scene03AEighteenCues:CUES.length===18,scene03AVerbatim:JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exactTexts),scene03ANarrationOnly:CUES.every(row=>row.kind==="narration"&&!row.speakerName),observeIntentProvenance:!!observe&&Array.isArray(observe.consequenceRequests)&&observe.consequenceRequests.some(row=>row&&row.requestId===OBSERVE_REQUEST),scene03AFiveChoices:!!major&&major.choices.map(row=>row.choiceId).join("|")==="stop_assassin|secure_package|secure_package_before_assassin|defeat_assassin_then_secure|go_after_original_target",scene03AChoiceLabelsExact:!!major&&major.choices.map(row=>row.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",scene03AFiveChoicesAvailable:!!major&&major.choices.every(row=>typeof row.availability==="function"&&row.availability().available===true&&row.knownBlocker===null),unauthorisedSuccessorsRemainContained:!!major&&major.choices.every(row=>row.nextBeatId===MAJOR_BEAT&&(!Array.isArray(row.consequenceRequests)||row.consequenceRequests.length===0)),objectiveWordingExact:INITIAL_OBJECTIVE==="Stop the package from falling into the wrong hands."&&POST_HANDOFF_OBJECTIVE==="Retrieve the package.",objectiveChangesAtPackageTransfer:objectiveForState35700(beforeHandoff)===INITIAL_OBJECTIVE&&objectiveForState35700(atHandoff)===POST_HANDOFF_OBJECTIVE&&objectiveForState35700(afterHandoff)===POST_HANDOFF_OBJECTIVE,factualCommitBeforeChoice:!!major&&Array.isArray(major.onEnterConsequences)&&major.onEnterConsequences.some(row=>row&&row.requestId===COMMIT_REQUEST),objectiveDeltaBridged:commitScene03A35700.toString().includes("objectiveDeltaRefs:[occurrenceId]"),noScene03ADialogue:CUES.every(row=>row.kind!=="dialogue"),rooftopObjectiveRevealAfterAssignment:syncObjective35700.toString().includes("Number(p.index)>=3"),presentationHookReadyOrHeadless:typeof document==="undefined"||presentationHooksInstalled,browserGoldenClaimed:false};
+  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,choiceIds:CHOICE_SPECS.map(row=>row.choiceId),objectives:Object.freeze({initial:INITIAL_OBJECTIVE,postHandoff:POST_HANDOFF_OBJECTIVE}),browserGoldenClaimed:false};
 }
 
 const installed=installSemanticSurface35700();if(!installed||installed.success!==true)throw new Error(`kakashi_scene03a_surface_install_failed:${installed&&installed.reason||"unknown"}`);
 ensurePresentationHooks35700();
 globalThis.runAcademyKakashiScene03A35700Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:CUES.length,choiceIds:CHOICE_SPECS.map(row=>row.choiceId),browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:CUES.length,choiceIds:CHOICE_SPECS.map(row=>row.choiceId),objectives:Object.freeze({initial:INITIAL_OBJECTIVE,postHandoff:POST_HANDOFF_OBJECTIVE}),browserGoldenClaimed:false});
 })();
