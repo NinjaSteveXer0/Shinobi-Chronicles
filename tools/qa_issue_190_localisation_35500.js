@@ -9,6 +9,8 @@ const loaderPath='runtime/alpha-origin-scenes-32900-core.js';
 const runtime=fs.readFileSync(runtimePath,'utf8');
 const loader=fs.readFileSync(loaderPath,'utf8');
 
+// Exact-head bridge: this file is watched by both the focused #190 workflow and
+// the global #141 tools/qa_*.js closure workflow, so both gates certify one SHA.
 function boot({stored=null,languages=['en-US']}={}){
   const store=new Map();if(stored!==null)store.set('shinobiChroniclesLocaleV1',stored);
   const playerData={rank:'Genin',currentPL:42,ownership:{academy_kakashi:true},knowledge:{lead:'sealed'},activityHistory:[{occurrenceId:'occ_1',intent:'OBSERVE'}]};
