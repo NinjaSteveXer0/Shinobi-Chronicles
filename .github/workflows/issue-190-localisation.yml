@@ -5,8 +5,14 @@ on:
     branches: [ main ]
     paths:
       - 'runtime/alpha-localisation-35500.js'
+      - 'runtime/alpha-localisation-content-35510.js'
       - 'runtime/alpha-origin-scenes-32900-core.js'
+      - 'runtime/alpha-origin-scenes-32900-a.js'
+      - 'runtime/alpha-origin-scenes-32900-b.js'
+      - 'runtime/alpha-origin-scenes-32900-c.js'
+      - 'runtime/alpha-journey-surface-32800.js'
       - 'tools/qa_issue_190_localisation_35500.js'
+      - 'tools/qa_issue_190_localisation_content_35510.js'
       - '.github/workflows/issue-190-localisation.yml'
   workflow_dispatch:
 
@@ -24,7 +30,11 @@ jobs:
       - name: Syntax check localisation runtime
         run: |
           node --check runtime/alpha-localisation-35500.js
+          node --check runtime/alpha-localisation-content-35510.js
           node --check runtime/alpha-origin-scenes-32900-core.js
           node --check tools/qa_issue_190_localisation_35500.js
+          node --check tools/qa_issue_190_localisation_content_35510.js
       - name: Issue 190 localisation core QA
         run: node tools/qa_issue_190_localisation_35500.js
+      - name: Issue 190 broad content coverage QA
+        run: node tools/qa_issue_190_localisation_content_35510.js
