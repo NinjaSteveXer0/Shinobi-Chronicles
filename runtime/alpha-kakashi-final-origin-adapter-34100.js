@@ -11,6 +11,9 @@
 // Generation 19 consumes the closed AK_SA_033 post-PS package-recovery authority
 // and binds the approved terminal Hokage Administration / Minato presentation.
 // Browser Golden remains separately unclaimed.
+//
+// Legacy terminal-debrief QA tranche marker only (not the active cache build):
+// kakashi-final-20260917-18
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
