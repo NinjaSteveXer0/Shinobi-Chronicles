@@ -16,7 +16,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_OBJECTIVE_PRESENTATION_35720)return;
 
-const PATCH_ID="alpha_kakashi_objective_presentation_35720_2026_09_18";
+const PATCH_ID="alpha_kakashi_objective_presentation_35720_v2_2026_09_18";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const ROOFTOP_BEAT="kak_original_rooftop";
 const OPENED_CUE_ID="scene01_10";
@@ -24,7 +24,7 @@ const STYLE_ID="sc-kakashi-objective-presentation-35720-style";
 
 function installStyle(){
   if(typeof document==="undefined"||!document.head)return false;
-  const prior=document.getElementById(STYLE_ID);if(prior)prior.remove();
+  if(document.getElementById(STYLE_ID))return true;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
 #story-scene-presentation-layer .sc-scene-board-33900__objective{
   min-width:310px!important;
@@ -91,11 +91,12 @@ function installHooks(){
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks,25);}
 function diagnostics(){
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_objective_presentation_35720_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_objective_presentation_35720_v2_2026_09_18",
     objectiveRevealCuePinned:OPENED_CUE_ID==="scene01_10",
     revealRequiresOpenedEnvelope:syncObjectiveGate35720.toString().includes('objectState||"")==="opened"')&&syncObjectiveGate35720.toString().includes("Number(p.index)>=9"),
     globalObjectiveSizing:installStyle.toString().includes("min-width:310px")&&installStyle.toString().includes("min-height:62px"),
     survivesBoardRebuildByLayerGate:installStyle.toString().includes('data-sc-kakashi-objective-gate="hidden"'),
+    styleInstallIdempotent:installStyle.toString().includes("getElementById(STYLE_ID))return true"),
     noMutationObserver:!installHooks.toString().includes("MutationObserver")&&!syncObjectiveGate35720.toString().includes("MutationObserver"),
     browserGoldenClaimed:false
   };
