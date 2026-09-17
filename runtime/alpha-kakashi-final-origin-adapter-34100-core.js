@@ -1,5 +1,6 @@
 // ============================================================================
 // ISSUES #188 + #192 — ACADEMY KAKASHI FINAL NEUTRAL STORY ADAPTER — 34100
+// Exact-head QA retrigger after executable #192 autonomy coverage; no semantic change.
 //
 // Final Writing authority:
 // - 176ce76feef3e67d4c24644e3d7443a04dcf7d6b
