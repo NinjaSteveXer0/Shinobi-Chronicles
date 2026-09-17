@@ -6,6 +6,27 @@ Date: 2026-09-17
 
 Purpose: establish the only allowed production workflow for completing Academy Kakashi's Origin from this point forward.
 
+## Required scene description fields
+
+Every Kakashi Origin scene presented to Stephen must use these five player-facing production fields:
+
+1. **Backdrop**
+2. **Objective**
+3. **Narration**
+4. **Dialogue**
+5. **Choices**
+
+`Objective` is the exact current top-right Story objective projected from the committed scene state. Writing must actively check whether the objective changes during or after each scene rather than carrying stale objective text forward automatically.
+
+If a scene changes the factual mission state enough to change the objective, the scene authority must identify the exact change point and the new exact player-facing objective wording.
+
+Current Kakashi objective continuity lock:
+
+- after Kakashi opens the ANBU envelope on the rooftop, the objective is: **Stop the package from falling into the wrong hands.**
+- when ANBU Marked Target hands the package to Package Smuggler, the objective changes to: **Retrieve the package.**
+
+The Objective display is presentation of current Story state. It does not manufacture new Story facts, custody, success, failure, or branch resolution.
+
 ## Binding workflow
 
 Kakashi's Origin will be completed **one scene at a time**.
@@ -13,40 +34,46 @@ Kakashi's Origin will be completed **one scene at a time**.
 For each scene, the required order is:
 
 1. **Writing authors exactly one scene.**
+   - Backdrop, Objective, Narration, Dialogue, and Choices must be clearly separated.
    - Dialogue and Narration/Action must be clearly separated.
    - Existing approved dialogue must be preserved verbatim unless Stephen has explicitly approved a replacement.
+   - The current Objective must match committed Story state, and any objective change must be explicitly identified at the exact causal point where it becomes true.
    - Do not author later scenes in the same production handoff.
    - If the scene contains a player choice, every choice branch must be explicitly labelled in the scene authority before GitHub write.
 
 2. **Stephen reviews that exact scene.**
    - Stephen may approve, edit, or reject it.
    - No scene is production authority until Stephen approves it.
+   - Stephen is also approving the exact Objective wording and any objective-change point included in the scene.
    - If the scene contains choices, Stephen is approving both the exact player-facing choice wording and the branch labels used to track each continuation.
 
 3. **Writing commits only the approved scene to GitHub.**
    - The GitHub scene file must match Stephen's approved wording.
    - No paraphrasing, compression, expansion, reordering, substitution, or additional dialogue is allowed during commit.
    - Dialogue changes require Stephen's explicit approval before GitHub write under the separate dialogue-approval guardrail.
+   - Objective wording/change points must be preserved exactly as approved.
    - Choice branches must be written as separately labelled continuations; do not bury or merge sibling branches in prose.
 
 4. **Coding implements that exact locked scene.**
-   - Coding consumes the scene's exact Dialogue/Narration split and existing semantic/resolver authority.
-   - Coding must not rewrite dialogue or narration while implementing.
+   - Coding consumes the scene's exact Backdrop/Objective/Narration/Dialogue/Choices authority and existing semantic/resolver authority.
+   - Coding must not rewrite dialogue, narration, or objective wording while implementing.
    - Runtime bindings should use stable cue/semantic IDs rather than mutable prose wherever possible.
+   - Objective projection must update only from the authorised committed Story state/change point.
    - Choice branch labels/IDs are tracking identity only; player-facing choice text remains the approved choice wording.
 
 5. **Coding records implementation evidence for that scene.**
    - exact implementation commit;
    - source/headless/runtime checks appropriate to the scene;
    - browser evidence when the scene is player-facing and browser-verifiable;
-   - exact branch coverage for every choice branch contained in that scene.
+   - exact branch coverage for every choice branch contained in that scene;
+   - objective projection/change evidence where the scene changes the objective.
    - Implementation is not called complete merely because the Writing file exists.
 
 6. **Only after Coding has implemented the current scene does Writing move to the next scene.**
 
 Binding loop:
 
-`WRITE ONE SCENE -> LABEL EVERY CHOICE BRANCH -> STEPHEN APPROVES -> WRITE EXACT APPROVED SCENE TO GITHUB -> CODING IMPLEMENTS THAT SCENE + ITS BRANCHES -> RECORD EVIDENCE -> MOVE TO NEXT SCENE`
+`WRITE ONE SCENE -> CHECK CURRENT OBJECTIVE / OBJECTIVE CHANGE -> LABEL EVERY CHOICE BRANCH -> STEPHEN APPROVES -> WRITE EXACT APPROVED SCENE TO GITHUB -> CODING IMPLEMENTS THAT SCENE + ITS BRANCHES -> RECORD EVIDENCE -> MOVE TO NEXT SCENE`
 
 ## Choice-branch labelling rule
 
@@ -88,6 +115,8 @@ Do not:
 - let Coding infer or invent missing dialogue;
 - let Writing alter dialogue during commit after Stephen approval;
 - let UI/presentation/localisation silently rewrite approved dialogue;
+- carry an old Objective forward after committed Story state has changed it;
+- let CE/UI invent a new Objective without exact Story authority;
 - treat a Writing commit as runtime implementation proof;
 - move Writing ahead several scenes while Coding is still implementing an earlier scene;
 - create replacement scene text from stale runtime prose when newer Stephen-approved scene authority exists;
@@ -116,6 +145,8 @@ Where stale runtime text conflicts with the current Stephen-approved scene file,
 
 Where an approved branch label conflicts with a stale runtime-only label, the current Stephen-approved scene authority wins for branch tracking identity.
 
+Where a stale runtime Objective conflicts with the current approved committed Story state, the approved objective-change authority wins for player-facing projection.
+
 ## Completion condition
 
-Academy Kakashi's Origin is complete only when every scene has passed this loop, every choice branch is durably labelled and implemented, and the final scene has been implemented and validated. Only then should the Origin receive final consolidated closure/audit/handoff status.
+Academy Kakashi's Origin is complete only when every scene has passed this loop, every choice branch is durably labelled and implemented, every Objective transition is projected from the correct committed Story state, and the final scene has been implemented and validated. Only then should the Origin receive final consolidated closure/audit/handoff status.
