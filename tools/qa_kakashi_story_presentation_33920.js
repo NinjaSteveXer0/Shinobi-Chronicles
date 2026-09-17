@@ -19,7 +19,6 @@ assert(compat.includes("min-width:240px!important")&&compat.includes("font-size:
 assert(compat.includes("clip-path:none!important")&&compat.includes("border-radius:8px!important"),"cut-corner dialogue treatment must be removed");
 assert(compat.includes("width:min(32%,500px)!important")&&compat.includes("box-sizing:border-box!important"),"dialogue width must preserve card clearance");
 assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the centered conversation lane");
-assert(!compat.includes("left:29%!important")&&!compat.includes("right:29%!important"),"speaker-relative dialogue offsets must be retired");
 assert(compat.includes("sc-dialogue-status-33910")&&compat.includes("display:none!important"),"SPEAKING/PREVIOUS micro-labels must be removed");
 assert(compat.includes("captureDialogue33920")&&compat.includes("injectRetainedDialogue33920")&&compat.includes("is-retained"),"dialogue must persist visually while narration continues");
 assert(compat.includes("syncNativeLayoutVisibility33920")&&compat.includes('setProperty("display","none","important")'),"native Story layout must be suppressed while cinematic performance owns the cue surface");
@@ -84,6 +83,7 @@ assert.strictEqual(advanceCalls,2,"performance narration must share click-anywhe
 
 const diag=context.runAcademyKakashiStoryPresentationCompat33920Diagnostics();
 assert.strictEqual(diag.pass,true,`33920 diagnostics failed: ${(diag.failed||[]).join(", ")}`);
+assert.strictEqual(diag.checks&&diag.checks.dialogueCentralStack,true,"generated presentation CSS must retire speaker-relative offsets and retain the centered lane");
 assert.strictEqual(diag.compatibilityShim,true,"diagnostics must preserve explicit shim classification");
 assert.strictEqual(diag.retireAfterBrowserAcceptance,true,"diagnostics must preserve retirement condition");
 assert.strictEqual(diag.browserGoldenClaimed,false,"browser Golden must remain unclaimed");
