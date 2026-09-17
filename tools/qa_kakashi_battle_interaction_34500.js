@@ -45,9 +45,9 @@ assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/clos
 // that same coherent delivery generation until the next deliberate cache bump.
 assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),
   "32900 Story-decision parent identity is stale");
-assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-15'),
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-16'),
   "34000 Kakashi adapter parent identity is stale");
-assert(adapterSrc.includes('const BUILD="kakashi-final-20260917-15";'),
+assert(adapterSrc.includes('const BUILD="kakashi-final-20260917-16";'),
   "34100 must request current Kakashi child cache identity");
 assert(adapterSrc.includes('fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`'),
   "34500 child is not versioned by current Kakashi BUILD");
@@ -173,6 +173,6 @@ console.log(JSON.stringify({
   hoverPresentationOnly:true,
   rerenderHandlerHardening:true,
   resolverSemanticsUntouched:true,
-  kakashiChildCacheIdentity:"kakashi-final-20260917-15",
+  kakashiChildCacheIdentity:"kakashi-final-20260917-16",
   browserGoldenClaimed:false
 },null,2));
