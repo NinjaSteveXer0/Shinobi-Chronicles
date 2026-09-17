@@ -63,6 +63,8 @@ assert(MOD&&CORE,"Scene 03A dependencies did not install");
 const diag=globalThis.runAcademyKakashiScene03A35700Diagnostics();
 assert.strictEqual(diag.pass,true,`35700 diagnostics failed: ${JSON.stringify(diag.failed)}`);
 assert.strictEqual(MOD.cueCount,18,"Scene 03A cue count drifted");
+assert.deepStrictEqual(MOD.objectives,{initial:"Stop the package from falling into the wrong hands.",postHandoff:"Retrieve the package."},"Scene 03A objective wording drifted");
+assert.strictEqual(diag.checks.objectiveChangesAtPackageTransfer,true,"Scene 03A objective does not change at exact package-transfer cue");
 
 const action=definition.beatMap.get("kak_original_action");
 const observe=action.choices.find(row=>row.choiceId==="observe");
@@ -113,6 +115,7 @@ assert.strictEqual(receipt.status,"resolved","Observe semantic intent did not re
 assert.strictEqual(receipt.successorSituationRef,"academy_kakashi.decision.observe_escalation");
 assert(receipt.stateDeltaRefs.includes(occurrence.occurrenceId),"Scene 03A factual occurrence not bridged as state delta");
 assert(receipt.knowledgeDeltaRefs.includes(occurrence.occurrenceId),"Scene 03A Knowledge occurrence not bridged");
+assert(receipt.objectiveDeltaRefs.includes(occurrence.occurrenceId),"Scene 03A objective change not bridged from handoff occurrence");
 
 const major=definition.beatMap.get("kak_original_major_choice");
 assert.strictEqual(major.text,"","Scene 03A choice beat retained unauthorised legacy prose");
@@ -138,6 +141,7 @@ console.log("Academy Kakashi Scene 03A 35700 QA: PASS");
 console.log(`- exact narration cues: ${expected.length}`);
 console.log("- dialogue: none");
 console.log("- factual handoff: ANBU Marked Target -> Package Smuggler");
+console.log("- objective: Stop the package from falling into the wrong hands. -> Retrieve the package. at exact handoff cue");
 console.log("- Masked Interceptor visibility commits after transfer");
 console.log("- exact five-way choice surface installed and available; successor scenes remain contained");
 console.log("- Observe semantic receipt resolves idempotently from committed Scene 03A state");
