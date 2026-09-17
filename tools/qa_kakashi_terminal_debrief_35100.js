@@ -67,7 +67,7 @@ run(terminal,"runtime/alpha-kakashi-terminal-debrief-35100.js");
 
 assert(loader.includes('runtime/alpha-kakashi-origin-rewards-34800.js'),"34100 does not production-load 34800 rewards");
 assert(loader.includes('runtime/alpha-kakashi-terminal-debrief-35100.js'),"34100 does not production-load 35100 terminal bridge");
-assert(loader.includes('kakashi-final-20260917-15'),"Kakashi child cache generation did not advance for reward tranche");
+assert(loader.includes('kakashi-final-20260917-17'),"Kakashi child cache generation did not advance for reward tranche");
 assert.strictEqual(plain(`runAcademyKakashiOriginRewards34800Diagnostics()`).pass,true,"34800 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).pass,true,"35100 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).browserGoldenClaimed,false);
