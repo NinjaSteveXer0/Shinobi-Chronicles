@@ -65,7 +65,7 @@ try{
     "He breaks it. A target photograph waits inside."
   ];
   for(const line of exactScene1)assert(`scene1_verbatim_${exactScene1.indexOf(line)+1}`,kakashiV3Source.includes(line));
-  for(const stale of ["What do you want?","Why bring this to me?","The Hokage approved you to assist us on this assignment."]){assert(`scene1_stale_copy_absent_${stale}`,!kakashiV3Source.includes(stale));}
+  assert("scene1_prohibited_stale_copy_absent",d33910.checks&&d33910.checks.prohibitedStaleRooftopCopyAbsent===true,d33910);
   assert("scene1_dialogue_narration_boundary_is_explicit",kakashiV3Source.includes('cue.kind!=="dialogue"'));
   assert("kakashi_v3_exact_final_story_card_assets",kakashiV3Source.includes('NPC/anbu_marked_target.png')&&kakashiV3Source.includes('NPC/package_smuggler.png')&&kakashiV3Source.includes('NPC/masked_interceptor.png'));
   assert("kakashi_v3_exact_extended_backdrops",backdrops.get("kakashi_origin_end_of_alleyway")==="Kakashi Origin Backdrop/end_of_alleyway.png"&&backdrops.get("kakashi_origin_pakkun_interception_alley")==="Kakashi Origin Backdrop/alleyway_konoha_night.png",[...backdrops]);
