@@ -1,19 +1,16 @@
 // ============================================================================
-// ISSUES #188 + #192 + #201 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
+// ISSUES #188 + #192 + #201 + #217 + #218 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
 //
-// The final semantic adapter is preserved byte-for-byte in the 34100 core file.
 // Browser order is:
-// semantic core -> stale-authority guard -> Combat deployment -> exact
-// sequential Story/Battle consumer -> installed-browser presentation fixes ->
-// Kakashi Substitution supersession -> installed-browser Battle interaction ->
-// neutral factual provider -> canonical Kakashi factual-state commit owner ->
-// Kakashi factual bindings -> Pakkun interception consumer -> Kakashi reward
-// adapter -> factual terminal debrief / Chronicle Receipt bridge.
-// Headless semantic QA loads only core + guard; dedicated harnesses load later
-// layers explicitly so each ownership seam remains independently testable.
-// Generation 18 consumes the closed AK_SA_008/009/010/011/018/024 interception
-// tranche while Browser Golden remains separately unclaimed.
-// Exact-head validation trigger after generation-18 QA alignment.
+// semantic core -> stale-authority guard -> Combat deployment -> sequential
+// Story/Battle consumer -> browser fixes -> Substitution -> Battle interaction ->
+// neutral factual provider -> Kakashi factual state/bindings -> sequential post-PS
+// package recovery -> Pakkun interception -> reward adapter -> terminal debrief ->
+// terminal Scene Board asset binding.
+//
+// Generation 19 consumes the closed AK_SA_033 post-PS package-recovery authority
+// and binds the approved terminal Hokage Administration / Minato presentation.
+// Browser Golden remains separately unclaimed.
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -28,10 +25,12 @@ const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-3
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
 const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
+const POST_PS_RECOVERY_PATH="runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js";
 const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
-const BUILD="kakashi-final-20260917-18";
+const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
+const BUILD="kakashi-final-20260917-19";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -45,6 +44,15 @@ function loadHeadless(path){
   vm.runInThisContext(fs.readFileSync(absolute,"utf8"),{filename:path});
   return true;
 }
+function appendScript(id,path,onload){
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return false;
+  const existing=document.getElementById(id);
+  if(existing){if(typeof onload==="function")existing.addEventListener("load",onload,{once:true});return true;}
+  const script=document.createElement("script");
+  script.id=id;script.src=`${path}?sc=${BUILD}`;script.async=false;
+  if(typeof onload==="function")script.addEventListener("load",onload,{once:true});
+  document.head.appendChild(script);return true;
+}
 
 if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function"){
   if(!globalThis.SC_ALPHA_KAKASHI_FINAL_34100&&!loadHeadless(CORE_PATH))return;
@@ -52,143 +60,63 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadTerminalSceneBoard(){
+  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_SCENE_BOARD_35610)return;
+  appendScript("sc-alpha-kakashi-terminal-scene-board-35610-script",TERMINAL_SCENE_BOARD_PATH);
+}
 function loadTerminalDebrief(){
-  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100||document.getElementById("sc-alpha-kakashi-terminal-debrief-35100-script"))return;
-  const terminal=document.createElement("script");
-  terminal.id="sc-alpha-kakashi-terminal-debrief-35100-script";
-  terminal.src=`${TERMINAL_DEBRIEF_PATH}?sc=${BUILD}`;
-  terminal.async=false;
-  document.head.appendChild(terminal);
+  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100){loadTerminalSceneBoard();return;}
+  appendScript("sc-alpha-kakashi-terminal-debrief-35100-script",TERMINAL_DEBRIEF_PATH,loadTerminalSceneBoard);
 }
 function loadRewards(){
   if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800){loadTerminalDebrief();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-origin-rewards-34800-script");
-  if(existing){existing.addEventListener("load",loadTerminalDebrief,{once:true});return;}
-  const rewards=document.createElement("script");
-  rewards.id="sc-alpha-kakashi-origin-rewards-34800-script";
-  rewards.src=`${REWARD_PATH}?sc=${BUILD}`;
-  rewards.async=false;
-  rewards.addEventListener("load",loadTerminalDebrief,{once:true});
-  document.head.appendChild(rewards);
+  appendScript("sc-alpha-kakashi-origin-rewards-34800-script",REWARD_PATH,loadTerminalDebrief);
 }
 function loadInterception(){
   if(globalThis.SC_ALPHA_KAKASHI_PAKKUN_INTERCEPTION_35300){loadRewards();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-pakkun-interception-35300-script");
-  if(existing){existing.addEventListener("load",loadRewards,{once:true});return;}
-  const interception=document.createElement("script");
-  interception.id="sc-alpha-kakashi-pakkun-interception-35300-script";
-  interception.src=`${INTERCEPTION_PATH}?sc=${BUILD}`;
-  interception.async=false;
-  interception.addEventListener("load",loadRewards,{once:true});
-  document.head.appendChild(interception);
+  appendScript("sc-alpha-kakashi-pakkun-interception-35300-script",INTERCEPTION_PATH,loadRewards);
+}
+function loadPostPsRecovery(){
+  if(globalThis.SC_ALPHA_KAKASHI_SEQ_POST_PS_RECOVERY_35600){loadInterception();return;}
+  appendScript("sc-alpha-kakashi-sequential-post-ps-recovery-35600-script",POST_PS_RECOVERY_PATH,loadInterception);
 }
 function loadKakashiFactualBindings(){
-  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadInterception();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-factual-bindings-34700-script");
-  if(existing){existing.addEventListener("load",loadInterception,{once:true});return;}
-  const bindings=document.createElement("script");
-  bindings.id="sc-alpha-kakashi-factual-bindings-34700-script";
-  bindings.src=`${KAKASHI_FACTUAL_BINDINGS_PATH}?sc=${BUILD}`;
-  bindings.async=false;
-  bindings.addEventListener("load",loadInterception,{once:true});
-  document.head.appendChild(bindings);
+  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadPostPsRecovery();return;}
+  appendScript("sc-alpha-kakashi-factual-bindings-34700-script",KAKASHI_FACTUAL_BINDINGS_PATH,loadPostPsRecovery);
 }
 function loadFactualState(){
   if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120){loadKakashiFactualBindings();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-factual-state-34120-script");
-  if(existing){existing.addEventListener("load",loadKakashiFactualBindings,{once:true});return;}
-  const state=document.createElement("script");
-  state.id="sc-alpha-kakashi-factual-state-34120-script";
-  state.src=`${FACTUAL_STATE_PATH}?sc=${BUILD}`;
-  state.async=false;
-  state.addEventListener("load",loadKakashiFactualBindings,{once:true});
-  document.head.appendChild(state);
+  appendScript("sc-alpha-kakashi-factual-state-34120-script",FACTUAL_STATE_PATH,loadKakashiFactualBindings);
 }
 function loadFactualProvider(){
   if(globalThis.SC_STORY_FACTUAL_RESOLVER_34600){loadFactualState();return;}
-  const existing=document.getElementById("sc-story-factual-resolver-34600-script");
-  if(existing){existing.addEventListener("load",loadFactualState,{once:true});return;}
-  const factual=document.createElement("script");
-  factual.id="sc-story-factual-resolver-34600-script";
-  factual.src=`${FACTUAL_PROVIDER_PATH}?sc=${BUILD}`;
-  factual.async=false;
-  factual.addEventListener("load",loadFactualState,{once:true});
-  document.head.appendChild(factual);
+  appendScript("sc-story-factual-resolver-34600-script",FACTUAL_PROVIDER_PATH,loadFactualState);
 }
 function loadBattleInteraction(){
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_INTERACTION_34500){loadFactualProvider();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-battle-interaction-hotfix-34500-script");
-  if(existing){existing.addEventListener("load",loadFactualProvider,{once:true});return;}
-  const fix=document.createElement("script");
-  fix.id="sc-alpha-kakashi-battle-interaction-hotfix-34500-script";
-  fix.src=`${BATTLE_INTERACTION_PATH}?sc=${BUILD}`;
-  fix.async=false;
-  fix.addEventListener("load",loadFactualProvider,{once:true});
-  document.head.appendChild(fix);
+  appendScript("sc-alpha-kakashi-battle-interaction-hotfix-34500-script",BATTLE_INTERACTION_PATH,loadFactualProvider);
 }
 function loadSubstitution(){
   if(globalThis.SC_ALPHA_KAKASHI_SUBSTITUTION_34900){loadBattleInteraction();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-substitution-34900-script");
-  if(existing){existing.addEventListener("load",loadBattleInteraction,{once:true});return;}
-  const substitution=document.createElement("script");
-  substitution.id="sc-alpha-kakashi-substitution-34900-script";
-  substitution.src=`${SUBSTITUTION_PATH}?sc=${BUILD}`;
-  substitution.async=false;
-  substitution.addEventListener("load",loadBattleInteraction,{once:true});
-  document.head.appendChild(substitution);
+  appendScript("sc-alpha-kakashi-substitution-34900-script",SUBSTITUTION_PATH,loadBattleInteraction);
 }
 function loadBrowserFix(){
   if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400){loadSubstitution();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-browser-red-fixes-34400-script");
-  if(existing){existing.addEventListener("load",loadSubstitution,{once:true});return;}
-  const fix=document.createElement("script");
-  fix.id="sc-alpha-kakashi-browser-red-fixes-34400-script";
-  fix.src=`${BROWSER_FIX_PATH}?sc=${BUILD}`;
-  fix.async=false;
-  fix.addEventListener("load",loadSubstitution,{once:true});
-  document.head.appendChild(fix);
+  appendScript("sc-alpha-kakashi-browser-red-fixes-34400-script",BROWSER_FIX_PATH,loadSubstitution);
 }
 function loadSequential(){
   if(globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410){loadBrowserFix();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-final-sequential-consumer-34410-script");
-  if(existing){existing.addEventListener("load",loadBrowserFix,{once:true});return;}
-  const sequential=document.createElement("script");
-  sequential.id="sc-alpha-kakashi-final-sequential-consumer-34410-script";
-  sequential.src=`${SEQUENTIAL_PATH}?sc=${BUILD}`;
-  sequential.async=false;
-  sequential.addEventListener("load",loadBrowserFix,{once:true});
-  document.head.appendChild(sequential);
+  appendScript("sc-alpha-kakashi-final-sequential-consumer-34410-script",SEQUENTIAL_PATH,loadBrowserFix);
 }
 function loadBattle(){
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300){loadSequential();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-origin-battle-deployment-34300-script");
-  if(existing){existing.addEventListener("load",loadSequential,{once:true});return;}
-  const battle=document.createElement("script");
-  battle.id="sc-alpha-kakashi-origin-battle-deployment-34300-script";
-  battle.src=`${BATTLE_PATH}?sc=${BUILD}`;
-  battle.async=false;
-  battle.addEventListener("load",loadSequential,{once:true});
-  document.head.appendChild(battle);
+  appendScript("sc-alpha-kakashi-origin-battle-deployment-34300-script",BATTLE_PATH,loadSequential);
 }
 function loadGuard(){
   if(globalThis.SC_ALPHA_KAKASHI_FINAL_GUARD_34200){loadBattle();return;}
-  const existing=document.getElementById("sc-alpha-kakashi-final-authority-guard-34200-script");
-  if(existing){existing.addEventListener("load",loadBattle,{once:true});return;}
-  const guard=document.createElement("script");
-  guard.id="sc-alpha-kakashi-final-authority-guard-34200-script";
-  guard.src=`${GUARD_PATH}?sc=${BUILD}`;
-  guard.async=false;
-  guard.addEventListener("load",loadBattle,{once:true});
-  document.head.appendChild(guard);
+  appendScript("sc-alpha-kakashi-final-authority-guard-34200-script",GUARD_PATH,loadBattle);
 }
 
 if(globalThis.SC_ALPHA_KAKASHI_FINAL_34100){loadGuard();return;}
-const existing=document.getElementById("sc-alpha-kakashi-final-34100-core-script");
-if(existing){existing.addEventListener("load",loadGuard,{once:true});return;}
-const core=document.createElement("script");
-core.id="sc-alpha-kakashi-final-34100-core-script";
-core.src=`${CORE_PATH}?sc=${BUILD}`;
-core.async=false;
-core.addEventListener("load",loadGuard,{once:true});
-document.head.appendChild(core);
+appendScript("sc-alpha-kakashi-final-34100-core-script",CORE_PATH,loadGuard);
 })();
