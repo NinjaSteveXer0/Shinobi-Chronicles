@@ -31,9 +31,9 @@ for(const forbidden of ["commitStoryIntent","resolveStoryFactualAction","launchA
 
 // Production delivery contract.
 assert(restoration.includes('alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}'),"33800 must load 33920 from the Scene Board chain");
-assert(restoration.includes('const BUILD="scene-board-20260917-5";'),"33800 Scene Board child identity must remain on accepted Scene 1 generation 5");
+assert(restoration.includes('const BUILD="scene-board-20260917-6";'),"33800 Scene Board child identity must advance to Scene 2 generation 6");
 assert(restoration.includes('polish.addEventListener("load",load33920,{once:true})'),"33920 must wait until the live 33910 consumer is loaded");
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260917-5";'),"33200 Scene Board parent identity must remain on accepted Scene 1 generation 5");
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260917-6";'),"33200 Scene Board parent identity must advance to Scene 2 generation 6");
 assert(traversal.includes('alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}'),"33200 must deliver 33800 through the versioned terminal chain");
 
 // Minimal installed-DOM semantic harness: non-interactive dialogue/narration
@@ -100,6 +100,7 @@ console.log(JSON.stringify({
   duplicateNativePerformanceSurfaceSuppressed:true,
   clickAnywhereDialogueAndNarration:true,
   controlsProtected:true,
+  sceneBoardDeliveryGeneration:6,
   compatibilityShim:true,
   retireAfterBrowserAcceptance:true,
   browserGoldenClaimed:false
