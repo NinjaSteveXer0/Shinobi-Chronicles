@@ -10,14 +10,16 @@ const restoration=fs.readFileSync(restorationPath,"utf8");
 const traversal=fs.readFileSync(traversalPath,"utf8");
 
 // Source / ownership contract.
-assert(compat.includes("academy_kakashi_story_presentation_compat_33920_v3_2026_09_17"),"33920 must expose the current v3 presentation patch identity");
+assert(compat.includes("academy_kakashi_story_presentation_compat_33920_v4_2026_09_17"),"33920 must expose the current v4 presentation patch identity");
 assert(compat.includes("compatibilityShim:true"),"33920 must identify itself as a compatibility shim");
 assert(compat.includes("retireAfterBrowserAcceptance:true"),"33920 must declare its retirement condition");
 assert(compat.includes("sc-scene-board-33900__actor-tag")&&compat.includes("display:none!important"),"runtime actor name overlay must be suppressed on collectible cards");
 assert(compat.includes("sc-performance-next-33910")&&compat.includes("removeAdvanceButtons33920"),"redundant dialogue/narration arrow must be removed");
 assert(compat.includes("min-width:240px!important")&&compat.includes("font-size:11px!important"),"scene object/instruction plate must be materially larger");
 assert(compat.includes("clip-path:none!important")&&compat.includes("border-radius:8px!important"),"cut-corner dialogue treatment must be removed");
-assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the central conversation stack");
+assert(compat.includes("width:min(32%,500px)!important")&&compat.includes("box-sizing:border-box!important"),"dialogue width must preserve card clearance");
+assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the centered conversation lane");
+assert(!compat.includes("left:29%!important")&&!compat.includes("right:29%!important"),"speaker-relative dialogue offsets must be retired");
 assert(compat.includes("sc-dialogue-status-33910")&&compat.includes("display:none!important"),"SPEAKING/PREVIOUS micro-labels must be removed");
 assert(compat.includes("captureDialogue33920")&&compat.includes("injectRetainedDialogue33920")&&compat.includes("is-retained"),"dialogue must persist visually while narration continues");
 assert(compat.includes("syncNativeLayoutVisibility33920")&&compat.includes('setProperty("display","none","important")'),"native Story layout must be suppressed while cinematic performance owns the cue surface");
@@ -29,12 +31,10 @@ for(const forbidden of ["commitStoryIntent","resolveStoryFactualAction","launchA
 
 // Production delivery contract.
 assert(restoration.includes('alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}'),"33800 must load 33920 from the Scene Board chain");
-assert(restoration.includes('const BUILD="scene-board-20260917-5";'),"33800 Scene Board child identity was not advanced to Scene 1 generation 5");
+assert(restoration.includes('const BUILD="scene-board-20260917-5";'),"33800 Scene Board child identity must remain on accepted Scene 1 generation 5");
 assert(restoration.includes('polish.addEventListener("load",load33920,{once:true})'),"33920 must wait until the live 33910 consumer is loaded");
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260917-5";'),"33200 Scene Board parent identity was not advanced to Scene 1 generation 5");
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260917-5";'),"33200 Scene Board parent identity must remain on accepted Scene 1 generation 5");
 assert(traversal.includes('alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}'),"33200 must deliver 33800 through the versioned terminal chain");
-assert(!restoration.includes('const BUILD="scene-board-20260916-4";'),"stale Scene Board child identity remains active");
-assert(!traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260916-4";'),"stale Scene Board parent identity remains active");
 
 // Minimal installed-DOM semantic harness: non-interactive dialogue/narration
 // clicks advance once; actual controls and decision mode do not.
@@ -90,15 +90,16 @@ assert.strictEqual(diag.browserGoldenClaimed,false,"browser Golden must remain u
 
 console.log(JSON.stringify({
   pass:true,
-  patch:"33920-v3",
+  patch:"33920-v4",
   redundantArrowRemoved:true,
   instructionPlateReadable:true,
   dialogueCentralStack:true,
+  dialogueCardClearance:true,
+  speakerRelativeOffsetsRetired:true,
   dialoguePersistsDuringNarration:true,
   duplicateNativePerformanceSurfaceSuppressed:true,
   clickAnywhereDialogueAndNarration:true,
   controlsProtected:true,
-  sceneBoardParentCacheIdentityAdvanced:true,
   compatibilityShim:true,
   retireAfterBrowserAcceptance:true,
   browserGoldenClaimed:false
