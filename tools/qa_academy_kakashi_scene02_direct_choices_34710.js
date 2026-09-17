@@ -12,7 +12,10 @@ function freshDefinition(){
   const major={beatId:"kak_original_major_choice",mode:"choice",choices:[choice("fight_assassin","STOP THE ASSASSIN","kak_original_major_choice"),choice("secure_package","SECURE THE PACKAGE","kak_original_secured"),choice("defeat_assassin_then_recover","DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","kak_original_major_choice"),choice("pursue_original_target","GO AFTER THE ORIGINAL TARGET","kak_original_pursue")]};
   const secured={beatId:"kak_original_secured",mode:"narration",exitScene:true,onEnterConsequences:[]};
   const pursue={beatId:"kak_original_pursue",mode:"narration",exitScene:true,onEnterConsequences:[]};
-  return{sceneId:"origin_academy_kakashi_anbu_retrieval",entryBeatId:"kak_original_action",beatMap:new Map([[action.beatId,action],[transfer.beatId,transfer],[major.beatId,major],[secured.beatId,secured],[pursue.beatId,pursue]]),onCompleteConsequences:[]};
+  // Production loader order is 34410 -> 34710. 34410 owns this shared terminal
+  // boundary, so the focused 34710 fixture must model that canonical dependency.
+  const debriefPending={beatId:"kak_seq_debrief_pending",mode:"narration",exitScene:false,allowPresentationClose:false,onEnterConsequences:[]};
+  return{sceneId:"origin_academy_kakashi_anbu_retrieval",entryBeatId:"kak_original_action",beatMap:new Map([[action.beatId,action],[transfer.beatId,transfer],[major.beatId,major],[secured.beatId,secured],[pursue.beatId,pursue],[debriefPending.beatId,debriefPending]]),onCompleteConsequences:[]};
 }
 
 let definition=freshDefinition();
@@ -68,6 +71,7 @@ let fact=globalThis.playerData.activityHistory[0].fact||globalThis.playerData.ac
 assert.strictEqual(fact.factClass,"academy_kakashi_direct_attack_factual_state");
 assert.strictEqual(fact.knowledgeStateByObserver.academy_kakashi.maskedInterceptorVisible,false,"Direct Attack invented Masked Interceptor visibility");
 assert.strictEqual(semanticReceiptFor("attack").status,"resolved","Attack semantic intent did not resolve");
+assert(active.localContext.kakashiDirectAttackContinuationBlocker,"Attack did not preserve its exact fail-closed resolver-state blocker");
 const attackReplay=runRequest(attack,MOD.attackRequestId);
 assert.strictEqual(attackReplay.selectedOutcomeRef,attackResult.selectedOutcomeRef,"Attack replay rerolled factual outcome");
 assert.strictEqual(globalThis.playerData.activityHistory.length,1,"Attack replay duplicated Origin occurrence");
@@ -83,7 +87,7 @@ assert.strictEqual(semanticReceiptFor("attempt_pickpocket").status,"resolved","P
 if(pickResult.selectedOutcomeRef==="PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION"){
   assert.strictEqual(fact.packageState.currentHolderClass,"KAKASHI");assert.strictEqual(fact.worldFacts.maskedInterceptorVisible,false);assert.strictEqual(pick.nextBeatId,MOD.pickpocketSuccessBoundaryBeatId);
 }else{
-  assert.strictEqual(fact.worldFacts.maskedInterceptorVisible,true);assert.strictEqual(fact.worldFacts.battleConfigId,MOD.pickpocketBattleConfigId);assert.strictEqual(pick.nextBeatId,MOD.pickpocketBattleBeatId);
+  assert.strictEqual(fact.packageState.currentHolderClass,"ANBU_MARKED_TARGET");assert.strictEqual(fact.worldFacts.maskedInterceptorVisible,true);assert.strictEqual(fact.worldFacts.battleConfigId,MOD.pickpocketBattleConfigId);assert.strictEqual(pick.nextBeatId,MOD.pickpocketBattleBeatId);
 }
 const pickReplay=runRequest(pick,MOD.pickpocketRequestId);
 assert.strictEqual(pickReplay.selectedOutcomeRef,pickResult.selectedOutcomeRef,"Pickpocket replay rerolled factual outcome");
@@ -94,7 +98,7 @@ function forcePick(outcomeRef,key){
   resetRuntime(`qa-force-${key}`);
   const occurrenceId=PROVIDER.stableRef("qa-direct-pick",{key,outcomeRef});
   const out=PROVIDER.resolveStoryFactualAction({storyDecisionReceiptId:`qa-decision-${key}`,bindingRef:"academy_kakashi.resolver.pickpocket_direct",actorRef:"academy_kakashi",intentCommitRef:`qa-intent-${key}`,attemptOrdinal:1,idempotenceKey:`qa-idem-${key}`,eligibleOutcomeRefs:[outcomeRef],authorityVersionRefs:["qa-34710"],inputStateRefs:[`qa-state-${key}`],continuityLineageRef:active.instanceId,committedAtOccurrenceRef:occurrenceId,context:{storySceneInstanceId:active.instanceId,sceneId:definition.sceneId,beatId:"kak_original_action"}});
-  assert.strictEqual(out.success,true,`forced Pickpocket ${outcomeRef} failed: ${JSON.stringify(out)}`);return{out,fact:(globalThis.playerData.activityHistory[0].fact||globalThis.playerData.activityHistory[0].data)};
+  assert.strictEqual(out.success,true,`forced Pickpocket ${outcomeRef} failed: ${JSON.stringify(out)}`);return{out,occurrenceId,fact:(globalThis.playerData.activityHistory[0].fact||globalThis.playerData.activityHistory[0].data)};
 }
 const forcedSuccess=forcePick("PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION","success");
 assert.strictEqual(forcedSuccess.fact.packageState.currentHolderClass,"KAKASHI");
@@ -102,11 +106,12 @@ assert.strictEqual(forcedSuccess.fact.worldFacts.cleanExtractionSucceeded,true);
 assert.strictEqual(forcedSuccess.fact.worldFacts.maskedInterceptorVisible,false);
 assert.strictEqual(forcedSuccess.fact.worldFacts.pakkunPresent,false);
 const forcedFailure=forcePick("PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1","failure");
+assert.strictEqual(forcedFailure.fact.packageState.currentHolderClass,"ANBU_MARKED_TARGET");
 assert.strictEqual(forcedFailure.fact.worldFacts.cleanExtractionSucceeded,false);
 assert.strictEqual(forcedFailure.fact.worldFacts.maskedInterceptorVisible,true);
 assert.strictEqual(forcedFailure.fact.worldFacts.pakkunPresent,false);
 assert.strictEqual(forcedFailure.fact.worldFacts.battleConfigId,"academy_kakashi_origin_battle_amt_ps_mi_3v1");
-active.localContext={kakashiDirectOpeningOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1"};
+active.localContext={kakashiDirectOpeningOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",kakashiDirectOpeningOccurrenceId:forcedFailure.occurrenceId};
 const battleBeat=definition.beatMap.get(MOD.pickpocketBattleBeatId);assert(battleBeat&&battleBeat.mode==="battle_transition","direct Pickpocket 3-v-1 Battle beat missing");
 const launch=battleBeat.battle.launchResolver({active,returnContext:{type:"story_scene",sceneId:definition.sceneId}});
 assert.strictEqual(launch.success,true,"direct Pickpocket 3-v-1 launch failed");
@@ -116,9 +121,29 @@ assert.strictEqual(launched.sourceAnchorRef,"AK_SA_028");
 assert.strictEqual(launched.bindingRef,"academy_kakashi.resolver.pickpocket_direct");
 assert.strictEqual(launched.pakkunAuthorized,false);
 
+const participant=participantRef=>({participantRef,side:"enemy",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"});
+active.battleResume={authored:{battleOccurrenceId:"qa-battle-direct-pick-victory",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",bindingRef:"academy_kakashi.resolver.pickpocket_direct",resultState:"player_side_victory",rewardGranted:false,lootGranted:false,participants:[participant("academy_kakashi_origin_amt"),participant("academy_kakashi_origin_package_smuggler"),participant("academy_kakashi_origin_masked_interceptor")]}};
+const battleReturn=definition.beatMap.get(MOD.pickpocketBattleReturnBeatId);assert(battleReturn&&battleReturn.nextBeatId==="kak_seq_debrief_pending","direct Pickpocket Battle return does not feed debrief boundary");
+const returnReq=battleReturn.onEnterConsequences.find(r=>r.requestId===MOD.pickpocketBattleReturnRequestId);assert(returnReq,"direct Pickpocket Battle return request missing");
+const returned=returnReq.resolve();assert.strictEqual(returned.success,true,`direct Pickpocket victory return failed: ${JSON.stringify(returned)}`);
+assert.strictEqual(returned.packageHolderClass,"KAKASHI");
+assert.strictEqual(returned.participantClassifications.length,3,"direct Pickpocket victory did not classify all three opponents independently");
+assert.strictEqual(active.localContext.kakashiDirectPickpocketPackageOccurrenceId,returned.occurrenceId,"direct Pickpocket terminal package occurrence not exposed");
+let postFact=(globalThis.playerData.activityHistory.find(row=>row.occurrenceId===returned.occurrenceId).fact||globalThis.playerData.activityHistory.find(row=>row.occurrenceId===returned.occurrenceId).data);
+assert.strictEqual(postFact.participantDeathCommitted,false);assert.strictEqual(postFact.participantCustodyCommitted,false);assert.strictEqual(postFact.worldFacts.pakkunPresent,false);
+
+const forcedDefeat=forcePick("PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1","defeat");
+active.localContext={kakashiDirectOpeningOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",kakashiDirectOpeningOccurrenceId:forcedDefeat.occurrenceId};
+active.battleResume={authored:{battleOccurrenceId:"qa-battle-direct-pick-defeat",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",bindingRef:"academy_kakashi.resolver.pickpocket_direct",resultState:"opposition_side_victory",rewardGranted:false,lootGranted:false,participants:[]}};
+const defeated=MOD.consumeDirectPickpocket3v1Return();assert.strictEqual(defeated.success,true,`direct Pickpocket defeat return failed: ${JSON.stringify(defeated)}`);
+assert.strictEqual(defeated.packageHolderClass,"ANBU_MARKED_TARGET");assert.strictEqual(defeated.participantClassifications.length,0);
+postFact=(globalThis.playerData.activityHistory.find(row=>row.occurrenceId===defeated.occurrenceId).fact||globalThis.playerData.activityHistory.find(row=>row.occurrenceId===defeated.occurrenceId).data);
+assert.strictEqual(postFact.worldFacts.amtEscapesWithPackage,true);assert.strictEqual(postFact.worldFacts.pakkunPresent,false);
+
 assert(saves>0,"Scene 02 routes never persisted state");
 console.log("Academy Kakashi Scene 02 direct choices 34710 QA: PASS");
-console.log("- STRIKE BEFORE THE HANDOFF: selectable, semantic + factual route committed, no legacy transfer");
-console.log("- SLIP IN FOR THE PACKAGE: selectable, success/failure factual routes committed, no legacy transfer");
-console.log("- direct Pickpocket failure exact Battle: Kakashi vs AMT + Package Smuggler + Masked Interceptor (3-v-1)");
+console.log("- STRIKE BEFORE THE HANDOFF: selectable, semantic + factual state commits, exact missing resolver continuation remains fail-closed");
+console.log("- SLIP IN FOR THE PACKAGE success: package -> Kakashi, clean withdrawal -> debrief boundary");
+console.log("- SLIP IN FOR THE PACKAGE failure: AMT keeps package at Battle entry, exact 3-v-1, factual win/loss return -> debrief boundary");
+console.log("- 3-v-1 victory classifies AMT / Package Smuggler / Masked Interceptor independently; no death/custody/Pakkun inferred");
 console.log("- Scene 03A downstream choices remain untouched/fail-closed");
