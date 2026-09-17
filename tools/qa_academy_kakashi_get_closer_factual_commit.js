@@ -368,7 +368,7 @@ assert.strictEqual(replayHandoffReceipt.selectedOutcomeRef,"GET_CLOSER_SUCCESS_H
 const loader=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-final-origin-adapter-34100.js"),"utf8");
 assert(loader.includes("alpha-kakashi-factual-state-commit-34120.js"),"production loader missing 34120 factual commit owner");
 assert(loader.indexOf("loadFactualState")<loader.indexOf("function loadFactualProvider")||loader.includes("loadFactualState();return;"),"34120 load seam missing");
-assert(loader.includes('const BUILD="kakashi-final-20260917-17"'),"Kakashi child cache identity not advanced");
+assert(loader.includes('const BUILD="kakashi-final-20260917-18"'),"Kakashi child cache identity not advanced");
 
 console.log(JSON.stringify({
   pass:true,
