@@ -4,19 +4,21 @@
 // Canonical browser order is:
 // semantic core -> stale-authority guard -> Combat deployment -> sequential
 // Story/Battle consumer -> Substitution -> Battle interaction -> neutral factual
-// provider -> Kakashi factual state/bindings -> sequential post-PS package
-// recovery -> Pakkun interception -> reward adapter -> terminal debrief ->
-// terminal Scene Board asset binding -> locked Scene 03A consumer.
+// provider -> Kakashi factual state/bindings -> direct Scene 02 Attack/Pickpocket
+// consumer -> sequential post-PS package recovery -> Pakkun interception ->
+// reward adapter -> terminal debrief -> terminal Scene Board asset binding ->
+// locked Scene 03A consumer.
 //
-// Generation 21 adds only the Stephen-approved Scene 03A Watch-the-Exchange
-// consumer after the existing final Kakashi chain. The old 34400 browser-red
-// overlay remains deliberately de-loaded. Browser Golden remains separately
-// unclaimed.
+// Generation 22 adds only the proof-bearing Scene 02 direct Attack/Pickpocket
+// consumer after the existing factual bindings. Scene 03A downstream choices
+// remain deliberately untouched. The old 34400 browser-red overlay remains
+// de-loaded. Browser Golden remains separately unclaimed.
 //
 // Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
 // const BUILD="kakashi-final-20260917-19";
 // const BUILD="kakashi-final-20260917-20";
+// const BUILD="kakashi-final-20260917-21";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -30,13 +32,14 @@ const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-3
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
 const FACTUAL_STATE_PATH="runtime/alpha-kakashi-factual-state-commit-34120.js";
 const KAKASHI_FACTUAL_BINDINGS_PATH="runtime/alpha-kakashi-factual-bindings-34700.js";
+const DIRECT_OPENING_PATH="runtime/alpha-kakashi-direct-opening-consumer-34710.js";
 const POST_PS_RECOVERY_PATH="runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js";
 const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
 const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
 const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
-const BUILD="kakashi-final-20260917-21";
+const BUILD="kakashi-final-20260917-22";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -90,9 +93,13 @@ function loadPostPsRecovery(){
   if(globalThis.SC_ALPHA_KAKASHI_SEQ_POST_PS_RECOVERY_35600){loadInterception();return;}
   appendScript("sc-alpha-kakashi-sequential-post-ps-recovery-35600-script",POST_PS_RECOVERY_PATH,loadInterception);
 }
+function loadDirectOpening(){
+  if(globalThis.SC_ALPHA_KAKASHI_DIRECT_OPENING_34710){loadPostPsRecovery();return;}
+  appendScript("sc-alpha-kakashi-direct-opening-34710-script",DIRECT_OPENING_PATH,loadPostPsRecovery);
+}
 function loadKakashiFactualBindings(){
-  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadPostPsRecovery();return;}
-  appendScript("sc-alpha-kakashi-factual-bindings-34700-script",KAKASHI_FACTUAL_BINDINGS_PATH,loadPostPsRecovery);
+  if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700){loadDirectOpening();return;}
+  appendScript("sc-alpha-kakashi-factual-bindings-34700-script",KAKASHI_FACTUAL_BINDINGS_PATH,loadDirectOpening);
 }
 function loadFactualState(){
   if(globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120){loadKakashiFactualBindings();return;}
