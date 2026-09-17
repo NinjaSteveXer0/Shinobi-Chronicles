@@ -58,7 +58,7 @@ function unitStore(storyUnitRef){
   for(const field of ["choiceSets","decisionReceipts","autonomyReceipts","participantStates","materialStates"]){
     if(!store[field]||typeof store[field]!=="object")store[field]={};
   }
-  return store;
+  return root.storyUnits[key];
 }
 function save(){
   try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}
@@ -365,9 +365,10 @@ globalThis.runStoryDecisionRealisation34000Diagnostics=runStoryDecisionRealisati
       const id="sc-alpha-kakashi-final-34100-script";
       if(document.getElementById(id))return;
       const script=document.createElement("script");script.id=id;script.async=false;
-      // Historical delivery-QA marker only; the active URL below is generation 19.
+      // Historical delivery-QA markers only; active URL is consolidation generation 20.
       // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-18
-      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-19";
+      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-19
+      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-20";
       document.head.appendChild(script);return;
     }
     attempts+=1;if(attempts<240&&typeof setTimeout==="function")setTimeout(tryLoad,50);
