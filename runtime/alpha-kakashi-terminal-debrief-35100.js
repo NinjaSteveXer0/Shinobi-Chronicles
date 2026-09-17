@@ -1,5 +1,5 @@
 // ============================================================================
-// ISSUE #188 — ACADEMY KAKASHI TERMINAL DEBRIEF / RECEIPT BRIDGE — 35100
+// ISSUE #188 / #192 — ACADEMY KAKASHI TERMINAL DEBRIEF / RECEIPT BRIDGE — 35100
 //
 // Consumes the closed Kakashi Writing terminal sequence and 34800 Rewards
 // adapter through existing Story / Origin / semantic-state authorities.
@@ -24,7 +24,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v1_2026_09_17";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v2_2026_09_17";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -52,6 +52,7 @@ const SEQ_AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
 const HARD_3V1_CONFIG="academy_kakashi_origin_battle_amt_ps_mi_3v1";
 const SECURE_PURSUIT_REACHED="SECURE_PACKAGE_AMT_PURSUIT_SUCCESS_REACHED";
 const SECURE_PURSUIT_ESCAPED="SECURE_PACKAGE_AMT_PURSUIT_FAILURE_ESCAPED";
+const STAY_PACKAGE_PURSUIT_REACHED="PURSUIT_SUCCESS_AMT_REACHED";
 const SECURE_PACKAGE_VICTORY_CLASS="academy_kakashi_secure_package_2v1_post_battle_factual_state";
 const DEBRIEF_TYPE="origin_story_terminal_debrief";
 const RECEIPT_TYPE="origin_story_chronicle_receipt";
@@ -122,7 +123,7 @@ function supplementCurrentBattleCapture(){
 }
 function committedPackageState(){
   const l=local();if(!l)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
-  const candidateIds=[l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
+  const candidateIds=[l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
   for(const id of candidateIds){
     const row=occurrence(id),fact=factOf(row),pkg=fact&&fact.packageState||{};
     if(!row||!pkg.objectRef||String(pkg.objectRef)!==PACKAGE_REF||!pkg.currentHolderClass)continue;
@@ -170,7 +171,8 @@ function deriveTerminalFacts35100(){
   const sequential=sequentialBenchmark(battles);
   const exceptionalFieldExecution=explicit.cleanExtraction||threeVsOneVictory||sequential||explicit.explicitExceptional;
   const l=local()||{};
-  const pakkunPresent=String(l.kakashiObserveSecurePackageAmtPursuitOutcome||"")===SECURE_PURSUIT_REACHED&&!occurrence(pakkunDepartureOccurrenceId());
+  const pakkunEntered=String(l.kakashiObserveSecurePackageAmtPursuitOutcome||"")===SECURE_PURSUIT_REACHED||String(l.kakashiGetCloserStayPackagePursuitOutcomeRef||"")===STAY_PACKAGE_PURSUIT_REACHED||l.kakashiTerminalSequentialAmtReached35100===true;
+  const pakkunPresent=pakkunEntered&&!occurrence(pakkunDepartureOccurrenceId());
   const participantRefs=[...new Set(battles.flatMap(row=>row.participants||[]).map(row=>row&&row.participantRef).filter(Boolean))];
   return{
     success:true,terminalDebriefReached:true,storySceneInstanceId:String(rt.instanceId||""),
@@ -320,12 +322,14 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v1_2026_09_17",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v2_2026_09_17",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
+    stayPackagePursuitStateConsumed:committedPackageState.toString().includes("kakashiGetCloserStayPackagePursuitOccurrenceId"),
     battleVictoryNotTerminalEntitlement:!deriveTerminalFacts35100.toString().includes("terminalDebriefReached:false")&&!commitTerminalDebrief35100.toString().includes("resultState===\"player_side_victory\""),
     exactSequentialBenchmark:sequentialBenchmark.toString().includes("<=4")&&sequentialBenchmark.toString().includes("<=3")&&sequentialBenchmark.toString().includes("kakashiTerminalSequentialAmtReached35100"),
+    pakkunPresenceCoversIndependentRoutes:deriveTerminalFacts35100.toString().includes("kakashiGetCloserStayPackagePursuitOutcomeRef")&&deriveTerminalFacts35100.toString().includes("kakashiTerminalSequentialAmtReached35100"),
     receiptBeforeReward:commitChronicleReceiptAndRewards35100.toString().indexOf("A.commitOccurrence")<commitChronicleReceiptAndRewards35100.toString().indexOf("commitAcademyKakashiTerminalDebriefRewards34800"),
     rewardGrantGate:closureReady35100.toString().includes("rewardGrantReady"),
     pakkunDepartureExplicit:!!map&&[PAKKUN_1,PAKKUN_2,PAKKUN_3,PAKKUN_EXIT].every(id=>map.has(id)),
