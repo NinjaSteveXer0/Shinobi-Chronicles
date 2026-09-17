@@ -10,9 +10,11 @@ on:
       - 'runtime/alpha-kakashi-final-sequential-consumer-34410.js'
       - 'runtime/alpha-kakashi-factual-state-commit-34120.js'
       - 'runtime/alpha-kakashi-factual-bindings-34700.js'
+      - 'runtime/alpha-kakashi-direct-opening-consumer-34710.js'
       - 'runtime/alpha-kakashi-origin-rewards-34800.js'
       - 'runtime/alpha-kakashi-terminal-debrief-35100.js'
       - 'tools/qa_kakashi_terminal_debrief_35100.js'
+      - 'tools/qa_kakashi_direct_pickpocket_terminal_35100.js'
       - '.github/workflows/issue-188-kakashi-terminal-debrief.yml'
   workflow_dispatch:
 
@@ -29,3 +31,5 @@ jobs:
           node-version: '22'
       - name: Issue 188 Kakashi terminal debrief deterministic QA
         run: node tools/qa_kakashi_terminal_debrief_35100.js
+      - name: Issue 188 direct Pickpocket terminal consumption QA
+        run: node tools/qa_kakashi_direct_pickpocket_terminal_35100.js
