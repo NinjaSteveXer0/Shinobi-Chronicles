@@ -1,0 +1,329 @@
+name: Temporary Kakashi Direct Pickpocket Patch
+
+on:
+  push:
+    branches: [ coding/kakashi-direct-pickpocket-20260917 ]
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: coding/kakashi-direct-pickpocket-20260917
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Patch canonical Kakashi owners surgically
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path): return Path(path).read_text()
+          def write(path, text): Path(path).write_text(text)
+          def rep(text, old, new, label):
+              n=text.count(old)
+              if n != 1:
+                  raise SystemExit(f"{label}: expected exactly one match, found {n}")
+              return text.replace(old,new,1)
+
+          # 34710 — existing canonical Scene 02 direct-opening owner.
+          p='runtime/alpha-kakashi-direct-opening-consumer-34710.js'
+          s=read(p)
+          s=rep(s,'const PATCH_ID="alpha_kakashi_direct_opening_consumer_34710_2026_09_17";','const PATCH_ID="alpha_kakashi_direct_opening_consumer_34710_v2_2026_09_17";','34710 patch id')
+          s=rep(s,'const ACTION_BEAT="kak_original_action";','const ACTION_BEAT="kak_original_action";\nconst PENDING_BEAT="kak_seq_debrief_pending";','34710 pending beat')
+          s=rep(s,'const WORLD_OBJECT_REF="kakashi_origin_outer_route_packet";','const WORLD_OBJECT_REF="kakashi_origin_outer_route_packet";\nconst AMT="academy_kakashi_origin_amt";\nconst PS="academy_kakashi_origin_package_smuggler";\nconst MI="academy_kakashi_origin_masked_interceptor";','34710 participant refs')
+          s=rep(s,'const PICKPOCKET_REQUEST="kakashi_direct_pickpocket_factual_commit_34710";','const PICKPOCKET_REQUEST="kakashi_direct_pickpocket_factual_commit_34710";\nconst PICKPOCKET_RETURN_REQUEST="kakashi_direct_pickpocket_3v1_return_commit_34710";','34710 return request')
+          s=rep(s,'const PICKPOCKET_SUCCESS_BOUNDARY="kak_scene03d_pickpocket_success_authoring_boundary_34710";\n','','34710 retire empty success boundary')
+          s=rep(s,'function occurrenceRef(rt,decisionReceipt,bindingRef){return PROVIDER.stableRef("occ_origin_kakashi_direct_opening",{storySceneInstanceId:String(rt&&rt.instanceId||""),storyDecisionReceiptId:String(decisionReceipt&&decisionReceipt.storyDecisionReceiptId||""),bindingRef:String(bindingRef||"")});}',
+                'function occurrenceRef(rt,decisionReceipt,bindingRef){return PROVIDER.stableRef("occ_origin_kakashi_direct_opening",{storySceneInstanceId:String(rt&&rt.instanceId||""),storyDecisionReceiptId:String(decisionReceipt&&decisionReceipt.storyDecisionReceiptId||""),bindingRef:String(bindingRef||"")});}\nfunction postBattleOccurrenceRef(rt,result){return PROVIDER.stableRef("occ_origin_kakashi_direct_pickpocket_3v1_return",{storySceneInstanceId:String(rt&&rt.instanceId||""),battleOccurrenceId:String(result&&result.battleOccurrenceId||""),bindingRef:PICKPOCKET_BINDING});}\nfunction latestBattleResult(){const rt=active();return rt&&rt.sceneId===SCENE_ID&&rt.battleResume&&rt.battleResume.authored&&typeof rt.battleResume.authored==="object"?rt.battleResume.authored:null;}',
+                '34710 post battle refs')
+          s=rep(s,':{objectRef:WORLD_OBJECT_REF,currentHolderClass:pickSuccess?"KAKASHI":null,custodyClass:pickSuccess?"KAKASHI":"UNRESOLVED",handoffCompleted:false};',
+                ':{objectRef:WORLD_OBJECT_REF,currentHolderClass:pickSuccess?"KAKASHI":"ANBU_MARKED_TARGET",custodyClass:pickSuccess?"KAKASHI":"ANBU_MARKED_TARGET",handoffCompleted:false};',
+                '34710 direct failure package entry')
+          s=rep(s,'if(bindingRef===PICKPOCKET_BINDING)nextBeatId=selected==="PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1"?PICKPOCKET_BATTLE:PICKPOCKET_SUCCESS_BOUNDARY;',
+                'if(bindingRef===PICKPOCKET_BINDING)nextBeatId=selected==="PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1"?PICKPOCKET_BATTLE:PENDING_BEAT;',
+                '34710 direct success continuation')
+
+          helper=r'''function exactOppositionParticipants(result){
+  const participants=Array.isArray(result&&result.participants)?result.participants:[];
+  const refs=participants.filter(row=>row&&row.side==="opposition").map(row=>String(row.participantRef||""));
+  return refs.length===3&&[AMT,PS,MI].every(id=>refs.includes(id));
+}
+function commitDirectPickpocket3v1Return(){
+  const rt=active();if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_direct_pickpocket_story_occurrence_missing"};
+  if(String(rt.localContext&&rt.localContext.kakashiDirectOpeningOutcomeRef||"")!=="PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1")return{success:false,reason:"kakashi_direct_pickpocket_failure_fact_required"};
+  const result=latestBattleResult();if(!result)return{success:false,reason:"kakashi_direct_pickpocket_battle_result_missing"};
+  if(String(result.battleConfigId||"")!==PICKPOCKET_3V1_CONFIG)return{success:false,reason:"kakashi_direct_pickpocket_battle_config_mismatch"};
+  if(String(result.sourceAnchorRef||"")!=="AK_SA_028"||String(result.bindingRef||"")!==PICKPOCKET_BINDING)return{success:false,reason:"kakashi_direct_pickpocket_battle_provenance_mismatch"};
+  if(result.storyOccurrenceId&&String(result.storyOccurrenceId)!==String(rt.instanceId||""))return{success:false,reason:"kakashi_direct_pickpocket_battle_story_occurrence_mismatch"};
+  if(!exactOppositionParticipants(result))return{success:false,reason:"kakashi_direct_pickpocket_battle_participants_mismatch"};
+  const resultState=String(result.resultState||"");
+  if(!["player_side_victory","opposition_side_victory","withdrawn"].includes(resultState))return{success:false,reason:"kakashi_direct_pickpocket_battle_result_unresolved"};
+  const participants=Array.isArray(result.participants)?result.participants:[];
+  if(resultState==="player_side_victory"&&[AMT,PS,MI].some(id=>!participants.some(row=>row&&row.participantRef===id&&row.battleStatus==="defeated")))return{success:false,reason:"kakashi_direct_pickpocket_victory_missing_defeated_participant"};
+  const holder=resultState==="player_side_victory"?"KAKASHI":"ANBU_MARKED_TARGET";
+  const recovered=holder==="KAKASHI";
+  const occurrenceId=postBattleOccurrenceRef(rt,result);
+  const parentId=String(rt.localContext&&rt.localContext.kakashiDirectOpeningOccurrenceId||"");
+  const fact={
+    factClass:"academy_kakashi_direct_pickpocket_3v1_post_battle_factual_state",anchorRef:"AK_SA_028",storySceneInstanceId:String(rt.instanceId||""),
+    parentDirectPickpocketOccurrenceId:parentId,battleOccurrenceId:String(result.battleOccurrenceId||""),battleConfigId:PICKPOCKET_3V1_CONFIG,battleResultState:resultState,
+    packageState:{objectRef:WORLD_OBJECT_REF,currentHolderClass:holder,custodyClass:holder,handoffCompleted:false,recovered},
+    participantBattleFacts:participants.map(row=>({participantRef:row&&row.participantRef||null,side:row&&row.side||null,battleStatus:row&&row.battleStatus||null,lifeState:row&&row.lifeState||null,custodyState:row&&row.custodyState||null})).filter(row=>row.participantRef),
+    worldFacts:{cleanExtractionSucceeded:false,maskedInterceptorVisible:true,maskedInterceptorInvolved:true,pakkunPresent:false,battleRequired:true,packageRecovered:recovered},
+    participantDeathCommitted:false,participantCustodyCommitted:false
+  };
+  let existing=A.findOccurrence(occurrenceId);
+  if(existing){
+    const ef=factOf(existing);
+    if(String(ef.battleOccurrenceId||"")!==String(result.battleOccurrenceId||"")||String(ef.packageState&&ef.packageState.currentHolderClass||"")!==holder)return{success:false,reason:"kakashi_direct_pickpocket_post_battle_replay_mismatch"};
+  }else{
+    const committed=A.commitOccurrence(ORIGIN_ID,occurrenceId,fact,[],{type:"origin_story_post_battle_factual_occurrence",outcome:resultState,participantRefs:[ORIGIN_ID,AMT,PS,MI],sourceRefs:[{type:"origin_occurrence",id:parentId,role:"direct_pickpocket_failure"},{type:"battle_occurrence",id:String(result.battleOccurrenceId||""),role:"battle_fact"}]});
+    if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_direct_pickpocket_post_battle_commit_failed"};
+  }
+  if(resultState==="player_side_victory"){
+    for(const id of [AMT,PS,MI]){
+      const row=participants.find(p=>p&&p.participantRef===id);
+      if(row&&row.battleStatus==="defeated"&&String(row.lifeState||"unresolved")==="unresolved"&&String(row.custodyState||"unresolved")==="unresolved"){
+        const classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef:id,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:String(result.battleOccurrenceId||"")});
+        if(!classified||classified.success!==true)return classified||{success:false,reason:"kakashi_direct_pickpocket_participant_classification_failed",participantRef:id};
+      }
+    }
+  }
+  rt.localContext={...(rt.localContext||{}),kakashiDirectOpeningPostBattleOccurrenceId:occurrenceId,kakashiDirectOpeningPostBattleOutcome:resultState};
+  save();
+  return{success:true,occurrenceId,battleOccurrenceId:String(result.battleOccurrenceId||""),resultState,packageHolderClass:holder,packageRecovered:recovered,nextBeatId:PENDING_BEAT};
+}
+
+'''
+          marker='function installBeatsAndChoices(){'
+          if s.count(marker)!=1: raise SystemExit('34710 install marker drifted')
+          s=s.replace(marker,helper+marker,1)
+          start=s.index('function installBeatsAndChoices(){')
+          end=s.index('\n\nconst upgraded=upgradeBindings()',start)
+          new_install=r'''function installBeatsAndChoices(){
+  const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null;if(!map)return{success:false,reason:"kakashi_direct_opening_scene_missing"};
+  const action=map.get(ACTION_BEAT);if(!action||!Array.isArray(action.choices))return{success:false,reason:"kakashi_direct_opening_action_missing"};
+  const attack=action.choices.find(row=>row&&row.choiceId===ATTACK_CHOICE),pick=action.choices.find(row=>row&&row.choiceId===PICKPOCKET_CHOICE);if(!attack||!pick)return{success:false,reason:"kakashi_direct_opening_choices_missing"};
+  if(!map.has(PENDING_BEAT))return{success:false,reason:"kakashi_direct_opening_terminal_pending_beat_missing"};
+  const beats=[
+    {beatId:ATTACK_BOUNDARY,mode:"narration",environmentRef:action.environmentRef||SAKURA,text:"",exitScene:false,allowPresentationClose:false},
+    {beatId:PICKPOCKET_BATTLE,mode:"battle_transition",environmentRef:action.environmentRef||SAKURA,text:"",battle:{encounterId:PICKPOCKET_3V1_CONFIG,launchResolver:ctx=>launchDirectPickpocket3v1(ctx),postBattleBeatId:PICKPOCKET_BATTLE_RETURN,resultProjector:typeof projectAcademyKakashiOriginBattleResult==="function"?projectAcademyKakashiOriginBattleResult:null,actionLabel:"SURVIVE THE INTERCEPTION"}},
+    {beatId:PICKPOCKET_BATTLE_RETURN,mode:"narration",environmentRef:action.environmentRef||SAKURA,text:"",onEnterConsequences:[{requestId:PICKPOCKET_RETURN_REQUEST,kind:"domain",resolve:commitDirectPickpocket3v1Return}],nextBeatId:PENDING_BEAT,exitScene:false,allowPresentationClose:false}
+  ];
+  beats.forEach((row,index)=>{const beat=normalizedBeat(row,970+index);if(beat)map.set(beat.beatId,beat);});
+  attack.nextBeatId=ATTACK_BOUNDARY;attack.consequenceRequests=[{requestId:ATTACK_REQUEST,kind:"domain",resolve:()=>resolveDirectChoice(attack,ATTACK_CHOICE,ATTACK_BINDING)}];
+  pick.nextBeatId=PENDING_BEAT;pick.consequenceRequests=[{requestId:PICKPOCKET_REQUEST,kind:"domain",resolve:()=>resolveDirectChoice(pick,PICKPOCKET_CHOICE,PICKPOCKET_BINDING)}];
+  const releaseAttack=GUARD.releaseInitialChoice(ATTACK_CHOICE,{successorProofRef:PATCH_ID,ownerRef:PATCH_ID,requiredConsequenceRequestId:ATTACK_REQUEST});
+  const releasePick=GUARD.releaseInitialChoice(PICKPOCKET_CHOICE,{successorProofRef:PATCH_ID,ownerRef:PATCH_ID,requiredConsequenceRequestId:PICKPOCKET_REQUEST});
+  if(!releaseAttack||releaseAttack.success!==true)return releaseAttack||{success:false,reason:"kakashi_direct_attack_guard_release_failed"};
+  if(!releasePick||releasePick.success!==true)return releasePick||{success:false,reason:"kakashi_direct_pickpocket_guard_release_failed"};
+  return{success:true,releaseAttack,releasePick,beatIds:beats.map(row=>row.beatId)};
+}'''
+          s=s[:start]+new_install+s[end:]
+          start=s.index('function diagnostics(){')
+          end=s.index('\nconst api=Object.freeze',start)
+          diagnostics=r'''function diagnostics(){
+  const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,action=map&&map.get(ACTION_BEAT);
+  const attack=action&&action.choices.find(row=>row.choiceId===ATTACK_CHOICE),pick=action&&action.choices.find(row=>row.choiceId===PICKPOCKET_CHOICE);
+  const guard=GUARD.getGuardState(),returnBeat=map&&map.get(PICKPOCKET_BATTLE_RETURN);
+  const checks={
+    patchId:PATCH_ID==="alpha_kakashi_direct_opening_consumer_34710_v2_2026_09_17",
+    bindingsUpgraded:registrations.length===2&&registrations.every(row=>row&&row.success===true),
+    attackSelectable:!!attack&&typeof attack.availability==="function"&&attack.availability().available===true,
+    pickpocketSelectable:!!pick&&typeof pick.availability==="function"&&pick.availability().available===true,
+    noLegacyAttackSuccessor:!!attack&&attack.nextBeatId!=="kak_original_transfer",
+    noLegacyPickpocketSuccessor:!!pick&&pick.nextBeatId!=="kak_original_transfer",
+    attackProofRequest:!!attack&&attack.consequenceRequests.some(row=>row&&row.requestId===ATTACK_REQUEST),
+    pickpocketProofRequest:!!pick&&pick.consequenceRequests.some(row=>row&&row.requestId===PICKPOCKET_REQUEST),
+    guardRecordedBoth:guard.releasedInitialChoiceIds.includes(ATTACK_CHOICE)&&guard.releasedInitialChoiceIds.includes(PICKPOCKET_CHOICE),
+    exactDirectPickpocket3v1:PICKPOCKET_3V1_CONFIG==="academy_kakashi_origin_battle_amt_ps_mi_3v1",
+    directPickSuccessTargetsDebrief:!!pick&&pick.nextBeatId===PENDING_BEAT,
+    directPickBattleReturnCommitsFacts:!!returnBeat&&Array.isArray(returnBeat.onEnterConsequences)&&returnBeat.onEnterConsequences.some(row=>row&&row.requestId===PICKPOCKET_RETURN_REQUEST)&&returnBeat.nextBeatId===PENDING_BEAT,
+    failureEntryKeepsPackageWithAmt:commitDirect.toString().includes('pickSuccess?"KAKASHI":"ANBU_MARKED_TARGET"'),
+    scene03aUntouched:!!map&&map.has("kak_original_major_choice"),
+    attackPostClassificationStillFailClosed:!!map&&map.has(ATTACK_BOUNDARY),
+    browserGoldenClaimed:false
+  };
+  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
+  return{pass:failed.length===0,checks,failed,installed:{...installed},browserGoldenClaimed:false};
+}
+'''
+          s=s[:start]+diagnostics+s[end:]
+          api_old='const api=Object.freeze({patchId:PATCH_ID,attackRequestId:ATTACK_REQUEST,pickpocketRequestId:PICKPOCKET_REQUEST,attackBoundaryBeatId:ATTACK_BOUNDARY,pickpocketSuccessBoundaryBeatId:PICKPOCKET_SUCCESS_BOUNDARY,pickpocketBattleBeatId:PICKPOCKET_BATTLE,pickpocketBattleConfigId:PICKPOCKET_3V1_CONFIG,diagnostics,browserGoldenClaimed:false});'
+          api_new='const api=Object.freeze({patchId:PATCH_ID,attackRequestId:ATTACK_REQUEST,pickpocketRequestId:PICKPOCKET_REQUEST,pickpocketReturnRequestId:PICKPOCKET_RETURN_REQUEST,attackBoundaryBeatId:ATTACK_BOUNDARY,pickpocketSuccessBoundaryBeatId:PENDING_BEAT,pickpocketBattleBeatId:PICKPOCKET_BATTLE,pickpocketBattleReturnBeatId:PICKPOCKET_BATTLE_RETURN,pickpocketBattleConfigId:PICKPOCKET_3V1_CONFIG,commitDirectPickpocket3v1Return,diagnostics,browserGoldenClaimed:false});'
+          s=rep(s,api_old,api_new,'34710 api')
+          write(p,s)
+
+          # 34300 — Battle deployment owns portrait binding.
+          p='runtime/alpha-kakashi-origin-battle-deployment-34300.js'; s=read(p)
+          pattern=r'(\[MI\]:\{id:MI,name:"MASKED INTERCEPTOR"[^\n]*?image:)null'
+          s,n=re.subn(pattern,r'\1"NPC/masked_interceptor.png"',s,count=1)
+          if n!=1: raise SystemExit(f'34300 MI image: expected one match, got {n}')
+          s=rep(s,'    exactMI:!!enemyDatabase[MI]&&enemyDatabase[MI].calibratedBasePL===14&&JSON.stringify(enemyDatabase[MI].baseStats)===JSON.stringify({nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13}),',
+                '    exactMI:!!enemyDatabase[MI]&&enemyDatabase[MI].calibratedBasePL===14&&JSON.stringify(enemyDatabase[MI].baseStats)===JSON.stringify({nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13}),\n    maskedInterceptorPortraitBound:!!enemyDatabase[MI]&&enemyDatabase[MI].image==="NPC/masked_interceptor.png",',
+                '34300 portrait diagnostic')
+          write(p,s)
+
+          # 35100 — terminal owner consumes direct-route package facts and the exact 3-v-1 receipt.
+          p='runtime/alpha-kakashi-terminal-debrief-35100.js'; s=read(p)
+          s=rep(s,'  const candidateIds=[l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);',
+                '  const candidateIds=[l.kakashiDirectOpeningPostBattleOccurrenceId,l.kakashiDirectOpeningOccurrenceId,l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);',
+                '35100 direct package facts')
+          s=rep(s,'  appendCapture(map,"kak_seq_amt_return",SEQ_AMT_CONFIG);',
+                '  appendCapture(map,"kak_seq_amt_return",SEQ_AMT_CONFIG);\n  appendCapture(map,"kak_scene03d_pickpocket_failure_3v1_return_34710",HARD_3V1_CONFIG);',
+                '35100 direct 3v1 capture')
+          write(p,s)
+
+          # Browser cache generations — same canonical loader chain, fresh generation only.
+          p='runtime/alpha-kakashi-final-origin-adapter-34100.js'; s=read(p)
+          s=rep(s,'Generation 22 adds only the proof-bearing Scene 02 direct Attack/Pickpocket','Generation 23 carries the Scene 02 direct-route continuation and portrait binding','34100 generation comment')
+          s=rep(s,'const BUILD="kakashi-final-20260917-22";','const BUILD="kakashi-final-20260917-23";','34100 build')
+          write(p,s)
+          p='runtime/alpha-story-decision-realisation-34000.js'; s=read(p)
+          s=rep(s,'// Historical delivery-QA markers only; active URL is consolidation generation 20.','// Historical delivery-QA markers only; active URL is consolidation generation 23.','34000 generation comment')
+          s=rep(s,'script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-20";','script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-23";','34000 loader URL')
+          write(p,s)
+
+          # Focused existing Scene 02 QA: success vs failure remain distinct; failure return is factual and 1-v-3.
+          p='tools/qa_academy_kakashi_scene02_direct_choices_34710.js'; s=read(p)
+          s=rep(s,'  const pursue={beatId:"kak_original_pursue",mode:"narration",exitScene:true,onEnterConsequences:[]};\n  return{sceneId:"origin_academy_kakashi_anbu_retrieval",entryBeatId:"kak_original_action",beatMap:new Map([[action.beatId,action],[transfer.beatId,transfer],[major.beatId,major],[secured.beatId,secured],[pursue.beatId,pursue]]),onCompleteConsequences:[]};',
+                '  const pursue={beatId:"kak_original_pursue",mode:"narration",exitScene:true,onEnterConsequences:[]};\n  const pending={beatId:"kak_seq_debrief_pending",mode:"narration",text:"",onEnterConsequences:[]};\n  return{sceneId:"origin_academy_kakashi_anbu_retrieval",entryBeatId:"kak_original_action",beatMap:new Map([[action.beatId,action],[transfer.beatId,transfer],[major.beatId,major],[secured.beatId,secured],[pursue.beatId,pursue],[pending.beatId,pending]]),onCompleteConsequences:[]};',
+                '34710 QA terminal pending')
+          s=rep(s,'active.localContext={kakashiDirectOpeningOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1"};',
+                'active.localContext={kakashiDirectOpeningOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",kakashiDirectOpeningOccurrenceId:playerData.activityHistory[0].occurrenceId};',
+                '34710 QA parent occurrence')
+          insert=r'''
+
+// Direct Pickpocket failure return: exact 1-v-3 Battle facts stay distinct from clean success.
+active.battleResume={authored:{battleOccurrenceId:"qa-direct-pick-3v1-win",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",storyOccurrenceId:active.instanceId,sourceAnchorRef:"AK_SA_028",bindingRef:"academy_kakashi.resolver.pickpocket_direct",resultState:"player_side_victory",playerActionOpportunityCount:3,participants:[
+  {participantRef:"academy_kakashi",side:"player",battleStatus:"active",lifeState:"unresolved",custodyState:"unresolved"},
+  {participantRef:"academy_kakashi_origin_amt",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},
+  {participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},
+  {participantRef:"academy_kakashi_origin_masked_interceptor",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}
+],rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false}};
+const postWin=MOD.commitDirectPickpocket3v1Return();
+assert.strictEqual(postWin.success,true,"direct Pickpocket 3-v-1 victory return did not commit");
+assert.strictEqual(postWin.packageHolderClass,"KAKASHI");
+let postFact=playerData.activityHistory.map(row=>row.fact||row.data).find(row=>row&&row.factClass==="academy_kakashi_direct_pickpocket_3v1_post_battle_factual_state");
+assert(postFact,"direct Pickpocket post-Battle occurrence missing");
+assert.strictEqual(postFact.packageState.currentHolderClass,"KAKASHI");
+assert.strictEqual(postFact.participantDeathCommitted,false);
+assert.strictEqual(postFact.participantCustodyCommitted,false);
+assert.deepStrictEqual(postFact.participantBattleFacts.filter(row=>row.side==="opposition").map(row=>row.participantRef).sort(),["academy_kakashi_origin_amt","academy_kakashi_origin_masked_interceptor","academy_kakashi_origin_package_smuggler"].sort());
+let participantStates=CORE.getStoryUnitSnapshot("academy_kakashi").participantStates;
+["academy_kakashi_origin_amt","academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"].forEach(id=>assert.strictEqual(participantStates[id].stateClass,"DEFEATED_BUT_NOT_CONTROLLED"));
+
+const forcedLoss=forcePick("PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1","failure-loss");
+active.localContext={kakashiDirectOpeningOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",kakashiDirectOpeningOccurrenceId:playerData.activityHistory[0].occurrenceId};
+active.battleResume={authored:{battleOccurrenceId:"qa-direct-pick-3v1-loss",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",storyOccurrenceId:active.instanceId,sourceAnchorRef:"AK_SA_028",bindingRef:"academy_kakashi.resolver.pickpocket_direct",resultState:"opposition_side_victory",playerActionOpportunityCount:2,participants:[
+  {participantRef:"academy_kakashi",side:"player",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},
+  {participantRef:"academy_kakashi_origin_amt",side:"opposition",battleStatus:"active",lifeState:"unresolved",custodyState:"unresolved"},
+  {participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"active",lifeState:"unresolved",custodyState:"unresolved"},
+  {participantRef:"academy_kakashi_origin_masked_interceptor",side:"opposition",battleStatus:"active",lifeState:"unresolved",custodyState:"unresolved"}
+],rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false}};
+const postLoss=MOD.commitDirectPickpocket3v1Return();
+assert.strictEqual(postLoss.success,true,"direct Pickpocket 3-v-1 loss return did not commit");
+assert.strictEqual(postLoss.packageHolderClass,"ANBU_MARKED_TARGET");
+postFact=playerData.activityHistory.map(row=>row.fact||row.data).find(row=>row&&row.factClass==="academy_kakashi_direct_pickpocket_3v1_post_battle_factual_state");
+assert.strictEqual(postFact.packageState.currentHolderClass,"ANBU_MARKED_TARGET");
+assert.strictEqual(postFact.worldFacts.pakkunPresent,false);
+assert.strictEqual(postFact.worldFacts.maskedInterceptorVisible,true);
+'''
+          marker='\nassert(saves>0,"Scene 02 routes never persisted state");'
+          if s.count(marker)!=1: raise SystemExit('34710 QA insert marker drifted')
+          s=s.replace(marker,insert+marker,1)
+          write(p,s)
+
+          # Battle deployment QA must assert the actual MI portrait authority.
+          p='tools/qa_academy_kakashi_origin_battle_deployment.js'; s=read(p)
+          marker='assert.strictEqual(diag.pass,true,`34300 diagnostics failed: ${JSON.stringify(diag.failed)}`);'
+          s=rep(s,marker,marker+'\nassert.strictEqual(globalThis.enemyDatabase["academy_kakashi_origin_masked_interceptor"].image,"NPC/masked_interceptor.png","Masked Interceptor portrait authority missing");','34300 QA portrait')
+          write(p,s)
+
+          # Terminal QA: direct clean success and direct 3-v-1 failure/victory facts are consumable independently.
+          p='tools/qa_kakashi_terminal_debrief_35100.js'; s=read(p)
+          direct_tests=r'''
+
+// Direct Pickpocket SUCCESS: clean extraction, no Battle, no MI/Pakkun route involvement.
+run(`resetDataQA("qa-direct-success-35100");
+qaCommitOccurrence("academy_kakashi","occ-direct-pick-success",{factClass:"academy_kakashi_direct_pickpocket_factual_state",storySceneInstanceId:__qaRuntime.instanceId,selectedOutcomeRef:"PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION",packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI"},worldFacts:{cleanExtractionSucceeded:true,maskedInterceptorVisible:false,pakkunPresent:false,battleRequired:false}},[],{type:"origin_story_factual_occurrence",outcome:"PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION"});
+__qaRuntime.localContext.kakashiDirectOpeningOccurrenceId="occ-direct-pick-success";
+`);
+let directFacts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
+assert.strictEqual(directFacts.success,true);
+assert.strictEqual(directFacts.packageRecovered,true);
+assert.strictEqual(directFacts.cleanExtractionBenchmarkMet,true);
+assert.strictEqual(directFacts.materiallyParticipatedInPlBattle,false);
+assert.strictEqual(directFacts.pakkunPresentAtDebrief,false);
+assert.deepStrictEqual(directFacts.participantRefs,[]);
+
+// Direct Pickpocket FAILURE followed by exact 3-v-1 victory: Battle and post-Battle package facts stay distinct.
+run(`resetDataQA("qa-direct-failure-35100");
+qaCommitOccurrence("academy_kakashi","occ-direct-pick-failure",{factClass:"academy_kakashi_direct_pickpocket_factual_state",storySceneInstanceId:__qaRuntime.instanceId,selectedOutcomeRef:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"ANBU_MARKED_TARGET",custodyClass:"ANBU_MARKED_TARGET"},worldFacts:{cleanExtractionSucceeded:false,maskedInterceptorVisible:true,pakkunPresent:false,battleRequired:true,battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1"}},[],{type:"origin_story_factual_occurrence",outcome:"PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1"});
+qaCommitOccurrence("academy_kakashi","occ-direct-pick-postbattle",{factClass:"academy_kakashi_direct_pickpocket_3v1_post_battle_factual_state",storySceneInstanceId:__qaRuntime.instanceId,parentDirectPickpocketOccurrenceId:"occ-direct-pick-failure",battleOccurrenceId:"battle-direct-3v1",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",battleResultState:"player_side_victory",packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",recovered:true},worldFacts:{cleanExtractionSucceeded:false,maskedInterceptorVisible:true,pakkunPresent:false,battleRequired:true,packageRecovered:true}},[],{type:"origin_story_post_battle_factual_occurrence",outcome:"player_side_victory"});
+__qaRuntime.localContext.kakashiDirectOpeningOccurrenceId="occ-direct-pick-failure";
+__qaRuntime.localContext.kakashiDirectOpeningPostBattleOccurrenceId="occ-direct-pick-postbattle";
+__qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-direct-3v1",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_028",bindingRef:"academy_kakashi.resolver.pickpocket_direct",resultState:"player_side_victory",playerActionOpportunityCount:3,participants:[{participantRef:"academy_kakashi_origin_amt",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:"academy_kakashi_origin_masked_interceptor",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}],rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false}};
+`);
+assert.strictEqual(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_amt_ps_mi_3v1")`).success,true);
+directFacts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
+assert.strictEqual(directFacts.success,true);
+assert.strictEqual(directFacts.packageRecovered,true);
+assert.strictEqual(directFacts.failedPickpocket3v1Victory,true);
+assert.strictEqual(directFacts.materiallyParticipatedInPlBattle,true);
+assert.strictEqual(directFacts.pakkunPresentAtDebrief,false);
+assert.deepStrictEqual(directFacts.participantRefs.sort(),["academy_kakashi_origin_amt","academy_kakashi_origin_masked_interceptor","academy_kakashi_origin_package_smuggler"].sort());
+
+resetDataQA("qa-secure-35100");
+'''
+          marker='\n// Battle victory alone cannot manufacture package success or terminal rewards.'
+          if s.count(marker)!=1: raise SystemExit('35100 QA insert marker drifted')
+          s=s.replace(marker,direct_tests+marker,1)
+          write(p,s)
+          PY
+
+          node --check runtime/alpha-kakashi-direct-opening-consumer-34710.js
+          node --check runtime/alpha-kakashi-origin-battle-deployment-34300.js
+          node --check runtime/alpha-kakashi-terminal-debrief-35100.js
+          node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
+          node --check runtime/alpha-story-decision-realisation-34000.js
+          node --check tools/qa_academy_kakashi_scene02_direct_choices_34710.js
+          node --check tools/qa_academy_kakashi_origin_battle_deployment.js
+          node --check tools/qa_kakashi_terminal_debrief_35100.js
+
+          node tools/qa_academy_kakashi_origin_battle_deployment.js
+          node tools/qa_academy_kakashi_scene02_direct_choices_34710.js
+          node tools/qa_kakashi_terminal_debrief_35100.js
+          node tools/qa_issue_188_story_decision_runtime.js
+          node tools/qa_issue_188_kakashi_final_guard.js
+          node tools/qa_academy_kakashi_get_closer_factual_commit.js
+          node tools/qa_academy_kakashi_sequential_consumer.js
+          node tools/qa_story_factual_resolver_34600.js
+          node tools/qa_academy_kakashi_factual_bindings_34700.js
+          node tools/qa_kakashi_origin_rewards_34800.js
+          node tools/qa_academy_kakashi_scene03a_35700.js
+
+      - name: Commit validated canonical-owner patch
+        shell: bash
+        run: |
+          git config user.name "OpenAI Coding Agent"
+          git config user.email "noreply@openai.com"
+          git rm .github/workflows/temp-kakashi-direct-pickpocket-fix.yml
+          git add runtime/alpha-kakashi-direct-opening-consumer-34710.js \
+                  runtime/alpha-kakashi-origin-battle-deployment-34300.js \
+                  runtime/alpha-kakashi-terminal-debrief-35100.js \
+                  runtime/alpha-kakashi-final-origin-adapter-34100.js \
+                  runtime/alpha-story-decision-realisation-34000.js \
+                  tools/qa_academy_kakashi_scene02_direct_choices_34710.js \
+                  tools/qa_academy_kakashi_origin_battle_deployment.js \
+                  tools/qa_kakashi_terminal_debrief_35100.js
+          git commit -m "Complete Kakashi direct pickpocket continuation"
+          git push origin HEAD:coding/kakashi-direct-pickpocket-20260917
