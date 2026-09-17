@@ -70,8 +70,8 @@ const boundReport=plain(`runAcademyKakashiSequentialConsumer34410Diagnostics()`,
 assert.strictEqual(boundReport.pass,true,`34410 bound diagnostics failed: ${boundReport.failed.join(",")}`);
 
 assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),"unexpected Story decision cache generation drift");
-assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-16'),"Kakashi parent cache generation did not advance with 34410 v7");
-assert.ok(loader.includes('const BUILD="kakashi-final-20260917-16"'),"Kakashi child cache generation did not advance with 34410 v7");
+assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-17'),"Kakashi parent cache generation did not advance with 34410 v7");
+assert.ok(loader.includes('const BUILD="kakashi-final-20260917-17"'),"Kakashi child cache generation did not advance with 34410 v7");
 assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"34100 production loader missing 34410 Observe Battle consumer");
 assert.ok(loader.includes('alpha-kakashi-factual-bindings-34700.js'),"34100 production loader missing terminal factual binding layer");
 
@@ -92,4 +92,4 @@ assert.ok(source.includes('battleOccurrenceId'),"semantic Battle return must ref
 assert.ok(!source.includes('sequential.nextBeatId="kak_seq_mi_battle"'),"34410 must not directly rebind the superseded major-choice sequential entry");
 assert.ok(!source.includes('completeChronicleOriginPrologue('));
 
-console.log(JSON.stringify({pass:true,patch:"34410-v7",legacySequentialChoiceActionable:false,legacySequentialChoiceRemainsGuarded:true,factualObserveSequentialChoiceActionable:true,factualObserveIsSoleSequentialEntry:true,securePackage2v1Prepared:true,securePackageProductionRelease:false,securePackageExactAnchor:"AK_SA_014",securePackageExactConfig:"academy_kakashi_origin_battle_ps_mi_2v1",securePackageSemanticIntentBeforeBattle:true,securePackageFactualBattleReceiptReturn:true,otherObserveChoicesFailClosed:true,kakashiChildCacheIdentity:"kakashi-final-20260917-16",miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
+console.log(JSON.stringify({pass:true,patch:"34410-v7",legacySequentialChoiceActionable:false,legacySequentialChoiceRemainsGuarded:true,factualObserveSequentialChoiceActionable:true,factualObserveIsSoleSequentialEntry:true,securePackage2v1Prepared:true,securePackageProductionRelease:false,securePackageExactAnchor:"AK_SA_014",securePackageExactConfig:"academy_kakashi_origin_battle_ps_mi_2v1",securePackageSemanticIntentBeforeBattle:true,securePackageFactualBattleReceiptReturn:true,otherObserveChoicesFailClosed:true,kakashiChildCacheIdentity:"kakashi-final-20260917-17",miGate:4,psGate:3,finalPakkunConfig:true,falseTerminalCompletionPrevented:true,browserGoldenClaimed:false},null,2));
