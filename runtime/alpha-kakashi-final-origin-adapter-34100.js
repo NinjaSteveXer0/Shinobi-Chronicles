@@ -11,7 +11,7 @@
 // / Chronicle Receipt bridge.
 // Headless semantic QA loads only core + guard; dedicated harnesses load later
 // layers explicitly so each ownership seam remains independently testable.
-// Exact-head CI trigger only: #188 Story + terminal + #141, generation 17.
+// Exact-head CI trigger after sequential QA alignment: #188 Story + terminal + #141, generation 17.
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
