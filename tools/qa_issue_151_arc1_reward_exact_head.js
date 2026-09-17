@@ -8,6 +8,7 @@ const assert=require('assert');
 // global Issue #141 `tools/qa_*.js` trigger so both gates certify one commit.
 // Browser wiring is part of the implementation contract: a green semantic
 // module that is never loaded by the live shell is not runtime-complete.
+// The #141 production closure now composes this same harness as a Coding subgate.
 const html=fs.readFileSync('index.html','utf8');
 const activation='<script src="runtime/alpha-arc1-reward-evaluation-35400.js"></script>';
 const activationCount=html.split(activation).length-1;
