@@ -6,6 +6,7 @@ on:
     paths:
       - 'runtime/alpha-arc1-reward-evaluation-35400.js'
       - 'tools/qa_arc1_reward_evaluation_35400.js'
+      - 'tools/qa_issue_151_arc1_reward_exact_head.js'
       - '.github/workflows/issue-151-arc1-reward-evaluation.yml'
   workflow_dispatch:
 
@@ -23,4 +24,4 @@ jobs:
       - name: Syntax check Arc-1 reward evaluator
         run: node --check runtime/alpha-arc1-reward-evaluation-35400.js
       - name: Issue 151 decision-sensitive reward snapshot QA
-        run: node tools/qa_arc1_reward_evaluation_35400.js
+        run: node tools/qa_issue_151_arc1_reward_exact_head.js
