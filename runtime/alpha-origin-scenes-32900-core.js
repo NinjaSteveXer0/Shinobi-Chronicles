@@ -58,19 +58,33 @@ globalThis.SC_ALPHA_ORIGIN_32900=A;
 //
 // 32900-core is the earliest small, always-loaded production seam before the
 // dynamic front-door chain. Localisation remains presentation-only and has no
-// dependency on Origin semantics. 35510 is a content catalogue owned by the
-// 35500 layer; it cannot load until 35500 has installed its registration API.
+// dependency on Origin semantics. 35510 owns broad base Story/Journey strings;
+// 35520 owns the final Writing-approved 33600 expression pass and is loaded
+// strictly after 35510 has registered its catalogue.
 // ============================================================================
 (function activateAlphaLocalisation35500From32900Core(){
   "use strict";
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  const loadFinalWriting=()=>{
+    if(!globalThis.SC_ALPHA_LOCALISATION_35500||!globalThis.SC_ALPHA_LOCALISATION_CONTENT_35510)return false;
+    if(globalThis.SC_ALPHA_LOCALISATION_FINAL_WRITING_35520||document.getElementById("sc-alpha-localisation-final-writing-35520-script"))return true;
+    const finalScript=document.createElement("script");
+    finalScript.id="sc-alpha-localisation-final-writing-35520-script";
+    finalScript.src="runtime/alpha-localisation-final-writing-35520.js";
+    finalScript.async=false;
+    document.head.appendChild(finalScript);
+    return true;
+  };
   const loadContent=()=>{
     if(!globalThis.SC_ALPHA_LOCALISATION_35500)return false;
-    if(globalThis.SC_ALPHA_LOCALISATION_CONTENT_35510||document.getElementById("sc-alpha-localisation-content-35510-script"))return true;
+    if(globalThis.SC_ALPHA_LOCALISATION_CONTENT_35510)return loadFinalWriting();
+    const existingContent=document.getElementById("sc-alpha-localisation-content-35510-script");
+    if(existingContent){existingContent.addEventListener("load",loadFinalWriting,{once:true});return true;}
     const contentScript=document.createElement("script");
     contentScript.id="sc-alpha-localisation-content-35510-script";
     contentScript.src="runtime/alpha-localisation-content-35510.js";
     contentScript.async=false;
+    contentScript.addEventListener("load",loadFinalWriting,{once:true});
     document.head.appendChild(contentScript);
     return true;
   };
