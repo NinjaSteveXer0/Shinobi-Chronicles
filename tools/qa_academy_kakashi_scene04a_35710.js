@@ -18,7 +18,8 @@ const major={beatId:"kak_original_major_choice",mode:"choice",environmentRef:{as
 ],onEnterConsequences:[]};
 const definition={sceneId:SCENE_ID,beatMap:new Map([[major.beatId,major]])};
 const active={sceneId:SCENE_ID,instanceId:"qa-scene04a",beatId:major.beatId,localContext:{kakashiObserveScene03AOccurrenceId:"occ_scene03a_committed"},committedChoiceKeys:[]};
-let saves=0,renders=0,launchSpec=null;
+let saves=0,renders=0,launchSpec=null,storyBattleLaunchCount=0;
+const backdropPaths={};
 
 globalThis.playerData={};
 globalThis.savePlayerData=()=>{saves+=1;return true;};
@@ -26,6 +27,8 @@ globalThis.getStorySceneDefinition=id=>id===SCENE_ID?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
 globalThis.renderStoryScenePresentationLayer=()=>{renders+=1;return true;};
+globalThis.registerSceneBackdropAssetPath=(id,p)=>{backdropPaths[id]=p;return true;};
+globalThis.getSceneBackdropAssetPath=id=>backdropPaths[id]||null;
 globalThis.advanceStoryScene=function baseAdvance(choiceId=null){
   const beat=definition.beatMap.get(active.beatId);if(!beat)return{success:false,reason:"qa_beat_missing"};
   if(beat.mode==="choice"){
@@ -39,6 +42,16 @@ globalThis.advanceStoryScene=function baseAdvance(choiceId=null){
   return{success:false,reason:"qa_base_advance_not_supported",mode:beat.mode};
 };
 globalThis.launchAcademyKakashiOriginPlBattle=spec=>{launchSpec=spec;return{success:true,battleId:"qa-battle",encounterId:spec.battleConfigId};};
+globalThis.launchStorySceneBattle=()=>{
+  storyBattleLaunchCount+=1;
+  const beat=definition.beatMap.get(active.beatId);
+  if(!beat||beat.mode!=="battle_transition"||!beat.battle)return{success:false,reason:"qa_not_battle_transition"};
+  const returnContext={type:"story_scene",sceneId:SCENE_ID,sceneInstanceId:active.instanceId,sourceBeatId:beat.beatId,postBattleBeatId:beat.battle.postBattleBeatId};
+  const launched=beat.battle.launchResolver({active:{...active,localContext:{...active.localContext}},returnContext});
+  if(!launched||launched.success!==true)return launched||{success:false,reason:"qa_launch_failed"};
+  active.pendingBattle={battleId:launched.battleId,encounterId:launched.encounterId,postBattleBeatId:beat.battle.postBattleBeatId};
+  return{success:true,type:"battle_transition",battleId:launched.battleId,encounterId:launched.encounterId};
+};
 globalThis.projectAcademyKakashiOriginBattleResult=()=>({battleConfigId:"academy_kakashi_origin_battle_mi_1v1",battleOccurrenceId:"qa-battle-occ",storyOccurrenceId:active.instanceId,sourceAnchorRef:"AK_SA_019",bindingRef:"academy_kakashi.battle.stop_assassin",resultState:"player_side_victory",participants:[{participantRef:"academy_kakashi",battleStatus:"active",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:"academy_kakashi_origin_masked_interceptor",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}],packageCustodyDelta:"none",participantDeathCommitted:false,participantCustodyCommitted:false,storyObjectiveCommitted:false});
 
 globalThis.SC_ALPHA_ORIGIN_32900={};
@@ -60,6 +73,9 @@ assert.strictEqual(MOD.cueCount,14);
 assert.strictEqual(MOD.battleConfigId,"academy_kakashi_origin_battle_mi_1v1");
 assert.strictEqual(MOD.bindingRef,"academy_kakashi.battle.stop_assassin");
 assert.strictEqual(MOD.sourceAnchorRef,"AK_SA_019");
+assert.strictEqual(MOD.fightBackdropId,"kakashi_origin_fight_at_sakura_tree");
+assert.strictEqual(MOD.fightBackdropPath,"Kakashi Origin Backdrop/fight_at_sakura_tree.png");
+assert.strictEqual(backdropPaths.kakashi_origin_fight_at_sakura_tree,"Kakashi Origin Backdrop/fight_at_sakura_tree.png");
 
 const stop=major.choices.find(row=>row.choiceId==="stop_assassin");
 assert.strictEqual(stop.nextBeatId,"kak_scene04a_stop_assassin");
@@ -73,21 +89,28 @@ let receipt=semantic.decisionReceipts[active.localContext.kakashiScene04AStoryDe
 assert(receipt&&receipt.status==="intent_committed","Stop Assassin intent must commit before Battle result");
 assert.strictEqual(receipt.resolverBindingRef,"academy_kakashi.battle.stop_assassin");
 
+const sceneBeat=definition.beatMap.get("kak_scene04a_stop_assassin");
+const battleBeat=definition.beatMap.get("kak_scene04a_stop_assassin_battle");
+const returnBeat=definition.beatMap.get("kak_scene04a_stop_assassin_return");
+for(const beat of [sceneBeat,battleBeat,returnBeat])assert.strictEqual(beat.environmentRef.assetId,"kakashi_origin_fight_at_sakura_tree","Scene 04A family must use fight_at_sakura_tree backdrop");
+
 const exact=["Kakashi moves.","Not toward ANBU Marked Target.","Not toward the package.","Toward Masked Interceptor.","She is already closing on Package Smuggler when Kakashi drops between them.","Package Smuggler sees the opening immediately.","He turns and runs.","The package goes with him.","Kakashi does not follow.","Masked Interceptor changes direction without hesitation.","Her attention settles on Kakashi.","He has made himself the obstacle now.","She comes straight through him.","Kakashi meets her head-on."];
 for(let i=0;i<exact.length;i++){
   const p=globalThis.getStoryScenePerformance33900();assert(p,`Scene 04A performance missing at ${i}`);assert.strictEqual(p.index,i);assert.strictEqual(p.cue.text,exact[i]);assert.strictEqual(p.cue.kind,"narration");
   if(i<exact.length-1){const advanced=globalThis.advanceStoryScene();assert.strictEqual(advanced.success,true);assert.strictEqual(active.beatId,"kak_scene04a_stop_assassin");}
 }
-const toBattle=globalThis.advanceStoryScene();assert.strictEqual(toBattle.success,true);assert.strictEqual(active.beatId,"kak_scene04a_stop_assassin_battle");
-const battleBeat=definition.beatMap.get(active.beatId);assert(battleBeat&&battleBeat.mode==="battle_transition");
-assert.strictEqual(battleBeat.text,"PL BATTLE: Kakashi Hatake vs Masked Interceptor");
-const launched=battleBeat.battle.launchResolver({active:{...active,localContext:{...active.localContext}},returnContext:{type:"story_scene",sceneId:SCENE_ID,sceneInstanceId:active.instanceId,sourceBeatId:battleBeat.beatId,postBattleBeatId:"kak_scene04a_stop_assassin_return"}});
-assert.strictEqual(launched.success,true);assert(launchSpec,"Scene 04A Battle launch spec missing");
+const launched=globalThis.advanceStoryScene();
+assert.strictEqual(launched.success,true,`Final Scene 04A cue did not launch Battle: ${JSON.stringify(launched)}`);
+assert.strictEqual(launched.autoLaunchedFromScene04A,true,"Scene 04A final cue must auto-launch canonical Story Battle");
+assert.strictEqual(active.beatId,"kak_scene04a_stop_assassin_battle");
+assert.strictEqual(storyBattleLaunchCount,1,"Scene 04A should call the generic Story Battle launcher exactly once");
+assert(launchSpec,"Scene 04A Battle launch spec missing");
 assert.strictEqual(launchSpec.sourceAnchorRef,"AK_SA_019");assert.strictEqual(launchSpec.bindingRef,"academy_kakashi.battle.stop_assassin");assert.strictEqual(launchSpec.battleConfigId,"academy_kakashi_origin_battle_mi_1v1");assert.strictEqual(launchSpec.pakkunAuthorized,false);
+assert.strictEqual(battleBeat.text,"PL BATTLE: Kakashi Hatake vs Masked Interceptor");
 
 active.beatId="kak_scene04a_stop_assassin_return";
+active.pendingBattle=null;
 active.battleResume={authored:globalThis.projectAcademyKakashiOriginBattleResult()};
-const returnBeat=definition.beatMap.get(active.beatId);assert(returnBeat&&returnBeat.mode==="post_battle");
 const consumed=returnBeat.onEnterConsequences[0].resolve();assert.strictEqual(consumed.success,true,`Scene 04A Battle return failed: ${JSON.stringify(consumed)}`);
 semantic=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");receipt=semantic.decisionReceipts[active.localContext.kakashiScene04AStoryDecisionReceiptId];
 assert(receipt&&receipt.status==="resolved","Scene 04A semantic receipt did not resolve from factual Battle result");
@@ -99,7 +122,9 @@ assert(saves>0,"Scene 04A never persisted runtime state");
 
 console.log("Academy Kakashi Scene 04A 35710 QA: PASS");
 console.log("- exact 14 narration cues / no dialogue / no authored choices");
+console.log("- fight_at_sakura_tree backdrop bound before and after PL Battle");
 console.log("- STOP THE ASSASSIN intent commits before Battle");
+console.log("- final narration cue auto-launches canonical Story PL Battle");
 console.log("- exact PL Battle: Kakashi vs Masked Interceptor, 1-v-1");
 console.log("- config academy_kakashi_origin_battle_mi_1v1 / AK_SA_019 / no Pakkun");
 console.log("- factual Battle return resolves semantic receipt without death/custody/package inference");
