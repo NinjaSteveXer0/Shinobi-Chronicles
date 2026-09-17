@@ -58,17 +58,29 @@ globalThis.SC_ALPHA_ORIGIN_32900=A;
 //
 // 32900-core is the earliest small, always-loaded production seam before the
 // dynamic front-door chain. Localisation remains presentation-only and has no
-// dependency on Origin semantics; async=false preserves insertion order among
-// dynamically inserted runtime scripts, and the localisation observer also
-// safely consumes surfaces that mounted before its network fetch completed.
+// dependency on Origin semantics. 35510 is a content catalogue owned by the
+// 35500 layer; it cannot load until 35500 has installed its registration API.
 // ============================================================================
 (function activateAlphaLocalisation35500From32900Core(){
   "use strict";
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
-  if(globalThis.SC_ALPHA_LOCALISATION_35500||document.getElementById("sc-alpha-localisation-35500-script"))return;
+  const loadContent=()=>{
+    if(!globalThis.SC_ALPHA_LOCALISATION_35500)return false;
+    if(globalThis.SC_ALPHA_LOCALISATION_CONTENT_35510||document.getElementById("sc-alpha-localisation-content-35510-script"))return true;
+    const contentScript=document.createElement("script");
+    contentScript.id="sc-alpha-localisation-content-35510-script";
+    contentScript.src="runtime/alpha-localisation-content-35510.js";
+    contentScript.async=false;
+    document.head.appendChild(contentScript);
+    return true;
+  };
+  if(globalThis.SC_ALPHA_LOCALISATION_35500){loadContent();return;}
+  const existing=document.getElementById("sc-alpha-localisation-35500-script");
+  if(existing){existing.addEventListener("load",loadContent,{once:true});return;}
   const script=document.createElement("script");
   script.id="sc-alpha-localisation-35500-script";
   script.src="runtime/alpha-localisation-35500.js";
   script.async=false;
+  script.addEventListener("load",loadContent,{once:true});
   document.head.appendChild(script);
 })();
