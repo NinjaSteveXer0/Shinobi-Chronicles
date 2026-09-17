@@ -1,19 +1,21 @@
 // ============================================================================
-// ISSUES #188 + #192 + #201 + #217 + #218 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
+// ISSUES #188 + #192 + #201 + #217 + #218 + #219 — ACADEMY KAKASHI FINAL ADAPTER LOADER — 34100
 //
-// Browser order is:
+// Canonical browser order is:
 // semantic core -> stale-authority guard -> Combat deployment -> sequential
-// Story/Battle consumer -> browser fixes -> Substitution -> Battle interaction ->
-// neutral factual provider -> Kakashi factual state/bindings -> sequential post-PS
-// package recovery -> Pakkun interception -> reward adapter -> terminal debrief ->
+// Story/Battle consumer -> Substitution -> Battle interaction -> neutral factual
+// provider -> Kakashi factual state/bindings -> sequential post-PS package
+// recovery -> Pakkun interception -> reward adapter -> terminal debrief ->
 // terminal Scene Board asset binding.
 //
-// Generation 19 consumes the closed AK_SA_033 post-PS package-recovery authority
-// and binds the approved terminal Hokage Administration / Minato presentation.
-// Browser Golden remains separately unclaimed.
+// Generation 20 is the first consolidation generation under #219. The old
+// 34400 browser-red overlay is deliberately de-loaded: presentation copy and
+// Story-surface ownership must come from the canonical Scene Board chain, not
+// from a later getter/DOM patch. Browser Golden remains separately unclaimed.
 //
-// Legacy terminal-debrief/delivery QA tranche marker only (not active code):
+// Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
+// const BUILD="kakashi-final-20260917-19";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -22,7 +24,6 @@ const CORE_PATH="runtime/alpha-kakashi-final-origin-adapter-34100-core.js";
 const GUARD_PATH="runtime/alpha-kakashi-final-authority-guard-34200.js";
 const BATTLE_PATH="runtime/alpha-kakashi-origin-battle-deployment-34300.js";
 const SEQUENTIAL_PATH="runtime/alpha-kakashi-final-sequential-consumer-34410.js";
-const BROWSER_FIX_PATH="runtime/alpha-kakashi-browser-red-fixes-34400.js";
 const SUBSTITUTION_PATH="runtime/alpha-kakashi-substitution-34900.js";
 const BATTLE_INTERACTION_PATH="runtime/alpha-kakashi-battle-interaction-hotfix-34500.js";
 const FACTUAL_PROVIDER_PATH="runtime/alpha-story-factual-resolver-34600.js";
@@ -33,7 +34,7 @@ const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
 const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
-const BUILD="kakashi-final-20260917-19";
+const BUILD="kakashi-final-20260917-20";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -103,13 +104,9 @@ function loadSubstitution(){
   if(globalThis.SC_ALPHA_KAKASHI_SUBSTITUTION_34900){loadBattleInteraction();return;}
   appendScript("sc-alpha-kakashi-substitution-34900-script",SUBSTITUTION_PATH,loadBattleInteraction);
 }
-function loadBrowserFix(){
-  if(globalThis.SC_KAKASHI_BROWSER_RED_FIXES_34400){loadSubstitution();return;}
-  appendScript("sc-alpha-kakashi-browser-red-fixes-34400-script",BROWSER_FIX_PATH,loadSubstitution);
-}
 function loadSequential(){
-  if(globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410){loadBrowserFix();return;}
-  appendScript("sc-alpha-kakashi-final-sequential-consumer-34410-script",SEQUENTIAL_PATH,loadBrowserFix);
+  if(globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410){loadSubstitution();return;}
+  appendScript("sc-alpha-kakashi-final-sequential-consumer-34410-script",SEQUENTIAL_PATH,loadSubstitution);
 }
 function loadBattle(){
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300){loadSequential();return;}
