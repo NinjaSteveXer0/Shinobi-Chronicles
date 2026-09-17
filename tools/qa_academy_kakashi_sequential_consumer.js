@@ -68,8 +68,8 @@ assert.strictEqual(boundReport.pass,true,`34410 bound diagnostics failed: ${boun
 // so it deliberately leaves the current browser cache generation unchanged.
 // The later AK_SA_025 release tranche must advance this full chain.
 assert.ok(integrator.includes('alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4'),"unexpected Story decision cache generation drift during guarded preparation");
-assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260916-14'),"unexpected Kakashi parent cache generation drift during guarded preparation");
-assert.ok(loader.includes('const BUILD="kakashi-final-20260916-14"'),"unexpected Kakashi child cache generation drift during guarded preparation");
+assert.ok(storyDecision.includes('alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-15'),"unexpected Kakashi parent cache generation drift during guarded preparation");
+assert.ok(loader.includes('const BUILD="kakashi-final-20260917-15"'),"unexpected Kakashi child cache generation drift during guarded preparation");
 assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"34100 production loader missing 34410 Observe Battle consumer");
 assert.ok(loader.includes('alpha-kakashi-factual-bindings-34700.js'),"34100 production loader missing terminal factual binding layer");
 
