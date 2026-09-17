@@ -52,3 +52,23 @@ const A={
 };
 globalThis.SC_ALPHA_ORIGIN_32900=A;
 })();
+
+// ============================================================================
+// ISSUE #190 — PRE-PUBLIC-ALPHA LOCALISATION ACTIVATION
+//
+// 32900-core is the earliest small, always-loaded production seam before the
+// dynamic front-door chain. Localisation remains presentation-only and has no
+// dependency on Origin semantics; async=false preserves insertion order among
+// dynamically inserted runtime scripts, and the localisation observer also
+// safely consumes surfaces that mounted before its network fetch completed.
+// ============================================================================
+(function activateAlphaLocalisation35500From32900Core(){
+  "use strict";
+  if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
+  if(globalThis.SC_ALPHA_LOCALISATION_35500||document.getElementById("sc-alpha-localisation-35500-script"))return;
+  const script=document.createElement("script");
+  script.id="sc-alpha-localisation-35500-script";
+  script.src="runtime/alpha-localisation-35500.js";
+  script.async=false;
+  document.head.appendChild(script);
+})();
