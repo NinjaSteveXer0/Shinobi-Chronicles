@@ -90,7 +90,9 @@ globalThis.runAlphaOriginScene32900Diagnostics=runAlphaOriginScene32900Diagnosti
   if(document.getElementById(SCRIPT_ID))return;
   const script=document.createElement("script");
   script.id=SCRIPT_ID;script.async=false;
-  script.src="runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4";
+  // Historical delivery-QA marker only; the active URL below is generation 5.
+  // runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260916-4
+  script.src="runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260917-5";
   document.head.appendChild(script);
 })();
 })();

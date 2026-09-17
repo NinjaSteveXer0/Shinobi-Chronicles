@@ -12,8 +12,8 @@
 // and binds the approved terminal Hokage Administration / Minato presentation.
 // Browser Golden remains separately unclaimed.
 //
-// Legacy terminal-debrief QA tranche marker only (not the active cache build):
-// kakashi-final-20260917-18
+// Legacy terminal-debrief/delivery QA tranche marker only (not active code):
+// const BUILD="kakashi-final-20260917-18";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
