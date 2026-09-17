@@ -6,16 +6,17 @@
 // Story/Battle consumer -> Substitution -> Battle interaction -> neutral factual
 // provider -> Kakashi factual state/bindings -> sequential post-PS package
 // recovery -> Pakkun interception -> reward adapter -> terminal debrief ->
-// terminal Scene Board asset binding.
+// terminal Scene Board asset binding -> locked Scene 03A consumer.
 //
-// Generation 20 is the first consolidation generation under #219. The old
-// 34400 browser-red overlay is deliberately de-loaded: presentation copy and
-// Story-surface ownership must come from the canonical Scene Board chain, not
-// from a later getter/DOM patch. Browser Golden remains separately unclaimed.
+// Generation 21 adds only the Stephen-approved Scene 03A Watch-the-Exchange
+// consumer after the existing final Kakashi chain. The old 34400 browser-red
+// overlay remains deliberately de-loaded. Browser Golden remains separately
+// unclaimed.
 //
 // Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
 // const BUILD="kakashi-final-20260917-19";
+// const BUILD="kakashi-final-20260917-20";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -34,7 +35,8 @@ const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
 const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
-const BUILD="kakashi-final-20260917-20";
+const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
+const BUILD="kakashi-final-20260917-21";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -64,9 +66,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadScene03A(){
+  if(globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700)return;
+  appendScript("sc-alpha-kakashi-scene03a-35700-script",SCENE03A_PATH);
+}
 function loadTerminalSceneBoard(){
-  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_SCENE_BOARD_35610)return;
-  appendScript("sc-alpha-kakashi-terminal-scene-board-35610-script",TERMINAL_SCENE_BOARD_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_SCENE_BOARD_35610){loadScene03A();return;}
+  appendScript("sc-alpha-kakashi-terminal-scene-board-35610-script",TERMINAL_SCENE_BOARD_PATH,loadScene03A);
 }
 function loadTerminalDebrief(){
   if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100){loadTerminalSceneBoard();return;}
