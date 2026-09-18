@@ -96,7 +96,8 @@ assert(source.includes("stopImmediatePropagation"),"installed-browser final-cue 
 assert(source.includes("confirmedKillPresentationStarted"),"post-delegate confirmed-kill transition seam missing");
 assert(source.includes("beginAcademyKakashiConfirmedKill35770"),"direct Scene 06 confirmed-kill entrypoint missing");
 assert(source.includes("installOutcomeWatchdog"),"confirmed-kill hold watchdog missing");
-assert(source.includes("continuation pending Writing #226"),"local non-kill resolver QA indicator missing");
+assert(source.includes("presentation owner unavailable"),"local non-kill resolver QA fallback indicator missing");
+assert(source.includes("beginAcademyKakashiResolvedOutcome35780"),"non-kill presentation watchdog dispatch missing");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
 console.log("- final Scene 06 click -> resolver hold -> direct/watchdog confirmed-kill presentation");
 console.log("- rooftop ANBU report -> Hokage office with hidden-operation Knowledge boundary");

@@ -26,6 +26,7 @@ on:
       - 'runtime/alpha-kakashi-scene05a-l-35750.js'
       - 'runtime/alpha-kakashi-scene06a-w2c-35760.js'
       - 'runtime/alpha-kakashi-w2c-ending-35770.js'
+      - 'runtime/alpha-kakashi-w2c-nonkill-35780.js'
       - 'runtime/alpha-kakashi-battle-development-35740.js'
       - 'runtime/alpha-battle-browser-32600.js'
       - 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
@@ -50,6 +51,7 @@ on:
       - 'tools/qa_academy_kakashi_scene05a_l_35750.js'
       - 'tools/qa_academy_kakashi_scene06a_w2c_35760.js'
       - 'tools/qa_academy_kakashi_w2c_ending_35770.js'
+      - 'tools/qa_academy_kakashi_w2c_nonkill_35780.js'
       - 'tools/qa_kakashi_battle_development_35740.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
@@ -89,6 +91,7 @@ jobs:
           node --check runtime/alpha-kakashi-scene05a-l-35750.js
           node --check runtime/alpha-kakashi-scene06a-w2c-35760.js
           node --check runtime/alpha-kakashi-w2c-ending-35770.js
+          node --check runtime/alpha-kakashi-w2c-nonkill-35780.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -109,6 +112,7 @@ jobs:
           node --check tools/qa_academy_kakashi_scene05a_l_35750.js
           node --check tools/qa_academy_kakashi_scene06a_w2c_35760.js
           node --check tools/qa_academy_kakashi_w2c_ending_35770.js
+          node --check tools/qa_academy_kakashi_w2c_nonkill_35780.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -116,8 +120,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-41' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260918-41";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-42' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260918-42";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -141,10 +145,22 @@ jobs:
           grep -Fq 'aa88db471b71a305ec34e01ff0e094ac26f1638f' runtime/alpha-kakashi-scene05a-l-35750.js
           grep -Fq 'alpha-kakashi-scene06a-w2c-35760.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-w2c-ending-35770.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-w2c-nonkill-35780.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq '820917031000c15e62f0a4cea7535397d3ad9e50' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-scene06a-w2c-35760.js
-          grep -Fq '67a3859a5862032eeb97955abf4865392cb4a97a' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq '2bcb6bb07dc862cb6f259b784782850619a08a4f' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq '275667ff8b65d5d7e9252164f7552676339a9086' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq '14c091f1620eef0275b5e713f782b6c99c8a9abc' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '84894e148e55b57ec74707690ca0b067b6b1e366' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'ecf8f813232d9d72e5c7c08ec544a20dbc2fa2a7' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'f0a4f162f976093a334be9f034067bf1a542bae8' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '896b8fcc9d5c5dd6b019d2f51a5fbccdaee66a25' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '851244e7b5a0911ee7faddd44923115294a0e4a7' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '5c6389d8c4bc53f27bf55cf269a2b66ee5e3848c' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'b52ed9670ddc369fb115d3a61147c496fc75155f' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '99c876dbb29b6ebe43ab6fb4610254db4cfd33ed' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'beginAcademyKakashiResolvedOutcome35780' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'PATROL_ASSET_PATHS=Object.freeze([])' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'installBrowserFinalCueCapture' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'confirmedKillPresentationStarted' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-w2c-ending-35770.js
@@ -209,5 +225,7 @@ jobs:
         run: node tools/qa_academy_kakashi_scene06a_w2c_35760.js
       - name: Academy Kakashi W2C confirmed-kill terminal ending
         run: node tools/qa_academy_kakashi_w2c_ending_35770.js
+      - name: Academy Kakashi W2C non-kill terminal endings
+        run: node tools/qa_academy_kakashi_w2c_nonkill_35780.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js

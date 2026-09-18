@@ -3,7 +3,7 @@
 //
 // Exact Writing authorities:
 // Scene 06 confirmed kill: 820917031000c15e62f0a4cea7535397d3ad9e50
-// Scene 07 rooftop ANBU report: 67a3859a5862032eeb97955abf4865392cb4a97a
+// Scene 07 rooftop ANBU report: 2bcb6bb07dc862cb6f259b784782850619a08a4f
 // Scene 08 Hokage office: 275667ff8b65d5d7e9252164f7552676339a9086
 //
 // This consumes only LETHAL_ATTEMPT_KILLED. Non-kill resolver outcomes remain
@@ -18,7 +18,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_w2c_ending_35770_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_w2c_ending_35770_v5_2026_09_18";
+const PATCH_ID="alpha_kakashi_w2c_ending_35770_v6_2026_09_18";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_HOLD="kak_scene06a_w2c_scene7_pending";
@@ -37,7 +37,7 @@ const RECEIPT_ID="sc-kakashi-origin-receipt-35770";
 const QA_OUTCOME_ID="sc-kakashi-w2c-outcome-qa-35770";
 const AUTHORITY=Object.freeze({
   scene06:"820917031000c15e62f0a4cea7535397d3ad9e50",
-  scene07:"67a3859a5862032eeb97955abf4865392cb4a97a",
+  scene07:"2bcb6bb07dc862cb6f259b784782850619a08a4f",
   scene08:"275667ff8b65d5d7e9252164f7552676339a9086"
 });
 const MI="academy_kakashi_origin_masked_interceptor";
@@ -81,7 +81,7 @@ const SCENE07_CUES=Object.freeze([
   {kind:"dialogue",speaker:"ANBU OPERATIVE",text:"The masked shinobi?",focus:ANBU},
   {kind:"dialogue",speaker:"KAKASHI",text:"I killed her.",focus:"academy_kakashi"},
   {kind:"narration",text:"Another silence.",focus:ANBU},
-  {kind:"dialogue",speaker:"ANBU OPERATIVE",text:"Why?",focus:ANBU},
+  {kind:"dialogue",speaker:"ANBU OPERATIVE",text:"Those weren’t your orders.",focus:ANBU},
   {kind:"dialogue",speaker:"KAKASHI",text:"That was my choice.",focus:"academy_kakashi"},
   {kind:"narration",text:"No other explanation was offered to the ANBU operative.",focus:"academy_kakashi"},
   {kind:"dialogue",speaker:"ANBU OPERATIVE",text:"Very well, you may go.",focus:ANBU},
@@ -235,7 +235,7 @@ function showQaOutcome(rt=active()){
   if(typeof document==="undefined"||!localQaHost()||!rt||rt.beatId!==SOURCE_HOLD)return false;
   const selected=String(rt.localContext&&rt.localContext.kakashiScene06AW2COutcomeRef||"");
   if(!selected||selected==="LETHAL_ATTEMPT_KILLED"){removeQaOutcome();return false;}
-  let n=document.getElementById(QA_OUTCOME_ID);if(!n){n=document.createElement("div");n.id=QA_OUTCOME_ID;n.style.cssText="position:fixed;right:18px;bottom:18px;z-index:119999;padding:10px 12px;border:1px solid rgba(97,220,229,.68);background:rgba(2,8,12,.94);color:#d6edf0;font:700 11px/1.35 system-ui,sans-serif;letter-spacing:.05em;box-shadow:0 10px 30px rgba(0,0,0,.45);pointer-events:none";document.body.appendChild(n);}n.textContent="QA · "+selected.replace(/^LETHAL_ATTEMPT_/,"")+" · continuation pending Writing #226";return true;
+  let n=document.getElementById(QA_OUTCOME_ID);if(!n){n=document.createElement("div");n.id=QA_OUTCOME_ID;n.style.cssText="position:fixed;right:18px;bottom:18px;z-index:119999;padding:10px 12px;border:1px solid rgba(97,220,229,.68);background:rgba(2,8,12,.94);color:#d6edf0;font:700 11px/1.35 system-ui,sans-serif;letter-spacing:.05em;box-shadow:0 10px 30px rgba(0,0,0,.45);pointer-events:none";document.body.appendChild(n);}n.textContent="QA · "+selected.replace(/^LETHAL_ATTEMPT_/,"")+" · presentation owner unavailable";return true;
 }
 function removeDeadMiCardAfterKill(rt,stage){
   if(!rt||!confirmedKill()||typeof document==="undefined")return false;
@@ -331,13 +331,17 @@ function installOutcomeWatchdog(){
     if(rt.beatId===SOURCE_HOLD){
       const selected=String(rt.localContext&&rt.localContext.kakashiScene06AW2COutcomeRef||"");
       if(selected==="LETHAL_ATTEMPT_KILLED"){removeQaOutcome();beginConfirmedKill();}
-      else showQaOutcome(rt);
+      else{
+        const fn=globalThis.beginAcademyKakashiResolvedOutcome35780;
+        if(typeof fn==="function"&&fn(selected)===true)removeQaOutcome();
+        else showQaOutcome(rt);
+      }
     }else removeQaOutcome();
   },120);
   return true;
 }
 function ensure(){if(hooks()){installBrowserFinalCueCapture();installOutcomeWatchdog();return;}if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
-function diagnostics(){const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null,checks={patchId:PATCH_ID==="alpha_kakashi_w2c_ending_35770_v5_2026_09_18",authorities:AUTHORITY.scene06==="820917031000c15e62f0a4cea7535397d3ad9e50"&&AUTHORITY.scene07==="67a3859a5862032eeb97955abf4865392cb4a97a"&&AUTHORITY.scene08==="275667ff8b65d5d7e9252164f7552676339a9086",aftermathExact:AFTERMATH_CUES.length===11&&AFTERMATH_CUES[0].text==="Petals drift across the stone."&&AFTERMATH_CUES[10].text==="Kakashi leaves the Sakura tree behind.",scene07Exact:SCENE07_CUES.length===23&&SCENE07_CUES[16].text==="I killed her."&&SCENE07_CUES[19].text==="That was my choice.",scene08Exact:SCENE08_CUES.length===33&&SCENE08_CUES[20].text==="And killed one of us on the way."&&SCENE08_CUES[32].text==="I won’t have trouble with that.",beats:!!m&&[AFTERMATH,SCENE07,SCENE08,RECEIPT,EXIT].every(x=>m.has(x)),deathBeforeAnimation:killLedger.toString().includes("confirmedKill")&&beginConfirmedKill.toString().includes("killLedger"),miPostKillCardDrop:removeDeadMiCardAfterKill.toString().includes("sc-kakashi-mi-death-drop-35770")&&installStyle.toString().includes("miCardDrop35770"),officeNarrativeStaging:installStyle.toString().includes('data-sc-kakashi-w2c-stage=\\\"office\\\"')&&installStyle.toString().includes('data-w2c-stage=\\\"office\\\"')&&board.toString().includes("sc-kakashi-w2c-package-status"),hiddenKnowledgeBoundary:commitHiddenReview.toString().includes("kakashiKnowledgeGranted:false"),receiptSeparate:openReceipt.toString().includes("document.body.appendChild"),konohaExit:completeToKonoha.toString().includes('openOverlay("village")'),finalCuePostDelegate:globalThis.advanceStoryScene.toString().includes("confirmedKillPresentationStarted"),browserFinalCueCapture:installBrowserFinalCueCapture.toString().includes("stopImmediatePropagation")&&installBrowserFinalCueCapture.toString().includes("p.atEnd!==true"),directScene06Entrypoint:typeof globalThis.beginAcademyKakashiConfirmedKill35770==="function",confirmedKillWatchdog:installOutcomeWatchdog.toString().includes("beginConfirmedKill")&&installOutcomeWatchdog.toString().includes("120"),nonKillLocalQa:showQaOutcome.toString().includes("continuation pending Writing #226"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};}
+function diagnostics(){const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null,checks={patchId:PATCH_ID==="alpha_kakashi_w2c_ending_35770_v6_2026_09_18",authorities:AUTHORITY.scene06==="820917031000c15e62f0a4cea7535397d3ad9e50"&&AUTHORITY.scene07==="2bcb6bb07dc862cb6f259b784782850619a08a4f"&&AUTHORITY.scene08==="275667ff8b65d5d7e9252164f7552676339a9086",aftermathExact:AFTERMATH_CUES.length===11&&AFTERMATH_CUES[0].text==="Petals drift across the stone."&&AFTERMATH_CUES[10].text==="Kakashi leaves the Sakura tree behind.",scene07Exact:SCENE07_CUES.length===23&&SCENE07_CUES[16].text==="I killed her."&&SCENE07_CUES[18].text==="Those weren’t your orders."&&SCENE07_CUES[19].text==="That was my choice.",scene08Exact:SCENE08_CUES.length===33&&SCENE08_CUES[20].text==="And killed one of us on the way."&&SCENE08_CUES[32].text==="I won’t have trouble with that.",beats:!!m&&[AFTERMATH,SCENE07,SCENE08,RECEIPT,EXIT].every(x=>m.has(x)),deathBeforeAnimation:killLedger.toString().includes("confirmedKill")&&beginConfirmedKill.toString().includes("killLedger"),miPostKillCardDrop:removeDeadMiCardAfterKill.toString().includes("sc-kakashi-mi-death-drop-35770")&&installStyle.toString().includes("miCardDrop35770"),officeNarrativeStaging:installStyle.toString().includes('data-sc-kakashi-w2c-stage=\\\"office\\\"')&&installStyle.toString().includes('data-w2c-stage=\\\"office\\\"')&&board.toString().includes("sc-kakashi-w2c-package-status"),hiddenKnowledgeBoundary:commitHiddenReview.toString().includes("kakashiKnowledgeGranted:false"),receiptSeparate:openReceipt.toString().includes("document.body.appendChild"),konohaExit:completeToKonoha.toString().includes('openOverlay("village")'),finalCuePostDelegate:globalThis.advanceStoryScene.toString().includes("confirmedKillPresentationStarted"),browserFinalCueCapture:installBrowserFinalCueCapture.toString().includes("stopImmediatePropagation")&&installBrowserFinalCueCapture.toString().includes("p.atEnd!==true"),directScene06Entrypoint:typeof globalThis.beginAcademyKakashiConfirmedKill35770==="function",confirmedKillWatchdog:installOutcomeWatchdog.toString().includes("beginConfirmedKill")&&installOutcomeWatchdog.toString().includes("120"),nonKillOutcomeDispatch:installOutcomeWatchdog.toString().includes("beginAcademyKakashiResolvedOutcome35780")&&showQaOutcome.toString().includes("presentation owner unavailable"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};}
 globalThis.beginAcademyKakashiConfirmedKill35770=beginConfirmedKill;
 globalThis.showAcademyKakashiW2CResolverOutcomeQa35770=showQaOutcome;
 globalThis.enterAcademyKakashiScene07W2CK35770=enter07;
