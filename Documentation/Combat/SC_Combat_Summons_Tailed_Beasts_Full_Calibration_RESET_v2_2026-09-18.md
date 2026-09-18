@@ -178,6 +178,28 @@ It does not automatically negate:
 
 unless explicitly stated.
 
+### Poison damage law
+
+**Poison is not a status-only effect in Shinobi Chronicles.**
+
+For damaging poison-delivery actions:
+
+1. resolve the action's **immediate authored damage**;
+2. then establish / refresh the `poisoned` condition;
+3. the `poisoned` condition continues dealing its own Battle-PL damage on its authored ticks.
+
+Therefore:
+
+> **Poison hurts now and keeps hurting afterward.**
+
+Examples:
+
+- a poison bite can deal normal Attack-PL damage, then apply Poison;
+- a poison cloud can deal immediate direct Battle-PL poison damage, then apply Poison;
+- Poison Immunity prevents the `poisoned` condition from establishing but does **not** erase the raw/immediate damage portion unless that exact effect separately says so.
+
+Do not author a damaging Poison skill that merely places a status marker with zero immediate gameplay impact unless Stephen explicitly approves it as a non-damaging exception.
+
 ### Item Find
 
 - determine eligible random loot table first;
