@@ -3,7 +3,7 @@
 //
 // Verbatim Writing authority:
 // Documentation/Story/Academy_Kakashi_Origin_Scene_06A_W2C_Attempt_To_Kill_Her_Verbatim_Lock_2026-09-18.md
-// commit 671e04042debafccead2c41ab31fc4ebf99a75b1
+// commit 820917031000c15e62f0a4cea7535397d3ad9e50
 //
 // Entry is ONLY STOP THE ASSASSIN -> Kakashi victory -> turn 4+ -> Scene 05A-W2
 // ATTEMPT TO KILL HER. The player choice commits lethal intent first. The
@@ -20,8 +20,8 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v2_2026_09_18";
-const AUTHORITY="671e04042debafccead2c41ab31fc4ebf99a75b1";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v3_2026_09_18";
+const AUTHORITY="820917031000c15e62f0a4cea7535397d3ad9e50";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
 const ORIGIN_ID="academy_kakashi";
@@ -44,22 +44,23 @@ const BOARD_CLASS="sc-kakashi-scene06aw2c-board-35760";
 const SOURCE_REQUEST="kakashi_scene06aw2c_source_choice_35760";
 
 const CUES=Object.freeze([
-  Object.freeze({cueId:"scene06aw2c_01",kind:"narration",text:"Kakashi looks once toward the empty street.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_02",kind:"narration",text:"Nothing.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_03",kind:"narration",text:"Package Smuggler is gone.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_04",kind:"narration",text:"The package with him.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_05",kind:"narration",text:"He turns back toward Masked Interceptor.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_06",kind:"narration",text:"She has forced herself partway up from the stone.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_07",kind:"narration",text:"Not recovered.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_08",kind:"narration",text:"Not helpless either.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_09",kind:"narration",text:"Her head lifts as Kakashi approaches.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_10",kind:"narration",text:"His hand moves to his kunai.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_11",kind:"narration",text:"This is not an arrest.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_12",kind:"narration",text:"Not a return to ANBU.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_13",kind:"narration",text:"Not the Police Force.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_14",kind:"narration",text:"Masked Interceptor sees the decision before Kakashi makes the first step.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_15",kind:"narration",text:"Her body tightens.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_16",kind:"narration",text:"Kakashi moves.",focusActorRef:"academy_kakashi"})
+  Object.freeze({cueId:"scene06aw2c_01",kind:"narration",text:"Kakashi watches Masked Interceptor push herself upright.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_02",kind:"narration",text:"One hand braces against the stone.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_03",kind:"narration",text:"The other stays close to her weapon.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_04",kind:"narration",text:"She is hurt.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_05",kind:"narration",text:"Still dangerous.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_06",kind:"narration",text:"Kakashi studies her for a heartbeat.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_07",kind:"narration",text:"Package Smuggler has already disappeared into Konoha.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_08",kind:"narration",text:"There is no sound of pursuit.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_09",kind:"narration",text:"No movement from the route ANBU Marked Target took.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_10",kind:"narration",text:"Only the two of them remain beneath the Sakura tree.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_11",kind:"narration",text:"Masked Interceptor steadies herself.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_12",kind:"narration",text:"Kakashi reaches for his kunai.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_13",kind:"narration",text:"She sees his hand move.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_14",kind:"narration",text:"Whatever she expected him to do next, this was not it.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_15",kind:"narration",text:"Her stance changes.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_16",kind:"narration",text:"Kakashi lowers his centre of gravity.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_17",kind:"narration",text:"Then disappears from where he was standing.",focusActorRef:"academy_kakashi"})
 ]);
 
 const OUTCOMES=Object.freeze([
@@ -323,11 +324,13 @@ function installBrowserChoiceCapture(){
 
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,sceneBeat=map&&map.get(SCENE_BEAT),hold=map&&map.get(HOLD_BEAT);
-  const exact=["Kakashi looks once toward the empty street.","Nothing.","Package Smuggler is gone.","The package with him.","He turns back toward Masked Interceptor.","She has forced herself partway up from the stone.","Not recovered.","Not helpless either.","Her head lifts as Kakashi approaches.","His hand moves to his kunai.","This is not an arrest.","Not a return to ANBU.","Not the Police Force.","Masked Interceptor sees the decision before Kakashi makes the first step.","Her body tightens.","Kakashi moves."];
+  const exact=[
+    "Kakashi watches Masked Interceptor push herself upright.","One hand braces against the stone.","The other stays close to her weapon.","She is hurt.","Still dangerous.","Kakashi studies her for a heartbeat.","Package Smuggler has already disappeared into Konoha.","There is no sound of pursuit.","No movement from the route ANBU Marked Target took.","Only the two of them remain beneath the Sakura tree.","Masked Interceptor steadies herself.","Kakashi reaches for his kunai.","She sees his hand move.","Whatever she expected him to do next, this was not it.","Her stance changes.","Kakashi lowers his centre of gravity.","Then disappears from where he was standing."
+  ];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v2_2026_09_18",
-    authorityPinned:AUTHORITY==="671e04042debafccead2c41ab31fc4ebf99a75b1",
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v3_2026_09_18",
+    authorityPinned:AUTHORITY==="820917031000c15e62f0a4cea7535397d3ad9e50",
     exactNarration:JSON.stringify(CUES.map(function(row){return row.text;}))===JSON.stringify(exact)&&CUES.every(function(row){return row.kind==="narration"&&!row.speakerName;}),
     exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes(">=4")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
     intentBeforeResolver:prepareScene06AW2CSourceChoice.toString().includes("ensureLethalIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("resolveStoryFactualAction"),
