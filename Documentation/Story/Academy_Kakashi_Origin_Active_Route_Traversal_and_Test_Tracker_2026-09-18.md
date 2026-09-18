@@ -201,3 +201,18 @@ The loss route is authored only through its rooftop ANBU report. Hidden Hokage O
 Coding handoff: issue #pending.
 
 CE #244 still exclusively blocks the factual consequence of RESTRAIN / ATTEMPT TO RESTRAIN AND CONTINUE.
+
+
+## 2026-09-19 approval advance — STOP THE ASSASSIN loss route closed in Writing
+
+Stephen approved the hidden Hokage Office continuation after the Kakashi-loss rooftop report.
+
+Durable scene:
+- `SCENE_07A_L — HOKAGE'S OFFICE: KAKASHI DEFEATED`
+- `Documentation/Story/Academy_Kakashi_Origin_Scene_07A_L_Hokage_Office_Kakashi_Defeated_Verbatim_Lock_2026-09-19.md`
+- commit `d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab`.
+
+Loss chronology is now Writing-complete through:
+`MI defeats Kakashi -> RETURN TO ANBU -> rooftop ANBU report -> hidden Hokage Office -> Chronicle Receipt / Origin closure`.
+
+Coding issue #249 has been updated to consume this final loss-route scene. Browser validation remains separate after implementation.
