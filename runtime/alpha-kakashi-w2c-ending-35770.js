@@ -194,6 +194,7 @@ function installStyle(){
   "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor[data-actor-id=\""+AMT+"\"]{left:57.5%!important;bottom:30.5%!important;z-index:3}"+
   "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor[data-actor-id=\""+PS+"\"]{left:69.5%!important;bottom:30.5%!important;z-index:3}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"][data-sc-board-ui-mode=\"performance_narration\"] .sc-dialogue-panel-33910{display:none!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:3.5%!important;right:auto!important;top:18%!important;bottom:auto!important;width:min(28%,400px)!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id=\"konoha_anbu_contact\"]{left:auto!important;right:3.5%!important}"+
   ".sc-kakashi-w2c-package-status{position:absolute;left:50%;right:auto;bottom:13.2%;transform:translateX(-50%);padding:8px 12px;border:1px solid rgba(214,169,58,.55);background:rgba(4,8,12,.9);color:#e6c65e;font-size:10px;font-weight:900;letter-spacing:.12em;z-index:6;white-space:nowrap}"+
