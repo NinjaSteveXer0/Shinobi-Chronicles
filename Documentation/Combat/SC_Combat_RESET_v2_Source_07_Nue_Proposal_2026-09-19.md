@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 07 UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 07 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Source baseline:** `13dec46d50761e0bf190d354b61865ce5db5db7f`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
@@ -112,3 +112,26 @@ Any future Sumire-only relationship technique must be separately authored.
 > **NUE — Attach Nue to feed on part of incoming chakra attacks. Manifest it to use that stored chakra for a dangerous Core Overload, or escape through its dimension when threatened. The bigger the stored blast, the more Battle PL Nue loses afterward.**
 
 **PROPOSED.**
+
+---
+
+## Stephen sign-off / closure
+
+Stephen has explicitly signed off this RESET v2 Nue package.
+
+This document is now binding Combat design authority for Source 07.
+
+Preserve:
+- ATTACHED Chakra Feeding Link;
+- first two qualifying controller chakra packets may feed Nue;
+- 25% pre-Stamina diversion, max 8 each, stored cap 16;
+- manifested PL100 independent Nue;
+- Demon Beast Claw ATK34;
+- Rift Pounce ATK30;
+- Chakra Devour once/Battle;
+- Core Overload once/Battle using stored chakra with backlash;
+- Rift Retreat once/Battle by ending manifestation;
+- no generic Sumire friendship multiplier;
+- Nue and Sumire remain distinct Registry identities.
+
+**design closed != implemented != runtime validated != Golden GREEN**
