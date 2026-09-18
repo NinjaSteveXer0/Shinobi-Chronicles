@@ -250,7 +250,7 @@ function diagnostics(){
     patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_2026_09_18",
     authorityPinned:AUTHORITY==="7dd9f248003604c15674d5e8eafb56abea029b1b",
     exactSeventeenNarrationCues:CUES.length===17&&JSON.stringify(CUES.map(x=>x.text))===JSON.stringify(exact)&&CUES.every(x=>x.kind==="narration"),
-    victoryEntryOnly:routeVictoryReturn35730.toString().includes('resultState==="player_side_victory"')&&routeVictoryReturn35730.toString().includes("kakashiScene04ABattleIntentResolved"),
+    victoryEntryOnly:validVictory.toString().includes('resultState==="player_side_victory"')&&routeVictoryReturn35730.toString().includes("kakashiScene04ABattleIntentResolved"),
     exactTurnGate:fastPursuit({resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:4})===true&&fastPursuit({resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:5})===false,
     pursuitRemovedAtFivePlus:materializeChoices35730.toString().includes("if(fastPursuit())"),
     exactDispositionLabels:materializeChoices35730.toString().includes("TAKE HER BACK TO ANBU")&&materializeChoices35730.toString().includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
