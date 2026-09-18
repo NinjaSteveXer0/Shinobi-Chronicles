@@ -57,6 +57,7 @@ globalThis.projectAcademyKakashiOriginBattleResult=()=>({
   battleOccurrenceId:battleId,
   resultState:"player_side_victory"
 });
+globalThis.createBattleChronicleResult=()=>({battleId,rewards:{exp:0,ryo:0,items:[],progression:[]}});
 globalThis.renderVictoryOverlay=()=>true;
 
 load("runtime/alpha-kakashi-origin-rewards-34800.js");
@@ -94,6 +95,14 @@ const projected=globalThis.projectAcademyKakashiOriginBattleResult();
 assert.strictEqual(projected.developmentSummary.totalExp,4);
 assert.strictEqual(projected.developmentSummary.terminalOriginRewardDeferred,true);
 
+const chronicle=globalThis.createBattleChronicleResult();
+assert.deepStrictEqual(chronicle.rewards.progression,[
+  {type:"discipline_exp",discipline:"ninjutsu",amount:1},
+  {type:"discipline_exp",discipline:"bukijutsu",amount:2},
+  {type:"discipline_exp",discipline:"stamina",amount:1}
+]);
+assert.strictEqual(chronicle.rewards.terminalOriginRewardDeferred,true);
+
 const snap=globalThis.getAcademyKakashiOriginRewardSnapshot34800();
 const receipts=Object.values(snap.sources);
 assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.discipline==="bukijutsu"&&r.payload.amount===2));
@@ -108,7 +117,7 @@ assert(saves>0);
 console.log("Academy Kakashi Story Battle development 35740 QA: PASS");
 console.log("- exact action evidence -> discipline development through 34800");
 console.log("- effective Bukijutsu +2 / committed Ninjutsu attempt +1 / Stamina mitigation +1");
-console.log("- progression projects separately from generic EXP");
+console.log("- progression projects separately from generic EXP and into the Battle Chronicle");
 console.log("- no Battle Ryō / item / rare-drop fabrication");
 console.log("- terminal Origin reward remains deferred");
 console.log("- retry is source-idempotent");
