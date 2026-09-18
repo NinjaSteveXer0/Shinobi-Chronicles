@@ -23,6 +23,11 @@ Current production traversal:
 -> `Scene 5A-W2 — Late Victory / no pursuit`
 -> selected `ATTEMPT TO KILL HER`
 -> `Scene 6A-W2C — Attempt to Kill Her`
+-> resolver result **LETHAL_ATTEMPT_KILLED**
+-> confirmed-kill animation + aftermath
+-> Objective switches to **Report to ANBU.**
+-> **BLACK WIPE**
+-> next: **ANBU Report Scene on the Konoha rooftop**
 -> **continue this route to its terminal Origin ending before rewinding**.
 
 ## Current route state
@@ -33,7 +38,10 @@ Current production traversal:
   - `TAKE HER BACK TO ANBU`;
   - `TAKE HER TO THE UCHIHA POLICE FORCE`.
 - Stephen is currently following the lethal-intent route:
-  - `Scene 6A-W2C — ATTEMPT TO KILL HER`.
+  - `Scene 6A-W2C — ATTEMPT TO KILL HER`;
+  - current browser-tested resolver result: `LETHAL_ATTEMPT_KILLED`;
+  - Scene 6A-W2C now continues through the confirmed-kill animation/aftermath and black-wipe transition;
+  - next scene to review/write is the **ANBU Report on the rooftop**, not the Hokage Administration interior.
 
 ## Required later browser test — manual fast-win exposure
 
@@ -88,8 +96,25 @@ For every new scene reached, update this file with:
 
 ## Current next action
 
-Continue from:
+Continue from the confirmed-kill end of:
 
 `SCENE_06A_W2C — ATTEMPT TO KILL HER`
 
-until the route reaches its terminal Origin ending.
+Next production task:
+
+**Review/write the ANBU Report scene on `rooftop_night.png`, then continue this same route to its terminal Origin ending.**
+
+
+## Resolver-result coverage still outstanding for Scene 06A-W2C
+
+Current tested/approved result:
+
+- `LETHAL_ATTEMPT_KILLED` — confirmed-kill continuation written and routed.
+
+Still untested / unwritten as separate continuations if produced by the resolver:
+
+- `LETHAL_ATTEMPT_SURVIVED`
+- `LETHAL_ATTEMPT_INTERRUPTED`
+- `LETHAL_ATTEMPT_ESCAPED`
+
+These must not be silently collapsed into the confirmed-kill route.
