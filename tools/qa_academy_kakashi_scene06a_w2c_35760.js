@@ -29,7 +29,7 @@ const choiceBeat={beatId:SOURCE_BEAT,mode:"choice",environmentRef:{assetId:"kaka
   {choiceId:SOURCE_CHOICE,label:"ATTEMPT TO KILL HER",nextBeatId:SOURCE_BEAT,availability:()=>({available:true}),consequenceRequests:[{requestId:"qa-old-fail-closed",kind:"domain",resolve:()=>({success:false,reason:"kakashi_scene05aw_successor_authority_not_implemented"})}]}
 ]};
 const definition={sceneId:SCENE_ID,beatMap:new Map([[SOURCE_BEAT,choiceBeat]])};
-const active={sceneId:SCENE_ID,instanceId:"qa-scene06aw2c",beatId:SOURCE_BEAT,localContext:{kakashiScene05AWPursuitEligible:false,kakashiScene05AWTurnCount:4,kakashiScene05AWBattleOccurrenceId:"battle-mi-qa"},battleResume:{authored:null}};
+const active={sceneId:SCENE_ID,instanceId:"qa-scene06aw2c",beatId:SOURCE_BEAT,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWPursuitEligible:false,kakashiScene05AWTurnCount:4,kakashiScene05AWBattleOccurrenceId:"battle-mi-qa"},battleResume:{authored:null}};
 globalThis.getStorySceneDefinition=id=>id===SCENE_ID?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
@@ -143,14 +143,14 @@ assert.strictEqual(active.beatId,HOLD_BEAT);
 assert(!JSON.stringify([...definition.beatMap.values()]).includes("kak_seq_debrief_pending"),"Scene 06A-W2C invented automatic debrief");
 
 globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-fast-reset"});
-active.beatId=SOURCE_BEAT;active.localContext={kakashiScene05AWPursuitEligible:true,kakashiScene05AWTurnCount:3,kakashiScene05AWBattleOccurrenceId:"battle-mi-fast"};
+active.beatId=SOURCE_BEAT;active.localContext={kakashiScene05AWEntered:true,kakashiScene05AWPursuitEligible:true,kakashiScene05AWTurnCount:3,kakashiScene05AWBattleOccurrenceId:"battle-mi-fast"};
+MOD.wireSourceChoice();
 const fast=globalThis.advanceStoryScene(SOURCE_CHOICE);
-assert.strictEqual(fast.success,false);
-assert.strictEqual(fast.reason,"kakashi_scene05aw_successor_authority_not_implemented","1-3 turn lethal route must remain fail-closed here");
-assert.strictEqual(active.beatId,SOURCE_BEAT);
+assert.strictEqual(fast.success,true,"1-4 pursuit-eligible ATTEMPT TO KILL must still enter Scene 06A-W2C: "+JSON.stringify(fast));
+assert.strictEqual(active.beatId,SCENE_BEAT);
 
 globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"CONTROLLED_DEFEATED",resultRef:"qa-controlled"});
-active.beatId=SOURCE_BEAT;active.localContext={kakashiScene05AWPursuitEligible:false,kakashiScene05AWTurnCount:4,kakashiScene05AWBattleOccurrenceId:"battle-mi-controlled"};
+active.beatId=SOURCE_BEAT;active.localContext={kakashiScene05AWEntered:true,kakashiScene05AWPursuitEligible:true,kakashiScene05AWTurnCount:4,kakashiScene05AWBattleOccurrenceId:"battle-mi-controlled"};
 const controlled=globalThis.advanceStoryScene(SOURCE_CHOICE);
 assert.strictEqual(controlled.success,false);
 assert.strictEqual(controlled.reason,"kakashi_scene05aw_successor_authority_not_implemented","controlled deterministic KILL route must not enter ATTEMPT TO KILL Scene 06A-W2C");
@@ -158,7 +158,7 @@ assert(saves>0,"Scene 06A-W2C never persisted state");
 
 console.log("Academy Kakashi Scene 06A-W2C 35760 QA: PASS");
 console.log("- exact 17-line locked narration / no dialogue / no post-commit player choice");
-console.log("- exact late 4+ STOP THE ASSASSIN entry only; fast and controlled variants remain fail-closed");
+console.log("- ATTEMPT TO KILL remains live inside the corrected 1-4 pursuit window; controlled deterministic KILL stays separate");
 console.log("- lethal intent commits before resolver selection");
 console.log("- resolver commits only the four Writing-authorised factual outcomes, idempotently");
 console.log("- package / PS / AMT pursuit stay closed; no Pakkun");
