@@ -138,7 +138,7 @@ jobs:
           grep -Fq 'alpha-kakashi-scene06a-w2c-35760.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq '671e04042debafccead2c41ab31fc4ebf99a75b1' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'stopImmediatePropagation' runtime/alpha-kakashi-scene06a-w2c-35760.js
-          if grep -Fq 'sc-scene-board-33900__objects' runtime/alpha-kakashi-scene04a-35710.js; then echo 'redundant standalone package badge container must stay removed'; exit 1; fi
+          if grep -Fq 'PACKAGE SMUGGLER HAS PACKAGE' runtime/alpha-kakashi-scene04a-35710.js; then echo 'redundant standalone package badge must stay removed'; exit 1; fi
           grep -Fq 'width:min(96%,338px)!important' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'kakashiScene05ALPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'alpha-kakashi-battle-development-35740.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
