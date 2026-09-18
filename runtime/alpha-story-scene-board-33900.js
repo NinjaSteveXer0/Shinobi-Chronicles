@@ -105,7 +105,7 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{min-height:0!important;max-height:31vh;padding:13px 18px 12px!important;border:1px solid rgba(205,169,83,.62)!important;background:linear-gradient(180deg,rgba(3,9,14,.76),rgba(2,7,11,.91))!important;backdrop-filter:blur(4px);box-shadow:0 18px 45px rgba(0,0,0,.42)!important;overflow:auto!important;cursor:pointer;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-portrait{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-text{margin-top:6px!important;font-size:clamp(13px,1.05vw,17px)!important;line-height:1.42!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:12px!important;margin-top:5px!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:11px!important;margin:0 0 2px!important;color:#e8c86e!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;line-height:1.15!important;}
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{width:34px!important;height:30px!important;min-height:0!important;padding:0!important;font-size:20px!important;line-height:1!important;float:right;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
 #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -156,9 +156,11 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   const text=layer.querySelector&&layer.querySelector(".sc-story-text");const cueText=String(cue.text||"");if(text&&text.textContent!==cueText)text.textContent=cueText;
   const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
   let name=layer.querySelector&&layer.querySelector(".sc-story-name");
-  const speaker=cue.kind==="dialogue"&&cue.speakerName?String(cue.speakerName):"";
-  if(speaker&&!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
-  if(name){if(name.textContent!==speaker)name.textContent=speaker;name.style.display=speaker?"block":"none";}
+  const dialogueSpeaker=cue.kind==="dialogue"?String(cue.speakerName||cue.speaker||""):"";
+  const speakerLabel=dialogueSpeaker||(cue.kind==="record"?"SHINOBI RECORD":"NARRATION");
+  if(!name&&panel){name=document.createElement("div");name.className="sc-story-name sc-performance-name-33900";}
+  if(name&&panel&&!panel.contains(name)){const t=panel.querySelector(".sc-story-text");panel.insertBefore(name,t||null);}
+  if(name){if(name.textContent!==speakerLabel)name.textContent=speakerLabel;name.style.display="block";}
   const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");const kickerText=`${String(cue.kind||"narration").toUpperCase()} · ACADEMY KAKASHI`;if(kicker&&kicker.textContent!==kickerText)kicker.textContent=kickerText;
   const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){if(primary.textContent!=="›")primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
   return true;
