@@ -373,7 +373,8 @@ globalThis.runStoryDecisionRealisation34000Diagnostics=runStoryDecisionRealisati
       // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-22
       // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-23
       // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-24
-      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-25";
+      // runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-25
+      script.src="runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-26";
       document.head.appendChild(script);return;
     }
     attempts+=1;if(attempts<240&&typeof setTimeout==="function")setTimeout(tryLoad,50);
