@@ -18,7 +18,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_w2c_nonkill_35780_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_w2c_nonkill_35780_v2_2026_09_18";
+const PATCH_ID="alpha_kakashi_w2c_nonkill_35780_v3_2026_09_18";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_HOLD="kak_scene06a_w2c_scene7_pending";
@@ -1727,12 +1727,16 @@ function installStyle(){
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-chronicle-layout{position:absolute!important;left:3.4%!important;top:13%!important;width:min(33%,430px)!important;margin:0!important;align-self:start!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-story-panel{max-height:36vh!important}"+
   "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actors{left:0!important;right:0!important;top:0!important;bottom:0!important;display:block!important;padding:0!important}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor{position:absolute!important;width:min(13.5vw,180px)!important;max-height:320px!important}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MINATO+"']{left:40.5%!important;top:3%!important;width:min(19vw,260px)!important;max-height:440px!important;z-index:6}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+ANBU+"']{left:21%!important;bottom:16.8%!important;z-index:4}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MI+"']{left:35%!important;bottom:16.8%!important;z-index:5}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+AMT+"']{left:60%!important;bottom:16.8%!important;z-index:3}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+PS+"']{left:74%!important;bottom:16.8%!important;z-index:3}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor{position:absolute!important;width:min(12.5vw,168px)!important;max-height:300px!important}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MINATO+"']{left:42%!important;top:1.5%!important;width:min(16.5vw,232px)!important;max-height:400px!important;z-index:6}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+ANBU+"']{left:20.5%!important;bottom:30.5%!important;z-index:4}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MI+"']{left:33.5%!important;bottom:30.5%!important;z-index:5}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+AMT+"']{left:57.5%!important;bottom:30.5%!important;z-index:3}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+PS+"']{left:69.5%!important;bottom:30.5%!important;z-index:3}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'][data-sc-board-ui-mode='performance_narration'] .sc-dialogue-panel-33910{display:none!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:3.5%!important;right:auto!important;top:18%!important;bottom:auto!important;width:min(28%,400px)!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='konoha_anbu_contact'],#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='masked_interceptor']{left:auto!important;right:3.5%!important}"+
   "."+BOARD_CLASS+" .sc-w2c-nonkill-enter-left{animation:w2cNonKillEnterLeft35780 500ms cubic-bezier(.18,.76,.24,1) both!important}"+
   "@keyframes w2cNonKillEnterLeft35780{0%{opacity:0;transform:translateX(-18vw) scale(.94);filter:brightness(.38) blur(2px)}100%{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}"+
   "."+BOARD_CLASS+" .sc-w2c-nonkill-enter-left.is-focus{animation-name:w2cNonKillEnterLeftFocus35780}@keyframes w2cNonKillEnterLeftFocus35780{0%{opacity:0;transform:translateX(-18vw) scale(.95)}100%{opacity:1;transform:translateX(0) scale(1)}}"+
@@ -1860,14 +1864,14 @@ function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<1
 function diagnostics(){
   const m=scene()&&scene().beatMap instanceof Map?scene().beatMap:null;
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_w2c_nonkill_35780_v2_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_w2c_nonkill_35780_v3_2026_09_18",
     allAuthorities:DATA.LETHAL_ATTEMPT_SURVIVED.authorities.scene07==="84894e148e55b57ec74707690ca0b067b6b1e366"&&DATA.LETHAL_ATTEMPT_INTERRUPTED.authorities.scene07==="896b8fcc9d5c5dd6b019d2f51a5fbccdaee66a25"&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene07==="b52ed9670ddc369fb115d3a61147c496fc75155f"&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene08==="4e679e92e6c97968bcf970a83b9ba88e19d96355",
     exactCueCounts:DATA.LETHAL_ATTEMPT_SURVIVED.aftermath.length===29&&DATA.LETHAL_ATTEMPT_INTERRUPTED.aftermath.length===23&&DATA.LETHAL_ATTEMPT_ESCAPED.aftermath.length===31&&DATA.LETHAL_ATTEMPT_SURVIVED.report.length===29&&DATA.LETHAL_ATTEMPT_INTERRUPTED.report.length===30&&DATA.LETHAL_ATTEMPT_ESCAPED.report.length===30&&DATA.LETHAL_ATTEMPT_SURVIVED.office.length===57&&DATA.LETHAL_ATTEMPT_INTERRUPTED.office.length===46&&DATA.LETHAL_ATTEMPT_ESCAPED.office.length===57,
     approvedChallenge:[DATA.LETHAL_ATTEMPT_SURVIVED,DATA.LETHAL_ATTEMPT_INTERRUPTED,DATA.LETHAL_ATTEMPT_ESCAPED].every(function(d){return d.report.some(function(c){return c.text==="Those weren’t your orders.";})&&d.report.some(function(c){return c.text==="That was my choice.";});}),
     failedLethalNotMercy:commitOutcomeLedger.toString().includes("mercyOutcome:false")&&commitReport.toString().includes("noMercyRewrite:true"),
     pursuitsStayClosed:commitOutcomeLedger.toString().includes("packagePursuitReopened:false")&&commitOutcomeLedger.toString().includes("anbuMarkedTargetPursuitReopened:false"),
     hiddenKnowledgeBoundary:commitHiddenReview.toString().includes("kakashiKnowledgeGranted:false")&&commitHiddenReview.toString().includes("kakashiLearnsHiddenOperationTruth:false"),
-    sharedHistoryPersisted:commitOutcomeLedger.toString().includes("sharedHistoryPersists:true"),allAttemptsAnimate:beginOutcome.toString().includes("playAcademyKakashiLethalAttemptAnimation35770")&&!beginOutcome.toString().includes("removeDeadMiCardAfterKill"),officeChairStaging:installStyle.toString().includes("left:21%!important")&&installStyle.toString().includes("left:35%!important")&&installStyle.toString().includes("left:60%!important")&&installStyle.toString().includes("left:74%!important")&&installStyle.toString().includes("left:50%;right:auto;bottom:13.2%"),speakerQuickRead:render.toString().includes('name.style.display="block"')&&render.toString().includes('"NARRATION"'),officeEntryMotion:board.toString().includes("The ANBU operative enters.")&&installStyle.toString().includes("w2cNonKillEnterLeft35780"),escapedOfficeRevision:!DATA.LETHAL_ATTEMPT_ESCAPED.office.some(function(row){return row&&row.text==="A beat.";})&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene08==="4e679e92e6c97968bcf970a83b9ba88e19d96355",
+    sharedHistoryPersisted:commitOutcomeLedger.toString().includes("sharedHistoryPersists:true"),allAttemptsAnimate:beginOutcome.toString().includes("playAcademyKakashiLethalAttemptAnimation35770")&&!beginOutcome.toString().includes("removeDeadMiCardAfterKill"),officeChairStaging:installStyle.toString().includes("left:20.5%!important")&&installStyle.toString().includes("left:33.5%!important")&&installStyle.toString().includes("left:57.5%!important")&&installStyle.toString().includes("left:69.5%!important")&&installStyle.toString().includes("bottom:30.5%!important")&&installStyle.toString().includes("left:50%;right:auto;bottom:13.2%")&&installStyle.toString().includes("sc-dialogue-panel-33910.is-current"),speakerQuickRead:render.toString().includes('name.style.display="block"')&&render.toString().includes('"NARRATION"'),officeEntryMotion:board.toString().includes("The ANBU operative enters.")&&installStyle.toString().includes("w2cNonKillEnterLeft35780"),escapedOfficeRevision:!DATA.LETHAL_ATTEMPT_ESCAPED.office.some(function(row){return row&&row.text==="A beat.";})&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene08==="4e679e92e6c97968bcf970a83b9ba88e19d96355",
     noPatrolPathInvented:PATROL_ASSET_PATHS.length===0,
     beats:!!m&&[AFTERMATH,SCENE07,SCENE08,RECEIPT,EXIT].every(function(x){return m.has(x);}),
     browserGoldenClaimed:false

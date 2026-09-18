@@ -36,6 +36,7 @@ try{
   assert("scene_board_delivery_generation_coherent",terminalSource.includes('const SCENE_BOARD_BUILD="scene-board-20260917-6";')&&restorationSource.includes('const BUILD="scene-board-20260917-6";'));
   assert("restoration_activates_generic_board_then_kakashi_v4",restorationSource.includes('runtime/alpha-story-scene-board-33900.js')&&restorationSource.includes('runtime/alpha-kakashi-scene-board-polish-33910.js'));
   assert("scene_board_quick_read_labels_inside_panel",sceneBoardSource.includes("speakerLabel")&&sceneBoardSource.includes('cue.speakerName||cue.speaker')&&sceneBoardSource.includes('panel.contains(name)')&&sceneBoardSource.includes('"NARRATION"'));
+  assert("scene_board_overlay_reads_w2c_speaker_field",kakashiV4Source.includes("cueSpeaker33910")&&kakashiV4Source.includes("cue.speakerName||cue.speaker")&&kakashiV4Source.includes("panel.dataset.speakerId=speakerId")&&kakashiV4Source.includes('key==="MINATO"'));
 
   load("runtime/alpha-kakashi-original-origin-restoration-33800.js");
   const rooftopEnvironment=context.resolveStorySceneEnvironmentProjection({environmentRef:{assetId:"kakashi_origin_rooftop_night"}},null,null,active);
@@ -51,7 +52,7 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v4_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v4_33910_2026_09_17'));
+  assert("kakashi_v5_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v5_33910_2026_09_18'));
 
   assert("scene1_authority_pinned",kakashiV4Source.includes('d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91'));
   const exactScene1=[
