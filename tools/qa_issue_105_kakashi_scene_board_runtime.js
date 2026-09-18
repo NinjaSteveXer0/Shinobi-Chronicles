@@ -35,6 +35,7 @@ try{
   assert("production_terminal_chain_references_336_337_338",terminalSource.includes('runtime/alpha-early-story-modernization-33600.js')&&terminalSource.includes('runtime/alpha-origin-screen-first-33700.js')&&terminalSource.includes('runtime/alpha-kakashi-original-origin-restoration-33800.js'));
   assert("scene_board_delivery_generation_coherent",terminalSource.includes('const SCENE_BOARD_BUILD="scene-board-20260917-6";')&&restorationSource.includes('const BUILD="scene-board-20260917-6";'));
   assert("restoration_activates_generic_board_then_kakashi_v4",restorationSource.includes('runtime/alpha-story-scene-board-33900.js')&&restorationSource.includes('runtime/alpha-kakashi-scene-board-polish-33910.js'));
+  assert("scene_board_quick_read_labels_inside_panel",sceneBoardSource.includes("speakerLabel")&&sceneBoardSource.includes('cue.speakerName||cue.speaker')&&sceneBoardSource.includes('panel.contains(name)')&&sceneBoardSource.includes('"NARRATION"'));
 
   load("runtime/alpha-kakashi-original-origin-restoration-33800.js");
   const rooftopEnvironment=context.resolveStorySceneEnvironmentProjection({environmentRef:{assetId:"kakashi_origin_rooftop_night"}},null,null,active);
