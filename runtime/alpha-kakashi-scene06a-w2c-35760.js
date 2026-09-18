@@ -20,7 +20,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v5_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v6_2026_09_18";
 const AUTHORITY="820917031000c15e62f0a4cea7535397d3ad9e50";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
@@ -80,7 +80,7 @@ function currentMiStateClass(){
   try{const snap=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{};const row=snap.participantStates&&snap.participantStates[MI_REF]||null;return row&&row.stateClass?String(row.stateClass):null;}catch(_error){return null;}
 }
 function lateEntryEligible(rt=active()){
-  return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWPursuitEligible===false&&Number(rt.localContext.kakashiScene05AWTurnCount)>=4&&currentMiStateClass()==="DEFEATED_BUT_NOT_CONTROLLED";
+  return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&Number(rt.localContext.kakashiScene05AWTurnCount)>=1&&currentMiStateClass()==="DEFEATED_BUT_NOT_CONTROLLED";
 }
 function contextStateRef(rt){
   return PROVIDER.stableRef("sc35760-entry",{storySceneInstanceId:String(rt&&rt.instanceId||""),battleOccurrenceId:String(rt&&rt.localContext&&rt.localContext.kakashiScene05AWBattleOccurrenceId||""),turnCount:Number(rt&&rt.localContext&&rt.localContext.kakashiScene05AWTurnCount||0),miStateClass:currentMiStateClass()});
@@ -90,7 +90,7 @@ function existingIntent(contextRef){
   return Object.values(snap.decisionReceipts||{}).find(function(row){return row&&row.storyDecisionContextId===contextRef&&row.selectedChoiceId===INTENT_CHOICE&&row.resolverBindingRef===BINDING;})||null;
 }
 function ensureLethalIntent(rt=active()){
-  if(!lateEntryEligible(rt))return{success:false,reason:"kakashi_scene06aw2c_late_uncontrolled_entry_required"};
+  if(!lateEntryEligible(rt))return{success:false,reason:"kakashi_scene06aw2c_uncontrolled_entry_required"};
   const contextRef=contextStateRef(rt);
   const existing=existingIntent(contextRef);
   if(existing){
@@ -109,7 +109,7 @@ function ensureLethalIntent(rt=active()){
   return{success:true,receipt:committed.receipt,contextStateRef:contextRef};
 }
 function prepareScene06AW2CSourceChoice(choice){
-  const rt=active();if(!lateEntryEligible(rt))return{success:false,reason:"kakashi_scene06aw2c_late_uncontrolled_entry_required"};
+  const rt=active();if(!lateEntryEligible(rt))return{success:false,reason:"kakashi_scene06aw2c_uncontrolled_entry_required"};
   const intent=ensureLethalIntent(rt);if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_scene06aw2c_intent_missing"};
   if(choice)choice.nextBeatId=SCENE_BEAT;
   rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CEntered:true,[CURSOR_KEY]:0};save();
@@ -319,7 +319,7 @@ function installHooks(){
     return PRE_ADVANCE.apply(this,arguments);
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35760(){const out=PRE_RENDER.apply(this,arguments);wireSourceChoice();if(typeof queueMicrotask==="function")queueMicrotask(renderScene);else if(typeof setTimeout==="function")setTimeout(renderScene,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35760(){const out=PRE_RENDER.apply(this,arguments);const settle=function(){wireSourceChoice();renderScene();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else if(typeof setTimeout==="function")setTimeout(settle,0);else settle();return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
   hooksInstalled=true;installStyle();wireSourceChoice();renderScene();return true;
 }
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks,25);}
@@ -347,10 +347,11 @@ function diagnostics(){
   ];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v5_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v6_2026_09_18",
     authorityPinned:AUTHORITY==="820917031000c15e62f0a4cea7535397d3ad9e50",
     exactNarration:JSON.stringify(CUES.map(function(row){return row.text;}))===JSON.stringify(exact)&&CUES.every(function(row){return row.kind==="narration"&&!row.speakerName;}),
-    exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes(">=4")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
+    exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWEntered===true")&&lateEntryEligible.toString().includes(">=1")&&!lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
+    postRenderConsumerRewire:typeof globalThis.renderStoryScenePresentationLayer==="function"&&globalThis.renderStoryScenePresentationLayer.toString().includes("const settle=function(){wireSourceChoice();renderScene();}"),
     intentBeforeResolver:prepareScene06AW2CSourceChoice.toString().includes("ensureLethalIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("resolveStoryFactualAction"),
     sourceChoiceWired:wireSourceChoice()===true&&wireSourceChoice.toString().includes("SOURCE_REQUEST")&&wireSourceChoice.toString().includes("prepareScene06AW2CSourceChoice"),
     exactResolverEnvelope:!!binding&&JSON.stringify(binding.outcomeRefs)===JSON.stringify(OUTCOMES.map(function(row){return row.outcomeRef;})),

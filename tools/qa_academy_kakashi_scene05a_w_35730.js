@@ -178,6 +178,21 @@ assert.strictEqual(blocked.success,false);
 assert.strictEqual(blocked.reason,"kakashi_scene05aw_successor_authority_not_implemented");
 assert.strictEqual(active.beatId,CHOICE_BEAT,"Fail-closed successor must not move Story");
 
+const wiredLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
+assert(wiredLethal,"lethal choice missing before downstream-wire preservation probe");
+wiredLethal.nextBeatId="qa_real_scene06";
+wiredLethal.consequenceRequests=[{requestId:"qa_real_scene06_consumer",kind:"domain",resolve:()=>({success:true})}];
+active.beatId=WIN_BEAT;
+active.localContext={...(active.localContext||{}),kakashiScene05AWPursuitEligible:true,__kakashiScene05AW35730Cursor:15};
+let preserved=globalThis.advanceStoryScene();
+assert.strictEqual(preserved.success,true);
+assert.strictEqual(active.beatId,CHOICE_BEAT);
+choiceBeat=definition.beatMap.get(CHOICE_BEAT);
+let preservedLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
+assert(preservedLethal,"lethal choice missing after rematerialization");
+assert.strictEqual(preservedLethal.nextBeatId,"qa_real_scene06","Scene 05A-W rematerialization clobbered downstream nextBeatId");
+assert.strictEqual(preservedLethal.consequenceRequests[0].requestId,"qa_real_scene06_consumer","Scene 05A-W rematerialization clobbered downstream consequence consumer");
+
 let classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"CONTROLLED_DEFEATED",resultRef:"qa-controlled-mi"
 });
@@ -192,6 +207,10 @@ labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
+const controlledLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
+assert(controlledLethal,"controlled lethal choice missing");
+assert.notStrictEqual(controlledLethal.nextBeatId,"qa_real_scene06","ATTEMPT consumer must not leak into deterministic KILL relabel");
+assert(!controlledLethal.consequenceRequests.some(x=>x&&x.requestId==="qa_real_scene06_consumer"),"ATTEMPT consumer leaked into deterministic KILL relabel");
 
 classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-uncontrolled-mi"
@@ -248,4 +267,4 @@ console.log("- 1-4 MI win exposes both Package Smuggler and ANBU Marked Target p
 console.log("- Package Smuggler -> later AMT preservation is capped at 1-3 PS turns");
 console.log("- MI post-resolution classification controls KILL HER vs ATTEMPT TO KILL HER");
 console.log("- ANBU/Uchiha disposition choices preserved");
-console.log("- successor branches fail closed; no automatic debrief or invented continuation");
+console.log("- downstream wired choice consumers survive Scene 05A-W rematerialization without leaking across ATTEMPT/KILL relabels");
