@@ -61,12 +61,14 @@ const SCENE05AW_PATH="runtime/alpha-kakashi-scene05a-w-35730.js";
 const SCENE05AL_PATH="runtime/alpha-kakashi-scene05a-l-35750.js";
 const SCENE06AW2C_PATH="runtime/alpha-kakashi-scene06a-w2c-35760.js";
 const W2C_ENDING_PATH="runtime/alpha-kakashi-w2c-ending-35770.js";
+const W2C_NONKILL_PATH="runtime/alpha-kakashi-w2c-nonkill-35780.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
 // const BUILD="kakashi-final-20260918-39";
 // const BUILD="kakashi-final-20260918-40";
-const BUILD="kakashi-final-20260918-41";
+// const BUILD="kakashi-final-20260918-41";
+const BUILD="kakashi-final-20260918-42";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -96,9 +98,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadW2CNonKill(){
+  if(globalThis.SC_ALPHA_KAKASHI_W2C_NONKILL_35780)return;
+  appendScript("sc-alpha-kakashi-w2c-nonkill-35780-script",W2C_NONKILL_PATH);
+}
 function loadW2CEnding(){
-  if(globalThis.SC_ALPHA_KAKASHI_W2C_ENDING_35770)return;
-  appendScript("sc-alpha-kakashi-w2c-ending-35770-script",W2C_ENDING_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_W2C_ENDING_35770){loadW2CNonKill();return;}
+  appendScript("sc-alpha-kakashi-w2c-ending-35770-script",W2C_ENDING_PATH,loadW2CNonKill);
 }
 function loadScene06AW2C(){
   if(globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760){loadW2CEnding();return;}
