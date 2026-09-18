@@ -213,7 +213,7 @@
         column-gap:2px!important;
         line-height:1!important;
         text-align:center!important;
-        transform:translateY(1px)!important;
+        transform:translateY(7px)!important;
       }
       .alpha-code-battle-stage .alpha-battle-pl-core strong{
         margin:0!important;
