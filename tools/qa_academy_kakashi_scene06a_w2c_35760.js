@@ -55,10 +55,11 @@ load("runtime/alpha-kakashi-scene06a-w2c-35760.js");
 
 const MOD=globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760;
 assert(MOD,"Scene 06A-W2C module missing");
-assert.strictEqual(MOD.authority,"820917031000c15e62f0a4cea7535397d3ad9e50");
+assert.strictEqual(MOD.authority,"bef78d90ccdea0206199ca0cdd06593ce3a0adb1");
 assert.strictEqual(MOD.actionContract,"778fc612d21beae9d3b96d8ace70ab10ad467237");
 assert.strictEqual(MOD.bindingRef,"academy_kakashi.lethal.attempt_kill");
-assert.strictEqual(MOD.cueCount,17);
+assert.strictEqual(MOD.cueCount,18);
+assert.strictEqual(MOD.closedCueCount,13);
 assert.strictEqual(MOD.objective,"Retrieve the package.");
 assert.deepStrictEqual([...MOD.outcomeRefs],["LETHAL_ATTEMPT_KILLED","LETHAL_ATTEMPT_SURVIVED","LETHAL_ATTEMPT_INTERRUPTED","LETHAL_ATTEMPT_ESCAPED"]);
 const diag=globalThis.runAcademyKakashiScene06AW2C35760Diagnostics();
@@ -71,10 +72,6 @@ const exact=[
   "She is hurt.",
   "Still dangerous.",
   "Kakashi studies her for a heartbeat.",
-  "Package Smuggler has already disappeared into Konoha.",
-  "There is no sound of pursuit.",
-  "No movement from the route ANBU Marked Target took.",
-  "Only the two of them remain beneath the Sakura tree.",
   "Masked Interceptor steadies herself.",
   "Kakashi reaches for his kunai.",
   "She sees his hand move.",
@@ -83,6 +80,27 @@ const exact=[
   "Kakashi lowers his centre of gravity.",
   "Then disappears from where he was standing."
 ];
+const exactOpen=[
+  "Kakashi watches Masked Interceptor push herself upright.",
+  "One hand braces against the stone.",
+  "The other stays close to her weapon.",
+  "She is hurt.",
+  "Still dangerous.",
+  "Kakashi studies her for a heartbeat.",
+  "His eye shifts toward the street.",
+  "Package Smuggler is still moving.",
+  "Somewhere beyond him, ANBU Marked Target is getting farther away.",
+  "Kakashi could move now.",
+  "Instead, he looks back at Masked Interceptor.",
+  "Masked Interceptor steadies herself.",
+  "Kakashi reaches for his kunai.",
+  "She sees his hand move.",
+  "Whatever she expected him to do next, this was not it.",
+  "Her stance changes.",
+  "Kakashi lowers his centre of gravity.",
+  "Then disappears from where he was standing."
+];
+
 
 MOD.wireSourceChoice();
 let entered=globalThis.advanceStoryScene(SOURCE_CHOICE);
@@ -149,6 +167,13 @@ const fast=globalThis.advanceStoryScene(SOURCE_CHOICE);
 assert.strictEqual(fast.success,true,"1-4 pursuit-eligible ATTEMPT TO KILL must still enter Scene 06A-W2C: "+JSON.stringify(fast));
 assert.strictEqual(active.beatId,SCENE_BEAT);
 
+assert.strictEqual(active.localContext.kakashiScene06AW2CPursuitWasOpenAtIntent,true,"lethal intent must preserve the pre-action pursuit window for factual recalculation");
+for(let i=0;i<exactOpen.length;i++){
+  const p=globalThis.getStoryScenePerformance33900();
+  assert.strictEqual(p.cue.text,exactOpen[i],"open-pursuit lethal narration mismatch at "+i);
+  if(i<exactOpen.length-1){const out=globalThis.advanceStoryScene();assert.strictEqual(out.success,true);}
+}
+
 globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"CONTROLLED_DEFEATED",resultRef:"qa-controlled"});
 active.beatId=SOURCE_BEAT;active.localContext={kakashiScene05AWEntered:true,kakashiScene05AWPursuitEligible:true,kakashiScene05AWTurnCount:4,kakashiScene05AWBattleOccurrenceId:"battle-mi-controlled"};
 const controlled=globalThis.advanceStoryScene(SOURCE_CHOICE);
@@ -157,12 +182,16 @@ assert.strictEqual(controlled.reason,"kakashi_scene05aw_successor_authority_not_
 assert(saves>0,"Scene 06A-W2C never persisted state");
 
 console.log("Academy Kakashi Scene 06A-W2C 35760 QA: PASS");
-console.log("- exact 17-line locked narration / no dialogue / no post-commit player choice");
+console.log("- exact pursuit-closed and pursuit-open Writing narration variants");
 console.log("- ATTEMPT TO KILL remains live inside the corrected 1-4 pursuit window; controlled deterministic KILL stays separate");
 console.log("- lethal intent commits before resolver selection");
 console.log("- resolver commits only the four Writing-authorised factual outcomes, idempotently");
-console.log("- package / PS / AMT pursuit stay closed; no Pakkun");
-console.log("- Scene 7 expression and automatic debrief remain fail-closed pending Writing authority");
+console.log("- lethal intent itself does not close pursuit; factual result owns recalculation; no Pakkun is invented");
+console.log("- pursuit-preserved KILLED state is kept out of the old terminal W2C ending");
 const scene06Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene06a-w2c-35760.js"),"utf8");
 assert(scene06Source.includes('addEventListener("click"'),"installed-browser choice capture seam missing");
 assert(scene06Source.includes("stopImmediatePropagation"),"browser choice capture must pre-empt stale fail-closed handler");
+assert(scene06Source.includes("fast_confirmed_kill_preserves_committed_pursuit_window"),"qualifying KILLED pursuit preservation rule missing");
+assert(scene06Source.includes("kakashiScene06AW2CPursuitWasOpenAtIntent"),"pre-lethal pursuit snapshot missing");
+assert(scene06Source.includes("GO AFTER PACKAGE SMUGGLER")&&scene06Source.includes("GO AFTER ANBU MARKED TARGET"),"state-derived post-lethal pursuit choices missing");
+

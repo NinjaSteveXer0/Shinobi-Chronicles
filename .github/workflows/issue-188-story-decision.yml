@@ -30,6 +30,8 @@ on:
       - 'runtime/alpha-kakashi-w2c-ending-35770.js'
       - 'runtime/alpha-kakashi-w2c-nonkill-35780.js'
       - 'runtime/alpha-kakashi-immediate-custody-35800.js'
+      - 'runtime/alpha-kakashi-deterministic-kill-35810.js'
+      - 'runtime/alpha-kakashi-loss-ending-35820.js'
       - 'runtime/alpha-kakashi-battle-development-35740.js'
       - 'runtime/alpha-battle-browser-32600.js'
       - 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
@@ -56,6 +58,8 @@ on:
       - 'tools/qa_academy_kakashi_w2c_ending_35770.js'
       - 'tools/qa_academy_kakashi_w2c_nonkill_35780.js'
       - 'tools/qa_academy_kakashi_immediate_custody_35800.js'
+      - 'tools/qa_academy_kakashi_deterministic_kill_35810.js'
+      - 'tools/qa_academy_kakashi_loss_ending_35820.js'
       - 'tools/qa_kakashi_battle_development_35740.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
@@ -99,6 +103,8 @@ jobs:
           node --check runtime/alpha-kakashi-w2c-ending-35770.js
           node --check runtime/alpha-kakashi-w2c-nonkill-35780.js
           node --check runtime/alpha-kakashi-immediate-custody-35800.js
+          node --check runtime/alpha-kakashi-deterministic-kill-35810.js
+          node --check runtime/alpha-kakashi-loss-ending-35820.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -121,6 +127,8 @@ jobs:
           node --check tools/qa_academy_kakashi_w2c_ending_35770.js
           node --check tools/qa_academy_kakashi_w2c_nonkill_35780.js
           node --check tools/qa_academy_kakashi_immediate_custody_35800.js
+          node --check tools/qa_academy_kakashi_deterministic_kill_35810.js
+          node --check tools/qa_academy_kakashi_loss_ending_35820.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -128,8 +136,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-48' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-48";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-49' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260919-49";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -148,7 +156,7 @@ jobs:
           grep -Fq 'alpha-kakashi-scene04a-35710.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-objective-presentation-35720.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-scene05a-w-35730.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
-          grep -Fq '30a8cf3a16f57fbe5e65f55bc9dc1de076a21522' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq 'bf16ebe0f677994878fbe60e30e7b546da899eb8' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq '90b20f565ef010d2b7cfca98c04feece3f7dfcb7' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'MI_PURSUIT_MAX_TURNS=4' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'preserveWiredChoice35730' runtime/alpha-kakashi-scene05a-w-35730.js
@@ -165,6 +173,15 @@ jobs:
           grep -Fq 'alpha-kakashi-w2c-ending-35770.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-w2c-nonkill-35780.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-immediate-custody-35800.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-deterministic-kill-35810.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq '0d4aa441e4ef6d566f3d1df23c198940bdc559dd' runtime/alpha-kakashi-deterministic-kill-35810.js
+          grep -Fq 'KILL — GUARANTEED' runtime/alpha-kakashi-deterministic-kill-35810.js
+          grep -Fq 'confirmedKillCountDelta:1' runtime/alpha-kakashi-deterministic-kill-35810.js
+          grep -Fq '8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623' runtime/alpha-kakashi-loss-ending-35820.js
+          grep -Fq 'd0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab' runtime/alpha-kakashi-loss-ending-35820.js
+          grep -Fq 'He reported that she beat him.' runtime/alpha-kakashi-loss-ending-35820.js
+          grep -Fq 'kakashiKnowledgeGranted:false' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'alpha_kakashi_immediate_custody_35800_v2_2026_09_19' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "top:22%!important" runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "right:7.5%!important" runtime/alpha-kakashi-immediate-custody-35800.js
@@ -183,7 +200,9 @@ jobs:
           grep -Fq 'NPC/uchiha_police_force_male_alt_1.png' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'kakashiScene06W2DCustodyOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashiScene06W2ECustodyOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq '820917031000c15e62f0a4cea7535397d3ad9e50' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'bef78d90ccdea0206199ca0cdd06593ce3a0adb1' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'fast_confirmed_kill_preserves_committed_pursuit_window' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'kakashiScene06AW2CPursuitWasOpenAtIntent' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq '2bcb6bb07dc862cb6f259b784782850619a08a4f' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq '275667ff8b65d5d7e9252164f7552676339a9086' runtime/alpha-kakashi-w2c-ending-35770.js
@@ -289,5 +308,9 @@ jobs:
         run: node tools/qa_academy_kakashi_w2c_nonkill_35780.js
       - name: Academy Kakashi immediate ANBU and Police custody endings
         run: node tools/qa_academy_kakashi_immediate_custody_35800.js
+      - name: Academy Kakashi deterministic KILL HER
+        run: node tools/qa_academy_kakashi_deterministic_kill_35810.js
+      - name: Academy Kakashi loss report and hidden review ending
+        run: node tools/qa_academy_kakashi_loss_ending_35820.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js

@@ -20,8 +20,8 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v6_2026_09_18";
-const AUTHORITY="820917031000c15e62f0a4cea7535397d3ad9e50";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v7_2026_09_19";
+const AUTHORITY="bef78d90ccdea0206199ca0cdd06593ce3a0adb1";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
 const ORIGIN_ID="academy_kakashi";
@@ -43,25 +43,32 @@ const STYLE_ID="sc-kakashi-scene06aw2c-35760-style";
 const BOARD_CLASS="sc-kakashi-scene06aw2c-board-35760";
 const SOURCE_REQUEST="kakashi_scene06aw2c_source_choice_35760";
 
-const CUES=Object.freeze([
+const COMMON_OPEN=Object.freeze([
   Object.freeze({cueId:"scene06aw2c_01",kind:"narration",text:"Kakashi watches Masked Interceptor push herself upright.",focusActorRef:"masked_interceptor"}),
   Object.freeze({cueId:"scene06aw2c_02",kind:"narration",text:"One hand braces against the stone.",focusActorRef:"masked_interceptor"}),
   Object.freeze({cueId:"scene06aw2c_03",kind:"narration",text:"The other stays close to her weapon.",focusActorRef:"masked_interceptor"}),
   Object.freeze({cueId:"scene06aw2c_04",kind:"narration",text:"She is hurt.",focusActorRef:"masked_interceptor"}),
   Object.freeze({cueId:"scene06aw2c_05",kind:"narration",text:"Still dangerous.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_06",kind:"narration",text:"Kakashi studies her for a heartbeat.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_07",kind:"narration",text:"Package Smuggler has already disappeared into Konoha.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_08",kind:"narration",text:"There is no sound of pursuit.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_09",kind:"narration",text:"No movement from the route ANBU Marked Target took.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_10",kind:"narration",text:"Only the two of them remain beneath the Sakura tree.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_11",kind:"narration",text:"Masked Interceptor steadies herself.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_12",kind:"narration",text:"Kakashi reaches for his kunai.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_13",kind:"narration",text:"She sees his hand move.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_14",kind:"narration",text:"Whatever she expected him to do next, this was not it.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_15",kind:"narration",text:"Her stance changes.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene06aw2c_16",kind:"narration",text:"Kakashi lowers his centre of gravity.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene06aw2c_17",kind:"narration",text:"Then disappears from where he was standing.",focusActorRef:"academy_kakashi"})
+  Object.freeze({cueId:"scene06aw2c_06",kind:"narration",text:"Kakashi studies her for a heartbeat.",focusActorRef:"academy_kakashi"})
 ]);
+const PURSUIT_OPEN_CUES=Object.freeze([
+  Object.freeze({cueId:"scene06aw2c_open_07",kind:"narration",text:"His eye shifts toward the street.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_open_08",kind:"narration",text:"Package Smuggler is still moving.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene06aw2c_open_09",kind:"narration",text:"Somewhere beyond him, ANBU Marked Target is getting farther away.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene06aw2c_open_10",kind:"narration",text:"Kakashi could move now.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_open_11",kind:"narration",text:"Instead, he looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"})
+]);
+const COMMON_CLOSE=Object.freeze([
+  Object.freeze({cueId:"scene06aw2c_12",kind:"narration",text:"Masked Interceptor steadies herself.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_13",kind:"narration",text:"Kakashi reaches for his kunai.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_14",kind:"narration",text:"She sees his hand move.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_15",kind:"narration",text:"Whatever she expected him to do next, this was not it.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_16",kind:"narration",text:"Her stance changes.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene06aw2c_17",kind:"narration",text:"Kakashi lowers his centre of gravity.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene06aw2c_18",kind:"narration",text:"Then disappears from where he was standing.",focusActorRef:"academy_kakashi"})
+]);
+const CUES_OPEN=Object.freeze([...COMMON_OPEN,...PURSUIT_OPEN_CUES,...COMMON_CLOSE]);
+const CUES_CLOSED=Object.freeze([...COMMON_OPEN,...COMMON_CLOSE]);
 
 const OUTCOMES=Object.freeze([
   Object.freeze({outcomeRef:"LETHAL_ATTEMPT_KILLED",resultPayloadTemplate:Object.freeze({outcomeClass:"LETHAL_ATTEMPT_KILLED",targetRef:MI_REF,deathState:"CONFIRMED_DEAD"})}),
@@ -112,7 +119,7 @@ function prepareScene06AW2CSourceChoice(choice){
   const rt=active();if(!lateEntryEligible(rt))return{success:false,reason:"kakashi_scene06aw2c_uncontrolled_entry_required"};
   const intent=ensureLethalIntent(rt);if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_scene06aw2c_intent_missing"};
   if(choice)choice.nextBeatId=SCENE_BEAT;
-  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CEntered:true,[CURSOR_KEY]:0};save();
+  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CEntered:true,kakashiScene06AW2CPursuitWasOpenAtIntent:rt.localContext&&rt.localContext.kakashiScene05AWPursuitEligible===true,kakashiScene06AW2CPreLethalPackagePursuitEligible:rt.localContext&&rt.localContext.kakashiScene05AWPackagePursuitEligible===true,kakashiScene06AW2CPreLethalAmtPursuitEligible:rt.localContext&&rt.localContext.kakashiScene05AWAmtPursuitEligible===true,[CURSOR_KEY]:0};save();
   return{success:true,type:"kakashi_scene06aw2c_source_choice_prepared",nextBeatId:SCENE_BEAT,intentCommitRef:intent.receipt.intentCommitRef,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId};
 }
 function wireSourceChoice(){
@@ -145,6 +152,33 @@ function participantStateForOutcome(selected){
   return null;
 }
 function factOf(row){return row&&(row.fact||row.data)||{};}
+function pursuitWasOpenAtIntent(rt=active()){return !!(rt&&rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitWasOpenAtIntent===true);}
+function derivePostLethalPursuit35760(rt,selected){
+  const turns=Number(rt&&rt.localContext&&rt.localContext.kakashiScene05AWTurnCount||0);
+  const fast=Number.isInteger(turns)&&turns>=1&&turns<=4&&pursuitWasOpenAtIntent(rt);
+  if(!fast||String(selected)!=="LETHAL_ATTEMPT_KILLED")return{pursuitAvailable:false,packageSmugglerAvailable:false,anbuMarkedTargetAvailable:false,reason:"resolved_lethal_result_consumed_or_closed_window"};
+  return{
+    pursuitAvailable:true,
+    packageSmugglerAvailable:rt.localContext&&rt.localContext.kakashiScene06AW2CPreLethalPackagePursuitEligible!==false,
+    anbuMarkedTargetAvailable:rt.localContext&&rt.localContext.kakashiScene06AW2CPreLethalAmtPursuitEligible!==false,
+    reason:"fast_confirmed_kill_preserves_committed_pursuit_window"
+  };
+}
+function postLethalChoiceRows35760(rt=active()){
+  if(!rt||!rt.localContext||rt.localContext.kakashiScene06AW2CPursuitAvailable!==true)return[];
+  const rows=[];
+  if(rt.localContext.kakashiScene06AW2CPackageAvailable===true)rows.push({choiceId:"scene06aw2c_postlethal_go_after_package_smuggler",label:"GO AFTER PACKAGE SMUGGLER",nextBeatId:HOLD_BEAT,availability:function(){return{available:true,knownBlocker:null};},knownBlocker:null,consequenceRequests:[{requestId:"kakashi_scene06aw2c_postlethal_ps_pending_35760",kind:"domain",resolve:function(){return{success:false,reason:"kakashi_stop_assassin_postlethal_ps_successor_scene_not_yet_locked",pursuitStatePreserved:true};}}]});
+  if(rt.localContext.kakashiScene06AW2CAMTAvailable===true)rows.push({choiceId:"scene06aw2c_postlethal_go_after_anbu_marked_target",label:"GO AFTER ANBU MARKED TARGET",nextBeatId:HOLD_BEAT,availability:function(){return{available:true,knownBlocker:null};},knownBlocker:null,consequenceRequests:[{requestId:"kakashi_scene06aw2c_postlethal_amt_pending_35760",kind:"domain",resolve:function(){return{success:false,reason:"kakashi_stop_assassin_postlethal_amt_successor_scene_not_yet_locked",pursuitStatePreserved:true};}}]});
+  return rows;
+}
+function materializePostLethalChoices35760(){
+  const def=scene(),beat=def&&def.beatMap instanceof Map?def.beatMap.get(HOLD_BEAT):null,rt=active();
+  if(!beat)return false;
+  beat.mode=rt&&rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true?"choice":"narration";
+  beat.objectiveText=rt&&rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true?OBJECTIVE:null;
+  beat.choices=postLethalChoiceRows35760(rt);
+  return true;
+}
 function commitLethalResult(spec){
   const receipt=spec&&spec.receipt||{},request=spec&&spec.request||{},result=spec&&spec.result||{};
   const rt=active(),instance=String(request&&request.context&&request.context.storySceneInstanceId||"");
@@ -159,8 +193,9 @@ function commitLethalResult(spec){
     storyDecisionReceiptId:String(receipt.storyDecisionReceiptId||""),storyFactualResolverReceiptId:String(receipt.storyFactualResolverReceiptId||""),selectedOutcomeRef:selected,
     targetDeathConfirmed:selected==="LETHAL_ATTEMPT_KILLED",targetSurvivalConfirmed:selected==="LETHAL_ATTEMPT_SURVIVED"||selected==="LETHAL_ATTEMPT_ESCAPED",
     attemptInterrupted:selected==="LETHAL_ATTEMPT_INTERRUPTED",targetEscapeConfirmed:selected==="LETHAL_ATTEMPT_ESCAPED",
-    packageState:{objectRef:WORLD_OBJECT_REF,currentHolderClass:"PACKAGE_SMUGGLER",recovered:false,available:false},
-    worldFacts:{packageSmugglerAvailable:false,packageAvailable:false,anbuMarkedTargetAvailable:false,pursuitAvailable:false,pakkunPresent:false},
+    packageState:{objectRef:WORLD_OBJECT_REF,currentHolderClass:"PACKAGE_SMUGGLER",recovered:false,available:derivePostLethalPursuit35760(rt,selected).packageSmugglerAvailable},
+    worldFacts:{packageSmugglerAvailable:derivePostLethalPursuit35760(rt,selected).packageSmugglerAvailable,packageAvailable:derivePostLethalPursuit35760(rt,selected).packageSmugglerAvailable,anbuMarkedTargetAvailable:derivePostLethalPursuit35760(rt,selected).anbuMarkedTargetAvailable,pursuitAvailable:derivePostLethalPursuit35760(rt,selected).pursuitAvailable,pakkunPresent:false},
+    pursuitRecalculation:{battleTurns:Number(rt.localContext&&rt.localContext.kakashiScene05AWTurnCount||0),pursuitWasOpenAtIntent:pursuitWasOpenAtIntent(rt),selectedOutcomeRef:selected,result:derivePostLethalPursuit35760(rt,selected)},
     resolverResult:clone(result)
   };
   const existing=A.findOccurrence(occurrenceId);
@@ -179,17 +214,39 @@ function commitLethalResult(spec){
     participantRefs.push(participantResultRef);
   }
   const stateRef=PROVIDER.stableRef("sc35760-state",{occurrenceId:occurrenceId,selectedOutcomeRef:selected});
-  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CResolutionOccurrenceId:occurrenceId,kakashiScene06AW2COutcomeRef:selected,kakashiScene06AW2CPackageAvailable:false,kakashiScene06AW2CAMTAvailable:false,kakashiScene06AW2CPursuitAvailable:false,kakashiScene06AW2CPakkunInvolved:false};save();
+  const pursuit=derivePostLethalPursuit35760(rt,selected);
+  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CResolutionOccurrenceId:occurrenceId,kakashiScene06AW2COutcomeRef:selected,kakashiScene06AW2CPackageAvailable:pursuit.packageSmugglerAvailable,kakashiScene06AW2CAMTAvailable:pursuit.anbuMarkedTargetAvailable,kakashiScene06AW2CPursuitAvailable:pursuit.pursuitAvailable,kakashiScene06AW2CPakkunInvolved:false,kakashiScene06AW2CPursuitResolutionCommitted:true,kakashiScene05AWPursuitEligible:pursuit.pursuitAvailable,kakashiScene05AWPackagePursuitEligible:pursuit.packageSmugglerAvailable,kakashiScene05AWAmtPursuitEligible:pursuit.anbuMarkedTargetAvailable};save();
+  materializePostLethalChoices35760();
   return{success:true,occurrenceId:occurrenceId,consequenceRefs:[occurrenceId],stateDeltaRefs:[stateRef],knowledgeDeltaRefs:[],relationshipHistoryRefs:[],objectiveDeltaRefs:[],participantStateDeltaRefs:participantRefs,successorSituationRef:null};
 }
 function providerBridge(factual){
   const receipt=factual&&factual.receipt||{};
   return{success:true,resolverResultRef:receipt.storyFactualResolverReceiptId||null,consequenceRefs:receipt.consequenceRefs||[],stateDeltaRefs:receipt.stateDeltaRefs||[],knowledgeDeltaRefs:receipt.knowledgeDeltaRefs||[],relationshipHistoryRefs:receipt.relationshipHistoryRefs||[],objectiveDeltaRefs:receipt.objectiveDeltaRefs||[],successorSituationRef:null,result:clone(factual&&factual.result||receipt.result||null)};
 }
+function beginPursuitPreservedOutcome35760(rt,selected){
+  if(!rt||rt.beatId!==HOLD_BEAT||rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable!==true)return false;
+  if(String(selected)!=="LETHAL_ATTEMPT_KILLED")return false;
+  const finish=function(){
+    rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CPursuitPresentationReady:true,kakashiScene06AW2CMiCardRemoved:true};
+    materializePostLethalChoices35760();save();
+    try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}
+  };
+  if(typeof document==="undefined"){finish();return true;}
+  const animate=globalThis.playAcademyKakashiLethalAttemptAnimation35770;
+  if(typeof animate==="function")return animate(function(){
+    try{
+      const layer=document.getElementById("story-scene-presentation-layer"),stage=layer&&((layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer),mi=stage&&stage.querySelector&&stage.querySelector("."+BOARD_CLASS+" [data-actor-id='masked_interceptor']");
+      if(mi){mi.classList.add("sc-kakashi-mi-death-drop-35760");setTimeout(finish,620);return;}
+    }catch(_error){}
+    finish();
+  });
+  finish();return true;
+}
 function triggerResolvedOutcomePresentation(rt,selected){
   if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!==HOLD_BEAT)return false;
   selected=String(selected||"");
   try{
+    if(rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true)return beginPursuitPreservedOutcome35760(rt,selected);
     const resolved=globalThis.beginAcademyKakashiResolvedOutcome35780;
     if(typeof resolved==="function")return resolved(selected)===true;
     if(selected==="LETHAL_ATTEMPT_KILLED"){
@@ -199,6 +256,7 @@ function triggerResolvedOutcomePresentation(rt,selected){
   }catch(_error){}
   return false;
 }
+
 function resolveLethalAttempt(rt=active()){
   if(!rt||rt.sceneId!==SCENE_ID||![SCENE_BEAT,HOLD_BEAT].includes(rt.beatId))return{success:false,reason:"kakashi_scene06aw2c_resolution_context_missing"};
   const receiptId=String(rt.localContext&&rt.localContext.kakashiScene06AW2CIntentReceiptId||"");
@@ -230,11 +288,13 @@ function resolveLethalAttempt(rt=active()){
   const presentationStarted=triggerResolvedOutcomePresentation(rt,selected);
   return{success:true,type:"kakashi_scene06aw2c_resolved_scene7_pending",selectedOutcomeRef:selected,occurrenceId:String(rt.localContext.kakashiScene06AW2CResolutionOccurrenceId||occurrenceId),storyFactualResolverReceiptId:String(factual.receipt&&factual.receipt.storyFactualResolverReceiptId||""),beatId:HOLD_BEAT,scene7Pending:!presentationStarted,confirmedKillPresentationStarted:presentationStarted};
 }
-function cursor(rt=active()){const raw=rt&&rt.localContext?Number(rt.localContext[CURSOR_KEY]):0;return Number.isInteger(raw)?Math.max(0,Math.min(CUES.length-1,raw)):0;}
+function sequenceFor35760(rt=active()){return pursuitWasOpenAtIntent(rt)?CUES_OPEN:CUES_CLOSED;}
+function cursor(rt=active()){const sequence=sequenceFor35760(rt),raw=rt&&rt.localContext?Number(rt.localContext[CURSOR_KEY]):0;return Number.isInteger(raw)?Math.max(0,Math.min(sequence.length-1,raw)):0;}
 function performance(rt=active()){
-  const index=rt&&rt.beatId===HOLD_BEAT?CUES.length-1:cursor(rt);
-  return{sequence:CUES,index:index,cue:CUES[index],atEnd:index>=CUES.length-1};
+  const sequence=sequenceFor35760(rt),index=rt&&rt.beatId===HOLD_BEAT?sequence.length-1:cursor(rt);
+  return{sequence,index:index,cue:sequence[index],atEnd:index>=sequence.length-1};
 }
+
 function isSceneBeat(rt=active()){return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SCENE_BEAT;}
 function isFamily(rt=active()){return !!rt&&rt.sceneId===SCENE_ID&&(rt.beatId===SCENE_BEAT||rt.beatId===HOLD_BEAT);}
 
@@ -247,7 +307,10 @@ function installStyle(){
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:20%!important;gap:2.2%!important}",
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actors[data-count='2']{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5.4%!important;column-gap:0!important}",
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important}",
-    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actor[data-actor-id='academy_kakashi']{width:min(96%,338px)!important;max-height:505px!important}"
+    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actor[data-actor-id='academy_kakashi']{width:min(96%,338px)!important;max-height:505px!important}",
+    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-kakashi-mi-death-drop-35760{animation:kakashiMiDeathDrop35760 .60s cubic-bezier(.35,.05,.75,.2) both!important}",
+    "@keyframes kakashiMiDeathDrop35760{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(72vh) rotate(8deg)}}"
+
   ].join("");
   document.head.appendChild(style);return true;
 }
@@ -262,9 +325,9 @@ function actorMarkup(id,label,image,state,focus){
 function boardMarkup(rt){
   const p=performance(rt),focus=p&&p.cue&&p.cue.focusActorRef||"academy_kakashi";
   const actors=[
-    actorMarkup("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png","PRESENT",focus==="academy_kakashi"),
-    actorMarkup("masked_interceptor","MASKED INTERCEPTOR","NPC/masked_interceptor.png","BATTLE-DEFEATED · NOT CONTROLLED",focus==="masked_interceptor")
+    actorMarkup("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png",rt.beatId===HOLD_BEAT&&rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true?"PURSUIT DECISION":"PRESENT",focus==="academy_kakashi")
   ];
+  if(!(rt.beatId===HOLD_BEAT&&rt.localContext&&rt.localContext.kakashiScene06AW2CMiCardRemoved===true))actors.push(actorMarkup("masked_interceptor","MASKED INTERCEPTOR","NPC/masked_interceptor.png",String(rt.localContext&&rt.localContext.kakashiScene06AW2COutcomeRef||"")==="LETHAL_ATTEMPT_KILLED"?"DEAD":"BATTLE-DEFEATED · NOT CONTROLLED",focus==="masked_interceptor"));
   return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+escapeHTML(OBJECTIVE)+'</div></div><div class="sc-scene-board-33900__actors" data-count="2">'+actors.join("")+'</div>';
 }
 function renderScene(){
@@ -288,7 +351,7 @@ function renderScene(){
 function installBeats(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null;if(!map)return{success:false,reason:"kakashi_scene06aw2c_story_definition_missing"};
   map.set(SCENE_BEAT,{beatId:SCENE_BEAT,mode:"narration",environmentRef:{assetId:BACKDROP_ID},text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,onEnterConsequences:[],onAdvanceConsequences:[],choices:[]});
-  map.set(HOLD_BEAT,{beatId:HOLD_BEAT,mode:"narration",environmentRef:{assetId:BACKDROP_ID},text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,onEnterConsequences:[],onAdvanceConsequences:[],choices:[]});
+  map.set(HOLD_BEAT,{beatId:HOLD_BEAT,mode:"choice",environmentRef:{assetId:BACKDROP_ID},text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,onEnterConsequences:[],onAdvanceConsequences:[],choices:[]});
   return{success:true,sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT};
 }
 
@@ -315,7 +378,7 @@ function installHooks(){
       if(!p.atEnd){const next=p.index+1;rt.localContext={...(rt.localContext||{}),[CURSOR_KEY]:next};save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return{success:true,type:"kakashi_scene06aw2c_performance_cue_advanced",beatId:SCENE_BEAT,cueIndex:next,semanticBeatUnchanged:true};}
       const resolved=resolveLethalAttempt(rt);try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return resolved;
     }
-    if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===HOLD_BEAT)return{success:false,reason:"kakashi_scene06aw2c_scene7_authority_pending",selectedOutcomeRef:String(rt.localContext&&rt.localContext.kakashiScene06AW2COutcomeRef||"")};
+    if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===HOLD_BEAT){materializePostLethalChoices35760();if(rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true&&choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);return{success:false,reason:rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true?"kakashi_scene06aw2c_postlethal_pursuit_choice_required":"kakashi_scene06aw2c_scene7_authority_pending",selectedOutcomeRef:String(rt.localContext&&rt.localContext.kakashiScene06AW2COutcomeRef||"")};}
     return PRE_ADVANCE.apply(this,arguments);
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
@@ -342,14 +405,17 @@ function installBrowserChoiceCapture(){
 
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,sceneBeat=map&&map.get(SCENE_BEAT),hold=map&&map.get(HOLD_BEAT);
-  const exact=[
-    "Kakashi watches Masked Interceptor push herself upright.","One hand braces against the stone.","The other stays close to her weapon.","She is hurt.","Still dangerous.","Kakashi studies her for a heartbeat.","Package Smuggler has already disappeared into Konoha.","There is no sound of pursuit.","No movement from the route ANBU Marked Target took.","Only the two of them remain beneath the Sakura tree.","Masked Interceptor steadies herself.","Kakashi reaches for his kunai.","She sees his hand move.","Whatever she expected him to do next, this was not it.","Her stance changes.","Kakashi lowers his centre of gravity.","Then disappears from where he was standing."
+  const exactOpen=[
+    "Kakashi watches Masked Interceptor push herself upright.","One hand braces against the stone.","The other stays close to her weapon.","She is hurt.","Still dangerous.","Kakashi studies her for a heartbeat.","His eye shifts toward the street.","Package Smuggler is still moving.","Somewhere beyond him, ANBU Marked Target is getting farther away.","Kakashi could move now.","Instead, he looks back at Masked Interceptor.","Masked Interceptor steadies herself.","Kakashi reaches for his kunai.","She sees his hand move.","Whatever she expected him to do next, this was not it.","Her stance changes.","Kakashi lowers his centre of gravity.","Then disappears from where he was standing."
+  ];
+  const exactClosed=[
+    "Kakashi watches Masked Interceptor push herself upright.","One hand braces against the stone.","The other stays close to her weapon.","She is hurt.","Still dangerous.","Kakashi studies her for a heartbeat.","Masked Interceptor steadies herself.","Kakashi reaches for his kunai.","She sees his hand move.","Whatever she expected him to do next, this was not it.","Her stance changes.","Kakashi lowers his centre of gravity.","Then disappears from where he was standing."
   ];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v6_2026_09_18",
-    authorityPinned:AUTHORITY==="820917031000c15e62f0a4cea7535397d3ad9e50",
-    exactNarration:JSON.stringify(CUES.map(function(row){return row.text;}))===JSON.stringify(exact)&&CUES.every(function(row){return row.kind==="narration"&&!row.speakerName;}),
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v7_2026_09_19",
+    authorityPinned:AUTHORITY==="bef78d90ccdea0206199ca0cdd06593ce3a0adb1",
+    exactNarration:JSON.stringify(CUES_OPEN.map(function(row){return row.text;}))===JSON.stringify(exactOpen)&&JSON.stringify(CUES_CLOSED.map(function(row){return row.text;}))===JSON.stringify(exactClosed)&&CUES_OPEN.concat(CUES_CLOSED).every(function(row){return row.kind==="narration"&&!row.speakerName;}),
     exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWEntered===true")&&lateEntryEligible.toString().includes(">=1")&&!lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
     postRenderConsumerRewire:typeof globalThis.renderStoryScenePresentationLayer==="function"&&globalThis.renderStoryScenePresentationLayer.toString().includes("const settle=function(){wireSourceChoice();renderScene();}"),
     intentBeforeResolver:prepareScene06AW2CSourceChoice.toString().includes("ensureLethalIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("resolveStoryFactualAction"),
@@ -359,10 +425,13 @@ function diagnostics(){
     exactBackdrop:!!sceneBeat&&sceneBeat.environmentRef&&sceneBeat.environmentRef.assetId===BACKDROP_ID&&!!hold&&hold.environmentRef&&hold.environmentRef.assetId===BACKDROP_ID,
     objectiveExact:OBJECTIVE==="Retrieve the package.",
     noChoicesAfterCommit:!!sceneBeat&&Array.isArray(sceneBeat.choices)&&sceneBeat.choices.length===0&&!!hold&&Array.isArray(hold.choices)&&hold.choices.length===0,
-    packageAmtPursuitStayClosed:commitLethalResult.toString().includes("packageSmugglerAvailable:false")&&commitLethalResult.toString().includes("anbuMarkedTargetAvailable:false")&&commitLethalResult.toString().includes("pursuitAvailable:false"),
+    lethalIntentDoesNotClosePursuit:prepareScene06AW2CSourceChoice.toString().includes("kakashiScene06AW2CPursuitWasOpenAtIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("kakashiScene05AWPursuitEligible:false"),
+    qualifyingKillCanPreservePursuit:derivePostLethalPursuit35760({localContext:{kakashiScene05AWTurnCount:4,kakashiScene06AW2CPursuitWasOpenAtIntent:true,kakashiScene06AW2CPreLethalPackagePursuitEligible:true,kakashiScene06AW2CPreLethalAmtPursuitEligible:true}},"LETHAL_ATTEMPT_KILLED").packageSmugglerAvailable===true&&derivePostLethalPursuit35760({localContext:{kakashiScene05AWTurnCount:5,kakashiScene06AW2CPursuitWasOpenAtIntent:false}},"LETHAL_ATTEMPT_KILLED").pursuitAvailable===false,
+    nonkillOutcomesUseExistingClosedEndings:["LETHAL_ATTEMPT_SURVIVED","LETHAL_ATTEMPT_INTERRUPTED","LETHAL_ATTEMPT_ESCAPED"].every(function(x){return derivePostLethalPursuit35760({localContext:{kakashiScene05AWTurnCount:1,kakashiScene06AW2CPursuitWasOpenAtIntent:true}},x).pursuitAvailable===false;}),
+    stateDerivedPostLethalChoices:postLethalChoiceRows35760.toString().includes("GO AFTER PACKAGE SMUGGLER")&&postLethalChoiceRows35760.toString().includes("GO AFTER ANBU MARKED TARGET"),
     noPakkun:commitLethalResult.toString().includes("pakkunPresent:false"),
     directResolvedOutcomeTrigger:resolveLethalAttempt.toString().includes("triggerResolvedOutcomePresentation")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiResolvedOutcome35780")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiConfirmedKill35770"),
-    scene7FailClosed:typeof globalThis.advanceStoryScene==="function"&&globalThis.advanceStoryScene.toString().includes("kakashi_scene06aw2c_scene7_authority_pending")&&HOLD_BEAT==="kak_scene06a_w2c_scene7_pending",
+    scene7FailClosedWhenNoPursuit:typeof globalThis.advanceStoryScene==="function"&&globalThis.advanceStoryScene.toString().includes("kakashi_scene06aw2c_scene7_authority_pending")&&HOLD_BEAT==="kak_scene06a_w2c_scene7_pending",
     standardCharacterCardScale:installStyle.toString().includes("width:min(94%,322px)")&&installStyle.toString().includes("width:min(96%,338px)")&&installStyle.toString().includes("max-height:505px"),
     browserGoldenClaimed:false
   };
@@ -371,7 +440,7 @@ function diagnostics(){
 }
 
 ensureHooks();installBrowserChoiceCapture();
-const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,actionContract:ACTION_CONTRACT,bindingRef:BINDING,sourceChoiceId:SOURCE_CHOICE,sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,cueCount:CUES.length,outcomeRefs:Object.freeze(OUTCOMES.map(function(row){return row.outcomeRef;})),objective:OBJECTIVE,enterScene06AW2C:enterScene06AW2C,wireSourceChoice:wireSourceChoice,resolveLethalAttempt:resolveLethalAttempt,diagnostics:diagnostics,browserGoldenClaimed:false});
+const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,actionContract:ACTION_CONTRACT,bindingRef:BINDING,sourceChoiceId:SOURCE_CHOICE,sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,cueCount:CUES_OPEN.length,closedCueCount:CUES_CLOSED.length,outcomeRefs:Object.freeze(OUTCOMES.map(function(row){return row.outcomeRef;})),objective:OBJECTIVE,enterScene06AW2C:enterScene06AW2C,wireSourceChoice:wireSourceChoice,resolveLethalAttempt:resolveLethalAttempt,diagnostics:diagnostics,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760=api;
 globalThis.runAcademyKakashiScene06AW2C35760Diagnostics=diagnostics;
 })();

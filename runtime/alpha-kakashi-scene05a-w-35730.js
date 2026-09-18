@@ -22,8 +22,8 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v7_2026_09_18";
-const AUTHORITY="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v8_2026_09_19";
+const AUTHORITY="bf16ebe0f677994878fbe60e30e7b546da899eb8";
 const CAUSAL_AUTHORITY="90b20f565ef010d2b7cfca98c04feece3f7dfcb7";
 const CHOICE_SURFACE_AUTHORITY="36454a31e9f61ffdaa528589ac11552d446ad3bc";
 const MI_PURSUIT_MAX_TURNS=4;
@@ -50,20 +50,25 @@ const COMMON_CUES=Object.freeze([
   Object.freeze({cueId:"scene05aw_02",kind:"narration",text:"Kakashi lands a few steps away.",focusActorRef:"academy_kakashi"}),
   Object.freeze({cueId:"scene05aw_03",kind:"narration",text:"For a moment, the street is still.",focusActorRef:"academy_kakashi"}),
   Object.freeze({cueId:"scene05aw_04",kind:"narration",text:"Then his eye moves past her.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_05",kind:"narration",text:"Toward the route Package Smuggler took.",focusActorRef:"academy_kakashi"})
+  Object.freeze({cueId:"scene05aw_05",kind:"narration",text:"Toward the routes the others took.",focusActorRef:"academy_kakashi"})
 ]);
 const FAST_CUES=Object.freeze([
-  Object.freeze({cueId:"scene05aw_fast_06",kind:"narration",text:"A figure cuts across the far end of the street.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_fast_07",kind:"narration",text:"Package Smuggler.",focusActorRef:"package_smuggler"}),
-  Object.freeze({cueId:"scene05aw_fast_08",kind:"narration",text:"Still moving.",focusActorRef:"package_smuggler"}),
-  Object.freeze({cueId:"scene05aw_fast_09",kind:"narration",text:"The package is still with him.",focusActorRef:"package_smuggler"}),
-  Object.freeze({cueId:"scene05aw_fast_10",kind:"narration",text:"Kakashi has not lost him yet.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_fast_11",kind:"narration",text:"Not quite.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_fast_12",kind:"narration",text:"He looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_fast_13",kind:"narration",text:"She lies where he put her.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_fast_14",kind:"narration",text:"Every second he spends here gives Package Smuggler more distance.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_fast_15",kind:"narration",text:"The package is still within reach.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_fast_16",kind:"narration",text:"But only if Kakashi moves now.",focusActorRef:"academy_kakashi"})
+  Object.freeze({cueId:"scene05aw_fast_06",kind:"narration",text:"Package Smuggler cuts across the far end of the street.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_07",kind:"narration",text:"Still moving.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_08",kind:"narration",text:"The package is still with him.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_09",kind:"narration",text:"Higher up, movement flashes across a distant roofline.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene05aw_fast_10",kind:"narration",text:"ANBU Marked Target.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene05aw_fast_11",kind:"narration",text:"Farther away.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene05aw_fast_12",kind:"narration",text:"But not gone.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene05aw_fast_13",kind:"narration",text:"Not yet.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene05aw_fast_14",kind:"narration",text:"Kakashi looks between them.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_15",kind:"narration",text:"One route leads to the package.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_16",kind:"narration",text:"The other to the man who carried it here.",focusActorRef:"anbu_marked_target"}),
+  Object.freeze({cueId:"scene05aw_fast_17",kind:"narration",text:"Then his eye drops back to Masked Interceptor.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_fast_18",kind:"narration",text:"She lies where he put her.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_fast_19",kind:"narration",text:"Three problems.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_20",kind:"narration",text:"Not enough time for all of them at once.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_21",kind:"narration",text:"Whatever Kakashi does next will decide which ones remain within reach.",focusActorRef:"academy_kakashi"})
 ]);
 const SLOW_CUES=Object.freeze([
   Object.freeze({cueId:"scene05aw_slow_06",kind:"narration",text:"The street ahead is empty.",focusActorRef:"academy_kakashi"}),
@@ -73,10 +78,11 @@ const SLOW_CUES=Object.freeze([
   Object.freeze({cueId:"scene05aw_slow_10",kind:"narration",text:"Nothing.",focusActorRef:"academy_kakashi"}),
   Object.freeze({cueId:"scene05aw_slow_11",kind:"narration",text:"Package Smuggler had too much time.",focusActorRef:"academy_kakashi"}),
   Object.freeze({cueId:"scene05aw_slow_12",kind:"narration",text:"The package is gone with him.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_slow_13",kind:"narration",text:"Kakashi looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_slow_14",kind:"narration",text:"She lies beneath the Sakura tree.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_slow_15",kind:"narration",text:"The chase is over.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_slow_16",kind:"narration",text:"What happens to her is the only decision left here.",focusActorRef:"masked_interceptor"})
+  Object.freeze({cueId:"scene05aw_slow_13",kind:"narration",text:"ANBU Marked Target is gone as well.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_14",kind:"narration",text:"Kakashi looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_slow_15",kind:"narration",text:"She lies beneath the Sakura tree.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_slow_16",kind:"narration",text:"The pursuit is over.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_17",kind:"narration",text:"What happens to her is the only decision left here.",focusActorRef:"masked_interceptor"})
 ]);
 const FAST_SEQUENCE=Object.freeze([...COMMON_CUES,...FAST_CUES]);
 const SLOW_SEQUENCE=Object.freeze([...COMMON_CUES,...SLOW_CUES]);
@@ -161,11 +167,11 @@ function materializeChoices35730(){
   if(pursuitEligible){
     add(choiceRow("scene05aw_go_after_package_smuggler","GO AFTER PACKAGE SMUGGLER","BRANCH_A"));
     add(choiceRow("scene05aw_go_after_anbu_marked_target","GO AFTER ANBU MARKED TARGET","BRANCH_B"));
-    add(choiceRow("scene05aw_restrain_and_continue",restraintPresentation(),"BRANCH_F"));
   }
   add(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
   add(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
   add(choiceRow("scene05aw_take_her_to_uchiha_police","TAKE HER TO THE UCHIHA POLICE FORCE","BRANCH_E"));
+  if(pursuitEligible)add(choiceRow("scene05aw_restrain_and_continue",restraintPresentation(),"BRANCH_F"));
   beat.choices=rows;
   const rt=active();if(rt&&rt.localContext){
     rt.localContext.kakashiScene05AWLethalPresentation=lethal.label;
@@ -314,13 +320,13 @@ function ensureHooks35730(){if(installHooks35730())return;if(typeof setTimeout==
 function diagnostics(){
   const def=scene(),ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null,win=def&&def.beatMap instanceof Map?def.beatMap.get(WIN_BEAT):null,choice=def&&def.beatMap instanceof Map?def.beatMap.get(CHOICE_BEAT):null;
   const common=[
-    "Masked Interceptor hits the stone beneath the Sakura tree.","Kakashi lands a few steps away.","For a moment, the street is still.","Then his eye moves past her.","Toward the route Package Smuggler took."
+    "Masked Interceptor hits the stone beneath the Sakura tree.","Kakashi lands a few steps away.","For a moment, the street is still.","Then his eye moves past her.","Toward the routes the others took."
   ];
   const exactFast=[...common,
-    "A figure cuts across the far end of the street.","Package Smuggler.","Still moving.","The package is still with him.","Kakashi has not lost him yet.","Not quite.","He looks back at Masked Interceptor.","She lies where he put her.","Every second he spends here gives Package Smuggler more distance.","The package is still within reach.","But only if Kakashi moves now."
+    "Package Smuggler cuts across the far end of the street.","Still moving.","The package is still with him.","Higher up, movement flashes across a distant roofline.","ANBU Marked Target.","Farther away.","But not gone.","Not yet.","Kakashi looks between them.","One route leads to the package.","The other to the man who carried it here.","Then his eye drops back to Masked Interceptor.","She lies where he put her.","Three problems.","Not enough time for all of them at once.","Whatever Kakashi does next will decide which ones remain within reach."
   ];
   const exactSlow=[...common,
-    "The street ahead is empty.","Kakashi searches the rooftops.","The alleys.","The next junction.","Nothing.","Package Smuggler had too much time.","The package is gone with him.","Kakashi looks back at Masked Interceptor.","She lies beneath the Sakura tree.","The chase is over.","What happens to her is the only decision left here."
+    "The street ahead is empty.","Kakashi searches the rooftops.","The alleys.","The next junction.","Nothing.","Package Smuggler had too much time.","The package is gone with him.","ANBU Marked Target is gone as well.","Kakashi looks back at Masked Interceptor.","She lies beneath the Sakura tree.","The pursuit is over.","What happens to her is the only decision left here."
   ];
   const fastProbe={resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:3};
   const turn4Probe={...fastProbe,playerActionOpportunityCount:4};
@@ -328,17 +334,18 @@ function diagnostics(){
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v7_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v8_2026_09_19",
     choiceSurfaceAuthorityPinned:CHOICE_SURFACE_AUTHORITY==="36454a31e9f61ffdaa528589ac11552d446ad3bc",
     downstreamConsumerPreservation:preserveWiredChoice35730({choiceId:"x",nextBeatId:"pending",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_pending_35730"}]},{choiceId:"x",nextBeatId:"real",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"real_consumer"}]}).nextBeatId==="real",
     causalAuthorityPinned:CAUSAL_AUTHORITY==="90b20f565ef010d2b7cfca98c04feece3f7dfcb7",
-    authorityPinned:AUTHORITY==="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522",
+    authorityPinned:AUTHORITY==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
     exactFastNarration:JSON.stringify(FAST_SEQUENCE.map(x=>x.text))===JSON.stringify(exactFast),
     exactSlowNarration:JSON.stringify(SLOW_SEQUENCE.map(x=>x.text))===JSON.stringify(exactSlow),
     victoryEntryOnly:validVictory.toString().includes('resultState==="player_side_victory"')&&routeVictoryReturn35730.toString().includes("kakashiScene04ABattleIntentResolved"),
     exactTurnGate:fastPursuit(fastProbe)===true&&fastPursuit(turn4Probe)===true&&fastPursuit(slowProbe)===false,
     psToAmtGate:psKeepsAmtPursuit(1)===true&&psKeepsAmtPursuit(3)===true&&psKeepsAmtPursuit(4)===false,
     dualPursuitChoices:menuSource.includes("GO AFTER PACKAGE SMUGGLER")&&menuSource.includes("GO AFTER ANBU MARKED TARGET"),
+    exactFastChoiceOrder:(()=>{const rt=active();const beat=choice;if(!rt||!beat)return true;return true;})()&&materializeChoices35730.toString().indexOf("scene05aw_go_after_package_smuggler")<materializeChoices35730.toString().indexOf("scene05aw_go_after_anbu_marked_target")&&materializeChoices35730.toString().indexOf("scene05aw_go_after_anbu_marked_target")<materializeChoices35730.toString().indexOf("scene05aw_lethal")&&materializeChoices35730.toString().indexOf("scene05aw_take_her_to_uchiha_police")<materializeChoices35730.toString().lastIndexOf("scene05aw_restrain_and_continue"),
     exactDispositionLabels:menuSource.includes("TAKE HER BACK TO ANBU")&&menuSource.includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
     fastRestrainChoice:menuSource.includes("scene05aw_restrain_and_continue")&&restraintPresentation.toString().includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),
     lethalModeFromClassification:lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&lethalPresentation.toString().includes("ATTEMPT TO KILL HER"),
