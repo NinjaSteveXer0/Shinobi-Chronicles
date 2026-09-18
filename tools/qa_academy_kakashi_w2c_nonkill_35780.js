@@ -118,8 +118,13 @@ assert(source.includes("896b8fcc9d5c5dd6b019d2f51a5fbccdaee66a25"));
 assert(source.includes("851244e7b5a0911ee7faddd44923115294a0e4a7"));
 assert(source.includes("5c6389d8c4bc53f27bf55cf269a2b66ee5e3848c"));
 assert(source.includes("b52ed9670ddc369fb115d3a61147c496fc75155f"));
-assert(source.includes("99c876dbb29b6ebe43ab6fb4610254db4cfd33ed"));
+assert(source.includes("4e679e92e6c97968bcf970a83b9ba88e19d96355"));
+assert(!MOD.data.LETHAL_ATTEMPT_ESCAPED.office.some(row=>row&&row.text==="A beat."),"updated ESCAPED office must remove stray beat narration");
 assert(source.includes("PATROL_ASSET_PATHS=Object.freeze([])"),"unapproved patrol asset path was introduced");
+assert(source.includes("playAcademyKakashiLethalAttemptAnimation35770"),"non-kill outcomes must consume the shared lethal-attempt animation");
+assert(source.includes("left:50%;right:auto;bottom:13.2%"),"non-kill recovered package badge must be centered above narration bar");
+assert(source.includes("w2cNonKillEnterLeft35780"),"Hokage Office ANBU entry motion missing");
+assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
 
 console.log("Academy Kakashi W2C non-kill ending 35780 QA: PASS");
 console.log("- SURVIVED / INTERRUPTED / ESCAPED exact locked scene chains consumed");
