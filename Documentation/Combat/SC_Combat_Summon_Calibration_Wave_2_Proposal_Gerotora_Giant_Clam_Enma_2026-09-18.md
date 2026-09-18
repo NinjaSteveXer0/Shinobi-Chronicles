@@ -38,9 +38,15 @@ If a future Story occurrence manifests Gerotora as an independently targetable p
 
 ## Proposed assisted actions
 
-Gerotora has **exactly two Battle abilities**.
+Gerotora has **exactly three Battle abilities**.
 
-No diagnostic button. No repair-vs-prevention vocabulary. No extra seal-management buttons.
+The kit stays deliberately simple:
+
+1. open the seal;
+2. close the seal;
+3. emergency-close it if V2 Cloak causes the Mindless Jinchūriki state.
+
+No diagnostic button and no extra seal-management vocabulary.
 
 ### `key_gero_open_the_seal` — **Open the Seal**
 
@@ -82,21 +88,46 @@ Player card text:
 **CLOSE THE SEAL**  
 **Force the seal closed. Tailed-Beast powers stop until it is opened again.**
 
+
+### `key_gero_emergency_reseal` — **Emergency Reseal**
+
+EMERGENCY / linked Tailed-Beast seal / once per Battle
+
+> **If V2 Cloak makes you lose control, Gerotora slams the seal shut and brings you back.**
+
+Trigger:
+
+- the linked player enters the exact **Mindless Jinchūriki** state caused by V2 Cloak.
+
+Effect:
+
+- triggers automatically; it does **not** wait for the mindless player to choose an action;
+- force the linked seal to **CLOSED**;
+- immediately end the active V2 Cloak / Mindless Jinchūriki state that depends on that open seal;
+- return ordinary player control;
+- the player does **not** gain an extra action from being restored;
+- does not undo damage or other effects that already resolved;
+- does not heal Battle PL;
+- once used, Emergency Reseal is unavailable for the rest of that Battle.
+
+Player card text:
+
+**EMERGENCY RESEAL**  
+**If V2 Cloak makes you lose control, Gerotora automatically shuts the seal and brings you back.**
+
 ## Relationship package
 
 Gerotora provides **no passive Stats and no attack package**.
 
 His entire Battle purpose is deliberately simple:
 
-**Open the Seal** ↔ **Close the Seal**
-
-That is the player decision.
-
-No third seal button is added merely to make the kit look larger.
+- **Open the Seal** — turn Tailed-Beast access on;
+- **Close the Seal** — turn Tailed-Beast access off;
+- **Emergency Reseal** — once per Battle, automatically shut the seal if V2 Cloak causes the Mindless Jinchūriki state.
 
 Player-facing shorthand:
 
-> **Gerotora controls one thing: the Tailed-Beast seal. Open it to use powers you already have. Close it to shut those powers off.**
+> **Gerotora controls the Tailed-Beast seal. Open it to use powers you already have. Close it to shut them off. If V2 Cloak makes you lose control, Emergency Reseal automatically brings you back once per Battle.**
 
 ---
 
