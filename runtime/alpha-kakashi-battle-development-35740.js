@@ -218,6 +218,22 @@ if(priorProject){
   try{projectAcademyKakashiOriginBattleResult=globalThis.projectAcademyKakashiOriginBattleResult;}catch(_error){}
 }
 
+const priorChronicle=typeof createBattleChronicleResult==="function"?createBattleChronicleResult:null;
+if(priorChronicle){
+  globalThis.createBattleChronicleResult=function createBattleChronicleResultKakashi35740(){
+    const b=battle();if(isKakashiOriginBattle(b))syncBattleDevelopment35740(b);
+    const result=priorChronicle.apply(this,arguments);
+    const summary=b&&b.kakashiOriginDevelopmentSummary||null;
+    if(result&&typeof result==="object"&&summary){
+      result.rewards=result.rewards&&typeof result.rewards==="object"?result.rewards:{};
+      result.rewards.progression=summary.rows.map(row=>({type:"discipline_exp",discipline:row.discipline,amount:row.amount}));
+      result.rewards.terminalOriginRewardDeferred=true;
+    }
+    return result;
+  };
+  try{createBattleChronicleResult=globalThis.createBattleChronicleResult;}catch(_error){}
+}
+
 const priorRender=typeof renderVictoryOverlay==="function"?renderVictoryOverlay:null;
 if(priorRender){
   globalThis.renderVictoryOverlay=function renderVictoryOverlayKakashi35740(container){
@@ -240,6 +256,7 @@ function diagnostics(){
     genericExpNotGranted:!sync.includes("playerData.exp")&&!sync.includes("rewards.exp="),
     noBattleRyoOrItemGrant:!sync.includes("playerData.ryo")&&!sync.includes("addItemToInventory"),
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
+    chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
     victoryExplainsDebriefBoundary:present.includes("DISCIPLINE EXP")&&present.includes("Evaluated at terminal debrief")&&present.includes("CLAIM BATTLE RESULT"),
     browserGoldenClaimed:false
   };
