@@ -20,7 +20,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v4_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v5_2026_09_18";
 const AUTHORITY="820917031000c15e62f0a4cea7535397d3ad9e50";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
@@ -188,11 +188,16 @@ function providerBridge(factual){
 }
 function triggerResolvedOutcomePresentation(rt,selected){
   if(!rt||rt.sceneId!==SCENE_ID||rt.beatId!==HOLD_BEAT)return false;
-  if(String(selected||"")!=="LETHAL_ATTEMPT_KILLED")return false;
+  selected=String(selected||"");
   try{
-    const fn=globalThis.beginAcademyKakashiConfirmedKill35770;
-    return typeof fn==="function"?fn()===true:false;
-  }catch(_error){return false;}
+    const resolved=globalThis.beginAcademyKakashiResolvedOutcome35780;
+    if(typeof resolved==="function")return resolved(selected)===true;
+    if(selected==="LETHAL_ATTEMPT_KILLED"){
+      const kill=globalThis.beginAcademyKakashiConfirmedKill35770;
+      return typeof kill==="function"?kill()===true:false;
+    }
+  }catch(_error){}
+  return false;
 }
 function resolveLethalAttempt(rt=active()){
   if(!rt||rt.sceneId!==SCENE_ID||![SCENE_BEAT,HOLD_BEAT].includes(rt.beatId))return{success:false,reason:"kakashi_scene06aw2c_resolution_context_missing"};
@@ -342,7 +347,7 @@ function diagnostics(){
   ];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v4_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v5_2026_09_18",
     authorityPinned:AUTHORITY==="820917031000c15e62f0a4cea7535397d3ad9e50",
     exactNarration:JSON.stringify(CUES.map(function(row){return row.text;}))===JSON.stringify(exact)&&CUES.every(function(row){return row.kind==="narration"&&!row.speakerName;}),
     exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes(">=4")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
@@ -355,7 +360,7 @@ function diagnostics(){
     noChoicesAfterCommit:!!sceneBeat&&Array.isArray(sceneBeat.choices)&&sceneBeat.choices.length===0&&!!hold&&Array.isArray(hold.choices)&&hold.choices.length===0,
     packageAmtPursuitStayClosed:commitLethalResult.toString().includes("packageSmugglerAvailable:false")&&commitLethalResult.toString().includes("anbuMarkedTargetAvailable:false")&&commitLethalResult.toString().includes("pursuitAvailable:false"),
     noPakkun:commitLethalResult.toString().includes("pakkunPresent:false"),
-    directConfirmedKillTrigger:resolveLethalAttempt.toString().includes("triggerResolvedOutcomePresentation")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiConfirmedKill35770"),
+    directResolvedOutcomeTrigger:resolveLethalAttempt.toString().includes("triggerResolvedOutcomePresentation")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiResolvedOutcome35780")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiConfirmedKill35770"),
     scene7FailClosed:typeof globalThis.advanceStoryScene==="function"&&globalThis.advanceStoryScene.toString().includes("kakashi_scene06aw2c_scene7_authority_pending")&&HOLD_BEAT==="kak_scene06a_w2c_scene7_pending",
     standardCharacterCardScale:installStyle.toString().includes("width:min(94%,322px)")&&installStyle.toString().includes("width:min(96%,338px)")&&installStyle.toString().includes("max-height:505px"),
     browserGoldenClaimed:false
