@@ -116,8 +116,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-40' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260918-40";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-41' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260918-41";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -149,6 +149,10 @@ jobs:
           grep -Fq 'confirmedKillPresentationStarted' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'installOutcomeWatchdog' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'miCardDrop35770' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'sc-kakashi-w2c-package-status' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'kakashiStateExitRight35710' runtime/alpha-kakashi-scene04a-35710.js
+          grep -Fq 'BREAKING AWAY' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'typeof document==="undefined"' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'kakashiScene06W2CKillLedgerOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           test -f 'Kakashi Origin Backdrop/rooftop_night.png'
