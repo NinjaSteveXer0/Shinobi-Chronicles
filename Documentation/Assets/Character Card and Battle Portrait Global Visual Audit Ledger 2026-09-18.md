@@ -331,6 +331,21 @@ The inventory itself is source-verified. Pixel verdicts are populated only when 
 
 ## 7. Battle/UI portrait inventory — repository cross-reference at 12ec215
 
+### Active portrait authority consumed
+
+Current durable Assets authority states:
+
+- live Battle/UI portrait projection is **116/116**;
+- `collectibleCard` and `uiPortrait` remain separate authorities;
+- approved production portrait root is `Portraits/`;
+- the corrected physical portrait tree does **not** authorize filename-derived remaps;
+- Character Creation's 2026-09-07 representation audit found **NO FURTHER REMAP REQUIRED FOR ALPHA**;
+- exact active mappings remain those already ratified by Assets/Registry/runtime authority;
+- pixel/dimension/content QA is separate from mapping authority.
+
+Therefore this audit must never convert a visual-quality finding into an identity/path remap by convenience. Repair or supersede the exact approved portrait through Assets authority if needed.
+
+
 **Repository cross-reference count: 185 PNGs under `Portraits/`.**
 
 This table is a path/blob cross-reference for matching the newly supplied portrait ZIP binaries. A repo path row is **not** automatically a production-manifest claim. Final Battle portrait authority still comes from the current explicit UI portrait projection/Registry authority.
