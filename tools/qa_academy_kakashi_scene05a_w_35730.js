@@ -53,15 +53,15 @@ load("runtime/alpha-kakashi-scene05a-w-35730.js");
 
 const MOD=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 assert(MOD,"Scene 05A-W module missing");
-assert.strictEqual(MOD.authority,"30a8cf3a16f57fbe5e65f55bc9dc1de076a21522");
+assert.strictEqual(MOD.authority,"bf16ebe0f677994878fbe60e30e7b546da899eb8");
 assert.strictEqual(MOD.causalAuthority,"90b20f565ef010d2b7cfca98c04feece3f7dfcb7");
 assert.strictEqual(MOD.miPursuitMaxTurns,4);
 assert.strictEqual(MOD.psToAmtMaxTurns,3);
 assert.strictEqual(MOD.psKeepsAmtPursuit(1),true);
 assert.strictEqual(MOD.psKeepsAmtPursuit(3),true);
 assert.strictEqual(MOD.psKeepsAmtPursuit(4),false);
-assert.strictEqual(MOD.cueCount,16);
-assert.strictEqual(MOD.slowCueCount,16);
+assert.strictEqual(MOD.cueCount,21);
+assert.strictEqual(MOD.slowCueCount,17);
 assert.strictEqual(MOD.objective,"Retrieve the package.");
 assert.strictEqual(MOD.battleConfigId,BATTLE_CONFIG);
 assert.strictEqual(MOD.bindingRef,BINDING);
@@ -75,20 +75,25 @@ const common=[
   "Kakashi lands a few steps away.",
   "For a moment, the street is still.",
   "Then his eye moves past her.",
-  "Toward the route Package Smuggler took."
+  "Toward the routes the others took."
 ];
 const exactFast=[...common,
-  "A figure cuts across the far end of the street.",
-  "Package Smuggler.",
+  "Package Smuggler cuts across the far end of the street.",
   "Still moving.",
   "The package is still with him.",
-  "Kakashi has not lost him yet.",
-  "Not quite.",
-  "He looks back at Masked Interceptor.",
+  "Higher up, movement flashes across a distant roofline.",
+  "ANBU Marked Target.",
+  "Farther away.",
+  "But not gone.",
+  "Not yet.",
+  "Kakashi looks between them.",
+  "One route leads to the package.",
+  "The other to the man who carried it here.",
+  "Then his eye drops back to Masked Interceptor.",
   "She lies where he put her.",
-  "Every second he spends here gives Package Smuggler more distance.",
-  "The package is still within reach.",
-  "But only if Kakashi moves now."
+  "Three problems.",
+  "Not enough time for all of them at once.",
+  "Whatever Kakashi does next will decide which ones remain within reach."
 ];
 const exactSlow=[...common,
   "The street ahead is empty.",
@@ -98,9 +103,10 @@ const exactSlow=[...common,
   "Nothing.",
   "Package Smuggler had too much time.",
   "The package is gone with him.",
+  "ANBU Marked Target is gone as well.",
   "Kakashi looks back at Masked Interceptor.",
   "She lies beneath the Sakura tree.",
-  "The chase is over.",
+  "The pursuit is over.",
   "What happens to her is the only decision left here."
 ];
 
@@ -166,10 +172,10 @@ let labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
   "GO AFTER PACKAGE SMUGGLER",
   "GO AFTER ANBU MARKED TARGET",
-  "ATTEMPT TO RESTRAIN HER AND CONTINUE",
   "ATTEMPT TO KILL HER",
   "TAKE HER BACK TO ANBU",
-  "TAKE HER TO THE UCHIHA POLICE FORCE"
+  "TAKE HER TO THE UCHIHA POLICE FORCE",
+  "ATTEMPT TO RESTRAIN HER AND CONTINUE"
 ]);
 assert.strictEqual(choiceBeat.choices.length,6);
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
@@ -184,7 +190,7 @@ assert(wiredLethal,"lethal choice missing before downstream-wire preservation pr
 wiredLethal.nextBeatId="qa_real_scene06";
 wiredLethal.consequenceRequests=[{requestId:"qa_real_scene06_consumer",kind:"domain",resolve:()=>({success:true})}];
 active.beatId=WIN_BEAT;
-active.localContext={...(active.localContext||{}),kakashiScene05AWPursuitEligible:true,__kakashiScene05AW35730Cursor:15};
+active.localContext={...(active.localContext||{}),kakashiScene05AWPursuitEligible:true,__kakashiScene05AW35730Cursor:20};
 let preserved=globalThis.advanceStoryScene();
 assert.strictEqual(preserved.success,true);
 assert.strictEqual(active.beatId,CHOICE_BEAT);
@@ -199,7 +205,7 @@ let classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantC
 });
 assert.strictEqual(classified.success,true);
 active.beatId=WIN_BEAT;
-active.localContext={...(active.localContext||{}),kakashiScene05AWPursuitEligible:true,__kakashiScene05AW35730Cursor:15};
+active.localContext={...(active.localContext||{}),kakashiScene05AWPursuitEligible:true,__kakashiScene05AW35730Cursor:20};
 let relabelled=globalThis.advanceStoryScene();
 assert.strictEqual(relabelled.success,true);
 assert.strictEqual(active.beatId,CHOICE_BEAT);
