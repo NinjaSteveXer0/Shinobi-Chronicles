@@ -28,25 +28,31 @@ Package Smuggler fled with the package while they fought.
 
 ANBU Marked Target went the other way.
 
-If Kakashi ended this quickly, neither trail is dead yet.
+Kakashi scans the street.
 
-He can still move.
+One trail cuts toward the package.
 
-Still choose which one to follow.
+The other leads after the original target.
 
-But every second he spends here gives both men more distance.
+Neither has vanished yet.
+
+Not completely.
+
+But both are getting farther away.
 
 Kakashi looks back at Masked Interceptor.
 
 She lies where he put her.
 
-The package is getting farther away.
+Every second he spends here makes the choice harder.
 
-The original target is getting farther away.
+The package.
 
-And the woman at Kakashi's feet is still his problem to resolve.
+The original target.
 
-He cannot do everything.
+Or the woman at his feet.
+
+He cannot deal with all three.
 
 Not anymore.
 
