@@ -94,7 +94,10 @@ assert(source.includes("maskedInterceptorPresent:false"),"Scene 08 must persist 
 assert(source.includes("installBrowserFinalCueCapture"),"installed-browser final-cue capture seam missing");
 assert(source.includes("stopImmediatePropagation"),"installed-browser final-cue capture must pre-empt the older 33900 lexical click handler");
 assert(source.includes("confirmedKillPresentationStarted"),"post-delegate confirmed-kill transition seam missing");
+assert(source.includes("beginAcademyKakashiConfirmedKill35770"),"direct Scene 06 confirmed-kill entrypoint missing");
+assert(source.includes("installOutcomeWatchdog"),"confirmed-kill hold watchdog missing");
+assert(source.includes("continuation pending Writing #226"),"local non-kill resolver QA indicator missing");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
-console.log("- final Scene 06 click -> resolver hold -> stylised kill presentation in one browser action");
+console.log("- final Scene 06 click -> resolver hold -> direct/watchdog confirmed-kill presentation");
 console.log("- rooftop ANBU report -> Hokage office with hidden-operation Knowledge boundary");
 console.log("- separate committed Chronicle Receipt -> Konoha destination");

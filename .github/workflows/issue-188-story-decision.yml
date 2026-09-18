@@ -116,8 +116,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-38' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260918-38";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-39' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260918-39";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -142,10 +142,13 @@ jobs:
           grep -Fq 'alpha-kakashi-scene06a-w2c-35760.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-w2c-ending-35770.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq '820917031000c15e62f0a4cea7535397d3ad9e50' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq '67a3859a5862032eeb97955abf4865392cb4a97a' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq '275667ff8b65d5d7e9252164f7552676339a9086' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'installBrowserFinalCueCapture' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'confirmedKillPresentationStarted' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'installOutcomeWatchdog' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'kakashiScene06W2CKillLedgerOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           test -f 'Kakashi Origin Backdrop/rooftop_night.png'
           test -f 'Kakashi Origin Backdrop/hokage_administration_interior_night.png'

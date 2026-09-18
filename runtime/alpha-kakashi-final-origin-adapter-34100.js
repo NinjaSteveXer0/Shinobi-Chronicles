@@ -63,7 +63,8 @@ const SCENE06AW2C_PATH="runtime/alpha-kakashi-scene06a-w2c-35760.js";
 const W2C_ENDING_PATH="runtime/alpha-kakashi-w2c-ending-35770.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
-const BUILD="kakashi-final-20260918-38";
+// const BUILD="kakashi-final-20260918-38";
+const BUILD="kakashi-final-20260918-39";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
