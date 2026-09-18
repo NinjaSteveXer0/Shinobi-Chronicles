@@ -404,6 +404,64 @@ The ANBU cohort demonstrates the current target particularly well: premium mater
 
 ---
 
+## 6D. Constructs + Enemy presentation-card direct-pixel audit — 2026-09-19
+
+**Source:** twelve individual PNGs uploaded directly by Stephen and visually inspected in the active workspace.
+
+**Scope note:** `Iron Maiden` and `Triple Rashomon` are Constructs, not human Character Cards. The remaining ten are reusable/generic Enemy presentation cards under `Enemies/`. They are audited here because they share the premium card presentation language, but they are **not folded into the frozen 141 ninja Character Card count**.
+
+**Repository cross-reference at audit time:**
+
+| Asset | Current source path | Current blob SHA |
+|---|---|---|
+| Iron Maiden | `Assets/Constructs/iron_maiden.png` | `07173c304ed652b4f61ea2226bfea43c21b17739` |
+| Triple Rashomon | `Assets/Constructs/triple_rashomon.png` | `771130d772d070e62ea688309013a1d1e503469f` |
+| Ambush Captain | `Enemies/ambush_captain.png` | `71b15545ba45dd0826ff308f996f49da8635b63e` |
+| ANBU-Style Operative | `Enemies/anbu_style_operative.png` | `84417f2bf75ef5a4811167d1566a7585272abab0` |
+| Bandit | `Enemies/Bandit.png` | `af9406037bc142419de48292908737194cfed523` |
+| Bandit Leader | `Enemies/BanditLeader.png` | `b717e73aec1937d1858af2d2c8b55eaef76326c2` |
+| Beast Handler Rogue | `Enemies/beast_handler_rogue.png` | `3b6fde856a25fed5bb596fda35bfc9c044e008e5` |
+| Chain-Blade Ronin | `Enemies/chain_blade_ronin.png` | `4c39efd2a1fd24e257061fb1f5ef15598842c0c0` |
+| Cipher Handler | `Enemies/cipher_handler.png` | `a3c1b90ad44cd0200cdca447b8c7742aaad0b9b0` |
+| Decoy Assassin | `Enemies/decoy_assassin.png` | `8de5bdae18c84554db17197d19af1feb27cf0e4c` |
+| Elite Missing-Nin | `Enemies/elite_missing_nin.png` | `f5e2df6a0320ef05e2d50310619c708910601427` |
+| Escort Breaker | `Enemies/escort_breaker.png` | `b33295e0fbba6353055688dcc6326ed0e1d03567` |
+
+### Cohort verdict
+
+- **No Golden Alert.**
+- The strongest human-presence results are **Bandit Leader, Chain-Blade Ronin, Ambush Captain, and Bandit**.
+- **Cipher Handler** and **Elite Missing-Nin** have clear visible environmental writing/calligraphy and therefore fail the locked text discipline absent exact authority.
+- **Iron Maiden** and **Triple Rashomon** are excellent construct cards; Menma's human-presence criterion is not applicable, but their premium material/environment/card-cohesion standard is GREEN.
+- Generic Enemy cards may legitimately use a **single archetype/nameplate label** rather than Title + personal Name; that does not itself violate the text hierarchy rule.
+
+| Asset | Asset class | Human Presence / Identity | Composition / Materials | Text / Hard Rule | Menma | Verdict | Primary Action |
+|---|---|---|---|---|---|---|---|
+| Iron Maiden | Construct | N/A | **GREEN** — exceptional metal mass, scale, chains, red internal light and readable containment concept | GREEN | N/A | **GREEN** | Preserve |
+| Triple Rashomon | Construct | N/A | **GREEN** — excellent monumental scale, repeated gate hierarchy, fire/chain material response and distinct icon | GREEN | N/A | **GREEN** | Preserve |
+| Ambush Captain | Generic Enemy | **MEETS** | Excellent face, wet/dark tactical materials, forest depth and authored command gesture | GREEN | **MEETS** | **GREEN** | Preserve |
+| ANBU-Style Operative | Generic Enemy | MEETS on body/material presence; face intentionally masked | Excellent night-rooftop ANBU silhouette and armor | GREEN | **MEETS** | **GREEN** | Preserve |
+| Bandit | Generic Enemy | **MEETS** | Very convincing close face/eyes, cloth wear, hand/knife detail and moonlit camp depth | GREEN | **MEETS** | **GREEN** | Preserve |
+| Bandit Leader | Generic Enemy | **MEETS** | One of the strongest generic-human cards: convincing age, scars, beard/hair, armor wear and hierarchical staging | GREEN | **MEETS** | **GREEN** | Preserve |
+| Beast Handler Rogue | Generic Enemy | NEAR-to-MEETS | Strong handler/wolf dual silhouette, believable outdoor materials and unique paw icon | GREEN | **NEAR** | PASS WITH NOTES | Slight facial/material uplift only if remastered; preserve concept |
+| Chain-Blade Ronin | Generic Enemy | **MEETS** | Excellent mature face, armor wear, chain motion, weapon readability and environmental depth | GREEN | **MEETS** | **GREEN** | Preserve |
+| Cipher Handler | Generic Enemy | NEAR | Strong authored tool/scroll/cipher workspace and premium costume detail | **FAIL — extensive visible writing/glyphs on documents/tags** | **NEAR** | **FAIL — HARD RULE** | Surgical environmental-text cleanup if no exact authority |
+| Decoy Assassin | Generic Enemy | NEAR | Strong purple motion language, decoy/escort story read and clear silhouette | GREEN | **NEAR** | PASS WITH NOTES | Humanize face/skin/eyes if remastered; preserve action concept |
+| Elite Missing-Nin | Generic Enemy | **MEETS** raw art | Excellent mature face, armor, cloth/weathering and grounded combat readiness | **FAIL — visible calligraphy/banner text at upper right** | **MEETS** | **FAIL — HARD RULE** | Surgical text cleanup; preserve subject/composition |
+| Escort Breaker | Generic Enemy | NEAR | Strong wire-combat concept, readable target-breaking action and cohesive purple/black battlefield language | GREEN | **NEAR** | PASS WITH NOTES | Facial/material uplift only if remastered |
+
+### Supplemental-card note
+
+This cohort reinforces an important distinction for future production:
+
+> **Menma benchmark does not require every card to imitate Menma's composition.**
+
+Several generic enemies meet the benchmark through entirely different visual verbs: older weathered faces, masks, beards, close-quarters threat, paired animal staging or tactical darkness. What matters is **specific human/material presence and total authored cohesion**, not copying Menma's age, camera, palette or pose.
+
+Constructs are judged on premium object/entity presence rather than human facial realism.
+
+---
+
 ## 7. Battle/UI portrait inventory — repository cross-reference at 12ec215
 
 ### Active portrait authority consumed
