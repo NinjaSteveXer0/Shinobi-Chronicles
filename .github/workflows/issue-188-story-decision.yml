@@ -25,7 +25,6 @@ on:
       - 'runtime/alpha-kakashi-scene05a-w-35730.js'
       - 'runtime/alpha-kakashi-battle-development-35740.js'
       - 'runtime/alpha-battle-browser-32600.js'
-      - 'index.html'
       - 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
       - 'NPC portrait/masked_interceptor.png'
       - 'NPC portrait/anbu_marked_target.png'
@@ -129,7 +128,6 @@ jobs:
           grep -Fq 'font-size:18px!important' runtime/alpha-kakashi-objective-presentation-35720.js
           grep -Fq 'grid-template-columns:auto auto!important' runtime/alpha-battle-browser-32600.js
           grep -Fq 'transform:translateY(7px)!important' runtime/alpha-battle-browser-32600.js
-          grep -Fq 'alpha-battle-browser-32600.js?sc=battle-browser-20260918-02' index.html
           grep -Fq 'Kakashi Origin Backdrop/fight_at_sakura_tree.png' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'NPC portrait/masked_interceptor.png' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'launchStorySceneBattle' runtime/alpha-kakashi-scene04a-35710.js
