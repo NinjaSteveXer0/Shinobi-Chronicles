@@ -16,37 +16,39 @@ This file is the exact player-facing and resolver-handoff authority for Kakashi 
 **Retrieve the package.**
 
 ## Narration
-Kakashi looks once toward the empty street.
+Kakashi watches Masked Interceptor push herself upright.
 
-Nothing.
+One hand braces against the stone.
 
-Package Smuggler is gone.
+The other stays close to her weapon.
 
-The package with him.
+She is hurt.
 
-He turns back toward Masked Interceptor.
+Still dangerous.
 
-She has forced herself partway up from the stone.
+Kakashi studies her for a heartbeat.
 
-Not recovered.
+Package Smuggler has already disappeared into Konoha.
 
-Not helpless either.
+There is no sound of pursuit.
 
-Her head lifts as Kakashi approaches.
+No movement from the route ANBU Marked Target took.
 
-His hand moves to his kunai.
+Only the two of them remain beneath the Sakura tree.
 
-This is not an arrest.
+Masked Interceptor steadies herself.
 
-Not a return to ANBU.
+Kakashi reaches for his kunai.
 
-Not the Police Force.
+She sees his hand move.
 
-Masked Interceptor sees the decision before Kakashi makes the first step.
+Whatever she expected him to do next, this was not it.
 
-Her body tightens.
+Her stance changes.
 
-Kakashi moves.
+Kakashi lowers his centre of gravity.
+
+Then disappears from where he was standing.
 
 ## Dialogue
 None.
@@ -58,28 +60,95 @@ Target: **Masked Interceptor**
 
 Commit Kakashi's lethal intent before resolution.
 
-The owning resolver determines the factual result:
+The owning resolver determines the factual result.
 
-- Masked Interceptor is killed; or
-- Masked Interceptor survives the attempt; or
-- the attempt is interrupted; or
-- Masked Interceptor escapes; or
-- another already-authorised factual result occurs.
+### Current confirmed-kill continuation
 
-Do not treat the button label as a confirmed death.
+If the resolver returns:
 
-Package Smuggler and the package remain unavailable.
+**`LETHAL_ATTEMPT_KILLED`**
 
-ANBU Marked Target remains unavailable.
+Masked Interceptor's death must commit **before** the kill presentation begins.
 
-No pursuit reopens.
+### Coding Presentation Note — Kill Animation Begins Here
 
-No Pakkun.
+Play the approved stylised lethal-action presentation immediately after the resolver confirms `LETHAL_ATTEMPT_KILLED`.
 
-After the lethal resolver commits its result, return to Story on the appropriate Scene 7 continuation.
+Presentation sequence:
+
+**Kakashi vanishes forward**
+-> Masked Interceptor reacts
+-> rapid close-distance movement
+-> brief weapon / impact flash
+-> **diagonal black slash across the screen**
+-> full black for a short beat
+-> audio / visual impact drops into silence
+-> fade back to `fight_at_sakura_tree.png`
+
+Do not show the death animation before the resolver confirms the kill.
+
+Do not use graphic gore.
+
+When the Sakura-tree scene returns, Masked Interceptor is factually **dead**.
+
+## Narration — Confirmed Kill Aftermath
+Petals drift across the stone.
+
+Masked Interceptor remains where she fell.
+
+Her weapon rests a short distance from her hand.
+
+Kakashi straightens.
+
+The kunai stays in his grip for another moment.
+
+Then he lowers it.
+
+His eye passes over the road beyond the Sakura tree.
+
+Whatever chance existed to recover the package is gone now.
+
+Kakashi puts the kunai away.
+
+There is only one place left to go.
+
+## Objective Switch
+**Report to ANBU.**
+
+## System / Resolver — Confirmed Kill Commit
+Commit:
+
+- Masked Interceptor: **DEAD**
+- Kakashi lethal intent: **COMMITTED**
+- lethal attempt result: **SUCCESS / CONFIRMED KILL**
+- Package Smuggler: escaped with package
+- package: not recovered
+- ANBU Marked Target: escaped
+- pursuit: closed
+- Pakkun: not present
+
+Record Masked Interceptor's confirmed death in Kakashi's lethal-trajectory history.
+
+The later ANBU report must preserve:
+
+- Kakashi failed to recover the package;
+- Package Smuggler escaped with it;
+- ANBU Marked Target escaped;
+- Kakashi fought Masked Interceptor;
+- Kakashi subsequently attempted to kill her;
+- that lethal attempt succeeded.
+
+Other resolver outcomes (`LETHAL_ATTEMPT_SURVIVED`, `LETHAL_ATTEMPT_INTERRUPTED`, `LETHAL_ATTEMPT_ESCAPED`, or another already-authorised factual result) do **not** consume this confirmed-kill aftermath and remain separate continuation work.
 
 ## Choices
 None.
+
+## Transition
+Kakashi leaves the Sakura tree behind.
+
+**BLACK WIPE**
+
+-> **ANBU Report Scene**
 
 ## Scene ID
 `SCENE_06A_W2C — ATTEMPT TO KILL HER`
