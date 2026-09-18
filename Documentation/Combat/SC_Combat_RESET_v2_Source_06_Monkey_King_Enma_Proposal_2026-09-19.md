@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 06 UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 06 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Source baseline:** `13dec46d50761e0bf190d354b61865ce5db5db7f`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
@@ -131,3 +131,23 @@ Never both at once.
 > **ENMA — Keep him as the Adamantine Staff for extending attacks, weapon-arm control and Prison Wall, or release him as an independent PL83 Monkey King fighter. You cannot have both modes at once.**
 
 **PROPOSED.**
+
+---
+
+## Stephen sign-off / closure
+
+Stephen has explicitly signed off this RESET v2 Monkey King Enma package.
+
+This document is now binding Combat design authority for Source 06.
+
+Preserve:
+- retirement of generic +Stamina / +Bukijutsu stacking;
+- mutually exclusive Adamantine Staff and Monkey King modes;
+- Staff-mode living-weapon action package;
+- manifested PL83 Monkey King package;
+- Adamantine Reach / positional and weapon-route interactions;
+- same Enma Remaining Battle PL across mode switches;
+- no simultaneous staff + independent Enma duplication;
+- no PL/Stat transfer.
+
+**design closed != implemented != runtime validated != Golden GREEN**
