@@ -244,7 +244,9 @@ function showQaOutcome(rt=active()){
 }
 function removeDeadMiCardAfterKill(rt,stage){
   if(!rt||!confirmedKill()||typeof document==="undefined")return false;
-  const boardNode=stage&&stage.querySelector?stage.querySelector("."+BOARD_CLASS):null;
+  const layer=document.getElementById("story-scene-presentation-layer");
+  const liveStage=(layer&&layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||stage||layer;
+  const boardNode=liveStage&&liveStage.querySelector?liveStage.querySelector("."+BOARD_CLASS):null;
   const mi=boardNode&&boardNode.querySelector?boardNode.querySelector('[data-actor-id="'+MI+'"]'):null;
   if(!mi){rt.localContext={...(rt.localContext||{}),kakashiScene06W2CMiCardRemoved:true};save();return false;}
   setTimeout(function(){
