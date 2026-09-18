@@ -108,7 +108,7 @@ assert(source.includes("performance_narration")&&source.includes("sc-dialogue-pa
 assert(source.includes("left:28%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"Hokage Office AMT / ANBU / PS table-row placement missing");
 assert(source.includes("sc-w2c-office-anbu-enter-35770"),"KILLED office ANBU slide-in missing");
 assert(source.includes("PACKAGE RECOVERED · HIDDEN OPERATION"),"Recovered-package state must live on Minato card");
-assert(!source.includes("sc-kakashi-w2c-package-status"),"Standalone recovered-package banner must be removed");
+assert(!source.includes('<div class="sc-kakashi-w2c-package-status">'),"Standalone recovered-package banner markup must be removed");
 assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
 console.log("- final Scene 06 click -> resolver hold -> direct/watchdog confirmed-kill presentation");

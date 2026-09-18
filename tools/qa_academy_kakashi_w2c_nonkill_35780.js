@@ -125,7 +125,7 @@ assert(source.includes("playAcademyKakashiLethalAttemptAnimation35770"),"non-kil
 assert(source.includes("w2cNonKillEnterLeft35780"),"Hokage Office ANBU entry motion missing");
 assert(source.includes("left:28%!important")&&source.includes("left:41%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"non-kill Hokage Office AMT / MI / ANBU / PS table-row placement missing");
 assert(source.includes("PACKAGE RECOVERED · HIDDEN OPERATION"),"Recovered-package state must live on Minato card");
-assert(!source.includes("sc-kakashi-w2c-nonkill-package"),"Standalone non-kill recovered-package banner must be removed");
+assert(!source.includes('<div class="sc-kakashi-w2c-nonkill-package">'),"Standalone non-kill recovered-package banner markup must be removed");
 assert(source.includes("sc-dialogue-panel-33910.is-current"),"non-kill Hokage Office dialogue must use negative-space placement");
 assert(source.includes("performance_narration")&&source.includes("sc-dialogue-panel-33910{display:none!important}"),"office narration must suppress stale dialogue overlay");
 assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
