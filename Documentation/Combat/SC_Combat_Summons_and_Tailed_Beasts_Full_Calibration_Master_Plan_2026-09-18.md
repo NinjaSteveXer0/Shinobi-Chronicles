@@ -165,6 +165,43 @@ Where independent presence is legal:
 
 List which dedicated Character forms already embody this source so the runtime cannot apply the relationship package twice.
 
+### E. PERSISTENT ENHANCEMENT PROFILE
+
+**Every Summon / Tailed-Beast calibration must explicitly ask what long-term enhancement the source or source-family gives the player outside its own Battle action palette.**
+
+Enhancement is broader than "another combat Skill".
+
+Possible exact enhancement classes include:
+
+- Item Find / loot chance;
+- tracking / discovery;
+- crafting / gathering;
+- elemental or discipline affinity;
+- source-owned Effective Stat modifiers;
+- support reactions;
+- travel / traversal / access;
+- seal management;
+- recovery / mitigation;
+- learned technique access;
+- relationship-gated effects;
+- collection-set progression.
+
+Rules:
+
+- enhancement may be **ownership/recruitment-owned**, **attachment-owned**, **manifestation-owned**, or **relationship-owned**; state which one;
+- do not assume enhancement requires the source to be manifested in Battle;
+- do not invent generic Stat bonuses when the source's identity supports a non-Stat enhancement;
+- collection/family effects must count **distinct legitimately acquired identities**, not duplicate representations;
+- percentage-point modifiers must state exact stacking and cap behavior;
+- reward/loot effects must apply only after reward-table eligibility is established;
+- no enhancement may silently create Story success, guaranteed quest rewards, or Entity PL transfer.
+
+Standing Kakashi Ninken example:
+
+> **Each distinct Kakashi Ninja Dog legitimately recruited grants +5 percentage points to eligible Item Find / random loot-drop chance. All 8 recruited dogs = +40%. Pakkun counts once. Duplicate representations do not stack. Final eligible chance caps at 100%.**
+
+This persistent enhancement layer is part of the required calibration, not optional polish.
+
 ---
 
 ## 5. Current Summon asset inventory
@@ -338,16 +375,29 @@ Combat closes, one by one:
 - Snake, after identity/PL return;
 - Kamatari.
 
-### Batch 2 — Summon relationship/enhancement packages
+### Batch 2 — Summon relationship + persistent enhancement packages
 
-For each Summon, separately define whether the relationship provides:
+For each Summon, separately define BOTH:
 
+**A. Battle relationship package**
 - no passive enhancement, actions only;
 - prepared/attached source modifiers;
 - summoner-owned assisted Skills;
 - independent manifestation;
 - alternate transformation/tool form;
 - utility outside direct damage.
+
+**B. Persistent enhancement package**
+- ownership/recruitment bonus;
+- collection/family progression;
+- Item Find / loot chance;
+- tracking/discovery;
+- crafting/gathering;
+- traversal/access;
+- affinity/support/recovery effect;
+- or an explicit statement that the source has no persistent enhancement.
+
+Do not consider a Summon fully calibrated merely because its Battle action palette is closed.
 
 ### Batch 3 — new Tailed Beast exact packages
 
@@ -432,7 +482,7 @@ At tranche opening:
 - generic hosted-Tailed-Beast catalogue families: **CLOSED AS CATALOGUE, NOT AUTO-ACCESS**
 - current new Tailed-Beast card batch: **NOT CALIBRATED**
 - current `snake` Summon: **NOT CALIBRATED**
-- full Summon relationship/enhancement matrix: **NOT CLOSED**
+- full Summon relationship + persistent enhancement matrix: **NOT CLOSED**
 - full Kurama-family enhancement reconciliation: **NOT CLOSED**
 - Jinchūriki anti-double-count audit: **NOT CLOSED**
 
