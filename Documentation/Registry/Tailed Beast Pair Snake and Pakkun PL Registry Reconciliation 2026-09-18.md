@@ -209,7 +209,7 @@ The stable `snake` row represents an ordinary combat-capable summoned snake prof
 
 Formula raw result:
 
-`46.9095...` → **47**
+`47.242857...` → **47**
 
 Calibration intent:
 
