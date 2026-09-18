@@ -30,14 +30,14 @@ The benchmark is not merely "high quality anime art." Its distinguishing target 
 
 ### FUTURE ACCEPTANCE GATE — STEPHEN DIRECT
 
-For a **new Character Card or a remaster/upgrade**, merely matching Genin Menma is no longer sufficient for final acceptance.
+For a **new Character Card or a remaster/upgrade**, Genin Menma is the acceptance floor.
 
 Future result states:
 
 - **BELOW MENMA** — reject;
 - **NEAR MENMA** — reject;
-- **MEETS MENMA** — technically benchmark-compliant, but not accepted as a new/remastered final;
-- **EXCEEDS MENMA** — eligible for Stephen approval and triggers a **GOLDEN ALERT**.
+- **MEETS MENMA** — acceptable final quality, subject to the ordinary identity/rule/Stephen approval gates;
+- **EXCEEDS MENMA** — acceptable final quality and triggers a **GOLDEN ALERT** for benchmark discussion.
 
 This does not retroactively delete or invalidate existing accepted cards. The audit records where they sit relative to the benchmark and identifies remaster candidates.
 
@@ -535,9 +535,9 @@ The audit may identify an existing card as BELOW/NEAR/MEETS/EXCEEDS Menma. This 
 
 A future new or upgraded card must be compared against the current benchmark before acceptance.
 
-**Stephen's acceptance gate:** only **EXCEEDS MENMA** is eligible for final acceptance.
+**Stephen's acceptance gate:** **MEETS MENMA or EXCEEDS MENMA** is eligible for final acceptance.
 
-If it only MEETS Menma, preserve it as an attempt/reference if useful, but do not call it the accepted final.
+If it EXCEEDS Menma, issue a **🚨 GOLDEN ALERT** and preserve the exact version for benchmark discussion.
 
 ### Golden Alert
 
