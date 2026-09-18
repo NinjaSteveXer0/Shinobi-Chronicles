@@ -163,7 +163,7 @@ let classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantC
 });
 assert.strictEqual(classified.success,true);
 active.beatId=WIN_BEAT;
-active.localContext.__kakashiScene05AW35730Cursor=16;
+active.localContext.__kakashiScene05AW35730Cursor=19;
 let relabelled=globalThis.advanceStoryScene();
 assert.strictEqual(relabelled.success,true);
 assert.strictEqual(active.beatId,CHOICE_BEAT);
@@ -185,7 +185,7 @@ assert.strictEqual(routed.success,true);
 assert.strictEqual(routed.routed,true);
 assert.strictEqual(routed.pursuitEligible,false);
 assert.strictEqual(routed.turnCount,5);
-active.localContext.__kakashiScene05AW35730Cursor=16;
+active.localContext.__kakashiScene05AW35730Cursor=19;
 let fiveTurnTransition=globalThis.advanceStoryScene();
 assert.strictEqual(fiveTurnTransition.success,true);
 assert.strictEqual(active.beatId,CHOICE_BEAT);
