@@ -6,6 +6,23 @@
 
 Combat's broad text-first catalogues define stable content identities and executable effects. They do not decide that an arbitrary Mission, training action, shop, mentor or discovery grants those rows.
 
+## Global mechanics-design boundary
+
+All executable effects referenced by this source-binding contract must comply with:
+
+`Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
+
+Source/grant correctness does not legitimise a generic mechanic.
+
+A Skill can have a valid acquisition source and still fail design review if its effect is merely an imported RPG template with Shinobi Chronicles naming.
+
+Likewise, a mechanically distinctive Skill must still respect this file's separate source/grant boundary.
+
+Preserve both:
+
+- **unique SC mechanic != automatic access**
+- **legitimate access != permission to ship a generic mechanic**
+
 Required division:
 
 - **Combat / Skills / Items / Weapons:** stable Skill/Item/Weapon/Gear identity within its domain, exact Battle effect, compatibility/payload semantics, equipment modifiers, rarity classification.
