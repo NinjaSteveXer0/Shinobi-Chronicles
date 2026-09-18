@@ -19,6 +19,20 @@ Canonical modes:
 
 A Skill definition may support more than one mode only when its row explicitly says so.
 
+## 1A. Unique-mechanics precedence
+
+All contextual Skill design in this contract is subordinate to:
+
+`Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
+
+Contextual execution mode does not excuse a generic mechanic.
+
+A passive/contextual Skill must still have a source-specific Shinobi Chronicles mechanical fingerprint. It should not collapse into generic RPG patterns such as automatic universal detection, flat omniscient bonuses, generic percentage buffs, guaranteed bypasses, generic cooldown procs, or context-free "success chance" mechanics unless an exact authored source requires that behavior.
+
+Canonical shorthand:
+
+> **Context supplies the opportunity; the Skill supplies a distinct Shinobi Chronicles interaction.**
+
 ## 2. Ownership boundary
 
 - **Story / World / Missions / Events:** factual situation, event eligibility, exact object/system/person/location/query/opportunity and resulting narrative continuation.
