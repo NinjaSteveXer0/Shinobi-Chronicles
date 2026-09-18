@@ -269,3 +269,29 @@ A source is only CLOSED again after Stephen approves the new full sheet includin
 Implementation remains separate:
 
 **design closed != implemented != runtime validated != Golden GREEN**.
+
+---
+
+## 6. Current RESET v2 progress — 2026-09-19
+
+Closed under fresh Stephen sign-off:
+
+- **Source 01 — Baku** — CLOSED
+- **Source 02 — Gamakichi** — CLOSED
+- **Source 04 — Gerotora** — CLOSED
+- **Source 05 — Giant Clam** — CLOSED
+- **Source 06 — Monkey King Enma** — CLOSED
+- **Source 07 — Nue** — CLOSED
+- **Source 08 — Pakkun / Kakashi Ninken family** — CLOSED
+
+Still open:
+
+- **Source 03 — Ibuse** — PROPOSED / not yet signed off after Neurotoxin redesign.
+
+Next uncalibrated ordinary Summons after the open Ibuse decision:
+
+- **Source 09 — Kamatari**
+- **Source 10 — Snake**
+
+Then continue into accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
+
