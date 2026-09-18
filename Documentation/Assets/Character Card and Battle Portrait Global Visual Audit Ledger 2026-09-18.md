@@ -477,6 +477,67 @@ Constructs are judged on premium object/entity presence rather than human facial
 
 ---
 
+## 6E. Enemy presentation-card direct-pixel audit — second cohort — 2026-09-19
+
+**Source:** twenty individual PNGs uploaded directly by Stephen and visually inspected in the active workspace.
+
+**Scope:** all twenty are reusable/generic Enemy presentation cards under `Enemies/`. They are audited against the premium Character Creation presentation language but remain outside the frozen 141 ninja Character Card count.
+
+**Text-authority clarification applied:** role-defining written material is not treated as random-text debt when it directly communicates the archetype. This applies here to fūinjutsu seals, medical/diagnostic records, poison labels, evidence documents, confession records, sealing tags and false-trail markers. Unrelated or accidental generator text remains a defect.
+
+| Asset | Current source path | Blob SHA | Human Presence / Identity | Composition / Materials | Text / Role Content | Menma | Verdict | Primary Action |
+|---|---|---|---|---|---|---|---|---|
+| Field Operative | `Enemies/field_operative.png` | `57b128c59313652cf7fe6d1740604c20d3fa19e0` | **MEETS** | Excellent wet-industrial materials, tactical silhouette, grounded crouch and believable adult face | `PUMP STATION FOUR` is coherent environmental location signage, not random decoration | **MEETS** | **GREEN** | Preserve |
+| Fugitive Scout | `Enemies/fugitive_scout.png` | `5d11d5710eb92097ea347c74cd7d2cc539be5c7c` | NEAR-to-MEETS; lower face intentionally masked | Strong moonlit forest movement, scout gear, map/satchel readability and escape-path storytelling | No blocking text concern | **NEAR** | PASS WITH NOTES | Preserve concept; facial/material uplift only if remastered |
+| Fūinjutsu Smuggler | `Enemies/fuinjutsu_smuggler.png` | `634e38ce7e35f526665cd605600f0321e79daec4` | **MEETS** | Excellent contraband-cache staging, seal containers, talisman light and premium costume detail | **AUTHORIZED ROLE CONTENT** — seals/tags/glyphs are identity-defining fūinjutsu-smuggling material | **MEETS** | **GREEN** | Preserve written seal language |
+| Genjutsu Decoy Specialist | `Enemies/genjutsu_decoy_specialist.png` | `709c9da31ebba385c35b48b2d0cc855beaf10587` | NEAR | Strong decoy repetition, mirror/orb read and coherent purple genjutsu palette | No blocking text concern | **NEAR** | PASS WITH NOTES | Humanize face/skin/eyes if remastered; preserve decoy concept |
+| Mercenary Shinobi | `Enemies/mercenary_shinobi.png` | `bd7f3a17ccc1088d9ad00bafd66aae2e3fb280f3` | **MEETS** | Convincing adult face/skin, wet market lighting, gear/material hierarchy and contract-carrying pose | Contract/seal tags are contextually coherent mercenary paperwork; preserve unless a specific tag is proven accidental | **MEETS** | **GREEN** | Preserve |
+| Missing-Nin Hunter | `Enemies/missing_nin_hunter.png` | `7985d16d8ebf84369501cf38dec90859891cbc3d` | NEAR-to-MEETS; mask limits full facial comparison | Excellent pursuit/tracker kit, paw-trail storytelling, mountain-path depth and crouched readiness | Paw/trail markings are role-defining | **NEAR** | PASS WITH NOTES | Preserve |
+| Poison Blade Mercenary | `Enemies/poison_blade_mercenary.png` | `5fc21f0bef68d542b21694bf1ea2cbabe44b8f7f` | **MEETS** through eyes/pose/materials despite mask | Strong poison-green blade read, vial kit, wet encampment and tactical wear | **AUTHORIZED ROLE CONTENT** — poison-vial labels/marks support the poison-specialist identity | **MEETS** | **GREEN** | Preserve |
+| Puppet Ambusher | `Enemies/puppet_ambusher.png` | `884ced8ee1b707fb4807d9342dd06562383a5297` | **MEETS** | Excellent puppet-body foreshortening, string geometry, controller pose and layered ambush scene | No blocking text concern | **MEETS** | **GREEN** | Preserve |
+| Pursuit Hunter | `Enemies/pursuit_hunter.png` | `5c559177b05132b53b47de21f16058407b2494b2` | NEAR | Strong chase direction, rain, target separation and forward momentum; face remains a little more illustrated than Menma | No blocking text concern | **NEAR** | PASS WITH NOTES | Facial/material uplift only if remastered |
+| Recall Medic | `Enemies/recall_medic.png` | `d72693fc1bb1528735b217f83b57a30c38e0f2f3` | **MEETS** | Strong adult face, diagnostic-scroll interaction, industrial extraction-site storytelling and medical kit | **AUTHORIZED ROLE CONTENT** — diagnostic/medical notes and tags are role-defining; location signage is coherent | **MEETS** | **GREEN** | Preserve medical-document language |
+| Rogue Chūnin | `Enemies/rogue_chunin.png` | `8433811129cb601e701d68daac9b77555836a275` | NEAR | Good combat readiness, rank silhouette and ruined-street depth | Scattered background papers carry incidental writing; minor cleanup candidate if remastered, not worth discarding composition | **NEAR** | PASS WITH NOTES | Preserve; clean incidental text only during remaster |
+| Rogue Genin | `Enemies/rogue_genin.png` | `005eadce57b24c0af2d70f5f778ceef6568d300e` | NEAR | Strong youthful rooftop pursuit/action read and clear rank-stage silhouette | No blocking text concern | **NEAR** | PASS WITH NOTES | Humanize face/skin if remastered |
+| Rogue Medic | `Enemies/rogue_medic.png` | `7d733305962745d3822e5af3ba247eb5d59cf6a8` | **MEETS** through eyes, posture and grounded medical action despite mask | Excellent surgical/field-treatment props, vial glow, fabric wear and close-range treatment storytelling | **AUTHORIZED ROLE CONTENT** — medical labels/markings are identity-defining | **MEETS** | **GREEN** | Preserve |
+| Sanitisation Operative — Breacher | `Enemies/s_o_breacher.png` | `3b854c2d49b3c0e8d9d6908207d156eb6bf91d84` | **MEETS** | Exceptional face, glass-break action, tactical materials, low-angle force and clean red/black identity | No blocking text concern | **MEETS** | **GREEN** | Preserve |
+| Sanitisation Operative — Sealer | `Enemies/s_o_sealer.png` | `42582e562ceee34009f39b7f951f177157e9d42d` | **MEETS** | Exceptional adult facial realism, wet fabric/skin response, grounded rain lighting and clear sealing stance | **AUTHORIZED ROLE CONTENT** — sealing tags are fundamental to the Sealer identity | **MEETS** | **GREEN** | Preserve; Golden-watch quality but not a clear benchmark supersession |
+| Sanitisation Operative — Warden | `Enemies/s_o_warden.png` | `375fe4739cac624f0997af7aeca97ad66651d132` | **MEETS** | Excellent adult face, rain materials, wire-control staging and understated tactical authority | No blocking text concern | **MEETS** | **GREEN** | Preserve |
+| Evidence Burner | `Enemies/evidence_burner.png` | `4711d68acb0789c446dda810c3108711ef99639e` | NEAR-to-MEETS; face partly masked | Excellent firelight, document destruction, archive density and mission clarity | **AUTHORIZED ROLE CONTENT** — written evidence is essential to the archetype; burning written records is the point | **MEETS** | **GREEN** | Preserve evidence/document language |
+| False Confessor | `Enemies/false_confessor.png` | `bbce18b27570a2962d2a9cf4b9c5b2edd2204a8e` | NEAR | Strong restrained interrogation staging and intentionally composed deceptive/captive read | **AUTHORIZED ROLE CONTENT** — confession/interrogation papers are context-defining | **NEAR** | PASS WITH NOTES | Humanize face/material depth if remastered |
+| False-Trail Courier | `Enemies/false_trail_courier.png` | `2c7d296c5a8730d06aa8ad372d5d9a8ed6d42648` | **MEETS** | Strong believable face, trail-marker action, courier kit and daylight path depth | **AUTHORIZED ROLE CONTENT** — false arrows/paw markers are exactly the identity/storytelling device | **MEETS** | **GREEN** | Preserve |
+| Field Commander | `Enemies/field_commander.png` | `377b23d85886c69a95d95aab0bba664dacced15b` | **MEETS** | Strong mature face, command gesture, squad hierarchy and destroyed-urban battlefield depth | Small hanging tag has writing; context reads as rank/faction marker. Preserve unless later authority says otherwise | **MEETS** | **GREEN** | Preserve |
+
+### Cohort result
+
+- **12 GREEN**
+- **8 PASS WITH NOTES**
+- **0 HARD FAIL**
+- **0 GOLDEN ALERT**
+
+The closest card in this cohort to triggering benchmark discussion is **Sanitisation Operative — Sealer**. Its facial realism, rain/skin/material response and authored adult presence are exceptional, but the audit does **not** currently call it a clear overall superior to Genin Menma across total-card cohesion, identity benchmark utility and consistency. Mark as **Golden-watch**, not Golden Alert.
+
+### Role-defining writing doctrine reinforced
+
+This cohort makes the distinction explicit:
+
+> **Random generator text is a defect. Meaningful written material that directly communicates the archetype is visual storytelling.**
+
+Examples now explicitly preserved include:
+
+- Cipher Handler cipher sheets;
+- Fūinjutsu Smuggler sealing tags;
+- Recall Medic diagnostic/medical records;
+- Poison Blade Mercenary poison labels;
+- Sanitisation Operative — Sealer sealing tags;
+- Evidence Burner written evidence;
+- False Confessor confession/interrogation papers;
+- False-Trail Courier trail markers.
+
+The audit should ask **what the writing is doing**, not merely whether writing exists.
+
+---
+
 ## 7. Battle/UI portrait inventory — repository cross-reference at 12ec215
 
 ### Active portrait authority consumed
