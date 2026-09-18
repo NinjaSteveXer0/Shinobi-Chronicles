@@ -61,6 +61,10 @@ Conceptual shape:
   selectedStartRepresentationRef,
 
   forbiddenStart: false,
+  forbiddenNinjaSourceChronicleRef: null,
+  forbiddenNinjaSourceRepresentationRef: null,
+  forbiddenNinjaDevelopmentSnapshotRef: null,
+
   parentChronicleRef: null,
   donorChronicleRef: null,
 
@@ -118,31 +122,109 @@ The player may therefore configure the start deliberately even on a completely f
 
 Inheritance Carryover creates a fresh Chronicle while allowing a controlled, provenance-bearing import from an eligible prior character/Chronicle.
 
-This is the mode that supports a player deliberately taking an out-of-band character representation into another difficulty.
+This is the mode that supports a player deliberately carrying one character they personally developed in the prior difficulty playthrough into the next difficulty.
 
 Example:
 
-> A player selects **Jōnin Kakashi** as a permitted **Forbidden Ninja** for a Genin-difficulty Chronicle, then chooses which additional eligible inherited development from that prior Kakashi is carried into the new Chronicle before starting Kakashi's Origin.
+> During the current playthrough, the player develops their own Kakashi into a powerful Jōnin-era character. When moving into the next difficulty, the player may choose that exact developed Kakashi as the run's **Forbidden Ninja**. The system does not add or generate a separate "Forbidden Ninja Kakashi" card.
 
-### 4.1 Forbidden Ninja
+### 4.1 Forbidden Ninja — player-created carryover, not a card category
 
-`Forbidden Ninja` is an explicit start exception, not a hidden normalization rule.
+`Forbidden Ninja` is a **contextual designation applied to one existing player-developed character card/state carried from the prior difficulty playthrough**.
 
-When a difficulty/start policy permits it:
+It is **not**:
 
-- one otherwise out-of-band representation may be selected as `selectedStartRepresentationRef`;
-- the chosen representation retains its own canonical Base identity / Base Stats / Base PL;
-- difficulty must not silently rewrite that representation's Base state merely to make it look like an ordinary lower-stage start;
-- encounter/world difficulty may still apply through its own legitimate difficulty systems;
-- the Start Review must visibly identify that the run is using a Forbidden start exception.
+- a separate rarity;
+- a special pre-authored Forbidden card pool;
+- an extra card automatically inserted into the roster;
+- a duplicate representation manufactured by Coding;
+- a shop/acquisition category;
+- a replacement for the player's developed character.
+
+Canonical rule:
+
+> **Your Forbidden Ninja is one ninja you developed yourself in the prior difficulty run.**
+
+At the qualifying difficulty transition:
+
+1. the system grants exactly **one Forbidden Ninja carry slot**;
+2. the player chooses one eligible character card they legitimately owned and developed during the source playthrough;
+3. that exact character/representation becomes the new Chronicle's `Forbidden Ninja`;
+4. its carryover is provenance-backed to the source Chronicle and source development state;
+5. no second "Forbidden" copy is created.
+
+Conceptually:
+
+```text
+source Chronicle
+-> one owned + developed character chosen by player
+-> snapshot exact eligible persistent developed state
+-> designate that carried character FORBIDDEN NINJA in the new Chronicle
+```
+
+The Forbidden designation belongs to the **new-run start context**, not to the underlying collectible-card definition.
+
+A card that was ordinary in the source playthrough can therefore become the player's Forbidden Ninja in the next difficulty because of what **that player developed it into**.
+
+### 4.1.1 Core Forbidden Ninja snapshot vs extra inheritance
+
+The Forbidden Ninja carries a **core source snapshot** of that chosen character rather than being reconstructed from a clean catalogue card.
+
+The core snapshot must preserve, subject to each owning domain's carryover law:
+
+- exact person / representation identity;
+- canonical Base state of that representation;
+- eligible permanent development actually earned on that character;
+- provenance of that development.
+
+Additional optional inheritance entries may still be selected on the Start Review where the mode/difficulty allows them.
+
+This creates a clean distinction:
+
+> **Forbidden Ninja core snapshot = the developed ninja you created.**
+
+> **Additional inheritance = other separately eligible carryover layered around that start.**
+
+No optional inheritance selection may double-count development already present in the Forbidden Ninja core snapshot.
+
+### 4.1.2 Kage / Jōnin / Special Jōnin card does not grant current formal Rank
+
+A Forbidden Ninja may come from a high-stage/high-rank representation such as Jōnin Kakashi or a Kage-era card.
+
+That does **not** automatically set the new Chronicle's formal institutional Rank to Jōnin, Special Jōnin, ANBU, Kage, Hokage or any other prior/source rank.
+
+Preserve the distinction:
+
+- the carried representation may retain its canonical Base identity / Base Stats / Base PL and eligible developed capability;
+- source-stage/rank descriptors remain provenance for that representation;
+- the **current Chronicle formal Rank** remains owned by PL / Registry / Rank and must be earned/recognised under the new Chronicle's Rank rules;
+- prior specialist qualification may carry as competence where authorised, but qualification != Recognition != formal Rank.
+
+Canonical rule:
+
+> **Taking a Kage card as your Forbidden Ninja does not make your new Chronicle character Kage-ranked.**
+
+### 4.1.3 Difficulty interaction
+
+Difficulty must not silently rewrite the carried Forbidden Ninja's canonical Base state merely to make it look like an ordinary lower-stage start.
+
+Encounter/world difficulty may still apply through its own legitimate difficulty systems.
+
+The Start Review must visibly identify:
+
+- the chosen Forbidden Ninja;
+- its source Chronicle;
+- its carried core development snapshot;
+- the current new-run formal Rank separately;
+- any additional optional inheritance.
 
 Preserve:
 
 > **difficulty != Base mutation**
 
-> **Forbidden representation != automatic inheritance of every prior-run fact**
+> **Forbidden Ninja != current formal Rank**
 
-The selected representation is the starting representation. Additional prior-run development is imported only through explicit inheritance entries.
+> **Forbidden Ninja != automatic inheritance of every prior-run World fact**
 
 ### 4.2 Fresh Chronicle still means fresh World
 
@@ -369,8 +451,8 @@ Difficulty may define what carryover is allowed, but it should do so explicitly.
 
 Each difficulty/start policy may publish an inheritance envelope such as:
 
-- whether Forbidden Ninja is allowed;
-- how many Forbidden representation slots exist;
+- whether the current transition is eligible for the standard one-slot Forbidden Ninja carry;
+- exact source-playthrough eligibility requirements for the chosen developed character;
 - permitted inheritance classes;
 - optional caps on transferred development/assets;
 - whether specific high-impact capability classes are blocked;
@@ -384,7 +466,7 @@ Canonical rule:
 
 > **difficulty may constrain eligibility; it must not silently mutate committed inherited truth**
 
-If a Jōnin Kakashi representation is allowed into Genin difficulty, it remains Jōnin Kakashi's canonical representation state rather than being secretly rewritten into Academy/Genin Base Stats.
+If the player's developed Jōnin Kakashi is carried as the Forbidden Ninja into Genin difficulty, its representation remains Jōnin Kakashi's canonical representation state rather than being secretly rewritten into Academy/Genin Base Stats. The new Chronicle's formal Rank remains separately owned and does not become Jōnin merely because the carried card is a Jōnin representation.
 
 ---
 
@@ -401,7 +483,8 @@ Minimum player-facing sections:
 
 2. **Start Mode**
    - New Start / Inheritance Carryover / Legacy Restart;
-   - Forbidden Ninja status where applicable.
+   - Forbidden Ninja status where applicable;
+   - source Chronicle + source developed character for the Forbidden carry.
 
 3. **Carryover**
    - New Start: explicit "No inherited character development";
@@ -423,7 +506,7 @@ CONFIRM START PACKAGE
 -> enter My Clan start staging
 ```
 
-Changing difficulty, Origin, donor, Forbidden representation or inheritance selection before confirmation must rebuild the uncommitted preview rather than mutate an already committed manifest.
+Changing difficulty, Origin, source Chronicle, chosen Forbidden Ninja or inheritance selection before confirmation must rebuild the uncommitted preview rather than mutate an already committed manifest.
 
 After confirmation, changes require an explicit restart/edit flow rather than silent reroll.
 
@@ -582,7 +665,8 @@ Owns:
 Owns:
 
 - which representations are legitimately available/owned;
-- Forbidden Ninja eligibility/source;
+- eligibility of the one player-developed source character for Forbidden carry;
+- proof that the chosen Forbidden Ninja was genuinely owned in the source playthrough;
 - starting roster bootstrap;
 - roster/representation carryover eligibility.
 
@@ -660,7 +744,7 @@ These may be scheduled after the current Kakashi/Origin benchmark is stable enou
 
 ### Queue / later unless Stephen reprioritises
 
-- Forbidden Ninja cross-difficulty starts;
+- one-player-created Forbidden Ninja cross-difficulty carry;
 - Inheritance Carryover;
 - Legacy Restart;
 - broad asset/Skill/qualification carryover catalogues;
@@ -687,15 +771,18 @@ Genin difficulty
 
 No prior facts or qualifications are invented.
 
-### Example B — Inheritance Carryover / Forbidden Kakashi
+### Example B — Inheritance Carryover / player-created Forbidden Kakashi
 
 ```text
-Genin difficulty
+source difficulty playthrough
+-> player owns and develops Kakashi into their own Jōnin-era Kakashi state
+-> next difficulty selected: Genin
 -> choose Kakashi Origin
--> select Jōnin Kakashi as permitted Forbidden Ninja
--> eligible prior Kakashi development is offered as inheritance candidates
--> player selects allowed carried entries
--> prior earned covert_operations.assassin qualification is carried as inherited specialist competence
+-> choose that exact developed Kakashi as the one Forbidden Ninja carry
+-> Start Review shows the source Chronicle + core developed snapshot
+-> player selects any separately allowed additional inheritance
+-> prior earned covert_operations.assassin qualification may carry as inherited specialist competence
+-> current Chronicle formal Rank remains whatever the new Chronicle legitimately holds; it is NOT made Jōnin/Kage by the card
 -> choose two basic starter items
 -> My Clan Start Staging
 -> BEGIN ORIGIN
@@ -729,9 +816,15 @@ Chronicle A remains history; it is not silently copied into Chronicle B's curren
 
 - New Start != Inheritance Carryover != Legacy Restart;
 - one Start Manifest != three runtime engines;
+- Forbidden Ninja != special card category;
+- Forbidden Ninja = one source-playthrough ninja the player actually developed;
+- exactly one Forbidden carry slot at the qualifying transition unless later authority explicitly changes this;
 - selected representation != inherited development;
+- Forbidden core snapshot != optional extra inheritance;
 - representation Base PL != direct inheritance bonus;
 - difficulty != Base mutation;
+- prior/source card Rank descriptor != current Chronicle formal Rank;
+- Kage card != Kage Rank;
 - prior Rank != current Rank;
 - qualification != Recognition != Rank;
 - inherited competence != formal Rank;
@@ -752,7 +845,8 @@ Chronicle A remains history; it is not silently copied into Chronicle B's curren
 
 Before full Inheritance/Legacy runtime implementation, exact owner decisions are still required for:
 
-- Forbidden Ninja eligibility rules by difficulty;
+- exact qualifying-transition rule for the standard one-slot Forbidden Ninja carry;
+- source-playthrough ownership/development eligibility for the chosen Forbidden Ninja;
 - exact inheritance-class/cap limits by difficulty/mode;
 - starting roster ownership/bootstrap;
 - persistent-development carryover list;
@@ -771,4 +865,4 @@ These are not permission for Coding to invent missing domain semantics.
 
 # Canonical summary
 
-> **Every Chronicle starts from one committed Start Manifest. New Start uses no inherited development. Inheritance Carryover selectively imports provenance-backed character development and may permit one explicit Forbidden representation without mutating its Base state. Legacy Restart creates a new Chronicle linked to a prior Chronicle while still beginning from fresh World/Knowledge/relationship truth. All three receive two basic starter-item picks, then enter the existing My Clan surface for start staging before BEGIN ORIGIN. Inherited specialist competence may materially alter resolvers — including lethal resolution — but it never turns UI labels, prior Rank or prior history into new factual truth by implication.**
+> **Every Chronicle starts from one committed Start Manifest. New Start uses no inherited development. At a qualifying difficulty transition, Inheritance Carryover gives the player one Forbidden Ninja carry slot: they choose one character they genuinely owned and developed in the source playthrough, and that exact provenance-backed developed character becomes their Forbidden Ninja in the new Chronicle — no special Forbidden card is generated. Additional inheritance remains separate. A high-rank/Kage card retains its legitimate representation/capability state but does not grant that formal Rank in the new Chronicle. Legacy Restart creates a new Chronicle linked to a prior Chronicle while still beginning from fresh World/Knowledge/relationship truth. All three receive two basic starter-item picks, then enter the existing My Clan surface for start staging before BEGIN ORIGIN. Inherited specialist competence may materially alter resolvers — including lethal resolution — but it never turns UI labels, prior Rank or prior history into new factual truth by implication.**
