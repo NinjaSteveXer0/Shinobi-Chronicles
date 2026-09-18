@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-18  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — NOT YET BINDING COMBAT CLOSURE**  
+**Status:** **MIXED — GEROTORA SIGNED OFF / BINDING; GIANT CLAM + ENMA STILL PROPOSED**  
 **Parent:** #235
 
 Consumes existing Registry/PL anchors:
@@ -21,9 +21,18 @@ No Entity PL transfers wholesale to a controller.
 
 Gerotora is a scroll toad trusted with the key to Naruto's Eight Trigrams Seal. The key can strengthen or deliberately loosen that exact seal. Gerotora is a keeper/administrator of sealing access, not a conventional damage-focused battle animal.
 
-## Proposed lifecycle
+## BINDING lifecycle and eligibility
 
-Gerotora is a **support Summon**.
+Gerotora is a **Jinchūriki-focused support Summon**.
+
+Battle eligibility:
+
+- Gerotora may be **owned** by any Character/account where Acquisition authority permits it;
+- Gerotora may be **attached/prepared for Battle only when the active Character has an exact compatible Tailed-Beast seal**;
+- a non-Jinchūriki / non-host Character without a compatible Tailed-Beast seal cannot attach Gerotora for Battle;
+- UI should present the simple requirement: **Requires a Tailed-Beast Seal**;
+- eligibility is based on the exact seal/host state, not whether the Character card title literally says `Jinchūriki`;
+- do not fabricate generic healing, Fūinjutsu buffs, or unrelated support effects just to make Gerotora usable by non-Jinchūriki.
 
 Default active mode:
 
@@ -36,7 +45,7 @@ Default active mode:
 
 If a future Story occurrence manifests Gerotora as an independently targetable participant, that occurrence may give him his own PL53 ledger, but this wave does not make ordinary Gerotora use a free extra battle body by default.
 
-## Proposed assisted actions
+## BINDING assisted actions
 
 Gerotora has **five support abilities**, but they remain deliberately simple and player-readable:
 
@@ -164,9 +173,9 @@ Player card text:
 **RELEASE MORE CHAKRA**  
 **Once per Battle, give your next Tailed-Beast attack +6 ATK.**
 
-## Relationship package
+## BINDING relationship package
 
-Gerotora provides **no passive Stats and no attack package**.
+Gerotora provides **no passive Stats and no independent attack package**.
 
 His Battle purpose is still easy to read:
 
@@ -427,10 +436,16 @@ Player-facing shorthand:
 
 # 4. Wave 2 decision state
 
-Awaiting Stephen sign-off:
+Stephen has explicitly signed off:
 
-- `key_gero` — Gerotora — sealing/support relationship package;
+- `key_gero` — **Gerotora — CLOSED / BINDING COMBAT DESIGN**
+  - Jinchūriki-focused support Summon;
+  - Battle attachment requires a compatible Tailed-Beast seal;
+  - five signed-off support abilities: Open the Seal, Close the Seal, Emergency Reseal, Protect the Seal, Release More Chakra.
+
+Still awaiting Stephen sign-off:
+
 - `mirage_clam` — Giant Clam — mist + deterministic mirage collaboration;
 - `mk_enma` — Monkey King Enma — independent fighter / Adamantine Staff mode tradeoff.
 
-No runtime implementation is authorised by this proposal until Combat marks the wave CLOSED after Stephen approval.
+Gerotora design closure does **not** imply runtime implementation or Golden validation. Giant Clam and Enma remain proposal-only until separately approved.
