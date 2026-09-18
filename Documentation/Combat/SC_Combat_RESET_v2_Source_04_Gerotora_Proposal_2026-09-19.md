@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 04 UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 04 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Source baseline:** `13dec46d50761e0bf190d354b61865ce5db5db7f`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
@@ -142,3 +142,23 @@ No account-wide collection bonus proposed.
 ## H. Closure state
 
 **PROPOSED.** No runtime implementation / validation / Golden claim.
+
+---
+
+## Stephen sign-off / closure
+
+Stephen has explicitly signed off this RESET v2 Gerotora package.
+
+This document is now binding Combat design authority for Source 04.
+
+Preserve:
+- compatible Tailed-Beast seal requirement;
+- Seal-Key Authority as the enhancement rather than a generic Stat bonus;
+- Open the Seal / Close the Seal;
+- Measured Release once/Battle;
+- Emergency Reseal once/Battle;
+- Lock the Key once/Battle;
+- no independent recurring Gerotora turn by default;
+- no hidden PL/Stat transfer.
+
+**design closed != implemented != runtime validated != Golden GREEN**
