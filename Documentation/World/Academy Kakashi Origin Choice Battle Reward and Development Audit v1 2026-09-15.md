@@ -1,6 +1,8 @@
 # Shinobi Chronicles — Academy Kakashi Origin Choice, Battle Reward and Development Audit v1
 
 **Date:** 2026-09-15  
+**2026-09-18 BATTLE-REWARD TIMING SUPERSESSION:** For the solo Academy Kakashi vs Masked Interceptor PL Battle, current authority is `Documentation/World/Academy Kakashi Masked Interceptor Immediate PL Battle Victory Reward Lock 2026-09-18.md`. A Kakashi VICTORY now creates an immediate Victory-screen material entitlement of **50 Ryō + Field Recovery Pill ×1**, claimed before Story return. Terminal ANBU-debrief / Origin rewards remain a separate reward class. The older terminal-debrief timing for that exact MI-victory fight reward is superseded; the once-per-Origin pill source must not double-grant at debrief after immediate claim.  
+
 **Owner:** World / Missions / Events / Rewards  
 **Status:** **BINDING WORLD REWARD-SOURCE AUTHORITY — WORLD VALUES CLOSED; EXACT PROGRESSION NUMBERS / ITEM-GRANT ACTIVATION / RUNTIME IMPLEMENTATION SEPARATE**
 
