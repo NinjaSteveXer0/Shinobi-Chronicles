@@ -183,3 +183,21 @@ Current binding timing:
 - corrected fast-win 1–4 decision surface;
 - later engineered Dev Tools fast-win coverage once the remaining successor branches exist.
 
+
+
+## 2026-09-19 approval advance — Scene 05A-W / lethal correction / loss report
+
+Stephen explicitly approved and Writing committed:
+
+- corrected Scene 05A-W exact 1–4 dual-pursuit choice surface — `bf16ebe0f677994878fbe60e30e7b546da899eb8`;
+- corrected resolver-determined ATTEMPT TO KILL continuation with post-result pursuit recalculation — `bef78d90ccdea0206199ca0cdd06593ce3a0adb1`;
+- deterministic CONTROLLED_DEFEATED KILL HER branch — `0d4aa441e4ef6d566f3d1df23c198940bdc559dd`;
+- Kakashi-loss RETURN TO ANBU report scene — `8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623`.
+
+The previous runtime assumption that lethal intent itself closes all pursuit is superseded. Current rule is factual-result commit -> pursuit recalculation.
+
+The loss route is authored only through its rooftop ANBU report. Hidden Hokage Office loss-route evaluation remains the next Writing scene for that branch.
+
+Coding handoff: issue #pending.
+
+CE #244 still exclusively blocks the factual consequence of RESTRAIN / ATTEMPT TO RESTRAIN AND CONTINUE.
