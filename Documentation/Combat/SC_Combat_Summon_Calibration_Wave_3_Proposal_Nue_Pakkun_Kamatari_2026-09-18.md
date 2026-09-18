@@ -165,6 +165,42 @@ Default Battle mode:
 
 This preserves the current Academy Kakashi semantics rather than creating a free extra turn from a PL16 support dog.
 
+## Locked Kakashi Ninken enhancement — ITEM FIND
+
+This is a **persistent recruited-Ninken enhancement**, not a Battle skill and not an attachment-only bonus.
+
+Stephen's standing rule:
+
+> **Each distinct Kakashi Ninja Dog legitimately found/recruited grants +5 percentage points to eligible Item Find / random loot-drop chance.**
+
+Exact stacking:
+
+- **1 dog = +5%**
+- **2 dogs = +10%**
+- **3 dogs = +15%**
+- **4 dogs = +20%**
+- **5 dogs = +25%**
+- **6 dogs = +30%**
+- **7 dogs = +35%**
+- **8 dogs = +40%**
+
+Rules:
+
+- Pakkun counts as **one** distinct dog once he is legitimately recruited/acquired;
+- finding/meeting Pakkun in Story without acquisition does **not** grant the enhancement;
+- duplicate representations of the same dog do not stack;
+- the enhancement is collection/roster-owned and does **not** require that dog to be attached or manifested in the current Battle;
+- check loot eligibility first, then apply the cumulative Ninken Item Find bonus;
+- the final eligible drop chance cannot exceed **100%**;
+- this modifies **eligible random item/loot-drop chances only**;
+- it does not alter fixed quest rewards, authored guaranteed drops, Story outcomes, Ryo, EXP, or unrelated reward tables.
+
+Player-facing progression text:
+
+> **NINJA DOG FINDER — Each Ninja Dog you recruit gives +5% Item Find. Recruit all 8 for +40%.**
+
+This enhancement applies to the **Kakashi Ninja Dog collection family**, not merely to Pakkun's equipped Battle state.
+
 ## Proposed actions
 
 ### `pakkun_track_by_scent` — **Track by Scent**
@@ -226,7 +262,7 @@ It does not create omniscient location knowledge.
 
 Player-facing shorthand:
 
-> **Pakkun is a tracking specialist. Mark an enemy by scent, stop them hiding, warn you about one attack, and cut off one escape attempt.**
+> **Pakkun is a tracking specialist. Mark an enemy by scent, stop them hiding, warn you about one attack, and cut off one escape attempt. Recruiting Pakkun also adds +5% Item Find as part of Kakashi's Ninja Dog collection.**
 
 Production note:
 
@@ -361,7 +397,7 @@ Player-facing shorthand:
 Awaiting Stephen sign-off:
 
 - `nue` — independent PL100 chakra-draining dimensional fighter + exact Nue-bond guard;
-- `pakkun` — PL16 support/tracking Summon using the controller action economy;
+- `pakkun` — PL16 support/tracking Summon using the controller action economy + standing Kakashi Ninken enhancement of +5% Item Find per distinct recruited dog (up to +40% across all 8);
 - `wr_kamatari` — attached +6 Bukijutsu OR manifested PL77 sickle fighter, with Quick Beheading Dance.
 
 No runtime implementation or production admission change is claimed by this proposal.
