@@ -69,7 +69,8 @@ const W2C_NONKILL_PATH="runtime/alpha-kakashi-w2c-nonkill-35780.js";
 // const BUILD="kakashi-final-20260918-40";
 // const BUILD="kakashi-final-20260918-41";
 // const BUILD="kakashi-final-20260918-42";
-const BUILD="kakashi-final-20260918-43";
+// const BUILD="kakashi-final-20260918-43";
+const BUILD="kakashi-final-20260918-44";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
