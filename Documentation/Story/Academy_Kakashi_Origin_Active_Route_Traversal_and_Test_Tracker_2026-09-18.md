@@ -107,6 +107,24 @@ For every new scene reached, update this file with:
 - whether normal play can reach the branch;
 - whether a Dev Tools/test override is needed for browser coverage.
 
+## Multi-target live-custody expansion
+
+Stephen approved a nonlethal multi-target trajectory parallel to the multi-target lethal trajectory.
+
+Durable Story requirement:
+`Documentation/Story/Academy_Kakashi_Multi_Target_Live_Custody_Trajectory_and_Group_Disposition_Requirement_2026-09-18.md`
+commit `0213690b64e0b381910ec089d9a81404a12adab0`.
+
+Required benchmark:
+`MI win 1–4 -> restrain MI and continue -> pursue PS -> PS win 1–3 -> restrain PS and continue -> reach AMT -> Pakkun -> capture AMT -> collect earlier secured captives -> transfer all captives to ANBU or Uchiha Police Force`.
+
+Immediate transfer remains distinct from restrain-and-continue:
+- TAKE HER BACK TO ANBU = deliver now / pursuit closes;
+- TAKE HER TO UCHIHA POLICE FORCE = deliver now / pursuit closes;
+- RESTRAIN AND CONTINUE = field-secure alive / pursuit may continue if still eligible.
+
+Reusable field-custody semantics are now waiting on CE / Codex / Coordination issue #244 before exact restrain-and-continue scenes are locked.
+
 ## Current next action
 
 Rewind to:
