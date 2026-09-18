@@ -104,6 +104,7 @@ assert(source.includes('classList.add("is-active")'),"lethal-attempt animation m
 assert(source.includes("2147483400"),"lethal-attempt animation must sit above Scene Board overlays");
 assert(source.includes("bottom:30.5%!important"),"Hokage Office seated cards must be lifted to chair-back line");
 assert(source.includes("sc-dialogue-panel-33910.is-current"),"Hokage Office dialogue must use negative-space placement");
+assert(source.includes("performance_narration")&&source.includes("sc-dialogue-panel-33910{display:none!important}"),"office narration must suppress stale dialogue overlay");
 assert(source.includes("left:50%;right:auto;bottom:13.2%"),"recovered package badge must be centered above narration bar");
 assert(source.includes("left:22%!important"),"Hokage Office chair-aligned ANBU placement missing");
 assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
