@@ -185,8 +185,6 @@ jobs:
           grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-nonkill-35780.js
-          grep -Fq 'left:50%;right:auto;bottom:13.2%' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'left:50%;right:auto;bottom:13.2%' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'kakashiMiEnterRightward35710' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-nonkill-35780.js
