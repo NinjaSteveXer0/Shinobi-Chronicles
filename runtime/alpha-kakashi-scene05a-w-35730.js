@@ -21,7 +21,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v3_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v4_2026_09_18";
 const AUTHORITY="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522";
 const STORY_UNIT_REF="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
@@ -181,6 +181,19 @@ function installStyle35730(){
   background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.40) 82%,rgba(2,5,8,.68)),var(--sc-kakashi-scene05aw-backdrop)!important;
   background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important
 }
+/* Stephen browser acceptance: post-MI Scene 05A-W uses the accepted Scene 04A Character Card scale. */
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors{
+  left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:20%!important;gap:2.2%!important;
+}
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="2"]{
+  display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5.4%!important;column-gap:0!important;
+}
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actor{
+  width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important;
+}
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{
+  width:min(96%,338px)!important;max-height:505px!important;
+}
 `;
   document.head.appendChild(style);return true;
 }
@@ -278,7 +291,7 @@ function diagnostics(){
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v3_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v4_2026_09_18",
     authorityPinned:AUTHORITY==="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522",
     exactFastNarration:JSON.stringify(FAST_SEQUENCE.map(x=>x.text))===JSON.stringify(exactFast),
     exactSlowNarration:JSON.stringify(SLOW_SEQUENCE.map(x=>x.text))===JSON.stringify(exactSlow),
@@ -292,6 +305,7 @@ function diagnostics(){
     objectiveExact:OBJECTIVE==="Retrieve the package.",
     noDialogue:allCues.every(x=>!x.speakerName&&x.kind==="narration"),
     returnHookInstalled:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(x=>x&&x.requestId===ENTRY_REQUEST),
+    standardCharacterCardScale:installStyle35730.toString().includes("width:min(94%,322px)")&&installStyle35730.toString().includes("width:min(96%,338px)")&&installStyle35730.toString().includes("max-height:505px"),
     successorsFailClosed:successorPending("BRANCH_A").success===false,
     browserGoldenClaimed:false
   };

@@ -32,6 +32,7 @@
 // const BUILD="kakashi-final-20260918-31";
 // const BUILD="kakashi-final-20260918-32";
 // const BUILD="kakashi-final-20260918-33";
+// const BUILD="kakashi-final-20260918-34";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -57,7 +58,8 @@ const SCENE04A_PATH="runtime/alpha-kakashi-scene04a-35710.js";
 const OBJECTIVE_PRESENTATION_PATH="runtime/alpha-kakashi-objective-presentation-35720.js";
 const SCENE05AW_PATH="runtime/alpha-kakashi-scene05a-w-35730.js";
 const SCENE05AL_PATH="runtime/alpha-kakashi-scene05a-l-35750.js";
-const BUILD="kakashi-final-20260918-34";
+const SCENE06AW2C_PATH="runtime/alpha-kakashi-scene06a-w2c-35760.js";
+const BUILD="kakashi-final-20260918-35";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -87,9 +89,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadScene06AW2C(){
+  if(globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760)return;
+  appendScript("sc-alpha-kakashi-scene06a-w2c-35760-script",SCENE06AW2C_PATH);
+}
 function loadScene05AL(){
-  if(globalThis.SC_ALPHA_KAKASHI_SCENE05AL_35750)return;
-  appendScript("sc-alpha-kakashi-scene05a-l-35750-script",SCENE05AL_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_SCENE05AL_35750){loadScene06AW2C();return;}
+  appendScript("sc-alpha-kakashi-scene05a-l-35750-script",SCENE05AL_PATH,loadScene06AW2C);
 }
 function loadScene05AW(){
   if(globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730){loadScene05AL();return;}
