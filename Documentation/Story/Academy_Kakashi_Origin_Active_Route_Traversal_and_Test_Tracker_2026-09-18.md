@@ -51,7 +51,11 @@ Current production traversal:
 - The KILLED / SURVIVED / INTERRUPTED / ESCAPED chains each now have their Scene 06 result, Scene 07 rooftop ANBU report, and Scene 08 Hokage Office continuation locked.
 - Coding has implemented the non-kill continuation family; installed-browser Golden remains open.
 - One surgical runtime correction is currently pending on #237: remove the stray player-facing narration `A beat.` from the ESCAPED Hokage Office scene. This does not reopen Story semantics.
-- The next Writing traversal rewinds to the same Scene 5A-W2 late-victory decision surface and takes the next unconsumed sibling branch: `TAKE HER BACK TO ANBU`.
+- `TAKE HER BACK TO ANBU` is now fully authored/Stephen-approved through its ANBU handoff, Hokage Office and Chronicle closure.
+- `TAKE HER TO THE UCHIHA POLICE FORCE` is now fully authored/Stephen-approved through Police handoff, ANBU report, Hokage Office and Chronicle closure.
+- The corrected post-MI fast-win choice surface is Stephen-approved, including the new `RESTRAIN HER AND CONTINUE` intent.
+- Immediate ANBU/Police branches are routed to Coding on #246.
+- `RESTRAIN HER AND CONTINUE` remains waiting on CE / Codex / Coordination #244 before exact runtime consequence scenes are authored/implemented.
 
 ## Required later browser test — manual fast-win exposure
 
