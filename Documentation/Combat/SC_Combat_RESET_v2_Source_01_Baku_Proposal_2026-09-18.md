@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-18  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — FIRST SOURCE UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 01 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`
 
@@ -57,26 +57,33 @@ Its identity is:
 
 ## OWNED
 
-- no passive global bonus merely for owning Baku.
+- Baku is present in the player's collection;
+- owning Baku alone does **not** apply its Battle enhancement to every Character.
 
 ## ATTACHED / PREPARED
 
-- Baku is available to manifest;
-- no elemental damage bonus yet;
+- Baku is the Character's active Summon source;
+- **Vacuum Amplification is active immediately while Baku is attached**;
 - no second Battle PL ledger;
-- no second turn.
+- no second turn;
+- Baku does not need to be manifested for the elemental enhancement to function.
 
 ## MANIFESTED
 
 - Baku becomes an independently targetable participant;
 - Baku uses its own PL64 Battle ledger;
 - Baku receives its own normal action opportunity;
-- its controller receives the Baku Enhancement Package while Baku remains manifested;
+- **Vacuum Amplification remains active while Baku is manifested** because Baku is still that Character's active Summon source;
 - Baku's PL/Stats never transfer to the controller.
 
-If Baku is depleted/dismissed:
+If Baku is detached/replaced:
 
-- the Enhancement Package ends immediately.
+- Vacuum Amplification ends.
+
+If Baku is depleted/dismissed from manifestation but remains the Character's valid attached Summon source:
+
+- the attachment enhancement remains active;
+- only Baku's manifested body, own Battle PL ledger, own actions and manifested-only drawback end.
 
 ---
 
@@ -86,11 +93,11 @@ If Baku is depleted/dismissed:
 
 Activation:
 
-**MANIFESTED**
+**ATTACHED** — remains active while Baku is manifested.
 
 Player text:
 
-> **While Baku is on the field, your Wind attacks deal +15% damage and your Fire attacks deal +10% damage.**
+> **While Baku is your active Summon, your Wind attacks deal +15% damage and your Fire attacks deal +10% damage.**
 
 Exact mechanics:
 
@@ -240,7 +247,13 @@ Baku can make Fire stronger, but Fire is also dangerous to Baku.
 
 Baku has **no proposed account-wide persistent collection bonus**.
 
-Its enhancement is deliberately **MANIFESTED**, because its defining value comes from actively creating the vacuum current.
+Baku has no separate account-wide collection bonus.
+
+Its primary enhancement is deliberately **ATTACHED**:
+
+- attach Baku -> Wind +15%, Fire +10%;
+- manifest Baku -> keep those bonuses and also gain Baku as an independent fighter;
+- simply owning Baku without attaching it does not apply the Battle enhancement.
 
 This is explicit rather than leaving the category unaudited.
 
@@ -275,11 +288,14 @@ Current runtime contains older Baku authority including:
 - `de_baku_anchor`;
 - `de_baku.devouring_pressure` with no Stat modifier.
 
-If Stephen signs off RESET v2 Baku:
+Stephen has signed off RESET v2 Baku.
 
-- this document becomes the new Combat design authority for Baku;
+Therefore:
+
+- this document is the new binding Combat design authority for Baku;
+- the signed-off enhancement is **ATTACHED**, not manifestation-only;
 - old Baku Combat package is implementation-superseded;
 - Coding must replace, not stack, legacy actions/effects;
-- no runtime implementation is claimed by this proposal.
+- no runtime implementation is claimed by this closure.
 
-**design proposed != design closed != implemented != runtime validated != Golden GREEN**
+**design closed != implemented != runtime validated != Golden GREEN**
