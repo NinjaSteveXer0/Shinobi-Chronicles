@@ -22,8 +22,12 @@ on:
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-kakashi-scene04a-35710.js'
       - 'runtime/alpha-kakashi-objective-presentation-35720.js'
+      - 'runtime/alpha-kakashi-scene05a-w-35730.js'
       - 'runtime/alpha-battle-browser-32600.js'
       - 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
+      - 'NPC portrait/masked_interceptor.png'
+      - 'NPC portrait/anbu_marked_target.png'
+      - 'NPC portrait/package_smuggler.png'
       - 'tools/qa_issue_188_story_decision_runtime.js'
       - 'tools/qa_issue_188_kakashi_final_guard.js'
       - 'tools/qa_academy_kakashi_get_closer_factual_commit.js'
@@ -38,6 +42,7 @@ on:
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_scene04a_35710.js'
       - 'tools/qa_kakashi_objective_presentation_35720.js'
+      - 'tools/qa_academy_kakashi_scene05a_w_35730.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
 
@@ -72,6 +77,7 @@ jobs:
           node --check runtime/alpha-kakashi-scene03a-35700.js
           node --check runtime/alpha-kakashi-scene04a-35710.js
           node --check runtime/alpha-kakashi-objective-presentation-35720.js
+          node --check runtime/alpha-kakashi-scene05a-w-35730.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
           node --check tools/qa_issue_188_kakashi_final_guard.js
@@ -87,11 +93,15 @@ jobs:
           node --check tools/qa_academy_kakashi_scene03a_35700.js
           node --check tools/qa_academy_kakashi_scene04a_35710.js
           node --check tools/qa_kakashi_objective_presentation_35720.js
+          node --check tools/qa_academy_kakashi_scene05a_w_35730.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
+          test -f 'NPC portrait/masked_interceptor.png'
+          test -f 'NPC portrait/anbu_marked_target.png'
+          test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-25' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'const BUILD="kakashi-final-20260918-25";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-26' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fq 'const BUILD="kakashi-final-20260918-26";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -109,7 +119,9 @@ jobs:
           grep -Fq 'alpha-kakashi-scene03a-35700.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-scene04a-35710.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-objective-presentation-35720.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-scene05a-w-35730.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'Kakashi Origin Backdrop/fight_at_sakura_tree.png' runtime/alpha-kakashi-scene04a-35710.js
+          grep -Fq 'NPC portrait/masked_interceptor.png' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'launchStorySceneBattle' runtime/alpha-kakashi-scene04a-35710.js
       - name: Neutral Story decision and Kakashi autonomy harness
         run: node tools/qa_issue_188_story_decision_runtime.js
@@ -139,3 +151,5 @@ jobs:
         run: node tools/qa_academy_kakashi_scene04a_35710.js
       - name: Kakashi Objective opening gate and global sizing
         run: node tools/qa_kakashi_objective_presentation_35720.js
+      - name: Academy Kakashi Scene 05A-W victory return
+        run: node tools/qa_academy_kakashi_scene05a_w_35730.js
