@@ -54,6 +54,12 @@ load("runtime/alpha-kakashi-scene05a-w-35730.js");
 const MOD=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 assert(MOD,"Scene 05A-W module missing");
 assert.strictEqual(MOD.authority,"30a8cf3a16f57fbe5e65f55bc9dc1de076a21522");
+assert.strictEqual(MOD.causalAuthority,"90b20f565ef010d2b7cfca98c04feece3f7dfcb7");
+assert.strictEqual(MOD.miPursuitMaxTurns,4);
+assert.strictEqual(MOD.psToAmtMaxTurns,3);
+assert.strictEqual(MOD.psKeepsAmtPursuit(1),true);
+assert.strictEqual(MOD.psKeepsAmtPursuit(3),true);
+assert.strictEqual(MOD.psKeepsAmtPursuit(4),false);
 assert.strictEqual(MOD.cueCount,16);
 assert.strictEqual(MOD.slowCueCount,16);
 assert.strictEqual(MOD.objective,"Retrieve the package.");
@@ -159,12 +165,13 @@ assert.strictEqual(choiceBeat.environmentRef.assetId,"kakashi_origin_fight_at_sa
 let labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
   "GO AFTER PACKAGE SMUGGLER",
+  "GO AFTER ANBU MARKED TARGET",
   "ATTEMPT TO KILL HER",
   "TAKE HER BACK TO ANBU",
   "TAKE HER TO THE UCHIHA POLICE FORCE"
 ]);
-assert.strictEqual(choiceBeat.choices.length,4);
-assert(!labels.includes("GO AFTER ANBU MARKED TARGET"));
+assert.strictEqual(choiceBeat.choices.length,5);
+assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 for(const row of choiceBeat.choices)assert.strictEqual(row.availability().available,true);
 let blocked=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
 assert.strictEqual(blocked.success,false);
@@ -184,7 +191,7 @@ choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
-assert(!labels.includes("GO AFTER ANBU MARKED TARGET"));
+assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 
 classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-uncontrolled-mi"
@@ -196,8 +203,25 @@ active.battleResume.authored=battleResult("player_side_victory",4);
 routed=entry.resolve();
 assert.strictEqual(routed.success,true);
 assert.strictEqual(routed.routed,true);
-assert.strictEqual(routed.pursuitEligible,false);
+assert.strictEqual(routed.pursuitEligible,true);
+assert.strictEqual(routed.packagePursuitEligible,true);
+assert.strictEqual(routed.amtPursuitEligible,true);
+assert.strictEqual(routed.psToAmtTurnCap,3);
 assert.strictEqual(routed.turnCount,4);
+assertNarration(exactFast);
+choiceBeat=definition.beatMap.get(CHOICE_BEAT);
+labels=choiceBeat.choices.map(x=>x.label);
+assert(labels.includes("GO AFTER PACKAGE SMUGGLER"));
+assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
+
+active.beatId=RETURN_BEAT;
+active.localContext={kakashiScene04ABattleIntentResolved:true};
+active.battleResume.authored=battleResult("player_side_victory",5);
+routed=entry.resolve();
+assert.strictEqual(routed.success,true);
+assert.strictEqual(routed.routed,true);
+assert.strictEqual(routed.pursuitEligible,false);
+assert.strictEqual(routed.turnCount,5);
 assertNarration(exactSlow);
 choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
@@ -217,11 +241,11 @@ assert(!JSON.stringify([definition.beatMap.get(WIN_BEAT),choiceBeat]).includes("
 assert(saves>0,"Scene 05A-W state was never persisted");
 
 console.log("Academy Kakashi Scene 05A-W 35730 QA: PASS");
-console.log("- exact 1-3-turn and 4+-turn locked narration variants / no dialogue");
+console.log("- binding 1-4-turn dual PS/AMT pursuit eligibility / 5+ cutoff");
 console.log("- exact fight_at_sakura_tree backdrop / Retrieve the package objective");
 console.log("- victory-only return; defeat never enters 05A-W");
-console.log("- 1-3 turn win exposes Package Smuggler pursuit only; 4+ removes pursuit");
-console.log("- direct ANBU Marked Target pursuit is absent from this immediate return");
+console.log("- 1-4 MI win exposes both Package Smuggler and ANBU Marked Target pursuit choices");
+console.log("- Package Smuggler -> later AMT preservation is capped at 1-3 PS turns");
 console.log("- MI post-resolution classification controls KILL HER vs ATTEMPT TO KILL HER");
 console.log("- ANBU/Uchiha disposition choices preserved");
 console.log("- successor branches fail closed; no automatic debrief or invented continuation");

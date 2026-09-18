@@ -6,12 +6,13 @@
 // commit 30a8cf3a16f57fbe5e65f55bc9dc1de076a21522
 //
 // Entry is ONLY the Scene 04A Kakashi-vs-Masked-Interceptor 1-v-1 victory.
-// This module consumes the committed Battle result, preserves the exact
-// 1-3-turn Package-Smuggler pursuit window / 4+ cutoff, classifies Masked
-// Interceptor before exposing the post-Battle lethal/disposition menu, and
-// presents the exact turn-gated narration. Direct AMT pursuit is deliberately
-// absent. Successor branch prose/resolvers remain fail-closed until
-// separately locked; no extra dialogue, debrief or terminal inference exists.
+// This module consumes the committed Battle result and the later binding
+// causal correction at 90b20f565ef010d2b7cfca98c04feece3f7dfcb7:
+// MI victory in 1-4 preserves BOTH PS and AMT pursuit eligibility; turn 5+
+// closes both. If PS is chosen, PS must then be defeated in 1-3 turns to
+// preserve later AMT pursuit. The exact rewritten Scene 05A-W prose remains
+// separately Writing-owned, so existing locked narration is not fabricated
+// here. Successor branch prose/resolvers remain fail-closed until locked.
 // ============================================================================
 (function installAcademyKakashiScene05AW35730(){
 "use strict";
@@ -21,8 +22,11 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v4_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v5_2026_09_18";
 const AUTHORITY="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522";
+const CAUSAL_AUTHORITY="90b20f565ef010d2b7cfca98c04feece3f7dfcb7";
+const MI_PURSUIT_MAX_TURNS=4;
+const PS_TO_AMT_MAX_TURNS=3;
 const STORY_UNIT_REF="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const RETURN_BEAT="kak_scene04a_stop_assassin_return";
@@ -84,7 +88,8 @@ function validVictory(row=result()){
   return !!row&&row.resultState==="player_side_victory"&&String(row.battleConfigId||"")===BATTLE_CONFIG&&String(row.bindingRef||"")===BINDING&&String(row.sourceAnchorRef||"")===SOURCE_ANCHOR;
 }
 function turnCount(row=result()){return Number.isInteger(Number(row&&row.playerActionOpportunityCount))?Number(row.playerActionOpportunityCount):NaN;}
-function fastPursuit(row=result()){const turns=turnCount(row);return validVictory(row)&&turns>=1&&turns<=3;}
+function fastPursuit(row=result()){const turns=turnCount(row);return validVictory(row)&&turns>=1&&turns<=MI_PURSUIT_MAX_TURNS;}
+function psKeepsAmtPursuit(turns){turns=Number(turns);return Number.isInteger(turns)&&turns>=1&&turns<=PS_TO_AMT_MAX_TURNS;}
 function escapeHTML(value){return String(value??"").replace(/[&<>\"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function cssUrlValue(value){return `url("${String(value||"").replace(/\\/g,"\\\\").replace(/\"/g,'\\\"')}")`; }
 function currentMiStateClass(){
@@ -127,9 +132,11 @@ function choiceRow(choiceId,label,branch){
 function materializeChoices35730(){
   const def=scene(),beat=def&&def.beatMap instanceof Map?def.beatMap.get(CHOICE_BEAT):null;if(!beat)return false;
   const lethal=lethalPresentation();
+  const pursuitEligible=fastPursuit();
   const rows=[];
-  if(fastPursuit()){
+  if(pursuitEligible){
     rows.push(choiceRow("scene05aw_go_after_package_smuggler","GO AFTER PACKAGE SMUGGLER","BRANCH_A"));
+    rows.push(choiceRow("scene05aw_go_after_anbu_marked_target","GO AFTER ANBU MARKED TARGET","BRANCH_B"));
   }
   rows.push(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
   rows.push(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
@@ -137,7 +144,10 @@ function materializeChoices35730(){
   beat.choices=rows;
   const rt=active();if(rt&&rt.localContext){
     rt.localContext.kakashiScene05AWLethalPresentation=lethal.label;
-    rt.localContext.kakashiScene05AWPursuitEligible=fastPursuit();
+    rt.localContext.kakashiScene05AWPursuitEligible=pursuitEligible;
+    rt.localContext.kakashiScene05AWPackagePursuitEligible=pursuitEligible;
+    rt.localContext.kakashiScene05AWAmtPursuitEligible=pursuitEligible;
+    rt.localContext.kakashiScene05AWPsToAmtTurnCap=PS_TO_AMT_MAX_TURNS;
   }
   return true;
 }
@@ -147,8 +157,9 @@ function routeVictoryReturn35730(){
   if(!(rt.localContext&&rt.localContext.kakashiScene04ABattleIntentResolved===true))return{success:true,routed:false,reason:"scene04a_battle_semantic_return_not_yet_committed"};
   const classification=classifyMi35730(row);if(!classification||classification.success!==true)return classification||{success:false,reason:"kakashi_scene05aw_mi_classification_missing"};
   const turns=turnCount(row);if(!Number.isFinite(turns)||turns<1)return{success:false,reason:"kakashi_scene05aw_turn_count_missing"};
-  rt.localContext={...(rt.localContext||{}),kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:String(row.battleOccurrenceId||""),kakashiScene05AWTurnCount:turns,kakashiScene05AWPursuitEligible:turns<=3,kakashiScene05AWMiStateClass:classification.stateClass,[CURSOR_KEY]:0};
-  rt.beatId=WIN_BEAT;save();return{success:true,routed:true,beatId:WIN_BEAT,turnCount:turns,pursuitEligible:turns<=3,miStateClass:classification.stateClass};
+  const pursuitEligible=turns<=MI_PURSUIT_MAX_TURNS;
+  rt.localContext={...(rt.localContext||{}),kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:String(row.battleOccurrenceId||""),kakashiScene05AWTurnCount:turns,kakashiScene05AWPursuitEligible:pursuitEligible,kakashiScene05AWPackagePursuitEligible:pursuitEligible,kakashiScene05AWAmtPursuitEligible:pursuitEligible,kakashiScene05AWPsToAmtTurnCap:PS_TO_AMT_MAX_TURNS,kakashiScene05AWMiStateClass:classification.stateClass,[CURSOR_KEY]:0};
+  rt.beatId=WIN_BEAT;save();return{success:true,routed:true,beatId:WIN_BEAT,turnCount:turns,pursuitEligible,packagePursuitEligible:pursuitEligible,amtPursuitEligible:pursuitEligible,psToAmtTurnCap:PS_TO_AMT_MAX_TURNS,miStateClass:classification.stateClass};
 }
 function narrationSequence(rt=active()){
   const local=rt&&rt.localContext&&typeof rt.localContext.kakashiScene05AWPursuitEligible==="boolean"?rt.localContext.kakashiScene05AWPursuitEligible:null;
@@ -287,17 +298,20 @@ function diagnostics(){
     "The street ahead is empty.","Kakashi searches the rooftops.","The alleys.","The next junction.","Nothing.","Package Smuggler had too much time.","The package is gone with him.","Kakashi looks back at Masked Interceptor.","She lies beneath the Sakura tree.","The chase is over.","What happens to her is the only decision left here."
   ];
   const fastProbe={resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:3};
-  const slowProbe={...fastProbe,playerActionOpportunityCount:4};
+  const turn4Probe={...fastProbe,playerActionOpportunityCount:4};
+  const slowProbe={...fastProbe,playerActionOpportunityCount:5};
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v4_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v5_2026_09_18",
+    causalAuthorityPinned:CAUSAL_AUTHORITY==="90b20f565ef010d2b7cfca98c04feece3f7dfcb7",
     authorityPinned:AUTHORITY==="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522",
     exactFastNarration:JSON.stringify(FAST_SEQUENCE.map(x=>x.text))===JSON.stringify(exactFast),
     exactSlowNarration:JSON.stringify(SLOW_SEQUENCE.map(x=>x.text))===JSON.stringify(exactSlow),
     victoryEntryOnly:validVictory.toString().includes('resultState==="player_side_victory"')&&routeVictoryReturn35730.toString().includes("kakashiScene04ABattleIntentResolved"),
-    exactTurnGate:fastPursuit(fastProbe)===true&&fastPursuit(slowProbe)===false,
-    packagePursuitOnly:menuSource.includes("GO AFTER PACKAGE SMUGGLER")&&!menuSource.includes("GO AFTER ANBU MARKED TARGET"),
+    exactTurnGate:fastPursuit(fastProbe)===true&&fastPursuit(turn4Probe)===true&&fastPursuit(slowProbe)===false,
+    psToAmtGate:psKeepsAmtPursuit(1)===true&&psKeepsAmtPursuit(3)===true&&psKeepsAmtPursuit(4)===false,
+    dualPursuitChoices:menuSource.includes("GO AFTER PACKAGE SMUGGLER")&&menuSource.includes("GO AFTER ANBU MARKED TARGET"),
     exactDispositionLabels:menuSource.includes("TAKE HER BACK TO ANBU")&&menuSource.includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
     lethalModeFromClassification:lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&lethalPresentation.toString().includes("ATTEMPT TO KILL HER"),
     miClassifiedBeforeMenu:routeVictoryReturn35730.toString().includes("classifyMi35730"),
@@ -316,5 +330,5 @@ function diagnostics(){
 const installed=installSurface35730();if(!installed||installed.success!==true)throw new Error(`kakashi_scene05aw_surface_install_failed:${installed&&installed.reason||"unknown"}`);
 ensureHooks35730();
 globalThis.runAcademyKakashiScene05AW35730Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:FAST_SEQUENCE.length,slowCueCount:SLOW_SEQUENCE.length,objective:OBJECTIVE,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,winBeatId:WIN_BEAT,choiceBeatId:CHOICE_BEAT,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,causalAuthority:CAUSAL_AUTHORITY,miPursuitMaxTurns:MI_PURSUIT_MAX_TURNS,psToAmtMaxTurns:PS_TO_AMT_MAX_TURNS,psKeepsAmtPursuit,installed,cueCount:FAST_SEQUENCE.length,slowCueCount:SLOW_SEQUENCE.length,objective:OBJECTIVE,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,winBeatId:WIN_BEAT,choiceBeatId:CHOICE_BEAT,browserGoldenClaimed:false});
 })();
