@@ -138,6 +138,7 @@ function isWiredChoice35730(row){
 }
 function preserveWiredChoice35730(fresh,existing){
   if(!fresh||!existing||!isWiredChoice35730(existing))return fresh;
+  if(String(fresh.choiceId||"")==="scene05aw_lethal"&&String(existing.label||"")!==String(fresh.label||""))return fresh;
   return{...fresh,
     nextBeatId:existing.nextBeatId||fresh.nextBeatId,
     availability:typeof existing.availability==="function"?existing.availability:fresh.availability,
