@@ -140,11 +140,13 @@ up to **2 hostiles**
 
 Player text:
 
-> **Poison up to 2 enemies. Poison hurts them after their actions and numbs their movement for their next turn.**
+> **Hit up to 2 enemies with poison gas for 4 Battle PL immediately, Poison them, and numb their movement for their next turn.**
 
 Effects on each successfully affected target:
 
-- establish ordinary `poisoned`;
+- deal **4 Battle PL immediately** from the poison exposure;
+- this immediate poison damage **bypasses Stamina**;
+- then establish ordinary `poisoned`;
 - current generic poison authority applies:
   - **2 Battle PL** damage at the end of the target's action opportunity;
   - maximum **3 ticks**;
@@ -187,7 +189,8 @@ Effects:
 
 - one direct Attack-PL packet;
 - ordinary Stamina mitigation;
-- establish/refresh ordinary `poisoned`;
+- then establish/refresh ordinary `poisoned`;
+- the poison condition continues dealing its own Battle-PL damage after application;
 - no additional numbness;
 - no automatic Stun.
 
@@ -308,7 +311,7 @@ That is the complete player-facing identity.
 Current runtime contains:
 
 - `ibuse.salamanders_endurance` = +6 Stamina;
-- `ibuse_poison_mist` = direct Battle-PL loss + poison;
+- `ibuse_poison_mist` = **4 immediate Battle PL + poison**;
 - `ibuse_venom_bite` = ATK13 + poison;
 - `ibuse_subterranean_ambush` = ATK10 / ATK13 contextual;
 - generic `poisoned` = 2 Battle PL per end-of-action tick, maximum 3 ticks, Stamina bypass, refresh-not-stack, standard antidote compatible.
@@ -316,7 +319,8 @@ Current runtime contains:
 If Stephen signs off RESET v2 Ibuse:
 
 - replace +6 Stamina with attached **Poison Immunity**;
-- preserve the existing generic poison condition as the shared poison resolver;
+- preserve the existing generic poison condition as the shared ongoing poison resolver;
+- preserve the design law that a damaging Poison application does **immediate damage and then applies Poison**, rather than using Poison as a status-only button;
 - replace old Ibuse attack numerics/action package with this signed-off kit;
 - add the authored Poison Mist recharge and Swallow Trap semantics;
 - do not stack old and new effects;
