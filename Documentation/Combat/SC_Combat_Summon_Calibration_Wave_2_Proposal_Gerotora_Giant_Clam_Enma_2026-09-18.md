@@ -60,13 +60,15 @@ SUPPORT / exact compatible hosted-beast seal / once per Battle
 - does not permanently strengthen the seal;
 - does not grant control over the hosted beast.
 
-### `key_gero_key_lock` — **Lock the Seal**
+### `key_gero_keyed_interlock` — **Keyed Interlock**
 
 DEFENSE / relationship / once per Battle
 
-> Block one hostile attempt to force open or tamper with the linked beast seal.
+> Pre-arm the seal against hostile tampering. Block the next attempt to force it open.
 
-- one compatible hostile seal-opening / forced-control / extraction-adjacent attempt must resolve as blocked by the key lock;
+- one compatible hostile seal-opening / forced-control / extraction-adjacent attempt must resolve as blocked by the keyed interlock;
+- this is **preventive protection**, not repair: it does not remove an instability marker that has already been committed;
+- `Emergency Reseal` remains the reactive option for an already destabilised seal;
 - voluntary host/beast cooperation is not blocked;
 - not universal extraction immunity.
 
@@ -96,13 +98,13 @@ No passive stats.
 Gerotora's value is **seal control**:
 
 - diagnose;
-- reinforce;
-- lock against hostile tampering;
+- repair an already destabilised seal with `Emergency Reseal`;
+- pre-arm the seal against the next hostile tamper/open attempt with `Keyed Interlock`;
 - deliberately open a legitimate existing access route.
 
 Player-facing shorthand:
 
-> **Gerotora manages Tailed-Beast seals. He can reinforce a weakening seal, block hostile tampering, or carefully open access you have already earned.**
+> **Gerotora manages Tailed-Beast seals. Emergency Reseal repairs an active destabilisation; Keyed Interlock blocks the next hostile tamper attempt before it succeeds; Measured Release carefully opens access you have already earned.**
 
 ---
 
@@ -132,14 +134,19 @@ The Clam does not grant Genjutsu mastery merely by being owned.
 
 ### `mirage_clam_mist_exhalation` — **Mirage Mist**
 
-SETUP / battlefield
+CONTROL / battlefield / up to **2 hostiles**
 
-> Fill the battlefield with the mist needed for a mirage.
+> Flood the field with dense mist. Weaken each affected enemy's next direct attack and enable the full Mirage Field technique.
 
 - deals no damage;
-- establish `giant_clam_mist_source`;
-- lasts until Clam is depleted/dismissed or the source is explicitly cleared;
-- by itself, mist does not create the full mirage.
+- establish persistent source state `giant_clam_mist_source` until Clam is depleted/dismissed or the source is explicitly cleared;
+- each selected hostile receives one `giant_clam_mist_obscured` marker;
+- that hostile's next qualifying direct Attack-PL packet against any target is reduced by **25% before Stamina**, then its marker is consumed;
+- an unused marker expires at that hostile's next action opportunity;
+- this is visibility/position interference, not Stun, accuracy Stat loss or a random miss roll;
+- if `Mirage Field` is activated while an enemy still has an unused 25% mist marker, the weaker marker is replaced by the Mirage Field's stronger false-position protection rather than stacking.
+
+So `Mirage Mist` is immediately useful even when the controller does not know the full collaboration technique, while also establishing the source required for `Mirage Field`.
 
 ### `mirage_clam_shell_bastion` — **Shell Bastion**
 
