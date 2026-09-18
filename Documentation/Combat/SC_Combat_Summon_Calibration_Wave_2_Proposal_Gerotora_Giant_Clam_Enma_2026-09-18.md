@@ -38,15 +38,15 @@ If a future Story occurrence manifests Gerotora as an independently targetable p
 
 ## Proposed assisted actions
 
-Gerotora has **exactly three Battle abilities**.
-
-The kit stays deliberately simple:
+Gerotora has **five support abilities**, but they remain deliberately simple and player-readable:
 
 1. open the seal;
 2. close the seal;
-3. emergency-close it if V2 Cloak causes the Mindless Jinchūriki state.
+3. emergency-close it if V2 Cloak causes the Mindless Jinchūriki state;
+4. protect the seal from one hostile tamper/extraction attempt;
+5. release extra Tailed-Beast chakra into one attack.
 
-No diagnostic button and no extra seal-management vocabulary.
+No diagnostic button and no abstract seal-management vocabulary.
 
 ### `key_gero_open_the_seal` — **Open the Seal**
 
@@ -115,19 +115,70 @@ Player card text:
 **EMERGENCY RESEAL**  
 **If V2 Cloak makes you lose control, Gerotora automatically shuts the seal and brings you back.**
 
+
+### `key_gero_protect_the_seal` — **Protect the Seal**
+
+REACTION / linked Tailed-Beast seal / once per Battle
+
+> **Block one enemy attempt to mess with your Tailed-Beast seal or pull the beast out.**
+
+Effect:
+
+- triggers when a hostile action would directly force-open, force-close, damage, suppress, tamper with, or extract through the exact linked seal;
+- block that one hostile seal interaction;
+- does not block ordinary damage;
+- does not block voluntary host/beast choices;
+- does not make the host permanently immune to extraction or sealing effects;
+- costs no player action because it is Gerotora reacting to the hostile seal interaction;
+- once used, Protect the Seal is unavailable for the rest of that Battle.
+
+Player card text:
+
+**PROTECT THE SEAL**  
+**Block one enemy attempt to mess with your seal or pull the Tailed Beast out.**
+
+### `key_gero_release_more_chakra` — **Release More Chakra**
+
+ASSIST / linked Tailed-Beast seal / once per Battle
+
+> **Push more Tailed-Beast chakra through the open seal. Your next Tailed-Beast attack gets +6 ATK.**
+
+Requirements:
+
+- linked seal is **OPEN**;
+- next action is an exact Tailed-Beast direct Attack-PL action the actor already legitimately has access to.
+
+Effect:
+
+- add **+6 Attack PL** to that one Tailed-Beast attack;
+- one packet/action occurrence only;
+- does not teach a new Skill;
+- does not change the beast relationship;
+- does not add the beast's PL or Stats;
+- does not itself cause V2 Cloak or Mindless Jinchūriki;
+- this is a Gerotora assist applied to the chosen attack, not a separate player turn;
+- consumed when the boosted attack resolves; unused assist expires at Battle end.
+
+Player card text:
+
+**RELEASE MORE CHAKRA**  
+**Once per Battle, give your next Tailed-Beast attack +6 ATK.**
+
 ## Relationship package
 
 Gerotora provides **no passive Stats and no attack package**.
 
-His entire Battle purpose is deliberately simple:
+His Battle purpose is still easy to read:
 
 - **Open the Seal** — turn Tailed-Beast access on;
 - **Close the Seal** — turn Tailed-Beast access off;
-- **Emergency Reseal** — once per Battle, automatically shut the seal if V2 Cloak causes the Mindless Jinchūriki state.
+- **Emergency Reseal** — automatically bring the player back from V2 Mindless Jinchūriki once per Battle;
+- **Protect the Seal** — block one hostile attempt to tamper with the seal or extract the beast;
+- **Release More Chakra** — once per Battle, add +6 ATK to one Tailed-Beast attack while the seal is open.
 
 Player-facing shorthand:
 
-> **Gerotora controls the Tailed-Beast seal. Open it to use powers you already have. Close it to shut them off. If V2 Cloak makes you lose control, Emergency Reseal automatically brings you back once per Battle.**
+> **Gerotora opens and closes the Tailed-Beast seal, can save you once if V2 makes you lose control, can block one enemy from messing with the seal, and can boost one Tailed-Beast attack by +6 ATK.**
 
 ---
 
