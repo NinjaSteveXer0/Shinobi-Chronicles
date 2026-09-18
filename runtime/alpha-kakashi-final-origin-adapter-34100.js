@@ -74,7 +74,8 @@ const IMMEDIATE_CUSTODY_PATH="runtime/alpha-kakashi-immediate-custody-35800.js";
 // const BUILD="kakashi-final-20260918-44";
 // const BUILD="kakashi-final-20260918-45";
 // const BUILD="kakashi-final-20260918-46";
-const BUILD="kakashi-final-20260918-47";
+// const BUILD="kakashi-final-20260918-47";
+const BUILD="kakashi-final-20260919-48";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);

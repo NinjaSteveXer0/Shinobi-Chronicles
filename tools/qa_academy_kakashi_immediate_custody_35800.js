@@ -77,6 +77,8 @@ const MOD=globalThis.SC_ALPHA_KAKASHI_IMMEDIATE_CUSTODY_35800;
 assert(MOD,"35800 module missing");
 const diag=globalThis.runAcademyKakashiImmediateCustody35800Diagnostics();
 assert.strictEqual(diag.pass,true,"35800 diagnostics failed: "+JSON.stringify(diag.failed));
+assert.strictEqual(diag.checks.raisedRouteDialogueBand,true,"raised rooftop/Police dialogue safe band missing");
+assert.strictEqual(diag.checks.officeDialogueSafeAnchor,true,"Hokage Office dialogue safe anchor missing");
 assert.strictEqual(MOD.wireChoices(),true);
 
 let out=globalThis.advanceStoryScene(ANBU_CHOICE);
@@ -133,6 +135,8 @@ assert(source.includes("NPC/uchiha_police_force_member_female.png"),"approved MI
 assert(source.includes("NPC/uchiha_police_force_male_alt_1.png"),"approved MI Police alternate member variant missing");
 assert(source.includes("He brought you back himself."),"W2D office verbatim anchor missing");
 assert(source.includes("She remains in Police custody until that custody is properly resolved."),"W2E office verbatim custody anchor missing");
+assert(source.includes("top:22%!important"),"route dialogue panel was not raised above card lane");
+assert(source.includes("right:7.5%!important")&&source.includes("top:14.5%!important"),"office dialogue panel is not locked to upper-right safe zone");
 
 const terminalSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-terminal-debrief-35100.js"),"utf8");
 assert(terminalSource.includes("kakashiScene06W2DCustodyOccurrenceId"),"terminal package-state adapter missing W2D custody source");
@@ -145,3 +149,4 @@ console.log("- W2E Police custody reaches Police handoff, bounded ANBU report, M
 console.log("- immediate transfer closes PS/AMT pursuit and does not create Pakkun");
 console.log("- Police custody remains Police custody; hidden operation Knowledge remains unavailable to Kakashi");
 console.log("- approved Police backdrop and route-specific approved Police card pairing are present");
+console.log("- route dialogue uses raised safe band; office dialogue uses upper-right safe anchor");
