@@ -7,7 +7,9 @@
 **Source branch:** `SCENE_03A / CHOICE_01 / BRANCH_A — STOP THE ASSASSIN`  
 **Entry:** Scene 04A PL Battle resolves with **Kakashi Hatake victory over Masked Interceptor**.
 
-This file is the exact player-facing and scene-continuation authority for Kakashi Origin Scene 5A-W. Coding must implement it verbatim. Do not paraphrase, condense, expand, reorder, substitute, or silently remove the approved pursuit/disposition choices.
+**Supersedes:** the earlier Scene 05A-W 1–4-turn / direct-AMT pursuit version.
+
+This file is the exact player-facing and scene-continuation authority for Kakashi Origin Scene 5A-W. Coding must implement it verbatim. Do not paraphrase, condense, expand, reorder, substitute, or silently restore the removed direct ANBU Marked Target pursuit choice.
 
 ## Backdrop
 `fight_at_sakura_tree.png`
@@ -20,41 +22,59 @@ Masked Interceptor hits the stone beneath the Sakura tree.
 
 Kakashi lands a few steps away.
 
-His eye is already off her.
+For a moment, the street is still.
 
-Searching.
+Then his eye moves past her.
 
-Package Smuggler fled with the package while they fought.
+Toward the route Package Smuggler took.
 
-ANBU Marked Target went the other way.
+### If Kakashi wins within 1–3 turns
 
-Kakashi scans the street.
+A figure cuts across the far end of the street.
 
-One trail cuts toward the package.
+Package Smuggler.
 
-The other leads after the original target.
+Still moving.
 
-Neither has vanished yet.
+The package is still with him.
 
-Not completely.
+Kakashi has not lost him yet.
 
-But both are getting farther away.
+Not quite.
 
-Kakashi looks back at Masked Interceptor.
+He looks back at Masked Interceptor.
 
 She lies where he put her.
 
-Every second he spends here makes the choice harder.
+Every second he spends here gives Package Smuggler more distance.
 
-The package.
+The package is still within reach.
 
-The original target.
+But only if Kakashi moves now.
 
-Or the woman at his feet.
+### If Kakashi wins on turn 4 or later
 
-He cannot deal with all three.
+The street ahead is empty.
 
-Not anymore.
+Kakashi searches the rooftops.
+
+The alleys.
+
+The next junction.
+
+Nothing.
+
+Package Smuggler had too much time.
+
+The package is gone with him.
+
+Kakashi looks back at Masked Interceptor.
+
+She lies beneath the Sakura tree.
+
+The chase is over.
+
+What happens to her is the only decision left here.
 
 ## Dialogue
 None.
@@ -67,15 +87,14 @@ Consume:
 
 Read the completed Battle turn count.
 
-**Victory within 1–4 turns:**
+**Victory within 1–3 turns:**
 - Package Smuggler remains reachable.
-- ANBU Marked Target remains reachable.
-- Pursuit choices remain available.
+- **GO AFTER PACKAGE SMUGGLER** remains available.
+- No direct ANBU Marked Target pursuit is available from this immediate post-MI return.
 
-**Victory on turn 5 or later:**
+**Victory on turn 4 or later:**
 - Package Smuggler is no longer reachable.
-- ANBU Marked Target is no longer reachable.
-- Pursuit choices are removed.
+- No pursuit choice remains.
 
 Masked Interceptor remains available for a post-Battle decision.
 
@@ -83,14 +102,13 @@ Her exact Battle-end condition determines whether the lethal choice is **KILL HE
 
 ## Choices
 
-**If Kakashi wins within 1–4 turns:**
+**If Kakashi wins within 1–3 turns:**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_A` — **GO AFTER PACKAGE SMUGGLER**
-- `SCENE_05A_W / CHOICE_01 / BRANCH_B` — **GO AFTER ANBU MARKED TARGET**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_C` — **KILL HER** / **ATTEMPT TO KILL HER**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_D` — **TAKE HER BACK TO ANBU**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_E` — **TAKE HER TO THE UCHIHA POLICE FORCE**
 
-**If Kakashi wins on turn 5 or later:**
+**If Kakashi wins on turn 4 or later:**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_C` — **KILL HER** / **ATTEMPT TO KILL HER**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_D` — **TAKE HER BACK TO ANBU**
 - `SCENE_05A_W / CHOICE_01 / BRANCH_E` — **TAKE HER TO THE UCHIHA POLICE FORCE**
