@@ -20,7 +20,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v1_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v2_2026_09_18";
 const AUTHORITY="671e04042debafccead2c41ab31fc4ebf99a75b1";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
@@ -41,6 +41,7 @@ const OBJECTIVE="Retrieve the package.";
 const CURSOR_KEY="__kakashiScene06AW2C35760Cursor";
 const STYLE_ID="sc-kakashi-scene06aw2c-35760-style";
 const BOARD_CLASS="sc-kakashi-scene06aw2c-board-35760";
+const SOURCE_REQUEST="kakashi_scene06aw2c_source_choice_35760";
 
 const CUES=Object.freeze([
   Object.freeze({cueId:"scene06aw2c_01",kind:"narration",text:"Kakashi looks once toward the empty street.",focusActorRef:"academy_kakashi"}),
@@ -106,10 +107,28 @@ function ensureLethalIntent(rt=active()){
   rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CIntentReceiptId:committed.receipt.storyDecisionReceiptId,kakashiScene06AW2CIntentCommitRef:committed.receipt.intentCommitRef,kakashiScene06AW2CContextStateRef:contextRef};save();
   return{success:true,receipt:committed.receipt,contextStateRef:contextRef};
 }
+function prepareScene06AW2CSourceChoice(choice){
+  const rt=active();if(!lateEntryEligible(rt))return{success:false,reason:"kakashi_scene06aw2c_late_uncontrolled_entry_required"};
+  const intent=ensureLethalIntent(rt);if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_scene06aw2c_intent_missing"};
+  if(choice)choice.nextBeatId=SCENE_BEAT;
+  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CEntered:true,[CURSOR_KEY]:0};save();
+  return{success:true,type:"kakashi_scene06aw2c_source_choice_prepared",nextBeatId:SCENE_BEAT,intentCommitRef:intent.receipt.intentCommitRef,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId};
+}
+function wireSourceChoice(){
+  const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,beat=map&&map.get(SOURCE_BEAT);if(!beat||!Array.isArray(beat.choices))return false;
+  const choice=beat.choices.find(function(row){return row&&row.choiceId===SOURCE_CHOICE;});if(!choice)return false;
+  const original=Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.find(function(row){return row&&row.requestId!==SOURCE_REQUEST;})||null:null;
+  choice.nextBeatId=SOURCE_BEAT;
+  choice.consequenceRequests=[{requestId:SOURCE_REQUEST,kind:"domain",resolve:function(){
+    if(lateEntryEligible())return prepareScene06AW2CSourceChoice(choice);
+    return original&&typeof original.resolve==="function"?original.resolve():{success:false,reason:"kakashi_scene05aw_successor_authority_not_implemented",branch:"BRANCH_C"};
+  }}];
+  return true;
+}
 function enterScene06AW2C(){
-  const rt=active();const intent=ensureLethalIntent(rt);if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_scene06aw2c_intent_missing"};
-  rt.beatId=SCENE_BEAT;rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CEntered:true,[CURSOR_KEY]:0};save();
-  return{success:true,type:"kakashi_scene06aw2c_entered",beatId:SCENE_BEAT,intentCommitRef:intent.receipt.intentCommitRef,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId};
+  const rt=active();const prepared=prepareScene06AW2CSourceChoice(null);if(!prepared||prepared.success!==true)return prepared;
+  rt.beatId=SCENE_BEAT;save();
+  return{success:true,type:"kakashi_scene06aw2c_entered",beatId:SCENE_BEAT,intentCommitRef:prepared.intentCommitRef,storyDecisionReceiptId:prepared.storyDecisionReceiptId};
 }
 function bridgeResolverResult(bindingRef){
   return function(spec){
@@ -230,6 +249,7 @@ function boardMarkup(rt){
   return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+escapeHTML(OBJECTIVE)+'</div></div><div class="sc-scene-board-33900__actors" data-count="2">'+actors.join("")+'</div>';
 }
 function renderScene(){
+  wireSourceChoice();
   if(typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
@@ -258,6 +278,7 @@ if(!CORE_RESOLVER_REGISTRATION||CORE_RESOLVER_REGISTRATION.success!==true)throw 
 const FACTUAL_REGISTRATION=PROVIDER.registerStoryFactualResolverBinding(BINDING,{ownerRef:"academy_kakashi.scene06a_w2c",authorityVersionRefs:[AUTHORITY,ACTION_CONTRACT,PROVIDER_AUTHORITY],outcomes:OUTCOMES,commitResult:commitLethalResult,metadata:{storyUnitRef:ORIGIN_ID,sceneId:"SCENE_06A_W2C",targetRef:MI_REF,resolverDetermined:true,noBranchLabelOutcomeInference:true,scene7ExpressionPending:true}});
 if(!FACTUAL_REGISTRATION||FACTUAL_REGISTRATION.success!==true)throw new Error("kakashi_scene06aw2c_factual_binding_registration_failed");
 const INSTALLED=installBeats();if(!INSTALLED||INSTALLED.success!==true)throw new Error("kakashi_scene06aw2c_surface_install_failed");
+wireSourceChoice();
 
 let hooksInstalled=false,attempts=0;
 function installHooks(){
@@ -279,21 +300,38 @@ function installHooks(){
     return PRE_ADVANCE.apply(this,arguments);
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35760(){const out=PRE_RENDER.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(renderScene);else if(typeof setTimeout==="function")setTimeout(renderScene,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
-  hooksInstalled=true;installStyle();renderScene();return true;
+  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35760(){const out=PRE_RENDER.apply(this,arguments);wireSourceChoice();if(typeof queueMicrotask==="function")queueMicrotask(renderScene);else if(typeof setTimeout==="function")setTimeout(renderScene,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  hooksInstalled=true;installStyle();wireSourceChoice();renderScene();return true;
 }
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks,25);}
+
+function installBrowserChoiceCapture(){
+  if(typeof document==="undefined"||document.__scKakashiScene06AW2CCapture35760)return false;
+  document.__scKakashiScene06AW2CCapture35760=true;
+  document.addEventListener("click",function(event){
+    const target=event&&event.target&&typeof event.target.closest==="function"?event.target.closest(".sc-story-choice"):null;
+    if(!target||!lateEntryEligible())return;
+    const label=String(target.textContent||"").replace(/\s+/g," ").trim().toUpperCase();
+    if(!label.includes("ATTEMPT TO KILL HER"))return;
+    if(event&&typeof event.preventDefault==="function")event.preventDefault();
+    if(event&&typeof event.stopImmediatePropagation==="function")event.stopImmediatePropagation();
+    const entered=enterScene06AW2C();
+    if(entered&&entered.success===true){try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}}
+  },true);
+  return true;
+}
 
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,sceneBeat=map&&map.get(SCENE_BEAT),hold=map&&map.get(HOLD_BEAT);
   const exact=["Kakashi looks once toward the empty street.","Nothing.","Package Smuggler is gone.","The package with him.","He turns back toward Masked Interceptor.","She has forced herself partway up from the stone.","Not recovered.","Not helpless either.","Her head lifts as Kakashi approaches.","His hand moves to his kunai.","This is not an arrest.","Not a return to ANBU.","Not the Police Force.","Masked Interceptor sees the decision before Kakashi makes the first step.","Her body tightens.","Kakashi moves."];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v1_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v2_2026_09_18",
     authorityPinned:AUTHORITY==="671e04042debafccead2c41ab31fc4ebf99a75b1",
     exactNarration:JSON.stringify(CUES.map(function(row){return row.text;}))===JSON.stringify(exact)&&CUES.every(function(row){return row.kind==="narration"&&!row.speakerName;}),
     exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes(">=4")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
-    intentBeforeResolver:enterScene06AW2C.toString().includes("ensureLethalIntent")&&!enterScene06AW2C.toString().includes("resolveStoryFactualAction"),
+    intentBeforeResolver:prepareScene06AW2CSourceChoice.toString().includes("ensureLethalIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("resolveStoryFactualAction"),
+    sourceChoiceWired:wireSourceChoice()===true&&wireSourceChoice.toString().includes("SOURCE_REQUEST")&&wireSourceChoice.toString().includes("prepareScene06AW2CSourceChoice"),
     exactResolverEnvelope:!!binding&&JSON.stringify(binding.outcomeRefs)===JSON.stringify(OUTCOMES.map(function(row){return row.outcomeRef;})),
     noOutcomeFromButton:ensureLethalIntent.toString().includes("ATTEMPT TO KILL")&&!ensureLethalIntent.toString().includes("LETHAL_ATTEMPT_KILLED"),
     exactBackdrop:!!sceneBeat&&sceneBeat.environmentRef&&sceneBeat.environmentRef.assetId===BACKDROP_ID&&!!hold&&hold.environmentRef&&hold.environmentRef.assetId===BACKDROP_ID,
@@ -309,8 +347,8 @@ function diagnostics(){
   return{pass:failed.length===0,checks:checks,failed:failed,authority:AUTHORITY,bindingRef:BINDING,outcomeRefs:OUTCOMES.map(function(row){return row.outcomeRef;}),sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,browserGoldenClaimed:false};
 }
 
-ensureHooks();
-const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,actionContract:ACTION_CONTRACT,bindingRef:BINDING,sourceChoiceId:SOURCE_CHOICE,sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,cueCount:CUES.length,outcomeRefs:Object.freeze(OUTCOMES.map(function(row){return row.outcomeRef;})),objective:OBJECTIVE,enterScene06AW2C:enterScene06AW2C,resolveLethalAttempt:resolveLethalAttempt,diagnostics:diagnostics,browserGoldenClaimed:false});
+ensureHooks();installBrowserChoiceCapture();
+const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,actionContract:ACTION_CONTRACT,bindingRef:BINDING,sourceChoiceId:SOURCE_CHOICE,sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,cueCount:CUES.length,outcomeRefs:Object.freeze(OUTCOMES.map(function(row){return row.outcomeRef;})),objective:OBJECTIVE,enterScene06AW2C:enterScene06AW2C,wireSourceChoice:wireSourceChoice,resolveLethalAttempt:resolveLethalAttempt,diagnostics:diagnostics,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760=api;
 globalThis.runAcademyKakashiScene06AW2C35760Diagnostics=diagnostics;
 })();

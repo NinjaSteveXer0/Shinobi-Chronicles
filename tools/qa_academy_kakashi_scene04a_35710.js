@@ -128,3 +128,5 @@ console.log("- final narration cue auto-launches canonical Story PL Battle");
 console.log("- exact PL Battle: Kakashi vs Masked Interceptor, 1-v-1");
 console.log("- config academy_kakashi_origin_battle_mi_1v1 / AK_SA_019 / no Pakkun");
 console.log("- factual Battle return resolves semantic receipt without death/custody/package inference");
+const scene04Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene04a-35710.js"),"utf8");
+assert(!scene04Source.includes("PACKAGE SMUGGLER HAS PACKAGE"),"redundant standalone package badge must be removed");

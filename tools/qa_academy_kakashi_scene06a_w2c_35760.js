@@ -68,8 +68,9 @@ const exact=[
   "Kakashi looks once toward the empty street.","Nothing.","Package Smuggler is gone.","The package with him.","He turns back toward Masked Interceptor.","She has forced herself partway up from the stone.","Not recovered.","Not helpless either.","Her head lifts as Kakashi approaches.","His hand moves to his kunai.","This is not an arrest.","Not a return to ANBU.","Not the Police Force.","Masked Interceptor sees the decision before Kakashi makes the first step.","Her body tightens.","Kakashi moves."
 ];
 
+MOD.wireSourceChoice();
 let entered=globalThis.advanceStoryScene(SOURCE_CHOICE);
-assert.strictEqual(entered.success,true,"late ATTEMPT TO KILL HER did not enter Scene 06A-W2C: "+JSON.stringify(entered));
+assert.strictEqual(entered.success,true,"late ATTEMPT TO KILL HER did not enter Scene 06A-W2C through the normal choice consequence path: "+JSON.stringify(entered));
 assert.strictEqual(active.beatId,SCENE_BEAT);
 const afterIntent=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");
 const intentReceipt=afterIntent.decisionReceipts[active.localContext.kakashiScene06AW2CIntentReceiptId];
@@ -146,3 +147,6 @@ console.log("- lethal intent commits before resolver selection");
 console.log("- resolver commits only the four Writing-authorised factual outcomes, idempotently");
 console.log("- package / PS / AMT pursuit stay closed; no Pakkun");
 console.log("- Scene 7 expression and automatic debrief remain fail-closed pending Writing authority");
+const scene06Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene06a-w2c-35760.js"),"utf8");
+assert(scene06Source.includes('addEventListener("click"'),"installed-browser choice capture seam missing");
+assert(scene06Source.includes("stopImmediatePropagation"),"browser choice capture must pre-empt stale fail-closed handler");
