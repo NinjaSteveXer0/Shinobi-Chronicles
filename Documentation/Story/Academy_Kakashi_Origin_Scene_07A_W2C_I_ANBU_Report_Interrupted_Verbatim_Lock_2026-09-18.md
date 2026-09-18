@@ -1,10 +1,10 @@
-# Academy Kakashi Origin — Scene 07A-W2C-K: ANBU Report — Verbatim Lock
+# Academy Kakashi Origin — Scene 07A-W2C-I: ANBU Report — Interrupted — Verbatim Lock
 
 **Date:** 2026-09-18  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED / LOCKED VERBATIM — DO NOT CHANGE**
 
-**Entry:** `SCENE_06A_W2C — ATTEMPT TO KILL HER` -> confirmed `LETHAL_ATTEMPT_KILLED` aftermath -> Objective `Report to ANBU.` -> black wipe.
+**Entry:** Scene 06A-W2C-I -> Objective `Report to ANBU.` -> black wipe -> rooftop.
 
 ## Backdrop
 `rooftop_night.png`
@@ -62,10 +62,30 @@ A short silence.
 “The masked shinobi?”
 
 **KAKASHI:**  
-“I killed her.”
+“I tried to kill her.”
 
-## Narration
-Another silence.
+**ANBU OPERATIVE:**  
+“What happened?”
+
+**KAKASHI:**  
+“A patrol came through.”
+
+**ANBU OPERATIVE:**  
+“And?”
+
+**KAKASHI:**  
+“She used it to get away.”
+
+**ANBU OPERATIVE:**  
+“Did you stop the attack?”
+
+Kakashi looks at him.
+
+## Dialogue
+**KAKASHI:**  
+“No.”
+
+A short silence.
 
 ## Dialogue
 **ANBU OPERATIVE:**  
@@ -74,8 +94,7 @@ Another silence.
 **KAKASHI:**  
 “That was my choice.”
 
-## Narration
-No other explanation was offered to the ANBU operative.
+The operative gives nothing away.
 
 ## Dialogue
 **ANBU OPERATIVE:**  
@@ -85,19 +104,21 @@ No other explanation was offered to the ANBU operative.
 “Understood.”
 
 ## System / Resolver
-Commit the factual ANBU report for this route:
+Commit factual ANBU report:
 
 - Package handoff occurred.
 - Package Smuggler escaped with the package.
 - ANBU Marked Target escaped.
-- Kakashi intervened against Masked Interceptor.
 - Kakashi defeated Masked Interceptor.
-- Kakashi subsequently killed Masked Interceptor.
-- Kakashi truthfully reported the confirmed kill.
-- No additional explanation for the lethal decision was given to the ANBU operative.
+- Kakashi committed lethal intent against Masked Interceptor.
+- A Konoha Patrol interrupted the lethal-action window.
+- Kakashi did **not** voluntarily abandon the lethal attempt.
+- Masked Interceptor used the interruption to escape.
+- Kakashi truthfully reported the interruption and escape.
+- Kakashi explicitly owns the lethal decision as his own.
 - No Pakkun.
 
-At the end of the scene, remove **Report to ANBU.** from the active Objective display.
+Remove **Report to ANBU.** from the active Objective display at scene end.
 
 ## Choices
 None.
@@ -105,6 +126,4 @@ None.
 ## Transition
 **BLACK WIPE**
 
--> `hokage_administration_interior_night.png`
-
--> `SCENE_08A_W2C_K — HOKAGE'S OFFICE`
+-> `SCENE_08A_W2C_I — HOKAGE'S OFFICE`
