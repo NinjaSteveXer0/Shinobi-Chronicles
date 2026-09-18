@@ -534,7 +534,7 @@ Coding must consume the closed sources through the existing reward/development f
 - Stealth/covert-acquisition / assassin-evidence semantics: **CLOSED by Progression**; no generic Assassination XP/bar.
 - `field_recovery_pill` catalogue/source + transaction semantics: **CLOSED by Combat + Acquisition**; immediate MI timing supersedes terminal timing only for the qualifying solo-MI victory occurrence.
 - `academy_training_tanto` exceptional reward identity + transaction semantics: **CLOSED by Combat + Acquisition**; still evaluated as Origin/debrief-class reward, not part of the MI fight package.
-- Runtime implementation of corrected immediate MI reward semantics: **OPEN in Coding #188 at this audit update**.
+- Runtime source consumption of corrected immediate MI reward semantics: **LANDED on main** through `bdd5eb6f9f92ea3feb81d076b94d43e7a16996a5` (entitlement/claim), `ee16f20bd24dec48c1d609b634e0337a633b4b6b` (Victory-result wiring), and `aa22c27ecd6d6b06b92b2ea0e5663c2e97e659f7` (explicit claim -> return-to-Story flow). Source/headless/CI acceptance remains Coding-owned and is not claimed merely from file presence.
 - Installed-browser validation of visible 50 Ryō + pill claim-before-return flow: **NOT YET PROVEN here**.
 - Kakashi Browser Golden: **NOT CLAIMED**.
 
