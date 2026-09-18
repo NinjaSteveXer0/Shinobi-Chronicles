@@ -5,6 +5,7 @@
 **Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 03 UNDER RESET v2**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
+**Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`  
 **Source baseline:** `284e4e2a832219f640302e09de74bc48fdd708e5`
 
 ---
