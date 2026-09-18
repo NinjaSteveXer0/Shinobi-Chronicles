@@ -195,16 +195,16 @@ The inventory itself is source-verified. Pixel verdicts are populated only when 
 | `academy_metal` | `Assets/Academy Student/academy_metal.png` | `7d43742e4ea83e1ac998ef8c3d2683dc6a02216b` | PENDING (machine-read) | PENDING | **BELOW** | **FAIL — HARD RULE** | NO | Direct pixel review: strong action/material/environment rendering and good age silhouette, but exaggerated cartoon eye/facial construction falls well below Menma human-presence standard. Top-left icon visibly uses Japanese/kanji text (`体`) without recorded exact authority. |
 | `academy_mirai` | `Assets/Academy Student/academy_mirai.png` | `71c1fccfbe59a829fb13ea5fce3cb8ec330a3a86` | PENDING (machine-read) | PENDING | **NEAR** | **PASS WITH NOTES / REMASTER CANDIDATE** | NO | Direct pixel review: clean child/early-adolescent read, coherent autumn training setting, distinct pose and frame. Face/skin/eyes remain smooth and anime-flat relative to Menma; human presence and material separation need remaster uplift. |
 | `academy_obito` | `Assets/Academy Student/academy_obito.png` | `3c7559ef5162a3a62433e9169541e213c1e0a9a1` | PENDING (machine-read) | PENDING | **NEAR** | **FAIL — HARD RULE** | NO | Direct pixel review: strong Obito identity, goggles, youthful action, lighting and foreshortening; face/material read is still below Menma. Visible Japanese text appears both in the top-left glyph icon (`土`) and background signage, conflicting with the locked no-random-Japanese / Title-Name-only rule absent explicit authority. |
-| `akatsuki_deva` | `Assets/Akatsuki/akatsuki_deva.png` | `c99bc291cc2bb45e0708a4c0a899b87b3c45c738` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `akatsuki_itachi` | `Assets/Akatsuki/akatsuki_itachi.png` | `2a7edf7bc7da08ccbde70e510aceaff2b04f778a` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `akatsuki_kakuzu` | `Assets/Akatsuki/akatsuki_kakuzu.png` | `5ca182ab12e2c5a8d353477f50b472948b75edb4` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `akatsuki_naruto` | `Assets/Akatsuki/akatsuki_naruto.png` | `48eee9bcdafc34bace4945c3986b23a146e565ce` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `akatsuki_sasuke` | `Assets/Akatsuki/akatsuki_sasuke.png` | `d54114dbb231b83839d52b1badb34395e484d39c` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `anbu_ino` | `Assets/Anbu/anbu_ino.png` | `f40dde565f8139f17edfb80f4c8d10a8222ac62a` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `anbu_menma` | `Assets/Anbu/anbu_menma.png` | `b54175c525af34d7746fc714346ea20877c48880` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `anbu_naruto` | `Assets/Anbu/anbu_naruto.png` | `fa9f0c11a4c677b542734ba7107ed9c90bba77f6` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `anbu_sasuke` | `Assets/Anbu/anbu_sasuke.png` | `4d56c1e093e94c21d0ee06a4283c1fb7d5306ffb` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
-| `anbu_torune` | `Assets/Anbu/anbu_torune.png` | `cad2193bb57da9988756b95f909941d28c8ed4b5` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
+| `akatsuki_deva` | `Assets/Akatsuki/akatsuki_deva.png` | `c99bc291cc2bb45e0708a4c0a899b87b3c45c738` | PENDING (machine-read) | PENDING | **NEAR** | **PASS WITH NOTES / REMASTER CANDIDATE** | NO | Direct pixel review complete. Exceptional scale, environment and premium spectacle; face is comparatively small/clean and still more illustrated than Genin Menma's living-person benchmark. No obvious extra-text defect seen. |
+| `akatsuki_itachi` | `Assets/Akatsuki/akatsuki_itachi.png` | `2a7edf7bc7da08ccbde70e510aceaff2b04f778a` | PENDING (machine-read) | PENDING | **MEETS** | **GREEN** | NO | Direct pixel review complete. Strongest Akatsuki human-presence result in this cohort: specific face, restrained expression, wet-material response, reflective environment and character-authored atmosphere. Meets Menma-level premium floor; no Golden Alert. |
+| `akatsuki_kakuzu` | `Assets/Akatsuki/akatsuki_kakuzu.png` | `5ca182ab12e2c5a8d353477f50b472948b75edb4` | PENDING (machine-read) | PENDING | **NEAR** | **FAIL — HARD RULE** | NO | Direct pixel review complete. Excellent stitched-body material, threat and foreshortening, but mask/face obstruction limits direct Menma human-presence comparison. Top-left icon visibly contains a kanji/glyph rather than a non-text symbol; absent exact authority this conflicts with the locked no-random-Japanese rule. |
+| `akatsuki_naruto` | `Assets/Akatsuki/akatsuki_naruto.png` | `48eee9bcdafc34bace4945c3986b23a146e565ce` | PENDING (machine-read) | PENDING | **NEAR** | **PASS WITH NOTES / REMASTER CANDIDATE** | NO | Direct pixel review complete. Very strong premium action card, nine-tail fan reads as the intended hard-count spectacle, and identity is clear. Rendering emphasis is still spectacle/effects-forward rather than Menma-level human-presence; face remains more anime-painted than benchmark. |
+| `akatsuki_sasuke` | `Assets/Akatsuki/akatsuki_sasuke.png` | `d54114dbb231b83839d52b1badb34395e484d39c` | PENDING (machine-read) | PENDING | **MEETS** | **FAIL — HARD RULE** | NO | Direct pixel review complete. Menma-level premium composition/material/lightning depth and strong Sasuke presence; visually meets benchmark floor. However visible Japanese writing on the stone pillar violates current Title/Name-only / no-random-Japanese discipline absent exact authority. |
+| `anbu_ino` | `Assets/Anbu/anbu_ino.png` | `f40dde565f8139f17edfb80f4c8d10a8222ac62a` | PENDING (machine-read) | PENDING | **MEETS** | **FAIL — HARD RULE** | NO | Direct pixel review complete. Strong dimensional face/hair/materials, mature ANBU presence, unique interrogation/memory-shard concept and subject-specific flower icon. Background scrolls contain visible writing; absent exact authority this conflicts with the locked no-random-Japanese / Title-Name-only discipline. |
+| `anbu_menma` | `Assets/Anbu/anbu_menma.png` | `b54175c525af34d7746fc714346ea20877c48880` | PENDING (machine-read) | PENDING | **MEETS** | **GREEN** | NO | Direct pixel review complete. Highly specific Menma identity, authored forward motion, convincing armor/mask/material layering, strong moonlit depth and distinctive monstrous-shadow storytelling. Meets benchmark floor without obvious extra-text defect. No Golden Alert. |
+| `anbu_naruto` | `Assets/Anbu/anbu_naruto.png` | `fa9f0c11a4c677b542734ba7107ed9c90bba77f6` | PENDING (machine-read) | PENDING | **MEETS** | **FAIL — HARD RULE** | NO | Direct pixel review complete. Strong believable facial anatomy, armor/material response, grounded ANBU posture and excellent library/interrogation-space depth. Multiple floating papers carry visible writing; absent exact authority this violates the no-random-Japanese / Title-Name-only rule. |
+| `anbu_sasuke` | `Assets/Anbu/anbu_sasuke.png` | `4d56c1e093e94c21d0ee06a4283c1fb7d5306ffb` | PENDING (machine-read) | PENDING | **MEETS** | **FAIL — HARD RULE** | NO | Direct pixel review complete. Menma-level subject rendering, strong face, wet armor, lightning and vertical-space composition; visually meets the premium floor. Background documents/wall calligraphy contain visible writing, which is a locked text-rule defect absent exact authority. |
+| `anbu_torune` | `Assets/Anbu/anbu_torune.png` | `cad2193bb57da9988756b95f909941d28c8ed4b5` | PENDING (machine-read) | PENDING | **MEETS** | **PASS WITH NOTES / AUTHORITY CHECK** | NO | Direct pixel review complete. Strongest raw human/material realism in the ANBU cohort despite goggles/face covering; convincing skin/lips, tactical fabric, insect dissolution and low-angle presence. Large Root-style wall glyph/signage requires exact authority check under the no-random-Japanese rule; do not hard-fail until representation-specific Root signage authority is checked. No Golden Alert. |
 | `advanced_optimisation_ren` | `Assets/Boss Cards/advanced_optimisation_ren.png` | `754849120a1f704ecaa8689c8b6d031a5c60ae2c` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
 | `black_madara` | `Assets/Boss Cards/black_madara.png` | `0f48acb78e8e12927064b260c5c233d447b1a2b9` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
 | `conditioned_echo_ren` | `Assets/Boss Cards/conditioned_echo_ren.png` | `9b02c5f1470620be197ef53a390d895e69017ecd` | PENDING | PENDING | **PENDING** | **VISUAL REVIEW REQUIRED / SOURCE-ONLY VERIFIED** | NO | Exact source row verified; pixel audit pending. |
@@ -361,6 +361,46 @@ The inventory itself is source-verified. Pixel verdicts are populated only when 
 The decisive gap is not raw detail density. Several Academy cards have **more visual effects, more frame ornament, or more environmental spectacle** than Genin Menma. They still fall short because Genin Menma's face, anatomy, skin/material response, camera presence and expression combine into a more believable **specific person** rather than a polished anime illustration.
 
 That distinction is now a durable audit criterion.
+
+---
+
+## 6B. Akatsuki direct-pixel audit — 2026-09-18
+
+**Source:** five individual PNGs uploaded directly by Stephen and visually inspected in the active workspace.
+
+**Cohort result:** visually much stronger than the Academy cohort. **Akatsuki Itachi and Akatsuki Sasuke reach the Genin Menma premium floor on raw visual quality.** Sasuke is not GREEN because of an independent text-rule defect. No card in this cohort clearly exceeds Menma; therefore **no Golden Alert**.
+
+| Asset | Human Presence | Composition / Materials | Text / Hard Rule | Menma | Verdict | Primary Action |
+|---|---|---|---|---|---|---|
+| Deva | NEAR | Exceptional scale and environmental spectacle | No obvious text defect | **NEAR** | REMASTER CANDIDATE | Raise facial/material dimensionality while preserving godlike composition |
+| Itachi | **MEETS** | Excellent restrained mood, wet materials, reflections and character specificity | GREEN | **MEETS** | **GREEN** | Preserve |
+| Kakuzu | NEAR | Excellent stitched anatomy, threat and foreshortening | **Kanji/glyph top-left icon requires authority; currently hard-rule defect** | **NEAR** | HARD-RULE FAIL | Replace/authorize text icon; preserve body/environment concept |
+| Naruto | NEAR | Excellent action/effect architecture; intended nine-tail fan reads clearly | No obvious text defect | **NEAR** | REMASTER CANDIDATE | More human facial/material presence; preserve spectacle |
+| Sasuke | **MEETS** | Excellent lightning/material depth and authored posture | **Visible Japanese writing on stone pillar** | **MEETS** | HARD-RULE FAIL | Surgical text cleanup/authority resolution only; do not discard composition |
+
+### Akatsuki note
+
+This cohort proves that **Menma-level quality is not synonymous with low-effects realism**. Itachi reaches the floor through restraint and specific human presence; Sasuke reaches it through a much more effects-heavy composition while still keeping a convincing person at the center. The benchmark question is whether the subject still feels alive and authored beneath the spectacle.
+
+---
+
+## 6C. ANBU direct-pixel audit — 2026-09-18
+
+**Source:** five individual PNGs uploaded directly by Stephen and visually inspected in the active workspace.
+
+**Cohort result:** this is currently the strongest audited family by raw rendering quality. **Ino, Menma, Naruto, Sasuke and Torune all visually reach the Genin Menma floor or sit directly on it.** Several fail or remain conditional only because of the separate locked no-random-Japanese/text rule. **No Golden Alert**: none is a clear overall superior benchmark once identity, readability, text discipline and total-card cohesion are considered together.
+
+| Asset | Human Presence | Composition / Materials | Text / Hard Rule | Menma | Verdict | Primary Action |
+|---|---|---|---|---|---|---|
+| ANBU Interrogation Captain Ino | **MEETS** | Excellent face/hair, memory-shard environment, interrogation identity | **Visible writing on background scrolls** | **MEETS** | HARD-RULE FAIL | Surgical text cleanup if not explicitly authorized |
+| ANBU Menma | **MEETS** | Excellent armor/mask depth, movement, monstrous-shadow environment | GREEN | **MEETS** | **GREEN** | Preserve |
+| ANBU Naruto | **MEETS** | Strong face/anatomy, grounded armor, excellent vertical archive setting | **Visible writing on floating papers** | **MEETS** | HARD-RULE FAIL | Surgical text cleanup if not explicitly authorized |
+| ANBU Sasuke | **MEETS** | Excellent face, wet armor, lightning, vertical composition | **Visible writing/calligraphy in environment** | **MEETS** | HARD-RULE FAIL | Surgical text cleanup if not explicitly authorized |
+| ANBU Torune Aburame | **MEETS** | Exceptional skin/lips/tactical materials, insect dissolution, low-angle human presence | Root-style wall glyph/signage needs exact authority check | **MEETS** | PASS WITH NOTES / AUTHORITY CHECK | Verify whether Root signage is explicitly authorized; otherwise clean text |
+
+### ANBU note
+
+The ANBU cohort demonstrates the current target particularly well: premium materials and lighting are already strong enough that the remaining acceptance failures are often **discipline failures rather than art-quality failures**. Do not throw away Menma-level compositions because a background generator invented signage; where preservation is possible, treat those as surgical cleanup problems.
 
 ---
 
