@@ -26,6 +26,16 @@ The full source package must explain what owning, attaching, hosting, bonding wi
 
 ---
 
+## 0A. Global Unique Mechanics Standard
+
+This recalibration is subordinate to the binding global rule:
+
+`Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
+
+Every Summon / Tailed-Beast / Hosted-source Skill, ability, buff, debuff, status effect, enhancement, drawback, reaction, collection bonus and related mechanic must be authored as a **Shinobi Chronicles mechanic**, not as a generic RPG template with Naruto-flavoured naming.
+
+Generic RPG concepts may be used as foundations, but the final package must have a source-specific mechanical fingerprint and pass the name-swap / decision / attractiveness tests in the global standard.
+
 ## 1. Supersession
 
 The following earlier documents remain historical records but are no longer final calibration authority:
