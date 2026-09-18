@@ -22,9 +22,10 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v6_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v7_2026_09_18";
 const AUTHORITY="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522";
 const CAUSAL_AUTHORITY="90b20f565ef010d2b7cfca98c04feece3f7dfcb7";
+const CHOICE_SURFACE_AUTHORITY="36454a31e9f61ffdaa528589ac11552d446ad3bc";
 const MI_PURSUIT_MAX_TURNS=4;
 const PS_TO_AMT_MAX_TURNS=3;
 const STORY_UNIT_REF="academy_kakashi";
@@ -123,6 +124,10 @@ function lethalPresentation(){
     ?{label:"KILL HER",mode:"deterministic",bindingRef:"academy_kakashi.lethal.kill_deterministic"}
     :{label:"ATTEMPT TO KILL HER",mode:"resolver_determined",bindingRef:"academy_kakashi.lethal.attempt_kill"};
 }
+function restraintPresentation(){
+  const stateClass=currentMiStateClass();
+  return stateClass==="CONTROLLED_DEFEATED"?"RESTRAIN HER AND CONTINUE":"ATTEMPT TO RESTRAIN HER AND CONTINUE";
+}
 function successorPending(branch){
   return{success:false,reason:"kakashi_scene05aw_successor_authority_not_implemented",branch,authority:AUTHORITY};
 }
@@ -156,6 +161,7 @@ function materializeChoices35730(){
   if(pursuitEligible){
     add(choiceRow("scene05aw_go_after_package_smuggler","GO AFTER PACKAGE SMUGGLER","BRANCH_A"));
     add(choiceRow("scene05aw_go_after_anbu_marked_target","GO AFTER ANBU MARKED TARGET","BRANCH_B"));
+    add(choiceRow("scene05aw_restrain_and_continue",restraintPresentation(),"BRANCH_F"));
   }
   add(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
   add(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
@@ -322,7 +328,8 @@ function diagnostics(){
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v6_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v7_2026_09_18",
+    choiceSurfaceAuthorityPinned:CHOICE_SURFACE_AUTHORITY==="36454a31e9f61ffdaa528589ac11552d446ad3bc",
     downstreamConsumerPreservation:preserveWiredChoice35730({choiceId:"x",nextBeatId:"pending",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_pending_35730"}]},{choiceId:"x",nextBeatId:"real",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"real_consumer"}]}).nextBeatId==="real",
     causalAuthorityPinned:CAUSAL_AUTHORITY==="90b20f565ef010d2b7cfca98c04feece3f7dfcb7",
     authorityPinned:AUTHORITY==="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522",
@@ -333,6 +340,7 @@ function diagnostics(){
     psToAmtGate:psKeepsAmtPursuit(1)===true&&psKeepsAmtPursuit(3)===true&&psKeepsAmtPursuit(4)===false,
     dualPursuitChoices:menuSource.includes("GO AFTER PACKAGE SMUGGLER")&&menuSource.includes("GO AFTER ANBU MARKED TARGET"),
     exactDispositionLabels:menuSource.includes("TAKE HER BACK TO ANBU")&&menuSource.includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
+    fastRestrainChoice:menuSource.includes("scene05aw_restrain_and_continue")&&restraintPresentation.toString().includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),
     lethalModeFromClassification:lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&lethalPresentation.toString().includes("ATTEMPT TO KILL HER"),
     miClassifiedBeforeMenu:routeVictoryReturn35730.toString().includes("classifyMi35730"),
     fightBackdropPreserved:win&&win.environmentRef&&win.environmentRef.assetId===FIGHT_BACKDROP_ID&&choice&&choice.environmentRef&&choice.environmentRef.assetId===FIGHT_BACKDROP_ID,
@@ -350,5 +358,5 @@ function diagnostics(){
 const installed=installSurface35730();if(!installed||installed.success!==true)throw new Error(`kakashi_scene05aw_surface_install_failed:${installed&&installed.reason||"unknown"}`);
 ensureHooks35730();
 globalThis.runAcademyKakashiScene05AW35730Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,causalAuthority:CAUSAL_AUTHORITY,miPursuitMaxTurns:MI_PURSUIT_MAX_TURNS,psToAmtMaxTurns:PS_TO_AMT_MAX_TURNS,psKeepsAmtPursuit,installed,cueCount:FAST_SEQUENCE.length,slowCueCount:SLOW_SEQUENCE.length,objective:OBJECTIVE,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,winBeatId:WIN_BEAT,choiceBeatId:CHOICE_BEAT,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,causalAuthority:CAUSAL_AUTHORITY,choiceSurfaceAuthority:CHOICE_SURFACE_AUTHORITY,miPursuitMaxTurns:MI_PURSUIT_MAX_TURNS,psToAmtMaxTurns:PS_TO_AMT_MAX_TURNS,psKeepsAmtPursuit,installed,cueCount:FAST_SEQUENCE.length,slowCueCount:SLOW_SEQUENCE.length,objective:OBJECTIVE,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,winBeatId:WIN_BEAT,choiceBeatId:CHOICE_BEAT,browserGoldenClaimed:false});
 })();
