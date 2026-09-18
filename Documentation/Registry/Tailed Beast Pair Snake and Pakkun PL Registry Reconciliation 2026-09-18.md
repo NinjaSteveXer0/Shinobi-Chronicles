@@ -2,12 +2,13 @@
 
 **Date:** 2026-09-18  
 **Owner:** PL / Registry / Rank  
-**Status:** **BINDING PL / REGISTRY CLOSURE — ISSUE #236 CONSUMED**  
+**Status:** **BINDING PL / REGISTRY CLOSURE — SOURCE-AUDITED CORRECTION — ISSUE #236 CONSUMED**  
 **Source issue:** #236  
 **Combat master:** #235  
-**Current source baseline inspected:** `12ec215b8674439449d64bdc4aa27e5e7ece5a62`
+**Current live source baseline inspected:** `99257fa50b016a87f34deb7bf82e09ea8058b85b`  
+**Current `game.js` blob inspected:** `9a95e018ac76b993c22b62ed6aa02be5520e97b1`
 
-## 1. Scope
+## 1. Scope and supersession
 
 This document closes the PL / Registry dependency opened by Combat master #235 for:
 
@@ -18,7 +19,14 @@ This document closes the PL / Registry dependency opened by Combat master #235 f
 - `Assets/Summons/snake.png`;
 - the Pakkun PL16 vs PL48 discrepancy.
 
-It does **not** author Combat actions, relationship unlock thresholds, acquisition routes, automatic manifestation, live admission, or runtime implementation.
+This revision **supersedes the blanket paired-card rule** introduced by commit
+`0a51aae9e7c8ccf2c9b5d513bc934e7152b4e478`.
+
+That earlier revision correctly preserved one persistent beast per canonical numbered/name pair, but it incorrectly generalized Stephen's Isobu/Three-Tails relationship-history rule to Shukaku, Matatabi and Chōmei without pair-specific authority.
+
+The correction below is deliberately evidence-specific.
+
+It does **not** author Combat actions, acquisition routes, automatic manifestation, live admission, runtime implementation, or a universal Tailed-Beast friendship mechanic.
 
 Canonical Stat order remains:
 
@@ -32,95 +40,170 @@ No direct or hidden PL bonuses are authorised.
 
 ---
 
-## 2. Canon Research First consumed
+## 2. Source-first and Canon Research First audit
 
-Canon research was performed before numerical authoring.
+### 2.1 Current SC source state
 
-Official Naruto material confirms the numbered-name relationships:
+At the source baseline above:
 
-- One-Tail = Shukaku;
-- Two-Tails = Matatabi;
-- Three-Tails = Isobu;
-- Seven-Tails = Chōmei.
+- active production Registry = **97 Characters + 18 Entities = 115**;
+- Teen Nagato is retired from the live runtime projection;
+- none of `one_tail`, `shukaku`, `two_tails`, `matatabi`, `three_tails`, `isobu`, `chomei`, `seven_tails`, or `snake` is present in the live `entityRegistry` / `ALPHA_PRODUCTION_ENTITY_IDS`;
+- Pakkun remains outside the live 115 and is represented in `AWAITING_OUTSIDE_116_STAGING_MANIFEST` at PL16;
+- physical card/portrait presence remains separate from Registry admission and runtime implementation.
 
-Canon capability anchors used only to shape Stat emphasis:
+Therefore every new calibration in this document is **durable PL/Registry authority only** until a separate implementation/admission owner consumes it.
 
-- **Shukaku:** sand manipulation, Wind/Earth/Magnet Release, sealing capability and strong defence;
-- **Matatabi:** blue-flame Fire Release, high agility/reflexes, powerful physical strikes;
-- **Isobu:** Water Release, coral production, heavy shell defence, rolling/spiked-body offence and strong swimming mobility;
-- **Chōmei:** flight, scale-powder/blinding utility, insect-like aerial attacks and high durability;
-- ordinary Naruto summoning snakes exist separately from named snakes such as Manda and Aoda.
+### 2.2 Canon identity anchors
 
-SC-specific authored divergence controls the paired-card meaning below.
+Official NARUTO material confirms the canonical numbered/name relationships:
+
+- One Tail = Shukaku;
+- Two Tails = Matatabi;
+- Three Tails = Isobu;
+- Seven Tails = Chōmei.
+
+Official material also distinguishes generic summoned/ninja snakes from named snakes such as Aoda. SC therefore does not need to reinterpret every generic snake asset as Manda/Aoda.
+
+Canon identity equivalence does **not** itself decide SC collectible-representation semantics.
+
+Preserve:
+
+**same canonical beast != automatically one exact collectible representation**
+
+**two physical cards != automatically two Registry representations**
+
+### 2.3 Pair-specific SC evidence recovered
+
+#### Shukaku / One-Tail
+
+Stephen previously defined:
+
+> "One Tail is the unfriendly version and the named version, ie, Shukaku, is the friendly version"
+
+This is sufficient to retain two exact collectible representations of one persistent Shukaku identity.
+
+It does **not** authorize copying Isobu's exact relationship-history threshold.
+
+#### Matatabi / Two-Tails
+
+Recovered Character Creation authoring evidence explicitly defined the personal-name card as the **named/friendly Matatabi**, contrasted with the hostile **Two-Tails encounter representation**.
+
+This is sufficient to retain two exact collectible representations of one persistent Matatabi identity.
+
+It does **not** authorize copying Isobu's exact relationship-history threshold.
+
+#### Isobu / Three-Tails
+
+Stephen explicitly closed the current distinction:
+
+- `three_tails` = wild / uncooperative representation before sufficient relationship history;
+- `isobu` = friendly / cooperative representation after sufficient relationship history;
+- both are the same persistent being.
+
+Relationship history is therefore an explicit eligibility/access distinction for this pair.
+
+#### Chōmei / Seven-Tails
+
+No pair-specific SC authority was found that defines `chomei` and `seven_tails` as different wild/cooperative, historical/body, relationship-history, or other exact representation states.
+
+Recovered project evidence uses Chōmei / Seven-Tails as names for the same beast rather than defining two states.
+
+Therefore PL / Registry must **not mint two numerical representations merely because both PNGs exist**.
 
 ---
 
-## 3. Paired Tailed Beast representation rule — CLOSED
+## 3. Exact persistent-identity / representation closure
 
-Stephen clarified the intended SC distinction using Isobu:
+### 3.1 Shukaku
 
-> **Three-Tails** is the wild/pre-cooperation representation.  
-> **Isobu** is the friendly/cooperative representation unlocked only after sufficient relationship history.  
-> They are the same historical being.
+Persistent Entity key:
 
-PL / Registry applies that same paired-card structure consistently to the current four numbered/name asset pairs.
+`beast_shukaku`
 
-### Hard identity rule
+Accepted exact representations:
 
-Each pair is:
+- `one_tail` — One-Tail — **unfriendly / non-cooperative representation**;
+- `shukaku` — Shukaku — **friendly / cooperative named representation**.
 
-**one persistent Tailed Beast identity + two exact collectible representations**
+Same persistent beast; both exact representations reserve against simultaneous duplicate use.
 
-not two beasts.
+No Isobu-style numeric relationship threshold is authored here.
 
-The numbered representation is the **wild / pre-cooperation** form.
+### 3.2 Matatabi
 
-The personal-name representation is the **cooperative / high-relationship** form.
+Persistent Entity key:
 
-The numerical difference is not a generic friendship multiplier and does not mean relationship history biologically mutates the beast. Each row is the Base package of that **exact authored representation state**.
+`beast_matatabi`
 
-Relationship history determines representation eligibility through the owning systems. It does not grant an unlisted +PL bonus.
+Accepted exact representations:
 
-Persistent beast identity must reserve against simultaneous use of both representations of the same beast.
+- `two_tails` — Two-Tails — **hostile encounter representation**;
+- `matatabi` — Matatabi — **named / friendly / cooperative representation**.
+
+Same persistent beast; both exact representations reserve against simultaneous duplicate use.
+
+No Isobu-style numeric relationship threshold is authored here.
+
+### 3.3 Isobu
+
+Persistent Entity key:
+
+`beast_isobu`
+
+Accepted exact representations:
+
+- `three_tails` — Three-Tails — **wild / pre-cooperation representation**;
+- `isobu` — Isobu — **friendly / cooperative high-relationship representation**.
+
+Same persistent beast; both exact representations reserve against simultaneous duplicate use.
+
+This pair alone currently carries Stephen's explicit relationship-history eligibility rule.
+
+### 3.4 Chōmei
+
+Persistent Entity key:
+
+`beast_chomei`
+
+Accepted exact Registry representation:
+
+- `chomei` — Chōmei / Seven-Tails.
+
+`Assets/Tailed Beasts/chomei.png` and `Assets/Tailed Beasts/seven_tails.png` are both physical presentation sources for the same canonical beast family, but current authority does **not** establish a second exact `seven_tails` Registry representation.
+
+Therefore:
+
+- `seven_tails` is **NOT** a separately calibrated Registry ID in this closure;
+- the prior PL103 `seven_tails` row is **RETIRED / SUPERSEDED**;
+- physical `seven_tails.png` remains an unratified alternate presentation asset until Assets/Registry authority explicitly gives it a distinct representation purpose or maps it as alternate art;
+- no second Chōmei ownership record, persistent beast, PL ledger, or simultaneous slot is created.
+
+This is a pair-specific reconciliation, not a global rule for numbered/name Tailed-Beast assets.
 
 ---
 
-## 4. Exact Tailed Beast Registry / PL closure
+## 4. Accepted Tailed Beast Base Stats / Base PL
 
-All eight rows below are:
+All accepted rows below are:
 
-- Registry type: **Entity**;
-- ontology / lifecycle family: **Tailed Beast**;
-- calibrated: **YES**;
+- Registry parent type: **Entity**;
+- family: **Tailed Beast**;
+- durable PL calibration: **CLOSED**;
 - current live-production admission: **NO**;
-- production state: **STAGED / CALIBRATED / NOT LIVE**;
-- acquisition/relationship unlock: **separately owned**;
+- current runtime Entity Registry implementation: **NO**;
+- current runtime staging-manifest implementation: **NO**;
 - Entity PL transfer to host: **FORBIDDEN**.
 
-| Persistent beast key | Exact representation ID | Display | Relationship state | Base Stats N/T/B/F/K/G/S | Base PL | Collectible card |
+| Persistent beast key | Exact representation ID | Display | Exact representation state | Base Stats N/T/B/F/K/G/S | Base PL | Physical card |
 |---|---|---|---|---|---:|---|
-| `beast_shukaku` | `one_tail` | One-Tail | wild / pre-cooperation | `94/86/52/96/100/44/108` | **103** | `Assets/Tailed Beasts/one_tail.png` |
-| `beast_shukaku` | `shukaku` | Shukaku | cooperative / high-relationship | `100/90/54/108/102/50/112` | **107** | `Assets/Tailed Beasts/shukaku.png` |
-| `beast_matatabi` | `two_tails` | Two-Tails | wild / pre-cooperation | `98/106/48/54/104/46/108` | **103** | `Assets/Tailed Beasts/two_tails.png` |
-| `beast_matatabi` | `matatabi` | Matatabi | cooperative / high-relationship | `104/112/50/58/108/52/112` | **108** | `Assets/Tailed Beasts/matatabi.png` |
+| `beast_shukaku` | `one_tail` | One-Tail | unfriendly / non-cooperative | `94/86/52/96/100/44/108` | **103** | `Assets/Tailed Beasts/one_tail.png` |
+| `beast_shukaku` | `shukaku` | Shukaku | friendly / cooperative named | `100/90/54/108/102/50/112` | **107** | `Assets/Tailed Beasts/shukaku.png` |
+| `beast_matatabi` | `two_tails` | Two-Tails | hostile encounter | `98/106/48/54/104/46/108` | **103** | `Assets/Tailed Beasts/two_tails.png` |
+| `beast_matatabi` | `matatabi` | Matatabi | named / friendly / cooperative | `104/112/50/58/108/52/112` | **108** | `Assets/Tailed Beasts/matatabi.png` |
 | `beast_isobu` | `three_tails` | Three-Tails | wild / pre-cooperation | `92/88/58/56/98/48/112` | **104** | `Assets/Tailed Beasts/three_tails.png` |
-| `beast_isobu` | `isobu` | Isobu | cooperative / high-relationship | `98/94/60/62/102/54/116` | **108** | `Assets/Tailed Beasts/isobu.png` |
-| `beast_chomei` | `seven_tails` | Seven-Tails | wild / pre-cooperation | `98/102/46/54/100/58/108` | **103** | `Assets/Tailed Beasts/seven_tails.png` |
-| `beast_chomei` | `chomei` | Chōmei | cooperative / high-relationship | `104/108/48/58/104/68/112` | **107** | `Assets/Tailed Beasts/chomei.png` |
-
-### Representation-specific calibration intent
-
-#### Shukaku
-Shukaku is Fūinjutsu/Kinjutsu/Stamina-forward because sealing, sand control, defence and Magnet/Wind expression are unusually defining for this beast. The cooperative row gains controlled Ninjutsu/Fūinjutsu use and modestly improved total operational expression; this is not a hidden relationship modifier.
-
-#### Matatabi
-Matatabi is Taijutsu/Kinjutsu/Stamina-forward, reflecting agility, powerful physical strikes and blue-flame Fire Release. Cooperative Matatabi represents more controlled movement/fire application rather than a new beast.
-
-#### Isobu
-Isobu is Stamina/Kinjutsu/Ninjutsu-forward, with the strongest defensive envelope of this four-beast batch and material body-weapon capability through shell/tails. `three_tails` is the wild representation; `isobu` is the exact friendly/cooperative representation Stephen explicitly established.
-
-#### Chōmei
-Chōmei is aerial Ninjutsu/Taijutsu/Stamina-forward, with comparatively higher Genjutsu-facing utility to reflect blinding scale-powder and perception-denial expression without treating it as a conventional Genjutsu specialist.
+| `beast_isobu` | `isobu` | Isobu | friendly / cooperative high-relationship | `98/94/60/62/102/54/116` | **108** | `Assets/Tailed Beasts/isobu.png` |
+| `beast_chomei` | `chomei` | Chōmei / Seven-Tails | single accepted exact representation; no second state authored | `104/108/48/58/104/68/112` | **107** | `Assets/Tailed Beasts/chomei.png`; `seven_tails.png` remains alternate/unratified |
 
 ### Formula checks
 
@@ -130,46 +213,69 @@ Chōmei is aerial Ninjutsu/Taijutsu/Stamina-forward, with comparatively higher G
 - `matatabi` raw 107.6381... → **108**
 - `three_tails` raw 104.1952... → **104**
 - `isobu` raw 108.4905... → **108**
-- `seven_tails` raw 102.7619... → **103**
 - `chomei` raw 107.1000... → **107**
+
+The Stats above are exact representation Base packages, not additive relationship bonuses.
+
+For Shukaku and Matatabi, the pair distinction is presentation/relationship-state authority but the exact acquisition/unlock gate remains separately owned.
+
+For Isobu, relationship history is explicitly part of representation eligibility.
+
+For Chōmei, no second state exists in current authority.
 
 ---
 
-## 5. Tailed Beast presentation / asset status
+## 5. Current source anchors — stale handoff numerics corrected
 
-Current physical card presence does not create live admission.
+Issue #236 and the opening Combat master reproduced several historical working anchors that no longer match current `game.js`.
 
-Current physical portrait evidence at source baseline:
+Live source wins.
 
-- `three_tails` → `Portraits/Tailed Beasts/three_tails.png` exists;
-- `isobu` → `Portraits/Tailed Beasts/three_tails_isobu.png` exists.
+This section does **not** recalibrate those existing live Entities; it records their current source truth so downstream Combat does not freeze stale handoff numbers.
 
-Those physical portrait files do not become ratified production mappings merely from presence.
+| Existing source | Current `game.js` Base PL |
+|---|---:|
+| `de_baku` | **64** |
+| `gamakichi` | **71** |
+| `ibuse` | **70** |
+| `key_gero` | **53** |
+| `mirage_clam` | **76** |
+| `mk_enma` | **83** |
+| `wr_kamatari` | **77** |
+| `nue` | **100** |
+| `kurama_complete` | **138** |
+| `nine_tails` | **117** |
+| `yang_kurama` | **122** |
+| `yin_kurama` | **122** |
+| `menma_kurama` | **124** |
+| `menma_nine_tails` | **117** |
+| `breakout_kurama` | **117** |
 
-No current dedicated portrait path was located for:
+`reborn_kurama` remains outside the live 115 in the awaiting/staged source at **PL112**.
 
-- `one_tail`;
-- `shukaku`;
-- `two_tails`;
-- `matatabi`;
-- `seven_tails`;
-- `chomei`.
+Consequences for Combat #235:
 
-This does not block Combat package authoring under #235.
+- a proposal using Mirage Clam PL66 is stale; current source is **PL76**;
+- a proposal using Enma PL77 is stale; current source is **PL83**;
+- Kamatari current source is **PL77**, not PL82;
+- Kurama-family work must consume current source values above rather than the opening handoff list.
+
+No PL/Registry document should silently rewrite current live source merely to preserve an older audit table.
 
 ---
 
 ## 6. Generic Snake Summon — CLOSED
 
-Current asset:
+Current physical sources:
 
-`Assets/Summons/snake.png`
+- `Assets/Summons/snake.png`;
+- `Portraits/Summons/snake.png`.
 
-Current portrait:
+Project source history commit:
 
-`Portraits/Summons/snake.png`
+`dd7bac6cb3d8a31c8667b6f120d0dd51567b7725` — **"added snake summon and portrait"**
 
-Exact Registry representation ID:
+Exact stable Registry representation ID:
 
 `snake`
 
@@ -197,7 +303,7 @@ This is **not**:
 - another named Ryūchi Cave individual;
 - a hidden alias for any named snake.
 
-The stable `snake` row represents an ordinary combat-capable summoned snake profile. Individual manifestations may be different ordinary snakes; the collectible row is therefore a generic representation, not proof that every manifestation is one immortal historical snake.
+The project source history establishes that the asset was authored as a snake Summon. Canon independently supports generic snake summoning as distinct from named individual snakes.
 
 ### Base Stats
 
@@ -213,14 +319,14 @@ Formula raw result:
 
 Calibration intent:
 
-- Taijutsu/Stamina lead because generic summoned snakes primarily contribute speed, constriction, body movement and physical field pressure;
-- Bukijutsu is moderate only as body-weapon/striking utility, not formal weapon mastery;
+- Taijutsu/Stamina lead for physical movement, constriction and field pressure;
+- Bukijutsu is moderate body-weapon utility, not formal weapon mastery;
 - Ninjutsu is secondary;
-- no named-snake strength, Sage power, venom package, shedding package or special loyalty contract is inherited automatically.
+- no named-snake strength, Sage package, venom package, shedding package, loyalty contract, or named-snake history is inherited automatically.
 
-Production state:
+State:
 
-**STAGED / CALIBRATED / NOT LIVE**
+**DURABLY CALIBRATED / NOT LIVE / RUNTIME REGISTRY NOT IMPLEMENTED**
 
 Card/portrait presence does not create acquisition, ownership, contract access or automatic Battle manifestation.
 
@@ -256,36 +362,42 @@ Formula raw result:
 
 `16.2166...` → **16**
 
-This package is supported by both:
+This package is supported by:
 
 - `Documentation/Registry/Awaiting Placement Additions - Kage Madara and Pakkun.md`;
+- `Documentation/SC_Combat_Pakkun_Summon_Action_Closure_2026-09-05.md`;
+- `Documentation/Combat/SC_Combat_Academy_Kakashi_Sequential_AMT_Pakkun_Final_Viability_Closure_2026-09-16.md`;
 - current source `AWAITING_OUTSIDE_116_STAGING_MANIFEST`.
 
 Therefore the PL48 row previously reproduced in the max-length successor audit is confirmed **stale reconstruction drift** and is superseded.
 
-### Academy Kakashi relationship
+### Academy Kakashi occurrence
 
-The Academy Kakashi Pakkun Battle source is:
+The Academy Kakashi occurrence handle:
 
-**the same exact Pakkun representation**
+`pakkun_origin_unfamiliar_ninken`
 
-not an occurrence-specific weaker Pakkun and not a second Entity identity.
+does **not** create a second weaker Pakkun Registry representation.
+
+It is an occurrence/access presentation for the same persistent `pakkun` source under temporary Story-authorised participation.
 
 Therefore:
 
-**Pakkun = PL16 everywhere unless a future separately-authored representation is explicitly created.**
+**Pakkun Base PL = 16 under exact Registry ID `pakkun`.**
 
-No two incompatible PL ledgers may coexist under `pakkun`.
+The Academy occurrence may own temporary access/action-economy semantics without owning a second Base Stats/Base PL package.
 
-Current production state remains:
+No two incompatible PL ledgers may coexist under one exact Pakkun representation.
 
-**STAGED / NOT LIVE** outside the live-116 production gate, notwithstanding authorised Story/Battle occurrence use.
+Current state:
+
+**STAGED OUTSIDE LIVE 115 / NOT LIVE**
 
 ---
 
 ## 8. Host / Jinchūriki anti-double-count rule
 
-For every row in this document:
+For every Entity package in this document:
 
 **Entity PL does not transfer wholesale to a host.**
 
@@ -319,29 +431,35 @@ Existing examples include:
 
 ## 9. Downstream Combat release
 
-PL / Registry has now closed the #236 blocker required by Combat master #235:
+PL / Registry has now source-audited and closed the #236 dependency required by Combat master #235:
 
-- four persistent Tailed Beast identities reconciled;
-- eight exact relationship-state representations calibrated;
-- `snake` identity/ontology/Stats/Base PL closed;
-- Pakkun PL16 made sole current authoritative package;
-- PL48 Pakkun drift retired;
+- Shukaku: one persistent beast, two evidenced exact representations, both calibrated;
+- Matatabi: one persistent beast, two evidenced exact representations, both calibrated;
+- Isobu: one persistent beast, two explicitly relationship-history representations, both calibrated;
+- Chōmei: one persistent beast, **one accepted exact Registry representation**; unsupported second `seven_tails` PL row retired;
+- `snake`: generic Summon identity/ontology/Stats/Base PL closed at PL47;
+- Pakkun: PL16 is the sole current Base package; PL48 retired;
+- current live Registry baseline confirmed at **97 Characters + 18 Entities = 115**;
+- stale existing-Entity handoff PL values corrected to current `game.js` source truth;
 - no new live admission inferred.
 
-Combat may now author exact own-action, relationship/enhancement, manifestation and control packages against these exact representations.
+Combat may now author exact own-action, relationship/enhancement, manifestation and control packages against the accepted rows above.
 
 Combat must preserve:
 
-- numbered vs personal-name representation distinction;
+- pair-specific evidence rather than a universal numbered-vs-name rule;
+- no Isobu relationship-history threshold copied to Shukaku or Matatabi without new authority;
+- no second `seven_tails` PL package unless a genuinely distinct representation is later authored;
 - same-beast identity reservation;
 - no generic friendship multiplier;
 - no wholesale PL transfer;
 - no dedicated-host double counting;
 - `snake` != Manda/Aoda;
-- Pakkun PL16.
+- Pakkun PL16;
+- current live source PL values, not stale master-plan anchor text.
 
 ---
 
 ## 10. Final lock
 
-> **The four new Tailed Beast pairs are not duplicate beasts: each pair is one persistent beast with a wild numbered representation and a cooperative personal-name representation. All eight rows are now calibrated but staged/not-live. `snake` is a generic Summon representation at PL47, not Manda/Aoda. Pakkun is authoritatively PL16 everywhere under exact ID `pakkun`; the old PL48 row is retired as stale reconstruction drift.**
+> **#236 is closed by pair-specific evidence, not by a universal naming pattern. Shukaku/One-Tail, Matatabi/Two-Tails, and Isobu/Three-Tails each retain two exact representations of one persistent beast because project authority supports those distinctions; only Isobu currently has an explicit relationship-history eligibility rule. Chōmei/Seven-Tails has no authored two-state distinction, so `chomei` is the sole accepted Registry representation at PL107 and the former separate `seven_tails` PL103 row is retired. `snake` is a generic Summon at PL47. Pakkun is PL16 under one exact Registry representation. Current live production remains 97 Characters + 18 Entities = 115, and downstream Combat must consume current `game.js` PL anchors rather than stale handoff numerics.**
