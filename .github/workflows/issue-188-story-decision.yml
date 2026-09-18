@@ -7,6 +7,7 @@ on:
       - 'runtime/alpha-origin-scenes-32900-integrator.js'
       - 'runtime/alpha-story-decision-realisation-34000.js'
       - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-kakashi-scene-board-polish-33910.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100-core.js'
       - 'runtime/alpha-kakashi-factual-state-commit-34120.js'
@@ -73,6 +74,7 @@ jobs:
           node --check runtime/alpha-origin-scenes-32900-integrator.js
           node --check runtime/alpha-story-decision-realisation-34000.js
           node --check runtime/alpha-story-scene-board-33900.js
+          node --check runtime/alpha-kakashi-scene-board-polish-33910.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100-core.js
           node --check runtime/alpha-kakashi-factual-state-commit-34120.js
@@ -176,6 +178,8 @@ jobs:
           grep -Fq 'bottom:30.5%!important' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'cueSpeaker33910' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'panel.dataset.speakerId=speakerId' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'left:50%;right:auto;bottom:13.2%' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'left:50%;right:auto;bottom:13.2%' runtime/alpha-kakashi-w2c-nonkill-35780.js
