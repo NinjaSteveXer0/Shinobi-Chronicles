@@ -1734,6 +1734,7 @@ function installStyle(){
   "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+AMT+"']{left:57.5%!important;bottom:30.5%!important;z-index:3}"+
   "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+PS+"']{left:69.5%!important;bottom:30.5%!important;z-index:3}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'][data-sc-board-ui-mode='performance_narration'] .sc-dialogue-panel-33910{display:none!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:3.5%!important;right:auto!important;top:18%!important;bottom:auto!important;width:min(28%,400px)!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='konoha_anbu_contact'],#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='masked_interceptor']{left:auto!important;right:3.5%!important}"+
   "."+BOARD_CLASS+" .sc-w2c-nonkill-enter-left{animation:w2cNonKillEnterLeft35780 500ms cubic-bezier(.18,.76,.24,1) both!important}"+
