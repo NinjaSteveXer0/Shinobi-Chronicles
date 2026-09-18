@@ -17,12 +17,18 @@ globalThis.SC_ALPHA_ORIGIN_32900={
 };
 load("runtime/alpha-story-decision-realisation-34000.js");
 const definition={sceneId:SCENE_ID,beatMap:new Map()};
-const active={sceneId:SCENE_ID,instanceId:"qa-w2c-ending",beatId:"kak_scene06a_w2c_scene7_pending",localContext:{kakashiScene05AWTurnCount:4,kakashiScene05AWPursuitEligible:false,kakashiScene06AW2COutcomeRef:"LETHAL_ATTEMPT_KILLED"}};
+const active={sceneId:SCENE_ID,instanceId:"qa-w2c-ending",beatId:"kak_scene06a_w2c_attempt_kill",localContext:{kakashiScene05AWTurnCount:4,kakashiScene05AWPursuitEligible:false,kakashiScene06AW2COutcomeRef:"LETHAL_ATTEMPT_KILLED"}};
 globalThis.getStorySceneDefinition=id=>id===SCENE_ID?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
 globalThis.renderStoryScenePresentationLayer=()=>true;
-globalThis.advanceStoryScene=()=>({success:true,type:"base"});
+globalThis.advanceStoryScene=()=>{
+  if(active.beatId==="kak_scene06a_w2c_attempt_kill"){
+    active.beatId="kak_scene06a_w2c_scene7_pending";
+    return{success:true,type:"qa_scene06_resolver_completed",scene7Pending:true,selectedOutcomeRef:"LETHAL_ATTEMPT_KILLED"};
+  }
+  return{success:true,type:"base"};
+};
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
   commitTerminalDebrief(){debriefs++;return{success:true,idempotent:debriefs>1};},
   commitChronicleReceiptAndRewards(){receipts++;return{success:true,idempotent:receipts>1};},
@@ -37,9 +43,10 @@ const MOD=globalThis.SC_ALPHA_KAKASHI_W2C_ENDING_35770;
 assert(MOD,"ending module missing");
 assert.strictEqual(MOD.diagnostics().pass,true,"ending diagnostics failed: "+JSON.stringify(MOD.diagnostics().failed));
 
-let out=MOD.beginConfirmedKill();
-assert.strictEqual(out,true);
-assert.strictEqual(active.beatId,MOD.aftermathBeatId);
+let out=globalThis.advanceStoryScene();
+assert.strictEqual(out.success,true);
+assert.strictEqual(out.confirmedKillPresentationStarted,true,"final Scene 06 advance must immediately start confirmed-kill presentation");
+assert.strictEqual(active.beatId,MOD.aftermathBeatId,"one final-cue advance must not strand runtime on Scene-7 pending hold");
 assert(active.localContext.kakashiScene06W2CKillLedgerOccurrenceId);
 const killLedger=store.get(active.localContext.kakashiScene06W2CKillLedgerOccurrenceId);
 assert.strictEqual(killLedger.fact.maskedInterceptorState,"DEAD");
@@ -84,7 +91,10 @@ assert(source.includes("rooftop_night.png"),"rooftop backdrop missing");
 assert(source.includes("hokage_administration_interior_night.png"),"Hokage backdrop missing");
 assert(source.includes("RECORDED IN YOUR CHRONICLE"),"separate Chronicle Receipt screen missing");
 assert(source.includes("maskedInterceptorPresent:false"),"Scene 08 must persist Masked Interceptor absence");
+assert(source.includes("installBrowserFinalCueCapture"),"installed-browser final-cue capture seam missing");
+assert(source.includes("stopImmediatePropagation"),"installed-browser final-cue capture must pre-empt the older 33900 lexical click handler");
+assert(source.includes("confirmedKillPresentationStarted"),"post-delegate confirmed-kill transition seam missing");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
-console.log("- confirmed resolver death -> stylised kill presentation -> exact aftermath");
+console.log("- final Scene 06 click -> resolver hold -> stylised kill presentation in one browser action");
 console.log("- rooftop ANBU report -> Hokage office with hidden-operation Knowledge boundary");
 console.log("- separate committed Chronicle Receipt -> Konoha destination");
