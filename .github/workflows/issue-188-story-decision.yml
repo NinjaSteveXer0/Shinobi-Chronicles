@@ -6,6 +6,7 @@ on:
     paths:
       - 'runtime/alpha-origin-scenes-32900-integrator.js'
       - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100-core.js'
       - 'runtime/alpha-kakashi-factual-state-commit-34120.js'
@@ -71,6 +72,7 @@ jobs:
         run: |
           node --check runtime/alpha-origin-scenes-32900-integrator.js
           node --check runtime/alpha-story-decision-realisation-34000.js
+          node --check runtime/alpha-story-scene-board-33900.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100-core.js
           node --check runtime/alpha-kakashi-factual-state-commit-34120.js
