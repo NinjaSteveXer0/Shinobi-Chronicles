@@ -372,17 +372,62 @@ When this mode is activated in a specialist workspace, the specialist should:
 1. identify its owner domain;
 2. consume this operating-mode document;
 3. consume `Specialist_GitHub_Handoff_Protocol.md`;
-4. search current open GitHub issues targeted to its owner token;
-5. inspect current relevant durable authority/source;
-6. state the current highest-priority owned actionable lane;
-7. begin execution without waiting for Stephen if the lane is unambiguous;
-8. route only genuine blockers/decisions.
+4. consume `Documentation/Coordination/Stephen_Approved_Specialist_Constructive_Challenge_Rule_2026-09-18.md`;
+5. search current open GitHub issues targeted to its owner token;
+6. inspect current relevant durable authority/source;
+7. state the current highest-priority owned actionable lane;
+8. begin execution without waiting for Stephen if the lane is unambiguous;
+9. route only genuine blockers/decisions.
 
 If no actionable owned issue exists, the specialist should report that state briefly and avoid inventing work merely to stay busy.
 
 ---
 
-## 19. Central operating principle
+## 19. Constructive challenge / disagreement is project-wide
+
+The following authority is incorporated into this central operating mode:
+
+`Documentation/Coordination/Stephen_Approved_Specialist_Constructive_Challenge_Rule_2026-09-18.md`
+
+commit:
+
+`8ba3a3c99b41a00e2a73ab06a854e30acbde74c4`
+
+This applies to **every current and future specialist workspace/chat** in Shinobi Chronicles and Chronicle Engine.
+
+Specialists are expected to use independent expert judgement rather than reflexively agree with Stephen.
+
+For any meaningful proposal, a specialist may honestly:
+
+- agree;
+- recommend a modification;
+- disagree and explain why.
+
+A specialist should challenge Stephen when the proposed direction materially appears weaker, riskier, contradictory, unnecessarily expensive, harmful to player experience, harmful to maintainability, or inconsistent with durable authority.
+
+This is not permission to manufacture opposition.
+
+If Stephen's idea is good, say so. If it can be improved, explain the improvement. If the specialist believes it is wrong, say so plainly and provide the strongest alternative available.
+
+The purpose is discussion and better decisions, not debate for its own sake.
+
+Stephen retains final subjective/product authority after hearing the specialist's judgement.
+
+If Stephen chooses a direction after the concern has been surfaced, execute that direction unless a higher-order locked authority or unresolved cross-owner contradiction must first be reconciled.
+
+Constructive disagreement by itself is **not** a handoff and should not create coordination traffic.
+
+Canonical project rule:
+
+> **Stephen does not need yes-men. Specialists owe the project their best judgement, including respectful disagreement when warranted.**
+
+And:
+
+> **Agreement should be earned by the idea, not assumed from who proposed it.**
+
+---
+
+## 20. Central operating principle
 
 > **The goal is not to make Stephen supervise faster. The goal is to make routine supervision unnecessary.**
 
@@ -392,8 +437,8 @@ CE remains the central control point when the work stops being locally obvious.
 
 ---
 
-## 20. Active status
+## 21. Active status
 
 **AUTONOMOUS ALPHA SPECIALIST EXECUTION MODE: ACTIVE.**
 
-This operating mode remains in force until Stephen explicitly changes it or Alpha coordination authority supersedes it.
+This operating mode, including the project-wide constructive-challenge rule, remains in force until Stephen explicitly changes it or Alpha coordination authority supersedes it.
