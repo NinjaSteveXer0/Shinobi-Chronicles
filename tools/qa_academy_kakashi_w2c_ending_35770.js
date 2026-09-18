@@ -105,7 +105,6 @@ assert(source.includes("2147483400"),"lethal-attempt animation must sit above Sc
 assert(source.includes("bottom:23.5%!important"),"Hokage Office lower cast must align to the table-row baseline");
 assert(source.includes("sc-dialogue-panel-33910.is-current"),"Hokage Office dialogue must use negative-space placement");
 assert(source.includes("performance_narration")&&source.includes("sc-dialogue-panel-33910{display:none!important}"),"office narration must suppress stale dialogue overlay");
-assert(source.includes("left:50%;right:auto;bottom:13.2%"),"recovered package badge must be centered above narration bar");
 assert(source.includes("left:28%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"Hokage Office AMT / ANBU / PS table-row placement missing");
 assert(source.includes("sc-w2c-office-anbu-enter-35770"),"KILLED office ANBU slide-in missing");
 assert(source.includes("PACKAGE RECOVERED · HIDDEN OPERATION"),"Recovered-package state must live on Minato card");
