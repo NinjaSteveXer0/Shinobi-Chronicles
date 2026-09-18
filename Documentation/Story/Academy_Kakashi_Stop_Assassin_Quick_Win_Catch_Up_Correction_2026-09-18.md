@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-18  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **STEPHEN-DIRECT STORY / CAUSAL CORRECTION — BINDING; EXACT SCENE 05A-W PLAYER-FACING REWRITE STILL PENDING APPROVAL**
+**Status:** **STEPHEN-DIRECT STORY / CAUSAL CORRECTION — BINDING; SCENE 05A-W REWRITE PUBLISHED**
 
 ## Purpose
 
@@ -83,11 +83,13 @@ Correct Stop-the-Assassin rule:
 
 ## Scene 05A-W correction boundary
 
-The current verbatim Scene 05A-W file contains now-superseded Stop-the-Assassin pursuit semantics and player-facing narration built around two simultaneous trails.
+The superseding exact player-facing authority is now:
 
-Do **not** treat that exact file as final for the Stop-the-Assassin win return until Writing publishes Stephen-approved replacement prose/choices.
+`Documentation/Story/Academy_Kakashi_Origin_Scene_05A_W_Kakashi_Wins_Verbatim_Lock_2026-09-18.md`
 
-This document closes the causal rule now so Coding does not continue implementing the wrong branch identity while the exact Scene 05A-W rewrite is being approved.
+commit `30a8cf3a16f57fbe5e65f55bc9dc1de076a21522`
+
+That Scene 05A-W file consumes this correction directly: **1–3 turns -> Package Smuggler pursuit only; turn 4+ -> no pursuit; no direct AMT pursuit from the immediate post-MI return.**
 
 ## Final lock
 
