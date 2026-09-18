@@ -173,6 +173,27 @@ for(const needle of [
   if(at>=0)console.log("\n--- GAME SRC "+needle+" @ "+at+" ---\n"+gameSrc.slice(Math.max(0,at-4000),at+14000));
 }
 
+for(const needle of [
+  "function confirmSelectedBattleSkill()",
+  "function attemptBattlePreparedSkill(",
+  "function recordBattleEvidence(",
+  "function generateBattle",
+  "function createBattleReward",
+  "function rollBattle",
+  "function completeBattle",
+  "rewards.generated",
+  "generated: true",
+  "generated:true"
+]){
+  let from=0,count=0;
+  while(count<4){
+    const at=gameSrc.indexOf(needle,from);
+    if(at<0)break;
+    console.log("\n--- GAME SRC EXTRA "+needle+" @ "+at+" ---\n"+gameSrc.slice(Math.max(0,at-6000),at+18000));
+    from=at+needle.length;count+=1;
+  }
+}
+
 console.log(JSON.stringify({
   pass:true,
   patch:"34500-v5",
