@@ -69,7 +69,7 @@ Another silence.
 
 ## Dialogue
 **ANBU OPERATIVE:**  
-“Why?”
+“Those weren’t your orders.”
 
 **KAKASHI:**  
 “That was my choice.”
