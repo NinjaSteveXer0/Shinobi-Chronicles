@@ -6,14 +6,16 @@
 // It supplies source-scoped/idempotent Kakashi Origin receipts and routes the
 // closed owner values into the existing canonical mutation APIs.
 //
-// Battle victory != terminal Origin reward entitlement.
-// Terminal debrief rewards are evaluated/committed only from exact factual input.
+// Battle victory != terminal Origin/debrief reward entitlement. The exact solo
+// Kakashi-vs-Masked-Interceptor victory now has its own immediate Battle reward
+// class under fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da. Terminal debrief rewards
+// remain separately evaluated/committed only from exact factual input.
 // ============================================================================
 (function installAcademyKakashiOriginRewards34800(){
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800)return;
 
-const PATCH_ID="alpha_kakashi_origin_rewards_34800_v2_2026_09_17";
+const PATCH_ID="alpha_kakashi_origin_rewards_34800_v3_2026_09_18";
 const ROUTE="academy_kakashi_origin_reward";
 const KAKASHI="academy_kakashi";
 const ITEM_SOURCE="kak_origin_item_field_recovery_resupply";
@@ -21,6 +23,13 @@ const WEAPON_SOURCE="kak_origin_weapon_exceptional_training_tanto";
 const ITEM_ID="field_recovery_pill";
 const WEAPON_ID="academy_training_tanto";
 const TERMINAL_SOURCE="kak_origin_terminal_debrief_reward";
+const MI_REWARD_AUTHORITY_COMMIT="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da";
+const MI_REWARD_FAMILY="kak_origin_battle_mi_victory_reward_v1";
+const MI_REWARD_CLAIM_FAMILY="kak_origin_battle_mi_victory_reward_claim_v1";
+const MI_RYO_SOURCE="kak_origin_battle_mi_victory_ryo_01";
+const MI_BATTLE_CONFIG="academy_kakashi_origin_battle_mi_1v1";
+const MI_PARTICIPANT="academy_kakashi_origin_masked_interceptor";
+const MI_REWARD_RYO=50;
 const DISCIPLINE_ID=Object.freeze({ninjutsu:"nin",taijutsu:"tai",genjutsu:"gen",bukijutsu:"buki",fuinjutsu:"fuin",kinjutsu:"kin",stamina:"stamina"});
 const WORLD_AUTHORITY_COMMIT="91f5969b20e270b3ef7d148342f28a1668b4eba1";
 const COMBAT_AUTHORITY_COMMIT="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8";
@@ -39,6 +48,9 @@ function ensureRoot(){
   root.fieldcraft=root.fieldcraft&&typeof root.fieldcraft==="object"?root.fieldcraft:{};
   root.entitlements=root.entitlements&&typeof root.entitlements==="object"?root.entitlements:{};
   root.grants=root.grants&&typeof root.grants==="object"?root.grants:{};
+  root.battleEntitlements=root.battleEntitlements&&typeof root.battleEntitlements==="object"?root.battleEntitlements:{};
+  root.battleRewardComponents=root.battleRewardComponents&&typeof root.battleRewardComponents==="object"?root.battleRewardComponents:{};
+  root.battleClaims=root.battleClaims&&typeof root.battleClaims==="object"?root.battleClaims:{};
   return root;
 }
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}try{if(typeof saveTestState==="function")saveTestState();}catch(_error){}}
@@ -121,6 +133,88 @@ function commitOriginInventoryEntitlement({sourceId,kind}={}){
   root.grants[exact.sourceId]={sourceId:exact.sourceId,kind,itemId:exact.itemId,grant:clone(granted),committed:true};save();
   return{success:true,idempotent:false,grant:clone(root.grants[exact.sourceId])};
 }
+function qualifyingMiVictoryBattle(battleState=null){
+  const b=battleState&&typeof battleState==="object"?battleState:(typeof currentBattle==="object"&&currentBattle?currentBattle:null);
+  const dep=b&&b.kakashiOriginDeployment&&typeof b.kakashiOriginDeployment==="object"?b.kakashiOriginDeployment:null;
+  if(!b||!dep)return{qualifies:false,reason:"kakashi_mi_battle_context_missing"};
+  const opposition=Array.isArray(dep.oppositionParticipantIds)?dep.oppositionParticipantIds.map(String):[];
+  const victory=!!(b.battleOver===true&&b.outcome&&b.outcome.type==="victory");
+  const qualifies=dep.controllerParticipantId===KAKASHI&&dep.battleConfigId===MI_BATTLE_CONFIG&&opposition.length===1&&opposition[0]===MI_PARTICIPANT&&victory;
+  return{
+    qualifies,
+    reason:qualifies?null:"kakashi_mi_victory_predicate_not_met",
+    battleOccurrenceId:String(dep.battleOccurrenceId||b.battleId||""),
+    sealedOriginOccurrenceId:String(dep.storyOccurrenceId||""),
+    battleConfigId:String(dep.battleConfigId||""),
+    oppositionParticipantIds:opposition,
+    resultState:victory?"player_side_victory":(b.battleOver===true?"opposition_side_victory":"unresolved")
+  };
+}
+function miEntitlementKey(ctx){
+  return `${MI_REWARD_FAMILY}::${String(ctx&&ctx.sealedOriginOccurrenceId||"unsealed")}::${String(ctx&&ctx.battleOccurrenceId||"missing")}`;
+}
+function miClaimKey(ctx){
+  return `${MI_REWARD_CLAIM_FAMILY}::${String(ctx&&ctx.battleOccurrenceId||"missing")}`;
+}
+function ensureMiVictoryBattleEntitlement(battleState=null){
+  const ctx=qualifyingMiVictoryBattle(battleState);
+  if(!ctx.qualifies||!ctx.battleOccurrenceId)return{success:false,reason:ctx.reason||"kakashi_mi_battle_occurrence_missing",context:ctx};
+  const root=ensureRoot();if(!root)return{success:false,reason:"kakashi_reward_receipt_store_missing"};
+  const entitlementId=miEntitlementKey(ctx);
+  const existing=root.battleEntitlements[entitlementId];
+  if(existing)return{success:true,idempotent:true,entitlement:clone(existing),claimed:!!root.battleClaims[miClaimKey(ctx)]};
+  const entitlement={
+    entitlementId,parentFamily:MI_REWARD_FAMILY,storyUnitRef:"academy_kakashi",subjectId:KAKASHI,
+    battleOccurrenceId:ctx.battleOccurrenceId,sealedOriginOccurrenceId:ctx.sealedOriginOccurrenceId,
+    battleConfigId:MI_BATTLE_CONFIG,oppositionParticipantIds:[MI_PARTICIPANT],resultState:"player_side_victory",
+    materialReward:{ryo:MI_REWARD_RYO,items:[{itemId:ITEM_ID,quantity:1,sourceId:ITEM_SOURCE}],genericExp:0,rareDrops:[]},
+    componentSources:{ryo:MI_RYO_SOURCE,item:ITEM_SOURCE},authorityCommit:MI_REWARD_AUTHORITY_COMMIT,
+    status:"pending_claim",createdAt:Date.now()
+  };
+  root.battleEntitlements[entitlementId]=entitlement;save();
+  return{success:true,idempotent:false,entitlement:clone(entitlement),claimed:false};
+}
+function getMiVictoryBattleRewardState(battleState=null){
+  const ctx=qualifyingMiVictoryBattle(battleState);
+  if(!ctx.qualifies||!ctx.battleOccurrenceId)return{success:false,qualifies:false,reason:ctx.reason||"kakashi_mi_victory_predicate_not_met",context:ctx};
+  const ensured=ensureMiVictoryBattleEntitlement(battleState);if(!ensured.success)return ensured;
+  const root=ensureRoot(),entitlementId=miEntitlementKey(ctx),claimId=miClaimKey(ctx);
+  const claim=root.battleClaims[claimId]||null;
+  return{success:true,qualifies:true,entitlementId,claimId,claimed:!!(claim&&claim.committed===true),entitlement:clone(root.battleEntitlements[entitlementId]),claim:clone(claim),components:clone(root.battleRewardComponents[entitlementId]||{})};
+}
+function commitMiVictoryBattleReward(battleState=null){
+  const state=getMiVictoryBattleRewardState(battleState);
+  if(!state.success||!state.qualifies)return state;
+  const root=ensureRoot(),entitlement=state.entitlement,entitlementId=state.entitlementId,claimId=state.claimId;
+  if(state.claimed)return{success:true,idempotent:true,claimed:true,entitlement:clone(entitlement),claim:clone(state.claim),ryoGranted:0,pillGranted:0};
+  const components=root.battleRewardComponents[entitlementId]=root.battleRewardComponents[entitlementId]||{};
+
+  let ryoGranted=0;
+  if(!(components.ryo&&components.ryo.committed===true)){
+    playerData.ryo=Number(playerData.ryo||0)+MI_REWARD_RYO;
+    components.ryo={sourceId:MI_RYO_SOURCE,battleOccurrenceId:entitlement.battleOccurrenceId,amount:MI_REWARD_RYO,committed:true,committedAt:Date.now(),authorityCommit:MI_REWARD_AUTHORITY_COMMIT};
+    ryoGranted=MI_REWARD_RYO;save();
+  }
+
+  let pillGranted=0;
+  if(!(components.pill&&components.pill.committed===true)){
+    const before=inventoryQuantity(ITEM_ID);
+    const pill=commitOriginInventoryEntitlement({sourceId:ITEM_SOURCE,kind:"field_recovery_pill"});
+    if(!pill||pill.success!==true)return{success:false,reason:pill&&pill.reason||"kakashi_mi_pill_commit_failed",entitlement:clone(entitlement),ryoComponentCommitted:true,pillResult:clone(pill)};
+    const after=inventoryQuantity(ITEM_ID);
+    pillGranted=Math.max(0,after-before);
+    components.pill={sourceId:ITEM_SOURCE,itemId:ITEM_ID,quantity:1,committed:true,committedAt:Date.now(),idempotent:pill.idempotent===true,authorityCommit:MI_REWARD_AUTHORITY_COMMIT};save();
+  }
+
+  root.battleClaims[claimId]={
+    claimId,claimFamily:MI_REWARD_CLAIM_FAMILY,entitlementId,battleOccurrenceId:entitlement.battleOccurrenceId,
+    subjectId:KAKASHI,ryo:MI_REWARD_RYO,itemId:ITEM_ID,itemQuantity:1,committed:true,committedAt:Date.now(),
+    authorityCommit:MI_REWARD_AUTHORITY_COMMIT
+  };
+  root.battleEntitlements[entitlementId]={...root.battleEntitlements[entitlementId],status:"claimed",claimedAt:Date.now(),claimId};
+  save();
+  return{success:true,idempotent:false,claimed:true,entitlement:clone(root.battleEntitlements[entitlementId]),claim:clone(root.battleClaims[claimId]),ryoGranted,pillGranted,totalRyo:Number(playerData.ryo||0)};
+}
 function evaluateTerminalDebriefRewards(facts={}){
   if(facts.terminalDebriefReached!==true)return{success:false,reason:"terminal_debrief_required"};
   const ryo=100+(facts.packageRecovered===true?75:0)+(facts.verifiedActionableIntelligence===true?25:0)+(facts.liveCustodyEstablished===true?25:0)+(facts.exceptionalFieldExecution===true?25:0);
@@ -150,6 +244,10 @@ function diagnostics(){
     technicalBattleCap:recordTechnicalDisciplineDevelopment.toString().includes("6-used"),
     staminaBattleCap:recordStaminaDevelopment.toString().includes("used<2?1:0"),
     noBattleVictoryRewardInference:!commitTerminalDebriefRewards.toString().includes("battleOver")&&!commitTerminalDebriefRewards.toString().includes("outcome"),
+    immediateMiAuthorityPinned:MI_REWARD_AUTHORITY_COMMIT==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&MI_REWARD_FAMILY==="kak_origin_battle_mi_victory_reward_v1"&&MI_REWARD_CLAIM_FAMILY==="kak_origin_battle_mi_victory_reward_claim_v1",
+    exactImmediateMiPackage:MI_REWARD_RYO===50&&ITEM_SOURCE==="kak_origin_item_field_recovery_resupply"&&ITEM_ID==="field_recovery_pill",
+    exactSoloMiPredicate:qualifyingMiVictoryBattle.toString().includes("opposition.length===1")&&qualifyingMiVictoryBattle.toString().includes("MI_BATTLE_CONFIG")&&qualifyingMiVictoryBattle.toString().includes("MI_PARTICIPANT"),
+    immediateClaimComponentReceipts:commitMiVictoryBattleReward.toString().includes("battleRewardComponents")&&commitMiVictoryBattleReward.toString().includes("MI_RYO_SOURCE")&&commitMiVictoryBattleReward.toString().includes("commitOriginInventoryEntitlement"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
@@ -162,7 +260,10 @@ globalThis.recordAcademyKakashiFieldcraftEvidence34800=recordFieldcraftEvidence;
 globalThis.evaluateAcademyKakashiTerminalDebriefRewards34800=evaluateTerminalDebriefRewards;
 globalThis.commitAcademyKakashiTerminalDebriefRewards34800=commitTerminalDebriefRewards;
 globalThis.commitAcademyKakashiOriginInventoryEntitlement34800=commitOriginInventoryEntitlement;
+globalThis.ensureAcademyKakashiMiVictoryBattleEntitlement34800=ensureMiVictoryBattleEntitlement;
+globalThis.getAcademyKakashiMiVictoryBattleRewardState34800=getMiVictoryBattleRewardState;
+globalThis.commitAcademyKakashiMiVictoryBattleReward34800=commitMiVictoryBattleReward;
 globalThis.getAcademyKakashiOriginRewardSnapshot34800=snapshot;
 globalThis.runAcademyKakashiOriginRewards34800Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800=Object.freeze({patchId:PATCH_ID,route:ROUTE,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800=Object.freeze({patchId:PATCH_ID,route:ROUTE,miImmediateReward:Object.freeze({authorityCommit:MI_REWARD_AUTHORITY_COMMIT,family:MI_REWARD_FAMILY,claimFamily:MI_REWARD_CLAIM_FAMILY,ryo:MI_REWARD_RYO,itemId:ITEM_ID,itemSource:ITEM_SOURCE,battleConfigId:MI_BATTLE_CONFIG,opponentRef:MI_PARTICIPANT}),browserGoldenClaimed:false});
 })();
