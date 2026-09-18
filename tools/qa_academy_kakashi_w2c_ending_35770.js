@@ -83,7 +83,7 @@ assert(source.includes("diagonal")===false,"presentation uses animation, not inv
 assert(source.includes("rooftop_night.png"),"rooftop backdrop missing");
 assert(source.includes("hokage_administration_interior_night.png"),"Hokage backdrop missing");
 assert(source.includes("RECORDED IN YOUR CHRONICLE"),"separate Chronicle Receipt screen missing");
-assert(!source.includes("Masked Interceptor","NPC/masked_interceptor.png","PRESENT""),"Scene 08 must not present Masked Interceptor");
+assert(source.includes("maskedInterceptorPresent:false"),"Scene 08 must persist Masked Interceptor absence");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
 console.log("- confirmed resolver death -> stylised kill presentation -> exact aftermath");
 console.log("- rooftop ANBU report -> Hokage office with hidden-operation Knowledge boundary");
