@@ -1,8 +1,13 @@
+> **RESET v2 NOW CONTROLS THIS TRANCHE — 2026-09-18**  
+> Stephen directed a full restart from Baku because the earlier waves underweighted Enhancement packages.  
+> Binding reset authority: `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md` at `72d6b5920d47460e964a7dc656a903404f16526a`.  
+> Prior Wave 1/2/3 sign-offs are historical only until each source is freshly approved under RESET v2.
+
 # Shinobi Chronicles — Summons + Tailed Beasts Full Calibration Master Plan
 
 **Date:** 2026-09-18  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **ACTIVE MASTER CALIBRATION TRANCHE — SOURCE/IDENTITY/PL RECONCILIATION + COMBAT PACKAGE AUTHORING**  
+**Status:** **ACTIVE MASTER TRANCHE — RESET v2 FULL RECALIBRATION FROM BAKU**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**  
 **Source baseline when opened:** `00b5efe2bff25e79bb54d13b15cc172b050913b3`
 
