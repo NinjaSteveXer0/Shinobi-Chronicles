@@ -48,6 +48,9 @@ assert.strictEqual(Object.prototype.hasOwnProperty.call(layer.dataset,"scKakashi
 const style=nodes.get("sc-kakashi-objective-presentation-35720-style");
 assert(style&&style.textContent.includes("min-width:310px"));
 assert(style.textContent.includes("min-height:62px"));
+assert(style.textContent.includes("align-items:center"));
+assert(style.textContent.includes("text-align:center"));
+assert(style.textContent.includes("font-size:15px"));
 assert(style.textContent.includes('data-sc-kakashi-objective-gate="hidden"'));
 assert(renders>=4);
 assert.strictEqual(advances,0);
@@ -55,5 +58,5 @@ assert.strictEqual(advances,0);
 console.log("Kakashi Objective Presentation 35720 QA: PASS");
 console.log("- objective hidden through sealed-envelope-held cue");
 console.log("- objective reveals only when Kakashi opens envelope / target photograph appears");
-console.log("- enlarged Objective panel styling applies globally to Story Scene Board objective boxes");
+console.log("- enlarged Objective panel + larger centered objective text applies globally to Story Scene Board objective boxes");
 console.log("- layer-level CSS gate survives board markup rebuilds without a new MutationObserver");
