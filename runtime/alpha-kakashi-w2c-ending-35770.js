@@ -18,7 +18,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_w2c_ending_35770_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_w2c_ending_35770_v4_2026_09_18";
+const PATCH_ID="alpha_kakashi_w2c_ending_35770_v5_2026_09_18";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_HOLD="kak_scene06a_w2c_scene7_pending";
@@ -185,26 +185,42 @@ function installStyle(){
   "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:4;pointer-events:none}"+
   "."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8%!important;bottom:20%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:2%!important;padding:0 4%!important}"+
   "."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(22vw,310px)!important;max-height:490px!important;aspect-ratio:7/10!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-chronicle-layout{position:absolute!important;left:3.4%!important;top:13%!important;width:min(37%,455px)!important;margin:0!important;align-self:start!important}"+
+  "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-story-panel{max-height:34vh!important}"+
+  "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actors{left:34%!important;right:2.5%!important;top:8%!important;bottom:21%!important;display:block!important;padding:0!important}"+
+  "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor{position:absolute!important;width:min(19vw,248px)!important;max-height:410px!important}"+
+  "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor[data-actor-id=\""+MINATO+"\"]{left:31%!important;top:-7%!important;width:min(21vw,278px)!important;max-height:455px!important;z-index:4}"+
+  "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor[data-actor-id=\""+ANBU+"\"]{left:0!important;bottom:0!important;z-index:3}"+
+  "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor[data-actor-id=\""+AMT+"\"]{right:20%!important;bottom:-1%!important;width:min(17vw,220px)!important;z-index:2}"+
+  "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actor[data-actor-id=\""+PS+"\"]{right:0!important;bottom:-1%!important;width:min(17vw,220px)!important;z-index:2}"+
+  ".sc-kakashi-w2c-package-status{position:absolute;right:4.5%;bottom:9.2%;padding:8px 12px;border:1px solid rgba(214,169,58,.55);background:rgba(4,8,12,.9);color:#e6c65e;font-size:10px;font-weight:900;letter-spacing:.12em;z-index:5}"+
+  "."+BOARD_CLASS+" .sc-kakashi-mi-death-drop-35770{animation:miCardDrop35770 620ms cubic-bezier(.42,.05,.86,.24) both!important;transform-origin:52% 82%!important}"+
   ".sc-kakashi-kill-35770{position:absolute;inset:0;z-index:90;pointer-events:none;overflow:hidden}.sc-kakashi-kill-35770 img{position:absolute;bottom:13%;height:min(58vh,510px);filter:drop-shadow(0 18px 24px #000)}"+
   ".sc-kakashi-kill-35770 .kak{left:12%;animation:kak35770 900ms cubic-bezier(.18,.75,.2,1) forwards}.sc-kakashi-kill-35770 .mi{right:12%;animation:mi35770 900ms ease-out forwards}.sc-kakashi-kill-35770 .slash{position:absolute;left:-12%;top:47%;width:130%;height:12%;background:#000;transform:rotate(-17deg) scaleX(0);transform-origin:left center;animation:slash35770 900ms forwards}.sc-kakashi-kill-35770 .flash{position:absolute;inset:0;background:#fff;opacity:0;animation:flash35770 900ms forwards}.sc-kakashi-kill-35770 .black{position:absolute;inset:0;background:#000;opacity:0;animation:black35770 900ms forwards}"+
-  "@keyframes kak35770{0%{transform:translateX(0)}38%{transform:translateX(8vw)}52%,100%{transform:translateX(42vw)}}@keyframes mi35770{0%,48%{transform:translateX(0)}60%,100%{transform:translateX(-3vw) rotate(-4deg)}}@keyframes slash35770{0%,48%{transform:rotate(-17deg) scaleX(0)}58%,100%{transform:rotate(-17deg) scaleX(1)}}@keyframes flash35770{0%,48%,57%,100%{opacity:0}52%{opacity:.92}}@keyframes black35770{0%,62%{opacity:0}72%,90%{opacity:1}100%{opacity:0}}"+
+  "@keyframes kak35770{0%{transform:translateX(0)}38%{transform:translateX(8vw)}52%,100%{transform:translateX(42vw)}}@keyframes mi35770{0%,48%{transform:translateX(0)}60%,100%{transform:translateX(-3vw) rotate(-4deg)}}@keyframes slash35770{0%,48%{transform:rotate(-17deg) scaleX(0)}58%,100%{transform:rotate(-17deg) scaleX(1)}}@keyframes flash35770{0%,48%,57%,100%{opacity:0}52%{opacity:.92}}@keyframes black35770{0%,62%{opacity:0}72%,90%{opacity:1}100%{opacity:0}}@keyframes miCardDrop35770{0%{opacity:.82;transform:translateY(0) rotate(0deg) scale(.96)}18%{opacity:.78;transform:translateY(10px) rotate(1deg) scale(.955)}100%{opacity:0;transform:translateY(115vh) rotate(7deg) scale(.92)}}"+
   "#"+RECEIPT_ID+"{position:fixed;inset:0;z-index:120000;display:grid;place-items:center;padding:32px;background:radial-gradient(circle at 50% 12%,rgba(35,56,70,.42),rgba(2,6,10,.98) 60%);color:#eee6d2}#"+RECEIPT_ID+" .card{width:min(980px,94vw);max-height:90vh;overflow:auto;padding:32px;border:1px solid rgba(214,169,58,.55);background:linear-gradient(155deg,rgba(9,16,22,.99),rgba(3,7,11,.99));box-shadow:0 30px 100px #000}#"+RECEIPT_ID+" .eye{color:#60d7e1;font-size:10px;font-weight:900;letter-spacing:.2em}#"+RECEIPT_ID+" h1{font:400 38px Georgia,serif;color:#efdba4;margin:8px 0 4px}#"+RECEIPT_ID+" .sub{color:#ae9654;font-size:11px;letter-spacing:.16em}#"+RECEIPT_ID+" .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:25px 0}#"+RECEIPT_ID+" section{padding:15px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025)}#"+RECEIPT_ID+" h2{margin:0 0 10px;color:#e0bf63;font-size:11px;letter-spacing:.12em}#"+RECEIPT_ID+" li{margin-bottom:8px;color:#cfd4d2;line-height:1.45;font-size:13px}#"+RECEIPT_ID+" button{min-height:46px;padding:0 22px;border:1px solid rgba(214,169,58,.65);background:#48370f;color:#f5d877;font-weight:900;letter-spacing:.1em;cursor:pointer}@media(max-width:900px){#"+RECEIPT_ID+" .grid{grid-template-columns:1fr}}";
   document.head.appendChild(s);
 }
 function card(id,label,img,state,focus){return '<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(id)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(img)+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label)+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
 function board(rt,p){
   const f=p&&p.cue&&p.cue.focus||null;
-  if(rt.beatId===AFTERMATH)return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+esc(p&&p.cue&&p.cue.objective||"Retrieve the package.")+'</div></div><div class="sc-scene-board-33900__actors" data-count="2">'+card("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png","PRESENT",f==="academy_kakashi")+card(MI,"MASKED INTERCEPTOR","NPC/masked_interceptor.png","DEAD",f===MI)+'</div>';
+  if(rt.beatId===AFTERMATH){
+    const removed=!!(rt.localContext&&rt.localContext.kakashiScene06W2CMiCardRemoved);
+    const actors=card("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png","PRESENT",f==="academy_kakashi")+(removed?"":card(MI,"MASKED INTERCEPTOR","NPC/masked_interceptor.png","DEAD",f===MI));
+    return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+esc(p&&p.cue&&p.cue.objective||"Retrieve the package.")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+(removed?1:2)+'">'+actors+'</div>';
+  }
   if(rt.beatId===SCENE07)return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">KONOHA ROOFTOP · NIGHT</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+REPORT_OBJECTIVE+'</div></div><div class="sc-scene-board-33900__actors" data-count="2">'+card("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png","REPORTING",f==="academy_kakashi")+card(ANBU,"ANBU OPERATIVE","NPC/konoha_anbu.png","RECEIVING REPORT",f===ANBU)+'</div>';
-  return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">HOKAGE ADMINISTRATION · NIGHT</div></div><div class="sc-scene-board-33900__actors" data-count="4">'+card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE",f===MINATO)+card(ANBU,"ANBU OPERATIVE","NPC/konoha_anbu.png","PRESENT",f===ANBU)+card(AMT,"ANBU MARKED TARGET","NPC/anbu_marked_target.png","ALIVE",f===AMT)+card(PS,"PACKAGE SMUGGLER","NPC/package_smuggler.png","ALIVE",f===PS)+'</div><div style="position:absolute;left:50%;bottom:22%;transform:translateX(-50%);padding:8px 12px;border:1px solid rgba(214,169,58,.55);background:rgba(4,8,12,.9);color:#e6c65e;font-size:10px;font-weight:900;letter-spacing:.12em">RECOVERED PACKAGE · HIDDEN OPERATION</div>';
+  return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">HOKAGE ADMINISTRATION · NIGHT</div></div><div class="sc-scene-board-33900__actors" data-count="4">'+card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE",f===MINATO)+card(ANBU,"ANBU OPERATIVE","NPC/konoha_anbu.png","PRESENT",f===ANBU)+card(AMT,"ANBU MARKED TARGET","NPC/anbu_marked_target.png","ALIVE",f===AMT)+card(PS,"PACKAGE SMUGGLER","NPC/package_smuggler.png","ALIVE",f===PS)+'</div><div class="sc-kakashi-w2c-package-status">RECOVERED PACKAGE · HIDDEN OPERATION</div>';
 }
 function setBackdrop(stage,path){stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+path.replace(/"/g,'%22')+'")';stage.style.backgroundPosition="center";stage.style.backgroundSize="cover";stage.style.backgroundRepeat="no-repeat";}
 function render(){
   if(typeof document==="undefined")return false;
   const rt=active();if(!rt||![AFTERMATH,SCENE07,SCENE08].includes(rt.beatId))return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer,p=sequence(rt);if(!p)return false;installStyle();
+  const stageKey=rt.beatId===SCENE08?"office":rt.beatId===SCENE07?"report":"aftermath";
+  layer.dataset.scKakashiW2cStage=stageKey;
   setBackdrop(stage,rt.beatId===AFTERMATH?SAKURA_BG:rt.beatId===SCENE07?ROOFTOP_BG:OFFICE_BG);
-  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;b.setAttribute("aria-hidden","true");stage.appendChild(b);}b.innerHTML=board(rt,p);
+  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;b.setAttribute("aria-hidden","true");stage.appendChild(b);}b.dataset.w2cStage=stageKey;b.innerHTML=board(rt,p);
   const text=layer.querySelector(".sc-story-text");if(text)text.textContent=p.cue.text;const name=layer.querySelector(".sc-story-name");if(name){name.textContent=p.cue.kind==="dialogue"?p.cue.speaker||"":"";name.style.display=p.cue.kind==="dialogue"?"":"none";}const kicker=layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent=rt.beatId===SCENE07?"ANBU REPORT · ACADEMY KAKASHI":rt.beatId===SCENE08?"HOKAGE'S OFFICE · HIDDEN OPERATION":"NARRATION · ACADEMY KAKASHI";return true;
 }
 let animationRunning=false;
@@ -221,15 +237,30 @@ function showQaOutcome(rt=active()){
   if(!selected||selected==="LETHAL_ATTEMPT_KILLED"){removeQaOutcome();return false;}
   let n=document.getElementById(QA_OUTCOME_ID);if(!n){n=document.createElement("div");n.id=QA_OUTCOME_ID;n.style.cssText="position:fixed;right:18px;bottom:18px;z-index:119999;padding:10px 12px;border:1px solid rgba(97,220,229,.68);background:rgba(2,8,12,.94);color:#d6edf0;font:700 11px/1.35 system-ui,sans-serif;letter-spacing:.05em;box-shadow:0 10px 30px rgba(0,0,0,.45);pointer-events:none";document.body.appendChild(n);}n.textContent="QA · "+selected.replace(/^LETHAL_ATTEMPT_/,"")+" · continuation pending Writing #226";return true;
 }
+function removeDeadMiCardAfterKill(rt,stage){
+  if(!rt||!confirmedKill()||typeof document==="undefined")return false;
+  const boardNode=stage&&stage.querySelector?stage.querySelector("."+BOARD_CLASS):null;
+  const mi=boardNode&&boardNode.querySelector?boardNode.querySelector('[data-actor-id="'+MI+'"]'):null;
+  if(!mi){rt.localContext={...(rt.localContext||{}),kakashiScene06W2CMiCardRemoved:true};save();return false;}
+  setTimeout(function(){
+    if(!confirmedKill())return;
+    mi.classList.add("sc-kakashi-mi-death-drop-35770");
+    setTimeout(function(){
+      rt.localContext={...(rt.localContext||{}),kakashiScene06W2CMiCardRemoved:true};save();
+      try{mi.remove();}catch(_error){}
+    },640);
+  },180);
+  return true;
+}
 function beginConfirmedKill(){
   const rt=active();if(!rt||rt.beatId!==SOURCE_HOLD||!confirmedKill())return false;
   removeQaOutcome();
   const ledger=killLedger();if(!ledger||ledger.success!==true)return false;
-  rt.localContext={...(rt.localContext||{}),[CURSOR_A]:0};save();
-  if(typeof document==="undefined"){rt.beatId=AFTERMATH;save();return true;}
+  rt.localContext={...(rt.localContext||{}),[CURSOR_A]:0,kakashiScene06W2CMiCardRemoved:false};save();
+  if(typeof document==="undefined"){rt.localContext.kakashiScene06W2CMiCardRemoved=true;rt.beatId=AFTERMATH;save();return true;}
   if(animationRunning)return true;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;installStyle();animationRunning=true;
   const old=stage.querySelector(".sc-kakashi-kill-35770");if(old)old.remove();const n=document.createElement("div");n.className="sc-kakashi-kill-35770";n.innerHTML='<img class="kak" src="Assets/Academy Student/academy_kakashi.png" alt=""><img class="mi" src="NPC/masked_interceptor.png" alt=""><div class="flash"></div><div class="slash"></div><div class="black"></div>';stage.appendChild(n);
-  setTimeout(function(){try{n.remove();}catch(_error){}animationRunning=false;rt.beatId=AFTERMATH;save();try{renderStoryScenePresentationLayer();}catch(_error){}},940);return true;
+  setTimeout(function(){try{n.remove();}catch(_error){}animationRunning=false;rt.beatId=AFTERMATH;save();try{renderStoryScenePresentationLayer();}catch(_error){}removeDeadMiCardAfterKill(rt,stage);},940);return true;
 }
 function wipe(next){
   if(typeof document==="undefined")return next();
@@ -306,7 +337,7 @@ function installOutcomeWatchdog(){
   return true;
 }
 function ensure(){if(hooks()){installBrowserFinalCueCapture();installOutcomeWatchdog();return;}if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
-function diagnostics(){const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null,checks={patchId:PATCH_ID==="alpha_kakashi_w2c_ending_35770_v4_2026_09_18",authorities:AUTHORITY.scene06==="820917031000c15e62f0a4cea7535397d3ad9e50"&&AUTHORITY.scene07==="67a3859a5862032eeb97955abf4865392cb4a97a"&&AUTHORITY.scene08==="275667ff8b65d5d7e9252164f7552676339a9086",aftermathExact:AFTERMATH_CUES.length===11&&AFTERMATH_CUES[0].text==="Petals drift across the stone."&&AFTERMATH_CUES[10].text==="Kakashi leaves the Sakura tree behind.",scene07Exact:SCENE07_CUES.length===23&&SCENE07_CUES[16].text==="I killed her."&&SCENE07_CUES[19].text==="That was my choice.",scene08Exact:SCENE08_CUES.length===33&&SCENE08_CUES[20].text==="And killed one of us on the way."&&SCENE08_CUES[32].text==="I won’t have trouble with that.",beats:!!m&&[AFTERMATH,SCENE07,SCENE08,RECEIPT,EXIT].every(x=>m.has(x)),deathBeforeAnimation:killLedger.toString().includes("confirmedKill")&&beginConfirmedKill.toString().includes("killLedger"),hiddenKnowledgeBoundary:commitHiddenReview.toString().includes("kakashiKnowledgeGranted:false"),receiptSeparate:openReceipt.toString().includes("document.body.appendChild"),konohaExit:completeToKonoha.toString().includes('openOverlay("village")'),finalCuePostDelegate:globalThis.advanceStoryScene.toString().includes("confirmedKillPresentationStarted"),browserFinalCueCapture:installBrowserFinalCueCapture.toString().includes("stopImmediatePropagation")&&installBrowserFinalCueCapture.toString().includes("p.atEnd!==true"),directScene06Entrypoint:typeof globalThis.beginAcademyKakashiConfirmedKill35770==="function",confirmedKillWatchdog:installOutcomeWatchdog.toString().includes("beginConfirmedKill")&&installOutcomeWatchdog.toString().includes("120"),nonKillLocalQa:showQaOutcome.toString().includes("continuation pending Writing #226"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};}
+function diagnostics(){const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null,checks={patchId:PATCH_ID==="alpha_kakashi_w2c_ending_35770_v5_2026_09_18",authorities:AUTHORITY.scene06==="820917031000c15e62f0a4cea7535397d3ad9e50"&&AUTHORITY.scene07==="67a3859a5862032eeb97955abf4865392cb4a97a"&&AUTHORITY.scene08==="275667ff8b65d5d7e9252164f7552676339a9086",aftermathExact:AFTERMATH_CUES.length===11&&AFTERMATH_CUES[0].text==="Petals drift across the stone."&&AFTERMATH_CUES[10].text==="Kakashi leaves the Sakura tree behind.",scene07Exact:SCENE07_CUES.length===23&&SCENE07_CUES[16].text==="I killed her."&&SCENE07_CUES[19].text==="That was my choice.",scene08Exact:SCENE08_CUES.length===33&&SCENE08_CUES[20].text==="And killed one of us on the way."&&SCENE08_CUES[32].text==="I won’t have trouble with that.",beats:!!m&&[AFTERMATH,SCENE07,SCENE08,RECEIPT,EXIT].every(x=>m.has(x)),deathBeforeAnimation:killLedger.toString().includes("confirmedKill")&&beginConfirmedKill.toString().includes("killLedger"),miPostKillCardDrop:removeDeadMiCardAfterKill.toString().includes("sc-kakashi-mi-death-drop-35770")&&installStyle.toString().includes("miCardDrop35770"),officeNarrativeStaging:installStyle.toString().includes('data-sc-kakashi-w2c-stage=\\\"office\\\"')&&installStyle.toString().includes('data-w2c-stage=\\\"office\\\"')&&board.toString().includes("sc-kakashi-w2c-package-status"),hiddenKnowledgeBoundary:commitHiddenReview.toString().includes("kakashiKnowledgeGranted:false"),receiptSeparate:openReceipt.toString().includes("document.body.appendChild"),konohaExit:completeToKonoha.toString().includes('openOverlay("village")'),finalCuePostDelegate:globalThis.advanceStoryScene.toString().includes("confirmedKillPresentationStarted"),browserFinalCueCapture:installBrowserFinalCueCapture.toString().includes("stopImmediatePropagation")&&installBrowserFinalCueCapture.toString().includes("p.atEnd!==true"),directScene06Entrypoint:typeof globalThis.beginAcademyKakashiConfirmedKill35770==="function",confirmedKillWatchdog:installOutcomeWatchdog.toString().includes("beginConfirmedKill")&&installOutcomeWatchdog.toString().includes("120"),nonKillLocalQa:showQaOutcome.toString().includes("continuation pending Writing #226"),browserGoldenClaimed:false};const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};}
 globalThis.beginAcademyKakashiConfirmedKill35770=beginConfirmedKill;
 globalThis.showAcademyKakashiW2CResolverOutcomeQa35770=showQaOutcome;
 globalThis.enterAcademyKakashiScene07W2CK35770=enter07;
