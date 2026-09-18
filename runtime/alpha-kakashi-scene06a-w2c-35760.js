@@ -283,7 +283,7 @@ function resolveLethalAttempt(rt=active()){
   const dispatched=CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN_ID,receiptId:receiptId,state:{resolverResults:{[BINDING]:providerBridge(factual)}},context:{sceneRef:SCENE_ID,originId:ORIGIN_ID,storySceneInstanceId:String(rt.instanceId||"")}});
   if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"kakashi_scene06aw2c_semantic_dispatch_failed"};
   const selected=String(factual.receipt&&factual.receipt.selectedOutcomeRef||"");
-  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CFactualReceiptId:String(factual.receipt&&factual.receipt.storyFactualResolverReceiptId||""),kakashiScene06AW2COutcomeRef:selected,[CURSOR_KEY]:CUES.length-1};
+  rt.localContext={...(rt.localContext||{}),kakashiScene06AW2CFactualReceiptId:String(factual.receipt&&factual.receipt.storyFactualResolverReceiptId||""),kakashiScene06AW2COutcomeRef:selected,[CURSOR_KEY]:sequenceFor35760(rt).length-1};
   rt.beatId=HOLD_BEAT;save();
   const presentationStarted=triggerResolvedOutcomePresentation(rt,selected);
   return{success:true,type:"kakashi_scene06aw2c_resolved_scene7_pending",selectedOutcomeRef:selected,occurrenceId:String(rt.localContext.kakashiScene06AW2CResolutionOccurrenceId||occurrenceId),storyFactualResolverReceiptId:String(factual.receipt&&factual.receipt.storyFactualResolverReceiptId||""),beatId:HOLD_BEAT,scene7Pending:!presentationStarted,confirmedKillPresentationStarted:presentationStarted};
