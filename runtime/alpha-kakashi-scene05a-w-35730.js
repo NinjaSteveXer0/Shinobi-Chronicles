@@ -3,7 +3,7 @@
 //
 // Verbatim Writing authority:
 // Documentation/Story/Academy_Kakashi_Origin_Scene_05A_W_Kakashi_Wins_Verbatim_Lock_2026-09-18.md
-// commit 7dd9f248003604c15674d5e8eafb56abea029b1b
+// commit c1121c588f8fb44393baebe8b9edb5624a38f3e3
 //
 // Entry is ONLY the Scene 04A Kakashi-vs-Masked-Interceptor 1-v-1 victory.
 // This module consumes the committed Battle result, preserves the exact
@@ -20,8 +20,8 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_2026_09_18";
-const AUTHORITY="7dd9f248003604c15674d5e8eafb56abea029b1b";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v2_2026_09_18";
+const AUTHORITY="c1121c588f8fb44393baebe8b9edb5624a38f3e3";
 const STORY_UNIT_REF="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const RETURN_BEAT="kak_scene04a_stop_assassin_return";
@@ -46,17 +46,20 @@ const CUES=Object.freeze([
   Object.freeze({cueId:"scene05aw_04",kind:"narration",text:"Searching.",focusActorRef:"academy_kakashi"}),
   Object.freeze({cueId:"scene05aw_05",kind:"narration",text:"Package Smuggler fled with the package while they fought.",focusActorRef:"academy_kakashi"}),
   Object.freeze({cueId:"scene05aw_06",kind:"narration",text:"ANBU Marked Target went the other way.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_07",kind:"narration",text:"If Kakashi ended this quickly, neither trail is dead yet.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_08",kind:"narration",text:"He can still move.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_09",kind:"narration",text:"Still choose which one to follow.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_10",kind:"narration",text:"But every second he spends here gives both men more distance.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_11",kind:"narration",text:"Kakashi looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_12",kind:"narration",text:"She lies where he put her.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_13",kind:"narration",text:"The package is getting farther away.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_14",kind:"narration",text:"The original target is getting farther away.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_15",kind:"narration",text:"And the woman at Kakashi's feet is still his problem to resolve.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_16",kind:"narration",text:"He cannot do everything.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_17",kind:"narration",text:"Not anymore.",focusActorRef:"academy_kakashi"})
+  Object.freeze({cueId:"scene05aw_07",kind:"narration",text:"Kakashi scans the street.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_08",kind:"narration",text:"One trail cuts toward the package.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_09",kind:"narration",text:"The other leads after the original target.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_10",kind:"narration",text:"Neither has vanished yet.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_11",kind:"narration",text:"Not completely.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_12",kind:"narration",text:"But both are getting farther away.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_13",kind:"narration",text:"Kakashi looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_14",kind:"narration",text:"She lies where he put her.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_15",kind:"narration",text:"Every second he spends here makes the choice harder.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_16",kind:"narration",text:"The package.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_17",kind:"narration",text:"The original target.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_18",kind:"narration",text:"Or the woman at his feet.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_19",kind:"narration",text:"He cannot deal with all three.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_20",kind:"narration",text:"Not anymore.",focusActorRef:"academy_kakashi"})
 ]);
 
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
@@ -244,12 +247,12 @@ function ensureHooks35730(){if(installHooks35730())return;if(typeof setTimeout==
 function diagnostics(){
   const def=scene(),ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null,win=def&&def.beatMap instanceof Map?def.beatMap.get(WIN_BEAT):null,choice=def&&def.beatMap instanceof Map?def.beatMap.get(CHOICE_BEAT):null;
   const exact=[
-    "Masked Interceptor hits the stone beneath the Sakura tree.","Kakashi lands a few steps away.","His eye is already off her.","Searching.","Package Smuggler fled with the package while they fought.","ANBU Marked Target went the other way.","If Kakashi ended this quickly, neither trail is dead yet.","He can still move.","Still choose which one to follow.","But every second he spends here gives both men more distance.","Kakashi looks back at Masked Interceptor.","She lies where he put her.","The package is getting farther away.","The original target is getting farther away.","And the woman at Kakashi's feet is still his problem to resolve.","He cannot do everything.","Not anymore."
+    "Masked Interceptor hits the stone beneath the Sakura tree.","Kakashi lands a few steps away.","His eye is already off her.","Searching.","Package Smuggler fled with the package while they fought.","ANBU Marked Target went the other way.","Kakashi scans the street.","One trail cuts toward the package.","The other leads after the original target.","Neither has vanished yet.","Not completely.","But both are getting farther away.","Kakashi looks back at Masked Interceptor.","She lies where he put her.","Every second he spends here makes the choice harder.","The package.","The original target.","Or the woman at his feet.","He cannot deal with all three.","Not anymore."
   ];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_2026_09_18",
-    authorityPinned:AUTHORITY==="7dd9f248003604c15674d5e8eafb56abea029b1b",
-    exactSeventeenNarrationCues:CUES.length===17&&JSON.stringify(CUES.map(x=>x.text))===JSON.stringify(exact)&&CUES.every(x=>x.kind==="narration"),
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v2_2026_09_18",
+    authorityPinned:AUTHORITY==="c1121c588f8fb44393baebe8b9edb5624a38f3e3",
+    exactTwentyNarrationCues:CUES.length===20&&JSON.stringify(CUES.map(x=>x.text))===JSON.stringify(exact)&&CUES.every(x=>x.kind==="narration"),
     victoryEntryOnly:validVictory.toString().includes('resultState==="player_side_victory"')&&routeVictoryReturn35730.toString().includes("kakashiScene04ABattleIntentResolved"),
     exactTurnGate:fastPursuit({resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:4})===true&&fastPursuit({resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:5})===false,
     pursuitRemovedAtFivePlus:materializeChoices35730.toString().includes("if(fastPursuit())"),
