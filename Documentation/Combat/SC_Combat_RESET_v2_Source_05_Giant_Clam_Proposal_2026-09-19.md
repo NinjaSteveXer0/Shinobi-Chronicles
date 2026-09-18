@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 05 UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 05 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Source baseline:** `13dec46d50761e0bf190d354b61865ce5db5db7f`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
@@ -109,3 +109,23 @@ No account-wide collection bonus proposed.
 If approved, this replaces the older generic `illusion_lattice` + old False Horizon/Crushing Shell package rather than stacking with it.
 
 **PROPOSED.**
+
+---
+
+## Stephen sign-off / closure
+
+Stephen has explicitly signed off this RESET v2 Giant Clam package.
+
+This document is now binding Combat design authority for Source 05.
+
+Preserve:
+- ATTACHED +7 Genjutsu;
+- manifested source-specific Mirage Field;
+- per-hostile false-position read instead of RNG accuracy/miss;
+- real-Clam locating as counterplay;
+- Shift the Horizon once/Battle;
+- Close the Shell 65% guard with immediate Mirage Field collapse;
+- Crushing Shell ATK20;
+- no Entity PL transfer.
+
+**design closed != implemented != runtime validated != Golden GREEN**
