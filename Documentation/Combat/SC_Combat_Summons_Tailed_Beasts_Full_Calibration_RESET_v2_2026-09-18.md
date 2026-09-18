@@ -178,27 +178,44 @@ It does not automatically negate:
 
 unless explicitly stated.
 
-### Poison damage law
+### Poison profile law
 
-**Poison is not a status-only effect in Shinobi Chronicles.**
+**Poison is not a generic fixed-tick DoT template in Shinobi Chronicles.**
 
-For damaging poison-delivery actions:
+A damaging poison-delivery action must do two distinct things:
 
-1. resolve the action's **immediate authored damage**;
-2. then establish / refresh the `poisoned` condition;
-3. the `poisoned` condition continues dealing its own Battle-PL damage on its authored ticks.
+1. resolve meaningful **immediate authored damage**;
+2. establish a **source-authored Poison Profile** that creates a real tactical problem if left untreated.
 
-Therefore:
+The runtime key `poisoned` / condition type `poison` is a **classification**, not a universal promise that every poison means "2 damage for 3 turns".
 
-> **Poison hurts now and keeps hurting afterward.**
+Named/specialist poisons may author different profiles, including:
 
-Examples:
+- exertion-triggered Battle-PL loss;
+- escalating damage;
+- movement numbness;
+- attack-output suppression;
+- chakra-expression penalties;
+- control/finisher prerequisites;
+- cure pressure;
+- another exact poison-specific consequence.
 
-- a poison bite can deal normal Attack-PL damage, then apply Poison;
-- a poison cloud can deal immediate direct Battle-PL poison damage, then apply Poison;
-- Poison Immunity prevents the `poisoned` condition from establishing but does **not** erase the raw/immediate damage portion unless that exact effect separately says so.
+The source must state:
 
-Do not author a damaging Poison skill that merely places a status marker with zero immediate gameplay impact unless Stephen explicitly approves it as a non-damaging exception.
+- immediate damage;
+- what being Poisoned actually does;
+- how long it lasts;
+- what actions make it worse, if any;
+- how it is cured/countered;
+- whether reapplication refreshes, escalates or is rejected.
+
+Canonical shorthand:
+
+> **Poison should force a decision, not just add tiny numbers to the end of a turn.**
+
+A baseline generic poison resolver may exist for ordinary low-importance sources, but **do not use that baseline as the design ceiling for named poison specialists such as Ibuse**.
+
+Poison Immunity prevents the poison profile / poison condition from establishing, but does **not** erase an attack's immediate raw damage unless that exact immunity separately says so.
 
 ### Item Find
 
