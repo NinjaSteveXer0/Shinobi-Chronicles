@@ -8,8 +8,8 @@
 Consumes existing Registry/PL anchors:
 
 - `key_gero` — **Gerotora** — Stats `34 / 20 / 8 / 62 / 38 / 28 / 32` — PL **53**
-- `mirage_clam` — **Giant Clam** — Stats `44 / 24 / 10 / 52 / 32 / 74 / 58` — PL **66**
-- `mk_enma` — **Monkey King Enma** — Stats `68 / 78 / 62 / 24 / 50 / 30 / 84` — PL **77**
+- `mirage_clam` — **Giant Clam** — current source Base PL **76**
+- `mk_enma` — **Monkey King Enma** — current source Base PL **83**
 
 No Entity PL transfers wholesale to a controller.
 
@@ -38,73 +38,65 @@ If a future Story occurrence manifests Gerotora as an independently targetable p
 
 ## Proposed assisted actions
 
-### `key_gero_seal_integrity_read` — **Seal Integrity Check**
+Gerotora has **exactly two Battle abilities**.
 
-INFO / self or one exact compatible seal source
+No diagnostic button. No repair-vs-prevention vocabulary. No extra seal-management buttons.
 
-> Check whether a compatible seal is stable, weakened or being tampered with.
+### `key_gero_open_the_seal` — **Open the Seal**
 
-- deals no damage;
-- records only legitimately available seal-condition evidence;
-- does not reveal an unknown full formula, hidden identity or unrelated Fūinjutsu Knowledge.
+SUPPORT / linked Tailed-Beast seal
 
-### `key_gero_emergency_reinforcement` — **Emergency Reseal**
-
-SUPPORT / exact compatible hosted-beast seal / once per Battle
-
-> Reinforce a weakening beast seal and stop one forced-release escalation.
-
-- remove one exact compatible source-owned seal-destabilisation / forced-release escalation marker;
-- does not heal Battle PL;
-- does not erase legitimate already-committed History;
-- does not permanently strengthen the seal;
-- does not grant control over the hosted beast.
-
-### `key_gero_keyed_interlock` — **Keyed Interlock**
-
-DEFENSE / relationship / once per Battle
-
-> Pre-arm the seal against hostile tampering. Block the next attempt to force it open.
-
-- one compatible hostile seal-opening / forced-control / extraction-adjacent attempt must resolve as blocked by the keyed interlock;
-- this is **preventive protection**, not repair: it does not remove an instability marker that has already been committed;
-- `Emergency Reseal` remains the reactive option for an already destabilised seal;
-- voluntary host/beast cooperation is not blocked;
-- not universal extraction immunity.
-
-### `key_gero_measured_release` — **Measured Release**
-
-SETUP / self / once per Battle
-
-> Open the seal only as far as your current beast relationship already allows.
-
-Requirements:
-
-- exact compatible hosted-beast seal;
-- legitimate current hosted source;
-- the actor already has the required learned Skill/access.
+> **Force the linked Tailed-Beast seal open. You can use Tailed-Beast powers you have already unlocked.**
 
 Effect:
 
-- establish one `gerotora_measured_release` marker;
-- the actor's next exact compatible hosted-beast Skill that is blocked **only by the seal-aperture state** may resolve;
-- this does not grant a new Skill, new relationship level, beast cooperation, Stats, PL, transformation or second action;
-- marker is consumed by that action and expires at Battle end.
+- set the exact linked seal state to **OPEN**;
+- while OPEN, the actor may use exact Tailed-Beast Skills / transformations they already legitimately own and satisfy;
+- does **not** teach a new Skill;
+- does **not** create cooperation;
+- does **not** add the beast's PL or Stats;
+- consumes the actor's normal action opportunity.
+
+Player card text:
+
+**OPEN THE SEAL**  
+**Force the seal open. Use Tailed-Beast powers you have already unlocked.**
+
+### `key_gero_close_the_seal` — **Close the Seal**
+
+SUPPORT / linked Tailed-Beast seal
+
+> **Force the linked Tailed-Beast seal closed. Tailed-Beast powers stop until the seal is opened again.**
+
+Effect:
+
+- set the exact linked seal state to **CLOSED**;
+- immediately end any current seal-dependent release/cloak/access state that requires the seal to remain open;
+- while CLOSED, seal-dependent Tailed-Beast Skills / transformations cannot be started;
+- does not undo damage or effects that already resolved;
+- does not erase Chronicle history;
+- consumes the actor's normal action opportunity.
+
+Player card text:
+
+**CLOSE THE SEAL**  
+**Force the seal closed. Tailed-Beast powers stop until it is opened again.**
 
 ## Relationship package
 
-No passive stats.
+Gerotora provides **no passive Stats and no attack package**.
 
-Gerotora's value is **seal control**:
+His entire Battle purpose is deliberately simple:
 
-- diagnose;
-- repair an already destabilised seal with `Emergency Reseal`;
-- pre-arm the seal against the next hostile tamper/open attempt with `Keyed Interlock`;
-- deliberately open a legitimate existing access route.
+**Open the Seal** ↔ **Close the Seal**
+
+That is the player decision.
+
+No third seal button is added merely to make the kit look larger.
 
 Player-facing shorthand:
 
-> **Gerotora manages Tailed-Beast seals. Emergency Reseal repairs an active destabilisation; Keyed Interlock blocks the next hostile tamper attempt before it succeeds; Measured Release carefully opens access you have already earned.**
+> **Gerotora controls one thing: the Tailed-Beast seal. Open it to use powers you already have. Close it to shut those powers off.**
 
 ---
 
@@ -118,7 +110,7 @@ Gengetsu's Giant Clam produces the mist used for Demonic Illusion: Steaming Mult
 
 Full independent manifested Summon:
 
-- own PL66 Battle ledger;
+- own PL76 Battle ledger;
 - independently targetable;
 - own action opportunity;
 - no PL/Stat donation to the summoner.
@@ -235,7 +227,7 @@ Enma has two explicit Battle modes.
 ### MONKEY MODE
 
 - independent targetable Summon;
-- own PL77 ledger;
+- own PL83 ledger;
 - own action opportunity.
 
 ### ADAMANTINE STAFF MODE
