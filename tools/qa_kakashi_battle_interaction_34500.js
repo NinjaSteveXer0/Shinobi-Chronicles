@@ -158,6 +158,21 @@ const diagnostics=JSON.parse(JSON.stringify(delegated.context.runAcademyKakashiB
 assert.strictEqual(diagnostics.pass,true,`34500 diagnostics failed: ${(diagnostics.failed||[]).join(",")}`);
 assert.strictEqual(diagnostics.browserGoldenClaimed,false);
 
+// TEMP reward-owner introspection for the installed-browser zero-reward report.
+for(const needle of [
+  "function claimVictoryRewardsFromOverlay",
+  "function continueAfterVictory",
+  "function renderVictory",
+  "alpha-victory-code-screen",
+  "REWARDS",
+  "pendingRewards",
+  "rewardSummary",
+  "battleRewards"
+]){
+  const at=gameSrc.indexOf(needle);
+  if(at>=0)console.log("\n--- GAME SRC "+needle+" @ "+at+" ---\n"+gameSrc.slice(Math.max(0,at-4000),at+14000));
+}
+
 console.log(JSON.stringify({
   pass:true,
   patch:"34500-v5",
