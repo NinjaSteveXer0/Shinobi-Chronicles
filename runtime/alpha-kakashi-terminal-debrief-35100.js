@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v4_2026_09_18";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v5_2026_09_18";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -128,7 +128,7 @@ function supplementCurrentBattleCapture(){
 }
 function committedPackageState(){
   const l=local();if(!l)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
-  const candidateIds=[l.kakashiScene05ALPackageOccurrenceId,l.kakashiDirectPickpocketPackageOccurrenceId,l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
+  const candidateIds=[l.kakashiScene06W2CKillLedgerOccurrenceId,l.kakashiScene06AW2CResolutionOccurrenceId,l.kakashiScene05ALPackageOccurrenceId,l.kakashiDirectPickpocketPackageOccurrenceId,l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
   for(const id of candidateIds){
     const row=occurrence(id),fact=factOf(row),pkg=fact&&fact.packageState||{};
     if(!row||!pkg.objectRef||String(pkg.objectRef)!==PACKAGE_REF||!pkg.currentHolderClass)continue;
@@ -328,7 +328,7 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v4_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v5_2026_09_18",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
