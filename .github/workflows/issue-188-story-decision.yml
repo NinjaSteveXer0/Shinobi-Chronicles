@@ -104,8 +104,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-31' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260918-31";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-32' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260918-32";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -124,7 +124,7 @@ jobs:
           grep -Fq 'alpha-kakashi-scene04a-35710.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-objective-presentation-35720.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-scene05a-w-35730.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
-          grep -Fq 'c1121c588f8fb44393baebe8b9edb5624a38f3e3' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq '30a8cf3a16f57fbe5e65f55bc9dc1de076a21522' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'alpha-kakashi-battle-development-35740.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'kak_origin_battle_mi_victory_reward_v1' runtime/alpha-kakashi-origin-rewards-34800.js

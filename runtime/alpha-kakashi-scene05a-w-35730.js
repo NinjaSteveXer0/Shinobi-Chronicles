@@ -3,13 +3,14 @@
 //
 // Verbatim Writing authority:
 // Documentation/Story/Academy_Kakashi_Origin_Scene_05A_W_Kakashi_Wins_Verbatim_Lock_2026-09-18.md
-// commit c1121c588f8fb44393baebe8b9edb5624a38f3e3
+// commit 30a8cf3a16f57fbe5e65f55bc9dc1de076a21522
 //
 // Entry is ONLY the Scene 04A Kakashi-vs-Masked-Interceptor 1-v-1 victory.
 // This module consumes the committed Battle result, preserves the exact
-// 1-4-turn pursuit window / 5+ cutoff, classifies Masked Interceptor before
-// exposing the post-Battle lethal/disposition menu, and presents the approved
-// text verbatim. Successor branch prose/resolvers remain fail-closed until
+// 1-3-turn Package-Smuggler pursuit window / 4+ cutoff, classifies Masked
+// Interceptor before exposing the post-Battle lethal/disposition menu, and
+// presents the exact turn-gated narration. Direct AMT pursuit is deliberately
+// absent. Successor branch prose/resolvers remain fail-closed until
 // separately locked; no extra dialogue, debrief or terminal inference exists.
 // ============================================================================
 (function installAcademyKakashiScene05AW35730(){
@@ -20,8 +21,8 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v2_2026_09_18";
-const AUTHORITY="c1121c588f8fb44393baebe8b9edb5624a38f3e3";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v3_2026_09_18";
+const AUTHORITY="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522";
 const STORY_UNIT_REF="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const RETURN_BEAT="kak_scene04a_stop_assassin_return";
@@ -39,28 +40,41 @@ const ENTRY_REQUEST="kakashi_scene05aw_victory_entry_35730";
 const STYLE_ID="sc-kakashi-scene05aw-35730-style";
 const BOARD_CLASS="sc-kakashi-scene05aw-board-35730";
 
-const CUES=Object.freeze([
+const COMMON_CUES=Object.freeze([
   Object.freeze({cueId:"scene05aw_01",kind:"narration",text:"Masked Interceptor hits the stone beneath the Sakura tree.",focusActorRef:"masked_interceptor"}),
   Object.freeze({cueId:"scene05aw_02",kind:"narration",text:"Kakashi lands a few steps away.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_03",kind:"narration",text:"His eye is already off her.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_04",kind:"narration",text:"Searching.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_05",kind:"narration",text:"Package Smuggler fled with the package while they fought.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_06",kind:"narration",text:"ANBU Marked Target went the other way.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_07",kind:"narration",text:"Kakashi scans the street.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_08",kind:"narration",text:"One trail cuts toward the package.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_09",kind:"narration",text:"The other leads after the original target.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_10",kind:"narration",text:"Neither has vanished yet.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_11",kind:"narration",text:"Not completely.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_12",kind:"narration",text:"But both are getting farther away.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_13",kind:"narration",text:"Kakashi looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_14",kind:"narration",text:"She lies where he put her.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_15",kind:"narration",text:"Every second he spends here makes the choice harder.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_16",kind:"narration",text:"The package.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_17",kind:"narration",text:"The original target.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_18",kind:"narration",text:"Or the woman at his feet.",focusActorRef:"masked_interceptor"}),
-  Object.freeze({cueId:"scene05aw_19",kind:"narration",text:"He cannot deal with all three.",focusActorRef:"academy_kakashi"}),
-  Object.freeze({cueId:"scene05aw_20",kind:"narration",text:"Not anymore.",focusActorRef:"academy_kakashi"})
+  Object.freeze({cueId:"scene05aw_03",kind:"narration",text:"For a moment, the street is still.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_04",kind:"narration",text:"Then his eye moves past her.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_05",kind:"narration",text:"Toward the route Package Smuggler took.",focusActorRef:"academy_kakashi"})
 ]);
+const FAST_CUES=Object.freeze([
+  Object.freeze({cueId:"scene05aw_fast_06",kind:"narration",text:"A figure cuts across the far end of the street.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_07",kind:"narration",text:"Package Smuggler.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_08",kind:"narration",text:"Still moving.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_09",kind:"narration",text:"The package is still with him.",focusActorRef:"package_smuggler"}),
+  Object.freeze({cueId:"scene05aw_fast_10",kind:"narration",text:"Kakashi has not lost him yet.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_11",kind:"narration",text:"Not quite.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_12",kind:"narration",text:"He looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_fast_13",kind:"narration",text:"She lies where he put her.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_fast_14",kind:"narration",text:"Every second he spends here gives Package Smuggler more distance.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_15",kind:"narration",text:"The package is still within reach.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_fast_16",kind:"narration",text:"But only if Kakashi moves now.",focusActorRef:"academy_kakashi"})
+]);
+const SLOW_CUES=Object.freeze([
+  Object.freeze({cueId:"scene05aw_slow_06",kind:"narration",text:"The street ahead is empty.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_07",kind:"narration",text:"Kakashi searches the rooftops.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_08",kind:"narration",text:"The alleys.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_09",kind:"narration",text:"The next junction.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_10",kind:"narration",text:"Nothing.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_11",kind:"narration",text:"Package Smuggler had too much time.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_12",kind:"narration",text:"The package is gone with him.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_13",kind:"narration",text:"Kakashi looks back at Masked Interceptor.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_slow_14",kind:"narration",text:"She lies beneath the Sakura tree.",focusActorRef:"masked_interceptor"}),
+  Object.freeze({cueId:"scene05aw_slow_15",kind:"narration",text:"The chase is over.",focusActorRef:"academy_kakashi"}),
+  Object.freeze({cueId:"scene05aw_slow_16",kind:"narration",text:"What happens to her is the only decision left here.",focusActorRef:"masked_interceptor"})
+]);
+const FAST_SEQUENCE=Object.freeze([...COMMON_CUES,...FAST_CUES]);
+const SLOW_SEQUENCE=Object.freeze([...COMMON_CUES,...SLOW_CUES]);
 
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_error){return null;}}
@@ -70,7 +84,7 @@ function validVictory(row=result()){
   return !!row&&row.resultState==="player_side_victory"&&String(row.battleConfigId||"")===BATTLE_CONFIG&&String(row.bindingRef||"")===BINDING&&String(row.sourceAnchorRef||"")===SOURCE_ANCHOR;
 }
 function turnCount(row=result()){return Number.isInteger(Number(row&&row.playerActionOpportunityCount))?Number(row.playerActionOpportunityCount):NaN;}
-function fastPursuit(row=result()){const turns=turnCount(row);return validVictory(row)&&turns>=1&&turns<=4;}
+function fastPursuit(row=result()){const turns=turnCount(row);return validVictory(row)&&turns>=1&&turns<=3;}
 function escapeHTML(value){return String(value??"").replace(/[&<>\"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function cssUrlValue(value){return `url("${String(value||"").replace(/\\/g,"\\\\").replace(/\"/g,'\\\"')}")`; }
 function currentMiStateClass(){
@@ -116,7 +130,6 @@ function materializeChoices35730(){
   const rows=[];
   if(fastPursuit()){
     rows.push(choiceRow("scene05aw_go_after_package_smuggler","GO AFTER PACKAGE SMUGGLER","BRANCH_A"));
-    rows.push(choiceRow("scene05aw_go_after_anbu_marked_target","GO AFTER ANBU MARKED TARGET","BRANCH_B"));
   }
   rows.push(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
   rows.push(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
@@ -134,13 +147,18 @@ function routeVictoryReturn35730(){
   if(!(rt.localContext&&rt.localContext.kakashiScene04ABattleIntentResolved===true))return{success:true,routed:false,reason:"scene04a_battle_semantic_return_not_yet_committed"};
   const classification=classifyMi35730(row);if(!classification||classification.success!==true)return classification||{success:false,reason:"kakashi_scene05aw_mi_classification_missing"};
   const turns=turnCount(row);if(!Number.isFinite(turns)||turns<1)return{success:false,reason:"kakashi_scene05aw_turn_count_missing"};
-  rt.localContext={...(rt.localContext||{}),kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:String(row.battleOccurrenceId||""),kakashiScene05AWTurnCount:turns,kakashiScene05AWPursuitEligible:turns<=4,kakashiScene05AWMiStateClass:classification.stateClass,[CURSOR_KEY]:0};
-  rt.beatId=WIN_BEAT;save();return{success:true,routed:true,beatId:WIN_BEAT,turnCount:turns,pursuitEligible:turns<=4,miStateClass:classification.stateClass};
+  rt.localContext={...(rt.localContext||{}),kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:String(row.battleOccurrenceId||""),kakashiScene05AWTurnCount:turns,kakashiScene05AWPursuitEligible:turns<=3,kakashiScene05AWMiStateClass:classification.stateClass,[CURSOR_KEY]:0};
+  rt.beatId=WIN_BEAT;save();return{success:true,routed:true,beatId:WIN_BEAT,turnCount:turns,pursuitEligible:turns<=3,miStateClass:classification.stateClass};
+}
+function narrationSequence(rt=active()){
+  const local=rt&&rt.localContext&&typeof rt.localContext.kakashiScene05AWPursuitEligible==="boolean"?rt.localContext.kakashiScene05AWPursuitEligible:null;
+  return (local===null?fastPursuit():local)?FAST_SEQUENCE:SLOW_SEQUENCE;
 }
 function performance(rt=active()){
+  const sequence=narrationSequence(rt);
   const raw=rt&&rt.localContext?Number(rt.localContext[CURSOR_KEY]):0;
-  const index=Number.isInteger(raw)?Math.max(0,Math.min(CUES.length-1,raw)):0;
-  return{sequence:CUES,index,cue:CUES[index],atEnd:index>=CUES.length-1};
+  const index=Number.isInteger(raw)?Math.max(0,Math.min(sequence.length-1,raw)):0;
+  return{sequence,index,cue:sequence[index],atEnd:index>=sequence.length-1};
 }
 function isWinNarration(rt=active()){return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===WIN_BEAT;}
 function isWinFamily(rt=active()){return !!rt&&rt.sceneId===SCENE_ID&&(rt.beatId===WIN_BEAT||rt.beatId===CHOICE_BEAT);}
@@ -246,22 +264,33 @@ function ensureHooks35730(){if(installHooks35730())return;if(typeof setTimeout==
 
 function diagnostics(){
   const def=scene(),ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null,win=def&&def.beatMap instanceof Map?def.beatMap.get(WIN_BEAT):null,choice=def&&def.beatMap instanceof Map?def.beatMap.get(CHOICE_BEAT):null;
-  const exact=[
-    "Masked Interceptor hits the stone beneath the Sakura tree.","Kakashi lands a few steps away.","His eye is already off her.","Searching.","Package Smuggler fled with the package while they fought.","ANBU Marked Target went the other way.","Kakashi scans the street.","One trail cuts toward the package.","The other leads after the original target.","Neither has vanished yet.","Not completely.","But both are getting farther away.","Kakashi looks back at Masked Interceptor.","She lies where he put her.","Every second he spends here makes the choice harder.","The package.","The original target.","Or the woman at his feet.","He cannot deal with all three.","Not anymore."
+  const common=[
+    "Masked Interceptor hits the stone beneath the Sakura tree.","Kakashi lands a few steps away.","For a moment, the street is still.","Then his eye moves past her.","Toward the route Package Smuggler took."
   ];
+  const exactFast=[...common,
+    "A figure cuts across the far end of the street.","Package Smuggler.","Still moving.","The package is still with him.","Kakashi has not lost him yet.","Not quite.","He looks back at Masked Interceptor.","She lies where he put her.","Every second he spends here gives Package Smuggler more distance.","The package is still within reach.","But only if Kakashi moves now."
+  ];
+  const exactSlow=[...common,
+    "The street ahead is empty.","Kakashi searches the rooftops.","The alleys.","The next junction.","Nothing.","Package Smuggler had too much time.","The package is gone with him.","Kakashi looks back at Masked Interceptor.","She lies beneath the Sakura tree.","The chase is over.","What happens to her is the only decision left here."
+  ];
+  const fastProbe={resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:3};
+  const slowProbe={...fastProbe,playerActionOpportunityCount:4};
+  const menuSource=materializeChoices35730.toString();
+  const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v2_2026_09_18",
-    authorityPinned:AUTHORITY==="c1121c588f8fb44393baebe8b9edb5624a38f3e3",
-    exactTwentyNarrationCues:CUES.length===20&&JSON.stringify(CUES.map(x=>x.text))===JSON.stringify(exact)&&CUES.every(x=>x.kind==="narration"),
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v3_2026_09_18",
+    authorityPinned:AUTHORITY==="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522",
+    exactFastNarration:JSON.stringify(FAST_SEQUENCE.map(x=>x.text))===JSON.stringify(exactFast),
+    exactSlowNarration:JSON.stringify(SLOW_SEQUENCE.map(x=>x.text))===JSON.stringify(exactSlow),
     victoryEntryOnly:validVictory.toString().includes('resultState==="player_side_victory"')&&routeVictoryReturn35730.toString().includes("kakashiScene04ABattleIntentResolved"),
-    exactTurnGate:fastPursuit({resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:4})===true&&fastPursuit({resultState:"player_side_victory",battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,playerActionOpportunityCount:5})===false,
-    pursuitRemovedAtFivePlus:materializeChoices35730.toString().includes("if(fastPursuit())"),
-    exactDispositionLabels:materializeChoices35730.toString().includes("TAKE HER BACK TO ANBU")&&materializeChoices35730.toString().includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
+    exactTurnGate:fastPursuit(fastProbe)===true&&fastPursuit(slowProbe)===false,
+    packagePursuitOnly:menuSource.includes("GO AFTER PACKAGE SMUGGLER")&&!menuSource.includes("GO AFTER ANBU MARKED TARGET"),
+    exactDispositionLabels:menuSource.includes("TAKE HER BACK TO ANBU")&&menuSource.includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
     lethalModeFromClassification:lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&lethalPresentation.toString().includes("ATTEMPT TO KILL HER"),
     miClassifiedBeforeMenu:routeVictoryReturn35730.toString().includes("classifyMi35730"),
     fightBackdropPreserved:win&&win.environmentRef&&win.environmentRef.assetId===FIGHT_BACKDROP_ID&&choice&&choice.environmentRef&&choice.environmentRef.assetId===FIGHT_BACKDROP_ID,
     objectiveExact:OBJECTIVE==="Retrieve the package.",
-    noDialogue:CUES.every(x=>!x.speakerName),
+    noDialogue:allCues.every(x=>!x.speakerName&&x.kind==="narration"),
     returnHookInstalled:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(x=>x&&x.requestId===ENTRY_REQUEST),
     successorsFailClosed:successorPending("BRANCH_A").success===false,
     browserGoldenClaimed:false
@@ -273,5 +302,5 @@ function diagnostics(){
 const installed=installSurface35730();if(!installed||installed.success!==true)throw new Error(`kakashi_scene05aw_surface_install_failed:${installed&&installed.reason||"unknown"}`);
 ensureHooks35730();
 globalThis.runAcademyKakashiScene05AW35730Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:CUES.length,objective:OBJECTIVE,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,winBeatId:WIN_BEAT,choiceBeatId:CHOICE_BEAT,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,cueCount:FAST_SEQUENCE.length,slowCueCount:SLOW_SEQUENCE.length,objective:OBJECTIVE,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,winBeatId:WIN_BEAT,choiceBeatId:CHOICE_BEAT,browserGoldenClaimed:false});
 })();

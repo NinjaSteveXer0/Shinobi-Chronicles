@@ -53,8 +53,9 @@ load("runtime/alpha-kakashi-scene05a-w-35730.js");
 
 const MOD=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 assert(MOD,"Scene 05A-W module missing");
-assert.strictEqual(MOD.authority,"c1121c588f8fb44393baebe8b9edb5624a38f3e3");
-assert.strictEqual(MOD.cueCount,20);
+assert.strictEqual(MOD.authority,"30a8cf3a16f57fbe5e65f55bc9dc1de076a21522");
+assert.strictEqual(MOD.cueCount,16);
+assert.strictEqual(MOD.slowCueCount,16);
 assert.strictEqual(MOD.objective,"Retrieve the package.");
 assert.strictEqual(MOD.battleConfigId,BATTLE_CONFIG);
 assert.strictEqual(MOD.bindingRef,BINDING);
@@ -63,28 +64,40 @@ assert.strictEqual(MOD.sourceAnchorRef,SOURCE_ANCHOR);
 const diag=globalThis.runAcademyKakashiScene05AW35730Diagnostics();
 assert.strictEqual(diag.pass,true,"Scene 05A-W diagnostics failed: "+JSON.stringify(diag.failed));
 
-const exact=[
+const common=[
   "Masked Interceptor hits the stone beneath the Sakura tree.",
   "Kakashi lands a few steps away.",
-  "His eye is already off her.",
-  "Searching.",
-  "Package Smuggler fled with the package while they fought.",
-  "ANBU Marked Target went the other way.",
-  "Kakashi scans the street.",
-  "One trail cuts toward the package.",
-  "The other leads after the original target.",
-  "Neither has vanished yet.",
-  "Not completely.",
-  "But both are getting farther away.",
-  "Kakashi looks back at Masked Interceptor.",
-  "She lies where he put her.",
-  "Every second he spends here makes the choice harder.",
-  "The package.",
-  "The original target.",
-  "Or the woman at his feet.",
-  "He cannot deal with all three.",
-  "Not anymore."
+  "For a moment, the street is still.",
+  "Then his eye moves past her.",
+  "Toward the route Package Smuggler took."
 ];
+const exactFast=[...common,
+  "A figure cuts across the far end of the street.",
+  "Package Smuggler.",
+  "Still moving.",
+  "The package is still with him.",
+  "Kakashi has not lost him yet.",
+  "Not quite.",
+  "He looks back at Masked Interceptor.",
+  "She lies where he put her.",
+  "Every second he spends here gives Package Smuggler more distance.",
+  "The package is still within reach.",
+  "But only if Kakashi moves now."
+];
+const exactSlow=[...common,
+  "The street ahead is empty.",
+  "Kakashi searches the rooftops.",
+  "The alleys.",
+  "The next junction.",
+  "Nothing.",
+  "Package Smuggler had too much time.",
+  "The package is gone with him.",
+  "Kakashi looks back at Masked Interceptor.",
+  "She lies beneath the Sakura tree.",
+  "The chase is over.",
+  "What happens to her is the only decision left here."
+];
+
 const entry=returnBeat.onEnterConsequences.find(x=>x&&x.requestId==="kakashi_scene05aw_victory_entry_35730");
 assert(entry,"Scene 05A-W victory entry hook missing");
 
@@ -102,7 +115,25 @@ function battleResult(resultState,turns,opts={}){
   };
 }
 
-// Defeat must not enter the victory scene.
+function assertNarration(expected){
+  for(let i=0;i<expected.length;i++){
+    const p=globalThis.getStoryScenePerformance33900();
+    assert(p,"Scene 05A-W performance missing at "+i);
+    assert.strictEqual(p.index,i);
+    assert.strictEqual(p.cue.kind,"narration");
+    assert.strictEqual(p.cue.text,expected[i]);
+    assert.strictEqual(p.cue.speakerName,undefined);
+    if(i<expected.length-1){
+      const out=globalThis.advanceStoryScene();
+      assert.strictEqual(out.success,true,"Narration advance "+i+" failed: "+JSON.stringify(out));
+      assert.strictEqual(active.beatId,WIN_BEAT);
+    }
+  }
+  const transitioned=globalThis.advanceStoryScene();
+  assert.strictEqual(transitioned.success,true);
+  assert.strictEqual(active.beatId,CHOICE_BEAT);
+}
+
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
 active.battleResume.authored=battleResult("opposition_side_victory",3);
@@ -111,59 +142,41 @@ assert.strictEqual(routed.success,true);
 assert.strictEqual(routed.routed,false);
 assert.strictEqual(active.beatId,RETURN_BEAT);
 
-// Four-turn victory enters exact Scene 05A-W and classifies MI without inventing control.
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
-active.battleResume.authored=battleResult("player_side_victory",4);
+active.battleResume.authored=battleResult("player_side_victory",3);
 routed=entry.resolve();
-assert.strictEqual(routed.success,true,"4-turn victory routing failed: "+JSON.stringify(routed));
+assert.strictEqual(routed.success,true,"3-turn victory routing failed: "+JSON.stringify(routed));
 assert.strictEqual(routed.routed,true);
-assert.strictEqual(routed.turnCount,4);
+assert.strictEqual(routed.turnCount,3);
 assert.strictEqual(routed.pursuitEligible,true);
 assert.strictEqual(routed.miStateClass,"DEFEATED_BUT_NOT_CONTROLLED");
 assert.strictEqual(active.beatId,WIN_BEAT);
-
-for(let i=0;i<exact.length;i++){
-  const p=globalThis.getStoryScenePerformance33900();
-  assert(p,"Scene 05A-W performance missing at "+i);
-  assert.strictEqual(p.index,i);
-  assert.strictEqual(p.cue.kind,"narration");
-  assert.strictEqual(p.cue.text,exact[i]);
-  assert.strictEqual(p.cue.speakerName,undefined);
-  if(i<exact.length-1){
-    const out=globalThis.advanceStoryScene();
-    assert.strictEqual(out.success,true,"Narration advance "+i+" failed: "+JSON.stringify(out));
-    assert.strictEqual(active.beatId,WIN_BEAT);
-  }
-}
-let transitioned=globalThis.advanceStoryScene();
-assert.strictEqual(transitioned.success,true);
-assert.strictEqual(active.beatId,CHOICE_BEAT);
+assertNarration(exactFast);
 
 let choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 assert.strictEqual(choiceBeat.environmentRef.assetId,"kakashi_origin_fight_at_sakura_tree");
 let labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
   "GO AFTER PACKAGE SMUGGLER",
-  "GO AFTER ANBU MARKED TARGET",
   "ATTEMPT TO KILL HER",
   "TAKE HER BACK TO ANBU",
   "TAKE HER TO THE UCHIHA POLICE FORCE"
 ]);
-assert.strictEqual(choiceBeat.choices.length,5);
+assert.strictEqual(choiceBeat.choices.length,4);
+assert(!labels.includes("GO AFTER ANBU MARKED TARGET"));
 for(const row of choiceBeat.choices)assert.strictEqual(row.availability().available,true);
 let blocked=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
 assert.strictEqual(blocked.success,false);
 assert.strictEqual(blocked.reason,"kakashi_scene05aw_successor_authority_not_implemented");
 assert.strictEqual(active.beatId,CHOICE_BEAT,"Fail-closed successor must not move Story");
 
-// A committed CONTROLLED_DEFEATED state switches the lethal label to deterministic KILL HER.
 let classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"CONTROLLED_DEFEATED",resultRef:"qa-controlled-mi"
 });
 assert.strictEqual(classified.success,true);
 active.beatId=WIN_BEAT;
-active.localContext.__kakashiScene05AW35730Cursor=19;
+active.localContext={...(active.localContext||{}),kakashiScene05AWPursuitEligible:true,__kakashiScene05AW35730Cursor:15};
 let relabelled=globalThis.advanceStoryScene();
 assert.strictEqual(relabelled.success,true);
 assert.strictEqual(active.beatId,CHOICE_BEAT);
@@ -171,24 +184,21 @@ choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
+assert(!labels.includes("GO AFTER ANBU MARKED TARGET"));
 
-// Five-turn victory removes both pursuit choices entirely, while retaining C/D/E.
 classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-uncontrolled-mi"
 });
 assert.strictEqual(classified.success,true);
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
-active.battleResume.authored=battleResult("player_side_victory",5);
+active.battleResume.authored=battleResult("player_side_victory",4);
 routed=entry.resolve();
 assert.strictEqual(routed.success,true);
 assert.strictEqual(routed.routed,true);
 assert.strictEqual(routed.pursuitEligible,false);
-assert.strictEqual(routed.turnCount,5);
-active.localContext.__kakashiScene05AW35730Cursor=19;
-let fiveTurnTransition=globalThis.advanceStoryScene();
-assert.strictEqual(fiveTurnTransition.success,true);
-assert.strictEqual(active.beatId,CHOICE_BEAT);
+assert.strictEqual(routed.turnCount,4);
+assertNarration(exactSlow);
 choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
@@ -200,7 +210,6 @@ assert.strictEqual(choiceBeat.choices.length,3);
 assert(!labels.includes("GO AFTER PACKAGE SMUGGLER"));
 assert(!labels.includes("GO AFTER ANBU MARKED TARGET"));
 
-// Exact Story constraints remain non-terminal and no automatic debrief exists.
 assert.strictEqual(definition.beatMap.get(WIN_BEAT).exitScene,false);
 assert.strictEqual(choiceBeat.exitScene,false);
 assert.strictEqual(choiceBeat.nextBeatId,null);
@@ -208,10 +217,11 @@ assert(!JSON.stringify([definition.beatMap.get(WIN_BEAT),choiceBeat]).includes("
 assert(saves>0,"Scene 05A-W state was never persisted");
 
 console.log("Academy Kakashi Scene 05A-W 35730 QA: PASS");
-console.log("- exact 20 corrected locked narration cues / no dialogue");
+console.log("- exact 1-3-turn and 4+-turn locked narration variants / no dialogue");
 console.log("- exact fight_at_sakura_tree backdrop / Retrieve the package objective");
 console.log("- victory-only return; defeat never enters 05A-W");
-console.log("- 1-4 turn win exposes both pursuits; 5+ removes both");
+console.log("- 1-3 turn win exposes Package Smuggler pursuit only; 4+ removes pursuit");
+console.log("- direct ANBU Marked Target pursuit is absent from this immediate return");
 console.log("- MI post-resolution classification controls KILL HER vs ATTEMPT TO KILL HER");
 console.log("- ANBU/Uchiha disposition choices preserved");
 console.log("- successor branches fail closed; no automatic debrief or invented continuation");
