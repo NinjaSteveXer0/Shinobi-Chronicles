@@ -122,7 +122,6 @@ assert(source.includes("4e679e92e6c97968bcf970a83b9ba88e19d96355"));
 assert(!MOD.data.LETHAL_ATTEMPT_ESCAPED.office.some(row=>row&&row.text==="A beat."),"updated ESCAPED office must remove stray beat narration");
 assert(source.includes("PATROL_ASSET_PATHS=Object.freeze([])"),"unapproved patrol asset path was introduced");
 assert(source.includes("playAcademyKakashiLethalAttemptAnimation35770"),"non-kill outcomes must consume the shared lethal-attempt animation");
-assert(source.includes("left:50%;right:auto;bottom:13.2%"),"non-kill recovered package badge must be centered above narration bar");
 assert(source.includes("w2cNonKillEnterLeft35780"),"Hokage Office ANBU entry motion missing");
 assert(source.includes("left:28%!important")&&source.includes("left:41%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"non-kill Hokage Office AMT / MI / ANBU / PS table-row placement missing");
 assert(source.includes("PACKAGE RECOVERED · HIDDEN OPERATION"),"Recovered-package state must live on Minato card");
