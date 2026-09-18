@@ -431,7 +431,7 @@ The ANBU cohort demonstrates the current target particularly well: premium mater
 
 - **No Golden Alert.**
 - The strongest human-presence results are **Bandit Leader, Chain-Blade Ronin, Ambush Captain, and Bandit**.
-- **Cipher Handler** and **Elite Missing-Nin** have clear visible environmental writing/calligraphy and therefore fail the locked text discipline absent exact authority.
+- **Cipher Handler** is explicitly exempt from the generic no-random-text concern because Stephen directly confirmed that cipher glyphs/documents are representation-defining storytelling for the archetype. **Elite Missing-Nin** still has a text-discipline defect pending authority.
 - **Iron Maiden** and **Triple Rashomon** are excellent construct cards; Menma's human-presence criterion is not applicable, but their premium material/environment/card-cohesion standard is GREEN.
 - Generic Enemy cards may legitimately use a **single archetype/nameplate label** rather than Title + personal Name; that does not itself violate the text hierarchy rule.
 
@@ -445,10 +445,25 @@ The ANBU cohort demonstrates the current target particularly well: premium mater
 | Bandit Leader | Generic Enemy | **MEETS** | One of the strongest generic-human cards: convincing age, scars, beard/hair, armor wear and hierarchical staging | GREEN | **MEETS** | **GREEN** | Preserve |
 | Beast Handler Rogue | Generic Enemy | NEAR-to-MEETS | Strong handler/wolf dual silhouette, believable outdoor materials and unique paw icon | GREEN | **NEAR** | PASS WITH NOTES | Slight facial/material uplift only if remastered; preserve concept |
 | Chain-Blade Ronin | Generic Enemy | **MEETS** | Excellent mature face, armor wear, chain motion, weapon readability and environmental depth | GREEN | **MEETS** | **GREEN** | Preserve |
-| Cipher Handler | Generic Enemy | NEAR | Strong authored tool/scroll/cipher workspace and premium costume detail | **FAIL — extensive visible writing/glyphs on documents/tags** | **NEAR** | **FAIL — HARD RULE** | Surgical environmental-text cleanup if no exact authority |
+| Cipher Handler | Generic Enemy | NEAR | Strong authored tool/scroll/cipher workspace and premium costume detail | **AUTHORIZED REPRESENTATION TEXT — cipher documents/glyphs are identity-defining environmental storytelling** | **NEAR** | **PASS WITH NOTES** | Preserve cipher-writing language; only remove accidental/unrelated text if it does not serve the Cipher Handler concept |
 | Decoy Assassin | Generic Enemy | NEAR | Strong purple motion language, decoy/escort story read and clear silhouette | GREEN | **NEAR** | PASS WITH NOTES | Humanize face/skin/eyes if remastered; preserve action concept |
 | Elite Missing-Nin | Generic Enemy | **MEETS** raw art | Excellent mature face, armor, cloth/weathering and grounded combat readiness | **FAIL — visible calligraphy/banner text at upper right** | **MEETS** | **FAIL — HARD RULE** | Surgical text cleanup; preserve subject/composition |
 | Escort Breaker | Generic Enemy | NEAR | Strong wire-combat concept, readable target-breaking action and cohesive purple/black battlefield language | GREEN | **NEAR** | PASS WITH NOTES | Facial/material uplift only if remastered |
+
+### Cipher Handler explicit authority clarification — Stephen direct
+
+Stephen clarified that the visible glyphs, encoded documents and cipher-writing environment on **Cipher Handler** are intentional and identity-defining:
+
+> Cipher Handler handles ciphers.
+
+Therefore:
+
+- cipher text/glyphs/documents are **authorized representation content** for this archetype;
+- they are not treated as random generator text merely because they are written marks;
+- the locked no-random-Japanese/text discipline still applies to **unrelated, accidental or semantically irrelevant writing**;
+- do not surgically remove cipher-language elements that communicate the character's role.
+
+**Revised verdict:** PASS WITH NOTES / preserve concept. The remaining note is benchmark/human-presence related, not text compliance.
 
 ### Supplemental-card note
 
