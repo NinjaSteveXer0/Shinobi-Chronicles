@@ -166,11 +166,12 @@ let labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
   "GO AFTER PACKAGE SMUGGLER",
   "GO AFTER ANBU MARKED TARGET",
+  "ATTEMPT TO RESTRAIN HER AND CONTINUE",
   "ATTEMPT TO KILL HER",
   "TAKE HER BACK TO ANBU",
   "TAKE HER TO THE UCHIHA POLICE FORCE"
 ]);
-assert.strictEqual(choiceBeat.choices.length,5);
+assert.strictEqual(choiceBeat.choices.length,6);
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 for(const row of choiceBeat.choices)assert.strictEqual(row.availability().available,true);
 let blocked=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
@@ -207,6 +208,8 @@ labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
+assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Controlled MI must expose deterministic RESTRAIN HER AND CONTINUE");
+assert(!labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Controlled MI must not expose attempted restraint wording");
 const controlledLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
 assert(controlledLethal,"controlled lethal choice missing");
 assert.notStrictEqual(controlledLethal.nextBeatId,"qa_real_scene06","ATTEMPT consumer must not leak into deterministic KILL relabel");
@@ -232,6 +235,7 @@ choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("GO AFTER PACKAGE SMUGGLER"));
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
+assert(labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Turn-4 uncontrolled MI must expose resolver-owned restrain-and-continue");
 
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
@@ -252,6 +256,7 @@ assert.deepStrictEqual(labels,[
 assert.strictEqual(choiceBeat.choices.length,3);
 assert(!labels.includes("GO AFTER PACKAGE SMUGGLER"));
 assert(!labels.includes("GO AFTER ANBU MARKED TARGET"));
+assert(!labels.some(x=>x.includes("RESTRAIN")&&x.includes("CONTINUE")),"Turn-5+ must not expose restrain-and-continue without pursuit");
 
 assert.strictEqual(definition.beatMap.get(WIN_BEAT).exitScene,false);
 assert.strictEqual(choiceBeat.exitScene,false);
@@ -266,5 +271,5 @@ console.log("- victory-only return; defeat never enters 05A-W");
 console.log("- 1-4 MI win exposes both Package Smuggler and ANBU Marked Target pursuit choices");
 console.log("- Package Smuggler -> later AMT preservation is capped at 1-3 PS turns");
 console.log("- MI post-resolution classification controls KILL HER vs ATTEMPT TO KILL HER");
-console.log("- ANBU/Uchiha disposition choices preserved");
+console.log("- ANBU/Uchiha immediate dispositions preserved; 1-4 adds state-aware restrain-and-continue choice only");
 console.log("- downstream wired choice consumers survive Scene 05A-W rematerialization without leaking across ATTEMPT/KILL relabels");
