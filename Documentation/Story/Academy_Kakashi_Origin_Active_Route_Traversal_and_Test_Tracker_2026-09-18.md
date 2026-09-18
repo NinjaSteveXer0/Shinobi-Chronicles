@@ -129,42 +129,57 @@ Immediate transfer remains distinct from restrain-and-continue:
 
 Reusable field-custody semantics are now waiting on CE / Codex / Coordination issue #244 before exact restrain-and-continue scenes are locked.
 
-## Current next action
+## Stop the Assassin — current completion inventory
 
-Rewind to:
+Current binding timing:
+- MI victory in **1–4 turns** -> both Package Smuggler and ANBU Marked Target pursuit options may remain.
+- MI victory on **turn 5+** -> immediate pursuit is closed.
+- PS-first continuation preserves later AMT pursuit only if PS is defeated within **1–3 turns**.
 
-`SCENE_05A_W2 — STOP THE ASSASSIN -> Kakashi Victory -> turn 4+`
+### Writing / Story complete
+- Scene 04A — Kakashi vs Masked Interceptor Battle caller.
+- Scene 05A-L — Kakashi loses, ending at **RETURN TO ANBU** choice.
+- Lethal-intent family after MI victory:
+  - KILLED;
+  - SURVIVED;
+  - INTERRUPTED;
+  - ESCAPED;
+  each authored through ANBU report / hidden Hokage-office continuation.
+- **TAKE HER BACK TO ANBU** immediate-transfer branch authored through terminal Origin closure.
+- **TAKE HER TO THE UCHIHA POLICE FORCE** immediate-transfer branch authored through terminal Origin closure.
+- Fast-win post-MI semantic choice surface approved, including **RESTRAIN HER AND CONTINUE**.
 
-Select the next unconsumed sibling choice:
+### Implemented
+- Immediate MI -> ANBU and MI -> Uchiha Police branches are implemented by Coding generation 47, commit `81ed5b581f119d6f2a186e0502b47fc5c3a9b8cf`; source/headless GREEN; installed-browser validation still required.
+- Corrected 1–4 MI pursuit predicates and 1–3 PS->AMT timing predicates are implemented.
+- **RESTRAIN HER AND CONTINUE** is visible where eligible but its consequence remains deliberately fail-closed pending CE issue #244.
 
-`SCENE_05A_W / CHOICE_01 / BRANCH_D — TAKE HER BACK TO ANBU`
+### Stop the Assassin Writing still outstanding
+1. Rewrite the exact Scene 05A-W player-facing authority so its narration/choice presentation matches the approved **1–4 dual-pursuit** rule and new restrain option; the older 1–3 verbatim file is superseded causally but not yet replaced cleanly.
+2. Complete **Kakashi loses -> RETURN TO ANBU** after Scene 05A-L through debrief / hidden evaluation / Chronicle closure.
+3. Complete **GO AFTER PACKAGE SMUGGLER** from the qualifying post-MI 1–4 state:
+   - pursuit/catch-up scene and resolver;
+   - PS Battle;
+   - post-PS result/disposition surface;
+   - <=3-turn PS victory may preserve AMT;
+   - 4+ closes later AMT pursuit.
+4. Complete **GO AFTER ANBU MARKED TARGET** directly after qualifying MI victory:
+   - PS route closes;
+   - pursuit;
+   - Pakkun entry;
+   - AMT Battle / return;
+   - legal post-AMT disposition and terminal continuation for this package-missing chronology.
+5. Reconcile the lethal scene's fast-win presentation/entry wording with the new 1–4 parent state, including a deterministic **KILL HER** exact branch if `CONTROLLED_DEFEATED` is actually produced.
+6. After CE #244 closes field-secured custody semantics, author **RESTRAIN HER AND CONTINUE**:
+   - MI field-secure continuation;
+   - PS restraint/custody continuation;
+   - accumulated-captive collection;
+   - final all-captive ANBU / Uchiha Police transfers;
+   - mixed live/dead/escaped custody histories as state-driven projections rather than bespoke permutation explosion.
 
-Current Writing production task:
+### Browser validation still outstanding
+- generation-47 immediate ANBU custody branch;
+- generation-47 immediate Uchiha Police custody branch;
+- corrected fast-win 1–4 decision surface;
+- later engineered Dev Tools fast-win coverage once the remaining successor branches exist.
 
-**Author both post-Battle Masked Interceptor custody branches before the next Coding tranche:**
-
-1. `SCENE_05A_W / CHOICE_01 / BRANCH_D — TAKE HER BACK TO ANBU`
-2. `SCENE_05A_W / CHOICE_01 / BRANCH_E — TAKE HER TO THE UCHIHA POLICE FORCE`
-
-Stephen has also corrected the STOP THE ASSASSIN pursuit timing. New binding causal authority:
-
-`Documentation/Story/Academy_Kakashi_Stop_Assassin_1_to_4_Turn_Dual_Pursuit_Fork_Correction_2026-09-18.md`
-
-Correct rule:
-- MI victory in **1–4 turns** -> both Package Smuggler and ANBU Marked Target are immediate pursuit options.
-- Choose Package Smuggler -> defeating PS within **1–3 turns** preserves later AMT pursuit.
-- Choose ANBU Marked Target immediately -> Package Smuggler route closes.
-- MI victory on turn **5+** -> no immediate pursuit remains.
-
-Do not ask Coding to implement this corrected pursuit fork until the two MI custody branches are authored/approved and Scene 05A-W exact player-facing authority is rewritten coherently.
-
-## Resolver-result coverage for Scene 06A-W2C
-
-Authored/locked:
-
-- `LETHAL_ATTEMPT_KILLED`
-- `LETHAL_ATTEMPT_SURVIVED`
-- `LETHAL_ATTEMPT_INTERRUPTED`
-- `LETHAL_ATTEMPT_ESCAPED`
-
-These remain distinct Chronicle histories and must not be collapsed into one another.
