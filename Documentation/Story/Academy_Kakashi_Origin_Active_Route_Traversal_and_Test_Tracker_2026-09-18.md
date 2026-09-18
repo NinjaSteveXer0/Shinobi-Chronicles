@@ -43,13 +43,15 @@ Current production traversal:
   - `ATTEMPT TO KILL HER` / `KILL HER` where lawful;
   - `TAKE HER BACK TO ANBU`;
   - `TAKE HER TO THE UCHIHA POLICE FORCE`.
-- Stephen is currently following the lethal-intent route:
-  - `Scene 6A-W2C — ATTEMPT TO KILL HER`;
-  - current browser-tested resolver result: `LETHAL_ATTEMPT_KILLED`;
-  - Scene 6A-W2C now continues through the confirmed-kill animation/aftermath and black-wipe transition;
-  - `Scene 7A-W2C-K — ANBU Report` is now locked on the rooftop;
-  - `Scene 8A-W2C-K — Hokage's Office` is now locked as the private reaction scene;
-  - current next step is Coding implementation/browser test through the Chronicle Receipt / closing sequence.
+- The `ATTEMPT TO KILL HER` family has now been authored through terminal continuation for all four resolver outcomes:
+  - `LETHAL_ATTEMPT_KILLED`;
+  - `LETHAL_ATTEMPT_SURVIVED`;
+  - `LETHAL_ATTEMPT_INTERRUPTED`;
+  - `LETHAL_ATTEMPT_ESCAPED`.
+- The KILLED / SURVIVED / INTERRUPTED / ESCAPED chains each now have their Scene 06 result, Scene 07 rooftop ANBU report, and Scene 08 Hokage Office continuation locked.
+- Coding has implemented the non-kill continuation family; installed-browser Golden remains open.
+- One surgical runtime correction is currently pending on #237: remove the stray player-facing narration `A beat.` from the ESCAPED Hokage Office scene. This does not reopen Story semantics.
+- The next Writing traversal rewinds to the same Scene 5A-W2 late-victory decision surface and takes the next unconsumed sibling branch: `TAKE HER BACK TO ANBU`.
 
 ## Required later browser test — manual fast-win exposure
 
@@ -104,25 +106,31 @@ For every new scene reached, update this file with:
 
 ## Current next action
 
-Continue from the confirmed-kill end of:
+Rewind to:
 
-`SCENE_06A_W2C — ATTEMPT TO KILL HER`
+`SCENE_05A_W2 — STOP THE ASSASSIN -> Kakashi Victory -> turn 4+`
 
-Current production task:
+Select the next unconsumed sibling choice:
 
-**Coding implements Scene 06A-W2C confirmed-kill continuation -> Scene 07A-W2C-K rooftop ANBU report -> Scene 08A-W2C-K Hokage Office, then Stephen browser-tests this same route through the Chronicle Receipt / terminal Origin ending.**
+`SCENE_05A_W / CHOICE_01 / BRANCH_D — TAKE HER BACK TO ANBU`
 
+Current Writing production task:
 
-## Resolver-result coverage still outstanding for Scene 06A-W2C
+**Author the immediate Scene 06 continuation for TAKE HER BACK TO ANBU, preserving the existing late-victory facts: Package Smuggler/package gone, ANBU Marked Target gone, no pursuit reopening, Masked Interceptor alive in Kakashi's control/custody only if the relevant resolver/state supports it, and no Pakkun.**
 
-Current tested/approved result:
+After that branch reaches its terminal Origin ending, rewind again to Scene 5A-W2 for:
 
-- `LETHAL_ATTEMPT_KILLED` — confirmed-kill continuation written and routed.
+`SCENE_05A_W / CHOICE_01 / BRANCH_E — TAKE HER TO THE UCHIHA POLICE FORCE`
 
-Still untested / unwritten as separate continuations if produced by the resolver:
+Only after the Scene 5A-W2 sibling family is completed should traversal move back to the earlier Scene 3A choice family.
 
+## Resolver-result coverage for Scene 06A-W2C
+
+Authored/locked:
+
+- `LETHAL_ATTEMPT_KILLED`
 - `LETHAL_ATTEMPT_SURVIVED`
 - `LETHAL_ATTEMPT_INTERRUPTED`
 - `LETHAL_ATTEMPT_ESCAPED`
 
-These must not be silently collapsed into the confirmed-kill route.
+These remain distinct Chronicle histories and must not be collapsed into one another.
