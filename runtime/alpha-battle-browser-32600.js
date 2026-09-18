@@ -199,6 +199,38 @@
         font-size:clamp(8px,.58vw,9px)!important;
         line-height:1.4!important;
       }
+
+      /* Keep the active/max Battle PL numerals optically centered in the ring. */
+      .alpha-code-battle-stage .alpha-battle-pl-core{
+        position:absolute!important;
+        inset:0!important;
+        z-index:2!important;
+        display:grid!important;
+        grid-template-columns:auto auto!important;
+        grid-template-rows:auto auto!important;
+        place-content:center!important;
+        align-items:baseline!important;
+        column-gap:2px!important;
+        line-height:1!important;
+        text-align:center!important;
+        transform:translateY(1px)!important;
+      }
+      .alpha-code-battle-stage .alpha-battle-pl-core strong{
+        margin:0!important;
+        font-size:24px!important;
+        line-height:.9!important;
+      }
+      .alpha-code-battle-stage .alpha-battle-pl-core small{
+        margin:0!important;
+        font-size:8px!important;
+        line-height:1!important;
+      }
+      .alpha-code-battle-stage .alpha-battle-pl-core em{
+        grid-column:1 / -1!important;
+        justify-self:center!important;
+        margin-top:4px!important;
+        line-height:1!important;
+      }
     `;
     document.head.appendChild(style);
   }
