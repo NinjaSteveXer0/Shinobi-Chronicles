@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 02 UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 02 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Source baseline:** `69d995bb1a0967d81854227de31819875d98c87e`
@@ -288,12 +288,14 @@ Current runtime contains:
 - `gamakichi_blade_guard` = flat prevention 7;
 - current generic Summon runtime consumes the Character action rather than providing an independent Entity turn.
 
-If Stephen signs off RESET v2 Gamakichi:
+Stephen has signed off RESET v2 Gamakichi.
 
-- preserve the +6 Ninjutsu enhancement concept;
+Therefore:
+
+- preserve the +6 Ninjutsu enhancement as binding attached-source authority;
 - replace the old action palette with this signed-off package;
 - do not stack old and new actions/effects;
 - implement the RESET v2 manifested independent-action semantics downstream;
-- no runtime implementation / validation is claimed by this proposal.
+- no runtime implementation / validation is claimed by this closure.
 
-**design proposed != design closed != implemented != runtime validated != Golden GREEN**
+**design closed != implemented != runtime validated != Golden GREEN**
