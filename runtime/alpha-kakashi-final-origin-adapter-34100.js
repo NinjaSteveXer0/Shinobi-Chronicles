@@ -6,14 +6,16 @@
 // Story/Battle consumer -> Substitution -> Battle interaction -> neutral factual
 // provider -> Kakashi factual state/bindings -> direct Scene 02 Attack/Pickpocket
 // consumer -> sequential post-PS package recovery -> Pakkun interception ->
-// reward adapter -> terminal debrief -> terminal Scene Board asset binding ->
+// reward adapter -> Story-Battle development projection -> terminal debrief -> terminal Scene Board asset binding ->
 // locked Scene 03A consumer -> locked Scene 04A Stop Assassin consumer ->
 // installed-browser Objective presentation acceptance fix -> locked Scene 05A-W
 // victory return consumer.
 //
-// Generation 26 consumes the locked Scene 05A-W Kakashi-victory return,
-// preserves the 1-4-turn pursuit window / 5+ cutoff, and binds the new NPC
-// Battle portrait authority. Browser Golden remains separately unclaimed.
+// Generation 27 consumes installed-browser reward/presentation evidence: exact
+// Kakashi Story-Battle action development now commits through 34800 and projects
+// on Victory, while objective text / PL radial alignment receive presentation
+// polish. Terminal Origin Ryō/items remain debrief-owned. Browser Golden remains
+// separately unclaimed.
 //
 // Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
@@ -24,6 +26,7 @@
 // const BUILD="kakashi-final-20260917-23";
 // const BUILD="kakashi-final-20260917-24";
 // const BUILD="kakashi-final-20260918-25";
+// const BUILD="kakashi-final-20260918-27";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -41,6 +44,7 @@ const DIRECT_OPENING_PATH="runtime/alpha-kakashi-direct-opening-consumer-34710.j
 const POST_PS_RECOVERY_PATH="runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js";
 const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
+const BATTLE_DEVELOPMENT_PATH="runtime/alpha-kakashi-battle-development-35740.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
 const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
 const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
@@ -101,9 +105,13 @@ function loadTerminalDebrief(){
   if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100){loadTerminalSceneBoard();return;}
   appendScript("sc-alpha-kakashi-terminal-debrief-35100-script",TERMINAL_DEBRIEF_PATH,loadTerminalSceneBoard);
 }
+function loadBattleDevelopment(){
+  if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740){loadTerminalDebrief();return;}
+  appendScript("sc-alpha-kakashi-battle-development-35740-script",BATTLE_DEVELOPMENT_PATH,loadTerminalDebrief);
+}
 function loadRewards(){
-  if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800){loadTerminalDebrief();return;}
-  appendScript("sc-alpha-kakashi-origin-rewards-34800-script",REWARD_PATH,loadTerminalDebrief);
+  if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800){loadBattleDevelopment();return;}
+  appendScript("sc-alpha-kakashi-origin-rewards-34800-script",REWARD_PATH,loadBattleDevelopment);
 }
 function loadInterception(){
   if(globalThis.SC_ALPHA_KAKASHI_PAKKUN_INTERCEPTION_35300){loadRewards();return;}
