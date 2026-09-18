@@ -22,7 +22,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v5_2026_09_18";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v6_2026_09_18";
 const AUTHORITY="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522";
 const CAUSAL_AUTHORITY="90b20f565ef010d2b7cfca98c04feece3f7dfcb7";
 const MI_PURSUIT_MAX_TURNS=4;
@@ -129,18 +129,36 @@ function successorPending(branch){
 function choiceRow(choiceId,label,branch){
   return{choiceId,label,nextBeatId:CHOICE_BEAT,availability:()=>({available:true,knownBlocker:null}),knownBlocker:null,consequenceRequests:[{requestId:`kakashi_scene05aw_${branch.toLowerCase()}_pending_35730`,kind:"domain",resolve:()=>successorPending(branch)}]};
 }
+function isWiredChoice35730(row){
+  const requests=row&&Array.isArray(row.consequenceRequests)?row.consequenceRequests:[];
+  return requests.some(function(request){
+    const id=String(request&&request.requestId||"");
+    return !!id&&!id.includes("_pending_35730");
+  });
+}
+function preserveWiredChoice35730(fresh,existing){
+  if(!fresh||!existing||!isWiredChoice35730(existing))return fresh;
+  return{...fresh,
+    nextBeatId:existing.nextBeatId||fresh.nextBeatId,
+    availability:typeof existing.availability==="function"?existing.availability:fresh.availability,
+    knownBlocker:existing.knownBlocker==null?fresh.knownBlocker:existing.knownBlocker,
+    consequenceRequests:existing.consequenceRequests
+  };
+}
 function materializeChoices35730(){
   const def=scene(),beat=def&&def.beatMap instanceof Map?def.beatMap.get(CHOICE_BEAT):null;if(!beat)return false;
+  const existingById=new Map((Array.isArray(beat.choices)?beat.choices:[]).filter(Boolean).map(function(row){return[String(row.choiceId||""),row];}));
   const lethal=lethalPresentation();
   const pursuitEligible=fastPursuit();
   const rows=[];
+  const add=function(row){rows.push(preserveWiredChoice35730(row,existingById.get(String(row.choiceId||""))));};
   if(pursuitEligible){
-    rows.push(choiceRow("scene05aw_go_after_package_smuggler","GO AFTER PACKAGE SMUGGLER","BRANCH_A"));
-    rows.push(choiceRow("scene05aw_go_after_anbu_marked_target","GO AFTER ANBU MARKED TARGET","BRANCH_B"));
+    add(choiceRow("scene05aw_go_after_package_smuggler","GO AFTER PACKAGE SMUGGLER","BRANCH_A"));
+    add(choiceRow("scene05aw_go_after_anbu_marked_target","GO AFTER ANBU MARKED TARGET","BRANCH_B"));
   }
-  rows.push(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
-  rows.push(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
-  rows.push(choiceRow("scene05aw_take_her_to_uchiha_police","TAKE HER TO THE UCHIHA POLICE FORCE","BRANCH_E"));
+  add(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
+  add(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
+  add(choiceRow("scene05aw_take_her_to_uchiha_police","TAKE HER TO THE UCHIHA POLICE FORCE","BRANCH_E"));
   beat.choices=rows;
   const rt=active();if(rt&&rt.localContext){
     rt.localContext.kakashiScene05AWLethalPresentation=lethal.label;
@@ -303,7 +321,8 @@ function diagnostics(){
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v5_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v6_2026_09_18",
+    downstreamConsumerPreservation:preserveWiredChoice35730({choiceId:"x",nextBeatId:"pending",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_pending_35730"}]},{choiceId:"x",nextBeatId:"real",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"real_consumer"}]}).nextBeatId==="real",
     causalAuthorityPinned:CAUSAL_AUTHORITY==="90b20f565ef010d2b7cfca98c04feece3f7dfcb7",
     authorityPinned:AUTHORITY==="30a8cf3a16f57fbe5e65f55bc9dc1de076a21522",
     exactFastNarration:JSON.stringify(FAST_SEQUENCE.map(x=>x.text))===JSON.stringify(exactFast),
