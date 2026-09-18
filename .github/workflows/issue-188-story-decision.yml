@@ -6,6 +6,7 @@ on:
     paths:
       - 'runtime/alpha-origin-scenes-32900-integrator.js'
       - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100-core.js'
       - 'runtime/alpha-kakashi-factual-state-commit-34120.js'
@@ -71,6 +72,7 @@ jobs:
         run: |
           node --check runtime/alpha-origin-scenes-32900-integrator.js
           node --check runtime/alpha-story-decision-realisation-34000.js
+          node --check runtime/alpha-story-scene-board-33900.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100-core.js
           node --check runtime/alpha-kakashi-factual-state-commit-34120.js
@@ -120,8 +122,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-42' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260918-42";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260918-43' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260918-43";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -158,7 +160,7 @@ jobs:
           grep -Fq '851244e7b5a0911ee7faddd44923115294a0e4a7' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq '5c6389d8c4bc53f27bf55cf269a2b66ee5e3848c' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'b52ed9670ddc369fb115d3a61147c496fc75155f' runtime/alpha-kakashi-w2c-nonkill-35780.js
-          grep -Fq '99c876dbb29b6ebe43ab6fb4610254db4cfd33ed' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '4e679e92e6c97968bcf970a83b9ba88e19d96355' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'beginAcademyKakashiResolvedOutcome35780' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'PATROL_ASSET_PATHS=Object.freeze([])' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'installBrowserFinalCueCapture' runtime/alpha-kakashi-w2c-ending-35770.js
@@ -166,6 +168,14 @@ jobs:
           grep -Fq 'beginAcademyKakashiConfirmedKill35770' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'installOutcomeWatchdog' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'miCardDrop35770' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'left:50%;right:auto;bottom:13.2%' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'left:50%;right:auto;bottom:13.2%' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'kakashiMiEnterRightward35710' runtime/alpha-kakashi-scene04a-35710.js
+          grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'speakerLabel' runtime/alpha-story-scene-board-33900.js
           grep -Fq 'sc-kakashi-w2c-package-status' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'kakashiStateExitRight35710' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'BREAKING AWAY' runtime/alpha-kakashi-scene04a-35710.js

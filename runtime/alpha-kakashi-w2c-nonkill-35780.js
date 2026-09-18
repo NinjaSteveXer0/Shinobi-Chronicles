@@ -18,7 +18,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_w2c_nonkill_35780_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_w2c_nonkill_35780_v1_2026_09_18";
+const PATCH_ID="alpha_kakashi_w2c_nonkill_35780_v2_2026_09_18";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_HOLD="kak_scene06a_w2c_scene7_pending";
@@ -1057,7 +1057,7 @@ const DATA=Object.freeze({
     "authorities": {
       "scene06": "5c6389d8c4bc53f27bf55cf269a2b66ee5e3848c",
       "scene07": "b52ed9670ddc369fb115d3a61147c496fc75155f",
-      "scene08": "99c876dbb29b6ebe43ab6fb4610254db4cfd33ed"
+      "scene08": "4e679e92e6c97968bcf970a83b9ba88e19d96355"
     },
     "aftermath": [
       {
@@ -1429,10 +1429,6 @@ const DATA=Object.freeze({
         "text": "I’m alive."
       },
       {
-        "kind": "narration",
-        "text": "A beat."
-      },
-      {
         "kind": "dialogue",
         "speaker": "MASKED INTERCEPTOR",
         "text": "I’m allowed to enjoy that."
@@ -1730,19 +1726,22 @@ function installStyle(){
   "@keyframes w2cNonKillExitRight35780{0%{opacity:.82;transform:translateX(0) scale(.96)}100%{opacity:0;transform:translateX(70vw) rotate(4deg) scale(.93)}}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-chronicle-layout{position:absolute!important;left:3.4%!important;top:13%!important;width:min(33%,430px)!important;margin:0!important;align-self:start!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-nonkill-stage='office'] .sc-story-panel{max-height:36vh!important}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actors{left:31%!important;right:2%!important;top:7%!important;bottom:20%!important;display:block!important;padding:0!important}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor{position:absolute!important;width:min(14vw,190px)!important;max-height:340px!important}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MINATO+"']{left:38%!important;top:-5%!important;width:min(18vw,245px)!important;max-height:420px!important;z-index:5}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+ANBU+"']{left:0!important;bottom:0!important;z-index:3}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MI+"']{left:22%!important;bottom:-1%!important;z-index:4}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+AMT+"']{right:15%!important;bottom:-1%!important;z-index:2}"+
-  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+PS+"']{right:0!important;bottom:-1%!important;z-index:2}"+
-  ".sc-kakashi-w2c-nonkill-package{position:absolute;right:4.5%;bottom:8.8%;padding:8px 12px;border:1px solid rgba(214,169,58,.55);background:rgba(4,8,12,.9);color:#e6c65e;font-size:10px;font-weight:900;letter-spacing:.12em;z-index:6}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actors{left:0!important;right:0!important;top:0!important;bottom:0!important;display:block!important;padding:0!important}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor{position:absolute!important;width:min(13.5vw,180px)!important;max-height:320px!important}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MINATO+"']{left:40.5%!important;top:3%!important;width:min(19vw,260px)!important;max-height:440px!important;z-index:6}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+ANBU+"']{left:21%!important;bottom:16.8%!important;z-index:4}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+MI+"']{left:35%!important;bottom:16.8%!important;z-index:5}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+AMT+"']{left:60%!important;bottom:16.8%!important;z-index:3}"+
+  "."+BOARD_CLASS+"[data-stage='office'] .sc-scene-board-33900__actor[data-actor-id='"+PS+"']{left:74%!important;bottom:16.8%!important;z-index:3}"+
+  "."+BOARD_CLASS+" .sc-w2c-nonkill-enter-left{animation:w2cNonKillEnterLeft35780 500ms cubic-bezier(.18,.76,.24,1) both!important}"+
+  "@keyframes w2cNonKillEnterLeft35780{0%{opacity:0;transform:translateX(-18vw) scale(.94);filter:brightness(.38) blur(2px)}100%{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}"+
+  "."+BOARD_CLASS+" .sc-w2c-nonkill-enter-left.is-focus{animation-name:w2cNonKillEnterLeftFocus35780}@keyframes w2cNonKillEnterLeftFocus35780{0%{opacity:0;transform:translateX(-18vw) scale(.95)}100%{opacity:1;transform:translateX(0) scale(1)}}"+
+  ".sc-kakashi-w2c-nonkill-package{position:absolute;left:50%;right:auto;bottom:13.2%;transform:translateX(-50%);padding:8px 12px;border:1px solid rgba(214,169,58,.55);background:rgba(4,8,12,.9);color:#e6c65e;font-size:10px;font-weight:900;letter-spacing:.12em;z-index:7;white-space:nowrap}"+
   "#"+RECEIPT_ID+"{position:fixed;inset:0;z-index:120000;display:grid;place-items:center;padding:32px;background:radial-gradient(circle at 50% 12%,rgba(35,56,70,.42),rgba(2,6,10,.98) 60%);color:#eee6d2}"+
   "#"+RECEIPT_ID+" .card{width:min(980px,94vw);max-height:90vh;overflow:auto;padding:32px;border:1px solid rgba(214,169,58,.55);background:linear-gradient(155deg,rgba(9,16,22,.99),rgba(3,7,11,.99));box-shadow:0 30px 100px #000}"+
   "#"+RECEIPT_ID+" h1{font:400 38px Georgia,serif;color:#efdba4;margin:8px 0 4px}#"+RECEIPT_ID+" .eye{color:#60d7e1;font-size:10px;font-weight:900;letter-spacing:.2em}#"+RECEIPT_ID+" .sub{color:#ae9654;font-size:11px;letter-spacing:.16em}"+
   "#"+RECEIPT_ID+" .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:25px 0}#"+RECEIPT_ID+" section{padding:15px;border:1px solid rgba(255,255,255,.09);background:rgba(255,255,255,.025)}#"+RECEIPT_ID+" h2{margin:0 0 10px;color:#e0bf63;font-size:11px;letter-spacing:.12em}#"+RECEIPT_ID+" li{margin-bottom:8px;color:#cfd4d2;line-height:1.45;font-size:13px}#"+RECEIPT_ID+" button{min-height:46px;padding:0 22px;border:1px solid rgba(214,169,58,.65);background:#48370f;color:#f5d877;font-weight:900;letter-spacing:.1em;cursor:pointer}"+
-  "@media(prefers-reduced-motion:reduce){."+BOARD_CLASS+" .sc-w2c-nonkill-exit-right{animation:none!important;opacity:0!important;transform:translateX(70vw)!important}}@media(max-width:900px){#"+RECEIPT_ID+" .grid{grid-template-columns:1fr}}";
+  "@media(prefers-reduced-motion:reduce){."+BOARD_CLASS+" .sc-w2c-nonkill-exit-right{animation:none!important;opacity:0!important;transform:translateX(70vw)!important}."+BOARD_CLASS+" .sc-w2c-nonkill-enter-left{animation:none!important}}@media(max-width:900px){#"+RECEIPT_ID+" .grid{grid-template-columns:1fr}}";
   document.head.appendChild(s);return true;
 }
 function card(id,label,img,state,focus,extra){
@@ -1770,7 +1769,16 @@ function board(rt,p){
     return'<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">KONOHA ROOFTOP · NIGHT</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+REPORT_OBJECTIVE+'</div></div><div class="sc-scene-board-33900__actors" data-count="2">'+card("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png","REPORTING",focus==="academy_kakashi","")+card(ANBU,"ANBU OPERATIVE","NPC/konoha_anbu.png","RECEIVING REPORT",focus===ANBU,"")+'</div>';
   }
   const focus=focusForCue(cue,MI),officeExit=d.officeExitText&&cue&&cue.text===d.officeExitText?"sc-w2c-nonkill-exit-right":"";
-  return'<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">HOKAGE ADMINISTRATION · NIGHT</div></div><div class="sc-scene-board-33900__actors" data-count="5">'+card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE",focus===MINATO,"")+card(ANBU,"ANBU OPERATIVE","NPC/konoha_anbu.png","PRESENT",focus===ANBU,"")+card(MI,"MASKED INTERCEPTOR","NPC/masked_interceptor.png",d.stateLabel,focus===MI,officeExit)+card(AMT,"ANBU MARKED TARGET","NPC/anbu_marked_target.png","ALIVE",focus===AMT,"")+card(PS,"PACKAGE SMUGGLER","NPC/package_smuggler.png","ALIVE",focus===PS,"")+'</div><div class="sc-kakashi-w2c-nonkill-package">RECOVERED PACKAGE · HIDDEN OPERATION</div>';
+  const entryIndex=p.rows.findIndex(function(row){return row&&row.text==="The ANBU operative enters.";});
+  const anbuVisible=entryIndex<0||p.index>=entryIndex,anbuExtra=entryIndex>=0&&p.index===entryIndex?"sc-w2c-nonkill-enter-left":"";
+  const officeActors=[
+    card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE",focus===MINATO,""),
+    anbuVisible?card(ANBU,"ANBU OPERATIVE","NPC/konoha_anbu.png","PRESENT",focus===ANBU,anbuExtra):"",
+    card(MI,"MASKED INTERCEPTOR","NPC/masked_interceptor.png",d.stateLabel,focus===MI,officeExit),
+    card(AMT,"ANBU MARKED TARGET","NPC/anbu_marked_target.png","ALIVE",focus===AMT,""),
+    card(PS,"PACKAGE SMUGGLER","NPC/package_smuggler.png","ALIVE",focus===PS,"")
+  ].join("");
+  return'<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">HOKAGE ADMINISTRATION · NIGHT</div></div><div class="sc-scene-board-33900__actors" data-count="'+(anbuVisible?5:4)+'">'+officeActors+'</div><div class="sc-kakashi-w2c-nonkill-package">RECOVERED PACKAGE · HIDDEN OPERATION</div>';
 }
 function setBackdrop(stage,path){stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+String(path).replace(/"/g,"%22")+'")';stage.style.backgroundPosition="center";stage.style.backgroundSize="cover";stage.style.backgroundRepeat="no-repeat";}
 function render(){
@@ -1780,7 +1788,7 @@ function render(){
   setBackdrop(stage,rt.beatId===AFTERMATH?SAKURA_BG:rt.beatId===SCENE07?ROOFTOP_BG:OFFICE_BG);
   let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;b.setAttribute("aria-hidden","true");stage.appendChild(b);}b.dataset.stage=key;b.innerHTML=board(rt,p);
   const text=layer.querySelector(".sc-story-text");if(text)text.textContent=p.cue.text;
-  const name=layer.querySelector(".sc-story-name");if(name){name.textContent=p.cue.kind==="dialogue"?p.cue.speaker||"":"";name.style.display=p.cue.kind==="dialogue"?"":"none";}
+  const name=layer.querySelector(".sc-story-name");if(name){name.textContent=p.cue.kind==="dialogue"?p.cue.speaker||"":p.cue.kind==="record"?"SHINOBI RECORD":"NARRATION";name.style.display="block";}
   const kicker=layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent=p.cue.kind==="record"?"SHINOBI RECORD UPDATED":rt.beatId===SCENE07?"ANBU REPORT · ACADEMY KAKASHI":rt.beatId===SCENE08?"HOKAGE'S OFFICE · HIDDEN OPERATION":"NARRATION · ACADEMY KAKASHI";
   return true;
 }
@@ -1795,7 +1803,12 @@ function beginOutcome(outcome){
   const rt=active(),d=cfg(outcome),source=resolverOccurrence();if(!rt||rt.beatId!==SOURCE_HOLD||!d||!source)return false;
   if(String(factOf(source).selectedOutcomeRef||"")!==outcome)return false;
   const ledger=commitOutcomeLedger();if(!ledger||ledger.success!==true)return false;
-  rt.localContext=Object.assign({},rt.localContext||{},{[CURSOR_A]:0});rt.beatId=AFTERMATH;save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return true;
+  rt.localContext=Object.assign({},rt.localContext||{},{[CURSOR_A]:0});save();
+  const enterAfterAttempt=function(){rt.beatId=AFTERMATH;save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}};
+  if(typeof document==="undefined"){enterAfterAttempt();return true;}
+  const animate=globalThis.playAcademyKakashiLethalAttemptAnimation35770;
+  if(typeof animate==="function")return animate(function(){enterAfterAttempt();});
+  enterAfterAttempt();return true;
 }
 function enter07(){const rt=active(),d=cfg();if(!rt||!d)return{success:false,reason:"nonkill_outcome_required"};rt.beatId=SCENE07;rt.localContext=Object.assign({},rt.localContext||{},{[CURSOR_7]:0});save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:SCENE07};}
 function enter08(){const rt=active(),r=commitReport();if(!r||r.success!==true)return r;const h=commitHiddenReview();if(!h||h.success!==true)return h;rt.beatId=SCENE08;rt.localContext=Object.assign({},rt.localContext||{},{[CURSOR_8]:0});save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:SCENE08};}
@@ -1847,14 +1860,14 @@ function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<1
 function diagnostics(){
   const m=scene()&&scene().beatMap instanceof Map?scene().beatMap:null;
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_w2c_nonkill_35780_v1_2026_09_18",
-    allAuthorities:DATA.LETHAL_ATTEMPT_SURVIVED.authorities.scene07==="84894e148e55b57ec74707690ca0b067b6b1e366"&&DATA.LETHAL_ATTEMPT_INTERRUPTED.authorities.scene07==="896b8fcc9d5c5dd6b019d2f51a5fbccdaee66a25"&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene07==="b52ed9670ddc369fb115d3a61147c496fc75155f",
-    exactCueCounts:DATA.LETHAL_ATTEMPT_SURVIVED.aftermath.length===29&&DATA.LETHAL_ATTEMPT_INTERRUPTED.aftermath.length===23&&DATA.LETHAL_ATTEMPT_ESCAPED.aftermath.length===31&&DATA.LETHAL_ATTEMPT_SURVIVED.report.length===29&&DATA.LETHAL_ATTEMPT_INTERRUPTED.report.length===30&&DATA.LETHAL_ATTEMPT_ESCAPED.report.length===30&&DATA.LETHAL_ATTEMPT_SURVIVED.office.length===57&&DATA.LETHAL_ATTEMPT_INTERRUPTED.office.length===46&&DATA.LETHAL_ATTEMPT_ESCAPED.office.length===58,
+    patchId:PATCH_ID==="alpha_kakashi_w2c_nonkill_35780_v2_2026_09_18",
+    allAuthorities:DATA.LETHAL_ATTEMPT_SURVIVED.authorities.scene07==="84894e148e55b57ec74707690ca0b067b6b1e366"&&DATA.LETHAL_ATTEMPT_INTERRUPTED.authorities.scene07==="896b8fcc9d5c5dd6b019d2f51a5fbccdaee66a25"&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene07==="b52ed9670ddc369fb115d3a61147c496fc75155f"&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene08==="4e679e92e6c97968bcf970a83b9ba88e19d96355",
+    exactCueCounts:DATA.LETHAL_ATTEMPT_SURVIVED.aftermath.length===29&&DATA.LETHAL_ATTEMPT_INTERRUPTED.aftermath.length===23&&DATA.LETHAL_ATTEMPT_ESCAPED.aftermath.length===31&&DATA.LETHAL_ATTEMPT_SURVIVED.report.length===29&&DATA.LETHAL_ATTEMPT_INTERRUPTED.report.length===30&&DATA.LETHAL_ATTEMPT_ESCAPED.report.length===30&&DATA.LETHAL_ATTEMPT_SURVIVED.office.length===57&&DATA.LETHAL_ATTEMPT_INTERRUPTED.office.length===46&&DATA.LETHAL_ATTEMPT_ESCAPED.office.length===57,
     approvedChallenge:[DATA.LETHAL_ATTEMPT_SURVIVED,DATA.LETHAL_ATTEMPT_INTERRUPTED,DATA.LETHAL_ATTEMPT_ESCAPED].every(function(d){return d.report.some(function(c){return c.text==="Those weren’t your orders.";})&&d.report.some(function(c){return c.text==="That was my choice.";});}),
     failedLethalNotMercy:commitOutcomeLedger.toString().includes("mercyOutcome:false")&&commitReport.toString().includes("noMercyRewrite:true"),
     pursuitsStayClosed:commitOutcomeLedger.toString().includes("packagePursuitReopened:false")&&commitOutcomeLedger.toString().includes("anbuMarkedTargetPursuitReopened:false"),
     hiddenKnowledgeBoundary:commitHiddenReview.toString().includes("kakashiKnowledgeGranted:false")&&commitHiddenReview.toString().includes("kakashiLearnsHiddenOperationTruth:false"),
-    sharedHistoryPersisted:commitOutcomeLedger.toString().includes("sharedHistoryPersists:true"),
+    sharedHistoryPersisted:commitOutcomeLedger.toString().includes("sharedHistoryPersists:true"),allAttemptsAnimate:beginOutcome.toString().includes("playAcademyKakashiLethalAttemptAnimation35770")&&!beginOutcome.toString().includes("removeDeadMiCardAfterKill"),officeChairStaging:installStyle.toString().includes("left:21%!important")&&installStyle.toString().includes("left:35%!important")&&installStyle.toString().includes("left:60%!important")&&installStyle.toString().includes("left:74%!important")&&installStyle.toString().includes("left:50%;right:auto;bottom:13.2%"),speakerQuickRead:render.toString().includes('name.style.display="block"')&&render.toString().includes('"NARRATION"'),officeEntryMotion:board.toString().includes("The ANBU operative enters.")&&installStyle.toString().includes("w2cNonKillEnterLeft35780"),escapedOfficeRevision:!DATA.LETHAL_ATTEMPT_ESCAPED.office.some(function(row){return row&&row.text==="A beat.";})&&DATA.LETHAL_ATTEMPT_ESCAPED.authorities.scene08==="4e679e92e6c97968bcf970a83b9ba88e19d96355",
     noPatrolPathInvented:PATROL_ASSET_PATHS.length===0,
     beats:!!m&&[AFTERMATH,SCENE07,SCENE08,RECEIPT,EXIT].every(function(x){return m.has(x);}),
     browserGoldenClaimed:false

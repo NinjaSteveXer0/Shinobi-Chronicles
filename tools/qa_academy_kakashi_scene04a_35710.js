@@ -120,6 +120,10 @@ assert.strictEqual(active.localContext.kakashiScene04ABattleResultState,"player_
 assert.strictEqual(active.localContext.kakashiScene04ABattleOccurrenceId,"qa-battle-occ");
 assert(saves>0,"Scene 04A never persisted runtime state");
 
+const scene04Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene04a-35710.js"),"utf8");
+assert(scene04Source.includes("kakashiMiEnterRightward35710"),"MI directional arrival animation missing");
+assert(scene04Source.includes("kakashi-blocks-line"),"Kakashi blocking-line staging missing");
+assert(scene04Source.includes('name.textContent="NARRATION"'),"narration quick-read label missing");
 console.log("Academy Kakashi Scene 04A 35710 QA: PASS");
 console.log("- exact 14 narration cues / no dialogue / no authored choices");
 console.log("- fight_at_sakura_tree backdrop bound before and after PL Battle");
