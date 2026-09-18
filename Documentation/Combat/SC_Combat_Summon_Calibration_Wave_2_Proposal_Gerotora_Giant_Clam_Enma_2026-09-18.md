@@ -1,3 +1,8 @@
+> **SUPERSEDED FOR FULL RECALIBRATION — 2026-09-18**  
+> Stephen directed a complete restart because the prior pass underweighted the required Summon/Tailed-Beast **Enhancement** layer.  
+> New authority: `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md` at commit `72d6b5920d47460e964a7dc656a903404f16526a`.  
+> This file remains historical only until each source is freshly re-approved under RESET v2.
+
 # Shinobi Chronicles — Summon Calibration Wave 2 Proposal: Gerotora, Giant Clam, Monkey King Enma
 
 **Date:** 2026-09-18  
