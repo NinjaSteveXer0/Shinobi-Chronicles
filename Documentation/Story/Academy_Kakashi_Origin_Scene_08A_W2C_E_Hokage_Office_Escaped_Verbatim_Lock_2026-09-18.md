@@ -65,8 +65,6 @@ The smile disappears.
 **MASKED INTERCEPTOR:**  
 “I’m alive.”
 
-A beat.
-
 **MASKED INTERCEPTOR:**  
 “I’m allowed to enjoy that.”
 
