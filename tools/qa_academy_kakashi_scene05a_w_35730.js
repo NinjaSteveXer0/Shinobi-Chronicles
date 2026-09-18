@@ -159,7 +159,11 @@ let classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantC
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"CONTROLLED_DEFEATED",resultRef:"qa-controlled-mi"
 });
 assert.strictEqual(classified.success,true);
-globalThis.renderStoryScenePresentationLayer();
+active.beatId=WIN_BEAT;
+active.localContext.__kakashiScene05AW35730Cursor=16;
+let relabelled=globalThis.advanceStoryScene();
+assert.strictEqual(relabelled.success,true);
+assert.strictEqual(active.beatId,CHOICE_BEAT);
 choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
@@ -178,8 +182,10 @@ assert.strictEqual(routed.success,true);
 assert.strictEqual(routed.routed,true);
 assert.strictEqual(routed.pursuitEligible,false);
 assert.strictEqual(routed.turnCount,5);
-active.beatId=CHOICE_BEAT;
-globalThis.renderStoryScenePresentationLayer();
+active.localContext.__kakashiScene05AW35730Cursor=16;
+let fiveTurnTransition=globalThis.advanceStoryScene();
+assert.strictEqual(fiveTurnTransition.success,true);
+assert.strictEqual(active.beatId,CHOICE_BEAT);
 choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
