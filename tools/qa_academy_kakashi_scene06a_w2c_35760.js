@@ -55,17 +55,33 @@ load("runtime/alpha-kakashi-scene06a-w2c-35760.js");
 
 const MOD=globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760;
 assert(MOD,"Scene 06A-W2C module missing");
-assert.strictEqual(MOD.authority,"671e04042debafccead2c41ab31fc4ebf99a75b1");
+assert.strictEqual(MOD.authority,"820917031000c15e62f0a4cea7535397d3ad9e50");
 assert.strictEqual(MOD.actionContract,"778fc612d21beae9d3b96d8ace70ab10ad467237");
 assert.strictEqual(MOD.bindingRef,"academy_kakashi.lethal.attempt_kill");
-assert.strictEqual(MOD.cueCount,16);
+assert.strictEqual(MOD.cueCount,17);
 assert.strictEqual(MOD.objective,"Retrieve the package.");
 assert.deepStrictEqual([...MOD.outcomeRefs],["LETHAL_ATTEMPT_KILLED","LETHAL_ATTEMPT_SURVIVED","LETHAL_ATTEMPT_INTERRUPTED","LETHAL_ATTEMPT_ESCAPED"]);
 const diag=globalThis.runAcademyKakashiScene06AW2C35760Diagnostics();
 assert.strictEqual(diag.pass,true,"Scene 06A-W2C diagnostics failed: "+JSON.stringify(diag.failed));
 
 const exact=[
-  "Kakashi looks once toward the empty street.","Nothing.","Package Smuggler is gone.","The package with him.","He turns back toward Masked Interceptor.","She has forced herself partway up from the stone.","Not recovered.","Not helpless either.","Her head lifts as Kakashi approaches.","His hand moves to his kunai.","This is not an arrest.","Not a return to ANBU.","Not the Police Force.","Masked Interceptor sees the decision before Kakashi makes the first step.","Her body tightens.","Kakashi moves."
+  "Kakashi watches Masked Interceptor push herself upright.",
+  "One hand braces against the stone.",
+  "The other stays close to her weapon.",
+  "She is hurt.",
+  "Still dangerous.",
+  "Kakashi studies her for a heartbeat.",
+  "Package Smuggler has already disappeared into Konoha.",
+  "There is no sound of pursuit.",
+  "No movement from the route ANBU Marked Target took.",
+  "Only the two of them remain beneath the Sakura tree.",
+  "Masked Interceptor steadies herself.",
+  "Kakashi reaches for his kunai.",
+  "She sees his hand move.",
+  "Whatever she expected him to do next, this was not it.",
+  "Her stance changes.",
+  "Kakashi lowers his centre of gravity.",
+  "Then disappears from where he was standing."
 ];
 
 MOD.wireSourceChoice();
@@ -141,7 +157,7 @@ assert.strictEqual(controlled.reason,"kakashi_scene05aw_successor_authority_not_
 assert(saves>0,"Scene 06A-W2C never persisted state");
 
 console.log("Academy Kakashi Scene 06A-W2C 35760 QA: PASS");
-console.log("- exact 16-line locked narration / no dialogue / no post-commit player choice");
+console.log("- exact 17-line locked narration / no dialogue / no post-commit player choice");
 console.log("- exact late 4+ STOP THE ASSASSIN entry only; fast and controlled variants remain fail-closed");
 console.log("- lethal intent commits before resolver selection");
 console.log("- resolver commits only the four Writing-authorised factual outcomes, idempotently");
