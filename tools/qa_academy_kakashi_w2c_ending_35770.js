@@ -98,6 +98,10 @@ assert(source.includes("beginAcademyKakashiConfirmedKill35770"),"direct Scene 06
 assert(source.includes("installOutcomeWatchdog"),"confirmed-kill hold watchdog missing");
 assert(source.includes("presentation owner unavailable"),"local non-kill resolver QA fallback indicator missing");
 assert(source.includes("beginAcademyKakashiResolvedOutcome35780"),"non-kill presentation watchdog dispatch missing");
+assert(source.includes("playAcademyKakashiLethalAttemptAnimation35770"),"shared lethal-attempt animation export missing");
+assert(source.includes("left:50%;right:auto;bottom:13.2%"),"recovered package badge must be centered above narration bar");
+assert(source.includes("left:22%!important"),"Hokage Office chair-aligned ANBU placement missing");
+assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
 console.log("- final Scene 06 click -> resolver hold -> direct/watchdog confirmed-kill presentation");
 console.log("- rooftop ANBU report -> Hokage office with hidden-operation Knowledge boundary");
