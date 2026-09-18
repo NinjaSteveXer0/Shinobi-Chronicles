@@ -140,30 +140,37 @@ up to **2 hostiles**
 
 Player text:
 
-> **Hit up to 2 enemies with poison gas for 4 Battle PL immediately, Poison them, and numb their movement for their next turn.**
+> **Hit up to 2 enemies with poison gas for 8 Battle PL immediately. They become Neurotoxin Poisoned: movement is numbed, and fighting through it costs more Battle PL.**
 
 Effects on each successfully affected target:
 
-- deal **4 Battle PL immediately** from the poison exposure;
+- deal **8 Battle PL immediately** from the poison exposure;
 - this immediate poison damage **bypasses Stamina**;
-- then establish ordinary `poisoned`;
-- current generic poison authority applies:
-  - **2 Battle PL** damage at the end of the target's action opportunity;
-  - maximum **3 ticks**;
-  - bypasses Stamina;
-  - reapplication refreshes rather than stacking;
-  - compatible standard antidote may cure it;
-- also apply `ibuse_poison_numbness` through that target's next action opportunity:
-  - movement/reposition-required actions unavailable;
-  - not Stun;
-  - direct attacks/support remain legal if they do not require movement.
+- establish `ibuse_neurotoxin` with condition type `poison`;
+- duration: until cured or after the target completes **3 action opportunities**;
+- on the target's **first** poisoned action opportunity:
+  - movement/reposition-required actions are unavailable;
+  - this is not Stun;
+- while `ibuse_neurotoxin` remains active:
+  - when the target completes a **hostile ATTACK** action or a **movement/reposition/escape** action, it loses **6 Battle PL** after that action resolves;
+  - this exertion damage bypasses Stamina;
+  - maximum **2 exertion triggers** per application;
+  - DEFENSE, SUPPORT and legitimate CLEANSE actions do not trigger the exertion damage;
+- a compatible antidote/cleanse removes the poison profile immediately;
+- reapplication refreshes the 3-action duration but does not restore already-spent exertion triggers beyond the profile maximum.
+
+Maximum uncured poison pressure from one Mist application:
+
+- **8 Battle PL immediately**;
+- up to **12 additional Battle PL** if the target keeps fighting/moving through the poison;
+- plus the first-action movement numbness.
 
 Recharge:
 
 - after use, **Poison Mist cannot be used during Ibuse's next 2 action opportunities**;
 - it becomes available again after those two opportunities pass.
 
-This expresses the canon poison-replenishment limitation in readable Battle timing.
+This makes Ibuse's poison a tactical threat: cure it, play defensively, or keep fighting and pay for it.
 
 ---
 
@@ -183,15 +190,15 @@ ATK:
 
 Player text:
 
-> **Bite one enemy for 24 ATK and Poison them.**
+> **Bite one enemy for 24 ATK and inflict Neurotoxin Poison.**
 
 Effects:
 
 - one direct Attack-PL packet;
 - ordinary Stamina mitigation;
-- then establish/refresh ordinary `poisoned`;
-- the poison condition continues dealing its own Battle-PL damage after application;
-- no additional numbness;
+- establish/refresh the same `ibuse_neurotoxin` Poison Profile;
+- Venom Bite does **not** add the Mist's separate 8 Battle-PL cloud-exposure packet;
+- the bite's immediate ATK24 is the immediate damage portion;
 - no automatic Stun.
 
 ---
@@ -240,11 +247,11 @@ one hostile
 
 Player text:
 
-> **Swallow one Poisoned enemy. Until their next turn ends, they cannot move away and their direct attacks can only target Ibuse.**
+> **Swallow one Neurotoxin-Poisoned enemy. Deal 6 Battle PL from concentrated venom, then trap them inside Ibuse.**
 
 Effect:
 
-- no direct damage;
+- target immediately loses **6 Battle PL**, bypassing Stamina;
 - target receives `ibuse_swallowed` through the end of its next action opportunity;
 - movement/reposition/escape actions are unavailable unless an exact escape effect overrides the trap;
 - hostile direct attacks may target Ibuse only if otherwise legal;
@@ -300,7 +307,7 @@ This is an explicit audited decision.
 
 ## IBUSE — POISON SPECIALIST / CONTROL
 
-> **Attach Ibuse to become immune to Poison. Manifest him to poison enemies, attack from underground, and swallow Poisoned targets. Poison Mist needs time to recharge after you use it.**
+> **Attach Ibuse to become immune to Poison. Manifest him to hit enemies with Neurotoxin: it hurts immediately, numbs movement, and punishes them for fighting through it. Poisoned enemies can also be swallowed for extra damage and control.**
 
 That is the complete player-facing identity.
 
@@ -311,7 +318,7 @@ That is the complete player-facing identity.
 Current runtime contains:
 
 - `ibuse.salamanders_endurance` = +6 Stamina;
-- `ibuse_poison_mist` = **4 immediate Battle PL + poison**;
+- `ibuse_poison_mist` = current legacy **4 immediate Battle PL + generic poison**;
 - `ibuse_venom_bite` = ATK13 + poison;
 - `ibuse_subterranean_ambush` = ATK10 / ATK13 contextual;
 - generic `poisoned` = 2 Battle PL per end-of-action tick, maximum 3 ticks, Stamina bypass, refresh-not-stack, standard antidote compatible.
@@ -319,8 +326,9 @@ Current runtime contains:
 If Stephen signs off RESET v2 Ibuse:
 
 - replace +6 Stamina with attached **Poison Immunity**;
-- preserve the existing generic poison condition as the shared ongoing poison resolver;
-- preserve the design law that a damaging Poison application does **immediate damage and then applies Poison**, rather than using Poison as a status-only button;
+- do **not** preserve the legacy generic 2-BP x 3-tick poison profile as Ibuse's final specialist design;
+- implement `ibuse_neurotoxin` as the source-authored Ibuse Poison Profile;
+- preserve the design law that a damaging Poison application does meaningful immediate damage and then creates a meaningful poison problem;
 - replace old Ibuse attack numerics/action package with this signed-off kit;
 - add the authored Poison Mist recharge and Swallow Trap semantics;
 - do not stack old and new effects;
