@@ -49,6 +49,9 @@ assert.strictEqual(exact.amtCombatAuthority,"32f79944304ea30689d87a4b1f7b48f84fb
 assert.strictEqual(exact.amt.calibratedBasePL,18);assert.deepStrictEqual(exact.amt.baseStats,{nin:14,tai:17,buki:19,fuin:10,kin:11,gen:13,stamina:17});
 assert.strictEqual(exact.ps.calibratedBasePL,10);assert.deepStrictEqual(exact.ps.baseStats,{nin:9,tai:7,buki:8,fuin:11,kin:9,gen:6,stamina:10});
 assert.strictEqual(exact.mi.calibratedBasePL,14);assert.deepStrictEqual(exact.mi.baseStats,{nin:11,tai:14,buki:15,fuin:8,kin:8,gen:10,stamina:13});
+assert.strictEqual(exact.amt.image,"NPC portrait/anbu_marked_target.png");
+assert.strictEqual(exact.ps.image,"NPC portrait/package_smuggler.png");
+assert.strictEqual(exact.mi.image,"NPC portrait/masked_interceptor.png");
 assert.strictEqual(exact.amt.provenance.combatSourceProfileId,"academy_kakashi_origin_amt");
 assert.strictEqual(exact.amt.provenance.derivationProfileId,"anbu_style_operative");
 assert.strictEqual(exact.ps.provenance.combatSourceProfileId,"academy_kakashi_origin_package_smuggler");
@@ -80,4 +83,4 @@ assert.strictEqual(exact.configs.academy_kakashi_origin_battle_seq_mi.timingGate
 assert.strictEqual(exact.configs.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions,3);
 assert.strictEqual(exact.configs.academy_kakashi_origin_battle_seq_amt_pakkun.timingGate,null);
 assert.strictEqual(exact.launchType,"function");assert.strictEqual(exact.pakkunActionType,"function");assert.strictEqual(exact.projectorType,"function");assert.strictEqual(exact.multiEnemyApi,"function","existing Battle engine must expose multi-enemy composition API");
-console.log(JSON.stringify({pass:true,patch:report.checks.patchId?"34300-v2":null,configCount:report.configIds.length,exactOccurrenceProfiles:true,genericProfilesPreserved:true,exactOppositionActions:true,directPSMI2v1:true,directMI1v1Untimed:true,directPS1v1Untimed:true,sequentialTimingPreserved:true,multiEnemyExistingApi:true,pakkunTemporaryActionSource:true,browserGoldenClaimed:false},null,2));
+console.log(JSON.stringify({pass:true,patch:report.checks.patchId?"34300-v2":null,configCount:report.configIds.length,exactOccurrenceProfiles:true,npcBattlePortraitAuthority:true,genericProfilesPreserved:true,exactOppositionActions:true,directPSMI2v1:true,directMI1v1Untimed:true,directPS1v1Untimed:true,sequentialTimingPreserved:true,multiEnemyExistingApi:true,pakkunTemporaryActionSource:true,browserGoldenClaimed:false},null,2));
