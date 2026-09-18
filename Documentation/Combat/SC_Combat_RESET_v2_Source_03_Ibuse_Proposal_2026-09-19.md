@@ -111,9 +111,9 @@ Player text:
 
 Exact Battle mechanics:
 
-- the controller cannot receive the ordinary Battle condition `poisoned` while Ibuse is the active attached Summon;
-- attempts to establish `poisoned` on the controller fail;
-- if an attached-state transition legitimately activates Ibuse while the controller already has the ordinary `poisoned` Battle condition, that condition is removed;
+- the controller cannot receive a Battle condition whose resolver classification is `conditionType: poison` while Ibuse is the active attached Summon, including ordinary `poisoned` and source-authored `ibuse_neurotoxin`;
+- attempts to establish a Battle poison condition on the controller fail;
+- if an attached-state transition legitimately activates Ibuse while the controller already has one or more Battle conditions classified `conditionType: poison`, those Battle poison conditions are removed;
 - this does **not** negate the raw damage of an attack that also carries poison;
 - this does **not** grant immunity to Burning, sealing, paralysis, curse effects, venom-like Story outcomes or unrelated conditions unless their exact resolver class is `poison`;
 - it does not rewrite past Story poisoning or automatically solve authored poison scenarios outside Battle;
@@ -240,7 +240,7 @@ Class:
 
 Requirement:
 
-target currently has ordinary `poisoned`.
+target currently has `ibuse_neurotoxin`.
 
 Target:
 
@@ -277,7 +277,7 @@ After Poison Mist:
 
 No artificial elemental weakness is added.
 
-Standard antidote remains legitimate counterplay against ordinary `poisoned`.
+A compatible antidote/cleanse remains legitimate counterplay against `ibuse_neurotoxin`; the shared poison classification may reuse authorised poison-cure plumbing without collapsing Neurotoxin into the generic poison profile.
 
 Poison Immunity protects the controller; it does not make Ibuse's poison impossible to counter.
 
@@ -299,7 +299,7 @@ This is an explicit audited decision.
 - Poison Immunity is a categorical controller enhancement, not Stamina/PL transfer.
 - do not also apply the legacy +6 Stamina package if this proposal is approved.
 - ordinary Poison immunity does not imply immunity to every harmful status.
-- Ibuse's own poison skill uses the existing generic `poisoned` condition rather than creating a second universal poison system.
+- Ibuse's own poison uses source-authored `ibuse_neurotoxin` with shared `conditionType: poison`; this reuses common poison classification/cure plumbing without turning Neurotoxin into the generic `poisoned` profile or creating a second universal poison system.
 - dedicated future Character representations that explicitly embody this same poison-immunity package must not receive it twice.
 
 ---
