@@ -28,6 +28,34 @@ Rarity ladder:
 
 No dedicated image asset is required for Skills, Items, Weapons or Gear in Alpha. Rarity is presentation/classification, not an automatic power/access multiplier.
 
+## 2A. Global Unique Mechanics Standard
+
+Binding global mechanics design authority:
+
+`Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
+
+This standard applies to all catalogue Skills and to every mechanically meaningful effect surrounding them, including:
+
+- abilities;
+- passives;
+- buffs;
+- debuffs;
+- status effects / conditions;
+- repeated-damage effects;
+- enhancements;
+- Summon / Tailed-Beast / Hosted-Entity effects;
+- Bloodline / Transformation effects;
+- item / weapon / equipment effects;
+- contextual capability effects.
+
+Canonical rule:
+
+> **Use generic RPG ideas as bones, never as the finished body.**
+
+If a mechanically important row could be copied unchanged into almost any RPG after only renaming it, it is not finished.
+
+Existing catalogue age does not permanently grandfather a generic design. Any row being revised, promoted to new runtime importance, recalibrated or found during audit to be generic filler must pass the Unique Mechanics Standard before design closure.
+
 ## 3. Skill catalogue waves
 
 - **001–050** — `Documentation/Combat/Alpha_Skill_Catalogue_v1_Wave1_001-050.md` — commit `b833b146aa72da7c311f6dc649fe547715f7e873` — core shinobi, Taijutsu, Bukijutsu, opening Fire.
