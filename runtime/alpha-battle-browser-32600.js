@@ -76,6 +76,21 @@
     const claimResult=priorClaimVictoryAutoReturn.apply(this,arguments);
     if(!(claimResult&&claimResult.success===true))return claimResult;
 
+    // Some authored Battles require an explicit post-claim confirmation step:
+    // claim the material reward, remain on the completed Victory surface, then
+    // RETURN TO STORY. This flag is reward-authority owned; generic Battles keep
+    // the established auto-return behaviour below.
+    if(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true){
+      try{openOverlay("victory");}catch(_error){}
+      return{
+        ...claimResult,
+        navigated:false,
+        autoReturned:false,
+        explicitPostClaimContinue:true,
+        rewardCommitBeforeCallerRestore:true
+      };
+    }
+
     let callerResult=null;
     let navigationError=null;
     const callerOwned=!!(returnContextBefore&&typeof returnContextBefore==="object"&&returnContextBefore.type);
@@ -250,6 +265,7 @@
       rewardCommitBeforeReturn:claimSource.indexOf("priorClaimVictoryAutoReturn")<claimSource.indexOf('resumeBattleCallerAfterCompletion("victory")'),
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
+      explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
