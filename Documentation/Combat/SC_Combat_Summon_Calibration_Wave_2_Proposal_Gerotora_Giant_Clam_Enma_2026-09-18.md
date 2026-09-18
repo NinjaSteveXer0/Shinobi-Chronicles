@@ -47,7 +47,7 @@ If a future Story occurrence manifests Gerotora as an independently targetable p
 
 ## BINDING assisted actions
 
-Gerotora has **five support abilities**, but they remain deliberately simple and player-readable:
+Gerotora has **five support abilities**, signed off as the final Battle support package:
 
 1. open the seal;
 2. close the seal;
