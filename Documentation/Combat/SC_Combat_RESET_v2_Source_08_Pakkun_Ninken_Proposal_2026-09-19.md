@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 08 UNDER RESET v2**  
+**Status:** **SIGNED OFF / BINDING COMBAT CALIBRATION — SOURCE 08 CLOSED UNDER RESET v2**  
 **Parent:** #235  
 **Source baseline:** `13dec46d50761e0bf190d354b61865ce5db5db7f`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`
@@ -160,3 +160,25 @@ Combat calibration does not by itself admit Pakkun into live production or mint 
 Their future Registry/PL/asset admission remains separately owned.
 
 **PROPOSED.**
+
+---
+
+## Stephen sign-off / closure
+
+Stephen has explicitly signed off this RESET v2 Pakkun / Kakashi Ninken package.
+
+This document is now binding Combat design authority for Source 08.
+
+Preserve:
+- Pakkun PL16 and STAGED / not live production status;
+- COLLECTION enhancement: +5 percentage points Item Find per distinct recruited Kakashi Ninja Dog, max +40% across all eight;
+- Pakkun counts once;
+- ATTACHED Scent Companion enhancement;
+- exact scent-lock tracking rather than generic detection;
+- Warning Bark once/Battle strips hidden/opening/ambush rider from one tracked enemy attack;
+- Stay on the Trail once/Battle preserves scent lock through ordinary concealment/movement;
+- Nipping Bite ATK7;
+- Field Guide bounded contextual route evidence;
+- no independent recurring Pakkun turn by default.
+
+**design closed != implemented != runtime validated != Golden GREEN**
