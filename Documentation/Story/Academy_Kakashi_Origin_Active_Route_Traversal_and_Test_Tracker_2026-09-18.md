@@ -55,21 +55,24 @@ Current production traversal:
 
 ## Required later browser test — manual fast-win exposure
 
-Current Academy-state combat makes the Masked Interceptor 1-v-1 naturally resolve too slowly to expose the `STOP THE ASSASSIN -> WIN -> 1–3 turns` branch during ordinary play.
+Current Academy-state combat may resolve too slowly to expose the corrected `STOP THE ASSASSIN -> WIN -> 1–4 turns` pursuit fork during ordinary play.
 
 Therefore this route requires a deliberate **Dev Tools / test-state intervention** later so Stephen can validate the quick-win scene.
 
 Required reminder point:
 
-> When the current late-win route is completed and Stephen rewinds to test `STOP THE ASSASSIN` again, remind him **before or at the Masked Interceptor Battle** that he needs to use the Dev Tools/test override to force a victory within 1–3 turns.
+> When Stephen rewinds to test the corrected `STOP THE ASSASSIN` fast-win fork, remind him **before or at the Masked Interceptor Battle** that he may need the Dev Tools/test override to force a victory within 1–4 turns.
 
-The quick-win branch to validate is:
+The corrected quick-win branch to validate is:
 
 `STOP THE ASSASSIN`
 -> `Kakashi vs Masked Interceptor`
--> **win in 1–3 turns**
--> `Scene 5A-W1 — Quick Victory`
--> five-choice surface including `GO AFTER PACKAGE SMUGGLER`.
+-> **win in 1–4 turns**
+-> immediate post-MI decision surface includes both:
+   - `GO AFTER PACKAGE SMUGGLER`
+   - `GO AFTER ANBU MARKED TARGET`
+-> selecting Package Smuggler can preserve later AMT pursuit only if Package Smuggler is then defeated within **1–3 turns**
+-> selecting ANBU Marked Target immediately closes the Package Smuggler route.
 
 Do not treat the Dev Tools intervention as canonical Chronicle history; it is browser/route validation only.
 
@@ -116,13 +119,22 @@ Select the next unconsumed sibling choice:
 
 Current Writing production task:
 
-**Author the immediate Scene 06 continuation for TAKE HER BACK TO ANBU, preserving the existing late-victory facts: Package Smuggler/package gone, ANBU Marked Target gone, no pursuit reopening, Masked Interceptor alive in Kakashi's control/custody only if the relevant resolver/state supports it, and no Pakkun.**
+**Author both post-Battle Masked Interceptor custody branches before the next Coding tranche:**
 
-After that branch reaches its terminal Origin ending, rewind again to Scene 5A-W2 for:
+1. `SCENE_05A_W / CHOICE_01 / BRANCH_D — TAKE HER BACK TO ANBU`
+2. `SCENE_05A_W / CHOICE_01 / BRANCH_E — TAKE HER TO THE UCHIHA POLICE FORCE`
 
-`SCENE_05A_W / CHOICE_01 / BRANCH_E — TAKE HER TO THE UCHIHA POLICE FORCE`
+Stephen has also corrected the STOP THE ASSASSIN pursuit timing. New binding causal authority:
 
-Only after the Scene 5A-W2 sibling family is completed should traversal move back to the earlier Scene 3A choice family.
+`Documentation/Story/Academy_Kakashi_Stop_Assassin_1_to_4_Turn_Dual_Pursuit_Fork_Correction_2026-09-18.md`
+
+Correct rule:
+- MI victory in **1–4 turns** -> both Package Smuggler and ANBU Marked Target are immediate pursuit options.
+- Choose Package Smuggler -> defeating PS within **1–3 turns** preserves later AMT pursuit.
+- Choose ANBU Marked Target immediately -> Package Smuggler route closes.
+- MI victory on turn **5+** -> no immediate pursuit remains.
+
+Do not ask Coding to implement this corrected pursuit fork until the two MI custody branches are authored/approved and Scene 05A-W exact player-facing authority is rewritten coherently.
 
 ## Resolver-result coverage for Scene 06A-W2C
 
