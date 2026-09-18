@@ -16,7 +16,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_OBJECTIVE_PRESENTATION_35720)return;
 
-const PATCH_ID="alpha_kakashi_objective_presentation_35720_v2_2026_09_18";
+const PATCH_ID="alpha_kakashi_objective_presentation_35720_v3_2026_09_18";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const ROOFTOP_BEAT="kak_original_rooftop";
 const OPENED_CUE_ID="scene01_10";
@@ -37,15 +37,15 @@ function installStyle(){
   box-sizing:border-box!important;
   align-items:center!important;
   text-align:center!important;
-  font-size:15px!important;
-  line-height:1.35!important;
+  font-size:18px!important;
+  line-height:1.28!important;
   box-shadow:0 11px 28px rgba(0,0,0,.36)!important;
 }
 #story-scene-presentation-layer .sc-scene-board-33900__objective b{
   width:100%!important;
   text-align:center!important;
-  font-size:10px!important;
-  margin-bottom:5px!important;
+  font-size:11.5px!important;
+  margin-bottom:6px!important;
 }
 #story-scene-presentation-layer[data-sc-kakashi-objective-gate="hidden"] .sc-scene-board-33900__objective{
   display:none!important;
@@ -56,11 +56,11 @@ function installStyle(){
     max-width:64%!important;
     min-height:52px!important;
     padding:9px 11px!important;
-    font-size:12px!important;
+    font-size:13.5px!important;
     line-height:1.3!important;
   }
   #story-scene-presentation-layer .sc-scene-board-33900__objective b{
-    font-size:8.5px!important;
+    font-size:9.5px!important;
   }
 }
 `;
@@ -99,10 +99,10 @@ function installHooks(){
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks,25);}
 function diagnostics(){
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_objective_presentation_35720_v2_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_objective_presentation_35720_v3_2026_09_18",
     objectiveRevealCuePinned:OPENED_CUE_ID==="scene01_10",
     revealRequiresOpenedEnvelope:syncObjectiveGate35720.toString().includes('objectState||"")==="opened"')&&syncObjectiveGate35720.toString().includes("Number(p.index)>=9"),
-    globalObjectiveSizing:installStyle.toString().includes("min-width:310px")&&installStyle.toString().includes("min-height:62px"),
+    globalObjectiveSizing:installStyle.toString().includes("min-width:310px")&&installStyle.toString().includes("min-height:62px")&&installStyle.toString().includes("font-size:18px"),
     survivesBoardRebuildByLayerGate:installStyle.toString().includes('data-sc-kakashi-objective-gate="hidden"'),
     styleInstallIdempotent:installStyle.toString().includes("getElementById(STYLE_ID))return true"),
     noMutationObserver:!installHooks.toString().includes("MutationObserver")&&!syncObjectiveGate35720.toString().includes("MutationObserver"),
