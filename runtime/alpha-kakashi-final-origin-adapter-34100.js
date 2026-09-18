@@ -8,12 +8,12 @@
 // consumer -> sequential post-PS package recovery -> Pakkun interception ->
 // reward adapter -> terminal debrief -> terminal Scene Board asset binding ->
 // locked Scene 03A consumer -> locked Scene 04A Stop Assassin consumer ->
-// installed-browser Objective presentation acceptance fix.
+// installed-browser Objective presentation acceptance fix -> locked Scene 05A-W
+// victory return consumer.
 //
-// Generation 25 consumes Stephen's fight_at_sakura_tree backdrop, launches the
-// Scene 04A Masked Interceptor 1-v-1 PL Battle immediately after the locked
-// build-up, and keeps the Rooftop objective hidden until Kakashi actually opens
-// the sealed envelope. Browser Golden remains separately unclaimed.
+// Generation 26 consumes the locked Scene 05A-W Kakashi-victory return,
+// preserves the 1-4-turn pursuit window / 5+ cutoff, and binds the new NPC
+// Battle portrait authority. Browser Golden remains separately unclaimed.
 //
 // Historical delivery-QA markers only (not active code):
 // const BUILD="kakashi-final-20260917-18";
@@ -23,6 +23,7 @@
 // const BUILD="kakashi-final-20260917-22";
 // const BUILD="kakashi-final-20260917-23";
 // const BUILD="kakashi-final-20260917-24";
+// const BUILD="kakashi-final-20260918-25";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
 "use strict";
@@ -45,7 +46,8 @@ const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-3561
 const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
 const SCENE04A_PATH="runtime/alpha-kakashi-scene04a-35710.js";
 const OBJECTIVE_PRESENTATION_PATH="runtime/alpha-kakashi-objective-presentation-35720.js";
-const BUILD="kakashi-final-20260918-25";
+const SCENE05AW_PATH="runtime/alpha-kakashi-scene05a-w-35730.js";
+const BUILD="kakashi-final-20260918-26";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -75,9 +77,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadScene05AW(){
+  if(globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730)return;
+  appendScript("sc-alpha-kakashi-scene05a-w-35730-script",SCENE05AW_PATH);
+}
 function loadObjectivePresentation(){
-  if(globalThis.SC_ALPHA_KAKASHI_OBJECTIVE_PRESENTATION_35720)return;
-  appendScript("sc-alpha-kakashi-objective-presentation-35720-script",OBJECTIVE_PRESENTATION_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_OBJECTIVE_PRESENTATION_35720){loadScene05AW();return;}
+  appendScript("sc-alpha-kakashi-objective-presentation-35720-script",OBJECTIVE_PRESENTATION_PATH,loadScene05AW);
 }
 function loadScene04A(){
   if(globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710){loadObjectivePresentation();return;}
