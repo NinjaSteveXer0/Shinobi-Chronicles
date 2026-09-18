@@ -53,8 +53,8 @@ load("runtime/alpha-kakashi-scene05a-w-35730.js");
 
 const MOD=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 assert(MOD,"Scene 05A-W module missing");
-assert.strictEqual(MOD.authority,"7dd9f248003604c15674d5e8eafb56abea029b1b");
-assert.strictEqual(MOD.cueCount,17);
+assert.strictEqual(MOD.authority,"c1121c588f8fb44393baebe8b9edb5624a38f3e3");
+assert.strictEqual(MOD.cueCount,20);
 assert.strictEqual(MOD.objective,"Retrieve the package.");
 assert.strictEqual(MOD.battleConfigId,BATTLE_CONFIG);
 assert.strictEqual(MOD.bindingRef,BINDING);
@@ -70,16 +70,19 @@ const exact=[
   "Searching.",
   "Package Smuggler fled with the package while they fought.",
   "ANBU Marked Target went the other way.",
-  "If Kakashi ended this quickly, neither trail is dead yet.",
-  "He can still move.",
-  "Still choose which one to follow.",
-  "But every second he spends here gives both men more distance.",
+  "Kakashi scans the street.",
+  "One trail cuts toward the package.",
+  "The other leads after the original target.",
+  "Neither has vanished yet.",
+  "Not completely.",
+  "But both are getting farther away.",
   "Kakashi looks back at Masked Interceptor.",
   "She lies where he put her.",
-  "The package is getting farther away.",
-  "The original target is getting farther away.",
-  "And the woman at Kakashi's feet is still his problem to resolve.",
-  "He cannot do everything.",
+  "Every second he spends here makes the choice harder.",
+  "The package.",
+  "The original target.",
+  "Or the woman at his feet.",
+  "He cannot deal with all three.",
   "Not anymore."
 ];
 const entry=returnBeat.onEnterConsequences.find(x=>x&&x.requestId==="kakashi_scene05aw_victory_entry_35730");
@@ -205,7 +208,7 @@ assert(!JSON.stringify([definition.beatMap.get(WIN_BEAT),choiceBeat]).includes("
 assert(saves>0,"Scene 05A-W state was never persisted");
 
 console.log("Academy Kakashi Scene 05A-W 35730 QA: PASS");
-console.log("- exact 17 locked narration cues / no dialogue");
+console.log("- exact 20 corrected locked narration cues / no dialogue");
 console.log("- exact fight_at_sakura_tree backdrop / Retrieve the package objective");
 console.log("- victory-only return; defeat never enters 05A-W");
 console.log("- 1-4 turn win exposes both pursuits; 5+ removes both");
