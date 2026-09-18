@@ -3,8 +3,10 @@
 **Date:** 2026-09-15  
 **2026-09-18 BATTLE-REWARD TIMING SUPERSESSION:** For the solo Academy Kakashi vs Masked Interceptor PL Battle, current authority is `Documentation/World/Academy Kakashi Masked Interceptor Immediate PL Battle Victory Reward Lock 2026-09-18.md`. A Kakashi VICTORY now creates an immediate Victory-screen material entitlement of **50 Ryō + Field Recovery Pill ×1**, claimed before Story return. Terminal ANBU-debrief / Origin rewards remain a separate reward class. The older terminal-debrief timing for that exact MI-victory fight reward is superseded; the once-per-Origin pill source must not double-grant at debrief after immediate claim.  
 
+**2026-09-18 STORY / OWNER-FIELD RECONCILIATION:** The current STOP THE ASSASSIN correction is `Documentation/Story/Academy_Kakashi_Stop_Assassin_Quick_Win_Catch_Up_Correction_2026-09-18.md`. It makes STOP THE ASSASSIN a distinct **MI 1-v-1 -> win in 1–3 turns preserves Package Smuggler catch-up only** route. The separate `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE` sequential benchmark remains **MI 1–4 -> PS 1–3 -> AMT legitimately reachable**. The immediate solo-MI victory package is independent of those pursuit gates: any qualifying committed solo Kakashi-vs-MI victory receives the same immediate 50 Ryō + pill package. Owner fields requested through #199 are closed by Progression `54314cc29e1374783cae0a0d90654cc9a2316a45`, Combat `e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8`, and Acquisition `b83884adb70f1e74e62f96ab96848c1ec33704f9`.  
+
 **Owner:** World / Missions / Events / Rewards  
-**Status:** **BINDING WORLD REWARD-SOURCE AUTHORITY — WORLD VALUES CLOSED; EXACT PROGRESSION NUMBERS / ITEM-GRANT ACTIVATION / RUNTIME IMPLEMENTATION SEPARATE**
+**Status:** **BINDING WORLD REWARD-SOURCE AUTHORITY — WORLD VALUES + OWNER SOURCE FIELDS CLOSED; RUNTIME / INSTALLED-BROWSER PROOF SEPARATE**
 
 ## 1. Purpose
 
@@ -92,11 +94,14 @@ World authors one optional tangible Battle-linked entitlement:
 
 `kak_origin_item_field_recovery_resupply`
 
-If Kakashi **materially participated in at least one PL Battle** during the sealed Origin occurrence and reaches terminal debrief, he is eligible for:
+The source remains **one per sealed Origin occurrence**, but its timing now has two authoritative lanes:
 
-- `field_recovery_pill` × **1**.
+1. **Immediate solo-MI victory lane:** a committed solo Kakashi vs Masked Interceptor PL Battle victory fulfils this source immediately on that Battle Victory result. The player claims `field_recovery_pill` × **1** there as part of `kak_origin_battle_mi_victory_reward_v1`, together with 50 Ryō, before returning to Story.
+2. **Terminal fallback lane:** if Kakashi materially participated in at least one PL Battle but no qualifying solo-MI victory fulfilled this source, reaching terminal debrief preserves the prior one-pill resupply entitlement.
 
-The catalogue identity/effect is Combat authority. The actual Inventory transaction remains Acquisition/Inventory/Coding work.
+The same source may not grant twice. An immediate MI-victory claim suppresses the terminal pill grant for that Origin occurrence.
+
+Combat has approved catalogue ID `field_recovery_pill`; Acquisition has closed source-scoped idempotent persistent Inventory grant semantics. Entitlement still does not auto-use or auto-place the pill into Battle Pouch.
 
 This is **one per Origin occurrence**, not one per Battle and not one per defeated opponent. It is field resupply after an operationally costly route, not loot from an enemy.
 
@@ -123,11 +128,21 @@ Explicit exclusions:
 
 ## 4. Discipline development — action-derived, not branch-derived
 
-World does **not** invent numeric Ninjutsu / Taijutsu / Genjutsu / Bukijutsu / Fūinjutsu / Kinjutsu / Stamina EXP values here because no current Progression authority found by this audit defines the exact action-level numeric projection.
+World consumes the closed Progression authority `Documentation/Progression/Action Derived Discipline and Fieldcraft Development Contract 2026-09-15.md` without re-owning its values.
 
-Instead this document closes the source law that Progression must consume:
+For Combat-authored technical-discipline tags:
 
-> **Every exact legal action that materially executes a discipline may emit that discipline's development once from its committed source occurrence, whether the larger Battle/mission is later won or lost.**
+- committed legitimate failed execution after material execution = **+1 EXP**;
+- effective execution = **+2 EXP**;
+- explicitly authored exceptional execution = **+3 EXP**;
+- these values are mutually exclusive per action/tag;
+- cap = **6 EXP per technical discipline per causal Battle**.
+
+Stamina is separate: **+1 Stamina EXP** only when legitimate Effective Stamina actually mitigates a positive hostile packet at the Stamina stage, capped at **2 Stamina EXP per causal Battle**.
+
+The source law remains:
+
+> **Every exact legal action that materially executes a discipline may emit that discipline's owner-defined development once from its committed source occurrence, whether the larger Battle/mission is later won or lost.**
 
 Examples:
 
@@ -180,18 +195,18 @@ Where current Progression authority already exposes a producer, World may projec
   - `information_extraction`
   - `credibility_assessment`
 
-### 5.2 Candidate families requiring owner closure
+### 5.2 Owner-closed additional fieldcraft semantics
 
-The Kakashi Origin also needs reusable development semantics for:
+Progression now closes reusable persistent non-XP evidence for:
 
-- Stealth / covert approach;
-- covert acquisition / pickpocket / sleight-of-hand fieldcraft;
-- assassination / lethal covert fieldcraft;
-- tactical interception / threat prioritisation where not already Tracking;
-- operational custody / evidence-objective handling where not Extraction;
-- Battle tactical performance / multi-target pressure where not a discipline action itself.
+- `fieldcraft.stealth_approach` via exact covert-approach / undetected-positioning / covert-route evidence;
+- `fieldcraft.covert_acquisition` via exact covert-acquisition / unnoticed-transfer / sleight-of-hand-control evidence.
 
-**Assassination is not invented here as a current Special Jōnin path or Skill ID.** A deterministic post-Battle kill proves a lethal fact; it becomes assassination development only if the method and owning capability contract say it demonstrates that capability.
+Significance remains owner-defined from factual contribution: 1 legitimate attempt / 2 effective execution / 3 exact exceptional benchmark, strengthened within one causal root rather than duplicated by child actions.
+
+There is **no generic Assassination/covert-lethal XP or fieldcraft bar**. The existing reusable Alpha path is exact `covert_operations.assassin` Special Jōnin evidence only when its authorised competency predicates are actually satisfied. A generic deterministic post-Battle `KILL` remains lethal history only.
+
+Tactical interception, custody handling and multi-target pressure may create factual Chronicle/history evidence, but they do not become a new generic development bucket merely because this Origin contains them.
 
 ## 6. Choice-by-choice source ledger
 
@@ -372,10 +387,11 @@ Choice sources above are supplemented by factual outcome sources. These are not 
 | `kak_origin_outcome_package_secured` | Package reaches Kakashi/authorised side at terminal evaluation. | +75 Ryō once. |
 | `kak_origin_outcome_actionable_intel` | Verified new actionable intelligence commits. | +25 Ryō once; Knowledge and suitable specialist evidence. |
 | `kak_origin_outcome_live_custody` | At least one relevant participant delivered alive to legitimate authority. | +25 Ryō once; Extraction evidence where exact contribution fits. |
-| `kak_origin_outcome_battle_participation` | Kakashi materially participates in >=1 PL Battle in this Origin. | `field_recovery_pill` ×1 entitlement at terminal debrief; exact discipline development from actions used; no per-Battle cash. |
-| `kak_origin_outcome_battle_loss` | A PL Battle is lost. | Does not erase prior action/discipline/specialist evidence. Package/custody outcomes consume actual state and may still succeed. |
+| `kak_origin_outcome_solo_mi_victory` | Kakashi wins the exact solo Kakashi vs Masked Interceptor PL Battle occurrence, regardless of which current branch reached that same solo Battle state. | Immediate Victory-screen package: **50 Ryō + Field Recovery Pill ×1** under `kak_origin_battle_mi_victory_reward_v1`; claim before Story return. Exact discipline/Stamina development comes from committed action evidence and is not re-granted by the claim. |
+| `kak_origin_outcome_battle_participation` | Kakashi materially participates in >=1 PL Battle in this Origin. | Exact discipline/Stamina development from actions used. If no qualifying solo-MI victory already fulfilled `kak_origin_item_field_recovery_resupply`, terminal debrief provides the one-pill fallback entitlement. No generic per-Battle cash. |
+| `kak_origin_outcome_battle_loss` | A PL Battle is lost. | Does not erase prior action/discipline/specialist evidence. Package/custody outcomes consume actual state and may still succeed. No MI-victory material package. |
 | `kak_origin_outcome_3v1_victory` | Failed direct-pickpocket 3-v-1 is won. | +25 exceptional benchmark; weapon-source candidate; Battle action development. No kill assumptions. |
-| `kak_origin_outcome_sequential_turn_benchmark` | MI <=4 turns and PS <=3 turns and AMT legitimately remains reachable. | +25 exceptional benchmark; weapon-source candidate; historical/achievement evidence. Actual Skills/actions still determine discipline development. |
+| `kak_origin_outcome_sequential_turn_benchmark` | On `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE`: MI <=4 turns, then PS <=3 turns, and AMT legitimately remains reachable. | +25 exceptional benchmark; weapon-source candidate; historical/achievement evidence. STOP THE ASSASSIN's separate MI <=3 Package-Smuggler catch-up gate does **not** by itself satisfy this sequential benchmark or create direct AMT pursuit. Actual Skills/actions still determine discipline development. |
 | `kak_origin_outcome_report_complete` | Factual ANBU debrief accounts for known participants/package/Battle/custody/lethal facts without inventing unknowns. | 100 Ryō terminal award; Surveillance `surveillance_reporting` where the report contains substantive observed field facts; institutional observer history. |
 | `kak_origin_outcome_report_incomplete_or_bounded` | Report is factually bounded by what Kakashi knows, including honest failure. | Still receives terminal 100 Ryō if the assignment/debrief closes. Honesty does not convert failure to success; no invented penalty for not knowing unknowable facts. |
 
@@ -407,6 +423,12 @@ A Battle victory does not multiply all discipline EXP and does not directly incr
 ### Turn-gate / exceptional performance
 
 The authored turn gates create historical/recognition value because Story explicitly cares about them. They do not multiply every action's EXP.
+
+Current branch-specific distinction:
+
+- `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE`: MI victory in **1–4** preserves PS catch-up; PS victory in **1–3** can preserve later AMT reach; this is the exact sequential exceptional benchmark family when AMT legitimately remains reachable.
+- `STOP THE ASSASSIN`: MI victory in **1–3** preserves **Package Smuggler catch-up only**; turn 4+ closes pursuit; the immediate post-MI return does not offer direct AMT pursuit.
+- the immediate **50 Ryō + Field Recovery Pill ×1** solo-MI Battle reward does **not** depend on meeting either pursuit-speed gate. The gates affect Story continuation / exceptional-history evaluation, not entitlement to the exact solo-MI victory package.
 
 ### Multi-target / triple-kill history
 
@@ -463,64 +485,57 @@ Rules:
 8. Multiple exceptional criteria in one Origin do not stack the +25 exceptional Ryō or duplicate the weapon-source entitlement.
 9. A future Legacy/new playthrough is a new Chronicle occurrence and may earn its own rewards under that playthrough's authority; replaying one saved occurrence is not.
 
-## 11. Owner closures still required
+## 11. Owner closures consumed / remaining Coding work
 
-### Progression / Development
+The #199 owner-field closures are complete and are consumed here:
 
-Return the exact numeric / bounded development projection for:
+### Progression / Development — CLOSED
 
-- action-level discipline development;
-- success vs failed-but-legitimate attempt treatment;
-- Stamina development semantics;
-- Stealth / covert approach;
-- covert acquisition / pickpocket fieldcraft;
-- Assassination / covert lethal fieldcraft if such a path exists;
-- whether existing Tracking/Surveillance/Extraction producer evidence also maps to persistent Skill/proficiency development and under what exact thresholds/caps.
+`Documentation/Progression/Action Derived Discipline and Fieldcraft Development Contract 2026-09-15.md`  
+commit `54314cc29e1374783cae0a0d90654cc9a2316a45`
 
-Do not create one generic hidden XP bucket.
+Closes technical-discipline numeric development, failed-but-material execution, Stamina mitigation development, Stealth/covert-approach evidence, covert-acquisition evidence, exact Special Jōnin assassin evidence boundaries, caps and anti-farm/idempotence.
 
-### Combat / Skills / Items / Weapons
+### Combat / Skills / Items / Weapons — CLOSED
 
-Return/confirm:
+`Documentation/Combat/SC_Combat_Academy_Kakashi_Reward_Action_Evidence_and_Item_Weapon_Source_Closure_2026-09-15.md`  
+commit `e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8`
 
-- exact Battle action -> discipline/capability tags consumed by Progression;
-- that `field_recovery_pill` is legal as this one-shot debrief source;
-- whether `academy_training_tanto` is approved for the exceptional evaluation source or provide an exact alternative catalogue ID;
-- any exact Battle/action facts needed to distinguish covert lethal execution from generic post-defeat deterministic kill.
+Closes action -> discipline/capability tags, failed-valid-action evidence, Stamina signal, `field_recovery_pill` approval, `academy_training_tanto` approval, `white_fang_tanto` exclusion and the rule that generic post-defeat `KILL` is not automatically Assassination/Kinjutsu/Bukijutsu/Taijutsu evidence.
 
-### Acquisition / Inventory
+### Acquisition / Inventory — CLOSED
 
-Return/implement:
+`Documentation/Acquisition/Academy Kakashi Origin Reward Entitlement and Inventory Transaction Contract 2026-09-15.md`  
+commit `b83884adb70f1e74e62f96ab96848c1ec33704f9`
 
-- idempotent grant transaction for the approved Item/Weapon entitlement;
-- already-owned handling for the exceptional weapon source;
-- no duplicate ownership/material grant on load/retry.
+Closes source-scoped idempotent grant receipts, persistent Inventory ownership, already-owned handling, no invented duplicate compensation, no auto-equip/auto-pouch, and entitlement != ownership != preparation/equipment/use.
 
-### Coding
+### Coding / Runtime — ACTIVE CONSUMER
 
-Only after owner fields are exact:
+Coding must consume the closed sources through the existing reward/development flow:
 
-- bind source IDs to committed Story/Battle/CE receipts;
-- persist entitlements and grant receipts;
-- project visible reward summary separately from hidden development evidence;
-- prove save/load/retry idempotence;
-- prove loss/failure keeps prior legitimate development;
-- browser/Golden/regression validation.
+- bind committed Story/Battle/CE source IDs to entitlement and development receipts;
+- implement the immediate solo-MI Victory package and claim-before-return boundary;
+- preserve the terminal fallback pill only when the immediate MI source was not fulfilled;
+- persist component and parent receipts idempotently across reload/crash/reopen;
+- project visible material reward separately from already-committed discipline/Stamina development;
+- preserve later debrief Ryō / Training Tantō evaluation as a separate reward class;
+- prove source/headless/integration first, then installed-browser behavior and Golden separately.
 
 ## 12. Current closure status
 
-- Writing decision graph: **CLOSED / consumable**.
-- World reward-source mapping: **CLOSED in this document**.
-- World Ryō values: **CLOSED in this document**.
+- Writing decision graph: **CLOSED / consumable**, with the 2026-09-18 STOP THE ASSASSIN branch-specific pursuit correction controlling that route.
+- World reward-source mapping: **CLOSED in this document + immediate MI reward lock**.
+- World Ryō values: **CLOSED** — debrief-class max remains 250 Ryō; exact solo-MI victory additionally grants immediate 50 Ryō outside that cap.
 - World no-kill-bounty / no-loot law: **CLOSED**.
 - PL Battle reward/development receipt requirements: **CLOSED at World consumer level**.
 - Relationship/Knowledge/future-opportunity consequences: **CLOSED at World consumer level**.
-- Exact numeric discipline EXP: **PENDING Progression authority**.
-- Stealth/pickpocket/assassination persistent development semantics: **PENDING Progression/Skills authority**.
-- `field_recovery_pill` source grant activation: **PENDING Combat + Acquisition consumption**.
-- `academy_training_tanto` exceptional reward activation: **PENDING Combat + Acquisition confirmation**.
-- Runtime implementation: **NOT CLAIMED**.
-- Browser validation: **NOT CLAIMED**.
-- Golden/regression: **NOT CLAIMED**.
+- Exact numeric discipline EXP / Stamina development: **CLOSED by Progression** (`54314cc29e1374783cae0a0d90654cc9a2316a45`).
+- Stealth/covert-acquisition / assassin-evidence semantics: **CLOSED by Progression**; no generic Assassination XP/bar.
+- `field_recovery_pill` catalogue/source + transaction semantics: **CLOSED by Combat + Acquisition**; immediate MI timing supersedes terminal timing only for the qualifying solo-MI victory occurrence.
+- `academy_training_tanto` exceptional reward identity + transaction semantics: **CLOSED by Combat + Acquisition**; still evaluated as Origin/debrief-class reward, not part of the MI fight package.
+- Runtime implementation of corrected immediate MI reward semantics: **OPEN in Coding #188 at this audit update**.
+- Installed-browser validation of visible 50 Ryō + pill claim-before-return flow: **NOT YET PROVEN here**.
+- Kakashi Browser Golden: **NOT CLAIMED**.
 
 This audit intentionally establishes the reusable direction that later Story/World occurrences must also reward **what the Character actually did**, not only mission completion. Kakashi is the first concrete Origin consumer, not an Origin-only exception.
