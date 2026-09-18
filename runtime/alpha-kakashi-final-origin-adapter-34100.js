@@ -29,6 +29,7 @@
 // const BUILD="kakashi-final-20260918-28";
 // const BUILD="kakashi-final-20260918-29";
 // const BUILD="kakashi-final-20260918-30";
+// const BUILD="kakashi-final-20260918-31";
 // const BUILD="kakashi-final-20260918-32";
 // ============================================================================
 (function activateAlphaKakashiFinal34100(){
@@ -54,7 +55,7 @@ const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
 const SCENE04A_PATH="runtime/alpha-kakashi-scene04a-35710.js";
 const OBJECTIVE_PRESENTATION_PATH="runtime/alpha-kakashi-objective-presentation-35720.js";
 const SCENE05AW_PATH="runtime/alpha-kakashi-scene05a-w-35730.js";
-const BUILD="kakashi-final-20260918-31";
+const BUILD="kakashi-final-20260918-33";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
