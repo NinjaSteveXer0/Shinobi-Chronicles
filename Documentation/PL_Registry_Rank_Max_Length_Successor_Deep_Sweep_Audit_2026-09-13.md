@@ -551,7 +551,7 @@ Method: exact Post-949 production source rows + exact Final-116 Character admiss
 | `kage_madara` | 109 | 97 | 90 | 80 | 98 | 108 | 108 | 107 | 107 | 0 | `None` | Post-949 source lineage |
 | `black_zetsu` | 58 | 36 | 14 | 62 | 95 | 50 | 90 | 86 | 86 | 0 | `None` | Post-949 source lineage |
 | `reborn_kurama` | 110 | 84 | 30 | 48 | 118 | 76 | 116 | 112 | 112 | 0 | `None` | Post-949 source lineage |
-| `pakkun` | 42 | 48 | 30 | 18 | 22 | 26 | 52 | 48 | 48 | 0 | `None` | Post-949 source lineage |
+| `pakkun` | 13 | 16 | 6 | 4 | 4 | 9 | 18 | 16 | 16 | 0 | `None` | #236 correction: original Pakkun calibration + current staging source; PL48 retired as stale reconstruction drift |
 | `unknown_operative` | 58 | 66 | 54 | 38 | 46 | 56 | 62 | 63 | 63 | 0 | `None` | Post-949 source lineage |
 | `academy_sasuke` | 12 | 10 | 11 | 5 | 8 | 9 | 10 | 11 | 11 | 0 | `academy` | Post-949 source lineage |
 | `academy_naruto` | 11 | 12 | 8 | 5 | 9 | 5 | 14 | 12 | 12 | 0 | `academy` | Post-949 source lineage |
