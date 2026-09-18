@@ -27,7 +27,13 @@ Current production traversal:
 -> confirmed-kill animation + aftermath
 -> Objective switches to **Report to ANBU.**
 -> **BLACK WIPE**
--> next: **ANBU Report Scene on the Konoha rooftop**
+-> `Scene 7A-W2C-K — ANBU Report` on `rooftop_night.png`
+-> Objective `Report to ANBU.` removed at scene end
+-> **BLACK WIPE**
+-> `Scene 8A-W2C-K — Hokage's Office` on `hokage_administration_interior_night.png`
+-> private reaction scene with Minato + ANBU Operative + ANBU Marked Target + Package Smuggler; Masked Interceptor absent because she is dead on this Chronicle
+-> **BLACK WIPE**
+-> Chronicle Receipt / closing sequence
 -> **continue this route to its terminal Origin ending before rewinding**.
 
 ## Current route state
@@ -41,7 +47,9 @@ Current production traversal:
   - `Scene 6A-W2C — ATTEMPT TO KILL HER`;
   - current browser-tested resolver result: `LETHAL_ATTEMPT_KILLED`;
   - Scene 6A-W2C now continues through the confirmed-kill animation/aftermath and black-wipe transition;
-  - next scene to review/write is the **ANBU Report on the rooftop**, not the Hokage Administration interior.
+  - `Scene 7A-W2C-K — ANBU Report` is now locked on the rooftop;
+  - `Scene 8A-W2C-K — Hokage's Office` is now locked as the private reaction scene;
+  - current next step is Coding implementation/browser test through the Chronicle Receipt / closing sequence.
 
 ## Required later browser test — manual fast-win exposure
 
@@ -100,9 +108,9 @@ Continue from the confirmed-kill end of:
 
 `SCENE_06A_W2C — ATTEMPT TO KILL HER`
 
-Next production task:
+Current production task:
 
-**Review/write the ANBU Report scene on `rooftop_night.png`, then continue this same route to its terminal Origin ending.**
+**Coding implements Scene 06A-W2C confirmed-kill continuation -> Scene 07A-W2C-K rooftop ANBU report -> Scene 08A-W2C-K Hokage Office, then Stephen browser-tests this same route through the Chronicle Receipt / terminal Origin ending.**
 
 
 ## Resolver-result coverage still outstanding for Scene 06A-W2C
