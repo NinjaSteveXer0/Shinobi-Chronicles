@@ -8,6 +8,9 @@ assert(src.includes("ACADEMY KAKASHI ORIGIN REWARD ADAPTER"));
 assert(src.includes('const ROUTE="academy_kakashi_origin_reward"'));
 assert(src.includes('const ITEM_SOURCE="kak_origin_item_field_recovery_resupply"'));
 assert(src.includes('const WEAPON_SOURCE="kak_origin_weapon_exceptional_training_tanto"'));
+assert(src.includes('const MI_REWARD_AUTHORITY_COMMIT="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"'));
+assert(src.includes('const MI_REWARD_FAMILY="kak_origin_battle_mi_victory_reward_v1"'));
+assert(src.includes('const MI_REWARD_CLAIM_FAMILY="kak_origin_battle_mi_victory_reward_claim_v1"'));
 assert(src.includes("addDisciplineExp"),"34800 must consume canonical discipline Progression");
 assert(src.includes("addItemToInventory"),"34800 must consume canonical Inventory grant");
 const terminalStart=src.indexOf("function commitTerminalDebriefRewards");
@@ -61,6 +64,37 @@ assert.strictEqual(diag.browserGoldenClaimed,false);
 // Battle victory alone is not a terminal reward source.
 assert.strictEqual(context.evaluateAcademyKakashiTerminalDebriefRewards34800({terminalDebriefReached:false}).success,false);
 
+// Exact solo Kakashi-vs-MI victory now owns one immediate material Battle reward.
+const miBattle={
+  battleId:"battle-mi-solo-1",battleOver:true,outcome:{type:"victory"},
+  kakashiOriginDeployment:{
+    battleConfigId:"academy_kakashi_origin_battle_mi_1v1",
+    battleOccurrenceId:"battle-mi-solo-1",
+    storyOccurrenceId:"origin-occurrence-1",
+    controllerParticipantId:"academy_kakashi",
+    oppositionParticipantIds:["academy_kakashi_origin_masked_interceptor"]
+  }
+};
+let immediate=context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(miBattle);
+assert.strictEqual(immediate.success,true);assert.strictEqual(immediate.claimed,false);
+let immediateState=context.getAcademyKakashiMiVictoryBattleRewardState34800(miBattle);
+assert.strictEqual(immediateState.success,true);assert.strictEqual(immediateState.entitlement.materialReward.ryo,50);
+assert.strictEqual(immediateState.entitlement.materialReward.items[0].itemId,"field_recovery_pill");
+let immediateClaim=context.commitAcademyKakashiMiVictoryBattleReward34800(miBattle);
+assert.strictEqual(immediateClaim.success,true);assert.strictEqual(immediateClaim.ryoGranted,50);
+assert.strictEqual(playerData.ryo,50);
+assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1);
+immediateClaim=context.commitAcademyKakashiMiVictoryBattleReward34800(miBattle);
+assert.strictEqual(immediateClaim.success,true);assert.strictEqual(immediateClaim.idempotent,true);
+assert.strictEqual(playerData.ryo,50,"immediate claim retry must not duplicate Ryō");
+assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1,"immediate claim retry must not duplicate pill");
+
+// Loss and multi-target MI Battles do not qualify by implication.
+const lossBattle=JSON.parse(JSON.stringify(miBattle));lossBattle.battleId="battle-mi-loss";lossBattle.outcome={type:"defeat"};lossBattle.kakashiOriginDeployment.battleOccurrenceId="battle-mi-loss";
+assert.strictEqual(context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(lossBattle).success,false);
+const multiBattle=JSON.parse(JSON.stringify(miBattle));multiBattle.battleId="battle-mi-multi";multiBattle.kakashiOriginDeployment.battleOccurrenceId="battle-mi-multi";multiBattle.kakashiOriginDeployment.battleConfigId="academy_kakashi_origin_battle_ps_mi_2v1";multiBattle.kakashiOriginDeployment.oppositionParticipantIds=["academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"];
+assert.strictEqual(context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(multiBattle).success,false);
+
 // Exact technical action development: effective +2, idempotent retry +0.
 let r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action1",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
 assert.strictEqual(r.success,true);assert.strictEqual(r.amount,2);assert.strictEqual(characterProgression.buki.exp,2);
@@ -86,11 +120,11 @@ assert.strictEqual(r.evidence.significance,2);assert.strictEqual(r.evidence.sour
 // Terminal debrief package: exact max 250 and source-scoped Inventory grants once.
 const facts={terminalDebriefReached:true,packageRecovered:true,verifiedActionableIntelligence:true,liveCustodyEstablished:true,exceptionalFieldExecution:true,materiallyParticipatedInPlBattle:true,exceptionalTrainingTantoPredicate:true};
 r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
-assert.strictEqual(r.success,true);assert.strictEqual(r.ryo,250);assert.strictEqual(playerData.ryo,250);
+assert.strictEqual(r.success,true);assert.strictEqual(r.ryo,250);assert.strictEqual(playerData.ryo,300);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1);
 r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
-assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,250);
+assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,300);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1,"same-source retry must not duplicate weapon grant");
 
-console.log(JSON.stringify({pass:true,adapter:"34800-v2",canonicalProgression:true,canonicalInventory:true,technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,sourceScopedIdempotence:true,battleVictoryNotTerminalReward:true,browserGoldenClaimed:false,saves},null,2));
+console.log(JSON.stringify({pass:true,adapter:"34800-v3",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
