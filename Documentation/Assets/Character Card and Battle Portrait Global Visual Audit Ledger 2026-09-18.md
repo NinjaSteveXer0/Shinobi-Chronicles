@@ -538,6 +538,60 @@ The audit should ask **what the writing is doing**, not merely whether writing e
 
 ---
 
+## 6F. Enemy presentation-card direct-pixel audit — third cohort — 2026-09-19
+
+**Source:** thirteen individual PNGs uploaded directly by Stephen and visually inspected in the active workspace.
+
+**Scope:** all thirteen are reusable/generic Enemy presentation cards under `Enemies/`. They remain outside the frozen 141 ninja Character Card count.
+
+**Machine-read note:** the uploaded PNGs are mounted in the workspace, but the local image-analysis backend timed out repeatedly during this audit turn. Therefore no local-upload dimension/hash values are asserted here. Repository source paths and blob SHAs were re-fetched live and are recorded below. Do not invent missing pixel metadata.
+
+| Asset | Current source path | Blob SHA | Human / Entity Presence | Composition / Materials | Role-defining writing/content | Menma | Verdict | Primary Action |
+|---|---|---|---|---|---|---|---|---|
+| Seal Breaker | `Enemies/seal_breaker.png` | `c3d4e785b03c7be70b41eec8850b6f6873302b04` | **MEETS** | Strong adult face, excellent cyan seal-light, shattered-stone depth, chains and high material separation | **AUTHORIZED ROLE CONTENT** — sealing tags/glyphs are central to a seal-breaking archetype | **MEETS** | **GREEN** | Preserve |
+| Senbon Duelist | `Enemies/senbon_duelist.png` | `956d5127966a0104fd9a55837daa961bb0c5b878` | NEAR | Clear youthful/adult identity, strong hand/needle staging and readable duel geometry; face remains more illustrated than Menma | Senbon placement is role-defining | **NEAR** | PASS WITH NOTES | Preserve; facial/skin realism uplift only if remastered |
+| Sensory Pursuer | `Enemies/sensory_pursuer.png` | `ba20c48eac2d102df08818057512d208e2f1522b` | NEAR-to-MEETS | Strong sensor-ring language, map/gear readability, moonlit terrain depth and pursuit staging | Map/marker details support tracking/sensory role | **NEAR** | PASS WITH NOTES | Preserve concept; human-presence uplift only if remastered |
+| Shinobi Infiltrator | `Enemies/shinobi_infiltrator.png` | `19a07fdde6cfd9811a54bab5c17064c90f1ff994` | NEAR; face intentionally obscured | Excellent stealth silhouette, elevated interior vantage, target-density storytelling and suppressed palette | Scroll/tag writing is contextually coherent infiltration material | **NEAR** | PASS WITH NOTES | Preserve |
+| Silent Cell Operative | `Enemies/silent_cell_operative.png` | `b9f2c679b4a325b2beb9e6dc08da9da3c4f67f8c` | NEAR; mask and restraint are intentional | Strong interrogation/cell staging and controlled symmetry; less material/facial richness than the strongest cohort cards | Cell records/diagrams are context-defining rather than random decoration | **NEAR** | PASS WITH NOTES | Preserve concept |
+| Test Subject — Altered Shinobi | `Enemies/test_subject_altered_shinobi.png` | `c9aaf2006c10eac6cc5d038fdcf70f3ae210a92f` | **MEETS** | Excellent damaged skin, stitches, asymmetric eyes, torn cloth, close threat staging and test-subject specificity | Test-subject label is identity-defining | **MEETS** | **GREEN** | Preserve |
+| Test Subject — Brute | `Enemies/test_subject_brute.png` | `56bc5595cf2304034ac6cdef60f13183de4f1f25` | **MEETS (entity-presence equivalent)** | Excellent mutated anatomy, mass, scar/stitch detail, floor weight and containment-lab staging | Subject-number signage is role/worldbuilding content | **MEETS** | **GREEN** | Preserve |
+| Test Subject — Unstable | `Enemies/test_subject_unstable.png` | `57e4c479051e13ce55b97d2ba23bf5fb0cc70c03` | NEAR-to-MEETS | Strong mutation asymmetry, violet crystalline/energy arm, damaged body and containment aftermath | Test-subject identifiers are role-defining | **NEAR** | PASS WITH NOTES | Preserve; humanize face/skin further only if remastered |
+| Trap Network Controller | `Enemies/trap_network_controller.png` | `36f3d12a7a9bdf6e9e7bee5f483af60929680015` | NEAR-to-MEETS | Exceptional environmental storytelling, wide trap lattice, tools/tags and authored control-station perspective | **AUTHORIZED ROLE CONTENT** — trap tags, diagrams and network marks are the point of the archetype | **MEETS** | **GREEN** | Preserve |
+| Trap Specialist | `Enemies/trap_specialist.png` | `8bffac5bdbf001295ac6dbf2cce94219c033b9e4` | NEAR-to-MEETS | Excellent wire/trip-line density, explosive staging, close-range hand action and rough terrain | **AUTHORIZED ROLE CONTENT** — trap labels/markers support the concept | **NEAR** | PASS WITH NOTES | Preserve |
+| Venom Mist Operative | `Enemies/venom_mist_operative.png` | `f16b04cb93e16a6d0eb63e89f9e9db05350b0c7f` | **MEETS** through eyes, posture and equipment despite respirator | Excellent poison-vial materials, green mist volume, layered tactical gear and hostile-zone atmosphere | Poison symbols/labels are role-defining | **MEETS** | **GREEN** | Preserve |
+| Scout | `Enemies/Scout.png` | `60ff9b58637ee3c1fd9d7478b32ee2ea9292ac7d` | **MEETS** | Strong grounded reconnaissance pose, binocular prop, pack/rope materials, moonlit overlook and believable tactical wear | No blocking text concern | **MEETS** | **GREEN** | Preserve |
+| Scout Reborn | `Enemies/ScoutReborn.png` | `2094048d21c6a8e70e366c1fc0aac3573a9eda77` | NEAR-to-MEETS | Excellent transformed/progression read, teal energy silhouette and aggressive forward motion; effects reduce some raw human realism | No blocking text concern | **NEAR** | PASS WITH NOTES | Preserve; progression distinction is strong |
+
+### Cohort result
+
+- **6 GREEN**
+- **7 PASS WITH NOTES**
+- **0 HARD FAIL**
+- **0 GOLDEN ALERT**
+
+### Notable findings
+
+**Seal Breaker** is one of the best concept-to-role executions in the generic Enemy library. The seal tags, glyphs and circular sealing geometry are not text debt; they are exactly what makes the card read instantly as a seal-breaking specialist.
+
+The **Test Subject** trio has excellent internal differentiation:
+- **Altered Shinobi** = lean, scarred, asymmetric, fast-threat read;
+- **Brute** = mass, force, mutation and containment-break weight;
+- **Unstable** = volatile energy mutation and partial bodily transformation.
+
+This satisfies the locked rule that sibling/series cards should not be the same composition with different effects.
+
+The **Scout -> Scout Reborn** pair also demonstrates meaningful progression rather than a simple glow pass:
+- Scout is grounded, observational, stealth/reconnaissance;
+- Scout Reborn becomes aggressive, kinetic and supernatural.
+
+That is a valid progression in visual verb.
+
+### Golden-watch note
+
+No card in this cohort clearly exceeds Genin Menma overall. **Seal Breaker** and **Test Subject — Altered Shinobi** are the closest human-presence cards in this upload, while **Trap Network Controller** is particularly strong in environmental storytelling. None currently warrants a Golden Alert.
+
+---
+
 ## 7. Battle/UI portrait inventory — repository cross-reference at 12ec215
 
 ### Active portrait authority consumed
