@@ -4,7 +4,7 @@ const assert=require("assert"),fs=require("fs"),vm=require("vm"),path=require("p
 function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(),rel),"utf8"),{filename:rel});}
 
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
-const RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DKILL_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
+const LIVE_SOURCE="kak_scene05a_w_choice",RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DKILL_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
 const MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt";
 const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0;
 const participantStates={
@@ -38,6 +38,10 @@ globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(){
  return{success:true,recovered:true,packageOccurrenceId:id};
 };
 
+const liveBeat={beatId:LIVE_SOURCE,mode:"choice",choices:[
+ {choiceId:"scene05aw_go_after_package_smuggler",label:"GO AFTER PACKAGE SMUGGLER",nextBeatId:LIVE_SOURCE,availability:()=>({available:true}),consequenceRequests:[{requestId:"pending-live-ps",kind:"domain",resolve:()=>({success:false,reason:"pending"})}]},
+ {choiceId:"scene05aw_go_after_anbu_marked_target",label:"GO AFTER ANBU MARKED TARGET",nextBeatId:LIVE_SOURCE,availability:()=>({available:true}),consequenceRequests:[{requestId:"pending-live-amt",kind:"domain",resolve:()=>({success:false,reason:"pending"})}]}
+]};
 const resolverBeat={beatId:RESOLVER_SOURCE,mode:"choice",choices:[
  {choiceId:"scene06aw2c_postlethal_go_after_package_smuggler",label:"GO AFTER PACKAGE SMUGGLER",nextBeatId:RESOLVER_SOURCE,availability:()=>({available:true}),consequenceRequests:[{requestId:"pending-ps",kind:"domain",resolve:()=>({success:false,reason:"pending"})}]},
  {choiceId:"scene06aw2c_postlethal_go_after_anbu_marked_target",label:"GO AFTER ANBU MARKED TARGET",nextBeatId:RESOLVER_SOURCE,availability:()=>({available:true}),consequenceRequests:[{requestId:"pending-amt",kind:"domain",resolve:()=>({success:false,reason:"pending"})}]}
@@ -46,7 +50,7 @@ const dkillBeat={beatId:DKILL_SOURCE,mode:"choice",choices:[
  {choiceId:"scene06aw2c_dkill_go_after_package_smuggler",label:"GO AFTER PACKAGE SMUGGLER",nextBeatId:DKILL_SOURCE,availability:()=>({available:true}),consequenceRequests:[{requestId:"pending-dps",kind:"domain",resolve:()=>({success:false,reason:"pending"})}]},
  {choiceId:"scene06aw2c_dkill_go_after_anbu_marked_target",label:"GO AFTER ANBU MARKED TARGET",nextBeatId:DKILL_SOURCE,availability:()=>({available:true}),consequenceRequests:[{requestId:"pending-damt",kind:"domain",resolve:()=>({success:false,reason:"pending"})}]}
 ]};
-const definition={sceneId:SCENE_ID,beatMap:new Map([[RESOLVER_SOURCE,resolverBeat],[DKILL_SOURCE,dkillBeat]])};
+const definition={sceneId:SCENE_ID,beatMap:new Map([[LIVE_SOURCE,liveBeat],[RESOLVER_SOURCE,resolverBeat],[DKILL_SOURCE,dkillBeat]])};
 let active=null;
 globalThis.getStorySceneDefinition=id=>id===SCENE_ID?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
@@ -91,14 +95,27 @@ function simulateBattleReturn(battleBeatId,result,returnBeatId){
  active.battleResume={authored:result};active.beatId=returnBeatId;
 }
 
-active=freshResolver();
 load("runtime/alpha-kakashi-post-mi-death-pursuit-35830.js");
 const MOD=globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830;
 assert(MOD,"35830 module missing");
 const diag=globalThis.runAcademyKakashiPostMiDeathPursuit35830Diagnostics();
 assert.strictEqual(diag.pass,true,"35830 diagnostics failed: "+JSON.stringify(diag.failed));
 
-let out=globalThis.advanceStoryScene("scene06aw2c_postlethal_go_after_package_smuggler");
+participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
+store.set("battle-mi-live",{occurrenceId:"battle-mi-live",fact:{factClass:"battle_result"}});
+active={sceneId:SCENE_ID,instanceId:"qa-postmi-live",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:3,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
+MOD.wireEntryChoices();
+let out=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
+assert.strictEqual(out.success,true,"live post-MI PS pursuit choice failed: "+JSON.stringify(out));
+assert.strictEqual(active.beatId,MOD.beats.psChase,"live fast-win pursuit did not enter authored PS chase");
+const liveSelection=store.get(active.localContext.kakashiPostMiPursuitSelectionOccurrenceId);
+assert(liveSelection,"live pursuit selection occurrence missing");
+assert.strictEqual(liveSelection.fact.miDeathAlreadyCommitted,false,"live pursuit falsely committed MI death");
+assert.strictEqual(liveSelection.fact.sourceMiResolutionState,"DEFEATED_BUT_NOT_CONTROLLED");
+
+participantStates[MI]={participantRef:MI,stateClass:"DEAD"};
+active=freshResolver();MOD.wireEntryChoices();
+out=globalThis.advanceStoryScene("scene06aw2c_postlethal_go_after_package_smuggler");
 assert.strictEqual(out.success,true,"PS pursuit choice failed: "+JSON.stringify(out));
 assert.strictEqual(active.beatId,MOD.beats.psChase);
 assert.strictEqual(participantStates[MI].stateClass,"DEAD","MI death was rewritten by successor entry");
@@ -167,7 +184,8 @@ assert.strictEqual(loss.reason,"post_mi_amt_defeat_requires_package_and_pakkun_a
 
 assert(saves>0);
 console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
-console.log("- committed MI death is never rerolled across successor selection");
+console.log("- live fast-win PS pursuit and post-kill PS/AMT pursuit entries use direct authored successor routing");
+console.log("- committed MI death is never rerolled across lethal successor selection");
 console.log("- PS route uses sequential PS Battle config and separate AK_SA_033 package recovery");
 console.log("- <=3 PS victory preserves AMT route; PS ATTEMPT lethal remains resolver-owned/fail-closed");
 console.log("- legitimate AMT reach commits Pakkun and uses sequential AMT+Pakkun config");
