@@ -296,8 +296,8 @@ jobs:
           grep -Fq 'alpha_kakashi_battle_development_35740_v3_2026_09_19' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'alpha_kakashi_origin_rewards_34800_v4_2026_09_19' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'ACTION_DERIVED_DISCIPLINE_SOURCE="action_derived_development"' runtime/alpha-kakashi-origin-rewards-34800.js
-          grep -Fq 'ACTION_DERIVED_DISCIPLINE_SOURCE =' game.js
-          grep -Fq '"action_derived_development"' game.js
+          grep -Fq 'installActionDerivedDisciplineSourceGate34800' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq '__scActionDerivedDevelopment34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'resolvedEvidenceMayOwnDiscipline' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'requiresExplicitPostClaimContinue' runtime/alpha-battle-browser-32600.js
           grep -Fq 'font-size:18px!important' runtime/alpha-kakashi-objective-presentation-35720.js
