@@ -66,14 +66,14 @@ assert.strictEqual(diag.checks.watchExchangeMotionStages,true,"Watch the Exchang
 assert.strictEqual(diag.checks.watchExchangeMotionLanguage,true,"Watch the Exchange motion language missing");
 const scene03Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene03a-35700.js"),"utf8");
 assert(scene03Source.includes("scWatchMiBurst35700"),"MI burst animation missing");
-assert(scene03Source.includes("scWatchAmtBreakaway35700"),"AMT breakaway animation missing");
-assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-breakaway-35700)")&&scene03Source.includes("opacity:1!important;filter:none!important"),"WATCH THE EXCHANGE must keep present actors vivid without suppressing the simultaneous AMT-exit / MI-entry cue");
+assert(scene03Source.includes("scWatchAmtExitGhost35700"),"AMT preserved-DOM exit animation missing");
+assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-exit-ghost-35700)")&&scene03Source.includes("opacity:1!important;filter:none!important"),"WATCH THE EXCHANGE must keep present actors vivid without suppressing the simultaneous preserved AMT-exit / MI-entry cue");
 assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes("left:22%!important")&&scene03Source.includes("right:22%!important"),"WATCH final choice must pin only MI / PS to distinct non-overlapping lanes");
-assert(scene03Source.includes('if(index===12){')&&scene03Source.includes('amtNode.classList.add("sc-watch-amt-breakaway-35700")')&&scene03Source.includes('miNode.classList.add("sc-watch-mi-burst-35700")'),"Cue 13 must animate AMT off-screen at the exact moment MI appears");
+assert(scene03Source.includes("if(next===12)prepareWatchAmtExitGhost35700()")&&scene03Source.includes("cloneNode(true)")&&scene03Source.includes('if(index===12&&miNode)miNode.classList.add("sc-watch-mi-burst-35700")'),"Cue 13 must preserve the visible AMT DOM for exit while MI appears in the new projection");
 assert(scene03Source.includes("sc-watch-handoff-giver-35700"),"package handoff animation missing");
 assert(scene03Source.includes("sc-watch-mi-cutoff-35700"),"MI interception animation missing");
 assert(scene03Source.includes("sc-watch-ps-turn-35700")&&!scene03Source.includes("sc-watch-ps-escape-35700"),"Package Smuggler must hold the exchange lane before branch-specific escape");
-assert(scene03Source.includes("data-watch-stage=\'interceptor-swap\'")&&scene03Source.includes("left:42%!important")&&scene03Source.includes("scWatchAmtBreakaway35700"),"MI must enter the active center lane while AMT exits on cue 13");
+assert(scene03Source.includes("data-watch-stage=\'interceptor-swap\'")&&scene03Source.includes("left:42%!important")&&scene03Source.includes("scWatchAmtExitGhost35700")&&scene03Source.includes("visibility:hidden!important"),"MI must enter the active center lane while the replacement AMT node stays hidden behind the preserved exit ghost");
 assert.strictEqual(MOD.cueCount,18,"Scene 03A cue count drifted");
 assert.deepStrictEqual(MOD.objectives,{initial:"Stop the package from falling into the wrong hands.",postHandoff:"Retrieve the package."},"Scene 03A objective wording drifted");
 assert.strictEqual(diag.checks.objectiveChangesAtPackageTransfer,true,"Scene 03A objective does not change at exact package-transfer cue");
@@ -94,13 +94,40 @@ active.beatId="kak_original_transfer";
 const expected=[
   "Kakashi stays where he is.","Not passive.","Watching.","ANBU Marked Target shifts the package from beneath his clothing and places it into Package Smuggler's hand.","The moment custody changes, the whole problem changes with it.","Kakashi's eye follows the package.","ANBU Marked Target is already moving away.","Package Smuggler turns in the opposite direction.","Kakashi has one additional fact now—who received the package—and less control over the situation than he had a few seconds earlier.","The trade was information for escalation.","Then the darkness beside the alley moved.","Not slowly.","A figure tore out of it like a lightning streak.","Masked Interceptor hit the new situation at speed, driving straight toward Package Smuggler and forcing him to react before he had properly cleared the exchange.","ANBU Marked Target broke away.","Package Smuggler tightened around the package.","Masked Interceptor cut across his escape line.","And Kakashi, still unseen for one more heartbeat, had to choose what mattered most now."
 ];
+let capturedAmtExitGhost=null;
 for(let i=0;i<expected.length;i++){
   const p=globalThis.getStoryScenePerformance33900();
   assert(p,"Scene 03A performance missing");
   assert.strictEqual(p.index,i,`Scene 03A cue index drift at ${i}`);
   assert.strictEqual(p.cue.kind,"narration",`Scene 03A cue ${i} is not narration`);
   assert.strictEqual(p.cue.text,expected[i],`Scene 03A cue ${i} text drift`);
-  if(i<expected.length-1){const advanced=globalThis.advanceStoryScene();assert.strictEqual(advanced.success,true,`Scene 03A cue ${i} failed to advance`);assert.strictEqual(active.beatId,"kak_original_transfer","Scene 03A advanced semantic beat before final cue");}
+  if(i<expected.length-1){
+    if(i===11){
+      function classes(initial=[]){const values=new Set(initial);return{add(...names){for(const name of names)values.add(name);},remove(...names){for(const name of names)values.delete(name);},contains(name){return values.has(name);},values};}
+      const source={classList:classes(["sc-scene-board-33900__actor","sc-watch-amt-moving-35700"]),style:{},getBoundingClientRect(){return{left:100,top:120,width:180,height:300};}};
+      source.cloneNode=()=>({classList:classes(["sc-scene-board-33900__actor","sc-watch-amt-moving-35700"]),style:{},setAttribute(){},getBoundingClientRect(){return{left:100,top:120,width:180,height:300};},addEventListener(){},remove(){this.removed=true;},offsetWidth:180});
+      const psNode={classList:classes(["sc-scene-board-33900__actor"]),style:{}},miNode={classList:classes(["sc-scene-board-33900__actor"]),style:{}};
+      const actors={dataset:{},querySelector(selector){if(selector.includes("anbu_marked_target"))return source;if(selector.includes("package_smuggler"))return psNode;if(selector.includes("masked_interceptor"))return miNode;return null;},querySelectorAll(){return[source,psNode,miNode];}};
+      const stage={children:[],appendChild(node){this.children.push(node);capturedAmtExitGhost=node;return node;},querySelector(selector){return selector===".sc-scene-board-33900__actors"?actors:null;},querySelectorAll(selector){return selector===".sc-watch-amt-exit-ghost-35700"?this.children.filter(node=>!node.removed&&node.classList&&node.classList.contains("sc-watch-amt-exit-ghost-35700")):[];},getBoundingClientRect(){return{left:10,top:20,width:1000,height:600};}};
+      const layer={dataset:{},querySelector(selector){if(selector===".sc-chronicle-stage")return stage;return null;}};
+      const styles=new Map();
+      globalThis.document={head:{appendChild(node){styles.set(node.id,node);node.remove=()=>styles.delete(node.id);}},createElement(){return{id:"",textContent:"",remove(){if(this.id)styles.delete(this.id);}};},getElementById(id){if(id==="story-scene-presentation-layer")return layer;return styles.get(id)||null;}};
+      globalThis.requestAnimationFrame=fn=>{fn();return 1;};
+    }
+    const advanced=globalThis.advanceStoryScene();
+    assert.strictEqual(advanced.success,true,`Scene 03A cue ${i} failed to advance`);
+    assert.strictEqual(active.beatId,"kak_original_transfer","Scene 03A advanced semantic beat before final cue");
+    if(i===11){
+      assert(capturedAmtExitGhost,"cue 13 transition must clone the already-visible AMT card before the Scene Board replaces actor markup");
+      assert(capturedAmtExitGhost.classList.contains("sc-watch-amt-exit-ghost-35700"),"preserved AMT clone missing exit-ghost class");
+      assert(capturedAmtExitGhost.classList.contains("is-running"),"preserved AMT clone did not start the left-exit animation");
+      assert.strictEqual(capturedAmtExitGhost.style.left,"90px","AMT exit ghost must preserve its pre-render x position");
+      assert.strictEqual(capturedAmtExitGhost.style.top,"100px","AMT exit ghost must preserve its pre-render y position");
+      assert.strictEqual(capturedAmtExitGhost.style.width,"180px");
+      assert.strictEqual(capturedAmtExitGhost.style.height,"300px");
+      delete globalThis.document;delete globalThis.requestAnimationFrame;
+    }
+  }
 }
 
 const finalAdvance=globalThis.advanceStoryScene();
@@ -152,7 +179,7 @@ assert(saves>0,"Scene 03A progression never persisted runtime state");
 console.log("Academy Kakashi Scene 03A 35700 QA: PASS");
 console.log(`- exact narration cues: ${expected.length}`);
 console.log("- dialogue: none");
-console.log("- Watch the Exchange uses state-driven handoff / divergence / MI arrival / AMT breakaway / interception motion");
+console.log("- Watch the Exchange preserves the visible AMT DOM through cue 13, slides it left while MI enters, then removes it");
 console.log("- factual handoff: ANBU Marked Target -> Package Smuggler");
 console.log("- objective: Stop the package from falling into the wrong hands. -> Retrieve the package. at exact handoff cue");
 console.log("- Masked Interceptor visibility commits after transfer");
