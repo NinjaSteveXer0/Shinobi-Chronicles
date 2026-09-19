@@ -982,3 +982,18 @@ Final lock:
 > **Information is what the answer contains. Character is how the person gives it.**
 >
 > **A correct answer that erases personality is not finished Shinobi Chronicles dialogue.**
+
+## 2026-09-19 — Production workflow benchmark pointer
+
+Player-facing craft remains governed by this document.
+
+The production process used to create, approve, commit and route that craft is now separately locked in:
+
+`Documentation/Story/Writing_Konoha_Production_Workflow_Benchmark_and_Change_Control_2026-09-19.md`
+
+commit:
+`2f32fe97394602d76ba7d4da4482b25359929b7e`
+
+That workflow is the current production benchmark.
+
+Material process changes require a demonstrated improvement over the benchmark and Stephen approval. Process convenience alone does not justify replacing a workflow that is producing stronger dialogue, cleaner authority and faster Alpha progress.
