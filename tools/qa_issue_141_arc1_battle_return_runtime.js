@@ -119,15 +119,21 @@ try {
   run(`
     globalThis.__issue141ReturnCalls=[];
     globalThis.__issue141LegacyContinueCalls=0;
+    globalThis.__issue141OverlayCalls=[];
+    globalThis.__issue141ForceReturnFailure=false;
     resumeBattleCallerAfterCompletion=function(outcome){
       globalThis.__issue141ReturnCalls.push(outcome);
+      if(globalThis.__issue141ForceReturnFailure)return {success:false,reason:"fixture_story_return_failed"};
       return {success:true,outcome,destination:"same_story_scene"};
     };
     continueAfterVictory=function(){
       globalThis.__issue141LegacyContinueCalls += 1;
       return {success:true,legacy:true};
     };
-    openOverlay=function(type){ return {success:true,type}; };
+    openOverlay=function(type){
+      globalThis.__issue141OverlayCalls.push(type);
+      return {success:true,type};
+    };
   `, "issue141-return-spies.js");
 
   run(sprint, "runtime/alpha-alpha-sprint-33100.js");
@@ -152,6 +158,32 @@ try {
     victory && victory.success === true && victory.alpha33100StoryReturnPriority === true &&
       victoryCalls.length === 1 && victoryCalls[0] === "victory" && context.__issue141LegacyContinueCalls === 0,
     { victory, victoryCalls, legacyCalls: context.__issue141LegacyContinueCalls }
+  );
+
+  // A broken authored Story continuation must fail closed on Victory. It must
+  // never drop the player into the generic Combat Arena.
+  const failedVictory = plain(run(`
+    globalThis.__issue141ForceReturnFailure=true;
+    const legacyBefore=globalThis.__issue141LegacyContinueCalls;
+    const overlayBefore=globalThis.__issue141OverlayCalls.length;
+    currentBattle={
+      active:false,battleOver:true,
+      outcome:{type:"victory"},
+      rewards:{claimed:true},
+      returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
+    };
+    const result=continueAfterVictory();
+    globalThis.__issue141ForceReturnFailure=false;
+    ({result,legacyBefore,legacyAfter:globalThis.__issue141LegacyContinueCalls,overlayCalls:globalThis.__issue141OverlayCalls.slice(overlayBefore)});
+  `, "issue141-victory-return-fail-closed.js"));
+  check(
+    "story_victory_return_failure_never_opens_generic_arena",
+    failedVictory && failedVictory.result && failedVictory.result.success === false &&
+      failedVictory.result.alpha33100StoryReturnFailClosed === true &&
+      failedVictory.result.genericBattleFallbackSuppressed === true &&
+      failedVictory.legacyAfter === failedVictory.legacyBefore &&
+      failedVictory.overlayCalls.includes("victory") && !failedVictory.overlayCalls.includes("battle"),
+    failedVictory
   );
 
   // Without claimed rewards, the wrapper must not consume the Story return;
@@ -187,6 +219,28 @@ try {
     setback && setback.success === true && setback.alpha33100SetbackReturn === true &&
       context.__issue141ReturnCalls.length === 2 && context.__issue141ReturnCalls[1] === "defeat",
     { setback, returnCalls: plain(context.__issue141ReturnCalls) }
+  );
+
+  const failedSetback = plain(run(`
+    globalThis.__issue141ForceReturnFailure=true;
+    const overlayBefore=globalThis.__issue141OverlayCalls.length;
+    currentBattle={
+      active:false,battleOver:true,
+      outcome:{type:"defeat",battlePLWithdrawal:true,injuryInferred:false,deathInferred:false},
+      rewards:{claimed:false},
+      returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
+    };
+    const result=continueAfterSetback33100();
+    globalThis.__issue141ForceReturnFailure=false;
+    ({result,overlayCalls:globalThis.__issue141OverlayCalls.slice(overlayBefore)});
+  `, "issue141-setback-return-fail-closed.js"));
+  check(
+    "story_setback_return_failure_never_opens_generic_arena",
+    failedSetback && failedSetback.result && failedSetback.result.success === false &&
+      failedSetback.result.alpha33100StorySetbackReturnFailClosed === true &&
+      failedSetback.result.genericBattleFallbackSuppressed === true &&
+      failedSetback.overlayCalls.includes("setback") && !failedSetback.overlayCalls.includes("battle"),
+    failedSetback
   );
 
   check(
