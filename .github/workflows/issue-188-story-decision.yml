@@ -32,6 +32,7 @@ on:
       - 'runtime/alpha-kakashi-immediate-custody-35800.js'
       - 'runtime/alpha-kakashi-deterministic-kill-35810.js'
       - 'runtime/alpha-kakashi-loss-ending-35820.js'
+      - 'runtime/alpha-kakashi-post-mi-death-pursuit-35830.js'
       - 'runtime/alpha-kakashi-battle-development-35740.js'
       - 'runtime/alpha-battle-browser-32600.js'
       - 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
@@ -60,6 +61,7 @@ on:
       - 'tools/qa_academy_kakashi_immediate_custody_35800.js'
       - 'tools/qa_academy_kakashi_deterministic_kill_35810.js'
       - 'tools/qa_academy_kakashi_loss_ending_35820.js'
+      - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
       - 'tools/qa_kakashi_battle_development_35740.js'
       - '.github/workflows/issue-188-story-decision.yml'
   workflow_dispatch:
@@ -105,6 +107,7 @@ jobs:
           node --check runtime/alpha-kakashi-immediate-custody-35800.js
           node --check runtime/alpha-kakashi-deterministic-kill-35810.js
           node --check runtime/alpha-kakashi-loss-ending-35820.js
+          node --check runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -129,6 +132,7 @@ jobs:
           node --check tools/qa_academy_kakashi_immediate_custody_35800.js
           node --check tools/qa_academy_kakashi_deterministic_kill_35810.js
           node --check tools/qa_academy_kakashi_loss_ending_35820.js
+          node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -136,8 +140,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-49' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-49";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-50' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260919-50";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -175,6 +179,15 @@ jobs:
           grep -Fq 'alpha-kakashi-immediate-custody-35800.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-deterministic-kill-35810.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-post-mi-death-pursuit-35830.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'bf30ca7dfff9f850bebe978acdd8830f16758042' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'e18729844922461c654481745e48a6eac20649cd' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'academy_kakashi_origin_battle_seq_ps' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'academy_kakashi_origin_battle_seq_amt_pakkun' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'resolveAcademyKakashiSequentialPostPsPackageRecovery35600' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'Apparently.' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'field_secured_custody_requires_ce_244' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'academy_kakashi.battle.stop_assassin_post_mi_ps' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
           grep -Fq '0d4aa441e4ef6d566f3d1df23c198940bdc559dd' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'KILL — GUARANTEED' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'confirmedKillCountDelta:1' runtime/alpha-kakashi-deterministic-kill-35810.js
@@ -312,5 +325,7 @@ jobs:
         run: node tools/qa_academy_kakashi_deterministic_kill_35810.js
       - name: Academy Kakashi loss report and hidden review ending
         run: node tools/qa_academy_kakashi_loss_ending_35820.js
+      - name: Academy Kakashi post-MI-death PS and AMT pursuits
+        run: node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js
