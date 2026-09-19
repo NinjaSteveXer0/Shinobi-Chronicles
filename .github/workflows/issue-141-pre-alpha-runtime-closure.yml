@@ -61,6 +61,10 @@ jobs:
           node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
           node tools/qa_kakashi_battle_development_35740.js
           node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
+          node --check tools/qa_kakashi_origin_rewards_34800.js
+          node --check tools/qa_kakashi_terminal_debrief_35100.js
+          node tools/qa_kakashi_origin_rewards_34800.js
+          node tools/qa_kakashi_terminal_debrief_35100.js
 
       - name: Execute Origin public-handler DOM-event realization seam
         run: |
