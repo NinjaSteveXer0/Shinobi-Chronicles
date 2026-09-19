@@ -24,7 +24,7 @@ const SEQ=globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410;
 const CLOSURE=globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900;
 if(!A||!CORE||!KAK||!PROVIDER||!BATTLE||!SEQ||!CLOSURE)throw new Error("kakashi_konoha_route_closure_35910_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v1_2026_09_20";
+const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v2_2026_09_20";
 const ORIGIN="academy_kakashi";
 const SCENE="origin_academy_kakashi_anbu_retrieval";
 const KAKASHI="academy_kakashi";
@@ -148,6 +148,24 @@ function defeatedUnresolved(result,refs){
  return refs.every(ref=>{const row=participant(result,ref);return !!row&&row.battleStatus==="defeated"&&row.lifeState==="unresolved"&&row.custodyState==="unresolved";});
 }
 function setNext(beatId,nextBeatId){const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.get(beatId):null;if(b)b.nextBeatId=nextBeatId;return !!b;}
+function directChainBinding(rt=active()){return String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeBindingRef||DIRECT_BINDING);}
+function directChainAnchor(rt=active()){return String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeAnchorRef||"AK_SA_003");}
+function directChainAuthority(rt=active()){return String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeAuthorityCommit||AUTH.directStrike);}
+function directChainRoute(rt=active()){return String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeRouteRef||"direct_root");}
+function beginReusedDirectStrikePhysical35910({receipt,bindingRef=DIRECT_BINDING,parentOccurrenceId="",routeRef="direct_root",anchorRef="AK_SA_003",authorityCommit=AUTH.directStrike,knowledgeStateRef=null}={}){
+ const rt=active();if(!rt||rt.sceneId!==SCENE)return{success:false,reason:"direct_strike_reuse_story_context_required"};
+ if(!receipt||!receipt.storyDecisionReceiptId)return{success:false,reason:"direct_strike_reuse_decision_receipt_required"};
+ const binding=String(bindingRef||DIRECT_BINDING),anchor=String(anchorRef||"AK_SA_003"),authority=String(authorityCommit||AUTH.directStrike);
+ const id=stable("occ_origin_kakashi_direct_strike_entry",{instance:String(rt.instanceId||""),receipt:String(receipt.storyDecisionReceiptId),binding,routeRef:String(routeRef||"")});
+ const fact={factClass:"academy_kakashi_direct_strike_entry",anchorRef:anchor,authorityCommit:authority,storySceneInstanceId:String(rt.instanceId||""),storyDecisionReceiptId:String(receipt.storyDecisionReceiptId),parentOccurrenceRef:String(parentOccurrenceId||"")||null,routeRef:String(routeRef||"direct_root"),knowledgeStateRef:knowledgeStateRef?String(knowledgeStateRef):null,
+  packageState:{objectRef:PACKAGE,currentHolderClass:"ANBU_MARKED_TARGET",custodyClass:"ANBU_MARKED_TARGET",locationClass:"AMT_PERSON",handoffCompleted:false},
+  participantStateByRef:{[AMT]:{presenceState:"PRESENT"},[PS]:{presenceState:"PRESENT"},[MI]:{presenceState:"UNSEEN"},[PAKKUN]:{presenceState:"NOT_PRESENT"}},
+  worldFacts:{handoffInterrupted:true,maskedInterceptorVisible:false,pakkunPresent:false,battleRequired:true,battleConfigId:DIRECT_2V1,retainsGetCloserKnowledge:!!knowledgeStateRef}};
+ const committed=commitOnce(id,fact,"DIRECT_STRIKE_ENTRY",[ORIGIN,AMT,PS],[{type:"story_decision_receipt",id:String(receipt.storyDecisionReceiptId)},{type:"world_object",id:PACKAGE},{type:"writing_authority",id:authority}].concat(parentOccurrenceId?[{type:"origin_occurrence",id:String(parentOccurrenceId),role:"route_parent"}]:[]));if(!committed.success)return committed;
+ const mat=material(fact.packageState,id,anchor);if(!mat||mat.success!==true)return mat;
+ rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrikeOccurrenceId:id,kakashiKonohaDirectStrikeReceiptId:String(receipt.storyDecisionReceiptId),kakashiKonohaDirectStrikeBindingRef:binding,kakashiKonohaDirectStrikeAnchorRef:anchor,kakashiKonohaDirectStrikeAuthorityCommit:authority,kakashiKonohaDirectStrikeRouteRef:String(routeRef||"direct_root"),kakashiKonohaDirectStrikeKnowledgeStateRef:knowledgeStateRef?String(knowledgeStateRef):null,kakashiKonohaPackageOccurrenceId:id};save();
+ return{success:true,occurrenceId:id,nextBeatId:D.directIntro,bindingRef:binding,anchorRef:anchor,routeRef:String(routeRef||"direct_root")};
+}
 
 // ---------------------------------------------------------------------------
 // DIRECT STRIKE BEFORE THE HANDOFF
@@ -157,66 +175,61 @@ function resolveDirectStrikeEntry(choice){
  const contextStateRef=rootContext(rt);
  const intent=ensureDecisionIntent({decisionPointRef:"AK_SA_001",choiceId:"attack",bindingRef:DIRECT_BINDING,contextStateRef,beatRef:ACTION_BEAT});
  if(!intent||intent.success!==true)return intent;
- const id=stable("occ_origin_kakashi_direct_strike_entry",{instance:String(rt.instanceId||""),receipt:intent.receipt.storyDecisionReceiptId});
- const fact={factClass:"academy_kakashi_direct_strike_entry",anchorRef:"AK_SA_003",authorityCommit:AUTH.directStrike,storySceneInstanceId:String(rt.instanceId||""),storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId,
-  packageState:{objectRef:PACKAGE,currentHolderClass:"ANBU_MARKED_TARGET",custodyClass:"ANBU_MARKED_TARGET",locationClass:"AMT_PERSON",handoffCompleted:false},
-  participantStateByRef:{[AMT]:{presenceState:"PRESENT"},[PS]:{presenceState:"PRESENT"},[MI]:{presenceState:"UNSEEN"},[PAKKUN]:{presenceState:"NOT_PRESENT"}},
-  worldFacts:{handoffInterrupted:true,maskedInterceptorVisible:false,pakkunPresent:false,battleRequired:true,battleConfigId:DIRECT_2V1}};
- const committed=commitOnce(id,fact,"DIRECT_STRIKE_ENTRY",[ORIGIN,AMT,PS],[{type:"story_decision_receipt",id:intent.receipt.storyDecisionReceiptId},{type:"world_object",id:PACKAGE},{type:"writing_authority",id:AUTH.directStrike}]);if(!committed.success)return committed;
- const mat=material(fact.packageState,id,"AK_SA_003");if(!mat||mat.success!==true)return mat;
- rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrikeOccurrenceId:id,kakashiKonohaDirectStrikeReceiptId:intent.receipt.storyDecisionReceiptId,kakashiKonohaPackageOccurrenceId:id};choice.nextBeatId=D.directIntro;save();
- return{success:true,occurrenceId:id,nextBeatId:D.directIntro};
+ const begun=beginReusedDirectStrikePhysical35910({receipt:intent.receipt,bindingRef:DIRECT_BINDING,parentOccurrenceId:"",routeRef:"direct_root",anchorRef:anchor,authorityCommit:authority});
+ if(!begun||begun.success!==true)return begun||{success:false,reason:"direct_strike_physical_chain_begin_failed"};
+ choice.nextBeatId=D.directIntro;return begun;
 }
 function launchDirect2v1(ctx={}){
  const rt=active(),source=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeOccurrenceId||"");
  if(!source)return{success:false,reason:"direct_strike_entry_occurrence_missing"};
- return launch(DIRECT_2V1,DIRECT_BINDING,"AK_SA_003",source,D.directReturn,"direct_strike_2v1",ctx);
+ return launch(DIRECT_2V1,directChainBinding(rt),directChainAnchor(rt),source,D.directReturn,"direct_strike_2v1",ctx);
 }
 function consumeDirect2v1(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.directReturn)return{success:false,reason:"direct_strike_return_context_required"};
- if(!r||String(r.battleConfigId||"")!==DIRECT_2V1||String(r.bindingRef||"")!==DIRECT_BINDING)return{success:false,reason:"direct_strike_battle_receipt_mismatch"};
+ const binding=directChainBinding(rt),anchor=directChainAnchor(rt),authority=directChainAuthority(rt),routeRef=directChainRoute(rt);
+ if(!r||String(r.battleConfigId||"")!==DIRECT_2V1||String(r.bindingRef||"")!==binding)return{success:false,reason:"direct_strike_battle_receipt_mismatch"};
  const receiptId=String(rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeReceiptId||"");const snap=CORE.getStoryUnitSnapshot(ORIGIN)||{},receipt=snap.decisionReceipts&&snap.decisionReceipts[receiptId];if(!receipt)return{success:false,reason:"direct_strike_story_receipt_missing"};
  const win=String(r.resultState||"")==="player_side_victory";
  const id=stable("occ_origin_kakashi_direct_strike_2v1_return",{instance:String(rt.instanceId||""),battle:String(r.battleOccurrenceId||""),win});
  let fact;
  if(win){
   if(!defeatedUnresolved(r,[AMT,PS]))return{success:false,reason:"direct_strike_2v1_victory_participant_state_invalid"};
-  fact={factClass:"academy_kakashi_direct_strike_2v1_victory",anchorRef:"AK_SA_003",authorityCommit:AUTH.directStrike,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),
+  fact={factClass:"academy_kakashi_direct_strike_2v1_victory",anchorRef:anchor,authorityCommit:authority,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),
    packageState:{objectRef:PACKAGE,previousHolderClass:"ANBU_MARKED_TARGET",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",handoffCompleted:false},
    participantStateByRef:{[AMT]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},[PS]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},[MI]:{presenceState:"UNSEEN"}},
    worldFacts:{handoffInterrupted:true,packageRecovered:true,maskedInterceptorVisible:false,pakkunPresent:false,participantDeathCommitted:false,participantCustodyCommitted:false}};
  }else{
-  fact={factClass:"academy_kakashi_direct_strike_2v1_defeat",anchorRef:"AK_SA_003",authorityCommit:AUTH.directStrike,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),
+  fact={factClass:"academy_kakashi_direct_strike_2v1_defeat",anchorRef:anchor,authorityCommit:authority,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),
    packageState:{objectRef:PACKAGE,currentHolderClass:"ANBU_MARKED_TARGET",custodyClass:"ANBU_MARKED_TARGET",locationClass:"AMT_ESCAPED_WITH_PACKAGE",handoffCompleted:false},
    participantStateByRef:{[AMT]:{presenceState:"ESCAPED",controlState:"FREE"},[PS]:{presenceState:"ESCAPED",controlState:"FREE"},[MI]:{presenceState:"UNSEEN"}},
    worldFacts:{handoffInterrupted:true,amtEscaped:true,packageSmugglerEscaped:true,maskedInterceptorVisible:false,pakkunPresent:false,participantDeathCommitted:false,participantCustodyCommitted:false}};
  }
- const committed=commitOnce(id,fact,win?"DIRECT_STRIKE_2V1_VICTORY":"DIRECT_STRIKE_2V1_DEFEAT",[ORIGIN,AMT,PS],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"writing_authority",id:AUTH.directStrike}]);if(!committed.success)return committed;
- const mat=material(fact.packageState,id,"AK_SA_003");if(!mat||mat.success!==true)return mat;
+ const committed=commitOnce(id,fact,win?"DIRECT_STRIKE_2V1_VICTORY":"DIRECT_STRIKE_2V1_DEFEAT",[ORIGIN,AMT,PS],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"writing_authority",id:authority}]);if(!committed.success)return committed;
+ const mat=material(fact.packageState,id,anchor);if(!mat||mat.success!==true)return mat;
  if(win){for(const ref of [AMT,PS]){const cl=classify(ref,"BATTLE_DEFEATED_UNRESOLVED",stable("sc35910-direct-defeated",{id,ref}));if(!cl.success)return cl;}}
  else{for(const ref of [AMT,PS]){const cl=classify(ref,"ESCAPED",stable("sc35910-direct-escaped",{id,ref}));if(!cl.success)return cl;}}
- const dispatched=dispatch(receipt,DIRECT_BINDING,bridge(id,{outcomeClass:win?"DIRECT_STRIKE_2V1_VICTORY_PACKAGE_SECURED":"DIRECT_STRIKE_2V1_DEFEAT_AMT_PS_ESCAPE",packageState:fact.packageState,battleResultState:r.resultState},win?"academy_kakashi.direct_strike.mi_arrival":"academy_kakashi.debrief"));
+ const dispatched=dispatch(receipt,binding,bridge(id,{outcomeClass:win?"DIRECT_STRIKE_2V1_VICTORY_PACKAGE_SECURED":"DIRECT_STRIKE_2V1_DEFEAT_AMT_PS_ESCAPE",packageState:fact.packageState,battleResultState:r.resultState,routeRef},win?"academy_kakashi.direct_strike.mi_arrival":"academy_kakashi.debrief"));
  if(!dispatched||dispatched.success!==true)return dispatched||{success:false,reason:"direct_strike_semantic_dispatch_failed"};
  rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrike2v1OccurrenceId:id,kakashiKonohaPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id};setNext(D.directReturn,win?D.directMiArrival:TERMINAL);save();
  return{success:true,victory:win,occurrenceId:id,nextBeatId:win?D.directMiArrival:TERMINAL};
 }
 function launchDirectMi(ctx={}){
  const rt=active(),source=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrike2v1OccurrenceId||"");if(!source)return{success:false,reason:"direct_strike_mi_parent_missing"};
- return launch(DIRECT_MI,"academy_kakashi.battle.direct_strike_mi","AK_SA_003",source,D.directMiReturn,"direct_strike_mi_1v1",ctx);
+ return launch(DIRECT_MI,"academy_kakashi.battle.direct_strike_mi",directChainAnchor(rt),source,D.directMiReturn,"direct_strike_mi_1v1",ctx);
 }
 function consumeDirectMi(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.directMiReturn)return{success:false,reason:"direct_strike_mi_return_context_required"};
  if(!r||String(r.battleConfigId||"")!==DIRECT_MI||String(r.bindingRef||"")!=="academy_kakashi.battle.direct_strike_mi")return{success:false,reason:"direct_strike_mi_receipt_mismatch"};
- const win=String(r.resultState||"")==="player_side_victory";
- const id=stable("occ_origin_kakashi_direct_strike_mi_return",{instance:String(rt.instanceId||""),battle:String(r.battleOccurrenceId||""),win});
+ const win=String(r.resultState||"")==="player_side_victory",anchor=directChainAnchor(rt),authority=directChainAuthority(rt),routeRef=directChainRoute(rt);
+ const id=stable("occ_origin_kakashi_direct_strike_mi_return",{instance:String(rt.instanceId||""),battle:String(r.battleOccurrenceId||""),win,routeRef});
  const pkg=win
   ?{objectRef:PACKAGE,currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON"}
   :{objectRef:PACKAGE,previousHolderClass:"KAKASHI",currentHolderClass:"MASKED_INTERCEPTOR",custodyClass:"MASKED_INTERCEPTOR",locationClass:"MI_ESCAPED_WITH_PACKAGE"};
- const fact={factClass:win?"academy_kakashi_direct_strike_mi_victory":"academy_kakashi_direct_strike_mi_defeat",anchorRef:"AK_SA_003",authorityCommit:AUTH.directStrike,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),packageState:pkg,
+ const fact={factClass:win?"academy_kakashi_direct_strike_mi_victory":"academy_kakashi_direct_strike_mi_defeat",anchorRef:anchor,authorityCommit:authority,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),packageState:pkg,
   participantStateByRef:{[AMT]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},[PS]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},[MI]:win?{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}:{presenceState:"ESCAPED",controlState:"FREE"}},
   worldFacts:{packageCustody:pkg.currentHolderClass,maskedInterceptorEscaped:!win,pakkunPresent:false,participantDeathCommitted:false,participantCustodyCommitted:false}};
- const committed=commitOnce(id,fact,win?"DIRECT_STRIKE_MI_VICTORY":"DIRECT_STRIKE_MI_DEFEAT",[ORIGIN,AMT,PS,MI],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"writing_authority",id:AUTH.directStrike}]);if(!committed.success)return committed;
- const mat=material(pkg,id,"AK_SA_003");if(!mat||mat.success!==true)return mat;
+ const committed=commitOnce(id,fact,win?"DIRECT_STRIKE_MI_VICTORY":"DIRECT_STRIKE_MI_DEFEAT",[ORIGIN,AMT,PS,MI],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"writing_authority",id:authority}]);if(!committed.success)return committed;
+ const mat=material(pkg,id,anchor);if(!mat||mat.success!==true)return mat;
  const cl=classify(MI,win?"BATTLE_DEFEATED_UNRESOLVED":"ESCAPED",stable("sc35910-direct-mi",{id,win}));if(!cl.success)return cl;
  rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrikeMiOccurrenceId:id,kakashiKonohaPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id};setNext(D.directMiReturn,win?D.directGroup:TERMINAL);save();
  return{success:true,victory:win,occurrenceId:id,nextBeatId:win?D.directGroup:TERMINAL};
@@ -229,9 +242,9 @@ function commitDirectGroupDisposition(kind){
  const participantStateByRef={};const participantStateDeltaRefs=[];
  for(const ref of [AMT,PS,MI]){participantStateByRef[ref]={stateClass,lifeState:kind==="KILL"?"DEAD":"ALIVE",custodyDestination:kind==="POLICE"?"UCHIHA_POLICE":kind==="ANBU"?"ANBU":null};}
  const pkg=kind==="ANBU"?{objectRef:PACKAGE,previousHolderClass:"KAKASHI",currentHolderClass:"ANBU",custodyClass:"ANBU",locationClass:"ANBU_ROOFTOP"}:{objectRef:PACKAGE,currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON"};
- const fact={factClass:"academy_kakashi_direct_strike_group_disposition",authorityCommit:AUTH.directStrike,storySceneInstanceId:String(rt.instanceId||""),parentOccurrenceRef:parent,selectedDisposition:kind,packageState:pkg,participantStateByRef,
+ const fact={factClass:"academy_kakashi_direct_strike_group_disposition",authorityCommit:directChainAuthority(rt),storySceneInstanceId:String(rt.instanceId||""),parentOccurrenceRef:parent,routeRef:directChainRoute(rt),selectedDisposition:kind,packageState:pkg,participantStateByRef,
   worldFacts:{deterministicPostBattleKills:kind==="KILL"?3:0,groupReleased:kind==="RELEASE",groupInstitutionalTransfer:kind==="POLICE"||kind==="ANBU",pakkunPresent:false}};
- const committed=commitOnce(id,fact,"DIRECT_STRIKE_GROUP_"+kind,[ORIGIN,AMT,PS,MI],[{type:"origin_occurrence",id:parent},{type:"writing_authority",id:AUTH.directStrike}]);if(!committed.success)return committed;
+ const committed=commitOnce(id,fact,"DIRECT_STRIKE_GROUP_"+kind,[ORIGIN,AMT,PS,MI],[{type:"origin_occurrence",id:parent},{type:"writing_authority",id:authority}]);if(!committed.success)return committed;
  for(const ref of [AMT,PS,MI]){const resultRef=stable("sc35910-direct-group-state",{id,ref,stateClass});const cl=classify(ref,stateClass,resultRef);if(!cl.success)return cl;participantStateDeltaRefs.push(resultRef);}
  const mat=material(pkg,id,"AK_SA_003");if(!mat||mat.success!==true)return mat;
  rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrikeDispositionOccurrenceId:id,kakashiKonohaPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id};save();
@@ -445,7 +458,7 @@ function diagnostics(){
  const d=scene(),action=d&&d.beatMap.get(ACTION_BEAT),attack=action&&action.choices&&action.choices.find(x=>x.choiceId==="attack"),observe=d&&d.beatMap.get(OBSERVE_BEAT),secure=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package_before_assassin"),original=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="go_after_original_target");
  const regs=PROVIDER.getRegisteredStoryFactualBindings();
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v1_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v2_2026_09_20",
   writing100Pinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8",
   directStrikeFixedChain:!!attack&&attack.label==="STRIKE BEFORE THE HANDOFF"&&attack.nextBeatId===D.directIntro&&d.beatMap.has(D.directBattle)&&d.beatMap.has(D.directMiBattle)&&d.beatMap.has(D.directGroup),
   directStrikeExactConfigs:!!(BATTLE.configs&&BATTLE.configs[DIRECT_2V1]&&BATTLE.configs[DIRECT_MI]),
@@ -458,6 +471,7 @@ function diagnostics(){
   getCloserHandoffReconvergence:patchGetCloserHandoff()===true,
   battleDoesNotOwnDisposition:consumeDirectMi.toString().includes("participantDeathCommitted:false")&&consumeDirectMi.toString().includes("participantCustodyCommitted:false"),
   battleLaunchContractExact:launch.toString().includes('type:"story_scene"')&&launch.toString().includes("pakkunAuthorized")&&launch.toString().includes("cfg.pakkun===true"),
+  directPhysicalChainReusable:beginReusedDirectStrikePhysical35910.toString().includes("bindingRef")&&launchDirect2v1.toString().includes("directChainBinding")&&consumeDirect2v1.toString().includes("directChainBinding"),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
@@ -466,7 +480,7 @@ function diagnostics(){
 
 globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910=Object.freeze({
  patchId:PATCH_ID,authority:AUTH,beats:D,
- resolveDirectStrikeEntry,consumeDirect2v1,consumeDirectMi,commitDirectGroupDisposition,
+ resolveDirectStrikeEntry,beginReusedDirectStrikePhysical:beginReusedDirectStrikePhysical35910,consumeDirect2v1,consumeDirectMi,commitDirectGroupDisposition,
  resolveSecureBeforeChoice,consumeSecureBeforeBattle,resolveOriginalTargetChoice,consumeOriginalAmt,commitOriginalDisposition,
  patchGetCloserHandoff,diagnostics,browserGoldenClaimed:false
 });
