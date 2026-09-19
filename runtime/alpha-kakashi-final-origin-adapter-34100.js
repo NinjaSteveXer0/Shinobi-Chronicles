@@ -71,6 +71,7 @@ const KONOHA_ROUTE_CLOSURE_PATH="runtime/alpha-kakashi-konoha-route-closure-3591
 const FIELD_SECURED_PATH="runtime/alpha-kakashi-field-secured-35920.js";
 const MOVE_CLOSER_CLOSURE_PATH="runtime/alpha-kakashi-move-closer-closure-35930.js";
 const DYNAMIC_TERMINAL_PATH="runtime/alpha-kakashi-dynamic-terminal-35940.js";
+const BROWSER_ACCEPTANCE_PATH="runtime/alpha-kakashi-browser-acceptance-35950.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
@@ -100,7 +101,8 @@ const DYNAMIC_TERMINAL_PATH="runtime/alpha-kakashi-dynamic-terminal-35940.js";
 // const BUILD="kakashi-final-20260919-66";
 // const BUILD="kakashi-final-20260920-67";
 // const BUILD="kakashi-final-20260920-68";
-const BUILD="kakashi-final-20260920-69";
+// const BUILD="kakashi-final-20260920-69";
+const BUILD="kakashi-final-20260920-70";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -130,9 +132,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadBrowserAcceptance(){
+  if(globalThis.SC_ALPHA_KAKASHI_BROWSER_ACCEPTANCE_35950)return;
+  appendScript("sc-alpha-kakashi-browser-acceptance-35950-script",BROWSER_ACCEPTANCE_PATH);
+}
 function loadDynamicTerminal(){
-  if(globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940)return;
-  appendScript("sc-alpha-kakashi-dynamic-terminal-35940-script",DYNAMIC_TERMINAL_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940){loadBrowserAcceptance();return;}
+  appendScript("sc-alpha-kakashi-dynamic-terminal-35940-script",DYNAMIC_TERMINAL_PATH,loadBrowserAcceptance);
 }
 function loadMoveCloserClosure(){
   if(globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930){loadDynamicTerminal();return;}
