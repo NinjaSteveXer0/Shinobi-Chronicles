@@ -13,10 +13,9 @@ const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const OBSERVE_BEAT="kak_original_major_choice";
 const SUCCESS_BEAT="kak_get_closer_success";
 const FAILURE_BEAT="kak_get_closer_failure";
-const SEQ=globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410;
 const ROUTE=globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910;
 const MOVE=globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930;
-if(!SEQ||!ROUTE||!MOVE)throw new Error("kakashi_browser_acceptance_35950_dependencies_missing");
+if(!ROUTE||!MOVE)throw new Error("kakashi_browser_acceptance_35950_dependencies_missing");
 
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
 function available(){return{available:true,knownBlocker:null};}
@@ -25,13 +24,22 @@ function choice(beatId,choiceId){
  return beat&&Array.isArray(beat.choices)?beat.choices.find(row=>row&&row.choiceId===choiceId)||null:null;
 }
 function bindObserve(){
- const secure=SEQ.bindObserveSecurePackageChoice({release:true});
- const sequential=SEQ.bindObserveEscalationChoice();
- if(!secure||secure.success!==true||!sequential||sequential.success!==true)return{success:false,reason:"observe_shared_choice_owner_rebind_failed",secure,sequential};
-
+ const secure=choice(OBSERVE_BEAT,"secure_package");
+ const sequential=choice(OBSERVE_BEAT,"defeat_assassin_then_secure");
  const secureBefore=choice(OBSERVE_BEAT,"secure_package_before_assassin");
  const original=choice(OBSERVE_BEAT,"go_after_original_target");
- if(!secureBefore||!original)return{success:false,reason:"observe_gen69_choice_missing"};
+ if(!secure||!sequential||!secureBefore||!original)return{success:false,reason:"observe_gen69_choice_missing"};
+
+ secure.label="SECURE THE PACKAGE";
+ secure.nextBeatId="kak_observe_secure_package_battle";
+ secure.availability=available;secure.knownBlocker=null;
+ secure.consequenceRequests=[{requestId:"kakashi_observe_secure_package_bridge_35950",kind:"domain",resolve:()=>ROUTE.beginSharedObserveBattleChoice("secure_package","academy_kakashi.battle.secure_package","kakashiObserveSecurePackageStoryDecisionReceiptId","kakashiObserveSecurePackageIntentCommitRef",secure.nextBeatId)}];
+
+ sequential.label="DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE";
+ sequential.nextBeatId="kak_seq_mi_battle";
+ sequential.availability=available;sequential.knownBlocker=null;
+ sequential.consequenceRequests=[{requestId:"kakashi_observe_sequential_bridge_35950",kind:"domain",resolve:()=>ROUTE.beginSharedObserveBattleChoice("defeat_assassin_then_secure","academy_kakashi.battle.defeat_assassin_then_secure","kakashiObserveSequentialStoryDecisionReceiptId","kakashiObserveSequentialIntentCommitRef",sequential.nextBeatId)}];
+
  secureBefore.label="SECURE THE PACKAGE BEFORE THE ASSASSIN";
  secureBefore.nextBeatId=ROUTE.beats.secureBeforeIntro;
  secureBefore.availability=available;
@@ -44,7 +52,7 @@ function bindObserve(){
  original.knownBlocker=null;
  original.consequenceRequests=[{requestId:"kakashi_original_target_resolve_35950",kind:"domain",resolve:()=>ROUTE.resolveOriginalTargetChoice(original)}];
 
- return{success:true,secure, sequential};
+ return{success:true,secure:true,sequential:true};
 }
 function bindMoveCloser(){
  if(ROUTE.patchGetCloserHandoff()!==true)return{success:false,reason:"move_closer_handoff_rebind_failed"};
