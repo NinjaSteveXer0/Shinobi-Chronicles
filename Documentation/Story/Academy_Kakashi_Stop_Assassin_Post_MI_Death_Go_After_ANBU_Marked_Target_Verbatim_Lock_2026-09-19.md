@@ -114,7 +114,7 @@ Pakkun does not appear because Kakashi never legitimately reached AMT.
 
 # 4. AMT pursuit success / Pakkun entry
 
-**Backdrop:** approved Konoha street / junction — night.
+**Backdrop:** `Kakashi Origin Backdrop/alleyway_konoha_night.png`.
 
 ## Narration
 
