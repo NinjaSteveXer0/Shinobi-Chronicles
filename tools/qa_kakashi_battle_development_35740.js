@@ -69,12 +69,12 @@ globalThis.generateBattleRewards=function baseGenerate(_enemy,finisher){
 };
 globalThis.projectAcademyKakashiOriginBattleResult=()=>({
   battleConfigId:currentBattle.kakashiOriginDeployment.battleConfigId,
-  battleOccurrenceId:battleId,
+  battleOccurrenceId:currentBattle.battleId,
   resultState:"player_side_victory",
   rewardGranted:false
 });
 globalThis.createBattleChronicleResult=()=>({
-  battleId,
+  battleId:currentBattle.battleId,
   rewards:{
     exp:Number(currentBattle.rewards&&currentBattle.rewards.exp)||0,
     ryo:Number(currentBattle.rewards&&currentBattle.rewards.ryo)||0,
@@ -180,6 +180,58 @@ assert.strictEqual(terminal.ryo,100);
 assert.strictEqual(playerData.ryo,150,"Immediate 50 + terminal 100 must remain separate reward classes");
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1,"terminal debrief must not duplicate immediate MI pill");
 
+// Sequential Package Smuggler and AMT Battles must consume the same exact
+// action-development contract without inventing per-Battle cash/loot.
+const PS="academy_kakashi_origin_package_smuggler";
+const AMT="academy_kakashi_origin_anbu_marked_target";
+function setStoryBattle(config,participant,id,evidence){
+  globalThis.currentBattle={
+    battleId:id,active:false,battleOver:true,outcome:{type:"victory"},
+    enemy:{id:participant,name:participant===PS?"PACKAGE SMUGGLER":"ANBU MARKED TARGET"},
+    activePlayer:{id:KAKASHI,name:"Academy Kakashi"},
+    kakashiOriginDeployment:{
+      battleConfigId:config,battleOccurrenceId:id,storyOccurrenceId:"qa-origin-occurrence-1",
+      controllerParticipantId:KAKASHI,oppositionParticipantIds:[participant]
+    },
+    runtime:{evidence},
+    rewards:{generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]}
+  };
+}
+const bukiBefore=discipline[KAKASHI+"::buki"]||0;
+setStoryBattle("academy_kakashi_origin_battle_seq_ps",PS,"qa-kakashi-ps-1",[
+  {evidenceId:"ps-attempt-1",battleId:"qa-kakashi-ps-1",actionId:"ps-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:PS},data:{actionClass:"skill",skillId:"academy_kakashi_kunai_quickdraw"}},
+  {evidenceId:"ps-damage-1",battleId:"qa-kakashi-ps-1",actionId:"ps-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:PS},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,finalDamage:4,remainingBattlePLBefore:10,remainingBattlePLAfter:6}}
+]);
+const psRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
+assert.strictEqual(psRewards.ryo,0,"PS Battle must not invent immediate per-Battle cash");
+assert.deepStrictEqual(psRewards.items,[],"PS Battle must not invent opponent loot");
+assert.deepStrictEqual(psRewards.progression,[{type:"discipline_exp",discipline:"bukijutsu",amount:2}]);
+assert.strictEqual(psRewards.terminalOriginRewardDeferred,true);
+assert.strictEqual((discipline[KAKASHI+"::buki"]||0)-bukiBefore,2,"PS resolved action evidence must commit Bukijutsu development");
+
+const ninBefore=discipline[KAKASHI+"::nin"]||0,staminaBefore=discipline[KAKASHI+"::stamina"]||0;
+setStoryBattle("academy_kakashi_origin_battle_seq_amt_pakkun",AMT,"qa-kakashi-amt-1",[
+  {evidenceId:"amt-attempt-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:AMT},data:{actionClass:"skill"}},
+  {evidenceId:"amt-effect-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:AMT},data:{primaryDiscipline:"Ninjutsu",resolvedAttackPL:6,finalDamage:5,remainingBattlePLBefore:18,remainingBattlePLAfter:13}},
+  {evidenceId:"amt-enemy-damage-1",battleId:"qa-kakashi-amt-1",actionId:"amt-e1",eventType:"damage_resolved",actorRef:{side:"enemy",participantId:AMT},targetRef:{side:"player",participantId:KAKASHI},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,staminaMitigationAmount:2,finalDamage:3,remainingBattlePLBefore:15,remainingBattlePLAfter:12}}
+]);
+const amtRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
+assert.strictEqual(amtRewards.ryo,0,"AMT Battle must keep material Ryō terminal-debrief owned");
+assert.deepStrictEqual(amtRewards.items,[],"AMT Battle must not turn participant equipment into loot");
+assert.deepStrictEqual(amtRewards.progression,[
+  {type:"discipline_exp",discipline:"ninjutsu",amount:2},
+  {type:"discipline_exp",discipline:"stamina",amount:1}
+]);
+assert.strictEqual(amtRewards.terminalOriginRewardDeferred,true);
+assert.strictEqual((discipline[KAKASHI+"::nin"]||0)-ninBefore,2,"AMT associated resolved evidence must commit Ninjutsu development");
+assert.strictEqual((discipline[KAKASHI+"::stamina"]||0)-staminaBefore,1,"AMT hostile packet must commit qualifying Stamina development");
+projected=globalThis.projectAcademyKakashiOriginBattleResult();
+assert.strictEqual(projected.developmentSummary.totalExp,3);
+assert.deepStrictEqual(projected.developmentSummary.rows,[
+  {discipline:"ninjutsu",amount:2},
+  {discipline:"stamina",amount:1}
+]);
+
 const snap=globalThis.getAcademyKakashiOriginRewardSnapshot34800();
 const receipts=Object.values(snap.sources);
 assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.discipline==="bukijutsu"&&r.payload.amount===2));
@@ -194,6 +246,8 @@ assert(saves>0);
 
 console.log("Academy Kakashi Story Battle development + immediate MI reward 35740 QA: PASS");
 console.log("- exact action evidence -> discipline development through 34800");
+console.log("- PS / AMT resolved evidence -> Battle development even when action_attempted omits top-level skillId");
+console.log("- PS / AMT retain zero immediate cash/loot; terminal Origin rewards remain independently deferred");
 console.log("- solo MI victory -> immediate 50 Ryō + Field Recovery Pill ×1 entitlement");
 console.log("- claim commits material package exactly once; no generic EXP");
 console.log("- claim retry/reprojection does not duplicate Ryō, pill or development");
