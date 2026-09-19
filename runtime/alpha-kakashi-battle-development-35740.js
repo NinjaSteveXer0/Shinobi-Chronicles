@@ -17,7 +17,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740)return;
 
-const PATCH_ID="alpha_kakashi_battle_development_35740_v2_2026_09_18";
+const PATCH_ID="alpha_kakashi_battle_development_35740_v3_2026_09_19";
 const KAKASHI="academy_kakashi";
 const ROUTE="academy_kakashi_origin_reward";
 const TECHNICAL=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
@@ -64,9 +64,13 @@ function skillDefinition(skillId,b=battle()){
   return null;
 }
 function disciplineForAction(attempt,rows,b=battle()){
-  const skill=skillDefinition(attempt&&attempt.skillId,b);
+  const attemptData=attempt&&attempt.data&&typeof attempt.data==="object"?attempt.data:{};
+  const skillId=attempt&&attempt.skillId||attemptData.skillId||attemptData.preparedSkillId||attemptData.actionSkillId||null;
+  const skill=skillDefinition(skillId,b);
   const direct=norm(skill&&skill.primaryDiscipline);
   if(TECHNICAL.has(direct))return direct;
+  const attemptDiscipline=norm(attemptData.primaryDiscipline||attemptData.effectivePrimaryDiscipline);
+  if(TECHNICAL.has(attemptDiscipline))return attemptDiscipline;
   const same=(rows||[]).filter(row=>row&&row.actionId&&row.actionId===attempt.actionId&&row.data);
   for(const row of same){
     const key=norm(row.data.primaryDiscipline||row.data.effectivePrimaryDiscipline);
@@ -155,7 +159,7 @@ function syncBattleDevelopment35740(b=battle()){
     return{success:false,reason:"kakashi_reward_development_adapter_missing"};
   }
 
-  const attempts=rows.filter(row=>row&&row.eventType==="action_attempted"&&row.actorRef&&row.actorRef.side==="player"&&row.actorRef.participantId===KAKASHI&&row.skillId&&row.actionId);
+  const attempts=rows.filter(row=>row&&row.eventType==="action_attempted"&&row.actorRef&&row.actorRef.side==="player"&&row.actorRef.participantId===KAKASHI&&row.actionId);
   for(const attempt of attempts){
     const discipline=disciplineForAction(attempt,rows,b);if(!discipline)continue;
     const executionClass=hasMaterialEffect(attempt,rows)?"effective":"attempt";
@@ -332,9 +336,10 @@ if(priorClaimRewards){
 function diagnostics(){
   const sync=syncBattleDevelopment35740.toString(),present=enhanceKakashiVictory35740.toString();
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v2_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v3_2026_09_19",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
     technicalDevelopmentUses34800:sync.includes("recordAcademyKakashiTechnicalDevelopment34800"),
+    resolvedEvidenceMayOwnDiscipline:disciplineForAction.toString().includes("attemptData.primaryDiscipline")&&disciplineForAction.toString().includes("row.data.primaryDiscipline")&&sync.includes('row.eventType==="action_attempted"')&&!sync.includes("&&row.skillId&&row.actionId"),
     staminaDevelopmentUses34800:sync.includes("recordAcademyKakashiStaminaDevelopment34800"),
     exactCombatEvidence:sync.includes('eventType==="action_attempted"')&&sync.includes('eventType!=="damage_resolved"')===false&&sync.includes("staminaMitigationAmount"),
     genericExpNotGranted:!sync.includes("playerData.exp")&&!sync.includes("rewards.exp="),
