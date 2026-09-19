@@ -86,7 +86,7 @@ SC adaptation below does **not** claim every gameplay state or number is literal
 
 # C. Battle role
 
-**WIND-RIDING BUKIJUTSU / PURSUIT / COVER BREAKER**
+**WIND-RIDING BUKIJUTSU / PURSUIT / FORMATION BYPASS**
 
 Kamatari's RESET v2 identity is not:
 
@@ -94,11 +94,10 @@ Kamatari's RESET v2 identity is not:
 
 His source-specific identity is:
 
-1. convert a real Wind Release action into a **wind lane**;
-2. let Bukijutsu ride that lane across ordinary battlefield distance;
+1. use Kamatari's wind-riding speed to reach **one enemy outside Active Slot 1** once per Battle;
+2. let the controller break the normal front-target restriction with an exact Wind Release / Bukijutsu strike rather than a generic Stat bonus;
 3. pursue enemies who try to reposition or escape;
-4. turn a prepared wind lane into **Quick Beheading Dance**;
-5. tear apart ordinary destructible cover / hiding terrain instead of applying a generic accuracy debuff.
+4. retain **Quick Beheading Dance** as Kamatari's signature manifested attack without inventing vegetation, debris or cover objects the current Battle model does not use.
 
 This deliberately replaces the old generic Stat-stick interpretation.
 
@@ -135,7 +134,7 @@ If Kamatari leaves manifestation but remains attached:
 Detaching or replacing Kamatari:
 
 - ends Sicklewind Route;
-- removes any unspent Kamatari wind-lane state.
+- removes any unused Sicklewind Route opportunity.
 
 ---
 
@@ -145,58 +144,39 @@ Detaching or replacing Kamatari:
 
 Activation:
 
-**ATTACHED** — remains active while manifested.
+**ATTACHED** — remains available while manifested.
+
+Limit:
+
+**once per Battle**
 
 Player text:
 
-> **Use Wind Release to open a wind lane. Your next Bukijutsu attack can ride that lane across normal distance, or Kamatari can turn it into Quick Beheading Dance.**
+> **Once per Battle, use a Wind Release or Bukijutsu attack on one enemy in the waiting formation instead of the active enemy.**
 
-## Wind-lane establishment
+Exact Battle mechanics:
 
-When the controller completes a qualifying **Wind Release** action that actually creates battlefield airflow / gust / whirlwind movement:
+- normal enemy targeting is centered on **Enemy Active Slot 1**;
+- Sicklewind Route may be declared when Kamatari's controller uses one qualifying **single-target Wind Release or Bukijutsu ATTACK**;
+- instead of Enemy Active Slot 1, choose one occupied enemy waiting slot from **Slots 2–6**;
+- resolve that attack normally against the chosen participant;
+- the chosen waiting enemy does **not** become the active enemy merely because it was attacked;
+- the enemy deployment queue is not reordered merely because Sicklewind Route was used;
+- if the attack legitimately depletes that participant to 0 Battle PL, ordinary depletion / queue rules handle the result;
+- Sicklewind Route cannot target an empty, already-depleted or otherwise legally untargetable participant;
+- the route does not bypass exact immunity, protection, sealing, space-time or technique-specific targeting restrictions;
+- the route is consumed when the off-slot attack is committed;
+- no second attack, bonus action, hidden Attack PL or Stat increase is created.
 
-- establish one `kamatari_wind_lane`;
-- the Wind action resolves normally first;
-- establishing the lane does **not** create another attack or action;
-- only one Kamatari wind lane may exist for this controller at a time;
-- creating a new valid lane replaces the unused prior lane.
+Why this is Kamatari-specific:
 
-A mere Wind-affinity label with no expressed airflow does not automatically qualify.
+Kamatari's defining wind-riding speed lets the controller **cut past the fighter currently occupying the front of the formation** and reach someone waiting behind them. SC expresses that canon identity through its actual six-slot Battle deployment model rather than through vegetation, debris or other environmental objects the current game does not model.
 
-## Attached-controller use
+Decision created:
 
-While Kamatari is attached but not manifested, the controller may consume the lane with their next qualifying **Bukijutsu** attack to:
+> **Do I spend Kamatari's one route now to hit a dangerous enemy before they reach Active Slot 1, or save it for later?**
 
-- bridge ordinary battlefield distance / reposition separation;
-- cut through ordinary soft/destructible obstruction along that authored route;
-- prevent ordinary vegetation/debris/soft-cover concealment on that route from making the target untargetable for that attack.
-
-The lane does **not**:
-
-- add hidden Attack PL;
-- bypass sealed barriers;
-- bypass space-time locks;
-- bypass exact indestructible protection;
-- automatically defeat Genjutsu;
-- create a generic accuracy stat.
-
-## Manifested use
-
-While Kamatari is manifested, the lane may instead be consumed by **Quick Beheading Dance**.
-
-The same lane cannot empower both the controller and Kamatari.
-
-## Expiration
-
-If Kamatari is manifested:
-
-- an unused lane expires after Kamatari completes his next action opportunity.
-
-If Kamatari is not manifested:
-
-- an unused lane expires after the controller completes their next action opportunity.
-
-This makes the enhancement a timing decision rather than a permanent passive Stat increase.
+This replaces the proposed generic wind-lane / soft-cover concept.
 
 ---
 
@@ -227,7 +207,7 @@ Rules:
 - can bridge ordinary close-to-mid battlefield separation;
 - no automatic Bleed;
 - no automatic Stun;
-- does not consume `kamatari_wind_lane`.
+- does not consume Sicklewind Route unless this attack is specifically used as the controller's declared off-slot Sicklewind attack.
 
 This is Kamatari's reliable no-setup attack.
 
@@ -321,13 +301,9 @@ Limit:
 
 **once per Battle**
 
-Requirement:
-
-consume one active `kamatari_wind_lane`.
-
 Target:
 
-up to **3 hostiles** reachable through the same authored wind path / affected area.
+the current legally targetable enemy group / active engagement, up to **3 hostiles** where the Battle occurrence actually exposes multiple simultaneous hostile targets.
 
 ATK:
 
@@ -335,7 +311,7 @@ ATK:
 
 Player text:
 
-> **Consume your wind lane. Kamatari rides it through up to 3 enemies for 32 ATK each and tears apart ordinary hiding cover in the path.**
+> **Kamatari rides the wind through up to 3 legally exposed enemies for 32 ATK each.**
 
 Rules:
 
@@ -343,34 +319,23 @@ Rules:
 - ordinary Stamina mitigation;
 - no random accuracy / miss roll;
 - does not create an extra controller action;
-- does not automatically kill, dismember, or remove a target;
-- does not destroy sealed barriers / authored indestructible terrain merely because the technique is destructive.
+- does not automatically kill, dismember or remove a target;
+- does **not** invent destructible vegetation, debris or soft-cover objects;
+- Sicklewind Route is the separate once-per-Battle rule that permits the controller to target a waiting-slot enemy;
+- Quick Beheading Dance does not independently grant unrestricted access to Slots 2–6 unless another exact rule makes those participants legally exposed.
 
-## Cover-breaking consequence
-
-For each affected position / target:
-
-- ordinary destructible vegetation, debris, soft cover or equivalent hiding terrain in the authored cutting path is treated as cut apart / cleared;
-- concealment or untargetability that depended **only** on that ordinary destroyed cover ends;
-- this does not reveal unrelated hidden information;
-- this does not break Genjutsu;
-- this does not negate a separate stealth technique whose authority does not depend on the destroyed terrain;
-- Story/world terrain destruction still requires authored Chronicle authority outside the Battle occurrence.
-
-Mechanical fingerprint:
-
-> Kamatari does not receive a generic "accuracy buff." He physically removes the ordinary cover that was doing the hiding.
+This preserves Kamatari's wide cutting signature while keeping the new formation-bypass enhancement mechanically distinct.
 
 ---
 
 # G. Counter / drawback
 
-Kamatari's main limitation is **Wind dependence for his signature technique**.
+Kamatari's defining enhancement is deliberately limited to **one off-slot strike per Battle**.
 
-- Reaping Rush and Gale Pursuit remain usable without setup.
-- Quick Beheading Dance requires a real Kamatari wind lane.
-- the Wind action that creates the lane already resolves normally, so the setup is not a dead button.
-- an enemy can deny the signature payoff by forcing Kamatari/controller timing, removing Kamatari, or using protection that is not ordinary destructible cover.
+- ordinary attacks still obey the normal active-enemy targeting structure;
+- Sicklewind Route must be spent on one qualifying single-target Wind Release or Bukijutsu attack;
+- using it does not reorder the enemy formation or pull the waiting target into Active Slot 1;
+- Reaping Rush and Gale Pursuit remain ordinary manifested attacks unless another exact rule changes their target eligibility;
 - no artificial elemental weakness is added.
 
 Crosswind Cutoff is limited to once per Battle and preserves target choice rather than creating generic hard crowd control.
@@ -393,7 +358,7 @@ His identity lives in the active Sicklewind Route / manifested combat package.
 - no Entity PL transfers to controller.
 - RESET v2 **retires** the old generic `wr_kamatari.sicklewind_guidance` +6 Bukijutsu Stat package if this proposal is approved.
 - do not apply +6 Bukijutsu and Sicklewind Route together.
-- one `kamatari_wind_lane` cannot empower both controller Bukijutsu and Quick Beheading Dance.
+- Sicklewind Route is consumed by one committed off-slot attack and cannot be reused in the same Battle.
 - manifested Kamatari remains the same attached source; no duplicate second Kamatari package is created.
 - a dedicated future representation that already embodies this exact Kamatari wind-lane package must not receive it twice.
 
@@ -425,9 +390,9 @@ No runtime implementation / browser validation / Golden claim is made by this pr
 
 # K. Player-facing summary
 
-## KAMATARI — WIND-RIDING SICKLE / PURSUIT / COVER BREAKER
+## KAMATARI — WIND-RIDING SICKLE / PURSUIT / FORMATION BYPASS
 
-> **Attach Kamatari and use Wind Release to open a wind lane. Spend it to carry a Bukijutsu attack across the field, or manifest Kamatari and unleash Quick Beheading Dance on up to 3 enemies. Kamatari is especially dangerous against enemies who run or hide behind ordinary cover.**
+> **Attach Kamatari to gain Sicklewind Route: once per Battle, one of your Wind Release or Bukijutsu attacks can target an enemy waiting outside Active Slot 1. Manifest Kamatari for fast sickle attacks, pursuit and Quick Beheading Dance.**
 
 That is the intended Source 09 identity.
 
