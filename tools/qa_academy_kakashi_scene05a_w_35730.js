@@ -182,8 +182,8 @@ assert.strictEqual(choiceBeat.choices.length,6);
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 for(const row of choiceBeat.choices){
   if(row.choiceId==="scene05aw_restrain_and_continue"){
-    assert.strictEqual(row.availability().available,false);
-    assert.strictEqual(row.availability().knownBlocker,"RESTRAINT CONTINUATION SCENE PENDING WRITING #281");
+    assert.strictEqual(row.availability().available,true);
+    assert.strictEqual(row.availability().knownBlocker,null);
   }else assert.strictEqual(row.availability().available,true);
 }
 let blocked=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
@@ -221,7 +221,7 @@ assert(labels.includes("KILL HER"),"Post-Battle MI victory must expose direct KI
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Post-Battle MI victory must expose direct RESTRAIN HER AND CONTINUE");
-assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"Writing #281 must keep restraint continuation fail-closed until its scene package lands");
+assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,true,"Closed #281 authority must make direct restraint continuation live");
 assert(!labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Controlled MI must not expose attempted restraint wording");
 const controlledLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
 assert(controlledLethal,"controlled lethal choice missing");
@@ -249,7 +249,7 @@ labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("GO AFTER PACKAGE SMUGGLER"));
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Turn-4 MI victory must expose direct restrain-and-continue regardless hidden control classification");
-assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"Writing #281 must keep direct restraint continuation fail-closed until authored");
+assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,true,"Turn-4 restraint continuation must be live under closed #281 authority");
 
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
@@ -286,5 +286,5 @@ console.log("- victory-only return; defeat never enters 05A-W");
 console.log("- 1-4 MI win exposes both Package Smuggler and ANBU Marked Target pursuit choices");
 console.log("- Package Smuggler -> later AMT preservation is capped at 1-3 PS turns");
 console.log("- MI Battle victory exposes direct KILL HER regardless hidden control classification");
-console.log("- ANBU/Uchiha immediate dispositions preserved; 1-4 adds direct restrain-and-continue, content-gated only by Writing #281");
+console.log("- ANBU/Uchiha immediate dispositions preserved; 1-4 direct restrain-and-continue is live under closed #281 field-secured authority");
 console.log("- downstream direct-choice consumers survive Scene 05A-W rematerialization across internal classification changes");

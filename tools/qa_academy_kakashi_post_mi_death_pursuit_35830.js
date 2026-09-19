@@ -33,6 +33,22 @@ globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300={
  }
 };
 globalThis.projectAcademyKakashiOriginBattleResult=()=>globalThis.currentResult||null;
+globalThis.commitAcademyKakashiFieldSecured35920=function(participantRef,spec={}){
+ participantStates[participantRef]={participantRef,stateClass:"FIELD_SECURED_PENDING_COLLECTION",resultRef:"qa-field-secured-"+participantRef};
+ return{success:true,occurrenceId:"qa-field-secured-"+participantRef,participantRef,stateClass:"FIELD_SECURED_PENDING_COLLECTION",locationRef:spec.locationRef||null};
+};
+globalThis.getAcademyKakashiFieldSecuredRefs35920=()=>Object.values(participantStates).filter(row=>row&&row.stateClass==="FIELD_SECURED_PENDING_COLLECTION").map(row=>row.participantRef);
+globalThis.commitAcademyKakashiSingleTransfer35920=function(participantRef,destination){
+ const stateClass=destination==="ANBU"?"ANBU_INSTITUTIONAL_CUSTODY":"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY";
+ participantStates[participantRef]={participantRef,stateClass,resultRef:"qa-transfer-"+participantRef+"-"+destination};
+ return{success:true,occurrenceId:"qa-transfer-"+participantRef+"-"+destination,stateClass};
+};
+globalThis.beginAcademyKakashiCollectionFromAmt35920=function(){
+ participantStates[AMT]={participantRef:AMT,stateClass:"COLLECTED_ACTIVE_ESCORT",resultRef:"qa-amt-collected"};
+ return{success:true,manifestId:"qa-collection-manifest",amtOccurrenceId:"qa-amt-collected",nextBeatId:"qa-collect-ps"};
+};
+globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920={beats:{collectPs:"qa-collect-ps"}};
+
 globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(){
  recoveryCalls+=1;
  const parentId=String(active&&active.localContext&&(active.localContext.kakashiSequentialPackageOccurrenceId35100||active.localContext.kakashiSequentialPackageOccurrenceId)||"");
@@ -206,7 +222,7 @@ assert.strictEqual(participantStates[PS].stateClass,"DEFEATED_BUT_NOT_CONTROLLED
 drainNarration(MOD.beats.psDecision);
 let psChoices=definition.beatMap.get(MOD.beats.psDecision).choices;
 assert.deepStrictEqual(psChoices.map(x=>x.label),["GO AFTER ANBU MARKED TARGET","KILL HIM","RETURN TO ANBU","RESTRAIN HIM AND CONTINUE"]);
-assert.strictEqual(psChoices.find(x=>x.label==="RESTRAIN HIM AND CONTINUE").availability().available,false,"Writing #281 continuation must remain fail-closed until authored");
+assert.strictEqual(psChoices.find(x=>x.label==="RESTRAIN HIM AND CONTINUE").availability().available,true,"Closed #281 authority must make PS restrain-and-continue live");
 const directPsKill=globalThis.advanceStoryScene("postmi_ps_kill");
 assert.strictEqual(directPsKill.success,true,"ordinary defeated PS must allow direct KILL without hidden control state");
 assert.strictEqual(participantStates[PS].stateClass,"DEAD");
@@ -227,10 +243,8 @@ assert.strictEqual(participantStates[AMT].stateClass,"CONTROLLED_DEFEATED");
 participantStates[AMT]={participantRef:AMT,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-amt-ordinary-defeat"};
 drainNarration(MOD.beats.amtDecision);
 let amtChoices=definition.beatMap.get(MOD.beats.amtDecision).choices;
-assert.deepStrictEqual(amtChoices.map(x=>x.label),["BRING HIM TO THE UCHIHA POLICE FORCE","LET HIM GO","KILL HIM","TAKE HIM BACK TO THE ANBU","RESTRAIN HIM AND TURN HIM INTO ANBU","RESTRAIN HIM AND TURN HIM INTO THE UCHIHA POLICE FORCE"]);
-assert.strictEqual(amtChoices[4].availability().available,false);
-assert.strictEqual(amtChoices[5].availability().available,false);
-assert.strictEqual(amtChoices[4].availability().knownBlocker,"WAITING ON WRITING #281");
+assert.deepStrictEqual(amtChoices.map(x=>x.label),["BRING HIM TO THE UCHIHA POLICE FORCE","LET HIM GO","KILL HIM","TAKE HIM BACK TO THE ANBU"]);
+assert(amtChoices.every(x=>x.availability().available===true),"closed AMT disposition surface must be fully live");
 assert(!amtChoices.some(x=>String(x.label||"").includes("ATTEMPT TO")),"AMT dispositions must not be renamed by hidden control classification");
 
 out=globalThis.advanceStoryScene("postmi_amt_kill");
@@ -283,7 +297,7 @@ console.log("- <=3 PS victory preserves AMT route; PS direct KILL works from ord
 console.log("- PS and AMT battle-transition beats auto-launch through canonical Story Battle authority");
 console.log("- legitimate AMT reach commits Pakkun, reveals Assets/Summons/pakkun.png on-cue, and uses alleyway_konoha_night");
 console.log("- legitimate AMT reach commits Pakkun and uses sequential AMT+Pakkun config");
-console.log("- AMT victory exposes direct disposition family regardless hidden control state; restraint continuation waits only on Writing #281");
+console.log("- AMT victory exposes the live direct disposition family; closed #281 no longer leaves restraint/transfer placeholders");
 console.log("- deterministic AMT KILL preserves package custody");
 console.log("- direct AMT fork permanently closes PS pursuit and KILL reaches terminal debrief");
 console.log("- AMT defeat refuses to invent object/Pakkun autonomy resolution");

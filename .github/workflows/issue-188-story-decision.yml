@@ -7,8 +7,18 @@ on:
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-kakashi-post-mi-death-pursuit-35830.js'
+      - 'runtime/alpha-kakashi-konoha-writing-closure-35900.js'
+      - 'runtime/alpha-kakashi-konoha-route-closure-35910.js'
+      - 'runtime/alpha-kakashi-field-secured-35920.js'
+      - 'runtime/alpha-kakashi-move-closer-closure-35930.js'
+      - 'runtime/alpha-kakashi-dynamic-terminal-35940.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
+      - 'tools/qa_academy_kakashi_konoha_closure_35900.js'
+      - 'tools/qa_academy_kakashi_konoha_route_closure_35910.js'
+      - 'tools/qa_academy_kakashi_field_secured_35920.js'
+      - 'tools/qa_academy_kakashi_move_closer_closure_35930.js'
+      - 'tools/qa_academy_kakashi_dynamic_terminal_35940.js'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -117,6 +127,11 @@ jobs:
           node --check runtime/alpha-kakashi-deterministic-kill-35810.js
           node --check runtime/alpha-kakashi-loss-ending-35820.js
           node --check runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          node --check runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          node --check runtime/alpha-kakashi-konoha-route-closure-35910.js
+          node --check runtime/alpha-kakashi-field-secured-35920.js
+          node --check runtime/alpha-kakashi-move-closer-closure-35930.js
+          node --check runtime/alpha-kakashi-dynamic-terminal-35940.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -142,6 +157,11 @@ jobs:
           node --check tools/qa_academy_kakashi_deterministic_kill_35810.js
           node --check tools/qa_academy_kakashi_loss_ending_35820.js
           node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
+          node --check tools/qa_academy_kakashi_konoha_closure_35900.js
+          node --check tools/qa_academy_kakashi_konoha_route_closure_35910.js
+          node --check tools/qa_academy_kakashi_field_secured_35920.js
+          node --check tools/qa_academy_kakashi_move_closer_closure_35930.js
+          node --check tools/qa_academy_kakashi_dynamic_terminal_35940.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -149,8 +169,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-68' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-68";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-69' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-69";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -182,7 +202,7 @@ jobs:
           grep -Fq 'GO AFTER ANBU MARKED TARGET' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq '36454a31e9f61ffdaa528589ac11552d446ad3bc' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'RESTRAIN HER AND CONTINUE' runtime/alpha-kakashi-scene05a-w-35730.js
-          grep -Fq 'alpha_kakashi_scene05aw_35730_v9_2026_09_19' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq 'alpha_kakashi_scene05aw_35730_v10_2026_09_20' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq '1ff3876e9b367ec518c254b612e4def14db8eaba' runtime/alpha-kakashi-scene05a-w-35730.js
           ! grep -Fq 'ATTEMPT TO KILL HER' runtime/alpha-kakashi-scene05a-w-35730.js
           ! grep -Fq 'ATTEMPT TO RESTRAIN HER AND CONTINUE' runtime/alpha-kakashi-scene05a-w-35730.js
@@ -195,13 +215,36 @@ jobs:
           grep -Fq 'alpha-kakashi-deterministic-kill-35810.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-post-mi-death-pursuit-35830.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-konoha-writing-closure-35900.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-konoha-route-closure-35910.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-field-secured-35920.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-move-closer-closure-35930.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-dynamic-terminal-35940.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v1_2026_09_20' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'a3cad415ea74a4fe8b3965b1136522aceab81047' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'dea066c9ea7de249d20734b5569a0a84a422ba28' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'kakashiKonohaPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
+          grep -Fq 'alpha_kakashi_move_closer_closure_35930_v1_2026_09_20' runtime/alpha-kakashi-move-closer-closure-35930.js
+          grep -Fq 'PICKPOCKET_IMPROVED_FAILURE_DETECTED_2V1' runtime/alpha-kakashi-move-closer-closure-35930.js
+          grep -Fq 'pakkunBattleActionAuthorized:false' runtime/alpha-kakashi-move-closer-closure-35930.js
+          grep -Fq 'alpha_kakashi_field_secured_35920_v1_2026_09_20' runtime/alpha-kakashi-field-secured-35920.js
+          grep -Fq 'FIELD_SECURED_PENDING_COLLECTION' runtime/alpha-kakashi-field-secured-35920.js
+          grep -Fq 'COLLECTED_ACTIVE_ESCORT' runtime/alpha-kakashi-field-secured-35920.js
+          grep -Fq 'TAKE THEM ALL BACK TO ANBU' runtime/alpha-kakashi-field-secured-35920.js
+          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v2_2026_09_20' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'AK_SA_020_FAILURE_RECONVERGENCE' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'GO AFTER THE ORIGINAL TARGET' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'alpha_kakashi_konoha_closure_35900_v2_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq 'academy_kakashi.resolver.post_amt_defeat_package_reach' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq '09db8ff4efc28ee608d41c828af48efc023d324f' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq '21e0407a0c371310ff06096905fd1fce4107ece8' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq 'bf30ca7dfff9f850bebe978acdd8830f16758042' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq '7a95637765a58b8f12b0bac877032625266830f6' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi_origin_battle_seq_ps' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi_origin_battle_seq_amt_pakkun' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'resolveAcademyKakashiSequentialPostPsPackageRecovery35600' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'Apparently.' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq 'field_secured_continuation_requires_writing_281' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'RESTRAIN HIM AND COLLECT THE OTHERS' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq '77d351e6f8d4eefaea0f8a6db82dec686391e1c0' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           ! grep -Fq 'ATTEMPT TO KILL HIM' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi.battle.stop_assassin_post_mi_ps' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
@@ -254,7 +297,7 @@ jobs:
           grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashiPostMiPakkunPresent' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v12_2026_09_20' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v13_2026_09_20' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'Runtime adds STATE ONLY' runtime/alpha-kakashi-story-presentation-compat-33920.js
           grep -Fq '24b7956781d2da6d3d1f70ce18d1ef0de348cfae' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4' runtime/alpha-kakashi-immediate-custody-35800.js
@@ -399,5 +442,15 @@ jobs:
         run: node tools/qa_academy_kakashi_loss_ending_35820.js
       - name: Academy Kakashi post-MI-death PS and AMT pursuits
         run: node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
+      - name: Academy Kakashi Konoha Writing closure and CE 256 factual consumption
+        run: node tools/qa_academy_kakashi_konoha_closure_35900.js
+      - name: Academy Kakashi Konoha route closure
+        run: node tools/qa_academy_kakashi_konoha_route_closure_35910.js
+      - name: Academy Kakashi field-secured collection and group transfer
+        run: node tools/qa_academy_kakashi_field_secured_35920.js
+      - name: Academy Kakashi Move-In-Closer downstream closure
+        run: node tools/qa_academy_kakashi_move_closer_closure_35930.js
+      - name: Academy Kakashi dynamic terminal projection
+        run: node tools/qa_academy_kakashi_dynamic_terminal_35940.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js
