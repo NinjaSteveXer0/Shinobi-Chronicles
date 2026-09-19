@@ -64,8 +64,8 @@ globalThis.currentBattle={
 };
 globalThis.getBattleParticipantByIdentity=(side,id)=>side==="player"&&id===KAKASHI?currentBattle.activePlayer:null;
 globalThis.getBattlePreparedSkillDefinition=(_actor,id)=>({
-  academy_kakashi_kunai_quickdraw:{id,primaryDiscipline:"Bukijutsu"},
-  academy_kakashi_clone_feint:{id,primaryDiscipline:"Ninjutsu"}
+  academy_kakashi_kunai_quickdraw:{id,name:"Kunai Quickdraw",primaryDiscipline:"Bukijutsu"},
+  academy_kakashi_clone_feint:{id,name:"Clone Feint",primaryDiscipline:"Ninjutsu"}
 }[id]||null);
 
 globalThis.generateBattleRewards=function baseGenerate(_enemy,finisher){
@@ -89,7 +89,7 @@ globalThis.createBattleChronicleResult=()=>({
 });
 globalThis.recordBattleChronicle=()=>{chronicleCalls+=1;return true;};
 globalThis.claimCurrentBattleRewards=function baseClaim(){
-  throw new Error("qualifying MI reward must not fall through to generic base claim");
+  throw new Error("qualifying Kakashi immediate Battle reward must not fall through to generic base claim");
 };
 globalThis.renderVictoryOverlay=()=>true;
 
@@ -105,6 +105,8 @@ const source35740=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kaka
 assert(source35740.includes('const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;'),"deferred Battle Ryō tile must source the existing material Battle reward value");
 assert(source35740.includes('<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:"0"}</strong>'),"deferred Battle Ryō tile must render a numeric value");
 assert(!source35740.includes('<span>RYŌ</span><strong>DEBRIEF</strong>'),"Ryō metric must never use DEBRIEF as a currency amount");
+assert(source35740.includes("REWARD DETAILS · WHY THESE REWARDS?"),"Victory surface must expose immediate reward/development causal detail");
+assert(source35740.includes("commitAcademyKakashiDownstreamBattleCashReward34800"),"PS/AMT claim path must use the 34800 source-scoped reward adapter");
 
 
 const first=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
@@ -199,7 +201,7 @@ assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pil
 // Sequential Package Smuggler and AMT Battles must consume the same exact
 // action-development contract without inventing per-Battle cash/loot.
 const PS="academy_kakashi_origin_package_smuggler";
-const AMT="academy_kakashi_origin_anbu_marked_target";
+const AMT="academy_kakashi_origin_amt";
 function setStoryBattle(config,participant,id,evidence){
   globalThis.currentBattle={
     battleId:id,active:false,battleOver:true,outcome:{type:"victory"},
@@ -219,21 +221,26 @@ setStoryBattle("academy_kakashi_origin_battle_seq_ps",PS,"qa-kakashi-ps-1",[
   {evidenceId:"ps-damage-1",battleId:"qa-kakashi-ps-1",actionId:"ps-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:PS},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,finalDamage:4,remainingBattlePLBefore:10,remainingBattlePLAfter:6}}
 ]);
 const psRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
-assert.strictEqual(psRewards.ryo,0,"PS Battle must not invent immediate per-Battle cash");
-assert.deepStrictEqual(psRewards.items,[],"PS Battle must not invent opponent loot");
+assert.strictEqual(psRewards.ryo,50,"PS exact solo victory must project the authored 50 Ryō cash reward");
+assert.deepStrictEqual(psRewards.items,[],"PS Battle 50 Ryō is cash-only and must not invent opponent loot");
 assert.deepStrictEqual(psRewards.progression,[{type:"discipline_exp",discipline:"bukijutsu",amount:2}]);
 assert.strictEqual(psRewards.terminalOriginRewardDeferred,true);
 assert.strictEqual((discipline[KAKASHI+"::buki"]||0)-bukiBefore,2,"PS resolved action evidence must commit Bukijutsu development");
+assert.strictEqual(playerData.ryo,150,"PS reward must remain entitlement-only before explicit claim");
+assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"PS Battle reward claim failed");
+assert.strictEqual(playerData.ryo,200,"PS claim must add exactly 50 Ryō");
+assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"PS reward idempotent retry failed");
+assert.strictEqual(playerData.ryo,200,"PS claim retry must not duplicate Ryō");
 
 const ninBefore=discipline[KAKASHI+"::nin"]||0,staminaBefore=discipline[KAKASHI+"::stamina"]||0;
 setStoryBattle("academy_kakashi_origin_battle_seq_amt_pakkun",AMT,"qa-kakashi-amt-1",[
-  {evidenceId:"amt-attempt-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:"runtime_clan_start_actor"},targetRef:{side:"enemy",participantId:AMT},data:{actionClass:"skill"}},
+  {evidenceId:"amt-attempt-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:"runtime_clan_start_actor"},targetRef:{side:"enemy",participantId:AMT},data:{actionClass:"skill",skillId:"academy_kakashi_clone_feint"}},
   {evidenceId:"amt-effect-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:AMT},data:{primaryDiscipline:"Ninjutsu",resolvedAttackPL:6,finalDamage:5,remainingBattlePLBefore:18,remainingBattlePLAfter:13}},
   {evidenceId:"amt-enemy-damage-1",battleId:"qa-kakashi-amt-1",actionId:"amt-e1",eventType:"damage_resolved",actorRef:{side:"enemy",participantId:AMT},targetRef:{side:"player",participantId:"runtime_clan_start_actor"},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,staminaMitigationAmount:2,finalDamage:3,remainingBattlePLBefore:15,remainingBattlePLAfter:12}}
 ]);
 const amtRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
-assert.strictEqual(amtRewards.ryo,0,"AMT Battle must keep material Ryō terminal-debrief owned");
-assert.deepStrictEqual(amtRewards.items,[],"AMT Battle must not turn participant equipment into loot");
+assert.strictEqual(amtRewards.ryo,50,"AMT exact solo victory must project the authored 50 Ryō cash reward");
+assert.deepStrictEqual(amtRewards.items,[],"AMT Battle 50 Ryō is cash-only and must not turn participant equipment into loot");
 assert.deepStrictEqual(amtRewards.progression,[
   {type:"discipline_exp",discipline:"ninjutsu",amount:2},
   {type:"discipline_exp",discipline:"stamina",amount:1}
@@ -241,6 +248,11 @@ assert.deepStrictEqual(amtRewards.progression,[
 assert.strictEqual(amtRewards.terminalOriginRewardDeferred,true);
 assert.strictEqual((discipline[KAKASHI+"::nin"]||0)-ninBefore,2,"AMT associated resolved evidence must commit Ninjutsu development");
 assert.strictEqual((discipline[KAKASHI+"::stamina"]||0)-staminaBefore,1,"AMT hostile packet must commit qualifying Stamina development");
+assert.strictEqual(playerData.ryo,200,"AMT reward must remain entitlement-only before explicit claim");
+assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"AMT Battle reward claim failed");
+assert.strictEqual(playerData.ryo,250,"AMT claim must add exactly 50 Ryō");
+assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"AMT reward idempotent retry failed");
+assert.strictEqual(playerData.ryo,250,"AMT claim retry must not duplicate Ryō");
 projected=globalThis.projectAcademyKakashiOriginBattleResult();
 assert.strictEqual(projected.developmentSummary.totalExp,3);
 assert.deepStrictEqual(projected.developmentSummary.rows,[
@@ -253,6 +265,11 @@ const receipts=Object.values(snap.sources);
 assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.discipline==="bukijutsu"&&r.payload.amount===2));
 assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.discipline==="ninjutsu"&&r.payload.amount===1));
 assert(receipts.some(r=>r.kind==="stamina_development"&&r.payload.amount===1));
+assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.actionLabel==="Kunai Quickdraw"),"PS development receipt must retain exact action label");
+assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.actionLabel==="Clone Feint"),"AMT development receipt must retain exact action label");
+assert(receipts.some(r=>r.kind==="stamina_development"&&r.payload.actionId==="amt-e1"&&r.payload.mitigationAmount===2),"AMT Stamina receipt must retain exact hostile packet cause");
+assert(Object.values(snap.battleClaims).some(r=>r.claimFamily==="kak_origin_battle_downstream_cash_reward_claim_v1"&&r.sourceId==="kak_origin_battle_ps_victory_ryo_01"&&r.committed===true));
+assert(Object.values(snap.battleClaims).some(r=>r.claimFamily==="kak_origin_battle_downstream_cash_reward_claim_v1"&&r.sourceId==="kak_origin_battle_amt_victory_ryo_01"&&r.committed===true));
 assert(Object.values(snap.battleClaims).some(r=>r.claimFamily==="kak_origin_battle_mi_victory_reward_claim_v1"&&r.committed===true));
 
 const diag=globalThis.runAcademyKakashiBattleDevelopment35740Diagnostics();
@@ -269,11 +286,11 @@ assert(rewardSource.includes('__scActionDerivedDevelopment34800'),"34800 source-
 console.log("Academy Kakashi Story Battle development + immediate MI reward 35740 QA: PASS");
 console.log("- exact action evidence -> discipline development through 34800");
 console.log("- PS / AMT player-side Battle evidence is owned by the Kakashi Story deployment even when runtime participantId is the My Clan START actor");
-console.log("- PS / AMT retain zero immediate cash/loot; terminal Origin rewards remain independently deferred");
+console.log("- PS / AMT exact solo victories each grant source-scoped 50 Ryō cash-only; terminal Origin rewards remain independently deferred");
 console.log("- frozen core validator initially rejects action_derived_development; 34800 installs the authorised runtime extension");
 console.log("- legacy Exam / Practical / Battle source routing remains unchanged");
 console.log("- solo MI victory -> immediate 50 Ryō + Field Recovery Pill ×1 entitlement");
 console.log("- claim commits material package exactly once; no generic EXP");
-console.log("- claim retry/reprojection does not duplicate Ryō, pill or development");
+console.log("- MI / PS / AMT claim retry and reprojection do not duplicate Ryō, pill or development");
 console.log("- terminal debrief remains separate and same-source pill does not duplicate");
-console.log("- Battle Chronicle carries 50 Ryō, pill and committed development");
+console.log("- Battle result surfaces expose immediate reward plus committed action/mitigation development causes");

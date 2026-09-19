@@ -5,9 +5,10 @@
 // Documentation/Story/Academy_Kakashi_Origin_Scene_06A_W2C_Kill_Her_Deterministic_Verbatim_Lock_2026-09-19.md
 // commit 0d4aa441e4ef6d566f3d1df23c198940bdc559dd
 //
-// KILL is available only from CONTROLLED_DEFEATED. It commits deterministic
-// death before cinematic realization, then recalculates pursuit from the
-// already committed fast-win state. It never downgrades KILL to ATTEMPT.
+// KILL is a direct authored post-Battle disposition after a valid living-target
+// victory. Hidden CONTROLLED_DEFEATED classification no longer gates player
+// agency. Death still commits before cinematic realization, then pursuit is
+// recalculated from the already committed fast-win state.
 // ============================================================================
 (function installAcademyKakashiDeterministicKill35810(){
 "use strict";
@@ -18,8 +19,10 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER)throw new Error("kakashi_deterministic_kill_35810_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_deterministic_kill_35810_v1_2026_09_19";
+const PATCH_ID="alpha_kakashi_deterministic_kill_35810_v2_2026_09_19";
 const AUTHORITY="0d4aa441e4ef6d566f3d1df23c198940bdc559dd";
+const POST_BATTLE_AGENCY_AUTHORITY="1ff3876e9b367ec518c254b612e4def14db8eaba";
+const KAKASHI_DISPOSITION_AUTHORITY="62821414baaadd047c524239d1b3bbf207692b61";
 const STORY_UNIT_REF="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_BEAT="kak_scene05a_w_choice";
@@ -90,7 +93,10 @@ function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){retu
 function occurrence(id){try{return id?A.findOccurrence(String(id)):null;}catch(_error){return null;}}
 function stable(prefix,payload){return typeof PROVIDER.stableRef==="function"?PROVIDER.stableRef(prefix,payload):prefix+"::"+JSON.stringify(payload||{});}
 function currentMiState(){try{const s=CORE.getStoryUnitSnapshot(STORY_UNIT_REF)||{},r=s.participantStates&&s.participantStates[MI]||null;return String(r&&r.stateClass||"");}catch(_error){return"";}}
-function eligible(rt=active()){return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&currentMiState()==="CONTROLLED_DEFEATED";}
+function eligible(rt=active()){
+  const state=currentMiState();
+  return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&["CONTROLLED_DEFEATED","DEFEATED_BUT_NOT_CONTROLLED"].includes(state);
+}
 function prePursuit(rt=active()){return !!(rt&&rt.localContext&&rt.localContext.kakashiScene05AWPursuitEligible===true&&Number(rt.localContext.kakashiScene05AWTurnCount)>=1&&Number(rt.localContext.kakashiScene05AWTurnCount)<=4);}
 function sceneSequence(rt=active()){return Object.freeze(prePursuit(rt)?[...COMMON_SCENE,...OPEN_SCENE,...COMMON_FINISH]:[...COMMON_SCENE,...COMMON_FINISH]);}
 function afterSequence(rt=active()){const open=!!(rt&&rt.localContext&&rt.localContext.kakashiDeterministicKillPursuitAvailable===true);return Object.freeze(open?[...AFTER_COMMON,...AFTER_OPEN]:[...AFTER_COMMON,...AFTER_CLOSED]);}
@@ -103,11 +109,11 @@ function registerSemantic(){
   return CORE.registerResolver(BINDING,function(spec){const state=spec&&spec.state||{},r=state.resolverResults&&state.resolverResults[BINDING];if(!r||r.success!==true)return{success:false,reason:"deterministic_kill_result_missing"};return r;},{owner:PATCH_ID});
 }
 function ensureIntent(rt=active()){
-  if(!eligible(rt))return{success:false,reason:"controlled_defeated_required"};
+  if(!eligible(rt))return{success:false,reason:"post_battle_defeated_living_target_required"};
   const stateRef=stable("sc35810-deterministic-kill-entry",{instance:String(rt.instanceId||""),battle:String(rt.localContext.kakashiScene05AWBattleOccurrenceId||""),turns:Number(rt.localContext.kakashiScene05AWTurnCount||0)});
   const existingId=String(rt.localContext.kakashiDeterministicKillIntentReceiptId||"");
   if(existingId){const snap=CORE.getStoryUnitSnapshot(STORY_UNIT_REF)||{},existing=snap.decisionReceipts&&snap.decisionReceipts[existingId];if(existing)return{success:true,idempotent:true,receipt:existing,stateRef};}
-  const opened=CORE.openSemanticChoiceSet({storyUnitRef:STORY_UNIT_REF,storyUnitType:"origin",decisionPointRef:"SCENE_06A_W2C_DETERMINISTIC_KILL",contextStateRef:stateRef,sceneRef:SCENE_ID,beatRef:SOURCE_BEAT,authorityVersionRefs:[AUTHORITY],sourceOccurrenceRefs:[String(rt.localContext.kakashiScene05AWBattleOccurrenceId||"")],observerRef:STORY_UNIT_REF,choices:[{choiceId:INTENT_CHOICE,intentType:"KILL",intentPayload:{semanticClass:"KILL — GUARANTEED",targetRef:MI,outcomeMode:"deterministic"},resolverBindingRef:BINDING,presentationLabel:"KILL HER",authoredOrder:0}]});
+  const opened=CORE.openSemanticChoiceSet({storyUnitRef:STORY_UNIT_REF,storyUnitType:"origin",decisionPointRef:"SCENE_06A_W2C_DETERMINISTIC_KILL",contextStateRef:stateRef,sceneRef:SCENE_ID,beatRef:SOURCE_BEAT,authorityVersionRefs:[AUTHORITY,POST_BATTLE_AGENCY_AUTHORITY,KAKASHI_DISPOSITION_AUTHORITY],sourceOccurrenceRefs:[String(rt.localContext.kakashiScene05AWBattleOccurrenceId||"")],observerRef:STORY_UNIT_REF,choices:[{choiceId:INTENT_CHOICE,intentType:"KILL",intentPayload:{semanticClass:"KILL — GUARANTEED",targetRef:MI,outcomeMode:"deterministic"},resolverBindingRef:BINDING,presentationLabel:"KILL HER",authoredOrder:0}]});
   if(!opened||opened.success!==true)return opened||{success:false,reason:"deterministic_kill_choice_set_failed"};
   const committed=CORE.commitStoryIntent({storyUnitRef:STORY_UNIT_REF,choiceSetId:opened.choiceSet.choiceSetId,choiceId:INTENT_CHOICE});
   if(!committed||committed.success!==true)return committed||{success:false,reason:"deterministic_kill_intent_failed"};
@@ -143,7 +149,7 @@ function sourceChoice(){const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.
 function wireSource(){
   const row=sourceChoice();if(!row)return false;
   if(!eligible())return false;
-  row.label="KILL HER";row.nextBeatId=SCENE_BEAT;row.availability=function(){return{available:eligible(),knownBlocker:eligible()?null:"CONTROLLED_DEFEATED REQUIRED"};};row.knownBlocker=null;
+  row.label="KILL HER";row.nextBeatId=SCENE_BEAT;row.availability=function(){return{available:eligible(),knownBlocker:eligible()?null:"POST-BATTLE DEFEAT REQUIRED"};};row.knownBlocker=null;
   row.consequenceRequests=[{requestId:SOURCE_REQUEST,kind:"domain",resolve:function(){const rt=active(),intent=ensureIntent(rt);if(!intent||intent.success!==true)return intent;rt.beatId=SCENE_BEAT;rt.localContext={...(rt.localContext||{}),[CURSOR_SCENE]:0};save();return{success:true,beatId:SCENE_BEAT,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId};}}];
   return true;
 }
@@ -239,9 +245,9 @@ function diagnostics(){
   const openExpected=["Masked Interceptor does not get back up.","Kakashi stands over her.","Her weapon is out of reach.","The fight is finished.","Kakashi looks once toward the street.","Package Smuggler is still within reach.","ANBU Marked Target is farther ahead.","There is still time to move.","Kakashi looks back down.","He makes his decision.","His hand closes around the kunai.","Masked Interceptor sees it.","There is no second fight.","No opening left for her to take.","Kakashi moves."];
   const afterOpenExpected=["Petals drift across the stone.","Masked Interceptor remains where she fell.","Her weapon rests a short distance from her hand.","Kakashi straightens.","The kunai stays in his grip for another moment.","Then he lowers it.","His eye returns to the road.","The others are still moving.","So is Kakashi."];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_deterministic_kill_35810_v1_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_deterministic_kill_35810_v2_2026_09_19",
     authorityPinned:AUTHORITY==="0d4aa441e4ef6d566f3d1df23c198940bdc559dd",
-    controlledOnly:eligible.toString().includes('currentMiState()==="CONTROLLED_DEFEATED"'),
+    postBattleAgencyNotControlGated:eligible.toString().includes('"CONTROLLED_DEFEATED","DEFEATED_BUT_NOT_CONTROLLED"')&&!wireSource.toString().includes(["CONTROLLED_DEFEATED"," REQUIRED"].join("")),
     deterministicSemantic:ensureIntent.toString().includes('"KILL — GUARANTEED"')&&ensureIntent.toString().includes('outcomeMode:"deterministic"'),
     exactOpenScene:JSON.stringify([...COMMON_SCENE,...OPEN_SCENE,...COMMON_FINISH].map(x=>x.text))===JSON.stringify(openExpected),
     exactOpenAftermath:JSON.stringify([...AFTER_COMMON,...AFTER_OPEN].map(x=>x.text))===JSON.stringify(afterOpenExpected),

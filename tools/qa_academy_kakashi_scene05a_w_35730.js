@@ -5,6 +5,7 @@ const fs=require("fs");
 const vm=require("vm");
 const path=require("path");
 const assert=require("assert");
+function cSourceHasAttemptLabels(){const src=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene05a-w-35730.js"),"utf8");return src.includes("ATTEMPT TO KILL HER")||src.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE");}
 function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(),rel),"utf8"),{filename:rel});}
 
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
@@ -172,17 +173,17 @@ let labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
   "GO AFTER PACKAGE SMUGGLER",
   "GO AFTER ANBU MARKED TARGET",
-  "ATTEMPT TO KILL HER",
+  "KILL HER",
   "TAKE HER BACK TO ANBU",
   "TAKE HER TO THE UCHIHA POLICE FORCE",
-  "ATTEMPT TO RESTRAIN HER AND CONTINUE"
+  "RESTRAIN HER AND CONTINUE"
 ]);
 assert.strictEqual(choiceBeat.choices.length,6);
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 for(const row of choiceBeat.choices){
   if(row.choiceId==="scene05aw_restrain_and_continue"){
     assert.strictEqual(row.availability().available,false);
-    assert.strictEqual(row.availability().knownBlocker,"FIELD-SECURED CUSTODY SEMANTICS PENDING CE #244");
+    assert.strictEqual(row.availability().knownBlocker,"RESTRAINT CONTINUATION SCENE PENDING WRITING #281");
   }else assert.strictEqual(row.availability().available,true);
 }
 let blocked=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
@@ -216,16 +217,16 @@ assert.strictEqual(relabelled.success,true);
 assert.strictEqual(active.beatId,CHOICE_BEAT);
 choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
-assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
+assert(labels.includes("KILL HER"),"Post-Battle MI victory must expose direct KILL HER");
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
-assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Controlled MI must expose deterministic RESTRAIN HER AND CONTINUE");
-assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"CE #244 must keep controlled field restraint non-executable");
+assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Post-Battle MI victory must expose direct RESTRAIN HER AND CONTINUE");
+assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"Writing #281 must keep restraint continuation fail-closed until its scene package lands");
 assert(!labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Controlled MI must not expose attempted restraint wording");
 const controlledLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
 assert(controlledLethal,"controlled lethal choice missing");
-assert.notStrictEqual(controlledLethal.nextBeatId,"qa_real_scene06","ATTEMPT consumer must not leak into deterministic KILL relabel");
-assert(!controlledLethal.consequenceRequests.some(x=>x&&x.requestId==="qa_real_scene06_consumer"),"ATTEMPT consumer leaked into deterministic KILL relabel");
+assert.strictEqual(controlledLethal.nextBeatId,"qa_real_scene06","Direct KILL consumer must survive classification-only rematerialization");
+assert(controlledLethal.consequenceRequests.some(x=>x&&x.requestId==="qa_real_scene06_consumer"),"Direct KILL consumer was lost across classification-only rematerialization");
 
 classified=globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({
   storyUnitRef:"academy_kakashi",participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-uncontrolled-mi"
@@ -247,8 +248,8 @@ choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("GO AFTER PACKAGE SMUGGLER"));
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
-assert(labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Turn-4 uncontrolled MI must expose resolver-owned restrain-and-continue");
-assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"CE #244 must keep attempted field restraint non-executable");
+assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Turn-4 MI victory must expose direct restrain-and-continue regardless hidden control classification");
+assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"Writing #281 must keep direct restraint continuation fail-closed until authored");
 
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
@@ -262,7 +263,7 @@ assertNarration(exactSlow);
 choiceBeat=definition.beatMap.get(CHOICE_BEAT);
 labels=choiceBeat.choices.map(x=>x.label);
 assert.deepStrictEqual(labels,[
-  "ATTEMPT TO KILL HER",
+  "KILL HER",
   "TAKE HER BACK TO ANBU",
   "TAKE HER TO THE UCHIHA POLICE FORCE"
 ]);
@@ -275,6 +276,7 @@ assert.strictEqual(definition.beatMap.get(WIN_BEAT).exitScene,false);
 assert.strictEqual(choiceBeat.exitScene,false);
 assert.strictEqual(choiceBeat.nextBeatId,null);
 assert(!JSON.stringify([definition.beatMap.get(WIN_BEAT),choiceBeat]).includes("kak_seq_debrief_pending"));
+assert(!cSourceHasAttemptLabels(),"fresh Scene 05A-W source must not expose control-gated ATTEMPT disposition labels");
 assert(saves>0,"Scene 05A-W state was never persisted");
 
 console.log("Academy Kakashi Scene 05A-W 35730 QA: PASS");
@@ -283,6 +285,6 @@ console.log("- exact fight_at_sakura_tree backdrop / Retrieve the package object
 console.log("- victory-only return; defeat never enters 05A-W");
 console.log("- 1-4 MI win exposes both Package Smuggler and ANBU Marked Target pursuit choices");
 console.log("- Package Smuggler -> later AMT preservation is capped at 1-3 PS turns");
-console.log("- MI post-resolution classification controls KILL HER vs ATTEMPT TO KILL HER");
-console.log("- ANBU/Uchiha immediate dispositions preserved; 1-4 adds state-aware restrain-and-continue choice only");
-console.log("- downstream wired choice consumers survive Scene 05A-W rematerialization without leaking across ATTEMPT/KILL relabels");
+console.log("- MI Battle victory exposes direct KILL HER regardless hidden control classification");
+console.log("- ANBU/Uchiha immediate dispositions preserved; 1-4 adds direct restrain-and-continue, content-gated only by Writing #281");
+console.log("- downstream direct-choice consumers survive Scene 05A-W rematerialization across internal classification changes");

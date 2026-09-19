@@ -140,8 +140,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-59' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-59";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-60' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260919-60";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -172,7 +172,11 @@ jobs:
           grep -Fq 'PS_TO_AMT_MAX_TURNS=3' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'GO AFTER ANBU MARKED TARGET' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq '36454a31e9f61ffdaa528589ac11552d446ad3bc' runtime/alpha-kakashi-scene05a-w-35730.js
-          grep -Fq 'ATTEMPT TO RESTRAIN HER AND CONTINUE' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq 'RESTRAIN HER AND CONTINUE' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq 'alpha_kakashi_scene05aw_35730_v9_2026_09_19' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq '1ff3876e9b367ec518c254b612e4def14db8eaba' runtime/alpha-kakashi-scene05a-w-35730.js
+          ! grep -Fq 'ATTEMPT TO KILL HER' runtime/alpha-kakashi-scene05a-w-35730.js
+          ! grep -Fq 'ATTEMPT TO RESTRAIN HER AND CONTINUE' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'alpha-kakashi-scene05a-l-35750.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'aa88db471b71a305ec34e01ff0e094ac26f1638f' runtime/alpha-kakashi-scene05a-l-35750.js
           grep -Fq 'alpha-kakashi-scene06a-w2c-35760.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -188,9 +192,13 @@ jobs:
           grep -Fq 'academy_kakashi_origin_battle_seq_amt_pakkun' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'resolveAcademyKakashiSequentialPostPsPackageRecovery35600' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'Apparently.' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq 'field_secured_custody_requires_ce_244' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'field_secured_continuation_requires_writing_281' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq '77d351e6f8d4eefaea0f8a6db82dec686391e1c0' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          ! grep -Fq 'ATTEMPT TO KILL HIM' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi.battle.stop_assassin_post_mi_ps' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
           grep -Fq '0d4aa441e4ef6d566f3d1df23c198940bdc559dd' runtime/alpha-kakashi-deterministic-kill-35810.js
+          grep -Fq 'alpha_kakashi_deterministic_kill_35810_v2_2026_09_19' runtime/alpha-kakashi-deterministic-kill-35810.js
+          grep -Fq '1ff3876e9b367ec518c254b612e4def14db8eaba' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'KILL — GUARANTEED' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'confirmedKillCountDelta:1' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq '8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623' runtime/alpha-kakashi-loss-ending-35820.js
@@ -221,7 +229,8 @@ jobs:
           grep -Fq 'sc-postmi-summon-35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq "data-speaker-id='pakkun'" runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'right:6%!important' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v6_2026_09_19' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'top:12%!important' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v7_2026_09_19' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'Runtime adds STATE ONLY' runtime/alpha-kakashi-story-presentation-compat-33920.js
           grep -Fq '24b7956781d2da6d3d1f70ce18d1ef0de348cfae' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4' runtime/alpha-kakashi-immediate-custody-35800.js
@@ -295,15 +304,21 @@ jobs:
           grep -Fq 'kakashiScene05ALPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'alpha-kakashi-battle-development-35740.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq '7446e80c7f2cb9d004ffd914e11c0c77e7321c2b' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq 'aad106b6a64ede81556aea0df0cc9fe4b8830178' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq 'kak_origin_battle_ps_victory_ryo_01' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq 'kak_origin_battle_amt_victory_ryo_01' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'kak_origin_battle_mi_victory_reward_v1' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'CLAIM BATTLE REWARD' runtime/alpha-kakashi-battle-development-35740.js
-          grep -Fq 'alpha_kakashi_origin_rewards_34800_v4_2026_09_19' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq 'alpha_kakashi_origin_rewards_34800_v5_2026_09_19' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'ACTION_DERIVED_DISCIPLINE_SOURCE="action_derived_development"' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'installActionDerivedDisciplineSourceGate34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq '__scActionDerivedDevelopment34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'storyDeploymentOwnsPlayerEvidence' runtime/alpha-kakashi-battle-development-35740.js
-          grep -Fq 'alpha_kakashi_battle_development_35740_v5_2026_09_19' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'alpha_kakashi_battle_development_35740_v6_2026_09_19' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'REWARD DETAILS · WHY THESE REWARDS?' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'commitAcademyKakashiDownstreamBattleCashReward34800' runtime/alpha-kakashi-battle-development-35740.js
           if grep -Fq '<span>RYŌ</span><strong>DEBRIEF</strong>' runtime/alpha-kakashi-battle-development-35740.js; then echo 'Ryō metric must remain numeric'; exit 1; fi
           grep -Fq 'requiresExplicitPostClaimContinue' runtime/alpha-battle-browser-32600.js
           grep -Fq 'font-size:18px!important' runtime/alpha-kakashi-objective-presentation-35720.js

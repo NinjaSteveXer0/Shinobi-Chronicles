@@ -9,21 +9,26 @@
 //
 // Exact Combat action evidence still commits authorised discipline development
 // through 34800. World/Rewards authority fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da
-// now also gives the exact solo Kakashi-vs-Masked-Interceptor victory its own
-// immediate material Battle reward: 50 Ryō + Field Recovery Pill ×1.
-// Terminal Origin/debrief Ryō and Academy Training Tanto remain separate.
+// gives the exact solo Kakashi-vs-Masked-Interceptor victory 50 Ryō + Field
+// Recovery Pill ×1. World authority 7446e80c7f2cb9d004ffd914e11c0c77e7321c2b
+// additionally gives exact solo PS and AMT victories 50 Ryō cash-only. Reward
+// disclosure authority aad106b6a64ede81556aea0df0cc9fe4b8830178 requires
+// exact action-derived development causes to remain inspectable on Victory.
+// Terminal Origin/debrief rewards remain separate.
 // ============================================================================
 (function installAcademyKakashiBattleDevelopment35740(){
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740)return;
 
-const PATCH_ID="alpha_kakashi_battle_development_35740_v5_2026_09_19";
+const PATCH_ID="alpha_kakashi_battle_development_35740_v6_2026_09_19";
 const KAKASHI="academy_kakashi";
 const ROUTE="academy_kakashi_origin_reward";
 const TECHNICAL=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
 const AUTHORITIES=Object.freeze({
   world:"91f5969b20e270b3ef7d148342f28a1668b4eba1",
   immediateMiReward:"fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da",
+  downstreamCashReward:"7446e80c7f2cb9d004ffd914e11c0c77e7321c2b",
+  rewardDisclosure:"aad106b6a64ede81556aea0df0cc9fe4b8830178",
   combat:"e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8",
   progression:"54314cc29e1374783cae0a0d90654cc9a2316a45",
   acquisition:"b83884adb70f1e74e62f96ab96848c1ec33704f9"
@@ -32,6 +37,11 @@ const MI_BATTLE_CONFIG="academy_kakashi_origin_battle_mi_1v1";
 const MI_PARTICIPANT="academy_kakashi_origin_masked_interceptor";
 const MI_REWARD_RYO=50;
 const MI_REWARD_ITEM_ID="field_recovery_pill";
+const PS_BATTLE_CONFIG="academy_kakashi_origin_battle_seq_ps";
+const PS_PARTICIPANT="academy_kakashi_origin_package_smuggler";
+const AMT_BATTLE_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
+const AMT_PARTICIPANT="academy_kakashi_origin_amt";
+const DOWNSTREAM_REWARD_RYO=50;
 
 function clone(v){try{return JSON.parse(JSON.stringify(v));}catch(_error){return v;}}
 function norm(v){return String(v||"").trim().toLowerCase().replace(/ū/g,"u");}
@@ -42,6 +52,14 @@ function isExactMiVictoryBattle(b=battle()){
   const d=deployment(b),opposition=d&&Array.isArray(d.oppositionParticipantIds)?d.oppositionParticipantIds.map(String):[];
   return !!(b&&d&&b.battleOver===true&&b.outcome&&b.outcome.type==="victory"&&d.controllerParticipantId===KAKASHI&&d.battleConfigId===MI_BATTLE_CONFIG&&opposition.length===1&&opposition[0]===MI_PARTICIPANT);
 }
+function downstreamCashSpec35740(b=battle()){
+  const d=deployment(b),opposition=d&&Array.isArray(d.oppositionParticipantIds)?d.oppositionParticipantIds.map(String):[];
+  if(!(b&&d&&b.battleOver===true&&b.outcome&&b.outcome.type==="victory"&&d.controllerParticipantId===KAKASHI&&opposition.length===1))return null;
+  if(d.battleConfigId===PS_BATTLE_CONFIG&&opposition[0]===PS_PARTICIPANT)return{battleConfigId:PS_BATTLE_CONFIG,participantRef:PS_PARTICIPANT,ryo:DOWNSTREAM_REWARD_RYO};
+  if(d.battleConfigId===AMT_BATTLE_CONFIG&&opposition[0]===AMT_PARTICIPANT)return{battleConfigId:AMT_BATTLE_CONFIG,participantRef:AMT_PARTICIPANT,ryo:DOWNSTREAM_REWARD_RYO};
+  return null;
+}
+function isExactDownstreamCashVictoryBattle(b=battle()){return !!downstreamCashSpec35740(b);}
 function battleOccurrenceId(b=battle()){const d=deployment(b);return d?String(d.battleOccurrenceId||b&&b.battleId||""):String(b&&b.battleId||"");}
 function evidenceRows(b=battle()){return b&&b.runtime&&Array.isArray(b.runtime.evidence)?b.runtime.evidence:[];}
 function kakashiActor(b=battle()){
@@ -89,6 +107,25 @@ function hasMaterialEffect(attempt,rows){
     return true;
   });
 }
+function technicalEvidenceMeta(attempt,b=battle()){
+  const data=attempt&&attempt.data&&typeof attempt.data==="object"?attempt.data:{};
+  const skillId=String(attempt&&attempt.skillId||data.skillId||data.preparedSkillId||data.actionSkillId||"");
+  const skill=skillDefinition(skillId,b);
+  return{
+    actionId:String(attempt&&attempt.actionId||""),
+    skillId:skillId||null,
+    actionLabel:String(skill&&skill.name||data.skillName||data.actionLabel||data.actionName||skillId||attempt&&attempt.actionId||"Unknown action")
+  };
+}
+function staminaEvidenceMeta(packet){
+  const data=packet&&packet.data&&typeof packet.data==="object"?packet.data:{};
+  const actionId=String(packet&&packet.actionId||data.actionId||"");
+  return{
+    actionId:actionId||null,
+    actionLabel:String(data.skillName||data.actionLabel||data.actionName||data.sourceSkillId||packet&&packet.skillId||actionId||"Hostile damage packet"),
+    sourceParticipantId:String(packet&&packet.actorRef&&packet.actorRef.participantId||data.sourceParticipantId||"")||null
+  };
+}
 function sourceAmountFromSnapshot(snapshot,battleId){
   const totals={};
   const sources=snapshot&&snapshot.sources&&typeof snapshot.sources==="object"?Object.values(snapshot.sources):[];
@@ -100,6 +137,35 @@ function sourceAmountFromSnapshot(snapshot,battleId){
     if(amount>0)totals[discipline]=(Number(totals[discipline])||0)+amount;
   }
   return totals;
+}
+function developmentEvidenceFromSnapshot(snapshot,battleId){
+  const detail={};
+  const sources=snapshot&&snapshot.sources&&typeof snapshot.sources==="object"?Object.values(snapshot.sources):[];
+  for(const receipt of sources){
+    if(!receipt||!receipt.payload||String(receipt.payload.battleOccurrenceId||"")!==String(battleId||""))continue;
+    if(receipt.kind!=="discipline_development"&&receipt.kind!=="stamina_development")continue;
+    const payload=receipt.payload,discipline=receipt.kind==="stamina_development"?"stamina":norm(payload.discipline),amount=Number(payload.amount)||0;
+    if(amount<=0)continue;
+    detail[discipline]=detail[discipline]||[];
+    detail[discipline].push({
+      sourceId:String(receipt.sourceId||payload.sourceId||""),
+      amount,
+      executionClass:String(payload.executionClass||""),
+      actionId:String(payload.actionId||""),
+      skillId:String(payload.skillId||""),
+      actionLabel:String(payload.actionLabel||payload.skillId||payload.actionId||receipt.sourceId||"Battle evidence"),
+      mitigationAmount:Number(payload.mitigationAmount)||0,
+      sourceParticipantId:String(payload.sourceParticipantId||"")
+    });
+  }
+  return detail;
+}
+function committedDevelopmentEvidence35740(b=battle()){
+  const id=battleOccurrenceId(b);if(!id)return{};
+  try{
+    if(typeof getAcademyKakashiOriginRewardSnapshot34800==="function")return developmentEvidenceFromSnapshot(getAcademyKakashiOriginRewardSnapshot34800(),id);
+  }catch(_error){}
+  return{};
 }
 function summaryFromTotals(battleId,totals){
   const order=["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu","stamina"];
@@ -150,6 +216,21 @@ function prepareImmediateMiReward35740(b=battle()){
   b.rewards.terminalOriginRewardDeferred=true;
   return{success:true,qualifies:true,state:clone(state)};
 }
+
+function prepareImmediateDownstreamCash35740(b=battle()){
+  const spec=downstreamCashSpec35740(b);if(!spec)return{success:false,qualifies:false,reason:"not_exact_ps_or_amt_solo_victory"};
+  if(typeof ensureAcademyKakashiDownstreamBattleCashEntitlement34800!=="function"||typeof getAcademyKakashiDownstreamBattleCashRewardState34800!=="function"){
+    return{success:false,qualifies:true,reason:"kakashi_downstream_cash_reward_adapter_missing"};
+  }
+  const ensured=ensureAcademyKakashiDownstreamBattleCashEntitlement34800(b);if(!ensured||ensured.success!==true)return ensured||{success:false,reason:"kakashi_downstream_cash_entitlement_failed"};
+  const state=getAcademyKakashiDownstreamBattleCashRewardState34800(b);if(!state||state.success!==true)return state||{success:false,reason:"kakashi_downstream_cash_reward_state_missing"};
+  b.rewards=b.rewards&&typeof b.rewards==="object"?b.rewards:{};
+  b.rewards.generated=true;b.rewards.claimed=state.claimed===true;b.rewards.ryo=spec.ryo;b.rewards.exp=0;b.rewards.items=[];b.rewards.rareDrops=[];
+  b.rewards.kakashiImmediateDownstreamCashReward=true;
+  b.rewards.immediateRewardEntitlementId=state.entitlementId;b.rewards.immediateRewardClaimId=state.claimId;
+  b.rewards.requiresExplicitPostClaimContinue=true;b.rewards.terminalOriginRewardDeferred=true;
+  return{success:true,qualifies:true,spec:clone(spec),state:clone(state)};
+}
 function syncBattleDevelopment35740(b=battle()){
   if(!isKakashiOriginBattle(b))return{success:false,reason:"not_kakashi_origin_battle"};
   const id=battleOccurrenceId(b);if(!id)return{success:false,reason:"kakashi_battle_occurrence_missing"};
@@ -163,8 +244,10 @@ function syncBattleDevelopment35740(b=battle()){
   for(const attempt of attempts){
     const discipline=disciplineForAction(attempt,rows,b);if(!discipline)continue;
     const executionClass=hasMaterialEffect(attempt,rows)?"effective":"attempt";
+    const meta=technicalEvidenceMeta(attempt,b);
     recordAcademyKakashiTechnicalDevelopment34800({
-      sourceId:String(attempt.evidenceId||attempt.actionId),discipline,executionClass,subjectId:KAKASHI,battleOccurrenceId:id
+      sourceId:String(attempt.evidenceId||attempt.actionId),discipline,executionClass,subjectId:KAKASHI,battleOccurrenceId:id,
+      actionId:meta.actionId,skillId:meta.skillId,actionLabel:meta.actionLabel
     });
   }
 
@@ -174,12 +257,16 @@ function syncBattleDevelopment35740(b=battle()){
     return Number(data.resolvedAttackPL)>0&&Number(data.staminaMitigationAmount)>0;
   });
   for(const packet of staminaPackets){
+    const meta=staminaEvidenceMeta(packet);
     recordAcademyKakashiStaminaDevelopment34800({
-      sourceId:String(packet.evidenceId||packet.actionId||id+":stamina"),mitigationAmount:Number(packet.data&&packet.data.staminaMitigationAmount)||0,battleOccurrenceId:id,subjectId:KAKASHI
+      sourceId:String(packet.evidenceId||packet.actionId||id+":stamina"),mitigationAmount:Number(packet.data&&packet.data.staminaMitigationAmount)||0,battleOccurrenceId:id,subjectId:KAKASHI,
+      actionId:meta.actionId,actionLabel:meta.actionLabel,sourceParticipantId:meta.sourceParticipantId
     });
   }
 
   const summary=readCommittedSummary(b);
+  const downstream=isExactDownstreamCashVictoryBattle(b)?prepareImmediateDownstreamCash35740(b):null;
+  if(downstream&&downstream.success===true&&downstream.state&&downstream.state.entitlement&&downstream.state.entitlement.materialReward)summary.materialBattleReward=clone(downstream.state.entitlement.materialReward);
   attachSummaryToBattle(b,summary);
   return{success:true,summary,attemptCount:attempts.length,staminaPacketCount:staminaPackets.length};
 }
@@ -193,12 +280,35 @@ function developmentListMarkup(summary){
   if(!rows.length)return '<span class="is-empty">NO QUALIFYING DEVELOPMENT</span>';
   return rows.map(row=>`<span>${esc(disciplineLabel(row.discipline).toUpperCase())} +${Number(row.amount)||0} EXP</span>`).join("");
 }
+function rewardDisclosureMarkup35740(summary,b=battle()){
+  const evidence=committedDevelopmentEvidence35740(b),reward=b&&b.rewards&&typeof b.rewards==="object"?b.rewards:{};
+  const parts=[];
+  parts.push('<span><b>IMMEDIATE RYŌ</b> '+(Number(reward.ryo)||0)+'</span>');
+  const items=Array.isArray(reward.items)?reward.items:[];
+  parts.push('<span><b>ITEMS</b> '+(items.length?items.map(x=>esc(String(x.name||x.id||"Item"))+' ×'+(Number(x.quantity)||1)).join(", "):"NONE")+'</span>');
+  parts.push('<span><b>GENERIC CHARACTER EXP</b> '+(Number(reward.exp)||0)+'</span>');
+  for(const row of summary&&Array.isArray(summary.rows)?summary.rows:[]){
+    const detail=Array.isArray(evidence[row.discipline])?evidence[row.discipline]:[];
+    const causes=detail.length?detail.map(src=>{
+      if(row.discipline==="stamina")return esc(src.actionLabel)+' — mitigated '+src.mitigationAmount+' damage · +'+src.amount+' EXP';
+      return esc(src.actionLabel)+' — '+esc(src.executionClass||"committed execution")+' · +'+src.amount+' EXP';
+    }).join("<br>"):"Committed Battle evidence · source detail unavailable";
+    parts.push('<span><b>'+esc(disciplineLabel(row.discipline).toUpperCase())+' +'+(Number(row.amount)||0)+' EXP</b><br>'+causes+'</span>');
+  }
+  parts.push('<span><b>ORIGIN / DEBRIEF REWARDS</b> evaluated separately at terminal debrief</span>');
+  return '<details class="alpha-victory-reward-disclosure"><summary>REWARD DETAILS · WHY THESE REWARDS?</summary><div>'+parts.join("")+'</div></details>';
+}
 function enhanceKakashiVictory35740(container){
   const b=battle();if(!isKakashiOriginBattle(b)||!container||typeof container.querySelector!=="function")return false;
   const summary=b.kakashiOriginDevelopmentSummary||readCommittedSummary(b);
   attachSummaryToBattle(b,summary);
   const immediate=isExactMiVictoryBattle(b)?prepareImmediateMiReward35740(b):null;
+  const downstream=isExactDownstreamCashVictoryBattle(b)?prepareImmediateDownstreamCash35740(b):null;
+  if(downstream&&downstream.success===true&&downstream.state&&downstream.state.entitlement&&downstream.state.entitlement.materialReward)summary.materialBattleReward=clone(downstream.state.entitlement.materialReward);
+  attachSummaryToBattle(b,summary);
   const isImmediate=!!(immediate&&immediate.success===true&&immediate.qualifies===true);
+  const isDownstreamCash=!!(downstream&&downstream.success===true&&downstream.qualifies===true);
+  const hasImmediateMaterial=isImmediate||isDownstreamCash;
   const claimed=!!(b.rewards&&b.rewards.claimed===true);
   const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;
 
@@ -210,7 +320,7 @@ function enhanceKakashiVictory35740(container){
         <div class="alpha-victory-metric"><span>BATTLE REWARD</span><strong>50 RYŌ</strong></div>
         <div class="alpha-victory-metric"><span>ITEM</span><strong>×1</strong></div>
         <div class="alpha-victory-list"><span>FIELD RECOVERY PILL</span><div><span>${claimed?"CLAIMED":"READY TO CLAIM"}</span></div></div>
-        <div class="alpha-victory-list is-rare"><span>BATTLE DEVELOPMENT</span><div>${developmentListMarkup(summary)}</div></div>
+        <div class="alpha-victory-list is-rare"><span>BATTLE DEVELOPMENT</span><div>${developmentListMarkup(summary)}${rewardDisclosureMarkup35740(summary,b)}</div></div>
       `;
     }else{
       rewards.setAttribute("aria-label","Battle development and deferred Origin rewards");
@@ -218,13 +328,13 @@ function enhanceKakashiVictory35740(container){
         <div class="alpha-victory-metric"><span>DISCIPLINE EXP</span><strong>+${Number(summary&&summary.totalExp)||0}</strong></div>
         <div class="alpha-victory-metric"><span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:"0"}</strong></div>
         <div class="alpha-victory-list"><span>DEVELOPMENT</span><div>${developmentListMarkup(summary)}</div></div>
-        <div class="alpha-victory-list is-rare"><span>ORIGIN REWARDS</span><div><span>Evaluated at terminal debrief</span></div></div>
+        <div class="alpha-victory-list is-rare"><span>ORIGIN REWARDS</span><div><span>Evaluated at terminal debrief</span>${rewardDisclosureMarkup35740(summary,b)}</div></div>
       `;
     }
   }
 
   const header=container.querySelector(".alpha-victory-header p");
-  if(header)header.textContent=isImmediate
+  if(header)header.textContent=hasImmediateMaterial
     ?"Battle reward, field development and Story continuation are separate runtime steps."
     :"Battle outcome, field development and Story continuation remain separate runtime steps.";
 
@@ -233,17 +343,21 @@ function enhanceKakashiVictory35740(container){
     ?(claimed
       ?"Battle reward claimed. Battle development remains committed. Return to Story to continue the Chronicle."
       :"Claim 50 Ryō and Field Recovery Pill ×1 now. Battle development is already committed from executed actions. Return to Story unlocks after the material reward claim.")
-    :"Battle development is committed from executed actions. Origin Ryō and item/equipment rewards are evaluated at terminal debrief. Claim records this Battle Chronicle and returns to Story.";
+    :isDownstreamCash
+      ?(claimed
+        ?"50 Ryō Battle reward claimed. Battle development remains committed. Origin/debrief rewards remain separate."
+        :"Claim 50 Ryō now. Battle development is already committed from executed actions; Origin/debrief rewards remain separate.")
+      :"Battle development is committed from executed actions. Origin Ryō and item/equipment rewards are evaluated at terminal debrief. Claim records this Battle Chronicle and returns to Story.";
 
   const button=container.querySelector(".alpha-victory-footer .victory-continue");
   if(button){
-    if(isImmediate)button.textContent=claimed?"RETURN TO STORY":"CLAIM BATTLE REWARD";
+    if(hasImmediateMaterial)button.textContent=claimed?"RETURN TO STORY":"CLAIM BATTLE REWARD";
     else if(!claimed)button.textContent="CLAIM BATTLE RESULT";
   }
 
   const state=container.querySelector(".alpha-victory-claim-state");
   if(state){
-    if(isImmediate)state.textContent=claimed?"REWARD CLAIMED":"BATTLE REWARD CLAIM PENDING";
+    if(hasImmediateMaterial)state.textContent=claimed?"REWARD CLAIMED":"BATTLE REWARD CLAIM PENDING";
     else if(!claimed)state.textContent="RESULT CLAIM PENDING";
   }
 
@@ -254,6 +368,9 @@ function enhanceKakashiVictory35740(container){
     if(isImmediate){
       rewardsDt.textContent="BATTLE REWARD";
       if(dd)dd.textContent=claimed?"50 RYŌ + FIELD RECOVERY PILL ×1 · CLAIMED":"50 RYŌ + FIELD RECOVERY PILL ×1";
+    }else if(isDownstreamCash){
+      rewardsDt.textContent="BATTLE REWARD";
+      if(dd)dd.textContent=claimed?"50 RYŌ · CLAIMED":"50 RYŌ";
     }else{
       rewardsDt.textContent="DEVELOPMENT";
       if(dd)dd.textContent=(Number(summary&&summary.totalExp)||0)>0?`+${summary.totalExp} EXP COMMITTED`:"NO QUALIFYING EXP";
@@ -269,7 +386,7 @@ if(priorGenerate){
     const b=battle();
     if(isKakashiOriginBattle(b)){
       syncBattleDevelopment35740(b);
-      if(isExactMiVictoryBattle(b))prepareImmediateMiReward35740(b);
+      if(isExactMiVictoryBattle(b))prepareImmediateMiReward35740(b);else if(isExactDownstreamCashVictoryBattle(b))prepareImmediateDownstreamCash35740(b);
     }
     return b&&b.rewards?b.rewards:result;
   };
@@ -282,7 +399,7 @@ if(priorProject){
     const b=battle();if(isKakashiOriginBattle(b)){syncBattleDevelopment35740(b);if(isExactMiVictoryBattle(b))prepareImmediateMiReward35740(b);}
     const result=priorProject.apply(this,arguments);
     const summary=b&&b.kakashiOriginDevelopmentSummary||null;
-    const immediate=b&&isExactMiVictoryBattle(b)&&typeof getAcademyKakashiMiVictoryBattleRewardState34800==="function"?getAcademyKakashiMiVictoryBattleRewardState34800(b):null;
+    const immediate=b&&isExactMiVictoryBattle(b)&&typeof getAcademyKakashiMiVictoryBattleRewardState34800==="function"?getAcademyKakashiMiVictoryBattleRewardState34800(b):b&&isExactDownstreamCashVictoryBattle(b)&&typeof getAcademyKakashiDownstreamBattleCashRewardState34800==="function"?getAcademyKakashiDownstreamBattleCashRewardState34800(b):null;
     return result&&typeof result==="object"?{...result,developmentSummary:clone(summary),rewardGranted:!!(immediate&&immediate.claimed===true),immediateBattleReward:immediate&&immediate.success===true?clone(immediate):null}:result;
   };
   try{projectAcademyKakashiOriginBattleResult=globalThis.projectAcademyKakashiOriginBattleResult;}catch(_error){}
@@ -318,12 +435,13 @@ if(priorRender){
 const priorClaimRewards=typeof claimCurrentBattleRewards==="function"?claimCurrentBattleRewards:null;
 if(priorClaimRewards){
   globalThis.claimCurrentBattleRewards=function claimCurrentBattleRewardsKakashi35740(){
-    const b=battle();
-    if(!isExactMiVictoryBattle(b))return priorClaimRewards.apply(this,arguments);
-    if(typeof commitAcademyKakashiMiVictoryBattleReward34800!=="function")return false;
-    const claim=commitAcademyKakashiMiVictoryBattleReward34800(b);
+    const b=battle(),mi=isExactMiVictoryBattle(b),downstream=isExactDownstreamCashVictoryBattle(b);
+    if(!mi&&!downstream)return priorClaimRewards.apply(this,arguments);
+    const claim=mi
+      ?(typeof commitAcademyKakashiMiVictoryBattleReward34800==="function"?commitAcademyKakashiMiVictoryBattleReward34800(b):null)
+      :(typeof commitAcademyKakashiDownstreamBattleCashReward34800==="function"?commitAcademyKakashiDownstreamBattleCashReward34800(b):null);
     if(!claim||claim.success!==true)return false;
-    prepareImmediateMiReward35740(b);
+    if(mi)prepareImmediateMiReward35740(b);else prepareImmediateDownstreamCash35740(b);
     if(b.rewards)b.rewards.claimed=true;
     b.claimedAt=Date.now();
     try{if(typeof recordBattleChronicle==="function")recordBattleChronicle();}catch(_error){}
@@ -338,8 +456,8 @@ function diagnostics(){
   const sync=syncBattleDevelopment35740.toString(),present=enhanceKakashiVictory35740.toString();
   const legacyDeferredRyoLabel="<span>RYŌ</span><strong>"+["DE","BRIEF"].join("")+"</strong>";
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v5_2026_09_19",
-    exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
+    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v6_2026_09_19",
+    exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.downstreamCashReward==="7446e80c7f2cb9d004ffd914e11c0c77e7321c2b"&&AUTHORITIES.rewardDisclosure==="aad106b6a64ede81556aea0df0cc9fe4b8830178"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
     technicalDevelopmentUses34800:sync.includes("recordAcademyKakashiTechnicalDevelopment34800"),
     storyDeploymentOwnsPlayerEvidence:sync.includes('row.actorRef.side==="player"')&&!sync.includes("row.actorRef.participantId===KAKASHI")&&!sync.includes("row.targetRef.participantId!==KAKASHI"),
     resolvedEvidenceMayOwnDiscipline:disciplineForAction.toString().includes("attemptData.primaryDiscipline")&&disciplineForAction.toString().includes("row.data.primaryDiscipline")&&sync.includes('row.eventType==="action_attempted"')&&!sync.includes("&&row.skillId&&row.actionId"),
@@ -347,11 +465,14 @@ function diagnostics(){
     exactCombatEvidence:sync.includes('eventType==="action_attempted"')&&sync.includes('eventType!=="damage_resolved"')===false&&sync.includes("staminaMitigationAmount"),
     genericExpNotGranted:!sync.includes("playerData.exp")&&!sync.includes("rewards.exp="),
     immediateMiRewardUses34800:prepareImmediateMiReward35740.toString().includes("ensureAcademyKakashiMiVictoryBattleEntitlement34800")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_RYO")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_ITEM_ID"),
+    downstreamCashUses34800:prepareImmediateDownstreamCash35740.toString().includes("ensureAcademyKakashiDownstreamBattleCashEntitlement34800")&&prepareImmediateDownstreamCash35740.toString().includes("getAcademyKakashiDownstreamBattleCashRewardState34800"),
+    downstreamCashExact:downstreamCashSpec35740.toString().includes("PS_BATTLE_CONFIG")&&downstreamCashSpec35740.toString().includes("AMT_BATTLE_CONFIG")&&DOWNSTREAM_REWARD_RYO===50,
+    causalRewardDisclosure:rewardDisclosureMarkup35740.toString().includes("WHY THESE REWARDS?")&&rewardDisclosureMarkup35740.toString().includes("mitigated")&&technicalEvidenceMeta.toString().includes("actionLabel"),
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
     chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
     immediateVictoryPresentation:present.includes("BATTLE REWARD")&&present.includes("50 RYŌ")&&present.includes("FIELD RECOVERY PILL")&&present.includes("CLAIM BATTLE REWARD")&&present.includes("RETURN TO STORY")&&present.includes("REWARD CLAIMED"),
     deferredBattleRyoStaysNumeric:present.includes("immediateRyo")&&present.includes("<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:\"0\"}</strong>")&&!present.includes(legacyDeferredRyoLabel),
-    exactClaimUses34800:typeof globalThis.claimCurrentBattleRewards==="function"&&globalThis.claimCurrentBattleRewards.toString().includes("commitAcademyKakashiMiVictoryBattleReward34800"),
+    exactClaimUses34800:typeof globalThis.claimCurrentBattleRewards==="function"&&globalThis.claimCurrentBattleRewards.toString().includes("commitAcademyKakashiMiVictoryBattleReward34800")&&globalThis.claimCurrentBattleRewards.toString().includes("commitAcademyKakashiDownstreamBattleCashReward34800"),
     browserGoldenClaimed:false
   };
   // Keep the diagnostic explicit rather than relying on one fragile source-text
@@ -364,6 +485,7 @@ function diagnostics(){
 
 globalThis.syncAcademyKakashiBattleDevelopment35740=syncBattleDevelopment35740;
 globalThis.prepareAcademyKakashiImmediateMiReward35740=prepareImmediateMiReward35740;
+globalThis.prepareAcademyKakashiImmediateDownstreamCash35740=prepareImmediateDownstreamCash35740;
 globalThis.enhanceAcademyKakashiVictory35740=enhanceKakashiVictory35740;
 globalThis.runAcademyKakashiBattleDevelopment35740Diagnostics=diagnostics;
 globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740=Object.freeze({patchId:PATCH_ID,route:ROUTE,authorities:AUTHORITIES,browserGoldenClaimed:false});

@@ -22,10 +22,13 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v8_2026_09_19";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v9_2026_09_19";
 const AUTHORITY="bf16ebe0f677994878fbe60e30e7b546da899eb8";
 const CAUSAL_AUTHORITY="90b20f565ef010d2b7cfca98c04feece3f7dfcb7";
 const CHOICE_SURFACE_AUTHORITY="36454a31e9f61ffdaa528589ac11552d446ad3bc";
+const POST_BATTLE_AGENCY_AUTHORITY="1ff3876e9b367ec518c254b612e4def14db8eaba";
+const KAKASHI_DISPOSITION_AUTHORITY="62821414baaadd047c524239d1b3bbf207692b61";
+const FIELD_SECURED_AUTHORITY="77d351e6f8d4eefaea0f8a6db82dec686391e1c0";
 const MI_PURSUIT_MAX_TURNS=4;
 const PS_TO_AMT_MAX_TURNS=3;
 const STORY_UNIT_REF="academy_kakashi";
@@ -125,14 +128,10 @@ function classifyMi35730(row=result()){
   return committed&&committed.success?{success:true,stateClass,resultRef:ref,state:committed.state}:committed||{success:false,reason:"kakashi_scene05aw_mi_classification_failed"};
 }
 function lethalPresentation(){
-  const stateClass=currentMiStateClass();
-  return stateClass==="CONTROLLED_DEFEATED"
-    ?{label:"KILL HER",mode:"deterministic",bindingRef:"academy_kakashi.lethal.kill_deterministic"}
-    :{label:"ATTEMPT TO KILL HER",mode:"resolver_determined",bindingRef:"academy_kakashi.lethal.attempt_kill"};
+  return{label:"KILL HER",mode:"deterministic",bindingRef:"academy_kakashi.lethal.kill_deterministic"};
 }
 function restraintPresentation(){
-  const stateClass=currentMiStateClass();
-  return stateClass==="CONTROLLED_DEFEATED"?"RESTRAIN HER AND CONTINUE":"ATTEMPT TO RESTRAIN HER AND CONTINUE";
+  return"RESTRAIN HER AND CONTINUE";
 }
 function successorPending(branch){
   return{success:false,reason:"kakashi_scene05aw_successor_authority_not_implemented",branch,authority:AUTHORITY};
@@ -141,8 +140,8 @@ function choiceRow(choiceId,label,branch){
   return{choiceId,label,nextBeatId:CHOICE_BEAT,availability:()=>({available:true,knownBlocker:null}),knownBlocker:null,consequenceRequests:[{requestId:`kakashi_scene05aw_${branch.toLowerCase()}_pending_35730`,kind:"domain",resolve:()=>successorPending(branch)}]};
 }
 function restraintChoiceRow35730(){
-  const blocker="FIELD-SECURED CUSTODY SEMANTICS PENDING CE #244";
-  return{choiceId:"scene05aw_restrain_and_continue",label:restraintPresentation(),nextBeatId:CHOICE_BEAT,availability:()=>({available:false,knownBlocker:blocker}),knownBlocker:blocker,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_f_ce244_blocked_35730",kind:"domain",resolve:()=>({success:false,reason:"field_secured_custody_requires_ce_244",issue:244,boundaryPreserved:true})}]};
+  const blocker="RESTRAINT CONTINUATION SCENE PENDING WRITING #281";
+  return{choiceId:"scene05aw_restrain_and_continue",label:restraintPresentation(),nextBeatId:CHOICE_BEAT,availability:()=>({available:false,knownBlocker:blocker}),knownBlocker:blocker,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_f_writing_281_blocked_35730",kind:"domain",resolve:()=>({success:false,reason:"field_secured_continuation_requires_writing_281",issue:281,fieldSecuredAuthority:FIELD_SECURED_AUTHORITY,playerAgencyAuthority:POST_BATTLE_AGENCY_AUTHORITY,boundaryPreserved:true})}]};
 }
 function isWiredChoice35730(row){
   const requests=row&&Array.isArray(row.consequenceRequests)?row.consequenceRequests:[];
@@ -338,8 +337,10 @@ function diagnostics(){
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v8_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v9_2026_09_19",
     choiceSurfaceAuthorityPinned:CHOICE_SURFACE_AUTHORITY==="36454a31e9f61ffdaa528589ac11552d446ad3bc",
+    postBattleAgencyAuthorityPinned:POST_BATTLE_AGENCY_AUTHORITY==="1ff3876e9b367ec518c254b612e4def14db8eaba"&&KAKASHI_DISPOSITION_AUTHORITY==="62821414baaadd047c524239d1b3bbf207692b61",
+    fieldSecuredAuthorityClosed:FIELD_SECURED_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0",
     downstreamConsumerPreservation:preserveWiredChoice35730({choiceId:"x",nextBeatId:"pending",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_pending_35730"}]},{choiceId:"x",nextBeatId:"real",availability:function(){return{available:true};},knownBlocker:null,consequenceRequests:[{requestId:"real_consumer"}]}).nextBeatId==="real",
     causalAuthorityPinned:CAUSAL_AUTHORITY==="90b20f565ef010d2b7cfca98c04feece3f7dfcb7",
     authorityPinned:AUTHORITY==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
@@ -351,8 +352,8 @@ function diagnostics(){
     dualPursuitChoices:menuSource.includes("GO AFTER PACKAGE SMUGGLER")&&menuSource.includes("GO AFTER ANBU MARKED TARGET"),
     exactFastChoiceOrder:(()=>{const rt=active();const beat=choice;if(!rt||!beat)return true;return true;})()&&menuSource.indexOf("scene05aw_go_after_package_smuggler")<menuSource.indexOf("scene05aw_go_after_anbu_marked_target")&&menuSource.indexOf("scene05aw_go_after_anbu_marked_target")<menuSource.indexOf("scene05aw_lethal")&&menuSource.indexOf("scene05aw_take_her_to_uchiha_police")<menuSource.indexOf("restraintChoiceRow35730"),
     exactDispositionLabels:menuSource.includes("TAKE HER BACK TO ANBU")&&menuSource.includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
-    fastRestrainChoice:menuSource.includes("restraintChoiceRow35730")&&restraintChoiceRow35730.toString().includes("scene05aw_restrain_and_continue")&&restraintChoiceRow35730.toString().includes("field_secured_custody_requires_ce_244")&&restraintPresentation.toString().includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),
-    lethalModeFromClassification:lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&lethalPresentation.toString().includes("ATTEMPT TO KILL HER"),
+    fastRestrainChoice:menuSource.includes("restraintChoiceRow35730")&&restraintChoiceRow35730.toString().includes("scene05aw_restrain_and_continue")&&restraintChoiceRow35730.toString().includes("field_secured_continuation_requires_writing_281")&&restraintPresentation()==="RESTRAIN HER AND CONTINUE",
+    directLethalNotControlGated:lethalPresentation().label==="KILL HER"&&lethalPresentation().mode==="deterministic"&&!lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&!lethalPresentation.toString().includes(["ATTEMPT"," TO KILL HER"].join("")),
     miClassifiedBeforeMenu:routeVictoryReturn35730.toString().includes("classifyMi35730"),
     fightBackdropPreserved:win&&win.environmentRef&&win.environmentRef.assetId===FIGHT_BACKDROP_ID&&choice&&choice.environmentRef&&choice.environmentRef.assetId===FIGHT_BACKDROP_ID,
     objectiveExact:OBJECTIVE==="Retrieve the package.",
