@@ -84,7 +84,7 @@ const POST_MI_PURSUIT_PATH="runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
 // const BUILD="kakashi-final-20260919-52";
 // const BUILD="kakashi-final-20260919-53";
 // const BUILD="kakashi-final-20260919-54";
-const BUILD="kakashi-final-20260919-55";
+const BUILD="kakashi-final-20260919-56";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);

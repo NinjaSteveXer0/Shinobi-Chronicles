@@ -140,8 +140,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-55' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-55";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-56' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260919-56";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -293,6 +293,8 @@ jobs:
           grep -Fq 'fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'kak_origin_battle_mi_victory_reward_v1' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'CLAIM BATTLE REWARD' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'alpha_kakashi_battle_development_35740_v3_2026_09_19' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'resolvedEvidenceMayOwnDiscipline' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'requiresExplicitPostClaimContinue' runtime/alpha-battle-browser-32600.js
           grep -Fq 'font-size:18px!important' runtime/alpha-kakashi-objective-presentation-35720.js
           grep -Fq 'grid-template-columns:auto auto!important' runtime/alpha-battle-browser-32600.js
