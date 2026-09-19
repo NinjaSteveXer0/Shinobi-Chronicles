@@ -1,5 +1,13 @@
 # Academy Kakashi Origin — W2C Lethal Attempt Differentiated Resolver Outcome Lock
 
+> **2026-09-20 DOWNSTREAM WRITING COMPLETE**  
+> The exact SURVIVED / INTERRUPTED / ESCAPED continuations required below have since been authored and locked, including ANBU report and Hokage-office variants.
+>
+> Mixed later lethal histories are additionally closed by:
+> `Academy_Kakashi_Mixed_Lethal_Terminal_Verbatim_Lock_2026-09-20.md`.
+>
+> The “Writing must provide” requirement below is historical and fulfilled.
+
 **Date:** 2026-09-18  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED / BINDING STORY-RESOLVER AUTHORITY**
