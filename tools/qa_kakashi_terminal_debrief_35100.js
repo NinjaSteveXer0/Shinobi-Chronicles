@@ -23,6 +23,7 @@ var __qaRuntime=null;
 var __qaScene=null;
 var __qaCompletionCalls=[];
 var __qaProgression={};
+var __qaLegacyTrainingSource={nin:"exam",tai:"practical",gen:"exam",buki:"practical",fuin:"exam",kin:"battle",stamina:"practical"};
 function cloneProgressionData(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v));}
 function savePlayerData(){activityHistory=playerData.activityHistory||[];return true;}
 function saveTestState(){return savePlayerData();}
@@ -31,7 +32,8 @@ function getActiveStorySceneRuntime(){return __qaRuntime;}
 function getStorySceneDefinition(sceneId){return __qaScene&&__qaScene.sceneId===sceneId?__qaScene:null;}
 function getItemDefinition(id){if(id==="field_recovery_pill")return{id,name:"Field Recovery Pill"};if(id==="academy_training_tanto")return{id,name:"Academy Training Tanto"};return null;}
 function addItemToInventory(item){playerData.inventory=Array.isArray(playerData.inventory)?playerData.inventory:[];playerData.inventory.push(JSON.parse(JSON.stringify(item)));return true;}
-function addDisciplineExp(subjectId,disciplineId,amount){const k=subjectId+"::"+disciplineId;__qaProgression[k]=Number(__qaProgression[k]||0)+Number(amount||0);return true;}
+function isValidDisciplineTrainingSource(disciplineId,source){return __qaLegacyTrainingSource[String(disciplineId||"")]===String(source||"");}
+function addDisciplineExp(subjectId,disciplineId,amount,source){if(!isValidDisciplineTrainingSource(disciplineId,source))return false;const k=subjectId+"::"+disciplineId;__qaProgression[k]=Number(__qaProgression[k]||0)+Number(amount||0);return true;}
 function getCharacterDisciplineProgression(subjectId,disciplineId){const k=subjectId+"::"+disciplineId;return{characterId:subjectId,disciplineId,exp:Number(__qaProgression[k]||0)};}
 function completeChronicleOriginPrologue(originId,evidenceIds){__qaCompletionCalls.push({originId,evidenceIds:[...(evidenceIds||[])]});return{success:true,originId,evidenceIds:[...(evidenceIds||[])]};}
 function resetDataQA(instanceId){
@@ -62,7 +64,11 @@ globalThis.SC_ALPHA_KAKASHI_FINAL_34100={
 };
 resetQA("qa-secure-35100");
 `,"qa35100-kakashi-stub.js");
+assert.strictEqual(truth('isValidDisciplineTrainingSource("buki","action_derived_development")'),false,"legacy source gate must reject action-derived development before 34800");
 run(rewards,"runtime/alpha-kakashi-origin-rewards-34800.js");
+assert.strictEqual(truth('isValidDisciplineTrainingSource("buki","action_derived_development")'),true,"34800 must extend the source gate for action-derived development");
+assert.strictEqual(truth('isValidDisciplineTrainingSource("buki","practical")'),true,"34800 must preserve legacy Bukijutsu Practical source");
+assert.strictEqual(truth('isValidDisciplineTrainingSource("buki","exam")'),false,"34800 must not broaden unrelated legacy sources");
 run(terminal,"runtime/alpha-kakashi-terminal-debrief-35100.js");
 
 assert(loader.includes('runtime/alpha-kakashi-origin-rewards-34800.js'),"34100 does not production-load 34800 rewards");
