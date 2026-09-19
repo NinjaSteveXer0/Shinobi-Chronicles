@@ -43,6 +43,8 @@ assert.strictEqual(diag.checks.revisedOfficeExact,true,"revised 137-cue loss-off
 assert.strictEqual(diag.checks.staleClippedExchangeRemoved,true,"stale clipped interrogation dialogue remains in loss office");
 assert.strictEqual(diag.checks.safeDialogueZones,true,"loss-office dialogue ownership/safe-zone lock missing");
 assert.strictEqual(diag.checks.liveStateCallout,true,"loss-office recovered package must use a Live State Callout");
+assert.strictEqual(MOD.authorities.officeFact,"d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab","loss hidden-review factual authority must remain unchanged");
+assert.strictEqual(MOD.authorities.officeExpression,"362f72b8f20f50fec1b8e11e483e40cf5030364c","revised Writing expression authority missing");
 MOD.wireSource();
 let out=globalThis.advanceStoryScene("scene05al_return_to_anbu");
 assert.strictEqual(out.success,true,"RETURN TO ANBU failed: "+JSON.stringify(out));
@@ -86,13 +88,15 @@ assert.strictEqual(hidden.fact.participantCustodyCommitted,false);
 assert.strictEqual(hidden.fact.lethalActionCommitted,false);
 assert.strictEqual(hidden.fact.pakkunPresent,false);
 assert.strictEqual(hidden.fact.minatoEvaluation.moralScoreCollapsed,false);
+assert.strictEqual(hidden.fact.authorityCommit,"d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab","expression rewrite must not mutate hidden-review fact provenance");
 assert(receipt>=1,"Chronicle Receipt was not committed");
 
 out=MOD.complete();
 assert.strictEqual(out.success,true,"loss Origin closure failed: "+JSON.stringify(out));
 assert.strictEqual(out.destination,"konoha_village");
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-loss-ending-35820.js"),"utf8");
-assert(source.includes("362f72b8f20f50fec1b8e11e483e40cf5030364c"),"revised loss-office Writing authority missing");
+assert(source.includes("362f72b8f20f50fec1b8e11e483e40cf5030364c"),"revised loss-office Writing expression authority missing");
+assert(source.includes("d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab"),"original hidden-review factual authority missing");
 assert(source.includes("He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in."),"revised character-driven office opening missing");
 assert(!source.includes('text:"He couldn’t follow?"')&&!source.includes('text:"No excuse?"'),"superseded clipped office exchange still present");
 assert(source.includes(".sc-chronicle-layout{display:none!important}")&&source.includes("scBoardUiMode"),"generic Chronicle dialogue panel can still reassert over Minato");
