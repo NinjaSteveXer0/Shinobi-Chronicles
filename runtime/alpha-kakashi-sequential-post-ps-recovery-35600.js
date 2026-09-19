@@ -23,6 +23,7 @@ const PS_BATTLE_BEAT="kak_seq_ps_battle";
 const PS_RETURN_BEAT="kak_seq_ps_return";
 const PS_CONFIG="academy_kakashi_origin_battle_seq_ps";
 const SEQUENTIAL_BINDING="academy_kakashi.battle.defeat_assassin_then_secure";
+const STOP_ASSASSIN_POST_MI_PS_BINDING="academy_kakashi.battle.stop_assassin_post_mi_ps";
 const WORLD_OBJECT_REF="kakashi_origin_outer_route_packet";
 const PACKAGE_SMUGGLER_REF="academy_kakashi_origin_package_smuggler";
 const SAKURA=Object.freeze({assetId:"kakashi_origin_sakura_tree_night"});
@@ -81,7 +82,7 @@ function resolveSequentialPostPsPackageRecovery35600(){
   const rt=active(),result=latestResult();
   if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_ak_sa_033_story_instance_missing"};
   if(!result||!result.battleOccurrenceId)return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_missing"};
-  if(String(result.battleConfigId||"")!==PS_CONFIG||String(result.bindingRef||"")!==SEQUENTIAL_BINDING)return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_mismatch"};
+  if(String(result.battleConfigId||"")!==PS_CONFIG||![SEQUENTIAL_BINDING,STOP_ASSASSIN_POST_MI_PS_BINDING].includes(String(result.bindingRef||"")))return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_mismatch"};
 
   const parent=parentPackageOccurrence(rt);if(!parent.success)return parent;
 
@@ -214,6 +215,7 @@ function diagnostics(){
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_seq_post_ps_recovery_35600_v1_2026_09_17",
     writingAuthorityExact:RECOVERY_ANCHOR==="AK_SA_033"&&RECOVERY_OCCURRENCE_ID==="kak_seq_secure_package_after_ps",
+    stopAssassinBindingAccepted:resolveSequentialPostPsPackageRecovery35600.toString().includes("STOP_ASSASSIN_POST_MI_PS_BINDING"),
     semanticActionExact:resolveSequentialPostPsPackageRecovery35600.toString().includes('semanticAction:"SECURE_PACKAGE_AFTER_PS"'),
     battleVictoryNotCustodyOwner:classifyPackageSmugglerDefeat.toString().includes("recordParticipantClassification")&&resolveSequentialPostPsPackageRecovery35600.toString().includes("commitOccurrence"),
     classificationBeforeRecovery:resolveSequentialPostPsPackageRecovery35600.toString().indexOf("classifyPackageSmugglerDefeat")<resolveSequentialPostPsPackageRecovery35600.toString().indexOf("commitOccurrence"),
