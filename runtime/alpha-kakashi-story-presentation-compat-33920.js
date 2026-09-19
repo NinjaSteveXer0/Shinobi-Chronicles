@@ -190,8 +190,8 @@ function runAcademyKakashiStoryPresentationCompat33920Diagnostics(){
   const click=bindStage33920.toString();const sync=sync33920.toString();
   const checks={
     patchId:PATCH_ID==="academy_kakashi_story_presentation_compat_33920_v6_2026_09_19",
-    bakedNameplateOwnsIdentity:css.includes("sc-scene-board-33900__actor-tag strong{display:none!important}")&&css.includes("bottom:-30px!important")&&css.includes("width:max-content!important"),
-    stateChipBelowCard:css.includes("Runtime adds STATE ONLY")&&css.includes("sc-scene-board-33900__actor-tag small")&&css.includes("overflow:visible!important"),
+    bakedNameplateOwnsIdentity:installStyle33920.toString().includes("sc-scene-board-33900__actor-tag strong")&&installStyle33920.toString().includes("display:none!important")&&installStyle33920.toString().includes("bottom:-30px!important"),
+    stateChipBelowCard:installStyle33920.toString().includes("Runtime adds STATE ONLY")&&installStyle33920.toString().includes("sc-scene-board-33900__actor-tag small")&&installStyle33920.toString().includes("overflow:visible!important"),
     redundantArrowRemoved:css.includes("sc-performance-next-33910")&&removeAdvanceButtons33920.toString().includes("node.remove"),
     compactLiveStateCallout:css.includes("bottom:auto!important")&&css.includes("width:max-content!important")&&css.includes("min-width:0!important")&&css.includes("height:auto!important")&&css.includes("text-align:left!important")&&css.includes("sc-scene-board-33900__object b"),
     cutCornersRemoved:css.includes("clip-path:none!important")&&css.includes("border-radius:8px!important"),
