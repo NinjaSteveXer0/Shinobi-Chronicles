@@ -1,5 +1,16 @@
 # Academy Kakashi Origin — Final Structured Autonomy Anchor Reconciliation
 
+> **2026-09-19 AK_SA_003 DIRECT ATTACK SUPERSESSION**  
+> For the direct Scene 02 `STRIKE BEFORE THE HANDOFF` route, the older `AK_SA_003` generic resolver-return description is superseded by:
+> `Documentation/Story/Academy_Kakashi_Strike_Before_The_Handoff_Verbatim_Scene_Family_2026-09-19.md`
+> @ `13166b7f56cdd89ad8a6c6ba3a51d1dada6bac06`.
+>
+> Direct Scene 02 Attack is now a fixed authored Battle chain using:
+> - `academy_kakashi_origin_battle_amt_ps_2v1`;
+> - then, only after Kakashi wins and secures the package, `academy_kakashi_origin_battle_mi_1v1`.
+>
+> The separate improved-position `AK_SA_029 / MOVE IN CLOSER -> STRIKE BEFORE THE HANDOFF` remains distinct.
+>
 **Date:** 2026-09-15  
 **Owner:** Stephen / Writing — Konoha; reusable semantics owned by CE / Codex / Coordination  
 **Status:** **FINAL WRITING-CLOSED IMPLEMENTATION ANCHOR INVENTORY — CODING MAY CONSUME**
