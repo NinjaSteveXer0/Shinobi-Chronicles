@@ -1030,6 +1030,24 @@ He closes the ledger slightly.
 
 Use only the module matching committed MI state.
 
+## MI — UNSEEN / not materially encountered
+
+Use on chronologies where Masked Interceptor never became visibly eligible.
+
+Do **not** make the ANBU operative ask Kakashi about a person Kakashi never saw.
+
+No Kakashi-facing participant line is projected.
+
+In private Minato evaluation only, where hidden-operation Knowledge legitimately knows this fact:
+
+**ANBU OPERATIVE:**  
+“The masked operative never entered his route.”
+
+**MINATO:**  
+“Then don't count her absence as a decision Kakashi made.”
+
+This state is especially important for two-target AMT + PS group-kill routes.
+
 ## MI — ESCAPED / unavailable
 
 **KAKASHI:**  
