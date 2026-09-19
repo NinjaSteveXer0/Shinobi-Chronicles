@@ -122,6 +122,8 @@ assert(saves>0,"Scene 04A never persisted runtime state");
 
 const scene04Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene04a-35710.js"),"utf8");
 assert(scene04Source.includes("kakashiMiEnterRightward35710"),"MI directional arrival animation missing");
+assert(scene04Source.includes("present actors stay vivid")&&scene04Source.includes("opacity:1!important;filter:none!important"),"Scene 04A live actors must not inherit generic greyed non-focus presentation");
+assert(scene04Source.includes('index===0')&&scene04Source.includes("sc-kakashi-state-exit-left-35710")&&scene04Source.includes('index===3&&isNarration?"sc-kakashi-mi-enter-rightward-35710"')&&scene04Source.includes('index===6&&isNarration?"sc-kakashi-state-exit-right-35710"'),"Scene 04A choreography must remain AMT out -> MI in -> PS out");
 assert(scene04Source.includes("kakashi-blocks-line"),"Kakashi blocking-line staging missing");
 assert(scene04Source.includes('name.textContent="NARRATION"'),"narration quick-read label missing");
 console.log("Academy Kakashi Scene 04A 35710 QA: PASS");
