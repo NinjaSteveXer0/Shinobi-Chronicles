@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v5_2026_09_18";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v6_2026_09_19";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -156,7 +156,8 @@ function explicitOutcomeFacts(){
   });
   const cleanExtraction=rows.some(f=>f&&f.cleanExtractionSucceeded===true||f&&f.worldFacts&&f.worldFacts.cleanExtractionSucceeded===true);
   const explicitExceptional=rows.some(f=>f&&f.exceptionalFieldExecution===true||f&&f.worldFacts&&f.worldFacts.exceptionalFieldExecution===true);
-  return{verifiedActionableIntelligence,liveCustodyEstablished,cleanExtraction,explicitExceptional};
+  const confirmedDeathRefs=[...new Set(rows.filter(f=>f&&f.targetDeathConfirmed===true&&f.targetRef).map(f=>String(f.targetRef)))];
+  return{verifiedActionableIntelligence,liveCustodyEstablished,cleanExtraction,explicitExceptional,confirmedDeathRefs};
 }
 function sequentialBenchmark(battles){
   const l=local()||{},mi=battles.find(row=>row.battleConfigId===SEQ_MI_CONFIG),ps=battles.find(row=>row.battleConfigId===SEQ_PS_CONFIG);
@@ -176,14 +177,14 @@ function deriveTerminalFacts35100(){
   const sequential=sequentialBenchmark(battles);
   const exceptionalFieldExecution=explicit.cleanExtraction||threeVsOneVictory||sequential||explicit.explicitExceptional;
   const l=local()||{};
-  const pakkunEntered=String(l.kakashiObserveSecurePackageAmtPursuitOutcome||"")===SECURE_PURSUIT_REACHED||String(l.kakashiGetCloserStayPackagePursuitOutcomeRef||"")===STAY_PACKAGE_PURSUIT_REACHED||l.kakashiTerminalSequentialAmtReached35100===true;
+  const pakkunEntered=String(l.kakashiObserveSecurePackageAmtPursuitOutcome||"")===SECURE_PURSUIT_REACHED||String(l.kakashiGetCloserStayPackagePursuitOutcomeRef||"")===STAY_PACKAGE_PURSUIT_REACHED||l.kakashiTerminalSequentialAmtReached35100===true||l.kakashiPostMiPakkunPresent===true;
   const pakkunPresent=pakkunEntered&&!occurrence(pakkunDepartureOccurrenceId());
   const participantRefs=[...new Set(battles.flatMap(row=>row.participants||[]).map(row=>row&&row.participantRef).filter(Boolean))];
   return{
     success:true,terminalDebriefReached:true,storySceneInstanceId:String(rt.instanceId||""),
     packageRecovered:packageState.recovered===true,packageState:{materialRef:PACKAGE_REF,resolved:true,holderClass:packageState.holderClass,stateRef:packageState.stateRef,factClass:packageState.factClass},
     verifiedActionableIntelligence:explicit.verifiedActionableIntelligence===true,
-    liveCustodyEstablished:explicit.liveCustodyEstablished===true,
+    liveCustodyEstablished:explicit.liveCustodyEstablished===true,confirmedDeathRefs:clone(explicit.confirmedDeathRefs||[]),
     exceptionalFieldExecution,exceptionalTrainingTantoPredicate:exceptionalFieldExecution,
     materiallyParticipatedInPlBattle:materiallyParticipated(battles,packageState),
     sequentialTurnBenchmarkMet:sequential,failedPickpocket3v1Victory:threeVsOneVictory,cleanExtractionBenchmarkMet:explicit.cleanExtraction===true,
@@ -213,7 +214,7 @@ function commitTerminalDebrief35100(){
   const id=debriefOccurrenceId();if(!id)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
   const fact={
     factClass:"academy_kakashi_terminal_anbu_debrief",storySceneInstanceId:facts.storySceneInstanceId,terminalDebriefReached:true,
-    packageState:clone(facts.packageState),participantRefs:clone(facts.participantRefs),battleFacts:clone(facts.battleFacts),
+    packageState:clone(facts.packageState),participantRefs:clone(facts.participantRefs),battleFacts:clone(facts.battleFacts),confirmedDeathRefs:clone(facts.confirmedDeathRefs||[]),
     reportBoundedToKnownFacts:true,hiddenEvaluationRevealed:false,pakkunPresentAtDebrief:facts.pakkunPresentAtDebrief===true,
     rewardFacts:debriefRewardFacts(facts),authority:clone(AUTHORITY)
   };
@@ -247,7 +248,7 @@ function commitChronicleReceiptAndRewards35100(){
     const id=receiptOccurrenceId();
     const fact={
       factClass:"academy_kakashi_chronicle_receipt",storySceneInstanceId:instanceKey(),terminalDebriefRef:debrief.occurrenceId,
-      packageState:clone(debriefFact.packageState),battleFacts:clone(debriefFact.battleFacts||[]),participantRefs:clone(debriefFact.participantRefs||[]),
+      packageState:clone(debriefFact.packageState),battleFacts:clone(debriefFact.battleFacts||[]),participantRefs:clone(debriefFact.participantRefs||[]),confirmedDeathRefs:clone(debriefFact.confirmedDeathRefs||[]),
       pakkunInvolved:debriefFact.pakkunPresentAtDebrief===true,pakkunDepartureRef:committedDeparture()&&committedDeparture().occurrenceId||null,
       reportCommitted:true,hiddenEvaluationTruthIncluded:false,siblingRouteFactsIncluded:false,authority:clone(AUTHORITY)
     };
@@ -274,18 +275,23 @@ function guardedOriginCompletion35100(){
   if(typeof completeChronicleOriginPrologue!=="function")return{success:false,reason:"origin_completion_authority_missing"};
   return completeChronicleOriginPrologue(ORIGIN_ID,ids);
 }
+function participantDisplayName35100(ref){
+ const id=String(ref||"");if(id==="academy_kakashi_origin_amt")return"ANBU Marked Target";if(id==="academy_kakashi_origin_package_smuggler")return"Package Smuggler";if(id==="academy_kakashi_origin_masked_interceptor")return"Masked Interceptor";return id;
+}
 function debriefSummaryText(){
   const row=committedDebrief(),fact=factOf(row);if(!row)return"The report has not been factually committed.";
   const recovered=fact.rewardFacts&&fact.rewardFacts.packageRecovered===true;
   const battles=Array.isArray(fact.battleFacts)?fact.battleFacts:[];
   const outcomes=battles.map(b=>b.resultState==="player_side_victory"?"won":"lost");
-  return `Kakashi gives the operative a bounded factual report. The package was ${recovered?"recovered":"not recovered"}.${battles.length?` He reports ${battles.length} PL Battle${battles.length===1?"":"s"} without turning Battle defeat into death or custody (${outcomes.join(", ")}).`:""} Unknown downstream facts remain unknown.`;
+  const deaths=Array.isArray(fact.confirmedDeathRefs)?fact.confirmedDeathRefs.map(participantDisplayName35100).filter(Boolean):[];
+  return `Kakashi gives the operative a bounded factual report. The package was ${recovered?"recovered":"not recovered"}.${battles.length?` He reports ${battles.length} PL Battle${battles.length===1?"":"s"} without turning Battle defeat into death or custody (${outcomes.join(", ")}).`:""}${deaths.length?` The report records ${deaths.join(", ")} as dead.`:""} Unknown downstream facts remain unknown.`;
 }
 function receiptText(){
   const row=committedReceipt(),fact=factOf(row);if(!row)return"Chronicle Receipt pending.";
   const recovered=fact.packageState&&["KAKASHI","KONOHA","ANBU","KONOHA_AUTHORITY"].includes(String(fact.packageState.holderClass||""));
   const battles=Array.isArray(fact.battleFacts)?fact.battleFacts.length:0;
-  return `CHRONICLE RECEIPT — Package ${recovered?"RECOVERED":"NOT RECOVERED"} · PL Battles ${battles} · ANBU report COMMITTED${fact.pakkunInvolved?" · Ninken involvement recorded":""}.`;
+  const deaths=Array.isArray(fact.confirmedDeathRefs)?fact.confirmedDeathRefs.map(participantDisplayName35100).filter(Boolean):[];
+  return `CHRONICLE RECEIPT — Package ${recovered?"RECOVERED":"NOT RECOVERED"} · PL Battles ${battles} · ANBU report COMMITTED${deaths.length?` · Confirmed dead: ${deaths.join(", ")}`:""}${fact.pakkunInvolved?" · Ninken involvement recorded":""}.`;
 }
 function installTerminalBeats35100(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null;if(!map)return{success:false,reason:"kakashi_terminal_scene_missing"};
@@ -328,7 +334,7 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v5_2026_09_18",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v6_2026_09_19",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
@@ -339,7 +345,8 @@ function diagnostics(){
     stayPackagePursuitStateConsumed:committedPackageState.toString().includes("kakashiGetCloserStayPackagePursuitOccurrenceId"),
     battleVictoryNotTerminalEntitlement:!deriveTerminalFacts35100.toString().includes("terminalDebriefReached:false")&&!commitTerminalDebrief35100.toString().includes("resultState===\"player_side_victory\""),
     exactSequentialBenchmark:sequentialBenchmark.toString().includes("<=4")&&sequentialBenchmark.toString().includes("<=3")&&sequentialBenchmark.toString().includes("kakashiTerminalSequentialAmtReached35100"),
-    pakkunPresenceCoversIndependentRoutes:deriveTerminalFacts35100.toString().includes("kakashiGetCloserStayPackagePursuitOutcomeRef")&&deriveTerminalFacts35100.toString().includes("kakashiTerminalSequentialAmtReached35100"),
+    pakkunPresenceCoversIndependentRoutes:deriveTerminalFacts35100.toString().includes("kakashiGetCloserStayPackagePursuitOutcomeRef")&&deriveTerminalFacts35100.toString().includes("kakashiTerminalSequentialAmtReached35100")&&deriveTerminalFacts35100.toString().includes("kakashiPostMiPakkunPresent"),
+    deterministicDeathsReachDebriefAndReceipt:explicitOutcomeFacts.toString().includes("confirmedDeathRefs")&&commitTerminalDebrief35100.toString().includes("confirmedDeathRefs")&&commitChronicleReceiptAndRewards35100.toString().includes("confirmedDeathRefs")&&debriefSummaryText.toString().includes("The report records")&&receiptText.toString().includes("Confirmed dead:"),
     receiptBeforeReward:commitChronicleReceiptAndRewards35100.toString().indexOf("A.commitOccurrence")<commitChronicleReceiptAndRewards35100.toString().indexOf("commitAcademyKakashiTerminalDebriefRewards34800"),
     rewardGrantGate:closureReady35100.toString().includes("rewardGrantReady"),
     pakkunDepartureExplicit:!!map&&[PAKKUN_1,PAKKUN_2,PAKKUN_3,PAKKUN_EXIT].every(id=>map.has(id)),
