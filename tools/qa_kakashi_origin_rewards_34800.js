@@ -4,6 +4,9 @@ const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("ass
 const root=path.resolve(__dirname,"..");
 const runtimePath=path.join(root,"runtime","alpha-kakashi-origin-rewards-34800.js");
 const src=fs.readFileSync(runtimePath,"utf8");
+const gameSrc=fs.readFileSync(path.join(root,"game.js"),"utf8");
+assert(gameSrc.includes("function registerDisciplineTrainingSource("),"canonical Progression source-registration API missing");
+assert(gameSrc.includes("ADDITIONAL_DISCIPLINE_TRAINING_SOURCES"),"canonical Progression additional-source registry missing");
 assert(src.includes("ACADEMY KAKASHI ORIGIN REWARD ADAPTER"));
 assert(src.includes('const ROUTE="academy_kakashi_origin_reward"'));
 assert(src.includes('const ITEM_SOURCE="kak_origin_item_field_recovery_resupply"'));
