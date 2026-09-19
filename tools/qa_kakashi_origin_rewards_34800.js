@@ -11,6 +11,9 @@ assert(src.includes('const WEAPON_SOURCE="kak_origin_weapon_exceptional_training
 assert(src.includes('const MI_REWARD_AUTHORITY_COMMIT="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"'));
 assert(src.includes('const MI_REWARD_FAMILY="kak_origin_battle_mi_victory_reward_v1"'));
 assert(src.includes('const MI_REWARD_CLAIM_FAMILY="kak_origin_battle_mi_victory_reward_claim_v1"'));
+assert(src.includes('const DOWNSTREAM_REWARD_AUTHORITY_COMMIT="7446e80c7f2cb9d004ffd914e11c0c77e7321c2b"'));
+assert(src.includes('kak_origin_battle_ps_victory_ryo_01'));
+assert(src.includes('kak_origin_battle_amt_victory_ryo_01'));
 assert(src.includes("addDisciplineExp"),"34800 must consume canonical discipline Progression");
 assert(src.includes("addItemToInventory"),"34800 must consume canonical Inventory grant");
 const terminalStart=src.indexOf("function commitTerminalDebriefRewards");
@@ -98,8 +101,35 @@ assert.strictEqual(context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(l
 const multiBattle=JSON.parse(JSON.stringify(miBattle));multiBattle.battleId="battle-mi-multi";multiBattle.kakashiOriginDeployment.battleOccurrenceId="battle-mi-multi";multiBattle.kakashiOriginDeployment.battleConfigId="academy_kakashi_origin_battle_ps_mi_2v1";multiBattle.kakashiOriginDeployment.oppositionParticipantIds=["academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"];
 assert.strictEqual(context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(multiBattle).success,false);
 
+
+// Exact solo downstream PS / AMT victories own 50 Ryō cash-only, source-scoped and idempotent.
+function downstreamBattle(config,participant,id){
+  return{battleId:id,battleOver:true,outcome:{type:"victory"},kakashiOriginDeployment:{
+    battleConfigId:config,battleOccurrenceId:id,storyOccurrenceId:"origin-occurrence-1",
+    controllerParticipantId:"academy_kakashi",oppositionParticipantIds:[participant]
+  }};
+}
+const psBattle=downstreamBattle("academy_kakashi_origin_battle_seq_ps","academy_kakashi_origin_package_smuggler","battle-ps-solo-1");
+let cash=context.ensureAcademyKakashiDownstreamBattleCashEntitlement34800(psBattle);
+assert.strictEqual(cash.success,true);assert.strictEqual(cash.entitlement.materialReward.ryo,50);assert.deepStrictEqual(JSON.parse(JSON.stringify(cash.entitlement.materialReward.items)),[]);
+let cashClaim=context.commitAcademyKakashiDownstreamBattleCashReward34800(psBattle);
+assert.strictEqual(cashClaim.success,true);assert.strictEqual(cashClaim.ryoGranted,50);assert.strictEqual(playerData.ryo,100);
+cashClaim=context.commitAcademyKakashiDownstreamBattleCashReward34800(psBattle);
+assert.strictEqual(cashClaim.idempotent,true);assert.strictEqual(playerData.ryo,100,"PS reward retry must not duplicate Ryō");
+
+const amtBattle=downstreamBattle("academy_kakashi_origin_battle_seq_amt_pakkun","academy_kakashi_origin_amt","battle-amt-solo-1");
+cash=context.getAcademyKakashiDownstreamBattleCashRewardState34800(amtBattle);
+assert.strictEqual(cash.success,true);assert.strictEqual(cash.entitlement.materialReward.ryo,50);assert.deepStrictEqual(JSON.parse(JSON.stringify(cash.entitlement.materialReward.items)),[]);
+cashClaim=context.commitAcademyKakashiDownstreamBattleCashReward34800(amtBattle);
+assert.strictEqual(cashClaim.success,true);assert.strictEqual(cashClaim.ryoGranted,50);assert.strictEqual(playerData.ryo,150);
+cashClaim=context.commitAcademyKakashiDownstreamBattleCashReward34800(amtBattle);
+assert.strictEqual(cashClaim.idempotent,true);assert.strictEqual(playerData.ryo,150,"AMT reward retry must not duplicate Ryō");
+
+const wrongDownstream=downstreamBattle("academy_kakashi_origin_battle_seq_amt_pakkun","academy_kakashi_origin_package_smuggler","battle-amt-wrong-opposition");
+assert.strictEqual(context.ensureAcademyKakashiDownstreamBattleCashEntitlement34800(wrongDownstream).success,false);
+
 // Exact technical action development: effective +2, idempotent retry +0.
-let r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action1",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
+let r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action1",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1",actionId:"a1",skillId:"kunai_quickdraw",actionLabel:"Kunai Quickdraw"});
 assert.strictEqual(r.success,true);assert.strictEqual(r.amount,2);assert.strictEqual(characterProgression.buki.exp,2);
 r=context.recordAcademyKakashiTechnicalDevelopment34800({sourceId:"battle1_action1",discipline:"bukijutsu",executionClass:"effective",battleOccurrenceId:"battle1"});
 assert.strictEqual(r.idempotent,true);assert.strictEqual(characterProgression.buki.exp,2);
@@ -110,7 +140,7 @@ assert.strictEqual(characterProgression.buki.exp,6);assert.strictEqual(r.amount,
 
 // Stamina development: positive mitigation only, max 2 per causal Battle.
 assert.strictEqual(context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam0",mitigationAmount:0,battleOccurrenceId:"battle1"}).success,false);
-context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam1",mitigationAmount:1,battleOccurrenceId:"battle1"});
+context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam1",mitigationAmount:1,battleOccurrenceId:"battle1",actionId:"enemy-a1",actionLabel:"Concealed Blade",sourceParticipantId:"enemy-1"});
 context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam2",mitigationAmount:2,battleOccurrenceId:"battle1"});
 r=context.recordAcademyKakashiStaminaDevelopment34800({sourceId:"stam3",mitigationAmount:3,battleOccurrenceId:"battle1"});
 assert.strictEqual(characterProgression.stamina.exp,2);assert.strictEqual(r.amount,0);
@@ -119,15 +149,18 @@ assert.strictEqual(characterProgression.stamina.exp,2);assert.strictEqual(r.amou
 context.recordAcademyKakashiFieldcraftEvidence34800({sourceId:"approach1",family:"fieldcraft.stealth_approach",evidenceType:"covert_approach_attempt",significance:1});
 r=context.recordAcademyKakashiFieldcraftEvidence34800({sourceId:"approach2",family:"fieldcraft.stealth_approach",evidenceType:"undetected_positioning",significance:2});
 assert.strictEqual(r.evidence.significance,2);assert.strictEqual(r.evidence.sourceIds.length,2);
+const causalSnapshot=context.getAcademyKakashiOriginRewardSnapshot34800();
+assert(Object.values(causalSnapshot.sources).some(x=>x.sourceId==="battle1_action1"&&x.payload.actionLabel==="Kunai Quickdraw"&&x.payload.actionId==="a1"));
+assert(Object.values(causalSnapshot.sources).some(x=>x.sourceId==="stam1"&&x.payload.actionLabel==="Concealed Blade"&&x.payload.mitigationAmount===1));
 
 // Terminal debrief package: exact max 250 and source-scoped Inventory grants once.
 const facts={terminalDebriefReached:true,packageRecovered:true,verifiedActionableIntelligence:true,liveCustodyEstablished:true,exceptionalFieldExecution:true,materiallyParticipatedInPlBattle:true,exceptionalTrainingTantoPredicate:true};
 r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
-assert.strictEqual(r.success,true);assert.strictEqual(r.ryo,250);assert.strictEqual(playerData.ryo,300);
+assert.strictEqual(r.success,true);assert.strictEqual(r.ryo,250);assert.strictEqual(playerData.ryo,400);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1);
 r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
-assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,300);
+assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,400);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1,"same-source retry must not duplicate weapon grant");
 
-console.log(JSON.stringify({pass:true,adapter:"34800-v3",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
+console.log(JSON.stringify({pass:true,adapter:"34800-v5",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",claimIdempotent:true},downstreamBattleCash:{ps:50,amt:50,claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
