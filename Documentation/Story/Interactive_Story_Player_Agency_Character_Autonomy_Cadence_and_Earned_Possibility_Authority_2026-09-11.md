@@ -4,6 +4,10 @@
 **Owner:** Writing — Konoha  
 **Status:** **BINDING WRITING / STORY AUTHORING AUTHORITY — CE/CHRONICLE STATE CONSUMER; IMPLEMENTATION / RUNTIME VALIDATION SEPARATE**
 
+> **2026-09-20 CE affordance/reincorporation extension**  
+> Consume `Documentation/Coordination/CE_Interactive_Narrative_Affordance_Intention_Reincorporation_and_Causal_Presentation_Doctrine_2026-09-20.md` (commit `64399463d1870b752954ffceaaf31629a5961691`).  
+> Important legitimate choices must be player-legible without leaking hidden predicates, and prior Chronicle history should be reincorporated when it changes meaning, reaction, possibility or payoff — not merely to prove the engine remembered it.
+
 ---
 
 ## 1. Purpose
