@@ -21,7 +21,7 @@ const ROUTE=globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910;
 const FIELD=globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920;
 if(!A||!CORE||!KAK||!PROVIDER||!BATTLE||!ROUTE||!FIELD)throw new Error("kakashi_move_closer_35930_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_move_closer_closure_35930_v1_2026_09_20";
+const PATCH_ID="alpha_kakashi_move_closer_closure_35930_v2_2026_09_20";
 const ORIGIN="academy_kakashi",SCENE="origin_academy_kakashi_anbu_retrieval";
 const KAKASHI="academy_kakashi",AMT="academy_kakashi_origin_amt",PS="academy_kakashi_origin_package_smuggler",MI="academy_kakashi_origin_masked_interceptor",PAKKUN="pakkun_origin_unfamiliar_ninken";
 const PACKAGE="kakashi_origin_outer_route_packet";
@@ -100,7 +100,8 @@ function bridge(resultRef,result,successor=null,consequenceRefs=[]){return{succe
 function dispatch(receipt,binding,result){return CORE.dispatchCommittedIntent({storyUnitRef:ORIGIN,receiptId:receipt.storyDecisionReceiptId,state:{resolverResults:{[binding]:result}},context:{sceneRef:SCENE,originId:ORIGIN,storySceneInstanceId:String(active()&&active().instanceId||""),selectedChoiceId:receipt.selectedChoiceId}});}
 function launch(config,binding,anchor,source,returnBeat,ctx={}){
  const cfg=BATTLE.configs&&BATTLE.configs[config]||null,rt=active();
- const rc=ctx&&ctx.returnContext&&typeof ctx.returnContext==="object"?ctx.returnContext:{type:"story_scene",sceneId:SCENE,postBattleBeatId:returnBeat};
+ const supplied=ctx&&ctx.returnContext&&typeof ctx.returnContext==="object"?ctx.returnContext:null;
+ const rc={...(supplied||{}),type:"story_scene",sceneId:SCENE,sceneInstanceId:String(rt&&rt.instanceId||""),postBattleBeatId:returnBeat};
  return BATTLE.launchAcademyKakashiOriginPlBattle({storyOccurrenceId:String(source||rt&&rt.instanceId||""),sourceAnchorRef:anchor,bindingRef:binding,battleConfigId:config,returnToken:String(rt&&rt.instanceId||"")+":"+binding,returnContext:rc,pakkunAuthorized:!!(cfg&&cfg.pakkun===true)});
 }
 function participant(r,ref){return Array.isArray(r&&r.participants)?r.participants.find(x=>x&&x.participantRef===ref)||null:null;}
@@ -287,7 +288,7 @@ const installed=install();if(!installed||installed.success!==true)throw new Erro
 function diagnostics(){
  const d=scene(),s=d&&d.beatMap.get(SUCCESS_BEAT),f=d&&d.beatMap.get(FAILURE_BEAT);
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_move_closer_closure_35930_v1_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_move_closer_closure_35930_v2_2026_09_20",
   authorityPinned:AUTH.moveCloser==="874900f9aa7a8cad3dd48e404c5a9e1cfe7d74fb",
   successChoicesExact:!!s&&JSON.stringify(s.choices.map(x=>x.label))===JSON.stringify(["LET THE HANDOFF HAPPEN","STRIKE BEFORE THE HANDOFF","ATTEMPT THE PICKPOCKET"]),
   failureChoicesExact:!!f&&JSON.stringify(f.choices.map(x=>x.label))===JSON.stringify(["STAY ON THE PACKAGE","STOP PACKAGE SMUGGLER","CUT THEM OFF AT THE SAKURA TREE"]),
