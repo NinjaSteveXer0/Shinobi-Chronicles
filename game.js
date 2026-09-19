@@ -11971,6 +11971,51 @@ function isValidDisciplineTrainingSource(
   }
 
 
+  // BRICK 2030 — ACTION-DERIVED ORIGIN DEVELOPMENT SOURCE ADMISSION
+  // ==============================================================
+  // The ordinary Training UI still uses each discipline's authored
+  // trainingSource. Story/Combat development is a separate factual source:
+  // Progression authority permits exact action-derived Kakashi Origin
+  // development without pretending that a Battle action was an Exam or
+  // Practical session.
+  //
+  // These two source IDs are intentionally narrow:
+  // - technical action development may address only the six technical
+  //   disciplines;
+  // - packet-level Stamina mitigation may address only Stamina.
+  // The Kakashi reward adapter still owns exact-source idempotence, Battle
+  // caps and evidence predicates before calling this canonical API.
+  // ==============================================================
+  if (
+    source ===
+      "kakashi_origin_action_development"
+  ) {
+
+    return [
+      "nin",
+      "tai",
+      "gen",
+      "buki",
+      "fuin",
+      "kin"
+    ].includes(
+      disciplineId
+    );
+  }
+
+
+  if (
+    source ===
+      "kakashi_origin_stamina_mitigation"
+  ) {
+
+    return (
+      disciplineId ===
+      "stamina"
+    );
+  }
+
+
   return (
     discipline.trainingSource ===
     source
