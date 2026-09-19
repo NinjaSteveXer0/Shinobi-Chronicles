@@ -66,6 +66,7 @@ const IMMEDIATE_CUSTODY_PATH="runtime/alpha-kakashi-immediate-custody-35800.js";
 const DETERMINISTIC_KILL_PATH="runtime/alpha-kakashi-deterministic-kill-35810.js";
 const LOSS_ENDING_PATH="runtime/alpha-kakashi-loss-ending-35820.js";
 const POST_MI_PURSUIT_PATH="runtime/alpha-kakashi-post-mi-death-pursuit-35830.js";
+const KONOHA_CLOSURE_PATH="runtime/alpha-kakashi-konoha-writing-closure-35900.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
@@ -94,7 +95,8 @@ const POST_MI_PURSUIT_PATH="runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
 // const BUILD="kakashi-final-20260919-65";
 // const BUILD="kakashi-final-20260919-66";
 // const BUILD="kakashi-final-20260920-67";
-const BUILD="kakashi-final-20260920-68";
+// const BUILD="kakashi-final-20260920-68";
+const BUILD="kakashi-final-20260920-69";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -124,9 +126,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadKonohaClosure(){
+  if(globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900)return;
+  appendScript("sc-alpha-kakashi-konoha-writing-closure-35900-script",KONOHA_CLOSURE_PATH);
+}
 function loadPostMiPursuit(){
-  if(globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830)return;
-  appendScript("sc-alpha-kakashi-post-mi-death-pursuit-35830-script",POST_MI_PURSUIT_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830){loadKonohaClosure();return;}
+  appendScript("sc-alpha-kakashi-post-mi-death-pursuit-35830-script",POST_MI_PURSUIT_PATH,loadKonohaClosure);
 }
 function loadLossEnding(){
   if(globalThis.SC_ALPHA_KAKASHI_LOSS_ENDING_35820){loadPostMiPursuit();return;}
