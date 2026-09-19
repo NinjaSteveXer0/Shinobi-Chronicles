@@ -271,9 +271,10 @@ function install(){
  ];
  beats.forEach((b,i)=>{const n=normalized(b,35930+i);if(n)m.set(n.beatId,n);});
  const success=m.get(SUCCESS_BEAT),failure=m.get(FAILURE_BEAT);if(!success||!failure)return{success:false,reason:"move_closer_parent_choice_beats_missing"};
- const strike=success.choices&&success.choices.find(x=>x&&x.choiceId==="strike_before_handoff"),pick=success.choices&&success.choices.find(x=>x&&x.choiceId==="attempt_pickpocket");
+ const handoff=success.choices&&success.choices.find(x=>x&&x.choiceId==="let_handoff_happen"),strike=success.choices&&success.choices.find(x=>x&&x.choiceId==="strike_before_handoff"),pick=success.choices&&success.choices.find(x=>x&&x.choiceId==="attempt_pickpocket");
  const stay=failure.choices&&failure.choices.find(x=>x&&x.choiceId==="stay_on_package"),stop=failure.choices&&failure.choices.find(x=>x&&x.choiceId==="stop_package_smuggler"),cut=failure.choices&&failure.choices.find(x=>x&&x.choiceId==="cut_off_sakura");
- if(!strike||!pick||!stay||!stop||!cut)return{success:false,reason:"move_closer_downstream_choice_missing"};
+ if(!handoff||!strike||!pick||!stay||!stop||!cut)return{success:false,reason:"move_closer_downstream_choice_missing"};
+ handoff.label="LET THE HANDOFF HAPPEN";
  strike.label="STRIKE BEFORE THE HANDOFF";strike.availability=available(true);strike.knownBlocker=null;strike.nextBeatId=ROUTE.beats.directIntro;strike.consequenceRequests=[{requestId:"kakashi_move_closer_strike_35930",kind:"domain",resolve:()=>resolveSuccessStrike(strike)}];
  pick.label="ATTEMPT THE PICKPOCKET";pick.availability=available(true);pick.knownBlocker=null;pick.nextBeatId=E.improvedIntro;pick.consequenceRequests=[{requestId:"kakashi_move_closer_improved_pickpocket_35930",kind:"domain",resolve:()=>resolveImprovedPickpocket(pick)}];
  stay.label="STAY ON THE PACKAGE";
