@@ -242,6 +242,7 @@ function diagnostics(){
     weaponSourceExact:WEAPON_SOURCE==="kak_origin_weapon_exceptional_training_tanto"&&WEAPON_ID==="academy_training_tanto",
     developmentUsesCanonicalProgression:recordTechnicalDisciplineDevelopment.toString().includes("addDisciplineExp")&&recordStaminaDevelopment.toString().includes("addDisciplineExp"),
     actionDerivedSourceExact:ACTION_DERIVED_DISCIPLINE_SOURCE==="action_derived_development"&&recordTechnicalDisciplineDevelopment.toString().includes("ACTION_DERIVED_DISCIPLINE_SOURCE")&&recordStaminaDevelopment.toString().includes("ACTION_DERIVED_DISCIPLINE_SOURCE"),
+    canonicalSourceGateAcceptsActionDevelopment:typeof isValidDisciplineTrainingSource!=="function"||isValidDisciplineTrainingSource(DISCIPLINE_ID.bukijutsu,ACTION_DERIVED_DISCIPLINE_SOURCE)===true,
     inventoryUsesCanonicalGrant:grantCatalogueItem.toString().includes("addItemToInventory")&&grantCatalogueItem.toString().includes("getItemDefinition"),
     technicalBattleCap:recordTechnicalDisciplineDevelopment.toString().includes("6-used"),
     staminaBattleCap:recordStaminaDevelopment.toString().includes("used<2?1:0"),
