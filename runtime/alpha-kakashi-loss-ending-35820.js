@@ -19,9 +19,10 @@ const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 if(!A||!TERMINAL||!CORE)throw new Error("kakashi_loss_ending_35820_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_loss_ending_35820_v2_2026_09_19";
+const PATCH_ID="alpha_kakashi_loss_ending_35820_v3_2026_09_19";
 const AUTH_REPORT="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623";
-const AUTH_OFFICE="362f72b8f20f50fec1b8e11e483e40cf5030364c";
+const AUTH_OFFICE="d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab";
+const AUTH_OFFICE_EXPRESSION="362f72b8f20f50fec1b8e11e483e40cf5030364c";
 const ORIGIN_ID="academy_kakashi",SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_BEAT="kak_scene05a_l_choice",SOURCE_CHOICE="scene05al_return_to_anbu";
 const REPORT_BEAT="kak_scene06a_l_anbu_report_35820",OFFICE_BEAT="kak_scene07a_l_hokage_office_35820";
@@ -313,8 +314,8 @@ function diagnostics(){
  const reportExpected=["Kakashi returns to the rooftop.","The ANBU operative is already there.","He turns as Kakashi lands.","Report.","The target made the handoff.","To whom?","Another man.","The package?","Gone with him.","The masked shinobi?","I tried to stop her.","The operative's mask remains fixed on him.","Result?","She beat me.","The answer sits between them.","Then what?","She went after the receiver.","Could you follow?","No.","The original target?","Gone.","The operative gives a small nod.","Understood.","Kakashi waits.","You may go.","Understood."];
  const officeExpectedFirst=["The recovered package rests on Minato's desk.","ANBU Marked Target stands near the window.","Package Smuggler has taken the wall beside him.","Masked Interceptor stands opposite them, arms folded.","The ANBU operative remains nearest the desk.","Kakashi's report lies open in front of Minato.","He reads the last page once more.","Then closes it.","He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in."];
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_loss_ending_35820_v2_2026_09_19",
-  authorities:AUTH_REPORT==="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623"&&AUTH_OFFICE==="362f72b8f20f50fec1b8e11e483e40cf5030364c",
+  patchId:PATCH_ID==="alpha_kakashi_loss_ending_35820_v3_2026_09_19",
+  authorities:AUTH_REPORT==="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623"&&AUTH_OFFICE==="d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab"&&AUTH_OFFICE_EXPRESSION==="362f72b8f20f50fec1b8e11e483e40cf5030364c",
   reportExact:REPORT.length===26&&JSON.stringify(REPORT.map(x=>x.text))===JSON.stringify(reportExpected),
   revisedOfficeExact:OFFICE_CUES.length===137&&JSON.stringify(OFFICE_CUES.slice(0,9).map(x=>x.text))===JSON.stringify(officeExpectedFirst)&&OFFICE_CUES[OFFICE_CUES.length-1].text==="That part is up to him.",
   staleClippedExchangeRemoved:!OFFICE_CUES.some(x=>x&&["He couldn't follow?","Did he know who she was?","Did he know who any of us were?","Just like that?","No excuse?"].includes(x.text)),
@@ -333,5 +334,5 @@ function diagnostics(){
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
 globalThis.runAcademyKakashiLossEnding35820Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_LOSS_ENDING_35820=Object.freeze({patchId:PATCH_ID,authorities:Object.freeze({report:AUTH_REPORT,office:AUTH_OFFICE}),reportBeatId:REPORT_BEAT,officeBeatId:OFFICE_BEAT,receiptBeatId:RECEIPT_BEAT,exitBeatId:EXIT_BEAT,wireSource,commitReport,commitHidden,openReceipt,complete,diagnostics,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_LOSS_ENDING_35820=Object.freeze({patchId:PATCH_ID,authorities:Object.freeze({report:AUTH_REPORT,officeFact:AUTH_OFFICE,officeExpression:AUTH_OFFICE_EXPRESSION}),reportBeatId:REPORT_BEAT,officeBeatId:OFFICE_BEAT,receiptBeatId:RECEIPT_BEAT,exitBeatId:EXIT_BEAT,wireSource,commitReport,commitHidden,openReceipt,complete,diagnostics,browserGoldenClaimed:false});
 })();
