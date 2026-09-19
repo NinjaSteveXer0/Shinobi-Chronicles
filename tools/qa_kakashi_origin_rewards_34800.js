@@ -32,6 +32,9 @@ const context={
   playerData,
   savePlayerData(){saves+=1;},
   saveTestState(){},
+  isValidDisciplineTrainingSource(disciplineId,source){
+    return (disciplineId==="buki"&&source==="practical")||(disciplineId==="nin"&&source==="exam");
+  },
   addDisciplineExp(characterId,disciplineId,amount){
     assert.strictEqual(characterId,"academy_kakashi");
     if(!characterProgression[disciplineId])return false;
