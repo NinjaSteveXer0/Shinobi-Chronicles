@@ -148,6 +148,7 @@ assert.strictEqual(active.beatId,MOD.beats.psWin,"live MI -> PS Battle return mu
 assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.parentOccurrenceRef.includes("occ_origin_kakashi_post_mi_ps_battle_return"),true,"AK_SA_033 must consume an Origin-owned PS Battle-return package parent");
 store.delete("kak_seq_secure_package_after_ps");
 participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"};
+recoveryCalls=0;
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi-amt"};
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-live-amt",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:4,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
