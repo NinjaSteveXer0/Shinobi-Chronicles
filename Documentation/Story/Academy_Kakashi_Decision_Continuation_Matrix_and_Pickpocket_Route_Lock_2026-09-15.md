@@ -1,5 +1,15 @@
 # Academy Kakashi Origin — Decision-Continuation Matrix + Pickpocket Route Lock
 
+> **2026-09-19 DIRECT SCENE 02 ATTACK SUPERSESSION**  
+> The older five-class resolver-return matrix in section 2 is superseded **only for the direct Scene 02 choice `STRIKE BEFORE THE HANDOFF`** by:
+> `Documentation/Story/Academy_Kakashi_Strike_Before_The_Handoff_Verbatim_Scene_Family_2026-09-19.md`
+> commit `13166b7f56cdd89ad8a6c6ba3a51d1dada6bac06`.
+>
+> Current direct route:
+> `STRIKE BEFORE THE HANDOFF -> Kakashi vs AMT + PS 2-v-1 -> on Kakashi victory package to Kakashi -> MI appears to take package -> Kakashi vs MI 1-v-1 -> exact group disposition`.
+>
+> This does **not** supersede `MOVE IN CLOSER -> STRIKE BEFORE THE HANDOFF`, which retains its own branch authority until separately changed.
+>
 > **2026-09-19 FAILED-PICKPOCKET 3-v-1 VICTORY SUPERSESSION**  
 > The older per-participant post-resolution classification language for the specific **direct Pickpocket failure -> Kakashi wins AMT + PS + MI 3-v-1** chronology is superseded by:
 > `Documentation/Story/Academy_Kakashi_Direct_Pickpocket_Verbatim_Scene_Family_2026-09-19.md`
