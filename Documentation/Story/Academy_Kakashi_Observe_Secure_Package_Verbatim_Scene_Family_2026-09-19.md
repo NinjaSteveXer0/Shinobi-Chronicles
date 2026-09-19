@@ -1,10 +1,10 @@
-# Academy Kakashi Origin — WATCH THE EXCHANGE -> GO FOR THE PACKAGE — Verbatim Scene Family
+# Academy Kakashi Origin — WATCH THE EXCHANGE -> SECURE THE PACKAGE — Verbatim Scene Family
 
 **Date:** 2026-09-19  
 **Owner:** Writing / Story — Konoha under Stephen delegated-authoring authority  
 **Status:** **LOCKED VERBATIM — DELEGATED CLEAN CONTINUATION / IMPLEMENTATION READY**  
 **Branch:** `SCENE_03A / CHOICE_01 / BRANCH_B`  
-**Player-facing entry choice:** **GO FOR THE PACKAGE**  
+**Player-facing entry choice:** **SECURE THE PACKAGE**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
 ## Consumed authority
@@ -29,7 +29,7 @@ The older Combat deployment document's seven-config list is stale on that point;
 
 ---
 
-# 1. GO FOR THE PACKAGE
+# 1. SECURE THE PACKAGE
 
 **Backdrop:** `Kakashi Origin Backdrop/sakura_tree_night.png`
 
@@ -523,10 +523,10 @@ Because the package is already secured and AMT is factually available, consume t
 
 Present in the established order and current exact wording:
 
-1. **TURN HIM OVER TO THE UCHIHA POLICE**
+1. **BRING HIM TO THE UCHIHA POLICE FORCE**
 2. **LET HIM GO**
 3. **KILL HIM**
-4. **TAKE HIM BACK TO ANBU**
+4. **TAKE HIM BACK TO THE ANBU**
 
 Consume the already-approved exact disposition scenes / continuations for the selected action.
 
@@ -975,7 +975,7 @@ No terminal projection may invent PS/MI later location, custody or hidden-operat
 
 # Final lock
 
-> **GO FOR THE PACKAGE means Kakashi prioritises Package Smuggler, causing Masked Interceptor to join and creating the exact PS+MI 2-v-1 Battle.**
+> **SECURE THE PACKAGE means Kakashi prioritises Package Smuggler, causing Masked Interceptor to join and creating the exact PS+MI 2-v-1 Battle.**
 
 > **Win: package custody commits to Kakashi; PS/MI are Battle-defeated; Kakashi may STAY ON THE FIRST MAN or RETURN AND REPORT.**
 
