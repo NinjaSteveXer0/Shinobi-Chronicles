@@ -13,9 +13,10 @@ const developmentSources=[];
 let saves=0,chronicleCalls=0;
 globalThis.savePlayerData=()=>{saves+=1;return true;};
 globalThis.saveTestState=()=>true;
+globalThis.isValidDisciplineTrainingSource=(_id,source)=>source==="action_derived_development";
 globalThis.addDisciplineExp=(subject,id,amount,source)=>{
   developmentSources.push(String(source||""));
-  if(source!=="action_derived_development")return false;
+  if(!globalThis.isValidDisciplineTrainingSource(id,source))return false;
   const key=subject+"::"+id;discipline[key]=(discipline[key]||0)+Number(amount||0);return true;
 };
 globalThis.getCharacterDisciplineProgression=(subject,id)=>({subjectId:subject,disciplineId:id,exp:discipline[subject+"::"+id]||0});
