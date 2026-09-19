@@ -227,16 +227,16 @@ try {
 
   const failedSetback = plain(run(`
     globalThis.__issue141ForceReturnFailure=true;
-    const overlayBefore=globalThis.__issue141OverlayCalls.length;
+    const setbackOverlayBefore=globalThis.__issue141OverlayCalls.length;
     currentBattle={
       active:false,battleOver:true,
       outcome:{type:"defeat",battlePLWithdrawal:true,injuryInferred:false,deathInferred:false},
       rewards:{claimed:false},
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
-    const result=continueAfterSetback33100();
+    const setbackFailResult=continueAfterSetback33100();
     globalThis.__issue141ForceReturnFailure=false;
-    ({result,overlayCalls:globalThis.__issue141OverlayCalls.slice(overlayBefore)});
+    ({result:setbackFailResult,overlayCalls:globalThis.__issue141OverlayCalls.slice(setbackOverlayBefore)});
   `, "issue141-setback-return-fail-closed.js"));
   check(
     "story_setback_return_failure_never_opens_generic_arena",
