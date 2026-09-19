@@ -103,7 +103,9 @@ function consumePsReturn(){
    if(typeof resolveAcademyKakashiSequentialPostPsPackageRecovery35600!=="function")return{success:false,reason:"ak_sa_033_package_recovery_owner_missing"};
    const recovered=resolveAcademyKakashiSequentialPostPsPackageRecovery35600();if(!recovered||recovered.success!==true)return recovered||{success:false,reason:"ak_sa_033_package_recovery_failed"};
    const pkgId=String(recovered.packageOccurrenceId||rt.localContext.kakashiSequentialPackageOccurrenceId35100||rt.localContext.kakashiSequentialPackageOccurrenceId||"");
-   rt.localContext={...(rt.localContext||{}),kakashiPostMiPackageOccurrenceId:pkgId,kakashiPostMiPsBattleOccurrenceId:id,kakashiPostMiPsBattleTurns:turns,kakashiPostMiAmtEligible:turns>=1&&turns<=3&&rt.localContext.kakashiPostMiAmtEligibleAtSelection===true,kakashiPostMiPsReturnProcessed:true,[CURSOR]:0};rt.beatId=BEAT.psWin;save();return{success:true,victory:true,packageOccurrenceId:pkgId,amtEligible:rt.localContext.kakashiPostMiAmtEligible};
+   const selection=factOf(occurrence(rt.localContext&&rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId));
+   const amtEligibleAtSelection=selection.anbuMarkedTargetPursuitAvailableAtSelection===true;
+   rt.localContext={...(rt.localContext||{}),kakashiPostMiPackageOccurrenceId:pkgId,kakashiPostMiPsBattleOccurrenceId:id,kakashiPostMiPsBattleTurns:turns,kakashiPostMiAmtEligibleAtSelection:amtEligibleAtSelection,kakashiPostMiAmtEligible:turns>=1&&turns<=3&&amtEligibleAtSelection,kakashiPostMiPsReturnProcessed:true,[CURSOR]:0};rt.beatId=BEAT.psWin;save();return{success:true,victory:true,packageOccurrenceId:pkgId,amtEligible:rt.localContext.kakashiPostMiAmtEligible};
  }
  rt.localContext={...(rt.localContext||{}),kakashiPostMiPsBattleOccurrenceId:id,kakashiPostMiPsBattleTurns:turns,kakashiPostMiAmtEligible:false,kakashiPostMiPsReturnProcessed:true,[CURSOR]:0};rt.beatId=BEAT.psLoss;save();return{success:true,victory:false};
 }
@@ -270,7 +272,7 @@ function diagnostics(){
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),
   psRecoveryUsesAkSa033:consumePsReturn.toString().includes("resolveAcademyKakashiSequentialPostPsPackageRecovery35600"),
-  psThreeTurnAmtGate:consumePsReturn.toString().includes("turns>=1&&turns<=3"),
+  psThreeTurnAmtGate:consumePsReturn.toString().includes("turns>=1&&turns<=3")&&consumePsReturn.toString().includes("anbuMarkedTargetPursuitAvailableAtSelection"),
   pakkunOnlyOnAmtReach:commitPakkunReach.toString().includes("pakkunPresent:true")&&launchAmt.toString().includes("kakashiPostMiPakkunPresent!==true"),
   amtVictoryDoesNotChangePackage:consumeAmtReturn.toString().includes("packageCustodyUnchanged:true"),
   amtDefeatFailClosedUntilObjectAndAutonomy:consumeAmtReturn.toString().includes("post_mi_amt_defeat_requires_package_and_pakkun_autonomy_resolution"),
