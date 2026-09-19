@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v2_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v3_2026_09_19";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="e18729844922461c654481745e48a6eac20649cd";
 const AUTH_LIVE="bf16ebe0f677994878fbe60e30e7b546da899eb8";
@@ -30,6 +30,7 @@ const ENTRY_IDS=Object.freeze({
  amt:Object.freeze(["scene05aw_go_after_anbu_marked_target","scene06aw2c_postlethal_go_after_anbu_marked_target","scene06aw2c_dkill_go_after_anbu_marked_target"])
 });
 const PS_CONFIG="academy_kakashi_origin_battle_seq_ps",AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
+const AMT_ALLEY_ASSET_ID="kakashi_origin_pakkun_interception_alley";
 const PS_BINDING="academy_kakashi.battle.stop_assassin_post_mi_ps",AMT_BINDING="academy_kakashi.battle.stop_assassin_post_mi_amt";
 const BEAT=Object.freeze({
  psChase:"kak_stop_postmi_ps_chase_35830",psFail:"kak_stop_postmi_ps_fail_35830",psCatch:"kak_stop_postmi_ps_catch_35830",psBattle:"kak_stop_postmi_ps_battle_35830",psReturn:"kak_stop_postmi_ps_return_35830",psWin:"kak_stop_postmi_ps_win_35830",psLoss:"kak_stop_postmi_ps_loss_35830",psDecision:"kak_stop_postmi_ps_decision_35830",psReport:"kak_stop_postmi_ps_report_boundary_35830",
@@ -37,7 +38,7 @@ const BEAT=Object.freeze({
 });
 const CUES={"psChase":[{"kind":"narration","text":"Kakashi moves before Package Smuggler disappears completely."},{"kind":"narration","text":"The Sakura tree drops behind him."},{"kind":"narration","text":"A turn."},{"kind":"narration","text":"A narrow street."},{"kind":"narration","text":"Another roofline."},{"kind":"narration","text":"Package Smuggler is already well ahead."},{"kind":"narration","text":"But Kakashi can still see him."},{"kind":"narration","text":"The package is tucked close against the man's side."},{"kind":"narration","text":"He is running hard now."},{"kind":"narration","text":"Not looking for somewhere to hide."},{"kind":"narration","text":"Looking for enough distance that he will not need to."},{"kind":"narration","text":"Kakashi increases his pace."}],"psFail":[{"kind":"narration","text":"Kakashi clears the next junction."},{"kind":"narration","text":"Nothing."},{"kind":"narration","text":"He takes the roofline instead."},{"kind":"narration","text":"Still nothing."},{"kind":"narration","text":"The trail has stretched too far."},{"kind":"narration","text":"Package Smuggler is gone."},{"kind":"narration","text":"And the package has gone with him."},{"kind":"narration","text":"Whatever lead Kakashi had on ANBU Marked Target is gone with the time he spent here."},{"kind":"narration","text":"There is no second pursuit left to take."}],"psCatch":[{"kind":"narration","text":"Package Smuggler turns into the next street."},{"kind":"narration","text":"Kakashi lands ahead of him."},{"kind":"narration","text":"The man stops sharply."},{"kind":"narration","text":"His eyes go first to Kakashi."},{"kind":"narration","text":"Then back the way he came."},{"kind":"narration","text":"Masked Interceptor is not coming."},{"kind":"narration","text":"His grip tightens around the package."},{"kind":"dialogue","speaker":"PACKAGE SMUGGLER","text":"You should've stayed with the woman you put down."},{"kind":"dialogue","speaker":"KAKASHI","text":"That was what you were counting on. She bought you distance. She just didn't buy you enough."},{"kind":"narration","text":"Package Smuggler glances toward the nearest side street."},{"kind":"narration","text":"Kakashi shifts with him before he can commit to it."},{"kind":"dialogue","speaker":"PACKAGE SMUGGLER","text":"You don't even know what you're carrying."},{"kind":"dialogue","speaker":"KAKASHI","text":"Maybe not. But I know it was handed over in the middle of the night by a man ANBU sent me to follow. That's enough reason to take it back."},{"kind":"dialogue","speaker":"PACKAGE SMUGGLER","text":"You think taking it back fixes this?"},{"kind":"dialogue","speaker":"KAKASHI","text":"No. It fixes the part in your hands."},{"kind":"narration","text":"The man's free hand drops toward his weapon."},{"kind":"narration","text":"Kakashi's posture changes with it."}],"psLoss":[{"kind":"narration","text":"Package Smuggler finds the opening first."},{"kind":"narration","text":"Kakashi tries to close it."},{"kind":"narration","text":"Too late."},{"kind":"narration","text":"The man breaks past him."},{"kind":"narration","text":"The package remains with its last factual holder."},{"kind":"narration","text":"By the time Kakashi can move after him again, the street ahead is empty."}],"psWin":[{"kind":"narration","text":"Package Smuggler goes down."},{"kind":"narration","text":"For a moment, Kakashi stays on him."},{"kind":"narration","text":"Makes sure he is not getting straight back up."},{"kind":"narration","text":"Then his attention moves."},{"kind":"narration","text":"To the package."},{"kind":"narration","text":"Package Smuggler is down."},{"kind":"narration","text":"Kakashi's eye goes to the package."},{"kind":"narration","text":"He takes it from the defeated man's reach, checks it once, and secures it against his body."},{"kind":"narration","text":"Only then does he look toward the route ANBU Marked Target took."}],"psToAmt":[{"kind":"narration","text":"Kakashi leaves Package Smuggler behind."},{"kind":"narration","text":"The recovered package is secured against him."},{"kind":"narration","text":"The other trail is thinner now."},{"kind":"narration","text":"Not gone."},{"kind":"narration","text":"He takes the roofs."},{"kind":"narration","text":"Cuts across a side street."},{"kind":"narration","text":"Drops to ground level again."},{"kind":"narration","text":"Movement ahead."},{"kind":"narration","text":"ANBU Marked Target."},{"kind":"narration","text":"Still running."},{"kind":"narration","text":"Kakashi closes."},{"kind":"narration","text":"The man reaches the next street—"},{"kind":"narration","text":"and stops."},{"kind":"narration","text":"A small ninken is already standing in the route ahead."},{"kind":"narration","text":"Pakkun looks past him."},{"kind":"narration","text":"At Kakashi."},{"kind":"dialogue","speaker":"PAKKUN","text":"This yours?"},{"kind":"narration","text":"Kakashi slows beside the far end of the street."},{"kind":"narration","text":"His eye stays on ANBU Marked Target."},{"kind":"dialogue","speaker":"KAKASHI","text":"Apparently."},{"kind":"narration","text":"ANBU Marked Target looks between them."},{"kind":"narration","text":"Then at the package secured against Kakashi."},{"kind":"dialogue","speaker":"ANBU MARKED TARGET","text":"You recovered it."},{"kind":"dialogue","speaker":"KAKASHI","text":"I did."},{"kind":"narration","text":"His eyes return to the man in front of him."},{"kind":"dialogue","speaker":"KAKASHI","text":"And you're still coming back with me."},{"kind":"narration","text":"ANBU Marked Target's expression hardens."},{"kind":"dialogue","speaker":"ANBU MARKED TARGET","text":"You think carrying that package means you understand what happened?"},{"kind":"dialogue","speaker":"KAKASHI","text":"No. It means I recovered what I was sent to recover. You're a separate problem."},{"kind":"narration","text":"Pakkun shifts off the centreline without waiting for an instruction."},{"kind":"dialogue","speaker":"ANBU MARKED TARGET","text":"And what exactly are you planning to do with me?"},{"kind":"narration","text":"Kakashi watches his stance."},{"kind":"dialogue","speaker":"KAKASHI","text":"That depends on how difficult you make the next few seconds."}],"psAmtWin":[{"kind":"narration","text":"ANBU Marked Target hits the ground hard enough to stay there."},{"kind":"narration","text":"Kakashi does not immediately move away."},{"kind":"narration","text":"Neither does Pakkun."},{"kind":"narration","text":"The package remains secured."},{"kind":"narration","text":"The man does not."},{"kind":"narration","text":"Not yet."}],"amtChase":[{"kind":"narration","text":"Kakashi looks once toward the route Package Smuggler took."},{"kind":"narration","text":"The package is moving farther away."},{"kind":"narration","text":"He turns in the other direction."},{"kind":"narration","text":"After the man who brought it here."},{"kind":"narration","text":"It is not the obvious choice."},{"kind":"narration","text":"And the cost is immediate."},{"kind":"narration","text":"Every second Kakashi spends on this trail belongs to Package Smuggler too."},{"kind":"narration","text":"There will be no going back for both."},{"kind":"narration","text":"Kakashi takes the roofline."},{"kind":"narration","text":"ANBU Marked Target is still ahead."},{"kind":"narration","text":"Barely."}],"amtFail":[{"kind":"narration","text":"Kakashi follows the trail across two rooftops."},{"kind":"narration","text":"Then three."},{"kind":"narration","text":"The spacing changes."},{"kind":"narration","text":"One landing mark becomes several."},{"kind":"narration","text":"Then none."},{"kind":"narration","text":"He drops into the street below and checks the exits."},{"kind":"narration","text":"Too many."},{"kind":"narration","text":"ANBU Marked Target has broken the pursuit."},{"kind":"narration","text":"The package trail is already gone in the opposite direction."},{"kind":"narration","text":"Kakashi has lost both."}],"amtCatch":[{"kind":"narration","text":"ANBU Marked Target rounds the next corner."},{"kind":"narration","text":"Then stops."},{"kind":"narration","text":"A small ninken is sitting in the street ahead of him."},{"kind":"narration","text":"He looks at it."},{"kind":"narration","text":"The ninken looks past him."},{"kind":"narration","text":"Kakashi lands behind."},{"kind":"narration","text":"Pakkun's ears lift."},{"kind":"dialogue","speaker":"PAKKUN","text":"This yours?"},{"kind":"narration","text":"Kakashi keeps his attention on the man between them."},{"kind":"dialogue","speaker":"KAKASHI","text":"Apparently."},{"kind":"narration","text":"ANBU Marked Target turns enough to see Kakashi clearly."},{"kind":"dialogue","speaker":"ANBU MARKED TARGET","text":"You know I don't have the package anymore."},{"kind":"dialogue","speaker":"KAKASHI","text":"I know. I watched you hand it off."},{"kind":"narration","text":"The man's expression shifts."},{"kind":"narration","text":"He had expected that fact to matter more."},{"kind":"dialogue","speaker":"ANBU MARKED TARGET","text":"Then why are you still following me?"},{"kind":"narration","text":"Kakashi glances once toward the route behind them."},{"kind":"narration","text":"Then back to him."},{"kind":"dialogue","speaker":"KAKASHI","text":"Because I had time to chase one of you."},{"kind":"narration","text":"He settles his stance."},{"kind":"dialogue","speaker":"KAKASHI","text":"I chose you."},{"kind":"narration","text":"ANBU Marked Target's shoulders tighten."},{"kind":"dialogue","speaker":"ANBU MARKED TARGET","text":"Bad choice."},{"kind":"dialogue","speaker":"KAKASHI","text":"We'll know in a minute."},{"kind":"narration","text":"Pakkun rises."},{"kind":"narration","text":"Not because Kakashi tells him to."},{"kind":"narration","text":"Because ANBU Marked Target has already shifted his weight toward an exit."},{"kind":"dialogue","speaker":"PAKKUN","text":"He's going to run."},{"kind":"narration","text":"Kakashi's eye follows the same movement."},{"kind":"dialogue","speaker":"KAKASHI","text":"I know."}],"amtWin":[{"kind":"narration","text":"The fight ends with ANBU Marked Target on the ground."},{"kind":"narration","text":"The package is still a separate problem."},{"kind":"narration","text":"Package Smuggler is somewhere else in the village."},{"kind":"narration","text":"Kakashi made that trade when he chose this pursuit."},{"kind":"narration","text":"But the man he followed is no longer running."}],"amtReturn":[{"kind":"narration","text":"Kakashi secures the defeated man for the return journey."},{"kind":"narration","text":"Pakkun stays with them."},{"kind":"narration","text":"For now."},{"kind":"narration","text":"The package is still missing."},{"kind":"narration","text":"That fact has not changed."},{"kind":"narration","text":"Neither has the fact that Kakashi chose the person over the objective when there was only time for one pursuit."}],"amtKill":[{"kind":"narration","text":"Kakashi looks down at the man he chased across the village."},{"kind":"narration","text":"The missing package is still missing."},{"kind":"narration","text":"Killing him will not change that."},{"kind":"narration","text":"Kakashi knows it."},{"kind":"narration","text":"The decision is about the man in front of him now."},{"kind":"narration","text":"Not the objective already gone."}]};
 const CURSOR="__kakashiPostMiPursuit35830Cursor",STYLE_ID="sc-kakashi-post-mi-pursuit-35830-style",BOARD_CLASS="sc-kakashi-post-mi-pursuit-35830-board";
-const BG=Object.freeze({sakura:"Kakashi Origin Backdrop/fight_at_sakura_tree.png",rooftop:"Kakashi Origin Backdrop/rooftop_night.png",street:"Kakashi Origin Backdrop/konoha_alleyway.png"});
+const BG=Object.freeze({sakura:"Kakashi Origin Backdrop/fight_at_sakura_tree.png",rooftop:"Kakashi Origin Backdrop/rooftop_night.png",psStreet:"Kakashi Origin Backdrop/konoha_alleyway.png",amtStreet:"Kakashi Origin Backdrop/alleyway_konoha_night.png"});
 const OBJECTIVE=Object.freeze({ps:"Recover the package.",amt:"Catch ANBU Marked Target.",secureAmt:"Secure ANBU Marked Target.",report:"Return to ANBU."});
 
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -174,7 +175,7 @@ function beginPostMiPursuitChoice35830(choiceId){
 function materializePsDecision(){
  const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.get(BEAT.psDecision):null,rt=active();if(!b||!rt)return false;
  const rows=[],amt=rt.localContext&&rt.localContext.kakashiPostMiAmtEligible===true,psState=participantState(PS);
- if(amt)rows.push(choice("postmi_ps_go_amt","GO AFTER ANBU MARKED TARGET",BEAT.psToAmt,()=>{rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtRoute:"ps_amt",[CURSOR]:0};save();return{success:true};}));
+ if(amt)rows.push(choice("postmi_ps_go_amt","GO AFTER ANBU MARKED TARGET",BEAT.psToAmt,()=>{rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtRoute:"ps_amt",[CURSOR]:0};save();const p=commitPakkunReach("ps_amt");return p&&p.success===true?{success:true,pakkunReachOccurrenceId:p.occurrenceId}:p;}));
  if(psState!=="DEAD"){
    if(psState==="CONTROLLED_DEFEATED")rows.push(choice("postmi_ps_kill","KILL HIM",BEAT.psDecision,()=>deterministicKillTarget(PS,"ps")));
    else rows.push(choice("postmi_ps_attempt_kill","ATTEMPT TO KILL HIM",BEAT.psDecision,()=>({success:false,reason:"package_smuggler_lethal_attempt_owning_resolver_result_required"})));
@@ -203,11 +204,11 @@ function installBeats(){
  narr(BEAT.psReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psLoss,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
  m.set(BEAT.psDecision,{beatId:BEAT.psDecision,mode:"choice",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},objectiveText:OBJECTIVE.ps,text:"Package Smuggler is down. The package is secure. Kakashi decides what remains worth pursuing.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psReport,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
- narr(BEAT.amtChase,"kakashi_origin_rooftop_night",OBJECTIVE.amt);narr(BEAT.amtFail,"kakashi_origin_rooftop_night",OBJECTIVE.report);narr(BEAT.amtCatch,"kakashi_origin_konoha_alleyway",OBJECTIVE.secureAmt);narr(BEAT.psToAmt,"kakashi_origin_rooftop_night",OBJECTIVE.secureAmt);
- m.set(BEAT.amtBattle,{beatId:BEAT.amtBattle,mode:"battle_transition",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},text:"",battle:{encounterId:AMT_CONFIG,launchResolver:ctx=>launchAmt(ctx),postBattleBeatId:BEAT.amtReturn,resultProjector:projector,actionLabel:"SECURE ANBU MARKED TARGET"},exitScene:false,allowPresentationClose:false,choices:[]});
- narr(BEAT.amtReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.secureAmt);narr(BEAT.amtWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.secureAmt);
- m.set(BEAT.amtDecision,{beatId:BEAT.amtDecision,mode:"choice",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},objectiveText:null,text:"ANBU Marked Target is defeated. Package state remains separate from his disposition.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
- narr(BEAT.amtLiveReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);narr(BEAT.amtKill,"kakashi_origin_konoha_alleyway",null);narr(BEAT.amtReport,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
+ narr(BEAT.amtChase,"kakashi_origin_rooftop_night",OBJECTIVE.amt);narr(BEAT.amtFail,"kakashi_origin_rooftop_night",OBJECTIVE.report);narr(BEAT.amtCatch,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);narr(BEAT.psToAmt,"kakashi_origin_rooftop_night",OBJECTIVE.secureAmt);
+ m.set(BEAT.amtBattle,{beatId:BEAT.amtBattle,mode:"battle_transition",environmentRef:{assetId:AMT_ALLEY_ASSET_ID},text:"",battle:{encounterId:AMT_CONFIG,launchResolver:ctx=>launchAmt(ctx),postBattleBeatId:BEAT.amtReturn,resultProjector:projector,actionLabel:"SECURE ANBU MARKED TARGET"},exitScene:false,allowPresentationClose:false,choices:[]});
+ narr(BEAT.amtReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);narr(BEAT.amtWin,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);
+ m.set(BEAT.amtDecision,{beatId:BEAT.amtDecision,mode:"choice",environmentRef:{assetId:AMT_ALLEY_ASSET_ID},objectiveText:null,text:"ANBU Marked Target is defeated. Package state remains separate from his disposition.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
+ narr(BEAT.amtLiveReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.report);narr(BEAT.amtKill,AMT_ALLEY_ASSET_ID,null);narr(BEAT.amtReport,AMT_ALLEY_ASSET_ID,OBJECTIVE.report);
  return true;
 }
 function sequenceFor(rt=active()){
@@ -219,20 +220,35 @@ function sequenceFor(rt=active()){
  return map[rt.beatId]||null;
 }
 function performance(rt=active()){const s=sequenceFor(rt);if(!s||!s.length)return null;const raw=Number(rt.localContext&&rt.localContext[CURSOR]||0),i=Number.isInteger(raw)?Math.max(0,Math.min(s.length-1,raw)):0;return{sequence:s,index:i,cue:s[i],atEnd:i>=s.length-1};}
+function launchCurrentBattleTransition35830(rt,transition){
+ if(!rt||![BEAT.psBattle,BEAT.amtBattle].includes(rt.beatId))return transition||{success:false,reason:"post_mi_battle_transition_context_missing"};
+ const launcher=typeof globalThis.launchStorySceneBattle==="function"?globalThis.launchStorySceneBattle:(typeof launchStorySceneBattle==="function"?launchStorySceneBattle:null);
+ if(typeof launcher!=="function"){
+  try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_e){}
+  return{...(transition||{}),success:false,battleLaunchPending:true,battleLaunchReason:"story_battle_launcher_missing",beatId:rt.beatId};
+ }
+ const launched=launcher.call(globalThis);
+ if(launched&&launched.success===true)return{...launched,autoLaunchedFromPostMiPursuit:true,storyTransition:transition||null};
+ try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_e){}
+ return launched||{success:false,reason:"post_mi_story_battle_launch_failed",beatId:rt.beatId,storyTransition:transition||null};
+}
 function transitionNarrative(rt){
+ let launchBattle=false;
  if(rt.beatId===BEAT.psChase){const r=resolveSelectedPursuit("ps");if(!r.success)return r;rt.beatId=r.reached?BEAT.psCatch:BEAT.psFail;}
- else if(rt.beatId===BEAT.psCatch)rt.beatId=BEAT.psBattle;
+ else if(rt.beatId===BEAT.psCatch){rt.beatId=BEAT.psBattle;launchBattle=true;}
  else if(rt.beatId===BEAT.psWin)rt.beatId=BEAT.psDecision;
  else if(rt.beatId===BEAT.psLoss||rt.beatId===BEAT.psFail)rt.beatId=BEAT.psReport;
- else if(rt.beatId===BEAT.amtChase){const r=resolveSelectedPursuit("amt");if(!r.success)return r;rt.beatId=r.reached?BEAT.amtCatch:BEAT.amtFail;}
- else if(rt.beatId===BEAT.amtCatch){const p=commitPakkunReach("direct_amt");if(!p.success)return p;rt.beatId=BEAT.amtBattle;}
- else if(rt.beatId===BEAT.psToAmt){const p=commitPakkunReach("ps_amt");if(!p.success)return p;rt.beatId=BEAT.amtBattle;}
+ else if(rt.beatId===BEAT.amtChase){const r=resolveSelectedPursuit("amt");if(!r.success)return r;if(r.reached){const p=commitPakkunReach("direct_amt");if(!p.success)return p;rt.beatId=BEAT.amtCatch;}else rt.beatId=BEAT.amtFail;}
+ else if(rt.beatId===BEAT.amtCatch){if(!(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true)){const p=commitPakkunReach("direct_amt");if(!p.success)return p;}rt.beatId=BEAT.amtBattle;launchBattle=true;}
+ else if(rt.beatId===BEAT.psToAmt){if(!(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true)){const p=commitPakkunReach("ps_amt");if(!p.success)return p;}rt.beatId=BEAT.amtBattle;launchBattle=true;}
  else if(rt.beatId===BEAT.amtFail)rt.beatId=BEAT.amtReport;
  else if(rt.beatId===BEAT.amtWin)rt.beatId=BEAT.amtDecision;
  else if(rt.beatId===BEAT.amtLiveReturn)rt.beatId=BEAT.amtReport;
  else if(rt.beatId===BEAT.amtKill){const k=deterministicKillTarget(AMT,"amt");if(!k.success)return k;rt.beatId=BEAT.amtReport;}
  else return{success:false,reason:"post_mi_narrative_transition_missing"};
- rt.localContext={...(rt.localContext||{}),[CURSOR]:0};save();try{renderStoryScenePresentationLayer();}catch(_e){}return{success:true,beatId:rt.beatId};
+ rt.localContext={...(rt.localContext||{}),[CURSOR]:0};save();try{renderStoryScenePresentationLayer();}catch(_e){}
+ const transition={success:true,beatId:rt.beatId};
+ return launchBattle?launchCurrentBattleTransition35830(rt,transition):transition;
 }
 function installStyle(){
  if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;const s=document.createElement("style");s.id=STYLE_ID;s.textContent=
@@ -242,18 +258,35 @@ function installStyle(){
 function image(ref){return ref===KAK?"Assets/Academy Student/academy_kakashi.png":ref===PS?"NPC/package_smuggler.png":ref===AMT?"NPC/anbu_marked_target.png":"Portraits/Summons/pakkun.png";}
 function label(ref){return ref===KAK?"KAKASHI":ref===PS?"PACKAGE SMUGGLER":ref===AMT?"ANBU MARKED TARGET":"NINKEN";}
 function card(ref,state,focus){return'<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(ref)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(image(ref))+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label(ref))+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
-function stageBg(rt){if([BEAT.amtChase,BEAT.psToAmt].includes(rt.beatId))return BG.rooftop;return BG.street;}
+function stageBg(rt,p=null){
+ if(rt.beatId===BEAT.amtChase||rt.beatId===BEAT.psToAmt)return BG.rooftop;
+ if([BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport].includes(rt.beatId))return BG.amtStreet;
+ return BG.psStreet;
+}
+function pakkunVisible35830(rt,p){
+ if(!(rt&&rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true))return false;
+ if(rt.beatId===BEAT.amtCatch)return !!p&&p.index>=2;
+ if(rt.beatId===BEAT.psToAmt)return !!p&&p.index>=13;
+ return [BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport].includes(rt.beatId);
+}
+function actorState35830(ref,rt){
+ if(ref===KAK)return"ACTIVE";
+ if(ref===PAKKUN)return"PRESENT";
+ if(ref===PS){const pkg=packageState(rt);if(String(pkg.currentHolderClass||"")==="PACKAGE_SMUGGLER")return"HAS PACKAGE";}
+ return participantState(ref)||"PRESENT";
+}
 function render(){
  wireEntryChoices();materializePsDecision();materializeAmtDecision();
  if(typeof document==="undefined")return false;const rt=active(),layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
  if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed)){const x=consumePsReturn();if(x&&x.success===true){try{return render();}catch(_e){}}}
  if(rt&&rt.beatId===BEAT.amtReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiAmtReturnProcessed)){const x=consumeAmtReturn();if(x&&x.success===true){try{return render();}catch(_e){}}}
  const ours=rt&&Object.values(BEAT).includes(rt.beatId);layer.dataset.scPostmi35830=ours?"true":"false";const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
- for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+stageBg(rt).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
+ for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+stageBg(rt,performance(rt)).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}
  const p=performance(rt),focus=p&&p.cue&&(p.cue.speaker==="KAKASHI"?KAK:p.cue.speaker==="PACKAGE SMUGGLER"?PS:p.cue.speaker==="ANBU MARKED TARGET"?AMT:p.cue.speaker==="PAKKUN"?PAKKUN:null)||KAK;
- let refs=[KAK];if([BEAT.psChase,BEAT.psCatch,BEAT.psWin,BEAT.psDecision].includes(rt.beatId)&&participantState(PS)!=="DEAD")refs.push(PS);if([BEAT.amtChase,BEAT.amtCatch,BEAT.psToAmt,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill].includes(rt.beatId)){refs.push(AMT);if(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true)refs.push(PAKKUN);}
- b.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+([BEAT.amtChase,BEAT.psToAmt].includes(rt.beatId)?"KONOHA ROOFTOPS · NIGHT":"KONOHA STREET · NIGHT")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+refs.length+'">'+refs.map(ref=>card(ref,ref===KAK?"ACTIVE":ref===PAKKUN?"PRESENT":participantState(ref)||"PRESENT",focus===ref)).join("")+'</div>';
+ let refs=[KAK];if([BEAT.psChase,BEAT.psCatch,BEAT.psWin,BEAT.psDecision].includes(rt.beatId)&&participantState(PS)!=="DEAD")refs.push(PS);if([BEAT.amtChase,BEAT.amtCatch,BEAT.psToAmt,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill].includes(rt.beatId)){refs.push(AMT);if(pakkunVisible35830(rt,p))refs.push(PAKKUN);}
+ const amtAlley=[BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport].includes(rt.beatId);
+ b.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+(amtAlley?"KONOHA ALLEY · NIGHT":[BEAT.amtChase,BEAT.psToAmt].includes(rt.beatId)?"KONOHA ROOFTOPS · NIGHT":"KONOHA STREET · NIGHT")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+refs.length+'">'+refs.map(ref=>card(ref,actorState35830(ref,rt),focus===ref)).join("")+'</div>';
  if(p){const t=layer.querySelector(".sc-story-text");if(t)t.textContent=p.cue.text;const n=layer.querySelector(".sc-story-name");if(n){n.textContent=p.cue.kind==="dialogue"?p.cue.speaker:"NARRATION";n.style.display="block";}}
  return true;
 }
@@ -286,7 +319,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v2_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v3_2026_09_19",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -294,6 +327,9 @@ function diagnostics(){
   exactPsCatch:CUES.psCatch.some(x=>x.kind==="dialogue"&&x.speaker==="KAKASHI"&&x.text==="No. It fixes the part in your hands."),
   exactPakkunCorrection:CUES.amtCatch.some(x=>x.speaker==="PAKKUN"&&x.text==="This yours?")&&CUES.amtCatch.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently.")&&CUES.psToAmt.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently."),
   exactBattleConfigs:PS_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
+   battleTransitionsAutoLaunch:transitionNarrative.toString().includes("launchCurrentBattleTransition35830")&&launchCurrentBattleTransition35830.toString().includes("launchStorySceneBattle"),
+   amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
+   pakkunCardRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&image(PAKKUN)==="Portraits/Summons/pakkun.png",
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),

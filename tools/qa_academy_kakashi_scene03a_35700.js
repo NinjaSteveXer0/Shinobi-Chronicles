@@ -69,6 +69,8 @@ assert(scene03Source.includes("scWatchMiBurst35700"),"MI burst animation missing
 assert(scene03Source.includes("scWatchAmtBreakaway35700"),"AMT breakaway animation missing");
 assert(scene03Source.includes("sc-watch-handoff-giver-35700"),"package handoff animation missing");
 assert(scene03Source.includes("sc-watch-mi-cutoff-35700"),"MI interception animation missing");
+assert(scene03Source.includes("sc-watch-ps-turn-35700")&&!scene03Source.includes("sc-watch-ps-escape-35700"),"Package Smuggler must hold the exchange lane before branch-specific escape");
+assert(scene03Source.includes("right:27%!important")&&scene03Source.includes("scWatchAmtBreakaway35700"),"MI must enter the PS lane while AMT breaks away");
 assert.strictEqual(MOD.cueCount,18,"Scene 03A cue count drifted");
 assert.deepStrictEqual(MOD.objectives,{initial:"Stop the package from falling into the wrong hands.",postHandoff:"Retrieve the package."},"Scene 03A objective wording drifted");
 assert.strictEqual(diag.checks.objectiveChangesAtPackageTransfer,true,"Scene 03A objective does not change at exact package-transfer cue");

@@ -33,7 +33,7 @@ try{
   const kakashiV4Source=read("runtime/alpha-kakashi-scene-board-polish-33910.js");
 
   assert("production_terminal_chain_references_336_337_338",terminalSource.includes('runtime/alpha-early-story-modernization-33600.js')&&terminalSource.includes('runtime/alpha-origin-screen-first-33700.js')&&terminalSource.includes('runtime/alpha-kakashi-original-origin-restoration-33800.js'));
-  assert("scene_board_delivery_generation_coherent",terminalSource.includes('const SCENE_BOARD_BUILD="scene-board-20260919-8";')&&restorationSource.includes('const BUILD="scene-board-20260919-8";'));
+  assert("scene_board_delivery_generation_coherent",terminalSource.includes('const SCENE_BOARD_BUILD="scene-board-20260919-9";')&&restorationSource.includes('const BUILD="scene-board-20260919-9";'));
   assert("restoration_activates_generic_board_then_kakashi_v4",restorationSource.includes('runtime/alpha-story-scene-board-33900.js')&&restorationSource.includes('runtime/alpha-kakashi-scene-board-polish-33910.js'));
   assert("scene_board_quick_read_labels_inside_panel",sceneBoardSource.includes("speakerLabel")&&sceneBoardSource.includes('cue.speakerName||cue.speaker')&&sceneBoardSource.includes('panel.contains(name)')&&sceneBoardSource.includes('"NARRATION"'));
   assert("scene_board_overlay_reads_w2c_speaker_field",kakashiV4Source.includes("cueSpeaker33910")&&kakashiV4Source.includes("cue.speakerName||cue.speaker")&&kakashiV4Source.includes("panel.dataset.speakerId=speakerId")&&kakashiV4Source.includes('key==="MINATO"'));
@@ -53,7 +53,7 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v6_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v6_33910_2026_09_19'));
+  assert("kakashi_v7_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v7_33910_2026_09_19'));
   assert("watch_exchange_expanded_projection",d33910.checks&&d33910.checks.expandedWatchExchangeProjection===true,d33910);
 
   assert("scene1_authority_pinned",kakashiV4Source.includes('d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91'));
@@ -111,7 +111,10 @@ try{
   assert("choice_stages_final_exchange_participants",action.mode==="encounter"&&action.actors.length===3&&action.actors.some(a=>a.label==="ANBU MARKED TARGET"&&a.image==="NPC/anbu_marked_target.png")&&action.actors.some(a=>a.label==="PACKAGE SMUGGLER"&&a.image==="NPC/package_smuggler.png")&&action.objects.some(x=>x.state==="EXCHANGE IN PROGRESS"),action);
 
   const transfer=projection("kak_original_transfer",{kakashiOriginalAction:"observe",__storyPerformanceCursor33900:{beatId:"kak_original_transfer",index:2}});
-  assert("masked_interceptor_enters_after_package_smuggler_receives_package",transfer.actors.some(a=>a.label==="MASKED INTERCEPTOR"&&a.state==="VISIBLE"&&a.entering===true)&&transfer.actors.some(a=>a.label==="ANBU MARKED TARGET"&&a.state==="LEAVING")&&transfer.objects.some(x=>x.state==="PACKAGE SMUGGLER HAS PACKAGE"),transfer);
+  assert("masked_interceptor_enters_after_package_smuggler_receives_package",transfer.actors.some(a=>a.label==="MASKED INTERCEPTOR"&&a.state==="PRESSING PACKAGE SMUGGLER"&&a.entering===true)&&transfer.actors.some(a=>a.label==="ANBU MARKED TARGET"&&a.state==="LEAVING")&&transfer.actors.some(a=>a.label==="PACKAGE SMUGGLER"&&a.state==="HAS PACKAGE")&&transfer.objects.length===0,transfer);
+
+  const majorProjection=projection("kak_original_major_choice");
+  assert("watch_exchange_choice_keeps_ps_and_mi_after_amt_breakaway",majorProjection.actors.some(a=>a.label==="PACKAGE SMUGGLER"&&a.state==="HAS PACKAGE")&&majorProjection.actors.some(a=>a.label==="MASKED INTERCEPTOR"&&a.state==="BLOCKING ESCAPE")&&!majorProjection.actors.some(a=>a.label==="ANBU MARKED TARGET")&&majorProjection.objects.length===0,majorProjection);
 
   const major=scene.beatMap.get("kak_original_major_choice");
   assert("legacy_battle_stubs_remain_fail_closed_until_current_scene_binding",major.choices.find(c=>c.choiceId==="fight_assassin").availability().available===false&&major.choices.find(c=>c.choiceId==="defeat_assassin_then_recover").availability().available===false);

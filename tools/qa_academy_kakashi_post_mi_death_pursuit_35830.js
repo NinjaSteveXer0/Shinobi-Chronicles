@@ -52,6 +52,11 @@ const dkillBeat={beatId:DKILL_SOURCE,mode:"choice",choices:[
 ]};
 const definition={sceneId:SCENE_ID,beatMap:new Map([[LIVE_SOURCE,liveBeat],[RESOLVER_SOURCE,resolverBeat],[DKILL_SOURCE,dkillBeat]])};
 let active=null;
+globalThis.launchStorySceneBattle=function(){
+ const beat=definition.beatMap.get(active&&active.beatId);
+ if(!beat||beat.mode!=="battle_transition"||!beat.battle||typeof beat.battle.launchResolver!=="function")return{success:false,reason:"qa_story_battle_transition_missing"};
+ return beat.battle.launchResolver({active,returnContext:{postBattleBeatId:beat.battle.postBattleBeatId}});
+};
 globalThis.getStorySceneDefinition=id=>id===SCENE_ID?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
@@ -90,8 +95,6 @@ function drainNarration(target,max=120){
 }
 function simulateBattleReturn(battleBeatId,result,returnBeatId){
  const beat=definition.beatMap.get(battleBeatId);assert(beat&&beat.battle,"battle beat missing "+battleBeatId);
- const launched=beat.battle.launchResolver({active,returnContext:{postBattleBeatId:returnBeatId}});
- assert.strictEqual(launched.success,true,"battle launch failed "+JSON.stringify(launched));
  active.battleResume={authored:result};active.beatId=returnBeatId;
 }
 
@@ -100,6 +103,10 @@ const MOD=globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830;
 assert(MOD,"35830 module missing");
 const diag=globalThis.runAcademyKakashiPostMiDeathPursuit35830Diagnostics();
 assert.strictEqual(diag.pass,true,"35830 diagnostics failed: "+JSON.stringify(diag.failed));
+const source35830=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"),"utf8");
+assert(source35830.includes('Kakashi Origin Backdrop/alleyway_konoha_night.png'),"AMT encounter must use exact alleyway_konoha_night backdrop");
+assert(source35830.includes('"Portraits/Summons/pakkun.png"'),"Pakkun Story card asset path missing");
+assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
 store.set("battle-mi-live",{occurrenceId:"battle-mi-live",fact:{factClass:"battle_result"}});
@@ -129,7 +136,10 @@ assert.strictEqual(active.beatId,MOD.beats.psChase);
 assert.strictEqual(participantStates[MI].stateClass,"DEAD","MI death was rewritten by successor entry");
 const deathCount=[...store.values()].filter(x=>x&&x.fact&&x.fact.factClass==="mi_death").length;
 
+launches.length=0;
 drainNarration(MOD.beats.psBattle);
+assert.strictEqual(launches.length,1,"PS battle transition did not auto-launch exactly once");
+assert.strictEqual(launches[0].battleConfigId,"academy_kakashi_origin_battle_seq_ps");
 simulateBattleReturn(MOD.beats.psBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-ps-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.psReturn);
 out=MOD.consumePsReturn();
 assert.strictEqual(out.success,true,"PS Battle return failed: "+JSON.stringify(out));
@@ -151,8 +161,12 @@ assert.strictEqual(active.beatId,MOD.beats.psDecision);
 
 out=globalThis.advanceStoryScene("postmi_ps_go_amt");
 assert.strictEqual(out.success,true);
+assert.strictEqual(active.localContext.kakashiPostMiPakkunPresent,true,"PS->AMT choice must commit legitimate Pakkun reach before his authored reveal");
+launches.length=0;
 drainNarration(MOD.beats.amtBattle);
-assert.strictEqual(active.localContext.kakashiPostMiPakkunPresent,true,"Pakkun must commit only when AMT is reached");
+assert.strictEqual(launches.length,1,"PS->AMT battle transition did not auto-launch exactly once");
+assert.strictEqual(launches[0].battleConfigId,"academy_kakashi_origin_battle_seq_amt_pakkun");
+assert.strictEqual(launches[0].pakkunAuthorized,true);
 simulateBattleReturn(MOD.beats.amtBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_amt",battleOccurrenceId:"qa-amt-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.amtReturn);
 out=MOD.consumeAmtReturn();
 assert.strictEqual(out.success,true,"AMT Battle return failed: "+JSON.stringify(out));
@@ -178,8 +192,7 @@ assert.strictEqual(active.localContext.kakashiPostMiPsPursuitClosedPermanently,t
 assert.strictEqual(active.localContext.kakashiDeterministicKillPackageAvailable,false,"direct AMT fork left PS route open");
 drainNarration(MOD.beats.amtBattle);
 assert.strictEqual(active.localContext.kakashiPostMiPakkunPresent,true);
-const amtLaunch=definition.beatMap.get(MOD.beats.amtBattle).battle.launchResolver({active,returnContext:{}});
-assert.strictEqual(amtLaunch.success,true);
+assert.strictEqual(launches.length,1,"direct AMT battle transition did not auto-launch exactly once");
 assert.strictEqual(launches[0].battleConfigId,"academy_kakashi_origin_battle_seq_amt_pakkun");
 assert.strictEqual(launches[0].pakkunAuthorized,true);
 assert.strictEqual(store.get(active.localContext.kakashiPostMiPackageOccurrenceId).fact.packageState.currentHolderClass,"PACKAGE_SMUGGLER","direct AMT pursuit fabricated package transfer");
@@ -196,6 +209,8 @@ console.log("- live fast-win PS pursuit and post-kill PS/AMT pursuit entries use
 console.log("- committed MI death is never rerolled across lethal successor selection");
 console.log("- PS route uses sequential PS Battle config and separate AK_SA_033 package recovery");
 console.log("- <=3 PS victory preserves AMT route; PS ATTEMPT lethal remains resolver-owned/fail-closed");
+console.log("- PS and AMT battle-transition beats auto-launch through canonical Story Battle authority");
+console.log("- legitimate AMT reach commits Pakkun, reveals Portraits/Summons/pakkun.png on-cue, and uses alleyway_konoha_night");
 console.log("- legitimate AMT reach commits Pakkun and uses sequential AMT+Pakkun config");
 console.log("- AMT controlled victory exposes exact disposition family; CE #244 extensions stay blocked");
 console.log("- deterministic AMT KILL preserves package custody");
