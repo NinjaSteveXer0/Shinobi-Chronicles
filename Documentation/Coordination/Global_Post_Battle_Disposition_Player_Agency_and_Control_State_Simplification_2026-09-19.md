@@ -282,3 +282,43 @@ Current and future QA should verify:
 > **Battle victory earns the post-Battle decision window.**
 >
 > **The player chooses the disposition; hidden control-state bookkeeping does not choose it for them.**
+
+
+---
+
+## 14. Restraint-method projection
+
+Stephen clarification, 2026-09-19:
+
+A deterministic post-Battle **RESTRAIN / CAPTURE** disposition does not mean the Story invents invisible rope or generic handcuffs.
+
+The physical method must project from a restraint-capable Skill, technique, tool or item the acting character actually has available under current capability / Inventory authority.
+
+Examples:
+- Academy Kakashi -> **Wire Snare** (`academy_kakashi_wire_snare`) using ninja wire;
+- Anko -> **Shadow Snake Binding** where that exact capability is currently owned/available.
+
+Canonical rule:
+
+> **The player chooses RESTRAIN. The character uses an actually available restraint method from their legitimate kit to perform it.**
+
+This is **not** a Battle-finisher requirement.
+
+The target does not need to already be bound when Battle ends.
+
+Do not require:
+- the restraint Skill to have been used during the Battle;
+- an active control condition to survive the Battle boundary;
+- a specific Skill when another legitimate restraint-capable method is available.
+
+Where multiple legitimate restraint methods exist, presentation/resolver may use the current authored/default appropriate method without turning that choice into a hidden minigame.
+
+Where no legitimate restraint-capable Skill/tool/item exists, do not fabricate one. The owning capability/Inventory/Story authority must determine whether a RESTRAIN disposition is available or whether another authored method is supplied.
+
+This capability check is distinct from the removed `CONTROLLED_DEFEATED` gate:
+- **old rejected gate:** enemy must already be controlled;
+- **current rule:** defeated enemy may be restrained after Battle using the actor's legitimate restraint method.
+
+The restraint occurrence should preserve the method/source reference where material so later Chronicle history can say how the participant was secured.
+
+> **Post-Battle restraint is capability-driven, not pre-existing-control-driven.**
