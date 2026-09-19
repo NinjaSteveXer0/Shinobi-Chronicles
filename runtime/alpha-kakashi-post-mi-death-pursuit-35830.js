@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v9_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v10_2026_09_19";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="e18729844922461c654481745e48a6eac20649cd";
 const AUTH_LIVE="bf16ebe0f677994878fbe60e30e7b546da899eb8";
@@ -70,6 +70,16 @@ function miResolution(rt=active()){
 }
 function packageOccurrenceId(rt=active()){const mi=miResolution(rt);return String(rt&&rt.localContext&&(rt.localContext.kakashiPostMiPackageOccurrenceId||rt.localContext.kakashiSequentialPackageOccurrenceId35100||rt.localContext.kakashiSequentialPackageOccurrenceId)||(mi&&mi.occurrenceId)||"");}
 function packageState(rt=active()){const row=occurrence(packageOccurrenceId(rt)),f=factOf(row);return clone(f.packageState||{objectRef:PACKAGE,currentHolderClass:"PACKAGE_SMUGGLER",custodyClass:"PACKAGE_SMUGGLER",locationClass:"PS_PERSON"});}
+function packageRecoveryParentOccurrenceId35830(rt=active(),preferredId=""){
+ const local=rt&&rt.localContext||{};
+ const candidates=[preferredId,local.kakashiPostMiPsBattleOccurrenceId,local.kakashiPostMiPursuitResolutionOccurrenceId,local.kakashiPostMiPursuitSelectionOccurrenceId,local.kakashiPostMiPackageOccurrenceId,local.kakashiSequentialPackageOccurrenceId35100,local.kakashiSequentialPackageOccurrenceId]
+   .map(value=>String(value||"")).filter((value,index,rows)=>value&&rows.indexOf(value)===index);
+ for(const id of candidates){
+   const row=occurrence(id),pkg=factOf(row).packageState||{};
+   if(row&&String(pkg.objectRef||"")===PACKAGE&&String(pkg.currentHolderClass||pkg.custodyClass||"")==="PACKAGE_SMUGGLER")return id;
+ }
+ return"";
+}
 function sourceAvailable(target,rt=active()){
  const mi=miResolution(rt);if(!rt||!mi)return false;
  if(mi.deathCommitted){
@@ -91,7 +101,7 @@ function commitPursuitSelection(target){
  const pkg=packageState(rt),successorAuthority=target==="ps"?AUTH_PS:AUTH_AMT;
  const fact={factClass:"academy_kakashi_stop_assassin_post_mi_pursuit_choice",authorityCommit:mi.deathCommitted?successorAuthority:AUTH_LIVE,successorAuthorityCommit:successorAuthority,storySceneInstanceId:String(rt.instanceId||""),sourceMiResolutionOccurrenceId:mi.occurrenceId,sourceMiResolutionState:mi.kind,sourceMiResolutionProvenance:mi.provenance,selectedPursuitTarget:target==="ps"?"PACKAGE_SMUGGLER":"ANBU_MARKED_TARGET",selectionIsNotPursuitSuccess:true,miDeathAlreadyCommitted:mi.deathCommitted,miDeathRerolled:false,miBattleTurns:Number(rt.localContext.kakashiScene05AWTurnCount||0),packageState:pkg,packageSmugglerPursuitAvailableAtSelection:sourceAvailable("ps",rt),anbuMarkedTargetPursuitAvailableAtSelection:sourceAvailable("amt",rt),pakkunPresent:false};
  const out=commitOnce(id,fact,target==="ps"?"PURSUE_PACKAGE_SMUGGLER":"PURSUE_ANBU_MARKED_TARGET",[ORIGIN_ID,MI,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:mi.occurrenceId,role:mi.deathCommitted?"committed_mi_death":"committed_mi_battle_defeat"},{type:"world_object",id:PACKAGE},{type:"writing_authority",id:successorAuthority}]);if(!out.success)return out;
- const patch={kakashiPostMiPursuitSelectionOccurrenceId:id,kakashiPostMiPursuitTarget:target,kakashiPostMiPackageOccurrenceId:packageOccurrenceId(rt),kakashiPostMiAmtEligibleAtSelection:sourceAvailable("amt",rt),kakashiPostMiSourceState:mi.kind,[CURSOR]:0};
+ const patch={kakashiPostMiPursuitSelectionOccurrenceId:id,kakashiPostMiPursuitTarget:target,kakashiPostMiPackageOccurrenceId:id,kakashiPostMiAmtEligibleAtSelection:sourceAvailable("amt",rt),kakashiPostMiSourceState:mi.kind,[CURSOR]:0};
  if(target==="amt"){patch.kakashiScene05AWPackagePursuitEligible=false;patch.kakashiScene06AW2CPackageAvailable=false;patch.kakashiDeterministicKillPackageAvailable=false;patch.kakashiPostMiPsPursuitClosedPermanently=true;}
  rt.localContext={...(rt.localContext||{}),...patch};save();return{success:true,occurrenceId:id,target,miState:mi.kind};
 }
@@ -101,7 +111,7 @@ function resolveSelectedPursuit(target){
  const id=stable("occ_origin_kakashi_post_mi_pursuit_resolution",{selection:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),target,eligible});
  const fact={factClass:"academy_kakashi_stop_assassin_post_mi_pursuit_resolution",authorityCommit:target==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),parentSelectionOccurrenceId:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),targetRef:target==="ps"?PS:AMT,selectedOutcomeRef:eligible?"PURSUIT_SUCCESS_REACHED":"PURSUIT_FAILURE_ESCAPED",sourceMiResolutionState:String(sf.sourceMiResolutionState||"DEAD"),packageState:packageState(rt),pakkunPresent:false};
  const out=commitOnce(id,fact,fact.selectedOutcomeRef,[ORIGIN_ID,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),role:"pursuit_selection"}]);if(!out.success)return out;
- rt.localContext={...(rt.localContext||{}),kakashiPostMiPursuitResolutionOccurrenceId:id,kakashiPostMiPursuitReached:eligible};save();return{success:true,reached:eligible,occurrenceId:id};
+ rt.localContext={...(rt.localContext||{}),kakashiPostMiPursuitResolutionOccurrenceId:id,kakashiPostMiPackageOccurrenceId:id,kakashiPostMiPursuitReached:eligible};save();return{success:true,reached:eligible,occurrenceId:id};
 }
 function launchPs({active:rt,returnContext}={}){if(!rt)return{success:false,reason:"post_mi_ps_story_missing"};return BATTLE.launchAcademyKakashiOriginPlBattle({storyOccurrenceId:String(rt.instanceId),sourceAnchorRef:"AK_SA_022",bindingRef:PS_BINDING,battleConfigId:PS_CONFIG,returnToken:String(rt.instanceId)+":stop-post-mi:ps",returnContext,pakkunAuthorized:false});}
 function launchAmt({active:rt,returnContext}={}){if(!rt)return{success:false,reason:"post_mi_amt_story_missing"};if(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent!==true)return{success:false,reason:"post_mi_amt_pakkun_reach_not_committed"};return BATTLE.launchAcademyKakashiOriginPlBattle({storyOccurrenceId:String(rt.instanceId),sourceAnchorRef:"AK_SA_022",bindingRef:AMT_BINDING,battleConfigId:AMT_CONFIG,returnToken:String(rt.instanceId)+":stop-post-mi:amt:"+String(rt.localContext.kakashiPostMiAmtRoute||"direct"),returnContext,pakkunAuthorized:true});}
@@ -120,7 +130,9 @@ function consumePsReturn(){
  const mi=miResolution(rt),fact={factClass:"academy_kakashi_stop_assassin_post_mi_ps_battle_return",authorityCommit:AUTH_PS,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),battleConfigId:PS_CONFIG,battleResultState:String(r.resultState||""),playerActionOpportunityCount:turns,packageState:packageState(rt),miResolutionOccurrenceId:mi&&mi.occurrenceId||"",miResolutionState:mi&&mi.kind||"",miDeathRerolled:false};
  const committed=commitOnce(id,fact,victory?"PS_BATTLE_VICTORY":"PS_BATTLE_DEFEAT",[ORIGIN_ID,PS],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"origin_occurrence",id:mi&&mi.occurrenceId||"",role:mi&&mi.deathCommitted?"mi_death":"mi_battle_defeat"}].filter(x=>x.id));if(!committed.success)return committed;
  if(victory){
-   rt.localContext={...(rt.localContext||{}),kakashiSequentialPackageOccurrenceId:packageOccurrenceId(rt),kakashiSequentialPackageOccurrenceId35100:packageOccurrenceId(rt)};save();
+   const recoveryParent=packageRecoveryParentOccurrenceId35830(rt,id);
+   if(!recoveryParent)return{success:false,reason:"post_mi_ps_package_recovery_parent_missing",battleReturnOccurrenceId:id};
+   rt.localContext={...(rt.localContext||{}),kakashiPostMiPsBattleOccurrenceId:id,kakashiPostMiPackageOccurrenceId:recoveryParent,kakashiSequentialPackageOccurrenceId:recoveryParent,kakashiSequentialPackageOccurrenceId35100:recoveryParent};save();
    if(typeof resolveAcademyKakashiSequentialPostPsPackageRecovery35600!=="function")return{success:false,reason:"ak_sa_033_package_recovery_owner_missing"};
    const recovered=resolveAcademyKakashiSequentialPostPsPackageRecovery35600();if(!recovered||recovered.success!==true)return recovered||{success:false,reason:"ak_sa_033_package_recovery_failed"};
    const pkgId=String(recovered.packageOccurrenceId||rt.localContext.kakashiSequentialPackageOccurrenceId35100||rt.localContext.kakashiSequentialPackageOccurrenceId||"");
@@ -345,7 +357,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v9_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v10_2026_09_19",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -365,6 +377,7 @@ function diagnostics(){
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),
   psRecoveryUsesAkSa033:consumePsReturn.toString().includes("resolveAcademyKakashiSequentialPostPsPackageRecovery35600"),
+  psRecoveryUsesOriginOwnedParent:packageRecoveryParentOccurrenceId35830.toString().includes("kakashiPostMiPursuitResolutionOccurrenceId")&&packageRecoveryParentOccurrenceId35830.toString().includes("PACKAGE_SMUGGLER")&&commitPursuitSelection.toString().includes("kakashiPostMiPackageOccurrenceId:id")&&resolveSelectedPursuit.toString().includes("kakashiPostMiPackageOccurrenceId:id")&&consumePsReturn.toString().includes("packageRecoveryParentOccurrenceId35830(rt,id)"),
   psThreeTurnAmtGate:consumePsReturn.toString().includes("turns>=1&&turns<=3")&&consumePsReturn.toString().includes("anbuMarkedTargetPursuitAvailableAtSelection"),
   pakkunOnlyOnAmtReach:commitPakkunReach.toString().includes("pakkunPresent:true")&&launchAmt.toString().includes("kakashiPostMiPakkunPresent!==true"),
   amtVictoryDoesNotChangePackage:consumeAmtReturn.toString().includes("packageCustodyUnchanged:true"),

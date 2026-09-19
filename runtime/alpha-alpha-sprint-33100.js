@@ -17,7 +17,7 @@
 (function installAlphaPlayableSprint33100(){
   "use strict";
 
-  const PATCH_ID="alpha_playability_sprint_33100_2026_09_13";
+  const PATCH_ID="alpha_playability_sprint_33100_v2_2026_09_19";
   const esc=value=>{
     if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));
     return String(value??"").replace(/[&<>\"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
@@ -44,9 +44,19 @@
       battle.battleOver===true
     ));
 
-    if(claimed&&victory&&rc&&rc.type==="story_scene"&&typeof resumeBattleCallerAfterCompletion==="function"){
-      const result=resumeBattleCallerAfterCompletion("victory");
+    if(claimed&&victory&&rc&&rc.type==="story_scene"){
+      const result=typeof resumeBattleCallerAfterCompletion==="function"
+        ?resumeBattleCallerAfterCompletion("victory")
+        :{success:false,reason:"battle_caller_resume_api_missing"};
       if(result&&result.success===true)return {...result,alpha33100StoryReturnPriority:true};
+      try{if(typeof openOverlay==="function")openOverlay("victory");}catch(_error){}
+      return{
+        success:false,
+        reason:String(result&&result.reason||"story_caller_resume_failed"),
+        callerResult:result||null,
+        alpha33100StoryReturnFailClosed:true,
+        genericBattleFallbackSuppressed:true
+      };
     }
     return priorContinueAfterVictory33100?priorContinueAfterVictory33100.apply(this,arguments):{success:false,reason:"victory_continue_authority_missing"};
   }
@@ -107,6 +117,20 @@
   function continueAfterSetback33100(){
     const battle=typeof currentBattle!=="undefined"?currentBattle:null;
     const rc=battle&&battle.returnContext||null;
+    if(rc&&rc.type==="story_scene"){
+      const result=typeof resumeBattleCallerAfterCompletion==="function"
+        ?resumeBattleCallerAfterCompletion("defeat")
+        :{success:false,reason:"battle_caller_resume_api_missing"};
+      if(result&&result.success===true)return {...result,alpha33100SetbackReturn:true};
+      try{if(typeof openOverlay==="function")openOverlay("setback");}catch(_error){}
+      return{
+        success:false,
+        reason:String(result&&result.reason||"story_caller_resume_failed"),
+        callerResult:result||null,
+        alpha33100StorySetbackReturnFailClosed:true,
+        genericBattleFallbackSuppressed:true
+      };
+    }
     if(rc&&typeof resumeBattleCallerAfterCompletion==="function"){
       const result=resumeBattleCallerAfterCompletion("defeat");
       if(result&&result.success===true)return {...result,alpha33100SetbackReturn:true};
@@ -305,10 +329,12 @@
     const utilitySrc=openAlphaArenaUtilitySurface33100.toString();
     const checks={
       storyReturnOutranksLegacy:continueSrc.includes('rc.type==="story_scene"')&&continueSrc.indexOf("resumeBattleCallerAfterCompletion")<continueSrc.indexOf("priorContinueAfterVictory33100"),
+      storyReturnFailsClosed:continueSrc.includes("alpha33100StoryReturnFailClosed:true")&&continueSrc.includes("genericBattleFallbackSuppressed:true")&&continueSrc.includes('openOverlay("victory")'),
       rewardsStillRequiredBeforeStoryReturn:continueSrc.includes("claimed")&&continueSrc.includes("rewards.claimed"),
       defeatIsBattlePLWithdrawal:setbackSrc.includes("battlePLWithdrawal:true"),
       defeatDoesNotInferInjuryOrDeath:setbackSrc.includes("injuryInferred:false")&&setbackSrc.includes("deathInferred:false"),
       setbackExactCallerReturn:continueAfterSetback33100.toString().includes('resumeBattleCallerAfterCompletion("defeat")'),
+      storySetbackFailsClosed:continueAfterSetback33100.toString().includes("alpha33100StorySetbackReturnFailClosed:true")&&continueAfterSetback33100.toString().includes("genericBattleFallbackSuppressed:true")&&continueAfterSetback33100.toString().includes('openOverlay("setback")'),
       promotionReusesExistingAuthority:promotionSrc.includes("priorPromotion33100")&&promotionSrc.includes("semanticAction"),
       promotionFailClosedWithoutAction:promotionSrc.includes("No exact Promotion launch action")&&promotionSrc.includes("disabled"),
       stagedNoFakeOpponent:utilitySrc.includes("fakeCompetitionStateCreated:false"),
