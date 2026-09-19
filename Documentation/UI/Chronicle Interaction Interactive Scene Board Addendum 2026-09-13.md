@@ -228,31 +228,33 @@ The Scene Board should preserve a reusable **Live State Callout** for important 
 
 This is intentionally distinct from a Character Card nameplate/status.
 
+- **Character-card identity** comes from the collectible art's baked nameplate. Runtime must not draw a second coded participant-name box over the card.
 - **Character-card status** answers: what is this participant doing / what is their local visible state?
-  - examples: `REPORTING`, `RECEIVING REPORT`, `ALIVE`, `PRESENT`, `IN PURSUIT`.
-- **Live State Callout** answers: what important situation/object/custody fact is currently true across the scene?
+  - examples: `FOCUSED`, `REPORTING`, `RECEIVING REPORT`, `ALIVE`, `PRESENT`, `HAS PACKAGE`;
+  - render the status as a compact cyan/gold state strip in the clear lane immediately **below the Character Card and above the narration/dialogue lane**, not on top of the baked nameplate.
+- **Live State Callout** answers: what important situation/object/custody fact is currently true across the scene when that fact is not already readable from a visible participant state?
   - examples: `PACKAGE — EXCHANGE IN PROGRESS`;
-  - `PACKAGE — PACKAGE SMUGGLER HAS PACKAGE`;
   - `PACKAGE — RECOVERED · HIDDEN OPERATION`.
 
 Binding rules:
 
 1. A Live State Callout is a **presentation of supplied authoritative/observer-safe state**. It never decides holder, custody, success, Knowledge or outcome.
 2. Once shown, the callout may remain continuously visible while that state remains relevant. It updates or disappears when authoritative state changes.
-3. Do not collapse scene-level continuity into ordinary actor nameplate text merely to save space.
-4. Use **cyan emphasis for active / changing / in-progress state** and **gold emphasis for committed / settled / pivotal state**. Mixed cyan-gold framing is permitted where one reusable component must cover both.
-5. Place callouts in a **safe HUD lane**. They must not cover actor faces/cards, dialogue, objectives or action choices.
-6. A Live State Callout is a **compact, content-sized tactical readout**, never a large card or vertical panel. Its normal form is one short category/header plus one factual state line, with no empty body beneath it.
-7. Safe placement is composition-aware rather than one absolute coordinate:
+3. Do not duplicate a baked participant nameplate with coded identity text. Coded participant presentation is state-only.
+4. When an object fact is naturally owned by a participant who is visibly on stage (for example Package Smuggler visibly holding the package), prefer the participant's state strip (`HAS PACKAGE`) instead of a second detached `PACKAGE SMUGGLER HAS PACKAGE` HUD box. Keep the Live State Callout for scene-wide transitions such as `EXCHANGE IN PROGRESS` or hidden/non-local state such as `RECOVERED · HIDDEN OPERATION`.
+5. Use **cyan emphasis for active / changing / in-progress state** and **gold emphasis for committed / settled / pivotal state**. Mixed cyan-gold framing is permitted where one reusable component must cover both.
+6. Place callouts in a **safe HUD lane**. They must not cover actor faces/cards, dialogue, objectives or action choices.
+7. A Live State Callout is a **compact, content-sized tactical readout**, never a large card or vertical panel. Its normal form is one short category/header plus one factual state line, with no empty body beneath it.
+8. Safe placement is composition-aware rather than one absolute coordinate:
    - default preference is the upper-left safe lane below/near the location tag when that does not cover actors;
    - the upper-right lane beneath the objective is acceptable only when the composition genuinely has room;
    - Hokage-office compositions should use the open left-side room lane because Minato owns the central authority position and dialogue may use the right-side safe zone.
-8. Card status readouts should retain stronger cyan/gold quick-read styling so moment-to-moment participant state remains legible even when no scene-level callout is required.
-9. Reduced-motion/accessibility does not remove the information; animation/glow is decorative, the text state remains sufficient.
+9. Card status readouts should retain stronger cyan/gold quick-read styling so moment-to-moment participant state remains legible even when no scene-level callout is required.
+10. Reduced-motion/accessibility does not remove the information; animation/glow is decorative, the text state remains sufficient.
 
 Canonical rule:
 
-> **Nameplates describe participants. Live State Callouts describe the evolving situation. Neither creates the truth it displays.**
+> **Baked nameplates identify participants. Runtime state strips describe visible participant state. Live State Callouts describe the wider evolving situation. None of them creates the truth it displays.**
 
 ## 8. Kakashi reference example — why this matters
 
