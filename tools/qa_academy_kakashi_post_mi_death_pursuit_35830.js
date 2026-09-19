@@ -117,11 +117,13 @@ assert(source35830.includes("if(ref===PAKKUN)return"),"Pakkun must bypass generi
 assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-board-33900__actor-frame\")"),"Pakkun regression guard must reject Character Card framing");
 assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
-assert(source35830.includes("top:4%!important"),"generic post-MI dialogue must clear the Character Card top edge");
+assert(source35830.includes("top:-6%!important")&&source35830.includes("positionCurrentDialogue35830"),"generic post-MI dialogue must be forced into the raised safe lane after global panel render");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
 assert(source35830.includes("packageRecoveryParentOccurrenceId35830")&&source35830.includes("post_mi_ps_package_recovery_parent_missing"),"PS post-Battle return must resolve an Origin-owned package parent before AK_SA_033");
+assert(source35830.includes('Kakashi Origin Backdrop/konoha_alleyway_alt_night.png')&&source35830.includes("PS_ALLEY_ALT_ASSET_ID"),"PS-focused route must use the exact alt-night alley backdrop");
+assert(source35830.includes('direct?BEAT.amtKill:TERMINAL_PENDING_BEAT')&&source35830.includes('rt.beatId=TERMINAL_PENDING_BEAT'),"package-secured AMT KILL must not route into the empty local report boundary");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-live",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:3,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
