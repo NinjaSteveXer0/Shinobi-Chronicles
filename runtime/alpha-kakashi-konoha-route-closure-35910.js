@@ -129,6 +129,13 @@ function observeIntent(choiceId,bindingRef){
  if(!stateRef||!choiceSetId)return{success:false,reason:"kakashi_observe_route_semantic_context_missing"};
  return ensureDecisionIntent({decisionPointRef:"OBSERVE_ESCALATION",choiceId,bindingRef,contextStateRef:stateRef,beatRef:OBSERVE_BEAT,choiceSetId,sourceOccurrenceRefs:[stateRef]});
 }
+function beginSharedObserveBattleChoice35910(choiceId,bindingRef,receiptKey,intentKey,nextBeatId){
+ const rt=active(),intent=observeIntent(choiceId,bindingRef);
+ if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_shared_observe_intent_failed"};
+ rt.localContext={...(rt.localContext||{}),[receiptKey]:String(intent.receipt&&intent.receipt.storyDecisionReceiptId||""),[intentKey]:String(intent.receipt&&intent.receipt.intentCommitRef||"")};
+ save();
+ return{success:true,choiceId,bindingRef,storyDecisionReceiptId:rt.localContext[receiptKey],intentCommitRef:rt.localContext[intentKey],nextBeatId};
+}
 function launch(config,binding,anchor,storyOccurrenceId,returnBeat,token,ctx={}){
  const rt=active(),cfg=BATTLE.configs&&BATTLE.configs[config]||null;
  const supplied=ctx&&ctx.returnContext&&typeof ctx.returnContext==="object"?ctx.returnContext:null;
@@ -483,7 +490,7 @@ globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910=Object.freeze({
  patchId:PATCH_ID,authority:AUTH,beats:D,
  resolveDirectStrikeEntry,beginReusedDirectStrikePhysical:beginReusedDirectStrikePhysical35910,consumeDirect2v1,consumeDirectMi,commitDirectGroupDisposition,
  resolveSecureBeforeChoice,consumeSecureBeforeBattle,resolveOriginalTargetChoice,consumeOriginalAmt,commitOriginalDisposition,
- patchGetCloserHandoff,diagnostics,browserGoldenClaimed:false
+ beginSharedObserveBattleChoice:beginSharedObserveBattleChoice35910,patchGetCloserHandoff,diagnostics,browserGoldenClaimed:false
 });
 globalThis.runAcademyKakashiKonohaRouteClosure35910Diagnostics=diagnostics;
 })();
