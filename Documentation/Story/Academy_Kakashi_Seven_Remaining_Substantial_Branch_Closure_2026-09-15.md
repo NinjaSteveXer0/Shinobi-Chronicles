@@ -1,5 +1,18 @@
 # Academy Kakashi Origin — Seven Remaining Substantial Branch Closure
 
+> **2026-09-19 PACKAGE-MISSING AMT DISPOSITION SUPERSESSION**  
+> For `WATCH THE EXCHANGE -> GO AFTER THE ORIGINAL TARGET -> AMT Battle victory`, the older statement that Kakashi automatically returns AMT alive to ANBU is superseded by:
+> `Documentation/Story/Academy_Kakashi_Package_Missing_AMT_Post_Battle_Disposition_Lock_2026-09-19.md`
+> commit `e06e06df9da15858f09a72d318cce233dc9e8333`.
+>
+> Current exact victory choices:
+> 1. **KILL HIM**
+> 2. **RESTRAIN HIM**
+> 3. **BRING HIM TO THE ANBU**
+> 4. **TAKE HIM TO THE UCHIHA POLICE FORCE**
+>
+> Package custody remains missing/separate. Do not auto-return AMT solely because this branch failed the package objective.
+
 **Date:** 2026-09-15  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED — LOCKED STORY / CAUSAL / BATTLE / RESOLVER AUTHORITY**
