@@ -1,5 +1,22 @@
 # Academy Kakashi Origin — Decision-Continuation Matrix + Pickpocket Route Lock
 
+> **2026-09-19 FAILED-PICKPOCKET 3-v-1 VICTORY SUPERSESSION**  
+> The older per-participant post-resolution classification language for the specific **direct Pickpocket failure -> Kakashi wins AMT + PS + MI 3-v-1** chronology is superseded by:
+> `Documentation/Story/Academy_Kakashi_Direct_Pickpocket_Verbatim_Scene_Family_2026-09-19.md`
+> commit `7e4e33b0e26d993ad9ff3dcf9bfae4cf25f587d6`.
+>
+> Current exact 3-v-1 victory choices are:
+> 1. **TAKE THEM TO THE UCHIHA POLICE FORCE**
+> 2. **TAKE THEM TO THE ANBU**
+> 3. **KILL THEM**
+> 4. **TAKE THE PACKAGE AND LET THEM GO**
+>
+> This route uses one group-disposition choice after the exceptional simultaneous victory rather than sequential per-target disposition menus.
+>
+> Package recovery remains a separate committed fact and is preserved across all four options.
+>
+> This supersession is branch-specific. Sequential routes may still produce mixed participant outcomes through their own individual decision windows.
+
 > **2026-09-19 PACKAGE-MISSING AMT DISPOSITION SUPERSESSION**  
 > Section 7's previously partial package-missing AMT continuation is now closed by:
 > `Documentation/Story/Academy_Kakashi_Package_Missing_AMT_Post_Battle_Disposition_Lock_2026-09-19.md`
