@@ -306,3 +306,42 @@ Issue impact:
 - #244 narrowed: no attempted-restraint success resolver needed; remaining scope is field-secured persistence, later escape/intervention, collection and group transfer.
 - #256 item 1 superseded: no separate PS attempted-lethal resolver merely because PS lacks hidden control classification.
 - Coding handoff #277: remove the control-state gate from MI/PS/AMT player-facing post-Battle choices and preserve existing timing/package/autonomy semantics.
+
+
+## 2026-09-19 — #281 restraint / collection / ANBU returns complete
+
+Stephen approved the complete post-restraint / collection / multi-captive transfer tranche and the supplemental ANBU-return scenes.
+
+Durable exact authorities:
+
+- `Documentation/Story/Academy_Kakashi_Post_Restraint_Collection_and_Multi_Captive_Transfer_Verbatim_Lock_2026-09-19.md`
+  - original approved lock: `bc8d0a1b5c6b829e0963feaa411864394ce7a092`
+  - PS exact alternate-night backdrop update: `b80a7b178509640f28ab9f586cad3d1d42b934f5`
+
+- `Documentation/Story/Academy_Kakashi_Supplemental_ANBU_Returns_PS_AMT_All_Three_Verbatim_Lock_2026-09-19.md`
+  - commit: `6af07c7e5374c2e6910c487d709961347a4b306f`
+
+- Kakashi backdrop inventory exact PS binding:
+  - `Documentation/Story/Academy_Kakashi_Origin_Backdrop_Asset_Inventory_and_Writing_Binding_2026-09-19.md`
+  - commit: `41ad6a16a5d776ccfec72e228998296b0f83f931`
+
+Current PS-focused backdrop:
+`Kakashi Origin Backdrop/konoha_alleyway_alt_night.png`
+
+Approved scenes now include:
+- MI `RESTRAIN HER AND CONTINUE`;
+- PS `RESTRAIN HIM AND CONTINUE`;
+- AMT `RESTRAIN HIM AND COLLECT THE OTHERS`;
+- state-driven collection of PS / MI;
+- singular/group final disposition projection;
+- group ANBU handoff;
+- group Uchiha Police handoff;
+- singular PS return to ANBU;
+- singular AMT + Pakkun return to ANBU;
+- all-three captive return journey into the approved group ANBU handoff.
+
+Kakashi uses `Wire Snare` / ninja wire as the physical restraint method after the player chooses RESTRAIN.
+
+#281 Writing work: COMPLETE.
+Coding/runtime implementation: separate; routed to the existing Kakashi Coding lane (#188).
+Browser Golden: not claimed.
