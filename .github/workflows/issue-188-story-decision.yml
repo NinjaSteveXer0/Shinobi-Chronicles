@@ -140,8 +140,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-64' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-64";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-65' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260919-65";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -215,17 +215,19 @@ jobs:
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "top:22%!important" runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "right:7.5%!important" runtime/alpha-kakashi-immediate-custody-35800.js
-          grep -Fq 'alpha_kakashi_scene03a_35700_v6_2026_09_19' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq 'alpha_kakashi_scene03a_35700_v7_2026_09_19' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchMiBurst35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchAmtBreakaway35700' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq 'if(index===12){' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-amt-offstage-35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'left:43%!important' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq 'left:22%!important' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'anbu_marked_target|masked_interceptor|package_smuggler' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'kakashi_scene_board_model_v8_33910_2026_09_19' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v9_33910_2026_09_19' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HAS PACKAGE · ESCAPE BLOCKED' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'BLOCKING ESCAPE' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'actors:[interceptor("BLOCKING ESCAPE"),smuggler("HAS PACKAGE")]' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'sc-watch-ps-turn-35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'Kakashi Origin Backdrop/alleyway_konoha_night.png' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'launchCurrentBattleTransition35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
