@@ -69,6 +69,7 @@ const POST_MI_PURSUIT_PATH="runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
 const KONOHA_CLOSURE_PATH="runtime/alpha-kakashi-konoha-writing-closure-35900.js";
 const KONOHA_ROUTE_CLOSURE_PATH="runtime/alpha-kakashi-konoha-route-closure-35910.js";
 const FIELD_SECURED_PATH="runtime/alpha-kakashi-field-secured-35920.js";
+const MOVE_CLOSER_CLOSURE_PATH="runtime/alpha-kakashi-move-closer-closure-35930.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
@@ -128,9 +129,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadMoveCloserClosure(){
+  if(globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930)return;
+  appendScript("sc-alpha-kakashi-move-closer-closure-35930-script",MOVE_CLOSER_CLOSURE_PATH);
+}
 function loadFieldSecured(){
-  if(globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920)return;
-  appendScript("sc-alpha-kakashi-field-secured-35920-script",FIELD_SECURED_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920){loadMoveCloserClosure();return;}
+  appendScript("sc-alpha-kakashi-field-secured-35920-script",FIELD_SECURED_PATH,loadMoveCloserClosure);
 }
 function loadKonohaRouteClosure(){
   if(globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910){loadFieldSecured();return;}
