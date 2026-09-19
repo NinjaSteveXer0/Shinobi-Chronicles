@@ -17,7 +17,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740)return;
 
-const PATCH_ID="alpha_kakashi_battle_development_35740_v3_2026_09_19";
+const PATCH_ID="alpha_kakashi_battle_development_35740_v4_2026_09_19";
 const KAKASHI="academy_kakashi";
 const ROUTE="academy_kakashi_origin_reward";
 const TECHNICAL=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
@@ -159,7 +159,7 @@ function syncBattleDevelopment35740(b=battle()){
     return{success:false,reason:"kakashi_reward_development_adapter_missing"};
   }
 
-  const attempts=rows.filter(row=>row&&row.eventType==="action_attempted"&&row.actorRef&&row.actorRef.side==="player"&&row.actorRef.participantId===KAKASHI&&row.actionId);
+  const attempts=rows.filter(row=>row&&row.eventType==="action_attempted"&&row.actorRef&&row.actorRef.side==="player"&&row.actionId);
   for(const attempt of attempts){
     const discipline=disciplineForAction(attempt,rows,b);if(!discipline)continue;
     const executionClass=hasMaterialEffect(attempt,rows)?"effective":"attempt";
@@ -169,7 +169,7 @@ function syncBattleDevelopment35740(b=battle()){
   }
 
   const staminaPackets=rows.filter(row=>{
-    if(!row||row.eventType!=="damage_resolved"||!row.targetRef||row.targetRef.side!=="player"||row.targetRef.participantId!==KAKASHI)return false;
+    if(!row||row.eventType!=="damage_resolved"||!row.targetRef||row.targetRef.side!=="player")return false;
     const data=row.data||{};
     return Number(data.resolvedAttackPL)>0&&Number(data.staminaMitigationAmount)>0;
   });
@@ -336,9 +336,10 @@ if(priorClaimRewards){
 function diagnostics(){
   const sync=syncBattleDevelopment35740.toString(),present=enhanceKakashiVictory35740.toString();
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v3_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v4_2026_09_19",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
     technicalDevelopmentUses34800:sync.includes("recordAcademyKakashiTechnicalDevelopment34800"),
+    storyDeploymentOwnsPlayerEvidence:sync.includes('row.actorRef.side==="player"')&&!sync.includes("row.actorRef.participantId===KAKASHI")&&!sync.includes("row.targetRef.participantId!==KAKASHI"),
     resolvedEvidenceMayOwnDiscipline:disciplineForAction.toString().includes("attemptData.primaryDiscipline")&&disciplineForAction.toString().includes("row.data.primaryDiscipline")&&sync.includes('row.eventType==="action_attempted"')&&!sync.includes("&&row.skillId&&row.actionId"),
     staminaDevelopmentUses34800:sync.includes("recordAcademyKakashiStaminaDevelopment34800"),
     exactCombatEvidence:sync.includes('eventType==="action_attempted"')&&sync.includes('eventType!=="damage_resolved"')===false&&sync.includes("staminaMitigationAmount"),
