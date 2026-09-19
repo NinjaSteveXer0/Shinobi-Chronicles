@@ -107,6 +107,11 @@ const source35830=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kaka
 assert(source35830.includes('Kakashi Origin Backdrop/alleyway_konoha_night.png'),"AMT encounter must use exact alleyway_konoha_night backdrop");
 assert(source35830.includes('"Assets/Summons/pakkun.png"'),"Pakkun Story-scene summon asset path missing");
 assert(!source35830.includes('"Portraits/Summons/pakkun.png"'),"Story scene must not reuse the Battle-only Pakkun portrait");
+assert(source35830.includes("sc-postmi-summon-35830"),"Pakkun must render through the plain Story summon surface");
+assert(source35830.includes("if(ref===PAKKUN)return"),"Pakkun must bypass generic Character Card markup");
+assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-board-33900__actor-frame\")"),"Pakkun regression guard must reject Character Card framing");
+assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
+assert(source35830.includes("right:29%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
