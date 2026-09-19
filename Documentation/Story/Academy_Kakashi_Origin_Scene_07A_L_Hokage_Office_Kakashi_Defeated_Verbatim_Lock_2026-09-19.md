@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Stephen / Writing — Konoha  
-**Status:** **STEPHEN-APPROVED / LOCKED VERBATIM — DO NOT CHANGE**
+**Status:** **STEPHEN-APPROVED / LOCKED VERBATIM — REVISED PLAYER-FACING PERFORMANCE AUTHORITY**
 
 **Entry:**  
 `STOP THE ASSASSIN`  
@@ -11,176 +11,377 @@
 → approved rooftop ANBU report  
 → black wipe
 
+**Writing-performance authority consumed:**
+- `Documentation/Story/Storywide_Player_Facing_Performance_and_Narrative_Craft_Successor_Authority_2026-09-14.md`;
+- `Documentation/Story/Character_Personality_and_Voice_Profile_Registry_2026-09-19.md`.
+
 ## Backdrop
+
 `hokage_administration_interior_night.png`
 
 ## Objective
+
 None.
+
+---
 
 ## Narration
 
-The recovered package rests on Minato’s desk.
+The recovered package rests on Minato's desk.
 
 ANBU Marked Target stands near the window.
 
-Package Smuggler is beside him.
+Package Smuggler has taken the wall beside him.
 
-Masked Interceptor stands across from them.
+Masked Interceptor stands opposite them, arms folded.
 
-The ANBU operative faces Minato.
+The ANBU operative remains nearest the desk.
 
-Minato looks down at Kakashi’s report.
+Kakashi's report lies open in front of Minato.
+
+He reads the last page once more.
+
+Then closes it.
 
 ## Dialogue
 
 **MINATO:**  
-“He couldn’t follow?”
+“He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in.”
+
+The ANBU operative nods.
 
 **ANBU OPERATIVE:**  
-“No.”
+“That is the sequence he reported.”
 
-Masked Interceptor folds her arms.
-
-**MASKED INTERCEPTOR:**  
-“I made sure of that.”
-
-Package Smuggler looks toward her.
+Package Smuggler looks across the room at Masked Interceptor.
 
 **PACKAGE SMUGGLER:**  
-“He actually tried to stop you.”
+“He makes it sound very orderly when you say it like that.”
+
+**MASKED INTERCEPTOR:**  
+“It wasn't.”
+
+**PACKAGE SMUGGLER:**  
+“I noticed.”
+
+ANBU Marked Target's attention stays on Minato.
+
+**ANBU MARKED TARGET:**  
+“How much did he understand before he moved?”
+
+**ANBU OPERATIVE:**  
+“Almost none of it.”
+
+He gestures lightly toward the closed report.
+
+**ANBU OPERATIVE:**  
+“He knew a package had changed hands. He knew you were the man he had been assigned to follow. Then he saw her pursuing the receiver.”
+
+Masked Interceptor looks toward Package Smuggler.
+
+**MASKED INTERCEPTOR:**  
+“Pursuing aggressively.”
+
+**PACKAGE SMUGGLER:**  
+“You threw a weapon at my head.”
+
+**MASKED INTERCEPTOR:**  
+“You moved.”
+
+**PACKAGE SMUGGLER:**  
+“That is generally what people do.”
+
+Minato lets the exchange pass.
+
+**ANBU OPERATIVE:**  
+“Kakashi had no reason to know she was part of the operation.”
+
+**ANBU MARKED TARGET:**  
+“So from where he was standing, he'd lost his assigned target and watched an unknown shinobi attack the man carrying the package.”
+
+**ANBU OPERATIVE:**  
+“Yes.”
+
+Masked Interceptor's eyes narrow slightly.
+
+**MASKED INTERCEPTOR:**  
+“And he decided that was enough.”
+
+**ANBU MARKED TARGET:**  
+“Was it?”
+
+She looks at him.
+
+**MASKED INTERCEPTOR:**  
+“Enough to make a decision?”
+
+A pause.
 
 **MASKED INTERCEPTOR:**  
 “Yes.”
 
-**ANBU MARKED TARGET:**  
-“Did he know who she was?”
+Her gaze shifts to Minato.
 
-**ANBU OPERATIVE:**  
-“No.”
+**MASKED INTERCEPTOR:**  
+“Enough to make the right one?”
 
-**ANBU MARKED TARGET:**  
-“Did he know who any of us were?”
+**MASKED INTERCEPTOR:**  
+“He didn't have enough information for that.”
 
-**ANBU OPERATIVE:**  
-“No.”
-
-Minato lifts his eyes from the report.
+Minato rests one hand on Kakashi's report.
 
 **MINATO:**  
-“What did he tell you?”
+“Neither did he.”
+
+Package Smuggler gives a quiet breath of amusement.
+
+**PACKAGE SMUGGLER:**  
+“That didn't stop him.”
+
+**MASKED INTERCEPTOR:**  
+“No.”
+
+This time there is something different in the answer.
+
+Less dismissal.
+
+**MASKED INTERCEPTOR:**  
+“He saw what looked like an assassination and put himself between me and the target.”
+
+**PACKAGE SMUGGLER:**  
+“And then you put him into the street.”
+
+**MASKED INTERCEPTOR:**  
+“He chose the fight.”
+
+**PACKAGE SMUGGLER:**  
+“You finished it.”
+
+**MASKED INTERCEPTOR:**  
+“Yes.”
+
+ANBU Marked Target turns slightly from the window.
+
+**ANBU MARKED TARGET:**  
+“How bad?”
+
+The question is directed at her.
+
+Masked Interceptor considers it.
+
+**MASKED INTERCEPTOR:**  
+“He wasn't ready for me.”
+
+**PACKAGE SMUGGLER:**  
+“That bad, then.”
+
+She ignores him.
+
+**MASKED INTERCEPTOR:**  
+“But he didn't hesitate once the fight started.”
+
+**ANBU MARKED TARGET:**  
+“That isn't the same as fighting well.”
+
+**MASKED INTERCEPTOR:**  
+“I didn't say it was.”
+
+Minato looks from one to the other.
+
+**MINATO:**  
+“What did he do after you disengaged?”
+
+The ANBU operative answers this time without consulting the report.
 
 **ANBU OPERATIVE:**  
-“The target made the handoff.”
+“Tried to reacquire the trail.”
 
-He looks toward Package Smuggler.
-
-**ANBU OPERATIVE:**  
-“The receiver escaped with the package.”
-
-Then toward Masked Interceptor.
+**MINATO:**  
+“And when he couldn't?”
 
 **ANBU OPERATIVE:**  
-“She pursued him.”
+“He returned.”
+
+Package Smuggler raises an eyebrow.
+
+**PACKAGE SMUGGLER:**  
+“That's it?”
+
+**ANBU OPERATIVE:**  
+“He reported the lost target, the lost package and the defeat.”
+
+**PACKAGE SMUGGLER:**  
+“I meant the explanation.”
+
+**ANBU OPERATIVE:**  
+“There wasn't one.”
+
+That catches ANBU Marked Target's attention.
+
+**ANBU MARKED TARGET:**  
+“He didn't blame her?”
+
+**ANBU OPERATIVE:**  
+“No.”
+
+**ANBU MARKED TARGET:**  
+“The assignment?”
+
+**ANBU OPERATIVE:**  
+“No.”
+
+**ANBU MARKED TARGET:**  
+“Bad information?”
+
+The operative shakes his head.
+
+**ANBU OPERATIVE:**  
+“He said he made the decision. Then he said he lost the fight.”
+
+The room goes quiet.
+
+Masked Interceptor looks at Kakashi's report.
+
+**MASKED INTERCEPTOR:**  
+“Good.”
+
+Package Smuggler turns toward her.
+
+**PACKAGE SMUGGLER:**  
+“That's generous.”
+
+**MASKED INTERCEPTOR:**  
+“No. It isn't.”
+
+She unfolds her arms.
+
+**MASKED INTERCEPTOR:**  
+“He lost.”
+
+Her eyes stay on the report.
+
+**MASKED INTERCEPTOR:**  
+“He should know exactly why he lost.”
+
+Then she looks at Minato.
+
+**MASKED INTERCEPTOR:**  
+“But he shouldn't invent a different decision afterward just because the one he made hurt.”
+
+Minato studies her for a moment.
+
+**MINATO:**  
+“You think he'd do that?”
+
+**MASKED INTERCEPTOR:**  
+“I think a lot of shinobi do.”
+
+ANBU Marked Target gives the smallest nod.
+
+**ANBU MARKED TARGET:**  
+“They learn the outcome first and rewrite the reason afterward.”
+
+**PACKAGE SMUGGLER:**  
+“Usually in a version where they were nearly right.”
+
+Minato looks down at the recovered package.
+
+Then at Kakashi's report beside it.
+
+**MINATO:**  
+“He doesn't know this is here.”
+
+No one answers.
+
+**MINATO:**  
+“He doesn't know who any of you are.”
+
+His eyes settle briefly on Masked Interceptor.
+
+**MINATO:**  
+“He doesn't know the person he tried to stop was protecting the same operation he was assigned to support.”
 
 Masked Interceptor says nothing.
 
-**ANBU OPERATIVE:**  
-“Kakashi intervened.”
+**MINATO:**  
+“So I won't judge his decision using information he never had.”
+
+ANBU Marked Target watches him carefully.
+
+**ANBU MARKED TARGET:**  
+“And the failure?”
 
 **MINATO:**  
-“And the fight?”
+“That doesn't disappear either.”
 
-**ANBU OPERATIVE:**  
-“He reported that she beat him.”
-
-Package Smuggler glances at Masked Interceptor.
-
-**PACKAGE SMUGGLER:**  
-“Just like that?”
-
-**ANBU OPERATIVE:**  
-“Just like that.”
-
-Minato looks down at the report again.
+He taps the closed report once.
 
 **MINATO:**  
-“No excuse?”
+“He chose to intervene.”
 
-**ANBU OPERATIVE:**  
-“None.”
+Then, more quietly:
 
-Masked Interceptor studies Minato.
+**MINATO:**  
+“And when that decision became a fight, he wasn't good enough to win it.”
+
+Masked Interceptor's expression does not change.
 
 **MASKED INTERCEPTOR:**  
-“He knew he lost.”
-
-**MINATO:**  
-“Yes.”
-
-**MASKED INTERCEPTOR:**  
-“And came back anyway.”
-
-**MINATO:**  
-“He was ordered to report.”
-
-**MASKED INTERCEPTOR:**  
-“That isn’t what I meant.”
+“Not tonight.”
 
 Minato looks at her.
 
 She nods toward the report.
 
 **MASKED INTERCEPTOR:**  
-“He didn’t know this was ours.”
+“If he remembers it properly, that part can change.”
 
-Her eyes move to the recovered package.
-
-**MASKED INTERCEPTOR:**  
-“He didn’t know I was chasing the right man.”
-
-**ANBU MARKED TARGET:**  
-“He saw you attack him.”
-
-**MASKED INTERCEPTOR:**  
-“And acted on what he saw.”
-
-Package Smuggler leans back slightly.
+Package Smuggler glances at her.
 
 **PACKAGE SMUGGLER:**  
-“And got put into the street for it.”
+“You almost sound impressed.”
 
 **MASKED INTERCEPTOR:**  
-“Yes.”
+“I beat him.”
 
-Minato closes the report.
+**PACKAGE SMUGGLER:**  
+“You've mentioned that.”
+
+A faint irritation crosses her face.
+
+ANBU Marked Target almost smiles.
+
+Minato picks up Kakashi's report.
 
 **MINATO:**  
 “He made a decision with incomplete information.”
 
-No one interrupts him.
+He places it beside the recovered package.
 
 **MINATO:**  
-“Then he lost the fight.”
+“He committed to it.”
 
-His eyes move briefly across the room.
+His hand leaves the report.
 
 **MINATO:**  
-“Both are part of what happened.”
+“And he failed.”
 
-Masked Interceptor looks toward the recovered package.
+Minato looks across the room.
+
+**MINATO:**  
+“All three things belong in the record.”
+
+Masked Interceptor looks once more at the report.
 
 **MASKED INTERCEPTOR:**  
-“He’ll remember the second part.”
+“Then make sure he gets the chance to improve the third.”
 
-Minato’s expression does not change.
+Minato's expression softens by almost nothing.
 
 **MINATO:**  
-“He should.”
+“That part is up to him.”
 
-She looks back at him.
-
-**MASKED INTERCEPTOR:**  
-“So will I.”
+---
 
 ## System / Resolver
 
@@ -198,17 +399,18 @@ Consume only the committed facts of the loss chronology:
 - Kakashi established no custody;
 - Pakkun never appeared;
 - the hidden operation subsequently has the recovered package;
-- Masked Interceptor, Package Smuggler and ANBU Marked Target are alive and present in this hidden evaluation scene;
-- Kakashi is **not present** and gains no Knowledge of this conversation, their hidden roles, or the package’s later recovery;
-- Kakashi’s own mission result remains a **failure** despite the hidden operation recovering its package;
-- Minato’s private evaluation records both Kakashi’s decision to intervene from incomplete Knowledge and his factual Battle defeat without collapsing one into the other.
+- Masked Interceptor, Package Smuggler and ANBU Marked Target are alive and present;
+- Kakashi is **not present** and gains no Knowledge of this conversation, their hidden roles, or the package's later recovery;
+- Kakashi's own mission result remains a **failure** despite the hidden operation recovering its package;
+- Minato records both Kakashi's decision under incomplete Knowledge and his factual Battle defeat without treating one as proof of the other.
 
 ## Choices
+
 None.
 
 ## Transition
 
-Minato sets Kakashi’s report down beside the recovered package.
+Minato sets Kakashi's report down beside the recovered package.
 
 **BLACK WIPE**
 
