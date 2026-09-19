@@ -69,7 +69,8 @@ assert(scene03Source.includes("scWatchMiBurst35700"),"MI burst animation missing
 assert(scene03Source.includes("scWatchAmtBreakaway35700"),"AMT breakaway animation missing");
 assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-breakaway-35700)")&&scene03Source.includes("opacity:1!important;filter:none!important"),"WATCH THE EXCHANGE must keep present actors vivid without suppressing the simultaneous AMT-exit / MI-entry cue");
 assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes("left:22%!important")&&scene03Source.includes("right:22%!important"),"WATCH final choice must pin only MI / PS to distinct non-overlapping lanes");
-assert(scene03Source.includes('if(index===12){')&&scene03Source.includes('amtNode.classList.add("sc-watch-amt-breakaway-35700")')&&scene03Source.includes('miNode.classList.add("sc-watch-mi-burst-35700")'),"Cue 13 must animate AMT off-screen at the exact moment MI appears");
+assert(scene03Source.includes("playWatchCue12Swap35700(amtNode,miNode)")&&scene03Source.includes('amtNode.classList.add("sc-watch-amt-breakaway-35700")')&&scene03Source.includes('miNode.classList.add("sc-watch-mi-burst-35700")'),"Cue 13 must animate AMT off-screen at the exact moment MI appears");
+assert(scene03Source.includes("requestAnimationFrame(()=>requestAnimationFrame(fire))")&&scene03Source.includes("void amtNode.offsetWidth"),"Cue 13 swap must cross a real browser paint boundary so AMT cannot pop away");
 assert(scene03Source.includes("sc-watch-handoff-giver-35700"),"package handoff animation missing");
 assert(scene03Source.includes("sc-watch-mi-cutoff-35700"),"MI interception animation missing");
 assert(scene03Source.includes("sc-watch-ps-turn-35700")&&!scene03Source.includes("sc-watch-ps-escape-35700"),"Package Smuggler must hold the exchange lane before branch-specific escape");
