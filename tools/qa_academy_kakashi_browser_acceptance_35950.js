@@ -36,6 +36,7 @@ ctx.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410={
 };
 ctx.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910={
  beats:{secureBeforeIntro:"kak_konoha_secure_before_intro_35910",originalIntro:"kak_konoha_original_target_intro_35910",directIntro:"kak_konoha_direct_strike_intro_35910"},
+ beginSharedObserveBattleChoice:()=>({success:true}),
  resolveSecureBeforeChoice:()=>({success:true}),
  resolveOriginalTargetChoice:()=>({success:true}),
  patchGetCloserHandoff(){const row=success.choices.find(x=>x.choiceId==="let_handoff_happen");row.nextBeatId="kak_original_major_choice";return true;}
