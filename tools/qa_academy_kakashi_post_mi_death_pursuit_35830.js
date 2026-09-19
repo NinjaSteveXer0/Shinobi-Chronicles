@@ -31,11 +31,16 @@ globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300={
 globalThis.projectAcademyKakashiOriginBattleResult=()=>globalThis.currentResult||null;
 globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(){
  recoveryCalls+=1;
+ const parentId=String(active&&active.localContext&&(active.localContext.kakashiSequentialPackageOccurrenceId35100||active.localContext.kakashiSequentialPackageOccurrenceId)||"");
+ const parent=store.get(parentId)||null,parentPackage=parent&&parent.fact&&parent.fact.packageState||{};
+ if(!parent||parentPackage.objectRef!=="kakashi_origin_outer_route_packet"||String(parentPackage.currentHolderClass||parentPackage.custodyClass||"")!=="PACKAGE_SMUGGLER"){
+   return{success:false,reason:"qa_ak_sa_033_parent_package_occurrence_missing",parentId};
+ }
  participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-ps-defeated"};
  const id="kak_seq_secure_package_after_ps";
- if(!store.has(id))store.set(id,{occurrenceId:id,fact:{factClass:"academy_kakashi_sequential_post_ps_package_recovery",storySceneInstanceId:active.instanceId,battleOccurrenceId:active.battleResume.authored.battleOccurrenceId,packageState:{objectRef:"kakashi_origin_outer_route_packet",previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",packageRecovered:true}}});
+ if(!store.has(id))store.set(id,{occurrenceId:id,fact:{factClass:"academy_kakashi_sequential_post_ps_package_recovery",storySceneInstanceId:active.instanceId,battleOccurrenceId:active.battleResume.authored.battleOccurrenceId,parentOccurrenceRef:parentId,packageState:{objectRef:"kakashi_origin_outer_route_packet",previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",packageRecovered:true}}});
  active.localContext.kakashiSequentialPackageOccurrenceId=id;active.localContext.kakashiSequentialPackageOccurrenceId35100=id;
- return{success:true,recovered:true,packageOccurrenceId:id};
+ return{success:true,recovered:true,packageOccurrenceId:id,parentOccurrenceId:parentId};
 };
 
 const liveBeat={beatId:LIVE_SOURCE,mode:"choice",choices:[
@@ -116,9 +121,9 @@ assert(source35830.includes("top:4%!important"),"generic post-MI dialogue must c
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
+assert(source35830.includes("packageRecoveryParentOccurrenceId35830")&&source35830.includes("post_mi_ps_package_recovery_parent_missing"),"PS post-Battle return must resolve an Origin-owned package parent before AK_SA_033");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
-store.set("battle-mi-live",{occurrenceId:"battle-mi-live",fact:{factClass:"battle_result"}});
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-live",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:3,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
 MOD.wireEntryChoices();
 let out=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
@@ -128,6 +133,22 @@ const liveSelection=store.get(active.localContext.kakashiPostMiPursuitSelectionO
 assert(liveSelection,"live pursuit selection occurrence missing");
 assert.strictEqual(liveSelection.fact.miDeathAlreadyCommitted,false,"live pursuit falsely committed MI death");
 assert.strictEqual(liveSelection.fact.sourceMiResolutionState,"DEFEATED_BUT_NOT_CONTROLLED");
+assert.strictEqual(store.has("battle-mi-live"),false,"QA must model the live MI Battle id as NOT being an Origin occurrence");
+assert.strictEqual(active.localContext.kakashiPostMiPackageOccurrenceId,active.localContext.kakashiPostMiPursuitSelectionOccurrenceId,"live pursuit must advance package provenance to the Origin-owned selection occurrence");
+
+launches.length=0;
+drainNarration(MOD.beats.psBattle);
+assert.strictEqual(launches.length,1,"live PS battle transition did not auto-launch exactly once");
+assert.strictEqual(active.localContext.kakashiPostMiPackageOccurrenceId,active.localContext.kakashiPostMiPursuitResolutionOccurrenceId,"reached PS pursuit must advance package provenance to the Origin-owned pursuit-resolution occurrence");
+simulateBattleReturn(MOD.beats.psBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-live-ps-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.psReturn);
+const livePsReturnBeat=definition.beatMap.get(MOD.beats.psReturn);
+const livePsReturned=livePsReturnBeat.onEnterConsequences.find(x=>x.requestId==="postmi_35830_ps_return_consume").resolve();
+assert.strictEqual(livePsReturned.success,true,"live MI -> PS Battle return must not depend on an Origin occurrence for the earlier MI Battle id: "+JSON.stringify(livePsReturned));
+assert.strictEqual(active.beatId,MOD.beats.psWin,"live MI -> PS Battle return must resume authored PS victory Story");
+assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.parentOccurrenceRef.includes("occ_origin_kakashi_post_mi_ps_battle_return"),true,"AK_SA_033 must consume an Origin-owned PS Battle-return package parent");
+store.delete("kak_seq_secure_package_after_ps");
+participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"};
+recoveryCalls=0;
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi-amt"};
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-live-amt",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:4,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
