@@ -95,6 +95,17 @@ assert.strictEqual(immediateClaim.success,true);assert.strictEqual(immediateClai
 assert.strictEqual(playerData.ryo,50,"immediate claim retry must not duplicate Ryō");
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="field_recovery_pill").reduce((n,row)=>n+Number(row.quantity||1),0),1,"immediate claim retry must not duplicate pill");
 
+// The sequential Observe-route MI stage is the same authorised solo MI reward class.
+const seqMiBattle=JSON.parse(JSON.stringify(miBattle));
+seqMiBattle.battleId="battle-mi-sequential-1";
+seqMiBattle.kakashiOriginDeployment.battleOccurrenceId="battle-mi-sequential-1";
+seqMiBattle.kakashiOriginDeployment.battleConfigId="academy_kakashi_origin_battle_seq_mi";
+const seqMiEntitlement=context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(seqMiBattle);
+assert.strictEqual(seqMiEntitlement.success,true,"sequential solo MI victory must qualify for the authored immediate reward");
+assert.strictEqual(seqMiEntitlement.entitlement.battleConfigId,"academy_kakashi_origin_battle_seq_mi");
+assert.strictEqual(seqMiEntitlement.entitlement.materialReward.ryo,50);
+assert.strictEqual(seqMiEntitlement.entitlement.materialReward.items[0].itemId,"field_recovery_pill");
+
 // Loss and multi-target MI Battles do not qualify by implication.
 const lossBattle=JSON.parse(JSON.stringify(miBattle));lossBattle.battleId="battle-mi-loss";lossBattle.outcome={type:"defeat"};lossBattle.kakashiOriginDeployment.battleOccurrenceId="battle-mi-loss";
 assert.strictEqual(context.ensureAcademyKakashiMiVictoryBattleEntitlement34800(lossBattle).success,false);
@@ -163,4 +174,4 @@ r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
 assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,400);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1,"same-source retry must not duplicate weapon grant");
 
-console.log(JSON.stringify({pass:true,adapter:"34800-v5",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",claimIdempotent:true},downstreamBattleCash:{ps:50,amt:50,claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
+console.log(JSON.stringify({pass:true,adapter:"34800-v6",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",sequentialRouteCovered:true,claimIdempotent:true},downstreamBattleCash:{ps:50,amt:50,claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
