@@ -70,6 +70,7 @@ const KONOHA_CLOSURE_PATH="runtime/alpha-kakashi-konoha-writing-closure-35900.js
 const KONOHA_ROUTE_CLOSURE_PATH="runtime/alpha-kakashi-konoha-route-closure-35910.js";
 const FIELD_SECURED_PATH="runtime/alpha-kakashi-field-secured-35920.js";
 const MOVE_CLOSER_CLOSURE_PATH="runtime/alpha-kakashi-move-closer-closure-35930.js";
+const DYNAMIC_TERMINAL_PATH="runtime/alpha-kakashi-dynamic-terminal-35940.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
@@ -129,9 +130,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadDynamicTerminal(){
+  if(globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940)return;
+  appendScript("sc-alpha-kakashi-dynamic-terminal-35940-script",DYNAMIC_TERMINAL_PATH);
+}
 function loadMoveCloserClosure(){
-  if(globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930)return;
-  appendScript("sc-alpha-kakashi-move-closer-closure-35930-script",MOVE_CLOSER_CLOSURE_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930){loadDynamicTerminal();return;}
+  appendScript("sc-alpha-kakashi-move-closer-closure-35930-script",MOVE_CLOSER_CLOSURE_PATH,loadDynamicTerminal);
 }
 function loadFieldSecured(){
   if(globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920){loadMoveCloserClosure();return;}
