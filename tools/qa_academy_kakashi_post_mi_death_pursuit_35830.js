@@ -105,7 +105,8 @@ const diag=globalThis.runAcademyKakashiPostMiDeathPursuit35830Diagnostics();
 assert.strictEqual(diag.pass,true,"35830 diagnostics failed: "+JSON.stringify(diag.failed));
 const source35830=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"),"utf8");
 assert(source35830.includes('Kakashi Origin Backdrop/alleyway_konoha_night.png'),"AMT encounter must use exact alleyway_konoha_night backdrop");
-assert(source35830.includes('"Assets/Summons/pakkun.png"'),"Pakkun collectible Story card asset path missing");
+assert(source35830.includes('"Assets/Summons/pakkun.png"'),"Pakkun Story-scene summon asset path missing");
+assert(!source35830.includes('"Portraits/Summons/pakkun.png"'),"Story scene must not reuse the Battle-only Pakkun portrait");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
