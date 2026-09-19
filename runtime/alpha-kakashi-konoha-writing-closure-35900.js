@@ -27,7 +27,7 @@ const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 const POSTMI=globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830;
 if(!A||!CORE||!BATTLE||!PROVIDER||!TERMINAL||!POSTMI)throw new Error("kakashi_konoha_closure_35900_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_konoha_closure_35900_v1_2026_09_20";
+const PATCH_ID="alpha_kakashi_konoha_closure_35900_v2_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const KAK="academy_kakashi";
@@ -36,7 +36,9 @@ const PAKKUN="pakkun_origin_unfamiliar_ninken";
 const PACKAGE="kakashi_origin_outer_route_packet";
 const TERMINAL_PENDING="kak_seq_debrief_pending";
 const AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
+const AMT_SECURE_PACKAGE_CONFIG="academy_kakashi_origin_battle_kakashi_pakkun_vs_amt";
 const AMT_BINDING="academy_kakashi.battle.stop_assassin_post_mi_amt";
+const CE256_AMT_BATTLE_CONFIGS=Object.freeze([AMT_CONFIG,AMT_SECURE_PACKAGE_CONFIG]);
 const CE256_BINDING="academy_kakashi.resolver.post_amt_defeat_package_reach";
 const CE256_PACKAGE_AUTHORITY="09db8ff4efc28ee608d41c828af48efc023d324f";
 const CE256_DIRECT_AUTHORITY="7a95637765a58b8f12b0bac877032625266830f6";
@@ -69,7 +71,7 @@ function latestResult(){
 }
 function packageOccurrenceId(rt=active()){
  const l=rt&&rt.localContext||{};
- return String(l.kakashiPostMiPackageOccurrenceId||l.kakashiSequentialPackageOccurrenceId35100||l.kakashiSequentialPackageOccurrenceId||l.kakashiObserveSecurePackageOccurrenceId||"");
+ return String(l.kakashiKonohaPackageOccurrenceId||l.kakashiPostMiPackageOccurrenceId||l.kakashiSequentialPackageOccurrenceId35100||l.kakashiSequentialPackageOccurrenceId||l.kakashiObserveSecurePackageOccurrenceId||l.kakashiGetCloserStayPackagePursuitOccurrenceId||"");
 }
 function packageState(rt=active()){
  const id=packageOccurrenceId(rt),row=occurrence(id),f=factOf(row),pkg=f.packageState||{};
@@ -132,8 +134,8 @@ function commitCe256Package({receipt,request,result}){
  };
  const committed=commitOnce(id,fact,fact.selectedOutcomeRef,[ORIGIN_ID,AMT],[{type:"battle_occurrence",id:String(battle.battleOccurrenceId||"")},{type:"world_object",id:PACKAGE},{type:"writing_authority",id:CE256_PACKAGE_AUTHORITY}]);if(!committed.success)return committed;
  const material=recordPackageMaterial(id,pkg);if(!material||material.success!==true)return material||{success:false,reason:"ce256_package_material_commit_failed"};
- rt.localContext={...(rt.localContext||{}),kakashiPostMiPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id,kakashiCe256PackageOccurrenceId:id,kakashiCe256PackageOutcomeRef:fact.selectedOutcomeRef};save();
- return{success:true,occurrenceId:id,consequenceRefs:[id],stateDeltaRefs:[id],objectCustodyDeltaRefs:[id],participantStateDeltaRefs:[],successorSituationRef:AMT_AFTERMATH};
+ rt.localContext={...(rt.localContext||{}),kakashiKonohaPackageOccurrenceId:id,kakashiPostMiPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id,kakashiCe256PackageOccurrenceId:id,kakashiCe256PackageOutcomeRef:fact.selectedOutcomeRef};save();
+ return{success:true,occurrenceId:id,consequenceRefs:[id],stateDeltaRefs:[id],objectCustodyDeltaRefs:[id],participantStateDeltaRefs:[],successorSituationRef:String(request&&request.context&&request.context.successorSituationRef||AMT_AFTERMATH)};
 }
 const ce256Registration=PROVIDER.registerStoryFactualResolverBinding(CE256_BINDING,{
  ownerRef:"academy_kakashi.konoha_closure.ce256",
@@ -178,8 +180,60 @@ function consumePakkunAfterCe256(packageResolution){
  };
  const committed=commitOnce(id,fact,guard?"PAKKUN_GUARDS_PACKAGE":"PAKKUN_REMAINS_PRESENT",[ORIGIN_ID,AMT,PAKKUN],[{type:"origin_occurrence",id:stateRef,role:"package_resolution"},{type:"story_autonomy_anchor",id:"AK_SA_012"},{type:"writing_authority",id:CE256_PACKAGE_AUTHORITY}]);if(!committed.success)return committed;
  const material=recordPackageMaterial(id,finalPkg);if(!material||material.success!==true)return material;
- rt.localContext={...(rt.localContext||{}),kakashiPostMiPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id,kakashiCe256PakkunOccurrenceId:id,kakashiPostMiPakkunPresent:true,kakashiCe256PakkunState:guard?"GUARDING_PACKAGE":"PRESENT"};save();
+ rt.localContext={...(rt.localContext||{}),kakashiKonohaPackageOccurrenceId:id,kakashiPostMiPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id,kakashiCe256PakkunOccurrenceId:id,kakashiKonohaPakkunPresent:true,kakashiPostMiPakkunPresent:true,kakashiCe256PakkunState:guard?"GUARDING_PACKAGE":"PRESENT"};save();
  return{success:true,occurrenceId:id,packageState:finalPkg,pakkunState:guard?"GUARDING_PACKAGE":"PRESENT"};
+}
+function resolveAmtDefeatFacts35900(options={}){
+ const rt=active(),battle=options.battleResult&&typeof options.battleResult==="object"?options.battleResult:latestResult();
+ if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"ce256_amt_story_context_required"};
+ if(!battle||!battle.battleOccurrenceId||!CE256_AMT_BATTLE_CONFIGS.includes(String(battle.battleConfigId||"")))return{success:false,reason:"ce256_amt_battle_receipt_mismatch"};
+ if(String(battle.resultState||"")!=="opposition_side_victory")return{success:false,reason:"ce256_amt_defeat_result_required",resultState:String(battle.resultState||"")};
+ rt.localContext=rt.localContext&&typeof rt.localContext==="object"?rt.localContext:{};
+ const suppliedPackageOccurrenceId=String(options.packageOccurrenceId||"");
+ if(suppliedPackageOccurrenceId)rt.localContext.kakashiKonohaPackageOccurrenceId=suppliedPackageOccurrenceId;
+ const inputPackageOccurrenceId=packageOccurrenceId(rt);
+ const routeRef=String(options.routeRef||battle.bindingRef||battle.battleConfigId||"amt_pakkun");
+ const existingFinalId=stable("occ_origin_kakashi_ce256_amt_defeat_complete",{scene:String(rt.instanceId||""),battle:String(battle.battleOccurrenceId||""),routeRef});
+ const existing=occurrence(existingFinalId);
+ if(existing){
+  const ef=factOf(existing),pkg=clone(ef.packageState||packageState(rt)),pakkunState=String(ef.participantStateByRef&&ef.participantStateByRef[PAKKUN]&&ef.participantStateByRef[PAKKUN].autonomyState||"PRESENT");
+  return{success:true,idempotent:true,occurrenceId:existingFinalId,packageState:pkg,pakkunState,routeRef};
+ }
+
+ const pkg=packageState(rt);
+ const parent=String(options.parentRef||rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId||rt.localContext.kakashiPostMiPakkunReachOccurrenceId||rt.localContext.kakashiObserveSecurePackageAmtPursuitOccurrenceId||battle.battleOccurrenceId||"");
+ const factual=PROVIDER.resolveStoryFactualAction({
+  storyDecisionReceiptId:parent,
+  bindingRef:CE256_BINDING,
+  actorRef:AMT,
+  intentCommitRef:parent,
+  attemptOrdinal:1,
+  idempotenceKey:stable("sc35900-ce256-amt-defeat",{scene:String(rt.instanceId||""),battle:String(battle.battleOccurrenceId||""),packageOccurrence:inputPackageOccurrenceId,routeRef}),
+  inputStateRefs:[String(battle.battleOccurrenceId||""),inputPackageOccurrenceId].filter(Boolean),
+  continuityLineageRef:String(rt.instanceId||""),
+  state:{packageState:pkg,pakkunPresent:rt.localContext.kakashiKonohaPakkunPresent===true||rt.localContext.kakashiPostMiPakkunPresent===true},
+  context:{storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(battle.battleOccurrenceId||""),beatId:String(options.returnBeatId||rt.beatId||""),routeRef,successorSituationRef:String(options.successorSituationRef||"")}
+ });
+ if(!factual||factual.success!==true)return factual||{success:false,reason:"ce256_package_resolution_failed"};
+ const pakkun=consumePakkunAfterCe256(factual.result);if(!pakkun||pakkun.success!==true)return pakkun||{success:false,reason:"ce256_pakkun_resolution_failed"};
+ const finalId=stable("occ_origin_kakashi_ce256_amt_defeat_complete",{scene:String(rt.instanceId||""),battle:String(battle.battleOccurrenceId||""),routeRef});
+ const fact={
+  factClass:"academy_kakashi_amt_defeats_kakashi_pakkun_complete",
+  anchorRef:"AK_SA_027",
+  authorityCommit:CE256_PACKAGE_AUTHORITY,
+  storySceneInstanceId:String(rt.instanceId||""),
+  routeRef,
+  battleOccurrenceId:String(battle.battleOccurrenceId||""),
+  battleConfigId:String(battle.battleConfigId||""),
+  battleBindingRef:String(battle.bindingRef||""),
+  battleResultState:"opposition_side_victory",
+  packageState:clone(pakkun.packageState),
+  participantStateByRef:{[AMT]:{presenceState:"ESCAPED",controlState:"FREE"},[PAKKUN]:{presenceState:"PRESENT",autonomyState:pakkun.pakkunState,temporaryParticipationOnly:true,ownershipGranted:false,nameKnowledgeGranted:false}},
+  worldFacts:{amtEscaped:true,pakkunPresent:true,noInjuryInferred:true,packageCustodyDerivedFromResolver:true,battleVictoryDidNotImplyPackageCustody:true}
+ };
+ const committed=commitOnce(finalId,fact,"AMT_BATTLE_DEFEAT_FACTS_RESOLVED",[ORIGIN_ID,AMT,PAKKUN],[{type:"battle_occurrence",id:String(battle.battleOccurrenceId||"")},{type:"origin_occurrence",id:pakkun.occurrenceId,role:"pakkun_autonomy"},{type:"writing_authority",id:CE256_PACKAGE_AUTHORITY}]);if(!committed.success)return committed;
+ rt.localContext={...(rt.localContext||{}),kakashiCe256LastAmtDefeatOccurrenceId:finalId,kakashiKonohaPackageOccurrenceId:pakkun.occurrenceId,kakashiPostMiPackageOccurrenceId:pakkun.occurrenceId,kakashiSequentialPackageOccurrenceId35100:pakkun.occurrenceId,kakashiKonohaPakkunPresent:true};save();
+ return{success:true,idempotent:false,occurrenceId:finalId,packageState:clone(pakkun.packageState),pakkunState:pakkun.pakkunState,routeRef};
 }
 function resolveCe256AmtDefeat(){
  const rt=active(),battle=latestResult();
@@ -188,39 +242,18 @@ function resolveCe256AmtDefeat(){
  if(String(battle.resultState||"")==="player_side_victory")return POSTMI.consumeAmtReturn();
  if(String(battle.resultState||"")!=="opposition_side_victory")return{success:false,reason:"ce256_amt_battle_result_unresolved"};
  if(rt.localContext&&rt.localContext.kakashiCe256AmtDefeatProcessed===true)return{success:true,idempotent:true,beatId:rt.beatId};
-
- const pkg=packageState(rt);
- const parent=String(rt.localContext&&rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId||rt.localContext&&rt.localContext.kakashiPostMiPakkunReachOccurrenceId||battle.battleOccurrenceId||"");
- const factual=PROVIDER.resolveStoryFactualAction({
-  storyDecisionReceiptId:parent,
-  bindingRef:CE256_BINDING,
-  actorRef:AMT,
-  intentCommitRef:parent,
-  attemptOrdinal:1,
-  idempotenceKey:stable("sc35900-ce256-amt-defeat",{scene:String(rt.instanceId||""),battle:String(battle.battleOccurrenceId||""),packageOccurrence:packageOccurrenceId(rt)}),
-  inputStateRefs:[String(battle.battleOccurrenceId||""),packageOccurrenceId(rt)].filter(Boolean),
-  continuityLineageRef:String(rt.instanceId||""),
-  state:{packageState:pkg,pakkunPresent:rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true},
-  context:{storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(battle.battleOccurrenceId||""),beatId:rt.beatId}
+ const resolved=resolveAmtDefeatFacts35900({
+  battleResult:battle,
+  packageOccurrenceId:packageOccurrenceId(rt),
+  parentRef:String(rt.localContext&&rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId||rt.localContext&&rt.localContext.kakashiPostMiPakkunReachOccurrenceId||battle.battleOccurrenceId||""),
+  routeRef:"stop_assassin_post_mi_amt",
+  returnBeatId:AMT_RETURN,
+  successorSituationRef:AMT_AFTERMATH
  });
- if(!factual||factual.success!==true)return factual||{success:false,reason:"ce256_package_resolution_failed"};
- const pakkun=consumePakkunAfterCe256(factual.result);if(!pakkun||pakkun.success!==true)return pakkun||{success:false,reason:"ce256_pakkun_resolution_failed"};
- const finalId=stable("occ_origin_kakashi_ce256_amt_defeat_complete",{scene:String(rt.instanceId||""),battle:String(battle.battleOccurrenceId||""),packageOccurrence:pakkun.occurrenceId});
- const fact={
-  factClass:"academy_kakashi_amt_defeats_kakashi_pakkun_complete",
-  anchorRef:"AK_SA_027",
-  authorityCommit:CE256_PACKAGE_AUTHORITY,
-  storySceneInstanceId:String(rt.instanceId||""),
-  battleOccurrenceId:String(battle.battleOccurrenceId||""),
-  battleResultState:"opposition_side_victory",
-  packageState:clone(pakkun.packageState),
-  participantStateByRef:{[AMT]:{presenceState:"ESCAPED",controlState:"FREE"},[PAKKUN]:{presenceState:"PRESENT",autonomyState:pakkun.pakkunState,temporaryParticipationOnly:true,ownershipGranted:false,nameKnowledgeGranted:false}},
-  worldFacts:{amtEscaped:true,pakkunPresent:true,noInjuryInferred:true,packageCustodyDerivedFromResolver:true}
- };
- const committed=commitOnce(finalId,fact,"AMT_BATTLE_DEFEAT_FACTS_RESOLVED",[ORIGIN_ID,AMT,PAKKUN],[{type:"battle_occurrence",id:String(battle.battleOccurrenceId||"")},{type:"origin_occurrence",id:pakkun.occurrenceId,role:"pakkun_autonomy"},{type:"writing_authority",id:CE256_PACKAGE_AUTHORITY}]);if(!committed.success)return committed;
- rt.localContext={...(rt.localContext||{}),kakashiCe256AmtDefeatProcessed:true,kakashiCe256AmtDefeatOccurrenceId:finalId,kakashiPostMiPackageOccurrenceId:pakkun.occurrenceId,kakashiSequentialPackageOccurrenceId35100:pakkun.occurrenceId,kakashiPostMiAmtReturnProcessed:true,[CURSOR]:0};
+ if(!resolved||resolved.success!==true)return resolved||{success:false,reason:"ce256_amt_defeat_fact_resolution_failed"};
+ rt.localContext={...(rt.localContext||{}),kakashiCe256AmtDefeatProcessed:true,kakashiCe256AmtDefeatOccurrenceId:resolved.occurrenceId,kakashiPostMiPackageOccurrenceId:String(rt.localContext.kakashiKonohaPackageOccurrenceId||""),kakashiSequentialPackageOccurrenceId35100:String(rt.localContext.kakashiKonohaPackageOccurrenceId||""),kakashiPostMiAmtReturnProcessed:true,[CURSOR]:0};
  rt.beatId=AMT_AFTERMATH;save();
- return{success:true,victory:false,occurrenceId:finalId,packageState:clone(pakkun.packageState),pakkunState:pakkun.pakkunState,nextBeatId:AMT_AFTERMATH};
+ return{...resolved,victory:false,nextBeatId:AMT_AFTERMATH};
 }
 
 const BASE_CUES=Object.freeze([
@@ -305,14 +338,16 @@ function diagnostics(){
  const def=scene(),amtReturn=def&&def.beatMap instanceof Map?def.beatMap.get(AMT_RETURN):null,aftermath=def&&def.beatMap instanceof Map?def.beatMap.get(AMT_AFTERMATH):null;
  const registered=PROVIDER.getRegisteredStoryFactualBindings().find(row=>row.bindingRef===CE256_BINDING)||null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_konoha_closure_35900_v1_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_konoha_closure_35900_v2_2026_09_20",
   writing100Pinned:WRITING_100_AUTHORITY==="21e0407a0c371310ff06096905fd1fce4107ece8",
   ce256AuthorityPinned:CE256_PACKAGE_AUTHORITY==="09db8ff4efc28ee608d41c828af48efc023d324f",
   ce244ClosedAuthorityPinned:CE244_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0",
   neutralProviderExact:PROVIDER.providerId==="ce.neutral_story_factual_resolver.v1",
   ce256BindingRegistered:!!registered&&registered.outcomeRefs.join("|")==="AMT_ESCAPE_PACKAGE_UNCHANGED_ELSEWHERE|AMT_ESCAPE_PACKAGE_UNCHANGED_KAKASHI_SIDE|AMT_ESCAPE_PACKAGE_RECLAIMED_BY_AMT",
   noBattlePackageInference:resolveCe256AmtDefeat.toString().includes("resolveStoryFactualAction")&&commitCe256Package.toString().includes("battleVictoryDidNotImplyPackageCustody:true"),
-  packageBeforePakkunOrdering:resolveCe256AmtDefeat.toString().indexOf("resolveStoryFactualAction")<resolveCe256AmtDefeat.toString().indexOf("consumePakkunAfterCe256"),
+  packageBeforePakkunOrdering:resolveAmtDefeatFacts35900.toString().indexOf("resolveStoryFactualAction")<resolveAmtDefeatFacts35900.toString().indexOf("consumePakkunAfterCe256"),
+  sharedAmtPakkunConfigsExact:CE256_AMT_BATTLE_CONFIGS.join("|")==="academy_kakashi_origin_battle_seq_amt_pakkun|academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",
+  sharedAmtDefeatOwnerExported:typeof resolveAmtDefeatFacts35900==="function"&&resolveAmtDefeatFacts35900.toString().includes("routeRef"),
   pakkunAutonomyConsumed:consumePakkunAfterCe256.toString().includes("consumeNextAutonomy")&&consumePakkunAfterCe256.toString().includes("AK_SA_012"),
   pakkunNoOwnershipLeak:consumePakkunAfterCe256.toString().includes("ownershipGranted:false")&&consumePakkunAfterCe256.toString().includes("nameKnowledgeGranted:false"),
   amtReturnOverridden:!!amtReturn&&Array.isArray(amtReturn.onEnterConsequences)&&amtReturn.onEnterConsequences.some(row=>row&&row.requestId==="kakashi_ce256_amt_defeat_consume_35900"),
@@ -325,10 +360,11 @@ function diagnostics(){
  return{pass:failed.length===0,checks,failed,ce256Binding:registered,amtAftermathBeatId:AMT_AFTERMATH,browserGoldenClaimed:false};
 }
 
+globalThis.resolveAcademyKakashiAmtDefeatFacts35900=resolveAmtDefeatFacts35900;
 globalThis.resolveAcademyKakashiCe256AmtDefeat35900=resolveCe256AmtDefeat;
 globalThis.runAcademyKakashiKonohaClosure35900Diagnostics=diagnostics;
 globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900=Object.freeze({
  patchId:PATCH_ID,writing100Authority:WRITING_100_AUTHORITY,ce256Authority:CE256_PACKAGE_AUTHORITY,ce244Authority:CE244_AUTHORITY,
- ce256BindingRef:CE256_BINDING,amtAftermathBeatId:AMT_AFTERMATH,resolveCe256AmtDefeat,diagnostics,browserGoldenClaimed:false
+ ce256BindingRef:CE256_BINDING,amtAftermathBeatId:AMT_AFTERMATH,amtBattleConfigs:CE256_AMT_BATTLE_CONFIGS,resolveAmtDefeatFacts:resolveAmtDefeatFacts35900,resolveCe256AmtDefeat,diagnostics,browserGoldenClaimed:false
 });
 })();
