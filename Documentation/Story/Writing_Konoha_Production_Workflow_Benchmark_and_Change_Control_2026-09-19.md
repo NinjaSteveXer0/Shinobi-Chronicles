@@ -362,6 +362,39 @@ For non-player-facing process, semantic, routing or authority corrections that S
 
 ---
 
+## 12A. Exact player-facing naming precedence
+
+When several durable documents contain different player-facing names for the same already-established choice, **do not treat a general style / modernization document as permission to rename the current exact choice**.
+
+Precedence for exact wording:
+
+1. later Stephen-approved **verbatim / exact choice lock** for that scene;
+2. current live implementation when it matches that later exact lock;
+3. branch-specific current authority;
+4. older general expression / modernization guidance.
+
+If those sources disagree materially and precedence is not clear, STOP and notify Stephen before changing the name.
+
+For delegated autonomous writing:
+
+> **Preserve established exact names by default.**
+
+Writing may still improve a name under Stephen's delegated judgement, but only when the change is consciously judged superior to the current game wording and is recorded as an intentional naming change — never accidentally inherited from an older superseded style document.
+
+Current benchmark example:
+
+The exact Scene 03A names are:
+
+- **STOP THE ASSASSIN**
+- **SECURE THE PACKAGE**
+- **SECURE THE PACKAGE BEFORE THE ASSASSIN**
+- **DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE**
+- **GO AFTER THE ORIGINAL TARGET**
+
+The older modernization alternatives do not override them.
+
+---
+
 # 13. Keep GitHub authority clean
 
 After approval:
