@@ -295,19 +295,21 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 
 Next ordinary Summon state:
 
-- **Source 09 — Kamatari** — PROPOSED / awaiting Stephen sign-off; PL / Registry numeric reconciliation routed as #258.
+- **Source 09 — Kamatari** — **MECHANICS DESIGN CLOSED under Stephen sign-off**; PL / Registry numeric reconciliation remains open as #258 before full Source 09 identity/PL closure.
 - **Source 10 — Snake** — next uncalibrated ordinary source.
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
 
-Kamatari RESET v2 mechanical direction:
+Kamatari RESET v2 mechanical closure:
+- **Stephen sign-off recorded 2026-09-19**;
 - retire generic +6 Bukijutsu Stat-stick in favour of **Sicklewind Route**;
 - **Sicklewind Route = once per Battle**, while Kamatari is attached, one qualifying single-target Wind Release or Bukijutsu attack may target one occupied enemy waiting slot (Slots 2–6) instead of Enemy Active Slot 1;
 - the waiting enemy remains in its queue slot; the route does not reorder formation, create a bonus action, add hidden Attack PL, or bypass exact targeting protection;
 - this uses the Battle system's real active/waiting-slot structure and explicitly rejects invented vegetation/debris/soft-cover mechanics;
 - manifested package remains Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles;
-- no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling.
+- no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling;
+- **mechanics design is CLOSED**, but full Source 09 closure still awaits #258's authoritative seven Stats / Base PL return.
 
 Then continue into Source 10 Snake, accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
 
