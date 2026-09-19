@@ -140,8 +140,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-66' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-66";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-67' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-67";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -187,7 +187,7 @@ jobs:
           grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-post-mi-death-pursuit-35830.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'bf30ca7dfff9f850bebe978acdd8830f16758042' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq 'e18729844922461c654481745e48a6eac20649cd' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq '7a95637765a58b8f12b0bac877032625266830f6' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi_origin_battle_seq_ps' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi_origin_battle_seq_amt_pakkun' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'resolveAcademyKakashiSequentialPostPsPackageRecovery35600' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
@@ -238,7 +238,12 @@ jobs:
           grep -Fq "data-speaker-id='pakkun'" runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'right:6%!important' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'top:4%!important' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v10_2026_09_19' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq "[data-sc-board-ui-mode='dialogue']" runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'You decided fast.' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
+          grep -Fq 'kakashiPostMiPakkunPresent' runtime/alpha-kakashi-terminal-debrief-35100.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v11_2026_09_19' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'Runtime adds STATE ONLY' runtime/alpha-kakashi-story-presentation-compat-33920.js
           grep -Fq '24b7956781d2da6d3d1f70ce18d1ef0de348cfae' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4' runtime/alpha-kakashi-immediate-custody-35800.js
