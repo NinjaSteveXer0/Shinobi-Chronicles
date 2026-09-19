@@ -55,10 +55,16 @@ jobs:
           node --check runtime/alpha-kakashi-battle-interaction-hotfix-34500.js
           node --check tools/qa_kakashi_battle_interaction_34500.js
           node tools/qa_kakashi_battle_interaction_34500.js
+          node --check runtime/alpha-kakashi-scene05a-w-35730.js
+          node --check runtime/alpha-kakashi-deterministic-kill-35810.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          node --check tools/qa_academy_kakashi_scene05a_w_35730.js
+          node --check tools/qa_academy_kakashi_deterministic_kill_35810.js
           node --check tools/qa_kakashi_battle_development_35740.js
           node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
+          node tools/qa_academy_kakashi_scene05a_w_35730.js
+          node tools/qa_academy_kakashi_deterministic_kill_35810.js
           node tools/qa_kakashi_battle_development_35740.js
           node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
           node --check tools/qa_kakashi_origin_rewards_34800.js
