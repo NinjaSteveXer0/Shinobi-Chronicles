@@ -15,7 +15,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800)return;
 
-const PATCH_ID="alpha_kakashi_origin_rewards_34800_v5_2026_09_19";
+const PATCH_ID="alpha_kakashi_origin_rewards_34800_v6_2026_09_20";
 const ROUTE="academy_kakashi_origin_reward";
 const KAKASHI="academy_kakashi";
 const ITEM_SOURCE="kak_origin_item_field_recovery_resupply";
@@ -28,6 +28,8 @@ const MI_REWARD_FAMILY="kak_origin_battle_mi_victory_reward_v1";
 const MI_REWARD_CLAIM_FAMILY="kak_origin_battle_mi_victory_reward_claim_v1";
 const MI_RYO_SOURCE="kak_origin_battle_mi_victory_ryo_01";
 const MI_BATTLE_CONFIG="academy_kakashi_origin_battle_mi_1v1";
+const MI_SEQUENTIAL_BATTLE_CONFIG="academy_kakashi_origin_battle_seq_mi";
+const MI_BATTLE_CONFIGS=new Set([MI_BATTLE_CONFIG,MI_SEQUENTIAL_BATTLE_CONFIG]);
 const MI_PARTICIPANT="academy_kakashi_origin_masked_interceptor";
 const MI_REWARD_RYO=50;
 const DOWNSTREAM_REWARD_AUTHORITY_COMMIT="7446e80c7f2cb9d004ffd914e11c0c77e7321c2b";
@@ -163,7 +165,7 @@ function qualifyingMiVictoryBattle(battleState=null){
   if(!b||!dep)return{qualifies:false,reason:"kakashi_mi_battle_context_missing"};
   const opposition=Array.isArray(dep.oppositionParticipantIds)?dep.oppositionParticipantIds.map(String):[];
   const victory=!!(b.battleOver===true&&b.outcome&&b.outcome.type==="victory");
-  const qualifies=dep.controllerParticipantId===KAKASHI&&dep.battleConfigId===MI_BATTLE_CONFIG&&opposition.length===1&&opposition[0]===MI_PARTICIPANT&&victory;
+  const qualifies=dep.controllerParticipantId===KAKASHI&&MI_BATTLE_CONFIGS.has(String(dep.battleConfigId||""))&&opposition.length===1&&opposition[0]===MI_PARTICIPANT&&victory;
   return{
     qualifies,
     reason:qualifies?null:"kakashi_mi_victory_predicate_not_met",
@@ -190,7 +192,7 @@ function ensureMiVictoryBattleEntitlement(battleState=null){
   const entitlement={
     entitlementId,parentFamily:MI_REWARD_FAMILY,storyUnitRef:"academy_kakashi",subjectId:KAKASHI,
     battleOccurrenceId:ctx.battleOccurrenceId,sealedOriginOccurrenceId:ctx.sealedOriginOccurrenceId,
-    battleConfigId:MI_BATTLE_CONFIG,oppositionParticipantIds:[MI_PARTICIPANT],resultState:"player_side_victory",
+    battleConfigId:ctx.battleConfigId,oppositionParticipantIds:[MI_PARTICIPANT],resultState:"player_side_victory",
     materialReward:{ryo:MI_REWARD_RYO,items:[{itemId:ITEM_ID,quantity:1,sourceId:ITEM_SOURCE}],genericExp:0,rareDrops:[]},
     componentSources:{ryo:MI_RYO_SOURCE,item:ITEM_SOURCE},authorityCommit:MI_REWARD_AUTHORITY_COMMIT,
     status:"pending_claim",createdAt:Date.now()
@@ -328,7 +330,7 @@ function commitTerminalDebriefRewards(facts={}){
 function snapshot(){const root=ensureRoot();return root?clone(root):null;}
 function diagnostics(){
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_origin_rewards_34800_v5_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_origin_rewards_34800_v6_2026_09_20",
     contextAdapterNotSecondSystem:typeof addDisciplineExp==="function"&&typeof addItemToInventory==="function",
     routeExact:ROUTE==="academy_kakashi_origin_reward",
     terminalDebriefSeparated:evaluateTerminalDebriefRewards({terminalDebriefReached:false}).success===false,
@@ -350,7 +352,8 @@ function diagnostics(){
     downstreamCashOnly:ensureDownstreamBattleCashEntitlement.toString().includes("items:[]")&&ensureDownstreamBattleCashEntitlement.toString().includes("genericExp:0")&&ensureDownstreamBattleCashEntitlement.toString().includes("rareDrops:[]"),
     downstreamCashIdempotent:commitDownstreamBattleCashReward.toString().includes("components.ryo")&&commitDownstreamBattleCashReward.toString().includes("registerSource"),
     causalMetadataStored:recordTechnicalDisciplineDevelopment.toString().includes("actionLabel")&&recordStaminaDevelopment.toString().includes("mitigationAmount")&&recordStaminaDevelopment.toString().includes("sourceParticipantId"),
-    exactSoloMiPredicate:qualifyingMiVictoryBattle.toString().includes("opposition.length===1")&&qualifyingMiVictoryBattle.toString().includes("MI_BATTLE_CONFIG")&&qualifyingMiVictoryBattle.toString().includes("MI_PARTICIPANT"),
+    exactSoloMiPredicate:qualifyingMiVictoryBattle.toString().includes("opposition.length===1")&&qualifyingMiVictoryBattle.toString().includes("MI_BATTLE_CONFIGS")&&qualifyingMiVictoryBattle.toString().includes("MI_PARTICIPANT"),
+    sequentialSoloMiCovered:MI_BATTLE_CONFIGS.has(MI_BATTLE_CONFIG)&&MI_BATTLE_CONFIGS.has(MI_SEQUENTIAL_BATTLE_CONFIG),
     immediateClaimComponentReceipts:commitMiVictoryBattleReward.toString().includes("battleRewardComponents")&&commitMiVictoryBattleReward.toString().includes("MI_RYO_SOURCE")&&commitMiVictoryBattleReward.toString().includes("commitOriginInventoryEntitlement"),
     browserGoldenClaimed:false
   };
@@ -372,5 +375,5 @@ globalThis.getAcademyKakashiDownstreamBattleCashRewardState34800=getDownstreamBa
 globalThis.commitAcademyKakashiDownstreamBattleCashReward34800=commitDownstreamBattleCashReward;
 globalThis.getAcademyKakashiOriginRewardSnapshot34800=snapshot;
 globalThis.runAcademyKakashiOriginRewards34800Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800=Object.freeze({patchId:PATCH_ID,route:ROUTE,miImmediateReward:Object.freeze({authorityCommit:MI_REWARD_AUTHORITY_COMMIT,family:MI_REWARD_FAMILY,claimFamily:MI_REWARD_CLAIM_FAMILY,ryo:MI_REWARD_RYO,itemId:ITEM_ID,itemSource:ITEM_SOURCE,battleConfigId:MI_BATTLE_CONFIG,opponentRef:MI_PARTICIPANT}),downstreamBattleCash:Object.freeze({authorityCommit:DOWNSTREAM_REWARD_AUTHORITY_COMMIT,disclosureAuthorityCommit:BATTLE_REWARD_DISCLOSURE_AUTHORITY_COMMIT,family:DOWNSTREAM_REWARD_FAMILY,claimFamily:DOWNSTREAM_REWARD_CLAIM_FAMILY,rewards:DOWNSTREAM_BATTLE_CASH}),browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800=Object.freeze({patchId:PATCH_ID,route:ROUTE,miImmediateReward:Object.freeze({authorityCommit:MI_REWARD_AUTHORITY_COMMIT,family:MI_REWARD_FAMILY,claimFamily:MI_REWARD_CLAIM_FAMILY,ryo:MI_REWARD_RYO,itemId:ITEM_ID,itemSource:ITEM_SOURCE,battleConfigId:MI_BATTLE_CONFIG,battleConfigIds:Object.freeze([MI_BATTLE_CONFIG,MI_SEQUENTIAL_BATTLE_CONFIG]),opponentRef:MI_PARTICIPANT}),downstreamBattleCash:Object.freeze({authorityCommit:DOWNSTREAM_REWARD_AUTHORITY_COMMIT,disclosureAuthorityCommit:BATTLE_REWARD_DISCLOSURE_AUTHORITY_COMMIT,family:DOWNSTREAM_REWARD_FAMILY,claimFamily:DOWNSTREAM_REWARD_CLAIM_FAMILY,rewards:DOWNSTREAM_BATTLE_CASH}),browserGoldenClaimed:false});
 })();
