@@ -1,5 +1,14 @@
 # Academy Kakashi Origin — Existing-Material Player-Facing Retrofit and Remaining Branch Inventory
 
+> **2026-09-19 CURRENT CLOSURE POINTER**  
+> This file is now historical inventory / retrofit archaeology.
+>
+> Current Academy Kakashi Writing closure:
+> `Documentation/Story/Academy_Kakashi_Origin_Current_Writing_Closure_2026-09-19.md`
+> @ `f8a7f9bceb59b9bddda3d919a58851669f5cd740`.
+>
+> Do not interpret older “remaining” branch notes below as current blockers where later exact scene locks have closed them.
+>
 **Date:** 2026-09-14  
 **Owner:** Stephen / Writing / Story — Konoha  
 **Status:** **STEPHEN-AUTHORISED PLAYER-FACING EXPRESSION RETROFIT + CURRENT REMAINING-BRANCH INVENTORY**  
