@@ -179,7 +179,12 @@ assert.deepStrictEqual(labels,[
 ]);
 assert.strictEqual(choiceBeat.choices.length,6);
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
-for(const row of choiceBeat.choices)assert.strictEqual(row.availability().available,true);
+for(const row of choiceBeat.choices){
+  if(row.choiceId==="scene05aw_restrain_and_continue"){
+    assert.strictEqual(row.availability().available,false);
+    assert.strictEqual(row.availability().knownBlocker,"FIELD-SECURED CUSTODY SEMANTICS PENDING CE #244");
+  }else assert.strictEqual(row.availability().available,true);
+}
 let blocked=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");
 assert.strictEqual(blocked.success,false);
 assert.strictEqual(blocked.reason,"kakashi_scene05aw_successor_authority_not_implemented");
@@ -215,6 +220,7 @@ assert(labels.includes("KILL HER"),"Controlled MI must expose KILL HER");
 assert(!labels.includes("ATTEMPT TO KILL HER"),"Controlled MI must not expose attempt wording");
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 assert(labels.includes("RESTRAIN HER AND CONTINUE"),"Controlled MI must expose deterministic RESTRAIN HER AND CONTINUE");
+assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"CE #244 must keep controlled field restraint non-executable");
 assert(!labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Controlled MI must not expose attempted restraint wording");
 const controlledLethal=choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_lethal");
 assert(controlledLethal,"controlled lethal choice missing");
@@ -242,6 +248,7 @@ labels=choiceBeat.choices.map(x=>x.label);
 assert(labels.includes("GO AFTER PACKAGE SMUGGLER"));
 assert(labels.includes("GO AFTER ANBU MARKED TARGET"));
 assert(labels.includes("ATTEMPT TO RESTRAIN HER AND CONTINUE"),"Turn-4 uncontrolled MI must expose resolver-owned restrain-and-continue");
+assert.strictEqual(choiceBeat.choices.find(x=>x&&x.choiceId==="scene05aw_restrain_and_continue").availability().available,false,"CE #244 must keep attempted field restraint non-executable");
 
 active.beatId=RETURN_BEAT;
 active.localContext={kakashiScene04ABattleIntentResolved:true};
