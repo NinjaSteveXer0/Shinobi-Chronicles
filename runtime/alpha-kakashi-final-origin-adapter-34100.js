@@ -65,6 +65,7 @@ const W2C_NONKILL_PATH="runtime/alpha-kakashi-w2c-nonkill-35780.js";
 const IMMEDIATE_CUSTODY_PATH="runtime/alpha-kakashi-immediate-custody-35800.js";
 const DETERMINISTIC_KILL_PATH="runtime/alpha-kakashi-deterministic-kill-35810.js";
 const LOSS_ENDING_PATH="runtime/alpha-kakashi-loss-ending-35820.js";
+const POST_MI_PURSUIT_PATH="runtime/alpha-kakashi-post-mi-death-pursuit-35830.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
@@ -78,7 +79,8 @@ const LOSS_ENDING_PATH="runtime/alpha-kakashi-loss-ending-35820.js";
 // const BUILD="kakashi-final-20260918-46";
 // const BUILD="kakashi-final-20260918-47";
 // const BUILD="kakashi-final-20260919-48";
-const BUILD="kakashi-final-20260919-49";
+// const BUILD="kakashi-final-20260919-49";
+const BUILD="kakashi-final-20260919-50";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -108,9 +110,13 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
+function loadPostMiPursuit(){
+  if(globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830)return;
+  appendScript("sc-alpha-kakashi-post-mi-death-pursuit-35830-script",POST_MI_PURSUIT_PATH);
+}
 function loadLossEnding(){
-  if(globalThis.SC_ALPHA_KAKASHI_LOSS_ENDING_35820)return;
-  appendScript("sc-alpha-kakashi-loss-ending-35820-script",LOSS_ENDING_PATH);
+  if(globalThis.SC_ALPHA_KAKASHI_LOSS_ENDING_35820){loadPostMiPursuit();return;}
+  appendScript("sc-alpha-kakashi-loss-ending-35820-script",LOSS_ENDING_PATH,loadPostMiPursuit);
 }
 function loadDeterministicKill(){
   if(globalThis.SC_ALPHA_KAKASHI_DETERMINISTIC_KILL_35810){loadLossEnding();return;}
