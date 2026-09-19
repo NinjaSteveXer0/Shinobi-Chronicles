@@ -278,17 +278,22 @@ Closed under fresh Stephen sign-off:
 
 - **Source 01 — Baku** — CLOSED
 - **Source 02 — Gamakichi** — CLOSED
+- **Source 03 — Ibuse** — CLOSED
 - **Source 04 — Gerotora** — CLOSED
 - **Source 05 — Giant Clam** — CLOSED
 - **Source 06 — Monkey King Enma** — CLOSED
 - **Source 07 — Nue** — CLOSED
 - **Source 08 — Pakkun / Kakashi Ninken family** — CLOSED
 
-Still open:
+Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
+- ATTACHED Poison Immunity;
+- Poison Mist = up to 2 targets, 8 immediate Battle PL bypassing Stamina, first-action movement/reposition numbness, 6 post-action Battle PL exertion cost on hostile ATTACK or movement/reposition/escape, max 2 exertion triggers, up to 3 action opportunities or cleanse, then 2 Ibuse action opportunities of recharge;
+- Venom Bite ATK24 + `ibuse_neurotoxin`;
+- Subterranean Ambush ATK28 + ordinary-distance underground traversal;
+- Swallow Trap requires `ibuse_neurotoxin`, deals 6 immediate Battle PL bypassing Stamina, then traps through the target's next action opportunity;
+- `ibuse_neurotoxin` uses shared `conditionType: poison` classification/cure plumbing without reverting to the legacy generic poison tick profile.
 
-- **Source 03 — Ibuse** — PROPOSED / not yet signed off after Neurotoxin redesign.
-
-Next uncalibrated ordinary Summons after the open Ibuse decision:
+Next uncalibrated ordinary Summons:
 
 - **Source 09 — Kamatari**
 - **Source 10 — Snake**
