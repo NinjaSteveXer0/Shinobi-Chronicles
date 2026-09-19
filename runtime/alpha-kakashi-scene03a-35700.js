@@ -24,7 +24,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function")throw new Error("kakashi_scene03a_origin_occurrence_authority_missing");
 if(!CORE||typeof CORE.commitStoryIntent!=="function"||!KAK||typeof KAK.openDecisionPoint!=="function"||!PROVIDER||typeof PROVIDER.stableRef!=="function")throw new Error("kakashi_scene03a_semantic_authority_missing");
 
-const PATCH_ID="alpha_kakashi_scene03a_35700_v7_2026_09_19";
+const PATCH_ID="alpha_kakashi_scene03a_35700_v8_2026_09_20";
 const AUTHORITY="ebc5f9ed1575ac01f72fd24487c3e38f09112117";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
@@ -186,7 +186,8 @@ function syncObjective35700(){
   const reveal=!!p&&Number(p.index)>=8;node.style.setProperty("display",reveal?"":"none",reveal?"":"important");if(reveal)node.style.removeProperty("display");return true;
 }
 function ensureWatchMotionStyle35700(){
-  if(typeof document==="undefined"||!document.head||document.getElementById(WATCH_MOTION_STYLE_ID))return false;
+  if(typeof document==="undefined"||!document.head)return false;
+  const prior=document.getElementById(WATCH_MOTION_STYLE_ID);if(prior)prior.remove();
   const style=document.createElement("style");style.id=WATCH_MOTION_STYLE_ID;style.textContent=`
 #story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors{
   display:block!important;position:absolute!important;left:2.5%!important;right:2.5%!important;top:13%!important;bottom:18%!important;padding:0!important;
@@ -195,7 +196,7 @@ function ensureWatchMotionStyle35700(){
   position:absolute!important;bottom:0!important;width:min(18vw,260px)!important;max-height:410px!important;
   transition:left .38s cubic-bezier(.2,.75,.25,1),right .38s cubic-bezier(.2,.75,.25,1),transform .38s cubic-bezier(.2,.75,.25,1),opacity .34s ease!important;
 }
-#story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actor:not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-breakaway-35700){opacity:1!important;filter:none!important}
+#story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actor:not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-exit-ghost-35700){opacity:1!important;filter:none!important}
 
 /* WATCH THE EXCHANGE is a remote observation scene: Kakashi remains physically in the alley and is never projected as an on-stage card here. */
 #story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors[data-watch-stage='exchange'] [data-actor-id='anbu_marked_target'],
@@ -221,17 +222,18 @@ function ensureWatchMotionStyle35700(){
 #story-scene-presentation-layer .sc-watch-ps-turn-35700{transform:translateX(1vw) scale(.99)!important}
 #story-scene-presentation-layer .sc-watch-mi-burst-35700{animation:scWatchMiBurst35700 .52s cubic-bezier(.12,.8,.2,1) both!important}
 #story-scene-presentation-layer .sc-watch-mi-drive-35700{animation:scWatchMiDrive35700 .42s cubic-bezier(.18,.82,.22,1) both!important}
-#story-scene-presentation-layer .sc-watch-amt-breakaway-35700{animation:scWatchAmtBreakaway35700 .58s cubic-bezier(.4,0,.7,.2) both!important}
+#story-scene-presentation-layer .sc-watch-amt-exit-ghost-35700{position:absolute!important;right:auto!important;bottom:auto!important;margin:0!important;z-index:14!important;pointer-events:none!important;opacity:1!important;filter:none!important;transition:none!important;animation:none!important}
+#story-scene-presentation-layer .sc-watch-amt-exit-ghost-35700.is-running{animation:scWatchAmtExitGhost35700 .62s cubic-bezier(.4,0,.7,.2) both!important}
 #story-scene-presentation-layer .sc-watch-mi-cutoff-35700{transform:translateX(1.5vw) scale(1.01)!important}
 #story-scene-presentation-layer .sc-watch-ps-checked-35700{transform:translateX(.7vw) scale(.98)!important}
 @keyframes scWatchHandoffGiver35700{0%{transform:translateX(0) scale(.97)}48%{transform:translateX(2vw) scale(.99)}100%{transform:translateX(0) scale(.97)}}
 @keyframes scWatchHandoffReceiver35700{0%{transform:translateX(0) scale(.97)}48%{transform:translateX(-2vw) scale(1.01)}100%{transform:translateX(0) scale(1)}}
 @keyframes scWatchMiBurst35700{0%{opacity:0;transform:translateX(30vw) scale(.9);filter:blur(4px) brightness(1.3)}58%{opacity:1;transform:translateX(-1vw) scale(1.03);filter:blur(0) brightness(1.08)}100%{opacity:1;transform:translateX(0) scale(1);filter:none}}
 @keyframes scWatchMiDrive35700{0%{transform:translateX(-2vw) scale(.98)}100%{transform:translateX(1.5vw) scale(1.01)}}
-@keyframes scWatchAmtBreakaway35700{0%{opacity:1;transform:translateX(-3vw) scale(.97)}100%{opacity:0;transform:translateX(-72vw) rotate(-3deg) scale(.92)}}
+@keyframes scWatchAmtExitGhost35700{0%{opacity:1;transform:translate3d(0,0,0) scale(1)}100%{opacity:0;transform:translate3d(-82vw,0,0) rotate(-3deg) scale(.92)}}
 @media(prefers-reduced-motion:reduce){
   #story-scene-presentation-layer .sc-watch-handoff-giver-35700,#story-scene-presentation-layer .sc-watch-handoff-receiver-35700,#story-scene-presentation-layer .sc-watch-mi-burst-35700,#story-scene-presentation-layer .sc-watch-mi-drive-35700{animation:none!important}
-  #story-scene-presentation-layer .sc-watch-amt-breakaway-35700{animation:none!important;opacity:0!important;transform:translateX(-72vw)!important}
+  #story-scene-presentation-layer .sc-watch-amt-exit-ghost-35700.is-running{animation:none!important;opacity:0!important;transform:translate3d(-82vw,0,0)!important}
 }`;
   document.head.appendChild(style);return true;
 }
@@ -241,28 +243,61 @@ function watchStageForIndex35700(index){
   if(index===12)return"interceptor-swap";
   return"interception";
 }
+function clearWatchAmtExitGhost35700(stage=null){
+  if(typeof document==="undefined")return false;
+  const root=stage||((document.getElementById&&document.getElementById("story-scene-presentation-layer"))||null);
+  if(!root||typeof root.querySelectorAll!=="function")return false;
+  let removed=false;
+  for(const node of root.querySelectorAll(".sc-watch-amt-exit-ghost-35700")){try{node.remove();removed=true;}catch(_error){}}
+  return removed;
+}
+function prepareWatchAmtExitGhost35700(){
+  if(typeof document==="undefined")return false;
+  const layer=document.getElementById&&document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+  const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
+  const actors=stage.querySelector&&stage.querySelector(".sc-scene-board-33900__actors");
+  const source=actors&&actors.querySelector&&actors.querySelector('[data-actor-id="anbu_marked_target"]');
+  if(!source||typeof source.cloneNode!=="function"||!stage||typeof stage.appendChild!=="function")return false;
+  clearWatchAmtExitGhost35700(stage);
+  const ghost=source.cloneNode(true);if(!ghost||!ghost.classList)return false;
+  for(const name of ["is-focus","is-entering","sc-watch-handoff-giver-35700","sc-watch-handoff-receiver-35700","sc-watch-amt-moving-35700","sc-watch-ps-turn-35700","sc-watch-mi-burst-35700","sc-watch-mi-drive-35700","sc-watch-mi-cutoff-35700","sc-watch-ps-checked-35700","is-running"])ghost.classList.remove(name);
+  ghost.classList.add("sc-watch-amt-exit-ghost-35700");
+  try{ghost.setAttribute("aria-hidden","true");}catch(_error){}
+  try{
+    const rect=typeof source.getBoundingClientRect==="function"?source.getBoundingClientRect():null;
+    const stageRect=typeof stage.getBoundingClientRect==="function"?stage.getBoundingClientRect():null;
+    if(rect&&stageRect&&ghost.style){
+      ghost.style.left=(rect.left-stageRect.left)+"px";ghost.style.top=(rect.top-stageRect.top)+"px";
+      ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";ghost.style.right="auto";ghost.style.bottom="auto";
+    }
+  }catch(_error){}
+  stage.appendChild(ghost);
+  const run=()=>{try{void ghost.offsetWidth;ghost.classList.add("is-running");}catch(_error){}};
+  if(typeof requestAnimationFrame==="function")requestAnimationFrame(()=>requestAnimationFrame(run));else if(typeof setTimeout==="function")setTimeout(run,0);else run();
+  const cleanup=()=>{try{ghost.remove();}catch(_error){}};
+  try{ghost.addEventListener("animationend",cleanup,{once:true});}catch(_error){}
+  if(typeof setTimeout==="function")setTimeout(cleanup,900);
+  return true;
+}
 function syncWatchMotion35700(){
   if(typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer"),rt=active();
   if(!layer)return false;
   const transferActive=isScene03A(rt),choiceReady=!!rt&&rt.sceneId===SCENE_ID&&rt.beatId===MAJOR_BEAT&&String(rt.localContext&&rt.localContext.kakashiOriginalAction||"")===OBSERVE_CHOICE;
-  if(!transferActive&&!choiceReady){delete layer.dataset.scKakashiWatchExchange;return false;}
+  if(!transferActive&&!choiceReady){clearWatchAmtExitGhost35700((layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer);delete layer.dataset.scKakashiWatchExchange;return false;}
   ensureWatchMotionStyle35700();
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer,actors=stage.querySelector&&stage.querySelector(".sc-scene-board-33900__actors");
   if(!actors)return false;
   layer.dataset.scKakashiWatchExchange="true";
-  const classes=["sc-watch-handoff-giver-35700","sc-watch-handoff-receiver-35700","sc-watch-amt-moving-35700","sc-watch-ps-turn-35700","sc-watch-mi-burst-35700","sc-watch-mi-drive-35700","sc-watch-amt-breakaway-35700","sc-watch-mi-cutoff-35700","sc-watch-ps-checked-35700"];
+  const classes=["sc-watch-handoff-giver-35700","sc-watch-handoff-receiver-35700","sc-watch-amt-moving-35700","sc-watch-ps-turn-35700","sc-watch-mi-burst-35700","sc-watch-mi-drive-35700","sc-watch-mi-cutoff-35700","sc-watch-ps-checked-35700"];
   for(const node of actors.querySelectorAll(".sc-scene-board-33900__actor"))for(const name of classes)node.classList.remove(name);
   const amtNode=actors.querySelector('[data-actor-id="anbu_marked_target"]'),psNode=actors.querySelector('[data-actor-id="package_smuggler"]'),miNode=actors.querySelector('[data-actor-id="masked_interceptor"]');
-  if(choiceReady){actors.dataset.watchStage="choice-ready";actors.dataset.watchCue="choice";return true;}
+  if(choiceReady){clearWatchAmtExitGhost35700(stage);actors.dataset.watchStage="choice-ready";actors.dataset.watchCue="choice";return true;}
   const index=cursor(rt),phase=watchStageForIndex35700(index);actors.dataset.watchStage=phase;actors.dataset.watchCue=String(index);
   if(index===3){if(amtNode)amtNode.classList.add("sc-watch-handoff-giver-35700");if(psNode)psNode.classList.add("sc-watch-handoff-receiver-35700");}
   if(index>=6&&index<=11&&amtNode)amtNode.classList.add("sc-watch-amt-moving-35700");
   if(index>=7&&index<16&&psNode)psNode.classList.add("sc-watch-ps-turn-35700");
-  if(index===12){
-    if(amtNode)amtNode.classList.add("sc-watch-amt-breakaway-35700");
-    if(miNode)miNode.classList.add("sc-watch-mi-burst-35700");
-  }
+  if(index===12&&miNode)miNode.classList.add("sc-watch-mi-burst-35700");
   if(index===13&&miNode)miNode.classList.add("sc-watch-mi-drive-35700");
   if(index>=16){if(miNode)miNode.classList.add("sc-watch-mi-cutoff-35700");if(psNode)psNode.classList.add("sc-watch-ps-checked-35700");}
   return true;
@@ -275,7 +310,13 @@ function installPresentationHooks35700(){
   globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35700(){const rt=active();return isScene03A(rt)?performance(rt):PRE_GET.apply(this,arguments);};
   globalThis.advanceStoryScene=function advanceStoryScene35700(choiceId=null){
     const rt=active();if(!isScene03A(rt)||choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
-    const p=performance(rt);if(!p.atEnd){const next=p.index+1;rt.localContext={...(rt.localContext||{}),[CUSTOM_CURSOR]:next};syncNativeCursor(rt,next);save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();else if(typeof renderStorySceneBoard33900==="function")renderStorySceneBoard33900();}catch(_error){}return{success:true,type:"kakashi_scene03a_performance_cue_advanced",beatId:TRANSFER_BEAT,cueIndex:next,semanticBeatUnchanged:true};}
+    const p=performance(rt);if(!p.atEnd){
+      const next=p.index+1;
+      if(next===12)prepareWatchAmtExitGhost35700();
+      rt.localContext={...(rt.localContext||{}),[CUSTOM_CURSOR]:next};syncNativeCursor(rt,next);save();
+      try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();else if(typeof renderStorySceneBoard33900==="function")renderStorySceneBoard33900();}catch(_error){}
+      return{success:true,type:"kakashi_scene03a_performance_cue_advanced",beatId:TRANSFER_BEAT,cueIndex:next,semanticBeatUnchanged:true};
+    }
     syncNativeCursor(rt,CUES.length-1);save();const result=PRE_ADVANCE.apply(this,arguments);const after=active();if(!after||after.sceneId!==SCENE_ID||after.beatId!==TRANSFER_BEAT){try{if(rt.localContext){delete rt.localContext[CUSTOM_CURSOR];delete rt.localContext[NATIVE_CURSOR];}save();}catch(_error){}}return result;
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
@@ -290,9 +331,9 @@ function diagnostics(){
   const beforeHandoff={sceneId:SCENE_ID,beatId:TRANSFER_BEAT,localContext:{kakashiOriginalAction:OBSERVE_CHOICE,[CUSTOM_CURSOR]:2}};
   const atHandoff={sceneId:SCENE_ID,beatId:TRANSFER_BEAT,localContext:{kakashiOriginalAction:OBSERVE_CHOICE,[CUSTOM_CURSOR]:3}};
   const afterHandoff={sceneId:SCENE_ID,beatId:MAJOR_BEAT,localContext:{kakashiOriginalAction:OBSERVE_CHOICE}};
-  const checks={patchId:PATCH_ID==="alpha_kakashi_scene03a_35700_v7_2026_09_19",
-    watchActorsRemainVivid:ensureWatchMotionStyle35700.toString().includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-breakaway-35700)")&&ensureWatchMotionStyle35700.toString().includes("opacity:1!important;filter:none!important"),choiceSurfaceHasTwoStableLanes:ensureWatchMotionStyle35700.toString().includes("data-watch-stage=\'choice-ready\'")&&ensureWatchMotionStyle35700.toString().includes("left:22%!important")&&ensureWatchMotionStyle35700.toString().includes("right:22%!important")&&syncWatchMotion35700.toString().includes('actors.dataset.watchStage="choice-ready"'),choiceSurfaceActorsRemainFullColour:ensureWatchMotionStyle35700.toString().includes("data-watch-stage=\'choice-ready\'")&&syncWatchMotion35700.toString().includes('actors.dataset.watchStage="choice-ready"'),amtExitCoincidesWithMiReveal:watchStageForIndex35700(12)==="interceptor-swap"&&syncWatchMotion35700.toString().includes('if(index===12){')&&syncWatchMotion35700.toString().includes('amtNode.classList.add("sc-watch-amt-breakaway-35700")')&&syncWatchMotion35700.toString().includes('miNode.classList.add("sc-watch-mi-burst-35700")'),watchExchangeMotionStages:watchStageForIndex35700(3)==="exchange"&&watchStageForIndex35700(7)==="divergence"&&watchStageForIndex35700(12)==="interceptor-swap"&&watchStageForIndex35700(13)==="interception"&&watchStageForIndex35700(16)==="interception",
-    watchExchangeMotionLanguage:ensureWatchMotionStyle35700.toString().includes("scWatchMiBurst35700")&&ensureWatchMotionStyle35700.toString().includes("scWatchAmtBreakaway35700")&&ensureWatchMotionStyle35700.toString().includes("interceptor-swap")&&syncWatchMotion35700.toString().includes("sc-watch-handoff-giver-35700")&&syncWatchMotion35700.toString().includes("sc-watch-ps-turn-35700")&&syncWatchMotion35700.toString().includes("sc-watch-mi-cutoff-35700"),authorityPinned:AUTHORITY==="ebc5f9ed1575ac01f72fd24487c3e38f09112117",scene03AEighteenCues:CUES.length===18,scene03AVerbatim:JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exactTexts),scene03ANarrationOnly:CUES.every(row=>row.kind==="narration"&&!row.speakerName),observeIntentProvenance:!!observe&&Array.isArray(observe.consequenceRequests)&&observe.consequenceRequests.some(row=>row&&row.requestId===OBSERVE_REQUEST),scene03AFiveChoices:!!major&&major.choices.map(row=>row.choiceId).join("|")==="stop_assassin|secure_package|secure_package_before_assassin|defeat_assassin_then_secure|go_after_original_target",scene03AChoiceLabelsExact:!!major&&major.choices.map(row=>row.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",scene03AFiveChoicesAvailable:!!major&&major.choices.every(row=>typeof row.availability==="function"&&row.availability().available===true&&row.knownBlocker===null),unauthorisedSuccessorsRemainContained:!!major&&major.choices.every(row=>row.nextBeatId===MAJOR_BEAT&&(!Array.isArray(row.consequenceRequests)||row.consequenceRequests.length===0)),objectiveWordingExact:INITIAL_OBJECTIVE==="Stop the package from falling into the wrong hands."&&POST_HANDOFF_OBJECTIVE==="Retrieve the package.",objectiveChangesAtPackageTransfer:objectiveForState35700(beforeHandoff)===INITIAL_OBJECTIVE&&objectiveForState35700(atHandoff)===POST_HANDOFF_OBJECTIVE&&objectiveForState35700(afterHandoff)===POST_HANDOFF_OBJECTIVE,factualCommitBeforeChoice:!!major&&Array.isArray(major.onEnterConsequences)&&major.onEnterConsequences.some(row=>row&&row.requestId===COMMIT_REQUEST),objectiveDeltaBridged:commitScene03A35700.toString().includes("objectiveDeltaRefs:[occurrenceId]"),noScene03ADialogue:CUES.every(row=>row.kind!=="dialogue"),rooftopObjectiveRevealAfterEnvelopeTaken:syncObjective35700.toString().includes("Number(p.index)>=8"),objectiveTextMutationIdempotent:setObjectiveText35700.toString().includes("if(current===text)return false"),noGlobalMutationObserver:!installPresentationHooks35700.toString().includes("MutationObserver"),presentationHookReadyOrHeadless:typeof document==="undefined"||presentationHooksInstalled,browserGoldenClaimed:false};
+  const checks={patchId:PATCH_ID==="alpha_kakashi_scene03a_35700_v8_2026_09_20",
+    watchActorsRemainVivid:ensureWatchMotionStyle35700.toString().includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-exit-ghost-35700)")&&ensureWatchMotionStyle35700.toString().includes("opacity:1!important;filter:none!important"),choiceSurfaceHasTwoStableLanes:ensureWatchMotionStyle35700.toString().includes("data-watch-stage=\'choice-ready\'")&&ensureWatchMotionStyle35700.toString().includes("left:22%!important")&&ensureWatchMotionStyle35700.toString().includes("right:22%!important")&&syncWatchMotion35700.toString().includes('actors.dataset.watchStage="choice-ready"'),choiceSurfaceActorsRemainFullColour:ensureWatchMotionStyle35700.toString().includes("data-watch-stage=\'choice-ready\'")&&syncWatchMotion35700.toString().includes('actors.dataset.watchStage="choice-ready"'),amtExitCoincidesWithMiReveal:watchStageForIndex35700(12)==="interceptor-swap"&&advanceStoryScene.toString().includes("if(next===12)prepareWatchAmtExitGhost35700()")&&prepareWatchAmtExitGhost35700.toString().includes("cloneNode(true)")&&prepareWatchAmtExitGhost35700.toString().includes("sc-watch-amt-exit-ghost-35700")&&syncWatchMotion35700.toString().includes('if(index===12&&miNode)miNode.classList.add("sc-watch-mi-burst-35700")'),watchExchangeMotionStages:watchStageForIndex35700(3)==="exchange"&&watchStageForIndex35700(7)==="divergence"&&watchStageForIndex35700(12)==="interceptor-swap"&&watchStageForIndex35700(13)==="interception"&&watchStageForIndex35700(16)==="interception",
+    watchExchangeMotionLanguage:ensureWatchMotionStyle35700.toString().includes("scWatchMiBurst35700")&&ensureWatchMotionStyle35700.toString().includes("scWatchAmtExitGhost35700")&&ensureWatchMotionStyle35700.toString().includes("interceptor-swap")&&syncWatchMotion35700.toString().includes("sc-watch-handoff-giver-35700")&&syncWatchMotion35700.toString().includes("sc-watch-ps-turn-35700")&&syncWatchMotion35700.toString().includes("sc-watch-mi-cutoff-35700"),authorityPinned:AUTHORITY==="ebc5f9ed1575ac01f72fd24487c3e38f09112117",scene03AEighteenCues:CUES.length===18,scene03AVerbatim:JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exactTexts),scene03ANarrationOnly:CUES.every(row=>row.kind==="narration"&&!row.speakerName),observeIntentProvenance:!!observe&&Array.isArray(observe.consequenceRequests)&&observe.consequenceRequests.some(row=>row&&row.requestId===OBSERVE_REQUEST),scene03AFiveChoices:!!major&&major.choices.map(row=>row.choiceId).join("|")==="stop_assassin|secure_package|secure_package_before_assassin|defeat_assassin_then_secure|go_after_original_target",scene03AChoiceLabelsExact:!!major&&major.choices.map(row=>row.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",scene03AFiveChoicesAvailable:!!major&&major.choices.every(row=>typeof row.availability==="function"&&row.availability().available===true&&row.knownBlocker===null),unauthorisedSuccessorsRemainContained:!!major&&major.choices.every(row=>row.nextBeatId===MAJOR_BEAT&&(!Array.isArray(row.consequenceRequests)||row.consequenceRequests.length===0)),objectiveWordingExact:INITIAL_OBJECTIVE==="Stop the package from falling into the wrong hands."&&POST_HANDOFF_OBJECTIVE==="Retrieve the package.",objectiveChangesAtPackageTransfer:objectiveForState35700(beforeHandoff)===INITIAL_OBJECTIVE&&objectiveForState35700(atHandoff)===POST_HANDOFF_OBJECTIVE&&objectiveForState35700(afterHandoff)===POST_HANDOFF_OBJECTIVE,factualCommitBeforeChoice:!!major&&Array.isArray(major.onEnterConsequences)&&major.onEnterConsequences.some(row=>row&&row.requestId===COMMIT_REQUEST),objectiveDeltaBridged:commitScene03A35700.toString().includes("objectiveDeltaRefs:[occurrenceId]"),noScene03ADialogue:CUES.every(row=>row.kind!=="dialogue"),rooftopObjectiveRevealAfterEnvelopeTaken:syncObjective35700.toString().includes("Number(p.index)>=8"),objectiveTextMutationIdempotent:setObjectiveText35700.toString().includes("if(current===text)return false"),noGlobalMutationObserver:!installPresentationHooks35700.toString().includes("MutationObserver"),presentationHookReadyOrHeadless:typeof document==="undefined"||presentationHooksInstalled,browserGoldenClaimed:false};
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,choiceIds:CHOICE_SPECS.map(row=>row.choiceId),objectives:Object.freeze({initial:INITIAL_OBJECTIVE,postHandoff:POST_HANDOFF_OBJECTIVE}),browserGoldenClaimed:false};
 }
 
