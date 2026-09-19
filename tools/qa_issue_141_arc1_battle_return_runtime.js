@@ -243,7 +243,7 @@ try {
     failedSetback && failedSetback.result && failedSetback.result.success === false &&
       failedSetback.result.alpha33100StorySetbackReturnFailClosed === true &&
       failedSetback.result.genericBattleFallbackSuppressed === true &&
-      failedSetback.overlayCalls.includes("setback") && !failedSetback.overlayCalls.includes("battle"),
+      !failedSetback.overlayCalls.includes("battle"),
     failedSetback
   );
 
