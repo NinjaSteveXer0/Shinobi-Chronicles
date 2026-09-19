@@ -27,14 +27,16 @@ const defs={
   academy_training_tanto:{id:"academy_training_tanto",name:"Academy Training Tanto",type:"weapon",weaponClass:"Tanto",stackable:false,statModifiers:{buki:1}}
 };
 let saves=0;
+const legacyTrainingSource={nin:"exam",tai:"practical",gen:"exam",buki:"practical",fuin:"exam",kin:"battle",stamina:"practical"};
 const context={
   console,globalThis:null,window:null,Set,Object,Array,String,Number,Boolean,JSON,Math,Date,Error,
   playerData,
   savePlayerData(){saves+=1;},
   saveTestState(){},
-  addDisciplineExp(characterId,disciplineId,amount){
+  isValidDisciplineTrainingSource(disciplineId,source){return legacyTrainingSource[String(disciplineId||"")]===String(source||"");},
+  addDisciplineExp(characterId,disciplineId,amount,source){
     assert.strictEqual(characterId,"academy_kakashi");
-    if(!characterProgression[disciplineId])return false;
+    if(!characterProgression[disciplineId]||!context.isValidDisciplineTrainingSource(disciplineId,source))return false;
     characterProgression[disciplineId].exp+=Number(amount)||0;
     return {success:true,exp:characterProgression[disciplineId].exp};
   },
@@ -55,7 +57,14 @@ const context={
   }
 };
 context.globalThis=context;context.window=context;
-vm.createContext(context);vm.runInContext(src,context,{filename:"alpha-kakashi-origin-rewards-34800.js"});
+vm.createContext(context);
+assert.strictEqual(context.isValidDisciplineTrainingSource("buki","action_derived_development"),false,"legacy Progression source gate should reject action-derived development before 34800 loads");
+vm.runInContext(src,context,{filename:"alpha-kakashi-origin-rewards-34800.js"});
+assert.strictEqual(context.isValidDisciplineTrainingSource("buki","action_derived_development"),true,"34800 must install the authorised action-derived source extension");
+assert.strictEqual(context.isValidDisciplineTrainingSource("stamina","action_derived_development"),true,"34800 must authorise exact Stamina action-development source");
+assert.strictEqual(context.isValidDisciplineTrainingSource("buki","practical"),true,"legacy Bukijutsu Practical source must remain valid");
+assert.strictEqual(context.isValidDisciplineTrainingSource("nin","exam"),true,"legacy Ninjutsu Exam source must remain valid");
+assert.strictEqual(context.isValidDisciplineTrainingSource("buki","exam"),false,"34800 must not broaden unrelated legacy source combinations");
 
 const diag=JSON.parse(JSON.stringify(context.runAcademyKakashiOriginRewards34800Diagnostics()));
 assert.strictEqual(diag.pass,true,`34800 diagnostics failed: ${(diag.failed||[]).join(",")}`);
