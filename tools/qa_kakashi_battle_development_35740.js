@@ -9,10 +9,13 @@ function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(
 
 globalThis.playerData={ryo:0,exp:0,inventory:[]};
 const discipline={};
+const developmentSources=[];
 let saves=0,chronicleCalls=0;
 globalThis.savePlayerData=()=>{saves+=1;return true;};
 globalThis.saveTestState=()=>true;
-globalThis.addDisciplineExp=(subject,id,amount)=>{
+globalThis.addDisciplineExp=(subject,id,amount,source)=>{
+  developmentSources.push(String(source||""));
+  if(source!=="action_derived_development")return false;
   const key=subject+"::"+id;discipline[key]=(discipline[key]||0)+Number(amount||0);return true;
 };
 globalThis.getCharacterDisciplineProgression=(subject,id)=>({subjectId:subject,disciplineId:id,exp:discipline[subject+"::"+id]||0});
@@ -243,11 +246,16 @@ const diag=globalThis.runAcademyKakashiBattleDevelopment35740Diagnostics();
 assert.strictEqual(diag.pass,true,"35740 diagnostics failed: "+JSON.stringify(diag.failed));
 assert.strictEqual(diag.browserGoldenClaimed,false);
 assert(saves>0);
+assert(developmentSources.length>0&&developmentSources.every(source=>source==="action_derived_development"),"all Kakashi action-derived discipline commits must use the reusable Progression source");
+const gameSource=fs.readFileSync(path.resolve(process.cwd(),"game.js"),"utf8");
+assert(gameSource.includes('const ACTION_DERIVED_DISCIPLINE_SOURCE =')&&gameSource.includes('"action_derived_development"'),"core Progression must expose the action-derived development source");
+assert(gameSource.includes("source ===")&&gameSource.includes("ACTION_DERIVED_DISCIPLINE_SOURCE"),"core Progression validator must accept the action-derived source");
 
 console.log("Academy Kakashi Story Battle development + immediate MI reward 35740 QA: PASS");
 console.log("- exact action evidence -> discipline development through 34800");
 console.log("- PS / AMT resolved evidence -> Battle development even when action_attempted omits top-level skillId");
 console.log("- PS / AMT retain zero immediate cash/loot; terminal Origin rewards remain independently deferred");
+console.log("- canonical addDisciplineExp accepts the reusable action_derived_development source instead of rejecting it as exam/practical mismatch");
 console.log("- solo MI victory -> immediate 50 Ryō + Field Recovery Pill ×1 entitlement");
 console.log("- claim commits material package exactly once; no generic EXP");
 console.log("- claim retry/reprojection does not duplicate Ryō, pill or development");
