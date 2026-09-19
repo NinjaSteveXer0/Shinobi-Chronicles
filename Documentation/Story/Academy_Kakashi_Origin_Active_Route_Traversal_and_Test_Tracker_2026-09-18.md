@@ -512,3 +512,35 @@ Implementation/runtime/browser validation: separate.
 
 Next root family:
 **MOVE IN CLOSER**.
+
+
+## 2026-09-19 — MOVE IN CLOSER downstream completed
+
+Current exact downstream authority:
+`Documentation/Story/Academy_Kakashi_Move_In_Closer_Downstream_Verbatim_Scene_Family_2026-09-19.md`
+current commit:
+`882c294c45f44d340b07fefd5b4a6f31016326c9`.
+
+Reusable exact endings:
+- AMT + PS two-target group disposition:
+  `Documentation/Story/Academy_Kakashi_AMT_PS_Two_Target_Group_Disposition_Verbatim_Lock_2026-09-19.md`
+  commit `7efacbb01328a91e5fe4cebb051e48d884ab52fd`;
+- package-missing PS post-Battle disposition:
+  `Documentation/Story/Academy_Kakashi_Package_Missing_PS_Post_Battle_Disposition_Verbatim_Lock_2026-09-19.md`
+  current commit `ea3752e0023b8c5cbd838a749f40353af8157184`.
+
+Closed SUCCESS continuations:
+1. LET THE HANDOFF HAPPEN -> Observe escalation with full Get Closer Knowledge retained;
+2. STRIKE BEFORE THE HANDOFF -> fixed AMT+PS 2-v-1 -> package -> MI arrival -> MI 1-v-1;
+3. ATTEMPT THE PICKPOCKET -> clean extraction OR MI-unseen AMT+PS 2-v-1.
+
+Closed FAILURE continuations:
+1. STAY ON THE PACKAGE -> existing Pakkun pursuit family;
+2. STOP PACKAGE SMUGGLER -> PS 1-v-1 -> KILL / RESTRAIN / ANBU / POLICE;
+3. CUT THEM OFF AT THE SAKURA TREE -> Pakkun present in Story, Kakashi vs AMT+PS 2-v-1, then exact two-target group disposition on victory.
+
+Old automatic-custody shortcuts superseded.
+Pakkun is not granted Battle actions in a non-Pakkun config.
+
+Writing MOVE IN CLOSER family: CLOSED.
+Implementation/runtime/browser validation: separate.
