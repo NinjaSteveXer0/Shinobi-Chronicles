@@ -5,6 +5,10 @@
 **Status:** **BINDING CE / STORY RUNTIME ADDENDUM — FIRST REQUIRED CONSUMER: ACADEMY KAKASHI**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
+> **2026-09-20 CE research-integration extension**  
+> This contract is extended by `Documentation/Coordination/CE_Interactive_Narrative_Affordance_Intention_Reincorporation_and_Causal_Presentation_Doctrine_2026-09-20.md` (commit `64399463d1870b752954ffceaaf31629a5961691`).  
+> Participant intention revision is now explicitly **Knowledge-gated**: a participant may revise intent when legitimate participant-side Knowledge/belief changes, not merely because omniscient World Truth changed.
+
 ## 1. Purpose
 
 GitHub issue #194 routed Stephen-approved Writing authority into CE for reusable generalisation.
