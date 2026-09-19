@@ -29,7 +29,7 @@ const KAK=globalThis.SC_ALPHA_KAKASHI_FINAL_34100;
 const SCENE03A=globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700;
 if(!A||!CORE||!KAK||!SCENE03A)throw new Error("kakashi_scene04a_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene04a_35710_v8_2026_09_19";
+const PATCH_ID="alpha_kakashi_scene04a_35710_v9_2026_09_19";
 const AUTHORITY="64966fb33590d09e7ae16a33d51d0e7262b5891d";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
@@ -107,62 +107,40 @@ function ensurePresentationStyle35710(){
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{
   width:min(96%,338px)!important;max-height:505px!important;
 }
-/* Scene 04A is live choreography: present actors stay vivid; focus is emphasis, not greying. */
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actor:not(.sc-kakashi-state-exit-left-35710):not(.sc-kakashi-state-exit-right-35710):not(.sc-kakashi-state-offstage-right-35710):not(.sc-kakashi-mi-enter-rightward-35710){
+/* Scene 04A begins from the final WATCH THE EXCHANGE state: AMT has already broken away and MI is already on-stage. */
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actor:not(.sc-kakashi-state-exit-right-35710):not(.sc-kakashi-state-offstage-right-35710){
   opacity:1!important;filter:none!important;
 }
 
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"]{
-  grid-template-columns:repeat(3,minmax(0,1fr))!important;align-items:end!important;gap:1.5%!important;padding:0 1.8%!important;
-}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"] .sc-scene-board-33900__actor{
-  width:min(90%,250px)!important;max-height:430px!important;
-}
-
-/* Narrative geography: actor placement expresses movement rather than equal tiles. */
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"][data-stage="amt-departure"],
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"][data-stage="interceptor-arrival"],
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"][data-stage="kakashi-blocks-line"],
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"][data-stage="smuggler-departure"]{
   display:block!important;padding:0!important;
 }
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="amt-departure"] .sc-scene-board-33900__actor,
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="interceptor-arrival"] .sc-scene-board-33900__actor,
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-blocks-line"] .sc-scene-board-33900__actor,
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="smuggler-departure"] .sc-scene-board-33900__actor{
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-count="3"] .sc-scene-board-33900__actor{
   position:absolute!important;bottom:0!important;width:min(20vw,252px)!important;max-height:430px!important;
 }
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="amt-departure"] [data-actor-id="academy_kakashi"]{left:28%!important}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="amt-departure"] [data-actor-id="anbu_marked_target"]{left:5%!important}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="amt-departure"] [data-actor-id="package_smuggler"]{right:7%!important}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="interceptor-arrival"] [data-actor-id="academy_kakashi"]{left:13%!important}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="interceptor-arrival"] [data-actor-id="masked_interceptor"]{left:46%!important}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="interceptor-arrival"] [data-actor-id="package_smuggler"]{right:6%!important}
+/* Kakashi moves out of the observer lane and physically inserts himself between MI and PS. */
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-approach"] [data-actor-id="masked_interceptor"]{left:10%!important}
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-approach"] [data-actor-id="academy_kakashi"]{left:27%!important}
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-approach"] [data-actor-id="package_smuggler"]{right:6%!important}
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-blocks-line"] [data-actor-id="masked_interceptor"],
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="smuggler-departure"] [data-actor-id="masked_interceptor"]{left:10%!important}
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-blocks-line"] [data-actor-id="academy_kakashi"],
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="smuggler-departure"] [data-actor-id="academy_kakashi"]{left:40%!important}
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="kakashi-blocks-line"] [data-actor-id="package_smuggler"],
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-scene-board-33900__actors[data-stage="smuggler-departure"] [data-actor-id="package_smuggler"]{right:6%!important}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-mi-enter-rightward-35710{
-  animation:kakashiMiEnterRightward35710 520ms cubic-bezier(.18,.76,.24,1) both!important;
+#story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-block-entry-35710{
+  animation:kakashiBlockEntry35710 520ms cubic-bezier(.18,.76,.24,1) both!important;
 }
-@keyframes kakashiMiEnterRightward35710{0%{opacity:0;transform:translateX(-22vw) scale(.93);filter:brightness(.38) blur(2px)}100%{opacity:1;transform:translateX(0) scale(.95);filter:none}}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-mi-enter-rightward-35710.is-focus{animation-name:kakashiMiEnterRightwardFocus35710}
-@keyframes kakashiMiEnterRightwardFocus35710{0%{opacity:0;transform:translateX(-22vw) scale(.95)}100%{opacity:1;transform:translateX(0) scale(1)}}
-#story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-state-exit-left-35710{
-  animation:kakashiStateExitLeft35710 560ms cubic-bezier(.36,.08,.76,.3) both!important;filter:none!important;
-}
+@keyframes kakashiBlockEntry35710{0%{opacity:1;transform:translateX(-18vw) scale(.96);filter:none}100%{opacity:1;transform:translateX(0) scale(1);filter:none}}
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-state-exit-right-35710{
   animation:kakashiStateExitRight35710 560ms cubic-bezier(.36,.08,.76,.3) both!important;filter:none!important;
 }
 #story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-state-offstage-right-35710{
-  opacity:0!important;transform:translateX(68vw) rotate(3deg) scale(.94)!important;
+  opacity:0!important;transform:translateX(68vw) rotate(3deg) scale(.94)!important;filter:none!important;
 }
-@keyframes kakashiStateExitLeft35710{0%{opacity:1;transform:translateX(0) scale(.95);filter:none}100%{opacity:0;transform:translateX(-68vw) rotate(-3deg) scale(.94);filter:none}}
 @keyframes kakashiStateExitRight35710{0%{opacity:1;transform:translateX(0) scale(.95);filter:none}100%{opacity:0;transform:translateX(68vw) rotate(3deg) scale(.94);filter:none}}
 @media(prefers-reduced-motion:reduce){
-  #story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-state-exit-left-35710{animation:none!important;opacity:0!important;transform:translateX(-68vw)!important}
+  #story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-block-entry-35710{animation:none!important;transform:none!important}
   #story-scene-presentation-layer .${BOARD_CLASS} .sc-kakashi-state-exit-right-35710{animation:none!important;opacity:0!important;transform:translateX(68vw)!important}
 }
 `;
@@ -263,21 +241,15 @@ function actorMarkup35710(id,label,image,state,focus=false,extraClass=""){return
 function boardMarkup35710(rt){
   const p=isScene04A(rt)?performance(rt):null,index=p?p.index:CUES.length-1,focus=p&&p.cue&&p.cue.focusActorRef||"academy_kakashi";
   const isNarration=rt.beatId===SCENE04A_BEAT;
-  const kak=()=>actorMarkup35710("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png",rt.beatId===BATTLE_BEAT?"ENGAGING MASKED INTERCEPTOR":focus==="academy_kakashi"?"FOCUSED":"PRESENT",focus==="academy_kakashi");
-  const mi=()=>actorMarkup35710("masked_interceptor","MASKED INTERCEPTOR","NPC/masked_interceptor.png",rt.beatId===RETURN_BEAT?"BATTLE RESULT COMMITTED":index>=9||rt.beatId===BATTLE_BEAT?"ENGAGING KAKASHI":"PRESSING PACKAGE SMUGGLER",focus==="masked_interceptor"||rt.beatId===BATTLE_BEAT,index===3&&isNarration?"sc-kakashi-mi-enter-rightward-35710":"");
+  const kakClass=isNarration&&index===4?"sc-kakashi-block-entry-35710":"";
+  const kak=()=>actorMarkup35710("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png",rt.beatId===BATTLE_BEAT?"ENGAGING MASKED INTERCEPTOR":focus==="academy_kakashi"?"FOCUSED":"PRESENT",focus==="academy_kakashi",kakClass);
+  const mi=()=>actorMarkup35710("masked_interceptor","MASKED INTERCEPTOR","NPC/masked_interceptor.png",rt.beatId===RETURN_BEAT?"BATTLE RESULT COMMITTED":index>=9||rt.beatId===BATTLE_BEAT?"ENGAGING KAKASHI":"PRESSING PACKAGE SMUGGLER",focus==="masked_interceptor"||rt.beatId===BATTLE_BEAT);
   const psExit=index===6&&isNarration?"sc-kakashi-state-exit-right-35710":index>=7&&index<=8&&isNarration?"sc-kakashi-state-offstage-right-35710":"";
   const ps=()=>actorMarkup35710("package_smuggler","PACKAGE SMUGGLER","NPC/package_smuggler.png",index>=6?"ESCAPING WITH PACKAGE":"CURRENT PACKAGE HOLDER",focus==="package_smuggler",psExit);
   const actors=[];
   let stage="duel";
-  if(isNarration&&index===0){
-    stage="amt-departure";
-    actors.push(kak());
-    actors.push(actorMarkup35710("anbu_marked_target","ANBU MARKED TARGET","NPC/anbu_marked_target.png","BREAKING AWAY",false,"sc-kakashi-state-exit-left-35710"));
-    actors.push(ps());
-  }else if(isNarration&&index<=2){
-    stage="pre-intercept";actors.push(kak(),ps());
-  }else if(isNarration&&index===3){
-    stage="interceptor-arrival";actors.push(kak(),mi(),ps());
+  if(isNarration&&index<=3){
+    stage="kakashi-approach";actors.push(mi(),kak(),ps());
   }else if(isNarration&&index>=4&&index<=8){
     stage=index>=6?"smuggler-departure":"kakashi-blocks-line";actors.push(mi(),kak(),ps());
   }else{
@@ -343,7 +315,7 @@ function diagnostics(){
   const def=scene(),major=def&&def.beatMap instanceof Map?def.beatMap.get(MAJOR_BEAT):null,choice=major&&Array.isArray(major.choices)?major.choices.find(row=>row&&row.choiceId===CHOICE_ID):null,battle=def&&def.beatMap instanceof Map?def.beatMap.get(BATTLE_BEAT):null,ret=def&&def.beatMap instanceof Map?def.beatMap.get(RETURN_BEAT):null,scene04=def&&def.beatMap instanceof Map?def.beatMap.get(SCENE04A_BEAT):null;
   const exact=["Kakashi moves.","Not toward ANBU Marked Target.","Not toward the package.","Toward Masked Interceptor.","She is already closing on Package Smuggler when Kakashi drops between them.","Package Smuggler sees the opening immediately.","He turns and runs.","The package goes with him.","Kakashi does not follow.","Masked Interceptor changes direction without hesitation.","Her attention settles on Kakashi.","He has made himself the obstacle now.","She comes straight through him.","Kakashi meets her head-on."];
   const envId=beat=>beat&&beat.environmentRef&&beat.environmentRef.assetId||null;
-  const checks={patchId:PATCH_ID==="alpha_kakashi_scene04a_35710_v8_2026_09_19",authorityPinned:AUTHORITY==="64966fb33590d09e7ae16a33d51d0e7262b5891d",exactFourteenNarrationCues:CUES.length===14&&JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exact)&&CUES.every(row=>row.kind==="narration"&&!row.speakerName),stopAssassinWired:!!choice&&choice.nextBeatId===SCENE04A_BEAT&&Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>row&&row.requestId===INTENT_REQUEST),intentBeforeBattle:ensureStopAssassinIntent35710.toString().includes("commitStoryIntent"),fightBackdropBound:envId(scene04)===FIGHT_BACKDROP_ID&&envId(battle)===FIGHT_BACKDROP_ID&&envId(ret)===FIGHT_BACKDROP_ID&&FIGHT_BACKDROP_PATH==="Kakashi Origin Backdrop/fight_at_sakura_tree.png",persistentScene04ABoard:BOARD_CLASS==="sc-kakashi-scene04a-board-35710"&&renderScene04APresentation35710.toString().includes("BOARD_CLASS"),exactBattleConfig:!!battle&&battle.mode==="battle_transition"&&battle.battle&&battle.battle.encounterId===BATTLE_CONFIG&&BATTLE_CONFIG==="academy_kakashi_origin_battle_mi_1v1",exactBattleBinding:BINDING==="academy_kakashi.battle.stop_assassin"&&SOURCE_ANCHOR==="AK_SA_019",finalCueAutoLaunch:launchBattleAfterFinalCue35710.toString().includes("launchStorySceneBattle")&&globalThis.advanceStoryScene.toString().includes("launchBattleAfterFinalCue35710"),noPakkun:launchScene04ABattle35710.toString().includes("pakkunAuthorized:false"),returnsSameBranch:!!battle&&battle.battle.postBattleBeatId===RETURN_BEAT&&!!ret&&ret.mode==="post_battle",battleReturnConsumed:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(row=>row&&row.requestId===RETURN_REQUEST)&&consumeScene04ABattleReturn35710.toString().includes("dispatchCommittedIntent"),noBattleOutcomeOverreach:consumeScene04ABattleReturn35710.toString().includes("resultState")&&!consumeScene04ABattleReturn35710.toString().includes("participantDeathCommitted:true")&&!consumeScene04ABattleReturn35710.toString().includes("participantCustodyCommitted:true"),objectiveExact:OBJECTIVE==="Retrieve the package.",standardCharacterCardScale:ensurePresentationStyle35710.toString().includes("width:min(94%,322px)")&&ensurePresentationStyle35710.toString().includes("width:min(96%,338px)")&&ensurePresentationStyle35710.toString().includes("max-height:505px"),activeActorsRemainFullColour:ensurePresentationStyle35710.toString().includes("present actors stay vivid")&&ensurePresentationStyle35710.toString().includes("opacity:1!important;filter:none!important"),orderedStopAssassinChoreography:boardMarkup35710.toString().includes('index===0')&&boardMarkup35710.toString().includes("sc-kakashi-state-exit-left-35710")&&boardMarkup35710.toString().includes('index===3&&isNarration?"sc-kakashi-mi-enter-rightward-35710"')&&boardMarkup35710.toString().includes('index===6&&isNarration?"sc-kakashi-state-exit-right-35710"'),stateDrivenDepartureMotion:ensurePresentationStyle35710.toString().includes("kakashiStateExitLeft35710")&&ensurePresentationStyle35710.toString().includes("kakashiStateExitRight35710")&&boardMarkup35710.toString().includes("BREAKING AWAY")&&boardMarkup35710.toString().includes("sc-kakashi-state-exit-right-35710"),narrativeCardStaging:boardMarkup35710.toString().includes("kakashi-blocks-line")&&boardMarkup35710.toString().includes("interceptor-arrival")&&ensurePresentationStyle35710.toString().includes("kakashiMiEnterRightward35710"),
+  const checks={patchId:PATCH_ID==="alpha_kakashi_scene04a_35710_v9_2026_09_19",authorityPinned:AUTHORITY==="64966fb33590d09e7ae16a33d51d0e7262b5891d",exactFourteenNarrationCues:CUES.length===14&&JSON.stringify(CUES.map(row=>row.text))===JSON.stringify(exact)&&CUES.every(row=>row.kind==="narration"&&!row.speakerName),stopAssassinWired:!!choice&&choice.nextBeatId===SCENE04A_BEAT&&Array.isArray(choice.consequenceRequests)&&choice.consequenceRequests.some(row=>row&&row.requestId===INTENT_REQUEST),intentBeforeBattle:ensureStopAssassinIntent35710.toString().includes("commitStoryIntent"),fightBackdropBound:envId(scene04)===FIGHT_BACKDROP_ID&&envId(battle)===FIGHT_BACKDROP_ID&&envId(ret)===FIGHT_BACKDROP_ID&&FIGHT_BACKDROP_PATH==="Kakashi Origin Backdrop/fight_at_sakura_tree.png",persistentScene04ABoard:BOARD_CLASS==="sc-kakashi-scene04a-board-35710"&&renderScene04APresentation35710.toString().includes("BOARD_CLASS"),exactBattleConfig:!!battle&&battle.mode==="battle_transition"&&battle.battle&&battle.battle.encounterId===BATTLE_CONFIG&&BATTLE_CONFIG==="academy_kakashi_origin_battle_mi_1v1",exactBattleBinding:BINDING==="academy_kakashi.battle.stop_assassin"&&SOURCE_ANCHOR==="AK_SA_019",finalCueAutoLaunch:launchBattleAfterFinalCue35710.toString().includes("launchStorySceneBattle")&&globalThis.advanceStoryScene.toString().includes("launchBattleAfterFinalCue35710"),noPakkun:launchScene04ABattle35710.toString().includes("pakkunAuthorized:false"),returnsSameBranch:!!battle&&battle.battle.postBattleBeatId===RETURN_BEAT&&!!ret&&ret.mode==="post_battle",battleReturnConsumed:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(row=>row&&row.requestId===RETURN_REQUEST)&&consumeScene04ABattleReturn35710.toString().includes("dispatchCommittedIntent"),noBattleOutcomeOverreach:consumeScene04ABattleReturn35710.toString().includes("resultState")&&!consumeScene04ABattleReturn35710.toString().includes("participantDeathCommitted:true")&&!consumeScene04ABattleReturn35710.toString().includes("participantCustodyCommitted:true"),objectiveExact:OBJECTIVE==="Retrieve the package.",standardCharacterCardScale:ensurePresentationStyle35710.toString().includes("width:min(94%,322px)")&&ensurePresentationStyle35710.toString().includes("width:min(96%,338px)")&&ensurePresentationStyle35710.toString().includes("max-height:505px"),activeActorsRemainFullColour:ensurePresentationStyle35710.toString().includes("opacity:1!important;filter:none!important"),watchStateNotReplayed:!boardMarkup35710.toString().includes("anbu_marked_target")&&!boardMarkup35710.toString().includes("sc-kakashi-mi-enter-rightward-35710"),orderedStopAssassinChoreography:boardMarkup35710.toString().includes("kakashi-approach")&&boardMarkup35710.toString().includes('index===4?"sc-kakashi-block-entry-35710"')&&boardMarkup35710.toString().includes('index===6&&isNarration?"sc-kakashi-state-exit-right-35710"'),stateDrivenDepartureMotion:ensurePresentationStyle35710.toString().includes("kakashiBlockEntry35710")&&ensurePresentationStyle35710.toString().includes("kakashiStateExitRight35710"),narrativeCardStaging:boardMarkup35710.toString().includes("kakashi-blocks-line")&&boardMarkup35710.toString().includes("smuggler-departure")&&ensurePresentationStyle35710.toString().includes("kakashiBlockEntry35710"),
     narrationQuickRead:renderScene04APresentation35710.toString().includes('name.textContent="NARRATION"'),redundantPackageBadgeRemoved:!boardMarkup35710.toString().includes("sc-scene-board-33900__objects")&&boardMarkup35710.toString().includes("ESCAPING WITH PACKAGE"),browserGoldenClaimed:false};
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);return{pass:failed.length===0,checks,failed,authority:AUTHORITY,battleConfigId:BATTLE_CONFIG,bindingRef:BINDING,sourceAnchorRef:SOURCE_ANCHOR,fightBackdropId:FIGHT_BACKDROP_ID,fightBackdropPath:FIGHT_BACKDROP_PATH,browserGoldenClaimed:false};
 }
