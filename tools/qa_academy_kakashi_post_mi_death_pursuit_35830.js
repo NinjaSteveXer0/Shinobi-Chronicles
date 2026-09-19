@@ -112,6 +112,7 @@ assert(source35830.includes("if(ref===PAKKUN)return"),"Pakkun must bypass generi
 assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-board-33900__actor-frame\")"),"Pakkun regression guard must reject Character Card framing");
 assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
+assert(source35830.includes("top:12%!important"),"generic post-MI dialogue must be lifted clear of Character Cards");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
@@ -158,11 +159,11 @@ assert.strictEqual(participantStates[PS].stateClass,"DEFEATED_BUT_NOT_CONTROLLED
 
 drainNarration(MOD.beats.psDecision);
 let psChoices=definition.beatMap.get(MOD.beats.psDecision).choices;
-assert.deepStrictEqual(psChoices.map(x=>x.label),["GO AFTER ANBU MARKED TARGET","ATTEMPT TO KILL HIM","RETURN TO ANBU","RESTRAIN HIM AND CONTINUE"]);
-assert.strictEqual(psChoices.find(x=>x.label==="RESTRAIN HIM AND CONTINUE").availability().available,false,"CE #244 choice must remain fail-closed");
-const attempt=globalThis.advanceStoryScene("postmi_ps_attempt_kill");
-assert.strictEqual(attempt.success,false);
-assert.strictEqual(attempt.reason,"package_smuggler_lethal_attempt_owning_resolver_result_required");
+assert.deepStrictEqual(psChoices.map(x=>x.label),["GO AFTER ANBU MARKED TARGET","KILL HIM","RETURN TO ANBU","RESTRAIN HIM AND CONTINUE"]);
+assert.strictEqual(psChoices.find(x=>x.label==="RESTRAIN HIM AND CONTINUE").availability().available,false,"Writing #281 continuation must remain fail-closed until authored");
+const directPsKill=globalThis.advanceStoryScene("postmi_ps_kill");
+assert.strictEqual(directPsKill.success,true,"ordinary defeated PS must allow direct KILL without hidden control state");
+assert.strictEqual(participantStates[PS].stateClass,"DEAD");
 assert.strictEqual(active.beatId,MOD.beats.psDecision);
 
 out=globalThis.advanceStoryScene("postmi_ps_go_amt");
@@ -177,11 +178,14 @@ simulateBattleReturn(MOD.beats.amtBattle,{battleConfigId:"academy_kakashi_origin
 out=MOD.consumeAmtReturn();
 assert.strictEqual(out.success,true,"AMT Battle return failed: "+JSON.stringify(out));
 assert.strictEqual(participantStates[AMT].stateClass,"CONTROLLED_DEFEATED");
+participantStates[AMT]={participantRef:AMT,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-amt-ordinary-defeat"};
 drainNarration(MOD.beats.amtDecision);
 let amtChoices=definition.beatMap.get(MOD.beats.amtDecision).choices;
 assert.deepStrictEqual(amtChoices.map(x=>x.label),["BRING HIM TO THE UCHIHA POLICE FORCE","LET HIM GO","KILL HIM","TAKE HIM BACK TO THE ANBU","RESTRAIN HIM AND TURN HIM INTO ANBU","RESTRAIN HIM AND TURN HIM INTO THE UCHIHA POLICE FORCE"]);
 assert.strictEqual(amtChoices[4].availability().available,false);
 assert.strictEqual(amtChoices[5].availability().available,false);
+assert.strictEqual(amtChoices[4].availability().knownBlocker,"WAITING ON WRITING #281");
+assert(!amtChoices.some(x=>String(x.label||"").includes("ATTEMPT TO")),"AMT dispositions must not be renamed by hidden control classification");
 
 out=globalThis.advanceStoryScene("postmi_amt_kill");
 assert.strictEqual(out.success,true);
@@ -214,11 +218,11 @@ console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
 console.log("- live fast-win PS pursuit and post-kill PS/AMT pursuit entries use direct authored successor routing");
 console.log("- committed MI death is never rerolled across lethal successor selection");
 console.log("- PS route uses sequential PS Battle config and separate AK_SA_033 package recovery");
-console.log("- <=3 PS victory preserves AMT route; PS ATTEMPT lethal remains resolver-owned/fail-closed");
+console.log("- <=3 PS victory preserves AMT route; PS direct KILL works from ordinary defeated state");
 console.log("- PS and AMT battle-transition beats auto-launch through canonical Story Battle authority");
 console.log("- legitimate AMT reach commits Pakkun, reveals Assets/Summons/pakkun.png on-cue, and uses alleyway_konoha_night");
 console.log("- legitimate AMT reach commits Pakkun and uses sequential AMT+Pakkun config");
-console.log("- AMT controlled victory exposes exact disposition family; CE #244 extensions stay blocked");
+console.log("- AMT victory exposes direct disposition family regardless hidden control state; restraint continuation waits only on Writing #281");
 console.log("- deterministic AMT KILL preserves package custody");
 console.log("- direct AMT fork permanently closes PS pursuit");
 console.log("- AMT defeat refuses to invent object/Pakkun autonomy resolution");
