@@ -101,6 +101,11 @@ assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","practical"
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("nin","exam"),true,"legacy Ninjutsu Exam source must remain valid");
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","exam"),false,"34800 must not broaden unrelated legacy training sources");
 load("runtime/alpha-kakashi-battle-development-35740.js");
+const source35740=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-battle-development-35740.js"),"utf8");
+assert(source35740.includes('const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;'),"deferred Battle Ryō tile must source the existing material Battle reward value");
+assert(source35740.includes('<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:"0"}</strong>'),"deferred Battle Ryō tile must render a numeric value");
+assert(!source35740.includes('<span>RYŌ</span><strong>DEBRIEF</strong>'),"Ryō metric must never use DEBRIEF as a currency amount");
+
 
 const first=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
 assert.strictEqual(first.generated,true);

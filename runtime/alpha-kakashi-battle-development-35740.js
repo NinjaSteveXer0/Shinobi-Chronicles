@@ -17,7 +17,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740)return;
 
-const PATCH_ID="alpha_kakashi_battle_development_35740_v4_2026_09_19";
+const PATCH_ID="alpha_kakashi_battle_development_35740_v5_2026_09_19";
 const KAKASHI="academy_kakashi";
 const ROUTE="academy_kakashi_origin_reward";
 const TECHNICAL=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
@@ -200,6 +200,7 @@ function enhanceKakashiVictory35740(container){
   const immediate=isExactMiVictoryBattle(b)?prepareImmediateMiReward35740(b):null;
   const isImmediate=!!(immediate&&immediate.success===true&&immediate.qualifies===true);
   const claimed=!!(b.rewards&&b.rewards.claimed===true);
+  const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;
 
   const rewards=container.querySelector(".alpha-victory-rewards");
   if(rewards){
@@ -215,7 +216,7 @@ function enhanceKakashiVictory35740(container){
       rewards.setAttribute("aria-label","Battle development and deferred Origin rewards");
       rewards.innerHTML=`
         <div class="alpha-victory-metric"><span>DISCIPLINE EXP</span><strong>+${Number(summary&&summary.totalExp)||0}</strong></div>
-        <div class="alpha-victory-metric"><span>RYŌ</span><strong>DEBRIEF</strong></div>
+        <div class="alpha-victory-metric"><span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:"0"}</strong></div>
         <div class="alpha-victory-list"><span>DEVELOPMENT</span><div>${developmentListMarkup(summary)}</div></div>
         <div class="alpha-victory-list is-rare"><span>ORIGIN REWARDS</span><div><span>Evaluated at terminal debrief</span></div></div>
       `;
@@ -335,8 +336,9 @@ if(priorClaimRewards){
 
 function diagnostics(){
   const sync=syncBattleDevelopment35740.toString(),present=enhanceKakashiVictory35740.toString();
+  const legacyDeferredRyoLabel="<span>RYŌ</span><strong>"+["DE","BRIEF"].join("")+"</strong>";
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v4_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v5_2026_09_19",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
     technicalDevelopmentUses34800:sync.includes("recordAcademyKakashiTechnicalDevelopment34800"),
     storyDeploymentOwnsPlayerEvidence:sync.includes('row.actorRef.side==="player"')&&!sync.includes("row.actorRef.participantId===KAKASHI")&&!sync.includes("row.targetRef.participantId!==KAKASHI"),
@@ -348,6 +350,7 @@ function diagnostics(){
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
     chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
     immediateVictoryPresentation:present.includes("BATTLE REWARD")&&present.includes("50 RYŌ")&&present.includes("FIELD RECOVERY PILL")&&present.includes("CLAIM BATTLE REWARD")&&present.includes("RETURN TO STORY")&&present.includes("REWARD CLAIMED"),
+    deferredBattleRyoStaysNumeric:present.includes("immediateRyo")&&present.includes("<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:\"0\"}</strong>")&&!present.includes(legacyDeferredRyoLabel),
     exactClaimUses34800:typeof globalThis.claimCurrentBattleRewards==="function"&&globalThis.claimCurrentBattleRewards.toString().includes("commitAcademyKakashiMiVictoryBattleReward34800"),
     browserGoldenClaimed:false
   };
