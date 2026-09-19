@@ -163,7 +163,7 @@ function materializeAmtDecision(){
  const rows=[
   choice("postmi_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE",BEAT.amtDecision,()=>({success:false,reason:"amt_police_handoff_scene_not_yet_locked"})),
   choice("postmi_amt_release","LET HIM GO",BEAT.amtReport,()=>commitAmtRelease()),
-  state==="CONTROLLED_DEFEATED"?choice("postmi_amt_kill","KILL HIM",BEAT.amtKill,()=>({success:true})):choice("postmi_amt_attempt_kill","ATTEMPT TO KILL HIM",BEAT.amtDecision,()=>({success:false,reason:"amt_lethal_attempt_owning_resolver_result_required"})),
+  state==="CONTROLLED_DEFEATED"?choice("postmi_amt_kill","KILL HIM",direct?BEAT.amtKill:BEAT.amtReport,direct?()=>({success:true}):()=>deterministicKillTarget(AMT,"amt")):choice("postmi_amt_attempt_kill","ATTEMPT TO KILL HIM",BEAT.amtDecision,()=>({success:false,reason:"amt_lethal_attempt_owning_resolver_result_required"})),
   choice("postmi_amt_return_anbu","TAKE HIM BACK TO THE ANBU",direct?BEAT.amtLiveReturn:BEAT.amtReport,()=>commitAmtAnbuReturn()),
   choice("postmi_amt_restrain_anbu","RESTRAIN HIM AND TURN HIM INTO ANBU",BEAT.amtDecision,()=>({success:false,reason:"field_secured_custody_requires_ce_244"}),false,"WAITING ON CE #244"),
   choice("postmi_amt_restrain_police","RESTRAIN HIM AND TURN HIM INTO THE UCHIHA POLICE FORCE",BEAT.amtDecision,()=>({success:false,reason:"field_secured_custody_requires_ce_244"}),false,"WAITING ON CE #244")
