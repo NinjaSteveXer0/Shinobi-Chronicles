@@ -478,3 +478,37 @@ Implementation/runtime/browser validation: separate.
 
 Next remaining Writing branch:
 **STRIKE BEFORE THE HANDOFF**.
+
+
+## 2026-09-19 — STRIKE BEFORE THE HANDOFF direct branch completed
+
+Stephen resolved the direct Attack continuation.
+
+Exact scene family:
+`Documentation/Story/Academy_Kakashi_Strike_Before_The_Handoff_Verbatim_Scene_Family_2026-09-19.md`
+commit `13166b7f56cdd89ad8a6c6ba3a51d1dada6bac06`.
+
+Exact root label preserved:
+**STRIKE BEFORE THE HANDOFF**
+
+Route:
+- Kakashi vs AMT + PS 2-v-1;
+- 2-v-1 loss -> AMT/PS withdraw with package; MI remains unseen;
+- 2-v-1 win -> package to Kakashi;
+- MI appears specifically to take package;
+- Kakashi vs MI 1-v-1;
+- MI win -> MI escapes with package;
+- Kakashi win -> exact group choices:
+  1. TAKE THEM TO THE UCHIHA POLICE FORCE
+  2. TAKE THEM TO THE ANBU
+  3. KILL THEM
+  4. TAKE THE PACKAGE AND LET THEM GO
+
+Direct Scene02 five-class Attack resolver lottery is superseded.
+The separate MOVE IN CLOSER -> STRIKE BEFORE THE HANDOFF route remains distinct.
+
+Writing branch: CLOSED.
+Implementation/runtime/browser validation: separate.
+
+Next root family:
+**MOVE IN CLOSER**.
