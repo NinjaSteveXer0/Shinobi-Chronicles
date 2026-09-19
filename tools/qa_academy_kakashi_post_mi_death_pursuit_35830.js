@@ -112,7 +112,7 @@ assert(source35830.includes("if(ref===PAKKUN)return"),"Pakkun must bypass generi
 assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-board-33900__actor-frame\")"),"Pakkun regression guard must reject Character Card framing");
 assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
-assert(source35830.includes("top:12%!important"),"generic post-MI dialogue must be lifted clear of Character Cards");
+assert(source35830.includes("top:4%!important"),"generic post-MI dialogue must clear the Character Card top edge");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
