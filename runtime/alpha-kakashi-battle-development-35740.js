@@ -20,7 +20,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740)return;
 
-const PATCH_ID="alpha_kakashi_battle_development_35740_v7_2026_09_19";
+const PATCH_ID="alpha_kakashi_battle_development_35740_v8_2026_09_20";
 const KAKASHI="academy_kakashi";
 const ROUTE="academy_kakashi_origin_reward";
 const TECHNICAL=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
@@ -34,6 +34,8 @@ const AUTHORITIES=Object.freeze({
   acquisition:"b83884adb70f1e74e62f96ab96848c1ec33704f9"
 });
 const MI_BATTLE_CONFIG="academy_kakashi_origin_battle_mi_1v1";
+const MI_SEQUENTIAL_BATTLE_CONFIG="academy_kakashi_origin_battle_seq_mi";
+const MI_BATTLE_CONFIGS=new Set([MI_BATTLE_CONFIG,MI_SEQUENTIAL_BATTLE_CONFIG]);
 const MI_PARTICIPANT="academy_kakashi_origin_masked_interceptor";
 const MI_REWARD_RYO=50;
 const MI_REWARD_ITEM_ID="field_recovery_pill";
@@ -42,6 +44,10 @@ const PS_PARTICIPANT="academy_kakashi_origin_package_smuggler";
 const AMT_BATTLE_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
 const AMT_PARTICIPANT="academy_kakashi_origin_amt";
 const DOWNSTREAM_REWARD_RYO=50;
+const THREE_V_ONE_BATTLE_CONFIG="academy_kakashi_origin_battle_amt_ps_mi_3v1";
+const THREE_V_ONE_PARTICIPANTS=new Set(["academy_kakashi_origin_amt","academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"]);
+const THREE_V_ONE_DEFERRED_RYO=25;
+const THREE_V_ONE_TANTO_ID="academy_training_tanto";
 
 function clone(v){try{return JSON.parse(JSON.stringify(v));}catch(_error){return v;}}
 function norm(v){return String(v||"").trim().toLowerCase().replace(/ū/g,"u");}
@@ -50,7 +56,11 @@ function deployment(b=battle()){return b&&b.kakashiOriginDeployment&&typeof b.ka
 function isKakashiOriginBattle(b=battle()){const d=deployment(b);return !!(b&&d&&d.controllerParticipantId===KAKASHI&&d.battleOccurrenceId);}
 function isExactMiVictoryBattle(b=battle()){
   const d=deployment(b),opposition=d&&Array.isArray(d.oppositionParticipantIds)?d.oppositionParticipantIds.map(String):[];
-  return !!(b&&d&&b.battleOver===true&&b.outcome&&b.outcome.type==="victory"&&d.controllerParticipantId===KAKASHI&&d.battleConfigId===MI_BATTLE_CONFIG&&opposition.length===1&&opposition[0]===MI_PARTICIPANT);
+  return !!(b&&d&&b.battleOver===true&&b.outcome&&b.outcome.type==="victory"&&d.controllerParticipantId===KAKASHI&&MI_BATTLE_CONFIGS.has(String(d.battleConfigId||""))&&opposition.length===1&&opposition[0]===MI_PARTICIPANT);
+}
+function isExceptionalThreeVsOneVictory35740(b=battle()){
+  const d=deployment(b),opposition=d&&Array.isArray(d.oppositionParticipantIds)?d.oppositionParticipantIds.map(String):[];
+  return !!(b&&d&&b.battleOver===true&&b.outcome&&b.outcome.type==="victory"&&d.controllerParticipantId===KAKASHI&&d.battleConfigId===THREE_V_ONE_BATTLE_CONFIG&&opposition.length===3&&opposition.every(ref=>THREE_V_ONE_PARTICIPANTS.has(ref)));
 }
 function downstreamCashSpec35740(b=battle()){
   const d=deployment(b),opposition=d&&Array.isArray(d.oppositionParticipantIds)?d.oppositionParticipantIds.map(String):[];
@@ -192,6 +202,10 @@ function attachSummaryToBattle(b,summary){
   b.rewards.progression=summary.rows.map(row=>({type:"discipline_exp",discipline:row.discipline,amount:row.amount}));
   b.rewards.kakashiOriginDevelopment=true;
   b.rewards.terminalOriginRewardDeferred=true;
+  if(isExceptionalThreeVsOneVictory35740(b)){
+    b.rewards.kakashiDeferredExceptionalFieldExecution=true;
+    b.rewards.kakashiDeferredOriginRewardComponents={exceptionalFieldExecutionRyo:THREE_V_ONE_DEFERRED_RYO,academyTrainingTantoEntitled:true,itemId:THREE_V_ONE_TANTO_ID,commitTiming:"terminal_debrief"};
+  }
   return summary;
 }
 function prepareImmediateMiReward35740(b=battle()){
@@ -295,6 +309,7 @@ function rewardDisclosureMarkup35740(summary,b=battle()){
     }).join("<br>"):"Committed Battle evidence · source detail unavailable";
     parts.push('<span><b>'+esc(disciplineLabel(row.discipline).toUpperCase())+' +'+(Number(row.amount)||0)+' EXP</b><br>'+causes+'</span>');
   }
+  if(isExceptionalThreeVsOneVictory35740(b))parts.push('<span><b>3-V-1 DEFERRED ORIGIN REWARD QUALIFIED</b> Exceptional field execution: +'+THREE_V_ONE_DEFERRED_RYO+' Ryō at terminal debrief · Academy Training Tantō entitlement at terminal debrief</span>');
   parts.push('<span><b>ORIGIN / DEBRIEF REWARDS</b> evaluated separately at terminal debrief</span>');
   return '<details class="alpha-victory-reward-disclosure"><summary>BATTLE BREAKDOWN</summary><div>'+parts.join("")+'</div></details>';
 }
@@ -308,6 +323,7 @@ function enhanceKakashiVictory35740(container){
   attachSummaryToBattle(b,summary);
   const isImmediate=!!(immediate&&immediate.success===true&&immediate.qualifies===true);
   const isDownstreamCash=!!(downstream&&downstream.success===true&&downstream.qualifies===true);
+  const isThreeVOne=isExceptionalThreeVsOneVictory35740(b);
   const hasImmediateMaterial=isImmediate||isDownstreamCash;
   const claimed=!!(b.rewards&&b.rewards.claimed===true);
   const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;
@@ -328,7 +344,7 @@ function enhanceKakashiVictory35740(container){
         <div class="alpha-victory-metric"><span>DISCIPLINE EXP</span><strong>+${Number(summary&&summary.totalExp)||0}</strong></div>
         <div class="alpha-victory-metric"><span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:"0"}</strong></div>
         <div class="alpha-victory-list"><span>DEVELOPMENT</span><div>${developmentListMarkup(summary)}${rewardDisclosureMarkup35740(summary,b)}</div></div>
-        <div class="alpha-victory-list is-rare"><span>ORIGIN REWARDS</span><div><span>Evaluated at terminal debrief</span></div></div>
+        <div class="alpha-victory-list is-rare"><span>ORIGIN REWARDS</span><div><span>${isThreeVOne?`3-V-1 EXCEPTIONAL FIELD EXECUTION · +${THREE_V_ONE_DEFERRED_RYO} RYŌ + ACADEMY TRAINING TANTŌ · DEFERRED TO TERMINAL DEBRIEF`:"Evaluated at terminal debrief"}</span></div></div>
       `;
     }
   }
@@ -347,7 +363,9 @@ function enhanceKakashiVictory35740(container){
       ?(claimed
         ?"50 Ryō Battle reward claimed. Battle development remains committed. Origin/debrief rewards remain separate."
         :"Claim 50 Ryō now. Battle development is already committed from executed actions; Origin/debrief rewards remain separate.")
-      :"Battle development is committed from executed actions. Origin Ryō and item/equipment rewards are evaluated at terminal debrief. Claim records this Battle Chronicle and returns to Story.";
+      :isThreeVOne
+        ?`This 3-v-1 victory gives no immediate Ryō or item. Action-derived development is already committed. It qualifies Exceptional Field Execution: +${THREE_V_ONE_DEFERRED_RYO} Ryō and Academy Training Tantō are deferred to terminal debrief.`
+        :"Battle development is committed from executed actions. Origin Ryō and item/equipment rewards are evaluated at terminal debrief. Claim records this Battle Chronicle and returns to Story.";
 
   const button=container.querySelector(".alpha-victory-footer .victory-continue");
   if(button){
@@ -371,6 +389,9 @@ function enhanceKakashiVictory35740(container){
     }else if(isDownstreamCash){
       rewardsDt.textContent="BATTLE REWARD";
       if(dd)dd.textContent=claimed?"50 RYŌ · CLAIMED":"50 RYŌ";
+    }else if(isThreeVOne){
+      rewardsDt.textContent="DEVELOPMENT + DEFERRED ORIGIN REWARD";
+      if(dd)dd.textContent=`${(Number(summary&&summary.totalExp)||0)>0?`+${summary.totalExp} EXP COMMITTED · `:""}+${THREE_V_ONE_DEFERRED_RYO} RYŌ + ACADEMY TRAINING TANTŌ DEFERRED`;
     }else{
       rewardsDt.textContent="DEVELOPMENT";
       if(dd)dd.textContent=(Number(summary&&summary.totalExp)||0)>0?`+${summary.totalExp} EXP COMMITTED`:"NO QUALIFYING EXP";
@@ -415,6 +436,7 @@ if(priorChronicle){
       result.rewards=result.rewards&&typeof result.rewards==="object"?result.rewards:{};
       result.rewards.progression=summary.rows.map(row=>({type:"discipline_exp",discipline:row.discipline,amount:row.amount}));
       result.rewards.terminalOriginRewardDeferred=true;
+      if(isExceptionalThreeVsOneVictory35740(b))result.rewards.deferredOriginReward={exceptionalFieldExecution:true,ryo:THREE_V_ONE_DEFERRED_RYO,academyTrainingTantoEntitled:true,itemId:THREE_V_ONE_TANTO_ID,commitTiming:"terminal_debrief"};
     }
     return result;
   };
@@ -457,7 +479,7 @@ function diagnostics(){
   const legacyDeferredRyoLabel="<span>RYŌ</span><strong>"+["DE","BRIEF"].join("")+"</strong>";
   const legacyRewardQuestion=["WHY"," THESE REWARDS?"].join("");
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v7_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v8_2026_09_20",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.downstreamCashReward==="7446e80c7f2cb9d004ffd914e11c0c77e7321c2b"&&AUTHORITIES.rewardDisclosure==="aad106b6a64ede81556aea0df0cc9fe4b8830178"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
     technicalDevelopmentUses34800:sync.includes("recordAcademyKakashiTechnicalDevelopment34800"),
     storyDeploymentOwnsPlayerEvidence:sync.includes('row.actorRef.side==="player"')&&!sync.includes("row.actorRef.participantId===KAKASHI")&&!sync.includes("row.targetRef.participantId!==KAKASHI"),
@@ -468,6 +490,8 @@ function diagnostics(){
     immediateMiRewardUses34800:prepareImmediateMiReward35740.toString().includes("ensureAcademyKakashiMiVictoryBattleEntitlement34800")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_RYO")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_ITEM_ID"),
     downstreamCashUses34800:prepareImmediateDownstreamCash35740.toString().includes("ensureAcademyKakashiDownstreamBattleCashEntitlement34800")&&prepareImmediateDownstreamCash35740.toString().includes("getAcademyKakashiDownstreamBattleCashRewardState34800"),
     downstreamCashExact:downstreamCashSpec35740.toString().includes("PS_BATTLE_CONFIG")&&downstreamCashSpec35740.toString().includes("AMT_BATTLE_CONFIG")&&DOWNSTREAM_REWARD_RYO===50,
+    sequentialSoloMiCovered:MI_BATTLE_CONFIGS.has(MI_BATTLE_CONFIG)&&MI_BATTLE_CONFIGS.has(MI_SEQUENTIAL_BATTLE_CONFIG)&&isExactMiVictoryBattle.toString().includes("MI_BATTLE_CONFIGS"),
+    threeVsOneDisclosureExact:THREE_V_ONE_DEFERRED_RYO===25&&THREE_V_ONE_TANTO_ID==="academy_training_tanto"&&rewardDisclosureMarkup35740.toString().includes("3-V-1 DEFERRED ORIGIN REWARD QUALIFIED")&&enhanceKakashiVictory35740.toString().includes("no immediate Ryō or item")&&attachSummaryToBattle.toString().includes("kakashiDeferredExceptionalFieldExecution"),
     causalRewardDisclosure:rewardDisclosureMarkup35740.toString().includes("BATTLE BREAKDOWN")&&!rewardDisclosureMarkup35740.toString().includes(legacyRewardQuestion)&&rewardDisclosureMarkup35740.toString().includes("mitigated")&&technicalEvidenceMeta.toString().includes("actionLabel"),
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
     chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
@@ -489,5 +513,5 @@ globalThis.prepareAcademyKakashiImmediateMiReward35740=prepareImmediateMiReward3
 globalThis.prepareAcademyKakashiImmediateDownstreamCash35740=prepareImmediateDownstreamCash35740;
 globalThis.enhanceAcademyKakashiVictory35740=enhanceKakashiVictory35740;
 globalThis.runAcademyKakashiBattleDevelopment35740Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740=Object.freeze({patchId:PATCH_ID,route:ROUTE,authorities:AUTHORITIES,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740=Object.freeze({patchId:PATCH_ID,route:ROUTE,authorities:AUTHORITIES,threeVsOne:Object.freeze({battleConfigId:THREE_V_ONE_BATTLE_CONFIG,deferredRyo:THREE_V_ONE_DEFERRED_RYO,itemId:THREE_V_ONE_TANTO_ID}),browserGoldenClaimed:false});
 })();
