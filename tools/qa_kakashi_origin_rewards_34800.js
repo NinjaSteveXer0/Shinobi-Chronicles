@@ -5,8 +5,8 @@ const root=path.resolve(__dirname,"..");
 const runtimePath=path.join(root,"runtime","alpha-kakashi-origin-rewards-34800.js");
 const src=fs.readFileSync(runtimePath,"utf8");
 const gameSrc=fs.readFileSync(path.join(root,"game.js"),"utf8");
-assert(gameSrc.includes("function registerDisciplineTrainingSource("),"canonical Progression source-registration API missing");
-assert(gameSrc.includes("ADDITIONAL_DISCIPLINE_TRAINING_SOURCES"),"canonical Progression additional-source registry missing");
+assert(!gameSrc.includes("action_derived_development"),"audited game.js must not be modified for Kakashi action-derived development");
+assert(src.includes("applyActionDerivedDisciplineExp34800"),"runtime adapter canonical ledger mutation bridge missing");
 assert(src.includes("ACADEMY KAKASHI ORIGIN REWARD ADAPTER"));
 assert(src.includes('const ROUTE="academy_kakashi_origin_reward"'));
 assert(src.includes('const ITEM_SOURCE="kak_origin_item_field_recovery_resupply"'));
@@ -59,6 +59,11 @@ const context={
   getCharacterDisciplineProgression(characterId,disciplineId){
     assert.strictEqual(characterId,"academy_kakashi");
     return characterProgression[disciplineId]||null;
+  },
+  processDisciplineLevelUps(characterId,disciplineId){
+    assert.strictEqual(characterId,"academy_kakashi");
+    const p=characterProgression[disciplineId];if(!p)return null;
+    return{levelsGained:0,level:1,exp:Number(p.exp||0),expToNext:999,statPointsGained:0,stat:0};
   },
   getItemDefinition(id){return defs[id]||null;},
   addItemToInventory(item){
