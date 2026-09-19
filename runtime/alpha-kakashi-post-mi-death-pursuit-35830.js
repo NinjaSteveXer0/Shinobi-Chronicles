@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v12_2026_09_20";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v13_2026_09_20";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -252,21 +252,27 @@ function materializePsDecision(){
  const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.get(BEAT.psDecision):null,rt=active();if(!b||!rt)return false;
  const rows=[],amt=rt.localContext&&rt.localContext.kakashiPostMiAmtEligible===true,psState=participantState(PS);
  if(amt)rows.push(choice("postmi_ps_go_amt","GO AFTER ANBU MARKED TARGET",BEAT.psToAmt,()=>{rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtRoute:"ps_amt",[CURSOR]:0};save();const p=commitPakkunReach("ps_amt");return p&&p.success===true?{success:true,pakkunReachOccurrenceId:p.occurrenceId}:p;}));
- if(psState!=="DEAD")rows.push(choice("postmi_ps_kill","KILL HIM",BEAT.psDecision,()=>deterministicKillTarget(PS,"ps")));
+ if(psState!=="DEAD"&&psState!=="FIELD_SECURED_PENDING_COLLECTION")rows.push(choice("postmi_ps_kill","KILL HIM",BEAT.psDecision,()=>deterministicKillTarget(PS,"ps")));
  rows.push(choice("postmi_ps_return_anbu","RETURN TO ANBU",BEAT.psReport,()=>({success:true})));
- if(amt&&psState!=="DEAD")rows.push(choice("postmi_ps_restrain_continue","RESTRAIN HIM AND CONTINUE",BEAT.psDecision,()=>({success:false,reason:"field_secured_continuation_requires_writing_281",issue:281,fieldSecuredAuthority:FIELD_SECURED_AUTHORITY}),false,"WAITING ON WRITING #281"));
+ if(amt&&psState!=="DEAD"&&psState!=="FIELD_SECURED_PENDING_COLLECTION")rows.push(choice("postmi_ps_restrain_continue","RESTRAIN HIM AND CONTINUE",BEAT.psToAmt,()=>{
+   const fn=globalThis.commitAcademyKakashiFieldSecured35920;if(typeof fn!=="function")return{success:false,reason:"field_secured_35920_not_loaded"};
+   const secured=fn(PS,{sourceOccurrenceId:String(rt.localContext.kakashiPostMiPsBattleOccurrenceId||""),locationRef:"KAKASHI_PS_ALT_NIGHT_STREET",routeRef:"post_mi_ps_restrain_continue"});if(!secured||secured.success!==true)return secured;
+   rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtRoute:"ps_amt",[CURSOR]:0};save();const p=commitPakkunReach("ps_amt");return p&&p.success===true?{success:true,fieldSecuredOccurrenceId:secured.occurrenceId,pakkunReachOccurrenceId:p.occurrenceId}:p;
+ }));
  b.choices=rows;return true;
 }
 function materializeAmtDecision(){
- const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.get(BEAT.amtDecision):null,rt=active();if(!b||!rt)return false;const state=participantState(AMT),direct=rt.localContext.kakashiPostMiAmtRoute==="direct_amt";
+ const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.get(BEAT.amtDecision):null,rt=active();if(!b||!rt)return false;const direct=rt.localContext.kakashiPostMiAmtRoute==="direct_amt";
+ const transfer=(destination)=>{const fn=globalThis.commitAcademyKakashiSingleTransfer35920;if(typeof fn!=="function")return{success:false,reason:"field_secured_35920_not_loaded"};return fn(AMT,destination,{sourceOccurrenceId:String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||"")});};
  const rows=[
-  choice("postmi_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE",BEAT.amtDecision,()=>({success:false,reason:"amt_police_handoff_scene_not_yet_locked"})),
+  choice("postmi_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE",BEAT.amtReport,()=>transfer("UCHIHA_POLICE")),
   choice("postmi_amt_release","LET HIM GO",BEAT.amtReport,()=>commitAmtRelease()),
   choice("postmi_amt_kill","KILL HIM",direct?BEAT.amtKill:BEAT.amtReport,()=>deterministicKillTarget(AMT,"amt")),
-  choice("postmi_amt_return_anbu","TAKE HIM BACK TO THE ANBU",direct?BEAT.amtLiveReturn:BEAT.amtReport,()=>commitAmtAnbuReturn()),
-  choice("postmi_amt_restrain_anbu","RESTRAIN HIM AND TURN HIM INTO ANBU",BEAT.amtDecision,()=>({success:false,reason:"field_secured_continuation_requires_writing_281",issue:281,fieldSecuredAuthority:FIELD_SECURED_AUTHORITY}),false,"WAITING ON WRITING #281"),
-  choice("postmi_amt_restrain_police","RESTRAIN HIM AND TURN HIM INTO THE UCHIHA POLICE FORCE",BEAT.amtDecision,()=>({success:false,reason:"field_secured_continuation_requires_writing_281",issue:281,fieldSecuredAuthority:FIELD_SECURED_AUTHORITY}),false,"WAITING ON WRITING #281")
+  choice("postmi_amt_return_anbu","TAKE HIM BACK TO THE ANBU",direct?BEAT.amtLiveReturn:BEAT.amtReport,()=>commitAmtAnbuReturn())
  ];
+ const refsFn=globalThis.getAcademyKakashiFieldSecuredRefs35920,beginFn=globalThis.beginAcademyKakashiCollectionFromAmt35920;
+ const earlier=typeof refsFn==="function"?refsFn().filter(ref=>ref!==AMT):[];
+ if(earlier.length&&typeof beginFn==="function")rows.push(choice("postmi_amt_restrain_collect","RESTRAIN HIM AND COLLECT THE OTHERS",globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920&&globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920.beats.collectPs||BEAT.amtDecision,()=>beginFn({sourceOccurrenceId:String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||"")})));
  b.choices=rows;return true;
 }
 function installBeats(){
@@ -395,7 +401,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v12_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v13_2026_09_20",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -421,7 +427,7 @@ function diagnostics(){
   pakkunOnlyOnAmtReach:commitPakkunReach.toString().includes("pakkunPresent:true")&&launchAmt.toString().includes("kakashiPostMiPakkunPresent!==true"),
   amtVictoryDoesNotChangePackage:consumeAmtReturn.toString().includes("packageCustodyUnchanged:true"),
   amtDefeatFailClosedUntilObjectAndAutonomy:consumeAmtReturn.toString().includes("post_mi_amt_defeat_requires_package_and_pakkun_autonomy_resolution"),
-  fieldSecuredSemanticsClosedContentPending:FIELD_SECURED_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0"&&materializePsDecision.toString().includes("field_secured_continuation_requires_writing_281")&&materializeAmtDecision.toString().includes("field_secured_continuation_requires_writing_281"),
+  fieldSecuredSemanticsLive:FIELD_SECURED_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0"&&materializePsDecision.toString().includes("commitAcademyKakashiFieldSecured35920")&&materializeAmtDecision.toString().includes("RESTRAIN HIM AND COLLECT THE OTHERS"),
   laterDebriefBoundary:globalThis.advanceStoryScene.toString().includes("post_mi_later_anbu_report_scene_not_yet_locked"),
   beats:!!m&&Object.values(BEAT).every(id=>m.has(id)),
   browserGoldenClaimed:false
