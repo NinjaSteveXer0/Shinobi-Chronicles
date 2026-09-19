@@ -283,3 +283,26 @@ Runtime currently still contains the superseded office cue sequence in `runtime/
 
 Coding handoff:
 - GitHub #257 — replace only the player-facing office cue realization; preserve existing loss semantics / hidden-review facts / closure.
+
+
+## 2026-09-19 simplification — remove post-Battle control-state gate
+
+Stephen simplified Academy Kakashi Origin post-Battle disposition semantics after installed-browser testing exposed that `CONTROLLED_DEFEATED` had no clear player-created path and was needlessly blocking restraint work.
+
+Binding authority:
+- `Documentation/Story/Academy_Kakashi_Post_Battle_Disposition_Simplification_2026-09-19.md`
+- commit `62821414baaadd047c524239d1b3bbf207692b61`.
+
+Current rule:
+- valid Battle victory opens authored post-Battle disposition;
+- no Ninja Wire / binding-skill finisher requirement;
+- no hidden `CONTROLLED_DEFEATED` prerequisite for direct Story choices;
+- do not rename choices to `ATTEMPT TO...` solely from internal control classification;
+- direct `KILL` is deterministic where authored after Battle victory;
+- direct `RESTRAIN ... AND CONTINUE` commits successful field restraint;
+- institutional custody and package custody remain separate.
+
+Issue impact:
+- #244 narrowed: no attempted-restraint success resolver needed; remaining scope is field-secured persistence, later escape/intervention, collection and group transfer.
+- #256 item 1 superseded: no separate PS attempted-lethal resolver merely because PS lacks hidden control classification.
+- Coding handoff #277: remove the control-state gate from MI/PS/AMT player-facing post-Battle choices and preserve existing timing/package/autonomy semantics.
