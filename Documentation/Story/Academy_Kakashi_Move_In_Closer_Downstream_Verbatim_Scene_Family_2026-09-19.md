@@ -399,32 +399,19 @@ Present exactly:
 3. **KILL THEM**
 4. **TAKE THE PACKAGE AND LET THEM GO**
 
-### Group semantics
+### Exact group continuation
 
-Police:
-- restrain AMT + PS individually using Wire Snare / ninja wire;
-- transfer each separately to Police;
-- package stays with Kakashi for ANBU report.
+Consume:
 
-ANBU:
-- restrain AMT + PS individually;
-- escort both to ANBU;
-- transfer each separately;
-- package -> ANBU separately.
+`Documentation/Story/Academy_Kakashi_AMT_PS_Two_Target_Group_Disposition_Verbatim_Lock_2026-09-19.md`
 
-KILL THEM:
-- AMT death commits;
-- PS death commits;
-- deterministic player-selected post-Battle group kill;
-- package remains with Kakashi.
+current exact commit lineage includes:
+`7efacbb01328a91e5fe4cebb051e48d884ab52fd`.
 
-TAKE THE PACKAGE AND LET THEM GO:
-- AMT alive / deliberate release;
-- PS alive / deliberate release;
-- package remains with Kakashi;
-- release != escape.
-
-No MI or Pakkun appears on this chronology.
+For this improved-Pickpocket chronology:
+- Pakkun = absent;
+- full Get Closer SUCCESS Knowledge remains retained;
+- no MI appears.
 
 ---
 
@@ -560,57 +547,22 @@ Present exactly:
 3. **BRING HIM TO THE ANBU**
 4. **TAKE HIM TO THE UCHIHA POLICE FORCE**
 
-### KILL HIM
+### Exact singular PS continuation
 
-Deterministic Story kill.
+Consume:
 
-PS -> dead.
+`Documentation/Story/Academy_Kakashi_Package_Missing_PS_Post_Battle_Disposition_Verbatim_Lock_2026-09-19.md`
 
-Package remains missing with AMT.
+current exact commit:
+`ea3752e0023b8c5cbd838a749f40353af8157184`.
 
-Set **Return to ANBU.**
+That lock owns exact:
+- **KILL HIM**
+- **RESTRAIN HIM**
+- **BRING HIM TO THE ANBU**
+- **TAKE HIM TO THE UCHIHA POLICE FORCE**
 
-### RESTRAIN HIM
-
-Kakashi uses Wire Snare / ninja wire.
-
-PS -> `FIELD_SECURED_PENDING_COLLECTION`
-
-Exact secured location uses:
-
-`Kakashi Origin Backdrop/konoha_alleyway_alt_night.png`
-
-Kakashi reports his location to ANBU.
-
-No package pursuit reopens.
-
-### BRING HIM TO THE ANBU
-
-Use the approved singular PS Return to ANBU scene, but project package state accurately:
-
-the package was never recovered and remains with escaped AMT.
-
-PS -> ANBU institutional custody only on completed transfer.
-
-### TAKE HIM TO THE UCHIHA POLICE FORCE
-
-Kakashi restrains PS with ninja wire and escorts him to:
-
-`Kakashi Origin Backdrop/uchiha_police_exterior_night.png`
-
-Police receive observer-safe facts:
-
-- failed Get Closer approach;
-- aborted handoff;
-- original carrier escaped with package;
-- PS was the intended receiver;
-- Kakashi fought and defeated PS.
-
-PS -> Uchiha Police institutional custody only at transfer.
-
-After Police handoff:
-
-**Return to ANBU.**
+including the package-missing PS ANBU return and Police handoff.
 
 ---
 
@@ -747,51 +699,21 @@ Present exactly:
 3. **KILL THEM**
 4. **TAKE THE PACKAGE AND LET THEM GO**
 
-### TAKE THEM TO THE UCHIHA POLICE FORCE
+### Exact group continuation
 
-Kakashi restrains AMT + PS individually with Wire Snare / ninja wire.
+Consume:
 
-Pakkun remains present through the connected escort/handoff until explicit departure.
+`Documentation/Story/Academy_Kakashi_AMT_PS_Two_Target_Group_Disposition_Verbatim_Lock_2026-09-19.md`
 
-Each participant transfers separately to Uchiha Police custody.
+current exact commit:
+`7efacbb01328a91e5fe4cebb051e48d884ab52fd`.
 
-Package remains with Kakashi for later ANBU report.
-
-### TAKE THEM TO THE ANBU
-
-Kakashi restrains both individually.
-
-Pakkun remains present.
-
-Package transfers separately to ANBU.
-
-AMT -> ANBU custody.
-
-PS -> ANBU custody.
-
-### KILL THEM
-
-Kakashi commits deterministic post-Battle lethal action against both defeated men.
-
-AMT -> dead.
-
-PS -> dead.
-
-Package remains with Kakashi.
-
-Pakkun is a materially present witness and receives a restrained, non-moralising reaction in the connected aftermath.
-
-### TAKE THE PACKAGE AND LET THEM GO
-
-AMT -> alive / deliberate release.
-
-PS -> alive / deliberate release.
-
-Package remains with Kakashi.
-
-Pakkun remains present long enough to observe that Kakashi has deliberately chosen the objective over custody.
-
-Release != escape.
+For this CUT THEM OFF chronology:
+- Pakkun = present in Story;
+- Pakkun remains until explicit departure;
+- package = Kakashi;
+- AMT + PS = defeated/available;
+- MI = unseen.
 
 ---
 
