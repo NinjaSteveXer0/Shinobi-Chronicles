@@ -13,7 +13,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_STORY_PRESENTATION_COMPAT_33920)return;
 
-const PATCH_ID="academy_kakashi_story_presentation_compat_33920_v5_2026_09_19";
+const PATCH_ID="academy_kakashi_story_presentation_compat_33920_v6_2026_09_19";
 const STYLE_ID="sc-kakashi-story-presentation-compat-33920-style";
 const boundStages=new WeakSet();
 
@@ -32,8 +32,25 @@ function installStyle33920(){
   const style=document.createElement("style");
   style.id=STYLE_ID;
   style.textContent=`
-/* Collectible cards already contain their identity treatment. */
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor-tag{display:none!important;}
+/* Collectible cards already contain their identity treatment.
+   Runtime adds STATE ONLY in the clear lane beneath the card. */
+#story-scene-presentation-layer .sc-scene-board-33900__actor{overflow:visible!important;}
+#story-scene-presentation-layer .sc-scene-board-33900__actor-tag{
+  display:block!important;left:50%!important;right:auto!important;top:auto!important;bottom:-30px!important;
+  width:max-content!important;max-width:95%!important;transform:translateX(-50%)!important;
+  padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;
+  backdrop-filter:none!important;text-align:center!important;white-space:nowrap!important;pointer-events:none!important;
+}
+#story-scene-presentation-layer .sc-scene-board-33900__actor-tag strong{display:none!important;}
+#story-scene-presentation-layer .sc-scene-board-33900__actor-tag small{
+  display:inline-block!important;margin:0!important;padding:3px 8px!important;
+  border:1px solid rgba(104,219,229,.36)!important;background:rgba(2,17,22,.86)!important;
+  color:#77dfe7!important;font-size:8px!important;font-weight:900!important;line-height:1.2!important;
+  letter-spacing:.08em!important;box-shadow:0 7px 18px rgba(0,0,0,.28),0 0 14px rgba(80,216,228,.08)!important;
+}
+#story-scene-presentation-layer .sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-tag small{
+  color:#f0cf78!important;border-color:rgba(220,177,77,.54)!important;background:rgba(24,17,5,.86)!important;
+}
 
 /* Click-anywhere progression owns advance. Do not show a redundant arrow. */
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-performance-next-33910{display:none!important;}
@@ -172,8 +189,9 @@ function runAcademyKakashiStoryPresentationCompat33920Diagnostics(){
   const css=typeof document!=="undefined"&&document.getElementById(STYLE_ID)?document.getElementById(STYLE_ID).textContent:"";
   const click=bindStage33920.toString();const sync=sync33920.toString();
   const checks={
-    patchId:PATCH_ID==="academy_kakashi_story_presentation_compat_33920_v5_2026_09_19",
-    collectibleNameOverlayRemoved:css.includes("sc-scene-board-33900__actor-tag")&&css.includes("display:none!important"),
+    patchId:PATCH_ID==="academy_kakashi_story_presentation_compat_33920_v6_2026_09_19",
+    bakedNameplateOwnsIdentity:css.includes("sc-scene-board-33900__actor-tag strong{display:none!important}")&&css.includes("bottom:-30px!important")&&css.includes("width:max-content!important"),
+    stateChipBelowCard:css.includes("Runtime adds STATE ONLY")&&css.includes("sc-scene-board-33900__actor-tag small")&&css.includes("overflow:visible!important"),
     redundantArrowRemoved:css.includes("sc-performance-next-33910")&&removeAdvanceButtons33920.toString().includes("node.remove"),
     compactLiveStateCallout:css.includes("bottom:auto!important")&&css.includes("width:max-content!important")&&css.includes("min-width:0!important")&&css.includes("height:auto!important")&&css.includes("text-align:left!important")&&css.includes("sc-scene-board-33900__object b"),
     cutCornersRemoved:css.includes("clip-path:none!important")&&css.includes("border-radius:8px!important"),
