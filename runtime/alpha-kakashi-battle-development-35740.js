@@ -455,6 +455,7 @@ if(priorClaimRewards){
 function diagnostics(){
   const sync=syncBattleDevelopment35740.toString(),present=enhanceKakashiVictory35740.toString();
   const legacyDeferredRyoLabel="<span>RYŌ</span><strong>"+["DE","BRIEF"].join("")+"</strong>";
+  const legacyRewardQuestion=["WHY"," THESE REWARDS?"].join("");
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v7_2026_09_19",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.downstreamCashReward==="7446e80c7f2cb9d004ffd914e11c0c77e7321c2b"&&AUTHORITIES.rewardDisclosure==="aad106b6a64ede81556aea0df0cc9fe4b8830178"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
@@ -467,7 +468,7 @@ function diagnostics(){
     immediateMiRewardUses34800:prepareImmediateMiReward35740.toString().includes("ensureAcademyKakashiMiVictoryBattleEntitlement34800")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_RYO")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_ITEM_ID"),
     downstreamCashUses34800:prepareImmediateDownstreamCash35740.toString().includes("ensureAcademyKakashiDownstreamBattleCashEntitlement34800")&&prepareImmediateDownstreamCash35740.toString().includes("getAcademyKakashiDownstreamBattleCashRewardState34800"),
     downstreamCashExact:downstreamCashSpec35740.toString().includes("PS_BATTLE_CONFIG")&&downstreamCashSpec35740.toString().includes("AMT_BATTLE_CONFIG")&&DOWNSTREAM_REWARD_RYO===50,
-    causalRewardDisclosure:rewardDisclosureMarkup35740.toString().includes("BATTLE BREAKDOWN")&&!rewardDisclosureMarkup35740.toString().includes("WHY THESE REWARDS?")&&rewardDisclosureMarkup35740.toString().includes("mitigated")&&technicalEvidenceMeta.toString().includes("actionLabel"),
+    causalRewardDisclosure:rewardDisclosureMarkup35740.toString().includes("BATTLE BREAKDOWN")&&!rewardDisclosureMarkup35740.toString().includes(legacyRewardQuestion)&&rewardDisclosureMarkup35740.toString().includes("mitigated")&&technicalEvidenceMeta.toString().includes("actionLabel"),
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
     chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
     immediateVictoryPresentation:present.includes("BATTLE REWARD")&&present.includes("50 RYŌ")&&present.includes("FIELD RECOVERY PILL")&&present.includes("CLAIM BATTLE REWARD")&&present.includes("RETURN TO STORY")&&present.includes("REWARD CLAIMED"),
