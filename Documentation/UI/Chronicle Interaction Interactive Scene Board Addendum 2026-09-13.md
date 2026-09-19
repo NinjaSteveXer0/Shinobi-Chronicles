@@ -222,6 +222,36 @@ This is directly compatible with #121/#175 CE decision-realisation work.
 
 ---
 
+## 7A. Live State Callouts — continuous situation readability
+
+The Scene Board should preserve a reusable **Live State Callout** for important scene-level facts that remain materially relevant while the situation is unfolding.
+
+This is intentionally distinct from a Character Card nameplate/status.
+
+- **Character-card status** answers: what is this participant doing / what is their local visible state?
+  - examples: `REPORTING`, `RECEIVING REPORT`, `ALIVE`, `PRESENT`, `IN PURSUIT`.
+- **Live State Callout** answers: what important situation/object/custody fact is currently true across the scene?
+  - examples: `PACKAGE — EXCHANGE IN PROGRESS`;
+  - `PACKAGE — PACKAGE SMUGGLER HAS PACKAGE`;
+  - `PACKAGE — RECOVERED · HIDDEN OPERATION`.
+
+Binding rules:
+
+1. A Live State Callout is a **presentation of supplied authoritative/observer-safe state**. It never decides holder, custody, success, Knowledge or outcome.
+2. Once shown, the callout may remain continuously visible while that state remains relevant. It updates or disappears when authoritative state changes.
+3. Do not collapse scene-level continuity into ordinary actor nameplate text merely to save space.
+4. Use **cyan emphasis for active / changing / in-progress state** and **gold emphasis for committed / settled / pivotal state**. Mixed cyan-gold framing is permitted where one reusable component must cover both.
+5. Place callouts in a **safe HUD lane**. They must not cover actor faces/cards, dialogue, objectives or action choices.
+6. Safe placement is composition-aware rather than one absolute coordinate:
+   - ordinary encounter/conversation scenes may use the upper-right lane beneath the objective;
+   - Hokage-office compositions should use the open left-side room lane because Minato owns the central authority position and dialogue may use the right-side safe zone.
+7. Card status readouts should retain stronger cyan/gold quick-read styling so moment-to-moment participant state remains legible even when no scene-level callout is required.
+8. Reduced-motion/accessibility does not remove the information; animation/glow is decorative, the text state remains sufficient.
+
+Canonical rule:
+
+> **Nameplates describe participants. Live State Callouts describe the evolving situation. Neither creates the truth it displays.**
+
 ## 8. Kakashi reference example — why this matters
 
 The recovered original Academy Kakashi Story is particularly suitable for the scene-board model:
