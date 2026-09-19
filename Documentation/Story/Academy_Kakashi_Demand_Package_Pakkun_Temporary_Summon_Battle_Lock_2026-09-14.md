@@ -1,5 +1,12 @@
 # Academy Kakashi Origin — Demand the Package → Pakkun Temporary Summon PL Battle Lock
 
+> **2026-09-20 DOWNSTREAM STORY COMPLETE**  
+> The post-Battle victory/defeat work described below as separate future authoring was subsequently closed by:
+> `Academy_Kakashi_Demand_Package_Battle_Victory_and_Defeat_Approved_Outcomes_2026-09-14.md`
+> plus the current terminal projection authorities.
+>
+> The old “post-Battle remains downstream Story authoring” wording is historical and fulfilled.
+
 **Date:** 2026-09-14  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED — LOCKED STORY / BATTLE CALLER AUTHORITY**
