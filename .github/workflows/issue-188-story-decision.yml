@@ -140,8 +140,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-61' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260919-61";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260919-62' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260919-62";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -215,9 +215,10 @@ jobs:
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "top:22%!important" runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "right:7.5%!important" runtime/alpha-kakashi-immediate-custody-35800.js
-          grep -Fq 'alpha_kakashi_scene03a_35700_v3_2026_09_19' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq 'alpha_kakashi_scene03a_35700_v4_2026_09_19' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchMiBurst35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchAmtBreakaway35700' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'kakashi_scene_board_model_v7_33910_2026_09_19' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HAS PACKAGE · ESCAPE BLOCKED' runtime/alpha-kakashi-scene-board-polish-33910.js
@@ -275,7 +276,9 @@ jobs:
           grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'alpha_kakashi_scene04a_35710_v8_2026_09_19' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'kakashiMiEnterRightward35710' runtime/alpha-kakashi-scene04a-35710.js
+          grep -Fq 'present actors stay vivid' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'speakerLabel' runtime/alpha-story-scene-board-33900.js
