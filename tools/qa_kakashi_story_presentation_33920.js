@@ -10,7 +10,7 @@ const restoration=fs.readFileSync(restorationPath,"utf8");
 const traversal=fs.readFileSync(traversalPath,"utf8");
 
 // Source / ownership contract.
-assert(compat.includes("academy_kakashi_story_presentation_compat_33920_v4_2026_09_17"),"33920 must expose the current v4 presentation patch identity");
+assert(compat.includes("academy_kakashi_story_presentation_compat_33920_v5_2026_09_19"),"33920 must expose the current v5 presentation patch identity");
 assert(compat.includes("compatibilityShim:true"),"33920 must identify itself as a compatibility shim");
 assert(compat.includes("retireAfterBrowserAcceptance:true"),"33920 must declare its retirement condition");
 assert(compat.includes("sc-scene-board-33900__actor-tag")&&compat.includes("display:none!important"),"runtime actor name overlay must be suppressed on collectible cards");
@@ -20,7 +20,7 @@ assert(compat.includes("clip-path:none!important")&&compat.includes("border-radi
 assert(compat.includes("width:min(32%,500px)!important")&&compat.includes("box-sizing:border-box!important"),"dialogue width must preserve card clearance");
 assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the centered conversation lane");
 assert(compat.includes("sc-dialogue-status-33910")&&compat.includes("display:none!important"),"SPEAKING/PREVIOUS micro-labels must be removed");
-assert(compat.includes("captureDialogue33920")&&compat.includes("injectRetainedDialogue33920")&&compat.includes("is-retained"),"dialogue must persist visually while narration continues");
+assert(compat.includes("clearRetainedDialogue33920")&&compat.includes('[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910{display:none!important}')&&!compat.includes("injectRetainedDialogue33920"),"narration must suppress and remove stale retained dialogue");
 assert(compat.includes("syncNativeLayoutVisibility33920")&&compat.includes('setProperty("display","none","important")'),"native Story layout must be suppressed while cinematic performance owns the cue surface");
 assert(compat.includes("globalThis.advanceStoryScene"),"Story stage click must use the existing Story advance authority");
 assert(compat.includes("interactiveTarget33920"),"interactive controls must be protected from stage-wide advance");
@@ -30,9 +30,9 @@ for(const forbidden of ["commitStoryIntent","resolveStoryFactualAction","launchA
 
 // Production delivery contract.
 assert(restoration.includes('alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}'),"33800 must load 33920 from the Scene Board chain");
-assert(restoration.includes('const BUILD="scene-board-20260919-7";'),"33800 Scene Board child identity must advance to compact-callout generation 7");
+assert(restoration.includes('const BUILD="scene-board-20260919-8";'),"33800 Scene Board child identity must advance to dialogue-fix generation 8");
 assert(restoration.includes('polish.addEventListener("load",load33920,{once:true})'),"33920 must wait until the live 33910 consumer is loaded");
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260919-7";'),"33200 Scene Board parent identity must advance to compact-callout generation 7");
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260919-8";'),"33200 Scene Board parent identity must advance to dialogue-fix generation 8");
 assert(traversal.includes('alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}'),"33200 must deliver 33800 through the versioned terminal chain");
 
 // Minimal installed-DOM semantic harness: non-interactive dialogue/narration
@@ -90,17 +90,17 @@ assert.strictEqual(diag.browserGoldenClaimed,false,"browser Golden must remain u
 
 console.log(JSON.stringify({
   pass:true,
-  patch:"33920-v4",
+  patch:"33920-v5",
   redundantArrowRemoved:true,
   instructionPlateReadable:true,
   dialogueCentralStack:true,
   dialogueCardClearance:true,
   speakerRelativeOffsetsRetired:true,
-  dialoguePersistsDuringNarration:true,
+  staleDialogueSuppressedDuringNarration:true,
   duplicateNativePerformanceSurfaceSuppressed:true,
   clickAnywhereDialogueAndNarration:true,
   controlsProtected:true,
-  sceneBoardDeliveryGeneration:6,
+  sceneBoardDeliveryGeneration:8,
   compatibilityShim:true,
   retireAfterBrowserAcceptance:true,
   browserGoldenClaimed:false
