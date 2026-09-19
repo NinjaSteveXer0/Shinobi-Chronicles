@@ -1,5 +1,17 @@
 # Academy Kakashi Origin — Seven Remaining Substantial Branch Closure
 
+> **2026-09-19 MOVE IN CLOSER POST-BATTLE SUPERSESSION**  
+> For current Get Closer downstream presentation and post-Battle agency, consume:
+> `Documentation/Story/Academy_Kakashi_Move_In_Closer_Downstream_Verbatim_Scene_Family_2026-09-19.md`.
+>
+> The older statements in this file that:
+> - STOP PACKAGE SMUGGLER victory automatically secures PS alive; or
+> - CUT THEM OFF victory automatically secures AMT while PS automatically escapes
+>
+> are superseded.
+>
+> Current law: Battle victory does not itself create custody or escape. The current exact post-Battle choice surfaces and reusable disposition locks own those results.
+>
 > **2026-09-19 PACKAGE-MISSING AMT DISPOSITION SUPERSESSION**  
 > For `WATCH THE EXCHANGE -> GO AFTER THE ORIGINAL TARGET -> AMT Battle victory`, the older statement that Kakashi automatically returns AMT alive to ANBU is superseded by:
 > `Documentation/Story/Academy_Kakashi_Package_Missing_AMT_Post_Battle_Disposition_Lock_2026-09-19.md`
