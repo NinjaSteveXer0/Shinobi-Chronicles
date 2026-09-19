@@ -336,6 +336,7 @@ if(priorClaimRewards){
 
 function diagnostics(){
   const sync=syncBattleDevelopment35740.toString(),present=enhanceKakashiVictory35740.toString();
+  const legacyDeferredRyoLabel="<span>RYŌ</span><strong>"+["DE","BRIEF"].join("")+"</strong>";
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v5_2026_09_19",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
@@ -349,7 +350,7 @@ function diagnostics(){
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
     chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
     immediateVictoryPresentation:present.includes("BATTLE REWARD")&&present.includes("50 RYŌ")&&present.includes("FIELD RECOVERY PILL")&&present.includes("CLAIM BATTLE REWARD")&&present.includes("RETURN TO STORY")&&present.includes("REWARD CLAIMED"),
-    deferredBattleRyoStaysNumeric:present.includes("immediateRyo")&&present.includes("<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:\"0\"}</strong>")&&!present.includes("<span>RYŌ</span><strong>DEBRIEF</strong>"),
+    deferredBattleRyoStaysNumeric:present.includes("immediateRyo")&&present.includes("<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:\"0\"}</strong>")&&!present.includes(legacyDeferredRyoLabel),
     exactClaimUses34800:typeof globalThis.claimCurrentBattleRewards==="function"&&globalThis.claimCurrentBattleRewards.toString().includes("commitAcademyKakashiMiVictoryBattleReward34800"),
     browserGoldenClaimed:false
   };
