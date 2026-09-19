@@ -20,7 +20,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v7_2026_09_19";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v8_2026_09_19";
 const AUTHORITY="bef78d90ccdea0206199ca0cdd06593ce3a0adb1";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
@@ -340,13 +340,20 @@ function renderScene(){
   for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!isFamily(rt))old.remove();
   if(!isFamily(rt)){try{delete stage.dataset.scKakashiScene06aw2c;}catch(_error){}if(stage.style)stage.style.removeProperty("--sc-kakashi-scene06aw2c-backdrop");return false;}
   installStyle();stage.dataset.scKakashiScene06aw2c="true";stage.style.setProperty("--sc-kakashi-scene06aw2c-backdrop",cssUrlValue(backdropPath()));
-  layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";layer.dataset.scPerformance="true";
+  layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
   let board=stage.querySelector&&stage.querySelector("."+BOARD_CLASS);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;board.setAttribute("aria-hidden","true");stage.appendChild(board);}
   const markup=boardMarkup(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
-  const p=performance(rt),cue=p.cue||{},text=layer.querySelector&&layer.querySelector(".sc-story-text");if(text&&text.textContent!==cue.text)text.textContent=cue.text;
-  const name=layer.querySelector&&layer.querySelector(".sc-story-name");if(name){name.textContent="";name.style.display="none";}
-  const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";
-  const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  const p=performance(rt);
+  if(p&&p.cue){
+    layer.dataset.scPerformance="true";
+    const cue=p.cue,text=layer.querySelector&&layer.querySelector(".sc-story-text");if(text&&text.textContent!==cue.text)text.textContent=cue.text;
+    const name=layer.querySelector&&layer.querySelector(".sc-story-name");if(name){name.textContent="";name.style.display="none";}
+    const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";
+    const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
+  }else{
+    try{delete layer.dataset.scPerformance;}catch(_error){}
+    materializePostLethalChoices35760();
+  }
   return true;
 }
 function installBeats(){
@@ -414,7 +421,7 @@ function diagnostics(){
   ];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v7_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v8_2026_09_19",
     authorityPinned:AUTHORITY==="bef78d90ccdea0206199ca0cdd06593ce3a0adb1",
     exactNarration:JSON.stringify(CUES_OPEN.map(function(row){return row.text;}))===JSON.stringify(exactOpen)&&JSON.stringify(CUES_CLOSED.map(function(row){return row.text;}))===JSON.stringify(exactClosed)&&CUES_OPEN.concat(CUES_CLOSED).every(function(row){return row.kind==="narration"&&!row.speakerName;}),
     exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWEntered===true")&&lateEntryEligible.toString().includes(">=1")&&!lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
@@ -433,6 +440,7 @@ function diagnostics(){
     noPakkun:commitLethalResult.toString().includes("pakkunPresent:false"),
     directResolvedOutcomeTrigger:resolveLethalAttempt.toString().includes("triggerResolvedOutcomePresentation")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiResolvedOutcome35780")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiConfirmedKill35770"),
     pursuitPresentationReleasesNarration:performance.toString().includes("kakashiScene06AW2CPursuitPresentationReady===true")&&globalThis.getStoryScenePerformance33900.toString().includes("owned||PRE_GET"),
+    settledPursuitRenderDoesNotDereferenceMissingCue:renderScene.toString().includes("if(p&&p.cue)")&&renderScene.toString().includes("materializePostLethalChoices35760()"),
     scene7FailClosedWhenNoPursuit:typeof globalThis.advanceStoryScene==="function"&&globalThis.advanceStoryScene.toString().includes("kakashi_scene06aw2c_scene7_authority_pending")&&HOLD_BEAT==="kak_scene06a_w2c_scene7_pending",
     standardCharacterCardScale:installStyle.toString().includes("width:min(94%,322px)")&&installStyle.toString().includes("width:min(96%,338px)")&&installStyle.toString().includes("max-height:505px"),
     browserGoldenClaimed:false
