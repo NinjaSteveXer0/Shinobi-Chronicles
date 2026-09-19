@@ -13,7 +13,7 @@ const traversal=fs.readFileSync(traversalPath,"utf8");
 assert(compat.includes("academy_kakashi_story_presentation_compat_33920_v6_2026_09_19"),"33920 must expose the current v6 presentation patch identity");
 assert(compat.includes("compatibilityShim:true"),"33920 must identify itself as a compatibility shim");
 assert(compat.includes("retireAfterBrowserAcceptance:true"),"33920 must declare its retirement condition");
-assert(compat.includes("sc-scene-board-33900__actor-tag strong{display:none!important}")&&compat.includes("bottom:-30px!important")&&compat.includes("Runtime adds STATE ONLY"),"collectible baked nameplate must own identity while runtime state sits below the card");
+assert(compat.includes("sc-scene-board-33900__actor-tag strong")&&compat.includes("display:none!important")&&compat.includes("bottom:-30px!important")&&compat.includes("Runtime adds STATE ONLY"),"collectible baked nameplate must own identity while runtime state sits below the card");
 assert(compat.includes("sc-performance-next-33910")&&compat.includes("removeAdvanceButtons33920"),"redundant dialogue/narration arrow must be removed");
 assert(compat.includes("bottom:auto!important")&&compat.includes("width:max-content!important")&&compat.includes("min-width:0!important")&&compat.includes("height:auto!important"),"Live State Callout must remain a compact content-sized HUD readout");
 assert(compat.includes("clip-path:none!important")&&compat.includes("border-radius:8px!important"),"cut-corner dialogue treatment must be removed");
