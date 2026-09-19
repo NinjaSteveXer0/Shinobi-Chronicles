@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v11_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v12_2026_09_20";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -33,6 +33,9 @@ const ENTRY_IDS=Object.freeze({
  amt:Object.freeze(["scene05aw_go_after_anbu_marked_target","scene06aw2c_postlethal_go_after_anbu_marked_target","scene06aw2c_dkill_go_after_anbu_marked_target"])
 });
 const PS_CONFIG="academy_kakashi_origin_battle_seq_ps",AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
+const PS_BATTLE_BACKDROP_ID="kakashi_origin_ps_battle_alt_night";
+const PS_BATTLE_BACKDROP_PATH="Kakashi Origin Backdrop/konoha_alleyway_alt_night.png";
+const PS_BATTLE_STAGE_CLASS="sc-kakashi-ps-battle-backdrop-35830",PS_BATTLE_STYLE_ID="sc-kakashi-ps-battle-backdrop-35830-style";
 const AMT_ALLEY_ASSET_ID="kakashi_origin_pakkun_interception_alley";
 const PS_BINDING="academy_kakashi.battle.stop_assassin_post_mi_ps",AMT_BINDING="academy_kakashi.battle.stop_assassin_post_mi_amt";
 const BEAT=Object.freeze({
@@ -115,7 +118,38 @@ function resolveSelectedPursuit(target){
  const out=commitOnce(id,fact,fact.selectedOutcomeRef,[ORIGIN_ID,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),role:"pursuit_selection"}]);if(!out.success)return out;
  rt.localContext={...(rt.localContext||{}),kakashiPostMiPursuitResolutionOccurrenceId:id,kakashiPostMiPackageOccurrenceId:id,kakashiPostMiPursuitReached:eligible};save();return{success:true,reached:eligible,occurrenceId:id};
 }
-function launchPs({active:rt,returnContext}={}){if(!rt)return{success:false,reason:"post_mi_ps_story_missing"};return BATTLE.launchAcademyKakashiOriginPlBattle({storyOccurrenceId:String(rt.instanceId),sourceAnchorRef:"AK_SA_022",bindingRef:PS_BINDING,battleConfigId:PS_CONFIG,returnToken:String(rt.instanceId)+":stop-post-mi:ps",returnContext,pakkunAuthorized:false});}
+function psBattleActive35830(){
+ try{return !!(currentBattle&&currentBattle.active===true&&currentBattle.battleOver!==true&&currentBattle.kakashiOriginDeployment&&String(currentBattle.kakashiOriginDeployment.battleConfigId||"")===PS_CONFIG);}catch(_e){return false;}
+}
+function registerPsBattleBackdrop35830(){
+ try{const reg=typeof registerSceneBackdropAssetPath==="function"?registerSceneBackdropAssetPath:globalThis.registerSceneBackdropAssetPath;if(typeof reg==="function"){reg(PS_BATTLE_BACKDROP_ID,PS_BATTLE_BACKDROP_PATH);return true;}}catch(_e){}
+ return false;
+}
+function ensurePsBattleBackdropStyle35830(){
+ if(typeof document==="undefined"||!document.head)return false;
+ const prior=document.getElementById(PS_BATTLE_STYLE_ID);if(prior)prior.remove();
+ const style=document.createElement("style");style.id=PS_BATTLE_STYLE_ID;style.textContent=
+  "."+PS_BATTLE_STAGE_CLASS+"{background-color:#050b10!important;background-image:linear-gradient(180deg,rgba(2,5,8,.08),rgba(2,5,8,.16) 56%,rgba(2,5,8,.48)),url(\""+PS_BATTLE_BACKDROP_PATH.replace(/\"/g,"%22")+"\")!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important}";
+ document.head.appendChild(style);return true;
+}
+function syncPsBattleBackdrop35830(){
+ if(typeof document==="undefined"||!document.querySelectorAll)return false;
+ ensurePsBattleBackdropStyle35830();const activePs=psBattleActive35830();let touched=false;
+ for(const stage of document.querySelectorAll(".alpha-code-battle-stage")){if(!stage||!stage.classList)continue;stage.classList.toggle(PS_BATTLE_STAGE_CLASS,activePs);touched=true;}
+ return touched;
+}
+function schedulePsBattleBackdrop35830(){
+ const run=()=>syncPsBattleBackdrop35830();
+ if(typeof queueMicrotask==="function")queueMicrotask(run);else if(typeof setTimeout==="function")setTimeout(run,0);
+ if(typeof requestAnimationFrame==="function")requestAnimationFrame(()=>requestAnimationFrame(run));
+ return true;
+}
+function launchPs({active:rt,returnContext}={}){
+ if(!rt)return{success:false,reason:"post_mi_ps_story_missing"};
+ const out=BATTLE.launchAcademyKakashiOriginPlBattle({storyOccurrenceId:String(rt.instanceId),sourceAnchorRef:"AK_SA_022",bindingRef:PS_BINDING,battleConfigId:PS_CONFIG,returnToken:String(rt.instanceId)+":stop-post-mi:ps",returnContext,pakkunAuthorized:false});
+ if(out&&out.success===true){try{if(currentBattle)currentBattle.kakashiOriginBattleBackdrop={assetId:PS_BATTLE_BACKDROP_ID,path:PS_BATTLE_BACKDROP_PATH,owner:"post_mi_ps_35830"};}catch(_e){}schedulePsBattleBackdrop35830();}
+ return out;
+}
 function launchAmt({active:rt,returnContext}={}){if(!rt)return{success:false,reason:"post_mi_amt_story_missing"};if(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent!==true)return{success:false,reason:"post_mi_amt_pakkun_reach_not_committed"};return BATTLE.launchAcademyKakashiOriginPlBattle({storyOccurrenceId:String(rt.instanceId),sourceAnchorRef:"AK_SA_022",bindingRef:AMT_BINDING,battleConfigId:AMT_CONFIG,returnToken:String(rt.instanceId)+":stop-post-mi:amt:"+String(rt.localContext.kakashiPostMiAmtRoute||"direct"),returnContext,pakkunAuthorized:true});}
 function projector(){return typeof projectAcademyKakashiOriginBattleResult==="function"?projectAcademyKakashiOriginBattleResult():null;}
 
@@ -239,7 +273,7 @@ function installBeats(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;if(!m)return false;
  const narr=(id,bg,obj)=>m.set(id,{beatId:id,mode:"narration",environmentRef:{assetId:bg},objectiveText:obj||null,text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psChase,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psFail,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);narr(BEAT.psCatch,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);
- m.set(BEAT.psBattle,{beatId:BEAT.psBattle,mode:"battle_transition",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},text:"",battle:{encounterId:PS_CONFIG,launchResolver:ctx=>launchPs(ctx),postBattleBeatId:BEAT.psReturn,resultProjector:projector,actionLabel:"STOP THE PACKAGE SMUGGLER"},exitScene:false,allowPresentationClose:false,choices:[]});
+ m.set(BEAT.psBattle,{beatId:BEAT.psBattle,mode:"battle_transition",environmentRef:{assetId:PS_BATTLE_BACKDROP_ID},text:"",battle:{encounterId:PS_CONFIG,launchResolver:ctx=>launchPs(ctx),postBattleBeatId:BEAT.psReturn,resultProjector:projector,actionLabel:"STOP THE PACKAGE SMUGGLER"},exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);m.get(BEAT.psReturn).onEnterConsequences=[{requestId:"postmi_35830_ps_return_consume",kind:"domain",resolve:()=>consumeReturnOnEnter35830("ps")}];narr(BEAT.psWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psLoss,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
  m.set(BEAT.psDecision,{beatId:BEAT.psDecision,mode:"choice",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},objectiveText:OBJECTIVE.ps,text:"Package Smuggler is down. The package is secure. Kakashi decides what remains worth pursuing.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psReport,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
@@ -331,11 +365,12 @@ function render(){
  return true;
 }
 
+registerPsBattleBackdrop35830();
 if(!installBeats())throw new Error("post_mi_pursuit_35830_beats_missing");
 let hooked=false,tries=0;
 function hooks(){
  if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;
- const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+ const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null,RC=typeof globalThis.renderCombatOverlay==="function"?globalThis.renderCombatOverlay:null;
  globalThis.getStoryScenePerformance33900=function(){const p=performance(active());return p||PG.apply(this,arguments);};
  globalThis.advanceStoryScene=function(choiceId=null){const rt=active(),p=performance(rt);
   if(rt&&choiceId!=null&&[LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId)&&entryTargetForChoice(choiceId))return beginPostMiPursuitChoice35830(choiceId);
@@ -347,7 +382,8 @@ function hooks(){
   return PA.apply(this,arguments);
  };
  try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_e){}
- if(PR){globalThis.renderStoryScenePresentationLayer=function(){wireEntryChoices();const out=PR.apply(this,arguments);const settle=()=>{wireEntryChoices();materializePsDecision();materializeAmtDecision();render();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else setTimeout(settle,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}}
+ if(PR){globalThis.renderStoryScenePresentationLayer=function(){wireEntryChoices();const out=PR.apply(this,arguments);const settle=()=>{wireEntryChoices();materializePsDecision();materializeAmtDecision();render();syncPsBattleBackdrop35830();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else setTimeout(settle,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}}
+ if(RC){globalThis.renderCombatOverlay=function(){const out=RC.apply(this,arguments);syncPsBattleBackdrop35830();return out;};try{renderCombatOverlay=globalThis.renderCombatOverlay;}catch(_e){}}
  hooked=true;wireEntryChoices();render();return true;
 }
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
@@ -359,7 +395,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v11_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v12_2026_09_20",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -367,6 +403,7 @@ function diagnostics(){
   exactPsCatch:CUES.psCatch.some(x=>x.kind==="dialogue"&&x.speaker==="KAKASHI"&&x.text==="No. It fixes the part in your hands."),
   exactPakkunCorrection:CUES.amtCatch.some(x=>x.speaker==="PAKKUN"&&x.text==="This yours?")&&CUES.amtCatch.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently.")&&CUES.psToAmt.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently."),
   exactBattleConfigs:PS_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
+  psBattleBackdropExact:PS_BATTLE_BACKDROP_PATH==="Kakashi Origin Backdrop/konoha_alleyway_alt_night.png"&&!!(m&&m.get(BEAT.psBattle)&&m.get(BEAT.psBattle).environmentRef&&m.get(BEAT.psBattle).environmentRef.assetId===PS_BATTLE_BACKDROP_ID)&&launchPs.toString().includes("kakashiOriginBattleBackdrop")&&syncPsBattleBackdrop35830.toString().includes(PS_BATTLE_STAGE_CLASS),
    battleTransitionsAutoLaunch:transitionNarrative.toString().includes("launchCurrentBattleTransition35830")&&launchCurrentBattleTransition35830.toString().includes("launchStorySceneBattle"),
    postBattleReturnOwnersInstalled:!!(m&&m.get(BEAT.psReturn)&&Array.isArray(m.get(BEAT.psReturn).onEnterConsequences)&&m.get(BEAT.psReturn).onEnterConsequences.some(x=>x&&x.requestId==="postmi_35830_ps_return_consume"))&&!!(m&&m.get(BEAT.amtReturn)&&Array.isArray(m.get(BEAT.amtReturn).onEnterConsequences)&&m.get(BEAT.amtReturn).onEnterConsequences.some(x=>x&&x.requestId==="postmi_35830_amt_return_consume"))&&latestResult.toString().includes("resume.projected")&&render.toString().includes("scheduleReturnRetry35830"),
    amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
