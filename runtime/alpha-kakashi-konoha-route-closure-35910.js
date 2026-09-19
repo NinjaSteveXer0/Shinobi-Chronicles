@@ -175,7 +175,7 @@ function resolveDirectStrikeEntry(choice){
  const contextStateRef=rootContext(rt);
  const intent=ensureDecisionIntent({decisionPointRef:"AK_SA_001",choiceId:"attack",bindingRef:DIRECT_BINDING,contextStateRef,beatRef:ACTION_BEAT});
  if(!intent||intent.success!==true)return intent;
- const begun=beginReusedDirectStrikePhysical35910({receipt:intent.receipt,bindingRef:DIRECT_BINDING,parentOccurrenceId:"",routeRef:"direct_root",anchorRef:anchor,authorityCommit:authority});
+ const begun=beginReusedDirectStrikePhysical35910({receipt:intent.receipt,bindingRef:DIRECT_BINDING,parentOccurrenceId:"",routeRef:"direct_root",anchorRef:"AK_SA_003",authorityCommit:AUTH.directStrike});
  if(!begun||begun.success!==true)return begun||{success:false,reason:"direct_strike_physical_chain_begin_failed"};
  choice.nextBeatId=D.directIntro;return begun;
 }
@@ -236,17 +236,18 @@ function consumeDirectMi(){
 }
 function commitDirectGroupDisposition(kind){
  const rt=active(),parent=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeMiOccurrenceId||"");if(!rt||rt.beatId!==D.directGroup||!parent)return{success:false,reason:"direct_strike_group_context_required"};
+ const authority=directChainAuthority(rt),anchor=directChainAnchor(rt);
  const stateByKind={POLICE:"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY",ANBU:"ANBU_INSTITUTIONAL_CUSTODY",KILL:"DEAD",RELEASE:"DELIBERATELY_RELEASED"};
  const stateClass=stateByKind[kind];if(!stateClass)return{success:false,reason:"direct_strike_group_disposition_unknown"};
  const id=stable("occ_origin_kakashi_direct_strike_group_disposition",{instance:String(rt.instanceId||""),parent,kind});
  const participantStateByRef={};const participantStateDeltaRefs=[];
  for(const ref of [AMT,PS,MI]){participantStateByRef[ref]={stateClass,lifeState:kind==="KILL"?"DEAD":"ALIVE",custodyDestination:kind==="POLICE"?"UCHIHA_POLICE":kind==="ANBU"?"ANBU":null};}
  const pkg=kind==="ANBU"?{objectRef:PACKAGE,previousHolderClass:"KAKASHI",currentHolderClass:"ANBU",custodyClass:"ANBU",locationClass:"ANBU_ROOFTOP"}:{objectRef:PACKAGE,currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON"};
- const fact={factClass:"academy_kakashi_direct_strike_group_disposition",authorityCommit:directChainAuthority(rt),storySceneInstanceId:String(rt.instanceId||""),parentOccurrenceRef:parent,routeRef:directChainRoute(rt),selectedDisposition:kind,packageState:pkg,participantStateByRef,
+ const fact={factClass:"academy_kakashi_direct_strike_group_disposition",authorityCommit:authority,anchorRef:anchor,storySceneInstanceId:String(rt.instanceId||""),parentOccurrenceRef:parent,routeRef:directChainRoute(rt),selectedDisposition:kind,packageState:pkg,participantStateByRef,
   worldFacts:{deterministicPostBattleKills:kind==="KILL"?3:0,groupReleased:kind==="RELEASE",groupInstitutionalTransfer:kind==="POLICE"||kind==="ANBU",pakkunPresent:false}};
  const committed=commitOnce(id,fact,"DIRECT_STRIKE_GROUP_"+kind,[ORIGIN,AMT,PS,MI],[{type:"origin_occurrence",id:parent},{type:"writing_authority",id:authority}]);if(!committed.success)return committed;
  for(const ref of [AMT,PS,MI]){const resultRef=stable("sc35910-direct-group-state",{id,ref,stateClass});const cl=classify(ref,stateClass,resultRef);if(!cl.success)return cl;participantStateDeltaRefs.push(resultRef);}
- const mat=material(pkg,id,"AK_SA_003");if(!mat||mat.success!==true)return mat;
+ const mat=material(pkg,id,anchor);if(!mat||mat.success!==true)return mat;
  rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrikeDispositionOccurrenceId:id,kakashiKonohaPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id};save();
  return{success:true,occurrenceId:id,nextBeatId:TERMINAL,participantStateDeltaRefs};
 }
