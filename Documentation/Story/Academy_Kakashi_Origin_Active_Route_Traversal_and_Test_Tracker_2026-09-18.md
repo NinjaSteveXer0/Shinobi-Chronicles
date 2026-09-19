@@ -345,3 +345,38 @@ Kakashi uses `Wire Snare` / ninja wire as the physical restraint method after th
 #281 Writing work: COMPLETE.
 Coding/runtime implementation: separate; routed to the existing Kakashi Coding lane (#188).
 Browser Golden: not claimed.
+
+
+## 2026-09-19 — Observe BRANCH_B GO FOR THE PACKAGE authored
+
+Delegated Writing authority consumed:
+`Documentation/Story/Academy_Kakashi_Remaining_Scenes_Delegated_Authoring_Authority_2026-09-19.md`
+commit `7ee7dcfc2e4c763869d34ed42021e839af04f2a9`.
+
+Exact scene family:
+`Documentation/Story/Academy_Kakashi_Observe_Secure_Package_Verbatim_Scene_Family_2026-09-19.md`
+commit `ccb9725104aea4de9373b4349253749c730e8a4b`.
+
+Closed Writing coverage:
+- Scene03A **GO FOR THE PACKAGE** entry;
+- exact PS+MI 2-v-1 Battle setup;
+- Kakashi loss / MI restraint / PS package escape;
+- Kakashi victory + package recovery;
+- post-win **STAY ON THE FIRST MAN** / **RETURN AND REPORT** choice;
+- AMT pursuit success/failure;
+- Pakkun interception on legitimate AMT reach;
+- AMT Battle handoff;
+- package-recovered AMT victory consumes existing four-way disposition;
+- AMT Battle loss preserves package custody;
+- state-driven factual ANBU report variants.
+
+Exact environments:
+- exchange / 2-v-1: `Kakashi Origin Backdrop/sakura_tree_night.png`;
+- successful AMT/Pakkun interception: `Kakashi Origin Backdrop/alleyway_konoha_night.png`;
+- ANBU report: `Kakashi Origin Backdrop/rooftop_night.png`.
+
+Writing status: CLOSED for BRANCH_B.
+Implementation/runtime/browser validation: separate.
+
+Next Writing branch:
+**BEAT HER TO THE PACKAGE** / `SECURE THE PACKAGE BEFORE THE ASSASSIN`.
