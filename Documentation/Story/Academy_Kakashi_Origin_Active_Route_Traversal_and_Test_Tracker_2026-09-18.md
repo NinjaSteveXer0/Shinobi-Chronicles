@@ -358,7 +358,7 @@ Exact scene family:
 commit `ccb9725104aea4de9373b4349253749c730e8a4b`.
 
 Closed Writing coverage:
-- Scene03A **GO FOR THE PACKAGE** entry;
+- Scene03A **SECURE THE PACKAGE** entry;
 - exact PS+MI 2-v-1 Battle setup;
 - Kakashi loss / MI restraint / PS package escape;
 - Kakashi victory + package recovery;
@@ -379,4 +379,30 @@ Writing status: CLOSED for BRANCH_B.
 Implementation/runtime/browser validation: separate.
 
 Next Writing branch:
-**BEAT HER TO THE PACKAGE** / `SECURE THE PACKAGE BEFORE THE ASSASSIN`.
+**SECURE THE PACKAGE BEFORE THE ASSASSIN** / `SECURE THE PACKAGE BEFORE THE ASSASSIN`.
+
+
+## 2026-09-19 — exact choice-label correction after autonomous-writing audit
+
+Stephen identified that the autonomous Writing pass had consumed an older choice-label modernization document despite the later exact Scene 03A verbatim lock and live runtime using different names.
+
+Correct current Scene 03A labels remain:
+
+- **STOP THE ASSASSIN**
+- **SECURE THE PACKAGE**
+- **SECURE THE PACKAGE BEFORE THE ASSASSIN**
+- **DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE**
+- **GO AFTER THE ORIGINAL TARGET**
+
+Autonomous scene-family corrections:
+- Secure Package scene family corrected at `787a858af8ea4554d90697d3493e77ff6a32184b`;
+- Secure Package Before Assassin scene family corrected at `9381be9d4a016f749fe6e2752ceda6dd7c34ebba`;
+- Defeat Assassin Then Secure Package scene family corrected at `a04f8042bb1e4b0aed295d177456f78b14ab3c67`.
+
+Older label-modernization guidance marked superseded for these exact named choices:
+`dee274c077b37cd092beb4962f51cbc2e6c78dba`.
+
+Writing workflow benchmark now contains an exact-label precedence guard:
+`495e10e2a87d72c13f9f93002cde3e20f01f996e`.
+
+No story causality was changed by this correction.
