@@ -164,6 +164,7 @@ try {
   // never drop the player into the generic Combat Arena.
   const failedVictory = plain(run(`
     globalThis.__issue141ForceReturnFailure=true;
+    const returnCallsBefore=globalThis.__issue141ReturnCalls.slice();
     const legacyBefore=globalThis.__issue141LegacyContinueCalls;
     const overlayBefore=globalThis.__issue141OverlayCalls.length;
     currentBattle={
@@ -173,14 +174,17 @@ try {
       returnContext:{type:"story_scene",missionId:"fixture_mission",sceneId:"fixture_scene"}
     };
     const result=continueAfterVictory();
+    const attemptedReturnCalls=globalThis.__issue141ReturnCalls.slice(returnCallsBefore.length);
+    globalThis.__issue141ReturnCalls=returnCallsBefore;
     globalThis.__issue141ForceReturnFailure=false;
-    ({result,legacyBefore,legacyAfter:globalThis.__issue141LegacyContinueCalls,overlayCalls:globalThis.__issue141OverlayCalls.slice(overlayBefore)});
+    ({result,attemptedReturnCalls,legacyBefore,legacyAfter:globalThis.__issue141LegacyContinueCalls,overlayCalls:globalThis.__issue141OverlayCalls.slice(overlayBefore)});
   `, "issue141-victory-return-fail-closed.js"));
   check(
     "story_victory_return_failure_never_opens_generic_arena",
     failedVictory && failedVictory.result && failedVictory.result.success === false &&
       failedVictory.result.alpha33100StoryReturnFailClosed === true &&
       failedVictory.result.genericBattleFallbackSuppressed === true &&
+      failedVictory.attemptedReturnCalls.length === 1 && failedVictory.attemptedReturnCalls[0] === "victory" &&
       failedVictory.legacyAfter === failedVictory.legacyBefore &&
       failedVictory.overlayCalls.includes("victory") && !failedVictory.overlayCalls.includes("battle"),
     failedVictory
