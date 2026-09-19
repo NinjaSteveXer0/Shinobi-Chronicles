@@ -1,5 +1,14 @@
 # Academy Kakashi Origin — Structured Autonomy Anchor Inventory
 
+> **2026-09-20 CURRENT CLOSURE POINTER**  
+> The old “final anchor inventory NOT YET CLOSED” statement below is historical.
+>
+> Current anchor precedence is governed by:
+> `Academy_Kakashi_Final_Structured_Autonomy_Anchor_Reconciliation_2026-09-15.md`
+> plus the current 2026-09-20 Writing closure authorities.
+>
+> Do not reopen Attack/Pickpocket or final-audit work from the old status line.
+
 **Date:** 2026-09-15  
 **Owner:** Stephen / Writing — Konoha; reusable semantics coordinated through CE / Codex / Coordination  
 **Status:** **LOCKED CURRENT IMPLEMENTATION-ANCHOR INVENTORY — APPEND/RECONCILE AT ORIGIN WRITING CLOSURE; CODING ACTIVATION DEFERRED**
