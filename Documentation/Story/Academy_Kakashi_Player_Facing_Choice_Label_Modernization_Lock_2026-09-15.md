@@ -1,5 +1,23 @@
 # Academy Kakashi Origin — Player-Facing Choice Label Modernization Lock
 
+> **2026-09-19 EXACT-LABEL SUPERSESSION NOTICE**  
+> This document is **historical expression guidance** where a later Stephen-approved exact verbatim scene lock or current exact implementation authority names the same player-facing choice differently.
+>
+> **Do not use this file to rename an already-established current button merely because the wording below sounds more conversational.**
+>
+> For Scene 03A / WATCH THE EXCHANGE, the current exact labels are:
+> - **STOP THE ASSASSIN**
+> - **SECURE THE PACKAGE**
+> - **SECURE THE PACKAGE BEFORE THE ASSASSIN**
+> - **DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE**
+> - **GO AFTER THE ORIGINAL TARGET**
+>
+> Those exact names are authoritative over the older substitutions `CUT HER OFF`, `GO FOR THE PACKAGE`, `BEAT HER TO THE PACKAGE`, `DEAL WITH HER FIRST, THEN CHASE THE PACKAGE`, and `STAY ON THE FIRST MAN` when referring to that Scene 03A choice surface.
+>
+> Likewise, where a later exact branch/runtime lock says **CHASE THE PACKAGE SMUGGLER**, **BRING HIM TO THE UCHIHA POLICE FORCE**, or **TAKE HIM BACK TO THE ANBU**, this older modernization file must not silently substitute another label.
+>
+> General style guidance in this document may still inform **new unnamed choices**. It does not override later exact named authority.
+
 **Date:** 2026-09-15  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-DIRECTED PLAYER-FACING EXPRESSION LOCK — SEMANTIC INTENTS UNCHANGED**
