@@ -1,9 +1,10 @@
-# Shinobi Chronicles — RESET v2 Source 03 Proposal: Ibuse
+# Shinobi Chronicles — RESET v2 Source 03: Ibuse
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — SOURCE 03 UNDER RESET v2**  
+**Status:** **DESIGN CLOSED — STEPHEN SIGN-OFF — SOURCE 03 UNDER RESET v2**  
 **Parent:** #235  
+**Stephen sign-off:** 2026-09-19  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`  
 **Source baseline:** `284e4e2a832219f640302e09de74bc48fdd708e5`
@@ -36,7 +37,7 @@ Current Registry:
 - Base PL **70**
 - canonical association: **Hanzō**
 
-This proposal does not reopen those Base Stats / Base PL.
+This closure does not reopen those Base Stats / Base PL.
 
 Canon anchors consumed before authoring:
 
@@ -123,7 +124,7 @@ SC divergence:
 
 Hanzō's own poison resistance came from a salamander venom-sac body modification rather than merely summoning Ibuse. SC deliberately turns the salamander relationship into a readable Summon enhancement: **equipping Ibuse grants Battle Poison Immunity**.
 
-This replaces the older generic `ibuse.salamanders_endurance` +6 Stamina enhancement if approved.
+This replaces the older generic `ibuse.salamanders_endurance` +6 Stamina enhancement.
 
 ---
 
@@ -324,7 +325,7 @@ Current runtime contains:
 - `ibuse_subterranean_ambush` = ATK10 / ATK13 contextual;
 - generic `poisoned` = 2 Battle PL per end-of-action tick, maximum 3 ticks, Stamina bypass, refresh-not-stack, standard antidote compatible.
 
-If Stephen signs off RESET v2 Ibuse:
+Stephen sign-off requires implementation to:
 
 - replace +6 Stamina with attached **Poison Immunity**;
 - do **not** preserve the legacy generic 2-BP x 3-tick poison profile as Ibuse's final specialist design;
@@ -335,4 +336,6 @@ If Stephen signs off RESET v2 Ibuse:
 - do not stack old and new effects;
 - no runtime implementation / validation is claimed by this proposal.
 
-**design proposed != design closed != implemented != runtime validated != Golden GREEN**
+**DESIGN CLOSED.** Implementation / runtime validation / Golden remain separate.
+
+**design closed != implemented != runtime validated != Golden GREEN**
