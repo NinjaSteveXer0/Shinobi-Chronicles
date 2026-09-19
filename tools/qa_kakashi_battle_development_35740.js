@@ -210,7 +210,7 @@ function setStoryBattle(config,participant,id,evidence){
 }
 const bukiBefore=discipline[KAKASHI+"::buki"]||0;
 setStoryBattle("academy_kakashi_origin_battle_seq_ps",PS,"qa-kakashi-ps-1",[
-  {evidenceId:"ps-attempt-1",battleId:"qa-kakashi-ps-1",actionId:"ps-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:PS},data:{actionClass:"skill",skillId:"academy_kakashi_kunai_quickdraw"}},
+  {evidenceId:"ps-attempt-1",battleId:"qa-kakashi-ps-1",actionId:"ps-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:"runtime_clan_start_actor"},targetRef:{side:"enemy",participantId:PS},data:{actionClass:"skill",skillId:"academy_kakashi_kunai_quickdraw"}},
   {evidenceId:"ps-damage-1",battleId:"qa-kakashi-ps-1",actionId:"ps-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:PS},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,finalDamage:4,remainingBattlePLBefore:10,remainingBattlePLAfter:6}}
 ]);
 const psRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
@@ -222,9 +222,9 @@ assert.strictEqual((discipline[KAKASHI+"::buki"]||0)-bukiBefore,2,"PS resolved a
 
 const ninBefore=discipline[KAKASHI+"::nin"]||0,staminaBefore=discipline[KAKASHI+"::stamina"]||0;
 setStoryBattle("academy_kakashi_origin_battle_seq_amt_pakkun",AMT,"qa-kakashi-amt-1",[
-  {evidenceId:"amt-attempt-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:AMT},data:{actionClass:"skill"}},
+  {evidenceId:"amt-attempt-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:"runtime_clan_start_actor"},targetRef:{side:"enemy",participantId:AMT},data:{actionClass:"skill"}},
   {evidenceId:"amt-effect-1",battleId:"qa-kakashi-amt-1",actionId:"amt-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:AMT},data:{primaryDiscipline:"Ninjutsu",resolvedAttackPL:6,finalDamage:5,remainingBattlePLBefore:18,remainingBattlePLAfter:13}},
-  {evidenceId:"amt-enemy-damage-1",battleId:"qa-kakashi-amt-1",actionId:"amt-e1",eventType:"damage_resolved",actorRef:{side:"enemy",participantId:AMT},targetRef:{side:"player",participantId:KAKASHI},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,staminaMitigationAmount:2,finalDamage:3,remainingBattlePLBefore:15,remainingBattlePLAfter:12}}
+  {evidenceId:"amt-enemy-damage-1",battleId:"qa-kakashi-amt-1",actionId:"amt-e1",eventType:"damage_resolved",actorRef:{side:"enemy",participantId:AMT},targetRef:{side:"player",participantId:"runtime_clan_start_actor"},data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:5,staminaMitigationAmount:2,finalDamage:3,remainingBattlePLBefore:15,remainingBattlePLAfter:12}}
 ]);
 const amtRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
 assert.strictEqual(amtRewards.ryo,0,"AMT Battle must keep material Ryō terminal-debrief owned");
@@ -263,7 +263,7 @@ assert(rewardSource.includes('__scActionDerivedDevelopment34800'),"34800 source-
 
 console.log("Academy Kakashi Story Battle development + immediate MI reward 35740 QA: PASS");
 console.log("- exact action evidence -> discipline development through 34800");
-console.log("- PS / AMT resolved evidence -> Battle development even when action_attempted omits top-level skillId");
+console.log("- PS / AMT player-side Battle evidence is owned by the Kakashi Story deployment even when runtime participantId is the My Clan START actor");
 console.log("- PS / AMT retain zero immediate cash/loot; terminal Origin rewards remain independently deferred");
 console.log("- frozen core validator initially rejects action_derived_development; 34800 installs the authorised runtime extension");
 console.log("- legacy Exam / Practical / Battle source routing remains unchanged");
