@@ -11952,110 +11952,6 @@ function processDisciplineLevelUps(
 // VALIDATE DISCIPLINE TRAINING SOURCE
 // =========================================================
 
-const ADDITIONAL_DISCIPLINE_TRAINING_SOURCES = new Map();
-
-function registerDisciplineTrainingSource(
-  source,
-  disciplineIds = []
-) {
-
-  const sourceId =
-    String(
-      source || ""
-    ).trim();
-
-  const ids =
-    [
-      ...new Set(
-        (
-          Array.isArray(
-            disciplineIds
-          )
-            ? disciplineIds
-            : []
-        )
-          .map(
-            disciplineId =>
-              String(
-                disciplineId || ""
-              ).trim()
-          )
-          .filter(
-            disciplineId =>
-              !!getShinobiDiscipline(
-                disciplineId
-              )
-          )
-      )
-    ];
-
-  if (
-    !sourceId ||
-    ids.length === 0
-  ) {
-
-    return {
-      success: false,
-      reason: "discipline_training_source_registration_invalid"
-    };
-
-  }
-
-  const current =
-    ADDITIONAL_DISCIPLINE_TRAINING_SOURCES.get(
-      sourceId
-    ) ||
-    new Set();
-
-  ids.forEach(
-    disciplineId =>
-      current.add(
-        disciplineId
-      )
-  );
-
-  ADDITIONAL_DISCIPLINE_TRAINING_SOURCES.set(
-    sourceId,
-    current
-  );
-
-  return {
-    success: true,
-    source: sourceId,
-    disciplineIds:
-      [
-        ...current
-      ]
-  };
-
-}
-
-function getRegisteredDisciplineTrainingSource(
-  source
-) {
-
-  const sourceId =
-    String(
-      source || ""
-    ).trim();
-
-  const ids =
-    ADDITIONAL_DISCIPLINE_TRAINING_SOURCES.get(
-      sourceId
-    );
-
-  return ids
-    ? {
-        source: sourceId,
-        disciplineIds:
-          [
-            ...ids
-          ]
-      }
-    : null;
-
-}
-
 function isValidDisciplineTrainingSource(
   disciplineId,
   source
@@ -12075,29 +11971,9 @@ function isValidDisciplineTrainingSource(
   }
 
 
-  if (
+  return (
     discipline.trainingSource ===
-      source
-  ) {
-
-    return true;
-
-  }
-
-
-  const registered =
-    ADDITIONAL_DISCIPLINE_TRAINING_SOURCES.get(
-      String(
-        source || ""
-      )
-    );
-
-
-  return !!(
-    registered &&
-    registered.has(
-      disciplineId
-    )
+    source
   );
 
 }
