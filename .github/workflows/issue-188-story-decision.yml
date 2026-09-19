@@ -1,6 +1,15 @@
 name: Issue 188 Story Decision QA
 
 on:
+  pull_request:
+    paths:
+      - 'runtime/alpha-story-decision-realisation-34000.js'
+      - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
+      - 'runtime/alpha-kakashi-scene03a-35700.js'
+      - 'runtime/alpha-kakashi-post-mi-death-pursuit-35830.js'
+      - 'tools/qa_academy_kakashi_scene03a_35700.js'
+      - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
+      - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
     paths:
