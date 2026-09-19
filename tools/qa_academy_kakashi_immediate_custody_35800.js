@@ -79,6 +79,7 @@ const diag=globalThis.runAcademyKakashiImmediateCustody35800Diagnostics();
 assert.strictEqual(diag.pass,true,"35800 diagnostics failed: "+JSON.stringify(diag.failed));
 assert.strictEqual(diag.checks.raisedRouteDialogueBand,true,"raised rooftop/Police dialogue safe band missing");
 assert.strictEqual(diag.checks.officeDialogueSafeAnchor,true,"Hokage Office dialogue safe anchor missing");
+assert.strictEqual(diag.checks.directCustodyEntrypoint,true,"immediate custody choices must own a direct runtime entrypoint");
 assert.strictEqual(MOD.wireChoices(),true);
 
 let out=globalThis.advanceStoryScene(ANBU_CHOICE);
@@ -137,6 +138,9 @@ assert(source.includes("He brought you back himself."),"W2D office verbatim anch
 assert(source.includes("She remains in Police custody until that custody is properly resolved."),"W2E office verbatim custody anchor missing");
 assert(source.includes("top:22%!important"),"route dialogue panel was not raised above card lane");
 assert(source.includes("right:7.5%!important")&&source.includes("top:14.5%!important"),"office dialogue panel is not locked to upper-right safe zone");
+assert(source.includes("beginImmediateCustodyChoice35800")&&source.includes("rt.beatId=route.firstBeat"),"TAKE HER BACK TO ANBU / Police must not depend on a fragile generic choice chain");
+assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"custody office package truth must use the persistent Live State Callout");
+assert(source.includes('card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE"'),"Minato nameplate must remain actor-local rather than carrying package state");
 
 const terminalSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-terminal-debrief-35100.js"),"utf8");
 assert(terminalSource.includes("kakashiScene06W2DCustodyOccurrenceId"),"terminal package-state adapter missing W2D custody source");

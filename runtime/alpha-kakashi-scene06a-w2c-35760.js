@@ -291,6 +291,7 @@ function resolveLethalAttempt(rt=active()){
 function sequenceFor35760(rt=active()){return pursuitWasOpenAtIntent(rt)?CUES_OPEN:CUES_CLOSED;}
 function cursor(rt=active()){const sequence=sequenceFor35760(rt),raw=rt&&rt.localContext?Number(rt.localContext[CURSOR_KEY]):0;return Number.isInteger(raw)?Math.max(0,Math.min(sequence.length-1,raw)):0;}
 function performance(rt=active()){
+  if(rt&&rt.beatId===HOLD_BEAT&&rt.localContext&&rt.localContext.kakashiScene06AW2CPursuitAvailable===true&&rt.localContext.kakashiScene06AW2CPursuitPresentationReady===true)return null;
   const sequence=sequenceFor35760(rt),index=rt&&rt.beatId===HOLD_BEAT?sequence.length-1:cursor(rt);
   return{sequence,index:index,cue:sequence[index],atEnd:index>=sequence.length-1};
 }
@@ -367,7 +368,7 @@ function installHooks(){
   if(hooksInstalled)return true;
   if(typeof globalThis.getStoryScenePerformance33900!=="function"||typeof globalThis.advanceStoryScene!=="function")return false;
   const PRE_GET=globalThis.getStoryScenePerformance33900,PRE_ADVANCE=globalThis.advanceStoryScene,PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
-  globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35760(){const rt=active();return isFamily(rt)?performance(rt):PRE_GET.apply(this,arguments);};
+  globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35760(){const rt=active(),owned=isFamily(rt)?performance(rt):null;return owned||PRE_GET.apply(this,arguments);};
   globalThis.advanceStoryScene=function advanceStoryScene35760(choiceId=null){
     const rt=active();
     if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&choiceId===SOURCE_CHOICE&&lateEntryEligible(rt)){
@@ -431,6 +432,7 @@ function diagnostics(){
     stateDerivedPostLethalChoices:postLethalChoiceRows35760.toString().includes("GO AFTER PACKAGE SMUGGLER")&&postLethalChoiceRows35760.toString().includes("GO AFTER ANBU MARKED TARGET"),
     noPakkun:commitLethalResult.toString().includes("pakkunPresent:false"),
     directResolvedOutcomeTrigger:resolveLethalAttempt.toString().includes("triggerResolvedOutcomePresentation")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiResolvedOutcome35780")&&triggerResolvedOutcomePresentation.toString().includes("beginAcademyKakashiConfirmedKill35770"),
+    pursuitPresentationReleasesNarration:performance.toString().includes("kakashiScene06AW2CPursuitPresentationReady===true")&&globalThis.getStoryScenePerformance33900.toString().includes("owned||PRE_GET"),
     scene7FailClosedWhenNoPursuit:typeof globalThis.advanceStoryScene==="function"&&globalThis.advanceStoryScene.toString().includes("kakashi_scene06aw2c_scene7_authority_pending")&&HOLD_BEAT==="kak_scene06a_w2c_scene7_pending",
     standardCharacterCardScale:installStyle.toString().includes("width:min(94%,322px)")&&installStyle.toString().includes("width:min(96%,338px)")&&installStyle.toString().includes("max-height:505px"),
     browserGoldenClaimed:false

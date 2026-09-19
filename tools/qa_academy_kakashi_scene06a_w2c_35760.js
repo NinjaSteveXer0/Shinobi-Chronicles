@@ -194,4 +194,5 @@ assert(scene06Source.includes("stopImmediatePropagation"),"browser choice captur
 assert(scene06Source.includes("fast_confirmed_kill_preserves_committed_pursuit_window"),"qualifying KILLED pursuit preservation rule missing");
 assert(scene06Source.includes("kakashiScene06AW2CPursuitWasOpenAtIntent"),"pre-lethal pursuit snapshot missing");
 assert(scene06Source.includes("GO AFTER PACKAGE SMUGGLER")&&scene06Source.includes("GO AFTER ANBU MARKED TARGET"),"state-derived post-lethal pursuit choices missing");
+assert(scene06Source.includes("kakashiScene06AW2CPursuitPresentationReady===true")&&scene06Source.includes("return null"),"installed-browser kill continuation must release narration after the lethal animation so pursuit choices can paint");
 

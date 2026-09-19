@@ -39,6 +39,10 @@ const MOD=globalThis.SC_ALPHA_KAKASHI_LOSS_ENDING_35820;
 assert(MOD,"loss ending module missing");
 const diag=globalThis.runAcademyKakashiLossEnding35820Diagnostics();
 assert.strictEqual(diag.pass,true,"35820 diagnostics failed: "+JSON.stringify(diag.failed));
+assert.strictEqual(diag.checks.revisedOfficeExact,true,"revised 137-cue loss-office authority not consumed exactly");
+assert.strictEqual(diag.checks.staleClippedExchangeRemoved,true,"stale clipped interrogation dialogue remains in loss office");
+assert.strictEqual(diag.checks.safeDialogueZones,true,"loss-office dialogue ownership/safe-zone lock missing");
+assert.strictEqual(diag.checks.liveStateCallout,true,"loss-office recovered package must use a Live State Callout");
 MOD.wireSource();
 let out=globalThis.advanceStoryScene("scene05al_return_to_anbu");
 assert.strictEqual(out.success,true,"RETURN TO ANBU failed: "+JSON.stringify(out));
@@ -63,7 +67,7 @@ assert.strictEqual(active.localContext.kakashiScene05ALObjective,null,"Return to
 assert(debrief>=1,"terminal debrief was not committed after factual report");
 
 safety=0;
-while(active.beatId===MOD.officeBeatId&&safety++<100){
+while(active.beatId===MOD.officeBeatId&&safety++<180){
  out=globalThis.advanceStoryScene();
  assert(out&&out.success===true,"hidden office advance failed: "+JSON.stringify(out));
 }
@@ -87,6 +91,12 @@ assert(receipt>=1,"Chronicle Receipt was not committed");
 out=MOD.complete();
 assert.strictEqual(out.success,true,"loss Origin closure failed: "+JSON.stringify(out));
 assert.strictEqual(out.destination,"konoha_village");
+const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-loss-ending-35820.js"),"utf8");
+assert(source.includes("362f72b8f20f50fec1b8e11e483e40cf5030364c"),"revised loss-office Writing authority missing");
+assert(source.includes("He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in."),"revised character-driven office opening missing");
+assert(!source.includes('text:"He couldn’t follow?"')&&!source.includes('text:"No excuse?"'),"superseded clipped office exchange still present");
+assert(source.includes(".sc-chronicle-layout{display:none!important}")&&source.includes("scBoardUiMode"),"generic Chronicle dialogue panel can still reassert over Minato");
+assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"loss office package state callout missing");
 assert(saves>0,"loss route never persisted state");
 console.log("Academy Kakashi loss ending 35820 QA: PASS");
 console.log("- RETURN TO ANBU reaches exact rooftop report");
