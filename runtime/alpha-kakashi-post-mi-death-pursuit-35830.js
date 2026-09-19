@@ -360,7 +360,7 @@ function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
   patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v11_2026_09_19",
-  authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
+  authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
   exactPsChase:CUES.psChase.length===12&&CUES.psChase[0].text==="Kakashi moves before Package Smuggler disappears completely."&&CUES.psChase[11].text==="Kakashi increases his pace.",
@@ -393,5 +393,5 @@ function diagnostics(){
 }
 globalThis.runAcademyKakashiPostMiDeathPursuit35830Diagnostics=diagnostics;
 globalThis.beginAcademyKakashiPostMiPursuitChoice35830=beginPostMiPursuitChoice35830;
-globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830=Object.freeze({patchId:PATCH_ID,authorities:Object.freeze({live:AUTH_LIVE,ps:AUTH_PS,amt:AUTH_AMT}),beats:BEAT,psConfig:PS_CONFIG,amtConfig:AMT_CONFIG,wireEntryChoices,beginPursuitChoice:beginPostMiPursuitChoice35830,commitPursuitSelection,resolveSelectedPursuit,consumePsReturn,consumeAmtReturn,commitPakkunReach,deterministicKillTarget,diagnostics,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830=Object.freeze({patchId:PATCH_ID,authorities:Object.freeze({live:AUTH_LIVE,ps:AUTH_PS,amt:AUTH_AMT,amtDisposition:AUTH_AMT_DISPOSITION}),beats:BEAT,psConfig:PS_CONFIG,amtConfig:AMT_CONFIG,wireEntryChoices,beginPursuitChoice:beginPostMiPursuitChoice35830,commitPursuitSelection,resolveSelectedPursuit,consumePsReturn,consumeAmtReturn,commitPakkunReach,deterministicKillTarget,diagnostics,browserGoldenClaimed:false});
 })();
