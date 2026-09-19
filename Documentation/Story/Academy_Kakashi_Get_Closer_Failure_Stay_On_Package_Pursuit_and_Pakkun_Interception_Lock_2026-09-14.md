@@ -1,5 +1,13 @@
 # Academy Kakashi Origin — Get Closer Failure → Stay on the Package Pursuit and Pakkun Interception Lock
 
+> **2026-09-20 SUCCESSOR CHOICES COMPLETE**  
+> The three pursuit-success choices whose downstream results were still future work in the historical section below are now closed:
+> - DEMAND THE PACKAGE — exact Battle + win/loss authority;
+> - TAKE HIM DOWN — exact distinct Battle-state + win/loss authority;
+> - ASK WHERE THE PACKAGE WAS GOING — current dedicated verbatim lock `Academy_Kakashi_Ask_Where_The_Package_Was_Going_Verbatim_Lock_2026-09-20.md`.
+>
+> Current terminal expressions are supplied by the 2026-09-20 dynamic / mixed-lethal terminal locks.
+
 **Date:** 2026-09-14  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED — LOCKED STORY / RESOLVER / PRESENTATION AUTHORITY**
