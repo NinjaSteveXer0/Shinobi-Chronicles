@@ -1,5 +1,14 @@
 # Academy Kakashi Origin — Scene 05A-W: Kakashi Wins — Verbatim Lock
 
+> **2026-09-20 CURRENT POST-BATTLE CHOICE NOTICE**  
+> The historical `KILL HER / ATTEMPT TO KILL HER` and `RESTRAIN / ATTEMPT TO RESTRAIN` control-state split below is superseded for the current player-facing choice surface by:
+> `Academy_Kakashi_Post_Battle_Disposition_Simplification_2026-09-19.md`
+> and the current post-restraint collection authority.
+>
+> Current authored choices are not renamed/hidden by `CONTROLLED_DEFEATED`.
+>
+> Legacy MI lethal-attempt outcome files remain valid for already-committed historical/save-state provenance; they are not permission to restore hidden-control gating to the current menu.
+
 **Date:** 2026-09-19  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED / LOCKED VERBATIM — DO NOT CHANGE**
