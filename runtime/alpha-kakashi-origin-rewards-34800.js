@@ -15,7 +15,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800)return;
 
-const PATCH_ID="alpha_kakashi_origin_rewards_34800_v4_2026_09_19";
+const PATCH_ID="alpha_kakashi_origin_rewards_34800_v5_2026_09_19";
 const ROUTE="academy_kakashi_origin_reward";
 const KAKASHI="academy_kakashi";
 const ITEM_SOURCE="kak_origin_item_field_recovery_resupply";
@@ -39,20 +39,18 @@ const PROGRESSION_AUTHORITY_COMMIT="54314cc29e1374783cae0a0d90654cc9a2316a45";
 const ACQUISITION_AUTHORITY_COMMIT="b83884adb70f1e74e62f96ab96848c1ec33704f9";
 
 function clone(v){try{return JSON.parse(JSON.stringify(v));}catch(_error){return v;}}
-const priorDisciplineTrainingSourceGate=typeof isValidDisciplineTrainingSource==="function"?isValidDisciplineTrainingSource:null;
-function installActionDerivedDisciplineSourceGate34800(){
-  if(typeof priorDisciplineTrainingSourceGate!=="function")return false;
-  if(globalThis.isValidDisciplineTrainingSource&&globalThis.isValidDisciplineTrainingSource.__scActionDerivedDevelopment34800===true)return true;
-  const wrapped=function isValidDisciplineTrainingSourceKakashi34800(disciplineId,source){
-    if(String(source||"")===ACTION_DERIVED_DISCIPLINE_SOURCE&&ACTION_DERIVED_DISCIPLINE_IDS.has(String(disciplineId||"")))return true;
-    return priorDisciplineTrainingSourceGate.apply(this,arguments);
-  };
-  try{Object.defineProperty(wrapped,"__scActionDerivedDevelopment34800",{value:true,enumerable:false});}catch(_error){wrapped.__scActionDerivedDevelopment34800=true;}
-  globalThis.isValidDisciplineTrainingSource=wrapped;
-  try{isValidDisciplineTrainingSource=wrapped;}catch(_error){}
-  return true;
+function applyActionDerivedDisciplineExp34800(subjectId,disciplineId,amount){
+  if(typeof getCharacterDisciplineProgression!=="function"||typeof processDisciplineLevelUps!=="function")return{success:false,reason:"canonical_progression_api_missing"};
+  const expAmount=Math.floor(Number(amount));
+  if(!Number.isFinite(expAmount)||expAmount<=0)return{success:false,reason:"development_amount_invalid"};
+  const progression=getCharacterDisciplineProgression(subjectId,disciplineId);
+  if(!progression)return{success:false,reason:"canonical_progression_record_missing"};
+  progression.exp=Number(progression.exp||0)+expAmount;
+  const levelResult=processDisciplineLevelUps(subjectId,disciplineId);
+  if(!levelResult)return{success:false,reason:"canonical_progression_level_processing_failed"};
+  save();
+  return{success:true,amount:expAmount,levelResult:clone(levelResult),progression:clone(getCharacterDisciplineProgression(subjectId,disciplineId))};
 }
-const ACTION_DERIVED_SOURCE_GATE_INSTALLED=installActionDerivedDisciplineSourceGate34800();
 function ensureRoot(){
   if(typeof playerData!=="object"||!playerData)return null;
   playerData.kakashiOriginRewardReceipts=playerData.kakashiOriginRewardReceipts&&typeof playerData.kakashiOriginRewardReceipts==="object"?playerData.kakashiOriginRewardReceipts:{};
@@ -80,7 +78,7 @@ function registerSource(kind,sourceId,payload={}){
   root.sources[key]=receipt;save();return{success:true,idempotent:false,receipt:clone(receipt)};
 }
 function normalizeDiscipline(value){return String(value||"").trim().toLowerCase().replace(/ū/g,"u");}
-function progressionAvailable(){return typeof addDisciplineExp==="function"&&typeof getCharacterDisciplineProgression==="function";}
+function progressionAvailable(){return typeof getCharacterDisciplineProgression==="function"&&typeof processDisciplineLevelUps==="function";}
 function recordTechnicalDisciplineDevelopment({sourceId,discipline,executionClass="attempt",subjectId=KAKASHI,battleOccurrenceId=null}={}){
   const key=normalizeDiscipline(discipline),disciplineId=DISCIPLINE_ID[key];
   if(!disciplineId||key==="stamina")return{success:false,reason:"technical_discipline_not_authored",discipline:key};
@@ -92,10 +90,10 @@ function recordTechnicalDisciplineDevelopment({sourceId,discipline,executionClas
   const used=battleKey?Number(root.battleDisciplineTotals[battleKey]||0):0;
   const amount=battleKey?Math.max(0,Math.min(authoredAmount,6-used)):authoredAmount;
   if(amount<=0){registerSource("discipline_development",sourceId,{subjectId,discipline:key,executionClass,battleOccurrenceId,amount:0,capReached:true});return{success:true,idempotent:false,discipline:key,amount:0,battleCap:6};}
-  const applied=addDisciplineExp(subjectId,disciplineId,amount,ACTION_DERIVED_DISCIPLINE_SOURCE);
-  if(applied===false||applied==null)return{success:false,reason:"canonical_progression_commit_failed",discipline:key};
+  const applied=applyActionDerivedDisciplineExp34800(subjectId,disciplineId,amount);
+  if(!applied||applied.success!==true)return{success:false,reason:applied&&applied.reason||"canonical_progression_commit_failed",discipline:key};
   if(battleKey)root.battleDisciplineTotals[battleKey]=used+amount;
-  registerSource("discipline_development",sourceId,{subjectId,discipline:key,disciplineId,executionClass,battleOccurrenceId,amount});save();
+  registerSource("discipline_development",sourceId,{subjectId,discipline:key,disciplineId,executionClass,battleOccurrenceId,amount,developmentSource:ACTION_DERIVED_DISCIPLINE_SOURCE});save();
   return{success:true,idempotent:false,discipline:key,disciplineId,amount,progression:clone(getCharacterDisciplineProgression(subjectId,disciplineId))};
 }
 function recordStaminaDevelopment({sourceId,mitigationAmount,battleOccurrenceId,subjectId=KAKASHI}={}){
@@ -104,11 +102,11 @@ function recordStaminaDevelopment({sourceId,mitigationAmount,battleOccurrenceId,
   if(sourceReceipt("stamina_development",sourceId,subjectId))return{success:true,idempotent:true,amount:0};
   const root=ensureRoot(),battleKey=String(battleOccurrenceId),used=Number(root.battleStaminaTotals[battleKey]||0),amount=used<2?1:0;
   if(amount>0){
-    const applied=addDisciplineExp(subjectId,DISCIPLINE_ID.stamina,1,ACTION_DERIVED_DISCIPLINE_SOURCE);
-    if(applied===false||applied==null)return{success:false,reason:"canonical_stamina_progression_commit_failed"};
+    const applied=applyActionDerivedDisciplineExp34800(subjectId,DISCIPLINE_ID.stamina,1);
+    if(!applied||applied.success!==true)return{success:false,reason:applied&&applied.reason||"canonical_stamina_progression_commit_failed"};
     root.battleStaminaTotals[battleKey]=used+1;
   }
-  registerSource("stamina_development",sourceId,{subjectId,battleOccurrenceId:battleKey,mitigationAmount:Number(mitigationAmount),amount,capReached:amount===0});save();
+  registerSource("stamina_development",sourceId,{subjectId,battleOccurrenceId:battleKey,mitigationAmount:Number(mitigationAmount),amount,capReached:amount===0,developmentSource:ACTION_DERIVED_DISCIPLINE_SOURCE});save();
   return{success:true,idempotent:false,amount,progression:clone(getCharacterDisciplineProgression(subjectId,DISCIPLINE_ID.stamina))};
 }
 function recordFieldcraftEvidence({sourceId,family,evidenceType,significance=1,subjectId=KAKASHI}={}){
@@ -249,16 +247,15 @@ function commitTerminalDebriefRewards(facts={}){
 function snapshot(){const root=ensureRoot();return root?clone(root):null;}
 function diagnostics(){
   const checks={
-    contextAdapterNotSecondSystem:typeof addDisciplineExp==="function"&&typeof addItemToInventory==="function",
+    contextAdapterNotSecondSystem:typeof getCharacterDisciplineProgression==="function"&&typeof processDisciplineLevelUps==="function"&&typeof addItemToInventory==="function",
     routeExact:ROUTE==="academy_kakashi_origin_reward",
     terminalDebriefSeparated:evaluateTerminalDebriefRewards({terminalDebriefReached:false}).success===false,
     ryoMax250:evaluateTerminalDebriefRewards({terminalDebriefReached:true,packageRecovered:true,verifiedActionableIntelligence:true,liveCustodyEstablished:true,exceptionalFieldExecution:true}).ryo===250,
     itemSourceExact:ITEM_SOURCE==="kak_origin_item_field_recovery_resupply"&&ITEM_ID==="field_recovery_pill",
     weaponSourceExact:WEAPON_SOURCE==="kak_origin_weapon_exceptional_training_tanto"&&WEAPON_ID==="academy_training_tanto",
-    developmentUsesCanonicalProgression:recordTechnicalDisciplineDevelopment.toString().includes("addDisciplineExp")&&recordStaminaDevelopment.toString().includes("addDisciplineExp"),
-    actionDerivedSourceExact:ACTION_DERIVED_DISCIPLINE_SOURCE==="action_derived_development"&&recordTechnicalDisciplineDevelopment.toString().includes("ACTION_DERIVED_DISCIPLINE_SOURCE")&&recordStaminaDevelopment.toString().includes("ACTION_DERIVED_DISCIPLINE_SOURCE"),
-    canonicalSourceGateAcceptsActionDevelopment:ACTION_DERIVED_SOURCE_GATE_INSTALLED===true&&typeof isValidDisciplineTrainingSource==="function"&&isValidDisciplineTrainingSource(DISCIPLINE_ID.bukijutsu,ACTION_DERIVED_DISCIPLINE_SOURCE)===true&&isValidDisciplineTrainingSource(DISCIPLINE_ID.stamina,ACTION_DERIVED_DISCIPLINE_SOURCE)===true,
-    legacyTrainingSourcesPreserved:typeof priorDisciplineTrainingSourceGate==="function"&&isValidDisciplineTrainingSource(DISCIPLINE_ID.bukijutsu,"practical")===priorDisciplineTrainingSourceGate(DISCIPLINE_ID.bukijutsu,"practical")&&isValidDisciplineTrainingSource(DISCIPLINE_ID.ninjutsu,"exam")===priorDisciplineTrainingSourceGate(DISCIPLINE_ID.ninjutsu,"exam"),
+    developmentUsesCanonicalProgression:applyActionDerivedDisciplineExp34800.toString().includes("getCharacterDisciplineProgression")&&applyActionDerivedDisciplineExp34800.toString().includes("processDisciplineLevelUps")&&applyActionDerivedDisciplineExp34800.toString().includes("save()"),
+    actionDerivedSourceExact:ACTION_DERIVED_DISCIPLINE_SOURCE==="action_derived_development"&&recordTechnicalDisciplineDevelopment.toString().includes("developmentSource:ACTION_DERIVED_DISCIPLINE_SOURCE")&&recordStaminaDevelopment.toString().includes("developmentSource:ACTION_DERIVED_DISCIPLINE_SOURCE"),
+    auditedCoreSourceGateUntouched:!applyActionDerivedDisciplineExp34800.toString().includes("isValidDisciplineTrainingSource")&&!applyActionDerivedDisciplineExp34800.toString().includes("addDisciplineExp"),
     inventoryUsesCanonicalGrant:grantCatalogueItem.toString().includes("addItemToInventory")&&grantCatalogueItem.toString().includes("getItemDefinition"),
     technicalBattleCap:recordTechnicalDisciplineDevelopment.toString().includes("6-used"),
     staminaBattleCap:recordStaminaDevelopment.toString().includes("used<2?1:0"),

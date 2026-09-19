@@ -23,6 +23,16 @@ var __qaRuntime=null;
 var __qaScene=null;
 var __qaCompletionCalls=[];
 var __qaProgression={};
+var __qaLegacyTrainingSources={nin:"exam",tai:"practical",gen:"exam",buki:"practical",fuin:"exam",kin:"battle",stamina:"practical"};
+var __qaExtraTrainingSources=new Map();
+function registerDisciplineTrainingSource(source,disciplineIds){
+  const id=String(source||"").trim(),ids=[...new Set((Array.isArray(disciplineIds)?disciplineIds:[]).map(String).filter(key=>Object.prototype.hasOwnProperty.call(__qaLegacyTrainingSources,key)))];
+  if(!id||!ids.length)return{success:false,reason:"discipline_training_source_registration_invalid"};
+  const set=__qaExtraTrainingSources.get(id)||new Set();ids.forEach(key=>set.add(key));__qaExtraTrainingSources.set(id,set);
+  return{success:true,source:id,disciplineIds:[...set]};
+}
+function getRegisteredDisciplineTrainingSource(source){const set=__qaExtraTrainingSources.get(String(source||""));return set?{source:String(source),disciplineIds:[...set]}:null;}
+function isValidDisciplineTrainingSource(disciplineId,source){return __qaLegacyTrainingSources[disciplineId]===source||!!(__qaExtraTrainingSources.get(String(source||""))&&__qaExtraTrainingSources.get(String(source||"")).has(disciplineId));}
 function cloneProgressionData(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v));}
 function savePlayerData(){activityHistory=playerData.activityHistory||[];return true;}
 function saveTestState(){return savePlayerData();}
@@ -31,8 +41,9 @@ function getActiveStorySceneRuntime(){return __qaRuntime;}
 function getStorySceneDefinition(sceneId){return __qaScene&&__qaScene.sceneId===sceneId?__qaScene:null;}
 function getItemDefinition(id){if(id==="field_recovery_pill")return{id,name:"Field Recovery Pill"};if(id==="academy_training_tanto")return{id,name:"Academy Training Tanto"};return null;}
 function addItemToInventory(item){playerData.inventory=Array.isArray(playerData.inventory)?playerData.inventory:[];playerData.inventory.push(JSON.parse(JSON.stringify(item)));return true;}
-function addDisciplineExp(subjectId,disciplineId,amount){const k=subjectId+"::"+disciplineId;__qaProgression[k]=Number(__qaProgression[k]||0)+Number(amount||0);return true;}
-function getCharacterDisciplineProgression(subjectId,disciplineId){const k=subjectId+"::"+disciplineId;return{characterId:subjectId,disciplineId,exp:Number(__qaProgression[k]||0)};}
+function addDisciplineExp(subjectId,disciplineId,amount,source){if(!isValidDisciplineTrainingSource(disciplineId,source))return false;const k=subjectId+"::"+disciplineId;__qaProgression[k]=Number(__qaProgression[k]||0)+Number(amount||0);return true;}
+function getCharacterDisciplineProgression(subjectId,disciplineId){const k=subjectId+"::"+disciplineId;if(!__qaProgression[k]||typeof __qaProgression[k]!=="object")__qaProgression[k]={characterId:subjectId,disciplineId,exp:Number(__qaProgression[k]||0),level:1};return __qaProgression[k];}
+function processDisciplineLevelUps(subjectId,disciplineId){const p=getCharacterDisciplineProgression(subjectId,disciplineId);return{levelsGained:0,level:Number(p.level||1),exp:Number(p.exp||0),expToNext:999,statPointsGained:0,stat:0};}
 function completeChronicleOriginPrologue(originId,evidenceIds){__qaCompletionCalls.push({originId,evidenceIds:[...(evidenceIds||[])]});return{success:true,originId,evidenceIds:[...(evidenceIds||[])]};}
 function resetDataQA(instanceId){
   playerData={activityHistory:[],inventory:[],ryo:0};activityHistory=playerData.activityHistory;__qaProgression={};__qaCompletionCalls=[];
