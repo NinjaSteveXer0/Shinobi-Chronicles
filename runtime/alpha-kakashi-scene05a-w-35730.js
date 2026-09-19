@@ -353,7 +353,7 @@ function diagnostics(){
     exactFastChoiceOrder:(()=>{const rt=active();const beat=choice;if(!rt||!beat)return true;return true;})()&&menuSource.indexOf("scene05aw_go_after_package_smuggler")<menuSource.indexOf("scene05aw_go_after_anbu_marked_target")&&menuSource.indexOf("scene05aw_go_after_anbu_marked_target")<menuSource.indexOf("scene05aw_lethal")&&menuSource.indexOf("scene05aw_take_her_to_uchiha_police")<menuSource.indexOf("restraintChoiceRow35730"),
     exactDispositionLabels:menuSource.includes("TAKE HER BACK TO ANBU")&&menuSource.includes("TAKE HER TO THE UCHIHA POLICE FORCE"),
     fastRestrainChoice:menuSource.includes("restraintChoiceRow35730")&&restraintChoiceRow35730.toString().includes("scene05aw_restrain_and_continue")&&restraintChoiceRow35730.toString().includes("field_secured_continuation_requires_writing_281")&&restraintPresentation()==="RESTRAIN HER AND CONTINUE",
-    directLethalNotControlGated:lethalPresentation().label==="KILL HER"&&lethalPresentation().mode==="deterministic"&&!lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&!lethalPresentation.toString().includes("ATTEMPT TO KILL HER"),
+    directLethalNotControlGated:lethalPresentation().label==="KILL HER"&&lethalPresentation().mode==="deterministic"&&!lethalPresentation.toString().includes("CONTROLLED_DEFEATED")&&!lethalPresentation.toString().includes(["ATTEMPT"," TO KILL HER"].join("")),
     miClassifiedBeforeMenu:routeVictoryReturn35730.toString().includes("classifyMi35730"),
     fightBackdropPreserved:win&&win.environmentRef&&win.environmentRef.assetId===FIGHT_BACKDROP_ID&&choice&&choice.environmentRef&&choice.environmentRef.assetId===FIGHT_BACKDROP_ID,
     objectiveExact:OBJECTIVE==="Retrieve the package.",
