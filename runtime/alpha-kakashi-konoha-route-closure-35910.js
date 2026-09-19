@@ -129,10 +129,18 @@ function observeIntent(choiceId,bindingRef){
  if(!stateRef||!choiceSetId)return{success:false,reason:"kakashi_observe_route_semantic_context_missing"};
  return ensureDecisionIntent({decisionPointRef:"OBSERVE_ESCALATION",choiceId,bindingRef,contextStateRef:stateRef,beatRef:OBSERVE_BEAT,choiceSetId,sourceOccurrenceRefs:[stateRef]});
 }
-function launch(config,binding,anchor,storyOccurrenceId,returnBeat,token){
+function launch(config,binding,anchor,storyOccurrenceId,returnBeat,token,ctx={}){
+ const rt=active(),cfg=BATTLE.configs&&BATTLE.configs[config]||null;
+ const supplied=ctx&&ctx.returnContext&&typeof ctx.returnContext==="object"?ctx.returnContext:null;
+ const returnContext=supplied?{...supplied}:{type:"story_scene",sceneId:SCENE,postBattleBeatId:returnBeat};
  return BATTLE.launchAcademyKakashiOriginPlBattle({
-  battleConfigId:config,storyOccurrenceId,sourceAnchorRef:anchor,bindingRef:binding,returnToken:token,
-  returnContext:{sceneRef:SCENE,storySceneInstanceId:String(active()&&active().instanceId||""),postBattleBeatId:returnBeat,routeOwner:PATCH_ID}
+  battleConfigId:config,
+  storyOccurrenceId:String(storyOccurrenceId||rt&&rt.instanceId||""),
+  sourceAnchorRef:anchor,
+  bindingRef:binding,
+  returnToken:token,
+  returnContext,
+  pakkunAuthorized:!!(cfg&&cfg.pakkun===true)
  });
 }
 function participant(result,ref){return Array.isArray(result&&result.participants)?result.participants.find(row=>row&&row.participantRef===ref)||null:null;}
@@ -159,10 +167,10 @@ function resolveDirectStrikeEntry(choice){
  rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrikeOccurrenceId:id,kakashiKonohaDirectStrikeReceiptId:intent.receipt.storyDecisionReceiptId,kakashiKonohaPackageOccurrenceId:id};choice.nextBeatId=D.directIntro;save();
  return{success:true,occurrenceId:id,nextBeatId:D.directIntro};
 }
-function launchDirect2v1(){
+function launchDirect2v1(ctx={}){
  const rt=active(),source=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeOccurrenceId||"");
  if(!source)return{success:false,reason:"direct_strike_entry_occurrence_missing"};
- return launch(DIRECT_2V1,DIRECT_BINDING,"AK_SA_003",source,D.directReturn,"direct_strike_2v1");
+ return launch(DIRECT_2V1,DIRECT_BINDING,"AK_SA_003",source,D.directReturn,"direct_strike_2v1",ctx);
 }
 function consumeDirect2v1(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.directReturn)return{success:false,reason:"direct_strike_return_context_required"};
@@ -192,9 +200,9 @@ function consumeDirect2v1(){
  rt.localContext={...(rt.localContext||{}),kakashiKonohaDirectStrike2v1OccurrenceId:id,kakashiKonohaPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id};setNext(D.directReturn,win?D.directMiArrival:TERMINAL);save();
  return{success:true,victory:win,occurrenceId:id,nextBeatId:win?D.directMiArrival:TERMINAL};
 }
-function launchDirectMi(){
+function launchDirectMi(ctx={}){
  const rt=active(),source=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaDirectStrike2v1OccurrenceId||"");if(!source)return{success:false,reason:"direct_strike_mi_parent_missing"};
- return launch(DIRECT_MI,"academy_kakashi.battle.direct_strike_mi","AK_SA_003",source,D.directMiReturn,"direct_strike_mi_1v1");
+ return launch(DIRECT_MI,"academy_kakashi.battle.direct_strike_mi","AK_SA_003",source,D.directMiReturn,"direct_strike_mi_1v1",ctx);
 }
 function consumeDirectMi(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.directMiReturn)return{success:false,reason:"direct_strike_mi_return_context_required"};
@@ -262,9 +270,22 @@ function resolveSecureBeforeChoice(choice){
  choice.nextBeatId=success?TERMINAL:D.secureBeforeIntro;save();
  return{success:true,selectedOutcomeRef:factual.receipt.selectedOutcomeRef,nextBeatId:choice.nextBeatId};
 }
-function launchSecureBeforeBattle(){
+function ensureSecureBeforeSharedBattleIntent35910(){
+ const rt=active(),stateRef=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaSecureBeforeOccurrenceId||"");
+ if(!rt||!stateRef)return{success:false,reason:"secure_before_shared_battle_parent_missing"};
+ const existingId=String(rt.localContext&&rt.localContext.kakashiObserveSecurePackageStoryDecisionReceiptId||"");
+ if(existingId){const snap=CORE.getStoryUnitSnapshot(ORIGIN)||{},row=snap.decisionReceipts&&snap.decisionReceipts[existingId];if(row&&row.resolverBindingRef==="academy_kakashi.battle.secure_package")return{success:true,idempotent:true,receipt:row};}
+ const opened=CORE.openSemanticChoiceSet({storyUnitRef:ORIGIN,storyUnitType:"origin",decisionPointRef:"AK_SA_020_FAILURE_RECONVERGENCE",contextStateRef:stateRef,sceneRef:SCENE,beatRef:D.secureBeforeBattle,sourceOccurrenceRefs:[stateRef],choices:[{choiceId:"secure_package",intentType:"secure_package",intentPayload:{reconvergedFrom:"secure_package_before_assassin_failure"},eligibilityBasisRefs:[stateRef],resolverBindingRef:"academy_kakashi.battle.secure_package",presentationLabel:"SECURE THE PACKAGE"}]});
+ if(!opened||opened.success!==true)return opened||{success:false,reason:"secure_before_shared_battle_choice_set_failed"};
+ const committed=CORE.commitStoryIntent({storyUnitRef:ORIGIN,choiceSetId:opened.choiceSet.choiceSetId,choiceId:"secure_package"});
+ if(!committed||committed.success!==true)return committed||{success:false,reason:"secure_before_shared_battle_intent_failed"};
+ rt.localContext={...(rt.localContext||{}),kakashiGetCloserHandoffOccurrenceId:stateRef,kakashiObserveSecurePackageStoryDecisionReceiptId:committed.receipt.storyDecisionReceiptId,kakashiObserveSecurePackageIntentCommitRef:committed.receipt.intentCommitRef,kakashiObserveSecurePackageReconvergedFromSecureBefore:true};save();
+ return{success:true,receipt:committed.receipt};
+}
+function launchSecureBeforeBattle(ctx={}){
  const rt=active(),source=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaSecureBeforeOccurrenceId||"");if(!source)return{success:false,reason:"secure_before_resolver_occurrence_missing"};
- return launch(SECURE_2V1,SECURE_BEFORE_BINDING,"AK_SA_014",source,D.secureBeforeReturn,"secure_before_shared_2v1");
+ const intent=ensureSecureBeforeSharedBattleIntent35910();if(!intent||intent.success!==true)return intent;
+ return launch(SECURE_2V1,"academy_kakashi.battle.secure_package","AK_SA_014",source,"kak_observe_secure_package_return","secure_before_shared_2v1",ctx);
 }
 function consumeSecureBeforeBattle(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.secureBeforeReturn)return{success:false,reason:"secure_before_return_context_required"};
@@ -318,9 +339,9 @@ function resolveOriginalTargetChoice(choice){
  const reached=String(factual.receipt.selectedOutcomeRef||"")==="ORIGINAL_TARGET_PURSUIT_SUCCESS_REACHED";choice.nextBeatId=reached?D.originalIntro:TERMINAL;save();
  return{success:true,selectedOutcomeRef:factual.receipt.selectedOutcomeRef,nextBeatId:choice.nextBeatId};
 }
-function launchOriginalAmt(){
+function launchOriginalAmt(ctx={}){
  const rt=active(),source=String(rt&&rt.localContext&&rt.localContext.kakashiKonohaOriginalTargetOccurrenceId||"");if(!source)return{success:false,reason:"original_target_pursuit_occurrence_missing"};
- return launch(AMT_PAKKUN,"academy_kakashi.battle.original_target_amt","AK_SA_021",source,D.originalReturn,"original_target_amt_pakkun");
+ return launch(AMT_PAKKUN,"academy_kakashi.battle.original_target_amt","AK_SA_021",source,D.originalReturn,"original_target_amt_pakkun",ctx);
 }
 function consumeOriginalAmt(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.originalReturn)return{success:false,reason:"original_target_amt_return_context_required"};
@@ -392,8 +413,7 @@ function install(){
    {choiceId:"direct_group_release",label:"TAKE THE PACKAGE AND LET THEM GO",nextBeatId:TERMINAL,availability:available(true),knownBlocker:null,consequenceRequests:[{requestId:"direct_group_release_35910",kind:"domain",resolve:()=>commitDirectGroupDisposition("RELEASE")}]}
   ]},
   {beatId:D.secureBeforeIntro,mode:"narration",environmentRef:SAKURA,objectiveText:"Retrieve the package.",text:"Kakashi is half a step late. There is no clean extraction anymore. The race collapses into the existing Package Smuggler + Masked Interceptor fight.",nextBeatId:D.secureBeforeBattle},
-  {beatId:D.secureBeforeBattle,mode:"battle_transition",environmentRef:SAKURA,text:"Resolver failure reconverges into the shared PS + MI 2-v-1 without replaying branch setup.",battle:{encounterId:SECURE_2V1,launchResolver:launchSecureBeforeBattle,postBattleBeatId:D.secureBeforeReturn,resultProjector:()=>latestResult(),actionLabel:"SECURE THE PACKAGE"}},
-  {beatId:D.secureBeforeReturn,mode:"narration",environmentRef:SAKURA,onEnterConsequences:[{requestId:"kakashi_secure_before_2v1_return_35910",kind:"domain",resolve:consumeSecureBeforeBattle}],text:"The shared 2-v-1 returns to Story for exact package and participant classification.",nextBeatId:TERMINAL},
+  {beatId:D.secureBeforeBattle,mode:"battle_transition",environmentRef:SAKURA,text:"Resolver failure reconverges into the shared PS + MI 2-v-1 without replaying branch setup.",battle:{encounterId:SECURE_2V1,launchResolver:launchSecureBeforeBattle,postBattleBeatId:"kak_observe_secure_package_return",resultProjector:()=>latestResult(),actionLabel:"SECURE THE PACKAGE"}},
   {beatId:D.originalIntro,mode:"narration",environmentRef:ALLEY,objectiveText:"Catch the original target.",text:"ANBU Marked Target rounds the next corner and stops. A small ninken is sitting in the street ahead of him. Kakashi lands behind.",nextBeatId:D.originalPakkun},
   {beatId:D.originalPakkun,mode:"dialogue",environmentRef:ALLEY,speakerName:"PAKKUN",text:"This yours?",nextBeatId:D.originalBattle},
   {beatId:D.originalBattle,mode:"battle_transition",environmentRef:ALLEY,text:"Kakashi and temporary Story-authorised Pakkun confront ANBU Marked Target. The package remains elsewhere.",battle:{encounterId:AMT_PAKKUN,launchResolver:launchOriginalAmt,postBattleBeatId:D.originalReturn,resultProjector:()=>latestResult(),actionLabel:"CONFRONT THE ORIGINAL TARGET"}},
@@ -428,14 +448,16 @@ function diagnostics(){
   patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v1_2026_09_20",
   writing100Pinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8",
   directStrikeFixedChain:!!attack&&attack.label==="STRIKE BEFORE THE HANDOFF"&&attack.nextBeatId===D.directIntro&&d.beatMap.has(D.directBattle)&&d.beatMap.has(D.directMiBattle)&&d.beatMap.has(D.directGroup),
-  directStrikeExactConfigs:BATTLE.configs&&BATTLE.configs[DIRECT_2V1]&&BATTLE.configs[DIRECT_MI],
+  directStrikeExactConfigs:!!(BATTLE.configs&&BATTLE.configs[DIRECT_2V1]&&BATTLE.configs[DIRECT_MI]),
   directGroupChoicesExact:JSON.stringify(d.beatMap.get(D.directGroup).choices.map(x=>x.label))===JSON.stringify(["TAKE THEM TO THE UCHIHA POLICE FORCE","TAKE THEM TO THE ANBU","KILL THEM","TAKE THE PACKAGE AND LET THEM GO"]),
   secureBeforeLive:!!secure&&secure.knownBlocker===null&&regs.some(x=>x.bindingRef===SECURE_BEFORE_BINDING),
+  secureBeforeFailureUsesSharedBattleOwner:launchSecureBeforeBattle.toString().includes('"academy_kakashi.battle.secure_package"')&&launchSecureBeforeBattle.toString().includes('"kak_observe_secure_package_return"')&&ensureSecureBeforeSharedBattleIntent35910.toString().includes("AK_SA_020_FAILURE_RECONVERGENCE"),
   originalTargetLive:!!original&&original.knownBlocker===null&&regs.some(x=>x.bindingRef===ORIGINAL_TARGET_BINDING),
   originalDispositionExact:JSON.stringify(d.beatMap.get(D.originalDisposition).choices.map(x=>x.label))===JSON.stringify(["KILL HIM","RESTRAIN HIM","BRING HIM TO THE ANBU","TAKE HIM TO THE UCHIHA POLICE FORCE"]),
   ce256SharedOwnerUsed:consumeOriginalAmt.toString().includes("CLOSURE.resolveAmtDefeatFacts"),
   getCloserHandoffReconvergence:patchGetCloserHandoff()===true,
   battleDoesNotOwnDisposition:consumeDirectMi.toString().includes("participantDeathCommitted:false")&&consumeDirectMi.toString().includes("participantCustodyCommitted:false"),
+  battleLaunchContractExact:launch.toString().includes('type:"story_scene"')&&launch.toString().includes("pakkunAuthorized")&&launch.toString().includes("cfg.pakkun===true"),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
