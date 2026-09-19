@@ -386,7 +386,7 @@ if(priorGenerate){
     const b=battle();
     if(isKakashiOriginBattle(b)){
       syncBattleDevelopment35740(b);
-      if(isExactMiVictoryBattle(b))prepareImmediateMiReward35740(b);else if(isExactDownstreamCashVictoryBattle(b))prepareImmediateDownstreamCash35740(b);else if(isExactDownstreamCashVictoryBattle(b))prepareImmediateDownstreamCash35740(b);else if(isExactDownstreamCashVictoryBattle(b))prepareImmediateDownstreamCash35740(b);else if(isExactDownstreamCashVictoryBattle(b))prepareImmediateDownstreamCash35740(b);
+      if(isExactMiVictoryBattle(b))prepareImmediateMiReward35740(b);else if(isExactDownstreamCashVictoryBattle(b))prepareImmediateDownstreamCash35740(b);
     }
     return b&&b.rewards?b.rewards:result;
   };
@@ -465,8 +465,8 @@ function diagnostics(){
     exactCombatEvidence:sync.includes('eventType==="action_attempted"')&&sync.includes('eventType!=="damage_resolved"')===false&&sync.includes("staminaMitigationAmount"),
     genericExpNotGranted:!sync.includes("playerData.exp")&&!sync.includes("rewards.exp="),
     immediateMiRewardUses34800:prepareImmediateMiReward35740.toString().includes("ensureAcademyKakashiMiVictoryBattleEntitlement34800")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_RYO")&&prepareImmediateMiReward35740.toString().includes("MI_REWARD_ITEM_ID"),
-    downstreamCashUses34800:prepareImmediateDownstreamCash35740.toString().includes("ensureAcademyKakashiDownstreamBattleCashEntitlement34800")&&prepareImmediateDownstreamCash35740.toString().includes("DOWNSTREAM_REWARD_RYO"),
-    downstreamCashExact:isExactDownstreamCashVictoryBattle.toString().includes("PS_BATTLE_CONFIG")&&isExactDownstreamCashVictoryBattle.toString().includes("AMT_BATTLE_CONFIG")&&DOWNSTREAM_REWARD_RYO===50,
+    downstreamCashUses34800:prepareImmediateDownstreamCash35740.toString().includes("ensureAcademyKakashiDownstreamBattleCashEntitlement34800")&&prepareImmediateDownstreamCash35740.toString().includes("getAcademyKakashiDownstreamBattleCashRewardState34800"),
+    downstreamCashExact:downstreamCashSpec35740.toString().includes("PS_BATTLE_CONFIG")&&downstreamCashSpec35740.toString().includes("AMT_BATTLE_CONFIG")&&DOWNSTREAM_REWARD_RYO===50,
     causalRewardDisclosure:rewardDisclosureMarkup35740.toString().includes("WHY THESE REWARDS?")&&rewardDisclosureMarkup35740.toString().includes("mitigated")&&technicalEvidenceMeta.toString().includes("actionLabel"),
     progressionProjectedSeparately:attachSummaryToBattle.toString().includes("rewards.progression")&&attachSummaryToBattle.toString().includes("terminalOriginRewardDeferred"),
     chronicleCarriesProgression:typeof globalThis.createBattleChronicleResult==="function"&&globalThis.createBattleChronicleResult.toString().includes("result.rewards.progression"),
