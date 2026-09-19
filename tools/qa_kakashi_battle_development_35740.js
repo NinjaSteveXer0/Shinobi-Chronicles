@@ -108,6 +108,9 @@ assert(!source35740.includes('<span>RYŌ</span><strong>DEBRIEF</strong>'),"Ryō 
 assert(source35740.includes("<summary>BATTLE BREAKDOWN</summary>")&&!source35740.includes("WHY THESE REWARDS?"),"Victory surface must expose causal Battle detail without the awkward WHY THESE REWARDS copy");
 assert(source35740.includes('<span>DEVELOPMENT</span><div>${developmentListMarkup(summary)}${rewardDisclosureMarkup35740(summary,b)}</div>'),"Battle breakdown must live with Battle development, not inside deferred Origin Rewards");
 assert(source35740.includes("commitAcademyKakashiDownstreamBattleCashReward34800"),"PS/AMT claim path must use the 34800 source-scoped reward adapter");
+assert(source35740.includes("MI_BATTLE_CONFIGS"),"both authorised solo MI config IDs must share the immediate reward predicate");
+assert(source35740.includes("3-V-1 DEFERRED ORIGIN REWARD QUALIFIED"),"3v1 Victory disclosure must name the deferred reward explicitly");
+assert(source35740.includes("kakashiDeferredExceptionalFieldExecution"),"3v1 Battle result must carry exceptional-field deferred reward metadata");
 
 
 const first=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
@@ -261,6 +264,42 @@ assert.deepStrictEqual(projected.developmentSummary.rows,[
   {discipline:"stamina",amount:1}
 ]);
 
+// Failed-pickpocket 3v1 victory: no immediate cash/loot, but exact action
+// development plus the already-authorised deferred exceptional-field package.
+const threeId="qa-kakashi-3v1-1";
+globalThis.currentBattle={
+  battleId:threeId,active:false,battleOver:true,outcome:{type:"victory"},
+  enemy:{id:"academy_kakashi_origin_amt",name:"ANBU MARKED TARGET"},
+  activePlayer:{id:KAKASHI,name:"Academy Kakashi"},
+  kakashiOriginDeployment:{
+    battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",
+    battleOccurrenceId:threeId,storyOccurrenceId:"qa-origin-occurrence-3v1",
+    controllerParticipantId:KAKASHI,
+    oppositionParticipantIds:["academy_kakashi_origin_amt","academy_kakashi_origin_package_smuggler","academy_kakashi_origin_masked_interceptor"]
+  },
+  runtime:{evidence:[
+    {evidenceId:"three-attempt-1",battleId:threeId,actionId:"three-a1",eventType:"action_attempted",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:"academy_kakashi_origin_amt"},skillId:"academy_kakashi_kunai_quickdraw",data:{actionClass:"skill"}},
+    {evidenceId:"three-damage-1",battleId:threeId,actionId:"three-a1",eventType:"damage_resolved",actorRef:{side:"player",participantId:KAKASHI},targetRef:{side:"enemy",participantId:"academy_kakashi_origin_amt"},skillId:"academy_kakashi_kunai_quickdraw",data:{primaryDiscipline:"Bukijutsu",resolvedAttackPL:6,finalDamage:4,remainingBattlePLBefore:16,remainingBattlePLAfter:12}}
+  ]},
+  rewards:{generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]}
+};
+const threeRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
+assert.strictEqual(threeRewards.ryo,0,"3v1 must not invent an immediate cash reward");
+assert.deepStrictEqual(threeRewards.items,[],"3v1 must not invent immediate loot");
+assert.strictEqual(threeRewards.kakashiDeferredExceptionalFieldExecution,true);
+assert.strictEqual(threeRewards.kakashiDeferredOriginRewardComponents.exceptionalFieldExecutionRyo,25);
+assert.strictEqual(threeRewards.kakashiDeferredOriginRewardComponents.academyTrainingTantoEntitled,true);
+assert.strictEqual(threeRewards.kakashiDeferredOriginRewardComponents.itemId,"academy_training_tanto");
+assert.strictEqual(threeRewards.kakashiDeferredOriginRewardComponents.commitTiming,"terminal_debrief");
+assert.deepStrictEqual(threeRewards.progression,[{type:"discipline_exp",discipline:"bukijutsu",amount:2}]);
+const threeChronicle=globalThis.createBattleChronicleResult();
+assert.strictEqual(threeChronicle.rewards.ryo,0);
+assert.strictEqual(threeChronicle.rewards.deferredOriginReward.exceptionalFieldExecution,true);
+assert.strictEqual(threeChronicle.rewards.deferredOriginReward.ryo,25);
+assert.strictEqual(threeChronicle.rewards.deferredOriginReward.academyTrainingTantoEntitled,true);
+assert.strictEqual(threeChronicle.rewards.deferredOriginReward.itemId,"academy_training_tanto");
+assert.strictEqual(threeChronicle.rewards.deferredOriginReward.commitTiming,"terminal_debrief");
+
 const snap=globalThis.getAcademyKakashiOriginRewardSnapshot34800();
 const receipts=Object.values(snap.sources);
 assert(receipts.some(r=>r.kind==="discipline_development"&&r.payload.discipline==="bukijutsu"&&r.payload.amount===2));
@@ -293,5 +332,6 @@ console.log("- legacy Exam / Practical / Battle source routing remains unchanged
 console.log("- solo MI victory -> immediate 50 Ryō + Field Recovery Pill ×1 entitlement");
 console.log("- claim commits material package exactly once; no generic EXP");
 console.log("- MI / PS / AMT claim retry and reprojection do not duplicate Ryō, pill or development");
+console.log("- failed-pickpocket 3v1 explicitly discloses 0 immediate material reward, action-derived EXP, deferred +25 Ryō exceptional-field component and Academy Training Tantō entitlement");
 console.log("- terminal debrief remains separate and same-source pill does not duplicate");
 console.log("- Battle result surfaces expose immediate reward plus committed action/mitigation development causes");
