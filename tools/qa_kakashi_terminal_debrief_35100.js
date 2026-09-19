@@ -147,6 +147,19 @@ const pakkunReward=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicl
 assert.strictEqual(pakkunReward.success,true);
 assert.strictEqual(Number(context.playerData.ryo||0),175);
 
+// Package-missing post-MI AMT pursuit is a valid terminal package fact and keeps Pakkun present until explicit departure.
+run(`resetDataQA("qa-postmi-amt-35100");
+qaCommitOccurrence("academy_kakashi","occ-postmi-amt-package",{factClass:"academy_kakashi_post_mi_pursuit_resolution",storySceneInstanceId:__qaRuntime.instanceId,packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"PACKAGE_SMUGGLER",custodyClass:"PACKAGE_SMUGGLER",locationClass:"PS_PERSON"}},[],{type:"origin_story_factual_occurrence",outcome:"post_mi_amt_pursuit"});
+__qaRuntime.localContext.kakashiPostMiPackageOccurrenceId="occ-postmi-amt-package";
+__qaRuntime.localContext.kakashiPostMiPursuitResolutionOccurrenceId="occ-postmi-amt-package";
+__qaRuntime.localContext.kakashiPostMiPakkunPresent=true;
+__qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-postmi-amt",battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_021",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_amt",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:"academy_kakashi_origin_amt",side:"opposition",battleStatus:"defeated",lifeState:"dead",custodyState:"none"}],rewardGranted:false,lootGranted:false}};`);
+const postMiFacts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
+assert.strictEqual(postMiFacts.success,true,"package-missing post-MI AMT route must enter terminal facts");
+assert.strictEqual(postMiFacts.packageRecovered,false);
+assert.strictEqual(postMiFacts.packageState.holderClass,"PACKAGE_SMUGGLER");
+assert.strictEqual(postMiFacts.pakkunPresentAtDebrief,true,"Pakkun presence from post-MI AMT pursuit must survive into explicit departure flow");
+
 // Exact sequential timing facts survive, but do NOT bypass unresolved package custody.
 run(`resetDataQA("qa-sequential-35100");
 __qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-seq-mi",battleConfigId:"academy_kakashi_origin_battle_seq_mi",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_015",bindingRef:"academy_kakashi.battle.observe_sequential",resultState:"player_side_victory",playerActionOpportunityCount:4,participants:[],rewardGranted:false,lootGranted:false}};`);
@@ -169,6 +182,6 @@ console.log(JSON.stringify({
   pass:true,issue:188,tranche:"kakashi_terminal_debrief_rewards_35100",
   securePackageDebrief:true,battleVictoryAloneCannotReward:true,packageMaterialGuard:true,
   terminalRyoExact:175,fieldRecoveryPillExactlyOnce:true,ordinarySecureRouteNoTanto:true,
-  pakkunExplicitDepartureRequired:true,sequentialTurnFactsPreserved:true,sequentialPackageGapFailsClosed:true,
+  pakkunExplicitDepartureRequired:true,postMiPackageMissingTerminalSupported:true,sequentialTurnFactsPreserved:true,sequentialPackageGapFailsClosed:true,
   chronicleReceiptBeforeReward:true,guardedOriginCompletion:true,browserGoldenClaimed:false
 },null,2));
