@@ -17,16 +17,17 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v1_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v2_2026_09_19";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="e18729844922461c654481745e48a6eac20649cd";
+const AUTH_LIVE="bf16ebe0f677994878fbe60e30e7b546da899eb8";
 const ORIGIN_ID="academy_kakashi",SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken",KAK="academy_kakashi";
 const PACKAGE="kakashi_origin_outer_route_packet";
-const RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DETERMINISTIC_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
+const LIVE_SOURCE="kak_scene05a_w_choice",RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DETERMINISTIC_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
 const ENTRY_IDS=Object.freeze({
- ps:Object.freeze(["scene06aw2c_postlethal_go_after_package_smuggler","scene06aw2c_dkill_go_after_package_smuggler"]),
- amt:Object.freeze(["scene06aw2c_postlethal_go_after_anbu_marked_target","scene06aw2c_dkill_go_after_anbu_marked_target"])
+ ps:Object.freeze(["scene05aw_go_after_package_smuggler","scene06aw2c_postlethal_go_after_package_smuggler","scene06aw2c_dkill_go_after_package_smuggler"]),
+ amt:Object.freeze(["scene05aw_go_after_anbu_marked_target","scene06aw2c_postlethal_go_after_anbu_marked_target","scene06aw2c_dkill_go_after_anbu_marked_target"])
 });
 const PS_CONFIG="academy_kakashi_origin_battle_seq_ps",AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
 const PS_BINDING="academy_kakashi.battle.stop_assassin_post_mi_ps",AMT_BINDING="academy_kakashi.battle.stop_assassin_post_mi_amt";
@@ -51,12 +52,22 @@ function latestResult(){const rt=active();return rt&&rt.battleResume&&rt.battleR
 function participantState(ref){try{const s=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{},r=s.participantStates&&s.participantStates[ref];return String(r&&r.stateClass||"");}catch(_e){return"";}}
 function deathOccurrenceId(rt=active()){return String(rt&&rt.localContext&&(rt.localContext.kakashiDeterministicKillOccurrenceId||rt.localContext.kakashiScene06AW2CResolutionOccurrenceId)||"");}
 function deathOccurrence(rt=active()){const id=deathOccurrenceId(rt),row=occurrence(id),f=factOf(row);if(!row||participantState(MI)!=="DEAD")return null;if(!(f.targetDeathConfirmed===true||String(f.selectedOutcomeRef||"")==="LETHAL_ATTEMPT_KILLED"||String(f.semanticClass||"")==="KILL — GUARANTEED"))return null;return{id,row,fact:f,provenance:String(f.semanticClass||"").includes("KILL")?"deterministic_kill":"resolver_successful_attempt"};}
-function packageOccurrenceId(rt=active()){return String(rt&&rt.localContext&&(rt.localContext.kakashiPostMiPackageOccurrenceId||rt.localContext.kakashiSequentialPackageOccurrenceId35100||rt.localContext.kakashiSequentialPackageOccurrenceId)||deathOccurrenceId(rt)||"");}
+function miResolution(rt=active()){
+ const dead=deathOccurrence(rt);if(dead)return{kind:"DEAD",occurrenceId:dead.id,provenance:dead.provenance,deathCommitted:true};
+ const state=participantState(MI),battleId=String(rt&&rt.localContext&&rt.localContext.kakashiScene05AWBattleOccurrenceId||"");
+ if(rt&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&battleId&&["CONTROLLED_DEFEATED","DEFEATED_BUT_NOT_CONTROLLED"].includes(state))return{kind:state,occurrenceId:battleId,provenance:"battle_defeat",deathCommitted:false};
+ return null;
+}
+function packageOccurrenceId(rt=active()){const mi=miResolution(rt);return String(rt&&rt.localContext&&(rt.localContext.kakashiPostMiPackageOccurrenceId||rt.localContext.kakashiSequentialPackageOccurrenceId35100||rt.localContext.kakashiSequentialPackageOccurrenceId)||(mi&&mi.occurrenceId)||"");}
 function packageState(rt=active()){const row=occurrence(packageOccurrenceId(rt)),f=factOf(row);return clone(f.packageState||{objectRef:PACKAGE,currentHolderClass:"PACKAGE_SMUGGLER",custodyClass:"PACKAGE_SMUGGLER",locationClass:"PS_PERSON"});}
 function sourceAvailable(target,rt=active()){
- if(!rt||!deathOccurrence(rt))return false;
- if(target==="ps")return rt.localContext.kakashiDeterministicKillOccurrenceId?rt.localContext.kakashiDeterministicKillPackageAvailable===true:rt.localContext.kakashiScene06AW2CPackageAvailable===true;
- return rt.localContext.kakashiDeterministicKillOccurrenceId?rt.localContext.kakashiDeterministicKillAmtAvailable===true:rt.localContext.kakashiScene06AW2CAMTAvailable===true;
+ const mi=miResolution(rt);if(!rt||!mi)return false;
+ if(mi.deathCommitted){
+  if(target==="ps")return rt.localContext.kakashiDeterministicKillOccurrenceId?rt.localContext.kakashiDeterministicKillPackageAvailable===true:rt.localContext.kakashiScene06AW2CPackageAvailable===true;
+  return rt.localContext.kakashiDeterministicKillOccurrenceId?rt.localContext.kakashiDeterministicKillAmtAvailable===true:rt.localContext.kakashiScene06AW2CAMTAvailable===true;
+ }
+ if(target==="ps")return rt.localContext.kakashiScene05AWPackagePursuitEligible===true;
+ return rt.localContext.kakashiScene05AWAmtPursuitEligible===true;
 }
 function commitOnce(id,fact,outcome,participants,sourceRefs){
  const old=occurrence(id);if(old)return{success:true,idempotent:true,occurrenceId:id,record:old};
@@ -64,21 +75,21 @@ function commitOnce(id,fact,outcome,participants,sourceRefs){
  return out&&out.success===true?{success:true,occurrenceId:id,record:out.record}:out||{success:false,reason:"post_mi_pursuit_occurrence_commit_failed"};
 }
 function commitPursuitSelection(target){
- const rt=active(),death=deathOccurrence(rt);if(!rt||!death)return{success:false,reason:"committed_mi_death_required"};
+ const rt=active(),mi=miResolution(rt);if(!rt||!mi)return{success:false,reason:"committed_mi_resolution_required"};
  if(!sourceAvailable(target,rt))return{success:false,reason:target+"_pursuit_not_available"};
- const id=stable("occ_origin_kakashi_post_mi_pursuit_choice",{instance:String(rt.instanceId||""),death:death.id,target});
- const pkg=packageState(rt);
- const fact={factClass:"academy_kakashi_stop_assassin_post_mi_death_pursuit_choice",authorityCommit:target==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),sourceMiDeathOccurrenceId:death.id,sourceMiDeathProvenance:death.provenance,selectedPursuitTarget:target==="ps"?"PACKAGE_SMUGGLER":"ANBU_MARKED_TARGET",selectionIsNotPursuitSuccess:true,miDeathAlreadyCommitted:true,miDeathRerolled:false,miBattleTurns:Number(rt.localContext.kakashiScene05AWTurnCount||0),packageState:pkg,packageSmugglerPursuitAvailableAtSelection:sourceAvailable("ps",rt),anbuMarkedTargetPursuitAvailableAtSelection:sourceAvailable("amt",rt),pakkunPresent:false};
- const out=commitOnce(id,fact,target==="ps"?"PURSUE_PACKAGE_SMUGGLER":"PURSUE_ANBU_MARKED_TARGET",[ORIGIN_ID,MI,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:death.id,role:"committed_mi_death"},{type:"world_object",id:PACKAGE},{type:"writing_authority",id:target==="ps"?AUTH_PS:AUTH_AMT}]);if(!out.success)return out;
- const patch={kakashiPostMiPursuitSelectionOccurrenceId:id,kakashiPostMiPursuitTarget:target,kakashiPostMiPackageOccurrenceId:packageOccurrenceId(rt),kakashiPostMiAmtEligibleAtSelection:sourceAvailable("amt",rt),[CURSOR]:0};
- if(target==="amt"){patch.kakashiScene06AW2CPackageAvailable=false;patch.kakashiDeterministicKillPackageAvailable=false;patch.kakashiPostMiPsPursuitClosedPermanently=true;}
- rt.localContext={...(rt.localContext||{}),...patch};save();return{success:true,occurrenceId:id,target};
+ const id=stable("occ_origin_kakashi_post_mi_pursuit_choice",{instance:String(rt.instanceId||""),miResolution:mi.occurrenceId,miKind:mi.kind,target});
+ const pkg=packageState(rt),successorAuthority=target==="ps"?AUTH_PS:AUTH_AMT;
+ const fact={factClass:"academy_kakashi_stop_assassin_post_mi_pursuit_choice",authorityCommit:mi.deathCommitted?successorAuthority:AUTH_LIVE,successorAuthorityCommit:successorAuthority,storySceneInstanceId:String(rt.instanceId||""),sourceMiResolutionOccurrenceId:mi.occurrenceId,sourceMiResolutionState:mi.kind,sourceMiResolutionProvenance:mi.provenance,selectedPursuitTarget:target==="ps"?"PACKAGE_SMUGGLER":"ANBU_MARKED_TARGET",selectionIsNotPursuitSuccess:true,miDeathAlreadyCommitted:mi.deathCommitted,miDeathRerolled:false,miBattleTurns:Number(rt.localContext.kakashiScene05AWTurnCount||0),packageState:pkg,packageSmugglerPursuitAvailableAtSelection:sourceAvailable("ps",rt),anbuMarkedTargetPursuitAvailableAtSelection:sourceAvailable("amt",rt),pakkunPresent:false};
+ const out=commitOnce(id,fact,target==="ps"?"PURSUE_PACKAGE_SMUGGLER":"PURSUE_ANBU_MARKED_TARGET",[ORIGIN_ID,MI,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:mi.occurrenceId,role:mi.deathCommitted?"committed_mi_death":"committed_mi_battle_defeat"},{type:"world_object",id:PACKAGE},{type:"writing_authority",id:successorAuthority}]);if(!out.success)return out;
+ const patch={kakashiPostMiPursuitSelectionOccurrenceId:id,kakashiPostMiPursuitTarget:target,kakashiPostMiPackageOccurrenceId:packageOccurrenceId(rt),kakashiPostMiAmtEligibleAtSelection:sourceAvailable("amt",rt),kakashiPostMiSourceState:mi.kind,[CURSOR]:0};
+ if(target==="amt"){patch.kakashiScene05AWPackagePursuitEligible=false;patch.kakashiScene06AW2CPackageAvailable=false;patch.kakashiDeterministicKillPackageAvailable=false;patch.kakashiPostMiPsPursuitClosedPermanently=true;}
+ rt.localContext={...(rt.localContext||{}),...patch};save();return{success:true,occurrenceId:id,target,miState:mi.kind};
 }
 function resolveSelectedPursuit(target){
  const rt=active(),sel=occurrence(rt&&rt.localContext&&rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),sf=factOf(sel);if(!rt||!sel||sf.selectedPursuitTarget!==(target==="ps"?"PACKAGE_SMUGGLER":"ANBU_MARKED_TARGET"))return{success:false,reason:"post_mi_pursuit_selection_missing"};
  const eligible=target==="ps"?sf.packageSmugglerPursuitAvailableAtSelection===true:sf.anbuMarkedTargetPursuitAvailableAtSelection===true;
  const id=stable("occ_origin_kakashi_post_mi_pursuit_resolution",{selection:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),target,eligible});
- const fact={factClass:"academy_kakashi_stop_assassin_post_mi_death_pursuit_resolution",authorityCommit:target==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),parentSelectionOccurrenceId:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),targetRef:target==="ps"?PS:AMT,selectedOutcomeRef:eligible?"PURSUIT_SUCCESS_REACHED":"PURSUIT_FAILURE_ESCAPED",packageState:packageState(rt),pakkunPresent:false};
+ const fact={factClass:"academy_kakashi_stop_assassin_post_mi_pursuit_resolution",authorityCommit:target==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),parentSelectionOccurrenceId:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),targetRef:target==="ps"?PS:AMT,selectedOutcomeRef:eligible?"PURSUIT_SUCCESS_REACHED":"PURSUIT_FAILURE_ESCAPED",sourceMiResolutionState:String(sf.sourceMiResolutionState||"DEAD"),packageState:packageState(rt),pakkunPresent:false};
  const out=commitOnce(id,fact,fact.selectedOutcomeRef,[ORIGIN_ID,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),role:"pursuit_selection"}]);if(!out.success)return out;
  rt.localContext={...(rt.localContext||{}),kakashiPostMiPursuitResolutionOccurrenceId:id,kakashiPostMiPursuitReached:eligible};save();return{success:true,reached:eligible,occurrenceId:id};
 }
@@ -96,8 +107,8 @@ function consumePsReturn(){
  const rt=active(),r=latestResult();if(!rt||rt.beatId!==BEAT.psReturn)return{success:false,reason:"post_mi_ps_return_context_required"};if(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed===true)return{success:true,idempotent:true};
  if(!r||String(r.battleConfigId||"")!==PS_CONFIG||String(r.bindingRef||"")!==PS_BINDING)return{success:false,reason:"post_mi_ps_battle_receipt_mismatch"};
  const victory=String(r.resultState||"")==="player_side_victory",turns=Number(r.playerActionOpportunityCount||0),id=stable("occ_origin_kakashi_post_mi_ps_battle_return",{battle:String(r.battleOccurrenceId||""),result:String(r.resultState||"")});
- const fact={factClass:"academy_kakashi_stop_assassin_post_mi_ps_battle_return",authorityCommit:AUTH_PS,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),battleConfigId:PS_CONFIG,battleResultState:String(r.resultState||""),playerActionOpportunityCount:turns,packageState:packageState(rt),miDeathOccurrenceId:deathOccurrenceId(rt),miDeathRerolled:false};
- const committed=commitOnce(id,fact,victory?"PS_BATTLE_VICTORY":"PS_BATTLE_DEFEAT",[ORIGIN_ID,PS],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"origin_occurrence",id:deathOccurrenceId(rt),role:"mi_death"}]);if(!committed.success)return committed;
+ const mi=miResolution(rt),fact={factClass:"academy_kakashi_stop_assassin_post_mi_ps_battle_return",authorityCommit:AUTH_PS,storySceneInstanceId:String(rt.instanceId||""),battleOccurrenceId:String(r.battleOccurrenceId||""),battleConfigId:PS_CONFIG,battleResultState:String(r.resultState||""),playerActionOpportunityCount:turns,packageState:packageState(rt),miResolutionOccurrenceId:mi&&mi.occurrenceId||"",miResolutionState:mi&&mi.kind||"",miDeathRerolled:false};
+ const committed=commitOnce(id,fact,victory?"PS_BATTLE_VICTORY":"PS_BATTLE_DEFEAT",[ORIGIN_ID,PS],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"origin_occurrence",id:mi&&mi.occurrenceId||"",role:mi&&mi.deathCommitted?"mi_death":"mi_battle_defeat"}].filter(x=>x.id));if(!committed.success)return committed;
  if(victory){
    rt.localContext={...(rt.localContext||{}),kakashiSequentialPackageOccurrenceId:packageOccurrenceId(rt),kakashiSequentialPackageOccurrenceId35100:packageOccurrenceId(rt)};save();
    if(typeof resolveAcademyKakashiSequentialPostPsPackageRecovery35600!=="function")return{success:false,reason:"ak_sa_033_package_recovery_owner_missing"};
@@ -124,7 +135,7 @@ function deterministicKillTarget(ref,kind){
  const rt=active();if(!rt||participantState(ref)!=="CONTROLLED_DEFEATED")return{success:false,reason:"controlled_defeated_required"};
  const pkg=packageState(rt),parent=kind==="ps"?String(rt.localContext.kakashiPostMiPsBattleOccurrenceId||""):String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||"");
  const id=stable("occ_origin_kakashi_post_mi_deterministic_kill",{instance:String(rt.instanceId||""),target:ref,parent,package:packageOccurrenceId(rt)});
- const fact={factClass:"academy_kakashi_stop_assassin_post_mi_deterministic_kill",authorityCommit:kind==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),semanticClass:"KILL — GUARANTEED",outcomeMode:"deterministic",targetRef:ref,targetDeathConfirmed:true,parentBattleOccurrenceRef:parent,packageState:pkg,packageCustodyChanged:false,pakkunPresent:kind==="amt",miDeathAlreadyCommitted:true,miDeathRerolled:false};
+ const mi=miResolution(rt),fact={factClass:"academy_kakashi_stop_assassin_post_mi_deterministic_kill",authorityCommit:kind==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),semanticClass:"KILL — GUARANTEED",outcomeMode:"deterministic",targetRef:ref,targetDeathConfirmed:true,parentBattleOccurrenceRef:parent,packageState:pkg,packageCustodyChanged:false,pakkunPresent:kind==="amt",miDeathAlreadyCommitted:!!(mi&&mi.deathCommitted),miResolutionState:mi&&mi.kind||"",miDeathRerolled:false};
  const out=commitOnce(id,fact,"CONFIRMED_KILL",[ORIGIN_ID,ref].concat(kind==="amt"?[PAKKUN]:[]),[{type:"origin_occurrence",id:parent,role:"post_battle_state"},{type:"world_object",id:PACKAGE}].filter(x=>x.id));if(!out.success)return out;
  const classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef:ref,stateClass:"DEAD",resultRef:id});if(!classified||classified.success!==true)return classified||{success:false,reason:"post_mi_kill_classification_failed"};
  if(kind==="ps")rt.localContext={...(rt.localContext||{}),kakashiPostMiPsKillOccurrenceId:id,kakashiPostMiPsDead:true};
@@ -146,7 +157,19 @@ function choice(id,label,next,resolve,available=true,blocker=null){return{choice
 function wireEntryChoices(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;if(!m)return false;
  const wire=(beatId,ids,target,next)=>{const beat=m.get(beatId);if(!beat||!Array.isArray(beat.choices))return false;const row=beat.choices.find(x=>x&&ids.includes(x.choiceId));if(!row)return false;row.nextBeatId=next;row.availability=()=>({available:sourceAvailable(target),knownBlocker:sourceAvailable(target)?null:"PURSUIT NO LONGER AVAILABLE"});row.knownBlocker=null;row.consequenceRequests=[{requestId:"postmi_35830_"+target+"_"+beatId,kind:"domain",resolve:()=>commitPursuitSelection(target)}];return true;};
+ wire(LIVE_SOURCE,ENTRY_IDS.ps,"ps",BEAT.psChase);wire(LIVE_SOURCE,ENTRY_IDS.amt,"amt",BEAT.amtChase);
  wire(RESOLVER_SOURCE,ENTRY_IDS.ps,"ps",BEAT.psChase);wire(DETERMINISTIC_SOURCE,ENTRY_IDS.ps,"ps",BEAT.psChase);wire(RESOLVER_SOURCE,ENTRY_IDS.amt,"amt",BEAT.amtChase);wire(DETERMINISTIC_SOURCE,ENTRY_IDS.amt,"amt",BEAT.amtChase);return true;
+}
+function entryTargetForChoice(choiceId){
+ const id=String(choiceId||"");if(ENTRY_IDS.ps.includes(id))return"ps";if(ENTRY_IDS.amt.includes(id))return"amt";return null;
+}
+function beginPostMiPursuitChoice35830(choiceId){
+ const rt=active(),target=entryTargetForChoice(choiceId);if(!rt||rt.sceneId!==SCENE_ID||!target||![LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId))return{success:false,reason:"post_mi_pursuit_entry_context_missing"};
+ if(!sourceAvailable(target,rt))return{success:false,reason:target+"_pursuit_not_available"};
+ const committed=commitPursuitSelection(target);if(!committed||committed.success!==true)return committed||{success:false,reason:"post_mi_pursuit_selection_commit_failed"};
+ rt.beatId=target==="ps"?BEAT.psChase:BEAT.amtChase;rt.localContext={...(rt.localContext||{}),[CURSOR]:0};save();
+ try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_e){}
+ return{success:true,beatId:rt.beatId,target,miState:committed.miState||null};
 }
 function materializePsDecision(){
  const d=scene(),b=d&&d.beatMap instanceof Map?d.beatMap.get(BEAT.psDecision):null,rt=active();if(!b||!rt)return false;
@@ -242,6 +265,7 @@ function hooks(){
  const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
  globalThis.getStoryScenePerformance33900=function(){const p=performance(active());return p||PG.apply(this,arguments);};
  globalThis.advanceStoryScene=function(choiceId=null){const rt=active(),p=performance(rt);
+  if(rt&&choiceId!=null&&[LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId)&&entryTargetForChoice(choiceId))return beginPostMiPursuitChoice35830(choiceId);
   if(p&&choiceId==null){if(!p.atEnd){rt.localContext={...(rt.localContext||{}),[CURSOR]:p.index+1};save();try{renderStoryScenePresentationLayer();}catch(_e){}return{success:true,beatId:rt.beatId,cueIndex:p.index+1};}return transitionNarrative(rt);}
   if(rt&&rt.beatId===BEAT.psDecision){materializePsDecision();return PA.apply(this,arguments);}
   if(rt&&rt.beatId===BEAT.amtDecision){materializeAmtDecision();return PA.apply(this,arguments);}
@@ -256,14 +280,16 @@ function hooks(){
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
 function browserCapture(){
  if(typeof document==="undefined"||document.__scPostMiPursuit35830)return false;document.__scPostMiPursuit35830=true;
- document.addEventListener("click",function(event){const t=event&&event.target&&typeof event.target.closest==="function"?event.target.closest(".sc-story-choice"):null,rt=active();if(!t||!rt||![RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId))return;const label=String(t.textContent||"").replace(/\s+/g," ").trim().toUpperCase();let id=null;if(label==="GO AFTER PACKAGE SMUGGLER"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.ps.includes(x.choiceId))||{}).choiceId;}else if(label==="GO AFTER ANBU MARKED TARGET"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.amt.includes(x.choiceId))||{}).choiceId;}if(!id)return;if(event.preventDefault)event.preventDefault();if(event.stopImmediatePropagation)event.stopImmediatePropagation();const out=globalThis.advanceStoryScene(id);if(out&&out.success===true)try{renderStoryScenePresentationLayer();}catch(_e){}},true);return true;
+ document.addEventListener("click",function(event){const t=event&&event.target&&typeof event.target.closest==="function"?event.target.closest(".sc-story-choice"):null,rt=active();if(!t||!rt||![LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId))return;const label=String(t.textContent||"").replace(/\s+/g," ").trim().toUpperCase();let id=null;if(label==="GO AFTER PACKAGE SMUGGLER"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.ps.includes(x.choiceId))||{}).choiceId;}else if(label==="GO AFTER ANBU MARKED TARGET"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.amt.includes(x.choiceId))||{}).choiceId;}if(!id)return;if(event.preventDefault)event.preventDefault();if(event.stopImmediatePropagation)event.stopImmediatePropagation();const out=beginPostMiPursuitChoice35830(id);if(out&&out.success===true)try{renderStoryScenePresentationLayer();}catch(_e){}},true);return true;
 }browserCapture();
 
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v1_2026_09_19",
-  authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v2_2026_09_19",
+  authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
+  liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
+  directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
   exactPsChase:CUES.psChase.length===12&&CUES.psChase[0].text==="Kakashi moves before Package Smuggler disappears completely."&&CUES.psChase[11].text==="Kakashi increases his pace.",
   exactPsCatch:CUES.psCatch.some(x=>x.kind==="dialogue"&&x.speaker==="KAKASHI"&&x.text==="No. It fixes the part in your hands."),
   exactPakkunCorrection:CUES.amtCatch.some(x=>x.speaker==="PAKKUN"&&x.text==="This yours?")&&CUES.amtCatch.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently.")&&CUES.psToAmt.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently."),
@@ -284,5 +310,6 @@ function diagnostics(){
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
 }
 globalThis.runAcademyKakashiPostMiDeathPursuit35830Diagnostics=diagnostics;
-globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830=Object.freeze({patchId:PATCH_ID,authorities:Object.freeze({ps:AUTH_PS,amt:AUTH_AMT}),beats:BEAT,psConfig:PS_CONFIG,amtConfig:AMT_CONFIG,wireEntryChoices,commitPursuitSelection,resolveSelectedPursuit,consumePsReturn,consumeAmtReturn,commitPakkunReach,deterministicKillTarget,diagnostics,browserGoldenClaimed:false});
+globalThis.beginAcademyKakashiPostMiPursuitChoice35830=beginPostMiPursuitChoice35830;
+globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830=Object.freeze({patchId:PATCH_ID,authorities:Object.freeze({live:AUTH_LIVE,ps:AUTH_PS,amt:AUTH_AMT}),beats:BEAT,psConfig:PS_CONFIG,amtConfig:AMT_CONFIG,wireEntryChoices,beginPursuitChoice:beginPostMiPursuitChoice35830,commitPursuitSelection,resolveSelectedPursuit,consumePsReturn,consumeAmtReturn,commitPakkunReach,deterministicKillTarget,diagnostics,browserGoldenClaimed:false});
 })();

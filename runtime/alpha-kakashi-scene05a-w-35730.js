@@ -140,6 +140,10 @@ function successorPending(branch){
 function choiceRow(choiceId,label,branch){
   return{choiceId,label,nextBeatId:CHOICE_BEAT,availability:()=>({available:true,knownBlocker:null}),knownBlocker:null,consequenceRequests:[{requestId:`kakashi_scene05aw_${branch.toLowerCase()}_pending_35730`,kind:"domain",resolve:()=>successorPending(branch)}]};
 }
+function restraintChoiceRow35730(){
+  const blocker="FIELD-SECURED CUSTODY SEMANTICS PENDING CE #244";
+  return{choiceId:"scene05aw_restrain_and_continue",label:restraintPresentation(),nextBeatId:CHOICE_BEAT,availability:()=>({available:false,knownBlocker:blocker}),knownBlocker:blocker,consequenceRequests:[{requestId:"kakashi_scene05aw_branch_f_ce244_blocked_35730",kind:"domain",resolve:()=>({success:false,reason:"field_secured_custody_requires_ce_244",issue:244,boundaryPreserved:true})}]};
+}
 function isWiredChoice35730(row){
   const requests=row&&Array.isArray(row.consequenceRequests)?row.consequenceRequests:[];
   return requests.some(function(request){
@@ -171,7 +175,7 @@ function materializeChoices35730(){
   add(choiceRow("scene05aw_lethal",lethal.label,"BRANCH_C"));
   add(choiceRow("scene05aw_take_her_back_to_anbu","TAKE HER BACK TO ANBU","BRANCH_D"));
   add(choiceRow("scene05aw_take_her_to_uchiha_police","TAKE HER TO THE UCHIHA POLICE FORCE","BRANCH_E"));
-  if(pursuitEligible)add(choiceRow("scene05aw_restrain_and_continue",restraintPresentation(),"BRANCH_F"));
+  if(pursuitEligible)add(restraintChoiceRow35730());
   beat.choices=rows;
   const rt=active();if(rt&&rt.localContext){
     rt.localContext.kakashiScene05AWLethalPresentation=lethal.label;

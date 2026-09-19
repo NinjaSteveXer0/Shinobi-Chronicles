@@ -104,6 +104,7 @@ assert(source.includes('classList.add("is-active")'),"lethal-attempt animation m
 assert(source.includes("2147483400"),"lethal-attempt animation must sit above Scene Board overlays");
 assert(source.includes("bottom:23.5%!important"),"Hokage Office lower cast must align to the table-row baseline");
 assert(source.includes("sc-dialogue-panel-33910.is-current"),"Hokage Office dialogue must use negative-space placement");
+assert(source.includes("transform:none!important;width:min(28%,400px)!important"),"Hokage Office side-lane dialogue must cancel the generic centered transform");
 assert(source.includes("performance_narration")&&source.includes("sc-dialogue-panel-33910{display:none!important}"),"office narration must suppress stale dialogue overlay");
 assert(source.includes("left:28%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"Hokage Office AMT / ANBU / PS table-row placement missing");
 assert(source.includes("sc-w2c-office-anbu-enter-35770"),"KILLED office ANBU slide-in missing");
