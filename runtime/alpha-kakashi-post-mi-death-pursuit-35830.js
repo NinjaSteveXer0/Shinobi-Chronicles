@@ -30,6 +30,7 @@ const ENTRY_IDS=Object.freeze({
  amt:Object.freeze(["scene05aw_go_after_anbu_marked_target","scene06aw2c_postlethal_go_after_anbu_marked_target","scene06aw2c_dkill_go_after_anbu_marked_target"])
 });
 const PS_CONFIG="academy_kakashi_origin_battle_seq_ps",AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
+const AMT_ALLEY_ASSET_ID="kakashi_origin_pakkun_interception_alley";
 const PS_BINDING="academy_kakashi.battle.stop_assassin_post_mi_ps",AMT_BINDING="academy_kakashi.battle.stop_assassin_post_mi_amt";
 const BEAT=Object.freeze({
  psChase:"kak_stop_postmi_ps_chase_35830",psFail:"kak_stop_postmi_ps_fail_35830",psCatch:"kak_stop_postmi_ps_catch_35830",psBattle:"kak_stop_postmi_ps_battle_35830",psReturn:"kak_stop_postmi_ps_return_35830",psWin:"kak_stop_postmi_ps_win_35830",psLoss:"kak_stop_postmi_ps_loss_35830",psDecision:"kak_stop_postmi_ps_decision_35830",psReport:"kak_stop_postmi_ps_report_boundary_35830",
@@ -203,11 +204,11 @@ function installBeats(){
  narr(BEAT.psReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psLoss,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
  m.set(BEAT.psDecision,{beatId:BEAT.psDecision,mode:"choice",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},objectiveText:OBJECTIVE.ps,text:"Package Smuggler is down. The package is secure. Kakashi decides what remains worth pursuing.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psReport,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
- narr(BEAT.amtChase,"kakashi_origin_rooftop_night",OBJECTIVE.amt);narr(BEAT.amtFail,"kakashi_origin_rooftop_night",OBJECTIVE.report);narr(BEAT.amtCatch,"kakashi_origin_konoha_alleyway",OBJECTIVE.secureAmt);narr(BEAT.psToAmt,"kakashi_origin_rooftop_night",OBJECTIVE.secureAmt);
- m.set(BEAT.amtBattle,{beatId:BEAT.amtBattle,mode:"battle_transition",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},text:"",battle:{encounterId:AMT_CONFIG,launchResolver:ctx=>launchAmt(ctx),postBattleBeatId:BEAT.amtReturn,resultProjector:projector,actionLabel:"SECURE ANBU MARKED TARGET"},exitScene:false,allowPresentationClose:false,choices:[]});
- narr(BEAT.amtReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.secureAmt);narr(BEAT.amtWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.secureAmt);
- m.set(BEAT.amtDecision,{beatId:BEAT.amtDecision,mode:"choice",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},objectiveText:null,text:"ANBU Marked Target is defeated. Package state remains separate from his disposition.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
- narr(BEAT.amtLiveReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);narr(BEAT.amtKill,"kakashi_origin_konoha_alleyway",null);narr(BEAT.amtReport,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
+ narr(BEAT.amtChase,"kakashi_origin_rooftop_night",OBJECTIVE.amt);narr(BEAT.amtFail,"kakashi_origin_rooftop_night",OBJECTIVE.report);narr(BEAT.amtCatch,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);narr(BEAT.psToAmt,"kakashi_origin_rooftop_night",OBJECTIVE.secureAmt);
+ m.set(BEAT.amtBattle,{beatId:BEAT.amtBattle,mode:"battle_transition",environmentRef:{assetId:AMT_ALLEY_ASSET_ID},text:"",battle:{encounterId:AMT_CONFIG,launchResolver:ctx=>launchAmt(ctx),postBattleBeatId:BEAT.amtReturn,resultProjector:projector,actionLabel:"SECURE ANBU MARKED TARGET"},exitScene:false,allowPresentationClose:false,choices:[]});
+ narr(BEAT.amtReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);narr(BEAT.amtWin,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);
+ m.set(BEAT.amtDecision,{beatId:BEAT.amtDecision,mode:"choice",environmentRef:{assetId:AMT_ALLEY_ASSET_ID},objectiveText:null,text:"ANBU Marked Target is defeated. Package state remains separate from his disposition.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
+ narr(BEAT.amtLiveReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.report);narr(BEAT.amtKill,AMT_ALLEY_ASSET_ID,null);narr(BEAT.amtReport,AMT_ALLEY_ASSET_ID,OBJECTIVE.report);
  return true;
 }
 function sequenceFor(rt=active()){
@@ -327,7 +328,7 @@ function diagnostics(){
   exactPakkunCorrection:CUES.amtCatch.some(x=>x.speaker==="PAKKUN"&&x.text==="This yours?")&&CUES.amtCatch.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently.")&&CUES.psToAmt.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently."),
   exactBattleConfigs:PS_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
    battleTransitionsAutoLaunch:transitionNarrative.toString().includes("launchCurrentBattleTransition35830")&&launchCurrentBattleTransition35830.toString().includes("launchStorySceneBattle"),
-   amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png",
+   amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
    pakkunCardRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&image(PAKKUN)==="Portraits/Summons/pakkun.png",
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
