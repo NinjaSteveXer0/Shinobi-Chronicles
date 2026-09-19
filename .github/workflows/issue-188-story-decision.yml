@@ -167,6 +167,8 @@ jobs:
           grep -Fq 'kakashiScene05AWEntered===true' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'Number(rt.localContext.kakashiScene05AWTurnCount)>=1' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'const settle=function(){wireSourceChoice();renderScene();}' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'alpha_kakashi_scene06aw2c_35760_v8_2026_09_19' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'if(p&&p.cue)' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'PS_TO_AMT_MAX_TURNS=3' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'GO AFTER ANBU MARKED TARGET' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq '36454a31e9f61ffdaa528589ac11552d446ad3bc' runtime/alpha-kakashi-scene05a-w-35730.js
@@ -192,6 +194,7 @@ jobs:
           grep -Fq 'KILL — GUARANTEED' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'confirmedKillCountDelta:1' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq '8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623' runtime/alpha-kakashi-loss-ending-35820.js
+          grep -Fq 'd0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq '362f72b8f20f50fec1b8e11e483e40cf5030364c' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in.' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'That part is up to him.' runtime/alpha-kakashi-loss-ending-35820.js
@@ -199,7 +202,7 @@ jobs:
           grep -Fq '.sc-chronicle-layout{display:none!important}' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'kakashiKnowledgeGranted:false' runtime/alpha-kakashi-loss-ending-35820.js
-          grep -Fq 'alpha_kakashi_immediate_custody_35800_v2_2026_09_19' runtime/alpha-kakashi-immediate-custody-35800.js
+          grep -Fq 'alpha_kakashi_immediate_custody_35800_v3_2026_09_19' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'beginImmediateCustodyChoice35800' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq "top:22%!important" runtime/alpha-kakashi-immediate-custody-35800.js
@@ -262,10 +265,8 @@ jobs:
           grep -Fq 'left:67%!important' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'left:41%!important' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'sc-w2c-office-anbu-enter-35770' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq '<b>PACKAGE</b>' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-nonkill-35780.js
-          grep -Fq '<b>PACKAGE</b>' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'PACKAGE RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq 'PACKAGE RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'Live State Callouts' runtime/alpha-story-scene-board-33900.js
