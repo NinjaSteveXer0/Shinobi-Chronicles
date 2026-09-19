@@ -406,3 +406,42 @@ Writing workflow benchmark now contains an exact-label precedence guard:
 `495e10e2a87d72c13f9f93002cde3e20f01f996e`.
 
 No story causality was changed by this correction.
+
+
+## 2026-09-19 — Observe BRANCH_E GO AFTER THE ORIGINAL TARGET authored
+
+Conflict resolved by Stephen.
+
+Exact package-missing AMT disposition authority:
+`Documentation/Story/Academy_Kakashi_Package_Missing_AMT_Post_Battle_Disposition_Lock_2026-09-19.md`
+commit `e06e06df9da15858f09a72d318cce233dc9e8333`.
+
+Supersession repairs:
+- Seven Remaining Substantial Branch Closure: `8442f42099df5de495b415ebb6d0416def47ba2d`
+- Decision-Continuation Matrix: `f98466c915261558cac6e2904710a4f77bf10573`
+
+Exact scene family:
+`Documentation/Story/Academy_Kakashi_Observe_Go_After_Original_Target_Verbatim_Scene_Family_2026-09-19.md`
+commit `7a95637765a58b8f12b0bac877032625266830f6`.
+
+Closed Writing coverage:
+- GO AFTER THE ORIGINAL TARGET pursuit;
+- pursuit success/failure;
+- Pakkun corner / first meeting;
+- Kakashi + Pakkun vs AMT PL Battle;
+- AMT Battle defeat;
+- package-missing AMT Battle victory;
+- exact post-victory choices:
+  1. KILL HIM
+  2. RESTRAIN HIM
+  3. BRING HIM TO THE ANBU
+  4. TAKE HIM TO THE UCHIHA POLICE FORCE
+- deterministic kill continuation;
+- Wire Snare field-secure continuation;
+- singular ANBU escort continuation;
+- Uchiha Police escort/handoff continuation;
+- factual package-missing ANBU report projection;
+- no INTERROGATE for Alpha.
+
+Writing BRANCH_E: CLOSED.
+Implementation/runtime/browser validation: separate.
