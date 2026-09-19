@@ -293,10 +293,20 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 - Swallow Trap requires `ibuse_neurotoxin`, deals 6 immediate Battle PL bypassing Stamina, then traps through the target's next action opportunity;
 - `ibuse_neurotoxin` uses shared `conditionType: poison` classification/cure plumbing without reverting to the legacy generic poison tick profile.
 
-Next uncalibrated ordinary Summons:
+Next ordinary Summon state:
 
-- **Source 09 — Kamatari**
-- **Source 10 — Snake**
+- **Source 09 — Kamatari** — PROPOSED / awaiting Stephen sign-off; PL / Registry numeric reconciliation routed as #258.
+- **Source 10 — Snake** — next uncalibrated ordinary source.
 
-Then continue into accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
+Source 09 proposal authority:
+`Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
+
+Kamatari RESET v2 mechanical direction:
+- retire generic +6 Bukijutsu Stat-stick in favour of **Sicklewind Route**;
+- qualifying controller Wind Release creates one consumable Kamatari wind lane;
+- lane can carry the controller's next Bukijutsu attack across ordinary distance / soft cover or empower Kamatari's signature **Quick Beheading Dance**;
+- manifested package: Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, Quick Beheading Dance once/Battle ATK32 each up to 3 + destruction of ordinary hiding cover in the authored wind path;
+- no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling.
+
+Then continue into Source 10 Snake, accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
 
