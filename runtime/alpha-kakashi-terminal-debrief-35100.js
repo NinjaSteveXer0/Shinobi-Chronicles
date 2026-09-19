@@ -361,7 +361,7 @@ function diagnostics(){
 
 const installed=installTerminalBeats35100();
 if(!installed||installed.success!==true)throw new Error(`kakashi_terminal_debrief_install_failed:${installed&&installed.reason||"unknown"}`);
-const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,deriveTerminalFacts:deriveTerminalFacts35100,captureBattleResult:captureBattleResult35100,commitTerminalDebrief:commitTerminalDebrief35100,commitPakkunDeparture:commitPakkunDeparture35100,commitChronicleReceiptAndRewards:commitChronicleReceiptAndRewards35100,closureReady:closureReady35100,guardedOriginCompletion:guardedOriginCompletion35100,diagnostics,browserGoldenClaimed:false});
+const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,deriveTerminalFacts:deriveTerminalFacts35100,debriefSummaryText,receiptText,captureBattleResult:captureBattleResult35100,commitTerminalDebrief:commitTerminalDebrief35100,commitPakkunDeparture:commitPakkunDeparture35100,commitChronicleReceiptAndRewards:commitChronicleReceiptAndRewards35100,closureReady:closureReady35100,guardedOriginCompletion:guardedOriginCompletion35100,diagnostics,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100=api;
 globalThis.runAcademyKakashiTerminalDebrief35100Diagnostics=diagnostics;
 })();
