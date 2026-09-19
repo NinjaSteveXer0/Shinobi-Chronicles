@@ -256,3 +256,30 @@ Do not author or implement field-secured custody, later collection, escape/inter
 
 Coding routing: **SEND NOW -> issue #252**.
 Stephen relay: **NONE**.
+
+
+## 2026-09-19 expression retrofit — loss Hokage Office
+
+Stephen rejected the implemented Scene 07A-L hidden Hokage Office conversation as repetitive information-terminal dialogue and approved a character-driven rewrite.
+
+Revised exact authority:
+- `Documentation/Story/Academy_Kakashi_Origin_Scene_07A_L_Hokage_Office_Kakashi_Defeated_Verbatim_Lock_2026-09-19.md`
+- commit `362f72b8f20f50fec1b8e11e483e40cf5030364c`.
+
+Semantics remain unchanged. This is a player-facing expression retrofit only.
+
+Global Writing law strengthened:
+- `Storywide_Player_Facing_Performance_and_Narrative_Craft_Successor_Authority_2026-09-14.md`
+- commit `f3367b021da9d7b111d29ff3fbf0537d600e1755`
+- explicit rule: **People ask questions. People answer as themselves.**
+- repetitive factual question / one-word-answer ping-pong is Writing RED unless deliberately earned.
+
+Writing-owned character profile registry created:
+- `Documentation/Story/Character_Personality_and_Voice_Profile_Registry_2026-09-19.md`
+- commit `e7cd58d0574d069e9b25bc7ec8506f639af22f0c`
+- active Kakashi Origin profiles: Academy Kakashi, Pakkun, Minato, ANBU Operative, Masked Interceptor, Package Smuggler, ANBU Marked Target, plus Uchiha Police institutional baseline.
+
+Runtime currently still contains the superseded office cue sequence in `runtime/alpha-kakashi-loss-ending-35820.js`.
+
+Coding handoff:
+- GitHub #257 — replace only the player-facing office cue realization; preserve existing loss semantics / hidden-review facts / closure.
