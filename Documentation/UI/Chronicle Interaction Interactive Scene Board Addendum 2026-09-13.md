@@ -256,6 +256,20 @@ Canonical rule:
 
 > **Baked nameplates identify participants. Runtime state strips describe visible participant state. Live State Callouts describe the wider evolving situation. None of them creates the truth it displays.**
 
+## 7B. Story-scene actor asset boundary
+
+Story / Chronicle scene presentation must not reuse **Battle Portraits** merely because the same participant also appears in Battle.
+
+- **Battle surfaces** may use Battle Portraits / Battle-specific portrait assets.
+- **Story / Scene Board surfaces** must use the participant's authored scene asset family (`Assets/...`, `NPC/...`, or another explicitly authored non-Battle scene source).
+- A summon, familiar, construct or other entity appearing as a scene participant follows the same rule: use its scene/entity asset, not its Battle portrait.
+- Exact Kakashi reference: Pakkun in the AMT alley scene uses `Assets/Summons/pakkun.png`; `Portraits/Summons/pakkun.png` is Battle-only and must not be projected into the Story scene.
+- Asset-family choice is presentation ontology only. It does not change participant identity, ownership, Battle eligibility, Summon semantics or Story facts.
+
+Canonical rule:
+
+> **Battle Portraits belong to Battle presentation. Story scenes use authored scene/entity assets. Sharing an identity across surfaces does not collapse the asset families.**
+
 ## 8. Kakashi reference example — why this matters
 
 The recovered original Academy Kakashi Story is particularly suitable for the scene-board model:
