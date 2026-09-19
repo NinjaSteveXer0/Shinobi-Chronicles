@@ -68,6 +68,12 @@ assert.strictEqual(MOD.ce256BindingRef,"academy_kakashi.resolver.post_amt_defeat
 assert.strictEqual(diag.checks.neutralProviderExact,true);
 assert.strictEqual(diag.checks.packageBeforePakkunOrdering,true);
 assert.strictEqual(diag.checks.pakkunAutonomyConsumed,true);
+assert.strictEqual(diag.checks.sharedAmtPakkunConfigsExact,true);
+assert.strictEqual(diag.checks.sharedAmtDefeatOwnerExported,true);
+assert.deepStrictEqual(MOD.amtBattleConfigs,[
+  "academy_kakashi_origin_battle_seq_amt_pakkun",
+  "academy_kakashi_origin_battle_kakashi_pakkun_vs_amt"
+]);
 
 function commitPackageOccurrence(id,holder,location){
   occurrenceStore.set(id,{occurrenceId:id,fact:{
@@ -173,6 +179,35 @@ assert.strictEqual(replay.success,true,"CE #256 factual replay failed");
 assert.strictEqual(replay.receipt.selectedOutcomeRef,firstOutcome,"CE #256 factual replay rerolled");
 drainToTerminal();
 
+// The same CE #256 owner must also consume the Secure-Package AMT+Pakkun
+// Battle config. Package custody is still resolved independently of Battle.
+commitPackageOccurrence("qa-package-secure-route","KAKASHI","KAKASHI_PERSON");
+active={
+  sceneId:SCENE_ID,instanceId:"qa-ce256-secure-route",beatId:"kak_observe_secure_package_amt_return",
+  localContext:{
+    kakashiKonohaPackageOccurrenceId:"qa-package-secure-route",
+    kakashiObserveSecurePackageAmtPursuitOccurrenceId:"qa-secure-amt-pursuit",
+    kakashiKonohaPakkunPresent:true
+  },
+  battleResume:{authored:{
+    battleConfigId:"academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",
+    bindingRef:"academy_kakashi.battle.secure_package_amt_pursuit",
+    battleOccurrenceId:"qa-secure-amt-loss",
+    resultState:"opposition_side_victory",
+    participants:[]
+  }}
+};
+out=globalThis.resolveAcademyKakashiAmtDefeatFacts35900({
+  packageOccurrenceId:"qa-package-secure-route",
+  parentRef:"qa-secure-amt-pursuit",
+  routeRef:"secure_package_amt_pursuit",
+  returnBeatId:"kak_observe_secure_package_amt_return",
+  successorSituationRef:TERMINAL
+});
+assert.strictEqual(out.success,true,"shared CE #256 secure-route resolution failed: "+JSON.stringify(out));
+assert(["KAKASHI","ANBU_MARKED_TARGET"].includes(out.packageState.currentHolderClass),"shared CE #256 returned impossible holder");
+assert(active.localContext.kakashiCe256LastAmtDefeatOccurrenceId,"shared CE #256 completion occurrence missing");
+
 // Player victory still delegates to the established 35830 winner owner.
 active={
   sceneId:SCENE_ID,instanceId:"qa-ce256-victory",beatId:AMT_RETURN,
@@ -205,6 +240,7 @@ console.log("- package elsewhere cannot be fabricated into AMT custody");
 console.log("- package-on-Kakashi branch persists and replays one stable factual outcome without reroll");
 console.log("- AK_SA_012 Pakkun autonomy is persisted through the real 34000/34100 anchor stack");
 console.log("- retained package makes Pakkun guard the exposed objective; otherwise he remains present");
+console.log("- shared CE #256 owner consumes both sequential and secure-package AMT+Pakkun Battle configs");
 console.log("- established AMT victory owner remains delegated");
 console.log("- historical post-MI / deterministic-kill report stops converge to the existing terminal owner");
 console.log("- Browser Golden is intentionally NOT claimed by this headless harness");
