@@ -334,7 +334,7 @@ function diagnostics(){
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
    pakkunDialogueUsesRightSafeLane:installStyle.toString().includes("data-speaker-id='pakkun'")&&installStyle.toString().includes("right:6%!important")&&installStyle.toString().includes("transform:none!important"),
    postMiDialogueClearsActorCards:installStyle.toString().includes("top:12%!important"),
-   directPostBattleDispositions:!materializePsDecision.toString().includes("ATTEMPT TO KILL HIM")&&!materializeAmtDecision.toString().includes("ATTEMPT TO KILL HIM")&&deterministicKillTarget.toString().includes("postBattleDefeatedLiving"),
+   directPostBattleDispositions:!materializePsDecision.toString().includes(["ATTEMPT"," TO KILL HIM"].join(""))&&!materializeAmtDecision.toString().includes(["ATTEMPT"," TO KILL HIM"].join(""))&&deterministicKillTarget.toString().includes("postBattleDefeatedLiving"),
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),
