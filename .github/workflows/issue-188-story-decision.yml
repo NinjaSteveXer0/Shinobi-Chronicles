@@ -12,6 +12,7 @@ on:
       - 'runtime/alpha-kakashi-field-secured-35920.js'
       - 'runtime/alpha-kakashi-move-closer-closure-35930.js'
       - 'runtime/alpha-kakashi-dynamic-terminal-35940.js'
+      - 'runtime/alpha-kakashi-browser-acceptance-35950.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
       - 'tools/qa_academy_kakashi_konoha_closure_35900.js'
@@ -19,6 +20,7 @@ on:
       - 'tools/qa_academy_kakashi_field_secured_35920.js'
       - 'tools/qa_academy_kakashi_move_closer_closure_35930.js'
       - 'tools/qa_academy_kakashi_dynamic_terminal_35940.js'
+      - 'tools/qa_academy_kakashi_browser_acceptance_35950.js'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -132,6 +134,7 @@ jobs:
           node --check runtime/alpha-kakashi-field-secured-35920.js
           node --check runtime/alpha-kakashi-move-closer-closure-35930.js
           node --check runtime/alpha-kakashi-dynamic-terminal-35940.js
+          node --check runtime/alpha-kakashi-browser-acceptance-35950.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -162,6 +165,7 @@ jobs:
           node --check tools/qa_academy_kakashi_field_secured_35920.js
           node --check tools/qa_academy_kakashi_move_closer_closure_35930.js
           node --check tools/qa_academy_kakashi_dynamic_terminal_35940.js
+          node --check tools/qa_academy_kakashi_browser_acceptance_35950.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -169,8 +173,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-69' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-69";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-70' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-70";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -221,17 +225,21 @@ jobs:
           grep -Fq 'alpha-kakashi-move-closer-closure-35930.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-dynamic-terminal-35940.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v1_2026_09_20' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'alpha-kakashi-browser-acceptance-35950.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha_kakashi_browser_acceptance_35950_v1_2026_09_20' runtime/alpha-kakashi-browser-acceptance-35950.js
+          grep -Fq 'initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true})' runtime/alpha-kakashi-origin-battle-deployment-34300.js
+          grep -Fq 'kakashi_multi_opposition_zero_battle_pl' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'a3cad415ea74a4fe8b3965b1136522aceab81047' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'dea066c9ea7de249d20734b5569a0a84a422ba28' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'kakashiKonohaPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_move_closer_closure_35930_v1_2026_09_20' runtime/alpha-kakashi-move-closer-closure-35930.js
+          grep -Fq 'alpha_kakashi_move_closer_closure_35930_v2_2026_09_20' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'PICKPOCKET_IMPROVED_FAILURE_DETECTED_2V1' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'pakkunBattleActionAuthorized:false' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'alpha_kakashi_field_secured_35920_v1_2026_09_20' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'FIELD_SECURED_PENDING_COLLECTION' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'COLLECTED_ACTIVE_ESCORT' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'TAKE THEM ALL BACK TO ANBU' runtime/alpha-kakashi-field-secured-35920.js
-          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v2_2026_09_20' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v3_2026_09_20' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'AK_SA_020_FAILURE_RECONVERGENCE' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'GO AFTER THE ORIGINAL TARGET' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'alpha_kakashi_konoha_closure_35900_v2_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
@@ -452,5 +460,7 @@ jobs:
         run: node tools/qa_academy_kakashi_move_closer_closure_35930.js
       - name: Academy Kakashi dynamic terminal projection
         run: node tools/qa_academy_kakashi_dynamic_terminal_35940.js
+      - name: Academy Kakashi gen70 browser acceptance integration
+        run: node tools/qa_academy_kakashi_browser_acceptance_35950.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js
