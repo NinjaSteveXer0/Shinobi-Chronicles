@@ -264,7 +264,7 @@ function installStyle(){
  "."+BOARD_CLASS+"[data-loss-stage='office'] [data-actor-id='"+ANBU+"']{left:54%!important}"+
  "."+BOARD_CLASS+"[data-loss-stage='office'] [data-actor-id='"+PS+"']{left:67%!important}"+
  "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] .sc-chronicle-layout{display:none!important}"+
- "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] ."+BOARD_CLASS+" .sc-scene-board-33900__objects{left:3.2%!important;right:auto!important;top:13.5%!important;bottom:auto!important;width:min(27%,340px)!important}"+
+ "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] ."+BOARD_CLASS+" .sc-scene-board-33900__objects{left:3.2%!important;right:auto!important;top:13.5%!important;bottom:auto!important;width:max-content!important;max-width:min(27%,340px)!important;height:auto!important;min-height:0!important;max-height:none!important}"+
  "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}"+
  "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:auto!important;right:7.5%!important;top:14.5%!important;bottom:auto!important;transform:none!important;width:min(25.5%,390px)!important}"+
  "#"+RECEIPT_ID+"{position:fixed;inset:0;z-index:120000;display:grid;place-items:center;padding:32px;background:rgba(2,6,10,.98);color:#eee6d2}#"+RECEIPT_ID+" .card{width:min(980px,94vw);max-height:90vh;overflow:auto;padding:32px;border:1px solid rgba(214,169,58,.55);background:#091016}#"+RECEIPT_ID+" .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:25px 0}#"+RECEIPT_ID+" button{min-height:46px;padding:0 22px}";
@@ -327,7 +327,7 @@ function diagnostics(){
   missionFailureSeparateFromHiddenRecovery:commitHidden.toString().includes('kakashiMissionResult:"FAILURE"')&&commitHidden.toString().includes("hiddenOperationPackageRecoveredAfterward:true"),
   blackWipe:globalThis.advanceStoryScene.toString().includes("wipe(enterOffice)")&&globalThis.advanceStoryScene.toString().includes("wipe(openReceipt)"),
   safeDialogueZones:installStyle.toString().includes("top:22%!important")&&installStyle.toString().includes("right:7.5%!important")&&installStyle.toString().includes(".sc-chronicle-layout{display:none!important}")&&render.toString().includes("scBoardUiMode"),
-  liveStateCallout:render.toString().includes("sc-live-state-callout-33900")&&render.toString().includes("RECOVERED · HIDDEN OPERATION")&&render.toString().includes('card(MINATO,"HOKAGE"'),
+  liveStateCallout:render.toString().includes("sc-live-state-callout-33900")&&render.toString().includes("RECOVERED · HIDDEN OPERATION")&&render.toString().includes('card(MINATO,"HOKAGE"')&&installStyle.toString().includes("width:max-content!important")&&installStyle.toString().includes("max-height:none!important"),
   receiptAndClosure:openReceipt.toString().includes("commitChronicleReceiptAndRewards")&&complete.toString().includes("guardedOriginCompletion"),
   browserGoldenClaimed:false
  };
