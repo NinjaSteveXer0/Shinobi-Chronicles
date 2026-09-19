@@ -1,5 +1,19 @@
 # Academy Kakashi Origin — Final Writing Closure Audit, Runtime + Rewards Consumption Authority
 
+> **2026-09-19 CURRENT WRITING SUCCESSOR NOTICE**  
+> This historical final audit remains useful for global closure principles, but several branch-specific statements have since been superseded by later Stephen decisions and the current Writing benchmark.
+>
+> Current exact successor authorities include:
+> - direct STRIKE BEFORE THE HANDOFF: `Academy_Kakashi_Strike_Before_The_Handoff_Verbatim_Scene_Family_2026-09-19.md`;
+> - direct SLIP IN FOR THE PACKAGE: `Academy_Kakashi_Direct_Pickpocket_Verbatim_Scene_Family_2026-09-19.md`;
+> - MOVE IN CLOSER downstream: `Academy_Kakashi_Move_In_Closer_Downstream_Verbatim_Scene_Family_2026-09-19.md`;
+> - package-missing AMT dispositions;
+> - package-missing PS dispositions;
+> - current post-restraint collection / group transfer authority;
+> - current exact Scene 03A names.
+>
+> Older claims that direct Attack is still a five-class resolver lottery or that Get Closer SUCCESS -> Strike must use that old lottery are superseded.
+>
 **Date:** 2026-09-15  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **WRITING CLOSED — IMPLEMENTATION / REWARDS CONSUMPTION READY; RUNTIME / BROWSER / GOLDEN NOT CLAIMED**  
