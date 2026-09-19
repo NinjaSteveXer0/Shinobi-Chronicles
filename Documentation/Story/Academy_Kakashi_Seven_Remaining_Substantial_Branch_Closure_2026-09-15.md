@@ -1,5 +1,12 @@
 # Academy Kakashi Origin — Seven Remaining Substantial Branch Closure
 
+> **2026-09-20 ASK-WHERE SUCCESSOR NOTICE**  
+> The historical ASK WHERE THE PACKAGE WAS GOING scene below is superseded for exact player-facing presentation by:
+> `Documentation/Story/Academy_Kakashi_Ask_Where_The_Package_Was_Going_Verbatim_Lock_2026-09-20.md`
+> @ `80564cf2502f25895539fa61a74fd7d596bba75b`.
+>
+> Knowledge semantics remain unchanged.
+>
 > **2026-09-19 MOVE IN CLOSER POST-BATTLE SUPERSESSION**  
 > For current Get Closer downstream presentation and post-Battle agency, consume:
 > `Documentation/Story/Academy_Kakashi_Move_In_Closer_Downstream_Verbatim_Scene_Family_2026-09-19.md`.
