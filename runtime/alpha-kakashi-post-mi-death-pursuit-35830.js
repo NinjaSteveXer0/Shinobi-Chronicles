@@ -332,7 +332,7 @@ function diagnostics(){
    amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
    pakkunSceneRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
-   pakkunDialogueUsesRightSafeLane:installStyle.toString().includes("data-speaker-id=\\'pakkun\\'")&&installStyle.toString().includes("right:29%!important")&&installStyle.toString().includes("transform:none!important"),
+   pakkunDialogueUsesRightSafeLane:installStyle.toString().includes("data-speaker-id='pakkun'")&&installStyle.toString().includes("right:29%!important")&&installStyle.toString().includes("transform:none!important"),
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),
