@@ -4,6 +4,7 @@ const fs=require("fs"),path=require("path"),vm=require("vm"),assert=require("ass
 const root=path.resolve(__dirname,"..");
 const runtimePath=path.join(root,"runtime","alpha-kakashi-origin-rewards-34800.js");
 const src=fs.readFileSync(runtimePath,"utf8");
+const gameSrc=fs.readFileSync(path.join(root,"game.js"),"utf8");
 assert(src.includes("ACADEMY KAKASHI ORIGIN REWARD ADAPTER"));
 assert(src.includes('const ROUTE="academy_kakashi_origin_reward"'));
 assert(src.includes('const ITEM_SOURCE="kak_origin_item_field_recovery_resupply"'));
@@ -12,6 +13,15 @@ assert(src.includes('const MI_REWARD_AUTHORITY_COMMIT="fe715e81cb76b3c4e4a7a8ccb
 assert(src.includes('const MI_REWARD_FAMILY="kak_origin_battle_mi_victory_reward_v1"'));
 assert(src.includes('const MI_REWARD_CLAIM_FAMILY="kak_origin_battle_mi_victory_reward_claim_v1"'));
 assert(src.includes("addDisciplineExp"),"34800 must consume canonical discipline Progression");
+assert(gameSrc.includes('"kakashi_origin_action_development"'),"canonical Progression must admit Kakashi action-derived technical development source");
+assert(gameSrc.includes('"kakashi_origin_stamina_mitigation"'),"canonical Progression must admit Kakashi Stamina mitigation development source");
+const sourceGateStart=gameSrc.indexOf("function isValidDisciplineTrainingSource");
+const sourceGateEnd=gameSrc.indexOf("// =========================================================\n// BRICK 128",sourceGateStart);
+assert(sourceGateStart>=0&&sourceGateEnd>sourceGateStart,"canonical discipline source gate missing");
+const sourceGate=gameSrc.slice(sourceGateStart,sourceGateEnd);
+assert(sourceGate.includes('"nin"\n      "tai"')===false,"guard against malformed technical source set");
+assert(["nin","tai","gen","buki","fuin","kin"].every(id=>sourceGate.includes(`"${id}"`)),"Kakashi action-derived source must admit exactly authored technical discipline IDs");
+assert(sourceGate.includes('disciplineId ===\n      "stamina"'),"Kakashi Stamina source must be Stamina-only");
 assert(src.includes("addItemToInventory"),"34800 must consume canonical Inventory grant");
 const terminalStart=src.indexOf("function commitTerminalDebriefRewards");
 const terminalEnd=src.indexOf("function snapshot",terminalStart);
