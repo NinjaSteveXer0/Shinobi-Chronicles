@@ -544,3 +544,51 @@ Pakkun is not granted Battle actions in a non-Pakkun config.
 
 Writing MOVE IN CLOSER family: CLOSED.
 Implementation/runtime/browser validation: separate.
+
+
+## 2026-09-20 — Academy Kakashi Writing 100% closure
+
+Stephen requested a full route/variation audit including defeat scenes, mixed lethal histories and combinations such as **2 kills / 1 escape**.
+
+Pre-fix audit:
+`Documentation/Story/Academy_Kakashi_100_Percent_Writing_Path_Variation_Audit_2026-09-20.md`
+
+Audit closed at:
+`4776bfca24c266a7702d711b793287d9798319b8`.
+
+Current authoritative 100% Writing closure:
+`Documentation/Story/Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20.md`
+commit:
+`21e0407a0c371310ff06096905fd1fce4107ece8`.
+
+New exact authorities that closed gaps:
+
+- mixed lethal terminal scenes:
+  `Academy_Kakashi_Mixed_Lethal_Terminal_Verbatim_Lock_2026-09-20.md`
+  current lineage through `dea066c9ea7de249d20734b5569a0a84a422ba28`;
+
+- dynamic nonlethal/defeat/custody/package/Knowledge terminal scenes:
+  `Academy_Kakashi_Dynamic_Terminal_State_Projection_Verbatim_Lock_2026-09-20.md`
+  current lineage through `a3cad415ea74a4fe8b3965b1136522aceab81047`;
+
+- ASK WHERE THE PACKAGE WAS GOING dedicated current verbatim lock:
+  `80564cf2502f25895539fa61a74fd7d596bba75b`;
+
+- package-recovered AMT -> Uchiha Police exact transfer:
+  `0b0aa32488b67944076362097662a036f4fbc918`;
+
+- AMT Battle defeat exact package/Pakkun projection:
+  `09db8ff4efc28ee608d41c828af48efc023d324f`.
+
+Anti-regression cleanup also marks:
+- old #244 blocked text superseded;
+- old STOP-before-debrief boundaries historical;
+- old control-state ATTEMPT TO KILL/RESTRAIN choice renaming superseded;
+- PS/AMT attempted-lethal menu variants compatibility-only;
+- old “Writing downstream” and “anchor inventory not closed” text historical.
+
+**Writing / Story — Academy Kakashi Origin: 100% CLOSED at current authority.**
+
+This is Writing closure only.
+
+Coding/runtime implementation, CE factual resolution consumption, installed-browser traversal and Browser Golden remain separate.
