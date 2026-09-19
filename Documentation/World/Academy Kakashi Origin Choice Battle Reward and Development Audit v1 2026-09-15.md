@@ -5,6 +5,8 @@
 
 **2026-09-18 STORY / OWNER-FIELD RECONCILIATION:** The current STOP THE ASSASSIN correction is `Documentation/Story/Academy_Kakashi_Stop_Assassin_Quick_Win_Catch_Up_Correction_2026-09-18.md`. It makes STOP THE ASSASSIN a distinct **MI 1-v-1 -> win in 1–3 turns preserves Package Smuggler catch-up only** route. The separate `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE` sequential benchmark remains **MI 1–4 -> PS 1–3 -> AMT legitimately reachable**. The immediate solo-MI victory package is independent of those pursuit gates: any qualifying committed solo Kakashi-vs-MI victory receives the same immediate 50 Ryō + pill package. Owner fields requested through #199 are closed by Progression `54314cc29e1374783cae0a0d90654cc9a2316a45`, Combat `e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8`, and Acquisition `b83884adb70f1e74e62f96ab96848c1ec33704f9`.  
 
+**2026-09-19 ORIGIN BATTLE CASH EXPANSION — STEPHEN LOCK:** Academy Kakashi's two current downstream solo Story Battles now also pay immediate Battle Ryō so the Origin gives the player useful early spending money through active play. A committed solo victory over **Package Smuggler** in `academy_kakashi_origin_battle_seq_ps` pays **50 Ryō**. A committed solo victory over **ANBU Marked Target** in `academy_kakashi_origin_battle_seq_amt_pakkun` pays **50 Ryō**. These are cash-only additions. They do **not** add Items, loot, generic EXP, custody, package recovery, intelligence, exceptional-execution status, changed pursuit gates, changed post-Battle state, or changed Story outcomes. The existing Masked Interceptor package remains exactly **50 Ryō + Field Recovery Pill ×1** and is otherwise unchanged.  
+
 **Owner:** World / Missions / Events / Rewards  
 **Status:** **BINDING WORLD REWARD-SOURCE AUTHORITY — WORLD VALUES + OWNER SOURCE FIELDS CLOSED; RUNTIME / INSTALLED-BROWSER PROOF SEPARATE**
 
@@ -76,6 +78,28 @@ All Ryō rows are one-shot per sealed Origin occurrence.
 | `kak_origin_ryo_exceptional_field_execution` | **+25** | One authored exceptional benchmark is factually met: clean undetected package extraction; failed direct-pickpocket 3-v-1 victory; qualifying sequential MI->PS->AMT turn-gate benchmark; or a future resolver-return explicitly classified by the same authority as exceptional field execution. Paid once. |
 
 **Maximum current Ryō package: 250.**
+
+### 3.1A Immediate Origin Battle Ryō — separate from debrief-class Ryō
+
+These Battle-cash sources are one-shot per exact committed Battle occurrence and are **outside** the 250-Ryō terminal/debrief cap:
+
+| Battle reward source | Immediate Ryō | Exact qualifying victory |
+|---|---:|---|
+| `kak_origin_battle_mi_victory_ryo_01` | **50** | Existing exact solo Kakashi vs Masked Interceptor victory. Existing Field Recovery Pill ×1 behavior remains unchanged. |
+| `kak_origin_battle_ps_victory_ryo_01` | **50** | Exact solo Kakashi vs Package Smuggler victory in `academy_kakashi_origin_battle_seq_ps`. |
+| `kak_origin_battle_amt_victory_ryo_01` | **50** | Exact solo Kakashi vs ANBU Marked Target victory in `academy_kakashi_origin_battle_seq_amt_pakkun`. |
+
+If all three exact solo victories occur in one Origin, immediate Battle Ryō totals **150 Ryō** before separately evaluated terminal/debrief rewards.
+
+For Package Smuggler and ANBU Marked Target, this is **cash only**:
+- no Item;
+- no opponent loot;
+- no generic Character EXP;
+- no extra Field Recovery Pill;
+- no automatic package/custody/intelligence/exceptional predicate;
+- no change to Story continuation, Battle semantics, participant state, pursuit timing, Pakkun behavior or post-Battle choices.
+
+Battle participation alone still does not create cash. The exact committed victory source above is required.
 
 No Ryō is awarded merely for:
 
@@ -388,7 +412,9 @@ Choice sources above are supplemented by factual outcome sources. These are not 
 | `kak_origin_outcome_actionable_intel` | Verified new actionable intelligence commits. | +25 Ryō once; Knowledge and suitable specialist evidence. |
 | `kak_origin_outcome_live_custody` | At least one relevant participant delivered alive to legitimate authority. | +25 Ryō once; Extraction evidence where exact contribution fits. |
 | `kak_origin_outcome_solo_mi_victory` | Kakashi wins the exact solo Kakashi vs Masked Interceptor PL Battle occurrence, regardless of which current branch reached that same solo Battle state. | Immediate Victory-screen package: **50 Ryō + Field Recovery Pill ×1** under `kak_origin_battle_mi_victory_reward_v1`; claim before Story return. Exact discipline/Stamina development comes from committed action evidence and is not re-granted by the claim. |
-| `kak_origin_outcome_battle_participation` | Kakashi materially participates in >=1 PL Battle in this Origin. | Exact discipline/Stamina development from actions used. If no qualifying solo-MI victory already fulfilled `kak_origin_item_field_recovery_resupply`, terminal debrief provides the one-pill fallback entitlement. No generic per-Battle cash. |
+| `kak_origin_outcome_solo_ps_victory` | Kakashi wins the exact solo Package Smuggler Battle `academy_kakashi_origin_battle_seq_ps`. | Immediate **50 Ryō** Battle cash from `kak_origin_battle_ps_victory_ryo_01`. No Item/loot or extra Story predicate. |
+| `kak_origin_outcome_solo_amt_victory` | Kakashi wins the exact solo ANBU Marked Target Battle `academy_kakashi_origin_battle_seq_amt_pakkun`. | Immediate **50 Ryō** Battle cash from `kak_origin_battle_amt_victory_ryo_01`. No Item/loot or extra Story predicate. |
+| `kak_origin_outcome_battle_participation` | Kakashi materially participates in >=1 PL Battle in this Origin. | Exact discipline/Stamina development from actions used. If no qualifying solo-MI victory already fulfilled `kak_origin_item_field_recovery_resupply`, terminal debrief provides the one-pill fallback entitlement. Participation alone does not create Battle cash; only the exact victory sources above do. |
 | `kak_origin_outcome_battle_loss` | A PL Battle is lost. | Does not erase prior action/discipline/specialist evidence. Package/custody outcomes consume actual state and may still succeed. No MI-victory material package. |
 | `kak_origin_outcome_3v1_victory` | Failed direct-pickpocket 3-v-1 is won. | +25 exceptional benchmark; weapon-source candidate; Battle action development. No kill assumptions. |
 | `kak_origin_outcome_sequential_turn_benchmark` | On `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE`: MI <=4 turns, then PS <=3 turns, and AMT legitimately remains reachable. | +25 exceptional benchmark; weapon-source candidate; historical/achievement evidence. STOP THE ASSASSIN's separate MI <=3 Package-Smuggler catch-up gate does **not** by itself satisfy this sequential benchmark or create direct AMT pursuit. Actual Skills/actions still determine discipline development. |
@@ -526,7 +552,7 @@ Coding must consume the closed sources through the existing reward/development f
 
 - Writing decision graph: **CLOSED / consumable**, with the 2026-09-18 STOP THE ASSASSIN branch-specific pursuit correction controlling that route.
 - World reward-source mapping: **CLOSED in this document + immediate MI reward lock**.
-- World Ryō values: **CLOSED** — debrief-class max remains 250 Ryō; exact solo-MI victory additionally grants immediate 50 Ryō outside that cap.
+- World Ryō values: **CLOSED** — debrief-class max remains 250 Ryō; exact solo MI / PS / AMT victories each grant immediate **50 Ryō** outside that cap. MI additionally retains its existing Field Recovery Pill ×1; PS and AMT are cash-only.
 - World no-kill-bounty / no-loot law: **CLOSED**.
 - PL Battle reward/development receipt requirements: **CLOSED at World consumer level**.
 - Relationship/Knowledge/future-opportunity consequences: **CLOSED at World consumer level**.
