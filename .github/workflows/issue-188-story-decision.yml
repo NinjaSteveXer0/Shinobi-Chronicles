@@ -7,8 +7,10 @@ on:
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-kakashi-post-mi-death-pursuit-35830.js'
+      - 'runtime/alpha-kakashi-konoha-writing-closure-35900.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
+      - 'tools/qa_academy_kakashi_konoha_closure_35900.js'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -117,6 +119,7 @@ jobs:
           node --check runtime/alpha-kakashi-deterministic-kill-35810.js
           node --check runtime/alpha-kakashi-loss-ending-35820.js
           node --check runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          node --check runtime/alpha-kakashi-konoha-writing-closure-35900.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -142,6 +145,7 @@ jobs:
           node --check tools/qa_academy_kakashi_deterministic_kill_35810.js
           node --check tools/qa_academy_kakashi_loss_ending_35820.js
           node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
+          node --check tools/qa_academy_kakashi_konoha_closure_35900.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -149,8 +153,8 @@ jobs:
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-68' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-68";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-69' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-69";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -195,6 +199,11 @@ jobs:
           grep -Fq 'alpha-kakashi-deterministic-kill-35810.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-post-mi-death-pursuit-35830.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-konoha-writing-closure-35900.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha_kakashi_konoha_closure_35900_v1_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq 'academy_kakashi.resolver.post_amt_defeat_package_reach' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq '09db8ff4efc28ee608d41c828af48efc023d324f' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq '21e0407a0c371310ff06096905fd1fce4107ece8' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq 'bf30ca7dfff9f850bebe978acdd8830f16758042' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq '7a95637765a58b8f12b0bac877032625266830f6' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi_origin_battle_seq_ps' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
@@ -399,5 +408,7 @@ jobs:
         run: node tools/qa_academy_kakashi_loss_ending_35820.js
       - name: Academy Kakashi post-MI-death PS and AMT pursuits
         run: node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
+      - name: Academy Kakashi Konoha Writing closure and CE 256 factual consumption
+        run: node tools/qa_academy_kakashi_konoha_closure_35900.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js
