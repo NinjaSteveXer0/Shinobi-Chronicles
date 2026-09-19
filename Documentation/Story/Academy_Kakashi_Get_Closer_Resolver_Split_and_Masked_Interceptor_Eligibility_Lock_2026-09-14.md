@@ -1,5 +1,18 @@
 # Academy Kakashi Origin — Get Closer Resolver Split and Masked Interceptor Eligibility Lock
 
+> **2026-09-19 DOWNSTREAM SUCCESSOR NOTICE**  
+> The exact Get Closer SUCCESS / FAILURE scenes in this document remain binding.
+>
+> Their downstream choice continuations are now governed by:
+> `Documentation/Story/Academy_Kakashi_Move_In_Closer_Downstream_Verbatim_Scene_Family_2026-09-19.md`
+> commit lineage beginning `874900f9aa7a8cad3dd48e404c5a9e1cfe7d74fb`.
+>
+> In particular:
+> - SUCCESS -> STRIKE BEFORE THE HANDOFF now consumes the fixed AMT+PS 2-v-1 -> package recovery -> MI appearance -> MI 1-v-1 chain while retaining Get Closer Knowledge;
+> - SUCCESS -> improved Pickpocket failure uses AMT+PS 2-v-1 and exact two-target group disposition on victory;
+> - FAILURE -> STOP PACKAGE SMUGGLER consumes the current package-missing PS disposition lock;
+> - FAILURE -> CUT THEM OFF AT THE SAKURA TREE no longer auto-secures AMT / auto-escapes PS after Battle victory; current post-Battle player agency applies.
+>
 **Date:** 2026-09-14  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED — LOCKED STORY / RESOLVER / PRESENTATION AUTHORITY**
