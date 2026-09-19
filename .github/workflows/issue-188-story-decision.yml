@@ -200,7 +200,7 @@ jobs:
           grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-post-mi-death-pursuit-35830.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-konoha-writing-closure-35900.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
-          grep -Fq 'alpha_kakashi_konoha_closure_35900_v1_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq 'alpha_kakashi_konoha_closure_35900_v2_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq 'academy_kakashi.resolver.post_amt_defeat_package_reach' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq '09db8ff4efc28ee608d41c828af48efc023d324f' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq '21e0407a0c371310ff06096905fd1fce4107ece8' runtime/alpha-kakashi-konoha-writing-closure-35900.js
