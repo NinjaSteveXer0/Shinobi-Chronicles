@@ -15,7 +15,7 @@ assert(compat.includes("compatibilityShim:true"),"33920 must identify itself as 
 assert(compat.includes("retireAfterBrowserAcceptance:true"),"33920 must declare its retirement condition");
 assert(compat.includes("sc-scene-board-33900__actor-tag")&&compat.includes("display:none!important"),"runtime actor name overlay must be suppressed on collectible cards");
 assert(compat.includes("sc-performance-next-33910")&&compat.includes("removeAdvanceButtons33920"),"redundant dialogue/narration arrow must be removed");
-assert(compat.includes("min-width:240px!important")&&compat.includes("font-size:11px!important"),"scene object/instruction plate must be materially larger");
+assert(compat.includes("bottom:auto!important")&&compat.includes("width:max-content!important")&&compat.includes("min-width:0!important")&&compat.includes("height:auto!important"),"Live State Callout must remain a compact content-sized HUD readout");
 assert(compat.includes("clip-path:none!important")&&compat.includes("border-radius:8px!important"),"cut-corner dialogue treatment must be removed");
 assert(compat.includes("width:min(32%,500px)!important")&&compat.includes("box-sizing:border-box!important"),"dialogue width must preserve card clearance");
 assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the centered conversation lane");
@@ -30,9 +30,9 @@ for(const forbidden of ["commitStoryIntent","resolveStoryFactualAction","launchA
 
 // Production delivery contract.
 assert(restoration.includes('alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}'),"33800 must load 33920 from the Scene Board chain");
-assert(restoration.includes('const BUILD="scene-board-20260917-6";'),"33800 Scene Board child identity must advance to Scene 2 generation 6");
+assert(restoration.includes('const BUILD="scene-board-20260919-7";'),"33800 Scene Board child identity must advance to compact-callout generation 7");
 assert(restoration.includes('polish.addEventListener("load",load33920,{once:true})'),"33920 must wait until the live 33910 consumer is loaded");
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260917-6";'),"33200 Scene Board parent identity must advance to Scene 2 generation 6");
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260919-7";'),"33200 Scene Board parent identity must advance to compact-callout generation 7");
 assert(traversal.includes('alpha-kakashi-original-origin-restoration-33800.js?v=${SCENE_BOARD_BUILD}'),"33200 must deliver 33800 through the versioned terminal chain");
 
 // Minimal installed-DOM semantic harness: non-interactive dialogue/narration

@@ -40,18 +40,23 @@ function installStyle33920(){
 /* Click-anywhere progression owns advance. Do not show a redundant arrow. */
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-performance-next-33910{display:none!important;}
 
-/* Object/instruction state must read as a real scene instruction, not an 8px tag. */
+/* Live State Callout: compact tactical HUD readout, never a stretched object panel. */
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__objects{
-  bottom:23.5%!important;gap:12px!important;
+  left:3.2%!important;right:auto!important;top:13.5%!important;bottom:auto!important;
+  width:max-content!important;max-width:min(31%,390px)!important;
+  height:auto!important;min-height:0!important;max-height:none!important;
+  gap:6px!important;align-items:flex-start!important;justify-content:flex-start!important;
 }
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__object{
-  min-width:240px!important;max-width:420px!important;padding:12px 18px!important;
-  font-size:11px!important;line-height:1.35!important;letter-spacing:.08em!important;text-align:center!important;
-  border-color:rgba(202,167,78,.72)!important;background:rgba(3,9,13,.90)!important;
-  box-shadow:0 12px 30px rgba(0,0,0,.34)!important;
+  display:inline-block!important;width:auto!important;min-width:0!important;max-width:390px!important;
+  height:auto!important;min-height:0!important;max-height:none!important;align-self:flex-start!important;
+  padding:7px 11px 7px 13px!important;font-size:9px!important;line-height:1.25!important;
+  letter-spacing:.07em!important;text-align:left!important;
+  border-color:rgba(214,175,76,.64)!important;background:linear-gradient(120deg,rgba(3,15,21,.93),rgba(12,12,9,.88))!important;
+  box-shadow:0 10px 28px rgba(0,0,0,.35),0 0 0 1px rgba(98,220,229,.08),0 0 20px rgba(90,214,224,.08)!important;
 }
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__object b{
-  display:block!important;margin:0 0 5px!important;font-size:10px!important;letter-spacing:.14em!important;
+  display:block!important;margin:0 0 3px!important;font-size:8px!important;letter-spacing:.15em!important;
 }
 
 /* Conversation lane: one spoken line, anchored centrally between both cards. */
@@ -116,7 +121,7 @@ function installStyle33920(){
 @media(max-width:820px){
   #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910,
   #story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910.is-retained{width:76%!important;}
-  #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__object{min-width:190px!important;max-width:74vw!important;}
+  #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__object{min-width:0!important;max-width:74vw!important;}
 }
 `;
   document.head.appendChild(style);return true;
@@ -240,7 +245,7 @@ function runAcademyKakashiStoryPresentationCompat33920Diagnostics(){
     patchId:PATCH_ID==="academy_kakashi_story_presentation_compat_33920_v4_2026_09_17",
     collectibleNameOverlayRemoved:css.includes("sc-scene-board-33900__actor-tag")&&css.includes("display:none!important"),
     redundantArrowRemoved:css.includes("sc-performance-next-33910")&&removeAdvanceButtons33920.toString().includes("node.remove"),
-    instructionPlateReadable:css.includes("min-width:240px!important")&&css.includes("font-size:11px!important")&&css.includes("sc-scene-board-33900__object b"),
+    compactLiveStateCallout:css.includes("bottom:auto!important")&&css.includes("width:max-content!important")&&css.includes("min-width:0!important")&&css.includes("height:auto!important")&&css.includes("text-align:left!important")&&css.includes("sc-scene-board-33900__object b"),
     cutCornersRemoved:css.includes("clip-path:none!important")&&css.includes("border-radius:8px!important"),
     dialogueCentralStack:css.includes("width:min(32%,500px)!important")&&css.includes("box-sizing:border-box!important")&&css.includes("left:50%!important")&&css.includes("transform:translateX(-50%)!important")&&!css.includes("left:29%!important")&&!css.includes("right:29%!important"),
     dialogueStatusRemoved:css.includes("sc-dialogue-status-33910")&&css.includes("display:none!important"),

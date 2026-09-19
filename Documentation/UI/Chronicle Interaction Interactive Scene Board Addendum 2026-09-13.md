@@ -242,11 +242,13 @@ Binding rules:
 3. Do not collapse scene-level continuity into ordinary actor nameplate text merely to save space.
 4. Use **cyan emphasis for active / changing / in-progress state** and **gold emphasis for committed / settled / pivotal state**. Mixed cyan-gold framing is permitted where one reusable component must cover both.
 5. Place callouts in a **safe HUD lane**. They must not cover actor faces/cards, dialogue, objectives or action choices.
-6. Safe placement is composition-aware rather than one absolute coordinate:
-   - ordinary encounter/conversation scenes may use the upper-right lane beneath the objective;
+6. A Live State Callout is a **compact, content-sized tactical readout**, never a large card or vertical panel. Its normal form is one short category/header plus one factual state line, with no empty body beneath it.
+7. Safe placement is composition-aware rather than one absolute coordinate:
+   - default preference is the upper-left safe lane below/near the location tag when that does not cover actors;
+   - the upper-right lane beneath the objective is acceptable only when the composition genuinely has room;
    - Hokage-office compositions should use the open left-side room lane because Minato owns the central authority position and dialogue may use the right-side safe zone.
-7. Card status readouts should retain stronger cyan/gold quick-read styling so moment-to-moment participant state remains legible even when no scene-level callout is required.
-8. Reduced-motion/accessibility does not remove the information; animation/glow is decorative, the text state remains sufficient.
+8. Card status readouts should retain stronger cyan/gold quick-read styling so moment-to-moment participant state remains legible even when no scene-level callout is required.
+9. Reduced-motion/accessibility does not remove the information; animation/glow is decorative, the text state remains sufficient.
 
 Canonical rule:
 
