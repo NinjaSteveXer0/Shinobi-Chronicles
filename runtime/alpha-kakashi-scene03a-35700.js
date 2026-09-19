@@ -205,7 +205,7 @@ function ensureWatchMotionStyle35700(){
 #story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors[data-watch-stage='divergence'] [data-actor-id='package_smuggler']{left:auto!important;right:18%!important}
 
 /* Exact cue 13: "A figure tore out of it like a lightning streak." AMT exits as MI appears. */
-#story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors[data-watch-stage='interceptor-swap'] [data-actor-id='anbu_marked_target']{left:8%!important;right:auto!important}
+#story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors[data-watch-stage='interceptor-swap'] [data-actor-id='anbu_marked_target']{left:8%!important;right:auto!important;opacity:0!important;visibility:hidden!important}
 #story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors[data-watch-stage='interceptor-swap'] [data-actor-id='masked_interceptor']{left:42%!important;right:auto!important}
 #story-scene-presentation-layer[data-sc-kakashi-watch-exchange='true'] .sc-scene-board-33900__actors[data-watch-stage='interceptor-swap'] [data-actor-id='package_smuggler']{left:auto!important;right:7%!important}
 
