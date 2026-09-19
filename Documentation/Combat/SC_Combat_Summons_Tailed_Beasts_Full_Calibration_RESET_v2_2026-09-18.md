@@ -296,7 +296,7 @@ Source 03 Ibuse closure preserves the signed-off Neurotoxin package:
 Next ordinary Summon state:
 
 - **Source 09 — Kamatari** — **MECHANICS DESIGN CLOSED under Stephen sign-off**; PL / Registry numeric reconciliation remains open as #258 before full Source 09 identity/PL closure.
-- **Source 10 — Snake** — next uncalibrated ordinary source.
+- **Source 10 — Snake** — PROPOSED / awaiting Stephen sign-off; PL / Registry identity already closed at generic `snake`, PL47, staged/not live.
 
 Source 09 proposal authority:
 `Documentation/Combat/SC_Combat_RESET_v2_Source_09_Kamatari_Proposal_2026-09-19.md`
@@ -310,6 +310,17 @@ Kamatari RESET v2 mechanical closure:
 - manifested package remains Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles;
 - no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling;
 - **mechanics design is CLOSED**, but full Source 09 closure still awaits #258's authoritative seven Stats / Base PL return.
+
+Source 10 proposal authority:
+`Documentation/Combat/SC_Combat_RESET_v2_Source_10_Snake_Proposal_2026-09-19.md`
+
+Snake RESET v2 proposed direction:
+- generic `snake`, PL47; explicitly not Manda/Aoda/Manda II and not live;
+- ATTACHED / NOT MANIFESTED enhancement = **Hidden Coil**, once/Battle after one qualifying single-target Taijutsu or Bukijutsu attack deals positive final damage, applying one-action movement-specific physical restraint to the same target;
+- Hidden Coil becomes unavailable while the same Snake is manifested and does not refresh after manifestation;
+- manifested package = Fang Lunge ATK18; Constricting Bite ATK12 + one-action movement restraint on positive damage; Coiling Crush ATK14 / ATK24 against same-source constriction and releases the bind on the boosted branch; Coiling Interpose once/Battle redirects one qualifying direct packet from controller to Snake;
+- no Poison/venom, shedding, Sage package, burrow package, environmental bonus, named-snake scale/history or generic Stat-stick;
+- no Stun; exact escape/anti-restraint remains counterplay.
 
 Then continue into Source 10 Snake, accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
 
