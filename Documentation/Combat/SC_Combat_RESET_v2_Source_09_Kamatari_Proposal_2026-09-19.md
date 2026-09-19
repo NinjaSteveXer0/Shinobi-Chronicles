@@ -2,8 +2,9 @@
 
 **Date:** 2026-09-19  
 **Owner:** Combat / Skills / Items / Weapons / Equipment / Summons  
-**Status:** **PROPOSED FOR STEPHEN SIGN-OFF — PL / REGISTRY NUMERIC RECONCILIATION #258 OPEN**  
+**Status:** **MECHANICS DESIGN CLOSED — STEPHEN SIGN-OFF — PL / REGISTRY NUMERIC RECONCILIATION #258 OPEN**  
 **Parent:** #235  
+**Stephen mechanics sign-off:** 2026-09-19  
 **PL / Registry dependency:** #258  
 **Reset authority:** `Documentation/Combat/SC_Combat_Summons_Tailed_Beasts_Full_Calibration_RESET_v2_2026-09-18.md`  
 **Global mechanics standard:** `Documentation/Combat/SC_Combat_Unique_Shinobi_Chronicles_Mechanics_Design_Standard_2026-09-19.md`  
@@ -376,7 +377,7 @@ Current `game.js` still contains the historical Kamatari package:
 
 Those rows pre-date RESET v2 and the global unique-mechanics standard.
 
-If Stephen signs off Source 09:
+Stephen sign-off requires implementation to:
 
 - replace +6 Bukijutsu with **Sicklewind Route**;
 - replace the old Kamatari manifested action palette with the signed-off Source 09 kit;
@@ -400,11 +401,13 @@ That is the intended Source 09 identity.
 
 # L. Decision state
 
-**Mechanics:** PROPOSED / awaiting Stephen sign-off.  
+**Mechanics:** **DESIGN CLOSED — Stephen sign-off.**  
 **Identity:** stable ID `wr_kamatari` preserved.  
 **PL numeric closure:** BLOCKED only on PL / Registry issue #258.  
 **Implementation:** NOT STARTED under RESET v2.  
 **Runtime validation:** NOT CLAIMED.  
 **Golden:** NOT CLAIMED.
 
-**design proposed != design closed != implemented != runtime validated != Golden GREEN**
+**KAMATARI MECHANICS DESIGN CLOSED.** PL / Registry numeric authority remains open under #258.
+
+**mechanics design closed != PL numeric authority closed != implemented != runtime validated != Golden GREEN**
