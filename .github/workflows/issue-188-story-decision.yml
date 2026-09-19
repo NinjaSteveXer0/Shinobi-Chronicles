@@ -8,9 +8,11 @@ on:
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-kakashi-post-mi-death-pursuit-35830.js'
       - 'runtime/alpha-kakashi-konoha-writing-closure-35900.js'
+      - 'runtime/alpha-kakashi-konoha-route-closure-35910.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
       - 'tools/qa_academy_kakashi_konoha_closure_35900.js'
+      - 'tools/qa_academy_kakashi_konoha_route_closure_35910.js'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -120,6 +122,7 @@ jobs:
           node --check runtime/alpha-kakashi-loss-ending-35820.js
           node --check runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           node --check runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          node --check runtime/alpha-kakashi-konoha-route-closure-35910.js
           node --check runtime/alpha-kakashi-battle-development-35740.js
           node --check runtime/alpha-battle-browser-32600.js
           node --check tools/qa_issue_188_story_decision_runtime.js
@@ -146,6 +149,7 @@ jobs:
           node --check tools/qa_academy_kakashi_loss_ending_35820.js
           node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
           node --check tools/qa_academy_kakashi_konoha_closure_35900.js
+          node --check tools/qa_academy_kakashi_konoha_route_closure_35910.js
           node --check tools/qa_kakashi_battle_development_35740.js
           test -f 'Kakashi Origin Backdrop/fight_at_sakura_tree.png'
           test -f 'NPC portrait/masked_interceptor.png'
@@ -200,6 +204,10 @@ jobs:
           grep -Fq 'alpha-kakashi-loss-ending-35820.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-post-mi-death-pursuit-35830.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-konoha-writing-closure-35900.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha-kakashi-konoha-route-closure-35910.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v1_2026_09_20' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'AK_SA_020_FAILURE_RECONVERGENCE' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'GO AFTER THE ORIGINAL TARGET' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'alpha_kakashi_konoha_closure_35900_v2_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq 'academy_kakashi.resolver.post_amt_defeat_package_reach' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq '09db8ff4efc28ee608d41c828af48efc023d324f' runtime/alpha-kakashi-konoha-writing-closure-35900.js
@@ -410,5 +418,7 @@ jobs:
         run: node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
       - name: Academy Kakashi Konoha Writing closure and CE 256 factual consumption
         run: node tools/qa_academy_kakashi_konoha_closure_35900.js
+      - name: Academy Kakashi Konoha route closure
+        run: node tools/qa_academy_kakashi_konoha_route_closure_35910.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js
