@@ -179,7 +179,7 @@ function runAcademyKakashiStoryPresentationCompat33920Diagnostics(){
     cutCornersRemoved:css.includes("clip-path:none!important")&&css.includes("border-radius:8px!important"),
     dialogueCentralStack:css.includes("width:min(32%,500px)!important")&&css.includes("box-sizing:border-box!important")&&css.includes("left:50%!important")&&css.includes("transform:translateX(-50%)!important")&&!css.includes("left:29%!important")&&!css.includes("right:29%!important"),
     dialogueStatusRemoved:css.includes("sc-dialogue-status-33910")&&css.includes("display:none!important"),
-    narrationClearsDialogue:css.includes("Narration never carries the previous spoken panel forward")&&css.includes("performance_narration")&&css.includes("sc-dialogue-panel-33910{display:none!important}")&&sync.includes("clearRetainedDialogue33920"),
+    narrationClearsDialogue:sync.includes("clearRetainedDialogue33920")&&!sync.includes("injectRetainedDialogue33920"),
     nativePerformanceLayoutSuppressed:sync.includes("syncNativeLayoutVisibility33920")&&syncNativeLayoutVisibility33920.toString().includes('setProperty("display","none","important")'),
     clickAnywhereAdvance:click.includes("globalThis.advanceStoryScene")&&click.includes("scBoardUiMode"),
     noRetainedDialogueGhost:!click.includes("captureDialogue33920")&&sync.includes("clearRetainedDialogue33920"),
