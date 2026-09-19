@@ -1,5 +1,18 @@
 # Academy Kakashi Origin — STOP THE ASSASSIN — Post-MI-Death GO AFTER ANBU MARKED TARGET Verbatim Lock
 
+> **2026-09-20 CURRENT SUCCESSOR NOTICE**  
+> This exact AMT pursuit/Pakkun/Battle scene remains valid, but its old #244 / terminal stop boundaries are superseded.
+>
+> Current successors:
+> - field restraint / group transfer: current #244 closure + post-restraint collection authority;
+> - package-missing AMT dispositions: `Academy_Kakashi_Package_Missing_AMT_Post_Battle_Disposition_Lock_2026-09-19.md`;
+> - mixed lethal terminal scenes: `Academy_Kakashi_Mixed_Lethal_Terminal_Verbatim_Lock_2026-09-20.md`;
+> - nonlethal/defeat dynamic terminal scenes: `Academy_Kakashi_Dynamic_Terminal_State_Projection_Verbatim_Lock_2026-09-20.md`.
+>
+> CE #244 is CLOSED. Do not fail closed on the old text below.
+>
+> “STOP before later ANBU report/debrief” is historical; current exact terminal projection now continues the route.
+
 **Date:** 2026-09-19  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED — EXACT PLAYER-FACING / CAUSAL / RESOLVER AUTHORITY**  
