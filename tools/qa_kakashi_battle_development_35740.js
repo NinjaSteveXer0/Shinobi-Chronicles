@@ -14,7 +14,15 @@ let saves=0,chronicleCalls=0;
 globalThis.savePlayerData=()=>{saves+=1;return true;};
 globalThis.saveTestState=()=>true;
 const legacyTrainingSource={nin:"exam",tai:"practical",gen:"exam",buki:"practical",fuin:"exam",kin:"battle",stamina:"practical"};
-globalThis.isValidDisciplineTrainingSource=(id,source)=>legacyTrainingSource[String(id||"")]===String(source||"");
+const registeredTrainingSources=new Map();
+globalThis.registerDisciplineTrainingSource=(source,disciplineIds=[])=>{
+  const sourceId=String(source||"").trim(),ids=[...new Set((Array.isArray(disciplineIds)?disciplineIds:[]).map(String).filter(id=>Object.prototype.hasOwnProperty.call(legacyTrainingSource,id)))];
+  if(!sourceId||!ids.length)return{success:false,reason:"discipline_training_source_registration_invalid"};
+  const set=registeredTrainingSources.get(sourceId)||new Set();ids.forEach(id=>set.add(id));registeredTrainingSources.set(sourceId,set);
+  return{success:true,source:sourceId,disciplineIds:[...set]};
+};
+globalThis.getRegisteredDisciplineTrainingSource=source=>{const set=registeredTrainingSources.get(String(source||""));return set?{source:String(source),disciplineIds:[...set]}:null;};
+globalThis.isValidDisciplineTrainingSource=(id,source)=>legacyTrainingSource[String(id||"")]===String(source||"")||!!(registeredTrainingSources.get(String(source||""))&&registeredTrainingSources.get(String(source||"")).has(String(id||"")));
 globalThis.addDisciplineExp=(subject,id,amount,source)=>{
   developmentSources.push(String(source||""));
   if(!globalThis.isValidDisciplineTrainingSource(id,source))return false;
@@ -95,8 +103,8 @@ globalThis.renderVictoryOverlay=()=>true;
 
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","action_derived_development"),false,"legacy core gate must reject action-derived source before 34800 installs its authorised extension");
 load("runtime/alpha-kakashi-origin-rewards-34800.js");
-assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","action_derived_development"),true,"34800 must extend the frozen core source gate for technical development");
-assert.strictEqual(globalThis.isValidDisciplineTrainingSource("stamina","action_derived_development"),true,"34800 must extend the frozen core source gate for Stamina development");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","action_derived_development"),true,"34800 must register the authorised reusable action-derived source for technical development");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("stamina","action_derived_development"),true,"34800 must register the authorised reusable action-derived source for Stamina development");
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","practical"),true,"legacy Bukijutsu Practical source must remain valid");
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("nin","exam"),true,"legacy Ninjutsu Exam source must remain valid");
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","exam"),false,"34800 must not broaden unrelated legacy training sources");
@@ -265,7 +273,7 @@ console.log("Academy Kakashi Story Battle development + immediate MI reward 3574
 console.log("- exact action evidence -> discipline development through 34800");
 console.log("- PS / AMT resolved evidence -> Battle development even when action_attempted omits top-level skillId");
 console.log("- PS / AMT retain zero immediate cash/loot; terminal Origin rewards remain independently deferred");
-console.log("- frozen core validator initially rejects action_derived_development; 34800 installs the authorised runtime extension");
+console.log("- canonical validator initially rejects unregistered action_derived_development; 34800 registers the authorised reusable source");
 console.log("- legacy Exam / Practical / Battle source routing remains unchanged");
 console.log("- solo MI victory -> immediate 50 Ryō + Field Recovery Pill ×1 entitlement");
 console.log("- claim commits material package exactly once; no generic EXP");
