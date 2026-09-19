@@ -11951,6 +11951,18 @@ function processDisciplineLevelUps(
 // =========================================================
 // VALIDATE DISCIPLINE TRAINING SOURCE
 // =========================================================
+//
+// Deliberate Exams / Practicals / legacy Kinjutsu Battle training retain their
+// authored source restrictions. The reusable Action-Derived Development
+// contract additionally authorises exact resolver-provenanced Story/World/
+// Battle actions to feed the same canonical discipline ledger.
+//
+// This source does not infer eligibility. Callers must already hold exact
+// action/discipline evidence and apply their own source idempotence/caps.
+// =========================================================
+
+const ACTION_DERIVED_DISCIPLINE_SOURCE =
+  "action_derived_development";
 
 function isValidDisciplineTrainingSource(
   disciplineId,
@@ -11967,6 +11979,16 @@ function isValidDisciplineTrainingSource(
   if (!discipline) {
 
     return false;
+
+  }
+
+
+  if (
+    source ===
+      ACTION_DERIVED_DISCIPLINE_SOURCE
+  ) {
+
+    return true;
 
   }
 
@@ -12831,6 +12853,25 @@ function runDisciplinePhaseDiagnostics() {
           "kin",
           "practical"
         ) === false
+      )
+
+  });
+
+
+  results.push({
+
+    test:
+      "Action-derived development source is reusable across exact disciplines",
+
+    pass:
+      Object.keys(
+        SHINOBI_DISCIPLINES
+      ).every(
+        disciplineId =>
+          isValidDisciplineTrainingSource(
+            disciplineId,
+            ACTION_DERIVED_DISCIPLINE_SOURCE
+          ) === true
       )
 
   });
