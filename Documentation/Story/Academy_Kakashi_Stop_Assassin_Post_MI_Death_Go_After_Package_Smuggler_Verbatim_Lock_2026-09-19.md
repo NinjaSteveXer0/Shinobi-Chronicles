@@ -1,5 +1,13 @@
 # Academy Kakashi Origin — STOP THE ASSASSIN — Post-MI-Death GO AFTER PACKAGE SMUGGLER Verbatim Lock
 
+> **2026-09-20 CURRENT LETHAL-SURFACE NOTICE**  
+> The historical `CONTROLLED_DEFEATED -> KILL HIM / otherwise ATTEMPT TO KILL HIM` wording below is superseded for current player-facing Kakashi post-Battle disposition by:
+> `Academy_Kakashi_Post_Battle_Disposition_Simplification_2026-09-19.md`.
+>
+> Current PS post-Battle lethal choice, where offered, is **KILL HIM** and is deterministic after a valid Kakashi Battle victory.
+>
+> Historical resolver-determined PS lethal receipts remain projection/save compatibility only; they do not create a current `ATTEMPT TO KILL HIM` button.
+
 > **2026-09-20 CURRENT SUCCESSOR NOTICE**  
 > This exact pursuit/Battle scene remains valid, but its old #244 / terminal stop boundaries are superseded.
 >
