@@ -42,7 +42,8 @@ function getStorySceneDefinition(sceneId){return __qaScene&&__qaScene.sceneId===
 function getItemDefinition(id){if(id==="field_recovery_pill")return{id,name:"Field Recovery Pill"};if(id==="academy_training_tanto")return{id,name:"Academy Training Tanto"};return null;}
 function addItemToInventory(item){playerData.inventory=Array.isArray(playerData.inventory)?playerData.inventory:[];playerData.inventory.push(JSON.parse(JSON.stringify(item)));return true;}
 function addDisciplineExp(subjectId,disciplineId,amount,source){if(!isValidDisciplineTrainingSource(disciplineId,source))return false;const k=subjectId+"::"+disciplineId;__qaProgression[k]=Number(__qaProgression[k]||0)+Number(amount||0);return true;}
-function getCharacterDisciplineProgression(subjectId,disciplineId){const k=subjectId+"::"+disciplineId;return{characterId:subjectId,disciplineId,exp:Number(__qaProgression[k]||0)};}
+function getCharacterDisciplineProgression(subjectId,disciplineId){const k=subjectId+"::"+disciplineId;if(!__qaProgression[k]||typeof __qaProgression[k]!=="object")__qaProgression[k]={characterId:subjectId,disciplineId,exp:Number(__qaProgression[k]||0),level:1};return __qaProgression[k];}
+function processDisciplineLevelUps(subjectId,disciplineId){const p=getCharacterDisciplineProgression(subjectId,disciplineId);return{levelsGained:0,level:Number(p.level||1),exp:Number(p.exp||0),expToNext:999,statPointsGained:0,stat:0};}
 function completeChronicleOriginPrologue(originId,evidenceIds){__qaCompletionCalls.push({originId,evidenceIds:[...(evidenceIds||[])]});return{success:true,originId,evidenceIds:[...(evidenceIds||[])]};}
 function resetDataQA(instanceId){
   playerData={activityHistory:[],inventory:[],ryo:0};activityHistory=playerData.activityHistory;__qaProgression={};__qaCompletionCalls=[];
