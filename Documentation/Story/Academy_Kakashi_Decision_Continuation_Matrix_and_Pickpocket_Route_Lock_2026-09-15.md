@@ -1,5 +1,16 @@
 # Academy Kakashi Origin — Decision-Continuation Matrix + Pickpocket Route Lock
 
+> **2026-09-19 PACKAGE-MISSING AMT DISPOSITION SUPERSESSION**  
+> Section 7's previously partial package-missing AMT continuation is now closed by:
+> `Documentation/Story/Academy_Kakashi_Package_Missing_AMT_Post_Battle_Disposition_Lock_2026-09-19.md`
+> commit `e06e06df9da15858f09a72d318cce233dc9e8333`.
+>
+> After Kakashi/Pakkun defeat AMT on the package-missing **GO AFTER THE ORIGINAL TARGET** route, present exactly:
+> **KILL HIM / RESTRAIN HIM / BRING HIM TO THE ANBU / TAKE HIM TO THE UCHIHA POLICE FORCE**.
+>
+> No `LET HIM GO` and no `INTERROGATE` for Alpha.
+> No hidden control-state gate.
+
 **Date:** 2026-09-15  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-DIRECT PICKPOCKET LOCK + CONSOLIDATED DECISION-CONTINUATION AUTHORITY**
