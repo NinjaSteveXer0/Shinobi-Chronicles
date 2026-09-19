@@ -22,6 +22,8 @@ assert(src.includes('if(facts.terminalDebriefReached!==true)return{success:false
 
 const characterProgression={nin:{exp:0},tai:{exp:0},gen:{exp:0},buki:{exp:0},fuin:{exp:0},kin:{exp:0},stamina:{exp:0}};
 const playerData={ryo:0,inventory:[]};
+const legacyTrainingSources={nin:"exam",tai:"practical",gen:"exam",buki:"practical",fuin:"exam",kin:"battle",stamina:"practical"};
+const extraTrainingSources=new Map();
 const defs={
   field_recovery_pill:{id:"field_recovery_pill",name:"Field Recovery Pill",type:"consumable",stackable:true},
   academy_training_tanto:{id:"academy_training_tanto",name:"Academy Training Tanto",type:"weapon",weaponClass:"Tanto",stackable:false,statModifiers:{buki:1}}
@@ -32,7 +34,20 @@ const context={
   playerData,
   savePlayerData(){saves+=1;},
   saveTestState(){},
-  addDisciplineExp(characterId,disciplineId,amount){
+  registerDisciplineTrainingSource(source,disciplineIds=[]){
+    const id=String(source||"").trim(),ids=[...new Set((Array.isArray(disciplineIds)?disciplineIds:[]).map(String).filter(key=>Object.prototype.hasOwnProperty.call(legacyTrainingSources,key)))];
+    if(!id||!ids.length)return{success:false,reason:"discipline_training_source_registration_invalid"};
+    const set=extraTrainingSources.get(id)||new Set();ids.forEach(key=>set.add(key));extraTrainingSources.set(id,set);
+    return{success:true,source:id,disciplineIds:[...set]};
+  },
+  getRegisteredDisciplineTrainingSource(source){
+    const set=extraTrainingSources.get(String(source||""));return set?{source:String(source),disciplineIds:[...set]}:null;
+  },
+  isValidDisciplineTrainingSource(disciplineId,source){
+    return legacyTrainingSources[disciplineId]===source||!!(extraTrainingSources.get(String(source||""))&&extraTrainingSources.get(String(source||"")).has(disciplineId));
+  },
+  addDisciplineExp(characterId,disciplineId,amount,source){
+    if(!context.isValidDisciplineTrainingSource(disciplineId,source))return false;
     assert.strictEqual(characterId,"academy_kakashi");
     if(!characterProgression[disciplineId])return false;
     characterProgression[disciplineId].exp+=Number(amount)||0;
@@ -127,4 +142,4 @@ r=context.commitAcademyKakashiTerminalDebriefRewards34800(facts);
 assert.strictEqual(r.success,true);assert.strictEqual(r.idempotent,true);assert.strictEqual(r.ryo,0);assert.strictEqual(playerData.ryo,300);
 assert.strictEqual(playerData.inventory.filter(row=>row.id==="academy_training_tanto").length,1,"same-source retry must not duplicate weapon grant");
 
-console.log(JSON.stringify({pass:true,adapter:"34800-v3",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
+console.log(JSON.stringify({pass:true,adapter:"34800-v5",canonicalProgression:true,canonicalInventory:true,immediateSoloMiReward:{ryo:50,item:"field_recovery_pill",claimIdempotent:true},technicalBattleCap:6,staminaBattleCap:2,terminalRewardMaxRyo:250,immediateRewardOutsideDebriefCap:true,sourceScopedIdempotence:true,battleVictoryNotTerminalOriginReward:true,browserGoldenClaimed:false,saves},null,2));
