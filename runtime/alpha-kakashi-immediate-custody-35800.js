@@ -12,7 +12,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_immediate_custody_35800_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_immediate_custody_35800_v2_2026_09_19";
+const PATCH_ID="alpha_kakashi_immediate_custody_35800_v3_2026_09_19";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_BEAT="kak_scene05a_w_choice";
@@ -93,7 +93,7 @@ function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(ch){retu
 function currentMiState(){try{const s=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{},r=s.participantStates&&s.participantStates[MI];return String(r&&r.stateClass||"");}catch(_error){return"";}}
 function routeForBeat(beatId){for(const route of Object.values(ROUTES))if(route.sceneBeats.includes(String(beatId||"")))return route;return null;}
 function currentRoute(rt){rt=rt||active();return ROUTES[String(rt&&rt.localContext&&rt.localContext[ROUTE_KEY]||"")]||routeForBeat(rt&&rt.beatId)||null;}
-function eligibleSource(rt){rt=rt||active();return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&currentMiState()!=="DEAD";}
+function eligibleSource(rt){rt=rt||active();const local=String(rt&&rt.localContext&&rt.localContext.kakashiScene05AWMiStateClass||""),miState=local||currentMiState();return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&miState!=="DEAD";}
 function instance(rt){rt=rt||active();return String(rt&&rt.instanceId||"");}
 function sourceRef(rt){rt=rt||active();return String(rt&&rt.localContext&&rt.localContext.kakashiScene05AWBattleOccurrenceId||"");}
 
@@ -266,7 +266,7 @@ function hooks(){
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
 
 function diagnostics(){const m=scene()&&scene().beatMap instanceof Map?scene().beatMap:null;const checks={
-  patchId:PATCH_ID==="alpha_kakashi_immediate_custody_35800_v2_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_immediate_custody_35800_v3_2026_09_19",
   raisedRouteDialogueBand:installStyle.toString().includes("data-sc-kakashi-custody-stage=\'rooftop_custody\'")&&installStyle.toString().includes("top:22%!important")&&installStyle.toString().includes("transform:translateX(-50%)!important"),
   officeDialogueSafeAnchor:installStyle.toString().includes("right:7.5%!important")&&installStyle.toString().includes("top:14.5%!important")&&installStyle.toString().includes("width:min(25.5%,390px)!important"),
   authorities:AUTH.d06==="24b7956781d2da6d3d1f70ce18d1ef0de348cfae"&&AUTH.d08==="e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4"&&AUTH.e07==="6cb1f7e59ce05e75e35d3cc1f0d59cbf1722d0c4"&&AUTH.e09==="0dafcca4f13afe437b7b81d9ef6ec09569d36efc",
@@ -276,7 +276,7 @@ function diagnostics(){const m=scene()&&scene().beatMap instanceof Map?scene().b
   pursuitsClose:commitStart.toString().includes("kakashiScene05AWPackagePursuitEligible:false")&&commitStart.toString().includes("kakashiScene05AWAmtPursuitEligible:false"),
   policeNotAnbu:commitTransfer.toString().includes('destination=route.key==="ANBU"?"ANBU":"UCHIHA_POLICE"'),
   hiddenKnowledgeBoundary:commitHidden.toString().includes("kakashiKnowledgeGranted:false")&&commitHidden.toString().includes("kakashiLearnsHiddenOperationTruth:false"),
-  receiptSeparate:openReceipt.toString().includes("document.body.appendChild"),directCustodyEntrypoint:beginImmediateCustodyChoice35800.toString().includes("rt.beatId=route.firstBeat")&&globalThis.advanceStoryScene.toString().includes("beginImmediateCustodyChoice35800"),browserCapture:installBrowserChoiceCapture.toString().includes("beginImmediateCustodyChoice35800")&&installBrowserChoiceCapture.toString().includes("stopImmediatePropagation"),browserGoldenClaimed:false
+  receiptSeparate:openReceipt.toString().includes("document.body.appendChild"),sourceUsesCurrentBattleClassification:eligibleSource.toString().includes("kakashiScene05AWMiStateClass")&&eligibleSource.toString().includes("local||currentMiState()"),directCustodyEntrypoint:beginImmediateCustodyChoice35800.toString().includes("rt.beatId=route.firstBeat")&&globalThis.advanceStoryScene.toString().includes("beginImmediateCustodyChoice35800"),browserCapture:installBrowserChoiceCapture.toString().includes("beginImmediateCustodyChoice35800")&&installBrowserChoiceCapture.toString().includes("stopImmediatePropagation"),browserGoldenClaimed:false
 };const failed=Object.entries(checks).filter(function(x){return x[0]!=="browserGoldenClaimed"&&x[1]!==true;}).map(function(x){return x[0];});return{pass:failed.length===0,checks,failed,authorities:AUTH,browserGoldenClaimed:false};}
 globalThis.runAcademyKakashiImmediateCustody35800Diagnostics=diagnostics;
 globalThis.SC_ALPHA_KAKASHI_IMMEDIATE_CUSTODY_35800=Object.freeze({patchId:PATCH_ID,authorities:AUTH,anbuFirstBeat:D06,policeFirstBeat:E06,receiptBeatId:RECEIPT,exitBeatId:EXIT,wireChoices,beginImmediateCustodyChoice:beginImmediateCustodyChoice35800,commitStart,commitTransfer,commitReport,commitHidden,diagnostics,browserGoldenClaimed:false});
