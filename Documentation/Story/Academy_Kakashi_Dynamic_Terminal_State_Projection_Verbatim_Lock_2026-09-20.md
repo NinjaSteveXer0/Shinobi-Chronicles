@@ -927,6 +927,146 @@ The terminal framework must not erase these differences merely because final pac
 
 ---
 
+# 24. Knowledge-bearing report modules
+
+Use these only where the committed Chronicle says Kakashi legitimately learned the information.
+
+---
+
+## 24A. MOVE IN CLOSER SUCCESS — contingency Knowledge
+
+The ANBU operative finishes the physical-outcome questions.
+
+Then:
+
+**ANBU OPERATIVE:**  
+“You heard them before you moved.”
+
+**KAKASHI:**  
+“Yes.”
+
+**ANBU OPERATIVE:**  
+“What did you learn?”
+
+**KAKASHI:**  
+“If the street stayed clear, the original carrier was supposed to hand the package over.”
+
+**ANBU OPERATIVE:**  
+“And if it didn't?”
+
+**KAKASHI:**  
+“He kept moving with it.”
+
+**ANBU OPERATIVE:**  
+“Destination?”
+
+**KAKASHI:**  
+“They didn't say.”
+
+## Narration
+
+Kakashi gives exactly what he heard.
+
+Nothing more.
+
+### Private Minato projection
+
+**MINATO:**  
+“He stayed long enough to understand the contingency.”
+
+**ANBU OPERATIVE:**  
+“Yes.”
+
+**MINATO:**  
+“And not long enough to invent the part they never said.”
+
+### Chronicle Receipt
+
+**Intelligence — Handoff contingency overheard.**  
+**Downstream package destination — Unknown.**
+
+---
+
+## 24B. ASK WHERE THE PACKAGE WAS GOING — limited Knowledge
+
+Use after the authored information scene where Kakashi learns:
+
+- AMT's role ended at the handoff;
+- PS was meant to take the package onward;
+- AMT did not know PS's downstream destination.
+
+### Rooftop report
+
+**ANBU OPERATIVE:**  
+“You questioned the original target.”
+
+**KAKASHI:**  
+“Yes.”
+
+**ANBU OPERATIVE:**  
+“What did he tell you?”
+
+**KAKASHI:**  
+“His job ended at the handoff.”
+
+**ANBU OPERATIVE:**  
+“And after that?”
+
+**KAKASHI:**  
+“The receiver was supposed to take it somewhere else.”
+
+**ANBU OPERATIVE:**  
+“Where?”
+
+**KAKASHI:**  
+“He didn't know.”
+
+The operative studies him.
+
+**ANBU OPERATIVE:**  
+“You believe that.”
+
+**KAKASHI:**  
+“He'd asked too.”
+
+### Private Minato projection
+
+**MINATO:**  
+“He stopped to ask a question before he chose the fight.”
+
+**ANBU OPERATIVE:**  
+“Yes.”
+
+**MINATO:**  
+“And learned the carrier didn't know the destination either.”
+
+**ANBU OPERATIVE:**  
+“Yes.”
+
+Minato looks at the report.
+
+**MINATO:**  
+“Useful.”
+
+The operative waits.
+
+**MINATO:**  
+“Not because it gives us a destination.”
+
+He taps the line once.
+
+**MINATO:**  
+“Because it tells us where the carrier's Knowledge ended.”
+
+### Chronicle Receipt
+
+**Intelligence — Original carrier's role ended at handoff.**  
+**Downstream destination — Unknown to original carrier.**
+
+Do not invent a downstream location.
+
+---
+
 # 24. Final lock
 
 > **All nonlethal / defeat / pursuit / custody / release terminal states now have exact current-quality report, Minato-evaluation and Receipt expression modules.**
