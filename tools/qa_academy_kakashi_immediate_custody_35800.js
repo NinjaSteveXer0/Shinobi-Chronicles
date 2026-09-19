@@ -24,9 +24,10 @@ globalThis.SC_ALPHA_ORIGIN_32900={
   findOccurrence(id){return store.get(String(id||""))||null;}
 };
 let ref=0;
+let snapshotMiState="DEFEATED_BUT_NOT_CONTROLLED";
 globalThis.SC_STORY_DECISION_REALISATION_34000={
   stableRef(prefix,payload){return prefix+":"+String(payload&&payload.instance||payload&&payload.source||payload&&payload.transfer||"ref")+":"+(++ref);},
-  getStoryUnitSnapshot(){return{participantStates:{[MI]:{participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"}}};}
+  getStoryUnitSnapshot(){return{participantStates:{[MI]:{participantRef:MI,stateClass:snapshotMiState}}};}
 };
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
   commitTerminalDebrief(){debriefCalls+=1;return{success:true,occurrenceId:"qa-terminal-"+debriefCalls};},
@@ -58,7 +59,7 @@ globalThis.advanceStoryScene=function baseAdvance(choiceId=null){
 function fresh(instance){
   return{sceneId:SCENE_ID,instanceId:instance,beatId:SOURCE_BEAT,localContext:{
     kakashiScene05AWEntered:true,kakashiScene05AWPursuitEligible:true,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true,
-    kakashiScene05AWBattleOccurrenceId:"battle-"+instance,kakashiScene05AWTurnCount:3
+    kakashiScene05AWBattleOccurrenceId:"battle-"+instance,kakashiScene05AWTurnCount:3,kakashiScene05AWMiStateClass:"DEFEATED_BUT_NOT_CONTROLLED"
   },battleResume:{authored:null}};
 }
 function drainUntil(target,max=200){
@@ -80,11 +81,14 @@ assert.strictEqual(diag.pass,true,"35800 diagnostics failed: "+JSON.stringify(di
 assert.strictEqual(diag.checks.raisedRouteDialogueBand,true,"raised rooftop/Police dialogue safe band missing");
 assert.strictEqual(diag.checks.officeDialogueSafeAnchor,true,"Hokage Office dialogue safe anchor missing");
 assert.strictEqual(diag.checks.directCustodyEntrypoint,true,"immediate custody choices must own a direct runtime entrypoint");
+assert.strictEqual(diag.checks.sourceUsesCurrentBattleClassification,true,"current Scene05 battle classification must outrank stale global participant state");
 assert.strictEqual(MOD.wireChoices(),true);
+snapshotMiState="DEAD"; // stale prior-run snapshot must not disable the current battle's live classification
 
 let out=globalThis.advanceStoryScene(ANBU_CHOICE);
 assert.strictEqual(out.success,true,"ANBU source choice failed: "+JSON.stringify(out));
 assert.strictEqual(current.beatId,MOD.anbuFirstBeat);
+snapshotMiState="DEFEATED_BUT_NOT_CONTROLLED";
 assert.strictEqual(current.localContext.kakashiScene05AWPackagePursuitEligible,false);
 assert.strictEqual(current.localContext.kakashiScene05AWAmtPursuitEligible,false);
 let start=fact(current.localContext.kakashiScene06W2DCustodyOccurrenceId);
