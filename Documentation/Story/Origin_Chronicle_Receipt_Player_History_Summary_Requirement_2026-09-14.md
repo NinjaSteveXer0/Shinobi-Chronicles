@@ -4,6 +4,10 @@
 **Owner:** Writing / Story with CE / Codex / Coordination semantics  
 **Status:** **BINDING PLAYER-FACING ORIGIN COMPLETION REQUIREMENT**
 
+> **2026-09-20 CE causal-presentation extension**  
+> Consume `Documentation/Coordination/CE_Interactive_Narrative_Affordance_Intention_Reincorporation_and_Causal_Presentation_Doctrine_2026-09-20.md` (commit `64399463d1870b752954ffceaaf31629a5961691`).  
+> The Receipt remains read-only and chronological facts remain exact, but presentation should prefer **causal/consequence grouping** over a raw event-log dump where the committed provenance supports that relationship. Never fabricate causality from sequence alone.
+
 ## Purpose
 
 After an Origin's final authored scene resolves, the player must see a concise summary of what CE actually entered into that Character's personal Chronicle before `YOUR CHRONICLE BEGINS`.
