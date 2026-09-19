@@ -1,10 +1,10 @@
-# Academy Kakashi Origin — WATCH THE EXCHANGE -> BEAT HER TO THE PACKAGE — Verbatim Scene Family
+# Academy Kakashi Origin — WATCH THE EXCHANGE -> SECURE THE PACKAGE BEFORE THE ASSASSIN — Verbatim Scene Family
 
 **Date:** 2026-09-19  
 **Owner:** Writing / Story — Konoha under Stephen delegated-authoring authority  
 **Status:** **LOCKED VERBATIM — DELEGATED CLEAN CONTINUATION / IMPLEMENTATION READY**  
 **Branch:** `SCENE_03A / CHOICE_01 / BRANCH_C`  
-**Player-facing entry choice:** **BEAT HER TO THE PACKAGE**  
+**Player-facing entry choice:** **SECURE THE PACKAGE BEFORE THE ASSASSIN**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
 ## Consumed authority
@@ -22,13 +22,13 @@ This is a resolver route.
 
 Success extracts the package and withdraws.
 
-Failure reconverges directly into the existing **GO FOR THE PACKAGE** PS+MI 2-v-1 Battle state.
+Failure reconverges directly into the existing **SECURE THE PACKAGE** PS+MI 2-v-1 Battle state.
 
 Do not duplicate or reroll that Battle branch.
 
 ---
 
-# 1. BEAT HER TO THE PACKAGE
+# 1. SECURE THE PACKAGE BEFORE THE ASSASSIN
 
 **Backdrop:** `Kakashi Origin Backdrop/sakura_tree_night.png`
 
@@ -301,7 +301,7 @@ The resolver failure itself is the causal bridge into the shared 2-v-1 state.
 
 # Final lock
 
-> **BEAT HER TO THE PACKAGE is a race, not a renamed GO FOR THE PACKAGE branch.**
+> **SECURE THE PACKAGE BEFORE THE ASSASSIN is a race, not a renamed SECURE THE PACKAGE branch.**
 
 > **Success: Kakashi extracts the objective cleanly and withdraws before the scene becomes a Battle.**
 
