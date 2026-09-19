@@ -1,5 +1,10 @@
 # Academy Kakashi Origin — STOP THE ASSASSIN 1–4 Turn Dual-Pursuit Fork Correction
 
+> **2026-09-20 PRODUCTION SEQUENCING COMPLETE**  
+> The separate exact Scene 05A-W rewrite and immediate-custody scenes required by the historical production sequencing below have since been completed and consumed.
+>
+> Current exact STOP THE ASSASSIN authority includes the 1–4 dual-pursuit fork, immediate ANBU/Police custody, restraint-and-continue, lethal continuation and current terminal projections.
+
 **Date:** 2026-09-18  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-DIRECT STORY / CAUSAL CORRECTION — BINDING**
