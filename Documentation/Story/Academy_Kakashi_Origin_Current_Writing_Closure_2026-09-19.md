@@ -1,5 +1,17 @@
 # Academy Kakashi Origin — Current Writing Closure
 
+> **2026-09-20 100% WRITING SUCCESSOR**  
+> Stephen's subsequent all-path audit found terminal-expression gaps that this 2026-09-19 closure had treated as state-driven implementation detail.
+>
+> Current authoritative closure is:
+> `Documentation/Story/Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20.md`
+>
+> Current resolved audit:
+> `Documentation/Story/Academy_Kakashi_100_Percent_Writing_Path_Variation_Audit_2026-09-20.md`
+> @ `4776bfca24c266a7702d711b793287d9798319b8`.
+>
+> Do not use this older file's “Writing CLOSED” statement to bypass the newer exact mixed-lethal / dynamic-terminal / AMT-Police / AMT-defeat authorities.
+>
 **Date:** 2026-09-19  
 **Owner:** Stephen / Writing / Story — Konoha  
 **Status:** **CURRENT SUCCESSOR WRITING CLOSURE — AUTHORITATIVE OVER OLDER PATCHED CLOSURE SUMMARIES**  
