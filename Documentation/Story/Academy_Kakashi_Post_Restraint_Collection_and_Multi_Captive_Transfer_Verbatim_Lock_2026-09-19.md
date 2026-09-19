@@ -139,7 +139,7 @@ No restraint timing penalty is added.
 
 This is available after Kakashi defeats Package Smuggler and the existing PS <=3 timing still leaves ANBU Marked Target reachable.
 
-**Backdrop:** `Kakashi Origin Backdrop/konoha_alleyway.png`
+**Backdrop:** `Kakashi Origin Backdrop/konoha_alleyway_alt_night.png`
 
 ## Narration
 
@@ -369,7 +369,7 @@ because this retraces Kakashi's pursuit.
 
 ## 4A. Collect Package Smuggler
 
-**Backdrop:** `Kakashi Origin Backdrop/konoha_alleyway.png`
+**Backdrop:** `Kakashi Origin Backdrop/konoha_alleyway_alt_night.png`
 
 ## Narration
 
