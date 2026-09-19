@@ -1,5 +1,12 @@
 # Academy Kakashi Origin — STOP THE ASSASSIN Post-MI Choice Surface Addendum
 
+> **2026-09-20 CURRENT CHOICE-SURFACE SUCCESSOR**  
+> This file's historical `KILL / ATTEMPT TO KILL` and `RESTRAIN / resolver-owned equivalent` split is superseded for current player-facing Kakashi by the 2026-09-19 post-Battle simplification and completed #244 restraint/collection authority.
+>
+> Current exact presentation preserves direct authored **KILL HER** and **RESTRAIN HER AND CONTINUE** where those intents are available, without hidden control-state renaming.
+>
+> Existing committed legacy lethal-attempt histories remain valid Chronicle provenance.
+
 **Date:** 2026-09-18  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED / BINDING CHOICE-SURFACE AUTHORITY**
