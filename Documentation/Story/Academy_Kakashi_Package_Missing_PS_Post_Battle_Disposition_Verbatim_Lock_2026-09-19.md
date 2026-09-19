@@ -127,23 +127,148 @@ At ANBU report, Kakashi gives exact secured location for collection.
 
 # 3. BRING HIM TO THE ANBU
 
-Consume the approved singular PS Return to ANBU performance from:
+**Backdrop:** `Kakashi Origin Backdrop/konoha_alleyway_alt_night.png`
 
-`Documentation/Story/Academy_Kakashi_Supplemental_ANBU_Returns_PS_AMT_All_Three_Verbatim_Lock_2026-09-19.md`
+## Narration
 
-with one factual projection difference:
+Kakashi secures Package Smuggler's wrists with ninja wire.
 
-- package is **not** recovered on this chronology;
-- Kakashi reports that AMT escaped with it.
+The man glances toward the route ANBU Marked Target used to escape.
 
-Do not use the package-recovered lines from the ordinary PS-return route.
+## Dialogue
 
-At completed transfer:
+**PACKAGE SMUGGLER:**  
+“You're taking me back without the package.”
+
+**KAKASHI:**  
+“Yes.”
+
+**PACKAGE SMUGGLER:**  
+“That feels incomplete.”
+
+**KAKASHI:**  
+“It is.”
+
+## Narration
+
+Kakashi takes hold of the restraint line.
+
+Package Smuggler studies him for a moment.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“You're not going to pretend otherwise?”
+
+**KAKASHI:**  
+“No.”
+
+**PACKAGE SMUGGLER:**  
+“Unusual.”
+
+## Narration
+
+They start walking.
+
+**BLACK WIPE**
+
+### ANBU rooftop
+
+**Backdrop:** `Kakashi Origin Backdrop/rooftop_night.png`
+
+The ANBU operative turns as Kakashi arrives.
+
+His attention goes to the restrained man.
+
+Then to Kakashi's empty hands.
+
+## Dialogue
+
+**ANBU OPERATIVE:**  
+“Report.”
+
+**KAKASHI:**  
+“The handoff was aborted.”
+
+**ANBU OPERATIVE:**  
+“The package?”
+
+**KAKASHI:**  
+“The original carrier escaped with it.”
+
+## Narration
+
+The operative absorbs that before looking at Package Smuggler.
+
+## Dialogue
+
+**ANBU OPERATIVE:**  
+“And him?”
+
+**KAKASHI:**  
+“He was the intended receiver.”
+
+**PACKAGE SMUGGLER:**  
+“Intended.”
+
+## Narration
+
+The operative ignores the correction.
+
+## Dialogue
+
+**ANBU OPERATIVE:**  
+“You chose him over the carrier.”
+
+**KAKASHI:**  
+“Yes.”
+
+**ANBU OPERATIVE:**  
+“Why?”
+
+## Narration
+
+Kakashi looks at Package Smuggler.
+
+Then back to the operative.
+
+## Dialogue
+
+**KAKASHI:**  
+“He detected me.”
+
+A beat.
+
+**KAKASHI:**  
+“And he knew more about the exchange than I did.”
+
+**PACKAGE SMUGGLER:**  
+“Still do.”
+
+## Narration
+
+The operative steps forward.
+
+## Dialogue
+
+**ANBU OPERATIVE:**  
+“Transfer custody.”
+
+## Narration
+
+Kakashi hands over the restraint line.
+
+The operative establishes control.
+
+Only then does Kakashi let go.
+
+## System / Resolver
 
 - PS -> ANBU institutional custody;
-- package remains missing.
-
----
+- package remains missing with escaped AMT;
+- no package recovery is inferred;
+- no MI;
+- no Pakkun.
 
 # 4. TAKE HIM TO THE UCHIHA POLICE FORCE
 
