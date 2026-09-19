@@ -1,5 +1,12 @@
 # Academy Kakashi Origin — Final Closure Audit Gate
 
+> **2026-09-19 CURRENT CLOSURE POINTER**  
+> Current Academy Kakashi Writing closure is:
+> `Documentation/Story/Academy_Kakashi_Origin_Current_Writing_Closure_2026-09-19.md`
+> @ `f8a7f9bceb59b9bddda3d919a58851669f5cd740`.
+>
+> Use that successor map for current branch-completion status and exact later authority. Historical remaining-inventory text below must not reopen scenes already closed by the 2026-09-19 successor locks.
+>
 **Date:** 2026-09-14  
 **Owner:** Stephen / Writing / Story — Konoha  
 **Status:** **ALPHA CLOSURE CONTROL — RECONCILED TO CURRENT AUTHORITY**
