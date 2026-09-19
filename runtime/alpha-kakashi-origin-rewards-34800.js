@@ -15,7 +15,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_ORIGIN_REWARDS_34800)return;
 
-const PATCH_ID="alpha_kakashi_origin_rewards_34800_v3_2026_09_18";
+const PATCH_ID="alpha_kakashi_origin_rewards_34800_v4_2026_09_19";
 const ROUTE="academy_kakashi_origin_reward";
 const KAKASHI="academy_kakashi";
 const ITEM_SOURCE="kak_origin_item_field_recovery_resupply";
@@ -31,6 +31,7 @@ const MI_BATTLE_CONFIG="academy_kakashi_origin_battle_mi_1v1";
 const MI_PARTICIPANT="academy_kakashi_origin_masked_interceptor";
 const MI_REWARD_RYO=50;
 const DISCIPLINE_ID=Object.freeze({ninjutsu:"nin",taijutsu:"tai",genjutsu:"gen",bukijutsu:"buki",fuinjutsu:"fuin",kinjutsu:"kin",stamina:"stamina"});
+const ACTION_DERIVED_DISCIPLINE_SOURCE="action_derived_development";
 const WORLD_AUTHORITY_COMMIT="91f5969b20e270b3ef7d148342f28a1668b4eba1";
 const COMBAT_AUTHORITY_COMMIT="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8";
 const PROGRESSION_AUTHORITY_COMMIT="54314cc29e1374783cae0a0d90654cc9a2316a45";
@@ -76,7 +77,7 @@ function recordTechnicalDisciplineDevelopment({sourceId,discipline,executionClas
   const used=battleKey?Number(root.battleDisciplineTotals[battleKey]||0):0;
   const amount=battleKey?Math.max(0,Math.min(authoredAmount,6-used)):authoredAmount;
   if(amount<=0){registerSource("discipline_development",sourceId,{subjectId,discipline:key,executionClass,battleOccurrenceId,amount:0,capReached:true});return{success:true,idempotent:false,discipline:key,amount:0,battleCap:6};}
-  const applied=addDisciplineExp(subjectId,disciplineId,amount,"kakashi_origin_action_development");
+  const applied=addDisciplineExp(subjectId,disciplineId,amount,ACTION_DERIVED_DISCIPLINE_SOURCE);
   if(applied===false||applied==null)return{success:false,reason:"canonical_progression_commit_failed",discipline:key};
   if(battleKey)root.battleDisciplineTotals[battleKey]=used+amount;
   registerSource("discipline_development",sourceId,{subjectId,discipline:key,disciplineId,executionClass,battleOccurrenceId,amount});save();
@@ -88,7 +89,7 @@ function recordStaminaDevelopment({sourceId,mitigationAmount,battleOccurrenceId,
   if(sourceReceipt("stamina_development",sourceId,subjectId))return{success:true,idempotent:true,amount:0};
   const root=ensureRoot(),battleKey=String(battleOccurrenceId),used=Number(root.battleStaminaTotals[battleKey]||0),amount=used<2?1:0;
   if(amount>0){
-    const applied=addDisciplineExp(subjectId,DISCIPLINE_ID.stamina,1,"kakashi_origin_stamina_mitigation");
+    const applied=addDisciplineExp(subjectId,DISCIPLINE_ID.stamina,1,ACTION_DERIVED_DISCIPLINE_SOURCE);
     if(applied===false||applied==null)return{success:false,reason:"canonical_stamina_progression_commit_failed"};
     root.battleStaminaTotals[battleKey]=used+1;
   }
@@ -240,6 +241,7 @@ function diagnostics(){
     itemSourceExact:ITEM_SOURCE==="kak_origin_item_field_recovery_resupply"&&ITEM_ID==="field_recovery_pill",
     weaponSourceExact:WEAPON_SOURCE==="kak_origin_weapon_exceptional_training_tanto"&&WEAPON_ID==="academy_training_tanto",
     developmentUsesCanonicalProgression:recordTechnicalDisciplineDevelopment.toString().includes("addDisciplineExp")&&recordStaminaDevelopment.toString().includes("addDisciplineExp"),
+    actionDerivedSourceExact:ACTION_DERIVED_DISCIPLINE_SOURCE==="action_derived_development"&&recordTechnicalDisciplineDevelopment.toString().includes("ACTION_DERIVED_DISCIPLINE_SOURCE")&&recordStaminaDevelopment.toString().includes("ACTION_DERIVED_DISCIPLINE_SOURCE"),
     inventoryUsesCanonicalGrant:grantCatalogueItem.toString().includes("addItemToInventory")&&grantCatalogueItem.toString().includes("getItemDefinition"),
     technicalBattleCap:recordTechnicalDisciplineDevelopment.toString().includes("6-used"),
     staminaBattleCap:recordStaminaDevelopment.toString().includes("used<2?1:0"),
