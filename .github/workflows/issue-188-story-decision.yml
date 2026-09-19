@@ -265,8 +265,8 @@ jobs:
           grep -Fq 'left:67%!important' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'left:41%!important' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'sc-w2c-office-anbu-enter-35770' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'PACKAGE RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'PACKAGE RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq '<b>PACKAGE</b>RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-ending-35770.js
+          grep -Fq '<b>PACKAGE</b>RECOVERED · HIDDEN OPERATION' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'Live State Callouts' runtime/alpha-story-scene-board-33900.js
