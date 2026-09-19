@@ -218,7 +218,8 @@ jobs:
           grep -Fq 'alpha_kakashi_scene03a_35700_v6_2026_09_19' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchMiBurst35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchAmtBreakaway35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'sc-watch-amt-offstage-35700' runtime/alpha-kakashi-scene03a-35700.js\n          grep -Fq 'left:43%!important' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq 'sc-watch-amt-offstage-35700' runtime/alpha-kakashi-scene03a-35700.js
+          grep -Fq 'left:43%!important' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'kakashi_scene_board_model_v8_33910_2026_09_19' runtime/alpha-kakashi-scene-board-polish-33910.js
