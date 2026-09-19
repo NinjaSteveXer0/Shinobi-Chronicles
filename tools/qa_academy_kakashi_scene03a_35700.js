@@ -67,13 +67,13 @@ assert.strictEqual(diag.checks.watchExchangeMotionLanguage,true,"Watch the Excha
 const scene03Source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene03a-35700.js"),"utf8");
 assert(scene03Source.includes("scWatchMiBurst35700"),"MI burst animation missing");
 assert(scene03Source.includes("scWatchAmtBreakaway35700"),"AMT breakaway animation missing");
-assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-breakaway-35700):not(.sc-watch-amt-offstage-35700)")&&scene03Source.includes("opacity:1!important;filter:none!important"),"WATCH THE EXCHANGE must keep present actors vivid without suppressing authored entry/exit opacity");
-assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes("left:43%!important")&&scene03Source.includes("right:4%!important"),"WATCH final choice must pin Kakashi / MI / PS to distinct non-overlapping lanes");
-assert(scene03Source.includes("sc-watch-amt-offstage-35700")&&scene03Source.includes("index>=15&&amtNode"),"AMT must remain off-stage after his authored breakaway instead of snapping back");
+assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes(":not(.sc-watch-mi-burst-35700):not(.sc-watch-amt-breakaway-35700)")&&scene03Source.includes("opacity:1!important;filter:none!important"),"WATCH THE EXCHANGE must keep present actors vivid without suppressing the simultaneous AMT-exit / MI-entry cue");
+assert(scene03Source.includes("data-watch-stage=\'choice-ready\'")&&scene03Source.includes("left:22%!important")&&scene03Source.includes("right:22%!important"),"WATCH final choice must pin only MI / PS to distinct non-overlapping lanes");
+assert(scene03Source.includes('if(index===12){')&&scene03Source.includes('amtNode.classList.add("sc-watch-amt-breakaway-35700")')&&scene03Source.includes('miNode.classList.add("sc-watch-mi-burst-35700")'),"Cue 13 must animate AMT off-screen at the exact moment MI appears");
 assert(scene03Source.includes("sc-watch-handoff-giver-35700"),"package handoff animation missing");
 assert(scene03Source.includes("sc-watch-mi-cutoff-35700"),"MI interception animation missing");
 assert(scene03Source.includes("sc-watch-ps-turn-35700")&&!scene03Source.includes("sc-watch-ps-escape-35700"),"Package Smuggler must hold the exchange lane before branch-specific escape");
-assert(scene03Source.includes("left:42%!important")&&scene03Source.includes("scWatchAmtBreakaway35700"),"MI must enter the active center lane while AMT breaks away");
+assert(scene03Source.includes("data-watch-stage=\'interceptor-swap\'")&&scene03Source.includes("left:42%!important")&&scene03Source.includes("scWatchAmtBreakaway35700"),"MI must enter the active center lane while AMT exits on cue 13");
 assert.strictEqual(MOD.cueCount,18,"Scene 03A cue count drifted");
 assert.deepStrictEqual(MOD.objectives,{initial:"Stop the package from falling into the wrong hands.",postHandoff:"Retrieve the package."},"Scene 03A objective wording drifted");
 assert.strictEqual(diag.checks.objectiveChangesAtPackageTransfer,true,"Scene 03A objective does not change at exact package-transfer cue");
