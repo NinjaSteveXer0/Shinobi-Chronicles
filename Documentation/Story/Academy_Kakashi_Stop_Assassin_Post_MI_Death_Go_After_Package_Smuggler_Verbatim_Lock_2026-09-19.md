@@ -1,5 +1,18 @@
 # Academy Kakashi Origin — STOP THE ASSASSIN — Post-MI-Death GO AFTER PACKAGE SMUGGLER Verbatim Lock
 
+> **2026-09-20 CURRENT SUCCESSOR NOTICE**  
+> This exact pursuit/Battle scene remains valid, but its old #244 / terminal stop boundaries are superseded.
+>
+> Current successors:
+> - field restraint / collection / group transfer: `Academy_Kakashi_Post_Restraint_Collection_and_Multi_Captive_Transfer_Verbatim_Lock_2026-09-19.md`;
+> - package-missing / package-recovered current disposition law under the global post-Battle simplification;
+> - mixed lethal terminal scenes: `Academy_Kakashi_Mixed_Lethal_Terminal_Verbatim_Lock_2026-09-20.md`;
+> - nonlethal/defeat dynamic terminal scenes: `Academy_Kakashi_Dynamic_Terminal_State_Projection_Verbatim_Lock_2026-09-20.md`.
+>
+> CE #244 is CLOSED. Do not fail closed on the old text below.
+>
+> “STOP before later ANBU report/debrief” is historical; current exact terminal projection now continues the route.
+
 **Date:** 2026-09-19  
 **Owner:** Stephen / Writing — Konoha  
 **Status:** **STEPHEN-APPROVED — EXACT PLAYER-FACING / CAUSAL / RESOLVER AUTHORITY**  
