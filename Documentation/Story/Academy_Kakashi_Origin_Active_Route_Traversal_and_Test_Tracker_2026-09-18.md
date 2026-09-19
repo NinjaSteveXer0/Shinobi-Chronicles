@@ -216,3 +216,43 @@ Loss chronology is now Writing-complete through:
 `MI defeats Kakashi -> RETURN TO ANBU -> rooftop ANBU report -> hidden Hokage Office -> Chronicle Receipt / Origin closure`.
 
 Coding issue #249 has been updated to consume this final loss-route scene. Browser validation remains separate after implementation.
+
+
+## 2026-09-19 approval advance — STOP THE ASSASSIN pursuit successors locked
+
+Stephen approved the remaining post-MI-death pursuit writing requested by Coding issue #252.
+
+Durable locks:
+
+1. **MI dead -> GO AFTER PACKAGE SMUGGLER**
+   - `Documentation/Story/Academy_Kakashi_Stop_Assassin_Post_MI_Death_Go_After_Package_Smuggler_Verbatim_Lock_2026-09-19.md`
+   - commit `bf30ca7dfff9f850bebe978acdd8830f16758042`
+   - closes chase / catch-up, PS Battle, separate package-recovery occurrence, post-PS lethal/disposition timing, qualifying PS->AMT continuation, Pakkun AMT entry, AMT Battle return, and corrected AMT-loss package-state resolver wording.
+
+2. **MI dead -> GO AFTER ANBU MARKED TARGET**
+   - `Documentation/Story/Academy_Kakashi_Stop_Assassin_Post_MI_Death_Go_After_ANBU_Marked_Target_Verbatim_Lock_2026-09-19.md`
+   - commit `e18729844922461c654481745e48a6eac20649cd`
+   - closes direct AMT pursuit, permanent PS-route closure, mandatory Pakkun entry on legitimate AMT reach, AMT Battle, state-derived disposition, and corrected package-custody resolution on Kakashi defeat.
+
+Both locks preserve:
+- deterministic MI KILL vs resolver-successful lethal-attempt provenance;
+- `Kill != automatic Origin ending`;
+- package custody independent from participant life/death;
+- PS <=3 benchmark for later AMT reach where applicable;
+- Pakkun continuity after legitimate AMT reach;
+- Kakashi's established `PAKKUN: "This yours?" -> KAKASHI: "Apparently."` exchange;
+- AMT Battle victory/defeat never granting package custody by implication.
+
+### Remaining STOP THE ASSASSIN Writing blocker
+
+Only the factual **RESTRAIN / ATTEMPT TO RESTRAIN AND CONTINUE** consequence family remains blocked on CE #244.
+
+The approved future choice projection is now recorded:
+- another objective remains -> **RESTRAIN HIM AND CONTINUE**;
+- final single restrained participant -> **RESTRAIN HIM AND TURN HIM INTO ANBU** / **RESTRAIN HIM AND TURN HIM INTO THE UCHIHA POLICE FORCE**;
+- earlier restrained captives also remain -> **RESTRAIN AND TURN THEM INTO ANBU** / **RESTRAIN AND TURN THEM INTO THE UCHIHA POLICE FORCE**.
+
+Do not author or implement field-secured custody, later collection, escape/intervention, or group-transfer facts until #244 publishes the reusable semantic contract.
+
+Coding routing: **SEND NOW -> issue #252**.
+Stephen relay: **NONE**.
