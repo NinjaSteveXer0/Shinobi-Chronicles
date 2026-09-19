@@ -1,5 +1,14 @@
 # Academy Kakashi Scene-by-Scene Writing -> Coding Workflow Lock
 
+> **2026-09-19 PROCESS SUPERSESSION NOTICE**  
+> The current production workflow is now governed by:
+> `Documentation/Story/Writing_Konoha_Production_Workflow_Benchmark_and_Change_Control_2026-09-19.md`
+> commit `2f32fe97394602d76ba7d4da4482b25359929b7e`.
+>
+> This older document remains authoritative for exact approval gates, Objective/System-Resolver visibility, branch identity, verbatim GitHub commits and Coding non-rewrite boundaries.
+>
+> It is superseded where it requires artificial one-scene-only batching or forbids Writing from authoring a coherent connected scene family before Coding implements the immediately previous scene. Current rule: use the smallest coherent tranche Stephen can meaningfully review and current authority supports.
+
 Status: **STEPHEN-LOCKED ACTIVE WORKFLOW — DO NOT BYPASS**
 
 Date: 2026-09-17
