@@ -53,7 +53,7 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v7_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v7_33910_2026_09_19'));
+  assert("kakashi_v8_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v8_33910_2026_09_19'));
   assert("watch_exchange_expanded_projection",d33910.checks&&d33910.checks.expandedWatchExchangeProjection===true,d33910);
 
   assert("scene1_authority_pinned",kakashiV4Source.includes('d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91'));
@@ -120,5 +120,5 @@ try{
   assert("legacy_battle_stubs_remain_fail_closed_until_current_scene_binding",major.choices.find(c=>c.choiceId==="fight_assassin").availability().available===false&&major.choices.find(c=>c.choiceId==="defeat_assassin_then_recover").availability().available===false);
   assert("browser_golden_not_claimed",d338.browserGoldenClaimed===false&&d339.browserGoldenClaimed===false&&d33910.browserGoldenClaimed===false);
 
-  console.log(JSON.stringify({pass:true,kind:"kakashi_scene1_scene2_verbatim_scene_board_v4",scene1Authority:"d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91",scene2Authority:"6e87a8c3364e22e696e0a9c120c51bc0c57e9881",browserGoldenClaimed:false},null,2));
+  console.log(JSON.stringify({pass:true,kind:"kakashi_scene1_scene2_verbatim_scene_board_v8",scene1Authority:"d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91",scene2Authority:"6e87a8c3364e22e696e0a9c120c51bc0c57e9881",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
