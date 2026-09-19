@@ -259,7 +259,7 @@
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const SCENE_BOARD_BUILD="scene-board-20260919-8";
+  const SCENE_BOARD_BUILD="scene-board-20260919-9";
 
   function load33800(){
     if(globalThis.SC_ALPHA_KAKASHI_ORIGINAL_33800||document.getElementById("sc-alpha-kakashi-original-33800-script"))return;
