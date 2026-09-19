@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v5_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v6_2026_09_19";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="e18729844922461c654481745e48a6eac20649cd";
 const AUTH_LIVE="bf16ebe0f677994878fbe60e30e7b546da899eb8";
@@ -252,13 +252,13 @@ function transitionNarrative(rt){
 }
 function installStyle(){
  if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;const s=document.createElement("style");s.id=STYLE_ID;s.textContent=
- "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}." +BOARD_CLASS+" .sc-scene-board-33900__actors{left:3%!important;right:3%!important;top:10%!important;bottom:19%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5%!important}." +BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(21vw,292px)!important;max-height:470px!important;aspect-ratio:7/10!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:50%!important;right:auto!important;top:20%!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(31%,430px)!important}";
+ "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}." +BOARD_CLASS+" .sc-scene-board-33900__actors{left:3%!important;right:3%!important;top:10%!important;bottom:19%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5%!important}." +BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(21vw,292px)!important;max-height:470px!important;aspect-ratio:7/10!important}." +BOARD_CLASS+" .sc-postmi-summon-35830{position:relative;width:min(14vw,190px)!important;max-height:235px!important;align-self:flex-end!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;overflow:visible!important;opacity:.88;transform:translateY(2px) scale(.98);filter:none!important;margin-bottom:2%!important}." +BOARD_CLASS+" .sc-postmi-summon-35830.is-focus{opacity:1;transform:translateY(0) scale(1.03)}." +BOARD_CLASS+" .sc-postmi-summon-35830 img{display:block;width:100%!important;height:auto!important;max-height:235px!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52))!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:50%!important;right:auto!important;top:20%!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(31%,430px)!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='pakkun']{left:auto!important;right:29%!important;top:17%!important;bottom:auto!important;transform:none!important;width:min(27%,380px)!important}";
  document.head.appendChild(s);return true;
 }
 const PAKKUN_SCENE_ASSET="Assets/Summons/pakkun.png";
 function image(ref){return ref===KAK?"Assets/Academy Student/academy_kakashi.png":ref===PS?"NPC/package_smuggler.png":ref===AMT?"NPC/anbu_marked_target.png":PAKKUN_SCENE_ASSET;}
 function label(ref){return ref===KAK?"KAKASHI":ref===PS?"PACKAGE SMUGGLER":ref===AMT?"ANBU MARKED TARGET":"NINKEN";}
-function card(ref,state,focus){return'<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(ref)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(image(ref))+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label(ref))+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
+function card(ref,state,focus){if(ref===PAKKUN)return'<figure class="sc-postmi-summon-35830 '+(focus?"is-focus":"")+'" data-actor-id="'+esc(ref)+'"><img src="'+esc(PAKKUN_SCENE_ASSET)+'" alt=""></figure>';return'<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(ref)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(image(ref))+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label(ref))+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
 function stageBg(rt,p=null){
  if(rt.beatId===BEAT.amtChase||rt.beatId===BEAT.psToAmt)return BG.rooftop;
  if([BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport].includes(rt.beatId))return BG.amtStreet;
@@ -320,7 +320,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v5_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v6_2026_09_19",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -330,7 +330,9 @@ function diagnostics(){
   exactBattleConfigs:PS_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
    battleTransitionsAutoLaunch:transitionNarrative.toString().includes("launchCurrentBattleTransition35830")&&launchCurrentBattleTransition35830.toString().includes("launchStorySceneBattle"),
    amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
-   pakkunCardRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
+   pakkunSceneRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
+   pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
+   pakkunDialogueUsesRightSafeLane:installStyle.toString().includes("data-speaker-id=\\'pakkun\\'")&&installStyle.toString().includes("right:29%!important")&&installStyle.toString().includes("transform:none!important"),
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),
