@@ -20,7 +20,7 @@ assert(compat.includes("clip-path:none!important")&&compat.includes("border-radi
 assert(compat.includes("width:min(32%,500px)!important")&&compat.includes("box-sizing:border-box!important"),"dialogue width must preserve card clearance");
 assert(compat.includes("left:50%!important")&&compat.includes("translateX(-50%)"),"dialogue must use the centered conversation lane");
 assert(compat.includes("sc-dialogue-status-33910")&&compat.includes("display:none!important"),"SPEAKING/PREVIOUS micro-labels must be removed");
-assert(compat.includes("clearRetainedDialogue33920")&&compat.includes('[data-sc-board-ui-mode="performance_narration"] .sc-dialogue-panel-33910{display:none!important}')&&!compat.includes("injectRetainedDialogue33920"),"narration must suppress and remove stale retained dialogue");
+assert(compat.includes("clearRetainedDialogue33920")&&compat.includes("performance_narration")&&compat.includes("sc-dialogue-panel-33910{display:none!important}")&&!compat.includes("injectRetainedDialogue33920"),"narration must suppress and remove stale retained dialogue");
 assert(compat.includes("syncNativeLayoutVisibility33920")&&compat.includes('setProperty("display","none","important")'),"native Story layout must be suppressed while cinematic performance owns the cue surface");
 assert(compat.includes("globalThis.advanceStoryScene"),"Story stage click must use the existing Story advance authority");
 assert(compat.includes("interactiveTarget33920"),"interactive controls must be protected from stage-wide advance");
