@@ -1,10 +1,10 @@
-# Academy Kakashi Origin — WATCH THE EXCHANGE -> DEAL WITH HER FIRST, THEN CHASE THE PACKAGE — Verbatim Scene Family
+# Academy Kakashi Origin — WATCH THE EXCHANGE -> DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE — Verbatim Scene Family
 
 **Date:** 2026-09-19  
 **Owner:** Writing / Story — Konoha under Stephen delegated-authoring authority  
 **Status:** **LOCKED VERBATIM — DELEGATED CLEAN CONTINUATION / IMPLEMENTATION READY**  
 **Branch:** `SCENE_03A / CHOICE_01 / BRANCH_D`  
-**Player-facing entry choice:** **DEAL WITH HER FIRST, THEN CHASE THE PACKAGE**  
+**Player-facing entry choice:** **DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
 ## Branch identity
@@ -14,7 +14,7 @@ This branch must not collapse into STOP THE ASSASSIN.
 The current distinction is binding:
 
 - **STOP THE ASSASSIN:** fast MI victory opens an immediate fork between PS and AMT.
-- **DEAL WITH HER FIRST, THEN CHASE THE PACKAGE:** Kakashi has already committed to package-second sequencing. After MI, PS is the next objective. AMT can become reachable only later if PS is resolved quickly enough.
+- **DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE:** Kakashi has already committed to package-second sequencing. After MI, PS is the next objective. AMT can become reachable only later if PS is resolved quickly enough.
 
 ---
 
@@ -213,7 +213,7 @@ Set:
 
 Present:
 
-**CHASE THE PACKAGE**
+**CHASE THE PACKAGE SMUGGLER**
 
 No direct AMT option appears here.
 
@@ -744,7 +744,7 @@ At all report endings:
 
 # Final lock
 
-> **DEAL WITH HER FIRST, THEN CHASE THE PACKAGE is package-second by commitment.**
+> **DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE is package-second by commitment.**
 
 > **MI <=4 preserves PS pursuit; MI 5+ closes it.**
 
