@@ -445,3 +445,36 @@ Closed Writing coverage:
 
 Writing BRANCH_E: CLOSED.
 Implementation/runtime/browser validation: separate.
+
+
+## 2026-09-19 — SLIP IN FOR THE PACKAGE completed
+
+Exact scene family:
+`Documentation/Story/Academy_Kakashi_Direct_Pickpocket_Verbatim_Scene_Family_2026-09-19.md`
+
+Initial clean-through-return commit:
+`291cc788a22075fe9176f0e48449934ddcc9a6bf`
+
+3-v-1 victory conflict resolved by Stephen and branch closed at:
+`7e4e33b0e26d993ad9ff3dcf9bfae4cf25f587d6`
+
+Exact root label preserved:
+**SLIP IN FOR THE PACKAGE**
+
+Direct Pickpocket:
+- SUCCESS -> package cleanly extracted; AMT/PS do not detect Kakashi before withdrawal; no MI; no Battle; no Pakkun.
+- FAILURE -> MI appears under branch-specific exception -> Kakashi vs AMT + PS + MI 3-v-1.
+- 3-v-1 defeat -> opposition escapes with package state preserved.
+- 3-v-1 victory -> package recovered -> exact choices:
+  1. TAKE THEM TO THE UCHIHA POLICE FORCE
+  2. TAKE THEM TO THE ANBU
+  3. KILL THEM
+  4. TAKE THE PACKAGE AND LET THEM GO
+
+No sequential per-target disposition menu on this exceptional simultaneous-victory route.
+
+Writing branch: CLOSED.
+Implementation/runtime/browser validation: separate.
+
+Next remaining Writing branch:
+**STRIKE BEFORE THE HANDOFF**.
