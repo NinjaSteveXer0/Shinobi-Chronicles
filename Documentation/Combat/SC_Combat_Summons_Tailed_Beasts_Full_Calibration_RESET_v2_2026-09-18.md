@@ -303,9 +303,10 @@ Source 09 proposal authority:
 
 Kamatari RESET v2 mechanical direction:
 - retire generic +6 Bukijutsu Stat-stick in favour of **Sicklewind Route**;
-- qualifying controller Wind Release creates one consumable Kamatari wind lane;
-- lane can carry the controller's next Bukijutsu attack across ordinary distance / soft cover or empower Kamatari's signature **Quick Beheading Dance**;
-- manifested package: Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, Quick Beheading Dance once/Battle ATK32 each up to 3 + destruction of ordinary hiding cover in the authored wind path;
+- **Sicklewind Route = once per Battle**, while Kamatari is attached, one qualifying single-target Wind Release or Bukijutsu attack may target one occupied enemy waiting slot (Slots 2–6) instead of Enemy Active Slot 1;
+- the waiting enemy remains in its queue slot; the route does not reorder formation, create a bonus action, add hidden Attack PL, or bypass exact targeting protection;
+- this uses the Battle system's real active/waiting-slot structure and explicitly rejects invented vegetation/debris/soft-cover mechanics;
+- manifested package remains Reaping Rush ATK30, Gale Pursuit ATK24 / 32 after enemy movement, Crosswind Cutoff once/Battle target-choice pursuit reaction, and Quick Beheading Dance once/Battle ATK32 each up to 3 legally exposed hostiles;
 - no generic accuracy roll / Speed Stat / hard Stun / hidden PL scaling.
 
 Then continue into Source 10 Snake, accepted Tailed-Beast representations, Kurama-family reconciliation, and Jinchūriki/transformation anti-double-count audit.
