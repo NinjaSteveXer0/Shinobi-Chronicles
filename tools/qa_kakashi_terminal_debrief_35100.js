@@ -72,6 +72,7 @@ assert(loader.includes('kakashi-final-20260917-18'),"Kakashi child cache generat
 assert.strictEqual(plain(`runAcademyKakashiOriginRewards34800Diagnostics()`).pass,true,"34800 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).pass,true,"35100 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).browserGoldenClaimed,false);
+assert(terminal.includes("confirmedDeathRefs")&&terminal.includes("kakashiPostMiPakkunPresent"),"terminal debrief must carry post-MI deterministic death and Pakkun presence facts");
 
 // Battle victory alone cannot manufacture package success or terminal rewards.
 run(`__qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-secure-1",battleConfigId:"academy_kakashi_origin_battle_ps_mi_2v1",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_014",bindingRef:"academy_kakashi.battle.secure_package",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:"academy_kakashi_origin_masked_interceptor",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}],rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false}};`);
@@ -146,6 +147,30 @@ assert.strictEqual(departureFact.reciprocalNameKnowledgeGranted,false);
 const pakkunReward=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
 assert.strictEqual(pakkunReward.success,true);
 assert.strictEqual(Number(context.playerData.ryo||0),175);
+
+// Post-MI package-secured AMT kill must carry the deterministic death into the real terminal owner, with Pakkun still present until explicit departure.
+run(`resetDataQA("qa-postmi-kill-35100");
+qaCommitOccurrence("academy_kakashi","occ-postmi-package",{factClass:"academy_kakashi_sequential_post_ps_package_recovery",storySceneInstanceId:__qaRuntime.instanceId,packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI"}},[],{type:"origin_story_factual_occurrence",outcome:"package_recovered"});
+qaCommitOccurrence("academy_kakashi","occ-postmi-amt-kill",{factClass:"academy_kakashi_stop_assassin_post_mi_deterministic_kill",storySceneInstanceId:__qaRuntime.instanceId,targetRef:"academy_kakashi_origin_amt",targetDeathConfirmed:true,packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI"},pakkunPresent:true},[],{type:"origin_story_factual_occurrence",outcome:"CONFIRMED_KILL",participantRefs:["academy_kakashi_origin_amt","pakkun_origin_unfamiliar_ninken"]});
+__qaRuntime.localContext.kakashiSequentialPackageOccurrenceId35100="occ-postmi-package";
+__qaRuntime.localContext.kakashiSequentialPackageOccurrenceId="occ-postmi-package";
+__qaRuntime.localContext.kakashiPostMiPakkunPresent=true;
+`);
+const postMiKillFacts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
+assert.strictEqual(postMiKillFacts.success,true);
+assert(postMiKillFacts.confirmedDeathRefs.includes("academy_kakashi_origin_amt"),"AMT deterministic death was lost before terminal debrief");
+assert.strictEqual(postMiKillFacts.pakkunPresentAtDebrief,true,"Pakkun disappeared before explicit terminal departure");
+const postMiKillDebrief=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitTerminalDebrief()`);
+assert.strictEqual(postMiKillDebrief.success,true);
+assert(postMiKillDebrief.record.fact.confirmedDeathRefs.includes("academy_kakashi_origin_amt"),"terminal debrief did not persist AMT death");
+assert(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.debriefSummaryText()`).includes("ANBU Marked Target as dead"),"terminal player-facing report did not account for AMT death");
+const postMiPrematureReceipt=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
+assert.strictEqual(postMiPrematureReceipt.success,false);
+assert.strictEqual(postMiPrematureReceipt.reason,"kakashi_terminal_pakkun_departure_required_before_receipt");
+assert.strictEqual(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitPakkunDeparture()`).success,true);
+const postMiKillReceipt=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
+assert.strictEqual(postMiKillReceipt.success,true);
+assert(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.receiptText()`).includes("Confirmed dead: ANBU Marked Target"),"Chronicle Receipt omitted deterministic AMT death");
 
 // Exact sequential timing facts survive, but do NOT bypass unresolved package custody.
 run(`resetDataQA("qa-sequential-35100");
