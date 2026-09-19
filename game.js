@@ -11951,15 +11951,6 @@ function processDisciplineLevelUps(
 // =========================================================
 // VALIDATE DISCIPLINE TRAINING SOURCE
 // =========================================================
-//
-// Progression #199 also authorises exact, source-addressable action-derived
-// Discipline Development EXP. This is distinct from ordinary Exam/Practical/
-// Battle training-source routing: the owning action-development adapter must
-// prove the committed action evidence and caps before calling addDisciplineExp.
-// =========================================================
-
-const ACTION_DERIVED_DISCIPLINE_SOURCE =
-  "action_derived_development";
 
 function isValidDisciplineTrainingSource(
   disciplineId,
@@ -11982,9 +11973,7 @@ function isValidDisciplineTrainingSource(
 
   return (
     discipline.trainingSource ===
-      source ||
-    source ===
-      ACTION_DERIVED_DISCIPLINE_SOURCE
+    source
   );
 
 }
