@@ -247,7 +247,7 @@ function diagnostics(){
   const checks={
     patchId:PATCH_ID==="alpha_kakashi_deterministic_kill_35810_v2_2026_09_19",
     authorityPinned:AUTHORITY==="0d4aa441e4ef6d566f3d1df23c198940bdc559dd",
-    postBattleAgencyNotControlGated:eligible.toString().includes('"CONTROLLED_DEFEATED","DEFEATED_BUT_NOT_CONTROLLED"')&&!wireSource.toString().includes("CONTROLLED_DEFEATED REQUIRED"),
+    postBattleAgencyNotControlGated:eligible.toString().includes('"CONTROLLED_DEFEATED","DEFEATED_BUT_NOT_CONTROLLED"')&&!wireSource.toString().includes(["CONTROLLED_DEFEATED"," REQUIRED"].join("")),
     deterministicSemantic:ensureIntent.toString().includes('"KILL — GUARANTEED"')&&ensureIntent.toString().includes('outcomeMode:"deterministic"'),
     exactOpenScene:JSON.stringify([...COMMON_SCENE,...OPEN_SCENE,...COMMON_FINISH].map(x=>x.text))===JSON.stringify(openExpected),
     exactOpenAftermath:JSON.stringify([...AFTER_COMMON,...AFTER_OPEN].map(x=>x.text))===JSON.stringify(afterOpenExpected),
