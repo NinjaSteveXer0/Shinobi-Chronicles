@@ -117,7 +117,10 @@ assert(source35830.includes("if(ref===PAKKUN)return"),"Pakkun must bypass generi
 assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-board-33900__actor-frame\")"),"Pakkun regression guard must reject Character Card framing");
 assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
-assert(source35830.includes("top:4%!important"),"generic post-MI dialogue must clear the Character Card top edge");
+assert(source35830.includes("[data-sc-board-ui-mode=\'dialogue\']")&&source35830.includes("top:4%!important"),"post-MI dialogue safe lane must outrank global dialogue centering and clear Character Cards");
+assert(source35830.includes("const prior=document.getElementById(STYLE_ID);if(prior)prior.remove()"),"post-MI style install must replace stale same-ID CSS");
+assert(source35830.includes("You decided fast.")&&source35830.includes("That doesn\'t make it lighter."),"direct AMT KILL aftermath must include locked Pakkun/Kakashi continuation");
+assert(source35830.includes('const TERMINAL_PENDING="kak_seq_debrief_pending"')&&source35830.includes("rt.beatId=TERMINAL_PENDING"),"direct AMT KILL must hand off to terminal report instead of dead-end boundary");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
@@ -237,6 +240,21 @@ const loss=MOD.consumeAmtReturn();
 assert.strictEqual(loss.success,false);
 assert.strictEqual(loss.reason,"post_mi_amt_defeat_requires_package_and_pakkun_autonomy_resolution","AMT defeat must fail closed until package + Pakkun autonomy resolve");
 
+active=freshDet();active.instanceId="qa-postmi-direct-kill";participantStates[MI]={participantRef:MI,stateClass:"DEAD"};delete participantStates[AMT];launches.length=0;
+MOD.wireEntryChoices();
+out=globalThis.advanceStoryScene("scene06aw2c_dkill_go_after_anbu_marked_target");
+assert.strictEqual(out.success,true,"direct AMT kill test pursuit entry failed: "+JSON.stringify(out));
+drainNarration(MOD.beats.amtBattle);
+simulateBattleReturn(MOD.beats.amtBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_amt",battleOccurrenceId:"qa-direct-amt-kill-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.amtReturn);
+out=MOD.consumeAmtReturn();assert.strictEqual(out.success,true,"direct AMT victory return failed: "+JSON.stringify(out));
+drainNarration(MOD.beats.amtDecision);
+out=globalThis.advanceStoryScene("postmi_amt_kill");
+assert.strictEqual(out.success,true,"direct AMT KILL choice failed: "+JSON.stringify(out));
+assert.strictEqual(active.beatId,MOD.beats.amtKill,"direct AMT KILL must enter authored kill aftermath before report");
+assert.strictEqual(participantStates[AMT].stateClass,"DEAD","direct AMT KILL must commit death on selection");
+drainNarration("kak_seq_debrief_pending");
+assert.strictEqual(active.beatId,"kak_seq_debrief_pending","direct AMT KILL aftermath must hand off to terminal debrief");
+
 assert(saves>0);
 console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
 console.log("- live fast-win PS pursuit and post-kill PS/AMT pursuit entries use direct authored successor routing");
@@ -248,5 +266,5 @@ console.log("- legitimate AMT reach commits Pakkun, reveals Assets/Summons/pakku
 console.log("- legitimate AMT reach commits Pakkun and uses sequential AMT+Pakkun config");
 console.log("- AMT victory exposes direct disposition family regardless hidden control state; restraint continuation waits only on Writing #281");
 console.log("- deterministic AMT KILL preserves package custody");
-console.log("- direct AMT fork permanently closes PS pursuit");
+console.log("- direct AMT fork permanently closes PS pursuit and KILL reaches terminal debrief");
 console.log("- AMT defeat refuses to invent object/Pakkun autonomy resolution");
