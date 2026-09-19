@@ -1,5 +1,9 @@
 # Academy Kakashi Origin — Multi-Target Live Custody Trajectory and Group Disposition Requirement
 
+> **2026-09-19 SUPERSESSION NOTICE**  
+> The older `CONTROLLED_DEFEATED` / `DEFEATED_BUT_NOT_CONTROLLED -> ATTEMPT TO RESTRAIN` gating language in this requirement has been superseded by the global post-Battle disposition authority and CE #244 closure.  
+> Current rule: valid Battle victory may expose direct **RESTRAIN ... AND CONTINUE** where the actor has a legitimate restraint-capable Skill/tool/item; selecting it commits successful field restraint, then the #244 post-restraint lifecycle applies. No pre-existing-control requirement remains.
+
 **Date:** 2026-09-18  
 **Owner:** Stephen / Writing — Konoha; reusable semantics require CE / Codex / Coordination reconciliation  
 **Status:** **STEPHEN-APPROVED STORY REQUIREMENT — REUSABLE CUSTODY SEMANTICS PENDING CE RECONCILIATION**
