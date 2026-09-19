@@ -113,6 +113,14 @@ assert(liveSelection,"live pursuit selection occurrence missing");
 assert.strictEqual(liveSelection.fact.miDeathAlreadyCommitted,false,"live pursuit falsely committed MI death");
 assert.strictEqual(liveSelection.fact.sourceMiResolutionState,"DEFEATED_BUT_NOT_CONTROLLED");
 
+participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi-amt"};
+active={sceneId:SCENE_ID,instanceId:"qa-postmi-live-amt",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:4,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
+MOD.wireEntryChoices();
+out=globalThis.advanceStoryScene("scene05aw_go_after_anbu_marked_target");
+assert.strictEqual(out.success,true,"live post-MI AMT pursuit choice failed: "+JSON.stringify(out));
+assert.strictEqual(active.beatId,MOD.beats.amtChase,"live fast-win AMT pursuit did not enter authored AMT chase");
+assert.strictEqual(active.localContext.kakashiPostMiPsPursuitClosedPermanently,true,"live direct AMT fork did not close PS pursuit");
+
 participantStates[MI]={participantRef:MI,stateClass:"DEAD"};
 active=freshResolver();MOD.wireEntryChoices();
 out=globalThis.advanceStoryScene("scene06aw2c_postlethal_go_after_package_smuggler");
