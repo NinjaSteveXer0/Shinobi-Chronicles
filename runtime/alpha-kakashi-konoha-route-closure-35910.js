@@ -24,7 +24,7 @@ const SEQ=globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410;
 const CLOSURE=globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900;
 if(!A||!CORE||!KAK||!PROVIDER||!BATTLE||!SEQ||!CLOSURE)throw new Error("kakashi_konoha_route_closure_35910_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v2_2026_09_20";
+const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v3_2026_09_20";
 const ORIGIN="academy_kakashi";
 const SCENE="origin_academy_kakashi_anbu_retrieval";
 const KAKASHI="academy_kakashi";
@@ -129,10 +129,17 @@ function observeIntent(choiceId,bindingRef){
  if(!stateRef||!choiceSetId)return{success:false,reason:"kakashi_observe_route_semantic_context_missing"};
  return ensureDecisionIntent({decisionPointRef:"OBSERVE_ESCALATION",choiceId,bindingRef,contextStateRef:stateRef,beatRef:OBSERVE_BEAT,choiceSetId,sourceOccurrenceRefs:[stateRef]});
 }
+function beginSharedObserveBattleChoice35910(choiceId,bindingRef,receiptKey,intentKey,nextBeatId){
+ const rt=active(),intent=observeIntent(choiceId,bindingRef);
+ if(!intent||intent.success!==true)return intent||{success:false,reason:"kakashi_shared_observe_intent_failed"};
+ rt.localContext={...(rt.localContext||{}),[receiptKey]:String(intent.receipt&&intent.receipt.storyDecisionReceiptId||""),[intentKey]:String(intent.receipt&&intent.receipt.intentCommitRef||"")};
+ save();
+ return{success:true,choiceId,bindingRef,storyDecisionReceiptId:rt.localContext[receiptKey],intentCommitRef:rt.localContext[intentKey],nextBeatId};
+}
 function launch(config,binding,anchor,storyOccurrenceId,returnBeat,token,ctx={}){
  const rt=active(),cfg=BATTLE.configs&&BATTLE.configs[config]||null;
  const supplied=ctx&&ctx.returnContext&&typeof ctx.returnContext==="object"?ctx.returnContext:null;
- const returnContext=supplied?{...supplied}:{type:"story_scene",sceneId:SCENE,postBattleBeatId:returnBeat};
+ const returnContext={...(supplied||{}),type:"story_scene",sceneId:SCENE,sceneInstanceId:String(rt&&rt.instanceId||""),postBattleBeatId:returnBeat};
  return BATTLE.launchAcademyKakashiOriginPlBattle({
   battleConfigId:config,
   storyOccurrenceId:String(storyOccurrenceId||rt&&rt.instanceId||""),
@@ -459,7 +466,7 @@ function diagnostics(){
  const d=scene(),action=d&&d.beatMap.get(ACTION_BEAT),attack=action&&action.choices&&action.choices.find(x=>x.choiceId==="attack"),observe=d&&d.beatMap.get(OBSERVE_BEAT),secure=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package_before_assassin"),original=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="go_after_original_target");
  const regs=PROVIDER.getRegisteredStoryFactualBindings();
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v2_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v3_2026_09_20",
   writing100Pinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8",
   directStrikeFixedChain:!!attack&&attack.label==="STRIKE BEFORE THE HANDOFF"&&attack.nextBeatId===D.directIntro&&d.beatMap.has(D.directBattle)&&d.beatMap.has(D.directMiBattle)&&d.beatMap.has(D.directGroup),
   directStrikeExactConfigs:!!(BATTLE.configs&&BATTLE.configs[DIRECT_2V1]&&BATTLE.configs[DIRECT_MI]),
@@ -483,7 +490,7 @@ globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910=Object.freeze({
  patchId:PATCH_ID,authority:AUTH,beats:D,
  resolveDirectStrikeEntry,beginReusedDirectStrikePhysical:beginReusedDirectStrikePhysical35910,consumeDirect2v1,consumeDirectMi,commitDirectGroupDisposition,
  resolveSecureBeforeChoice,consumeSecureBeforeBattle,resolveOriginalTargetChoice,consumeOriginalAmt,commitOriginalDisposition,
- patchGetCloserHandoff,diagnostics,browserGoldenClaimed:false
+ beginSharedObserveBattleChoice:beginSharedObserveBattleChoice35910,patchGetCloserHandoff,diagnostics,browserGoldenClaimed:false
 });
 globalThis.runAcademyKakashiKonohaRouteClosure35910Diagnostics=diagnostics;
 })();

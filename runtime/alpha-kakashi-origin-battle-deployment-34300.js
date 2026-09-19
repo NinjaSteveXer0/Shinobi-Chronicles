@@ -269,6 +269,12 @@ function launchAcademyKakashiOriginPlBattle(spec={}){
   const composedIds=Array.isArray(composed)?composed.map(row=>row&&row.id).filter(Boolean):[];
   const compositionExact=composedIds.length===config.opposition.length&&config.opposition.every((participantId,index)=>composedIds[index]===participantId);
   if(!compositionExact)return{success:false,reason:"kakashi_opposition_composition_failed",expectedParticipantIds:[...config.opposition],actualParticipantIds:composedIds};
+  const initializedPL=typeof initializeBattleRemainingPLFromDeployment==="function"
+    ?initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true})
+    :null;
+  if(!initializedPL)return{success:false,reason:"kakashi_multi_opposition_pl_initialization_failed"};
+  const zeroCapacity=composedIds.filter(participantId=>typeof getBattleMaximumPL==="function"&&Number(getBattleMaximumPL("enemy",participantId))<=0);
+  if(zeroCapacity.length)return{success:false,reason:"kakashi_multi_opposition_zero_battle_pl",participantIds:zeroCapacity};
   const occurrenceId=currentBattle.battleId||launched.battleId||`kakashi-origin-battle-${Date.now()}`;
   currentBattle.encounterId=config.id;
   currentBattle.kakashiOriginDeployment={battleConfigId:config.id,battleOccurrenceId:occurrenceId,storyOccurrenceId:String(spec.storyOccurrenceId),sourceAnchorRef:String(spec.sourceAnchorRef),bindingRef:String(spec.bindingRef),returnToken:spec.returnToken?String(spec.returnToken):null,controllerParticipantId:KAKASHI,oppositionParticipantIds:[...config.opposition],pakkunAuthorized:config.pakkun===true,temporaryPakkun:config.pakkun?{participantRef:PAKKUN,basePL:16,remainingBattlePL:16,ownershipGranted:false,independentInitiative:false}:null,timingGate:clone(config.timingGate),playerActionOpportunityCount:0,countedControllerActionIds:[],packageCustodyDelta:"none",authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,sequentialRegistryCommit:SEQUENTIAL_REGISTRY_COMMIT,sequentialMiPsCombatCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT,amtRegistryCommit:AMT_REGISTRY_COMMIT,amtCombatCommit:AMT_COMBAT_COMMIT};
@@ -353,7 +359,7 @@ function runAcademyKakashiOriginBattleDeployment34300Diagnostics(){
     timingExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3&&CONFIGS.academy_kakashi_origin_battle_seq_amt_pakkun.timingGate===null,
     portraitAuthorityBound:enemyDatabase[AMT].image==="NPC portrait/anbu_marked_target.png"&&enemyDatabase[PS].image==="NPC portrait/package_smuggler.png"&&enemyDatabase[MI].image==="NPC portrait/masked_interceptor.png",
     noLoot:[AMT,PS,MI].every(id=>enemyDatabase[id].rewards&&enemyDatabase[id].rewards.ryo.min===0&&enemyDatabase[id].rewards.commonDrops.length===0),
-    compositionUsesExactArray:launchAcademyKakashiOriginPlBattle.toString().includes("configureBattleEnemyParticipants(config.opposition)"),
+    compositionUsesExactArray:launchAcademyKakashiOriginPlBattle.toString().includes("configureBattleEnemyParticipants(config.opposition)"),multiOpponentPlInitializedAfterComposition:launchAcademyKakashiOriginPlBattle.toString().includes("initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true})")&&launchAcademyKakashiOriginPlBattle.toString().includes("kakashi_multi_opposition_zero_battle_pl"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
