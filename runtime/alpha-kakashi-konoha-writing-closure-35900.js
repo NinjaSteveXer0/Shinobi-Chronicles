@@ -344,7 +344,7 @@ function diagnostics(){
   ce244ClosedAuthorityPinned:CE244_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0",
   neutralProviderExact:PROVIDER.providerId==="ce.neutral_story_factual_resolver.v1",
   ce256BindingRegistered:!!registered&&registered.outcomeRefs.join("|")==="AMT_ESCAPE_PACKAGE_UNCHANGED_ELSEWHERE|AMT_ESCAPE_PACKAGE_UNCHANGED_KAKASHI_SIDE|AMT_ESCAPE_PACKAGE_RECLAIMED_BY_AMT",
-  noBattlePackageInference:resolveCe256AmtDefeat.toString().includes("resolveStoryFactualAction")&&commitCe256Package.toString().includes("battleVictoryDidNotImplyPackageCustody:true"),
+  noBattlePackageInference:resolveAmtDefeatFacts35900.toString().includes("resolveStoryFactualAction")&&commitCe256Package.toString().includes("battleVictoryDidNotImplyPackageCustody:true"),
   packageBeforePakkunOrdering:resolveAmtDefeatFacts35900.toString().indexOf("resolveStoryFactualAction")<resolveAmtDefeatFacts35900.toString().indexOf("consumePakkunAfterCe256"),
   sharedAmtPakkunConfigsExact:CE256_AMT_BATTLE_CONFIGS.join("|")==="academy_kakashi_origin_battle_seq_amt_pakkun|academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",
   sharedAmtDefeatOwnerExported:typeof resolveAmtDefeatFacts35900==="function"&&resolveAmtDefeatFacts35900.toString().includes("routeRef"),
