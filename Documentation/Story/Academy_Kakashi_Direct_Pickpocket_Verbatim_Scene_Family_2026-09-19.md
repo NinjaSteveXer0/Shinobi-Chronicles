@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-19  
 **Owner:** Writing / Story — Konoha under Stephen delegated-authoring authority  
-**Status:** **PARTIALLY CLOSED — CLEAN THROUGH PICKPOCKET SUCCESS / FAILURE 3-v-1 RETURN; 3-v-1 VICTORY DISPOSITION HELD FOR CONFLICT REVIEW**  
+**Status:** **LOCKED VERBATIM — DELEGATED CLEAN CONTINUATION / IMPLEMENTATION READY**  
 **Branch:** `SCENE_02 / CHOICE_01 / BRANCH_D`  
 **Player-facing entry choice:** **SLIP IN FOR THE PACKAGE**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
@@ -396,7 +396,7 @@ Proceed to factual ANBU report / existing terminal evaluation.
 
 ---
 
-# 7. Kakashi wins the 3-v-1 — STOP BOUNDARY
+# 7. Kakashi wins the 3-v-1
 
 **Backdrop:** `Kakashi Origin Backdrop/fight_at_sakura_tree.png`
 
@@ -410,35 +410,544 @@ Three defeated shinobi.
 
 One package.
 
-One decision space that is no longer simple.
+Kakashi goes to the objective first.
+
+ANBU Marked Target is no longer in a position to keep it from him.
+
+Kakashi takes the package, checks the seal and secures it against himself.
+
+Then he looks back at the three people on the ground.
+
+Winning the fight solved the package problem.
+
+It did not decide what happens to them.
 
 ## System / Resolver
 
-Commit only the closed minimum facts:
+Commit independently:
 
 - AMT Battle-defeated;
 - PS Battle-defeated;
 - MI Battle-defeated;
-- package state commits separately and is recoverable by Kakashi where physically available;
-- no participant death/custody inferred from Battle victory;
+- package custody -> Kakashi;
+- no participant death from Battle victory;
+- no participant institutional custody from Battle victory;
 - no Pakkun.
 
-**Do not project a player-facing disposition menu from this file.**
+## Choices
 
-Current durable authority supports:
-- multiple lethal histories;
-- multiple live-custody histories;
-- mixed histories;
-- group transfer after participants are secured;
-- state re-evaluation after material actions.
+Present exactly:
 
-It does **not yet provide one unambiguous, benchmark-quality player-facing choice structure for three simultaneously defeated participants.**
+1. **TAKE THEM TO THE UCHIHA POLICE FORCE**
+2. **TAKE THEM TO THE ANBU**
+3. **KILL THEM**
+4. **TAKE THE PACKAGE AND LET THEM GO**
 
-Writing must resolve that presentation/decision structure before implementation continues past this victory.
+No per-target sequential disposition menu appears on this exceptional 3-v-1 victory route.
 
 ---
 
-# Final current lock
+# 8. TAKE THEM TO THE UCHIHA POLICE FORCE
+
+## Narration
+
+Kakashi looks over all three.
+
+Nobody is getting another fight.
+
+He draws out the ninja wire.
+
+Package Smuggler watches him.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“All three of us?”
+
+**KAKASHI:**  
+“Yes.”
+
+**PACKAGE SMUGGLER:**  
+“Efficient.”
+
+**MASKED INTERCEPTOR:**  
+“Be quiet.”
+
+## Narration
+
+Kakashi restrains them one by one.
+
+ANBU Marked Target first.
+
+Package Smuggler next.
+
+Masked Interceptor last.
+
+Three separate restraints.
+
+One decision.
+
+The recovered package remains secured against Kakashi.
+
+## Dialogue
+
+**ANBU MARKED TARGET:**  
+“ANBU?”
+
+**KAKASHI:**  
+“Police.”
+
+## Narration
+
+That gets a reaction.
+
+Package Smuggler looks from Kakashi to the other two.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“I think I preferred ANBU.”
+
+**MASKED INTERCEPTOR:**  
+“You don't know enough to have a preference.”
+
+**PACKAGE SMUGGLER:**  
+“I know there will be paperwork.”
+
+## Transition
+
+**BLACK WIPE**
+
+### Uchiha Police Force handoff
+
+**Backdrop:** `Kakashi Origin Backdrop/uchiha_police_exterior_night.png`
+
+The Police entrance is still lit.
+
+Two officers come forward.
+
+Then slow when they see Kakashi bringing three restrained shinobi with him.
+
+One officer raises a hand.
+
+**UCHIHA POLICE OFFICER:**  
+“Stop there.”
+
+Kakashi does.
+
+The officer's eyes move across all three prisoners.
+
+Then to the package secured against Kakashi.
+
+**UCHIHA POLICE OFFICER:**  
+“Start from the beginning.”
+
+Kakashi gives him exactly what he observed.
+
+The original tail.
+
+The attempted theft.
+
+The failed stealth approach.
+
+The fight.
+
+The recovered package.
+
+He does not invent affiliations.
+
+He does not explain hidden motives he does not know.
+
+When he finishes, the officer looks across the three restrained shinobi again.
+
+**UCHIHA POLICE OFFICER:**  
+“You fought all three?”
+
+**KAKASHI:**  
+“Yes.”
+
+Package Smuggler exhales.
+
+**PACKAGE SMUGGLER:**  
+“It sounds worse when he says it that simply.”
+
+The second officer steps toward the first restraint.
+
+**UCHIHA POLICE OFFICER:**  
+“We'll take them.”
+
+Kakashi transfers each captive separately.
+
+ANBU Marked Target.
+
+Package Smuggler.
+
+Masked Interceptor.
+
+Only after each officer has secure control does Kakashi release his own restraint line.
+
+## System / Resolver
+
+Commit separately:
+
+- AMT -> Uchiha Police institutional custody;
+- PS -> Uchiha Police institutional custody;
+- MI -> Uchiha Police institutional custody;
+- package remains with Kakashi for ANBU return;
+- no ANBU custody inferred.
+
+Set objective:
+
+**Return to ANBU.**
+
+---
+
+# 9. TAKE THEM TO THE ANBU
+
+## Narration
+
+Kakashi looks at the three defeated shinobi.
+
+Then reaches for the ninja wire.
+
+Package Smuggler notices.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“I was hoping that wasn't for us.”
+
+**KAKASHI:**  
+“It is.”
+
+## Narration
+
+Kakashi secures them individually.
+
+ANBU Marked Target.
+
+Package Smuggler.
+
+Masked Interceptor.
+
+The package stays against Kakashi's side.
+
+Masked Interceptor tests the restraint once.
+
+Stops.
+
+## Dialogue
+
+**MASKED INTERCEPTOR:**  
+“You won the difficult part.”
+
+**KAKASHI:**  
+“I noticed.”
+
+**PACKAGE SMUGGLER:**  
+“He does that.”
+
+## Narration
+
+Kakashi looks at him.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“Notices things.”
+
+**ANBU MARKED TARGET:**  
+“Keep talking.”
+
+**PACKAGE SMUGGLER:**  
+“I was planning to.”
+
+## Transition
+
+**BLACK WIPE**
+
+### ANBU rooftop handoff
+
+**Backdrop:** `Kakashi Origin Backdrop/rooftop_night.png`
+
+The ANBU operative turns as Kakashi arrives.
+
+His attention goes first to the package.
+
+Then to the three restrained shinobi.
+
+The pause is longer than usual.
+
+## Dialogue
+
+**ANBU OPERATIVE:**  
+“Report.”
+
+## Narration
+
+Kakashi hands over the package first.
+
+## Dialogue
+
+**KAKASHI:**  
+“I tried to take it before the handoff.”
+
+**ANBU OPERATIVE:**  
+“And?”
+
+## Narration
+
+Kakashi glances toward the three prisoners.
+
+## Dialogue
+
+**KAKASHI:**  
+“They noticed.”
+
+Package Smuggler looks mildly offended.
+
+**PACKAGE SMUGGLER:**  
+“Eventually.”
+
+The operative ignores him.
+
+Kakashi gives the sequence.
+
+The attempted theft.
+
+Masked Interceptor's arrival.
+
+The fight.
+
+The package recovery.
+
+The three live captives.
+
+When the report is complete, the operative steps forward.
+
+**ANBU OPERATIVE:**  
+“We'll take custody.”
+
+Kakashi transfers each captive separately.
+
+AMT.
+
+PS.
+
+MI.
+
+No group shortcut replaces the three actual custody transfers.
+
+## System / Resolver
+
+Commit separately:
+
+- AMT -> ANBU institutional custody;
+- PS -> ANBU institutional custody;
+- MI -> ANBU institutional custody;
+- package -> ANBU custody;
+- no Police custody.
+
+---
+
+# 10. KILL THEM
+
+## Narration
+
+Kakashi looks across the three defeated shinobi.
+
+The package is secure.
+
+The fight is over.
+
+What happens next is not.
+
+He makes the decision once.
+
+It applies to all three.
+
+The end is controlled.
+
+Fast.
+
+Without spectacle.
+
+When it is finished, none of the three are moving.
+
+Kakashi stands alone with the recovered package.
+
+For several seconds, the Sakura tree is the only thing in the street still moving.
+
+Wind through the branches.
+
+Nothing else.
+
+## System / Resolver
+
+Commit three distinct deterministic Story deaths:
+
+- AMT -> dead;
+- PS -> dead;
+- MI -> dead.
+
+Each death preserves:
+
+- exact target identity;
+- player-selected lethal provenance;
+- shared 3-v-1 post-Battle group-decision occurrence;
+- package custody remains with Kakashi.
+
+This is **three confirmed kills**, not one aggregate death flag.
+
+No Pakkun.
+
+Set objective:
+
+**Return to ANBU.**
+
+### ANBU report projection
+
+Kakashi reports all three deaths directly.
+
+Do not soften **KILL THEM** into Battle casualties.
+
+Do not describe the result as three Battle wins.
+
+The operative receives:
+
+- failed Pickpocket;
+- 3-v-1 Battle;
+- package recovered;
+- AMT killed by Kakashi after Battle;
+- PS killed by Kakashi after Battle;
+- MI killed by Kakashi after Battle.
+
+Private Minato evaluation / Chronicle Receipt must consume the exact three-kill lethal history.
+
+---
+
+# 11. TAKE THE PACKAGE AND LET THEM GO
+
+## Narration
+
+Kakashi looks at the recovered package.
+
+Then at the three defeated shinobi.
+
+He already has what ANBU sent him for.
+
+He does not reach for the wire.
+
+Package Smuggler notices first.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“That's it?”
+
+**KAKASHI:**  
+“I have the package.”
+
+**PACKAGE SMUGGLER:**  
+“And us?”
+
+## Narration
+
+Kakashi looks at him.
+
+## Dialogue
+
+**KAKASHI:**  
+“You're free to leave.”
+
+## Narration
+
+ANBU Marked Target studies him.
+
+Masked Interceptor does not move immediately.
+
+## Dialogue
+
+**ANBU MARKED TARGET:**  
+“You fought all three of us for the package.”
+
+**KAKASHI:**  
+“Yes.”
+
+**ANBU MARKED TARGET:**  
+“And now you're letting us walk.”
+
+**KAKASHI:**  
+“I didn't say I came for you.”
+
+## Narration
+
+Package Smuggler slowly gets to his feet.
+
+## Dialogue
+
+**PACKAGE SMUGGLER:**  
+“I've had worse negotiations.”
+
+**MASKED INTERCEPTOR:**  
+“This wasn't a negotiation.”
+
+**PACKAGE SMUGGLER:**  
+“That's why I said worse.”
+
+## Narration
+
+Kakashi does not stop them.
+
+One by one, they leave the street.
+
+The package remains with him.
+
+## System / Resolver
+
+Commit separately:
+
+- AMT alive / released;
+- PS alive / released;
+- MI alive / released;
+- no participant custody;
+- package remains with Kakashi;
+- no passive pursuit is reopened merely because Kakashi released them;
+- no hidden lethal/custody action occurs afterward.
+
+Set objective:
+
+**Return to ANBU.**
+
+### ANBU report projection
+
+Kakashi reports:
+
+- failed Pickpocket;
+- 3-v-1 Battle victory;
+- package recovered;
+- all three opponents released alive by deliberate choice.
+
+Do not project release as escape.
+
+Do not project zero custody as failure to control them.
+
+This was a player-selected release.
+
+---
+
+# 12. Terminal continuation
+
+For all four 3-v-1 victory dispositions:
+
+- preserve package recovery;
+- preserve the exact group disposition;
+- preserve each participant's individual final state;
+- consume existing private Minato evaluation / Chronicle Receipt architecture;
+- do not reveal hidden-operation truth to Kakashi;
+- no Pakkun involvement exists on this route.
+
+# Final lock
 
 > **SLIP IN FOR THE PACKAGE success is a clean stealth win with no Battle and no Masked Interceptor appearance.**
 
@@ -446,4 +955,4 @@ Writing must resolve that presentation/decision structure before implementation 
 
 > **3-v-1 defeat is closed.**
 
-> **3-v-1 victory is factually closed but its player-facing multi-participant disposition surface remains intentionally held pending conflict resolution.**
+> **3-v-1 victory presents exactly: TAKE THEM TO THE UCHIHA POLICE FORCE / TAKE THEM TO THE ANBU / KILL THEM / TAKE THE PACKAGE AND LET THEM GO.**
