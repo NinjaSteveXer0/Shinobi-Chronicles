@@ -7,6 +7,8 @@
 
 **2026-09-19 ORIGIN BATTLE CASH EXPANSION — STEPHEN LOCK:** Academy Kakashi's two current downstream solo Story Battles now also pay immediate Battle Ryō so the Origin gives the player useful early spending money through active play. A committed solo victory over **Package Smuggler** in `academy_kakashi_origin_battle_seq_ps` pays **50 Ryō**. A committed solo victory over **ANBU Marked Target** in `academy_kakashi_origin_battle_seq_amt_pakkun` pays **50 Ryō**. These are cash-only additions. They do **not** add Items, loot, generic EXP, custody, package recovery, intelligence, exceptional-execution status, changed pursuit gates, changed post-Battle state, or changed Story outcomes. The existing Masked Interceptor package remains exactly **50 Ryō + Field Recovery Pill ×1** and is otherwise unchanged.  
 
+**2026-09-19 GLOBAL REWARD-DISCLOSURE RULE:** Battle Victory presentation/explanation must follow `Documentation/World/Battle Reward Full Disclosure and Causal Attribution Rule 2026-09-19.md` (authority commit `aad106b6a64ede81556aea0df0cc9fe4b8830178`). Money, Items, action-derived discipline/Stamina development, hidden persistent development, generic EXP, entitlements and deferred rewards must remain distinct; development gains must be explainable from exact committed causal evidence.  
+
 **Owner:** World / Missions / Events / Rewards  
 **Status:** **BINDING WORLD REWARD-SOURCE AUTHORITY — WORLD VALUES + OWNER SOURCE FIELDS CLOSED; RUNTIME / INSTALLED-BROWSER PROOF SEPARATE**
 
