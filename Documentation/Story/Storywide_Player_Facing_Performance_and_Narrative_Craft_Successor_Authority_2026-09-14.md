@@ -850,3 +850,135 @@ Where quality improvement genuinely requires new choreography that changes subst
 > **The Kakashi benchmark proves the required quality of specificity. It does not force every character or scene to sound like Kakashi.**
 
 > **Chat succession may change the tool doing the writing. It must not change who the characters are, how the world feels, or the literary quality of Shinobi Chronicles.**
+
+
+---
+
+## 2026-09-19 — Conversational Response and Personality-Profile Enforcement Addendum
+
+**Stephen-directed status:** **BINDING EXTENSION TO THIS SINGLE ACTIVE WRITING-QUALITY LAW**
+
+This addendum closes a recurring failure mode visible in institutional, debrief and hidden-evaluation scenes: a scene may contain technically correct questions and technically correct answers while still sounding like a form being completed.
+
+Canonical rule:
+
+> **People ask questions. People answer as themselves.**
+
+A question is not merely a request for a fact. It is a social act received by a particular person in a particular emotional state, relationship and situation.
+
+Therefore a substantial answer should normally be filtered through:
+
+- the speaker's personality;
+- their current emotion;
+- their relationship to the questioner;
+- what they know and do not know;
+- what they want;
+- what they are willing to reveal;
+- how much they care;
+- current stress, fear, anger, humour, sympathy, irritation, confidence or restraint;
+- institutional role where relevant.
+
+The factual payload may be identical while the human answer may be:
+
+- thoughtful;
+- humorous;
+- understanding;
+- sympathetic;
+- apathetic;
+- dry;
+- unkind;
+- fierce;
+- warm;
+- defensive;
+- evasive;
+- suspicious;
+- irritated;
+- embarrassed;
+- frightened;
+- amused;
+- impatient;
+- compassionate;
+- contemptuous;
+- professionally restrained;
+- deliberately silent.
+
+These are examples, not a closed taxonomy.
+
+A character may:
+
+- answer the literal question;
+- answer the emotional meaning underneath it;
+- challenge the premise;
+- ask a question back;
+- joke;
+- deflect;
+- refuse;
+- over-explain;
+- under-explain;
+- change subject;
+- answer with body language;
+- remain silent.
+
+### One-word answers
+
+One-word or very short answers remain valid when they are **deliberate character performance**.
+
+They are not the default merely because the factual answer is short.
+
+Repeated structures such as:
+
+`question -> one-word answer -> paraphrase -> one-word answer -> next question`
+
+are a Writing RED flag unless the scene specifically earns that interrogation rhythm.
+
+Canonical distinction:
+
+> **Brief can be characterful. Repetitive factual ping-pong is not characterisation.**
+
+A short answer should still carry attitude through word choice, timing, physicality, silence, relationship context or surrounding reaction when the moment matters.
+
+### Debrief / institutional scene enforcement
+
+Debriefs, command rooms, reports, police scenes, ANBU scenes and hidden evaluations must not degrade into information-terminal dialogue.
+
+Questions should create human response.
+
+Reports should create interpretation, disagreement, humour, discomfort, sympathy, suspicion, anger, restraint or other character-specific reaction where appropriate.
+
+Characters present in the room should have their own perspective rather than existing only to repeat the report.
+
+### Personality-profile requirement
+
+The existing Writing-owned personality-baseline requirement is now mandatory preflight for recurring named characters.
+
+Before substantial player-facing dialogue is authored for a recurring named character, Writing must:
+
+1. consume the current durable personality / voice profile if one exists;
+2. consume any more specific current canon/Chronicle modifier;
+3. if no durable profile exists, create at least a minimum viable Writing-owned profile before treating the dialogue as complete;
+4. preserve that profile across successor chats;
+5. update the profile when Recorded History legitimately changes the character's presentation.
+
+Character personality profiles guide expression. They do **not** manufacture World Truth, hidden Knowledge, biography, relationships or causal history.
+
+Character Creation / Visuals owns visual identity and representation fidelity. It may consume these personality anchors for expressions/poses, but it does not own Story voice unless a later explicit cross-lane authority says otherwise.
+
+The active profile registry begins at:
+
+`Documentation/Story/Character_Personality_and_Voice_Profile_Registry_2026-09-19.md`
+
+### Additional acceptance tests
+
+A substantial dialogue scene is not Writing-complete until it passes:
+
+- **Q1 — Human-answer test:** do answers sound like a person responding, not a database returning the requested field?
+- **Q2 — Emotional-filter test:** does the answer reflect the speaker's actual current emotional/social posture where that posture matters?
+- **Q3 — Personality test:** could a different character give the same line unchanged? If yes, strengthen voice unless interchangeability is deliberately intended.
+- **Q4 — Question-shape test:** does the conversation vary naturally between questions, answers, reactions, interruptions, silence, counter-questions and voluntary statements?
+- **Q5 — Ping-pong test:** has the scene fallen into repeated short interrogatory exchanges with no developing relationship, emotion or room dynamics?
+
+Final lock:
+
+> **Information is what the answer contains. Character is how the person gives it.**
+>
+> **A correct answer that erases personality is not finished Shinobi Chronicles dialogue.**
