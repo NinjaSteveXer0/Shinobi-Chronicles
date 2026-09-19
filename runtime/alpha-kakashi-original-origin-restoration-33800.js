@@ -222,7 +222,7 @@ globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800D
   const SCRIPT_ID="sc-story-scene-board-33900-script";
   const POLISH_ID="sc-kakashi-scene-board-polish-33910-script";
   const COMPAT_ID="sc-kakashi-story-presentation-compat-33920-script";
-  const BUILD="scene-board-20260917-6";
+  const BUILD="scene-board-20260919-7";
 
   function load33920(){
     if(globalThis.SC_ALPHA_KAKASHI_STORY_PRESENTATION_COMPAT_33920||document.getElementById(COMPAT_ID))return;
