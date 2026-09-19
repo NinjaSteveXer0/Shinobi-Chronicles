@@ -297,7 +297,7 @@ jobs:
           ! grep -Fq '<div class="sc-kakashi-w2c-package-status">' runtime/alpha-kakashi-w2c-ending-35770.js
           ! grep -Fq '<div class="sc-kakashi-w2c-nonkill-package">' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'kakashiStateExitRight35710' runtime/alpha-kakashi-scene04a-35710.js
-          grep -Fq 'BREAKING AWAY' runtime/alpha-kakashi-scene04a-35710.js
+          grep -Fq 'ANBU Marked Target broke away.' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'typeof document==="undefined"' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'kakashiScene06W2CKillLedgerOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           test -f 'Kakashi Origin Backdrop/rooftop_night.png'
