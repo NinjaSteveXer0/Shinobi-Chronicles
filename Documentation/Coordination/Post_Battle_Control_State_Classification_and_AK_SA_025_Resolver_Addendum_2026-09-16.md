@@ -1,5 +1,14 @@
 # Shinobi Chronicles — Post-Battle Control-State Classification and AK_SA_025 Resolver Addendum
 
+> **2026-09-19 GLOBAL SUPERSESSION NOTICE**  
+> Internal classification provenance in this document remains usable, but its former reusable player-facing implication has been superseded by:
+> `Documentation/Coordination/Global_Post_Battle_Disposition_Player_Agency_and_Control_State_Simplification_2026-09-19.md`
+> (`1ff3876e9b367ec518c254b612e4def14db8eaba`).
+>
+> **`CONTROLLED_DEFEATED` / `DEFEATED_BUT_NOT_CONTROLLED` must no longer gate, rename or hide ordinary authored post-Battle player dispositions in any present or future fight.**
+>
+> Battle victory enters the authored post-Battle decision window unless a separate factual escape/death/removal/interruption makes the target unavailable. Do not require binding Skills, special finishers or hidden control-state manipulation merely to unlock ordinary restraint/capture/kill choices.
+
 **Date:** 2026-09-16  
 **Owner:** CE / Codex / Coordination  
 **Status:** **BINDING CE RUNTIME SEMANTIC ADDENDUM — ISSUE #213 CLOSED; CODING MAY CONSUME**  
