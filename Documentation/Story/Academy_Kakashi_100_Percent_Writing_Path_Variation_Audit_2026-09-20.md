@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-20  
 **Owner:** Stephen / Writing / Story — Konoha  
-**Status:** **ACTIVE 100% CLOSURE AUDIT — PRE-FIX INVENTORY**  
+**Status:** **CLOSED — ALL IDENTIFIED WRITING GAPS RESOLVED / 100% CURRENT WRITING COVERAGE**  
 **Primary priority:** **FINISH SHINOBI CHRONICLES ALPHA**
 
 ## Purpose
@@ -19,6 +19,128 @@ This audit distinguishes:
 - Pakkun reaction/departure where applicable.
 
 A branch is not considered 100% Writing-complete merely because the state machine can represent it.
+
+
+## 0. Resolution ledger
+
+The pre-fix audit below identified the remaining current-quality Writing gaps.
+
+They are now resolved.
+
+### A. Mixed lethal terminal expression — CLOSED
+
+Current authority:
+
+`Documentation/Story/Academy_Kakashi_Mixed_Lethal_Terminal_Verbatim_Lock_2026-09-20.md`
+
+Current lineage:
+- initial exact lock: `837a01be2603302e05025e9bc317eb3714cd29a1`;
+- unseen-MI / branch-isolation refinement: `dea066c9ea7de249d20734b5569a0a84a422ba28`.
+
+Closes:
+- 3 kills;
+- all 2-kill survivor-identity families;
+- all 1-kill killed-identity families;
+- survivor-state differentiation;
+- package-state cross projection;
+- Pakkun mixed-lethal reactions;
+- exact Minato evaluation;
+- exact Chronicle Receipt lines.
+
+### B. Nonlethal / defeat / pursuit / custody terminal expression — CLOSED
+
+Current authority:
+
+`Documentation/Story/Academy_Kakashi_Dynamic_Terminal_State_Projection_Verbatim_Lock_2026-09-20.md`
+
+Current lineage:
+- initial exact lock: `10d98fa46065c89f2d9f77f6c3b53350f8f9cec9`;
+- Knowledge-bearing report modules: `a3cad415ea74a4fe8b3965b1136522aceab81047`.
+
+Closes exact terminal expression for:
+- package recovered/lost variants;
+- pursuit failure;
+- Battle defeat with package lost;
+- Battle defeat with package preserved;
+- deliberate release;
+- defeated-left-alive;
+- field-secured;
+- ANBU custody;
+- Uchiha Police custody;
+- Pakkun presence/departure;
+- Get Closer SUCCESS Knowledge;
+- ASK WHERE limited Knowledge;
+- Minato evaluation;
+- Chronicle Receipt.
+
+### C. ASK WHERE THE PACKAGE WAS GOING dedicated current scene — CLOSED
+
+Authority:
+
+`Documentation/Story/Academy_Kakashi_Ask_Where_The_Package_Was_Going_Verbatim_Lock_2026-09-20.md`
+
+Commit:
+`80564cf2502f25895539fa61a74fd7d596bba75b`.
+
+The older omnibus version remains historical.
+
+### D. Package-recovered AMT -> Uchiha Police — CLOSED
+
+Authority:
+
+`Documentation/Story/Academy_Kakashi_Package_Recovered_AMT_Uchiha_Police_Transfer_Verbatim_Lock_2026-09-20.md`
+
+Commit:
+`0b0aa32488b67944076362097662a036f4fbc918`.
+
+Closes:
+- restraint for escort;
+- Police arrival/handoff;
+- participant-specific Police custody;
+- Pakkun explicit departure;
+- package retained by Kakashi;
+- rooftop ANBU package return/report.
+
+### E. AMT Battle-defeat package/Pakkun factual projections — WRITING CLOSED
+
+Authority:
+
+`Documentation/Story/Academy_Kakashi_AMT_Battle_Defeat_Factual_Projection_Verbatim_Lock_2026-09-20.md`
+
+Commit:
+`09db8ff4efc28ee608d41c828af48efc023d324f`.
+
+Writing now covers every legal committed factual result:
+- AMT obtains package;
+- Kakashi retains package;
+- package remains elsewhere;
+- Pakkun remains;
+- Pakkun materially guards/preserves package;
+- Pakkun legitimately separates.
+
+CE/runtime still owns which factual result commits.
+
+That is not a remaining Writing gap.
+
+### F. Historical blocker / supersession cleanup — CLOSED
+
+Old:
+- #244 blocker language;
+- `STOP before debrief` boundaries;
+- hidden `CONTROLLED_DEFEATED` choice renaming;
+- PS/AMT `ATTEMPT TO KILL HIM` menu variants;
+- unfinished ASK WHERE / Demand downstream wording;
+- old anchor-inventory “not closed” state
+
+have all received current successor notices.
+
+Current rule:
+
+> historical PS/AMT failed-lethal receipts are compatibility projection only; they do **not** create current player-facing `ATTEMPT TO KILL HIM` choices.
+
+Current valid post-Battle lethal buttons are deterministic **KILL HER / KILL HIM** where authored.
+
+---
 
 ---
 
@@ -191,13 +313,15 @@ The existing MI-only late lethal-attempt family has exact scenes.
 
 What was not exact before this audit is the broader terminal expression when committed history contains multiple failed lethal intents or a failed lethal intent followed by later nonlethal outcomes.
 
-Required support includes:
+Projection compatibility support includes:
 
 - 0 kills / 1 failed lethal intent;
 - 0 kills / 2 failed lethal intents;
 - 0 kills / 3 failed lethal intents;
 - 1 kill / additional failed lethal intents;
 - 2 kills / one failed lethal intent.
+
+**Current-route clarification (2026-09-20):** the post-Battle simplification removed hidden-control PS/AMT `ATTEMPT TO KILL HIM` menu variants. Multi-failed-lethal combinations beyond the historically authored MI family are therefore **legacy/save compatibility**, not new current playable branches.
 
 Failed lethal results must preserve exact result type where known:
 
@@ -417,11 +541,17 @@ It does not require dozens of duplicate full-scene files.
 
 # 15. Current audit status
 
-At publication of this pre-fix audit:
+Final post-fix result:
 
-- causal branch graph: substantially closed;
-- immediate scenes: substantially closed;
-- mixed lethal terminal expression: **NOT 100%**;
-- dynamic debrief / Minato / Receipt expression: **NOT 100%**;
-- target after this tranche: **100% Writing coverage at current authority**.
+- causal branch graph: **CLOSED at current Writing authority**;
+- immediate scenes: **CLOSED at current Writing authority**;
+- mixed lethal terminal expression: **CLOSED**;
+- nonlethal/defeat dynamic terminal expression: **CLOSED**;
+- Knowledge-bearing terminal expression: **CLOSED**;
+- package-recovered AMT Police route: **CLOSED**;
+- AMT Battle-defeat factual projection: **CLOSED on the Writing side**;
+- historical stale blocker language: **SUPERSEDED / anti-regression pointers applied**;
+- current Writing coverage target: **100%**.
+
+This does not claim Coding implementation, runtime validation, installed-browser acceptance or Golden/regression GREEN.
 
