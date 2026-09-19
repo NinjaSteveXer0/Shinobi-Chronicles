@@ -9,10 +9,15 @@ function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(
 
 globalThis.playerData={ryo:0,exp:0,inventory:[]};
 const discipline={};
+const developmentSources=[];
 let saves=0,chronicleCalls=0;
 globalThis.savePlayerData=()=>{saves+=1;return true;};
 globalThis.saveTestState=()=>true;
-globalThis.addDisciplineExp=(subject,id,amount)=>{
+const legacyTrainingSource={nin:"exam",tai:"practical",gen:"exam",buki:"practical",fuin:"exam",kin:"battle",stamina:"practical"};
+globalThis.isValidDisciplineTrainingSource=(id,source)=>legacyTrainingSource[String(id||"")]===String(source||"");
+globalThis.addDisciplineExp=(subject,id,amount,source)=>{
+  developmentSources.push(String(source||""));
+  if(!globalThis.isValidDisciplineTrainingSource(id,source))return false;
   const key=subject+"::"+id;discipline[key]=(discipline[key]||0)+Number(amount||0);return true;
 };
 globalThis.getCharacterDisciplineProgression=(subject,id)=>({subjectId:subject,disciplineId:id,exp:discipline[subject+"::"+id]||0});
@@ -88,7 +93,13 @@ globalThis.claimCurrentBattleRewards=function baseClaim(){
 };
 globalThis.renderVictoryOverlay=()=>true;
 
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","action_derived_development"),false,"legacy core gate must reject action-derived source before 34800 installs its authorised extension");
 load("runtime/alpha-kakashi-origin-rewards-34800.js");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","action_derived_development"),true,"34800 must extend the frozen core source gate for technical development");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("stamina","action_derived_development"),true,"34800 must extend the frozen core source gate for Stamina development");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","practical"),true,"legacy Bukijutsu Practical source must remain valid");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("nin","exam"),true,"legacy Ninjutsu Exam source must remain valid");
+assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","exam"),false,"34800 must not broaden unrelated legacy training sources");
 load("runtime/alpha-kakashi-battle-development-35740.js");
 
 const first=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
@@ -243,11 +254,19 @@ const diag=globalThis.runAcademyKakashiBattleDevelopment35740Diagnostics();
 assert.strictEqual(diag.pass,true,"35740 diagnostics failed: "+JSON.stringify(diag.failed));
 assert.strictEqual(diag.browserGoldenClaimed,false);
 assert(saves>0);
+assert(developmentSources.length>0&&developmentSources.every(source=>source==="action_derived_development"),"all Kakashi action-derived discipline commits must use the reusable Progression source");
+const gameSource=fs.readFileSync(path.resolve(process.cwd(),"game.js"),"utf8");
+assert(!gameSource.includes('ACTION_DERIVED_DISCIPLINE_SOURCE ='),"audited game.js must remain unchanged; source extension belongs to runtime adapter");
+const rewardSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-origin-rewards-34800.js"),"utf8");
+assert(rewardSource.includes("installActionDerivedDisciplineSourceGate34800"),"34800 must own the source-gate extension");
+assert(rewardSource.includes('__scActionDerivedDevelopment34800'),"34800 source-gate extension must be explicitly marked and idempotent");
 
 console.log("Academy Kakashi Story Battle development + immediate MI reward 35740 QA: PASS");
 console.log("- exact action evidence -> discipline development through 34800");
 console.log("- PS / AMT resolved evidence -> Battle development even when action_attempted omits top-level skillId");
 console.log("- PS / AMT retain zero immediate cash/loot; terminal Origin rewards remain independently deferred");
+console.log("- frozen core validator initially rejects action_derived_development; 34800 installs the authorised runtime extension");
+console.log("- legacy Exam / Practical / Battle source routing remains unchanged");
 console.log("- solo MI victory -> immediate 50 Ryō + Field Recovery Pill ×1 entitlement");
 console.log("- claim commits material package exactly once; no generic EXP");
 console.log("- claim retry/reprojection does not duplicate Ryō, pill or development");

@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v3_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v4_2026_09_19";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="e18729844922461c654481745e48a6eac20649cd";
 const AUTH_LIVE="bf16ebe0f677994878fbe60e30e7b546da899eb8";
@@ -255,7 +255,7 @@ function installStyle(){
  "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}." +BOARD_CLASS+" .sc-scene-board-33900__actors{left:3%!important;right:3%!important;top:10%!important;bottom:19%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5%!important}." +BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(21vw,292px)!important;max-height:470px!important;aspect-ratio:7/10!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:50%!important;right:auto!important;top:20%!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(31%,430px)!important}";
  document.head.appendChild(s);return true;
 }
-function image(ref){return ref===KAK?"Assets/Academy Student/academy_kakashi.png":ref===PS?"NPC/package_smuggler.png":ref===AMT?"NPC/anbu_marked_target.png":"Portraits/Summons/pakkun.png";}
+function image(ref){return ref===KAK?"Assets/Academy Student/academy_kakashi.png":ref===PS?"NPC/package_smuggler.png":ref===AMT?"NPC/anbu_marked_target.png":"Assets/Summons/pakkun.png";}
 function label(ref){return ref===KAK?"KAKASHI":ref===PS?"PACKAGE SMUGGLER":ref===AMT?"ANBU MARKED TARGET":"NINKEN";}
 function card(ref,state,focus){return'<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(ref)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(image(ref))+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label(ref))+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
 function stageBg(rt,p=null){
@@ -319,7 +319,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v3_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v4_2026_09_19",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -329,7 +329,7 @@ function diagnostics(){
   exactBattleConfigs:PS_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
    battleTransitionsAutoLaunch:transitionNarrative.toString().includes("launchCurrentBattleTransition35830")&&launchCurrentBattleTransition35830.toString().includes("launchStorySceneBattle"),
    amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
-   pakkunCardRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&image(PAKKUN)==="Portraits/Summons/pakkun.png",
+   pakkunCardRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&image(PAKKUN)==="Assets/Summons/pakkun.png",
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
   directAmtClosesPs:commitPursuitSelection.toString().includes("kakashiPostMiPsPursuitClosedPermanently=true"),
