@@ -114,6 +114,8 @@ assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must 
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
 assert(source35830.includes("top:4%!important"),"generic post-MI dialogue must clear the Character Card top edge");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
+assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
+assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
 store.set("battle-mi-live",{occurrenceId:"battle-mi-live",fact:{factClass:"battle_result"}});
@@ -148,8 +150,9 @@ drainNarration(MOD.beats.psBattle);
 assert.strictEqual(launches.length,1,"PS battle transition did not auto-launch exactly once");
 assert.strictEqual(launches[0].battleConfigId,"academy_kakashi_origin_battle_seq_ps");
 simulateBattleReturn(MOD.beats.psBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-ps-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.psReturn);
-out=MOD.consumePsReturn();
-assert.strictEqual(out.success,true,"PS Battle return failed: "+JSON.stringify(out));
+const psReturnBeat=definition.beatMap.get(MOD.beats.psReturn);assert(psReturnBeat&&Array.isArray(psReturnBeat.onEnterConsequences),"PS return beat missing on-enter consumer");
+out=psReturnBeat.onEnterConsequences.find(x=>x.requestId==="postmi_35830_ps_return_consume").resolve();
+assert.strictEqual(out.success,true,"PS Battle return failed through owned return beat: "+JSON.stringify(out));
 assert.strictEqual(out.victory,true);
 assert.strictEqual(out.amtEligible,true,"2-turn PS victory must preserve AMT reach");
 assert.strictEqual(recoveryCalls,1,"AK_SA_033 package recovery was not invoked");

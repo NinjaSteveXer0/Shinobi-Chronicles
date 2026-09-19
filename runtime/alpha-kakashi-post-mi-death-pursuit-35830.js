@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v8_2026_09_19";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v9_2026_09_19";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="e18729844922461c654481745e48a6eac20649cd";
 const AUTH_LIVE="bf16ebe0f677994878fbe60e30e7b546da899eb8";
@@ -51,7 +51,13 @@ function factOf(row){return row&&(row.fact||row.data)||{};}
 function occurrence(id){try{return id?A.findOccurrence(String(id)):null;}catch(_e){return null;}}
 function stable(prefix,payload){return typeof CORE.stableRef==="function"?CORE.stableRef(prefix,payload):prefix+"::"+JSON.stringify(payload||{});}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
-function latestResult(){const rt=active();return rt&&rt.battleResume&&rt.battleResume.authored&&typeof rt.battleResume.authored==="object"?rt.battleResume.authored:null;}
+function latestResult(){
+ const rt=active(),resume=rt&&rt.battleResume&&typeof rt.battleResume==="object"?rt.battleResume:null;
+ const candidates=resume?[resume.authored,resume.projected,resume.result,resume.battleResult]:[];
+ for(const row of candidates)if(row&&typeof row==="object"&&row.battleConfigId&&row.bindingRef)return row;
+ try{const row=projector();if(row&&typeof row==="object"&&row.battleConfigId&&row.bindingRef)return row;}catch(_e){}
+ return null;
+}
 function participantState(ref){try{const s=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{},r=s.participantStates&&s.participantStates[ref];return String(r&&r.stateClass||"");}catch(_e){return"";}}
 function postBattleDefeatedLiving(ref){return ["CONTROLLED_DEFEATED","DEFEATED_BUT_NOT_CONTROLLED"].includes(participantState(ref));}
 function deathOccurrenceId(rt=active()){return String(rt&&rt.localContext&&(rt.localContext.kakashiDeterministicKillOccurrenceId||rt.localContext.kakashiScene06AW2CResolutionOccurrenceId)||"");}
@@ -135,6 +141,25 @@ function consumeAmtReturn(){
  const out=commitOnce(id,fact,"AMT_BATTLE_VICTORY",[ORIGIN_ID,AMT,PAKKUN],[{type:"battle_occurrence",id:String(r.battleOccurrenceId||"")},{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiPakkunReachOccurrenceId||""),role:"pakkun_reach"}].filter(x=>x.id));if(!out.success)return out;
  rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtBattleOccurrenceId:id,kakashiPostMiAmtReturnProcessed:true,[CURSOR]:0};rt.beatId=BEAT.amtWin;save();return{success:true,victory:true};
 }
+function consumeReturnOnEnter35830(kind){
+ const rt=active();if(!rt)return{success:false,reason:"post_mi_battle_return_story_missing"};
+ if(!latestResult())return{success:true,pending:true,reason:"post_mi_battle_result_projection_pending",beatId:rt.beatId};
+ return kind==="ps"?consumePsReturn():consumeAmtReturn();
+}
+let returnRetryTimer35830=null,returnRetryCount35830=0;
+function scheduleReturnRetry35830(beatId){
+ if(typeof setTimeout!=="function"||returnRetryTimer35830||returnRetryCount35830>=80)return false;
+ returnRetryTimer35830=setTimeout(()=>{
+  returnRetryTimer35830=null;
+  const rt=active();if(!rt||rt.beatId!==beatId){returnRetryCount35830=0;return;}
+  const kind=beatId===BEAT.psReturn?"ps":beatId===BEAT.amtReturn?"amt":null;if(!kind){returnRetryCount35830=0;return;}
+  const out=consumeReturnOnEnter35830(kind);
+  if(out&&out.success===true&&out.pending!==true){returnRetryCount35830=0;try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_e){}return;}
+  if(out&&out.success===true&&out.pending===true){returnRetryCount35830+=1;scheduleReturnRetry35830(beatId);}
+ },25);
+ return true;
+}
+
 function deterministicKillTarget(ref,kind){
  const rt=active();if(!rt||!postBattleDefeatedLiving(ref))return{success:false,reason:"post_battle_defeated_living_target_required"};
  const pkg=packageState(rt),parent=kind==="ps"?String(rt.localContext.kakashiPostMiPsBattleOccurrenceId||""):String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||"");
@@ -201,12 +226,12 @@ function installBeats(){
  const narr=(id,bg,obj)=>m.set(id,{beatId:id,mode:"narration",environmentRef:{assetId:bg},objectiveText:obj||null,text:"",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psChase,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psFail,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);narr(BEAT.psCatch,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);
  m.set(BEAT.psBattle,{beatId:BEAT.psBattle,mode:"battle_transition",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},text:"",battle:{encounterId:PS_CONFIG,launchResolver:ctx=>launchPs(ctx),postBattleBeatId:BEAT.psReturn,resultProjector:projector,actionLabel:"STOP THE PACKAGE SMUGGLER"},exitScene:false,allowPresentationClose:false,choices:[]});
- narr(BEAT.psReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psLoss,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
+ narr(BEAT.psReturn,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);m.get(BEAT.psReturn).onEnterConsequences=[{requestId:"postmi_35830_ps_return_consume",kind:"domain",resolve:()=>consumeReturnOnEnter35830("ps")}];narr(BEAT.psWin,"kakashi_origin_konoha_alleyway",OBJECTIVE.ps);narr(BEAT.psLoss,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
  m.set(BEAT.psDecision,{beatId:BEAT.psDecision,mode:"choice",environmentRef:{assetId:"kakashi_origin_konoha_alleyway"},objectiveText:OBJECTIVE.ps,text:"Package Smuggler is down. The package is secure. Kakashi decides what remains worth pursuing.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.psReport,"kakashi_origin_konoha_alleyway",OBJECTIVE.report);
  narr(BEAT.amtChase,"kakashi_origin_rooftop_night",OBJECTIVE.amt);narr(BEAT.amtFail,"kakashi_origin_rooftop_night",OBJECTIVE.report);narr(BEAT.amtCatch,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);narr(BEAT.psToAmt,"kakashi_origin_rooftop_night",OBJECTIVE.secureAmt);
  m.set(BEAT.amtBattle,{beatId:BEAT.amtBattle,mode:"battle_transition",environmentRef:{assetId:AMT_ALLEY_ASSET_ID},text:"",battle:{encounterId:AMT_CONFIG,launchResolver:ctx=>launchAmt(ctx),postBattleBeatId:BEAT.amtReturn,resultProjector:projector,actionLabel:"SECURE ANBU MARKED TARGET"},exitScene:false,allowPresentationClose:false,choices:[]});
- narr(BEAT.amtReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);narr(BEAT.amtWin,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);
+ narr(BEAT.amtReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);m.get(BEAT.amtReturn).onEnterConsequences=[{requestId:"postmi_35830_amt_return_consume",kind:"domain",resolve:()=>consumeReturnOnEnter35830("amt")}];narr(BEAT.amtWin,AMT_ALLEY_ASSET_ID,OBJECTIVE.secureAmt);
  m.set(BEAT.amtDecision,{beatId:BEAT.amtDecision,mode:"choice",environmentRef:{assetId:AMT_ALLEY_ASSET_ID},objectiveText:null,text:"ANBU Marked Target is defeated. Package state remains separate from his disposition.",nextBeatId:null,exitScene:false,allowPresentationClose:false,choices:[]});
  narr(BEAT.amtLiveReturn,AMT_ALLEY_ASSET_ID,OBJECTIVE.report);narr(BEAT.amtKill,AMT_ALLEY_ASSET_ID,null);narr(BEAT.amtReport,AMT_ALLEY_ASSET_ID,OBJECTIVE.report);
  return true;
@@ -279,8 +304,8 @@ function actorState35830(ref,rt){
 function render(){
  wireEntryChoices();materializePsDecision();materializeAmtDecision();
  if(typeof document==="undefined")return false;const rt=active(),layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
- if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed)){const x=consumePsReturn();if(x&&x.success===true){try{return render();}catch(_e){}}}
- if(rt&&rt.beatId===BEAT.amtReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiAmtReturnProcessed)){const x=consumeAmtReturn();if(x&&x.success===true){try{return render();}catch(_e){}}}
+ if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed)){const x=consumeReturnOnEnter35830("ps");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.psReturn);}
+ if(rt&&rt.beatId===BEAT.amtReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiAmtReturnProcessed)){const x=consumeReturnOnEnter35830("amt");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.amtReturn);}
  const ours=rt&&Object.values(BEAT).includes(rt.beatId);layer.dataset.scPostmi35830=ours?"true":"false";const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
  for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+stageBg(rt,performance(rt)).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}
@@ -320,7 +345,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v8_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v9_2026_09_19",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="e18729844922461c654481745e48a6eac20649cd"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -329,6 +354,7 @@ function diagnostics(){
   exactPakkunCorrection:CUES.amtCatch.some(x=>x.speaker==="PAKKUN"&&x.text==="This yours?")&&CUES.amtCatch.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently.")&&CUES.psToAmt.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently."),
   exactBattleConfigs:PS_CONFIG==="academy_kakashi_origin_battle_seq_ps"&&AMT_CONFIG==="academy_kakashi_origin_battle_seq_amt_pakkun",
    battleTransitionsAutoLaunch:transitionNarrative.toString().includes("launchCurrentBattleTransition35830")&&launchCurrentBattleTransition35830.toString().includes("launchStorySceneBattle"),
+   postBattleReturnOwnersInstalled:!!(m&&m.get(BEAT.psReturn)&&Array.isArray(m.get(BEAT.psReturn).onEnterConsequences)&&m.get(BEAT.psReturn).onEnterConsequences.some(x=>x&&x.requestId==="postmi_35830_ps_return_consume"))&&!!(m&&m.get(BEAT.amtReturn)&&Array.isArray(m.get(BEAT.amtReturn).onEnterConsequences)&&m.get(BEAT.amtReturn).onEnterConsequences.some(x=>x&&x.requestId==="postmi_35830_amt_return_consume"))&&latestResult.toString().includes("resume.projected")&&render.toString().includes("scheduleReturnRetry35830"),
    amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
    pakkunSceneRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),

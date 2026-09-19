@@ -105,7 +105,8 @@ const source35740=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kaka
 assert(source35740.includes('const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;'),"deferred Battle Ryō tile must source the existing material Battle reward value");
 assert(source35740.includes('<span>RYŌ</span><strong>${immediateRyo>0?`+${immediateRyo}`:"0"}</strong>'),"deferred Battle Ryō tile must render a numeric value");
 assert(!source35740.includes('<span>RYŌ</span><strong>DEBRIEF</strong>'),"Ryō metric must never use DEBRIEF as a currency amount");
-assert(source35740.includes("REWARD DETAILS · WHY THESE REWARDS?"),"Victory surface must expose immediate reward/development causal detail");
+assert(source35740.includes("<summary>BATTLE BREAKDOWN</summary>")&&!source35740.includes("WHY THESE REWARDS?"),"Victory surface must expose causal Battle detail without the awkward WHY THESE REWARDS copy");
+assert(source35740.includes('<span>DEVELOPMENT</span><div>${developmentListMarkup(summary)}${rewardDisclosureMarkup35740(summary,b)}</div>'),"Battle breakdown must live with Battle development, not inside deferred Origin Rewards");
 assert(source35740.includes("commitAcademyKakashiDownstreamBattleCashReward34800"),"PS/AMT claim path must use the 34800 source-scoped reward adapter");
 
 
