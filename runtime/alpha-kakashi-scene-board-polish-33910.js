@@ -150,27 +150,27 @@ function transferProjection(performance,context){
   if(expanded){
     const actors=[kakashi("OBSERVING · UNSEEN",focus==="academy_kakashi")];
     if(idx<=14){
-      const amtState=idx===14?"BREAKING AWAY":idx>=6?"MOVING AWAY":"AT EXCHANGE";
+      const amtState=idx===14?"BREAKING AWAY":idx>=6?"LEAVING EXCHANGE":"AT EXCHANGE";
       actors.push(amt(amtState,focus==="anbu_marked_target"));
     }
-    const psState=idx>=16?"ESCAPE LINE CONTESTED":idx>=7?"ESCAPING WITH PACKAGE":idx>=3?"HAS PACKAGE":"AT EXCHANGE";
+    const psState=idx>=16?"HAS PACKAGE · ESCAPE BLOCKED":idx>=3?"HAS PACKAGE":"AT EXCHANGE";
     actors.push(smuggler(psState,focus==="package_smuggler"));
     if(idx>=12){
-      const miState=idx>=16?"CUTTING OFF ESCAPE":idx>=13?"INTERCEPTING PACKAGE SMUGGLER":"BURSTING FROM SHADOW";
+      const miState=idx>=16?"CUTTING OFF ESCAPE":idx>=13?"PRESSING PACKAGE SMUGGLER":"BURSTING FROM SHADOW";
       actors.push(interceptor(miState,focus==="masked_interceptor",idx===12));
     }
-    return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=3?[{label:"PACKAGE",state:"PACKAGE SMUGGLER HAS PACKAGE"}]:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
+    return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=3?[]:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
   }
-  const actors=[kakashi("OBSERVING",focus==="academy_kakashi"),amt(idx>=2?"LEAVING":"AT EXCHANGE",focus==="anbu_marked_target")];
-  if(idx<2)actors.push(smuggler(idx>=1?"HAS PACKAGE":"AT EXCHANGE",focus==="package_smuggler",cue.actorEntrance==="package_smuggler"));else actors.push(interceptor("VISIBLE",true,cue.actorEntrance==="masked_interceptor"));
-  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=1?[{label:"PACKAGE",state:"PACKAGE SMUGGLER HAS PACKAGE"}]:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
+  const actors=[kakashi("OBSERVING",focus==="academy_kakashi"),amt(idx>=2?"LEAVING":"AT EXCHANGE",focus==="anbu_marked_target"),smuggler(idx>=1?"HAS PACKAGE":"AT EXCHANGE",focus==="package_smuggler",cue.actorEntrance==="package_smuggler")];
+  if(idx>=2)actors.push(interceptor("PRESSING PACKAGE SMUGGLER",true,cue.actorEntrance==="masked_interceptor"));
+  return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors,objects:idx>=1?[]:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
 }
 function kakashiBoardResolver({beatId,context,performance}){
   if(beatId==="kak_original_rooftop"||beatId==="kak_original_anbu"||beatId==="kak_original_envelope"||beatId==="kak_original_order")return roofProjection(performance);
   if(beatId==="kak_original_tail")return tailProjection(performance);
   if(beatId==="kak_original_action")return{mode:"encounter",location:"KONOHA ALLEY",objective:OBJECTIVE,actors:[kakashi("UNDETECTED POSITION",true),amt("CURRENT CARRIER"),smuggler("RECEIVING CONTACT")],objects:[{label:"PACKAGE",state:"EXCHANGE IN PROGRESS"}]};
   if(beatId==="kak_original_transfer")return transferProjection(performance,context);
-  if(beatId==="kak_original_major_choice")return{mode:"encounter",location:"KONOHA ALLEY",objective:"Choose which problem Kakashi prioritizes.",actors:[kakashi("DECISION WINDOW",true),amt("MOVING"),interceptor("ACTIVE")],objects:[{label:"PACKAGE",state:"PACKAGE SMUGGLER HAS PACKAGE"}]};
+  if(beatId==="kak_original_major_choice")return{mode:"encounter",location:"KONOHA ALLEY",objective:"Choose which problem Kakashi prioritizes.",actors:[kakashi("DECISION WINDOW",true),smuggler("HAS PACKAGE"),interceptor("BLOCKING ESCAPE")],objects:[]};
   if(beatId==="kak_original_secured"){const r=committedFact(),fact=r&&r.fact||{};return{mode:"consequence",location:"KONOHA ALLEY",objective:"Return with the retrieval result.",committed:fact.packageDisposition==="secured",actors:[kakashi("PACKAGE SECURED",true),smuggler("PACKAGE RELINQUISHED"),interceptor("SEPARATE COMPLICATION")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="secured"?"SECURED BY KAKASHI":"RESOLVING"}]};}
   if(beatId==="kak_original_pursue"){const r=committedFact(),fact=r&&r.fact||{};return{mode:"consequence",location:"KONOHA ALLEY",objective:"Return with the retrieval result.",committed:fact.packageDisposition==="lost",actors:[kakashi("IN PURSUIT",true),amt("PURSUED"),smuggler("RETAINS PACKAGE")],objects:[{label:"PACKAGE",state:fact.packageDisposition==="lost"?"NOT RECOVERED BY KAKASHI":"RESOLVING"}]};}
   return null;
