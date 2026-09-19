@@ -74,3 +74,24 @@ Only exact current Story/UI authority or Stephen approval establishes scene-to-b
 > **Kakashi Origin backdrop selection is exact-asset-driven, not description-driven.**
 >
 > **`alleyway_konoha_night.png` and `konoha_alleyway.png` are distinct assets and must not be treated as synonyms.**
+
+## 2026-09-19 — Package Smuggler alternate-night binding
+
+New exact Kakashi-specific asset confirmed on live source:
+
+`Kakashi Origin Backdrop/konoha_alleyway_alt_night.png`
+
+Stephen-approved binding:
+
+> **Package Smuggler-focused Kakashi Origin scenes use `Kakashi Origin Backdrop/konoha_alleyway_alt_night.png` where the PS alley/street location is the focal environment.**
+
+This specifically includes the current approved:
+- PS `RESTRAIN HIM AND CONTINUE` scene;
+- later **Collect Package Smuggler** scene;
+- singular **Package Smuggler — Return to ANBU** departure/return scene.
+
+This supersedes `Kakashi Origin Backdrop/konoha_alleyway.png` for those PS-focused beats.
+
+Do not treat the two files as synonyms.
+
+The already-approved multi-captive return journey is not automatically rebound merely because Package Smuggler is one member of the escort; use its own exact scene authority.
