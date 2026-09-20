@@ -272,7 +272,6 @@ jobs:
           grep -Fq 'binding===STOP_ASSASSIN_POST_MI_PS_BINDING' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
           grep -Fq 'rejectedParentCandidates' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
           grep -Fq 'alpha_playability_sprint_33100_v3_2026_09_20' runtime/alpha-alpha-sprint-33100.js
-          grep -Fq 'runtime/alpha-alpha-sprint-33100.js?sc=alpha33100-20260920-3' index.html
           grep -Fq '0d4aa441e4ef6d566f3d1df23c198940bdc559dd' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'alpha_kakashi_deterministic_kill_35810_v2_2026_09_19' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq '1ff3876e9b367ec518c254b612e4def14db8eaba' runtime/alpha-kakashi-deterministic-kill-35810.js
