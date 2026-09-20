@@ -30,7 +30,7 @@ globalThis.getActiveStorySceneRuntime=()=>active;
 
 const captures=[];
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
- patchId:"alpha_kakashi_terminal_debrief_35100_v7_2026_09_20",
+ patchId:"alpha_kakashi_terminal_debrief_35100_v8_2026_09_20",
  deriveTerminalFacts(){return{success:true,packageRecovered:false,packageState:{holderClass:"ANBU_MARKED_TARGET",stateRef:"qa-pkg"},pakkunPresentAtDebrief:false,battleFacts:[]};},
  captureBattleResult(config){captures.push(config);return{success:true,battle:{battleConfigId:config}};},
  commitChronicleReceiptAndRewards(){return{success:true};},
@@ -94,11 +94,24 @@ assert(receipt.includes("Masked Interceptor — Killed by Kakashi after defeat."
 assert(receipt.includes("Package Smuggler — Killed by Kakashi after defeat."));
 assert(receipt.includes("ANBU Marked Target — Killed by Kakashi after defeat."));
 assert(receipt.includes("Package — Lost with ANBU Marked Target."));
-assert(receipt.includes("Temporary ninken intervention — Present."));
+assert(receipt.includes("Temporary ninken intervention — Involved."));
+assert(receipt.includes("Status at ANBU report — Present."));
 assert(receipt.includes("Permanent Summon ownership — None."));
 assert(minato.includes("Three confirmed deaths."));
 assert(minato.includes("Battle casualties?"));
 assert(!/merciless|ruthless|alignment/i.test(report+receipt+minato));
+
+// Pakkun may already have explicitly departed on a route-specific handoff; do not resurrect him at terminal.
+const departedSnapshot={
+ participantStates:{[PAKKUN]:{participantRef:PAKKUN,stateClass:"DEPARTED",resultRef:"pakkun-departed"}},
+ materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-anbu-departed",value:{currentHolderClass:"ANBU",custodyClass:"ANBU"}}},
+ decisionReceipts:{"r1":{selectedChoiceId:"get_closer",createdAt:1}}
+};
+state=MOD.buildProjectionState({snapshot:departedSnapshot,history:[{occurrenceId:"pakkun-involved",fact:{storySceneInstanceId:"qa-terminal",worldFacts:{pakkunPresent:true}}}],terminalFacts:{success:true,packageRecovered:true,packageState:{holderClass:"ANBU",stateRef:"pkg-anbu-departed"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{kakashiKonohaPakkunPresent:false}});
+receipt=MOD.receiptText(state);report=MOD.reportText(state);
+assert(receipt.includes("Temporary ninken intervention — Involved."));
+assert(receipt.includes("Status at ANBU report — Explicitly departed."));
+assert(!report.includes("And the ninken?"),"terminal report resurrected a departed Pakkun");
 
 // TWO KILLS + Police survivor + recovered package keeps survivor identity visible.
 occurrences.set("police-ps",{occurrenceId:"police-ps",fact:{participantRef:PS,participantState:{status:"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY"},storySceneInstanceId:"qa-terminal"}});
