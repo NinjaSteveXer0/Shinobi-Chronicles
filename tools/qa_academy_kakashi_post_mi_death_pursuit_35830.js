@@ -183,6 +183,13 @@ assert(psBattleClasses.has("sc-kakashi-ps-battle-backdrop-35830"),"PS Battle lau
 const psStyle=psBattleStyles.get("sc-kakashi-ps-battle-backdrop-35830-style");
 assert(psStyle&&psStyle.textContent.includes("Kakashi Origin Backdrop/konoha_alleyway_alt_night.png"),"PS Battle stage style must project the exact approved alternate-night alley asset");
 assert(globalThis.currentBattle&&globalThis.currentBattle.kakashiOriginBattleBackdrop&&globalThis.currentBattle.kakashiOriginBattleBackdrop.path==="Kakashi Origin Backdrop/konoha_alleyway_alt_night.png","PS Battle launch must carry exact backdrop metadata on the active Battle");
+for(const beatId of [MOD.beats.psChase,MOD.beats.psFail,MOD.beats.psCatch,MOD.beats.psReturn,MOD.beats.psWin,MOD.beats.psLoss,MOD.beats.psDecision,MOD.beats.psReport]){
+ const beat=definition.beatMap.get(beatId);
+ assert(beat&&beat.environmentRef&&beat.environmentRef.assetId==="kakashi_origin_ps_battle_alt_night","PS Story beat must stay on approved alternate-night alley: "+beatId);
+}
+const postMiSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"),"utf8");
+assert(postMiSource.includes('psStreet:PS_BATTLE_BACKDROP_PATH'),"PS Story renderer must use the exact PS alternate-night backdrop path");
+assert(postMiSource.includes('"KONOHA ALLEY · NIGHT"'),"PS Story location chip must identify the alley, not the old street presentation");
 delete globalThis.document;
 assert.strictEqual(active.localContext.kakashiPostMiPackageOccurrenceId,active.localContext.kakashiPostMiPursuitResolutionOccurrenceId,"reached PS pursuit must advance package provenance to the Origin-owned pursuit-resolution occurrence");
 simulateBattleReturn(MOD.beats.psBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-live-ps-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.psReturn);
@@ -339,7 +346,7 @@ assert(saves>0);
 console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
 console.log("- live fast-win PS pursuit and post-kill PS/AMT pursuit entries use direct authored successor routing");
 console.log("- committed MI death is never rerolled across lethal successor selection");
-console.log("- PS route uses sequential PS Battle config, exact alternate-night Battle backdrop, and separate AK_SA_033 package recovery");
+console.log("- PS route uses sequential PS Battle config, exact alternate-night Story/Battle backdrop, and separate AK_SA_033 package recovery");
 console.log("- <=3 PS victory preserves AMT route; PS direct KILL works from ordinary defeated state");
 console.log("- PS and AMT battle-transition beats auto-launch through canonical Story Battle authority");
 console.log("- legitimate AMT reach commits Pakkun, reveals Assets/Summons/pakkun.png on-cue, and uses alleyway_konoha_night");

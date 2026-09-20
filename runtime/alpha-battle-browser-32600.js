@@ -15,7 +15,7 @@
 (function installAlphaBattleBrowser32600(){
   "use strict";
 
-  const PATCH_ID="alpha_battle_browser_32600_2026_09_17";
+  const PATCH_ID="alpha_battle_browser_32600_v2_2026_09_20";
 
   // --------------------------------------------------------------------------
   // 1. REPEAT-SKILL UX — FIX STALE SELECTION, DO NOT INVENT A COOLDOWN BYPASS
@@ -69,18 +69,35 @@
   // caller return context.
   const priorClaimVictoryAutoReturn=claimVictoryRewardsFromOverlay;
   claimVictoryRewardsFromOverlay=function claimVictoryRewardsFromOverlayBrowser32600(){
-    const returnContextBefore=currentBattle&&currentBattle.returnContext&&typeof cloneBattleRuntimeValue==="function"
-      ? cloneBattleRuntimeValue(currentBattle.returnContext)
-      : (currentBattle&&currentBattle.returnContext?currentBattle.returnContext:null);
+    const liveReturnContext=currentBattle&&currentBattle.returnContext&&typeof currentBattle.returnContext==="object"
+      ?currentBattle.returnContext:null;
+    const storedReturnContext=currentBattle&&currentBattle.__scExplicitPostClaimReturnContext32600&&typeof currentBattle.__scExplicitPostClaimReturnContext32600==="object"
+      ?currentBattle.__scExplicitPostClaimReturnContext32600:null;
+    const rawReturnContext=liveReturnContext||storedReturnContext;
+    const returnContextBefore=rawReturnContext&&typeof cloneBattleRuntimeValue==="function"
+      ?cloneBattleRuntimeValue(rawReturnContext)
+      :rawReturnContext;
+    const explicitPostClaim=!!(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true);
+    const explicitClaimedContinue=!!(explicitPostClaim&&currentBattle&&currentBattle.rewards&&currentBattle.rewards.claimed===true);
 
-    const claimResult=priorClaimVictoryAutoReturn.apply(this,arguments);
+    // The first click commits the reward. The second click is continuation only:
+    // never ask reward authority to grant an already-claimed reward again.
+    const claimResult=explicitClaimedContinue
+      ?{success:true,claimed:true,idempotent:true,explicitPostClaimContinue:true}
+      :priorClaimVictoryAutoReturn.apply(this,arguments);
     if(!(claimResult&&claimResult.success===true))return claimResult;
 
-    // Some authored Battles require an explicit post-claim confirmation step:
-    // claim the material reward, remain on the completed Victory surface, then
-    // RETURN TO STORY. This flag is reward-authority owned; generic Battles keep
-    // the established auto-return behaviour below.
-    if(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true){
+    if(explicitPostClaim&&!explicitClaimedContinue){
+      if(currentBattle){
+        currentBattle.__scExplicitPostClaimReturnContext32600=returnContextBefore&&typeof cloneBattleRuntimeValue==="function"
+          ?cloneBattleRuntimeValue(returnContextBefore)
+          :returnContextBefore;
+        if(returnContextBefore){
+          currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
+            ?cloneBattleRuntimeValue(returnContextBefore)
+            :returnContextBefore;
+        }
+      }
       try{openOverlay("victory");}catch(_error){}
       return{
         ...claimResult,
@@ -97,7 +114,6 @@
 
     try{
       if(callerOwned){
-        // Claiming rewards must not erase or weaken the Battle caller identity.
         if(currentBattle){
           currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
             ?cloneBattleRuntimeValue(returnContextBefore)
@@ -112,8 +128,6 @@
 
         if(!(callerResult&&callerResult.success===true)){
           navigationError=String(callerResult&&callerResult.reason||"caller_restore_failed");
-          // Fail closed on the completed Victory surface. Do not drop a Story
-          // Battle into generic Combat Arena when its caller cannot resume.
           try{openOverlay("victory");}catch(_error){}
           return {
             ...claimResult,
@@ -157,6 +171,7 @@
       returnContextBefore,
       callerResult:callerResult||null,
       navigationError,
+      explicitClaimedContinue,
       rewardCommitBeforeCallerRestore:true
     };
   };
@@ -266,6 +281,8 @@
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
       explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
+      explicitClaimedContinueSkipsDuplicateGrant:claimSource.includes("const explicitClaimedContinue=")&&claimSource.includes("const claimResult=explicitClaimedContinue")&&claimSource.includes("idempotent:true"),
+      explicitReturnContextPersisted:claimSource.includes("__scExplicitPostClaimReturnContext32600")&&claimSource.includes("storedReturnContext"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
