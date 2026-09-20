@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v20_2026_09_20";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v21_2026_09_20";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -397,7 +397,7 @@ function transitionNarrative(rt){
 }
 function installStyle(){
  if(typeof document==="undefined"||!document.head)return false;const prior=document.getElementById(STYLE_ID);if(prior)prior.remove();const s=document.createElement("style");s.id=STYLE_ID;s.textContent=
- "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}." +BOARD_CLASS+" .sc-scene-board-33900__actors{left:3%!important;right:3%!important;top:10%!important;bottom:19%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5%!important}." +BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(21vw,292px)!important;max-height:470px!important;aspect-ratio:7/10!important}." +BOARD_CLASS+" .sc-postmi-summon-35830{position:relative;width:min(14vw,190px)!important;max-height:235px!important;align-self:flex-end!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;overflow:visible!important;opacity:.88;transform:translateY(2px) scale(.98);filter:none!important;margin-bottom:2%!important}." +BOARD_CLASS+" .sc-postmi-summon-35830.is-focus{opacity:1;transform:translateY(0) scale(1.03)}." +BOARD_CLASS+" .sc-postmi-summon-35830 img{display:block;width:100%!important;height:auto!important;max-height:235px!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52))!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:50%!important;right:auto!important;top:4%!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(38%,540px)!important;max-width:540px!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'][data-sc-board-ui-mode='dialogue'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='pakkun']{left:auto!important;right:6%!important;top:10%!important;bottom:auto!important;transform:none!important;width:min(27%,380px)!important}";
+ "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}." +BOARD_CLASS+" .sc-scene-board-33900__actors{left:3%!important;right:3%!important;top:10%!important;bottom:19%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5%!important}." +BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(21vw,292px)!important;max-height:470px!important;aspect-ratio:7/10!important}." +BOARD_CLASS+" .sc-postmi-summon-35830{position:relative;width:min(14vw,190px)!important;max-height:235px!important;align-self:flex-end!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;overflow:visible!important;opacity:.88;transform:translateY(2px) scale(.98);filter:none!important;margin-bottom:2%!important}." +BOARD_CLASS+" .sc-postmi-summon-35830.is-focus{opacity:1;transform:translateY(0) scale(1.03)}." +BOARD_CLASS+" .sc-postmi-summon-35830 img{display:block;width:100%!important;height:auto!important;max-height:235px!important;object-fit:contain!important;object-position:center bottom!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52))!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-previous{display:none!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{left:50%!important;right:auto!important;top:4%!important;bottom:auto!important;transform:translateX(-50%)!important;width:min(38%,540px)!important;max-width:540px!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'][data-sc-postmi-phase='amt'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current{top:1%!important;transform:translate(-50%,-38%)!important}#story-scene-presentation-layer[data-sc-postmi-35830='true'][data-sc-board-ui-mode='dialogue'] .sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current[data-speaker-id='pakkun']{left:auto!important;right:6%!important;top:10%!important;bottom:auto!important;transform:none!important;width:min(27%,380px)!important}";
  document.head.appendChild(s);return true;
 }
 const PAKKUN_SCENE_ASSET="Assets/Summons/pakkun.png";
@@ -419,6 +419,7 @@ function pakkunVisible35830(rt,p){
 }
 function actorState35830(ref,rt){
  if(ref===KAK)return"ACTIVE";
+ if(ref===ANBU)return rt&&rt.beatId===BEAT.amtPoliceAnbuReturn?"RECEIVING PACKAGE":"RECEIVING CUSTODY";
  if(ref===PAKKUN)return"PRESENT";
  if(ref===PS){const pkg=packageState(rt);if(String(pkg.currentHolderClass||"")==="PACKAGE_SMUGGLER")return"HAS PACKAGE";}
  return participantState(ref)||"PRESENT";
@@ -428,16 +429,16 @@ function render(){
  if(typeof document==="undefined")return false;const rt=active(),layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
  if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed)){const x=consumeReturnOnEnter35830("ps");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.psReturn);}
  if(rt&&rt.beatId===BEAT.amtReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiAmtReturnProcessed)){const x=consumeReturnOnEnter35830("amt");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.amtReturn);}
- const ours=rt&&Object.values(BEAT).includes(rt.beatId);layer.dataset.scPostmi35830=ours?"true":"false";const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
+ const ours=rt&&Object.values(BEAT).includes(rt.beatId);layer.dataset.scPostmi35830=ours?"true":"false";if(ours)layer.dataset.scPostmiPhase=String(rt.beatId||"").includes("_amt_")||rt.beatId===BEAT.psToAmt?"amt":"ps";else delete layer.dataset.scPostmiPhase;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
  for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+stageBg(rt,performance(rt)).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}
  const p=performance(rt),focus=p&&p.cue&&(p.cue.speaker==="KAKASHI"?KAK:p.cue.speaker==="PACKAGE SMUGGLER"?PS:p.cue.speaker==="ANBU MARKED TARGET"?AMT:p.cue.speaker==="PAKKUN"?PAKKUN:p.cue.speaker==="ANBU OPERATIVE"?ANBU:null)||KAK;
  let refs=[KAK];
  if([BEAT.psChase,BEAT.psCatch,BEAT.psWin,BEAT.psDecision,BEAT.psAnbuEscort,BEAT.psAnbuHandoff].includes(rt.beatId)&&participantState(PS)!=="DEAD")refs.push(PS);
  if([BEAT.amtChase,BEAT.amtCatch,BEAT.psToAmt,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtAnbuHandoff,BEAT.amtKill,BEAT.amtPoliceEscort,BEAT.amtPoliceHandoff].includes(rt.beatId)){refs.push(AMT);if(pakkunVisible35830(rt,p)||[BEAT.amtLiveReturn,BEAT.amtAnbuHandoff,BEAT.amtPoliceEscort,BEAT.amtPoliceHandoff].includes(rt.beatId))refs.push(PAKKUN);}
- if([BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff].includes(rt.beatId))refs.unshift(ANBU);
- const amtAlley=[BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport,BEAT.amtPoliceEscort].includes(rt.beatId);
- b.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+(amtAlley?"KONOHA ALLEY · NIGHT":[BEAT.amtChase,BEAT.psToAmt].includes(rt.beatId)?"KONOHA ROOFTOPS · NIGHT":"KONOHA ALLEY · NIGHT")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+refs.length+'">'+refs.map(ref=>card(ref,actorState35830(ref,rt),focus===ref)).join("")+'</div>';
+ if([BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId))refs.unshift(ANBU);
+ const amtAlley=[BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport,BEAT.amtPoliceEscort].includes(rt.beatId),rooftop=[BEAT.amtChase,BEAT.psToAmt,BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId);
+ b.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+(rooftop?"KONOHA ROOFTOP · NIGHT":amtAlley?"KONOHA ALLEY · NIGHT":BEAT.amtPoliceHandoff===rt.beatId?"UCHIHA POLICE FORCE · NIGHT":"KONOHA ALLEY · NIGHT")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+refs.length+'">'+refs.map(ref=>card(ref,actorState35830(ref,rt),focus===ref)).join("")+'</div>';
  if(p){const t=layer.querySelector(".sc-story-text");if(t)t.textContent=p.cue.text;const n=layer.querySelector(".sc-story-name");if(n){n.textContent=p.cue.kind==="dialogue"?p.cue.speaker:"NARRATION";n.style.display="block";}}
  return true;
 }
@@ -479,7 +480,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v20_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v21_2026_09_20",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
