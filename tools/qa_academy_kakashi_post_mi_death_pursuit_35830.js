@@ -6,7 +6,7 @@ function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const LIVE_SOURCE="kak_scene05a_w_choice",RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DKILL_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
 const MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt";
-const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0;const materialStates={};
+const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0,terminalDebriefCommits=0,wipes=0;const materialStates={};
 const participantStates={
  [MI]:{participantRef:MI,stateClass:"DEAD"},
  [PS]:{participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"}
@@ -49,6 +49,16 @@ globalThis.beginAcademyKakashiCollectionFromAmt35920=function(){
  return{success:true,manifestId:"qa-collection-manifest",amtOccurrenceId:"qa-amt-collected",nextBeatId:"qa-collect-ps"};
 };
 globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920={beats:{collectPs:"qa-collect-ps"}};
+globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
+ commitTerminalDebrief(){
+  terminalDebriefCommits+=1;
+  return{success:true,occurrenceId:"qa-terminal-debrief-"+String(active&&active.instanceId||"none")};
+ }
+};
+globalThis.performKakashiSceneWipe33910=function(continuation){
+ wipes+=1;
+ return typeof continuation==="function"?continuation():{success:false,reason:"qa_wipe_continuation_missing"};
+};
 
 globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(explicitResult=null){
  recoveryCalls+=1;
@@ -143,9 +153,10 @@ assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-
 assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
 assert(source35830.includes("[data-sc-board-ui-mode=\'dialogue\']")&&source35830.includes("top:4%!important"),"post-MI dialogue safe lane must outrank global dialogue centering and clear Character Cards");
-assert(source35830.includes("data-sc-postmi-phase='amt'")&&source35830.includes("translate(-50%,-38%)"),"AMT dialogue must use the raised route-specific safe lane without moving the GREEN PS dialogue lane");
+assert(source35830.includes("enforceAmtDialogueLane35830")&&source35830.includes('style.setProperty("top","14%","important")')&&source35830.includes("requestAnimationFrame"),"AMT dialogue must use a direct post-render safe lane without moving the GREEN PS dialogue lane");
 assert(source35830.includes("[BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId))refs.unshift(ANBU)"),"Police-to-ANBU package return must visibly stage the ANBU operative");
 assert(source35830.includes('rooftop=[BEAT.amtChase,BEAT.psToAmt,BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn]')&&source35830.includes('"KONOHA ROOFTOP · NIGHT"'),"Police-to-ANBU return must project the rooftop location instead of the alley label");
+assert(source35830.includes('TERMINAL_MINATO="kak_terminal_minato_private_evaluation_35100"')&&source35830.includes("enterPrivateMinatoAfterSpecificReport35830")&&source35830.includes("genericReportGateSkipped:true"),"recovered Police route must skip the duplicate REPORT gate and transition directly to the private Minato scene");
 assert(source35830.includes("const prior=document.getElementById(STYLE_ID);if(prior)prior.remove()"),"post-MI style install must replace stale same-ID CSS");
 assert(source35830.includes("You decided fast.")&&source35830.includes("That doesn\'t make it lighter."),"direct AMT KILL aftermath must include locked Pakkun/Kakashi continuation");
 assert(source35830.includes('const TERMINAL_PENDING="kak_seq_debrief_pending"')&&source35830.includes("rt.beatId=TERMINAL_PENDING"),"direct AMT KILL must hand off to terminal report instead of dead-end boundary");
@@ -370,6 +381,21 @@ assert.notStrictEqual(participantStates[AMT].stateClass,"UCHIHA_POLICE_INSTITUTI
 drainNarration("kak_seq_debrief_pending");
 assert.strictEqual(participantStates[AMT].stateClass,"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY");
 assert.strictEqual(participantStates["pakkun_origin_unfamiliar_ninken"].stateClass,"DEPARTED");
+
+// Recovered PS -> AMT -> Uchiha Police -> ANBU report is already a complete
+// branch-specific report. It must black-wipe directly to Minato, never expose
+// the generic REPORT choice, and must commit terminal facts exactly once.
+const PACKAGE="kakashi_origin_outer_route_packet";
+materialStates[PACKAGE]={materialRef:PACKAGE,resolved:true,stateRef:"qa-specific-report-package",value:{objectRef:PACKAGE,currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",packageRecovered:true}};
+participantStates[AMT]={participantRef:AMT,stateClass:"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY",resultRef:"qa-specific-report-police"};
+participantStates["pakkun_origin_unfamiliar_ninken"]={participantRef:"pakkun_origin_unfamiliar_ninken",stateClass:"DEPARTED",resultRef:"qa-specific-report-pakkun"};
+active={sceneId:SCENE_ID,instanceId:"qa-postmi-specific-report",beatId:MOD.beats.amtPoliceAnbuReturn,localContext:{kakashiPostMiAmtBattleOccurrenceId:"qa-specific-report-battle"},battleResume:{authored:null}};
+const commitsBeforeSpecificReport=terminalDebriefCommits,wipesBeforeSpecificReport=wipes;
+drainNarration("kak_terminal_minato_private_evaluation_35100",40);
+assert.strictEqual(terminalDebriefCommits,commitsBeforeSpecificReport+1,"branch-specific Police report did not commit terminal debrief exactly once");
+assert.strictEqual(wipes,wipesBeforeSpecificReport+1,"branch-specific Police report did not use the black wipe into Hokage office");
+assert.strictEqual(active.localContext.kakashiPostMiSpecificAnbuReportCompleted,true,"branch-specific report completion marker missing");
+assert.strictEqual(materialStates[PACKAGE].value.currentHolderClass,"ANBU","package was not returned to ANBU before private Minato review");
 
 assert(saves>0);
 console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
