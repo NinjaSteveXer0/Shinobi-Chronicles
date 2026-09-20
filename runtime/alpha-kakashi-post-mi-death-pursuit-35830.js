@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v18_2026_09_20";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v19_2026_09_20";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -206,7 +206,7 @@ function consumePsReturn(){
    if(!recoveryParent)return{success:false,reason:"post_mi_ps_package_recovery_parent_missing",battleReturnOccurrenceId:id};
    rt.localContext={...(rt.localContext||{}),kakashiPostMiPsBattleOccurrenceId:id,kakashiPostMiPackageOccurrenceId:recoveryParent,kakashiSequentialPackageOccurrenceId:recoveryParent,kakashiSequentialPackageOccurrenceId35100:recoveryParent};save();
    if(typeof resolveAcademyKakashiSequentialPostPsPackageRecovery35600!=="function")return{success:false,reason:"ak_sa_033_package_recovery_owner_missing"};
-   const recovered=resolveAcademyKakashiSequentialPostPsPackageRecovery35600();if(!recovered||recovered.success!==true)return recovered||{success:false,reason:"ak_sa_033_package_recovery_failed"};
+   const recovered=resolveAcademyKakashiSequentialPostPsPackageRecovery35600(r);if(!recovered||recovered.success!==true)return recovered||{success:false,reason:"ak_sa_033_package_recovery_failed"};
    const pkgId=String(recovered.packageOccurrenceId||rt.localContext.kakashiSequentialPackageOccurrenceId35100||rt.localContext.kakashiSequentialPackageOccurrenceId||"");
    const selection=factOf(occurrence(rt.localContext&&rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId));
    const amtEligibleAtSelection=selection.anbuMarkedTargetPursuitAvailableAtSelection===true;
@@ -529,7 +529,7 @@ if(PRE_CONTINUE_VICTORY_35830){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v18_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v19_2026_09_20",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
