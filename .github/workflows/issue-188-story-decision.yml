@@ -235,7 +235,7 @@ jobs:
           grep -Fq 'alpha_kakashi_move_closer_closure_35930_v2_2026_09_20' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'PICKPOCKET_IMPROVED_FAILURE_DETECTED_2V1' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'pakkunBattleActionAuthorized:false' runtime/alpha-kakashi-move-closer-closure-35930.js
-          grep -Fq 'alpha_kakashi_field_secured_35920_v1_2026_09_20' runtime/alpha-kakashi-field-secured-35920.js
+          grep -Fq 'alpha_kakashi_field_secured_35920_v2_2026_09_20' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'FIELD_SECURED_PENDING_COLLECTION' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'COLLECTED_ACTIVE_ESCORT' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'TAKE THEM ALL BACK TO ANBU' runtime/alpha-kakashi-field-secured-35920.js
@@ -283,7 +283,7 @@ jobs:
           grep -Fq 'anbu_marked_target|masked_interceptor|package_smuggler' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'kakashi_scene_board_model_v9_33910_2026_09_19' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v10_33910_2026_09_20' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HAS PACKAGE · ESCAPE BLOCKED' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'BLOCKING ESCAPE' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'actors:[interceptor("BLOCKING ESCAPE"),smuggler("HAS PACKAGE")]' runtime/alpha-kakashi-scene-board-polish-33910.js
