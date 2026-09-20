@@ -7,7 +7,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_dynamic_terminal_35940_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v3_2026_09_20";
+const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v4_2026_09_20";
 const ORIGIN="academy_kakashi",SCENE="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE="kakashi_origin_outer_route_packet";
 const KAK="academy_kakashi",MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken";
@@ -220,23 +220,40 @@ function receiptText35940(state=buildProjectionState35940()){
 function survivorSummary(state){
  return[MI,PS,AMT].filter(ref=>state.participants[ref].stateClass!=="DEAD"&&state.participants[ref].stateClass).map(ref=>ROLE[ref].receipt+": "+statePhrase(state.participants[ref])).join("; ");
 }
-function minatoText35940(state=buildProjectionState35940()){
- const lines=["Later, in private, Minato reviews the sealed field record."],kills=state.lethal.confirmedKillCount;
- if(kills===3)lines.push("MINATO: “Three confirmed deaths.”","ANBU OPERATIVE: “Yes.”","MINATO: “Battle casualties?”","ANBU OPERATIVE: “No.”","MINATO: “He won the fights first.”","ANBU OPERATIVE: “Yes.”","MINATO: “And then chose the ending afterward.”");
- else if(kills===2)lines.push("MINATO: “Two confirmed deaths.”","ANBU OPERATIVE: “Yes.”","The surviving result remains separate: "+(survivorSummary(state)||"no survivor state was materially committed")+".","MINATO: “Keep the decisions separate from the count.”");
- else if(kills===1)lines.push("MINATO: “One confirmed death.”","ANBU OPERATIVE: “Yes.”","The other participant states remain separate: "+(survivorSummary(state)||"no additional participant state was materially committed")+".","MINATO: “One death doesn't tell me much by itself. When he chose it does.”");
- if(state.package.recovered)lines.push("MINATO: “He brought the package back.”","ANBU OPERATIVE: “Yes.”");
- else lines.push("MINATO: “He didn't recover the package.”","ANBU OPERATIVE: “No.”");
+function minatoPerformance35940(state=buildProjectionState35940()){
+ const cues=[];let n=0;
+ const add=(kind,text,speakerName=null)=>{
+  const cue={cueId:"terminal_minato_"+String(++n).padStart(2,"0"),kind,text,focusActorRef:speakerName==="ANBU OPERATIVE"?"konoha_anbu_contact":"hokage_minato"};
+  if(speakerName)cue.speakerName=speakerName;
+  cues.push(Object.freeze(cue));
+ };
+ const narrate=text=>add("narration",text);
+ const minato=text=>add("dialogue",text,"MINATO");
+ const anbu=text=>add("dialogue",text,"ANBU OPERATIVE");
+ narrate("Later, in private, Minato reviews the sealed field record.");
+ const kills=state.lethal.confirmedKillCount;
+ if(kills===3){
+  minato("Three confirmed deaths.");anbu("Yes.");minato("Battle casualties?");anbu("No.");minato("He won the fights first.");anbu("Yes.");minato("And then chose the ending afterward.");
+ }else if(kills===2){
+  minato("Two confirmed deaths.");anbu("Yes.");narrate("The surviving result remains separate: "+(survivorSummary(state)||"no survivor state was materially committed")+".");minato("Keep the decisions separate from the count.");
+ }else if(kills===1){
+  minato("One confirmed death.");anbu("Yes.");narrate("The other participant states remain separate: "+(survivorSummary(state)||"no additional participant state was materially committed")+".");minato("One death doesn't tell me much by itself. When he chose it does.");
+ }
+ if(state.package.recovered){minato("He brought the package back.");anbu("Yes.");}
+ else{minato("He didn't recover the package.");anbu("No.");}
  const states=[MI,PS,AMT].map(ref=>state.participants[ref].stateClass);
- if(states.includes("FIELD_SECURED_PENDING_COLLECTION"))lines.push("MINATO: “He left them secured and kept moving.”","ANBU OPERATIVE: “Yes.”","MINATO: “Then he treated custody like part of the mission. Not the end of it.”");
- if(states.includes("UCHIHA_POLICE_INSTITUTIONAL_CUSTODY"))lines.push("MINATO: “He chose the Police.”","ANBU OPERATIVE: “Yes.”","MINATO: “Instead of bringing them here.”","ANBU OPERATIVE: “Yes.”");
- if(states.includes("ANBU_INSTITUTIONAL_CUSTODY"))lines.push("MINATO: “He brought a target back alive.”","ANBU OPERATIVE: “Yes.”","MINATO: “Then custody was a decision.”");
- if(states.includes("DELIBERATELY_RELEASED")||states.includes("RELEASED"))lines.push("MINATO: “He had control and released it deliberately.”");
+ if(states.includes("FIELD_SECURED_PENDING_COLLECTION")){minato("He left them secured and kept moving.");anbu("Yes.");minato("Then he treated custody like part of the mission. Not the end of it.");}
+ if(states.includes("UCHIHA_POLICE_INSTITUTIONAL_CUSTODY")){minato("He chose the Police.");anbu("Yes.");minato("Instead of bringing them here.");anbu("Yes.");}
+ if(states.includes("ANBU_INSTITUTIONAL_CUSTODY")){minato("He brought a target back alive.");anbu("Yes.");minato("Then custody was a decision.");}
+ if(states.includes("DELIBERATELY_RELEASED")||states.includes("RELEASED"))minato("He had control and released it deliberately.");
  const anyLoss=state.battles.some(b=>String(b.resultState||"")==="opposition_side_victory");
- if(anyLoss&&state.package.recovered)lines.push("MINATO: “He lost a fight and still returned the package.”","ANBU OPERATIVE: “Yes.”","MINATO: “Good. Not because he lost. Because the mission didn't become the fight.”");
- if(state.knowledge.getCloserSuccess)lines.push("MINATO: “He stayed long enough to understand the contingency.”","ANBU OPERATIVE: “Yes.”","MINATO: “And not long enough to invent the part they never said.”");
- if(state.knowledge.askDestination)lines.push("MINATO: “He learned where the original carrier's Knowledge ended.”");
- return lines.join("\\n\\n");
+ if(anyLoss&&state.package.recovered){minato("He lost a fight and still returned the package.");anbu("Yes.");minato("Good. Not because he lost. Because the mission didn't become the fight.");}
+ if(state.knowledge.getCloserSuccess){minato("He stayed long enough to understand the contingency.");anbu("Yes.");minato("And not long enough to invent the part they never said.");}
+ if(state.knowledge.askDestination)minato("He learned where the original carrier's Knowledge ended.");
+ return cues;
+}
+function minatoText35940(state=buildProjectionState35940()){
+ return minatoPerformance35940(state).map(cue=>cue.kind==="dialogue"?cue.speakerName+": “"+cue.text+"”":cue.text).join("\n\n");
 }
 function pakkunLine35940(index,state=buildProjectionState35940()){
  if(state.lethal.confirmedKillCount===3){
@@ -290,12 +307,13 @@ const installed=install();if(!installed||installed.success!==true)throw new Erro
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v3_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v4_2026_09_20",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
   projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
   terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
   dynamicSummaryInstalled:!!m&&typeof m.get(BEAT.summary).presentationResolver==="function",
   dynamicMinatoInstalled:!!m&&typeof m.get(BEAT.minato).presentationResolver==="function",
+  minatoStructuredPerformance:minatoPerformance35940().length>=3&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO")&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE")&&!minatoText35940().includes("\\n\\n"),
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",
   packageModules:packageReportLines.toString().includes("The receiver got away with it")&&packageReportLines.toString().includes("original target still had it")&&packageReportLines.toString().includes("masked shinobi took it"),
   mixedLethalIdentityAware:reportText35940.toString().includes("All three by you")&&receiptText35940.toString().includes("LETHAL HISTORY")&&minatoText35940.toString().includes("survivorSummary"),
@@ -307,6 +325,6 @@ pakkunReceiptStateAware:receiptText35940.toString().includes("Status at ANBU rep
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
  return{pass:failed.length===0,checks,failed,installed,browserGoldenClaimed:false};
 }
-globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940=Object.freeze({patchId:PATCH_ID,authority:AUTH,beats:BEAT,installed,buildProjectionState:buildProjectionState35940,reportText:reportText35940,minatoText:minatoText35940,receiptText:receiptText35940,diagnostics,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940=Object.freeze({patchId:PATCH_ID,authority:AUTH,beats:BEAT,installed,buildProjectionState:buildProjectionState35940,reportText:reportText35940,minatoPerformance:minatoPerformance35940,minatoText:minatoText35940,receiptText:receiptText35940,diagnostics,browserGoldenClaimed:false});
 globalThis.runAcademyKakashiDynamicTerminal35940Diagnostics=diagnostics;
 })();
