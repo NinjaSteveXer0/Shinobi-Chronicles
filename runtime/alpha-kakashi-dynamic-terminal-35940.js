@@ -316,7 +316,7 @@ function diagnostics(){
   minatoStructuredPerformance:minatoPerformance35940().length>=3&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO")&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE")&&!minatoText35940().includes("\\n\\n"),
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",
   packageModules:packageReportLines.toString().includes("The receiver got away with it")&&packageReportLines.toString().includes("original target still had it")&&packageReportLines.toString().includes("masked shinobi took it"),
-  mixedLethalIdentityAware:reportText35940.toString().includes("All three by you")&&receiptText35940.toString().includes("LETHAL HISTORY")&&minatoText35940.toString().includes("survivorSummary"),
+  mixedLethalIdentityAware:reportText35940.toString().includes("All three by you")&&receiptText35940.toString().includes("LETHAL HISTORY")&&minatoPerformance35940.toString().includes("survivorSummary"),
   knowledgeModules:reportText35940.toString().includes("If the street stayed clear")&&receiptText35940.toString().includes("Handoff contingency overheard"),
 pakkunReceiptStateAware:receiptText35940.toString().includes("Status at ANBU report — Present.")&&receiptText35940.toString().includes("Status at ANBU report — Explicitly departed."),
   noAlignmentLabels:![reportText35940,minatoText35940,receiptText35940].some(fn=>/merciless|ruthless|alignment/i.test(fn.toString())),
