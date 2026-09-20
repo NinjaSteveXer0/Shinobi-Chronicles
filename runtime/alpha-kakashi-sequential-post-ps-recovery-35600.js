@@ -13,7 +13,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_SEQ_POST_PS_RECOVERY_35600)return;
 
-const PATCH_ID="alpha_kakashi_seq_post_ps_recovery_35600_v2_2026_09_20";
+const PATCH_ID="alpha_kakashi_seq_post_ps_recovery_35600_v3_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const RECOVERY_BEAT="kak_seq_secure_package_after_ps";
@@ -85,9 +85,9 @@ function classifyPackageSmugglerDefeat(result){
   return classified&&classified.success===true?{success:true,resultRef,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"}:classified||{success:false,reason:"kakashi_ak_sa_033_ps_classification_failed"};
 }
 
-function resolveSequentialPostPsPackageRecovery35600(){
+function resolveSequentialPostPsPackageRecovery35600(explicitResult=null){
   const authority=requireAuthority();if(!authority.success)return authority;
-  const rt=active(),result=latestResult();
+  const rt=active(),result=explicitResult&&typeof explicitResult==="object"?explicitResult:latestResult();
   if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_ak_sa_033_story_instance_missing"};
   if(!result||!result.battleOccurrenceId)return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_missing"};
   if(String(result.battleConfigId||"")!==PS_CONFIG||![SEQUENTIAL_BINDING,STOP_ASSASSIN_POST_MI_PS_BINDING].includes(String(result.bindingRef||"")))return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_mismatch"};
