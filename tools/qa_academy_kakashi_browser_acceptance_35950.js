@@ -20,7 +20,19 @@ const failure={beatId:"kak_get_closer_failure",choices:[
  {choiceId:"stop_package_smuggler",label:"STOP PACKAGE SMUGGLER",nextBeatId:null,consequenceRequests:[]},
  {choiceId:"cut_off_sakura",label:"CUT THEM OFF AT THE SAKURA TREE",nextBeatId:null,consequenceRequests:[]}
 ]};
-const definition={beatMap:new Map([[observe.beatId,observe],[success.beatId,success],[failure.beatId,failure]])};
+const intercept={beatId:"kak_get_closer_failure_stay_package_intercept",choices:[
+ {choiceId:"demand_package",label:"DEMAND THE PACKAGE",availability:()=>({available:true,knownBlocker:null}),consequenceRequests:[{requestId:"demand"}]},
+ {choiceId:"take_him_down",label:"TAKE HIM DOWN",availability:()=>({available:true,knownBlocker:null}),consequenceRequests:[{requestId:"take"}]},
+ {choiceId:"ask_where_package_was_going",label:"ASK WHERE THE PACKAGE WAS GOING",availability:()=>({available:true,knownBlocker:null}),consequenceRequests:[{requestId:"ask"}]}
+]};
+const disposition={beatId:"kak_intercept_disposition_pending_35300",choices:[
+ {choiceId:"turn_over_to_police",label:"BRING HIM TO THE UCHIHA POLICE FORCE",availability:()=>({available:true,knownBlocker:null})},
+ {choiceId:"release",label:"LET HIM GO",availability:()=>({available:true,knownBlocker:null})},
+ {choiceId:"kill",label:"KILL HIM",availability:()=>({available:true,knownBlocker:null})},
+ {choiceId:"return_to_anbu",label:"TAKE HIM BACK TO THE ANBU",availability:()=>({available:true,knownBlocker:null})}
+]};
+const stay=failure.choices.find(x=>x.choiceId==="stay_on_package");stay.availability=()=>({available:true,knownBlocker:null});stay.consequenceRequests=[{requestId:"kakashi_get_closer_stay_package_pursuit_34120",resolve:()=>({success:true})}];
+const definition={beatMap:new Map([[observe.beatId,observe],[success.beatId,success],[failure.beatId,failure],[intercept.beatId,intercept],[disposition.beatId,disposition]])};
 const ctx={
  console,Map,Object,Array,String,Boolean,Number,JSON,Set,Error,
  getStorySceneDefinition:id=>id==="origin_academy_kakashi_anbu_retrieval"?definition:null
@@ -47,6 +59,8 @@ ctx.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930={
  resolveImprovedPickpocket:()=>({success:true}),
  beginFailureBattle:()=>({success:true})
 };
+ctx.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120={beats:{stayPackageSuccess:"kak_get_closer_failure_stay_package_intercept"}};
+ctx.SC_ALPHA_KAKASHI_PAKKUN_INTERCEPTION_35300={beats:{disposition:"kak_intercept_disposition_pending_35300"}};
 vm.createContext(ctx);vm.runInContext(source,ctx,{filename:"alpha-kakashi-browser-acceptance-35950.js"});
 const report=JSON.parse(JSON.stringify(ctx.runAcademyKakashiBrowserAcceptance35950Diagnostics()));
 assert.strictEqual(report.pass,true,`35950 diagnostics failed: ${report.failed.join(",")}`);
@@ -59,4 +73,10 @@ assert.strictEqual(success.choices.find(x=>x.choiceId==="strike_before_handoff")
 assert.strictEqual(success.choices.find(x=>x.choiceId==="attempt_pickpocket").nextBeatId,"kak_move_closer_improved_pickpocket_intro_35930");
 assert.strictEqual(failure.choices.find(x=>x.choiceId==="stop_package_smuggler").nextBeatId,"kak_move_closer_failure_ps_intro_35930");
 assert.strictEqual(failure.choices.find(x=>x.choiceId==="cut_off_sakura").nextBeatId,"kak_move_closer_failure_cutoff_intro_35930");
-console.log(JSON.stringify({pass:true,patch:"35950-v1",observeRebound:true,moveCloserRebound:true,browserGoldenClaimed:false},null,2));
+assert.strictEqual(failure.choices.find(x=>x.choiceId==="stay_on_package").availability().available,true);
+assert.strictEqual(failure.choices.find(x=>x.choiceId==="stay_on_package").consequenceRequests[0].requestId,"kakashi_get_closer_stay_package_pursuit_34120");
+assert.strictEqual(intercept.choices.map(x=>x.label).join("|"),"DEMAND THE PACKAGE|TAKE HIM DOWN|ASK WHERE THE PACKAGE WAS GOING");
+assert(intercept.choices.every(x=>x.availability().available===true));
+assert.strictEqual(disposition.choices.map(x=>x.label).join("|"),"BRING HIM TO THE UCHIHA POLICE FORCE|LET HIM GO|KILL HIM|TAKE HIM BACK TO THE ANBU");
+assert(disposition.choices.every(x=>x.availability().available===true));
+console.log(JSON.stringify({pass:true,patch:"35950-v2",observeRebound:true,moveCloserRebound:true,browserGoldenClaimed:false},null,2));
