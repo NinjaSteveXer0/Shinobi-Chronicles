@@ -88,9 +88,12 @@ jobs:
           node --check runtime/alpha-story-scene-board-33900.js
           node --check runtime/alpha-kakashi-story-presentation-compat-33920.js
           node --check runtime/alpha-kakashi-scene03a-35700.js
+          node --check runtime/alpha-kakashi-terminal-scene-board-35610.js
+          node --check tools/qa_academy_kakashi_terminal_scene_board_35610.js
           node --check tools/qa_issue_105_kakashi_scene_board_runtime.js
           node --check tools/qa_kakashi_story_presentation_33920.js
           node --check tools/qa_academy_kakashi_scene03a_35700.js
+          node tools/qa_academy_kakashi_terminal_scene_board_35610.js
           node tools/qa_issue_105_kakashi_scene_board_runtime.js
           node tools/qa_kakashi_story_presentation_33920.js
           node tools/qa_academy_kakashi_scene03a_35700.js
