@@ -57,6 +57,18 @@ try{
   assert("terminal_report_stages_anbu",kakashiV4Source.includes('kak_seq_debrief_pending')&&kakashiV4Source.includes('terminalReportProjection33910')&&kakashiV4Source.includes('konoha_anbu_contact'));
   assert("terminal_hokage_scene_staged",kakashiV4Source.includes('kak_terminal_minato_private_evaluation_35100')&&kakashiV4Source.includes('Assets/Kage/kage_minato.png')&&kakashiV4Source.includes('Kakashi Origin Backdrop/hokage_administration_interior_night.png')&&kakashiV4Source.includes('HOKAGE ADMINISTRATION · NIGHT'));
   assert("terminal_minato_performance_bridge",kakashiV4Source.includes("terminalMinatoPerformance33910")&&kakashiV4Source.includes("SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940")&&kakashiV4Source.includes('return"hokage_minato"'));
+  const terminalScene=scenes.get(active.sceneId);
+  terminalScene.beatMap.set("kak_terminal_minato_private_evaluation_35100",{beatId:"kak_terminal_minato_private_evaluation_35100",mode:"narration",nextBeatId:null});
+  context.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940={minatoPerformance:()=>[
+    {cueId:"qa_minato_1",kind:"narration",text:"Later, in private, Minato reviews the sealed field record.",focusActorRef:"hokage_minato"},
+    {cueId:"qa_minato_2",kind:"dialogue",speakerName:"MINATO",text:"He brought the package back.",focusActorRef:"hokage_minato"},
+    {cueId:"qa_minato_3",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Yes.",focusActorRef:"konoha_anbu_contact"}
+  ]};
+  active.beatId="kak_terminal_minato_private_evaluation_35100";active.localContext={};
+  const terminalPerformance=context.getStoryScenePerformance33900();
+  assert("terminal_minato_runtime_performance_resolves",terminalPerformance&&terminalPerformance.sequence.length===3&&terminalPerformance.cue.kind==="narration",terminalPerformance);
+  const terminalProjection=context.resolveStorySceneBoardProjection(active.sceneId,active.beatId,active);
+  assert("terminal_minato_actor_ids_match_dialogue_sides",terminalProjection&&terminalProjection.actors.some(a=>a.id==="hokage_minato")&&terminalProjection.actors.some(a=>a.id==="konoha_anbu_contact"),terminalProjection);
   assert("watch_exchange_expanded_projection",d33910.checks&&d33910.checks.expandedWatchExchangeProjection===true,d33910);
 
   assert("scene1_authority_pinned",kakashiV4Source.includes('d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91'));
