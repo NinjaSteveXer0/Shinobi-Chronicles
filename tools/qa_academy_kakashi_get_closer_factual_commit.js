@@ -78,6 +78,12 @@ const BINDINGS=globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700;
 assert(A&&CORE&&KAK&&GUARD&&PROVIDER&&STATE&&BINDINGS,"#188 Kakashi factual route dependency missing");
 assert.strictEqual(BINDINGS.factualCommitOwnerPresent,true,"34700 did not bind the canonical 34120 commit owner");
 assert.strictEqual(STATE.diagnostics().pass,true,`34120 diagnostics failed: ${JSON.stringify(STATE.diagnostics().failed)}`);
+const source34120=read("runtime/alpha-kakashi-factual-state-commit-34120.js");
+assert(source34120.includes('PATCH_ID="alpha_kakashi_factual_state_commit_34120_v4_2026_09_20"'));
+assert(source34120.includes("Package Smuggler is coming toward the alley."),"Stay-on-Package branch performance missing");
+assert(source34120.includes("This yours?"),"Pakkun interception performance missing");
+assert(source34120.includes("For the first time since the ANBU operative handed him the assignment"),"pursuit-failure performance missing");
+assert(source34120.includes("STAY_PACKAGE_CHASE_BEAT"),"pursuit outcome must route through authored chase projection");
 assert.strictEqual(BINDINGS.diagnostics().pass,true,`34700 diagnostics failed: ${JSON.stringify(BINDINGS.diagnostics().failed)}`);
 assert.strictEqual(typeof STATE.getCommitResult("academy_kakashi.resolver.stay_on_package_pursuit"),"function","stay-on-package pursuit has no authoritative 34120 commit owner");
 
@@ -298,11 +304,11 @@ const routedOccurrence=A.findOccurrence(routedResult.occurrenceId);assert(routed
 assert.strictEqual(routedOccurrence.fact.packageState.currentHolderClass,"ANBU_MARKED_TARGET");
 assert.strictEqual(routedOccurrence.fact.worldFacts.maskedInterceptorVisible,false);
 if(routedResult.selectedOutcomeRef==="PURSUIT_SUCCESS_AMT_REACHED"){
-  assert.strictEqual(routedResult.nextBeatId,"kak_get_closer_failure_stay_package_intercept");
+  assert.strictEqual(routedResult.nextBeatId,"kak_get_closer_failure_stay_package_chase_34120","successful pursuit must project the authored chase before interception");
   assert.strictEqual(routedResult.pakkunPresent,true);
   assert(active.localContext.kakashiGetCloserStayPackageInterceptionChoiceSetId,"successful pursuit did not open AK_SA_008 choice set");
 }else{
-  assert.strictEqual(routedResult.nextBeatId,"kak_seq_debrief_pending");
+  assert.strictEqual(routedResult.nextBeatId,"kak_get_closer_failure_stay_package_chase_34120","failed pursuit must project its authored chase/failure before terminal");
   assert.strictEqual(routedResult.pakkunPresent,false);
   assert.strictEqual(active.localContext.kakashiGetCloserStayPackageInterceptionChoiceSetId,null);
 }
@@ -372,7 +378,7 @@ assert(loader.includes('const BUILD="kakashi-final-20260917-18"'),"Kakashi child
 
 console.log(JSON.stringify({
   pass:true,
-  patch:"34120-v3",
+  patch:"34120-v4",
   fullRouteOutcome:full.selectedOutcomeRef,
   authoritativeOccurrenceOwner:"SC_ALPHA_ORIGIN_32900.commitOccurrence",
   persistentSaveOwner:"playerData/savePlayerData",
@@ -387,8 +393,9 @@ console.log(JSON.stringify({
   stayPackageMaskedInterceptorUnseen:true,
   stayPackageRouteOutcome:routedResult.selectedOutcomeRef,
   stayPackageSemanticIntentResolved:true,
-  interceptionDownstreamChoicesGuarded:true,
-  interceptionAssetPathStillUnbound:true,
+  interceptionDownstreamChoicesGuardedAt34120Load:true,
+  stayPackagePerformanceProjected:true,
+  interceptionAssetPathBoundBySceneBoard:true,
   handoffOutcome:handoff.selectedOutcomeRef,
   handoffCustodyDeltaCount:handoffFactual.objectCustodyDeltaRefs.length,
   exactStoryInstancePreserved:true,
