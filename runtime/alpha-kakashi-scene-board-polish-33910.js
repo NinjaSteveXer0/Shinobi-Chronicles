@@ -16,7 +16,7 @@
 "use strict";
 if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910)return;
 
-const PATCH_ID="kakashi_scene_board_model_v10_33910_2026_09_20";
+const PATCH_ID="kakashi_scene_board_model_v11_33910_2026_09_20";
 const SCENE_01_AUTHORITY="d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91";
 const SCENE_02_AUTHORITY="6e87a8c3364e22e696e0a9c120c51bc0c57e9881";
 const STYLE_ID="sc-kakashi-scene-board-polish-33910-style";
@@ -37,6 +37,9 @@ const AMT_IMAGE="NPC/anbu_marked_target.png";
 const PS_IMAGE="NPC/package_smuggler.png";
 const MI_IMAGE="NPC/masked_interceptor.png";
 const PAKKUN_IMAGE="Assets/Summons/pakkun.png";
+const MINATO_IMAGE="Assets/Kage/kage_minato.png";
+const HOKAGE_INTERIOR_ID="kakashi_origin_hokage_administration_interior_night";
+const HOKAGE_INTERIOR_PATH="Kakashi Origin Backdrop/hokage_administration_interior_night.png";
 const kakashiOccurrence="occ_origin_kakashi_anbu_retrieval_resolution";
 
 try{
@@ -44,6 +47,7 @@ try{
   if(typeof reg==="function"){
     reg(END_ALLEY_ID,END_ALLEY_PATH);
     reg(PAKKUN_INTERCEPT_ID,PAKKUN_INTERCEPT_PATH);
+    reg(HOKAGE_INTERIOR_ID,HOKAGE_INTERIOR_PATH);
   }
 }catch(_error){}
 
@@ -97,6 +101,18 @@ function amt(state,focus=false,entering=false){return actor("anbu_marked_target"
 function smuggler(state,focus=false,entering=false){return actor("package_smuggler","PACKAGE SMUGGLER",PS_IMAGE,state,focus,entering);}
 function interceptor(state,focus=false,entering=false){return actor("masked_interceptor","MASKED INTERCEPTOR",MI_IMAGE,state,focus,entering);}
 function pakkun(state="PRESENT",focus=false,entering=false){return actor("pakkun","PAKKUN",PAKKUN_IMAGE,state,focus,entering);}
+function minato(state="REVIEWING SEALED RECORD",focus=false,entering=false){return actor("hokage_minato","HOKAGE MINATO",MINATO_IMAGE,state,focus,entering);}
+function terminalPakkunPresent33910(context){
+ return !!(context&&(context.kakashiPostMiPakkunPresent===true||context.kakashiKonohaPakkunPresent===true||context.kakashiTerminalSequentialAmtReached35100===true)&&!context.kakashiPostMiPakkunDepartureOccurrenceId);
+}
+function terminalReportProjection33910(beatId,context){
+ const reportBeat=beatId==="kak_terminal_debrief_report_35100",actors=[kakashi("REPORTING",!reportBeat),anbu(reportBeat?"SPEAKING":"RECEIVING REPORT",reportBeat)];
+ if(terminalPakkunPresent33910(context))actors.push(pakkun("PRESENT"));
+ return{mode:"conversation",location:"KONOHA ROOFTOP · NIGHT",objective:"Report the mission outcome to ANBU.",actors,objects:[]};
+}
+function terminalHokageProjection33910(){
+ return{mode:"conversation",location:"HOKAGE ADMINISTRATION · NIGHT",objective:"Private review of the sealed field record.",actors:[anbu("REPORTING"),minato("REVIEWING SEALED RECORD",true)],objects:[{label:"SEALED FIELD RECORD",state:"UNDER HOKAGE REVIEW"}]};
+}
 function currentEscortRefs33910(){try{const m=globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920;return m&&typeof m.escortRefs==="function"?m.escortRefs():[];}catch(_e){return[];}}
 function escortActors33910(focus=null){const refs=currentEscortRefs33910(),out=[];for(const ref of refs){if(ref==="academy_kakashi_origin_amt")out.push(amt("RESTRAINED",focus==="anbu_marked_target"));else if(ref==="academy_kakashi_origin_package_smuggler")out.push(smuggler("RESTRAINED",focus==="package_smuggler"));else if(ref==="academy_kakashi_origin_masked_interceptor")out.push(interceptor("RESTRAINED",focus==="masked_interceptor"));}return out;}
 function committedFact(){try{return A&&typeof A.findOccurrence==="function"?A.findOccurrence(kakashiOccurrence):null;}catch(_error){return null;}}
@@ -236,6 +252,8 @@ function kakashiBoardResolver({beatId,context,performance}){
   if(beatId==="kak_konoha_group_anbu_journey_35920")return{mode:"encounter",location:"KONOHA · NIGHT",objective:"Take them all back to ANBU.",actors:[kakashi("ESCORTING",true),...escortActors33910(),pakkun("PRESENT")],objects:[]};
   if(beatId==="kak_konoha_group_anbu_handoff_35920")return{mode:"conversation",location:"KONOHA ROOFTOP · NIGHT",objective:"Transfer the captives to ANBU.",actors:[anbu("RECEIVING CUSTODY",true),kakashi("REPORTING"),...escortActors33910(),pakkun("PRESENT")],objects:[]};
   if(beatId==="kak_konoha_group_police_handoff_35920")return{mode:"conversation",location:"UCHIHA POLICE FORCE · NIGHT",objective:"Transfer the captives to the Uchiha Police Force.",actors:[kakashi("REPORTING",true),...escortActors33910(),pakkun("PRESENT")],objects:[]};
+  if(["kak_seq_debrief_pending","kak_terminal_debrief_report_35100","kak_terminal_debrief_summary_35100","kak_terminal_pakkun_departure_1_35100","kak_terminal_pakkun_departure_2_35100","kak_terminal_pakkun_departure_3_35100","kak_terminal_pakkun_departure_exit_35100"].includes(beatId))return terminalReportProjection33910(beatId,context);
+  if(["kak_terminal_minato_private_evaluation_35100","kak_terminal_chronicle_receipt_35100"].includes(beatId))return terminalHokageProjection33910();
   return null;
 }
 
@@ -294,7 +312,7 @@ function runKakashiSceneBoardPolish33910Diagnostics(){
   const scene02Texts=tailPerformance.map(row=>row.text);
   const scene02Expected=["Kakashi did not need long to find the man from the envelope.","The difficult part was making sure the man never realised he had been found.","Konoha changed shape when Kakashi followed someone through it. Streets stopped being streets and became sightlines. Crowds became cover. Roof edges became distances to clear before the person below could turn his head.","ANBU Marked Target moved without the nervous scanning of someone who expected immediate pursuit.","Kakashi kept it that way.","He followed from above until the route tightened into older streets and narrower angles, then dropped lower when the rooftops would have made him too obvious.","The target never looked directly at him.","Not once.","That did not make Kakashi relax.","It made him wonder who the man expected to meet.","By the time the route bent toward the Sakura tree and the alley beyond it, Kakashi had his answer.","Someone was waiting."];
   let tailBeat=null;try{const d=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(scene):null;tailBeat=d&&d.beatMap instanceof Map?d.beatMap.get("kak_original_tail")||null:null;}catch(_error){}
-  const checks={patchId:PATCH_ID==="kakashi_scene_board_model_v10_33910_2026_09_20",multiActorKakashiLayouts:installStyle.toString().includes('data-count="6"')&&PAKKUN_IMAGE==="Assets/Summons/pakkun.png"&&kakashiBoardResolver({beatId:"kak_konoha_group_anbu_handoff_35920",context:{},performance:null}).actors.length>=3,
+  const checks={patchId:PATCH_ID==="kakashi_scene_board_model_v11_33910_2026_09_20",multiActorKakashiLayouts:installStyle.toString().includes('data-count="6"')&&PAKKUN_IMAGE==="Assets/Summons/pakkun.png"&&kakashiBoardResolver({beatId:"kak_konoha_group_anbu_handoff_35920",context:{},performance:null}).actors.length>=3,terminalReportStagesAnbu:(()=>{const q=kakashiBoardResolver({beatId:"kak_seq_debrief_pending",context:{},performance:null});return q&&q.location==="KONOHA ROOFTOP · NIGHT"&&q.actors.some(row=>row.id==="konoha_anbu_contact")&&q.actors.some(row=>row.id==="academy_kakashi");})(),terminalHokageSceneStaged:(()=>{const q=kakashiBoardResolver({beatId:"kak_terminal_minato_private_evaluation_35100",context:{},performance:null});return q&&q.location==="HOKAGE ADMINISTRATION · NIGHT"&&q.actors.some(row=>row.id==="hokage_minato")&&q.actors.some(row=>row.id==="konoha_anbu_contact")&&MINATO_IMAGE==="Assets/Kage/kage_minato.png"&&HOKAGE_INTERIOR_PATH==="Kakashi Origin Backdrop/hokage_administration_interior_night.png";})(),
     expandedWatchExchangeProjection:(()=>{const seq=Array.from({length:18},(_,index)=>({cueId:"qa_"+index,kind:"narration",text:"qa",focusActorRef:index===12?"masked_interceptor":"academy_kakashi"}));const q11=transferProjection({sequence:seq,index:11,cue:seq[11]},{kakashiOriginalAction:"observe"}),q12=transferProjection({sequence:seq,index:12,cue:seq[12]},{kakashiOriginalAction:"observe"}),q13=transferProjection({sequence:seq,index:13,cue:seq[13]},{kakashiOriginalAction:"observe"}),q16=transferProjection({sequence:seq,index:16,cue:seq[16]},{kakashiOriginalAction:"observe"});const ids=row=>row.actors.map(actor=>actor.id).join("|");return q11.actors.length===2&&ids(q11)==="anbu_marked_target|package_smuggler"&&!q11.actors.some(row=>row.id==="academy_kakashi")&&q12.actors.length===3&&ids(q12)==="anbu_marked_target|masked_interceptor|package_smuggler"&&q12.actors.some(row=>row.id==="anbu_marked_target"&&row.state==="BREAKING AWAY")&&q12.actors.some(row=>row.id==="masked_interceptor"&&row.entering===true)&&q13.actors.length===2&&ids(q13)==="masked_interceptor|package_smuggler"&&!q13.actors.some(row=>row.id==="anbu_marked_target"||row.id==="academy_kakashi")&&q16.actors.some(row=>row.id==="package_smuggler"&&row.state==="HAS PACKAGE · ESCAPE BLOCKED")&&q16.objects.length===0;})(),holderStateUsesParticipantStrip:(()=>{const seq=Array.from({length:18},(_,index)=>({cueId:"qa_"+index,kind:"narration",text:"qa",focusActorRef:"package_smuggler"}));const q=transferProjection({sequence:seq,index:8,cue:seq[8]},{kakashiOriginalAction:"observe"}),major=kakashiBoardResolver({beatId:"kak_original_major_choice",context:{},performance:null});return q.actors.some(row=>row.id==="package_smuggler"&&row.state==="HAS PACKAGE")&&q.objects.length===0&&major.actors.some(row=>row.id==="package_smuggler"&&row.state==="HAS PACKAGE")&&major.actors.some(row=>row.id==="masked_interceptor"&&row.state==="BLOCKING ESCAPE")&&!major.actors.some(row=>row.id==="anbu_marked_target"||row.id==="academy_kakashi")&&major.objects.length===0;})(),scene01AuthorityPinned:SCENE_01_AUTHORITY==="d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91",scene01TenCues:rooftopPerformance.length===10,scene01Verbatim:JSON.stringify(scene01Texts)===JSON.stringify(scene01Expected),scene01OnlyFourSpoken:rooftopPerformance.filter(row=>row.kind==="dialogue").map(row=>`${row.speakerName}:${row.text}`).join("|")==="ANBU OPERATIVE:Kakashi Hatake.|ANBU OPERATIVE:You have orders. Stop this package from falling into the wrong hands.|KAKASHI:Why are you coming to me with this?|ANBU OPERATIVE:Hokage's orders.",prohibitedStaleRooftopCopyAbsent:!["What do you want?","Why bring this to me?","The Hokage approved you to assist us."].some(text=>scene01Texts.includes(text)),narrationNotPromotedToDialogue:rooftopPerformance.filter(row=>row.kind==="dialogue").every(row=>!!row.speakerName),previousDialogueStopsAtNarrationBoundary:previousDialogue.toString().includes('cue.kind!=="dialogue"'),scene02AuthorityPinned:SCENE_02_AUTHORITY==="6e87a8c3364e22e696e0a9c120c51bc0c57e9881",scene02TwelveCues:tailPerformance.length===12,scene02Verbatim:JSON.stringify(scene02Texts)===JSON.stringify(scene02Expected),scene02NarrationOnly:tailPerformance.every(row=>row.kind==="narration"&&!row.speakerName),scene02NoChoices:!!tailBeat&&tailBeat.mode==="narration"&&(!Array.isArray(tailBeat.choices)||tailBeat.choices.length===0),scene02AlleyBackdrop:!!tailBeat&&environmentId(tailBeat)==="kakashi_origin_konoha_alleyway",scene02NoPrematureExchangeReveal:tailProjection({cue:tailPerformance[11],index:11}).actors.every(row=>row.id!=="package_smuggler")&&tailProjection({cue:tailPerformance[11],index:11}).objects.length===0,exactReplacementCardAssets:AMT_IMAGE==="NPC/anbu_marked_target.png"&&PS_IMAGE==="NPC/package_smuggler.png"&&MI_IMAGE==="NPC/masked_interceptor.png",browserGoldenClaimed:false};
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
   return{pass:failed.length===0,checks,failed,patchId:PATCH_ID,scene01Authority:SCENE_01_AUTHORITY,scene02Authority:SCENE_02_AUTHORITY,browserGoldenClaimed:false};
