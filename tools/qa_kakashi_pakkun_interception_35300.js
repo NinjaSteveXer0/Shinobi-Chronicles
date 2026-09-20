@@ -49,7 +49,7 @@ assert(consumer.includes('stateClass:"DELIBERATELY_RELEASED"'),"deliberate relea
 assert(consumer.includes('semanticClass:"KILL — GUARANTEED"')&&consumer.includes('targetDeathConfirmed:true'),"KILL HIM must remain deterministic");
 assert(consumer.includes('Where was it going?')&&consumer.includes("Now you're caught up."),"ASK WHERE exact performance missing");
 assert(consumer.includes("So that's it.")&&consumer.includes("Persistent."),"Demand victory/defeat exact aftermath missing");
-assert(consumer.includes("You've got to be kidding me.")&&consumer.includes('text:"Nope."'),"Take Him Down exact setup missing");
+assert(consumer.includes("You've got to be kidding me.")&&consumer.includes('"text":"Nope."'),"Take Him Down exact setup missing");
 assert(consumer.includes('t==="Kakashi lets go completely."')&&consumer.includes('t==="ANBU Marked Target is moved to the officers\' side."')&&consumer.includes('t==="Only then does Kakashi release it."'),"physical state commits must be cue-timed");
 assert(!consumer.includes('"speakerName":"KAKASHI:"')&&!consumer.includes('"speakerName":"PAKKUN:"')&&!consumer.includes('"speakerName":"ANBU MARKED TARGET:"'),"dialogue speaker IDs contain stale colon suffixes");
 assert(consumer.includes('ownershipGranted:false')&&consumer.includes('nameKnowledgeGranted:false'),"temporary Pakkun participation must not leak ownership or name Knowledge");
