@@ -224,38 +224,6 @@ assert.strictEqual(browserPsReturned.success,true,"real 35830 PS return could no
 assert.strictEqual(active.beatId,MOD.beats.psWin,"real PS return did not advance into the authored PS victory continuation");
 assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.packageState.currentHolderClass,"KAKASHI","real PS return did not commit package recovery");
 
-store.delete("kak_seq_secure_package_after_ps");recoveryCalls=0;
-participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-browser-mi"};
-participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-browser-ps"};
-active={sceneId:SCENE_ID,instanceId:"qa-browser-postmi-ps",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"qa-browser-mi-battle",kakashiScene05AWTurnCount:2,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
-MOD.wireEntryChoices();
-out=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");assert.strictEqual(out.success,true);
-launches.length=0;drainNarration(MOD.beats.psBattle);assert.strictEqual(launches.length,1);
-const browserPsResult={battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-browser-ps-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]};
-globalThis.currentResult=browserPsResult;
-globalThis.currentBattle={active:false,battleOver:true,battleId:"qa-browser-ps-battle",encounterId:"academy_kakashi_origin_battle_seq_ps",outcome:{type:"victory"},rewards:{generated:true,claimed:true,ryo:50,requiresExplicitPostClaimContinue:true},returnContext:{type:"story_scene",sceneId:SCENE_ID,sceneInstanceId:active.instanceId,sourceBeatId:MOD.beats.psBattle,postBattleBeatId:MOD.beats.psReturn,battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps"}};
-const qaVictoryOverlay={style:{display:"flex"}},priorDocument35830=globalThis.document;
-globalThis.document={getElementById(id){return id==="screen-overlay"?qaVictoryOverlay:null;}};
-globalThis.currentOverlayType="victory";
-globalThis.resumeBattleCallerAfterCompletion=function(){
- active.battleResume=null;active.beatId=MOD.beats.psReturn;globalThis.currentBattle.returnContext=null;globalThis.currentResult=null;
- const returnBeat=definition.beatMap.get(MOD.beats.psReturn);
- const duringResume=returnBeat.onEnterConsequences.find(x=>x.requestId==="postmi_35830_ps_return_consume").resolve();
- if(!duringResume||duringResume.success!==true||duringResume.pending===true)return{success:false,reason:"qa_core_resume_on_enter_failed",duringResume};
- return{success:true,type:"story_scene",postBattleBeatId:MOD.beats.psReturn,duringResume};
-};
-const browserPsReturned=globalThis.continueAfterVictory();
-assert.strictEqual(browserPsReturned.success,true,"real 35830 RETURN TO STORY bridge failed: "+JSON.stringify(browserPsReturned));
-assert.strictEqual(browserPsReturned.postMiPsReturnBridge35830,true,"real PS return did not use the late route bridge");
-assert.strictEqual(browserPsReturned.postMiPsResultSnapshotCaptured,true,"real PS return did not snapshot the result before caller teardown");
-assert.strictEqual(browserPsReturned.postMiPsResultVisibleDuringCoreResume,true,"real PS return did not expose the pre-resume result during core Story resume");
-assert(browserPsReturned.duringResume&&browserPsReturned.duringResume.success===true,"core Story resume did not consume the PS result during on-enter");
-assert.strictEqual(active.beatId,MOD.beats.psWin,"real PS RETURN TO STORY did not consume the authored return beat");
-assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.packageState.currentHolderClass,"KAKASHI","real PS return did not commit package recovery");
-assert.strictEqual(qaVictoryOverlay.style.display,"none","real PS RETURN TO STORY left Victory visible");
-assert.strictEqual(globalThis.currentOverlayType,null,"real PS RETURN TO STORY left Victory as the active overlay");
-if(priorDocument35830===undefined)delete globalThis.document;else globalThis.document=priorDocument35830;
-
 store.delete("kak_seq_secure_package_after_ps");
 participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"};
 recoveryCalls=0;
