@@ -60,12 +60,6 @@ function bindMoveCloser(){
  if(ROUTE.patchGetCloserHandoff()!==true)return{success:false,reason:"move_closer_handoff_rebind_failed"};
  const strike=choice(SUCCESS_BEAT,"strike_before_handoff");
  const pick=choice(SUCCESS_BEAT,"attempt_pickpocket");
- const stay=choice(FAILURE_BEAT,"stay_on_package");
- const interceptBeat=scene()&&scene().beatMap instanceof Map?scene().beatMap.get(FACTUAL.beats.stayPackageSuccess)||null:null;
- const dispositionBeat=scene()&&scene().beatMap instanceof Map?scene().beatMap.get(INTERCEPT.beats.disposition)||null:null;
- const stay=choice(FAILURE_BEAT,"stay_on_package");
- const interceptBeat=INTERCEPT&&INTERCEPT.beats&&INTERCEPT.beats.disposition?scene().beatMap.get(FACTUAL.beats.stayPackageSuccess):null;
- const dispositionBeat=INTERCEPT&&INTERCEPT.beats?scene().beatMap.get(INTERCEPT.beats.disposition):null;
  const stop=choice(FAILURE_BEAT,"stop_package_smuggler");
  const cut=choice(FAILURE_BEAT,"cut_off_sakura");
  if(!strike||!pick||!stop||!cut)return{success:false,reason:"move_closer_gen69_choice_missing"};
@@ -101,6 +95,10 @@ function diagnostics(){
  const handoff=choice(SUCCESS_BEAT,"let_handoff_happen");
  const strike=choice(SUCCESS_BEAT,"strike_before_handoff");
  const pick=choice(SUCCESS_BEAT,"attempt_pickpocket");
+ const stay=choice(FAILURE_BEAT,"stay_on_package");
+ const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
+ const interceptBeat=m?m.get(FACTUAL.beats.stayPackageSuccess)||null:null;
+ const dispositionBeat=m?m.get(INTERCEPT.beats.disposition)||null:null;
  const checks={
   patchId:PATCH_ID==="alpha_kakashi_browser_acceptance_35950_v2_2026_09_20",
   securePackageRebound:!!secure&&secure.nextBeatId==="kak_observe_secure_package_battle"&&Array.isArray(secure.consequenceRequests)&&secure.consequenceRequests.length>0,
