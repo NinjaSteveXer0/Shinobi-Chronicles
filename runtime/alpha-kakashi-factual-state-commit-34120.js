@@ -400,7 +400,7 @@ function stayPerformanceSequence34120(rt=active()){
  if(!rt||rt.sceneId!==SCENE_ID)return null;
  if(rt.beatId===STAY_PACKAGE_CHASE_BEAT)return [...STAY_BRANCH_CUES,...STAY_PURSUIT_CUES];
  if(rt.beatId===STAY_PACKAGE_FAILURE_BEAT)return STAY_FAILURE_CUES;
- if(rt.beatId===STAY_PACKAGE_SUCCESS_BEAT)return STAY_SUCCESS_CUES;
+ if(rt.beatId===STAY_PACKAGE_SUCCESS_BEAT&&!Boolean(rt.localContext&&rt.localContext.kakashiStayPackageInterceptionPerformanceComplete))return STAY_SUCCESS_CUES;
  return null;
 }
 function stayPerformance34120(rt=active()){
