@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v22_2026_09_20";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v23_2026_09_20";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -446,33 +446,21 @@ function actorState35830(ref,rt){
  if(ref===PS){const pkg=packageState(rt);if(String(pkg.currentHolderClass||"")==="PACKAGE_SMUGGLER")return"HAS PACKAGE";}
  return participantState(ref)||"PRESENT";
 }
-function enforceAmtDialogueLane35830(){
+function primePostMiPresentationState35830(){
  if(typeof document==="undefined")return false;
- const rt=active();if(!rt||!AMT_DIALOGUE_BEATS.has(rt.beatId))return false;
- const layer=document.getElementById("story-scene-presentation-layer");if(!layer||typeof layer.querySelector!=="function")return false;
- const panel=layer.querySelector(".sc-performance-surface-33910 .sc-dialogue-panel-33910.is-current");if(!panel)return false;
- if(String(panel.dataset&&panel.dataset.speakerId||"")==="pakkun")return false;
- const style=panel.style;if(!style||typeof style.setProperty!=="function")return false;
- style.setProperty("left","50%","important");
- style.setProperty("right","auto","important");
- style.setProperty("top","14%","important");
- style.setProperty("bottom","auto","important");
- style.setProperty("transform","translateX(-50%)","important");
- return true;
-}
-function scheduleAmtDialogueLane35830(){
- const settle=()=>{try{enforceAmtDialogueLane35830();}catch(_e){}};
- if(typeof queueMicrotask==="function")queueMicrotask(settle);
- if(typeof requestAnimationFrame==="function")requestAnimationFrame(()=>requestAnimationFrame(settle));
- else if(typeof setTimeout==="function")setTimeout(settle,0);
- return true;
+ const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+ const rt=active(),ours=!!(rt&&Object.values(BEAT).includes(rt.beatId));
+ layer.dataset.scPostmi35830=ours?"true":"false";
+ if(ours)layer.dataset.scPostmiPhase=String(rt.beatId||"").includes("_amt_")||rt.beatId===BEAT.psToAmt?"amt":"ps";
+ else delete layer.dataset.scPostmiPhase;
+ return ours;
 }
 function render(){
  wireEntryChoices();materializePsDecision();materializeAmtDecision();
  if(typeof document==="undefined")return false;const rt=active(),layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
  if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed)){const x=consumeReturnOnEnter35830("ps");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.psReturn);}
  if(rt&&rt.beatId===BEAT.amtReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiAmtReturnProcessed)){const x=consumeReturnOnEnter35830("amt");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.amtReturn);}
- const ours=rt&&Object.values(BEAT).includes(rt.beatId);layer.dataset.scPostmi35830=ours?"true":"false";if(ours)layer.dataset.scPostmiPhase=String(rt.beatId||"").includes("_amt_")||rt.beatId===BEAT.psToAmt?"amt":"ps";else delete layer.dataset.scPostmiPhase;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
+ const ours=primePostMiPresentationState35830();const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
  for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+stageBg(rt,performance(rt)).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}
  const p=performance(rt),focus=p&&p.cue&&(p.cue.speaker==="KAKASHI"?KAK:p.cue.speaker==="PACKAGE SMUGGLER"?PS:p.cue.speaker==="ANBU MARKED TARGET"?AMT:p.cue.speaker==="PAKKUN"?PAKKUN:p.cue.speaker==="ANBU OPERATIVE"?ANBU:null)||KAK;
@@ -483,7 +471,6 @@ function render(){
  const amtAlley=[BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport,BEAT.amtPoliceEscort].includes(rt.beatId),rooftop=[BEAT.amtChase,BEAT.psToAmt,BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId);
  b.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+(rooftop?"KONOHA ROOFTOP · NIGHT":amtAlley?"KONOHA ALLEY · NIGHT":BEAT.amtPoliceHandoff===rt.beatId?"UCHIHA POLICE FORCE · NIGHT":"KONOHA ALLEY · NIGHT")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+refs.length+'">'+refs.map(ref=>card(ref,actorState35830(ref,rt),focus===ref)).join("")+'</div>';
  if(p){const t=layer.querySelector(".sc-story-text");if(t)t.textContent=p.cue.text;const n=layer.querySelector(".sc-story-name");if(n){n.textContent=p.cue.kind==="dialogue"?p.cue.speaker:"NARRATION";n.style.display="block";}}
- scheduleAmtDialogueLane35830();
  return true;
 }
 
@@ -504,7 +491,7 @@ function hooks(){
   return PA.apply(this,arguments);
  };
  try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_e){}
- if(PR){globalThis.renderStoryScenePresentationLayer=function(){wireEntryChoices();const out=PR.apply(this,arguments);const settle=()=>{wireEntryChoices();materializePsDecision();materializeAmtDecision();render();scheduleAmtDialogueLane35830();syncPsBattleBackdrop35830();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else setTimeout(settle,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}}
+ if(PR){globalThis.renderStoryScenePresentationLayer=function(){wireEntryChoices();primePostMiPresentationState35830();const out=PR.apply(this,arguments);const settle=()=>{wireEntryChoices();materializePsDecision();materializeAmtDecision();render();syncPsBattleBackdrop35830();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else setTimeout(settle,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}}
  if(RC){globalThis.renderCombatOverlay=function(){const out=RC.apply(this,arguments);syncPsBattleBackdrop35830();return out;};try{renderCombatOverlay=globalThis.renderCombatOverlay;}catch(_e){}}
  hooked=true;wireEntryChoices();render();return true;
 }
@@ -524,7 +511,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v22_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v23_2026_09_20",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -545,7 +532,7 @@ function diagnostics(){
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
    pakkunDialogueUsesRightSafeLane:installStyle.toString().includes("data-speaker-id='pakkun'")&&installStyle.toString().includes("right:6%!important")&&installStyle.toString().includes("transform:none!important"),
    postMiDialogueClearsActorCards:installStyle.toString().includes("top:4%!important"),
-   amtDialogueUsesDirectSafeLane:enforceAmtDialogueLane35830.toString().includes('style.setProperty("top","14%","important")')&&scheduleAmtDialogueLane35830.toString().includes("requestAnimationFrame"),
+   amtDialogueUsesPrepaintStableLane:installStyle.toString().includes("top:14%!important")&&primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&globalThis.renderStoryScenePresentationLayer.toString().includes("primePostMiPresentationState35830"),
    recoveredPoliceReportSkipsDuplicateGate:transitionNarrative.toString().includes("enterPrivateMinatoAfterSpecificReport35830")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("TERMINAL_MINATO")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("performKakashiSceneWipe33910"),
    directPostBattleDispositions:!materializePsDecision.toString().includes(["ATTEMPT"," TO KILL HIM"].join(""))&&!materializeAmtDecision.toString().includes(["ATTEMPT"," TO KILL HIM"].join(""))&&deterministicKillTarget.toString().includes("postBattleDefeatedLiving"),
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
