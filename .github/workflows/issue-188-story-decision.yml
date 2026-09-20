@@ -387,12 +387,12 @@ jobs:
           grep -Fq 'kak_origin_battle_amt_victory_ryo_01' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'kak_origin_battle_mi_victory_reward_v1' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'CLAIM BATTLE REWARD' runtime/alpha-kakashi-battle-development-35740.js
-          grep -Fq 'alpha_kakashi_origin_rewards_34800_v5_2026_09_19' runtime/alpha-kakashi-origin-rewards-34800.js
+          grep -Fq 'alpha_kakashi_origin_rewards_34800_v6_2026_09_20' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'ACTION_DERIVED_DISCIPLINE_SOURCE="action_derived_development"' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'installActionDerivedDisciplineSourceGate34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq '__scActionDerivedDevelopment34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'storyDeploymentOwnsPlayerEvidence' runtime/alpha-kakashi-battle-development-35740.js
-          grep -Fq 'alpha_kakashi_battle_development_35740_v7_2026_09_19' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'alpha_kakashi_battle_development_35740_v8_2026_09_20' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'BATTLE BREAKDOWN' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'commitAcademyKakashiDownstreamBattleCashReward34800' runtime/alpha-kakashi-battle-development-35740.js
