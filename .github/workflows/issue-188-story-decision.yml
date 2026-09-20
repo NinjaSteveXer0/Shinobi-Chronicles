@@ -178,8 +178,8 @@ jobs:
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-10' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-80' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-80";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-81' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-81";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -307,6 +307,9 @@ jobs:
           grep -Fq 'postmi_35830_ps_return_consume' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'packageRecoveryParentOccurrenceId35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'post_mi_ps_package_recovery_parent_missing' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'kakashiOriginStoryReturnResultSnapshot' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          ! grep -Fq 'continueAfterVictoryPostMiPs35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          ! grep -Fq 'PRE_CONTINUE_VICTORY_35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'const PAKKUN_SCENE_ASSET="Assets/Summons/pakkun.png";' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'sc-postmi-summon-35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq "data-speaker-id='pakkun'" runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
@@ -317,7 +320,7 @@ jobs:
           grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashiPostMiPakkunPresent' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v19_2026_09_20' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v20_2026_09_20' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'Runtime adds STATE ONLY' runtime/alpha-kakashi-story-presentation-compat-33920.js
           grep -Fq '24b7956781d2da6d3d1f70ce18d1ef0de348cfae' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4' runtime/alpha-kakashi-immediate-custody-35800.js
@@ -404,7 +407,7 @@ jobs:
           grep -Fq 'installActionDerivedDisciplineSourceGate34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq '__scActionDerivedDevelopment34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'storyDeploymentOwnsPlayerEvidence' runtime/alpha-kakashi-battle-development-35740.js
-          grep -Fq 'alpha_kakashi_battle_development_35740_v9_2026_09_20' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'alpha_kakashi_battle_development_35740_v10_2026_09_20' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'BATTLE BREAKDOWN' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'commitAcademyKakashiDownstreamBattleCashReward34800' runtime/alpha-kakashi-battle-development-35740.js
