@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v7_2026_09_20";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v8_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -128,6 +128,12 @@ function supplementCurrentBattleCapture(){
 }
 function committedPackageState(){
   const l=local();if(!l)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
+  const snap=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{},material=snap.materialStates&&snap.materialStates[PACKAGE_REF]||null,value=material&&material.value||{};
+  const materialHolder=String(value.currentHolderClass||value.custodyClass||value.holderClass||"");
+  if(materialHolder){
+    const stateRef=String(material&&material.stateRef||"");
+    return{success:true,resolved:material.resolved!==false,recovered:["KAKASHI","KONOHA","ANBU","KONOHA_AUTHORITY"].includes(materialHolder),holderClass:materialHolder,stateRef,factClass:String(value.factClass||"material_state"),sourceOccurrence:stateRef?occurrence(stateRef):null,materialState:true};
+  }
   const candidateIds=[l.kakashiKonohaPackageOccurrenceId,l.kakashiScene06W2CKillLedgerOccurrenceId,l.kakashiScene06AW2CResolutionOccurrenceId,l.kakashiScene06W2DCustodyOccurrenceId,l.kakashiScene06W2ECustodyOccurrenceId,l.kakashiScene05ALPackageOccurrenceId,l.kakashiDirectPickpocketPackageOccurrenceId,l.kakashiGetCloserStayPackagePursuitOccurrenceId,l.kakashiObserveSecurePackageAmtPursuitOccurrenceId,l.kakashiObserveSecurePackageOccurrenceId,l.kakashiPostMiPackageOccurrenceId,l.kakashiPostMiPursuitResolutionOccurrenceId,l.kakashiPostMiPursuitSelectionOccurrenceId,l.kakashiSequentialPackageOccurrenceId35100,l.kakashiSequentialPackageOccurrenceId].filter(Boolean);
   for(const id of candidateIds){
     const row=occurrence(id),fact=factOf(row),pkg=fact&&fact.packageState||{};
@@ -176,8 +182,10 @@ function deriveTerminalFacts35100(){
   const sequential=sequentialBenchmark(battles);
   const exceptionalFieldExecution=explicit.cleanExtraction||threeVsOneVictory||sequential||explicit.explicitExceptional;
   const l=local()||{};
-  const pakkunEntered=String(l.kakashiObserveSecurePackageAmtPursuitOutcome||"")===SECURE_PURSUIT_REACHED||String(l.kakashiGetCloserStayPackagePursuitOutcomeRef||"")===STAY_PACKAGE_PURSUIT_REACHED||l.kakashiTerminalSequentialAmtReached35100===true||l.kakashiPostMiPakkunPresent===true;
-  const pakkunPresent=pakkunEntered&&!occurrence(pakkunDepartureOccurrenceId());
+  const pakkunEntered=String(l.kakashiObserveSecurePackageAmtPursuitOutcome||"")===SECURE_PURSUIT_REACHED||String(l.kakashiGetCloserStayPackagePursuitOutcomeRef||"")===STAY_PACKAGE_PURSUIT_REACHED||l.kakashiTerminalSequentialAmtReached35100===true||l.kakashiPostMiPakkunPresent===true||l.kakashiKonohaPakkunPresent===true||l.kakashiMoveCloserFailurePakkunPresent===true;
+  const storySnap=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{},pakkunState=storySnap.participantStates&&storySnap.participantStates[PAKKUN_REF]||null;
+  const routeDepartureCommitted=String(pakkunState&&pakkunState.stateClass||"")==="DEPARTED"||!!l.kakashiKonohaPakkunDepartureOccurrenceId||!!l.kakashiInterceptPakkunDepartureOccurrenceId||!!l.kakashiMoveCloserPakkunDepartureOccurrenceId;
+  const pakkunPresent=pakkunEntered&&!routeDepartureCommitted&&!occurrence(pakkunDepartureOccurrenceId());
   const participantRefs=[...new Set(battles.flatMap(row=>row.participants||[]).map(row=>row&&row.participantRef).filter(Boolean))];
   return{
     success:true,terminalDebriefReached:true,storySceneInstanceId:String(rt.instanceId||""),
@@ -205,15 +213,16 @@ function debriefRewardFacts(facts){return{terminalDebriefReached:true,packageRec
 function commitTerminalDebrief35100(){
   const existing=committedDebrief();if(existing)return{success:true,idempotent:true,occurrenceId:existing.occurrenceId,record:clone(existing)};
   const pre=preflightTerminal35100();if(!pre.success)return pre;
-  const facts=pre.facts;
-  const material=KAK.recordPostResolutionState({materialStates:[{materialRef:PACKAGE_REF,resolved:true,stateRef:facts.packageState.stateRef,value:{holderClass:facts.packageState.holderClass,recovered:facts.packageRecovered===true,factClass:facts.packageState.factClass}}]});
+  const facts=pre.facts,id=debriefOccurrenceId();if(!id)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
+  const transferToAnbu=facts.packageRecovered===true&&!["ANBU","KONOHA_AUTHORITY"].includes(String(facts.packageState.holderClass||""));
+  const committedPackageState=transferToAnbu?{...clone(facts.packageState),previousHolderClass:String(facts.packageState.holderClass||""),holderClass:"ANBU",stateRef:id,factClass:"academy_kakashi_terminal_anbu_debrief_package_return"}:clone(facts.packageState);
+  const material=KAK.recordPostResolutionState({materialStates:[{materialRef:PACKAGE_REF,resolved:true,stateRef:committedPackageState.stateRef,value:{holderClass:committedPackageState.holderClass,currentHolderClass:committedPackageState.holderClass,custodyClass:committedPackageState.holderClass,recovered:facts.packageRecovered===true,factClass:committedPackageState.factClass,previousHolderClass:committedPackageState.previousHolderClass||null}}]});
   if(!material||material.success!==true)return material||{success:false,reason:"kakashi_terminal_package_material_commit_failed"};
   const guard=KAK.terminalGuard({committedStateRef:facts.packageState.stateRef,battleLive:false,materiallyRelevantRefs:[PACKAGE_REF]});
   if(!guard||guard.success!==true)return guard||{success:false,reason:"kakashi_terminal_material_guard_failed"};
-  const id=debriefOccurrenceId();if(!id)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
   const fact={
     factClass:"academy_kakashi_terminal_anbu_debrief",storySceneInstanceId:facts.storySceneInstanceId,terminalDebriefReached:true,
-    packageState:clone(facts.packageState),participantRefs:clone(facts.participantRefs),battleFacts:clone(facts.battleFacts),
+    packageState:committedPackageState,packageTransferredToAnbuAtDebrief:transferToAnbu,participantRefs:clone(facts.participantRefs),battleFacts:clone(facts.battleFacts),
     reportBoundedToKnownFacts:true,hiddenEvaluationRevealed:false,pakkunPresentAtDebrief:facts.pakkunPresentAtDebrief===true,
     rewardFacts:debriefRewardFacts(facts),authority:clone(AUTHORITY)
   };
@@ -229,7 +238,11 @@ function commitPakkunDeparture35100(){
   const fact=factOf(debrief);if(fact.pakkunPresentAtDebrief!==true)return{success:false,reason:"kakashi_terminal_pakkun_not_present"};
   const id=pakkunDepartureOccurrenceId();
   const committed=A.commitOccurrence(ORIGIN_ID,id,{factClass:"academy_kakashi_pakkun_terminal_departure",storySceneInstanceId:instanceKey(),participantRef:PAKKUN_REF,presentBeforeDeparture:true,departed:true,temporaryParticipationEnded:true,ownershipGranted:false,reciprocalNameKnowledgeGranted:false,parentDebriefRef:debrief.occurrenceId},[],{type:DEPARTURE_TYPE,outcome:"pakkun_explicit_departure",participantRefs:[PAKKUN_REF],sourceRefs:[{type:"origin_occurrence",id:debrief.occurrenceId,role:"debrief"}]});
-  return committed&&committed.success===true?{success:true,idempotent:false,occurrenceId:id}:committed||{success:false,reason:"kakashi_terminal_pakkun_departure_commit_failed"};
+  if(!committed||committed.success!==true)return committed||{success:false,reason:"kakashi_terminal_pakkun_departure_commit_failed"};
+  const classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef:PAKKUN_REF,stateClass:"DEPARTED",resultRef:id});
+  if(!classified||classified.success!==true)return classified||{success:false,reason:"kakashi_terminal_pakkun_departure_classification_failed"};
+  const rt=active();if(rt)rt.localContext={...(rt.localContext||{}),kakashiKonohaPakkunPresent:false,kakashiPostMiPakkunPresent:false,kakashiTerminalPakkunDepartureOccurrenceId35100:id};save();
+  return{success:true,idempotent:false,occurrenceId:id};
 }
 function rewardGrantReady(snapshot,rewardFacts){
   if(!snapshot||!snapshot.terminalDebrief||snapshot.terminalDebrief.committed!==true)return false;
@@ -328,7 +341,7 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v7_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v8_2026_09_20",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
@@ -342,6 +355,10 @@ function diagnostics(){
     battleVictoryNotTerminalEntitlement:!deriveTerminalFacts35100.toString().includes("terminalDebriefReached:false")&&!commitTerminalDebrief35100.toString().includes("resultState===\"player_side_victory\""),
     exactSequentialBenchmark:sequentialBenchmark.toString().includes("<=4")&&sequentialBenchmark.toString().includes("<=3")&&sequentialBenchmark.toString().includes("kakashiTerminalSequentialAmtReached35100"),
     pakkunPresenceCoversIndependentRoutes:deriveTerminalFacts35100.toString().includes("kakashiGetCloserStayPackagePursuitOutcomeRef")&&deriveTerminalFacts35100.toString().includes("kakashiTerminalSequentialAmtReached35100")&&deriveTerminalFacts35100.toString().includes("kakashiPostMiPakkunPresent"),
+routePakkunDepartureConsumed:deriveTerminalFacts35100.toString().includes('stateClass||"")==="DEPARTED"')&&deriveTerminalFacts35100.toString().includes("kakashiInterceptPakkunDepartureOccurrenceId"),
+materialAuthorityPrecedesLegacyPackageFallback:committedPackageState.toString().indexOf("materialStates")<committedPackageState.toString().indexOf("candidateIds"),
+debriefReturnsRecoveredPackageToAnbu:commitTerminalDebrief35100.toString().includes('holderClass:"ANBU"')&&commitTerminalDebrief35100.toString().includes("packageTransferredToAnbuAtDebrief"),
+terminalPakkunDepartureClassified:commitPakkunDeparture35100.toString().includes('stateClass:"DEPARTED"'),
     receiptBeforeReward:commitChronicleReceiptAndRewards35100.toString().indexOf("A.commitOccurrence")<commitChronicleReceiptAndRewards35100.toString().indexOf("commitAcademyKakashiTerminalDebriefRewards34800"),
     rewardGrantGate:closureReady35100.toString().includes("rewardGrantReady"),
     pakkunDepartureExplicit:!!map&&[PAKKUN_1,PAKKUN_2,PAKKUN_3,PAKKUN_EXIT].every(id=>map.has(id)),
