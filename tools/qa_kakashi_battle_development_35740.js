@@ -92,6 +92,15 @@ globalThis.claimCurrentBattleRewards=function baseClaim(){
   throw new Error("qualifying Kakashi immediate Battle reward must not fall through to generic base claim");
 };
 globalThis.renderVictoryOverlay=()=>true;
+let restoredDeploymentRecoveryCalls=0;
+globalThis.recoverAcademyKakashiOriginBattleDeployment34300=b=>{
+  if(!b)return null;if(b.kakashiOriginDeployment)return b.kakashiOriginDeployment;
+  const rc=b.returnContext||{};if(rc.type!=="story_scene"||!rc.battleConfigId||!rc.bindingRef)return null;
+  restoredDeploymentRecoveryCalls+=1;
+  const participant=rc.battleConfigId==="academy_kakashi_origin_battle_seq_amt_pakkun"?"academy_kakashi_origin_amt":"academy_kakashi_origin_package_smuggler";
+  b.kakashiOriginDeployment={battleConfigId:rc.battleConfigId,battleOccurrenceId:String(b.battleId||""),storyOccurrenceId:String(rc.storyOccurrenceId||""),sourceAnchorRef:String(rc.sourceAnchorRef||""),bindingRef:String(rc.bindingRef||""),controllerParticipantId:KAKASHI,oppositionParticipantIds:[participant],pakkunAuthorized:rc.battleConfigId==="academy_kakashi_origin_battle_seq_amt_pakkun",playerActionOpportunityCount:2};
+  return b.kakashiOriginDeployment;
+};
 
 assert.strictEqual(globalThis.isValidDisciplineTrainingSource("buki","action_derived_development"),false,"legacy core gate must reject action-derived source before 34800 installs its authorised extension");
 load("runtime/alpha-kakashi-origin-rewards-34800.js");
@@ -312,6 +321,17 @@ assert(Object.values(snap.battleClaims).some(r=>r.claimFamily==="kak_origin_batt
 assert(Object.values(snap.battleClaims).some(r=>r.claimFamily==="kak_origin_battle_downstream_cash_reward_claim_v1"&&r.sourceId==="kak_origin_battle_amt_victory_ryo_01"&&r.committed===true));
 assert(Object.values(snap.battleClaims).some(r=>r.claimFamily==="kak_origin_battle_mi_victory_reward_claim_v1"&&r.committed===true));
 
+// Reload-style PS Victory: 35740 must recover 34300 deployment identity before
+// deciding the exact source-scoped +50 Ryō claim owner.
+const ryoBeforeRestoredPs=Number(playerData.ryo||0);
+globalThis.currentBattle={battleId:"qa-kakashi-ps-restored-claim",active:false,battleOver:true,outcome:{type:"victory"},enemy:{id:PS,name:"PACKAGE SMUGGLER"},activePlayer:{id:KAKASHI,name:"Academy Kakashi"},returnContext:{type:"story_scene",sceneId:"origin_academy_kakashi_anbu_retrieval",sceneInstanceId:"qa-restored-ps",sourceBeatId:"qa_ps_battle",postBattleBeatId:"qa_ps_return",battleConfigId:"academy_kakashi_origin_battle_seq_ps",storyOccurrenceId:"qa-origin-restored-ps",sourceAnchorRef:"AK_SA_022",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",returnToken:"qa-restored-ps-token"},runtime:{evidence:[]},rewards:{generated:false,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]}};
+const restoredPsRewards=globalThis.generateBattleRewards(currentBattle.enemy,currentBattle.activePlayer);
+assert(restoredDeploymentRecoveryCalls>0,"35740 did not recover missing 34300 deployment identity");
+assert.strictEqual(restoredPsRewards.ryo,50);assert.strictEqual(restoredPsRewards.exp,0);assert.deepStrictEqual(restoredPsRewards.items,[]);
+assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"restored PS source-scoped claim failed");
+assert.strictEqual(playerData.ryo,ryoBeforeRestoredPs+50,"restored PS claim must grant exactly +50 Ryō once");
+assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"restored PS idempotent claim retry failed");
+assert.strictEqual(playerData.ryo,ryoBeforeRestoredPs+50,"restored PS claim retry duplicated Ryō");
 const diag=globalThis.runAcademyKakashiBattleDevelopment35740Diagnostics();
 assert.strictEqual(diag.pass,true,"35740 diagnostics failed: "+JSON.stringify(diag.failed));
 assert.strictEqual(diag.browserGoldenClaimed,false);

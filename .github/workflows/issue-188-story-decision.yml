@@ -176,10 +176,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-8' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-9' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-74' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-74";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-75' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-75";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -232,6 +232,10 @@ jobs:
           grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v1_2026_09_20' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'alpha-kakashi-browser-acceptance-35950.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha_kakashi_browser_acceptance_35950_v2_2026_09_20' runtime/alpha-kakashi-browser-acceptance-35950.js
+          grep -Fq 'alpha_kakashi_origin_battle_deployment_34300_v3_2026_09_20' runtime/alpha-kakashi-origin-battle-deployment-34300.js
+          grep -Fq 'recoverAcademyKakashiOriginBattleDeployment34300' runtime/alpha-kakashi-origin-battle-deployment-34300.js
+          grep -Fq 'claimedPsReturnAfterReload:true' tools/qa_academy_kakashi_origin_battle_deployment.js
+          grep -Fq 'restoredDeploymentRecoveryCalls' tools/qa_kakashi_battle_development_35740.js
           grep -Fq 'initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true})' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'kakashi_multi_opposition_zero_battle_pl' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'a3cad415ea74a4fe8b3965b1136522aceab81047' runtime/alpha-kakashi-dynamic-terminal-35940.js
@@ -399,7 +403,7 @@ jobs:
           grep -Fq 'installActionDerivedDisciplineSourceGate34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq '__scActionDerivedDevelopment34800' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'storyDeploymentOwnsPlayerEvidence' runtime/alpha-kakashi-battle-development-35740.js
-          grep -Fq 'alpha_kakashi_battle_development_35740_v8_2026_09_20' runtime/alpha-kakashi-battle-development-35740.js
+          grep -Fq 'alpha_kakashi_battle_development_35740_v9_2026_09_20' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'const immediateRyo=Number(summary&&summary.materialBattleReward&&summary.materialBattleReward.ryo)||0;' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'BATTLE BREAKDOWN' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'commitAcademyKakashiDownstreamBattleCashReward34800' runtime/alpha-kakashi-battle-development-35740.js

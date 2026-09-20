@@ -25,7 +25,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300)return;
 
-const PATCH_ID="alpha_kakashi_origin_battle_deployment_34300_v2_2026_09_16";
+const PATCH_ID="alpha_kakashi_origin_battle_deployment_34300_v3_2026_09_20";
 const AUTHORITY_COMMIT="6c0037db3531d38890447a4e86c2e7e8c80e6e2e";
 const CONFIG_AUTHORITY_COMMIT="3f7502e4b41b1f58c88fe83e89f9839ed0607ef4";
 const SEQUENTIAL_REGISTRY_COMMIT="930c5048453d0034b2856ad3ddfa5ea65fdede7b";
@@ -254,6 +254,41 @@ function validateLaunch(spec,config){
   if(config.pakkun===true&&spec.pakkunAuthorized!==true)return{success:false,reason:"pakkun_story_authority_missing"};
   return{success:true};
 }
+function recoverAcademyKakashiOriginBattleDeployment34300(battleState=null){
+  const b=battleState&&typeof battleState==="object"?battleState:(typeof currentBattle==="object"&&currentBattle?currentBattle:null);
+  if(!b)return null;
+  if(b.kakashiOriginDeployment&&typeof b.kakashiOriginDeployment==="object")return b.kakashiOriginDeployment;
+  const rc=b.returnContext&&typeof b.returnContext==="object"?b.returnContext:null;
+  if(!rc||rc.type!=="story_scene"||String(rc.sceneId||"")!==STORY_SCENE_ID)return null;
+  const config=getConfig(rc.battleConfigId||b.encounterId);
+  if(!config)return null;
+  const battleOccurrenceId=String(b.battleId||"");
+  const storyOccurrenceId=String(rc.storyOccurrenceId||"");
+  const sourceAnchorRef=String(rc.sourceAnchorRef||"");
+  const bindingRef=String(rc.bindingRef||"");
+  if(!battleOccurrenceId||!storyOccurrenceId||!sourceAnchorRef||!bindingRef)return null;
+  const evidence=b.runtime&&Array.isArray(b.runtime.evidence)?b.runtime.evidence:[];
+  const countedControllerActionIds=[...new Set(evidence.filter(row=>row&&row.eventType==="action_attempted"&&row.actorRef&&row.actorRef.side==="player"&&row.actionId).map(row=>String(row.actionId)))];
+  let playerActionOpportunityCount=countedControllerActionIds.length;
+  if(playerActionOpportunityCount===0){
+    try{
+      const runtime=typeof ensureBattleRuntimeState==="function"?ensureBattleRuntimeState():null;
+      const counters=runtime&&runtime.actionOpportunityState&&runtime.actionOpportunityState.counters&&runtime.actionOpportunityState.counters.player;
+      const values=counters&&typeof counters==="object"?Object.values(counters).map(value=>Math.max(0,Number(value)||0)):[];
+      if(values.length)playerActionOpportunityCount=Math.max(...values);
+    }catch(_error){}
+  }
+  const recovered={
+    battleConfigId:config.id,battleOccurrenceId,storyOccurrenceId,sourceAnchorRef,bindingRef,
+    returnToken:rc.returnToken?String(rc.returnToken):null,controllerParticipantId:KAKASHI,oppositionParticipantIds:[...config.opposition],
+    pakkunAuthorized:config.pakkun===true,temporaryPakkun:config.pakkun?{participantRef:PAKKUN,basePL:16,remainingBattlePL:16,ownershipGranted:false,independentInitiative:false}:null,
+    timingGate:clone(config.timingGate),playerActionOpportunityCount,countedControllerActionIds,packageCustodyDelta:"none",
+    authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,sequentialRegistryCommit:SEQUENTIAL_REGISTRY_COMMIT,sequentialMiPsCombatCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT,amtRegistryCommit:AMT_REGISTRY_COMMIT,amtCombatCommit:AMT_COMBAT_COMMIT,
+    restoredFromPersistedBattleCaller:true
+  };
+  b.kakashiOriginDeployment=recovered;
+  return recovered;
+}
 function launchAcademyKakashiOriginPlBattle(spec={}){
   const config=getConfig(spec.battleConfigId);const gate=validateLaunch(spec,config);if(!gate.success)return gate;
   registerProfiles();
@@ -311,7 +346,7 @@ function attemptAcademyKakashiPakkunBattleAction(actionId,{targetParticipantId=n
 }
 
 function projectAcademyKakashiOriginBattleResult(){
-  const dep=currentBattle&&currentBattle.kakashiOriginDeployment;if(!dep)return null;
+  const dep=recoverAcademyKakashiOriginBattleDeployment34300(typeof currentBattle==="object"?currentBattle:null);if(!dep)return null;
   const evidence=currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[];
   const outcome=currentBattle.outcome&&currentBattle.outcome.type==="victory"?"player_side_victory":currentBattle.outcome?"opposition_side_victory":"unresolved";
   const participants=[];
@@ -333,7 +368,7 @@ function runAcademyKakashiOriginBattleDeployment34300Diagnostics(){
   const psBurst=byId(psActions,"enemy_fuinjutsu_smuggler_contraband_seal_burst");
   const miBlade=byId(miActions,"enemy_decoy_assassin_concealed_blade");
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_origin_battle_deployment_34300_v2_2026_09_16",
+    patchId:PATCH_ID==="alpha_kakashi_origin_battle_deployment_34300_v3_2026_09_20",
     authorityPinned:AUTHORITY_COMMIT==="6c0037db3531d38890447a4e86c2e7e8c80e6e2e",
     configAuthorityPinned:CONFIG_AUTHORITY_COMMIT==="3f7502e4b41b1f58c88fe83e89f9839ed0607ef4",
     sequentialAuthorityPinned:SEQUENTIAL_REGISTRY_COMMIT==="930c5048453d0034b2856ad3ddfa5ea65fdede7b"&&SEQUENTIAL_MI_PS_COMBAT_COMMIT==="4ef10cc556790a35e692b6a10f2733846809b494"&&AMT_REGISTRY_COMMIT==="0a0bbaf3c3c2395e22977a41da0892a209a73994"&&AMT_COMBAT_COMMIT==="32f79944304ea30689d87a4b1f7b48f84fb2734e",
@@ -359,6 +394,7 @@ function runAcademyKakashiOriginBattleDeployment34300Diagnostics(){
     timingExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3&&CONFIGS.academy_kakashi_origin_battle_seq_amt_pakkun.timingGate===null,
     portraitAuthorityBound:enemyDatabase[AMT].image==="NPC portrait/anbu_marked_target.png"&&enemyDatabase[PS].image==="NPC portrait/package_smuggler.png"&&enemyDatabase[MI].image==="NPC portrait/masked_interceptor.png",
     noLoot:[AMT,PS,MI].every(id=>enemyDatabase[id].rewards&&enemyDatabase[id].rewards.ryo.min===0&&enemyDatabase[id].rewards.commonDrops.length===0),
+    restoredProjectionRecovery:recoverAcademyKakashiOriginBattleDeployment34300.toString().includes("restoredFromPersistedBattleCaller:true")&&recoverAcademyKakashiOriginBattleDeployment34300.toString().includes("rc.battleConfigId||b.encounterId")&&projectAcademyKakashiOriginBattleResult.toString().includes("recoverAcademyKakashiOriginBattleDeployment34300"),
     compositionUsesExactArray:launchAcademyKakashiOriginPlBattle.toString().includes("configureBattleEnemyParticipants(config.opposition)"),multiOpponentPlInitializedAfterComposition:launchAcademyKakashiOriginPlBattle.toString().includes("initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true})")&&launchAcademyKakashiOriginPlBattle.toString().includes("kakashi_multi_opposition_zero_battle_pl"),
     browserGoldenClaimed:false
   };
@@ -366,11 +402,13 @@ function runAcademyKakashiOriginBattleDeployment34300Diagnostics(){
   return{pass:failed.length===0,checks,failed,registered,configIds:Object.keys(CONFIGS),browserGoldenClaimed:false};
 }
 
-const api=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,sequentialRegistryCommit:SEQUENTIAL_REGISTRY_COMMIT,sequentialMiPsCombatCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT,amtRegistryCommit:AMT_REGISTRY_COMMIT,amtCombatCommit:AMT_COMBAT_COMMIT,configs:CONFIGS,participantRefs:Object.freeze({kakashi:KAKASHI,pakkun:PAKKUN,amt:AMT,packageSmuggler:PS,maskedInterceptor:MI}),registerProfiles,getConfig,launchAcademyKakashiOriginPlBattle,attemptAcademyKakashiPakkunBattleAction,projectAcademyKakashiOriginBattleResult,browserGoldenClaimed:false});
+const api=Object.freeze({patchId:PATCH_ID,authorityCommit:AUTHORITY_COMMIT,configAuthorityCommit:CONFIG_AUTHORITY_COMMIT,sequentialRegistryCommit:SEQUENTIAL_REGISTRY_COMMIT,sequentialMiPsCombatCommit:SEQUENTIAL_MI_PS_COMBAT_COMMIT,amtRegistryCommit:AMT_REGISTRY_COMMIT,amtCombatCommit:AMT_COMBAT_COMMIT,configs:CONFIGS,participantRefs:Object.freeze({kakashi:KAKASHI,pakkun:PAKKUN,amt:AMT,packageSmuggler:PS,maskedInterceptor:MI}),registerProfiles,getConfig,launchAcademyKakashiOriginPlBattle,attemptAcademyKakashiPakkunBattleAction,projectAcademyKakashiOriginBattleResult,recoverDeployment:recoverAcademyKakashiOriginBattleDeployment34300,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300=api;
 globalThis.launchAcademyKakashiOriginPlBattle=launchAcademyKakashiOriginPlBattle;
 globalThis.attemptAcademyKakashiPakkunBattleAction=attemptAcademyKakashiPakkunBattleAction;
 globalThis.projectAcademyKakashiOriginBattleResult=projectAcademyKakashiOriginBattleResult;
+globalThis.recoverAcademyKakashiOriginBattleDeployment34300=recoverAcademyKakashiOriginBattleDeployment34300;
 globalThis.runAcademyKakashiOriginBattleDeployment34300Diagnostics=runAcademyKakashiOriginBattleDeployment34300Diagnostics;
 registerProfiles();
+recoverAcademyKakashiOriginBattleDeployment34300();
 })();

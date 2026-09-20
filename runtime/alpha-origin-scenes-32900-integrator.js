@@ -95,7 +95,7 @@ globalThis.runAlphaOriginScene32900Diagnostics=runAlphaOriginScene32900Diagnosti
   // runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260917-5
   // runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260917-6
   // runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-7
-  script.src="runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-8";
+  script.src="runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-9";
   document.head.appendChild(script);
 })();
 })();

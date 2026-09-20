@@ -83,4 +83,45 @@ assert.strictEqual(exact.configs.academy_kakashi_origin_battle_seq_mi.timingGate
 assert.strictEqual(exact.configs.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions,3);
 assert.strictEqual(exact.configs.academy_kakashi_origin_battle_seq_amt_pakkun.timingGate,null);
 assert.strictEqual(exact.launchType,"function");assert.strictEqual(exact.pakkunActionType,"function");assert.strictEqual(exact.projectorType,"function");assert.strictEqual(exact.multiEnemyApi,"function","existing Battle engine must expose multi-enemy composition API");
-console.log(JSON.stringify({pass:true,patch:report.checks.patchId?"34300-v2":null,configCount:report.configIds.length,exactOccurrenceProfiles:true,npcBattlePortraitAuthority:true,genericProfilesPreserved:true,exactOppositionActions:true,directPSMI2v1:true,directMI1v1Untimed:true,directPS1v1Untimed:true,sequentialTimingPreserved:true,multiEnemyExistingApi:true,pakkunTemporaryActionSource:true,browserGoldenClaimed:false},null,2));
+// Claimed PS Victory must survive a reload-style loss of the Kakashi-only
+// deployment object and still use the real core caller restoration path.
+run(fs.readFileSync(path.join(root,"runtime","alpha-alpha-sprint-33100.js"),"utf8"),"runtime/alpha-alpha-sprint-33100.js");
+const claimedPsReturn=JSON.parse(JSON.stringify(run(`(()=>{
+  const SCENE="origin_academy_kakashi_anbu_retrieval",KAK="academy_kakashi",PS="academy_kakashi_origin_package_smuggler";
+  unregisterStoryScene(SCENE);
+  const registered=registerStoryScene({sceneId:SCENE,entryBeatId:"qa_ps_battle",beats:[
+    {beatId:"qa_ps_battle",mode:"battle_transition",battle:{encounterId:"academy_kakashi_origin_battle_seq_ps",postBattleBeatId:"qa_ps_return",resultProjector:projectAcademyKakashiOriginBattleResult}},
+    {beatId:"qa_ps_return",mode:"post_battle",onEnterConsequences:[{requestId:"qa_claimed_ps_return_consume",kind:"domain",resolve:()=>{
+      const active=getActiveStorySceneRuntime(),authored=active&&active.battleResume&&active.battleResume.authored;
+      if(!authored)return{success:false,reason:"qa_claimed_ps_authored_result_missing"};
+      if(authored.battleConfigId!=="academy_kakashi_origin_battle_seq_ps"||authored.bindingRef!=="academy_kakashi.battle.stop_assassin_post_mi_ps")return{success:false,reason:"qa_claimed_ps_authored_result_mismatch"};
+      active.localContext={...(active.localContext||{}),qaClaimedPsReturnConsumed:true};active.beatId="qa_ps_win";return{success:true};
+    }}]},
+    {beatId:"qa_ps_win",mode:"narration",text:"PS return restored.",nextBeatId:null}
+  ]});
+  if(!registered||registered.success!==true)return{success:false,reason:"qa_story_registration_failed"};
+  playerData.storySceneRuntime={version:1,sequence:1,lastFeedbackReceipt:null,active:{instanceId:"qa-ps-return-instance",sceneId:SCENE,beatId:"qa_ps_battle",startedAt:Date.now(),sourceEventId:SCENE,sourceOpportunityId:null,returnContext:null,presentationUnderlay:null,localContext:{},processedConsequenceKeys:[],committedChoiceKeys:[],pendingBattle:{battleId:"qa-ps-claimed-return",sourceBeatId:"qa_ps_battle",postBattleBeatId:"qa_ps_return"},battleResume:null}};
+  currentBattle.active=false;currentBattle.battleOver=true;currentBattle.battleId="qa-ps-claimed-return";currentBattle.encounterId="academy_kakashi_origin_battle_seq_ps";
+  currentBattle.enemy=enemyDatabase[PS];selectedEnemy=currentBattle.enemy;currentBattle.outcome={type:"victory",completedAt:Date.now()};
+  currentBattle.rewards={generated:true,claimed:true,ryo:50,exp:0,items:[],rareDrops:[],requiresExplicitPostClaimContinue:true};
+  currentBattle.returnContext={type:"story_scene",sceneId:SCENE,sceneInstanceId:"qa-ps-return-instance",sourceBeatId:"qa_ps_battle",postBattleBeatId:"qa_ps_return",battleConfigId:"academy_kakashi_origin_battle_seq_ps",storyOccurrenceId:"qa-origin-ps-route",sourceAnchorRef:"AK_SA_022",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",returnToken:"qa-ps-return-token"};
+  currentBattle.kakashiOriginDeployment=null;currentBattle.runtime=null;
+  const runtime=ensureBattleRuntimeState();runtime.evidence=[
+    {eventType:"action_attempted",actionId:"qa-ps-a1",actorRef:{side:"player",participantId:KAK},targetRef:{side:"enemy",participantId:PS}},
+    {eventType:"action_attempted",actionId:"qa-ps-a2",actorRef:{side:"player",participantId:KAK},targetRef:{side:"enemy",participantId:PS}}
+  ];
+  runtime.remainingPL.player[KAK]={maximum:20,current:12};runtime.remainingPL.enemy[PS]={maximum:10,current:0};
+  runtime.actionOpportunityState.counters.player[KAK]=2;currentOverlayType="victory";
+  const returned=continueAfterVictory(),active=getActiveStorySceneRuntime(),authored=active&&active.battleResume&&active.battleResume.authored;
+  return{success:returned&&returned.success===true,priority:returned&&returned.alpha33100StoryReturnPriority===true,beatId:active&&active.beatId,consumed:active&&active.localContext&&active.localContext.qaClaimedPsReturnConsumed===true,returnContextCleared:currentBattle.returnContext===null,recovered:currentBattle.kakashiOriginDeployment,authored};
+})()`,"claimed-ps-return.js")));
+assert.strictEqual(claimedPsReturn.success,true,"claimed PS RETURN TO STORY failed through real core caller restoration");
+assert.strictEqual(claimedPsReturn.priority,true,"33100 Story caller did not own claimed PS continuation");
+assert.strictEqual(claimedPsReturn.beatId,"qa_ps_win");assert.strictEqual(claimedPsReturn.consumed,true);assert.strictEqual(claimedPsReturn.returnContextCleared,true);
+assert.strictEqual(claimedPsReturn.recovered.battleConfigId,"academy_kakashi_origin_battle_seq_ps");
+assert.strictEqual(claimedPsReturn.recovered.bindingRef,"academy_kakashi.battle.stop_assassin_post_mi_ps");
+assert.strictEqual(claimedPsReturn.recovered.playerActionOpportunityCount,2);
+assert.strictEqual(claimedPsReturn.authored.battleOccurrenceId,"qa-ps-claimed-return");
+assert.strictEqual(claimedPsReturn.authored.playerActionOpportunityCount,2);
+assert.strictEqual(claimedPsReturn.authored.participants.find(row=>row.participantRef==="academy_kakashi_origin_package_smuggler").battleStatus,"defeated");
+console.log(JSON.stringify({pass:true,patch:report.checks.patchId?"34300-v3":null,configCount:report.configIds.length,exactOccurrenceProfiles:true,npcBattlePortraitAuthority:true,genericProfilesPreserved:true,exactOppositionActions:true,directPSMI2v1:true,directMI1v1Untimed:true,directPS1v1Untimed:true,sequentialTimingPreserved:true,multiEnemyExistingApi:true,pakkunTemporaryActionSource:true,claimedPsReturnAfterReload:true,browserGoldenClaimed:false},null,2));
