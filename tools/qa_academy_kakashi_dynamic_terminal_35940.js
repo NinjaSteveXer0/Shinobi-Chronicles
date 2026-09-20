@@ -99,6 +99,12 @@ assert(receipt.includes("Status at ANBU report — Present."));
 assert(receipt.includes("Permanent Summon ownership — None."));
 assert(minato.includes("Three confirmed deaths."));
 assert(minato.includes("Battle casualties?"));
+assert(!minato.includes("\\n\\n"),"Minato fallback text must contain real line breaks, not escaped newline literals");
+let minatoPerformance=MOD.minatoPerformance(state);
+assert(Array.isArray(minatoPerformance)&&minatoPerformance.length>=8,"structured Minato performance missing for triple-kill projection");
+assert.strictEqual(minatoPerformance[0].kind,"narration");
+assert(minatoPerformance.some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO"&&cue.text==="Three confirmed deaths."));
+assert(minatoPerformance.some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE"&&cue.text==="Yes."));
 assert(!/merciless|ruthless|alignment/i.test(report+receipt+minato));
 
 // Pakkun may already have explicitly departed on a route-specific handoff; do not resurrect him at terminal.
@@ -142,6 +148,9 @@ assert(receipt.includes("Handoff contingency overheard."));
 assert(receipt.includes("Downstream package destination — Unknown."));
 assert(minato.includes("The surviving result remains separate: Package Smuggler: in Uchiha Police custody."));
 assert(minato.includes("He chose the Police."));
+minatoPerformance=MOD.minatoPerformance(state);
+assert(minatoPerformance.some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO"&&cue.text==="He chose the Police."));
+assert(minatoPerformance.some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE"&&cue.text==="Yes."));
 
 // Field-secured location is reported exactly; no fictional institutional custody.
 occurrences.set("field-ps",{occurrenceId:"field-ps",fact:{participantRef:PS,participantState:{status:"FIELD_SECURED_PENDING_COLLECTION",securedAtLocationRef:"KAKASHI_PS_ALT_NIGHT_STREET"},storySceneInstanceId:"qa-terminal"}});
@@ -178,6 +187,7 @@ assert(!MOD.reportText(state).includes("The receiver got away with it."));
 // Installed 35100 expression beats are overridden, while completion ownership is untouched.
 assert.strictEqual(typeof beatMap.get("kak_terminal_debrief_summary_35100").presentationResolver,"function");
 assert.strictEqual(typeof beatMap.get("kak_terminal_minato_private_evaluation_35100").presentationResolver,"function");
+assert.strictEqual(typeof MOD.minatoPerformance,"function");
 assert.strictEqual(typeof beatMap.get("kak_terminal_chronicle_receipt_35100").presentationResolver,"function");
 assert.strictEqual(typeof globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.guardedOriginCompletion,"function");
 
