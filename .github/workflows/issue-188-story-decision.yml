@@ -230,7 +230,7 @@ jobs:
           grep -Fq 'alpha-kakashi-dynamic-terminal-35940.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v1_2026_09_20' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'alpha-kakashi-browser-acceptance-35950.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
-          grep -Fq 'alpha_kakashi_browser_acceptance_35950_v1_2026_09_20' runtime/alpha-kakashi-browser-acceptance-35950.js
+          grep -Fq 'alpha_kakashi_browser_acceptance_35950_v2_2026_09_20' runtime/alpha-kakashi-browser-acceptance-35950.js
           grep -Fq 'initializeBattleRemainingPLFromDeployment({preserveExistingEnemyPower:true})' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'kakashi_multi_opposition_zero_battle_pl' runtime/alpha-kakashi-origin-battle-deployment-34300.js
           grep -Fq 'a3cad415ea74a4fe8b3965b1136522aceab81047' runtime/alpha-kakashi-dynamic-terminal-35940.js
