@@ -61,6 +61,9 @@ function bindMoveCloser(){
  const strike=choice(SUCCESS_BEAT,"strike_before_handoff");
  const pick=choice(SUCCESS_BEAT,"attempt_pickpocket");
  const stay=choice(FAILURE_BEAT,"stay_on_package");
+ const interceptBeat=scene()&&scene().beatMap instanceof Map?scene().beatMap.get(FACTUAL.beats.stayPackageSuccess)||null:null;
+ const dispositionBeat=scene()&&scene().beatMap instanceof Map?scene().beatMap.get(INTERCEPT.beats.disposition)||null:null;
+ const stay=choice(FAILURE_BEAT,"stay_on_package");
  const interceptBeat=INTERCEPT&&INTERCEPT.beats&&INTERCEPT.beats.disposition?scene().beatMap.get(FACTUAL.beats.stayPackageSuccess):null;
  const dispositionBeat=INTERCEPT&&INTERCEPT.beats?scene().beatMap.get(INTERCEPT.beats.disposition):null;
  const stop=choice(FAILURE_BEAT,"stop_package_smuggler");
