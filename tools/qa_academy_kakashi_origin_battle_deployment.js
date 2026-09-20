@@ -89,7 +89,7 @@ run(fs.readFileSync(path.join(root,"runtime","alpha-alpha-sprint-33100.js"),"utf
 const claimedPsReturn=JSON.parse(JSON.stringify(run(`(()=>{
   const SCENE="origin_academy_kakashi_anbu_retrieval",KAK="academy_kakashi",PS="academy_kakashi_origin_package_smuggler";
   const qaNodes=new Map();
-  const qaScreenOverlay={id:"screen-overlay",style:{display:"flex"},dataset:{},childNodes:[],innerHTML:"",setAttribute(){},querySelector(){return null;},querySelectorAll(){return[];}};
+  const qaScreenOverlay={id:"screen-overlay",style:{display:"flex"},dataset:{},classList:{add(){},remove(){},toggle(){}},childNodes:[],innerHTML:"",setAttribute(){},querySelector(){return null;},querySelectorAll(){return[];}};
   qaNodes.set("screen-overlay",qaScreenOverlay);
   const priorGetElementById=document.getElementById,priorBodyAppend=document.body.appendChild;
   document.getElementById=id=>qaNodes.get(id)||priorGetElementById.call(document,id);
