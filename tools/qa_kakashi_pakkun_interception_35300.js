@@ -11,7 +11,7 @@ const adapterCore=read("runtime/alpha-kakashi-final-origin-adapter-34100-core.js
 const core=read("runtime/alpha-story-decision-realisation-34000.js");
 const factual=read("runtime/alpha-kakashi-factual-state-commit-34120.js");
 
-assert(consumer.includes('PATCH_ID="alpha_kakashi_pakkun_interception_35300_v1_2026_09_17"'),"35300 patch identity missing");
+assert(consumer.includes('PATCH_ID="alpha_kakashi_pakkun_interception_35300_v2_2026_09_20"'),"35300 patch identity missing");
 assert(consumer.includes('ENTRY_BEAT="kak_get_closer_failure_stay_package_intercept"'),"35300 must bind the factual pursuit-success interception beat");
 assert(consumer.includes('CONFIG="academy_kakashi_origin_battle_kakashi_pakkun_vs_amt"'),"35300 must use exact Pakkun + Kakashi vs AMT config");
 assert(consumer.includes('BINDING.demand')&&consumer.includes('"AK_SA_009"'),"Demand must consume AK_SA_009");
@@ -43,7 +43,15 @@ const resolveAskSource=consumer.slice(resolveAskStart,closeBattleStart);
 assert(!resolveAskSource.includes('verifiedActionableIntelligence:true'),"Ask Destination must not silently grant intelligence reward predicate");
 assert(consumer.includes('decisionPointRef:"AK_SA_018_RECONVERGENCE"'),"Ask Destination must reconverge through a new semantic choice set");
 assert(consumer.includes('KAK.openDecisionPoint("AK_SA_013"'),"victory must open existing four-way disposition semantic family");
-assert(consumer.includes('availability:available(false,blocker)'),"disposition execution must remain fail-closed until its exact runtime owner is bound");
+assert(consumer.includes('label:"BRING HIM TO THE UCHIHA POLICE FORCE"')&&consumer.includes('label:"LET HIM GO"')&&consumer.includes('label:"KILL HIM"')&&consumer.includes('label:"TAKE HIM BACK TO THE ANBU"'),"four-way disposition menu must be live in exact authored order");
+assert(consumer.includes('function commitInstitutional35300('),"institutional disposition owner missing");
+assert(consumer.includes('stateClass:"DELIBERATELY_RELEASED"'),"deliberate release must remain distinct from escape");
+assert(consumer.includes('semanticClass:"KILL — GUARANTEED"')&&consumer.includes('targetDeathConfirmed:true'),"KILL HIM must remain deterministic");
+assert(consumer.includes('Where was it going?')&&consumer.includes("Now you're caught up."),"ASK WHERE exact performance missing");
+assert(consumer.includes("So that's it.")&&consumer.includes("Persistent."),"Demand victory/defeat exact aftermath missing");
+assert(consumer.includes("You've got to be kidding me.")&&consumer.includes('text:"Nope."'),"Take Him Down exact setup missing");
+assert(consumer.includes('t==="Kakashi lets go completely."')&&consumer.includes('t==="ANBU Marked Target is moved to the officers\' side."')&&consumer.includes('t==="Only then does Kakashi release it."'),"physical state commits must be cue-timed");
+assert(!consumer.includes('"speakerName":"KAKASHI:"')&&!consumer.includes('"speakerName":"PAKKUN:"')&&!consumer.includes('"speakerName":"ANBU MARKED TARGET:"'),"dialogue speaker IDs contain stale colon suffixes");
 assert(consumer.includes('ownershipGranted:false')&&consumer.includes('nameKnowledgeGranted:false'),"temporary Pakkun participation must not leak ownership or name Knowledge");
 assert(consumer.includes('browserGoldenClaimed:false'),"35300 must not claim browser Golden");
 assert(loader.includes('runtime/alpha-kakashi-pakkun-interception-35300.js'),"34100 must production-load 35300");
