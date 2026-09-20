@@ -89,7 +89,7 @@ globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
 globalThis.renderStoryScenePresentationLayer=()=>true;
 globalThis.queueMicrotask=fn=>fn(); // settle runtime render/materialization synchronously in headless QA
-globalThis.advanceStoryScene=function baseAdvance(choiceId=null){
+globalThis.continueAfterVictory=()=>({success:false,reason:"qa_prior_continue"});\nglobalThis.advanceStoryScene=function baseAdvance(choiceId=null){
  const beat=definition.beatMap.get(active.beatId);if(!beat)return{success:false,reason:"qa_beat_missing",beatId:active.beatId};
  if(beat.mode==="choice"){
   const row=(beat.choices||[]).find(x=>x&&x.choiceId===choiceId);if(!row)return{success:false,reason:"qa_choice_missing",choiceId};
@@ -154,6 +154,9 @@ assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
 assert(source35830.includes("packageRecoveryParentOccurrenceId35830")&&source35830.includes("post_mi_ps_package_recovery_parent_missing"),"PS post-Battle return must resolve an Origin-owned package parent before AK_SA_033");
+const decoratedPsChoice={textContent:"◇OBJECTIVEGO AFTER PACKAGE SMUGGLER›",getAttribute(name){return name==="aria-label"?"GO AFTER PACKAGE SMUGGLER":null;}};
+assert.strictEqual(MOD.choiceLabelFromButton(decoratedPsChoice),"GO AFTER PACKAGE SMUGGLER","decorated tactical choice must still resolve its authored label for the black wipe capture");
+assert(source35830.includes("performKakashiSceneWipe33910")&&source35830.includes("decoratedChoiceLabel35830(t)"),"post-MI choice capture must retain the black wipe after 33910 decorates the button text");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-live",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:3,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
@@ -198,6 +201,33 @@ const livePsReturned=livePsReturnBeat.onEnterConsequences.find(x=>x.requestId===
 assert.strictEqual(livePsReturned.success,true,"live MI -> PS Battle return must not depend on an Origin occurrence for the earlier MI Battle id: "+JSON.stringify(livePsReturned));
 assert.strictEqual(active.beatId,MOD.beats.psWin,"live MI -> PS Battle return must resume authored PS victory Story");
 assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.parentOccurrenceRef.includes("occ_origin_kakashi_post_mi_ps_battle_return"),true,"AK_SA_033 must consume an Origin-owned PS Battle-return package parent");
+// Installed-browser RETURN TO STORY must exercise the real 35830 consumer, not a synthetic post-Battle beat.
+store.delete("kak_seq_secure_package_after_ps");recoveryCalls=0;
+participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-browser-mi"};
+participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-browser-ps"};
+active={sceneId:SCENE_ID,instanceId:"qa-browser-postmi-ps",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"qa-browser-mi-battle",kakashiScene05AWTurnCount:2,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
+MOD.wireEntryChoices();
+out=globalThis.advanceStoryScene("scene05aw_go_after_package_smuggler");assert.strictEqual(out.success,true);
+launches.length=0;drainNarration(MOD.beats.psBattle);assert.strictEqual(launches.length,1);
+const browserPsResult={battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-browser-ps-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]};
+globalThis.currentResult=browserPsResult;
+globalThis.currentBattle={active:false,battleOver:true,battleId:"qa-browser-ps-battle",encounterId:"academy_kakashi_origin_battle_seq_ps",outcome:{type:"victory"},rewards:{generated:true,claimed:true,ryo:50,requiresExplicitPostClaimContinue:true},returnContext:{type:"story_scene",sceneId:SCENE_ID,sceneInstanceId:active.instanceId,sourceBeatId:MOD.beats.psBattle,postBattleBeatId:MOD.beats.psReturn,battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps"}};
+const qaVictoryOverlay={style:{display:"flex"}},priorDocument35830=globalThis.document;
+globalThis.document={getElementById(id){return id==="screen-overlay"?qaVictoryOverlay:null;}};
+globalThis.currentOverlayType="victory";
+globalThis.resumeBattleCallerAfterCompletion=function(){
+ active.battleResume={authored:browserPsResult};active.beatId=MOD.beats.psReturn;globalThis.currentBattle.returnContext=null;
+ return{success:true,type:"story_scene",postBattleBeatId:MOD.beats.psReturn};
+};
+const browserPsReturned=globalThis.continueAfterVictory();
+assert.strictEqual(browserPsReturned.success,true,"real 35830 RETURN TO STORY bridge failed: "+JSON.stringify(browserPsReturned));
+assert.strictEqual(browserPsReturned.postMiPsReturnBridge35830,true,"real PS return did not use the late route bridge");
+assert.strictEqual(active.beatId,MOD.beats.psWin,"real PS RETURN TO STORY did not consume the authored return beat");
+assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.packageState.currentHolderClass,"KAKASHI","real PS return did not commit package recovery");
+assert.strictEqual(qaVictoryOverlay.style.display,"none","real PS RETURN TO STORY left Victory visible");
+assert.strictEqual(globalThis.currentOverlayType,null,"real PS RETURN TO STORY left Victory as the active overlay");
+if(priorDocument35830===undefined)delete globalThis.document;else globalThis.document=priorDocument35830;
+
 store.delete("kak_seq_secure_package_after_ps");
 participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"};
 recoveryCalls=0;
