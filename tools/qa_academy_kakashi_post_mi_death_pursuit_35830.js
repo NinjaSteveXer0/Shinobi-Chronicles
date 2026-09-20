@@ -322,6 +322,18 @@ drainNarration("kak_seq_debrief_pending");
 assert.strictEqual(participantStates[AMT].stateClass,"ANBU_INSTITUTIONAL_CUSTODY");
 assert.strictEqual(participantStates["pakkun_origin_unfamiliar_ninken"].stateClass,"DEPARTED");
 
+// Direct AMT Police handoff must commit custody only after its exact transfer performance.
+active=freshDet();active.instanceId="qa-postmi-amt-police";participantStates[MI]={participantRef:MI,stateClass:"DEAD"};delete participantStates[AMT];delete participantStates["pakkun_origin_unfamiliar_ninken"];launches.length=0;
+MOD.wireEntryChoices();out=globalThis.advanceStoryScene("scene06aw2c_dkill_go_after_anbu_marked_target");assert.strictEqual(out.success,true);
+drainNarration(MOD.beats.amtBattle);
+simulateBattleReturn(MOD.beats.amtBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_amt",battleOccurrenceId:"qa-amt-police-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.amtReturn);
+out=MOD.consumeAmtReturn();assert.strictEqual(out.success,true);drainNarration(MOD.beats.amtDecision);
+out=globalThis.advanceStoryScene("postmi_amt_police");assert.strictEqual(out.success,true);assert.strictEqual(active.beatId,MOD.beats.amtPoliceEscort);
+assert.notStrictEqual(participantStates[AMT].stateClass,"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY","AMT Police custody committed on choice click");
+drainNarration("kak_seq_debrief_pending");
+assert.strictEqual(participantStates[AMT].stateClass,"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY");
+assert.strictEqual(participantStates["pakkun_origin_unfamiliar_ninken"].stateClass,"DEPARTED");
+
 assert(saves>0);
 console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
 console.log("- live fast-win PS pursuit and post-kill PS/AMT pursuit entries use direct authored successor routing");
