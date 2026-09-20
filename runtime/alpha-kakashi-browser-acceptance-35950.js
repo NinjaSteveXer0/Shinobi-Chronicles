@@ -1,5 +1,5 @@
 // ============================================================================
-// KAKASHI ORIGIN GEN70 BROWSER ACCEPTANCE FINALISER — 35950
+// KAKASHI ORIGIN GEN71 BROWSER ACCEPTANCE FINALISER — 35950
 // Surgical final-load integration after the closed gen69 Story/CE owners.
 // Rebinds only choices that earlier Story materialisers can replace and does not
 // own factual resolution, Battle semantics, custody, package state, or rewards.
@@ -8,14 +8,16 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BROWSER_ACCEPTANCE_35950)return;
 
-const PATCH_ID="alpha_kakashi_browser_acceptance_35950_v1_2026_09_20";
+const PATCH_ID="alpha_kakashi_browser_acceptance_35950_v2_2026_09_20";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const OBSERVE_BEAT="kak_original_major_choice";
 const SUCCESS_BEAT="kak_get_closer_success";
 const FAILURE_BEAT="kak_get_closer_failure";
 const ROUTE=globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910;
 const MOVE=globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930;
-if(!ROUTE||!MOVE)throw new Error("kakashi_browser_acceptance_35950_dependencies_missing");
+const FACTUAL=globalThis.SC_ALPHA_KAKASHI_FACTUAL_STATE_34120;
+const INTERCEPT=globalThis.SC_ALPHA_KAKASHI_PAKKUN_INTERCEPTION_35300;
+if(!ROUTE||!MOVE||!FACTUAL||!INTERCEPT)throw new Error("kakashi_browser_acceptance_35950_dependencies_missing");
 
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
 function available(){return{available:true,knownBlocker:null};}
@@ -58,6 +60,9 @@ function bindMoveCloser(){
  if(ROUTE.patchGetCloserHandoff()!==true)return{success:false,reason:"move_closer_handoff_rebind_failed"};
  const strike=choice(SUCCESS_BEAT,"strike_before_handoff");
  const pick=choice(SUCCESS_BEAT,"attempt_pickpocket");
+ const stay=choice(FAILURE_BEAT,"stay_on_package");
+ const interceptBeat=INTERCEPT&&INTERCEPT.beats&&INTERCEPT.beats.disposition?scene().beatMap.get(FACTUAL.beats.stayPackageSuccess):null;
+ const dispositionBeat=INTERCEPT&&INTERCEPT.beats?scene().beatMap.get(INTERCEPT.beats.disposition):null;
  const stop=choice(FAILURE_BEAT,"stop_package_smuggler");
  const cut=choice(FAILURE_BEAT,"cut_off_sakura");
  if(!strike||!pick||!stop||!cut)return{success:false,reason:"move_closer_gen69_choice_missing"};
@@ -94,13 +99,16 @@ function diagnostics(){
  const strike=choice(SUCCESS_BEAT,"strike_before_handoff");
  const pick=choice(SUCCESS_BEAT,"attempt_pickpocket");
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_browser_acceptance_35950_v1_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_browser_acceptance_35950_v2_2026_09_20",
   securePackageRebound:!!secure&&secure.nextBeatId==="kak_observe_secure_package_battle"&&Array.isArray(secure.consequenceRequests)&&secure.consequenceRequests.length>0,
   sequentialRebound:!!sequential&&sequential.nextBeatId==="kak_seq_mi_battle"&&Array.isArray(sequential.consequenceRequests)&&sequential.consequenceRequests.length>0,
   secureBeforeRebound:!!secureBefore&&secureBefore.nextBeatId===ROUTE.beats.secureBeforeIntro&&Array.isArray(secureBefore.consequenceRequests)&&secureBefore.consequenceRequests.length>0,
   originalTargetRebound:!!original&&original.nextBeatId===ROUTE.beats.originalIntro&&Array.isArray(original.consequenceRequests)&&original.consequenceRequests.length>0,
   handoffReconverges:!!handoff&&handoff.nextBeatId===OBSERVE_BEAT,
   moveCloserActionsRebound:!!strike&&!!pick&&Array.isArray(strike.consequenceRequests)&&strike.consequenceRequests.length>0&&Array.isArray(pick.consequenceRequests)&&pick.consequenceRequests.length>0,
+stayPackageOwnerLive:!!stay&&typeof stay.availability==="function"&&stay.availability().available===true&&Array.isArray(stay.consequenceRequests)&&stay.consequenceRequests.some(row=>row&&row.requestId==="kakashi_get_closer_stay_package_pursuit_34120"),
+interceptionChoicesLive:!!interceptBeat&&interceptBeat.choices.map(row=>row.label).join("|")==="DEMAND THE PACKAGE|TAKE HIM DOWN|ASK WHERE THE PACKAGE WAS GOING"&&interceptBeat.choices.every(row=>typeof row.availability==="function"&&row.availability().available===true),
+interceptionDispositionLive:!!dispositionBeat&&dispositionBeat.choices.map(row=>row.label).join("|")==="BRING HIM TO THE UCHIHA POLICE FORCE|LET HIM GO|KILL HIM|TAKE HIM BACK TO THE ANBU"&&dispositionBeat.choices.every(row=>typeof row.availability==="function"&&row.availability().available===true),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
