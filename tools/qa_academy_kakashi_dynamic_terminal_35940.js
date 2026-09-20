@@ -54,7 +54,7 @@ for(const [beatId,expected] of [
  [moveBeats.improvedReturn,"academy_kakashi_origin_battle_amt_ps_2v1"],
  [moveBeats.psReturn,"academy_kakashi_origin_battle_ps_1v1"],
  [moveBeats.cutReturn,"academy_kakashi_origin_battle_amt_ps_2v1"],
- [postBeats.psReturn,"academy_kakashi_origin_battle_ps_1v1"],
+ [postBeats.psReturn,"academy_kakashi_origin_battle_seq_ps"],
  [postBeats.amtReturn,"academy_kakashi_origin_battle_seq_amt_pakkun"]
 ]){
  const req=beatMap.get(beatId).onEnterConsequences.find(x=>x.requestId==="kakashi_terminal_capture_35940::"+beatId);

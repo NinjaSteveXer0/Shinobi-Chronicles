@@ -176,10 +176,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-9' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-10' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-75' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-75";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-76' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-76";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -229,7 +229,8 @@ jobs:
           grep -Fq 'alpha-kakashi-field-secured-35920.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-move-closer-closure-35930.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-dynamic-terminal-35940.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
-          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v1_2026_09_20' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v2_2026_09_20' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'if(post.beats.psReturn)captureHook(m,post.beats.psReturn,"academy_kakashi_origin_battle_seq_ps");' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'alpha-kakashi-browser-acceptance-35950.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha_kakashi_browser_acceptance_35950_v2_2026_09_20' runtime/alpha-kakashi-browser-acceptance-35950.js
           grep -Fq 'alpha_kakashi_origin_battle_deployment_34300_v3_2026_09_20' runtime/alpha-kakashi-origin-battle-deployment-34300.js
