@@ -20,7 +20,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740)return;
 
-const PATCH_ID="alpha_kakashi_battle_development_35740_v9_2026_09_20";
+const PATCH_ID="alpha_kakashi_battle_development_35740_v10_2026_09_20";
 const KAKASHI="academy_kakashi";
 const ROUTE="academy_kakashi_origin_reward";
 const TECHNICAL=new Set(["ninjutsu","taijutsu","genjutsu","bukijutsu","fuinjutsu","kinjutsu"]);
@@ -427,7 +427,9 @@ if(priorProject){
     const result=priorProject.apply(this,arguments);
     const summary=b&&b.kakashiOriginDevelopmentSummary||null;
     const immediate=b&&isExactMiVictoryBattle(b)&&typeof getAcademyKakashiMiVictoryBattleRewardState34800==="function"?getAcademyKakashiMiVictoryBattleRewardState34800(b):b&&isExactDownstreamCashVictoryBattle(b)&&typeof getAcademyKakashiDownstreamBattleCashRewardState34800==="function"?getAcademyKakashiDownstreamBattleCashRewardState34800(b):null;
-    return result&&typeof result==="object"?{...result,developmentSummary:clone(summary),rewardGranted:!!(immediate&&immediate.claimed===true),immediateBattleReward:immediate&&immediate.success===true?clone(immediate):null}:result;
+    const projected=result&&typeof result==="object"?{...result,developmentSummary:clone(summary),rewardGranted:!!(immediate&&immediate.claimed===true),immediateBattleReward:immediate&&immediate.success===true?clone(immediate):null}:result;
+    if(b&&projected&&typeof projected==="object"&&projected.battleConfigId&&projected.bindingRef&&projected.battleOccurrenceId)b.kakashiOriginStoryReturnResultSnapshot=clone(projected);
+    return projected;
   };
   try{projectAcademyKakashiOriginBattleResult=globalThis.projectAcademyKakashiOriginBattleResult;}catch(_error){}
 }
@@ -472,6 +474,7 @@ if(priorClaimRewards){
     if(mi)prepareImmediateMiReward35740(b);else prepareImmediateDownstreamCash35740(b);
     if(b.rewards)b.rewards.claimed=true;
     b.claimedAt=Date.now();
+    try{if(typeof projectAcademyKakashiOriginBattleResult==="function")projectAcademyKakashiOriginBattleResult();}catch(_error){}
     try{if(typeof recordBattleChronicle==="function")recordBattleChronicle();}catch(_error){}
     try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}
     try{if(typeof saveTestState==="function")saveTestState();}catch(_error){}
@@ -485,9 +488,10 @@ function diagnostics(){
   const legacyDeferredRyoLabel="<span>RYŌ</span><strong>"+["DE","BRIEF"].join("")+"</strong>";
   const legacyRewardQuestion=["WHY"," THESE REWARDS?"].join("");
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v9_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_battle_development_35740_v10_2026_09_20",
     exactAuthorities:AUTHORITIES.world==="91f5969b20e270b3ef7d148342f28a1668b4eba1"&&AUTHORITIES.immediateMiReward==="fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da"&&AUTHORITIES.downstreamCashReward==="7446e80c7f2cb9d004ffd914e11c0c77e7321c2b"&&AUTHORITIES.rewardDisclosure==="aad106b6a64ede81556aea0df0cc9fe4b8830178"&&AUTHORITIES.combat==="e14a65f181d6384d1a4010ed805f1ca8e6c6c6e8"&&AUTHORITIES.progression==="54314cc29e1374783cae0a0d90654cc9a2316a45"&&AUTHORITIES.acquisition==="b83884adb70f1e74e62f96ab96848c1ec33704f9",
     restoredDeploymentUses34300Recovery:deployment.toString().includes("recoverAcademyKakashiOriginBattleDeployment34300"),
+    storyReturnResultSnapshotOwnedByBattleProjector:globalThis.projectAcademyKakashiOriginBattleResult.toString().includes("kakashiOriginStoryReturnResultSnapshot")&&globalThis.claimCurrentBattleRewards.toString().includes("projectAcademyKakashiOriginBattleResult"),
     technicalDevelopmentUses34800:sync.includes("recordAcademyKakashiTechnicalDevelopment34800"),
     storyDeploymentOwnsPlayerEvidence:sync.includes('row.actorRef.side==="player"')&&!sync.includes("row.actorRef.participantId===KAKASHI")&&!sync.includes("row.targetRef.participantId!==KAKASHI"),
     resolvedEvidenceMayOwnDiscipline:disciplineForAction.toString().includes("attemptData.primaryDiscipline")&&disciplineForAction.toString().includes("row.data.primaryDiscipline")&&sync.includes('row.eventType==="action_attempted"')&&!sync.includes("&&row.skillId&&row.actionId"),
