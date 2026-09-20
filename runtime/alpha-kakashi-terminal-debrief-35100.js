@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v9_2026_09_20";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -64,6 +64,8 @@ const STAY_PACKAGE_PURSUIT_REACHED="PURSUIT_SUCCESS_AMT_REACHED";
 const SECURE_PACKAGE_VICTORY_CLASS="academy_kakashi_secure_package_2v1_post_battle_factual_state";
 const DEBRIEF_TYPE="origin_story_terminal_debrief";
 const RECEIPT_TYPE="origin_story_chronicle_receipt";
+const ROOFTOP_ENV="kakashi_origin_rooftop_night";
+const HOKAGE_ENV="kakashi_origin_hokage_administration_interior_night";
 const DEPARTURE_TYPE="origin_story_pakkun_departure";
 const AUTHORITY=Object.freeze({
   finalWriting:"176ce76feef3e67d4c24644e3d7443a04dcf7d6b",
@@ -352,18 +354,18 @@ function installTerminalBeats35100(){
     };
     seqAmt.battle.__terminal35100Wrapped=true;
   }
-  pending.mode="choice";pending.text="Kakashi returns to the ANBU rendezvous. The assignment cannot close until the factual report accounts for the package, encountered participants and every PL Battle without inventing unknown outcomes.";pending.exitScene=false;pending.allowPresentationClose=false;
+  pending.mode="choice";pending.environmentRef={assetId:ROOFTOP_ENV};pending.text="Kakashi returns to the ANBU rendezvous. The assignment cannot close until the factual report accounts for the package, encountered participants and every PL Battle without inventing unknown outcomes.";pending.exitScene=false;pending.allowPresentationClose=false;
   pending.choices=[{choiceId:REPORT_CHOICE,label:"REPORT",nextBeatId:DEBRIEF_BEAT,availability:reportAvailability,consequenceRequests:[{requestId:"kakashi_terminal_debrief_commit_35100",kind:"domain",resolve:commitTerminalDebrief35100}]}];
   const beats=[
-    {beatId:DEBRIEF_BEAT,mode:"dialogue",speakerName:"ANBU OPERATIVE",text:"Report.",nextBeatId:SUMMARY_BEAT,exitScene:false,allowPresentationClose:false},
-    {beatId:SUMMARY_BEAT,mode:"narration",presentationResolver:()=>({text:debriefSummaryText()}),text:"Kakashi gives the factual report.",nextBeatId:MINATO_BEAT,exitScene:false,allowPresentationClose:false},
-    {beatId:PAKKUN_1,mode:"dialogue",speakerName:"PAKKUN",text:"I'm heading off.",nextBeatId:PAKKUN_2,exitScene:false,allowPresentationClose:false},
-    {beatId:PAKKUN_2,mode:"dialogue",speakerName:"KAKASHI",text:"Thanks.",nextBeatId:PAKKUN_3,exitScene:false,allowPresentationClose:false},
-    {beatId:PAKKUN_3,mode:"dialogue",speakerName:"PAKKUN",text:"You said that already.",nextBeatId:PAKKUN_EXIT,exitScene:false,allowPresentationClose:false},
-    {beatId:PAKKUN_EXIT,mode:"narration",text:"Pakkun turns down the side street and disappears around the corner. No names are exchanged.",onEnterConsequences:[{requestId:"kakashi_terminal_pakkun_departure_commit_35100",kind:"domain",resolve:commitPakkunDeparture35100}],nextBeatId:MINATO_BEAT,exitScene:false,allowPresentationClose:false},
-    {beatId:MINATO_BEAT,mode:"narration",text:"Later, in private, Minato reviews the sealed field record. He weighs the committed mission facts without changing them or exposing that private evaluation to Kakashi.",nextBeatId:RECEIPT_BEAT,exitScene:false,allowPresentationClose:false},
-    {beatId:RECEIPT_BEAT,mode:"choice",text:"Chronicle Receipt",presentationResolver:()=>({text:receiptText()}),onEnterConsequences:[{requestId:"kakashi_terminal_receipt_reward_commit_35100",kind:"domain",resolve:commitChronicleReceiptAndRewards35100}],exitScene:false,allowPresentationClose:false,choices:[{choiceId:CONTINUE_CHOICE,label:"CONTINUE",nextBeatId:FINAL_BEAT,availability:completionAvailability}]},
-    {beatId:FINAL_BEAT,mode:"narration",text:"YOUR CHRONICLE BEGINS",exitScene:true,allowPresentationClose:true}
+    {beatId:DEBRIEF_BEAT,mode:"dialogue",environmentRef:{assetId:ROOFTOP_ENV},speakerName:"ANBU OPERATIVE",text:"Report.",nextBeatId:SUMMARY_BEAT,exitScene:false,allowPresentationClose:false},
+    {beatId:SUMMARY_BEAT,mode:"narration",environmentRef:{assetId:ROOFTOP_ENV},presentationResolver:()=>({text:debriefSummaryText()}),text:"Kakashi gives the factual report.",nextBeatId:MINATO_BEAT,exitScene:false,allowPresentationClose:false},
+    {beatId:PAKKUN_1,mode:"dialogue",environmentRef:{assetId:ROOFTOP_ENV},speakerName:"PAKKUN",text:"I'm heading off.",nextBeatId:PAKKUN_2,exitScene:false,allowPresentationClose:false},
+    {beatId:PAKKUN_2,mode:"dialogue",environmentRef:{assetId:ROOFTOP_ENV},speakerName:"KAKASHI",text:"Thanks.",nextBeatId:PAKKUN_3,exitScene:false,allowPresentationClose:false},
+    {beatId:PAKKUN_3,mode:"dialogue",environmentRef:{assetId:ROOFTOP_ENV},speakerName:"PAKKUN",text:"You said that already.",nextBeatId:PAKKUN_EXIT,exitScene:false,allowPresentationClose:false},
+    {beatId:PAKKUN_EXIT,mode:"narration",environmentRef:{assetId:ROOFTOP_ENV},text:"Pakkun turns down the side street and disappears around the corner. No names are exchanged.",onEnterConsequences:[{requestId:"kakashi_terminal_pakkun_departure_commit_35100",kind:"domain",resolve:commitPakkunDeparture35100}],nextBeatId:MINATO_BEAT,exitScene:false,allowPresentationClose:false},
+    {beatId:MINATO_BEAT,mode:"narration",environmentRef:{assetId:HOKAGE_ENV},text:"Later, in private, Minato reviews the sealed field record. He weighs the committed mission facts without changing them or exposing that private evaluation to Kakashi.",nextBeatId:RECEIPT_BEAT,exitScene:false,allowPresentationClose:false},
+    {beatId:RECEIPT_BEAT,mode:"choice",environmentRef:{assetId:HOKAGE_ENV},text:"Chronicle Receipt",presentationResolver:()=>({text:receiptText()}),onEnterConsequences:[{requestId:"kakashi_terminal_receipt_reward_commit_35100",kind:"domain",resolve:commitChronicleReceiptAndRewards35100}],exitScene:false,allowPresentationClose:false,choices:[{choiceId:CONTINUE_CHOICE,label:"CONTINUE",nextBeatId:FINAL_BEAT,availability:completionAvailability}]},
+    {beatId:FINAL_BEAT,mode:"narration",environmentRef:{assetId:HOKAGE_ENV},text:"YOUR CHRONICLE BEGINS",exitScene:true,allowPresentationClose:true}
   ];
   beats.forEach((beat,index)=>map.set(beat.beatId,normalizedBeat(beat,1100+index)));
   def.onCompleteConsequences=[{requestId:"complete_academy_kakashi_origin_terminal_35100",kind:"domain",resolve:guardedOriginCompletion35100}];
@@ -372,7 +374,7 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v9_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
