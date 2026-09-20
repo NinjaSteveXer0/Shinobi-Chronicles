@@ -218,13 +218,17 @@ globalThis.document={getElementById(id){return id==="screen-overlay"?qaVictoryOv
 globalThis.currentOverlayType="victory";
 globalThis.resumeBattleCallerAfterCompletion=function(){
  active.battleResume=null;active.beatId=MOD.beats.psReturn;globalThis.currentBattle.returnContext=null;globalThis.currentResult=null;
- return{success:true,type:"story_scene",postBattleBeatId:MOD.beats.psReturn};
+ const returnBeat=definition.beatMap.get(MOD.beats.psReturn);
+ const duringResume=returnBeat.onEnterConsequences.find(x=>x.requestId==="postmi_35830_ps_return_consume").resolve();
+ if(!duringResume||duringResume.success!==true||duringResume.pending===true)return{success:false,reason:"qa_core_resume_on_enter_failed",duringResume};
+ return{success:true,type:"story_scene",postBattleBeatId:MOD.beats.psReturn,duringResume};
 };
 const browserPsReturned=globalThis.continueAfterVictory();
 assert.strictEqual(browserPsReturned.success,true,"real 35830 RETURN TO STORY bridge failed: "+JSON.stringify(browserPsReturned));
 assert.strictEqual(browserPsReturned.postMiPsReturnBridge35830,true,"real PS return did not use the late route bridge");
 assert.strictEqual(browserPsReturned.postMiPsResultSnapshotCaptured,true,"real PS return did not snapshot the result before caller teardown");
-assert.strictEqual(browserPsReturned.postMiPsResultRestoredFromPreResumeSnapshot,true,"real PS return did not restore the pre-resume result after caller teardown");
+assert.strictEqual(browserPsReturned.postMiPsResultVisibleDuringCoreResume,true,"real PS return did not expose the pre-resume result during core Story resume");
+assert(browserPsReturned.duringResume&&browserPsReturned.duringResume.success===true,"core Story resume did not consume the PS result during on-enter");
 assert.strictEqual(active.beatId,MOD.beats.psWin,"real PS RETURN TO STORY did not consume the authored return beat");
 assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.packageState.currentHolderClass,"KAKASHI","real PS return did not commit package recovery");
 assert.strictEqual(qaVictoryOverlay.style.display,"none","real PS RETURN TO STORY left Victory visible");
