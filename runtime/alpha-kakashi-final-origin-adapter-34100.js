@@ -109,7 +109,8 @@ const BROWSER_ACCEPTANCE_PATH="runtime/alpha-kakashi-browser-acceptance-35950.js
 // const BUILD="kakashi-final-20260920-75";
 // const BUILD="kakashi-final-20260920-76";
 // const BUILD="kakashi-final-20260920-77";
-const BUILD="kakashi-final-20260920-78";
+// const BUILD="kakashi-final-20260920-78";
+const BUILD="kakashi-final-20260920-79";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
