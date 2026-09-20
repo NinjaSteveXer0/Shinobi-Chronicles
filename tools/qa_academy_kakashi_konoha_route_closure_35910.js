@@ -79,11 +79,31 @@ globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900={
  resolveAmtDefeatFacts(spec){ce256Calls+=1;return{success:true,occurrenceId:"qa-ce256-shared",packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"PACKAGE_SMUGGLER",custodyClass:"PACKAGE_SMUGGLER"},pakkunState:"PRESENT",routeRef:spec.routeRef};}
 };
 
+const fieldCalls=[];
+globalThis.commitAcademyKakashiFieldSecured35920=(ref,spec)=>{
+ fieldCalls.push({type:"field",ref,spec});
+ const resultRef="qa-field-"+ref+"-"+fieldCalls.length;
+ globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:ref,stateClass:"FIELD_SECURED_PENDING_COLLECTION",resultRef});
+ return{success:true,occurrenceId:resultRef,stateClass:"FIELD_SECURED_PENDING_COLLECTION"};
+};
+globalThis.commitAcademyKakashiSingleTransfer35920=(ref,dest,spec)=>{
+ fieldCalls.push({type:"transfer",ref,dest,spec});
+ const stateClass=dest==="ANBU"?"ANBU_INSTITUTIONAL_CUSTODY":"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY",resultRef="qa-transfer-"+ref+"-"+fieldCalls.length;
+ globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:ref,stateClass,resultRef});
+ return{success:true,occurrenceId:resultRef,stateClass};
+};
+
 load("runtime/alpha-kakashi-konoha-route-closure-35910.js");
 const MOD=globalThis.SC_ALPHA_KAKASHI_KONOHA_ROUTE_CLOSURE_35910;
 assert(MOD,"35910 route closure missing");
 const diag=globalThis.runAcademyKakashiKonohaRouteClosure35910Diagnostics();
 assert.strictEqual(diag.pass,true,"35910 diagnostics failed: "+JSON.stringify(diag.failed));
+const source35910=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-konoha-route-closure-35910.js"),"utf8");
+assert(source35910.includes("I saw enough."),"direct-strike verbatim performance missing");
+assert(source35910.includes("You two always this helpful?"),"original-target Pakkun scene missing");
+assert(source35910.includes("D.originalFailure"),"original pursuit failure scene must be routed explicitly");
+assert(source35910.includes("D.getCloserHandoff"),"Get-Closer handoff performance beat missing");
+assert(source35910.includes("commitAcademyKakashiSingleTransfer35920"),"institutional transfer must use the field/custody owner");
 
 const attack=definition.beatMap.get(ACTION).choices.find(x=>x.choiceId==="attack");
 assert.strictEqual(attack.label,"STRIKE BEFORE THE HANDOFF");
@@ -137,7 +157,7 @@ assert.deepStrictEqual(definition.beatMap.get(MOD.beats.directGroup).choices.map
 ]);
 
 // Group lethal action is one player decision but three exact participant deaths.
-active.beatId=MOD.beats.directGroup;
+active.beatId=MOD.beats.directKill;
 out=MOD.commitDirectGroupDisposition("KILL");
 assert.strictEqual(out.success,true,"direct KILL THEM failed");
 const states=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi").participantStates;
@@ -176,15 +196,39 @@ active.battleResume={authored:{
 out=MOD.consumeOriginalAmt();
 assert.strictEqual(out.success,true,"original-target AMT loss failed: "+JSON.stringify(out));
 assert.strictEqual(out.nextBeatId,TERMINAL);
+assert.strictEqual(definition.beatMap.get(MOD.beats.originalReturn).nextBeatId,TERMINAL);
 assert.strictEqual(ce256Calls,1,"original-target AMT loss did not consume shared CE #256 owner");
+
+// Original-target victory keeps disposition separate from Battle and commits custody at the physical handoff.
+active={sceneId:SCENE,instanceId:"qa-original-win",beatId:MOD.beats.originalReturn,localContext:{
+ kakashiKonohaOriginalTargetOccurrenceId:"qa-original-parent-win",
+ kakashiKonohaPackageOccurrenceId:"qa-original-package",
+ kakashiKonohaPakkunPresent:true
+},battleResume:{authored:{
+ battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",bindingRef:"academy_kakashi.battle.original_target_amt",battleOccurrenceId:"qa-original-win-battle",resultState:"player_side_victory",
+ participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]
+}}};
+out=MOD.consumeOriginalAmt();
+assert.strictEqual(out.success,true);
+assert.strictEqual(out.nextBeatId,MOD.beats.originalDisposition);
+active.beatId=MOD.beats.originalDisposition;
+const anbuChoice=definition.beatMap.get(MOD.beats.originalDisposition).choices.find(x=>x.choiceId==="original_anbu");
+out=anbuChoice.consequenceRequests[0].resolve();
+assert.strictEqual(out.success,true);
+assert.strictEqual(fieldCalls.filter(x=>x.type==="transfer"&&x.ref===AMT).length,0,"AMT custody committed on the choice click");
+active.beatId=MOD.beats.originalAnbuHandoff;
+out=MOD.commitOriginalDisposition("ANBU");
+assert.strictEqual(out.success,true);
+assert(fieldCalls.some(x=>x.type==="transfer"&&x.ref===AMT&&x.dest==="ANBU"),"AMT ANBU handoff did not use institutional transfer owner");
 
 // MOVE IN CLOSER -> LET HANDOFF HAPPEN must reconverge to the Observe five-choice surface.
 active={sceneId:SCENE,instanceId:"qa-get-closer",beatId:GET_CLOSER_SUCCESS,localContext:{},battleResume:null};
 const handoff=definition.beatMap.get(GET_CLOSER_SUCCESS).choices.find(x=>x.choiceId==="let_handoff_happen");
 out=handoff.consequenceRequests[0].resolve();
 assert.strictEqual(out.success,true,"Get-Closer handoff reconvergence failed");
-assert.strictEqual(out.nextBeatId,OBSERVE);
-assert.strictEqual(handoff.nextBeatId,OBSERVE);
+assert.strictEqual(out.nextBeatId,MOD.beats.getCloserHandoff);
+assert.strictEqual(handoff.nextBeatId,MOD.beats.getCloserHandoff);
+assert.strictEqual(definition.beatMap.get(MOD.beats.getCloserHandoff).nextBeatId,OBSERVE);
 assert.strictEqual(active.localContext.kakashiObserveScene03AOccurrenceId,"qa-get-closer-handoff");
 assert(active.localContext.kakashiObserveEscalationChoiceSetId);
 
@@ -200,5 +244,5 @@ console.log("- Battle launches satisfy story_scene return context and exact Pakk
 console.log("- KILL THEM commits three distinct deterministic participant deaths");
 console.log("- Secure-Before failure reconverges through the existing Secure-Package Battle binding/return owner");
 console.log("- Original-Target AMT loss consumes shared CE #256 and preserves package separation");
-console.log("- Move-In-Closer LET THE HANDOFF HAPPEN reconverges to the existing Observe choice surface");
+console.log("- Move-In-Closer LET THE HANDOFF HAPPEN plays its authored handoff performance before reconverging to Observe");
 console.log("- Browser Golden is intentionally NOT claimed by this headless harness");
