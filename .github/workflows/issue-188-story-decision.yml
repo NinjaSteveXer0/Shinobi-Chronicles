@@ -146,6 +146,7 @@ jobs:
           node --check tools/qa_kakashi_pakkun_interception_35300.js
           node --check tools/qa_academy_kakashi_origin_battle_deployment.js
           node --check tools/qa_academy_kakashi_sequential_consumer.js
+          node --check tools/qa_academy_kakashi_post_ps_recovery_35600.js
           node --check tools/qa_kakashi_battle_interaction_34500.js
           node --check tools/qa_story_factual_resolver_34600.js
           node --check tools/qa_academy_kakashi_factual_bindings_34700.js
@@ -176,10 +177,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-10' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-11' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-81' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-81";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-82' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-82";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -267,7 +268,11 @@ jobs:
           ! grep -Fq 'ATTEMPT TO KILL HIM' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi.battle.stop_assassin_post_mi_ps' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
           grep -Fq 'sc35600-ak-sa-033-post-mi-ps-recovery' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
-          grep -Fq 'alpha_kakashi_seq_post_ps_recovery_35600_v3_2026_09_20' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
+          grep -Fq 'alpha_kakashi_seq_post_ps_recovery_35600_v4_2026_09_20' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
+          grep -Fq 'binding===STOP_ASSASSIN_POST_MI_PS_BINDING' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
+          grep -Fq 'rejectedParentCandidates' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
+          grep -Fq 'alpha_playability_sprint_33100_v3_2026_09_20' runtime/alpha-alpha-sprint-33100.js
+          grep -Fq 'runtime/alpha-alpha-sprint-33100.js?sc=alpha33100-20260920-3' index.html
           grep -Fq '0d4aa441e4ef6d566f3d1df23c198940bdc559dd' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'alpha_kakashi_deterministic_kill_35810_v2_2026_09_19' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq '1ff3876e9b367ec518c254b612e4def14db8eaba' runtime/alpha-kakashi-deterministic-kill-35810.js
@@ -431,7 +436,9 @@ jobs:
       - name: Kakashi Origin Combat deployment harness
         run: node tools/qa_academy_kakashi_origin_battle_deployment.js
       - name: Kakashi sequential Story Battle consumer harness
-        run: node tools/qa_academy_kakashi_sequential_consumer.js
+        run: |
+          node tools/qa_academy_kakashi_sequential_consumer.js
+          node tools/qa_academy_kakashi_post_ps_recovery_35600.js
       - name: Kakashi Battle browser interaction contract
         run: node tools/qa_kakashi_battle_interaction_34500.js
       - name: Neutral Story factual resolver provider
