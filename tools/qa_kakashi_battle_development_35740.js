@@ -75,6 +75,7 @@ globalThis.generateBattleRewards=function baseGenerate(_enemy,finisher){
 globalThis.projectAcademyKakashiOriginBattleResult=()=>({
   battleConfigId:currentBattle.kakashiOriginDeployment.battleConfigId,
   battleOccurrenceId:currentBattle.battleId,
+  bindingRef:currentBattle.kakashiOriginDeployment.bindingRef||"qa.kakashi.binding",
   resultState:"player_side_victory",
   rewardGranted:false
 });
@@ -117,6 +118,7 @@ assert(!source35740.includes('<span>RYŌ</span><strong>DEBRIEF</strong>'),"Ryō 
 assert(source35740.includes("<summary>BATTLE BREAKDOWN</summary>")&&!source35740.includes("WHY THESE REWARDS?"),"Victory surface must expose causal Battle detail without the awkward WHY THESE REWARDS copy");
 assert(source35740.includes('<span>DEVELOPMENT</span><div>${developmentListMarkup(summary)}${rewardDisclosureMarkup35740(summary,b)}</div>'),"Battle breakdown must live with Battle development, not inside deferred Origin Rewards");
 assert(source35740.includes("commitAcademyKakashiDownstreamBattleCashReward34800"),"PS/AMT claim path must use the 34800 source-scoped reward adapter");
+assert(source35740.includes("kakashiOriginStoryReturnResultSnapshot"),"Kakashi Battle projector must preserve a Story-return result snapshot on the Battle object");
 assert(source35740.includes("MI_BATTLE_CONFIGS"),"both authorised solo MI config IDs must share the immediate reward predicate");
 assert(source35740.includes("3-V-1 DEFERRED ORIGIN REWARD QUALIFIED"),"3v1 Victory disclosure must name the deferred reward explicitly");
 assert(source35740.includes("kakashiDeferredExceptionalFieldExecution"),"3v1 Battle result must carry exceptional-field deferred reward metadata");
@@ -222,6 +224,7 @@ function setStoryBattle(config,participant,id,evidence){
     activePlayer:{id:KAKASHI,name:"Academy Kakashi"},
     kakashiOriginDeployment:{
       battleConfigId:config,battleOccurrenceId:id,storyOccurrenceId:"qa-origin-occurrence-1",
+      bindingRef:config==="academy_kakashi_origin_battle_seq_ps"?"academy_kakashi.battle.stop_assassin_post_mi_ps":"academy_kakashi.battle.stop_assassin_post_mi_amt",
       controllerParticipantId:KAKASHI,oppositionParticipantIds:[participant]
     },
     runtime:{evidence},
@@ -241,6 +244,9 @@ assert.strictEqual(psRewards.terminalOriginRewardDeferred,true);
 assert.strictEqual((discipline[KAKASHI+"::buki"]||0)-bukiBefore,2,"PS resolved action evidence must commit Bukijutsu development");
 assert.strictEqual(playerData.ryo,150,"PS reward must remain entitlement-only before explicit claim");
 assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"PS Battle reward claim failed");
+assert(currentBattle.kakashiOriginStoryReturnResultSnapshot,"PS claim must preserve the authoritative Battle result for Story return");
+assert.strictEqual(currentBattle.kakashiOriginStoryReturnResultSnapshot.battleOccurrenceId,"qa-kakashi-ps-1");
+assert.strictEqual(currentBattle.kakashiOriginStoryReturnResultSnapshot.bindingRef,"academy_kakashi.battle.stop_assassin_post_mi_ps");
 assert.strictEqual(playerData.ryo,200,"PS claim must add exactly 50 Ryō");
 assert.strictEqual(globalThis.claimCurrentBattleRewards(),true,"PS reward idempotent retry failed");
 assert.strictEqual(playerData.ryo,200,"PS claim retry must not duplicate Ryō");
