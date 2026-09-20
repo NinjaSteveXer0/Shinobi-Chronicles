@@ -32,6 +32,7 @@ on:
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100-core.js'
       - 'runtime/alpha-kakashi-factual-state-commit-34120.js'
+      - 'runtime/alpha-kakashi-pakkun-interception-35300.js'
       - 'runtime/alpha-kakashi-final-authority-guard-34200.js'
       - 'runtime/alpha-kakashi-origin-battle-deployment-34300.js'
       - 'runtime/alpha-kakashi-browser-red-fixes-34400.js'
@@ -108,6 +109,7 @@ jobs:
           node --check runtime/alpha-kakashi-final-origin-adapter-34100.js
           node --check runtime/alpha-kakashi-final-origin-adapter-34100-core.js
           node --check runtime/alpha-kakashi-factual-state-commit-34120.js
+          node --check runtime/alpha-kakashi-pakkun-interception-35300.js
           node --check runtime/alpha-kakashi-final-authority-guard-34200.js
           node --check runtime/alpha-kakashi-origin-battle-deployment-34300.js
           node --check runtime/alpha-kakashi-browser-red-fixes-34400.js
