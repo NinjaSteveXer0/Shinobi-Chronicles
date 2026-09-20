@@ -17,7 +17,7 @@
 (function installAlphaPlayableSprint33100(){
   "use strict";
 
-  const PATCH_ID="alpha_playability_sprint_33100_v2_2026_09_19";
+  const PATCH_ID="alpha_playability_sprint_33100_v3_2026_09_20";
   const esc=value=>{
     if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));
     return String(value??"").replace(/[&<>\"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));
@@ -62,6 +62,39 @@
     };
   }
 
+  function storyReturnFailureDetails33100(battle,result){
+    let active=null;
+    try{active=typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_error){}
+    return{
+      reason:String(result&&result.reason||"story_caller_resume_failed"),
+      callerResult:clone(result),
+      battleId:String(battle&&battle.battleId||""),
+      encounterId:String(battle&&battle.encounterId||""),
+      returnContext:clone(battle&&battle.returnContext||null),
+      activeStory:active?{sceneId:String(active.sceneId||""),instanceId:String(active.instanceId||""),beatId:String(active.beatId||"")} : null
+    };
+  }
+
+  function publishStoryReturnFailure33100(battle,result){
+    const details=storyReturnFailureDetails33100(battle,result);
+    globalThis.SC_LAST_STORY_RETURN_FAILURE_33100=details;
+    try{if(console&&typeof console.error==="function")console.error("RETURN TO STORY blocked:",details);}catch(_error){}
+    try{
+      const host=typeof location!=="undefined"?String(location.hostname||""):"";
+      if(!["127.0.0.1","localhost"].includes(host)||typeof document==="undefined")return details;
+      const container=document.getElementById("overlay-content-container");if(!container)return details;
+      let node=document.getElementById("alpha331-story-return-debug");
+      if(!node){
+        node=document.createElement("div");node.id="alpha331-story-return-debug";
+        node.style.cssText="position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:2147483600;max-width:88%;padding:8px 12px;border:1px solid rgba(255,188,74,.65);background:rgba(16,8,2,.94);color:#ffd98a;font:700 11px/1.35 monospace;letter-spacing:.02em;pointer-events:none;text-align:center";
+        container.appendChild(node);
+      }
+      node.textContent="LOCAL RUNTIME DIAGNOSTIC · RETURN TO STORY BLOCKED · "+details.reason;
+      try{node.title=JSON.stringify(details);}catch(_error){}
+    }catch(_error){}
+    return details;
+  }
+
   function continueAfterVictory33100(){
     const battle=typeof currentBattle!=="undefined"?currentBattle:null;
     const rc=battle&&battle.returnContext||null;
@@ -76,14 +109,17 @@
         ?resumeBattleCallerAfterCompletion("victory")
         :{success:false,reason:"battle_caller_resume_api_missing"};
       if(result&&result.success===true){
+        globalThis.SC_LAST_STORY_RETURN_FAILURE_33100=null;
         const presentation=settleClaimedStoryVictoryPresentation33100();
         return {...result,...presentation,alpha33100StoryReturnPriority:true};
       }
       try{if(typeof openOverlay==="function")openOverlay("victory");}catch(_error){}
+      const diagnostic=publishStoryReturnFailure33100(battle,result);
       return{
         success:false,
         reason:String(result&&result.reason||"story_caller_resume_failed"),
         callerResult:result||null,
+        alpha33100StoryReturnDiagnostic:diagnostic,
         alpha33100StoryReturnFailClosed:true,
         genericBattleFallbackSuppressed:true
       };
@@ -361,6 +397,7 @@
     const checks={
       storyReturnOutranksLegacy:continueSrc.includes('rc.type==="story_scene"')&&continueSrc.indexOf("resumeBattleCallerAfterCompletion")<continueSrc.indexOf("priorContinueAfterVictory33100"),
       storyReturnFailsClosed:continueSrc.includes("alpha33100StoryReturnFailClosed:true")&&continueSrc.includes("genericBattleFallbackSuppressed:true")&&continueSrc.includes('openOverlay("victory")'),
+      storyReturnFailureObservable:continueSrc.includes("publishStoryReturnFailure33100")&&publishStoryReturnFailure33100.toString().includes("SC_LAST_STORY_RETURN_FAILURE_33100")&&publishStoryReturnFailure33100.toString().includes("LOCAL RUNTIME DIAGNOSTIC"),
       rewardsStillRequiredBeforeStoryReturn:continueSrc.includes("claimed")&&continueSrc.includes("rewards.claimed"),
       claimedStoryReturnReleasesStaleVictorySurface:storyReturnPresentationSrc.includes('currentOverlayType==="victory"')&&storyReturnPresentationSrc.includes('overlay.style.display="none"')&&storyReturnPresentationSrc.includes("currentOverlayType=null"),
       claimedStoryReturnRefreshesStoryLayer:storyReturnPresentationSrc.includes("renderStoryScenePresentationLayer"),
