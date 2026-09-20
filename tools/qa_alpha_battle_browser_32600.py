@@ -9,7 +9,7 @@ checks={
     'no_repeat_bypass_flag': 'repeatStillUsesAuthoritativeAvailability:true' in js,
     'claim_auto_returns_generic': 'continueAfterVictory()' in js and 'autoReturned:true' in js,
     'explicit_post_claim_continue_supported': 'requiresExplicitPostClaimContinue' in js and 'explicitPostClaimContinue:true' in js,
-    'explicit_continue_single_owner': 'continueOwner:"continueAfterVictory"' in js and 'explicitClaimedContinue' not in js and '__scExplicitPostClaimReturnContext32600' not in js,
+    'explicit_continue_single_owner': 'continueOwner:"continueAfterVictory"' in js and 'const explicitClaimedContinue=' not in js and 'currentBattle.__scExplicitPostClaimReturnContext32600' not in js,
     'explicit_first_claim_preserves_return_context': 'currentBattle.returnContext=' in js and 'returnContextBefore' in js,
     'claim_happens_before_continue': js.find('priorClaimVictoryAutoReturn.apply') >= 0 and js.find('continueAfterVictory()', js.find('priorClaimVictoryAutoReturn.apply')) > js.find('priorClaimVictoryAutoReturn.apply'),
     'return_context_captured': 'returnContextBefore' in js,
