@@ -493,7 +493,6 @@ function performanceSequence35910(rt=active()){
  if(rt.beatId===D.directReturn){const f=factOf(occurrence(rt.localContext&&rt.localContext.kakashiKonohaDirectStrike2v1OccurrenceId));return f.factClass==="academy_kakashi_direct_strike_2v1_victory"?DIRECT_WIN1_CUES:DIRECT_LOSS1_CUES;}
  if(rt.beatId===D.directMiArrival)return DIRECT_MI_ARRIVAL_CUES;
  if(rt.beatId===D.directMiReturn){const f=factOf(occurrence(rt.localContext&&rt.localContext.kakashiKonohaDirectStrikeMiOccurrenceId));return f.factClass==="academy_kakashi_direct_strike_mi_victory"?DIRECT_MI_WIN_CUES:DIRECT_MI_LOSS_CUES;}
- if(rt.beatId===D.directGroup&&!preludeDone35910(rt,D.directGroup))return DIRECT_MI_WIN_CUES;
  if(rt.beatId===D.directPoliceEscort)return DIRECT_POLICE_ESCORT_CUES;
  if(rt.beatId===D.directPoliceHandoff)return DIRECT_POLICE_HANDOFF_CUES;
  if(rt.beatId===D.directAnbuEscort)return DIRECT_ANBU_ESCORT_CUES;
@@ -504,7 +503,6 @@ function performanceSequence35910(rt=active()){
  if(rt.beatId===D.originalFailure)return ORIGINAL_FAILURE_CUES;
  if(rt.beatId===D.originalPakkun)return ORIGINAL_PAKKUN_CUES;
  if(rt.beatId===D.originalReturn){const f=factOf(occurrence(rt.localContext&&rt.localContext.kakashiKonohaOriginalTargetAmtVictoryOccurrenceId));return f.factClass==="academy_kakashi_original_target_amt_battle_victory"?ORIGINAL_WIN_CUES:ORIGINAL_LOSS_CUES;}
- if(rt.beatId===D.originalDisposition&&!preludeDone35910(rt,D.originalDisposition))return ORIGINAL_WIN_CUES;
  if(rt.beatId===D.originalKill)return ORIGINAL_KILL_CUES;
  if(rt.beatId===D.originalRestrain)return ORIGINAL_RESTRAIN_CUES;
  if(rt.beatId===D.originalAnbuEscort)return ORIGINAL_ANBU_ESCORT_CUES;
@@ -587,7 +585,6 @@ function installPresentationHooks35910(){
   const rt=active(),p=performance35910(rt);
   if(!rt||rt.sceneId!==SCENE||!Object.values(D).includes(rt.beatId)||choiceId!==null&&choiceId!==undefined)return PRE_ADVANCE.apply(this,arguments);
   if(p&&!p.atEnd){persistPerformance35910(rt,p.index+1);try{renderStoryScenePresentationLayer();}catch(_e){}return{success:true,type:"kakashi_konoha_route_performance_advanced",beatId:rt.beatId,cueIndex:p.index+1,semanticBeatUnchanged:true};}
-  if([D.directGroup,D.originalDisposition].includes(rt.beatId)&&p){markPreludeDone35910(rt,rt.beatId);clearPerformance35910(rt);try{renderStoryScenePresentationLayer();}catch(_e){}return{success:true,type:"kakashi_konoha_route_choice_prelude_complete",beatId:rt.beatId,semanticBeatUnchanged:true};}
   let commit=null;
   if(rt.beatId===D.directPoliceHandoff)commit=commitDirectGroupDisposition("POLICE");
   else if(rt.beatId===D.directAnbuHandoff)commit=commitDirectGroupDisposition("ANBU");
