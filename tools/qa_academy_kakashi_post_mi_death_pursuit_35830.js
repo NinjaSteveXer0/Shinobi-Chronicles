@@ -6,7 +6,7 @@ function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const LIVE_SOURCE="kak_scene05a_w_choice",RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DKILL_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
 const MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt";
-const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0;
+const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0;const materialStates={};
 const participantStates={
  [MI]:{participantRef:MI,stateClass:"DEAD"},
  [PS]:{participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"}
@@ -22,8 +22,9 @@ globalThis.SC_ALPHA_ORIGIN_32900={
 };
 globalThis.SC_STORY_DECISION_REALISATION_34000={
  stableRef(prefix,payload){return prefix+"::"+JSON.stringify(payload||{})+"::"+(++ref);},
- getStoryUnitSnapshot(){return{participantStates};},
- recordParticipantClassification({participantRef,stateClass,resultRef}){participantStates[participantRef]={participantRef,stateClass,resultRef};return{success:true,resultRef,stateClass};}
+ getStoryUnitSnapshot(){return{participantStates,materialStates};},
+ recordParticipantClassification({participantRef,stateClass,resultRef}){participantStates[participantRef]={participantRef,stateClass,resultRef};return{success:true,resultRef,stateClass};},
+ recordMaterialState({materialRef,stateRef,value}){materialStates[materialRef]={materialRef,stateRef,value:JSON.parse(JSON.stringify(value))};return{success:true,materialRef,stateRef,value};}
 };
 globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300={
  launchAcademyKakashiOriginPlBattle(spec){
@@ -59,6 +60,7 @@ globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(){
  participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-ps-defeated"};
  const id="kak_seq_secure_package_after_ps";
  if(!store.has(id))store.set(id,{occurrenceId:id,fact:{factClass:"academy_kakashi_sequential_post_ps_package_recovery",storySceneInstanceId:active.instanceId,battleOccurrenceId:active.battleResume.authored.battleOccurrenceId,parentOccurrenceRef:parentId,packageState:{objectRef:"kakashi_origin_outer_route_packet",previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",packageRecovered:true}}});
+ materialStates["kakashi_origin_outer_route_packet"]={materialRef:"kakashi_origin_outer_route_packet",stateRef:id,value:JSON.parse(JSON.stringify(store.get(id).fact.packageState))};
  active.localContext.kakashiSequentialPackageOccurrenceId=id;active.localContext.kakashiSequentialPackageOccurrenceId35100=id;
  return{success:true,recovered:true,packageOccurrenceId:id,parentOccurrenceId:parentId};
 };
@@ -143,6 +145,10 @@ assert(source35830.includes("[data-sc-board-ui-mode=\'dialogue\']")&&source35830
 assert(source35830.includes("const prior=document.getElementById(STYLE_ID);if(prior)prior.remove()"),"post-MI style install must replace stale same-ID CSS");
 assert(source35830.includes("You decided fast.")&&source35830.includes("That doesn\'t make it lighter."),"direct AMT KILL aftermath must include locked Pakkun/Kakashi continuation");
 assert(source35830.includes('const TERMINAL_PENDING="kak_seq_debrief_pending"')&&source35830.includes("rt.beatId=TERMINAL_PENDING"),"direct AMT KILL must hand off to terminal report instead of dead-end boundary");
+assert(!source35830.includes("post_mi_later_anbu_report_scene_not_yet_locked"),"stale post-MI report blocker must be removed");
+assert(source35830.includes("You recovered it.")&&source35830.includes("You brought the original target back."),"exact PS/AMT ANBU return writing must be present");
+assert(source35830.includes("We'll take custody.")&&source35830.includes("We'll take him."),"package-recovered and package-missing AMT Police handoffs must both be present");
+assert(source35830.includes("commitInstitutionalTransfer35830")&&source35830.includes("transferPackageToAnbu35830"),"custody and package transfer must remain separate commits");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
@@ -254,6 +260,21 @@ assert.strictEqual(participantStates[AMT].stateClass,"DEAD","deterministic AMT K
 assert.strictEqual(store.get(active.localContext.kakashiPostMiPackageOccurrenceId).fact.packageState.currentHolderClass,"KAKASHI","AMT kill rewrote package custody");
 assert.strictEqual([...store.values()].filter(x=>x&&x.fact&&x.fact.factClass==="mi_death").length,deathCount,"MI death was recommitted/rerolled");
 
+// Singular PS return-to-ANBU must not commit custody until the rooftop handoff.
+active=freshDet();active.instanceId="qa-postmi-ps-anbu";participantStates[MI]={participantRef:MI,stateClass:"DEAD"};participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"};launches.length=0;recoveryCalls=0;
+MOD.wireEntryChoices();
+out=globalThis.advanceStoryScene("scene06aw2c_dkill_go_after_package_smuggler");assert.strictEqual(out.success,true);
+drainNarration(MOD.beats.psBattle);
+simulateBattleReturn(MOD.beats.psBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-ps-anbu-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.psReturn);
+out=MOD.consumePsReturn();assert.strictEqual(out.success,true);
+drainNarration(MOD.beats.psDecision);
+out=globalThis.advanceStoryScene("postmi_ps_return_anbu");assert.strictEqual(out.success,true);
+assert.strictEqual(active.beatId,MOD.beats.psAnbuEscort);
+assert.notStrictEqual(participantStates[PS].stateClass,"ANBU_INSTITUTIONAL_CUSTODY","PS custody committed at RETURN TO ANBU choice");
+drainNarration("kak_seq_debrief_pending");
+assert.strictEqual(participantStates[PS].stateClass,"ANBU_INSTITUTIONAL_CUSTODY","PS ANBU custody missing after physical handoff");
+assert.strictEqual(materialStates["kakashi_origin_outer_route_packet"].value.custodyClass,"ANBU","PS route package was not separately returned to ANBU");
+
 active=freshDet();participantStates[MI]={participantRef:MI,stateClass:"DEAD"};delete participantStates[AMT];launches.length=0;
 MOD.wireEntryChoices();
 out=globalThis.advanceStoryScene("scene06aw2c_dkill_go_after_anbu_marked_target");
@@ -284,9 +305,22 @@ drainNarration(MOD.beats.amtDecision);
 out=globalThis.advanceStoryScene("postmi_amt_kill");
 assert.strictEqual(out.success,true,"direct AMT KILL choice failed: "+JSON.stringify(out));
 assert.strictEqual(active.beatId,MOD.beats.amtKill,"direct AMT KILL must enter authored kill aftermath before report");
-assert.strictEqual(participantStates[AMT].stateClass,"DEAD","direct AMT KILL must commit death on selection");
+assert.notStrictEqual(participantStates[AMT].stateClass,"DEAD","direct AMT KILL must not commit death before the authored kill performance");
 drainNarration("kak_seq_debrief_pending");
+assert.strictEqual(participantStates[AMT].stateClass,"DEAD","direct AMT KILL must commit death when the authored kill performance completes");
 assert.strictEqual(active.beatId,"kak_seq_debrief_pending","direct AMT KILL aftermath must hand off to terminal debrief");
+
+// Direct AMT live return uses exact escort/handoff and explicit Pakkun departure.
+active=freshDet();active.instanceId="qa-postmi-amt-anbu";participantStates[MI]={participantRef:MI,stateClass:"DEAD"};delete participantStates[AMT];delete participantStates["pakkun_origin_unfamiliar_ninken"];launches.length=0;
+MOD.wireEntryChoices();out=globalThis.advanceStoryScene("scene06aw2c_dkill_go_after_anbu_marked_target");assert.strictEqual(out.success,true);
+drainNarration(MOD.beats.amtBattle);
+simulateBattleReturn(MOD.beats.amtBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_amt",battleOccurrenceId:"qa-amt-anbu-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.amtReturn);
+out=MOD.consumeAmtReturn();assert.strictEqual(out.success,true);drainNarration(MOD.beats.amtDecision);
+out=globalThis.advanceStoryScene("postmi_amt_return_anbu");assert.strictEqual(out.success,true);assert.strictEqual(active.beatId,MOD.beats.amtLiveReturn);
+assert.notStrictEqual(participantStates[AMT].stateClass,"ANBU_INSTITUTIONAL_CUSTODY","AMT custody committed before handoff");
+drainNarration("kak_seq_debrief_pending");
+assert.strictEqual(participantStates[AMT].stateClass,"ANBU_INSTITUTIONAL_CUSTODY");
+assert.strictEqual(participantStates["pakkun_origin_unfamiliar_ninken"].stateClass,"DEPARTED");
 
 assert(saves>0);
 console.log("Academy Kakashi post-MI-death pursuit 35830 QA: PASS");
