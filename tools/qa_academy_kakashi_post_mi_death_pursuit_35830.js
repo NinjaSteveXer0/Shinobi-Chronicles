@@ -217,12 +217,14 @@ const qaVictoryOverlay={style:{display:"flex"}},priorDocument35830=globalThis.do
 globalThis.document={getElementById(id){return id==="screen-overlay"?qaVictoryOverlay:null;}};
 globalThis.currentOverlayType="victory";
 globalThis.resumeBattleCallerAfterCompletion=function(){
- active.battleResume={authored:browserPsResult};active.beatId=MOD.beats.psReturn;globalThis.currentBattle.returnContext=null;
+ active.battleResume=null;active.beatId=MOD.beats.psReturn;globalThis.currentBattle.returnContext=null;globalThis.currentResult=null;
  return{success:true,type:"story_scene",postBattleBeatId:MOD.beats.psReturn};
 };
 const browserPsReturned=globalThis.continueAfterVictory();
 assert.strictEqual(browserPsReturned.success,true,"real 35830 RETURN TO STORY bridge failed: "+JSON.stringify(browserPsReturned));
 assert.strictEqual(browserPsReturned.postMiPsReturnBridge35830,true,"real PS return did not use the late route bridge");
+assert.strictEqual(browserPsReturned.postMiPsResultSnapshotCaptured,true,"real PS return did not snapshot the result before caller teardown");
+assert.strictEqual(browserPsReturned.postMiPsResultRestoredFromPreResumeSnapshot,true,"real PS return did not restore the pre-resume result after caller teardown");
 assert.strictEqual(active.beatId,MOD.beats.psWin,"real PS RETURN TO STORY did not consume the authored return beat");
 assert.strictEqual(store.get("kak_seq_secure_package_after_ps").fact.packageState.currentHolderClass,"KAKASHI","real PS return did not commit package recovery");
 assert.strictEqual(qaVictoryOverlay.style.display,"none","real PS RETURN TO STORY left Victory visible");
