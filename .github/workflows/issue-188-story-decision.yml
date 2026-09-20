@@ -5,6 +5,7 @@ on:
     paths:
       - 'runtime/alpha-story-decision-realisation-34000.js'
       - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
+      - 'runtime/alpha-kakashi-terminal-scene-board-35610.js'
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-kakashi-post-mi-death-pursuit-35830.js'
       - 'runtime/alpha-kakashi-konoha-writing-closure-35900.js'
@@ -13,6 +14,7 @@ on:
       - 'runtime/alpha-kakashi-move-closer-closure-35930.js'
       - 'runtime/alpha-kakashi-dynamic-terminal-35940.js'
       - 'runtime/alpha-kakashi-browser-acceptance-35950.js'
+      - 'tools/qa_academy_kakashi_terminal_scene_board_35610.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
       - 'tools/qa_academy_kakashi_konoha_closure_35900.js'
@@ -43,6 +45,7 @@ on:
       - 'runtime/alpha-kakashi-direct-opening-consumer-34710.js'
       - 'runtime/alpha-kakashi-origin-rewards-34800.js'
       - 'runtime/alpha-kakashi-terminal-debrief-35100.js'
+      - 'runtime/alpha-kakashi-terminal-scene-board-35610.js'
       - 'runtime/alpha-kakashi-scene03a-35700.js'
       - 'runtime/alpha-kakashi-scene04a-35710.js'
       - 'runtime/alpha-kakashi-objective-presentation-35720.js'
@@ -73,6 +76,7 @@ on:
       - 'tools/qa_academy_kakashi_scene02_direct_choices_34710.js'
       - 'tools/qa_kakashi_origin_rewards_34800.js'
       - 'tools/qa_kakashi_direct_pickpocket_terminal_35100.js'
+      - 'tools/qa_academy_kakashi_terminal_scene_board_35610.js'
       - 'tools/qa_academy_kakashi_scene03a_35700.js'
       - 'tools/qa_academy_kakashi_scene04a_35710.js'
       - 'tools/qa_kakashi_objective_presentation_35720.js'
@@ -120,6 +124,7 @@ jobs:
           node --check runtime/alpha-kakashi-direct-opening-consumer-34710.js
           node --check runtime/alpha-kakashi-origin-rewards-34800.js
           node --check runtime/alpha-kakashi-terminal-debrief-35100.js
+          node --check runtime/alpha-kakashi-terminal-scene-board-35610.js
           node --check runtime/alpha-kakashi-scene03a-35700.js
           node --check runtime/alpha-kakashi-scene04a-35710.js
           node --check runtime/alpha-kakashi-objective-presentation-35720.js
@@ -153,6 +158,7 @@ jobs:
           node --check tools/qa_academy_kakashi_scene02_direct_choices_34710.js
           node --check tools/qa_kakashi_origin_rewards_34800.js
           node --check tools/qa_kakashi_direct_pickpocket_terminal_35100.js
+          node --check tools/qa_academy_kakashi_terminal_scene_board_35610.js
           node --check tools/qa_academy_kakashi_scene03a_35700.js
           node --check tools/qa_academy_kakashi_scene04a_35710.js
           node --check tools/qa_kakashi_objective_presentation_35720.js
@@ -177,10 +183,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-13' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-14' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-84' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-84";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-85' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-85";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -324,7 +330,17 @@ jobs:
           grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashiPostMiPakkunPresent' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v21_2026_09_20' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v22_2026_09_20' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'TERMINAL_MINATO="kak_terminal_minato_private_evaluation_35100"' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'genericReportGateSkipped:true' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'style.setProperty("top","14%","important")' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_terminal_scene_board_35610_v2_2026_09_20' runtime/alpha-kakashi-terminal-scene-board-35610.js
+          grep -Fq 'compatibilityOnly:true' runtime/alpha-kakashi-terminal-scene-board-35610.js
+          grep -Fq 'kakashi_scene_board_model_v11_33910_2026_09_20' runtime/alpha-kakashi-terminal-scene-board-35610.js
+          grep -Fq 'alpha_kakashi_terminal_debrief_35100_v10_2026_09_20' runtime/alpha-kakashi-terminal-scene-board-35610.js
+          if grep -Fq 'new MutationObserver' runtime/alpha-kakashi-terminal-scene-board-35610.js; then echo 'terminal 35610 must not install a DOM observer'; exit 1; fi
+          if grep -Fq 'observer.observe(' runtime/alpha-kakashi-terminal-scene-board-35610.js; then echo 'terminal 35610 must not observe/rewrite its own DOM'; exit 1; fi
+          if grep -Fq 'innerHTML=' runtime/alpha-kakashi-terminal-scene-board-35610.js; then echo 'terminal 35610 must not own terminal DOM rendering'; exit 1; fi
           grep -Fq 'Runtime adds STATE ONLY' runtime/alpha-kakashi-story-presentation-compat-33920.js
           grep -Fq '24b7956781d2da6d3d1f70ce18d1ef0de348cfae' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4' runtime/alpha-kakashi-immediate-custody-35800.js
@@ -459,6 +475,8 @@ jobs:
         run: node tools/qa_kakashi_origin_rewards_34800.js
       - name: Academy Kakashi direct Pickpocket terminal consumption
         run: node tools/qa_kakashi_direct_pickpocket_terminal_35100.js
+      - name: Academy Kakashi terminal scene-board compatibility
+        run: node tools/qa_academy_kakashi_terminal_scene_board_35610.js
       - name: Academy Kakashi Scene 03A exact runtime
         run: node tools/qa_academy_kakashi_scene03a_35700.js
       - name: Academy Kakashi Scene 04A exact runtime and Battle bridge
