@@ -89,7 +89,8 @@ globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
 globalThis.renderStoryScenePresentationLayer=()=>true;
 globalThis.queueMicrotask=fn=>fn(); // settle runtime render/materialization synchronously in headless QA
-globalThis.continueAfterVictory=()=>({success:false,reason:"qa_prior_continue"});\nglobalThis.advanceStoryScene=function baseAdvance(choiceId=null){
+globalThis.continueAfterVictory=()=>({success:false,reason:"qa_prior_continue"});
+globalThis.advanceStoryScene=function baseAdvance(choiceId=null){
  const beat=definition.beatMap.get(active.beatId);if(!beat)return{success:false,reason:"qa_beat_missing",beatId:active.beatId};
  if(beat.mode==="choice"){
   const row=(beat.choices||[]).find(x=>x&&x.choiceId===choiceId);if(!row)return{success:false,reason:"qa_choice_missing",choiceId};
