@@ -13,7 +13,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_SEQ_POST_PS_RECOVERY_35600)return;
 
-const PATCH_ID="alpha_kakashi_seq_post_ps_recovery_35600_v3_2026_09_20";
+const PATCH_ID="alpha_kakashi_seq_post_ps_recovery_35600_v4_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const RECOVERY_BEAT="kak_seq_secure_package_after_ps";
@@ -53,19 +53,28 @@ function requireAuthority(){
   return{success:true};
 }
 
-function parentPackageOccurrence(rt){
-  const id=String(rt&&rt.localContext&&(
-    rt.localContext.kakashiGetCloserHandoffOccurrenceId||
-    rt.localContext.kakashiSequentialPackageOccurrenceId35100||
-    rt.localContext.kakashiSequentialPackageOccurrenceId
-  )||"");
-  if(!id)return{success:false,reason:"kakashi_ak_sa_033_parent_package_occurrence_missing"};
-  const row=A.findOccurrence(id);
-  if(!row)return{success:false,reason:"kakashi_ak_sa_033_parent_package_occurrence_not_found",occurrenceId:id};
-  const fact=factOf(row),pkg=fact.packageState||{};
-  if(String(pkg.objectRef||"")!==WORLD_OBJECT_REF)return{success:false,reason:"kakashi_ak_sa_033_parent_package_object_mismatch",occurrenceId:id};
-  if(String(pkg.currentHolderClass||pkg.custodyClass||"")!=="PACKAGE_SMUGGLER")return{success:false,reason:"kakashi_ak_sa_033_parent_package_not_with_ps",occurrenceId:id};
-  return{success:true,occurrenceId:id,row,fact,packageState:pkg};
+function parentPackageOccurrence(rt,result=null){
+  const local=rt&&rt.localContext||{},binding=String(result&&result.bindingRef||"");
+  // STOP post-MI is a newer consumer of AK_SA_033. Its freshly committed
+  // post-MI package provenance must outrank any stale Get-Closer lineage that
+  // may still exist in a long-lived browser save. The original sequential
+  // Observe route keeps its legacy Get-Closer handoff preference.
+  const rawIds=binding===STOP_ASSASSIN_POST_MI_PS_BINDING
+    ?[local.kakashiSequentialPackageOccurrenceId35100,local.kakashiSequentialPackageOccurrenceId,local.kakashiPostMiPackageOccurrenceId,local.kakashiPostMiPsBattleOccurrenceId]
+    :[local.kakashiGetCloserHandoffOccurrenceId,local.kakashiSequentialPackageOccurrenceId35100,local.kakashiSequentialPackageOccurrenceId];
+  const ids=rawIds.map(value=>String(value||"")).filter((value,index,rows)=>value&&rows.indexOf(value)===index);
+  if(!ids.length)return{success:false,reason:"kakashi_ak_sa_033_parent_package_occurrence_missing"};
+  const rejected=[];
+  for(const id of ids){
+    const row=A.findOccurrence(id);
+    if(!row){rejected.push({occurrenceId:id,reason:"kakashi_ak_sa_033_parent_package_occurrence_not_found"});continue;}
+    const fact=factOf(row),pkg=fact.packageState||{};
+    if(String(pkg.objectRef||"")!==WORLD_OBJECT_REF){rejected.push({occurrenceId:id,reason:"kakashi_ak_sa_033_parent_package_object_mismatch"});continue;}
+    if(String(pkg.currentHolderClass||pkg.custodyClass||"")!=="PACKAGE_SMUGGLER"){rejected.push({occurrenceId:id,reason:"kakashi_ak_sa_033_parent_package_not_with_ps"});continue;}
+    return{success:true,occurrenceId:id,row,fact,packageState:pkg,parentSelectionBinding:binding||SEQUENTIAL_BINDING};
+  }
+  const first=rejected[0]||{reason:"kakashi_ak_sa_033_parent_package_occurrence_missing"};
+  return{success:false,...first,rejectedParentCandidates:rejected,bindingRef:binding||null};
 }
 
 function classifyPackageSmugglerDefeat(result){
@@ -93,7 +102,7 @@ function resolveSequentialPostPsPackageRecovery35600(explicitResult=null){
   if(String(result.battleConfigId||"")!==PS_CONFIG||![SEQUENTIAL_BINDING,STOP_ASSASSIN_POST_MI_PS_BINDING].includes(String(result.bindingRef||"")))return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_mismatch"};
   const recoveryOccurrenceId=recoveryOccurrenceIdFor(result,rt);
 
-  const parent=parentPackageOccurrence(rt);if(!parent.success)return parent;
+  const parent=parentPackageOccurrence(rt,result);if(!parent.success)return parent;
 
   // Loss/withdrawal never fabricates a custody change. The last explicit package
   // state remains authoritative and terminal debrief can consume that occurrence.
@@ -222,9 +231,11 @@ function install(){
 function diagnostics(){
   const def=scene(),battleBeat=def&&def.beatMap instanceof Map?def.beatMap.get(PS_BATTLE_BEAT):null,recovery=def&&def.beatMap instanceof Map?def.beatMap.get(RECOVERY_BEAT):null;
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_seq_post_ps_recovery_35600_v2_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_seq_post_ps_recovery_35600_v4_2026_09_20",
     writingAuthorityExact:RECOVERY_ANCHOR==="AK_SA_033"&&RECOVERY_OCCURRENCE_ID==="kak_seq_secure_package_after_ps",
     stopAssassinBindingAccepted:resolveSequentialPostPsPackageRecovery35600.toString().includes("STOP_ASSASSIN_POST_MI_PS_BINDING"),
+    stopPostMiParentOutranksLegacyGetCloser:parentPackageOccurrence.toString().includes("binding===STOP_ASSASSIN_POST_MI_PS_BINDING")&&parentPackageOccurrence.toString().indexOf("kakashiSequentialPackageOccurrenceId35100")<parentPackageOccurrence.toString().indexOf("kakashiGetCloserHandoffOccurrenceId"),
+    invalidLegacyParentCanFallThrough:parentPackageOccurrence.toString().includes("rejectedParentCandidates")&&parentPackageOccurrence.toString().includes("continue;"),
     postMiRecoveryOccurrenceBattleScoped:recoveryOccurrenceIdFor.toString().includes("sc35600-ak-sa-033-post-mi-ps-recovery")&&recoveryOccurrenceIdFor.toString().includes("battleOccurrenceId")&&recoveryOccurrenceIdFor.toString().includes("STOP_ASSASSIN_POST_MI_PS_BINDING"),
     semanticActionExact:resolveSequentialPostPsPackageRecovery35600.toString().includes('semanticAction:"SECURE_PACKAGE_AFTER_PS"'),
     battleVictoryNotCustodyOwner:classifyPackageSmugglerDefeat.toString().includes("recordParticipantClassification")&&resolveSequentialPostPsPackageRecovery35600.toString().includes("commitOccurrence"),
