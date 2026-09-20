@@ -78,7 +78,7 @@ const BINDINGS=globalThis.SC_ALPHA_KAKASHI_FACTUAL_BINDINGS_34700;
 assert(A&&CORE&&KAK&&GUARD&&PROVIDER&&STATE&&BINDINGS,"#188 Kakashi factual route dependency missing");
 assert.strictEqual(BINDINGS.factualCommitOwnerPresent,true,"34700 did not bind the canonical 34120 commit owner");
 assert.strictEqual(STATE.diagnostics().pass,true,`34120 diagnostics failed: ${JSON.stringify(STATE.diagnostics().failed)}`);
-const source34120=read("runtime/alpha-kakashi-factual-state-commit-34120.js");
+const source34120=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-factual-state-commit-34120.js"),"utf8");
 assert(source34120.includes('PATCH_ID="alpha_kakashi_factual_state_commit_34120_v4_2026_09_20"'));
 assert(source34120.includes("Package Smuggler is coming toward the alley."),"Stay-on-Package branch performance missing");
 assert(source34120.includes("This yours?"),"Pakkun interception performance missing");
