@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v17_2026_09_20";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v18_2026_09_20";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -67,10 +67,12 @@ function factOf(row){return row&&(row.fact||row.data)||{};}
 function occurrence(id){try{return id?A.findOccurrence(String(id)):null;}catch(_e){return null;}}
 function stable(prefix,payload){return typeof CORE.stableRef==="function"?CORE.stableRef(prefix,payload):prefix+"::"+JSON.stringify(payload||{});}
 function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
+let pendingPsReturnResult35830=null;
 function latestResult(){
  const rt=active(),resume=rt&&rt.battleResume&&typeof rt.battleResume==="object"?rt.battleResume:null;
  const candidates=resume?[resume.authored,resume.projected,resume.result,resume.battleResult]:[];
  for(const row of candidates)if(row&&typeof row==="object"&&row.battleConfigId&&row.bindingRef)return row;
+ if(rt&&rt.beatId===BEAT.psReturn&&pendingPsReturnResult35830&&pendingPsReturnResult35830.battleConfigId&&pendingPsReturnResult35830.bindingRef)return pendingPsReturnResult35830;
  try{const row=projector();if(row&&typeof row==="object"&&row.battleConfigId&&row.bindingRef)return row;}catch(_e){}
  return null;
 }
@@ -488,39 +490,36 @@ function snapshotPsResultBeforeResume35830(){
   return clone(row);
  }catch(_e){return null;}
 }
-function seedPsReturnResult35830(rt,row){
- if(!rt||rt.beatId!==BEAT.psReturn||!row)return false;
- const resume=rt.battleResume&&typeof rt.battleResume==="object"?rt.battleResume:{};
- const copy=()=>clone(row);
- rt.battleResume={...resume,authored:resume.authored||copy(),projected:resume.projected||copy(),result:resume.result||copy(),battleResult:resume.battleResult||copy()};
- save();return true;
-}
 function continueAfterVictoryPostMiPs35830(){
  const battle=typeof currentBattle!=="undefined"?currentBattle:null,rc=battle&&battle.returnContext&&typeof battle.returnContext==="object"?battle.returnContext:null;
  const exact=!!(battle&&battle.rewards&&battle.rewards.claimed===true&&battle.battleOver===true&&battle.outcome&&battle.outcome.type==="victory"&&rc&&rc.type==="story_scene"&&String(rc.sceneId||"")===SCENE_ID&&String(rc.battleConfigId||battle.encounterId||"")===PS_CONFIG&&String(rc.bindingRef||"")===PS_BINDING);
  if(!exact)return PRE_CONTINUE_VICTORY_35830?PRE_CONTINUE_VICTORY_35830.apply(this,arguments):{success:false,reason:"post_mi_prior_victory_continue_missing"};
  const returnContextBefore=clone(rc),projectedBefore=snapshotPsResultBeforeResume35830();
- let resumed=typeof globalThis.resumeBattleCallerAfterCompletion==="function"?globalThis.resumeBattleCallerAfterCompletion("victory"):{success:false,reason:"battle_caller_resume_api_missing"};
- let consumer=null,seededResult=false,rt=active();
- if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed===true)){
-  if(!latestResult()&&projectedBefore)seededResult=seedPsReturnResult35830(rt,projectedBefore);
-  consumer=consumeReturnOnEnter35830("ps");
+ pendingPsReturnResult35830=projectedBefore?clone(projectedBefore):null;
+ let resumed;
+ try{
+  resumed=typeof globalThis.resumeBattleCallerAfterCompletion==="function"?globalThis.resumeBattleCallerAfterCompletion("victory"):{success:false,reason:"battle_caller_resume_api_missing"};
+ }finally{
+  pendingPsReturnResult35830=null;
+ }
+ let consumer=null,rt=active();
+ if(resumed&&resumed.success===true&&rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed===true)){
+  pendingPsReturnResult35830=projectedBefore?clone(projectedBefore):null;
+  try{consumer=consumeReturnOnEnter35830("ps");}finally{pendingPsReturnResult35830=null;}
   if(consumer&&consumer.success===true&&consumer.pending===true)scheduleReturnRetry35830(BEAT.psReturn);
-  else if(consumer&&consumer.success===true){
-   if(!resumed||resumed.success!==true)resumed={success:true,type:"story_scene",postMiPsRecoveredAfterCoreResumeFailure:true,consumer};
-  }else{
+  else if(!(consumer&&consumer.success===true)){
    if(battle&&!battle.returnContext)battle.returnContext=returnContextBefore;
    try{if(typeof openOverlay==="function")openOverlay("victory");}catch(_e){}
-   return{success:false,reason:String(consumer&&consumer.reason||"post_mi_ps_return_consumer_failed"),postMiPsReturnBridge35830:true,callerResult:resumed,consumerResult:consumer||null,postMiPsResultSnapshotCaptured:!!projectedBefore,postMiPsResultRestoredFromPreResumeSnapshot:seededResult};
+   return{success:false,reason:String(consumer&&consumer.reason||"post_mi_ps_return_consumer_failed"),postMiPsReturnBridge35830:true,callerResult:resumed,consumerResult:consumer||null,postMiPsResultSnapshotCaptured:!!projectedBefore,postMiPsResultVisibleDuringCoreResume:true};
   }
  }
  if(!(resumed&&resumed.success===true)){
   if(battle&&!battle.returnContext)battle.returnContext=returnContextBefore;
   try{if(typeof openOverlay==="function")openOverlay("victory");}catch(_e){}
-  return{...(resumed||{}),success:false,reason:String(resumed&&resumed.reason||"post_mi_ps_story_resume_failed"),postMiPsReturnBridge35830:true,consumerResult:consumer||null,postMiPsResultSnapshotCaptured:!!projectedBefore,postMiPsResultRestoredFromPreResumeSnapshot:seededResult};
+  return{...(resumed||{}),success:false,reason:String(resumed&&resumed.reason||"post_mi_ps_story_resume_failed"),postMiPsReturnBridge35830:true,consumerResult:consumer||null,postMiPsResultSnapshotCaptured:!!projectedBefore,postMiPsResultVisibleDuringCoreResume:true};
  }
  const presentation=settlePsVictoryReturnPresentation35830();
- return{...resumed,...presentation,postMiPsReturnBridge35830:true,consumerResult:consumer||null,postMiPsResultSnapshotCaptured:!!projectedBefore,postMiPsResultRestoredFromPreResumeSnapshot:seededResult};
+ return{...resumed,...presentation,postMiPsReturnBridge35830:true,consumerResult:consumer||null,postMiPsResultSnapshotCaptured:!!projectedBefore,postMiPsResultVisibleDuringCoreResume:true};
 }
 if(PRE_CONTINUE_VICTORY_35830){
  globalThis.continueAfterVictory=continueAfterVictoryPostMiPs35830;
@@ -530,13 +529,13 @@ if(PRE_CONTINUE_VICTORY_35830){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v17_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v18_2026_09_20",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
   decoratedChoiceWipeUsesAriaLabel:decoratedChoiceLabel35830.toString().includes("aria-label")&&browserCapture.toString().includes("decoratedChoiceLabel35830")&&browserCapture.toString().includes("performKakashiSceneWipe33910"),
   exactPsClaimedVictoryReturnBridge:continueAfterVictoryPostMiPs35830.toString().includes("resumeBattleCallerAfterCompletion")&&continueAfterVictoryPostMiPs35830.toString().includes("consumeReturnOnEnter35830")&&continueAfterVictoryPostMiPs35830.toString().includes("PS_BINDING")&&settlePsVictoryReturnPresentation35830.toString().includes('overlay.style.display="none"'),
-  psResultSnapshottedBeforeCallerClear:snapshotPsResultBeforeResume35830.toString().includes("projector()")&&seedPsReturnResult35830.toString().includes("battleResume")&&continueAfterVictoryPostMiPs35830.toString().includes("projectedBefore"),
+  psResultSnapshottedBeforeCallerClear:snapshotPsResultBeforeResume35830.toString().includes("projector()")&&latestResult.toString().includes("pendingPsReturnResult35830")&&continueAfterVictoryPostMiPs35830.toString().includes("pendingPsReturnResult35830=projectedBefore"),
   exactPsChase:CUES.psChase.length===12&&CUES.psChase[0].text==="Kakashi moves before Package Smuggler disappears completely."&&CUES.psChase[11].text==="Kakashi increases his pace.",
   exactPsCatch:CUES.psCatch.some(x=>x.kind==="dialogue"&&x.speaker==="KAKASHI"&&x.text==="No. It fixes the part in your hands."),
   exactPakkunCorrection:CUES.amtCatch.some(x=>x.speaker==="PAKKUN"&&x.text==="This yours?")&&CUES.amtCatch.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently.")&&CUES.psToAmt.some(x=>x.speaker==="KAKASHI"&&x.text==="Apparently."),
