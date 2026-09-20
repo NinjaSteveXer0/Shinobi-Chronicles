@@ -104,7 +104,11 @@ assert.strictEqual(truth(`!!SC_ALPHA_ORIGIN_32900.findOccurrence("occ_origin_kak
 assert.strictEqual(Number(context.playerData.ryo||0),0,"debrief alone prematurely granted terminal Ryō");
 const material=plain(`SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi").materialStates["kakashi_origin_outer_route_packet"]`);
 assert.strictEqual(material.resolved,true,"package material state was not terminally committed");
-assert.strictEqual(material.value.holderClass,"KAKASHI");
+assert.strictEqual(material.value.holderClass,"ANBU","recovered package must transfer to ANBU when the factual report commits");
+assert.strictEqual(material.value.currentHolderClass,"ANBU");
+const debriefFact=plain(`SC_ALPHA_ORIGIN_32900.findOccurrence("occ_origin_kakashi_terminal_debrief_35100::qa-secure-35100").fact`);
+assert.strictEqual(debriefFact.packageTransferredToAnbuAtDebrief,true,"terminal report did not record the package handoff");
+assert.strictEqual(debriefFact.packageState.holderClass,"ANBU");
 
 const rewardCommit=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
 assert.strictEqual(rewardCommit.success,true,"Chronicle Receipt + reward commit failed");
@@ -143,9 +147,26 @@ const departureFact=plain(`SC_ALPHA_ORIGIN_32900.findOccurrence("occ_origin_kaka
 assert.strictEqual(departureFact.departed,true);
 assert.strictEqual(departureFact.ownershipGranted,false);
 assert.strictEqual(departureFact.reciprocalNameKnowledgeGranted,false);
+const pakkunClassification=plain(`SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi").participantStates["pakkun_origin_unfamiliar_ninken"]`);
+assert.strictEqual(pakkunClassification.stateClass,"DEPARTED","terminal Pakkun departure must update shared participant classification");
 const pakkunReward=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
 assert.strictEqual(pakkunReward.success,true);
 assert.strictEqual(Number(context.playerData.ryo||0),175);
+
+// A route-owned explicit Pakkun departure must prevent a duplicate terminal departure sequence.
+run(`resetDataQA("qa-pakkun-predeparted-35100");
+qaCommitOccurrence("academy_kakashi","occ-predeparted-package",{factClass:"academy_kakashi_predeparted_package",storySceneInstanceId:__qaRuntime.instanceId,packageState:{objectRef:"kakashi_origin_outer_route_packet",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI"}},[],{type:"origin_story_factual_occurrence",outcome:"package_recovered"});
+__qaRuntime.localContext.kakashiSequentialPackageOccurrenceId="occ-predeparted-package";
+__qaRuntime.localContext.kakashiGetCloserStayPackagePursuitOutcomeRef="PURSUIT_SUCCESS_AMT_REACHED";
+SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:"pakkun_origin_unfamiliar_ninken",stateClass:"DEPARTED",resultRef:"occ-route-pakkun-departed"});
+`);
+const predepartedFacts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
+assert.strictEqual(predepartedFacts.success,true);
+assert.strictEqual(predepartedFacts.pakkunPresentAtDebrief,false,"route-owned Pakkun departure was ignored by terminal owner");
+const predepartedDebrief=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitTerminalDebrief()`);
+assert.strictEqual(predepartedDebrief.success,true);
+assert.strictEqual(predepartedDebrief.facts.pakkunPresentAtDebrief,false);
+assert.strictEqual(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`).success,true,"pre-departed Pakkun route should not require a second departure");
 
 // Package-missing post-MI AMT pursuit is a valid terminal package fact and keeps Pakkun present until explicit departure.
 run(`resetDataQA("qa-postmi-amt-35100");
@@ -182,6 +203,6 @@ console.log(JSON.stringify({
   pass:true,issue:188,tranche:"kakashi_terminal_debrief_rewards_35100",
   securePackageDebrief:true,battleVictoryAloneCannotReward:true,packageMaterialGuard:true,
   terminalRyoExact:175,fieldRecoveryPillExactlyOnce:true,ordinarySecureRouteNoTanto:true,
-  pakkunExplicitDepartureRequired:true,postMiPackageMissingTerminalSupported:true,sequentialTurnFactsPreserved:true,sequentialPackageGapFailsClosed:true,
+  pakkunExplicitDepartureRequired:true,routeOwnedPakkunDepartureRespected:true,postMiPackageMissingTerminalSupported:true,sequentialTurnFactsPreserved:true,sequentialPackageGapFailsClosed:true,
   chronicleReceiptBeforeReward:true,guardedOriginCompletion:true,browserGoldenClaimed:false
 },null,2));
