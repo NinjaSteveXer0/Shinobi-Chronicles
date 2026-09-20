@@ -72,23 +72,23 @@ assert.deepStrictEqual(MOD.escortRefs(),[AMT]);
 
 // Collection visits exact still-secured participants; no numeric captive source truth.
 active.beatId=MOD.beats.collectPs;
-let beat=definition.beatMap.get(MOD.beats.collectPs);
-out=beat.onEnterConsequences[0].resolve();
+out=MOD.commitCollected(PS,active.localContext.kakashiKonohaCollectionManifestId);
 assert.strictEqual(out.success,true);
 assert.strictEqual(out.participantRef,PS);
+active.localContext.kakashiKonohaCollectionPsOccurrenceId=out.occurrenceId;
 snap=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");
 assert.strictEqual(snap.participantStates[PS].stateClass,"COLLECTED_ACTIVE_ESCORT");
 
 active.beatId=MOD.beats.collectMi;
-beat=definition.beatMap.get(MOD.beats.collectMi);
-out=beat.onEnterConsequences[0].resolve();
+out=MOD.commitCollected(MI,active.localContext.kakashiKonohaCollectionManifestId);
 assert.strictEqual(out.success,true);
 assert.strictEqual(out.participantRef,MI);
+active.localContext.kakashiKonohaCollectionMiOccurrenceId=out.occurrenceId;
 assert.deepStrictEqual(MOD.fieldSecuredRefs(),[]);
 assert.deepStrictEqual(MOD.escortRefs(),[MI,PS,AMT]);
 
 // One group intent -> one parent transaction + one exact custody child per person.
-active.beatId=MOD.beats.disposition;
+active.beatId=MOD.beats.groupAnbuHandoff;
 out=MOD.commitGroupTransfer("ANBU");
 assert.strictEqual(out.success,true,"ANBU group transfer failed: "+JSON.stringify(out));
 assert.strictEqual(out.childOccurrenceIds.length,3);
@@ -105,7 +105,7 @@ for(const childId of out.childOccurrenceIds){
 for(const ref of [MI,PS,AMT]){
  globalThis.SC_STORY_DECISION_REALISATION_34000.recordParticipantClassification({storyUnitRef:"academy_kakashi",participantRef:ref,stateClass:"COLLECTED_ACTIVE_ESCORT",resultRef:"qa-recollect-"+ref});
 }
-active={sceneId:SCENE,instanceId:"qa-field-secured-police",beatId:MOD.beats.disposition,localContext:{kakashiKonohaCollectionManifestId:"qa-police-manifest",kakashiKonohaPakkunPresent:true},battleResume:null};
+active={sceneId:SCENE,instanceId:"qa-field-secured-police",beatId:MOD.beats.groupPoliceHandoff,localContext:{kakashiKonohaCollectionManifestId:"qa-police-manifest",kakashiKonohaPakkunPresent:true},battleResume:null};
 out=MOD.commitGroupTransfer("UCHIHA_POLICE");
 assert.strictEqual(out.success,true,"Police group transfer failed: "+JSON.stringify(out));
 assert.strictEqual(out.childOccurrenceIds.length,3);
