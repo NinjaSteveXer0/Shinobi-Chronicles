@@ -447,6 +447,7 @@ function hooks(){
   if(p&&choiceId==null){if(!p.atEnd){rt.localContext={...(rt.localContext||{}),[CURSOR]:p.index+1};save();try{renderStoryScenePresentationLayer();}catch(_e){}return{success:true,beatId:rt.beatId,cueIndex:p.index+1};}return transitionNarrative(rt);}
   if(rt&&rt.beatId===BEAT.psDecision){materializePsDecision();return PA.apply(this,arguments);}
   if(rt&&rt.beatId===BEAT.amtDecision){materializeAmtDecision();return PA.apply(this,arguments);}
+  if(rt&&choiceId==null&&[BEAT.psReport,BEAT.amtReport].includes(rt.beatId)){rt.beatId=TERMINAL_PENDING;rt.localContext={...(rt.localContext||{}),[CURSOR]:0};save();try{renderStoryScenePresentationLayer();}catch(_e){}return{success:true,beatId:TERMINAL_PENDING,reportBoundaryConsumed:true};}
   if(rt&&rt.beatId===BEAT.amtReturn){return consumeAmtReturn();}
   return PA.apply(this,arguments);
  };
