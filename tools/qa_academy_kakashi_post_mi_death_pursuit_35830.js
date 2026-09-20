@@ -50,7 +50,7 @@ globalThis.beginAcademyKakashiCollectionFromAmt35920=function(){
 };
 globalThis.SC_ALPHA_KAKASHI_FIELD_SECURED_35920={beats:{collectPs:"qa-collect-ps"}};
 
-globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(){
+globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(explicitResult=null){
  recoveryCalls+=1;
  const parentId=String(active&&active.localContext&&(active.localContext.kakashiSequentialPackageOccurrenceId35100||active.localContext.kakashiSequentialPackageOccurrenceId)||"");
  const parent=store.get(parentId)||null,parentPackage=parent&&parent.fact&&parent.fact.packageState||{};
@@ -59,7 +59,7 @@ globalThis.resolveAcademyKakashiSequentialPostPsPackageRecovery35600=function(){
  }
  participantStates[PS]={participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-ps-defeated"};
  const id="kak_seq_secure_package_after_ps";
- if(!store.has(id))store.set(id,{occurrenceId:id,fact:{factClass:"academy_kakashi_sequential_post_ps_package_recovery",storySceneInstanceId:active.instanceId,battleOccurrenceId:active.battleResume.authored.battleOccurrenceId,parentOccurrenceRef:parentId,packageState:{objectRef:"kakashi_origin_outer_route_packet",previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",packageRecovered:true}}});
+ if(!store.has(id))store.set(id,{occurrenceId:id,fact:{factClass:"academy_kakashi_sequential_post_ps_package_recovery",storySceneInstanceId:active.instanceId,battleOccurrenceId:String((explicitResult||(active.battleResume&&active.battleResume.authored)||{}).battleOccurrenceId||""),parentOccurrenceRef:parentId,packageState:{objectRef:"kakashi_origin_outer_route_packet",previousHolderClass:"PACKAGE_SMUGGLER",currentHolderClass:"KAKASHI",custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",packageRecovered:true}}});
  materialStates["kakashi_origin_outer_route_packet"]={materialRef:"kakashi_origin_outer_route_packet",stateRef:id,value:JSON.parse(JSON.stringify(store.get(id).fact.packageState))};
  active.localContext.kakashiSequentialPackageOccurrenceId=id;active.localContext.kakashiSequentialPackageOccurrenceId35100=id;
  return{success:true,recovered:true,packageOccurrenceId:id,parentOccurrenceId:parentId};
@@ -132,6 +132,7 @@ assert(MOD,"35830 module missing");
 const diag=globalThis.runAcademyKakashiPostMiDeathPursuit35830Diagnostics();
 assert.strictEqual(diag.pass,true,"35830 diagnostics failed: "+JSON.stringify(diag.failed));
 const source35830=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"),"utf8");
+const source35600=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js"),"utf8");
 assert(source35830.includes('Kakashi Origin Backdrop/alleyway_konoha_night.png'),"AMT encounter must use exact alleyway_konoha_night backdrop");
 assert(source35830.includes('Kakashi Origin Backdrop/konoha_alleyway_alt_night.png'),"PS Battle must use exact alternate-night alley backdrop");
 assert.strictEqual(definition.beatMap.get(MOD.beats.psBattle).environmentRef.assetId,"kakashi_origin_ps_battle_alt_night","PS Battle beat must bind only the alternate-night Battle backdrop");
@@ -155,6 +156,8 @@ assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
 assert(source35830.includes("packageRecoveryParentOccurrenceId35830")&&source35830.includes("post_mi_ps_package_recovery_parent_missing"),"PS post-Battle return must resolve an Origin-owned package parent before AK_SA_033");
+assert(source35830.includes("resolveAcademyKakashiSequentialPostPsPackageRecovery35600(r)"),"post-MI PS return must pass the authoritative Battle result into AK_SA_033");
+assert(source35600.includes("function resolveSequentialPostPsPackageRecovery35600(explicitResult=null)")&&source35600.includes('explicitResult&&typeof explicitResult==="object"?explicitResult:latestResult()'),"AK_SA_033 must accept an explicit authoritative Battle result while preserving legacy fallback");
 const decoratedPsChoice={textContent:"◇OBJECTIVEGO AFTER PACKAGE SMUGGLER›",getAttribute(name){return name==="aria-label"?"GO AFTER PACKAGE SMUGGLER":null;}};
 assert.strictEqual(MOD.choiceLabelFromButton(decoratedPsChoice),"GO AFTER PACKAGE SMUGGLER","decorated tactical choice must still resolve its authored label for the black wipe capture");
 assert(source35830.includes("performKakashiSceneWipe33910")&&source35830.includes("decoratedChoiceLabel35830(t)"),"post-MI choice capture must retain the black wipe after 33910 decorates the button text");
