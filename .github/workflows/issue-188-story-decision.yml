@@ -232,7 +232,7 @@ jobs:
           grep -Fq 'a3cad415ea74a4fe8b3965b1136522aceab81047' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'dea066c9ea7de249d20734b5569a0a84a422ba28' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'kakashiKonohaPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_move_closer_closure_35930_v2_2026_09_20' runtime/alpha-kakashi-move-closer-closure-35930.js
+          grep -Fq 'alpha_kakashi_move_closer_closure_35930_v3_2026_09_20' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'PICKPOCKET_IMPROVED_FAILURE_DETECTED_2V1' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'pakkunBattleActionAuthorized:false' runtime/alpha-kakashi-move-closer-closure-35930.js
           grep -Fq 'alpha_kakashi_field_secured_35920_v2_2026_09_20' runtime/alpha-kakashi-field-secured-35920.js
