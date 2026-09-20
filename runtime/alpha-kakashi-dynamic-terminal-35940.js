@@ -209,7 +209,11 @@ function receiptText35940(state=buildProjectionState35940()){
  }
  if(state.knowledge.getCloserSuccess)lines.push("","INTELLIGENCE","Handoff contingency overheard.","Downstream package destination — Unknown.");
  if(state.knowledge.askDestination)lines.push("","INTELLIGENCE","Original carrier's role ended at handoff.","Downstream destination — Unknown to original carrier.");
- if(state.pakkun.involved)lines.push("","PAKKUN","Temporary ninken intervention — Present.","Permanent Summon ownership — None.");
+ if(state.pakkun.involved){
+  lines.push("","PAKKUN","Temporary ninken intervention — Involved.");
+  lines.push(state.pakkun.present?"Status at ANBU report — Present.":"Status at ANBU report — Explicitly departed.");
+  lines.push("Permanent Summon ownership — None.");
+ }
  lines.push("","REPORT","ANBU report — completed from Kakashi-observed facts.");
  return lines.join("\\n");
 }
@@ -289,13 +293,14 @@ function diagnostics(){
   patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v1_2026_09_20",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
   projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
-  terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v7_2026_09_20"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
+  terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v8_2026_09_20"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
   dynamicSummaryInstalled:!!m&&typeof m.get(BEAT.summary).presentationResolver==="function",
   dynamicMinatoInstalled:!!m&&typeof m.get(BEAT.minato).presentationResolver==="function",
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",
   packageModules:packageReportLines.toString().includes("The receiver got away with it")&&packageReportLines.toString().includes("original target still had it")&&packageReportLines.toString().includes("masked shinobi took it"),
   mixedLethalIdentityAware:reportText35940.toString().includes("All three by you")&&receiptText35940.toString().includes("LETHAL HISTORY")&&minatoText35940.toString().includes("survivorSummary"),
   knowledgeModules:reportText35940.toString().includes("If the street stayed clear")&&receiptText35940.toString().includes("Handoff contingency overheard"),
+pakkunReceiptStateAware:receiptText35940.toString().includes("Status at ANBU report — Present.")&&receiptText35940.toString().includes("Status at ANBU report — Explicitly departed."),
   noAlignmentLabels:![reportText35940,minatoText35940,receiptText35940].some(fn=>/merciless|ruthless|alignment/i.test(fn.toString())),
   browserGoldenClaimed:false
  };
