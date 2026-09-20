@@ -7,7 +7,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_dynamic_terminal_35940_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v2_2026_09_20";
+const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v3_2026_09_20";
 const ORIGIN="academy_kakashi",SCENE="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE="kakashi_origin_outer_route_packet";
 const KAK="academy_kakashi",MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken";
@@ -290,10 +290,10 @@ const installed=install();if(!installed||installed.success!==true)throw new Erro
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v2_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v3_2026_09_20",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
   projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
-  terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v8_2026_09_20"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
+  terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
   dynamicSummaryInstalled:!!m&&typeof m.get(BEAT.summary).presentationResolver==="function",
   dynamicMinatoInstalled:!!m&&typeof m.get(BEAT.minato).presentationResolver==="function",
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",
