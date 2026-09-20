@@ -145,7 +145,8 @@ assert(source35830.includes("[data-sc-board-ui-mode=\'dialogue\']")&&source35830
 assert(source35830.includes("const prior=document.getElementById(STYLE_ID);if(prior)prior.remove()"),"post-MI style install must replace stale same-ID CSS");
 assert(source35830.includes("You decided fast.")&&source35830.includes("That doesn\'t make it lighter."),"direct AMT KILL aftermath must include locked Pakkun/Kakashi continuation");
 assert(source35830.includes('const TERMINAL_PENDING="kak_seq_debrief_pending"')&&source35830.includes("rt.beatId=TERMINAL_PENDING"),"direct AMT KILL must hand off to terminal report instead of dead-end boundary");
-assert(!source35830.includes("post_mi_later_anbu_report_scene_not_yet_locked"),"stale post-MI report blocker must be removed");
+assert.strictEqual(diag.checks.laterDebriefBoundaryRemoved,true,"stale post-MI report blocker must be removed from executable route");
+assert(source35830.includes('m.get(BEAT.psReport).nextBeatId=TERMINAL_PENDING')&&source35830.includes('m.get(BEAT.amtReport).nextBeatId=TERMINAL_PENDING'),"post-MI report boundaries must route into the live terminal owner");
 assert(source35830.includes("You recovered it.")&&source35830.includes("You brought the original target back."),"exact PS/AMT ANBU return writing must be present");
 assert(source35830.includes("We'll take custody.")&&source35830.includes("We'll take him."),"package-recovered and package-missing AMT Police handoffs must both be present");
 assert(source35830.includes("commitInstitutionalTransfer35830")&&source35830.includes("transferPackageToAnbu35830"),"custody and package transfer must remain separate commits");
