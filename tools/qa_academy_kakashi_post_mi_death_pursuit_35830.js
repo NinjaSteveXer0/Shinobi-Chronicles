@@ -144,7 +144,7 @@ assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must 
 assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
 assert(source35830.includes("[data-sc-board-ui-mode=\'dialogue\']")&&source35830.includes("top:4%!important"),"post-MI dialogue safe lane must outrank global dialogue centering and clear Character Cards");
 assert(source35830.includes("data-sc-postmi-phase='amt'")&&source35830.includes("translate(-50%,-38%)"),"AMT dialogue must use the raised route-specific safe lane without moving the GREEN PS dialogue lane");
-assert(source35830.includes("[BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId))refs.unshift(ANBU)","Police-to-ANBU package return must visibly stage the ANBU operative");
+assert(source35830.includes("[BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId))refs.unshift(ANBU)"),"Police-to-ANBU package return must visibly stage the ANBU operative");
 assert(source35830.includes('rooftop=[BEAT.amtChase,BEAT.psToAmt,BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn]')&&source35830.includes('"KONOHA ROOFTOP · NIGHT"'),"Police-to-ANBU return must project the rooftop location instead of the alley label");
 assert(source35830.includes("const prior=document.getElementById(STYLE_ID);if(prior)prior.remove()"),"post-MI style install must replace stale same-ID CSS");
 assert(source35830.includes("You decided fast.")&&source35830.includes("That doesn\'t make it lighter."),"direct AMT KILL aftermath must include locked Pakkun/Kakashi continuation");
