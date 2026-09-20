@@ -223,7 +223,7 @@ function diagnostics(){
   groupTransferChildren:commitGroupTransfer.toString().includes("group_transfer_child")&&commitGroupTransfer.toString().includes("for(const ref of members)"),
   exactCollectionPerformances:COLLECT_PS_CUES.some(x=>x.text==="You actually came back.")&&COLLECT_MI_CUES.some(x=>x.text==="This is certainly one interpretation."),
   exactGroupPerformances:GROUP_ANBU_CUES.some(x=>x.text==="Not arrive with a procession.")&&GROUP_POLICE_CUES.some(x=>x.text==="Everyone stays exactly where they are.")&&ALL_THREE_ANBU_JOURNEY_CUES.some(x=>x.text==="This is becoming embarrassing."),
-  custodyCommitsAtHandoff:commitGroupTransfer.toString().includes("groupAnbuHandoff")&&globalThis.advanceStoryScene.toString().includes('commitGroupTransfer("ANBU")')&&globalThis.advanceStoryScene.toString().includes('commitGroupTransfer("UCHIHA_POLICE")'),
+  custodyCommitsAtHandoff:commitGroupTransfer.toString().includes("groupAnbuHandoff")&&installPresentationHooks35920.toString().includes('commitGroupTransfer("ANBU")')&&installPresentationHooks35920.toString().includes('commitGroupTransfer("UCHIHA_POLICE")'),
   pakkunDepartureExplicit:commitGroupTransfer.toString().includes("commitPakkunDeparture"),
   beatsInstalled:!!m&&Object.values(BEAT).every(id=>m.has(id)),
   browserGoldenClaimed:false
