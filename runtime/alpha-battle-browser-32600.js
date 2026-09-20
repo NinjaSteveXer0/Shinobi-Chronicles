@@ -15,7 +15,7 @@
 (function installAlphaBattleBrowser32600(){
   "use strict";
 
-  const PATCH_ID="alpha_battle_browser_32600_v2_2026_09_20";
+  const PATCH_ID="alpha_battle_browser_32600_v3_2026_09_20";
 
   // --------------------------------------------------------------------------
   // 1. REPEAT-SKILL UX — FIX STALE SELECTION, DO NOT INVENT A COOLDOWN BYPASS
@@ -69,34 +69,26 @@
   // caller return context.
   const priorClaimVictoryAutoReturn=claimVictoryRewardsFromOverlay;
   claimVictoryRewardsFromOverlay=function claimVictoryRewardsFromOverlayBrowser32600(){
-    const liveReturnContext=currentBattle&&currentBattle.returnContext&&typeof currentBattle.returnContext==="object"
+    const rawReturnContext=currentBattle&&currentBattle.returnContext&&typeof currentBattle.returnContext==="object"
       ?currentBattle.returnContext:null;
-    const storedReturnContext=currentBattle&&currentBattle.__scExplicitPostClaimReturnContext32600&&typeof currentBattle.__scExplicitPostClaimReturnContext32600==="object"
-      ?currentBattle.__scExplicitPostClaimReturnContext32600:null;
-    const rawReturnContext=liveReturnContext||storedReturnContext;
     const returnContextBefore=rawReturnContext&&typeof cloneBattleRuntimeValue==="function"
       ?cloneBattleRuntimeValue(rawReturnContext)
       :rawReturnContext;
-    const explicitPostClaim=!!(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true);
-    const explicitClaimedContinue=!!(explicitPostClaim&&currentBattle&&currentBattle.rewards&&currentBattle.rewards.claimed===true);
 
-    // The first click commits the reward. The second click is continuation only:
-    // never ask reward authority to grant an already-claimed reward again.
-    const claimResult=explicitClaimedContinue
-      ?{success:true,claimed:true,idempotent:true,explicitPostClaimContinue:true}
-      :priorClaimVictoryAutoReturn.apply(this,arguments);
+    const claimResult=priorClaimVictoryAutoReturn.apply(this,arguments);
     if(!(claimResult&&claimResult.success===true))return claimResult;
 
-    if(explicitPostClaim&&!explicitClaimedContinue){
-      if(currentBattle){
-        currentBattle.__scExplicitPostClaimReturnContext32600=returnContextBefore&&typeof cloneBattleRuntimeValue==="function"
+    // Explicit Kakashi material rewards intentionally use two UI actions:
+    // CLAIM BATTLE REWARD, then core-owned RETURN TO STORY. This wrapper owns
+    // only the first action. The claimed-state button is rendered by the core
+    // Victory surface with onclick="continueAfterVictory()", so do not create a
+    // parallel second-click continuation path here.
+    const explicitPostClaim=!!(currentBattle&&currentBattle.rewards&&currentBattle.rewards.requiresExplicitPostClaimContinue===true);
+    if(explicitPostClaim){
+      if(currentBattle&&returnContextBefore){
+        currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
           ?cloneBattleRuntimeValue(returnContextBefore)
           :returnContextBefore;
-        if(returnContextBefore){
-          currentBattle.returnContext=typeof cloneBattleRuntimeValue==="function"
-            ?cloneBattleRuntimeValue(returnContextBefore)
-            :returnContextBefore;
-        }
       }
       try{openOverlay("victory");}catch(_error){}
       return{
@@ -104,6 +96,7 @@
         navigated:false,
         autoReturned:false,
         explicitPostClaimContinue:true,
+        continueOwner:"continueAfterVictory",
         rewardCommitBeforeCallerRestore:true
       };
     }
@@ -119,17 +112,15 @@
             ?cloneBattleRuntimeValue(returnContextBefore)
             :returnContextBefore;
         }
-
         if(typeof resumeBattleCallerAfterCompletion!=="function"){
           callerResult={success:false,reason:"battle_caller_resume_api_missing"};
         }else{
           callerResult=resumeBattleCallerAfterCompletion("victory");
         }
-
         if(!(callerResult&&callerResult.success===true)){
           navigationError=String(callerResult&&callerResult.reason||"caller_restore_failed");
           try{openOverlay("victory");}catch(_error){}
-          return {
+          return{
             ...claimResult,
             navigated:false,
             autoReturned:false,
@@ -148,7 +139,7 @@
       navigationError=String(error&&error.message||error||"caller_restore_failed");
       if(callerOwned){
         try{openOverlay("victory");}catch(_error){}
-        return {
+        return{
           ...claimResult,
           navigated:false,
           autoReturned:false,
@@ -163,7 +154,7 @@
     }
 
     const leftVictory=typeof currentOverlayType==="undefined"||currentOverlayType!=="victory";
-    return {
+    return{
       ...claimResult,
       navigated:leftVictory,
       autoReturned:true,
@@ -171,7 +162,6 @@
       returnContextBefore,
       callerResult:callerResult||null,
       navigationError,
-      explicitClaimedContinue,
       rewardCommitBeforeCallerRestore:true
     };
   };
@@ -272,6 +262,7 @@
     const closureAvailabilitySource=typeof evaluateClosureWaveSkillAvailability==="function"?evaluateClosureWaveSkillAvailability.toString():"";
     const genericRepeatLockPattern=/lastSkill|previousSkill|different_skill|required_different|same_skill_forbidden|repeat_skill_forbidden/i;
     const checks={
+      patchId:PATCH_ID==="alpha_battle_browser_32600_v3_2026_09_20",
       staleSelectionRerenderFixed:confirmSource.includes("selectBattlePreparedSkill(usedSkillId)"),
       repeatStillChecksAvailability:confirmSource.includes("repeatStillUsesAuthoritativeAvailability:true"),
       academyHasNoGenericRepeatLock:!genericRepeatLockPattern.test(academyAvailabilitySource),
@@ -281,8 +272,7 @@
       callerContextPreserved:claimSource.includes("returnContextBefore")&&claimSource.includes("currentBattle.returnContext"),
       callerOwnedCannotGenericFallback:claimSource.includes("genericBattleFallbackSuppressed:true")&&claimSource.includes('openOverlay("victory")'),
       explicitPostClaimContinueSupported:claimSource.includes("requiresExplicitPostClaimContinue")&&claimSource.includes("explicitPostClaimContinue:true"),
-      explicitClaimedContinueSkipsDuplicateGrant:claimSource.includes("const explicitClaimedContinue=")&&claimSource.includes("const claimResult=explicitClaimedContinue")&&claimSource.includes("idempotent:true"),
-      explicitReturnContextPersisted:claimSource.includes("__scExplicitPostClaimReturnContext32600")&&claimSource.includes("storedReturnContext"),
+      explicitContinueHasSingleOwner:claimSource.includes('continueOwner:"continueAfterVictory"')&&!claimSource.includes("explicitClaimedContinue")&&!claimSource.includes("__scExplicitPostClaimReturnContext32600"),
       ordinaryBattleStillUsesGenericContinue:claimSource.includes("callerResult=continueAfterVictory()"),
       feedStyleInstalled:typeof document==="undefined"||!!document.getElementById("alpha-battle-browser-32600-style"),
       browserGoldenNotClaimed:true
