@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v8_2026_09_20";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v9_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -53,6 +53,10 @@ const SEQ_PS_CONFIG="academy_kakashi_origin_battle_seq_ps";
 const SEQ_AMT_CONFIG="academy_kakashi_origin_battle_seq_amt_pakkun";
 const HARD_3V1_CONFIG="academy_kakashi_origin_battle_amt_ps_mi_3v1";
 const STOP_ASSASSIN_CONFIG="academy_kakashi_origin_battle_mi_1v1";
+const MI_IMMEDIATE_REWARD_FAMILY="kak_origin_battle_mi_victory_reward_v1";
+const DOWNSTREAM_IMMEDIATE_REWARD_FAMILY="kak_origin_battle_downstream_cash_reward_v1";
+const MI_IMMEDIATE_REWARD_CONFIGS=new Set([STOP_ASSASSIN_CONFIG,SEQ_MI_CONFIG]);
+const DOWNSTREAM_IMMEDIATE_REWARD_CONFIGS=new Set([SEQ_PS_CONFIG,SEQ_AMT_CONFIG]);
 const DIRECT_PICKPOCKET_RETURN_BEAT="kak_scene03d_pickpocket_failure_3v1_return_34710";
 const SECURE_PURSUIT_REACHED="SECURE_PACKAGE_AMT_PURSUIT_SUCCESS_REACHED";
 const SECURE_PURSUIT_ESCAPED="SECURE_PACKAGE_AMT_PURSUIT_FAILURE_ESCAPED";
@@ -64,7 +68,7 @@ const DEPARTURE_TYPE="origin_story_pakkun_departure";
 const AUTHORITY=Object.freeze({
   finalWriting:"176ce76feef3e67d4c24644e3d7443a04dcf7d6b",
   rewardAudit:"91f5969b20e270b3ef7d148342f28a1668b4eba1",
-  rewardAdapter:"alpha_kakashi_origin_rewards_34800_v2_2026_09_17",
+  rewardAdapter:"alpha_kakashi_origin_rewards_34800_v6_2026_09_20",
   scene05AL:"aa88db471b71a305ec34e01ff0e094ac26f1638f"
 });
 
@@ -99,15 +103,42 @@ function compactBattleResult(result){
     sourceAnchorRef:result.sourceAnchorRef?String(result.sourceAnchorRef):null,bindingRef:result.bindingRef?String(result.bindingRef):null,
     resultState:String(result.resultState||""),playerActionOpportunityCount:Math.max(0,Number(result.playerActionOpportunityCount)||0),
     participants:Array.isArray(result.participants)?result.participants.map(row=>({participantRef:row&&row.participantRef||null,side:row&&row.side||null,battleStatus:row&&row.battleStatus||null,lifeState:row&&row.lifeState||null,custodyState:row&&row.custodyState||null})).filter(row=>row.participantRef):[],
-    rewardGranted:result.rewardGranted===true,lootGranted:result.lootGranted===true,participantDeathCommitted:result.participantDeathCommitted===true,participantCustodyCommitted:result.participantCustodyCommitted===true,
+    rewardGranted:result.rewardGranted===true,lootGranted:result.lootGranted===true,
+    immediateBattleReward:result.immediateBattleReward&&typeof result.immediateBattleReward==="object"?clone(result.immediateBattleReward):null,
+    participantDeathCommitted:result.participantDeathCommitted===true,participantCustodyCommitted:result.participantCustodyCommitted===true,
     capturedAt:Date.now()
   };
+}
+function validateImmediateBattleReward35100(result){
+  if(!result||result.rewardGranted!==true)return{success:true,authorised:false};
+  const reward=result.immediateBattleReward;
+  if(!reward||typeof reward!=="object"||reward.success!==true||reward.qualifies!==true||reward.claimed!==true)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"unscoped_or_unclaimed_battle_reward"};
+  const entitlement=reward.entitlement&&typeof reward.entitlement==="object"?reward.entitlement:null;
+  if(!entitlement)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"battle_reward_entitlement_missing"};
+  const config=String(result.battleConfigId||""),occurrence=String(result.battleOccurrenceId||"");
+  if(String(entitlement.battleConfigId||"")!==config||String(entitlement.battleOccurrenceId||"")!==occurrence)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"battle_reward_identity_mismatch"};
+  const family=String(entitlement.parentFamily||""),material=entitlement.materialReward&&typeof entitlement.materialReward==="object"?entitlement.materialReward:{};
+  const items=Array.isArray(material.items)?material.items:[],rare=Array.isArray(material.rareDrops)?material.rareDrops:[];
+  if(Number(material.genericExp||0)!==0||rare.length>0)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"generic_or_rare_battle_reward_not_authorised"};
+  if(family===DOWNSTREAM_IMMEDIATE_REWARD_FAMILY&&DOWNSTREAM_IMMEDIATE_REWARD_CONFIGS.has(config)){
+    if(Number(material.ryo)!==50||items.length!==0)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"downstream_battle_reward_package_mismatch"};
+    return{success:true,authorised:true,rewardClass:"downstream_cash",family,ryo:50};
+  }
+  if(family===MI_IMMEDIATE_REWARD_FAMILY&&MI_IMMEDIATE_REWARD_CONFIGS.has(config)){
+    const pill=items.length===1&&String(items[0]&&items[0].itemId||"")==="field_recovery_pill"&&Number(items[0]&&items[0].quantity||0)===1;
+    if(Number(material.ryo)!==50||!pill)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"mi_battle_reward_package_mismatch"};
+    return{success:true,authorised:true,rewardClass:"mi_material",family,ryo:50};
+  }
+  return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"battle_reward_family_not_authorised",family,battleConfigId:config};
 }
 function captureBattleResult35100(expectedConfig=null){
   const result=latestResult();if(!result)return{success:false,reason:"kakashi_terminal_battle_result_missing"};
   if(expectedConfig&&String(result.battleConfigId||"")!==String(expectedConfig))return{success:false,reason:"kakashi_terminal_battle_config_mismatch",expectedConfig,actualConfig:String(result.battleConfigId||"")};
+  const immediate=validateImmediateBattleReward35100(result);if(!immediate.success)return immediate;
   const compact=compactBattleResult(result);if(!compact)return{success:false,reason:"kakashi_terminal_battle_receipt_incomplete"};
-  if(compact.rewardGranted||compact.lootGranted)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward"};
+  if(compact.lootGranted)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"generic_battle_loot_not_authorised"};
+  compact.immediateBattleRewardAuthorised=immediate.authorised===true;
+  compact.immediateBattleRewardClass=immediate.rewardClass||null;
   const store=battleStore();if(!store)return{success:false,reason:"kakashi_terminal_story_instance_missing"};
   const existing=store[compact.battleConfigId];
   if(existing&&String(existing.battleOccurrenceId)!==compact.battleOccurrenceId)return{success:false,reason:"kakashi_terminal_battle_replay_mismatch",battleConfigId:compact.battleConfigId};
@@ -341,7 +372,7 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v8_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v9_2026_09_20",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
@@ -353,6 +384,8 @@ function diagnostics(){
     postMiPackageMissingStateConsumed:committedPackageState.toString().includes("kakashiPostMiPackageOccurrenceId")&&committedPackageState.toString().includes("kakashiPostMiPursuitResolutionOccurrenceId"),
     gen69SharedPackageStateConsumed:committedPackageState.toString().includes("kakashiKonohaPackageOccurrenceId"),
     battleVictoryNotTerminalEntitlement:!deriveTerminalFacts35100.toString().includes("terminalDebriefReached:false")&&!commitTerminalDebrief35100.toString().includes("resultState===\"player_side_victory\""),
+    authorisedImmediateBattleRewardsAccepted:validateImmediateBattleReward35100.toString().includes("DOWNSTREAM_IMMEDIATE_REWARD_FAMILY")&&validateImmediateBattleReward35100.toString().includes("MI_IMMEDIATE_REWARD_FAMILY")&&captureBattleResult35100.toString().includes("validateImmediateBattleReward35100"),
+    terminalRewardSeparationPreserved:validateImmediateBattleReward35100.toString().includes("generic_or_rare_battle_reward_not_authorised")&&captureBattleResult35100.toString().includes("generic_battle_loot_not_authorised"),
     exactSequentialBenchmark:sequentialBenchmark.toString().includes("<=4")&&sequentialBenchmark.toString().includes("<=3")&&sequentialBenchmark.toString().includes("kakashiTerminalSequentialAmtReached35100"),
     pakkunPresenceCoversIndependentRoutes:deriveTerminalFacts35100.toString().includes("kakashiGetCloserStayPackagePursuitOutcomeRef")&&deriveTerminalFacts35100.toString().includes("kakashiTerminalSequentialAmtReached35100")&&deriveTerminalFacts35100.toString().includes("kakashiPostMiPakkunPresent"),
 routePakkunDepartureConsumed:deriveTerminalFacts35100.toString().includes('stateClass||"")==="DEPARTED"')&&deriveTerminalFacts35100.toString().includes("kakashiInterceptPakkunDepartureOccurrenceId"),
