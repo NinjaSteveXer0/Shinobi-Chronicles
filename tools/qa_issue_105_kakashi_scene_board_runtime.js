@@ -53,10 +53,13 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v12_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v12_33910_2026_09_20'));
+  assert("kakashi_v13_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v13_33910_2026_09_21'));
   assert("terminal_report_stages_anbu",kakashiV4Source.includes('kak_seq_debrief_pending')&&kakashiV4Source.includes('terminalReportProjection33910')&&kakashiV4Source.includes('konoha_anbu_contact'));
   assert("terminal_hokage_scene_staged",kakashiV4Source.includes('kak_terminal_minato_private_evaluation_35100')&&kakashiV4Source.includes('Assets/Kage/kage_minato.png')&&kakashiV4Source.includes('Kakashi Origin Backdrop/hokage_administration_interior_night.png')&&kakashiV4Source.includes('HOKAGE ADMINISTRATION · NIGHT'));
   assert("terminal_minato_performance_bridge",kakashiV4Source.includes("terminalMinatoPerformance33910")&&kakashiV4Source.includes("SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940")&&kakashiV4Source.includes('return"hokage_minato"'));
+  assert("terminal_no_duplicate_mutation_observer",!kakashiV4Source.includes("new MutationObserver(()=>scheduleSync())"));
+  assert("terminal_wipe_has_single_render_owner",kakashiV4Source.includes("try{next();}finally{setTimeout(reveal,110);}")&&!kakashiV4Source.includes("try{next();if(typeof renderStorySceneBoard33900"));
+
   const terminalScene=scenes.get(active.sceneId);
   terminalScene.beatMap.set("kak_terminal_minato_private_evaluation_35100",{beatId:"kak_terminal_minato_private_evaluation_35100",mode:"narration",nextBeatId:null});
   context.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940={minatoPerformance:()=>[
