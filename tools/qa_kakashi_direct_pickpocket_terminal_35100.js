@@ -59,6 +59,43 @@ assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).p
 const directReturn=context.__qaScene.beatMap.get("kak_scene03d_pickpocket_failure_3v1_return_34710");
 assert(directReturn.onEnterConsequences.some(row=>row.requestId==="kakashi_terminal_capture_35100::kak_scene03d_pickpocket_failure_3v1_return_34710"),"35100 did not bind direct Pickpocket 3-v-1 capture");
 
+// Gen83 regression: approved immediate Battle rewards are not terminal/debrief
+// rewards and must not block Story return. This reproduces the installed-browser
+// PS diagnostic kakashi_terminal_battle_illegally_granted_reward.
+run(`resetQA("qa-ps-immediate-reward");__qaRuntime.battleResume={authored:{
+  battleOccurrenceId:"battle-ps-immediate-1",battleConfigId:"academy_kakashi_origin_battle_seq_ps",storyOccurrenceId:__qaRuntime.instanceId,
+  sourceAnchorRef:"AK_SA_022",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",resultState:"player_side_victory",playerActionOpportunityCount:2,
+  participants:[{participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}],
+  rewardGranted:true,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false,
+  immediateBattleReward:{success:true,qualifies:true,claimed:true,
+    entitlement:{parentFamily:"kak_origin_battle_downstream_cash_reward_v1",battleConfigId:"academy_kakashi_origin_battle_seq_ps",battleOccurrenceId:"battle-ps-immediate-1",materialReward:{ryo:50,items:[],genericExp:0,rareDrops:[]}}
+  }
+}};`);
+let immediateCapture=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_seq_ps")`);
+assert.strictEqual(immediateCapture.success,true,"approved PS 50 Ryō Battle reward must not block Story return: "+JSON.stringify(immediateCapture));
+assert.strictEqual(immediateCapture.battle.immediateBattleRewardAuthorised,true);
+assert.strictEqual(immediateCapture.battle.immediateBattleRewardClass,"downstream_cash");
+
+// rewardGranted without an exact source-scoped receipt still fails closed.
+run(`resetQA("qa-illegal-unscoped-reward");__qaRuntime.battleResume={authored:{
+  battleOccurrenceId:"battle-illegal-1",battleConfigId:"academy_kakashi_origin_battle_seq_ps",resultState:"player_side_victory",
+  participants:[],rewardGranted:true,lootGranted:false
+}};`);
+let illegalCapture=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_seq_ps")`);
+assert.strictEqual(illegalCapture.success,false);
+assert.strictEqual(illegalCapture.reason,"kakashi_terminal_battle_illegally_granted_reward");
+assert.strictEqual(illegalCapture.violation,"unscoped_or_unclaimed_battle_reward");
+
+// generic Battle loot remains forbidden; terminal/debrief grant authority is separate.
+run(`resetQA("qa-illegal-generic-loot");__qaRuntime.battleResume={authored:{
+  battleOccurrenceId:"battle-illegal-loot-1",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",resultState:"player_side_victory",
+  participants:[],rewardGranted:false,lootGranted:true
+}};`);
+illegalCapture=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_amt_ps_mi_3v1")`);
+assert.strictEqual(illegalCapture.success,false);
+assert.strictEqual(illegalCapture.violation,"generic_battle_loot_not_authorised");
+
+
 function commitPackageOccurrence(id,fact,outcome,participantRefs=[]){
   context.qaCommitOccurrence("academy_kakashi",id,fact,[],{type:"origin_story_factual_occurrence",outcome,participantRefs});
   context.__qaRuntime.localContext.kakashiDirectPickpocketPackageOccurrenceId=id;
