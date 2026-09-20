@@ -176,10 +176,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-7' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260920-8' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-73' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260920-73";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260920-74' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260920-74";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -261,6 +261,8 @@ jobs:
           grep -Fq '77d351e6f8d4eefaea0f8a6db82dec686391e1c0' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           ! grep -Fq 'ATTEMPT TO KILL HIM' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'academy_kakashi.battle.stop_assassin_post_mi_ps' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
+          grep -Fq 'sc35600-ak-sa-033-post-mi-ps-recovery' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
+          grep -Fq 'alpha_kakashi_seq_post_ps_recovery_35600_v2_2026_09_20' runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js
           grep -Fq '0d4aa441e4ef6d566f3d1df23c198940bdc559dd' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq 'alpha_kakashi_deterministic_kill_35810_v2_2026_09_19' runtime/alpha-kakashi-deterministic-kill-35810.js
           grep -Fq '1ff3876e9b367ec518c254b612e4def14db8eaba' runtime/alpha-kakashi-deterministic-kill-35810.js

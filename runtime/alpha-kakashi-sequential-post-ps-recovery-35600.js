@@ -13,7 +13,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_SEQ_POST_PS_RECOVERY_35600)return;
 
-const PATCH_ID="alpha_kakashi_seq_post_ps_recovery_35600_v1_2026_09_17";
+const PATCH_ID="alpha_kakashi_seq_post_ps_recovery_35600_v2_2026_09_20";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const RECOVERY_BEAT="kak_seq_secure_package_after_ps";
@@ -38,6 +38,14 @@ function latestResult(){const rt=active();return rt&&rt.sceneId===SCENE_ID&&rt.b
 function factOf(row){return row&&(row.fact||row.data)||{};}
 function normalizeBeat(row,index){return typeof normalizeStorySceneBeat==="function"?normalizeStorySceneBeat(row,index):row;}
 function isVictory(result){return !!result&&String(result.resultState||"")==="player_side_victory";}
+function recoveryOccurrenceIdFor(result,rt){
+  const binding=String(result&&result.bindingRef||"");
+  if(binding!==STOP_ASSASSIN_POST_MI_PS_BINDING)return RECOVERY_OCCURRENCE_ID;
+  const identity={storySceneInstanceId:String(rt&&rt.instanceId||""),battleOccurrenceId:String(result&&result.battleOccurrenceId||""),anchorRef:RECOVERY_ANCHOR};
+  return typeof CORE.stableRef==="function"
+    ?CORE.stableRef("sc35600-ak-sa-033-post-mi-ps-recovery",identity)
+    :RECOVERY_OCCURRENCE_ID+"::post-mi::"+identity.battleOccurrenceId;
+}
 
 function requireAuthority(){
   if(!A||typeof A.findOccurrence!=="function"||typeof A.commitOccurrence!=="function")return{success:false,reason:"kakashi_ak_sa_033_origin_occurrence_owner_missing"};
@@ -83,6 +91,7 @@ function resolveSequentialPostPsPackageRecovery35600(){
   if(!rt||rt.sceneId!==SCENE_ID)return{success:false,reason:"kakashi_ak_sa_033_story_instance_missing"};
   if(!result||!result.battleOccurrenceId)return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_missing"};
   if(String(result.battleConfigId||"")!==PS_CONFIG||![SEQUENTIAL_BINDING,STOP_ASSASSIN_POST_MI_PS_BINDING].includes(String(result.bindingRef||"")))return{success:false,reason:"kakashi_ak_sa_033_ps_battle_receipt_mismatch"};
+  const recoveryOccurrenceId=recoveryOccurrenceIdFor(result,rt);
 
   const parent=parentPackageOccurrence(rt);if(!parent.success)return parent;
 
@@ -103,7 +112,7 @@ function resolveSequentialPostPsPackageRecovery35600(){
   // Ordering lock: post-Battle classification happens before package recovery.
   const classification=classifyPackageSmugglerDefeat(result);if(!classification.success)return classification;
 
-  const existing=A.findOccurrence(RECOVERY_OCCURRENCE_ID);
+  const existing=A.findOccurrence(recoveryOccurrenceId);
   if(existing){
     const prior=factOf(existing),pkg=prior.packageState||{};
     if(String(prior.storySceneInstanceId||"")!==String(rt.instanceId||"")||
@@ -144,7 +153,7 @@ function resolveSequentialPostPsPackageRecovery35600(){
       },
       nextPostResolutionAnchorRef:"AK_SA_024"
     };
-    const committed=A.commitOccurrence(ORIGIN_ID,RECOVERY_OCCURRENCE_ID,fact,[],{
+    const committed=A.commitOccurrence(ORIGIN_ID,recoveryOccurrenceId,fact,[],{
       type:"origin_story_factual_occurrence",
       outcome:"SECURE_PACKAGE_AFTER_PS",
       participantRefs:[ORIGIN_ID,PACKAGE_SMUGGLER_REF],
@@ -163,21 +172,21 @@ function resolveSequentialPostPsPackageRecovery35600(){
     storyUnitRef:ORIGIN_ID,
     materialRef:WORLD_OBJECT_REF,
     resolved:true,
-    stateRef:RECOVERY_OCCURRENCE_ID,
+    stateRef:recoveryOccurrenceId,
     value:{custodyClass:"KAKASHI",locationClass:"KAKASHI_PERSON",sourceAnchorRef:RECOVERY_ANCHOR,packageRecovered:true,packageRecoverable:false}
   });
   if(!material||material.success!==true)return material||{success:false,reason:"kakashi_ak_sa_033_material_state_commit_failed"};
 
   rt.localContext={...(rt.localContext||{}),
-    kakashiSequentialPackageOccurrenceId:RECOVERY_OCCURRENCE_ID,
-    kakashiSequentialPackageOccurrenceId35100:RECOVERY_OCCURRENCE_ID,
+    kakashiSequentialPackageOccurrenceId:recoveryOccurrenceId,
+    kakashiSequentialPackageOccurrenceId35100:recoveryOccurrenceId,
     kakashiSequentialPackageRecoveryCommitted:true,
     kakashiSequentialPackageResolutionReady:true,
     kakashiSequentialPackageRecoveryClassificationRef:classification.resultRef,
     kakashiSequentialPackageResolutionAnchor:RECOVERY_ANCHOR
   };
   save();
-  return{success:true,recovered:true,packageOccurrenceId:RECOVERY_OCCURRENCE_ID,classificationRef:classification.resultRef};
+  return{success:true,recovered:true,packageOccurrenceId:recoveryOccurrenceId,classificationRef:classification.resultRef};
 }
 
 function install(){
@@ -213,9 +222,10 @@ function install(){
 function diagnostics(){
   const def=scene(),battleBeat=def&&def.beatMap instanceof Map?def.beatMap.get(PS_BATTLE_BEAT):null,recovery=def&&def.beatMap instanceof Map?def.beatMap.get(RECOVERY_BEAT):null;
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_seq_post_ps_recovery_35600_v1_2026_09_17",
+    patchId:PATCH_ID==="alpha_kakashi_seq_post_ps_recovery_35600_v2_2026_09_20",
     writingAuthorityExact:RECOVERY_ANCHOR==="AK_SA_033"&&RECOVERY_OCCURRENCE_ID==="kak_seq_secure_package_after_ps",
     stopAssassinBindingAccepted:resolveSequentialPostPsPackageRecovery35600.toString().includes("STOP_ASSASSIN_POST_MI_PS_BINDING"),
+    postMiRecoveryOccurrenceBattleScoped:recoveryOccurrenceIdFor.toString().includes("sc35600-ak-sa-033-post-mi-ps-recovery")&&recoveryOccurrenceIdFor.toString().includes("battleOccurrenceId")&&recoveryOccurrenceIdFor.toString().includes("STOP_ASSASSIN_POST_MI_PS_BINDING"),
     semanticActionExact:resolveSequentialPostPsPackageRecovery35600.toString().includes('semanticAction:"SECURE_PACKAGE_AFTER_PS"'),
     battleVictoryNotCustodyOwner:classifyPackageSmugglerDefeat.toString().includes("recordParticipantClassification")&&resolveSequentialPostPsPackageRecovery35600.toString().includes("commitOccurrence"),
     classificationBeforeRecovery:resolveSequentialPostPsPackageRecovery35600.toString().indexOf("classifyPackageSmugglerDefeat")<resolveSequentialPostPsPackageRecovery35600.toString().indexOf("commitOccurrence"),
