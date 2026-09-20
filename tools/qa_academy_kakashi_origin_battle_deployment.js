@@ -88,6 +88,12 @@ assert.strictEqual(exact.launchType,"function");assert.strictEqual(exact.pakkunA
 run(fs.readFileSync(path.join(root,"runtime","alpha-alpha-sprint-33100.js"),"utf8"),"runtime/alpha-alpha-sprint-33100.js");
 const claimedPsReturn=JSON.parse(JSON.stringify(run(`(()=>{
   const SCENE="origin_academy_kakashi_anbu_retrieval",KAK="academy_kakashi",PS="academy_kakashi_origin_package_smuggler";
+  const qaNodes=new Map();
+  const qaScreenOverlay={id:"screen-overlay",style:{display:"flex"},dataset:{},childNodes:[],innerHTML:"",setAttribute(){},querySelector(){return null;},querySelectorAll(){return[];}};
+  qaNodes.set("screen-overlay",qaScreenOverlay);
+  const priorGetElementById=document.getElementById,priorBodyAppend=document.body.appendChild;
+  document.getElementById=id=>qaNodes.get(id)||priorGetElementById.call(document,id);
+  document.body.appendChild=node=>{if(node&&node.id)qaNodes.set(node.id,node);return node;};
   unregisterStoryScene(SCENE);
   const registered=registerStoryScene({sceneId:SCENE,entryBeatId:"qa_ps_battle",beats:[
     {beatId:"qa_ps_battle",mode:"battle_transition",battle:{encounterId:"academy_kakashi_origin_battle_seq_ps",postBattleBeatId:"qa_ps_return",resultProjector:projectAcademyKakashiOriginBattleResult}},
@@ -113,11 +119,17 @@ const claimedPsReturn=JSON.parse(JSON.stringify(run(`(()=>{
   runtime.remainingPL.player[KAK]={maximum:20,current:12};runtime.remainingPL.enemy[PS]={maximum:10,current:0};
   runtime.actionOpportunityState.counters.player[KAK]=2;currentOverlayType="victory";
   const returned=continueAfterVictory(),active=getActiveStorySceneRuntime(),authored=active&&active.battleResume&&active.battleResume.authored;
-  return{success:returned&&returned.success===true,priority:returned&&returned.alpha33100StoryReturnPriority===true,beatId:active&&active.beatId,consumed:active&&active.localContext&&active.localContext.qaClaimedPsReturnConsumed===true,returnContextCleared:currentBattle.returnContext===null,recovered:currentBattle.kakashiOriginDeployment,authored};
+  const storyLayer=qaNodes.get("story-scene-presentation-layer")||null;
+  const result={success:returned&&returned.success===true,priority:returned&&returned.alpha33100StoryReturnPriority===true,beatId:active&&active.beatId,consumed:active&&active.localContext&&active.localContext.qaClaimedPsReturnConsumed===true,returnContextCleared:currentBattle.returnContext===null,recovered:currentBattle.kakashiOriginDeployment,authored,victorySurfaceReleased:qaScreenOverlay.style.display==="none"&&currentOverlayType===null,storyPresentationVisible:!!storyLayer&&storyLayer.style.display==="flex"&&String(storyLayer.innerHTML||"").includes("PS return restored."),presentationMetadata:returned&&returned.alpha33100VictorySurfaceReleased===true&&returned.alpha33100StoryPresentationRefreshed===true};
+  document.getElementById=priorGetElementById;document.body.appendChild=priorBodyAppend;
+  return result;
 })()`,"claimed-ps-return.js")));
 assert.strictEqual(claimedPsReturn.success,true,"claimed PS RETURN TO STORY failed through real core caller restoration");
 assert.strictEqual(claimedPsReturn.priority,true,"33100 Story caller did not own claimed PS continuation");
 assert.strictEqual(claimedPsReturn.beatId,"qa_ps_win");assert.strictEqual(claimedPsReturn.consumed,true);assert.strictEqual(claimedPsReturn.returnContextCleared,true);
+assert.strictEqual(claimedPsReturn.victorySurfaceReleased,true,"claimed PS RETURN TO STORY left the Victory screen overlay visible");
+assert.strictEqual(claimedPsReturn.storyPresentationVisible,true,"claimed PS RETURN TO STORY did not expose the resumed Story presentation");
+assert.strictEqual(claimedPsReturn.presentationMetadata,true,"33100 claimed Story return did not report presentation teardown/refresh");
 assert.strictEqual(claimedPsReturn.recovered.battleConfigId,"academy_kakashi_origin_battle_seq_ps");
 assert.strictEqual(claimedPsReturn.recovered.bindingRef,"academy_kakashi.battle.stop_assassin_post_mi_ps");
 assert.strictEqual(claimedPsReturn.recovered.playerActionOpportunityCount,2);

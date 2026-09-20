@@ -35,6 +35,33 @@
   // A committed Story caller is more specific authority and must be restored
   // before those generic fallbacks.
   const priorContinueAfterVictory33100=typeof continueAfterVictory==="function"?continueAfterVictory:null;
+
+  // Story presentation is a separate layer from the global screen overlay. The
+  // core Story resume intentionally leaves currentOverlayType unchanged when it
+  // renders that layer. If Victory was the Battle surface, explicitly release
+  // only that stale surface after semantic Story restoration has succeeded.
+  function settleClaimedStoryVictoryPresentation33100(){
+    let victorySurfaceReleased=false;
+    let storyPresentationRefreshed=false;
+    try{
+      if(typeof currentOverlayType!=="undefined"&&currentOverlayType==="victory"){
+        const overlay=typeof document!=="undefined"?document.getElementById("screen-overlay"):null;
+        if(overlay&&overlay.style)overlay.style.display="none";
+        currentOverlayType=null;
+        victorySurfaceReleased=true;
+      }
+    }catch(_error){}
+    try{
+      if(typeof renderStoryScenePresentationLayer==="function"){
+        storyPresentationRefreshed=renderStoryScenePresentationLayer()!==false;
+      }
+    }catch(_error){}
+    return{
+      alpha33100VictorySurfaceReleased:victorySurfaceReleased,
+      alpha33100StoryPresentationRefreshed:storyPresentationRefreshed
+    };
+  }
+
   function continueAfterVictory33100(){
     const battle=typeof currentBattle!=="undefined"?currentBattle:null;
     const rc=battle&&battle.returnContext||null;
@@ -48,7 +75,10 @@
       const result=typeof resumeBattleCallerAfterCompletion==="function"
         ?resumeBattleCallerAfterCompletion("victory")
         :{success:false,reason:"battle_caller_resume_api_missing"};
-      if(result&&result.success===true)return {...result,alpha33100StoryReturnPriority:true};
+      if(result&&result.success===true){
+        const presentation=settleClaimedStoryVictoryPresentation33100();
+        return {...result,...presentation,alpha33100StoryReturnPriority:true};
+      }
       try{if(typeof openOverlay==="function")openOverlay("victory");}catch(_error){}
       return{
         success:false,
@@ -324,6 +354,7 @@
   // --------------------------------------------------------------------------
   function runAlphaPlayableSprint33100Diagnostics(){
     const continueSrc=continueAfterVictory33100.toString();
+    const storyReturnPresentationSrc=settleClaimedStoryVictoryPresentation33100.toString();
     const setbackSrc=markBattleSetback33100.toString();
     const promotionSrc=openArenaPromotionSurface33100.toString();
     const utilitySrc=openAlphaArenaUtilitySurface33100.toString();
@@ -331,6 +362,8 @@
       storyReturnOutranksLegacy:continueSrc.includes('rc.type==="story_scene"')&&continueSrc.indexOf("resumeBattleCallerAfterCompletion")<continueSrc.indexOf("priorContinueAfterVictory33100"),
       storyReturnFailsClosed:continueSrc.includes("alpha33100StoryReturnFailClosed:true")&&continueSrc.includes("genericBattleFallbackSuppressed:true")&&continueSrc.includes('openOverlay("victory")'),
       rewardsStillRequiredBeforeStoryReturn:continueSrc.includes("claimed")&&continueSrc.includes("rewards.claimed"),
+      claimedStoryReturnReleasesStaleVictorySurface:storyReturnPresentationSrc.includes('currentOverlayType==="victory"')&&storyReturnPresentationSrc.includes('overlay.style.display="none"')&&storyReturnPresentationSrc.includes("currentOverlayType=null"),
+      claimedStoryReturnRefreshesStoryLayer:storyReturnPresentationSrc.includes("renderStoryScenePresentationLayer"),
       defeatIsBattlePLWithdrawal:setbackSrc.includes("battlePLWithdrawal:true"),
       defeatDoesNotInferInjuryOrDeath:setbackSrc.includes("injuryInferred:false")&&setbackSrc.includes("deathInferred:false"),
       setbackExactCallerReturn:continueAfterSetback33100.toString().includes('resumeBattleCallerAfterCompletion("defeat")'),
