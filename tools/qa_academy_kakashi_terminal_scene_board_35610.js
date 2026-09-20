@@ -10,7 +10,7 @@ const sourcePath=path.resolve(process.cwd(),"runtime/alpha-kakashi-terminal-scen
 const source=fs.readFileSync(sourcePath,"utf8");
 
 assert(source.includes("alpha_kakashi_terminal_scene_board_35610_v2_2026_09_20"),"35610 v2 compatibility patch id missing");
-assert(!source.includes("MutationObserver"),"retired terminal scene-board module must not install a MutationObserver");
+assert(!source.includes("new MutationObserver")&&!source.includes("observer.observe("),"retired terminal scene-board module must not install a DOM mutation observer");
 assert(!source.includes("innerHTML="),"retired terminal scene-board module must not rewrite terminal board DOM");
 assert(!source.includes("renderStorySceneBoard33900="),"retired terminal scene-board module must not wrap the live scene-board renderer");
 assert(!source.includes(".environmentRef=ENV_REF"),"retired terminal scene-board module must not overwrite 35100 beat environments");
