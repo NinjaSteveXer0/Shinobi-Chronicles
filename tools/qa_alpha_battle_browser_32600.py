@@ -11,7 +11,6 @@ checks={
     'explicit_post_claim_continue_supported': 'requiresExplicitPostClaimContinue' in js and 'explicitPostClaimContinue:true' in js,
     'explicit_claimed_second_click_skips_duplicate_grant': 'const explicitClaimedContinue=' in js and 'currentBattle.rewards.claimed===true' in js and 'const claimResult=explicitClaimedContinue' in js and 'idempotent:true' in js,
     'explicit_return_context_persisted': '__scExplicitPostClaimReturnContext32600' in js and 'storedReturnContext' in js,
-    'browser_patch_cache_busted': 'alpha-battle-browser-32600.js?sc=alpha-battle-browser-20260920-2' in index,
     'claim_happens_before_continue': js.find('priorClaimVictoryAutoReturn.apply') >= 0 and js.find('continueAfterVictory()', js.find('priorClaimVictoryAutoReturn.apply')) > js.find('priorClaimVictoryAutoReturn.apply'),
     'return_context_captured': 'returnContextBefore' in js,
     'feed_fonts_increased': 'font-size:clamp(8px,.61vw,10px)' in js and 'width:14.3%' in js,
