@@ -30,7 +30,7 @@ globalThis.getActiveStorySceneRuntime=()=>active;
 
 const captures=[];
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
- patchId:"alpha_kakashi_terminal_debrief_35100_v10_2026_09_20",
+ patchId:"alpha_kakashi_terminal_debrief_35100_v11_2026_09_21",
  deriveTerminalFacts(){return{success:true,packageRecovered:false,packageState:{holderClass:"ANBU_MARKED_TARGET",stateRef:"qa-pkg"},pakkunPresentAtDebrief:false,battleFacts:[]};},
  captureBattleResult(config){captures.push(config);return{success:true,battle:{battleConfigId:config}};},
  commitChronicleReceiptAndRewards(){return{success:true};},
