@@ -304,7 +304,6 @@ function installStyle(){
   const style=document.createElement("style");style.id=STYLE_ID;
   style.textContent=[
     "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}",
-    "#story-scene-presentation-layer .sc-chronicle-stage[data-sc-kakashi-scene06aw2c='true']{background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.40) 82%,rgba(2,5,8,.68)),var(--sc-kakashi-scene06aw2c-backdrop)!important;background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important}",
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:20%!important;gap:2.2%!important}",
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actors[data-count='2']{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5.4%!important;column-gap:0!important}",
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important}",
@@ -338,8 +337,8 @@ function renderScene(){
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
   const rt=active();
   for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!isFamily(rt))old.remove();
-  if(!isFamily(rt)){try{delete stage.dataset.scKakashiScene06aw2c;}catch(_error){}if(stage.style)stage.style.removeProperty("--sc-kakashi-scene06aw2c-backdrop");return false;}
-  installStyle();stage.dataset.scKakashiScene06aw2c="true";stage.style.setProperty("--sc-kakashi-scene06aw2c-backdrop",cssUrlValue(backdropPath()));
+  if(!isFamily(rt))return false;
+  installStyle();if(typeof globalThis.applyStorySceneBoardBackdrop33900==="function")globalThis.applyStorySceneBoardBackdrop33900(stage,rt);
   layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
   let board=stage.querySelector&&stage.querySelector("."+BOARD_CLASS);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;board.setAttribute("aria-hidden","true");stage.appendChild(board);}
   const markup=boardMarkup(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
@@ -374,7 +373,7 @@ let hooksInstalled=false,attempts=0;
 function installHooks(){
   if(hooksInstalled)return true;
   if(typeof globalThis.getStoryScenePerformance33900!=="function"||typeof globalThis.advanceStoryScene!=="function")return false;
-  const PRE_GET=globalThis.getStoryScenePerformance33900,PRE_ADVANCE=globalThis.advanceStoryScene,PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+  const PRE_GET=globalThis.getStoryScenePerformance33900,PRE_ADVANCE=globalThis.advanceStoryScene;
   globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35760(){const rt=active(),owned=isFamily(rt)?performance(rt):null;return owned||PRE_GET.apply(this,arguments);};
   globalThis.advanceStoryScene=function advanceStoryScene35760(choiceId=null){
     const rt=active();
@@ -390,7 +389,7 @@ function installHooks(){
     return PRE_ADVANCE.apply(this,arguments);
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35760(){const out=PRE_RENDER.apply(this,arguments);const settle=function(){wireSourceChoice();renderScene();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else if(typeof setTimeout==="function")setTimeout(settle,0);else settle();return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_scene06aw2c_35760",()=>{wireSourceChoice();return renderScene();});
   hooksInstalled=true;installStyle();wireSourceChoice();renderScene();return true;
 }
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks,25);}
