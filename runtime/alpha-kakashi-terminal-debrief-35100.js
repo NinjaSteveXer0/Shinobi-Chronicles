@@ -399,6 +399,7 @@ terminalPakkunDepartureClassified:commitPakkunDeparture35100.toString().includes
     pakkunDepartureExplicit:!!map&&[PAKKUN_1,PAKKUN_2,PAKKUN_3,PAKKUN_EXIT].every(id=>map.has(id)),
     guardedOriginCompletion:Array.isArray(def&&def.onCompleteConsequences)&&def.onCompleteConsequences.length===1&&def.onCompleteConsequences[0].requestId==="complete_academy_kakashi_origin_terminal_35100",
     receiptChoiceGuarded:!!receipt&&receipt.mode==="choice"&&receipt.choices.some(row=>row.choiceId===CONTINUE_CHOICE&&typeof row.availability==="function"),
+    terminalObjectivesExplicit:!!pending&&pending.objectiveText==="Report the mission outcome to ANBU."&&!!receipt&&receipt.objectiveText==="Private review of the sealed field record."&&!!finalBeat&&finalBeat.objectiveText==="",
     finalChronicleBeat:!!finalBeat&&finalBeat.text==="YOUR CHRONICLE BEGINS"&&finalBeat.exitScene===true,
     browserGoldenClaimed:false
   };
