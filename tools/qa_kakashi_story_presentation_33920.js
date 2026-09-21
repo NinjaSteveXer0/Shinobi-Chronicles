@@ -10,12 +10,12 @@ assert(compat.includes("academy_kakashi_story_presentation_compat_33920_retired_
 assert(!/new\s+MutationObserver\s*\(/.test(compat),"retired 33920 must not construct a DOM observer");
 assert(!compat.includes("style.textContent")&&!compat.includes("addEventListener(\"click\""),"retired 33920 must own no CSS/click handler");
 assert(!restoration.includes("alpha-kakashi-story-presentation-compat-33920.js"),"33800 must not production-load retired 33920");
+assert(!canonical.includes('#story-scene-presentation-layer[data-sc-postmi-35830='),"retired 33920 route-specific dialogue geometry must not be folded back into 33910");
 assert(restoration.includes('const BUILD="scene-board-20260921-16";'));
 assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260921-16";'));
 
 for(const marker of [
  "former 33920 compatibility behavior",
- "data-sc-postmi-lane=\"field\"",
  "bindStageAdvance33910",
  "sc-scene-board-33900__actor-tag strong",
  "sc-dialogue-status-33910"
@@ -35,7 +35,7 @@ console.log(JSON.stringify({
  pass:true,
  patch:"33920-retired-v7",
  productionLoaded:false,
- replacedBy:"33910-v17",
+ replacedBy:"33910-v18",
  domObserver:false,
  browserGoldenClaimed:false
 },null,2));
