@@ -17,10 +17,10 @@ const polish=read("runtime/alpha-kakashi-scene-board-polish-33910.js");
 const terminal=read("runtime/alpha-kakashi-terminal-debrief-35100.js");
 const dynamicTerminal=read("runtime/alpha-kakashi-dynamic-terminal-35940.js");
 
-assert(/^const BUILD="kakashi-final-20260921-92";$/m.test(loader),"Kakashi loader not on gen92");
-assert(/story-decision-20260921-20/.test(integrator),"root Story delivery not generation 20");
-assert(/kakashi-final-20260921-92/.test(storyDecision),"Story Decision does not deliver Kakashi gen92");
-assert(/scene-board-20260921-16/.test(restoration),"Scene Board bootstrap not generation 16");
+assert(/^const BUILD="kakashi-final-20260921-93";$/m.test(loader),"Kakashi loader not on gen93");
+assert(/story-decision-20260921-21/.test(integrator),"root Story delivery not generation 21");
+assert(/kakashi-final-20260921-93/.test(storyDecision),"Story Decision does not deliver Kakashi gen93");
+assert(/scene-board-20260921-17/.test(restoration),"Scene Board bootstrap not generation 17");
 
 const loaded=[...loader.matchAll(/const\s+[A-Z0-9_]+_PATH="([^"]+)"/g)].map(m=>m[1]);
 assert.strictEqual(loaded.length,31,"unexpected Kakashi production child count; reconcile owner map before changing loader");
