@@ -1,0 +1,594 @@
+{
+  "schema": "shinobi-chronicles.academy-kakashi.end-to-end-route-manifest.v1",
+  "campaign": "Kakashi one-swoop end-to-end completion",
+  "campaignBaselineHead": "526aa9a58eedb3a2fb0b68035949f7689772a881",
+  "browserGoldenClaimed": false,
+  "authorities": {
+    "writingClosure": "Documentation/Story/Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20.md",
+    "pathVariationAudit": "Documentation/Story/Academy_Kakashi_100_Percent_Writing_Path_Variation_Audit_2026-09-20.md",
+    "completionGate": "Documentation/Coordination/Academy_Kakashi_Origin_Completion_Gate_2026-09-17.md",
+    "completionCampaign": "Documentation/Coordination/Coding_Runtime_Kakashi_One_Swoop_End_to_End_Completion_Campaign_2026-09-21.md"
+  },
+  "productionDelivery": {
+    "root": "runtime/alpha-origin-scenes-32900-integrator.js",
+    "storyDecision": "runtime/alpha-story-decision-realisation-34000.js",
+    "kakashiLoader": "runtime/alpha-kakashi-final-origin-adapter-34100.js",
+    "requiredGeneration": {
+      "storyDecision": "story-decision-20260921-18",
+      "kakashiFinal": "kakashi-final-20260921-89",
+      "sceneBoard": "scene-board-20260921-13"
+    }
+  },
+  "canonicalOwners": {
+    "storyChoiceSemantics": [
+      "runtime/alpha-kakashi-final-origin-adapter-34100-core.js",
+      "runtime/alpha-kakashi-final-authority-guard-34200.js"
+    ],
+    "factualResolver": [
+      "runtime/alpha-story-factual-resolver-34600.js",
+      "runtime/alpha-kakashi-factual-bindings-34700.js"
+    ],
+    "sceneBoard": [
+      "runtime/alpha-story-scene-board-33900.js",
+      "runtime/alpha-kakashi-scene-board-polish-33910.js"
+    ],
+    "directOpening": [
+      "runtime/alpha-kakashi-direct-opening-consumer-34710.js",
+      "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+    ],
+    "battleDeployment": [
+      "runtime/alpha-kakashi-origin-battle-deployment-34300.js"
+    ],
+    "battleCallerReturn": [
+      "runtime/alpha-alpha-sprint-33100.js",
+      "runtime/alpha-battle-browser-32600.js"
+    ],
+    "observeSequential": [
+      "runtime/alpha-kakashi-final-sequential-consumer-34410.js",
+      "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js"
+    ],
+    "pakkunInterception": [
+      "runtime/alpha-kakashi-pakkun-interception-35300.js"
+    ],
+    "stopAssassin": [
+      "runtime/alpha-kakashi-scene04a-35710.js",
+      "runtime/alpha-kakashi-scene05a-w-35730.js",
+      "runtime/alpha-kakashi-scene05a-l-35750.js"
+    ],
+    "lethalContinuation": [
+      "runtime/alpha-kakashi-scene06a-w2c-35760.js",
+      "runtime/alpha-kakashi-w2c-ending-35770.js",
+      "runtime/alpha-kakashi-w2c-nonkill-35780.js",
+      "runtime/alpha-kakashi-deterministic-kill-35810.js"
+    ],
+    "postMiPursuit": [
+      "runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"
+    ],
+    "routeClosure": [
+      "runtime/alpha-kakashi-konoha-route-closure-35910.js",
+      "runtime/alpha-kakashi-move-closer-closure-35930.js"
+    ],
+    "fieldSecuredCollection": [
+      "runtime/alpha-kakashi-field-secured-35920.js"
+    ],
+    "terminalSemantics": [
+      "runtime/alpha-kakashi-terminal-debrief-35100.js"
+    ],
+    "terminalProjection": [
+      "runtime/alpha-kakashi-dynamic-terminal-35940.js"
+    ],
+    "rewardsDevelopment": [
+      "runtime/alpha-kakashi-origin-rewards-34800.js",
+      "runtime/alpha-kakashi-battle-development-35740.js"
+    ],
+    "teamFormationAndFreePlay": [
+      "game.js",
+      "runtime/alpha-first-konoha-tutorial-35000.js"
+    ]
+  },
+  "commonTerminalTail": {
+    "required": [
+      "ANBU_REPORT",
+      "PAKKUN_DEPARTURE_IF_PRESENT",
+      "MINATO_PRIVATE_EVALUATION",
+      "CHRONICLE_RECEIPT_READ_ONLY",
+      "TERMINAL_REWARD_DEVELOPMENT_PROJECTION",
+      "YOUR_CHRONICLE_BEGINS",
+      "ORIGIN_COMPLETION",
+      "EXACTLY_TWO_ACADEMY_TEAMMATES",
+      "FIRST_KONOHA_ORIENTATION",
+      "ACADEMY_FREE_PLAY"
+    ],
+    "terminalOwner": "runtime/alpha-kakashi-terminal-debrief-35100.js",
+    "onboardingOwner": "runtime/alpha-first-konoha-tutorial-35000.js"
+  },
+  "coverageAxes": {
+    "resolver": [
+      "success",
+      "failure"
+    ],
+    "pursuit": [
+      "reached",
+      "lost"
+    ],
+    "battle": [
+      "player_side_victory",
+      "opposition_side_victory"
+    ],
+    "package": [
+      "ANBU_MARKED_TARGET",
+      "PACKAGE_SMUGGLER",
+      "KAKASHI",
+      "ANBU",
+      "MASKED_INTERCEPTOR",
+      "NEUTRAL_CONTESTED"
+    ],
+    "participant": [
+      "DEFEATED_BUT_NOT_CONTROLLED",
+      "CONTROLLED_DEFEATED",
+      "FIELD_SECURED_PENDING_COLLECTION",
+      "COLLECTED_ACTIVE_ESCORT",
+      "ANBU_INSTITUTIONAL_CUSTODY",
+      "UCHIHA_POLICE_INSTITUTIONAL_CUSTODY",
+      "DELIBERATELY_RELEASED",
+      "DEAD",
+      "ESCAPED"
+    ],
+    "institution": [
+      "ANBU",
+      "UCHIHA_POLICE"
+    ],
+    "pakkun": [
+      "ABSENT",
+      "PRESENT_STORY_ONLY",
+      "TEMPORARY_BATTLE_PARTICIPANT",
+      "DEPARTED"
+    ],
+    "knowledge": [
+      "NO_FABRICATION",
+      "GET_CLOSER_CONTINGENCY",
+      "ASK_DESTINATION_LIMITED"
+    ],
+    "reward": [
+      "MI_50_RYO_PLUS_FIELD_RECOVERY_PILL",
+      "PS_50_RYO",
+      "AMT_50_RYO",
+      "THREE_V_ONE_DEFERRED_25_RYO_PLUS_TANTO",
+      "TERMINAL_FACT_DEPENDENT",
+      "NO_GENERIC_EXP"
+    ]
+  },
+  "routes": [
+    {
+      "id": "watch.stop_assassin",
+      "family": "WATCH THE EXCHANGE",
+      "entry": [
+        "observe",
+        "stop_assassin"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-scene03a-35700.js",
+        "runtime/alpha-kakashi-scene04a-35710.js",
+        "runtime/alpha-kakashi-scene05a-w-35730.js",
+        "runtime/alpha-kakashi-scene05a-l-35750.js",
+        "runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_mi_1v1",
+        "academy_kakashi_origin_battle_seq_ps",
+        "academy_kakashi_origin_battle_seq_amt_pakkun"
+      ],
+      "variations": [
+        "MI_BATTLE_DEFEAT_RETURN_ANBU",
+        "MI_BATTLE_VICTORY_FAST_WINDOW",
+        "MI_BATTLE_VICTORY_SLOW_WINDOW",
+        "MI_KILL",
+        "MI_RESTRAIN_CONTINUE",
+        "MI_TRANSFER_ANBU",
+        "MI_TRANSFER_UCHIHA_POLICE",
+        "PURSUE_PS_REACHED",
+        "PURSUE_PS_LOST",
+        "PS_BATTLE_VICTORY_1_TO_3_TURNS_AMT_REMAINS_REACHABLE",
+        "PS_BATTLE_VICTORY_4_PLUS_AMT_GONE",
+        "PS_BATTLE_DEFEAT",
+        "PS_KILL",
+        "PS_TRANSFER_ANBU",
+        "PS_FIELD_SECURE_AND_CONTINUE",
+        "PURSUE_AMT_REACHED",
+        "PURSUE_AMT_LOST",
+        "AMT_BATTLE_VICTORY",
+        "AMT_BATTLE_DEFEAT_AUTONOMY_REQUIRED",
+        "AMT_TRANSFER_UCHIHA_POLICE",
+        "AMT_RELEASE",
+        "AMT_KILL",
+        "AMT_TRANSFER_ANBU",
+        "FIELD_SECURED_COLLECTION_GROUP_ANBU",
+        "FIELD_SECURED_COLLECTION_GROUP_UCHIHA_POLICE"
+      ],
+      "packageStates": [
+        "PACKAGE_SMUGGLER",
+        "KAKASHI",
+        "ANBU"
+      ],
+      "pakkun": [
+        "ABSENT",
+        "PRESENT_STORY_ONLY",
+        "TEMPORARY_BATTLE_PARTICIPANT",
+        "DEPARTED"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_scene04a_35710.js",
+        "tools/qa_academy_kakashi_scene05a_w_35730.js",
+        "tools/qa_academy_kakashi_scene05a_l_35750.js",
+        "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js",
+        "tools/qa_academy_kakashi_field_secured_35920.js"
+      ]
+    },
+    {
+      "id": "watch.secure_package",
+      "family": "WATCH THE EXCHANGE",
+      "entry": [
+        "observe",
+        "secure_package"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-final-sequential-consumer-34410.js",
+        "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_ps_mi_2v1"
+      ],
+      "variations": [
+        "BATTLE_VICTORY_PACKAGE_FACT_RESOLVED_BY_OWNING_RETURN",
+        "BATTLE_DEFEAT_NO_FALSE_CUSTODY",
+        "POST_BATTLE_STATE_REMAINS_NONTERMINAL_UNTIL_FACTS_CLOSE"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_sequential_consumer.js",
+        "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+      ]
+    },
+    {
+      "id": "watch.secure_package_before_assassin",
+      "family": "WATCH THE EXCHANGE",
+      "entry": [
+        "observe",
+        "secure_package_before_assassin"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_ps_mi_2v1"
+      ],
+      "variations": [
+        "RESOLVER_SUCCESS_CLEAN_EXTRACTION",
+        "RESOLVER_FAILURE_RECONVERGE_EXISTING_SECURE_PACKAGE_2V1",
+        "BATTLE_VICTORY",
+        "BATTLE_DEFEAT"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+      ]
+    },
+    {
+      "id": "watch.defeat_assassin_then_secure",
+      "family": "WATCH THE EXCHANGE",
+      "entry": [
+        "observe",
+        "defeat_assassin_then_secure"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-final-sequential-consumer-34410.js",
+        "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_seq_mi",
+        "academy_kakashi_origin_battle_seq_ps",
+        "academy_kakashi_origin_battle_seq_amt_pakkun"
+      ],
+      "variations": [
+        "MI_VICTORY_WITHIN_4_ACTION_GATE",
+        "MI_DEFEAT",
+        "PS_VICTORY_WITHIN_3_ACTION_GATE",
+        "PS_DEFEAT",
+        "AK_SA_033_PACKAGE_RECOVERY",
+        "AMT_REACHED_ONLY_WHEN_GATE_PRESERVED",
+        "AMT_BATTLE_VICTORY",
+        "AMT_BATTLE_DEFEAT"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_sequential_consumer.js",
+        "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
+        "tools/qa_academy_kakashi_origin_battle_deployment.js"
+      ]
+    },
+    {
+      "id": "watch.go_after_original_target",
+      "family": "WATCH THE EXCHANGE",
+      "entry": [
+        "observe",
+        "go_after_original_target"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_seq_amt_pakkun"
+      ],
+      "variations": [
+        "PURSUIT_REACHED",
+        "PURSUIT_LOST",
+        "BATTLE_VICTORY",
+        "BATTLE_DEFEAT",
+        "POST_BATTLE_ANBU",
+        "POST_BATTLE_UCHIHA_POLICE",
+        "POST_BATTLE_RELEASE",
+        "POST_BATTLE_KILL"
+      ],
+      "packageStates": [
+        "PACKAGE_SMUGGLER"
+      ],
+      "pakkun": [
+        "PRESENT_STORY_ONLY",
+        "TEMPORARY_BATTLE_PARTICIPANT",
+        "DEPARTED"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+      ]
+    },
+    {
+      "id": "move_closer.success.let_handoff_happen",
+      "family": "MOVE IN CLOSER",
+      "entry": [
+        "get_closer",
+        "resolver_success",
+        "let_handoff_happen"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "variations": [
+        "AUTHORED_HANDOFF_PERFORMANCE",
+        "RECONVERGE_WATCH_EXCHANGE_FIVE_CHOICE_SURFACE",
+        "GET_CLOSER_KNOWLEDGE_PRESERVED"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_get_closer_factual_commit.js",
+        "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+      ]
+    },
+    {
+      "id": "move_closer.success.strike_before_handoff",
+      "family": "MOVE IN CLOSER",
+      "entry": [
+        "get_closer",
+        "resolver_success",
+        "strike_before_handoff"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-move-closer-closure-35930.js",
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_amt_ps_2v1",
+        "academy_kakashi_origin_battle_mi_1v1"
+      ],
+      "variations": [
+        "FIRST_BATTLE_VICTORY_THEN_MI",
+        "FIRST_BATTLE_DEFEAT",
+        "MI_BATTLE_VICTORY",
+        "MI_BATTLE_DEFEAT",
+        "GROUP_ANBU",
+        "GROUP_UCHIHA_POLICE",
+        "GROUP_KILL",
+        "GROUP_RELEASE"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_move_closer_closure_35930.js",
+        "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+      ]
+    },
+    {
+      "id": "move_closer.success.attempt_pickpocket",
+      "family": "MOVE IN CLOSER",
+      "entry": [
+        "get_closer",
+        "resolver_success",
+        "attempt_pickpocket"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-move-closer-closure-35930.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_amt_ps_2v1"
+      ],
+      "variations": [
+        "RESOLVER_SUCCESS",
+        "RESOLVER_FAILURE_DETECTED_2V1",
+        "BATTLE_VICTORY",
+        "BATTLE_DEFEAT",
+        "GROUP_ANBU",
+        "GROUP_UCHIHA_POLICE",
+        "GROUP_KILL",
+        "GROUP_RELEASE"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+      ]
+    },
+    {
+      "id": "move_closer.failure.stay_on_package",
+      "family": "MOVE IN CLOSER",
+      "entry": [
+        "get_closer",
+        "resolver_failure",
+        "stay_on_package"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-factual-state-commit-34120.js",
+        "runtime/alpha-kakashi-pakkun-interception-35300.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_kakashi_pakkun_vs_amt"
+      ],
+      "variations": [
+        "PURSUIT_REACHED",
+        "PURSUIT_LOST",
+        "DEMAND_PACKAGE",
+        "TAKE_HIM_DOWN",
+        "ASK_DESTINATION_THEN_DEMAND",
+        "ASK_DESTINATION_THEN_TAKE",
+        "BATTLE_VICTORY",
+        "BATTLE_DEFEAT",
+        "ANBU",
+        "UCHIHA_POLICE",
+        "RELEASE",
+        "KILL"
+      ],
+      "pakkun": [
+        "PRESENT_STORY_ONLY",
+        "TEMPORARY_BATTLE_PARTICIPANT",
+        "DEPARTED"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_get_closer_factual_commit.js",
+        "tools/qa_kakashi_pakkun_interception_35300.js"
+      ]
+    },
+    {
+      "id": "move_closer.failure.stop_package_smuggler",
+      "family": "MOVE IN CLOSER",
+      "entry": [
+        "get_closer",
+        "resolver_failure",
+        "stop_package_smuggler"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-move-closer-closure-35930.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_ps_1v1"
+      ],
+      "variations": [
+        "BATTLE_VICTORY",
+        "BATTLE_DEFEAT",
+        "PS_RESTRAIN",
+        "PS_KILL",
+        "PS_ANBU",
+        "PS_UCHIHA_POLICE",
+        "PACKAGE_REMAINS_WITH_ESCAPED_AMT"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+      ]
+    },
+    {
+      "id": "move_closer.failure.cut_off_sakura",
+      "family": "MOVE IN CLOSER",
+      "entry": [
+        "get_closer",
+        "resolver_failure",
+        "cut_off_sakura"
+      ],
+      "owners": [
+        "runtime/alpha-kakashi-move-closer-closure-35930.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_amt_ps_2v1"
+      ],
+      "variations": [
+        "PAKKUN_STORY_PRESENT_NO_BATTLE_ACTION",
+        "BATTLE_VICTORY",
+        "BATTLE_DEFEAT",
+        "GROUP_ANBU",
+        "GROUP_UCHIHA_POLICE",
+        "GROUP_KILL",
+        "GROUP_RELEASE"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+      ]
+    },
+    {
+      "id": "direct.strike_before_handoff",
+      "family": "DIRECT ROOT",
+      "entry": [
+        "attack"
+      ],
+      "presentationLabel": "STRIKE BEFORE THE HANDOFF",
+      "owners": [
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_amt_ps_2v1",
+        "academy_kakashi_origin_battle_mi_1v1"
+      ],
+      "variations": [
+        "FIRST_BATTLE_VICTORY_PACKAGE_SECURED",
+        "FIRST_BATTLE_DEFEAT_AMT_PS_ESCAPE",
+        "MI_ARRIVAL",
+        "MI_BATTLE_VICTORY",
+        "MI_BATTLE_DEFEAT",
+        "TAKE_THEM_UCHIHA_POLICE",
+        "TAKE_THEM_ANBU",
+        "KILL_THEM",
+        "TAKE_PACKAGE_LET_THEM_GO"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_scene02_direct_choices_34710.js",
+        "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+      ]
+    },
+    {
+      "id": "direct.slip_in_for_package",
+      "family": "DIRECT ROOT",
+      "entry": [
+        "attempt_pickpocket"
+      ],
+      "presentationLabel": "SLIP IN FOR THE PACKAGE",
+      "owners": [
+        "runtime/alpha-kakashi-direct-opening-consumer-34710.js"
+      ],
+      "battles": [
+        "academy_kakashi_origin_battle_amt_ps_mi_3v1"
+      ],
+      "variations": [
+        "PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION",
+        "PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",
+        "THREE_V_ONE_VICTORY_PACKAGE_KAKASHI",
+        "THREE_V_ONE_DEFEAT_PACKAGE_AMT",
+        "NO_PAKKUN",
+        "THREE_V_ONE_DEFERRED_25_RYO_PLUS_TANTO"
+      ],
+      "qa": [
+        "tools/qa_academy_kakashi_scene02_direct_choices_34710.js",
+        "tools/qa_kakashi_direct_pickpocket_terminal_35100.js",
+        "tools/qa_kakashi_battle_development_35740.js"
+      ]
+    }
+  ],
+  "globalQa": [
+    "tools/qa_academy_kakashi_origin_battle_deployment.js",
+    "tools/qa_kakashi_battle_interaction_34500.js",
+    "tools/qa_kakashi_origin_rewards_34800.js",
+    "tools/qa_kakashi_battle_development_35740.js",
+    "tools/qa_kakashi_terminal_debrief_35100.js",
+    "tools/qa_academy_kakashi_dynamic_terminal_35940.js",
+    "tools/qa_academy_kakashi_browser_acceptance_35950.js",
+    "tools/qa_academy_kakashi_completion_tail_36000.js"
+  ],
+  "saveLoadBoundaries": [
+    "ACTIVE_STORY_CHOICE",
+    "BATTLE_CALLER_CONTEXT",
+    "POST_CLAIM_PRE_RETURN",
+    "POST_BATTLE_FACTUAL_RETURN",
+    "FIELD_SECURED_COLLECTION",
+    "TERMINAL_DEBRIEF_PRE_RECEIPT",
+    "REWARD_RECEIPT_COMMITTED",
+    "TEAM_FORMATION_COMMITTED",
+    "FIRST_KONOHA_PENDING",
+    "ACADEMY_FREE_PLAY"
+  ]
+}
