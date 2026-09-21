@@ -368,6 +368,106 @@ Writing complete != runtime implemented.
 
 ---
 
+## 6A. Mandatory full-Origin Writing preflight before Coding
+
+Before declaring **ORIGIN IMPLEMENTATION PACKAGE COMPLETE**, Writing must perform one full-Origin continuity/read-through pass.
+
+This exists because individual scenes can each look correct while the complete route still contains:
+
+- a missing actor;
+- a character who disappears/reappears without cause;
+- wrong speaker ownership;
+- duplicated or stale dialogue;
+- objective drift;
+- backdrop mismatch;
+- inconsistent package/participant state;
+- branch wording that no longer matches the actual transition;
+- terminal dialogue that forgets earlier history;
+- a scene that technically has prose but does not feel like the same story.
+
+The preflight must verify:
+
+### Actor continuity matrix
+
+For every scene/branch:
+
+- who is present;
+- who enters;
+- who leaves;
+- who is merely referenced;
+- who is dead / escaped / restrained / escorted / institutionally held;
+- exact visible actor assets;
+- observer-safe labels.
+
+A participant must not vanish from presentation merely because Coding was not told to stage them.
+
+### Whole-Origin prose pass
+
+Read the Origin as a player would encounter it.
+
+Check:
+
+- dialogue still sounds like the correct character;
+- narration and dialogue do not contradict;
+- approved lines are not accidentally duplicated;
+- branch-specific lines do not leak into sibling routes;
+- pronouns/singular/plural match exact participant state;
+- no stale earlier draft survives;
+- no admin/debug language appears;
+- emotional continuity makes sense after wins, losses, kills, releases and custody outcomes.
+
+If Writing finds a line that is wrong after Stephen already approved it, show the exact correction to Stephen before changing durable authority.
+
+### Scene-to-scene causal continuity
+
+For every edge:
+
+```text
+SCENE A committed facts
+-> resolver/result
+-> SCENE B entry predicates
+```
+
+must reconcile exactly.
+
+No successor scene may require a fact its predecessor did not create.
+
+### Presentation inventory
+
+Verify exact:
+
+- backdrop;
+- actors;
+- cards/portraits;
+- object visibility;
+- dialogue speaker;
+- objective;
+- transition style.
+
+### Terminal continuity
+
+For every route family verify the terminal projection remembers all material earlier facts and does not collapse:
+
+- prior kills;
+- earlier restraint/custody;
+- package state;
+- Knowledge;
+- Pakkun involvement;
+- deliberate release vs escape;
+- reward predicates.
+
+### No implementation ambiguity
+
+Writing must explicitly answer any question that would otherwise force Coding to guess what the player should see or what scene comes next.
+
+The goal is:
+
+> **Coding receives no avoidable narrative ambiguity.**
+
+This preflight is still Writing/design validation, not runtime proof.
+
+---
+
 ## 7. One clean Coding handoff
 
 Once the Writing package is complete, send one implementation-ready handoff to Coding.
