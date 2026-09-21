@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v11_2026_09_21";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -320,6 +320,14 @@ function guardedOriginCompletion35100(){
   if(typeof completeChronicleOriginPrologue!=="function")return{success:false,reason:"origin_completion_authority_missing"};
   return completeChronicleOriginPrologue(ORIGIN_ID,ids);
 }
+function enterCanonicalReceipt35100(){
+  const rt=active();if(!rt)return{success:false,reason:"kakashi_terminal_story_runtime_missing"};
+  const debrief=commitTerminalDebrief35100();if(!debrief||debrief.success!==true)return debrief||{success:false,reason:"kakashi_terminal_debrief_commit_failed"};
+  const receipt=commitChronicleReceiptAndRewards35100();if(!receipt||receipt.success!==true)return receipt||{success:false,reason:"kakashi_terminal_receipt_reward_commit_failed"};
+  rt.beatId=RECEIPT_BEAT;rt.localContext={...(rt.localContext||{}),__kakashiTerminalCanonicalReceipt35100:true};save();
+  try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}
+  return{success:true,beatId:RECEIPT_BEAT,terminalDebriefOccurrenceId:String(debrief.occurrenceId||debrief.terminalDebriefOccurrenceId||""),receiptOccurrenceId:String(receipt.receiptOccurrenceId||"")};
+}
 function debriefSummaryText(){
   const row=committedDebrief(),fact=factOf(row);if(!row)return"The report has not been factually committed.";
   const recovered=fact.rewardFacts&&fact.rewardFacts.packageRecovered===true;
@@ -374,7 +382,7 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v11_2026_09_21",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
     pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
@@ -401,6 +409,7 @@ terminalPakkunDepartureClassified:commitPakkunDeparture35100.toString().includes
     receiptChoiceGuarded:!!receipt&&receipt.mode==="choice"&&receipt.choices.some(row=>row.choiceId===CONTINUE_CHOICE&&typeof row.availability==="function"),
     terminalObjectivesExplicit:!!pending&&pending.objectiveText==="Report the mission outcome to ANBU."&&!!receipt&&receipt.objectiveText==="Private review of the sealed field record."&&!!finalBeat&&finalBeat.objectiveText==="",
     finalChronicleBeat:!!finalBeat&&finalBeat.text==="YOUR CHRONICLE BEGINS"&&finalBeat.exitScene===true,
+    canonicalRouteReceiptHandoff:enterCanonicalReceipt35100.toString().includes("commitTerminalDebrief35100")&&enterCanonicalReceipt35100.toString().includes("commitChronicleReceiptAndRewards35100")&&enterCanonicalReceipt35100.toString().includes("rt.beatId=RECEIPT_BEAT"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
@@ -409,7 +418,7 @@ terminalPakkunDepartureClassified:commitPakkunDeparture35100.toString().includes
 
 const installed=installTerminalBeats35100();
 if(!installed||installed.success!==true)throw new Error(`kakashi_terminal_debrief_install_failed:${installed&&installed.reason||"unknown"}`);
-const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,deriveTerminalFacts:deriveTerminalFacts35100,captureBattleResult:captureBattleResult35100,commitTerminalDebrief:commitTerminalDebrief35100,commitPakkunDeparture:commitPakkunDeparture35100,commitChronicleReceiptAndRewards:commitChronicleReceiptAndRewards35100,closureReady:closureReady35100,guardedOriginCompletion:guardedOriginCompletion35100,diagnostics,browserGoldenClaimed:false});
+const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,installed,deriveTerminalFacts:deriveTerminalFacts35100,captureBattleResult:captureBattleResult35100,commitTerminalDebrief:commitTerminalDebrief35100,commitPakkunDeparture:commitPakkunDeparture35100,commitChronicleReceiptAndRewards:commitChronicleReceiptAndRewards35100,enterCanonicalReceipt:enterCanonicalReceipt35100,closureReady:closureReady35100,guardedOriginCompletion:guardedOriginCompletion35100,diagnostics,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100=api;
 globalThis.runAcademyKakashiTerminalDebrief35100Diagnostics=diagnostics;
 })();
