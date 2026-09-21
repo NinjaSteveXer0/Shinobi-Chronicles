@@ -76,7 +76,7 @@ assert.ok(loader.includes('alpha-kakashi-final-sequential-consumer-34410.js'),"3
 assert.ok(loader.includes('alpha-kakashi-factual-bindings-34700.js'),"34100 production loader missing terminal factual binding layer");
 
 const source=consumer;
-assert.ok(source.includes('alpha_kakashi_final_sequential_consumer_34410_v7_2026_09_17'),"34410 v7 semantic correction missing");
+assert.ok(source.includes('alpha_kakashi_final_sequential_consumer_34410_v8_2026_09_21'),"34410 v8 surgical return correction missing");
 assert.ok(source.includes('sourceAnchorRef:spec.anchor'));
 assert.ok(source.includes('bindingRef:BINDING.sequential'));
 assert.ok(source.includes('pakkunAuthorized:spec.pakkun'));
