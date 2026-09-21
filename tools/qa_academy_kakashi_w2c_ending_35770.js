@@ -85,6 +85,7 @@ assert.strictEqual(completions,1);
 assert(saves>0);
 
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-w2c-ending-35770.js"),"utf8");
+const polishSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene-board-polish-33910.js"),"utf8");
 assert(source.includes("sc-kakashi-kill-35770"),"kill animation CSS missing");
 assert(source.includes("diagonal")===false,"presentation uses animation, not invented prose");
 assert(source.includes("rooftop_night.png"),"rooftop backdrop missing");
@@ -103,9 +104,8 @@ assert(source.includes("document.body.appendChild(n)"),"lethal-attempt animation
 assert(source.includes('classList.add("is-active")'),"lethal-attempt animation must receive an explicit painted start");
 assert(source.includes("2147483400"),"lethal-attempt animation must sit above Scene Board overlays");
 assert(source.includes("bottom:23.5%!important"),"Hokage Office lower cast must align to the table-row baseline");
-assert(source.includes("sc-dialogue-panel-33910.is-current"),"Hokage Office dialogue must use negative-space placement");
-assert(source.includes("transform:none!important;width:min(28%,400px)!important"),"Hokage Office side-lane dialogue must cancel the generic centered transform");
-assert(source.includes("performance_narration")&&source.includes("sc-dialogue-panel-33910{display:none!important}"),"office narration must suppress stale dialogue overlay");
+assert(!source.includes("sc-dialogue-panel-33910"),"W2C kill route must not own Kakashi dialogue geometry");
+assert(polishSource.includes("top:4%!important")&&polishSource.includes("kakashi_scene_board_model_v16_33910_2026_09_21"),"canonical 33910 dialogue lane missing");
 assert(source.includes("left:28%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"Hokage Office AMT / ANBU / PS table-row placement missing");
 assert(source.includes("sc-w2c-office-anbu-enter-35770"),"KILLED office ANBU slide-in missing");
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"Recovered-package state must use the persistent Live State Callout");
