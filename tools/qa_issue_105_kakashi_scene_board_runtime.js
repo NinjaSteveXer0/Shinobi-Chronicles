@@ -33,7 +33,7 @@ try{
   const kakashiV4Source=read("runtime/alpha-kakashi-scene-board-polish-33910.js");
 
   assert("production_terminal_chain_references_336_337_338",terminalSource.includes('runtime/alpha-early-story-modernization-33600.js')&&terminalSource.includes('runtime/alpha-origin-screen-first-33700.js')&&terminalSource.includes('runtime/alpha-kakashi-original-origin-restoration-33800.js'));
-  assert("scene_board_delivery_generation_coherent",terminalSource.includes('const SCENE_BOARD_BUILD="scene-board-20260921-13";')&&restorationSource.includes('const BUILD="scene-board-20260921-13";'));
+  assert("scene_board_delivery_generation_coherent",terminalSource.includes('const SCENE_BOARD_BUILD="scene-board-20260921-14";')&&restorationSource.includes('const BUILD="scene-board-20260921-14";'));
   assert("restoration_activates_generic_board_then_kakashi_v4",restorationSource.includes('runtime/alpha-story-scene-board-33900.js')&&restorationSource.includes('runtime/alpha-kakashi-scene-board-polish-33910.js'));
   assert("scene_board_quick_read_labels_inside_panel",sceneBoardSource.includes("speakerLabel")&&sceneBoardSource.includes('cue.speakerName||cue.speaker')&&sceneBoardSource.includes('panel.contains(name)')&&sceneBoardSource.includes('"NARRATION"'));
   assert("scene_board_overlay_reads_w2c_speaker_field",kakashiV4Source.includes("cueSpeaker33910")&&kakashiV4Source.includes("cue.speakerName||cue.speaker")&&kakashiV4Source.includes("panel.dataset.speakerId=speakerId")&&kakashiV4Source.includes('key==="MINATO"'));
@@ -48,6 +48,7 @@ try{
   assert("33900_generic_bridge_diagnostics_green_before_final_consumer",d339.pass===true,d339);
   assert("scene_board_reads_exact_rooftop_backdrop",context.resolveStorySceneBoardBackdropPath(active)==="Kakashi Origin Backdrop/rooftop_night.png",context.resolveStorySceneBoardBackdropPath(active));
   assert("scene_board_neutralizes_opaque_master_shell",sceneBoardSource.includes('.sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}'));
+  assert("scene_board_full_screen_backdrop_fails_closed",sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#020508!important;}')&&!sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}')&&sceneBoardSource.includes('layer.dataset.scSceneBoardBackdrop=path?"dedicated":"fallback"')&&sceneBoardSource.includes('layer.style.setProperty("--sc-scene-board-backdrop",cssUrlValue(path))'));
   assert("live_state_callout_is_compact_content_sized_hud",sceneBoardSource.includes(".sc-scene-board-33900__objects{position:absolute;left:3.2%;right:auto")&&sceneBoardSource.includes("width:max-content;max-width:min(31%,390px)")&&sceneBoardSource.includes("height:auto!important;min-height:0!important;max-height:none!important")&&sceneBoardSource.includes("align-items:flex-start")&&sceneBoardSource.includes(".sc-scene-board-33900__object{position:relative;display:inline-block"));
 
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");

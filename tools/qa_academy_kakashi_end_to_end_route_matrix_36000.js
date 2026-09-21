@@ -62,9 +62,13 @@ const traversal=read("runtime/alpha-traversal-bridge-33200.js");
 assert(/script\.src="runtime\/alpha-story-decision-realisation-34000\.js\?sc=story-decision-20260921-18";/.test(integrator),"active root Story delivery is not generation 18");
 assert(/script\.src="runtime\/alpha-kakashi-final-origin-adapter-34100\.js\?sc=kakashi-final-20260921-89";/.test(storyDecision),"active Kakashi parent delivery is not gen89");
 assert(/^const BUILD="kakashi-final-20260921-89";$/m.test(loader),"active Kakashi loader is not gen89");
-assert(/^\s*const BUILD="scene-board-20260921-13";$/m.test(restoration),"active Scene Board restoration delivery is not generation 13");
-assert(/^const SCENE_BOARD_BUILD="scene-board-20260921-13";$/m.test(traversal),"active traversal Scene Board delivery is not generation 13");
+assert(/^\s*const BUILD="scene-board-20260921-14";$/m.test(restoration),"active Scene Board restoration delivery is not generation 13");
+assert(/^const SCENE_BOARD_BUILD="scene-board-20260921-14";$/m.test(traversal),"active traversal Scene Board delivery is not generation 13");
 assert(!restoration.includes("alpha-kakashi-story-presentation-compat-33920.js"),"retired 33920 returned to production load path");
+const sceneBoardSource=read("runtime/alpha-story-scene-board-33900.js");
+assert(sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#020508!important;}'),"Story Scene Board can fail open onto World UI");
+assert(!sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}'),"transparent Story Scene Board root reintroduced");
+assert(sceneBoardSource.includes('layer.dataset.scSceneBoardBackdrop=path?"dedicated":"fallback"')&&sceneBoardSource.includes('layer.style.setProperty("--sc-scene-board-backdrop",cssUrlValue(path))'),"full-screen Story backdrop ownership missing");
 
 const terminal=read("runtime/alpha-kakashi-terminal-debrief-35100.js");
 for(const marker of [
@@ -157,7 +161,7 @@ console.log(JSON.stringify({
  deliveryParity:{
    storyDecision:"story-decision-20260921-18",
    kakashiFinal:"kakashi-final-20260921-89",
-   sceneBoard:"scene-board-20260921-13"
+   sceneBoard:"scene-board-20260921-14"
  },
  terminalTail:manifest.commonTerminalTail.required,
  saveLoadBoundaries:manifest.saveLoadBoundaries,

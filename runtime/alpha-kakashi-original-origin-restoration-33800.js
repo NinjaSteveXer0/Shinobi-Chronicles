@@ -224,7 +224,7 @@ globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800D
   // const BUILD="scene-board-20260919-9";
   // const BUILD="scene-board-20260919-10";
   // const BUILD="scene-board-20260919-11";
-  const BUILD="scene-board-20260921-13";
+  const BUILD="scene-board-20260921-14";
 
   function load33910(){
     if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910||document.getElementById(POLISH_ID))return;
