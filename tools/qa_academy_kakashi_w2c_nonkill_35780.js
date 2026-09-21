@@ -110,6 +110,7 @@ assert.strictEqual(completions,3);
 assert(saves>0);
 
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-w2c-nonkill-35780.js"),"utf8");
+const polishSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene-board-polish-33910.js"),"utf8");
 assert(source.includes("14c091f1620eef0275b5e713f782b6c99c8a9abc"));
 assert(source.includes("84894e148e55b57ec74707690ca0b067b6b1e366"));
 assert(source.includes("ecf8f813232d9d72e5c7c08ec544a20dbc2fa2a7"));
@@ -124,12 +125,11 @@ assert(source.includes("PATROL_ASSET_PATHS=Object.freeze([])"),"unapproved patro
 assert(source.includes("playAcademyKakashiLethalAttemptAnimation35770"),"non-kill outcomes must consume the shared lethal-attempt animation");
 assert(source.includes("w2cNonKillEnterLeft35780"),"Hokage Office ANBU entry motion missing");
 assert(source.includes("left:28%!important")&&source.includes("left:41%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"non-kill Hokage Office AMT / MI / ANBU / PS table-row placement missing");
+assert(!source.includes("sc-dialogue-panel-33910"),"W2C non-kill route must not own Kakashi dialogue geometry");
+assert(polishSource.includes("top:4%!important"),"canonical 33910 dialogue lane missing");
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"Recovered-package state must use the persistent Live State Callout");
 assert(source.includes('card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE"'),"Minato nameplate must show actor status rather than package state");
 assert(!source.includes('<div class="sc-kakashi-w2c-nonkill-package">'),"Standalone non-kill recovered-package banner markup must be removed");
-assert(source.includes("sc-dialogue-panel-33910.is-current"),"non-kill Hokage Office dialogue must use negative-space placement");
-assert(source.includes("transform:none!important;width:min(28%,400px)!important"),"non-kill office side-lane dialogue must cancel the generic centered transform");
-assert(source.includes("performance_narration")&&source.includes("sc-dialogue-panel-33910{display:none!important}"),"office narration must suppress stale dialogue overlay");
 assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
 
 console.log("Academy Kakashi W2C non-kill ending 35780 QA: PASS");
