@@ -9,6 +9,7 @@ on:
       - 'index.html'
       - 'runtime/**'
       - 'tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json'
+      - 'tools/fixtures/academy_kakashi_runtime_owner_map_36100.json'
       - 'tools/qa_*.py'
       - 'tools/qa_*.js'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
@@ -18,6 +19,7 @@ on:
       - 'index.html'
       - 'runtime/**'
       - 'tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json'
+      - 'tools/fixtures/academy_kakashi_runtime_owner_map_36100.json'
       - 'tools/qa_*.py'
       - 'tools/qa_*.js'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
@@ -103,6 +105,12 @@ jobs:
           node tools/qa_academy_kakashi_dynamic_terminal_35940.js
           node tools/qa_kakashi_story_presentation_33920.js
           node tools/qa_academy_kakashi_scene03a_35700.js
+
+      - name: Execute Kakashi canonical owner audit
+        run: |
+          node --check tools/qa_academy_kakashi_runtime_owner_map_36100.js
+          node -e "JSON.parse(require('fs').readFileSync('tools/fixtures/academy_kakashi_runtime_owner_map_36100.json','utf8'))"
+          node tools/qa_academy_kakashi_runtime_owner_map_36100.js
 
       - name: Execute Kakashi one-swoop completion matrix
         run: |
