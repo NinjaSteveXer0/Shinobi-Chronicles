@@ -322,7 +322,7 @@ function diagnostics(){
   noLethalCustodyPakkun:commitHidden.toString().includes("participantCustodyCommitted:false")&&commitHidden.toString().includes("lethalActionCommitted:false")&&commitHidden.toString().includes("pakkunPresent:false"),
   missionFailureSeparateFromHiddenRecovery:commitHidden.toString().includes('kakashiMissionResult:"FAILURE"')&&commitHidden.toString().includes("hiddenOperationPackageRecoveredAfterward:true"),
   blackWipe:globalThis.advanceStoryScene.toString().includes("wipe(enterOffice)")&&globalThis.advanceStoryScene.toString().includes("wipe(openReceipt)"),
-  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue-panel-33910")&&installStyle.toString().includes(".sc-chronicle-layout{display:none!important}")&&render.toString().includes("scBoardUiMode"),
+  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910")&&installStyle.toString().includes(".sc-chronicle-layout{display:none!important}")&&render.toString().includes("scBoardUiMode"),
   liveStateCallout:render.toString().includes("sc-live-state-callout-33900")&&render.toString().includes("RECOVERED · HIDDEN OPERATION")&&render.toString().includes('card(MINATO,"HOKAGE"')&&installStyle.toString().includes("width:max-content!important")&&installStyle.toString().includes("max-height:none!important"),
   receiptAndClosure:openReceipt.toString().includes("commitChronicleReceiptAndRewards")&&complete.toString().includes("guardedOriginCompletion"),
   browserGoldenClaimed:false
