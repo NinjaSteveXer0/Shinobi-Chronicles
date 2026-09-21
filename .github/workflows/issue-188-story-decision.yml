@@ -339,7 +339,7 @@ jobs:
           grep -Fq 'const PAKKUN_SCENE_ASSET="Assets/Summons/pakkun.png";' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'sc-postmi-summon-35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'top:4%!important' runtime/alpha-kakashi-scene-board-polish-33910.js
-          grep -Fq 'bottom:33%!important' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'bottom:38%!important' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'opacity:.78;' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'data-sc-board-ui-mode="battle_transition"' runtime/alpha-kakashi-scene-board-polish-33910.js
           if grep -Fq '#story-scene-presentation-layer[data-sc-postmi-35830=' runtime/alpha-kakashi-scene-board-polish-33910.js; then echo 'route-specific Pakkun dialogue geometry must stay retired'; exit 1; fi
