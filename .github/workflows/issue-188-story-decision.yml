@@ -305,8 +305,8 @@ jobs:
           grep -Fq 'alpha_kakashi_immediate_custody_35800_v3_2026_09_19' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'beginImmediateCustodyChoice35800' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-immediate-custody-35800.js
-          grep -Fq "top:22%!important" runtime/alpha-kakashi-immediate-custody-35800.js
-          grep -Fq "right:7.5%!important" runtime/alpha-kakashi-immediate-custody-35800.js
+          if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-immediate-custody-35800.js; then echo '35800 must not own Kakashi dialogue geometry'; exit 1; fi
+          if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-loss-ending-35820.js; then echo '35820 must not own Kakashi dialogue geometry'; exit 1; fi
           grep -Fq 'alpha_kakashi_scene03a_35700_v8_2026_09_20' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchMiBurst35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchAmtExitGhost35700' runtime/alpha-kakashi-scene03a-35700.js
@@ -406,6 +406,8 @@ jobs:
           grep -Fq '2147483400' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'bottom:23.5%!important' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'bottom:23.5%!important' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-w2c-ending-35770.js; then echo '35770 must not own Kakashi dialogue geometry'; exit 1; fi
+          if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-w2c-nonkill-35780.js; then echo '35780 must not own Kakashi dialogue geometry'; exit 1; fi
           grep -Fq 'cueSpeaker33910' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'panel.dataset.speakerId=speakerId' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-ending-35770.js
