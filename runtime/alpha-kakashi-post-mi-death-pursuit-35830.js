@@ -539,7 +539,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v26_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v27_2026_09_21",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
