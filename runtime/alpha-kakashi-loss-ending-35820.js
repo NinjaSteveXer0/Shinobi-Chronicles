@@ -273,11 +273,11 @@ function installStyle(){
 function img(id){return id===KAK?"Assets/Academy Student/academy_kakashi.png":id===ANBU?"NPC/konoha_anbu.png":id===MI?"NPC/masked_interceptor.png":id===AMT?"NPC/anbu_marked_target.png":id===PS?"NPC/package_smuggler.png":"Assets/Kage/kage_minato.png";}
 function label(id){return id===KAK?"KAKASHI":id===ANBU?"ANBU OPERATIVE":id===MI?"MASKED INTERCEPTOR":id===AMT?"ANBU MARKED TARGET":id===PS?"PACKAGE SMUGGLER":"MINATO";}
 function card(id,state,focus){return'<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(id)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(img(id))+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label(id))+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
-function backdrop(stage,path){stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+String(path).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";}
+function applyCanonicalBackdrop35820(stage,rt){return !!(stage&&typeof globalThis.applyStorySceneBoardBackdrop33900==="function"&&globalThis.applyStorySceneBoardBackdrop33900(stage,rt));}
 function render(){
  wireSource();if(typeof document==="undefined")return false;const rt=active(),p=sequence(rt),layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
  for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!family(rt))old.remove();
- if(!family(rt))return false;if(!p)return false;installStyle();const office=rt.beatId===OFFICE_BEAT;layer.dataset.scKakashiLossStage=office?"office":"report";backdrop(stage,office?OFFICE:ROOFTOP);
+ if(!family(rt))return false;if(!p)return false;installStyle();const office=rt.beatId===OFFICE_BEAT;layer.dataset.scKakashiLossStage=office?"office":"report";applyCanonicalBackdrop35820(stage,rt);
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}b.dataset.lossStage=office?"office":"report";
  const focus=p.cue&&p.cue.focusActorRef||"";let actors;
  if(office)actors=[card(MINATO,"HOKAGE",focus===MINATO),card(AMT,"ALIVE",focus===AMT),card(MI,"ALIVE",focus===MI),card(ANBU,"PRESENT",focus===ANBU),card(PS,"ALIVE",focus===PS)];
@@ -297,7 +297,7 @@ function complete(){const rt=active();if(!rt||rt.beatId!==RECEIPT_BEAT)return{su
 if(!installBeats())throw new Error("kakashi_loss_ending_35820_beats_missing");
 let hooked=false,tries=0;
 function hooks(){
- if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+ if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900;
  globalThis.getStoryScenePerformance33900=function(){const p=sequence(active());return p||PG.apply(this,arguments);};
  globalThis.advanceStoryScene=function(choiceId=null){const rt=active();
   if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&choiceId===SOURCE_CHOICE){wireSource();return PA.apply(this,arguments);}
@@ -305,7 +305,7 @@ function hooks(){
   return PA.apply(this,arguments);
  };
  try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_error){}
- if(PR){globalThis.renderStoryScenePresentationLayer=function(){wireSource();const out=PR.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(function(){wireSource();render();});else setTimeout(function(){wireSource();render();},0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+ if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_loss_35820",()=>{wireSource();return render();});
  hooked=true;wireSource();render();return true;
 }
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
