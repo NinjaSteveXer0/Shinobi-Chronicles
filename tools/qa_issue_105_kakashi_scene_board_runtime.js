@@ -54,14 +54,20 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v17_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v17_33910_2026_09_21'));
+  assert("kakashi_v18_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v18_33910_2026_09_21'));
   assert("terminal_report_stages_anbu",kakashiV4Source.includes('kak_seq_debrief_pending')&&kakashiV4Source.includes('terminalReportProjection33910')&&kakashiV4Source.includes('konoha_anbu_contact'));
   assert("terminal_hokage_scene_staged",kakashiV4Source.includes('kak_terminal_minato_private_evaluation_35100')&&kakashiV4Source.includes('Assets/Kage/kage_minato.png')&&kakashiV4Source.includes('Kakashi Origin Backdrop/hokage_administration_interior_night.png')&&kakashiV4Source.includes('HOKAGE ADMINISTRATION · NIGHT'));
   assert("terminal_final_chronicle_beat_stays_on_scene_board",kakashiV4Source.includes('kak_terminal_chronicle_begins_35100')&&kakashiV4Source.includes("terminalFinalPerformance33910")&&kakashiV4Source.includes('text:"YOUR CHRONICLE BEGINS"')&&kakashiV4Source.includes('kak_terminal_chronicle_begins_35100:()=>terminalFinalPerformance33910()'));
   assert("terminal_minato_performance_bridge",kakashiV4Source.includes("terminalMinatoPerformance33910")&&kakashiV4Source.includes("SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940")&&kakashiV4Source.includes('return"hokage_minato"'));
   assert("terminal_no_duplicate_mutation_observer",!/new\s+MutationObserver\s*\(/.test(kakashiV4Source)&&!/new\s+MutationObserver\s*\(/.test(sceneBoardSource));
-  assert("canonical_dialogue_first_paint_owned_by_33910",kakashiV4Source.includes("top:4%!important")&&!kakashiV4Source.includes("top:2%!important")&&kakashiV4Source.includes('data-speaker-id="pakkun"'));
+  assert("canonical_dialogue_first_paint_owned_by_33910",kakashiV4Source.includes("top:4%!important")&&!kakashiV4Source.includes("top:2%!important")&&!kakashiV4Source.includes("data-sc-postmi-35830")&&!kakashiV4Source.includes("right:6%!important"));
   assert("terminal_wipe_has_single_render_owner",kakashiV4Source.includes("try{next();}finally{setTimeout(reveal,110);}")&&!kakashiV4Source.includes("try{next();if(typeof renderStorySceneBoard33900"));
+  assert("golden_actor_safe_zone_is_single_and_stable",kakashiV4Source.includes("bottom:33%!important")&&kakashiV4Source.includes("bottom:-18px!important"));
+  assert("golden_secondary_actors_remain_readable",kakashiV4Source.includes("opacity:.78!important")&&kakashiV4Source.includes("brightness(.90)!important")&&!kakashiV4Source.includes("opacity:.50!important"));
+  assert("golden_battle_transition_has_explicit_mode",kakashiV4Source.includes('data-sc-board-ui-mode="battle_transition"')&&kakashiV4Source.includes('beat.mode==="battle_transition"'));
+  assert("golden_route_specific_dialogue_geometry_retired",!kakashiV4Source.includes("data-sc-postmi-35830")&&!kakashiV4Source.includes("right:6%!important"));
+  assert("generic_scene_board_owns_actor_motion",sceneBoardSource.includes("is-exiting")&&sceneBoardSource.includes("is-falling")&&sceneBoardSource.includes("priorActorIds")&&sceneBoardSource.includes("data-actor-motion"));
+  assert("terminal_report_opening_uses_click_performance",kakashiV4Source.includes("terminalReportOpeningPerformance33910")&&kakashiV4Source.includes('kak_seq_debrief_pending:()=>terminalReportOpeningPerformance33910()'));
 
   const terminalScene=scenes.get(active.sceneId);
   terminalScene.beatMap.set("kak_terminal_minato_private_evaluation_35100",{beatId:"kak_terminal_minato_private_evaluation_35100",mode:"narration",nextBeatId:null});
@@ -130,6 +136,10 @@ try{
 
   const action=projection("kak_original_action");
   assert("choice_stages_final_exchange_participants",action.mode==="encounter"&&action.actors.length===3&&action.actors.some(a=>a.label==="ANBU MARKED TARGET"&&a.image==="NPC/anbu_marked_target.png")&&action.actors.some(a=>a.label==="PACKAGE SMUGGLER"&&a.image==="NPC/package_smuggler.png")&&action.objects.some(x=>x.state==="EXCHANGE IN PROGRESS"),action);
+  const directKill=projection("kak_konoha_direct_strike_kill_all_35910");
+  assert("direct_kill_projects_fall_motion",directKill.actors.filter(a=>a.id!=="academy_kakashi").length===3&&directKill.actors.filter(a=>a.id!=="academy_kakashi").every(a=>a.motion==="fall"),directKill);
+  const directRelease=projection("kak_konoha_direct_strike_release_all_35910");
+  assert("direct_release_projects_exit_motion",directRelease.actors.filter(a=>a.id!=="academy_kakashi").length===3&&directRelease.actors.filter(a=>a.id!=="academy_kakashi").every(a=>a.motion==="exit"),directRelease);
 
   const transfer=projection("kak_original_transfer",{kakashiOriginalAction:"observe",__storyPerformanceCursor33900:{beatId:"kak_original_transfer",index:2}});
   assert("masked_interceptor_enters_as_amt_breaks_away",transfer.actors.length===3&&transfer.actors.some(a=>a.label==="MASKED INTERCEPTOR"&&a.state==="BURSTING FROM SHADOW"&&a.entering===true)&&transfer.actors.some(a=>a.label==="ANBU MARKED TARGET"&&a.state==="BREAKING AWAY")&&transfer.actors.some(a=>a.label==="PACKAGE SMUGGLER"&&a.state==="HAS PACKAGE")&&!transfer.actors.some(a=>a.label==="KAKASHI")&&transfer.objects.length===0,transfer);
