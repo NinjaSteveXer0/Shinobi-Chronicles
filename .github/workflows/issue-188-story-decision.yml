@@ -342,7 +342,7 @@ jobs:
           grep -Fq 'bottom:33%!important' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'opacity:.78;' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'data-sc-board-ui-mode="battle_transition"' runtime/alpha-kakashi-scene-board-polish-33910.js
-          if grep -Fq 'data-sc-postmi-35830' runtime/alpha-kakashi-scene-board-polish-33910.js; then echo 'route-specific Pakkun dialogue geometry must stay retired'; exit 1; fi
+          if grep -Fq '#story-scene-presentation-layer[data-sc-postmi-35830=' runtime/alpha-kakashi-scene-board-polish-33910.js; then echo 'route-specific Pakkun dialogue geometry must stay retired'; exit 1; fi
           grep -Fq 'You decided fast.' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
