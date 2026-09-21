@@ -53,10 +53,8 @@ const INTERCEPTION_PATH="runtime/alpha-kakashi-pakkun-interception-35300.js";
 const REWARD_PATH="runtime/alpha-kakashi-origin-rewards-34800.js";
 const BATTLE_DEVELOPMENT_PATH="runtime/alpha-kakashi-battle-development-35740.js";
 const TERMINAL_DEBRIEF_PATH="runtime/alpha-kakashi-terminal-debrief-35100.js";
-const TERMINAL_SCENE_BOARD_PATH="runtime/alpha-kakashi-terminal-scene-board-35610.js";
 const SCENE03A_PATH="runtime/alpha-kakashi-scene03a-35700.js";
 const SCENE04A_PATH="runtime/alpha-kakashi-scene04a-35710.js";
-const OBJECTIVE_PRESENTATION_PATH="runtime/alpha-kakashi-objective-presentation-35720.js";
 const SCENE05AW_PATH="runtime/alpha-kakashi-scene05a-w-35730.js";
 const SCENE05AL_PATH="runtime/alpha-kakashi-scene05a-l-35750.js";
 const SCENE06AW2C_PATH="runtime/alpha-kakashi-scene06a-w2c-35760.js";
@@ -71,7 +69,6 @@ const KONOHA_ROUTE_CLOSURE_PATH="runtime/alpha-kakashi-konoha-route-closure-3591
 const FIELD_SECURED_PATH="runtime/alpha-kakashi-field-secured-35920.js";
 const MOVE_CLOSER_CLOSURE_PATH="runtime/alpha-kakashi-move-closer-closure-35930.js";
 const DYNAMIC_TERMINAL_PATH="runtime/alpha-kakashi-dynamic-terminal-35940.js";
-const BROWSER_ACCEPTANCE_PATH="runtime/alpha-kakashi-browser-acceptance-35950.js";
 // const BUILD="kakashi-final-20260918-36";
 // const BUILD="kakashi-final-20260918-37";
 // const BUILD="kakashi-final-20260918-38";
@@ -119,7 +116,7 @@ const BROWSER_ACCEPTANCE_PATH="runtime/alpha-kakashi-browser-acceptance-35950.js
 // const BUILD="kakashi-final-20260920-85";
 // const BUILD="kakashi-final-20260920-86";
 // const BUILD="kakashi-final-20260921-87";
-const BUILD="kakashi-final-20260921-89";
+const BUILD="kakashi-final-20260921-91";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
@@ -149,13 +146,9 @@ if(typeof document==="undefined"||!document.head||typeof document.createElement!
   return;
 }
 
-function loadBrowserAcceptance(){
-  if(globalThis.SC_ALPHA_KAKASHI_BROWSER_ACCEPTANCE_35950)return;
-  appendScript("sc-alpha-kakashi-browser-acceptance-35950-script",BROWSER_ACCEPTANCE_PATH);
-}
 function loadDynamicTerminal(){
-  if(globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940){loadBrowserAcceptance();return;}
-  appendScript("sc-alpha-kakashi-dynamic-terminal-35940-script",DYNAMIC_TERMINAL_PATH,loadBrowserAcceptance);
+  if(globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940)return;
+  appendScript("sc-alpha-kakashi-dynamic-terminal-35940-script",DYNAMIC_TERMINAL_PATH);
 }
 function loadMoveCloserClosure(){
   if(globalThis.SC_ALPHA_KAKASHI_MOVE_CLOSER_CLOSURE_35930){loadDynamicTerminal();return;}
@@ -209,25 +202,17 @@ function loadScene05AW(){
   if(globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730){loadScene05AL();return;}
   appendScript("sc-alpha-kakashi-scene05a-w-35730-script",SCENE05AW_PATH,loadScene05AL);
 }
-function loadObjectivePresentation(){
-  if(globalThis.SC_ALPHA_KAKASHI_OBJECTIVE_PRESENTATION_35720){loadScene05AW();return;}
-  appendScript("sc-alpha-kakashi-objective-presentation-35720-script",OBJECTIVE_PRESENTATION_PATH,loadScene05AW);
-}
 function loadScene04A(){
-  if(globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710){loadObjectivePresentation();return;}
-  appendScript("sc-alpha-kakashi-scene04a-35710-script",SCENE04A_PATH,loadObjectivePresentation);
+  if(globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710){loadScene05AW();return;}
+  appendScript("sc-alpha-kakashi-scene04a-35710-script",SCENE04A_PATH,loadScene05AW);
 }
 function loadScene03A(){
   if(globalThis.SC_ALPHA_KAKASHI_SCENE03A_35700){loadScene04A();return;}
   appendScript("sc-alpha-kakashi-scene03a-35700-script",SCENE03A_PATH,loadScene04A);
 }
-function loadTerminalSceneBoard(){
-  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_SCENE_BOARD_35610){loadScene03A();return;}
-  appendScript("sc-alpha-kakashi-terminal-scene-board-35610-script",TERMINAL_SCENE_BOARD_PATH,loadScene03A);
-}
 function loadTerminalDebrief(){
-  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100){loadTerminalSceneBoard();return;}
-  appendScript("sc-alpha-kakashi-terminal-debrief-35100-script",TERMINAL_DEBRIEF_PATH,loadTerminalSceneBoard);
+  if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100){loadScene03A();return;}
+  appendScript("sc-alpha-kakashi-terminal-debrief-35100-script",TERMINAL_DEBRIEF_PATH,loadScene03A);
 }
 function loadBattleDevelopment(){
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_DEVELOPMENT_35740){loadTerminalDebrief();return;}
