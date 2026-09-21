@@ -22,7 +22,7 @@ if(globalThis.SC_ALPHA_KAKASHI_TERMINAL_SCENE_BOARD_35610)return;
 const PATCH_ID="alpha_kakashi_terminal_scene_board_35610_v4_2026_09_21";
 const HOKAGE_ENV_ID="kakashi_origin_hokage_administration_interior_night";
 const HOKAGE_ENV_PATH="Kakashi Origin Backdrop/hokage_administration_interior_night.png";
-const PRESENTATION_OWNER="kakashi_scene_board_model_v14_33910_2026_09_21";
+const PRESENTATION_OWNER="kakashi_scene_board_model_v15_33910_2026_09_21";
 const TERMINAL_OWNER="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20";
 
 function registerApprovedBackdrop35610(){
@@ -45,7 +45,7 @@ function diagnostics(){
     patchId:PATCH_ID==="alpha_kakashi_terminal_scene_board_35610_v4_2026_09_21",
     backdropExact:HOKAGE_ENV_PATH==="Kakashi Origin Backdrop/hokage_administration_interior_night.png",
     passiveCompatibilityOnly:true,
-    presentationOwner33910:PRESENTATION_OWNER==="kakashi_scene_board_model_v14_33910_2026_09_21",
+    presentationOwner33910:PRESENTATION_OWNER==="kakashi_scene_board_model_v15_33910_2026_09_21",
     terminalOwner35100:TERMINAL_OWNER==="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20",
     noDomRenderOwnership:true,
     noBeatEnvironmentMutation:true,
