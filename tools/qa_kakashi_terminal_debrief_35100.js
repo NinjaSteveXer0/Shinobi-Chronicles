@@ -83,6 +83,21 @@ assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).b
 run(`__qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-secure-1",battleConfigId:"academy_kakashi_origin_battle_ps_mi_2v1",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_014",bindingRef:"academy_kakashi.battle.secure_package",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:"academy_kakashi_origin_masked_interceptor",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}],rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false}};`);
 let captured=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_ps_mi_2v1")`);
 assert.strictEqual(captured.success,true);
+
+// Installed-browser resume may keep an older authored receipt while the current
+// MI result is projected. Terminal capture must select the expected config.
+run(`resetDataQA("qa-resume-envelope-35100");
+__qaRuntime.battleResume={
+ authored:{battleOccurrenceId:"battle-stale-direct-2v1",battleConfigId:"academy_kakashi_origin_battle_amt_ps_2v1",storyOccurrenceId:__qaRuntime.instanceId,bindingRef:"academy_kakashi.resolver.attack",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[],rewardGranted:false,lootGranted:false},
+ projected:{battleOccurrenceId:"battle-current-mi",battleConfigId:"academy_kakashi_origin_battle_mi_1v1",storyOccurrenceId:__qaRuntime.instanceId,bindingRef:"academy_kakashi.battle.direct_strike_mi",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[],rewardGranted:false,lootGranted:false}
+};`);
+captured=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_mi_1v1")`);
+assert.strictEqual(captured.success,true,"terminal capture rejected valid projected MI result behind stale authored receipt");
+assert.strictEqual(captured.battle.battleOccurrenceId,"battle-current-mi","terminal capture consumed stale authored Battle result");
+run(`resetDataQA("qa-secure-35100");
+__qaRuntime.battleResume={authored:{battleOccurrenceId:"battle-secure-1",battleConfigId:"academy_kakashi_origin_battle_ps_mi_2v1",storyOccurrenceId:__qaRuntime.instanceId,sourceAnchorRef:"AK_SA_014",bindingRef:"academy_kakashi.battle.secure_package",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:"academy_kakashi_origin_package_smuggler",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:"academy_kakashi_origin_masked_interceptor",side:"opposition",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}],rewardGranted:false,lootGranted:false,participantDeathCommitted:false,participantCustodyCommitted:false}};`);
+captured=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.captureBattleResult("academy_kakashi_origin_battle_ps_mi_2v1")`);
+assert.strictEqual(captured.success,true);
 let facts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
 assert.strictEqual(facts.success,false,"Battle victory alone incorrectly enabled terminal facts");
 assert.strictEqual(facts.reason,"kakashi_terminal_package_state_unresolved");
@@ -210,10 +225,16 @@ assert.strictEqual(terminalObjectives.minato,"Private review of the sealed field
 assert.strictEqual(terminalObjectives.receipt,"Private review of the sealed field record.");
 assert.strictEqual(terminalObjectives.final,"","final Chronicle boundary must explicitly clear the prior objective");
 
-const reportChoice=plain(`(()=>{const c=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_seq_debrief_pending").choices[0],a=c.availability();return{choiceId:c.choiceId,available:a.available,knownBlocker:a.knownBlocker};})()`);
-assert.strictEqual(reportChoice.choiceId,"kak_terminal_report_35100");
-assert.strictEqual(reportChoice.available,false);
-assert(String(reportChoice.knownBlocker).includes("kakashi_terminal_package_state_unresolved"));
+const reportOpening=plain(`(()=>{const b=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_seq_debrief_pending");return{mode:b.mode,speakerName:b.speakerName,text:b.text,nextBeatId:b.nextBeatId,choiceCount:Array.isArray(b.choices)?b.choices.length:-1,onEnterIds:(b.onEnterConsequences||[]).map(row=>row.requestId)};})()`);
+assert.strictEqual(reportOpening.mode,"dialogue");
+assert.strictEqual(reportOpening.speakerName,"ANBU OPERATIVE");
+assert.strictEqual(reportOpening.text,"Report.");
+assert.strictEqual(reportOpening.nextBeatId,"kak_terminal_debrief_summary_35100");
+assert.strictEqual(reportOpening.choiceCount,0,"player-facing REPORT button/scaffolding returned");
+assert(reportOpening.onEnterIds.includes("kakashi_terminal_debrief_commit_35100"),"automatic report opening lost factual debrief commit");
+const blockedAutomaticReport=plain(`getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_seq_debrief_pending").onEnterConsequences[0].resolve()`);
+assert.strictEqual(blockedAutomaticReport.success,false);
+assert.strictEqual(blockedAutomaticReport.reason,"kakashi_terminal_package_state_unresolved");
 assert.strictEqual(Number(context.playerData.ryo||0),0,"blocked sequential terminal granted reward");
 
 console.log(JSON.stringify({
@@ -221,5 +242,5 @@ console.log(JSON.stringify({
   securePackageDebrief:true,battleVictoryAloneCannotReward:true,packageMaterialGuard:true,
   terminalRyoExact:175,fieldRecoveryPillExactlyOnce:true,ordinarySecureRouteNoTanto:true,
   pakkunExplicitDepartureRequired:true,routeOwnedPakkunDepartureRespected:true,postMiPackageMissingTerminalSupported:true,sequentialTurnFactsPreserved:true,sequentialPackageGapFailsClosed:true,
-  chronicleReceiptBeforeReward:true,saveLoadBeforeReport:true,saveLoadAfterReport:true,saveLoadAtReceipt:true,guardedOriginCompletion:true,browserGoldenClaimed:false
+  chronicleReceiptBeforeReward:true,saveLoadBeforeReport:true,saveLoadAfterReport:true,saveLoadAtReceipt:true,guardedOriginCompletion:true,exactResumeReceiptSelection:true,automaticReportOpening:true,browserGoldenClaimed:false
 },null,2));
