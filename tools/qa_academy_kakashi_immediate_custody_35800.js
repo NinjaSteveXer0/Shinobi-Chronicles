@@ -27,11 +27,13 @@ let ref=0;
 let snapshotMiState="DEFEATED_BUT_NOT_CONTROLLED";
 globalThis.SC_STORY_DECISION_REALISATION_34000={
   stableRef(prefix,payload){return prefix+":"+String(payload&&payload.instance||payload&&payload.source||payload&&payload.transfer||"ref")+":"+(++ref);},
-  getStoryUnitSnapshot(){return{participantStates:{[MI]:{participantRef:MI,stateClass:snapshotMiState}}};}
+  getStoryUnitSnapshot(){return{participantStates:{[MI]:{participantRef:MI,stateClass:snapshotMiState}}};},
+  recordParticipantClassification({participantRef,stateClass}){assert.strictEqual(participantRef,MI);snapshotMiState=stateClass;return{success:true,participantRef,stateClass};}
 };
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
   commitTerminalDebrief(){debriefCalls+=1;return{success:true,occurrenceId:"qa-terminal-"+debriefCalls};},
   commitChronicleReceiptAndRewards(){receiptCalls+=1;return{success:true,receiptOccurrenceId:"qa-receipt-"+receiptCalls};},
+  enterCanonicalReceipt(){debriefCalls+=1;receiptCalls+=1;current.beatId="kak_terminal_chronicle_receipt_35100";return{success:true,beatId:current.beatId,terminalDebriefOccurrenceId:"qa-terminal-"+debriefCalls,receiptOccurrenceId:"qa-receipt-"+receiptCalls};},
   guardedOriginCompletion(){return{success:true};}
 };
 
@@ -105,9 +107,10 @@ let hidden=fact(current.localContext.kakashiScene08W2DHiddenOccurrenceId);
 assert.strictEqual(hidden.maskedInterceptorPresent,true);
 assert.strictEqual(hidden.maskedInterceptorCustody,"ANBU");
 assert.strictEqual(hidden.kakashiKnowledgeGranted,false);
-drainUntil(MOD.receiptBeatId);
+drainUntil("kak_terminal_chronicle_receipt_35100");
+assert.strictEqual(snapshotMiState,"ANBU_INSTITUTIONAL_CUSTODY","ANBU transfer did not update canonical MI classification");
 assert(debriefCalls>=1,"ANBU route never committed terminal debrief");
-assert(receiptCalls>=1,"ANBU route never committed Chronicle Receipt");
+assert(receiptCalls>=1,"ANBU route never entered canonical Chronicle Receipt");
 
 current=fresh("qa-police");
 assert.strictEqual(MOD.wireChoices(),true);
@@ -129,9 +132,10 @@ hidden=fact(current.localContext.kakashiScene09W2EHiddenOccurrenceId);
 assert.strictEqual(hidden.maskedInterceptorPresent,false,"MI must not teleport into Police-custody Hokage Office");
 assert.strictEqual(hidden.maskedInterceptorCustody,"UCHIHA_POLICE");
 assert.strictEqual(hidden.kakashiKnowledgeGranted,false);
-drainUntil(MOD.receiptBeatId);
+drainUntil("kak_terminal_chronicle_receipt_35100");
+assert.strictEqual(snapshotMiState,"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY","Police transfer did not update canonical MI classification");
 assert(debriefCalls>=2,"Police route never committed terminal debrief");
-assert(receiptCalls>=2,"Police route never committed Chronicle Receipt");
+assert(receiptCalls>=2,"Police route never entered canonical Chronicle Receipt");
 
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-immediate-custody-35800.js"),"utf8");
 const polishSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene-board-polish-33910.js"),"utf8");
@@ -143,6 +147,9 @@ assert(source.includes("She remains in Police custody until that custody is prop
 assert(!source.includes("sc-dialogue-panel-33910"),"immediate-custody route must not own Kakashi dialogue geometry");
 assert(polishSource.includes("top:4%!important"),"canonical 33910 dialogue lane missing");
 assert(source.includes("beginImmediateCustodyChoice35800")&&source.includes("rt.beatId=route.firstBeat"),"TAKE HER BACK TO ANBU / Police must not depend on a fragile generic choice chain");
+assert(source.includes("recordParticipantClassification")&&source.includes("ANBU_INSTITUTIONAL_CUSTODY")&&source.includes("UCHIHA_POLICE_INSTITUTIONAL_CUSTODY"),"immediate custody must commit canonical participant classification");
+assert(source.includes("TERMINAL.enterCanonicalReceipt()"),"immediate custody must hand off to canonical 35100 Receipt");
+assert(!source.includes('document.body.appendChild(node)'),"stale route-local immediate-custody Receipt renderer remains active");
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"custody office package truth must use the persistent Live State Callout");
 assert(source.includes('card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE"'),"Minato nameplate must remain actor-local rather than carrying package state");
 
@@ -152,8 +159,8 @@ assert(terminalSource.includes("kakashiScene06W2ECustodyOccurrenceId"),"terminal
 
 assert(saves>0,"custody runtime never persisted state");
 console.log("Academy Kakashi immediate custody 35800 QA: PASS");
-console.log("- W2D immediate ANBU custody reaches handoff, hidden office and Chronicle Receipt");
-console.log("- W2E Police custody reaches Police handoff, bounded ANBU report, MI-absent hidden office and Chronicle Receipt");
+console.log("- W2D immediate ANBU custody reaches handoff, hidden office and canonical 35100 Chronicle Receipt");
+console.log("- W2E Police custody reaches Police handoff, bounded ANBU report, MI-absent hidden office and canonical 35100 Chronicle Receipt");
 console.log("- immediate transfer closes PS/AMT pursuit and does not create Pakkun");
 console.log("- Police custody remains Police custody; hidden operation Knowledge remains unavailable to Kakashi");
 console.log("- approved Police backdrop and route-specific approved Police card pairing are present");
