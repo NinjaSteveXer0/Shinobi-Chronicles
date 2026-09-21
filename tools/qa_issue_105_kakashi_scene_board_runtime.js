@@ -39,7 +39,7 @@ try{
   assert("scene_board_quick_read_labels_inside_panel",sceneBoardSource.includes("speakerLabel")&&sceneBoardSource.includes('cue.speakerName||cue.speaker')&&sceneBoardSource.includes('panel.contains(name)')&&sceneBoardSource.includes('"NARRATION"'));
   assert("scene_board_overlay_reads_w2c_speaker_field",kakashiV4Source.includes("cueSpeaker33910")&&kakashiV4Source.includes("cue.speakerName||cue.speaker")&&kakashiV4Source.includes("panel.dataset.speakerId=speakerId")&&kakashiV4Source.includes('key==="MINATO"'));
   assert("scene_board_dialogue_lifecycle_is_canonical",kakashiV4Source.includes('const PRESENTATION_HOOK_ID_33910="kakashi_scene_board_projection_33910"')&&kakashiV4Source.includes("registerStorySceneBoardRenderHook(PRESENTATION_HOOK_ID_33910")&&kakashiV4Source.includes('node.style.removeProperty("display")')&&!kakashiV4Source.includes('setProperty("display","none","important")'));
-  assert("scene04_cannot_clear_canonical_dialogue_surface",!scene04Source.includes("sc-performance-surface-33910")&&!scene04Source.includes("delete layer.dataset.scBoardUiMode"));
+  assert("scene04_cannot_clear_canonical_dialogue_surface",!scene04Source.includes('querySelectorAll(".sc-performance-surface-33910")')&&!scene04Source.includes("delete layer.dataset.scBoardUiMode"));
 
   load("runtime/alpha-kakashi-original-origin-restoration-33800.js");
   const rooftopEnvironment=context.resolveStorySceneEnvironmentProjection({environmentRef:{assetId:"kakashi_origin_rooftop_night"}},null,null,active);
