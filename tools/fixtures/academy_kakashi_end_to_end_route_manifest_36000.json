@@ -14,7 +14,7 @@
     "storyDecision": "runtime/alpha-story-decision-realisation-34000.js",
     "kakashiLoader": "runtime/alpha-kakashi-final-origin-adapter-34100.js",
     "requiredGeneration": {
-      "storyDecision": "story-decision-20260921-18",
+      "storyDecision": "story-decision-20260921-19",
       "kakashiFinal": "kakashi-final-20260921-91",
       "sceneBoard": "scene-board-20260921-15"
     }
