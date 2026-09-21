@@ -75,7 +75,7 @@ assert(scene03Source.includes("sc-watch-mi-cutoff-35700"),"MI interception anima
 assert(scene03Source.includes("sc-watch-ps-turn-35700")&&!scene03Source.includes("sc-watch-ps-escape-35700"),"Package Smuggler must hold the exchange lane before branch-specific escape");
 assert(scene03Source.includes("data-watch-stage=\'interceptor-swap\'")&&scene03Source.includes("left:42%!important")&&scene03Source.includes("scWatchAmtExitGhost35700")&&scene03Source.includes("visibility:hidden!important"),"MI must enter the active center lane while the replacement AMT node stays hidden behind the preserved exit ghost");
 assert.strictEqual(MOD.cueCount,18,"Scene 03A cue count drifted");
-assert.deepStrictEqual(MOD.objectives,{initial:"Stop the package from falling into the wrong hands.",postHandoff:"Retrieve the package."},"Scene 03A objective wording drifted");
+assert.deepStrictEqual(MOD.objectives,{initial:"Stop the package from falling into the wrong hands.",postHandoff:"Recover the package from Package Smuggler."},"Scene 03A objective wording drifted");
 assert.strictEqual(diag.checks.objectiveChangesAtPackageTransfer,true,"Scene 03A objective does not change at exact package-transfer cue");
 
 const action=definition.beatMap.get("kak_original_action");
@@ -181,7 +181,7 @@ console.log(`- exact narration cues: ${expected.length}`);
 console.log("- dialogue: none");
 console.log("- Watch the Exchange preserves the visible AMT DOM through cue 13, slides it left while MI enters, then removes it");
 console.log("- factual handoff: ANBU Marked Target -> Package Smuggler");
-console.log("- objective: Stop the package from falling into the wrong hands. -> Retrieve the package. at exact handoff cue");
+console.log("- objective: Stop the package from falling into the wrong hands. -> Recover the package from Package Smuggler. at exact handoff cue");
 console.log("- Masked Interceptor visibility commits after transfer");
 console.log("- exact five-way choice surface installed and available; successor scenes remain contained");
 console.log("- Observe semantic receipt resolves idempotently from committed Scene 03A state");
