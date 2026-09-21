@@ -105,7 +105,7 @@ assert(source.includes('classList.add("is-active")'),"lethal-attempt animation m
 assert(source.includes("2147483400"),"lethal-attempt animation must sit above Scene Board overlays");
 assert(source.includes("bottom:23.5%!important"),"Hokage Office lower cast must align to the table-row baseline");
 assert(!source.includes("sc-dialogue-panel-33910"),"W2C kill route must not own Kakashi dialogue geometry");
-assert(polishSource.includes("top:4%!important")&&polishSource.includes("kakashi_scene_board_model_v18_33910_2026_09_21")&&!polishSource.includes("#story-scene-presentation-layer[data-sc-postmi-35830="),"canonical 33910 dialogue lane missing or route-specific dialogue geometry reappeared");
+assert(polishSource.includes("top:4%!important")&&polishSource.includes("kakashi_scene_board_model_v19_33910_2026_09_22")&&!polishSource.includes("#story-scene-presentation-layer[data-sc-postmi-35830="),"canonical 33910 dialogue lane missing or route-specific dialogue geometry reappeared");
 assert(source.includes("left:28%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"Hokage Office AMT / ANBU / PS table-row placement missing");
 assert(source.includes("sc-w2c-office-anbu-enter-35770"),"KILLED office ANBU slide-in missing");
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"Recovered-package state must use the persistent Live State Callout");
