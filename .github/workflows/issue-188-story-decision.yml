@@ -347,7 +347,7 @@ jobs:
           grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashiPostMiPakkunPresent' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v27_2026_09_21' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v28_2026_09_22' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'NPC/uchiha_police_force_female_alt_2.png' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'NPC/uchiha_police_force_member_male.png' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'actorRefsForBeat:actorRefs35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
