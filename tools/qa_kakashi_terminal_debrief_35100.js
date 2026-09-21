@@ -26,6 +26,12 @@ var __qaProgression={};
 function cloneProgressionData(v){return v===undefined?undefined:JSON.parse(JSON.stringify(v));}
 function savePlayerData(){activityHistory=playerData.activityHistory||[];return true;}
 function saveTestState(){return savePlayerData();}
+function reloadQaState(label){
+  const serialized=JSON.stringify({playerData:playerData,runtime:__qaRuntime,progression:__qaProgression,completionCalls:__qaCompletionCalls});
+  const restored=JSON.parse(serialized);
+  playerData=restored.playerData;activityHistory=playerData.activityHistory||[];__qaRuntime=restored.runtime;__qaProgression=restored.progression||{};__qaCompletionCalls=restored.completionCalls||[];
+  return{label:label,activityCount:activityHistory.length,ryo:Number(playerData.ryo||0),inventoryCount:Array.isArray(playerData.inventory)?playerData.inventory.length:0,beatId:__qaRuntime&&__qaRuntime.beatId||null};
+}
 function normalizeStorySceneBeat(def){return def;}
 function getActiveStorySceneRuntime(){return __qaRuntime;}
 function getStorySceneDefinition(sceneId){return __qaScene&&__qaScene.sceneId===sceneId?__qaScene:null;}
@@ -68,7 +74,7 @@ run(terminal,"runtime/alpha-kakashi-terminal-debrief-35100.js");
 
 assert(loader.includes('runtime/alpha-kakashi-origin-rewards-34800.js'),"34100 does not production-load 34800 rewards");
 assert(loader.includes('runtime/alpha-kakashi-terminal-debrief-35100.js'),"34100 does not production-load 35100 terminal bridge");
-assert(loader.includes('kakashi-final-20260917-18'),"Kakashi child cache generation did not advance for reward tranche");
+assert(/^const BUILD="kakashi-final-20260921-91";$/m.test(loader),"active Kakashi child BUILD must be gen91");
 assert.strictEqual(plain(`runAcademyKakashiOriginRewards34800Diagnostics()`).pass,true,"34800 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).pass,true,"35100 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).browserGoldenClaimed,false);
@@ -98,6 +104,8 @@ assert.strictEqual(facts.exceptionalFieldExecution,false,"ordinary secure-packag
 assert.strictEqual(facts.exceptionalTrainingTantoPredicate,false);
 
 assert.strictEqual(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.guardedOriginCompletion()`).success,false,"Origin completed before terminal receipts");
+const beforeReportReload=plain(`reloadQaState("before-terminal-report")`);
+assert.strictEqual(beforeReportReload.beatId,"kak_seq_debrief_pending");
 const debrief=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitTerminalDebrief()`);
 assert.strictEqual(debrief.success,true,"terminal ANBU debrief did not commit");
 assert.strictEqual(truth(`!!SC_ALPHA_ORIGIN_32900.findOccurrence("occ_origin_kakashi_terminal_debrief_35100::qa-secure-35100")`),true);
@@ -109,7 +117,8 @@ assert.strictEqual(material.value.currentHolderClass,"ANBU");
 const debriefFact=plain(`SC_ALPHA_ORIGIN_32900.findOccurrence("occ_origin_kakashi_terminal_debrief_35100::qa-secure-35100").fact`);
 assert.strictEqual(debriefFact.packageTransferredToAnbuAtDebrief,true,"terminal report did not record the package handoff");
 assert.strictEqual(debriefFact.packageState.holderClass,"ANBU");
-
+const afterReportReload=plain(`reloadQaState("after-terminal-report-before-reward")`);
+assert(afterReportReload.activityCount>=1,"terminal report occurrence did not survive reload");
 const rewardCommit=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
 assert.strictEqual(rewardCommit.success,true,"Chronicle Receipt + reward commit failed");
 assert.strictEqual(Number(context.playerData.ryo||0),175,"secure-package terminal Ryō was not exact 100+75");
@@ -117,7 +126,9 @@ assert.strictEqual(context.playerData.inventory.filter(row=>row&&row.id==="field
 assert.strictEqual(context.playerData.inventory.filter(row=>row&&row.id==="academy_training_tanto").length,0,"ordinary secure-package route incorrectly granted Tantō");
 assert.strictEqual(truth(`!!SC_ALPHA_ORIGIN_32900.findOccurrence("occ_origin_kakashi_chronicle_receipt_35100::qa-secure-35100")`),true);
 assert.strictEqual(plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.closureReady()`),true);
-
+const atReceiptReload=plain(`reloadQaState("after-reward-at-receipt")`);
+assert.strictEqual(atReceiptReload.ryo,175,"terminal reward did not survive reload");
+assert(atReceiptReload.activityCount>=2,"Chronicle Receipt occurrence did not survive reload");
 const repeated=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.commitChronicleReceiptAndRewards()`);
 assert.strictEqual(repeated.success,true);
 assert.strictEqual(Number(context.playerData.ryo||0),175,"repeat terminal commit duplicated Ryō");
@@ -210,5 +221,5 @@ console.log(JSON.stringify({
   securePackageDebrief:true,battleVictoryAloneCannotReward:true,packageMaterialGuard:true,
   terminalRyoExact:175,fieldRecoveryPillExactlyOnce:true,ordinarySecureRouteNoTanto:true,
   pakkunExplicitDepartureRequired:true,routeOwnedPakkunDepartureRespected:true,postMiPackageMissingTerminalSupported:true,sequentialTurnFactsPreserved:true,sequentialPackageGapFailsClosed:true,
-  chronicleReceiptBeforeReward:true,guardedOriginCompletion:true,browserGoldenClaimed:false
+  chronicleReceiptBeforeReward:true,saveLoadBeforeReport:true,saveLoadAfterReport:true,saveLoadAtReceipt:true,guardedOriginCompletion:true,browserGoldenClaimed:false
 },null,2));
