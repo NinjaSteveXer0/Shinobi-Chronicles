@@ -487,11 +487,7 @@ function render(){
  for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;
  installStyle();
  layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
- const canonicalBackdrop=typeof globalThis.applyStorySceneBoardBackdrop33900==="function"?globalThis.applyStorySceneBoardBackdrop33900(stage,rt):null;
- if(!canonicalBackdrop){
-  const fallback=stageBg(rt,performance(rt));stage.dataset.scSceneBoardBackdrop="dedicated";stage.style.setProperty("--sc-scene-board-backdrop",'url("'+fallback.replace(/"/g,"%22")+'")');
- }
- stage.style.removeProperty("background-image");stage.style.removeProperty("background-size");stage.style.removeProperty("background-position");
+ if(typeof globalThis.applyStorySceneBoardBackdrop33900==="function")globalThis.applyStorySceneBoardBackdrop33900(stage,rt);
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}
  const p=performance(rt),focus=p&&p.cue&&(p.cue.speaker==="KAKASHI"?KAK:p.cue.speaker==="PACKAGE SMUGGLER"?PS:p.cue.speaker==="ANBU MARKED TARGET"?AMT:p.cue.speaker==="PAKKUN"?PAKKUN:p.cue.speaker==="ANBU OPERATIVE"?ANBU:p.cue.speaker==="UCHIHA POLICE OFFICER"?POLICE_AMT[0].ref:null)||KAK;
  const refs=actorRefs35830(rt,p);
@@ -508,7 +504,7 @@ if(!installBeats())throw new Error("post_mi_pursuit_35830_beats_missing");
 let hooked=false,tries=0;
 function hooks(){
  if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;
- const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null,RC=typeof globalThis.renderCombatOverlay==="function"?globalThis.renderCombatOverlay:null;
+ const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,RC=typeof globalThis.renderCombatOverlay==="function"?globalThis.renderCombatOverlay:null;
  globalThis.getStoryScenePerformance33900=function(){const p=performance(active());return p||PG.apply(this,arguments);};
  globalThis.advanceStoryScene=function(choiceId=null){const rt=active(),p=performance(rt);
   if(rt&&choiceId!=null&&[LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId)&&entryTargetForChoice(choiceId))return beginPostMiPursuitChoice35830(choiceId);
@@ -520,7 +516,7 @@ function hooks(){
   return PA.apply(this,arguments);
  };
  try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_e){}
- if(PR){globalThis.renderStoryScenePresentationLayer=function(){wireEntryChoices();primePostMiPresentationState35830();const out=PR.apply(this,arguments);wireEntryChoices();materializePsDecision();materializeAmtDecision();render();syncPsBattleBackdrop35830();return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}}
+ if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_post_mi_35830",()=>{wireEntryChoices();primePostMiPresentationState35830();materializePsDecision();materializeAmtDecision();const out=render();syncPsBattleBackdrop35830();return out;});
  if(RC){globalThis.renderCombatOverlay=function(){const out=RC.apply(this,arguments);syncPsBattleBackdrop35830();return out;};try{renderCombatOverlay=globalThis.renderCombatOverlay;}catch(_e){}}
  hooked=true;wireEntryChoices();render();return true;
 }
@@ -561,7 +557,7 @@ function diagnostics(){
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
    dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue-panel-33910")&&primePostMiPresentationState35830.toString().includes("scPostmiLane"),
    canonicalBackdropOwnership:render.toString().includes("applyStorySceneBoardBackdrop33900")&&render.toString().includes('scSceneBoard="true"')&&!render.toString().includes("stage.style.backgroundImage"),
-   amtDialogueUsesPrepaintStableLane:primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&primePostMiPresentationState35830.toString().includes("scPostmiLane")&&globalThis.renderStoryScenePresentationLayer.toString().includes("primePostMiPresentationState35830"),
+   amtDialogueUsesPrepaintStableLane:primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&primePostMiPresentationState35830.toString().includes("scPostmiLane")&&hooks.toString().includes("registerStorySceneBoardRenderHook"),
    distinctPolicePairsConfigured:(()=>{const refs=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.ref),images=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.image);return refs.length===6&&new Set(refs).size===6&&new Set(images).size===6;})(),
    amtPoliceHandoffStagesTwoOfficers:(()=>{const refs=actorRefs35830({beatId:BEAT.amtPoliceHandoff,localContext:{kakashiPostMiPakkunPresent:true}},{index:0,cue:{speaker:"UCHIHA POLICE OFFICER"}});return refs.includes(POLICE_AMT[0].ref)&&refs.includes(POLICE_AMT[1].ref)&&refs.filter(ref=>isPolice35830(ref)).length===2&&POLICE_AMT[0].image==="NPC/uchiha_police_force_female_alt_2.png"&&POLICE_AMT[1].image==="NPC/uchiha_police_force_member_male.png";})(),
    recoveredPoliceReportSkipsDuplicateGate:transitionNarrative.toString().includes("enterPrivateMinatoAfterSpecificReport35830")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("TERMINAL_MINATO")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("performKakashiSceneWipe33910"),
