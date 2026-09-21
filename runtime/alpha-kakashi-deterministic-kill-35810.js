@@ -175,9 +175,6 @@ function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=
     "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}"+
-    "."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:20%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5.4%!important}"+
-    "."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important}"+
-    "."+BOARD_CLASS+" .sc-scene-board-33900__actor[data-actor-id='academy_kakashi']{width:min(96%,338px)!important;max-height:505px!important}"+
     "."+BOARD_CLASS+" .sc-kakashi-mi-death-drop-35810{animation:kakashiMiDeathDrop35810 .60s cubic-bezier(.35,.05,.75,.2) both!important}"+
     "@keyframes kakashiMiDeathDrop35810{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(72vh) rotate(8deg)}}";
   document.head.appendChild(s);return true;
