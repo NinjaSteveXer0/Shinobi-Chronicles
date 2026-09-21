@@ -32,6 +32,7 @@ globalThis.advanceStoryScene=()=>{
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
   commitTerminalDebrief(){debriefs++;return{success:true,idempotent:debriefs>1};},
   commitChronicleReceiptAndRewards(){receipts++;return{success:true,idempotent:receipts>1};},
+  enterCanonicalReceipt(){debriefs++;receipts++;active.beatId="kak_terminal_chronicle_receipt_35100";return{success:true,beatId:active.beatId};},
   guardedOriginCompletion(){completions++;return{success:true,idempotent:completions>1};}
 };
 const resolverId="qa-resolver-kill";
@@ -75,13 +76,13 @@ assert(hidden);assert.strictEqual(hidden.fact.maskedInterceptorPresent,false);as
 for(let i=0;i<32;i++){out=globalThis.advanceStoryScene();assert.strictEqual(out.success,true);}
 perf=globalThis.getStoryScenePerformance33900();assert.strictEqual(perf.cue.text,"I won’t have trouble with that.");
 out=globalThis.advanceStoryScene();assert.strictEqual(out.success,true);
-assert.strictEqual(active.beatId,MOD.receiptBeatId);
+assert.strictEqual(active.beatId,"kak_terminal_chronicle_receipt_35100");
 assert.strictEqual(receipts,1);
-
+assert.strictEqual(debriefs,2,"route report + canonical terminal debrief should each commit once in this isolated QA");
 out=MOD.completeToKonoha();
-assert.strictEqual(out.success,true);
-assert.strictEqual(out.destination,"konoha_village");
-assert.strictEqual(completions,1);
+assert.strictEqual(out.success,false);
+assert.strictEqual(out.reason,"retired_to_canonical_terminal_35100");
+assert.strictEqual(completions,0);
 assert(saves>0);
 
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-w2c-ending-35770.js"),"utf8");
@@ -90,7 +91,8 @@ assert(source.includes("sc-kakashi-kill-35770"),"kill animation CSS missing");
 assert(source.includes("diagonal")===false,"presentation uses animation, not invented prose");
 assert(source.includes("rooftop_night.png"),"rooftop backdrop missing");
 assert(source.includes("hokage_administration_interior_night.png"),"Hokage backdrop missing");
-assert(source.includes("RECORDED IN YOUR CHRONICLE"),"separate Chronicle Receipt screen missing");
+assert(source.includes("enterCanonicalReceipt"),"canonical Chronicle Receipt handoff missing");
+assert(!source.includes("n.innerHTML=\'<div class=\"card\"><div class=\"eye\">YOUR ORIGIN"),"route-local Chronicle Receipt overlay must remain retired");
 assert(source.includes("maskedInterceptorPresent:false"),"Scene 08 must persist Masked Interceptor absence");
 assert(source.includes("installBrowserFinalCueCapture"),"installed-browser final-cue capture seam missing");
 assert(source.includes("stopImmediatePropagation"),"installed-browser final-cue capture must pre-empt the older 33900 lexical click handler");
@@ -105,13 +107,14 @@ assert(source.includes('classList.add("is-active")'),"lethal-attempt animation m
 assert(source.includes("2147483400"),"lethal-attempt animation must sit above Scene Board overlays");
 assert(source.includes("bottom:23.5%!important"),"Hokage Office lower cast must align to the table-row baseline");
 assert(!source.includes("sc-dialogue-panel-33910"),"W2C kill route must not own Kakashi dialogue geometry");
-assert(polishSource.includes("top:4%!important")&&polishSource.includes("kakashi_scene_board_model_v21_33910_2026_09_22")&&!polishSource.includes("#story-scene-presentation-layer[data-sc-postmi-35830="),"canonical 33910 dialogue lane missing or route-specific dialogue geometry reappeared");
+assert(polishSource.includes("top:4%!important")&&polishSource.includes("kakashi_scene_board_model_v22_33910_2026_09_22")&&!polishSource.includes("#story-scene-presentation-layer[data-sc-postmi-35830="),"canonical 33910 dialogue lane missing or route-specific dialogue geometry reappeared");
 assert(source.includes("left:28%!important")&&source.includes("left:54%!important")&&source.includes("left:67%!important")&&source.includes("bottom:23.5%!important"),"Hokage Office AMT / ANBU / PS table-row placement missing");
 assert(source.includes("sc-w2c-office-anbu-enter-35770"),"KILLED office ANBU slide-in missing");
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"Recovered-package state must use the persistent Live State Callout");
 assert(source.includes('card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE"'),"Minato nameplate must show actor status rather than package state");
 assert(!source.includes('<div class="sc-kakashi-w2c-package-status">'),"Standalone recovered-package banner markup must be removed");
-assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
+assert(!source.includes('querySelector(".sc-story-text")')&&!source.includes('querySelector(".sc-story-name")'),"W2C kill route must delegate cue text/speaker projection to canonical 33910");
+assert(source.includes("performStorySceneCut33900"),"W2C kill route must delegate black cuts to canonical 33900");
 console.log("Academy Kakashi W2C ending 35770 QA: PASS");
 console.log("- final Scene 06 click -> resolver hold -> direct/watchdog confirmed-kill presentation");
 console.log("- rooftop ANBU report -> Hokage office with hidden-operation Knowledge boundary");
