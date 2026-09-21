@@ -32,6 +32,7 @@ const REPORT_OBJECTIVE="Return to ANBU.";
 const STYLE_ID="sc-kakashi-loss-ending-35820-style",BOARD_CLASS="sc-kakashi-loss-ending-35820-board",RECEIPT_ID="sc-kakashi-loss-receipt-35820";
 const ROOFTOP="Kakashi Origin Backdrop/rooftop_night.png",OFFICE="Kakashi Origin Backdrop/hokage_administration_interior_night.png";
 const KAK="academy_kakashi",ANBU="konoha_anbu_contact",MI="academy_kakashi_origin_masked_interceptor",AMT="anbu_marked_target",PS="package_smuggler",MINATO="kage_minato";
+const AMT_REF="academy_kakashi_origin_amt",PS_REF="academy_kakashi_origin_package_smuggler";
 
 const REPORT=Object.freeze([
  {kind:"narration",text:"Kakashi returns to the rooftop.",focusActorRef:KAK},
@@ -218,6 +219,9 @@ function commitReport(){
   const fact={factClass:"academy_kakashi_scene06a_l_anbu_report",sceneId:"SCENE_06A_L",authorityCommit:AUTH_REPORT,packageHandoffOccurred:true,packageSmugglerEscapedWithPackage:true,anbuMarkedTargetEscaped:true,kakashiIntervenedAgainstMaskedInterceptor:true,maskedInterceptorDefeatedKakashi:true,maskedInterceptorLeftSightPursuingPackageSmuggler:true,kakashiCouldNotReacquire:true,maskedInterceptorPackageSmugglerAftermathKnownToKakashi:false,kakashiMissionPackageRecovered:false,participantCustodyCommitted:false,lethalActionCommitted:false,pakkunPresent:false,missionObjectiveResultFromKakashiKnowledge:"FAILED",truthfulReport:true,excusesGiven:false,objectiveRemovedAtSceneEnd:true};
   const out=A.commitOccurrence(ORIGIN_ID,id,fact,[],{type:"origin_story_anbu_report",outcome:"stop_assassin_loss_truthfully_reported",participantRefs:[ORIGIN_ID,ANBU],sourceRefs:[{type:"origin_occurrence",id:String(loss.occurrenceId||rt.localContext.kakashiScene05ALPackageOccurrenceId),role:"loss_closure"},{type:"writing_authority",id:AUTH_REPORT}]});
   if(!out||out.success!==true)return out||{success:false,reason:"loss_anbu_report_commit_failed"};
+  for(const [participantRef,stateClass] of [[MI,"LEFT_KAKASHI_SIGHT"],[PS_REF,"ESCAPED"],[AMT_REF,"ESCAPED"]]){
+   const classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef,stateClass,resultRef:id+"::"+participantRef});if(!classified||classified.success!==true)return classified||{success:false,reason:"loss_participant_classification_failed",participantRef,stateClass};
+  }
   rt.localContext={...(rt.localContext||{}),kakashiScene06ALReportOccurrenceId:id,kakashiScene05ALObjective:null};save();
   const terminal=TERMINAL.commitTerminalDebrief();if(!terminal||terminal.success!==true)return terminal||{success:false,reason:"loss_terminal_debrief_commit_failed"};
   return{success:true,occurrenceId:id};
