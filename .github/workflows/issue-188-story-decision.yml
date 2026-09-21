@@ -27,6 +27,7 @@ on:
       - 'tools/fixtures/academy_kakashi_runtime_owner_map_36100.json'
       - 'tools/qa_academy_kakashi_completion_tail_36000.js'
       - 'tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js'
+      - 'tools/qa_academy_kakashi_deterministic_route_traversal_36200.js'
       - 'tools/qa_academy_kakashi_runtime_owner_map_36100.js'
       - 'tools/qa_academy_kakashi_alpha_completion_356xx.js'
       - 'runtime/alpha-first-konoha-tutorial-35000.js'
@@ -101,6 +102,7 @@ on:
       - 'tools/fixtures/academy_kakashi_runtime_owner_map_36100.json'
       - 'tools/qa_academy_kakashi_completion_tail_36000.js'
       - 'tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js'
+      - 'tools/qa_academy_kakashi_deterministic_route_traversal_36200.js'
       - 'tools/qa_academy_kakashi_runtime_owner_map_36100.js'
       - 'tools/qa_academy_kakashi_alpha_completion_356xx.js'
       - 'runtime/alpha-first-konoha-tutorial-35000.js'
@@ -563,3 +565,8 @@ jobs:
           node -e "JSON.parse(require('fs').readFileSync('tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json','utf8'))"
           node tools/qa_academy_kakashi_alpha_completion_356xx.js
           node tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js
+
+      - name: Kakashi deterministic full-route traversal
+        run: |
+          node --check tools/qa_academy_kakashi_deterministic_route_traversal_36200.js
+          node tools/qa_academy_kakashi_deterministic_route_traversal_36200.js
