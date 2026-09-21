@@ -26,6 +26,7 @@ globalThis.advanceStoryScene=()=>({success:true,type:"base"});
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
   commitTerminalDebrief(){debriefs++;return{success:true,idempotent:false};},
   commitChronicleReceiptAndRewards(){receipts++;return{success:true,idempotent:false};},
+  enterCanonicalReceipt(){debriefs++;receipts++;active.beatId="kak_terminal_chronicle_receipt_35100";return{success:true,beatId:active.beatId};},
   guardedOriginCompletion(){completions++;return{success:true,idempotent:false};}
 };
 
@@ -98,15 +99,15 @@ for(let n=0;n<cases.length;n++){
 
   guard=0;
   while(active.beatId===MOD.scene08BeatId&&guard++<120){const out=globalThis.advanceStoryScene();assert.strictEqual(out.success,true);}
-  assert.strictEqual(active.beatId,MOD.receiptBeatId,"office did not reach receipt for "+spec.outcome);
+  assert.strictEqual(active.beatId,"kak_terminal_chronicle_receipt_35100","office did not reach canonical receipt for "+spec.outcome);
   const out=MOD.completeToKonoha();
-  assert.strictEqual(out.success,true);
-  assert.strictEqual(out.destination,"konoha_village");
+  assert.strictEqual(out.success,false);
+  assert.strictEqual(out.reason,"retired_to_canonical_terminal_35100");
 }
 
-assert.strictEqual(debriefs,3);
+assert.strictEqual(debriefs,6,"each route commits its authored report plus canonical terminal debrief in this isolated QA");
 assert.strictEqual(receipts,3);
-assert.strictEqual(completions,3);
+assert.strictEqual(completions,0);
 assert(saves>0);
 
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-w2c-nonkill-35780.js"),"utf8");
@@ -130,7 +131,9 @@ assert(polishSource.includes("top:4%!important"),"canonical 33910 dialogue lane 
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"Recovered-package state must use the persistent Live State Callout");
 assert(source.includes('card(MINATO,"MINATO","Assets/Kage/kage_minato.png","HOKAGE"'),"Minato nameplate must show actor status rather than package state");
 assert(!source.includes('<div class="sc-kakashi-w2c-nonkill-package">'),"Standalone non-kill recovered-package banner markup must be removed");
-assert(source.includes('name.style.display="block"'),"speaker/narration quick-read label must remain visible in panel");
+assert(!source.includes('querySelector(".sc-story-text")')&&!source.includes('querySelector(".sc-story-name")'),"W2C non-kill route must delegate cue text/speaker projection to canonical 33910");
+assert(source.includes("performStorySceneCut33900"),"W2C non-kill route must delegate black cuts to canonical 33900");
+assert(source.includes("enterCanonicalReceipt"),"W2C non-kill route must hand off to canonical Receipt");
 
 console.log("Academy Kakashi W2C non-kill ending 35780 QA: PASS");
 console.log("- SURVIVED / INTERRUPTED / ESCAPED exact locked scene chains consumed");
