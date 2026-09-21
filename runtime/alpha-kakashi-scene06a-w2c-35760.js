@@ -304,10 +304,6 @@ function installStyle(){
   const style=document.createElement("style");style.id=STYLE_ID;
   style.textContent=[
     "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}",
-    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:20%!important;gap:2.2%!important}",
-    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actors[data-count='2']{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5.4%!important;column-gap:0!important}",
-    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important}",
-    "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-scene-board-33900__actor[data-actor-id='academy_kakashi']{width:min(96%,338px)!important;max-height:505px!important}",
     "#story-scene-presentation-layer ."+BOARD_CLASS+" .sc-kakashi-mi-death-drop-35760{animation:kakashiMiDeathDrop35760 .60s cubic-bezier(.35,.05,.75,.2) both!important}",
     "@keyframes kakashiMiDeathDrop35760{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(72vh) rotate(8deg)}}"
 
