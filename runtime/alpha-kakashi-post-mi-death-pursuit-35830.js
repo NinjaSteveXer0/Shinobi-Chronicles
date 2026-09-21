@@ -395,7 +395,7 @@ function transitionNarrative(rt){
  let launchBattle=false;
  if(rt.beatId===BEAT.psChase){const r=resolveSelectedPursuit("ps");if(!r.success)return r;rt.beatId=r.reached?BEAT.psCatch:BEAT.psFail;}
  else if(rt.beatId===BEAT.psCatch){rt.beatId=BEAT.psBattle;launchBattle=true;}
- else if(rt.beatId===BEAT.psWin)rt.beatId=BEAT.psDecision;
+ else if(rt.beatId===BEAT.psWin){rt.beatId=BEAT.psDecision;if(!materializePsDecision())return{success:false,reason:"post_mi_ps_decision_materialization_failed"};}
  else if(rt.beatId===BEAT.psLoss||rt.beatId===BEAT.psFail)rt.beatId=BEAT.psReport;
  else if(rt.beatId===BEAT.psAnbuEscort)rt.beatId=BEAT.psAnbuHandoff;
  else if(rt.beatId===BEAT.psAnbuHandoff){
@@ -406,7 +406,7 @@ function transitionNarrative(rt){
  else if(rt.beatId===BEAT.amtCatch){if(!(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true)){const p=commitPakkunReach("direct_amt");if(!p.success)return p;}rt.beatId=BEAT.amtBattle;launchBattle=true;}
  else if(rt.beatId===BEAT.psToAmt){if(!(rt.localContext&&rt.localContext.kakashiPostMiPakkunPresent===true)){const p=commitPakkunReach("ps_amt");if(!p.success)return p;}rt.beatId=BEAT.amtBattle;launchBattle=true;}
  else if(rt.beatId===BEAT.amtFail)rt.beatId=BEAT.amtReport;
- else if(rt.beatId===BEAT.amtWin)rt.beatId=BEAT.amtDecision;
+ else if(rt.beatId===BEAT.amtWin){rt.beatId=BEAT.amtDecision;if(!materializeAmtDecision())return{success:false,reason:"post_mi_amt_decision_materialization_failed"};}
  else if(rt.beatId===BEAT.amtLiveReturn)rt.beatId=BEAT.amtAnbuHandoff;
  else if(rt.beatId===BEAT.amtAnbuHandoff){
   const tr=commitInstitutionalTransfer35830(AMT,"ANBU",String(rt.localContext&&rt.localContext.kakashiPostMiAmtBattleOccurrenceId||""));if(!tr||tr.success!==true)return tr||{success:false,reason:"post_mi_amt_anbu_transfer_failed"};
@@ -556,6 +556,7 @@ function diagnostics(){
    pakkunSceneRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
    dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue-panel-33910")&&primePostMiPresentationState35830.toString().includes("scPostmiLane"),
+   decisionMaterializationSemantic:transitionNarrative.toString().includes("post_mi_ps_decision_materialization_failed")&&transitionNarrative.toString().includes("post_mi_amt_decision_materialization_failed"),
    canonicalBackdropOwnership:render.toString().includes("applyStorySceneBoardBackdrop33900")&&render.toString().includes('scSceneBoard="true"')&&!render.toString().includes("stage.style.backgroundImage"),
    amtDialogueUsesPrepaintStableLane:primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&primePostMiPresentationState35830.toString().includes("scPostmiLane")&&hooks.toString().includes("registerStorySceneBoardRenderHook"),
    distinctPolicePairsConfigured:(()=>{const refs=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.ref),images=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.image);return refs.length===6&&new Set(refs).size===6&&new Set(images).size===6;})(),
