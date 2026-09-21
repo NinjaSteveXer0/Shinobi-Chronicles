@@ -1709,7 +1709,7 @@ function commitHiddenReview(){
 }
 function installBeats(){
   const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;if(!m)return false;
-  m.set(AFTERMATH,{beatId:AFTERMATH,mode:"narration",text:"",exitScene:false,allowPresentationClose:false,choices:[]});
+  m.set(AFTERMATH,{beatId:AFTERMATH,mode:"narration",environmentRef:{assetId:"kakashi_origin_fight_at_sakura_tree"},text:"",exitScene:false,allowPresentationClose:false,choices:[]});
   m.set(SCENE07,{beatId:SCENE07,mode:"narration",environmentRef:{assetId:"kakashi_origin_rooftop_night"},text:"",exitScene:false,allowPresentationClose:false,choices:[]});
   m.set(SCENE08,{beatId:SCENE08,mode:"narration",environmentRef:{assetId:"kakashi_origin_hokage_administration_interior_night"},text:"",exitScene:false,allowPresentationClose:false,choices:[]});
   m.set(RECEIPT,{beatId:RECEIPT,mode:"narration",text:"",exitScene:false,allowPresentationClose:false,choices:[]});
@@ -1784,12 +1784,12 @@ function board(rt,p){
   ].join("");
   return'<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">HOKAGE ADMINISTRATION · NIGHT</div></div><div class="sc-scene-board-33900__actors" data-count="'+(anbuVisible?5:4)+'">'+officeActors+'</div><div class="sc-scene-board-33900__objects sc-live-state-callouts-33900"><span class="sc-scene-board-33900__object sc-live-state-callout-33900 is-committed"><b>PACKAGE</b>RECOVERED · HIDDEN OPERATION</span></div>';
 }
-function setBackdrop(stage,path){stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+String(path).replace(/"/g,"%22")+'")';stage.style.backgroundPosition="center";stage.style.backgroundSize="cover";stage.style.backgroundRepeat="no-repeat";}
+function applyCanonicalBackdrop35780(stage,rt){return !!(stage&&typeof globalThis.applyStorySceneBoardBackdrop33900==="function"&&globalThis.applyStorySceneBoardBackdrop33900(stage,rt));}
 function render(){
   if(typeof document==="undefined")return false;const rt=active(),p=sequence(rt);if(!rt||!p)return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;installStyle();
   const key=rt.beatId===SCENE08?"office":rt.beatId===SCENE07?"report":"aftermath";layer.dataset.scKakashiW2cNonkillStage=key;
-  setBackdrop(stage,rt.beatId===AFTERMATH?SAKURA_BG:rt.beatId===SCENE07?ROOFTOP_BG:OFFICE_BG);
+  applyCanonicalBackdrop35780(stage,rt);
   let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;b.setAttribute("aria-hidden","true");stage.appendChild(b);}b.dataset.stage=key;b.innerHTML=board(rt,p);
   const text=layer.querySelector(".sc-story-text");if(text)text.textContent=p.cue.text;
   const name=layer.querySelector(".sc-story-name");if(name){name.textContent=p.cue.kind==="dialogue"?p.cue.speaker||"":p.cue.kind==="record"?"SHINOBI RECORD":"NARRATION";name.style.display="block";}
@@ -1842,7 +1842,7 @@ if(!installBeats())throw new Error("kakashi_w2c_nonkill_35780_beats_missing");
 let hooked=false,tries=0;
 function hooks(){
   if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;
-  const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+  const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900;
   globalThis.getStoryScenePerformance33900=function(){const p=sequence(active());return p||PG.apply(this,arguments);};
   globalThis.advanceStoryScene=function(choiceId){
     if(arguments.length===0)choiceId=null;const rt=active(),selected=selectedOutcome();
@@ -1857,7 +1857,7 @@ function hooks(){
     return delegated;
   };
   try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_error){}
-  if(PR){globalThis.renderStoryScenePresentationLayer=function(){const out=PR.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(render);else if(typeof setTimeout==="function")setTimeout(render,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_w2c_nonkill_35780",()=>render());
   hooked=true;return true;
 }
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
