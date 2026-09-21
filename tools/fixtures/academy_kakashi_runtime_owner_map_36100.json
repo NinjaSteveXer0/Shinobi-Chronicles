@@ -124,35 +124,36 @@
     },
     {
       "id": "battle_browser_interaction",
-      "responsibility": "Kakashi Combat browser interaction hardening",
-      "classification": "REQUIRED COMPATIBILITY",
+      "responsibility": "Kakashi Combat browser interaction and factual action presentation",
+      "classification": "CANONICAL",
       "owners": [
         "runtime/alpha-kakashi-battle-interaction-hotfix-34500.js"
       ],
       "caller": "Combat overlay render/DOM interaction",
       "writes": [
-        "presentation-only Battle interaction bindings"
+        "Battle interaction bindings",
+        "factual action/impact presentation"
       ],
       "nextConsumer": [
         "shared Combat resolver"
       ],
-      "notes": "Kept because it adapts shared Combat browser surfaces; it does not own Story facts."
+      "notes": "Sole Kakashi Battle-card interaction/presentation owner; consumes shared Combat facts and never resolves Combat semantics."
     },
     {
       "id": "substitution",
-      "responsibility": "Kakashi Substitution Battle interaction/runtime integration",
+      "responsibility": "Kakashi Substitution semantic/palette/runtime integration",
       "classification": "REQUIRED COMPATIBILITY",
       "owners": [
         "runtime/alpha-kakashi-substitution-34900.js"
       ],
-      "caller": "active Kakashi Battle DOM/runtime",
+      "caller": "Kakashi prepared-skill palette/runtime",
       "writes": [
-        "Battle presentation/runtime interaction only"
+        "Substitution definition/palette/guide projection only"
       ],
       "nextConsumer": [
         "shared Combat runtime"
       ],
-      "notes": "DOM observer is Battle-scoped, not Story Scene Board ownership."
+      "notes": "No DOM observer or separate click owner; rendered interaction delegates to canonical 34500."
     },
     {
       "id": "battle_claim_return",
