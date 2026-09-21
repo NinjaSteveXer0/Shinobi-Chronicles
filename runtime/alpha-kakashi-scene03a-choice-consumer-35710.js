@@ -111,29 +111,9 @@ function installChoiceSurface35710(){
   return{success:true,choiceIds:major.choices.map(row=>row.choiceId)};
 }
 
-let hooksInstalled=false,hookAttempts=0;
-function scheduleSync35710(){
-  const run=()=>{syncObjective35710();try{const rt=active();if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===MAJOR_BEAT&&typeof globalThis.renderStoryScenePresentationLayer==="function")globalThis.renderStoryScenePresentationLayer();}catch(_error){}};
-  if(typeof queueMicrotask==="function")queueMicrotask(run);else if(typeof setTimeout==="function")setTimeout(run,0);
-}
-function installHooks35710(){
-  if(hooksInstalled)return true;
-  const PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
-  const PRE_BOARD=typeof globalThis.renderStorySceneBoard33900==="function"?globalThis.renderStorySceneBoard33900:null;
-  const PRE_ADVANCE=typeof globalThis.advanceStoryScene==="function"?globalThis.advanceStoryScene:null;
-  if(!PRE_RENDER||!PRE_ADVANCE)return false;
-  globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35710(){const result=PRE_RENDER.apply(this,arguments);if(typeof queueMicrotask==="function")queueMicrotask(syncObjective35710);else setTimeout(syncObjective35710,0);return result;};
-  try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}
-  if(PRE_BOARD){globalThis.renderStorySceneBoard33900=function renderStorySceneBoard35710(){const result=PRE_BOARD.apply(this,arguments);syncObjective35710();return result;};try{renderStorySceneBoard33900=globalThis.renderStorySceneBoard33900;}catch(_error){}}
-  globalThis.advanceStoryScene=function advanceStoryScene35710(){const result=PRE_ADVANCE.apply(this,arguments);scheduleSync35710();return result;};
-  try{advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(typeof document!=="undefined"&&typeof MutationObserver==="function"){
-    const root=document.getElementById("story-scene-presentation-layer")||document.body;
-    if(root){const observer=new MutationObserver(()=>syncObjective35710());observer.observe(root,{childList:true,subtree:true});}
-  }
-  hooksInstalled=true;syncObjective35710();return true;
-}
-function ensureHooks35710(){if(installHooks35710())return;if(typeof setTimeout==="function"&&hookAttempts++<80)setTimeout(ensureHooks35710,25);}
+// Presentation synchronization is owned by Scene03A 35700 + Scene Board 33900/33910.
+ // This consumer owns semantic choice release only; it deliberately installs no
+ // render wrapper, advance wrapper, DOM observer, timeout, or microtask UI patch.
 
 function diagnostics(){
   const def=definition(),major=def&&def.beatMap instanceof Map?def.beatMap.get(MAJOR_BEAT):null;
@@ -145,7 +125,7 @@ function diagnostics(){
     exactBindings:!!major&&major.choices.every((row,index)=>row.scene03AResolverBindingRef===CHOICES[index].resolverBindingRef),
     packageObjectiveChangesAtHandoff:objectiveForState({sceneId:SCENE_ID,beatId:TRANSFER_BEAT,action:OBSERVE_CHOICE,cueIndex:2,currentObjective:PRE_HANDOFF_OBJECTIVE})===PRE_HANDOFF_OBJECTIVE&&objectiveForState({sceneId:SCENE_ID,beatId:TRANSFER_BEAT,action:OBSERVE_CHOICE,cueIndex:3,currentObjective:PRE_HANDOFF_OBJECTIVE})===POST_HANDOFF_OBJECTIVE,
     majorObjectiveUntouched:objectiveForState({sceneId:SCENE_ID,beatId:MAJOR_BEAT,action:OBSERVE_CHOICE,cueIndex:17,currentObjective:"Choose which problem Kakashi prioritizes."})==="Choose which problem Kakashi prioritizes.",
-    noPakkunSurfaceInjection:!JSON.stringify(CHOICES).toLowerCase().includes("pakkun"),
+    noPakkunSurfaceInjection:!JSON.stringify(CHOICES).toLowerCase().includes("pakkun"),presentationOwnershipRetired:!installAcademyKakashiScene03AChoiceConsumer35710.toString().includes("MutationObserver")&&!installAcademyKakashiScene03AChoiceConsumer35710.toString().includes("renderStoryScenePresentationLayer=function")&&!installAcademyKakashiScene03AChoiceConsumer35710.toString().includes("advanceStoryScene=function"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
@@ -153,7 +133,6 @@ function diagnostics(){
 }
 
 const installed=installChoiceSurface35710();if(!installed||installed.success!==true)throw new Error(`kakashi_scene03a_choices_35710_install_failed:${installed&&installed.reason||"unknown"}`);
-ensureHooks35710();
 globalThis.runAcademyKakashiScene03AChoices35710Diagnostics=diagnostics;
 globalThis.SC_ALPHA_KAKASHI_SCENE03A_CHOICES_35710=Object.freeze({
   patchId:PATCH_ID,installed,choiceIds:CHOICES.map(row=>row.choiceId),choiceSpecs:CHOICES,postHandoffObjective:POST_HANDOFF_OBJECTIVE,
