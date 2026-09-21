@@ -331,9 +331,6 @@ function renderScene(){
   const p=performance(rt);
   if(p&&p.cue){
     layer.dataset.scPerformance="true";
-    const cue=p.cue,text=layer.querySelector&&layer.querySelector(".sc-story-text");if(text&&text.textContent!==cue.text)text.textContent=cue.text;
-    const name=layer.querySelector&&layer.querySelector(".sc-story-name");if(name){name.textContent="";name.style.display="none";}
-    const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";
     const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
   }else{
     try{delete layer.dataset.scPerformance;}catch(_error){}
