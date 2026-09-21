@@ -10,7 +10,11 @@ globalThis.SC_ALPHA_ORIGIN_32900={
  commitOccurrence(originId,occurrenceId,fact,links,meta){if(store.has(occurrenceId))return{success:true,idempotent:true,record:store.get(occurrenceId)};const record={originId,occurrenceId,fact,links,meta};store.set(occurrenceId,record);globalThis.playerData.activityHistory.push(record);return{success:true,record};},
  findOccurrence(id){return store.get(String(id||""))||null;}
 };
-globalThis.SC_STORY_DECISION_REALISATION_34000={stableRef(prefix,payload){return prefix+"::"+JSON.stringify(payload||{});}};
+const participantStates={};
+globalThis.SC_STORY_DECISION_REALISATION_34000={
+ stableRef(prefix,payload){return prefix+"::"+JSON.stringify(payload||{});},
+ recordParticipantClassification({participantRef,stateClass,resultRef}){participantStates[participantRef]={participantRef,stateClass,resultRef};return{success:true,participantRef,stateClass,resultRef};}
+};
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
  commitTerminalDebrief(){debrief+=1;return{success:true,occurrenceId:"terminal-"+debrief};},
  commitChronicleReceiptAndRewards(){receipt+=1;return{success:true,receiptOccurrenceId:"receipt-"+receipt};},
@@ -66,6 +70,9 @@ assert.strictEqual(report.fact.lethalActionCommitted,false);
 assert.strictEqual(report.fact.participantCustodyCommitted,false);
 assert.strictEqual(report.fact.pakkunPresent,false);
 assert.strictEqual(report.fact.missionObjectiveResultFromKakashiKnowledge,"FAILED");
+assert.strictEqual(participantStates["academy_kakashi_origin_masked_interceptor"].stateClass,"LEFT_KAKASHI_SIGHT");
+assert.strictEqual(participantStates["academy_kakashi_origin_package_smuggler"].stateClass,"ESCAPED");
+assert.strictEqual(participantStates["academy_kakashi_origin_amt"].stateClass,"ESCAPED");
 assert.strictEqual(active.localContext.kakashiScene05ALObjective,null,"Return to ANBU objective must be removed after report");
 assert(debrief>=1,"terminal debrief was not committed after factual report");
 
