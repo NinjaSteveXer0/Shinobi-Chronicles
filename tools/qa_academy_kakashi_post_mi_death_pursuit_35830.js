@@ -6,7 +6,7 @@ function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const LIVE_SOURCE="kak_scene05a_w_choice",RESOLVER_SOURCE="kak_scene06a_w2c_scene7_pending",DKILL_SOURCE="kak_scene06a_w2c_deterministic_kill_pursuit_35810";
 const MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt";
-const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0,terminalDebriefCommits=0,wipes=0;const materialStates={};
+const store=new Map();let ref=0,saves=0,launches=[],recoveryCalls=0,terminalDebriefCommits=0,wipes=0,renders=0;const materialStates={};
 const participantStates={
  [MI]:{participantRef:MI,stateClass:"DEAD"},
  [PS]:{participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"}
@@ -97,7 +97,7 @@ globalThis.launchStorySceneBattle=function(){
 globalThis.getStorySceneDefinition=id=>id===SCENE_ID?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
 globalThis.getStoryScenePerformance33900=()=>null;
-globalThis.renderStoryScenePresentationLayer=()=>true;
+globalThis.renderStoryScenePresentationLayer=()=>{renders+=1;return true;};
 globalThis.queueMicrotask=fn=>fn(); // settle runtime render/materialization synchronously in headless QA
 globalThis.advanceStoryScene=function baseAdvance(choiceId=null){
  const beat=definition.beatMap.get(active.beatId);if(!beat)return{success:false,reason:"qa_beat_missing",beatId:active.beatId};
@@ -150,17 +150,19 @@ assert(!source35830.includes('"Portraits/Summons/pakkun.png"'),"Story scene must
 assert(source35830.includes("sc-postmi-summon-35830"),"Pakkun must render through the plain Story summon surface");
 assert(source35830.includes("if(ref===PAKKUN)return"),"Pakkun must bypass generic Character Card markup");
 assert(source35830.includes("!card(PAKKUN,\"PRESENT\",true).includes(\"sc-scene-board-33900__actor-frame\")"),"Pakkun regression guard must reject Character Card framing");
-assert(source35830.includes("data-speaker-id=\'pakkun\'"),"Pakkun dialogue must have a speaker-specific safe-lane rule");
-assert(source35830.includes("right:6%!important")&&source35830.includes("transform:none!important"),"Pakkun dialogue must use the authored right-side safe lane");
-assert(source35830.includes("[data-sc-board-ui-mode=\'dialogue\']")&&source35830.includes("top:4%!important"),"post-MI dialogue safe lane must outrank global dialogue centering and clear Character Cards");
-assert(source35830.includes("primePostMiPresentationState35830")&&source35830.includes("top:2%!important")&&source35830.includes("primePostMiPresentationState35830();const out=PR.apply"),"AMT dialogue must establish its final high safe lane before the Story renderer paints the dialogue panel");
+const styleStart35830=source35830.indexOf("function installStyle()");
+const styleEnd35830=source35830.indexOf("const PAKKUN_SCENE_ASSET",styleStart35830);
+const styleBody35830=source35830.slice(styleStart35830,styleEnd35830);
+assert(!styleBody35830.includes("sc-dialogue-panel-33910"),"35830 must not compete with 33910 for dialogue geometry");
+assert(source35830.includes("scPostmiLane")&&source35830.includes("primePostMiPresentationState35830();const out=PR.apply"),"35830 must establish route/lane state before first paint");
+assert(!source35830.includes("queueMicrotask(settle)")&&!source35830.includes("setTimeout(settle,0)"),"35830 must not use delayed post-render layout/projection correction");
 assert(!source35830.includes("enforceAmtDialogueLane35830")&&!source35830.includes("scheduleAmtDialogueLane35830"),"AMT dialogue must not be repositioned by post-render microtask/frame corrections");
 assert(source35830.includes("[BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId))refs.unshift(ANBU)"),"Police-to-ANBU package return must visibly stage the ANBU operative");
 assert(source35830.includes('rooftop=[BEAT.amtChase,BEAT.psToAmt,BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn]')&&source35830.includes('"KONOHA ROOFTOP · NIGHT"'),"Police-to-ANBU return must project the rooftop location instead of the alley label");
 assert(source35830.includes('TERMINAL_MINATO="kak_terminal_minato_private_evaluation_35100"')&&source35830.includes("enterPrivateMinatoAfterSpecificReport35830")&&source35830.includes("genericReportGateSkipped:true"),"recovered Police route must skip the duplicate REPORT gate and transition directly to the private Minato scene");
 assert(source35830.includes('NPC/uchiha_police_force_female_alt_2.png')&&source35830.includes('NPC/uchiha_police_force_member_male.png'),"AMT Police handoff must use its dedicated two-officer asset pair");
 assert(source35830.includes('NPC/uchiha_police_force_member_female.png')&&source35830.includes('NPC/uchiha_police_force_male_alt_1.png')&&source35830.includes('NPC/uchiha_police_force_female_alt_1.png')&&source35830.includes('NPC/uchiha_police_force_male_alt_2.png'),"all MI/PS/AMT Police portrait pairs must remain explicitly distinct");
-assert(source35830.includes("refs.push(POLICE_AMT[0].ref,POLICE_AMT[1].ref)"),"AMT Police handoff board must actually stage both Police officers");
+const policeProjection=MOD.actorRefsForBeat({beatId:MOD.beats.amtPoliceHandoff,localContext:{kakashiPostMiPakkunPresent:true}},{index:0,cue:{speaker:"UCHIHA POLICE OFFICER"}});assert(policeProjection.includes("uchiha_police_officer_amt_a")&&policeProjection.includes("uchiha_police_officer_amt_b")&&policeProjection.filter(ref=>String(ref).startsWith("uchiha_police_officer_")).length===2,"AMT Police handoff runtime projection must contain exactly its dedicated two-officer pair");
 assert(source35830.includes("const prior=document.getElementById(STYLE_ID);if(prior)prior.remove()"),"post-MI style install must replace stale same-ID CSS");
 assert(source35830.includes("You decided fast.")&&source35830.includes("That doesn\'t make it lighter."),"direct AMT KILL aftermath must include locked Pakkun/Kakashi continuation");
 assert(source35830.includes('const TERMINAL_PENDING="kak_seq_debrief_pending"')&&source35830.includes("rt.beatId=TERMINAL_PENDING"),"direct AMT KILL must hand off to terminal report instead of dead-end boundary");
@@ -394,10 +396,11 @@ materialStates[PACKAGE]={materialRef:PACKAGE,resolved:true,stateRef:"qa-specific
 participantStates[AMT]={participantRef:AMT,stateClass:"UCHIHA_POLICE_INSTITUTIONAL_CUSTODY",resultRef:"qa-specific-report-police"};
 participantStates["pakkun_origin_unfamiliar_ninken"]={participantRef:"pakkun_origin_unfamiliar_ninken",stateClass:"DEPARTED",resultRef:"qa-specific-report-pakkun"};
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-specific-report",beatId:MOD.beats.amtPoliceAnbuReturn,localContext:{kakashiPostMiAmtBattleOccurrenceId:"qa-specific-report-battle"},battleResume:{authored:null}};
-const commitsBeforeSpecificReport=terminalDebriefCommits,wipesBeforeSpecificReport=wipes;
+const commitsBeforeSpecificReport=terminalDebriefCommits,wipesBeforeSpecificReport=wipes,rendersBeforeSpecificReport=renders;
 drainNarration("kak_terminal_minato_private_evaluation_35100",40);
 assert.strictEqual(terminalDebriefCommits,commitsBeforeSpecificReport+1,"branch-specific Police report did not commit terminal debrief exactly once");
 assert.strictEqual(wipes,wipesBeforeSpecificReport+1,"branch-specific Police report did not use the black wipe into Hokage office");
+assert(renders-rendersBeforeSpecificReport<=45,"ANBU-report -> Minato transition exceeded bounded render budget: "+String(renders-rendersBeforeSpecificReport));
 assert.strictEqual(active.localContext.kakashiPostMiSpecificAnbuReportCompleted,true,"branch-specific report completion marker missing");
 assert.strictEqual(materialStates[PACKAGE].value.currentHolderClass,"ANBU","package was not returned to ANBU before private Minato review");
 

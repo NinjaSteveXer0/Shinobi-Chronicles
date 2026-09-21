@@ -186,7 +186,7 @@ assert(!MOD.reportText(state).includes("The receiver got away with it."));
 
 // Installed 35100 expression beats are overridden, while completion ownership is untouched.
 assert.strictEqual(typeof beatMap.get("kak_terminal_debrief_summary_35100").presentationResolver,"function");
-assert.strictEqual(typeof beatMap.get("kak_terminal_minato_private_evaluation_35100").presentationResolver,"function");
+assert.strictEqual(typeof beatMap.get("kak_terminal_minato_private_evaluation_35100").presentationResolver,"undefined","35940 must not independently render flattened Minato narration");
 assert.strictEqual(typeof MOD.minatoPerformance,"function");
 assert.strictEqual(typeof beatMap.get("kak_terminal_chronicle_receipt_35100").presentationResolver,"function");
 assert.strictEqual(typeof globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.guardedOriginCompletion,"function");

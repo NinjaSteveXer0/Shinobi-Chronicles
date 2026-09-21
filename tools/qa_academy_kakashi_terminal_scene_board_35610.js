@@ -23,7 +23,7 @@ vm.runInThisContext(source,{filename:"runtime/alpha-kakashi-terminal-scene-board
 const mod=globalThis.SC_ALPHA_KAKASHI_TERMINAL_SCENE_BOARD_35610;
 assert(mod,"35610 compatibility module missing");
 assert.strictEqual(mod.compatibilityOnly,true,"35610 must remain presentation compatibility only");
-assert.strictEqual(mod.presentationOwner,"kakashi_scene_board_model_v13_33910_2026_09_21");
+assert.strictEqual(mod.presentationOwner,"kakashi_scene_board_model_v14_33910_2026_09_21");
 assert.strictEqual(mod.terminalOwner,"alpha_kakashi_terminal_debrief_35100_v10_2026_09_20");
 assert(registrations.some(row=>row.id==="kakashi_origin_hokage_administration_interior_night"&&row.asset==="Kakashi Origin Backdrop/hokage_administration_interior_night.png"),"approved Hokage backdrop registration missing");
 
