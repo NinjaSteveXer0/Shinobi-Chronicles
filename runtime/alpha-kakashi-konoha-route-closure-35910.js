@@ -24,7 +24,7 @@ const SEQ=globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410;
 const CLOSURE=globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900;
 if(!A||!CORE||!KAK||!PROVIDER||!BATTLE||!SEQ||!CLOSURE)throw new Error("kakashi_konoha_route_closure_35910_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v4_2026_09_20";
+const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v5_2026_09_21";
 const ORIGIN="academy_kakashi";
 const SCENE="origin_academy_kakashi_anbu_retrieval";
 const KAKASHI="academy_kakashi";
@@ -392,8 +392,11 @@ function commitOriginalTarget({receipt,request,result}){
   knowledgeStateByObserver:{[KAKASHI]:{packageHolderKnown:"PACKAGE_SMUGGLER",laterPsMiOutcomeKnown:false}},worldFacts:{packageSmugglerPursuitClosed:true,amtReached:reached,amtEscaped:escaped,pakkunPresent:reached,packageCustody:"PACKAGE_SMUGGLER"}};
  const committed=commitOnce(id,fact,selected,[ORIGIN,AMT,PS].concat(reached?[PAKKUN]:[]),[{type:"story_decision_receipt",id:String(receipt&&receipt.storyDecisionReceiptId||"")},{type:"writing_authority",id:AUTH.originalTarget},{type:"world_object",id:PACKAGE}]);if(!committed.success)return committed;
  const mat=material(pkg,id,"AK_SA_021");if(!mat||mat.success!==true)return mat;
+ const psClass=classify(PS,"ESCAPED",stable("sc35910-original-ps-escaped",{id}));if(!psClass||psClass.success!==true)return psClass;
+ const participantStateDeltaRefs=[String(psClass.resultRef||"")];
+ if(escaped){const amtClass=classify(AMT,"ESCAPED",stable("sc35910-original-amt-escaped",{id}));if(!amtClass||amtClass.success!==true)return amtClass;participantStateDeltaRefs.push(String(amtClass.resultRef||""));}
  rt.localContext={...(rt.localContext||{}),kakashiKonohaOriginalTargetOccurrenceId:id,kakashiKonohaPackageOccurrenceId:id,kakashiSequentialPackageOccurrenceId35100:id,kakashiKonohaPakkunPresent:reached,kakashiPostMiPakkunPresent:reached};save();
- return{success:true,occurrenceId:id,consequenceRefs:[id],stateDeltaRefs:[id],participantStateDeltaRefs:[],objectCustodyDeltaRefs:[],successorSituationRef:reached?"academy_kakashi.pakkun_intercept":"academy_kakashi.debrief"};
+ return{success:true,occurrenceId:id,consequenceRefs:[id],stateDeltaRefs:[id],participantStateDeltaRefs,objectCustodyDeltaRefs:[],successorSituationRef:reached?"academy_kakashi.pakkun_intercept":"academy_kakashi.debrief"};
 }
 const originalRegistration=PROVIDER.registerStoryFactualResolverBinding(ORIGINAL_TARGET_BINDING,{ownerRef:"academy_kakashi.konoha_route_closure.original_target",authorityVersionRefs:[AUTH.originalTarget,AUTH.writing100,AUTH.factualProvider],outcomes:[
  {outcomeRef:"ORIGINAL_TARGET_PURSUIT_SUCCESS_REACHED",authoredOrder:0,resultPayloadTemplate:{outcomeClass:"ORIGINAL_TARGET_PURSUIT_SUCCESS_REACHED",amtReached:true,pakkunPresent:true,packageCustody:"PACKAGE_SMUGGLER"}},
@@ -615,7 +618,7 @@ function diagnostics(){
  const d=scene(),action=d&&d.beatMap.get(ACTION_BEAT),attack=action&&action.choices&&action.choices.find(x=>x.choiceId==="attack"),observe=d&&d.beatMap.get(OBSERVE_BEAT),securePackage=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package"),sequential=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="defeat_assassin_then_secure"),secure=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package_before_assassin"),original=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="go_after_original_target");
  const regs=PROVIDER.getRegisteredStoryFactualBindings();
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v4_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v5_2026_09_21",
   writing100Pinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8",
   directStrikeFixedChain:!!attack&&attack.label==="STRIKE BEFORE THE HANDOFF"&&attack.nextBeatId===D.directIntro&&d.beatMap.has(D.directBattle)&&d.beatMap.has(D.directMiBattle)&&d.beatMap.has(D.directGroup),
   directStrikeExactConfigs:!!(BATTLE.configs&&BATTLE.configs[DIRECT_2V1]&&BATTLE.configs[DIRECT_MI]),
