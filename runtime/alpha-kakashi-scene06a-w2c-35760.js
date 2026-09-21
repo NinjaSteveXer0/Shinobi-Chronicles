@@ -437,7 +437,7 @@ function diagnostics(){
     pursuitPresentationReleasesNarration:performance.toString().includes("kakashiScene06AW2CPursuitPresentationReady===true")&&globalThis.getStoryScenePerformance33900.toString().includes("owned||PRE_GET"),
     settledPursuitRenderDoesNotDereferenceMissingCue:renderScene.toString().includes("if(p&&p.cue)")&&renderScene.toString().includes("materializePostLethalChoices35760()"),
     scene7FailClosedWhenNoPursuit:typeof globalThis.advanceStoryScene==="function"&&globalThis.advanceStoryScene.toString().includes("kakashi_scene06aw2c_scene7_authority_pending")&&HOLD_BEAT==="kak_scene06a_w2c_scene7_pending",
-    standardCharacterCardScale:installStyle.toString().includes("width:min(94%,322px)")&&installStyle.toString().includes("width:min(96%,338px)")&&installStyle.toString().includes("max-height:505px"),
+    fieldGeometryDelegatedTo33910:!installStyle.toString().includes("width:min(94%,322px)")&&!installStyle.toString().includes("bottom:20%!important")&&installStyle.toString().includes("kakashiMiDeathDrop35760"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(function(pair){return pair[0]!=="browserGoldenClaimed"&&pair[1]!==true;}).map(function(pair){return pair[0];});
