@@ -119,6 +119,36 @@ sourceHas("tools/qa_academy_kakashi_konoha_route_closure_35910.js",
   'pakkunAuthorized,false'
 );
 
+// Repaired Secure-Package continuation is part of the executable graph, including
+// STAY ON THE FIRST MAN -> Pakkun -> AMT Battle -> shared CE #256 loss handling.
+sourceHas("runtime/alpha-kakashi-final-sequential-consumer-34410.js",
+  '"STAY ON THE FIRST MAN"',
+  'academy_kakashi_origin_battle_kakashi_pakkun_vs_amt',
+  'resolveAmtReturnFacts34410("secure_package")',
+  '"BATTLE_DEFEATED_UNRESOLVED"',
+  '"ESCAPED"'
+);
+sourceHas("runtime/alpha-kakashi-konoha-writing-closure-35900.js",
+  'resolveAmtDefeatFacts35900',
+  'stateClass:"ESCAPED"'
+);
+
+// Direct failed Pickpocket 3-v-1 victory must expose all four locked dispositions;
+// defeat must expose only RETURN TO ANBU and classify all three escaped.
+sourceHas("runtime/alpha-kakashi-direct-opening-consumer-34710.js",
+  '"TAKE THEM TO THE UCHIHA POLICE FORCE"',
+  '"TAKE THEM TO THE ANBU"',
+  '"KILL THEM"',
+  '"TAKE THE PACKAGE AND LET THEM GO"',
+  '"RETURN TO ANBU"',
+  'BATTLE_DEFEATED_UNRESOLVED',
+  '"ESCAPED"'
+);
+sourceHas("tools/qa_academy_kakashi_scene02_direct_choices_34710.js",
+  '"3-v-1 victory choice surface does not exactly match locked Writing"',
+  '"3-v-1 defeat exposed victory dispositions or lost RETURN TO ANBU"'
+);
+
 // Move-In-Closer failures and improved Pickpocket explicitly force resolver/Battle variants.
 sourceHas("tools/qa_academy_kakashi_move_closer_closure_35930.js",
   'PICKPOCKET_IMPROVED_FAILURE_DETECTED_2V1',
