@@ -231,7 +231,58 @@
         "tools/qa_academy_kakashi_konoha_closure_35900.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_scene04a_35710.js",
+          "tools/qa_academy_kakashi_scene05a_w_35730.js",
+          "tools/qa_academy_kakashi_scene05a_l_35750.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_scene05a_w_35730.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_scene05a_w_35730.js",
+          "tools/qa_academy_kakashi_scene05a_l_35750.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_scene05a_w_35730.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_field_secured_35920.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "watch.secure_package",
@@ -258,7 +309,55 @@
         "tools/qa_academy_kakashi_konoha_closure_35900.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "watch.secure_package_before_assassin",
@@ -283,7 +382,55 @@
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "watch.defeat_assassin_then_secure",
@@ -317,7 +464,55 @@
         "tools/qa_academy_kakashi_origin_battle_deployment.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_sequential_consumer.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "watch.go_after_original_target",
@@ -355,7 +550,55 @@
         "tools/qa_academy_kakashi_konoha_closure_35900.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "move_closer.success.let_handoff_happen",
@@ -378,7 +621,55 @@
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "move_closer.success.strike_before_handoff",
@@ -411,7 +702,55 @@
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "move_closer.success.attempt_pickpocket",
@@ -441,7 +780,55 @@
         "tools/qa_academy_kakashi_move_closer_closure_35930.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "move_closer.failure.stay_on_package",
@@ -483,7 +870,55 @@
         "tools/qa_academy_kakashi_konoha_closure_35900.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "availableChoices": [
+          "tools/qa_kakashi_pakkun_interception_35300.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_kakashi_pakkun_interception_35300.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_get_closer_factual_commit.js"
+        ],
+        "amtState": [
+          "tools/qa_kakashi_pakkun_interception_35300.js"
+        ],
+        "pakkunState": [
+          "tools/qa_kakashi_pakkun_interception_35300.js"
+        ],
+        "custodyState": [
+          "tools/qa_kakashi_pakkun_interception_35300.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "move_closer.failure.stop_package_smuggler",
@@ -512,7 +947,55 @@
         "tools/qa_academy_kakashi_move_closer_closure_35930.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "move_closer.failure.cut_off_sakura",
@@ -541,7 +1024,55 @@
         "tools/qa_academy_kakashi_move_closer_closure_35930.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_move_closer_closure_35930.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "direct.strike_before_handoff",
@@ -573,7 +1104,55 @@
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "custodyState": [
+          "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     },
     {
       "id": "direct.slip_in_for_package",
@@ -602,7 +1181,55 @@
         "tools/qa_kakashi_battle_development_35740.js"
       ],
       "completionTail": "COMMON_TERMINAL_TAIL",
-      "saveLoadRequired": true
+      "saveLoadRequired": true,
+      "boundaryProofs": {
+        "currentBeat": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "availableChoices": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "resolverOutcome": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "battleCallerConfig": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "battleClaim": [
+          "tools/qa_academy_kakashi_origin_battle_deployment.js"
+        ],
+        "storyReturn": [
+          "tools/qa_kakashi_direct_pickpocket_terminal_35100.js"
+        ],
+        "packageHolder": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "miState": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "psState": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "amtState": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "pakkunState": [
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
+        ],
+        "custodyState": [
+          "tools/qa_kakashi_direct_pickpocket_terminal_35100.js"
+        ],
+        "rewardState": [
+          "tools/qa_kakashi_origin_rewards_34800.js",
+          "tools/qa_kakashi_battle_development_35740.js"
+        ],
+        "receiptFacts": [
+          "tools/qa_kakashi_terminal_debrief_35100.js"
+        ],
+        "completionState": [
+          "tools/qa_academy_kakashi_completion_tail_36000.js"
+        ]
+      }
     }
   ],
   "globalQa": [
@@ -614,7 +1241,10 @@
     "tools/qa_kakashi_terminal_debrief_35100.js",
     "tools/qa_academy_kakashi_dynamic_terminal_35940.js",
     "tools/qa_academy_kakashi_browser_acceptance_35950.js",
-    "tools/qa_academy_kakashi_completion_tail_36000.js"
+    "tools/qa_academy_kakashi_completion_tail_36000.js",
+    "tools/qa_academy_kakashi_runtime_owner_map_36100.js",
+    "tools/qa_academy_kakashi_get_closer_factual_commit.js",
+    "tools/qa_academy_kakashi_field_secured_35920.js"
   ],
   "saveLoadBoundaries": [
     "ACTIVE_STORY_CHOICE",
@@ -627,5 +1257,35 @@
     "TEAM_FORMATION_COMMITTED",
     "FIRST_KONOHA_PENDING",
     "ACADEMY_FREE_PLAY"
-  ]
+  ],
+  "ownerMap": {
+    "fixture": "tools/fixtures/academy_kakashi_runtime_owner_map_36100.json",
+    "qa": "tools/qa_academy_kakashi_runtime_owner_map_36100.js",
+    "durableAuthority": "Documentation/Coordination/Academy_Kakashi_Runtime_Canonical_Owner_Map_2026-09-21.md"
+  },
+  "requiredBoundaryAssertions": [
+    "currentBeat",
+    "availableChoices",
+    "resolverOutcome",
+    "battleCallerConfig",
+    "battleClaim",
+    "storyReturn",
+    "packageHolder",
+    "miState",
+    "psState",
+    "amtState",
+    "pakkunState",
+    "custodyState",
+    "rewardState",
+    "receiptFacts",
+    "completionState"
+  ],
+  "saveLoadProofs": {
+    "beforeDecisionAfterResolver": "tools/qa_academy_kakashi_get_closer_factual_commit.js",
+    "beforeBattleAfterClaimBeforeStoryReturn": "tools/qa_academy_kakashi_origin_battle_deployment.js",
+    "afterRestraintDuringCaptiveCollection": "tools/qa_academy_kakashi_field_secured_35920.js",
+    "rewardIdempotence": "tools/qa_kakashi_origin_rewards_34800.js",
+    "beforeReportAfterRewardAtReceipt": "tools/qa_kakashi_terminal_debrief_35100.js",
+    "afterOriginCompletionAndOnboarding": "tools/qa_academy_kakashi_completion_tail_36000.js"
+  }
 }
