@@ -145,6 +145,9 @@ assert(source.includes("NPC/uchiha_police_force_male_alt_1.png"),"approved MI Po
 assert(source.includes("He brought you back himself."),"W2D office verbatim anchor missing");
 assert(source.includes("She remains in Police custody until that custody is properly resolved."),"W2E office verbatim custody anchor missing");
 assert(!source.includes("sc-dialogue-panel-33910"),"immediate-custody route must not own Kakashi dialogue geometry");
+assert(source.includes("alpha_kakashi_immediate_custody_35800_v5_2026_09_22"),"immediate-custody canonical-presentation repair generation missing");
+assert(!source.includes('querySelector(".sc-story-text")')&&!source.includes('querySelector(".sc-story-name")'),"immediate-custody route must delegate cue projection to canonical 33910");
+assert(source.includes("performStorySceneCut33900")&&!source.includes("custodyWipeInProgress35800"),"immediate-custody route must delegate black cuts to canonical 33900");
 assert(polishSource.includes("top:4%!important"),"canonical 33910 dialogue lane missing");
 assert(source.includes("beginImmediateCustodyChoice35800")&&source.includes("rt.beatId=route.firstBeat"),"TAKE HER BACK TO ANBU / Police must not depend on a fragile generic choice chain");
 assert(source.includes("recordParticipantClassification")&&source.includes("ANBU_INSTITUTIONAL_CUSTODY")&&source.includes("UCHIHA_POLICE_INSTITUTIONAL_CUSTODY"),"immediate custody must commit canonical participant classification");
