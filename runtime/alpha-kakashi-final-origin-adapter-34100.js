@@ -116,7 +116,7 @@ const DYNAMIC_TERMINAL_PATH="runtime/alpha-kakashi-dynamic-terminal-35940.js";
 // const BUILD="kakashi-final-20260920-85";
 // const BUILD="kakashi-final-20260920-86";
 // const BUILD="kakashi-final-20260921-87";
-const BUILD="kakashi-final-20260921-92";
+const BUILD="kakashi-final-20260921-93";
 
 function builtin(name){
   if(typeof process!=="undefined"&&process&&typeof process.getBuiltinModule==="function")return process.getBuiltinModule(name);
