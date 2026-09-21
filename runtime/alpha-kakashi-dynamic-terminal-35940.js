@@ -77,12 +77,13 @@ function normalizePackage(snapshot,terminalFacts){
  return{holderClass:holder,classRef,recovered,materialStateRef:String(material&&material.stateRef||terminalFacts&&terminalFacts.packageState&&terminalFacts.packageState.stateRef||""),value:clone(value)};
 }
 function firstAction(snapshot,l){
- const direct=String(l&&l.kakashiOriginalAction||"");
  const map={observe:"WATCH THE EXCHANGE",get_closer:"MOVE IN CLOSER",attack:"STRIKE BEFORE THE HANDOFF",attempt_pickpocket:"SLIP IN FOR THE PACKAGE"};
- if(map[direct])return map[direct];
  const receipts=Object.values(snapshot&&snapshot.decisionReceipts||{}).filter(Boolean).sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
  const root=receipts.find(r=>["observe","get_closer","attack","attempt_pickpocket"].includes(String(r.selectedChoiceId||"")));
- return map[String(root&&root.selectedChoiceId||"")]||"UNRESOLVED";
+ const committed=String(root&&root.selectedChoiceId||"");
+ if(map[committed])return map[committed];
+ const fallback=String(l&&l.kakashiOriginalAction||"");
+ return map[fallback]||"UNRESOLVED";
 }
 function historyFacts(history){return(history||[]).map(row=>({row,fact:factOf(row)}));}
 function lethalEvidence(history,participants){
