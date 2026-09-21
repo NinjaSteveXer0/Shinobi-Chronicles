@@ -174,6 +174,65 @@ state=MOD.buildProjectionState({
 assert(MOD.reportText(state).includes("The masked shinobi took it."));
 assert(MOD.receiptText(state).includes("Package — Taken from Kakashi by Masked Interceptor."));
 
+// Surgical tranche regressions: committed root identity beats reconvergence-local compatibility flags.
+state=MOD.buildProjectionState({
+ snapshot:{participantStates:{},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-root",value:{currentHolderClass:"ANBU",custodyClass:"ANBU"}}},decisionReceipts:{"root":{selectedChoiceId:"get_closer",createdAt:1},"later":{selectedChoiceId:"observe",createdAt:2}}},
+ history:[],terminalFacts:{success:true,packageRecovered:true,packageState:{holderClass:"ANBU",stateRef:"pkg-root"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{kakashiOriginalAction:"observe"}
+});
+assert(MOD.receiptText(state).includes("FIRST ACTION\nMOVE IN CLOSER"),"reconvergence overwrote committed root choice");
+
+// Canonical 35300 ask-destination Knowledge shape must survive terminal projection.
+state=MOD.buildProjectionState({
+ snapshot:{participantStates:{},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-ask",value:{currentHolderClass:"ANBU_MARKED_TARGET",custodyClass:"ANBU_MARKED_TARGET"}}},decisionReceipts:{"root":{selectedChoiceId:"get_closer",createdAt:1}}},
+ history:[{occurrenceId:"ask-destination",fact:{factClass:"academy_kakashi_ask_destination_knowledge_state",storySceneInstanceId:"qa-terminal",knowledgeStateByObserver:{[KAK]:{amtRoleEndedAtHandoff:true,amtKnowsDownstreamDestination:false}}}}],
+ terminalFacts:{success:true,packageRecovered:false,packageState:{holderClass:"ANBU_MARKED_TARGET",stateRef:"pkg-ask"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{}
+});
+assert(MOD.reportText(state).includes("His job ended at the handoff."),"ask-destination report Knowledge missing");
+assert(MOD.receiptText(state).includes("Unknown to original carrier."),"ask-destination Receipt Knowledge missing");
+assert(MOD.minatoText(state).includes("where the original carrier's Knowledge ended"),"ask-destination Minato Knowledge missing");
+
+// Clean extraction uses the locked no-fight terminal lens and remains Battle-free.
+state=MOD.buildProjectionState({
+ snapshot:{participantStates:{},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-clean",value:{currentHolderClass:"ANBU",custodyClass:"ANBU"}}},decisionReceipts:{"root":{selectedChoiceId:"attempt_pickpocket",createdAt:1}}},
+ history:[{occurrenceId:"clean",fact:{factClass:"academy_kakashi_direct_pickpocket_factual_state",storySceneInstanceId:"qa-terminal",worldFacts:{cleanExtractionSucceeded:true}}}],
+ terminalFacts:{success:true,packageRecovered:true,packageState:{holderClass:"ANBU",stateRef:"pkg-clean"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{}
+});
+assert(MOD.reportText(state).includes("Clean enough."),"clean-extraction ANBU report module missing");
+assert(MOD.minatoText(state).includes("Sometimes the cleanest decision leaves the least to discuss."),"clean-extraction Minato lens missing");
+assert(MOD.receiptText(state).includes("No PL Battle materially resolved."),"clean extraction invented a Battle");
+
+// Legacy defeated-but-not-controlled is normalized to the locked unrestrained wording.
+state=MOD.buildProjectionState({
+ snapshot:{participantStates:{[PS]:{participantRef:PS,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"legacy-ps"}},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-legacy",value:{currentHolderClass:"ANBU",custodyClass:"ANBU"}}},decisionReceipts:{"root":{selectedChoiceId:"observe",createdAt:1}}},
+ history:[],terminalFacts:{success:true,packageRecovered:true,packageState:{holderClass:"ANBU",stateRef:"pkg-legacy"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{}
+});
+assert(MOD.receiptText(state).includes("Package Smuggler — Defeated; left alive and unrestrained."),"legacy defeated state leaked internal wording");
+
+// Exact escape modules distinguish package holder and AMT Battle defeat.
+state=MOD.buildProjectionState({
+ snapshot:{participantStates:{[PS]:{participantRef:PS,stateClass:"ESCAPED",resultRef:"ps-escape"},[AMT]:{participantRef:AMT,stateClass:"ESCAPED",resultRef:"amt-escape"}},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-ps-escape",value:{currentHolderClass:"PACKAGE_SMUGGLER",custodyClass:"PACKAGE_SMUGGLER"}}},decisionReceipts:{"root":{selectedChoiceId:"attack",createdAt:1}}},
+ history:[],terminalFacts:{success:true,packageRecovered:false,packageState:{holderClass:"PACKAGE_SMUGGLER",stateRef:"pkg-ps-escape"},pakkunPresentAtDebrief:false,battleFacts:[{battleConfigId:"academy_kakashi_origin_battle_amt_ps_2v1",resultState:"opposition_side_victory",capturedAt:1}]},localContext:{}
+});
+receipt=MOD.receiptText(state);
+assert(receipt.includes("Package Smuggler — Escaped with package."),"PS package escape was flattened");
+assert(receipt.includes("ANBU Marked Target — Defeated Kakashi and escaped."),"AMT Battle-defeat escape was flattened");
+
+// Two-target kill with MI unseen must not turn her absence into a Kakashi survivor decision.
+state=MOD.buildProjectionState({
+ snapshot:{participantStates:{[PS]:{participantRef:PS,stateClass:"DEAD",resultRef:"kill-ps"},[AMT]:{participantRef:AMT,stateClass:"DEAD",resultRef:"kill-amt"}},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-two-kill",value:{currentHolderClass:"KAKASHI",custodyClass:"KAKASHI"}}},decisionReceipts:{"root":{selectedChoiceId:"get_closer",createdAt:1}}},
+ history:[{occurrenceId:"unseen-mi",fact:{storySceneInstanceId:"qa-terminal",participantStateByRef:{[MI]:{presenceState:"UNSEEN"}}}},{occurrenceId:"kill-ps",fact:{storySceneInstanceId:"qa-terminal",targetRef:PS,targetDeathConfirmed:true}},{occurrenceId:"kill-amt",fact:{storySceneInstanceId:"qa-terminal",targetRef:AMT,targetDeathConfirmed:true}}],
+ terminalFacts:{success:true,packageRecovered:true,packageState:{holderClass:"KAKASHI",stateRef:"pkg-two-kill"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{}
+});
+minato=MOD.minatoText(state);
+assert(minato.includes("The masked operative never entered his route."),"MI-unseen private projection missing");
+assert(minato.includes("don't count her absence as a decision Kakashi made."),"MI-unseen decision law missing");
+
+// Kakashi-facing Receipt must not expose Pakkun's name where name Knowledge was never granted.
+state=MOD.buildProjectionState({snapshot:{participantStates:{[PAKKUN]:{participantRef:PAKKUN,stateClass:"DEPARTED",resultRef:"pakkun-departed"}},materialStates:{[PACKAGE]:{materialRef:PACKAGE,resolved:true,stateRef:"pkg-ninken",value:{currentHolderClass:"ANBU",custodyClass:"ANBU"}}},decisionReceipts:{"root":{selectedChoiceId:"observe",createdAt:1}}},history:[{occurrenceId:"pakkun-witness",fact:{storySceneInstanceId:"qa-terminal",worldFacts:{pakkunPresent:true}}}],terminalFacts:{success:true,packageRecovered:true,packageState:{holderClass:"ANBU",stateRef:"pkg-ninken"},pakkunPresentAtDebrief:false,battleFacts:[]},localContext:{kakashiKonohaPakkunPresent:false}});
+receipt=MOD.receiptText(state);
+assert(receipt.includes("\nNINKEN\nTemporary ninken intervention — Involved."),"ninken Receipt section missing");
+assert(!receipt.includes("\nPAKKUN\n"),"Kakashi-facing Receipt leaked Pakkun identity");
+
 // A branch-specific report takes precedence; 35940 does not narrate a second report.
 state=MOD.buildProjectionState({
  snapshot:fieldSnapshot,
