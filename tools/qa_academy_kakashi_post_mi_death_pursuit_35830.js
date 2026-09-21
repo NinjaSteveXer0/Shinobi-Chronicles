@@ -175,6 +175,8 @@ assert(source35830.includes("We'll take custody.")&&source35830.includes("We'll 
 assert(source35830.includes("commitInstitutionalTransfer35830")&&source35830.includes("transferPackageToAnbu35830"),"custody and package transfer must remain separate commits");
 assert(source35830.includes("launchCurrentBattleTransition35830"),"PS/AMT battle auto-launch handoff missing");
 assert(source35830.includes("postmi_35830_ps_return_consume")&&source35830.includes("postmi_35830_amt_return_consume"),"PS/AMT post-Battle return beats must own result consumption");
+assert(source35830.includes('stateClass:"ESCAPED"')&&source35830.includes("post_mi_pursuit_escape_classification_failed"),"pursuit-failure path must commit the pursued target as ESCAPED");
+assert(source35830.includes('stateClass:"DELIBERATELY_RELEASED"')&&source35830.includes("amt_release_classification_failed"),"LET HIM GO must commit DELIBERATELY_RELEASED");
 assert(source35830.includes("resume.projected")&&source35830.includes("scheduleReturnRetry35830"),"browser post-Battle return must tolerate projected-result timing without rendering a blank return beat");
 assert(source35830.includes("packageRecoveryParentOccurrenceId35830")&&source35830.includes("post_mi_ps_package_recovery_parent_missing"),"PS post-Battle return must resolve an Origin-owned package parent before AK_SA_033");
 assert(source35830.includes("resolveAcademyKakashiSequentialPostPsPackageRecovery35600(r)"),"post-MI PS return must pass the authoritative Battle result into AK_SA_033");
@@ -365,6 +367,20 @@ assert.notStrictEqual(participantStates[AMT].stateClass,"DEAD","direct AMT KILL 
 drainNarration("kak_seq_debrief_pending");
 assert.strictEqual(participantStates[AMT].stateClass,"DEAD","direct AMT KILL must commit death when the authored kill performance completes");
 assert.strictEqual(active.beatId,"kak_seq_debrief_pending","direct AMT KILL aftermath must hand off to terminal debrief");
+
+// Direct AMT LET HIM GO commits deliberate release, never generic escape/control state.
+active=freshDet();active.instanceId="qa-postmi-direct-release";participantStates[MI]={participantRef:MI,stateClass:"DEAD"};delete participantStates[AMT];launches.length=0;
+MOD.wireEntryChoices();
+out=globalThis.advanceStoryScene("scene06aw2c_dkill_go_after_anbu_marked_target");
+assert.strictEqual(out.success,true,"direct AMT release test pursuit entry failed: "+JSON.stringify(out));
+drainNarration(MOD.beats.amtBattle);
+simulateBattleReturn(MOD.beats.amtBattle,{battleConfigId:"academy_kakashi_origin_battle_seq_amt_pakkun",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_amt",battleOccurrenceId:"qa-direct-amt-release-battle",resultState:"player_side_victory",playerActionOpportunityCount:2,participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]},MOD.beats.amtReturn);
+out=MOD.consumeAmtReturn();assert.strictEqual(out.success,true,"direct AMT release victory return failed: "+JSON.stringify(out));
+drainNarration(MOD.beats.amtDecision);
+out=globalThis.advanceStoryScene("postmi_amt_release");
+assert.strictEqual(out.success,true,"LET HIM GO choice failed: "+JSON.stringify(out));
+assert.strictEqual(participantStates[AMT].stateClass,"DELIBERATELY_RELEASED","LET HIM GO did not commit deliberate-release classification");
+assert.strictEqual(active.beatId,MOD.beats.amtReport,"LET HIM GO did not preserve the authored report continuation");
 
 // Direct AMT live return uses exact escort/handoff and explicit Pakkun departure.
 active=freshDet();active.instanceId="qa-postmi-amt-anbu";participantStates[MI]={participantRef:MI,stateClass:"DEAD"};delete participantStates[AMT];delete participantStates["pakkun_origin_unfamiliar_ninken"];launches.length=0;
