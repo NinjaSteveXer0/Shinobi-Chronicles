@@ -1,14 +1,11 @@
 // ============================================================================
-// ISSUE #188 — ACADEMY KAKASHI SCENE 06A-W2C: ATTEMPT TO KILL HER — 35760
+// ISSUE #188 — ACADEMY KAKASHI SCENE 06A-W2C LEGACY RESUME COMPATIBILITY — 35760
 //
-// Verbatim Writing authority:
-// Documentation/Story/Academy_Kakashi_Origin_Scene_06A_W2C_Attempt_To_Kill_Her_Verbatim_Lock_2026-09-18.md
-// commit 820917031000c15e62f0a4cea7535397d3ad9e50
-//
-// Entry is ONLY STOP THE ASSASSIN -> Kakashi victory -> turn 4+ -> Scene 05A-W2
-// ATTEMPT TO KILL HER. The player choice commits lethal intent first. The
-// neutral factual resolver then chooses and durably commits one exact authorised
-// factual result. Scene 7 presentation remains fail-closed until Writing locks it.
+// Historical authority retained only so already-persisted Scene 06A-W2C saves
+// can resume without losing their committed resolver receipt/presentation.
+// Current post-Battle entry was superseded by the global player-agency rule and
+// deterministic KILL HER owner 35810. This module must not rewrite the live
+// Scene 05A-W choice, capture KILL/ATTEMPT input, or create a new attempt intent.
 // ============================================================================
 (function installAcademyKakashiScene06AW2C35760(){
 "use strict";
@@ -20,7 +17,7 @@ const PROVIDER=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 const SCENE05AW=globalThis.SC_ALPHA_KAKASHI_SCENE05AW_35730;
 if(!A||typeof A.commitOccurrence!=="function"||typeof A.findOccurrence!=="function"||!CORE||!PROVIDER||!SCENE05AW)throw new Error("kakashi_scene06aw2c_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v8_2026_09_19";
+const PATCH_ID="alpha_kakashi_scene06aw2c_35760_v9_legacy_resume_only_2026_09_22";
 const AUTHORITY="bef78d90ccdea0206199ca0cdd06593ce3a0adb1";
 const ACTION_CONTRACT="778fc612d21beae9d3b96d8ace70ab10ad467237";
 const PROVIDER_AUTHORITY="f2291162085cb3a35fc2a8e49df7ed905c214c85";
@@ -86,8 +83,9 @@ function cssUrlValue(value){return 'url("'+String(value||"").replace(/\\/g,"\\\\
 function currentMiStateClass(){
   try{const snap=CORE.getStoryUnitSnapshot(ORIGIN_ID)||{};const row=snap.participantStates&&snap.participantStates[MI_REF]||null;return row&&row.stateClass?String(row.stateClass):null;}catch(_error){return null;}
 }
-function lateEntryEligible(rt=active()){
-  return !!rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&rt.localContext&&rt.localContext.kakashiScene05AWEntered===true&&Number(rt.localContext.kakashiScene05AWTurnCount)>=1&&currentMiStateClass()==="DEFEATED_BUT_NOT_CONTROLLED";
+function lateEntryEligible(){
+  // New player-facing entry is retired. 35810 owns current KILL HER.
+  return false;
 }
 function contextStateRef(rt){
   return PROVIDER.stableRef("sc35760-entry",{storySceneInstanceId:String(rt&&rt.instanceId||""),battleOccurrenceId:String(rt&&rt.localContext&&rt.localContext.kakashiScene05AWBattleOccurrenceId||""),turnCount:Number(rt&&rt.localContext&&rt.localContext.kakashiScene05AWTurnCount||0),miStateClass:currentMiStateClass()});
@@ -123,15 +121,8 @@ function prepareScene06AW2CSourceChoice(choice){
   return{success:true,type:"kakashi_scene06aw2c_source_choice_prepared",nextBeatId:SCENE_BEAT,intentCommitRef:intent.receipt.intentCommitRef,storyDecisionReceiptId:intent.receipt.storyDecisionReceiptId};
 }
 function wireSourceChoice(){
-  const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,beat=map&&map.get(SOURCE_BEAT);if(!beat||!Array.isArray(beat.choices))return false;
-  const choice=beat.choices.find(function(row){return row&&row.choiceId===SOURCE_CHOICE;});if(!choice)return false;
-  const original=Array.isArray(choice.consequenceRequests)?choice.consequenceRequests.find(function(row){return row&&row.requestId!==SOURCE_REQUEST;})||null:null;
-  choice.nextBeatId=SOURCE_BEAT;
-  choice.consequenceRequests=[{requestId:SOURCE_REQUEST,kind:"domain",resolve:function(){
-    if(lateEntryEligible())return prepareScene06AW2CSourceChoice(choice);
-    return original&&typeof original.resolve==="function"?original.resolve():{success:false,reason:"kakashi_scene05aw_successor_authority_not_implemented",branch:"BRANCH_C"};
-  }}];
-  return true;
+  // Compatibility module is forbidden from mutating the current choice surface.
+  return false;
 }
 function enterScene06AW2C(){
   const rt=active();const prepared=prepareScene06AW2CSourceChoice(null);if(!prepared||prepared.success!==true)return prepared;
@@ -327,7 +318,6 @@ function boardMarkup(rt){
   return '<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+escapeHTML(OBJECTIVE)+'</div></div><div class="sc-scene-board-33900__actors" data-count="2">'+actors.join("")+'</div>';
 }
 function renderScene(){
-  wireSourceChoice();
   if(typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
@@ -363,7 +353,6 @@ if(!CORE_RESOLVER_REGISTRATION||CORE_RESOLVER_REGISTRATION.success!==true)throw 
 const FACTUAL_REGISTRATION=PROVIDER.registerStoryFactualResolverBinding(BINDING,{ownerRef:"academy_kakashi.scene06a_w2c",authorityVersionRefs:[AUTHORITY,ACTION_CONTRACT,PROVIDER_AUTHORITY],outcomes:OUTCOMES,commitResult:commitLethalResult,metadata:{storyUnitRef:ORIGIN_ID,sceneId:"SCENE_06A_W2C",targetRef:MI_REF,resolverDetermined:true,noBranchLabelOutcomeInference:true,scene7ExpressionPending:true}});
 if(!FACTUAL_REGISTRATION||FACTUAL_REGISTRATION.success!==true)throw new Error("kakashi_scene06aw2c_factual_binding_registration_failed");
 const INSTALLED=installBeats();if(!INSTALLED||INSTALLED.success!==true)throw new Error("kakashi_scene06aw2c_surface_install_failed");
-wireSourceChoice();
 
 let hooksInstalled=false,attempts=0;
 function installHooks(){
@@ -373,9 +362,6 @@ function installHooks(){
   globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35760(){const rt=active(),owned=isFamily(rt)?performance(rt):null;return owned||PRE_GET.apply(this,arguments);};
   globalThis.advanceStoryScene=function advanceStoryScene35760(choiceId=null){
     const rt=active();
-    if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&choiceId===SOURCE_CHOICE&&lateEntryEligible(rt)){
-      const entered=enterScene06AW2C();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return entered;
-    }
     if(isSceneBeat(rt)&&choiceId===null){
       const p=performance(rt);
       if(!p.atEnd){const next=p.index+1;rt.localContext={...(rt.localContext||{}),[CURSOR_KEY]:next};save();try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}return{success:true,type:"kakashi_scene06aw2c_performance_cue_advanced",beatId:SCENE_BEAT,cueIndex:next,semanticBeatUnchanged:true};}
@@ -385,25 +371,14 @@ function installHooks(){
     return PRE_ADVANCE.apply(this,arguments);
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_scene06aw2c_35760",()=>{wireSourceChoice();return renderScene();});
-  hooksInstalled=true;installStyle();wireSourceChoice();renderScene();return true;
+  if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_scene06aw2c_35760",()=>renderScene());
+  hooksInstalled=true;installStyle();renderScene();return true;
 }
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks,25);}
 
 function installBrowserChoiceCapture(){
-  if(typeof document==="undefined"||document.__scKakashiScene06AW2CCapture35760)return false;
-  document.__scKakashiScene06AW2CCapture35760=true;
-  document.addEventListener("click",function(event){
-    const target=event&&event.target&&typeof event.target.closest==="function"?event.target.closest(".sc-story-choice"):null;
-    if(!target||!lateEntryEligible())return;
-    const label=String(target.textContent||"").replace(/\s+/g," ").trim().toUpperCase();
-    if(!label.includes("ATTEMPT TO KILL HER"))return;
-    if(event&&typeof event.preventDefault==="function")event.preventDefault();
-    if(event&&typeof event.stopImmediatePropagation==="function")event.stopImmediatePropagation();
-    const entered=enterScene06AW2C();
-    if(entered&&entered.success===true){try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_error){}}
-  },true);
-  return true;
+  // Retired with current-entry authority. No browser input interception.
+  return false;
 }
 
 function diagnostics(){
@@ -416,13 +391,14 @@ function diagnostics(){
   ];
   const binding=(PROVIDER.getRegisteredStoryFactualBindings()||[]).find(function(row){return row.bindingRef===BINDING;});
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v8_2026_09_19",
+    patchId:PATCH_ID==="alpha_kakashi_scene06aw2c_35760_v9_legacy_resume_only_2026_09_22",
     authorityPinned:AUTHORITY==="bef78d90ccdea0206199ca0cdd06593ce3a0adb1",
     exactNarration:JSON.stringify(CUES_OPEN.map(function(row){return row.text;}))===JSON.stringify(exactOpen)&&JSON.stringify(CUES_CLOSED.map(function(row){return row.text;}))===JSON.stringify(exactClosed)&&CUES_OPEN.concat(CUES_CLOSED).every(function(row){return row.kind==="narration"&&!row.speakerName;}),
-    exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWEntered===true")&&lateEntryEligible.toString().includes(">=1")&&!lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
+    currentEntryRetired:lateEntryEligible()===false&&!lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
     renderDelegatedTo33900:installHooks.toString().includes('registerStorySceneBoardRenderHook("kakashi_scene06aw2c_35760"')&&!installHooks.toString().includes("renderStoryScenePresentationLayer=function"),
+    browserChoiceCaptureRetired:installBrowserChoiceCapture()===false&&!installBrowserChoiceCapture.toString().includes("addEventListener"),
     intentBeforeResolver:prepareScene06AW2CSourceChoice.toString().includes("ensureLethalIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("resolveStoryFactualAction"),
-    sourceChoiceWired:wireSourceChoice()===true&&wireSourceChoice.toString().includes("SOURCE_REQUEST")&&wireSourceChoice.toString().includes("prepareScene06AW2CSourceChoice"),
+    sourceChoiceNotMutated:wireSourceChoice()===false&&!wireSourceChoice.toString().includes("consequenceRequests="),
     exactResolverEnvelope:!!binding&&JSON.stringify(binding.outcomeRefs)===JSON.stringify(OUTCOMES.map(function(row){return row.outcomeRef;})),
     noOutcomeFromButton:ensureLethalIntent.toString().includes("ATTEMPT TO KILL")&&!ensureLethalIntent.toString().includes("LETHAL_ATTEMPT_KILLED"),
     exactBackdrop:!!sceneBeat&&sceneBeat.environmentRef&&sceneBeat.environmentRef.assetId===BACKDROP_ID&&!!hold&&hold.environmentRef&&hold.environmentRef.assetId===BACKDROP_ID,
@@ -444,7 +420,7 @@ function diagnostics(){
   return{pass:failed.length===0,checks:checks,failed:failed,authority:AUTHORITY,bindingRef:BINDING,outcomeRefs:OUTCOMES.map(function(row){return row.outcomeRef;}),sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,browserGoldenClaimed:false};
 }
 
-ensureHooks();installBrowserChoiceCapture();
+ensureHooks();
 const api=Object.freeze({patchId:PATCH_ID,authority:AUTHORITY,actionContract:ACTION_CONTRACT,bindingRef:BINDING,sourceChoiceId:SOURCE_CHOICE,sceneBeatId:SCENE_BEAT,holdBeatId:HOLD_BEAT,cueCount:CUES_OPEN.length,closedCueCount:CUES_CLOSED.length,outcomeRefs:Object.freeze(OUTCOMES.map(function(row){return row.outcomeRef;})),objective:OBJECTIVE,enterScene06AW2C:enterScene06AW2C,wireSourceChoice:wireSourceChoice,resolveLethalAttempt:resolveLethalAttempt,diagnostics:diagnostics,browserGoldenClaimed:false});
 globalThis.SC_ALPHA_KAKASHI_SCENE06AW2C_35760=api;
 globalThis.runAcademyKakashiScene06AW2C35760Diagnostics=diagnostics;
