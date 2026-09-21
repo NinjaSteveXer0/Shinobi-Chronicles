@@ -181,7 +181,7 @@ function installStyle(){
 .sc-scene-board-33900__actor img{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 14px rgba(0,0,0,.52));}
 .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"]{width:min(72%,228px);aspect-ratio:7/10;max-height:330px;}
 .sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{width:min(67%,220px);aspect-ratio:7/10;max-height:350px;}
-.sc-scene-board-33900__actor.is-entering{animation:scActorEnter33900 .46s cubic-bezier(.2,.75,.25,1) both;}
+.sc-scene-board-33900__actor.is-entering{animation:scActorEnter33900 .46s cubic-bezier(.2,.75,.25,1);}
 @keyframes scActorEnter33900{from{opacity:0;transform:translateX(44px) scale(.96);filter:brightness(.35) blur(2px)}to{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}
 .sc-scene-board-33900__actor.is-entering.is-focus{animation-name:scActorEnterFocus33900}@keyframes scActorEnterFocus33900{from{opacity:0;transform:translateX(44px) scale(.97)}to{opacity:1;transform:translateX(0) scale(1)}}
 .sc-scene-board-33900__actor.is-exiting{animation:scActorExit33900 .42s cubic-bezier(.55,.05,.8,.35) both;}
