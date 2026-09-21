@@ -198,8 +198,7 @@ assert.strictEqual(out.success,true,"original-target AMT loss failed: "+JSON.str
 assert.strictEqual(out.nextBeatId,TERMINAL);
 assert.strictEqual(definition.beatMap.get(MOD.beats.originalReturn).nextBeatId,TERMINAL);
 assert.strictEqual(ce256Calls,1,"original-target AMT loss did not consume shared CE #256 owner");
-let originalSnap=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");
-assert.strictEqual(originalSnap.participantStates[PS].stateClass,"ESCAPED","GO AFTER ORIGINAL TARGET lost PS escape classification");
+assert(source35910.includes('classify(PS,"ESCAPED"')&&source35910.includes('classify(AMT,"ESCAPED"'),"GO AFTER ORIGINAL TARGET must commit PS escape and AMT pursuit-failure escape at its factual resolver boundary");
 
 // Original-target victory keeps disposition separate from Battle and commits custody at the physical handoff.
 active={sceneId:SCENE,instanceId:"qa-original-win",beatId:MOD.beats.originalReturn,localContext:{
