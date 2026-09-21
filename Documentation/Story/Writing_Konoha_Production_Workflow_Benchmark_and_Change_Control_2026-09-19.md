@@ -618,6 +618,42 @@ Do not split merely because an older process said “one”.
 
 ---
 
+# 21A. Academy Origin implementation-readiness benchmark
+
+For Academy Origins, this Writing workflow is now extended by:
+
+`Documentation/Coordination/Academy_Origin_Writing_to_Coding_One_Pass_Production_Benchmark_2026-09-21.md`
+
+commit:
+
+`0f28abb2e255cbf5f9911aaa99d8a44ee94489a1`
+
+Kakashi established the required production lesson:
+
+> **Writing may review scenes incrementally with Stephen, but normal Coding implementation should begin from one stable, complete, implementation-ready Origin package rather than from a materially evolving sequence of partial scenes.**
+
+For every remaining Academy Origin:
+
+- author every scene with stable scene/branch IDs;
+- expose exact entry predicates;
+- bind exact Backdrop / Objective / Narration / Dialogue / Choices;
+- state explicit System / Resolver / PL Battle seams;
+- state factual reads and factual writes separately;
+- map every authorised resolver/Battle result to an exact successor;
+- identify save/load/idempotence identity;
+- identify terminal/reward/Receipt contribution;
+- publish one complete finite Origin route manifest;
+- declare **ORIGIN IMPLEMENTATION PACKAGE COMPLETE** only after no implementation-critical field remains TBD;
+- then route one clean implementation package to Coding.
+
+Coding should then implement the Origin as one sustained completion campaign over the proven shared Origin runtime, build deterministic route traversal, and request one consolidated browser acceptance pass.
+
+This does not require every Origin to have Kakashi's complexity.
+
+The benchmark is **clarity + completeness before implementation**, not branch count.
+
+---
+
 # 22. Benchmark summary
 
 The current Writing / Konoha production loop is:
