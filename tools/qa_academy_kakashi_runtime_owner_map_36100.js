@@ -17,9 +17,9 @@ const polish=read("runtime/alpha-kakashi-scene-board-polish-33910.js");
 const terminal=read("runtime/alpha-kakashi-terminal-debrief-35100.js");
 const dynamicTerminal=read("runtime/alpha-kakashi-dynamic-terminal-35940.js");
 
-assert(/^const BUILD="kakashi-final-20260922-95";$/m.test(loader),"Kakashi loader not on gen94");
-assert(/story-decision-20260922-23/.test(integrator),"root Story delivery not generation 22");
-assert(/kakashi-final-20260922-95/.test(storyDecision),"Story Decision does not deliver Kakashi gen94");
+assert(/^const BUILD="kakashi-final-20260922-96";$/m.test(loader),"Kakashi loader not on gen94");
+assert(/story-decision-20260922-24/.test(integrator),"root Story delivery not generation 22");
+assert(/kakashi-final-20260922-96/.test(storyDecision),"Story Decision does not deliver Kakashi gen94");
 assert(/scene-board-20260922-20/.test(restoration),"Scene Board bootstrap not generation 19");
 
 const loaded=[...loader.matchAll(/const\s+[A-Z0-9_]+_PATH="([^"]+)"/g)].map(m=>m[1]);
