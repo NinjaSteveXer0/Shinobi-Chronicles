@@ -86,6 +86,14 @@ const tripleFacts={success:true,packageRecovered:false,packageState:{holderClass
 ]};
 let state=MOD.buildProjectionState({snapshot:tripleSnapshot,history:tripleHistory,terminalFacts:tripleFacts,localContext:{kakashiKonohaPakkunPresent:true}});
 let report=MOD.reportText(state),receipt=MOD.receiptText(state),minato=MOD.minatoText(state);
+let reportPerformance=MOD.reportPerformance(state);
+assert(Array.isArray(reportPerformance)&&reportPerformance.length>2,"structured ANBU report performance missing");
+assert.strictEqual(reportPerformance[0].kind,"narration");
+assert.strictEqual(reportPerformance[0].text,"Kakashi returns to the rooftop.");
+assert.strictEqual(reportPerformance[1].kind,"dialogue");
+assert.strictEqual(reportPerformance[1].speakerName,"ANBU OPERATIVE");
+assert.strictEqual(reportPerformance[1].text,"Report.");
+assert.strictEqual(reportPerformance.map(cue=>cue.kind==="dialogue"?cue.speakerName+": “"+cue.text+"”":cue.text).join("\n\n"),report,"report performance rewrote or reordered factual report text");
 assert(report.includes("All three by you."));
 assert(report.includes("After the fights?"));
 assert(report.includes("original target still had it when he escaped"));
