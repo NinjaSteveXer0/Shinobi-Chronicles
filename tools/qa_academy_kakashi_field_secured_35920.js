@@ -27,6 +27,13 @@ globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={patchId:"qa-terminal"};
 
 const definition={sceneId:SCENE,beatMap:new Map([[TERMINAL,{beatId:TERMINAL,mode:"narration"}]])};
 let active={sceneId:SCENE,instanceId:"qa-field-secured",beatId:"qa-entry",localContext:{},battleResume:null};
+function reloadBoundary(label){
+ const restoredPlayer=JSON.parse(JSON.stringify(globalThis.playerData));
+ const restoredActive=JSON.parse(JSON.stringify(active));
+ const restoredStore=JSON.parse(JSON.stringify([...store.entries()]));
+ globalThis.playerData=restoredPlayer;active=restoredActive;store.clear();for(const [k,v] of restoredStore)store.set(k,v);
+ return{label,beatId:active.beatId,localContext:JSON.parse(JSON.stringify(active.localContext||{})),snapshot:globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi")};
+}
 globalThis.getStorySceneDefinition=id=>id===SCENE?definition:null;
 globalThis.getActiveStorySceneRuntime=()=>active;
 
@@ -55,6 +62,9 @@ assert.strictEqual(row.fact.participantState.physicalMethod,"ninja wire");
 assert.strictEqual(row.fact.participantState.noPassiveEscapeTimer,true);
 assert.strictEqual(row.fact.participantState.noHiddenRestraintReroll,true);
 assert.strictEqual(row.fact.worldFacts.pursuitTimingPenaltyAdded,false);
+let reload=reloadBoundary("after-mi-restraint");
+assert.strictEqual(reload.snapshot.participantStates[MI].stateClass,"FIELD_SECURED_PENDING_COLLECTION","MI restraint did not survive reload");
+assert.strictEqual(store.get(out.occurrenceId).fact.participantState.noHiddenRestraintReroll,true,"restraint provenance did not survive reload");
 
 // PS can be independently restrained later. Identity is preserved.
 out=MOD.commitFieldSecured(PS,{sourceOccurrenceId:"qa-ps-battle",locationRef:"KAKASHI_PS_ALT_NIGHT_STREET"});
@@ -69,6 +79,10 @@ snap=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academ
 assert.strictEqual(snap.participantStates[AMT].stateClass,"COLLECTED_ACTIVE_ESCORT");
 assert.deepStrictEqual(MOD.fieldSecuredRefs(),[MI,PS]);
 assert.deepStrictEqual(MOD.escortRefs(),[AMT]);
+reload=reloadBoundary("after-collection-manifest");
+assert.strictEqual(reload.snapshot.participantStates[AMT].stateClass,"COLLECTED_ACTIVE_ESCORT","AMT escort state did not survive reload");
+assert.strictEqual(reload.snapshot.participantStates[MI].stateClass,"FIELD_SECURED_PENDING_COLLECTION");
+assert.strictEqual(reload.snapshot.participantStates[PS].stateClass,"FIELD_SECURED_PENDING_COLLECTION");
 
 // Collection visits exact still-secured participants; no numeric captive source truth.
 active.beatId=MOD.beats.collectPs;
@@ -78,6 +92,9 @@ assert.strictEqual(out.participantRef,PS);
 active.localContext.kakashiKonohaCollectionPsOccurrenceId=out.occurrenceId;
 snap=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");
 assert.strictEqual(snap.participantStates[PS].stateClass,"COLLECTED_ACTIVE_ESCORT");
+reload=reloadBoundary("mid-captive-collection");
+assert.strictEqual(reload.snapshot.participantStates[PS].stateClass,"COLLECTED_ACTIVE_ESCORT","PS collection did not survive reload");
+assert.strictEqual(reload.snapshot.participantStates[MI].stateClass,"FIELD_SECURED_PENDING_COLLECTION","MI was incorrectly collected/resurrected across reload");
 
 active.beatId=MOD.beats.collectMi;
 out=MOD.commitCollected(MI,active.localContext.kakashiKonohaCollectionManifestId);
@@ -122,4 +139,5 @@ console.log("- AMT collection boundary creates COLLECTED_ACTIVE_ESCORT without c
 console.log("- PS and MI are collected individually only from current field-secured truth");
 console.log("- ANBU and Police group intents create one parent plus one institutional-custody child per exact captive");
 console.log("- Pakkun departure is explicit and package custody remains a separate material fact");
+console.log("- reload after restraint / collection manifest / mid-collection preserves exact participant state and provenance");
 console.log("- Browser Golden is intentionally NOT claimed by this headless harness");
