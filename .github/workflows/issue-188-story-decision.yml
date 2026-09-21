@@ -322,7 +322,7 @@ jobs:
           ! grep -Fq 'PRE_CONTINUE_VICTORY_35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'const PAKKUN_SCENE_ASSET="Assets/Summons/pakkun.png";' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'sc-postmi-summon-35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq "data-speaker-id='pakkun'" runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'data-speaker-id="pakkun"' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'right:6%!important' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'top:4%!important' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'data-sc-postmi-lane="field"' runtime/alpha-kakashi-scene-board-polish-33910.js
@@ -348,7 +348,7 @@ jobs:
           grep -Fq 'minatoPerformance:minatoPerformance35940' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'TERMINAL_MINATO="kak_terminal_minato_private_evaluation_35100"' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'genericReportGateSkipped:true' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          grep -Fq "top:2%!important" runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq "top:2%!important" runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'primePostMiPresentationState35830();const out=PR.apply' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           if grep -Fq 'style.setProperty("top","14%","important")' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js; then echo 'AMT dialogue must not move after first paint'; exit 1; fi
           grep -Fq 'alpha_kakashi_terminal_scene_board_35610_v4_2026_09_21' runtime/alpha-kakashi-terminal-scene-board-35610.js
@@ -444,7 +444,7 @@ jobs:
           grep -Fq 'kakashi_origin_hokage_administration_interior_night' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'Assets/Kage/kage_minato.png' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HOKAGE ADMINISTRATION · NIGHT' runtime/alpha-kakashi-scene-board-polish-33910.js
-          grep -Fq 'data-sc-postmi-phase=' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'scPostmiPhase' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'BEAT.amtPoliceAnbuReturn].includes(rt.beatId))refs.unshift(ANBU)' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'validateImmediateBattleReward35100' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kak_origin_battle_downstream_cash_reward_v1' runtime/alpha-kakashi-terminal-debrief-35100.js
