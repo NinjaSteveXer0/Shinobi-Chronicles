@@ -55,7 +55,7 @@ globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
   return{success:true,occurrenceId:"qa-terminal-debrief-"+String(active&&active.instanceId||"none")};
  }
 };
-globalThis.performKakashiSceneWipe33910=function(continuation){
+globalThis.performStorySceneCut33900=function(continuation){
  wipes+=1;
  return typeof continuation==="function"?continuation():{success:false,reason:"qa_wipe_continuation_missing"};
 };
@@ -185,7 +185,7 @@ assert(!source35830.includes("continueAfterVictoryPostMiPs35830")&&!source35830.
 assert(source35600.includes("function resolveSequentialPostPsPackageRecovery35600(explicitResult=null)")&&source35600.includes('explicitResult&&typeof explicitResult==="object"?explicitResult:latestResult()'),"AK_SA_033 must accept an explicit authoritative Battle result while preserving legacy fallback");
 const decoratedPsChoice={textContent:"◇OBJECTIVEGO AFTER PACKAGE SMUGGLER›",getAttribute(name){return name==="aria-label"?"GO AFTER PACKAGE SMUGGLER":null;}};
 assert.strictEqual(MOD.choiceLabelFromButton(decoratedPsChoice),"GO AFTER PACKAGE SMUGGLER","decorated tactical choice must still resolve its authored label for the black wipe capture");
-assert(source35830.includes("performKakashiSceneWipe33910")&&source35830.includes("decoratedChoiceLabel35830(t)"),"post-MI choice capture must retain the black wipe after 33910 decorates the button text");
+assert(source35830.includes("performStorySceneCut33900")&&source35830.includes("decoratedChoiceLabel35830(t)"),"post-MI choice capture must use the canonical 33900 Scene Board cut after 33910 decorates the button text");
 
 participantStates[MI]={participantRef:MI,stateClass:"DEFEATED_BUT_NOT_CONTROLLED",resultRef:"qa-live-mi"};
 active={sceneId:SCENE_ID,instanceId:"qa-postmi-live",beatId:LIVE_SOURCE,localContext:{kakashiScene05AWEntered:true,kakashiScene05AWBattleOccurrenceId:"battle-mi-live",kakashiScene05AWTurnCount:3,kakashiScene05AWPackagePursuitEligible:true,kakashiScene05AWAmtPursuitEligible:true},battleResume:{authored:null}};
