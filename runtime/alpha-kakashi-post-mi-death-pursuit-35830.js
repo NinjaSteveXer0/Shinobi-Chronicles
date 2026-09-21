@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v27_2026_09_21";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v28_2026_09_22";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -391,7 +391,7 @@ function enterPrivateMinatoAfterSpecificReport35830(rt){
   try{if(typeof renderStoryScenePresentationLayer==="function")renderStoryScenePresentationLayer();}catch(_e){}
   return{success:true,beatId:TERMINAL_MINATO,specificReportCompleted:true,genericReportGateSkipped:true,blackWipeToHokage:true,terminalDebriefOccurrenceId:String(committed.occurrenceId||"")};
  };
- const wipe=globalThis.performKakashiSceneWipe33910;
+ const wipe=globalThis.performStorySceneCut33900;
  return typeof wipe==="function"?wipe(enter):enter();
 }
 function transitionNarrative(rt){
@@ -533,17 +533,17 @@ function decoratedChoiceLabel35830(button){
 }
 function browserCapture(){
  if(typeof document==="undefined"||document.__scPostMiPursuit35830)return false;document.__scPostMiPursuit35830=true;
- document.addEventListener("click",function(event){const t=event&&event.target&&typeof event.target.closest==="function"?event.target.closest(".sc-story-choice"):null,rt=active();if(!t||!rt||![LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId))return;const label=decoratedChoiceLabel35830(t);let id=null;if(label==="GO AFTER PACKAGE SMUGGLER"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.ps.includes(x.choiceId))||{}).choiceId;}else if(label==="GO AFTER ANBU MARKED TARGET"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.amt.includes(x.choiceId))||{}).choiceId;}if(!id)return;if(event.preventDefault)event.preventDefault();if(event.stopImmediatePropagation)event.stopImmediatePropagation();const run=()=>{const out=beginPostMiPursuitChoice35830(id);if(out&&out.success===true)try{renderStoryScenePresentationLayer();}catch(_e){}return out;};const wipe=globalThis.performKakashiSceneWipe33910;if(typeof wipe==="function")wipe(run);else run();},true);return true;
+ document.addEventListener("click",function(event){const t=event&&event.target&&typeof event.target.closest==="function"?event.target.closest(".sc-story-choice"):null,rt=active();if(!t||!rt||![LIVE_SOURCE,RESOLVER_SOURCE,DETERMINISTIC_SOURCE].includes(rt.beatId))return;const label=decoratedChoiceLabel35830(t);let id=null;if(label==="GO AFTER PACKAGE SMUGGLER"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.ps.includes(x.choiceId))||{}).choiceId;}else if(label==="GO AFTER ANBU MARKED TARGET"){wireEntryChoices();id=(scene().beatMap.get(rt.beatId).choices.find(x=>ENTRY_IDS.amt.includes(x.choiceId))||{}).choiceId;}if(!id)return;if(event.preventDefault)event.preventDefault();if(event.stopImmediatePropagation)event.stopImmediatePropagation();const run=()=>{const out=beginPostMiPursuitChoice35830(id);if(out&&out.success===true)try{renderStoryScenePresentationLayer();}catch(_e){}return out;};const wipe=globalThis.performStorySceneCut33900;if(typeof wipe==="function")wipe(run);else run();},true);return true;
 }browserCapture();
 
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v27_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v28_2026_09_22",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
-  decoratedChoiceWipeUsesAriaLabel:decoratedChoiceLabel35830.toString().includes("aria-label")&&browserCapture.toString().includes("decoratedChoiceLabel35830")&&browserCapture.toString().includes("performKakashiSceneWipe33910"),
+  decoratedChoiceWipeUsesAriaLabel:decoratedChoiceLabel35830.toString().includes("aria-label")&&browserCapture.toString().includes("decoratedChoiceLabel35830")&&browserCapture.toString().includes("performStorySceneCut33900"),
   stableBattleResultSurvivesCallerTeardown:stableBattleResultSnapshot35830.toString().includes("kakashiOriginStoryReturnResultSnapshot")&&latestResult.toString().includes("stableBattleResultSnapshot35830"),
 
 
@@ -564,7 +564,7 @@ function diagnostics(){
    amtDialogueUsesPrepaintStableLane:primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&primePostMiPresentationState35830.toString().includes("scPostmiLane")&&hooks.toString().includes("registerStorySceneBoardRenderHook"),
    distinctPolicePairsConfigured:(()=>{const refs=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.ref),images=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.image);return refs.length===6&&new Set(refs).size===6&&new Set(images).size===6;})(),
    amtPoliceHandoffStagesTwoOfficers:(()=>{const refs=actorRefs35830({beatId:BEAT.amtPoliceHandoff,localContext:{kakashiPostMiPakkunPresent:true}},{index:0,cue:{speaker:"UCHIHA POLICE OFFICER"}});return refs.includes(POLICE_AMT[0].ref)&&refs.includes(POLICE_AMT[1].ref)&&refs.filter(ref=>isPolice35830(ref)).length===2&&POLICE_AMT[0].image==="NPC/uchiha_police_force_female_alt_2.png"&&POLICE_AMT[1].image==="NPC/uchiha_police_force_member_male.png";})(),
-   recoveredPoliceReportSkipsDuplicateGate:transitionNarrative.toString().includes("enterPrivateMinatoAfterSpecificReport35830")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("TERMINAL_MINATO")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("performKakashiSceneWipe33910"),
+   recoveredPoliceReportSkipsDuplicateGate:transitionNarrative.toString().includes("enterPrivateMinatoAfterSpecificReport35830")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("TERMINAL_MINATO")&&enterPrivateMinatoAfterSpecificReport35830.toString().includes("performStorySceneCut33900"),
    directPostBattleDispositions:!materializePsDecision.toString().includes(["ATTEMPT"," TO KILL HIM"].join(""))&&!materializeAmtDecision.toString().includes(["ATTEMPT"," TO KILL HIM"].join(""))&&deterministicKillTarget.toString().includes("postBattleDefeatedLiving"),
   miDeathNeverRerolled:commitPursuitSelection.toString().includes("miDeathRerolled:false")&&consumePsReturn.toString().includes("miDeathRerolled:false"),
   selectionNotPursuitSuccess:commitPursuitSelection.toString().includes("selectionIsNotPursuitSuccess:true")&&resolveSelectedPursuit.toString().includes("PURSUIT_SUCCESS_REACHED"),
