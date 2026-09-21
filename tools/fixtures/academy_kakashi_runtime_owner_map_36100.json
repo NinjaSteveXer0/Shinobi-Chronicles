@@ -8,9 +8,9 @@
     "kakashiLoader": "runtime/alpha-kakashi-final-origin-adapter-34100.js",
     "sceneBoardBootstrap": "runtime/alpha-kakashi-original-origin-restoration-33800.js",
     "generations": {
-      "storyDecision": "story-decision-20260922-22",
-      "kakashiFinal": "kakashi-final-20260922-94",
-      "sceneBoard": "scene-board-20260922-19"
+      "storyDecision": "story-decision-20260922-23",
+      "kakashiFinal": "kakashi-final-20260922-95",
+      "sceneBoard": "scene-board-20260922-20"
     }
   },
   "invariants": [
