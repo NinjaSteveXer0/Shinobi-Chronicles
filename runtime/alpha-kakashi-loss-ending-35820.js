@@ -19,7 +19,7 @@ const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 if(!A||!TERMINAL||!CORE)throw new Error("kakashi_loss_ending_35820_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_loss_ending_35820_v4_2026_09_21";
+const PATCH_ID="alpha_kakashi_loss_ending_35820_v5_2026_09_22";
 const AUTH_REPORT="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623";
 const AUTH_OFFICE="d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab";
 const AUTH_OFFICE_EXPRESSION="362f72b8f20f50fec1b8e11e483e40cf5030364c";
@@ -263,7 +263,6 @@ function installStyle(){
  "."+BOARD_CLASS+"[data-loss-stage='office'] [data-actor-id='"+MI+"']{left:41%!important;z-index:5}"+
  "."+BOARD_CLASS+"[data-loss-stage='office'] [data-actor-id='"+ANBU+"']{left:54%!important}"+
  "."+BOARD_CLASS+"[data-loss-stage='office'] [data-actor-id='"+PS+"']{left:67%!important}"+
- "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] .sc-chronicle-layout{display:none!important}"+
  "#story-scene-presentation-layer[data-sc-kakashi-loss-stage='office'] ."+BOARD_CLASS+" .sc-scene-board-33900__objects{left:3.2%!important;right:auto!important;top:13.5%!important;bottom:auto!important;width:max-content!important;max-width:min(27%,340px)!important;height:auto!important;min-height:0!important;max-height:none!important}"+
  "#"+RECEIPT_ID+"{position:fixed;inset:0;z-index:120000;display:grid;place-items:center;padding:32px;background:rgba(2,6,10,.98);color:#eee6d2}#"+RECEIPT_ID+" .card{width:min(980px,94vw);max-height:90vh;overflow:auto;padding:32px;border:1px solid rgba(214,169,58,.55);background:#091016}#"+RECEIPT_ID+" .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:25px 0}#"+RECEIPT_ID+" button{min-height:46px;padding:0 22px}";
  document.head.appendChild(s);return true;
@@ -281,9 +280,15 @@ function render(){
  if(office)actors=[card(MINATO,"HOKAGE",focus===MINATO),card(AMT,"ALIVE",focus===AMT),card(MI,"ALIVE",focus===MI),card(ANBU,"PRESENT",focus===ANBU),card(PS,"ALIVE",focus===PS)];
  else actors=[card(KAK,"REPORTING",focus===KAK),card(ANBU,"RECEIVING REPORT",focus===ANBU)];
  b.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+(office?"HOKAGE ADMINISTRATION · NIGHT":"KONOHA ROOFTOP · NIGHT")+'</div>'+(office?"":'<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+REPORT_OBJECTIVE+'</div>')+'</div><div class="sc-scene-board-33900__actors" data-count="'+actors.length+'">'+actors.join("")+'</div>'+(office?'<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900"><span class="sc-scene-board-33900__object sc-live-state-callout-33900 is-committed"><b>PACKAGE</b>RECOVERED · HIDDEN OPERATION</span></div>':"");
- layer.dataset.scBoardUiMode=p.cue.kind==="dialogue"?"dialogue":"performance_narration";const text=layer.querySelector(".sc-story-text");if(text)text.textContent=p.cue.text;const name=layer.querySelector(".sc-story-name");if(name){name.textContent=p.cue.kind==="dialogue"?p.cue.speaker:"NARRATION";name.style.display="block";}const kicker=layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent=office?"HOKAGE'S OFFICE · HIDDEN OPERATION":"ANBU REPORT · ACADEMY KAKASHI";return true;
+ // Dialogue/narration projection is canonical 33910 ownership. This loss-route
+ // hook owns only factual participant staging, backdrop state, and route-specific
+ // card choreography; getStoryScenePerformance33900 already exposes p.cue.
+ return true;
 }
-function wipe(next){if(typeof document==="undefined")return next();const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return next();const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer,n=document.createElement("div");n.style.cssText="position:absolute;inset:0;z-index:99;background:#000;opacity:0;transition:opacity 260ms ease;pointer-events:none";stage.appendChild(n);requestAnimationFrame?requestAnimationFrame(()=>n.style.opacity="1"):n.style.opacity="1";setTimeout(()=>{next();n.style.opacity="0";setTimeout(()=>{try{n.remove();}catch(_error){}},280);},280);return{success:true,pending:true};}
+function sharedSceneCut35820(next){
+ if(typeof globalThis.performStorySceneCut33900==="function")return globalThis.performStorySceneCut33900(next);
+ return typeof next==="function"?next():{success:false,reason:"loss_scene_cut_continuation_missing"};
+}
 function enterOffice(){const rt=active(),r=commitReport();if(!r||r.success!==true)return r;rt.beatId=OFFICE_BEAT;rt.localContext={...(rt.localContext||{}),[CURSOR_OFFICE]:0};save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:OFFICE_BEAT};}
 function receiptRows(){return{decisions:["Chose STOP THE ASSASSIN after the package handoff.","Returned to ANBU and reported the loss without making excuses."],outcomes:["Masked Interceptor defeated Kakashi in PL Battle.","Package Smuggler escaped Kakashi with the package.","ANBU Marked Target escaped Kakashi.","Kakashi did not recover the package."],history:["Kakashi’s mission result is recorded as a failure.","Kakashi performed no lethal action and established no participant custody.","No Pakkun involvement occurred.","Kakashi did not learn the hidden operation or its later package recovery."]};}
 function openReceipt(){
@@ -299,7 +304,7 @@ function hooks(){
  globalThis.getStoryScenePerformance33900=function(){const p=sequence(active());return p||PG.apply(this,arguments);};
  globalThis.advanceStoryScene=function(choiceId=null){const rt=active();
   if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&choiceId===SOURCE_CHOICE){wireSource();return PA.apply(this,arguments);}
-  if(rt&&[REPORT_BEAT,OFFICE_BEAT].includes(rt.beatId)&&choiceId==null){const p=sequence(rt);if(!p)return{success:false,reason:"loss_sequence_missing"};if(!p.atEnd){rt.localContext={...(rt.localContext||{}),[p.key]:p.index+1};save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:rt.beatId,cueIndex:p.index+1};}if(rt.beatId===REPORT_BEAT){const r=commitReport();if(!r||r.success!==true)return r;rt.localContext.kakashiScene05ALObjective=null;save();return wipe(enterOffice);}const h=commitHidden();if(!h||h.success!==true)return h;return wipe(openReceipt);}
+  if(rt&&[REPORT_BEAT,OFFICE_BEAT].includes(rt.beatId)&&choiceId==null){const p=sequence(rt);if(!p)return{success:false,reason:"loss_sequence_missing"};if(!p.atEnd){rt.localContext={...(rt.localContext||{}),[p.key]:p.index+1};save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:rt.beatId,cueIndex:p.index+1};}if(rt.beatId===REPORT_BEAT){const r=commitReport();if(!r||r.success!==true)return r;rt.localContext.kakashiScene05ALObjective=null;save();return sharedSceneCut35820(enterOffice);}const h=commitHidden();if(!h||h.success!==true)return h;return sharedSceneCut35820(openReceipt);}
   return PA.apply(this,arguments);
  };
  try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_error){}
@@ -312,7 +317,7 @@ function diagnostics(){
  const reportExpected=["Kakashi returns to the rooftop.","The ANBU operative is already there.","He turns as Kakashi lands.","Report.","The target made the handoff.","To whom?","Another man.","The package?","Gone with him.","The masked shinobi?","I tried to stop her.","The operative's mask remains fixed on him.","Result?","She beat me.","The answer sits between them.","Then what?","She went after the receiver.","Could you follow?","No.","The original target?","Gone.","The operative gives a small nod.","Understood.","Kakashi waits.","You may go.","Understood."];
  const officeExpectedFirst=["The recovered package rests on Minato's desk.","ANBU Marked Target stands near the window.","Package Smuggler has taken the wall beside him.","Masked Interceptor stands opposite them, arms folded.","The ANBU operative remains nearest the desk.","Kakashi's report lies open in front of Minato.","He reads the last page once more.","Then closes it.","He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in."];
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_loss_ending_35820_v4_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_loss_ending_35820_v5_2026_09_22",
   authorities:AUTH_REPORT==="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623"&&AUTH_OFFICE==="d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab"&&AUTH_OFFICE_EXPRESSION==="362f72b8f20f50fec1b8e11e483e40cf5030364c",
   reportExact:REPORT.length===26&&JSON.stringify(REPORT.map(x=>x.text))===JSON.stringify(reportExpected),
   revisedOfficeExact:OFFICE_CUES.length===137&&JSON.stringify(OFFICE_CUES.slice(0,9).map(x=>x.text))===JSON.stringify(officeExpectedFirst)&&OFFICE_CUES[OFFICE_CUES.length-1].text==="That part is up to him.",
@@ -323,8 +328,8 @@ function diagnostics(){
   allThreeAliveHidden:commitHidden.toString().includes('maskedInterceptorState:"ALIVE"')&&commitHidden.toString().includes('packageSmugglerState:"ALIVE"')&&commitHidden.toString().includes('anbuMarkedTargetState:"ALIVE"'),
   noLethalCustodyPakkun:commitHidden.toString().includes("participantCustodyCommitted:false")&&commitHidden.toString().includes("lethalActionCommitted:false")&&commitHidden.toString().includes("pakkunPresent:false"),
   missionFailureSeparateFromHiddenRecovery:commitHidden.toString().includes('kakashiMissionResult:"FAILURE"')&&commitHidden.toString().includes("hiddenOperationPackageRecoveredAfterward:true"),
-  blackWipe:globalThis.advanceStoryScene.toString().includes("wipe(enterOffice)")&&globalThis.advanceStoryScene.toString().includes("wipe(openReceipt)"),
-  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910")&&installStyle.toString().includes(".sc-chronicle-layout{display:none!important}")&&render.toString().includes("scBoardUiMode"),
+  blackWipe:globalThis.advanceStoryScene.toString().includes("sharedSceneCut35820(enterOffice)")&&globalThis.advanceStoryScene.toString().includes("sharedSceneCut35820(openReceipt)")&&sharedSceneCut35820.toString().includes("performStorySceneCut33900"),
+  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910")&&!installStyle.toString().includes(".sc-chronicle-layout{display:none!important}")&&!render.toString().includes("scBoardUiMode")&&!render.toString().includes(".sc-story-text"),
   liveStateCallout:render.toString().includes("sc-live-state-callout-33900")&&render.toString().includes("RECOVERED · HIDDEN OPERATION")&&render.toString().includes('card(MINATO,"HOKAGE"')&&installStyle.toString().includes("width:max-content!important")&&installStyle.toString().includes("max-height:none!important"),
   canonicalReceiptHandoff:openReceipt.toString().includes("enterCanonicalReceipt")&&!openReceipt.toString().includes("document.body.appendChild")&&complete.toString().includes("retired_to_canonical_terminal_35100"),
   browserGoldenClaimed:false
