@@ -88,10 +88,10 @@ function classifyPackageSmugglerDefeat(result){
   const classified=CORE.recordParticipantClassification({
     storyUnitRef:ORIGIN_ID,
     participantRef:PACKAGE_SMUGGLER_REF,
-    stateClass:"DEFEATED_BUT_NOT_CONTROLLED",
+    stateClass:"BATTLE_DEFEATED_UNRESOLVED",
     resultRef
   });
-  return classified&&classified.success===true?{success:true,resultRef,stateClass:"DEFEATED_BUT_NOT_CONTROLLED"}:classified||{success:false,reason:"kakashi_ak_sa_033_ps_classification_failed"};
+  return classified&&classified.success===true?{success:true,resultRef,stateClass:"BATTLE_DEFEATED_UNRESOLVED"}:classified||{success:false,reason:"kakashi_ak_sa_033_ps_classification_failed"};
 }
 
 function resolveSequentialPostPsPackageRecovery35600(explicitResult=null){
@@ -107,6 +107,9 @@ function resolveSequentialPostPsPackageRecovery35600(explicitResult=null){
   // Loss/withdrawal never fabricates a custody change. The last explicit package
   // state remains authoritative and terminal debrief can consume that occurrence.
   if(!isVictory(result)){
+    const resultRef=typeof CORE.stableRef==="function"?CORE.stableRef("sc35600-ak-sa-033-ps-escape",{battleOccurrenceId:String(result.battleOccurrenceId||""),participantRef:PACKAGE_SMUGGLER_REF}):String(result.battleOccurrenceId||"")+"::"+PACKAGE_SMUGGLER_REF+"::ESCAPED";
+    const escaped=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef:PACKAGE_SMUGGLER_REF,stateClass:"ESCAPED",resultRef});
+    if(!escaped||escaped.success!==true)return escaped||{success:false,reason:"kakashi_ak_sa_033_ps_escape_classification_failed"};
     rt.localContext={...(rt.localContext||{}),
       kakashiSequentialPackageOccurrenceId:parent.occurrenceId,
       kakashiSequentialPackageOccurrenceId35100:parent.occurrenceId,
@@ -115,7 +118,7 @@ function resolveSequentialPostPsPackageRecovery35600(explicitResult=null){
       kakashiSequentialPackageResolutionAnchor:RECOVERY_ANCHOR
     };
     save();
-    return{success:true,recovered:false,packageOccurrenceId:parent.occurrenceId,resultState:String(result.resultState||"")};
+    return{success:true,recovered:false,packageOccurrenceId:parent.occurrenceId,resultState:String(result.resultState||""),participantStateClass:"ESCAPED"};
   }
 
   // Ordering lock: post-Battle classification happens before package recovery.
@@ -151,7 +154,7 @@ function resolveSequentialPostPsPackageRecovery35600(explicitResult=null){
         handoffCompleted:true
       },
       participantBattleStateByRef:{
-        [PACKAGE_SMUGGLER_REF]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved",storyClassification:"DEFEATED_BUT_NOT_CONTROLLED"}
+        [PACKAGE_SMUGGLER_REF]:{battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved",storyClassification:"BATTLE_DEFEATED_UNRESOLVED"}
       },
       worldFacts:{
         packageCustody:"KAKASHI",
