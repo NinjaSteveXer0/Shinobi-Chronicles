@@ -293,15 +293,21 @@
       ],
       "owners": [
         "runtime/alpha-kakashi-final-sequential-consumer-34410.js",
-        "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js"
+        "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js",
+        "runtime/alpha-kakashi-konoha-writing-closure-35900.js"
       ],
       "battles": [
-        "academy_kakashi_origin_battle_ps_mi_2v1"
+        "academy_kakashi_origin_battle_ps_mi_2v1",
+        "academy_kakashi_origin_battle_kakashi_pakkun_vs_amt"
       ],
       "variations": [
-        "BATTLE_VICTORY_PACKAGE_FACT_RESOLVED_BY_OWNING_RETURN",
-        "BATTLE_DEFEAT_NO_FALSE_CUSTODY",
-        "POST_BATTLE_STATE_REMAINS_NONTERMINAL_UNTIL_FACTS_CLOSE"
+        "INITIAL_2V1_VICTORY_PACKAGE_KAKASHI_PS_MI_DEFEATED_UNRESTRAINED",
+        "INITIAL_2V1_DEFEAT_PS_MI_ESCAPE_NO_FALSE_CUSTODY",
+        "RETURN_AND_REPORT_AFTER_INITIAL_RESULT",
+        "STAY_ON_FIRST_MAN_PURSUIT_FAILURE_AMT_ESCAPES_PACKAGE_RETAINED",
+        "STAY_ON_FIRST_MAN_PURSUIT_SUCCESS_PAKKUN_PRESENT",
+        "STAY_ON_FIRST_MAN_AMT_BATTLE_VICTORY_AMT_DEFEATED_UNRESTRAINED",
+        "STAY_ON_FIRST_MAN_AMT_BATTLE_DEFEAT_CE256_PACKAGE_PAKKUN_AUTONOMY_AMT_ESCAPED"
       ],
       "qa": [
         "tools/qa_academy_kakashi_sequential_consumer.js",
@@ -327,10 +333,14 @@
           "tools/qa_academy_kakashi_origin_battle_deployment.js"
         ],
         "storyReturn": [
-          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
+          "tools/qa_academy_kakashi_sequential_consumer.js",
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
         ],
         "packageHolder": [
-          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
+          "tools/qa_academy_kakashi_sequential_consumer.js",
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
         ],
         "miState": [
           "tools/qa_academy_kakashi_sequential_consumer.js"
@@ -339,10 +349,14 @@
           "tools/qa_academy_kakashi_sequential_consumer.js"
         ],
         "amtState": [
-          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
+          "tools/qa_academy_kakashi_sequential_consumer.js",
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
         ],
         "pakkunState": [
-          "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
+          "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
+          "tools/qa_academy_kakashi_sequential_consumer.js",
+          "tools/qa_academy_kakashi_konoha_closure_35900.js"
         ],
         "custodyState": [
           "tools/qa_academy_kakashi_konoha_closure_35900.js"
@@ -1170,8 +1184,11 @@
       "variations": [
         "PICKPOCKET_DIRECT_SUCCESS_CLEAN_EXTRACTION",
         "PICKPOCKET_DIRECT_FAILURE_DETECTED_3V1",
-        "THREE_V_ONE_VICTORY_PACKAGE_KAKASHI",
-        "THREE_V_ONE_DEFEAT_PACKAGE_AMT",
+        "THREE_V_ONE_VICTORY_POLICE_THREE_INDIVIDUAL_TRANSFERS",
+        "THREE_V_ONE_VICTORY_ANBU_THREE_INDIVIDUAL_TRANSFERS_PACKAGE_ANBU",
+        "THREE_V_ONE_VICTORY_KILL_THREE_DISTINCT_DEATHS",
+        "THREE_V_ONE_VICTORY_TAKE_PACKAGE_RELEASE_THREE_ALIVE",
+        "THREE_V_ONE_DEFEAT_ALL_THREE_ESCAPE_PACKAGE_AMT",
         "NO_PAKKUN",
         "THREE_V_ONE_DEFERRED_25_RYO_PLUS_TANTO"
       ],
@@ -1199,7 +1216,8 @@
           "tools/qa_academy_kakashi_origin_battle_deployment.js"
         ],
         "storyReturn": [
-          "tools/qa_kakashi_direct_pickpocket_terminal_35100.js"
+          "tools/qa_kakashi_direct_pickpocket_terminal_35100.js",
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
         ],
         "packageHolder": [
           "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
@@ -1217,7 +1235,8 @@
           "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
         ],
         "custodyState": [
-          "tools/qa_kakashi_direct_pickpocket_terminal_35100.js"
+          "tools/qa_kakashi_direct_pickpocket_terminal_35100.js",
+          "tools/qa_academy_kakashi_scene02_direct_choices_34710.js"
         ],
         "rewardState": [
           "tools/qa_kakashi_origin_rewards_34800.js",
