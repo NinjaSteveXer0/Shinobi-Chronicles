@@ -12,7 +12,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_immediate_custody_35800_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_immediate_custody_35800_v4_2026_09_21";
+const PATCH_ID="alpha_kakashi_immediate_custody_35800_v5_2026_09_22";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const SOURCE_BEAT="kak_scene05a_w_choice";
@@ -221,11 +221,13 @@ function applyCanonicalBackdrop35800(stage,rt){return !!(stage&&typeof globalThi
 function render(){
   if(typeof document==="undefined")return false;const rt=active(),p=sequence(rt);if(!rt||!p)return false;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
   installStyle();layer.dataset.scKakashiCustodyStage=p.cfg.stage;applyCanonicalBackdrop35800(stage,rt);let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;b.setAttribute("aria-hidden","true");stage.appendChild(b);}b.dataset.stage=p.cfg.stage;b.innerHTML=board(rt,p);
-  const text=layer.querySelector(".sc-story-text");if(text)text.textContent=p.cue.text;const name=layer.querySelector(".sc-story-name");if(name){name.textContent=p.cue.kind==="dialogue"?p.cue.speaker:"NARRATION";name.style.display="block";}
-  const kicker=layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent=p.cfg.stage.indexOf("office")===0?"HOKAGE'S OFFICE · HIDDEN OPERATION":p.cfg.stage==="police"?"UCHIHA POLICE FORCE · ACADEMY KAKASHI":p.cfg.stage.indexOf("rooftop")===0?"ANBU REPORT · ACADEMY KAKASHI":"NARRATION · ACADEMY KAKASHI";return true;
+  // Canonical 33910 owns dialogue/narration projection for this performance cue.
+  return true;
 }
-let custodyWipeInProgress35800=false;
-function wipe(next){if(custodyWipeInProgress35800)return{success:false,reason:"kakashi_custody_transition_in_progress"};if(typeof document==="undefined")return next();const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return next();const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer,n=document.createElement("div");custodyWipeInProgress35800=true;n.style.cssText="position:absolute;inset:0;z-index:99;background:#000;opacity:0;transition:opacity 260ms ease;pointer-events:auto";stage.appendChild(n);if(typeof requestAnimationFrame==="function")requestAnimationFrame(function(){n.style.opacity="1";});else n.style.opacity="1";setTimeout(function(){try{next();}finally{n.style.opacity="0";setTimeout(function(){try{n.remove();}catch(_error){}custodyWipeInProgress35800=false;},280);}},280);return{success:true,pending:true};}
+function sharedSceneCut35800(next){
+  if(typeof globalThis.performStorySceneCut33900==="function")return globalThis.performStorySceneCut33900(next);
+  return typeof next==="function"?next():{success:false,reason:"kakashi_custody_scene_cut_continuation_missing"};
+}
 function enterBeat(id,route){const rt=active();if(!rt)return{success:false,reason:"kakashi_immediate_custody_runtime_missing"};rt.beatId=id;rt.localContext=Object.assign({},rt.localContext||{},{[ROUTE_KEY]:route.key,[CURSOR_KEY]:0});save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:id};}
 function transitionAfter(route,beatId){
   if(route.key==="ANBU"){if(beatId===D06)return enterBeat(D07,route);if(beatId===D07){const r=commitReport(route);if(!r||r.success!==true)return r;const h=commitHidden(route);if(!h||h.success!==true)return h;return enterBeat(D08,route);}return openReceipt(route);}
@@ -256,7 +258,7 @@ function hooks(){
   if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;
   const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900;
   globalThis.getStoryScenePerformance33900=function(){const p=sequence(active());return p||PG.apply(this,arguments);};
-  globalThis.advanceStoryScene=function(choiceId){if(arguments.length===0)choiceId=null;const rt=active(),p=sequence(rt);if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&(choiceId===CHOICE_ANBU||choiceId===CHOICE_POLICE))return beginImmediateCustodyChoice35800(choiceId);if(p&&(choiceId===null||choiceId===undefined)){if(!p.atEnd){rt.localContext=Object.assign({},rt.localContext||{},{[CURSOR_KEY]:p.index+1});save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:rt.beatId,cueIndex:p.index+1};}return wipe(function(){return transitionAfter(p.route,rt.beatId);});}const out=PA.apply(this,arguments),after=active();if(after&&routeForBeat(after.beatId)){after.localContext=Object.assign({},after.localContext||{},{[CURSOR_KEY]:0});save();try{renderStoryScenePresentationLayer();}catch(_error){}}return out;};
+  globalThis.advanceStoryScene=function(choiceId){if(arguments.length===0)choiceId=null;const rt=active(),p=sequence(rt);if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===SOURCE_BEAT&&(choiceId===CHOICE_ANBU||choiceId===CHOICE_POLICE))return beginImmediateCustodyChoice35800(choiceId);if(p&&(choiceId===null||choiceId===undefined)){if(!p.atEnd){rt.localContext=Object.assign({},rt.localContext||{},{[CURSOR_KEY]:p.index+1});save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:rt.beatId,cueIndex:p.index+1};}return sharedSceneCut35800(function(){return transitionAfter(p.route,rt.beatId);});}const out=PA.apply(this,arguments),after=active();if(after&&routeForBeat(after.beatId)){after.localContext=Object.assign({},after.localContext||{},{[CURSOR_KEY]:0});save();try{renderStoryScenePresentationLayer();}catch(_error){}}return out;};
   try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_error){}
   if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_immediate_custody_35800",()=>{wireChoices();return render();});
   hooked=true;wireChoices();installBrowserChoiceCapture();return true;
@@ -264,8 +266,9 @@ function hooks(){
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
 
 function diagnostics(){const m=scene()&&scene().beatMap instanceof Map?scene().beatMap:null;const checks={
-  patchId:PATCH_ID==="alpha_kakashi_immediate_custody_35800_v4_2026_09_21",
-  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910"),
+  patchId:PATCH_ID==="alpha_kakashi_immediate_custody_35800_v5_2026_09_22",
+  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910")&&!render.toString().includes(".sc-story-text")&&!render.toString().includes(".sc-story-name"),
+  sharedSceneCut:sharedSceneCut35800.toString().includes("performStorySceneCut33900"),
 
   compactLiveStateCallout:installStyle.toString().includes("width:max-content!important")&&installStyle.toString().includes("max-height:none!important"),
   authorities:AUTH.d06==="24b7956781d2da6d3d1f70ce18d1ef0de348cfae"&&AUTH.d08==="e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4"&&AUTH.e07==="6cb1f7e59ce05e75e35d3cc1f0d59cbf1722d0c4"&&AUTH.e09==="0dafcca4f13afe437b7b81d9ef6ec09569d36efc",
