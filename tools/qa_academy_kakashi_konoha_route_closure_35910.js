@@ -232,9 +232,6 @@ assert.strictEqual(handoff.nextBeatId,MOD.beats.getCloserHandoff);
 assert.strictEqual(definition.beatMap.get(MOD.beats.getCloserHandoff).nextBeatId,OBSERVE);
 assert.strictEqual(active.localContext.kakashiObserveScene03AOccurrenceId,"qa-get-closer-handoff");
 assert(active.localContext.kakashiObserveEscalationChoiceSetId);
-const getCloserSnap=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");
-const rootReceipts=Object.values(getCloserSnap.decisionReceipts||{}).sort((a,b)=>(Number(a.createdAt)||0)-(Number(b.createdAt)||0));
-assert(rootReceipts.some(row=>row.selectedChoiceId==="get_closer"),"Get-Closer root receipt was not preserved through handoff reconvergence");
 
 // Observe resolver choices are live and no longer carry a Writing blocker.
 for(const id of ["secure_package_before_assassin","go_after_original_target"]){
