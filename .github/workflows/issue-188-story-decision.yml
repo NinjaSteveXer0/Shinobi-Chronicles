@@ -305,7 +305,9 @@ jobs:
           grep -Fq 'He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in.' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'That part is up to him.' runtime/alpha-kakashi-loss-ending-35820.js
           ! grep -Fq 'He couldn’t follow?' runtime/alpha-kakashi-loss-ending-35820.js
-          grep -Fq '.sc-chronicle-layout{display:none!important}' runtime/alpha-kakashi-loss-ending-35820.js
+          if grep -Fq '.sc-chronicle-layout{display:none!important}' runtime/alpha-kakashi-loss-ending-35820.js; then echo '35820 must not hide canonical Chronicle dialogue layout'; exit 1; fi
+          if grep -Fq 'layer.dataset.scBoardUiMode' runtime/alpha-kakashi-loss-ending-35820.js; then echo '35820 must not own canonical dialogue mode'; exit 1; fi
+          grep -Fq 'performStorySceneCut33900' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'kakashiKnowledgeGranted:false' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'alpha_kakashi_immediate_custody_35800_v4_2026_09_21' runtime/alpha-kakashi-immediate-custody-35800.js
@@ -321,7 +323,7 @@ jobs:
           grep -Fq 'anbu_marked_target|masked_interceptor|package_smuggler' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'kakashi_scene_board_model_v21_33910_2026_09_22' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v22_33910_2026_09_22' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HAS PACKAGE · ESCAPE BLOCKED' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'BLOCKING ESCAPE' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'actors:[interceptor("BLOCKING ESCAPE"),smuggler("HAS PACKAGE")]' runtime/alpha-kakashi-scene-board-polish-33910.js
@@ -357,7 +359,7 @@ jobs:
           if grep -Fq 'try{next();if(typeof renderStorySceneBoard33900' runtime/alpha-kakashi-scene-board-polish-33910.js; then echo '33910 wipe must not duplicate-render terminal presentation'; exit 1; fi
           grep -Fq 'registerStorySceneBoardRenderHook("kakashi_post_mi_35830"' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           if grep -Fq 'enforceAmtDialogueLane35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js; then echo 'post-MI dialogue must not move after first paint'; exit 1; fi
-          grep -Fq 'kakashi_scene_board_model_v21_33910_2026_09_22' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v22_33910_2026_09_22' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'kak_terminal_minato_private_evaluation_35100:()=>terminalMinatoPerformance33910()' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'return"hokage_minato"' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v8_2026_09_22' runtime/alpha-kakashi-dynamic-terminal-35940.js
@@ -420,7 +422,7 @@ jobs:
           grep -Fq 'data-sc-board-ui-mode="performance_narration"' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'sc-narration-panel-33910' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-nonkill-35780.js
-          grep -Fq 'alpha_kakashi_scene04a_35710_v9_2026_09_19' runtime/alpha-kakashi-scene04a-35710.js
+          grep -Fq 'alpha_kakashi_scene04a_35710_v10_2026_09_22' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'kakashiBlockEntry35710' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'Scene 04A begins from the final WATCH THE EXCHANGE state' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-ending-35770.js
