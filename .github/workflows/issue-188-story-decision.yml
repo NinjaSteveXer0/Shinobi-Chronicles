@@ -225,8 +225,8 @@ jobs:
           grep -Fq '90b20f565ef010d2b7cfca98c04feece3f7dfcb7' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'MI_PURSUIT_MAX_TURNS=4' runtime/alpha-kakashi-scene05a-w-35730.js
           grep -Fq 'preserveWiredChoice35730' runtime/alpha-kakashi-scene05a-w-35730.js
-          grep -Fq 'kakashiScene05AWEntered===true' runtime/alpha-kakashi-scene06a-w2c-35760.js
-          grep -Fq 'Number(rt.localContext.kakashiScene05AWTurnCount)>=1' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'function lateEntryEligible()' runtime/alpha-kakashi-scene06a-w2c-35760.js
+          grep -Fq 'New player-facing entry is retired. 35810 owns current KILL HER.' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'registerStorySceneBoardRenderHook("kakashi_scene06aw2c_35760"' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'alpha_kakashi_scene06aw2c_35760_v9_legacy_resume_only_2026_09_22' runtime/alpha-kakashi-scene06a-w2c-35760.js
           grep -Fq 'if(p&&p.cue)' runtime/alpha-kakashi-scene06a-w2c-35760.js
