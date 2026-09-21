@@ -182,14 +182,13 @@ function installStyle(){
     "@keyframes kakashiMiDeathDrop35810{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(72vh) rotate(8deg)}}";
   document.head.appendChild(s);return true;
 }
-function backdrop(){try{if(typeof getSceneBackdropAssetPath==="function")return getSceneBackdropAssetPath(BACKDROP_ID)||BACKDROP_PATH;}catch(_error){}return BACKDROP_PATH;}
 function actor(id,label,img,state,focus){return'<figure class="sc-scene-board-33900__actor '+(focus?"is-focus":"")+'" data-actor-id="'+esc(id)+'"><div class="sc-scene-board-33900__actor-frame"></div><img src="'+esc(img)+'" alt=""><figcaption class="sc-scene-board-33900__actor-tag"><strong>'+esc(label)+'</strong><small>'+esc(state)+'</small></figcaption></figure>';}
 function render(){
   wireSource();materializePursuit();
   if(typeof document==="undefined")return false;const rt=active(),layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
   for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!family(rt))old.remove();
   if(!family(rt))return false;
-  installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.40) 82%,rgba(2,5,8,.68)),url("'+String(backdrop()).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
+  installStyle();if(typeof globalThis.applyStorySceneBoardBackdrop33900==="function")globalThis.applyStorySceneBoardBackdrop33900(stage,rt);
   let board=stage.querySelector("."+BOARD_CLASS);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;stage.appendChild(board);}
   const p=performance(rt),focus=p&&p.cue&&p.cue.focusActorRef||"academy_kakashi",removed=rt.localContext&&rt.localContext.kakashiDeterministicKillMiCardRemoved===true;
   const actors=[actor("academy_kakashi","KAKASHI","Assets/Academy Student/academy_kakashi.png",rt.beatId===PURSUIT_BEAT?"PURSUIT DECISION":"PRESENT",focus==="academy_kakashi")];
@@ -219,7 +218,7 @@ if(!installBeats())throw new Error("kakashi_deterministic_kill_beats_missing");
 let hooked=false,tries=0;
 function hooks(){
   if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;
-  const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900,PR=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+  const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900;
   globalThis.getStoryScenePerformance33900=function(){const p=performance(active());return p||PG.apply(this,arguments);};
   globalThis.advanceStoryScene=function(choiceId=null){
     const rt=active();
@@ -231,7 +230,7 @@ function hooks(){
     return PA.apply(this,arguments);
   };
   try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_error){}
-  if(PR){globalThis.renderStoryScenePresentationLayer=function(){const out=PR.apply(this,arguments);const settle=function(){wireSource();render();};if(typeof queueMicrotask==="function")queueMicrotask(settle);else setTimeout(settle,0);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+  if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_deterministic_kill_35810",()=>{wireSource();return render();});
   hooked=true;wireSource();render();return true;
 }
 function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<120)setTimeout(ensure,25);}ensure();
