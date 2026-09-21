@@ -183,6 +183,10 @@ function installStyle(){
 .sc-scene-board-33900__actor.is-entering{animation:scActorEnter33900 .46s cubic-bezier(.2,.75,.25,1) both;}
 @keyframes scActorEnter33900{from{opacity:0;transform:translateX(44px) scale(.96);filter:brightness(.35) blur(2px)}to{opacity:.72;transform:translateX(0) scale(.95);filter:saturate(.78) brightness(.88)}}
 .sc-scene-board-33900__actor.is-entering.is-focus{animation-name:scActorEnterFocus33900}@keyframes scActorEnterFocus33900{from{opacity:0;transform:translateX(44px) scale(.97)}to{opacity:1;transform:translateX(0) scale(1)}}
+.sc-scene-board-33900__actor.is-exiting{animation:scActorExit33900 .42s cubic-bezier(.55,.05,.8,.35) both;}
+@keyframes scActorExit33900{from{opacity:.72;transform:translateX(0) scale(.95)}to{opacity:0;transform:translateX(86px) scale(.92)}}
+.sc-scene-board-33900__actor.is-falling{transform-origin:50% 92%;animation:scActorFall33900 .48s cubic-bezier(.45,.02,.75,.36) both;}
+@keyframes scActorFall33900{from{opacity:.72;transform:translateY(0) rotate(0deg) scale(.95)}to{opacity:0;transform:translateY(72%) rotate(8deg) scale(.92)}}
 .sc-scene-board-33900__actor-silhouette{position:relative;z-index:1;width:58%;height:78%;margin-bottom:24px;border-radius:46% 46% 18% 18%;background:radial-gradient(circle at 50% 18%,rgba(177,191,194,.38) 0 14%,transparent 15%),linear-gradient(180deg,transparent 0 24%,rgba(81,95,101,.38) 25% 100%);filter:blur(.2px);}
 .sc-scene-board-33900__actor-tag{position:absolute;z-index:3;left:7%;right:7%;bottom:4%;padding:6px 8px;background:rgba(2,7,10,.84);border:1px solid rgba(194,158,73,.48);text-align:center;backdrop-filter:blur(2px);}.sc-scene-board-33900__actor-tag strong{display:block;color:#efe6cf;font-size:10px;letter-spacing:.1em}.sc-scene-board-33900__actor-tag small{display:table;color:#77dfe7;font-size:8px;font-weight:900;letter-spacing:.07em;margin:4px auto 0;padding:2px 6px;line-height:1.25;border:1px solid rgba(104,219,229,.32);background:rgba(2,17,22,.78);box-shadow:0 0 14px rgba(80,216,228,.09);text-shadow:0 0 8px rgba(93,223,233,.22)}.sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-tag small{color:#f0cf78;border-color:rgba(220,177,77,.54);background:rgba(24,17,5,.72);box-shadow:0 0 16px rgba(220,177,77,.13);text-shadow:0 0 8px rgba(235,199,98,.24)}
 /* Live State Callouts: persistent scene-level facts belong in the HUD, not on actor nameplates. */
@@ -190,14 +194,15 @@ function installStyle(){
 .sc-scene-board-33900__reaction{position:absolute;left:50%;top:12.5%;transform:translateX(-50%);max-width:64%;padding:8px 12px;border:1px solid rgba(102,212,188,.62);background:rgba(3,12,14,.78);color:#d9f1e9;font-size:9px;font-weight:800;letter-spacing:.05em;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .sc-scene-board-33900__receipt{position:absolute;right:3.2%;top:12.5%;border-color:rgba(93,205,162,.62);color:#bfead8;font-size:8px;font-weight:900;letter-spacing:.1em;}
 .sc-scene-board-wipe-33900{position:absolute;inset:0;z-index:9999;background:#000;transform:translateX(100%);pointer-events:auto;transition:transform .28s cubic-bezier(.7,0,.3,1)}.sc-scene-board-wipe-33900.is-covering{transform:translateX(0)}.sc-scene-board-wipe-33900.is-revealing{transform:translateX(-100%)}
-@media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}.sc-scene-board-wipe-33900{transition:none!important}}
+@media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering,.sc-scene-board-33900__actor.is-exiting,.sc-scene-board-33900__actor.is-falling{animation:none!important}.sc-scene-board-wipe-33900{transition:none!important}}
 @media(max-width:820px){.sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%}.sc-scene-board-33900__actors[data-count="2"]{column-gap:20px}.sc-scene-board-33900__actor{width:90%;max-height:290px}.sc-scene-board-33900__objective{max-width:58%;font-size:8px}#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr}}
 `;
   document.head.appendChild(style);return true;
 }
 function actorMarkup(actor){
   const image=actor.image?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
-  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
+  const motion=String(actor&&actor.motion||"").toLowerCase(),motionClass=motion==="exit"?"is-exiting":motion==="fall"?"is-falling":"";
+  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering&&!motionClass?"is-entering":""} ${motionClass}" data-actor-id="${escapeHTML(actor.id||"")}" data-actor-motion="${escapeHTML(motion)}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
 }
 function boardMarkup(projection){
   const actors=Array.isArray(projection.actors)?projection.actors.slice(0,6):[];
@@ -238,8 +243,15 @@ function renderStorySceneBoard33900(){
     let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;
     if(projection){
       if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}
-      const signature=JSON.stringify(projection);
-      if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}
+      const priorActorIds=new Set(Array.from(board.querySelectorAll?board.querySelectorAll(".sc-scene-board-33900__actor"):[]).map(node=>String(node&&node.dataset&&node.dataset.actorId||"")).filter(Boolean));
+      const projectedActors=Array.isArray(projection.actors)?projection.actors.map(row=>{
+        const actor={...(row||{})},motion=String(actor.motion||"").toLowerCase();
+        if(!motion&&actor.entering!==true&&actor.id&&!priorActorIds.has(String(actor.id)))actor.entering=true;
+        return actor;
+      }):[];
+      const animatedProjection={...projection,actors:projectedActors};
+      const signature=JSON.stringify(animatedProjection);
+      if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(animatedProjection);board.dataset.signature=signature;}
     }else if(board&&typeof board.remove==="function")board.remove();
     updatePerformancePanel(layer,runtime);
     const hookHandled=runStorySceneBoardRenderHooks(runtime,layer,stage,projection);
