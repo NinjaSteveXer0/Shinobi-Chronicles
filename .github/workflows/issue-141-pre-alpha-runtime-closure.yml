@@ -8,6 +8,7 @@ on:
       - 'game.js'
       - 'index.html'
       - 'runtime/**'
+      - 'tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json'
       - 'tools/qa_*.py'
       - 'tools/qa_*.js'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
@@ -16,6 +17,7 @@ on:
       - 'game.js'
       - 'index.html'
       - 'runtime/**'
+      - 'tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json'
       - 'tools/qa_*.py'
       - 'tools/qa_*.js'
       - '.github/workflows/issue-141-pre-alpha-runtime-closure.yml'
@@ -101,3 +103,10 @@ jobs:
           node tools/qa_academy_kakashi_dynamic_terminal_35940.js
           node tools/qa_kakashi_story_presentation_33920.js
           node tools/qa_academy_kakashi_scene03a_35700.js
+
+      - name: Execute Kakashi one-swoop completion matrix
+        run: |
+          node --check tools/qa_academy_kakashi_completion_tail_36000.js
+          node --check tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js
+          node -e "JSON.parse(require('fs').readFileSync('tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json','utf8'))"
+          node tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js
