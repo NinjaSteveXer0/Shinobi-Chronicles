@@ -127,6 +127,8 @@ assert(!scene04Source.includes("kakashiMiEnterRightward35710")&&!scene04Source.i
 assert(scene04Source.includes('index===4?"sc-kakashi-block-entry-35710"')&&scene04Source.includes('index===6&&isNarration?"sc-kakashi-state-exit-right-35710"'),"Scene 04A must animate Kakashi blocking first, then PS fleeing on the authored cue");
 assert(scene04Source.includes("kakashi-blocks-line"),"Kakashi blocking-line staging missing");
 assert(scene04Source.includes('name.textContent="NARRATION"'),"narration quick-read label missing");
+assert(scene04Source.includes("alpha_kakashi_scene04a_35710_v10_2026_09_22"),"Scene 04A dialogue-lifecycle repair generation missing");
+assert(!scene04Source.includes('querySelectorAll(".sc-performance-surface-33910")')&&!scene04Source.includes("delete layer.dataset.scBoardUiMode"),"Scene 04A must not clear canonical 33910 dialogue surface/state");
 console.log("Academy Kakashi Scene 04A 35710 QA: PASS");
 console.log("- exact 14 narration cues / no dialogue / no authored choices");
 console.log("- fight_at_sakura_tree backdrop bound before and after PL Battle");
