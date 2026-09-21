@@ -53,13 +53,17 @@
     try{return typeof currentBattle!=="undefined"?currentBattle:null;}catch(_error){return null;}
   }
 
-  function activeKakashiBattle34500(){
+  function kakashiOriginBattleContext34500(){
     const battle=battle34500();
-    if(!battle||battle.battleOver===true)return false;
+    if(!battle)return false;
     const dep=battle.kakashiOriginDeployment;
     if(!dep)return false;
     const controller=String(dep.controllerParticipantId||dep.controllerId||"");
     return controller===KAKASHI;
+  }
+  function activeKakashiBattle34500(){
+    const battle=battle34500();
+    return kakashiOriginBattleContext34500()&&battle&&battle.battleOver!==true;
   }
 
   function activeActor34500(){
@@ -270,6 +274,120 @@
       success:false,
       reason:"battle_skill_guide_unavailable"
     };
+  }
+
+  const STYLE_ID_34500="sc-kakashi-battle-presentation-34500-style";
+  function installStyle34500(){
+    if(typeof document==="undefined"||!document.head||typeof document.head.appendChild!=="function"||document.getElementById(STYLE_ID_34500))return false;
+    const style=document.createElement("style");style.id=STYLE_ID_34500;style.textContent=`
+.alpha-code-battle-stage.sc-kakashi-battle-input-34500 .sc-kakashi-battle-deck-34500{pointer-events:auto!important;z-index:45!important;isolation:isolate}
+.alpha-code-battle-stage.sc-kakashi-battle-input-34500 .battle-dev-skill-card[data-alpha34500-bound="true"],.alpha-code-battle-stage.sc-kakashi-battle-input-34500 .battle-live-skill-card[data-alpha34500-bound="true"]{position:relative;z-index:2}
+.sc-kakashi-battle-event-34500{position:absolute;left:50%;top:3.5%;transform:translateX(-50%);z-index:90;width:min(72%,860px);padding:10px 18px;border:1px solid rgba(220,177,77,.62);background:linear-gradient(100deg,rgba(3,11,16,.94),rgba(8,23,30,.88));box-shadow:0 14px 34px rgba(0,0,0,.45);pointer-events:none;text-align:center;letter-spacing:.05em}
+.sc-kakashi-battle-event-34500 strong{display:block;color:#78e1e7;font-size:clamp(11px,.95vw,14px);letter-spacing:.12em;text-transform:uppercase}
+.sc-kakashi-battle-event-34500 span{display:block;margin-top:4px;color:#f0dfad;font-size:clamp(10px,.82vw,13px);font-weight:800}
+.sc-kakashi-battle-event-34500[data-event-kind="entry"] strong{color:#e8c66f}
+.sc-kakashi-battle-event-34500[data-event-kind="outcome"] strong{font-size:clamp(14px,1.2vw,19px)}
+.sc-kakashi-battle-actor-action-34500{animation:scKakashiBattleActor34500 .34s cubic-bezier(.2,.78,.3,1)}
+.sc-kakashi-battle-impact-34500{animation:scKakashiBattleImpact34500 .34s cubic-bezier(.35,.02,.55,1)}
+.sc-kakashi-battle-defended-34500{animation:scKakashiBattleDefended34500 .42s ease-out}
+.sc-kakashi-battle-entry-34500{animation:scKakashiBattleEntry34500 .46s cubic-bezier(.2,.76,.25,1)}
+@keyframes scKakashiBattleActor34500{0%{transform:translateX(0) scale(1)}45%{transform:translateX(12px) scale(1.035);filter:brightness(1.16)}100%{transform:translateX(0) scale(1)}}
+@keyframes scKakashiBattleImpact34500{0%{transform:translateX(0);filter:brightness(1)}25%{transform:translateX(-9px);filter:brightness(1.35)}55%{transform:translateX(6px)}100%{transform:translateX(0);filter:brightness(1)}}
+@keyframes scKakashiBattleDefended34500{0%{filter:brightness(1)}35%{filter:brightness(1.42) drop-shadow(0 0 14px rgba(105,220,230,.75))}100%{filter:brightness(1)}}
+@keyframes scKakashiBattleEntry34500{0%{opacity:.25;transform:translateY(14px) scale(.97)}100%{opacity:1;transform:translateY(0) scale(1)}}
+@media(prefers-reduced-motion:reduce){.sc-kakashi-battle-actor-action-34500,.sc-kakashi-battle-impact-34500,.sc-kakashi-battle-defended-34500,.sc-kakashi-battle-entry-34500{animation:none!important}}
+`;document.head.appendChild(style);return true;
+  }
+  function escapeBattleText34500(value){return String(value??"").replace(/[&<>"]/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[ch]));}
+  function prettyBattleId34500(value){return String(value||"ACTION").replace(/^academy_kakashi_/,"").replace(/^enemy_/,"").replace(/_/g," ").replace(/\b\w/g,ch=>ch.toUpperCase());}
+  function participantName34500(ref){
+    if(!ref)return"UNKNOWN";
+    try{if(typeof getBattleParticipantByIdentity==="function"){const row=getBattleParticipantByIdentity(ref.side,ref.participantId);if(row)return String(row.name||row.displayName||row.id||ref.participantId);}}catch(_error){}
+    return prettyBattleId34500(ref.participantId||ref.id||ref.side);
+  }
+  function skillName34500(skillId,actorRef){
+    if(!skillId)return"Action";
+    if(actorRef&&actorRef.side==="player"){
+      try{const actor=activeActor34500(),skill=actor&&typeof getBattlePreparedSkillDefinition==="function"?getBattlePreparedSkillDefinition(actor,skillId):null;if(skill)return String(skill.displayName||skill.name||skill.id||skillId);}catch(_error){}
+    }
+    return prettyBattleId34500(skillId);
+  }
+  function evidenceForAction34500(actionId){
+    const battle=battle34500(),rows=battle&&battle.runtime&&Array.isArray(battle.runtime.evidence)?battle.runtime.evidence:[];
+    return actionId?rows.filter(row=>row&&row.actionId===actionId):[];
+  }
+  function buildActionPresentation34500(record){
+    if(!record||!record.actionId)return null;
+    const rows=evidenceForAction34500(record.actionId),damage=rows.filter(row=>row&&row.eventType==="damage_resolved");
+    const plLoss=damage.reduce((sum,row)=>sum+Math.max(0,Number(row.data&&row.data.absorbedPL)||0),0);
+    const preDefenseBlocked=damage.reduce((sum,row)=>sum+Math.max(0,(Number(row.data&&row.data.preDefenseAttackPL)||0)-(Number(row.data&&row.data.resolvedAttackPL)||0)),0);
+    const staminaBlocked=damage.reduce((sum,row)=>sum+Math.max(0,Number(row.data&&row.data.staminaMitigationAmount)||0),0);
+    const substitution=damage.some(row=>JSON.stringify(row&&row.data||{}).includes("academy_kakashi_substitution_guard"));
+    const actorRef=record.actorRef||null,targetRef=record.targetRef||damage.find(row=>row&&row.targetRef)?.targetRef||null;
+    let resultText="RESOLVED";
+    if(plLoss>0)resultText=`IMPACT · ${plLoss} BATTLE PL LOST`;
+    else if(preDefenseBlocked>0)resultText=`${substitution?"SUBSTITUTION":"DEFENDED"} · ${preDefenseBlocked} BLOCKED`;
+    else if(staminaBlocked>0)resultText=`STAMINA DEFENSE · ${staminaBlocked} BLOCKED`;
+    else if(Array.isArray(record.stateRefs)&&record.stateRefs.length>0)resultText="STATE PREPARED";
+    const battle=battle34500();battle.kakashiOriginPresentationSequence34500=(Number(battle.kakashiOriginPresentationSequence34500)||0)+1;
+    return{sequence:battle.kakashiOriginPresentationSequence34500,kind:"action",actorRef,targetRef,actorName:participantName34500(actorRef),targetName:participantName34500(targetRef),actionName:skillName34500(record.skillId,actorRef),plLoss,preDefenseBlocked,staminaBlocked,substitution,resultText};
+  }
+  function captureBattleEvidence34500(record){
+    if(!kakashiOriginBattleContext34500()||!record)return false;
+    const type=String(record.eventType||"");
+    const battle=battle34500();
+    if(type==="skill_action_completed"||type==="enemy_authored_action_completed"){
+      const event=buildActionPresentation34500(record);if(event)battle.kakashiOriginPresentation34500=event;return!!event;
+    }
+    if(type==="battle_victory"||type==="battle_defeat"){
+      battle.kakashiOriginPresentationSequence34500=(Number(battle.kakashiOriginPresentationSequence34500)||0)+1;
+      battle.kakashiOriginPresentation34500={sequence:battle.kakashiOriginPresentationSequence34500,kind:"outcome",actorRef:record.actorRef||null,targetRef:record.targetRef||null,actorName:participantName34500(record.actorRef),targetName:participantName34500(record.targetRef),actionName:type==="battle_victory"?"VICTORY":"DEFEAT",resultText:type==="battle_victory"?"OPPOSITION WITHDRAWN":"PLAYER SIDE WITHDRAWN",plLoss:0,preDefenseBlocked:0,staminaBlocked:0};
+      return true;
+    }
+    return false;
+  }
+  function battleCardForSide34500(stage,side){if(!stage||!stage.querySelector)return null;return stage.querySelector(side==="enemy"?".battle-live-active-card-enemy":".battle-live-active-card-player");}
+  function animateOnce34500(node,className){if(!node||!node.classList)return false;node.classList.remove(className);node.classList.add(className);if(typeof node.addEventListener==="function")node.addEventListener("animationend",()=>node.classList.remove(className),{once:true});return true;}
+  function renderKakashiBattlePresentation34500(root=null){
+    if(typeof document==="undefined"||!kakashiOriginBattleContext34500())return false;
+    installStyle34500();
+    const stage=stageRoot34500(root);if(!stage)return false;
+    try{stage.classList.add("sc-kakashi-battle-input-34500");}catch(_error){}
+    const battle=battle34500(),event=battle.kakashiOriginPresentation34500||null;
+    if(!event){
+      const entryKey=String(battle.battleId||"kakashi_origin");
+      if(stage.dataset&&stage.dataset.scKakashiBattleEntry34500===entryKey)return true;
+      if(stage.dataset)stage.dataset.scKakashiBattleEntry34500=entryKey;
+      const old=stage.querySelector&&stage.querySelector(".sc-kakashi-battle-event-34500");if(old&&old.remove)old.remove();
+      if(typeof document.createElement==="function"){const ribbon=document.createElement("div");ribbon.className="sc-kakashi-battle-event-34500";ribbon.dataset.eventKind="entry";ribbon.innerHTML="<strong>PL BATTLE · ENGAGE</strong><span>KAKASHI enters the active slot</span>";stage.appendChild(ribbon);}
+      animateOnce34500(battleCardForSide34500(stage,"player"),"sc-kakashi-battle-entry-34500");animateOnce34500(battleCardForSide34500(stage,"enemy"),"sc-kakashi-battle-entry-34500");return true;
+    }
+    if(stage.dataset&&stage.dataset.scKakashiBattleEvent34500===String(event.sequence))return true;
+    if(stage.dataset)stage.dataset.scKakashiBattleEvent34500=String(event.sequence);
+    const old=stage.querySelector&&stage.querySelector(".sc-kakashi-battle-event-34500");if(old&&old.remove)old.remove();
+    if(typeof document.createElement==="function"){
+      const ribbon=document.createElement("div");ribbon.className="sc-kakashi-battle-event-34500";ribbon.dataset.eventKind=event.kind||"action";
+      const line=event.kind==="outcome"?event.actionName:`${event.actorName} → ${event.actionName}${event.targetRef?` → ${event.targetName}`:""}`;
+      ribbon.innerHTML=`<strong>${escapeBattleText34500(line)}</strong><span>${escapeBattleText34500(event.resultText||"RESOLVED")}</span>`;stage.appendChild(ribbon);
+    }
+    const actorSide=event.actorRef&&event.actorRef.side||"player",targetSide=event.targetRef&&event.targetRef.side||null;
+    animateOnce34500(battleCardForSide34500(stage,actorSide),"sc-kakashi-battle-actor-action-34500");
+    if(targetSide){
+      const target=battleCardForSide34500(stage,targetSide);
+      if(event.plLoss>0)animateOnce34500(target,"sc-kakashi-battle-impact-34500");
+      else if(event.preDefenseBlocked>0||event.staminaBlocked>0)animateOnce34500(target,"sc-kakashi-battle-defended-34500");
+    }
+    return true;
+  }
+  const PRE_RECORD_EVIDENCE_34500=typeof globalThis.recordBattleEvidence==="function"?globalThis.recordBattleEvidence:null;
+  if(PRE_RECORD_EVIDENCE_34500&&!PRE_RECORD_EVIDENCE_34500.__scKakashiBattlePresentation34500){
+    const observed=function recordBattleEvidence34500Observed(){
+      const result=PRE_RECORD_EVIDENCE_34500.apply(this,arguments);
+      try{captureBattleEvidence34500(result&&typeof result==="object"?result:arguments[0]);}catch(_error){}
+      return result;
+    };
+    observed.__scKakashiBattlePresentation34500=true;
+    globalThis.recordBattleEvidence=observed;try{recordBattleEvidence=observed;}catch(_error){}
   }
 
   function rememberActivation34500(result,skillId,source){
@@ -930,7 +1048,8 @@
     if(typeof prior!=="function"||prior.__scKakashiBattleInteraction34500)return false;
     const wrapped=function(){
       const result=prior.apply(this,arguments);
-      scheduleHarden34500(arguments&&arguments[0]);
+      hardenBattleDOM34500(arguments&&arguments[0]);
+      renderKakashiBattlePresentation34500(arguments&&arguments[0]);
       return result;
     };
     wrapped.__scKakashiBattleInteraction34500=true;
@@ -945,9 +1064,9 @@
     const wrapped=function(){
       const result=prior.apply(this,arguments);
       if(result&&typeof result.then==="function"){
-        return result.then(value=>{scheduleHarden34500();return value;});
+        return result.then(value=>{hardenBattleDOM34500();renderKakashiBattlePresentation34500();return value;});
       }
-      scheduleHarden34500();
+      hardenBattleDOM34500();renderKakashiBattlePresentation34500();
       return result;
     };
     wrapped.__scKakashiBattleInteraction34500=true;
@@ -974,7 +1093,7 @@
     const skillSource=visibleBattleSkills34500.toString();
     const launchWrapper=wrapKakashiLaunch34500.toString();
     const checks={
-      patchId:PATCH_ID==="alpha_kakashi_battle_interaction_hotfix_34500_v5_2026_09_16",
+      patchId:PATCH_ID==="alpha_kakashi_battle_interaction_34500_v6_2026_09_22",
       exactFiveSkills:EXACT_KAKASHI_SKILLS.size===5,
       exactKakashiScope:activeKakashiBattle34500.toString().includes("controllerParticipantId"),
       canonicalPaletteFirst:skillSource.includes("canonicalBattleSkills34500")&&canonicalBattleSkills34500.toString().includes("getBattleUISkillPalettePresentation")&&canonicalBattleSkills34500.toString().includes("getBattlePreparedSkillDefinition"),
@@ -986,10 +1105,13 @@
       delegatedCaptureInstalled:delegatedClickInstalled===true||typeof document==="undefined",
       delegatedLearnInstalled:delegatedLearnInstalled===true||typeof document==="undefined",
       delegatedClickOwnsRenderedCard:delegate.includes("resolveDelegatedCard34500")&&delegate.includes("stopImmediatePropagation")&&delegate.includes("activate34500(skillId)"),
-      postDeploymentLaunchHardening:launchWrapper.includes("launchAcademyKakashiOriginPlBattle")&&launchWrapper.includes("scheduleHarden34500"),
-      observesLateDOM:typeof MutationObserver!=="undefined"?!!observer:true,
+      postDeploymentLaunchHardening:launchWrapper.includes("launchAcademyKakashiOriginPlBattle")&&launchWrapper.includes("hardenBattleDOM34500")&&launchWrapper.includes("renderKakashiBattlePresentation34500"),
+      singleDomInteractionOwner:!installStyle34500.toString().includes("MutationObserver")&&!hardenBattleDOM34500.toString().includes("style.setProperty")&&skillIdFromCard34500.toString().includes("LEGACY_FIFTH_SKILL")&&EXACT_KAKASHI_SKILLS.has(SUBSTITUTION_SKILL),
+      factualActionPresentation:buildActionPresentation34500.toString().includes("damage_resolved")&&buildActionPresentation34500.toString().includes("absorbedPL")&&captureBattleEvidence34500.toString().includes("skill_action_completed")&&captureBattleEvidence34500.toString().includes("enemy_authored_action_completed"),
+      semanticAuthorityPreserved:PRE_RECORD_EVIDENCE_34500?String(globalThis.recordBattleEvidence).includes("PRE_RECORD_EVIDENCE_34500.apply"):true,
+      battleEntryImpact:renderKakashiBattlePresentation34500.toString().includes("PL BATTLE · ENGAGE"),
       broadBattleCardCoverage:CARD_SELECTOR.includes("battle-live-skill-card")&&CARD_SELECTOR.includes("battle-dev-skill-card"),
-      noDirectDamageResolver:!activation.includes("resolveBattleDamagePacket")&&!activation.includes("applyBattleDamage")&&!activation.includes("recordBattleEvidence"),
+      noDirectDamageResolver:!activation.includes("resolveBattleDamagePacket")&&!activation.includes("applyBattleDamage")&&!captureBattleEvidence34500.toString().includes("remainingBattlePLAfter="),
       browserGoldenClaimed:false
     };
     const failed=Object.entries(checks).filter(([key,value])=>key!=="browserGoldenClaimed"&&value!==true).map(([key])=>key);
@@ -1000,6 +1122,7 @@
   globalThis.previewAcademyKakashiBattleSkill34500=renderGuide34500;
   globalThis.hardenAcademyKakashiBattleDOM34500=hardenBattleDOM34500;
   globalThis.handleAcademyKakashiBattleCardClick34500=delegatedClick34500;
+  globalThis.renderAcademyKakashiBattlePresentation34500=renderKakashiBattlePresentation34500;
   globalThis.runAcademyKakashiBattleInteraction34500Diagnostics=runAcademyKakashiBattleInteraction34500Diagnostics;
   globalThis.SC_ALPHA_KAKASHI_BATTLE_INTERACTION_34500=Object.freeze({version:VERSION,patchId:PATCH_ID,browserGoldenClaimed:false});
 })();
