@@ -1,0 +1,557 @@
+{
+  "schema": "shinobi-chronicles.academy-kakashi.runtime-owner-map.v1",
+  "authorityDate": "2026-09-21",
+  "productionBranch": "codex/kakashi-gen71-full-audit-closure",
+  "productionDelivery": {
+    "root": "runtime/alpha-origin-scenes-32900-integrator.js",
+    "storyDecision": "runtime/alpha-story-decision-realisation-34000.js",
+    "kakashiLoader": "runtime/alpha-kakashi-final-origin-adapter-34100.js",
+    "sceneBoardBootstrap": "runtime/alpha-kakashi-original-origin-restoration-33800.js",
+    "generations": {
+      "storyDecision": "story-decision-20260921-19",
+      "kakashiFinal": "kakashi-final-20260921-91",
+      "sceneBoard": "scene-board-20260921-15"
+    }
+  },
+  "invariants": [
+    "ONE_LIVE_OWNER_PER_SEMANTIC_RESPONSIBILITY",
+    "WORLD_TRUTH_NE_KNOWLEDGE_NE_PRESENTATION",
+    "BATTLE_VICTORY_NE_STORY_OUTCOME",
+    "PACKAGE_CUSTODY_NE_PARTICIPANT_CUSTODY",
+    "DEFEAT_NE_DEATH",
+    "FIELD_RESTRAINT_NE_INSTITUTIONAL_CUSTODY",
+    "OWNERSHIP_NE_ASSIGNMENT_NE_DEPLOYMENT",
+    "PAKKUN_TEMPORARY_PARTICIPATION_NE_OWNERSHIP",
+    "PRESENTATION_REFRESH_NE_SEMANTIC_RECOMMIT",
+    "NO_HIDDEN_CONTROL_GATE_FOR_AUTHORISED_POST_BATTLE_RESTRAINT_OR_KILL",
+    "NO_HIDDEN_RUNTIME_SCALING_OR_BASE_MUTATION",
+    "NO_STORY_FACT_INFERENCE_FROM_BUTTON_LABEL"
+  ],
+  "responsibilities": [
+    {
+      "id": "origin_materialisation",
+      "responsibility": "Origin registration/materialisation",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-origin-scenes-32900-core.js",
+        "runtime/alpha-origin-scenes-32900-integrator.js"
+      ],
+      "caller": "beginAlphaChronicleOriginPrologue / Origin dispatcher",
+      "writes": [
+        "chronicle origin runtime",
+        "active Story scene runtime"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-story-decision-realisation-34000.js",
+        "runtime/alpha-kakashi-final-origin-adapter-34100.js"
+      ]
+    },
+    {
+      "id": "delivery_chain",
+      "responsibility": "Kakashi loader/version/generation ownership",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-origin-scenes-32900-integrator.js",
+        "runtime/alpha-story-decision-realisation-34000.js",
+        "runtime/alpha-kakashi-final-origin-adapter-34100.js",
+        "runtime/alpha-traversal-bridge-33200.js"
+      ],
+      "caller": "browser runtime bootstrap",
+      "writes": [
+        "script delivery identity only"
+      ],
+      "nextConsumer": [
+        "all production-loaded Kakashi runtime modules"
+      ]
+    },
+    {
+      "id": "choice_semantics",
+      "responsibility": "Root Story choice eligibility/materialisation and final authority guard",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-final-origin-adapter-34100-core.js",
+        "runtime/alpha-kakashi-final-authority-guard-34200.js"
+      ],
+      "caller": "Story choice runtime",
+      "writes": [
+        "choice availability",
+        "semantic intent provenance",
+        "Kakashi localContext"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-story-factual-resolver-34600.js",
+        "route owners"
+      ]
+    },
+    {
+      "id": "factual_resolution",
+      "responsibility": "Resolver dispatch and factual-state commits",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-story-factual-resolver-34600.js",
+        "runtime/alpha-kakashi-factual-bindings-34700.js",
+        "runtime/alpha-kakashi-factual-state-commit-34120.js"
+      ],
+      "caller": "committed Story intents",
+      "writes": [
+        "origin occurrences",
+        "package state",
+        "participant classification",
+        "Knowledge-scoped factual receipts"
+      ],
+      "nextConsumer": [
+        "route owners",
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "battle_deployment",
+      "responsibility": "Kakashi Story Battle deployment/config/caller metadata",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-origin-battle-deployment-34300.js"
+      ],
+      "caller": "authorised Story Battle beats",
+      "writes": [
+        "battle deployment",
+        "battleResume.authored",
+        "Story caller/config identity"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-battle-browser-32600.js",
+        "runtime/alpha-alpha-sprint-33100.js"
+      ]
+    },
+    {
+      "id": "battle_browser_interaction",
+      "responsibility": "Kakashi Combat browser interaction hardening",
+      "classification": "REQUIRED COMPATIBILITY",
+      "owners": [
+        "runtime/alpha-kakashi-battle-interaction-hotfix-34500.js"
+      ],
+      "caller": "Combat overlay render/DOM interaction",
+      "writes": [
+        "presentation-only Battle interaction bindings"
+      ],
+      "nextConsumer": [
+        "shared Combat resolver"
+      ],
+      "notes": "Kept because it adapts shared Combat browser surfaces; it does not own Story facts."
+    },
+    {
+      "id": "substitution",
+      "responsibility": "Kakashi Substitution Battle interaction/runtime integration",
+      "classification": "REQUIRED COMPATIBILITY",
+      "owners": [
+        "runtime/alpha-kakashi-substitution-34900.js"
+      ],
+      "caller": "active Kakashi Battle DOM/runtime",
+      "writes": [
+        "Battle presentation/runtime interaction only"
+      ],
+      "nextConsumer": [
+        "shared Combat runtime"
+      ],
+      "notes": "DOM observer is Battle-scoped, not Story Scene Board ownership."
+    },
+    {
+      "id": "battle_claim_return",
+      "responsibility": "Battle CLAIM and same-Story return",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-battle-browser-32600.js",
+        "runtime/alpha-alpha-sprint-33100.js"
+      ],
+      "caller": "Battle result CLAIM/continue",
+      "writes": [
+        "claimed Battle result",
+        "return-to-caller state"
+      ],
+      "nextConsumer": [
+        "exact Kakashi return beat"
+      ]
+    },
+    {
+      "id": "observe_sequential",
+      "responsibility": "WATCH secure-package/sequential Battle chain",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-final-sequential-consumer-34410.js",
+        "runtime/alpha-kakashi-sequential-post-ps-recovery-35600.js"
+      ],
+      "caller": "Observe route choices and exact Battle returns",
+      "writes": [
+        "Battle outcome facts",
+        "timing windows",
+        "package recovery facts"
+      ],
+      "nextConsumer": [
+        "later pursuit/terminal owners"
+      ]
+    },
+    {
+      "id": "direct_root",
+      "responsibility": "Direct STRIKE / SLIP-IN root consumption",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-direct-opening-consumer-34710.js",
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "caller": "direct root Story choice",
+      "writes": [
+        "direct intent/factual outcome",
+        "package state",
+        "participant states"
+      ],
+      "nextConsumer": [
+        "Battle/route closure",
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "stop_assassin",
+      "responsibility": "STOP THE ASSASSIN scene/Battle win-loss chain",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-scene03a-35700.js",
+        "runtime/alpha-kakashi-scene04a-35710.js",
+        "runtime/alpha-kakashi-scene05a-w-35730.js",
+        "runtime/alpha-kakashi-scene05a-l-35750.js"
+      ],
+      "caller": "WATCH THE EXCHANGE -> STOP THE ASSASSIN",
+      "writes": [
+        "route beat",
+        "Battle timing facts",
+        "pursuit eligibility",
+        "loss closure facts"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-scene06a-w2c-35760.js",
+        "runtime/alpha-kakashi-post-mi-death-pursuit-35830.js",
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "lethal_continuation",
+      "responsibility": "Post-MI lethal/non-lethal continuation and exact outcome expression",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-scene06a-w2c-35760.js",
+        "runtime/alpha-kakashi-w2c-ending-35770.js",
+        "runtime/alpha-kakashi-w2c-nonkill-35780.js",
+        "runtime/alpha-kakashi-deterministic-kill-35810.js"
+      ],
+      "caller": "authorised post-Battle disposition choice",
+      "writes": [
+        "lethal intent/outcome facts",
+        "participant life state",
+        "route report facts"
+      ],
+      "nextConsumer": [
+        "ANBU/Hokage terminal sequence",
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "immediate_custody",
+      "responsibility": "Immediate ANBU / Uchiha Police custody endings",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-immediate-custody-35800.js"
+      ],
+      "caller": "post-MI immediate custody choices",
+      "writes": [
+        "institutional custody occurrence",
+        "handoff/report/hidden-review facts"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "loss_ending",
+      "responsibility": "Stop-Assassin Battle defeat report/hidden review",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-loss-ending-35820.js"
+      ],
+      "caller": "Scene05A-L RETURN TO ANBU",
+      "writes": [
+        "truthful report",
+        "hidden review",
+        "failure/package facts"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "post_mi_pursuit",
+      "responsibility": "Post-MI PS/AMT pursuit, timing, Police/ANBU handoffs and Pakkun participation",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"
+      ],
+      "caller": "post-MI pursuit choices",
+      "writes": [
+        "pursuit selection/result",
+        "package outcome",
+        "participant disposition",
+        "temporary Pakkun state"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-konoha-writing-closure-35900.js",
+        "runtime/alpha-kakashi-field-secured-35920.js",
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "pakkun_interception",
+      "responsibility": "Pakkun interception branch and temporary participation semantics",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-pakkun-interception-35300.js"
+      ],
+      "caller": "eligible package pursuit",
+      "writes": [
+        "temporary Pakkun participation",
+        "interception facts",
+        "explicit departure"
+      ],
+      "nextConsumer": [
+        "Battle/terminal owners"
+      ]
+    },
+    {
+      "id": "ce256_closure",
+      "responsibility": "AMT defeat package factual consumption / CE256 closure",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-konoha-writing-closure-35900.js"
+      ],
+      "caller": "AMT Battle/factual return",
+      "writes": [
+        "package factual occurrence",
+        "Pakkun autonomy consumption",
+        "terminal transition beat"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ]
+    },
+    {
+      "id": "konoha_route_closure",
+      "responsibility": "WATCH/direct downstream route closure",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js"
+      ],
+      "caller": "Observe/direct route choices",
+      "writes": [
+        "route-specific intent/factual state",
+        "Battle continuation"
+      ],
+      "nextConsumer": [
+        "Battle/terminal owners"
+      ]
+    },
+    {
+      "id": "field_secured",
+      "responsibility": "Field restraint, collection and group transfer",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-field-secured-35920.js"
+      ],
+      "caller": "authorised restraint/collect choices",
+      "writes": [
+        "FIELD_SECURED_PENDING_COLLECTION",
+        "COLLECTED_ACTIVE_ESCORT",
+        "institutional group transfer"
+      ],
+      "nextConsumer": [
+        "terminal owner"
+      ]
+    },
+    {
+      "id": "move_closer",
+      "responsibility": "MOVE IN CLOSER success/failure downstream closure",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-move-closer-closure-35930.js"
+      ],
+      "caller": "Get Closer factual outcome choices",
+      "writes": [
+        "route intent",
+        "Battle/factual outcome",
+        "participant/package state"
+      ],
+      "nextConsumer": [
+        "terminal owner"
+      ]
+    },
+    {
+      "id": "rewards_development",
+      "responsibility": "Immediate Battle rewards and action-derived development",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-origin-rewards-34800.js",
+        "runtime/alpha-kakashi-battle-development-35740.js"
+      ],
+      "caller": "Battle CLAIM / terminal reward projection",
+      "writes": [
+        "Ryō",
+        "inventory entitlement",
+        "discipline development receipts"
+      ],
+      "nextConsumer": [
+        "Battle result UI",
+        "terminal Receipt"
+      ]
+    },
+    {
+      "id": "terminal_semantics",
+      "responsibility": "ANBU debrief, package handoff, Pakkun departure gate, Chronicle Receipt, terminal rewards and Origin completion",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-terminal-debrief-35100.js"
+      ],
+      "caller": "all route terminal boundaries",
+      "writes": [
+        "terminal factual debrief",
+        "ANBU package state",
+        "Receipt/reward occurrence",
+        "Origin completion evidence"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-dynamic-terminal-35940.js",
+        "game.js"
+      ],
+      "notes": "Sole Kakashi owner allowed to call completeChronicleOriginPrologue."
+    },
+    {
+      "id": "terminal_projection",
+      "responsibility": "Dynamic ANBU report / Minato / Receipt text projection",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-dynamic-terminal-35940.js"
+      ],
+      "caller": "terminal beat presentation resolvers / 33910",
+      "writes": [
+        "presentation only"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-scene-board-polish-33910.js"
+      ]
+    },
+    {
+      "id": "backdrop_registry",
+      "responsibility": "Approved Kakashi Story backdrop registration",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-original-origin-restoration-33800.js"
+      ],
+      "caller": "Scene Board bootstrap",
+      "writes": [
+        "scene backdrop asset registry only"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-story-scene-board-33900.js"
+      ]
+    },
+    {
+      "id": "scene_board",
+      "responsibility": "Story Scene Board render lifecycle and full-screen backdrop ownership",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-story-scene-board-33900.js"
+      ],
+      "caller": "shared Story render lifecycle",
+      "writes": [
+        "presentation DOM only"
+      ],
+      "nextConsumer": [
+        "runtime/alpha-kakashi-scene-board-polish-33910.js",
+        "registered route render hooks"
+      ]
+    },
+    {
+      "id": "dialogue_objective_presentation",
+      "responsibility": "Kakashi dialogue geometry, objective sizing and terminal actor projection",
+      "classification": "CANONICAL",
+      "owners": [
+        "runtime/alpha-kakashi-scene-board-polish-33910.js"
+      ],
+      "caller": "33900 / shared Story renderer",
+      "writes": [
+        "presentation DOM/CSS only"
+      ],
+      "nextConsumer": [
+        "browser presentation"
+      ],
+      "notes": "Route modules must not contain .sc-dialogue-panel-33910 geometry."
+    },
+    {
+      "id": "team_onboarding_free_play",
+      "responsibility": "Exactly-two teammate formation, first-Konoha orientation and Academy free play",
+      "classification": "CANONICAL",
+      "owners": [
+        "game.js",
+        "runtime/alpha-first-konoha-tutorial-35000.js"
+      ],
+      "caller": "completed Academy Kakashi Origin",
+      "writes": [
+        "character ownership",
+        "academy team formation",
+        "onboarding status",
+        "academy_free_play"
+      ],
+      "nextConsumer": [
+        "normal game shell"
+      ]
+    }
+  ],
+  "retiredOwners": [
+    {
+      "file": "runtime/alpha-kakashi-story-presentation-compat-33920.js",
+      "classification": "DEAD/UNREACHABLE",
+      "productionLoaded": false,
+      "migratedTo": [
+        "runtime/alpha-story-scene-board-33900.js",
+        "runtime/alpha-kakashi-scene-board-polish-33910.js"
+      ],
+      "reason": "Former compatibility CSS/click/observer owner retired before Gen91."
+    },
+    {
+      "file": "runtime/alpha-kakashi-terminal-scene-board-35610.js",
+      "classification": "DEAD/UNREACHABLE",
+      "productionLoaded": false,
+      "migratedTo": [
+        "runtime/alpha-kakashi-original-origin-restoration-33800.js",
+        "runtime/alpha-kakashi-scene-board-polish-33910.js"
+      ],
+      "reason": "Backdrop registration migrated; terminal presentation already canonical in 33910."
+    },
+    {
+      "file": "runtime/alpha-kakashi-objective-presentation-35720.js",
+      "classification": "DEAD/UNREACHABLE",
+      "productionLoaded": false,
+      "migratedTo": [
+        "runtime/alpha-kakashi-scene-board-polish-33910.js",
+        "runtime/alpha-kakashi-scene03a-35700.js"
+      ],
+      "reason": "Objective sizing moved to 33910; Rooftop reveal timing remains 35700."
+    },
+    {
+      "file": "runtime/alpha-kakashi-browser-acceptance-35950.js",
+      "classification": "DEAD/UNREACHABLE",
+      "productionLoaded": false,
+      "migratedTo": [
+        "runtime/alpha-kakashi-konoha-route-closure-35910.js",
+        "runtime/alpha-kakashi-move-closer-closure-35930.js"
+      ],
+      "reason": "Duplicate final choice rebinding retired after canonical route owners consumed legitimate bindings."
+    }
+  ],
+  "unresolvedCompetingOwners": [],
+  "browserGoldenClaimed": false
+}
