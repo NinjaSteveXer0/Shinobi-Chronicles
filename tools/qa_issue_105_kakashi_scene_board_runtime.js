@@ -46,6 +46,7 @@ try{
   const d339=context.runStorySceneBoard33900Diagnostics();
   assert("33800_diagnostics_green",d338.pass===true,d338);
   assert("33900_generic_bridge_diagnostics_green_before_final_consumer",d339.pass===true,d339);
+  assert("generic_scene_board_supports_performance_before_choice",d339.checks&&d339.checks.choiceBeatPerformanceCompletesBeforeDecision===true&&sceneBoardSource.includes("story_performance_choice_revealed")&&sceneBoardSource.includes("row.complete===true"));
   assert("scene_board_reads_exact_rooftop_backdrop",context.resolveStorySceneBoardBackdropPath(active)==="Kakashi Origin Backdrop/rooftop_night.png",context.resolveStorySceneBoardBackdropPath(active));
   assert("scene_board_neutralizes_opaque_master_shell",sceneBoardSource.includes('.sc-chronicle-stage.is-master-art-off{background:transparent!important;box-shadow:none!important;}'));
   assert("scene_board_full_screen_backdrop_fails_closed",sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#020508!important;}')&&!sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}')&&sceneBoardSource.includes('layer.dataset.scSceneBoardBackdrop=path?"dedicated":"fallback"')&&sceneBoardSource.includes('layer.style.setProperty("--sc-scene-board-backdrop",cssUrlValue(path))'));
@@ -57,17 +58,23 @@ try{
   assert("kakashi_v20_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v20_33910_2026_09_22'));
   assert("terminal_report_stages_anbu",kakashiV4Source.includes('kak_seq_debrief_pending')&&kakashiV4Source.includes('terminalReportProjection33910')&&kakashiV4Source.includes('konoha_anbu_contact'));
   assert("terminal_hokage_scene_staged",kakashiV4Source.includes('kak_terminal_minato_private_evaluation_35100')&&kakashiV4Source.includes('Assets/Kage/kage_minato.png')&&kakashiV4Source.includes('Kakashi Origin Backdrop/hokage_administration_interior_night.png')&&kakashiV4Source.includes('HOKAGE ADMINISTRATION · NIGHT'));
-  assert("terminal_final_chronicle_beat_stays_on_scene_board",kakashiV4Source.includes('kak_terminal_chronicle_begins_35100')&&kakashiV4Source.includes("terminalFinalPerformance33910")&&kakashiV4Source.includes('text:"YOUR CHRONICLE BEGINS"')&&kakashiV4Source.includes('kak_terminal_chronicle_begins_35100:()=>terminalFinalPerformance33910()'));
+  assert("terminal_final_chronicle_beat_stays_on_scene_board",kakashiV4Source.includes('TERMINAL_FINAL_35100="kak_terminal_chronicle_begins_35100"')&&kakashiV4Source.includes("terminalFinalPerformance33910")&&kakashiV4Source.includes('text:"YOUR CHRONICLE BEGINS"')&&kakashiV4Source.includes('[TERMINAL_FINAL_35100]:()=>terminalFinalPerformance33910()'));
   assert("terminal_minato_performance_bridge",kakashiV4Source.includes("terminalMinatoPerformance33910")&&kakashiV4Source.includes("SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940")&&kakashiV4Source.includes('return"hokage_minato"'));
   assert("terminal_no_duplicate_mutation_observer",!/new\s+MutationObserver\s*\(/.test(kakashiV4Source)&&!/new\s+MutationObserver\s*\(/.test(sceneBoardSource));
   assert("canonical_dialogue_first_paint_owned_by_33910",d33910.checks&&d33910.checks.singleDialogueLane===true&&kakashiV4Source.includes("top:4%!important")&&!kakashiV4Source.includes("#story-scene-presentation-layer[data-sc-postmi-35830="));
   assert("terminal_wipe_has_single_render_owner",kakashiV4Source.includes("try{next();}finally{setTimeout(reveal,110);}")&&!kakashiV4Source.includes("try{next();if(typeof renderStorySceneBoard33900"));
-  assert("golden_actor_safe_zone_is_single_and_stable",kakashiV4Source.includes("bottom:33%!important")&&kakashiV4Source.includes("bottom:-18px!important"));
-  assert("golden_secondary_actors_remain_readable",d33910.checks&&d33910.checks.secondaryActorsRemainReadable===true&&kakashiV4Source.includes('.sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important;opacity:.78;'));
+  assert("golden_actor_safe_zone_is_single_and_stable",kakashiV4Source.includes("bottom:38%!important")&&kakashiV4Source.includes("bottom:-14px!important"));
+  assert("golden_secondary_actors_remain_readable",d33910.checks&&d33910.checks.secondaryActorsRemainReadable===true&&kakashiV4Source.includes('.sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:455px!important;aspect-ratio:7/10!important;overflow:visible!important;opacity:.78;'));
   assert("golden_battle_transition_has_explicit_mode",kakashiV4Source.includes('data-sc-board-ui-mode="battle_transition"')&&kakashiV4Source.includes('beat.mode==="battle_transition"'));
   assert("golden_route_specific_dialogue_geometry_retired",d33910.checks&&d33910.checks.singleDialogueLane===true&&!kakashiV4Source.includes("#story-scene-presentation-layer[data-sc-postmi-35830="));
   assert("generic_scene_board_owns_actor_motion",sceneBoardSource.includes("is-exiting")&&sceneBoardSource.includes("is-falling")&&sceneBoardSource.includes("priorActorIds")&&sceneBoardSource.includes("data-actor-motion")&&sceneBoardSource.includes("syncAutomaticActorEntrances33900")&&sceneBoardSource.includes("actorIdsByBoard33900")&&sceneBoardSource.includes("hasExplicitActorMotion33900"));
   assert("terminal_report_opening_uses_click_performance",kakashiV4Source.includes("terminalReportOpeningPerformance33910")&&kakashiV4Source.includes('kak_seq_debrief_pending:()=>terminalReportOpeningPerformance33910()'));
+  assert("golden_direct_pickpocket_return_uses_prechoice_performance",d33910.checks&&d33910.checks.directPickpocketReturnUsesPreChoicePerformance===true&&kakashiV4Source.includes('[DIRECT_PICKPOCKET_RETURN_34710]:({beat})=>textPerformance33910'));
+  assert("golden_direct_pickpocket_dispositions_have_projection_and_performance",d33910.checks&&d33910.checks.directPickpocketDispositionPresentationComplete===true&&["DIRECT_PICKPOCKET_POLICE_34710","DIRECT_PICKPOCKET_ANBU_34710","DIRECT_PICKPOCKET_KILL_34710","DIRECT_PICKPOCKET_RELEASE_34710"].every(token=>kakashiV4Source.includes('['+token+']:({beat})=>textPerformance33910')));
+  assert("golden_terminal_receipt_is_paged_record_not_dump",d33910.checks&&d33910.checks.receiptUsesPagedRecordPerformance===true&&kakashiV4Source.includes('[TERMINAL_RECEIPT_35100]:()=>terminalReceiptPerformance33910()')&&kakashiV4Source.includes('kind==="record"?"CHRONICLE RECEIPT"'));
+  assert("golden_terminal_final_clears_objective",d33910.checks&&d33910.checks.terminalFinalObjectiveCleared===true);
+  assert("golden_contextual_intents_not_hidden_id_misclassified",d33910.checks&&d33910.checks.contextualChoiceIntent===true);
+  assert("golden_hokage_office_has_noncolliding_hierarchy",d33910.checks&&d33910.checks.officeHierarchyStyled===true&&kakashiV4Source.includes('left:50%!important;right:auto!important;top:15.5%!important'));
 
   const terminalScene=scenes.get(active.sceneId);
   terminalScene.beatMap.set("kak_terminal_minato_private_evaluation_35100",{beatId:"kak_terminal_minato_private_evaluation_35100",mode:"narration",nextBeatId:null});
@@ -81,10 +88,12 @@ try{
     {cueId:"qa_minato_1",kind:"narration",text:"Later, in private, Minato reviews the sealed field record.",focusActorRef:"hokage_minato"},
     {cueId:"qa_minato_2",kind:"dialogue",speakerName:"MINATO",text:"He brought the package back.",focusActorRef:"hokage_minato"},
     {cueId:"qa_minato_3",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Yes.",focusActorRef:"konoha_anbu_contact"}
-   ]
+   ],
+   receiptText:()=>"CHRONICLE RECEIPT\n\nASSIGNMENT\nHokage-authorised limited retrieval operation.\n\nPACKAGE\nNot recovered.\n\nREPORT\nANBU report — completed."
   };
   terminalScene.beatMap.set("kak_seq_debrief_pending",{beatId:"kak_seq_debrief_pending",mode:"dialogue",nextBeatId:"kak_terminal_debrief_summary_35100"});
   terminalScene.beatMap.set("kak_terminal_debrief_summary_35100",{beatId:"kak_terminal_debrief_summary_35100",mode:"narration",nextBeatId:"kak_terminal_minato_private_evaluation_35100"});
+  terminalScene.beatMap.set("kak_terminal_chronicle_receipt_35100",{beatId:"kak_terminal_chronicle_receipt_35100",mode:"choice",text:"Chronicle Receipt",choices:[{choiceId:"continue",label:"CONTINUE",nextBeatId:"kak_terminal_chronicle_begins_35100"}]});
   active.beatId="kak_seq_debrief_pending";active.localContext={};
   const reportOpeningPerformance=context.getStoryScenePerformance33900();
   assert("terminal_report_opening_performs_arrival_then_report",reportOpeningPerformance&&reportOpeningPerformance.sequence.length===2&&reportOpeningPerformance.sequence[0].text==="Kakashi returns to the rooftop."&&reportOpeningPerformance.sequence[1].speakerName==="ANBU OPERATIVE"&&reportOpeningPerformance.sequence[1].text==="Report.",reportOpeningPerformance);
@@ -96,6 +105,11 @@ try{
   assert("terminal_minato_runtime_performance_resolves",terminalPerformance&&terminalPerformance.sequence.length===3&&terminalPerformance.cue.kind==="narration",terminalPerformance);
   const terminalProjection=context.resolveStorySceneBoardProjection(active.sceneId,active.beatId,active);
   assert("terminal_minato_actor_ids_match_dialogue_sides",terminalProjection&&terminalProjection.actors.some(a=>a.id==="hokage_minato")&&terminalProjection.actors.some(a=>a.id==="konoha_anbu_contact"),terminalProjection);
+  active.beatId="kak_terminal_chronicle_receipt_35100";active.localContext={};
+  const receiptPerformance=context.getStoryScenePerformance33900();
+  assert("terminal_receipt_pages_structured_record_blocks",receiptPerformance&&receiptPerformance.sequence.length===3&&receiptPerformance.sequence.every(cue=>cue.kind==="record")&&receiptPerformance.sequence[0].text.includes("CHRONICLE RECEIPT\n\nASSIGNMENT"),receiptPerformance);
+  const receiptProjection=context.resolveStorySceneBoardProjection(active.sceneId,active.beatId,active);
+  assert("terminal_receipt_projection_uses_private_review_objective",receiptProjection&&receiptProjection.objective==="Private review of the sealed field record."&&receiptProjection.objects.some(row=>row.label==="SEALED FIELD RECORD"),receiptProjection);
   assert("watch_exchange_expanded_projection",d33910.checks&&d33910.checks.expandedWatchExchangeProjection===true,d33910);
 
   assert("scene1_authority_pinned",kakashiV4Source.includes('d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91'));
