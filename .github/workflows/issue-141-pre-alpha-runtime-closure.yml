@@ -118,3 +118,8 @@ jobs:
           node --check tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js
           node -e "JSON.parse(require('fs').readFileSync('tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json','utf8'))"
           node tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js
+
+      - name: Execute Kakashi deterministic full-route traversal
+        run: |
+          node --check tools/qa_academy_kakashi_deterministic_route_traversal_36200.js
+          node tools/qa_academy_kakashi_deterministic_route_traversal_36200.js
