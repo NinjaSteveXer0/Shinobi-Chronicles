@@ -1287,5 +1287,6 @@
     "rewardIdempotence": "tools/qa_kakashi_origin_rewards_34800.js",
     "beforeReportAfterRewardAtReceipt": "tools/qa_kakashi_terminal_debrief_35100.js",
     "afterOriginCompletionAndOnboarding": "tools/qa_academy_kakashi_completion_tail_36000.js"
-  }
+  },
+  "deterministicTraversalHarness": "tools/qa_academy_kakashi_deterministic_route_traversal_36200.js"
 }
