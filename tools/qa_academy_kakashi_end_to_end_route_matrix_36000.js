@@ -59,11 +59,11 @@ const storyDecision=read("runtime/alpha-story-decision-realisation-34000.js");
 const loader=read("runtime/alpha-kakashi-final-origin-adapter-34100.js");
 const restoration=read("runtime/alpha-kakashi-original-origin-restoration-33800.js");
 const traversal=read("runtime/alpha-traversal-bridge-33200.js");
-assert(/script\.src="runtime\/alpha-story-decision-realisation-34000\.js\?sc=story-decision-20260922-24";/.test(integrator),"active root Story delivery is not generation 22");
-assert(/script\.src="runtime\/alpha-kakashi-final-origin-adapter-34100\.js\?sc=kakashi-final-20260922-96";/.test(storyDecision),"active Kakashi parent delivery is not gen94");
-assert(/^const BUILD="kakashi-final-20260922-96";$/m.test(loader),"active Kakashi loader is not gen94");
-assert(/^\s*const BUILD="scene-board-20260922-20";$/m.test(restoration),"active Scene Board restoration delivery is not generation 19");
-assert(/^const SCENE_BOARD_BUILD="scene-board-20260922-20";$/m.test(traversal),"active traversal Scene Board delivery is not generation 19");
+assert(/script\.src="runtime\/alpha-story-decision-realisation-34000\.js\?sc=story-decision-20260922-25";/.test(integrator),"active root Story delivery is not generation 22");
+assert(/script\.src="runtime\/alpha-kakashi-final-origin-adapter-34100\.js\?sc=kakashi-final-20260922-97";/.test(storyDecision),"active Kakashi parent delivery is not gen94");
+assert(/^const BUILD="kakashi-final-20260922-97";$/m.test(loader),"active Kakashi loader is not gen94");
+assert(/^\s*const BUILD="scene-board-20260922-21";$/m.test(restoration),"active Scene Board restoration delivery is not generation 19");
+assert(/^const SCENE_BOARD_BUILD="scene-board-20260922-21";$/m.test(traversal),"active traversal Scene Board delivery is not generation 19");
 assert(!restoration.includes("alpha-kakashi-story-presentation-compat-33920.js"),"retired 33920 returned to production load path");
 const sceneBoardSource=read("runtime/alpha-story-scene-board-33900.js");
 assert(sceneBoardSource.includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#020508!important;}'),"Story Scene Board can fail open onto World UI");
@@ -159,9 +159,9 @@ console.log(JSON.stringify({
  qaHarnessCount:results.length,
  routeMatrix:routeRows,
  deliveryParity:{
-   storyDecision:"story-decision-20260922-24",
-   kakashiFinal:"kakashi-final-20260922-96",
-   sceneBoard:"scene-board-20260922-20"
+   storyDecision:"story-decision-20260922-25",
+   kakashiFinal:"kakashi-final-20260922-97",
+   sceneBoard:"scene-board-20260922-21"
  },
  terminalTail:manifest.commonTerminalTail.required,
  saveLoadBoundaries:manifest.saveLoadBoundaries,
