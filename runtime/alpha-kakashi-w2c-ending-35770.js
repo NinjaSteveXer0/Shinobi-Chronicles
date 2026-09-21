@@ -183,8 +183,6 @@ function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return;
   const s=document.createElement("style");s.id=STYLE_ID;s.textContent=
   "."+BOARD_CLASS+"{position:absolute;inset:0;z-index:4;pointer-events:none}"+
-  "."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8%!important;bottom:20%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:2%!important;padding:0 4%!important}"+
-  "."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(22vw,310px)!important;max-height:490px!important;aspect-ratio:7/10!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-chronicle-layout{position:absolute!important;left:3.4%!important;top:13%!important;width:min(37%,455px)!important;margin:0!important;align-self:start!important}"+
   "#story-scene-presentation-layer[data-sc-kakashi-w2c-stage=\"office\"] .sc-story-panel{max-height:34vh!important}"+
   "."+BOARD_CLASS+"[data-w2c-stage=\"office\"] .sc-scene-board-33900__actors{left:0!important;right:0!important;top:0!important;bottom:0!important;display:block!important;padding:0!important}"+
