@@ -191,10 +191,6 @@ function installStyle35750(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
 .${BOARD_CLASS}{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
-#story-scene-presentation-layer .sc-chronicle-stage[data-sc-kakashi-scene05al="true"]{
-  background-image:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.05) 50%,rgba(2,5,8,.40) 82%,rgba(2,5,8,.68)),var(--sc-kakashi-scene05al-backdrop)!important;
-  background-position:center!important;background-size:cover!important;background-repeat:no-repeat!important
-}
 `;document.head.appendChild(style);return true;
 }
 function fightPath(){
@@ -217,9 +213,9 @@ function renderScene05AL35750(){
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
   const rt=active();
   for(const old of stage.querySelectorAll?stage.querySelectorAll(`.${BOARD_CLASS}`):[])if(!isLossFamily(rt))old.remove();
-  if(!isLossFamily(rt)){if(stage.style){try{delete stage.dataset.scKakashiScene05al;}catch(_error){}stage.style.removeProperty("--sc-kakashi-scene05al-backdrop");}return false;}
+  if(!isLossFamily(rt))return false;
   installStyle35750();materializeChoice35750();
-  stage.dataset.scKakashiScene05al="true";stage.style.setProperty("--sc-kakashi-scene05al-backdrop",cssUrlValue(fightPath()));
+  if(typeof globalThis.applyStorySceneBoardBackdrop33900==="function")globalThis.applyStorySceneBoardBackdrop33900(stage,rt);
   layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
   let board=stage.querySelector&&stage.querySelector(`.${BOARD_CLASS}`);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;board.setAttribute("aria-hidden","true");stage.appendChild(board);}
   const markup=boardMarkup(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
@@ -239,7 +235,6 @@ function installHooks35750(){
   if(typeof globalThis.getStoryScenePerformance33900!=="function"||typeof globalThis.advanceStoryScene!=="function")return false;
   const PRE_GET=globalThis.getStoryScenePerformance33900;
   const PRE_ADVANCE=globalThis.advanceStoryScene;
-  const PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
   globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35750(){const rt=active();return isLossNarration(rt)?performance(rt):PRE_GET.apply(this,arguments);};
   globalThis.advanceStoryScene=function advanceStoryScene35750(choiceId=null){
     const rt=active();
@@ -257,16 +252,11 @@ function installHooks35750(){
     const transition=PRE_ADVANCE.apply(this,arguments);materializeChoice35750();return transition;
   };
   try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_error){}
-  if(PRE_RENDER){
-    globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35750(){
-      const rt=active();
-      if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===RETURN_BEAT&&validDefeat()&&rt.localContext&&rt.localContext.kakashiScene04ABattleIntentResolved===true)routeDefeatReturn35750();
-      const out=PRE_RENDER.apply(this,arguments);
-      if(typeof queueMicrotask==="function")queueMicrotask(renderScene05AL35750);else if(typeof setTimeout==="function")setTimeout(renderScene05AL35750,0);
-      return out;
-    };
-    try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}
-  }
+  if(typeof globalThis.registerStorySceneBoardRenderHook==="function")globalThis.registerStorySceneBoardRenderHook("kakashi_scene05al_35750",()=>{
+    const rt=active();
+    if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===RETURN_BEAT&&validDefeat()&&rt.localContext&&rt.localContext.kakashiScene04ABattleIntentResolved===true)routeDefeatReturn35750();
+    return renderScene05AL35750();
+  });
   hooksInstalled=true;installStyle35750();renderScene05AL35750();return true;
 }
 function ensureHooks35750(){if(installHooks35750())return;if(typeof setTimeout==="function"&&attempts++<120)setTimeout(ensureHooks35750,25);}
