@@ -14,6 +14,7 @@ globalThis.SC_STORY_DECISION_REALISATION_34000={stableRef(prefix,payload){return
 globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100={
  commitTerminalDebrief(){debrief+=1;return{success:true,occurrenceId:"terminal-"+debrief};},
  commitChronicleReceiptAndRewards(){receipt+=1;return{success:true,receiptOccurrenceId:"receipt-"+receipt};},
+ enterCanonicalReceipt(){debrief+=1;receipt+=1;active.beatId="kak_terminal_chronicle_receipt_35100";return{success:true,beatId:active.beatId,terminalDebriefOccurrenceId:"terminal-"+debrief,receiptOccurrenceId:"receipt-"+receipt};},
  guardedOriginCompletion(){return{success:true};}
 };
 const lossId="occ-loss-qa";
@@ -73,7 +74,7 @@ while(active.beatId===MOD.officeBeatId&&safety++<180){
  out=globalThis.advanceStoryScene();
  assert(out&&out.success===true,"hidden office advance failed: "+JSON.stringify(out));
 }
-assert.strictEqual(active.beatId,MOD.receiptBeatId,"hidden office did not reach Chronicle Receipt");
+assert.strictEqual(active.beatId,"kak_terminal_chronicle_receipt_35100","hidden office did not reach canonical 35100 Chronicle Receipt");
 const hidden=store.get(active.localContext.kakashiScene07ALHiddenOccurrenceId);
 assert(hidden,"hidden loss review occurrence missing");
 assert.strictEqual(hidden.fact.kakashiMissionResult,"FAILURE");
@@ -91,9 +92,7 @@ assert.strictEqual(hidden.fact.minatoEvaluation.moralScoreCollapsed,false);
 assert.strictEqual(hidden.fact.authorityCommit,"d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab","expression rewrite must not mutate hidden-review fact provenance");
 assert(receipt>=1,"Chronicle Receipt was not committed");
 
-out=MOD.complete();
-assert.strictEqual(out.success,true,"loss Origin closure failed: "+JSON.stringify(out));
-assert.strictEqual(out.destination,"konoha_village");
+assert(receipt>=1,"canonical Chronicle Receipt was not entered");
 const source=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-loss-ending-35820.js"),"utf8");
 const polishSource=fs.readFileSync(path.resolve(process.cwd(),"runtime/alpha-kakashi-scene-board-polish-33910.js"),"utf8");
 assert(source.includes("362f72b8f20f50fec1b8e11e483e40cf5030364c"),"revised loss-office Writing expression authority missing");
@@ -104,6 +103,9 @@ assert(source.includes(".sc-chronicle-layout{display:none!important}")&&source.i
 assert(!source.includes("sc-dialogue-panel-33910"),"loss route must not own Kakashi dialogue geometry");
 assert(polishSource.includes("top:4%!important"),"canonical 33910 dialogue lane missing");
 assert(source.includes("sc-live-state-callout-33900")&&source.includes("RECOVERED · HIDDEN OPERATION"),"loss office package state callout missing");
+assert(source.includes("TERMINAL.enterCanonicalReceipt()"),"loss ending must hand off to canonical 35100 Receipt");
+assert(!source.includes('document.body.appendChild(n)'),"stale route-local loss Receipt renderer remains active");
+assert(!source.includes('openOverlay("village")'),"loss ending still bypasses canonical post-Receipt onboarding");
 assert(saves>0,"loss route never persisted state");
 console.log("Academy Kakashi loss ending 35820 QA: PASS");
 console.log("- RETURN TO ANBU reaches exact rooftop report");
@@ -111,4 +113,4 @@ console.log("- report commits only observer-known failure facts and removes the 
 console.log("- black-wipe continuation reaches exact hidden Hokage Office");
 console.log("- MI / PS / AMT remain alive; Kakashi stays absent and gains no hidden-operation Knowledge");
 console.log("- hidden package recovery never rewrites Kakashi's mission failure");
-console.log("- Chronicle Receipt and Origin closure complete");
+console.log("- hidden office hands off to canonical 35100 Chronicle Receipt; route-local Konoha exit is retired");
