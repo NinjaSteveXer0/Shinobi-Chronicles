@@ -252,7 +252,7 @@ jobs:
           grep -Fq 'alpha-kakashi-field-secured-35920.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-move-closer-closure-35930.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-dynamic-terminal-35940.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
-          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v7_2026_09_21' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'if(post.beats.psReturn)captureHook(m,post.beats.psReturn,"academy_kakashi_origin_battle_seq_ps");' runtime/alpha-kakashi-dynamic-terminal-35940.js
           if grep -Fq 'alpha-kakashi-browser-acceptance-35950.js' runtime/alpha-kakashi-final-origin-adapter-34100.js; then echo 'retired 35950 must not be production-loaded by 34100'; exit 1; fi
           grep -Fq 'RETIRED — 2026-09-21' runtime/alpha-kakashi-browser-acceptance-35950.js
@@ -272,10 +272,10 @@ jobs:
           grep -Fq 'FIELD_SECURED_PENDING_COLLECTION' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'COLLECTED_ACTIVE_ESCORT' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'TAKE THEM ALL BACK TO ANBU' runtime/alpha-kakashi-field-secured-35920.js
-          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v4_2026_09_20' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v5_2026_09_21' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'AK_SA_020_FAILURE_RECONVERGENCE' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'GO AFTER THE ORIGINAL TARGET' runtime/alpha-kakashi-konoha-route-closure-35910.js
-          grep -Fq 'alpha_kakashi_konoha_closure_35900_v2_2026_09_20' runtime/alpha-kakashi-konoha-writing-closure-35900.js
+          grep -Fq 'alpha_kakashi_konoha_closure_35900_v3_2026_09_21' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq 'academy_kakashi.resolver.post_amt_defeat_package_reach' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq '09db8ff4efc28ee608d41c828af48efc023d324f' runtime/alpha-kakashi-konoha-writing-closure-35900.js
           grep -Fq '21e0407a0c371310ff06096905fd1fce4107ece8' runtime/alpha-kakashi-konoha-writing-closure-35900.js
@@ -308,7 +308,7 @@ jobs:
           grep -Fq '.sc-chronicle-layout{display:none!important}' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'kakashiKnowledgeGranted:false' runtime/alpha-kakashi-loss-ending-35820.js
-          grep -Fq 'alpha_kakashi_immediate_custody_35800_v3_2026_09_19' runtime/alpha-kakashi-immediate-custody-35800.js
+          grep -Fq 'alpha_kakashi_immediate_custody_35800_v4_2026_09_21' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'beginImmediateCustodyChoice35800' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-immediate-custody-35800.js
           if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-immediate-custody-35800.js; then echo '35800 must not own Kakashi dialogue geometry'; exit 1; fi
@@ -346,7 +346,7 @@ jobs:
           grep -Fq 'kak_seq_debrief_pending' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'kakashiPostMiPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashiPostMiPakkunPresent' runtime/alpha-kakashi-terminal-debrief-35100.js
-          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v26_2026_09_21' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
+          grep -Fq 'alpha_kakashi_post_mi_death_pursuit_35830_v27_2026_09_21' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'NPC/uchiha_police_force_female_alt_2.png' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'NPC/uchiha_police_force_member_male.png' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           grep -Fq 'actorRefsForBeat:actorRefs35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
@@ -359,7 +359,7 @@ jobs:
           grep -Fq 'kakashi_scene_board_model_v17_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'kak_terminal_minato_private_evaluation_35100:()=>terminalMinatoPerformance33910()' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'return"hokage_minato"' runtime/alpha-kakashi-scene-board-polish-33910.js
-          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21' runtime/alpha-kakashi-dynamic-terminal-35940.js
+          grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v7_2026_09_21' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'function minatoPerformance35940' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'minatoPerformance:minatoPerformance35940' runtime/alpha-kakashi-dynamic-terminal-35940.js
           grep -Fq 'TERMINAL_MINATO="kak_terminal_minato_private_evaluation_35100"' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
