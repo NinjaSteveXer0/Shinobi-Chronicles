@@ -15,6 +15,7 @@ const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const registry=new Map();
 const renderHooks=new Map();
 let rendering=false,transitioning=false,lastBackdropSignature33900=null;
+const actorIdsByBoard33900=new WeakMap();
 
 function escapeHTML(value){
   if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));
@@ -209,6 +210,25 @@ function boardMarkup(projection){
   const objects=(projection.objects||[]).map(row=>`<span class="sc-scene-board-33900__object sc-live-state-callout-33900${row&&row.committed?" is-committed":""}"><b>${escapeHTML(row.label||"OBJECT")}</b>${escapeHTML(row.state||"")}</span>`).join("");
   return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900">${objects}</div>`:""}`;
 }
+function hasExplicitActorMotion33900(node){
+  if(!node||!node.classList)return false;
+  if(node.classList.contains("is-entering")||node.classList.contains("is-exiting")||node.classList.contains("is-falling"))return true;
+  for(const name of Array.from(node.classList)){if(name==="sc-scene-board-33900__actor"||name==="is-focus")continue;if(/^sc-(?:watch|kakashi|w2c|postmi)-/.test(name))return true;}
+  return false;
+}
+function syncAutomaticActorEntrances33900(stage){
+  if(!stage||typeof stage.querySelectorAll!=="function")return false;
+  let changed=false;
+  for(const lane of Array.from(stage.querySelectorAll(".sc-scene-board-33900__actors"))){
+    const owner=lane.closest&&lane.closest("section")||lane,prior=actorIdsByBoard33900.get(owner)||new Set(),current=new Set();
+    for(const node of Array.from(lane.querySelectorAll(".sc-scene-board-33900__actor"))){
+      const id=String(node&&node.dataset&&node.dataset.actorId||"");if(!id)continue;current.add(id);
+      if(!prior.has(id)&&!hasExplicitActorMotion33900(node)){node.classList.add("is-entering");changed=true;}
+    }
+    actorIdsByBoard33900.set(owner,current);
+  }
+  return changed;
+}
 function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;delete layer.dataset.scSceneBoardBackdrop;}catch(_error){};try{if(layer.style)layer.style.removeProperty("--sc-scene-board-backdrop");}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[])if(node&&typeof node.remove==="function")node.remove();}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!layer||!runtime)return false;const p=performanceCursor(runtime,currentBeat(runtime));
@@ -255,6 +275,7 @@ function renderStorySceneBoard33900(){
     }else if(board&&typeof board.remove==="function")board.remove();
     updatePerformancePanel(layer,runtime);
     const hookHandled=runStorySceneBoardRenderHooks(runtime,layer,stage,projection);
+    syncAutomaticActorEntrances33900(stage);
     return !!projection||hookHandled||!!resolveBoardBackdropPath(runtime,currentBeat(runtime));
   }finally{rendering=false;}
 }
