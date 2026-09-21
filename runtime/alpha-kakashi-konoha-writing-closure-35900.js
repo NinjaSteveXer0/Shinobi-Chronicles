@@ -27,7 +27,7 @@ const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 const POSTMI=globalThis.SC_ALPHA_KAKASHI_POST_MI_DEATH_PURSUIT_35830;
 if(!A||!CORE||!BATTLE||!PROVIDER||!TERMINAL||!POSTMI)throw new Error("kakashi_konoha_closure_35900_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_konoha_closure_35900_v2_2026_09_20";
+const PATCH_ID="alpha_kakashi_konoha_closure_35900_v3_2026_09_21";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const KAK="academy_kakashi";
@@ -232,8 +232,9 @@ function resolveAmtDefeatFacts35900(options={}){
   worldFacts:{amtEscaped:true,pakkunPresent:true,noInjuryInferred:true,packageCustodyDerivedFromResolver:true,battleVictoryDidNotImplyPackageCustody:true}
  };
  const committed=commitOnce(finalId,fact,"AMT_BATTLE_DEFEAT_FACTS_RESOLVED",[ORIGIN_ID,AMT,PAKKUN],[{type:"battle_occurrence",id:String(battle.battleOccurrenceId||"")},{type:"origin_occurrence",id:pakkun.occurrenceId,role:"pakkun_autonomy"},{type:"writing_authority",id:CE256_PACKAGE_AUTHORITY}]);if(!committed.success)return committed;
+ const classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef:AMT,stateClass:"ESCAPED",resultRef:finalId});if(!classified||classified.success!==true)return classified||{success:false,reason:"ce256_amt_escape_classification_failed"};
  rt.localContext={...(rt.localContext||{}),kakashiCe256LastAmtDefeatOccurrenceId:finalId,kakashiKonohaPackageOccurrenceId:pakkun.occurrenceId,kakashiPostMiPackageOccurrenceId:pakkun.occurrenceId,kakashiSequentialPackageOccurrenceId35100:pakkun.occurrenceId,kakashiKonohaPakkunPresent:true};save();
- return{success:true,idempotent:false,occurrenceId:finalId,packageState:clone(pakkun.packageState),pakkunState:pakkun.pakkunState,routeRef};
+ return{success:true,idempotent:false,occurrenceId:finalId,packageState:clone(pakkun.packageState),pakkunState:pakkun.pakkunState,participantStateClass:"ESCAPED",routeRef};
 }
 function resolveCe256AmtDefeat(){
  const rt=active(),battle=latestResult();
@@ -334,7 +335,7 @@ function diagnostics(){
  const def=scene(),amtReturn=def&&def.beatMap instanceof Map?def.beatMap.get(AMT_RETURN):null,aftermath=def&&def.beatMap instanceof Map?def.beatMap.get(AMT_AFTERMATH):null;
  const registered=PROVIDER.getRegisteredStoryFactualBindings().find(row=>row.bindingRef===CE256_BINDING)||null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_konoha_closure_35900_v2_2026_09_20",
+  patchId:PATCH_ID==="alpha_kakashi_konoha_closure_35900_v3_2026_09_21",
   writing100Pinned:WRITING_100_AUTHORITY==="21e0407a0c371310ff06096905fd1fce4107ece8",
   ce256AuthorityPinned:CE256_PACKAGE_AUTHORITY==="09db8ff4efc28ee608d41c828af48efc023d324f",
   ce244ClosedAuthorityPinned:CE244_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0",
@@ -343,7 +344,7 @@ function diagnostics(){
   noBattlePackageInference:resolveAmtDefeatFacts35900.toString().includes("resolveStoryFactualAction")&&commitCe256Package.toString().includes("battleVictoryDidNotImplyPackageCustody:true"),
   packageBeforePakkunOrdering:resolveAmtDefeatFacts35900.toString().indexOf("resolveStoryFactualAction")<resolveAmtDefeatFacts35900.toString().indexOf("consumePakkunAfterCe256"),
   sharedAmtPakkunConfigsExact:CE256_AMT_BATTLE_CONFIGS.join("|")==="academy_kakashi_origin_battle_seq_amt_pakkun|academy_kakashi_origin_battle_kakashi_pakkun_vs_amt",
-  sharedAmtDefeatOwnerExported:typeof resolveAmtDefeatFacts35900==="function"&&resolveAmtDefeatFacts35900.toString().includes("routeRef"),
+  sharedAmtDefeatOwnerExported:typeof resolveAmtDefeatFacts35900==="function"&&resolveAmtDefeatFacts35900.toString().includes("routeRef")&&resolveAmtDefeatFacts35900.toString().includes('stateClass:"ESCAPED"'),
   pakkunAutonomyConsumed:consumePakkunAfterCe256.toString().includes("consumeNextAutonomy")&&consumePakkunAfterCe256.toString().includes("AK_SA_012"),
   pakkunNoOwnershipLeak:consumePakkunAfterCe256.toString().includes("ownershipGranted:false")&&consumePakkunAfterCe256.toString().includes("nameKnowledgeGranted:false"),
   amtReturnOverridden:!!amtReturn&&Array.isArray(amtReturn.onEnterConsequences)&&amtReturn.onEnterConsequences.some(row=>row&&row.requestId==="kakashi_ce256_amt_defeat_consume_35900"),
