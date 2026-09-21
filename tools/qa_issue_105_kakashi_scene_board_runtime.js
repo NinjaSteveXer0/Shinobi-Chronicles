@@ -66,7 +66,7 @@ try{
   assert("golden_secondary_actors_remain_readable",d33910.checks&&d33910.checks.secondaryActorsRemainReadable===true&&kakashiV4Source.includes('.sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important;opacity:.78;'));
   assert("golden_battle_transition_has_explicit_mode",kakashiV4Source.includes('data-sc-board-ui-mode="battle_transition"')&&kakashiV4Source.includes('beat.mode==="battle_transition"'));
   assert("golden_route_specific_dialogue_geometry_retired",d33910.checks&&d33910.checks.singleDialogueLane===true&&!kakashiV4Source.includes("#story-scene-presentation-layer[data-sc-postmi-35830="));
-  assert("generic_scene_board_owns_actor_motion",sceneBoardSource.includes("is-exiting")&&sceneBoardSource.includes("is-falling")&&sceneBoardSource.includes("priorActorIds")&&sceneBoardSource.includes("data-actor-motion"));
+  assert("generic_scene_board_owns_actor_motion",sceneBoardSource.includes("is-exiting")&&sceneBoardSource.includes("is-falling")&&sceneBoardSource.includes("priorActorIds")&&sceneBoardSource.includes("data-actor-motion")&&sceneBoardSource.includes("syncAutomaticActorEntrances33900")&&sceneBoardSource.includes("actorIdsByBoard33900")&&sceneBoardSource.includes("hasExplicitActorMotion33900"));
   assert("terminal_report_opening_uses_click_performance",kakashiV4Source.includes("terminalReportOpeningPerformance33910")&&kakashiV4Source.includes('kak_seq_debrief_pending:()=>terminalReportOpeningPerformance33910()'));
 
   const terminalScene=scenes.get(active.sceneId);
