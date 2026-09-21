@@ -1079,7 +1079,7 @@
     const checks={
       patchId:PATCH_ID==="alpha_kakashi_battle_interaction_34500_v6_2026_09_22",
       exactFiveSkills:EXACT_KAKASHI_SKILLS.size===5,
-      exactKakashiScope:activeKakashiBattle34500.toString().includes("controllerParticipantId"),
+      exactKakashiScope:kakashiOriginBattleContext34500.toString().includes("controllerParticipantId")&&activeKakashiBattle34500.toString().includes("kakashiOriginBattleContext34500"),
       canonicalPaletteFirst:skillSource.includes("canonicalBattleSkills34500")&&canonicalBattleSkills34500.toString().includes("getBattleUISkillPalettePresentation")&&canonicalBattleSkills34500.toString().includes("getBattlePreparedSkillDefinition"),
       acceptsBothHandlerGenerations:parser.includes("activateBattlePreparedSkillCard")&&parser.includes("selectBattlePreparedSkill"),
       acceptsBothDatasetGenerations:parser.includes("battleSkillId")&&parser.includes("skillId"),
