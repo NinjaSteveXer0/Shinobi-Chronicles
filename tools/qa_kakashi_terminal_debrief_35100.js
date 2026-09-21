@@ -74,7 +74,7 @@ run(terminal,"runtime/alpha-kakashi-terminal-debrief-35100.js");
 
 assert(loader.includes('runtime/alpha-kakashi-origin-rewards-34800.js'),"34100 does not production-load 34800 rewards");
 assert(loader.includes('runtime/alpha-kakashi-terminal-debrief-35100.js'),"34100 does not production-load 35100 terminal bridge");
-assert(/^const BUILD="kakashi-final-20260922-94";$/m.test(loader),"active Kakashi child BUILD must be gen94");
+assert(/^const BUILD="kakashi-final-20260922-95";$/m.test(loader),"active Kakashi child BUILD must be gen94");
 assert.strictEqual(plain(`runAcademyKakashiOriginRewards34800Diagnostics()`).pass,true,"34800 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).pass,true,"35100 diagnostics failed");
 assert.strictEqual(plain(`runAcademyKakashiTerminalDebrief35100Diagnostics()`).browserGoldenClaimed,false);
