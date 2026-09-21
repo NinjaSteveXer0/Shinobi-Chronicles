@@ -11,8 +11,8 @@ assert(!/new\s+MutationObserver\s*\(/.test(compat),"retired 33920 must not const
 assert(!compat.includes("style.textContent")&&!compat.includes("addEventListener(\"click\""),"retired 33920 must own no CSS/click handler");
 assert(!restoration.includes("alpha-kakashi-story-presentation-compat-33920.js"),"33800 must not production-load retired 33920");
 assert(!canonical.includes('#story-scene-presentation-layer[data-sc-postmi-35830='),"retired 33920 route-specific dialogue geometry must not be folded back into 33910");
-assert(restoration.includes('const BUILD="scene-board-20260922-18";'));
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260922-18";'));
+assert(restoration.includes('const BUILD="scene-board-20260922-19";'));
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260922-19";'));
 
 for(const marker of [
  "former 33920 compatibility behavior",
