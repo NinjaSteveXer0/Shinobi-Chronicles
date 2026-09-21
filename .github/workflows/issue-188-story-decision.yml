@@ -414,8 +414,8 @@ jobs:
           if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-w2c-nonkill-35780.js; then echo '35780 must not own Kakashi dialogue geometry'; exit 1; fi
           grep -Fq 'cueSpeaker33910' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'panel.dataset.speakerId=speakerId' runtime/alpha-kakashi-scene-board-polish-33910.js
-          grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'performance_narration' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          grep -Fq 'data-sc-board-ui-mode="performance_narration"' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'sc-narration-panel-33910' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'playAcademyKakashiLethalAttemptAnimation35770' runtime/alpha-kakashi-w2c-nonkill-35780.js
           grep -Fq 'alpha_kakashi_scene04a_35710_v9_2026_09_19' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'kakashiBlockEntry35710' runtime/alpha-kakashi-scene04a-35710.js
