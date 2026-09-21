@@ -22,7 +22,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const SCENE04A=globalThis.SC_ALPHA_KAKASHI_SCENE04A_35710;
 if(!CORE||!SCENE04A)throw new Error("kakashi_scene05aw_runtime_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_scene05aw_35730_v10_2026_09_20";
+const PATCH_ID="alpha_kakashi_scene05aw_35730_v11_2026_09_21";
 const AUTHORITY="bf16ebe0f677994878fbe60e30e7b546da899eb8";
 const CAUSAL_AUTHORITY="90b20f565ef010d2b7cfca98c04feece3f7dfcb7";
 const CHOICE_SURFACE_AUTHORITY="36454a31e9f61ffdaa528589ac11552d446ad3bc";
@@ -280,7 +280,9 @@ function renderScene05AW35730(){
   for(const old of stage.querySelectorAll?stage.querySelectorAll(`.${BOARD_CLASS}`):[])if(!isWinFamily(rt))old.remove();
   if(!isWinFamily(rt)){if(stage.style){try{delete stage.dataset.scKakashiScene05aw;}catch(_error){}stage.style.removeProperty("--sc-kakashi-scene05aw-backdrop");}return false;}
   installStyle35730();materializeChoices35730();
-  stage.dataset.scKakashiScene05aw="true";stage.style.setProperty("--sc-kakashi-scene05aw-backdrop",cssUrlValue(fightPath()));
+  stage.dataset.scKakashiScene05aw="true";
+  const canonicalBackdrop=typeof globalThis.applyStorySceneBoardBackdrop33900==="function"?globalThis.applyStorySceneBoardBackdrop33900(stage,rt):null;
+  if(!canonicalBackdrop)stage.style.setProperty("--sc-kakashi-scene05aw-backdrop",cssUrlValue(fightPath()));else stage.style.removeProperty("--sc-kakashi-scene05aw-backdrop");
   layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
   let board=stage.querySelector&&stage.querySelector(`.${BOARD_CLASS}`);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;board.setAttribute("aria-hidden","true");stage.appendChild(board);}
   const markup=boardMarkup(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
@@ -325,7 +327,7 @@ function installHooks35730(){
       const rt=active();
       if(rt&&rt.sceneId===SCENE_ID&&rt.beatId===RETURN_BEAT&&validVictory()&&rt.localContext&&rt.localContext.kakashiScene04ABattleIntentResolved===true)routeVictoryReturn35730();
       const out=PRE_RENDER.apply(this,arguments);
-      if(typeof queueMicrotask==="function")queueMicrotask(renderScene05AW35730);else if(typeof setTimeout==="function")setTimeout(renderScene05AW35730,0);
+      renderScene05AW35730();
       return out;
     };
     try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}
@@ -351,7 +353,7 @@ function diagnostics(){
   const menuSource=materializeChoices35730.toString();
   const allCues=[...COMMON_CUES,...FAST_CUES,...SLOW_CUES];
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v10_2026_09_20",
+    patchId:PATCH_ID==="alpha_kakashi_scene05aw_35730_v11_2026_09_21",
     choiceSurfaceAuthorityPinned:CHOICE_SURFACE_AUTHORITY==="36454a31e9f61ffdaa528589ac11552d446ad3bc",
     postBattleAgencyAuthorityPinned:POST_BATTLE_AGENCY_AUTHORITY==="1ff3876e9b367ec518c254b612e4def14db8eaba"&&KAKASHI_DISPOSITION_AUTHORITY==="62821414baaadd047c524239d1b3bbf207692b61",
     fieldSecuredAuthorityClosed:FIELD_SECURED_AUTHORITY==="77d351e6f8d4eefaea0f8a6db82dec686391e1c0",
@@ -374,6 +376,8 @@ function diagnostics(){
     noDialogue:allCues.every(x=>!x.speakerName&&x.kind==="narration"),
     returnHookInstalled:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(x=>x&&x.requestId===ENTRY_REQUEST),
     standardCharacterCardScale:installStyle35730.toString().includes("width:min(94%,322px)")&&installStyle35730.toString().includes("width:min(96%,338px)")&&installStyle35730.toString().includes("max-height:505px"),
+    canonicalBackdropOwnership:renderScene05AW35730.toString().includes("applyStorySceneBoardBackdrop33900"),
+    synchronousBoardRetirement:globalThis.renderStoryScenePresentationLayer.toString().includes("renderScene05AW35730()")&&!globalThis.renderStoryScenePresentationLayer.toString().includes("queueMicrotask(renderScene05AW35730)"),
     successorsFailClosed:successorPending("BRANCH_A").success===false,
     browserGoldenClaimed:false
   };
