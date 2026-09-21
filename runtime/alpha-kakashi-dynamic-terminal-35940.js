@@ -7,7 +7,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_dynamic_terminal_35940_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v5_2026_09_21";
+const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21";
 const ORIGIN="academy_kakashi",SCENE="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE="kakashi_origin_outer_route_packet";
 const KAK="academy_kakashi",MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken";
@@ -172,7 +172,7 @@ function reportText35940(state=buildProjectionState35940()){
  if(state.knowledge.getCloserSuccess)lines.push("ANBU OPERATIVE: “You heard them before you moved.”","KAKASHI: “Yes.”","ANBU OPERATIVE: “What did you learn?”","KAKASHI: “If the street stayed clear, the original carrier was supposed to hand the package over.”","ANBU OPERATIVE: “And if it didn't?”","KAKASHI: “He kept moving with it.”","ANBU OPERATIVE: “Destination?”","KAKASHI: “They didn't say.”");
  if(state.knowledge.askDestination)lines.push("ANBU OPERATIVE: “What did the original target tell you?”","KAKASHI: “His job ended at the handoff. The receiver was supposed to take it onward.”","ANBU OPERATIVE: “Where?”","KAKASHI: “He didn't know.”");
  if(state.pakkun.present)lines.push("ANBU OPERATIVE: “And the ninken?”","PAKKUN: “Temporary.”","PAKKUN: “I was there when it mattered.”","KAKASHI: “He helped.”","PAKKUN: “Better.”");
- return lines.join("\\n\\n");
+ return lines.join("\n\n");
 }
 function packageReceiptLine(state){
  if(state.package.classRef==="RECOVERED")return"Package — Recovered by Kakashi and returned to ANBU.";
@@ -215,7 +215,7 @@ function receiptText35940(state=buildProjectionState35940()){
   lines.push("Permanent Summon ownership — None.");
  }
  lines.push("","REPORT","ANBU report — completed from Kakashi-observed facts.");
- return lines.join("\\n");
+ return lines.join("\n");
 }
 function survivorSummary(state){
  return[MI,PS,AMT].filter(ref=>state.participants[ref].stateClass!=="DEAD"&&state.participants[ref].stateClass).map(ref=>ROLE[ref].receipt+": "+statePhrase(state.participants[ref])).join("; ");
@@ -307,14 +307,14 @@ const installed=install();if(!installed||installed.success!==true)throw new Erro
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v5_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
   projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
   terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v10_2026_09_20"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
   dynamicSummaryInstalled:!!m&&typeof m.get(BEAT.summary).presentationResolver==="function",
   minatoPresentationDelegatedTo33910:!!m&&typeof m.get(BEAT.minato).presentationResolver!=="function",
   minatoStructuredPerformance:minatoPerformance35940().length>=3&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO")&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE")&&!minatoText35940().includes("\\n\\n"),
-  dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",
+  dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",terminalTextUsesRealNewlines:reportText35940().includes("\n\n")&&!reportText35940().includes("\\n")&&receiptText35940().includes("\n")&&!receiptText35940().includes("\\n"),
   packageModules:packageReportLines.toString().includes("The receiver got away with it")&&packageReportLines.toString().includes("original target still had it")&&packageReportLines.toString().includes("masked shinobi took it"),
   mixedLethalIdentityAware:reportText35940.toString().includes("All three by you")&&receiptText35940.toString().includes("LETHAL HISTORY")&&minatoPerformance35940.toString().includes("survivorSummary"),
   knowledgeModules:reportText35940.toString().includes("If the street stayed clear")&&receiptText35940.toString().includes("Handoff contingency overheard"),

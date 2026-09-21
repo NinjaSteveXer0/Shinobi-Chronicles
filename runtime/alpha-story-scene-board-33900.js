@@ -13,6 +13,7 @@ const PATCH_ID="story_scene_board_33900_2026_09_20_multi_actor";
 const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const registry=new Map();
+const renderHooks=new Map();
 let rendering=false,transitioning=false,lastBackdropSignature33900=null;
 
 function escapeHTML(value){
@@ -40,6 +41,18 @@ function registerStorySceneBoardDefinition(sceneId,definition){
 }
 function unregisterStorySceneBoardDefinition(sceneId){return registry.delete(String(sceneId||""));}
 function boardDefinition(sceneId){return registry.get(String(sceneId||""))||null;}
+function registerStorySceneBoardRenderHook(hookId,hook){
+  if(!hookId||typeof hook!=="function")return{success:false,reason:"story_scene_board_render_hook_required"};
+  renderHooks.set(String(hookId),hook);return{success:true,hookId:String(hookId)};
+}
+function unregisterStorySceneBoardRenderHook(hookId){return renderHooks.delete(String(hookId||""));}
+function runStorySceneBoardRenderHooks(runtime,layer,stage,projection){
+  let handled=false;
+  for(const [hookId,hook] of renderHooks){
+    try{if(hook({hookId,runtime,beat:currentBeat(runtime),layer,stage,projection})===true)handled=true;}catch(error){try{console.error("Story Scene Board render hook failed",hookId,error);}catch(_e){}}
+  }
+  return handled;
+}
 function performanceSequenceFor(runtime=currentRuntime(),beat=currentBeat(runtime)){
   if(!runtime||!beat)return null;
   const def=boardDefinition(runtime.sceneId),source=def&&def.performanceSequences;
@@ -209,10 +222,29 @@ function updatePerformancePanel(layer,runtime=currentRuntime()){
   return true;
 }
 function renderStorySceneBoard33900(){
-  if(rendering||typeof document==="undefined")return false;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
-  const runtime=currentRuntime(),projection=runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;if(!projection){clearBoard(layer);return false;}
+  if(rendering||typeof document==="undefined")return false;
+  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+  const runtime=currentRuntime(),definition=runtime?boardDefinition(runtime.sceneId):null;
+  if(!runtime||!definition){clearBoard(layer);return false;}
+  const projection=resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime);
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
-  rendering=true;try{installStyle();layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode=projection.mode||"conversation";applyBoardBackdrop(stage,runtime);installFallbackBackdropCut33900(layer,runtime,currentBeat(runtime));let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const signature=JSON.stringify(projection);if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}updatePerformancePanel(layer,runtime);return true;}finally{rendering=false;}
+  rendering=true;
+  try{
+    installStyle();
+    layer.dataset.scSceneBoard="true";
+    layer.dataset.scSceneMode=projection&&projection.mode||"conversation";
+    applyBoardBackdrop(stage,runtime);
+    installFallbackBackdropCut33900(layer,runtime,currentBeat(runtime));
+    let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;
+    if(projection){
+      if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}
+      const signature=JSON.stringify(projection);
+      if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}
+    }else if(board&&typeof board.remove==="function")board.remove();
+    updatePerformancePanel(layer,runtime);
+    const hookHandled=runStorySceneBoardRenderHooks(runtime,layer,stage,projection);
+    return !!projection||hookHandled||!!resolveBoardBackdropPath(runtime,currentBeat(runtime));
+  }finally{rendering=false;}
 }
 function scheduleBoardRender(){if(typeof queueMicrotask==="function")queueMicrotask(renderStorySceneBoard33900);else if(typeof setTimeout==="function")setTimeout(renderStorySceneBoard33900,0);}
 
@@ -334,7 +366,7 @@ if(kakashiScene){
 
 function runStorySceneBoard33900Diagnostics(){
   const kak=boardDefinition(kakashiScene),rootDef=typeof getStorySceneDefinition==="function"?getStorySceneDefinition(kakashiScene):null,root=rootDef&&rootDef.beatMap instanceof Map?rootDef.beatMap.get("kak_original_rooftop"):null;
-  const checks={patchId:PATCH_ID==="story_scene_board_33900_2026_09_20_multi_actor",multiActorBoardSupportsSix:boardMarkup.toString().includes("slice(0,6)")&&installStyle.toString().includes('data-count="6"')&&installStyle.toString().includes("repeat(6"),compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",kakashiBenchmarkRegistered:!!kakashiScene&&!!kak&&kak.benchmark===true,academyKakashiUsesCharacterCard:KAKASHI_IMAGE==="Assets/Academy Student/academy_kakashi.png",exactRoleAssets:ROGUE_IMAGE==="Enemies Portraits/rogue_chunin.png"&&CIPHER_IMAGE==="Enemies Portraits/cipher_handler.png"&&DECOY_IMAGE==="Enemies Portraits/decoy_assassin.png",rooftopIsSingleSemanticBeat:!!root&&root.nextBeatId==="kak_original_tail",rooftopPerformanceHasElevenCues:rooftopPerformance.length===11&&rooftopPerformance[2].text==="Kakashi Hatake."&&rooftopPerformance[9].text==="Hokage's orders.",persistentAssignmentObjective:OBJECTIVE==="Stop the package from falling into the wrong hands.",observePerformsDecoyEntrance:observeTransferPerformance.some(c=>c.actorEntrance==="kakashi_origin_decoy_assassin_01"),performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),wrapsExistingStoryRenderer:!!PRE_RENDER,noDomMutationObserver:true,
+  const checks={patchId:PATCH_ID==="story_scene_board_33900_2026_09_20_multi_actor",multiActorBoardSupportsSix:boardMarkup.toString().includes("slice(0,6)")&&installStyle.toString().includes('data-count="6"')&&installStyle.toString().includes("repeat(6"),compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",renderHookRegistry:typeof registerStorySceneBoardRenderHook==="function"&&typeof runStorySceneBoardRenderHooks==="function",kakashiBenchmarkRegistered:!!kakashiScene&&!!kak&&kak.benchmark===true,academyKakashiUsesCharacterCard:KAKASHI_IMAGE==="Assets/Academy Student/academy_kakashi.png",exactRoleAssets:ROGUE_IMAGE==="Enemies Portraits/rogue_chunin.png"&&CIPHER_IMAGE==="Enemies Portraits/cipher_handler.png"&&DECOY_IMAGE==="Enemies Portraits/decoy_assassin.png",rooftopIsSingleSemanticBeat:!!root&&root.nextBeatId==="kak_original_tail",rooftopPerformanceHasElevenCues:rooftopPerformance.length===11&&rooftopPerformance[2].text==="Kakashi Hatake."&&rooftopPerformance[9].text==="Hokage's orders.",persistentAssignmentObjective:OBJECTIVE==="Stop the package from falling into the wrong hands.",observePerformsDecoyEntrance:observeTransferPerformance.some(c=>c.actorEntrance==="kakashi_origin_decoy_assassin_01"),performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),wrapsExistingStoryRenderer:!!PRE_RENDER,noDomMutationObserver:true,
 automaticBackdropCut:advanceStoryScene33900.toString().includes("shouldSceneCut33900")&&installFallbackBackdropCut33900.toString().includes("lastBackdropSignature33900"),
 sharedCutExported:typeof globalThis.performStorySceneCut33900==="function",sharedBackdropOwnerExported:typeof globalThis.applyStorySceneBoardBackdrop33900==="function",fullScreenBackdropFailsClosed:installStyle.toString().includes('#story-scene-presentation-layer[data-sc-scene-board="true"]{background:#020508!important;}')&&applyBoardBackdrop.toString().includes("layer.dataset.scSceneBoardBackdrop")&&applyBoardBackdrop.toString().includes('layer.style.setProperty("--sc-scene-board-backdrop"'),browserGoldenClaimed:false};
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
@@ -342,6 +374,8 @@ sharedCutExported:typeof globalThis.performStorySceneCut33900==="function",share
 
 globalThis.registerStorySceneBoardDefinition=registerStorySceneBoardDefinition;
 globalThis.unregisterStorySceneBoardDefinition=unregisterStorySceneBoardDefinition;
+globalThis.registerStorySceneBoardRenderHook=registerStorySceneBoardRenderHook;
+globalThis.unregisterStorySceneBoardRenderHook=unregisterStorySceneBoardRenderHook;
 globalThis.resolveStorySceneBoardProjection=resolveStorySceneBoardProjection;
 globalThis.getActiveStorySceneBoardProjection=getActiveStorySceneBoardProjection;
 globalThis.resolveStorySceneBoardBackdropPath=resolveBoardBackdropPath;

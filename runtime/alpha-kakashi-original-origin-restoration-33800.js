@@ -33,15 +33,34 @@ const occurrence="occ_origin_kakashi_anbu_retrieval_resolution";
 const rooftop=Object.freeze({assetId:"kakashi_origin_rooftop_night"});
 const alley=Object.freeze({assetId:"kakashi_origin_konoha_alleyway"});
 const sakura=Object.freeze({assetId:"kakashi_origin_sakura_tree_night"});
+const fight=Object.freeze({assetId:"kakashi_origin_fight_at_sakura_tree"});
+const psStreet=Object.freeze({assetId:"kakashi_origin_ps_battle_alt_night"});
+const endAlley=Object.freeze({assetId:"kakashi_origin_end_of_alleyway"});
+const pakkunAlley=Object.freeze({assetId:"kakashi_origin_pakkun_interception_alley"});
+const police=Object.freeze({assetId:"kakashi_origin_uchiha_police_exterior_night"});
+const hokage=Object.freeze({assetId:"kakashi_origin_hokage_administration_interior_night"});
 const backdropPaths=Object.freeze({
   [rooftop.assetId]:"Kakashi Origin Backdrop/rooftop_night.png",
   [alley.assetId]:"Kakashi Origin Backdrop/konoha_alleyway.png",
-  [sakura.assetId]:"Kakashi Origin Backdrop/sakura_tree_night.png"
+  [sakura.assetId]:"Kakashi Origin Backdrop/sakura_tree_night.png",
+  [fight.assetId]:"Kakashi Origin Backdrop/fight_at_sakura_tree.png",
+  [psStreet.assetId]:"Kakashi Origin Backdrop/konoha_alleyway_alt_night.png",
+  [endAlley.assetId]:"Kakashi Origin Backdrop/end_of_alleyway.png",
+  [pakkunAlley.assetId]:"Kakashi Origin Backdrop/alleyway_konoha_night.png",
+  [police.assetId]:"Kakashi Origin Backdrop/uchiha_police_exterior_night.png",
+  [hokage.assetId]:"Kakashi Origin Backdrop/hokage_administration_interior_night.png"
 });
+const environment=(ref)=>Object.freeze({assetId:ref.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true});
 const kakashiEnvironmentDefinitions=Object.freeze({
-  [rooftop.assetId]:Object.freeze({assetId:rooftop.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true}),
-  [alley.assetId]:Object.freeze({assetId:alley.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true}),
-  [sakura.assetId]:Object.freeze({assetId:sakura.assetId,status:"origin_story_asset",timeOfDay:"night",aspectRatio:"16:9",masterWidth:1920,masterHeight:1080,dialogueSafeLowerRatio:0.35,storyOnly:true,neverBattleSurface:true})
+  [rooftop.assetId]:environment(rooftop),
+  [alley.assetId]:environment(alley),
+  [sakura.assetId]:environment(sakura),
+  [fight.assetId]:environment(fight),
+  [psStreet.assetId]:environment(psStreet),
+  [endAlley.assetId]:environment(endAlley),
+  [pakkunAlley.assetId]:environment(pakkunAlley),
+  [police.assetId]:environment(police),
+  [hokage.assetId]:environment(hokage)
 });
 
 try{
@@ -224,7 +243,7 @@ globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800D
   // const BUILD="scene-board-20260919-9";
   // const BUILD="scene-board-20260919-10";
   // const BUILD="scene-board-20260919-11";
-  const BUILD="scene-board-20260921-14";
+  const BUILD="scene-board-20260921-15";
 
   function load33910(){
     if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910||document.getElementById(POLISH_ID))return;
