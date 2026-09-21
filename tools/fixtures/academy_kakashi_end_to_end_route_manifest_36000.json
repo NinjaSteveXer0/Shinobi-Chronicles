@@ -100,7 +100,13 @@
       "ACADEMY_FREE_PLAY"
     ],
     "terminalOwner": "runtime/alpha-kakashi-terminal-debrief-35100.js",
-    "onboardingOwner": "runtime/alpha-first-konoha-tutorial-35000.js"
+    "onboardingOwner": "runtime/alpha-first-konoha-tutorial-35000.js",
+    "compatibilityProofs": [
+      "tools/qa_academy_kakashi_konoha_closure_35900.js",
+      "tools/qa_kakashi_terminal_debrief_35100.js",
+      "tools/qa_academy_kakashi_dynamic_terminal_35940.js",
+      "tools/qa_academy_kakashi_completion_tail_36000.js"
+    ]
   },
   "coverageAxes": {
     "resolver": [
@@ -221,8 +227,11 @@
         "tools/qa_academy_kakashi_scene05a_w_35730.js",
         "tools/qa_academy_kakashi_scene05a_l_35750.js",
         "tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js",
-        "tools/qa_academy_kakashi_field_secured_35920.js"
-      ]
+        "tools/qa_academy_kakashi_field_secured_35920.js",
+        "tools/qa_academy_kakashi_konoha_closure_35900.js"
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "watch.secure_package",
@@ -245,8 +254,11 @@
       ],
       "qa": [
         "tools/qa_academy_kakashi_sequential_consumer.js",
-        "tools/qa_academy_kakashi_post_ps_recovery_35600.js"
-      ]
+        "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
+        "tools/qa_academy_kakashi_konoha_closure_35900.js"
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "watch.secure_package_before_assassin",
@@ -269,7 +281,9 @@
       ],
       "qa": [
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "watch.defeat_assassin_then_secure",
@@ -301,7 +315,9 @@
         "tools/qa_academy_kakashi_sequential_consumer.js",
         "tools/qa_academy_kakashi_post_ps_recovery_35600.js",
         "tools/qa_academy_kakashi_origin_battle_deployment.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "watch.go_after_original_target",
@@ -335,8 +351,11 @@
         "DEPARTED"
       ],
       "qa": [
-        "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
-      ]
+        "tools/qa_academy_kakashi_konoha_route_closure_35910.js",
+        "tools/qa_academy_kakashi_konoha_closure_35900.js"
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "move_closer.success.let_handoff_happen",
@@ -357,7 +376,9 @@
       "qa": [
         "tools/qa_academy_kakashi_get_closer_factual_commit.js",
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "move_closer.success.strike_before_handoff",
@@ -388,7 +409,9 @@
       "qa": [
         "tools/qa_academy_kakashi_move_closer_closure_35930.js",
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "move_closer.success.attempt_pickpocket",
@@ -416,7 +439,9 @@
       ],
       "qa": [
         "tools/qa_academy_kakashi_move_closer_closure_35930.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "move_closer.failure.stay_on_package",
@@ -454,8 +479,11 @@
       ],
       "qa": [
         "tools/qa_academy_kakashi_get_closer_factual_commit.js",
-        "tools/qa_kakashi_pakkun_interception_35300.js"
-      ]
+        "tools/qa_kakashi_pakkun_interception_35300.js",
+        "tools/qa_academy_kakashi_konoha_closure_35900.js"
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "move_closer.failure.stop_package_smuggler",
@@ -482,7 +510,9 @@
       ],
       "qa": [
         "tools/qa_academy_kakashi_move_closer_closure_35930.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "move_closer.failure.cut_off_sakura",
@@ -509,7 +539,9 @@
       ],
       "qa": [
         "tools/qa_academy_kakashi_move_closer_closure_35930.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "direct.strike_before_handoff",
@@ -539,7 +571,9 @@
       "qa": [
         "tools/qa_academy_kakashi_scene02_direct_choices_34710.js",
         "tools/qa_academy_kakashi_konoha_route_closure_35910.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     },
     {
       "id": "direct.slip_in_for_package",
@@ -566,7 +600,9 @@
         "tools/qa_academy_kakashi_scene02_direct_choices_34710.js",
         "tools/qa_kakashi_direct_pickpocket_terminal_35100.js",
         "tools/qa_kakashi_battle_development_35740.js"
-      ]
+      ],
+      "completionTail": "COMMON_TERMINAL_TAIL",
+      "saveLoadRequired": true
     }
   ],
   "globalQa": [
@@ -574,6 +610,7 @@
     "tools/qa_kakashi_battle_interaction_34500.js",
     "tools/qa_kakashi_origin_rewards_34800.js",
     "tools/qa_kakashi_battle_development_35740.js",
+    "tools/qa_academy_kakashi_konoha_closure_35900.js",
     "tools/qa_kakashi_terminal_debrief_35100.js",
     "tools/qa_academy_kakashi_dynamic_terminal_35940.js",
     "tools/qa_academy_kakashi_browser_acceptance_35950.js",
