@@ -19,7 +19,7 @@ const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 if(!A||!TERMINAL||!CORE)throw new Error("kakashi_loss_ending_35820_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_loss_ending_35820_v3_2026_09_19";
+const PATCH_ID="alpha_kakashi_loss_ending_35820_v4_2026_09_21";
 const AUTH_REPORT="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623";
 const AUTH_OFFICE="d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab";
 const AUTH_OFFICE_EXPRESSION="362f72b8f20f50fec1b8e11e483e40cf5030364c";
@@ -285,13 +285,12 @@ function wipe(next){if(typeof document==="undefined")return next();const layer=d
 function enterOffice(){const rt=active(),r=commitReport();if(!r||r.success!==true)return r;rt.beatId=OFFICE_BEAT;rt.localContext={...(rt.localContext||{}),[CURSOR_OFFICE]:0};save();try{renderStoryScenePresentationLayer();}catch(_error){}return{success:true,beatId:OFFICE_BEAT};}
 function receiptRows(){return{decisions:["Chose STOP THE ASSASSIN after the package handoff.","Returned to ANBU and reported the loss without making excuses."],outcomes:["Masked Interceptor defeated Kakashi in PL Battle.","Package Smuggler escaped Kakashi with the package.","ANBU Marked Target escaped Kakashi.","Kakashi did not recover the package."],history:["Kakashi’s mission result is recorded as a failure.","Kakashi performed no lethal action and established no participant custody.","No Pakkun involvement occurred.","Kakashi did not learn the hidden operation or its later package recovery."]};}
 function openReceipt(){
- const rt=active(),h=commitHidden();if(!rt||!h||h.success!==true)return h||{success:false,reason:"loss_hidden_review_required"};const receipt=TERMINAL.commitChronicleReceiptAndRewards();if(!receipt||receipt.success!==true)return receipt||{success:false,reason:"loss_chronicle_receipt_commit_failed"};rt.beatId=RECEIPT_BEAT;save();
- if(typeof document==="undefined")return{success:true,headless:true};installStyle();const old=document.getElementById(RECEIPT_ID);if(old)old.remove();const rows=receiptRows(),li=a=>a.map(x=>"<li>"+esc(x)+"</li>").join(""),n=document.createElement("div");n.id=RECEIPT_ID;n.innerHTML='<div class="card"><div class="eye">YOUR ORIGIN</div><h1>ACADEMY KAKASHI</h1><div class="sub">RECORDED IN YOUR CHRONICLE</div><div class="grid"><section><h2>YOUR DECISIONS</h2><ul>'+li(rows.decisions)+'</ul></section><section><h2>WHAT HAPPENED</h2><ul>'+li(rows.outcomes)+'</ul></section><section><h2>HISTORY CREATED</h2><ul>'+li(rows.history)+'</ul></section></div><button type="button">ENTER KONOHA</button><div class="err" hidden></div></div>';document.body.appendChild(n);const b=n.querySelector("button"),e=n.querySelector(".err");b.addEventListener("click",()=>{b.disabled=true;const out=complete();if(!out||out.success!==true){b.disabled=false;e.hidden=false;e.textContent=String(out&&out.reason||"Origin completion is not ready.");}});return{success:true};
+ const rt=active(),h=commitHidden();if(!rt||!h||h.success!==true)return h||{success:false,reason:"loss_hidden_review_required"};
+ if(typeof TERMINAL.enterCanonicalReceipt!=="function")return{success:false,reason:"canonical_terminal_receipt_owner_missing"};
+ return TERMINAL.enterCanonicalReceipt();
 }
-function complete(){const rt=active();if(!rt||rt.beatId!==RECEIPT_BEAT)return{success:false,reason:"loss_receipt_not_active"};const done=TERMINAL.guardedOriginCompletion();if(!done||done.success!==true)return done||{success:false,reason:"origin_completion_failed"};if(typeof document!=="undefined"){const n=document.getElementById(RECEIPT_ID);if(n)n.remove();}rt.beatId=EXIT_BEAT;save();let adv={success:true};try{adv=globalThis.advanceStoryScene();}catch(_error){}const open=()=>{try{if(typeof openOverlay==="function")return openOverlay("village");if(typeof globalThis.openOverlay==="function")return globalThis.openOverlay("village");}catch(_error){}return null;};if(typeof setTimeout==="function")setTimeout(open,40);else open();return{success:adv&&adv.success!==false,destination:"konoha_village",completion:done};}
+function complete(){return{success:false,reason:"retired_to_canonical_terminal_35100"};}
 
-if(!installBeats())throw new Error("kakashi_loss_ending_35820_beats_missing");
-let hooked=false,tries=0;
 function hooks(){
  if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900;
  globalThis.getStoryScenePerformance33900=function(){const p=sequence(active());return p||PG.apply(this,arguments);};
@@ -310,7 +309,7 @@ function diagnostics(){
  const reportExpected=["Kakashi returns to the rooftop.","The ANBU operative is already there.","He turns as Kakashi lands.","Report.","The target made the handoff.","To whom?","Another man.","The package?","Gone with him.","The masked shinobi?","I tried to stop her.","The operative's mask remains fixed on him.","Result?","She beat me.","The answer sits between them.","Then what?","She went after the receiver.","Could you follow?","No.","The original target?","Gone.","The operative gives a small nod.","Understood.","Kakashi waits.","You may go.","Understood."];
  const officeExpectedFirst=["The recovered package rests on Minato's desk.","ANBU Marked Target stands near the window.","Package Smuggler has taken the wall beside him.","Masked Interceptor stands opposite them, arms folded.","The ANBU operative remains nearest the desk.","Kakashi's report lies open in front of Minato.","He reads the last page once more.","Then closes it.","He followed the handoff. Lost the original target. Saw her go after the receiver and stepped in."];
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_loss_ending_35820_v3_2026_09_19",
+  patchId:PATCH_ID==="alpha_kakashi_loss_ending_35820_v4_2026_09_21",
   authorities:AUTH_REPORT==="8e1d18cdc2b1e2ca0c6d0d0b56dd3c3b5fd5d623"&&AUTH_OFFICE==="d0d29a18ae2104b0cd29c1ca29b1f5a88fef71ab"&&AUTH_OFFICE_EXPRESSION==="362f72b8f20f50fec1b8e11e483e40cf5030364c",
   reportExact:REPORT.length===26&&JSON.stringify(REPORT.map(x=>x.text))===JSON.stringify(reportExpected),
   revisedOfficeExact:OFFICE_CUES.length===137&&JSON.stringify(OFFICE_CUES.slice(0,9).map(x=>x.text))===JSON.stringify(officeExpectedFirst)&&OFFICE_CUES[OFFICE_CUES.length-1].text==="That part is up to him.",
@@ -324,7 +323,7 @@ function diagnostics(){
   blackWipe:globalThis.advanceStoryScene.toString().includes("wipe(enterOffice)")&&globalThis.advanceStoryScene.toString().includes("wipe(openReceipt)"),
   dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910")&&installStyle.toString().includes(".sc-chronicle-layout{display:none!important}")&&render.toString().includes("scBoardUiMode"),
   liveStateCallout:render.toString().includes("sc-live-state-callout-33900")&&render.toString().includes("RECOVERED · HIDDEN OPERATION")&&render.toString().includes('card(MINATO,"HOKAGE"')&&installStyle.toString().includes("width:max-content!important")&&installStyle.toString().includes("max-height:none!important"),
-  receiptAndClosure:openReceipt.toString().includes("commitChronicleReceiptAndRewards")&&complete.toString().includes("guardedOriginCompletion"),
+  canonicalReceiptHandoff:openReceipt.toString().includes("enterCanonicalReceipt")&&!openReceipt.toString().includes("document.body.appendChild")&&complete.toString().includes("retired_to_canonical_terminal_35100"),
   browserGoldenClaimed:false
  };
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
