@@ -24,8 +24,10 @@ on:
       - 'tools/qa_academy_kakashi_dynamic_terminal_35940.js'
       - 'tools/qa_academy_kakashi_browser_acceptance_35950.js'
       - 'tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json'
+      - 'tools/fixtures/academy_kakashi_runtime_owner_map_36100.json'
       - 'tools/qa_academy_kakashi_completion_tail_36000.js'
       - 'tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js'
+      - 'tools/qa_academy_kakashi_runtime_owner_map_36100.js'
       - 'tools/qa_academy_kakashi_alpha_completion_356xx.js'
       - 'runtime/alpha-first-konoha-tutorial-35000.js'
       - '.github/workflows/issue-188-story-decision.yml'
@@ -96,8 +98,10 @@ on:
       - 'tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js'
       - 'tools/qa_kakashi_battle_development_35740.js'
       - 'tools/fixtures/academy_kakashi_end_to_end_route_manifest_36000.json'
+      - 'tools/fixtures/academy_kakashi_runtime_owner_map_36100.json'
       - 'tools/qa_academy_kakashi_completion_tail_36000.js'
       - 'tools/qa_academy_kakashi_end_to_end_route_matrix_36000.js'
+      - 'tools/qa_academy_kakashi_runtime_owner_map_36100.js'
       - 'tools/qa_academy_kakashi_alpha_completion_356xx.js'
       - 'runtime/alpha-first-konoha-tutorial-35000.js'
       - '.github/workflows/issue-188-story-decision.yml'
@@ -545,6 +549,12 @@ jobs:
         run: node tools/qa_academy_kakashi_browser_acceptance_35950.js
       - name: Academy Kakashi Story Battle development rewards
         run: node tools/qa_kakashi_battle_development_35740.js
+
+      - name: Kakashi canonical owner audit
+        run: |
+          node --check tools/qa_academy_kakashi_runtime_owner_map_36100.js
+          node -e "JSON.parse(require('fs').readFileSync('tools/fixtures/academy_kakashi_runtime_owner_map_36100.json','utf8'))"
+          node tools/qa_academy_kakashi_runtime_owner_map_36100.js
 
       - name: Kakashi one-swoop end-to-end route matrix
         run: |
