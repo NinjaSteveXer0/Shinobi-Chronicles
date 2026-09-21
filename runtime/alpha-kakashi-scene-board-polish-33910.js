@@ -104,13 +104,13 @@ function installStyle(){
 installStyle();
 
 function actor(id,label,image,state,focus=false,entering=false,motion=null){return{id,label,image,state,focus,entering,motion};}
-function kakashi(state,focus=false){return actor("academy_kakashi","KAKASHI",KAKASHI_IMAGE,state,focus);}
-function anbu(state,focus=false,entering=false){return actor("konoha_anbu_contact","ANBU OPERATIVE",ANBU_IMAGE,state,focus,entering);}
-function amt(state,focus=false,entering=false){return actor("anbu_marked_target","ANBU MARKED TARGET",AMT_IMAGE,state,focus,entering);}
-function smuggler(state,focus=false,entering=false){return actor("package_smuggler","PACKAGE SMUGGLER",PS_IMAGE,state,focus,entering);}
-function interceptor(state,focus=false,entering=false){return actor("masked_interceptor","MASKED INTERCEPTOR",MI_IMAGE,state,focus,entering);}
-function pakkun(state="PRESENT",focus=false,entering=false){return actor("pakkun","PAKKUN",PAKKUN_IMAGE,state,focus,entering);}
-function minato(state="REVIEWING SEALED RECORD",focus=false,entering=false){return actor("hokage_minato","HOKAGE MINATO",MINATO_IMAGE,state,focus,entering);}
+function kakashi(state,focus=false,entering=false,motion=null){return actor("academy_kakashi","KAKASHI",KAKASHI_IMAGE,state,focus,entering,motion);}
+function anbu(state,focus=false,entering=false,motion=null){return actor("konoha_anbu_contact","ANBU OPERATIVE",ANBU_IMAGE,state,focus,entering,motion);}
+function amt(state,focus=false,entering=false,motion=null){return actor("anbu_marked_target","ANBU MARKED TARGET",AMT_IMAGE,state,focus,entering,motion);}
+function smuggler(state,focus=false,entering=false,motion=null){return actor("package_smuggler","PACKAGE SMUGGLER",PS_IMAGE,state,focus,entering,motion);}
+function interceptor(state,focus=false,entering=false,motion=null){return actor("masked_interceptor","MASKED INTERCEPTOR",MI_IMAGE,state,focus,entering,motion);}
+function pakkun(state="PRESENT",focus=false,entering=false,motion=null){return actor("pakkun","PAKKUN",PAKKUN_IMAGE,state,focus,entering,motion);}
+function minato(state="REVIEWING SEALED RECORD",focus=false,entering=false,motion=null){return actor("hokage_minato","HOKAGE MINATO",MINATO_IMAGE,state,focus,entering,motion);}
 function terminalPakkunPresent33910(context){
  return !!(context&&(context.kakashiPostMiPakkunPresent===true||context.kakashiKonohaPakkunPresent===true||context.kakashiTerminalSequentialAmtReached35100===true)&&!context.kakashiPostMiPakkunDepartureOccurrenceId);
 }
