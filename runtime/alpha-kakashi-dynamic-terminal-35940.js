@@ -7,7 +7,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_dynamic_terminal_35940_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v7_2026_09_21";
+const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v8_2026_09_22";
 const ORIGIN="academy_kakashi",SCENE="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE="kakashi_origin_outer_route_packet";
 const KAK="academy_kakashi",MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken";
@@ -178,6 +178,18 @@ function reportText35940(state=buildProjectionState35940()){
  if(state.pakkun.present)lines.push("ANBU OPERATIVE: “And the ninken?”","NINKEN: “Temporary.”","NINKEN: “I was there when it mattered.”","KAKASHI: “He helped.”","NINKEN: “Better.”");
  return lines.join("\n\n");
 }
+function reportPerformance35940(state=buildProjectionState35940()){
+ const lines=String(reportText35940(state)||"").split(/\n{2,}/).map(line=>line.trim()).filter(Boolean);
+ return lines.map((line,index)=>{
+  const dialogue=line.match(/^(ANBU OPERATIVE|KAKASHI|NINKEN):\s+[“"]([\s\S]*?)[”"]$/);
+  const cueId="terminal_report_"+String(index+1).padStart(2,"0");
+  if(dialogue){
+   const speakerName=dialogue[1],focusActorRef=speakerName==="ANBU OPERATIVE"?"konoha_anbu_contact":speakerName==="NINKEN"?"pakkun":"academy_kakashi";
+   return Object.freeze({cueId,kind:"dialogue",speakerName,text:dialogue[2],focusActorRef});
+  }
+  return Object.freeze({cueId,kind:"narration",text:line,focusActorRef:"academy_kakashi"});
+ });
+}
 function packageReceiptLine(state){
  if(state.package.classRef==="RECOVERED")return"Package — Recovered by Kakashi and returned to ANBU.";
  if(state.package.classRef==="LOST_PS")return"Package — Lost with Package Smuggler.";
@@ -318,11 +330,12 @@ const installed=install();if(!installed||installed.success!==true)throw new Erro
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v7_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v8_2026_09_22",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
   projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
   terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v12_2026_09_21"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
   dynamicSummaryInstalled:!!m&&typeof m.get(BEAT.summary).presentationResolver==="function",
+  reportPerformancePreservesExactText:(()=>{const text=reportText35940(),seq=reportPerformance35940();return Array.isArray(seq)&&seq.length>1&&seq.map(cue=>cue.kind==="dialogue"?`${cue.speakerName}: “${cue.text}”`:cue.text).join("\n\n")===text;})(),
   minatoPresentationDelegatedTo33910:!!m&&typeof m.get(BEAT.minato).presentationResolver!=="function",
   minatoStructuredPerformance:minatoPerformance35940().length>=3&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO")&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE")&&!minatoText35940().includes("\\n\\n"),
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",terminalTextUsesRealNewlines:reportText35940().includes("\n\n")&&!reportText35940().includes("\\n")&&receiptText35940().includes("\n")&&!receiptText35940().includes("\\n"),
@@ -336,6 +349,6 @@ pakkunReceiptStateAware:receiptText35940.toString().includes("Status at ANBU rep
  const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
  return{pass:failed.length===0,checks,failed,installed,browserGoldenClaimed:false};
 }
-globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940=Object.freeze({patchId:PATCH_ID,authority:AUTH,beats:BEAT,installed,buildProjectionState:buildProjectionState35940,reportText:reportText35940,minatoPerformance:minatoPerformance35940,minatoText:minatoText35940,receiptText:receiptText35940,diagnostics,browserGoldenClaimed:false});
+globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940=Object.freeze({patchId:PATCH_ID,authority:AUTH,beats:BEAT,installed,buildProjectionState:buildProjectionState35940,reportText:reportText35940,reportPerformance:reportPerformance35940,minatoPerformance:minatoPerformance35940,minatoText:minatoText35940,receiptText:receiptText35940,diagnostics,browserGoldenClaimed:false});
 globalThis.runAcademyKakashiDynamicTerminal35940Diagnostics=diagnostics;
 })();
