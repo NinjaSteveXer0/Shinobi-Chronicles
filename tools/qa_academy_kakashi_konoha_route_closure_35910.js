@@ -145,12 +145,21 @@ assert.strictEqual(spec.battleConfigId,"academy_kakashi_origin_battle_mi_1v1");
 assert.strictEqual(spec.pakkunAuthorized,false);
 
 active.beatId=MOD.beats.directMiReturn;
-active.battleResume={authored:{
- battleConfigId:"academy_kakashi_origin_battle_mi_1v1",bindingRef:"academy_kakashi.battle.direct_strike_mi",battleOccurrenceId:"qa-direct-mi-win",resultState:"player_side_victory",
- participants:[{participantRef:MI,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]
-}};
+// Browser resume can retain the prior 2v1 authored envelope while the new MI result
+// is supplied as projected. The consumer must select the exact MI config+binding.
+active.battleResume={
+ authored:{
+  battleConfigId:"academy_kakashi_origin_battle_amt_ps_2v1",bindingRef:"academy_kakashi.resolver.attack",battleOccurrenceId:"qa-stale-direct-2v1",resultState:"player_side_victory",
+  participants:[{participantRef:AMT,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"},{participantRef:PS,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]
+ },
+ projected:{
+  battleConfigId:"academy_kakashi_origin_battle_mi_1v1",bindingRef:"academy_kakashi.battle.direct_strike_mi",battleOccurrenceId:"qa-direct-mi-win",resultState:"player_side_victory",
+  participants:[{participantRef:MI,battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"}]
+ }
+};
 out=MOD.consumeDirectMi();
 assert.strictEqual(out.success,true,"direct MI return failed: "+JSON.stringify(out));
+assert.strictEqual(out.occurrenceId.includes("qa-direct-mi-win"),true,"direct MI return consumed the stale 2v1 receipt instead of the projected MI receipt");
 assert.strictEqual(out.nextBeatId,MOD.beats.directGroup);
 assert.deepStrictEqual(definition.beatMap.get(MOD.beats.directGroup).choices.map(x=>x.label),[
  "TAKE THEM TO THE UCHIHA POLICE FORCE","TAKE THEM TO THE ANBU","KILL THEM","TAKE THE PACKAGE AND LET THEM GO"
