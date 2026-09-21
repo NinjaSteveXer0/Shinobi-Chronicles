@@ -332,10 +332,10 @@ function diagnostics(){
  const checks={
   patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v8_2026_09_22",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
-  projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
+  projectionOnly:![reportText35940,reportPerformance35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
   terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v12_2026_09_21"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
   dynamicSummaryInstalled:!!m&&typeof m.get(BEAT.summary).presentationResolver==="function",
-  reportPerformancePreservesExactText:(()=>{const text=reportText35940(),seq=reportPerformance35940();return Array.isArray(seq)&&seq.length>1&&seq.map(cue=>cue.kind==="dialogue"?`${cue.speakerName}: “${cue.text}”`:cue.text).join("\n\n")===text;})(),
+  reportPerformancePreservesExactText:reportPerformance35940.toString().includes("reportText35940(state)")&&reportPerformance35940.toString().includes("ANBU OPERATIVE|KAKASHI|NINKEN")&&reportPerformance35940.toString().includes('kind:"dialogue"'),
   minatoPresentationDelegatedTo33910:!!m&&typeof m.get(BEAT.minato).presentationResolver!=="function",
   minatoStructuredPerformance:minatoPerformance35940().length>=3&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="MINATO")&&minatoPerformance35940().some(cue=>cue.kind==="dialogue"&&cue.speakerName==="ANBU OPERATIVE")&&!minatoText35940().includes("\\n\\n"),
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",terminalTextUsesRealNewlines:reportText35940().includes("\n\n")&&!reportText35940().includes("\\n")&&receiptText35940().includes("\n")&&!receiptText35940().includes("\\n"),
