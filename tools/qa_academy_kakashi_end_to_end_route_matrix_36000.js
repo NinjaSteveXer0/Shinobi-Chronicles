@@ -40,6 +40,8 @@ for(const route of manifest.routes){
  assert(Array.isArray(route.owners)&&route.owners.length>0,"route owner missing: "+route.id);
  assert(Array.isArray(route.variations)&&route.variations.length>0,"route variations missing: "+route.id);
  assert(Array.isArray(route.qa)&&route.qa.length>0,"route QA missing: "+route.id);
+ assert.strictEqual(route.completionTail,"COMMON_TERMINAL_TAIL","route does not explicitly converge to common completion tail: "+route.id);
+ assert.strictEqual(route.saveLoadRequired,true,"route is missing save/load requirement: "+route.id);
  for(const file of [...route.owners,...route.qa])assert(exists(file),"route file missing for "+route.id+": "+file);
 }
 
@@ -141,6 +143,7 @@ const routeRows=manifest.routes.map(route=>({
  pass:route.qa.every(file=>passed.has(file))
 }));
 assert(routeRows.every(row=>row.pass),"not every manifest route has executable GREEN QA");
+for(const proof of manifest.commonTerminalTail.compatibilityProofs||[])assert(passed.has(proof),"common terminal-tail compatibility proof did not run: "+proof);
 assert(passed.has("tools/qa_academy_kakashi_completion_tail_36000.js"),"Kakashi-specific completion tail did not run");
 
 console.log(JSON.stringify({
