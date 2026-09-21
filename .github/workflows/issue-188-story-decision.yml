@@ -455,7 +455,7 @@ jobs:
           grep -Fq 'kak_origin_battle_mi_victory_reward_v1' runtime/alpha-kakashi-origin-rewards-34800.js
           grep -Fq 'CLAIM BATTLE REWARD' runtime/alpha-kakashi-battle-development-35740.js
           grep -Fq 'alpha_kakashi_origin_rewards_34800_v6_2026_09_20' runtime/alpha-kakashi-origin-rewards-34800.js
-          grep -Fq 'alpha_kakashi_terminal_debrief_35100_v10_2026_09_20' runtime/alpha-kakashi-terminal-debrief-35100.js
+          grep -Fq 'alpha_kakashi_terminal_debrief_35100_v11_2026_09_21' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'kakashi_origin_hokage_administration_interior_night' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'Assets/Kage/kage_minato.png' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HOKAGE ADMINISTRATION · NIGHT' runtime/alpha-kakashi-scene-board-polish-33910.js
