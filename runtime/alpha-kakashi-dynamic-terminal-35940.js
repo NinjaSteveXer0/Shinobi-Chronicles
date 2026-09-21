@@ -7,7 +7,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const TERMINAL=globalThis.SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100;
 if(!A||!CORE||!TERMINAL)throw new Error("kakashi_dynamic_terminal_35940_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21";
+const PATCH_ID="alpha_kakashi_dynamic_terminal_35940_v7_2026_09_21";
 const ORIGIN="academy_kakashi",SCENE="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE="kakashi_origin_outer_route_packet";
 const KAK="academy_kakashi",MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken";
@@ -164,6 +164,7 @@ function participantReportLines(ref,detail){
 function reportText35940(state=buildProjectionState35940()){
  if(state.specificReportAlreadyCommitted)return"The branch-specific ANBU report already completed from committed facts. That report remains authoritative; no second version is invented here.";
  const lines=["Kakashi returns to the rooftop.","ANBU OPERATIVE: “Report.”"].concat(packageReportLines(state));
+ if(state.knowledge.cleanExtraction)lines.push("ANBU OPERATIVE: “They saw you?”","KAKASHI: “Not before I was gone.”","ANBU OPERATIVE: “No fight.”","KAKASHI: “No.”","The operative looks at the recovered package.","ANBU OPERATIVE: “Clean.”","KAKASHI: “Clean enough.”");
  const kills=state.lethal.confirmedKillCount;
  if(kills===3){
   lines.push("ANBU OPERATIVE: “The masked shinobi?”","KAKASHI: “Dead.”","ANBU OPERATIVE: “The receiver?”","KAKASHI: “Dead.”","ANBU OPERATIVE: “And the original target?”","KAKASHI: “Dead.”","ANBU OPERATIVE: “All three by you.”","KAKASHI: “Yes.”","ANBU OPERATIVE: “After the fights?”","KAKASHI: “Yes.”");
@@ -241,12 +242,15 @@ function minatoPerformance35940(state=buildProjectionState35940()){
  const kills=state.lethal.confirmedKillCount;
  if(kills===3){
   minato("Three confirmed deaths.");anbu("Yes.");minato("Battle casualties?");anbu("No.");minato("He won the fights first.");anbu("Yes.");minato("And then chose the ending afterward.");
+ }else if(kills===2&&state.knowledge.miUnseen&&state.participants[MI].stateClass===""){
+  minato("The receiver and the original target are dead.");anbu("Yes.");minato("The masked shinobi?");anbu("The masked operative never entered his route.");minato("Then don't count her absence as a decision Kakashi made.");
  }else if(kills===2){
   minato("Two confirmed deaths.");anbu("Yes.");narrate("The surviving result remains separate: "+(survivorSummary(state)||"no survivor state was materially committed")+".");minato("Keep the decisions separate from the count.");
  }else if(kills===1){
   minato("One confirmed death.");anbu("Yes.");narrate("The other participant states remain separate: "+(survivorSummary(state)||"no additional participant state was materially committed")+".");minato("One death doesn't tell me much by itself. When he chose it does.");
  }
- if(state.package.recovered){minato("He brought the package back.");anbu("Yes.");}
+ if(state.knowledge.cleanExtraction){minato("No fight.");anbu("No.");minato("No pursuit.");anbu("No.");minato("And the package came back.");anbu("Yes.");narrate("Minato looks at the short report.");minato("Sometimes the cleanest decision leaves the least to discuss.");}
+ else if(state.package.recovered){minato("He brought the package back.");anbu("Yes.");}
  else{minato("He didn't recover the package.");anbu("No.");}
  const states=[MI,PS,AMT].map(ref=>state.participants[ref].stateClass);
  if(states.includes("FIELD_SECURED_PENDING_COLLECTION")){minato("He left them secured and kept moving.");anbu("Yes.");minato("Then he treated custody like part of the mission. Not the end of it.");}
@@ -314,7 +318,7 @@ const installed=install();if(!installed||installed.success!==true)throw new Erro
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_dynamic_terminal_35940_v7_2026_09_21",
   authoritiesPinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8"&&AUTH.dynamicTerminal==="a3cad415ea74a4fe8b3965b1136522aceab81047"&&AUTH.mixedLethal==="dea066c9ea7de249d20734b5569a0a84a422ba28",
   projectionOnly:![reportText35940,minatoText35940,receiptText35940,buildProjectionState35940].some(fn=>/commitOccurrence|recordParticipantClassification|recordMaterialState|savePlayerData/.test(fn.toString())),
   terminalOwnerPreserved:TERMINAL.patchId==="alpha_kakashi_terminal_debrief_35100_v11_2026_09_21"&&typeof TERMINAL.commitChronicleReceiptAndRewards==="function"&&typeof TERMINAL.guardedOriginCompletion==="function",
@@ -324,7 +328,7 @@ function diagnostics(){
   dynamicReceiptInstalled:!!m&&typeof m.get(BEAT.receipt).presentationResolver==="function",terminalTextUsesRealNewlines:reportText35940().includes("\n\n")&&!reportText35940().includes("\\n")&&receiptText35940().includes("\n")&&!receiptText35940().includes("\\n"),
   packageModules:packageReportLines.toString().includes("The receiver got away with it")&&packageReportLines.toString().includes("original target still had it")&&packageReportLines.toString().includes("masked shinobi took it"),
   mixedLethalIdentityAware:reportText35940.toString().includes("All three by you")&&receiptText35940.toString().includes("LETHAL HISTORY")&&minatoPerformance35940.toString().includes("survivorSummary"),
-  knowledgeModules:reportText35940.toString().includes("If the street stayed clear")&&receiptText35940.toString().includes("Handoff contingency overheard"),
+  knowledgeModules:reportText35940.toString().includes("If the street stayed clear")&&receiptText35940.toString().includes("Handoff contingency overheard")&&knowledge.toString().includes("academy_kakashi_ask_destination_knowledge_state")&&reportText35940.toString().includes("Clean enough")&&minatoPerformance35940.toString().includes("Sometimes the cleanest decision leaves the least to discuss"),
 pakkunReceiptStateAware:receiptText35940.toString().includes("Status at ANBU report — Present.")&&receiptText35940.toString().includes("Status at ANBU report — Explicitly departed."),
   noAlignmentLabels:![reportText35940,minatoText35940,receiptText35940].some(fn=>/merciless|ruthless|alignment/i.test(fn.toString())),
   browserGoldenClaimed:false
