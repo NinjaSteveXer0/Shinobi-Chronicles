@@ -245,10 +245,7 @@ function renderScene04APresentation35710(){
   layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
   let board=stage.querySelector&&stage.querySelector(`.${BOARD_CLASS}`);if(!board){board=document.createElement("section");board.className=BOARD_CLASS;board.setAttribute("aria-hidden","true");stage.appendChild(board);}const markup=boardMarkup35710(rt);if(board.innerHTML!==markup)board.innerHTML=markup;
   if(isScene04A(rt)){
-    const p=performance(rt),cue=p.cue||{};layer.dataset.scPerformance="true";
-    const text=layer.querySelector&&layer.querySelector(".sc-story-text");if(text&&text.textContent!==cue.text)text.textContent=cue.text;
-    const name=layer.querySelector&&layer.querySelector(".sc-story-name");if(name){name.textContent="NARRATION";name.style.display="block";}
-    const kicker=layer.querySelector&&layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";
+    layer.dataset.scPerformance="true";
     const primary=layer.querySelector&&layer.querySelector(".sc-chronicle-primary");if(primary){primary.textContent="›";primary.setAttribute("aria-label","Advance scene");primary.title="Advance scene";}
   }
   // Generic dialogue/narration visibility and the 33910 performance surface are
