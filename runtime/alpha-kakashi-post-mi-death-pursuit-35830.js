@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v25_2026_09_21";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v26_2026_09_21";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -484,7 +484,14 @@ function render(){
  if(rt&&rt.beatId===BEAT.psReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiPsReturnProcessed)){const x=consumeReturnOnEnter35830("ps");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.psReturn);}
  if(rt&&rt.beatId===BEAT.amtReturn&&!(rt.localContext&&rt.localContext.kakashiPostMiAmtReturnProcessed)){const x=consumeReturnOnEnter35830("amt");if(x&&x.success===true&&x.pending!==true){try{return render();}catch(_e){}}if(x&&x.success===true&&x.pending===true)scheduleReturnRetry35830(BEAT.amtReturn);}
  const ours=primePostMiPresentationState35830();const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||layer;
- for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;installStyle();stage.style.backgroundImage='linear-gradient(180deg,rgba(2,5,8,.03),rgba(2,5,8,.08) 55%,rgba(2,5,8,.62)),url("'+stageBg(rt,performance(rt)).replace(/"/g,"%22")+'")';stage.style.backgroundSize="cover";stage.style.backgroundPosition="center";
+ for(const old of stage.querySelectorAll?stage.querySelectorAll("."+BOARD_CLASS):[])if(!ours)old.remove();if(!ours)return false;
+ installStyle();
+ layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode="encounter";
+ const canonicalBackdrop=typeof globalThis.applyStorySceneBoardBackdrop33900==="function"?globalThis.applyStorySceneBoardBackdrop33900(stage,rt):null;
+ if(!canonicalBackdrop){
+  const fallback=stageBg(rt,performance(rt));stage.dataset.scSceneBoardBackdrop="dedicated";stage.style.setProperty("--sc-scene-board-backdrop",'url("'+fallback.replace(/"/g,"%22")+'")');
+ }
+ stage.style.removeProperty("background-image");stage.style.removeProperty("background-size");stage.style.removeProperty("background-position");
  let b=stage.querySelector("."+BOARD_CLASS);if(!b){b=document.createElement("section");b.className=BOARD_CLASS;stage.appendChild(b);}
  const p=performance(rt),focus=p&&p.cue&&(p.cue.speaker==="KAKASHI"?KAK:p.cue.speaker==="PACKAGE SMUGGLER"?PS:p.cue.speaker==="ANBU MARKED TARGET"?AMT:p.cue.speaker==="PAKKUN"?PAKKUN:p.cue.speaker==="ANBU OPERATIVE"?ANBU:p.cue.speaker==="UCHIHA POLICE OFFICER"?POLICE_AMT[0].ref:null)||KAK;
  const refs=actorRefs35830(rt,p);
@@ -533,7 +540,7 @@ function browserCapture(){
 function diagnostics(){
  const d=scene(),m=d&&d.beatMap instanceof Map?d.beatMap:null;
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v25_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_post_mi_death_pursuit_35830_v26_2026_09_21",
   authorities:AUTH_PS==="bf30ca7dfff9f850bebe978acdd8830f16758042"&&AUTH_AMT==="7a95637765a58b8f12b0bac877032625266830f6"&&AUTH_AMT_DISPOSITION==="e06e06df9da15858f09a72d318cce233dc9e8333"&&AUTH_LIVE==="bf16ebe0f677994878fbe60e30e7b546da899eb8",
   liveFastWinEntry:wireEntryChoices.toString().includes("LIVE_SOURCE")&&beginPostMiPursuitChoice35830.toString().includes("LIVE_SOURCE"),
   directBrowserEntry:browserCapture.toString().includes("beginPostMiPursuitChoice35830")&&globalThis.advanceStoryScene.toString().includes("beginPostMiPursuitChoice35830"),
@@ -553,6 +560,7 @@ function diagnostics(){
    pakkunSceneRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
    dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue-panel-33910")&&primePostMiPresentationState35830.toString().includes("scPostmiLane"),
+   canonicalBackdropOwnership:render.toString().includes("applyStorySceneBoardBackdrop33900")&&render.toString().includes('scSceneBoard="true"')&&!render.toString().includes("stage.style.backgroundImage"),
    amtDialogueUsesPrepaintStableLane:primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&primePostMiPresentationState35830.toString().includes("scPostmiLane")&&globalThis.renderStoryScenePresentationLayer.toString().includes("primePostMiPresentationState35830"),
    distinctPolicePairsConfigured:(()=>{const refs=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.ref),images=[...POLICE_MI,...POLICE_PS,...POLICE_AMT].map(row=>row.image);return refs.length===6&&new Set(refs).size===6&&new Set(images).size===6;})(),
    amtPoliceHandoffStagesTwoOfficers:(()=>{const refs=actorRefs35830({beatId:BEAT.amtPoliceHandoff,localContext:{kakashiPostMiPakkunPresent:true}},{index:0,cue:{speaker:"UCHIHA POLICE OFFICER"}});return refs.includes(POLICE_AMT[0].ref)&&refs.includes(POLICE_AMT[1].ref)&&refs.filter(ref=>isPolice35830(ref)).length===2&&POLICE_AMT[0].image==="NPC/uchiha_police_force_female_alt_2.png"&&POLICE_AMT[1].image==="NPC/uchiha_police_force_member_male.png";})(),
