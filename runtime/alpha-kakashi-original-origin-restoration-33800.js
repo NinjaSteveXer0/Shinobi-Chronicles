@@ -214,36 +214,24 @@ globalThis.runAlphaKakashiOriginal33800Diagnostics=runAlphaKakashiOriginal33800D
 // Story authority has won the expression chain. The 33900 module is a generic
 // projection adapter over the existing Story renderer and consumes these exact
 // Kakashi-Origin-specific backdrop bindings; it does not create a second Story engine.
-// 33910 is the current Kakashi Scene Board consumer. 33920 is an explicit,
-// temporary compatibility shim for installed-browser presentation defects and
-// must be folded into 33910 after browser acceptance.
+// 33910 is the sole Kakashi Scene Board presentation consumer. Gen88 folded
+// the former 33920 compatibility behavior into 33910 and retired 33920 from
+// the production load path.
 (function activateStorySceneBoard33900AfterKakashi33800(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
   const SCRIPT_ID="sc-story-scene-board-33900-script";
   const POLISH_ID="sc-kakashi-scene-board-polish-33910-script";
-  const COMPAT_ID="sc-kakashi-story-presentation-compat-33920-script";
   // const BUILD="scene-board-20260919-9";
   // const BUILD="scene-board-20260919-10";
-  const BUILD="scene-board-20260919-11";
-
-  function load33920(){
-    if(globalThis.SC_ALPHA_KAKASHI_STORY_PRESENTATION_COMPAT_33920||document.getElementById(COMPAT_ID))return;
-    const compat=document.createElement("script");
-    compat.id=COMPAT_ID;
-    compat.src=`runtime/alpha-kakashi-story-presentation-compat-33920.js?v=${BUILD}`;
-    compat.async=false;
-    document.head.appendChild(compat);
-  }
+  // const BUILD="scene-board-20260919-11";
+  const BUILD="scene-board-20260921-12";
 
   function load33910(){
-    if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910){load33920();return;}
-    const existing=document.getElementById(POLISH_ID);
-    if(existing){existing.addEventListener("load",load33920,{once:true});return;}
+    if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910||document.getElementById(POLISH_ID))return;
     const polish=document.createElement("script");
     polish.id=POLISH_ID;
     polish.src=`runtime/alpha-kakashi-scene-board-polish-33910.js?v=${BUILD}`;
     polish.async=false;
-    polish.addEventListener("load",load33920,{once:true});
     document.head.appendChild(polish);
   }
 
