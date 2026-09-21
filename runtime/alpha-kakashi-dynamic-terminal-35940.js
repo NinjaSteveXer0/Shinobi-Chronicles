@@ -103,8 +103,10 @@ function lethalEvidence(history,participants){
 function knowledge(history,l){
  const facts=historyFacts(history).map(x=>x.fact);
  const getCloserSuccess=!!(l&&l.kakashiMoveCloserKnowledgeStateRef)||facts.some(f=>String(f&&f.selectedOutcomeRef||"")==="GET_CLOSER_SUCCESS"||f&&f.knowledgeStateByObserver&&f.knowledgeStateByObserver[KAK]&&f.knowledgeStateByObserver[KAK].getCloserSuccessKnowledgeRetained===true||f&&f.worldFacts&&f.worldFacts.retainsGetCloserKnowledge===true);
- const askDestination=facts.some(f=>String(f&&f.factClass||"").includes("ask")&&String(f&&f.factClass||"").includes("package")||f&&f.worldFacts&&f.worldFacts.originalCarrierRoleEndedAtHandoff===true);
- return{getCloserSuccess,askDestination};
+ const askDestination=facts.some(f=>String(f&&f.factClass||"")==="academy_kakashi_ask_destination_knowledge_state"||f&&f.knowledgeStateByObserver&&f.knowledgeStateByObserver[KAK]&&f.knowledgeStateByObserver[KAK].amtRoleEndedAtHandoff===true||f&&f.worldFacts&&f.worldFacts.originalCarrierRoleEndedAtHandoff===true);
+ const cleanExtraction=facts.some(f=>f&&f.worldFacts&&f.worldFacts.cleanExtractionSucceeded===true||f&&f.cleanExtractionSucceeded===true);
+ const miUnseen=facts.some(f=>f&&f.participantStateByRef&&f.participantStateByRef[MI]&&String(f.participantStateByRef[MI].presenceState||"")==="UNSEEN"||f&&f.participantStateByRole&&f.participantStateByRole.masked_interceptor&&String(f.participantStateByRole.masked_interceptor.visibilityState||"")==="UNSEEN");
+ return{getCloserSuccess,askDestination,cleanExtraction,miUnseen};
 }
 function specificReport(history){
  return historyFacts(history).some(entry=>{const fact=entry.fact,cls=String(fact&&fact.factClass||"");return cls&&cls!=="academy_kakashi_terminal_anbu_debrief"&&(cls.includes("anbu_report")||fact&&fact.truthfulReport===true);});
@@ -136,7 +138,7 @@ function statePhrase(detail){
  if(state==="DELIBERATELY_RELEASED"||state==="RELEASED")return"deliberately released";
  if(state==="ESCAPED")return"escaped";
  if(state==="LEFT_KAKASHI_SIGHT")return"left Kakashi's sight";
- if(state==="BATTLE_DEFEATED_UNRESOLVED")return"defeated; left alive and unrestrained";
+ if(state==="BATTLE_DEFEATED_UNRESOLVED"||state==="DEFEATED_BUT_NOT_CONTROLLED")return"defeated; left alive and unrestrained";
  return state?state.toLowerCase().replace(/_/g," "):"not materially resolved";
 }
 function packageReportLines(state){
@@ -156,7 +158,7 @@ function participantReportLines(ref,detail){
  if(state==="FIELD_SECURED_PENDING_COLLECTION")return["KAKASHI: “"+cap+" is restrained.”","ANBU OPERATIVE: “Where?”","KAKASHI: “"+(detail.securedAtLocationRef||"At the committed field location")+".”","ANBU OPERATIVE: “Alive?”","KAKASHI: “Yes.”"];
  if(state==="DELIBERATELY_RELEASED"||state==="RELEASED")return["ANBU OPERATIVE: “You had "+role+".”","KAKASHI: “Yes.”","ANBU OPERATIVE: “And let "+role+" go.”","KAKASHI: “Yes.”"];
  if(state==="ESCAPED")return["KAKASHI: “"+cap+" escaped.”"];
- if(state==="BATTLE_DEFEATED_UNRESOLVED")return["ANBU OPERATIVE: “You beat "+role+".”","KAKASHI: “Yes.”","ANBU OPERATIVE: “Custody?”","KAKASHI: “No.”","ANBU OPERATIVE: “Alive when you left.”","KAKASHI: “Yes.”"];
+ if(state==="BATTLE_DEFEATED_UNRESOLVED"||state==="DEFEATED_BUT_NOT_CONTROLLED")return["ANBU OPERATIVE: “You beat "+role+".”","KAKASHI: “Yes.”","ANBU OPERATIVE: “Custody?”","KAKASHI: “No.”","ANBU OPERATIVE: “Alive when you left.”","KAKASHI: “Yes.”"];
  return[];
 }
 function reportText35940(state=buildProjectionState35940()){
@@ -182,17 +184,21 @@ function packageReceiptLine(state){
  if(state.package.classRef==="TAKEN_MI")return"Package — Taken from Kakashi by Masked Interceptor.";
  return"Package — Not recovered by Kakashi.";
 }
-function participantReceiptLine(ref,detail){
- const name=ROLE[ref]&&ROLE[ref].receipt||ref,state=String(detail&&detail.stateClass||"");
- if(!state)return null;
- if(state==="DEAD")return name+" — Killed by Kakashi after defeat.";
- if(state==="FIELD_SECURED_PENDING_COLLECTION")return name+" — Field-secured alive.";
- if(state==="ANBU_INSTITUTIONAL_CUSTODY")return name+" — Transferred to ANBU custody.";
- if(state==="UCHIHA_POLICE_INSTITUTIONAL_CUSTODY")return name+" — Transferred to Uchiha Police custody.";
- if(state==="DELIBERATELY_RELEASED"||state==="RELEASED")return name+" — Deliberately released.";
- if(state==="BATTLE_DEFEATED_UNRESOLVED")return name+" — Defeated; left alive and unrestrained.";
- if(state==="ESCAPED")return name+" — Escaped.";
- if(state==="LEFT_KAKASHI_SIGHT")return name+" — Left Kakashi's sight; later state unknown.";
+function participantReceiptLine(ref,detail,state){
+ const name=ROLE[ref]&&ROLE[ref].receipt||ref,stateClass=String(detail&&detail.stateClass||"");
+ if(!stateClass)return null;
+ if(stateClass==="DEAD")return name+" — Killed by Kakashi after defeat.";
+ if(stateClass==="FIELD_SECURED_PENDING_COLLECTION")return name+" — Field-secured alive.";
+ if(stateClass==="ANBU_INSTITUTIONAL_CUSTODY")return name+" — Transferred to ANBU custody.";
+ if(stateClass==="UCHIHA_POLICE_INSTITUTIONAL_CUSTODY")return name+" — Transferred to Uchiha Police custody.";
+ if(stateClass==="DELIBERATELY_RELEASED"||stateClass==="RELEASED")return name+" — Deliberately released.";
+ if(stateClass==="BATTLE_DEFEATED_UNRESOLVED"||stateClass==="DEFEATED_BUT_NOT_CONTROLLED")return name+" — Defeated; left alive and unrestrained.";
+ if(stateClass==="ESCAPED"){
+  if(ref===PS)return state&&state.package&&state.package.holderClass==="PACKAGE_SMUGGLER"?name+" — Escaped with package.":name+" — Escaped without package.";
+  if(ref===AMT){const lostBattle=state&&state.battles&&state.battles.some(row=>["academy_kakashi_origin_battle_seq_amt_pakkun","academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","academy_kakashi_origin_battle_amt_ps_2v1"].includes(String(row.battleConfigId||""))&&String(row.resultState||"")==="opposition_side_victory");return lostBattle?name+" — Defeated Kakashi and escaped.":name+" — Escaped after pursuit failed.";}
+  return name+" — Escaped.";
+ }
+ if(stateClass==="LEFT_KAKASHI_SIGHT")return name+" — Left Kakashi's sight; later state unknown.";
  return name+" — "+statePhrase(detail)+".";
 }
 function battleReceiptLines(state){
@@ -200,7 +206,7 @@ function battleReceiptLines(state){
 }
 function receiptText35940(state=buildProjectionState35940()){
  const lines=["CHRONICLE RECEIPT","","ASSIGNMENT","Hokage-authorised limited retrieval operation.","","FIRST ACTION",state.firstAction,"","PACKAGE",packageReceiptLine(state),"","PARTICIPANTS"];
- const participantLines=[MI,PS,AMT].map(ref=>participantReceiptLine(ref,state.participants[ref])).filter(Boolean);lines.push.apply(lines,participantLines.length?participantLines:["No participant outcome line was materially committed."]);
+ const participantLines=[MI,PS,AMT].map(ref=>participantReceiptLine(ref,state.participants[ref],state)).filter(Boolean);lines.push.apply(lines,participantLines.length?participantLines:["No participant outcome line was materially committed."]);
  lines.push("","BATTLES");lines.push.apply(lines,state.battles.length?battleReceiptLines(state):["No PL Battle materially resolved."]);
  const custody=participantLines.filter(line=>/custody|Field-secured|released/i.test(line));if(custody.length){lines.push("","CUSTODY / RELEASE");lines.push.apply(lines,custody);}
  if(state.lethal.confirmedKillCount||state.lethal.failedAttemptCount){
@@ -211,7 +217,7 @@ function receiptText35940(state=buildProjectionState35940()){
  if(state.knowledge.getCloserSuccess)lines.push("","INTELLIGENCE","Handoff contingency overheard.","Downstream package destination — Unknown.");
  if(state.knowledge.askDestination)lines.push("","INTELLIGENCE","Original carrier's role ended at handoff.","Downstream destination — Unknown to original carrier.");
  if(state.pakkun.involved){
-  lines.push("","PAKKUN","Temporary ninken intervention — Involved.");
+  lines.push("","NINKEN","Temporary ninken intervention — Involved.");
   lines.push(state.pakkun.present?"Status at ANBU report — Present.":"Status at ANBU report — Explicitly departed.");
   lines.push("Permanent Summon ownership — None.");
  }
