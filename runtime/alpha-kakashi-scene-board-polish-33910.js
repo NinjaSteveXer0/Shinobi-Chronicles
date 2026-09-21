@@ -16,7 +16,7 @@
 "use strict";
 if(globalThis.SC_KAKASHI_SCENE_BOARD_POLISH_33910)return;
 
-const PATCH_ID="kakashi_scene_board_model_v19_33910_2026_09_22";
+const PATCH_ID="kakashi_scene_board_model_v20_33910_2026_09_22";
 const SCENE_01_AUTHORITY="d11aa0f4f8e1ee203d3b63cee9a1b0d2fa88ea91";
 const SCENE_02_AUTHORITY="6e87a8c3364e22e696e0a9c120c51bc0c57e9881";
 const STYLE_ID="sc-kakashi-scene-board-polish-33910-style";
@@ -43,6 +43,12 @@ const HOKAGE_INTERIOR_PATH="Kakashi Origin Backdrop/hokage_administration_interi
 const kakashiOccurrence="occ_origin_kakashi_anbu_retrieval_resolution";
 const DIRECT_PICKPOCKET_BATTLE_34710="kak_scene03d_pickpocket_failure_3v1_battle_34710";
 const DIRECT_PICKPOCKET_RETURN_34710="kak_scene03d_pickpocket_failure_3v1_return_34710";
+const DIRECT_PICKPOCKET_POLICE_34710="kak_scene03d_pickpocket_3v1_police_34710";
+const DIRECT_PICKPOCKET_ANBU_34710="kak_scene03d_pickpocket_3v1_anbu_34710";
+const DIRECT_PICKPOCKET_KILL_34710="kak_scene03d_pickpocket_3v1_kill_34710";
+const DIRECT_PICKPOCKET_RELEASE_34710="kak_scene03d_pickpocket_3v1_release_34710";
+const TERMINAL_RECEIPT_35100="kak_terminal_chronicle_receipt_35100";
+const TERMINAL_FINAL_35100="kak_terminal_chronicle_begins_35100";
 const DIRECT_PICKPOCKET_DEFEAT_CHOICE_34710="kak_direct_pickpocket_defeat_return_anbu";
 const DIRECT_PICKPOCKET_VICTORY_CHOICES_34710=Object.freeze([
  "kak_direct_pickpocket_take_to_police",
@@ -56,15 +62,15 @@ function installStyle(){
   const prior=document.getElementById(STYLE_ID);if(prior)prior.remove();
   const style=document.createElement("style");style.id=STYLE_ID;
   style.textContent=`
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:33%!important;gap:2.2%!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8.5%!important;bottom:38%!important;gap:2.2%!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors[data-count="1"]{grid-template-columns:minmax(0,390px)!important;justify-content:start!important;padding-left:5.5%!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors[data-count="2"]{display:flex!important;justify-content:space-between!important;align-items:flex-end!important;padding:0 5.4%!important;column-gap:0!important;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important;opacity:.78;transform:translateY(2px) scale(.975);filter:saturate(.88) brightness(.90);transition:opacity .22s ease,filter .22s ease,transform .22s ease;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:455px!important;aspect-ratio:7/10!important;overflow:visible!important;opacity:.78;transform:translateY(2px) scale(.975);filter:saturate(.88) brightness(.90);transition:opacity .22s ease,filter .22s ease,transform .22s ease;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors[data-count="4"] .sc-scene-board-33900__actor{width:min(92%,220px)!important;max-height:405px!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors[data-count="5"] .sc-scene-board-33900__actor{width:min(94%,188px)!important;max-height:365px!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actors[data-count="6"] .sc-scene-board-33900__actor{width:min(96%,166px)!important;max-height:340px!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor.is-focus{opacity:1;transform:translateY(0) scale(1);filter:none;}
-#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"],#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{width:min(96%,338px)!important;max-height:505px!important;}
+#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor[data-actor-id="academy_kakashi"],#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{width:min(96%,338px)!important;max-height:465px!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor-frame,#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor.is-focus .sc-scene-board-33900__actor-frame{border:0!important;background:transparent!important;box-shadow:none!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor img{object-fit:contain!important;filter:drop-shadow(0 17px 20px rgba(0,0,0,.52))!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"],#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage,#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-layout,#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-panel{animation:none!important;}
@@ -95,7 +101,7 @@ function installStyle(){
 
 .sc-kakashi-entry-curtain-33910,.sc-kakashi-wipe-33910{position:fixed;inset:0;background:#000;z-index:2147483000;pointer-events:auto;}.sc-kakashi-entry-curtain-33910{opacity:1;transition:opacity .30s ease;}.sc-kakashi-entry-curtain-33910.is-revealing{opacity:0;}.sc-kakashi-wipe-33910{transform:translateX(100%);transition:transform .42s cubic-bezier(.72,0,.28,1);will-change:transform;}.sc-kakashi-wipe-33910.is-covering{transform:translateX(0);}.sc-kakashi-wipe-33910.is-revealing{transform:translateX(-100%);}
 /* Gen88: former 33920 compatibility behavior is folded into this canonical owner. */
-#story-scene-presentation-layer .sc-scene-board-33900__actor-tag{display:block!important;left:50%!important;right:auto!important;top:auto!important;bottom:-18px!important;width:max-content!important;max-width:95%!important;transform:translateX(-50%)!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;text-align:center!important;white-space:nowrap!important;pointer-events:none!important;}
+#story-scene-presentation-layer .sc-scene-board-33900__actor-tag{display:block!important;left:50%!important;right:auto!important;top:auto!important;bottom:-14px!important;width:max-content!important;max-width:95%!important;transform:translateX(-50%)!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;backdrop-filter:none!important;text-align:center!important;white-space:nowrap!important;pointer-events:none!important;}
 #story-scene-presentation-layer .sc-scene-board-33900__actor-tag strong{display:none!important;}
 #story-scene-presentation-layer .sc-scene-board-33900__actor-tag small{display:inline-block!important;margin:0!important;padding:3px 8px!important;border:1px solid rgba(104,219,229,.36)!important;background:rgba(2,17,22,.86)!important;color:#77dfe7!important;font-size:8px!important;font-weight:900!important;line-height:1.2!important;letter-spacing:.08em!important;}
 #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-dialogue-panel-33910{width:min(32%,500px)!important;box-sizing:border-box!important;min-height:104px!important;padding:17px 22px 16px!important;clip-path:none!important;border-radius:8px!important;transition:none!important;}
@@ -109,7 +115,15 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-board-ui-mode="decision"][data-sc-visible-choice-count="1"] .sc-chronicle-layout{width:min(58%,780px)!important;}
 #story-scene-presentation-layer[data-sc-board-ui-mode="decision"][data-sc-visible-choice-count="1"] .sc-chronicle-actions{grid-template-columns:1fr!important;}
 #story-scene-presentation-layer[data-sc-board-ui-mode="decision"][data-sc-visible-choice-count="1"] .sc-story-text{max-height:18vh!important;overflow:auto!important;}
+#story-scene-presentation-layer[data-sc-choice-performance-complete="true"]:not([data-sc-terminal-receipt="true"]) .sc-story-kicker,#story-scene-presentation-layer[data-sc-choice-performance-complete="true"] .sc-story-text{display:none!important;}
+#story-scene-presentation-layer[data-sc-terminal-receipt="true"] .sc-story-kicker{width:min(78%,760px)!important;padding:11px 16px!important;text-align:center!important;letter-spacing:.16em!important;}
+#story-scene-presentation-layer[data-sc-terminal-receipt="true"] .sc-story-choice{min-height:58px!important;}
+#story-scene-presentation-layer[data-sc-terminal-office="true"] .sc-scene-board-33900__objects{left:50%!important;right:auto!important;top:15.5%!important;transform:translateX(-50%)!important;max-width:min(30%,360px)!important;z-index:8!important;}
+#story-scene-presentation-layer[data-sc-terminal-office="true"] .sc-scene-board-33900__actor[data-actor-id="hokage_minato"]{max-height:455px!important;transform:translateY(-7%) scale(1)!important;}
+#story-scene-presentation-layer[data-sc-terminal-office="true"] .sc-scene-board-33900__actor[data-actor-id="konoha_anbu_contact"]{max-height:410px!important;transform:translateY(3%) scale(.94)!important;}
+#story-scene-presentation-layer[data-sc-terminal-office="true"] .sc-scene-board-33900__actor[data-actor-id="hokage_minato"].is-focus{transform:translateY(-7%) scale(1)!important;}
 #story-scene-presentation-layer[data-sc-board-ui-mode="dialogue"] .sc-chronicle-stage,#story-scene-presentation-layer[data-sc-board-ui-mode="performance_narration"] .sc-chronicle-stage{cursor:pointer!important;}
+.sc-narration-panel-33910.is-record{width:min(68%,900px)!important;min-height:96px!important;max-height:28vh!important;overflow:auto!important;}
 @media(max-width:820px){#story-scene-presentation-layer[data-sc-scene-board="true"] .sc-scene-board-33900__actor{width:46%!important;max-height:340px!important;}.sc-dialogue-panel-33910{width:58%;}.sc-narration-panel-33910{width:88%;}#story-scene-presentation-layer[data-sc-board-ui-mode="decision"] .sc-chronicle-actions{grid-template-columns:1fr!important;}}
 `;
   document.head.appendChild(style);return true;
@@ -135,8 +149,9 @@ function terminalReportProjection33910(beatId,context,performance){
  if(terminalPakkunPresent33910(context))actors.push(beatId==="kak_terminal_pakkun_departure_exit_35100"?pakkun("DEPARTING",false,false,"exit"):pakkun(focus==="pakkun"?"SPEAKING":"PRESENT",focus==="pakkun"));
  return{mode:"conversation",location:"KONOHA ROOFTOP · NIGHT",objective:"Report the mission outcome to ANBU.",actors,objects:[]};
 }
-function terminalHokageProjection33910(){
- return{mode:"conversation",location:"HOKAGE ADMINISTRATION · NIGHT",objective:"Private review of the sealed field record.",actors:[anbu("REPORTING"),minato("REVIEWING SEALED RECORD",true)],objects:[{label:"SEALED FIELD RECORD",state:"UNDER HOKAGE REVIEW"}]};
+function terminalHokageProjection33910(beatId){
+ const finalBeat=beatId===TERMINAL_FINAL_35100;
+ return{mode:"conversation",location:"HOKAGE ADMINISTRATION · NIGHT",objective:finalBeat?"":"Private review of the sealed field record.",actors:[anbu(finalBeat?"PRESENT":"REPORTING"),minato(finalBeat?"PRESENT":"REVIEWING SEALED RECORD",!finalBeat)],objects:finalBeat?[]:[{label:"SEALED FIELD RECORD",state:"UNDER HOKAGE REVIEW"}]};
 }
 function terminalMinatoPerformance33910(){
  try{
@@ -148,6 +163,28 @@ function terminalReportPerformance33910(){
  try{
   const mod=globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940;
   return mod&&typeof mod.reportPerformance==="function"?mod.reportPerformance():null;
+ }catch(_error){return null;}
+}
+function authoredBeatText33910(beat){
+ if(!beat)return"";
+ let text=String(beat.text||"");
+ try{if(typeof beat.presentationResolver==="function"){const row=beat.presentationResolver();if(row&&row.text!==undefined&&row.text!==null)text=String(row.text);}}catch(_error){}
+ return text;
+}
+function textPerformance33910(beat,prefix="kakashi_story",defaultFocus="academy_kakashi"){
+ const blocks=authoredBeatText33910(beat).split(/\n{2,}/).map(row=>row.trim()).filter(Boolean);
+ return blocks.map((text,index)=>{
+  const dialogue=text.match(/^([A-Z][A-Z .’'\-]+):\s+[“"]([\s\S]*?)[”"]$/);
+  const speakerName=dialogue?dialogue[1].trim():"";
+  return Object.freeze({cueId:`${prefix}_${String(index+1).padStart(2,"0")}`,kind:dialogue?"dialogue":"narration",speakerName:dialogue?speakerName:undefined,text:dialogue?dialogue[2]:text,focusActorRef:dialogue?(speakerActorId(speakerName)||defaultFocus):defaultFocus});
+ });
+}
+function terminalReceiptPerformance33910(){
+ try{
+  const mod=globalThis.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940,text=mod&&typeof mod.receiptText==="function"?String(mod.receiptText()||""):"";
+  const blocks=text.split(/\n{2,}/).map(row=>row.trim()).filter(Boolean);
+  if(blocks[0]==="CHRONICLE RECEIPT"&&blocks.length>1)blocks.splice(0,2,blocks[0]+"\n\n"+blocks[1]);
+  return blocks.map((text,index)=>Object.freeze({cueId:`terminal_receipt_${String(index+1).padStart(2,"0")}`,kind:"record",text,focusActorRef:"hokage_minato"}));
  }catch(_error){return null;}
 }
 function terminalReportSplit33910(){
