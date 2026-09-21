@@ -555,7 +555,7 @@ function diagnostics(){
    amtBackdropExact:BG.amtStreet==="Kakashi Origin Backdrop/alleyway_konoha_night.png"&&AMT_ALLEY_ASSET_ID==="kakashi_origin_pakkun_interception_alley",
    pakkunSceneRevealBounded:pakkunVisible35830.toString().includes("BEAT.amtCatch")&&pakkunVisible35830.toString().includes("p.index>=2")&&PAKKUN_SCENE_ASSET==="Assets/Summons/pakkun.png"&&image(PAKKUN)===PAKKUN_SCENE_ASSET,
    pakkunUsesPlainSceneMarkup:card(PAKKUN,"PRESENT",true).includes("sc-postmi-summon-35830")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-frame")&&!card(PAKKUN,"PRESENT",true).includes("sc-scene-board-33900__actor-tag"),
-   dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue-panel-33910")&&primePostMiPresentationState35830.toString().includes("scPostmiLane"),
+   dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910")&&primePostMiPresentationState35830.toString().includes("scPostmiLane"),
    decisionMaterializationSemantic:transitionNarrative.toString().includes("post_mi_ps_decision_materialization_failed")&&transitionNarrative.toString().includes("post_mi_amt_decision_materialization_failed"),
    canonicalBackdropOwnership:render.toString().includes("applyStorySceneBoardBackdrop33900")&&render.toString().includes('scSceneBoard="true"')&&!render.toString().includes("stage.style.backgroundImage"),
    amtDialogueUsesPrepaintStableLane:primePostMiPresentationState35830.toString().includes("scPostmiPhase")&&primePostMiPresentationState35830.toString().includes("scPostmiLane")&&hooks.toString().includes("registerStorySceneBoardRenderHook"),
