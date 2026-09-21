@@ -24,7 +24,7 @@ const SEQ=globalThis.SC_ALPHA_KAKASHI_SEQUENTIAL_CONSUMER_34410;
 const CLOSURE=globalThis.SC_ALPHA_KAKASHI_KONOHA_CLOSURE_35900;
 if(!A||!CORE||!KAK||!PROVIDER||!BATTLE||!SEQ||!CLOSURE)throw new Error("kakashi_konoha_route_closure_35910_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v5_2026_09_21";
+const PATCH_ID="alpha_kakashi_konoha_route_closure_35910_v6_2026_09_21";
 const ORIGIN="academy_kakashi";
 const SCENE="origin_academy_kakashi_anbu_retrieval";
 const KAKASHI="academy_kakashi";
@@ -126,7 +126,16 @@ function factOf(row){return row&&(row.fact||row.data)||{};}
 function stable(prefix,payload){return PROVIDER.stableRef(prefix,payload);}
 function normalized(def,index){return typeof normalizeStorySceneBeat==="function"?normalizeStorySceneBeat(def,index):def;}
 function available(v=true,blocker=null){return()=>({available:v===true,knownBlocker:v===true?null:blocker});}
-function latestResult(){const rt=active();const resume=rt&&rt.battleResume&&typeof rt.battleResume==="object"?rt.battleResume:null;for(const row of resume?[resume.authored,resume.projected,resume.result,resume.battleResult]:[])if(row&&row.battleConfigId&&row.bindingRef)return row;try{const row=typeof projectAcademyKakashiOriginBattleResult==="function"?projectAcademyKakashiOriginBattleResult():null;if(row&&row.battleConfigId)return row;}catch(_e){}return null;}
+function latestResult(expectedConfigId=null,expectedBindingRef=null){
+ const rt=active(),resume=rt&&rt.battleResume&&typeof rt.battleResume==="object"?rt.battleResume:null,rows=[];
+ for(const row of resume?[resume.authored,resume.projected,resume.result,resume.battleResult]:[])if(row&&row.battleConfigId&&row.bindingRef)rows.push(row);
+ try{const row=typeof projectAcademyKakashiOriginBattleResult==="function"?projectAcademyKakashiOriginBattleResult():null;if(row&&row.battleConfigId&&row.bindingRef)rows.push(row);}catch(_e){}
+ if(expectedConfigId||expectedBindingRef){
+  const exact=rows.find(row=>(!expectedConfigId||String(row.battleConfigId||"")===String(expectedConfigId))&&(!expectedBindingRef||String(row.bindingRef||"")===String(expectedBindingRef)));
+  return exact||null;
+ }
+ return rows[0]||null;
+}
 function material(pkg,stateRef,anchorRef){
  return CORE.recordMaterialState({storyUnitRef:ORIGIN,materialRef:PACKAGE,resolved:true,stateRef,value:{
   custodyClass:String(pkg.currentHolderClass||pkg.custodyClass||""),custodianRef:pkg.custodianRef||null,locationClass:pkg.locationClass||null,sourceAnchorRef:anchorRef||null
@@ -267,8 +276,8 @@ function launchDirectMi(ctx={}){
  return launch(DIRECT_MI,"academy_kakashi.battle.direct_strike_mi",directChainAnchor(rt),source,D.directMiReturn,"direct_strike_mi_1v1",ctx);
 }
 function consumeDirectMi(){
- const rt=active(),r=latestResult();if(!rt||rt.beatId!==D.directMiReturn)return{success:false,reason:"direct_strike_mi_return_context_required"};
- if(!r||String(r.battleConfigId||"")!==DIRECT_MI||String(r.bindingRef||"")!=="academy_kakashi.battle.direct_strike_mi")return{success:false,reason:"direct_strike_mi_receipt_mismatch"};
+ const rt=active(),expectedBinding="academy_kakashi.battle.direct_strike_mi",r=latestResult(DIRECT_MI,expectedBinding);if(!rt||rt.beatId!==D.directMiReturn)return{success:false,reason:"direct_strike_mi_return_context_required"};
+ if(!r)return{success:false,reason:"direct_strike_mi_receipt_mismatch",expectedBattleConfigId:DIRECT_MI,expectedBindingRef:expectedBinding};
  const win=String(r.resultState||"")==="player_side_victory",anchor=directChainAnchor(rt),authority=directChainAuthority(rt),routeRef=directChainRoute(rt);
  const id=stable("occ_origin_kakashi_direct_strike_mi_return",{instance:String(rt.instanceId||""),battle:String(r.battleOccurrenceId||""),win,routeRef});
  const pkg=win
@@ -618,7 +627,7 @@ function diagnostics(){
  const d=scene(),action=d&&d.beatMap.get(ACTION_BEAT),attack=action&&action.choices&&action.choices.find(x=>x.choiceId==="attack"),observe=d&&d.beatMap.get(OBSERVE_BEAT),securePackage=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package"),sequential=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="defeat_assassin_then_secure"),secure=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package_before_assassin"),original=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="go_after_original_target");
  const regs=PROVIDER.getRegisteredStoryFactualBindings();
  const checks={
-  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v5_2026_09_21",
+  patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v6_2026_09_21",
   writing100Pinned:AUTH.writing100==="21e0407a0c371310ff06096905fd1fce4107ece8",
   directStrikeFixedChain:!!attack&&attack.label==="STRIKE BEFORE THE HANDOFF"&&attack.nextBeatId===D.directIntro&&d.beatMap.has(D.directBattle)&&d.beatMap.has(D.directMiBattle)&&d.beatMap.has(D.directGroup),
   directStrikeExactConfigs:!!(BATTLE.configs&&BATTLE.configs[DIRECT_2V1]&&BATTLE.configs[DIRECT_MI]),
