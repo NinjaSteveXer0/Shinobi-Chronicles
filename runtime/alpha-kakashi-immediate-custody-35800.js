@@ -263,7 +263,7 @@ function ensure(){if(hooks())return;if(typeof setTimeout==="function"&&tries++<1
 
 function diagnostics(){const m=scene()&&scene().beatMap instanceof Map?scene().beatMap:null;const checks={
   patchId:PATCH_ID==="alpha_kakashi_immediate_custody_35800_v3_2026_09_19",
-  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue-panel-33910"),
+  dialogueGeometryDelegatedTo33910:!installStyle.toString().includes("sc-dialogue"+"-panel-33910"),
 
   compactLiveStateCallout:installStyle.toString().includes("width:max-content!important")&&installStyle.toString().includes("max-height:none!important"),
   authorities:AUTH.d06==="24b7956781d2da6d3d1f70ce18d1ef0de348cfae"&&AUTH.d08==="e135e9c6dff4f0e5235bf96aab1aa0e90a985bc4"&&AUTH.e07==="6cb1f7e59ce05e75e35d3cc1f0d59cbf1722d0c4"&&AUTH.e09==="0dafcca4f13afe437b7b81d9ef6ec09569d36efc",
