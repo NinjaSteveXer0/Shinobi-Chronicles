@@ -23,15 +23,17 @@
   "use strict";
   if(globalThis.SC_ALPHA_KAKASHI_BATTLE_INTERACTION_34500)return;
 
-  const VERSION="34500-v5";
-  const PATCH_ID="alpha_kakashi_battle_interaction_hotfix_34500_v5_2026_09_16";
+  const VERSION="34500-v6";
+  const PATCH_ID="alpha_kakashi_battle_interaction_34500_v6_2026_09_22";
   const KAKASHI="academy_kakashi";
+  const LEGACY_FIFTH_SKILL="academy_kakashi_prodigys_read";
+  const SUBSTITUTION_SKILL="academy_kakashi_substitution_jutsu";
   const EXACT_KAKASHI_SKILLS=new Set([
     "academy_kakashi_kunai_quickdraw",
     "academy_kakashi_clone_feint",
     "academy_kakashi_opening_exploit",
     "academy_kakashi_wire_snare",
-    "academy_kakashi_prodigys_read"
+    SUBSTITUTION_SKILL
   ]);
   const CARD_SELECTOR=[
     ".battle-live-skill-card:not(.is-empty)",
@@ -43,7 +45,6 @@
     "[onclick*='activateBattlePreparedSkillCard']"
   ].join(",");
   const boundCards=new WeakSet();
-  let observer=null;
   let hardenScheduled=false;
   let delegatedClickInstalled=false;
   let delegatedLearnInstalled=false;
@@ -143,7 +144,7 @@
 
     if(handlerMatch){
       const id=String(handlerMatch[1]||"").trim();
-      if(id)return id;
+      if(id)return id===LEGACY_FIFTH_SKILL?SUBSTITUTION_SKILL:id;
     }
 
     const dataset=card.dataset||{};
@@ -153,7 +154,7 @@
       ""
     ).trim();
 
-    if(direct)return direct;
+    if(direct)return direct===LEGACY_FIFTH_SKILL?SUBSTITUTION_SKILL:direct;
 
     if(card.querySelector){
       const child=card.querySelector(
@@ -167,7 +168,7 @@
           ""
         ).trim();
 
-        if(nested)return nested;
+        if(nested)return nested===LEGACY_FIFTH_SKILL?SUBSTITUTION_SKILL:nested;
       }
     }
 
@@ -543,26 +544,6 @@
       }catch(_error){}
     }
 
-    try{
-      card.style.setProperty(
-        "pointer-events",
-        "auto",
-        "important"
-      );
-
-      card.style.setProperty(
-        "position",
-        "relative",
-        "important"
-      );
-
-      card.style.setProperty(
-        "z-index",
-        "2",
-        "important"
-      );
-    }catch(_error){}
-
     return true;
   }
 
@@ -740,26 +721,7 @@
         ".battle-live-skill-deck"
       );
 
-    if(deck&&deck.style){
-      try{
-        deck.style.setProperty(
-          "pointer-events",
-          "auto",
-          "important"
-        );
-
-        deck.style.setProperty(
-          "z-index",
-          "45",
-          "important"
-        );
-
-        deck.style.setProperty(
-          "isolation",
-          "isolate"
-        );
-      }catch(_error){}
-    }
+    if(deck&&deck.classList)deck.classList.add("sc-kakashi-battle-deck-34500");
 
     let bound=0;
 
@@ -786,17 +748,7 @@
       }catch(_error){}
     };
 
-    if(
-      typeof queueMicrotask==="function"
-    ){
-      queueMicrotask(run);
-    }else if(
-      typeof setTimeout==="function"
-    ){
-      setTimeout(run,0);
-    }else{
-      run();
-    }
+    if(typeof queueMicrotask==="function")queueMicrotask(run);else run();
   }
 
   function resolveDelegatedCard34500(target){
@@ -1003,17 +955,6 @@
     return true;
   }
 
-  function installObserver34500(){
-    if(typeof MutationObserver!=="function"||typeof document==="undefined")return false;
-    const target=document.body||document.documentElement;
-    if(!target)return false;
-    observer=new MutationObserver(()=>{
-      if(activeKakashiBattle34500())scheduleHarden34500();
-    });
-    observer.observe(target,{childList:true,subtree:true});
-    return true;
-  }
-
   wrapRender34500("renderCombatOverlay");
   wrapRender34500("refreshBattleActionRegionPresentation");
   wrapRender34500("refreshBattleLiveDOM33000");
@@ -1024,7 +965,6 @@
   installDelegatedLearn34500();
   installDelegatedClick34500();
 
-  installObserver34500();
   scheduleHarden34500();
 
   function runAcademyKakashiBattleInteraction34500Diagnostics(){
