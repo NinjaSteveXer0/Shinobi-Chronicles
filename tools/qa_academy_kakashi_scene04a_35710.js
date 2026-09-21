@@ -126,7 +126,7 @@ assert(scene04Source.includes("opacity:1!important;filter:none!important"),"Scen
 assert(!scene04Source.includes("kakashiMiEnterRightward35710")&&!scene04Source.includes("sc-kakashi-state-exit-left-35710")&&!scene04Source.includes('actorMarkup35710("anbu_marked_target"'),"STOP THE ASSASSIN must not replay WATCH THE EXCHANGE AMT departure or MI arrival");
 assert(scene04Source.includes('index===4?"sc-kakashi-block-entry-35710"')&&scene04Source.includes('index===6&&isNarration?"sc-kakashi-state-exit-right-35710"'),"Scene 04A must animate Kakashi blocking first, then PS fleeing on the authored cue");
 assert(scene04Source.includes("kakashi-blocks-line"),"Kakashi blocking-line staging missing");
-assert(scene04Source.includes('name.textContent="NARRATION"'),"narration quick-read label missing");
+assert(!scene04Source.includes('querySelector(".sc-story-text")')&&!scene04Source.includes('querySelector&&layer.querySelector(".sc-story-text")'),"Scene 04A must delegate narration text projection to canonical 33910");
 assert(scene04Source.includes("alpha_kakashi_scene04a_35710_v10_2026_09_22"),"Scene 04A dialogue-lifecycle repair generation missing");
 assert(!scene04Source.includes('querySelectorAll(".sc-performance-surface-33910")')&&!scene04Source.includes("delete layer.dataset.scBoardUiMode"),"Scene 04A must not clear canonical 33910 dialogue surface/state");
 console.log("Academy Kakashi Scene 04A 35710 QA: PASS");
