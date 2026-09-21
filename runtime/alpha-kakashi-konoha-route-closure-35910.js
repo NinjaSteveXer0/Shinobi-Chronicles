@@ -568,8 +568,16 @@ function install(){
  if(!attack)return{success:false,reason:"direct_strike_source_choice_missing"};
  attack.label="STRIKE BEFORE THE HANDOFF";attack.nextBeatId=D.directIntro;attack.availability=available(true);attack.knownBlocker=null;attack.consequenceRequests=[{requestId:"kakashi_direct_strike_entry_35910",kind:"domain",resolve:()=>resolveDirectStrikeEntry(attack)}];
 
- const observe=d.beatMap.get(OBSERVE_BEAT),secure=observe&&Array.isArray(observe.choices)?observe.choices.find(row=>row&&row.choiceId==="secure_package_before_assassin"):null,original=observe&&Array.isArray(observe.choices)?observe.choices.find(row=>row&&row.choiceId==="go_after_original_target"):null;
- if(!secure||!original)return{success:false,reason:"observe_route_choices_missing"};
+ const observe=d.beatMap.get(OBSERVE_BEAT);
+ const securePackage=observe&&Array.isArray(observe.choices)?observe.choices.find(row=>row&&row.choiceId==="secure_package"):null;
+ const sequential=observe&&Array.isArray(observe.choices)?observe.choices.find(row=>row&&row.choiceId==="defeat_assassin_then_secure"):null;
+ const secure=observe&&Array.isArray(observe.choices)?observe.choices.find(row=>row&&row.choiceId==="secure_package_before_assassin"):null;
+ const original=observe&&Array.isArray(observe.choices)?observe.choices.find(row=>row&&row.choiceId==="go_after_original_target"):null;
+ if(!securePackage||!sequential||!secure||!original)return{success:false,reason:"observe_route_choices_missing"};
+ securePackage.label="SECURE THE PACKAGE";securePackage.nextBeatId="kak_observe_secure_package_battle";securePackage.availability=available(true);securePackage.knownBlocker=null;
+ securePackage.consequenceRequests=[{requestId:"kakashi_observe_secure_package_bridge_35910",kind:"domain",resolve:()=>beginSharedObserveBattleChoice35910("secure_package","academy_kakashi.battle.secure_package","kakashiObserveSecurePackageStoryDecisionReceiptId","kakashiObserveSecurePackageIntentCommitRef",securePackage.nextBeatId)}];
+ sequential.label="DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE";sequential.nextBeatId="kak_seq_mi_battle";sequential.availability=available(true);sequential.knownBlocker=null;
+ sequential.consequenceRequests=[{requestId:"kakashi_observe_sequential_bridge_35910",kind:"domain",resolve:()=>beginSharedObserveBattleChoice35910("defeat_assassin_then_secure","academy_kakashi.battle.defeat_assassin_then_secure","kakashiObserveSequentialStoryDecisionReceiptId","kakashiObserveSequentialIntentCommitRef",sequential.nextBeatId)}];
  secure.label="SECURE THE PACKAGE BEFORE THE ASSASSIN";secure.nextBeatId=D.secureBeforeIntro;secure.availability=available(true);secure.knownBlocker=null;secure.consequenceRequests=[{requestId:"kakashi_secure_before_resolve_35910",kind:"domain",resolve:()=>resolveSecureBeforeChoice(secure)}];
  original.label="GO AFTER THE ORIGINAL TARGET";original.nextBeatId=D.originalIntro;original.availability=available(true);original.knownBlocker=null;original.consequenceRequests=[{requestId:"kakashi_original_target_resolve_35910",kind:"domain",resolve:()=>resolveOriginalTargetChoice(original)}];
  patchGetCloserHandoff();
@@ -604,7 +612,7 @@ function ensurePresentationHooks35910(){if(installPresentationHooks35910())retur
 const installed=install();if(!installed||installed.success!==true)throw new Error("kakashi_konoha_route_closure_35910_install_failed:"+(installed&&installed.reason||"unknown"));ensurePresentationHooks35910();
 
 function diagnostics(){
- const d=scene(),action=d&&d.beatMap.get(ACTION_BEAT),attack=action&&action.choices&&action.choices.find(x=>x.choiceId==="attack"),observe=d&&d.beatMap.get(OBSERVE_BEAT),secure=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package_before_assassin"),original=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="go_after_original_target");
+ const d=scene(),action=d&&d.beatMap.get(ACTION_BEAT),attack=action&&action.choices&&action.choices.find(x=>x.choiceId==="attack"),observe=d&&d.beatMap.get(OBSERVE_BEAT),securePackage=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package"),sequential=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="defeat_assassin_then_secure"),secure=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="secure_package_before_assassin"),original=observe&&observe.choices&&observe.choices.find(x=>x.choiceId==="go_after_original_target");
  const regs=PROVIDER.getRegisteredStoryFactualBindings();
  const checks={
   patchId:PATCH_ID==="alpha_kakashi_konoha_route_closure_35910_v4_2026_09_20",
@@ -614,6 +622,7 @@ function diagnostics(){
   directGroupChoicesExact:JSON.stringify(d.beatMap.get(D.directGroup).choices.map(x=>x.label))===JSON.stringify(["TAKE THEM TO THE UCHIHA POLICE FORCE","TAKE THEM TO THE ANBU","KILL THEM","TAKE THE PACKAGE AND LET THEM GO"]),
   directVerbatimPerformances:DIRECT_INTRO_CUES.some(x=>x.text==="I saw enough.")&&DIRECT_MI_ARRIVAL_CUES.some(x=>x.text==="Not for what I came for.")&&DIRECT_RELEASE_CUES.length>0,
   directDispositionCommitsAtAction:commitDirectGroupDisposition.toString().includes("D.directPoliceHandoff")&&commitDirectGroupDisposition.toString().includes("D.directKill"),
+  canonicalObserveBattleBindings:!!securePackage&&securePackage.nextBeatId==="kak_observe_secure_package_battle"&&!!sequential&&sequential.nextBeatId==="kak_seq_mi_battle"&&securePackage.consequenceRequests.some(x=>x&&x.requestId==="kakashi_observe_secure_package_bridge_35910")&&sequential.consequenceRequests.some(x=>x&&x.requestId==="kakashi_observe_sequential_bridge_35910"),
   secureBeforeLive:!!secure&&secure.knownBlocker===null&&regs.some(x=>x.bindingRef===SECURE_BEFORE_BINDING),
   secureBeforeFailureUsesSharedBattleOwner:launchSecureBeforeBattle.toString().includes('"academy_kakashi.battle.secure_package"')&&launchSecureBeforeBattle.toString().includes('"kak_observe_secure_package_return"')&&ensureSecureBeforeSharedBattleIntent35910.toString().includes("AK_SA_020_FAILURE_RECONVERGENCE"),
   originalTargetLive:!!original&&original.knownBlocker===null&&regs.some(x=>x.bindingRef===ORIGINAL_TARGET_BINDING),
