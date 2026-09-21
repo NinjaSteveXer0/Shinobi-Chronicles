@@ -351,7 +351,7 @@ function diagnostics(){
     objectiveExact:OBJECTIVE==="Retrieve the package.",
     noDialogue:allCues.every(x=>!x.speakerName&&x.kind==="narration"),
     returnHookInstalled:!!ret&&Array.isArray(ret.onEnterConsequences)&&ret.onEnterConsequences.some(x=>x&&x.requestId===ENTRY_REQUEST),
-    standardCharacterCardScale:installStyle35730.toString().includes("width:min(94%,322px)")&&installStyle35730.toString().includes("width:min(96%,338px)")&&installStyle35730.toString().includes("max-height:505px"),
+    fieldGeometryDelegatedTo33910:installStyle35730.toString().includes("inherited from canonical 33910")&&!installStyle35730.toString().includes("width:min(94%,322px)")&&!installStyle35730.toString().includes("bottom:20%!important"),
     canonicalBackdropOwnership:renderScene05AW35730.toString().includes("applyStorySceneBoardBackdrop33900"),
     synchronousBoardRetirement:installHooks35730.toString().includes("registerStorySceneBoardRenderHook")&&!installHooks35730.toString().includes("renderStoryScenePresentationLayer=function")&&!installHooks35730.toString().includes("queueMicrotask(renderScene05AW35730)"),
     successorsFailClosed:successorPending("BRANCH_A").success===false,
