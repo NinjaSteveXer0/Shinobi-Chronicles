@@ -26,7 +26,7 @@ if(!KAK||typeof KAK.recordPostResolutionState!=="function"||typeof KAK.terminalG
 if(!CORE||typeof CORE.getStoryUnitSnapshot!=="function")throw new Error("kakashi_terminal_story_decision_authority_missing");
 if(typeof commitAcademyKakashiTerminalDebriefRewards34800!=="function"||typeof getAcademyKakashiOriginRewardSnapshot34800!=="function")throw new Error("kakashi_terminal_reward_adapter_34800_missing");
 
-const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v11_2026_09_21";
+const PATCH_ID="alpha_kakashi_terminal_debrief_35100_v12_2026_09_21";
 const ORIGIN_ID="academy_kakashi";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const PACKAGE_REF="kakashi_origin_outer_route_packet";
@@ -79,7 +79,17 @@ function active(){try{return typeof getActiveStorySceneRuntime==="function"?getA
 function scene(){try{return typeof getStorySceneDefinition==="function"?getStorySceneDefinition(SCENE_ID):null;}catch(_error){return null;}}
 function save(){try{if(typeof savePlayerData==="function")savePlayerData();}catch(_error){}}
 function local(){const rt=active();return rt&&rt.sceneId===SCENE_ID&&rt.localContext&&typeof rt.localContext==="object"?rt.localContext:null;}
-function latestResult(){const rt=active();return rt&&rt.sceneId===SCENE_ID&&rt.battleResume&&rt.battleResume.authored&&typeof rt.battleResume.authored==="object"?rt.battleResume.authored:null;}
+function resumeResults35100(){
+  const rt=active(),resume=rt&&rt.sceneId===SCENE_ID&&rt.battleResume&&typeof rt.battleResume==="object"?rt.battleResume:null,out=[];
+  for(const row of resume?[resume.authored,resume.projected,resume.result,resume.battleResult]:[])if(row&&row.battleConfigId)out.push(row);
+  try{const row=typeof projectAcademyKakashiOriginBattleResult==="function"?projectAcademyKakashiOriginBattleResult():null;if(row&&row.battleConfigId)out.push(row);}catch(_error){}
+  const seen=new Set();return out.filter(row=>{const key=`${String(row.battleConfigId||"")}::${String(row.battleOccurrenceId||"")}::${String(row.bindingRef||"")}`;if(seen.has(key))return false;seen.add(key);return true;});
+}
+function latestResult(expectedConfig=null){
+  const rows=resumeResults35100();
+  if(expectedConfig){const exact=rows.find(row=>String(row.battleConfigId||"")===String(expectedConfig));return exact||null;}
+  return rows[0]||null;
+}
 function factOf(row){return row&&(row.fact||row.data)||{};}
 function normalizedBeat(def,index){return typeof normalizeStorySceneBeat==="function"?normalizeStorySceneBeat(def,index):def;}
 function instanceKey(){const rt=active();return rt&&rt.sceneId===SCENE_ID?String(rt.instanceId||""):"";}
@@ -134,8 +144,10 @@ function validateImmediateBattleReward35100(result){
   return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"battle_reward_family_not_authorised",family,battleConfigId:config};
 }
 function captureBattleResult35100(expectedConfig=null){
-  const result=latestResult();if(!result)return{success:false,reason:"kakashi_terminal_battle_result_missing"};
-  if(expectedConfig&&String(result.battleConfigId||"")!==String(expectedConfig))return{success:false,reason:"kakashi_terminal_battle_config_mismatch",expectedConfig,actualConfig:String(result.battleConfigId||"")};
+  const result=latestResult(expectedConfig);if(!result){
+    const availableConfigs=resumeResults35100().map(row=>String(row&&row.battleConfigId||"")).filter(Boolean);
+    return expectedConfig?{success:false,reason:"kakashi_terminal_battle_config_mismatch",expectedConfig,actualConfigs:availableConfigs}:{success:false,reason:"kakashi_terminal_battle_result_missing"};
+  }
   const immediate=validateImmediateBattleReward35100(result);if(!immediate.success)return immediate;
   const compact=compactBattleResult(result);if(!compact)return{success:false,reason:"kakashi_terminal_battle_receipt_incomplete"};
   if(compact.lootGranted)return{success:false,reason:"kakashi_terminal_battle_illegally_granted_reward",violation:"generic_battle_loot_not_authorised"};
@@ -362,8 +374,9 @@ function installTerminalBeats35100(){
     };
     seqAmt.battle.__terminal35100Wrapped=true;
   }
-  pending.mode="choice";pending.environmentRef={assetId:ROOFTOP_ENV};pending.objectiveText="Report the mission outcome to ANBU.";pending.text="Kakashi returns to the ANBU rendezvous. The assignment cannot close until the factual report accounts for the package, encountered participants and every PL Battle without inventing unknown outcomes.";pending.exitScene=false;pending.allowPresentationClose=false;
-  pending.choices=[{choiceId:REPORT_CHOICE,label:"REPORT",nextBeatId:DEBRIEF_BEAT,availability:reportAvailability,consequenceRequests:[{requestId:"kakashi_terminal_debrief_commit_35100",kind:"domain",resolve:commitTerminalDebrief35100}]}];
+  pending.mode="dialogue";pending.environmentRef={assetId:ROOFTOP_ENV};pending.objectiveText="Report the mission outcome to ANBU.";pending.speakerName="ANBU OPERATIVE";pending.text="Report.";pending.nextBeatId=SUMMARY_BEAT;pending.exitScene=false;pending.allowPresentationClose=false;
+  pending.onEnterConsequences=[{requestId:"kakashi_terminal_debrief_commit_35100",kind:"domain",resolve:commitTerminalDebrief35100}];
+  pending.choices=[];
   const beats=[
     {beatId:DEBRIEF_BEAT,mode:"dialogue",environmentRef:{assetId:ROOFTOP_ENV},objectiveText:"Report the mission outcome to ANBU.",speakerName:"ANBU OPERATIVE",text:"Report.",nextBeatId:SUMMARY_BEAT,exitScene:false,allowPresentationClose:false},
     {beatId:SUMMARY_BEAT,mode:"narration",environmentRef:{assetId:ROOFTOP_ENV},objectiveText:"Report the mission outcome to ANBU.",presentationResolver:()=>({text:debriefSummaryText()}),text:"Kakashi gives the factual report.",nextBeatId:MINATO_BEAT,exitScene:false,allowPresentationClose:false},
@@ -382,9 +395,9 @@ function installTerminalBeats35100(){
 function diagnostics(){
   const def=scene(),map=def&&def.beatMap instanceof Map?def.beatMap:null,pending=map&&map.get(PENDING_BEAT),receipt=map&&map.get(RECEIPT_BEAT),finalBeat=map&&map.get(FINAL_BEAT),directPickReturn=map&&map.get(DIRECT_PICKPOCKET_RETURN_BEAT);
   const checks={
-    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v11_2026_09_21",
+    patchId:PATCH_ID==="alpha_kakashi_terminal_debrief_35100_v12_2026_09_21",
     rewardAdapterPresent:typeof commitAcademyKakashiTerminalDebriefRewards34800==="function",
-    pendingBecomesGuardedReport:!!pending&&pending.mode==="choice"&&Array.isArray(pending.choices)&&pending.choices.some(row=>row.choiceId===REPORT_CHOICE&&typeof row.availability==="function"),
+    pendingBecomesAutomaticReport:!!pending&&pending.mode==="dialogue"&&pending.text==="Report."&&pending.nextBeatId===SUMMARY_BEAT&&Array.isArray(pending.onEnterConsequences)&&pending.onEnterConsequences.some(row=>row.requestId==="kakashi_terminal_debrief_commit_35100")&&Array.isArray(pending.choices)&&pending.choices.length===0,
     packageFactFailClosed:committedPackageState.toString().includes("kakashi_terminal_package_state_unresolved"),
     scene05ALLossPackageStateConsumed:committedPackageState.toString().includes("kakashiScene05ALPackageOccurrenceId"),
     stopAssassinBattleCapture:supplementCurrentBattleCapture.toString().includes("STOP_ASSASSIN_CONFIG"),
