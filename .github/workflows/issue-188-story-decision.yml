@@ -272,7 +272,7 @@ jobs:
           grep -Fq 'FIELD_SECURED_PENDING_COLLECTION' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'COLLECTED_ACTIVE_ESCORT' runtime/alpha-kakashi-field-secured-35920.js
           grep -Fq 'TAKE THEM ALL BACK TO ANBU' runtime/alpha-kakashi-field-secured-35920.js
-          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v5_2026_09_21' runtime/alpha-kakashi-konoha-route-closure-35910.js
+          grep -Fq 'alpha_kakashi_konoha_route_closure_35910_v6_2026_09_21' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'AK_SA_020_FAILURE_RECONVERGENCE' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'GO AFTER THE ORIGINAL TARGET' runtime/alpha-kakashi-konoha-route-closure-35910.js
           grep -Fq 'alpha_kakashi_konoha_closure_35900_v3_2026_09_21' runtime/alpha-kakashi-konoha-writing-closure-35900.js
