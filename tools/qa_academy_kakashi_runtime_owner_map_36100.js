@@ -17,10 +17,10 @@ const polish=read("runtime/alpha-kakashi-scene-board-polish-33910.js");
 const terminal=read("runtime/alpha-kakashi-terminal-debrief-35100.js");
 const dynamicTerminal=read("runtime/alpha-kakashi-dynamic-terminal-35940.js");
 
-assert(/^const BUILD="kakashi-final-20260922-96";$/m.test(loader),"Kakashi loader not on gen94");
-assert(/story-decision-20260922-24/.test(integrator),"root Story delivery not generation 22");
-assert(/kakashi-final-20260922-96/.test(storyDecision),"Story Decision does not deliver Kakashi gen94");
-assert(/scene-board-20260922-20/.test(restoration),"Scene Board bootstrap not generation 19");
+assert(/^const BUILD="kakashi-final-20260922-97";$/m.test(loader),"Kakashi loader not on Golden dialogue repair generation 97");
+assert(/story-decision-20260922-25/.test(integrator),"root Story delivery not Golden dialogue repair generation 25");
+assert(/kakashi-final-20260922-97/.test(storyDecision),"Story Decision does not deliver Kakashi generation 97");
+assert(/scene-board-20260922-21/.test(restoration),"Scene Board bootstrap not dialogue repair generation 21");
 
 const loaded=[...loader.matchAll(/const\s+[A-Z0-9_]+_PATH="([^"]+)"/g)].map(m=>m[1]);
 assert.strictEqual(loaded.length,31,"unexpected Kakashi production child count; reconcile owner map before changing loader");
@@ -43,9 +43,16 @@ const loadedSources=new Map(loaded.map(file=>[file,read(file)]));
 for(const [file,src] of loadedSources){
   assert(!/globalThis\.renderStoryScenePresentationLayer\s*=(?!=)/.test(src),"route module still owns global Story renderer: "+file);
   assert(!src.includes("sc-dialogue-panel-33910"),"route module still owns Kakashi dialogue geometry: "+file);
+  assert(!/querySelector\(["']\.sc-story-text["']\)/.test(src),"route module still writes native Story cue text: "+file);
+  assert(!/querySelector\(["']\.sc-story-name["']\)/.test(src),"route module still writes native Story speaker text: "+file);
+  assert(!/function\s+wipe\s*\(/.test(src),"route module still owns a competing Story wipe: "+file);
+  assert(!src.includes("layer.dataset.scBoardUiMode"),"route module still owns canonical Scene Board dialogue mode: "+file);
+  assert(!src.includes('querySelectorAll(".sc-performance-surface-33910")'),"route module still deletes canonical 33910 performance surface: "+file);
 }
 assert(/globalThis\.renderStoryScenePresentationLayer\s*=renderStoryScenePresentationLayer33910/.test(polish),"33910 is not the sole Kakashi Story renderer wrapper");
 assert(polish.includes("sc-dialogue-panel-33910")&&polish.includes("top:4%!important"),"33910 canonical dialogue geometry missing");
+assert(polish.includes('const PRESENTATION_HOOK_ID_33910="kakashi_scene_board_projection_33910"')&&polish.includes("registerStorySceneBoardRenderHook(PRESENTATION_HOOK_ID_33910"),"33910 is not synchronized through the 33900 render lifecycle");
+assert(polish.includes('node.style.removeProperty("display")')&&!polish.includes('setProperty("display","none","important")'),"33910 retains sticky inline native-layout suppression");
 assert(board.includes("registerStorySceneBoardRenderHook")&&board.includes("runStorySceneBoardRenderHooks"),"33900 render-hook ownership missing");
 assert(board.includes('background:#020508!important')&&board.includes('layer.style.setProperty("--sc-scene-board-backdrop"'),"33900 fail-closed full-screen backdrop ownership missing");
 
