@@ -54,7 +54,7 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v18_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v18_33910_2026_09_21'));
+  assert("kakashi_v19_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v19_33910_2026_09_22'));
   assert("terminal_report_stages_anbu",kakashiV4Source.includes('kak_seq_debrief_pending')&&kakashiV4Source.includes('terminalReportProjection33910')&&kakashiV4Source.includes('konoha_anbu_contact'));
   assert("terminal_hokage_scene_staged",kakashiV4Source.includes('kak_terminal_minato_private_evaluation_35100')&&kakashiV4Source.includes('Assets/Kage/kage_minato.png')&&kakashiV4Source.includes('Kakashi Origin Backdrop/hokage_administration_interior_night.png')&&kakashiV4Source.includes('HOKAGE ADMINISTRATION · NIGHT'));
   assert("terminal_final_chronicle_beat_stays_on_scene_board",kakashiV4Source.includes('kak_terminal_chronicle_begins_35100')&&kakashiV4Source.includes("terminalFinalPerformance33910")&&kakashiV4Source.includes('text:"YOUR CHRONICLE BEGINS"')&&kakashiV4Source.includes('kak_terminal_chronicle_begins_35100:()=>terminalFinalPerformance33910()'));
@@ -71,11 +71,26 @@ try{
 
   const terminalScene=scenes.get(active.sceneId);
   terminalScene.beatMap.set("kak_terminal_minato_private_evaluation_35100",{beatId:"kak_terminal_minato_private_evaluation_35100",mode:"narration",nextBeatId:null});
-  context.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940={minatoPerformance:()=>[
+  context.SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940={
+   reportPerformance:()=>[
+    {cueId:"terminal_report_01",kind:"narration",text:"Kakashi returns to the rooftop.",focusActorRef:"academy_kakashi"},
+    {cueId:"terminal_report_02",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Report.",focusActorRef:"konoha_anbu_contact"},
+    {cueId:"terminal_report_03",kind:"dialogue",speakerName:"KAKASHI",text:"I lost the package.",focusActorRef:"academy_kakashi"}
+   ],
+   minatoPerformance:()=>[
     {cueId:"qa_minato_1",kind:"narration",text:"Later, in private, Minato reviews the sealed field record.",focusActorRef:"hokage_minato"},
     {cueId:"qa_minato_2",kind:"dialogue",speakerName:"MINATO",text:"He brought the package back.",focusActorRef:"hokage_minato"},
     {cueId:"qa_minato_3",kind:"dialogue",speakerName:"ANBU OPERATIVE",text:"Yes.",focusActorRef:"konoha_anbu_contact"}
-  ]};
+   ]
+  };
+  terminalScene.beatMap.set("kak_seq_debrief_pending",{beatId:"kak_seq_debrief_pending",mode:"dialogue",nextBeatId:"kak_terminal_debrief_summary_35100"});
+  terminalScene.beatMap.set("kak_terminal_debrief_summary_35100",{beatId:"kak_terminal_debrief_summary_35100",mode:"narration",nextBeatId:"kak_terminal_minato_private_evaluation_35100"});
+  active.beatId="kak_seq_debrief_pending";active.localContext={};
+  const reportOpeningPerformance=context.getStoryScenePerformance33900();
+  assert("terminal_report_opening_performs_arrival_then_report",reportOpeningPerformance&&reportOpeningPerformance.sequence.length===2&&reportOpeningPerformance.sequence[0].text==="Kakashi returns to the rooftop."&&reportOpeningPerformance.sequence[1].speakerName==="ANBU OPERATIVE"&&reportOpeningPerformance.sequence[1].text==="Report.",reportOpeningPerformance);
+  active.beatId="kak_terminal_debrief_summary_35100";active.localContext={};
+  const reportBodyPerformance=context.getStoryScenePerformance33900();
+  assert("terminal_report_summary_continues_as_click_per_line_dialogue",reportBodyPerformance&&reportBodyPerformance.sequence.length===1&&reportBodyPerformance.sequence[0].speakerName==="KAKASHI"&&reportBodyPerformance.sequence[0].text==="I lost the package.",reportBodyPerformance);
   active.beatId="kak_terminal_minato_private_evaluation_35100";active.localContext={};
   const terminalPerformance=context.getStoryScenePerformance33900();
   assert("terminal_minato_runtime_performance_resolves",terminalPerformance&&terminalPerformance.sequence.length===3&&terminalPerformance.cue.kind==="narration",terminalPerformance);
@@ -140,6 +155,8 @@ try{
   assert("direct_kill_projects_fall_motion",directKill.actors.filter(a=>a.id!=="academy_kakashi").length===3&&directKill.actors.filter(a=>a.id!=="academy_kakashi").every(a=>a.motion==="fall"),directKill);
   const directRelease=projection("kak_konoha_direct_strike_release_all_35910");
   assert("direct_release_projects_exit_motion",directRelease.actors.filter(a=>a.id!=="academy_kakashi").length===3&&directRelease.actors.filter(a=>a.id!=="academy_kakashi").every(a=>a.motion==="exit"),directRelease);
+  const directPickpocketBattle=projection("kak_scene03d_pickpocket_failure_3v1_battle_34710");
+  assert("direct_pickpocket_3v1_transition_stages_all_four_actors",directPickpocketBattle&&directPickpocketBattle.mode==="battle_transition"&&directPickpocketBattle.actors.map(a=>a.id).join("|")==="academy_kakashi|anbu_marked_target|package_smuggler|masked_interceptor"&&directPickpocketBattle.actors.find(a=>a.id==="masked_interceptor").entering===true,directPickpocketBattle);
 
   const transfer=projection("kak_original_transfer",{kakashiOriginalAction:"observe",__storyPerformanceCursor33900:{beatId:"kak_original_transfer",index:2}});
   assert("masked_interceptor_enters_as_amt_breaks_away",transfer.actors.length===3&&transfer.actors.some(a=>a.label==="MASKED INTERCEPTOR"&&a.state==="BURSTING FROM SHADOW"&&a.entering===true)&&transfer.actors.some(a=>a.label==="ANBU MARKED TARGET"&&a.state==="BREAKING AWAY")&&transfer.actors.some(a=>a.label==="PACKAGE SMUGGLER"&&a.state==="HAS PACKAGE")&&!transfer.actors.some(a=>a.label==="KAKASHI")&&transfer.objects.length===0,transfer);
