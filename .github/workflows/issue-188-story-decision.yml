@@ -199,10 +199,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260922-24' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260922-25' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260922-96' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260922-96";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260922-97' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260922-97";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -310,11 +310,13 @@ jobs:
           grep -Fq 'performStorySceneCut33900' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-loss-ending-35820.js
           grep -Fq 'kakashiKnowledgeGranted:false' runtime/alpha-kakashi-loss-ending-35820.js
-          grep -Fq 'alpha_kakashi_immediate_custody_35800_v4_2026_09_21' runtime/alpha-kakashi-immediate-custody-35800.js
+          grep -Fq 'alpha_kakashi_immediate_custody_35800_v5_2026_09_22' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'beginImmediateCustodyChoice35800' runtime/alpha-kakashi-immediate-custody-35800.js
           grep -Fq 'sc-live-state-callout-33900' runtime/alpha-kakashi-immediate-custody-35800.js
           if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-immediate-custody-35800.js; then echo '35800 must not own Kakashi dialogue geometry'; exit 1; fi
           if grep -Fq 'sc-dialogue-panel-33910' runtime/alpha-kakashi-loss-ending-35820.js; then echo '35820 must not own Kakashi dialogue geometry'; exit 1; fi
+          if grep -R -F 'querySelector(".sc-story-text")' runtime/alpha-kakashi-scene04a-35710.js runtime/alpha-kakashi-scene05a-w-35730.js runtime/alpha-kakashi-scene05a-l-35750.js runtime/alpha-kakashi-scene06a-w2c-35760.js runtime/alpha-kakashi-w2c-ending-35770.js runtime/alpha-kakashi-w2c-nonkill-35780.js runtime/alpha-kakashi-immediate-custody-35800.js runtime/alpha-kakashi-deterministic-kill-35810.js runtime/alpha-kakashi-loss-ending-35820.js runtime/alpha-kakashi-post-mi-death-pursuit-35830.js; then echo 'route-local native Story cue projection reappeared'; exit 1; fi
+          if grep -R -E 'function[[:space:]]+wipe[[:space:]]*\(' runtime/alpha-kakashi-scene04a-35710.js runtime/alpha-kakashi-scene05a-w-35730.js runtime/alpha-kakashi-scene05a-l-35750.js runtime/alpha-kakashi-scene06a-w2c-35760.js runtime/alpha-kakashi-w2c-ending-35770.js runtime/alpha-kakashi-w2c-nonkill-35780.js runtime/alpha-kakashi-immediate-custody-35800.js runtime/alpha-kakashi-deterministic-kill-35810.js runtime/alpha-kakashi-loss-ending-35820.js runtime/alpha-kakashi-post-mi-death-pursuit-35830.js; then echo 'route-local Story wipe owner reappeared'; exit 1; fi
           grep -Fq 'alpha_kakashi_scene03a_35700_v8_2026_09_20' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchMiBurst35700' runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'scWatchAmtExitGhost35700' runtime/alpha-kakashi-scene03a-35700.js
