@@ -424,7 +424,7 @@ function diagnostics(){
     authorityPinned:AUTHORITY==="bef78d90ccdea0206199ca0cdd06593ce3a0adb1",
     exactNarration:JSON.stringify(CUES_OPEN.map(function(row){return row.text;}))===JSON.stringify(exactOpen)&&JSON.stringify(CUES_CLOSED.map(function(row){return row.text;}))===JSON.stringify(exactClosed)&&CUES_OPEN.concat(CUES_CLOSED).every(function(row){return row.kind==="narration"&&!row.speakerName;}),
     exactEntryGate:lateEntryEligible.toString().includes("kakashiScene05AWEntered===true")&&lateEntryEligible.toString().includes(">=1")&&!lateEntryEligible.toString().includes("kakashiScene05AWPursuitEligible===false")&&lateEntryEligible.toString().includes("DEFEATED_BUT_NOT_CONTROLLED"),
-    postRenderConsumerRewire:typeof globalThis.renderStoryScenePresentationLayer==="function"&&globalThis.renderStoryScenePresentationLayer.toString().includes("const settle=function(){wireSourceChoice();renderScene();}"),
+    renderDelegatedTo33900:installHooks.toString().includes('registerStorySceneBoardRenderHook("kakashi_scene06aw2c_35760"')&&!installHooks.toString().includes("renderStoryScenePresentationLayer=function"),
     intentBeforeResolver:prepareScene06AW2CSourceChoice.toString().includes("ensureLethalIntent")&&!prepareScene06AW2CSourceChoice.toString().includes("resolveStoryFactualAction"),
     sourceChoiceWired:wireSourceChoice()===true&&wireSourceChoice.toString().includes("SOURCE_REQUEST")&&wireSourceChoice.toString().includes("prepareScene06AW2CSourceChoice"),
     exactResolverEnvelope:!!binding&&JSON.stringify(binding.outcomeRefs)===JSON.stringify(OUTCOMES.map(function(row){return row.outcomeRef;})),
