@@ -55,6 +55,17 @@ const postMi=occurrences.get(out.packageOccurrenceId);
 assert(postMi,"post-MI recovery occurrence missing");
 assert.strictEqual(postMi.fact.parentOccurrenceRef,"fresh-post-mi","STOP post-MI recovery consumed stale Get-Closer provenance");
 assert.strictEqual(postMi.fact.packageState.currentHolderClass,"KAKASHI");
+assert(classifications.some(row=>row.participantRef==="academy_kakashi_origin_package_smuggler"&&row.stateClass==="BATTLE_DEFEATED_UNRESOLVED"),"PS victory did not commit canonical unrestrained defeat classification");
+
+// PS Battle defeat preserves prior package custody but must classify PS as escaped.
+occurrences.clear();materials.clear();classifications.length=0;
+active={sceneId:"origin_academy_kakashi_anbu_retrieval",instanceId:"qa-post-mi-loss",beatId:"qa-return",localContext:{kakashiSequentialPackageOccurrenceId35100:"qa-loss-parent",kakashiSequentialPackageOccurrenceId:"qa-loss-parent",kakashiPostMiPackageOccurrenceId:"qa-loss-parent"}};
+occurrence("qa-loss-parent","PACKAGE_SMUGGLER");
+const lossResult={battleConfigId:"academy_kakashi_origin_battle_seq_ps",bindingRef:"academy_kakashi.battle.stop_assassin_post_mi_ps",battleOccurrenceId:"qa-post-mi-loss-battle",resultState:"opposition_side_victory",participants:[]};
+out=context.resolveAcademyKakashiSequentialPostPsPackageRecovery35600(lossResult);
+assert.strictEqual(out.success,true,"PS defeat resolution failed: "+JSON.stringify(out));
+assert.strictEqual(out.recovered,false);
+assert(classifications.some(row=>row.participantRef==="academy_kakashi_origin_package_smuggler"&&row.stateClass==="ESCAPED"),"PS defeat did not commit escape classification");
 
 // Original sequential Observe route retains its valid Get-Closer handoff parent.
 occurrences.clear();materials.clear();classifications.length=0;
