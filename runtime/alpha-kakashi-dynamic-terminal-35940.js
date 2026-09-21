@@ -175,7 +175,7 @@ function reportText35940(state=buildProjectionState35940()){
  }
  if(state.knowledge.getCloserSuccess)lines.push("ANBU OPERATIVE: “You heard them before you moved.”","KAKASHI: “Yes.”","ANBU OPERATIVE: “What did you learn?”","KAKASHI: “If the street stayed clear, the original carrier was supposed to hand the package over.”","ANBU OPERATIVE: “And if it didn't?”","KAKASHI: “He kept moving with it.”","ANBU OPERATIVE: “Destination?”","KAKASHI: “They didn't say.”");
  if(state.knowledge.askDestination)lines.push("ANBU OPERATIVE: “What did the original target tell you?”","KAKASHI: “His job ended at the handoff. The receiver was supposed to take it onward.”","ANBU OPERATIVE: “Where?”","KAKASHI: “He didn't know.”");
- if(state.pakkun.present)lines.push("ANBU OPERATIVE: “And the ninken?”","PAKKUN: “Temporary.”","PAKKUN: “I was there when it mattered.”","KAKASHI: “He helped.”","PAKKUN: “Better.”");
+ if(state.pakkun.present)lines.push("ANBU OPERATIVE: “And the ninken?”","NINKEN: “Temporary.”","NINKEN: “I was there when it mattered.”","KAKASHI: “He helped.”","NINKEN: “Better.”");
  return lines.join("\n\n");
 }
 function packageReceiptLine(state){
