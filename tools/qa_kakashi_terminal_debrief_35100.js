@@ -193,6 +193,12 @@ assert.strictEqual(truth(`__qaRuntime.localContext.kakashiTerminalSequentialAmtR
 const seqFacts=plain(`SC_ALPHA_KAKASHI_TERMINAL_DEBRIEF_35100.deriveTerminalFacts()`);
 assert.strictEqual(seqFacts.success,false,"sequential timing benchmark bypassed unresolved package state");
 assert.strictEqual(seqFacts.reason,"kakashi_terminal_package_state_unresolved");
+const terminalObjectives=plain(`(()=>{const m=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap;return{pending:m.get("kak_seq_debrief_pending").objectiveText,minato:m.get("kak_terminal_minato_private_evaluation_35100").objectiveText,receipt:m.get("kak_terminal_chronicle_receipt_35100").objectiveText,final:m.get("kak_terminal_chronicle_begins_35100").objectiveText};})()`);
+assert.strictEqual(terminalObjectives.pending,"Report the mission outcome to ANBU.");
+assert.strictEqual(terminalObjectives.minato,"Private review of the sealed field record.");
+assert.strictEqual(terminalObjectives.receipt,"Private review of the sealed field record.");
+assert.strictEqual(terminalObjectives.final,"","final Chronicle boundary must explicitly clear the prior objective");
+
 const reportChoice=plain(`(()=>{const c=getStorySceneDefinition("origin_academy_kakashi_anbu_retrieval").beatMap.get("kak_seq_debrief_pending").choices[0],a=c.availability();return{choiceId:c.choiceId,available:a.available,knownBlocker:a.knownBlocker};})()`);
 assert.strictEqual(reportChoice.choiceId,"kak_terminal_report_35100");
 assert.strictEqual(reportChoice.available,false);
