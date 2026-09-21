@@ -136,6 +136,8 @@ assert.strictEqual(out.pakkunState,"PRESENT","Pakkun must remain present when th
 assert.strictEqual(active.localContext.kakashiPostMiPakkunPresent,true);
 assert(active.localContext.kakashiCe256PackageOccurrenceId,"CE #256 package occurrence missing");
 assert(active.localContext.kakashiCe256PakkunOccurrenceId,"CE #256 Pakkun autonomy occurrence missing");
+let snapParticipants=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi").participantStates;
+assert.strictEqual(snapParticipants[AMT].stateClass,"ESCAPED","CE #256 AMT defeat did not classify AMT as escaped");
 const elsewherePackage=occurrenceStore.get(active.localContext.kakashiCe256PackageOccurrenceId);
 assert.strictEqual(elsewherePackage.fact.worldFacts.battleVictoryDidNotImplyPackageCustody,true);
 const snapElsewhere=globalThis.SC_STORY_DECISION_REALISATION_34000.getStoryUnitSnapshot("academy_kakashi");
