@@ -4,7 +4,7 @@ const assert=require("assert"),fs=require("fs"),vm=require("vm"),path=require("p
 function load(rel){vm.runInThisContext(fs.readFileSync(path.resolve(process.cwd(),rel),"utf8"),{filename:rel});}
 
 const SCENE="origin_academy_kakashi_anbu_retrieval";
-const MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken",PACKAGE="kakashi_origin_outer_route_packet";
+const KAK="academy_kakashi",MI="academy_kakashi_origin_masked_interceptor",PS="academy_kakashi_origin_package_smuggler",AMT="academy_kakashi_origin_amt",PAKKUN="pakkun_origin_unfamiliar_ninken",PACKAGE="kakashi_origin_outer_route_packet";
 
 globalThis.playerData={activityHistory:[]};
 globalThis.savePlayerData=()=>true;
