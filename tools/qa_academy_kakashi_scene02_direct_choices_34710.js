@@ -129,7 +129,9 @@ assert.strictEqual(launched.pakkunAuthorized,false);
 
 const participant=participantRef=>({participantRef,side:"enemy",battleStatus:"defeated",lifeState:"unresolved",custodyState:"unresolved"});
 active.battleResume={authored:{battleOccurrenceId:"qa-battle-direct-pick-victory",battleConfigId:"academy_kakashi_origin_battle_amt_ps_mi_3v1",bindingRef:"academy_kakashi.resolver.pickpocket_direct",resultState:"player_side_victory",rewardGranted:false,lootGranted:false,participants:[participant("academy_kakashi_origin_amt"),participant("academy_kakashi_origin_package_smuggler"),participant("academy_kakashi_origin_masked_interceptor")]}};
-const battleReturn=definition.beatMap.get(MOD.pickpocketBattleReturnBeatId);\nassert(battleReturn&&battleReturn.mode==="choice","direct Pickpocket Battle return must be a disposition choice surface");\nassert.strictEqual(battleReturn.nextBeatId,undefined,"3-v-1 victory still bypasses dispositions to debrief");
+const battleReturn=definition.beatMap.get(MOD.pickpocketBattleReturnBeatId);
+assert(battleReturn&&battleReturn.mode==="choice","direct Pickpocket Battle return must be a disposition choice surface");
+assert.strictEqual(battleReturn.nextBeatId,undefined,"3-v-1 victory still bypasses dispositions to debrief");
 const returnReq=battleReturn.onEnterConsequences.find(r=>r.requestId===MOD.pickpocketBattleReturnRequestId);assert(returnReq,"direct Pickpocket Battle return request missing");
 const returned=returnReq.resolve();assert.strictEqual(returned.success,true,`direct Pickpocket victory return failed: ${JSON.stringify(returned)}`);
 assert.strictEqual(returned.packageHolderClass,"KAKASHI");
@@ -171,7 +173,10 @@ active.battleResume={authored:{battleOccurrenceId:"qa-battle-direct-pick-defeat"
 const defeated=MOD.consumeDirectPickpocket3v1Return();assert.strictEqual(defeated.success,true,`direct Pickpocket defeat return failed: ${JSON.stringify(defeated)}`);
 assert.strictEqual(defeated.packageHolderClass,"ANBU_MARKED_TARGET");assert.strictEqual(defeated.participantClassifications.length,3);assert(defeated.participantClassifications.every(row=>row.stateClass==="ESCAPED"),"3-v-1 defeat did not classify all three as escaped");
 postFact=(globalThis.playerData.activityHistory.find(row=>row.occurrenceId===defeated.occurrenceId).fact||globalThis.playerData.activityHistory.find(row=>row.occurrenceId===defeated.occurrenceId).data);
-assert.strictEqual(postFact.worldFacts.amtEscapesWithPackage,true);assert.strictEqual(postFact.worldFacts.pakkunPresent,false);\nconst defeatChoices=battleReturn.choices.filter(row=>row.availability().available);\nassert.deepStrictEqual(defeatChoices.map(row=>row.label),["RETURN TO ANBU"],"3-v-1 defeat exposed victory dispositions or lost RETURN TO ANBU");\n
+assert.strictEqual(postFact.worldFacts.amtEscapesWithPackage,true);assert.strictEqual(postFact.worldFacts.pakkunPresent,false);
+const defeatChoices=battleReturn.choices.filter(row=>row.availability().available);
+assert.deepStrictEqual(defeatChoices.map(row=>row.label),["RETURN TO ANBU"],"3-v-1 defeat exposed victory dispositions or lost RETURN TO ANBU");
+
 assert(saves>0,"Scene 02 routes never persisted state");
 console.log("Academy Kakashi Scene 02 direct choices 34710 QA: PASS");
 console.log("- STRIKE BEFORE THE HANDOFF: selectable, semantic + factual state commits, exact missing resolver continuation remains fail-closed");
