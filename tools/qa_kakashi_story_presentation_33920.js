@@ -10,8 +10,8 @@ assert(compat.includes("academy_kakashi_story_presentation_compat_33920_retired_
 assert(!/new\s+MutationObserver\s*\(/.test(compat),"retired 33920 must not construct a DOM observer");
 assert(!compat.includes("style.textContent")&&!compat.includes("addEventListener(\"click\""),"retired 33920 must own no CSS/click handler");
 assert(!restoration.includes("alpha-kakashi-story-presentation-compat-33920.js"),"33800 must not production-load retired 33920");
-assert(restoration.includes('const BUILD="scene-board-20260921-14";'));
-assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260921-14";'));
+assert(restoration.includes('const BUILD="scene-board-20260921-15";'));
+assert(traversal.includes('const SCENE_BOARD_BUILD="scene-board-20260921-15";'));
 
 for(const marker of [
  "former 33920 compatibility behavior",
