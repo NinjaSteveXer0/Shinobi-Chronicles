@@ -59,9 +59,9 @@ const storyDecision=read("runtime/alpha-story-decision-realisation-34000.js");
 const loader=read("runtime/alpha-kakashi-final-origin-adapter-34100.js");
 const restoration=read("runtime/alpha-kakashi-original-origin-restoration-33800.js");
 const traversal=read("runtime/alpha-traversal-bridge-33200.js");
-assert(/script\.src="runtime\/alpha-story-decision-realisation-34000\.js\?sc=story-decision-20260921-21";/.test(integrator),"active root Story delivery is not generation 21");
-assert(/script\.src="runtime\/alpha-kakashi-final-origin-adapter-34100\.js\?sc=kakashi-final-20260921-93";/.test(storyDecision),"active Kakashi parent delivery is not gen93");
-assert(/^const BUILD="kakashi-final-20260921-93";$/m.test(loader),"active Kakashi loader is not gen93");
+assert(/script\.src="runtime\/alpha-story-decision-realisation-34000\.js\?sc=story-decision-20260922-22";/.test(integrator),"active root Story delivery is not generation 22");
+assert(/script\.src="runtime\/alpha-kakashi-final-origin-adapter-34100\.js\?sc=kakashi-final-20260922-94";/.test(storyDecision),"active Kakashi parent delivery is not gen94");
+assert(/^const BUILD="kakashi-final-20260922-94";$/m.test(loader),"active Kakashi loader is not gen94");
 assert(/^\s*const BUILD="scene-board-20260921-17";$/m.test(restoration),"active Scene Board restoration delivery is not generation 17");
 assert(/^const SCENE_BOARD_BUILD="scene-board-20260921-17";$/m.test(traversal),"active traversal Scene Board delivery is not generation 17");
 assert(!restoration.includes("alpha-kakashi-story-presentation-compat-33920.js"),"retired 33920 returned to production load path");
@@ -159,8 +159,8 @@ console.log(JSON.stringify({
  qaHarnessCount:results.length,
  routeMatrix:routeRows,
  deliveryParity:{
-   storyDecision:"story-decision-20260921-21",
-   kakashiFinal:"kakashi-final-20260921-93",
+   storyDecision:"story-decision-20260922-22",
+   kakashiFinal:"kakashi-final-20260922-94",
    sceneBoard:"scene-board-20260921-17"
  },
  terminalTail:manifest.commonTerminalTail.required,
