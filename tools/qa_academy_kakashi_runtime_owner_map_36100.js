@@ -73,10 +73,7 @@ assert(!/commitOccurrence|recordParticipantClassification|savePlayerData/.test(d
 
 const observerOwners=[];
 for(const [file,src] of loadedSources)if(/new\s+MutationObserver\s*\(/.test(src))observerOwners.push(file);
-assert.deepStrictEqual(observerOwners.sort(),[
- "runtime/alpha-kakashi-battle-interaction-hotfix-34500.js",
- "runtime/alpha-kakashi-substitution-34900.js"
-].sort(),"unexpected MutationObserver owner in Kakashi production chain");
+assert.deepStrictEqual(observerOwners,[],"Kakashi production chain must not use MutationObserver presentation/interaction owners");
 
 const badClasses=manifest.responsibilities.filter(row=>["SUPERSEDED BUT STILL LIVE","UNKNOWN"].includes(row.classification));
 assert.deepStrictEqual(badClasses,[],"owner map retains unresolved live classifications");
