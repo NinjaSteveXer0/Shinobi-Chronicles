@@ -52,7 +52,7 @@ for(const [file,src] of loadedSources){
 assert(/globalThis\.renderStoryScenePresentationLayer\s*=renderStoryScenePresentationLayer33910/.test(polish),"33910 is not the sole Kakashi Story renderer wrapper");
 assert(polish.includes("sc-dialogue-panel-33910")&&polish.includes("top:4%!important"),"33910 canonical dialogue geometry missing");
 assert(polish.includes('const PRESENTATION_HOOK_ID_33910="kakashi_scene_board_projection_33910"')&&polish.includes("registerStorySceneBoardRenderHook(PRESENTATION_HOOK_ID_33910"),"33910 is not synchronized through the 33900 render lifecycle");
-assert(polish.includes('node.style.removeProperty("display")')&&!polish.includes('setProperty("display","none","important")'),"33910 retains sticky inline native-layout suppression");
+assert(polish.includes('function syncNativePerformanceLayout33910(layer){')&&polish.includes('node.style.removeProperty("display")')&&polish.includes("!syncNativePerformanceLayout33910.toString().includes('setProperty(\"display\",\"none\",\"important\")')"),"33910 retains sticky inline native-layout suppression");
 assert(board.includes("registerStorySceneBoardRenderHook")&&board.includes("runStorySceneBoardRenderHooks"),"33900 render-hook ownership missing");
 assert(board.includes('background:#020508!important')&&board.includes('layer.style.setProperty("--sc-scene-board-backdrop"'),"33900 fail-closed full-screen backdrop ownership missing");
 
