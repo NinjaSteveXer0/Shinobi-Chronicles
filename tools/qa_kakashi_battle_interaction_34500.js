@@ -18,10 +18,13 @@ const exactFive=[
   "academy_kakashi_clone_feint",
   "academy_kakashi_opening_exploit",
   "academy_kakashi_wire_snare",
-  "academy_kakashi_prodigys_read"
+  "academy_kakashi_substitution_jutsu"
 ];
 
-assert(src.includes('const VERSION="34500-v5"'),"34500 v5 not active");
+assert(src.includes('const VERSION="34500-v6"'),"34500 v6 not active");
+assert(!/new\s+MutationObserver\s*\(/.test(src),"34500 must not use a DOM MutationObserver");
+assert(!src.includes("card.style.setProperty"),"34500 must not use per-card inline style overrides");
+assert(src.includes("buildActionPresentation34500")&&src.includes("captureBattleEvidence34500")&&src.includes("renderKakashiBattlePresentation34500"),"factual Battle presentation chain missing");
 assert(src.includes('document.addEventListener(\n      "pointerover",'),"delegated pointer hover missing");
 assert(src.includes('document.addEventListener(\n      "focusin",'),"delegated focus learning missing");
 assert(src.includes('document.addEventListener(\n      "click",'),"delegated click missing");
@@ -32,10 +35,14 @@ assert(src.includes('renderTemporaryBattleSkillGuide'),"native Skill Guide fallb
 assert(src.includes('selectBattlePreparedSkill'),"native Battle selection authority missing");
 assert(src.includes('confirmSelectedBattleSkill'),"native Battle confirmation authority missing");
 assert(src.includes('launchAcademyKakashiOriginPlBattle'),"post-deployment hardening must remain bound");
-for(const forbidden of ["resolveBattleDamagePacket(","applyBattleDamage(","recordBattleEvidence(","consumeBattleActionOpportunity("]){
+for(const forbidden of ["resolveBattleDamagePacket(","applyBattleDamage(","consumeBattleActionOpportunity("]){
   assert(!src.includes(forbidden),`34500 must not own Battle semantics: ${forbidden}`);
 }
-for(const id of exactFive)assert(gameSrc.includes(id),`game.js missing Kakashi authored Skill ${id}`);
+for(const id of exactFive.filter(id=>id!=="academy_kakashi_substitution_jutsu"))assert(gameSrc.includes(id),`game.js missing Kakashi authored Skill ${id}`);
+const substitutionSrc=fs.readFileSync(path.join(root,"runtime","alpha-kakashi-substitution-34900.js"),"utf8");
+assert(substitutionSrc.includes('const SKILL_ID="academy_kakashi_substitution_jutsu"'),"34900 substitution authority missing");
+assert(!/new\s+MutationObserver\s*\(/.test(substitutionSrc),"34900 must not race 34500 with another DOM observer");
+assert(substitutionSrc.includes("activateAcademyKakashiBattleSkill34500"),"34900 interaction must delegate to 34500");
 assert(gameSrc.includes("function confirmSelectedBattleSkill()"),"native confirm owner missing");
 assert(gameSrc.includes("const result=attemptBattlePreparedSkill(skillId,targetParticipantId,options)"),"native confirm no longer dispatches through Battle skill authority");
 assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/closure Battle resolver missing");
@@ -86,18 +93,20 @@ function buildContext(){
   const context={
     console,document,window:null,globalThis:null,WeakSet,Set,Map,Object,Array,String,Number,Boolean,RegExp,Date,Math,JSON,Error,
     queueMicrotask(fn){fn();},setTimeout(fn){fn();return 1;},clearTimeout(){},MutationObserver:undefined,
-    currentBattle:{active:true,battleOver:false,kakashiOriginDeployment:{controllerParticipantId:"academy_kakashi"},selectedSkillId:null},
+    currentBattle:{active:true,battleOver:false,battleId:"qa_kakashi_battle",kakashiOriginDeployment:{controllerParticipantId:"academy_kakashi"},selectedSkillId:null,runtime:{evidence:[]}},
     getBattleDeploymentParticipant(side,slot){return side==="player"&&slot===1?actor:null;},
     getBattleUISkillPalettePresentation(){return{skillIds:[...exactFive]};},
     getBattlePreparedSkillDefinition(row,id){assert.strictEqual(row,actor);return definitions[id]||null;},
     getBattlePreparedSkillDefaultTarget(){return{participant:{id:"masked_interceptor"}};},
+    getBattleParticipantByIdentity(side,id){return{id,name:id==="academy_kakashi"?"Kakashi":id==="masked_interceptor"?"Masked Interceptor":id};},
     evaluateBattlePreparedSkillAvailability(){return{available:true};},
     previewBattlePreparedSkill33000(id){guideCalls+=1;assert(exactFive.includes(id));return true;},
     renderTemporaryBattleSkillGuide(id){guideCalls+=1;assert(exactFive.includes(id));},
     selectBattlePreparedSkill(id){selectCalls+=1;context.currentBattle.selectedSkillId=id;return{success:true,skillId:id};},
     syncBattleActionRegionState(){return{selectedSkillId:context.currentBattle.selectedSkillId};},
     confirmSelectedBattleSkill(){confirmCalls+=1;const id=context.currentBattle.selectedSkillId;context.currentBattle.selectedSkillId=null;return{success:true,executed:true,skillId:id};},
-    launchAcademyKakashiOriginPlBattle(){launchCalls+=1;return{success:true};}
+    launchAcademyKakashiOriginPlBattle(){launchCalls+=1;return{success:true};},
+    recordBattleEvidence(row){const out={...row,evidenceId:`qa_ev_${context.currentBattle.runtime.evidence.length+1}`};context.currentBattle.runtime.evidence.push(out);return out;}
   };
   context.window=context;context.globalThis=context;
   vm.createContext(context);
@@ -144,6 +153,14 @@ assert.strictEqual(delegated.counts().confirmCalls,1,"rendered click must confir
 assert.strictEqual(click.lastResult.success,true,"rendered delegated click must report action success");
 assert.strictEqual(delegated.context.currentBattle.selectedSkillId,null,"committed direct click must not leave stale selected Skill state");
 
+const actionId="qa_action_1";
+delegated.context.recordBattleEvidence({eventType:"damage_resolved",actionId,actorRef:{side:"player",participantId:"academy_kakashi"},targetRef:{side:"enemy",participantId:"masked_interceptor"},skillId:exactFive[0],data:{absorbedPL:12,finalDamage:12,preDefenseAttackPL:15,resolvedAttackPL:15,staminaMitigationAmount:3}});
+delegated.context.recordBattleEvidence({eventType:"skill_action_completed",committedOccurrence:true,actionId,actorRef:{side:"player",participantId:"academy_kakashi"},targetRef:{side:"enemy",participantId:"masked_interceptor"},skillId:exactFive[0],stateRefs:[],data:{resolved:true,damageApplied:true,finalDamage:12}});
+assert.strictEqual(delegated.context.currentBattle.kakashiOriginPresentation34500.plLoss,12,"Battle presentation must project committed Battle PL loss");
+assert.strictEqual(delegated.context.currentBattle.kakashiOriginPresentation34500.actorName,"Kakashi","Battle presentation actor must come from Battle participant state");
+assert.strictEqual(delegated.context.currentBattle.kakashiOriginPresentation34500.targetName,"Masked Interceptor","Battle presentation target must come from Battle participant state");
+assert(delegated.context.currentBattle.kakashiOriginPresentation34500.resultText.includes("12 BATTLE PL LOST"),"Battle presentation must make factual impact legible");
+
 delegated.card.onmouseenter=()=>{};
 delegated.card.onfocus=()=>{};
 delegated.context.hardenAcademyKakashiBattleDOM34500(delegated.stage);
@@ -160,7 +177,7 @@ assert.strictEqual(diagnostics.browserGoldenClaimed,false);
 
 console.log(JSON.stringify({
   pass:true,
-  patch:"34500-v5",
+  patch:"34500-v6",
   exactFiveSkillsCanonical:true,
   renderedDomHoverExercised:true,
   renderedDomFocusExercised:true,
@@ -169,6 +186,8 @@ console.log(JSON.stringify({
   explicitSelectConfirmExactlyOnce:true,
   hoverPresentationOnly:true,
   rerenderHandlerHardening:true,
+  factualActionImpactPresentation:true,
+  singleBattleInteractionOwner:true,
   resolverSemanticsUntouched:true,
   kakashiChildCacheIdentity:"kakashi-final-20260917-19",
   browserGoldenClaimed:false
