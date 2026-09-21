@@ -427,8 +427,8 @@ jobs:
           grep -Fq 'alpha_kakashi_scene04a_35710_v10_2026_09_22' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'kakashiBlockEntry35710' runtime/alpha-kakashi-scene04a-35710.js
           grep -Fq 'Scene 04A begins from the final WATCH THE EXCHANGE state' runtime/alpha-kakashi-scene04a-35710.js
-          grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-ending-35770.js
-          grep -Fq 'name.style.display="block"' runtime/alpha-kakashi-w2c-nonkill-35780.js
+          if grep -Fq 'querySelector(".sc-story-name")' runtime/alpha-kakashi-w2c-ending-35770.js; then echo '35770 must delegate speaker projection to 33910'; exit 1; fi
+          if grep -Fq 'querySelector(".sc-story-name")' runtime/alpha-kakashi-w2c-nonkill-35780.js; then echo '35780 must delegate speaker projection to 33910'; exit 1; fi
           grep -Fq 'speakerLabel' runtime/alpha-story-scene-board-33900.js
           grep -Fq 'left:28%!important' runtime/alpha-kakashi-w2c-ending-35770.js
           grep -Fq 'left:54%!important' runtime/alpha-kakashi-w2c-ending-35770.js
