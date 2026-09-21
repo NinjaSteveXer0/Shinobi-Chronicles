@@ -50,11 +50,11 @@ assert(gameSrc.includes("function attemptClosureWaveBattleSkill("),"factory/clos
 // Browser RED on the Story/continuation lane proved the production parent URLs
 // must advance with the Kakashi children. Keep the Battle interaction layer on
 // that same coherent delivery generation until the next deliberate cache bump.
-assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260917-5'),
+assert(originSrc.includes('runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260922-23'),
   "32900 Story-decision parent identity is stale");
-assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260917-19'),
+assert(decisionSrc.includes('runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260922-95'),
   "34000 Kakashi adapter parent identity is stale");
-assert(adapterSrc.includes('const BUILD="kakashi-final-20260917-19";'),
+assert(adapterSrc.includes('const BUILD="kakashi-final-20260922-95";'),
   "34100 must request current Kakashi child cache identity");
 assert(adapterSrc.includes('script.id=id;script.src=`${path}?sc=${BUILD}`;script.async=false;'),
   "34100 generic child loader must version children by current Kakashi BUILD");
@@ -189,6 +189,6 @@ console.log(JSON.stringify({
   factualActionImpactPresentation:true,
   singleBattleInteractionOwner:true,
   resolverSemanticsUntouched:true,
-  kakashiChildCacheIdentity:"kakashi-final-20260917-19",
+  kakashiChildCacheIdentity:"kakashi-final-20260922-95",
   browserGoldenClaimed:false
 },null,2));
