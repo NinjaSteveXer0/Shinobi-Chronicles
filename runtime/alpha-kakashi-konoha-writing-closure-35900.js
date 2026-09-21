@@ -306,7 +306,7 @@ let hooksInstalled=false,hookAttempts=0;
 function installHooks(){
  if(hooksInstalled)return true;
  if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;
- const PRE_ADVANCE=globalThis.advanceStoryScene,PRE_GET=globalThis.getStoryScenePerformance33900,PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+ const PRE_ADVANCE=globalThis.advanceStoryScene,PRE_GET=globalThis.getStoryScenePerformance33900;
  globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35900(){
   const p=performance35900();return p||PRE_GET.apply(this,arguments);
  };
@@ -325,10 +325,6 @@ function installHooks(){
   return PRE_ADVANCE.apply(this,arguments);
  };
  try{advanceStoryScene=globalThis.advanceStoryScene;getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;}catch(_e){}
- if(PRE_RENDER){
-  globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35900(){return PRE_RENDER.apply(this,arguments);};
-  try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}
- }
  hooksInstalled=true;return true;
 }
 function ensureHooks(){if(installHooks())return;if(typeof setTimeout==="function"&&hookAttempts++<120)setTimeout(ensureHooks,25);}
