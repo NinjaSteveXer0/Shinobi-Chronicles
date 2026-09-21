@@ -141,7 +141,7 @@ report=MOD.reportText(state);receipt=MOD.receiptText(state);minato=MOD.minatoTex
 assert(report.includes("I turned the receiver over to the Uchiha Police Force."));
 assert(report.includes("So two died."));
 assert(report.includes("If the street stayed clear"));
-assert(receipt.includes("FIRST ACTION\\nMOVE IN CLOSER"));
+assert(receipt.includes("FIRST ACTION\nMOVE IN CLOSER"));
 assert(receipt.includes("Package — Recovered by Kakashi and returned to ANBU."));
 assert(receipt.includes("Package Smuggler — Transferred to Uchiha Police custody."));
 assert(receipt.includes("Handoff contingency overheard."));
