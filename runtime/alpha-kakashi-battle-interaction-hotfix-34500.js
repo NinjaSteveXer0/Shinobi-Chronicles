@@ -45,7 +45,6 @@
     "[onclick*='activateBattlePreparedSkillCard']"
   ].join(",");
   const boundCards=new WeakSet();
-  let hardenScheduled=false;
   let delegatedClickInstalled=false;
   let delegatedLearnInstalled=false;
 
@@ -853,22 +852,6 @@
     return bound>0;
   }
 
-  function scheduleHarden34500(root=null){
-    if(hardenScheduled)return;
-
-    hardenScheduled=true;
-
-    const run=()=>{
-      hardenScheduled=false;
-
-      try{
-        hardenBattleDOM34500(root);
-      }catch(_error){}
-    };
-
-    if(typeof queueMicrotask==="function")queueMicrotask(run);else run();
-  }
-
   function resolveDelegatedCard34500(target){
     if(
       !target ||
@@ -1084,7 +1067,8 @@
   installDelegatedLearn34500();
   installDelegatedClick34500();
 
-  scheduleHarden34500();
+  hardenBattleDOM34500();
+  renderKakashiBattlePresentation34500();
 
   function runAcademyKakashiBattleInteraction34500Diagnostics(){
     const parser=skillIdFromCard34500.toString();
