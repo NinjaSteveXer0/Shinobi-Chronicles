@@ -209,9 +209,6 @@ function board(rt,p){
 function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;const s=document.createElement("style");s.id=STYLE_ID;
   s.textContent="."+BOARD_CLASS+"{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}"+
-  "."+BOARD_CLASS+" .sc-scene-board-33900__actors{left:2.5%!important;right:2.5%!important;top:8%!important;bottom:20%!important;display:flex!important;justify-content:space-between!important;align-items:flex-end!important;gap:2%!important;padding:0 4%!important}"+
-  "."+BOARD_CLASS+" .sc-scene-board-33900__actor{width:min(19vw,270px)!important;max-height:440px!important;aspect-ratio:7/10!important}"+
-  "."+BOARD_CLASS+"[data-stage='police'] .sc-scene-board-33900__actor{width:min(18vw,250px)!important;max-height:410px!important}"+
   "."+BOARD_CLASS+"[data-stage^='office'] .sc-scene-board-33900__actors{left:0!important;right:0!important;top:0!important;bottom:0!important;display:block!important;padding:0!important}"+
   "."+BOARD_CLASS+"[data-stage^='office'] .sc-scene-board-33900__actor{position:absolute!important;width:min(11.5vw,158px)!important;max-height:286px!important;bottom:23.5%!important}"+
   "."+BOARD_CLASS+"[data-stage^='office'] .sc-scene-board-33900__actor[data-actor-id='"+MINATO+"']{left:41%!important;top:1%!important;bottom:auto!important;width:min(18vw,252px)!important;max-height:430px!important;z-index:6}"+
