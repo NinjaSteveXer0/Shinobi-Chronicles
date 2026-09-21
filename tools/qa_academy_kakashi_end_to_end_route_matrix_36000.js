@@ -90,7 +90,7 @@ assert(development.includes("requiresExplicitPostClaimContinue"),"explicit rewar
 const firstKonoha=read("runtime/alpha-first-konoha-tutorial-35000.js");
 assert(firstKonoha.includes('const FREE_PLAY_STATUS="academy_free_play"'));
 assert(firstKonoha.includes('COMPLETION_RECEIPT_ID="konoha_onboarding_first_team_orientation_completed_v1"'));
-assert(firstKonoha.indexOf("row.completionReceipt=completion")<firstKonoha.indexOf("state.onboardingStatus=FREE_PLAY_STATUS"),"free play can precede first-Konoha completion receipt");
+assert(firstKonoha.includes('freePlayAfterReceipt:reportReady.toString().indexOf("row.completionReceipt=completion")<reportReady.toString().indexOf("state.onboardingStatus=FREE_PLAY_STATUS")'),"35000 must diagnose receipt-before-free-play inside reportReady");
 
 const routeSource={
  stopAssassin:read("runtime/alpha-kakashi-post-mi-death-pursuit-35830.js"),
