@@ -497,7 +497,7 @@ function render(){
  const amtAlley=[BEAT.amtCatch,BEAT.amtBattle,BEAT.amtReturn,BEAT.amtWin,BEAT.amtDecision,BEAT.amtLiveReturn,BEAT.amtKill,BEAT.amtReport,BEAT.amtPoliceEscort].includes(rt.beatId),rooftop=[BEAT.amtChase,BEAT.psToAmt,BEAT.psAnbuHandoff,BEAT.amtAnbuHandoff,BEAT.amtPoliceAnbuReturn].includes(rt.beatId);
  const markup='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">'+(rooftop?"KONOHA ROOFTOP · NIGHT":amtAlley?"KONOHA ALLEY · NIGHT":BEAT.amtPoliceHandoff===rt.beatId?"UCHIHA POLICE FORCE · NIGHT":"KONOHA ALLEY · NIGHT")+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+refs.length+'">'+refs.map(ref=>card(ref,actorState35830(ref,rt),focus===ref)).join("")+'</div>';
  if(!b.dataset||b.dataset.signature!==markup){b.innerHTML=markup;if(b.dataset)b.dataset.signature=markup;}
- if(p){const t=layer.querySelector(".sc-story-text");if(t)t.textContent=p.cue.text;const n=layer.querySelector(".sc-story-name");if(n){n.textContent=p.cue.kind==="dialogue"?p.cue.speaker:"NARRATION";n.style.display="block";}}
+ // Canonical 33910 projects the active performance cue; this route keeps only factual staging.
  return true;
 }
 
