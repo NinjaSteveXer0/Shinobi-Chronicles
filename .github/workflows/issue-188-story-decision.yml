@@ -199,10 +199,10 @@ jobs:
           test -f 'NPC portrait/anbu_marked_target.png'
           test -f 'NPC portrait/package_smuggler.png'
           grep -Fq 'alpha-story-decision-realisation-34000.js' runtime/alpha-origin-scenes-32900-integrator.js
-          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260921-19' runtime/alpha-origin-scenes-32900-integrator.js
+          grep -Fq 'runtime/alpha-story-decision-realisation-34000.js?sc=story-decision-20260921-20' runtime/alpha-origin-scenes-32900-integrator.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100.js' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260921-91' runtime/alpha-story-decision-realisation-34000.js
-          grep -Fxq 'const BUILD="kakashi-final-20260921-91";' runtime/alpha-kakashi-final-origin-adapter-34100.js
+          grep -Fq 'runtime/alpha-kakashi-final-origin-adapter-34100.js?sc=kakashi-final-20260921-92' runtime/alpha-story-decision-realisation-34000.js
+          grep -Fxq 'const BUILD="kakashi-final-20260921-92";' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-origin-adapter-34100-core.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-final-authority-guard-34200.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'alpha-kakashi-origin-battle-deployment-34300.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
@@ -321,7 +321,7 @@ jobs:
           grep -Fq 'anbu_marked_target|masked_interceptor|package_smuggler' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'kakashi_scene_board_model_v16_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v17_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HAS PACKAGE · ESCAPE BLOCKED' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'BLOCKING ESCAPE' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'actors:[interceptor("BLOCKING ESCAPE"),smuggler("HAS PACKAGE")]' runtime/alpha-kakashi-scene-board-polish-33910.js
@@ -356,7 +356,7 @@ jobs:
           if grep -Fq 'try{next();if(typeof renderStorySceneBoard33900' runtime/alpha-kakashi-scene-board-polish-33910.js; then echo '33910 wipe must not duplicate-render terminal presentation'; exit 1; fi
           grep -Fq 'registerStorySceneBoardRenderHook("kakashi_post_mi_35830"' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           if grep -Fq 'enforceAmtDialogueLane35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js; then echo 'post-MI dialogue must not move after first paint'; exit 1; fi
-          grep -Fq 'kakashi_scene_board_model_v16_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v17_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'kak_terminal_minato_private_evaluation_35100:()=>terminalMinatoPerformance33910()' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'return"hokage_minato"' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v6_2026_09_21' runtime/alpha-kakashi-dynamic-terminal-35940.js
