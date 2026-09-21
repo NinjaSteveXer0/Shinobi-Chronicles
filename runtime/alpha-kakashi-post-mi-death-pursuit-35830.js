@@ -17,7 +17,7 @@ const CORE=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const BATTLE=globalThis.SC_ALPHA_KAKASHI_BATTLE_DEPLOYMENT_34300;
 if(!A||!CORE||!BATTLE)throw new Error("kakashi_post_mi_pursuit_35830_dependencies_missing");
 
-const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v26_2026_09_21";
+const PATCH_ID="alpha_kakashi_post_mi_death_pursuit_35830_v27_2026_09_21";
 const AUTH_PS="bf30ca7dfff9f850bebe978acdd8830f16758042";
 const AUTH_AMT="7a95637765a58b8f12b0bac877032625266830f6";
 const AUTH_AMT_DISPOSITION="e06e06df9da15858f09a72d318cce233dc9e8333";
@@ -172,6 +172,7 @@ function resolveSelectedPursuit(target){
  const id=stable("occ_origin_kakashi_post_mi_pursuit_resolution",{selection:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),target,eligible});
  const fact={factClass:"academy_kakashi_stop_assassin_post_mi_pursuit_resolution",authorityCommit:target==="ps"?AUTH_PS:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),parentSelectionOccurrenceId:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),targetRef:target==="ps"?PS:AMT,selectedOutcomeRef:eligible?"PURSUIT_SUCCESS_REACHED":"PURSUIT_FAILURE_ESCAPED",sourceMiResolutionState:String(sf.sourceMiResolutionState||"DEAD"),packageState:packageState(rt),pakkunPresent:false};
  const out=commitOnce(id,fact,fact.selectedOutcomeRef,[ORIGIN_ID,target==="ps"?PS:AMT],[{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiPursuitSelectionOccurrenceId),role:"pursuit_selection"}]);if(!out.success)return out;
+ if(!eligible){const participantRef=target==="ps"?PS:AMT,classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef,stateClass:"ESCAPED",resultRef:id});if(!classified||classified.success!==true)return classified||{success:false,reason:"post_mi_pursuit_escape_classification_failed",participantRef};}
  rt.localContext={...(rt.localContext||{}),kakashiPostMiPursuitResolutionOccurrenceId:id,kakashiPostMiPackageOccurrenceId:id,kakashiPostMiPursuitReached:eligible};save();return{success:true,reached:eligible,occurrenceId:id};
 }
 function psBattleActive35830(){
@@ -279,7 +280,9 @@ function deterministicKillTarget(ref,kind){
 function commitAmtRelease(){
  const rt=active();if(!rt||!postBattleDefeatedLiving(AMT))return{success:false,reason:"amt_post_battle_defeated_living_target_required"};const id=stable("occ_origin_kakashi_post_mi_amt_release",{battle:String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||""),package:packageOccurrenceId(rt)});
  const fact={factClass:"academy_kakashi_amt_deliberate_release",authorityCommit:AUTH_AMT,storySceneInstanceId:String(rt.instanceId||""),participantRef:AMT,participantAlive:true,releaseState:"DELIBERATE_RELEASE",custodyCommitted:false,escapeState:"RELEASED_BY_KAKASHI",packageState:packageState(rt),packageCustodyChanged:false,pakkunPresent:true};
- const out=commitOnce(id,fact,"AMT_RELEASED",[ORIGIN_ID,AMT,PAKKUN],[{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||""),role:"controlled_amt"}]);if(out.success){rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtReleaseOccurrenceId:id};save();}return out;
+ const out=commitOnce(id,fact,"AMT_RELEASED",[ORIGIN_ID,AMT,PAKKUN],[{type:"origin_occurrence",id:String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||""),role:"controlled_amt"}]);if(!out.success)return out;
+ const classified=CORE.recordParticipantClassification({storyUnitRef:ORIGIN_ID,participantRef:AMT,stateClass:"DELIBERATELY_RELEASED",resultRef:id});if(!classified||classified.success!==true)return classified||{success:false,reason:"amt_release_classification_failed"};
+ rt.localContext={...(rt.localContext||{}),kakashiPostMiAmtReleaseOccurrenceId:id};save();return{success:true,occurrenceId:id,stateClass:"DELIBERATELY_RELEASED"};
 }
 function commitAmtAnbuReturn(){
  const rt=active();if(!rt||!postBattleDefeatedLiving(AMT))return{success:false,reason:"amt_post_battle_defeated_living_target_required"};const id=stable("occ_origin_kakashi_post_mi_amt_anbu_return",{battle:String(rt.localContext.kakashiPostMiAmtBattleOccurrenceId||""),package:packageOccurrenceId(rt)});
