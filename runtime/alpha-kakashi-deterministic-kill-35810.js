@@ -192,7 +192,7 @@ function render(){
   if(!removed)actors.push(actor(MI,"MASKED INTERCEPTOR","NPC/masked_interceptor.png",rt.localContext&&rt.localContext.kakashiDeterministicKillOutcomeRef?"DEAD":"CONTROLLED · DEFEATED",focus===MI));
   const objective=rt.beatId===REPORT_PENDING_BEAT?REPORT_OBJECTIVE:OBJECTIVE;
   board.innerHTML='<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">SAKURA TREE · MAIN STREET</div><div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>'+esc(objective)+'</div></div><div class="sc-scene-board-33900__actors" data-count="'+actors.length+'">'+actors.join("")+'</div>';
-  if(p){const text=layer.querySelector(".sc-story-text");if(text)text.textContent=p.cue.text;const name=layer.querySelector(".sc-story-name");if(name){name.textContent="";name.style.display="none";}const kicker=layer.querySelector(".sc-story-kicker");if(kicker)kicker.textContent="NARRATION · ACADEMY KAKASHI";}
+  // Canonical 33910 projects p.cue; this route owns only factual card choreography.
   return true;
 }
 function playCommittedKill(rt){
