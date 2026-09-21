@@ -54,9 +54,10 @@ try{
   load("runtime/alpha-kakashi-scene-board-polish-33910.js");
   const d33910=context.runKakashiSceneBoardPolish33910Diagnostics();
   assert("kakashi_v4_diagnostics_green",d33910.pass===true,d33910);
-  assert("kakashi_v16_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v17_33910_2026_09_21'));
+  assert("kakashi_v17_exact_patch_id",kakashiV4Source.includes('kakashi_scene_board_model_v17_33910_2026_09_21'));
   assert("terminal_report_stages_anbu",kakashiV4Source.includes('kak_seq_debrief_pending')&&kakashiV4Source.includes('terminalReportProjection33910')&&kakashiV4Source.includes('konoha_anbu_contact'));
   assert("terminal_hokage_scene_staged",kakashiV4Source.includes('kak_terminal_minato_private_evaluation_35100')&&kakashiV4Source.includes('Assets/Kage/kage_minato.png')&&kakashiV4Source.includes('Kakashi Origin Backdrop/hokage_administration_interior_night.png')&&kakashiV4Source.includes('HOKAGE ADMINISTRATION · NIGHT'));
+  assert("terminal_final_chronicle_beat_stays_on_scene_board",kakashiV4Source.includes('kak_terminal_chronicle_begins_35100')&&kakashiV4Source.includes("terminalFinalPerformance33910")&&kakashiV4Source.includes('text:"YOUR CHRONICLE BEGINS"')&&kakashiV4Source.includes('kak_terminal_chronicle_begins_35100:()=>terminalFinalPerformance33910()'));
   assert("terminal_minato_performance_bridge",kakashiV4Source.includes("terminalMinatoPerformance33910")&&kakashiV4Source.includes("SC_ALPHA_KAKASHI_DYNAMIC_TERMINAL_35940")&&kakashiV4Source.includes('return"hokage_minato"'));
   assert("terminal_no_duplicate_mutation_observer",!/new\s+MutationObserver\s*\(/.test(kakashiV4Source)&&!/new\s+MutationObserver\s*\(/.test(sceneBoardSource));
   assert("canonical_dialogue_first_paint_owned_by_33910",kakashiV4Source.includes("top:4%!important")&&!kakashiV4Source.includes("top:2%!important")&&kakashiV4Source.includes('data-speaker-id="pakkun"'));
