@@ -447,7 +447,9 @@ jobs:
           test -f 'Assets/Kage/kage_minato.png'
           grep -Fq 'stopImmediatePropagation' runtime/alpha-kakashi-scene06a-w2c-35760.js
           if grep -Fq 'PACKAGE SMUGGLER HAS PACKAGE' runtime/alpha-kakashi-scene04a-35710.js; then echo 'redundant standalone package badge must stay removed'; exit 1; fi
-          grep -Fq 'width:min(96%,338px)!important' runtime/alpha-kakashi-scene05a-w-35730.js
+          grep -Fq 'Field actor geometry is inherited from canonical 33910' runtime/alpha-kakashi-scene05a-w-35730.js
+          if grep -Fq 'bottom:20%!important' runtime/alpha-kakashi-scene05a-w-35730.js; then echo '35730 must not restore stale field safe-zone geometry'; exit 1; fi
+          if grep -Fq 'width:min(96%,338px)!important' runtime/alpha-kakashi-scene05a-w-35730.js; then echo '35730 must not duplicate canonical Kakashi card sizing'; exit 1; fi
           grep -Fq 'kakashiScene05ALPackageOccurrenceId' runtime/alpha-kakashi-terminal-debrief-35100.js
           grep -Fq 'alpha-kakashi-battle-development-35740.js' runtime/alpha-kakashi-final-origin-adapter-34100.js
           grep -Fq 'fe715e81cb76b3c4e4a7a8ccbc48ae04bc3b99da' runtime/alpha-kakashi-origin-rewards-34800.js
