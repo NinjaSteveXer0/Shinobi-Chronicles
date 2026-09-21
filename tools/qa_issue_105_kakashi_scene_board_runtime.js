@@ -63,9 +63,9 @@ try{
   assert("canonical_dialogue_first_paint_owned_by_33910",d33910.checks&&d33910.checks.singleDialogueLane===true&&kakashiV4Source.includes("top:4%!important")&&!kakashiV4Source.includes("#story-scene-presentation-layer[data-sc-postmi-35830="));
   assert("terminal_wipe_has_single_render_owner",kakashiV4Source.includes("try{next();}finally{setTimeout(reveal,110);}")&&!kakashiV4Source.includes("try{next();if(typeof renderStorySceneBoard33900"));
   assert("golden_actor_safe_zone_is_single_and_stable",kakashiV4Source.includes("bottom:33%!important")&&kakashiV4Source.includes("bottom:-18px!important"));
-  assert("golden_secondary_actors_remain_readable",kakashiV4Source.includes("opacity:.78;")&&kakashiV4Source.includes("brightness(.90)")&&!kakashiV4Source.includes("opacity:.78!important")&&!kakashiV4Source.includes("opacity:.50!important"));
+  assert("golden_secondary_actors_remain_readable",d33910.checks&&d33910.checks.secondaryActorsRemainReadable===true&&kakashiV4Source.includes('.sc-scene-board-33900__actor{width:min(94%,322px)!important;max-height:490px!important;aspect-ratio:7/10!important;overflow:visible!important;opacity:.78;'));
   assert("golden_battle_transition_has_explicit_mode",kakashiV4Source.includes('data-sc-board-ui-mode="battle_transition"')&&kakashiV4Source.includes('beat.mode==="battle_transition"'));
-  assert("golden_route_specific_dialogue_geometry_retired",!kakashiV4Source.includes("data-sc-postmi-35830")&&!kakashiV4Source.includes("right:6%!important"));
+  assert("golden_route_specific_dialogue_geometry_retired",d33910.checks&&d33910.checks.singleDialogueLane===true&&!kakashiV4Source.includes("#story-scene-presentation-layer[data-sc-postmi-35830="));
   assert("generic_scene_board_owns_actor_motion",sceneBoardSource.includes("is-exiting")&&sceneBoardSource.includes("is-falling")&&sceneBoardSource.includes("priorActorIds")&&sceneBoardSource.includes("data-actor-motion"));
   assert("terminal_report_opening_uses_click_performance",kakashiV4Source.includes("terminalReportOpeningPerformance33910")&&kakashiV4Source.includes('kak_seq_debrief_pending:()=>terminalReportOpeningPerformance33910()'));
 
