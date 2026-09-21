@@ -159,7 +159,8 @@ active.battleResume={
 };
 out=MOD.consumeDirectMi();
 assert.strictEqual(out.success,true,"direct MI return failed: "+JSON.stringify(out));
-const directMiCommitted=occurrenceStore.get(out.occurrenceId);\nassert(directMiCommitted&&directMiCommitted.fact&&directMiCommitted.fact.battleOccurrenceId==="qa-direct-mi-win","direct MI return consumed the stale 2v1 receipt instead of the projected MI receipt");
+const directMiCommitted=occurrenceStore.get(out.occurrenceId);
+assert(directMiCommitted&&directMiCommitted.fact&&directMiCommitted.fact.battleOccurrenceId==="qa-direct-mi-win","direct MI return consumed the stale 2v1 receipt instead of the projected MI receipt");
 assert.strictEqual(out.nextBeatId,MOD.beats.directGroup);
 assert.deepStrictEqual(definition.beatMap.get(MOD.beats.directGroup).choices.map(x=>x.label),[
  "TAKE THEM TO THE UCHIHA POLICE FORCE","TAKE THEM TO THE ANBU","KILL THEM","TAKE THE PACKAGE AND LET THEM GO"
