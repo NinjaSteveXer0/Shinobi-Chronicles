@@ -295,6 +295,7 @@ function openReceipt(){
 }
 function complete(){return{success:false,reason:"retired_to_canonical_terminal_35100"};}
 
+let hooked=false,tries=0;
 function hooks(){
  if(hooked)return true;if(typeof globalThis.advanceStoryScene!=="function"||typeof globalThis.getStoryScenePerformance33900!=="function")return false;const PA=globalThis.advanceStoryScene,PG=globalThis.getStoryScenePerformance33900;
  globalThis.getStoryScenePerformance33900=function(){const p=sequence(active());return p||PG.apply(this,arguments);};
