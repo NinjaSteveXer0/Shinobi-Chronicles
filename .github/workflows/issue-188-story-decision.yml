@@ -321,7 +321,7 @@ jobs:
           grep -Fq 'anbu_marked_target|masked_interceptor|package_smuggler' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq "data-watch-stage='choice-ready'" runtime/alpha-kakashi-scene03a-35700.js
           grep -Fq 'sc-watch-mi-cutoff-35700' runtime/alpha-kakashi-scene03a-35700.js
-          grep -Fq 'kakashi_scene_board_model_v18_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v19_33910_2026_09_22' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'HAS PACKAGE · ESCAPE BLOCKED' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'BLOCKING ESCAPE' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'actors:[interceptor("BLOCKING ESCAPE"),smuggler("HAS PACKAGE")]' runtime/alpha-kakashi-scene-board-polish-33910.js
@@ -357,7 +357,7 @@ jobs:
           if grep -Fq 'try{next();if(typeof renderStorySceneBoard33900' runtime/alpha-kakashi-scene-board-polish-33910.js; then echo '33910 wipe must not duplicate-render terminal presentation'; exit 1; fi
           grep -Fq 'registerStorySceneBoardRenderHook("kakashi_post_mi_35830"' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
           if grep -Fq 'enforceAmtDialogueLane35830' runtime/alpha-kakashi-post-mi-death-pursuit-35830.js; then echo 'post-MI dialogue must not move after first paint'; exit 1; fi
-          grep -Fq 'kakashi_scene_board_model_v18_33910_2026_09_21' runtime/alpha-kakashi-scene-board-polish-33910.js
+          grep -Fq 'kakashi_scene_board_model_v19_33910_2026_09_22' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'kak_terminal_minato_private_evaluation_35100:()=>terminalMinatoPerformance33910()' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'return"hokage_minato"' runtime/alpha-kakashi-scene-board-polish-33910.js
           grep -Fq 'alpha_kakashi_dynamic_terminal_35940_v8_2026_09_22' runtime/alpha-kakashi-dynamic-terminal-35940.js
