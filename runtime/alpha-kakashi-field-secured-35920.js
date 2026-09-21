@@ -191,7 +191,7 @@ let presentationHooksInstalled35920=false,presentationHookAttempts35920=0;
 function installPresentationHooks35920(){
  if(presentationHooksInstalled35920)return true;
  if(typeof globalThis.getStoryScenePerformance33900!=="function"||typeof globalThis.advanceStoryScene!=="function")return false;
- const PRE_GET=globalThis.getStoryScenePerformance33900,PRE_ADVANCE=globalThis.advanceStoryScene,PRE_RENDER=typeof globalThis.renderStoryScenePresentationLayer==="function"?globalThis.renderStoryScenePresentationLayer:null;
+ const PRE_GET=globalThis.getStoryScenePerformance33900,PRE_ADVANCE=globalThis.advanceStoryScene;
  globalThis.getStoryScenePerformance33900=function getStoryScenePerformance35920(){const p=performance35920(active());return p||PRE_GET.apply(this,arguments);};
  globalThis.advanceStoryScene=function advanceStoryScene35920(choiceId=null){
   const rt=active(),p=performance35920(rt);
@@ -201,11 +201,11 @@ function installPresentationHooks35920(){
   if(rt.beatId===BEAT.collectMi&&stateClass(MI)==="FIELD_SECURED_PENDING_COLLECTION"){const out=commitCollected(MI,String(rt.localContext&&rt.localContext.kakashiKonohaCollectionManifestId||""));if(!out||out.success!==true)return out||{success:false,reason:"mi_collection_commit_failed"};rt.localContext.kakashiKonohaCollectionMiOccurrenceId=out.occurrenceId;}
   if(rt.beatId===BEAT.groupAnbuHandoff){const out=commitGroupTransfer("ANBU");if(!out||out.success!==true)return out||{success:false,reason:"anbu_group_transfer_commit_failed"};}
   if(rt.beatId===BEAT.groupPoliceHandoff){const out=commitGroupTransfer("UCHIHA_POLICE");if(!out||out.success!==true)return out||{success:false,reason:"police_group_transfer_commit_failed"};}
+  materializeDisposition35920();
   clearPerformance35920(rt);save();
   return PRE_ADVANCE.apply(this,arguments);
  };
  try{getStoryScenePerformance33900=globalThis.getStoryScenePerformance33900;advanceStoryScene=globalThis.advanceStoryScene;}catch(_e){}
- if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function renderStoryScenePresentationLayer35920(){materializeDisposition35920();const out=PRE_RENDER.apply(this,arguments);return out;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}}
  presentationHooksInstalled35920=true;return true;
 }
 function ensurePresentationHooks35920(){if(installPresentationHooks35920())return;if(typeof setTimeout==="function"&&presentationHookAttempts35920++<100)setTimeout(ensurePresentationHooks35920,25);}
