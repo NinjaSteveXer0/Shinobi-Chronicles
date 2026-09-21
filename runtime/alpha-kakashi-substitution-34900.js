@@ -14,7 +14,7 @@
 "use strict";
 if(globalThis.SC_ALPHA_KAKASHI_SUBSTITUTION_34900)return;
 
-const PATCH_ID="alpha_kakashi_substitution_34900_v1_2026_09_17";
+const PATCH_ID="alpha_kakashi_substitution_34900_v2_2026_09_22";
 const AUTHORITY_COMMIT="c08ecd2271a49eebbd28fc8dae2c737b6acc3037";
 const KAKASHI="academy_kakashi";
 const LEGACY_ID="academy_kakashi_prodigys_read";
@@ -173,116 +173,20 @@ globalThis.previewBattlePreparedSkill33000=function previewBattlePreparedSkill33
 };
 
 // ---------------------------------------------------------------------------
-// v5 34500 predates this Combat supersession. Install a narrower capture
-// delegate *before* 34500 is loaded. It owns only the superseded fifth slot;
-// the existing 34500 delegate continues to own the other four Kakashi Skills.
-// A stale rendered Analyze card is intercepted as Substitution before its old
-// inline/capture path can commit the retired action.
+// Interaction ownership
 // ---------------------------------------------------------------------------
-const CARD_SELECTOR=[
-  ".battle-live-skill-card:not(.is-empty)",
-  ".battle-dev-skill-card:not(.is-empty)",
-  ".sc-battle-skill-card:not(.is-empty)",
-  "[data-battle-skill-id]",
-  "[data-skill-id]",
-  "[onclick*='selectBattlePreparedSkill']",
-  "[onclick*='activateBattlePreparedSkillCard']"
-].join(",");
-
-function cardFromEvent34900(target){
-  if(!target)return null;
-  if(typeof target.closest==="function"){
-    try{return target.closest(CARD_SELECTOR);}catch(_error){}
-  }
-  return target;
-}
-function cardSkillId34900(card){
-  if(!card)return null;
-  const ds=card.dataset||{};
-  let id=String(ds.skillId||ds.battleSkillId||"").trim();
-  if(!id&&card.getAttribute){
-    const handler=String(card.getAttribute("onclick")||"");
-    const match=handler.match(/(?:activateBattlePreparedSkillCard|selectBattlePreparedSkill)\(['"]([^'"]+)['"]\)/);
-    if(match)id=String(match[1]||"").trim();
-  }
-  if(id===LEGACY_ID||id===SKILL_ID)return SKILL_ID;
-  return null;
-}
-function normalizeCard34900(card){
-  if(!card)return false;
-  const id=cardSkillId34900(card);
-  if(id!==SKILL_ID)return false;
-  if(card.dataset){
-    card.dataset.skillId=SKILL_ID;
-    if("battleSkillId" in card.dataset)card.dataset.battleSkillId=SKILL_ID;
-    card.dataset.alpha34900Supersession="substitution_jutsu";
-  }
-  try{
-    card.disabled=false;
-    if(card.removeAttribute)card.removeAttribute("disabled");
-    if(card.setAttribute){card.setAttribute("aria-disabled","false");card.setAttribute("data-skill-name","Substitution Jutsu");}
-    if(card.classList){card.classList.remove("is-disabled");card.classList.add("is-ready");}
-  }catch(_error){}
-  return true;
-}
+// 34900 owns only the Substitution semantic/palette/guide projection. Rendered
+// Battle-card interaction is owned by the later-loaded canonical 34500 layer.
+// This prevents two document delegates / DOM observers from racing over the
+// same fifth slot while preserving old external entry points as delegates.
+const INTERACTION_OWNER_34900="runtime/alpha-kakashi-battle-interaction-hotfix-34500.js";
 function activate34900(){
-  if(!activeKakashiBattle34900())return{success:false,reason:"kakashi_origin_battle_not_active"};
-  if(typeof selectBattlePreparedSkill!=="function"||typeof confirmSelectedBattleSkill!=="function")return{success:false,reason:"battle_skill_commit_path_missing"};
-  const selected=selectBattlePreparedSkill(SKILL_ID);
-  let selectionSucceeded=!!(selected&&selected.success===true);
-  try{
-    const state=typeof syncBattleActionRegionState==="function"?syncBattleActionRegionState():null;
-    if(String(state&&state.selectedSkillId||"")===SKILL_ID)selectionSucceeded=true;
-  }catch(_error){}
-  const battle=battle34900();
-  if(String(battle&&battle.selectedSkillId||"")===SKILL_ID)selectionSucceeded=true;
-  if(!selectionSucceeded)return selected||{success:false,reason:"battle_skill_selection_failed"};
-  const committed=confirmSelectedBattleSkill();
-  return committed&&typeof committed==="object"?Object.assign({},committed,{alpha34900Substitution:true,selectedSkillId:SKILL_ID}):{success:committed!==false,alpha34900Substitution:true,selectedSkillId:SKILL_ID};
+  const owner=globalThis.activateAcademyKakashiBattleSkill34500;
+  return typeof owner==="function"?owner(SKILL_ID):{success:false,reason:"kakashi_battle_interaction_owner_not_loaded",owner:INTERACTION_OWNER_34900};
 }
-
-function installDelegates34900(){
-  if(typeof document==="undefined"||typeof document.addEventListener!=="function")return false;
-  document.addEventListener("pointerover",event=>{
-    if(!activeKakashiBattle34900())return;
-    const card=cardFromEvent34900(event&&event.target);
-    if(cardSkillId34900(card)!==SKILL_ID)return;
-    normalizeCard34900(card);renderExactGuide34900();
-  },true);
-  document.addEventListener("focusin",event=>{
-    if(!activeKakashiBattle34900())return;
-    const card=cardFromEvent34900(event&&event.target);
-    if(cardSkillId34900(card)!==SKILL_ID)return;
-    normalizeCard34900(card);renderExactGuide34900();
-  },true);
-  document.addEventListener("click",event=>{
-    if(!activeKakashiBattle34900())return;
-    const card=cardFromEvent34900(event&&event.target);
-    if(cardSkillId34900(card)!==SKILL_ID)return;
-    normalizeCard34900(card);
-    try{event.preventDefault();event.stopPropagation();event.stopImmediatePropagation();}catch(_error){}
-    activate34900();
-  },true);
-  return true;
-}
-
 function hardenRenderedCards34900(root){
-  if(typeof document==="undefined")return 0;
-  const scope=root&&typeof root.querySelectorAll==="function"?root:document;
-  let cards=[];
-  try{cards=[...(scope.querySelectorAll?scope.querySelectorAll(CARD_SELECTOR):[])];}catch(_error){cards=[];}
-  let changed=0;
-  for(const card of cards)if(normalizeCard34900(card))changed+=1;
-  return changed;
-}
-
-installDelegates34900();
-try{hardenRenderedCards34900();}catch(_error){}
-if(typeof MutationObserver==="function"&&typeof document!=="undefined"&&document.body){
-  try{
-    const observer=new MutationObserver(()=>{if(activeKakashiBattle34900())hardenRenderedCards34900();});
-    observer.observe(document.body,{childList:true,subtree:true});
-  }catch(_error){}
+  const owner=globalThis.hardenAcademyKakashiBattleDOM34500;
+  return typeof owner==="function"?owner(root):false;
 }
 
 function runAcademyKakashiSubstitution34900Diagnostics(){
@@ -299,7 +203,8 @@ function runAcademyKakashiSubstitution34900Diagnostics(){
     exactDefinition:!!(definition&&definition.id===SKILL_ID&&definition.resolutionKind==="ratio_guard_state"&&definition.targetMode==="self"&&definition.repeatUseRule==="no_repeat_same_battle"),
     directPacketGuard:GUARD.preventionRatio===0.5&&GUARD.oneUse===true&&GUARD.requiresDirectAttackPLPacket===true&&GUARD.staminaOrder==="pre_stamina",
     legacyDefinitionPreserved:!!legacy,
-    exactYouthCopy:!!(summary&&summary.summary===SUMMARY.summary&&summary.kind==="DEFENSE"&&summary.tags&&summary.tags.includes("NEXT DIRECT HIT -50%"))
+    exactYouthCopy:!!(summary&&summary.summary===SUMMARY.summary&&summary.kind==="DEFENSE"&&summary.tags&&summary.tags.includes("NEXT DIRECT HIT -50%")),
+    interactionDelegatedTo34500:INTERACTION_OWNER_34900.endsWith("34500.js")&&activate34900.toString().includes("activateAcademyKakashiBattleSkill34500")&&hardenRenderedCards34900.toString().includes("hardenAcademyKakashiBattleDOM34500")
   };
   const failed=Object.entries(checks).filter(([key,value])=>key!=="patchId"&&key!=="authorityCommit"&&value!==true).map(([key])=>key);
   return{pass:failed.length===0,checks,failed,browserGoldenClaimed:false};
