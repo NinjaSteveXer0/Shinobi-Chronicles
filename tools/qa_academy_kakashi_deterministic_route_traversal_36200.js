@@ -115,8 +115,8 @@ sourceHas("tools/qa_academy_kakashi_konoha_route_closure_35910.js",
   'academy_kakashi_origin_battle_mi_1v1',
   'resultState:"player_side_victory"',
   'resultState:"opposition_side_victory"',
-  'pakkunAuthorized:true',
-  'pakkunAuthorized:false'
+  'pakkunAuthorized,true',
+  'pakkunAuthorized,false'
 );
 
 // Move-In-Closer failures and improved Pickpocket explicitly force resolver/Battle variants.
@@ -125,7 +125,7 @@ sourceHas("tools/qa_academy_kakashi_move_closer_closure_35930.js",
   'academy_kakashi_origin_battle_amt_ps_2v1',
   'academy_kakashi_origin_battle_ps_1v1',
   'resultState:"player_side_victory"',
-  'pakkunBattleActionAuthorized:false'
+  'pakkunBattleActionAuthorized,false'
 );
 
 // Field-secured collection forces both institutional destinations and explicit Pakkun departure.
