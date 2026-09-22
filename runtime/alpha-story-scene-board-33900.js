@@ -302,7 +302,7 @@ function installStyle(){
 @keyframes scChoreoEvade33900{0%{transform:translateX(0)}55%{transform:translateX(4.5vw)}100%{transform:translateX(2.5vw)}}
 @keyframes scChoreoRecoil33900{0%{transform:translateX(0)}42%{transform:translateX(2.2vw) rotate(1deg)}100%{transform:translateX(.6vw)}}
 @keyframes scChoreoCollapse33900{from{opacity:1;transform:translateY(0) rotate(0)}to{opacity:.38;transform:translateY(18%) rotate(4deg);filter:saturate(.35) brightness(.55)}}
-@keyframes scChoreoFlee33900{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(22vw) scale(.93)}}
+@keyframes scChoreoFlee33900{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(var(--sc-choreo-flee-x,22vw)) scale(.93)}}
 @keyframes scChoreoExit33900{from{opacity:1}to{opacity:0;transform:translateX(8vw)}}
 @keyframes scChoreoRestrain33900{0%{transform:scale(1)}55%{transform:scale(.96);filter:brightness(.78)}100%{transform:scale(.98);filter:brightness(.84)}}
 @keyframes scChoreoRelease33900{from{transform:scale(.98);filter:brightness(.84)}to{transform:scale(1);filter:none}}
