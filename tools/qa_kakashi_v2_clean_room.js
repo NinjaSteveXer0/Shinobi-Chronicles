@@ -193,8 +193,9 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
   assert(stopWin.choices.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER"),"Stop Assassin lost Package Smuggler catch-up");
   assert(!stopWin.choices.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),"Stop Assassin illegally exposes direct AMT pursuit");
   const psCatchup=stopWin.choices.find(c=>c.label==="GO AFTER PACKAGE SMUGGLER");
-  const availSource=String(psCatchup&&psCatchup.availability||"");
-  assert(availSource.includes("<=3"),"Stop Assassin Package Smuggler catch-up is not the current <=3 controller-action gate");
+  assert(psCatchup&&typeof psCatchup.availability==="function","Stop Assassin Package Smuggler catch-up availability missing");
+  assert(coreSource.includes("const STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS=3;"),"Stop Assassin Package Smuggler catch-up is not locked to the current three-action gate");
+  assert(coreSource.includes('battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS'),"Stop Assassin choice does not consume the named three-action gate");
   const restrainedStop=def.beatMap.get("v2_mi_restrained_next");
   assert(restrainedStop&&restrainedStop.choices.length===1&&restrainedStop.choices[0].label==="GO AFTER PACKAGE SMUGGLER","restrain-and-continue reopened illegal direct AMT pursuit");
 
