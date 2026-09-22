@@ -71,6 +71,16 @@ jobs:
           node --check tools/qa_merge_safety_gate_305.js
           node tools/qa_merge_safety_gate_305.js
 
+      - name: Contract-test integrity / anti-self-certification
+        env:
+          SC_BASE_SHA: ${{ steps.refs.outputs.base }}
+          SC_HEAD_SHA: ${{ steps.refs.outputs.head }}
+          SC_EVENT_NAME: ${{ github.event_name }}
+          SC_PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          node --check tools/qa_contract_integrity_311.js
+          node tools/qa_contract_integrity_311.js --base "$SC_BASE_SHA" --head "$SC_HEAD_SHA"
+
       - name: Set up Python for runtime candidate
         if: steps.classify.outputs.runtime == 'true'
         uses: actions/setup-python@v5
@@ -88,6 +98,14 @@ jobs:
           node tools/qa_runtime_ownership_safety_300.js
           node --check tools/qa_kakashi_v2_legacy_exclusion.js
           node tools/qa_kakashi_v2_legacy_exclusion.js
+          node --check tools/qa_save_compatibility_311.js
+          node tools/qa_save_compatibility_311.js
+          node --check tools/qa_reference_integrity_311.js
+          node tools/qa_reference_integrity_311.js
+          node --check tools/qa_browser_runtime_error_gate_311.js
+          node tools/qa_browser_runtime_error_gate_311.js
+          node --check tools/qa_release_candidate_evidence_311.js
+          node tools/qa_release_candidate_evidence_311.js
           python tools/qa_issue_141_pre_alpha_runtime_closure.py
 
       - name: Story and Origin runtime closure
@@ -103,6 +121,8 @@ jobs:
           node tools/qa_issue_105_origin_browser_realisation_runtime.js
           node --check tools/qa_issue_105_origin_screen_first_activation.js
           node tools/qa_issue_105_origin_screen_first_activation.js
+          node --check tools/qa_story_reachability_311.js
+          node tools/qa_story_reachability_311.js
 
       - name: Battle runtime closure
         if: steps.classify.outputs.battle == 'true'

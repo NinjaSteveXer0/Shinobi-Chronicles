@@ -13,6 +13,8 @@ on:
       - 'runtime/alpha-origin-scenes-32900-integrator.js'
       - 'runtime/alpha-traversal-bridge-33200.js'
       - 'tools/qa_kakashi_v2_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/qa_browser_runtime_error_gate_311.js'
       - 'tools/qa_runtime_ownership_safety_300.js'
       - 'tools/fixtures/runtime_*_300.json'
       - '.github/workflows/kakashi-v2-browser-golden.yml'

@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "issue": 311,
+  "authorityRef": "Documentation/Coordination/Alpha_Second_Wave_Regression_and_Integrity_Safeguards_2026-09-22.md",
+  "contractVersion": "alpha-integrity-311-v1",
+  "acceptedChangeReasons": [
+    "AUTHORITY_CHANGED",
+    "BUG_IN_TEST",
+    "INTENTIONAL_SCHEMA_MIGRATION"
+  ],
+  "reasonMarker": "CONTRACT CHANGE REASON",
+  "protectedContracts": [
+    {
+      "contractId": "runtime-ownership-300",
+      "authorityRef": "Documentation/Coordination/Runtime_Change_Safety_Ownership_Retirement_and_Golden_Promotion_Gate_2026-09-22.md",
+      "contractVersion": "runtime-ownership-300-v1",
+      "responsibilityId": "runtime.safety.ownership",
+      "expectedInvariant": "one responsibility -> one canonical owner; retired owners absent; production load parity exact",
+      "contractFiles": [
+        "tools/qa_runtime_ownership_safety_300.js",
+        "tools/fixtures/runtime_responsibility_registry_300.json",
+        "tools/fixtures/runtime_change_declarations_300.json"
+      ],
+      "implementationPrefixes": [
+        "runtime/",
+        "game.js",
+        "index.html"
+      ]
+    },
+    {
+      "contractId": "post-battle-agency-278",
+      "authorityRef": "Documentation/Coordination/Global_Post_Battle_Disposition_Player_Agency_and_Control_State_Simplification_2026-09-19.md",
+      "contractVersion": "post-battle-agency-278-v1",
+      "responsibilityId": "battle.story.post_battle_agency",
+      "expectedInvariant": "ordinary post-Battle disposition is not hidden behind pre-existing bind/stun/control state",
+      "contractFiles": [
+        "tools/qa_issue_278_post_battle_agency.js"
+      ],
+      "implementationPrefixes": [
+        "runtime/alpha-alpha-sprint-33100.js",
+        "runtime/alpha-kakashi-v2-battle-36010.js",
+        "runtime/alpha-kakashi-v2-core-36020.js"
+      ]
+    },
+    {
+      "contractId": "runtime-fingerprint-303",
+      "authorityRef": "Documentation/Coordination/Runtime_Change_Safety_Ownership_Retirement_and_Golden_Promotion_Gate_2026-09-22.md",
+      "contractVersion": "runtime-fingerprint-303-v1",
+      "responsibilityId": "runtime.build_fingerprint",
+      "expectedInvariant": "browser-loaded runtime fingerprint exactly matches committed manifest",
+      "contractFiles": [
+        "tools/qa_issue_303_runtime_build_fingerprint.js",
+        "tools/fixtures/runtime_build_manifest_303.json"
+      ],
+      "implementationPrefixes": [
+        "runtime/",
+        "game.js",
+        "index.html"
+      ]
+    },
+    {
+      "contractId": "kakashi-v2-route-closure",
+      "authorityRef": "Documentation/Story/Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20.md",
+      "contractVersion": "academy-kakashi-v2-route-v1",
+      "responsibilityId": "origin.academy_kakashi.v2.story_state",
+      "expectedInvariant": "all authored Kakashi V2 beats are reachable and converge through the authorised common terminal tail",
+      "contractFiles": [
+        "tools/qa_kakashi_v2_route_matrix.js"
+      ],
+      "implementationPrefixes": [
+        "runtime/academy-kakashi-v2-content-36000.js",
+        "runtime/alpha-kakashi-v2-core-36020.js",
+        "runtime/alpha-kakashi-v2-battle-36010.js",
+        "runtime/alpha-kakashi-v2-transition-36040.js"
+      ]
+    },
+    {
+      "contractId": "merge-safety-305",
+      "authorityRef": "Documentation/Coordination/Main_Branch_Protection_and_Merge_Safety_Activation_Plan_2026-09-22.md",
+      "contractVersion": "merge-safety-305-v1",
+      "responsibilityId": "runtime.safety.merge_gate",
+      "expectedInvariant": "merge-safety-gate always resolves and fails closed for uncertain runtime changes",
+      "contractFiles": [
+        "tools/qa_merge_safety_gate_305.js",
+        "tools/fixtures/merge_safety_gate_305_manifest.json"
+      ],
+      "implementationPrefixes": [
+        ".github/workflows/merge-safety-gate.yml",
+        "tools/merge_safety_gate_305.js"
+      ]
+    }
+  ]
+}

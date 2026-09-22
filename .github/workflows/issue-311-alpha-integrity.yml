@@ -1,0 +1,93 @@
+name: Issue 311 Alpha Integrity Safeguards
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/**'
+      - 'tools/qa_*311*.js'
+      - 'tools/*311*.js'
+      - 'tools/fixtures/*_311.json'
+      - 'tools/qa_kakashi_v2_browser.js'
+      - 'tools/merge_safety_gate_305.js'
+      - 'tools/qa_merge_safety_gate_305.js'
+      - '.github/workflows/merge-safety-gate.yml'
+      - '.github/workflows/issue-311-alpha-integrity.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'game.js'
+      - 'index.html'
+      - 'runtime/**'
+      - 'tools/qa_*311*.js'
+      - 'tools/*311*.js'
+      - 'tools/fixtures/*_311.json'
+      - 'tools/qa_kakashi_v2_browser.js'
+      - 'tools/merge_safety_gate_305.js'
+      - 'tools/qa_merge_safety_gate_305.js'
+      - '.github/workflows/merge-safety-gate.yml'
+      - '.github/workflows/issue-311-alpha-integrity.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  alpha-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Contract-test integrity metadata and negative fixtures
+        run: |
+          node --check tools/qa_contract_integrity_311.js
+          node tools/qa_contract_integrity_311.js
+
+      - name: Story / Origin route reachability
+        run: |
+          node --check tools/story_graph_integrity_311.js
+          node --check tools/qa_story_reachability_311.js
+          node tools/qa_story_reachability_311.js
+
+      - name: Save compatibility corpus
+        run: |
+          node --check tools/qa_save_compatibility_311.js
+          node tools/qa_save_compatibility_311.js
+
+      - name: Runtime reference integrity
+        run: |
+          node --check tools/qa_reference_integrity_311.js
+          node tools/qa_reference_integrity_311.js
+
+      - name: Browser error-gate policy
+        run: |
+          node --check tools/browser_runtime_error_gate_311.js
+          node --check tools/qa_browser_runtime_error_gate_311.js
+          node tools/qa_browser_runtime_error_gate_311.js
+
+      - name: Release-candidate evidence manifest
+        env:
+          SC_SAVE_COMPATIBILITY_RESULT: GREEN
+          SC_BROWSER_ERROR_RESULT: GREEN
+          SC_LOCAL_SYNC_REQUIREMENT: NOT_REQUIRED
+          SC_EVIDENCE_PURPOSE: issue_311_ci
+        run: |
+          node --check tools/generate_release_candidate_evidence_311.js
+          node --check tools/qa_release_candidate_evidence_311.js
+          node tools/qa_release_candidate_evidence_311.js
+          node tools/generate_release_candidate_evidence_311.js --out artifacts/release-candidate-evidence-311.json
+
+      - name: Upload release-candidate evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-311-release-candidate-evidence
+          path: artifacts/release-candidate-evidence-311.json
+          if-no-files-found: error

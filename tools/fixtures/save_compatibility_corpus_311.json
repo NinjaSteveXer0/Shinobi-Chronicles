@@ -1,0 +1,478 @@
+{
+  "schemaVersion": 1,
+  "runtimeGeneration": "SC-ALPHA-RUNTIME-R303-2026-09-22-A",
+  "authorityRef": "Documentation/Coordination/Alpha_Second_Wave_Regression_and_Integrity_Safeguards_2026-09-22.md",
+  "compatibilityHorizon": "current plus one representative pre-characterOwnership Alpha shape",
+  "fixtures": [
+    {
+      "id": "legacy_pre_origin",
+      "lifecycle": "pre-Origin",
+      "saveSchemaGeneration": "pre-characterOwnership-alpha",
+      "save": {
+        "ryo": 25,
+        "exp": 7,
+        "inventory": [],
+        "activityHistory": [],
+        "retiredKakashiOwner": "runtime/alpha-kakashi-scene-board-polish-33910.js"
+      },
+      "expect": {
+        "onboardingStatus": "identity_selection_pending",
+        "activeStoryBeat": null,
+        "ryo": 25,
+        "exp": 7
+      }
+    },
+    {
+      "id": "mid_origin_pre_battle",
+      "lifecycle": "mid-Origin/pre-Battle",
+      "saveSchemaGeneration": "current-alpha",
+      "save": {
+        "ryo": 50,
+        "exp": 11,
+        "inventory": [],
+        "characterOwnership": {
+          "ownedRegistryIds": [
+            "academy_kakashi"
+          ]
+        },
+        "acquisition": {
+          "records": [],
+          "processedRecordKeys": [],
+          "ownedCharactersByVariantId": {
+            "academy_kakashi": {
+              "ownedCharacterId": "owned_character_academy_kakashi",
+              "variantId": "academy_kakashi",
+              "progressionCharacterId": "academy_kakashi",
+              "acquisitionRecordIds": []
+            }
+          },
+          "chronicleOriginVariantId": "academy_kakashi",
+          "chronicleOriginOwnedCharacterId": "owned_character_academy_kakashi",
+          "ninjaIdentityVariantId": "academy_kakashi",
+          "ninjaIdentityOwnedCharacterId": "owned_character_academy_kakashi",
+          "ninjaIdentityLocked": true,
+          "onboardingStatus": "chronicle_origin_story",
+          "chronicleOrigin": {
+            "variantId": "academy_kakashi",
+            "ownedCharacterId": "owned_character_academy_kakashi",
+            "prologueCompleted": false,
+            "completionEvidenceIds": [],
+            "activeKonohaEntered": false
+          }
+        },
+        "storySceneRuntime": {
+          "version": 1,
+          "sequence": 4,
+          "active": {
+            "instanceId": "save311_mid_origin",
+            "sceneId": "origin_academy_kakashi_anbu_retrieval",
+            "beatId": "v2_scene02_tail",
+            "startedAt": 1,
+            "localContext": {
+              "kakashiV2": {
+                "package": {
+                  "holder": "AMT"
+                },
+                "participants": {
+                  "AMT": {
+                    "state": "ACTIVE"
+                  }
+                }
+              }
+            },
+            "processedConsequenceKeys": [
+              "save311:enter"
+            ],
+            "committedChoiceKeys": [
+              "save311:watch"
+            ],
+            "pendingBattle": null,
+            "battleResume": null
+          }
+        },
+        "originConsequences": {
+          "receipts": [],
+          "committedAddresses": []
+        }
+      },
+      "expect": {
+        "originVariantId": "academy_kakashi",
+        "activeStoryBeat": "v2_scene02_tail",
+        "packageHolder": "AMT",
+        "ryo": 50,
+        "exp": 11
+      }
+    },
+    {
+      "id": "post_battle_pre_continuation",
+      "lifecycle": "post-Battle/pre-continuation",
+      "saveSchemaGeneration": "current-alpha",
+      "save": {
+        "ryo": 100,
+        "exp": 15,
+        "inventory": [
+          {
+            "id": "field_recovery_pill",
+            "name": "Field Recovery Pill",
+            "type": "consumable",
+            "rarity": "Common",
+            "stackable": true,
+            "quantity": 1
+          }
+        ],
+        "characterOwnership": {
+          "ownedRegistryIds": [
+            "academy_kakashi"
+          ]
+        },
+        "acquisition": {
+          "records": [],
+          "processedRecordKeys": [],
+          "ownedCharactersByVariantId": {
+            "academy_kakashi": {
+              "ownedCharacterId": "owned_character_academy_kakashi",
+              "variantId": "academy_kakashi",
+              "progressionCharacterId": "academy_kakashi",
+              "acquisitionRecordIds": []
+            }
+          },
+          "chronicleOriginVariantId": "academy_kakashi",
+          "chronicleOriginOwnedCharacterId": "owned_character_academy_kakashi",
+          "ninjaIdentityVariantId": "academy_kakashi",
+          "ninjaIdentityOwnedCharacterId": "owned_character_academy_kakashi",
+          "ninjaIdentityLocked": true,
+          "onboardingStatus": "chronicle_origin_story",
+          "chronicleOrigin": {
+            "variantId": "academy_kakashi",
+            "ownedCharacterId": "owned_character_academy_kakashi",
+            "prologueCompleted": false,
+            "completionEvidenceIds": [],
+            "activeKonohaEntered": false
+          }
+        },
+        "storySceneRuntime": {
+          "version": 1,
+          "sequence": 7,
+          "active": {
+            "instanceId": "save311_post_battle",
+            "sceneId": "origin_academy_kakashi_anbu_retrieval",
+            "beatId": "v2_mi_stop_win",
+            "startedAt": 2,
+            "localContext": {
+              "kakashiV2": {
+                "package": {
+                  "holder": "PS"
+                },
+                "participants": {
+                  "MI": {
+                    "state": "BATTLE_DEFEATED"
+                  }
+                }
+              }
+            },
+            "processedConsequenceKeys": [
+              "battle:return"
+            ],
+            "committedChoiceKeys": [],
+            "pendingBattle": null,
+            "battleResume": {
+              "outcome": "victory",
+              "battle_id": "save311_battle",
+              "encounter_id": "academy_kakashi_origin_battle_mi_1v1"
+            }
+          }
+        },
+        "originConsequences": {
+          "receipts": [],
+          "committedAddresses": []
+        }
+      },
+      "expect": {
+        "originVariantId": "academy_kakashi",
+        "activeStoryBeat": "v2_mi_stop_win",
+        "participantMI": "BATTLE_DEFEATED",
+        "battleResumeOutcome": "victory",
+        "inventoryQuantity": 1,
+        "ryo": 100
+      }
+    },
+    {
+      "id": "custody_object_state",
+      "lifecycle": "meaningful custody/object state",
+      "saveSchemaGeneration": "current-alpha",
+      "save": {
+        "ryo": 100,
+        "exp": 15,
+        "inventory": [],
+        "characterOwnership": {
+          "ownedRegistryIds": [
+            "academy_kakashi"
+          ]
+        },
+        "acquisition": {
+          "records": [],
+          "processedRecordKeys": [],
+          "ownedCharactersByVariantId": {
+            "academy_kakashi": {
+              "ownedCharacterId": "owned_character_academy_kakashi",
+              "variantId": "academy_kakashi",
+              "progressionCharacterId": "academy_kakashi",
+              "acquisitionRecordIds": []
+            }
+          },
+          "chronicleOriginVariantId": "academy_kakashi",
+          "chronicleOriginOwnedCharacterId": "owned_character_academy_kakashi",
+          "onboardingStatus": "chronicle_origin_story",
+          "chronicleOrigin": {
+            "variantId": "academy_kakashi",
+            "ownedCharacterId": "owned_character_academy_kakashi",
+            "prologueCompleted": false,
+            "completionEvidenceIds": [],
+            "activeKonohaEntered": false
+          }
+        },
+        "storySceneRuntime": {
+          "version": 1,
+          "sequence": 8,
+          "active": {
+            "instanceId": "save311_custody",
+            "sceneId": "origin_academy_kakashi_anbu_retrieval",
+            "beatId": "v2_report",
+            "startedAt": 3,
+            "localContext": {
+              "kakashiV2": {
+                "package": {
+                  "holder": "ANBU",
+                  "returned": true
+                },
+                "participants": {
+                  "AMT": {
+                    "state": "POLICE_CUSTODY"
+                  },
+                  "PS": {
+                    "state": "POLICE_CUSTODY"
+                  },
+                  "MI": {
+                    "state": "UNSEEN"
+                  }
+                }
+              }
+            },
+            "processedConsequenceKeys": [
+              "custody:commit"
+            ],
+            "committedChoiceKeys": [
+              "police"
+            ],
+            "pendingBattle": null,
+            "battleResume": null
+          }
+        },
+        "originConsequences": {
+          "receipts": [],
+          "committedAddresses": []
+        }
+      },
+      "expect": {
+        "activeStoryBeat": "v2_report",
+        "packageHolder": "ANBU",
+        "participantAMT": "POLICE_CUSTODY",
+        "participantPS": "POLICE_CUSTODY"
+      }
+    },
+    {
+      "id": "terminal_receipt",
+      "lifecycle": "terminal reward/Receipt",
+      "saveSchemaGeneration": "current-alpha",
+      "save": {
+        "ryo": 150,
+        "exp": 15,
+        "inventory": [
+          {
+            "id": "field_recovery_pill",
+            "name": "Field Recovery Pill",
+            "type": "consumable",
+            "rarity": "Common",
+            "stackable": true,
+            "quantity": 1
+          }
+        ],
+        "characterOwnership": {
+          "ownedRegistryIds": [
+            "academy_kakashi"
+          ]
+        },
+        "acquisition": {
+          "records": [],
+          "processedRecordKeys": [],
+          "ownedCharactersByVariantId": {
+            "academy_kakashi": {
+              "ownedCharacterId": "owned_character_academy_kakashi",
+              "variantId": "academy_kakashi",
+              "progressionCharacterId": "academy_kakashi",
+              "acquisitionRecordIds": []
+            }
+          },
+          "chronicleOriginVariantId": "academy_kakashi",
+          "chronicleOriginOwnedCharacterId": "owned_character_academy_kakashi",
+          "onboardingStatus": "chronicle_origin_story",
+          "chronicleOrigin": {
+            "variantId": "academy_kakashi",
+            "ownedCharacterId": "owned_character_academy_kakashi",
+            "prologueCompleted": false,
+            "completionEvidenceIds": [],
+            "activeKonohaEntered": false
+          }
+        },
+        "storySceneRuntime": {
+          "version": 1,
+          "sequence": 10,
+          "active": {
+            "instanceId": "save311_receipt",
+            "sceneId": "origin_academy_kakashi_anbu_retrieval",
+            "beatId": "v2_receipt",
+            "startedAt": 4,
+            "localContext": {
+              "kakashiV2": {
+                "package": {
+                  "holder": "ANBU",
+                  "returned": true
+                },
+                "rewards": {
+                  "terminalCommitted": true
+                }
+              }
+            },
+            "processedConsequenceKeys": [
+              "reward:terminal"
+            ],
+            "committedChoiceKeys": [],
+            "pendingBattle": null,
+            "battleResume": null
+          }
+        },
+        "originConsequences": {
+          "receipts": [
+            {
+              "originVariantId": "academy_kakashi",
+              "sourceOccurrenceId": "save311_terminal",
+              "consequenceContractId": "save311_reward_contract",
+              "rowId": "SAVE311",
+              "payload": {
+                "ryo": 150
+              },
+              "consumer": "save_compatibility_311",
+              "causalAncestry": [],
+              "committedAt": 4
+            }
+          ],
+          "committedAddresses": []
+        }
+      },
+      "expect": {
+        "activeStoryBeat": "v2_receipt",
+        "packageHolder": "ANBU",
+        "terminalCommitted": true,
+        "originConsequenceReceiptCount": 1,
+        "ryo": 150,
+        "inventoryQuantity": 1
+      }
+    },
+    {
+      "id": "origin_complete_free_play",
+      "lifecycle": "Origin complete/team formation/free play",
+      "saveSchemaGeneration": "current-alpha",
+      "save": {
+        "ryo": 150,
+        "exp": 15,
+        "inventory": [],
+        "characterOwnership": {
+          "ownedRegistryIds": [
+            "academy_kakashi",
+            "academy_hinata",
+            "academy_kushina"
+          ]
+        },
+        "acquisition": {
+          "records": [],
+          "processedRecordKeys": [],
+          "ownedCharactersByVariantId": {
+            "academy_kakashi": {
+              "ownedCharacterId": "owned_character_academy_kakashi",
+              "variantId": "academy_kakashi",
+              "progressionCharacterId": "academy_kakashi",
+              "acquisitionRecordIds": []
+            },
+            "academy_hinata": {
+              "ownedCharacterId": "owned_character_academy_hinata",
+              "variantId": "academy_hinata",
+              "progressionCharacterId": "academy_hinata",
+              "acquisitionRecordIds": []
+            },
+            "academy_kushina": {
+              "ownedCharacterId": "owned_character_academy_kushina",
+              "variantId": "academy_kushina",
+              "progressionCharacterId": "academy_kushina",
+              "acquisitionRecordIds": []
+            }
+          },
+          "chronicleOriginVariantId": "academy_kakashi",
+          "chronicleOriginOwnedCharacterId": "owned_character_academy_kakashi",
+          "ninjaIdentityVariantId": "academy_kakashi",
+          "ninjaIdentityOwnedCharacterId": "owned_character_academy_kakashi",
+          "ninjaIdentityLocked": true,
+          "onboardingStatus": "academy_free_play",
+          "chronicleOrigin": {
+            "variantId": "academy_kakashi",
+            "ownedCharacterId": "owned_character_academy_kakashi",
+            "prologueCompleted": true,
+            "completionEvidenceIds": [
+              "save311_complete"
+            ],
+            "activeKonohaEntered": true,
+            "activeKonohaEnteredAt": 5,
+            "activeKonohaEntryBoundaryId": "save311_boundary"
+          },
+          "academyTeamFormation": {
+            "unlocked": true,
+            "required": false,
+            "completed": true,
+            "selectedTeammateIds": [
+              "academy_hinata",
+              "academy_kushina"
+            ],
+            "eligibleCandidateVariantIds": [
+              "academy_hinata",
+              "academy_kushina"
+            ],
+            "completedAt": 5,
+            "confirmationReceipt": {
+              "receiptId": "save311_team"
+            },
+            "continuationCompleted": true,
+            "continuedAt": 6
+          }
+        },
+        "storySceneRuntime": {
+          "version": 1,
+          "sequence": 11,
+          "active": null,
+          "lastFeedbackReceipt": null
+        },
+        "originConsequences": {
+          "receipts": [],
+          "committedAddresses": []
+        }
+      },
+      "expect": {
+        "originVariantId": "academy_kakashi",
+        "originCompleted": true,
+        "onboardingStatus": "academy_free_play",
+        "activeStoryBeat": null,
+        "ownedCount": 3,
+        "teamCompleted": true,
+        "teamContinued": true
+      }
+    }
+  ]
+}
