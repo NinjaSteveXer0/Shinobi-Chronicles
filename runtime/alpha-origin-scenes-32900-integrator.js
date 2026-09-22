@@ -56,7 +56,7 @@ function getAlphaOriginScene32900Status(){
   return Object.entries(A.sceneByVariant).map(([originId,sceneId])=>({
     originId,sceneId,
     registered:typeof getStorySceneDefinition==="function"&&!!getStorySceneDefinition(sceneId),
-    writingAuthority:originId==="academy_menma"?"existing production Menma":originId==="academy_kakashi"?"Academy Kakashi V2 clean-room pending; durable Writing remains authoritative":originId==="academy_obito"?"#135/#136 final production Writing":"#135 CE-recovered final Writing lock"
+    writingAuthority:originId==="academy_menma"?"existing production Menma":originId==="academy_kakashi"?"Academy Kakashi V2 clean-room runtime / current 2026-09-20 durable Writing":originId==="academy_obito"?"#135/#136 final production Writing":"#135 CE-recovered final Writing lock"
   }));
 }
 function runAlphaOriginScene32900Diagnostics(){
@@ -65,8 +65,8 @@ function runAlphaOriginScene32900Diagnostics(){
     patchId:A.patchId==="alpha_origin_scenes_32900_2026_09_12",
     tenMappings:Object.keys(A.sceneByVariant).length===10,
     nonKakashiNewScenesRegistered:status.filter(r=>r.originId!=="academy_menma"&&r.originId!=="academy_kakashi").every(r=>r.registered),
-    kakashiV2IntentionallyUnregistered:status.find(r=>r.originId==="academy_kakashi")?.registered===false,
-    kakashiV2DispatcherFailClosed:src.includes("academy_kakashi_v2_pending"),
+    kakashiV2RegistrationCoherent:globalThis.SC_ACADEMY_KAKASHI_V2_CORE_36020?status.find(r=>r.originId==="academy_kakashi")?.registered===true:status.find(r=>r.originId==="academy_kakashi")?.registered===false,
+    kakashiV2DispatcherFailClosedWhenAbsent:src.includes("academy_kakashi_v2_pending"),
     menmaPreserved:status.find(r=>r.originId==="academy_menma")?.registered===true,
     allEightNonKakashiRegistrationAttemptsGreen:A.registrations.length===8&&A.registrations.every(r=>r&&r.success===true),
     dispatcherNo135FailClosed:!src.includes("origin_story_scene_package_not_projected")&&!src.includes("coordinationIssue:135"),
