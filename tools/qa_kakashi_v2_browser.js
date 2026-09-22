@@ -28,9 +28,12 @@ async function boot(browser){
   const result=await page.evaluate(()=>{
     const selected=selectChronicleOrigin("academy_kakashi","kakashi_v2_browser_acceptance");
     const launched=beginAlphaChronicleOriginPrologue();
+    const released=typeof releaseAlphaFrontDoor33300==="function"?releaseAlphaFrontDoor33300():null;
     const game=document.querySelector(".game-container");
-    if(game)game.removeAttribute("data-alpha-front-door-locked");
-    return{selected,launched};
+    if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
+    const front=document.getElementById("sc-alpha-front-door-33300");
+    if(front&&front.isConnected)front.remove();
+    return{selected,launched,released};
   });
   assert(result.selected&&result.selected.success===true,JSON.stringify(result));
   assert(result.launched&&result.launched.success===true,JSON.stringify(result));
@@ -227,7 +230,7 @@ async function visualAndBattle(browser){
   await drain(page);
   const launched=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
   assert(launched&&launched.success===true,JSON.stringify(launched));
-  await page.waitForFunction(()=>!!(globalThis.currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
+  await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
   const battle=await page.evaluate(()=>({
     config:currentBattle.kakashiV2?.battleConfigId||null,
