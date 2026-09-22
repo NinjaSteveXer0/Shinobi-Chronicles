@@ -9,6 +9,8 @@ on:
       - 'runtime/alpha-origin-scenes-32900-integrator.js'
       - 'runtime/alpha-traversal-bridge-33200.js'
       - 'tools/qa_kakashi_v2_browser.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_*_300.json'
       - '.github/workflows/kakashi-v2-browser-golden.yml'
 
 permissions:
@@ -28,6 +30,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Runtime ownership pre-Golden gate
+        run: |
+          node --check tools/qa_runtime_ownership_safety_300.js
+          node tools/qa_runtime_ownership_safety_300.js
 
       - name: Install Playwright Chromium
         run: |
