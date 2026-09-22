@@ -88,7 +88,7 @@ function assertExpected(id,got,expected){
 }
 
 assert.strictEqual(CORPUS.schemaVersion,1,"#311 save corpus schema");
-assert.strictEqual(CORPUS.runtimeGeneration,"SC-ALPHA-RUNTIME-R303-2026-09-22-B","#311 save corpus runtime generation drift");
+assert.strictEqual(CORPUS.runtimeGeneration,"SC-ALPHA-RUNTIME-R303-2026-09-22-C","#311 save corpus runtime generation drift");
 assert(Array.isArray(CORPUS.fixtures)&&CORPUS.fixtures.length>=6,"#311 bounded lifecycle corpus incomplete");
 
 const {context,store}=makeContext();
