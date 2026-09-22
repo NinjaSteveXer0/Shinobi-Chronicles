@@ -311,6 +311,65 @@ async function shot(page,name,selector=null){
     assert.strictEqual(launched.enemy,"academy_kakashi_origin_masked_interceptor");
     await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
 
+    // Current UI authority: Formation Stage, not the legacy four-family shell.
+    const formationOpening=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const row=stage?.querySelector(".battle-live-action-family-row");
+      const primary=[...row.querySelectorAll("button")];
+      const withdraw=stage?.querySelector(".battle2-formation-withdraw");
+      const active=[...stage.querySelectorAll(".battle-live-active-card-player,.battle-live-active-card-enemy")];
+      const visibleSupport=[...stage.querySelectorAll(".battle2-formation-support")].filter(n=>getComputedStyle(n).display!=="none");
+      return{
+        formationStage:stage?.dataset.formationStage,
+        mode:stage?.dataset.formationMode,
+        playerCount:stage?.dataset.playerFormationCount,
+        enemyCount:stage?.dataset.enemyFormationCount,
+        tray:stage?.dataset.formationTray,
+        primaryCount:primary.length,
+        primaryLabels:primary.map(b=>b.textContent.trim()),
+        primaryDataset:row?.dataset.primaryFamilies||"",
+        withdrawOutsideDock:!!withdraw&&withdraw.parentElement===stage&&!row.contains(withdraw),
+        withdrawHandler:withdraw?.getAttribute("onclick")||"",
+        activeCount:active.length,
+        activePortraits:active.map(n=>({side:n.dataset.side,path:n.querySelector("img")?.getAttribute("src")||"",formationPortrait:n.querySelector("img")?.dataset.formationPortrait||null})),
+        visibleSupportCount:visibleSupport.length
+      };
+    });
+    assert.strictEqual(formationOpening.formationStage,"true");
+    assert.strictEqual(formationOpening.mode,"duel","#312 1v1 must use Formation Stage duel composition");
+    assert.strictEqual(formationOpening.playerCount,"1");
+    assert.strictEqual(formationOpening.enemyCount,"1");
+    assert.strictEqual(formationOpening.tray,"closed","#312 Formation Stage should open on battlefield, not a permanent inspector/tray");
+    assert.strictEqual(formationOpening.primaryCount,3,"#312 primary Battle dock must contain exactly three families");
+    assert.deepStrictEqual(formationOpening.primaryLabels,["SKILLS","ITEMS","SUMMONS"],"#312 primary Battle dock taxonomy drift");
+    assert.strictEqual(formationOpening.primaryDataset,"SKILLS|ITEMS|SUMMONS");
+    assert.strictEqual(formationOpening.withdrawOutsideDock,true,"#312 WITHDRAW must remain available without becoming a fourth primary family");
+    assert(formationOpening.withdrawHandler.includes("invokeBattleWithdrawAction"),"#312 WITHDRAW semantic API was disconnected");
+    assert.strictEqual(formationOpening.activeCount,2);
+    assert(formationOpening.activePortraits.every(row=>row.path),"#312 Formation Stage active combatant portrait authority missing: "+JSON.stringify(formationOpening.activePortraits));
+    assert.strictEqual(formationOpening.visibleSupportCount,0,"#312 duel composition retained empty/support formation furniture");
+
+    await page.locator('.battle-live-action-family-row button[data-formation-family="skills"]').click();
+    await page.waitForFunction(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const deck=stage&&stage.querySelector(".battle-live-skill-deck");
+      return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
+    },null,{timeout:3000});
+    const skillTray=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage"),deck=stage.querySelector(".battle-live-skill-deck"),details=stage.querySelector(".battle-live-skill-details");
+      const sr=stage.getBoundingClientRect(),dr=deck.getBoundingClientRect(),ir=details?.getBoundingClientRect();
+      return{
+        tray:stage.dataset.formationTray,
+        deck:{left:dr.left-sr.left,top:dr.top-sr.top,width:dr.width,height:dr.height},
+        inspector:ir?{left:ir.left-sr.left,top:ir.top-sr.top,width:ir.width,height:ir.height}:null,
+        stageHeight:sr.height
+      };
+    });
+    assert.strictEqual(skillTray.tray,"skills");
+    assert(skillTray.deck.top>skillTray.stageHeight*.62,"#312 Skill tray is consuming the central confrontation lane: "+JSON.stringify(skillTray));
+    await page.locator('.battle-live-action-family-row button[data-formation-family="skills"]').click();
+    await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="closed",null,{timeout:3000});
+
     const seed=async(kind)=>page.evaluate(kind=>{
       const runtime=ensureBattleRuntimeState(),battleId=currentBattle.battleId;
       const actorPlayer={side:"player",participantId:"academy_kakashi"};
