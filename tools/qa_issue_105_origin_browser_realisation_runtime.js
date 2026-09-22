@@ -112,9 +112,10 @@ try{
   beginOrigin("academy_iwabee");clickContinue();clickChoice("build_path");
   assert("iwabee_terrain_choice_changes_visible_world_result",render.beatId==="iwa_expose"&&render.text.includes("builds a stable path"),render);
 
-  // Kakashi's route now visibly reports both objective disposition and intelligence quality.
-  beginOrigin("academy_kakashi");clickContinue();clickChoice("shadow_the_clerk");clickContinue();clickChoice("secure_package");
-  assert("kakashi_debrief_consumes_actual_route",render.beatId==="kak_debrief"&&render.text.includes("PACKAGE SECURED")&&render.text.includes("RETRIEVAL INTELLIGENCE HIGH"),render);
+  // Academy Kakashi legacy Origin is intentionally absent during the V2 clean-room rebuild.
+  selectOrigin("academy_kakashi");
+  const kakashiPending=context.beginAlphaChronicleOriginPrologue();
+  assert("academy_kakashi_v2_fails_closed",kakashiPending&&kakashiPending.success===false&&kakashiPending.reason==="academy_kakashi_v2_pending",kakashiPending);
 
   console.log(JSON.stringify({pass:true,kind:"dom_event_public_story_handler_harness",browserGoldenClaimed:false},null,2));
 }catch(error){console.error(error&&error.stack||error);process.exit(1);}
