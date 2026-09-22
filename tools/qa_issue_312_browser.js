@@ -635,6 +635,125 @@ async function shot(page,name,selector=null){
     assert.strictEqual(offSlotFocus.chipLocal,true,"#312 off-slot result feedback did not stay participant-local");
     await shot(page,"08-battle-formation-offslot-target.png",".alpha-code-battle-stage");
 
+    // MANUAL RED REGRESSION — exact Stephen repro:
+    // Kakashi -> SKILLS -> second prepared Skill (Clone Feint) -> USE SKILL
+    // -> exactly one authored AMT response -> player control returns -> SKILLS reopens.
+    const amtLifecycleLaunch=await page.evaluate(()=>{
+      const rt=getActiveStorySceneRuntime();
+      const returnContext={
+        type:"story_scene",sceneId:rt.sceneId,sceneInstanceId:rt.instanceId,
+        sourceBeatId:"v2_battle_amt_stop",
+        victoryBeatId:"v2_amt_stop_win",defeatBeatId:"v2_amt_stop_loss",
+        postBattleBeatId:null,exposeFinisher:false
+      };
+      const beforeEnemyTurns=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&
+        typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled==="function"
+          ?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled():null;
+      const out=launchAcademyKakashiV2Battle36010({
+        battleConfigId:"academy_kakashi_origin_battle_amt_1v1",
+        storyOccurrenceId:"issue312_manual_red_regression",
+        sourceAnchorRef:"ISSUE312_MANUAL_RED",
+        bindingRef:"amt_second_skill_lifecycle",
+        returnContext
+      });
+      return{
+        out,
+        beforeEnemyTurns,
+        schedulerBefore:typeof evaluateEnemyActionScheduler==="function"?evaluateEnemyActionScheduler():null,
+        playerOpportunityBefore:getBattleActionOpportunityIndex("player","academy_kakashi"),
+        enemyOpportunityBefore:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt")
+      };
+    });
+    assert(amtLifecycleLaunch.out?.success===true,JSON.stringify(amtLifecycleLaunch));
+    assert.strictEqual(amtLifecycleLaunch.schedulerBefore?.ready,true,"#312 AMT scheduler must be ready before the player action: "+JSON.stringify(amtLifecycleLaunch));
+
+    await page.waitForFunction(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      return stage?.dataset.formationMode==="duel"&&stage?.dataset.enemyFormationCount==="1";
+    },null,{timeout:8000});
+
+    const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
+    await amtSkillsButton.click();
+    await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="skills",null,{timeout:3000});
+
+    const amtPreparedIds=await page.evaluate(()=>[...document.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")].map(node=>node.dataset.skillId||null));
+    assert.strictEqual(amtPreparedIds[1],"academy_kakashi_clone_feint","#312 Stephen repro no longer addresses Kakashi's second prepared Skill: "+JSON.stringify(amtPreparedIds));
+
+    const secondSkill=page.locator(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)").nth(1);
+    await secondSkill.click();
+    await page.waitForFunction(()=>syncBattleActionRegionState()?.selectedSkillId==="academy_kakashi_clone_feint",null,{timeout:3000});
+    await page.locator(".battle-live-use-skill").click();
+
+    await page.waitForFunction(()=>{
+      const battleId=currentBattle?.battleId;
+      const rows=ensureBattleRuntimeState()?.evidence||[];
+      return rows.some(row=>row&&row.battleId===battleId&&row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");
+    },null,{timeout:5000});
+
+    const amtLifecycleAfterFirst=await page.evaluate(beforeEnemyTurns=>{
+      const battleId=currentBattle.battleId;
+      const rows=(ensureBattleRuntimeState().evidence||[]).filter(row=>row&&row.battleId===battleId);
+      const playerCompletions=rows.filter(row=>row.eventType==="skill_action_completed"&&row.actorRef?.participantId==="academy_kakashi");
+      const enemyCompletions=rows.filter(row=>row.eventType==="enemy_authored_action_completed"&&row.actorRef?.participantId==="academy_kakashi_origin_amt");
+      const afterEnemyTurns=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&
+        typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled==="function"
+          ?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.getEnemyTurnsScheduled():null;
+      const state=syncBattleActionRegionState();
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      return{
+        playerCompletions:playerCompletions.map(row=>({actionId:row.actionId,skillId:row.skillId,resolved:row.data?.resolved})),
+        enemyCompletions:enemyCompletions.map(row=>({actionId:row.actionId,skillId:row.skillId,resolved:row.data?.resolved})),
+        enemyTurnDelta:beforeEnemyTurns===null||afterEnemyTurns===null?null:afterEnemyTurns-beforeEnemyTurns,
+        playerOpportunity:getBattleActionOpportunityIndex("player","academy_kakashi"),
+        enemyOpportunity:getBattleActionOpportunityIndex("enemy","academy_kakashi_origin_amt"),
+        selectedSkillId:state.selectedSkillId,
+        selectedTargetRef:state.selectedTargetRef,
+        tray:stage?.dataset.formationTray||null,
+        schedulerAfter:evaluateEnemyActionScheduler(),
+        amtConditions:getBattleParticipantConditions("player","academy_kakashi").map(row=>({key:row.conditionKey,id:row.conditionId}))
+      };
+    },amtLifecycleLaunch.beforeEnemyTurns);
+    console.log("ISSUE312_AMT_LIFECYCLE_AFTER_FIRST "+JSON.stringify(amtLifecycleAfterFirst));
+    assert.strictEqual(amtLifecycleAfterFirst.playerCompletions.length,1,"#312 player opportunity committed more or less than once: "+JSON.stringify(amtLifecycleAfterFirst));
+    assert.strictEqual(amtLifecycleAfterFirst.playerCompletions[0].skillId,"academy_kakashi_clone_feint");
+    assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions.length,1,"#312 AMT must perform exactly one authored response: "+JSON.stringify(amtLifecycleAfterFirst));
+    assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions[0].skillId,"enemy_anbu_style_operative_wire_capture","#312 AMT first response drifted from deterministic Wire Capture");
+    assert.strictEqual(amtLifecycleAfterFirst.enemyCompletions[0].resolved,true,"#312 AMT authored response did not resolve");
+    assert.strictEqual(amtLifecycleAfterFirst.enemyTurnDelta,1,"#312 browser enemy-turn bridge did not schedule exactly one AMT opportunity");
+    assert.strictEqual(amtLifecycleAfterFirst.playerOpportunity,amtLifecycleLaunch.playerOpportunityBefore+1,"#312 player opportunity did not advance exactly once");
+    assert.strictEqual(amtLifecycleAfterFirst.enemyOpportunity,amtLifecycleLaunch.enemyOpportunityBefore+1,"#312 enemy opportunity did not advance exactly once");
+    assert.strictEqual(amtLifecycleAfterFirst.selectedSkillId,null,"#312 successful Skill selection survived semantic resolution");
+    assert.strictEqual(amtLifecycleAfterFirst.selectedTargetRef,null,"#312 successful Skill target survived semantic resolution");
+
+    await amtSkillsButton.click();
+    await page.waitForFunction(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const deck=stage?.querySelector(".battle-live-skill-deck");
+      return stage?.dataset.formationTray==="skills"&&!!deck&&getComputedStyle(deck).display!=="none";
+    },null,{timeout:3000});
+    const amtReopened=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const state=syncBattleActionRegionState();
+      const cards=[...stage.querySelectorAll(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)")];
+      return{
+        tray:stage.dataset.formationTray,
+        selectedSkillId:state.selectedSkillId,
+        readySkillIds:cards.filter(node=>!node.disabled).map(node=>node.dataset.skillId||null)
+      };
+    });
+    assert.strictEqual(amtReopened.tray,"skills","#312 SKILLS tray did not reopen after AMT response");
+    assert.strictEqual(amtReopened.selectedSkillId,null,"#312 stale selected Skill blocks the returned player opportunity");
+    assert(amtReopened.readySkillIds.length>0,"#312 no legal Skill remains selectable after AMT response: "+JSON.stringify(amtReopened));
+
+    const nextReadyId=amtReopened.readySkillIds[0];
+    await page.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+nextReadyId+'"]').click();
+    await page.waitForFunction(id=>syncBattleActionRegionState()?.selectedSkillId===id,nextReadyId,{timeout:3000});
+    const amtSecondSelection=await page.evaluate(()=>({
+      selectedSkillId:syncBattleActionRegionState().selectedSkillId,
+      targetRef:syncBattleActionRegionState().selectedTargetRef
+    }));
+    assert.strictEqual(amtSecondSelection.selectedSkillId,nextReadyId,"#312 another legal player Skill could not be selected after enemy resolution");
+
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
     const result={
       pass:true,
