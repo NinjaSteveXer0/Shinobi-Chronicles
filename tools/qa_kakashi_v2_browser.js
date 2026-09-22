@@ -7,6 +7,8 @@ const assert=require("assert");
 const crypto=require("crypto");
 const {chromium}=require("playwright");
 
+const BUILD_MANIFEST=JSON.parse(fs.readFileSync(path.join(__dirname,"fixtures/runtime_build_manifest_303.json"),"utf8"));
+
 const BASE=process.env.KAKASHI_V2_BASE_URL||"http://127.0.0.1:8080/index.html";
 const OUT=process.env.KAKASHI_V2_BROWSER_OUT||"artifacts/kakashi-v2-browser";
 fs.mkdirSync(OUT,{recursive:true});
@@ -18,6 +20,9 @@ async function boot(browser){
   const page=await context.newPage();
   await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){}});
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
+  await page.waitForFunction(()=>typeof globalThis.getRuntimeBuildFingerprint==="function",null,{timeout:10000});
+  const runtimeFingerprint=await page.evaluate(()=>globalThis.getRuntimeBuildFingerprint());
+  assert.deepStrictEqual(runtimeFingerprint,BUILD_MANIFEST,"installed browser runtime fingerprint does not match committed manifest");
   await page.waitForFunction(()=>!!(
     globalThis.SC_ACADEMY_KAKASHI_V2_CONTENT_36000&&
     globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&
@@ -42,7 +47,7 @@ async function boot(browser){
   assert(result.launched&&result.launched.success===true,JSON.stringify(result));
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:15000});
   assert.strictEqual(await page.locator("#sc-alpha-front-door-33300,#sc-alpha-front-door-33400").count(),0,"front-door presentation still covers Kakashi V2");
-  return{context,page};
+  return{context,page,runtimeFingerprint};
 }
 
 async function currentBeat(page){
