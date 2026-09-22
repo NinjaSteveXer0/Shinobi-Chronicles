@@ -8,6 +8,7 @@ const assert=require("assert");
 
 const ROOT=path.resolve(__dirname,"..");
 const CONTRACT=JSON.parse(fs.readFileSync(path.join(ROOT,"tools/fixtures/release_candidate_evidence_contract_311.json"),"utf8"));
+const RUNTIME_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"tools/fixtures/runtime_build_manifest_303.json"),"utf8"));
 const out=cp.execFileSync("node",["tools/generate_release_candidate_evidence_311.js"],{
   cwd:ROOT,
   encoding:"utf8",
@@ -25,7 +26,7 @@ for(const field of CONTRACT.requiredFields){
 }
 assert(/^[0-9a-f]{40}$/.test(manifest.candidateHead),"#311 candidateHead invalid");
 assert.strictEqual(manifest.expectedLocalHead,manifest.candidateHead,"#311 expected local head must match candidate");
-assert.strictEqual(manifest.runtimeFingerprint,"SC-ALPHA-RUNTIME-R303-2026-09-22-C","#311 runtime fingerprint drift");
+assert.strictEqual(manifest.runtimeFingerprint,RUNTIME_MANIFEST.buildId,"#311 runtime fingerprint drift");
 assert.strictEqual(manifest.saveCompatibilityResult,"GREEN");
 assert.strictEqual(manifest.browserErrorResult,"GREEN");
 assert.strictEqual(manifest.localSyncRequirement,"NOT_REQUIRED");
