@@ -451,7 +451,10 @@ function applyWatchExchangeStaticState(root,p,t){
     amt.classList.toggle("kv2-cue-departed",idx>=11&&!moving);
   }
   const token=root.querySelector('[data-story-object-id="PACKAGE"]');
-  if(token&&!token.hidden&&token.dataset.packageHolder==="PS"&&idx>=6&&typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(token,"OPPONENT_RIGHT");
+  if(token&&!token.hidden&&token.dataset.packageHolder==="PS"&&idx>=6&&typeof applyStoryStageAnchor33900==="function"){
+    applyStoryStageAnchor33900(token,"OPPONENT_RIGHT");
+    token.dataset.packageAnchor="OPPONENT_RIGHT";
+  }
 }
 function syncSpeech(root,p,cue,focused){
   const speech=root.querySelector(".kv2-speech");if(!speech)return;
