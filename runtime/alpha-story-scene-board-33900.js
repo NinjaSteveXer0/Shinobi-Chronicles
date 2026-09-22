@@ -9,11 +9,15 @@
 "use strict";
 if(globalThis.SC_STORY_SCENE_BOARD_33900)return;
 
-const PATCH_ID="story_scene_board_33900_2026_09_14_cinematic";
+const PATCH_ID="story_scene_board_33900_2026_09_22_shared_choreography";
 const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const registry=new Map();
-let rendering=false,observer=null,transitioning=false;
+let rendering=false,transitioning=false;
+const choreographyControllers=new WeakMap();
+const SEMANTIC_STAGE_ANCHORS=Object.freeze({PLAYER_LEFT:8,INNER_LEFT:27,CENTER:46,CENTER_OBJECT:50,INNER_RIGHT:61,OPPONENT_RIGHT:78,FAR_ENTRY_LEFT:-18,FAR_ENTRY_RIGHT:108});
+const CHOREOGRAPHY_CLASSES=Object.freeze(["ENTER","EXIT","FOCUS","REPOSITION","APPROACH","RETREAT","LUNGE","STRIKE","EVADE","RECOIL","COLLAPSE","FLEE","RESTRAIN","RELEASE","HANDOFF","OBJECT_TRANSFER","SURPRISE_ENTRY"]);
+const CHOREOGRAPHY_DURATION_MS=Object.freeze({ENTER:310,EXIT:260,FOCUS:150,REPOSITION:300,APPROACH:320,RETREAT:300,LUNGE:190,STRIKE:130,EVADE:220,RECOIL:180,COLLAPSE:390,FLEE:360,RESTRAIN:330,RELEASE:260,HANDOFF:370,OBJECT_TRANSFER:370,SURPRISE_ENTRY:285});
 
 function escapeHTML(value){
   if(typeof escapeStorySceneHTML==="function")return escapeStorySceneHTML(String(value??""));
@@ -76,6 +80,118 @@ function resolveStorySceneBoardProjection(sceneId,beatId,runtime=currentRuntime(
 }
 function getActiveStorySceneBoardProjection(){const runtime=currentRuntime();return runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;}
 
+function normalizeStageAnchor33900(anchor,fallback="CENTER"){
+  const value=String(anchor||fallback).toUpperCase();
+  return Object.prototype.hasOwnProperty.call(SEMANTIC_STAGE_ANCHORS,value)?value:fallback;
+}
+function applyStoryStageAnchor33900(node,anchor){
+  if(!node||!node.style)return null;
+  const exact=normalizeStageAnchor33900(anchor);
+  node.dataset.scStageAnchor=exact;
+  node.style.setProperty("--sc-stage-anchor-x",SEMANTIC_STAGE_ANCHORS[exact]+"%");
+  return exact;
+}
+function storyChoreographyReducedMotion33900(){
+  try{return typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(_error){return false;}
+}
+function normalizeStoryChoreographyCue33900(raw={}){
+  const kind=String(raw.kind||raw.class||"").toUpperCase();
+  if(!CHOREOGRAPHY_CLASSES.includes(kind))return null;
+  const requested=Number(raw.durationMs);
+  const bounded=Number.isFinite(requested)?Math.max(0,Math.min(650,requested)):CHOREOGRAPHY_DURATION_MS[kind];
+  return{
+    kind,
+    actorId:raw.actorId?String(raw.actorId):null,
+    targetId:raw.targetId?String(raw.targetId):null,
+    objectId:raw.objectId?String(raw.objectId):null,
+    fromAnchor:raw.fromAnchor?normalizeStageAnchor33900(raw.fromAnchor):null,
+    toAnchor:raw.toAnchor?normalizeStageAnchor33900(raw.toAnchor):null,
+    resultLabel:raw.resultLabel?String(raw.resultLabel):null,
+    durationMs:storyChoreographyReducedMotion33900()?Math.min(100,bounded):bounded
+  };
+}
+function cancelStoryChoreography33900(root,reason="superseded"){
+  if(!root)return{success:false,reason:"story_choreography_root_missing"};
+  const controller=choreographyControllers.get(root);
+  if(controller){
+    controller.cancelled=true;
+    for(const id of controller.timerIds||[])try{clearTimeout(id);}catch(_error){}
+  }
+  for(const node of root.querySelectorAll?root.querySelectorAll("[data-sc-choreography-active]"):[]){
+    delete node.dataset.scChoreographyActive;
+    node.classList.remove(...CHOREOGRAPHY_CLASSES.map(k=>"sc-choreo-"+k.toLowerCase().replaceAll("_","-")));
+    node.style.removeProperty("--sc-choreo-from-x");
+    node.style.removeProperty("--sc-choreo-to-x");
+    node.style.removeProperty("--sc-choreo-duration");
+  }
+  root.dataset.scChoreographyState="settled";
+  root.dataset.scChoreographyCancelReason=String(reason);
+  choreographyControllers.delete(root);
+  return{success:true,reason};
+}
+function storyChoreographyActorNode33900(root,id){
+  if(!root||!id)return null;
+  const safe=String(id).replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+  return root.querySelector&&(
+    root.querySelector('[data-actor-id="'+safe+'"]')||
+    root.querySelector('[data-participant-id="'+safe+'"]')
+  );
+}
+function storyChoreographyObjectNode33900(root,id){
+  if(!root||!id)return null;
+  const safe=String(id).replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+  return root.querySelector&&root.querySelector('[data-story-object-id="'+safe+'"]');
+}
+function applyStoryChoreographyCue33900(root,cue){
+  const row=normalizeStoryChoreographyCue33900(cue);if(!root||!row)return{success:false,reason:"story_choreography_cue_invalid"};
+  const actor=storyChoreographyActorNode33900(root,row.actorId);
+  const target=storyChoreographyActorNode33900(root,row.targetId);
+  const object=storyChoreographyObjectNode33900(root,row.objectId);
+  const node=row.kind==="OBJECT_TRANSFER"||row.kind==="HANDOFF"?object:actor;
+  if(!node)return{success:false,reason:"story_choreography_subject_missing",cue:row};
+  const className="sc-choreo-"+row.kind.toLowerCase().replaceAll("_","-");
+  node.dataset.scChoreographyActive=row.kind;
+  node.style.setProperty("--sc-choreo-duration",row.durationMs+"ms");
+  if(row.fromAnchor)node.style.setProperty("--sc-choreo-from-x",SEMANTIC_STAGE_ANCHORS[row.fromAnchor]+"%");
+  if(row.toAnchor)node.style.setProperty("--sc-choreo-to-x",SEMANTIC_STAGE_ANCHORS[row.toAnchor]+"%");
+  if(row.toAnchor&&row.kind==="REPOSITION")applyStoryStageAnchor33900(node,row.toAnchor);
+  if(target&&["APPROACH","LUNGE","STRIKE"].includes(row.kind))target.dataset.scChoreographyTarget="true";
+  node.classList.remove(className);void node.offsetWidth;node.classList.add(className);
+  return{success:true,cue:row,node,target};
+}
+function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
+  if(!root)return{success:false,reason:"story_choreography_root_missing"};
+  const scope=String(scopeKey||"unscoped");
+  const normalized=(Array.isArray(cues)?cues:[]).map(normalizeStoryChoreographyCue33900).filter(Boolean);
+  cancelStoryChoreography33900(root,"new_scope");
+  root.dataset.scChoreographyScope=scope;
+  if(!normalized.length){root.dataset.scChoreographyState="settled";return{success:true,scopeKey:scope,cueCount:0,settled:true};}
+  const controller={scopeKey:scope,cancelled:false,timerIds:[],cueIndex:-1};
+  choreographyControllers.set(root,controller);root.dataset.scChoreographyState="playing";
+  const later=(fn,ms)=>{const id=setTimeout(()=>{controller.timerIds=controller.timerIds.filter(x=>x!==id);if(!controller.cancelled)fn();},ms);controller.timerIds.push(id);};
+  const run=index=>{
+    if(controller.cancelled)return;
+    if(index>=normalized.length){root.dataset.scChoreographyState="settled";choreographyControllers.delete(root);return;}
+    controller.cueIndex=index;
+    const applied=applyStoryChoreographyCue33900(root,normalized[index]);
+    const duration=applied.success?applied.cue.durationMs:0;
+    later(()=>{
+      if(applied.node){
+        applied.node.classList.remove("sc-choreo-"+applied.cue.kind.toLowerCase().replaceAll("_","-"));
+        delete applied.node.dataset.scChoreographyActive;
+      }
+      if(applied.target)delete applied.target.dataset.scChoreographyTarget;
+      run(index+1);
+    },duration);
+  };
+  run(0);
+  return{success:true,scopeKey:scope,cueCount:normalized.length,settled:false};
+}
+function getStoryChoreographyState33900(root){
+  const controller=root&&choreographyControllers.get(root);
+  return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled"};
+}
+
 function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
 function resolveBoardBackdropPath(runtime=currentRuntime(),beat=currentBeat(runtime)){
   const def=sceneDefinition(runtime);
@@ -132,6 +248,33 @@ function installStyle(){
 .sc-scene-board-33900__objects{position:absolute;left:3.2%;right:auto;top:13.5%;bottom:auto;width:max-content;max-width:min(31%,390px);height:auto!important;min-height:0!important;max-height:none!important;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;z-index:7}.sc-scene-board-33900__object{position:relative;display:inline-block;box-sizing:border-box;width:auto;max-width:100%;height:auto!important;min-height:0!important;max-height:none!important;align-self:flex-start;flex:0 0 auto;padding:7px 11px 7px 13px;line-height:1.25;white-space:normal;border:1px solid rgba(214,175,76,.64);background:linear-gradient(120deg,rgba(3,15,21,.93),rgba(12,12,9,.88));font-size:9px;font-weight:800;letter-spacing:.07em;color:#e8ddc4;backdrop-filter:blur(5px);box-shadow:0 10px 28px rgba(0,0,0,.35),0 0 0 1px rgba(98,220,229,.08),0 0 20px rgba(90,214,224,.08)}.sc-scene-board-33900__object::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#76e2e8,#dcb14d)}.sc-scene-board-33900__object b{display:block;color:#76e2e8;margin:0 0 3px;font-size:8px;letter-spacing:.15em;text-transform:uppercase}.sc-scene-board-33900__object.is-committed{border-color:rgba(220,177,77,.78);box-shadow:0 10px 28px rgba(0,0,0,.35),0 0 18px rgba(220,177,77,.14)}
 .sc-scene-board-33900__reaction{position:absolute;left:50%;top:12.5%;transform:translateX(-50%);max-width:64%;padding:8px 12px;border:1px solid rgba(102,212,188,.62);background:rgba(3,12,14,.78);color:#d9f1e9;font-size:9px;font-weight:800;letter-spacing:.05em;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .sc-scene-board-33900__receipt{position:absolute;right:3.2%;top:12.5%;border-color:rgba(93,205,162,.62);color:#bfead8;font-size:8px;font-weight:900;letter-spacing:.1em;}
+/* #312 shared choreography primitives. These classes are presentation-only and may be consumed by any Story renderer. */
+[data-sc-stage-anchor]{left:var(--sc-stage-anchor-x)!important;}
+[data-sc-choreography-active]{will-change:transform,opacity,filter;animation-duration:var(--sc-choreo-duration,220ms)!important;animation-fill-mode:both!important;}
+.sc-choreo-focus{animation-name:scChoreoFocus33900}.sc-choreo-enter{animation-name:scChoreoEnter33900}.sc-choreo-surprise-entry{animation-name:scChoreoSurprise33900}
+.sc-choreo-approach{animation-name:scChoreoApproach33900}.sc-choreo-lunge{animation-name:scChoreoLunge33900}.sc-choreo-retreat{animation-name:scChoreoRetreat33900}
+.sc-choreo-reposition{animation-name:scChoreoReposition33900}.sc-choreo-strike{animation-name:scChoreoStrike33900}.sc-choreo-evade{animation-name:scChoreoEvade33900}
+.sc-choreo-recoil{animation-name:scChoreoRecoil33900}.sc-choreo-collapse{animation-name:scChoreoCollapse33900}.sc-choreo-flee{animation-name:scChoreoFlee33900}.sc-choreo-exit{animation-name:scChoreoExit33900}
+.sc-choreo-restrain{animation-name:scChoreoRestrain33900}.sc-choreo-release{animation-name:scChoreoRelease33900}
+.sc-choreo-handoff,.sc-choreo-object-transfer{animation-name:scChoreoObjectTransfer33900}
+@keyframes scChoreoFocus33900{0%{transform:translateY(0) scale(1);filter:brightness(.82)}60%{transform:translateY(-12px) scale(1.045);filter:brightness(1.1)}100%{transform:translateY(-8px) scale(1.035);filter:brightness(1.06)}}
+@keyframes scChoreoEnter33900{from{opacity:0;transform:translateX(7vw) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes scChoreoSurprise33900{0%{opacity:0;transform:translateX(13vw) scale(.92);filter:brightness(.5)}70%{opacity:1;transform:translateX(-1.2vw) scale(1.04);filter:brightness(1.14)}100%{opacity:1;transform:translateX(0) scale(1)}}
+@keyframes scChoreoApproach33900{0%{transform:translateX(0)}70%{transform:translateX(5vw)}100%{transform:translateX(4vw)}}
+@keyframes scChoreoLunge33900{0%{transform:translateX(0)}58%{transform:translateX(9vw) scale(1.025)}100%{transform:translateX(6.5vw) scale(1)}}
+@keyframes scChoreoRetreat33900{from{transform:translateX(0)}to{transform:translateX(-5vw)}}
+@keyframes scChoreoReposition33900{from{left:var(--sc-choreo-from-x,var(--sc-stage-anchor-x))}to{left:var(--sc-choreo-to-x,var(--sc-stage-anchor-x))}}
+@keyframes scChoreoStrike33900{0%{transform:translateX(0)}50%{transform:translateX(2.2vw) scale(1.02)}100%{transform:translateX(0)}}
+@keyframes scChoreoEvade33900{0%{transform:translateX(0)}55%{transform:translateX(4.5vw)}100%{transform:translateX(2.5vw)}}
+@keyframes scChoreoRecoil33900{0%{transform:translateX(0)}42%{transform:translateX(2.2vw) rotate(1deg)}100%{transform:translateX(.6vw)}}
+@keyframes scChoreoCollapse33900{from{opacity:1;transform:translateY(0) rotate(0)}to{opacity:.38;transform:translateY(18%) rotate(4deg);filter:saturate(.35) brightness(.55)}}
+@keyframes scChoreoFlee33900{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(22vw) scale(.93)}}
+@keyframes scChoreoExit33900{from{opacity:1}to{opacity:0;transform:translateX(8vw)}}
+@keyframes scChoreoRestrain33900{0%{transform:scale(1)}55%{transform:scale(.96);filter:brightness(.78)}100%{transform:scale(.98);filter:brightness(.84)}}
+@keyframes scChoreoRelease33900{from{transform:scale(.98);filter:brightness(.84)}to{transform:scale(1);filter:none}}
+@keyframes scChoreoObjectTransfer33900{0%{left:var(--sc-choreo-from-x);transform:translate(-50%,0) scale(.92)}65%{transform:translate(-50%,-12px) scale(1.08)}100%{left:var(--sc-choreo-to-x);transform:translate(-50%,0) scale(1)}}
+[data-sc-choreography-target="true"]{filter:brightness(1.08)}
+@media(prefers-reduced-motion:reduce){[data-sc-choreography-active]{animation-duration:80ms!important}.sc-choreo-approach,.sc-choreo-lunge,.sc-choreo-retreat,.sc-choreo-reposition,.sc-choreo-evade,.sc-choreo-recoil,.sc-choreo-flee,.sc-choreo-exit,.sc-choreo-handoff,.sc-choreo-object-transfer{animation-name:scChoreoReduced33900!important}@keyframes scChoreoReduced33900{from{opacity:.72}to{opacity:1}}}
 .sc-scene-board-wipe-33900{position:absolute;inset:0;z-index:9999;background:#000;transform:translateX(100%);pointer-events:auto;transition:transform .28s cubic-bezier(.7,0,.3,1)}.sc-scene-board-wipe-33900.is-covering{transform:translateX(0)}.sc-scene-board-wipe-33900.is-revealing{transform:translateX(-100%)}
 @media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}.sc-scene-board-wipe-33900{transition:none!important}}
 @media(max-width:820px){.sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%}.sc-scene-board-33900__actors[data-count="2"]{column-gap:20px}.sc-scene-board-33900__actor{width:90%;max-height:290px}.sc-scene-board-33900__objective{max-width:58%;font-size:8px}#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr}}
@@ -175,16 +318,16 @@ function scheduleBoardRender(){if(typeof queueMicrotask==="function")queueMicrot
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
 if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function storySceneBoard33900RenderWrapper(){const result=PRE_RENDER.apply(this,arguments);renderStorySceneBoard33900();return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
 
-function reducedMotion(){try{return typeof matchMedia==="function"&&matchMedia("(prefers-reduced-motion: reduce)").matches;}catch(_error){return false;}}
-function performSceneCut(next){
-  if(typeof next!=="function")return{success:false,reason:"scene_cut_continuation_missing"};
-  if(typeof document==="undefined"||reducedMotion())return next();
-  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return next();
-  if(transitioning)return{success:false,reason:"story_scene_transition_in_progress"};transitioning=true;
+function reducedMotion(){return storyChoreographyReducedMotion33900();}
+function performSceneCut(){
+  if(typeof document==="undefined"||reducedMotion())return{success:true,type:"story_scene_cinematic_cut",skippedMotion:true};
+  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return{success:true,type:"story_scene_cinematic_cut",skippedMotion:true};
+  if(transitioning)return{success:false,reason:"story_scene_transition_in_progress"};
+  transitioning=true;
   const wipe=document.createElement("div");wipe.className="sc-scene-board-wipe-33900";layer.appendChild(wipe);
   requestAnimationFrame(()=>wipe.classList.add("is-covering"));
-  setTimeout(()=>{try{next();}finally{wipe.classList.remove("is-covering");wipe.classList.add("is-revealing");setTimeout(()=>{wipe.remove();transitioning=false;},320);}},290);
-  return{success:true,type:"story_scene_cinematic_cut",pending:true};
+  setTimeout(()=>{wipe.classList.remove("is-covering");wipe.classList.add("is-revealing");setTimeout(()=>{wipe.remove();transitioning=false;},320);},120);
+  return{success:true,type:"story_scene_cinematic_cut",pending:true,presentationOnly:true};
 }
 const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
 function advanceStoryScene33900(choiceId=null){
@@ -196,15 +339,17 @@ function advanceStoryScene33900(choiceId=null){
   if(!p.atEnd){persistPerformanceCursor(runtime,beat,p.index+1);renderStorySceneBoard33900();return{success:true,type:"story_performance_cue_advanced",beatId:beat.beatId,cueIndex:p.index+1,semanticBeatUnchanged:true};}
   clearPerformanceCursor(runtime);
   const def=boardDefinition(runtime.sceneId),transition=def&&def.performanceTransitions&&def.performanceTransitions[beat.beatId];
-  if(transition==="wipe_right_to_left")return performSceneCut(()=>PRE_ADVANCE.call(this));
-  return PRE_ADVANCE.apply(this,arguments);
+  // #312: semantic Story advancement commits first. Choreography may illustrate
+  // that committed transition afterwards, but animation completion never owns it.
+  const result=PRE_ADVANCE.apply(this,arguments);
+  if(result&&result.success===true&&transition==="wipe_right_to_left")performSceneCut();
+  return result;
 }
 if(PRE_ADVANCE){globalThis.advanceStoryScene=advanceStoryScene33900;try{advanceStoryScene=advanceStoryScene33900;}catch(_error){}}
 
 if(typeof document!=="undefined"){
   document.addEventListener("click",event=>{const panel=event.target&&event.target.closest?event.target.closest("#story-scene-presentation-layer[data-sc-performance='true'] .sc-story-panel"):null;if(!panel||event.target.closest("button,a,input,select,textarea"))return;event.preventDefault();advanceStoryScene33900();});
   document.addEventListener("keydown",event=>{if(event.defaultPrevented||!(event.key==="Enter"||event.key===" "))return;const tag=String(event.target&&event.target.tagName||"").toLowerCase();if(["input","textarea","select","button","a"].includes(tag))return;const runtime=currentRuntime(),p=performanceCursor(runtime,currentBeat(runtime));if(!p)return;event.preventDefault();advanceStoryScene33900();});
-  if(typeof MutationObserver==="function"){const target=document.getElementById("story-scene-presentation-layer")||document.body;if(target){observer=new MutationObserver(()=>scheduleBoardRender());observer.observe(target,{childList:true,subtree:true});}}
 }
 
 // Origin-specific board definitions are registered by their own consumers.
@@ -212,11 +357,16 @@ if(typeof document!=="undefined"){
 
 function runStorySceneBoard33900Diagnostics(){
   const checks={
-    patchId:PATCH_ID==="story_scene_board_33900_2026_09_14_cinematic",
+    patchId:PATCH_ID==="story_scene_board_33900_2026_09_22_shared_choreography",
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
     performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),
+    semanticAdvancePrecedesWipe:advanceStoryScene33900.toString().indexOf("PRE_ADVANCE.apply")<advanceStoryScene33900.toString().indexOf("performSceneCut"),
+    semanticAnchorVocabulary:["PLAYER_LEFT","INNER_LEFT","CENTER","CENTER_OBJECT","INNER_RIGHT","OPPONENT_RIGHT","FAR_ENTRY_LEFT","FAR_ENTRY_RIGHT"].every(key=>Object.prototype.hasOwnProperty.call(SEMANTIC_STAGE_ANCHORS,key)),
+    boundedChoreographyVocabulary:CHOREOGRAPHY_CLASSES.length===17&&Object.values(CHOREOGRAPHY_DURATION_MS).every(ms=>ms<=650),
+    scopedCancellableQueue:String(playStoryChoreography33900).includes("scopeKey")&&String(cancelStoryChoreography33900).includes("cancelled=true"),
+    noMutationObserver:!String(installStorySceneBoard33900).includes("new MutationObserver"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
@@ -231,7 +381,12 @@ globalThis.getActiveStorySceneBoardProjection=getActiveStorySceneBoardProjection
 globalThis.resolveStorySceneBoardBackdropPath=resolveBoardBackdropPath;
 globalThis.renderStorySceneBoard33900=renderStorySceneBoard33900;
 globalThis.getStoryScenePerformance33900=()=>performanceCursor(currentRuntime(),currentBeat(currentRuntime()));
+globalThis.applyStoryStageAnchor33900=applyStoryStageAnchor33900;
+globalThis.playStoryChoreography33900=playStoryChoreography33900;
+globalThis.cancelStoryChoreography33900=cancelStoryChoreography33900;
+globalThis.getStoryChoreographyState33900=getStoryChoreographyState33900;
+globalThis.normalizeStoryChoreographyCue33900=normalizeStoryChoreographyCue33900;
 globalThis.runStorySceneBoard33900Diagnostics=runStorySceneBoard33900Diagnostics;
-globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,browserGoldenClaimed:false});
+globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,semanticStageAnchors:SEMANTIC_STAGE_ANCHORS,choreographyClasses:CHOREOGRAPHY_CLASSES,browserGoldenClaimed:false});
 try{renderStorySceneBoard33900();}catch(_error){}
 })();
