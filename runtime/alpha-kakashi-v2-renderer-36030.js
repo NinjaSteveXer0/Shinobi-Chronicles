@@ -12,7 +12,7 @@ const PATCH_ID="academy_kakashi_v2_renderer_36030_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const STYLE_ID="kakashi-v2-renderer-36030-style";
 const ROOT_ID="kakashi-v2-scene-board";
-let rendering=false,lastProjectionSnapshot=null;
+let rendering=false,lastProjectionSnapshot=null,pendingVisualSnapshot=null;
 
 function esc(v){return String(v??"").replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));}
 function active(){try{return typeof getActiveStorySceneRuntime==="function"?getActiveStorySceneRuntime():null;}catch(_e){return null;}}
@@ -249,26 +249,65 @@ function departureMode(previous,next,id){
   if(state==="DEAD"||state==="BATTLE_DEFEATED")return"COLLAPSE";
   return"EXIT";
 }
-function prepareDepartureGhosts(root,previous,next){
-  const ghostLayer=root.querySelector(".kv2-ghost-layer"),out=[];
-  if(!ghostLayer||!previous||!next)return out;
-  const nextIds=new Set((next.actors||[]).map(a=>a.id));
+function departureGhostClass(kind){return kind==="COLLAPSE"?"is-falling":kind==="FLEE"?"is-fleeing":"is-fading";}
+function captureDepartureVisuals(root,previous){
+  if(!root||!previous)return[];
+  const rr=root.getBoundingClientRect(),out=[];
   for(const row of previous.actors||[]){
-    if(nextIds.has(row.id))continue;
     const live=[...root.querySelectorAll(".kv2-actors > .kv2-actor")].find(n=>n.dataset.actorId===row.id);
     if(!live)continue;
-    const rr=root.getBoundingClientRect(),rect=live.getBoundingClientRect(),ghost=live.cloneNode(true);
-    const ghostId="departure:"+row.id;
-    const kind=departureMode(previous,next,row.id);
-    ghost.dataset.actorId=ghostId;ghost.classList.add("kv2-departure-ghost","kv2-actor-ghost",kind==="COLLAPSE"?"is-falling":kind==="FLEE"?"is-fleeing":"is-fading");
-    ghost.style.left=(rect.left-rr.left)+"px";ghost.style.top=(rect.top-rr.top)+"px";ghost.style.bottom="auto";
-    ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
-    ghostLayer.appendChild(ghost);
-    const cleanup=()=>{try{ghost.remove();}catch(_e){}};
-    ghost.addEventListener("animationend",cleanup,{once:true});setTimeout(cleanup,720);
-    out.push({originalId:row.id,ghostId,kind});
+    const rect=live.getBoundingClientRect();
+    out.push({
+      originalId:row.id,
+      clone:live.cloneNode(true),
+      left:Math.max(0,rect.left-rr.left),
+      top:Math.max(0,rect.top-rr.top),
+      width:rect.width,
+      height:rect.height
+    });
   }
   return out;
+}
+function appendDepartureGhost(root,visual,kind){
+  const ghostLayer=root&&root.querySelector(".kv2-ghost-layer");
+  if(!ghostLayer||!visual||!visual.clone)return null;
+  const ghost=visual.clone,ghostId="departure:"+visual.originalId;
+  ghost.dataset.actorId=ghostId;
+  ghost.classList.remove("is-entering","is-focus");
+  ghost.classList.add("kv2-departure-ghost","kv2-actor-ghost",departureGhostClass(kind));
+  ghost.style.left=visual.left+"px";ghost.style.top=visual.top+"px";ghost.style.bottom="auto";
+  ghost.style.width=visual.width+"px";ghost.style.height=visual.height+"px";
+  ghostLayer.appendChild(ghost);
+  const cleanup=()=>{try{ghost.remove();}catch(_e){}};
+  ghost.addEventListener("animationend",cleanup,{once:true});setTimeout(cleanup,1800);
+  return{originalId:visual.originalId,ghostId,kind};
+}
+function materializeDepartureGhosts(root,capture,next){
+  if(!root||!capture||!capture.previous||!next)return[];
+  for(const stale of [...root.querySelectorAll(".kv2-departure-ghost")])stale.remove();
+  const nextIds=new Set((next.actors||[]).map(a=>a.id)),out=[];
+  for(const visual of capture.actorVisuals||[]){
+    if(nextIds.has(visual.originalId))continue;
+    const ghost=appendDepartureGhost(root,visual,departureMode(capture.previous,next,visual.originalId));
+    if(ghost)out.push(ghost);
+  }
+  return out;
+}
+function prepareDepartureGhosts(root,previous,next){
+  const capture={previous,actorVisuals:captureDepartureVisuals(root,previous)};
+  return materializeDepartureGhosts(root,capture,next);
+}
+function preparePreCommitVisualSnapshot(){
+  if(typeof document==="undefined")return{success:true,headless:true};
+  const root=document.getElementById(ROOT_ID),p=projection();
+  const previous=lastProjectionSnapshot||snapshotProjection(p);
+  if(!root||!previous)return{success:false,reason:"kakashi_v2_visual_snapshot_unavailable"};
+  pendingVisualSnapshot={previous,actorVisuals:captureDepartureVisuals(root,previous)};
+  return{success:true,actorCount:pendingVisualSnapshot.actorVisuals.length,beatId:previous.id,presentationOnly:true};
+}
+function cancelPreparedVisualSnapshot(reason="cancelled"){
+  const existed=!!pendingVisualSnapshot;pendingVisualSnapshot=null;
+  return{success:true,cancelled:existed,reason,presentationOnly:true};
 }
 function syncPackageToken(root,p){
   const token=root.querySelector('[data-story-object-id="PACKAGE"]');if(!token)return;
@@ -385,14 +424,15 @@ function syncReceipt(root,p,t){
 function render(){
   if(rendering||typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");
-  if(!isActive()){if(layer){delete layer.dataset.kakashiV2;const stale=document.getElementById(ROOT_ID);if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}}if(!active()||active().sceneId!==SCENE_ID)lastProjectionSnapshot=null;return false;}
+  if(!isActive()){pendingVisualSnapshot=null;if(layer){delete layer.dataset.kakashiV2;const stale=document.getElementById(ROOT_ID);if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}}if(!active()||active().sceneId!==SCENE_ID)lastProjectionSnapshot=null;return false;}
   if(!layer)return false;
   const p=projection();if(!p)return false;
   rendering=true;
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
-    const previous=lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors)||JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates));
-    const departures=semanticChanged?prepareDepartureGhosts(root,previous,next):[];
+    const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors)||JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates));
+    const departures=semanticChanged?(prepared?materializeDepartureGhosts(root,prepared,next):prepareDepartureGhosts(root,previous,next)):[];
+    pendingVisualSnapshot=null;
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
     if(semanticChanged)playProjectionTransition(root,previous,next,p,departures);
@@ -437,6 +477,7 @@ function diagnostics(){
     projectionComesFromCore:String(projection).includes("getAcademyKakashiV2Presentation36020"),
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
+    preCommitVisualSnapshotIsPresentationOnly:String(preparePreCommitVisualSnapshot).includes("presentationOnly:true")&&String(preparePreCommitVisualSnapshot).includes("captureDepartureVisuals"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
     adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
@@ -452,6 +493,8 @@ function diagnostics(){
 }
 globalThis.renderAcademyKakashiV236030=render;
 globalThis.setAcademyKakashiV2Wipe36030=setWipe;
+globalThis.prepareAcademyKakashiV2VisualSnapshot36030=preparePreCommitVisualSnapshot;
+globalThis.cancelAcademyKakashiV2VisualSnapshot36030=cancelPreparedVisualSnapshot;
 globalThis.playAcademyKakashiV2ProjectionTransition36030=playProjectionTransition;
 globalThis.runAcademyKakashiV2Renderer36030Diagnostics=diagnostics;
 globalThis.runAcademyKakashiV2Geometry36030=geometryDiagnostics;
