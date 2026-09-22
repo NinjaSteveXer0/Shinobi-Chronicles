@@ -5,7 +5,6 @@
 // - Academy_Origins_Screen_First_Player_Facing_Story_Rewrite_2026-09-13.md
 //   a08dcf50f67d264497944af761475865dff8dc81
 // - Origin_Prologue_Screen_First_Scene_Performance_Rewrite_v2_2026-09-13.md
-//   c774cd1582b267fb5afbc67bc3bb8556bea71449 (Kakashi v2 override)
 // - Storywide_Interactive_Presence_Consequence_and_Screen_First_Authoring_Doctrine_2026-09-13.md
 //   7b646d8697879506f0421af01d6083f8482b828c
 //
@@ -20,7 +19,6 @@ if(globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700)return;
 
 const PATCH_ID="alpha_origin_screen_first_33700_2026_09_13";
 const AUTHORITY_ORIGINS="a08dcf50f67d264497944af761475865dff8dc81";
-const AUTHORITY_KAKASHI_V2="c774cd1582b267fb5afbc67bc3bb8556bea71449";
 const AUTHORITY_DOCTRINE="7b646d8697879506f0421af01d6083f8482b828c";
 const patched=[];
 
@@ -270,40 +268,8 @@ function patchMetal(){
   return commit(d);
 }
 
-function patchKakashi(){
-  const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_kakashi);if(!d)return false;
-  setText(d,"kak_brief","The evaluator sets a sealed packet on the table between them, then slides it into the hands of a waiting logistics clerk.\n\n\"Recover it.\"\n\nKakashi looks from the packet to the clerk, then back.\n\nThe evaluator raises one finger. \"And Kakashi? Bring me what you can prove. Not what you guessed correctly.\"","narration");
-  setText(d,"kak_clerk","The clerk leaves the Academy quarter and folds into the morning market traffic.\n\nKakashi keeps far enough back that the man never sees him directly. Even so, the clerk checks the same shop-window reflection twice and keeps one hand close to the sealed packet.\n\nNervous.\n\nOr trained.\n\nKakashi doesn't need to decide which yet.");
-  setLabel(d,"kak_clerk","shadow_the_clerk","Stay out of sight. See who takes the packet.");
-  setLabel(d,"kak_clerk","question_the_clerk","Step in now. Make him explain the route.");
-  setLabel(d,"kak_clerk","cut_ahead","Cut ahead. Be where the packet is going.");
-  setResolver(d,"kak_exchange",()=>{const r=local().kakashiFirstChoice;
-    if(r==="shadow_the_clerk")return{text:"The clerk stops beside a produce stall without looking at it.\n\nA second man reaches past him for a basket. For less than a second, both hands disappear behind hanging cloth.\n\nWhen they separate, the clerk's sleeve sits flat. The other man's does not.\n\nKakashi's eye follows the new weight under the broker's arm.\n\nAcross the lane, somebody else starts moving toward him too quickly to be a shopper.\n\nFarther ahead, a third figure breaks from the crowd carrying a package that looks exactly right from a distance."};
-    if(r==="question_the_clerk")return{text:"Kakashi steps into the clerk's path.\n\nThe man's surprise is good. His answer is better—too quick, too complete, and just vague enough around the destination.\n\nThen his eyes flick once past Kakashi's shoulder.\n\nA man is already moving through the crowd toward them. Another figure farther ahead breaks away with what looks like the sealed packet.\n\nThe clerk has given Kakashi information. He has not given him certainty."};
-    return{text:"Kakashi leaves the clerk behind and takes the roofs for two blocks.\n\nHe reaches the likely transfer lane first.\n\nThat means he sees the problem before he understands the whole chain: one man carrying something under his sleeve, another moving toward Kakashi with the deliberate pace of someone who has already chosen violence, and a third figure slipping away with an obvious packet.\n\nKakashi knows where the packet might be. He doesn't pretend he saw how it got there."};
-  });
-  setText(d,"kak_choice","The man approaching Kakashi shifts his shoulder and frees his weapon hand.\n\nThe apparent carrier is almost at the corner.\n\nThe broker stays where he is, one arm tight against his side.\n\nThree problems. Only one of them can get Kakashi's full attention first.");
-  setLabel(d,"kak_choice","secure_package","Stay on the packet he can account for. Take it from the broker.");
-  setLabel(d,"kak_choice","fight_assassin","Stop the assassin first.");
-  setLabel(d,"kak_choice","pursue_apparent_carrier","Follow the apparent carrier before he disappears.");
-  conciseUnavailable(choice(d,"kak_choice","fight_assassin"),"Battle route unavailable.");
-  const db=beat(d,"kak_debrief");if(db){db.nextBeatId="kak_debrief_answer";db.text="";db.presentationResolver=()=>({text:local().kakashiRetrievalChoice==="secure_package"?"The packet lands on the evaluator's table with a soft wooden knock.\n\nThe evaluator does not touch it.\n\n\"Start from the clerk.\"":"The space where the packet should be stays empty. The evaluator leaves it that way.\n\n\"Start where you knew.\""});}
-  add(d,{beatId:"kak_debrief_answer",mode:"narration",presentationResolver:()=>{const c=local();const line=c.kakashiFirstChoice==="shadow_the_clerk"?(c.kakashiRetrievalChoice==="secure_package"?"\"The clerk transferred it to the broker. I watched both hands. I stayed on that packet.\"":"\"The broker had the packet. I left it to follow the runner.\""):c.kakashiFirstChoice==="question_the_clerk"?"\"I knew the clerk was off-route. I didn't see enough of the handoff to call the rest certainty.\"":"\"I predicted the exchange point. I didn't witness the custody chain.\"";return{text:`Kakashi answers without adding anything he can't support.\n\n${line}`};},nextBeatId:"kak_debrief_probe"});
-  add(d,{beatId:"kak_debrief_probe",mode:"narration",text:"The evaluator finally looks up.\n\n\"And the thing you guessed correctly?\"\n\nKakashi's gaze shifts once to the route map.\n\n\"Still a guess.\"\n\nThe evaluator's mouth moves—not quite a smile.",nextBeatId:"kak_reflect"});
-  setText(d,"kak_reflect","The evaluator closes the file.\n\n\"One answer before you go. What did the exercise punish?\"");
-  setLabel(d,"kak_reflect","objective","\"Losing sight of the objective.\"");
-  setLabel(d,"kak_reflect","proof","\"Treating an inference like evidence.\"");
-  setLabel(d,"kak_reflect","responsibility","\"Trying to own every problem in the street.\"");
-  for(const c of beat(d,"kak_reflect").choices||[])c.nextBeatId="kak_sakumo";
-  const sak=beat(d,"kak_sakumo");if(sak){sak.exitScene=false;sak.nextBeatId="kak_sakumo_branch";delete sak.presentationResolver;sak.mode="narration";delete sak.speakerName;sak.text="Evening has settled by the time Kakashi gets home.\n\nSakumo is at the low table repairing a strap on his field pack when Kakashi comes in. He glances up once, then at Kakashi's hands.\n\n\"Assessment?\"\n\n\"Finished.\"\n\nSakumo waits. Kakashi starts past him.\n\n\"That good, huh?\"\n\nKakashi stops.";}
-  add(d,{beatId:"kak_sakumo_branch",mode:"narration",presentationResolver:()=>{const r=local().kakashiReflection;
-    if(r==="objective")return{text:"Kakashi glances toward Sakumo. \"I had the job in front of me. Everything else kept trying to become the job.\"\n\nSakumo puts the strap down. \"Objectives are useful.\"\n\nKakashi raises an eyebrow at the pause.\n\n\"So is noticing what they cost you.\""};
-    if(r==="proof")return{text:"\"I was right about something I couldn't prove.\" Kakashi pauses. \"I don't like that those are different.\"\n\n\"Good.\"\n\nKakashi's brow tightens. \"I said I was wrong.\"\n\n\"No. You said you noticed the difference.\""};
-    return{text:"\"There were three things happening. I could only take one.\"\n\nSakumo's expression loses its humour. \"That part doesn't get easier.\"\n\nKakashi looks at him properly then."};
-  },nextBeatId:"kak_sakumo_close"});
-  add(d,{beatId:"kak_sakumo_close",mode:"narration",text:"Kakashi drops his pouch beside the door and sits across from his father.\n\nSakumo pushes the half-repaired strap toward him.\n\n\"Since you're here. Hold that.\"\n\nKakashi takes the strap without complaint.\n\nThe two of them work at the same table.",exitScene:true});
-  return commit(d);
-}
+// Academy Kakashi legacy screen-first patch retired for clean-room V2.
+// Shared screen-first behavior remains active for every other Origin.
 
 function patchObito(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)return false;const d=editable(A.sceneByVariant.academy_obito);if(!d)return false;
@@ -342,18 +308,16 @@ function patchMenma(){
 }
 
 ensureStyle();
-const result={hinata:patchHinata(),izuno:patchIzuno(),mirai:patchMirai(),kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),kakashi:patchKakashi(),obito:patchObito(),menma:patchMenma()};
+const result={hinata:patchHinata(),izuno:patchIzuno(),mirai:patchMirai(),kushina:patchKushina(),kurenai:patchKurenai(),iwabee:patchIwabee(),metal:patchMetal(),obito:patchObito(),menma:patchMenma()};
 
 function runAlphaOriginScreenFirst33700Diagnostics(){
   const A=globalThis.SC_ALPHA_ORIGIN_32900;
-  const kak=A&&definition(A.sceneByVariant.academy_kakashi),hin=A&&definition(A.sceneByVariant.academy_hinata),met=A&&definition(A.sceneByVariant.academy_metal_lee),men=A&&definition(A.sceneByVariant.academy_menma);
-  const kakText=kak&&kak.beatMap?String(kak.beatMap.get("kak_brief")?.text||""):"";
+  const hin=A&&definition(A.sceneByVariant.academy_hinata),met=A&&definition(A.sceneByVariant.academy_metal_lee),men=A&&definition(A.sceneByVariant.academy_menma);
   const checks={
     patchId:PATCH_ID==="alpha_origin_screen_first_33700_2026_09_13",
-    writingAuthorityPinned:AUTHORITY_ORIGINS==="a08dcf50f67d264497944af761475865dff8dc81"&&AUTHORITY_KAKASHI_V2==="c774cd1582b267fb5afbc67bc3bb8556bea71449"&&AUTHORITY_DOCTRINE==="7b646d8697879506f0421af01d6083f8482b828c",
-    tenOriginsPatched:Object.keys(result).length===10&&Object.values(result).every(Boolean),
-    kakashiV2SceneProjected:!!kak&&kakText.includes("sealed packet")&&kakText.includes("guessed correctly")&&kak.beatMap.has("kak_debrief_answer")&&kak.beatMap.has("kak_sakumo_close"),
-    kakashiDeveloperBlockerHidden:!!kak&&String(kak.beatMap.get("kak_choice")?.choices?.find(c=>c.choiceId==="fight_assassin")?.availability?.().knownBlocker||"")==="Battle route unavailable.",
+    writingAuthorityPinned:AUTHORITY_ORIGINS==="a08dcf50f67d264497944af761475865dff8dc81"&&AUTHORITY_DOCTRINE==="7b646d8697879506f0421af01d6083f8482b828c",
+    nonKakashiOriginsPatched:Object.keys(result).length===9&&Object.values(result).every(Boolean),
+    kakashiLegacyScreenPatchRetired:!Object.prototype.hasOwnProperty.call(result,"kakashi"),
     hinataPhysicalScene:!!hin&&String(hin.beatMap.get("hin_practice")?.text||"").includes("Morning mist"),
     metalAddsPerformedPressureBeats:!!met&&met.beatMap.has("met_private_choice")&&met.beatMap.has("met_pressure_choice"),
     menmaSceneStillRegisteredAndProjected:!!men&&String(men.beatMap.get(men.entryBeatId)?.text||"").includes("Iruka"),
@@ -363,6 +327,6 @@ function runAlphaOriginScreenFirst33700Diagnostics(){
   return{pass:failed.length===0,checks,failed,result:{...result},patched:[...patched],browserGoldenClaimed:false};
 }
 
-globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700=Object.freeze({patchId:PATCH_ID,originAuthorityCommit:AUTHORITY_ORIGINS,kakashiV2AuthorityCommit:AUTHORITY_KAKASHI_V2,doctrineCommit:AUTHORITY_DOCTRINE,result:{...result},browserGoldenClaimed:false});
+globalThis.SC_ALPHA_ORIGIN_SCREEN_FIRST_33700=Object.freeze({patchId:PATCH_ID,originAuthorityCommit:AUTHORITY_ORIGINS,doctrineCommit:AUTHORITY_DOCTRINE,result:{...result},browserGoldenClaimed:false});
 globalThis.runAlphaOriginScreenFirst33700Diagnostics=runAlphaOriginScreenFirst33700Diagnostics;
 })();
