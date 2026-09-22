@@ -38,11 +38,27 @@ function installStyle(){
 #${ROOT_ID} .kv2-location{justify-self:start;padding:7px 10px;border-left:2px solid rgba(215,173,73,.72);background:linear-gradient(90deg,rgba(2,9,13,.82),rgba(2,9,13,.34));font-size:clamp(8px,.62vw,11px);font-weight:900;letter-spacing:.14em;color:#e4c978;text-transform:uppercase;text-shadow:0 2px 4px #000}
 #${ROOT_ID} .kv2-objective{justify-self:end;box-sizing:border-box;width:min(100%,390px);padding:8px 11px;border:1px solid rgba(75,209,220,.46);background:rgba(2,12,16,.82);box-shadow:0 10px 30px rgba(0,0,0,.32);font-size:clamp(9px,.68vw,12px);line-height:1.35;color:#e9eeeb}
 #${ROOT_ID} .kv2-objective b{display:block;margin-bottom:3px;color:#67dce5;font-size:7px;letter-spacing:.14em}
-#${ROOT_ID} .kv2-actors{position:absolute;left:3.5%;right:3.5%;top:13.2%;bottom:29%;display:flex;align-items:flex-end;justify-content:center;gap:clamp(22px,5vw,92px);z-index:4;pointer-events:none}
-#${ROOT_ID} .kv2-actors[data-count="1"]{justify-content:flex-start;padding-left:7%}
-#${ROOT_ID} .kv2-actors[data-count="4"]{gap:clamp(10px,2.5vw,42px)}
-#${ROOT_ID} .kv2-actor{position:relative;flex:0 1 min(23vw,250px);width:min(23vw,250px);height:min(53vh,390px);max-height:100%;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}
-#${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor{flex-basis:min(19vw,205px);width:min(19vw,205px);height:min(47vh,345px)}
+#${ROOT_ID} .kv2-actors{position:absolute;left:3.5%;right:3.5%;top:13.2%;bottom:29%;z-index:4;pointer-events:none}
+#${ROOT_ID} .kv2-actor{position:absolute;left:var(--kv2-x,5%);bottom:var(--kv2-y,0);width:var(--kv2-w,min(20vw,220px));height:var(--kv2-h,min(52vh,380px));max-height:100%;display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0);transition:none!important}
+#${ROOT_ID} .kv2-actor[data-slot="kakashi"]{--kv2-x:4%;--kv2-w:min(20vw,220px)}
+#${ROOT_ID} .kv2-actor[data-slot="mi"]{--kv2-x:29%;--kv2-w:min(19vw,210px)}
+#${ROOT_ID} .kv2-actor[data-slot="ps"]{--kv2-x:52%;--kv2-w:min(19vw,210px)}
+#${ROOT_ID} .kv2-actor[data-slot="amt"]{--kv2-x:75%;--kv2-w:min(19vw,210px)}
+#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-x:42%;--kv2-y:1%;--kv2-w:min(14vw,150px);--kv2-h:min(37vh,270px)}
+#${ROOT_ID} .kv2-actor[data-slot="anbu"]{--kv2-x:72%;--kv2-w:min(20vw,220px)}
+#${ROOT_ID} .kv2-actor[data-slot="minato"]{--kv2-x:69%;--kv2-y:10%;--kv2-w:min(23vw,250px);--kv2-h:min(55vh,400px)}
+#${ROOT_ID}[data-preset="sakura_group"] .kv2-actor[data-slot="kakashi"]{--kv2-x:2%;--kv2-w:min(18vw,195px)}
+#${ROOT_ID}[data-preset="sakura_group"] .kv2-actor[data-slot="pakkun"]{--kv2-x:24%;--kv2-w:min(13vw,140px);--kv2-h:min(34vh,245px)}
+#${ROOT_ID}[data-preset="sakura_group"] .kv2-actor[data-slot="ps"]{--kv2-x:43%;--kv2-w:min(18vw,195px)}
+#${ROOT_ID}[data-preset="sakura_group"] .kv2-actor[data-slot="amt"]{--kv2-x:70%;--kv2-w:min(18vw,195px)}
+#${ROOT_ID}[data-preset="escort"] .kv2-actor{--kv2-w:min(16vw,174px);--kv2-h:min(45vh,330px)}
+#${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="kakashi"]{--kv2-x:1%}
+#${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="mi"]{--kv2-x:19%}
+#${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="ps"]{--kv2-x:38%}
+#${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="amt"]{--kv2-x:57%}
+#${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="pakkun"]{--kv2-x:79%;--kv2-w:min(13vw,140px);--kv2-h:min(32vh,235px)}
+#${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:13%;--kv2-y:0}
+#${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="minato"]{--kv2-x:67%;--kv2-y:12%}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 #${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .48s cubic-bezier(.2,.75,.24,1) both}
 #${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}\n#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important}
@@ -65,14 +81,17 @@ function installStyle(){
 #${ROOT_ID} .kv2-next{grid-column:2;grid-row:3;justify-self:end;align-self:end;width:36px;height:30px;border:1px solid rgba(92,215,225,.42);background:rgba(6,30,36,.8);color:#71dee7;font-size:19px;font-weight:900;cursor:pointer}
 #${ROOT_ID} .kv2-battle{grid-column:1/-1!important;text-align:center!important;border-color:rgba(206,91,72,.66)!important;color:#f2c0ae!important;background:linear-gradient(180deg,rgba(67,20,15,.82),rgba(27,9,8,.95))!important}
 #${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-top,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-actors,#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-dialogue{display:none!important}
-#${ROOT_ID} .kv2-receipt{position:absolute;left:50%;top:50%;width:min(780px,78vw);max-height:76vh;transform:translate(-50%,-50%);z-index:40;box-sizing:border-box;padding:34px 38px;border:1px solid rgba(214,173,74,.72);background:linear-gradient(165deg,rgba(6,13,17,.98),rgba(2,7,10,.99));box-shadow:0 36px 90px rgba(0,0,0,.72),inset 0 0 50px rgba(201,162,73,.03);overflow:auto}
+#${ROOT_ID} .kv2-receipt{display:none;position:absolute;left:50%;top:50%;width:min(780px,78vw);max-height:76vh;transform:translate(-50%,-50%);z-index:40;box-sizing:border-box;padding:34px 38px;border:1px solid rgba(214,173,74,.72);background:linear-gradient(165deg,rgba(6,13,17,.98),rgba(2,7,10,.99));box-shadow:0 36px 90px rgba(0,0,0,.72),inset 0 0 50px rgba(201,162,73,.03);overflow:auto}
 #${ROOT_ID} .kv2-receipt span{display:block;color:#64dae3;font-size:9px;font-weight:900;letter-spacing:.16em}
 #${ROOT_ID} .kv2-receipt h1{margin:9px 0 18px;color:#e5c66f;font:900 clamp(21px,2.1vw,34px)/1 Georgia,serif;letter-spacing:.05em}
 #${ROOT_ID} .kv2-receipt pre{margin:0;white-space:pre-wrap;color:#e1e6e1;font:600 clamp(11px,.83vw,14px)/1.65 inherit}
-#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-receipt{display:block}\n#${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
+#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-receipt{display:block}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-speaker,#${ROOT_ID}[data-battle-action-only="true"] .kv2-progress,#${ROOT_ID}[data-battle-action-only="true"] .kv2-text{display:none!important}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-dialogue{min-height:8%;max-height:10%;grid-template-rows:1fr;padding:10px 14px}
+#${ROOT_ID}[data-battle-action-only="true"] .kv2-actions{grid-row:1;margin-top:0;max-height:none}\n#${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
 #${ROOT_ID} .kv2-wipe{position:absolute;inset:0;z-index:999;background:#000;opacity:0;pointer-events:none;transition:opacity .22s ease}
 #${ROOT_ID} .kv2-wipe.is-covering{opacity:1;pointer-events:auto}
-@media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;gap:12px;bottom:31%}#${ROOT_ID} .kv2-actor{width:min(25vw,190px);height:min(46vh,300px)}#${ROOT_ID} .kv2-dialogue{left:3%;right:3%;bottom:2.5%;max-height:26%;min-height:22%}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
+@media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;bottom:31%}#${ROOT_ID} .kv2-actor{--kv2-w:min(19vw,170px);--kv2-h:min(44vh,290px)}#${ROOT_ID} .kv2-actor[data-slot="pakkun"]{--kv2-w:min(13vw,120px);--kv2-h:min(30vh,210px)}#${ROOT_ID} .kv2-dialogue{left:3%;right:3%;bottom:2.5%;max-height:26%;min-height:22%}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
 @media(prefers-reduced-motion:reduce){#${ROOT_ID} .kv2-wipe{transition:none!important}#${ROOT_ID} .kv2-actor.is-entering,#${ROOT_ID} .kv2-actor-ghost{animation:none!important}}
 `;
   document.head.appendChild(s);
@@ -87,10 +106,22 @@ function availableChoices(){
     }).filter(c=>c.available);
   }catch(_e){return[];}
 }
+function actorSlot(actor){
+  const id=String(actor&&actor.id||"");
+  if(id==="academy_kakashi")return"kakashi";
+  if(id==="academy_kakashi_origin_masked_interceptor")return"mi";
+  if(id==="academy_kakashi_origin_package_smuggler")return"ps";
+  if(id==="academy_kakashi_origin_amt")return"amt";
+  if(id==="pakkun_origin_unfamiliar_ninken")return"pakkun";
+  if(id==="konoha_anbu_operational_contact")return"anbu";
+  if(id==="kage_minato")return"minato";
+  return"unknown";
+}
 function actorMarkup(actor){
   const figure=document.createElement("figure");
   figure.className="kv2-actor";
   figure.dataset.actorId=String(actor.id||"");
+  figure.dataset.slot=actorSlot(actor);
   const frame=document.createElement("div");frame.className="kv2-card-frame";
   const img=document.createElement("img");img.alt="";img.src=String(actor.image||"");
   const label=document.createElement("figcaption");label.className="kv2-actor-label";label.textContent=String(actor.label||"");
@@ -143,6 +174,7 @@ function syncActors(root,actors){
     const img=node.querySelector("img"),label=node.querySelector(".kv2-actor-label");
     if(img&&img.getAttribute("src")!==String(actor.image||""))img.setAttribute("src",String(actor.image||""));
     if(label&&label.textContent!==String(actor.label||""))label.textContent=String(actor.label||"");
+    const slot=actorSlot(actor);if(node.dataset.slot!==slot)node.dataset.slot=slot;
     box.appendChild(node);
   }
 }
@@ -176,6 +208,7 @@ function syncStandard(root,p,t){
   const choices=t.atEnd?availableChoices():[];
   const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
   const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
+  root.dataset.battleActionOnly=battleReady&&Number(t.cueCount||0)===0?"true":"false";
   const semanticNext=t.atEnd&&beat&&beat.mode!=="choice"&&beat.mode!=="battle_transition";
   const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
   syncActions(root,actions);
@@ -183,6 +216,7 @@ function syncStandard(root,p,t){
   const next=root.querySelector(".kv2-next");if(next)next.style.display=!actions.length&&(!t.atEnd||semanticNext)?"":"none";
 }
 function syncReceipt(root,p,t){
+  root.dataset.battleActionOnly="false";
   setBackdrop(root,p.backdrop);
   syncActors(root,[]);
   const cue=currentCue(p,t),pre=root.querySelector(".kv2-receipt pre");
@@ -235,10 +269,11 @@ function diagnostics(){
     hidesNativeStorySurface:installStyle.toString().includes('>*:not(#')&&installStyle.toString().includes('{display:none!important}'),
     protectedObjectiveRegion:installStyle.toString().includes("grid-template-columns:minmax(0,1fr) minmax(240px,34%)"),
     protectedDialogueRegion:installStyle.toString().includes("bottom:29%")&&installStyle.toString().includes("bottom:3.7%"),
-    receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&renderReceipt.toString().includes("CHRONICLE RECEIPT"),
+    receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&String(syncReceipt).includes("kv2-receipt"),
     routesDoNotOwnDom:source.includes("getAcademyKakashiV2Presentation36020"),
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
+    deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     noMutationObserver:!String(render).includes("MutationObserver"),
     browserGoldenClaimed:false
   };
