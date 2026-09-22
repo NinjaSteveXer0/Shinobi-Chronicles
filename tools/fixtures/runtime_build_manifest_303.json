@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "buildId": "SC-ALPHA-RUNTIME-R303-2026-09-22-A",
+  "sourceBaselineCommit": "107d602107237f95d23694685ed15b46d0dc4a45",
+  "sourceRef": "issue-303-runtime-build-fingerprint-v1",
+  "runtimeGeneration": "alpha-clean-runtime-kakashi-v2-ownership300-agency278",
+  "majorRuntimeFeatures": [
+    "academy-kakashi-v2",
+    "runtime-ownership-safety-300",
+    "post-battle-agency-278"
+  ],
+  "productionLoader": "index.html",
+  "runtimeModule": "runtime/alpha-runtime-build-fingerprint-303.js",
+  "api": "getRuntimeBuildFingerprint",
+  "fingerprintPolicy": "bump_on_runtime_affecting_change",
+  "playerFacing": false
+}
