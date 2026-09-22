@@ -95,7 +95,7 @@ function installStyle(){
 #${ROOT_ID}[data-has-choices="true"] .kv2-continue-hint{display:none}
 #${ROOT_ID} .kv2-speech{position:absolute;left:var(--kv2-speech-x,50%);bottom:23.5%;z-index:31;width:min(36vw,500px);box-sizing:border-box;transform:translateX(-50%);padding:12px 15px 13px;border:1px solid rgba(103,221,230,.55);border-radius:16px;background:linear-gradient(145deg,rgba(4,18,24,.94),rgba(2,9,14,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(78,210,220,.08);backdrop-filter:blur(8px);pointer-events:none}
 #${ROOT_ID} .kv2-speech[hidden]{display:none!important}
-#${ROOT_ID} .kv2-speech::after{content:"";position:absolute;left:var(--kv2-speech-tail,50%);bottom:-8px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-right:1px solid rgba(103,221,230,.5);border-bottom:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97)}
+#${ROOT_ID} .kv2-speech::after{content:"";position:absolute;left:var(--kv2-speech-tail,50%);top:-8px;width:14px;height:14px;transform:translateX(-50%) rotate(45deg);border-left:1px solid rgba(103,221,230,.5);border-top:1px solid rgba(103,221,230,.5);background:rgba(2,9,14,.97)}
 #${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]{border-color:rgba(218,176,77,.58);background:linear-gradient(145deg,rgba(25,18,6,.93),rgba(8,10,12,.97));box-shadow:0 18px 48px rgba(0,0,0,.48),0 0 22px rgba(218,176,77,.08)}
 #${ROOT_ID} .kv2-speech[data-speaker-side="opposition"]::after{border-color:rgba(218,176,77,.52);background:rgba(8,10,12,.97)}
 #${ROOT_ID} .kv2-speech-name{color:#78dfe7;font-size:8px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
@@ -475,9 +475,12 @@ function syncSpeech(root,p,cue,focused){
   if(actor&&typeof actor.getBoundingClientRect==="function"){
     const rr=root.getBoundingClientRect(),ar=actor.getBoundingClientRect();
     if(rr.width>0){
-      const pct=Math.max(20,Math.min(80,((ar.left+ar.width/2-rr.left)/rr.width)*100));
+      const actorCenter=ar.left+ar.width/2;
+      const pct=Math.max(20,Math.min(80,((actorCenter-rr.left)/rr.width)*100));
       speech.style.setProperty("--kv2-speech-x",pct+"%");
-      speech.style.setProperty("--kv2-speech-tail","50%");
+      const sr=speech.getBoundingClientRect();
+      const tailPct=sr.width>0?Math.max(14,Math.min(86,((actorCenter-sr.left)/sr.width)*100)):50;
+      speech.style.setProperty("--kv2-speech-tail",tailPct+"%");
     }
   }
 }
