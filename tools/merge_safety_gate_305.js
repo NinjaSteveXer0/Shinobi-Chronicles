@@ -82,7 +82,9 @@ function classifyFiles(files){
         /^\.github\/workflows\//.test(p)||
         /^tools\/qa_runtime_ownership_safety_300\.js$/.test(p)||
         /^tools\/fixtures\/runtime_(?:responsibility_registry|change_declarations)_300\.json$/.test(p)||
-        /^tools\/(?:merge_safety_gate_305|qa_merge_safety_gate_305)\.js$/.test(p)
+        /^tools\/(?:merge_safety_gate_305|qa_merge_safety_gate_305)\.js$/.test(p)||
+        /^tools\/(?:qa_contract_integrity_311|story_graph_integrity_311|qa_story_reachability_311|browser_runtime_error_gate_311|qa_browser_runtime_error_gate_311|qa_reference_integrity_311|qa_release_candidate_evidence_311|generate_release_candidate_evidence_311)\.js$/.test(p)||
+        /^tools\/fixtures\/(?:alpha_contract_integrity_311|release_candidate_evidence_contract_311)\.json$/.test(p)
       ){
         classSet.add("WORKFLOW_SAFETY");classSet.add("RUNTIME_CORE");matched=true;
       }
