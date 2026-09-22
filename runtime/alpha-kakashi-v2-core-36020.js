@@ -490,7 +490,7 @@ addBeat("v2_mi_stop_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",obje
 addBeat("v2_mi_stop_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:({state:s})=>{
  const fast=battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS;
  return fast?[N("Masked Interceptor hits the stone beneath the Sakura tree."),N("Kakashi lands a few steps away."),N("For a moment, the street is still."),N("Then his eye moves past her."),N("Toward the routes the others took."),N("Package Smuggler cuts across the far end of the street."),N("Still moving."),N("The package is still with him."),N("Higher up, movement flashes across a distant roofline."),N("ANBU Marked Target."),N("Farther away."),N("But not gone."),N("Not yet."),N("Three problems."),N("Not enough time for all of them at once.")]:
- [N("The street ahead is empty."),N("Kakashi searches the rooftops."),N("The alleys."),N("The next junction."),N("Nothing."),N("Package Smuggler had too much time."),N("The package is gone with him."),N("ANBU Marked Target is gone as well."),N("The pursuit is over."),N("What happens to Masked Interceptor is the only decision left here.")];
+ [N("The street ahead is empty."),N("Kakashi searches the rooftops."),N("The alleys."),N("The next junction."),N("Nothing."),N("Package Smuggler had too much time."),N("The package is gone with him."),N("ANBU Marked Target is gone as well."),N("The pursuit is over."),N("What happens to her is the only decision left here.")];
 },choices:[
  C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>history("PURSUE_PS_AFTER_MI")}),
  C("mi_kill","KILL HER","v2_report",{patch:()=>{dispose("MI","KILL");history("KILL_MI");}}),
@@ -533,8 +533,15 @@ addBeat("v2_ps_pursuit_success",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",
  N("The man's free hand drops toward his weapon."),N("Kakashi's posture changes with it.")
 ],nextBeatId:"v2_battle_ps_seq"});
 addBeat("v2_battle_ps_seq",{mode:"battle_transition",backdrop:B.fight,location:"KONOHA · PL BATTLE",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_seq_ps","ps_seq","v2_ps_seq_win","v2_ps_seq_loss","AK_SA_022")});
-addBeat("v2_ps_seq_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[N("Package Smuggler creates enough space to escape."),N("Kakashi loses the fight and the package leaves with him."),N("ANBU Marked Target is no longer reachable.")],nextBeatId:"v2_report"});
-addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("Package Smuggler goes down."),N("Kakashi recovers the package before he looks toward the route ANBU Marked Target took."),N("The package problem is solved."),N("The remaining people are not.")],choices:[
+addBeat("v2_ps_seq_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[
+ N("Package Smuggler finds the opening first."),N("Kakashi tries to close it."),N("Too late."),N("The man breaks past him."),
+ N("The package remains with its last factual holder."),N("By the time Kakashi can move after him again, the street ahead is empty.")
+],nextBeatId:"v2_report"});
+addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_seq",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[
+ N("Package Smuggler goes down."),N("For a moment, Kakashi stays on him."),N("Makes sure he is not getting straight back up."),N("Then his attention moves."),N("To the package."),
+ N("Package Smuggler is down."),N("Kakashi's eye goes to the package."),N("He takes it from the defeated man's reach, checks it once, and secures it against his body."),
+ N("Only then does he look toward the route ANBU Marked Target took.")
+],choices:[
  C("ps_go_amt","GO AFTER ANBU MARKED TARGET","v2_amt_after_ps",{available:()=>battleActions("ps_seq")<=3,patch:()=>history("PS_FAST_CONTINUE_AMT")}),
  C("ps_kill","KILL HIM","v2_report",{patch:()=>{dispose("PS","KILL");history("KILL_PS");}}),
  C("ps_restrain_continue","RESTRAIN HIM AND CONTINUE","v2_amt_after_ps",{available:()=>battleActions("ps_seq")<=3,patch:()=>{addField("PS");history("RESTRAIN_PS_CONTINUE");}}),
@@ -542,9 +549,27 @@ addBeat("v2_ps_seq_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGH
  C("ps_police","TAKE HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("PS","POLICE");history("PS_TO_POLICE");}}),
  C("ps_report","RETURN TO ANBU","v2_report",{patch:()=>history("RETURN_AFTER_PS")})
 ]});
-addBeat("v2_amt_after_ps",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>{participant("AMT",{state:"AVAILABLE"});setPakkun(true);return history("PAKKUN_INTERCEPT_AFTER_PS");},cues:[N("Kakashi takes the thinner trail toward ANBU Marked Target."),N("A small ninken closes the other exit before Kakashi reaches him."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),N("No introduction. No names exchanged."),N("ANBU Marked Target looks between them and understands the shape of the problem.")],nextBeatId:"v2_battle_amt_seq_pakkun"});
+addBeat("v2_amt_after_ps",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>{participant("AMT",{state:"AVAILABLE"});setPakkun(true);return history("PAKKUN_INTERCEPT_AFTER_PS");},cues:[
+ N("Kakashi leaves Package Smuggler behind."),N("The recovered package is secured against him."),N("The other trail is thinner now."),N("Not gone."),
+ N("He takes the roofs."),N("Cuts across a side street."),N("Drops to ground level again."),N("Movement ahead."),N("ANBU Marked Target."),N("Still running."),N("Kakashi closes."),
+ N("The man reaches the next street—"),N("and stops."),N("A small ninken is already standing in the route ahead."),N("Pakkun looks past him."),N("At Kakashi."),
+ Q("PAKKUN","This yours?"),N("Kakashi slows beside the far end of the street."),N("His eye stays on ANBU Marked Target."),Q("KAKASHI","Apparently."),
+ N("ANBU Marked Target looks between them."),N("Then at the package secured against Kakashi."),Q("ANBU MARKED TARGET","You recovered it."),Q("KAKASHI","I did."),
+ N("His eyes return to the man in front of him."),Q("KAKASHI","And you're still coming back with me."),
+ Q("ANBU MARKED TARGET","You think carrying that package means you understand what happened?"),
+ Q("KAKASHI","No. It means I recovered what I was sent to recover. You're a separate problem."),
+ N("Pakkun shifts off the centreline without waiting for an instruction."),
+ Q("ANBU MARKED TARGET","And what exactly are you planning to do with me?"),N("Kakashi watches his stance."),
+ Q("KAKASHI","That depends on how difficult you make the next few seconds.")
+],nextBeatId:"v2_battle_amt_seq_pakkun"});
 addBeat("v2_battle_amt_seq_pakkun",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_seq_amt_pakkun","amt_seq","v2_amt_seq_win","v2_amt_seq_loss","AK_SA_022")});
-addBeat("v2_amt_seq_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target forces the opening."),N("Kakashi loses the fight."),N("The man escapes."),Q("PAKKUN","You kept the important part."),Q("KAKASHI","I lost him."),Q("PAKKUN","Both things can be true.")],nextBeatId:"v2_report"});
+addBeat("v2_amt_seq_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[
+ N("ANBU Marked Target finds the opening first."),N("Kakashi loses the fight."),N("He does not lose the package with it."),
+ N("The recovered objective was secured before this confrontation began."),N("ANBU Marked Target looks once toward it."),N("Then toward the route out."),N("He chooses distance."),
+ N("By the time Kakashi can force himself back into the pursuit, the man is gone."),N("Pakkun remains nearby."),N("Quiet for once."),
+ Q("PAKKUN","You kept the important part."),N("Kakashi looks down at the package."),Q("KAKASHI","I lost him."),Q("PAKKUN","I noticed."),
+ N("A beat."),N("Pakkun's voice is drier when he continues."),Q("PAKKUN","Both things can be true.")
+],nextBeatId:"v2_report"});
 addBeat("v2_amt_seq_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_seq",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[N("ANBU Marked Target hits the ground hard enough to stay there."),N("Kakashi does not immediately move away."),N("Neither does Pakkun."),N("The man does not."),N("Not yet.")],choices:[
  C("amt_seq_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("AMT","POLICE");history("AMT_TO_POLICE");}}),
  C("amt_seq_release","LET HIM GO","v2_report",{patch:()=>{dispose("AMT","RELEASE");history("RELEASE_AMT");}}),
@@ -613,15 +638,26 @@ addBeat("v2_ps_mi_win",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE ·
  C("secure_stay_first","STAY ON THE FIRST MAN","v2_secure_amt_pursuit_resolver",{patch:()=>history("SECURE_PACKAGE_STAY_FIRST")}),
  C("secure_return","RETURN AND REPORT","v2_report",{patch:()=>history("SECURE_PACKAGE_RETURN_REPORT")})
 ]});
-addBeat("v2_secure_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the first man.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("secureAmtPursuit"),cues:[N("Kakashi leaves the two defeated shinobi behind."),N("The package is secure now."),N("He takes the rooftops after the first man."),N("Selection of the pursuit does not guarantee success.")],choices:[
+addBeat("v2_secure_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch the first man.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("secureAmtPursuit"),cues:[
+ N("Kakashi leaves the two defeated shinobi behind."),N("Not because they no longer matter."),N("Because the first man is still moving."),N("The package is secure now."),
+ N("That changes the calculation."),N("Kakashi can chase without wondering whether every step is taking him farther from the objective."),
+ N("He takes the rooftops."),N("The trail is thinner than it was before the fight."),N("Still there."),N("For now.")
+],choices:[
  C("secure_amt_success","CONTINUE","v2_secure_amt_intercept",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_SUCCESS"}),
  C("secure_amt_fail","CONTINUE","v2_secure_amt_fail",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_FAILURE"})
 ]});
-addBeat("v2_secure_amt_fail",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>participant("AMT",{state:"ESCAPED"}),cues:[N("Kakashi clears another rooftop."),N("Nothing."),N("The route has split too many times."),N("Whatever lead remained is gone."),N("The package is still secured against him."),N("The first man is gone."),N("Those facts can both be true.")],nextBeatId:"v2_report"});
+addBeat("v2_secure_amt_fail",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>participant("AMT",{state:"ESCAPED"}),cues:[
+ N("Kakashi clears another rooftop."),N("Nothing."),N("He drops to street level."),N("Checks the crossing."),N("The route has split too many times."),
+ N("Whatever lead remained after the fight is gone."),N("He stops chasing before guesswork becomes a substitute for a trail."),
+ N("The package is still secured against him."),N("The first man is gone."),N("Those facts can both be true.")
+],nextBeatId:"v2_report"});
 addBeat("v2_secure_amt_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("ANBU Marked Target cuts into the next alley."),N("Then stops."),N("A small ninken is sitting in the route ahead of him."),N("Kakashi lands behind."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),Q("ANBU MARKED TARGET","Then why are you still following me?"),Q("KAKASHI","You're the part I haven't finished."),Q("PAKKUN","He's thinking about running."),Q("KAKASHI","I know."),Q("ANBU MARKED TARGET","You two always this irritating?"),Q("PAKKUN","We just met.")],nextBeatId:"v2_battle_secure_amt"});
 addBeat("v2_battle_secure_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","secure_amt","v2_secure_amt_win","v2_secure_amt_loss","AK_SA_025")});
 addBeat("v2_secure_amt_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("secure_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target finds the opening first."),N("Kakashi loses the fight."),N("He does not lose the package with it."),Q("PAKKUN","You kept the important part."),Q("KAKASHI","I lost him."),Q("PAKKUN","I noticed."),Q("PAKKUN","Both things can be true.")],nextBeatId:"v2_report"});
-addBeat("v2_secure_amt_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("secure_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("The package remains secure."),N("The man does not. Not yet.")],choices:[
+addBeat("v2_secure_amt_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("secure_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[
+ N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("Pakkun stays where he can see both of them."),
+ N("The package remains secure."),N("The man does not."),N("Not yet.")
+],choices:[
  C("secure_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
  C("secure_amt_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
  C("secure_amt_kill","KILL HIM","v2_report",{patch:()=>dispose("AMT","KILL")}),
@@ -651,7 +687,10 @@ addBeat("v2_package_second_ps_lost",{backdrop:B.alleyAlt,location:"KONOHA · NIG
 addBeat("v2_package_second_ps_reached",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:W("assassinThenPackage","6_ps_catch_up_success"),nextBeatId:"v2_battle_ps_package_second"});
 addBeat("v2_battle_ps_package_second",{mode:"battle_transition",backdrop:B.alleyAlt,location:"KONOHA · PL BATTLE",objective:"Recover the package.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_seq_ps","ps_package_second","v2_ps_package_second_win","v2_ps_package_second_loss","AK_SA_015")});
 addBeat("v2_ps_package_second_loss",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_package_second",ctx,s=>{s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[N("Package Smuggler gets through him."),N("The package stays with him."),N("Kakashi has fought twice for the same objective tonight."),N("The second loss closes what little trail remained.")],nextBeatId:"v2_report"});
-addBeat("v2_ps_package_second_win",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_package_second",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("Package Smuggler goes down."),N("Kakashi takes the package from the defeated man's reach."),N("Checks the seal."),N("Secures it against himself."),N("Only then does he look farther down the route.")],choices:[
+addBeat("v2_ps_package_second_win",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_package_second",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[
+ N("Package Smuggler goes down."),N("Kakashi stays on him long enough to know the fight is finished."),N("Then his attention moves to the objective."),
+ N("He takes the package from the defeated man's reach."),N("Checks the seal."),N("Secures it against himself."),N("Only then does he look farther down the route.")
+],choices:[
  C("package_second_stay_amt","STAY ON THE FIRST MAN","v2_package_second_amt_pursuit",{available:()=>battleActions("ps_package_second")<=3,patch:()=>history("PACKAGE_SECOND_STAY_AMT")}),
  C("package_second_return","RETURN AND REPORT","v2_report",{patch:()=>history("PACKAGE_SECOND_RETURN_REPORT")})
 ]});
@@ -659,10 +698,27 @@ addBeat("v2_package_second_amt_pursuit",{mode:"choice",backdrop:B.alleyAlt,locat
  C("package_second_amt_success","CONTINUE","v2_package_second_amt_intercept",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_SUCCESS"}),
  C("package_second_amt_failure","CONTINUE","v2_secure_amt_fail",{available:()=>getOutcome("secureAmtPursuit")==="SECURE_AMT_PURSUIT_FAILURE"})
 ]});
-addBeat("v2_package_second_amt_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("Kakashi legitimately reaches ANBU Marked Target."),N("A small ninken closes the other exit."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),N("The package remains secured to Kakashi."),N("The first man is the remaining problem.")],nextBeatId:"v2_battle_amt_package_second"});
+addBeat("v2_package_second_amt_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[
+ N("ANBU Marked Target cuts into the next alley."),N("Then stops."),N("A small ninken is sitting in the route ahead of him."),N("The man looks at it."),N("The ninken looks past him."),
+ N("Kakashi lands behind."),N("Pakkun's ears lift."),Q("PAKKUN","This yours?"),N("Kakashi keeps his eye on the man between them."),Q("KAKASHI","Apparently."),
+ N("ANBU Marked Target notices the package secured against Kakashi."),Q("ANBU MARKED TARGET","You got it back."),Q("KAKASHI","I did."),
+ Q("ANBU MARKED TARGET","Then why are you still following me?"),N("Kakashi shifts his stance."),Q("KAKASHI","You were the first man in the exchange."),
+ Q("ANBU MARKED TARGET","And that matters more than finishing the assignment?"),Q("KAKASHI","The assignment is here."),N("Kakashi touches the package once."),N("Then looks back at him."),
+ Q("KAKASHI","You're the part I haven't finished."),N("Pakkun rises."),N("ANBU Marked Target glances toward the alley mouth."),N("Pakkun notices."),
+ Q("PAKKUN","He's thinking about running."),Q("KAKASHI","I know."),Q("ANBU MARKED TARGET","You two always this irritating?"),N("Pakkun gives him a flat look."),Q("PAKKUN","We just met.")
+],nextBeatId:"v2_battle_amt_package_second"});
 addBeat("v2_battle_amt_package_second",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Catch the first man.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_seq_amt_pakkun","amt_package_second","v2_amt_package_second_win","v2_amt_package_second_loss","AK_SA_015")});
-addBeat("v2_amt_package_second_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_package_second",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target wins the final fight and escapes."),N("The package remains secured to Kakashi."),N("Earlier victories and package recovery are not erased by the later loss.")],nextBeatId:"v2_report"});
-addBeat("v2_amt_package_second_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_package_second",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[N("ANBU Marked Target is defeated."),N("The package remains secure."),N("The final participant still requires an authored disposition.")],choices:[
+addBeat("v2_amt_package_second_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_package_second",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[
+ N("ANBU Marked Target finds the opening first."),N("Kakashi loses the fight."),N("He does not lose the package with it."),
+ N("The recovered objective was secured before this confrontation began."),N("ANBU Marked Target looks once toward it."),N("Then toward the route out."),N("He chooses distance."),
+ N("By the time Kakashi can force himself back into the pursuit, the man is gone."),N("Pakkun remains nearby."),N("Quiet for once."),
+ Q("PAKKUN","You kept the important part."),N("Kakashi looks down at the package."),Q("KAKASHI","I lost him."),Q("PAKKUN","I noticed."),
+ N("A beat."),N("Pakkun's voice is drier when he continues."),Q("PAKKUN","Both things can be true.")
+],nextBeatId:"v2_report"});
+addBeat("v2_amt_package_second_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_package_second",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[
+ N("ANBU Marked Target goes down."),N("Kakashi stays on him until the fight is unquestionably over."),N("Pakkun stays where he can see both of them."),
+ N("The package remains secure."),N("The man does not."),N("Not yet.")
+],choices:[
  C("package_second_amt_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
  C("package_second_amt_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
  C("package_second_amt_kill","KILL HIM","v2_report",{patch:()=>dispose("AMT","KILL")}),
@@ -680,11 +736,25 @@ addBeat("v2_go_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location
 // ---------------------------------------------------------------------------
 // MOVE IN CLOSER.
 // ---------------------------------------------------------------------------
-addBeat("v2_get_closer_resolver",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Learn more without exposing yourself.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("getCloser"),cues:[N("The Sakura tree is still some distance ahead."),N("From deeper in the alley, Kakashi can see the meeting."),N("He cannot hear enough of it."),N("That is the problem."),N("Kakashi leaves the safer distance behind."),N("He stays low in the darker side of the alley, where lantern light does not quite reach the walls."),N("Wet stone catches everything else—moonlight, windows, the warm glow beyond the alley mouth."),N("He avoids all of it."),N("One doorway."),N("Then another."),N("Closer."),N("The Sakura tree grows larger beyond the entrance."),N("So do the voices.")],choices:[
+addBeat("v2_get_closer_resolver",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Learn more without exposing yourself.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("getCloser"),cues:[N("The Sakura tree is still some distance ahead."),N("From deeper in the alley, Kakashi can see the meeting."),N("He cannot hear enough of it."),N("That is the problem."),N("Kakashi leaves the safer distance behind."),N("He stays low in the darker side of the alley, where lantern light does not quite reach the walls."),N("Wet stone catches everything else — moonlight, windows, the warm glow beyond the alley mouth."),N("He avoids all of it."),N("One doorway."),N("Then another."),N("Closer."),N("The Sakura tree grows larger beyond the entrance."),N("So do the voices.")],choices:[
  C("closer_success","CONTINUE","v2_get_closer_success",{available:()=>getOutcome("getCloser")==="GET_CLOSER_SUCCESS"}),
  C("closer_failure","CONTINUE","v2_get_closer_failure",{available:()=>getOutcome("getCloser")==="GET_CLOSER_FAILURE"})
 ]});
-addBeat("v2_get_closer_success",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Choose what to do with the handoff.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>mutate(s=>{s.knowledge.getCloserContingency=true;}),cues:[N("Kakashi keeps the concealment."),N("From the closer position, he hears enough to understand the contingency: if the street is not clear, ANBU Marked Target keeps the package moving instead of completing the handoff."),N("No downstream destination is stated."),N("Kakashi now knows more, but he still has to decide what to do with it.")],choices:[
+addBeat("v2_get_closer_success",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Choose what to do with the handoff.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>mutate(s=>{s.knowledge.getCloserContingency=true;}),cues:[
+ N("Neither man looks toward Kakashi."),N("Good."),N("He settles into the shadow near the end of the alley."),N("Close enough now."),
+ N("ANBU Marked Target keeps one hand against the package beneath his clothing."),N("Package Smuggler stands opposite him."),N("No hurry in either man's posture."),N("Too little hurry, considering what they are doing."),
+ N("Then Kakashi hears them clearly."),Q("ANBU MARKED TARGET","You said once I hand it over, I'm done."),N("Package Smuggler barely looks at him."),Q("PACKAGE SMUGGLER","You are."),
+ N("The target does not seem reassured."),N("His eyes flick toward the main street."),Q("ANBU MARKED TARGET","And if somebody followed me?"),
+ N("Package Smuggler's expression changes."),N("Not fear."),N("Annoyance."),Q("PACKAGE SMUGGLER","Then you keep walking."),N("A pause."),N("The target's hand remains over the package."),
+ Q("ANBU MARKED TARGET","With it?"),N("Now Package Smuggler looks at him."),Q("PACKAGE SMUGGLER","Until I say otherwise."),N("The answer bothers him."),N("Kakashi can tell from the way his fingers tighten against the cloth."),
+ Q("ANBU MARKED TARGET","That wasn't the plan."),N("Package Smuggler glances once along the street."),N("Not toward Kakashi."),N("Just checking."),Q("PACKAGE SMUGGLER","Plans are for empty streets."),
+ N("The target's mouth tightens."),Q("ANBU MARKED TARGET","And if the street is empty?"),N("Package Smuggler holds out his hand."),Q("PACKAGE SMUGGLER","Then I take it."),
+ N("His fingers remain open between them."),Q("PACKAGE SMUGGLER","And you disappear."),N("The target looks at the waiting hand."),Q("ANBU MARKED TARGET","Where does it go after you?"),
+ N("Package Smuggler's expression almost becomes a smile."),N("Almost."),Q("PACKAGE SMUGGLER","Away from you."),N("Kakashi's eye narrows."),
+ N("That was more useful than anything either of them had said from a distance."),N("The arrangement is clearer now."),N("If the handoff happens, ANBU Marked Target walks away."),
+ N("Package Smuggler leaves with the objective."),N("If they believe somebody is following them, the handoff does not happen at all."),N("Kakashi has moved closer without changing the scene."),
+ N("For now."),N("Package Smuggler's hand is still waiting."),N("ANBU Marked Target begins to move his own."),N("The decision has become smaller."),N("And more immediate.")
+],choices:[
  C("closer_handoff","LET THE HANDOFF HAPPEN","v2_closer_handoff",{patch:()=>history("CLOSER_LET_HANDOFF")}),
  C("closer_strike","STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup",{patch:()=>history("CLOSER_STRIKE")}),
  C("closer_pick","ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver",{patch:()=>history("CLOSER_PICKPOCKET")})
@@ -697,30 +767,108 @@ addBeat("v2_closer_handoff",{mode:"choice",backdrop:B.sakura,location:"SAKURA TR
  C("closer_watch_amt","GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver",{patch:()=>history("GO_ORIGINAL_AFTER_CLOSER")})
 ]});
 
-addBeat("v2_get_closer_failure",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Stop the package from escaping.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:[N("Package Smuggler catches the movement before Kakashi reaches the position he wanted."),N("The handoff aborts."),N("ANBU Marked Target keeps the package."),N("Package Smuggler starts toward the compromised observation point."),N("Masked Interceptor never becomes visibly eligible because the transfer never happened.")],choices:[
+addBeat("v2_get_closer_failure",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Stop the package from escaping.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:[
+ N("The Sakura tree is still some distance ahead."),N("Kakashi can see the meeting."),N("He cannot hear enough of it."),N("He starts forward."),N("Quietly."),
+ N("The darker side of the alley gives him more cover than the lantern-lit street ahead. He slips past one doorway, then another, keeping the two men framed between the buildings."),
+ N("Closer."),N("The voices begin to carry."),N("Kakashi catches the beginning of the conversation."),
+ Q("ANBU MARKED TARGET","You said once I hand it over, I'm done."),Q("PACKAGE SMUGGLER","You are."),N("The target looks toward the main street."),
+ Q("ANBU MARKED TARGET","And if somebody followed me?"),Q("PACKAGE SMUGGLER","Then you keep walking."),N("The target frowns."),Q("ANBU MARKED TARGET","With it?"),
+ N("Package Smuggler does not answer."),N("His eyes have moved."),N("Not toward Kakashi."),N("Down."),N("A thin pool of rainwater lies along the edge of the street."),
+ N("Lantern light trembles across it."),N("So does something else."),N("Movement where the reflected alley should have been empty."),N("Package Smuggler's hand rises."),N("Not for the package."),N("A warning."),
+ Q("PACKAGE SMUGGLER","Hold it."),N("ANBU Marked Target freezes."),N("His hand never leaves his clothing."),N("The package remains with him."),Q("ANBU MARKED TARGET","What?"),
+ N("Package Smuggler keeps staring into the alley."),N("Kakashi does not move."),N("Too late."),N("The man's posture has already changed."),Q("PACKAGE SMUGGLER","Someone's close."),
+ N("The target finally starts to turn."),Q("PACKAGE SMUGGLER","Don't."),N("He stops."),N("Package Smuggler's voice hardens."),Q("PACKAGE SMUGGLER","Keep it."),N("A beat."),
+ Q("PACKAGE SMUGGLER","Main street. Go."),N("ANBU Marked Target does not argue this time."),N("He moves."),N("Fast."),N("Toward the Sakura tree and the open street beyond it."),
+ N("The package goes with him."),N("Package Smuggler stays behind."),N("For one second he watches the target leave."),N("Then he turns toward the alley."),N("Toward Kakashi."),
+ N("Not his exact hiding place."),N("Not yet."),N("But close enough that the difference will not last."),N("Kakashi's eye shifts past him."),N("ANBU Marked Target is already gaining distance."),
+ N("The package is still secure beneath his clothing."),N("Package Smuggler is walking toward the person who ruined the handoff."),N("Kakashi wanted more information."),N("He got some."),
+ N("He also changed the scene."),N("Now he has to decide which consequence matters more.")
+],choices:[
  C("failure_stay","STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver",{patch:()=>history("STAY_ON_PACKAGE")}),
  C("failure_stop_ps","STOP PACKAGE SMUGGLER","v2_stop_ps_setup",{patch:()=>history("STOP_PACKAGE_SMUGGLER")}),
  C("failure_cutoff","CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup",{patch:()=>history("CUT_OFF_SAKURA")})
 ]});
 
-addBeat("v2_stay_package_pursuit_resolver",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("stayPackagePursuit"),cues:[N("Package Smuggler is coming toward the alley."),N("ANBU Marked Target is going the other way."),N("The package goes with him."),N("Kakashi runs straight past Package Smuggler."),Q("PACKAGE SMUGGLER","There!"),Q("ANBU MARKED TARGET","A kid?"),Q("KAKASHI","The package."),N("Kakashi stops trying to run faster and starts cutting the route instead.")],choices:[
+addBeat("v2_stay_package_pursuit_resolver",{mode:"choice",backdrop:B.sakura,location:"SAKURA TREE · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("stayPackagePursuit"),cues:[
+ N("Package Smuggler is coming toward the alley."),N("ANBU Marked Target is going the other way."),N("The package goes with him."),N("Kakashi doesn't need longer than that."),N("He moves."),
+ N("Package Smuggler catches the motion at the edge of the alley."),N("His head snaps around."),N("There."),N("For the first time, he actually sees the person who spoiled the exchange."),
+ N("For half a heartbeat, surprise shows."),N("Kakashi is younger than he expected."),N("It lasts half a heartbeat."),Q("PACKAGE SMUGGLER","There!"),
+ N("ANBU Marked Target looks back."),N("His expression changes when he sees Kakashi burst into the open."),Q("ANBU MARKED TARGET","A kid?"),N("Kakashi doesn't answer."),
+ N("He runs straight past Package Smuggler."),N("The man reaches for him."),N("Too slow."),N("Kakashi slips outside the grab and keeps moving."),Q("PACKAGE SMUGGLER","Don't stop!"),
+ N("The target is already crossing toward the Sakura tree."),N("He shouts without looking back."),Q("ANBU MARKED TARGET","You said I was done!"),N("Package Smuggler's answer follows him across the street."),
+ Q("PACKAGE SMUGGLER","Not while you're holding it!"),N("That lands."),N("Kakashi's eye sharpens."),N("Another piece of the arrangement."),N("The man ahead had not been meant to keep the package."),N("Now he had no choice."),
+ N("The alley falls away behind Kakashi."),N("The Sakura tree fills the square ahead."),N("Lantern light catches wet stone beneath it. Petals move through the glow as ANBU Marked Target cuts across the open space."),
+ N("Kakashi follows."),N("The target glances back again."),N("This time he sees how quickly the distance is shrinking."),N("He swears under his breath."),Q("ANBU MARKED TARGET","What do you want?"),
+ N("Kakashi's answer is immediate."),Q("KAKASHI","The package."),N("The target gives a short, breathless laugh."),N("No humour in it."),Q("ANBU MARKED TARGET","Of course."),
+ N("His hand presses against it beneath his clothing."),N("Still there."),N("Still his."),N("He changes direction around the Sakura tree."),N("Kakashi watches the turn."),N("Not the man."),N("The route."),
+ N("There are three ways out of the square."),N("The target chooses one."),N("Kakashi starts cutting toward another."),N("He isn't trying to run faster anymore."),N("He's trying to arrive first.")
+],choices:[
  C("stay_success","CONTINUE","v2_stay_package_intercept",{available:()=>getOutcome("stayPackagePursuit")==="STAY_PACKAGE_PURSUIT_SUCCESS"}),
  C("stay_failure","CONTINUE","v2_stay_package_failure",{available:()=>getOutcome("stayPackagePursuit")==="STAY_PACKAGE_PURSUIT_FAILURE"})
 ]});
-addBeat("v2_stay_package_failure",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[N("Kakashi cuts inside the target's route."),N("The target is not there."),N("By the time Kakashi reaches the far side of the tree, ANBU Marked Target is already at the edge of the square."),N("A turn between buildings."),N("Gone."),N("Three possible routes."),N("No movement."),N("The package is still in the wrong hands."),N("Kakashi looks down the empty route."),N("There is nobody there to stop the target for him.")],nextBeatId:"v2_report"});
+addBeat("v2_stay_package_failure",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[
+ N("Kakashi cuts inside the target's route."),N("For several seconds the Sakura tree blocks them from one another."),N("Kakashi listens."),N("Footsteps."),N("Fast."),N("Then slowing."),
+ N("Kakashi changes direction."),N("The target isn't there."),N("His eye moves across the square."),N("A shadow disappears beyond one of the lanterns."),N("Wrong exit."),N("Kakashi turns immediately."),
+ N("By the time he reaches the far side of the tree, ANBU Marked Target is already at the edge of the square."),N("He looks back once."),N("Their eyes meet across the distance."),
+ N("The package is still pressed beneath his arm."),N("Then two late-night pedestrians step into the street between them."),N("Kakashi changes line."),N("The target doesn't."),N("He uses the interruption."),
+ N("A turn between buildings."),N("Gone."),N("Kakashi reaches the corner seconds later."),N("Empty street."),N("Three possible routes."),N("No movement."),N("No sound he can separate from the rest of Konoha."),
+ N("Kakashi stands still."),N("Listens again."),N("Nothing."),N("His visible eye narrows."),N("He looks back toward the Sakura tree."),N("Package Smuggler isn't there either."),N("Of course he isn't."),
+ N("Kakashi had chosen the package."),N("The other man had used the choice."),N("For the first time since the ANBU operative handed him the assignment, Kakashi has neither person in sight."),
+ N("And the package is still in the wrong hands."),N("He remains there for another second."),N("Not because he expects the street to give the answer back."),
+ N("Because committing the mistake to memory takes less time than repeating it."),N("Then he turns toward the only place left where somebody is expecting him."),N("ANBU.")
+],nextBeatId:"v2_report"});
 addBeat("v2_stay_package_intercept",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("Kakashi cuts inside the target's route."),N("ANBU Marked Target comes around the far side and sees him."),N("Too late."),N("A small ninken stands in the middle of the exit."),Q("ANBU MARKED TARGET","Seriously?"),N("Kakashi arrives behind him."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),Q("KAKASHI","Thanks."),N("No introduction."),N("No names exchanged."),Q("ANBU MARKED TARGET","You've been chasing this thing all night."),Q("KAKASHI","You've been running with it."),Q("ANBU MARKED TARGET","Fair."),Q("PAKKUN","Trouble?"),Q("KAKASHI","Probably."),Q("PAKKUN","Useful."),N("The pursuit is over."),N("The package problem isn't.")],choices:[
  C("demand_package","DEMAND THE PACKAGE","v2_demand_setup",{patch:()=>history("DEMAND_PACKAGE")}),
  C("take_him_down","TAKE HIM DOWN","v2_take_down_setup",{patch:()=>history("TAKE_HIM_DOWN")}),
  C("ask_where","ASK WHERE THE PACKAGE WAS GOING","v2_ask_where",{patch:()=>history("ASK_WHERE_PACKAGE_GOING")})
 ]});
-addBeat("v2_ask_where",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>mutate(s=>{s.knowledge.askWhere=true;s.knowledge.downstreamDestinationKnown=false;}),cues:[N("ANBU Marked Target keeps one hand close to the package."),N("He waits for Kakashi to demand it."),N("Kakashi asks something else."),Q("KAKASHI","Where was the package going after the handoff?"),N("The question surprises him."),Q("ANBU MARKED TARGET","My part ended there."),Q("KAKASHI","The receiver was taking it onward."),Q("ANBU MARKED TARGET","That was the plan."),Q("KAKASHI","Where?"),Q("ANBU MARKED TARGET","I asked the same thing."),N("Kakashi gets information, but not a destination."),N("The carrier's role ended at the handoff. Package Smuggler was meant to carry it onward. ANBU Marked Target did not know where.")],choices:[
+addBeat("v2_ask_where",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>mutate(s=>{s.knowledge.askWhere=true;s.knowledge.downstreamDestinationKnown=false;}),cues:[
+ N("ANBU Marked Target keeps one hand close to the package."),N("Kakashi notices."),N("He does not reach for it."),N("Not yet."),N("Pakkun stays in the man's escape line and watches both of them."),
+ N("ANBU Marked Target looks at Kakashi."),N("Waiting for the demand."),N("Kakashi asks something else."),Q("KAKASHI","Where was it going?"),N("The man's expression changes."),
+ N("Not surprise at the question."),N("Surprise that Kakashi asked it first."),Q("ANBU MARKED TARGET","You think they told me?"),N("Kakashi says nothing."),
+ N("The man looks toward the blocked street behind him."),N("Pakkun is still there."),N("No opening."),Q("ANBU MARKED TARGET","You heard us."),Q("KAKASHI","Enough."),
+ Q("ANBU MARKED TARGET","I carry it to him."),N("He glances at the package."),Q("ANBU MARKED TARGET","He carries it somewhere else."),Q("KAKASHI","Where?"),
+ N("The man gives Kakashi a tired look."),Q("ANBU MARKED TARGET","I asked the same thing."),N("Kakashi remembers the answer from the interrupted exchange."),N("Away from you."),
+ N("His eye narrows."),Q("KAKASHI","He didn't tell you."),Q("ANBU MARKED TARGET","Now you're caught up."),N("Pakkun looks between them."),Q("PAKKUN","Efficient organisation."),
+ N("Kakashi glances toward him."),Q("KAKASHI","Apparently."),N("ANBU Marked Target exhales through his nose."),Q("ANBU MARKED TARGET","You two always like this?"),
+ N("Pakkun looks at Kakashi."),N("Kakashi looks at Pakkun."),N("Neither answers him.")
+],choices:[
  C("ask_then_demand","DEMAND THE PACKAGE","v2_demand_setup"),
  C("ask_then_take","TAKE HIM DOWN","v2_take_down_setup")
 ]});
 addBeat("v2_demand_setup",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",cues:[Q("KAKASHI","Give me the package."),N("ANBU Marked Target does not surrender it."),N("The demand becomes a fight without changing package custody before Battle.")],nextBeatId:"v2_battle_demand_amt"});
 addBeat("v2_battle_demand_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","demand_amt","v2_demand_win","v2_demand_loss","AK_SA_008")});
-addBeat("v2_demand_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[N("ANBU Marked Target forces the opening."),N("Kakashi loses it a moment later."),N("The fight breaks apart."),N("ANBU Marked Target moves before Kakashi can recover his footing."),N("By the time Kakashi looks up again, the man is already leaving the street."),N("The package is gone with him."),N("Pakkun remains nearby as the alley empties.")],nextBeatId:"v2_report"});
-addBeat("v2_demand_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("ANBU Marked Target hits the ground hard enough to stay there."),N("Kakashi does not immediately move away."),N("Neither does Pakkun."),N("Kakashi secures the package."),N("The man remains on the ground."),N("Kakashi looks at him before deciding what comes next.")],choices:[
+addBeat("v2_demand_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[
+ N("The alley comes back into focus slowly."),N("Kakashi is on one knee."),N("One hand against the wet stone."),N("His breathing is heavier than he wants it to be."),
+ N("Across from him, ANBU Marked Target is still standing."),N("Barely comfortably."),N("But standing."),N("The package remains secured against him."),
+ N("Pakkun is several paces away, recovering his footing and watching the man with narrowed eyes."),N("Nobody speaks for a moment."),N("ANBU Marked Target looks at Kakashi."),N("Not triumphant."),N("Just tired."),
+ Q("ANBU MARKED TARGET","You asked."),N("Kakashi lifts his eye."),N("The man adjusts the package beneath his clothing."),Q("ANBU MARKED TARGET","I answered."),
+ N("He starts backing toward the far end of the alley."),N("Pakkun rises fully."),N("The target sees it."),N("His stance changes immediately."),N("Ready again if it has to."),
+ N("Pakkun looks at him."),N("Then at Kakashi."),N("Then back toward the growing distance between them."),N("He could chase."),N("For a moment, it looks like he might."),
+ N("Instead, he stays."),N("His decision."),N("Not Kakashi's command."),N("ANBU Marked Target reaches the corner."),N("Stops once."),N("Looks back."),
+ N("Kakashi is already pushing himself upright."),N("Their eyes meet."),N("Then the man disappears."),N("Footsteps fade into Konoha."),N("The package goes with him."),
+ N("Kakashi stands."),N("Too late."),N("Pakkun looks toward the empty corner."),Q("PAKKUN","Persistent."),N("Kakashi brushes water from one glove."),
+ Q("KAKASHI","So was I."),N("Pakkun glances up at him."),Q("PAKKUN","Was?"),N("Kakashi looks down the street."),N("Nothing left to follow."),N("No sound."),
+ N("No useful trail he can separate from the village around it."),N("His eye narrows."),Q("KAKASHI","Tonight."),N("Pakkun gives a quiet huff."),N("Could be amusement."),
+ N("Could be approval."),N("Could be neither."),N("Kakashi doesn't ask."),N("The facts are simple enough."),N("ANBU Marked Target escaped."),
+ N("The package escaped with him."),N("Kakashi lost the Battle."),N("There is no custody."),N("There is no disposition choice."),N("And there is no second roll pretending the result didn't matter."),
+ N("The only honest thing left is the report."),N("Kakashi turns back toward the ANBU meeting point."),N("After a moment, Pakkun follows.")
+],nextBeatId:"v2_report"});
+addBeat("v2_demand_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[
+ N("The alley returns around Kakashi in pieces."),N("Rainwater."),N("Lantern light."),N("Hard breathing."),N("ANBU Marked Target is down on one knee."),
+ N("Not unconscious."),N("Not dead."),N("Finished."),N("The package lies several feet away where it came loose during the fight."),N("The man's eyes find it."),N("So does Kakashi."),
+ N("He moves first."),N("ANBU Marked Target pushes off the ground—"),N("Pakkun steps into his path."),N("No growl this time."),N("He doesn't need one."),N("The man stops."),
+ N("Looks down at the ninken."),N("Then past him at Kakashi."),N("Kakashi picks up the package."),N("Turns it once in his hand."),N("Checks the seal."),N("Still intact."),
+ N("The tension that has followed him since the rooftop doesn't disappear."),N("It changes."),N("The package is secure."),N("Finally."),
+ Q("ANBU MARKED TARGET","So that's it."),N("Kakashi slips the package safely away."),Q("KAKASHI","That part is."),N("The man's expression tightens."),
+ N("He looks toward the open end of the alley."),N("Pakkun notices."),N("Moves half a step."),N("The exit closes again."),Q("PAKKUN","You really like running."),
+ N("ANBU Marked Target looks at him."),Q("ANBU MARKED TARGET","You really like getting in the way."),N("Pakkun considers that."),Q("PAKKUN","Seems to be working."),
+ N("Kakashi approaches."),N("The target's attention shifts back to him."),N("His hands are empty now."),N("Kakashi still watches them."),Q("ANBU MARKED TARGET","You got what you wanted."),
+ Q("KAKASHI","Yeah."),N("The man waits."),N("Kakashi doesn't leave."),N("A small change reaches his face."),N("Recognition."),Q("ANBU MARKED TARGET","Ah."),
+ N("Kakashi takes hold of his arm."),N("The target tests the grip once."),N("Not seriously."),N("Enough to confirm what it means."),N("Kakashi secures him."),
+ N("Pakkun watches the restraint settle into place."),N("The chase is over."),N("The package is no longer in the wrong hands."),N("And ANBU Marked Target is now in Kakashi's custody."),
+ N("Those are two separate problems."),N("Kakashi has solved both."),N("What happens to the man next is still a choice.")
+],choices:[
  C("demand_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
  C("demand_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
  C("demand_kill","KILL HIM","v2_report",{patch:()=>dispose("AMT","KILL")}),
@@ -747,10 +895,20 @@ addBeat("v2_take_down_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA 
  C("take_anbu","TAKE HIM BACK TO THE ANBU","v2_report",{patch:()=>dispose("AMT","ANBU")})
 ]});
 
-addBeat("v2_stop_ps_setup",{backdrop:B.alleyAlt,location:"KONOHA ALLEYWAY · NIGHT",objective:"Stop Package Smuggler.",actors:["kakashi","ps"],preset:"battle_pair",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[N("Kakashi turns on Package Smuggler instead of following the objective carrier."),N("ANBU Marked Target uses the choice to leave with the package."),N("Masked Interceptor remains unseen."),N("Package Smuggler is the only opponent Kakashi commits to here.")],nextBeatId:"v2_battle_ps_direct"});
+addBeat("v2_stop_ps_setup",{backdrop:B.alleyAlt,location:"KONOHA ALLEYWAY · NIGHT",objective:"Stop Package Smuggler.",actors:["kakashi","ps"],preset:"battle_pair",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[
+ N("ANBU Marked Target is already moving away."),N("The package goes with him."),N("Package Smuggler is coming toward Kakashi instead."),N("Kakashi looks once toward the Sakura tree."),N("Then stops looking."),
+ N("He steps out of the alley."),N("Package Smuggler slows."),Q("PACKAGE SMUGGLER","Wrong one."),N("Kakashi's eye settles on him."),Q("KAKASHI","You were waiting for it."),
+ N("The man glances toward the street where ANBU Marked Target disappeared."),Q("PACKAGE SMUGGLER","Was."),Q("KAKASHI","Then you know where it was going."),N("A faint smile."),
+ Q("PACKAGE SMUGGLER","And you chose me instead of following it."),N("Kakashi shifts his footing."),Q("KAKASHI","I chose to stop you."),N("The smile disappears."),
+ N("Package Smuggler reaches for his weapon."),Q("PACKAGE SMUGGLER","Then stop me.")
+],nextBeatId:"v2_battle_ps_direct"});
 addBeat("v2_battle_ps_direct",{mode:"battle_transition",backdrop:B.fight,location:"KONOHA · PL BATTLE",objective:"Stop Package Smuggler.",actors:["kakashi","ps"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_ps_1v1","ps_direct","v2_ps_missing_win","v2_ps_missing_loss","AK_SA_016")});
-addBeat("v2_ps_missing_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="ESCAPED";}),cues:[N("Package Smuggler wins the fight and gets away."),N("ANBU Marked Target already escaped with the package."),N("Masked Interceptor never appeared.")],nextBeatId:"v2_report"});
-addBeat("v2_ps_missing_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";}),cues:[N("Package Smuggler is defeated."),N("The package is still missing with ANBU Marked Target."),N("Package failure does not remove Kakashi's post-Battle agency over the defeated man.")],choices:[
+addBeat("v2_ps_missing_loss",{backdrop:B.fight,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="ESCAPED";}),cues:[
+ N("Package Smuggler gets away."),N("ANBU Marked Target is already gone with the objective."),N("Kakashi ends with neither package nor prisoner.")
+],nextBeatId:"v2_report"});
+addBeat("v2_ps_missing_win",{mode:"choice",backdrop:B.fight,location:"KONOHA · NIGHT",objective:null,actors:["kakashi","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("ps_direct",ctx,s=>{s.participants.PS.state="BATTLE_DEFEATED";}),cues:[
+ N("The package is still gone with AMT."),N("Package Smuggler is defeated and physically available.")
+],choices:[
  C("ps_missing_kill","KILL HIM","v2_report",{patch:()=>dispose("PS","KILL")}),
  C("ps_missing_restrain","RESTRAIN HIM","v2_report",{patch:()=>addField("PS")}),
  C("ps_missing_anbu","BRING HIM TO THE ANBU","v2_report",{patch:()=>dispose("PS","ANBU")}),
@@ -765,7 +923,9 @@ addBeat("v2_cutoff_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",obj
  N("A beat."),Q("KAKASHI","Thanks."),N("No names are exchanged.")
 ],nextBeatId:"v2_battle_cutoff"});
 addBeat("v2_battle_cutoff",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Stop the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_amt_ps_2v1","cutoff","v2_cutoff_win","v2_cutoff_loss","AK_SA_017")});
-addBeat("v2_cutoff_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("cutoff",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[N("Both men break containment."),N("ANBU Marked Target escapes with the package."),N("Package Smuggler escapes."),N("Pakkun remains with Kakashi after the field clears.")],nextBeatId:"v2_report"});
+addBeat("v2_cutoff_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("cutoff",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[
+ N("Both men break containment."),N("AMT escapes with package."),N("PS escapes."),N("Pakkun remains with Kakashi after the field clears.")
+],nextBeatId:"v2_report"});
 addBeat("v2_cutoff_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("cutoff",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;s.groupParticipants=["AMT","PS"];}),cues:W("getCloserDownstream","9_failure_cut_them_off_at_the_sakura_tree"),choices:[
  C("cutoff_police","TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>disposeGroup("POLICE",[AMT,PS])}),
  C("cutoff_anbu","TAKE THEM TO THE ANBU","v2_report",{patch:()=>disposeGroup("ANBU",[AMT,PS])}),
@@ -774,14 +934,26 @@ addBeat("v2_cutoff_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE ·
 ]});
 
 // Improved-position Pickpocket.
-addBeat("v2_improved_pickpocket_resolver",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Take the package cleanly.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("improvedPickpocket"),cues:[N("Kakashi uses the closer position to attempt the package before the handoff."),N("Success is a clean extraction."),N("Failure exposes him to ANBU Marked Target and Package Smuggler; Masked Interceptor remains unseen because the handoff never completed.")],choices:[
+addBeat("v2_improved_pickpocket_resolver",{mode:"choice",backdrop:B.endAlley,location:"END OF ALLEYWAY · NIGHT",objective:"Take the package cleanly.",actors:["kakashi","amt","ps"],preset:"observe",onEnter:()=>resolverEnter("improvedPickpocket"),cues:[
+ N("Kakashi has already shortened the distance."),N("Now he uses it."),N("ANBU Marked Target's hand is still over the package."),N("Package Smuggler is waiting."),
+ N("Kakashi knows exactly what happens if the street stays quiet."),N("He tries to remove the package before either man can find out that it will not.")
+],choices:[
  C("improved_pick_success","CONTINUE","v2_pickpocket_clean_success",{available:()=>getOutcome("improvedPickpocket")==="PICKPOCKET_IMPROVED_SUCCESS"}),
  C("improved_pick_fail","CONTINUE","v2_improved_pick_fail_setup",{available:()=>getOutcome("improvedPickpocket")==="PICKPOCKET_IMPROVED_FAILURE"})
 ]});
-addBeat("v2_improved_pick_fail_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:[N("Kakashi gets a hand to the package."),N("ANBU Marked Target catches the movement before the theft is clean."),N("Package Smuggler moves at the same time."),N("Kakashi breaks contact and lands in the open."),N("ANBU Marked Target still has the package."),N("Package Smuggler is already closing with him."),N("The quiet approach is over.")],nextBeatId:"v2_battle_improved_2v1"});
+addBeat("v2_improved_pick_fail_setup",{backdrop:B.sakura,location:"SAKURA TREE · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",onEnter:()=>mutate(s=>{s.package.holder="AMT";s.participants.MI.state="UNSEEN";}),cues:[
+ N("Kakashi reaches the package."),N("ANBU Marked Target catches the movement."),N("Package Smuggler reacts to him immediately."),N("The theft fails."),N("The clean handoff fails with it."),
+ N("Masked Interceptor does not appear."),N("This is no longer a stealth problem."),N("It is two men who know exactly where Kakashi is."),
+ Q("PACKAGE SMUGGLER","You should've stayed in the alley."),Q("KAKASHI","You noticed me there too."),Q("PACKAGE SMUGGLER","Eventually.")
+],nextBeatId:"v2_battle_improved_2v1"});
 addBeat("v2_battle_improved_2v1",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","ps"],preset:"battle_trio",cues:[N("Kakashi Hatake vs ANBU Marked Target + Package Smuggler.")],battle:battle("academy_kakashi_origin_battle_amt_ps_2v1","improved_2v1","v2_improved_2v1_win","v2_improved_2v1_loss","AK_SA_030")});
-addBeat("v2_improved_2v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("improved_2v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[N("Kakashi loses the two-target fight."),N("The package remains with ANBU Marked Target."),N("Both opponents withdraw."),N("What Kakashi heard before the fight remains something he can report.")],nextBeatId:"v2_report"});
-addBeat("v2_improved_2v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("improved_2v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[N("Both men go down."),N("Kakashi goes to the package first."),N("He secures it against himself."),N("Then he looks back at the two defeated men."),N("Neither is moving to continue the fight.")],choices:[
+addBeat("v2_improved_2v1_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"post_battle",onEnter:ctx=>captureBattle("improved_2v1",ctx,s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";s.package.holder="AMT";}),cues:[
+ N("ANBU Marked Target and Package Smuggler break away after the fight."),N("AMT keeps the package."),N("The failed handoff never becomes the Observe handoff."),N("MI remains unseen.")
+],nextBeatId:"v2_report"});
+addBeat("v2_improved_2v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:null,actors:["kakashi","amt","ps"],preset:"post_battle",onEnter:ctx=>captureBattle("improved_2v1",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.participants.PS.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;}),cues:[
+ N("Both men go down."),N("Kakashi goes to ANBU Marked Target first."),N("The package is still there."),N("He takes it."),N("Secures it."),
+ N("Then looks at the two defeated men."),N("No masked shinobi appears."),N("This route never gave her a visible opening."),N("The package is safe."),N("The two men are still Kakashi's decision.")
+],choices:[
  C("improved_police","TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>disposeGroup("POLICE",[AMT,PS])}),
  C("improved_anbu","TAKE THEM TO THE ANBU","v2_report",{patch:()=>disposeGroup("ANBU",[AMT,PS])}),
  C("improved_kill","KILL THEM","v2_report",{patch:()=>disposeGroup("KILL",[AMT,PS])}),
