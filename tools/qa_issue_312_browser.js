@@ -101,31 +101,135 @@ async function shot(page,name,selector=null){
 
     await nextSemantic(page,"v2_scene02_tail");
     await choose(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+
+    // Manual #312 blocker: MI must not be visible before the narration actually
+    // reaches her entrance. The scene is mounted with all semantic participants,
+    // but presentation withholds MI until cue 10.
+    const watchOpening=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
+      const actions=root.querySelector(".kv2-actions");
+      return{
+        cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
+        miPending:mi?.dataset.scChoreographyPendingEntry==="true",
+        miOpacity:mi?Number(getComputedStyle(mi).opacity):1,
+        actionsVisible:actions?getComputedStyle(actions).display!=="none":false,
+        canAdvance:root.dataset.canAdvance,
+        hasChoices:root.dataset.hasChoices
+      };
+    });
+    assert.strictEqual(watchOpening.cue,0);
+    assert.strictEqual(watchOpening.miPending,true,"#312 MI must be visually withheld until the authored surprise-entry cue");
+    assert(watchOpening.miOpacity<=0.01,"#312 MI is visible before her authored entrance: "+watchOpening.miOpacity);
+    assert.strictEqual(watchOpening.actionsVisible,false,"#312 choices appeared before WATCH narration completed");
+    assert.strictEqual(watchOpening.canAdvance,"true");
+    assert.strictEqual(watchOpening.hasChoices,"false");
+
+    async function advanceWatchCue(index){
+      const result=await page.evaluate(()=>advanceAcademyKakashiV236040());
+      assert(result?.success&&result.semanticBeatUnchanged===true&&result.cueIndex===index,JSON.stringify(result));
+    }
+
+    for(let i=1;i<=5;i++)await advanceWatchCue(i);
+    await page.waitForTimeout(430);
+    let watch=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
+      return{cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,amtAnchor:amt?.dataset.scStageAnchor};
+    });
+    assert.strictEqual(watch.cue,5);
+    assert.strictEqual(watch.amtAnchor,"PLAYER_LEFT","#312 'first man moving away' did not move AMT left");
+
+    await advanceWatchCue(6);
+    await page.waitForTimeout(430);
+    watch=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
+      const token=root.querySelector('[data-story-object-id="PACKAGE"]');
+      return{psAnchor:ps?.dataset.scStageAnchor,packageAnchor:token?.dataset.packageAnchor,packageHolder:token?.dataset.packageHolder};
+    });
+    assert.strictEqual(watch.psAnchor,"OPPONENT_RIGHT","#312 Package Smuggler did not separate right with the package");
+    assert.strictEqual(watch.packageHolder,"PS");
+    assert.strictEqual(watch.packageAnchor,"OPPONENT_RIGHT","#312 package presentation did not travel with Package Smuggler");
+
+    await advanceWatchCue(7);
+    await advanceWatchCue(8);
+    await advanceWatchCue(9);
+    await page.waitForTimeout(260);
+    const anticipation=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      return{
+        cue:getAcademyKakashiV2TransitionState36040()?.cueIndex,
+        miPending:root.querySelector('.kv2-actor[data-slot="mi"]')?.dataset.scChoreographyPendingEntry==="true",
+        lastKinds:getStoryChoreographyState33900(root).lastKinds
+      };
+    });
+    assert.strictEqual(anticipation.cue,9);
+    assert.strictEqual(anticipation.miPending,true);
+    assert(anticipation.lastKinds.includes("FOCUS"),"#312 'movement snaps' anticipation focus missing");
+
+    await advanceWatchCue(10);
     await page.waitForFunction(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const state=root&&getStoryChoreographyState33900(root);
-      return !!state&&Array.isArray(state.completedKinds)&&state.completedKinds.includes("SURPRISE_ENTRY");
+      return !!state&&state.state==="settled"&&state.completedKinds.includes("SURPRISE_ENTRY")&&state.completedKinds.includes("LUNGE");
     },null,{timeout:2600});
-    const watch=await page.evaluate(()=>{
+    watch=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
-      const token=root.querySelector('[data-story-object-id="PACKAGE"]');
       const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
       return{
-        anchors:[...root.querySelectorAll(".kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor})),
-        packageHolder:token?.dataset.packageHolder||null,
-        packageHidden:!!token?.hidden,
+        miAnchor:mi?.dataset.scStageAnchor,
         miPending:mi?.dataset.scChoreographyPendingEntry==="true",
         miOpacity:mi?Number(getComputedStyle(mi).opacity):0,
         choreography:getStoryChoreographyState33900(root)
       };
     });
-    assert.deepStrictEqual(watch.anchors.map(x=>x.anchor),["INNER_LEFT","CENTER","OPPONENT_RIGHT"]);
-    assert.strictEqual(watch.packageHolder,"PS");
-    assert.strictEqual(watch.packageHidden,false);
-    assert.strictEqual(watch.miPending,false,"#312 Masked Interceptor remained hidden after SURPRISE_ENTRY completed");
-    assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not return to the authorised settled actor visibility after SURPRISE_ENTRY: "+watch.miOpacity);
-    assert(watch.choreography.scopeKey&&watch.choreography.lastKinds.includes("SURPRISE_ENTRY")&&watch.choreography.completedKinds.includes("SURPRISE_ENTRY"),"#312 watch-exchange surprise entry was not executed: "+JSON.stringify(watch.choreography));
+    assert.strictEqual(watch.miAnchor,"CENTER");
+    assert.strictEqual(watch.miPending,false,"#312 Masked Interceptor remained hidden after authored SURPRISE_ENTRY");
+    assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not become visible after authored entrance: "+watch.miOpacity);
+    assert(watch.choreography.completedKinds.includes("LUNGE"),"#312 MI entrance did not visibly drive toward Package Smuggler");
     await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
+
+    await advanceWatchCue(11);
+    await page.waitForTimeout(720);
+    const breakaway=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const amt=root.querySelector('.kv2-actor[data-slot="amt"]');
+      const ps=root.querySelector('.kv2-actor[data-slot="ps"]');
+      return{
+        amtDeparted:amt?.classList.contains("kv2-cue-departed")===true,
+        amtOpacity:amt?Number(getComputedStyle(amt).opacity):1,
+        psAnchor:ps?.dataset.scStageAnchor
+      };
+    });
+    assert.strictEqual(breakaway.amtDeparted,true,"#312 ANBU Marked Target did not visibly break away");
+    assert(breakaway.amtOpacity<=0.01,"#312 AMT lingered after breakaway");
+    assert.strictEqual(breakaway.psAnchor,"OPPONENT_RIGHT");
+
+    for(let i=12;i<=17;i++)await advanceWatchCue(i);
+    const choiceLayout=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const box=root.querySelector(".kv2-actions");
+      const buttons=[...box.querySelectorAll("button")];
+      return{
+        count:buttons.length,
+        labels:buttons.map(b=>b.textContent.trim()),
+        icons:buttons.map(b=>b.dataset.intentIcon||""),
+        scrollHeight:box.scrollHeight,
+        clientHeight:box.clientHeight,
+        overflowY:getComputedStyle(box).overflowY,
+        hasChoices:root.dataset.hasChoices,
+        canAdvance:root.dataset.canAdvance,
+        narrationRadius:getComputedStyle(root.querySelector(".kv2-dialogue")).borderRadius
+      };
+    });
+    assert.strictEqual(choiceLayout.count,5,"#312 exact WATCH choice set lost");
+    assert(choiceLayout.icons.every(Boolean),"#312 choice intent icons missing: "+JSON.stringify(choiceLayout.icons));
+    assert(choiceLayout.scrollHeight<=choiceLayout.clientHeight+2,"#312 five-choice surface still requires an internal scrollbar: "+JSON.stringify(choiceLayout));
+    assert.notStrictEqual(choiceLayout.overflowY,"scroll");
+    assert.strictEqual(choiceLayout.hasChoices,"true");
+    assert.strictEqual(choiceLayout.canAdvance,"false");
+    assert(parseFloat(choiceLayout.narrationRadius)>=10,"#312 narration/choice surface is not modern rounded presentation");
 
     // Choice is not trapped by the running animation: semantic transition is immediate.
     const start=Date.now();
