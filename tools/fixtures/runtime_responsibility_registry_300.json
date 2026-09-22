@@ -558,5 +558,32 @@
         "tools/qa_runtime_ownership_safety_300.js"
       ]
     }
+  ],
+  "stateWriterClaims": [
+    {
+      "stateRef": "activeStorySceneRuntime.localContext.kakashiV2",
+      "owner": "runtime/alpha-kakashi-v2-core-36020.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_state"
+    },
+    {
+      "stateRef": "activeStorySceneRuntime.localContext.__kakashiV2Presentation36040",
+      "owner": "runtime/alpha-kakashi-v2-transition-36040.js",
+      "responsibilityId": "origin.academy_kakashi.v2.semantic_advance"
+    },
+    {
+      "stateRef": "currentBattle.kakashiV2",
+      "owner": "runtime/alpha-kakashi-v2-battle-36010.js",
+      "responsibilityId": "origin.academy_kakashi.v2.story_to_battle"
+    },
+    {
+      "stateRef": "academyKakashiV2.rewardReceipts",
+      "owner": "runtime/alpha-kakashi-v2-rewards-36015.js",
+      "responsibilityId": "origin.academy_kakashi.v2.reward_commit"
+    },
+    {
+      "stateRef": "chronicleOrigin.prologueCompleted",
+      "owner": "game.js",
+      "responsibilityId": "origin.completion.shared"
+    }
   ]
 }
