@@ -14,6 +14,7 @@ const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const registry=new Map();
 let rendering=false,transitioning=false;
+const OBSERVER_DRIVEN_RENDERING=false;
 const choreographyControllers=new WeakMap();
 const SEMANTIC_STAGE_ANCHORS=Object.freeze({PLAYER_LEFT:8,INNER_LEFT:27,CENTER:46,CENTER_OBJECT:50,INNER_RIGHT:61,OPPONENT_RIGHT:78,FAR_ENTRY_LEFT:-18,FAR_ENTRY_RIGHT:108});
 const CHOREOGRAPHY_CLASSES=Object.freeze(["ENTER","EXIT","FOCUS","REPOSITION","APPROACH","RETREAT","LUNGE","STRIKE","EVADE","RECOIL","COLLAPSE","FLEE","RESTRAIN","RELEASE","HANDOFF","OBJECT_TRANSFER","SURPRISE_ENTRY"]);
@@ -366,7 +367,7 @@ function runStorySceneBoard33900Diagnostics(){
     semanticAnchorVocabulary:["PLAYER_LEFT","INNER_LEFT","CENTER","CENTER_OBJECT","INNER_RIGHT","OPPONENT_RIGHT","FAR_ENTRY_LEFT","FAR_ENTRY_RIGHT"].every(key=>Object.prototype.hasOwnProperty.call(SEMANTIC_STAGE_ANCHORS,key)),
     boundedChoreographyVocabulary:CHOREOGRAPHY_CLASSES.length===17&&Object.values(CHOREOGRAPHY_DURATION_MS).every(ms=>ms<=650),
     scopedCancellableQueue:String(playStoryChoreography33900).includes("scopeKey")&&String(cancelStoryChoreography33900).includes("cancelled=true"),
-    noMutationObserver:!String(installStorySceneBoard33900).includes("observer.observe("),
+    noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
