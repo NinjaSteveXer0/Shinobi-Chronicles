@@ -34,6 +34,8 @@ assert(storySource.includes("reused:true"),"#312 same-scope Story choreography m
 assert(storySource.includes("scChoreographyCompletedKinds")&&storySource.includes("completedKinds"),"#312 shared Story choreography must expose presentation-only completion receipts");
 assert(storySource.includes("removeOnComplete")&&kv2Renderer.includes("removeOnComplete:true"),"#312 departure ghost lifetime must be owned by shared cue completion");
 assert(storySource.includes("var(--sc-choreo-flee-x,22vw)"),"#312 shared FLEE primitive must allow the consuming scene to choose the correct escape direction");
+assert(storySource.includes("@keyframes scChoreoLunge33900")&&storySource.includes("100%{transform:translate3d(0,0,0)}"),"#312 transient Story movement must return to its semantic anchor instead of snapping after cue cleanup");
+assert(storySource.includes("@keyframes scChoreoFocus33900")&&!storySource.includes("@keyframes scChoreoFocus33900{0%{transform:"),"#312 FOCUS must not translate the actor before a strike");
 
 assert(kv2Renderer.includes("playStoryChoreography33900"),"#312 Kakashi must consume shared Story choreography");
 assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must consume shared semantic anchors");
@@ -68,6 +70,8 @@ assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=f
 assert(kv2Renderer.includes("normalizeCueLocalActorState")&&kv2Renderer.includes("kv2-cue-departed")&&kv2Renderer.includes("node.hidden=false"),"#312 WATCH-only hidden/departed presentation state must not leak into later beats");
 assert(kv2Renderer.includes('next.id==="v2_direct_strike_setup"')&&kv2Renderer.includes('kind:"STRIKE"'),"#312 STRIKE BEFORE THE HANDOFF must visibly drive Kakashi into the authored attack");
 assert(kv2Renderer.includes("kv2ActorFall36030")&&kv2Renderer.includes('data-sc-choreography-active="COLLAPSE"')&&kv2Renderer.includes('state==="KILLED"'),"#312 lethal Story departure must visibly fall off-screen and remain forward-compatible with KILLED truth");
+assert(kv2Renderer.includes("materializeRetainedHoldGhosts")&&kv2Renderer.includes("kv2-outgoing-hold-ghost")&&kv2Renderer.includes('data-transition-active="true"] .kv2-actors'),"#312 hard Story transitions must freeze retained outgoing actors while departure motion plays");
+assert(kv2Renderer.includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),"#312 outgoing actor ghosts must not inherit stale live choreography classes");
 assert(kv2Transition.includes("?650:0"),"#312 hard scene transition must leave enough presentation time for the lethal fall to be visible");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
 
@@ -81,7 +85,7 @@ assert(battleSource.includes("installFormationStage33000"),"#312 shared Battle o
 assert(battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("deployedFormation33000"),"#312 Formation Stage must consume deployed participant truth");
 assert(battleSource.includes('return peak<=1?"duel":peak>=4?"arc":"wedge"'),"#312 adaptive duel / wedge / arc formation modes missing");
 assert(battleSource.includes('data-formation-mode="duel"] .battle-live-active-card{top:9.5%!important;width:33.5%!important;height:56%!important')&&battleSource.includes('data-formation-mode="duel"] .battle-code-vs{top:28.5%!important;opacity:.55!important'),"#312 sparse duel must use the battlefield confidently without fake support furniture");
-assert(battleSource.includes(".battle-live-power-player{left:33%!important}")&&battleSource.includes(".battle-live-power-enemy{left:67%!important"),"#312 Duel PL rings must sit inward toward the confrontation lane");
+assert(battleSource.includes('data-formation-mode="duel"] .battle-live-power{top:42.5%!important}')&&battleSource.includes(".battle-live-power-player{left:41.5%!important}")&&battleSource.includes(".battle-live-power-enemy{left:58.5%!important"),"#312 Duel PL rings must flank the center confrontation lane instead of sitting below the portraits");
 assert(battleSource.includes('"SKILLS"')&&battleSource.includes('"ITEMS"')&&battleSource.includes('"SUMMONS"')&&battleSource.includes("primary.length===3"),"#312 primary action dock must be exactly Skills / Items / Summons");
 assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
@@ -108,6 +112,8 @@ assert(battleSource.includes("applyBattlePerformanceRoles33000")&&battleSource.i
 assert(battleSource.includes("function battlePerformanceResultChip33000")&&battleSource.includes('targetNode.appendChild(chip)'),"#312 factual Battle result must attach to the exact target presentation");
 assert(battleSource.includes("function battlePerformanceRoleNode33000")&&battleSource.includes("participantId")&&battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("data-slot"),"#312 Battle performance role lookup must resolve exact participant identity, including deployed off-slot targets");
 assert(battleSource.includes(".battle2-performance-stage.is-settled{opacity:0"),"#312 compact action identity must clear after playback");
+assert(battleSource.includes("battle2-performance-active .battle-live-active-card{transition:filter .14s ease,opacity .14s ease!important;will-change:transform")&&!battleSource.includes("battle2-performance-active .battle-live-active-card{transition:filter .14s ease,opacity .14s ease,transform"),"#312 Battle performance must not transition transform while keyframes also own transform");
+assert(battleSource.includes("@keyframes battle2ActorStrike33000")&&battleSource.includes("translate3d")&&battleSource.includes("@keyframes battle2TargetImpact33000"),"#312 Battle actor/target motion must use one transform animation path");
 assert(battleSource.includes("},920);"),"#312 Battle formation-stage playback must settle within the authorised short playback window");
 assert(!battleSource.includes(".battle2-modern.battle2-performance-active .battle-live-active-card-player{left:5.5%"),"#312 Battle playback must not shove the duel formation outward to make room for a center panel");
 assert(battleSource.includes("host.dataset.actionId===p.actionId"),"#312 stale Battle performance settle must not clear a newer action");

@@ -309,7 +309,7 @@ async function shot(page,name,selector=null){
       const root=document.getElementById("kakashi-v2-scene-board");
       return{
         beat:getActiveStorySceneRuntime()?.beatId,
-        anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width})),
+        anchors:[...root.querySelectorAll(".kv2-actors > .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width,transform:getComputedStyle(n).transform})),
         ghostCount:root.querySelectorAll(".kv2-departure-ghost").length,
         pendingEntryCount:root.querySelectorAll("[data-sc-choreography-pending-entry]").length,
         choreography:getStoryChoreographyState33900(root),
@@ -321,7 +321,8 @@ async function shot(page,name,selector=null){
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
     assert.strictEqual(stop.ghostCount,0,"#312 committed departures survived after choreography settled");
     assert.strictEqual(stop.pendingEntryCount,0,"#312 entrant remained hidden after choreography settled");
-    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE")&&stop.choreography.lastKinds.includes("STRIKE"),"#312 shared FOCUS -> LUNGE -> STRIKE choreography receipt missing: "+JSON.stringify(stop.choreography));
+    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("STRIKE")&&!stop.choreography.lastKinds.includes("LUNGE"),"#312 Kakashi sudden strike must use one transform-owning STRIKE cue after FOCUS: "+JSON.stringify(stop.choreography));
+    assert(stop.anchors.every(a=>a.transform==="none"||a.transform==="matrix(1, 0, 0, 1, 0, 0)"||a.transform==="matrix3d(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1)"),"#312 Story actors retained residual transform after choreography settled: "+JSON.stringify(stop.anchors));
     assert(stop.choreography.completedKinds.includes("ENTER"),"#312 Kakashi entry completion receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
     await page.waitForFunction(()=>{
@@ -728,11 +729,14 @@ async function shot(page,name,selector=null){
       }).length;
       return{
         stageWidth:sr?.width||0,
+        stageHeight:sr?.height||0,
         playerWidthRatio:sr&&pr?pr.width/sr.width:0,
         enemyWidthRatio:sr&&er?er.width/sr.width:0,
         confrontationGapRatio:sr&&pr&&er?(er.left-(pr.left+pr.width))/sr.width:1,
         playerPowerCenterRatio:sr&&ppr?(ppr.left+ppr.width/2-sr.left)/sr.width:0,
         enemyPowerCenterRatio:sr&&epr?(epr.left+epr.width/2-sr.left)/sr.width:1,
+        playerPowerCenterYRatio:sr&&ppr?(ppr.top+ppr.height/2-sr.top)/sr.height:1,
+        enemyPowerCenterYRatio:sr&&epr?(epr.top+epr.height/2-sr.top)/sr.height:1,
         visibleSupports,
         vsOpacity:vs?Number(getComputedStyle(vs).opacity):0
       };
@@ -741,8 +745,10 @@ async function shot(page,name,selector=null){
     assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33,"#312 sparse duel combatants are still undersized: "+JSON.stringify(duelComposition));
     assert(duelComposition.confrontationGapRatio<=0.17,"#312 sparse duel leaves an excessive empty confrontation gap: "+JSON.stringify(duelComposition));
     assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
-    assert(duelComposition.playerPowerCenterRatio>=0.32&&duelComposition.playerPowerCenterRatio<=0.34,"#312 player PL ring did not move inward: "+JSON.stringify(duelComposition));
-    assert(duelComposition.enemyPowerCenterRatio>=0.66&&duelComposition.enemyPowerCenterRatio<=0.68,"#312 enemy PL ring did not move inward: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerCenterRatio>=0.40&&duelComposition.playerPowerCenterRatio<=0.43,"#312 player PL ring is not flanking the confrontation lane: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerCenterRatio>=0.57&&duelComposition.enemyPowerCenterRatio<=0.60,"#312 enemy PL ring is not flanking the confrontation lane: "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerPowerCenterYRatio>=0.46&&duelComposition.playerPowerCenterYRatio<=0.49,"#312 player PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
+    assert(duelComposition.enemyPowerCenterYRatio>=0.46&&duelComposition.enemyPowerCenterYRatio<=0.49,"#312 enemy PL ring still sits at the portrait bottom: "+JSON.stringify(duelComposition));
     assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
 
     const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
