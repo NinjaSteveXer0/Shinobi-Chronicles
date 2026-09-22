@@ -64,7 +64,7 @@ function hasLethalConsequenceInFlight(){
 }
 function playPostCommitTransition(prev,next){
   const kind=transitionKind(prev,next);if(!kind)return{played:false};
-  const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?460:0;
+  const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?650:0;
   const coverFor=kind==="hard"?360:150;
   if(kind==="hard"){
     try{if(typeof setAcademyKakashiV2TransitionMemory36030==="function")setAcademyKakashiV2TransitionMemory36030(prev&&prev.backdrop||null,true);}catch(_e){}
