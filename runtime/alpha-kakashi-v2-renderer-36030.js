@@ -632,7 +632,11 @@ function render(){
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors));
     const capture=semanticChanged?(prepared||{previous,actorVisuals:captureDepartureVisuals(root,previous)}):null;
-    const hardTransition=semanticChanged&&isHardProjectionTransition(previous,next);
+    // A cinematic hard transition is valid only when semanticAdvance prepared
+    // the outgoing visual snapshot before committing Story truth. Plain rerenders
+    // or diagnostic beat restoration must never create a transition lock by
+    // themselves.
+    const hardTransition=semanticChanged&&!!prepared&&isHardProjectionTransition(previous,next);
     const departures=capture?materializeDepartureGhosts(root,capture,next):[];
     const heldActors=hardTransition&&capture?materializeRetainedHoldGhosts(root,capture,next):[];
     if(hardTransition){
@@ -742,6 +746,7 @@ function diagnostics(){
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
     preCommitVisualSnapshotIsPresentationOnly:String(preparePreCommitVisualSnapshot).includes("presentationOnly:true")&&String(preparePreCommitVisualSnapshot).includes("captureDepartureVisuals"),
+    hardTransitionRequiresPreparedSnapshot:String(render).includes("semanticChanged&&!!prepared&&isHardProjectionTransition"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
     sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
     adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
