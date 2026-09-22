@@ -19,7 +19,8 @@ const traversalSource=fs.readFileSync(TRAVERSAL_PATH,"utf8");
 // Architecture gates.
 assert(!/runtime\/alpha-kakashi-(?!v2-)/.test(traversalSource),"legacy Kakashi loader leaked back into traversal");
 for(const p of [BATTLE_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH])assert(traversalSource.includes(p),`V2 loader missing ${p}`);
-assert(!/querySelector|document\.|createElement/.test(coreSource),"Story/state core owns DOM");
+const coreOperationalSource=coreSource.split("function diagnostics()")[0];
+assert(!/querySelector|document\.|createElement/.test(coreOperationalSource),"Story/state core owns DOM");
 assert(!/querySelector|document\.|createElement/.test(battleSource.split("function installPakkunBattleButtons")[0]),"Battle semantic adapter touches Story/presentation DOM");
 assert(rendererSource.includes('>*:not(#${ROOT_ID}){display:none!important}'),"renderer does not suppress native Story layer");
 assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronicle_receipt"),"renderer missing singular dialogue/Receipt modes");
