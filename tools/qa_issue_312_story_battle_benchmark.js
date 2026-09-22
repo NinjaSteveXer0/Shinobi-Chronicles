@@ -43,6 +43,7 @@ for(const token of ["PHYSICAL_STRIKE","HEAVY_STRIKE","PROJECTILE","CHAKRA_RANGED
   assert(battleSource.includes(token),"#312 Battle presentation class missing "+token);
 }
 assert(battleSource.includes("resolveUIPortraitProjection")&&battleSource.includes("resolveBattleEnemyPortraitProjection"),"#312 Battle staging must use Battle portrait authority");
+assert(battleSource.includes("suspendCallerStoryPresentation33000")&&battleSource.includes("markStoryPresentationHidden33900"),"#312 Story-called Battle must suspend the shared Story presentation layer");
 
 const storyOwner=ownership.responsibilities.find(x=>x.responsibilityId==="story.scene.presentation.shared");
 const battleOwner=ownership.responsibilities.find(x=>x.responsibilityId==="battle.presentation.shared");
