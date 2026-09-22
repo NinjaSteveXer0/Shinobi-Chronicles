@@ -101,16 +101,6 @@ add("Get between them and take the impact.","Interponerse y recibir el impacto."
 add("Break it before it reaches them.","Romperlo antes de que lo alcance.");
 add("Metal lowers his hands and ends the session before the watching turns into another performance. The decision stings more than the training did.","Metal baja las manos y termina la sesión antes de que las miradas la conviertan en otra actuación. La decisión duele más que el entrenamiento.");
 
-// Kakashi.
-add("The logistics clerk keeps one hand near the sealed packet and checks the same reflection twice while crossing the market lane. Either he is nervous or he knows someone is following him. Kakashi does not need to decide which yet.","El empleado de logística mantiene una mano cerca del paquete sellado y comprueba dos veces el mismo reflejo mientras cruza el mercado. O está nervioso o sabe que alguien lo sigue. Kakashi todavía no necesita decidir cuál de las dos.");
-add("Stay invisible. Watch who receives it.","Mantenerse invisible. Ver quién lo recibe.");
-add("Step in now and force the route into the open.","Intervenir ahora y obligar a que la ruta quede expuesta.");
-add("Cut ahead. Be where the packet is going.","Adelantarse. Estar donde va el paquete.");
-add("Then the retrieval fractures into three problems at once: a confirmed packet, an assassin creating pressure and an apparent carrier moving away. Kakashi can pursue all three badly or choose which fact matters most.","Entonces la recuperación se divide en tres problemas a la vez: un paquete confirmado, un asesino creando presión y un aparente portador alejándose. Kakashi puede perseguir mal los tres o elegir qué hecho importa más.");
-add("The objective mattered. Everything else was noise.","El objetivo importaba. Todo lo demás era ruido.");
-add("Proof mattered. Guessing correctly is still guessing.","La prueba importaba. Adivinar correctamente sigue siendo adivinar.");
-add("The hard part was deciding which responsibility was actually mine.","Lo difícil era decidir qué responsabilidad era realmente mía.");
-add("Sakumo is at the Hatake threshold when Kakashi gets home. He takes one look at his son's face and does not ask whether he passed. “You picked one.” Kakashi's eyes narrow slightly. “I had to.” Sakumo nods once. “That's usually when the choice matters.”","Sakumo está en el umbral de los Hatake cuando Kakashi llega a casa. Mira una vez el rostro de su hijo y no pregunta si aprobó. “Elegiste una.” Los ojos de Kakashi se estrechan ligeramente. “Tenía que hacerlo.” Sakumo asiente una vez. “Normalmente es ahí cuando la elección importa.”");
 
 // Obito.
 add("Obito leaves early. Deliberately early. Today is one of the sessions that matters—the kind where nobody can say he only talks about becoming Hokage. He makes it three streets before somebody needs something.","Obito sale temprano. Deliberadamente temprano. Hoy es una de las sesiones que importan, de esas en las que nadie puede decir que solo habla de convertirse en Hokage. Recorre tres calles antes de que alguien necesite algo.");
@@ -220,19 +210,6 @@ for(const response of metalResponses)add(
   `${response[1]} Cuando el patio se calma, Metal sigue pensando en la primera combinación, la que ejecutó limpiamente antes de que nadie aplaudiera.`
 );
 add("Metal leaves with the private session and the moment he backed out both still sitting in his head. Neither one disappears because the other happened.","Metal se marcha con la sesión privada y el momento en que se retiró todavía presentes en su cabeza. Ninguno desaparece porque el otro haya ocurrido.");
-const kakRoutes=[
-  ["The packet is on the table in front of the evaluator.","El paquete está sobre la mesa frente al evaluador."],
-  ["The packet is not.","El paquete no está."]
-];
-const kakEvidence=[
-  ["Kakashi can describe the custody transfer because he watched it happen.","Kakashi puede describir la transferencia de custodia porque la vio ocurrir."],
-  ["Some of what Kakashi knows came from answers he had to weigh against movement he observed.","Parte de lo que Kakashi sabe provino de respuestas que tuvo que contrastar con los movimientos que observó."],
-  ["Kakashi predicted the destination correctly without pretending he witnessed the route that led there.","Kakashi predijo correctamente el destino sin fingir que presenció la ruta que llevó hasta allí."]
-];
-for(const route of kakRoutes)for(const evidence of kakEvidence)add(
-  `${route[0]} The evaluator makes Kakashi reconstruct the operation in order: what he saw, what he inferred and what was lost when he chose one responsibility over another. ${evidence[0]}`,
-  `${route[1]} El evaluador hace que Kakashi reconstruya la operación en orden: lo que vio, lo que infirió y lo que se perdió cuando eligió una responsabilidad sobre otra. ${evidence[1]}`
-);
 
 const en={},es={};
 for(let i=0;i<pairs.length;i++){
@@ -248,14 +225,13 @@ function diagnostics(){
   const checks={
     englishRegistered:enResult&&enResult.success===true&&enResult.count===pairs.length,
     spanishRegistered:esResult&&esResult.success===true&&esResult.count===pairs.length,
-    substantialFinalWritingCoverage:pairs.length>=230,
+    substantialFinalWritingCoverage:pairs.length>=200,
     glossaryClean:glossaryFailures.length===0,
     hinataDynamicCovered:sourceTexts.some(text=>text.startsWith("The instructor stops the exchange, corrects Hinata's footing")),
     wasabiDynamicCovered:sourceTexts.some(text=>text.startsWith("By the time the instructor calls the exercise, Wasabi has an answer")),
     miraiDynamicCovered:sourceTexts.some(text=>text.startsWith("Later, one small detail refuses to fit"))&&sourceTexts.some(text=>text.startsWith("Suspicion has become a pattern")),
     iwabeeDynamicCovered:sourceTexts.some(text=>text.includes("Then something underneath the collapsed edge moves.")),
     metalDynamicCovered:sourceTexts.some(text=>text.includes("When the yard settles, Metal is still thinking")),
-    kakashiDynamicCovered:sourceTexts.some(text=>text.includes("The evaluator makes Kakashi reconstruct the operation in order")),
     obitoFinalCovered:sourceTexts.includes("Obito looks toward the Hokage Monument for another second, then turns back toward the village. Whatever the journey cost him, the answer in his head is still his."),
     browserGoldenClaimed:false
   };
