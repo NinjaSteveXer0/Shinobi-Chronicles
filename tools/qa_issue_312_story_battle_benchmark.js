@@ -29,6 +29,7 @@ assert(storySource.includes("Math.min(650"),"#312 ordinary Story choreography mu
 assert(storySource.includes("cancelStoryChoreography33900"),"#312 cancellable Story choreography missing");
 assert(storySource.includes('data-sc-choreography-pending-entry'),"#312 shared Story owner must pre-stage entrants before their ENTER cue");
 assert(storySource.includes("reused:true"),"#312 same-scope Story choreography must not replay on harmless rerender");
+assert(storySource.includes("removeOnComplete")&&kv2Renderer.includes("removeOnComplete:true"),"#312 departure ghost lifetime must be owned by shared cue completion");
 
 assert(kv2Renderer.includes("playStoryChoreography33900"),"#312 Kakashi must consume shared Story choreography");
 assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must consume shared semantic anchors");
