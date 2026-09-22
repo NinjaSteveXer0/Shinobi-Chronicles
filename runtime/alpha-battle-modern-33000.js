@@ -711,15 +711,20 @@
     if(!host){host=document.createElement("div");host.className="battle2-performance-host";stage.appendChild(host);}
     if(!p){host.replaceChildren();delete host.dataset.actionId;clearBattlePerformanceRoles33000(stage);return null;}
     const key=p.battleId+":"+p.actionId;
+    const played=playedBattlePerformanceKeys33000.has(key);
     if(host.dataset.actionId!==p.actionId){
       host.dataset.actionId=p.actionId;
       host.innerHTML=battlePerformanceMarkup33000(p);
-      formationTrayMode33000=null;
-      stage.dataset.formationTray="closed";
+      // A newly committed action contracts the tray for playback. Rebuilding the
+      // combat DOM around an already-played receipt must not re-close a tray the
+      // player has deliberately reopened for their next opportunity.
+      if(!played){
+        formationTrayMode33000=null;
+        stage.dataset.formationTray="closed";
+      }
     }
     const lane=host.querySelector(".battle2-performance-stage");
     if(lane){
-      const played=playedBattlePerformanceKeys33000.has(key);
       lane.classList.toggle("is-playing",!played);
       lane.classList.toggle("is-settled",played);
       if(!played){
