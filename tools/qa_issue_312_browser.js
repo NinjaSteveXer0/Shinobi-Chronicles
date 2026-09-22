@@ -672,6 +672,31 @@ async function shot(page,name,selector=null){
       return stage?.dataset.formationMode==="duel"&&stage?.dataset.enemyFormationCount==="1";
     },null,{timeout:8000});
 
+    const duelComposition=await page.evaluate(()=>{
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const player=stage?.querySelector(".battle-live-active-card-player");
+      const enemy=stage?.querySelector(".battle-live-active-card-enemy");
+      const vs=stage?.querySelector(".battle-code-vs");
+      const sr=stage?.getBoundingClientRect(),pr=player?.getBoundingClientRect(),er=enemy?.getBoundingClientRect();
+      const visibleSupports=[...stage.querySelectorAll(".battle2-formation-support")].filter(node=>{
+        const style=getComputedStyle(node),rect=node.getBoundingClientRect();
+        return style.display!=="none"&&style.visibility!=="hidden"&&rect.width>0&&rect.height>0;
+      }).length;
+      return{
+        stageWidth:sr?.width||0,
+        playerWidthRatio:sr&&pr?pr.width/sr.width:0,
+        enemyWidthRatio:sr&&er?er.width/sr.width:0,
+        confrontationGapRatio:sr&&pr&&er?(er.left-(pr.left+pr.width))/sr.width:1,
+        visibleSupports,
+        vsOpacity:vs?Number(getComputedStyle(vs).opacity):0
+      };
+    });
+    console.log("ISSUE312_DUEL_COMPOSITION "+JSON.stringify(duelComposition));
+    assert(duelComposition.playerWidthRatio>=0.33&&duelComposition.enemyWidthRatio>=0.33,"#312 sparse duel combatants are still undersized: "+JSON.stringify(duelComposition));
+    assert(duelComposition.confrontationGapRatio<=0.17,"#312 sparse duel leaves an excessive empty confrontation gap: "+JSON.stringify(duelComposition));
+    assert.strictEqual(duelComposition.visibleSupports,0,"#312 sparse duel rendered fake/empty support furniture: "+JSON.stringify(duelComposition));
+    assert(duelComposition.vsOpacity>=0.5,"#312 sparse duel confrontation marker is too visually weak: "+JSON.stringify(duelComposition));
+
     const amtSkillsButton=page.locator('.battle-live-action-family-row button[data-formation-family="skills"]');
     await amtSkillsButton.click();
     await page.waitForFunction(()=>document.querySelector(".alpha-code-battle-stage")?.dataset.formationTray==="skills",null,{timeout:3000});
