@@ -16,8 +16,8 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-I",
-    sourceBaselineCommit:"a0ccb6097967db21348bec56d6139c39448a09d9",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-J",
+    sourceBaselineCommit:"b7f89d2aa28ef0cbe9a0a68d9c2b4d925c3f5c93",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
     runtimeGeneration:"alpha-story-battle-formation-stage-312",
     majorRuntimeFeatures:Object.freeze([
@@ -58,7 +58,7 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-23-I",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-23-J",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
       generationPresent:first.runtimeGeneration==="alpha-story-battle-formation-stage-312",
