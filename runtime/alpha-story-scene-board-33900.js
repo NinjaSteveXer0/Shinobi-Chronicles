@@ -295,16 +295,16 @@ function installStyle(){
 .sc-choreo-recoil{animation-name:scChoreoRecoil33900}.sc-choreo-collapse{animation-name:scChoreoCollapse33900}.sc-choreo-flee{animation-name:scChoreoFlee33900}.sc-choreo-exit{animation-name:scChoreoExit33900}
 .sc-choreo-restrain{animation-name:scChoreoRestrain33900}.sc-choreo-release{animation-name:scChoreoRelease33900}
 .sc-choreo-handoff,.sc-choreo-object-transfer{animation-name:scChoreoObjectTransfer33900}
-@keyframes scChoreoFocus33900{0%{transform:translateY(0) scale(1);filter:brightness(.82)}60%{transform:translateY(-12px) scale(1.045);filter:brightness(1.1)}100%{transform:translateY(-8px) scale(1.035);filter:brightness(1.06)}}
-@keyframes scChoreoEnter33900{from{opacity:0;transform:translateX(7vw) scale(.96)}to{opacity:1;transform:translateX(0) scale(1)}}
-@keyframes scChoreoSurprise33900{0%{opacity:0;transform:translateX(13vw) scale(.92);filter:brightness(.5)}70%{opacity:1;transform:translateX(-1.2vw) scale(1.04);filter:brightness(1.14)}100%{opacity:1;transform:translateX(0) scale(1)}}
-@keyframes scChoreoApproach33900{0%{transform:translateX(0)}70%{transform:translateX(5vw)}100%{transform:translateX(4vw)}}
-@keyframes scChoreoLunge33900{0%{transform:translateX(0)}58%{transform:translateX(9vw) scale(1.025)}100%{transform:translateX(6.5vw) scale(1)}}
-@keyframes scChoreoRetreat33900{from{transform:translateX(0)}to{transform:translateX(-5vw)}}
+@keyframes scChoreoFocus33900{0%{filter:brightness(.92)}55%{filter:brightness(1.12)}100%{filter:brightness(1)}}
+@keyframes scChoreoEnter33900{from{opacity:0;transform:translate3d(7vw,0,0) scale(.96)}to{opacity:1;transform:translate3d(0,0,0) scale(1)}}
+@keyframes scChoreoSurprise33900{0%{opacity:0;transform:translate3d(13vw,0,0) scale(.92);filter:brightness(.5)}68%{opacity:1;transform:translate3d(-1vw,0,0) scale(1.025);filter:brightness(1.12)}100%{opacity:1;transform:translate3d(0,0,0) scale(1);filter:brightness(1)}}
+@keyframes scChoreoApproach33900{0%{transform:translate3d(0,0,0)}58%{transform:translate3d(4.5vw,0,0)}100%{transform:translate3d(0,0,0)}}
+@keyframes scChoreoLunge33900{0%{transform:translate3d(0,0,0)}54%{transform:translate3d(8vw,0,0)}100%{transform:translate3d(0,0,0)}}
+@keyframes scChoreoRetreat33900{0%{transform:translate3d(0,0,0)}58%{transform:translate3d(-5vw,0,0)}100%{transform:translate3d(0,0,0)}}
 @keyframes scChoreoReposition33900{from{left:var(--sc-choreo-from-x,var(--sc-stage-anchor-x))}to{left:var(--sc-choreo-to-x,var(--sc-stage-anchor-x))}}
-@keyframes scChoreoStrike33900{0%{transform:translateX(0)}50%{transform:translateX(2.2vw) scale(1.02)}100%{transform:translateX(0)}}
-@keyframes scChoreoEvade33900{0%{transform:translateX(0)}55%{transform:translateX(4.5vw)}100%{transform:translateX(2.5vw)}}
-@keyframes scChoreoRecoil33900{0%{transform:translateX(0)}42%{transform:translateX(2.2vw) rotate(1deg)}100%{transform:translateX(.6vw)}}
+@keyframes scChoreoStrike33900{0%{transform:translate3d(0,0,0)}48%{transform:translate3d(8.5vw,0,0)}68%{transform:translate3d(7vw,0,0)}100%{transform:translate3d(0,0,0)}}
+@keyframes scChoreoEvade33900{0%{transform:translate3d(0,0,0)}48%{transform:translate3d(4.5vw,0,0)}70%{transform:translate3d(-.8vw,0,0)}100%{transform:translate3d(0,0,0)}}
+@keyframes scChoreoRecoil33900{0%{transform:translate3d(0,0,0)}38%{transform:translate3d(2.2vw,0,0)}68%{transform:translate3d(-.7vw,0,0)}100%{transform:translate3d(0,0,0)}}
 @keyframes scChoreoCollapse33900{from{opacity:1;transform:translateY(0) rotate(0)}to{opacity:.38;transform:translateY(18%) rotate(4deg);filter:saturate(.35) brightness(.55)}}
 @keyframes scChoreoFlee33900{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(var(--sc-choreo-flee-x,22vw)) scale(.93)}}
 @keyframes scChoreoExit33900{from{opacity:1}to{opacity:0;transform:translateX(8vw)}}
