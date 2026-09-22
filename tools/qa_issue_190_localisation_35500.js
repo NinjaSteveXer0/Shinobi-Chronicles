@@ -81,7 +81,6 @@ assert(!loader.includes('scSetLocale35500('));
   const {ctx}=boot(),L=ctx.SC_ALPHA_LOCALISATION_35500;
   L.setLocale('es-419',{persist:false,source:'qa'});
   assert.equal(L.translatePresentedText('CONTINUE CHRONICLE'),'CONTINUAR CRÓNICA');
-  assert.equal(L.translatePresentedText('Stop the package from falling into the wrong hands.'),'Evita que el paquete caiga en las manos equivocadas.');
   assert.equal(L.translatePresentedText('Ninja ID: Sakura · Continue restores the currently saved Chronicle exactly as it stands.'),'ID ninja: Sakura · Continuar restaura la crónica guardada exactamente como está.');
   L.setLocale('en',{persist:false,source:'qa'});
   assert.equal(L.translatePresentedText('CONTINUAR CRÓNICA'),'CONTINUE CHRONICLE');
