@@ -77,7 +77,7 @@ assert(battleSource.includes('return peak<=1?"duel":peak>=4?"arc":"wedge"'),"#31
 assert(battleSource.includes('"SKILLS"')&&battleSource.includes('"ITEMS"')&&battleSource.includes('"SUMMONS"')&&battleSource.includes("primary.length===3"),"#312 primary action dock must be exactly Skills / Items / Summons");
 assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
-assert(battleSource.includes("if(state&&state.selectedSkillId)return false")&&battleSource.includes("Preserve that DOM verbatim"),"#312 hover inspector must not replace canonical selected-Skill USE/CANCEL controls");
+assert(battleSource.includes("if(state&&state.selectedSkillId)return false")&&battleSource.includes("Preserve that DOM verbatim"),"#312 hover inspector must not replace the canonical selected-Skill action/mode/cancel surface");
 assert(battleSource.includes('stage.dataset.formationTray="closed"'),"#312 action playback must contract the secondary tray");
 assert(battleSource.includes("const played=playedBattlePerformanceKeys33000.has(key)")&&battleSource.includes("if(!played){")&&battleSource.includes("player has deliberately reopened"),"#312 settled performance receipts must not re-close a reopened action tray");
 assert(battleSource.includes('data-formation-hidden="true"')||battleSource.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
