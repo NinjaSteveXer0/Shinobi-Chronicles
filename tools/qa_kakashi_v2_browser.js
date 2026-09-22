@@ -6,6 +6,7 @@ const path=require("path");
 const assert=require("assert");
 const crypto=require("crypto");
 const {chromium}=require("playwright");
+const {installBrowserRuntimeErrorGate}=require("./browser_runtime_error_gate_311.js");
 
 const BUILD_MANIFEST=JSON.parse(fs.readFileSync(path.join(__dirname,"fixtures/runtime_build_manifest_303.json"),"utf8"));
 
@@ -18,6 +19,7 @@ function pause(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 async function boot(browser){
   const context=await browser.newContext({viewport:{width:1440,height:900},deviceScaleFactor:1});
   const page=await context.newPage();
+  const runtimeErrorGate=await installBrowserRuntimeErrorGate(page);
   await page.addInitScript(()=>{try{localStorage.clear();sessionStorage.clear();}catch(_){}});
   await page.goto(BASE,{waitUntil:"domcontentloaded",timeout:60000});
   await page.waitForFunction(()=>typeof globalThis.getRuntimeBuildFingerprint==="function",null,{timeout:10000});
@@ -47,7 +49,7 @@ async function boot(browser){
   assert(result.launched&&result.launched.success===true,JSON.stringify(result));
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:15000});
   assert.strictEqual(await page.locator("#sc-alpha-front-door-33300,#sc-alpha-front-door-33400").count(),0,"front-door presentation still covers Kakashi V2");
-  return{context,page,runtimeFingerprint};
+  return{context,page,runtimeFingerprint,runtimeErrorGate};
 }
 
 async function currentBeat(page){
@@ -348,7 +350,7 @@ async function finishTerminalBrowser(page,label){
 }
 
 async function cleanRoute(browser){
-  const {context,page}=await boot(browser);
+  const {context,page,runtimeErrorGate}=await boot(browser);
   const checkpoints=[];
   assert.strictEqual(await currentBeat(page),"v2_scene01_rooftop");
   checkpoints.push(await inspect(page,"rooftop"));
@@ -426,12 +428,13 @@ async function cleanRoute(browser){
   assert.strictEqual(completion.academyTeamFormationRequired,true);
   assert.strictEqual(completion.activeStory,null);
   assert(completion.rewards.length>=2,"material reward receipts missing: "+JSON.stringify(completion));
+  const browserErrors=await runtimeErrorGate.assertClean("cleanRoute");
   await context.close();
-  return{checkpoints,animation,completion};
+  return{checkpoints,animation,completion,browserErrors};
 }
 
 async function visualAndBattle(browser){
-  const {context,page}=await boot(browser);
+  const {context,page,runtimeErrorGate}=await boot(browser);
   await drain(page);
   await go(page,"v2_scene02_tail");
   await drain(page);
@@ -520,19 +523,21 @@ async function visualAndBattle(browser){
   assert.strictEqual(post.pendingBattle,null);
   assert(post.battleResume&&post.battleResume.outcome==="victory",JSON.stringify(post));
   await shot(page,"11-story-return-after-battle.png");
+  const browserErrors=await runtimeErrorGate.assertClean("visualAndBattle");
   await context.close();
-  return{watch,kill,battle,post};
+  return{watch,kill,battle,post,browserErrors};
 }
 
 async function browserRouteMatrix(browser){
   const results=[];
 
   async function scenario(name,run){
-    const {context,page}=await boot(browser);
+    const {context,page,runtimeErrorGate}=await boot(browser);
     try{
       await toScene02Root(page);
       const detail=await run(page);
-      results.push({name,success:true,...(detail||{})});
+      const browserErrors=await runtimeErrorGate.assertClean("matrix:"+name);
+      results.push({name,success:true,...(detail||{}),browserErrors});
     }finally{
       await context.close();
     }
@@ -703,7 +708,7 @@ async function browserRouteMatrix(browser){
     const uniqueScreenshots=new Set(hashes).size;
     assert(pngs.length>=11,"installed-browser evidence screenshots missing");
     assert(uniqueScreenshots>=8,"browser evidence is visually static/occluded: "+JSON.stringify({pngs,uniqueScreenshots}));
-    const result={pass:true,clean,visualBattle,browserMatrix,pngCount:pngs.length,uniqueScreenshots,browserGoldenClaimed:false};
+    const result={pass:true,clean,visualBattle,browserMatrix,pngCount:pngs.length,uniqueScreenshots,browserRuntimeErrorGate:"GREEN",browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));
     console.log(JSON.stringify(result,null,2));
   }finally{
