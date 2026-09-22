@@ -37,6 +37,12 @@ assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package toke
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
 assert(kv2Renderer.indexOf("for(const row of departures)")<kv2Renderer.indexOf("const prevIds"),"#312 committed departures must stage before newly entered actors");
 {
+  const transitionStart=kv2Renderer.indexOf("function playProjectionTransition(");
+  const transitionEnd=kv2Renderer.indexOf("function syncActors(",transitionStart);
+  const transitionSource=kv2Renderer.slice(transitionStart,transitionEnd);
+  assert(transitionStart>=0&&transitionEnd>transitionStart&&transitionSource.includes("actorSignature")&&!transitionSource.includes("next.packageHolder"),"#312 actor choreography scope must not restart for same-beat package truth updates");
+}
+{
   const renderStart=kv2Renderer.indexOf("function render(){");
   const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
   const renderSource=kv2Renderer.slice(renderStart,renderEnd);
