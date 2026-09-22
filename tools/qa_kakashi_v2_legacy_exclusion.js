@@ -97,6 +97,26 @@ const traversal=fs.readFileSync("runtime/alpha-traversal-bridge-33200.js","utf8"
 assert(traversal.includes("runtime/alpha-story-scene-board-33900.js"));
 assert(!traversal.includes("alpha-kakashi-original-origin-restoration-33800.js"));
 
+const choiceReaction=fs.readFileSync("runtime/alpha-origin-choice-reaction-33510.js","utf8");
+const modernization=fs.readFileSync("runtime/alpha-early-story-modernization-33600.js","utf8");
+const screenFirst=fs.readFileSync("runtime/alpha-origin-screen-first-33700.js","utf8");
+assert(!choiceReaction.includes("function patchKakashi("));
+assert(!modernization.includes("function patchKakashi("));
+assert(!screenFirst.includes("function patchKakashi("));
+
+const anbuHardening=fs.readFileSync("runtime/alpha-anbu-root-contained-155-knowledge-fix.js","utf8");
+assert(!anbuHardening.includes("alpha-kakashi-original-origin-restoration-33800.js"));
+assert(!anbuHardening.includes("SC_ALPHA_KAKASHI_ORIGINAL_33800"));
+
+const localisationCore=fs.readFileSync("runtime/alpha-localisation-35500.js","utf8");
+const localisationContent=fs.readFileSync("runtime/alpha-localisation-content-35510.js","utf8");
+const localisationFinal=fs.readFileSync("runtime/alpha-localisation-final-writing-35520.js","utf8");
+assert(!localisationCore.includes("story.kakashi."));
+assert(!localisationContent.includes("Which responsibility does Kakashi prioritise?"));
+assert(!localisationContent.includes("Kakashi identifies the logistics clerk"));
+assert(!localisationFinal.includes("The evaluator makes Kakashi reconstruct the operation in order"));
+assert(!localisationFinal.includes("const kakRoutes="));
+
 for(const authority of [
   "Documentation/Story/Academy_Kakashi_100_Percent_Writing_Path_Variation_Audit_2026-09-20.md",
   "Documentation/Story/Academy_Kakashi_Origin_100_Percent_Writing_Closure_2026-09-20.md",
