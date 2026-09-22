@@ -28,6 +28,7 @@ for(const token of ["ENTER","EXIT","FOCUS","REPOSITION","APPROACH","RETREAT","LU
 }
 assert(storySource.includes("Math.min(650"),"#312 ordinary Story choreography must be bounded");
 assert(storySource.includes("cancelStoryChoreography33900"),"#312 cancellable Story choreography missing");
+assert(storySource.includes('function playStoryChoreography33900')&&storySource.includes('installStyle();'),"#312 shared choreography playback must install its own animation primitives for custom renderers");
 assert(storySource.includes('data-sc-choreography-pending-entry'),"#312 shared Story owner must pre-stage entrants before their ENTER cue");
 assert(storySource.includes("reused:true"),"#312 same-scope Story choreography must not replay on harmless rerender");
 assert(storySource.includes("scChoreographyCompletedKinds")&&storySource.includes("completedKinds"),"#312 shared Story choreography must expose presentation-only completion receipts");
