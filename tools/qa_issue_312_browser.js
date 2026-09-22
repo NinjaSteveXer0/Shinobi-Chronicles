@@ -349,6 +349,29 @@ async function shot(page,name,selector=null){
     assert(formationOpening.activePortraits.every(row=>row.path),"#312 Formation Stage active combatant portrait authority missing: "+JSON.stringify(formationOpening.activePortraits));
     assert.strictEqual(formationOpening.visibleSupportCount,0,"#312 duel composition retained empty/support formation furniture");
 
+    // Manual reward blocker: prove the exact authoritative MI package reaches
+    // the Victory renderer, not only the reward adapter's internal state.
+    const rewardProjection=await page.evaluate(()=>{
+      const priorOutcome=currentBattle.outcome?cloneBattleRuntimeValue(currentBattle.outcome):null;
+      const priorRewards=currentBattle.rewards?cloneBattleRuntimeValue(currentBattle.rewards):null;
+      currentBattle.outcome={type:"victory",completedAt:Date.now(),finishingShinobiId:"academy_kakashi"};
+      const ensured=ensureAcademyKakashiV2BattleRewardProjection36015();
+      const host=document.createElement("div");
+      host.style.position="fixed";host.style.left="-10000px";host.style.top="0";
+      document.body.appendChild(host);
+      renderVictoryOverlay(host);
+      const text=String(host.textContent||"").replace(/\s+/g," ").trim();
+      const projected=cloneBattleRuntimeValue(currentBattle.rewards);
+      host.remove();
+      currentBattle.outcome=priorOutcome;
+      currentBattle.rewards=priorRewards;
+      return{ensured,projected,text};
+    });
+    assert.strictEqual(rewardProjection.projected.ryo,50,"#312 MI Victory must project locked 50 Ryō");
+    assert.strictEqual(rewardProjection.projected.exp,0,"#312 must not invent generic Character EXP");
+    assert.deepStrictEqual(rewardProjection.projected.items.map(row=>row.name),["Field Recovery Pill"],"#312 MI Victory item projection drift");
+    assert(rewardProjection.text.includes("50")&&rewardProjection.text.includes("Field Recovery Pill"),"#312 Victory UI did not visibly consume authoritative MI rewards: "+rewardProjection.text);
+
     await page.locator('.battle-live-action-family-row button[data-formation-family="skills"]').click();
     await page.waitForFunction(()=>{
       const stage=document.querySelector(".alpha-code-battle-stage");
