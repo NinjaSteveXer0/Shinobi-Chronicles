@@ -966,3 +966,28 @@ Secondary material is not allowed to override manga/official canon or current SC
 > **A character may move the plot only by behaving like themselves while doing it.**
 
 > **Before finalising substantial multi-character dialogue: remove the names, run the speaker-fingerprint test, then run the plot-puppet test.**
+
+
+## 15. Runtime application record
+
+The active-cast anchors were applied back to the current Kakashi V2 runtime after creation.
+
+Runtime commits:
+- `015d663148fb9c06a7041f3da2be1b32ee31978c` — first Kakashi / Pakkun / opponent differentiation pass;
+- `1680a03e0cdb97b9b18710ec640719976528e5d3` — ANBU / Minato evaluation voice repair plus cast differentiation;
+- `b690ef04ef0fd4aa2564ae7a53a211610fdd7e4d` and `d8c313094de7bc8322e4765ca4683a0d836cd1e8` — residual shared dry-voice cleanup;
+- `d1d42febfc2f7835365ad2cbd7a5de0b70dde536` — removal of remaining Pakkun house-voice banter.
+
+Acceptance after application:
+- V2 core parses as executable JavaScript;
+- exact current root / Scene03A choice labels remain unchanged;
+- targeted shared-house-voice phrases are absent from live core;
+- ANBU Operative no longer collapses into repeated yes/no terminal behaviour;
+- Minato retains measured evaluative synthesis rather than interrogation cadence;
+- Pakkun remains practical and autonomous rather than quip-driven;
+- MI remains sparse and operational;
+- AMT remains challenge/boundary-driven;
+- PS remains socially agile and pressure-responsive;
+- Kakashi remains young/direct rather than adult-cool by default.
+
+This is **source/runtime expression validation only**. Installed-browser Golden must still be rerun separately.
