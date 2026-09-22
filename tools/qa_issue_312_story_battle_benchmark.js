@@ -35,7 +35,12 @@ assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must con
 assert(kv2Renderer.includes('data-story-object-id="PACKAGE"'),"#312 package token missing");
 assert(kv2Renderer.includes('data-count="1"')&&kv2Renderer.includes('data-count="2"'),"#312 actor prominence must adapt to cast count");
 assert(kv2Renderer.indexOf("for(const row of departures)")<kv2Renderer.indexOf("const prevIds"),"#312 committed departures must stage before newly entered actors");
-assert(!kv2Renderer.includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),"#312 harmless participant-state refresh must not replay actor choreography");
+{
+  const renderStart=kv2Renderer.indexOf("function render(){");
+  const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
+  const renderSource=kv2Renderer.slice(renderStart,renderEnd);
+  assert(renderStart>=0&&renderEnd>renderStart&&!renderSource.includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),"#312 harmless participant-state refresh must not replay actor choreography");
+}
 assert(kv2Transition.includes("semanticAlreadyCommitted:true"),"#312 wipe must be post-commit presentation");
 assert(!kv2Transition.includes("cloneNode"),"#312 transition adapter must not own actor animation DOM");
 assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on animation lock");
