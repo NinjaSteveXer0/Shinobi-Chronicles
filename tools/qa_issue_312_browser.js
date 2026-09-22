@@ -101,21 +101,30 @@ async function shot(page,name,selector=null){
 
     await nextSemantic(page,"v2_scene02_tail");
     await choose(page,"WATCH THE EXCHANGE","v2_watch_exchange");
-    await page.waitForSelector("#kakashi-v2-scene-board .sc-choreo-surprise-entry",{state:"attached",timeout:1800});
+    await page.waitForFunction(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const state=root&&getStoryChoreographyState33900(root);
+      return !!state&&Array.isArray(state.completedKinds)&&state.completedKinds.includes("SURPRISE_ENTRY");
+    },null,{timeout:2600});
     const watch=await page.evaluate(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const token=root.querySelector('[data-story-object-id="PACKAGE"]');
+      const mi=root.querySelector('.kv2-actor[data-slot="mi"]');
       return{
         anchors:[...root.querySelectorAll(".kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor})),
         packageHolder:token?.dataset.packageHolder||null,
         packageHidden:!!token?.hidden,
+        miPending:mi?.dataset.scChoreographyPendingEntry==="true",
+        miOpacity:mi?Number(getComputedStyle(mi).opacity):0,
         choreography:getStoryChoreographyState33900(root)
       };
     });
     assert.deepStrictEqual(watch.anchors.map(x=>x.anchor),["INNER_LEFT","CENTER","OPPONENT_RIGHT"]);
     assert.strictEqual(watch.packageHolder,"PS");
     assert.strictEqual(watch.packageHidden,false);
-    assert(watch.choreography.scopeKey&&watch.choreography.state==="playing","#312 watch-exchange choreography not active");
+    assert.strictEqual(watch.miPending,false,"#312 Masked Interceptor remained hidden after SURPRISE_ENTRY completed");
+    assert(watch.miOpacity>0.9,"#312 Masked Interceptor did not become visibly present after SURPRISE_ENTRY");
+    assert(watch.choreography.scopeKey&&watch.choreography.lastKinds.includes("SURPRISE_ENTRY")&&watch.choreography.completedKinds.includes("SURPRISE_ENTRY"),"#312 watch-exchange surprise entry was not executed: "+JSON.stringify(watch.choreography));
     await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
 
     // Choice is not trapped by the running animation: semantic transition is immediate.
