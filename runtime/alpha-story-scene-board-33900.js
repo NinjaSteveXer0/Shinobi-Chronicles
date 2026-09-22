@@ -168,6 +168,10 @@ function applyStoryChoreographyCue33900(root,cue){
 }
 function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
   if(!root)return{success:false,reason:"story_choreography_root_missing"};
+  // Shared choreography owns its animation primitives. Custom Story renderers
+  // (such as Kakashi V2) may consume this API without ever rendering the
+  // generic 33900 board, so install the shared stylesheet at playback time.
+  installStyle();
   const scope=String(scopeKey||"unscoped");
   const normalized=(Array.isArray(cues)?cues:[]).map(normalizeStoryChoreographyCue33900).filter(Boolean);
   if(root.dataset&&root.dataset.scChoreographyScope===scope){
