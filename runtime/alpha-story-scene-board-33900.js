@@ -166,7 +166,8 @@ function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
   const normalized=(Array.isArray(cues)?cues:[]).map(normalizeStoryChoreographyCue33900).filter(Boolean);
   cancelStoryChoreography33900(root,"new_scope");
   root.dataset.scChoreographyScope=scope;
-  if(!normalized.length){root.dataset.scChoreographyState="settled";return{success:true,scopeKey:scope,cueCount:0,settled:true};}
+  root.dataset.scChoreographyLastKinds=normalized.map(row=>row.kind).join(",");
+  if(!normalized.length){root.dataset.scChoreographyState="settled";return{success:true,scopeKey:scope,cueCount:0,lastKinds:[],settled:true};}
   const controller={scopeKey:scope,cancelled:false,timerIds:[],cueIndex:-1};
   choreographyControllers.set(root,controller);root.dataset.scChoreographyState="playing";
   const later=(fn,ms)=>{const id=setTimeout(()=>{controller.timerIds=controller.timerIds.filter(x=>x!==id);if(!controller.cancelled)fn();},ms);controller.timerIds.push(id);};
@@ -190,7 +191,8 @@ function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
 }
 function getStoryChoreographyState33900(root){
   const controller=root&&choreographyControllers.get(root);
-  return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled"};
+  const lastKinds=root&&root.dataset&&root.dataset.scChoreographyLastKinds?root.dataset.scChoreographyLastKinds.split(",").filter(Boolean):[];
+  return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled",lastKinds};
 }
 
 function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
