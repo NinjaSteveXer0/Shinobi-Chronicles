@@ -6,8 +6,11 @@ const path=require("path");
 const assert=require("assert");
 
 const CORE="runtime/alpha-kakashi-v2-core-36020.js";
+const CONTENT="runtime/academy-kakashi-v2-content-36000.js";
 const STORY_DIR="Documentation/Story";
 const core=fs.readFileSync(CORE,"utf8");
+const content=fs.readFileSync(CONTENT,"utf8");
+const implementation=core+"\n"+content;
 const storyFiles=fs.readdirSync(STORY_DIR)
   .filter(name=>/^Academy_Kakashi_.*\.md$/i.test(name))
   .map(name=>path.join(STORY_DIR,name));
@@ -53,7 +56,7 @@ for(const required of [
   "SECURE THE PACKAGE BEFORE THE ASSASSIN",
   "DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE",
   "GO AFTER THE ORIGINAL TARGET"
-])assert(core.includes(required),`required current Writing token missing: ${required}`);
+])assert(implementation.includes(required),`required current Writing token missing: ${required}`);
 
 assert(!core.includes('"ATTEMPT TO KILL HER"'));
 assert(!core.includes('"ATTEMPT TO KILL HIM"'));
