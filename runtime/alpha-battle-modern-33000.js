@@ -427,15 +427,15 @@
 
   function battlePerformanceMarkup33000(p){
     if(!p)return"";
-    const delta=p.finalDamage>0?\`-${p.finalDamage} PL\`:p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
-    const state=p.beforePL!==null&&p.afterPL!==null?\`${p.beforePL} → ${p.afterPL} PL\`:"AUTHORITATIVE STATE UPDATED";
+    const delta=p.finalDamage>0?`-${p.finalDamage} PL`:p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
+    const state=p.beforePL!==null&&p.afterPL!==null?`${p.beforePL} → ${p.afterPL} PL`:"AUTHORITATIVE STATE UPDATED";
     const substitution=p.result==="SUBSTITUTION"&&p.targetPortrait
-      ?\`<img class="battle2-performance-afterimage" src="${esc(p.targetPortrait)}" alt="" aria-hidden="true">\`:"";
-    return \`<section class="battle2-performance-stage" data-action-id="${esc(p.actionId)}" data-performance-class="${esc(p.presentationClass)}" data-result="${esc(p.result)}" aria-label="Latest committed Battle action">
-      <div class="battle2-performance-actor" data-performance-role="actor">${p.actorPortrait?\`<img src="${esc(p.actorPortrait)}" alt="">\`:""}<span>${esc(p.actorName)}</span></div>
+      ?`<img class="battle2-performance-afterimage" src="${esc(p.targetPortrait)}" alt="" aria-hidden="true">`:"";
+    return `<section class="battle2-performance-stage" data-action-id="${esc(p.actionId)}" data-performance-class="${esc(p.presentationClass)}" data-result="${esc(p.result)}" aria-label="Latest committed Battle action">
+      <div class="battle2-performance-actor" data-performance-role="actor">${p.actorPortrait?`<img src="${esc(p.actorPortrait)}" alt="">`:""}<span>${esc(p.actorName)}</span></div>
       <div class="battle2-performance-center"><small>ACTION</small><strong>${esc(p.actionLabel)}</strong><b>${esc(p.result)}</b><em>${esc(delta)}</em><span>${esc(state)}</span></div>
-      <div class="battle2-performance-target" data-performance-role="target">${p.targetPortrait?\`<img src="${esc(p.targetPortrait)}" alt="">\`:""}${substitution}<span>${esc(p.targetName)}</span></div>
-    </section>\`;
+      <div class="battle2-performance-target" data-performance-role="target">${p.targetPortrait?`<img src="${esc(p.targetPortrait)}" alt="">`:""}${substitution}<span>${esc(p.targetName)}</span></div>
+    </section>`;
   }
   function installBattlePerformance33000(stage){
     if(!stage)return null;
