@@ -2,6 +2,7 @@
 "use strict";
 
 const fs=require("fs"),vm=require("vm"),assert=require("assert");
+const CONTENT_PATH="runtime/academy-kakashi-v2-content-36000.js";
 const CORE_PATH="runtime/alpha-kakashi-v2-core-36020.js";
 const BATTLE_PATH="runtime/alpha-kakashi-v2-battle-36010.js";
 const REWARD_PATH="runtime/alpha-kakashi-v2-rewards-36015.js";
@@ -9,8 +10,9 @@ const RENDER_PATH="runtime/alpha-kakashi-v2-renderer-36030.js";
 const TRANSITION_PATH="runtime/alpha-kakashi-v2-transition-36040.js";
 const TRAVERSAL_PATH="runtime/alpha-traversal-bridge-33200.js";
 
-for(const p of [CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH])assert(fs.existsSync(p),`missing V2 file: ${p}`);
+for(const p of [CONTENT_PATH,CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH])assert(fs.existsSync(p),`missing V2 file: ${p}`);
 
+const contentSource=fs.readFileSync(CONTENT_PATH,"utf8");
 const battleSource=fs.readFileSync(BATTLE_PATH,"utf8");
 const rewardSource=fs.readFileSync(REWARD_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
@@ -20,7 +22,7 @@ const traversalSource=fs.readFileSync(TRAVERSAL_PATH,"utf8");
 
 // Architecture gates.
 assert(!/runtime\/alpha-kakashi-(?!v2-)/.test(traversalSource),"legacy Kakashi loader leaked back into traversal");
-for(const p of [BATTLE_PATH,REWARD_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH])assert(traversalSource.includes(p),`V2 loader missing ${p}`);
+for(const p of [CONTENT_PATH,BATTLE_PATH,REWARD_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH])assert(traversalSource.includes(p),`V2 loader missing ${p}`);
 const coreOperationalSource=coreSource.split("function diagnostics()")[0];
 assert(!/querySelector|document\.|createElement/.test(coreOperationalSource),"Story/state core owns DOM");
 assert(!/querySelector|document\.|createElement/.test(battleSource.split("function installPakkunBattleButtons")[0]),"Battle semantic adapter touches Story/presentation DOM");
@@ -182,6 +184,7 @@ assert(transitionSource.includes("is-falling")&&transitionSource.includes("is-fl
     completeChronicleOriginPrologue:()=>({success:true})
   };
   context.globalThis=context;vm.createContext(context);
+  vm.runInContext(contentSource,context,{filename:CONTENT_PATH});
   vm.runInContext(coreSource,context,{filename:CORE_PATH});
   const diag=context.runAcademyKakashiV2Core36020Diagnostics();
   assert.strictEqual(diag.pass,true,JSON.stringify(diag,null,2));
