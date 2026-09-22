@@ -36,6 +36,12 @@ assert(WORKFLOW.includes("tools/qa_kakashi_v2_route_matrix.js"),"#305 Kakashi ro
 assert(WORKFLOW.includes("tools/qa_kakashi_v2_browser.js"),"#305 Kakashi installed-browser/cardinality QA missing");
 assert(WORKFLOW.includes("tools/qa_issue_141_arc1_battle_return_runtime.js"),"#305 Battle return QA missing");
 assert(WORKFLOW.includes("tools/qa_issue_278_post_battle_agency.js"),"#305 Battle agency QA missing");
+assert(WORKFLOW.includes("tools/qa_contract_integrity_311.js"),"#311 contract integrity not wired into merge gate");
+assert(WORKFLOW.includes("tools/qa_save_compatibility_311.js"),"#311 save compatibility not wired into merge gate");
+assert(WORKFLOW.includes("tools/qa_reference_integrity_311.js"),"#311 reference integrity not wired into merge gate");
+assert(WORKFLOW.includes("tools/qa_story_reachability_311.js"),"#311 Story reachability not wired into merge gate");
+assert(WORKFLOW.includes("tools/qa_browser_runtime_error_gate_311.js"),"#311 browser error policy not wired into merge gate");
+assert(WORKFLOW.includes("tools/qa_release_candidate_evidence_311.js"),"#311 release evidence QA not wired into merge gate");
 
 // Existing #300 negative fixtures are part of the merge-gate proof. The gate
 // must consume the same canonical detector instead of creating a second owner.
