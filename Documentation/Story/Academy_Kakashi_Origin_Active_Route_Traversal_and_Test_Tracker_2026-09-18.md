@@ -647,3 +647,39 @@ Browser/runtime revalidation remains separate.
 One choreography boundary remains outside Writing-only scope:
 several current disposition choices are contractually asserted by the browser Golden to transition directly to `v2_report`.
 Adding intermediate aftermath beats requires Coding / Runtime + Golden expectation updates together.
+
+
+## 2026-09-22 — Character Voice / Personality Anchor re-pass
+
+Stephen strengthened the Writing preflight:
+
+> refresh/build a behavioural voice anchor for every materially speaking recurring character before substantial dialogue rewrite/finalisation.
+
+Current Kakashi Origin active-cast anchor:
+`Documentation/Story/Academy_Kakashi_Active_Cast_Character_Voice_and_Personality_Anchors_2026-09-22.md`
+@ `4b2f25f3802da8b0a3d6e1e34696e81353d8da0f`.
+
+General registry reinforcement:
+`9dcfd72efe741bf23ea81bef2bcd1b50ffe070bd`.
+
+Current materially speaking recurring cast profiled:
+- Academy Kakashi;
+- Pakkun;
+- Minato;
+- Kakashi Origin ANBU Operative;
+- ANBU Marked Target;
+- Package Smuggler;
+- Masked Interceptor;
+- Uchiha Police receiving-officer role.
+
+Canon research refreshed for Kakashi / Minato / Pakkun before runtime re-pass.
+
+Current live voice-application head:
+`d1d42febfc2f7835365ad2cbd7a5de0b70dde536`.
+
+Validation:
+- core JS parse GREEN;
+- exact current choice labels preserved;
+- targeted shared-house-voice scan GREEN;
+- source/runtime expression validated;
+- installed-browser validation remains separate.
