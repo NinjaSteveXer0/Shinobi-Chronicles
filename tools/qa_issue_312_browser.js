@@ -252,7 +252,12 @@ async function shot(page,name,selector=null){
     assert.strictEqual(stopEntryPhase.before.scopeKey,stopEntryPhase.after.scopeKey,"#312 repeated same-beat render changed choreography scope");
     assert.strictEqual(stopEntryPhase.before.cueIndex,stopEntryPhase.after.cueIndex,"#312 repeated same-beat render replayed choreography");
 
-    await page.waitForSelector('#kakashi-v2-scene-board .kv2-actor[data-slot="kakashi"][data-sc-choreography-active="ENTER"]',{state:"attached",timeout:1800});
+    await page.waitForFunction(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const state=root&&getStoryChoreographyState33900(root);
+      const kakashi=root&&root.querySelector('.kv2-actor[data-slot="kakashi"]');
+      return !!state&&state.completedKinds.includes("ENTER")&&!!kakashi&&!kakashi.hasAttribute("data-sc-choreography-pending-entry");
+    },null,{timeout:2600});
     await page.waitForFunction(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
       const state=root&&getStoryChoreographyState33900(root);
@@ -275,6 +280,7 @@ async function shot(page,name,selector=null){
     assert.strictEqual(stop.ghostCount,0,"#312 committed departures survived after choreography settled");
     assert.strictEqual(stop.pendingEntryCount,0,"#312 entrant remained hidden after choreography settled");
     assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE"),"#312 shared FOCUS -> LUNGE choreography receipt missing: "+JSON.stringify(stop.choreography));
+    assert(stop.choreography.completedKinds.includes("ENTER"),"#312 Kakashi entry completion receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
     await page.waitForFunction(()=>{
       const root=document.getElementById("kakashi-v2-scene-board");
