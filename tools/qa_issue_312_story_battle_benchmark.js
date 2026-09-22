@@ -72,7 +72,12 @@ assert(kv2Renderer.includes('next.id==="v2_direct_strike_setup"')&&kv2Renderer.i
 assert(kv2Renderer.includes("kv2ActorFall36030")&&kv2Renderer.includes('data-sc-choreography-active="COLLAPSE"')&&kv2Renderer.includes('state==="KILLED"'),"#312 lethal Story departure must visibly fall off-screen and remain forward-compatible with KILLED truth");
 assert(kv2Renderer.includes("materializeRetainedHoldGhosts")&&kv2Renderer.includes("kv2-outgoing-hold-ghost")&&kv2Renderer.includes('data-transition-active="true"] .kv2-actors'),"#312 hard Story transitions must freeze retained outgoing actors while departure motion plays");
 assert(kv2Renderer.includes("kv2-transition-memory.is-releasing")&&kv2Renderer.includes("is-hard.is-covering{opacity:.58}")&&kv2Renderer.includes("transitionMemoryReleaseTimer"),"#312 hard Story scene changes must use the outgoing-scene crossfade rather than an opaque black cut");
-assert(kv2Renderer.includes('root.dataset.transitionActive="true"')&&kv2Renderer.indexOf('root.dataset.transitionActive="true"')<kv2Renderer.indexOf("pendingVisualSnapshot=null"),"#312 next-scene Story UI must be suppressed before the hard transition begins");
+{
+  const renderStart=kv2Renderer.indexOf("function render(){");
+  const renderEnd=kv2Renderer.indexOf("function bind(",renderStart);
+  const renderSource=kv2Renderer.slice(renderStart,renderEnd);
+  assert(renderStart>=0&&renderEnd>renderStart&&renderSource.includes('root.dataset.transitionActive="true"')&&renderSource.indexOf('root.dataset.transitionActive="true"')<renderSource.indexOf("pendingVisualSnapshot=null"),"#312 next-scene Story UI must be suppressed before the hard transition begins");
+}
 assert(kv2Renderer.includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),"#312 outgoing actor ghosts must not inherit stale live choreography classes");
 assert(kv2Transition.includes("?650:0"),"#312 hard scene transition must leave enough presentation time for the lethal fall to be visible");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
