@@ -444,9 +444,25 @@
     chip.append(result,change,settled);
     return chip;
   }
-  function battlePerformanceRoleNode33000(stage,side){
-    if(!stage)return null;
-    return side==="player"?stage.querySelector(".battle-live-active-card-player"):side==="enemy"?stage.querySelector(".battle-live-active-card-enemy"):null;
+  function battlePerformanceRoleNode33000(stage,ref){
+    if(!stage||!ref||!ref.side||!ref.participantId)return null;
+    const side=String(ref.side),participantId=String(ref.participantId);
+    let active=null;
+    try{
+      active=side==="player"
+        ?(currentBattle&&currentBattle.activePlayer||getBattleDeploymentParticipant("player",1)||null)
+        :(typeof getActiveBattleEnemy33000==="function"?getActiveBattleEnemy33000():getBattleDeploymentParticipant("enemy",1)||null);
+    }catch(_error){active=null;}
+    if(active&&String(active.id||"")===participantId){
+      return side==="player"?stage.querySelector(".battle-live-active-card-player"):stage.querySelector(".battle-live-active-card-enemy");
+    }
+    for(let slot=1;slot<=6;slot+=1){
+      let deployed=null;
+      try{deployed=typeof getBattleDeploymentParticipant==="function"?getBattleDeploymentParticipant(side,slot):null;}catch(_error){deployed=null;}
+      if(!deployed||String(deployed.id||"")!==participantId)continue;
+      return stage.querySelector('.battle-live-roster-'+side+' [data-slot="'+slot+'"]');
+    }
+    return null;
   }
   function clearBattlePerformanceRoles33000(stage,actionId=null){
     if(!stage)return false;
@@ -464,8 +480,8 @@
   function applyBattlePerformanceRoles33000(stage,p){
     clearBattlePerformanceRoles33000(stage);
     if(!stage||!p)return{actorNode:null,targetNode:null};
-    const actorNode=battlePerformanceRoleNode33000(stage,p.actorRef&&p.actorRef.side);
-    const targetNode=battlePerformanceRoleNode33000(stage,p.targetRef&&p.targetRef.side);
+    const actorNode=battlePerformanceRoleNode33000(stage,p.actorRef);
+    const targetNode=battlePerformanceRoleNode33000(stage,p.targetRef);
     stage.classList.add("battle2-performance-active");
     stage.dataset.battle2PerformanceActionId=String(p.actionId||"");
     stage.dataset.battle2PerformanceClass=String(p.presentationClass||"BATTLE_ACTION");
@@ -630,9 +646,10 @@
       performanceClassVocabulary:BATTLE_PRESENTATION_CLASSES_33000.length===16,
       noResolverSemanticsInPerformance:!String(resolveBattlePerformanceProjection33000).includes("resolveBattle"+"DamagePacket")&&!String(installBattlePerformance33000).includes("recordBattle"+"Evidence"),
       battlePortraitProjection:String(portrait33000).includes("resolveUIPortraitProjection")&&String(portrait33000).includes("resolveBattleEnemyPortraitProjection"),
-      performanceUsesCanonicalCombatants:String(applyBattlePerformanceRoles33000).includes("battle-live-active-card-player")&&String(applyBattlePerformanceRoles33000).includes("battle-live-active-card-enemy"),
+      performanceUsesCanonicalCombatants:String(battlePerformanceRoleNode33000).includes("battle-live-active-card-player")&&String(battlePerformanceRoleNode33000).includes("battle-live-active-card-enemy"),
+      exactParticipantRoleLookup:String(battlePerformanceRoleNode33000).includes("participantId")&&String(battlePerformanceRoleNode33000).includes("getBattleDeploymentParticipant")&&String(battlePerformanceRoleNode33000).includes("data-slot"),
       performanceDoesNotDuplicatePortraits:!String(battlePerformanceMarkup33000).includes("actorPortrait")&&!String(battlePerformanceMarkup33000).includes("targetPortrait")&&!String(battlePerformanceMarkup33000).includes("<img"),
-      resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("battlePerformanceResultChip33000")&&String(battlePerformanceResultChip33000).includes("remaining")===false,
+      resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("targetNode.appendChild(chip)")&&String(battlePerformanceResultChip33000).includes("AUTHORITATIVE STATE UPDATED"),
       performanceSettleIsActionScoped:String(installBattlePerformance33000).includes("host.dataset.actionId===p.actionId")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active")&&String(installBattlePerformance33000).includes("920"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
