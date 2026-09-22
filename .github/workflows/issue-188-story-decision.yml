@@ -18,6 +18,7 @@ on:
       - 'tools/qa_kakashi_v2_clean_room.js'
       - 'tools/qa_kakashi_v2_route_matrix.js'
       - 'tools/qa_kakashi_v2_assets.js'
+      - 'tools/qa_kakashi_v2_writing_authority.js'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -64,6 +65,7 @@ jobs:
           node --check runtime/alpha-kakashi-v2-renderer-36030.js
           node --check runtime/alpha-kakashi-v2-transition-36040.js
           node --check tools/qa_kakashi_v2_clean_room.js
+          node --check tools/qa_kakashi_v2_writing_authority.js
       - name: Neutral Story decision runtime
         run: node tools/qa_issue_188_story_decision_runtime.js
       - name: Neutral Story factual resolver
@@ -79,3 +81,4 @@ jobs:
           node tools/qa_kakashi_v2_route_matrix.js
           node --check tools/qa_kakashi_v2_assets.js
           node tools/qa_kakashi_v2_assets.js
+          node tools/qa_kakashi_v2_writing_authority.js
