@@ -122,15 +122,24 @@ async function shot(page,name){
     await choose(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
     const elapsed=Date.now()-start;
     assert(elapsed<900,"#312 Story semantic choice waited for presentation animation: "+elapsed+"ms");
-    await page.waitForSelector("#kakashi-v2-scene-board .sc-choreo-lunge",{state:"attached",timeout:2200});
-    const stop=await page.evaluate(()=>({
-      beat:getActiveStorySceneRuntime()?.beatId,
-      anchors:[...document.querySelectorAll("#kakashi-v2-scene-board .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width})),
-      transition:runAcademyKakashiV2Transition36040Diagnostics()
-    }));
+    await page.waitForFunction(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      const state=root&&getStoryChoreographyState33900(root);
+      return !!state&&Array.isArray(state.lastKinds)&&state.lastKinds.includes("LUNGE");
+    },null,{timeout:2200});
+    const stop=await page.evaluate(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      return{
+        beat:getActiveStorySceneRuntime()?.beatId,
+        anchors:[...document.querySelectorAll("#kakashi-v2-scene-board .kv2-actor")].map(n=>({slot:n.dataset.slot,anchor:n.dataset.scStageAnchor,width:n.getBoundingClientRect().width})),
+        choreography:getStoryChoreographyState33900(root),
+        transition:runAcademyKakashiV2Transition36040Diagnostics()
+      };
+    });
     assert.strictEqual(stop.beat,"v2_stop_assassin_setup");
     assert.deepStrictEqual(stop.anchors.map(x=>x.anchor),["PLAYER_LEFT","OPPONENT_RIGHT"]);
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
+    assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE"),"#312 shared FOCUS -> LUNGE choreography receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
     await shot(page,"03-story-stop-assassin-lunge.png");
 
