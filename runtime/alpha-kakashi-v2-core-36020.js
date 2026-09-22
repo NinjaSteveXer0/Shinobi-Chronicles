@@ -292,7 +292,7 @@ function lethalReportCues(s){
   return out;
 }
 function dynamicTerminalCues(){
-  const s=state();if(!s)return[N("No Chronicle state is available.")];
+  const s=state();if(!s)return[];
   const cues=[N("Kakashi returns to the rooftop.")];
   if(s.pakkun.present)cues.push(N("Pakkun arrives with Kakashi and stays off to one side."));
   cues.push(N("The ANBU operative is waiting."),N("He looks at Kakashi."),N("Then at whatever Kakashi actually brought back."),N("A package."),N("A prisoner."),N("Both."),N("Or neither."),Q("ANBU OPERATIVE","Report."));
