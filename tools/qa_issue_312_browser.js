@@ -73,10 +73,11 @@ async function choose(page,label,expected){
   assert(result?.success,JSON.stringify(result));
   await waitBeat(page,expected);
 }
-async function shot(page,name){
-  const visible=page.locator("#kakashi-v2-scene-board:visible,.alpha-code-battle-stage:visible,#story-scene-presentation-layer:visible,#screen-overlay:visible").first();
-  if(await visible.count()){
-    await visible.screenshot({path:path.join(OUT,name),timeout:12000});
+async function shot(page,name,selector=null){
+  if(selector){
+    const exact=page.locator(selector).first();
+    await exact.waitFor({state:"visible",timeout:12000});
+    await exact.screenshot({path:path.join(OUT,name),timeout:12000});
     return;
   }
   await page.screenshot({path:path.join(OUT,name),fullPage:false,timeout:12000});
@@ -96,7 +97,7 @@ async function shot(page,name){
     assert.deepStrictEqual(rooftop.actors.map(a=>a.anchor),["PLAYER_LEFT","OPPONENT_RIGHT"]);
     assert(rooftop.actors.every(a=>a.width>=245),"#312 two-actor Story prominence too small: "+JSON.stringify(rooftop.actors));
     assert(rooftop.diagnostic.pass&&rooftop.shared.pass,JSON.stringify(rooftop));
-    await shot(page,"01-story-rooftop-two-actor.png");
+    await shot(page,"01-story-rooftop-two-actor.png","#kakashi-v2-scene-board");
 
     await nextSemantic(page,"v2_scene02_tail");
     await choose(page,"WATCH THE EXCHANGE","v2_watch_exchange");
@@ -115,7 +116,7 @@ async function shot(page,name){
     assert.strictEqual(watch.packageHolder,"PS");
     assert.strictEqual(watch.packageHidden,false);
     assert(watch.choreography.scopeKey&&watch.choreography.state==="playing","#312 watch-exchange choreography not active");
-    await shot(page,"02-story-handoff-surprise-entry.png");
+    await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
 
     // Choice is not trapped by the running animation: semantic transition is immediate.
     const start=Date.now();
@@ -141,7 +142,12 @@ async function shot(page,name){
     assert(stop.anchors.every(a=>a.width>=245),"#312 battle-pair Story prominence too small");
     assert(stop.choreography.lastKinds.includes("FOCUS")&&stop.choreography.lastKinds.includes("LUNGE"),"#312 shared FOCUS -> LUNGE choreography receipt missing: "+JSON.stringify(stop.choreography));
     assert(stop.transition.pass,JSON.stringify(stop.transition));
-    await shot(page,"03-story-stop-assassin-lunge.png");
+    await page.waitForFunction(()=>{
+      const root=document.getElementById("kakashi-v2-scene-board");
+      return !!root&&!root.classList.contains("is-wipe-covering");
+    },null,{timeout:3000});
+    await page.waitForTimeout(260);
+    await shot(page,"03-story-stop-assassin-lunge.png","#kakashi-v2-scene-board");
 
     // BATTLE BENCHMARK — use the authorised sequential MI package against the
     // same current Story instance. This is a QA launcher only; Battle truth and
@@ -205,21 +211,21 @@ async function shot(page,name){
     assert.strictEqual(substitution.p.exactTarget,true);
     assert.strictEqual(substitution.afterimages,1);
     assert.strictEqual(substitution.actorImages,2);
-    await shot(page,"04-battle-substitution-performance.png");
+    await shot(page,"04-battle-substitution-performance.png",".alpha-code-battle-stage");
 
     await seed("hit");
     await page.waitForSelector('.battle2-performance-stage[data-result="HIT"]',{state:"visible",timeout:8000});
     const hit=await page.evaluate(()=>resolveBattlePerformanceProjection33000());
     assert(hit.result==="HIT"&&hit.finalDamage===7&&hit.beforePL===14&&hit.afterPL===7,JSON.stringify(hit));
     assert(hit.actorRef.participantId==="academy_kakashi"&&hit.targetRef.participantId==="academy_kakashi_origin_masked_interceptor");
-    await shot(page,"05-battle-hit-performance.png");
+    await shot(page,"05-battle-hit-performance.png",".alpha-code-battle-stage");
 
     await seed("defeat");
     await page.waitForSelector('.battle2-performance-stage[data-result="DEFEAT"]',{state:"visible",timeout:8000});
     const defeat=await page.evaluate(()=>resolveBattlePerformanceProjection33000());
     assert(defeat.result==="DEFEAT"&&defeat.afterPL===0,JSON.stringify(defeat));
     assert(!JSON.stringify(defeat).toLowerCase().includes("death"),"#312 defeat presentation leaked death semantics");
-    await shot(page,"06-battle-defeat-performance.png");
+    await shot(page,"06-battle-defeat-performance.png",".alpha-code-battle-stage");
 
     const errors=await runtimeErrorGate.assertClean("issue312_story_battle_benchmark");
     const result={
