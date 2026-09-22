@@ -84,7 +84,7 @@ function participantKey(ref){
 function participant(ref,next){const key=participantKey(ref);return mutate(s=>{s.participants[key]={...(s.participants[key]||{}),...next};});}
 function packageState(holder,{recovered=null,returned=null,neutral=null}={}){return mutate(s=>{s.package.holder=holder;if(recovered!==null)s.package.recovered=!!recovered;if(returned!==null)s.package.returned=!!returned;if(neutral!==null)s.package.neutral=!!neutral;});}
 function setPakkun(present=true){return mutate(s=>{s.pakkun.present=present;s.pakkun.departed=!present;});}
-function addField(ref){const key=participantKey(ref);return mutate(s=>{if(!s.fieldSecured.includes(key))s.fieldSecured.push(key);if(!s.participants[key])s.participants[key]={state:"AVAILABLE"};s.participants[key].state="FIELD_SECURED_PENDING_COLLECTION";});}
+function addField(ref){const key=participantKey(ref);return mutate(s=>{if(!s.fieldSecured.includes(key))s.fieldSecured.push(key);if(!s.participants[key])s.participants[key]={state:"AVAILABLE"};s.participants[key].state="FIELD_SECURED_PENDING_COLLECTION";s.participants[key].fieldLocation=key==="MI"?"beneath the Sakura tree":key==="PS"?"in the side street":key==="AMT"?"in the alley":"at the committed field location";});}
 function dispose(ref,kind){
   const key=participantKey(ref);
   return mutate(s=>{
@@ -184,47 +184,257 @@ function resolveFactual(key){
 }
 function resolverEnter(key){const r=resolveFactual(key);return r&&r.success?r:{success:false,reason:r&&r.reason||"kakashi_v2_resolver_failed"};}
 
+function packageReportCues(s){
+  if(s.package.returned===true||s.package.holder==="ANBU")return[
+    N("Kakashi produces the package."),Q("KAKASHI","Recovered."),N("The operative takes it.")
+  ];
+  if(s.package.holder==="PS")return[
+    Q("ANBU OPERATIVE","The package?"),Q("KAKASHI","The receiver got away with it."),Q("ANBU OPERATIVE","You saw him leave with it."),Q("KAKASHI","Yes.")
+  ];
+  if(s.package.holder==="AMT")return[
+    Q("ANBU OPERATIVE","The package?"),Q("KAKASHI","The original target still had it when he escaped.")
+  ];
+  if(s.package.holder==="MI")return[
+    Q("ANBU OPERATIVE","The package?"),Q("KAKASHI","The masked shinobi took it."),Q("ANBU OPERATIVE","From you?"),Q("KAKASHI","Yes.")
+  ];
+  return[Q("ANBU OPERATIVE","The package?"),Q("KAKASHI","Lost."),Q("ANBU OPERATIVE","To whom?"),Q("KAKASHI","I can't say.")];
+}
+function participantReportCues(s,ref){
+  const row=s.participants&&s.participants[ref];if(!row||row.state==="UNSEEN")return[];
+  const out=[];
+  if(ref==="MI"){
+    if(row.state==="DEAD")out.push(Q("KAKASHI","The masked shinobi is dead."));
+    else if(row.state==="ESCAPED")out.push(Q("KAKASHI","She got away."),Q("ANBU OPERATIVE","After the fight?"),Q("KAKASHI","Yes."));
+    else if(row.state==="FIELD_SECURED_PENDING_COLLECTION")out.push(Q("KAKASHI","She is restrained under the Sakura tree."),Q("ANBU OPERATIVE","Alive?"),Q("KAKASHI","Yes."));
+    else if(row.state==="ANBU_CUSTODY")out.push(Q("KAKASHI","You have her."));
+    else if(row.state==="POLICE_CUSTODY")out.push(Q("KAKASHI","I turned her over to the Uchiha Police Force."),Q("ANBU OPERATIVE","Alive?"),Q("KAKASHI","Yes."));
+    else if(row.state==="RELEASED")out.push(Q("KAKASHI","I let her go."),Q("ANBU OPERATIVE","Deliberately."),Q("KAKASHI","Yes."));
+    else if(row.state==="BATTLE_DEFEATED")out.push(Q("KAKASHI","She was alive when I left her."),Q("ANBU OPERATIVE","Restrained?"),Q("KAKASHI","No."));
+  }else if(ref==="PS"){
+    if(row.state==="DEAD")out.push(Q("KAKASHI","The receiver is dead."));
+    else if(row.state==="ESCAPED"&&s.package.holder==="PS")out.push(Q("KAKASHI","The receiver escaped with the package."),Q("ANBU OPERATIVE","You saw him leave with it."),Q("KAKASHI","Yes."));
+    else if(row.state==="ESCAPED")out.push(Q("KAKASHI","The receiver got away."),Q("ANBU OPERATIVE","The package?"));
+    else if(row.state==="FIELD_SECURED_PENDING_COLLECTION")out.push(Q("KAKASHI","He is restrained in the side street."),Q("ANBU OPERATIVE","Location?"),Q("KAKASHI",row.fieldLocation||"The side street."));
+    else if(row.state==="ANBU_CUSTODY")out.push(Q("KAKASHI","You have him."));
+    else if(row.state==="POLICE_CUSTODY")out.push(Q("KAKASHI","I turned him over to the Uchiha Police Force."));
+    else if(row.state==="RELEASED")out.push(Q("KAKASHI","I let him go."),Q("ANBU OPERATIVE","After recovering the package?"),Q("KAKASHI",s.package.returned||s.package.recovered?"Yes.":"No."));
+    else if(row.state==="BATTLE_DEFEATED")out.push(Q("KAKASHI","He was alive when I left."),Q("ANBU OPERATIVE","Restrained?"),Q("KAKASHI","No."));
+  }else if(ref==="AMT"){
+    const lostBattle=Object.values(s.battles||{}).some(b=>b&&b.outcome==="defeat"&&String(b.encounterId||"").includes("amt"));
+    if(row.state==="DEAD")out.push(Q("KAKASHI","The original target is dead."));
+    else if(row.state==="ESCAPED"&&lostBattle){
+      out.push(Q("KAKASHI","He beat me and escaped."));
+      if(s.pakkun.present)out.push(Q("PAKKUN","He did."),N("The operative looks at him."),Q("PAKKUN","What? He did."));
+    }else if(row.state==="ESCAPED")out.push(Q("KAKASHI","The original target got away."),Q("ANBU OPERATIVE","You lost the trail."),Q("KAKASHI","Yes."));
+    else if(row.state==="FIELD_SECURED_PENDING_COLLECTION")out.push(Q("KAKASHI","He is restrained in the alley."),Q("ANBU OPERATIVE","Alive?"),Q("KAKASHI","Yes."));
+    else if(row.state==="ANBU_CUSTODY")out.push(Q("KAKASHI","He's in ANBU custody."));
+    else if(row.state==="POLICE_CUSTODY")out.push(Q("KAKASHI","I turned him over to the Uchiha Police Force."),Q("ANBU OPERATIVE","Alive?"),Q("KAKASHI","Yes."));
+    else if(row.state==="RELEASED")out.push(Q("KAKASHI","I let him go."),Q("ANBU OPERATIVE","Deliberately."),Q("KAKASHI","Yes."));
+    else if(row.state==="BATTLE_DEFEATED")out.push(Q("KAKASHI","He was alive when I left."),Q("ANBU OPERATIVE","Restrained?"),Q("KAKASHI","No."));
+  }
+  return out;
+}
+function knowledgeReportCues(s){
+  const out=[];
+  if(s.knowledge.getCloserContingency)out.push(
+    N("The ANBU operative finishes the physical-outcome questions."),
+    Q("ANBU OPERATIVE","You heard them before you moved."),Q("KAKASHI","Yes."),
+    Q("ANBU OPERATIVE","What did you learn?"),Q("KAKASHI","If the street stayed clear, the original carrier was supposed to hand the package over."),
+    Q("ANBU OPERATIVE","And if it didn't?"),Q("KAKASHI","He kept moving with it."),
+    Q("ANBU OPERATIVE","Destination?"),Q("KAKASHI","They didn't say."),
+    N("Kakashi gives exactly what he heard."),N("Nothing more.")
+  );
+  if(s.knowledge.askWhere)out.push(
+    Q("ANBU OPERATIVE","You questioned the original target."),Q("KAKASHI","Yes."),
+    Q("ANBU OPERATIVE","What did he tell you?"),Q("KAKASHI","His job ended at the handoff."),
+    Q("ANBU OPERATIVE","And after that?"),Q("KAKASHI","The receiver was supposed to take it somewhere else."),
+    Q("ANBU OPERATIVE","Where?"),Q("KAKASHI","He didn't know."),
+    N("The operative studies him."),Q("ANBU OPERATIVE","You believe that."),Q("KAKASHI","He'd asked too.")
+  );
+  return out;
+}
+function pakkunReportAndDepartureCues(s){
+  if(!s.pakkun.present)return[];
+  return[
+    Q("ANBU OPERATIVE","And the ninken?"),Q("PAKKUN","Temporary."),N("The operative looks at him."),
+    Q("PAKKUN","I was there when it mattered."),N("Kakashi glances down at him."),Q("KAKASHI","He helped."),
+    N("Pakkun's ears shift."),Q("PAKKUN","Better."),
+    Q("PAKKUN","That's me done."),N("Kakashi looks down at him."),Q("KAKASHI","Thanks."),
+    N("Pakkun studies him."),Q("PAKKUN","You're welcome."),N("He turns toward the edge of the rooftop."),
+    Q("PAKKUN","Try not to make the next one this complicated."),Q("KAKASHI","I wasn't planning to."),
+    N("Pakkun looks back."),Q("PAKKUN","Nobody ever is."),N("Then he leaves.")
+  ];
+}
+function lethalReportCues(s){
+  const dead=["MI","PS","AMT"].filter(ref=>s.participants[ref]&&s.participants[ref].state==="DEAD");
+  if(dead.length===3)return[
+    Q("ANBU OPERATIVE","The masked shinobi?"),Q("KAKASHI","Dead."),
+    Q("ANBU OPERATIVE","The receiver?"),Q("KAKASHI","Dead."),N("The operative is still for a moment."),
+    Q("ANBU OPERATIVE","And the original target?"),Q("KAKASHI","Dead."),
+    N("The answer is no louder than the first two."),N("That makes it heavier, not lighter."),
+    Q("ANBU OPERATIVE","All three by you."),Q("KAKASHI","Yes."),Q("ANBU OPERATIVE","After the fights?"),
+    N("Kakashi meets his eyes."),Q("KAKASHI","Yes."),
+    Q("ANBU OPERATIVE","Anything else?"),Q("KAKASHI","No."),
+    N("It is not an attempt to make the night smaller."),N("It is the end of the factual report.")
+  ];
+  const out=[];
+  if(dead.length===2){
+    const a=dead.includes("MI")&&dead.includes("PS")?["The masked shinobi?","The receiver?"]:
+      dead.includes("MI")&&dead.includes("AMT")?["The masked shinobi?","The original target?"]:
+      ["The receiver?","The original target?"];
+    for(const q of a){out.push(Q("ANBU OPERATIVE",q),Q("KAKASHI","Dead."));}
+    const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
+    out.push(...participantReportCues(s,survivor),Q("ANBU OPERATIVE","So two died."),Q("KAKASHI","Yes."));
+    return out;
+  }
+  if(dead.length===1){
+    const ref=dead[0],question=ref==="MI"?"The masked shinobi?":ref==="PS"?"The receiver?":"The original target?";
+    out.push(Q("ANBU OPERATIVE",question),Q("KAKASHI","Dead."));
+    for(const other of ["MI","PS","AMT"])if(other!==ref)out.push(...participantReportCues(s,other));
+    out.push(Q("ANBU OPERATIVE","One death."),Q("KAKASHI","Yes."));
+  }
+  return out;
+}
 function dynamicTerminalCues(){
   const s=state();if(!s)return[N("No Chronicle state is available.")];
-  const cues=[N("Kakashi returns to the rooftop. The ANBU operative is waiting."),Q("ANBU OPERATIVE","Report.")];
-  if(s.package.returned||s.package.holder==="ANBU")cues.push(Q("KAKASHI","The package is back with you."));
-  else if(s.package.holder==="KAKASHI")cues.push(Q("KAKASHI","I recovered the package."));
-  else if(s.package.holder==="PS")cues.push(Q("KAKASHI","Package Smuggler got away with it."));
-  else if(s.package.holder==="AMT")cues.push(Q("KAKASHI","The original carrier escaped with it."));
-  else if(s.package.holder==="MI")cues.push(Q("KAKASHI","Masked Interceptor took it."));
-  else if(s.package.neutral)cues.push(Q("KAKASHI","The package was separated from the carrier."));
-  else cues.push(Q("KAKASHI","I couldn't recover the package."));
-  for(const [ref,label] of [["MI","Masked Interceptor"],["PS","Package Smuggler"],["AMT","ANBU Marked Target"]]){
-    const row=s.participants[ref];if(!row||row.state==="UNSEEN")continue;
-    const text=row.state==="DEAD"?`${label} is dead.`:row.state==="ANBU_CUSTODY"?`${label} was transferred to ANBU custody.`:row.state==="POLICE_CUSTODY"?`${label} was transferred to the Uchiha Police Force.`:row.state==="FIELD_SECURED_PENDING_COLLECTION"?`${label} is restrained in the field for collection.`:row.state==="RELEASED"?`${label} was released.`:row.state==="ESCAPED"?`${label} escaped.`:row.state==="BATTLE_DEFEATED"?`${label} was defeated and left alive.`:`${label}: ${row.state}.`;
-    cues.push(Q("KAKASHI",text));
-  }
-  if(s.knowledge.getCloserContingency)cues.push(Q("KAKASHI","I heard the handoff contingency before I moved."));
-  if(s.knowledge.askWhere)cues.push(Q("KAKASHI","The original carrier's role ended at the handoff. The receiver was meant to carry it onward. He did not know the final destination."));
-  if(s.pakkun.present)cues.push(N("The unfamiliar ninken remains nearby while the factual report closes."));
-  cues.push(Q("ANBU OPERATIVE","Understood."));
+  const cues=[N("Kakashi returns to the rooftop.")];
+  if(s.pakkun.present)cues.push(N("Pakkun arrives with Kakashi and stays off to one side."));
+  cues.push(N("The ANBU operative is waiting."),N("He looks at Kakashi."),N("Then at whatever Kakashi actually brought back."),N("A package."),N("A prisoner."),N("Both."),N("Or neither."),Q("ANBU OPERATIVE","Report."));
+  cues.push(...packageReportCues(s));
+  const deaths=["MI","PS","AMT"].filter(ref=>s.participants[ref]&&s.participants[ref].state==="DEAD").length;
+  if(deaths)cues.push(...lethalReportCues(s));
+  else for(const ref of ["MI","PS","AMT"])cues.push(...participantReportCues(s,ref));
+  cues.push(...knowledgeReportCues(s),...pakkunReportAndDepartureCues(s));
   return cues;
+}
+function minatoPackageCues(s,{lethal=false}={}){
+  if(lethal){
+    if(s.package.recovered||s.package.returned||s.package.holder==="ANBU")return[Q("MINATO","And the package?"),Q("ANBU OPERATIVE","Recovered by Kakashi."),N("Minato nods once."),Q("MINATO","Then record that separately.")];
+    return[Q("MINATO","And the package?"),N("The operative reports the exact holder and outcome."),N("Minato looks at the lethal history again."),Q("MINATO","Don't let the deaths turn a failed objective into a successful one.")];
+  }
+  if(s.package.recovered||s.package.returned||s.package.holder==="ANBU")return[
+    N("The ANBU operative finishes the factual summary."),N("Minato looks at the package result first."),
+    Q("MINATO","He brought it back."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","What did it cost him?"),
+    N("The operative reports the exact Battle, custody and pursuit history.")
+  ];
+  return[
+    N("The ANBU operative finishes the factual summary."),N("Minato looks at the package result first."),
+    Q("MINATO","He didn't recover it."),Q("ANBU OPERATIVE","No."),Q("MINATO","What did he recover instead?")
+  ];
+}
+function lethalMinatoCues(s){
+  const dead=["MI","PS","AMT"].filter(ref=>s.participants[ref]&&s.participants[ref].state==="DEAD");
+  const out=[];
+  if(dead.length===3)out.push(
+    N("The report rests open in front of Minato."),N("The ANBU operative stands across from him."),N("No participant who is dead appears in the room."),
+    Q("MINATO","Three confirmed deaths."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","Battle casualties?"),Q("ANBU OPERATIVE","No."),
+    N("Minato looks down at the report again."),Q("MINATO","He won the fights first."),Q("ANBU OPERATIVE","Yes."),
+    Q("MINATO","And then chose the same answer three times."),Q("ANBU OPERATIVE","Yes."),
+    N("Minato is quiet."),N("Not shocked."),N("Not impressed."),N("Thinking."),
+    Q("MINATO","Did he lose control?"),Q("ANBU OPERATIVE","No."),Q("MINATO","Did he misunderstand what he was doing?"),Q("ANBU OPERATIVE","No."),
+    N("Minato closes the report halfway."),Q("MINATO","Then the number isn't the important part."),N("The operative waits."),
+    Q("MINATO","He knew when each fight was over."),N("His eyes settle on the page."),Q("MINATO","And he decided the ending afterward.")
+  );
+  else if(dead.length===2){
+    const pair=dead.includes("MI")&&dead.includes("PS")?"Masked shinobi and receiver.":dead.includes("MI")&&dead.includes("AMT")?"The masked shinobi and the original target.":"The receiver and the original target are dead.";
+    out.push(Q("MINATO",pair),Q("ANBU OPERATIVE","Yes."));
+    const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
+    out.push(Q("MINATO",survivor==="MI"?"The masked shinobi?":survivor==="PS"?"The receiver?":"And the original target?"));
+    if(s.participants[survivor].state==="RELEASED")out.push(Q("MINATO","Then the third result was a different decision."));
+    else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(s.participants[survivor].state))out.push(Q("MINATO","He chose control the third time."));
+    else out.push(Q("MINATO","He ran out of opportunity."));
+  }else if(dead.length===1){
+    const ref=dead[0];
+    if(ref==="MI")out.push(Q("MINATO","One confirmed death."),Q("ANBU OPERATIVE","The masked shinobi."),Q("MINATO","And the other two?"),N("Minato reads the sequence, not the total."),Q("MINATO","One death doesn't tell me much by itself."),N("He looks at the chronology."),Q("MINATO","When he chose it does."));
+    else if(ref==="PS")out.push(Q("MINATO","The receiver."),Q("ANBU OPERATIVE","Dead."),Q("MINATO","The package?"),N("The operative reports the package result and the other participant states."),Q("MINATO","Keep those separate."),N("The operative waits."),Q("MINATO","The objective and the death are not the same result."));
+    else out.push(Q("MINATO","The original target died."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","The others?"),N("Minato looks at the first assignment line in the report."),Q("MINATO","He started the night following that man."),N("The operative waits."),Q("MINATO","And ended it deciding whether he should live."));
+  }
+  out.push(...minatoPackageCues(s,{lethal:true}));
+  return out;
+}
+function nonlethalMinatoCues(s){
+  const out=[...minatoPackageCues(s)];
+  const states=Object.values(s.participants||{}).map(r=>r&&r.state);
+  if(states.includes("ANBU_CUSTODY"))out.push(Q("MINATO","He brought the target back alive."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","Because he couldn't finish the fight?"),Q("ANBU OPERATIVE","No."),N("Minato looks at the report."),Q("MINATO","Then custody was a decision."));
+  else if(states.includes("POLICE_CUSTODY"))out.push(Q("MINATO","He chose the Police."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","Instead of bringing them here."),Q("ANBU OPERATIVE","Yes."),N("Minato considers that longer than the institutional difference alone requires."),Q("MINATO","He wanted the decision outside this room."));
+  else if(states.includes("FIELD_SECURED_PENDING_COLLECTION"))out.push(Q("MINATO","He left them secured and kept moving."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","Then he treated custody like part of the mission."),N("A pause."),Q("MINATO","Not the end of it."));
+  else if(states.includes("RELEASED")){
+    const released=states.filter(x=>x==="RELEASED").length;
+    if(released>1)out.push(Q("MINATO","He had all of them."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","And let all of them go."),Q("ANBU OPERATIVE","Yes."),N("Minato looks down at the report."),Q("MINATO","That's not an accident."));
+    else out.push(Q("MINATO","He had control."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","And released him."),Q("ANBU OPERATIVE","Yes."),Q("MINATO",s.package.recovered||s.package.returned?"Then he decided the objective was enough.":"Then the release wasn't payment for success."),...(s.package.recovered||s.package.returned?[]:[N("The operative waits."),Q("MINATO","It was a separate choice.")]));
+  }
+  const clean=(s.resolvers.directPickpocket&&s.resolvers.directPickpocket.selectedOutcomeRef==="PICKPOCKET_DIRECT_SUCCESS")||(s.resolvers.improvedPickpocket&&s.resolvers.improvedPickpocket.selectedOutcomeRef==="PICKPOCKET_IMPROVED_SUCCESS");
+  if(clean)out.push(Q("MINATO","No fight."),Q("ANBU OPERATIVE","No."),Q("MINATO","No pursuit."),Q("ANBU OPERATIVE","No."),Q("MINATO","And the package came back."),Q("ANBU OPERATIVE","Yes."),N("Minato looks at the short report."),Q("MINATO","Sometimes the cleanest decision leaves the least to discuss."));
+  if(s.knowledge.getCloserContingency)out.push(Q("MINATO","He stayed long enough to understand the contingency."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","And not long enough to invent the part they never said."));
+  if(s.knowledge.askWhere)out.push(Q("MINATO","He stopped to ask a question before he chose the fight."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","And learned the carrier didn't know the destination either."),Q("ANBU OPERATIVE","Yes."),N("Minato looks at the report."),Q("MINATO","Useful."),N("The operative waits."),Q("MINATO","Not because it gives us a destination."),N("He taps the line once."),Q("MINATO","Because it tells us where the carrier's Knowledge ended."));
+  return out;
 }
 function minatoCues(){
-  const s=state();const deaths=Object.values(s.participants).filter(r=>r&&r.state==="DEAD").length;
-  const cues=[N("The report moves upward without Kakashi."),N("Later, inside the Hokage Administration, Minato reviews the field record with the ANBU operative.")];
-  if(s.package.recovered||s.package.returned||s.package.holder==="ANBU")cues.push(Q("MINATO","He recovered the objective."));
-  else cues.push(Q("MINATO","The objective was not recovered."));
-  if(deaths)cues.push(Q("MINATO",deaths===1?"He also chose to end one life after the fighting stopped.":`He also chose to end ${deaths} lives after the fighting stopped.`));
-  if(s.fieldSecured.length)cues.push(Q("ANBU OPERATIVE",`${s.fieldSecured.length} field-secured captive${s.fieldSecured.length===1?" remains":"s remain"} for collection.`));
-  cues.push(Q("MINATO","Record what happened. Not what we wish had happened."));
-  cues.push(N("The evaluation remains outside Kakashi's Knowledge."));
-  return cues;
+  const s=state();const deaths=Object.values(s.participants||{}).filter(r=>r&&r.state==="DEAD").length;
+  return deaths?lethalMinatoCues(s):nonlethalMinatoCues(s);
+}
+function firstActionReceipt(s){
+  const labels={WATCH_THE_EXCHANGE:"WATCH THE EXCHANGE",MOVE_IN_CLOSER:"MOVE IN CLOSER",STRIKE_BEFORE_THE_HANDOFF:"STRIKE BEFORE THE HANDOFF",SLIP_IN_FOR_THE_PACKAGE:"SLIP IN FOR THE PACKAGE"};
+  const row=(s.routeHistory||[]).find(r=>r&&labels[r.label]);return row?labels[row.label]:"Not recorded";
+}
+function packageReceiptLine(s){
+  if(s.package.returned===true||s.package.holder==="ANBU")return"Package — Recovered by Kakashi and returned to ANBU.";
+  if(s.package.holder==="PS")return"Package — Lost with Package Smuggler.";
+  if(s.package.holder==="AMT")return"Package — Lost with ANBU Marked Target.";
+  if(s.package.holder==="MI")return"Package — Taken from Kakashi by Masked Interceptor.";
+  return"Package — Not recovered by Kakashi.";
+}
+function participantReceiptLine(s,ref){
+  const row=s.participants[ref];if(!row||row.state==="UNSEEN")return null;
+  const name=ref==="MI"?"Masked Interceptor":ref==="PS"?"Package Smuggler":"ANBU Marked Target";
+  if(row.state==="DEAD")return`${name} — Killed by Kakashi after defeat.`;
+  if(row.state==="FIELD_SECURED_PENDING_COLLECTION")return`${name} — Field-secured alive.`;
+  if(row.state==="ANBU_CUSTODY")return`${name} — Transferred to ANBU custody.`;
+  if(row.state==="POLICE_CUSTODY")return`${name} — Transferred to Uchiha Police custody.`;
+  if(row.state==="RELEASED")return`${name} — Deliberately released.`;
+  if(row.state==="BATTLE_DEFEATED")return`${name} — Defeated; left alive and unrestrained.`;
+  if(row.state==="ESCAPED"){
+    if(ref==="PS")return`${name} — Escaped ${s.package.holder==="PS"?"with":"without"} package.`;
+    if(ref==="AMT"){
+      const lostBattle=Object.values(s.battles||{}).some(b=>b&&b.outcome==="defeat"&&String(b.encounterId||"").includes("amt"));
+      return lostBattle?`${name} — Defeated Kakashi and escaped.`:`${name} — Escaped after pursuit failed.`;
+    }
+    return`${name} — Escaped.`;
+  }
+  return`${name} — ${row.state}.`;
+}
+function battleReceiptLines(s){
+  const names={
+    academy_kakashi_origin_battle_mi_1v1:"Kakashi vs Masked Interceptor",
+    academy_kakashi_origin_battle_seq_mi:"Kakashi vs Masked Interceptor",
+    academy_kakashi_origin_battle_ps_1v1:"Kakashi vs Package Smuggler",
+    academy_kakashi_origin_battle_seq_ps:"Kakashi vs Package Smuggler",
+    academy_kakashi_origin_battle_amt_1v1:"Kakashi vs ANBU Marked Target",
+    academy_kakashi_origin_battle_kakashi_pakkun_vs_amt:"Kakashi + temporary ninken support vs ANBU Marked Target",
+    academy_kakashi_origin_battle_seq_amt_pakkun:"Kakashi + temporary ninken support vs ANBU Marked Target",
+    academy_kakashi_origin_battle_amt_ps_2v1:"Kakashi vs ANBU Marked Target + Package Smuggler",
+    academy_kakashi_origin_battle_ps_mi_2v1:"Kakashi vs Package Smuggler + Masked Interceptor",
+    academy_kakashi_origin_battle_amt_ps_mi_3v1:"Kakashi vs ANBU Marked Target + Package Smuggler + Masked Interceptor"
+  };
+  return Object.values(s.battles||{}).map(row=>`${names[row.encounterId]||"Kakashi Battle"} — ${row.outcome==="victory"?"Victory":"Defeat"}.`);
 }
 function receiptCues(){
-  const s=state();const lines=["ACADEMY KAKASHI ORIGIN — FIELD RECORD"];
-  lines.push(s.package.returned||s.package.holder==="ANBU"?"Package — Returned to ANBU.":s.package.holder==="KAKASHI"?"Package — Recovered by Kakashi.":s.package.holder==="PS"?"Package — Lost with Package Smuggler.":s.package.holder==="AMT"?"Package — Lost with ANBU Marked Target.":s.package.holder==="MI"?"Package — Taken from Kakashi by Masked Interceptor.":s.package.neutral?"Package — Recovered from neutral ground / secured objective state.":"Package — Not recovered.");
-  const label={MI:"Masked Interceptor",PS:"Package Smuggler",AMT:"ANBU Marked Target"};
-  for(const ref of ["MI","PS","AMT"]){const row=s.participants[ref];if(!row||row.state==="UNSEEN")continue;const suffix=row.state==="DEAD"?"Killed by Kakashi after Battle.":row.state==="FIELD_SECURED_PENDING_COLLECTION"?"Field-secured alive.":row.state==="ANBU_CUSTODY"?"Transferred to ANBU custody.":row.state==="POLICE_CUSTODY"?"Transferred to Uchiha Police custody.":row.state==="RELEASED"?"Deliberately released.":row.state==="ESCAPED"?"Escaped.":row.state==="BATTLE_DEFEATED"?"Defeated; left alive and unrestrained.":row.state;lines.push(`${label[ref]} — ${suffix}`);}
-  if(s.knowledge.getCloserContingency)lines.push("Knowledge — Handoff contingency observed before intervention.");
-  if(s.knowledge.askWhere)lines.push("Knowledge — Carrier role ended at handoff; receiver intended onward; downstream destination not learned.");
+  const s=state();const lines=[
+    "ASSIGNMENT","Hokage-authorised limited retrieval operation.","",
+    "FIRST ACTION",firstActionReceipt(s),"",
+    "PACKAGE",packageReceiptLine(s),"",
+    "PARTICIPANTS"
+  ];
+  for(const ref of ["MI","PS","AMT"]){const line=participantReceiptLine(s,ref);if(line)lines.push(line);}
+  lines.push("","BATTLES",...battleReceiptLines(s),"","REPORT","ANBU report — completed from Kakashi-observed facts.");
+  if(s.pakkun.present||s.pakkun.departed)lines.push("","PAKKUN","Temporary ninken intervention — Present.","Permanent Summon ownership — None.");
+  if(s.knowledge.getCloserContingency)lines.push("","INTELLIGENCE","Handoff contingency overheard.","Downstream package destination — Unknown.");
+  if(s.knowledge.askWhere)lines.push("","INTELLIGENCE","Original carrier's role ended at handoff.","Downstream destination — Unknown to original carrier.");
+  const dead=["MI","PS","AMT"].filter(ref=>s.participants[ref]&&s.participants[ref].state==="DEAD");
+  if(dead.length)lines.push("","LETHAL HISTORY",...dead.map(ref=>participantReceiptLine(s,ref)),`Confirmed kills: ${dead.length}`,"Failed lethal attempts: 0");
   const result=s.rewards&&s.rewards.terminalResult||null;
   const receipts=result&&Array.isArray(result.sourceReceipts)?result.sourceReceipts:[];
+  if(receipts.length)lines.push("","REWARDS");
   const why={
     kak_origin_ryo_terminal_debrief:"terminal factual ANBU debrief and Chronicle Receipt completed",
     kak_origin_ryo_package_recovered:"package returned to the authorised Konoha side",
@@ -236,11 +446,11 @@ function receiptCues(){
     kak_origin_battle_amt_victory_ryo_01:"solo ANBU Marked Target Battle victory"
   };
   for(const receipt of receipts){
-    if(receipt.rewardClass==="battle_cash"||receipt.rewardClass==="terminal_cash")lines.push(`Reward — ${receipt.ryo} Ryō · ${why[receipt.sourceId]||receipt.sourceId}.`);
-    if(receipt.itemId==="field_recovery_pill")lines.push(`Reward — Field Recovery Pill ×1 · ${receipt.metadata&&receipt.metadata.timing==="immediate_solo_mi_victory"?"solo Masked Interceptor victory resupply":"PL Battle participation resupply at terminal debrief"}.`);
-    if(receipt.itemId==="academy_training_tanto")lines.push("Reward — Academy Training Tantō ×1 · exceptional field-evaluation award.");
+    if(receipt.rewardClass==="battle_cash"||receipt.rewardClass==="terminal_cash")lines.push(`${receipt.ryo} Ryō — ${why[receipt.sourceId]||receipt.sourceId}.`);
+    if(receipt.itemId==="field_recovery_pill")lines.push(`Field Recovery Pill ×1 — ${receipt.metadata&&receipt.metadata.timing==="immediate_solo_mi_victory"?"solo Masked Interceptor victory resupply":"PL Battle participation resupply at terminal debrief"}.`);
+    if(receipt.itemId==="academy_training_tanto")lines.push("Academy Training Tantō ×1 — exceptional field-evaluation award.");
   }
-  lines.push("Development — discipline/Stamina development is derived from committed actions used in Battle; no generic Character EXP or direct PL is granted here.");
+  lines.push("","DEVELOPMENT","Discipline/Stamina development derives from committed Battle actions; no generic Character EXP or direct PL is granted by the debrief.");
   return[RECORD(lines.join("\n"))];
 }
 
@@ -583,7 +793,7 @@ addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA
 // ---------------------------------------------------------------------------
 // TERMINAL — factual report -> private evaluation -> Receipt -> Origin complete.
 // ---------------------------------------------------------------------------
-addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:["kakashi","anbu"],preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
+addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:["kakashi","anbu"],preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
 function commitTerminalRewardsAtReceipt(){
   const s=state(),rt=active();if(!s||!rt)return{success:false,reason:"kakashi_v2_state_missing"};
   s.terminal.receiptReached=true;save();
