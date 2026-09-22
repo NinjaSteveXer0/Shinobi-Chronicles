@@ -75,7 +75,176 @@ async function go(page,expected,choice){
 }
 
 async function waitVisualReady(page,label="scene"){
-  const result=await page.evaluate(async()=>{
+  const result=await page.evaluate
+async function browserRouteMatrix(browser){
+  const results=[];
+
+  async function scenario(name,run){
+    const {context,page}=await boot(browser);
+    try{
+      await toScene02Root(page);
+      const detail=await run(page);
+      results.push({name,success:true,...(detail||{})});
+    }finally{
+      await context.close();
+    }
+  }
+
+  await scenario("failed_pickpocket_3v1_release",async page=>{
+    await seedResolver(page,"directPickpocket","PICKPOCKET_DIRECT_FAILURE");
+    await chooseLabel(page,"SLIP IN FOR THE PACKAGE","v2_direct_pickpocket_resolver");
+    await advanceTo(page,"v2_battle_pickpocket_3v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_pickpocket_3v1_win"});
+    await chooseLabel(page,"TAKE THE PACKAGE AND LET THEM GO","v2_report");
+    const s=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"RELEASED");
+    assert.strictEqual(s.package.holder,"ANBU");
+    return{terminal:await finishTerminalBrowser(page,"failed_pickpocket_3v1_release")};
+  });
+
+  await scenario("direct_strike_double_victory_kill_all",async page=>{
+    await chooseLabel(page,"STRIKE BEFORE THE HANDOFF","v2_direct_strike_setup");
+    await advanceTo(page,"v2_battle_direct_strike_2v1");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_direct_strike_2v1_win"});
+    await advanceTo(page,"v2_battle_direct_mi");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:2,expectedBeat:"v2_direct_mi_win"});
+    await chooseLabel(page,"KILL THEM","v2_report");
+    const s=await stateSnapshot(page);
+    for(const ref of ["AMT","PS","MI"])assert.strictEqual(s.participants[ref].state,"DEAD");
+    return{terminal:await finishTerminalBrowser(page,"direct_strike_double_victory_kill_all")};
+  });
+
+  await scenario("closer_failure_ask_where_take_down_loss",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
+    await seedResolver(page,"stayPackagePursuit","STAY_PACKAGE_PURSUIT_SUCCESS");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_failure");
+    await chooseLabel(page,"STAY ON THE PACKAGE","v2_stay_package_pursuit_resolver");
+    await advanceTo(page,"v2_stay_package_intercept");
+    await chooseLabel(page,"ASK WHERE THE PACKAGE WAS GOING");
+    await chooseLabel(page,"TAKE HIM DOWN","v2_take_down_setup");
+    await advanceTo(page,"v2_battle_take_down_amt");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:4,expectedBeat:"v2_take_down_loss"});
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"KAKASHI");
+    assert.strictEqual(s.package.recovered,true);
+    assert.strictEqual(s.participants.AMT.state,"ESCAPED");
+    assert.strictEqual(s.knowledge.askWhere,true);
+    assert.strictEqual(s.knowledge.downstreamDestinationKnown,false);
+    return{terminal:await finishTerminalBrowser(page,"closer_failure_ask_where_take_down_loss")};
+  });
+
+  await scenario("stop_assassin_fast_restrain_then_ps_loss",async page=>{
+    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await advanceTo(page,"v2_battle_mi_stop");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_mi_stop_win"});
+    const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
+    assert(labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
+    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
+    await chooseLabel(page,"RESTRAIN HER AND CONTINUE","v2_mi_restrained_next");
+    await chooseLabel(page,"GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver");
+    await advanceTo(page,"v2_battle_ps_seq");
+    await launchAndReturnBattle(page,{outcome:"defeat",actions:2,expectedBeat:"v2_ps_seq_loss"});
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.participants.MI.state,"FIELD_SECURED_PENDING_COLLECTION");
+    assert.strictEqual(s.participants.PS.state,"ESCAPED");
+    return{terminal:await finishTerminalBrowser(page,"stop_assassin_fast_restrain_then_ps_loss")};
+  });
+
+  await scenario("stop_assassin_slow_anbu_custody",async page=>{
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"STOP THE ASSASSIN","v2_stop_assassin_setup");
+    await advanceTo(page,"v2_battle_mi_stop");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_stop_win"});
+    const labels=await page.evaluate(()=>getCurrentStorySceneBeat().choices.filter(c=>!c.availability||c.availability().available).map(c=>c.label));
+    assert(!labels.includes("GO AFTER PACKAGE SMUGGLER"),JSON.stringify(labels));
+    assert(!labels.includes("GO AFTER ANBU MARKED TARGET"),JSON.stringify(labels));
+    assert(!labels.includes("RESTRAIN HER AND CONTINUE"),JSON.stringify(labels));
+    await chooseLabel(page,"TAKE HER BACK TO ANBU","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.participants.MI.state,"ANBU_CUSTODY");
+    return{terminal:await finishTerminalBrowser(page,"stop_assassin_slow_anbu_custody")};
+  });
+
+  await scenario("assassin_then_package_full_sequence",async page=>{
+    await seedResolver(page,"psPursuit","PS_PURSUIT_SUCCESS");
+    await seedResolver(page,"secureAmtPursuit","SECURE_AMT_PURSUIT_SUCCESS");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE","v2_assassin_then_package_setup");
+    await advanceTo(page,"v2_battle_mi_package_second");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_mi_package_second_win"});
+    await chooseLabel(page,"CHASE THE PACKAGE SMUGGLER","v2_package_second_ps_pursuit");
+    await advanceTo(page,"v2_battle_ps_package_second");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:3,expectedBeat:"v2_ps_package_second_win"});
+    await chooseLabel(page,"STAY ON THE FIRST MAN","v2_package_second_amt_pursuit");
+    await advanceTo(page,"v2_battle_amt_package_second");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_amt_package_second_win"});
+    await chooseLabel(page,"TAKE HIM BACK TO THE ANBU","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.AMT.state,"ANBU_CUSTODY");
+    return{terminal:await finishTerminalBrowser(page,"assassin_then_package_full_sequence")};
+  });
+
+  await scenario("secure_package_return_report",async page=>{
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"SECURE THE PACKAGE","v2_secure_package_setup");
+    await advanceTo(page,"v2_battle_ps_mi");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:5,expectedBeat:"v2_ps_mi_win"});
+    await chooseLabel(page,"RETURN AND REPORT","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.PS.state,"BATTLE_DEFEATED");
+    assert.strictEqual(s.participants.MI.state,"BATTLE_DEFEATED");
+    return{terminal:await finishTerminalBrowser(page,"secure_package_return_report")};
+  });
+
+  await scenario("go_original_target_pursuit_failure",async page=>{
+    await seedResolver(page,"amtPursuitRoot","AMT_PURSUIT_FAILURE");
+    await chooseLabel(page,"WATCH THE EXCHANGE","v2_watch_exchange");
+    await chooseLabel(page,"GO AFTER THE ORIGINAL TARGET","v2_go_amt_pursuit_resolver");
+    await advanceTo(page,"v2_amt_direct_pursuit_fail");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"PS");
+    return{terminal:await finishTerminalBrowser(page,"go_original_target_pursuit_failure")};
+  });
+
+  await scenario("closer_success_improved_pickpocket",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_SUCCESS");
+    await seedResolver(page,"improvedPickpocket","PICKPOCKET_IMPROVED_SUCCESS");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_success");
+    await chooseLabel(page,"ATTEMPT THE PICKPOCKET","v2_improved_pickpocket_resolver");
+    await advanceTo(page,"v2_pickpocket_clean_success");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.knowledge.getCloserContingency,true);
+    assert.strictEqual(s.package.holder,"KAKASHI");
+    return{terminal:await finishTerminalBrowser(page,"closer_success_improved_pickpocket")};
+  });
+
+  await scenario("closer_failure_cutoff_police",async page=>{
+    await seedResolver(page,"getCloser","GET_CLOSER_FAILURE");
+    await chooseLabel(page,"MOVE IN CLOSER","v2_get_closer_resolver");
+    await advanceTo(page,"v2_get_closer_failure");
+    await chooseLabel(page,"CUT THEM OFF AT THE SAKURA TREE","v2_cutoff_setup");
+    await advanceTo(page,"v2_battle_cutoff");
+    await launchAndReturnBattle(page,{outcome:"victory",actions:4,expectedBeat:"v2_cutoff_win"});
+    await chooseLabel(page,"TAKE THEM TO THE UCHIHA POLICE FORCE","v2_report");
+    const s=await stateSnapshot(page);
+    assert.strictEqual(s.package.holder,"ANBU");
+    assert.strictEqual(s.participants.AMT.state,"POLICE_CUSTODY");
+    assert.strictEqual(s.participants.PS.state,"POLICE_CUSTODY");
+    assert.strictEqual(s.participants.MI.state,"UNSEEN");
+    return{terminal:await finishTerminalBrowser(page,"closer_failure_cutoff_police")};
+  });
+
+  assert.strictEqual(results.length,10);
+  return{pass:true,scenarioFamiliesValidated:results.length,results};
+}
+
+(async()=>{
     const p=globalThis.getAcademyKakashiV2Presentation36020&&globalThis.getAcademyKakashiV2Presentation36020(getActiveStorySceneRuntime()?.beatId);
     if(!p)return{success:false,reason:"projection_missing"};
     const sources=[p.backdrop,...(p.actors||[]).map(a=>a&&a.image)].filter(Boolean);
@@ -131,6 +300,164 @@ async function inspect(page,label){
     assert.strictEqual(row.visibleDialogueSurfaces,1,label+" visible dialogue count");
   }
   return row;
+}
+
+
+async function fastDrain(page){
+  const result=await page.evaluate(()=>{
+    const rt=globalThis.getActiveStorySceneRuntime&&globalThis.getActiveStorySceneRuntime();
+    if(!rt)return{success:false,reason:"story_runtime_missing"};
+    const p=globalThis.getAcademyKakashiV2Presentation36020&&globalThis.getAcademyKakashiV2Presentation36020(rt.beatId);
+    const count=p&&Array.isArray(p.cues)?p.cues.length:0;
+    if(!rt.localContext||typeof rt.localContext!=="object")rt.localContext={};
+    rt.localContext.__kakashiV2Presentation36040={beatId:rt.beatId,cueIndex:Math.max(0,count-1),settled:true};
+    if(typeof savePlayerData==="function")savePlayerData();
+    if(typeof renderAcademyKakashiV236030==="function")renderAcademyKakashiV236030();
+    return{success:true,beatId:rt.beatId,cueCount:count};
+  });
+  assert(result&&result.success===true,JSON.stringify(result));
+  return result;
+}
+
+async function waitBeatChange(page,oldBeat,expected=null){
+  await page.waitForFunction(({oldBeat,expected})=>{
+    const rt=globalThis.getActiveStorySceneRuntime&&globalThis.getActiveStorySceneRuntime();
+    const t=globalThis.getAcademyKakashiV2TransitionState36040&&globalThis.getAcademyKakashiV2TransitionState36040();
+    if(!rt||!t||t.locked!==false)return false;
+    return expected?rt.beatId===expected:rt.beatId!==oldBeat;
+  },{oldBeat,expected},{timeout:12000});
+}
+
+async function chooseLabel(page,label,expected=null){
+  await fastDrain(page);
+  const before=await currentBeat(page);
+  const selected=await page.evaluate(label=>{
+    const beat=globalThis.getCurrentStorySceneBeat&&globalThis.getCurrentStorySceneBeat();
+    if(!beat)return{success:false,reason:"beat_missing"};
+    const rows=(beat.choices||[]).filter(row=>row&&row.label===label);
+    const row=rows.find(candidate=>typeof candidate.availability!=="function"||candidate.availability().available===true);
+    if(!row)return{success:false,reason:"choice_unavailable",label,available:(beat.choices||[]).map(x=>x.label)};
+    const result=globalThis.advanceAcademyKakashiV236040(row.choiceId);
+    return{success:!!result&&result.success===true,result,choiceId:row.choiceId};
+  },label);
+  assert(selected&&selected.success===true,JSON.stringify(selected));
+  await waitBeatChange(page,before,expected);
+  return selected;
+}
+
+async function nextSemantic(page,expected=null){
+  await fastDrain(page);
+  const before=await currentBeat(page);
+  const result=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(result&&result.success===true,JSON.stringify(result));
+  await waitBeatChange(page,before,expected);
+  return result;
+}
+
+async function seedResolver(page,key,outcome){
+  const result=await page.evaluate(({key,outcome})=>{
+    const s=globalThis.getAcademyKakashiV2State36020&&globalThis.getAcademyKakashiV2State36020();
+    if(!s)return{success:false,reason:"state_missing"};
+    s.resolvers[key]={selectedOutcomeRef:outcome,receiptId:`browser_matrix:${key}:${outcome}`,resolutionMode:"installed_browser_matrix_fixture"};
+    if(typeof savePlayerData==="function")savePlayerData();
+    return{success:true,key,outcome};
+  },{key,outcome});
+  assert(result&&result.success===true,JSON.stringify(result));
+}
+
+async function advanceTo(page,target,{max=18}={}){
+  for(let i=0;i<max;i++){
+    const id=await currentBeat(page);
+    if(id===target)return id;
+    const meta=await page.evaluate(()=>{
+      const beat=globalThis.getCurrentStorySceneBeat&&globalThis.getCurrentStorySceneBeat();
+      if(!beat)return null;
+      const available=(beat.choices||[]).filter(c=>typeof c.availability!=="function"||c.availability().available===true).map(c=>({choiceId:c.choiceId,label:c.label}));
+      return{beatId:beat.beatId,mode:beat.mode||null,available,nextBeatId:beat.nextBeatId||null};
+    });
+    assert(meta,"story beat metadata missing while advancing to "+target);
+    if(meta.mode==="battle_transition")throw new Error(`unexpected Battle ${meta.beatId} while advancing to ${target}`);
+    if(meta.mode==="choice"){
+      assert.strictEqual(meta.available.length,1,`ambiguous choice at ${meta.beatId} while advancing to ${target}: ${JSON.stringify(meta.available)}`);
+      assert.strictEqual(meta.available[0].label,"CONTINUE",`non-CONTINUE choice requires explicit route decision at ${meta.beatId}`);
+      await chooseLabel(page,"CONTINUE");
+    }else{
+      await nextSemantic(page);
+    }
+  }
+  throw new Error(`advanceTo guard exceeded: target=${target}, current=${await currentBeat(page)}`);
+}
+
+async function launchAndReturnBattle(page,{outcome="victory",actions=1,expectedBeat=null,assertVisible=false}={}){
+  const battleBeat=await currentBeat(page);
+  const meta=await page.evaluate(()=>{const b=getCurrentStorySceneBeat();return b?{mode:b.mode,encounterId:b.battle&&b.battle.encounterId||null}:null;});
+  assert(meta&&meta.mode==="battle_transition",`expected Battle transition at ${battleBeat}: ${JSON.stringify(meta)}`);
+  await fastDrain(page);
+  const launched=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(launched&&launched.success===true,JSON.stringify(launched));
+  await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
+  await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
+  if(assertVisible){
+    await page.waitForFunction(()=>{
+      const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
+      return visible(document.querySelector(".alpha-code-battle-stage"))&&!visible(document.getElementById("kakashi-v2-scene-board"));
+    },null,{timeout:12000});
+  }
+  const resumed=await page.evaluate(({outcome,actions})=>{
+    const prior=globalThis.getBattleActionOpportunityIndex;
+    globalThis.getBattleActionOpportunityIndex=(side,participantId)=>{
+      if(side==="player"&&participantId==="academy_kakashi")return actions;
+      return typeof prior==="function"?prior(side,participantId):0;
+    };
+    try{
+      currentBattle.outcome={...(currentBattle.outcome||{}),type:outcome,completedAt:Date.now(),finishingShinobiId:outcome==="victory"?"academy_kakashi":null};
+      currentBattle.battleOver=true;
+      currentBattle.active=false;
+      return resumeBattleCallerAfterCompletion(outcome);
+    }finally{
+      globalThis.getBattleActionOpportunityIndex=prior;
+    }
+  },{outcome,actions});
+  assert(resumed&&resumed.success===true,JSON.stringify(resumed));
+  await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:12000});
+  await page.evaluate(()=>resetAcademyKakashiV2Transition36040());
+  await waitUnlocked(page,expectedBeat);
+  if(expectedBeat)assert.strictEqual(await currentBeat(page),expectedBeat);
+  const authored=await page.evaluate(()=>getActiveStorySceneRuntime()?.battleResume?.authored||null);
+  assert(authored&&Number(authored.playerActionOpportunityCount)===actions,`Battle action count did not round-trip: expected ${actions}, got ${JSON.stringify(authored)}`);
+  return{battleBeat,outcome,actions,expectedBeat,resumed};
+}
+
+async function toScene02Root(page){
+  assert.strictEqual(await currentBeat(page),"v2_scene01_rooftop");
+  await nextSemantic(page,"v2_scene02_tail");
+  assert.strictEqual(await currentBeat(page),"v2_scene02_tail");
+}
+
+async function stateSnapshot(page){
+  return page.evaluate(()=>JSON.parse(JSON.stringify(getAcademyKakashiV2State36020())));
+}
+
+async function finishTerminalBrowser(page,label){
+  await advanceTo(page,"v2_report",{max:20});
+  const report=await inspect(page,label+":report");
+  await nextSemantic(page,"v2_minato");
+  await nextSemantic(page,"v2_receipt");
+  const receipt=await inspect(page,label+":receipt");
+  await nextSemantic(page,"v2_complete");
+  await fastDrain(page);
+  const final=await page.evaluate(()=>globalThis.advanceAcademyKakashiV236040());
+  assert(final&&final.success===true,label+" completion: "+JSON.stringify(final));
+  await page.waitForFunction(()=>ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,null,{timeout:12000});
+  const completed=await page.evaluate(()=>({
+    originComplete:ensurePlayerAcquisitionState().chronicleOrigin?.prologueCompleted===true,
+    teamFormationRequired:ensurePlayerAcquisitionState().academyTeamFormation?.required===true,
+    activeStory:getActiveStorySceneRuntime()
+  }));
+  assert.strictEqual(completed.originComplete,true);
+  assert.strictEqual(completed.teamFormationRequired,true);
+  assert.strictEqual(completed.activeStory,null);
+  return{report,receipt,completed};
 }
 
 async function cleanRoute(browser){
@@ -313,12 +640,13 @@ async function visualAndBattle(browser){
   try{
     const clean=await cleanRoute(browser);
     const visualBattle=await visualAndBattle(browser);
+    const browserMatrix=await browserRouteMatrix(browser);
     const pngs=fs.readdirSync(OUT).filter(name=>name.endsWith(".png")).sort();
     const hashes=pngs.map(name=>crypto.createHash("sha256").update(fs.readFileSync(path.join(OUT,name))).digest("hex"));
     const uniqueScreenshots=new Set(hashes).size;
     assert(pngs.length>=11,"installed-browser evidence screenshots missing");
     assert(uniqueScreenshots>=8,"browser evidence is visually static/occluded: "+JSON.stringify({pngs,uniqueScreenshots}));
-    const result={pass:true,clean,visualBattle,pngCount:pngs.length,uniqueScreenshots,browserGoldenClaimed:false};
+    const result={pass:true,clean,visualBattle,browserMatrix,pngCount:pngs.length,uniqueScreenshots,browserGoldenClaimed:false};
     fs.writeFileSync(path.join(OUT,"results.json"),JSON.stringify(result,null,2));
     console.log(JSON.stringify(result,null,2));
   }finally{
