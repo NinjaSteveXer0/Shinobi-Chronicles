@@ -172,7 +172,9 @@
         "tools/qa_issue_312_browser.js",
         "tools/qa_runtime_ownership_safety_300.js"
       ],
-      "replaces": []
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Implements the authorised sparse Duel composition with stronger participant presence and no fake support furniture; presentation-only."
     }
   ]
 }
