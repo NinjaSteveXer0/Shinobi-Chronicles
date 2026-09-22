@@ -424,7 +424,19 @@ function syncReceipt(root,p,t){
 function render(){
   if(rendering||typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");
-  if(!isActive()){pendingVisualSnapshot=null;if(layer){delete layer.dataset.kakashiV2;const stale=document.getElementById(ROOT_ID);if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}}if(!active()||active().sceneId!==SCENE_ID)lastProjectionSnapshot=null;return false;}
+  if(!isActive()){
+    pendingVisualSnapshot=null;
+    const rt=active(),suspended=!!rt&&rt.sceneId===SCENE_ID&&storySuspendedForBattle();
+    if(layer){
+      delete layer.dataset.kakashiV2;
+      const stale=document.getElementById(ROOT_ID);
+      if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}
+      if(suspended){layer.style.display="none";layer.innerHTML="";layer.dataset.kakashiV2BattleSuspended="true";}
+      else delete layer.dataset.kakashiV2BattleSuspended;
+    }
+    if(!rt||rt.sceneId!==SCENE_ID)lastProjectionSnapshot=null;
+    return false;
+  }
   if(!layer)return false;
   const p=projection();if(!p)return false;
   rendering=true;
@@ -452,7 +464,15 @@ function setWipe(covering){
 }
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
 if(PRE_RENDER){
-  globalThis.renderStoryScenePresentationLayer=function kakashiV2RendererWrapper(){const result=PRE_RENDER.apply(this,arguments);if(isActive())render();return result;};
+  globalThis.renderStoryScenePresentationLayer=function kakashiV2RendererWrapper(){
+  const result=PRE_RENDER.apply(this,arguments);
+  const rt=active();
+  // Even while Battle suspends Kakashi projection, run the renderer cleanup
+  // path after the generic Story renderer so the preserved Story runtime cannot
+  // reopen an opaque presentation layer above the Battle overlay.
+  if(rt&&rt.sceneId===SCENE_ID)render();
+  return result;
+};
   try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_e){}
 }
 if(typeof document!=="undefined"){
@@ -486,6 +506,8 @@ function diagnostics(){
     speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
+    battleSuspensionHidesWholeStoryLayer:String(render).includes('layer.style.display="none"')&&String(render).includes('kakashiV2BattleSuspended'),
+    wrapperRunsSuspensionCleanup:String(globalThis.renderStoryScenePresentationLayer).includes("rt&&rt.sceneId===SCENE_ID")&&String(globalThis.renderStoryScenePresentationLayer).includes("render()"),
     browserGoldenClaimed:false
   };
   const failed=Object.entries(checks).filter(([k,v])=>k!=="browserGoldenClaimed"&&v!==true).map(([k])=>k);
