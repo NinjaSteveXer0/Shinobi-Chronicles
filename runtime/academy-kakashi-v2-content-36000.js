@@ -638,17 +638,11 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "PACKAGE SMUGGLER",
-          "text": "“I knew the night was getting worse.”"
+          "text": "“Wire. Of course.”"
         },
         {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "“You talk too much.”"
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "“I've had a difficult evening.”"
+          "kind": "narration",
+          "text": "Masked Interceptor gives him one flat look. He stops talking while Kakashi works."
         },
         {
           "kind": "narration",
@@ -687,7 +681,7 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "PACKAGE SMUGGLER",
-          "text": "“Anyone want to try him again?”"
+          "text": "“I'm not trying him again.”"
         },
         {
           "kind": "narration",
@@ -737,9 +731,8 @@ const CONTENT={
           "text": "“Yes.”"
         },
         {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "“He's very concise about it.”"
+          "kind": "narration",
+          "text": "Package Smuggler opens his mouth, sees the officer's expression, and leaves it alone."
         },
         {
           "kind": "narration",
@@ -1292,7 +1285,7 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "MASKED INTERCEPTOR",
-          "text": "“You nearly made that interesting.”"
+          "text": "“Stay down.”"
         },
         {
           "kind": "narration",
@@ -1419,17 +1412,11 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "PACKAGE SMUGGLER",
-          "text": "“I think I preferred ANBU.”"
+          "text": "“Police.”"
         },
         {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "“You don't know enough to have a preference.”"
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "“I know there will be paperwork.”"
+          "kind": "narration",
+          "text": "The humour drops out of his voice. Masked Interceptor keeps her eyes ahead."
         }
       ],
       "9_take_them_to_the_anbu": [
@@ -4381,7 +4368,7 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "PACKAGE SMUGGLER",
-          "text": "“There. Much more human.”"
+          "text": "“Good. Thought you were going to pretend otherwise.”"
         },
         {
           "kind": "narration",
@@ -4648,33 +4635,21 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "There is the smallest shift behind her mask."
-        },
-        {
-          "kind": "narration",
-          "text": "Not amusement exactly."
-        },
-        {
-          "kind": "narration",
-          "text": "Close."
+          "text": "A small tension passes through her posture."
         },
         {
           "kind": "dialogue",
           "speakerName": "MASKED INTERCEPTOR",
-          "text": "“That's a very confident use of the word finish.”"
+          "text": "“They'll have distance by now.”"
         },
         {
           "kind": "narration",
-          "text": "Kakashi rises."
-        },
-        {
-          "kind": "narration",
-          "text": "His eye moves toward the rooftops."
+          "text": "Kakashi rises. His eye moves toward the rooftops."
         },
         {
           "kind": "dialogue",
           "speakerName": "KAKASHI",
-          "text": "“I'll let you know.”"
+          "text": "“Then I need to move.”"
         },
         {
           "kind": "narration",
@@ -5277,26 +5252,31 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Pakkun gets to his feet."
+          "text": "Pakkun looks at the officer holding custody, then gets to his feet."
         },
         {
           "kind": "dialogue",
           "speakerName": "PAKKUN",
-          "text": "“That's my cue.”"
+          "text": "“They've got him.”"
         },
         {
           "kind": "dialogue",
           "speakerName": "KAKASHI",
-          "text": "“You had one?”"
-        },
-        {
-          "kind": "narration",
-          "text": "Pakkun is already walking away."
+          "text": "“Yes.”"
         },
         {
           "kind": "dialogue",
           "speakerName": "PAKKUN",
-          "text": "“I do now.”"
+          "text": "“Then I'm done.”"
+        },
+        {
+          "kind": "dialogue",
+          "speakerName": "KAKASHI",
+          "text": "“Thanks.”"
+        },
+        {
+          "kind": "narration",
+          "text": "Pakkun leaves without waiting for anything else."
         }
       ]
     }
@@ -5349,21 +5329,11 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "KAKASHI",
-          "text": "“You can file a complaint.”"
+          "text": "“Keep walking.”"
         },
         {
           "kind": "narration",
-          "text": "Package Smuggler laughs once despite himself."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "“With ANBU?”"
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "“You seem optimistic.”"
+          "text": "Package Smuggler watches him for a second, then does."
         },
         {
           "kind": "narration",
@@ -5661,16 +5631,11 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "PAKKUN",
-          "text": "“Careful. That almost sounded like praise.”"
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "KAKASHI",
-          "text": "“It wasn't.”"
+          "text": "“Useful is enough.”"
         },
         {
           "kind": "narration",
-          "text": "Pakkun gives him a dry look and leaves."
+          "text": "He leaves without waiting for anything else."
         }
       ],
       "3_all_three_captured_return_to_anbu": [
@@ -5698,30 +5663,20 @@ const CONTENT={
         {
           "kind": "dialogue",
           "speakerName": "ANBU MARKED TARGET",
-          "text": "“For you, maybe.”"
+          "text": "“Talking won't loosen the wire.”"
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor keeps walking."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "“Save your breath.”"
+          "text": "Masked Interceptor keeps walking without looking at either of them."
         },
         {
           "kind": "dialogue",
           "speakerName": "PACKAGE SMUGGLER",
-          "text": "“I have plenty.”"
+          "text": "“Worth checking.”"
         },
         {
           "kind": "narration",
-          "text": "Pakkun does not look at him."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PAKKUN",
-          "text": "“We noticed.”"
+          "text": "Pakkun stays on the outside of the group and watches the street."
         },
         {
           "kind": "narration",
@@ -5766,30 +5721,11 @@ const CONTENT={
         },
         {
           "kind": "narration",
-          "text": "Masked Interceptor finally looks at him."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "“That's not the whole reason.”"
+          "text": "Masked Interceptor looks at him once, then back to the road."
         },
         {
           "kind": "narration",
-          "text": "Kakashi meets the look but does not answer."
-        },
-        {
-          "kind": "narration",
-          "text": "Package Smuggler notices."
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "PACKAGE SMUGGLER",
-          "text": "“I liked it better when nobody was analysing him.”"
-        },
-        {
-          "kind": "dialogue",
-          "speakerName": "MASKED INTERCEPTOR",
-          "text": "“Then stop giving people time.”"
+          "text": "Package Smuggler notices the silence and, for once, leaves it alone."
         },
         {
           "kind": "narration",
