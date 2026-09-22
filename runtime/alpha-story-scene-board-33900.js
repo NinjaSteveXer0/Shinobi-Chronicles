@@ -9,7 +9,7 @@
 "use strict";
 if(globalThis.SC_STORY_SCENE_BOARD_33900)return;
 
-const PATCH_ID="story_scene_board_33900_2026_09_14_cinematic";
+const PATCH_ID="story_scene_board_33900_2026_09_22_deterministic_slots";
 const STYLE_ID="sc-story-scene-board-33900-style";
 const PERFORMANCE_KEY="__storyPerformanceCursor33900";
 const registry=new Map();
@@ -108,6 +108,9 @@ function installStyle(){
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-name{font-size:11px!important;margin:0 0 2px!important;color:#e8c86e!important;font-weight:900!important;letter-spacing:.12em!important;text-transform:uppercase!important;line-height:1.15!important;}
 #story-scene-presentation-layer[data-sc-performance="true"] .sc-chronicle-primary{width:34px!important;height:30px!important;min-height:0!important;padding:0!important;font-size:20px!important;line-height:1!important;float:right;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-actions{margin-top:9px!important;gap:7px!important;}
+#story-scene-presentation-layer[data-sc-performance="true"][data-sc-performance-complete="false"] .sc-chronicle-actions{display:none!important;}
+#story-scene-presentation-layer[data-sc-hide-unavailable-choices="true"] .sc-story-choice:disabled{display:none!important;}
+#story-scene-presentation-layer[data-sc-receipt-mode="true"] .sc-chronicle-layout{display:none!important;}
 #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr));}
 #story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-story-choice{min-height:42px;align-items:center;background:linear-gradient(180deg,rgba(14,24,30,.91),rgba(7,14,19,.94))!important;border-color:rgba(207,169,76,.68)!important;}
 .sc-scene-board-33900{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden;}
@@ -118,6 +121,26 @@ function installStyle(){
 .sc-scene-board-33900__actors{position:absolute;left:4%;right:4%;top:13%;bottom:26%;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));align-items:end;gap:3%;}
 .sc-scene-board-33900__actors[data-count="1"]{grid-template-columns:minmax(0,300px);justify-content:start;padding-left:4%;}
 .sc-scene-board-33900__actors[data-count="2"]{grid-template-columns:repeat(2,minmax(0,270px));justify-content:center;column-gap:clamp(80px,14vw,240px);}
+.sc-scene-board-33900__actors[data-layout="slots"]{display:block;left:3.2%;right:3.2%;top:13%;bottom:25%;padding:0;}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor{position:absolute;width:min(21%,238px);height:min(100%,390px);max-height:none;bottom:0;}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="left"]{left:5%;}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="center-left"]{left:24%;}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="center"]{left:50%;transform:translateX(-50%) translateY(4px) scale(.95);}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="center"].is-focus{transform:translateX(-50%) translateY(0) scale(1);}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="center-right"]{right:24%;}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="right"]{right:5%;}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="upper-left"]{left:10%;bottom:16%;width:min(18%,205px);}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="upper-center"]{left:50%;bottom:16%;width:min(18%,205px);transform:translateX(-50%) translateY(4px) scale(.95);}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="upper-center"].is-focus{transform:translateX(-50%) translateY(0) scale(1);}
+.sc-scene-board-33900__actors[data-layout="slots"] .sc-scene-board-33900__actor[data-slot="upper-right"]{right:10%;bottom:16%;width:min(18%,205px);}
+.sc-scene-board-33900__actor[data-scale="small"]{width:min(17%,190px)!important;}
+.sc-scene-board-33900__actor[data-scale="large"]{width:min(24%,270px)!important;}
+.sc-scene-board-33900__actor[data-motion="enter-left"]{animation:scActorEnterLeft33900 .42s cubic-bezier(.2,.75,.25,1) both;}
+.sc-scene-board-33900__actor[data-motion="enter-right"]{animation:scActorEnterRight33900 .42s cubic-bezier(.2,.75,.25,1) both;}
+.sc-scene-board-33900__actor[data-motion="fall"]{animation:scActorFall33900 .48s cubic-bezier(.55,.05,.75,.35) both;}
+@keyframes scActorEnterLeft33900{from{opacity:0;transform:translateX(-70px) scale(.96)}to{opacity:.72;transform:translateX(0) scale(.95)}}
+@keyframes scActorEnterRight33900{from{opacity:0;transform:translateX(70px) scale(.96)}to{opacity:.72;transform:translateX(0) scale(.95)}}
+@keyframes scActorFall33900{from{opacity:1;transform:translateY(0) rotate(0deg)}to{opacity:0;transform:translateY(110%) rotate(7deg)}}
 .sc-scene-board-33900__actor{position:relative;justify-self:center;width:min(74%,238px);aspect-ratio:7/10;max-height:390px;display:flex;align-items:flex-end;justify-content:center;overflow:hidden;opacity:.72;transform:translateY(4px) scale(.95);filter:saturate(.78) brightness(.88);}
 .sc-scene-board-33900__actor.is-focus{opacity:1;transform:translateY(0) scale(1);filter:none;}
 .sc-scene-board-33900__actor-frame{position:absolute;inset:0;border:1px solid rgba(194,158,73,.38);background:linear-gradient(180deg,rgba(7,13,17,.03),rgba(3,7,10,.12) 65%,rgba(3,7,10,.72));box-shadow:0 16px 34px rgba(0,0,0,.30);}
@@ -132,6 +155,13 @@ function installStyle(){
 .sc-scene-board-33900__objects{position:absolute;left:3.2%;right:auto;top:13.5%;bottom:auto;width:max-content;max-width:min(31%,390px);height:auto!important;min-height:0!important;max-height:none!important;display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;z-index:7}.sc-scene-board-33900__object{position:relative;display:inline-block;box-sizing:border-box;width:auto;max-width:100%;height:auto!important;min-height:0!important;max-height:none!important;align-self:flex-start;flex:0 0 auto;padding:7px 11px 7px 13px;line-height:1.25;white-space:normal;border:1px solid rgba(214,175,76,.64);background:linear-gradient(120deg,rgba(3,15,21,.93),rgba(12,12,9,.88));font-size:9px;font-weight:800;letter-spacing:.07em;color:#e8ddc4;backdrop-filter:blur(5px);box-shadow:0 10px 28px rgba(0,0,0,.35),0 0 0 1px rgba(98,220,229,.08),0 0 20px rgba(90,214,224,.08)}.sc-scene-board-33900__object::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(180deg,#76e2e8,#dcb14d)}.sc-scene-board-33900__object b{display:block;color:#76e2e8;margin:0 0 3px;font-size:8px;letter-spacing:.15em;text-transform:uppercase}.sc-scene-board-33900__object.is-committed{border-color:rgba(220,177,77,.78);box-shadow:0 10px 28px rgba(0,0,0,.35),0 0 18px rgba(220,177,77,.14)}
 .sc-scene-board-33900__reaction{position:absolute;left:50%;top:12.5%;transform:translateX(-50%);max-width:64%;padding:8px 12px;border:1px solid rgba(102,212,188,.62);background:rgba(3,12,14,.78);color:#d9f1e9;font-size:9px;font-weight:800;letter-spacing:.05em;text-align:center;box-shadow:0 10px 28px rgba(0,0,0,.35)}
 .sc-scene-board-33900__receipt{position:absolute;right:3.2%;top:12.5%;border-color:rgba(93,205,162,.62);color:#bfead8;font-size:8px;font-weight:900;letter-spacing:.1em;}
+.sc-scene-board-33900__terminal-receipt{position:absolute;z-index:40;left:50%;top:50%;width:min(78%,920px);max-height:78%;transform:translate(-50%,-50%);overflow:auto;pointer-events:auto;padding:22px 26px;border:1px solid rgba(208,173,83,.74);background:linear-gradient(155deg,rgba(3,11,16,.97),rgba(2,6,9,.985));box-shadow:0 28px 90px rgba(0,0,0,.72);}
+.sc-scene-board-33900__terminal-receipt>span{display:block;color:#62dce5;font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase;}
+.sc-scene-board-33900__terminal-receipt h2{margin:7px 0 16px;color:#ead39a;font:900 clamp(22px,2.4vw,38px)/1 Georgia,serif;letter-spacing:.05em;}
+.sc-scene-board-33900__terminal-receipt section{padding:9px 0;border-top:1px solid rgba(255,255,255,.07);}
+.sc-scene-board-33900__terminal-receipt section b{display:block;color:#d7b55d;font-size:8px;letter-spacing:.13em;margin-bottom:4px;}
+.sc-scene-board-33900__terminal-receipt section p{margin:3px 0;color:#d8dfdd;font-size:11px;line-height:1.42;}
+.sc-scene-board-33900__terminal-receipt button{margin-top:16px;min-width:150px;padding:10px 14px;border:1px solid rgba(88,217,228,.55);background:rgba(9,45,53,.72);color:#91ebf0;font-weight:900;letter-spacing:.1em;cursor:pointer;}
 .sc-scene-board-wipe-33900{position:absolute;inset:0;z-index:9999;background:#000;transform:translateX(100%);pointer-events:auto;transition:transform .28s cubic-bezier(.7,0,.3,1)}.sc-scene-board-wipe-33900.is-covering{transform:translateX(0)}.sc-scene-board-wipe-33900.is-revealing{transform:translateX(-100%)}
 @media(prefers-reduced-motion:reduce){.sc-scene-board-33900__actor.is-entering{animation:none!important}.sc-scene-board-wipe-33900{transition:none!important}}
 @media(max-width:820px){.sc-scene-board-33900__actors{left:1.5%;right:1.5%;gap:1%;bottom:31%}.sc-scene-board-33900__actors[data-count="2"]{column-gap:20px}.sc-scene-board-33900__actor{width:90%;max-height:290px}.sc-scene-board-33900__objective{max-width:58%;font-size:8px}#story-scene-presentation-layer[data-sc-scene-mode="encounter"] .sc-chronicle-actions{grid-template-columns:1fr}}
@@ -140,18 +170,26 @@ function installStyle(){
 }
 function actorMarkup(actor){
   const image=actor.image?`<img src="${escapeHTML(actor.image)}" alt="">`:`<div class="sc-scene-board-33900__actor-silhouette" aria-hidden="true"></div>`;
-  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
+  return `<figure class="sc-scene-board-33900__actor ${actor.focus?"is-focus":""} ${actor.entering?"is-entering":""}" data-actor-id="${escapeHTML(actor.id||"")}" data-slot="${escapeHTML(actor.slot||"")}" data-scale="${escapeHTML(actor.scale||"")}" data-motion="${escapeHTML(actor.motion||"")}"><div class="sc-scene-board-33900__actor-frame"></div>${image}<figcaption class="sc-scene-board-33900__actor-tag"><strong>${escapeHTML(actor.label||"UNKNOWN")}</strong>${actor.state?`<small>${escapeHTML(actor.state)}</small>`:""}</figcaption></figure>`;
+}
+function terminalReceiptMarkup(receipt){
+  if(!receipt||typeof receipt!=="object")return "";
+  const sections=Array.isArray(receipt.sections)?receipt.sections:[];
+  return `<article class="sc-scene-board-33900__terminal-receipt"><span>${escapeHTML(receipt.kicker||"CHRONICLE RECEIPT")}</span><h2>${escapeHTML(receipt.title||"ACADEMY KAKASHI")}</h2>${sections.map(section=>`<section><b>${escapeHTML(section.label||"RECORD")}</b>${(Array.isArray(section.lines)?section.lines:[section.text]).filter(Boolean).map(line=>`<p>${escapeHTML(line)}</p>`).join("")}</section>`).join("")}<button type="button" onclick="advanceStoryScene()">CONTINUE</button></article>`;
 }
 function boardMarkup(projection){
-  const actors=Array.isArray(projection.actors)?projection.actors.slice(0,3):[];
+  const actors=Array.isArray(projection.actors)?projection.actors.slice(0,6):[];
   const objects=(projection.objects||[]).map(row=>`<span class="sc-scene-board-33900__object sc-live-state-callout-33900${row&&row.committed?" is-committed":""}"><b>${escapeHTML(row.label||"OBJECT")}</b>${escapeHTML(row.state||"")}</span>`).join("");
-  return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900">${objects}</div>`:""}`;
+  return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}" data-layout="${escapeHTML(projection.layout||"grid")}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900">${objects}</div>`:""}${terminalReceiptMarkup(projection.terminalReceipt)}`;
 }
-function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[])if(node&&typeof node.remove==="function")node.remove();}
+function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;delete layer.dataset.scPerformanceComplete;delete layer.dataset.scHideUnavailableChoices;delete layer.dataset.scReceiptMode;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[])if(node&&typeof node.remove==="function")node.remove();}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
-  if(!layer||!runtime)return false;const p=performanceCursor(runtime,currentBeat(runtime));
-  if(!p){delete layer.dataset.scPerformance;return false;}
-  layer.dataset.scPerformance="true";const cue=p.cue||{};
+  if(!layer||!runtime)return false;
+  const beat=currentBeat(runtime),p=performanceCursor(runtime,beat);
+  if(beat&&beat.uiHints&&beat.uiHints.hideUnavailableChoices===true)layer.dataset.scHideUnavailableChoices="true";else delete layer.dataset.scHideUnavailableChoices;
+  if(!p){delete layer.dataset.scPerformance;delete layer.dataset.scPerformanceComplete;return false;}
+  layer.dataset.scPerformance="true";layer.dataset.scPerformanceComplete=p.atEnd?"true":"false";
+  const cue=p.cue||{};
   const text=layer.querySelector&&layer.querySelector(".sc-story-text");const cueText=String(cue.text||"");if(text&&text.textContent!==cueText)text.textContent=cueText;
   const panel=layer.querySelector&&layer.querySelector(".sc-story-panel");
   let name=layer.querySelector&&layer.querySelector(".sc-story-name");
@@ -168,7 +206,7 @@ function renderStorySceneBoard33900(){
   if(rendering||typeof document==="undefined")return false;const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
   const runtime=currentRuntime(),projection=runtime?resolveStorySceneBoardProjection(runtime.sceneId,runtime.beatId,runtime):null;if(!projection){clearBoard(layer);return false;}
   const stage=(layer.querySelector&&layer.querySelector(".sc-chronicle-stage"))||(layer.querySelector&&layer.querySelector(".sc-story-stage"))||layer;if(!stage)return false;
-  rendering=true;try{installStyle();layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode=projection.mode||"conversation";applyBoardBackdrop(stage,runtime);let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const signature=JSON.stringify(projection);if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}updatePerformancePanel(layer,runtime);return true;}finally{rendering=false;}
+  rendering=true;try{installStyle();layer.dataset.scSceneBoard="true";layer.dataset.scSceneMode=projection.mode||"conversation";if(projection.terminalReceipt)layer.dataset.scReceiptMode="true";else delete layer.dataset.scReceiptMode;applyBoardBackdrop(stage,runtime);let board=stage.querySelector?stage.querySelector(".sc-scene-board-33900"):null;if(!board){board=document.createElement("section");board.className="sc-scene-board-33900";board.setAttribute("aria-hidden","true");stage.appendChild(board);}const signature=projection.renderKey?String(projection.renderKey):JSON.stringify(projection);if(board.dataset&&board.dataset.signature!==signature){board.innerHTML=boardMarkup(projection);board.dataset.signature=signature;}updatePerformancePanel(layer,runtime);return true;}finally{rendering=false;}
 }
 function scheduleBoardRender(){if(typeof queueMicrotask==="function")queueMicrotask(renderStorySceneBoard33900);else if(typeof setTimeout==="function")setTimeout(renderStorySceneBoard33900,0);}
 
@@ -212,11 +250,16 @@ if(typeof document!=="undefined"){
 
 function runStorySceneBoard33900Diagnostics(){
   const checks={
-    patchId:PATCH_ID==="story_scene_board_33900_2026_09_14_cinematic",
+    patchId:PATCH_ID==="story_scene_board_33900_2026_09_22_deterministic_slots",
     compactLiveStateCallout:installStyle.toString().includes("width:max-content")&&installStyle.toString().includes("height:auto!important")&&installStyle.toString().includes("align-items:flex-start")&&installStyle.toString().includes("left:3.2%;right:auto"),
     reusableRegistry:typeof registerStorySceneBoardDefinition==="function"&&typeof unregisterStorySceneBoardDefinition==="function"&&typeof resolveStorySceneBoardProjection==="function",
     genericPerformanceLifecycle:typeof performanceSequenceFor==="function"&&typeof advanceStoryScene33900==="function"&&typeof performSceneCut==="function",
     performanceAdvanceCommitsNoOccurrence:advanceStoryScene33900.toString().includes("performanceCursor")&&!advanceStoryScene33900.toString().includes("commitOccurrence"),
+    deterministicRenderKey:renderStorySceneBoard33900.toString().includes("projection.renderKey"),
+    namedSlotLayout:actorMarkup.toString().includes("data-slot")&&boardMarkup.toString().includes("projection.layout"),
+    performanceDefersActions:updatePerformancePanel.toString().includes("scPerformanceComplete"),
+    unavailableChoiceSuppression:updatePerformancePanel.toString().includes("hideUnavailableChoices"),
+    terminalReceiptOwnsSurface:boardMarkup.toString().includes("terminalReceiptMarkup")&&installStyle.toString().includes("data-sc-receipt-mode"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
