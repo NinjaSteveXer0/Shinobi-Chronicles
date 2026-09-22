@@ -885,10 +885,11 @@
       .battle2-modern[data-formation-stage="true"] .battle2-formation-selected-target{outline:1px solid rgba(96,221,230,.82)!important;outline-offset:4px!important;box-shadow:0 0 26px rgba(73,213,225,.18)!important}
       .battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-skill-target,.battle2-modern[data-formation-stage="true"] .battle-live-roster-slot.is-item-target{pointer-events:auto!important;cursor:pointer!important}
 
-      /* Duel: two combatants own the battlefield. */
-      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:12%!important;width:31%!important;height:52%!important}
-      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card-player{left:6.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-active-card-enemy{left:62.5%!important}
-      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:58%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:26%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:74%!important;right:auto!important}
+      /* Duel: two combatants own the battlefield. No fake support furniture. */
+      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:9.5%!important;width:33.5%!important;height:56%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-active-card-player{left:8.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-active-card-enemy{left:58%!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:61%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:25.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:74.5%!important;right:auto!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-code-vs{top:28.5%!important;opacity:.55!important;font-size:clamp(22px,2.8vw,42px)!important;letter-spacing:.1em!important;filter:drop-shadow(0 8px 14px rgba(0,0,0,.55))}
 
       /* Squad wedge: support stays visibly behind/outward from the confrontation lane. */
       .battle2-modern[data-formation-mode="wedge"] .battle-live-active-card{top:13%!important;width:24%!important;height:45%!important}
