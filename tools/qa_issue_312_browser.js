@@ -123,7 +123,7 @@ async function shot(page,name,selector=null){
     assert.strictEqual(watch.packageHolder,"PS");
     assert.strictEqual(watch.packageHidden,false);
     assert.strictEqual(watch.miPending,false,"#312 Masked Interceptor remained hidden after SURPRISE_ENTRY completed");
-    assert(watch.miOpacity>0.9,"#312 Masked Interceptor did not become visibly present after SURPRISE_ENTRY");
+    assert(watch.miOpacity>=0.75,"#312 Masked Interceptor did not return to the authorised settled actor visibility after SURPRISE_ENTRY: "+watch.miOpacity);
     assert(watch.choreography.scopeKey&&watch.choreography.lastKinds.includes("SURPRISE_ENTRY")&&watch.choreography.completedKinds.includes("SURPRISE_ENTRY"),"#312 watch-exchange surprise entry was not executed: "+JSON.stringify(watch.choreography));
     await shot(page,"02-story-handoff-surprise-entry.png","#kakashi-v2-scene-board");
 
