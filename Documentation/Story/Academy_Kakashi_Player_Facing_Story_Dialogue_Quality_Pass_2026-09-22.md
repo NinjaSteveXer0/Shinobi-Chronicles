@@ -242,3 +242,69 @@ Before substantial dialogue finalisation:
 
 The live Kakashi V2 dialogue was re-passed under these anchors through commit:
 `d1d42febfc2f7835365ad2cbd7a5de0b70dde536`.
+## Final character-performance acceptance pass — 2026-09-23
+
+A final source-first acceptance pass was performed after the active-cast anchor application, against live `main` beginning at:
+
+`0535108163d300a8ce04493b19ae9a8d8ebae612` — `Track Kakashi character anchor voice re-pass`.
+
+The binding active-cast anchor was re-consumed before changing dialogue.
+
+### Runtime expression commits
+
+- `1cb74396a40bb767c7eff108f3b3f519af30460d` — `Refine Kakashi active-cast character performance`
+- `561f5ba7c8e24e7362d50236ac8923852a13052d` — `Finish Kakashi character-performance acceptance pass`
+
+### Acceptance corrections
+
+The pass changed expression only where the speaker-fingerprint / plot-puppet tests still genuinely failed.
+
+It specifically:
+
+- removed remaining Pakkun punchline chains and conscience-like commentary in favour of practical, autonomous observations;
+- removed several adult-Kakashi-style comeback exchanges and kept the current Academy Kakashi more direct / young;
+- removed Masked Interceptor from conversational banter where silence or immediate operational judgement fit her better;
+- tightened Package Smuggler humour where danger / custody had closed in, without removing his social-pressure defence;
+- sharpened ANBU Marked Target toward premise / boundary challenges rather than generic irritation;
+- converted remaining ANBU / Minato form-like report enumeration into professional operational synthesis while preserving every reported fact and Knowledge boundary.
+
+### Preserved exactly
+
+No Story semantic or route-topology change was authorised or made.
+
+The current exact player choices remain unchanged, including:
+
+- `WATCH THE EXCHANGE`
+- `MOVE IN CLOSER`
+- `STRIKE BEFORE THE HANDOFF`
+- `SLIP IN FOR THE PACKAGE`
+- `STOP THE ASSASSIN`
+- `SECURE THE PACKAGE`
+- `SECURE THE PACKAGE BEFORE THE ASSASSIN`
+- `DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE`
+- `GO AFTER THE ORIGINAL TARGET`
+
+Current direct disposition transitions to `v2_report` remain intact.
+
+### Validation
+
+Post-write live-`main` validation:
+
+- `runtime/academy-kakashi-v2-content-36000.js` parses GREEN;
+- `runtime/alpha-kakashi-v2-core-36020.js` parses GREEN;
+- locked choice-label scan GREEN;
+- targeted residual shared-house-voice scan GREEN;
+- targeted internal rules/runtime-language scan GREEN;
+- representative KILL / ANBU / POLICE direct-`v2_report` topology checks GREEN.
+
+This proves **SOURCE / RUNTIME EXPRESSION VALIDATED** for the final acceptance pass.
+
+It does **not** claim installed-browser validation or Browser Golden after these latest expression commits.
+
+### #312 reconciliation note
+
+Coding / Runtime issue #312 / PR #318 had already reconciled an earlier Writing head before these two commits existed.
+
+Before #312 is merged, its branch must reconcile the current `36000` / `36020` expression heads above so superseded dialogue is not restored.
+
+That reconciliation must not alter the already-owned #312 choreography / Battle presentation semantics.
