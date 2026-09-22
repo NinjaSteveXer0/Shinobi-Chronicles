@@ -15,6 +15,8 @@ const storyFiles=fs.readdirSync(STORY_DIR)
   .filter(name=>/^Academy_Kakashi_.*\.md$/i.test(name))
   .map(name=>path.join(STORY_DIR,name));
 const corpus=storyFiles.map(file=>fs.readFileSync(file,"utf8")).join("\n");
+const runtimeStaticAuthority=path.join(STORY_DIR,"Academy_Kakashi_Runtime_Static_Cue_Authority_Snapshot_2026-09-22.md");
+assert(fs.existsSync(runtimeStaticAuthority),"Current Kakashi runtime static-cue authority snapshot is missing");
 
 function decode(raw){try{return JSON.parse(`"${raw}"`);}catch(_){return null;}}
 const cues=[];
