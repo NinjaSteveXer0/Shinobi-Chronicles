@@ -86,7 +86,7 @@ function installStyle(){
 @keyframes kv2ActorFlee36030{0%{opacity:1;transform:translate3d(0,0,0) scale(1)}22%{opacity:1;transform:translate3d(0,-1%,0) scale(1.015)}100%{opacity:0;transform:translate3d(var(--kv2-departure-x,70vw),-4%,0) scale(.88)}}
 @keyframes kv2ActorFade36030{from{opacity:1}to{opacity:0}}
 #${ROOT_ID} .kv2-card-frame{position:absolute;inset:0;border:1px solid rgba(210,172,80,.28);background:linear-gradient(180deg,transparent 50%,rgba(1,6,9,.68));box-shadow:inset 0 0 0 1px rgba(255,255,255,.018)}
-#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.78;filter:saturate(.82) brightness(.88) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
+#${ROOT_ID} .kv2-actor-label{position:absolute;left:6%;right:6%;bottom:3%;padding:6px 8px;border:1px solid rgba(208,168,75,.4);background:rgba(2,7,11,.88);text-align:center;font-size:8px;font-weight:900;letter-spacing:.11em;color:#eee2c7;text-shadow:0 1px 2px #000}\n#${ROOT_ID} .kv2-actor-state{display:table;margin:4px auto 0;padding:2px 6px;border:1px solid rgba(92,215,225,.35);background:rgba(4,23,28,.82);color:#7fe1e8;font-size:7px;font-weight:900;letter-spacing:.08em}\n#${ROOT_ID} .kv2-object-layer{position:absolute;inset:0;z-index:16;pointer-events:none}\n#${ROOT_ID} .kv2-package-token{position:absolute;top:42%;left:var(--sc-stage-anchor-x,50%);width:64px;height:45px;transform:translate(-8%,-50%);display:grid;place-items:center;border:1px solid rgba(221,178,73,.75);background:linear-gradient(145deg,rgba(42,30,12,.95),rgba(12,14,13,.96));box-shadow:0 12px 28px rgba(0,0,0,.48),0 0 18px rgba(221,178,73,.12);color:#e4c66e;font-size:7px;font-weight:900;letter-spacing:.12em}\n#${ROOT_ID} .kv2-package-token::before{content:"";position:absolute;width:32px;height:21px;border:1px solid rgba(226,190,100,.64);background:linear-gradient(135deg,#4a3a21,#21190f);transform:rotate(-4deg)}\n#${ROOT_ID} .kv2-package-token span{position:absolute;top:calc(100% + 5px);white-space:nowrap;padding:3px 5px;background:rgba(2,8,11,.82);border:1px solid rgba(215,174,76,.32)}\n#${ROOT_ID} .kv2-package-token[hidden]{display:none!important}\n#${ROOT_ID} .kv2-departure-ghost,#${ROOT_ID} .kv2-outgoing-hold-ghost{position:absolute!important;z-index:13!important;pointer-events:none!important}\n#${ROOT_ID} .kv2-departure-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.9) brightness(.94) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-outgoing-hold-ghost{display:flex;align-items:flex-end;justify-content:center;opacity:.92;filter:saturate(.96) brightness(.96) drop-shadow(0 18px 24px rgba(0,0,0,.48));transform:translate3d(0,0,0)}\n#${ROOT_ID} .kv2-departure-ghost img,#${ROOT_ID} .kv2-outgoing-hold-ghost img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}\n#${ROOT_ID}[data-transition-active="true"] .kv2-actors{opacity:0!important;pointer-events:none!important}
 #${ROOT_ID} .kv2-dialogue{position:absolute;left:50%;bottom:3%;width:min(72%,980px);min-height:0;max-height:none;z-index:30;box-sizing:border-box;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:14px;padding:11px 15px 12px;transform:translateX(-50%);border:1px solid rgba(93,215,225,.32);border-radius:16px;background:linear-gradient(180deg,rgba(5,16,22,.88),rgba(2,9,14,.95));box-shadow:0 18px 48px rgba(0,0,0,.46),inset 0 0 0 1px rgba(255,255,255,.025);backdrop-filter:blur(8px)}
 #${ROOT_ID} .kv2-speaker{grid-column:1;grid-row:1;color:#e3bd5f;font-size:8px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;min-height:11px}
 #${ROOT_ID} .kv2-text{grid-column:1/-1;grid-row:2;margin-top:4px;max-height:8.5vh;overflow:auto;white-space:pre-wrap;color:#eef3f1;font-size:clamp(12px,.94vw,15px);line-height:1.42;text-shadow:0 1px 2px #000}
@@ -266,10 +266,16 @@ function snapshotProjection(p){
   return{
     id:String(p.id||""),
     preset:String(p.preset||"standard"),
+    backdrop:String(p.backdrop||""),
+    transition:String(p.transition||""),
     actors:(p.actors||[]).map(a=>({id:String(a.id||""),slot:actorSlot(a),anchor:actorAnchor(a,p)})),
     packageHolder:p.state&&p.state.package&&p.state.package.holder||null,
     participantStates:{MI:participants.MI&&participants.MI.state||null,PS:participants.PS&&participants.PS.state||null,AMT:participants.AMT&&participants.AMT.state||null}
   };
+}
+function isHardProjectionTransition(previous,next){
+  if(!previous||!next)return false;
+  return previous.transition==="wipe"||next.transition==="wipe"||String(previous.backdrop||"")!==String(next.backdrop||"");
 }
 function departureMode(previous,next,id){
   const prev=(previous&&previous.actors||[]).find(a=>a.id===id);
@@ -303,9 +309,10 @@ function appendDepartureGhost(root,visual,kind){
   const ghostLayer=root&&root.querySelector(".kv2-ghost-layer");
   if(!ghostLayer||!visual||!visual.clone)return null;
   const ghost=visual.clone,ghostId="departure:"+visual.originalId;
-  ghost.dataset.actorId=ghostId;
-  ghost.classList.remove("kv2-actor","is-entering","is-focus");
-  ghost.classList.add("kv2-departure-ghost","kv2-actor-ghost",departureGhostClass(kind));
+  ghost.className="kv2-departure-ghost kv2-actor-ghost "+departureGhostClass(kind);
+  ghost.hidden=false;ghost.removeAttribute("aria-hidden");
+  ghost.dataset.actorId=ghostId;ghost.dataset.originalActorId=visual.originalId;
+  delete ghost.dataset.kv2CueWithheld;delete ghost.dataset.scChoreographyActive;delete ghost.dataset.scChoreographyTarget;delete ghost.dataset.scChoreographyPendingEntry;
   ghost.style.left=visual.left+"px";ghost.style.top=visual.top+"px";ghost.style.bottom="auto";
   ghost.style.width=visual.width+"px";ghost.style.height=visual.height+"px";
   const center=visual.left+visual.width/2,mid=(Number(visual.rootWidth)||0)/2;
@@ -326,9 +333,29 @@ function materializeDepartureGhosts(root,capture,next){
   }
   return out;
 }
-function prepareDepartureGhosts(root,previous,next){
-  const capture={previous,actorVisuals:captureDepartureVisuals(root,previous)};
-  return materializeDepartureGhosts(root,capture,next);
+function appendOutgoingHoldGhost(root,visual){
+  const ghostLayer=root&&root.querySelector(".kv2-ghost-layer");
+  if(!ghostLayer||!visual||!visual.clone)return null;
+  const ghost=visual.clone,ghostId="hold:"+visual.originalId;
+  ghost.className="kv2-outgoing-hold-ghost kv2-actor-ghost";
+  ghost.hidden=false;ghost.removeAttribute("aria-hidden");
+  ghost.dataset.actorId=ghostId;ghost.dataset.originalActorId=visual.originalId;
+  delete ghost.dataset.kv2CueWithheld;delete ghost.dataset.scChoreographyActive;delete ghost.dataset.scChoreographyTarget;delete ghost.dataset.scChoreographyPendingEntry;
+  ghost.style.left=visual.left+"px";ghost.style.top=visual.top+"px";ghost.style.bottom="auto";
+  ghost.style.width=visual.width+"px";ghost.style.height=visual.height+"px";
+  ghostLayer.appendChild(ghost);
+  return{originalId:visual.originalId,ghostId};
+}
+function materializeRetainedHoldGhosts(root,capture,next){
+  if(!root||!capture||!capture.previous||!next)return[];
+  for(const stale of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])stale.remove();
+  const nextIds=new Set((next.actors||[]).map(a=>a.id)),out=[];
+  for(const visual of capture.actorVisuals||[]){
+    if(!nextIds.has(visual.originalId))continue;
+    const ghost=appendOutgoingHoldGhost(root,visual);
+    if(ghost)out.push(ghost);
+  }
+  return out;
 }
 function preparePreCommitVisualSnapshot(){
   if(typeof document==="undefined")return{success:true,headless:true};
@@ -378,18 +405,16 @@ function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   if(previous.id==="v2_watch_exchange"&&next.id==="v2_stop_assassin_setup"){
     const kakashi=(p.actors||[]).find(a=>actorSlot(a)==="kakashi"),mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
     if(kakashi&&mi)cues.push(
-      {kind:"FOCUS",actorId:kakashi.id},
-      {kind:"LUNGE",actorId:kakashi.id,targetId:mi.id,durationMs:230},
-      {kind:"STRIKE",actorId:kakashi.id,targetId:mi.id,durationMs:170}
+      {kind:"FOCUS",actorId:kakashi.id,durationMs:110},
+      {kind:"STRIKE",actorId:kakashi.id,targetId:mi.id,durationMs:360}
     );
   }
   if(next.id==="v2_direct_strike_setup"){
     const kakashi=(p.actors||[]).find(a=>actorSlot(a)==="kakashi");
     const target=(p.actors||[]).find(a=>actorSlot(a)==="amt")||(p.actors||[]).find(a=>actorSlot(a)==="ps");
     if(kakashi&&target)cues.push(
-      {kind:"FOCUS",actorId:kakashi.id},
-      {kind:"LUNGE",actorId:kakashi.id,targetId:target.id,durationMs:220},
-      {kind:"STRIKE",actorId:kakashi.id,targetId:target.id,durationMs:170}
+      {kind:"FOCUS",actorId:kakashi.id,durationMs:110},
+      {kind:"STRIKE",actorId:kakashi.id,targetId:target.id,durationMs:360}
     );
   }
   if(next.id==="v2_mi_stop_win"&&next.participantStates.MI==="BATTLE_DEFEATED"){
@@ -604,7 +629,11 @@ function render(){
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const prepared=pendingVisualSnapshot,previous=prepared&&prepared.previous||lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors));
-    const departures=semanticChanged?(prepared?materializeDepartureGhosts(root,prepared,next):prepareDepartureGhosts(root,previous,next)):[];
+    const capture=semanticChanged?(prepared||{previous,actorVisuals:captureDepartureVisuals(root,previous)}):null;
+    const hardTransition=semanticChanged&&isHardProjectionTransition(previous,next);
+    const departures=capture?materializeDepartureGhosts(root,capture,next):[];
+    const heldActors=hardTransition&&capture?materializeRetainedHoldGhosts(root,capture,next):[];
+    if(hardTransition&&heldActors.length)root.dataset.outgoingTableau="true";else if(!hardTransition)delete root.dataset.outgoingTableau;
     pendingVisualSnapshot=null;
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
@@ -648,7 +677,8 @@ function setTransitionMemory(backdropPath,visible){
     memory.style.backgroundImage=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
     memory.hidden=false;root.dataset.transitionActive="true";
   }else{
-    memory.hidden=true;memory.style.backgroundImage="";delete root.dataset.transitionActive;
+    memory.hidden=true;memory.style.backgroundImage="";delete root.dataset.transitionActive;delete root.dataset.outgoingTableau;
+    for(const ghost of [...root.querySelectorAll(".kv2-outgoing-hold-ghost")])ghost.remove();
   }
   return true;
 }
@@ -694,6 +724,8 @@ function diagnostics(){
     sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
     departuresPrecedeNewEntries:String(deriveProjectionChoreography).indexOf("for(const row of departures)")<String(deriveProjectionChoreography).indexOf("const prevIds"),
     departureGhostCleanupOwnedByCue:String(deriveProjectionChoreography).includes("removeOnComplete:true"),
+    hardTransitionFreezesOutgoingTableau:String(materializeRetainedHoldGhosts).includes("kv2-outgoing-hold-ghost")&&installStyle.toString().includes('data-transition-active="true"] .kv2-actors')&&String(setTransitionMemory).includes("kv2-outgoing-hold-ghost"),
+    departureGhostsSanitizeLiveAnimationState:String(appendDepartureGhost).includes('ghost.className="kv2-departure-ghost kv2-actor-ghost'),
     actorScopeIgnoresObjectState:String(playProjectionTransition).includes("actorSignature")&&!String(playProjectionTransition).includes("next.packageHolder"),
     semanticDiffIgnoresHarmlessParticipantRefresh:!String(render).includes('JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates)'),
     packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
