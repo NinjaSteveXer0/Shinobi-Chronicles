@@ -74,7 +74,7 @@ async function shot(page,name){
 async function inspect(page,label){
   const row=await page.evaluate(()=>{
     const root=document.getElementById("kakashi-v2-scene-board");
-    const visible=n=>!!n&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"&&Number(getComputedStyle(n).opacity)!==0;
+    const visible=n=>!!n&&n.getClientRects().length>0&&getComputedStyle(n).display!=="none"&&getComputedStyle(n).visibility!=="hidden"&&Number(getComputedStyle(n).opacity)!==0;
     const legacy=[...document.querySelectorAll("#story-scene-presentation-layer .sc-story-panel,#story-scene-presentation-layer .sc-chronicle-layout")].filter(visible);
     const dialogue=root&&root.querySelector(".kv2-dialogue");
     const receipt=root&&root.querySelector(".kv2-receipt");
