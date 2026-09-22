@@ -50,47 +50,29 @@ jobs:
       - name: Execute Arc-1 and exact Story Battle return runtime seam
         run: node tools/qa_issue_141_arc1_battle_return_runtime.js
 
-      - name: Execute Kakashi Battle interaction and delivery seam
-        run: |
-          node --check runtime/alpha-kakashi-battle-interaction-hotfix-34500.js
-          node --check tools/qa_kakashi_battle_interaction_34500.js
-          node tools/qa_kakashi_battle_interaction_34500.js
-          node --check runtime/alpha-kakashi-scene05a-w-35730.js
-          node --check runtime/alpha-kakashi-deterministic-kill-35810.js
-          node --check runtime/alpha-kakashi-battle-development-35740.js
-          node --check runtime/alpha-kakashi-post-mi-death-pursuit-35830.js
-          node --check tools/qa_academy_kakashi_scene05a_w_35730.js
-          node --check tools/qa_academy_kakashi_deterministic_kill_35810.js
-          node --check tools/qa_kakashi_battle_development_35740.js
-          node --check tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
-          node tools/qa_academy_kakashi_scene05a_w_35730.js
-          node tools/qa_academy_kakashi_deterministic_kill_35810.js
-          node tools/qa_kakashi_battle_development_35740.js
-          node tools/qa_academy_kakashi_post_mi_death_pursuit_35830.js
-          node --check tools/qa_kakashi_origin_rewards_34800.js
-          node --check tools/qa_kakashi_terminal_debrief_35100.js
-          node tools/qa_kakashi_origin_rewards_34800.js
-          node tools/qa_kakashi_terminal_debrief_35100.js
-
       - name: Execute Origin public-handler DOM-event realization seam
         run: |
           node --check runtime/alpha-origin-browser-realisation-33500.js
+          node --check tools/qa_issue_105_origin_browser_realisation_runtime.js
           node tools/qa_issue_105_origin_browser_realisation_runtime.js
 
-      - name: Execute screen-first Origin activation seam
+      - name: Execute non-Kakashi screen-first Origin activation seam
         run: |
           node --check runtime/alpha-origin-screen-first-33700.js
+          node --check tools/qa_issue_105_origin_screen_first_activation.js
           node tools/qa_issue_105_origin_screen_first_activation.js
 
-      - name: Execute Kakashi interactive Story scene-board benchmark
+      - name: Execute generic Story decision and Scene Board seam
         run: |
-          node --check runtime/alpha-kakashi-original-origin-restoration-33800.js
+          node --check runtime/alpha-story-decision-realisation-34000.js
+          node --check runtime/alpha-story-factual-resolver-34600.js
           node --check runtime/alpha-story-scene-board-33900.js
-          node --check runtime/alpha-kakashi-story-presentation-compat-33920.js
-          node --check runtime/alpha-kakashi-scene03a-35700.js
-          node --check tools/qa_issue_105_kakashi_scene_board_runtime.js
-          node --check tools/qa_kakashi_story_presentation_33920.js
-          node --check tools/qa_academy_kakashi_scene03a_35700.js
-          node tools/qa_issue_105_kakashi_scene_board_runtime.js
-          node tools/qa_kakashi_story_presentation_33920.js
-          node tools/qa_academy_kakashi_scene03a_35700.js
+          node --check tools/qa_issue_188_story_decision_runtime.js
+          node --check tools/qa_story_factual_resolver_34600.js
+          node tools/qa_issue_188_story_decision_runtime.js
+          node tools/qa_story_factual_resolver_34600.js
+
+      - name: Enforce Kakashi V2 legacy exclusion
+        run: |
+          node --check tools/qa_kakashi_v2_legacy_exclusion.js
+          node tools/qa_kakashi_v2_legacy_exclusion.js
