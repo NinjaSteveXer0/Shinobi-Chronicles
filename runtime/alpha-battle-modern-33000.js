@@ -427,11 +427,22 @@
 
   function battlePerformanceMarkup33000(p){
     if(!p)return"";
+    return `<section class="battle2-performance-stage" data-action-id="${esc(p.actionId)}" data-performance-class="${esc(p.presentationClass)}" data-result="${esc(p.result)}" aria-label="Latest committed Battle action">
+      <div class="battle2-performance-center"><small>${esc(p.actorName)} → ${esc(p.targetName)}</small><strong>${esc(p.actionLabel)}</strong></div>
+    </section>`;
+  }
+  function battlePerformanceResultChip33000(p){
+    if(typeof document==="undefined"||!p)return null;
+    const chip=document.createElement("div");
+    chip.className="battle2-performance-result-chip";
+    chip.dataset.result=String(p.result||"RESOLVED");
     const delta=p.finalDamage>0?`-${p.finalDamage} PL`:p.result==="SUBSTITUTION"?"NO DIRECT HIT":"STATE CHANGE";
     const state=p.beforePL!==null&&p.afterPL!==null?`${p.beforePL} → ${p.afterPL} PL`:"AUTHORITATIVE STATE UPDATED";
-    return `<section class="battle2-performance-stage" data-action-id="${esc(p.actionId)}" data-performance-class="${esc(p.presentationClass)}" data-result="${esc(p.result)}" aria-label="Latest committed Battle action">
-      <div class="battle2-performance-center"><small>${esc(p.actorName)} → ${esc(p.targetName)}</small><strong>${esc(p.actionLabel)}</strong><b>${esc(p.result)}</b><em>${esc(delta)}</em><span>${esc(state)}</span></div>
-    </section>`;
+    const result=document.createElement("b");result.textContent=String(p.result||"RESOLVED");
+    const change=document.createElement("em");change.textContent=delta;
+    const settled=document.createElement("span");settled.textContent=state;
+    chip.append(result,change,settled);
+    return chip;
   }
   function battlePerformanceRoleNode33000(stage,side){
     if(!stage)return null;
@@ -444,6 +455,7 @@
     for(const node of stage.querySelectorAll(".battle2-performance-role-actor,.battle2-performance-role-target")){
       node.classList.remove("battle2-performance-role-actor","battle2-performance-role-target");
     }
+    for(const node of stage.querySelectorAll(".battle2-performance-result-chip"))try{node.remove();}catch(_error){}
     delete stage.dataset.battle2PerformanceActionId;
     delete stage.dataset.battle2PerformanceClass;
     delete stage.dataset.battle2PerformanceResult;
@@ -459,8 +471,12 @@
     stage.dataset.battle2PerformanceClass=String(p.presentationClass||"BATTLE_ACTION");
     stage.dataset.battle2PerformanceResult=String(p.result||"RESOLVED");
     if(actorNode)actorNode.classList.add("battle2-performance-role-actor");
-    if(targetNode)targetNode.classList.add("battle2-performance-role-target");
-    return{actorNode,targetNode};
+    if(targetNode){
+      targetNode.classList.add("battle2-performance-role-target");
+      const chip=battlePerformanceResultChip33000(p);
+      if(chip)targetNode.appendChild(chip);
+    }
+    return{actorNode,targetNode,resultChip:targetNode&&targetNode.querySelector(".battle2-performance-result-chip")||null};
   }
   function installBattlePerformance33000(stage){
     if(!stage)return null;
@@ -486,7 +502,7 @@
             lane.classList.remove("is-playing");lane.classList.add("is-settled");
             clearBattlePerformanceRoles33000(stage,p.actionId);
           }
-        },620);
+        },920);
       }else clearBattlePerformanceRoles33000(stage);
     }
     return p;
@@ -611,7 +627,8 @@
       battlePortraitProjection:String(portrait33000).includes("resolveUIPortraitProjection")&&String(portrait33000).includes("resolveBattleEnemyPortraitProjection"),
       performanceUsesCanonicalCombatants:String(applyBattlePerformanceRoles33000).includes("battle-live-active-card-player")&&String(applyBattlePerformanceRoles33000).includes("battle-live-active-card-enemy"),
       performanceDoesNotDuplicatePortraits:!String(battlePerformanceMarkup33000).includes("actorPortrait")&&!String(battlePerformanceMarkup33000).includes("targetPortrait")&&!String(battlePerformanceMarkup33000).includes("<img"),
-      performanceSettleIsActionScoped:String(installBattlePerformance33000).includes("host.dataset.actionId===p.actionId")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active"),
+      resultFeedbackAttachedToExactTarget:String(applyBattlePerformanceRoles33000).includes("battlePerformanceResultChip33000")&&String(battlePerformanceResultChip33000).includes("remaining")===false,
+      performanceSettleIsActionScoped:String(installBattlePerformance33000).includes("host.dataset.actionId===p.actionId")&&String(clearBattlePerformanceRoles33000).includes("battle2-performance-active")&&String(installBattlePerformance33000).includes("920"),
       storyCallerPresentationSuspension:String(suspendCallerStoryPresentation33000).includes("markStoryPresentationHidden33900")&&String(renderCombatOverlay).includes("suspendCallerStoryPresentation33000"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
       browserGoldenClaimed:false
