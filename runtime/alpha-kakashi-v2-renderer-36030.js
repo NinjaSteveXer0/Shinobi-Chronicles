@@ -57,6 +57,9 @@ function installStyle(){
 #${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="ps"]{--kv2-x:38%}
 #${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="amt"]{--kv2-x:57%}
 #${ROOT_ID}[data-preset="escort"] .kv2-actor[data-slot="pakkun"]{--kv2-x:79%;--kv2-w:min(13vw,140px);--kv2-h:min(32vh,235px)}
+#${ROOT_ID}[data-preset="anbu_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:9%;--kv2-y:0}
+#${ROOT_ID}[data-preset="anbu_report"] .kv2-actor[data-slot="pakkun"]{--kv2-x:43%;--kv2-y:0;--kv2-w:min(14vw,150px);--kv2-h:min(36vh,255px)}
+#${ROOT_ID}[data-preset="anbu_report"] .kv2-actor[data-slot="kakashi"]{--kv2-x:71%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="anbu"]{--kv2-x:13%;--kv2-y:0}
 #${ROOT_ID}[data-preset="hokage_report"] .kv2-actor[data-slot="minato"]{--kv2-x:67%;--kv2-y:12%}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
