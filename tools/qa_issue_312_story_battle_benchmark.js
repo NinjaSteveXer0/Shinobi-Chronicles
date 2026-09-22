@@ -67,6 +67,8 @@ assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdro
 assert(kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015"),"#312 Kakashi reward projection self-heal missing");
 assert(kv2Rewards.includes("Field Recovery Pill")&&kv2Rewards.includes("authoritativeProjectionRepaired"),"#312 MI authoritative reward projection must expose the locked item package");
 assert(kv2Rewards.includes("renderVictoryOverlay36015"),"#312 Victory screen must consume the authoritative Kakashi reward projection");
+assert(kv2Rewards.includes("currentBattleState36015"),"#312 Kakashi reward projection must resolve canonical Battle state");
+assert(!kv2Rewards.includes("const battle=globalThis.currentBattle;"),"#312 reward projection must not depend on currentBattle being a globalThis property");
 
 assert(battleSource.includes("installFormationStage33000"),"#312 shared Battle owner is missing Formation Stage composition");
 assert(battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("deployedFormation33000"),"#312 Formation Stage must consume deployed participant truth");
