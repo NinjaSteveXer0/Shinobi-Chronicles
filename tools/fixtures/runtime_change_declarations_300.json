@@ -175,6 +175,32 @@
       "replaces": [],
       "contractChangeReason": "AUTHORITY_CHANGED",
       "rationale": "Implements the authorised sparse Duel composition with stronger participant presence and no fake support furniture; presentation-only."
+    },
+    {
+      "changeId": "story-battle-motion-and-quick-skill-tray-2026-09-23",
+      "classification": "EXTENDS",
+      "responsibilityIds": [
+        "story.scene.presentation.shared",
+        "battle.presentation.shared",
+        "origin.academy_kakashi.v2.story_dom"
+      ],
+      "owner": "runtime/alpha-story-scene-board-33900.js + runtime/alpha-kakashi-v2-renderer-36030.js + runtime/alpha-battle-modern-33000.js",
+      "directCallers": [
+        "runtime/alpha-kakashi-v2-renderer-36030.js",
+        "runtime/alpha-traversal-bridge-33200.js",
+        "index.html"
+      ],
+      "stateTouched": [],
+      "productionLoader": "runtime/alpha-traversal-bridge-33200.js + index.html",
+      "qaRefs": [
+        "tools/qa_issue_312_story_battle_benchmark.js",
+        "tools/qa_issue_312_browser.js",
+        "tools/qa_kakashi_v2_browser.js",
+        "tools/qa_runtime_ownership_safety_300.js"
+      ],
+      "replaces": [],
+      "contractChangeReason": "AUTHORITY_CHANGED",
+      "rationale": "Implements the owner-requested visible Story action motion, true AMT flee, visible lethal fall, inward Duel PL rings, stronger Battle action motion, and persistent Skills tray after Skill activation; presentation-only with no semantic authority reassigned."
     }
   ]
 }
