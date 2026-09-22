@@ -256,7 +256,7 @@
 (function activateOriginSceneBoardTerminalChain33200(){
   if(typeof document==="undefined"||!document.head||typeof document.createElement!=="function")return;
 
-  const BUILD="kakashi-v2-clean-room-20260922-1";
+  const BUILD="kakashi-v2-clean-room-20260922-2";
   function loadOne(id,src,ready,next){
     if(ready()){if(next)next();return;}
     let script=document.getElementById(id);
@@ -268,7 +268,8 @@
   function load36040(){loadOne("sc-kakashi-v2-transition-36040-script","runtime/alpha-kakashi-v2-transition-36040.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040);}
   function load36030(){loadOne("sc-kakashi-v2-renderer-36030-script","runtime/alpha-kakashi-v2-renderer-36030.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_RENDERER_36030,load36040);}
   function load36020(){loadOne("sc-kakashi-v2-core-36020-script","runtime/alpha-kakashi-v2-core-36020.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_CORE_36020,load36030);}
-  function load36010(){loadOne("sc-kakashi-v2-battle-36010-script","runtime/alpha-kakashi-v2-battle-36010.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010,load36020);}
+  function load36015(){loadOne("sc-kakashi-v2-rewards-36015-script","runtime/alpha-kakashi-v2-rewards-36015.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_REWARDS_36015,load36020);}
+  function load36010(){loadOne("sc-kakashi-v2-battle-36010-script","runtime/alpha-kakashi-v2-battle-36010.js",()=>!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010,load36015);}
   function load34600(){loadOne("sc-story-factual-resolver-34600-script","runtime/alpha-story-factual-resolver-34600.js",()=>!!globalThis.SC_STORY_FACTUAL_RESOLVER_34600,load36010);}
   function load34000(){loadOne("sc-story-decision-realisation-34000-script","runtime/alpha-story-decision-realisation-34000.js",()=>!!globalThis.SC_STORY_DECISION_REALISATION_34000,load34600);}
   function load33900(){loadOne("sc-story-scene-board-33900-script","runtime/alpha-story-scene-board-33900.js",()=>!!globalThis.SC_STORY_SCENE_BOARD_33900,load34000);}
