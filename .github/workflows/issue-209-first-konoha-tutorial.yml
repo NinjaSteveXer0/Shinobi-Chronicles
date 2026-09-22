@@ -6,7 +6,6 @@ on:
     paths:
       - 'game.js'
       - 'runtime/alpha-first-konoha-tutorial-35000.js'
-      - 'runtime/alpha-kakashi-final-origin-adapter-34100.js'
       - 'tools/qa_first_konoha_tutorial_35000.js'
       - '.github/workflows/issue-209-first-konoha-tutorial.yml'
   workflow_dispatch:
