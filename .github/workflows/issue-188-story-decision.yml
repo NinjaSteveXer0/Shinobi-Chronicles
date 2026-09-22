@@ -20,6 +20,8 @@ on:
       - 'tools/qa_kakashi_v2_route_matrix.js'
       - 'tools/qa_kakashi_v2_assets.js'
       - 'tools/qa_kakashi_v2_writing_authority.js'
+      - 'tools/qa_runtime_ownership_safety_300.js'
+      - 'tools/fixtures/runtime_*_300.json'
       - '.github/workflows/issue-188-story-decision.yml'
   push:
     branches: [ main ]
@@ -68,6 +70,7 @@ jobs:
           node --check runtime/alpha-kakashi-v2-transition-36040.js
           node --check tools/qa_kakashi_v2_clean_room.js
           node --check tools/qa_kakashi_v2_writing_authority.js
+          node --check tools/qa_runtime_ownership_safety_300.js
       - name: Neutral Story decision runtime
         run: node tools/qa_issue_188_story_decision_runtime.js
       - name: Neutral Story factual resolver
@@ -76,6 +79,9 @@ jobs:
         run: node tools/qa_kakashi_v2_legacy_exclusion.js
       - name: Kakashi V2 clean-room runtime
         run: node tools/qa_kakashi_v2_clean_room.js
+
+      - name: Runtime ownership safety gate
+        run: node tools/qa_runtime_ownership_safety_300.js
 
       - name: Kakashi V2 route and asset closure
         run: |
