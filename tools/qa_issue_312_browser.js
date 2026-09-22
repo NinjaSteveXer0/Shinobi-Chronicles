@@ -211,6 +211,44 @@ async function shot(page,name,selector=null){
     assert.strictEqual(substitution.p.exactTarget,true);
     assert.strictEqual(substitution.afterimages,1);
     assert.strictEqual(substitution.actorImages,2);
+    const battlePaint=await page.evaluate(()=>{
+      const selectors=[
+        "#screen-overlay",".overlay-content-box","#overlay-content-container",
+        ".battle-live-screen",".alpha-code-battle-stage",".battle2-performance-host",
+        ".battle2-performance-stage",".battle-live-active-card-player",".battle-live-active-card-enemy"
+      ];
+      const describe=selector=>{
+        const node=document.querySelector(selector);
+        if(!node)return{selector,missing:true};
+        const cs=getComputedStyle(node),r=node.getBoundingClientRect();
+        return{
+          selector,tag:node.tagName,className:node.className,
+          rect:{x:r.x,y:r.y,width:r.width,height:r.height},
+          display:cs.display,visibility:cs.visibility,opacity:cs.opacity,zIndex:cs.zIndex,
+          backgroundColor:cs.backgroundColor,backgroundImage:cs.backgroundImage,
+          transform:cs.transform,filter:cs.filter,overflow:cs.overflow,
+          childCount:node.children.length,htmlLength:node.innerHTML.length
+        };
+      };
+      const stage=document.querySelector(".alpha-code-battle-stage");
+      const r=stage&&stage.getBoundingClientRect();
+      const center=r?{x:r.left+r.width/2,y:r.top+r.height/2}:null;
+      const stack=center?document.elementsFromPoint(center.x,center.y).slice(0,12).map(node=>{
+        const cs=getComputedStyle(node);
+        return{tag:node.tagName,id:node.id,className:node.className,opacity:cs.opacity,display:cs.display,visibility:cs.visibility,zIndex:cs.zIndex,backgroundColor:cs.backgroundColor};
+      }):[];
+      return{
+        currentOverlayType:typeof currentOverlayType!=="undefined"?currentOverlayType:null,
+        screenOverlayClass:document.getElementById("screen-overlay")?.className||null,
+        screenOverlayInline:document.getElementById("screen-overlay")?.getAttribute("style")||null,
+        nodes:selectors.map(describe),center,stack
+      };
+    });
+    console.log("ISSUE312_BATTLE_PAINT_DIAGNOSTIC "+JSON.stringify(battlePaint));
+    fs.writeFileSync(path.join(OUT,"battle-paint-diagnostic.json"),JSON.stringify(battlePaint,null,2));
+    await page.screenshot({path:path.join(OUT,"04-battle-full-page.png"),fullPage:false,timeout:12000});
+    await shot(page,"04-battle-overlay.png","#screen-overlay");
+    await shot(page,"04-battle-performance-only.png",".battle2-performance-stage");
     await shot(page,"04-battle-substitution-performance.png",".alpha-code-battle-stage");
 
     await seed("hit");
