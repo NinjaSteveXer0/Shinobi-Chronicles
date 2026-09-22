@@ -401,7 +401,10 @@ function runStorySceneBoard33900Diagnostics(){
     scopedCancellableQueue:String(playStoryChoreography33900).includes("scopeKey")&&String(cancelStoryChoreography33900).includes("cancelled=true"),
     noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
     authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
-    battleSuspensionKeepsLayerHidden:String(globalThis.renderStoryScenePresentationLayer).includes("storyPresentationBattleSuspended33900")&&installStorySceneBoard33900.toString().includes('data-sc-presentation-hidden="true"'),
+    battleSuspensionKeepsLayerHidden:
+      String(globalThis.renderStoryScenePresentationLayer).includes("storyPresentationBattleSuspended33900")&&
+      String(markStoryPresentationHidden33900).includes('scPresentationHidden="true"')&&
+      installStyle.toString().includes('data-sc-presentation-hidden="true"]{display:none!important'),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
