@@ -404,8 +404,10 @@ function runStorySceneBoard33900Diagnostics(){
     authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
     battleSuspensionKeepsLayerHidden:
       String(globalThis.renderStoryScenePresentationLayer).includes("storyPresentationBattleSuspended33900")&&
-      String(markStoryPresentationHidden33900).includes('scPresentationHidden="true"')&&
-      installStyle.toString().includes('data-sc-presentation-hidden="true"]{display:none!important'),
+      String(globalThis.renderStoryScenePresentationLayer).includes("markStoryPresentationHidden33900")&&
+      String(markStoryPresentationHidden33900).includes("scPresentationHidden")&&
+      String(markStoryPresentationHidden33900).includes("style.display")&&
+      installStyle.toString().includes("data-sc-presentation-hidden"),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
