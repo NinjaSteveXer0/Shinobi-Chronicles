@@ -75,7 +75,7 @@ function runAlphaOriginScene32900Diagnostics(){
     sourceFirstConsumer:A.commitOccurrence.toString().includes("this.history().push(record)")&&A.commitOccurrence.toString().includes("consumeStaticOriginSourceOccurrence"),
     continuityReused:A.completionRequest.toString().includes("completeChronicleOriginPrologue"),
     noDirectPLGrant:!A.commitOccurrence.toString().includes("currentPL")&&!A.commitOccurrence.toString().includes("BasePL"),
-    optionalBattleBranchesExplicitlyFailClosed:A.battleFailClosedScenes.size>=5,
+    nonKakashiOptionalBattleScenesExplicitlyFailClosed:A.battleFailClosedScenes.size>=4,
     browserGoldenClaimed:false
   };
   return{patchId:A.patchId,pass:Object.entries(checks).filter(([k])=>k!=="browserGoldenClaimed").every(([,v])=>v===true),checks,registrations:A.clone(A.registrations),status,browserGolden:false};
