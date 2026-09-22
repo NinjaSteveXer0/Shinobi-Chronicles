@@ -74,6 +74,11 @@ jobs:
           node tools/qa_issue_188_story_decision_runtime.js
           node tools/qa_story_factual_resolver_34600.js
 
+      - name: Enforce global post-Battle player agency
+        run: |
+          node --check tools/qa_issue_278_post_battle_agency.js
+          node tools/qa_issue_278_post_battle_agency.js
+
       - name: Enforce Kakashi V2 legacy exclusion
         run: |
           node --check tools/qa_kakashi_v2_legacy_exclusion.js
