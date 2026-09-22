@@ -4,13 +4,15 @@
 const fs=require("fs"),vm=require("vm"),assert=require("assert");
 const CORE_PATH="runtime/alpha-kakashi-v2-core-36020.js";
 const BATTLE_PATH="runtime/alpha-kakashi-v2-battle-36010.js";
+const REWARD_PATH="runtime/alpha-kakashi-v2-rewards-36015.js";
 const RENDER_PATH="runtime/alpha-kakashi-v2-renderer-36030.js";
 const TRANSITION_PATH="runtime/alpha-kakashi-v2-transition-36040.js";
 const TRAVERSAL_PATH="runtime/alpha-traversal-bridge-33200.js";
 
-for(const p of [CORE_PATH,BATTLE_PATH,RENDER_PATH,TRANSITION_PATH])assert(fs.existsSync(p),`missing V2 file: ${p}`);
+for(const p of [CORE_PATH,BATTLE_PATH,REWARD_PATH,RENDER_PATH,TRANSITION_PATH])assert(fs.existsSync(p),`missing V2 file: ${p}`);
 
 const battleSource=fs.readFileSync(BATTLE_PATH,"utf8");
+const rewardSource=fs.readFileSync(REWARD_PATH,"utf8");
 const coreSource=fs.readFileSync(CORE_PATH,"utf8");
 const rendererSource=fs.readFileSync(RENDER_PATH,"utf8");
 const transitionSource=fs.readFileSync(TRANSITION_PATH,"utf8");
@@ -18,7 +20,7 @@ const traversalSource=fs.readFileSync(TRAVERSAL_PATH,"utf8");
 
 // Architecture gates.
 assert(!/runtime\/alpha-kakashi-(?!v2-)/.test(traversalSource),"legacy Kakashi loader leaked back into traversal");
-for(const p of [BATTLE_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH])assert(traversalSource.includes(p),`V2 loader missing ${p}`);
+for(const p of [BATTLE_PATH,REWARD_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH])assert(traversalSource.includes(p),`V2 loader missing ${p}`);
 const coreOperationalSource=coreSource.split("function diagnostics()")[0];
 assert(!/querySelector|document\.|createElement/.test(coreOperationalSource),"Story/state core owns DOM");
 assert(!/querySelector|document\.|createElement/.test(battleSource.split("function installPakkunBattleButtons")[0]),"Battle semantic adapter touches Story/presentation DOM");
@@ -26,6 +28,81 @@ assert(rendererSource.includes('>*:not(#${ROOT_ID}){display:none!important}'),"r
 assert(rendererSource.includes("kv2-dialogue")&&rendererSource.includes("chronicle_receipt"),"renderer missing singular dialogue/Receipt modes");
 assert(transitionSource.includes("kakashi_v2_transition_locked"),"transition lock missing");
 assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animation missing");
+
+// Reward authority uses the existing Currency / Inventory / Battle claim surfaces
+// while proving exact source values and idempotence.
+{
+  const itemDatabase={
+    field_recovery_pill:{id:"field_recovery_pill",name:"Field Recovery Pill",type:"consumable",rarity:"Common",stackable:true}
+  };
+  const context={
+    console,JSON,Object,Array,String,Number,Boolean,Set,Map,Math,Date,globalThis:null,
+    itemDatabase,
+    playerData:{ryo:0,inventory:[]},
+    currentBattle:null,
+    cloneProgressionData:v=>v===undefined?undefined:JSON.parse(JSON.stringify(v)),
+    getItemDefinition:id=>itemDatabase[id]||null,
+    addItemToInventory:item=>{
+      const d=itemDatabase[item.id]||item;
+      if(d.stackable===true){
+        const found=context.playerData.inventory.find(x=>x.id===d.id&&!x.instanceId);
+        if(found){found.quantity=(found.quantity||0)+1;return;}
+        context.playerData.inventory.push({id:d.id,name:d.name,type:d.type,rarity:d.rarity,quantity:1});return;
+      }
+      context.playerData.inventory.push({id:d.id,name:d.name,type:d.type,rarity:d.rarity,quantity:1,instanceId:`${d.id}_qa_${context.playerData.inventory.length+1}`});
+    },
+    generateBattleRewards:()=>({generated:true,claimed:false,ryo:0,exp:0,items:[],rareDrops:[]}),
+    claimCurrentBattleRewards:()=>false,
+    recordBattleChronicle:()=>true,
+    savePlayerData:()=>true,saveTestState:()=>true
+  };
+  context.globalThis=context;vm.createContext(context);
+  vm.runInContext(rewardSource,context,{filename:REWARD_PATH});
+  const diag=context.runAcademyKakashiV2Rewards36015Diagnostics();
+  assert.strictEqual(diag.pass,true,JSON.stringify(diag,null,2));
+  assert(context.itemDatabase.academy_training_tanto,"Academy Training Tantō not registered");
+  assert.strictEqual(context.itemDatabase.academy_training_tanto.statModifiers.buki,1);
+  assert.strictEqual(context.itemDatabase.academy_training_tanto.sourceActivation,"kakashi_origin_exceptional_reward_only");
+
+  context.currentBattle={
+    battleId:"qa_mi_battle",encounterId:"academy_kakashi_origin_battle_seq_mi",
+    outcome:{type:"victory"},
+    rewards:{generated:false,claimed:false},
+    kakashiV2:{battleConfigId:"academy_kakashi_origin_battle_seq_mi",battleOccurrenceId:"qa_mi_battle",storyOccurrenceId:"qa_origin"}
+  };
+  const immediate=context.generateBattleRewards({rewards:{ryo:{min:0,max:0},exp:{min:0,max:0},commonDrops:[],rareDrops:[]}},{name:"Kakashi"});
+  assert.strictEqual(immediate.ryo,50);
+  assert.strictEqual(immediate.exp,0);
+  assert.deepStrictEqual(immediate.items.map(x=>x.id),["field_recovery_pill"]);
+  assert.strictEqual(context.claimCurrentBattleRewards(),true);
+  assert.strictEqual(context.playerData.ryo,50);
+  assert.strictEqual(context.playerData.inventory.find(x=>x.id==="field_recovery_pill").quantity,1);
+
+  const state={
+    package:{holder:"ANBU",returned:true,recovered:true},
+    knowledge:{askWhere:true},
+    participants:{MI:{state:"ANBU_CUSTODY"},PS:{state:"RELEASED"},AMT:{state:"ESCAPED"}},
+    resolvers:{},routeHistory:[],
+    battles:{pickpocket_3v1:{outcome:"victory",playerActionOpportunityCount:3}},
+    terminal:{reportReached:true,minatoReached:true,receiptReached:true}
+  };
+  const terminal=context.commitAcademyKakashiV2TerminalRewards36015(state,"qa_origin");
+  assert.strictEqual(terminal.success,true,JSON.stringify(terminal,null,2));
+  assert.strictEqual(terminal.plan.totalRyo,250);
+  assert.strictEqual(terminal.grantedRyo,250);
+  assert.strictEqual(terminal.pillGranted,0,"immediate MI pill must suppress terminal fallback");
+  assert.strictEqual(terminal.trainingTantoGranted,1);
+  assert.strictEqual(context.playerData.ryo,300);
+  assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="field_recovery_pill").reduce((n,x)=>n+(x.quantity||1),0),1);
+  assert.strictEqual(context.playerData.inventory.filter(x=>x.id==="academy_training_tanto").length,1);
+  const before=JSON.stringify({ryo:context.playerData.ryo,inventory:context.playerData.inventory});
+  const replay=context.commitAcademyKakashiV2TerminalRewards36015(state,"qa_origin");
+  assert.strictEqual(replay.success,true);
+  assert.strictEqual(replay.grantedRyo,0);
+  assert.strictEqual(replay.pillGranted,0);
+  assert.strictEqual(replay.trainingTantoGranted,0);
+  assert.strictEqual(JSON.stringify({ryo:context.playerData.ryo,inventory:context.playerData.inventory}),before,"terminal reward replay duplicated material rewards");
+}
 
 // Battle authority executes in a bounded mock to prove exact configuration data.
 {
@@ -75,6 +152,7 @@ assert(transitionSource.includes("kv2-actor-ghost"),"one-shot actor exit animati
     playerData:{},savePlayerData:()=>true,
     SC_STORY_DECISION_REALISATION_34000:D,SC_STORY_FACTUAL_RESOLVER_34600:F,
     SC_ACADEMY_KAKASHI_V2_BATTLE_36010:{configs:tenConfigs},
+    commitAcademyKakashiV2TerminalRewards36015:()=>({success:true,sourceReceipts:[],plan:{totalRyo:100}}),
     unregisterStoryScene:id=>scenes.delete(id),
     registerStoryScene:def=>{const copy={...def,beatMap:new Map((def.beats||[]).map(b=>[b.beatId,b]))};scenes.set(def.sceneId,copy);return{success:true,sceneId:def.sceneId};},
     getStorySceneDefinition:id=>scenes.get(id)||null,
@@ -113,6 +191,8 @@ console.log(JSON.stringify({
   pass:true,
   architectureBoundary:true,
   exactBattleConfigCount:10,
+  rewardSourcesIdempotent:true,
+  terminalRewardCap:250,
   routeGraphClosed:true,
   stableSceneId:"origin_academy_kakashi_anbu_retrieval",
   browserGoldenClaimed:false
