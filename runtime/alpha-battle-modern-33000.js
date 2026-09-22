@@ -542,7 +542,7 @@
     const source=enhanceBattle2DOM33000.toString();
     const summary=getBattleSkillYouthSummary33000.toString();
     const checks={
-      patchId:PATCH_ID==="alpha_battle_modern_33000_2026_09_12",
+      patchId:PATCH_ID==="alpha_battle_modern_33000_2026_09_22_performance",
       hoverLearns:source.includes("enhanceBattleSkillCards33000")&&previewBattlePreparedSkill33000.toString().includes("battle-live-skill-details"),
       clickStillUsesExistingCommitPath:typeof activateBattlePreparedSkillCard==="function",
       youthReadingContract:YOUTH_READING_TARGET==="12-13"&&summary.includes("Hit one enemy")&&summary.includes("This does not deal damage"),
@@ -553,7 +553,7 @@
       sharedPerformanceProjection:String(battleEvidence33000).includes("runtime.evidence"),
       exactTargetFromEvidence:String(resolveBattlePerformanceProjection33000).includes("targetRef")&&String(resolveBattlePerformanceProjection33000).includes("exactTarget"),
       resultGrammar:["HIT","MISS","EVADE","GUARD","BLOCK","SUBSTITUTION","DEFEAT"].every(token=>String(resultClass33000).includes(token)),
-      performanceClassVocabulary:BATTLE_PRESENTATION_CLASSES_33000.length===17,
+      performanceClassVocabulary:BATTLE_PRESENTATION_CLASSES_33000.length===16,
       noResolverSemanticsInPerformance:!String(resolveBattlePerformanceProjection33000).includes("resolveBattleDamagePacket")&&!String(installBattlePerformance33000).includes("recordBattleEvidence"),
       battlePortraitProjection:String(portrait33000).includes("resolveUIPortraitProjection")&&String(portrait33000).includes("resolveBattleEnemyPortraitProjection"),
       branchModesRemainExplicit:renderInspector33000.toString().includes("setSelectedBattleSkillMode"),
