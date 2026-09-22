@@ -293,7 +293,7 @@ function boardMarkup(projection){
   const objects=(projection.objects||[]).map(row=>`<span class="sc-scene-board-33900__object sc-live-state-callout-33900${row&&row.committed?" is-committed":""}"><b>${escapeHTML(row.label||"OBJECT")}</b>${escapeHTML(row.state||"")}</span>`).join("");
   return `<div class="sc-scene-board-33900__top"><div class="sc-scene-board-33900__location">${escapeHTML(projection.location||"STORY SCENE")}</div>${projection.objective?`<div class="sc-scene-board-33900__objective"><b>OBJECTIVE</b>${escapeHTML(projection.objective)}</div>`:""}</div>${projection.reaction?`<div class="sc-scene-board-33900__reaction">${escapeHTML(projection.reaction)}</div>`:""}${projection.committed?`<div class="sc-scene-board-33900__receipt">CHRONICLE FACT COMMITTED</div>`:""}<div class="sc-scene-board-33900__actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>${objects?`<div class="sc-scene-board-33900__objects sc-live-state-callouts-33900">${objects}</div>`:""}`;
 }
-function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[])if(node&&typeof node.remove==="function")node.remove();}
+function clearBoard(layer){if(!layer)return;try{delete layer.dataset.scSceneBoard;delete layer.dataset.scSceneMode;delete layer.dataset.scPerformance;}catch(_error){};for(const node of layer.querySelectorAll?layer.querySelectorAll(".sc-scene-board-33900"):[]){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(node,"scene_board_teardown");if(node&&typeof node.remove==="function")node.remove();}}
 function updatePerformancePanel(layer,runtime=currentRuntime()){
   if(!layer||!runtime)return false;const p=performanceCursor(runtime,currentBeat(runtime));
   if(!p){delete layer.dataset.scPerformance;return false;}
@@ -399,6 +399,7 @@ function runStorySceneBoard33900Diagnostics(){
     semanticAnchorVocabulary:["PLAYER_LEFT","INNER_LEFT","CENTER","CENTER_OBJECT","INNER_RIGHT","OPPONENT_RIGHT","FAR_ENTRY_LEFT","FAR_ENTRY_RIGHT"].every(key=>Object.prototype.hasOwnProperty.call(SEMANTIC_STAGE_ANCHORS,key)),
     boundedChoreographyVocabulary:CHOREOGRAPHY_CLASSES.length===17&&Object.values(CHOREOGRAPHY_DURATION_MS).every(ms=>ms<=650),
     scopedCancellableQueue:String(playStoryChoreography33900).includes("scopeKey")&&String(cancelStoryChoreography33900).includes("cancelled=true"),
+    teardownCancelsChoreography:String(clearBoard).includes("cancelStoryChoreography33900"),
     noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
     authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
     battleSuspensionKeepsLayerHidden:
