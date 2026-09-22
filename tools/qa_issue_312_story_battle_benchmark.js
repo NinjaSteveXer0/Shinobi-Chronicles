@@ -57,6 +57,7 @@ assert(!kv2Transition.includes("cloneNode"),"#312 transition adapter must not ow
 assert(!kv2Transition.includes("locked=true"),"#312 Story truth must not wait on animation lock");
 
 assert(kv2Renderer.includes(".kv2-speech")&&kv2Renderer.includes("syncSpeech"),"#312 actor-linked speech surface missing");
+assert(kv2Renderer.includes("top:-8px")&&kv2Renderer.includes("border-top:1px solid")&&kv2Renderer.includes("tailPct=sr.width>0"),"#312 speech tail must point upward toward and horizontally track the speaking actor");
 assert(kv2Renderer.includes("CLICK ANYWHERE TO CONTINUE")&&!kv2Renderer.includes('class="kv2-next"'),"#312 arrow-only continuation must be retired");
 assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes('root.dataset.transitionActive==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal / cinematic transition must block click-through / accidental commitment");
 assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
@@ -77,6 +78,7 @@ assert(battleSource.includes('"SKILLS"')&&battleSource.includes('"ITEMS"')&&batt
 assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
 assert(battleSource.includes('stage.dataset.formationTray="closed"'),"#312 action playback must contract the secondary tray");
+assert(battleSource.includes("const played=playedBattlePerformanceKeys33000.has(key)")&&battleSource.includes("if(!played){")&&battleSource.includes("player has deliberately reopened"),"#312 settled performance receipts must not re-close a reopened action tray");
 assert(battleSource.includes('data-formation-hidden="true"')||battleSource.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
 
 assert(battleSource.includes("resolveBattlePerformanceProjection33000"),"#312 shared Battle performance projection missing");
@@ -110,6 +112,8 @@ assert((battleOwner.stateWrites||[]).length===0,"#312 Battle presentation must n
 
 assert(kv2Core.includes('"v2_watch_exchange"')&&kv2Core.includes('"v2_stop_assassin_setup"'),"#312 Kakashi Sakura benchmark route missing");
 assert(kv2Battle.includes("academy_kakashi_origin_battle_seq_mi"),"#312 MI sequential benchmark Battle config missing");
+assert(kv2Battle.includes('return{available:!!marker||prior!=="enemy_anbu_style_operative_tanto_flash"'),"#312 AMT Tantō must not remain incorrectly dependent on live Wire Capture");
+assert(kv2Battle.includes('available:!!enemy&&!sourceState("silent_body_flicker_position",enemy.id)&&lastEnemyAction(enemy.id)==="enemy_anbu_style_operative_tanto_flash"'),"#312 AMT Body Flicker must follow Tantō independently of expired Wire Capture");
 
 // Executable Story ordering probe: cue stepping may be presentation-only; once
 // cues are exhausted, semantic advancement must happen synchronously.
