@@ -209,13 +209,28 @@ function pakkunAction(actionId,{targetParticipantId=null}={}){
   return{success:resolution.resolved===true,envelope,resolution,actionOpportunityConsumed:resolution.resolved===true,temporaryParticipantRef:PAKKUN};
 }
 
+function authoritativePlayerBasePLAtEntry(participantId){
+  const participant=typeof getBattleParticipantByIdentity==="function"?getBattleParticipantByIdentity("player",participantId):null;
+  const registry=typeof getCharacterRegistryEntry==="function"?getCharacterRegistryEntry(participantId):null;
+  const candidates=[
+    participant&&participant.basePL,
+    participant&&participant.basePower,
+    participant&&participant.powerLevel,
+    registry&&registry.basePL,
+    registry&&registry.powerLevel,
+    registry&&registry.pl
+  ];
+  for(const value of candidates){const n=Number(value);if(Number.isFinite(n)&&n>0)return n;}
+  const maximum=typeof getBattleMaximumPL==="function"?Number(getBattleMaximumPL("player",participantId)):0;
+  return Number.isFinite(maximum)&&maximum>0?maximum:null;
+}
 function projectResult(){
   const dep=currentBattle&&currentBattle.kakashiV2;if(!dep)return null;
   const evidence=currentBattle.runtime&&Array.isArray(currentBattle.runtime.evidence)?currentBattle.runtime.evidence:[];
   const actionCount=typeof getBattleActionOpportunityIndex==="function"?getBattleActionOpportunityIndex("player",KAKASHI):0;
   const participants=[{
     participantRef:KAKASHI,combatSourceProfileId:KAKASHI,side:"player",deploymentRole:"controller",
-    basePLAtEntry:15,remainingBattlePL:getBattleRemainingPL("player",KAKASHI),
+    basePLAtEntry:authoritativePlayerBasePLAtEntry(KAKASHI),remainingBattlePL:getBattleRemainingPL("player",KAKASHI),
     battleStatus:getBattleRemainingPL("player",KAKASHI)<=0?"defeated":"active",lifeState:"unresolved",custodyState:"unresolved",
     actionOccurrenceRefs:evidence.filter(e=>e&&e.actorRef&&e.actorRef.participantId===KAKASHI).map(e=>e.actionId).filter(Boolean)
   }];
@@ -257,6 +272,7 @@ function diagnostics(){
     noAutoScaling:Object.values(PROFILE).every(p=>enemyDatabase[p.id].provenance.noAutoScaling===true),
     timingGatesExact:CONFIGS.academy_kakashi_origin_battle_seq_mi.timingGate.maximumControllerActions===4&&CONFIGS.academy_kakashi_origin_battle_seq_ps.timingGate.maximumControllerActions===3,
     pakkunTemporaryOnly:!String(pakkunAction).includes("grantEntityOwnership")&&!String(pakkunAction).includes("attachEntitySummonToCharacter"),
+    playerEntryPLNotHardcoded:!String(projectResult).includes("basePLAtEntry:15")&&String(projectResult).includes("authoritativePlayerBasePLAtEntry"),
     noStoryDom:!String(launch).includes("querySelector")&&!String(projectResult).includes("document."),
     browserGoldenClaimed:false
   };
