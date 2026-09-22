@@ -270,7 +270,7 @@ function diagnostics(){
     protectedObjectiveRegion:installStyle.toString().includes("grid-template-columns:minmax(0,1fr) minmax(240px,34%)"),
     protectedDialogueRegion:installStyle.toString().includes("bottom:29%")&&installStyle.toString().includes("bottom:3.7%"),
     receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&String(syncReceipt).includes("kv2-receipt"),
-    routesDoNotOwnDom:source.includes("getAcademyKakashiV2Presentation36020"),
+    projectionComesFromCore:String(projection).includes("getAcademyKakashiV2Presentation36020"),
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
