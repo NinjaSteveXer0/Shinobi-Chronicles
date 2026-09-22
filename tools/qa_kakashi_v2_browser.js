@@ -28,16 +28,19 @@ async function boot(browser){
   const result=await page.evaluate(()=>{
     const selected=selectChronicleOrigin("academy_kakashi","kakashi_v2_browser_acceptance");
     const launched=beginAlphaChronicleOriginPrologue();
-    const released=typeof releaseAlphaFrontDoor33300==="function"?releaseAlphaFrontDoor33300():null;
+    const released33300=typeof releaseAlphaFrontDoor33300==="function"?releaseAlphaFrontDoor33300():null;
+    const released33400=globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400&&typeof globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.release==="function"?globalThis.SC_ALPHA_BROWSER_ONBOARDING_FIXES_33400.release():null;
     const game=document.querySelector(".game-container");
     if(game){game.removeAttribute("data-alpha-front-door-locked");game.inert=false;}
-    const front=document.getElementById("sc-alpha-front-door-33300");
-    if(front&&front.isConnected)front.remove();
-    return{selected,launched,released};
+    for(const id of ["sc-alpha-front-door-33300","sc-alpha-front-door-33400"]){
+      const front=document.getElementById(id);if(front&&front.isConnected)front.remove();
+    }
+    return{selected,launched,released33300,released33400};
   });
   assert(result.selected&&result.selected.success===true,JSON.stringify(result));
   assert(result.launched&&result.launched.success===true,JSON.stringify(result));
   await page.waitForSelector("#kakashi-v2-scene-board",{state:"visible",timeout:15000});
+  assert.strictEqual(await page.locator("#sc-alpha-front-door-33300,#sc-alpha-front-door-33400").count(),0,"front-door presentation still covers Kakashi V2");
   return{context,page};
 }
 
