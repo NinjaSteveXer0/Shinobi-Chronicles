@@ -59,7 +59,12 @@ assert(battleSource.includes("applyBattlePerformanceRoles33000")&&battleSource.i
   const end=battleSource.indexOf("function battlePerformanceRoleNode33000",start);
   const markupSource=battleSource.slice(start,end);
   assert(start>=0&&end>start&&!markupSource.includes("<img"),"#312 Battle performance must not duplicate actor/target portrait images");
+  assert(!markupSource.includes("<b>")&&!markupSource.includes("<em>"),"#312 factual result/delta must not remain in a persistent center receipt");
 }
+assert(battleSource.includes("function battlePerformanceResultChip33000")&&battleSource.includes('targetNode.appendChild(chip)'),"#312 factual Battle result must attach to the exact target presentation");
+assert(battleSource.includes(".battle2-performance-stage.is-settled{opacity:0"),"#312 compact action identity must clear after playback");
+assert(battleSource.includes("},920);"),"#312 Battle formation-stage playback must settle within the authorised short playback window");
+assert(!battleSource.includes(".battle2-modern.battle2-performance-active .battle-live-active-card-player{left:5.5%"),"#312 Battle playback must not shove the duel formation outward to make room for a center panel");
 assert(battleSource.includes("host.dataset.actionId===p.actionId"),"#312 stale Battle performance settle must not clear a newer action");
 assert(battleSource.includes("suspendCallerStoryPresentation33000")&&battleSource.includes("markStoryPresentationHidden33900"),"#312 Story-called Battle must suspend the shared Story presentation layer");
 
