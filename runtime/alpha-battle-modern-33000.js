@@ -891,7 +891,7 @@
       /* Duel: two combatants own the battlefield. No fake support furniture. */
       .battle2-modern[data-formation-mode="duel"] .battle-live-active-card{top:9.5%!important;width:33.5%!important;height:56%!important}
       .battle2-modern[data-formation-mode="duel"] .battle-live-active-card-player{left:8.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-active-card-enemy{left:58%!important}
-      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:45.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:41.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:58.5%!important;right:auto!important}
+      .battle2-modern[data-formation-mode="duel"] .battle-live-power{top:42.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-player{left:41.5%!important}.battle2-modern[data-formation-mode="duel"] .battle-live-power-enemy{left:58.5%!important;right:auto!important}
       .battle2-modern[data-formation-mode="duel"] .battle-code-vs{top:28.5%!important;opacity:.55!important;font-size:clamp(22px,2.8vw,42px)!important;letter-spacing:.1em!important;filter:drop-shadow(0 8px 14px rgba(0,0,0,.55))}
 
       /* Squad wedge: support stays visibly behind/outward from the confrontation lane. */
