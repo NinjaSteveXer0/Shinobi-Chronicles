@@ -77,23 +77,38 @@ function animateEntering(previousProjection,nextProjection){
     later(done,700);
   }
 }
-function ghostLeaving(previousProjection,nextProjection){
-  if(typeof document==="undefined")return;
+function exitAnimationClass(choiceId,targetBeatId){
+  const token=`${String(choiceId||"")}|${String(targetBeatId||"")}`.toLowerCase();
+  if(token.includes("kill"))return"is-falling";
+  if(token.includes("release")||token.includes("_loss")||token.includes("_failure")||token.includes("pursuit_fail"))return"is-fleeing";
+  return"is-fading";
+}
+function ghostLeaving(previousProjection,nextProjection,{choiceId=null,targetBeatId=null}={}){
+  if(typeof document==="undefined")return{count:0,duration:0,nodes:[]};
   const prev=actorIds(previousProjection),next=actorIds(nextProjection);
-  const leaving=[...prev].filter(id=>!next.has(id));if(!leaving.length)return;
-  const root=document.getElementById("kakashi-v2-scene-board");if(!root)return;
+  const leaving=[...prev].filter(id=>!next.has(id));if(!leaving.length)return{count:0,duration:0,nodes:[]};
+  const root=document.getElementById("kakashi-v2-scene-board");if(!root)return{count:0,duration:0,nodes:[]};
+  const layer=root.querySelector(".kv2-ghost-layer")||root;
+  const exitClass=exitAnimationClass(choiceId,targetBeatId);
+  const nodes=[];
   for(const id of leaving){
-    const node=[...root.querySelectorAll(".kv2-actor")].find(n=>n.dataset&&n.dataset.actorId===id);
+    const node=[...root.querySelectorAll(".kv2-actors > .kv2-actor")].find(n=>n.dataset&&n.dataset.actorId===id);
     if(!node)continue;
     const rect=node.getBoundingClientRect(),rr=root.getBoundingClientRect();
     const ghost=node.cloneNode(true);
-    ghost.classList.add("kv2-actor-ghost","is-leaving");
+    ghost.classList.remove("is-entering");
+    ghost.classList.add("kv2-actor-ghost",exitClass);
     ghost.style.left=`${Math.max(0,rect.left-rr.left)}px`;
     ghost.style.top=`${Math.max(0,rect.top-rr.top)}px`;
     ghost.style.width=`${rect.width}px`;ghost.style.height=`${rect.height}px`;
-    root.appendChild(ghost);
-    later(()=>{try{ghost.remove();}catch(_e){}},680);
+    node.style.visibility="hidden";
+    layer.appendChild(ghost);nodes.push({node,ghost});
+    later(()=>{try{ghost.remove();}catch(_e){}},720);
   }
+  return{count:nodes.length,duration:exitClass==="is-fading"?320:exitClass==="is-fleeing"?480:540,nodes,exitClass};
+}
+function restoreHiddenActors(exit){
+  for(const row of exit&&exit.nodes||[])try{row.node.style.visibility="";}catch(_e){}
 }
 function targetBeat(choiceId=null){
   try{
@@ -113,27 +128,50 @@ function shouldWipe(prev,next){
 function semanticAdvance(choiceId=null){
   const prev=projection(),target=targetBeat(choiceId),nextPreview=target?projection(target):null;
   const wipe=shouldWipe(prev,nextPreview);
-  if(!wipe){
-    const result=choiceId==null?PRE_ADVANCE():PRE_ADVANCE(choiceId);
-    if(result&&result.success===true&&active()){resetForBeat();render();animateEntering(prev,projection());}
-    return result;
-  }
   if(locked)return{success:false,reason:"kakashi_v2_transition_locked"};
-  locked=true;wipeCovering=true;lastTransition={type:"black_wipe",fromBeatId:runtime().beatId,toBeatId:target||null,startedAt:Date.now()};
-  ghostLeaving(prev,nextPreview);render();
-  later(()=>{
+
+  const exit=ghostLeaving(prev,nextPreview,{choiceId,targetBeatId:target});
+  const commit=()=>{
     let result=null;
     try{result=choiceId==null?PRE_ADVANCE():PRE_ADVANCE(choiceId);}catch(error){result={success:false,reason:"kakashi_v2_semantic_advance_exception",error:String(error&&error.message||error)};}
-    lastTransition.result=result&&typeof result==="object"?{success:result.success!==false,type:result.type||null,reason:result.reason||null}:null;
+    if(!result||result.success!==true){
+      restoreHiddenActors(exit);locked=false;wipeCovering=false;render();return result||{success:false,reason:"kakashi_v2_semantic_advance_failed"};
+    }
     if(active())resetForBeat();
     render();
-    const next=projection();
-    animateEntering(prev,next);
+    const next=projection();animateEntering(prev,next);
+    return result;
+  };
+
+  if(!wipe&&exit.count===0)return commit();
+
+  locked=true;
+  if(!wipe){
+    lastTransition={type:"actor_exit",fromBeatId:runtime().beatId,toBeatId:target||null,exitClass:exit.exitClass,startedAt:Date.now()};
     later(()=>{
-      wipeCovering=false;render();
-      later(()=>{locked=false;lastTransition={...(lastTransition||{}),completedAt:Date.now()};const row=cursor();if(row)row.settled=true;save();},250);
-    },32);
-  },230);
+      const result=commit();
+      lastTransition={...(lastTransition||{}),result:result&&typeof result==="object"?{success:result.success!==false,type:result.type||null,reason:result.reason||null}:null,completedAt:Date.now()};
+      const row=cursor();if(row)row.settled=true;save();locked=false;render();
+    },Math.max(0,exit.duration));
+    return{success:true,type:"kakashi_v2_actor_exit_transition",pending:true,fromBeatId:lastTransition.fromBeatId,toBeatId:target||null};
+  }
+
+  lastTransition={type:"black_wipe",fromBeatId:runtime().beatId,toBeatId:target||null,exitClass:exit.exitClass||null,startedAt:Date.now()};
+  const cover=()=>{
+    wipeCovering=true;render();
+    later(()=>{
+      const result=commit();
+      lastTransition.result=result&&typeof result==="object"?{success:result.success!==false,type:result.type||null,reason:result.reason||null}:null;
+      if(!result||result.success!==true){
+        wipeCovering=false;locked=false;render();return;
+      }
+      later(()=>{
+        wipeCovering=false;render();
+        later(()=>{locked=false;lastTransition={...(lastTransition||{}),completedAt:Date.now()};const row=cursor();if(row)row.settled=true;save();},250);
+      },32);
+    },230);
+  };
+  if(exit.count>0)later(cover,Math.min(exit.duration,420));else cover();
   return{success:true,type:"kakashi_v2_black_wipe_transition",pending:true,fromBeatId:lastTransition.fromBeatId,toBeatId:target||null};
 }
 function advance(choiceId=null){
@@ -170,6 +208,8 @@ function diagnostics(){
     blackWipeOnBackdropChange:String(shouldWipe).includes("backdrop"),
     enteringOnlyOnActorSetChange:String(animateEntering).includes("!prev.has(id)"),
     leavingUsesTemporaryGhost:String(ghostLeaving).includes("kv2-actor-ghost"),
+    semanticExitModes:String(exitAnimationClass).includes("is-falling")&&String(exitAnimationClass).includes("is-fleeing")&&String(exitAnimationClass).includes("is-fading"),
+    exitCompletesBeforeWipe:String(semanticAdvance).includes("Math.min(exit.duration,420)"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),
     browserGoldenClaimed:false
   };
