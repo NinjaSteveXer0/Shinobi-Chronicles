@@ -62,6 +62,7 @@ assert(battleSource.includes("applyBattlePerformanceRoles33000")&&battleSource.i
   assert(!markupSource.includes("<b>")&&!markupSource.includes("<em>"),"#312 factual result/delta must not remain in a persistent center receipt");
 }
 assert(battleSource.includes("function battlePerformanceResultChip33000")&&battleSource.includes('targetNode.appendChild(chip)'),"#312 factual Battle result must attach to the exact target presentation");
+assert(battleSource.includes("function battlePerformanceRoleNode33000")&&battleSource.includes("participantId")&&battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("data-slot"),"#312 Battle performance role lookup must resolve exact participant identity, including deployed off-slot targets");
 assert(battleSource.includes(".battle2-performance-stage.is-settled{opacity:0"),"#312 compact action identity must clear after playback");
 assert(battleSource.includes("},920);"),"#312 Battle formation-stage playback must settle within the authorised short playback window");
 assert(!battleSource.includes(".battle2-modern.battle2-performance-active .battle-live-active-card-player{left:5.5%"),"#312 Battle playback must not shove the duel formation outward to make room for a center panel");
