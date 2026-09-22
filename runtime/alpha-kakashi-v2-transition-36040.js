@@ -12,7 +12,7 @@ if(globalThis.SC_ACADEMY_KAKASHI_V2_TRANSITION_36040)return;
 const PATCH_ID="academy_kakashi_v2_transition_36040_2026_09_22_shared_choreography";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const CURSOR_KEY="__kakashiV2Presentation36040";
-let wipeCovering=false,lastTransition=null,timerIds=[];
+let wipeCovering=false,wipeMode=null,lastTransition=null,timerIds=[];
 
 const PRE_ADVANCE=typeof advanceStoryScene==="function"?advanceStoryScene:null;
 if(!PRE_ADVANCE)throw new Error("kakashi_v2_transition_requires_story_advance");
@@ -47,18 +47,35 @@ function resetForBeat(){
 }
 function render(){
   try{if(typeof renderAcademyKakashiV236030==="function")renderAcademyKakashiV236030();}catch(_e){}
-  try{if(typeof setAcademyKakashiV2Wipe36030==="function")setAcademyKakashiV2Wipe36030(wipeCovering);}catch(_e){}
+  try{if(typeof setAcademyKakashiV2Wipe36030==="function")setAcademyKakashiV2Wipe36030(wipeCovering?wipeMode:null);}catch(_e){}
 }
-function shouldWipe(prev,next){
-  if(!prev||!next)return false;
-  return prev.transition==="wipe"||next.transition==="wipe"||String(prev.backdrop||"")!==String(next.backdrop||"");
+function transitionKind(prev,next){
+  if(!prev||!next)return null;
+  if(prev.transition==="wipe"||next.transition==="wipe"||String(prev.backdrop||"")!==String(next.backdrop||""))return"hard";
+  if(String(prev.id||"")!==String(next.id||""))return"soft";
+  return null;
 }
-function playPostCommitWipe(prev,next){
-  if(!shouldWipe(prev,next))return{played:false};
-  wipeCovering=true;render();
-  lastTransition={type:"black_wipe",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,startedAt:Date.now()};
-  later(()=>{wipeCovering=false;render();lastTransition={...lastTransition,completedAt:Date.now()};},180);
-  return{played:true};
+function hasLethalConsequenceInFlight(){
+  try{
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const kinds=String(root&&root.dataset&&root.dataset.scChoreographyLastKinds||"").split(",").filter(Boolean);
+    return kinds.includes("COLLAPSE");
+  }catch(_e){return false;}
+}
+function playPostCommitTransition(prev,next){
+  const kind=transitionKind(prev,next);if(!kind)return{played:false};
+  const lethalDelay=kind==="hard"&&hasLethalConsequenceInFlight()?460:0;
+  const coverFor=kind==="hard"?360:150;
+  const start=()=>{
+    wipeMode=kind;wipeCovering=true;render();
+    lastTransition={type:kind==="hard"?"cinematic_scene_change":"same_environment_beat_shift",fromBeatId:prev&&prev.id||null,toBeatId:next&&next.id||null,semanticAlreadyCommitted:true,lethalConsequenceDelayMs:lethalDelay,startedAt:Date.now()};
+    later(()=>{
+      wipeCovering=false;render();
+      later(()=>{wipeMode=null;render();lastTransition={...lastTransition,completedAt:Date.now()};},kind==="hard"?320:180);
+    },coverFor);
+  };
+  if(lethalDelay)later(start,lethalDelay);else start();
+  return{played:true,kind,lethalDelayMs:lethalDelay};
 }
 function semanticAdvance(choiceId=null){
   const previous=projection();
@@ -79,7 +96,7 @@ function semanticAdvance(choiceId=null){
   if(active())resetForBeat();
   render();
   const next=projection();
-  playPostCommitWipe(previous,next);
+  playPostCommitTransition(previous,next);
   return result;
 }
 function advance(choiceId=null){
@@ -90,7 +107,9 @@ function advance(choiceId=null){
     return semanticAdvance(choiceId);
   }
   if(list.length&&row.cueIndex<list.length-1){
-    row.cueIndex+=1;row.settled=true;save();render();
+    row.cueIndex+=1;row.settled=true;save();
+    try{if(typeof playAcademyKakashiV2CuePresentation36030==="function")playAcademyKakashiV2CuePresentation36030(row.cueIndex);}catch(_e){}
+    render();
     return{success:true,type:"kakashi_v2_cue_advanced",beatId:rt.beatId,cueIndex:row.cueIndex,semanticBeatUnchanged:true};
   }
   return semanticAdvance(null);
@@ -105,6 +124,7 @@ function getState(){
     atEnd:count<=1||!!row&&row.cueIndex>=count-1,
     locked:false,
     wipeCovering,
+    wipeMode,
     lastTransition:lastTransition?{...lastTransition}:null
   };
 }
@@ -112,7 +132,7 @@ function getState(){
 globalThis.advanceAcademyKakashiV236040=advance;
 globalThis.getAcademyKakashiV2TransitionState36040=getState;
 globalThis.resetAcademyKakashiV2Transition36040=()=>{
-  clearTimers();wipeCovering=false;lastTransition=null;
+  clearTimers();wipeCovering=false;wipeMode=null;lastTransition=null;
   const root=typeof document!=="undefined"?document.getElementById("kakashi-v2-scene-board"):null;
   if(root&&typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(root,"kakashi_transition_reset");
   resetForBeat();render();return{success:true};
@@ -131,8 +151,9 @@ function diagnostics(){
     semanticAdvanceDelegates:String(semanticAdvance).includes("PRE_ADVANCE"),
     outgoingSnapshotCapturedBeforeCommit:String(semanticAdvance).indexOf("prepareAcademyKakashiV2VisualSnapshot36030")<String(semanticAdvance).indexOf("PRE_ADVANCE"),
     semanticCommitPrecedesPresentation:String(semanticAdvance).indexOf("PRE_ADVANCE")<String(semanticAdvance).indexOf("render()"),
-    animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitWipe).includes("PRE_ADVANCE"),
-    blackWipeIsPostCommitPresentation:String(playPostCommitWipe).includes("semanticAlreadyCommitted:true"),
+    animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitTransition).includes("PRE_ADVANCE"),
+    transitionHierarchyIsPostCommitPresentation:String(playPostCommitTransition).includes("semanticAlreadyCommitted:true")&&String(transitionKind).includes('"hard"')&&String(transitionKind).includes('"soft"'),
+    cuePresentationDoesNotCommitTruth:String(advance).includes("playAcademyKakashiV2CuePresentation36030")&&String(advance).includes("semanticBeatUnchanged:true"),
     sharedChoreographyReset:String(globalThis.resetAcademyKakashiV2Transition36040).includes("cancelStoryChoreography33900"),
     noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),
