@@ -86,3 +86,7 @@ jobs:
           node --check runtime/alpha-kakashi-v2-transition-36040.js
           node --check tools/qa_kakashi_v2_clean_room.js
           node tools/qa_kakashi_v2_clean_room.js
+          node --check tools/qa_kakashi_v2_route_matrix.js
+          node tools/qa_kakashi_v2_route_matrix.js
+          node --check tools/qa_kakashi_v2_assets.js
+          node tools/qa_kakashi_v2_assets.js
