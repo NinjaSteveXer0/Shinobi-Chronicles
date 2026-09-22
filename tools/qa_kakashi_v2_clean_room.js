@@ -23,6 +23,7 @@ const traversalSource=fs.readFileSync(TRAVERSAL_PATH,"utf8");
 // Architecture gates.
 assert(!/runtime\/alpha-kakashi-(?!v2-)/.test(traversalSource),"legacy Kakashi loader leaked back into traversal");
 for(const p of [CONTENT_PATH,BATTLE_PATH,REWARD_PATH,CORE_PATH,RENDER_PATH,TRANSITION_PATH])assert(traversalSource.includes(p),`V2 loader missing ${p}`);
+assert(traversalSource.includes("function after33600()")&&traversalSource.includes("sc-alpha-origin-choice-reaction-33510-script")&&traversalSource.includes("function load33700()"),"V2 terminal loader can drop activation before future 33600/33700 scripts exist");
 const coreOperationalSource=coreSource.split("function diagnostics()")[0];
 assert(!/querySelector|document\.|createElement/.test(coreOperationalSource),"Story/state core owns DOM");
 assert(!/querySelector|document\.|createElement/.test(battleSource.split("function installPakkunBattleButtons")[0]),"Battle semantic adapter touches Story/presentation DOM");
