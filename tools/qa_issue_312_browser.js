@@ -681,16 +681,9 @@ async function shot(page,name,selector=null){
 
     const secondSkill=page.locator(".battle-live-skill-deck .battle-dev-skill-card:not(.is-empty)").nth(1);
     await secondSkill.click();
-    await page.waitForFunction(()=>syncBattleActionRegionState()?.selectedSkillId==="academy_kakashi_clone_feint",null,{timeout:3000});
-    const selectedControls=await page.evaluate(()=>({
-      use:document.querySelectorAll(".alpha-code-battle-stage .battle-live-use-skill").length,
-      cancel:document.querySelectorAll(".alpha-code-battle-stage .battle-live-cancel-skill").length,
-      selected:syncBattleActionRegionState()?.selectedSkillId||null
-    }));
-    assert.strictEqual(selectedControls.use,1,"#312 selected Skill lost its canonical USE control after rerender: "+JSON.stringify(selectedControls));
-    assert.strictEqual(selectedControls.cancel,1,"#312 selected Skill lost its canonical CANCEL control after rerender: "+JSON.stringify(selectedControls));
-    await page.locator(".battle-live-use-skill").click();
 
+    // Production Battle UX (32700): ordinary prepared Skills execute on card
+    // click. There is intentionally no separate USE SKILL confirmation button.
     await page.waitForFunction(()=>{
       const battleId=currentBattle?.battleId;
       const rows=ensureBattleRuntimeState()?.evidence||[];
@@ -754,14 +747,6 @@ async function shot(page,name,selector=null){
 
     const nextReadyId=amtReopened.readySkillIds[0];
     await page.locator('.battle-live-skill-deck .battle-dev-skill-card[data-skill-id="'+nextReadyId+'"]').click();
-    await page.waitForFunction(id=>syncBattleActionRegionState()?.selectedSkillId===id,nextReadyId,{timeout:3000});
-    const amtSecondSelection=await page.evaluate(()=>({
-      selectedSkillId:syncBattleActionRegionState().selectedSkillId,
-      targetRef:syncBattleActionRegionState().selectedTargetRef
-    }));
-    assert.strictEqual(amtSecondSelection.selectedSkillId,nextReadyId,"#312 another legal player Skill could not be selected after enemy resolution");
-
-    await page.locator(".battle-live-use-skill").click();
     await page.waitForFunction(()=>{
       const battleId=currentBattle?.battleId;
       const rows=(ensureBattleRuntimeState()?.evidence||[]).filter(row=>row&&row.battleId===battleId);
