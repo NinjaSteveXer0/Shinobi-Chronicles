@@ -76,3 +76,12 @@ jobs:
         run: |
           node --check tools/qa_kakashi_v2_legacy_exclusion.js
           node tools/qa_kakashi_v2_legacy_exclusion.js
+
+      - name: Validate Academy Kakashi V2 clean-room runtime
+        run: |
+          node --check runtime/alpha-kakashi-v2-battle-36010.js
+          node --check runtime/alpha-kakashi-v2-core-36020.js
+          node --check runtime/alpha-kakashi-v2-renderer-36030.js
+          node --check runtime/alpha-kakashi-v2-transition-36040.js
+          node --check tools/qa_kakashi_v2_clean_room.js
+          node tools/qa_kakashi_v2_clean_room.js
