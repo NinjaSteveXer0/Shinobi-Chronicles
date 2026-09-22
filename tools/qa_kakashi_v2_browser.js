@@ -74,7 +74,31 @@ async function go(page,expected,choice){
   return r;
 }
 
-async function shot(page,name){
+async function waitVisualReady(page,label="scene"){
+  const result=await page.evaluate(async()=>{
+    const p=globalThis.getAcademyKakashiV2Presentation36020&&globalThis.getAcademyKakashiV2Presentation36020(getActiveStorySceneRuntime()?.beatId);
+    if(!p)return{success:false,reason:"projection_missing"};
+    const sources=[p.backdrop,...(p.actors||[]).map(a=>a&&a.image)].filter(Boolean);
+    const rows=await Promise.all(sources.map(src=>new Promise(resolve=>{
+      const img=new Image();
+      const done=ok=>resolve({src,ok,naturalWidth:img.naturalWidth,naturalHeight:img.naturalHeight});
+      img.onload=()=>done(true);img.onerror=()=>done(false);img.src=src;
+      if(img.complete)setTimeout(()=>done(img.naturalWidth>0),0);
+    })));
+    if(globalThis.renderAcademyKakashiV236030)globalThis.renderAcademyKakashiV236030();
+    return{success:rows.every(r=>r.ok&&r.naturalWidth>0&&r.naturalHeight>0),rows};
+  });
+  assert(result&&result.success===true,label+" assets not ready: "+JSON.stringify(result));
+  await page.waitForFunction(()=>{
+    const root=document.getElementById("kakashi-v2-scene-board");if(!root)return false;
+    return [...root.querySelectorAll(".kv2-actor img")].every(img=>img.complete&&img.naturalWidth>0&&img.naturalHeight>0);
+  },null,{timeout:12000});
+  await pause(60);
+  return result;
+}
+
+async function shot(page,name,{skipReady=false}={}){
+  if(!skipReady)await waitVisualReady(page,name);
   await page.locator("#kakashi-v2-scene-board").screenshot({path:path.join(OUT,name)});
 }
 
@@ -192,12 +216,11 @@ async function cleanRoute(browser){
 
 async function visualAndBattle(browser){
   const {context,page}=await boot(browser);
-  await page.evaluate(()=>{
-    const rt=getActiveStorySceneRuntime();
-    rt.beatId="v2_watch_exchange";
-    resetAcademyKakashiV2Transition36040();
-  });
-  await waitUnlocked(page,"v2_watch_exchange");
+  await drain(page);
+  await go(page,"v2_scene02_tail");
+  await drain(page);
+  await go(page,"v2_watch_exchange","watch_exchange");
+  await waitVisualReady(page,"watch_exchange");
   const watch=await inspect(page,"watch_exchange");
   const actorCount=await page.locator("#kakashi-v2-scene-board .kv2-actor").count();
   assert.strictEqual(actorCount,3,"WATCH THE EXCHANGE actor count");
@@ -212,15 +235,16 @@ async function visualAndBattle(browser){
     rt.localContext.__kakashiV2Presentation36040={beatId:"v2_mi_stop_win",cueIndex:999,settled:true};
     renderAcademyKakashiV236030();
   });
+  await waitVisualReady(page,"mi_stop_win");
   await drain(page);
   const killPromise=page.evaluate(()=>globalThis.advanceAcademyKakashiV236040("mi_kill"));
-  await pause(90);
+  await pause(260);
   const kill=await page.evaluate(()=>{
     const ghost=document.querySelector("#kakashi-v2-scene-board .kv2-actor-ghost");
     return{exists:!!ghost,falling:!!ghost&&ghost.classList.contains("is-falling"),classes:ghost?.className||null};
   });
   assert(kill.exists&&kill.falling,"kill fall animation missing: "+JSON.stringify(kill));
-  await shot(page,"09-kill-fall-animation.png");
+  await shot(page,"09-kill-fall-animation.png",{skipReady:true});
   const killResult=await killPromise;
   assert(killResult&&killResult.success===true,JSON.stringify(killResult));
   await waitUnlocked(page,"v2_report");
@@ -236,16 +260,29 @@ async function visualAndBattle(browser){
   assert(launched&&launched.success===true,JSON.stringify(launched));
   await page.waitForFunction(()=>!!(typeof currentBattle!=="undefined"&&currentBattle&&currentBattle.returnContext&&currentBattle.returnContext.type==="story_scene"),null,{timeout:12000});
   await page.waitForSelector(".alpha-code-battle-stage",{state:"visible",timeout:12000});
-  const battle=await page.evaluate(()=>({
-    config:currentBattle.kakashiV2?.battleConfigId||null,
-    returnType:currentBattle.returnContext?.type||null,
-    sceneId:currentBattle.returnContext?.sceneId||null,
-    activePlayer:currentBattle.activePlayer?.id||null
-  }));
+  await page.waitForFunction(()=>{
+    const stage=document.querySelector(".alpha-code-battle-stage");
+    const root=document.getElementById("kakashi-v2-scene-board");
+    const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
+    return visible(stage)&&!visible(root);
+  },null,{timeout:12000});
+  const battle=await page.evaluate(()=>{
+    const visible=node=>!!node&&node.getClientRects().length>0&&getComputedStyle(node).display!=="none"&&getComputedStyle(node).visibility!=="hidden";
+    return{
+      config:currentBattle.kakashiV2?.battleConfigId||null,
+      returnType:currentBattle.returnContext?.type||null,
+      sceneId:currentBattle.returnContext?.sceneId||null,
+      activePlayer:currentBattle.activePlayer?.id||null,
+      battleStageVisible:visible(document.querySelector(".alpha-code-battle-stage")),
+      kakashiStoryRootVisible:visible(document.getElementById("kakashi-v2-scene-board"))
+    };
+  });
   assert.strictEqual(battle.config,"academy_kakashi_origin_battle_mi_1v1");
   assert.strictEqual(battle.returnType,"story_scene");
   assert.strictEqual(battle.sceneId,"origin_academy_kakashi_anbu_retrieval");
   assert.strictEqual(battle.activePlayer,"academy_kakashi");
+  assert.strictEqual(battle.battleStageVisible,true,"PL Battle stage is not player-visible");
+  assert.strictEqual(battle.kakashiStoryRootVisible,false,"Kakashi Scene Board still covers active PL Battle");
   await page.locator("#screen-overlay").screenshot({path:path.join(OUT,"10-pl-battle-launch.png")});
 
   const resumed=await page.evaluate(()=>{
