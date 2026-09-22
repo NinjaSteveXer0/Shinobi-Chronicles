@@ -117,16 +117,19 @@ async function inspect(page,label){
     const legacy=[...document.querySelectorAll("#story-scene-presentation-layer .sc-story-panel,#story-scene-presentation-layer .sc-chronicle-layout,.sc-dialogue-panel-33910,.sc-narration-panel-33910")].filter(visible);
     const canonicalRoots=[...document.querySelectorAll("#kakashi-v2-scene-board")].filter(visible);
     const dialogue=root&&root.querySelector(".kv2-dialogue");
+    const speech=root&&root.querySelector(".kv2-speech");
     const receipt=root&&root.querySelector(".kv2-receipt");
     return{
       beatId:getActiveStorySceneRuntime()?.beatId||null,
       preset:root?.dataset.preset||null,
+      cueKind:root?.dataset.cueKind||null,
       geometry:runAcademyKakashiV2Geometry36030(),
       renderer:runAcademyKakashiV2Renderer36030Diagnostics(),
       transition:runAcademyKakashiV2Transition36040Diagnostics(),
       visibleCanonicalRoots:canonicalRoots.length,
       visibleLegacyStorySurfaces:legacy.length,
-      visibleDialogueSurfaces:visible(dialogue)?1:0,
+      visibleNarrationSurfaces:visible(dialogue)?1:0,
+      visibleSpeechSurfaces:visible(speech)?1:0,
       receiptVisible:visible(receipt)
     };
   });
@@ -135,11 +138,13 @@ async function inspect(page,label){
   assert.strictEqual(row.visibleCanonicalRoots,1,label+" canonical Story root cardinality");
   assert.strictEqual(row.visibleLegacyStorySurfaces,0,label+" legacy Story surface visible");
   if(row.preset==="chronicle_receipt"){
-    assert.strictEqual(row.visibleDialogueSurfaces,0,label+" receipt must replace dialogue");
+    assert.strictEqual(row.visibleNarrationSurfaces+row.visibleSpeechSurfaces,0,label+" receipt must replace Story text surfaces");
     assert.strictEqual(row.receiptVisible,true,label+" receipt not visible");
   }else{
     assert(row.geometry.pass,label+" geometry: "+JSON.stringify(row.geometry));
-    assert.strictEqual(row.visibleDialogueSurfaces,1,label+" visible dialogue count");
+    assert.strictEqual(row.visibleNarrationSurfaces+row.visibleSpeechSurfaces,1,label+" exactly one narration/speech surface must be visible");
+    if(row.cueKind==="dialogue")assert.strictEqual(row.visibleSpeechSurfaces,1,label+" dialogue must use actor-linked speech surface");
+    else assert.strictEqual(row.visibleNarrationSurfaces,1,label+" narration must use compact narration surface");
   }
   return row;
 }
@@ -152,14 +157,14 @@ async function assertSingleAdvancePaths(page){
   }));
   assert(before.state&&before.state.cueCount>=3,"single-advance fixture needs at least three cues");
 
-  await page.locator("#kakashi-v2-scene-board .kv2-dialogue").click({position:{x:24,y:24}});
+  await page.locator("#kakashi-v2-scene-board").click({position:{x:720,y:180}});
   await pause(70);
   const afterClick=await page.evaluate(()=>({
     beatId:getActiveStorySceneRuntime()?.beatId||null,
     state:getAcademyKakashiV2TransitionState36040()
   }));
   const singleAdvanceClick=afterClick.beatId===before.beatId&&afterClick.state.cueIndex===before.state.cueIndex+1;
-  assert.strictEqual(singleAdvanceClick,true,"one dialogue click must advance exactly one cue: "+JSON.stringify({before,afterClick}));
+  assert.strictEqual(singleAdvanceClick,true,"one non-interactive stage click must advance exactly one cue: "+JSON.stringify({before,afterClick}));
 
   await page.keyboard.press("Enter");
   await pause(70);
