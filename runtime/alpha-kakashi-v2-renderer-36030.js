@@ -585,7 +585,7 @@ function bind(root){
   root.onclick=e=>{
     if(e.defaultPrevented)return;
     if(e.target&&e.target.closest&&e.target.closest("button,.kv2-actions,.kv2-receipt"))return;
-    if(root.dataset.hasChoices==="true"||root.dataset.canAdvance!=="true")return;
+    if(root.dataset.hasChoices==="true"||root.dataset.canAdvance!=="true"||root.dataset.transitionActive==="true")return;
     const wipe=root.querySelector(".kv2-wipe");if(wipe&&wipe.classList.contains("is-covering"))return;
     globalThis.advanceAcademyKakashiV236040?globalThis.advanceAcademyKakashiV236040():advanceStoryScene();
   };
