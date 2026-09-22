@@ -611,10 +611,10 @@ function groupCollectActorKeys(){
 function groupCollectCues(){
  const s=state(),out=[
   N("ANBU Marked Target remains on the ground."),N("Kakashi looks back the way they came."),N("There are still people waiting behind him."),N("Pakkun follows his eye."),
-  Q("PAKKUN","We're going back."),Q("KAKASHI","I left prisoners behind."),Q("PAKKUN","I noticed."),N("Kakashi draws out the ninja wire."),
-  N("ANBU Marked Target sees it."),Q("ANBU MARKED TARGET","You've been doing this all night?"),N("Kakashi secures his wrists."),Q("KAKASHI","More than I expected."),
-  N("Pakkun gives the wire a look."),Q("PAKKUN","You're going to need more of that."),N("Kakashi checks what remains."),Q("KAKASHI","I know."),
-  N("Pakkun starts down the street."),Q("PAKKUN","Good. I wasn't offering mine."),N("Kakashi looks at him."),N("Pakkun keeps walking.")
+  Q("PAKKUN","We're going back."),Q("KAKASHI","I left people restrained behind me."),Q("PAKKUN","Then don't keep them waiting."),N("Kakashi draws out the ninja wire."),
+  N("ANBU Marked Target sees it."),Q("ANBU MARKED TARGET","You've been doing this all night?"),N("Kakashi secures his wrists."),Q("KAKASHI","It keeps happening."),
+  N("Pakkun gives the wire a brief look, then starts down the street. Kakashi follows with the restraint line."),
+
  ];
  if(s&&s.fieldSecured.includes("PS"))out.push(
   N("Package Smuggler is exactly where Kakashi left him."),N("His eyes move first to Kakashi."),N("Then to ANBU Marked Target under restraint."),N("Then to Pakkun."),
@@ -628,9 +628,9 @@ function groupCollectCues(){
   N("Masked Interceptor is still beneath the Sakura tree."),N("Her attention settles on Kakashi first."),N("Then the restrained people with him."),
   ...(s.fieldSecured.includes("PS")?[N("Package Smuggler notices the look."),Q("PACKAGE SMUGGLER","Don't."),N("Masked Interceptor says nothing."),Q("PACKAGE SMUGGLER","You were going to say something."),Q("MASKED INTERCEPTOR","I didn't need to.")]:[]),
   N("Kakashi removes the line fixing Masked Interceptor to the tree."),N("The restraint around her remains."),N("She joins the escort."),N("Her eyes move to Kakashi."),
-  Q("MASKED INTERCEPTOR","You got all the way back."),Q("KAKASHI","I said I would."),Q("MASKED INTERCEPTOR","No."),N("She looks over the group."),
-  Q("MASKED INTERCEPTOR","You said you'd finish what you started."),N("A moment."),Q("MASKED INTERCEPTOR","This is certainly one interpretation."),
-  N("Kakashi starts walking."),Q("KAKASHI","Keep moving."),N("This time the faint amusement behind her mask is obvious.")
+  Q("MASKED INTERCEPTOR","You came back."),Q("KAKASHI","I said I would."),N("She looks over the group."),
+  Q("MASKED INTERCEPTOR","You weren't finished."),
+  N("Kakashi starts walking."),Q("KAKASHI","Keep moving."),N("She falls in without another comment.")
  );
  return out;
 }
