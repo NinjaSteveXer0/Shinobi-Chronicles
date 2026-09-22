@@ -16,15 +16,16 @@
 
   const MANIFEST=Object.freeze({
     schemaVersion:1,
-    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-D",
+    buildId:"SC-ALPHA-RUNTIME-R303-2026-09-23-E",
     sourceBaselineCommit:"6f0cbca5fb1b38114bc2392eba6b0561aa853b0c",
     sourceRef:"issue-303-runtime-build-fingerprint-v1",
-    runtimeGeneration:"alpha-story-battle-performance-312",
+    runtimeGeneration:"alpha-story-battle-formation-stage-312",
     majorRuntimeFeatures:Object.freeze([
       "academy-kakashi-v2",
       "runtime-ownership-safety-300",
       "post-battle-agency-278",
-      "story-battle-performance-312"
+      "story-battle-performance-312",
+      "battle-formation-stage-319"
     ]),
     productionLoader:"index.html",
     runtimeModule:"runtime/alpha-runtime-build-fingerprint-303.js",
@@ -57,10 +58,10 @@
     const first=getRuntimeBuildFingerprint();
     const second=getRuntimeBuildFingerprint();
     const checks={
-      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-23-D",
+      exactBuildId:first.buildId==="SC-ALPHA-RUNTIME-R303-2026-09-23-E",
       sourceBaselineIsRealSha:/^[0-9a-f]{40}$/.test(first.sourceBaselineCommit),
       sourceRefPresent:first.sourceRef==="issue-303-runtime-build-fingerprint-v1",
-      generationPresent:first.runtimeGeneration==="alpha-story-battle-performance-312",
+      generationPresent:first.runtimeGeneration==="alpha-story-battle-formation-stage-312",
       noPlayerFacingSurface:first.playerFacing===false,
       deterministic:JSON.stringify(first)===JSON.stringify(second),
       immutable:Object.isFrozen(first)&&Object.isFrozen(first.majorRuntimeFeatures)
