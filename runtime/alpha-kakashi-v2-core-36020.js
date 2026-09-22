@@ -207,7 +207,7 @@ function participantReportCues(s,ref){
   const row=s.participants&&s.participants[ref];if(!row||row.state==="UNSEEN")return[];
   const out=[];
   if(ref==="MI"){
-    if(row.state==="DEAD")out.push(Q("KAKASHI","The masked shinobi is dead."));
+    if(row.state==="DEAD")return out;
     else if(row.state==="ESCAPED")out.push(Q("KAKASHI","She got away."),Q("ANBU OPERATIVE","After the fight?"),Q("KAKASHI","Yes."));
     else if(row.state==="FIELD_SECURED_PENDING_COLLECTION")out.push(Q("KAKASHI","She is restrained under the Sakura tree."),Q("ANBU OPERATIVE","Alive?"),Q("KAKASHI","Yes."));
     else if(row.state==="ANBU_CUSTODY")out.push(Q("KAKASHI","You have her."));
@@ -215,7 +215,7 @@ function participantReportCues(s,ref){
     else if(row.state==="RELEASED")out.push(Q("KAKASHI","I let her go."),Q("ANBU OPERATIVE","Deliberately."),Q("KAKASHI","Yes."));
     else if(row.state==="BATTLE_DEFEATED")out.push(Q("KAKASHI","She was alive when I left her."),Q("ANBU OPERATIVE","Restrained?"),Q("KAKASHI","No."));
   }else if(ref==="PS"){
-    if(row.state==="DEAD")out.push(Q("KAKASHI","The receiver is dead."));
+    if(row.state==="DEAD")return out;
     else if(row.state==="ESCAPED"&&s.package.holder==="PS")out.push(Q("KAKASHI","The receiver escaped with the package."),Q("ANBU OPERATIVE","You saw him leave with it."),Q("KAKASHI","Yes."));
     else if(row.state==="ESCAPED")out.push(Q("KAKASHI","The receiver got away."));
     else if(row.state==="FIELD_SECURED_PENDING_COLLECTION")out.push(Q("KAKASHI","He is restrained in the side street."),Q("ANBU OPERATIVE","Location?"),Q("KAKASHI",row.fieldLocation||"The side street."));
@@ -225,7 +225,7 @@ function participantReportCues(s,ref){
     else if(row.state==="BATTLE_DEFEATED")out.push(Q("KAKASHI","He was alive when I left."),Q("ANBU OPERATIVE","Restrained?"),Q("KAKASHI","No."));
   }else if(ref==="AMT"){
     const lostBattle=Object.values(s.battles||{}).some(b=>b&&b.outcome==="defeat"&&String(b.encounterId||"").includes("amt"));
-    if(row.state==="DEAD")out.push(Q("KAKASHI","The original target is dead."));
+    if(row.state==="DEAD")return out;
     else if(row.state==="ESCAPED"&&lostBattle){
       out.push(Q("KAKASHI","He beat me and escaped."));
       if(s.pakkun.present)out.push(Q("PAKKUN","He did."),N("The operative looks at him."),Q("PAKKUN","What? He did."));
@@ -302,7 +302,7 @@ function lethalReportCues(s){
 function dynamicTerminalCues(){
   const s=state();if(!s)return[];
   const cues=[N("Kakashi returns to the rooftop.")];
-  if(s.pakkun.present)cues.push(N("Pakkun arrives with Kakashi and stays off to one side."));
+  if(s.pakkun.present)cues.push(N("If Pakkun is still legitimately present, he arrives with Kakashi and stays off to one side."));
   cues.push(N("The ANBU operative is waiting."),N("He looks at Kakashi."),N("Then at whatever Kakashi actually brought back."),N("A package."),N("A prisoner."),N("Both."),N("Or neither."),Q("ANBU OPERATIVE","Report."));
   cues.push(...packageReportCues(s));
   const deaths=["MI","PS","AMT"].filter(ref=>s.participants[ref]&&s.participants[ref].state==="DEAD").length;
@@ -314,12 +314,12 @@ function dynamicTerminalCues(){
 function minatoPackageCues(s,{lethal=false}={}){
   if(lethal){
     if(s.package.recovered||s.package.returned||s.package.holder==="ANBU")return[Q("MINATO","And the package?"),Q("ANBU OPERATIVE","Recovered by Kakashi."),N("Minato nods once."),Q("MINATO","Then record that separately.")];
-    return[Q("MINATO","And the package?"),N("The operative reports the exact holder and outcome."),N("Minato looks at the lethal history again."),Q("MINATO","Don't let the deaths turn a failed objective into a successful one.")];
+    return[Q("MINATO","And the package?"),N("The operative reports the exact holder/outcome."),N("Minato looks at the lethal history again."),Q("MINATO","Don't let the deaths turn a failed objective into a successful one.")];
   }
   if(s.package.recovered||s.package.returned||s.package.holder==="ANBU")return[
     N("The ANBU operative finishes the factual summary."),N("Minato looks at the package result first."),
     Q("MINATO","He brought it back."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","What did it cost him?"),
-    N("The operative reports the exact Battle, custody and pursuit history.")
+    N("The operative reports the exact Battle/custody/pursuit history.")
   ];
   return[
     N("The ANBU operative finishes the factual summary."),N("Minato looks at the package result first."),
@@ -344,13 +344,13 @@ function lethalMinatoCues(s){
     out.push(Q("MINATO",pair),Q("ANBU OPERATIVE","Yes."));
     const survivor=["MI","PS","AMT"].find(ref=>!dead.includes(ref));
     out.push(Q("MINATO",survivor==="MI"?"The masked shinobi?":survivor==="PS"?"The receiver?":"And the original target?"));
-    if(s.participants[survivor].state==="RELEASED")out.push(Q("MINATO","Then the third result was a different decision."));
+    if(s.participants[survivor].state==="RELEASED")out.push(Q("MINATO","So the third result was a different decision."));
     else if(["ANBU_CUSTODY","POLICE_CUSTODY","FIELD_SECURED_PENDING_COLLECTION"].includes(s.participants[survivor].state))out.push(Q("MINATO","He chose control the third time."));
     else out.push(Q("MINATO","He ran out of opportunity."));
   }else if(dead.length===1){
     const ref=dead[0];
     if(ref==="MI")out.push(Q("MINATO","One confirmed death."),Q("ANBU OPERATIVE","The masked shinobi."),Q("MINATO","And the other two?"),N("Minato reads the sequence, not the total."),Q("MINATO","One death doesn't tell me much by itself."),N("He looks at the chronology."),Q("MINATO","When he chose it does."));
-    else if(ref==="PS")out.push(Q("MINATO","The receiver."),Q("ANBU OPERATIVE","Dead."),Q("MINATO","The package?"),N("The operative gives him the package result, then the fate of the others."),Q("MINATO","Keep those separate."),N("The operative waits."),Q("MINATO","The objective and the death are not the same result."));
+    else if(ref==="PS")out.push(Q("MINATO","The receiver."),Q("ANBU OPERATIVE","Dead."),Q("MINATO","The package?"),Q("MINATO","Keep those separate."),N("The operative waits."),Q("MINATO","The objective and the death are not the same result."));
     else out.push(Q("MINATO","The original target died."),Q("ANBU OPERATIVE","Yes."),Q("MINATO","The others?"),N("Minato looks at the first assignment line in the report."),Q("MINATO","He started the night following that man."),N("The operative waits."),Q("MINATO","And ended it deciding whether he should live."));
   }
   out.push(...minatoPackageCues(s,{lethal:true}));
@@ -603,7 +603,7 @@ function groupCollectCues(){
  );
  if(s&&s.fieldSecured.includes("MI"))out.push(
   N("Masked Interceptor is still beneath the Sakura tree."),N("Her attention settles on Kakashi first."),N("Then the restrained people with him."),
-  ...(s.fieldSecured.includes("PS")?[N("Package Smuggler notices the look."),Q("PACKAGE SMUGGLER","Don't."),N("Masked Interceptor says nothing."),Q("PACKAGE SMUGGLER","You were going to say something."),Q("MASKED INTERCEPTOR","I didn't need to."),N("Pakkun gives Package Smuggler a brief look."),Q("PAKKUN","She really didn't.")]:[]),
+  ...(s.fieldSecured.includes("PS")?[N("Package Smuggler, if present, notices the look."),Q("PACKAGE SMUGGLER","Don't."),N("Masked Interceptor says nothing."),Q("PACKAGE SMUGGLER","You were going to say something."),Q("MASKED INTERCEPTOR","I didn't need to."),N("Pakkun gives Package Smuggler a brief look."),Q("PAKKUN","She really didn't.")]:[]),
   N("Kakashi removes the line fixing Masked Interceptor to the tree."),N("The restraint around her remains."),N("She joins the escort."),N("Her eyes move to Kakashi."),
   Q("MASKED INTERCEPTOR","You got all the way back."),Q("KAKASHI","I said I would."),Q("MASKED INTERCEPTOR","No."),N("She looks over the group."),
   Q("MASKED INTERCEPTOR","You said you'd finish what you started."),N("A moment."),Q("MASKED INTERCEPTOR","This is certainly one interpretation."),
@@ -836,7 +836,6 @@ addBeat("v2_ask_where",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLE
  C("ask_then_demand","DEMAND THE PACKAGE","v2_demand_setup"),
  C("ask_then_take","TAKE HIM DOWN","v2_take_down_setup")
 ]});
-addBeat("v2_demand_setup",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"intercept",cues:[Q("KAKASHI","Give me the package."),N("ANBU Marked Target does not surrender it."),N("The demand becomes a fight without changing package custody before Battle.")],nextBeatId:"v2_battle_demand_amt"});
 addBeat("v2_battle_demand_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Recover the package.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","demand_amt","v2_demand_win","v2_demand_loss","AK_SA_008")});
 addBeat("v2_demand_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("demand_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="AMT";}),cues:[
  N("The alley comes back into focus slowly."),N("Kakashi is on one knee."),N("One hand against the wet stone."),N("His breathing is heavier than he wants it to be."),
@@ -887,8 +886,8 @@ addBeat("v2_take_down_setup",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · 
  N("That matters."),N("The target knows it too."),N("He stops trying to run."),N("Now he has to win it back.")
 ],nextBeatId:"v2_battle_take_down_amt"});
 addBeat("v2_battle_take_down_amt",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Control the target and the neutral package.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake and the ninken face ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","take_down_amt","v2_take_down_win","v2_take_down_loss","AK_SA_008")});
-addBeat("v2_take_down_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("take_down_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="KAKASHI";s.package.recovered=true;s.package.neutral=false;}),cues:[N("Kakashi loses the fight."),N("The result does not rewind the opening intervention."),N("ANBU Marked Target uses the escape window instead of recovering the package."),N("The mission objective remains behind."),N("Kakashi loses the target but recovers the package."),N("Both facts remain true.")],nextBeatId:"v2_report"});
-addBeat("v2_take_down_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("take_down_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;s.package.neutral=false;}),cues:[N("ANBU Marked Target goes down."),N("Pakkun stays between him and the package."),N("Kakashi reaches the objective first."),N("He picks it up from the wet stone and secures it."),N("Then he looks back at the man on the ground.")],choices:[
+addBeat("v2_take_down_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("take_down_amt",ctx,s=>{s.participants.AMT.state="ESCAPED";s.package.holder="KAKASHI";s.package.recovered=true;s.package.neutral=false;}),cues:[N("Kakashi loses the fight.")],nextBeatId:"v2_report"});
+addBeat("v2_take_down_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("take_down_amt",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";s.package.holder="KAKASHI";s.package.recovered=true;s.package.neutral=false;}),cues:[N("ANBU Marked Target goes down.")],choices:[
  C("take_police","BRING HIM TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>dispose("AMT","POLICE")}),
  C("take_release","LET HIM GO","v2_report",{patch:()=>dispose("AMT","RELEASE")}),
  C("take_kill","KILL HIM","v2_report",{patch:()=>dispose("AMT","KILL")}),
