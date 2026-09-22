@@ -214,6 +214,13 @@
   function previewBattlePreparedSkill33000(skillId){
     const actor=getActiveBattleActor33000();
     if(!actor||!skillId||typeof getBattlePreparedSkillDefinition!=="function")return false;
+    // The shared Battle renderer owns SELECT -> TARGET/MODE -> USE/CANCEL.
+    // Once a Skill is selected, this presentation-only hover inspector must not
+    // replace that canonical control surface or it deletes the commit buttons.
+    try{
+      const state=syncBattleActionRegionState();
+      if(state&&state.selectedSkillId)return false;
+    }catch(_error){}
     const skill=getBattlePreparedSkillDefinition(actor,skillId);
     const panel=typeof document!=="undefined"?document.querySelector(".alpha-code-battle-stage .battle-live-skill-details"):null;
     if(!skill||!panel)return false;
@@ -230,7 +237,12 @@
     let selected=null,actor=getActiveBattleActor33000();
     try{const state=syncBattleActionRegionState();selected=actor&&state.selectedSkillId?getBattlePreparedSkillDefinition(actor,state.selectedSkillId):null;}catch(_error){}
     panel.classList.add("battle2-inspector");
-    if(selected){panel.innerHTML=renderInspector33000(selected,actor);return true;}
+    if(selected){
+      // Base Battle render has already rebuilt this panel with its authoritative
+      // target/mode/USE/CANCEL controls. Preserve that DOM verbatim.
+      delete panel.dataset.previewSkillId;
+      return true;
+    }
     panel.innerHTML=`<div class="battle2-inspector-empty"><span>SKILL GUIDE</span><h2>Choose your next move</h2><p>Move your mouse over a Skill to learn what it does. Click the Skill when you are ready to use it.</p><div><b>HOVER</b> Learn &nbsp; · &nbsp; <b>CLICK</b> Use</div></div>`;
     return true;
   }
