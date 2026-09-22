@@ -74,22 +74,29 @@ function state(){
 function save(){try{savePlayerData();}catch(_e){}}
 function mutate(fn){const s=state();if(!s)return{success:false,reason:"kakashi_v2_state_missing"};fn(s);save();return{success:true};}
 function history(label,data={}){return mutate(s=>s.routeHistory.push({label,...data}));}
-function participant(ref,next){return mutate(s=>{s.participants[ref]={...(s.participants[ref]||{}),...next};});}
+function participantKey(ref){
+  if(ref==="AMT"||ref===AMT)return "AMT";
+  if(ref==="PS"||ref===PS)return "PS";
+  if(ref==="MI"||ref===MI)return "MI";
+  return String(ref||"");
+}
+function participant(ref,next){const key=participantKey(ref);return mutate(s=>{s.participants[key]={...(s.participants[key]||{}),...next};});}
 function packageState(holder,{recovered=null,returned=null,neutral=null}={}){return mutate(s=>{s.package.holder=holder;if(recovered!==null)s.package.recovered=!!recovered;if(returned!==null)s.package.returned=!!returned;if(neutral!==null)s.package.neutral=!!neutral;});}
 function setPakkun(present=true){return mutate(s=>{s.pakkun.present=present;s.pakkun.departed=!present;});}
-function addField(ref){return mutate(s=>{if(!s.fieldSecured.includes(ref))s.fieldSecured.push(ref);if(s.participants[ref])s.participants[ref].state="FIELD_SECURED_PENDING_COLLECTION";});}
+function addField(ref){const key=participantKey(ref);return mutate(s=>{if(!s.fieldSecured.includes(key))s.fieldSecured.push(key);if(!s.participants[key])s.participants[key]={state:"AVAILABLE"};s.participants[key].state="FIELD_SECURED_PENDING_COLLECTION";});}
 function dispose(ref,kind){
+  const key=participantKey(ref);
   return mutate(s=>{
-    const row=s.participants[ref]||(s.participants[ref]={});
+    const row=s.participants[key]||(s.participants[key]={});
     if(kind==="KILL")row.state="DEAD";
     else if(kind==="ANBU")row.state="ANBU_CUSTODY";
     else if(kind==="POLICE")row.state="POLICE_CUSTODY";
     else if(kind==="RELEASE")row.state="RELEASED";
-    else if(kind==="FIELD") {row.state="FIELD_SECURED_PENDING_COLLECTION";if(!s.fieldSecured.includes(ref))s.fieldSecured.push(ref);}
+    else if(kind==="FIELD") {row.state="FIELD_SECURED_PENDING_COLLECTION";if(!s.fieldSecured.includes(key))s.fieldSecured.push(key);}
     row.disposition=kind;
   });
 }
-function disposeGroup(kind,refs=[AMT,PS,MI]){return mutate(s=>refs.forEach(ref=>{const row=s.participants[ref]||(s.participants[ref]={});row.disposition=kind;row.state=kind==="KILL"?"DEAD":kind==="ANBU"?"ANBU_CUSTODY":kind==="POLICE"?"POLICE_CUSTODY":"RELEASED";}));}
+function disposeGroup(kind,refs=[AMT,PS,MI]){return mutate(s=>refs.forEach(ref=>{const key=participantKey(ref);const row=s.participants[key]||(s.participants[key]={});row.disposition=kind;row.state=kind==="KILL"?"DEAD":kind==="ANBU"?"ANBU_CUSTODY":kind==="POLICE"?"POLICE_CUSTODY":"RELEASED";}));}
 function getOutcome(key){const s=state();return s&&s.resolvers[key]&&s.resolvers[key].selectedOutcomeRef||null;}
 function battleRow(key){const s=state();return s&&s.battles[key]||null;}
 function battleActions(key){const row=battleRow(key);return row?Number(row.playerActionOpportunityCount)||0:0;}
@@ -134,7 +141,11 @@ const factualDefs={
   {outcomeRef:"PS_PURSUIT_SUCCESS",resultPayloadTemplate:{outcomeClass:"PS_PURSUIT_SUCCESS"}},
   {outcomeRef:"PS_PURSUIT_FAILURE",resultPayloadTemplate:{outcomeClass:"PS_PURSUIT_FAILURE"}}
  ]},
- amtPursuit:{binding:"academy_kakashi.v2.amt_pursuit",outcomes:[
+ amtPursuitAfterMI:{binding:"academy_kakashi.v2.amt_pursuit_after_mi",outcomes:[
+  {outcomeRef:"AMT_PURSUIT_SUCCESS",resultPayloadTemplate:{outcomeClass:"AMT_PURSUIT_SUCCESS"}},
+  {outcomeRef:"AMT_PURSUIT_FAILURE",resultPayloadTemplate:{outcomeClass:"AMT_PURSUIT_FAILURE"}}
+ ]},
+ amtPursuitRoot:{binding:"academy_kakashi.v2.amt_pursuit_root",outcomes:[
   {outcomeRef:"AMT_PURSUIT_SUCCESS",resultPayloadTemplate:{outcomeClass:"AMT_PURSUIT_SUCCESS"}},
   {outcomeRef:"AMT_PURSUIT_FAILURE",resultPayloadTemplate:{outcomeClass:"AMT_PURSUIT_FAILURE"}}
  ]},
@@ -330,13 +341,13 @@ addBeat("v2_group_collect",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA �
 ]});
 
 // Direct AMT pursuit after MI.
-addBeat("v2_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("amtPursuit"),cues:[N("Kakashi chooses the original carrier and closes Package Smuggler's route behind him."),N("Reaching ANBU Marked Target remains a factual pursuit result.")],choices:[
- C("amt_pursuit_success","CONTINUE","v2_amt_direct_intercept",{available:()=>getOutcome("amtPursuit")==="AMT_PURSUIT_SUCCESS"}),
- C("amt_pursuit_failure","CONTINUE","v2_amt_direct_pursuit_fail",{available:()=>getOutcome("amtPursuit")==="AMT_PURSUIT_FAILURE"})
+addBeat("v2_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>resolverEnter("amtPursuitAfterMI"),cues:[N("Kakashi chooses the original carrier and closes Package Smuggler's route behind him."),N("Reaching ANBU Marked Target remains a factual pursuit result.")],choices:[
+ C("amt_pursuit_success","CONTINUE","v2_amt_direct_intercept",{available:()=>getOutcome("amtPursuitAfterMI")==="AMT_PURSUIT_SUCCESS"}),
+ C("amt_pursuit_failure","CONTINUE","v2_amt_direct_pursuit_fail",{available:()=>getOutcome("amtPursuitAfterMI")==="AMT_PURSUIT_FAILURE"})
 ]});
 addBeat("v2_amt_direct_pursuit_fail",{backdrop:B.alleyAlt,location:"KONOHA · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"pursuit",onEnter:()=>mutate(s=>{s.participants.AMT.state="ESCAPED";s.participants.PS.state="ESCAPED";}),cues:[N("ANBU Marked Target breaks the pursuit."),N("Kakashi reaches the next route too late."),N("Package Smuggler's route was closed by the choice to pursue the first man."),N("There is nobody left within reach.")],nextBeatId:"v2_report"});
 addBeat("v2_amt_direct_intercept",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"intercept",onEnter:()=>setPakkun(true),cues:[N("ANBU Marked Target rounds the next corner."),N("A small ninken blocks the remaining exit."),Q("PAKKUN","This yours?"),Q("KAKASHI","Apparently."),N("Kakashi never gives Pakkun a name and Pakkun never gives Kakashi one."),N("The target shifts his weight toward an exit."),N("Kakashi and the ninken close the geometry around him.")],nextBeatId:"v2_battle_amt_direct_pakkun"});
-addBeat("v2_battle_amt_direct_pakkun",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake with temporary Story-authorised Pakkun vs ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_amt_1v1","amt_direct","v2_amt_missing_win","v2_amt_missing_loss","AK_SA_021")});
+addBeat("v2_battle_amt_direct_pakkun",{mode:"battle_transition",backdrop:B.intercept,location:"KONOHA ALLEYWAY · PL BATTLE",objective:"Secure ANBU Marked Target.",actors:["kakashi","amt","pakkun"],preset:"battle_trio",cues:[N("Kakashi Hatake with temporary Story-authorised Pakkun vs ANBU Marked Target.")],battle:battle("academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","amt_direct","v2_amt_missing_win","v2_amt_missing_loss","AK_SA_021")});
 addBeat("v2_amt_missing_loss",{backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:"Return to ANBU.",actors:["kakashi","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_direct",ctx,s=>{s.participants.AMT.state="ESCAPED";}),cues:[N("ANBU Marked Target breaks Kakashi's control of the fight."),N("He uses the opening to get away."),N("The package remains outside Kakashi's control."),N("Pakkun stays nearby through the connected return.")],nextBeatId:"v2_report"});
 addBeat("v2_amt_missing_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA ALLEYWAY · NIGHT",objective:null,actors:["kakashi","amt","pakkun"],preset:"post_battle",onEnter:ctx=>captureBattle("amt_direct",ctx,s=>{s.participants.AMT.state="BATTLE_DEFEATED";}),cues:[N("The fight ends with ANBU Marked Target on the ground."),N("The package is still missing with Package Smuggler."),N("Package failure and AMT disposition remain separate facts.")],choices:[
  C("amt_missing_kill","KILL HIM","v2_report",{patch:()=>dispose("AMT","KILL")}),
@@ -389,9 +400,9 @@ addBeat("v2_assassin_then_package_setup",{backdrop:B.fight,location:"SAKURA TREE
 // ---------------------------------------------------------------------------
 // GO AFTER ORIGINAL TARGET from WATCH.
 // ---------------------------------------------------------------------------
-addBeat("v2_go_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>{participant("PS",{state:"ESCAPED"});return resolverEnter("amtPursuit");},cues:[N("Kakashi leaves the package holder and commits to the original target."),N("Package Smuggler continues away with the objective."),N("Kakashi's target is the first man now.")],choices:[
- C("go_amt_success","CONTINUE","v2_amt_direct_intercept",{available:()=>getOutcome("amtPursuit")==="AMT_PURSUIT_SUCCESS"}),
- C("go_amt_failure","CONTINUE","v2_amt_direct_pursuit_fail",{available:()=>getOutcome("amtPursuit")==="AMT_PURSUIT_FAILURE"})
+addBeat("v2_go_amt_pursuit_resolver",{mode:"choice",backdrop:B.alleyAlt,location:"KONOHA · PURSUIT",objective:"Catch ANBU Marked Target.",actors:["kakashi","amt"],preset:"pursuit",onEnter:()=>{participant("PS",{state:"ESCAPED"});return resolverEnter("amtPursuitRoot");},cues:[N("Kakashi leaves the package holder and commits to the original target."),N("Package Smuggler continues away with the objective."),N("Kakashi's target is the first man now.")],choices:[
+ C("go_amt_success","CONTINUE","v2_amt_direct_intercept",{available:()=>getOutcome("amtPursuitRoot")==="AMT_PURSUIT_SUCCESS"}),
+ C("go_amt_failure","CONTINUE","v2_amt_direct_pursuit_fail",{available:()=>getOutcome("amtPursuitRoot")==="AMT_PURSUIT_FAILURE"})
 ]});
 
 // ---------------------------------------------------------------------------
@@ -553,7 +564,7 @@ function diagnostics(){
   sceneRegistered:!!def,
   exactRootChoices:!!root&&root.choices.map(c=>c.label).join("|")==="WATCH THE EXCHANGE|MOVE IN CLOSER|STRIKE BEFORE THE HANDOFF|SLIP IN FOR THE PACKAGE",
   exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",
-  allTenBattleConfigsReferenced:["academy_kakashi_origin_battle_amt_1v1","academy_kakashi_origin_battle_amt_ps_2v1","academy_kakashi_origin_battle_amt_ps_mi_3v1","academy_kakashi_origin_battle_kakashi_pakkun_vs_amt","academy_kakashi_origin_battle_ps_mi_2v1","academy_kakashi_origin_battle_mi_1v1","academy_kakashi_origin_battle_ps_1v1","academy_kakashi_origin_battle_seq_mi","academy_kakashi_origin_battle_seq_ps","academy_kakashi_origin_battle_seq_amt_pakkun"].every(id=>JSON.stringify(beats).includes(id)),
+  tenBattleConfigsAvailable:!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&Object.keys(globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs||{}).length===10,
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT TO KILL"),
   stableFactualResolver:Object.keys(factualDefs).length>=7,
   noDomOwnership:!String(addBeat).includes("document.")&&!String(resolveFactual).includes("querySelector"),
