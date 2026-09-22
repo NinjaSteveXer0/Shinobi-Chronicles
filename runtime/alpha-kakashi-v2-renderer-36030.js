@@ -175,7 +175,131 @@ function setBackdrop(root,path){
   const value=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
   if(node.style.backgroundImage!==value)node.style.backgroundImage=value;
 }
-function syncActors(root,actors){
+function actorAnchor(actor){
+  const slot=actorSlot(actor);
+  if(slot==="kakashi")return"PLAYER_LEFT";
+  if(slot==="amt")return"INNER_LEFT";
+  if(slot==="ps")return"CENTER";
+  if(slot==="mi")return"OPPONENT_RIGHT";
+  if(slot==="pakkun")return"INNER_LEFT";
+  if(slot==="anbu")return"PLAYER_LEFT";
+  if(slot==="minato")return"OPPONENT_RIGHT";
+  return"CENTER";
+}
+function participantStateForActor(p,actor){
+  const s=p&&p.state||{},slot=actorSlot(actor);
+  if(slot==="mi")return s.participants&&s.participants.MI&&s.participants.MI.state||null;
+  if(slot==="ps")return s.participants&&s.participants.PS&&s.participants.PS.state||null;
+  if(slot==="amt")return s.participants&&s.participants.AMT&&s.participants.AMT.state||null;
+  if(slot==="pakkun")return s.pakkun&&s.pakkun.present===true?"PRESENT":null;
+  return null;
+}
+function readableActorState(p,actor){
+  const raw=participantStateForActor(p,actor);
+  const slot=actorSlot(actor),holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
+  const key=slot==="mi"?"MI":slot==="ps"?"PS":slot==="amt"?"AMT":slot==="kakashi"?"KAKASHI":slot==="anbu"?"ANBU":null;
+  if(key&&holder===key)return"HAS PACKAGE";
+  const map={BATTLE_DEFEATED:"DEFEATED",FIELD_SECURED_PENDING_COLLECTION:"RESTRAINED",ANBU_CUSTODY:"ANBU CUSTODY",POLICE_CUSTODY:"POLICE CUSTODY",ESCAPED:"ESCAPED",RELEASED:"RELEASED",DEAD:"DEAD"};
+  return raw&&map[raw]||null;
+}
+function speakerActorId(p,cue){
+  const name=String(cue&&cue.speakerName||"").toUpperCase();
+  if(!name)return null;
+  const aliases=[
+    [/KAKASHI/,"kakashi"],[/MASKED INTERCEPTOR|INTERCEPTOR/,"mi"],[/PACKAGE SMUGGLER|SMUGGLER/,"ps"],
+    [/ANBU MARKED TARGET|MARKED TARGET/,"amt"],[/PAKKUN/,"pakkun"],[/MINATO|HOKAGE/,"minato"],[/ANBU/,"anbu"]
+  ];
+  const slot=(aliases.find(([re])=>re.test(name))||[])[1]||null;
+  const actor=(p&&p.actors||[]).find(a=>actorSlot(a)===slot);
+  return actor&&actor.id||null;
+}
+function holderSlot(holder){
+  return holder==="AMT"?"amt":holder==="PS"?"ps":holder==="MI"?"mi":holder==="KAKASHI"?"kakashi":holder==="ANBU"?"anbu":null;
+}
+function holderActor(p,holder){
+  const slot=holderSlot(holder);
+  return (p&&p.actors||[]).find(a=>actorSlot(a)===slot)||null;
+}
+function snapshotProjection(p){
+  if(!p)return null;
+  const participants=p.state&&p.state.participants||{};
+  return{
+    id:String(p.id||""),
+    preset:String(p.preset||"standard"),
+    actors:(p.actors||[]).map(a=>({id:String(a.id||""),slot:actorSlot(a),anchor:actorAnchor(a)})),
+    packageHolder:p.state&&p.state.package&&p.state.package.holder||null,
+    participantStates:{MI:participants.MI&&participants.MI.state||null,PS:participants.PS&&participants.PS.state||null,AMT:participants.AMT&&participants.AMT.state||null}
+  };
+}
+function departureMode(previous,next,id){
+  const prev=(previous&&previous.actors||[]).find(a=>a.id===id);
+  const key=prev&&prev.slot==="mi"?"MI":prev&&prev.slot==="ps"?"PS":prev&&prev.slot==="amt"?"AMT":null;
+  const state=key&&next&&next.participantStates&&next.participantStates[key]||null;
+  if(state==="ESCAPED"||state==="RELEASED")return"FLEE";
+  if(state==="DEAD"||state==="BATTLE_DEFEATED")return"COLLAPSE";
+  return"EXIT";
+}
+function prepareDepartureGhosts(root,previous,next){
+  const ghostLayer=root.querySelector(".kv2-ghost-layer"),out=[];
+  if(!ghostLayer||!previous||!next)return out;
+  const nextIds=new Set((next.actors||[]).map(a=>a.id));
+  for(const row of previous.actors||[]){
+    if(nextIds.has(row.id))continue;
+    const live=[...root.querySelectorAll(".kv2-actors > .kv2-actor")].find(n=>n.dataset.actorId===row.id);
+    if(!live)continue;
+    const rr=root.getBoundingClientRect(),rect=live.getBoundingClientRect(),ghost=live.cloneNode(true);
+    const ghostId="departure:"+row.id;
+    ghost.dataset.actorId=ghostId;ghost.classList.add("kv2-departure-ghost");
+    ghost.style.left=(rect.left-rr.left)+"px";ghost.style.top=(rect.top-rr.top)+"px";ghost.style.bottom="auto";
+    ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
+    ghostLayer.appendChild(ghost);
+    out.push({originalId:row.id,ghostId,kind:departureMode(previous,next,row.id)});
+  }
+  return out;
+}
+function syncPackageToken(root,p){
+  const token=root.querySelector('[data-story-object-id="PACKAGE"]');if(!token)return;
+  const holder=p&&p.state&&p.state.package&&p.state.package.holder||null;
+  const actor=holderActor(p,holder);
+  if(!holder||!actor){token.hidden=true;return;}
+  token.hidden=false;token.dataset.packageHolder=String(holder);
+  const finalAnchor=actorAnchor(actor);
+  if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(token,finalAnchor);
+  else token.style.setProperty("--sc-stage-anchor-x","50%");
+  token.dataset.packageAnchor=finalAnchor;
+}
+function deriveProjectionChoreography(root,previous,next,p){
+  if(!previous||!next)return[];
+  const cues=[];
+  const prevIds=new Set((previous.actors||[]).map(a=>a.id));
+  for(const actor of next.actors||[]){
+    if(!prevIds.has(actor.id))cues.push({kind:actor.slot==="mi"?"SURPRISE_ENTRY":"ENTER",actorId:actor.id,fromAnchor:actor.slot==="mi"?"FAR_ENTRY_RIGHT":null});
+  }
+  for(const row of prepareDepartureGhosts(root,previous,next))cues.push({kind:row.kind,actorId:row.ghostId});
+  if(previous.packageHolder&&next.packageHolder&&previous.packageHolder!==next.packageHolder){
+    const from=(previous.actors||[]).find(a=>a.slot===holderSlot(previous.packageHolder));
+    const to=(next.actors||[]).find(a=>a.slot===holderSlot(next.packageHolder));
+    if(from&&to)cues.push({kind:"OBJECT_TRANSFER",objectId:"PACKAGE",fromAnchor:from.anchor,toAnchor:to.anchor});
+  }
+  if(previous.id==="v2_watch_exchange"&&next.id==="v2_stop_assassin_setup"){
+    const kakashi=(p.actors||[]).find(a=>actorSlot(a)==="kakashi"),mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
+    if(kakashi&&mi)cues.push({kind:"FOCUS",actorId:kakashi.id},{kind:"LUNGE",actorId:kakashi.id,targetId:mi.id});
+  }
+  if(next.id==="v2_mi_stop_win"&&next.participantStates.MI==="BATTLE_DEFEATED"){
+    const mi=(p.actors||[]).find(a=>actorSlot(a)==="mi");
+    if(mi)cues.push({kind:"RECOIL",actorId:mi.id},{kind:"COLLAPSE",actorId:mi.id});
+  }
+  return cues;
+}
+function playProjectionTransition(root,previous,next,p){
+  if(typeof playStoryChoreography33900!=="function"||!previous||!next)return{success:true,skipped:true};
+  const cues=deriveProjectionChoreography(root,previous,next,p);
+  const rt=active();
+  const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+next.id+":"+previous.id+"->"+next.id+":"+String(next.packageHolder||"");
+  return playStoryChoreography33900({root,scopeKey,cues});
+}
+
+function syncActors(root,actors,p){
   const box=root.querySelector(".kv2-actors");if(!box)return;
   const desired=Array.isArray(actors)?actors:[];
   box.dataset.count=String(desired.length);
@@ -188,10 +312,13 @@ function syncActors(root,actors){
     const id=String(actor.id||"");
     let node=existing.get(id);
     if(!node){node=actorMarkup(actor);existing.set(id,node);}
-    const img=node.querySelector("img"),label=node.querySelector(".kv2-actor-label");
+    const img=node.querySelector("img"),label=node.querySelector(".kv2-actor-label"),name=label&&label.querySelector("strong"),stateNode=label&&label.querySelector(".kv2-actor-state");
     if(img&&img.getAttribute("src")!==String(actor.image||""))img.setAttribute("src",String(actor.image||""));
-    if(label&&label.textContent!==String(actor.label||""))label.textContent=String(actor.label||"");
+    if(name&&name.textContent!==String(actor.label||""))name.textContent=String(actor.label||"");
+    const stateText=readableActorState(p,actor);
+    if(stateNode){stateNode.hidden=!stateText;if(stateNode.textContent!==String(stateText||""))stateNode.textContent=String(stateText||"");}
     const slot=actorSlot(actor);if(node.dataset.slot!==slot)node.dataset.slot=slot;
+    if(typeof applyStoryStageAnchor33900==="function")applyStoryStageAnchor33900(node,actorAnchor(actor));
     box.appendChild(node);
   }
 }
@@ -216,7 +343,10 @@ function syncStandard(root,p,t){
   const location=root.querySelector(".kv2-location"),objective=root.querySelector(".kv2-objective"),objectiveText=objective&&objective.querySelector("span");
   if(location&&location.textContent!==String(p.location||"KONOHA · NIGHT"))location.textContent=String(p.location||"KONOHA · NIGHT");
   if(objective){objective.style.display=p.objective?"":"none";if(objectiveText&&objectiveText.textContent!==String(p.objective||""))objectiveText.textContent=String(p.objective||"");}
-  syncActors(root,Array.isArray(p.actors)?p.actors:[]);
+  syncActors(root,Array.isArray(p.actors)?p.actors:[],p);
+  syncPackageToken(root,p);
+  const focused=speakerActorId(p,cue);
+  for(const node of root.querySelectorAll(".kv2-actor"))node.classList.toggle("is-focus",!!focused&&node.dataset.actorId===focused);
   const speakerNode=root.querySelector(".kv2-speaker"),progress=root.querySelector(".kv2-progress"),textNode=root.querySelector(".kv2-text");
   if(speakerNode&&speakerNode.textContent!==String(speaker||""))speakerNode.textContent=String(speaker||"");
   const progressText=`${Math.min((Number(t.cueIndex)||0)+1,Math.max(1,Number(t.cueCount)||1))} / ${Math.max(1,Number(t.cueCount)||1)}`;
@@ -242,14 +372,17 @@ function syncReceipt(root,p,t){
 function render(){
   if(rendering||typeof document==="undefined")return false;
   const layer=document.getElementById("story-scene-presentation-layer");
-  if(!isActive()){if(layer){delete layer.dataset.kakashiV2;const stale=document.getElementById(ROOT_ID);if(stale)stale.remove();}return false;}
+  if(!isActive()){if(layer){delete layer.dataset.kakashiV2;const stale=document.getElementById(ROOT_ID);if(stale){if(typeof cancelStoryChoreography33900==="function")cancelStoryChoreography33900(stale,"story_suspended_or_exited");stale.remove();}}if(!active()||active().sceneId!==SCENE_ID)lastProjectionSnapshot=null;return false;}
   if(!layer)return false;
   const p=projection();if(!p)return false;
   rendering=true;
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
+    const previous=lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors)||JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates));
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
+    if(semanticChanged)playProjectionTransition(root,previous,next,p);
+    lastProjectionSnapshot=next;
     bind(root);return true;
   }finally{rendering=false;}
 }
@@ -291,6 +424,11 @@ function diagnostics(){
     stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
     persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
     deterministicActorSlots:String(actorSlot).includes("academy_kakashi_origin_masked_interceptor")&&installStyle.toString().includes('data-slot="minato"'),
+    sharedSemanticAnchors:String(syncActors).includes("applyStoryStageAnchor33900")&&String(actorAnchor).includes("PLAYER_LEFT")&&String(actorAnchor).includes("OPPONENT_RIGHT"),
+    adaptiveActorProminence:installStyle.toString().includes('data-count="1"')&&installStyle.toString().includes('data-count="2"'),
+    sharedChoreographyConsumer:String(playProjectionTransition).includes("playStoryChoreography33900"),
+    packageTokenConsumesHolderTruth:String(syncPackageToken).includes("state.package")&&String(syncPackageToken).includes("packageHolder"),
+    speakerFocusUsesCurrentCue:String(syncStandard).includes("speakerActorId"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     battleSuspendsStoryProjection:String(storySuspendedForBattle).includes("pendingBattle")&&String(storySuspendedForBattle).includes('rc.type==="story_scene"'),
     browserGoldenClaimed:false
@@ -300,6 +438,7 @@ function diagnostics(){
 }
 globalThis.renderAcademyKakashiV236030=render;
 globalThis.setAcademyKakashiV2Wipe36030=setWipe;
+globalThis.playAcademyKakashiV2ProjectionTransition36030=playProjectionTransition;
 globalThis.runAcademyKakashiV2Renderer36030Diagnostics=diagnostics;
 globalThis.runAcademyKakashiV2Geometry36030=geometryDiagnostics;
 globalThis.SC_ACADEMY_KAKASHI_V2_RENDERER_36030=Object.freeze({patchId:PATCH_ID,rootId:ROOT_ID,browserGoldenClaimed:false});
