@@ -177,7 +177,8 @@ function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
   cancelStoryChoreography33900(root,"new_scope");
   root.dataset.scChoreographyScope=scope;
   root.dataset.scChoreographyLastKinds=normalized.map(row=>row.kind).join(",");
-  if(!normalized.length){root.dataset.scChoreographyState="settled";return{success:true,scopeKey:scope,cueCount:0,lastKinds:[],settled:true};}
+  root.dataset.scChoreographyCompletedKinds="";
+  if(!normalized.length){root.dataset.scChoreographyState="settled";return{success:true,scopeKey:scope,cueCount:0,lastKinds:[],completedKinds:[],settled:true};}
   for(const row of normalized){
     if(row.kind!=="ENTER"&&row.kind!=="SURPRISE_ENTRY")continue;
     const actor=storyChoreographyActorNode33900(root,row.actorId);
@@ -197,6 +198,11 @@ function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
     const applied=applyStoryChoreographyCue33900(root,normalized[index]);
     const duration=applied.success?applied.cue.durationMs:0;
     later(()=>{
+      if(applied.success&&applied.cue){
+        const completed=root.dataset.scChoreographyCompletedKinds?root.dataset.scChoreographyCompletedKinds.split(",").filter(Boolean):[];
+        completed.push(applied.cue.kind);
+        root.dataset.scChoreographyCompletedKinds=completed.join(",");
+      }
       if(applied.node){
         applied.node.classList.remove("sc-choreo-"+applied.cue.kind.toLowerCase().replaceAll("_","-"));
         delete applied.node.dataset.scChoreographyActive;
@@ -215,7 +221,8 @@ function playStoryChoreography33900({root,scopeKey,cues=[]}={}){
 function getStoryChoreographyState33900(root){
   const controller=root&&choreographyControllers.get(root);
   const lastKinds=root&&root.dataset&&root.dataset.scChoreographyLastKinds?root.dataset.scChoreographyLastKinds.split(",").filter(Boolean):[];
-  return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled",lastKinds};
+  const completedKinds=root&&root.dataset&&root.dataset.scChoreographyCompletedKinds?root.dataset.scChoreographyCompletedKinds.split(",").filter(Boolean):[];
+  return{active:!!controller,scopeKey:controller&&controller.scopeKey||root&&root.dataset&&root.dataset.scChoreographyScope||null,cueIndex:controller?controller.cueIndex:null,state:root&&root.dataset&&root.dataset.scChoreographyState||"settled",lastKinds,completedKinds};
 }
 
 function requestedAssetIdFromBeat(beat){const ref=beat&&beat.environmentRef;return typeof ref==="string"?ref:ref&&typeof ref==="object"&&ref.assetId?String(ref.assetId):null;}
@@ -436,6 +443,7 @@ function runStorySceneBoard33900Diagnostics(){
     sameScopeDoesNotReplay:String(playStoryChoreography33900).includes("reused:true"),
     entryPreflightPreventsFlash:String(playStoryChoreography33900).includes("scChoreographyPendingEntry")&&installStyle.toString().includes("data-sc-choreography-pending-entry"),
     presentationOnlySubjectCleanup:String(normalizeStoryChoreographyCue33900).includes("removeOnComplete")&&String(playStoryChoreography33900).includes("applied.cue.removeOnComplete"),
+    completionReceipt:String(playStoryChoreography33900).includes("scChoreographyCompletedKinds")&&String(getStoryChoreographyState33900).includes("completedKinds"),
     teardownCancelsChoreography:String(clearBoard).includes("cancelStoryChoreography33900"),
     noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
     authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
