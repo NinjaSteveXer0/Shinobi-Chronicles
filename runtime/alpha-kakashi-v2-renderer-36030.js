@@ -484,6 +484,16 @@ function applyWatchExchangeStaticState(root,p,t){
     token.dataset.packageAnchor="OPPONENT_RIGHT";
   }
 }
+function normalizeCueLocalActorState(root,p){
+  if(!root||!p||p.id==="v2_watch_exchange")return;
+  for(const node of root.querySelectorAll(".kv2-actors > .kv2-actor")){
+    node.classList.remove("kv2-cue-departed");
+    delete node.dataset.kv2CueWithheld;
+    node.hidden=false;
+    node.removeAttribute("aria-hidden");
+    node.style.removeProperty("--sc-choreo-flee-x");
+  }
+}
 function syncSpeech(root,p,cue,focused){
   const speech=root.querySelector(".kv2-speech");if(!speech)return;
   const isDialogue=cue&&cue.kind==="dialogue"&&focused;
@@ -544,6 +554,7 @@ function syncStandard(root,p,t){
   if(location&&location.textContent!==String(p.location||"KONOHA · NIGHT"))location.textContent=String(p.location||"KONOHA · NIGHT");
   if(objective){objective.style.display=p.objective?"":"none";if(objectiveText&&objectiveText.textContent!==String(p.objective||""))objectiveText.textContent=String(p.objective||"");}
   syncActors(root,Array.isArray(p.actors)?p.actors:[],p);
+  normalizeCueLocalActorState(root,p);
   syncPackageToken(root,p);
   applyWatchExchangeStaticState(root,p,t);
   const focused=speakerActorId(p,cue);
@@ -690,6 +701,7 @@ function diagnostics(){
     stageWideAdvanceGuard:String(bind).includes('root.dataset.hasChoices==="true"')&&String(bind).includes("Date.now()-revealed<360"),
     actorLinkedSpeech:String(syncSpeech).includes("--kv2-speech-x")&&installStyle.toString().includes(".kv2-speech"),
     watchCuePerformance:String(playCuePresentation).includes("v2_watch_exchange")&&String(playCuePresentation).includes("SURPRISE_ENTRY")&&String(playCuePresentation).includes('"FLEE"')&&String(playCuePresentation).includes("-30vw"),
+    cueLocalStateCannotLeakAcrossBeats:String(normalizeCueLocalActorState).includes('p.id==="v2_watch_exchange"')&&String(normalizeCueLocalActorState).includes("kv2-cue-departed")&&String(normalizeCueLocalActorState).includes("node.hidden=false"),
     hardTransitionPreservesOutgoingEnvironment:String(setTransitionMemory).includes("kv2-transition-memory")&&installStyle.toString().includes("data-transition-active"),
     fiveChoiceLayoutNoScroll:installStyle.toString().includes("repeat(3,minmax(0,1fr))")&&installStyle.toString().includes("overflow:visible"),
     noMutationObserver:!String(render).includes("MutationObserver"),
