@@ -74,7 +74,12 @@ async function choose(page,label,expected){
   await waitBeat(page,expected);
 }
 async function shot(page,name){
-  await page.locator("#screen-overlay,#story-scene-presentation-layer").first().screenshot({path:path.join(OUT,name)});
+  const visible=page.locator("#kakashi-v2-scene-board:visible,.alpha-code-battle-stage:visible,#story-scene-presentation-layer:visible,#screen-overlay:visible").first();
+  if(await visible.count()){
+    await visible.screenshot({path:path.join(OUT,name),timeout:12000});
+    return;
+  }
+  await page.screenshot({path:path.join(OUT,name),fullPage:false,timeout:12000});
 }
 
 (async()=>{
