@@ -32,6 +32,7 @@ assert(storySource.includes('data-sc-choreography-pending-entry'),"#312 shared S
 assert(storySource.includes("reused:true"),"#312 same-scope Story choreography must not replay on harmless rerender");
 assert(storySource.includes("scChoreographyCompletedKinds")&&storySource.includes("completedKinds"),"#312 shared Story choreography must expose presentation-only completion receipts");
 assert(storySource.includes("removeOnComplete")&&kv2Renderer.includes("removeOnComplete:true"),"#312 departure ghost lifetime must be owned by shared cue completion");
+assert(storySource.includes("var(--sc-choreo-flee-x,22vw)"),"#312 shared FLEE primitive must allow the consuming scene to choose the correct escape direction");
 
 assert(kv2Renderer.includes("playStoryChoreography33900"),"#312 Kakashi must consume shared Story choreography");
 assert(kv2Renderer.includes("applyStoryStageAnchor33900"),"#312 Kakashi must consume shared semantic anchors");
@@ -61,8 +62,11 @@ assert(kv2Renderer.includes("top:-8px")&&kv2Renderer.includes("border-top:1px so
 assert(kv2Renderer.includes("CLICK ANYWHERE TO CONTINUE")&&!kv2Renderer.includes('class="kv2-next"'),"#312 arrow-only continuation must be retired");
 assert(kv2Renderer.includes('root.dataset.hasChoices==="true"')&&kv2Renderer.includes('root.dataset.transitionActive==="true"')&&kv2Renderer.includes("Date.now()-revealed<360"),"#312 choice reveal / cinematic transition must block click-through / accidental commitment");
 assert(kv2Renderer.includes("repeat(3,minmax(0,1fr))")&&kv2Renderer.includes("max-height:none;overflow:visible"),"#312 five-choice desktop layout must not require an internal scrollbar");
-assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes("FAR_ENTRY_LEFT"),"#312 WATCH exchange cue choreography missing");
-assert(kv2Renderer.includes('if(idx<10)mi.dataset.kv2CueWithheld="true"'),"#312 Masked Interceptor must remain visually withheld until her authored reveal cue");
+assert(kv2Renderer.includes('p.id!=="v2_watch_exchange"')&&kv2Renderer.includes("SURPRISE_ENTRY")&&kv2Renderer.includes('kind:"FLEE"'),"#312 WATCH exchange surprise-entry / true-flee choreography missing");
+assert(kv2Renderer.includes("mi.hidden=true")&&kv2Renderer.includes("mi.hidden=false"),"#312 Masked Interceptor must remain hard-withheld until her authored reveal cue");
+assert(kv2Renderer.includes('next.id==="v2_direct_strike_setup"')&&kv2Renderer.includes('kind:"STRIKE"'),"#312 STRIKE BEFORE THE HANDOFF must visibly drive Kakashi into the authored attack");
+assert(kv2Renderer.includes("kv2ActorFall36030")&&kv2Renderer.includes('data-sc-choreography-active="COLLAPSE"')&&kv2Renderer.includes('state==="KILLED"'),"#312 lethal Story departure must visibly fall off-screen and remain forward-compatible with KILLED truth");
+assert(kv2Transition.includes("?650:0"),"#312 hard scene transition must leave enough presentation time for the lethal fall to be visible");
 assert(kv2Renderer.includes("border-radius:16px")&&kv2Renderer.includes("backdrop-filter:blur(8px)"),"#312 modern compact narration/speech styling missing");
 
 assert(kv2Rewards.includes("ensureKakashiV2BattleRewardProjection36015"),"#312 Kakashi reward projection self-heal missing");
@@ -75,12 +79,13 @@ assert(battleSource.includes("installFormationStage33000"),"#312 shared Battle o
 assert(battleSource.includes("getBattleDeploymentParticipant")&&battleSource.includes("deployedFormation33000"),"#312 Formation Stage must consume deployed participant truth");
 assert(battleSource.includes('return peak<=1?"duel":peak>=4?"arc":"wedge"'),"#312 adaptive duel / wedge / arc formation modes missing");
 assert(battleSource.includes('data-formation-mode="duel"] .battle-live-active-card{top:9.5%!important;width:33.5%!important;height:56%!important')&&battleSource.includes('data-formation-mode="duel"] .battle-code-vs{top:28.5%!important;opacity:.55!important'),"#312 sparse duel must use the battlefield confidently without fake support furniture");
+assert(battleSource.includes(".battle-live-power-player{left:33%!important}")&&battleSource.includes(".battle-live-power-enemy{left:67%!important"),"#312 Duel PL rings must sit inward toward the confrontation lane");
 assert(battleSource.includes('"SKILLS"')&&battleSource.includes('"ITEMS"')&&battleSource.includes('"SUMMONS"')&&battleSource.includes("primary.length===3"),"#312 primary action dock must be exactly Skills / Items / Summons");
 assert(battleSource.includes("battle2-formation-withdraw")&&battleSource.includes("invokeBattleWithdrawAction"),"#312 Withdraw semantic action must remain available outside the primary dock");
 assert(battleSource.includes("selectedTargetRef")&&battleSource.includes("formationNodeForRef33000"),"#312 contextual exact-target formation focus missing");
 assert(battleSource.includes("if(state&&state.selectedSkillId)return false")&&battleSource.includes("Preserve that DOM verbatim"),"#312 hover inspector must not replace the canonical selected-Skill action/mode/cancel surface");
-assert(battleSource.includes('stage.dataset.formationTray="closed"'),"#312 action playback must contract the secondary tray");
-assert(battleSource.includes("const played=playedBattlePerformanceKeys33000.has(key)")&&battleSource.includes("if(!played){")&&battleSource.includes("player has deliberately reopened"),"#312 settled performance receipts must not re-close a reopened action tray");
+assert(battleSource.includes('const preserveSkills=formationTrayMode33000==="skills"||stage.dataset.formationTray==="skills"')&&battleSource.includes("if(!preserveSkills)"),"#312 committed Skill playback must preserve an already-open Skills tray for fast Battle flow");
+assert(battleSource.includes("const played=playedBattlePerformanceKeys33000.has(key)")&&battleSource.includes("if(!played){"),"#312 settled performance receipts must not replay tray mutations");
 assert(battleSource.includes('data-formation-hidden="true"')||battleSource.includes('dataset.formationHidden="true"'),"#312 undeployed/reserve formation furniture is not being suppressed");
 
 assert(battleSource.includes("resolveBattlePerformanceProjection33000"),"#312 shared Battle performance projection missing");
