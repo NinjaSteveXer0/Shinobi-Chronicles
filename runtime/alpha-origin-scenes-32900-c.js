@@ -4,43 +4,10 @@
 const A=globalThis.SC_ALPHA_ORIGIN_32900;if(!A)throw new Error("alpha_origin_32900_core_required");
 const C=A.choice.bind(A),R=A.commitRequest.bind(A),X=A.completionRequest.bind(A);
 
-// Kakashi — restricted Academy packet retrieval. No Sharingan, no Chidori.
-(()=>{
-  const occ="occ_origin_kakashi_anbu_retrieval_resolution",scene=A.sceneByVariant.academy_kakashi;
-  const intelligence=ctx=>ctx.kakashiFirstChoice==="shadow_the_clerk"?"high":ctx.kakashiFirstChoice==="question_the_clerk"?"mixed":"low";
-  const result=R("kakashi_retrieval_resolution_32900","academy_kakashi",occ,ctx=>({
-    packageDisposition:ctx.kakashiRetrievalChoice==="secure_package"?"secured":"lost",
-    packageInstanceRef:"kakashi_origin_outer_route_packet",
-    retrievalIntelligenceClass:intelligence(ctx),
-    observerKnowledgeBasis:ctx.kakashiFirstChoice||null,
-    qualifyingParticipantOrCustodyInteractionOccurred:true,
-    participantRefs:["kakashi_origin_logistics_clerk","kakashi_origin_information_broker","kakashi_origin_outer_route_packet","kakashi_origin_decoy_assassin_01"],
-    custodyFacts:["logistics_clerk_initial_holder","broker_receives_during_illicit_exchange",ctx.kakashiRetrievalChoice==="secure_package"?"broker_transfers_to_kakashi":"kakashi_leaves_confirmed_packet_position_and_packet_is_lost"]
-  }),["KAK-01","KAK-02","KAK-03"],{participantRefs:["kakashi_origin_logistics_clerk","kakashi_origin_information_broker","kakashi_origin_decoy_assassin_01"],sourceRefs:[{type:"world_object",id:"kakashi_origin_outer_route_packet"}]});
-  A.register({sceneId:scene,eventId:scene,title:"ACADEMY KAKASHI",entryBeatId:"kak_brief",participants:[],beats:[
-    {beatId:"kak_brief",mode:"dialogue",speakerName:"ACADEMY EVALUATOR",text:"Recover the packet. Bring back what you can prove, not what you assume.",nextBeatId:"kak_clerk"},
-    {beatId:"kak_clerk",mode:"choice",text:"Kakashi identifies the logistics clerk moving with the sealed packet.",choices:[
-      C("shadow_the_clerk","Stay unseen. Watch the transfer.","kak_exchange",{kakashiFirstChoice:"shadow_the_clerk"}),
-      C("question_the_clerk","Step in now. Make him explain the route.","kak_exchange",{kakashiFirstChoice:"question_the_clerk"}),
-      C("cut_ahead","Bypass him. Predict where the packet is going.","kak_exchange",{kakashiFirstChoice:"cut_ahead"})]},
-    {beatId:"kak_exchange",mode:"narration",presentationResolver:()=>{
-      const route=A.local().kakashiFirstChoice;
-      if(route==="shadow_the_clerk")return{text:"Kakashi stays unseen long enough to personally witness the clerk transfer the packet to an information broker. A decoy-assassin pressure event and an apparent-carrier movement now destabilise the retrieval."};
-      if(route==="question_the_clerk")return{text:"The clerk's answers and movement give Kakashi mixed but useful intelligence. The retrieval grows unstable as a decoy-assassin pressure event and an apparent-carrier movement compete for his attention."};
-      return{text:"Kakashi cuts ahead using prediction rather than pretending he saw the full custody chain. At the retrieval point, a decoy-assassin pressure event and an apparent-carrier movement create competing responsibilities."};
-    },nextBeatId:"kak_choice"},
-    {beatId:"kak_choice",mode:"choice",text:"Which responsibility does Kakashi prioritise?",choices:[
-      C("secure_package","Stay on the confirmed packet. Secure it from the broker.","kak_debrief",{kakashiRetrievalChoice:"secure_package"}),
-      C("fight_assassin","Stop the assassin first.","kak_choice",null,{availability:A.unavailableBattle(scene,"The nested decoy-assassin Battle needs an exact production opposition entry. Battle victory will not be fabricated as packet custody.")}),
-      C("pursue_apparent_carrier","Follow the apparent carrier before he disappears.","kak_debrief",{kakashiRetrievalChoice:"pursue_apparent_carrier"})]},
-    {beatId:"kak_debrief",mode:"narration",text:"The Academy debrief separates package disposition, retrieval intelligence, Battle result if any, and the actual custody chain.",onEnterConsequences:[result],nextBeatId:"kak_reflect"},
-    {beatId:"kak_reflect",mode:"choice",text:"What does Kakashi think mattered most?",choices:[
-      C("objective","Recovering the objective.","kak_sakumo",{kakashiReflection:"objective"}),
-      C("proof","Knowing what I could prove.","kak_sakumo",{kakashiReflection:"proof"}),
-      C("responsibility","Knowing which responsibility was mine.","kak_sakumo",{kakashiReflection:"responsibility"})]},
-    {beatId:"kak_sakumo",mode:"narration",text:"At the Hatake threshold, living Sakumo can tell Kakashi is replaying the assessment. The quiet end beat preserves Kakashi's own interpretation without inventing a permanent Personality rewrite.",exitScene:true}
-  ],onCompleteConsequences:[X("academy_kakashi",[occ])]});
-})();
+// Academy Kakashi is intentionally not registered here.
+// The legacy implementation was retired for the clean-room V2 rebuild.
+// The stable academy_kakashi identity/scene mapping remains reserved in 32900-core,
+// while the dispatcher fails closed until V2 registers its fresh scene package.
 
 // Obito — five independent diversions plus factual formal-training entitlement.
 (()=>{
