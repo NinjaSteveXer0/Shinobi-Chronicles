@@ -218,3 +218,27 @@ The installed-browser Golden test currently asserts those direct transition targ
 This Writing pass therefore does **not** insert new intermediate route beats.
 
 Where an immediate post-choice choreography beat is later desired, Coding / Runtime must change that route topology and its Golden expectations together. That is a presentation/choreography follow-up, not an unresolved Story fact.
+
+
+## Character-anchor reinforcement — 2026-09-22
+
+The dialogue-quality pass now has an explicit mandatory character preflight:
+
+`Documentation/Story/Academy_Kakashi_Active_Cast_Character_Voice_and_Personality_Anchors_2026-09-22.md`
+@ `4b2f25f3802da8b0a3d6e1e34696e81353d8da0f`
+
+The general registry reinforcement is:
+`Documentation/Story/Character_Personality_and_Voice_Profile_Registry_2026-09-19.md`
+@ `9dcfd72efe741bf23ea81bef2bcd1b50ffe070bd`.
+
+Before substantial dialogue finalisation:
+- refresh/build every materially speaking recurring character anchor;
+- research canon age/era and behavioural range for established characters;
+- apply SC Recorded History after canon;
+- preserve recurring original-NPC anchors durably;
+- remove speaker names and run the speaker-fingerprint test;
+- run the plot-puppet test;
+- reject shared project house voice even when the lines are individually competent.
+
+The live Kakashi V2 dialogue was re-passed under these anchors through commit:
+`d1d42febfc2f7835365ad2cbd7a5de0b70dde536`.
