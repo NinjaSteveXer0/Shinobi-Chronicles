@@ -13,6 +13,7 @@ const PATCH_ID="academy_kakashi_v2_core_36020_2026_09_22";
 const SCENE_ID="origin_academy_kakashi_anbu_retrieval";
 const ORIGIN_ID="academy_kakashi";
 const AMT="academy_kakashi_origin_amt",PS="academy_kakashi_origin_package_smuggler",MI="academy_kakashi_origin_masked_interceptor",PAKKUN="pakkun_origin_unfamiliar_ninken";
+const STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS=3;
 const D=globalThis.SC_STORY_DECISION_REALISATION_34000;
 const F=globalThis.SC_STORY_FACTUAL_RESOLVER_34600;
 if(!D||!F)throw new Error("kakashi_v2_requires_story_decision_and_factual_resolver");
@@ -310,15 +311,15 @@ addBeat("v2_mi_stop_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",obje
 ],nextBeatId:"v2_report"});
 
 addBeat("v2_mi_stop_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:({state:s})=>{
- const fast=battleActions("mi_stop")<=3;
+ const fast=battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS;
  return fast?[N("Masked Interceptor hits the stone beneath the Sakura tree."),N("Kakashi lands a few steps away."),N("For a moment, the street is still."),N("Then his eye moves past her."),N("Toward the routes the others took."),N("Package Smuggler cuts across the far end of the street."),N("Still moving."),N("The package is still with him."),N("Higher up, movement flashes across a distant roofline."),N("ANBU Marked Target."),N("Farther away."),N("But not gone."),N("Not yet."),N("Three problems."),N("Not enough time for all of them at once.")]:
  [N("The street ahead is empty."),N("Kakashi searches the rooftops."),N("The alleys."),N("The next junction."),N("Nothing."),N("Package Smuggler had too much time."),N("The package is gone with him."),N("ANBU Marked Target is gone as well."),N("The pursuit is over."),N("What happens to Masked Interceptor is the only decision left here.")];
 },choices:[
- C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=3,patch:()=>history("PURSUE_PS_AFTER_MI")}),
+ C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>history("PURSUE_PS_AFTER_MI")}),
  C("mi_kill","KILL HER","v2_report",{patch:()=>{dispose("MI","KILL");history("KILL_MI");}}),
  C("mi_anbu","TAKE HER BACK TO ANBU","v2_report",{patch:()=>{dispose("MI","ANBU");history("MI_TO_ANBU");}}),
  C("mi_police","TAKE HER TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("MI","POLICE");history("MI_TO_POLICE");}}),
- C("mi_restrain","RESTRAIN HER AND CONTINUE","v2_mi_restrained_next",{available:()=>battleActions("mi_stop")<=3,patch:()=>{addField("MI");history("RESTRAIN_MI_CONTINUE");}})
+ C("mi_restrain","RESTRAIN HER AND CONTINUE","v2_mi_restrained_next",{available:()=>battleActions("mi_stop")<=STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS,patch:()=>{addField("MI");history("RESTRAIN_MI_CONTINUE");}})
 ]});
 addBeat("v2_mi_restrained_next",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",cues:[N("Kakashi takes out the ninja wire."),N("Wire Snare becomes a physical restraint after the Battle, not a hidden Battle-finisher requirement."),N("Masked Interceptor is field-secured at the Sakura tree."),N("Package Smuggler is the only pursuit still within reach from this route.")],choices:[
  C("restrained_mi_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{patch:()=>history("PURSUE_PS_AFTER_RESTRAIN_MI")}),
@@ -634,7 +635,7 @@ function diagnostics(){
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT TO KILL"),
   stopAssassinUsesDirectMiConfig:!!def&&def.beatMap.get("v2_battle_mi_stop")?.battle?.encounterId==="academy_kakashi_origin_battle_mi_1v1",
   stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),
-  stopAssassinThreeActionGate:String(def&&def.beatMap.get("v2_mi_stop_win")?.choices?.find(c=>c.label==="GO AFTER PACKAGE SMUGGLER")?.availability||"").includes("<=3"),
+  stopAssassinThreeActionGate:STOP_ASSASSIN_PS_CATCHUP_MAX_ACTIONS===3,
   stableFactualResolver:Object.keys(factualDefs).length>=7,
   noDomOwnership:!String(addBeat).includes("document.")&&!String(resolveFactual).includes("querySelector"),
   terminalRewardsCommittedAtReceipt:String(commitTerminalRewardsAtReceipt).includes("commitAcademyKakashiV2TerminalRewards36015"),
