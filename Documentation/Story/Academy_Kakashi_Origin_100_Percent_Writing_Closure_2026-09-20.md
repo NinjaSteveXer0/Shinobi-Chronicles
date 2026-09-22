@@ -1,5 +1,23 @@
 # Academy Kakashi Origin — 100% Writing Closure
 
+> **2026-09-22 PLAYER-FACING EXPRESSION SUCCESSOR**  
+> Route/semantic closure in this document remains binding.
+>
+> Current player-facing narration, dialogue, character interaction and debrief performance are additionally governed by:
+> `Documentation/Story/Academy_Kakashi_Player_Facing_Story_Dialogue_Quality_Pass_2026-09-22.md`
+> @ `fdecd05b30befc6ca318742f3e9e5c8481f57a22`.
+>
+> Current live V2 expression implementation has been rewritten under that authority without changing route outcomes, choices, Battle results, custody, Knowledge, rewards or chronology.
+>
+> Runtime expression lineage:
+> - content catalogue rewrite: `02d544ed1c7261a9177a23cb2ff09a8043c5a4d0`;
+> - live consumed scene polish: `519bc52486fb60760965104a19cb197b9bb213d3`;
+> - dynamic ANBU / Minato rewrite: `3cb5416509ad682e5573608ece58d8611fc1d153`;
+> - rules-language cleanup: `a7a31ff82db2df2ce1d360390b154afb726a7644`;
+> - final 30-beat live inline performance pass: `6be81a79bdb6d24386211c5da8c4e92c719dd493`.
+>
+> Older delegated/derived wording is expression-superseded where the live V2 quality pass differs. Explicit Stephen-locked dialogue and exact choice labels remain protected.
+
 **Date:** 2026-09-20  
 **Owner:** Stephen / Writing / Story — Konoha  
 **Status:** **CURRENT AUTHORITATIVE WRITING CLOSURE — 100% CURRENT ROUTE / VARIATION COVERAGE**  
