@@ -11,7 +11,7 @@ const scenes=new Map();
 const factualDefinitions=new Map();
 let factualOutcomes={};
 let activeRuntime=null;
-let completionCalls=0;
+let completionCalls=0,scenarioSequence=0;
 
 const D={
   openSemanticChoiceSet:spec=>({success:true,choiceSet:{choiceSetId:`qa:${spec.decisionPointRef}`}}),
@@ -104,7 +104,7 @@ assert.strictEqual(cycle,null,`unexpected Kakashi V2 route cycle: ${cycle&&cycle
 
 assert.strictEqual(def.beats.filter(b=>b.exitScene===true).length,1,"Kakashi V2 must have one semantic exit");
 assert.strictEqual(def.beats.find(b=>b.exitScene===true).beatId,"v2_complete");
-assert.strictEqual(def.beats.length,99,"unexpected Kakashi V2 beat count");
+assert.strictEqual(def.beats.length,98,"unexpected Kakashi V2 beat count after retiring the illegal direct post-STOP AMT fork");
 
 // ---------------------------------------------------------------------------
 // Scenario driver: execute authored state consequences rather than merely parse
@@ -113,7 +113,7 @@ assert.strictEqual(def.beats.length,99,"unexpected Kakashi V2 beat count");
 function reset(forced={}){
   factualOutcomes={...forced};
   activeRuntime={
-    sceneId:SCENE_ID,instanceId:`qa_origin_${Math.random().toString(36).slice(2)}`,
+    sceneId:SCENE_ID,instanceId:`qa_origin_${++scenarioSequence}`,
     beatId:def.entryBeatId,localContext:{},battleResume:null
   };
   enter(def.entryBeatId);
