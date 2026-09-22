@@ -345,11 +345,16 @@ if(PRE_HIDE){
   };
   try{hideStoryScenePresentationLayer=globalThis.hideStoryScenePresentationLayer;}catch(_error){}
 }
-if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function storySceneBoard33900RenderWrapper(){
-  const result=PRE_RENDER.apply(this,arguments);
-  if(storyPresentationBattleSuspended33900()){markStoryPresentationHidden33900("caller_owned_battle");return result;}
-  clearStoryPresentationHidden33900();renderStorySceneBoard33900();return result;
-};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+let RENDER_WRAPPER_33900=null;
+if(PRE_RENDER){
+  RENDER_WRAPPER_33900=function storySceneBoard33900RenderWrapper(){
+    const result=PRE_RENDER.apply(this,arguments);
+    if(storyPresentationBattleSuspended33900()){markStoryPresentationHidden33900("caller_owned_battle");return result;}
+    clearStoryPresentationHidden33900();renderStorySceneBoard33900();return result;
+  };
+  globalThis.renderStoryScenePresentationLayer=RENDER_WRAPPER_33900;
+  try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}
+}
 
 function reducedMotion(){return storyChoreographyReducedMotion33900();}
 function performSceneCut(){
@@ -403,8 +408,9 @@ function runStorySceneBoard33900Diagnostics(){
     noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
     authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
     battleSuspensionKeepsLayerHidden:
-      String(globalThis.renderStoryScenePresentationLayer).includes("storyPresentationBattleSuspended33900")&&
-      String(globalThis.renderStoryScenePresentationLayer).includes("markStoryPresentationHidden33900")&&
+      typeof RENDER_WRAPPER_33900==="function"&&
+      String(RENDER_WRAPPER_33900).includes("storyPresentationBattleSuspended33900")&&
+      String(RENDER_WRAPPER_33900).includes("markStoryPresentationHidden33900")&&
       String(markStoryPresentationHidden33900).includes("scPresentationHidden")&&
       String(markStoryPresentationHidden33900).includes("style.display")&&
       installStyle.toString().includes("data-sc-presentation-hidden"),
