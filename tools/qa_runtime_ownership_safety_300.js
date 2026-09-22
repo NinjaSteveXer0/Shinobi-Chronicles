@@ -117,6 +117,21 @@ function validateSemanticOwners(registry){
     assertFile(ownerPath(row.owner),`semantic owner ${row.semanticId}`);
   }
 }
+function validateStateWriters(registry){
+  const seen=new Map();
+  const responsibilities=new Set((registry.responsibilities||[]).map(row=>row.responsibilityId));
+  for(const row of registry.stateWriterClaims||[]){
+    assert(row.stateRef&&row.owner&&row.responsibilityId,"state writer row incomplete");
+    if(seen.has(row.stateRef))throw new Error(`duplicate state writer: ${row.stateRef} -> ${seen.get(row.stateRef)} + ${row.owner}`);
+    seen.set(row.stateRef,row.owner);
+    assert(responsibilities.has(row.responsibilityId),`state writer references unknown responsibility: ${row.responsibilityId}`);
+    assertFile(ownerPath(row.owner),`state writer ${row.stateRef}`);
+  }
+  assert(seen.has("activeStorySceneRuntime.localContext.kakashiV2"),"Kakashi V2 semantic state writer missing");
+  assert(seen.has("chronicleOrigin.prologueCompleted"),"Origin completion writer missing");
+  return seen.size;
+}
+
 function validateWrapperChains(registry,reachable){
   for(const row of registry.globalWrapperChains||[]){
     assert(row.symbol&&Array.isArray(row.chain)&&row.chain.length>=1,"global wrapper chain incomplete");
@@ -188,6 +203,15 @@ function runNegativeFixtures(registry){
   assert.throws(()=>validateSemanticOwners(duplicateSemantic),/duplicate semantic owner/);
   results.duplicateSemanticRegistrationRejected=true;
 
+  const duplicateWriter=clone(registry);
+  duplicateWriter.stateWriterClaims.push({
+    stateRef:duplicateWriter.stateWriterClaims[0].stateRef,
+    owner:"runtime/alpha-story-scene-board-33900.js",
+    responsibilityId:"story.scene.presentation.shared"
+  });
+  assert.throws(()=>validateStateWriters(duplicateWriter),/duplicate state writer/);
+  results.duplicateStateWriterRejected=true;
+
   const firstRetired=retiredOwners(registry)[0];
   assert(firstRetired,"negative retired-owner fixture requires at least one retired owner");
   const refs=findRetiredReferences(registry,{"fixture-loader.js":`load "${path.basename(firstRetired)}"`});
@@ -214,6 +238,7 @@ const responsibilityIds=validateResponsibilities(registry,reachable);
 validateAdapters(registry);
 validateSurfaceContracts(registry);
 validateSemanticOwners(registry);
+const stateWriterCount=validateStateWriters(registry);
 validateWrapperChains(registry,reachable);
 const retiredCount=validateRetirement(registry);
 validateDeclarations(declarations,registry);
@@ -235,6 +260,7 @@ console.log(JSON.stringify({
   adapterRetirementMetadata:{status:"GREEN",adapterCount:(registry.adapters||[]).length},
   playerFacingCardinality:{status:"GREEN",browserQa:"tools/qa_kakashi_v2_browser.js"},
   semanticOwnerUniqueness:"GREEN",
+  stateWriterUniqueness:{status:"GREEN",writerCount:stateWriterCount},
   negativeFixtures,
   browserGoldenClaimed:false
 },null,2));
