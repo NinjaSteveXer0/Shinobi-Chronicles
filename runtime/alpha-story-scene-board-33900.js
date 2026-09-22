@@ -212,7 +212,7 @@ function applyBoardBackdrop(stage,runtime=currentRuntime()){
 function installStyle(){
   if(typeof document==="undefined"||!document.head||document.getElementById(STYLE_ID))return false;
   const style=document.createElement("style");style.id=STYLE_ID;style.textContent=`
-#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}
+#story-scene-presentation-layer[data-sc-presentation-hidden="true"]{display:none!important;pointer-events:none!important;}\n#story-scene-presentation-layer[data-sc-scene-board="true"]{background:transparent!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment{z-index:0!important;filter:saturate(1.04) brightness(.94);}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-story-environment-scrim{z-index:1!important;background:linear-gradient(180deg,rgba(2,5,8,.02),rgba(2,5,8,.06) 48%,rgba(2,5,8,.50) 84%,rgba(2,5,8,.76))!important;}
 #story-scene-presentation-layer[data-sc-scene-board="true"] .sc-chronicle-stage{width:min(100vw,calc(100vh * 1.7777778))!important;max-width:none!important;aspect-ratio:16/9!important;overflow:hidden;z-index:2!important;}
@@ -318,8 +318,38 @@ function renderStorySceneBoard33900(){
 }
 function scheduleBoardRender(){if(typeof queueMicrotask==="function")queueMicrotask(renderStorySceneBoard33900);else if(typeof setTimeout==="function")setTimeout(renderStorySceneBoard33900,0);}
 
+const PRE_HIDE=typeof hideStoryScenePresentationLayer==="function"?hideStoryScenePresentationLayer:null;
 const PRE_RENDER=typeof renderStoryScenePresentationLayer==="function"?renderStoryScenePresentationLayer:null;
-if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function storySceneBoard33900RenderWrapper(){const result=PRE_RENDER.apply(this,arguments);renderStorySceneBoard33900();return result;};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
+function markStoryPresentationHidden33900(reason="hidden"){
+  if(typeof document==="undefined")return false;
+  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+  layer.dataset.scPresentationHidden="true";layer.dataset.scPresentationHiddenReason=String(reason);layer.style.display="none";return true;
+}
+function clearStoryPresentationHidden33900(){
+  if(typeof document==="undefined")return false;
+  const layer=document.getElementById("story-scene-presentation-layer");if(!layer)return false;
+  delete layer.dataset.scPresentationHidden;delete layer.dataset.scPresentationHiddenReason;return true;
+}
+function storyPresentationBattleSuspended33900(){
+  try{
+    if(typeof currentOverlayType==="undefined"||currentOverlayType!=="combat")return false;
+    const battle=typeof currentBattle!=="undefined"?currentBattle:null,rc=battle&&battle.returnContext||null;
+    return !!(battle&&rc&&rc.type==="story_scene");
+  }catch(_error){return false;}
+}
+if(PRE_HIDE){
+  globalThis.hideStoryScenePresentationLayer=function storySceneBoard33900HideWrapper(options={}){
+    const result=PRE_HIDE.apply(this,arguments);
+    markStoryPresentationHidden33900(options&&options.preserveRuntime===true?"preserved_runtime_hidden":"hidden");
+    return result;
+  };
+  try{hideStoryScenePresentationLayer=globalThis.hideStoryScenePresentationLayer;}catch(_error){}
+}
+if(PRE_RENDER){globalThis.renderStoryScenePresentationLayer=function storySceneBoard33900RenderWrapper(){
+  const result=PRE_RENDER.apply(this,arguments);
+  if(storyPresentationBattleSuspended33900()){markStoryPresentationHidden33900("caller_owned_battle");return result;}
+  clearStoryPresentationHidden33900();renderStorySceneBoard33900();return result;
+};try{renderStoryScenePresentationLayer=globalThis.renderStoryScenePresentationLayer;}catch(_error){}}
 
 function reducedMotion(){return storyChoreographyReducedMotion33900();}
 function performSceneCut(){
@@ -370,6 +400,8 @@ function runStorySceneBoard33900Diagnostics(){
     boundedChoreographyVocabulary:CHOREOGRAPHY_CLASSES.length===17&&Object.values(CHOREOGRAPHY_DURATION_MS).every(ms=>ms<=650),
     scopedCancellableQueue:String(playStoryChoreography33900).includes("scopeKey")&&String(cancelStoryChoreography33900).includes("cancelled=true"),
     noMutationObserver:OBSERVER_DRIVEN_RENDERING===false,
+    authoritativePresentationHide:!!PRE_HIDE&&String(globalThis.hideStoryScenePresentationLayer).includes("markStoryPresentationHidden33900"),
+    battleSuspensionKeepsLayerHidden:String(globalThis.renderStoryScenePresentationLayer).includes("storyPresentationBattleSuspended33900")&&installStorySceneBoard33900.toString().includes('data-sc-presentation-hidden="true"'),
     wrapsExistingStoryRenderer:!!PRE_RENDER,
     browserGoldenClaimed:false
   };
@@ -389,6 +421,9 @@ globalThis.playStoryChoreography33900=playStoryChoreography33900;
 globalThis.cancelStoryChoreography33900=cancelStoryChoreography33900;
 globalThis.getStoryChoreographyState33900=getStoryChoreographyState33900;
 globalThis.normalizeStoryChoreographyCue33900=normalizeStoryChoreographyCue33900;
+globalThis.markStoryPresentationHidden33900=markStoryPresentationHidden33900;
+globalThis.clearStoryPresentationHidden33900=clearStoryPresentationHidden33900;
+globalThis.storyPresentationBattleSuspended33900=storyPresentationBattleSuspended33900;
 globalThis.runStorySceneBoard33900Diagnostics=runStorySceneBoard33900Diagnostics;
 globalThis.SC_STORY_SCENE_BOARD_33900=Object.freeze({patchId:PATCH_ID,semanticStageAnchors:SEMANTIC_STAGE_ANCHORS,choreographyClasses:CHOREOGRAPHY_CLASSES,browserGoldenClaimed:false});
 try{renderStorySceneBoard33900();}catch(_error){}
