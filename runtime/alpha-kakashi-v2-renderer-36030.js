@@ -75,9 +75,9 @@ function installStyle(){
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 #${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .48s cubic-bezier(.2,.75,.24,1) both}
 #${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}\n#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important}
-#${ROOT_ID} .kv2-actor-ghost.is-falling{animation:kv2ActorFall36030 .54s cubic-bezier(.55,.05,.78,.25) both}
-#${ROOT_ID} .kv2-actor-ghost.is-fleeing{animation:kv2ActorFlee36030 .48s cubic-bezier(.4,.05,.8,.3) both}
-#${ROOT_ID} .kv2-actor-ghost.is-fading{animation:kv2ActorFade36030 .32s ease both}
+#${ROOT_ID} .kv2-actor-ghost.is-falling{will-change:transform,opacity}
+#${ROOT_ID} .kv2-actor-ghost.is-fleeing{will-change:transform,opacity}
+#${ROOT_ID} .kv2-actor-ghost.is-fading{will-change:transform,opacity}
 @keyframes kv2ActorEnter36030{from{opacity:0;transform:translate3d(56px,0,0) scale(.96);filter:brightness(.45) blur(1px)}to{opacity:1;transform:translate3d(0,0,0) scale(1);filter:drop-shadow(0 18px 24px rgba(0,0,0,.48))}}
 @keyframes kv2ActorFall36030{from{opacity:1;transform:translate3d(0,0,0) rotate(0)}to{opacity:0;transform:translate3d(0,118%,0) rotate(5deg)}}
 @keyframes kv2ActorFlee36030{from{opacity:1;transform:translate3d(0,0,0) scale(1)}to{opacity:0;transform:translate3d(135%,0,0) scale(.94)}}
@@ -249,11 +249,14 @@ function prepareDepartureGhosts(root,previous,next){
     if(!live)continue;
     const rr=root.getBoundingClientRect(),rect=live.getBoundingClientRect(),ghost=live.cloneNode(true);
     const ghostId="departure:"+row.id;
-    ghost.dataset.actorId=ghostId;ghost.classList.add("kv2-departure-ghost");
+    const kind=departureMode(previous,next,row.id);
+    ghost.dataset.actorId=ghostId;ghost.classList.add("kv2-departure-ghost","kv2-actor-ghost",kind==="COLLAPSE"?"is-falling":kind==="FLEE"?"is-fleeing":"is-fading");
     ghost.style.left=(rect.left-rr.left)+"px";ghost.style.top=(rect.top-rr.top)+"px";ghost.style.bottom="auto";
     ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
     ghostLayer.appendChild(ghost);
-    out.push({originalId:row.id,ghostId,kind:departureMode(previous,next,row.id)});
+    const cleanup=()=>{try{ghost.remove();}catch(_e){}};
+    ghost.addEventListener("animationend",cleanup,{once:true});setTimeout(cleanup,720);
+    out.push({originalId:row.id,ghostId,kind});
   }
   return out;
 }
@@ -268,14 +271,14 @@ function syncPackageToken(root,p){
   else token.style.setProperty("--sc-stage-anchor-x","50%");
   token.dataset.packageAnchor=finalAnchor;
 }
-function deriveProjectionChoreography(root,previous,next,p){
+function deriveProjectionChoreography(root,previous,next,p,departures=[]){
   if(!previous||!next)return[];
   const cues=[];
   const prevIds=new Set((previous.actors||[]).map(a=>a.id));
   for(const actor of next.actors||[]){
     if(!prevIds.has(actor.id))cues.push({kind:actor.slot==="mi"?"SURPRISE_ENTRY":"ENTER",actorId:actor.id,fromAnchor:actor.slot==="mi"?"FAR_ENTRY_RIGHT":null});
   }
-  for(const row of prepareDepartureGhosts(root,previous,next))cues.push({kind:row.kind,actorId:row.ghostId});
+  for(const row of departures)cues.push({kind:row.kind,actorId:row.ghostId});
   if(previous.packageHolder&&next.packageHolder&&previous.packageHolder!==next.packageHolder){
     const from=(previous.actors||[]).find(a=>a.slot===holderSlot(previous.packageHolder));
     const to=(next.actors||[]).find(a=>a.slot===holderSlot(next.packageHolder));
@@ -291,9 +294,9 @@ function deriveProjectionChoreography(root,previous,next,p){
   }
   return cues;
 }
-function playProjectionTransition(root,previous,next,p){
+function playProjectionTransition(root,previous,next,p,departures=[]){
   if(typeof playStoryChoreography33900!=="function"||!previous||!next)return{success:true,skipped:true};
-  const cues=deriveProjectionChoreography(root,previous,next,p);
+  const cues=deriveProjectionChoreography(root,previous,next,p,departures);
   const rt=active();
   const scopeKey=(rt&&rt.instanceId||"kakashi")+":"+next.id+":"+previous.id+"->"+next.id+":"+String(next.packageHolder||"");
   return playStoryChoreography33900({root,scopeKey,cues});
@@ -379,9 +382,10 @@ function render(){
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const previous=lastProjectionSnapshot,next=snapshotProjection(p),semanticChanged=!!previous&&!!next&&(previous.id!==next.id||previous.packageHolder!==next.packageHolder||JSON.stringify(previous.actors)!==JSON.stringify(next.actors)||JSON.stringify(previous.participantStates)!==JSON.stringify(next.participantStates));
+    const departures=semanticChanged?prepareDepartureGhosts(root,previous,next):[];
     const t=cueState();
     if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
-    if(semanticChanged)playProjectionTransition(root,previous,next,p);
+    if(semanticChanged)playProjectionTransition(root,previous,next,p,departures);
     lastProjectionSnapshot=next;
     bind(root);return true;
   }finally{rendering=false;}
