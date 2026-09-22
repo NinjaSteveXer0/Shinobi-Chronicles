@@ -582,9 +582,11 @@ addBeat("v2_amt_seq_win",{mode:"choice",backdrop:B.intercept,location:"KONOHA AL
  C("amt_seq_collect","RESTRAIN HIM AND COLLECT THE OTHERS","v2_group_collect",{available:()=>state().fieldSecured.length>0,patch:()=>{addField("AMT");history("COLLECT_ALL_FIELD_SECURED");}})
 ]});
 function groupCollectActorKeys(){
- const s=state(),keys=["kakashi","amt"];
- if(s&&s.fieldSecured.includes("PS"))keys.push("ps");
+ const s=state(),keys=["kakashi"];
  if(s&&s.fieldSecured.includes("MI"))keys.push("mi");
+ if(s&&s.fieldSecured.includes("PS"))keys.push("ps");
+ keys.push("amt");
+ if(s&&s.pakkun.present)keys.push("pakkun");
  return keys;
 }
 function groupCollectCues(){
@@ -864,7 +866,7 @@ addBeat("v2_pickpocket_3v1_win",{mode:"choice",backdrop:B.fight,location:"SAKURA
 // ---------------------------------------------------------------------------
 // TERMINAL — factual report -> private evaluation -> Receipt -> Origin complete.
 // ---------------------------------------------------------------------------
-addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:["kakashi","anbu"],preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
+addBeat("v2_report",{backdrop:B.rooftop,location:"ANBU REPORT · KONOHA ROOFTOP · NIGHT",objective:"Report to ANBU.",actors:()=>{const s=state();return s&&s.pakkun.present?["kakashi","pakkun","anbu"]:["kakashi","anbu"];},preset:"anbu_report",transition:"wipe",onEnter:()=>mutate(s=>{if(s.package.holder==="KAKASHI"){s.package.holder="ANBU";s.package.returned=true;}s.terminal.reportReached=true;}),onAdvance:()=>mutate(s=>{if(s.pakkun.present){s.pakkun.present=false;s.pakkun.departed=true;}}),cues:()=>dynamicTerminalCues(),nextBeatId:"v2_minato"});
 function commitTerminalRewardsAtReceipt(){
   const s=state(),rt=active();if(!s||!rt)return{success:false,reason:"kakashi_v2_state_missing"};
   s.terminal.receiptReached=true;save();
