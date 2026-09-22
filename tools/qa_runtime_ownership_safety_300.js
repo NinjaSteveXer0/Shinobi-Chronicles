@@ -220,7 +220,7 @@ function runNegativeFixtures(registry){
 
   const duplicateResponsibility=clone(registry);
   duplicateResponsibility.responsibilities.push(clone(duplicateResponsibility.responsibilities[0]));
-  const fakeReachable=new Set(["index.html","game.js",...duplicateResponsibility.productionDynamicChain,"runtime/alpha-traversal-bridge-33200.js","runtime/alpha-alpha-sprint-33100.js"]);
+  const fakeReachable=new Set(["index.html","game.js",...duplicateResponsibility.responsibilities.flatMap(row=>row.productionLoadPath||[])]);
   assert.throws(()=>validateResponsibilities(duplicateResponsibility,fakeReachable),/duplicate responsibilityId/);
   results.duplicateResponsibilityRejected=true;
 
