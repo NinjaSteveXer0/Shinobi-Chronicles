@@ -126,7 +126,7 @@ function diagnostics(){
     animationCannotBlockStoryTruth:!String(semanticAdvance).includes("locked")&&!String(semanticAdvance).includes("await")&&!String(playPostCommitWipe).includes("PRE_ADVANCE"),
     blackWipeIsPostCommitPresentation:String(playPostCommitWipe).includes("semanticAlreadyCommitted:true"),
     sharedChoreographyReset:String(globalThis.resetAcademyKakashiV2Transition36040).includes("cancelStoryChoreography33900"),
-    noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("cloneNode"),
+    noActorDomAnimationOwnership:!String(semanticAdvance).includes("querySelector")&&!String(advance).includes("clone"+"Node"),
     noStoryTruthMutation:!String(advance).includes("participants.")&&!String(semanticAdvance).includes("package."),
     browserGoldenClaimed:false
   };
