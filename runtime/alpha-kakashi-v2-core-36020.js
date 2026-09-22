@@ -296,11 +296,11 @@ addBeat("v2_stop_assassin_setup",{backdrop:B.fight,location:"SAKURA TREE · NIGH
  N("Kakashi moves."),N("Not toward ANBU Marked Target."),N("Not toward the package."),N("Toward Masked Interceptor."),
  N("She is already closing on Package Smuggler when Kakashi drops between them."),N("Package Smuggler sees the opening immediately."),N("He turns and runs."),N("The package goes with him."),
  N("Kakashi does not follow."),N("Masked Interceptor changes direction without hesitation."),N("Her attention settles on Kakashi."),N("He has made himself the obstacle now."),N("She comes straight through him."),N("Kakashi meets her head-on.")
-],nextBeatId:"v2_battle_mi_seq"});
+],nextBeatId:"v2_battle_mi_stop"});
 
-addBeat("v2_battle_mi_seq",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Defeat Masked Interceptor.",actors:["kakashi","mi"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_seq_mi","mi_seq","v2_mi_seq_win","v2_mi_seq_loss","AK_SA_009")});
+addBeat("v2_battle_mi_stop",{mode:"battle_transition",backdrop:B.fight,location:"SAKURA TREE · PL BATTLE",objective:"Defeat Masked Interceptor.",actors:["kakashi","mi"],preset:"battle_pair",cues:[N("Kakashi Hatake vs Masked Interceptor.")],battle:battle("academy_kakashi_origin_battle_mi_1v1","mi_stop","v2_mi_stop_win","v2_mi_stop_loss","AK_SA_009")});
 
-addBeat("v2_mi_seq_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:ctx=>captureBattle("mi_seq",ctx,s=>{s.participants.MI.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[
+addBeat("v2_mi_stop_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Return to ANBU.",actors:["kakashi"],preset:"sakura_kakashi_only",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="ESCAPED";s.participants.PS.state="ESCAPED";s.participants.AMT.state="ESCAPED";s.package.holder="PS";}),cues:[
  N("The opening is small."),N("Masked Interceptor takes it."),N("Kakashi hits the stone beneath the Sakura tree."),N("Before he can recover, she is on him."),
  N("His arm is forced behind his back."),N("His shoulder pinned."),N("Kakashi twists once."),N("She tightens the hold."),N("Enough to stop him."),
  N("Then her attention shifts."),N("Not to Kakashi."),N("Down the street."),N("Toward the route Package Smuggler took."),N("The pressure disappears."),
@@ -309,21 +309,19 @@ addBeat("v2_mi_seq_loss",{backdrop:B.fight,location:"SAKURA TREE · NIGHT",objec
  N("No trail."),N("No one left to follow."),N("The package is beyond his reach now.")
 ],nextBeatId:"v2_report"});
 
-addBeat("v2_mi_seq_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_seq",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:({state:s})=>{
- const fast=battleActions("mi_seq")<=4;
+addBeat("v2_mi_stop_win",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",onEnter:ctx=>captureBattle("mi_stop",ctx,s=>{s.participants.MI.state="BATTLE_DEFEATED";}),cues:({state:s})=>{
+ const fast=battleActions("mi_stop")<=3;
  return fast?[N("Masked Interceptor hits the stone beneath the Sakura tree."),N("Kakashi lands a few steps away."),N("For a moment, the street is still."),N("Then his eye moves past her."),N("Toward the routes the others took."),N("Package Smuggler cuts across the far end of the street."),N("Still moving."),N("The package is still with him."),N("Higher up, movement flashes across a distant roofline."),N("ANBU Marked Target."),N("Farther away."),N("But not gone."),N("Not yet."),N("Three problems."),N("Not enough time for all of them at once.")]:
  [N("The street ahead is empty."),N("Kakashi searches the rooftops."),N("The alleys."),N("The next junction."),N("Nothing."),N("Package Smuggler had too much time."),N("The package is gone with him."),N("ANBU Marked Target is gone as well."),N("The pursuit is over."),N("What happens to Masked Interceptor is the only decision left here.")];
 },choices:[
- C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_seq")<=4,patch:()=>history("PURSUE_PS_AFTER_MI")}),
- C("mi_pursue_amt","GO AFTER ANBU MARKED TARGET","v2_amt_pursuit_resolver",{available:()=>battleActions("mi_seq")<=4,patch:()=>history("PURSUE_AMT_AFTER_MI")}),
+ C("mi_pursue_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{available:()=>battleActions("mi_stop")<=3,patch:()=>history("PURSUE_PS_AFTER_MI")}),
  C("mi_kill","KILL HER","v2_report",{patch:()=>{dispose("MI","KILL");history("KILL_MI");}}),
  C("mi_anbu","TAKE HER BACK TO ANBU","v2_report",{patch:()=>{dispose("MI","ANBU");history("MI_TO_ANBU");}}),
  C("mi_police","TAKE HER TO THE UCHIHA POLICE FORCE","v2_report",{patch:()=>{dispose("MI","POLICE");history("MI_TO_POLICE");}}),
- C("mi_restrain","RESTRAIN HER AND CONTINUE","v2_mi_restrained_next",{available:()=>battleActions("mi_seq")<=4,patch:()=>{addField("MI");history("RESTRAIN_MI_CONTINUE");}})
+ C("mi_restrain","RESTRAIN HER AND CONTINUE","v2_mi_restrained_next",{available:()=>battleActions("mi_stop")<=3,patch:()=>{addField("MI");history("RESTRAIN_MI_CONTINUE");}})
 ]});
-addBeat("v2_mi_restrained_next",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",cues:[N("Kakashi takes out the ninja wire."),N("Wire Snare becomes a physical restraint after the Battle, not a hidden Battle-finisher requirement."),N("Masked Interceptor is field-secured at the Sakura tree."),N("Kakashi looks toward the two routes still within reach.")],choices:[
+addBeat("v2_mi_restrained_next",{mode:"choice",backdrop:B.fight,location:"SAKURA TREE · NIGHT",objective:"Retrieve the package.",actors:["kakashi","mi"],preset:"post_battle",cues:[N("Kakashi takes out the ninja wire."),N("Wire Snare becomes a physical restraint after the Battle, not a hidden Battle-finisher requirement."),N("Masked Interceptor is field-secured at the Sakura tree."),N("Package Smuggler is the only pursuit still within reach from this route.")],choices:[
  C("restrained_mi_ps","GO AFTER PACKAGE SMUGGLER","v2_ps_pursuit_resolver",{patch:()=>history("PURSUE_PS_AFTER_RESTRAIN_MI")}),
- C("restrained_mi_amt","GO AFTER ANBU MARKED TARGET","v2_amt_pursuit_resolver",{patch:()=>history("PURSUE_AMT_AFTER_RESTRAIN_MI")})
 ]});
 
 // PS pursuit after MI.
@@ -634,6 +632,9 @@ function diagnostics(){
   exactWatchChoices:!!watch&&watch.choices.map(c=>c.label).join("|")==="STOP THE ASSASSIN|SECURE THE PACKAGE|SECURE THE PACKAGE BEFORE THE ASSASSIN|DEFEAT THE ASSASSIN, THEN SECURE THE PACKAGE|GO AFTER THE ORIGINAL TARGET",
   tenBattleConfigsAvailable:!!globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010&&Object.keys(globalThis.SC_ACADEMY_KAKASHI_V2_BATTLE_36010.configs||{}).length===10,
   currentLethalLabels:JSON.stringify(beats).includes("KILL HER")&&JSON.stringify(beats).includes("KILL HIM")&&JSON.stringify(beats).includes("KILL THEM")&&!JSON.stringify(beats).includes("ATTEMPT TO KILL"),
+  stopAssassinUsesDirectMiConfig:!!def&&def.beatMap.get("v2_battle_mi_stop")?.battle?.encounterId==="academy_kakashi_origin_battle_mi_1v1",
+  stopAssassinPackageOnlyCatchup:!!def&&def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER PACKAGE SMUGGLER")&&!def.beatMap.get("v2_mi_stop_win")?.choices?.some(c=>c.label==="GO AFTER ANBU MARKED TARGET"),
+  stopAssassinThreeActionGate:String(def&&def.beatMap.get("v2_mi_stop_win")?.choices?.find(c=>c.label==="GO AFTER PACKAGE SMUGGLER")?.availability||"").includes("<=3"),
   stableFactualResolver:Object.keys(factualDefs).length>=7,
   noDomOwnership:!String(addBeat).includes("document.")&&!String(resolveFactual).includes("querySelector"),
   terminalRewardsCommittedAtReceipt:String(commitTerminalRewardsAtReceipt).includes("commitAcademyKakashiV2TerminalRewards36015"),
