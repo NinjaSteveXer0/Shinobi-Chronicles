@@ -11,6 +11,7 @@ on:
       - 'tools/qa_story_factual_resolver_34600.js'
       - 'tools/qa_kakashi_v2_legacy_exclusion.js'
       - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'runtime/alpha-kakashi-v2-rewards-36015.js'
       - 'runtime/alpha-kakashi-v2-core-36020.js'
       - 'runtime/alpha-kakashi-v2-renderer-36030.js'
       - 'runtime/alpha-kakashi-v2-transition-36040.js'
@@ -27,6 +28,7 @@ on:
       - 'tools/qa_story_factual_resolver_34600.js'
       - 'tools/qa_kakashi_v2_legacy_exclusion.js'
       - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'runtime/alpha-kakashi-v2-rewards-36015.js'
       - 'runtime/alpha-kakashi-v2-core-36020.js'
       - 'runtime/alpha-kakashi-v2-renderer-36030.js'
       - 'runtime/alpha-kakashi-v2-transition-36040.js'
@@ -55,6 +57,7 @@ jobs:
           node --check tools/qa_story_factual_resolver_34600.js
           node --check tools/qa_kakashi_v2_legacy_exclusion.js
           node --check runtime/alpha-kakashi-v2-battle-36010.js
+          node --check runtime/alpha-kakashi-v2-rewards-36015.js
           node --check runtime/alpha-kakashi-v2-core-36020.js
           node --check runtime/alpha-kakashi-v2-renderer-36030.js
           node --check runtime/alpha-kakashi-v2-transition-36040.js
