@@ -1,0 +1,109 @@
+name: Issue 312 Story Battle Benchmark
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'runtime/alpha-kakashi-v2-core-36020.js'
+      - 'runtime/alpha-kakashi-v2-renderer-36030.js'
+      - 'runtime/alpha-kakashi-v2-transition-36040.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_312_story_battle_benchmark.js'
+      - 'tools/qa_issue_312_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - '.github/workflows/issue-312-story-battle-benchmark.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'index.html'
+      - 'game.js'
+      - 'runtime/alpha-story-scene-board-33900.js'
+      - 'runtime/alpha-battle-modern-33000.js'
+      - 'runtime/alpha-runtime-build-fingerprint-303.js'
+      - 'runtime/academy-kakashi-v2-content-36000.js'
+      - 'runtime/alpha-kakashi-v2-battle-36010.js'
+      - 'runtime/alpha-kakashi-v2-core-36020.js'
+      - 'runtime/alpha-kakashi-v2-renderer-36030.js'
+      - 'runtime/alpha-kakashi-v2-transition-36040.js'
+      - 'runtime/alpha-traversal-bridge-33200.js'
+      - 'tools/qa_issue_312_story_battle_benchmark.js'
+      - 'tools/qa_issue_312_browser.js'
+      - 'tools/browser_runtime_error_gate_311.js'
+      - 'tools/fixtures/runtime_build_manifest_303.json'
+      - 'tools/fixtures/runtime_responsibility_registry_300.json'
+      - '.github/workflows/issue-312-story-battle-benchmark.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  story-battle-benchmark:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Source and ownership benchmark contract
+        run: |
+          node --check runtime/alpha-story-scene-board-33900.js
+          node --check runtime/alpha-battle-modern-33000.js
+          node --check runtime/alpha-kakashi-v2-renderer-36030.js
+          node --check runtime/alpha-kakashi-v2-transition-36040.js
+          node --check tools/qa_issue_312_story_battle_benchmark.js
+          node tools/qa_issue_312_story_battle_benchmark.js
+          node tools/qa_runtime_ownership_safety_300.js
+
+      - name: Install Playwright Chromium
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local Alpha server
+        run: |
+          python3 -m http.server 8080 > /tmp/issue-312-http.log 2>&1 &
+          echo $! > /tmp/issue-312-http.pid
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/index.html >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/issue-312-http.log
+          exit 1
+
+      - name: Installed-browser Story and Battle benchmark
+        env:
+          ISSUE_312_BASE_URL: http://127.0.0.1:8080/index.html
+          ISSUE_312_BROWSER_OUT: artifacts/issue-312-browser
+        run: xvfb-run -a node tools/qa_issue_312_browser.js
+
+      - name: Preserve server log
+        if: always()
+        run: |
+          mkdir -p artifacts/issue-312-browser
+          cp /tmp/issue-312-http.log artifacts/issue-312-browser/http-server.log || true
+
+      - name: Upload benchmark evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: issue-312-story-battle-browser-evidence
+          path: artifacts/issue-312-browser
+          if-no-files-found: warn
