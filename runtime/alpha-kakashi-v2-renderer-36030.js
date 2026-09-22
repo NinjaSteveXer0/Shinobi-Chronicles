@@ -45,7 +45,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-actors[data-count="4"] .kv2-actor{flex-basis:min(19vw,205px);width:min(19vw,205px);height:min(47vh,345px)}
 #${ROOT_ID} .kv2-actor img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom}
 #${ROOT_ID} .kv2-actor.is-entering{animation:kv2ActorEnter36030 .48s cubic-bezier(.2,.75,.24,1) both}
-#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:12!important;margin:0!important;pointer-events:none!important}
+#${ROOT_ID} .kv2-ghost-layer{position:absolute;inset:0;z-index:12;pointer-events:none;overflow:hidden}\n#${ROOT_ID} .kv2-actor-ghost{position:absolute!important;z-index:1!important;margin:0!important;pointer-events:none!important}
 #${ROOT_ID} .kv2-actor-ghost.is-falling{animation:kv2ActorFall36030 .54s cubic-bezier(.55,.05,.78,.25) both}
 #${ROOT_ID} .kv2-actor-ghost.is-fleeing{animation:kv2ActorFlee36030 .48s cubic-bezier(.4,.05,.8,.3) both}
 #${ROOT_ID} .kv2-actor-ghost.is-fading{animation:kv2ActorFade36030 .32s ease both}
@@ -69,7 +69,7 @@ function installStyle(){
 #${ROOT_ID} .kv2-receipt span{display:block;color:#64dae3;font-size:9px;font-weight:900;letter-spacing:.16em}
 #${ROOT_ID} .kv2-receipt h1{margin:9px 0 18px;color:#e5c66f;font:900 clamp(21px,2.1vw,34px)/1 Georgia,serif;letter-spacing:.05em}
 #${ROOT_ID} .kv2-receipt pre{margin:0;white-space:pre-wrap;color:#e1e6e1;font:600 clamp(11px,.83vw,14px)/1.65 inherit}
-#${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
+#${ROOT_ID}[data-preset="chronicle_receipt"] .kv2-receipt{display:block}\n#${ROOT_ID} .kv2-receipt button{margin-top:24px;width:100%;min-height:40px;border:1px solid rgba(95,215,225,.42);background:rgba(7,33,39,.72);color:#78dfe7;font-weight:900;letter-spacing:.1em;cursor:pointer}
 #${ROOT_ID} .kv2-wipe{position:absolute;inset:0;z-index:999;background:#000;opacity:0;pointer-events:none;transition:opacity .22s ease}
 #${ROOT_ID} .kv2-wipe.is-covering{opacity:1;pointer-events:auto}
 @media(max-width:900px){#${ROOT_ID} .kv2-actors{left:1.5%;right:1.5%;gap:12px;bottom:31%}#${ROOT_ID} .kv2-actor{width:min(25vw,190px);height:min(46vh,300px)}#${ROOT_ID} .kv2-dialogue{left:3%;right:3%;bottom:2.5%;max-height:26%;min-height:22%}#${ROOT_ID} .kv2-top{left:2.5%;right:2.5%;grid-template-columns:1fr minmax(190px,42%)}}
@@ -88,21 +88,105 @@ function availableChoices(){
   }catch(_e){return[];}
 }
 function actorMarkup(actor){
-  return `<figure class="kv2-actor" data-actor-id="${esc(actor.id)}"><div class="kv2-card-frame"></div><img src="${esc(actor.image)}" alt=""><figcaption class="kv2-actor-label">${esc(actor.label)}</figcaption></figure>`;
+  const figure=document.createElement("figure");
+  figure.className="kv2-actor";
+  figure.dataset.actorId=String(actor.id||"");
+  const frame=document.createElement("div");frame.className="kv2-card-frame";
+  const img=document.createElement("img");img.alt="";img.src=String(actor.image||"");
+  const label=document.createElement("figcaption");label.className="kv2-actor-label";label.textContent=String(actor.label||"");
+  figure.append(frame,img,label);
+  return figure;
 }
 function ensureRoot(layer){
   let root=document.getElementById(ROOT_ID);
-  if(!root){root=document.createElement("section");root.id=ROOT_ID;root.setAttribute("aria-label","Academy Kakashi Origin scene");layer.appendChild(root);}
+  if(root)return root;
+  root=document.createElement("section");root.id=ROOT_ID;root.setAttribute("aria-label","Academy Kakashi Origin scene");
+  root.innerHTML=`
+    <div class="kv2-backdrop"></div>
+    <div class="kv2-scrim"></div>
+    <div class="kv2-frame"></div>
+    <header class="kv2-top"><div class="kv2-location"></div><div class="kv2-objective"><b>OBJECTIVE</b><span></span></div></header>
+    <div class="kv2-actors"></div>
+    <section class="kv2-dialogue" aria-live="polite">
+      <div class="kv2-speaker"></div><div class="kv2-progress"></div><div class="kv2-text"></div>
+      <div class="kv2-actions"></div><button class="kv2-next" type="button" data-kv2-advance="true" aria-label="Continue">›</button>
+    </section>
+    <article class="kv2-receipt"><span>SHINOBI CHRONICLES · RECORD</span><h1>CHRONICLE RECEIPT</h1><pre></pre><button type="button" data-kv2-advance="true">CONTINUE</button></article>
+    <div class="kv2-ghost-layer" aria-hidden="true"></div>
+    <div class="kv2-wipe"></div>`;
+  layer.appendChild(root);
   return root;
 }
 function currentCue(p,t){
   const cues=p&&Array.isArray(p.cues)?p.cues:[];if(!cues.length)return{kind:"narration",text:""};
   return cues[Math.max(0,Math.min(cues.length-1,Number(t.cueIndex)||0))]||cues[0];
 }
-function renderReceipt(root,p,t){
-  const cue=currentCue(p,t);
-  const atEnd=t.atEnd===true;
-  root.innerHTML=`<div class="kv2-backdrop" style="background-image:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.72)),url(&quot;${esc(p.backdrop)}&quot;)"></div><div class="kv2-scrim"></div><div class="kv2-frame"></div><article class="kv2-receipt"><span>SHINOBI CHRONICLES · RECORD</span><h1>CHRONICLE RECEIPT</h1><pre>${esc(cue.text||"")}</pre>${atEnd?'<button type="button" data-kv2-advance="true">CONTINUE</button>':'<button type="button" data-kv2-advance="true">CONTINUE</button>'}</article><div class="kv2-wipe"></div>`;
+function setBackdrop(root,path){
+  const node=root.querySelector(".kv2-backdrop");if(!node)return;
+  const safe=String(path||"").replace(/\\/g,"\\\\").replace(/"/g,'\\"');
+  const value=`linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url("${safe}")`;
+  if(node.style.backgroundImage!==value)node.style.backgroundImage=value;
+}
+function syncActors(root,actors){
+  const box=root.querySelector(".kv2-actors");if(!box)return;
+  const desired=Array.isArray(actors)?actors:[];
+  box.dataset.count=String(desired.length);
+  const keep=new Set(desired.map(a=>String(a.id||"")));
+  for(const node of [...box.querySelectorAll(":scope > .kv2-actor")]){
+    if(!keep.has(String(node.dataset.actorId||"")))node.remove();
+  }
+  const existing=new Map([...box.querySelectorAll(":scope > .kv2-actor")].map(node=>[String(node.dataset.actorId||""),node]));
+  for(const actor of desired){
+    const id=String(actor.id||"");
+    let node=existing.get(id);
+    if(!node){node=actorMarkup(actor);existing.set(id,node);}
+    const img=node.querySelector("img"),label=node.querySelector(".kv2-actor-label");
+    if(img&&img.getAttribute("src")!==String(actor.image||""))img.setAttribute("src",String(actor.image||""));
+    if(label&&label.textContent!==String(actor.label||""))label.textContent=String(actor.label||"");
+    box.appendChild(node);
+  }
+}
+function syncActions(root,actions){
+  const box=root.querySelector(".kv2-actions");if(!box)return;
+  const signature=JSON.stringify(actions||[]);
+  if(box.dataset.signature===signature)return;
+  box.dataset.signature=signature;
+  box.replaceChildren();
+  for(const action of actions||[]){
+    const button=document.createElement("button");button.type="button";
+    if(action.choiceId)button.dataset.kv2Choice=String(action.choiceId);
+    else button.dataset.kv2Advance="true";
+    if(action.battle===true)button.className="kv2-battle";
+    button.textContent=String(action.label||"");
+    box.appendChild(button);
+  }
+}
+function syncStandard(root,p,t){
+  const cue=currentCue(p,t),speaker=cue.kind==="dialogue"?cue.speakerName:(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
+  setBackdrop(root,p.backdrop);
+  const location=root.querySelector(".kv2-location"),objective=root.querySelector(".kv2-objective"),objectiveText=objective&&objective.querySelector("span");
+  if(location&&location.textContent!==String(p.location||"KONOHA · NIGHT"))location.textContent=String(p.location||"KONOHA · NIGHT");
+  if(objective){objective.style.display=p.objective?"":"none";if(objectiveText&&objectiveText.textContent!==String(p.objective||""))objectiveText.textContent=String(p.objective||"");}
+  syncActors(root,Array.isArray(p.actors)?p.actors:[]);
+  const speakerNode=root.querySelector(".kv2-speaker"),progress=root.querySelector(".kv2-progress"),textNode=root.querySelector(".kv2-text");
+  if(speakerNode&&speakerNode.textContent!==String(speaker||""))speakerNode.textContent=String(speaker||"");
+  const progressText=`${Math.min((Number(t.cueIndex)||0)+1,Math.max(1,Number(t.cueCount)||1))} / ${Math.max(1,Number(t.cueCount)||1)}`;
+  if(progress&&progress.textContent!==progressText)progress.textContent=progressText;
+  if(textNode&&textNode.textContent!==String(cue.text||""))textNode.textContent=String(cue.text||"");
+  const choices=t.atEnd?availableChoices():[];
+  const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
+  const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
+  const semanticNext=t.atEnd&&beat&&beat.mode!=="choice"&&beat.mode!=="battle_transition";
+  const actions=choices.length?choices.map(row=>({choiceId:row.choiceId,label:row.label})):battleReady?[{label:"BEGIN PL BATTLE",battle:true}]:[];
+  syncActions(root,actions);
+  const actionBox=root.querySelector(".kv2-actions");if(actionBox)actionBox.style.display=actions.length?"grid":"none";
+  const next=root.querySelector(".kv2-next");if(next)next.style.display=!actions.length&&(!t.atEnd||semanticNext)?"":"none";
+}
+function syncReceipt(root,p,t){
+  setBackdrop(root,p.backdrop);
+  syncActors(root,[]);
+  const cue=currentCue(p,t),pre=root.querySelector(".kv2-receipt pre");
+  if(pre&&pre.textContent!==String(cue.text||""))pre.textContent=String(cue.text||"");
 }
 function render(){
   if(rendering||typeof document==="undefined")return false;
@@ -114,22 +198,7 @@ function render(){
   try{
     installStyle();layer.dataset.kakashiV2="true";const root=ensureRoot(layer);root.dataset.preset=p.preset||"standard";
     const t=cueState();
-    if(p.preset==="chronicle_receipt"){renderReceipt(root,p,t);bind(root);return true;}
-    const cue=currentCue(p,t),speaker=cue.kind==="dialogue"?cue.speakerName:(cue.kind==="record"?"CHRONICLE RECEIPT":"NARRATION");
-    const actors=Array.isArray(p.actors)?p.actors:[];
-    const choices=t.atEnd?availableChoices():[];
-    const beat=typeof getCurrentStorySceneBeat==="function"?getCurrentStorySceneBeat():null;
-    const battleReady=t.atEnd&&beat&&beat.mode==="battle_transition";
-    const semanticNext=t.atEnd&&beat&&beat.mode!=="choice"&&beat.mode!=="battle_transition";
-    const actions=choices.length?choices.map(c=>`<button type="button" data-kv2-choice="${esc(c.choiceId)}">${esc(c.label)}</button>`).join(""):battleReady?'<button type="button" class="kv2-battle" data-kv2-advance="true">BEGIN PL BATTLE</button>':"";
-    const nextButton=!actions&&(!t.atEnd||semanticNext)?'<button class="kv2-next" type="button" data-kv2-advance="true" aria-label="Continue">›</button>':"";
-    root.innerHTML=`
-      <div class="kv2-backdrop" style="background-image:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.42)),url(&quot;${esc(p.backdrop)}&quot;)"></div>
-      <div class="kv2-scrim"></div><div class="kv2-frame"></div>
-      <header class="kv2-top"><div class="kv2-location">${esc(p.location||"KONOHA · NIGHT")}</div>${p.objective?`<div class="kv2-objective"><b>OBJECTIVE</b>${esc(p.objective)}</div>`:""}</header>
-      <div class="kv2-actors" data-count="${actors.length}">${actors.map(actorMarkup).join("")}</div>
-      <section class="kv2-dialogue" aria-live="polite"><div class="kv2-speaker">${esc(speaker)}</div><div class="kv2-progress">${Math.min((Number(t.cueIndex)||0)+1,Math.max(1,Number(t.cueCount)||1))} / ${Math.max(1,Number(t.cueCount)||1)}</div><div class="kv2-text">${esc(cue.text||"")}</div>${actions?`<div class="kv2-actions">${actions}</div>`:""}${nextButton}</section>
-      <div class="kv2-wipe"></div>`;
+    if(p.preset==="chronicle_receipt")syncReceipt(root,p,t);else syncStandard(root,p,t);
     bind(root);return true;
   }finally{rendering=false;}
 }
@@ -168,6 +237,8 @@ function diagnostics(){
     protectedDialogueRegion:installStyle.toString().includes("bottom:29%")&&installStyle.toString().includes("bottom:3.7%"),
     receiptReplacesScene:installStyle.toString().includes('[data-preset="chronicle_receipt"] .kv2-top')&&renderReceipt.toString().includes("CHRONICLE RECEIPT"),
     routesDoNotOwnDom:source.includes("getAcademyKakashiV2Presentation36020"),
+    stableKeyedActorDom:!String(syncStandard).includes("innerHTML")&&!String(syncActors).includes("innerHTML")&&String(syncActors).includes("appendChild(node)"),
+    persistentGhostLayer:String(ensureRoot).includes("kv2-ghost-layer"),
     noMutationObserver:!String(render).includes("MutationObserver"),
     browserGoldenClaimed:false
   };
