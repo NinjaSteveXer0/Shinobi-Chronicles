@@ -90,3 +90,5 @@ jobs:
           node tools/qa_kakashi_v2_route_matrix.js
           node --check tools/qa_kakashi_v2_assets.js
           node tools/qa_kakashi_v2_assets.js
+          node --check tools/qa_kakashi_v2_writing_authority.js
+          node tools/qa_kakashi_v2_writing_authority.js
