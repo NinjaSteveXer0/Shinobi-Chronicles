@@ -11,7 +11,7 @@ assert(API,'provider missing');
 assert.strictEqual(API.providerId,'ce.neutral_story_factual_resolver.v1');
 
 function req(bindingRef,id,extra={}){
-  return {bindingRef,storyDecisionReceiptId:`decision:${id}`,intentCommitRef:`intent:${id}`,actorRef:'academy_kakashi',attemptOrdinal:1,idempotenceKey:`idem:${id}`,...extra};
+  return {bindingRef,storyDecisionReceiptId:`decision:${id}`,intentCommitRef:`intent:${id}`,actorRef:'qa_actor',attemptOrdinal:1,idempotenceKey:`idem:${id}`,...extra};
 }
 
 assert(registerStoryFactualResolverBinding('qa.zero',{
